@@ -238,7 +238,7 @@ protected:
 	bool m_IsEncrypted;
 	
 	cAesCfb128Decryptor m_Decryptor;
-	cAesCfb128Decryptor m_Encryptor;
+	cAesCfb128Encryptor m_Encryptor;
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;

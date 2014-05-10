@@ -400,14 +400,14 @@ bool cPluginLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGri
 
 
 
-bool cPluginLua::OnDisconnect(cPlayer * a_Player, const AString & a_Reason)
+bool cPluginLua::OnDisconnect(cClientHandle & a_Client, const AString & a_Reason)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_DISCONNECT];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Reason, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Client, a_Reason, cLuaState::Return, res);
 		if (res)
 		{
 			return true;

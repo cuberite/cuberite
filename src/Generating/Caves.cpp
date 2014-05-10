@@ -35,13 +35,6 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 
 
-/// How many nests in each direction are generated for a given chunk. Must be an even number
-#define NEIGHBORHOOD_SIZE 8
-
-
-
-
-
 const int MIN_RADIUS = 3;
 const int MAX_RADIUS = 8;
 
@@ -122,26 +115,18 @@ typedef std::vector<cCaveTunnel *> cCaveTunnels;
 
 
 /// A collection of connected tunnels, possibly branching.
-class cStructGenWormNestCaves::cCaveSystem
+class cStructGenWormNestCaves::cCaveSystem :
+	public cGridStructGen::cStructure
 {
+	typedef cGridStructGen::cStructure super;
+
 public:
 	// The generating block position; is read directly in cStructGenWormNestCaves::GetCavesForChunk()
 	int m_BlockX;
 	int m_BlockZ;
 
-	cCaveSystem(int a_BlockX, int a_BlockZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
+	cCaveSystem(int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
 	~cCaveSystem();
-
-	/// Carves the cave system into the chunk specified
-	void ProcessChunk(
-		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,
-		cChunkDef::HeightMap & a_HeightMap
-	);
-
-	#ifdef _DEBUG
-	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
-	#endif  // _DEBUG
 
 protected:
 	int m_Size;
@@ -157,6 +142,9 @@ protected:
 
 	/// Returns a radius based on the location provided.
 	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
+
+	// cGridStructGen::cStructure overrides:
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -239,9 +227,15 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 
 bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst)
 {
+	if (a_Src.size() < 2)
+	{
+		// There are no midpoints, nothing to smooth
+		return true;
+	}
+
 	// Smoothing: for each line segment, add points on its 1/4 lengths
 	bool res = false;
-	int Num = a_Src.size() - 2;  // this many intermediary points
+	size_t Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
 	cCaveDefPoints::const_iterator itr = a_Src.begin() + 1;
@@ -251,7 +245,7 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 	int PrevY = Source.m_BlockY;
 	int PrevZ = Source.m_BlockZ;
 	int PrevR = Source.m_Radius;
-	for (int i = 0; i <= Num; ++i, ++itr)
+	for (size_t i = 0; i <= Num; ++i, ++itr)
 	{
 		int dx = itr->m_BlockX - PrevX;
 		int dy = itr->m_BlockY - PrevY;
@@ -580,17 +574,16 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves::cCaveSystem:
 
-cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_BlockX, int a_BlockZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
-	m_BlockX(a_BlockX),
-	m_BlockZ(a_BlockZ),
+cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
+	super(a_OriginX, a_OriginZ),
 	m_Size(a_Size)
 {
-	int Num = 1 + a_Noise.IntNoise2DInt(a_BlockX, a_BlockZ) % 3;
+	int Num = 1 + a_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) % 3;
 	for (int i = 0; i < Num; i++)
 	{
-		int OriginX = a_BlockX + (a_Noise.IntNoise3DInt(13 * a_BlockX, 17 * a_BlockZ, 11 * i) / 19) % a_MaxOffset;
-		int OriginZ = a_BlockZ + (a_Noise.IntNoise3DInt(17 * a_BlockX, 13 * a_BlockZ, 11 * i) / 23) % a_MaxOffset;
-		int OriginY  = 20 + (a_Noise.IntNoise3DInt(19 * a_BlockX, 13 * a_BlockZ, 11 * i) / 17) % 20;
+		int OriginX = a_OriginX + (a_Noise.IntNoise3DInt(13 * a_OriginX, 17 * a_OriginZ, 11 * i) / 19) % a_MaxOffset;
+		int OriginZ = a_OriginZ + (a_Noise.IntNoise3DInt(17 * a_OriginX, 13 * a_OriginZ, 11 * i) / 23) % a_MaxOffset;
+		int OriginY  = 20 + (a_Noise.IntNoise3DInt(19 * a_OriginX, 13 * a_OriginZ, 11 * i) / 17) % 20;
 
 		// Generate three branches from the origin point:
 		// The tunnels generated depend on X, Y, Z and Branches,
@@ -616,64 +609,17 @@ cStructGenWormNestCaves::cCaveSystem::~cCaveSystem()
 
 
 
-void cStructGenWormNestCaves::cCaveSystem::ProcessChunk(
-	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDef::HeightMap & a_HeightMap
-)
+void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 {
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
+	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
+	cChunkDef::HeightMap &  HeightMap  = a_ChunkDesc.GetHeightMap();
 	for (cCaveTunnels::const_iterator itr = m_Tunnels.begin(), end = m_Tunnels.end(); itr != end; ++itr)
 	{
-		(*itr)->ProcessChunk(a_ChunkX, a_ChunkZ, a_BlockTypes, a_HeightMap);
+		(*itr)->ProcessChunk(ChunkX, ChunkZ, BlockTypes, HeightMap);
 	}  // for itr - m_Tunnels[]
 }
-
-
-
-
-
-#ifdef _DEBUG
-AString cStructGenWormNestCaves::cCaveSystem::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const
-{
-	AString SVG;
-	SVG.reserve(512 * 1024);
-	for (cCaveTunnels::const_iterator itr = m_Tunnels.begin(), end = m_Tunnels.end(); itr != end; ++itr)
-	{
-		SVG.append((*itr)->ExportAsSVG(a_Color, a_OffsetX, a_OffsetZ));
-	}  // for itr - m_Tunnels[]
-
-	// Base point highlight:
-	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX - 5, a_OffsetZ + m_BlockZ, a_OffsetX + m_BlockX + 5, a_OffsetZ + m_BlockZ
-	);
-	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ - 5, a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ + 5
-	);
-
-	// A gray line from the base point to the first point of the ravine, for identification:
-	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ,
-		a_OffsetX + m_Tunnels.front()->m_Points.front().m_BlockX,
-		a_OffsetZ + m_Tunnels.front()->m_Points.front().m_BlockZ
-	);
-
-	// Offset guides:
-	if (a_OffsetX > 0)
-	{
-		AppendPrintf(SVG, "<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M %d,0 L %d,1024\"/>\n",
-			a_OffsetX, a_OffsetX
-		);
-	}
-	if (a_OffsetZ > 0)
-	{
-		AppendPrintf(SVG, "<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M 0,%d L 1024,%d\"/>\n",
-			a_OffsetZ, a_OffsetZ
-		);
-	}
-
-	return SVG;
-}
-#endif  // _DEBUG
 
 
 
@@ -744,142 +690,9 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves:
 
-cStructGenWormNestCaves::~cStructGenWormNestCaves()
+cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_OriginX, int a_OriginZ)
 {
-	ClearCache();
-}
-
-
-
-
-
-void cStructGenWormNestCaves::ClearCache(void)
-{
-	for (cCaveSystems::const_iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end; ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Cache[]
-	m_Cache.clear();
-}
-
-
-
-
-
-void cStructGenWormNestCaves::GenFinish(cChunkDesc & a_ChunkDesc)
-{
-	int ChunkX = a_ChunkDesc.GetChunkX();
-	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	cCaveSystems Caves;
-	GetCavesForChunk(ChunkX, ChunkZ, Caves);
-	for (cCaveSystems::const_iterator itr = Caves.begin(); itr != Caves.end(); ++itr)
-	{
-		(*itr)->ProcessChunk(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
-	}  // for itr - Caves[]
-}
-
-
-
-
-
-void cStructGenWormNestCaves::GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cStructGenWormNestCaves::cCaveSystems & a_Caves)
-{
-	int BaseX = a_ChunkX * cChunkDef::Width / m_Grid;
-	int BaseZ = a_ChunkZ * cChunkDef::Width / m_Grid;
-	if (BaseX < 0)
-	{
-		--BaseX;
-	}
-	if (BaseZ < 0)
-	{
-		--BaseZ;
-	}
-	BaseX -= NEIGHBORHOOD_SIZE / 2;
-	BaseZ -= NEIGHBORHOOD_SIZE / 2;
-
-	// Walk the cache, move each cave system that we want into a_Caves:
-	int StartX = BaseX * m_Grid;
-	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_Grid;
-	int StartZ = BaseZ * m_Grid;
-	int EndZ = (BaseZ + NEIGHBORHOOD_SIZE + 1) * m_Grid;
-	for (cCaveSystems::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
-	{
-		if (
-			((*itr)->m_BlockX >= StartX) && ((*itr)->m_BlockX < EndX) &&
-			((*itr)->m_BlockZ >= StartZ) && ((*itr)->m_BlockZ < EndZ)
-		)
-		{
-			// want
-			a_Caves.push_back(*itr);
-			itr = m_Cache.erase(itr);
-		}
-		else
-		{
-			// don't want
-			++itr;
-		}
-	}  // for itr - m_Cache[]
-
-	for (int x = 0; x < NEIGHBORHOOD_SIZE; x++)
-	{
-		int RealX = (BaseX + x) * m_Grid;
-		for (int z = 0; z < NEIGHBORHOOD_SIZE; z++)
-		{
-			int RealZ = (BaseZ + z) * m_Grid;
-			bool Found = false;
-			for (cCaveSystems::const_iterator itr = a_Caves.begin(), end = a_Caves.end(); itr != end; ++itr)
-			{
-				if (((*itr)->m_BlockX == RealX) && ((*itr)->m_BlockZ == RealZ))
-				{
-					Found = true;
-					break;
-				}
-			}
-			if (!Found)
-			{
-				a_Caves.push_back(new cCaveSystem(RealX, RealZ, m_MaxOffset, m_Size, m_Noise));
-			}
-		}
-	}
-
-	// Copy a_Caves into m_Cache to the beginning:
-	cCaveSystems CavesCopy(a_Caves);
-	m_Cache.splice(m_Cache.begin(), CavesCopy, CavesCopy.begin(), CavesCopy.end());
-
-	// Trim the cache if it's too long:
-	if (m_Cache.size() > 100)
-	{
-		cCaveSystems::iterator itr = m_Cache.begin();
-		std::advance(itr, 100);
-		for (cCaveSystems::iterator end = m_Cache.end(); itr != end; ++itr)
-		{
-			delete *itr;
-		}
-		itr = m_Cache.begin();
-		std::advance(itr, 100);
-		m_Cache.erase(itr, m_Cache.end());
-	}
-
-	/*
-	// Uncomment this block for debugging the caves' shapes in 2D using an SVG export
-	#ifdef _DEBUG
-	AString SVG;
-	SVG.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1024\" height = \"1024\">\n");
-	SVG.reserve(2 * 1024 * 1024);
-	for (cCaveSystems::const_iterator itr = a_Caves.begin(), end = a_Caves.end(); itr != end; ++itr)
-	{
-		int Color = 0x10 * abs((*itr)->m_BlockX / m_Grid);
-		Color |= 0x1000 * abs((*itr)->m_BlockZ / m_Grid);
-		SVG.append((*itr)->ExportAsSVG(Color, 512, 512));
-	}
-	SVG.append("</svg>\n");
-
-	AString fnam;
-	Printf(fnam, "wnc\\%03d_%03d.svg", a_ChunkX, a_ChunkZ);
-	cFile File(fnam, cFile::fmWrite);
-	File.Write(SVG.c_str(), SVG.size());
-	#endif  // _DEBUG
-	//*/
+	return cStructurePtr(new cCaveSystem(a_OriginX, a_OriginZ, m_MaxOffset, m_Size, m_Noise));
 }
 
 

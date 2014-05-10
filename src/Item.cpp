@@ -151,6 +151,8 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 			a_OutValue["Colours"] = m_FireworkItem.ColoursToString(m_FireworkItem);
 			a_OutValue["FadeColours"] = m_FireworkItem.FadeColoursToString(m_FireworkItem);
 		}
+
+		a_OutValue["RepairCost"] = m_RepairCost;
 	}
 }
 
@@ -179,6 +181,8 @@ void cItem::FromJson(const Json::Value & a_Value)
 			m_FireworkItem.ColoursFromString(a_Value.get("Colours", "").asString(), m_FireworkItem);
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
 		}
+
+		m_RepairCost = a_Value.get("RepairCost", 0).asInt();
 	}
 }
 

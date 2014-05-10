@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "ComposableGenerator.h"
+#include "GridStructGen.h"
 #include "../Noise.h"
 
 
@@ -64,10 +64,12 @@ protected:
 
 
 class cStructGenWormNestCaves :
-	public cFinishGen
+	public cGridStructGen
 {
+	typedef cGridStructGen super;
 public:
 	cStructGenWormNestCaves(int a_Seed, int a_Size = 64, int a_Grid = 96, int a_MaxOffset = 128) :
+		super(a_Seed, a_Grid, a_Grid, a_Size + a_MaxOffset, a_Size + a_MaxOffset, 100),
 		m_Noise(a_Seed),
 		m_Size(a_Size),
 		m_MaxOffset(a_MaxOffset),
@@ -75,26 +77,16 @@ public:
 	{
 	}
 	
-	~cStructGenWormNestCaves();
-	
 protected:
 	class cCaveSystem;  // fwd: Caves.cpp
-	typedef std::list<cCaveSystem *> cCaveSystems;
 
 	cNoise       m_Noise;
 	int          m_Size;  // relative size of the cave systems' caves. Average number of blocks of each initial tunnel
 	int          m_MaxOffset;  // maximum offset of the cave nest origin from the grid cell the nest belongs to
 	int          m_Grid;  // average spacing of the nests
-	cCaveSystems m_Cache;
-	
-	/// Clears everything from the cache
-	void ClearCache(void);
-	
-	/// Returns all caves that *may* intersect the given chunk. All the caves are valid until the next call to this function.
-	void GetCavesForChunk(int a_ChunkX, int a_ChunkZ, cCaveSystems & a_Caves);
-	
-	// cStructGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+	// cGridStructGen override:
+	virtual cStructurePtr CreateStructure(int a_OriginX, int a_OriginZ) override;
 } ;
 
 

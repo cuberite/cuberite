@@ -28,14 +28,18 @@ public:
 
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
+		Vector3d Pos = a_Player->GetThrowStartPos();
+		Vector3d Speed = a_Player->GetLookVector() * m_SpeedCoeff;
+
+		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, a_Player->GetEquippedItem(), &Speed) < 0)
+		{
+			return false;
+		}
+
 		if (!a_Player->IsGameModeCreative())
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
-
-		Vector3d Pos = a_Player->GetThrowStartPos();
-		Vector3d Speed = a_Player->GetLookVector() * m_SpeedCoeff;
-		a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, a_Player->GetEquippedItem(), &Speed);
 
 		return true;
 	}
@@ -127,7 +131,10 @@ public:
 			return false;
 		}
 
-		a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, a_Player->GetEquippedItem());
+		if (a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, a_Player->GetEquippedItem()) < 0)
+		{
+			return false;
+		}
 
 		if (!a_Player->IsGameModeCreative())
 		{

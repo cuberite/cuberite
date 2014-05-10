@@ -181,7 +181,7 @@ public:
 
 	// tolua_end
 
-	unsigned int GetNumDecorators(void) const;
+	size_t GetNumDecorators(void) const;
 
 	const cColorList & GetData(void) const { return m_Data; }
 

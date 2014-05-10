@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../Inventory.h"
+#include "Window.h"
 
 
 
@@ -253,6 +254,43 @@ protected:
 	
 	/// Retrieves the recipe for the specified player from the map, or creates one if not found
 	cCraftingRecipe & GetRecipeForPlayer(cPlayer & a_Player);
+} ;
+
+
+
+
+
+class cSlotAreaAnvil :
+	public cSlotAreaTemporary
+{
+	typedef cSlotAreaTemporary super;
+
+public:
+	cSlotAreaAnvil(cAnvilWindow & a_ParentWindow);
+
+	// cSlotArea overrides:
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
+	// cSlotAreaTemporary overrides:
+	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+
+	/** Can the player take the item from the slot? */
+	bool CanTakeResultItem(cPlayer & a_Player);
+
+	/** This function will call, when the player take the item from the slot. */
+	void OnTakeResult(cPlayer & a_Player);
+
+	/** Handles a click in the item slot. */
+	void UpdateResult(cPlayer & a_Player);
+
+protected:
+	/** The maximum cost of repairing/renaming in the anvil. */
+	int m_MaximumCost;
+
+	/** The stack size of the second item where was used for repair */
+	char m_StackSizeToBeUsedInRepair;
 } ;
 
 

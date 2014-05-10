@@ -143,13 +143,14 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 		}
 	}
 
-	if (GetNumPlugins() == 0)
+	size_t NumLoadedPlugins = GetNumPlugins();
+	if (NumLoadedPlugins == 0)
 	{
 		LOG("-- No Plugins Loaded --");
 	}
-	else if (GetNumPlugins() > 1)
+	else if (NumLoadedPlugins > 1)
 	{
-		LOG("-- Loaded %i Plugins --", GetNumPlugins());
+		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
 	}
 	else
 	{
@@ -442,7 +443,7 @@ bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cC
 
 
 
-bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Reason)
+bool cPluginManager::CallHookDisconnect(cClientHandle & a_Client, const AString & a_Reason)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_DISCONNECT);
 	if (Plugins == m_Hooks.end())
@@ -451,7 +452,7 @@ bool cPluginManager::CallHookDisconnect(cPlayer * a_Player, const AString & a_Re
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnDisconnect(a_Player, a_Reason))
+		if ((*itr)->OnDisconnect(a_Client, a_Reason))
 		{
 			return true;
 		}
@@ -1869,7 +1870,7 @@ void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 
 
 
-unsigned int cPluginManager::GetNumPlugins() const
+size_t cPluginManager::GetNumPlugins() const
 {
 	return m_Plugins.size();
 }

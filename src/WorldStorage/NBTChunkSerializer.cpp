@@ -88,23 +88,48 @@ void cNBTChunkSerializer::Finish(void)
 void cNBTChunkSerializer::AddItem(const cItem & a_Item, int a_Slot, const AString & a_CompoundName)
 {
 	m_Writer.BeginCompound(a_CompoundName);
-	m_Writer.AddShort("id",     (short)(a_Item.m_ItemType));
-	m_Writer.AddShort("Damage", a_Item.m_ItemDamage);
-	m_Writer.AddByte ("Count",  a_Item.m_ItemCount);
+	m_Writer.AddShort("id",         (short)(a_Item.m_ItemType));
+	m_Writer.AddShort("Damage",     a_Item.m_ItemDamage);
+	m_Writer.AddByte ("Count",      a_Item.m_ItemCount);
 	if (a_Slot >= 0)
 	{
 		m_Writer.AddByte ("Slot", (unsigned char)a_Slot);
 	}
 	
-	// Write the enchantments:
-	if (!a_Item.m_Enchantments.IsEmpty() || ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)))
+	// Write the tag compound (for enchantment, firework, custom name and repair cost):
+	if (
+		(!a_Item.m_Enchantments.IsEmpty()) ||
+		((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) ||
+		(a_Item.m_RepairCost > 0) ||
+		(a_Item.m_CustomName != "") ||
+		(a_Item.m_Lore != "")
+	)
 	{
 		m_Writer.BeginCompound("tag");
+			if (a_Item.m_RepairCost > 0)
+			{
+				m_Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+			}
+
+			if ((a_Item.m_CustomName != "") || (a_Item.m_Lore != ""))
+			{
+				m_Writer.BeginCompound("display");
+				if (a_Item.m_CustomName != "")
+				{
+					m_Writer.AddString("Name", a_Item.m_CustomName);
+				}
+				if (a_Item.m_Lore != "")
+				{
+					m_Writer.AddString("Lore", a_Item.m_Lore);
+				}
+				m_Writer.EndCompound();
+			}
+
 			if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
 			{
 				cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, m_Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
 			}
-			
+
 			if (!a_Item.m_Enchantments.IsEmpty())
 			{
 				const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
@@ -490,7 +515,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case cMonster::mtMagmaCube:
 			{
-				m_Writer.AddByte("Size", ((const cMagmaCube *)a_Monster)->GetSize());
+				m_Writer.AddInt("Size", ((const cMagmaCube *)a_Monster)->GetSize());
 				break;
 			}
 			case cMonster::mtSheep:

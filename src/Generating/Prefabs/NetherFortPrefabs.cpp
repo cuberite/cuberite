@@ -134,7 +134,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 12, 2, 2: 5\n"  /* Type 1, direction X+ */
-		"1: 0, 2, 2: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 2, 2: 4\n"  /* Type 1, direction X- */
+		"-1: 12, 2, 2: 5\n"  /* Type -1, direction X+ */
+		"-1: 0, 2, 2: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -143,7 +145,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		20,
@@ -291,7 +293,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Connectors:
 		"1: 12, 2, 4: 5\n"  /* Type 1, direction X+ */
 		"1: 6, 2, 0: 2\n"  /* Type 1, direction Z- */
-		"1: 0, 2, 4: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 2, 4: 4\n"  /* Type 1, direction X- */
+		"-1: 12, 2, 4: 5\n"  /* Type -1, direction X+ */
+		"-1: 6, 2, 0: 2\n"  /* Type -1, direction Z- */
+		"-1: 0, 2, 4: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -300,7 +305,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		20,
@@ -420,7 +425,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -590,7 +595,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -790,7 +795,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		5,
@@ -991,7 +996,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		10,
@@ -1085,7 +1090,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -1185,7 +1190,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -1208,7 +1213,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		4, 6, 15,  // MaxX, MaxY, MaxZ
+		4, 16, 15,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1364,7 +1369,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		10,
@@ -1604,7 +1609,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		5,
@@ -1933,7 +1938,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		20,
@@ -2052,7 +2057,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		500,
@@ -2212,7 +2217,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		10,
@@ -2302,7 +2307,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 10, 1, 2: 5\n"  /* Type 1, direction X+ */
-		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
+		"-1: 10, 1, 2: 5\n"  /* Type -1, direction X+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -2311,7 +2318,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		300,
@@ -2401,7 +2408,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 12, 1, 2: 5\n"  /* Type 1, direction X+ */
-		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
+		"-1: 12, 1, 2: 5\n"  /* Type -1, direction X+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -2410,7 +2419,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		300,
@@ -2494,7 +2503,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 4, 1, 2: 5\n"  /* Type 1, direction X+ */
-		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
+		"-1: 4, 1, 2: 5\n"  /* Type -1, direction X+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -2503,7 +2514,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		500,
@@ -2631,7 +2642,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 2, 1, 10: 3\n"  /* Type 1, direction Z+ */
-		"1: 10, 1, 2: 5\n"  /* Type 1, direction X+ */,
+		"1: 10, 1, 2: 5\n"  /* Type 1, direction X+ */
+		"-1: 2, 1, 10: 3\n"  /* Type -1, direction Z+ */
+		"-1: 10, 1, 2: 5\n"  /* Type -1, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -2640,7 +2653,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -2769,7 +2782,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 10, 1, 2: 5\n"  /* Type 1, direction X+ */
-		"1: 2, 1, 10: 3\n"  /* Type 1, direction Z+ */,
+		"1: 2, 1, 10: 3\n"  /* Type 1, direction Z+ */
+		"-1: 2, 1, 10: 3\n"  /* Type -1, direction Z+ */
+		"-1: 10, 1, 2: 5\n"  /* Type -1, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -2778,7 +2793,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -2890,7 +2905,11 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 8, 1, 4: 5\n"  /* Type 1, direction X+ */
 		"1: 4, 1, 0: 2\n"  /* Type 1, direction Z- */
 		"1: 4, 1, 8: 3\n"  /* Type 1, direction Z+ */
-		"1: 0, 1, 4: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 4: 4\n"  /* Type 1, direction X- */
+		"-1: 8, 1, 4: 5\n"  /* Type -1, direction X+ */
+		"-1: 4, 1, 8: 3\n"  /* Type -1, direction Z+ */
+		"-1: 0, 1, 4: 4\n"  /* Type -1, direction X- */
+		"-1: 4, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -2899,7 +2918,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -3040,7 +3059,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
-		"1: 8, 8, 2: 5\n"  /* Type 1, direction X+ */,
+		"1: 8, 8, 2: 5\n"  /* Type 1, direction X+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */
+		"-1: 8, 8, 2: 5\n"  /* Type -1, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -3049,7 +3070,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		1000,
@@ -3139,7 +3160,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
-		"1: 13, 1, 2: 5\n"  /* Type 1, direction X+ */,
+		"1: 13, 1, 2: 5\n"  /* Type 1, direction X+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */
+		"-1: 13, 1, 2: 5\n"  /* Type -1, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -3148,7 +3171,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -3393,7 +3416,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Connectors:
 		"1: 0, 6, 7: 4\n"  /* Type 1, direction X- */
 		"1: 9, 1, 14: 3\n"  /* Type 1, direction Z+ */
-		"1: 9, 1, 0: 2\n"  /* Type 1, direction Z- */,
+		"1: 9, 1, 0: 2\n"  /* Type 1, direction Z- */
+		"-1: 0, 6, 7: 4\n"  /* Type -1, direction X- */
+		"-1: 9, 1, 14: 3\n"  /* Type -1, direction Z+ */
+		"-1: 9, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -3402,7 +3428,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		10,
@@ -3722,7 +3748,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 11, 1, 7: 5\n"  /* Type 1, direction X+ */
-		"1: 0, 9, 7: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 9, 7: 4\n"  /* Type 1, direction X- */
+		"-1: 11, 1, 7: 5\n"  /* Type -1, direction X+ */
+		"-1: 0, 9, 7: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -3731,7 +3759,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		10,
@@ -4009,7 +4037,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		10,
@@ -4186,7 +4214,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 12, 1, 6: 5\n"  /* Type 1, direction X+ */
-		"1: 0, 1, 6: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 6: 4\n"  /* Type 1, direction X- */
+		"-1: 12, 1, 6: 5\n"  /* Type -1, direction X+ */
+		"-1: 0, 1, 6: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -4195,7 +4225,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4338,7 +4368,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4481,7 +4511,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4586,7 +4616,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Connectors:
 		"1: 0, 1, 4: 4\n"  /* Type 1, direction X- */
 		"1: 6, 1, 0: 2\n"  /* Type 1, direction Z- */
-		"1: 12, 1, 4: 5\n"  /* Type 1, direction X+ */,
+		"1: 12, 1, 4: 5\n"  /* Type 1, direction X+ */
+		"-1: 0, 1, 4: 4\n"  /* Type -1, direction X- */
+		"-1: 12, 1, 4: 5\n"  /* Type -1, direction X+ */
+		"-1: 6, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -4595,7 +4628,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4712,7 +4745,10 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		// Connectors:
 		"1: 0, 1, 6: 4\n"  /* Type 1, direction X- */
 		"1: 6, 1, 0: 2\n"  /* Type 1, direction Z- */
-		"1: 12, 1, 6: 5\n"  /* Type 1, direction X+ */,
+		"1: 12, 1, 6: 5\n"  /* Type 1, direction X+ */
+		"-1: 0, 1, 6: 4\n"  /* Type -1, direction X- */
+		"-1: 6, 1, 0: 2\n"  /* Type -1, direction Z- */
+		"-1: 12, 1, 6: 5\n"  /* Type -1, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -4721,7 +4757,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4806,7 +4842,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 2, 1, 4: 3\n"  /* Type 1, direction Z+ */
-		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
+		"-1: 2, 1, 4: 3\n"  /* Type -1, direction Z+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -4815,7 +4853,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4901,7 +4939,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// Connectors:
 		"1: 2, 1, 4: 3\n"  /* Type 1, direction Z+ */
-		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */,
+		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
+		"-1: 2, 1, 4: 3\n"  /* Type -1, direction Z+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -4910,7 +4950,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -4996,7 +5036,11 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		"1: 4, 1, 2: 5\n"  /* Type 1, direction X+ */
 		"1: 2, 1, 4: 3\n"  /* Type 1, direction Z+ */
 		"1: 0, 1, 2: 4\n"  /* Type 1, direction X- */
-		"1: 2, 1, 0: 2\n"  /* Type 1, direction Z- */,
+		"1: 2, 1, 0: 2\n"  /* Type 1, direction Z- */
+		"-1: 4, 1, 2: 5\n"  /* Type -1, direction X+ */
+		"-1: 2, 1, 4: 3\n"  /* Type -1, direction Z+ */
+		"-1: 0, 1, 2: 4\n"  /* Type -1, direction X- */
+		"-1: 2, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -5005,7 +5049,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -5120,7 +5164,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,
@@ -5314,7 +5358,8 @@ const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 
 		// Connectors:
 		"0: 6, 1, 0: 2\n"  /* Type 0, direction Z- */
-		"1: 6, 1, 12: 3\n"  /* Type 1, direction Z+ */,
+		"1: 6, 1, 12: 3\n"  /* Type 1, direction Z+ */
+		"-1: 6, 1, 12: 3\n"  /* Type -1, direction Z+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -5323,7 +5368,7 @@ const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 		cBlockArea::msSpongePrint,
 
 		// ShouldExtendFloor:
-		false,
+		true,
 
 		// DefaultWeight:
 		100,

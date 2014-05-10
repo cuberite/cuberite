@@ -119,7 +119,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	if (SpreadFurther && (NewMeta < 8))
 	{
 		// Spread to the neighbors:
-		Spread(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
+		SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
 	}
 	
 	// Mark as processed:
@@ -130,7 +130,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 
 
 
-void cFloodyFluidSimulator::Spread(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
+void cFloodyFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
 {
 	SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     a_NewMeta);
 	SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     a_NewMeta);

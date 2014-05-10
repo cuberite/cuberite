@@ -202,7 +202,7 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 {
 	switch (a_ChatPrefix)
 	{
-		case mtCustom:      return AString();
+		case mtCustom:      return "";
 		case mtFailure:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Rose,   cChatColor::White);
 		case mtInformation: return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Yellow, cChatColor::White);
 		case mtSuccess:     return FormatChatPrefix(ShouldAppendChatPrefixes, "INFO",  cChatColor::Green,  cChatColor::White);
@@ -224,7 +224,7 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		}
 	}
 	ASSERT(!"Unhandled chat prefix type!");
-	return AString();
+	return "";
 }
 
 
@@ -633,6 +633,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
 	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
+	}
 	else if (a_Channel == "REGISTER")
 	{
 		if (HasPluginChannel(a_Channel))
@@ -767,6 +771,29 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Leng
 	else
 	{
 		SendChat("Command blocks are not enabled on this server", mtFailure);
+	}
+}
+
+
+
+
+
+void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
+{
+	if (a_Length < 1)
+	{
+		return;
+	}
+
+	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
+	{
+		return;
+	}
+
+	AString Name(a_Data, a_Length);
+	if (Name.length() <= 30)
+	{
+		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(Name, m_Player);
 	}
 }
 
@@ -1510,7 +1537,7 @@ void cClientHandle::HandleDisconnect(const AString & a_Reason)
 {
 	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
 
-	cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, a_Reason);
+	cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, a_Reason);
 
 	m_HasSentDC = true;
 	Destroy();
@@ -2690,9 +2717,9 @@ void cClientHandle::SocketClosed(void)
 	
 	LOGD("Player %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 
-	if (m_Username != "") // Ignore client pings
+	if (!m_Username.empty())  // Ignore client pings
 	{
-		cRoot::Get()->GetPluginManager()->CallHookDisconnect(m_Player, "Player disconnected");
+		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
 
 	Destroy();

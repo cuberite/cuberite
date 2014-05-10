@@ -423,9 +423,6 @@ protected:
 	/** Number of ticks remaining for the foodpoisoning effect; zero if not foodpoisoned */
 	int m_FoodPoisonedTicksRemaining;
 	
-	/** Last position that has been recorded for food-related processing: */
-	Vector3d m_LastFoodPos;
-	
 	float m_LastJumpHeight;
 	float m_LastGroundHeight;
 	bool m_bTouchGround;

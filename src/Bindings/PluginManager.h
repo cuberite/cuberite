@@ -159,7 +159,7 @@ public:																	// tolua_export
 	/** Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
 
-	unsigned int GetNumPlugins() const;  // tolua_export
+	size_t GetNumPlugins() const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
@@ -172,7 +172,7 @@ public:																	// tolua_export
 	bool CallHookChunkUnloading           (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookCollectingPickup         (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	bool CallHookDisconnect               (cPlayer * a_Player, const AString & a_Reason);
+	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);

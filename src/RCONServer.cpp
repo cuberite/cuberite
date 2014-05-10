@@ -59,7 +59,7 @@ public:
 	
 	virtual void Finished(void) override
 	{
-		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, m_Buffer.size(), m_Buffer.c_str());
+		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, (int)m_Buffer.size(), m_Buffer.c_str());
 		delete this;
 	}
 	

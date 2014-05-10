@@ -591,7 +591,7 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 	
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	int ToEachSlot = (int)ToDistribute.m_ItemCount / SlotNums.size();
+	int ToEachSlot = (int)ToDistribute.m_ItemCount / (int)SlotNums.size();
 	
 	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 	
@@ -798,6 +798,51 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 	m_SlotAreas.push_back(new cSlotAreaCrafting(3, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cAnvilWindow:
+
+cAnvilWindow::cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+	cWindow(wtAnvil, "Repair"),
+	m_RepairedItemName(""),
+	m_BlockX(a_BlockX),
+	m_BlockY(a_BlockY),
+	m_BlockZ(a_BlockZ)
+{
+	m_AnvilSlotArea = new cSlotAreaAnvil(*this);
+	m_SlotAreas.push_back(m_AnvilSlotArea);
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cAnvilWindow::SetRepairedItemName(const AString & a_Name, cPlayer * a_Player)
+{
+	m_RepairedItemName = a_Name;
+
+	if (a_Player != NULL)
+	{
+		m_AnvilSlotArea->UpdateResult(*a_Player);
+	}
+}
+
+
+
+
+
+void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
+{
+	a_PosX = m_BlockX;
+	a_PosY = m_BlockY;
+	a_PosZ = m_BlockZ;
 }
 
 

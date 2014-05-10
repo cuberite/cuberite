@@ -24,6 +24,7 @@ class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
 class cSlotArea;
+class cSlotAreaAnvil;
 class cWorld;
 
 typedef std::list<cPlayer *> cPlayerList;
@@ -231,6 +232,32 @@ public:
 
 
 
+class cAnvilWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Gets the repaired item name. */
+	AString GetRepairedItemName(void) const { return m_RepairedItemName; }
+
+	/** Set the repaired item name. */
+	void SetRepairedItemName(const AString & a_Name, cPlayer * a_Player);
+
+	/** Gets the Position from the Anvil */
+	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
+
+protected:
+	cSlotAreaAnvil * m_AnvilSlotArea;
+	AString m_RepairedItemName;
+	int m_BlockX, m_BlockY, m_BlockZ;
+} ;
+
+
+
+
+
 class cEnchantingWindow :
 	public cWindow
 {
@@ -243,7 +270,7 @@ public:
 	/** Return the Value of a Property */
 	int GetPropertyValue(int a_Property);
 
-	/** Set the Position Values to the Position of the Enchantment Table */
+	/** Get the Position from the Enchantment Table */
 	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
 
 	cSlotArea * m_SlotArea;

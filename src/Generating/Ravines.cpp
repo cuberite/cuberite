@@ -9,9 +9,6 @@
 
 
 
-/// How many ravines in each direction are generated for a given chunk. Must be an even number
-static const int NEIGHBORHOOD_SIZE = 8;
-
 static const int NUM_RAVINE_POINTS = 4;
 
 
@@ -42,40 +39,38 @@ typedef std::vector<cRavDefPoint> cRavDefPoints;
 
 
 
-class cStructGenRavines::cRavine
+class cStructGenRavines::cRavine :
+	public cGridStructGen::cStructure
 {
+	typedef cGridStructGen::cStructure super;
+
 	cRavDefPoints m_Points;
+
 	
-	/// Generates the shaping defpoints for the ravine, based on the ravine block coords and noise
+	/** Generates the shaping defpoints for the ravine, based on the ravine block coords and noise */
 	void GenerateBaseDefPoints(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise);
 	
-	/// Refines (adds and smooths) defpoints from a_Src into a_Dst
+	/** Refines (adds and smooths) defpoints from a_Src into a_Dst */
 	void RefineDefPoints(const cRavDefPoints & a_Src, cRavDefPoints & a_Dst);
 	
-	/// Does one round of smoothing, two passes of RefineDefPoints()
+	/** Does one round of smoothing, two passes of RefineDefPoints() */
 	void Smooth(void);
 	
-	/// Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block
+	/** Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block */
 	void FinishLinear(void);
 	
 public:
-	// Coords for which the ravine was generated (not necessarily the center)
-	int m_BlockX;
-	int m_BlockZ;
 	
 	cRavine(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise);
-	
-	/// Carves the ravine into the chunk specified
-	void ProcessChunk(
-		int a_ChunkX, int a_ChunkZ, 
-		cChunkDef::BlockTypes & a_BlockTypes, 
-		cChunkDef::HeightMap & a_HeightMap
-	);
 	
 	#ifdef _DEBUG
 	/// Exports itself as a SVG line definition
 	AString ExportAsSVG(int a_Color, int a_OffsetX = 0, int a_OffsetZ = 0) const;
 	#endif  // _DEBUG
+
+protected:
+	// cGridStructGen::cStructure overrides:
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -86,6 +81,7 @@ public:
 // cStructGenRavines:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
+	super(a_Seed, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
 	m_Noise(a_Seed),
 	m_Size(a_Size)
 {
@@ -95,139 +91,9 @@ cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
 
 
 
-cStructGenRavines::~cStructGenRavines()
+cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_OriginX, int a_OriginZ)
 {
-	ClearCache();
-}
-
-
-
-
-
-void cStructGenRavines::ClearCache(void)
-{
-	for (cRavines::const_iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end; ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_Cache[]
-	m_Cache.clear();
-}
-
-
-
-
-
-void cStructGenRavines::GenFinish(cChunkDesc & a_ChunkDesc)
-{
-	int ChunkX = a_ChunkDesc.GetChunkX();
-	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	cRavines Ravines;
-	GetRavinesForChunk(ChunkX, ChunkZ, Ravines);
-	for (cRavines::const_iterator itr = Ravines.begin(), end = Ravines.end(); itr != end; ++itr)
-	{
-		(*itr)->ProcessChunk(ChunkX, ChunkZ, a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
-	}  // for itr - Ravines[]
-}
-
-
-
-
-
-void cStructGenRavines::GetRavinesForChunk(int a_ChunkX, int a_ChunkZ, cStructGenRavines::cRavines & a_Ravines)
-{
-	int BaseX = a_ChunkX * cChunkDef::Width / m_Size;
-	int BaseZ = a_ChunkZ * cChunkDef::Width / m_Size;
-	if (BaseX < 0)
-	{
-		--BaseX;
-	}
-	if (BaseZ < 0)
-	{
-		--BaseZ;
-	}
-	BaseX -= 4;
-	BaseZ -= 4;
-	
-	// Walk the cache, move each ravine that we want into a_Ravines:
-	int StartX = BaseX * m_Size;
-	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_Size;
-	int StartZ = BaseZ * m_Size;
-	int EndZ = (BaseZ + NEIGHBORHOOD_SIZE + 1) * m_Size;
-	for (cRavines::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
-	{
-		if (
-			((*itr)->m_BlockX >= StartX) && ((*itr)->m_BlockX < EndX) &&
-			((*itr)->m_BlockZ >= StartZ) && ((*itr)->m_BlockZ < EndZ)
-		)
-		{
-			// want
-			a_Ravines.push_back(*itr);
-			itr = m_Cache.erase(itr);
-		}
-		else
-		{
-			// don't want
-			++itr;
-		}
-	}  // for itr - m_Cache[]
-	
-	for (int x = 0; x < NEIGHBORHOOD_SIZE; x++)
-	{
-		int RealX = (BaseX + x) * m_Size;
-		for (int z = 0; z < NEIGHBORHOOD_SIZE; z++)
-		{
-			int RealZ = (BaseZ + z) * m_Size;
-			bool Found = false;
-			for (cRavines::const_iterator itr = a_Ravines.begin(), end = a_Ravines.end(); itr != end; ++itr)
-			{
-				if (((*itr)->m_BlockX == RealX) && ((*itr)->m_BlockZ == RealZ))
-				{
-					Found = true;
-					break;
-				}
-			}
-			if (!Found)
-			{
-				a_Ravines.push_back(new cRavine(RealX, RealZ, m_Size, m_Noise));
-			}
-		}
-	}
-	
-	// Copy a_Ravines into m_Cache to the beginning:
-	cRavines RavinesCopy(a_Ravines);
-	m_Cache.splice(m_Cache.begin(), RavinesCopy, RavinesCopy.begin(), RavinesCopy.end());
-	
-	// Trim the cache if it's too long:
-	if (m_Cache.size() > 100)
-	{
-		cRavines::iterator itr = m_Cache.begin();
-		std::advance(itr, 100);
-		for (cRavines::iterator end = m_Cache.end(); itr != end; ++itr)
-		{
-			delete *itr;
-		}
-		itr = m_Cache.begin();
-		std::advance(itr, 100);
-		m_Cache.erase(itr, m_Cache.end());
-	}
-	
-	/*
-	#ifdef _DEBUG
-	// DEBUG: Export as SVG into a file specific for the chunk, for visual verification:
-	AString SVG;
-	SVG.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1024\" height = \"1024\">\n");
-	for (cRavines::const_iterator itr = a_Ravines.begin(), end = a_Ravines.end(); itr != end; ++itr)
-	{
-		SVG.append((*itr)->ExportAsSVG(0, 512, 512));
-	}
-	SVG.append("</svg>\n");
-	
-	AString fnam;
-	Printf(fnam, "ravines\\%03d_%03d.svg", a_ChunkX, a_ChunkZ);
-	cFile File(fnam, cFile::fmWrite);
-	File.Write(SVG.c_str(), SVG.size());
-	#endif  // _DEBUG
-	//*/
+	return cStructurePtr(new cRavine(a_OriginX, a_OriginZ, m_Size, m_Noise));
 }
 
 
@@ -238,14 +104,13 @@ void cStructGenRavines::GetRavinesForChunk(int a_ChunkX, int a_ChunkZ, cStructGe
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines::cRavine
 
-cStructGenRavines::cRavine::cRavine(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise) :
-	m_BlockX(a_BlockX),
-	m_BlockZ(a_BlockZ)
+cStructGenRavines::cRavine::cRavine(int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise) :
+	super(a_OriginX, a_OriginZ)
 {
 	// Calculate the ravine shape-defining points:
-	GenerateBaseDefPoints(a_BlockX, a_BlockZ, a_Size, a_Noise);
+	GenerateBaseDefPoints(a_OriginX, a_OriginZ, a_Size, a_Noise);
 	
-	// Smooth the ravine. A two passes are needed:
+	// Smooth the ravine. Two passes are needed:
 	Smooth();
 	Smooth();
 	
@@ -263,8 +128,8 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 	a_Size = (512 + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 11 * a_BlockZ, a_BlockX + a_BlockZ) / 17) % 512)) * a_Size / 1024;
 	
 	// The complete offset of the ravine from its cellpoint, up to 2 * a_Size in each direction
-	int OffsetX = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 0)    / 9) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * m_BlockZ, 1000) / 7) % (2 * a_Size)) - 2 * a_Size) / 2;
-	int OffsetZ = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 2000) / 7) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * m_BlockZ, 3000) / 9) % (2 * a_Size)) - 2 * a_Size) / 2;
+	int OffsetX = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 0)    / 9) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 1000) / 7) % (2 * a_Size)) - 2 * a_Size) / 2;
+	int OffsetZ = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 2000) / 7) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 3000) / 9) % (2 * a_Size)) - 2 * a_Size) / 2;
 	int CenterX = a_BlockX + OffsetX;
 	int CenterZ = a_BlockZ + OffsetZ;
 	
@@ -306,8 +171,14 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 
 void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cRavDefPoints & a_Dst)
 {
+	if (a_Src.size() < 2)
+	{
+		// No midpoints, nothing to refine
+		return;
+	}
+
 	// Smoothing: for each line segment, add points on its 1/4 lengths
-	int Num = a_Src.size() - 2;  // this many intermediary points
+	size_t Num = a_Src.size() - 2;  // this many intermediary points
 	a_Dst.clear();
 	a_Dst.reserve(Num * 2 + 2);
 	cRavDefPoints::const_iterator itr = a_Src.begin() + 1;
@@ -318,7 +189,7 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 	int PrevR = Source.m_Radius;
 	int PrevT = Source.m_Top;
 	int PrevB = Source.m_Bottom;
-	for (int i = 0; i <= Num; ++i, ++itr)
+	for (size_t i = 0; i <= Num; ++i, ++itr)
 	{
 		int dx = itr->m_BlockX - PrevX;
 		int dz = itr->m_BlockZ - PrevZ;
@@ -423,15 +294,15 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
   
   // Base point highlight:
   AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX - 5, a_OffsetZ + m_BlockZ, a_OffsetX + m_BlockX + 5, a_OffsetZ + m_BlockZ
+		a_OffsetX + m_OriginX - 5, a_OffsetZ + m_OriginZ, a_OffsetX + m_OriginX + 5, a_OffsetZ + m_OriginZ
 	);
   AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ - 5, a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ + 5
+		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ - 5, a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ + 5
 	);
 	
 	// A gray line from the base point to the first point of the ravine, for identification:
   AppendPrintf(SVG, "<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
-		a_OffsetX + m_BlockX, a_OffsetZ + m_BlockZ, a_OffsetX + m_Points.front().m_BlockX, a_OffsetZ + m_Points.front().m_BlockZ
+		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ, a_OffsetX + m_Points.front().m_BlockX, a_OffsetZ + m_Points.front().m_BlockZ
 	);
 	
 	// Offset guides:
@@ -455,14 +326,10 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 
 
 
-void cStructGenRavines::cRavine::ProcessChunk(
-	int a_ChunkX, int a_ChunkZ, 
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDef::HeightMap & a_HeightMap
-)
+void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 {
-	int BlockStartX = a_ChunkX * cChunkDef::Width;
-	int BlockStartZ = a_ChunkZ * cChunkDef::Width;
+	int BlockStartX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int BlockStartZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int BlockEndX = BlockStartX + cChunkDef::Width;
 	int BlockEndZ = BlockStartZ + cChunkDef::Width;
 	for (cRavDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
@@ -488,7 +355,7 @@ void cStructGenRavines::cRavine::ProcessChunk(
 			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
 			if ((DifX + x == 0) && (DifZ + z == 0))
 			{
-				cChunkDef::SetBlock(a_BlockTypes, x, 4, z, E_BLOCK_LAPIS_ORE);
+				a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
 			}
 			#endif  // _DEBUG
 			
@@ -498,7 +365,7 @@ void cStructGenRavines::cRavine::ProcessChunk(
 				int Top = std::min(itr->m_Top, (int)(cChunkDef::Height));  // Stupid gcc needs int cast
 				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 				{
-					switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
+					switch (a_ChunkDesc.GetBlockType(x, y, z))
 					{
 						// Only carve out these specific block types
 						case E_BLOCK_DIRT:
@@ -516,7 +383,7 @@ void cStructGenRavines::cRavine::ProcessChunk(
 						case E_BLOCK_REDSTONE_ORE:
 						case E_BLOCK_REDSTONE_ORE_GLOWING:
 						{
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
 							break;
 						}
 						default: break;
