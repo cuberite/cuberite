@@ -1568,24 +1568,6 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 
 
-void cChunk::SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta)
-{
-	if (GetNibble(m_BlockMeta, a_BlockIdx) == a_Meta)
-	{
-		return;
-	}
-
-	MarkDirty();
-	SetNibble(m_BlockMeta, a_BlockIdx, a_Meta);
-	Vector3i Coords(IndexToCoordinate(a_BlockIdx));
-
-	m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, Coords.x, Coords.y, Coords.z, GetBlock(a_BlockIdx), a_Meta));
-}
-
-
-
-
-
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 
