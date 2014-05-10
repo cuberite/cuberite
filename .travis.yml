@@ -21,7 +21,7 @@ env:
 matrix:
   include:
     - compiler: gcc
-      env: TRAVIS_MCSERVER_BUILD_TYPE=COVERAGE   MCSERVER_PATH=./MCServer_debug
+      env: TRAVIS_MCSERVER_BUILD_TYPE=COVERAGE   MCSERVER_PATH=./MCServer
 
 # Notification Settings
 notifications:
