@@ -61,10 +61,10 @@ public:
 	
 	// The following members are indices into the data stream. m_DataLength == 0 if no data available
 	// They must not be pointers, because the datastream may be copied into another AString object in the meantime.
-	int m_NameStart;
-	int m_NameLength;
-	int m_DataStart;
-	int m_DataLength;
+	size_t m_NameStart;
+	size_t m_NameLength;
+	size_t m_DataStart;
+	size_t m_DataLength;
 	
 	// The following members are indices into the array returned; -1 if not valid
 	// They must not be pointers, because pointers would not survive std::vector reallocation
@@ -114,7 +114,7 @@ Each primitive tag also stores the length of the contained data, in bytes.
 class cParsedNBT
 {
 public:
-	cParsedNBT(const char * a_Data, int a_Length);
+	cParsedNBT(const char * a_Data, size_t a_Length);
 	
 	bool IsValid(void) const {return m_IsValid; }
 	
@@ -135,7 +135,7 @@ public:
 	
 	/** Returns the length of the tag's data, in bytes.
 	Not valid for Compound or List tags! */
-	int GetDataLength (int a_Tag) const
+	size_t GetDataLength (int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_List);
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type != TAG_Compound);
@@ -251,15 +251,15 @@ public:
 	
 protected:
 	const char *             m_Data;
-	int                      m_Length;
+	size_t                   m_Length;
 	std::vector<cFastNBTTag> m_Tags;
 	bool                     m_IsValid;  // True if parsing succeeded
 
 	// Used while parsing:
-	int m_Pos;
+	size_t m_Pos;
 
 	bool Parse(void);
-	bool ReadString(int & a_StringStart, int & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
+	bool ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
 	bool ReadCompound(void);  // Reads the latest tag as a compound
 	bool ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
 	bool ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
@@ -319,7 +319,7 @@ protected:
 	
 	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
 	
-	void WriteString(const char * a_Data, short a_Length);
+	void WriteString(const char * a_Data, UInt16 a_Length);
 	
 	inline void TagCommon(const AString & a_Name, eTagType a_Type)
 	{
@@ -330,7 +330,7 @@ protected:
 		{
 			// Compound: add the type and name:
 			m_Result.push_back((char)a_Type);
-			WriteString(a_Name.c_str(), (short)a_Name.length());
+			WriteString(a_Name.c_str(), (UInt16)a_Name.length());
 		}
 		else
 		{

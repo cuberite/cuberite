@@ -15,6 +15,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	m_IsCritical(false),
 	m_Timer(0),
 	m_HitGroundTimer(0),
+	m_HasTeleported(false),
 	m_bIsCollected(false),
 	m_HitBlockPos(Vector3i(0, 0, 0))
 {

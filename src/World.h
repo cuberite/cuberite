@@ -351,7 +351,7 @@ public:
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
 
-	/** Set the state of a trapdoor. Returns true if the trapdoor was update, false if there was no trapdoor at those coords. */
+	/** Set the state of a trapdoor. Returns true if the trapdoor was updated, false if there was no trapdoor at those coords. */
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
 	/** Regenerate the given chunk: */
@@ -710,7 +710,9 @@ public:
 	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) override;  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
-	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise */
+	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
+	Item parameter used currently for Fireworks to correctly set entity metadata based on item metadata
+	*/
 	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem & a_Item, const Vector3d * a_Speed = NULL);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */

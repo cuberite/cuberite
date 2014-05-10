@@ -104,13 +104,13 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 		}
 	}
 
-	int allowedMobsSize = allowedMobs.size();
+	size_t allowedMobsSize = allowedMobs.size();
 	if (allowedMobsSize > 0)
 	{
 		std::set<cMonster::eType>::iterator itr = allowedMobs.begin();
-		int iRandom = m_Random.NextInt(allowedMobsSize,a_Biome);
+		int iRandom = m_Random.NextInt((int)allowedMobsSize, a_Biome);
 
-		for(int i = 0; i < iRandom; i++)
+		for (int i = 0; i < iRandom; i++)
 		{
 			++itr;
 		}

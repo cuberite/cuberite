@@ -86,9 +86,8 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 	AddSpeedY(MilliDt * -9.8f);
 	AddPosition(GetSpeed() * MilliDt);
 
-	// If not static (One billionth precision) broadcast movement.
-	static const float epsilon = 0.000000001f;
-	if ((fabs(GetSpeedX()) > epsilon) || (fabs(GetSpeedZ()) > epsilon))
+	// If not static (one billionth precision) broadcast movement
+	if ((fabs(GetSpeedX()) > std::numeric_limits<double>::epsilon()) || (fabs(GetSpeedZ()) > std::numeric_limits<double>::epsilon()))
 	{
 		BroadcastMovementUpdate();
 	}

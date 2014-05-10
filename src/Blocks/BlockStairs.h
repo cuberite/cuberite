@@ -77,6 +77,11 @@ public:
 		// Reset meta to 0
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
 	
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{

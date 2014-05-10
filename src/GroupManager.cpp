@@ -79,23 +79,24 @@ void cGroupManager::CheckUsers(void)
 		return;
 	}
 	
-	unsigned int NumKeys = IniFile.GetNumKeys();
-	for (size_t i = 0; i < NumKeys; i++)
+	int NumKeys = IniFile.GetNumKeys();
+	for (int i = 0; i < NumKeys; i++)
 	{
-		AString Player = IniFile.GetKeyName( i );
+		AString Player = IniFile.GetKeyName(i);
 		AString Groups = IniFile.GetValue(Player, "Groups", "");
-		if (!Groups.empty())
+		if (Groups.empty())
 		{
-			AStringVector Split = StringSplit( Groups, "," );
-			for( unsigned int i = 0; i < Split.size(); i++ )
-			{
-				if (!ExistsGroup(Split[i]))
-				{
-					LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), Player.c_str());
-				}
-			}
+			continue;
 		}
-	}
+		AStringVector Split = StringSplitAndTrim(Groups, ",");
+		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
+		{
+			if (!ExistsGroup(*itr))
+			{
+				LOGWARNING("The group %s for player %s was not found!", Split[i].c_str(), Player.c_str());
+			}
+		}  // for itr - Split[]
+	}  // for i - ini file keys
 }
 
 
@@ -128,15 +129,15 @@ void cGroupManager::LoadGroups()
 		IniFile.WriteFile("groups.ini");
 	}
 
-	unsigned int NumKeys = IniFile.GetNumKeys();
-	for (size_t i = 0; i < NumKeys; i++)
+	int NumKeys = IniFile.GetNumKeys();
+	for (int i = 0; i < NumKeys; i++)
 	{
-		AString KeyName = IniFile.GetKeyName( i );
-		cGroup* Group = GetGroup( KeyName.c_str() );
+		AString KeyName = IniFile.GetKeyName(i);
+		cGroup * Group = GetGroup(KeyName.c_str());
 		
 		Group->ClearPermission(); // Needed in case the groups are reloaded.
 
-		LOGD("Loading group: %s", KeyName.c_str() );
+		LOGD("Loading group %s", KeyName.c_str());
 
 		Group->SetName(KeyName);
 		AString Color = IniFile.GetValue(KeyName, "Color", "-");

@@ -599,7 +599,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		// Decompress the data:
 		AString UncompressedData;
 		{
-			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, UncompressedSize);
+			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, (size_t)UncompressedSize);
 			if (errorcode != Z_OK)
 			{
 				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
@@ -679,7 +679,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		// Re-compress data
 		AString CompressedData;
 		{
-			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData,m_CompressionFactor);
+			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData, m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
 				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
@@ -691,9 +691,9 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		}
 
 		// Save into file's cache
-		Header->m_UncompressedSize = Converted.size();
-		Header->m_CompressedSize = CompressedData.size();
-		NewDataContents.append( CompressedData );
+		Header->m_UncompressedSize = (int)Converted.size();
+		Header->m_CompressedSize = (int)CompressedData.size();
+		NewDataContents.append(CompressedData);
 	}
 
 	// Done converting
@@ -729,7 +729,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		Offset += Header->m_CompressedSize;
 
 		// Crude data integrity check:
-		const int ExpectedSize = (16*256*16)*2 + (16*256*16)/2; // For version 2
+		const int ExpectedSize = (16 * 256 * 16) * 2 + (16 * 256 * 16) / 2;  // For version 2
 		if (UncompressedSize < ExpectedSize)
 		{
 			LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
@@ -743,7 +743,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		// Decompress the data:
 		AString UncompressedData;
 		{
-			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, UncompressedSize);
+			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, (size_t)UncompressedSize);
 			if (errorcode != Z_OK)
 			{
 				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
@@ -827,9 +827,9 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		}
 
 		// Save into file's cache
-		Header->m_UncompressedSize = Converted.size();
-		Header->m_CompressedSize = CompressedData.size();
-		NewDataContents.append( CompressedData );
+		Header->m_UncompressedSize = (int)Converted.size();
+		Header->m_CompressedSize = (int)CompressedData.size();
+		NewDataContents.append(CompressedData);
 	}
 
 	// Done converting
@@ -859,7 +859,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 	
 	// Decompress the data:
 	AString UncompressedData;
-	int errorcode = UncompressString(a_Data.data(), a_Data.size(), UncompressedData, a_UncompressedSize);
+	int errorcode = UncompressString(a_Data.data(), a_Data.size(), UncompressedData, (size_t)a_UncompressedSize);
 	if (errorcode != Z_OK)
 	{
 		LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
@@ -871,7 +871,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 	
 	if (a_UncompressedSize != (int)UncompressedData.size())
 	{
-		LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT  ") for chunk [%d, %d]",
+		LOGWARNING("Uncompressed data size differs (exp %d bytes, got " SIZE_T_FMT ") for chunk [%d, %d]",
 			a_UncompressedSize, UncompressedData.size(),
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);

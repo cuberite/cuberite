@@ -136,7 +136,7 @@ inline void PushSomeColumns(int a_BlockX, int a_Height, int a_BlockZ, int a_Colu
 	{
 		int x = a_BlockX + a_Coords[i].x;
 		int z = a_BlockZ + a_Coords[i].z;
-		if (a_Noise.IntNoise3DInt(x + 64 * a_Seq, a_Height + i, z + 64 * a_Seq) <= a_Chance)
+		if (a_Noise.IntNoise3DInt(x + 64 * a_Seq, a_Height + (int)i, z + 64 * a_Seq) <= a_Chance)
 		{
 			for (int j = 0; j < a_ColumnHeight; j++)
 			{

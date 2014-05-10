@@ -85,6 +85,9 @@ public:
 	
 	/// Checks if the block can stay at the specified relative coords in the chunk
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);
+
+	/** Can the dirt under this block grow to grass? */
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta);
 	
 	/** Checks if the block can be placed at this point.
 	Default: CanBeAt(...) 

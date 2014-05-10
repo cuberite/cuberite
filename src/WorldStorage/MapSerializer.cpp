@@ -152,6 +152,10 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	if (CurrLine >= 0)
 	{
 		unsigned int Width = a_NBT.GetShort(CurrLine);
+		if (Width != 128)
+		{
+			return false;
+		}
 		m_Map->m_Width = Width;
 	}
 
@@ -159,6 +163,10 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	if (CurrLine >= 0)
 	{
 		unsigned int Height = a_NBT.GetShort(CurrLine);
+		if (Height >= 256)
+		{
+			return false;
+		}
 		m_Map->m_Height = Height;
 	}
 

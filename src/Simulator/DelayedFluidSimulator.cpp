@@ -148,7 +148,7 @@ void cDelayedFluidSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_Chunk
 		{
 			SimulateBlock(a_Chunk, itr->x, itr->y, itr->z);
 		}
-		m_TotalBlocks -= Blocks.size();
+		m_TotalBlocks -= (int)Blocks.size();
 		Blocks.clear();
 	}
 }

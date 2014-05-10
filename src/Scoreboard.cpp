@@ -261,7 +261,7 @@ void cTeam::SetDisplayName(const AString & a_Name)
 
 
 
-unsigned int cTeam::GetNumPlayers(void) const
+size_t cTeam::GetNumPlayers(void) const
 {
 	return m_Players.size();
 }
@@ -569,7 +569,7 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 
 
 
-unsigned int cScoreboard::GetNumObjectives(void) const
+size_t cScoreboard::GetNumObjectives(void) const
 {
 	return m_Objectives.size();
 }
@@ -578,7 +578,7 @@ unsigned int cScoreboard::GetNumObjectives(void) const
 
 
 
-unsigned int cScoreboard::GetNumTeams(void) const
+size_t cScoreboard::GetNumTeams(void) const
 {
 	return m_Teams.size();
 }

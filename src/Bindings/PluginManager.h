@@ -159,7 +159,7 @@ public:																	// tolua_export
 	/** Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
 
-	unsigned int GetNumPlugins() const;  // tolua_export
+	size_t GetNumPlugins() const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);

@@ -614,7 +614,7 @@ unsigned int cMap::GetNumPixels(void) const
 
 
 
-unsigned int cMap::GetNumDecorators(void) const
+size_t cMap::GetNumDecorators(void) const
 {
 	return m_Decorators.size();
 }

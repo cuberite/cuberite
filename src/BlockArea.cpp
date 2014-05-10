@@ -707,11 +707,11 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 	
 	if (IsDummyMetas)
 	{
-		MergeByStrategy<true>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
+		MergeByStrategy<false>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
 	}
 	else
 	{
-		MergeByStrategy<false>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
+		MergeByStrategy<true>(a_Src, a_RelX, a_RelY, a_RelZ, a_Strategy, SrcMetas, DstMetas);
 	}
 }
 
@@ -738,31 +738,31 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 		a_DataTypes = a_DataTypes & GetDataTypes();
 	}
 	
-	int BlockCount = GetBlockCount();
+	size_t BlockCount = GetBlockCount();
 	if ((a_DataTypes & baTypes) != 0)
 	{
-		for (int i = 0; i < BlockCount; i++)
+		for (size_t i = 0; i < BlockCount; i++)
 		{
 			m_BlockTypes[i] = a_BlockType;
 		}
 	}
 	if ((a_DataTypes & baMetas) != 0)
 	{
-		for (int i = 0; i < BlockCount; i++)
+		for (size_t i = 0; i < BlockCount; i++)
 		{
 			m_BlockMetas[i] = a_BlockMeta;
 		}
 	}
 	if ((a_DataTypes & baLight) != 0)
 	{
-		for (int i = 0; i < BlockCount; i++)
+		for (size_t i = 0; i < BlockCount; i++)
 		{
 			m_BlockLight[i] = a_BlockLight;
 		}
 	}
 	if ((a_DataTypes & baSkyLight) != 0)
 	{
-		for (int i = 0; i < BlockCount; i++)
+		for (size_t i = 0; i < BlockCount; i++)
 		{
 			m_BlockSkyLight[i] = a_BlockSkyLight;
 		}

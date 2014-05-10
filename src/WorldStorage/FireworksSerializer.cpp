@@ -96,7 +96,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					if (ExplosionName == "Colors")
 					{
 						// Divide by four as data length returned in bytes
-						int DataLength = a_NBT.GetDataLength(explosiontag);
+						size_t DataLength = a_NBT.GetDataLength(explosiontag);
 						// round to the next highest multiple of four
 						DataLength -= DataLength % 4; 
 						if (DataLength == 0)
@@ -105,14 +105,14 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 						}
 
 						const char * ColourData = (a_NBT.GetData(explosiontag));
-						for (int i = 0; i < DataLength; i += 4 /* Size of network int*/)
+						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
 						}
 					}
 					else if (ExplosionName == "FadeColors")
 					{
-						int DataLength = a_NBT.GetDataLength(explosiontag) / 4;
+						size_t DataLength = a_NBT.GetDataLength(explosiontag) / 4;
 						// round to the next highest multiple of four
 						DataLength -= DataLength % 4; 
 						if (DataLength == 0)
@@ -121,7 +121,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 						}
 
 						const char * FadeColourData = (a_NBT.GetData(explosiontag));
-						for (int i = 0; i < DataLength; i += 4 /* Size of network int*/)
+						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));
 						}
