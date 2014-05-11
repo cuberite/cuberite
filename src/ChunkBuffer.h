@@ -121,12 +121,17 @@ public:
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
 		if(!m_Sections[Section])
 		{
+			if(a_Block == 0x00)
+			{
+				return;
+			}
 			m_Sections[Section] = Allocate();
 			if(!m_Sections[Section])
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
 			}
+			ZeroSection(m_Sections[Section]);
 		}
 		int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 		m_Sections[Section]->m_BlockTypes[Index] = a_Block;
@@ -166,12 +171,17 @@ public:
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
 		if(!m_Sections[Section])
 		{
+			if((a_Nibble & 0xf) == 0x00)
+			{
+				return;
+			}
 			m_Sections[Section] = Allocate();
 			if(!m_Sections[Section])
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
 			}
+			ZeroSection(m_Sections[Section]);
 		}
 		int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 		m_Sections[Section]->m_BlockMeta[Index / 2] = static_cast<NIBBLETYPE>(
@@ -247,6 +257,8 @@ private:
 	
 	sChunkSection * Allocate() const;
 	void Free(sChunkSection * ptr) const;
+	
+	void ZeroSection(sChunkSection * ptr) const;
 };
 
 
