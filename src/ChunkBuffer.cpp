@@ -151,7 +151,7 @@ void cChunkBuffer::SetBlocks(const BLOCKTYPE * a_src)
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0; j++);
-			if (j != segment_length)
+			if (j != (segment_length - 1))
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
@@ -186,7 +186,7 @@ void cChunkBuffer::SetMeta(const NIBBLETYPE * a_src)
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0; j++);
-			if (j != segment_length)
+			if (j != (segment_length - 1))
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
@@ -222,7 +222,7 @@ void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0; j++);
-			if (j != segment_length)
+			if (j != (segment_length - 1))
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
@@ -258,7 +258,7 @@ void cChunkBuffer::SetSkyLight  (const NIBBLETYPE * a_src)
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0xFF; j++);
-			if (j != segment_length)
+			if (j != (segment_length -1))
 			{
 				m_Sections[i] = Allocate();
 				memcpy(
