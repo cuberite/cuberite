@@ -653,6 +653,13 @@ void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 		case BLOCK_FACE_YP: m_Writer.AddByte("Dir", (unsigned char)1); break;
 		case BLOCK_FACE_ZM: m_Writer.AddByte("Dir", (unsigned char)0); break;
 		case BLOCK_FACE_ZP: m_Writer.AddByte("Dir", (unsigned char)3); break;
+		
+		case BLOCK_FACE_XM:
+		case BLOCK_FACE_XP:
+		case BLOCK_FACE_NONE:
+		{
+			break;
+		}
 	}
 }
 
