@@ -65,7 +65,7 @@ protected:
 		
 
 		// cSocketThreads::cCallback overrides:
-		virtual void DataReceived(const char * a_Data, size_t a_Size) override;
+		virtual bool DataReceived(const char * a_Data, size_t a_Size) override;
 		virtual void GetOutgoingData(AString & a_Data) override;
 		virtual void SocketClosed(void) override;
 		

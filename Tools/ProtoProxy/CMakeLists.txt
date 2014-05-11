@@ -38,9 +38,9 @@ set(SHARED_SRC
 	../../src/MCLogger.cpp
 	../../src/PolarSSL++/AesCfb128Decryptor.cpp
 	../../src/PolarSSL++/AesCfb128Encryptor.cpp
+	../../src/PolarSSL++/CryptoKey.cpp
 	../../src/PolarSSL++/CtrDrbgContext.cpp
 	../../src/PolarSSL++/EntropyContext.cpp
-	../../src/PolarSSL++/PublicKey.cpp
 	../../src/PolarSSL++/RsaPrivateKey.cpp
 )
 set(SHARED_HDR
@@ -50,9 +50,9 @@ set(SHARED_HDR
 	../../src/MCLogger.h
 	../../src/PolarSSL++/AesCfb128Decryptor.h
 	../../src/PolarSSL++/AesCfb128Encryptor.h
+	../../src/PolarSSL++/CryptoKey.h
 	../../src/PolarSSL++/CtrDrbgContext.h
 	../../src/PolarSSL++/EntropyContext.h
-	../../src/PolarSSL++/PublicKey.h
 	../../src/PolarSSL++/RsaPrivateKey.h
 )
 set(SHARED_OSS_SRC

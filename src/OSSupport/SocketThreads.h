@@ -63,8 +63,10 @@ public:
 		// Force a virtual destructor in all subclasses:
 		virtual ~cCallback() {}
 		
-		/** Called when data is received from the remote party */
-		virtual void DataReceived(const char * a_Data, size_t a_Size) = 0;
+		/** Called when data is received from the remote party.
+		SocketThreads does not care about the return value, others can use it for their specific purpose -
+		for example HTTPServer uses it to signal if the connection was terminated as a result of the data received. */
+		virtual bool DataReceived(const char * a_Data, size_t a_Size) = 0;
 		
 		/** Called when data can be sent to remote party
 		The function is supposed to *set* outgoing data to a_Data (overwrite) */

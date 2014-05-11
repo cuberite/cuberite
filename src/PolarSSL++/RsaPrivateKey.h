@@ -19,6 +19,8 @@
 /** Encapsulates an RSA private key used in PKI cryptography */
 class cRsaPrivateKey
 {
+	friend class cSslContext;
+	
 public:
 	/** Creates a new empty object, the key is not assigned */
 	cRsaPrivateKey(void);
@@ -51,7 +53,13 @@ protected:
 
 	/** The random generator used for generating the key and encryption / decryption */
 	cCtrDrbgContext m_CtrDrbg;
+	
+	
+	/** Returns the internal context ptr. Only use in PolarSSL API calls. */
+	rsa_context * GetInternal(void) { return &m_Rsa; }
 } ;
+
+typedef SharedPtr<cRsaPrivateKey> cRsaPrivateKeyPtr;
 
 
 
