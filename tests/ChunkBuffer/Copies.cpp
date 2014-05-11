@@ -86,4 +86,49 @@ int main(int argc, char** argv)
 	delete DstNibbleBuffer;
 	SrcNibbleBuffer = NULL;
 	DstNibbleBuffer = NULL;
+	
+	SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
+	memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
+	buffer.SetBlocks(SrcBlockBuffer);
+	DstBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
+	buffer.CopyBlocks(DstBlockBuffer);
+	testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) -1) == 0);
+	delete SrcBlockBuffer;
+	delete DstBlockBuffer;
+	SrcBlockBuffer = NULL;
+	DstBlockBuffer = NULL;
+	
+	SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+	for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
+	memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+	buffer.SetMeta(SrcNibbleBuffer);
+	DstNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/ 2];
+	buffer.CopyMeta(DstNibbleBuffer);
+	testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) -1) == 0);
+	delete SrcNibbleBuffer;
+	delete DstNibbleBuffer;
+	SrcNibbleBuffer = NULL;
+	DstNibbleBuffer = NULL;
+	
+	SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+	memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+	buffer.SetLight(SrcNibbleBuffer);
+	DstNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/ 2];
+	buffer.CopyLight(DstNibbleBuffer);
+	testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) -1) == 0);
+	delete SrcNibbleBuffer;
+	delete DstNibbleBuffer;
+	SrcNibbleBuffer = NULL;
+	DstNibbleBuffer = NULL;
+	
+	SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+	memset(SrcNibbleBuffer, 0xFF, 16 * 16 * 256 /2);
+	buffer.SetSkyLight(SrcNibbleBuffer);
+	DstNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/ 2];
+	buffer.CopySkyLight(DstNibbleBuffer);
+	testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) -1) == 0);
+	delete SrcNibbleBuffer;
+	delete DstNibbleBuffer;
+	SrcNibbleBuffer = NULL;
+	DstNibbleBuffer = NULL;
 }
