@@ -7,6 +7,8 @@
 #include "../World.h"
 #include "../ClientHandle.h"
 
+#include "../Statistics.h"
+
 
 
 
@@ -174,6 +176,9 @@ public:
 	cTeam * UpdateTeam(void);
 
 	// tolua_end
+
+	/** Return the associated statistic and achievement manager. */
+	cStatManager & GetStatManager() { return m_Stats; }
 	
 	void SetIP(const AString & a_IP);
 	
@@ -486,6 +491,8 @@ protected:
 	int m_FloaterID;
 
 	cTeam * m_Team;
+
+	cStatManager m_Stats;
 
 
 

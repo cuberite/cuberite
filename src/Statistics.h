@@ -9,6 +9,7 @@
 
 
 
+// tolua_begin
 enum eStatistic
 {
 	// The order must match the order of cStatInfo::ms_Info
@@ -77,6 +78,7 @@ enum eStatistic
 
 	statCount
 };
+// tolua_end
 
 
 
@@ -111,6 +113,52 @@ private:
 
 	static cStatInfo ms_Info[statCount];
 };
+
+
+
+
+/* Signed (?) integral value. */
+typedef int StatValue; // tolua_export
+
+
+
+
+/** Class that manages the statistics and achievements of a single player. */
+// tolua_begin
+class cStatManager
+{
+public:
+	// tolua_end
+
+	cStatManager();
+
+	// tolua_begin
+
+	/** Return the value of the specified stat. */
+	StatValue GetValue(const eStatistic a_Stat) const;
+
+	/** Set the value of the specified stat. */
+	void SetValue(const eStatistic a_Stat, const StatValue a_Value);
+
+	/** Reset everything. */
+	void Reset();
+
+	/** Increment the specified stat.
+	 *
+	 * Returns the new value.
+	 */
+	StatValue AddValue(const eStatistic a_Stat, const StatValue a_Delta = 1);
+
+	// tolua_end
+
+private:
+
+	StatValue m_MainStats[statCount];
+
+	// TODO 10-05-2014 xdot: Use, mine, craft statistics
+
+
+}; // tolua_export
 
 
 

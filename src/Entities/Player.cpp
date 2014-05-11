@@ -16,6 +16,8 @@
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
 
+#include "../WorldStorage/StatSerializer.h"
+
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
@@ -130,6 +132,15 @@ cPlayer::~cPlayer(void)
 	cRoot::Get()->GetServer()->PlayerDestroying(this);
 
 	SaveToDisk();
+
+#if 0
+	/* Save statistics. */
+	cStatSerializer StatSerializer(m_World->GetName(), m_PlayerName, &m_Stats);
+	if (!StatSerializer.Save())
+	{
+		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
+	}
+#endif
 
 	m_World->RemovePlayer( this );
 
@@ -871,9 +882,13 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	}
 	else if (a_Killer->IsPlayer())
 	{
-		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+		cPlayer* Killer = (cPlayer*)a_Killer;
 
-		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::otPlayerKillCount, 1);
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
+
+		Killer->GetStatManager().AddValue(statPlayerKills);
+
+		m_World->GetScoreBoard().AddPlayerScore(Killer->GetName(), cObjective::otPlayerKillCount, 1);
 	}
 	else
 	{
@@ -882,6 +897,8 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
+
+	m_Stats.AddValue(statDeaths);
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
 }
