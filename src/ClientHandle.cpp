@@ -878,7 +878,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
-			HandleBlockDigCancel();
+			FinishDigAnimation();
 			return;
 		}
 
@@ -998,7 +998,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	HandleBlockDigCancel();
+	FinishDigAnimation();
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 
@@ -1041,7 +1041,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 
 
-void cClientHandle::HandleBlockDigCancel()
+void cClientHandle::FinishDigAnimation()
 {
 	if (
 		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
