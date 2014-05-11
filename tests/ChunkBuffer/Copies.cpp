@@ -99,7 +99,6 @@ int main(int argc, char** argv)
 	DstBlockBuffer = NULL;
 	
 	SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
-	for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
 	memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
 	buffer.SetMeta(SrcNibbleBuffer);
 	DstNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/ 2];
