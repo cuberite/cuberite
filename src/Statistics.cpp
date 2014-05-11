@@ -114,7 +114,7 @@ eStatistic cStatInfo::GetType(const AString & a_Name)
 {
 	for (unsigned int i = 0; i < ARRAYCOUNT(ms_Info); ++i)
 	{
-		if (NoCaseCompare(ms_Info[i].m_Name, a_Name))
+		if (NoCaseCompare(ms_Info[i].m_Name, a_Name) == 0)
 		{
 			return ms_Info[i].m_Type;
 		}

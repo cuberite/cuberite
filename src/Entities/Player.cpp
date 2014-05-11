@@ -133,15 +133,6 @@ cPlayer::~cPlayer(void)
 
 	SaveToDisk();
 
-#if 0
-	/* Save statistics. */
-	cStatSerializer StatSerializer(m_World->GetName(), m_PlayerName, &m_Stats);
-	if (!StatSerializer.Save())
-	{
-		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
-	}
-#endif
-
 	m_World->RemovePlayer( this );
 
 	m_ClientHandle = NULL;
@@ -1638,6 +1629,12 @@ bool cPlayer::LoadFromDisk()
 	m_Inventory.LoadFromJson(root["inventory"]);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
+
+	/* Load the player stats.
+	 * We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
+	 */
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
+	StatSerializer.Load();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
 		m_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
@@ -1709,6 +1706,17 @@ bool cPlayer::SaveToDisk()
 		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
+
+	/* Save the player stats.
+	 * We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
+	 */
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), m_PlayerName, &m_Stats);
+	if (!StatSerializer.Save())
+	{
+		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
+		return false;
+	}
+
 	return true;
 }
 
@@ -1723,7 +1731,10 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
 	for( PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr )
 	{
-		if( itr->second ) Permissions.push_back( itr->first );
+		if (itr->second)
+		{
+			Permissions.push_back( itr->first );
+		}
 	}
 
 	return Permissions;

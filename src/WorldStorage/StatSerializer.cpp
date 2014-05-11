@@ -7,8 +7,6 @@
 
 #include "../Statistics.h"
 
-#include <fstream>
-
 
 
 
@@ -19,7 +17,7 @@ cStatSerializer::cStatSerializer(const AString& a_WorldName, const AString& a_Pl
 	AString StatsPath;
 	Printf(StatsPath, "%s/stats", a_WorldName.c_str());
 
-	m_Path = StatsPath + "/" + a_PlayerName + ".dat";
+	m_Path = StatsPath + "/" + a_PlayerName + ".json";
 
 	/* Ensure that the directory exists. */
 	cFile::CreateFolder(FILE_IO_PREFIX + StatsPath);
@@ -88,6 +86,8 @@ void cStatSerializer::SaveStatToJSON(Json::Value & a_Out)
 
 			a_Out[StatName] = Value;
 		}
+
+		// TODO 2014-05-11 xdot: Save "progress"
 	}
 }
 
@@ -107,11 +107,28 @@ bool cStatSerializer::LoadStatFromJSON(const Json::Value & a_In)
 
 		if (StatType == statInvalid)
 		{
-			LOGWARNING("Invalid statistic type %s", StatName.c_str());
+			LOGWARNING("Invalid statistic type \"%s\"", StatName.c_str());
 			continue;
 		}
 
-		m_Manager->SetValue(StatType, (*it).asInt());
+		Json::Value & Node = *it;
+
+		if (Node.isInt())
+		{
+			m_Manager->SetValue(StatType, Node.asInt());
+		}
+		else if (Node.isObject())
+		{
+			StatValue Value = Node.get("value", 0).asInt();
+
+			// TODO 2014-05-11 xdot: Load "progress"
+
+			m_Manager->SetValue(StatType, Value);
+		}
+		else
+		{
+			LOGWARNING("Invalid statistic value for type \"%s\"", StatName.c_str());
+		}
 	}
 
 	return true;
