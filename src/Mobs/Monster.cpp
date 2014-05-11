@@ -355,6 +355,8 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			InStateEscaping(a_Dt);
 			break;
 		}
+			
+		case ATTACKING: break;
 	}  // switch (m_EMState)
 
 	BroadcastMovementUpdate();
