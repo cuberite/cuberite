@@ -300,7 +300,7 @@ void cChunkBuffer::ZeroSection(cChunkBuffer::sChunkSection * ptr) const
 	memset(ptr->m_BlockTypes,0x00,sizeof(ptr->m_BlockTypes));
 	memset(ptr->m_BlockMeta,0x00,sizeof(ptr->m_BlockMeta));
 	memset(ptr->m_BlockLight,0x00,sizeof(ptr->m_BlockLight));
-	memset(ptr->m_BlockSkyLight,0x00,sizeof(ptr->m_BlockSkyLight));
+	memset(ptr->m_BlockSkyLight,0xFF,sizeof(ptr->m_BlockSkyLight));
 }
 
 
