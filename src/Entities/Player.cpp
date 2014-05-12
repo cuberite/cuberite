@@ -194,6 +194,8 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 			return;
 		}
 	}
+
+	m_Stats.AddValue(statMinutesPlayed, 1);
 	
 	if (!a_Chunk.IsValid())
 	{
@@ -835,6 +837,8 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		// Any kind of damage adds food exhaustion
 		AddFoodExhaustion(0.3f);
 		SendHealth();
+
+		m_Stats.AddValue(statDamageTaken, round(a_TDI.FinalDamage * 10));
 		return true;
 	}
 	return false;
@@ -864,6 +868,8 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	{
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
+
+	m_Stats.AddValue(statItemsDropped, Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -1262,6 +1268,9 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	
 	// TODO: should do some checks to see if player is not moving through terrain
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
+
+	Vector3d DeltaPos = a_NewPos - GetPosition();
+	UpdateMovementStats(DeltaPos);
 	
 	SetPosition( a_NewPos );
 	SetStance(a_NewPos.y + 1.62);
@@ -1492,10 +1501,7 @@ void cPlayer::TossEquippedItem(char a_Amount)
 		Drops.push_back(DroppedItem);
 	}
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	TossItems(Drops);
 }
 
 
@@ -1511,6 +1517,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 		char OriginalItemAmount = Item.m_ItemCount;
 		Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
 		Drops.push_back(Item);
+
 		if (OriginalItemAmount > a_Amount)
 		{
 			Item.m_ItemCount = OriginalItemAmount - a_Amount;
@@ -1521,10 +1528,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 		}
 	}
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	TossItems(Drops);
 }
 
 
@@ -1536,10 +1540,21 @@ void cPlayer::TossPickup(const cItem & a_Item)
 	cItems Drops;
 	Drops.push_back(a_Item);
 
+	TossItems(Drops);
+}
+
+
+
+
+
+void cPlayer::TossItems(const cItems & a_Items)
+{
+	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
 
 
@@ -1929,6 +1944,59 @@ void cPlayer::HandleFloater()
 	} Callback;
 	m_World->DoWithEntityByID(m_FloaterID, Callback);
 	SetIsFishing(false);
+}
+
+
+
+
+
+void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
+{
+	StatValue Value = round(a_DeltaPos.Length() * 100);
+
+	if (m_AttachedTo == NULL)
+	{
+		int PosX = POSX_TOINT;
+		int PosY = POSY_TOINT;
+		int PosZ = POSZ_TOINT;
+
+		BLOCKTYPE Block;
+		NIBBLETYPE Meta;
+		if (!m_World->GetBlockTypeMeta(PosX, PosY, PosZ, Block, Meta))
+		{
+			return;
+		}
+
+		if ((Block == E_BLOCK_LADDER) && (a_DeltaPos.y > 0.0)) // Going up
+		{
+			m_Stats.AddValue(statDistClimbed, round(a_DeltaPos.y * 100));
+		}
+		else
+		{
+			// TODO 2014-05-12 xdot: Other types
+			m_Stats.AddValue(statDistWalked, Value);
+		}
+	}
+	else
+	{
+		switch (m_AttachedTo->GetEntityType())
+		{
+			case cEntity::etMinecart: m_Stats.AddValue(statDistMinecart, Value); break;
+			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
+			case cEntity::etMonster:
+			{
+				cMonster * Monster = (cMonster *)m_AttachedTo;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
+					case cMonster::mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					default: break;
+				}
+				break;
+			}
+			default: break;
+		}
+	}
 }
 
 

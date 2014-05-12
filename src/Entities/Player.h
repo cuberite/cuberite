@@ -391,6 +391,9 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
+	/** Update movement-related statistics. */
+	void UpdateMovementStats(const Vector3d & a_DeltaPos);
+
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
 	// tolua_end
@@ -523,6 +526,9 @@ protected:
 
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
+
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
 
 	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
 	void ApplyFoodExhaustionFromMovement();

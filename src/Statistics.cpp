@@ -64,7 +64,7 @@ cStatInfo cStatInfo::ms_Info[statCount] = {
 	cStatInfo(statDistHorse,      "stat.horseOneCm"),
 	cStatInfo(statJumps,          "stat.jump"),
 	cStatInfo(statItemsDropped,   "stat.drop"),
-	cStatInfo(statDamageDealt,    "stat.damageDealth"),
+	cStatInfo(statDamageDealt,    "stat.damageDealt"),
 	cStatInfo(statDamageTaken,    "stat.damageTaken"),
 	cStatInfo(statDeaths,         "stat.deaths"),
 	cStatInfo(statMobKills,       "stat.mobKills"),

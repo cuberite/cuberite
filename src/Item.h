@@ -228,7 +228,7 @@ public:
 	void    Add   (const cItem & a_Item) {push_back(a_Item); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
-	size_t  Size  (void) {return size(); }
+	size_t  Size  (void) const { return size(); }
 	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
 
 	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
