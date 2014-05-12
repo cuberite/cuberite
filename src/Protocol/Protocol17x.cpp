@@ -1879,11 +1879,7 @@ void cProtocol172::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 		case 2:
 		{
 			// Open Inventory achievement
-			cStatManager & Manager = m_Client->GetPlayer()->GetStatManager();
-			Manager.AddValue(achOpenInv);
-
-			SendStatistics(Manager);
-
+			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
 			break;
 		}
 	}

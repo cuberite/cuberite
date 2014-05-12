@@ -17,6 +17,7 @@
 #include "../Vector3.h"
 
 #include "../WorldStorage/StatSerializer.h"
+#include "../CompositeChat.h"
 
 #include "inifile/iniFile.h"
 #include "json/json.h"
@@ -876,10 +877,6 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		cPlayer* Killer = (cPlayer*)a_Killer;
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
-
-		Killer->GetStatManager().AddValue(statPlayerKills);
-
-		m_World->GetScoreBoard().AddPlayerScore(Killer->GetName(), cObjective::otPlayerKillCount, 1);
 	}
 	else
 	{
@@ -892,6 +889,33 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	m_Stats.AddValue(statDeaths);
 
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
+}
+
+
+
+
+
+void cPlayer::Killed(cEntity * a_Victim)
+{
+	cScoreboard & ScoreBoard = m_World->GetScoreBoard();
+
+	if (a_Victim->IsPlayer())
+	{
+		m_Stats.AddValue(statPlayerKills);
+
+		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
+	}
+	else if (a_Victim->IsMob())
+	{
+		if (((cMonster *)a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		{
+			AwardAchievement(achKillMonster);
+		}
+
+		m_Stats.AddValue(statMobKills);
+	}
+
+	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
 }
 
 
@@ -1110,6 +1134,44 @@ void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
 void cPlayer::SetIP(const AString & a_IP)
 {
 	m_IP = a_IP;
+}
+
+
+
+
+
+unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
+{
+	eStatistic Prerequisite = cStatInfo::GetPrerequisite(a_Ach);
+
+	if (Prerequisite != statInvalid)
+	{
+		if (m_Stats.GetValue(Prerequisite) == 0)
+		{
+			return 0;
+		}
+	}
+
+	StatValue Old = m_Stats.GetValue(a_Ach);
+
+	if (Old > 0)
+	{
+		return m_Stats.AddValue(a_Ach);
+	}
+	else
+	{
+		cCompositeChat Msg;
+		Msg.AddTextPart(m_PlayerName + " has just earned the achievement ");
+		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat submessage type and send the actual title
+		m_World->BroadcastChat(Msg);
+
+		StatValue New = m_Stats.AddValue(a_Ach);
+
+		/* Achievement Get! */
+		m_ClientHandle->SendStatistics(m_Stats);
+
+		return New;
+	}
 }
 
 

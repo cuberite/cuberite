@@ -370,6 +370,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	if (m_Health <= 0)
 	{
 		KilledBy(a_TDI.Attacker);
+
+		if (a_TDI.Attacker != NULL)
+		{
+			a_TDI.Attacker->Killed(this);
+		}
 	}
 	return true;
 }
