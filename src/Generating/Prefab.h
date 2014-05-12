@@ -95,6 +95,9 @@ public:
 	/** Returns the weight (chance) of this prefab generating as the next piece after the specified placed piece.
 	PiecePool implementations can use this for their GetPieceWeight() implementations. */
 	int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector) const;
+	
+	/** Returns the unmodified DefaultWeight property for the piece. */
+	int GetDefaultWeight(void) const { return m_DefaultWeight; }
 
 protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
