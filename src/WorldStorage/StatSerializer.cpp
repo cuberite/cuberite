@@ -11,15 +11,18 @@
 
 
 
-cStatSerializer::cStatSerializer(const AString& a_WorldName, const AString& a_PlayerName, cStatManager* a_Manager)
+cStatSerializer::cStatSerializer(const AString & a_WorldName, const AString & a_PlayerName, cStatManager * a_Manager)
 	: m_Manager(a_Manager)
 {
+	// Even though stats are shared between worlds, they are (usually) saved
+	// inside the folder of the default world.
+
 	AString StatsPath;
 	Printf(StatsPath, "%s/stats", a_WorldName.c_str());
 
 	m_Path = StatsPath + "/" + a_PlayerName + ".json";
 
-	/* Ensure that the directory exists. */
+	// Ensure that the directory exists.
 	cFile::CreateFolder(FILE_IO_PREFIX + StatsPath);
 }
 

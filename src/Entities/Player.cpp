@@ -820,7 +820,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer* Attacker = (cPlayer*) a_TDI.Attacker;
+		cPlayer * Attacker = (cPlayer *)a_TDI.Attacker;
 
 		if ((m_Team != NULL) && (m_Team == Attacker->m_Team))
 		{
@@ -880,7 +880,7 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	}
 	else if (a_Killer->IsPlayer())
 	{
-		cPlayer* Killer = (cPlayer*)a_Killer;
+		cPlayer * Killer = (cPlayer *)a_Killer;
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
 	}
@@ -1150,6 +1150,7 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 {
 	eStatistic Prerequisite = cStatInfo::GetPrerequisite(a_Ach);
 
+	// Check if the prerequisites are met
 	if (Prerequisite != statInvalid)
 	{
 		if (m_Stats.GetValue(Prerequisite) == 0)
@@ -1166,14 +1167,16 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	}
 	else
 	{
+		// First time, announce it
 		cCompositeChat Msg;
 		Msg.AddTextPart(m_PlayerName + " has just earned the achievement ");
-		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat submessage type and send the actual title
+		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat part (cAchievement)
 		m_World->BroadcastChat(Msg);
 
+		// Increment the statistic
 		StatValue New = m_Stats.AddValue(a_Ach);
 
-		/* Achievement Get! */
+		// Achievement Get!
 		m_ClientHandle->SendStatistics(m_Stats);
 
 		return New;
@@ -1707,9 +1710,8 @@ bool cPlayer::LoadFromDisk()
 
 	m_LoadedWorldName = root.get("world", "world").asString();
 
-	/* Load the player stats.
-	 * We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
-	 */
+	// Load the player stats.
+	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	StatSerializer.Load();
 	
@@ -1784,9 +1786,8 @@ bool cPlayer::SaveToDisk()
 		return false;
 	}
 
-	/* Save the player stats.
-	 * We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
-	 */
+	// Save the player stats.
+	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), m_PlayerName, &m_Stats);
 	if (!StatSerializer.Save())
 	{

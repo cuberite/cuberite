@@ -25,10 +25,12 @@ class cStatSerializer
 {
 public:
 
-	cStatSerializer(const AString& a_WorldName, const AString& a_PlayerName, cStatManager* a_Manager);
+	cStatSerializer(const AString & a_WorldName, const AString & a_PlayerName, cStatManager * a_Manager);
 
+	/* Try to load the player statistics. Returns whether the operation was successful or not. */
 	bool Load(void);
 
+	/* Try to save the player statistics. Returns whether the operation was successful or not. */
 	bool Save(void);
 
 

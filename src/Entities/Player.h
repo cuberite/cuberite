@@ -181,12 +181,9 @@ public:
 	cStatManager & GetStatManager() { return m_Stats; }
 
 	/** Awards the player an achievement.
-	 *
-	 * If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
-	 * If the achievement has been already awarded to the player, this method will just increment the stat counter.
-	 *
-	 * Returns the _new_ stat value. (0 = Could not award achievement)
-	 */
+	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
+	If the achievement has been already awarded to the player, this method will just increment the stat counter.
+	Returns the _new_ stat value. (0 = Could not award achievement) */
 	unsigned int AwardAchievement(const eStatistic a_Ach);
 	
 	void SetIP(const AString & a_IP);
