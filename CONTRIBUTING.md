@@ -27,7 +27,7 @@ Code Stuff
   - The only exception: a `switch` statement with all `case` statements being a single short statement is allowed to use the short brace-less form.
   - These two rules really mean that indent is governed by braces
  * Add an empty last line in all source files (GCC and GIT can complain otherwise)
- * Use doxy-comments for functions in the header file, format as `/** Description */`
+ * All new public functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
  * Use spaces after the comment markers: `// Comment` instead of `//Comment`
 
 
