@@ -63,7 +63,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "d.....d.....d",
 
 		// Connectors:
-		"",
+		"-1: 6, 0, 8: 3\n"  /* Type -1, direction Z+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -103,7 +103,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -183,7 +183,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ "...........",
 
 		// Connectors:
-		"",
+		"-1: 5, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -223,7 +223,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -326,7 +326,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "...........",
 
 		// Connectors:
-		"",
+		"-1: 5, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -366,7 +366,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -444,7 +444,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ ".............",
 
 		// Connectors:
-		"",
+		"-1: 6, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -484,7 +484,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -587,7 +587,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ ".............",
 
 		// Connectors:
-		"",
+		"-1: 6, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -627,7 +627,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -730,7 +730,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "...............",
 
 		// Connectors:
-		"",
+		"-1: 6, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -770,7 +770,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -873,7 +873,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "................",
 
 		// Connectors:
-		"",
+		"-1: 9, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -913,7 +913,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -984,7 +984,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ ".......",
 
 		// Connectors:
-		"",
+		"-1: 4, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1024,7 +1024,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 5\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
 		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
@@ -1096,7 +1096,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ ".........",
 
 		// Connectors:
-		"",
+		"-1: 4, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1136,9 +1136,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"b:128: 2\n"  /* sandstonestairs */
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
-		"e: 64: 1\n"  /* wooddoorblock */
+		"e: 64: 7\n"  /* wooddoorblock */
 		"f:102: 0\n"  /* glasspane */
-		"g: 64: 8\n"  /* wooddoorblock */
+		"g: 64:12\n"  /* wooddoorblock */
 		"h:128: 7\n"  /* sandstonestairs */
 		"i: 50: 3\n"  /* torch */
 		"j: 50: 4\n"  /* torch */
@@ -1232,7 +1232,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ ".........",
 
 		// Connectors:
-		"",
+		"-1: 4, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1273,17 +1273,18 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
 		"e:128: 3\n"  /* sandstonestairs */
-		"f: 64: 5\n"  /* wooddoorblock */
-		"g:102: 0\n"  /* glasspane */
-		"h: 64:12\n"  /* wooddoorblock */
-		"i:128: 7\n"  /* sandstonestairs */
-		"j: 50: 3\n"  /* torch */
-		"k: 50: 4\n"  /* torch */
-		"l:128: 6\n"  /* sandstonestairs */
+		"f: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 5\n"  /* wooddoorblock */
+		"h:102: 0\n"  /* glasspane */
+		"i: 64:12\n"  /* wooddoorblock */
+		"j:128: 7\n"  /* sandstonestairs */
+		"k: 50: 3\n"  /* torch */
+		"l: 50: 4\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */
-		"n:128: 5\n"  /* sandstonestairs */
-		"o:128: 4\n"  /* sandstonestairs */
-		"p: 50: 1\n"  /* torch */,
+		"n:128: 6\n"  /* sandstonestairs */
+		"o:128: 5\n"  /* sandstonestairs */
+		"p:128: 4\n"  /* sandstonestairs */
+		"q: 50: 1\n"  /* torch */,
 
 		// Block data:
 		// Level 0
@@ -1310,7 +1311,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  2 */ ".d..........d."
 		/*  3 */ ".d..........d."
 		/*  4 */ ".d..........d."
-		/*  5 */ ".ddddfddd...d."
+		/*  5 */ ".ddddgddd...d."
 		/*  6 */ "........d...d."
 		/*  7 */ "mmmmmmm.d...d."
 		/*  8 */ "mmmmmmm.d...d."
@@ -1322,49 +1323,49 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
 		/*  0 */ ".............."
-		/*  1 */ ".dggdggdhdggd."
-		/*  2 */ ".g..........g."
-		/*  3 */ ".g..........g."
-		/*  4 */ ".g..........d."
-		/*  5 */ ".dggdhdgg...g."
-		/*  6 */ "........g...g."
+		/*  1 */ ".dhhdhhdidhhd."
+		/*  2 */ ".h..........h."
+		/*  3 */ ".h..........h."
+		/*  4 */ ".h..........d."
+		/*  5 */ ".dhhdidhh...h."
+		/*  6 */ "........h...h."
 		/*  7 */ "mmmmmmm.d...d."
-		/*  8 */ "mmmmmmm.g...g."
-		/*  9 */ "mmmmmmm.g...g."
-		/* 10 */ "mmmmmmm.dgggd."
+		/*  8 */ "mmmmmmm.h...h."
+		/*  9 */ "mmmmmmm.h...h."
+		/* 10 */ "mmmmmmm.dhhhd."
 		/* 11 */ "mmmmmmm......."
 
 		// Level 3
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
 		/*  0 */ "bbbbbbbbbbbbbb"
-		/*  1 */ "iddddddddddddc"
-		/*  2 */ ".d.....j.j..dc"
+		/*  1 */ "jddddddddddddc"
+		/*  2 */ ".d.....k.k..dc"
 		/*  3 */ ".d..........dc"
-		/*  4 */ ".d..k.k.....dc"
-		/*  5 */ "ldddddddd...dc"
+		/*  4 */ ".d..l.l.....dc"
+		/*  5 */ "ndddddddd...dc"
 		/*  6 */ "eeeeeeead...dc"
 		/*  7 */ "mmmmmmmad...dc"
 		/*  8 */ "mmmmmmmad...dc"
 		/*  9 */ "mmmmmmmad...dc"
 		/* 10 */ "mmmmmmmadddddc"
-		/* 11 */ "mmmmmmman...oc"
+		/* 11 */ "mmmmmmmao...pc"
 
 		// Level 4
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
 		/*  0 */ ".............."
 		/*  1 */ "bbbbbbbbbbbbb."
-		/*  2 */ "idddddddddddc."
-		/*  3 */ ".dp........dc."
-		/*  4 */ "lddddddddd.dc."
+		/*  2 */ "jdddddddddddc."
+		/*  3 */ ".dq........dc."
+		/*  4 */ "nddddddddd.dc."
 		/*  5 */ "eeeeeeeead.dc."
 		/*  6 */ "........ad.dc."
 		/*  7 */ "mmmmmmm.ad.dc."
 		/*  8 */ "mmmmmmm.ad.dc."
-		/*  9 */ "mmmmmmm.adkdc."
+		/*  9 */ "mmmmmmm.adldc."
 		/* 10 */ "mmmmmmm.adddc."
-		/* 11 */ "mmmmmmm.an.oc."
+		/* 11 */ "mmmmmmm.ao.pc."
 
 		// Level 5
 		/* z\x*             1111 */
@@ -1383,7 +1384,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/* 11 */ "mmmmmmm..adc..",
 
 		// Connectors:
-		"",
+		"-1: 8, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1424,19 +1425,18 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"c:128: 1\n"  /* sandstonestairs */
 		"d: 24: 0\n"  /* sandstone */
 		"e:128: 3\n"  /* sandstonestairs */
-		"f: 64: 5\n"  /* wooddoorblock */
-		"g: 64: 7\n"  /* wooddoorblock */
-		"h:102: 0\n"  /* glasspane */
-		"i: 64:12\n"  /* wooddoorblock */
-		"j:128: 7\n"  /* sandstonestairs */
-		"k: 50: 3\n"  /* torch */
-		"l: 50: 2\n"  /* torch */
+		"f: 64: 7\n"  /* wooddoorblock */
+		"g:102: 0\n"  /* glasspane */
+		"h: 64:12\n"  /* wooddoorblock */
+		"i:128: 7\n"  /* sandstonestairs */
+		"j: 50: 3\n"  /* torch */
+		"k: 50: 2\n"  /* torch */
+		"l: 50: 4\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */
-		"n: 50: 4\n"  /* torch */
-		"o:128: 6\n"  /* sandstonestairs */
-		"p: 50: 1\n"  /* torch */
-		"q:128: 5\n"  /* sandstonestairs */
-		"r:128: 4\n"  /* sandstonestairs */,
+		"n:128: 6\n"  /* sandstonestairs */
+		"o: 50: 1\n"  /* torch */
+		"p:128: 5\n"  /* sandstonestairs */
+		"q:128: 4\n"  /* sandstonestairs */,
 
 		// Block data:
 		// Level 0
@@ -1465,7 +1465,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  4 */ ".d..........d."
 		/*  5 */ ".d..........d."
 		/*  6 */ ".d..........d."
-		/*  7 */ ".ddddgd.....d."
+		/*  7 */ ".ddddfd.....d."
 		/*  8 */ "......d.....d."
 		/*  9 */ "mmmmm.d.....d."
 		/* 10 */ "mmmmm.ddddddd."
@@ -1475,49 +1475,49 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
 		/*  0 */ ".............."
-		/*  1 */ ".dhhdidhhdhhd."
-		/*  2 */ ".h..........h."
-		/*  3 */ ".h..........h."
+		/*  1 */ ".dggdhdggdggd."
+		/*  2 */ ".g..........g."
+		/*  3 */ ".g..........g."
 		/*  4 */ ".d..........d."
-		/*  5 */ ".h..........h."
-		/*  6 */ ".h..........h."
-		/*  7 */ ".dhhdid.....d."
-		/*  8 */ "......h.....h."
-		/*  9 */ "mmmmm.h.....h."
-		/* 10 */ "mmmmm.dhhdhhd."
+		/*  5 */ ".g..........g."
+		/*  6 */ ".g..........g."
+		/*  7 */ ".dggdhd.....d."
+		/*  8 */ "......g.....g."
+		/*  9 */ "mmmmm.g.....g."
+		/* 10 */ "mmmmm.dggdggd."
 		/* 11 */ "mmmmm........."
 
 		// Level 3
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
 		/*  0 */ "bbbbbbbbbbbbbb"
-		/*  1 */ "jddddddddddddc"
-		/*  2 */ ".d..k.k.....dc"
+		/*  1 */ "iddddddddddddc"
+		/*  2 */ ".d..j.j.....dc"
 		/*  3 */ ".d..........dc"
-		/*  4 */ ".d.........ldc"
+		/*  4 */ ".d.........kdc"
 		/*  5 */ ".d..........dc"
-		/*  6 */ ".d..n.n.....dc"
-		/*  7 */ "oddddddp...ldc"
+		/*  6 */ ".d..l.l.....dc"
+		/*  7 */ "nddddddo...kdc"
 		/*  8 */ "eeeeead.....dc"
 		/*  9 */ "mmmmmad.....dc"
 		/* 10 */ "mmmmmadddddddc"
-		/* 11 */ "mmmmmaq.....rc"
+		/* 11 */ "mmmmmap.....qc"
 
 		// Level 4
 		/* z\x*             1111 */
 		/*    *   01234567890123 */
 		/*  0 */ ".............."
 		/*  1 */ "bbbbbbbbbbbbc."
-		/*  2 */ "jdddddddddddc."
+		/*  2 */ "idddddddddddc."
 		/*  3 */ ".d.........dc."
 		/*  4 */ ".d.........dc."
 		/*  5 */ ".d.........dc."
-		/*  6 */ "oddddddd...dc."
+		/*  6 */ "nddddddd...dc."
 		/*  7 */ "eeeeeead...dc."
 		/*  8 */ "......ad...dc."
 		/*  9 */ "mmmmm.ad...dc."
 		/* 10 */ "mmmmm.adddddc."
-		/* 11 */ "mmmmm.aq...rc."
+		/* 11 */ "mmmmm.ap...qc."
 
 		// Level 5
 		/* z\x*             1111 */
@@ -1525,15 +1525,15 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  0 */ ".............."
 		/*  1 */ ".............."
 		/*  2 */ "bbbbbbbbbbbb.."
-		/*  3 */ "jddddddddddc.."
+		/*  3 */ "iddddddddddc.."
 		/*  4 */ ".d........dc.."
-		/*  5 */ "odddddddd.dc.."
+		/*  5 */ "ndddddddd.dc.."
 		/*  6 */ "eeeeeeeed.dc.."
 		/*  7 */ ".......ad.dc.."
 		/*  8 */ ".......ad.dc.."
 		/*  9 */ "mmmmm..ad.dc.."
 		/* 10 */ "mmmmm..adddc.."
-		/* 11 */ "mmmmm..aq.rc.."
+		/* 11 */ "mmmmm..ap.qc.."
 
 		// Level 6
 		/* z\x*             1111 */
@@ -1552,7 +1552,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/* 11 */ "mmmmm...adc...",
 
 		// Connectors:
-		"",
+		"-1: 5, 0, 1: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1619,7 +1619,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ "d........d",
 
 		// Connectors:
-		"",
+		"-1: 0, 0, 3: 4\n"  /* Type -1, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1661,8 +1661,8 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		"d: 50: 5\n"  /* torch */
 		"e: 26:10\n"  /* bedblock */
 		"f: 26: 2\n"  /* bedblock */
-		"g: 64: 3\n"  /* wooddoorblock */
-		"h: 64: 8\n"  /* wooddoorblock */
+		"g: 64: 5\n"  /* wooddoorblock */
+		"h: 64:12\n"  /* wooddoorblock */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -1712,7 +1712,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  5 */ ".....",
 
 		// Connectors:
-		"",
+		"-1: 2, 0, 4: 3\n"  /* Type -1, direction Z+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1853,7 +1853,10 @@ const cPrefab::sDef g_SandVillageStartingPrefabs[] =
 		/*  3 */ "bbbb",
 
 		// Connectors:
-		"",
+		"1: 2, 8, 0: 2\n"  /* Type 1, direction Z- */
+		"1: 0, 8, 1: 4\n"  /* Type 1, direction X- */
+		"1: 1, 8, 3: 3\n"  /* Type 1, direction Z+ */
+		"1: 3, 8, 2: 5\n"  /* Type 1, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */

@@ -21,19 +21,13 @@ class cVillageGen :
 {
 	typedef cGridStructGen super;
 public:
-	cVillageGen(int a_Seed, int a_GridSize, int a_MaxRoadDepth, int a_MaxSize, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
+	cVillageGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSize, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
 
 protected:
 	class cVillage;  // fwd: VillageGen.cpp
 
-	/** The prefabs for the sand village. We're not exactly using the cPiecePool functionality, only the containment. */
-	static cPrefabPiecePool m_SandVillage;
-
-	/** The prefabs for the plains village. We're not exactly using the cPiecePool functionality, only the containment. */
-	static cPrefabPiecePool m_PlainsVillage;
-	
-	/** Maximum number of roads generated one from another (tree depth). */
-	int m_MaxRoadDepth;
+	/** Maximum depth of the generator tree*/
+	int m_MaxDepth;
 	
 	/** Maximum size, in X/Z blocks, of the village (radius from the origin) */
 	int m_MaxSize;
