@@ -136,6 +136,33 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	ParseConnectors(a_Def.m_Connectors);
 	ParseDepthWeight(a_Def.m_DepthWeight);
 	
+	AddRotatedBlockAreas();
+}
+
+
+
+
+
+cPrefab::cPrefab(const cBlockArea & a_Image, int a_AllowedRotations) :
+	m_Size(a_Image.GetSize()),
+	m_AllowedRotations(a_AllowedRotations),
+	m_MergeStrategy(cBlockArea::msOverwrite),
+	m_ShouldExtendFloor(false),
+	m_DefaultWeight(1),
+	m_AddWeightIfSame(0)
+{
+	m_HitBox.p1.Set(0, 0, 0);
+	m_HitBox.p2.Set(m_Size.x - 1, m_Size.y - 1, m_Size.z - 1);
+	m_BlockArea[0].CopyFrom(a_Image);
+	AddRotatedBlockAreas();
+}
+
+
+
+
+
+void cPrefab::AddRotatedBlockAreas(void)
+{
 	// 1 CCW rotation:
 	if ((m_AllowedRotations & 0x01) != 0)
 	{
@@ -251,6 +278,15 @@ int cPrefab::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cC
 		res += m_AddWeightIfSame;
 	}
 	return res;
+}
+
+
+
+
+
+void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
+{
+	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
 }
 
 
