@@ -408,8 +408,8 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "Villages") == 0)
 		{
-			int GridSize = a_IniFile.GetValueSetI("Generator", "VillageGridSize", 256);
-			int MaxDepth = a_IniFile.GetValueSetI("Generator", "VillageMaxDepth", 7);
+			int GridSize = a_IniFile.GetValueSetI("Generator", "VillageGridSize", 384);
+			int MaxDepth = a_IniFile.GetValueSetI("Generator", "VillageMaxDepth", 3);
 			int MaxSize  = a_IniFile.GetValueSetI("Generator", "VillageMaxSize",  128);
 			m_FinishGens.push_back(new cVillageGen(Seed, GridSize, MaxDepth, MaxSize, *m_BiomeGen, *m_HeightGen));
 		}
