@@ -374,6 +374,9 @@ private:
 	/** Handles the DIG_FINISHED dig packet: */
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 
+	/** The clients will receive a finished dig animation */
+	void FinishDigAnimation();
+
 	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
 	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
 	
