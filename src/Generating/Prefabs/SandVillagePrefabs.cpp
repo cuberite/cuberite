@@ -1853,10 +1853,10 @@ const cPrefab::sDef g_SandVillageStartingPrefabs[] =
 		/*  3 */ "bbbb",
 
 		// Connectors:
-		"1: 2, 8, 0: 2\n"  /* Type 1, direction Z- */
-		"1: 0, 8, 1: 4\n"  /* Type 1, direction X- */
-		"1: 1, 8, 3: 3\n"  /* Type 1, direction Z+ */
-		"1: 3, 8, 2: 5\n"  /* Type 1, direction X+ */,
+		"2: 2, 8, 0: 2\n"  /* Type 2, direction Z- */
+		"2: 0, 8, 1: 4\n"  /* Type 2, direction X- */
+		"2: 1, 8, 3: 3\n"  /* Type 2, direction Z+ */
+		"2: 3, 8, 2: 5\n"  /* Type 2, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */

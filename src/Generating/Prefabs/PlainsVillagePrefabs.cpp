@@ -3691,10 +3691,10 @@ const cPrefab::sDef g_PlainsVillageStartingPrefabs[] =
 		/*  3 */ "bbbb",
 
 		// Connectors:
-		"1: 1, 9, 3: 3\n"  /* Type 1, direction Z+ */
-		"1: 2, 9, 0: 2\n"  /* Type 1, direction Z- */
-		"1: 0, 9, 1: 4\n"  /* Type 1, direction X- */
-		"1: 3, 9, 2: 5\n"  /* Type 1, direction X+ */,
+		"2: 1, 9, 3: 3\n"  /* Type 2, direction Z+ */
+		"2: 2, 9, 0: 2\n"  /* Type 2, direction Z- */
+		"2: 0, 9, 1: 4\n"  /* Type 2, direction X- */
+		"2: 3, 9, 2: 5\n"  /* Type 2, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */

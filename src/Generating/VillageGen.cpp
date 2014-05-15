@@ -44,43 +44,42 @@ public:
 	) :
 		super(a_PieceDefs, a_NumPieceDefs, a_StartingPieceDefs, a_NumStartingPieceDefs)
 	{
-		// Add the road piece:
-		cBlockArea BA;
-		BA.Create(5, 1, 3, cBlockArea::baTypes | cBlockArea::baMetas);
-		BA.Fill(cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_GRAVEL, 0);
-		cPrefab * RoadPiece = new cPrefab(BA, 7);
-		RoadPiece->AddConnector(0, 0, 1, BLOCK_FACE_XM, -1);
-		RoadPiece->AddConnector(4, 0, 1, BLOCK_FACE_XP, -1);
-		RoadPiece->AddConnector(4, 0, 1, BLOCK_FACE_XP, 1);
-		RoadPiece->AddConnector(1, 0, 0, BLOCK_FACE_ZM, 1);
-		RoadPiece->AddConnector(3, 0, 0, BLOCK_FACE_ZM, 1);
-		RoadPiece->AddConnector(1, 0, 2, BLOCK_FACE_ZP, 1);
-		RoadPiece->AddConnector(3, 0, 2, BLOCK_FACE_ZP, 1);
-		RoadPiece->SetAddWeightIfSame(10000);
-		m_AllPieces.push_back(RoadPiece);
-		m_PiecesByConnector[-1].push_back(RoadPiece);
-		m_PiecesByConnector[1].push_back(RoadPiece);
+		// Add the road pieces:
+		for (int len = 19; len < 60; len += 8)
+		{
+			cBlockArea BA;
+			BA.Create(len, 1, 3, cBlockArea::baTypes | cBlockArea::baMetas);
+			BA.Fill(cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_GRAVEL, 0);
+			cPrefab * RoadPiece = new cPrefab(BA, 1);
+			RoadPiece->AddConnector(0,       0, 1, BLOCK_FACE_XM, -2);
+			RoadPiece->AddConnector(len - 1, 0, 1, BLOCK_FACE_XP, -2);
+			
+			// Add the road connectors:
+			for (int x = 1; x < len; x += 8)
+			{
+				RoadPiece->AddConnector(x, 0, 0, BLOCK_FACE_ZM, 2);
+				RoadPiece->AddConnector(x, 0, 2, BLOCK_FACE_ZP, 2);
+			}
+			
+			// Add the buildings connectors:
+			for (int x = 5; x < len; x += 8)
+			{
+				RoadPiece->AddConnector(x, 0, 0, BLOCK_FACE_ZM, 1);
+				RoadPiece->AddConnector(x, 0, 2, BLOCK_FACE_ZP, 1);
+			}
+			m_AllPieces.push_back(RoadPiece);
+			m_PiecesByConnector[-2].push_back(RoadPiece);
+			m_PiecesByConnector[1].push_back(RoadPiece);
+			m_PiecesByConnector[2].push_back(RoadPiece);
+		}  // for len - roads of varying length
 	}
 	
 	
 	// cPrefabPiecePool overrides:
 	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override
 	{
-		// Only roads are allowed to connect to the well:
-		if ((a_PlacedPiece.GetDepth() == 0) && (a_NewPiece.GetSize().y != 1))
-		{
-			return 0;
-		}
-		
-		// Roads cannot branch T-wise:
-		if (
-			(a_PlacedPiece.GetPiece().GetSize().y == 1) &&  // Connecting to a road
-			(
-				(a_ExistingConnector.m_Direction == BLOCK_FACE_ZP) ||
-				(a_ExistingConnector.m_Direction == BLOCK_FACE_ZM) 
-			) &&            // Through the long-edge connector
-			(a_NewPiece.GetSize().y == 1)                   // And the new piece is a road
-		)
+		// Roads cannot branch T-wise (appending -2 connector to a +2 connector):
+		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0))
 		{
 			return 0;
 		}
