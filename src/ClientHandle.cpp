@@ -582,16 +582,37 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 		return;
 	}
 
-	/*
-	// TODO: Invalid stance check
-	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
+	if (m_Player->GetHealth() <= 0)
 	{
-		LOGD("Invalid stance");
-		SendPlayerMoveLook();
+		// The player is dead. He can't move :D
 		return;
 	}
-	*/
-	
+
+	if (std::isnan(a_PosX) || std::isnan(a_PosY) || std::isnan(a_PosZ) || std::isnan(a_Stance))
+	{
+		LOGWARN("%s was caught trying to crash the server with an invalid position.", m_Player->GetName().c_str());
+		Kick("Nope!");
+		return;
+	}
+
+	// Invalid stance check
+	if (!m_Player->IsInBed())
+	{
+		double Difference = a_Stance - a_PosY;
+		if ((Difference > 1.65) || (Difference < 1.0))
+		{
+			Kick("Illegal stance!");
+			LOGWARN("%s had an illegal stance: %f", m_Player->GetName().c_str(), a_Stance);
+			return;
+		}
+	}
+
+	if ((std::abs(a_PosX) > 32000000.0) || (std::abs(a_PosZ) > 32000000.0))
+	{
+		Kick("Illegal position!");
+		return;
+	}
+
 	// If the player has moved too far, "repair" them:
 	Vector3d Pos(a_PosX, a_PosY, a_PosZ);
 	if ((m_Player->GetPosition() - Pos).SqrLength() > 100 * 100)
@@ -1388,7 +1409,7 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 
 
-void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
+void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Yaw, float a_Pitch, bool a_IsOnGround)
 {
 	if ((m_Player == NULL) || (m_State != csPlaying))
 	{
@@ -1396,21 +1417,42 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 		return;
 	}
 
-	/*
-	// TODO: Invalid stance check
-	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
+	if (m_Player->GetHealth() <= 0)
 	{
-		LOGD("Invalid stance");
-		SendPlayerMoveLook();
+		// The player is dead. He can't move :D
 		return;
 	}
-	*/
+
+	if (std::isnan(a_PosX) || std::isnan(a_PosY) || std::isnan(a_PosZ) || std::isnan(a_Stance))
+	{
+		LOGWARN("%s was caught trying to crash the server with an invalid position.", m_Player->GetName().c_str());
+		Kick("Nope!");
+		return;
+	}
+
+	// Invalid stance check
+	if (!m_Player->IsInBed())
+	{
+		double Difference = a_Stance - a_PosY;
+		if ((Difference > 1.65) || (Difference < 1.0))
+		{
+			Kick("Illegal stance!");
+			LOGWARN("%s had an illegal stance: %f", m_Player->GetName().c_str(), a_Stance);
+			return;
+		}
+	}
+
+	if ((std::abs(a_PosX) > 32000000.0) || (std::abs(a_PosZ) > 32000000.0))
+	{
+		Kick("Illegal position!");
+		return;
+	}
 	
 	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
 	m_Player->SetStance     (a_Stance);
 	m_Player->SetTouchGround(a_IsOnGround);
-	m_Player->SetHeadYaw    (a_Rotation);
-	m_Player->SetYaw        (a_Rotation);
+	m_Player->SetHeadYaw    (a_Yaw);
+	m_Player->SetYaw        (a_Yaw);
 	m_Player->SetPitch      (a_Pitch);
 }
 
