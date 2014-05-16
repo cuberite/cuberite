@@ -760,7 +760,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 {
 	if (!a_Player.IsGameModeCreative())
 	{
-		a_Player.DeltaExperience(cPlayer::XpForLevel(m_MaximumCost));
+		a_Player.DeltaExperience(-cPlayer::XpForLevel(m_MaximumCost));
 	}
 	SetSlot(0, a_Player, cItem());
 
