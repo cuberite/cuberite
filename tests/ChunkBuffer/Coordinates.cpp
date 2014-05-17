@@ -120,5 +120,16 @@ int main(int argc, char** argv)
 	}
 	
 	
+	{
+		// Operator =
+		cChunkBuffer buffer;
+		buffer.SetBlock(0,0,0,0x42);
+		cChunkBuffer copy;
+		copy = buffer;
+		testassert(copy.GetBlock(0,0,0) == 0x42);
+		copy = copy;
+		testassert(copy.GetBlock(0,0,0) == 0x42)
+	}
+	
 	return 0;
 }
