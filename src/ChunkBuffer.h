@@ -55,7 +55,7 @@ public:
 
 	cChunkBuffer& operator=(const cChunkBuffer& other)
 	{
-		if(&other == this)
+		if(&other != this)
 		{
 			if(IsOwner)
 			{
