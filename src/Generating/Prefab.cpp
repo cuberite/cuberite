@@ -192,12 +192,20 @@ void cPrefab::AddRotatedBlockAreas(void)
 
 void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 {
+	Draw(a_Dest, a_Placement->GetCoords(), a_Placement->GetNumCCWRotations());
+}
+
+
+
+
+void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumRotations) const
+{
 	// Draw the basic image:
-	Vector3i Placement = a_Placement->GetCoords();
+	Vector3i Placement(a_Placement);
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	const cBlockArea & Image = m_BlockArea[a_Placement->GetNumCCWRotations()];
+	const cBlockArea & Image = m_BlockArea[a_NumRotations];
 	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)

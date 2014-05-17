@@ -94,6 +94,9 @@ public:
 	/** Draws the prefab into the specified chunk, according to the placement stored in the PlacedPiece. */
 	void Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const;
 	
+	/** Draws the prefab into the specified chunks, according to the specified placement and rotations. */
+	void Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumRotations) const;
+	
 	/** Returns true if the prefab has any connector of the specified type. */
 	bool HasConnectorType(int a_ConnectorType) const;
 	

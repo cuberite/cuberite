@@ -115,7 +115,9 @@ public:
 		m_HeightGen(a_HeightGen)
 	{
 		cBFSPieceGenerator pg(m_Prefabs, a_Seed);
-		pg.PlacePieces(a_OriginX, 10, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
+		// Generate the pieces at very negative Y coords, so that we can later test
+		// Piece has negative Y coord -> hasn't been height-adjusted yet
+		pg.PlacePieces(a_OriginX, -1000, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
 	}
 	
 protected:
@@ -144,15 +146,44 @@ protected:
 	// cGrdStructGen::cStructure overrides:
 	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override
 	{
-		// TODO
 		// Iterate over all items
-		// Each intersecting prefab is placed on ground (if not already placed), then drawn
+		// Each intersecting prefab is placed on ground, then drawn
 		// Each intersecting road is drawn by replacing top soil blocks with gravel / sandstone blocks
-		for (cPlacedPieces::const_iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
+		cChunkDef::HeightMap HeightMap;  // Heightmap for this chunk, used by roads
+		m_HeightGen.GenHeightMap(a_Chunk.GetChunkX(), a_Chunk.GetChunkZ(), HeightMap);
+		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
-			const cPrefab & Prefab = (const cPrefab &)((*itr)->GetPiece());
+			cPrefab & Prefab = (cPrefab &)((*itr)->GetPiece());
+			if ((*itr)->GetPiece().GetSize().y == 1)
+			{
+				// It's a road, special handling (change top terrain blocks
+				// TODO
+				Prefab.Draw(a_Chunk, (*itr)->GetCoords() + Vector3i(0, 1100, 0), (*itr)->GetNumCCWRotations());
+				continue;
+			}
+			if ((*itr)->GetCoords().y < 0)
+			{
+				PlacePieceOnGround(**itr);
+			}
 			Prefab.Draw(a_Chunk, *itr);
 		}  // for itr - m_PlacedPieces[]
+	}
+	
+	
+	/**  Adjusts the Y coord of the given piece so that the piece is on the ground.
+	Ground level is assumed to be represented by the first connector in the piece. */
+	void PlacePieceOnGround(cPlacedPiece & a_Piece)
+	{
+		cPiece::cConnector FirstConnector = a_Piece.GetRotatedConnector(0);
+		int ChunkX, ChunkZ;
+		int BlockX = FirstConnector.m_Pos.x;
+		int BlockZ = FirstConnector.m_Pos.z;
+		int BlockY;
+		cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+		cChunkDef::HeightMap HeightMap;
+		m_HeightGen.GenHeightMap(ChunkX, ChunkZ, HeightMap);
+		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
+		a_Piece.GetCoords().y += TerrainHeight - FirstConnector.m_Pos.y + 1;
 	}
 } ;
 

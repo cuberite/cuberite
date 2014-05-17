@@ -144,6 +144,13 @@ public:
 	const cCuboid &  GetHitBox         (void) const { return m_HitBox; }
 	int              GetDepth          (void) const { return m_Depth; }
 	
+	/** Returns the coords as a modifiable object. */
+	Vector3i & GetCoords(void) { return m_Coords; }
+	
+	/** Returns the connector at the specified index, rotated in the actual placement.
+	Undefined behavior if a_Index is out of range. */
+	cPiece::cConnector GetRotatedConnector(size_t a_Index) const;
+	
 protected:
 	const cPlacedPiece * m_Parent;
 	const cPiece * m_Piece;
