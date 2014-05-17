@@ -53,21 +53,25 @@ public:
 		other.IsOwner = false;
 	}
 
-	void operator=(const cChunkBuffer& other)
+	cChunkBuffer& operator=(const cChunkBuffer& other)
 	{
-		if(IsOwner)
+		if(&other == this)
 		{
+			if(IsOwner)
+			{
+				for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+				{
+					if(m_Sections[i]) Free(m_Sections[i]);;
+				}
+			}
+			IsOwner = true;
 			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 			{
-				if(m_Sections[i]) Free(m_Sections[i]);;
+				m_Sections[i] = other.m_Sections[i];
 			}
+			other.IsOwner = false;
 		}
-		IsOwner = true;
-		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
-		{
-			m_Sections[i] = other.m_Sections[i];
-		}
-		other.IsOwner = false;
+		
 	}
 	#else
 	// unique_ptr style interface for memory management
@@ -79,7 +83,7 @@ public:
 		}
 	}
 	
-	void operator=(const cChunkBuffer&& other)
+	cChunkBuffer& operator=(const cChunkBuffer&& other)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
