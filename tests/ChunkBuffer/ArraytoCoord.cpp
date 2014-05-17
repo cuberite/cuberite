@@ -7,6 +7,7 @@
 int main(int argc, char** argv)
 {
 	{
+		// Test first segment
 		cChunkBuffer buffer;
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
@@ -43,6 +44,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
+		// test following segment
 		cChunkBuffer buffer;
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
@@ -74,6 +76,39 @@ int main(int argc, char** argv)
 		SrcNibbleBuffer[(6+1*16+24*16*16)/2] = 0xE;
 		buffer.SetSkyLight(SrcNibbleBuffer);
 		testassert(buffer.GetSkyLight(6,24,1) == 0xE);
+		delete SrcNibbleBuffer;
+		SrcNibbleBuffer = NULL;
+	}
+	
+	{
+		// test zeros
+		cChunkBuffer buffer;
+
+		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
+		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
+		buffer.SetBlocks(SrcBlockBuffer);
+		testassert(buffer.GetBlock(7,24,4) == 0x00);
+		delete SrcBlockBuffer;
+		SrcBlockBuffer = NULL;
+	
+		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+		buffer.SetMeta(SrcNibbleBuffer);
+		testassert(buffer.GetMeta(6,24,1) == 0x0);
+		delete SrcNibbleBuffer;
+		SrcNibbleBuffer = NULL;
+	
+		SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+		buffer.SetLight(SrcNibbleBuffer);
+		testassert(buffer.GetBlockLight(6,24,1) == 0x0);
+		delete SrcNibbleBuffer;
+		SrcNibbleBuffer = NULL;
+	
+		SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
+		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+		buffer.SetSkyLight(SrcNibbleBuffer);
+		testassert(buffer.GetSkyLight(6,24,1) == 0xF);
 		delete SrcNibbleBuffer;
 		SrcNibbleBuffer = NULL;
 	}
