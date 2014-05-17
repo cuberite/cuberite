@@ -71,6 +71,7 @@ public:
 			}
 			other.IsOwner = false;
 		}
+		return *this;
 		
 	}
 	#else
@@ -85,11 +86,15 @@ public:
 	
 	cChunkBuffer& operator=(const cChunkBuffer&& other)
 	{
-		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+		if(&other != this)
 		{
-			if(m_Sections[i]) Free(m_Sections[i]);;
-			m_Sections[i] = other.m_Sections[i];
+			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+			{
+				if(m_Sections[i]) Free(m_Sections[i]);;
+				m_Sections[i] = other.m_Sections[i];
+			}
 		}
+		return *this;
 	}
 	#endif
 
