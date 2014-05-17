@@ -156,8 +156,8 @@ protected:
 	const cPiece * m_Piece;
 	Vector3i m_Coords;
 	int m_NumCCWRotations;
-	cCuboid m_HitBox;
-	int m_Depth;
+	cCuboid m_HitBox;  // Hitbox of the placed piece, in world coords
+	int m_Depth;       // Depth in the generated piece tree
 };
 
 typedef std::vector<cPlacedPiece *> cPlacedPieces;

@@ -104,7 +104,8 @@ public:
 		int a_MaxRoadDepth,
 		int a_MaxSize,
 		cPrefabPiecePool & a_Prefabs,
-		cTerrainHeightGen & a_HeightGen
+		cTerrainHeightGen & a_HeightGen,
+		BLOCKTYPE a_RoadBlock
 	) :
 		super(a_OriginX, a_OriginZ),
 		m_Seed(a_Seed),
@@ -112,7 +113,8 @@ public:
 		m_MaxSize(a_MaxSize),
 		m_Borders(a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize, a_OriginX + a_MaxSize, 255, a_OriginZ + a_MaxSize),
 		m_Prefabs(a_Prefabs),
-		m_HeightGen(a_HeightGen)
+		m_HeightGen(a_HeightGen),
+		m_RoadBlock(a_RoadBlock)
 	{
 		cBFSPieceGenerator pg(m_Prefabs, a_Seed);
 		// Generate the pieces at very negative Y coords, so that we can later test
@@ -142,6 +144,9 @@ protected:
 	/** The village pieces, placed by the generator. */
 	cPlacedPieces m_Pieces;
 	
+	/** The block to use for the roads. */
+	BLOCKTYPE m_RoadBlock;
+	
 	
 	// cGrdStructGen::cStructure overrides:
 	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override
@@ -156,9 +161,8 @@ protected:
 			cPrefab & Prefab = (cPrefab &)((*itr)->GetPiece());
 			if ((*itr)->GetPiece().GetSize().y == 1)
 			{
-				// It's a road, special handling (change top terrain blocks
-				// TODO
-				Prefab.Draw(a_Chunk, (*itr)->GetCoords() + Vector3i(0, 1100, 0), (*itr)->GetNumCCWRotations());
+				// It's a road, special handling (change top terrain blocks to m_RoadBlock)
+				DrawRoad(a_Chunk, **itr, HeightMap);
 				continue;
 			}
 			if ((*itr)->GetCoords().y < 0)
@@ -184,6 +188,27 @@ protected:
 		m_HeightGen.GenHeightMap(ChunkX, ChunkZ, HeightMap);
 		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 		a_Piece.GetCoords().y += TerrainHeight - FirstConnector.m_Pos.y + 1;
+	}
+	
+	
+	/** Draws the road into the chunk.
+	The heightmap is not queried from the heightgen, but is given via parameter, so that it may be queried just
+	once for all roads in a chunk. */
+	void DrawRoad(cChunkDesc & a_Chunk, cPlacedPiece & a_Road, cChunkDef::HeightMap & a_HeightMap)
+	{
+		cCuboid RoadCoords = a_Road.GetHitBox();
+		RoadCoords.Sort();
+		int MinX = std::max(RoadCoords.p1.x - a_Chunk.GetChunkX() * cChunkDef::Width, 0);
+		int MaxX = std::min(RoadCoords.p2.x - a_Chunk.GetChunkX() * cChunkDef::Width, cChunkDef::Width - 1);
+		int MinZ = std::max(RoadCoords.p1.z - a_Chunk.GetChunkZ() * cChunkDef::Width, 0);
+		int MaxZ = std::min(RoadCoords.p2.z - a_Chunk.GetChunkZ() * cChunkDef::Width, cChunkDef::Width - 1);
+		for (int z = MinZ; z <= MaxZ; z++)
+		{
+			for (int x = MinX; x <= MaxX; x++)
+			{
+				a_Chunk.SetBlockType(x, cChunkDef::GetHeight(a_HeightMap, x, z), z, m_RoadBlock);
+			}
+		}
 	}
 } ;
 
@@ -228,6 +253,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	// Check if all the biomes are village-friendly:
 	// If just one is not, no village is created, because it's likely that an unfriendly biome is too close
 	cVillagePiecePool * VillagePrefabs = NULL;
+	BLOCKTYPE RoadBlock = E_BLOCK_GRAVEL;
 	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		switch (Biomes[i])
@@ -237,6 +263,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 			{
 				// These biomes allow sand villages
 				VillagePrefabs = &g_SandVillage;
+				RoadBlock = E_BLOCK_SANDSTONE;
 				break;
 			}
 			case biPlains:
@@ -261,7 +288,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	{
 		return cStructurePtr();
 	}
-	return cStructurePtr(new cVillage(m_Seed, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, *VillagePrefabs, m_HeightGen));
+	return cStructurePtr(new cVillage(m_Seed, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, *VillagePrefabs, m_HeightGen, RoadBlock));
 }
 
 
