@@ -76,15 +76,16 @@ public:
 	}
 	#else
 	// unique_ptr style interface for memory management
-	cChunkBuffer(const cChunkBuffer&& other)
+	cChunkBuffer(cChunkBuffer&& other)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
 			m_Sections[i] = other.m_Sections[i];
+			other.m_Sections[i] = 0;
 		}
 	}
 	
-	cChunkBuffer& operator=(const cChunkBuffer&& other)
+	cChunkBuffer& operator=(cChunkBuffer&& other)
 	{
 		if(&other != this)
 		{
@@ -92,6 +93,7 @@ public:
 			{
 				if(m_Sections[i]) Free(m_Sections[i]);;
 				m_Sections[i] = other.m_Sections[i];
+				other.m_Sections[i] = 0;
 			}
 		}
 		return *this;
@@ -230,7 +232,7 @@ public:
 			}
 			else
 			{
-				return 0xFF;
+				return 0xF;
 			}
 		}
 		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");

@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 		SrcNibbleBuffer = NULL;
 	
 		SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
-		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
+		memset(SrcNibbleBuffer, 0xFF, 16 * 16 * 256 /2);
 		buffer.SetSkyLight(SrcNibbleBuffer);
 		testassert(buffer.GetSkyLight(6,24,1) == 0xF);
 		delete SrcNibbleBuffer;
