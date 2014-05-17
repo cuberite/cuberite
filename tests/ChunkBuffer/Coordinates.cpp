@@ -125,9 +125,17 @@ int main(int argc, char** argv)
 		cChunkBuffer buffer;
 		buffer.SetBlock(0,0,0,0x42);
 		cChunkBuffer copy;
+		#if __cplusplus < 201103L
+		copy = buffer;
+		#else
 		copy = std::move(buffer);
+		#endif
 		testassert(copy.GetBlock(0,0,0) == 0x42);
+		#if __cplusplus < 201103L
+		copy = copy;
+		#else
 		copy = std::move(copy);
+		#endif
 		testassert(copy.GetBlock(0,0,0) == 0x42);
 	}
 	
