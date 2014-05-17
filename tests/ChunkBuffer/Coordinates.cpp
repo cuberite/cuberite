@@ -125,10 +125,10 @@ int main(int argc, char** argv)
 		cChunkBuffer buffer;
 		buffer.SetBlock(0,0,0,0x42);
 		cChunkBuffer copy;
-		copy = buffer;
+		copy = std::move(buffer);
 		testassert(copy.GetBlock(0,0,0) == 0x42);
-		copy = copy;
-		testassert(copy.GetBlock(0,0,0) == 0x42)
+		copy = std::move(copy);
+		testassert(copy.GetBlock(0,0,0) == 0x42);
 	}
 	
 	return 0;
