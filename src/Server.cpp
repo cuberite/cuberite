@@ -476,6 +476,12 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
+	if (split[0] == "load" && !split[1].empty())
+	{
+		cPluginManager::Get()->LoadPlugin(split[1]);
+		a_Output.Out("Plugin " + split[1] + " added and activated!");
+		a_Output.Finished();
+	}
 	
 	// There is currently no way a plugin can do these (and probably won't ever be):
 	if (split[0].compare("chunkstats") == 0)
