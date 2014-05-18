@@ -476,7 +476,37 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
-	
+	if (split[0] == "load")
+	{
+		if (split.size() > 1)
+		{
+			cPluginManager::Get()->LoadPlugin(split[1]);
+
+			return;
+		}
+		else
+		{
+			a_Output.Out("No plugin given! Command: load <pluginname>");
+			a_Output.Finished();
+			return;
+		}
+	}
+
+	if (split[0] == "unload")
+	{
+		if (split.size() > 1)
+		{
+			cPluginManager::Get()->RemovePlugin(cPluginManager::Get()->GetPlugin(split[1]));
+			return;
+		}
+		else
+		{
+			a_Output.Out("No plugin given! Command: unload <pluginname>");
+			a_Output.Finished();
+			return;
+		}
+	}
+
 	// There is currently no way a plugin can do these (and probably won't ever be):
 	if (split[0].compare("chunkstats") == 0)
 	{
@@ -567,6 +597,9 @@ void cServer::BindBuiltInConsoleCommands(void)
 	PlgMgr->BindConsoleCommand("restart", NULL, " - Restarts the server cleanly");
 	PlgMgr->BindConsoleCommand("stop", NULL, " - Stops the server cleanly");
 	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("load <pluginname>", NULL, " - Adds and enables the specified plugin");
+	PlgMgr->BindConsoleCommand("unload <pluginname>", NULL, " - Disables the specified plugin");
+
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif

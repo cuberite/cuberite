@@ -7,7 +7,7 @@
 #include "Connection.h"
 #include "Server.h"
 #include <iostream>
-#include "PolarSSL++/PublicKey.h"
+#include "PolarSSL++/CryptoKey.h"
 
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
@@ -2900,7 +2900,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	Byte SharedSecret[16];
 	Byte EncryptedSecret[128];
 	memset(SharedSecret, 0, sizeof(SharedSecret));  // Use all zeroes for the initial secret
-	cPublicKey PubKey(a_ServerPublicKey);
+	cCryptoKey PubKey(a_ServerPublicKey);
 	int res = PubKey.Encrypt(SharedSecret, sizeof(SharedSecret), EncryptedSecret, sizeof(EncryptedSecret));
 	if (res < 0)
 	{

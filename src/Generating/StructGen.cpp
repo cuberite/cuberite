@@ -596,24 +596,22 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
-			switch (a_ChunkDesc.GetBiome(x, z))
+			EMCSBiome biome = a_ChunkDesc.GetBiome(x, z);
+			
+			if ((biome == biExtremeHills) || (biome == biExtremeHillsEdge))
 			{
-				case biExtremeHills:
-				case biExtremeHillsEdge:
+				int Lo = FloorLo[x + 17 * z] / 256;
+				int Hi = FloorHi[x + 17 * z] / 256;
+				for (int y = 0; y < SEGMENT_HEIGHT; y++)
 				{
-					int Lo = FloorLo[x + 17 * z] / 256;
-					int Hi = FloorHi[x + 17 * z] / 256;
-					for (int y = 0; y < SEGMENT_HEIGHT; y++)
+					int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
+					if (Val < 0)
 					{
-						int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
-						if (Val < 0)
-						{
-							a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_AIR);
-						}
-					}  // for y
-					break;
-				}
-			}  // switch (biome)
+						a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_AIR);
+					}
+				}  // for y
+				break;
+			}  // if (biome)
 		}  // for z, x
 		
 		// Swap the floors:

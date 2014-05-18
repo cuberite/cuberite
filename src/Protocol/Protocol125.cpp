@@ -99,6 +99,7 @@ enum
 	PACKET_ENCHANT_ITEM              = 0x6C,
 	PACKET_UPDATE_SIGN               = 0x82,
 	PACKET_ITEM_DATA                 = 0x83,
+	PACKET_INCREMENT_STATISTIC       = 0xC8,
 	PACKET_PLAYER_LIST_ITEM          = 0xC9,
 	PACKET_PLAYER_ABILITIES          = 0xca,
 	PACKET_PLUGIN_MESSAGE            = 0xfa,
@@ -986,6 +987,33 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 		WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
 	}
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendStatistics(const cStatManager & a_Manager)
+{
+	/* NOTE:
+	 * Versions prior to minecraft 1.7 use an incremental statistic sync
+	 * method. The current setup does not allow us to implement that, because
+	 * of performance considerations.
+	 */
+#if 0
+	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	{
+		StatValue Value = m_Manager->GetValue((eStatistic) i);
+
+		unsigned int StatID = cStatInfo::GetID((eStatistic) i);
+
+		cCSLock Lock(m_CSPacket);
+		WriteByte(PACKET_INCREMENT_STATISTIC);
+		WriteInt(StatID);
+		WriteByte(Value); /* Can overflow! */
+		Flush();
+	}
+#endif
 }
 
 

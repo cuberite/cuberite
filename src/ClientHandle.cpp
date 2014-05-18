@@ -336,7 +336,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 
 	// Send scoreboard data
 	World->GetScoreBoard().SendTo(*this);
-	
+
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
 	cTimer t1;
@@ -815,6 +815,16 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		return;
 	}
 
+	if (
+		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+	)
+	{
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
 	{
@@ -878,6 +888,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_CANCELLED:
 		{
 			// Block breaking cancelled by player
+			FinishDigAnimation();
 			return;
 		}
 
@@ -916,7 +927,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		// It is a duplicate packet, drop it right away
 		return;
 	}
-	
+
 	if (
 		m_Player->IsGameModeCreative() &&
 		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
@@ -925,14 +936,17 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		// Players can't destroy blocks with a Sword in the hand.
 		return;
 	}
-	
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+
+	if (
+		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+	)
 	{
-		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
-	
+
 	// Set the last digging coords to the block being dug, so that they can be checked in DIG_FINISHED to avoid dig/aim bug in the client:
 	m_HasStartedDigging = true;
 	m_LastDigBlockX = a_BlockX;
@@ -1004,24 +1018,24 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
-	m_HasStartedDigging = false;
-	if (m_BlockDigAnimStage != -1)
+	FinishDigAnimation();
+
+	cWorld * World = m_Player->GetWorld();
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
-		// End dig animation
-		m_BlockDigAnimStage = -1;
-		// It seems that 10 ends block animation
-		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_BlockDigAnimX, m_BlockDigAnimY, m_BlockDigAnimZ, 10, this);
+		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
 	}
 
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-	
 	if (a_OldBlock == E_BLOCK_AIR)
 	{
 		LOGD("Dug air - what the function?");
 		return;
 	}
-	
-	cWorld * World = m_Player->GetWorld();
+
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1036,6 +1050,36 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 
 
+void cClientHandle::FinishDigAnimation()
+{
+	if (
+		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
+		(m_LastDigBlockX == -1) ||
+		(m_LastDigBlockY == -1) ||
+		(m_LastDigBlockZ == -1)
+	)
+	{
+		return;
+	}
+
+	m_HasStartedDigging = false;
+	if (m_BlockDigAnimStage != -1)
+	{
+		// End dig animation
+		m_BlockDigAnimStage = -1;
+		// It seems that 10 ends block animation
+		m_Player->GetWorld()->BroadcastBlockBreakAnimation(m_UniqueID, m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ, 10, this);
+	}
+
+	m_BlockDigAnimX = -1;
+	m_BlockDigAnimY = -1;
+	m_BlockDigAnimZ = -1;
+}
+
+
+
+
+
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
 {
 	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
@@ -1043,7 +1087,23 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	);
 	
 	cWorld * World = m_Player->GetWorld();
-	
+
+	if (
+		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+	)
+	{
+		if (a_BlockFace != BLOCK_FACE_NONE)
+		{
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+			m_Player->GetInventory().SendEquippedSlot();
+		}
+		return;
+	}
+
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
@@ -1057,7 +1117,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		{
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player); //2 block high things
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+			m_Player->GetInventory().SendEquippedSlot();
 		}
 		return;
 	}
@@ -1246,6 +1307,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Handler refused the placement, send that information back to the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
 	
@@ -1255,6 +1317,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// A plugin doesn't agree with placing the block, revert the block on the client:
 		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
 	
@@ -2437,6 +2500,15 @@ void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTy
 
 
 
+void cClientHandle::SendStatistics(const cStatManager & a_Manager)
+{
+	m_Protocol->SendStatistics(a_Manager);
+}
+
+
+
+
+
 void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
 {
 	m_Protocol->SendTabCompletionResults(a_Results);
@@ -2676,12 +2748,13 @@ void cClientHandle::PacketError(unsigned char a_PacketType)
 
 
 
-void cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
+bool cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
 	m_TimeSinceLastPacket = 0;
 	cCSLock Lock(m_CSIncomingData);
 	m_IncomingData.append(a_Data, a_Size);
+	return false;
 }
 
 

@@ -169,7 +169,7 @@ cRCONServer::cConnection::cConnection(cRCONServer & a_RCONServer, cSocket & a_So
 
 
 
-void cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
+bool cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
 {
 	// Append data to the buffer:
 	m_Buffer.append(a_Data, a_Size);
@@ -187,12 +187,12 @@ void cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
 			m_RCONServer.m_SocketThreads.RemoveClient(this);
 			m_Socket.CloseSocket();
 			delete this;
-			return;
+			return false;
 		}
 		if (Length > (int)(m_Buffer.size() + 4))
 		{
 			// Incomplete packet yet, wait for more data to come
-			return;
+			return false;
 		}
 		
 		int RequestID  = IntFromBuffer(m_Buffer.data() + 4);
@@ -202,10 +202,11 @@ void cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
 			m_RCONServer.m_SocketThreads.RemoveClient(this);
 			m_Socket.CloseSocket();
 			delete this;
-			return;
+			return false;
 		}
 		m_Buffer.erase(0, Length + 4);
 	}  // while (m_Buffer.size() >= 14)
+	return false;
 }
 
 

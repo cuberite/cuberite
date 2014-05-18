@@ -8,6 +8,7 @@
 #include "HTTPMessage.h"
 #include "HTTPConnection.h"
 #include "HTTPFormParser.h"
+#include "SslHTTPConnection.h"
 
 
 
@@ -142,6 +143,41 @@ cHTTPServer::~cHTTPServer()
 
 bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6)
 {
+	// Read the HTTPS cert + key:
+	AString CertFile = cFile::ReadWholeFile("webadmin/httpscert.crt");
+	AString KeyFile  = cFile::ReadWholeFile("webadmin/httpskey.pem");
+	if (!CertFile.empty() && !KeyFile.empty())
+	{
+		m_Cert.reset(new cX509Cert);
+		int res = m_Cert->Parse(CertFile.data(), CertFile.size());
+		if (res == 0)
+		{
+			m_CertPrivKey.reset(new cCryptoKey);
+			int res2 = m_CertPrivKey->ParsePrivate(KeyFile.data(), KeyFile.size(), "");
+			if (res2 != 0)
+			{
+				// Reading the private key failed, reset the cert:
+				LOGWARNING("WebServer: Cannot read HTTPS certificate private key: -0x%x", -res2);
+				m_Cert.reset();
+			}
+		}
+		else
+		{
+			LOGWARNING("WebServer: Cannot read HTTPS certificate: -0x%x", -res);
+		}
+	}
+
+	// Notify the admin about the HTTPS / HTTP status
+	if (m_Cert.get() == NULL)
+	{
+		LOGWARNING("WebServer: The server is running in unsecure HTTP mode.");
+	}
+	else
+	{
+		LOGINFO("WebServer: The server is running in secure HTTPS mode.");
+	}
+	
+	// Open up requested ports:
 	bool HasAnyPort;
 	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
 	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
@@ -195,7 +231,15 @@ void cHTTPServer::Stop(void)
 
 void cHTTPServer::OnConnectionAccepted(cSocket & a_Socket)
 {
-	cHTTPConnection * Connection = new cHTTPConnection(*this);
+	cHTTPConnection * Connection;
+	if (m_Cert.get() != NULL)
+	{
+		Connection = new cSslHTTPConnection(*this, m_Cert, m_CertPrivKey);
+	}
+	else
+	{
+		Connection = new cHTTPConnection(*this);
+	}
 	m_SocketThreads.AddClient(a_Socket, Connection);
 	cCSLock Lock(m_CSConnections);
 	m_Connections.push_back(Connection);

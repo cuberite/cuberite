@@ -299,6 +299,9 @@ public:
 	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)
 	virtual void KilledBy(cEntity * a_Killer);
 
+	/// Called when the entity kills another entity
+	virtual void Killed(cEntity * a_Victim) {}
+
 	/// Heals the specified amount of HPs
 	void Heal(int a_HitPoints);
 	
