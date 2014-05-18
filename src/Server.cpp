@@ -29,7 +29,6 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <list>
 
 extern "C" {
 	#include "zlib/zlib.h"
