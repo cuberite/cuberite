@@ -601,6 +601,10 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			m_TicksSinceLastVoidDamage = 0;
 		}
 
+		if (IsMob() || IsPlayer() || IsPickup() || IsExpOrb())
+		{
+			DetectCacti();
+		}
 		if (IsMob() || IsPlayer())
 		{
 			// Set swimming state
@@ -991,6 +995,25 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 	else
 	{
 		m_TicksSinceLastVoidDamage++;
+	}
+}
+
+
+
+
+
+void cEntity::DetectCacti()
+{
+	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	if (
+		((X + 1) - GetPosX() < 0.3) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS) ||
+		((GetPosX() - (X - 1)) - 1 < 0.3) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS) ||
+		((Z + 1) - GetPosZ() < 0.3) && (GetWorld()->GetBlock(X, Y, Z + 1) == E_BLOCK_CACTUS) ||
+		((GetPosZ() - (Z - 1)) - 1 < 0.3) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS) ||
+		(((Y > 0) && (Y < cChunkDef::Height)) && ((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS)))
+		)
+	{
+		TakeDamage(dtCactus, NULL, 1, 0);
 	}
 }
 

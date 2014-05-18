@@ -816,9 +816,10 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	if (
-		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED)) && // Only do a radius check for block destruction - things like pickup tossing send coordinates that are to be ignored
+		((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
 		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
 	)
 	{
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
