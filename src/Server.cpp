@@ -29,6 +29,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <list>
 
 extern "C" {
 	#include "zlib/zlib.h"
@@ -481,6 +482,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->LoadPlugin(split[1]);
+
 			return;
 		}
 		else
@@ -490,20 +492,22 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 			return;
 		}
 	}
-	/*
-	 * TODO: Declare unload command
+
 	if (split[0] == "unload")
 	{
 		if (split.size() > 1)
 		{
-
+			cPluginManager::Get()->RemovePlugin(cPluginManager::Get()->GetPlugin(split[1]));
+			return;
 		}
 		else
 		{
-
+			a_Output.Out("No plugin given! Command: unload <pluginname>");
+			a_Output.Finished();
+			return;
 		}
 	}
-	*/
+
 	// There is currently no way a plugin can do these (and probably won't ever be):
 	if (split[0].compare("chunkstats") == 0)
 	{
