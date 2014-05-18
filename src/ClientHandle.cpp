@@ -336,7 +336,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 
 	// Send scoreboard data
 	World->GetScoreBoard().SendTo(*this);
-	
+
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
 	cTimer t1;
@@ -2494,6 +2494,15 @@ void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType,
 void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) // VehicleSubType is specific to Minecarts
 {
 	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
+}
+
+
+
+
+
+void cClientHandle::SendStatistics(const cStatManager & a_Manager)
+{
+	m_Protocol->SendStatistics(a_Manager);
 }
 
 

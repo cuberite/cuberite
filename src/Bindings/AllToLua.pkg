@@ -76,6 +76,7 @@ $cfile "../CompositeChat.h"
 $cfile "../Map.h"
 $cfile "../MapManager.h"
 $cfile "../Scoreboard.h"
+$cfile "../Statistics.h"
 
 
 

@@ -7,6 +7,8 @@
 #include "../World.h"
 #include "../ClientHandle.h"
 
+#include "../Statistics.h"
+
 
 
 
@@ -174,6 +176,15 @@ public:
 	cTeam * UpdateTeam(void);
 
 	// tolua_end
+
+	/** Return the associated statistic and achievement manager. */
+	cStatManager & GetStatManager() { return m_Stats; }
+
+	/** Awards the player an achievement.
+	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
+	If the achievement has been already awarded to the player, this method will just increment the stat counter.
+	Returns the _new_ stat value. (0 = Could not award achievement) */
+	unsigned int AwardAchievement(const eStatistic a_Ach);
 	
 	void SetIP(const AString & a_IP);
 	
@@ -306,6 +317,8 @@ public:
 	void AbortEating(void);
 	
 	virtual void KilledBy(cEntity * a_Killer) override;
+
+	virtual void Killed(cEntity * a_Victim) override;
 	
 	void Respawn(void);															// tolua_export
 
@@ -374,6 +387,9 @@ public:
 
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
+
+	/** Update movement-related statistics. */
+	void UpdateMovementStats(const Vector3d & a_DeltaPos);
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
@@ -487,6 +503,8 @@ protected:
 
 	cTeam * m_Team;
 
+	cStatManager m_Stats;
+
 
 
 	void ResolvePermissions(void);
@@ -505,6 +523,9 @@ protected:
 
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
+
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
 
 	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
 	void ApplyFoodExhaustionFromMovement();

@@ -496,6 +496,8 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 		DraggingItem = Result;
 		Recipe.ConsumeIngredients(Grid);
 		Grid.CopyToItems(PlayerSlots);
+
+		HandleCraftItem(Result, a_Player);
 	}
 	else if (DraggingItem.IsEqual(Result))
 	{
@@ -505,6 +507,8 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 			DraggingItem.m_ItemCount += Result.m_ItemCount;
 			Recipe.ConsumeIngredients(Grid);
 			Grid.CopyToItems(PlayerSlots);
+
+			HandleCraftItem(Result, a_Player);
 		}
 	}
 
@@ -589,6 +593,27 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
+}
+
+
+
+
+void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Player)
+{
+	switch (a_Result.m_ItemType)
+	{
+		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(achCraftWorkbench);    break;
+		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(achCraftFurnace);      break;
+		case E_BLOCK_CAKE:              a_Player.AwardAchievement(achBakeCake);          break;
+		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(achCraftEnchantTable); break;
+		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(achBookshelf);         break;
+		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(achCraftPickaxe);      break;
+		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(achCraftSword);        break;
+		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(achCraftBetterPick);   break;
+		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(achCraftHoe);          break;
+		case E_ITEM_BREAD:              a_Player.AwardAchievement(achMakeBread);         break;
+		default: break;
+	}
 }
 
 
@@ -1393,8 +1418,23 @@ void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	// Something has changed in the window, broadcast the entire window to all clients
 	ASSERT(a_ItemGrid == &(m_Furnace->GetContents()));
-	
+
 	m_ParentWindow.BroadcastWholeWindow();
+}
+
+
+
+
+
+void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player)
+{
+	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
+	switch (a_Result.m_ItemType)
+	{
+		case E_ITEM_IRON:        a_Player.AwardAchievement(achAcquireIron); break;
+		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(achCookFish);    break;
+		default: break;
+	}
 }
 
 

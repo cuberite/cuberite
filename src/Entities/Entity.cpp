@@ -312,12 +312,16 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
+		cPlayer * Player = (cPlayer *)a_TDI.Attacker;
+
 		// IsOnGround() only is false if the player is moving downwards
-		if (!((cPlayer *)a_TDI.Attacker)->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		if (!Player->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
 		{
 			a_TDI.FinalDamage += 2;
 			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
 		}
+
+		Player->GetStatManager().AddValue(statDamageDealt, round(a_TDI.FinalDamage * 10));
 	}
 
 	m_Health -= (short)a_TDI.FinalDamage;
@@ -370,6 +374,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	if (m_Health <= 0)
 	{
 		KilledBy(a_TDI.Attacker);
+
+		if (a_TDI.Attacker != NULL)
+		{
+			a_TDI.Attacker->Killed(this);
+		}
 	}
 	return true;
 }
@@ -575,9 +584,16 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_AttachedTo != NULL)
 	{
-		if ((m_Pos - m_AttachedTo->GetPosition()).Length() > 0.5)
+		Vector3d DeltaPos = m_Pos - m_AttachedTo->GetPosition();
+		if (DeltaPos.Length() > 0.5)
 		{
 			SetPosition(m_AttachedTo->GetPosition());
+
+			if (IsPlayer())
+			{
+				cPlayer * Player = (cPlayer *)this;
+				Player->UpdateMovementStats(DeltaPos);
+			}
 		}
 	}
 	else
