@@ -183,7 +183,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ "...........",
 
 		// Connectors:
-		"-1: 5, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 5, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -326,7 +326,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "...........",
 
 		// Connectors:
-		"-1: 5, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 5, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -444,7 +444,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ ".............",
 
 		// Connectors:
-		"-1: 6, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 6, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -587,7 +587,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ ".............",
 
 		// Connectors:
-		"-1: 6, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 6, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -730,7 +730,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "...............",
 
 		// Connectors:
-		"-1: 6, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 6, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -873,7 +873,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ "................",
 
 		// Connectors:
-		"-1: 9, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 9, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -984,7 +984,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ ".......",
 
 		// Connectors:
-		"-1: 4, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 4, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1096,7 +1096,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  6 */ ".........",
 
 		// Connectors:
-		"-1: 4, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 4, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1232,7 +1232,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  8 */ ".........",
 
 		// Connectors:
-		"-1: 4, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 4, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1384,7 +1384,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/* 11 */ "mmmmmmm..adc..",
 
 		// Connectors:
-		"-1: 8, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 8, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1552,7 +1552,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/* 11 */ "mmmmm...adc...",
 
 		// Connectors:
-		"-1: 5, 0, 1: 2\n"  /* Type -1, direction Z- */,
+		"-1: 5, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1712,7 +1712,7 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 		/*  5 */ ".....",
 
 		// Connectors:
-		"-1: 2, 0, 4: 3\n"  /* Type -1, direction Z+ */,
+		"-1: 2, 0, 5: 3\n"  /* Type -1, direction Z+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
