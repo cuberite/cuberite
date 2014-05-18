@@ -838,7 +838,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		AddFoodExhaustion(0.3f);
 		SendHealth();
 
-		m_Stats.AddValue(statDamageTaken, round(a_TDI.FinalDamage * 10));
+		m_Stats.AddValue(statDamageTaken, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
 	return false;
@@ -1953,7 +1953,7 @@ void cPlayer::HandleFloater()
 
 void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 {
-	StatValue Value = round(a_DeltaPos.Length() * 100);
+	StatValue Value = (StatValue)floor(a_DeltaPos.Length() * 100 + 0.5);
 
 	if (m_AttachedTo == NULL)
 	{
@@ -1970,7 +1970,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 
 		if ((Block == E_BLOCK_LADDER) && (a_DeltaPos.y > 0.0)) // Going up
 		{
-			m_Stats.AddValue(statDistClimbed, round(a_DeltaPos.y * 100));
+			m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
 		}
 		else
 		{

@@ -321,7 +321,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
 		}
 
-		Player->GetStatManager().AddValue(statDamageDealt, round(a_TDI.FinalDamage * 10));
+		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
 	}
 
 	m_Health -= (short)a_TDI.FinalDamage;
