@@ -14,7 +14,7 @@
 #include "WorldStorage.h"
 #include "../Vector3.h"
 #include "json/json.h"
-#include "ChunkBuffer.h"
+#include "ChunkDataCallback.h"
 
 
 
