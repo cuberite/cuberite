@@ -1005,7 +1005,7 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 void cEntity::DetectCacti()
 {
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	float w = m_Width / 2
+	float w = m_Width / 2;
 	if (
 		(((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
 		(((GetPosX() - (X - 1)) - 1 < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
