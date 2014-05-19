@@ -202,13 +202,8 @@ private:
 			case E_BLOCK_POWERED_RAIL:
 			{
 				return true;
-				break;
 			}
-			default:
-			{
-				return false;
-				break;
-			}
+			default: return false;
 		}
 	}
 
@@ -280,13 +275,8 @@ private:
 			case E_BLOCK_PISTON:
 			{
 				 return true;
-				 break;
 			}
-			default:
-			{
-				return false;
-				break;
-			}
+			default: return false;
 		}
 	}
 };
