@@ -600,7 +600,8 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
 	cSlotAreaTemporary(3, a_ParentWindow),
-	m_MaximumCost(0)
+	m_MaximumCost(0),
+	m_StackSizeToBeUsedInRepair(0)
 {
 }
 
