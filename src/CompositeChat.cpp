@@ -299,9 +299,10 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 
 
 
-void cCompositeChat::SetMessageType(eMessageType a_MessageType)
+void cCompositeChat::SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData)
 {
 	m_MessageType = a_MessageType;
+	m_AdditionalMessageTypeData = a_AdditionalMessageTypeData;
 }
 
 

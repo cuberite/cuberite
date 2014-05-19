@@ -47,6 +47,7 @@ public:
 		ePartType m_PartType;
 		AString m_Text;
 		AString m_Style;
+		AString m_AdditionalStyleData;
 		
 		cBasePart(ePartType a_PartType, const AString & a_Text, const AString & a_Style = "");
 		
@@ -169,7 +170,7 @@ public:
 	void ParseText(const AString & a_ParseText);
 	
 	/** Sets the message type, which is indicated by prefixes added to the message when serializing. */
-	void SetMessageType(eMessageType a_MessageType);
+	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeata = "");
 	
 	/** Adds the "underline" style to each part that is an URL. */
 	void UnderlineUrls(void);
@@ -178,6 +179,9 @@ public:
 
 	/** Returns the message type set previously by SetMessageType(). */
 	eMessageType GetMessageType(void) const { return m_MessageType; }
+
+	/** Returns additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
+	AString GetAdditionalMessageTypeData(void) const { return m_AdditionalMessageTypeData; }
 	
 	/** Returns the text from the parts that comprises the human-readable data.
 	Used for older protocols that don't support composite chat
@@ -198,6 +202,9 @@ protected:
 	
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
+	
+	/** Additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
+	AString m_AdditionalMessageTypeData;
 	
 	
 	/** Adds a_AddStyle to a_Style; overwrites the existing style if appropriate.
