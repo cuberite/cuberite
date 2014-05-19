@@ -320,6 +320,9 @@ public:
 	
 	/// Updates the state related to this entity being on fire
 	virtual void TickBurning(cChunk & a_Chunk);
+
+	/** Detects the time for application of cacti damage */
+	virtual void DetectCacti(void);
 	
 	/// Handles when the entity is in the void
 	virtual void TickInVoid(cChunk & a_Chunk);
