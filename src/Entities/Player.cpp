@@ -1169,8 +1169,8 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	{
 		// First time, announce it
 		cCompositeChat Msg;
-		Msg.AddTextPart(m_PlayerName + " has just earned the achievement ");
-		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat part (cAchievement)
+		Msg.SetMessageType(mtSuccess);
+		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
 		m_World->BroadcastChat(Msg);
 
 		// Increment the statistic
@@ -1788,7 +1788,7 @@ bool cPlayer::SaveToDisk()
 
 	// Save the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), m_PlayerName, &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
 		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
@@ -1963,7 +1963,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
-		if (!m_World->GetBlockTypeMeta(PosX, PosY, PosZ, Block, Meta))
+		if ((PosY < 0) || (PosY > cChunkDef::Height) || !m_World->GetBlockTypeMeta(PosX, PosY, PosZ, Block, Meta))
 		{
 			return;
 		}

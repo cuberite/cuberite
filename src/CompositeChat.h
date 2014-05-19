@@ -38,6 +38,7 @@ public:
 		ptUrl,
 		ptRunCommand,
 		ptSuggestCommand,
+		ptShowAchievement,
 	} ;
 	
 	class cBasePart
@@ -106,6 +107,15 @@ public:
 	public:
 		cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "");
 	} ;
+
+	class cShowAchievementPart :
+		public cBasePart
+	{
+		typedef cBasePart super;
+	public:
+		AString m_PlayerName;
+		cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
+	} ;
 	
 	typedef std::vector<cBasePart *> cParts;
 	
@@ -148,6 +158,11 @@ public:
 	/** Adds a part that suggests a command (enters it into the chat message area, but doesn't send) when clicked.
 	The default style is underlined yellow text. */
 	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "u@b");
+
+	/** Adds a part that fully formats a specified achievement using client translatable strings
+	Takes achievement name and player awarded to. Displays as {player} has earned the achievement {achievement_name}.
+	*/
+	void AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
 	
 	/** Parses text into various parts, adds those.
 	Recognizes "http:" and "https:" URLs and @color-codes. */

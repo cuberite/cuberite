@@ -289,6 +289,35 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 				AddChatPartStyle(Part, p.m_Style);
 				break;
 			}
+
+			case cCompositeChat::ptShowAchievement:
+			{
+				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
+				Part["translate"] = "chat.type.achievement";
+
+				Json::Value Ach;
+				Ach["action"] = "show_achievement";
+				Ach["value"] = p.m_Text;
+				
+				Json::Value AchColourAndName;
+				AchColourAndName["color"] = "green";
+				AchColourAndName["translate"] = p.m_Text;
+				AchColourAndName["hoverEvent"] = Ach;
+
+				Json::Value Extra;
+				Extra.append(AchColourAndName);
+
+				Json::Value Name;
+				Name["text"] = p.m_PlayerName;
+
+				Json::Value With;
+				With.append(Name);
+				With.append(Extra);
+
+				Part["with"] = With;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
 		}
 		msg["extra"].append(Part);
 	}  // for itr - Parts[]

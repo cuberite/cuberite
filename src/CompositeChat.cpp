@@ -189,6 +189,15 @@ void cCompositeChat::AddSuggestCommandPart(const AString & a_Text, const AString
 
 
 
+void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style)
+{
+	m_Parts.push_back(new cShowAchievementPart(a_PlayerName, a_Achievement, a_Style));
+}
+
+
+
+
+
 void cCompositeChat::ParseText(const AString & a_ParseText)
 {
 	size_t len = a_ParseText.length();
@@ -470,6 +479,19 @@ cCompositeChat::cRunCommandPart::cRunCommandPart(const AString & a_Text, const A
 
 cCompositeChat::cSuggestCommandPart::cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style) :
 	super(ptSuggestCommand, a_Text, a_Command, a_Style)
+{
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cCompositeChat::cShowAchievementPart:
+
+cCompositeChat::cShowAchievementPart::cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style) :
+	super(ptShowAchievement, a_Achievement, a_Style),
+	m_PlayerName(a_PlayerName)
 {
 }
 
