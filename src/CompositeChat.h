@@ -169,8 +169,10 @@ public:
 	Recognizes "http:" and "https:" URLs and @color-codes. */
 	void ParseText(const AString & a_ParseText);
 	
-	/** Sets the message type, which is indicated by prefixes added to the message when serializing. */
-	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeata = "");
+	/** Sets the message type, which is indicated by prefixes added to the message when serializing
+	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more documentation.
+	*/
+	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData = "");
 	
 	/** Adds the "underline" style to each part that is an URL. */
 	void UnderlineUrls(void);
