@@ -2,7 +2,9 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Wither.h"
+
 #include "../World.h"
+#include "../Entities/Player.h"
 
 
 
@@ -95,6 +97,37 @@ void cWither::Tick(float a_Dt, cChunk & a_Chunk)
 void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 1, 1, E_ITEM_NETHER_STAR);
+}
+
+
+
+
+
+void cWither::KilledBy(cEntity * a_Killer)
+{
+	UNUSED(a_Killer);
+
+	class cPlayerCallback : public cPlayerListCallback
+	{
+		Vector3f m_Pos;
+
+		virtual bool Item(cPlayer * a_Player)
+		{
+			double Dist = (a_Player->GetPosition() - m_Pos).Length();
+			if (Dist < 50.0)
+			{
+				// If player is close, award achievement
+				a_Player->AwardAchievement(achKillWither);
+			}
+			return false;
+		}
+
+	public:
+		cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
+
+	} PlayerCallback(GetPosition());
+
+	m_World->ForEachPlayer(PlayerCallback);
 }
 
 
