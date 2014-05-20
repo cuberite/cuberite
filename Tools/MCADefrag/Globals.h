@@ -22,6 +22,15 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	
+	#define FORMATSTRING(formatIndex, va_argsIndex)
+
+	// MSVC has its own custom version of zu format
+	#define SIZE_T_FMT "%Iu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
+	#define SIZE_T_FMT_HEX "%Ix"
+	
+	#define NORETURN      __declspec(noreturn)
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -39,6 +48,12 @@
 	#define stricmp strcasecmp
 	
 	#define FORMATSTRING(formatIndex,va_argsIndex)
+
+	#define SIZE_T_FMT "%zu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
+	#define SIZE_T_FMT_HEX "%zx"
+	
+	#define NORETURN      __attribute((__noreturn__))
 #else
 
 	#error "You are using an unsupported compiler, you might need to #define some stuff here for your compiler"
