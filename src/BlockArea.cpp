@@ -1838,7 +1838,7 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
 {
 	{
-		if (!(m_Area.m_BlockTypes == NULL))
+		if (m_Area.m_BlockTypes != NULL)
 		{
 			int SizeY = m_Area.m_Size.y;
 			int MinY = m_Origin.y;
@@ -1901,17 +1901,17 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
 		}
 	}
 
-	if (m_Area.m_BlockMetas)
+	if (m_Area.m_BlockMetas != NULL)
 	{
 		a_BlockBuffer.CopyMeta(m_Area.m_BlockMetas);
 	}
 
-	if (m_Area.m_BlockLight)
+	if (m_Area.m_BlockLight != NULL)
 	{
 		a_BlockBuffer.CopyLight(m_Area.m_BlockLight);
 	}
 
-	if (m_Area.m_BlockSkyLight)
+	if (m_Area.m_BlockSkyLight != NULL)
 	{
 		a_BlockBuffer.CopySkyLight(m_Area.m_BlockSkyLight);
 	}

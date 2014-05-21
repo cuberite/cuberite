@@ -37,7 +37,7 @@ public:
 		#endif
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
-			if(m_Sections[i]) Free(m_Sections[i]);;
+			if(m_Sections[i] == NULL) Free(m_Sections[i]);;
 		}
 	}
 	
@@ -91,7 +91,7 @@ public:
 		{
 			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 			{
-				if(m_Sections[i]) Free(m_Sections[i]);;
+				Free(m_Sections[i]);;
 				m_Sections[i] = other.m_Sections[i];
 				other.m_Sections[i] = 0;
 			}
@@ -106,7 +106,7 @@ public:
 		ASSERT((a_Y >= 0) && (a_Y < cChunkDef::Height));
 		ASSERT((a_Z >= 0) && (a_Z < cChunkDef::Width));
 		int Section = a_Y / CHUNK_SECTION_HEIGHT;
-		if(m_Sections[Section])
+		if(m_Sections[Section] == NULL)
 		{
 			int Index = cChunkDef::MakeIndexNoCheck(a_X, a_Y - (Section * CHUNK_SECTION_HEIGHT), a_Z);
 			return m_Sections[Section]->m_BlockTypes[Index];
@@ -130,14 +130,14 @@ public:
 		}
 
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-		if(!m_Sections[Section])
+		if(m_Sections[Section] != NULL)
 		{
 			if(a_Block == 0x00)
 			{
 				return;
 			}
 			m_Sections[Section] = Allocate();
-			if(!m_Sections[Section])
+			if(m_Sections[Section] != NULL)
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
@@ -153,7 +153,7 @@ public:
 		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-			if(m_Sections[Section])
+			if(m_Sections[Section] == NULL)
 			{
 				int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 				return (m_Sections[Section]->m_BlockMeta[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
@@ -180,14 +180,14 @@ public:
 		}
 
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-		if(!m_Sections[Section])
+		if(m_Sections[Section] != NULL)
 		{
 			if((a_Nibble & 0xf) == 0x00)
 			{
 				return;
 			}
 			m_Sections[Section] = Allocate();
-			if(!m_Sections[Section])
+			if(m_Sections[Section] != NULL)
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
@@ -206,7 +206,7 @@ public:
 		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-			if(m_Sections[Section])
+			if(m_Sections[Section] == NULL)
 			{
 				int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 				return (m_Sections[Section]->m_BlockLight[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
@@ -225,7 +225,7 @@ public:
 		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-			if(m_Sections[Section])
+			if(m_Sections[Section] == NULL)
 			{
 				int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 				return (m_Sections[Section]->m_BlockLight[Index / 2] >> ((Index & 1) * 4)) & 0x0f;

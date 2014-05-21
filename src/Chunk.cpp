@@ -326,9 +326,9 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
-	m_ChunkData.SetLight    (a_BlockLight);
+	m_ChunkData.SetLight(a_BlockLight);
 
-	m_ChunkData.SetSkyLight (a_SkyLight);
+	m_ChunkData.SetSkyLight(a_SkyLight);
 
 	m_IsLightValid = true;
 }
