@@ -52,7 +52,7 @@ cStatInfo cStatInfo::ms_Info[statCount] = {
 	/*             Type         |     Name          */
 	cStatInfo(statGamesQuit,      "stat.leaveGame"),
 	cStatInfo(statMinutesPlayed,  "stat.playOneMinute"),
-	cStatInfo(statDistWalked,     "stat.walkOnCm"),
+	cStatInfo(statDistWalked,     "stat.walkOneCm"),
 	cStatInfo(statDistSwum,       "stat.swimOneCm"),
 	cStatInfo(statDistFallen,     "stat.fallOneCm"),
 	cStatInfo(statDistClimbed,    "stat.climbOneCm"),
