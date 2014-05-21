@@ -268,7 +268,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 			{
 				// These biomes allow sand villages
 				VillagePrefabs = (rnd % 2 == 0) ? &g_SandVillage : &g_SandFlatRoofVillage;
-				RoadBlock = E_BLOCK_SANDSTONE;
+				// RoadBlock = E_BLOCK_SANDSTONE;
 				break;
 			}
 			case biPlains:
