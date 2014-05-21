@@ -7,7 +7,7 @@ cChunkData cChunkData::Copy() const
 	cChunkData copy;
 	for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
-		if(m_Sections[i] != NULL)
+		if (m_Sections[i] != NULL)
 		{
 			copy.m_Sections[i] = Allocate();
 			*copy.m_Sections[i] = *m_Sections[i];
@@ -30,7 +30,7 @@ void cChunkData::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length) 
 		{
 			size_t tocopy = length > segment_length ? segment_length : length;
 			length -= tocopy;
-			if(m_Sections[i] != NULL)
+			if (m_Sections[i] != NULL)
 			{
 				memcpy(
 					&a_dest[i * segment_length],
@@ -59,12 +59,13 @@ void cChunkData::CopyMeta(NIBBLETYPE * a_dest) const
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if(m_Sections[i] != NULL)
+		if (m_Sections[i] != NULL)
 		{
 			memcpy(
 				&a_dest[i * segment_length], 
 				&m_Sections[i]->m_BlockMeta, 
-				sizeof(NIBBLETYPE) * segment_length);
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -86,7 +87,7 @@ void cChunkData::CopyLight(NIBBLETYPE * a_dest) const
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if(m_Sections[i] != NULL)
+		if (m_Sections[i] != NULL)
 		{
 			memcpy(
 				&a_dest[i * segment_length],
@@ -114,7 +115,7 @@ void cChunkData::CopySkyLight(NIBBLETYPE * a_dest) const
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if(m_Sections[i] != NULL)
+		if (m_Sections[i] != NULL)
 		{
 			memcpy(
 				&a_dest[i * segment_length],
