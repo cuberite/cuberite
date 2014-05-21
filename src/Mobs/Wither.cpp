@@ -105,7 +105,7 @@ void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cWither::KilledBy(cEntity * a_Killer)
 {
-	UNUSED(a_Killer);
+	super::KilledBy(a_Killer);
 
 	class cPlayerCallback : public cPlayerListCallback
 	{
@@ -113,6 +113,7 @@ void cWither::KilledBy(cEntity * a_Killer)
 
 		virtual bool Item(cPlayer * a_Player)
 		{
+			// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
 			double Dist = (a_Player->GetPosition() - m_Pos).Length();
 			if (Dist < 50.0)
 			{
