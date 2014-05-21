@@ -238,12 +238,12 @@ void cChunk::MarkLoadFailed(void)
 
 void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
-	a_Callback.HeightMap    (&m_HeightMap);
-	a_Callback.BiomeData    (&m_BiomeMap);
+	a_Callback.HeightMap(&m_HeightMap);
+	a_Callback.BiomeData(&m_BiomeMap);
 
-	a_Callback.LightIsValid (m_IsLightValid);
+	a_Callback.LightIsValid(m_IsLightValid);
 
-	a_Callback.ChunkBuffer  (m_ChunkBuffer);
+	a_Callback.ChunkData(m_ChunkData);
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -282,10 +282,10 @@ void cChunk::SetAllData(
 		CalculateHeightmap(a_BlockTypes);
 	}
 
-	m_ChunkBuffer.SetBlocks(a_BlockTypes);
-	m_ChunkBuffer.SetMeta(a_BlockMeta);
-	m_ChunkBuffer.SetLight(a_BlockLight);
-	m_ChunkBuffer.SetSkyLight(a_BlockSkyLight);
+	m_ChunkData.SetBlocks(a_BlockTypes);
+	m_ChunkData.SetMeta(a_BlockMeta);
+	m_ChunkData.SetLight(a_BlockLight);
+	m_ChunkData.SetSkyLight(a_BlockSkyLight);
 	
 	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
 
@@ -326,9 +326,9 @@ void cChunk::SetLight(
 	// TODO: We might get cases of wrong lighting when a chunk changes in the middle of a lighting calculation.
 	// Postponing until we see how bad it is :)
 
-	m_ChunkBuffer.SetLight    (a_BlockLight);
+	m_ChunkData.SetLight    (a_BlockLight);
 
-	m_ChunkBuffer.SetSkyLight (a_SkyLight);
+	m_ChunkData.SetSkyLight (a_SkyLight);
 
 	m_IsLightValid = true;
 }
@@ -339,7 +339,7 @@ void cChunk::SetLight(
 
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	m_ChunkBuffer.CopyBlocks(a_BlockTypes);
+	m_ChunkData.CopyBlocks(a_BlockTypes);
 }
 
 
@@ -1507,7 +1507,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	ASSERT(IsValid());
 	
 	const BLOCKTYPE OldBlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
-	const BLOCKTYPE OldBlockMeta = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
+	const BLOCKTYPE OldBlockMeta = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
 	if ((OldBlockType == a_BlockType) && (OldBlockMeta == a_BlockMeta))
 	{
 		return;
@@ -1515,7 +1515,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	MarkDirty();
 
-	m_ChunkBuffer.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
+	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
 	// The client doesn't need to distinguish between stationary and nonstationary fluids:
 	if (
@@ -1531,7 +1531,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta));
 	}
 	
-	m_ChunkBuffer.SetMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
+	m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_BlockMeta);
 
 	// ONLY recalculate lighting if it's necessary!
 	if (
@@ -2438,7 +2438,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 		return 0; // Clip
 	}
 
-	return m_ChunkBuffer.GetBlock(a_RelX, a_RelY, a_RelZ);
+	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -2448,7 +2448,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
 {
 	a_BlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
-	a_BlockMeta = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
+	a_BlockMeta = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -2458,9 +2458,9 @@ void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_
 void cChunk::GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
 {
 	a_BlockType  = GetBlock(a_RelX, a_RelY, a_RelZ);
-	a_Meta       = m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
-	a_SkyLight   = m_ChunkBuffer.GetSkyLight(a_RelX, a_RelY, a_RelZ);
-	a_BlockLight = m_ChunkBuffer.GetBlockLight(a_RelX, a_RelY, a_RelZ);
+	a_Meta       = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
+	a_SkyLight   = m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ);
+	a_BlockLight = m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ);
 }
 
 

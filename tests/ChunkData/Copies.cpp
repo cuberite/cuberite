@@ -1,18 +1,18 @@
 
 #include "TestGlobals.h"
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
 
 
 int main(int argc, char** argv)
 {
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 	
 		buffer.SetBlock(3,1,4,0xDE);
 		buffer.SetMeta(3,1,4,0xA);
 	
-		cChunkBuffer copy = buffer.Copy();
+		cChunkData copy = buffer.Copy();
 		testassert(copy.GetBlock(3,1,4) == 0xDE);
 		testassert(copy.GetMeta(3,1,4) == 0xA);
 	
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 	
 	}
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 	
 		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 	
 	}
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 		
 		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 		
 	}
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 		
 		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
 		
 	}
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 		
 		BLOCKTYPE * SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);

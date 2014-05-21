@@ -9,7 +9,7 @@
 #include "OSSupport/GZipFile.h"
 #include "Blocks/BlockHandler.h"
 #include "Cuboid.h"
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
 
 
@@ -1835,7 +1835,7 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cBlockArea::cChunkReader::ChunkBuffer(const cChunkBuffer &  a_BlockBuffer)
+void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
 {
 	{
 		if (!(m_Area.m_BlockTypes == NULL))

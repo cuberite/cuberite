@@ -17,11 +17,11 @@
 // unique_ptr style interface for memory management
 #endif
 
-class cChunkBuffer
+class cChunkData
 {
 public:
 
-	cChunkBuffer()
+	cChunkData()
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	: IsOwner(true)
@@ -29,7 +29,7 @@ public:
 	{
 		memset(m_Sections, 0, sizeof(m_Sections));
 	}
-	~cChunkBuffer()
+	~cChunkData()
 	{
 		#if __cplusplus < 201103L
 		// auto_ptr style interface for memory management
@@ -43,7 +43,7 @@ public:
 	
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	cChunkBuffer(const cChunkBuffer& other) :
+	cChunkData(const cChunkData& other) :
 	IsOwner(true)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
@@ -53,7 +53,7 @@ public:
 		other.IsOwner = false;
 	}
 
-	cChunkBuffer& operator=(const cChunkBuffer& other)
+	cChunkData& operator=(const cChunkData& other)
 	{
 		if(&other != this)
 		{
@@ -76,7 +76,7 @@ public:
 	}
 	#else
 	// unique_ptr style interface for memory management
-	cChunkBuffer(cChunkBuffer&& other)
+	cChunkData(cChunkData&& other)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -85,7 +85,7 @@ public:
 		}
 	}
 	
-	cChunkBuffer& operator=(cChunkBuffer&& other)
+	cChunkData& operator=(cChunkData&& other)
 	{
 		if(&other != this)
 		{
@@ -125,7 +125,7 @@ public:
 			(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
 		)
 		{
-			ASSERT(!"cChunkBuffer::SetMeta(): index out of range!");
+			ASSERT(!"cChunkData::SetMeta(): index out of range!");
 			return;
 		}
 
@@ -163,7 +163,7 @@ public:
 				return 0;
 			}
 		}
-		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");
+		ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 		return 0;
 	}
 	
@@ -175,7 +175,7 @@ public:
 			(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
 		)
 		{
-			ASSERT(!"cChunkBuffer::SetMeta(): index out of range!");
+			ASSERT(!"cChunkData::SetMeta(): index out of range!");
 			return;
 		}
 
@@ -216,7 +216,7 @@ public:
 				return 0;
 			}
 		}
-		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");
+		ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 		return 0;
 	}
 	
@@ -235,11 +235,11 @@ public:
 				return 0xF;
 			}
 		}
-		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");
+		ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 		return 0;
 	}
 	
-	cChunkBuffer Copy() const;
+	cChunkData Copy() const;
 	void CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx = 0, size_t length = cChunkDef::NumBlocks)  const;
 	void CopyMeta     (NIBBLETYPE * a_dest) const;
 	void CopyLight    (NIBBLETYPE * a_dest) const;

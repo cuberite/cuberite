@@ -3,7 +3,7 @@
 
 #include "Entities/Entity.h"
 #include "ChunkDef.h"
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
@@ -324,21 +324,21 @@ public:
 	
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return m_ChunkBuffer.GetMeta(a_RelX, a_RelY, a_RelZ);
+		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
 	}
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 			if (!(GetMeta(a_RelX, a_RelY, a_RelZ) == a_Meta))
 			{
 				MarkDirty();
-				m_ChunkBuffer.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
+				m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
 
 				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
 			}
 	}
 
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkBuffer.GetBlockLight(a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkBuffer.GetSkyLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ); }
 	
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
@@ -430,7 +430,7 @@ private:
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	cChunkBuffer m_ChunkBuffer;
+	cChunkData m_ChunkData;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;

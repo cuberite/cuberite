@@ -3,7 +3,7 @@
 #pragma once
 
 
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
 
 /** Interface class used for getting data out of a chunk using the GetAllData() function.
@@ -26,13 +26,13 @@ public:
 	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {UNUSED(a_HeightMap); };
 	
 	/// Called once to provide biome data
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) {UNUSED(a_BiomeMap); };
+	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) {UNUSED(a_BiomeMap); };
 	
 	/// Called once to let know if the chunk lighting is valid. Return value is ignored
 	virtual void LightIsValid(bool a_IsLightValid) {UNUSED(a_IsLightValid); };
 	
 	/// Called once to export block info
-	virtual void ChunkBuffer   (const cChunkBuffer & a_Buffer) {UNUSED(a_Buffer); };
+	virtual void ChunkData(const cChunkData & a_Buffer) {UNUSED(a_Buffer); };
 	
 	/// Called for each entity in the chunk
 	virtual void Entity(cEntity * a_Entity) {UNUSED(a_Entity); };
@@ -43,16 +43,16 @@ public:
 
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a buffer
 */
-class cChunkBufferCollector :
+class cChunkDataCollector :
 	public cChunkDataCallback
 {
 public:
 
-	cChunkBuffer m_BlockData;
+	cChunkData m_BlockData;
 
 protected:
 
-	virtual void ChunkBuffer(const cChunkBuffer & a_BlockData) override
+	virtual void ChunkData(const cChunkData & a_BlockData) override
 	{
 		m_BlockData = a_BlockData.Copy();
 	}
@@ -61,7 +61,7 @@ protected:
 
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer
 */
-class cChunkDataCollector :
+class cChunkDataArrayCollector :
 public cChunkDataCallback
 {
 public:
@@ -71,7 +71,7 @@ public:
 
 protected:
 
-	virtual void ChunkBuffer(const cChunkBuffer & a_ChunkBuffer) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
 		a_ChunkBuffer.CopyBlocks(m_BlockData);
 		a_ChunkBuffer.CopyMeta(m_BlockData + cChunkDef::NumBlocks);
@@ -94,7 +94,7 @@ public:
 
 protected:
 
-	virtual void ChunkBuffer(const cChunkBuffer & a_ChunkBuffer) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
 	a_ChunkBuffer.CopyBlocks(m_BlockTypes);
 	a_ChunkBuffer.CopyMeta(m_BlockMetas);
