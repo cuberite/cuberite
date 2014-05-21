@@ -167,7 +167,7 @@ public:
 		return 0;
 	}
 	
-	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
+	bool SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
 	{
 		if (
 			(a_RelX >= cChunkDef::Width)  || (a_RelX < 0) ||
@@ -176,7 +176,7 @@ public:
 		)
 		{
 			ASSERT(!"cChunkData::SetMeta(): index out of range!");
-			return;
+			return false;
 		}
 
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
@@ -184,21 +184,23 @@ public:
 		{
 			if((a_Nibble & 0xf) == 0x00)
 			{
-				return;
+				return false;
 			}
 			m_Sections[Section] = Allocate();
 			if(m_Sections[Section] != NULL)
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
-				return;
+				return false;
 			}
 			ZeroSection(m_Sections[Section]);
 		}
 		int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
+		NIBBLETYPE oldval = m_Sections[Section]->m_BlockMeta[Index / 2] >> ((Index & 1) * 4) & 0xf;
 		m_Sections[Section]->m_BlockMeta[Index / 2] = static_cast<NIBBLETYPE>(
 			(m_Sections[Section]->m_BlockMeta[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 		);
+		return oldval == a_Nibble;
 	}
 	
 	NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const

@@ -328,11 +328,11 @@ public:
 	}
 	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
-			if (!(GetMeta(a_RelX, a_RelY, a_RelZ) == a_Meta))
+			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
+			if (hasChanged)
 			{
 				MarkDirty();
-				m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
-
+				
 				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
 			}
 	}
