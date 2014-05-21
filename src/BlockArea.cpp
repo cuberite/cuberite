@@ -1843,7 +1843,7 @@ void cBlockArea::cChunkReader::ChunkBuffer(const cChunkBuffer &  a_BlockBuffer)
 			int SizeY = m_Area.m_Size.y;
 			int MinY = m_Origin.y;
 	
-			// SizeX, SizeZ are the dmensions of the block data to copy from the current chunk (size of the geometric union)
+			// SizeX, SizeZ are the dimensions of the block data to copy from the current chunk (size of the geometric union)
 			// OffX, OffZ are the offsets of the current chunk data from the area origin
 			// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
 			int SizeX = cChunkDef::Width;

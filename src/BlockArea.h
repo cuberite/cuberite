@@ -317,8 +317,8 @@ protected:
 		void CopyNibbles(NIBBLETYPE * a_AreaDst, const NIBBLETYPE * a_ChunkSrc);
 		
 		// cChunkDataCallback overrides:
-		virtual bool Coords       (int a_ChunkX, int a_ChunkZ) override;
-		virtual void ChunkBuffer   (const cChunkBuffer &  a_BlockTypes)    override;
+		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
+		virtual void ChunkBuffer(const cChunkBuffer &  a_BlockTypes)    override;
 	} ;
 	
 	typedef NIBBLETYPE * NIBBLEARRAY;

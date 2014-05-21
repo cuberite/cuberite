@@ -282,10 +282,10 @@ void cChunk::SetAllData(
 		CalculateHeightmap(a_BlockTypes);
 	}
 
-	m_ChunkBuffer.SetBlocks   (a_BlockTypes);
-	m_ChunkBuffer.SetMeta     (a_BlockMeta);
-	m_ChunkBuffer.SetLight    (a_BlockLight);
-	m_ChunkBuffer.SetSkyLight (a_BlockSkyLight);
+	m_ChunkBuffer.SetBlocks(a_BlockTypes);
+	m_ChunkBuffer.SetMeta(a_BlockMeta);
+	m_ChunkBuffer.SetLight(a_BlockLight);
+	m_ChunkBuffer.SetSkyLight(a_BlockSkyLight);
 	
 	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
 
