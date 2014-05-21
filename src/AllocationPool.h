@@ -43,6 +43,10 @@ class AllocationPool {
 		void Free(T* ptr)
 		{
 			m_FreeList.push_front(ptr);
+			if (m_FreeList.size() == BufferSize)
+			{
+				StarvationCallbacks.OnStopUsingBuffer();
+			}
 		}
 		
 	private:
