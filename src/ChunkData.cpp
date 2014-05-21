@@ -144,7 +144,11 @@ void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16;
 		if (m_Sections[i] == NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockTypes, &a_src[i * segment_length], sizeof(BLOCKTYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockTypes,
+				&a_src[i * segment_length],
+				sizeof(BLOCKTYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -159,9 +163,21 @@ void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockMeta,0x00,sizeof(m_Sections[i]->m_BlockMeta));
-				memset(m_Sections[i]->m_BlockLight,0x00,sizeof(m_Sections[i]->m_BlockLight));
-				memset(m_Sections[i]->m_BlockSkyLight,0xFF,sizeof(m_Sections[i]->m_BlockSkyLight));
+				memset(
+					m_Sections[i]->m_BlockMeta,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockMeta)
+				);
+				memset(
+					m_Sections[i]->m_BlockLight,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockLight)
+				);
+				memset(
+					m_Sections[i]->m_BlockSkyLight,
+					0xFF,
+					sizeof(m_Sections[i]->m_BlockSkyLight)
+				);
 			}
 			else
 			{
@@ -182,7 +198,11 @@ void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] == NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockMeta, &a_src[i * segment_length], sizeof(NIBBLETYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockMeta, 
+				&a_src[i * segment_length],
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -197,9 +217,21 @@ void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockTypes,0x00,sizeof(m_Sections[i]->m_BlockTypes));
-				memset(m_Sections[i]->m_BlockLight,0x00,sizeof(m_Sections[i]->m_BlockLight));
-				memset(m_Sections[i]->m_BlockSkyLight,0xFF,sizeof(m_Sections[i]->m_BlockSkyLight));
+				memset(
+					m_Sections[i]->m_BlockTypes,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockTypes)
+				);
+				memset(
+					m_Sections[i]->m_BlockLight,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockLight)
+				);
+				memset(
+					m_Sections[i]->m_BlockSkyLight,
+					0xFF,
+					sizeof(m_Sections[i]->m_BlockSkyLight)
+				);
 			}
 			else
 			{
@@ -221,7 +253,11 @@ void cChunkData::SetLight(const NIBBLETYPE * a_src)
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] == NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockLight, &a_src[i * segment_length], sizeof(NIBBLETYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockLight,
+				&a_src[i * segment_length],
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -236,9 +272,21 @@ void cChunkData::SetLight(const NIBBLETYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockTypes,0x00,sizeof(m_Sections[i]->m_BlockTypes));
-				memset(m_Sections[i]->m_BlockMeta,0x00,sizeof(m_Sections[i]->m_BlockMeta));
-				memset(m_Sections[i]->m_BlockSkyLight,0xFF,sizeof(m_Sections[i]->m_BlockSkyLight));
+				memset(
+					m_Sections[i]->m_BlockTypes,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockTypes)
+				);
+				memset(
+					m_Sections[i]->m_BlockMeta,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockMeta)
+				);
+				memset(
+					m_Sections[i]->m_BlockSkyLight,
+					0xFF,
+					sizeof(m_Sections[i]->m_BlockSkyLight)
+				);
 			}
 			else
 			{
@@ -260,7 +308,11 @@ void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] == NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockSkyLight, &a_src[i * segment_length], sizeof(NIBBLETYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockSkyLight,
+				&a_src[i * segment_length],
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -275,9 +327,21 @@ void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockTypes,0x00,sizeof(m_Sections[i]->m_BlockTypes));
-				memset(m_Sections[i]->m_BlockMeta,0x00,sizeof(m_Sections[i]->m_BlockMeta));
-				memset(m_Sections[i]->m_BlockLight,0x00,sizeof(m_Sections[i]->m_BlockLight));
+				memset(
+					m_Sections[i]->m_BlockTypes,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockTypes)
+				);
+				memset(
+					m_Sections[i]->m_BlockMeta,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockMeta)
+				);
+				memset(
+					m_Sections[i]->m_BlockLight,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockLight)
+				);
 			}
 			else
 			{
@@ -309,10 +373,26 @@ void cChunkData::Free(cChunkData::sChunkSection * ptr) const
 
 void cChunkData::ZeroSection(cChunkData::sChunkSection * ptr) const
 {
-	memset(ptr->m_BlockTypes,0x00,sizeof(ptr->m_BlockTypes));
-	memset(ptr->m_BlockMeta,0x00,sizeof(ptr->m_BlockMeta));
-	memset(ptr->m_BlockLight,0x00,sizeof(ptr->m_BlockLight));
-	memset(ptr->m_BlockSkyLight,0xFF,sizeof(ptr->m_BlockSkyLight));
+	memset(
+		ptr->m_BlockTypes,
+		0x00,
+		sizeof(ptr->m_BlockTypes)
+	);
+	memset(
+		ptr->m_BlockMeta,
+		0x00,
+		sizeof(ptr->m_BlockMeta)
+	);
+	memset(
+		ptr->m_BlockLight,
+		0x00,
+		sizeof(ptr->m_BlockLight)
+	);
+	memset(
+		ptr->m_BlockSkyLight,
+		0xFF,
+		sizeof(ptr->m_BlockSkyLight)
+	);
 }
 
 
