@@ -308,6 +308,15 @@ cPiece::cConnector cPlacedPiece::GetRotatedConnector(size_t a_Index) const
 
 
 
+cPiece::cConnector cPlacedPiece::GetRotatedConnector(const cPiece::cConnector & a_Connector) const
+{
+	return m_Piece->RotateMoveConnector(a_Connector, m_NumCCWRotations, m_Coords.x, m_Coords.y, m_Coords.z);
+}
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cPieceGenerator:
 

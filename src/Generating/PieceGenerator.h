@@ -110,6 +110,7 @@ public:
 	virtual cPieces GetStartingPieces(void) = 0;
 	
 	/** Returns the relative weight with which the a_NewPiece is to be selected for placing under a_PlacedPiece through a_ExistingConnector.
+	a_ExistingConnector is the original connector, before any movement or rotation is applied to it.
 	This allows the pool to tweak the piece's chances, based on the previous pieces in the tree and the connector used.
 	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will never be chosen.
 	*/
@@ -150,6 +151,10 @@ public:
 	/** Returns the connector at the specified index, rotated in the actual placement.
 	Undefined behavior if a_Index is out of range. */
 	cPiece::cConnector GetRotatedConnector(size_t a_Index) const;
+	
+	/** Returns a copy of the specified connector, modified to account for the translation and rotation for
+	this placement. */
+	cPiece::cConnector GetRotatedConnector(const cPiece::cConnector & a_Connector) const;
 	
 protected:
 	const cPlacedPiece * m_Parent;
