@@ -302,28 +302,28 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Level 0
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
-		/*  0 */ "aaaaaaamaaaaaaa"
-		/*  1 */ "abbcbbamabbcbba"
-		/*  2 */ "abbcbbamabbcbba"
-		/*  3 */ "abbcbbamabbcbba"
-		/*  4 */ "abbcbbamabbcbba"
-		/*  5 */ "abbcbbamabbcbba"
-		/*  6 */ "abbcbbamabbcbba"
-		/*  7 */ "abbcbbamabbcbba"
-		/*  8 */ "aaaaaaamaaaaaaa"
+		/*  0 */ "aaaaaaa.aaaaaaa"
+		/*  1 */ "abbcbba.abbcbba"
+		/*  2 */ "abbcbba.abbcbba"
+		/*  3 */ "abbcbba.abbcbba"
+		/*  4 */ "abbcbba.abbcbba"
+		/*  5 */ "abbcbba.abbcbba"
+		/*  6 */ "abbcbba.abbcbba"
+		/*  7 */ "abbcbba.abbcbba"
+		/*  8 */ "aaaaaaa.aaaaaaa"
 
 		// Level 1
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
-		/*  0 */ "dmmmmmdmdmmmmmd"
-		/*  1 */ "meemeemmmeemeem"
-		/*  2 */ "memmmemmmeemeem"
-		/*  3 */ "memmmmmmmeemeem"
-		/*  4 */ "meemmemmmeemeem"
-		/*  5 */ "meemmemmmeemeem"
-		/*  6 */ "mmemmemmmeemeem"
-		/*  7 */ "mmememmmmeemeem"
-		/*  8 */ "dmmmmmdmdmmmmmd",
+		/*  0 */ "d.....d.d.....d"
+		/*  1 */ ".ee.ee...ee.ee."
+		/*  2 */ ".e...e...ee.ee."
+		/*  3 */ ".e.......ee.ee."
+		/*  4 */ ".ee..e...ee.ee."
+		/*  5 */ ".ee..e...ee.ee."
+		/*  6 */ "..e..e...ee.ee."
+		/*  7 */ "..e.e....ee.ee."
+		/*  8 */ "d.....d.d.....d",
 
 		// Connectors:
 		"-1: 7, 0, 8: 3\n"  /* Type -1, direction Z+ */,
@@ -779,7 +779,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  8 */ "uh...hv"
 		/*  9 */ "uh...hv"
 		/* 10 */ "uh...hv"
-		/* 11 */ "ughhhhv"
+		/* 11 */ "ughhhgv"
 		/* 12 */ "uw...xv"
 
 		// Level 6
@@ -901,7 +901,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  2 */ "uhDDDhv"
 		/*  3 */ "uhDDDhv"
 		/*  4 */ "uhDDDhv"
-		/*  5 */ "uhhhhhv"
+		/*  5 */ "ughhhgv"
 		/*  6 */ "uw...xv"
 		/*  7 */ "......."
 		/*  8 */ "......."
@@ -1893,16 +1893,15 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"k: 85: 0\n"  /* fence */
 		"l: 53: 0\n"  /* woodstairs */
 		"m: 19: 0\n"  /* sponge */
-		"n: 64: 6\n"  /* wooddoorblock */
+		"n: 64: 2\n"  /* wooddoorblock */
 		"o: 64: 0\n"  /* wooddoorblock */
 		"p:102: 0\n"  /* glasspane */
 		"q: 72: 0\n"  /* woodplate */
-		"r: 64:12\n"  /* wooddoorblock */
-		"s: 64: 8\n"  /* wooddoorblock */
-		"t: 53: 5\n"  /* woodstairs */
-		"u: 53: 4\n"  /* woodstairs */
-		"v: 50: 1\n"  /* torch */
-		"w: 50: 2\n"  /* torch */,
+		"r: 64: 8\n"  /* wooddoorblock */
+		"s: 53: 5\n"  /* woodstairs */
+		"t: 53: 4\n"  /* woodstairs */
+		"u: 50: 1\n"  /* torch */
+		"v: 50: 2\n"  /* torch */,
 
 		// Block data:
 		// Level 0
@@ -1973,7 +1972,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  2 */ ".p.q.pmmmm"
 		/*  3 */ ".p...p...."
 		/*  4 */ ".d...d...."
-		/*  5 */ ".r...s...."
+		/*  5 */ ".r...r...."
 		/*  6 */ ".d...d...."
 		/*  7 */ ".p...p...."
 		/*  8 */ ".p...p...."
@@ -1983,22 +1982,22 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Level 5
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "lt...ujmmm"
+		/*  0 */ "ls...tjmmm"
 		/*  1 */ "lidddijmmm"
 		/*  2 */ "ld...djmmm"
 		/*  3 */ "ld...dj..."
-		/*  4 */ "ldv.wdj..."
+		/*  4 */ "ldu.vdj..."
 		/*  5 */ "ld...dj..."
-		/*  6 */ "ldv.wdj..."
+		/*  6 */ "ldu.vdj..."
 		/*  7 */ "ld...dj..."
 		/*  8 */ "ld...dj..."
 		/*  9 */ "lidddijmmm"
-		/* 10 */ "lt...ujmmm"
+		/* 10 */ "ls...tjmmm"
 
 		// Level 6
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "mlt.ujmmmm"
+		/*  0 */ "mls.tjmmmm"
 		/*  1 */ "mldddjmmmm"
 		/*  2 */ "mld.djmmmm"
 		/*  3 */ "mld.djm..."
@@ -2008,7 +2007,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  7 */ "mld.djm..."
 		/*  8 */ "mld.djm..."
 		/*  9 */ "mldddjmmmm"
-		/* 10 */ "mlt.ujmmmm"
+		/* 10 */ "mls.tjmmmm"
 
 		// Level 7
 		/* z\x*              */
@@ -3052,16 +3051,16 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  3 */ "lllllllllllll..."
 		/*  4 */ "eeeeeeeeeeeen..."
 		/*  5 */ "qqqqqqqqqqren..."
-		/*  6 */ "mmmmmmmmmmren..."
-		/*  7 */ "mmmmmmmmmmren..."
-		/*  8 */ "mmmmmmmmmmren..."
-		/*  9 */ "mmmmmmmmmmren..."
-		/* 10 */ "mmmmmmmmmmren..."
-		/* 11 */ "mmmmmmmmmmren..."
-		/* 12 */ "mmmmmmmmmmren..."
-		/* 13 */ "mmmmmmmmmmren..."
-		/* 14 */ "mmmmmmmmmmren..."
-		/* 15 */ "mmmmmmmmmmren...",
+		/*  6 */ "..........ren..."
+		/*  7 */ "..........ren..."
+		/*  8 */ "mmmmmmmm..ren..."
+		/*  9 */ "mmmmmmmm..ren..."
+		/* 10 */ "mmmmmmmm..ren..."
+		/* 11 */ "mmmmmmmm..ren..."
+		/* 12 */ "mmmmmmmm..ren..."
+		/* 13 */ "mmmmmmmm..ren..."
+		/* 14 */ "mmmmmmmm..ren..."
+		/* 15 */ "mmmmmmmm..ren...",
 
 		// Connectors:
 		"-1: 9, 0, 0: 2\n"  /* Type -1, direction Z- */,
