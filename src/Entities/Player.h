@@ -194,12 +194,14 @@ public:
 	/** Forces the player to move in the given direction. DEPRECATED! Use SetSpeed instead */
 	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
 
-	void SetSpeed(const Vector3d & a_Speed);
-	virtual void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-
-	virtual void SetSpeedX(double a_SpeedX) override;
-	virtual void SetSpeedY(double a_SpeedY) override;
-	virtual void SetSpeedZ(double a_SpeedZ) override;
+	/** Sets the speed of the player and moves them in the given speed. */
+	void SetSpeed           (const Vector3d & a_Speed);
+	virtual void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
+	
+	/** Sets the speed for the X, Y or Z axis */
+	virtual void SetSpeedX  (double a_SpeedX) override;
+	virtual void SetSpeedY  (double a_SpeedY) override;
+	virtual void SetSpeedZ  (double a_SpeedZ) override;
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
