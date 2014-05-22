@@ -222,9 +222,9 @@ public:
 	// tolua_begin
 	virtual void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	virtual void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
-	void SetSpeedX  (double a_SpeedX);
-	void SetSpeedY  (double a_SpeedY);
-	void SetSpeedZ  (double a_SpeedZ);
+	virtual void SetSpeedX  (double a_SpeedX);
+	virtual void SetSpeedY  (double a_SpeedY);
+	virtual void SetSpeedZ  (double a_SpeedZ);
 	void SetWidth   (double a_Width);
 	
 	void AddPosX    (double a_AddPosX);
