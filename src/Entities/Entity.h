@@ -214,8 +214,14 @@ public:
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
-	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
-	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	// tolua_end
+
+	/** Measured in meter/second (m/s) */
+	Vector3d m_Speed;
+
+	// tolua_begin
+	virtual void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	virtual void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
 	void SetSpeedX  (double a_SpeedX);
 	void SetSpeedY  (double a_SpeedY);
 	void SetSpeedZ  (double a_SpeedZ);
@@ -503,9 +509,6 @@ protected:
 private:
 	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
-	
-	/** Measured in meter/second (m/s) */
-	Vector3d m_Speed;
 	
 	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;

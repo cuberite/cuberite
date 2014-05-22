@@ -1252,6 +1252,26 @@ void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 
 
 
+void cPlayer::SetSpeed(const Vector3d & a_Speed)
+{
+	m_Speed.Set(a_Speed.x, a_Speed.y, a_Speed.z);
+	m_ClientHandle->SendEntityVelocity(*this);
+}
+
+
+
+
+
+void cPlayer::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_ClientHandle->SendEntityVelocity(*this);
+}
+
+
+
+
+
 void cPlayer::MoveTo( const Vector3d & a_NewPos )
 {
 	if ((a_NewPos.y < -990) && (GetPosY() > -100))
