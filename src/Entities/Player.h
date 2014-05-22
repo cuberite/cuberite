@@ -194,7 +194,7 @@ public:
 	/** Forces the player to move in the given direction. DEPRECATED! Use SetSpeed instead */
 	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
 
-	virtual void SetSpeed(const Vector3d & a_Speed) override;
+	void SetSpeed(const Vector3d & a_Speed);
 	virtual void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
 	virtual void SetSpeedX(double a_SpeedX) override;
