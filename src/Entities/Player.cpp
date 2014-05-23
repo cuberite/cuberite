@@ -456,8 +456,18 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	else
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
+
+		if (Dist >= 2.0) // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
+		{
+			// Increment statistic
+			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
+		}
+
 		int Damage = (int)(Dist - 3.f);
-		if (m_LastJumpHeight > m_LastGroundHeight) Damage++;
+		if (m_LastJumpHeight > m_LastGroundHeight)
+		{
+			Damage++;
+		}
 		m_LastJumpHeight = (float)GetPosY();
 
 		if (Damage > 0)
@@ -1951,31 +1961,64 @@ void cPlayer::HandleFloater()
 
 
 
+bool cPlayer::IsClimbing(void) const
+{
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
+
+	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	{
+		return false;
+	}
+
+	BLOCKTYPE Block = m_World->GetBlock(PosX, PosY, PosZ);
+	switch (Block)
+	{
+		case E_BLOCK_LADDER:
+		case E_BLOCK_VINES:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
+
 void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 {
 	StatValue Value = (StatValue)floor(a_DeltaPos.Length() * 100 + 0.5);
 
 	if (m_AttachedTo == NULL)
 	{
-		int PosX = POSX_TOINT;
-		int PosY = POSY_TOINT;
-		int PosZ = POSZ_TOINT;
-
-		BLOCKTYPE Block;
-		NIBBLETYPE Meta;
-		if (!m_World->GetBlockTypeMeta(PosX, PosY, PosZ, Block, Meta))
+		if (IsClimbing())
 		{
-			return;
+			if (a_DeltaPos.y > 0.0) // Going up
+			{
+				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
+			}
 		}
-
-		if ((Block == E_BLOCK_LADDER) && (a_DeltaPos.y > 0.0)) // Going up
+		else if (IsSubmerged())
 		{
-			m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
+			m_Stats.AddValue(statDistDove, Value);
+		}
+		else if (IsSwimming())
+		{
+			m_Stats.AddValue(statDistSwum, Value);
+		}
+		else if (IsOnGround())
+		{
+			m_Stats.AddValue(statDistWalked, Value);
 		}
 		else
 		{
-			// TODO 2014-05-12 xdot: Other types
-			m_Stats.AddValue(statDistWalked, Value);
+			if (Value >= 25) // Ignore small/slow movement
+			{
+				m_Stats.AddValue(statDistFlown, Value);
+			}
 		}
 	}
 	else
