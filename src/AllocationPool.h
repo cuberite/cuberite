@@ -36,12 +36,15 @@ class AllocationPool {
 					}
 				}
 			}
-			T* ret = m_FreeList.front();
+			// placement new, used to initalize the object
+			T* ret = new (m_FreeList.front()) T;
 			m_FreeList.pop_front();
 			return ret;
 		}
 		void Free(T* ptr)
 		{
+			// placement destruct.
+			ptr->~T();
 			m_FreeList.push_front(ptr);
 			if (m_FreeList.size() == BufferSize)
 			{
@@ -50,5 +53,5 @@ class AllocationPool {
 		}
 		
 	private:
-		std::list<T*> m_FreeList;
+		std::list<void *> m_FreeList;
 }
