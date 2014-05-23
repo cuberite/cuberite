@@ -4,7 +4,7 @@
 
 cChunkData cChunkData::Copy() const
 {
-	cChunkData copy;
+	cChunkData copy(m_Pool);
 	for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		if (m_Sections[i] != NULL)
@@ -360,14 +360,14 @@ void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 cChunkData::sChunkSection * cChunkData::Allocate() const
 {
 	// TODO: use a allocation pool
-	return new cChunkData::sChunkSection;
+	return m_Pool.Allocate();
 }
 
 
 
 void cChunkData::Free(cChunkData::sChunkSection * ptr) const
 {
-	delete ptr;
+	m_Pool.Free(ptr);
 }
 
 

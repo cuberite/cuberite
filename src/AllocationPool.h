@@ -1,36 +1,52 @@
 
 #pragma once
 
-template<class T, size_t BufferSize, class StarvationCallbacks>
-class AllocationPool {
+#include <memory>
+
+template<class T, size_t BufferSize>
+class cAllocationPool {
 	public:
+
+		class cStarvationCallbacks
+		{
+			public:
+				virtual ~cStarvationCallbacks() {}
+				virtual void OnStartingUsingBuffer() = 0;
+				virtual void OnStopUsingBuffer() = 0;
+				virtual void OnBufferEmpty() = 0;
+		};
 		
-		~AllocationPool()
+		cAllocationPool(std::auto_ptr<cStarvationCallbacks> a_Callbacks) :
+		m_Callbacks(a_Callbacks)
+		{
+		}
+		
+		~cAllocationPool()
 		{
 			while (!m_FreeList.empty())
 			{
-				delete m_FreeList.front();
+				free (m_FreeList.front());
 				m_FreeList.pop_front();
 			}
 		}	
 		
 		T* Allocate()
 		{
-			if (m_FreeList.Size() <= BufferSize)
+			if (m_FreeList.size() <= BufferSize)
 			{
 				try
 				{
-					return new T;
+					return new(malloc(sizeof(T))) T;
 				}
-				catch (std::bad_alloc& ex)
+				catch (std::bad_alloc&)
 				{
 					if (m_FreeList.size() == BufferSize)
 					{
-						StarvationCallbacks.OnStartingUsingBuffer();
+						m_Callbacks->OnStartingUsingBuffer();
 					}
 					else if (m_FreeList.empty())
 					{
-						StarvationCallbacks.OnBufferEmpty();
+						m_Callbacks->OnBufferEmpty();
 						// Try again until the memory is avalable
 						return Allocate();
 					}
@@ -48,10 +64,11 @@ class AllocationPool {
 			m_FreeList.push_front(ptr);
 			if (m_FreeList.size() == BufferSize)
 			{
-				StarvationCallbacks.OnStopUsingBuffer();
+				m_Callbacks->OnStopUsingBuffer();
 			}
 		}
 		
 	private:
 		std::list<void *> m_FreeList;
-}
+		std::auto_ptr<cStarvationCallbacks> m_Callbacks;
+};

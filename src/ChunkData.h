@@ -7,6 +7,8 @@
 
 #include "ChunkDef.h"
 
+#include "AllocationPool.h"
+
 
 #define CHUNK_SECTION_HEIGHT 16
 #define CHUNK_SECTION_NUM (256 / CHUNK_SECTION_HEIGHT)
@@ -21,11 +23,14 @@ class cChunkData
 {
 public:
 
-	cChunkData()
+	struct sChunkSection;
+
+	cChunkData(cAllocationPool<cChunkData::sChunkSection, 1600>& a_Pool) :
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	: IsOwner(true)
+	IsOwner(true),
 	#endif
+	m_Pool(a_Pool)
 	{
 		memset(m_Sections, 0, sizeof(m_Sections));
 	}
@@ -44,7 +49,8 @@ public:
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	cChunkData(const cChunkData& other) :
-	IsOwner(true)
+	IsOwner(true),
+	m_Pool(other.m_Pool)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -70,13 +76,15 @@ public:
 				m_Sections[i] = other.m_Sections[i];
 			}
 			other.IsOwner = false;
+			ASSERT(&m_Pool == &other.m_Pool);
 		}
 		return *this;
 		
 	}
 	#else
 	// unique_ptr style interface for memory management
-	cChunkData(cChunkData&& other)
+	cChunkData(cChunkData&& other) :
+	m_Pool(other.m_Pool)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -95,6 +103,7 @@ public:
 				m_Sections[i] = other.m_Sections[i];
 				other.m_Sections[i] = 0;
 			}
+			ASSERT(&m_Pool == &other.m_Pool);
 		}
 		return *this;
 	}
@@ -252,13 +261,6 @@ public:
 	void SetLight     (const NIBBLETYPE * a_src);
 	void SetSkyLight  (const NIBBLETYPE * a_src);
 	
-private:
-
-	#if __cplusplus < 201103L
-	// auto_ptr style interface for memory management
-	mutable bool IsOwner;
-	#endif
-	
 	struct sChunkSection {
 		BLOCKTYPE  m_BlockTypes   [CHUNK_SECTION_HEIGHT * 16 * 16]    ;
 		NIBBLETYPE m_BlockMeta    [CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
@@ -266,12 +268,21 @@ private:
 		NIBBLETYPE m_BlockSkyLight[CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
 	};
 	
+private:
+
+	#if __cplusplus < 201103L
+	// auto_ptr style interface for memory management
+	mutable bool IsOwner;
+	#endif
+
 	sChunkSection *m_Sections[CHUNK_SECTION_NUM];
 	
 	sChunkSection * Allocate() const;
 	void Free(sChunkSection * ptr) const;
 	
 	void ZeroSection(sChunkSection * ptr) const;
+	
+	cAllocationPool<cChunkData::sChunkSection, 1600>& m_Pool;
 };
 
 

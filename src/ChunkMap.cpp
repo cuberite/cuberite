@@ -34,7 +34,8 @@
 // cChunkMap:
 
 cChunkMap::cChunkMap(cWorld * a_World )
-	: m_World( a_World )
+	: m_World( a_World ),
+	m_Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks>(new cStarvationCallbacks()))
 {
 }
 
@@ -78,7 +79,7 @@ cChunkMap::cChunkLayer * cChunkMap::GetLayer(int a_LayerX, int a_LayerZ)
 	}
 	
 	// Not found, create new:
-	cChunkLayer * Layer = new cChunkLayer(a_LayerX, a_LayerZ, this);
+	cChunkLayer * Layer = new cChunkLayer(a_LayerX, a_LayerZ, this, m_Pool);
 	if (Layer == NULL)
 	{
 		LOGERROR("cChunkMap: Cannot create new layer, server out of memory?");
@@ -2646,11 +2647,13 @@ void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap::cChunkLayer:
 
-cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent)
+cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent,
+		                            cAllocationPool<cChunkData::sChunkSection,1600>& a_Pool)
 	: m_LayerX( a_LayerX )
 	, m_LayerZ( a_LayerZ )
 	, m_Parent( a_Parent )
 	, m_NumChunksLoaded( 0 )
+	, m_Pool(a_Pool)
 {
 	memset(m_Chunks, 0, sizeof(m_Chunks));
 }
@@ -2692,7 +2695,7 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 		cChunk * neixp = (LocalX < LAYER_SIZE - 1) ? m_Chunks[Index + 1]          : m_Parent->FindChunk(a_ChunkX + 1, a_ChunkZ);
 		cChunk * neizm = (LocalZ > 0)              ? m_Chunks[Index - LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX    , a_ChunkZ - 1);
 		cChunk * neizp = (LocalZ < LAYER_SIZE - 1) ? m_Chunks[Index + LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX    , a_ChunkZ + 1);
-		m_Chunks[Index] = new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld(), neixm, neixp, neizm, neizp);
+		m_Chunks[Index] = new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld(), neixm, neixp, neizm, neizp, m_Pool);
 	}
 	return m_Chunks[Index];
 }

@@ -6,8 +6,16 @@
 
 int main(int argc, char** argv)
 {
+	class cStarvationCallbacks
+		: public cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks
 	{
-		cChunkData buffer;
+		virtual void OnStartingUsingBuffer() {}
+		virtual void OnStopUsingBuffer() {}
+		virtual void OnBufferEmpty() {}
+	};
+	cAllocationPool<cChunkData::sChunkSection,1600> Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks>(new cStarvationCallbacks()));
+	{
+		cChunkData buffer(Pool);
 	
 		buffer.SetBlock(3,1,4,0xDE);
 		buffer.SetMeta(3,1,4,0xA);
@@ -47,7 +55,7 @@ int main(int argc, char** argv)
 	
 	}
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 	
 		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -80,7 +88,7 @@ int main(int argc, char** argv)
 	
 	}
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -114,7 +122,7 @@ int main(int argc, char** argv)
 		
 	}
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		NIBBLETYPE * SrcNibbleBuffer = new NIBBLETYPE[16 * 16 * 256/2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -148,7 +156,7 @@ int main(int argc, char** argv)
 		
 	}
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		BLOCKTYPE * SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);

@@ -6,9 +6,18 @@
 
 int main(int argc, char** argv)
 {
+	class cStarvationCallbacks
+		: public cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks
 	{
+		virtual void OnStartingUsingBuffer() {}
+		virtual void OnStopUsingBuffer() {}
+		virtual void OnBufferEmpty() {}
+	};
+	cAllocationPool<cChunkData::sChunkSection,1600> Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks>(new cStarvationCallbacks()));
+	{
+	
 		// Test first segment
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
@@ -45,7 +54,7 @@ int main(int argc, char** argv)
 	
 	{
 		// test following segment
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
@@ -82,7 +91,7 @@ int main(int argc, char** argv)
 	
 	{
 		// test zeros
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
