@@ -22,7 +22,7 @@
 
 /// Helper class for serializing a chunk into Json
 class cJsonChunkSerializer :
-	public cChunkDataCollector
+	public cChunkDataArrayCollector
 {
 public:
 

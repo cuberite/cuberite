@@ -1,6 +1,6 @@
 
 #include "TestGlobals.h"
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
 
 
@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 {
 	{
 		// Test first segment
-		cChunkBuffer buffer;
+		cChunkData buffer;
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	
 	{
 		// test following segment
-		cChunkBuffer buffer;
+		cChunkData buffer;
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 	
 	{
 		// test zeros
-		cChunkBuffer buffer;
+		cChunkData buffer;
 
 		BLOCKTYPE*  SrcBlockBuffer = new BLOCKTYPE[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);

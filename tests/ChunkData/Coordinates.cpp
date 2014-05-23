@@ -1,13 +1,13 @@
 
 #include "TestGlobals.h"
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
 
 
 int main(int argc, char** argv)
 {
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 
 		// Empty chunks
 		buffer.SetBlock(0,0,0, 0xAB);
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
-		cChunkBuffer buffer;
+		cChunkData buffer;
 		
 		// Zero's
 		buffer.SetBlock(0,0,0, 0x0);
@@ -122,9 +122,9 @@ int main(int argc, char** argv)
 	
 	{
 		// Operator =
-		cChunkBuffer buffer;
+		cChunkData buffer;
 		buffer.SetBlock(0,0,0,0x42);
-		cChunkBuffer copy;
+		cChunkData copy;
 		#if __cplusplus < 201103L
 		copy = buffer;
 		#else

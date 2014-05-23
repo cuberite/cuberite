@@ -17,11 +17,11 @@
 // unique_ptr style interface for memory management
 #endif
 
-class cChunkBuffer
+class cChunkData
 {
 public:
 
-	cChunkBuffer()
+	cChunkData()
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	: IsOwner(true)
@@ -29,21 +29,21 @@ public:
 	{
 		memset(m_Sections, 0, sizeof(m_Sections));
 	}
-	~cChunkBuffer()
+	~cChunkData()
 	{
 		#if __cplusplus < 201103L
 		// auto_ptr style interface for memory management
-		if(!IsOwner) return;
+		if (!IsOwner) return;
 		#endif
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
-			if(m_Sections[i]) Free(m_Sections[i]);;
+			if (m_Sections[i] == NULL) Free(m_Sections[i]);;
 		}
 	}
 	
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	cChunkBuffer(const cChunkBuffer& other) :
+	cChunkData(const cChunkData& other) :
 	IsOwner(true)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
@@ -53,15 +53,15 @@ public:
 		other.IsOwner = false;
 	}
 
-	cChunkBuffer& operator=(const cChunkBuffer& other)
+	cChunkData& operator=(const cChunkData& other)
 	{
-		if(&other != this)
+		if (&other != this)
 		{
-			if(IsOwner)
+			if (IsOwner)
 			{
 				for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 				{
-					if(m_Sections[i]) Free(m_Sections[i]);;
+					if (m_Sections[i]) Free(m_Sections[i]);;
 				}
 			}
 			IsOwner = true;
@@ -76,7 +76,7 @@ public:
 	}
 	#else
 	// unique_ptr style interface for memory management
-	cChunkBuffer(cChunkBuffer&& other)
+	cChunkData(cChunkData&& other)
 	{
 		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 		{
@@ -85,13 +85,13 @@ public:
 		}
 	}
 	
-	cChunkBuffer& operator=(cChunkBuffer&& other)
+	cChunkData& operator=(cChunkData&& other)
 	{
-		if(&other != this)
+		if (&other != this)
 		{
 			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 			{
-				if(m_Sections[i]) Free(m_Sections[i]);;
+				Free(m_Sections[i]);;
 				m_Sections[i] = other.m_Sections[i];
 				other.m_Sections[i] = 0;
 			}
@@ -106,7 +106,7 @@ public:
 		ASSERT((a_Y >= 0) && (a_Y < cChunkDef::Height));
 		ASSERT((a_Z >= 0) && (a_Z < cChunkDef::Width));
 		int Section = a_Y / CHUNK_SECTION_HEIGHT;
-		if(m_Sections[Section])
+		if (m_Sections[Section] != NULL)
 		{
 			int Index = cChunkDef::MakeIndexNoCheck(a_X, a_Y - (Section * CHUNK_SECTION_HEIGHT), a_Z);
 			return m_Sections[Section]->m_BlockTypes[Index];
@@ -125,19 +125,19 @@ public:
 			(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
 		)
 		{
-			ASSERT(!"cChunkBuffer::SetMeta(): index out of range!");
+			ASSERT(!"cChunkData::SetMeta(): index out of range!");
 			return;
 		}
 
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-		if(!m_Sections[Section])
+		if (m_Sections[Section] == NULL)
 		{
-			if(a_Block == 0x00)
+			if (a_Block == 0x00)
 			{
 				return;
 			}
 			m_Sections[Section] = Allocate();
-			if(!m_Sections[Section])
+			if (m_Sections[Section] == NULL)
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
 				return;
@@ -153,7 +153,7 @@ public:
 		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-			if(m_Sections[Section])
+			if (m_Sections[Section] != NULL)
 			{
 				int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 				return (m_Sections[Section]->m_BlockMeta[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
@@ -163,11 +163,11 @@ public:
 				return 0;
 			}
 		}
-		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");
+		ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 		return 0;
 	}
 	
-	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
+	bool SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
 	{
 		if (
 			(a_RelX >= cChunkDef::Width)  || (a_RelX < 0) ||
@@ -175,30 +175,32 @@ public:
 			(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
 		)
 		{
-			ASSERT(!"cChunkBuffer::SetMeta(): index out of range!");
-			return;
+			ASSERT(!"cChunkData::SetMeta(): index out of range!");
+			return false;
 		}
 
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-		if(!m_Sections[Section])
+		if (m_Sections[Section] == NULL)
 		{
-			if((a_Nibble & 0xf) == 0x00)
+			if ((a_Nibble & 0xf) == 0x00)
 			{
-				return;
+				return false;
 			}
 			m_Sections[Section] = Allocate();
-			if(!m_Sections[Section])
+			if (m_Sections[Section] == NULL)
 			{
 				ASSERT(!"Failed to allocate a new section in Chunkbuffer");
-				return;
+				return false;
 			}
 			ZeroSection(m_Sections[Section]);
 		}
 		int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
+		NIBBLETYPE oldval = m_Sections[Section]->m_BlockMeta[Index / 2] >> ((Index & 1) * 4) & 0xf;
 		m_Sections[Section]->m_BlockMeta[Index / 2] = static_cast<NIBBLETYPE>(
 			(m_Sections[Section]->m_BlockMeta[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 		);
+		return oldval == a_Nibble;
 	}
 	
 	NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
@@ -206,7 +208,7 @@ public:
 		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-			if(m_Sections[Section])
+			if (m_Sections[Section] != NULL)
 			{
 				int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 				return (m_Sections[Section]->m_BlockLight[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
@@ -216,7 +218,7 @@ public:
 				return 0;
 			}
 		}
-		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");
+		ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 		return 0;
 	}
 	
@@ -225,7 +227,7 @@ public:
 		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
-			if(m_Sections[Section])
+			if (m_Sections[Section] != NULL)
 			{
 				int Index = cChunkDef::MakeIndexNoCheck(a_RelX, a_RelY - (Section * CHUNK_SECTION_HEIGHT), a_RelZ);
 				return (m_Sections[Section]->m_BlockLight[Index / 2] >> ((Index & 1) * 4)) & 0x0f;
@@ -235,11 +237,11 @@ public:
 				return 0xF;
 			}
 		}
-		ASSERT(!"cChunkBuffer::GetMeta(): coords out of chunk range!");
+		ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 		return 0;
 	}
 	
-	cChunkBuffer Copy() const;
+	cChunkData Copy() const;
 	void CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx = 0, size_t length = cChunkDef::NumBlocks)  const;
 	void CopyMeta     (NIBBLETYPE * a_dest) const;
 	void CopyLight    (NIBBLETYPE * a_dest) const;

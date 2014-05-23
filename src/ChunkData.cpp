@@ -1,13 +1,13 @@
 
 #include "Globals.h"
-#include "ChunkBuffer.h"
+#include "ChunkData.h"
 
-cChunkBuffer cChunkBuffer::Copy() const
+cChunkData cChunkData::Copy() const
 {
-	cChunkBuffer copy;
+	cChunkData copy;
 	for (int i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
-		if(m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
 			copy.m_Sections[i] = Allocate();
 			*copy.m_Sections[i] = *m_Sections[i];
@@ -20,7 +20,7 @@ cChunkBuffer cChunkBuffer::Copy() const
 
 
 
-void cChunkBuffer::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length)  const
+void cChunkData::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length)  const
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
@@ -30,7 +30,7 @@ void cChunkBuffer::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length
 		{
 			size_t tocopy = length > segment_length ? segment_length : length;
 			length -= tocopy;
-			if(m_Sections[i])
+			if (m_Sections[i] != NULL)
 			{
 				memcpy(
 					&a_dest[i * segment_length],
@@ -54,17 +54,18 @@ void cChunkBuffer::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length
 
 
 
-void cChunkBuffer::CopyMeta(NIBBLETYPE * a_dest) const
+void cChunkData::CopyMeta(NIBBLETYPE * a_dest) const
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if(m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
 			memcpy(
 				&a_dest[i * segment_length], 
 				&m_Sections[i]->m_BlockMeta, 
-				sizeof(NIBBLETYPE) * segment_length);
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -81,12 +82,12 @@ void cChunkBuffer::CopyMeta(NIBBLETYPE * a_dest) const
 
 
 
-void cChunkBuffer::CopyLight(NIBBLETYPE * a_dest) const
+void cChunkData::CopyLight(NIBBLETYPE * a_dest) const
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if(m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
 			memcpy(
 				&a_dest[i * segment_length],
@@ -109,12 +110,12 @@ void cChunkBuffer::CopyLight(NIBBLETYPE * a_dest) const
 
 
 
-void cChunkBuffer::CopySkyLight(NIBBLETYPE * a_dest) const
+void cChunkData::CopySkyLight(NIBBLETYPE * a_dest) const
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if(m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
 			memcpy(
 				&a_dest[i * segment_length],
@@ -137,14 +138,18 @@ void cChunkBuffer::CopySkyLight(NIBBLETYPE * a_dest) const
 
 
 
-void cChunkBuffer::SetBlocks(const BLOCKTYPE * a_src)
+void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16;
-		if (m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockTypes, &a_src[i * segment_length], sizeof(BLOCKTYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockTypes,
+				&a_src[i * segment_length],
+				sizeof(BLOCKTYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -159,9 +164,21 @@ void cChunkBuffer::SetBlocks(const BLOCKTYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockMeta,0x00,sizeof(m_Sections[i]->m_BlockMeta));
-				memset(m_Sections[i]->m_BlockLight,0x00,sizeof(m_Sections[i]->m_BlockLight));
-				memset(m_Sections[i]->m_BlockSkyLight,0xFF,sizeof(m_Sections[i]->m_BlockSkyLight));
+				memset(
+					m_Sections[i]->m_BlockMeta,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockMeta)
+				);
+				memset(
+					m_Sections[i]->m_BlockLight,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockLight)
+				);
+				memset(
+					m_Sections[i]->m_BlockSkyLight,
+					0xFF,
+					sizeof(m_Sections[i]->m_BlockSkyLight)
+				);
 			}
 			else
 			{
@@ -175,14 +192,18 @@ void cChunkBuffer::SetBlocks(const BLOCKTYPE * a_src)
 
 
 
-void cChunkBuffer::SetMeta(const NIBBLETYPE * a_src)
+void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 {
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if (m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockMeta, &a_src[i * segment_length], sizeof(NIBBLETYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockMeta, 
+				&a_src[i * segment_length],
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -197,9 +218,21 @@ void cChunkBuffer::SetMeta(const NIBBLETYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockTypes,0x00,sizeof(m_Sections[i]->m_BlockTypes));
-				memset(m_Sections[i]->m_BlockLight,0x00,sizeof(m_Sections[i]->m_BlockLight));
-				memset(m_Sections[i]->m_BlockSkyLight,0xFF,sizeof(m_Sections[i]->m_BlockSkyLight));
+				memset(
+					m_Sections[i]->m_BlockTypes,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockTypes)
+				);
+				memset(
+					m_Sections[i]->m_BlockLight,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockLight)
+				);
+				memset(
+					m_Sections[i]->m_BlockSkyLight,
+					0xFF,
+					sizeof(m_Sections[i]->m_BlockSkyLight)
+				);
 			}
 			else
 			{
@@ -213,15 +246,19 @@ void cChunkBuffer::SetMeta(const NIBBLETYPE * a_src)
 
 
 
-void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
+void cChunkData::SetLight(const NIBBLETYPE * a_src)
 {
 	if (!a_src) return;
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if (m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockLight, &a_src[i * segment_length], sizeof(NIBBLETYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockLight,
+				&a_src[i * segment_length],
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -236,9 +273,21 @@ void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockTypes,0x00,sizeof(m_Sections[i]->m_BlockTypes));
-				memset(m_Sections[i]->m_BlockMeta,0x00,sizeof(m_Sections[i]->m_BlockMeta));
-				memset(m_Sections[i]->m_BlockSkyLight,0xFF,sizeof(m_Sections[i]->m_BlockSkyLight));
+				memset(
+					m_Sections[i]->m_BlockTypes,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockTypes)
+				);
+				memset(
+					m_Sections[i]->m_BlockMeta,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockMeta)
+				);
+				memset(
+					m_Sections[i]->m_BlockSkyLight,
+					0xFF,
+					sizeof(m_Sections[i]->m_BlockSkyLight)
+				);
 			}
 			else
 			{
@@ -252,15 +301,19 @@ void cChunkBuffer::SetLight(const NIBBLETYPE * a_src)
 
 
 
-void cChunkBuffer::SetSkyLight  (const NIBBLETYPE * a_src)
+void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 {
 	if (!a_src) return;
 	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
-		if (m_Sections[i])
+		if (m_Sections[i] != NULL)
 		{
-			memcpy(&m_Sections[i]->m_BlockSkyLight, &a_src[i * segment_length], sizeof(NIBBLETYPE) * segment_length);
+			memcpy(
+				&m_Sections[i]->m_BlockSkyLight,
+				&a_src[i * segment_length],
+				sizeof(NIBBLETYPE) * segment_length
+			);
 		}
 		else
 		{
@@ -275,9 +328,21 @@ void cChunkBuffer::SetSkyLight  (const NIBBLETYPE * a_src)
 					&a_src[i * segment_length],
 					sizeof(BLOCKTYPE) * segment_length
 					);
-				memset(m_Sections[i]->m_BlockTypes,0x00,sizeof(m_Sections[i]->m_BlockTypes));
-				memset(m_Sections[i]->m_BlockMeta,0x00,sizeof(m_Sections[i]->m_BlockMeta));
-				memset(m_Sections[i]->m_BlockLight,0x00,sizeof(m_Sections[i]->m_BlockLight));
+				memset(
+					m_Sections[i]->m_BlockTypes,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockTypes)
+				);
+				memset(
+					m_Sections[i]->m_BlockMeta,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockMeta)
+				);
+				memset(
+					m_Sections[i]->m_BlockLight,
+					0x00,
+					sizeof(m_Sections[i]->m_BlockLight)
+				);
 			}
 			else
 			{
@@ -292,27 +357,43 @@ void cChunkBuffer::SetSkyLight  (const NIBBLETYPE * a_src)
 
 
 
-cChunkBuffer::sChunkSection * cChunkBuffer::Allocate() const
+cChunkData::sChunkSection * cChunkData::Allocate() const
 {
 	// TODO: use a allocation pool
-	return new cChunkBuffer::sChunkSection;
+	return new cChunkData::sChunkSection;
 }
 
 
 
-void cChunkBuffer::Free(cChunkBuffer::sChunkSection * ptr) const
+void cChunkData::Free(cChunkData::sChunkSection * ptr) const
 {
 	delete ptr;
 }
 
 
 
-void cChunkBuffer::ZeroSection(cChunkBuffer::sChunkSection * ptr) const
+void cChunkData::ZeroSection(cChunkData::sChunkSection * ptr) const
 {
-	memset(ptr->m_BlockTypes,0x00,sizeof(ptr->m_BlockTypes));
-	memset(ptr->m_BlockMeta,0x00,sizeof(ptr->m_BlockMeta));
-	memset(ptr->m_BlockLight,0x00,sizeof(ptr->m_BlockLight));
-	memset(ptr->m_BlockSkyLight,0xFF,sizeof(ptr->m_BlockSkyLight));
+	memset(
+		ptr->m_BlockTypes,
+		0x00,
+		sizeof(ptr->m_BlockTypes)
+	);
+	memset(
+		ptr->m_BlockMeta,
+		0x00,
+		sizeof(ptr->m_BlockMeta)
+	);
+	memset(
+		ptr->m_BlockLight,
+		0x00,
+		sizeof(ptr->m_BlockLight)
+	);
+	memset(
+		ptr->m_BlockSkyLight,
+		0xFF,
+		sizeof(ptr->m_BlockSkyLight)
+	);
 }
 
 

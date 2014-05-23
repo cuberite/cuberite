@@ -18,7 +18,7 @@
 class cReader :
 	public cChunkDataCallback
 {
-	virtual void ChunkBuffer(const cChunkBuffer & a_ChunkBuffer) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
 		BLOCKTYPE * OutputRows = m_BlockTypes;
 		int InputIdx = 0;
