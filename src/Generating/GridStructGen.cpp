@@ -22,6 +22,15 @@ cGridStructGen::cGridStructGen(
 	m_MaxStructureSizeZ(a_MaxStructureSizeZ),
 	m_MaxCacheSize(a_MaxCacheSize)
 {
+	size_t NumStructuresPerQuery = (size_t)((m_MaxStructureSizeX / m_GridSizeX + 1) * (m_MaxStructureSizeZ / m_GridSizeZ + 1));
+	if (NumStructuresPerQuery > m_MaxCacheSize)
+	{
+		m_MaxCacheSize = NumStructuresPerQuery * 4;
+		LOGINFO(
+			"cGridStructGen: The cache size is too small (%u), increasing the cache size to %u to avoid inefficiency.",
+			(unsigned)a_MaxCacheSize, (unsigned)m_MaxCacheSize
+		);
+	}
 }
 
 
