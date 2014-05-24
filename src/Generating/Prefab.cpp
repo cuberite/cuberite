@@ -292,6 +292,15 @@ int cPrefab::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cC
 
 
 
+void cPrefab::SetDefaultWeight(int a_DefaultWeight)
+{
+	m_DefaultWeight = a_DefaultWeight;
+}
+
+
+
+
+
 void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
 {
 	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));

@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "VillageGen.h"
+#include "Prefabs/JapaneseVillagePrefabs.h"
 #include "Prefabs/PlainsVillagePrefabs.h"
 #include "Prefabs/SandVillagePrefabs.h"
 #include "Prefabs/SandFlatRoofVillagePrefabs.h"
@@ -59,6 +60,7 @@ public:
 			cPrefab * RoadPiece = new cPrefab(BA, 1);
 			RoadPiece->AddConnector(0,       0, 1, BLOCK_FACE_XM, -2);
 			RoadPiece->AddConnector(len - 1, 0, 1, BLOCK_FACE_XP, -2);
+			RoadPiece->SetDefaultWeight(100);
 			
 			// Add the road connectors:
 			for (int x = 1; x < len; x += 12)
@@ -84,8 +86,8 @@ public:
 	// cPrefabPiecePool overrides:
 	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override
 	{
-		// Roads cannot branch T-wise (appending -2 connector to a +2 connector):
-		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0))
+		// Roads cannot branch T-wise (appending -2 connector to a +2 connector on a 1-high piece):
+		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0) && (a_PlacedPiece.GetPiece().GetSize().y == 1))
 		{
 			return 0;
 		}
@@ -283,6 +285,9 @@ static cVillagePiecePool g_SandFlatRoofVillage(g_SandFlatRoofVillagePrefabs, g_S
 /** The prefabs for the plains village. */
 static cVillagePiecePool g_PlainsVillage(g_PlainsVillagePrefabs, g_PlainsVillagePrefabsCount, g_PlainsVillageStartingPrefabs, g_PlainsVillageStartingPrefabsCount);
 
+/** The prefabs for the Japanese village. */
+static cVillagePiecePool g_JapaneseVillage(g_JapaneseVillagePrefabs, g_JapaneseVillagePrefabsCount, g_JapaneseVillageStartingPrefabs, g_JapaneseVillageStartingPrefabsCount);
+
 
 
 
@@ -316,6 +321,8 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	cVillagePiecePool * VillagePrefabs = NULL;
 	BLOCKTYPE RoadBlock = E_BLOCK_GRAVEL;
 	int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
+	cVillagePiecePool * PlainsVillage = (rnd % 2 == 0) ? &g_PlainsVillage : &g_JapaneseVillage;
+	cVillagePiecePool * DesertVillage = (rnd % 2 == 0) ? &g_SandVillage : &g_SandFlatRoofVillage;
 	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		switch (Biomes[i])
@@ -324,7 +331,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 			case biDesertM:
 			{
 				// These biomes allow sand villages
-				VillagePrefabs = (rnd % 2 == 0) ? &g_SandVillage : &g_SandFlatRoofVillage;
+				VillagePrefabs = DesertVillage;
 				// RoadBlock = E_BLOCK_SANDSTONE;
 				break;
 			}
@@ -334,7 +341,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 			case biSunflowerPlains:
 			{
 				// These biomes allow plains-style villages
-				VillagePrefabs = &g_PlainsVillage;
+				VillagePrefabs = PlainsVillage;
 				break;
 			}
 			default:

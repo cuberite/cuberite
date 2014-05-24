@@ -104,6 +104,9 @@ public:
 	PiecePool implementations can use this for their GetPieceWeight() implementations. */
 	int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector) const;
 	
+	/** Sets the (unmodified) DefaultWeight property for this piece. */
+	void SetDefaultWeight(int a_DefaultWeight);
+	
 	/** Returns the unmodified DefaultWeight property for the piece. */
 	int GetDefaultWeight(void) const { return m_DefaultWeight; }
 	
