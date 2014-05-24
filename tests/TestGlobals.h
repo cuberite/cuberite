@@ -126,9 +126,9 @@ class cAssertFailure
 #define UNUSED(X) (void)(X)
 
 // Logging functions
-void LOGERROR(const char* a_Format, ...) FORMATSTRING(1,2);
+void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1,2);
 
-void LOGERROR(const char* a_Format, ...)
+void inline LOGERROR(const char* a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);

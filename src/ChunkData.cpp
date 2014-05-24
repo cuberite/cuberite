@@ -1,5 +1,9 @@
 
+#ifdef TEST_GLOBALS
+#include "TestGlobals.h"
+#else
 #include "Globals.h"
+#endif
 #include "ChunkData.h"
 
 cChunkData::cChunkData()
@@ -39,7 +43,7 @@ cChunkData::~cChunkData()
 		other.IsOwner = false;
 	}
 
-	cChunkData::cChunkData& operator=(const cChunkData& other)
+	cChunkData& cChunkData::operator=(const cChunkData& other)
 	{
 		if (&other != this)
 		{
@@ -71,7 +75,7 @@ cChunkData::~cChunkData()
 		}
 	}
 
-	cChunkData::cChunkData& operator=(cChunkData&& other)
+	cChunkData& cChunkData::operator=(cChunkData&& other)
 	{
 		if (&other != this)
 		{
@@ -230,7 +234,7 @@ NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 	return 0;
 }
 
-cChunkData cChunkData::cChunkData::Copy() const
+cChunkData cChunkData::Copy() const
 {
 	cChunkData copy;
 	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
