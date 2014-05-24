@@ -1,4 +1,4 @@
-MCServer [![Build Status](https://travis-ci.org/mc-server/MCServer.png?branch=master)](https://travis-ci.org/mc-server/MCServer) [![Support via Gittip](http://img.shields.io/gittip/on%2Fgithub%2Fmc-server.svg)](https://www.gittip.com/on/github/mc-server/)
+MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer) [![Support via Gittip](http://img.shields.io/gittip/on%2Fgithub%2Fmc-server.svg)](https://www.gittip.com/on/github/mc-server/)
 ========
 
 **Current Protocol Supported:** Minecraft v1.2 -> v1.7
