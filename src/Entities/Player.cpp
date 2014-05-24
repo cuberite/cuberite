@@ -16,6 +16,9 @@
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
 
+#include "../WorldStorage/StatSerializer.h"
+#include "../CompositeChat.h"
+
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
@@ -191,6 +194,8 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 			return;
 		}
 	}
+
+	m_Stats.AddValue(statMinutesPlayed, 1);
 	
 	if (!a_Chunk.IsValid())
 	{
@@ -451,8 +456,18 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	else
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
+
+		if (Dist >= 2.0) // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
+		{
+			// Increment statistic
+			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
+		}
+
 		int Damage = (int)(Dist - 3.f);
-		if (m_LastJumpHeight > m_LastGroundHeight) Damage++;
+		if (m_LastJumpHeight > m_LastGroundHeight)
+		{
+			Damage++;
+		}
 		m_LastJumpHeight = (float)GetPosY();
 
 		if (Damage > 0)
@@ -815,7 +830,7 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
-		cPlayer* Attacker = (cPlayer*) a_TDI.Attacker;
+		cPlayer * Attacker = (cPlayer *)a_TDI.Attacker;
 
 		if ((m_Team != NULL) && (m_Team == Attacker->m_Team))
 		{
@@ -832,6 +847,8 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		// Any kind of damage adds food exhaustion
 		AddFoodExhaustion(0.3f);
 		SendHealth();
+
+		m_Stats.AddValue(statDamageTaken, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
 		return true;
 	}
 	return false;
@@ -862,6 +879,8 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
 
+	m_Stats.AddValue(statItemsDropped, Pickups.Size());
+
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
@@ -871,9 +890,9 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	}
 	else if (a_Killer->IsPlayer())
 	{
-		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), ((cPlayer *)a_Killer)->GetName().c_str()));
+		cPlayer * Killer = (cPlayer *)a_Killer;
 
-		m_World->GetScoreBoard().AddPlayerScore(((cPlayer *)a_Killer)->GetName(), cObjective::otPlayerKillCount, 1);
+		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
 	}
 	else
 	{
@@ -883,7 +902,36 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
 
+	m_Stats.AddValue(statDeaths);
+
 	m_World->GetScoreBoard().AddPlayerScore(GetName(), cObjective::otDeathCount, 1);
+}
+
+
+
+
+
+void cPlayer::Killed(cEntity * a_Victim)
+{
+	cScoreboard & ScoreBoard = m_World->GetScoreBoard();
+
+	if (a_Victim->IsPlayer())
+	{
+		m_Stats.AddValue(statPlayerKills);
+
+		ScoreBoard.AddPlayerScore(GetName(), cObjective::otPlayerKillCount, 1);
+	}
+	else if (a_Victim->IsMob())
+	{
+		if (((cMonster *)a_Victim)->GetMobFamily() == cMonster::mfHostile)
+		{
+			AwardAchievement(achKillMonster);
+		}
+
+		m_Stats.AddValue(statMobKills);
+	}
+
+	ScoreBoard.AddPlayerScore(GetName(), cObjective::otTotalKillCount, 1);
 }
 
 
@@ -1108,6 +1156,47 @@ void cPlayer::SetIP(const AString & a_IP)
 
 
 
+unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
+{
+	eStatistic Prerequisite = cStatInfo::GetPrerequisite(a_Ach);
+
+	// Check if the prerequisites are met
+	if (Prerequisite != statInvalid)
+	{
+		if (m_Stats.GetValue(Prerequisite) == 0)
+		{
+			return 0;
+		}
+	}
+
+	StatValue Old = m_Stats.GetValue(a_Ach);
+
+	if (Old > 0)
+	{
+		return m_Stats.AddValue(a_Ach);
+	}
+	else
+	{
+		// First time, announce it
+		cCompositeChat Msg;
+		Msg.AddTextPart(m_PlayerName + " has just earned the achievement ");
+		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat part (cAchievement)
+		m_World->BroadcastChat(Msg);
+
+		// Increment the statistic
+		StatValue New = m_Stats.AddValue(a_Ach);
+
+		// Achievement Get!
+		m_ClientHandle->SendStatistics(m_Stats);
+
+		return New;
+	}
+}
+
+
+
+
+
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	SetPosition(a_PosX, a_PosY, a_PosZ);
@@ -1192,6 +1281,9 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	
 	// TODO: should do some checks to see if player is not moving through terrain
 	// TODO: Official server refuses position packets too far away from each other, kicking "hacked" clients; we should, too
+
+	Vector3d DeltaPos = a_NewPos - GetPosition();
+	UpdateMovementStats(DeltaPos);
 	
 	SetPosition( a_NewPos );
 	SetStance(a_NewPos.y + 1.62);
@@ -1422,10 +1514,7 @@ void cPlayer::TossEquippedItem(char a_Amount)
 		Drops.push_back(DroppedItem);
 	}
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	TossItems(Drops);
 }
 
 
@@ -1441,6 +1530,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 		char OriginalItemAmount = Item.m_ItemCount;
 		Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
 		Drops.push_back(Item);
+
 		if (OriginalItemAmount > a_Amount)
 		{
 			Item.m_ItemCount = OriginalItemAmount - a_Amount;
@@ -1451,10 +1541,7 @@ void cPlayer::TossHeldItem(char a_Amount)
 		}
 	}
 
-	double vX = 0, vY = 0, vZ = 0;
-	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
-	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	TossItems(Drops);
 }
 
 
@@ -1466,10 +1553,21 @@ void cPlayer::TossPickup(const cItem & a_Item)
 	cItems Drops;
 	Drops.push_back(a_Item);
 
+	TossItems(Drops);
+}
+
+
+
+
+
+void cPlayer::TossItems(const cItems & a_Items)
+{
+	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(Drops, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
 }
 
 
@@ -1621,6 +1719,11 @@ bool cPlayer::LoadFromDisk()
 	m_Inventory.LoadFromJson(root["inventory"]);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
+
+	// Load the player stats.
+	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
+	StatSerializer.Load();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
 		m_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
@@ -1692,6 +1795,16 @@ bool cPlayer::SaveToDisk()
 		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
 		return false;
 	}
+
+	// Save the player stats.
+	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), m_PlayerName, &m_Stats);
+	if (!StatSerializer.Save())
+	{
+		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
+		return false;
+	}
+
 	return true;
 }
 
@@ -1706,7 +1819,10 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
 	for( PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr )
 	{
-		if( itr->second ) Permissions.push_back( itr->first );
+		if (itr->second)
+		{
+			Permissions.push_back( itr->first );
+		}
 	}
 
 	return Permissions;
@@ -1839,6 +1955,92 @@ void cPlayer::HandleFloater()
 	} Callback;
 	m_World->DoWithEntityByID(m_FloaterID, Callback);
 	SetIsFishing(false);
+}
+
+
+
+
+
+bool cPlayer::IsClimbing(void) const
+{
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
+
+	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	{
+		return false;
+	}
+
+	BLOCKTYPE Block = m_World->GetBlock(PosX, PosY, PosZ);
+	switch (Block)
+	{
+		case E_BLOCK_LADDER:
+		case E_BLOCK_VINES:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
+
+void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
+{
+	StatValue Value = (StatValue)floor(a_DeltaPos.Length() * 100 + 0.5);
+
+	if (m_AttachedTo == NULL)
+	{
+		if (IsClimbing())
+		{
+			if (a_DeltaPos.y > 0.0) // Going up
+			{
+				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
+			}
+		}
+		else if (IsSubmerged())
+		{
+			m_Stats.AddValue(statDistDove, Value);
+		}
+		else if (IsSwimming())
+		{
+			m_Stats.AddValue(statDistSwum, Value);
+		}
+		else if (IsOnGround())
+		{
+			m_Stats.AddValue(statDistWalked, Value);
+		}
+		else
+		{
+			if (Value >= 25) // Ignore small/slow movement
+			{
+				m_Stats.AddValue(statDistFlown, Value);
+			}
+		}
+	}
+	else
+	{
+		switch (m_AttachedTo->GetEntityType())
+		{
+			case cEntity::etMinecart: m_Stats.AddValue(statDistMinecart, Value); break;
+			case cEntity::etBoat:     m_Stats.AddValue(statDistBoat,     Value); break;
+			case cEntity::etMonster:
+			{
+				cMonster * Monster = (cMonster *)m_AttachedTo;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
+					case cMonster::mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					default: break;
+				}
+				break;
+			}
+			default: break;
+		}
+	}
 }
 
 

@@ -46,7 +46,29 @@ public:
 			bool IsWither(void) const { return m_IsWither; }
 
 			void Reset(void) { m_IsWither = false; }
+
 		} CallbackA, CallbackB;
+
+		class cPlayerCallback : public cPlayerListCallback
+		{
+			Vector3f m_Pos;
+
+			virtual bool Item(cPlayer * a_Player)
+			{
+				// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
+				double Dist = (a_Player->GetPosition() - m_Pos).Length();
+				if (Dist < 50.0)
+				{
+					// If player is close, award achievement
+					a_Player->AwardAchievement(achSpawnWither);
+				}
+				return false;
+			}
+
+		public:
+			cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
+
+		} PlayerCallback(Vector3f(a_BlockX, a_BlockY, a_BlockZ));
 
 		a_World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, CallbackA);
 
@@ -86,6 +108,9 @@ public:
 			// Spawn the wither:
 			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtWither);
 
+			// Award Achievement
+			a_World->ForEachPlayer(PlayerCallback);
+
 			return true;
 		}
 
@@ -112,6 +137,9 @@ public:
 
 			// Spawn the wither:
 			a_World->SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtWither);
+
+			// Award Achievement
+			a_World->ForEachPlayer(PlayerCallback);
 
 			return true;
 		}

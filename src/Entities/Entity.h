@@ -299,6 +299,9 @@ public:
 	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)
 	virtual void KilledBy(cEntity * a_Killer);
 
+	/// Called when the entity kills another entity
+	virtual void Killed(cEntity * a_Victim) {}
+
 	/// Heals the specified amount of HPs
 	void Heal(int a_HitPoints);
 	
@@ -317,6 +320,9 @@ public:
 	
 	/// Updates the state related to this entity being on fire
 	virtual void TickBurning(cChunk & a_Chunk);
+
+	/** Detects the time for application of cacti damage */
+	virtual void DetectCacti(void);
 	
 	/// Handles when the entity is in the void
 	virtual void TickInVoid(cChunk & a_Chunk);

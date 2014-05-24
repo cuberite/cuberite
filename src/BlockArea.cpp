@@ -2095,7 +2095,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msOverwrite
 		
 		case cBlockArea::msFillAir:
@@ -2109,7 +2109,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msFillAir
 		
 		case cBlockArea::msImprint:
@@ -2123,7 +2123,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msImprint
 		
 		case cBlockArea::msLake:
@@ -2137,7 +2137,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msLake
 		
 		case cBlockArea::msSpongePrint:
@@ -2151,7 +2151,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msSpongePrint
 
 		case cBlockArea::msDifference:
@@ -2165,7 +2165,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}	// case msDifference
 		
 		case cBlockArea::msMask:
@@ -2179,16 +2179,13 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msMask
-		
-		default:
-		{
-			LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
-			ASSERT(!"Unknown block area merge strategy");
-			break;
-		}
 	}  // switch (a_Strategy)
+	
+	LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
+	ASSERT(!"Unknown block area merge strategy");
+	return;
 }
 
 

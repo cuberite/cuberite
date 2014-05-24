@@ -355,6 +355,8 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			InStateEscaping(a_Dt);
 			break;
 		}
+			
+		case ATTACKING: break;
 	}  // switch (m_EMState)
 
 	BroadcastMovementUpdate();
@@ -464,8 +466,10 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if((m_SoundHurt != "") && (m_Health > 0))
+	if (!m_SoundHurt.empty() && (m_Health > 0))
+	{
 		m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+	}
 
 	if (a_TDI.Attacker != NULL)
 	{

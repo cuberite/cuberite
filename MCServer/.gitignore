@@ -30,3 +30,7 @@ motd.txt
 *.xml
 mcserver_api.lua
 
+# Ignore the webadmin certs / privkey, so that no-one commits theirs by accident:
+webadmin/httpscert.crt
+webadmin/httpskey.pem
+
