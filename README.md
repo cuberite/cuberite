@@ -1,4 +1,4 @@
-MCServer
+MCServer [![Build Status](https://travis-ci.org/mc-server/MCServer.png?branch=master)](https://travis-ci.org/mc-server/MCServer)
 ========
 
 **Current Protocol Supported:** Minecraft v1.2 -> v1.7
@@ -33,6 +33,8 @@ Other Stuff
 For other stuff, including plugins and discussion, check the [forums](http://forum.mc-server.org) and [wiki](http://wiki.mc-server.org/).
 
 Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
+
+[![Support via Gittip](https://rawgithub.com/twolfson/gittip-badge/0.2.0/dist/gittip.png)](https://www.gittip.com/USERNAME/)
 
 Travis CI: [![Build Status](https://travis-ci.org/mc-server/MCServer.png?branch=master)](https://travis-ci.org/mc-server/MCServer)
 
