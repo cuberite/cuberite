@@ -36,5 +36,5 @@ Earn bitcoins for commits or donate to reward the MCServer developers: [![tip fo
 
 Support Via Gittip: [![Support via Gittip](http://img.shields.io/gittip/on%2Fgithub%2Fmc-server.svg)](https://www.gittip.com/on/github/mc-server/)
 
-Travis CI: [![Build Status]((http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer)
+Travis CI: [![Build Status]((http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer))
 
