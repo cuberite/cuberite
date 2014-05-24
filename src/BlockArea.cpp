@@ -1908,7 +1908,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
 
 	if (m_Area.m_BlockLight != NULL)
 	{
-		a_BlockBuffer.CopyLight(m_Area.m_BlockLight);
+		a_BlockBuffer.CopyBlockLight(m_Area.m_BlockLight);
 	}
 
 	if (m_Area.m_BlockSkyLight != NULL)

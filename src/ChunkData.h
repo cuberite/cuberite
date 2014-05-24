@@ -8,8 +8,7 @@
 #include "ChunkDef.h"
 
 
-#define CHUNK_SECTION_HEIGHT 16
-#define CHUNK_SECTION_NUM (256 / CHUNK_SECTION_HEIGHT)
+
 
 #if __cplusplus < 201103L
 // auto_ptr style interface for memory management
@@ -23,8 +22,8 @@ public:
 
 	cChunkData()
 	#if __cplusplus < 201103L
-	// auto_ptr style interface for memory management
-	: IsOwner(true)
+		// auto_ptr style interface for memory management
+		: IsOwner(true)
 	#endif
 	{
 		memset(m_Sections, 0, sizeof(m_Sections));
@@ -32,72 +31,75 @@ public:
 	~cChunkData()
 	{
 		#if __cplusplus < 201103L
-		// auto_ptr style interface for memory management
-		if (!IsOwner) return;
+			// auto_ptr style interface for memory management
+			if (!IsOwner)
+			{
+				return;
+			}
 		#endif
-		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+		for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 		{
 			if (m_Sections[i] == NULL) Free(m_Sections[i]);;
 		}
 	}
 	
 	#if __cplusplus < 201103L
-	// auto_ptr style interface for memory management
-	cChunkData(const cChunkData& other) :
-	IsOwner(true)
-	{
-		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+		// auto_ptr style interface for memory management
+		cChunkData(const cChunkData& other) :
+		IsOwner(true)
 		{
-			m_Sections[i] = other.m_Sections[i];
-		}
-		other.IsOwner = false;
-	}
-
-	cChunkData& operator=(const cChunkData& other)
-	{
-		if (&other != this)
-		{
-			if (IsOwner)
-			{
-				for (int i = 0; i < CHUNK_SECTION_NUM; i++)
-				{
-					if (m_Sections[i]) Free(m_Sections[i]);;
-				}
-			}
-			IsOwner = true;
-			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+			for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 			{
 				m_Sections[i] = other.m_Sections[i];
 			}
 			other.IsOwner = false;
 		}
-		return *this;
-		
-	}
-	#else
-	// unique_ptr style interface for memory management
-	cChunkData(cChunkData&& other)
-	{
-		for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+
+		cChunkData& operator=(const cChunkData& other)
 		{
-			m_Sections[i] = other.m_Sections[i];
-			other.m_Sections[i] = 0;
-		}
-	}
-	
-	cChunkData& operator=(cChunkData&& other)
-	{
-		if (&other != this)
-		{
-			for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+			if (&other != this)
 			{
-				Free(m_Sections[i]);;
+				if (IsOwner)
+				{
+					for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
+					{
+						if (m_Sections[i]) Free(m_Sections[i]);;
+					}
+				}
+				IsOwner = true;
+				for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
+				{
+					m_Sections[i] = other.m_Sections[i];
+				}
+				other.IsOwner = false;
+			}
+			return *this;
+		
+		}
+	#else
+		// unique_ptr style interface for memory management
+		cChunkData(cChunkData&& other)
+		{
+			for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
+			{
 				m_Sections[i] = other.m_Sections[i];
-				other.m_Sections[i] = 0;
+				other.m_Sections[i] = NULL;
 			}
 		}
-		return *this;
-	}
+	
+		cChunkData& operator=(cChunkData&& other)
+		{
+			if (&other != this)
+			{
+				for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
+				{
+					Free(m_Sections[i]);;
+					m_Sections[i] = other.m_Sections[i];
+					other.m_Sections[i] = NULL;
+				}
+			}
+			return *this;
+		}
 	#endif
 
 	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z) const
@@ -150,7 +152,10 @@ public:
 
 	NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
+		if (
+			(a_RelX < cChunkDef::Width) && (a_RelX > -1) &&
+			(a_RelY < cChunkDef::Height) && (a_RelY > -1) &&
+			(a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
 		{
 			int Section = a_RelY / CHUNK_SECTION_HEIGHT;
 			if (m_Sections[Section] != NULL)
@@ -244,15 +249,18 @@ public:
 	cChunkData Copy() const;
 	void CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx = 0, size_t length = cChunkDef::NumBlocks)  const;
 	void CopyMeta     (NIBBLETYPE * a_dest) const;
-	void CopyLight    (NIBBLETYPE * a_dest) const;
+	void CopyBlockLight    (NIBBLETYPE * a_dest) const;
 	void CopySkyLight (NIBBLETYPE * a_dest) const;
 	
 	void SetBlocks    (const BLOCKTYPE * a_src);
 	void SetMeta      (const NIBBLETYPE * a_src);
-	void SetLight     (const NIBBLETYPE * a_src);
+	void SetBlockLight     (const NIBBLETYPE * a_src);
 	void SetSkyLight  (const NIBBLETYPE * a_src);
 	
 private:
+
+	static const size_t CHUNK_SECTION_HEIGHT = 16;
+	static const size_t CHUNK_SECTION_COUNT = (256 / CHUNK_SECTION_HEIGHT);
 
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
@@ -266,7 +274,7 @@ private:
 		NIBBLETYPE m_BlockSkyLight[CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
 	};
 	
-	sChunkSection *m_Sections[CHUNK_SECTION_NUM];
+	sChunkSection *m_Sections[CHUNK_SECTION_COUNT];
 	
 	sChunkSection * Allocate() const;
 	void Free(sChunkSection * ptr) const;

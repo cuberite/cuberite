@@ -5,7 +5,7 @@
 cChunkData cChunkData::Copy() const
 {
 	cChunkData copy;
-	for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		if (m_Sections[i] != NULL)
 		{
@@ -22,13 +22,16 @@ cChunkData cChunkData::Copy() const
 
 void cChunkData::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length)  const
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length =  CHUNK_SECTION_HEIGHT * 16 * 16;
-		if (a_Idx > 0) a_Idx = a_Idx > length ? a_Idx - length : 0;
+		if (a_Idx > 0)
+		{
+			a_Idx = std::max(a_Idx - length, (size_t) 0);
+		}
 		if (a_Idx == 0) 
 		{
-			size_t tocopy = length > segment_length ? segment_length : length;
+			size_t tocopy = std::min(segment_length, length);
 			length -= tocopy;
 			if (m_Sections[i] != NULL)
 			{
@@ -56,7 +59,7 @@ void cChunkData::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length) 
 
 void cChunkData::CopyMeta(NIBBLETYPE * a_dest) const
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -82,9 +85,9 @@ void cChunkData::CopyMeta(NIBBLETYPE * a_dest) const
 
 
 
-void cChunkData::CopyLight(NIBBLETYPE * a_dest) const
+void cChunkData::CopyBlockLight(NIBBLETYPE * a_dest) const
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -112,7 +115,7 @@ void cChunkData::CopyLight(NIBBLETYPE * a_dest) const
 
 void cChunkData::CopySkyLight(NIBBLETYPE * a_dest) const
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -140,7 +143,7 @@ void cChunkData::CopySkyLight(NIBBLETYPE * a_dest) const
 
 void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16;
 		if (m_Sections[i] != NULL)
@@ -153,6 +156,9 @@ void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 		}
 		else
 		{
+			// j counts how many of leading zeros the buffer has
+			// if j == segment_length then the buffer is all zeros so there is no point
+			// creating the buffer.
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0; j++);
@@ -180,11 +186,6 @@ void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 					sizeof(m_Sections[i]->m_BlockSkyLight)
 				);
 			}
-			else
-			{
-				Free(m_Sections[i]);
-				m_Sections[i] = 0;
-			}
 		}
 	} 
 }
@@ -194,7 +195,7 @@ void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 
 void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -207,6 +208,9 @@ void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 		}
 		else
 		{
+			// j counts how many of leading zeros the buffer has
+			// if j == segment_length then the buffer is all zeros so there is no point
+			// creating the buffer.
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0; j++);
@@ -234,11 +238,6 @@ void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 					sizeof(m_Sections[i]->m_BlockSkyLight)
 				);
 			}
-			else
-			{
-				Free(m_Sections[i]);
-				m_Sections[i] = 0;
-			}
 		}
 	} 
 }
@@ -246,10 +245,10 @@ void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 
 
 
-void cChunkData::SetLight(const NIBBLETYPE * a_src)
+void cChunkData::SetBlockLight(const NIBBLETYPE * a_src)
 {
 	if (!a_src) return;
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -262,6 +261,9 @@ void cChunkData::SetLight(const NIBBLETYPE * a_src)
 		}
 		else
 		{
+			// j counts how many of leading zeros the buffer has
+			// if j == segment_length then the buffer is all zeros so there is no point
+			// creating the buffer.
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0; j++);
@@ -289,11 +291,6 @@ void cChunkData::SetLight(const NIBBLETYPE * a_src)
 					sizeof(m_Sections[i]->m_BlockSkyLight)
 				);
 			}
-			else
-			{
-				Free(m_Sections[i]);
-				m_Sections[i] = 0;
-			}
 		}
 	}
 }
@@ -304,7 +301,7 @@ void cChunkData::SetLight(const NIBBLETYPE * a_src)
 void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 {
 	if (!a_src) return;
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -317,6 +314,9 @@ void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 		}
 		else
 		{
+			// j counts how many of leading zeros the buffer has
+			// if j == segment_length then the buffer is all zeros so there is no point
+			// creating the buffer.
 			size_t j = 0;
 			// do nothing whilst 0
 			for (; j < segment_length && a_src[i * segment_length + j] == 0xFF; j++);
@@ -343,11 +343,6 @@ void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 					0x00,
 					sizeof(m_Sections[i]->m_BlockLight)
 				);
-			}
-			else
-			{
-				Free(m_Sections[i]);
-				m_Sections[i] = 0;
 			}
 		}
 	}
