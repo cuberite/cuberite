@@ -34,7 +34,7 @@ For other stuff, including plugins and discussion, check the [forums](http://for
 
 Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 
-[![Support via Gittip](https://rawgithub.com/twolfson/gittip-badge/0.2.0/dist/gittip.png)](https://www.gittip.com/on/github/mc-server/)
+[![Support via Gittip](http://img.shields.io/gittip/mc-server.svg)](https://www.gittip.com/on/github/mc-server/)
 
 Travis CI: [![Build Status](https://travis-ci.org/mc-server/MCServer.png?branch=master)](https://travis-ci.org/mc-server/MCServer)
 
