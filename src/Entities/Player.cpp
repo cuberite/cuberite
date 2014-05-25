@@ -551,7 +551,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 	}
 	
 	m_FoodLevel = std::min(a_Food + m_FoodLevel, (int)MAX_FOOD_LEVEL);
-	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, (double)m_FoodLevel);
+	m_FoodSaturationLevel = m_FoodSaturationLevel + a_Saturation;
 	
 	SendHealth();
 	return true;
