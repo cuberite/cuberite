@@ -1,7 +1,7 @@
 MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer) [![Support via Gittip](http://img.shields.io/gittip/on%2Fgithub%2Fmc-server.svg)](https://www.gittip.com/on/github/mc-server/) [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 ========
 
-MCServer is a performant C++ Minecraft server designed for use in memory and cpu-limited places, or just to make regular server perform better.
+MCServer is a Minecraft server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API.
 
 MCServer can run on PCs, Macs, and *nix. This includes android phones and tablets as well as Raspberry Pis. 
 
