@@ -24,6 +24,8 @@ Contributing
 
 MCServer is licensed under the Apache license V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
 
+Check out the [CONTRIBUTING.md](https://github.com/mc-server/MCServer/blob/master/CONTRIBUTING.md) file for more infos.
+
 Other Stuff
 -----------
 
