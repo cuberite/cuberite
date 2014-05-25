@@ -80,9 +80,9 @@ public:
 	static AString GenerateOfflineUUID(const AString & a_Username);  // tolua_export
 	
 	/** Formats the type of message with the proper color and prefix for sending to the client. **/
-	AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
+	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 	
-	AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
+	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
 
 	void Kick(const AString & a_Reason);		// tolua_export
 	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication

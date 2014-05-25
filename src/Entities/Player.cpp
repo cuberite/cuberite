@@ -377,7 +377,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 	}
 
 	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
-		m_PlayerName.c_str(), a_Xp_delta, m_CurrentXp);
+		GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
@@ -391,7 +391,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 
 void cPlayer::StartChargingBow(void)
 {
-	LOGD("Player \"%s\" started charging their bow", m_PlayerName.c_str());
+	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
 	m_BowCharge = 0;
 }
@@ -402,7 +402,7 @@ void cPlayer::StartChargingBow(void)
 
 int cPlayer::FinishChargingBow(void)
 {
-	LOGD("Player \"%s\" finished charging their bow at a charge of %d", m_PlayerName.c_str(), m_BowCharge);
+	LOGD("Player \"%s\" finished charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	int res = m_BowCharge;
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
@@ -415,7 +415,7 @@ int cPlayer::FinishChargingBow(void)
 
 void cPlayer::CancelChargingBow(void)
 {
-	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", m_PlayerName.c_str(), m_BowCharge);
+	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
 }
@@ -1179,8 +1179,8 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	{
 		// First time, announce it
 		cCompositeChat Msg;
-		Msg.AddTextPart(m_PlayerName + " has just earned the achievement ");
-		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat part (cAchievement)
+		Msg.SetMessageType(mtSuccess);
+		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
 		m_World->BroadcastChat(Msg);
 
 		// Increment the statistic
@@ -1315,7 +1315,7 @@ void cPlayer::AddToGroup( const AString & a_GroupName )
 {
 	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
 	m_Groups.push_back( Group );
-	LOGD("Added %s to group %s", m_PlayerName.c_str(), a_GroupName.c_str() );
+	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str() );
 	ResolveGroups();
 	ResolvePermissions();
 }
@@ -1339,13 +1339,13 @@ void cPlayer::RemoveFromGroup( const AString & a_GroupName )
 
 	if( bRemoved )
 	{
-		LOGD("Removed %s from group %s", m_PlayerName.c_str(), a_GroupName.c_str() );
+		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str() );
 		ResolveGroups();
 		ResolvePermissions();
 	}
 	else
 	{
-		LOGWARN("Tried to remove %s from group %s but was not in that group", m_PlayerName.c_str(), a_GroupName.c_str() );
+		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str() );
 	}
 }
 
@@ -1451,7 +1451,7 @@ void cPlayer::ResolveGroups()
 		if( AllGroups.find( CurrentGroup ) != AllGroups.end() )
 		{
 			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
-				m_PlayerName.c_str(), CurrentGroup->GetName().c_str()
+				GetName().c_str(), CurrentGroup->GetName().c_str()
 			);
 		}
 		else
@@ -1463,7 +1463,7 @@ void cPlayer::ResolveGroups()
 			{
 				if( AllGroups.find( *itr ) != AllGroups.end() )
 				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", m_PlayerName.c_str(), (*itr)->GetName().c_str() );
+					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str() );
 					continue;
 				}
 				ToIterate.push_back( *itr );
@@ -1615,19 +1615,19 @@ void cPlayer::LoadPermissionsFromDisk()
 	cIniFile IniFile;
 	if (IniFile.ReadFile("users.ini"))
 	{
-		AString Groups = IniFile.GetValueSet(m_PlayerName, "Groups", "Default");
+		AString Groups = IniFile.GetValueSet(GetName(), "Groups", "Default");
 		AStringVector Split = StringSplitAndTrim(Groups, ",");
 
 		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 		{
 			if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
 			{
-				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
+				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), GetName().c_str());
 			}
 			AddToGroup(*itr);
 		}
 
-		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
+		AString Color = IniFile.GetValue(GetName(), "Color", "-");
 		if (!Color.empty())
 		{
 			m_Color = Color[0];
@@ -1636,7 +1636,7 @@ void cPlayer::LoadPermissionsFromDisk()
 	else
 	{
 		cGroupManager::GenerateDefaultUsersIni(IniFile);
-		IniFile.AddValue("Groups", m_PlayerName, "Default");
+		IniFile.AddValue("Groups", GetName(), "Default");
 		AddToGroup("Default");
 	}
 	IniFile.WriteFile("users.ini");
@@ -1651,14 +1651,14 @@ bool cPlayer::LoadFromDisk()
 	LoadPermissionsFromDisk();
 
 	// Log player permissions, cause it's what the cool kids do
-	LOGINFO("Player %s has permissions:", m_PlayerName.c_str() );
+	LOGINFO("Player %s has permissions:", GetName().c_str() );
 	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
 	{
 		if( itr->second ) LOG(" - %s", itr->first.c_str() );
 	}
 
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
+	Printf(SourceFile, "players/%s.json", GetName().c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
@@ -1726,7 +1726,7 @@ bool cPlayer::LoadFromDisk()
 	StatSerializer.Load();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		m_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
 	);
 	
 	return true;
@@ -1782,12 +1782,12 @@ bool cPlayer::SaveToDisk()
 	std::string JsonData = writer.write(root);
 
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
+	Printf(SourceFile, "players/%s.json", GetName().c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_PlayerName.c_str(), SourceFile.c_str());
+		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", GetName().c_str(), SourceFile.c_str());
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
@@ -1798,10 +1798,10 @@ bool cPlayer::SaveToDisk()
 
 	// Save the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), m_PlayerName, &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
-		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
+		LOGERROR("Could not save stats for player %s", GetName().c_str());
 		return false;
 	}
 
