@@ -104,7 +104,7 @@ bool cGroupManager::CheckUsers()
 		}  // for itr - Split[]
 	}  // for i - ini file keys
 	// Always return true for now, just but we can handle writefile fails later.
-	return true
+	return true;
 }
 
 
@@ -189,7 +189,7 @@ bool cGroupManager::LoadGroups()
 		}
 	}
 	// Always return true, we can handle writefile fails later.
-	return true
+	return true;
 }
 
 
