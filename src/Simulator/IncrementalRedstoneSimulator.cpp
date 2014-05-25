@@ -11,7 +11,7 @@
 #include "../Blocks/BlockDoor.h"
 #include "../Blocks/BlockButton.h"
 #include "../Blocks/BlockLever.h"
-#include "../Piston.h"
+#include "../Blocks/BlockPiston.h"
 
 
 
@@ -814,17 +814,16 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 
 void cIncrementalRedstoneSimulator::HandlePiston(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {	
-	cPiston Piston(&m_World);
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
 	if (IsPistonPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7)) // We only want the bottom three bits (4th controls extended-ness)
 	{
-		Piston.ExtendPiston(BlockX, a_RelBlockY, BlockZ);
+		cBlockPistonHandler::ExtendPiston(BlockX, a_RelBlockY, BlockZ, &m_World);
 	}
 	else
 	{
-		Piston.RetractPiston(BlockX, a_RelBlockY, BlockZ);
+		cBlockPistonHandler::RetractPiston(BlockX, a_RelBlockY, BlockZ, &m_World);
 	}
 }
 
@@ -1491,7 +1490,7 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 	// Pistons cannot be powered through their front face; this function verifies that a source meets this requirement
 
 	int OldX = a_RelBlockX, OldY = a_RelBlockY, OldZ = a_RelBlockZ;
-	eBlockFace Face = cPiston::MetaDataToDirection(a_Meta);
+	eBlockFace Face = cBlockPistonHandler::MetaDataToDirection(a_Meta);
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 

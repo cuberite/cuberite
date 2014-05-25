@@ -1255,7 +1255,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 
 
-void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients)
 {
 	cChunkInterface ChunkInterface(this);
 	if (a_BlockType == E_BLOCK_AIR)
@@ -1270,7 +1270,7 @@ void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
-		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_SendToClients);
 		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
 	}
 	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
