@@ -139,11 +139,13 @@ class cPlacedPiece
 public:
 	cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece, const Vector3i & a_Coords, int a_NumCCWRotations);
 	
-	const cPiece &   GetPiece          (void) const { return *m_Piece; }
-	const Vector3i & GetCoords         (void) const { return m_Coords; }
-	int              GetNumCCWRotations(void) const { return m_NumCCWRotations; }
-	const cCuboid &  GetHitBox         (void) const { return m_HitBox; }
-	int              GetDepth          (void) const { return m_Depth; }
+	const cPlacedPiece * GetParent           (void) const { return m_Parent; }
+	const cPiece &       GetPiece            (void) const { return *m_Piece; }
+	const Vector3i &     GetCoords           (void) const { return m_Coords; }
+	int                  GetNumCCWRotations  (void) const { return m_NumCCWRotations; }
+	const cCuboid &      GetHitBox           (void) const { return m_HitBox; }
+	int                  GetDepth            (void) const { return m_Depth; }
+	bool                 HasBeenMovedToGround(void) const { return m_HasBeenMovedToGround; }
 	
 	/** Returns the coords as a modifiable object. */
 	Vector3i & GetCoords(void) { return m_Coords; }
@@ -156,6 +158,11 @@ public:
 	this placement. */
 	cPiece::cConnector GetRotatedConnector(const cPiece::cConnector & a_Connector) const;
 	
+	/** Moves the placed piece Y-wise by the specified offset.
+	Sets m_HasBeenMovedToGround to true, too.
+	Used eg. by village houses. */
+	void MoveToGroundBy(int a_OffsetY);
+	
 protected:
 	const cPlacedPiece * m_Parent;
 	const cPiece * m_Piece;
@@ -163,6 +170,10 @@ protected:
 	int m_NumCCWRotations;
 	cCuboid m_HitBox;  // Hitbox of the placed piece, in world coords
 	int m_Depth;       // Depth in the generated piece tree
+	
+	/** Set to true once the piece has been moved Y-wise.
+	Used eg. by village houses. */
+	bool m_HasBeenMovedToGround;
 };
 
 typedef std::vector<cPlacedPiece *> cPlacedPieces;

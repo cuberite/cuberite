@@ -127,7 +127,8 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_MergeStrategy(a_Def.m_MergeStrategy),
 	m_ShouldExtendFloor(a_Def.m_ShouldExtendFloor),
 	m_DefaultWeight(a_Def.m_DefaultWeight),
-	m_AddWeightIfSame(a_Def.m_AddWeightIfSame)
+	m_AddWeightIfSame(a_Def.m_AddWeightIfSame),
+	m_MoveToGround(a_Def.m_MoveToGround)
 {
 	m_BlockArea[0].Create(m_Size);
 	CharMap cm;
@@ -149,7 +150,8 @@ cPrefab::cPrefab(const cBlockArea & a_Image, int a_AllowedRotations) :
 	m_MergeStrategy(cBlockArea::msOverwrite),
 	m_ShouldExtendFloor(false),
 	m_DefaultWeight(1),
-	m_AddWeightIfSame(0)
+	m_AddWeightIfSame(0),
+	m_MoveToGround(false)
 {
 	m_HitBox.p1.Set(0, 0, 0);
 	m_HitBox.p2.Set(m_Size.x - 1, m_Size.y - 1, m_Size.z - 1);

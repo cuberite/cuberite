@@ -141,6 +141,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Forge
 
 
@@ -264,6 +267,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House11x7
 
 
@@ -363,6 +369,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House5x4
 
 
@@ -468,6 +477,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House5x5
 
 
@@ -573,6 +585,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House7x5
 
 
@@ -683,6 +698,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House8x5
 
 
@@ -805,6 +823,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House8x7
 
 
@@ -928,6 +949,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House9x7
 
 
@@ -1078,6 +1102,9 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseL13x12
 
 
@@ -1087,75 +1114,86 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 34, ID 175, created by Aloe_vera
 	{
 		// Size:
-		7, 5, 7,  // SizeX = 7, SizeY = 5, SizeZ = 7
+		7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		6, 4, 6,  // MaxX, MaxY, MaxZ
+		6, 5, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a: 85: 0\n"  /* fence */
-		"b:171:14\n"  /* carpet */
-		"c:171:15\n"  /* carpet */
-		"d:171: 0\n"  /* carpet */
-		"e: 35:14\n"  /* wool */
-		"f: 35: 0\n"  /* wool */
+		"a: 12: 0\n"  /* sand */
+		"b: 85: 0\n"  /* fence */
+		"c:171:14\n"  /* carpet */
+		"d:171:15\n"  /* carpet */
+		"e:171: 0\n"  /* carpet */
+		"f: 35:14\n"  /* wool */
+		"g: 35: 0\n"  /* wool */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
 		// Level 0
 		/* z\x*   0123456 */
-		/*  0 */ "a.....a"
-		/*  1 */ "bccdccb"
-		/*  2 */ "bcdddcb"
-		/*  3 */ "bcdddcb"
-		/*  4 */ "bccdccb"
-		/*  5 */ "a.....a"
-		/*  6 */ "......."
+		/*  0 */ "aaaaaaa"
+		/*  1 */ "aaaaaaa"
+		/*  2 */ "aaaaaaa"
+		/*  3 */ "aaaaaaa"
+		/*  4 */ "aaaaaaa"
+		/*  5 */ "aaaaaaa"
+		/*  6 */ "aaaaaaa"
 
 		// Level 1
 		/* z\x*   0123456 */
-		/*  0 */ "a.....a"
-		/*  1 */ "......."
-		/*  2 */ "......."
-		/*  3 */ "......."
-		/*  4 */ "......."
-		/*  5 */ "a.....a"
+		/*  0 */ "b.....b"
+		/*  1 */ "cddeddc"
+		/*  2 */ "cdeeedc"
+		/*  3 */ "cdeeedc"
+		/*  4 */ "cddeddc"
+		/*  5 */ "b.....b"
 		/*  6 */ "......."
 
 		// Level 2
 		/* z\x*   0123456 */
-		/*  0 */ "a.....a"
+		/*  0 */ "b.....b"
 		/*  1 */ "......."
 		/*  2 */ "......."
 		/*  3 */ "......."
 		/*  4 */ "......."
-		/*  5 */ "a.....a"
-		/*  6 */ "efefefe"
+		/*  5 */ "b.....b"
+		/*  6 */ "......."
 
 		// Level 3
 		/* z\x*   0123456 */
-		/*  0 */ "efefefe"
+		/*  0 */ "b.....b"
 		/*  1 */ "......."
 		/*  2 */ "......."
 		/*  3 */ "......."
 		/*  4 */ "......."
-		/*  5 */ "efefefe"
-		/*  6 */ "......."
+		/*  5 */ "b.....b"
+		/*  6 */ "fgfgfgf"
 
 		// Level 4
 		/* z\x*   0123456 */
+		/*  0 */ "fgfgfgf"
+		/*  1 */ "......."
+		/*  2 */ "......."
+		/*  3 */ "......."
+		/*  4 */ "......."
+		/*  5 */ "fgfgfgf"
+		/*  6 */ "......."
+
+		// Level 5
+		/* z\x*   0123456 */
 		/*  0 */ "......."
-		/*  1 */ "efefefe"
-		/*  2 */ "efefefe"
-		/*  3 */ "efefefe"
-		/*  4 */ "efefefe"
+		/*  1 */ "fgfgfgf"
+		/*  2 */ "fgfgfgf"
+		/*  3 */ "fgfgfgf"
+		/*  4 */ "fgfgfgf"
 		/*  5 */ "......."
 		/*  6 */ ".......",
 
 		// Connectors:
-		"-1: 2, -1, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 2, 0, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1167,13 +1205,16 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		true,
 
 		// DefaultWeight:
-		100,
+		5,
 
 		// DepthWeight:
 		"",
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // MarketStall
 
 
@@ -1300,13 +1341,16 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		true,
 
 		// DefaultWeight:
-		100,
+		20,
 
 		// DepthWeight:
 		"",
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Marketplace
 };  // g_SandFlatRoofVillagePrefabs
 
@@ -1496,6 +1540,9 @@ const cPrefab::sDef g_SandFlatRoofVillageStartingPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Well
 };
 

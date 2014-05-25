@@ -127,10 +127,23 @@ public:
 		m_HeightGen(a_HeightGen),
 		m_RoadBlock(a_RoadBlock)
 	{
+		// Generate the pieces for this village; don't care about the Y coord:
 		cBFSPieceGenerator pg(*this, a_Seed);
-		// Generate the pieces at very negative Y coords, so that we can later test
-		// Piece has negative Y coord -> hasn't been height-adjusted yet
-		pg.PlacePieces(a_OriginX, -1000, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
+		pg.PlacePieces(a_OriginX, 0, a_OriginZ, a_MaxRoadDepth + 1, m_Pieces);
+		if (m_Pieces.empty())
+		{
+			return;
+		}
+		
+		// If the central piece should be moved to ground, move it, and
+		// check all of its dependents and move those that are strictly connector-driven based on its new Y coord:
+		if (((cPrefab &)m_Pieces[0]->GetPiece()).ShouldMoveToGround())
+		{
+			int OrigPosY = m_Pieces[0]->GetCoords().y;
+			PlacePieceOnGround(*m_Pieces[0]);
+			int NewPosY = m_Pieces[0]->GetCoords().y;
+			MoveAllDescendants(m_Pieces, 0, NewPosY - OrigPosY);
+		}
 	}
 	
 protected:
@@ -179,7 +192,7 @@ protected:
 				DrawRoad(a_Chunk, **itr, HeightMap);
 				continue;
 			}
-			if ((*itr)->GetCoords().y < 0)
+			if (Prefab.ShouldMoveToGround() && !(*itr)->HasBeenMovedToGround())
 			{
 				PlacePieceOnGround(**itr);
 			}
@@ -201,7 +214,7 @@ protected:
 		cChunkDef::HeightMap HeightMap;
 		m_HeightGen.GenHeightMap(ChunkX, ChunkZ, HeightMap);
 		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
-		a_Piece.GetCoords().y += TerrainHeight - FirstConnector.m_Pos.y + 1;
+		a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 	}
 	
 	
@@ -232,10 +245,12 @@ protected:
 		return m_Prefabs.GetPiecesWithConnector(a_ConnectorType);
 	}
 	
+	
 	virtual cPieces GetStartingPieces(void)
 	{
 		return m_Prefabs.GetStartingPieces();
 	}
+	
 	
 	virtual int GetPieceWeight(
 		const cPlacedPiece & a_PlacedPiece,
@@ -258,14 +273,34 @@ protected:
 		return m_Prefabs.GetPieceWeight(a_PlacedPiece, a_ExistingConnector, a_NewPiece);
 	}
 	
+	
 	virtual void PiecePlaced(const cPiece & a_Piece) override
 	{
 		m_Prefabs.PiecePlaced(a_Piece);
 	}
 	
+	
 	virtual void Reset(void) override
 	{
 		m_Prefabs.Reset();
+	}
+	
+	
+	void MoveAllDescendants(cPlacedPieces & a_PlacedPieces, size_t a_Pivot, int a_HeightDifference)
+	{
+		size_t num = a_PlacedPieces.size();
+		cPlacedPiece * Pivot = a_PlacedPieces[a_Pivot];
+		for (size_t i = a_Pivot + 1; i < num; i++)
+		{
+			if (
+				(a_PlacedPieces[i]->GetParent() == Pivot) &&  // It is a direct dependant of the pivot
+				!((const cPrefab &)a_PlacedPieces[i]->GetPiece()).ShouldMoveToGround()  // It attaches strictly by connectors
+			)
+			{
+				a_PlacedPieces[i]->MoveToGroundBy(a_HeightDifference);
+				MoveAllDescendants(a_PlacedPieces, i, a_HeightDifference);
+			}
+		}  // for i - a_PlacedPieces[]
 	}
 } ;
 

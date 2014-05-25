@@ -82,6 +82,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // DoubleField
 
 
@@ -202,6 +205,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House11x7
 
 
@@ -345,6 +351,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House11x9
 
 
@@ -463,6 +472,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House13x7
 
 
@@ -606,6 +618,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House13x9
 
 
@@ -749,6 +764,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House15x9
 
 
@@ -892,6 +910,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House16x9
 
 
@@ -1003,6 +1024,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House7x7
 
 
@@ -1115,6 +1139,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // House9x7
 
 
@@ -1251,159 +1278,10 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
-	},  // House9x9
 
-
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// HouseL14x12:
-	// The data has been exported from the gallery Desert, area index 7, ID 82, created by Aloe_vera
-	{
-		// Size:
-		14, 6, 12,  // SizeX = 14, SizeY = 6, SizeZ = 12
-
-		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		13, 5, 11,  // MaxX, MaxY, MaxZ
-
-		// Block definitions:
-		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
-		"e:128: 3\n"  /* sandstonestairs */
-		"f: 64: 7\n"  /* wooddoorblock */
-		"g: 64: 5\n"  /* wooddoorblock */
-		"h:102: 0\n"  /* glasspane */
-		"i: 64:12\n"  /* wooddoorblock */
-		"j:128: 7\n"  /* sandstonestairs */
-		"k: 50: 3\n"  /* torch */
-		"l: 50: 4\n"  /* torch */
-		"m: 19: 0\n"  /* sponge */
-		"n:128: 6\n"  /* sandstonestairs */
-		"o:128: 5\n"  /* sandstonestairs */
-		"p:128: 4\n"  /* sandstonestairs */
-		"q: 50: 1\n"  /* torch */,
-
-		// Block data:
-		// Level 0
-		/* z\x*             1111 */
-		/*    *   01234567890123 */
-		/*  0 */ ".......abc...."
-		/*  1 */ ".dddddddddddd."
-		/*  2 */ ".dddddddddddd."
-		/*  3 */ ".dddddddddddd."
-		/*  4 */ ".dddddddddddd."
-		/*  5 */ ".dddddddddddd."
-		/*  6 */ "....aec.ddddd."
-		/*  7 */ "mmmmmmm.ddddd."
-		/*  8 */ "mmmmmmm.ddddd."
-		/*  9 */ "mmmmmmm.ddddd."
-		/* 10 */ "mmmmmmm.ddddd."
-		/* 11 */ "mmmmmmm......."
-
-		// Level 1
-		/* z\x*             1111 */
-		/*    *   01234567890123 */
-		/*  0 */ ".............."
-		/*  1 */ ".dddddddfdddd."
-		/*  2 */ ".d..........d."
-		/*  3 */ ".d..........d."
-		/*  4 */ ".d..........d."
-		/*  5 */ ".ddddgddd...d."
-		/*  6 */ "........d...d."
-		/*  7 */ "mmmmmmm.d...d."
-		/*  8 */ "mmmmmmm.d...d."
-		/*  9 */ "mmmmmmm.d...d."
-		/* 10 */ "mmmmmmm.ddddd."
-		/* 11 */ "mmmmmmm......."
-
-		// Level 2
-		/* z\x*             1111 */
-		/*    *   01234567890123 */
-		/*  0 */ ".............."
-		/*  1 */ ".dhhdhhdidhhd."
-		/*  2 */ ".h..........h."
-		/*  3 */ ".h..........h."
-		/*  4 */ ".h..........d."
-		/*  5 */ ".dhhdidhh...h."
-		/*  6 */ "........h...h."
-		/*  7 */ "mmmmmmm.d...d."
-		/*  8 */ "mmmmmmm.h...h."
-		/*  9 */ "mmmmmmm.h...h."
-		/* 10 */ "mmmmmmm.dhhhd."
-		/* 11 */ "mmmmmmm......."
-
-		// Level 3
-		/* z\x*             1111 */
-		/*    *   01234567890123 */
-		/*  0 */ "bbbbbbbbbbbbbb"
-		/*  1 */ "jddddddddddddc"
-		/*  2 */ ".d.....k.k..dc"
-		/*  3 */ ".d..........dc"
-		/*  4 */ ".d..l.l.....dc"
-		/*  5 */ "ndddddddd...dc"
-		/*  6 */ "eeeeeeead...dc"
-		/*  7 */ "mmmmmmmad...dc"
-		/*  8 */ "mmmmmmmad...dc"
-		/*  9 */ "mmmmmmmad...dc"
-		/* 10 */ "mmmmmmmadddddc"
-		/* 11 */ "mmmmmmmao...pc"
-
-		// Level 4
-		/* z\x*             1111 */
-		/*    *   01234567890123 */
-		/*  0 */ ".............."
-		/*  1 */ "bbbbbbbbbbbbb."
-		/*  2 */ "jdddddddddddc."
-		/*  3 */ ".dq........dc."
-		/*  4 */ "nddddddddd.dc."
-		/*  5 */ "eeeeeeeead.dc."
-		/*  6 */ "........ad.dc."
-		/*  7 */ "mmmmmmm.ad.dc."
-		/*  8 */ "mmmmmmm.ad.dc."
-		/*  9 */ "mmmmmmm.adldc."
-		/* 10 */ "mmmmmmm.adddc."
-		/* 11 */ "mmmmmmm.ao.pc."
-
-		// Level 5
-		/* z\x*             1111 */
-		/*    *   01234567890123 */
-		/*  0 */ ".............."
-		/*  1 */ ".............."
-		/*  2 */ "bbbbbbbbbbbb.."
-		/*  3 */ "dddddddddddc.."
-		/*  4 */ "eeeeeeeeeadc.."
-		/*  5 */ ".........adc.."
-		/*  6 */ ".........adc.."
-		/*  7 */ "mmmmmmm..adc.."
-		/*  8 */ "mmmmmmm..adc.."
-		/*  9 */ "mmmmmmm..adc.."
-		/* 10 */ "mmmmmmm..adc.."
-		/* 11 */ "mmmmmmm..adc..",
-
-		// Connectors:
-		"-1: 8, 0, 0: 2\n"  /* Type -1, direction Z- */,
-
-		// AllowedRotations:
-		7,  /* 1, 2, 3 CCW rotation allowed */
-
-		// Merge strategy:
-		cBlockArea::msSpongePrint,
-
-		// ShouldExtendFloor:
+		// MoveToGround:
 		true,
-
-		// DefaultWeight:
-		100,
-
-		// DepthWeight:
-		"",
-
-		// AddWeightIfSame:
-		0,
-	},  // HouseL14x12
+	},  // House9x9
 
 
 
@@ -1571,6 +1449,164 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
+	},  // HouseL14x12
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// HouseL14x12:
+	// The data has been exported from the gallery Desert, area index 7, ID 82, created by Aloe_vera
+	{
+		// Size:
+		14, 6, 12,  // SizeX = 14, SizeY = 6, SizeZ = 12
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		13, 5, 11,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:128: 0\n"  /* sandstonestairs */
+		"b:128: 2\n"  /* sandstonestairs */
+		"c:128: 1\n"  /* sandstonestairs */
+		"d: 24: 0\n"  /* sandstone */
+		"e:128: 3\n"  /* sandstonestairs */
+		"f: 64: 7\n"  /* wooddoorblock */
+		"g: 64: 5\n"  /* wooddoorblock */
+		"h:102: 0\n"  /* glasspane */
+		"i: 64:12\n"  /* wooddoorblock */
+		"j:128: 7\n"  /* sandstonestairs */
+		"k: 50: 3\n"  /* torch */
+		"l: 50: 4\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */
+		"n:128: 6\n"  /* sandstonestairs */
+		"o:128: 5\n"  /* sandstonestairs */
+		"p:128: 4\n"  /* sandstonestairs */
+		"q: 50: 1\n"  /* torch */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ ".......abc...."
+		/*  1 */ ".dddddddddddd."
+		/*  2 */ ".dddddddddddd."
+		/*  3 */ ".dddddddddddd."
+		/*  4 */ ".dddddddddddd."
+		/*  5 */ ".dddddddddddd."
+		/*  6 */ "....aec.ddddd."
+		/*  7 */ "mmmmmmm.ddddd."
+		/*  8 */ "mmmmmmm.ddddd."
+		/*  9 */ "mmmmmmm.ddddd."
+		/* 10 */ "mmmmmmm.ddddd."
+		/* 11 */ "mmmmmmm......."
+
+		// Level 1
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ ".............."
+		/*  1 */ ".dddddddfdddd."
+		/*  2 */ ".d..........d."
+		/*  3 */ ".d..........d."
+		/*  4 */ ".d..........d."
+		/*  5 */ ".ddddgddd...d."
+		/*  6 */ "........d...d."
+		/*  7 */ "mmmmmmm.d...d."
+		/*  8 */ "mmmmmmm.d...d."
+		/*  9 */ "mmmmmmm.d...d."
+		/* 10 */ "mmmmmmm.ddddd."
+		/* 11 */ "mmmmmmm......."
+
+		// Level 2
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ ".............."
+		/*  1 */ ".dhhdhhdidhhd."
+		/*  2 */ ".h..........h."
+		/*  3 */ ".h..........h."
+		/*  4 */ ".h..........d."
+		/*  5 */ ".dhhdidhh...h."
+		/*  6 */ "........h...h."
+		/*  7 */ "mmmmmmm.d...d."
+		/*  8 */ "mmmmmmm.h...h."
+		/*  9 */ "mmmmmmm.h...h."
+		/* 10 */ "mmmmmmm.dhhhd."
+		/* 11 */ "mmmmmmm......."
+
+		// Level 3
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "bbbbbbbbbbbbbb"
+		/*  1 */ "jddddddddddddc"
+		/*  2 */ ".d.....k.k..dc"
+		/*  3 */ ".d..........dc"
+		/*  4 */ ".d..l.l.....dc"
+		/*  5 */ "ndddddddd...dc"
+		/*  6 */ "eeeeeeead...dc"
+		/*  7 */ "mmmmmmmad...dc"
+		/*  8 */ "mmmmmmmad...dc"
+		/*  9 */ "mmmmmmmad...dc"
+		/* 10 */ "mmmmmmmadddddc"
+		/* 11 */ "mmmmmmmao...pc"
+
+		// Level 4
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ ".............."
+		/*  1 */ "bbbbbbbbbbbbb."
+		/*  2 */ "jdddddddddddc."
+		/*  3 */ ".dq........dc."
+		/*  4 */ "nddddddddd.dc."
+		/*  5 */ "eeeeeeeead.dc."
+		/*  6 */ "........ad.dc."
+		/*  7 */ "mmmmmmm.ad.dc."
+		/*  8 */ "mmmmmmm.ad.dc."
+		/*  9 */ "mmmmmmm.adldc."
+		/* 10 */ "mmmmmmm.adddc."
+		/* 11 */ "mmmmmmm.ao.pc."
+
+		// Level 5
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ ".............."
+		/*  1 */ ".............."
+		/*  2 */ "bbbbbbbbbbbb.."
+		/*  3 */ "dddddddddddc.."
+		/*  4 */ "eeeeeeeeeadc.."
+		/*  5 */ ".........adc.."
+		/*  6 */ ".........adc.."
+		/*  7 */ "mmmmmmm..adc.."
+		/*  8 */ "mmmmmmm..adc.."
+		/*  9 */ "mmmmmmm..adc.."
+		/* 10 */ "mmmmmmm..adc.."
+		/* 11 */ "mmmmmmm..adc..",
+
+		// Connectors:
+		"-1: 8, 0, 0: 2\n"  /* Type -1, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseL14x12
 
 
@@ -1638,6 +1674,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // SingleField
 
 
@@ -1731,6 +1770,9 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // SmallHut
 };  // g_SandVillagePrefabs
 
@@ -1741,6 +1783,204 @@ const cPrefab::sDef g_SandVillagePrefabs[] =
 
 const cPrefab::sDef g_SandVillageStartingPrefabs[] =
 {
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// RoofedWell:
+	// The data has been exported from the gallery Desert, area index 43, ID 274, created by Aloe_vera
+	{
+		// Size:
+		7, 14, 7,  // SizeX = 7, SizeY = 14, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 13, 6,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  1: 0\n"  /* stone */
+		"b: 24: 0\n"  /* sandstone */
+		"c:  8: 0\n"  /* water */
+		"d: 12: 0\n"  /* sand */
+		"e:118: 3\n"  /* cauldronblock */
+		"f: 85: 0\n"  /* fence */
+		"g:128: 2\n"  /* sandstonestairs */
+		"h:128: 7\n"  /* sandstonestairs */
+		"i:128: 4\n"  /* sandstonestairs */
+		"j:128: 5\n"  /* sandstonestairs */
+		"k:128: 6\n"  /* sandstonestairs */
+		"l:128: 3\n"  /* sandstonestairs */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   0123456 */
+		/*  0 */ "aaaaaaa"
+		/*  1 */ "aaaaaaa"
+		/*  2 */ "aaaaaaa"
+		/*  3 */ "aaaaaaa"
+		/*  4 */ "aaaaaaa"
+		/*  5 */ "aaaaaaa"
+		/*  6 */ "aaaaaaa"
+
+		// Level 1
+		/* z\x*   0123456 */
+		/*  0 */ "aaaaaaa"
+		/*  1 */ "abbbbba"
+		/*  2 */ "abcccba"
+		/*  3 */ "abcccba"
+		/*  4 */ "abcccba"
+		/*  5 */ "abbbbba"
+		/*  6 */ "aaaaaaa"
+
+		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ "aaaaaaa"
+		/*  1 */ "abbbbba"
+		/*  2 */ "abcccba"
+		/*  3 */ "abcccba"
+		/*  4 */ "abcccba"
+		/*  5 */ "abbbbba"
+		/*  6 */ "aaaaaaa"
+
+		// Level 3
+		/* z\x*   0123456 */
+		/*  0 */ "aaaaaaa"
+		/*  1 */ "abbbbba"
+		/*  2 */ "abcccba"
+		/*  3 */ "abcccba"
+		/*  4 */ "abcccba"
+		/*  5 */ "abbbbba"
+		/*  6 */ "aaaaaaa"
+
+		// Level 4
+		/* z\x*   0123456 */
+		/*  0 */ "ddddddd"
+		/*  1 */ "dbbbbbd"
+		/*  2 */ "dbcccbd"
+		/*  3 */ "dbcccbd"
+		/*  4 */ "dbcccbd"
+		/*  5 */ "dbbbbbd"
+		/*  6 */ "ddddddd"
+
+		// Level 5
+		/* z\x*   0123456 */
+		/*  0 */ "ddddddd"
+		/*  1 */ "dbbbbbd"
+		/*  2 */ "dbcccbd"
+		/*  3 */ "dbcccbd"
+		/*  4 */ "dbcccbd"
+		/*  5 */ "dbbbbbd"
+		/*  6 */ "ddddddd"
+
+		// Level 6
+		/* z\x*   0123456 */
+		/*  0 */ "ddddddd"
+		/*  1 */ "dbbbbbd"
+		/*  2 */ "dbcccbd"
+		/*  3 */ "dbcccbd"
+		/*  4 */ "dbcccbd"
+		/*  5 */ "dbbbbbd"
+		/*  6 */ "ddddddd"
+
+		// Level 7
+		/* z\x*   0123456 */
+		/*  0 */ "ddbbbdd"
+		/*  1 */ "dbbbbbd"
+		/*  2 */ "bbcccbb"
+		/*  3 */ "bbcccbb"
+		/*  4 */ "bbcccbb"
+		/*  5 */ "dbbbbbd"
+		/*  6 */ "ddbbbdd"
+
+		// Level 8
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".bbbbb."
+		/*  2 */ ".b...b."
+		/*  3 */ ".b.e.b."
+		/*  4 */ ".b...b."
+		/*  5 */ ".bbbbb."
+		/*  6 */ "......."
+
+		// Level 9
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".f...f."
+		/*  2 */ "......."
+		/*  3 */ "...f..."
+		/*  4 */ "......."
+		/*  5 */ ".f...f."
+		/*  6 */ "......."
+
+		// Level 10
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".f...f."
+		/*  2 */ "......."
+		/*  3 */ "...f..."
+		/*  4 */ "......."
+		/*  5 */ ".f...f."
+		/*  6 */ "......."
+
+		// Level 11
+		/* z\x*   0123456 */
+		/*  0 */ "ggggggg"
+		/*  1 */ "hbhhhbh"
+		/*  2 */ ".i...j."
+		/*  3 */ ".i.f.j."
+		/*  4 */ ".i...j."
+		/*  5 */ "kbkkkbk"
+		/*  6 */ "lllllll"
+
+		// Level 12
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "ggggggg"
+		/*  2 */ "hb...bh"
+		/*  3 */ ".b.f.b."
+		/*  4 */ "kb...bk"
+		/*  5 */ "lllllll"
+		/*  6 */ "......."
+
+		// Level 13
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "......."
+		/*  2 */ "ggggggg"
+		/*  3 */ "bbbbbbb"
+		/*  4 */ "lllllll"
+		/*  5 */ "......."
+		/*  6 */ ".......",
+
+		// Connectors:
+		"2: 6, 8, 3: 5\n"  /* Type 2, direction X+ */
+		"2: 3, 8, 6: 3\n"  /* Type 2, direction Z+ */
+		"2: 0, 8, 3: 4\n"  /* Type 2, direction X- */
+		"2: 3, 8, 0: 2\n"  /* Type 2, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
+	},  // RoofedWell
+
+
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Well:
 	// The data has been exported from the gallery Desert, area index 0, ID 1, created by Aloe_vera
@@ -1875,6 +2115,9 @@ const cPrefab::sDef g_SandVillageStartingPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Well
 };
 

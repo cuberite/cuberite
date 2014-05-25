@@ -122,6 +122,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Arch
 
 
@@ -385,7 +388,162 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Forge
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Garden2:
+	// The data has been exported from the gallery Plains, area index 147, ID 491, created by Aloe_vera
+	{
+		// Size:
+		16, 5, 16,  // SizeX = 16, SizeY = 5, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 4, 15,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  3: 0\n"  /* dirt */
+		"b:  8: 0\n"  /* water */
+		"c:  2: 0\n"  /* grass */
+		"d: 17: 1\n"  /* tree */
+		"e: 13: 0\n"  /* gravel */
+		"f: 31: 2\n"  /* tallgrass */
+		"g: 18: 5\n"  /* leaves */
+		"h: 38: 7\n"  /* rose */
+		"i: 17: 9\n"  /* tree */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "aaaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaaa"
+		/*  4 */ "aaaaaaaaaaaaaaaa"
+		/*  5 */ "aaaaaaaaaaaaaaaa"
+		/*  6 */ "aaaaaaaaaaaaaaaa"
+		/*  7 */ "aaaaaaaaaaaaaaaa"
+		/*  8 */ "aaaaaaaaaaaaaaaa"
+		/*  9 */ "aaaaaaaaaaaaaaaa"
+		/* 10 */ "aaaaaaaaaaaaaaaa"
+		/* 11 */ "aaaaaaaaaaaaaaaa"
+		/* 12 */ "aaaaaaaaaaaaaaaa"
+		/* 13 */ "aaaaaaaaaaaaaaaa"
+		/* 14 */ "aaaaaaaaaaaaaaaa"
+		/* 15 */ "aaaaaaaaaaaaaaaa"
+
+		// Level 1
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "aaaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaaa"
+		/*  4 */ "aaaaaaaaaaaaaaaa"
+		/*  5 */ "aaaaaaaaaaaaaaaa"
+		/*  6 */ "aaaabbaaaaaaaaaa"
+		/*  7 */ "aaabbbaaaaaaaaaa"
+		/*  8 */ "aaabbaaaaaaaaaaa"
+		/*  9 */ "aaaabaaaaaaaaaaa"
+		/* 10 */ "aaaaaaaaaaaaaaaa"
+		/* 11 */ "aaaaaaaaaaaaaaaa"
+		/* 12 */ "aaaaaaaaaaaaaaaa"
+		/* 13 */ "aaaaaaaaaaaaaaaa"
+		/* 14 */ "aaaaaaaaaaaaaaaa"
+		/* 15 */ "aaaaaaaaaaaaaaaa"
+
+		// Level 2
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "cccccccccccccccc"
+		/*  1 */ "ccdccccccccdcccc"
+		/*  2 */ "cccccceecccccdcc"
+		/*  3 */ "ccccccceeccccccc"
+		/*  4 */ "cccccccceccccccc"
+		/*  5 */ "cccbbbbceccccccc"
+		/*  6 */ "cccbbbbceecccccc"
+		/*  7 */ "ccbbbbbcceeeeccc"
+		/*  8 */ "ccbbbbbccccceecc"
+		/*  9 */ "ccbbbbcccccccecc"
+		/* 10 */ "ccccbcccccccceec"
+		/* 11 */ "ccccccccccccccec"
+		/* 12 */ "ccccccccaaacccec"
+		/* 13 */ "cccccccccaccccec"
+		/* 14 */ "ccccccccccccceec"
+		/* 15 */ "cccccccccccceecc"
+
+		// Level 3
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "......f...gg.g.."
+		/*  1 */ "..gg.....gggggg."
+		/*  2 */ "ffgg......ghgggg"
+		/*  3 */ ".............gg."
+		/*  4 */ "...........f...."
+		/*  5 */ "...........h.ff."
+		/*  6 */ ".............fh."
+		/*  7 */ "...............f"
+		/*  8 */ "................"
+		/*  9 */ ".......ff.f....."
+		/* 10 */ ".f.....ffggf...."
+		/* 11 */ ".......gggg.f..."
+		/* 12 */ ".f......iddg...."
+		/* 13 */ ".....f..gdgg...."
+		/* 14 */ "....ff...gg....."
+		/* 15 */ "................"
+
+		// Level 4
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "................"
+		/*  1 */ "...........g.g.."
+		/*  2 */ ".............gg."
+		/*  3 */ "................"
+		/*  4 */ "................"
+		/*  5 */ "................"
+		/*  6 */ "................"
+		/*  7 */ "................"
+		/*  8 */ "................"
+		/*  9 */ "................"
+		/* 10 */ ".........g......"
+		/* 11 */ "........ggg....."
+		/* 12 */ "........ggg....."
+		/* 13 */ ".........g......"
+		/* 14 */ "................"
+		/* 15 */ "................",
+
+		// Connectors:
+		"-1: 12, 3, 15: 3\n"  /* Type -1, direction Z+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
+	},  // Garden2
 
 
 
@@ -558,6 +716,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseMid
 
 
@@ -666,7 +827,134 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseSmall
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// HouseSmallDblWithDoor:
+	// The data has been exported from the gallery Plains, area index 113, ID 265, created by Aloe_vera
+	{
+		// Size:
+		11, 6, 7,  // SizeX = 11, SizeY = 6, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		-1, 0, 0,  // MinX, MinY, MinZ
+		11, 5, 7,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 2\n"  /* wood */
+		"b: 17: 9\n"  /* tree */
+		"c: 17: 1\n"  /* tree */
+		"d: 35: 0\n"  /* wool */
+		"e: 64: 7\n"  /* wooddoorblock */
+		"f:171:12\n"  /* carpet */
+		"g:135: 1\n"  /* 135 */
+		"h:126: 2\n"  /* woodenslab */
+		"i:135: 2\n"  /* 135 */
+		"j: 50: 4\n"  /* torch */
+		"k: 64:12\n"  /* wooddoorblock */
+		"l: 85: 0\n"  /* fence */
+		"m: 19: 0\n"  /* sponge */
+		"n: 44: 8\n"  /* step */
+		"o: 43: 0\n"  /* doubleslab */
+		"p: 44: 0\n"  /* step */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "maaaaaaaaam"
+		/*  2 */ "maaaabaaaam"
+		/*  3 */ "maaaabaaaam"
+		/*  4 */ "maaaabaaaam"
+		/*  5 */ "maaaaaaaaam"
+		/*  6 */ "mmmmmmmmmmm"
+
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".cdedcdddc."
+		/*  2 */ ".dfff.fffd."
+		/*  3 */ ".dgffdfhfd."
+		/*  4 */ ".diifdfffd."
+		/*  5 */ ".cdddcdddc."
+		/*  6 */ "..........."
+
+		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ ".j...j...j."
+		/*  1 */ ".cdkdclllc."
+		/*  2 */ ".d.......l."
+		/*  3 */ ".l...l...l."
+		/*  4 */ ".d...l...l."
+		/*  5 */ ".clllclllc."
+		/*  6 */ "..........."
+
+		// Level 3
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ ".nnnnnnnnn."
+		/*  1 */ "ncdddcdddcn"
+		/*  2 */ "nd...d...dn"
+		/*  3 */ "nd...d...dn"
+		/*  4 */ "nd...d...dn"
+		/*  5 */ "ncdddcdddcn"
+		/*  6 */ ".nnnnnnnnn."
+
+		// Level 4
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "op.......po"
+		/*  1 */ "ppppppppppp"
+		/*  2 */ ".pooooooop."
+		/*  3 */ ".ponndnnop."
+		/*  4 */ ".pooooooop."
+		/*  5 */ "ppppppppppp"
+		/*  6 */ "op.......po"
+
+		// Level 5
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ "..........."
+		/*  2 */ "..........."
+		/*  3 */ "...ppppp..."
+		/*  4 */ "..........."
+		/*  5 */ "..........."
+		/*  6 */ "...........",
+
+		// Connectors:
+		"-1: 3, 1, -1: 2\n"  /* Type -1, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
+	},  // HouseSmallDblWithDoor
 
 
 
@@ -784,7 +1072,123 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseSmallDouble
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// HouseSmallWithDoor:
+	// The data has been exported from the gallery Plains, area index 112, ID 264, created by Aloe_vera
+	{
+		// Size:
+		7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		-1, 0, 0,  // MinX, MinY, MinZ
+		7, 5, 7,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 2\n"  /* wood */
+		"b: 17: 1\n"  /* tree */
+		"c: 35: 0\n"  /* wool */
+		"d: 64: 7\n"  /* wooddoorblock */
+		"e: 50: 4\n"  /* torch */
+		"f: 64:12\n"  /* wooddoorblock */
+		"g: 85: 0\n"  /* fence */
+		"h: 44: 8\n"  /* step */
+		"i: 43: 0\n"  /* doubleslab */
+		"j: 44: 0\n"  /* step */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "maaaaam"
+		/*  2 */ "maaaaam"
+		/*  3 */ "maaaaam"
+		/*  4 */ "maaaaam"
+		/*  5 */ "maaaaam"
+		/*  6 */ "mmmmmmm"
+
+		// Level 1
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".bcdcb."
+		/*  2 */ ".c...c."
+		/*  3 */ ".c...c."
+		/*  4 */ ".c...c."
+		/*  5 */ ".bcccb."
+		/*  6 */ "......."
+
+		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ ".....e."
+		/*  1 */ ".bcfcb."
+		/*  2 */ ".g...g."
+		/*  3 */ ".g...g."
+		/*  4 */ ".g...g."
+		/*  5 */ ".bgggb."
+		/*  6 */ "......."
+
+		// Level 3
+		/* z\x*   0123456 */
+		/*  0 */ ".hhhhh."
+		/*  1 */ "hbcccbh"
+		/*  2 */ "hc...ch"
+		/*  3 */ "hc...ch"
+		/*  4 */ "hc...ch"
+		/*  5 */ "hbcccbh"
+		/*  6 */ ".hhhhh."
+
+		// Level 4
+		/* z\x*   0123456 */
+		/*  0 */ "ij...ji"
+		/*  1 */ "jjjjjjj"
+		/*  2 */ ".jiiij."
+		/*  3 */ ".jiiij."
+		/*  4 */ ".jiiij."
+		/*  5 */ "jjjjjjj"
+		/*  6 */ "ij...ji"
+
+		// Level 5
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "......."
+		/*  2 */ "......."
+		/*  3 */ "...j..."
+		/*  4 */ "......."
+		/*  5 */ "......."
+		/*  6 */ ".......",
+
+		// Connectors:
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
+	},  // HouseSmallWithDoor
 
 
 
@@ -929,6 +1333,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseWide
 
 
@@ -1172,6 +1579,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseWithGarden
 
 
@@ -1363,7 +1773,372 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HouseWithSakura1
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// HouseWithSpa:
+	// The data has been exported from the gallery Plains, area index 73, ID 139, created by Aloe_vera
+	{
+		// Size:
+		16, 8, 14,  // SizeX = 16, SizeY = 8, SizeZ = 14
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 7, 13,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 2\n"  /* wood */
+		"b:  3: 0\n"  /* dirt */
+		"c:  2: 0\n"  /* grass */
+		"d:  8: 0\n"  /* water */
+		"e:135: 3\n"  /* 135 */
+		"f:135: 1\n"  /* 135 */
+		"g:113: 0\n"  /* netherbrickfence */
+		"h: 17: 1\n"  /* tree */
+		"i: 35: 0\n"  /* wool */
+		"j:171:12\n"  /* carpet */
+		"k: 64: 6\n"  /* wooddoorblock */
+		"l:126: 2\n"  /* woodenslab */
+		"m: 19: 0\n"  /* sponge */
+		"n:135: 2\n"  /* 135 */
+		"o: 64: 7\n"  /* wooddoorblock */
+		"p: 50: 4\n"  /* torch */
+		"q: 85: 0\n"  /* fence */
+		"r: 64:12\n"  /* wooddoorblock */
+		"s: 50: 3\n"  /* torch */
+		"t: 44: 8\n"  /* step */
+		"u: 43: 0\n"  /* doubleslab */
+		"v: 44: 0\n"  /* step */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "................"
+		/*  1 */ ".aaaaaaaaaaaaaa."
+		/*  2 */ ".aaaaaaaaaaaaaa."
+		/*  3 */ ".aaaaaaaaaaaaaa."
+		/*  4 */ ".aaaaaaaaaaaaaa."
+		/*  5 */ ".aaaaaaaaaaaaaa."
+		/*  6 */ ".aaaaaaaaaaaaaa."
+		/*  7 */ ".aaaaaabbbbbbbbb"
+		/*  8 */ ".aaaaaabbbbbbbbb"
+		/*  9 */ ".aaaaaabbbbbbbbb"
+		/* 10 */ ".aaaaaabbbbbbbbb"
+		/* 11 */ ".aaaaaabbbbbbbbb"
+		/* 12 */ ".aaaaaabbbbbbbbb"
+		/* 13 */ ".......bbbbbbbbb"
+
+		// Level 1
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "maaaaaaaaaaaaaam"
+		/*  2 */ "maaaaaaaaaaaaaam"
+		/*  3 */ "maaaaaaaaaaaaaam"
+		/*  4 */ "maaaaaaaaaaaaaam"
+		/*  5 */ "maaaaaaaaaaaaaam"
+		/*  6 */ "maaaaaaaaaaaaaam"
+		/*  7 */ "maaaaaaaaaaccccc"
+		/*  8 */ "maaaaaaacccccccc"
+		/*  9 */ "maaaaaaacccccccc"
+		/* 10 */ "maaaaaaacccccccc"
+		/* 11 */ "maaaaaaccccccccc"
+		/* 12 */ "maaaaaaccccccccc"
+		/* 13 */ "mmmmmmmccccccccc"
+
+		// Level 2
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "................"
+		/*  1 */ ".aaaaaaaaaaaaaa."
+		/*  2 */ ".aaaaaaaaaaaaaa."
+		/*  3 */ ".aaaaaaaaaaaaaa."
+		/*  4 */ ".aaaaaaaaaaaaaa."
+		/*  5 */ ".aaaaaaaaaaaaaa."
+		/*  6 */ ".aaddaaaaaaaaaa."
+		/*  7 */ ".aaddaaeeef....."
+		/*  8 */ ".aaddaaf........"
+		/*  9 */ ".aaddaaf........"
+		/* 10 */ ".aaddaae........"
+		/* 11 */ ".aaddaa........."
+		/* 12 */ ".aaaaaa........."
+		/* 13 */ "................"
+
+		// Level 3
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "................"
+		/*  1 */ ".ggggghiiihiiih."
+		/*  2 */ ".geee.ijjjjjjji."
+		/*  3 */ ".gf...kjjjijlji."
+		/*  4 */ ".gf...innjijjji."
+		/*  5 */ ".g....hiiohiiih."
+		/*  6 */ ".g....g........."
+		/*  7 */ ".g.............."
+		/*  8 */ ".g.............."
+		/*  9 */ ".g.............."
+		/* 10 */ ".g....g........."
+		/* 11 */ ".g....g........."
+		/* 12 */ ".gggggg........."
+		/* 13 */ "................"
+
+		// Level 4
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "......p...p...p."
+		/*  1 */ ".g....hqqqhqqqh."
+		/*  2 */ "......i.......i."
+		/*  3 */ "......r...q...q."
+		/*  4 */ "......i...q...i."
+		/*  5 */ "......hqqrhqqqh."
+		/*  6 */ "......g...s....."
+		/*  7 */ "................"
+		/*  8 */ "................"
+		/*  9 */ "................"
+		/* 10 */ "................"
+		/* 11 */ "................"
+		/* 12 */ ".g....g........."
+		/* 13 */ "................"
+
+		// Level 5
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ ".tttttttttttttt."
+		/*  1 */ "tggggghqqqhqqqht"
+		/*  2 */ "tg....i.......it"
+		/*  3 */ "tg....i...i...it"
+		/*  4 */ "tg....i...i...it"
+		/*  5 */ "tg....hiiihiiiht"
+		/*  6 */ "tg....gtttttttt."
+		/*  7 */ "tg....gt........"
+		/*  8 */ "tg....gt........"
+		/*  9 */ "tg....gt........"
+		/* 10 */ "tg....gt........"
+		/* 11 */ "tg....gt........"
+		/* 12 */ "tggggggt........"
+		/* 13 */ ".tttttt........."
+
+		// Level 6
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "uv............vu"
+		/*  1 */ "vvvvvvvvvvvvvvvv"
+		/*  2 */ ".vuuuuuuuuuuuuv."
+		/*  3 */ ".vuuuuuutuuuuuv."
+		/*  4 */ ".vuuuuuuuuuuuuv."
+		/*  5 */ ".vuuuuvvvvvvvvvv"
+		/*  6 */ ".vuuuuv.......vu"
+		/*  7 */ ".vuuuuv........."
+		/*  8 */ ".vuuuuv........."
+		/*  9 */ ".vuuuuv........."
+		/* 10 */ ".vuuuuv........."
+		/* 11 */ ".vuuuuv........."
+		/* 12 */ "vvvvvvvv........"
+		/* 13 */ "uv....vu........"
+
+		// Level 7
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "................"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "...vvvvvvvvvv..."
+		/*  4 */ "...vv..........."
+		/*  5 */ "...vv..........."
+		/*  6 */ "...vv..........."
+		/*  7 */ "...vv..........."
+		/*  8 */ "...vv..........."
+		/*  9 */ "...vv..........."
+		/* 10 */ "...vv..........."
+		/* 11 */ "................"
+		/* 12 */ "................"
+		/* 13 */ "................",
+
+		// Connectors:
+		"",
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
+	},  // HouseWithSpa
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MediumSakuraTree:
+	// The data has been exported from the gallery Plains, area index 146, ID 490, created by STR_Warrior
+	{
+		// Size:
+		7, 10, 7,  // SizeX = 7, SizeY = 10, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 9, 6,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  3: 0\n"  /* dirt */
+		"b:  2: 0\n"  /* grass */
+		"c: 31: 1\n"  /* tallgrass */
+		"d: 38: 7\n"  /* rose */
+		"e: 17: 1\n"  /* tree */
+		"f: 38: 0\n"  /* rose */
+		"g: 38: 8\n"  /* rose */
+		"h: 38: 5\n"  /* rose */
+		"i: 35: 6\n"  /* wool */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   0123456 */
+		/*  0 */ "aaaaaaa"
+		/*  1 */ "aaaaaaa"
+		/*  2 */ "aaaaaaa"
+		/*  3 */ "aaaaaaa"
+		/*  4 */ "aaaaaaa"
+		/*  5 */ "aaaaaaa"
+		/*  6 */ "aaaaaaa"
+
+		// Level 1
+		/* z\x*   0123456 */
+		/*  0 */ "bbbbbbb"
+		/*  1 */ "bbbbbbb"
+		/*  2 */ "bbbbbbb"
+		/*  3 */ "bbbabbb"
+		/*  4 */ "bbbbbbb"
+		/*  5 */ "bbbbbbb"
+		/*  6 */ "bbbbbbb"
+
+		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "..c.c.."
+		/*  2 */ ".dccdc."
+		/*  3 */ "..cefc."
+		/*  4 */ ".ccfgh."
+		/*  5 */ "..ccc.."
+		/*  6 */ "......."
+
+		// Level 3
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "......."
+		/*  2 */ "......."
+		/*  3 */ "...e..."
+		/*  4 */ "......."
+		/*  5 */ "......."
+		/*  6 */ "......."
+
+		// Level 4
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "..i...."
+		/*  2 */ "......."
+		/*  3 */ "...e.i."
+		/*  4 */ ".i....."
+		/*  5 */ "......."
+		/*  6 */ "......."
+
+		// Level 5
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "..i...."
+		/*  2 */ "...i..."
+		/*  3 */ "..ieii."
+		/*  4 */ ".i.ii.."
+		/*  5 */ "...i..."
+		/*  6 */ "......."
+
+		// Level 6
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "..ii..."
+		/*  2 */ "..iii.."
+		/*  3 */ ".iieii."
+		/*  4 */ ".iiii.."
+		/*  5 */ "..iii.."
+		/*  6 */ "......."
+
+		// Level 7
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "..iii.."
+		/*  2 */ ".iiiii."
+		/*  3 */ ".iieii."
+		/*  4 */ ".iiiii."
+		/*  5 */ "..iii.."
+		/*  6 */ "......."
+
+		// Level 8
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "...i..."
+		/*  2 */ "..iiii."
+		/*  3 */ ".iiiii."
+		/*  4 */ "..iii.."
+		/*  5 */ "...i..."
+		/*  6 */ "......."
+
+		// Level 9
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ "......."
+		/*  2 */ "...i..."
+		/*  3 */ "..iii.."
+		/*  4 */ "...i..."
+		/*  5 */ "......."
+		/*  6 */ ".......",
+
+		// Connectors:
+		"-1: 3, 2, 0: 2\n"  /* Type -1, direction Z- */
+		"3: 6, 2, 3: 5\n"  /* Type 3, direction X+ */
+		"-3: 0, 2, 3: 4\n"  /* Type -3, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		true,
+	},  // MediumSakuraTree
 
 
 
@@ -1614,6 +2389,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Restaurant
 
 
@@ -1626,8 +2404,8 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		12, 8, 6,  // SizeX = 12, SizeY = 8, SizeZ = 6
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		11, 7, 5,  // MaxX, MaxY, MaxZ
+		-1, 0, -1,  // MinX, MinY, MinZ
+		12, 7, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1719,7 +2497,11 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  5 */ "............",
 
 		// Connectors:
-		"-1: 0, 2, 2: 4\n"  /* Type -1, direction X- */,
+		"-1: -1, 2, 2: 4\n"  /* Type -1, direction X- */
+		"3: 5, 2, 6: 3\n"  /* Type 3, direction Z+ */
+		"-3: 6, 2, -1: 2\n"  /* Type -3, direction Z- */
+		"-3: 12, 2, 2: 5\n"  /* Type -3, direction X+ */
+		"3: 12, 2, 2: 5\n"  /* Type 3, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1738,6 +2520,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // SakuraDouble
 
 
@@ -1750,8 +2535,8 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		5, 7, 5,  // SizeX = 5, SizeY = 7, SizeZ = 5
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		4, 6, 4,  // MaxX, MaxY, MaxZ
+		-1, 0, -1,  // MinX, MinY, MinZ
+		5, 6, 5,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1819,7 +2604,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  4 */ ".....",
 
 		// Connectors:
-		"-1: 2, 2, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 2, 2, -1: 2\n"  /* Type -1, direction Z- */
+		"3: 5, 2, 2: 5\n"  /* Type 3, direction X+ */
+		"-3: -1, 2, 2: 4\n"  /* Type -3, direction X- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -1838,6 +2625,9 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // SakuraSmall
 };  // g_JapaneseVillagePrefabs
 
@@ -2192,6 +2982,9 @@ const cPrefab::sDef g_JapaneseVillageStartingPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // HighTemple
 
 
@@ -2389,6 +3182,9 @@ const cPrefab::sDef g_JapaneseVillageStartingPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		true,
 	},  // Well
 };
 

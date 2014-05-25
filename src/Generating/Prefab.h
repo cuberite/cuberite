@@ -82,6 +82,10 @@ public:
 		Can be positive or negative.
 		This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
 		int m_AddWeightIfSame;
+		
+		/** If true, the piece will be moved Y-wise so that its first connector is sitting on the terrain.
+		This is used e. g. for village houses. */
+		bool m_MoveToGround;
 	};
 	
 	
@@ -115,6 +119,10 @@ public:
 	
 	/** Adds the specified connector to the list of connectors this piece supports. */
 	void AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type);
+	
+	/** Returns whether the prefab should be moved Y-wise to ground before drawing, rather than staying
+	at the coords governed by the connectors. */
+	bool ShouldMoveToGround(void) const { return m_MoveToGround; }
 
 protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
@@ -169,6 +177,10 @@ protected:
 	Can be positive or negative.
 	This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
 	int m_AddWeightIfSame;
+
+	/** If true, the piece will be moved Y-wise so that its first connector is sitting on the terrain.
+	This is used e. g. for village houses. */
+	bool m_MoveToGround;
 	
 	
 	// cPiece overrides:	
