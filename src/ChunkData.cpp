@@ -242,7 +242,7 @@ NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 cChunkData cChunkData::Copy() const
 {
 	cChunkData copy(m_Pool);
-	for (int i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		if (m_Sections[i] != NULL)
 		{
@@ -432,7 +432,7 @@ void cChunkData::SetBlocks(const BLOCKTYPE * a_src)
 
 void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 {
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -484,10 +484,10 @@ void cChunkData::SetMeta(const NIBBLETYPE * a_src)
 
 
 
-void cChunkData::SetLight(const NIBBLETYPE * a_src)
+void cChunkData::SetBlockLight(const NIBBLETYPE * a_src)
 {
 	if (!a_src) return;
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)
@@ -542,7 +542,7 @@ void cChunkData::SetLight(const NIBBLETYPE * a_src)
 void cChunkData::SetSkyLight  (const NIBBLETYPE * a_src)
 {
 	if (!a_src) return;
-	for (size_t i = 0; i < CHUNK_SECTION_NUM; i++)
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
 		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16 / 2;
 		if (m_Sections[i] != NULL)

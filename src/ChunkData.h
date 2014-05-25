@@ -19,6 +19,11 @@
 
 class cChunkData
 {
+private:
+
+	static const size_t CHUNK_SECTION_HEIGHT = 16;
+	static const size_t CHUNK_SECTION_COUNT = (256 / CHUNK_SECTION_HEIGHT);
+
 public:
 
 	struct sChunkSection;
@@ -65,10 +70,6 @@ public:
 	};
 	
 private:
-
-	static const size_t CHUNK_SECTION_HEIGHT = 16;
-	static const size_t CHUNK_SECTION_COUNT = (256 / CHUNK_SECTION_HEIGHT);
-
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	mutable bool IsOwner;
