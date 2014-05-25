@@ -45,8 +45,14 @@ cGroupManager::cGroupManager()
 {
 	LOGD("-- Loading Groups --");
 	
-	LoadGroups();
-	CheckUsers();
+	if (!LoadGroups())
+	{
+		LOGWARNING("ERROR: Groups could not load!");
+	}
+	if (!CheckUsers())
+	{
+		LOGWARNING("ERROR: User file could not be found!");
+	}
 	
 	LOGD("-- Groups Successfully Loaded --");
 }
@@ -70,13 +76,13 @@ void cGroupManager::GenerateDefaultUsersIni(cIniFile & a_IniFile)
 
 
 
-void cGroupManager::CheckUsers(void)
+bool cGroupManager::CheckUsers()
 {
 	cIniFile IniFile;
 	if (!IniFile.ReadFile("users.ini"))
 	{
 		GenerateDefaultUsersIni(IniFile);
-		return;
+		return true;
 	}
 	
 	int NumKeys = IniFile.GetNumKeys();
@@ -97,13 +103,15 @@ void cGroupManager::CheckUsers(void)
 			}
 		}  // for itr - Split[]
 	}  // for i - ini file keys
+	// Always return true for now, just but we can handle writefile fails later.
+	return true
 }
 
 
 
 
 
-void cGroupManager::LoadGroups()
+bool cGroupManager::LoadGroups()
 {
 	cIniFile IniFile;
 	if (!IniFile.ReadFile("groups.ini"))
@@ -180,6 +188,8 @@ void cGroupManager::LoadGroups()
 			}
 		}
 	}
+	// Always return true, we can handle writefile fails later.
+	return true
 }
 
 
