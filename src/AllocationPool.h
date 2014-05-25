@@ -34,22 +34,20 @@ class cAllocationPool {
 		{
 			if (m_FreeList.size() <= BufferSize)
 			{
-				try
+				void * space = malloc(sizeof(T));
+				if (space != NULL)
 				{
-					return new(malloc(sizeof(T))) T;
+					return new(space) T;
 				}
-				catch (std::bad_alloc&)
+				else if (m_FreeList.size() == BufferSize)
 				{
-					if (m_FreeList.size() == BufferSize)
-					{
-						m_Callbacks->OnStartingUsingBuffer();
-					}
-					else if (m_FreeList.empty())
-					{
-						m_Callbacks->OnBufferEmpty();
-						// Try again until the memory is avalable
-						return Allocate();
-					}
+					m_Callbacks->OnStartingUsingBuffer();
+				}
+				else if (m_FreeList.empty())
+				{
+					m_Callbacks->OnBufferEmpty();
+					// Try again until the memory is avalable
+					return Allocate();
 				}
 			}
 			// placement new, used to initalize the object
@@ -59,6 +57,10 @@ class cAllocationPool {
 		}
 		void Free(T* ptr)
 		{
+			if (ptr == NULL) 
+			{
+				return;
+			}
 			// placement destruct.
 			ptr->~T();
 			m_FreeList.push_front(ptr);
