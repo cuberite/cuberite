@@ -142,6 +142,8 @@ public:
 							break;
 						}
 					}
+
+					a_Player->GetStatManager().AddValue(statTreasureFished, 1);
 				}
 				else if (ItemCategory <= 14)  // Junk 10%
 				{
@@ -190,6 +192,8 @@ public:
 					{
 						Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
 					}
+
+					a_Player->GetStatManager().AddValue(statJunkFished, 1);
 				}
 				else  // Fish
 				{
@@ -210,6 +214,8 @@ public:
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
 					}
+
+					a_Player->GetStatManager().AddValue(statFishCaught, 1);
 				}
 
 				if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(*a_Player, Drops))

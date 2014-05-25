@@ -3,6 +3,7 @@
 
 #include "ChatColor.h"
 #include <limits>
+#include <cmath>
 
 
 
@@ -522,6 +523,15 @@ inline float GetSignf(float a_Val)
 inline float GetSpecialSignf( float a_Val )
 {
 	return (a_Val <= 0.f) ? -1.f : 1.f;
+}
+
+
+
+
+
+template<class T> inline T Diff(T a_Val1, T a_Val2)
+{
+	return std::abs(a_Val1 - a_Val2);
 }
 
 

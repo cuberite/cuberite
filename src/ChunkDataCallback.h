@@ -62,7 +62,7 @@ protected:
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer
 */
 class cChunkDataArrayCollector :
-public cChunkDataCallback
+	public cChunkDataCallback
 {
 public:
 
@@ -75,7 +75,7 @@ protected:
 	{
 		a_ChunkBuffer.CopyBlocks(m_BlockData);
 		a_ChunkBuffer.CopyMeta(m_BlockData + cChunkDef::NumBlocks);
-		a_ChunkBuffer.CopyLight(m_BlockData + 3 * cChunkDef::NumBlocks / 2);
+		a_ChunkBuffer.CopyBlockLight(m_BlockData + 3 * cChunkDef::NumBlocks / 2);
 		a_ChunkBuffer.CopySkyLight(m_BlockData + 2 * cChunkDef::NumBlocks);
 	}
 };
@@ -83,7 +83,7 @@ protected:
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a separate buffers
 */
 class cChunkDataSeparateCollector :
-public cChunkDataCallback
+	public cChunkDataCallback
 {
 public:
 
@@ -98,7 +98,7 @@ protected:
 	{
 	a_ChunkBuffer.CopyBlocks(m_BlockTypes);
 	a_ChunkBuffer.CopyMeta(m_BlockMetas);
-	a_ChunkBuffer.CopyLight(m_BlockLight);
+	a_ChunkBuffer.CopyBlockLight(m_BlockLight);
 	a_ChunkBuffer.CopySkyLight(m_BlockSkyLight);
 	}
 } ;

@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.6)
 project (MCServer)
 
@@ -11,8 +10,8 @@ set(SOURCES
 	BufferedSslContext.cpp
 	CallbackSslContext.cpp
 	CtrDrbgContext.cpp
+	CryptoKey.cpp
 	EntropyContext.cpp
-	PublicKey.cpp
 	RsaPrivateKey.cpp
 	Sha1Checksum.cpp
 	SslContext.cpp
@@ -26,8 +25,8 @@ set(HEADERS
 	BufferedSslContext.h
 	CallbackSslContext.h
 	CtrDrbgContext.h
+	CryptoKey.h
 	EntropyContext.h
-	PublicKey.h
 	RsaPrivateKey.h
 	SslContext.h
 	Sha1Checksum.h

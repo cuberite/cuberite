@@ -11,29 +11,24 @@
 
 
 
-static const int NEIGHBORHOOD_SIZE = 3;
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cNetherFortGen::cNetherFort:
 
-class cNetherFortGen::cNetherFort
+class cNetherFortGen::cNetherFort :
+	public cGridStructGen::cStructure
 {
+	typedef cGridStructGen::cStructure super;
+	
 public:
 	cNetherFortGen & m_ParentGen;
-	int m_BlockX, m_BlockZ;
 	int m_GridSize;
 	int m_Seed;
 	cPlacedPieces m_Pieces;
 
 
-	cNetherFort(cNetherFortGen & a_ParentGen, int a_BlockX, int a_BlockZ, int a_GridSize, int a_MaxDepth, int a_Seed) :
+	cNetherFort(cNetherFortGen & a_ParentGen, int a_OriginX, int a_OriginZ, int a_GridSize, int a_MaxDepth, int a_Seed) :
+		super(a_OriginX, a_OriginZ),
 		m_ParentGen(a_ParentGen),
-		m_BlockX(a_BlockX),
-		m_BlockZ(a_BlockZ),
 		m_GridSize(a_GridSize),
 		m_Seed(a_Seed)
 	{
@@ -43,8 +38,8 @@ public:
 		// Generate pieces:
 		for (int i = 0; m_Pieces.size() < (size_t)(a_MaxDepth * a_MaxDepth / 8 + a_MaxDepth); i++)
 		{
-			cBFSPieceGenerator pg(m_ParentGen, a_Seed + i);
-			pg.PlacePieces(a_BlockX, BlockY, a_BlockZ, a_MaxDepth, m_Pieces);
+			cBFSPieceGenerator pg(cNetherFortGen::m_PiecePool, a_Seed + i);
+			pg.PlacePieces(a_OriginX, BlockY, a_OriginZ, a_MaxDepth, m_Pieces);
 		}
 	}
 
@@ -56,7 +51,7 @@ public:
 	
 		
 	/** Carves the system into the chunk data */
-	void ProcessChunk(cChunkDesc & a_Chunk)
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk)
 	{
 		for (cPlacedPieces::const_iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
@@ -107,214 +102,30 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cNetherFortGen:
 
+cPrefabPiecePool cNetherFortGen::m_PiecePool(g_NetherFortPrefabs, g_NetherFortPrefabsCount, g_NetherFortStartingPrefabs, g_NetherFortStartingPrefabsCount);
+
+
+
+
+
 cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth) :
-	m_Seed(a_Seed),
-	m_Noise(a_Seed),
-	m_GridSize(a_GridSize),
+	super(a_Seed, a_GridSize, a_GridSize, a_MaxDepth * 10, a_MaxDepth * 10, 200),
 	m_MaxDepth(a_MaxDepth)
 {
-	// Initialize the prefabs:
-	for (size_t i = 0; i < g_NetherFortPrefabsCount; i++)
-	{
-		cPrefab * Prefab = new cPrefab(g_NetherFortPrefabs[i]);
-		m_AllPieces.push_back(Prefab);
-		if (Prefab->HasConnectorType(0))
-		{
-			m_OuterPieces.push_back(Prefab);
-		}
-		if (Prefab->HasConnectorType(1))
-		{
-			m_InnerPieces.push_back(Prefab);
-		}
-	}
-	
-	// Initialize the starting piece prefabs:
-	for (size_t i = 0; i < g_NetherFortStartingPrefabsCount; i++)
-	{
-		m_StartingPieces.push_back(new cPrefab(g_NetherFortStartingPrefabs[i]));
-	}
-
 	/*
 	// DEBUG: Try one round of placement:
 	cPlacedPieces Pieces;
-	cBFSPieceGenerator pg(*this, a_Seed);
+	cBFSPieceGenerator pg(m_PiecePool, a_Seed);
 	pg.PlacePieces(0, 64, 0, a_MaxDepth, Pieces);
-	*/
+	//*/
 }
 
 
 
 
 
-cNetherFortGen::~cNetherFortGen()
+cGridStructGen::cStructurePtr cNetherFortGen::CreateStructure(int a_OriginX, int a_OriginZ)
 {
-	ClearCache();
-	for (cPieces::iterator itr = m_AllPieces.begin(), end = m_AllPieces.end(); itr != end; ++itr)
-	{
-		delete *itr;
-	}  // for itr - m_AllPieces[]
-	m_AllPieces.clear();
+	return cStructurePtr(new cNetherFort(*this, a_OriginX, a_OriginZ, m_GridSizeX, m_MaxDepth, m_Seed));
 }
-
-
-
-
-
-void cNetherFortGen::ClearCache(void)
-{
-	// TODO
-}
-
-
-
-
-
-void cNetherFortGen::GetFortsForChunk(int a_ChunkX, int a_ChunkZ, cNetherForts & a_Forts)
-{
-	int BaseX = a_ChunkX * cChunkDef::Width / m_GridSize;
-	int BaseZ = a_ChunkZ * cChunkDef::Width / m_GridSize;
-	if (BaseX < 0)
-	{
-		--BaseX;
-	}
-	if (BaseZ < 0)
-	{
-		--BaseZ;
-	}
-	BaseX -= NEIGHBORHOOD_SIZE / 2;
-	BaseZ -= NEIGHBORHOOD_SIZE / 2;
-
-	// Walk the cache, move each cave system that we want into a_Forts:
-	int StartX = BaseX * m_GridSize;
-	int EndX = (BaseX + NEIGHBORHOOD_SIZE + 1) * m_GridSize;
-	int StartZ = BaseZ * m_GridSize;
-	int EndZ = (BaseZ + NEIGHBORHOOD_SIZE + 1) * m_GridSize;
-	for (cNetherForts::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
-	{
-		if (
-			((*itr)->m_BlockX >= StartX) && ((*itr)->m_BlockX < EndX) &&
-			((*itr)->m_BlockZ >= StartZ) && ((*itr)->m_BlockZ < EndZ)
-		)
-		{
-			// want
-			a_Forts.push_back(*itr);
-			itr = m_Cache.erase(itr);
-		}
-		else
-		{
-			// don't want
-			++itr;
-		}
-	}  // for itr - m_Cache[]
-
-	// Create those forts that haven't been in the cache:
-	for (int x = 0; x < NEIGHBORHOOD_SIZE; x++)
-	{
-		int RealX = (BaseX + x) * m_GridSize;
-		for (int z = 0; z < NEIGHBORHOOD_SIZE; z++)
-		{
-			int RealZ = (BaseZ + z) * m_GridSize;
-			bool Found = false;
-			for (cNetherForts::const_iterator itr = a_Forts.begin(), end = a_Forts.end(); itr != end; ++itr)
-			{
-				if (((*itr)->m_BlockX == RealX) && ((*itr)->m_BlockZ == RealZ))
-				{
-					Found = true;
-					break;
-				}
-			}  // for itr - a_Mineshafts
-			if (!Found)
-			{
-				a_Forts.push_back(new cNetherFort(*this, RealX, RealZ, m_GridSize, m_MaxDepth, m_Seed));
-			}
-		}  // for z
-	}  // for x
-
-	// Copy a_Forts into m_Cache to the beginning:
-	cNetherForts FortsCopy (a_Forts);
-	m_Cache.splice(m_Cache.begin(), FortsCopy, FortsCopy.begin(), FortsCopy.end());
-
-	// Trim the cache if it's too long:
-	if (m_Cache.size() > 100)
-	{
-		cNetherForts::iterator itr = m_Cache.begin();
-		std::advance(itr, 100);
-		for (cNetherForts::iterator end = m_Cache.end(); itr != end; ++itr)
-		{
-			delete *itr;
-		}
-		itr = m_Cache.begin();
-		std::advance(itr, 100);
-		m_Cache.erase(itr, m_Cache.end());
-	}
-}
-
-
-
-
-
-void cNetherFortGen::GenFinish(cChunkDesc & a_ChunkDesc)
-{
-	int ChunkX = a_ChunkDesc.GetChunkX();
-	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	cNetherForts Forts;
-	GetFortsForChunk(ChunkX, ChunkZ, Forts);
-	for (cNetherForts::const_iterator itr = Forts.begin(); itr != Forts.end(); ++itr)
-	{
-		(*itr)->ProcessChunk(a_ChunkDesc);
-	}  // for itr - Forts[]
-}
-
-
-
-
-
-cPieces cNetherFortGen::GetPiecesWithConnector(int a_ConnectorType)
-{
-	switch (a_ConnectorType)
-	{
-		case 0: return m_OuterPieces;
-		case 1: return m_InnerPieces;
-		default: return cPieces();
-	}
-}
-
-
-
-
-
-cPieces cNetherFortGen::GetStartingPieces(void)
-{
-	return m_StartingPieces;
-}
-
-
-
-
-
-int cNetherFortGen::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
-{
-	return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
-}
-
-
-
-
-
-void cNetherFortGen::PiecePlaced(const cPiece & a_Piece)
-{
-	UNUSED(a_Piece);
-}
-
-
-
-
-
-void cNetherFortGen::Reset(void)
-{
-	// Nothing needed
-}
-
-
-
 

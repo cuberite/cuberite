@@ -9,27 +9,21 @@ int main(int argc, char** argv)
 	class cStarvationCallbacks
 		: public cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks
 	{
-		virtual void OnStartingUsingBuffer() {}
-		virtual void OnStopUsingBuffer() {}
-		virtual void OnBufferEmpty() {}
-	};
-	cAllocationPool<cChunkData::sChunkSection,1600> Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks>(new cStarvationCallbacks()));
-	{
-		cChunkData buffer(Pool);
+		cChunkData buffer;
 
 		// Empty chunks
-		buffer.SetBlock(0,0,0, 0xAB);
-		testassert(buffer.GetBlock(0,0,0) == 0xAB);
-		buffer.SetMeta(0,16,0, 0xC);
-		testassert(buffer.GetMeta(0,16,0) == 0xC);
+		buffer.SetBlock(0, 0, 0, 0xAB);
+		testassert(buffer.GetBlock(0, 0, 0) == 0xAB);
+		buffer.SetMeta(0, 16, 0, 0xC);
+		testassert(buffer.GetMeta(0, 16, 0) == 0xC);
 
 		// loaded but not written segments
-		testassert(buffer.GetBlock(1,0,0) == 0x0);
-		testassert(buffer.GetMeta(1,16,0) == 0x0);
+		testassert(buffer.GetBlock(1, 0, 0) == 0x0);
+		testassert(buffer.GetMeta(1, 16, 0) == 0x0);
 
 		// Notloaded segments
-		testassert(buffer.GetBlock(0,32,0) == 0x0);
-		testassert(buffer.GetMeta(0,48,0) == 0x0);
+		testassert(buffer.GetBlock(0, 32, 0) == 0x0);
+		testassert(buffer.GetMeta(0, 48, 0) == 0x0);
 
 		// Out of Range
 		CheckAsserts(
@@ -116,29 +110,29 @@ int main(int argc, char** argv)
 		cChunkData buffer(Pool);
 		
 		// Zero's
-		buffer.SetBlock(0,0,0, 0x0);
-		buffer.SetBlock(0,0,1, 0xAB);
-		testassert(buffer.GetBlock(0,0,0) == 0x0);
-		testassert(buffer.GetBlock(0,0,1) == 0xAB);
+		buffer.SetBlock(0, 0, 0, 0x0);
+		buffer.SetBlock(0, 0, 1, 0xAB);
+		testassert(buffer.GetBlock(0, 0, 0) == 0x0);
+		testassert(buffer.GetBlock(0, 0, 1) == 0xAB);
 
-		buffer.SetMeta(0,16,0, 0x0);
-		buffer.SetMeta(0,16,1, 0xC);
-		testassert(buffer.GetMeta(0,16,0) == 0x0);
-		testassert(buffer.GetMeta(0,16,1) == 0xC);
+		buffer.SetMeta(0, 16, 0, 0x0);
+		buffer.SetMeta(0, 16, 1, 0xC);
+		testassert(buffer.GetMeta(0, 16, 0) == 0x0);
+		testassert(buffer.GetMeta(0, 16, 1) == 0xC);
 	}
 	
 	
 	{
 		// Operator =
 		cChunkData buffer(Pool);
-		buffer.SetBlock(0,0,0,0x42);
+		buffer.SetBlock(0, 0, 0, 0x42);
 		cChunkData copy(Pool);
 		#if __cplusplus < 201103L
 		copy = buffer;
 		#else
 		copy = std::move(buffer);
 		#endif
-		testassert(copy.GetBlock(0,0,0) == 0x42);
+		testassert(copy.GetBlock(0, 0, 0) == 0x42);
 		#if __cplusplus < 201103L
 		copy = copy;
 		#else

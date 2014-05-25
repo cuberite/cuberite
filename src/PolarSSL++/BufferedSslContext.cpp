@@ -20,6 +20,37 @@ cBufferedSslContext::cBufferedSslContext(size_t a_BufferSize):
 
 
 
+size_t cBufferedSslContext::WriteIncoming(const void * a_Data, size_t a_NumBytes)
+{
+	size_t NumBytes = std::min(m_IncomingData.GetFreeSpace(), a_NumBytes);
+	if (NumBytes > 0)
+	{
+		m_IncomingData.Write(a_Data, NumBytes);
+		return NumBytes;
+	}
+	return 0;
+}
+
+
+
+
+
+size_t cBufferedSslContext::ReadOutgoing(void * a_Data, size_t a_DataMaxSize)
+{
+	size_t NumBytes = std::min(m_OutgoingData.GetReadableSpace(), a_DataMaxSize);
+	if (NumBytes > 0)
+	{
+		m_OutgoingData.ReadBuf(a_Data, NumBytes);
+		m_OutgoingData.CommitRead();
+		return NumBytes;
+	}
+	return 0;
+}
+
+
+
+
+
 int cBufferedSslContext::ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes)
 {
 	// Called when PolarSSL wants to read encrypted data from the SSL peer
