@@ -81,6 +81,8 @@ public:																	// tolua_export
 		HOOK_HOPPER_PUSHING_ITEM,
 		HOOK_KILLING,
 		HOOK_LOGIN,
+		HOOK_PRE_ENCHANTING,
+		HOOK_POST_ENCHANTING,
 		HOOK_PLAYER_BREAKING_BLOCK,
 		HOOK_PLAYER_BROKEN_BLOCK,
 		HOOK_PLAYER_DESTROYED,
@@ -181,6 +183,8 @@ public:																	// tolua_export
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
+	bool CallHookPreEnchanting            (const cPlayer * a_Player, cEnchantments * a_Enchantment);
+	bool CallHookPostEnchanting           (const cPlayer * a_Player, cEnchantments * a_Enchantment);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -309,7 +313,7 @@ private:
 	/** Reloads all plugins, defaulting to settings.ini for settings location */
 	void ReloadPluginsNow(void);
 
-	/** Reloads all plugins with a cIniFile object expected to be initialised to settings.ini */
+	/** Reloads all plugins with a cIniFile object expected to be initialized to settings.ini */
 	void ReloadPluginsNow(cIniFile & a_SettingsIni);
 
 	/** Unloads all plugins */
