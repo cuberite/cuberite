@@ -9,7 +9,10 @@
 #include "../World.h"
 #include "../Entities/ArrowEntity.h"
 #include "../Entities/FireChargeEntity.h"
+#include "../Entities/ProjectileEntity.h"
 #include "../Matrix4.h"
+
+
 
 
 cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
@@ -143,56 +146,37 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIRE_CHARGE:
 		{
-			Vector3d Speed = GetProjectileLookVector(a_Chunk);
-
-			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-
-
-			cFireChargeEntity* fireCharge = new cFireChargeEntity(NULL /*was this*/, MobX, (double) DispY + 0.3, MobZ, Speed);
-
-
-			if (fireCharge == NULL)
-			{
-				break;
-			}
-			if (!fireCharge->Initialize(m_World))
-			{
-
-				delete fireCharge;
-				break;
-			}
-			m_World->BroadcastSpawnEntity(*fireCharge);
-
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge);
 
 			break;
 		}
 
 		case E_ITEM_ARROW:
 		{
-			Vector3d Speed = GetProjectileLookVector(a_Chunk);
+			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow);
 
-			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+			break;
+		}
 
+		case E_ITEM_SNOWBALL:
+		{
+			// Not working as there is no such entity yet?
+			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball);
 
-			cArrowEntity* Arrow = new cArrowEntity(NULL /*was this*/, MobX, (double) DispY + 0.3, MobZ, Speed);
+			break;
+		}
 
+		case E_ITEM_EGG:
+		{
+			// Not working as there is no such entity yet?
+			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg);
 
-			if (Arrow == NULL)
-			{
-				break;
-			}
-			if (!Arrow->Initialize(m_World))
-			{
+			break;
+		}
 
-				delete Arrow;
-				break;
-			}
-			m_World->BroadcastSpawnEntity(*Arrow);
-
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+		case E_ITEM_FIREWORK_ROCKET:
+		{
+			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework);
 
 			break;
 		}
@@ -204,6 +188,20 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		}
 	}  // switch (ItemType)
 }
+
+
+
+void cDispenserEntity::spawnProjectileFromDispenser(cChunk& a_Chunk, int& DispX, int& DispY, int& DispZ, cProjectileEntity::eKind kind)
+{
+	Vector3d Speed = GetProjectileLookVector(a_Chunk);
+	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+
+	double EntityX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+	double EntityZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+
+	m_World->CreateProjectile((double) EntityX, (double) DispY, (double) EntityZ, cProjectileEntity::pkArrow, NULL, NULL, &Speed);
+}
+
 
 
 Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
@@ -229,6 +227,10 @@ Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
 
 	return Speed;
 }
+
+
+
+
 
 
 bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
@@ -289,3 +291,7 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 	m_Contents.AddItem(EmptyBucket);
 	return true;
 }
+
+
+
+
