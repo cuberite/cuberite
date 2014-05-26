@@ -6,8 +6,10 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Chunk.h"
 
-
-
+#include "../World.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/FireChargeEntity.h"
+#include "../Matrix4.h"
 
 
 cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
@@ -69,7 +71,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}  // E_ITEM_BUCKET
-		
+
 		case E_ITEM_WATER_BUCKET:
 		{
 			LOGD("Dispensing water bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
@@ -83,7 +85,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_ITEM_LAVA_BUCKET:
 		{
 			LOGD("Dispensing lava bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
@@ -97,7 +99,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_ITEM_SPAWN_EGG:
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
@@ -108,7 +110,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_BLOCK_TNT:
 		{
 			// Spawn a primed TNT entity, if space allows:
@@ -128,7 +130,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			if (DispChunk->GetBlock(DispX, DispY, DispZ) == E_BLOCK_AIR)
 			{
 				DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_FIRE, 0);
-				
+
 				bool ItemBroke = m_Contents.DamageItem(a_SlotNum, 1);
 
 				if (ItemBroke)
@@ -138,13 +140,63 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_ITEM_FIRE_CHARGE:
 		{
-			// TODO: Spawn fireball entity
+			Vector3d Speed = GetProjectileLookVector(a_Chunk);
+
+			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+
+
+			cFireChargeEntity* fireCharge = new cFireChargeEntity(NULL /*was this*/, MobX, (double) DispY + 0.3, MobZ, Speed);
+
+
+			if (fireCharge == NULL)
+			{
+				break;
+			}
+			if (!fireCharge->Initialize(m_World))
+			{
+
+				delete fireCharge;
+				break;
+			}
+			m_World->BroadcastSpawnEntity(*fireCharge);
+
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+
 			break;
 		}
-		
+
+		case E_ITEM_ARROW:
+		{
+			Vector3d Speed = GetProjectileLookVector(a_Chunk);
+
+			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+
+
+			cArrowEntity* Arrow = new cArrowEntity(NULL /*was this*/, MobX, (double) DispY + 0.3, MobZ, Speed);
+
+
+			if (Arrow == NULL)
+			{
+				break;
+			}
+			if (!Arrow->Initialize(m_World))
+			{
+
+				delete Arrow;
+				break;
+			}
+			m_World->BroadcastSpawnEntity(*Arrow);
+
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+
+			break;
+		}
+
 		default:
 		{
 			DropFromSlot(a_Chunk, a_SlotNum);
@@ -154,8 +206,29 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 }
 
 
+Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
+{
+	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
+	int Direction = 0;
+	switch (Meta)
+	{
+		case E_META_DROPSPENSER_FACING_YP: Direction = 0; break; // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
+		case E_META_DROPSPENSER_FACING_YM: Direction = 0; break;
+		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break; // WEST
+		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break; // EAST
+		case E_META_DROPSPENSER_FACING_ZM: Direction = 180; break;
+		case E_META_DROPSPENSER_FACING_ZP: Direction = 0; break;
+	}
 
+	Matrix4d m;
+	m.Init(Vector3d(), 0, Direction, 0);
+	Vector3d Look = m.Transform(Vector3d(0, 0, 1));
 
+	Vector3d Speed = Look * 20;
+	Speed.y = Speed.y + 1;
+
+	return Speed;
+}
 
 
 bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
@@ -167,14 +240,14 @@ bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
 		m_Contents.SetSlot(a_SlotNum, LiquidBucket);
 		return true;
 	}
-	
+
 	// There are stacked buckets at the selected slot, see if a full bucket will fit somewhere else
 	if (m_Contents.HowManyCanFit(LiquidBucket) < 1)
 	{
 		// Cannot fit into m_Contents
 		return false;
 	}
-	
+
 	m_Contents.ChangeSlotCount(a_SlotNum, -1);
 	m_Contents.AddItem(LiquidBucket);
 	return true;
@@ -195,7 +268,7 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 		// Not a suitable block in front
 		return false;
 	}
-	
+
 	cItem EmptyBucket(E_ITEM_BUCKET, 1);
 	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
 	{
@@ -203,20 +276,16 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 		m_Contents.SetSlot(a_SlotNum, EmptyBucket);
 		return true;
 	}
-	
+
 	// There are full buckets stacked at this slot, check if we can fit in the empty bucket
 	if (m_Contents.HowManyCanFit(EmptyBucket) < 1)
 	{
 		// The empty bucket wouldn't fit into m_Contents
 		return false;
 	}
-	
+
 	// The empty bucket fits in, remove one full bucket and add the empty one
 	m_Contents.ChangeSlotCount(a_SlotNum, -1);
 	m_Contents.AddItem(EmptyBucket);
 	return true;
 }
-
-
-
-
