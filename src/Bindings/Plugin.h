@@ -65,6 +65,8 @@ public:
 	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) = 0;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer) = 0;
 	virtual bool OnLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) = 0;
+	virtual bool OnPreEnchanting            (const cPlayer * a_Player, cEnchantments * a_Enchantment, cItem * a_item, int a_levels) = 0;
+	virtual bool OnPostEnchanting           (const cPlayer * a_Player, cEnchantments * a_Enchantment, cItem * a_item, int a_levels) = 0;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) = 0;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;

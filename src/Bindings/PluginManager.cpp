@@ -632,6 +632,48 @@ bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersi
 
 
 
+bool cPluginManager::CallHookPreEnchanting(const cPlayer * a_Player, cEnchantments * a_Enchantment, cItem * a_Item, int a_Levels)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_ENCHANTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPreEnchanting(a_Player, a_Enchantment, a_Item, a_Levels))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPostEnchanting(const cPlayer * a_Player, cEnchantments * a_Enchantment, cItem * a_Item, int a_Levels)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_ENCHANTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPostEnchanting(a_Player, a_Enchantment, a_Item, a_Levels))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_ANIMATION);
