@@ -206,7 +206,7 @@ public:
 	void Push(void * a_Ptr);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cBlockEntity * a_BlockEntity);
-	void Push(cEnchantments * a_Enchantment);
+	void Push(cEnchantments & a_Enchantment);
 	
 	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, bool & a_Value);

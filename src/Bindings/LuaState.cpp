@@ -468,11 +468,11 @@ void cLuaState::Push(const cPlayer * a_Player)
 
 
 
-void cLuaState::Push(cEnchantments * a_Enchantment)
+void cLuaState::Push(cEnchantments & a_Enchantment)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Enchantment, "cEnchantments");
+	tolua_pushusertype(m_LuaState, &a_Enchantment, "cEnchantments");
 	m_NumCurrentFunctionArgs += 1;
 }
 
