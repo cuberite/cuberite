@@ -1024,7 +1024,7 @@ void cEntity::DetectCacti(void)
 	// Basic bounds checking.
 	if ((y < 0) || (y > 256))
 	{
-		return
+		return;
 	}
 	double w = m_Width / 2;
 	if (
