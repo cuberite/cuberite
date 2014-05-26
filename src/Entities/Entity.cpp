@@ -878,7 +878,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	
 	// Do the burning damage:
 	if (m_TicksLeftBurning > 0)
-	{C
+	{
 		m_TicksSinceLastBurnDamage++;
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
