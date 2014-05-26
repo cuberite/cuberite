@@ -1022,7 +1022,7 @@ void cEntity::DetectCacti(void)
 {
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	// Basic bounds checking.
-	if ((y < 0) || (y > 256))
+	if ((Y < 0) || (Y > 256))
 	{
 		return;
 	}
