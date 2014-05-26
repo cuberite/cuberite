@@ -108,6 +108,9 @@ static const cPrefab::sDef g_TestPrefabDef =
 
 	// AddWeightIfSame:
 	1000,
+	
+	// MoveToGround:
+	false,
 };
 
 static cPrefab g_TestPrefab(g_TestPrefabDef);
