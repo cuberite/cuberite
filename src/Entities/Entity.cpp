@@ -878,7 +878,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	
 	// Do the burning damage:
 	if (m_TicksLeftBurning > 0)
-	{
+	{C
 		m_TicksSinceLastBurnDamage++;
 		if (m_TicksSinceLastBurnDamage >= BURN_TICKS_PER_DAMAGE)
 		{
@@ -1021,6 +1021,11 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 void cEntity::DetectCacti(void)
 {
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	// Basic bounds checking.
+	if ((y < 0) || (y > 256))
+	{
+		return
+	}
 	double w = m_Width / 2;
 	if (
 		((Y > 0) && (Y < cChunkDef::Height)) &&
