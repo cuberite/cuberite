@@ -183,8 +183,8 @@ public:																	// tolua_export
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
-	bool CallHookPreEnchanting            (const cPlayer * a_Player, cEnchantments * a_Enchantment);
-	bool CallHookPostEnchanting           (const cPlayer * a_Player, cEnchantments * a_Enchantment);
+	bool CallHookPreEnchanting            (const cPlayer * a_Player, cEnchantments * a_Enchantment, cItem * a_item, int a_levels);
+	bool CallHookPostEnchanting           (const cPlayer * a_Player, cEnchantments * a_Enchantment, cItem * a_item, int a_levels);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
