@@ -480,6 +480,18 @@ void cLuaState::Push(cEnchantments & a_Enchantment)
 
 
 
+void cLuaState::Push(cWeightedEnchantment & a_WeightedEnchantment)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, &a_WeightedEnchantment, "cWeightedEnchantment");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
