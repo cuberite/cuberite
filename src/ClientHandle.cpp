@@ -2798,7 +2798,7 @@ void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
 	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
 	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
 
-	if (Item.EnchantByXPLevels(BaseEnchantmentLevel, m_Player))
+	if (Item.EnchantByXPLevels(BaseEnchantmentLevel, m_Player, Item))
 	{
 		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
 		{

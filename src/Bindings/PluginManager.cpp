@@ -632,7 +632,7 @@ bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersi
 
 
 
-bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_WeightedEnchantment, cItem & a_Item)
+bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_WeightedEnchantment, cItem a_Item)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_ENCHANTING);
 	if (Plugins == m_Hooks.end())
@@ -653,7 +653,7 @@ bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantm
 
 
 
-bool cPluginManager::CallHookPostEnchanting(cPlayer & a_Player, cEnchantments & a_Enchantment, cItem & a_Item, int a_Levels)
+bool cPluginManager::CallHookPostEnchanting(cPlayer & a_Player, cEnchantments a_Enchantment, cItem a_Item, int a_Levels)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_ENCHANTING);
 	if (Plugins == m_Hooks.end())

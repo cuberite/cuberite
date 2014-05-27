@@ -285,7 +285,7 @@ int cItem::GetEnchantability()
 
 
 
-bool cItem::EnchantByXPLevels(int a_NumXPLevels, cPlayer * a_Player)
+bool cItem::EnchantByXPLevels(int a_NumXPLevels, cPlayer * a_Player, cItem a_Item)
 {
 	if (!cItem::IsEnchantable(m_ItemType) && (m_ItemType != E_ITEM_BOOK))
 	{
@@ -300,7 +300,7 @@ bool cItem::EnchantByXPLevels(int a_NumXPLevels, cPlayer * a_Player)
 	int FinalEnchantmentLevel = (int)(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
 	cWeightedEnchantments enchantments;
-	cEnchantments::AddItemEnchantmentWeights(enchantments, m_ItemType, FinalEnchantmentLevel, a_Player);
+	cEnchantments::AddItemEnchantmentWeights(enchantments, m_ItemType, FinalEnchantmentLevel, a_Player, a_Item);
 
 	if (m_ItemType == E_ITEM_BOOK)
 	{

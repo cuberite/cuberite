@@ -19,6 +19,7 @@
 class cFastNBTWriter;
 class cParsedNBT;
 class cPlayer;
+class cItem;
 
 
 // fwd:
@@ -113,10 +114,10 @@ public:
 	// tolua_end
 
 	/** Add enchantment weights from item to the vector */
-	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel, cPlayer * a_Player);
+	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel, cPlayer * a_Player, cItem a_Item);
 
 	/** Add a enchantment with weight to the vector */
-	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel);
+	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel, cPlayer * a_Player, cItem a_Item);
 	
 	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
