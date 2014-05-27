@@ -362,7 +362,31 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 	
 	// Choose a random one of the starting pieces:
 	cPieces StartingPieces = m_PiecePool.GetStartingPieces();
-	cPiece * StartingPiece = StartingPieces[rnd % StartingPieces.size()];
+	int Total = 0;
+	for (cPieces::const_iterator itr = StartingPieces.begin(), end = StartingPieces.end(); itr != end; ++itr)
+	{
+		Total += m_PiecePool.GetStartingPieceWeight(**itr);
+	}
+	cPiece * StartingPiece;
+	if (Total > 0)
+	{
+		int Chosen = rnd % Total;
+		StartingPiece = StartingPieces.front();
+		for (cPieces::const_iterator itr = StartingPieces.begin(), end = StartingPieces.end(); itr != end; ++itr)
+		{
+			Chosen -= m_PiecePool.GetStartingPieceWeight(**itr);
+			if (Chosen <= 0)
+			{
+				StartingPiece = *itr;
+				break;
+			}
+		}
+	}
+	else
+	{
+		// All pieces returned zero weight, but we need one to start. Choose with equal chance:
+		StartingPiece = StartingPieces[rnd % StartingPieces.size()];
+	}
 	rnd = rnd >> 16;
 	
 	// Choose a random supported rotation:

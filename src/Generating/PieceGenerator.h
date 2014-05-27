@@ -120,6 +120,15 @@ public:
 		const cPiece & a_NewPiece
 	) { return 1; }
 	
+	/** Returns the relative weight with which the a_NewPiece is to be selected for placing as the first piece.
+	This allows the pool to tweak the piece's chances.
+	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will not be chosen.
+	If all pieces return 0, a random piece is chosen, with all equal chances.
+	*/
+	virtual int GetStartingPieceWeight(
+		const cPiece & a_NewPiece
+	) { return 1; }
+
 	/** Called after a piece is placed, to notify the pool that it has been used.
 	The pool may adjust the pieces it will return the next time. */
 	virtual void PiecePlaced(const cPiece & a_Piece) = 0;
