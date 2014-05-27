@@ -4601,7 +4601,7 @@ const cPrefab::sDef g_PlainsVillageStartingPrefabs[] =
 		true,
 
 		// DefaultWeight:
-		0,
+		100,
 
 		// DepthWeight:
 		"",
@@ -5048,7 +5048,7 @@ const cPrefab::sDef g_PlainsVillageStartingPrefabs[] =
 		false,
 
 		// DefaultWeight:
-		1000,
+		100,
 
 		// DepthWeight:
 		"",
@@ -5259,7 +5259,7 @@ const cPrefab::sDef g_PlainsVillageStartingPrefabs[] =
 		true,
 
 		// DefaultWeight:
-		0,
+		100,
 
 		// DepthWeight:
 		"",
