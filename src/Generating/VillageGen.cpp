@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "VillageGen.h"
+#include "Prefabs/AlchemistVillagePrefabs.h"
 #include "Prefabs/JapaneseVillagePrefabs.h"
 #include "Prefabs/PlainsVillagePrefabs.h"
 #include "Prefabs/SandVillagePrefabs.h"
@@ -274,6 +275,12 @@ protected:
 	}
 	
 	
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override
+	{
+		return m_Prefabs.GetStartingPieceWeight(a_NewPiece);
+	}
+	
+	
 	virtual void PiecePlaced(const cPiece & a_Piece) override
 	{
 		m_Prefabs.PiecePlaced(a_Piece);
@@ -311,17 +318,24 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cVillageGen:
 
-/** The prefabs for the sand village. */
 static cVillagePiecePool g_SandVillage(g_SandVillagePrefabs, g_SandVillagePrefabsCount, g_SandVillageStartingPrefabs, g_SandVillageStartingPrefabsCount);
-
-/** The prefabs for the flat-roofed sand village. */
 static cVillagePiecePool g_SandFlatRoofVillage(g_SandFlatRoofVillagePrefabs, g_SandFlatRoofVillagePrefabsCount, g_SandFlatRoofVillageStartingPrefabs, g_SandFlatRoofVillageStartingPrefabsCount);
-
-/** The prefabs for the plains village. */
+static cVillagePiecePool g_AlchemistVillage(g_AlchemistVillagePrefabs, g_AlchemistVillagePrefabsCount, g_AlchemistVillageStartingPrefabs, g_AlchemistVillageStartingPrefabsCount);
 static cVillagePiecePool g_PlainsVillage(g_PlainsVillagePrefabs, g_PlainsVillagePrefabsCount, g_PlainsVillageStartingPrefabs, g_PlainsVillageStartingPrefabsCount);
-
-/** The prefabs for the Japanese village. */
 static cVillagePiecePool g_JapaneseVillage(g_JapaneseVillagePrefabs, g_JapaneseVillagePrefabsCount, g_JapaneseVillageStartingPrefabs, g_JapaneseVillageStartingPrefabsCount);
+
+static cVillagePiecePool * g_DesertVillagePools[] =
+{
+	&g_SandVillage,
+	&g_SandFlatRoofVillage,
+	&g_AlchemistVillage,
+} ;
+
+static cVillagePiecePool * g_PlainsVillagePools[] =
+{
+	&g_PlainsVillage,
+	&g_JapaneseVillage,
+} ;
 
 
 
@@ -356,8 +370,8 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	cVillagePiecePool * VillagePrefabs = NULL;
 	BLOCKTYPE RoadBlock = E_BLOCK_GRAVEL;
 	int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
-	cVillagePiecePool * PlainsVillage = (rnd % 2 == 0) ? &g_PlainsVillage : &g_JapaneseVillage;
-	cVillagePiecePool * DesertVillage = (rnd % 2 == 0) ? &g_SandVillage : &g_SandFlatRoofVillage;
+	cVillagePiecePool * PlainsVillage = g_PlainsVillagePools[rnd % ARRAYCOUNT(g_PlainsVillagePools)];
+	cVillagePiecePool * DesertVillage = g_DesertVillagePools[rnd % ARRAYCOUNT(g_DesertVillagePools)];
 	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		switch (Biomes[i])
