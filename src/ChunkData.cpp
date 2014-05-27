@@ -1,9 +1,5 @@
 
-#ifdef TEST_GLOBALS
-#include "TestGlobals.h"
-#else
 #include "Globals.h"
-#endif
 #include "ChunkData.h"
 
 cChunkData::cChunkData()

@@ -225,16 +225,28 @@ template class SizeChecker<UInt16, 2>;
 
 
 
+#ifndef TEST_GLOBALS
+	// Common headers (part 1, without macros):
+	#include "StringUtils.h"
+	#include "OSSupport/Sleep.h"
+	#include "OSSupport/CriticalSection.h"
+	#include "OSSupport/Semaphore.h"
+	#include "OSSupport/Event.h"
+	#include "OSSupport/Thread.h"
+	#include "OSSupport/File.h"
+	#include "MCLogger.h"
+#else
+	// Logging functions
+void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1,2);
 
-// Common headers (part 1, without macros):
-#include "StringUtils.h"
-#include "OSSupport/Sleep.h"
-#include "OSSupport/CriticalSection.h"
-#include "OSSupport/Semaphore.h"
-#include "OSSupport/Event.h"
-#include "OSSupport/Thread.h"
-#include "OSSupport/File.h"
-#include "MCLogger.h"
+void inline LOGERROR(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	va_end(argList);
+}
+#endif
 
 
 
@@ -253,10 +265,22 @@ template class SizeChecker<UInt16, 2>;
 #define FAST_FLOOR_DIV( x, div ) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
 // Own version of assert() that writes failed assertions to the log for review
-#ifdef  _DEBUG
-	#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
+#ifdef TEST_GLOBALS
+
+	class cAssertFailure
+	{
+	};
+
+	#define ASSERT(x) do { if (!(x)) { throw cAssertFailure();} } while (0)
+	#define testassert(x) do { if(!(x)) { exit(1); } } while (0)
+	#define CheckAsserts(x) do { try {x} catch (cAssertFailure) { break; }  exit(1); } while (0)
+
 #else
-	#define ASSERT(x) ((void)(x))
+	#ifdef  _DEBUG
+		#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
+	#else
+		#define ASSERT(x) ((void)(x))
+	#endif
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
