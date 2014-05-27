@@ -1018,16 +1018,17 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 
 
 
-void cEntity::DetectCacti()
+void cEntity::DetectCacti(void)
 {
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	float w = m_Width / 2;
+	double w = m_Width / 2;
 	if (
-		(((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
-		(((GetPosX() - (X - 1)) - 1 < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
+		((Y > 0) && (Y < cChunkDef::Height)) &&
+		((((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
+		((GetPosX() - X < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
 		(((Z + 1) - GetPosZ() < w) && (GetWorld()->GetBlock(X, Y, Z + 1) == E_BLOCK_CACTUS)) ||
-		(((GetPosZ() - (Z - 1)) - 1 < w) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS)) ||
-		(((Y > 0) && (Y < cChunkDef::Height)) && ((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS)))
+		((GetPosZ() - Z < w) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS)) ||
+		(((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS))))
 		)
 	{
 		TakeDamage(dtCactusContact, NULL, 1, 0);
