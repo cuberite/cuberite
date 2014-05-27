@@ -1391,28 +1391,8 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	if ((m_Player == NULL) || (m_State != csPlaying))
-	{
-		// The client hasn't been spawned yet and sends nonsense, we know better
-		return;
-	}
-
-	/*
-	// TODO: Invalid stance check
-	if ((a_PosY >= a_Stance) || (a_Stance > a_PosY + 1.65))
-	{
-		LOGD("Invalid stance");
-		SendPlayerMoveLook();
-		return;
-	}
-	*/
-	
-	m_Player->MoveTo(Vector3d(a_PosX, a_PosY, a_PosZ));
-	m_Player->SetStance     (a_Stance);
-	m_Player->SetTouchGround(a_IsOnGround);
-	m_Player->SetHeadYaw    (a_Rotation);
-	m_Player->SetYaw        (a_Rotation);
-	m_Player->SetPitch      (a_Pitch);
+	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
+	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
 }
 
 
