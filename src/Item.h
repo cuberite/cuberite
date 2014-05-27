@@ -12,7 +12,7 @@
 #include "Defines.h"
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
-#include "Entities/Player.h"
+
 
 
 
@@ -20,6 +20,7 @@
 
 // fwd:
 class cItemHandler;
+class cPlayer;
 
 namespace Json
 {

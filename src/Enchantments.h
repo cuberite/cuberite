@@ -10,7 +10,7 @@
 
 #include "Defines.h"
 #include "WorldStorage/EnchantmentSerializer.h"
-#include "Entities/Player.h"
+
 
 
 
@@ -18,6 +18,7 @@
 // fwd: WorldStorage/FastNBT.h
 class cFastNBTWriter;
 class cParsedNBT;
+class cPlayer;
 
 
 // fwd:
