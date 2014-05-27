@@ -6,6 +6,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
+#include "Entities/Player.h"
 
 
 
@@ -240,7 +241,7 @@ bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 
 
 
-void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel)
+void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, int a_EnchantmentLevel, cPlayer * a_Player)
 {
 	if (ItemCategory::IsSword(a_ItemType))
 	{

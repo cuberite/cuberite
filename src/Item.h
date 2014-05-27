@@ -12,6 +12,7 @@
 #include "Defines.h"
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
+#include "Entities/Player.h"
 
 
 
@@ -191,7 +192,7 @@ public:
 
 	/** Enchants the item using the specified number of XP levels.
 	Returns true if item enchanted, false if not. */
-	bool EnchantByXPLevels(int a_NumXPLevels); // tolua_export
+	bool EnchantByXPLevels(int a_NumXPLevels, cPlayer * a_Player); // tolua_export
 
 	// tolua_begin
 	
