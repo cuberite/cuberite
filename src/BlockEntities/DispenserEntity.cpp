@@ -146,14 +146,14 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIRE_CHARGE:
 		{
-			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge);
+			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge);
 
 			break;
 		}
 
 		case E_ITEM_ARROW:
 		{
-			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow);
+			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow);
 
 			break;
 		}
@@ -161,7 +161,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case E_ITEM_SNOWBALL:
 		{
 			// Not working as there is no such entity yet?
-			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball);
+			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball);
 
 			break;
 		}
@@ -169,14 +169,14 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case E_ITEM_EGG:
 		{
 			// Not working as there is no such entity yet?
-			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg);
+			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg);
 
 			break;
 		}
 
 		case E_ITEM_FIREWORK_ROCKET:
 		{
-			spawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework);
+			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework);
 
 			break;
 		}
@@ -191,7 +191,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 
 
-void cDispenserEntity::spawnProjectileFromDispenser(cChunk& a_Chunk, int& DispX, int& DispY, int& DispZ, cProjectileEntity::eKind kind)
+void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & DispX, int & DispY, int & DispZ, cProjectileEntity::eKind kind)
 {
 	Vector3d Speed = GetProjectileLookVector(a_Chunk);
 	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
@@ -199,7 +199,7 @@ void cDispenserEntity::spawnProjectileFromDispenser(cChunk& a_Chunk, int& DispX,
 	double EntityX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 	double EntityZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-	m_World->CreateProjectile((double) EntityX, (double) DispY, (double) EntityZ, cProjectileEntity::pkArrow, NULL, NULL, &Speed);
+	m_World->CreateProjectile((double) EntityX, (double) DispY, (double) EntityZ, cProjectileEntity::pkArrow, NULL, NULL, & Speed);
 }
 
 
