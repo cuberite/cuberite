@@ -1391,8 +1391,8 @@ void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsO
 
 void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
 	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
+	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
 }
 
 
