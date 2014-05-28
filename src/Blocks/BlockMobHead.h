@@ -19,7 +19,46 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_ITEM_HEAD, 1, 0));
+		// The drops spawns in OnDestroyed
+	}
+	
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		if (a_Player->IsGameModeCreative())
+		{
+			// No drops in creative mode
+			return;
+		}
+
+		class cCallback : public cMobHeadCallback
+		{
+			virtual bool Item(cMobHeadEntity * a_MobHeadEntity)
+			{
+				cItems Pickups;
+				Pickups.Add(E_ITEM_HEAD, 1, (short) a_MobHeadEntity->GetType());
+				MTRand r1;
+
+				// Mid-block position first
+				double MicroX, MicroY, MicroZ;
+				MicroX = a_MobHeadEntity->GetPosX() + 0.5;
+				MicroY = a_MobHeadEntity->GetPosY() + 0.5;
+				MicroZ = a_MobHeadEntity->GetPosZ() + 0.5;
+
+				// Add random offset second
+				MicroX += r1.rand(1) - 0.5;
+				MicroZ += r1.rand(1) - 0.5;
+
+				a_MobHeadEntity->GetWorld()->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
+				return false;
+			}
+		
+		public:
+			cCallback() {}
+		};
+		cCallback Callback;
+		
+		cWorld * World = (cWorld *) &a_WorldInterface;
+		World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 	}
 
 	bool TrySpawnWither(cChunkInterface & a_ChunkInterface, cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
@@ -170,7 +209,7 @@ public:
 				
 				a_MobHeadEntity->SetType(static_cast<eMobHeadType>(m_OldBlockMeta));
 				a_MobHeadEntity->SetRotation(static_cast<eMobHeadRotation>(Rotation));
-				a_MobHeadEntity->GetWorld()->BroadcastBlockEntity(a_MobHeadEntity->GetPosX(), a_MobHeadEntity->GetPosY(), a_MobHeadEntity->GetPosZ(), m_Player->GetClientHandle());
+				a_MobHeadEntity->GetWorld()->BroadcastBlockEntity(a_MobHeadEntity->GetPosX(), a_MobHeadEntity->GetPosY(), a_MobHeadEntity->GetPosZ());
 				return false;
 			}
 		
