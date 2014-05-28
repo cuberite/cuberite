@@ -234,7 +234,8 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 	
 	// Compose the complete Json string to send:
 	Json::Value msg;
-	msg["text"] = cClientHandle::FormatMessageType(m_Client->GetPlayer()->GetWorld()->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
+	cWorld * World = m_Client->GetPlayer()->GetWorld();
+	msg["text"] = cClientHandle::FormatMessageType((World == NULL) ? false : World->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
 	const cCompositeChat::cParts & Parts = a_Message.GetParts();
 	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
 	{
