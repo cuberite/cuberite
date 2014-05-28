@@ -147,6 +147,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case E_ITEM_FIRE_CHARGE:
 		{
 			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge);
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
 		}
@@ -154,6 +155,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case E_ITEM_ARROW:
 		{
 			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow);
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
 		}
@@ -162,6 +164,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			// Not working as there is no such entity yet?
 			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball);
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
 		}
@@ -170,6 +173,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			// Not working as there is no such entity yet?
 			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg);
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
 		}
@@ -177,6 +181,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case E_ITEM_FIREWORK_ROCKET:
 		{
 			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework);
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
 		}
@@ -199,7 +204,7 @@ void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & Disp
 	double EntityX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 	double EntityZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-	m_World->CreateProjectile((double) EntityX, (double) DispY, (double) EntityZ, cProjectileEntity::pkArrow, NULL, NULL, & Speed);
+	m_World->CreateProjectile((double) EntityX, (double) DispY + 0.5, (double) EntityZ, cProjectileEntity::pkArrow, NULL, NULL, &Speed);
 }
 
 
@@ -210,22 +215,45 @@ Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
 	int Direction = 0;
 	switch (Meta)
 	{
-		case E_META_DROPSPENSER_FACING_YP: Direction = 0; break; // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
-		case E_META_DROPSPENSER_FACING_YM: Direction = 0; break;
-		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break; // WEST
-		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break; // EAST
+		case E_META_DROPSPENSER_FACING_YP: Direction = -1; break;	// UP
+		case E_META_DROPSPENSER_FACING_YM: Direction = -2; break;	// DOWN
+		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break;	// WEST
+		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break;	// EAST
 		case E_META_DROPSPENSER_FACING_ZM: Direction = 180; break;
 		case E_META_DROPSPENSER_FACING_ZP: Direction = 0; break;
 	}
 
-	Matrix4d m;
-	m.Init(Vector3d(), 0, Direction, 0);
-	Vector3d Look = m.Transform(Vector3d(0, 0, 1));
+	if(Direction >= 0)
+	{
+		Matrix4d m;
+		m.Init(Vector3d(), 0, Direction, 0);
+		Vector3d Look = m.Transform(Vector3d(0, 0, 1));
 
-	Vector3d Speed = Look * 20;
-	Speed.y = Speed.y + 1;
+		Vector3d Speed = Look * 20;
+		Speed.y = Speed.y + 1;
 
-	return Speed;
+		return Speed;
+
+	} else if(Direction == -1)
+	{
+		Matrix4d m;
+		m.Init(Vector3d(), 0, 180, 0);
+		Vector3d Look = m.Transform(Vector3d(0, 1, 0));
+
+		Vector3d Speed = Look * 20;
+
+		return Speed;
+
+	} else {
+
+		Matrix4d m;
+		m.Init(Vector3d(), 0, -360, 0);
+		Vector3d Look = m.Transform(Vector3d(0, -1, 0));
+
+		Vector3d Speed = Look * 20;
+
+		return Speed;
+	}
 }
 
 
@@ -291,7 +319,3 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 	m_Contents.AddItem(EmptyBucket);
 	return true;
 }
-
-
-
-

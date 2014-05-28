@@ -30,7 +30,7 @@ private:
 	bool ScoopUpLiquid(int a_SlotNum, short a_BucketItemType);
 
 	// Spawns a projectile of the given kind in front of the dispenser
-	void SpawnProjectileFromDispenser(cChunk& a_Chunk, int& DispX, int& DispY, int& DispZ, cProjectileEntity::eKind kind);
+	void SpawnProjectileFromDispenser(cChunk & a_Chunk, int & DispX, int & DispY, int & DispZ, cProjectileEntity::eKind kind);
 
 	// Returns how to aim the projectile
 	Vector3d GetProjectileLookVector(cChunk & a_Chunk);
