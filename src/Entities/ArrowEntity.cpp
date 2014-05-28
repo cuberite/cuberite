@@ -19,7 +19,10 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	m_bIsCollected(false),
 	m_HitBlockPos(Vector3i(0, 0, 0))
 {
-	SetPosY(GetPosY() + a_Creator->GetHeight() - 0.1000000014901161);
+	if (a_Creator != NULL)
+	{
+		SetPosY(GetPosY() + a_Creator->GetHeight() - 0.1000000014901161);
+	}
 	SetSpeed(a_Speed);
 	SetMass(0.1);
 	SetYawFromSpeed();

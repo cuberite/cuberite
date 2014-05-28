@@ -608,6 +608,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			case cProjectileEntity::pkGhastFireball:
 			{
 				m_Writer.AddInt("ExplosionPower", 1);
+				break;
 				// fall-through:
 			}
 			case cProjectileEntity::pkFireCharge:
