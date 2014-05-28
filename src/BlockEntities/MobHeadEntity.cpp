@@ -70,11 +70,8 @@ void cMobHeadEntity::SetOwner(const AString & a_Owner)
 
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
-	BLOCKTYPE Block;
-	NIBBLETYPE Meta;
-	a_Client.GetPlayer()->GetWorld()->GetBlockTypeMeta(m_PosX, m_PosY, m_PosZ, Block, Meta);
-
-	a_Client.SendBlockChange(m_PosX, m_PosY, m_PosZ, Block, Meta);
+	cWorld * World = a_Client.GetPlayer()->GetWorld();
+	a_Client.SendBlockChange(m_PosX, m_PosY, m_PosZ, m_BlockType, World->GetBlockMeta(m_PosX, m_PosY, m_PosZ));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 
