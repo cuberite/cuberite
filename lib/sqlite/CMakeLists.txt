@@ -18,7 +18,7 @@ if (WIN32)
 endif()
 
 # FreeBSD requires us to define this to get POSIX 2001 standard
-if (SYSTEM_NAME STREQUAL "FreeBSD")
+if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_cxx(-D__POSIX_VISIBLE=200112)
 endif()
 
