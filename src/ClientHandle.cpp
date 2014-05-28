@@ -954,6 +954,23 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
+	if (a_BlockFace != BLOCK_FACE_NONE)
+	{
+		int pX = a_BlockX;
+		int pY = a_BlockY;
+		int pZ = a_BlockZ;
+
+		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
+		cBlockHandler * Handler = cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(pX, pY, pZ));
+
+		if (Handler->IsClickedThrough())
+		{
+			cChunkInterface ChunkInterface(m_Player->GetWorld()->GetChunkMap());
+			Handler->OnDigging(ChunkInterface, *m_Player->GetWorld(), m_Player, pX, pY, pZ);
+			return;
+		}
+	}
+
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
 		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
@@ -980,22 +997,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-	// Check for clickthrough-blocks:
-	if (a_BlockFace != BLOCK_FACE_NONE)
-	{
-		int pX = a_BlockX;
-		int pY = a_BlockY;
-		int pZ = a_BlockZ;
-
-		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
-
-		if (Handler->IsClickedThrough())
-		{
-			Handler->OnDigging(ChunkInterface, *World, m_Player, pX, pY, pZ);
-		}
-	}
 }
 
 
