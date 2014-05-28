@@ -198,13 +198,13 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & DispX, int & DispY, int & DispZ, cProjectileEntity::eKind kind)
 {
-	Vector3d Speed = GetProjectileLookVector(a_Chunk);
+	Vector3d Angle = GetProjectileLookVector(a_Chunk);
 	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
 
 	double EntityX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 	double EntityZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-	m_World->CreateProjectile((double) EntityX, (double) DispY + 0.5, (double) EntityZ, cProjectileEntity::pkArrow, NULL, NULL, &Speed);
+	m_World->CreateProjectile((double) EntityX, (double) DispY + 0.5, (double) EntityZ, kind, NULL, NULL, &Angle);
 }
 
 
@@ -213,47 +213,38 @@ Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
 {
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	int Direction = 0;
+	Matrix4d m;
+	Vector3d Look;
+
 	switch (Meta)
 	{
-		case E_META_DROPSPENSER_FACING_YP: Direction = -1; break;	// UP
-		case E_META_DROPSPENSER_FACING_YM: Direction = -2; break;	// DOWN
+		case E_META_DROPSPENSER_FACING_YP:
+			m.Init(Vector3d(), 0, 180, 0);
+			Look = m.Transform(Vector3d(0, 1, 0));
+
+			return Look * 20; // UP
+			break;
+
+		case E_META_DROPSPENSER_FACING_YM:
+			m.Init(Vector3d(), 0, -360, 0);
+			Look = m.Transform(Vector3d(0, -1, 0));
+
+			return Look * 20;; // DOWN
+			break;
+
 		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break;	// WEST
 		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break;	// EAST
 		case E_META_DROPSPENSER_FACING_ZM: Direction = 180; break;
 		case E_META_DROPSPENSER_FACING_ZP: Direction = 0; break;
 	}
 
-	if(Direction >= 0)
-	{
-		Matrix4d m;
-		m.Init(Vector3d(), 0, Direction, 0);
-		Vector3d Look = m.Transform(Vector3d(0, 0, 1));
+	m.Init(Vector3d(), 0, Direction, 0);
+	Look = m.Transform(Vector3d(0, 0, 1));
 
-		Vector3d Speed = Look * 20;
-		Speed.y = Speed.y + 1;
+	Vector3d Angle = Look * 20;
+	Angle.y = Angle.y + 1;
 
-		return Speed;
-
-	} else if(Direction == -1)
-	{
-		Matrix4d m;
-		m.Init(Vector3d(), 0, 180, 0);
-		Vector3d Look = m.Transform(Vector3d(0, 1, 0));
-
-		Vector3d Speed = Look * 20;
-
-		return Speed;
-
-	} else {
-
-		Matrix4d m;
-		m.Init(Vector3d(), 0, -360, 0);
-		Vector3d Look = m.Transform(Vector3d(0, -1, 0));
-
-		Vector3d Speed = Look * 20;
-
-		return Speed;
-	}
+	return Angle;
 }
 
 
