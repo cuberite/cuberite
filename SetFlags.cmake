@@ -184,7 +184,11 @@ macro(enable_profile)
 		CMAKE_EXE_LINKER_FLAGS_RELEASEPROFILE
 		CMAKE_SHARED_LINKER_FLAGS_RELEASEPROFILE )
 	# The configuration types need to be set after their respective c/cxx/linker flags and before the project directive
-	set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile;Coverage" CACHE STRING "" FORCE)
+	if(MSVC)
+		set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile" CACHE STRING "" FORCE)
+	else()
+		set(CMAKE_CONFIGURATION_TYPES "Debug;Release;DebugProfile;ReleaseProfile;Coverage" CACHE STRING "" FORCE)
+	endif()
 endmacro()
     
 macro(set_exe_flags)
