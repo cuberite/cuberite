@@ -25,12 +25,12 @@ public:
 	
 	#if __cplusplus < 201103L
 		// auto_ptr style interface for memory management
-		cChunkData(const cChunkData & other);
-		cChunkData & operator =(const cChunkData & other);
+		cChunkData(const cChunkData & a_Other);
+		cChunkData & operator =(const cChunkData & a_Other);
 	#else
 		// unique_ptr style interface for memory management
-		cChunkData(cChunkData && other);
-		cChunkData & operator =(cChunkData && other);
+		cChunkData(cChunkData && a_Other);
+		cChunkData & operator =(cChunkData && a_ther);
 	#endif
 
 	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z) const;
@@ -44,10 +44,10 @@ public:
 	NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
 	
 	cChunkData Copy(void) const;
-	void CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx = 0, size_t length = cChunkDef::NumBlocks)  const;
-	void CopyMeta     (NIBBLETYPE * a_dest) const;
-	void CopyBlockLight(NIBBLETYPE * a_dest) const;
-	void CopySkyLight (NIBBLETYPE * a_dest) const;
+	void CopyBlocks    (BLOCKTYPE * a_Dest, size_t a_Idx = 0, size_t a_Length = cChunkDef::NumBlocks) const;
+	void CopyMeta      (NIBBLETYPE * a_Dest) const;
+	void CopyBlockLight(NIBBLETYPE * a_Dest) const;
+	void CopySkyLight  (NIBBLETYPE * a_Dest) const;
 	
 	void SetBlocks    (const BLOCKTYPE * a_src);
 	void SetMeta      (const NIBBLETYPE * a_src);
@@ -73,10 +73,15 @@ private:
 	
 	sChunkSection * m_Sections[CHUNK_SECTION_COUNT];
 	
-	sChunkSection * Allocate(void) const;
-	void Free(sChunkSection * ptr) const;
+	/** Allocates a new section. Entry-point to custom allocators. */
+	static sChunkSection * Allocate(void);
 	
-	void ZeroSection(sChunkSection * ptr) const;
+	/** Frees the specified section, previously allocated using Allocate().
+	Note that a_Section may be NULL. */
+	static void Free(sChunkSection * a_Section);
+	
+	/** Sets the data in the specified section to their default values. */
+	void ZeroSection(sChunkSection * a_Section) const;
 };
 
 
