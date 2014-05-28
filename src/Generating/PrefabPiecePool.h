@@ -34,6 +34,12 @@ public:
 		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs
 	);
 	
+	/** Destroys the pool, freeing all pieces. */
+	~cPrefabPiecePool();
+	
+	/** Removes and frees all pieces from this pool. */
+	void Clear(void);
+	
 	/** Adds pieces from the specified definitions into m_AllPieces. Also adds the pieces into
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces. */
@@ -43,7 +49,6 @@ public:
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces. */
 	void AddStartingPieceDefs(const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs);
-	
 	
 protected:
 

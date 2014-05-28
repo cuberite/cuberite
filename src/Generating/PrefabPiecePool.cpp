@@ -26,6 +26,34 @@ cPrefabPiecePool::cPrefabPiecePool(
 
 
 
+cPrefabPiecePool::~cPrefabPiecePool()
+{
+	Clear();
+}
+
+
+
+
+
+void cPrefabPiecePool::Clear(void)
+{
+	m_PiecesByConnector.clear();
+	for (cPieces::iterator itr = m_AllPieces.begin(), end = m_AllPieces.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_AllPieces.clear();
+	for (cPieces::iterator itr = m_StartingPieces.begin(), end = m_StartingPieces.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_StartingPieces.clear();
+}
+
+
+
+
+
 void cPrefabPiecePool::AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_NumPieceDefs)
 {
 	ASSERT(a_PieceDefs != NULL);
