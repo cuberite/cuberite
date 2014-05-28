@@ -223,14 +223,12 @@ Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
 			Look = m.Transform(Vector3d(0, 1, 0));
 
 			return Look * 20; // UP
-			break;
 
 		case E_META_DROPSPENSER_FACING_YM:
 			m.Init(Vector3d(), 0, -360, 0);
 			Look = m.Transform(Vector3d(0, -1, 0));
 
 			return Look * 20;; // DOWN
-			break;
 
 		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break;	// WEST
 		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break;	// EAST
