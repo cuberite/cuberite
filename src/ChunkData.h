@@ -25,12 +25,12 @@ public:
 	
 	#if __cplusplus < 201103L
 		// auto_ptr style interface for memory management
-		cChunkData(const cChunkData& other);
-		cChunkData& operator=(const cChunkData& other);
+		cChunkData(const cChunkData & other);
+		cChunkData & operator =(const cChunkData & other);
 	#else
 		// unique_ptr style interface for memory management
-		cChunkData(cChunkData&& other);
-		cChunkData& operator=(cChunkData&& other);
+		cChunkData(cChunkData && other);
+		cChunkData & operator =(cChunkData && other);
 	#endif
 
 	BLOCKTYPE GetBlock(int a_X, int a_Y, int a_Z) const;
@@ -43,15 +43,15 @@ public:
 	
 	NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
 	
-	cChunkData Copy() const;
+	cChunkData Copy(void) const;
 	void CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx = 0, size_t length = cChunkDef::NumBlocks)  const;
 	void CopyMeta     (NIBBLETYPE * a_dest) const;
-	void CopyBlockLight    (NIBBLETYPE * a_dest) const;
+	void CopyBlockLight(NIBBLETYPE * a_dest) const;
 	void CopySkyLight (NIBBLETYPE * a_dest) const;
 	
 	void SetBlocks    (const BLOCKTYPE * a_src);
 	void SetMeta      (const NIBBLETYPE * a_src);
-	void SetBlockLight     (const NIBBLETYPE * a_src);
+	void SetBlockLight(const NIBBLETYPE * a_src);
 	void SetSkyLight  (const NIBBLETYPE * a_src);
 	
 private:
@@ -61,19 +61,19 @@ private:
 
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	mutable bool IsOwner;
+	mutable bool m_IsOwner;
 	#endif
 	
 	struct sChunkSection {
-		BLOCKTYPE  m_BlockTypes   [CHUNK_SECTION_HEIGHT * 16 * 16]    ;
+		BLOCKTYPE  m_BlockTypes   [CHUNK_SECTION_HEIGHT * 16 * 16];
 		NIBBLETYPE m_BlockMeta    [CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
 		NIBBLETYPE m_BlockLight   [CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
 		NIBBLETYPE m_BlockSkyLight[CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
 	};
 	
-	sChunkSection *m_Sections[CHUNK_SECTION_COUNT];
+	sChunkSection * m_Sections[CHUNK_SECTION_COUNT];
 	
-	sChunkSection * Allocate() const;
+	sChunkSection * Allocate(void) const;
 	void Free(sChunkSection * ptr) const;
 	
 	void ZeroSection(sChunkSection * ptr) const;

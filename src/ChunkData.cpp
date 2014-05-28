@@ -5,64 +5,86 @@
 cChunkData::cChunkData()
 #if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	: IsOwner(true)
+	: m_IsOwner(true)
 #endif
 {
-	memset(m_Sections, 0, sizeof(m_Sections));
+	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
+	{
+		m_Sections[i] = NULL;
+	}
 }
+
+
+
 
 
 cChunkData::~cChunkData()
 {
 	#if __cplusplus < 201103L
 		// auto_ptr style interface for memory management
-		if (!IsOwner)
+		if (!m_IsOwner)
 		{
 			return;
 		}
 	#endif
 	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
-		if (m_Sections[i] == NULL) Free(m_Sections[i]);;
+		Free(m_Sections[i]);
 	}
 }
 
+
+
+
+
 #if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	cChunkData::cChunkData(const cChunkData& other) :
-	IsOwner(true)
+	cChunkData::cChunkData(const cChunkData & a_Other) :
+		m_IsOwner(true)
 	{
+		// Move contents and ownership from a_Other to this, pointer-wise:
 		for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 		{
-			m_Sections[i] = other.m_Sections[i];
+			m_Sections[i] = a_Other.m_Sections[i];
 		}
-		other.IsOwner = false;
+		a_Other.m_IsOwner = false;
 	}
 
-	cChunkData& cChunkData::operator=(const cChunkData& other)
+
+
+
+
+	cChunkData & cChunkData::operator =(const cChunkData & a_Other)
 	{
-		if (&other != this)
+		// If assigning to self, no-op
+		if (&a_Other == this)
 		{
-			if (IsOwner)
-			{
-				for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
-				{
-					if (m_Sections[i]) Free(m_Sections[i]);;
-				}
-			}
-			IsOwner = true;
+			return *this;
+		}
+		
+		// Free any currently held contents:
+		if (m_IsOwner)
+		{
 			for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 			{
-				m_Sections[i] = other.m_Sections[i];
+				Free(m_Sections[i]);
 			}
-			other.IsOwner = false;
 		}
+		
+		// Move contents and ownership from a_Other to this, pointer-wise:
+		m_IsOwner = true;
+		for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
+		{
+			m_Sections[i] = a_Other.m_Sections[i];
+		}
+		a_Other.m_IsOwner = false;
 		return *this;
-	
 	}
+	
 #else
+
 	// unique_ptr style interface for memory management
-	cChunkData::cChunkData(cChunkData&& other)
+	cChunkData::cChunkData(cChunkData && other)
 	{
 		for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 		{
@@ -70,14 +92,18 @@ cChunkData::~cChunkData()
 			other.m_Sections[i] = NULL;
 		}
 	}
+	
+	
+	
+	
 
-	cChunkData& cChunkData::operator=(cChunkData&& other)
+	cChunkData & cChunkData::operator =(cChunkData && other)
 	{
 		if (&other != this)
 		{
 			for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 			{
-				Free(m_Sections[i]);;
+				Free(m_Sections[i]);
 				m_Sections[i] = other.m_Sections[i];
 				other.m_Sections[i] = NULL;
 			}
@@ -85,6 +111,10 @@ cChunkData::~cChunkData()
 		return *this;
 	}
 #endif
+
+
+
+
 
 BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 {
@@ -102,6 +132,10 @@ BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 		return 0;
 	}
 }
+
+
+
+
 
 void cChunkData::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 {
@@ -134,6 +168,10 @@ void cChunkData::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 	m_Sections[Section]->m_BlockTypes[Index] = a_Block;
 }
 
+
+
+
+
 NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	if (
@@ -155,6 +193,10 @@ NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 	return 0;
 }
+
+
+
+
 
 bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
 {
@@ -192,9 +234,17 @@ bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble
 	return oldval == a_Nibble;
 }
 
+
+
+
+
 NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
+	if (
+		(a_RelX < cChunkDef::Width) && (a_RelX > -1) &&
+		(a_RelY < cChunkDef::Height) && (a_RelY > -1) &&
+		(a_RelZ < cChunkDef::Width) && (a_RelZ > -1)
+	)
 	{
 		int Section = a_RelY / CHUNK_SECTION_HEIGHT;
 		if (m_Sections[Section] != NULL)
@@ -210,6 +260,10 @@ NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 	ASSERT(!"cChunkData::GetMeta(): coords out of chunk range!");
 	return 0;
 }
+
+
+
+
 
 NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
@@ -230,7 +284,11 @@ NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 	return 0;
 }
 
-cChunkData cChunkData::Copy() const
+
+
+
+
+cChunkData cChunkData::Copy(void) const
 {
 	cChunkData copy;
 	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
@@ -248,11 +306,11 @@ cChunkData cChunkData::Copy() const
 
 
 
-void cChunkData::CopyBlocks   (BLOCKTYPE * a_dest, size_t a_Idx, size_t length)  const
+void cChunkData::CopyBlocks(BLOCKTYPE * a_dest, size_t a_Idx, size_t length)  const
 {
 	for (size_t i = 0; i < CHUNK_SECTION_COUNT; i++)
 	{
-		const size_t segment_length =  CHUNK_SECTION_HEIGHT * 16 * 16;
+		const size_t segment_length = CHUNK_SECTION_HEIGHT * 16 * 16;
 		if (a_Idx > 0)
 		{
 			a_Idx = std::max(a_Idx - length, (size_t) 0);
@@ -588,10 +646,14 @@ cChunkData::sChunkSection * cChunkData::Allocate() const
 
 
 
+
+
 void cChunkData::Free(cChunkData::sChunkSection * ptr) const
 {
 	delete ptr;
 }
+
+
 
 
 
