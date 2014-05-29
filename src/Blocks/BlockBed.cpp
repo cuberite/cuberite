@@ -108,7 +108,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 			if (Meta & 0x4)
 			{
-				a_Player->SendMessageFailure("This bed is occupied.");
+				a_Player->SendMessageFailure("This bed is occupied");
 			}
 			else
 			{
