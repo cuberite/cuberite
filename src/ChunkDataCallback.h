@@ -1,9 +1,18 @@
 
+// ChunkDataCallback.h
+
+// Declares the cChunkDataCallback interface and several trivial descendants, for reading chunk data
+
+
+
+
 
 #pragma once
 
-
 #include "ChunkData.h"
+
+
+
 
 
 /** Interface class used for getting data out of a chunk using the GetAllData() function.
@@ -41,6 +50,10 @@ public:
 	virtual void BlockEntity(cBlockEntity * a_Entity) {UNUSED(a_Entity); };
 } ;
 
+
+
+
+
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a buffer
 */
 class cChunkDataCollector :
@@ -59,6 +72,9 @@ protected:
 };
 
 
+
+
+
 /** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer
 */
 class cChunkDataArrayCollector :
@@ -73,15 +89,18 @@ protected:
 
 	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
-		a_ChunkBuffer.CopyBlocks(m_BlockData);
-		a_ChunkBuffer.CopyMeta(m_BlockData + cChunkDef::NumBlocks);
+		a_ChunkBuffer.CopyBlockTypes(m_BlockData);
+		a_ChunkBuffer.CopyMetas(m_BlockData + cChunkDef::NumBlocks);
 		a_ChunkBuffer.CopyBlockLight(m_BlockData + 3 * cChunkDef::NumBlocks / 2);
 		a_ChunkBuffer.CopySkyLight(m_BlockData + 2 * cChunkDef::NumBlocks);
 	}
 };
 
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a separate buffers
-*/
+
+
+
+
+/** A simple implementation of the cChunkDataCallback interface that collects all block data into separate buffers */
 class cChunkDataSeparateCollector :
 	public cChunkDataCallback
 {
@@ -96,10 +115,13 @@ protected:
 
 	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
-	a_ChunkBuffer.CopyBlocks(m_BlockTypes);
-	a_ChunkBuffer.CopyMeta(m_BlockMetas);
-	a_ChunkBuffer.CopyBlockLight(m_BlockLight);
-	a_ChunkBuffer.CopySkyLight(m_BlockSkyLight);
+		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes);
+		a_ChunkBuffer.CopyMetas(m_BlockMetas);
+		a_ChunkBuffer.CopyBlockLight(m_BlockLight);
+		a_ChunkBuffer.CopySkyLight(m_BlockSkyLight);
 	}
 } ;
+
+
+
 

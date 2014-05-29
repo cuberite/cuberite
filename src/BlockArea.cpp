@@ -1903,7 +1903,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
 
 	if (m_Area.m_BlockMetas != NULL)
 	{
-		a_BlockBuffer.CopyMeta(m_Area.m_BlockMetas);
+		a_BlockBuffer.CopyMetas(m_Area.m_BlockMetas);
 	}
 
 	if (m_Area.m_BlockLight != NULL)

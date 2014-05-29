@@ -1,4 +1,12 @@
 
+// ChunkData.h
+
+// Declares the cChunkData class that represents the block's type, meta, blocklight and skylight storage for a chunk
+
+
+
+
+
 #pragma once
 
 
@@ -20,7 +28,7 @@ class cChunkData
 {
 public:
 
-	cChunkData();
+	cChunkData(void);
 	~cChunkData();
 	
 	#if __cplusplus < 201103L
@@ -43,25 +51,48 @@ public:
 	
 	NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
 	
+	/** Creates a (deep) copy of self. */
 	cChunkData Copy(void) const;
 	
-	// Copys data from this object into the buffer in the a_Dest param
-	// CopyBlocks also povides the optional parameters a_Idx and a_Length which specify an offset and length for
-	// copying part of the BlockTypes array.
-	void CopyBlocks    (BLOCKTYPE * a_Dest, size_t a_Idx = 0, size_t a_Length = cChunkDef::NumBlocks) const;
-	void CopyMeta      (NIBBLETYPE * a_Dest) const;
+	/** Copies the blocktype data into the specified flat array.
+	Optionally, only a part of the data is copied, as specified by the a_Idx and a_Length parameters. */
+	void CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx = 0, size_t a_Length = cChunkDef::NumBlocks) const;
+	
+	/** Copies the metadata into the specified flat array. */
+	void CopyMetas(NIBBLETYPE * a_Dest) const;
+	
+	/** Copies the block light data into the specified flat array. */
 	void CopyBlockLight(NIBBLETYPE * a_Dest) const;
+	
+	/** Copies the skylight data into the specified flat array. */
 	void CopySkyLight  (NIBBLETYPE * a_Dest) const;
 	
-	void SetBlocks    (const BLOCKTYPE * a_src);
-	void SetMeta      (const NIBBLETYPE * a_src);
-	void SetBlockLight(const NIBBLETYPE * a_src);
-	void SetSkyLight  (const NIBBLETYPE * a_src);
+	/** Copies the blocktype data from the specified flat array into the internal representation.
+	Allocates sections that are needed for the operation.
+	Requires that a_Src is a valid pointer. */
+	void SetBlockTypes(const BLOCKTYPE * a_Src);
+	
+	/** Copies the metadata from the specified flat array into the internal representation.
+	Allocates sectios that are needed for the operation.
+	Requires that a_Src is a valid pointer. */
+	void SetMetas(const NIBBLETYPE * a_Src);
+	
+	/** Copies the blocklight data from the specified flat array into the internal representation.
+	Allocates sectios that are needed for the operation.
+	Allows a_Src to be NULL, in which case it doesn't do anything. */
+	void SetBlockLight(const NIBBLETYPE * a_Src);
+
+	/** Copies the skylight data from the specified flat array into the internal representation.
+	Allocates sectios that are needed for the operation.
+	Allows a_Src to be NULL, in which case it doesn't do anything. */
+	void SetSkyLight(const NIBBLETYPE * a_Src);
 	
 private:
 
-	static const size_t CHUNK_SECTION_HEIGHT = 16;
-	static const size_t CHUNK_SECTION_COUNT = (256 / CHUNK_SECTION_HEIGHT);
+	static const size_t SectionHeight = 16;
+	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
+	static const size_t SegmentLength = cChunkDef::Width * cChunkDef::Height * SectionHeight;
+	static const size_t SectionBlockCount = SectionHeight * cChunkDef::Width * cChunkDef::Width;
 
 	#if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
@@ -69,13 +100,13 @@ private:
 	#endif
 	
 	struct sChunkSection {
-		BLOCKTYPE  m_BlockTypes   [CHUNK_SECTION_HEIGHT * 16 * 16];
-		NIBBLETYPE m_BlockMeta    [CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
-		NIBBLETYPE m_BlockLight   [CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
-		NIBBLETYPE m_BlockSkyLight[CHUNK_SECTION_HEIGHT * 16 * 16 / 2];
+		BLOCKTYPE  m_BlockTypes   [SectionBlockCount];
+		NIBBLETYPE m_BlockMeta    [SectionBlockCount / 2];
+		NIBBLETYPE m_BlockLight   [SectionBlockCount / 2];
+		NIBBLETYPE m_BlockSkyLight[SectionBlockCount / 2];
 	};
 	
-	sChunkSection * m_Sections[CHUNK_SECTION_COUNT];
+	sChunkSection * m_Sections[NumSections];
 	
 	/** Allocates a new section. Entry-point to custom allocators. */
 	static sChunkSection * Allocate(void);

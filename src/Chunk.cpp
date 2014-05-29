@@ -282,8 +282,8 @@ void cChunk::SetAllData(
 		CalculateHeightmap(a_BlockTypes);
 	}
 
-	m_ChunkData.SetBlocks(a_BlockTypes);
-	m_ChunkData.SetMeta(a_BlockMeta);
+	m_ChunkData.SetBlockTypes(a_BlockTypes);
+	m_ChunkData.SetMetas(a_BlockMeta);
 	m_ChunkData.SetBlockLight(a_BlockLight);
 	m_ChunkData.SetSkyLight(a_BlockSkyLight);
 	
@@ -339,7 +339,7 @@ void cChunk::SetLight(
 
 void cChunk::GetBlockTypes(BLOCKTYPE * a_BlockTypes)
 {
-	m_ChunkData.CopyBlocks(a_BlockTypes);
+	m_ChunkData.CopyBlockTypes(a_BlockTypes);
 }
 
 
