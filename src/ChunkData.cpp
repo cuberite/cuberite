@@ -340,7 +340,7 @@ void cChunkData::CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx, size_t a_Lengt
 		size_t StartPos = 0;
 		if (ToSkip > 0)
 		{
-			ToSkip = std::max((ssize_t)ToSkip - (ssize_t)SectionBlockCount, (size_t) 0);
+			ToSkip = std::max((ssize_t)ToSkip - (ssize_t)SectionBlockCount, (ssize_t) 0);
 			StartPos = SectionBlockCount - ToSkip;
 		}
 		if (ToSkip == 0)
