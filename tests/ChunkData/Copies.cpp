@@ -25,14 +25,14 @@ int main(int argc, char** argv)
 			SrcBlockBuffer[i+3] = 0xEF;
 		}
 	
-		buffer.SetBlocks(SrcBlockBuffer);
+		buffer.SetBlockTypes(SrcBlockBuffer);
 		BLOCKTYPE DstBlockBuffer[16 * 16 * 256];
-		buffer.CopyBlocks(DstBlockBuffer);
+		buffer.CopyBlockTypes(DstBlockBuffer);
 		testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1) == 0);
 		
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
-		buffer.SetBlocks(SrcBlockBuffer);
-		buffer.CopyBlocks(DstBlockBuffer);
+		buffer.SetBlockTypes(SrcBlockBuffer);
+		buffer.CopyBlockTypes(DstBlockBuffer);
 		testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1) == 0);
 	
 	}
@@ -48,14 +48,14 @@ int main(int argc, char** argv)
 			SrcNibbleBuffer[i+3] = 0xBE;
 		}
 	
-		buffer.SetMeta(SrcNibbleBuffer);
+		buffer.SetMetas(SrcNibbleBuffer);
 		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256/ 2];
-		buffer.CopyMeta(DstNibbleBuffer);
+		buffer.CopyMetas(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
 		
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
-		buffer.SetMeta(SrcNibbleBuffer);
-		buffer.CopyMeta(DstNibbleBuffer);
+		buffer.SetMetas(SrcNibbleBuffer);
+		buffer.CopyMetas(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
 
 	
@@ -114,13 +114,13 @@ int main(int argc, char** argv)
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
 		BLOCKTYPE DstBlockBuffer[16 * 16 * 256];
-		buffer.CopyBlocks(DstBlockBuffer);
+		buffer.CopyBlockTypes(DstBlockBuffer);
 		testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1) == 0);
 	
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);
 		NIBBLETYPE DstNibbleBuffer[16 * 16 * 256 / 2];
-		buffer.CopyMeta(DstNibbleBuffer);
+		buffer.CopyMetas(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
 	
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);

@@ -13,13 +13,13 @@ int main(int argc, char** argv)
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
 		SrcBlockBuffer[7 + (4 * 16) + (5 * 16 * 16)] = 0xCD;
-		buffer.SetBlocks(SrcBlockBuffer);
+		buffer.SetBlockTypes(SrcBlockBuffer);
 		testassert(buffer.GetBlock(7,5,4) == 0xCD);
 	
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);
 		SrcNibbleBuffer[(6 + (1 * 16) + (2 * 16 * 16)) / 2] = 0xE;
-		buffer.SetMeta(SrcNibbleBuffer);
+		buffer.SetMetas(SrcNibbleBuffer);
 		testassert(buffer.GetMeta(6, 2, 1) == 0xE);
 	
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);
@@ -40,13 +40,13 @@ int main(int argc, char** argv)
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
 		SrcBlockBuffer[7 + (4 * 16) + (24 * 16 * 16)] = 0xCD;
-		buffer.SetBlocks(SrcBlockBuffer);
+		buffer.SetBlockTypes(SrcBlockBuffer);
 		testassert(buffer.GetBlock(7, 24, 4) == 0xCD);
 	
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 / 2);
 		SrcNibbleBuffer[(6 + (1 * 16) + (24 * 16 * 16)) / 2] = 0xE;
-		buffer.SetMeta(SrcNibbleBuffer);
+		buffer.SetMetas(SrcNibbleBuffer);
 		testassert(buffer.GetMeta(6, 24, 1) == 0xE);
 	
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
@@ -66,12 +66,12 @@ int main(int argc, char** argv)
 
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);
-		buffer.SetBlocks(SrcBlockBuffer);
+		buffer.SetBlockTypes(SrcBlockBuffer);
 		testassert(buffer.GetBlock(7, 24, 4) == 0x00);
 	
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256/2];
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
-		buffer.SetMeta(SrcNibbleBuffer);
+		buffer.SetMetas(SrcNibbleBuffer);
 		testassert(buffer.GetMeta(6, 24, 1) == 0x0);
 	
 		memset(SrcNibbleBuffer, 0x00, 16 * 16 * 256 /2);
