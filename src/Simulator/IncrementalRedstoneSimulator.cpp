@@ -906,8 +906,11 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_RelBlockX, int a_RelBlockY,
 		if (!AreCoordsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true))
 		{
 			cChunkInterface ChunkInterface(m_World.GetChunkMap());
-			cBlockDoorHandler::ChangeDoor(ChunkInterface, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-			m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			if (!cBlockDoorHandler::IsOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ))
+			{
+				cBlockDoorHandler::SetOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ, true);
+				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true);
 		}
 	}
@@ -916,8 +919,11 @@ void cIncrementalRedstoneSimulator::HandleDoor(int a_RelBlockX, int a_RelBlockY,
 		if (!AreCoordsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, false))
 		{
 			cChunkInterface ChunkInterface(m_World.GetChunkMap());
-			cBlockDoorHandler::ChangeDoor(ChunkInterface, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-			m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			if (cBlockDoorHandler::IsOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ))
+			{
+				cBlockDoorHandler::SetOpen(ChunkInterface, BlockX, a_RelBlockY, BlockZ, false);
+				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, false);
 		}
 	}
