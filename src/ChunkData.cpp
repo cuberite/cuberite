@@ -375,7 +375,7 @@ void cChunkData::CopyMetas(NIBBLETYPE * a_Dest) const
 		}
 		else
 		{
-			memset(&a_Dest[i * SegmentLength], 0, sizeof(BLOCKTYPE) * SegmentLength);
+			memset(&a_Dest[i * SegmentLength], 0, sizeof(NIBBLETYPE) * SegmentLength);
 		}
 	}
 }
@@ -395,7 +395,7 @@ void cChunkData::CopyBlockLight(NIBBLETYPE * a_Dest) const
 		}
 		else
 		{
-			memset(&a_Dest[i * SegmentLength], 0, sizeof(BLOCKTYPE) * SegmentLength);
+			memset(&a_Dest[i * SegmentLength], 0, sizeof(NIBBLETYPE) * SegmentLength);
 		}
 	}
 }
@@ -415,7 +415,7 @@ void cChunkData::CopySkyLight(NIBBLETYPE * a_Dest) const
 		}
 		else
 		{
-			memset(&a_Dest[i * SegmentLength], 0xff, sizeof(BLOCKTYPE) * SegmentLength);
+			memset(&a_Dest[i * SegmentLength], 0xff, sizeof(NIBBLETYPE) * SegmentLength);
 		}
 	}
 }
