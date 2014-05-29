@@ -318,7 +318,7 @@ void cChunkData::CopyBlocks(BLOCKTYPE * a_Dest, size_t a_Idx, size_t a_Length)  
 		if (a_Idx == 0) 
 		{
 			size_t ToCopy = std::min(SegmentLength, a_Length);
-			length -= ToCopy;
+			a_Length -= ToCopy;
 			if (m_Sections[i] != NULL)
 			{
 				memcpy(
@@ -649,7 +649,7 @@ void cChunkData::SetSkyLight(const NIBBLETYPE * a_Src)
 
 
 
-cChunkData::sChunkSection * cChunkData::Allocate(void) const
+cChunkData::sChunkSection * cChunkData::Allocate(void)
 {
 	// TODO: Use an allocation pool
 	return new cChunkData::sChunkSection;
@@ -659,7 +659,7 @@ cChunkData::sChunkSection * cChunkData::Allocate(void) const
 
 
 
-void cChunkData::Free(cChunkData::sChunkSection * a_Section) const
+void cChunkData::Free(cChunkData::sChunkSection * a_Section)
 {
 	// TODO: Use an allocation pool
 	delete a_Section;
