@@ -143,7 +143,12 @@ private:
 			}
 		}
 
-		return CanBreakPush(a_BlockType) ? false /* CanBreakPush returns true, but we need false to prevent pulling */ : CanPush(a_BlockType, a_BlockMeta);
+		if (CanBreakPush(a_BlockType))
+		{
+			return false; // CanBreakPush returns true, but we need false to prevent pulling
+		}
+		
+		return CanPush(a_BlockType, a_BlockMeta);
 	}
 
 	/// Returns how many blocks the piston has to push (where the first free space is); < 0 when unpushable
