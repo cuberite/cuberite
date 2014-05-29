@@ -121,15 +121,13 @@ public:
 		public cTask
 	{
 	public:
-		cTaskSendBlockToAllPlayers(int a_BlockX, int a_BlockY, int a_BlockZ);
+		cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue);
 
 	protected:
 		// cTask overrides:
 		virtual void Run(cWorld & a_World) override;
 
-		int m_BlockX;
-		int m_BlockY;
-		int m_BlockZ;
+		std::vector<Vector3i> m_SendQueue;
 	};
 
 

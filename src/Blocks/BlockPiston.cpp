@@ -27,6 +27,7 @@
 	}
 
 #define PISTON_TICK_DELAY 1
+#define PISTON_MAX_PUSH_DISTANCE 12
 
 
 
@@ -78,7 +79,7 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 int cBlockPistonHandler::FirstPassthroughBlock(int pistonX, int pistonY, int pistonZ, NIBBLETYPE pistonmeta, cWorld * a_World)
 {
 	// Examine each of the 12 blocks ahead of the piston:
-	for (int ret = 0; ret < 12; ret++)
+	for (int ret = 0; ret < PISTON_MAX_PUSH_DISTANCE; ret++)
 	{
 		BLOCKTYPE currBlock;
 		NIBBLETYPE currMeta;
@@ -144,12 +145,15 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 	// Push blocks, from the furthest to the nearest:
 	int oldx = a_BlockX, oldy = a_BlockY, oldz = a_BlockZ;
 	NIBBLETYPE currBlockMeta;
+	std::vector<Vector3i> ScheduledBlocks;
+	ScheduledBlocks.reserve(PISTON_MAX_PUSH_DISTANCE);
+
 	for (int i = dist + 1; i > 1; i--)
 	{
 		AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, -1);
 		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, currBlock, currBlockMeta);
 		a_World->SetBlock(oldx, oldy, oldz, currBlock, currBlockMeta, false);
-		a_World->ScheduleTask(PISTON_TICK_DELAY, new cWorld::cTaskSendBlockToAllPlayers(oldx, oldy, oldz));
+		ScheduledBlocks.push_back(Vector3i(oldx, oldy, oldz));
 		oldx = a_BlockX;
 		oldy = a_BlockY;
 		oldz = a_BlockZ;
@@ -158,12 +162,13 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 	int extx = a_BlockX;
 	int exty = a_BlockY;
 	int extz = a_BlockZ;
+	ScheduledBlocks.push_back(Vector3i(extx, exty, extz));
 	AddPistonDir(a_BlockX, a_BlockY, a_BlockZ, pistonMeta, -1);
 	// "a_Block" now at piston body, "ext" at future extension
 
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta | 0x8);
 	a_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0), false);
-	a_World->ScheduleTask(PISTON_TICK_DELAY, new cWorld::cTaskSendBlockToAllPlayers(extx, exty, extz));
+	a_World->ScheduleTask(PISTON_TICK_DELAY, new cWorld::cTaskSendBlockToAllPlayers(ScheduledBlocks));
 }
 
 
@@ -209,15 +214,21 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 			// Pull the block
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, tempBlock, tempMeta, false);
 			a_World->SetBlock(tempx, tempy, tempz, E_BLOCK_AIR, 0, false);
-			a_World->ScheduleTask(PISTON_TICK_DELAY + 1, new cWorld::cTaskSendBlockToAllPlayers(a_BlockX, a_BlockY, a_BlockZ));
-			a_World->ScheduleTask(PISTON_TICK_DELAY, new cWorld::cTaskSendBlockToAllPlayers(tempx, tempy, tempz));
+
+			std::vector<Vector3i> ScheduledBlocks;
+			ScheduledBlocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+			ScheduledBlocks.push_back(Vector3i(tempx, tempy, tempz));
+			a_World->ScheduleTask(PISTON_TICK_DELAY + 1, new cWorld::cTaskSendBlockToAllPlayers(ScheduledBlocks));
 			return;
 		}
 	}
 	
 	// Retract without pulling
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0, false);
-	a_World->ScheduleTask(PISTON_TICK_DELAY + 1, new cWorld::cTaskSendBlockToAllPlayers(a_BlockX, a_BlockY, a_BlockZ));
+
+	std::vector<Vector3i> ScheduledBlocks;
+	ScheduledBlocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	a_World->ScheduleTask(PISTON_TICK_DELAY + 1, new cWorld::cTaskSendBlockToAllPlayers(ScheduledBlocks));
 }
 
 

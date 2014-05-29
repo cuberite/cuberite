@@ -3130,10 +3130,8 @@ void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSendBlockTo
 
-cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue) :
+	m_SendQueue(a_SendQueue)
 {
 }
 
@@ -3143,26 +3141,27 @@ void cWorld::cTaskSendBlockToAllPlayers::Run(cWorld & a_World)
 		public cPlayerListCallback
 	{
 	public:
-		cPlayerCallback(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld & a_World) :
-			m_BlockX(a_BlockX),
-			m_BlockY(a_BlockY),
-			m_BlockZ(a_BlockZ),
+		cPlayerCallback(std::vector<Vector3i> & a_SendQueue, cWorld & a_World) :
+			m_SendQueue(a_SendQueue),
 			m_World(a_World)
 		{
 		}
 
 		virtual bool Item(cPlayer * a_Player)
 		{
-			m_World.SendBlockTo(m_BlockX, m_BlockY, m_BlockZ, a_Player);
+			for (std::vector<Vector3i>::const_iterator itr = m_SendQueue.begin(); itr != m_SendQueue.end(); ++itr)
+			{
+				m_World.SendBlockTo(itr->x, itr->y, itr->z, a_Player);
+			}
 			return false;
 		}
 
 	private:
 
-		int m_BlockX, m_BlockY, m_BlockZ;
+		std::vector<Vector3i> m_SendQueue;
 		cWorld & m_World;
 
-	} PlayerCallback(m_BlockX, m_BlockY, m_BlockZ, a_World);
+	} PlayerCallback(m_SendQueue, a_World);
 
 	a_World.ForEachPlayer(PlayerCallback);
 }
