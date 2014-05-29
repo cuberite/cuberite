@@ -196,15 +196,15 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 
 
-void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & DispX, int & DispY, int & DispZ, cProjectileEntity::eKind kind)
+void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind)
 {
 	Vector3d Angle = GetProjectileLookVector(a_Chunk);
-	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_DispX, a_DispZ);
 
-	double EntityX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-	double EntityZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
+	double EntityX = 0.5 + (a_DispX + DispChunk->GetPosX() * cChunkDef::Width);
+	double EntityZ = 0.5 + (a_DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-	m_World->CreateProjectile((double) EntityX, (double) DispY + 0.5, (double) EntityZ, kind, NULL, NULL, &Angle);
+	m_World->CreateProjectile((double) EntityX, (double) a_DispY + 0.5, (double) EntityZ, a_kind, NULL, NULL, &Angle);
 }
 
 
@@ -219,16 +219,20 @@ Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
 	switch (Meta)
 	{
 		case E_META_DROPSPENSER_FACING_YP:
+		{
 			m.Init(Vector3d(), 0, 180, 0);
 			Look = m.Transform(Vector3d(0, 1, 0));
 
 			return Look * 20; // UP
+		}
 
 		case E_META_DROPSPENSER_FACING_YM:
+		{
 			m.Init(Vector3d(), 0, -360, 0);
 			Look = m.Transform(Vector3d(0, -1, 0));
 
 			return Look * 20;; // DOWN
+		}
 
 		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break;	// WEST
 		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break;	// EAST
