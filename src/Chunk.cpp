@@ -961,7 +961,6 @@ void cChunk::ApplyWeatherToTop()
 			}
 			break;
 		}  // case (snowy biomes)
-		// TODO: Rainy biomes should check for farmland and cauldrons
 		default:
 		{
 			break;

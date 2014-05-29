@@ -37,4 +37,7 @@ public:
 
 	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
 
+	/** Returns true if the current weather has any precipitation - rain or storm */
+	virtual bool IsWeatherWet(void) const = 0;
+
 };

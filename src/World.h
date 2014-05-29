@@ -690,8 +690,8 @@ public:
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 	
 	/** Returns true if the current weather has any precipitation - rain or storm */
-	bool IsWeatherWet  (void) const { return (m_Weather != wSunny); }
-	
+	virtual bool IsWeatherWet(void) const override { return (m_Weather != wSunny); }
+
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }

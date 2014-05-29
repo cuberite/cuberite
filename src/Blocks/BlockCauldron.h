@@ -58,6 +58,20 @@ public:
 	{
 		return true;
 	}
+
+	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	{
+		if (!a_WorldInterface.IsWeatherWet())
+		{
+			return;
+		}
+
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		if (Meta < 3)
+		{
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta + 1);
+		}
+	}
 } ;
 
 
