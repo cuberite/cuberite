@@ -14,8 +14,8 @@ class cPlayerLookCheck :
 {
 public:
 	cPlayerLookCheck(Vector3d a_EndermanPos) :
-		m_EndermanPos(a_EndermanPos),
-		m_Player(NULL)
+		m_Player(NULL),
+		m_EndermanPos(a_EndermanPos)
 	{
 	}
 
