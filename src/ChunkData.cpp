@@ -345,7 +345,7 @@ void cChunkData::CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx, size_t a_Lengt
 		}
 		if (ToSkip < SectionBlockCount)
 		{
-			size_t ToCopy = std::min(SectionBlockCount, a_Length);
+			size_t ToCopy = std::min(+SectionBlockCount, a_Length);
 			a_Length -= ToCopy;
 			if (m_Sections[i] != NULL)
 			{
