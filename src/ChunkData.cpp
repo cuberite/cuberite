@@ -333,25 +333,28 @@ cChunkData cChunkData::Copy(void) const
 
 void cChunkData::CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx, size_t a_Length) const
 {
-	// TODO: This code seems wrong. It always copies into a_Dest[i * SegmentLength], even when a_Idx > 0
+	size_t toskip = a_Idx;
+	
 	for (size_t i = 0; i < NumSections; i++)
 	{
 		const size_t SegmentLength = SectionHeight * 16 * 16;
-		if (a_Idx > 0)
+		size_t startpos = 0;
+		if (toskip > 0)
 		{
-			a_Idx = std::max(a_Idx - a_Length, (size_t) 0);
+			toskip = std::max(toskip - SegmentLength, (size_t) 0);
+			startpos = SegmentLength - toskip;
 		}
-		if (a_Idx == 0) 
+		if (toskip == 0) 
 		{
 			size_t ToCopy = std::min(SegmentLength, a_Length);
 			a_Length -= ToCopy;
 			if (m_Sections[i] != NULL)
 			{
-				memcpy(&a_Dest[i * SegmentLength], &m_Sections[i]->m_BlockTypes, sizeof(BLOCKTYPE) * ToCopy);
+				memcpy(&a_Dest[(i * SegmentLength) - a_Idx], (&m_Sections[i]->m_BlockTypes) + startpos, sizeof(BLOCKTYPE) * (ToCopy - startpos));
 			}
 			else
 			{
-				memset(&a_Dest[i * SegmentLength], 0, sizeof(BLOCKTYPE) * ToCopy);
+				memset(&a_Dest[(i * SegmentLength) - a_Idx], 0, sizeof(BLOCKTYPE) * (ToCopy - startpos));
 			}
 		}
 	}
