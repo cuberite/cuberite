@@ -44,6 +44,10 @@ public:
 	NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
 	
 	cChunkData Copy(void) const;
+	
+	// Copys data from this object into the buffer in the a_Dest param
+	// CopyBlocks also povides the optional parameters a_Idx and a_Length which specify an offset and length for
+	// copying part of the BlockTypes array.
 	void CopyBlocks    (BLOCKTYPE * a_Dest, size_t a_Idx = 0, size_t a_Length = cChunkDef::NumBlocks) const;
 	void CopyMeta      (NIBBLETYPE * a_Dest) const;
 	void CopyBlockLight(NIBBLETYPE * a_Dest) const;
