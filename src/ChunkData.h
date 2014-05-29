@@ -91,7 +91,6 @@ private:
 
 	static const size_t SectionHeight = 16;
 	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
-	static const size_t SegmentLength = cChunkDef::Width * cChunkDef::Height * SectionHeight;
 	static const size_t SectionBlockCount = SectionHeight * cChunkDef::Width * cChunkDef::Width;
 
 	#if __cplusplus < 201103L
@@ -101,7 +100,7 @@ private:
 	
 	struct sChunkSection {
 		BLOCKTYPE  m_BlockTypes   [SectionBlockCount];
-		NIBBLETYPE m_BlockMeta    [SectionBlockCount / 2];
+		NIBBLETYPE m_BlockMetas   [SectionBlockCount / 2];
 		NIBBLETYPE m_BlockLight   [SectionBlockCount / 2];
 		NIBBLETYPE m_BlockSkyLight[SectionBlockCount / 2];
 	};

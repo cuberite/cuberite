@@ -19,10 +19,10 @@ int main(int argc, char** argv)
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		for (int i = 0; i < 16 * 16 * 256; i += 4)
 		{
-			SrcBlockBuffer[i+0] = 0xDE;
-			SrcBlockBuffer[i+1] = 0xAD;
-			SrcBlockBuffer[i+2] = 0xBE;
-			SrcBlockBuffer[i+3] = 0xEF;
+			SrcBlockBuffer[i + 0] = 0xde;
+			SrcBlockBuffer[i + 1] = 0xad;
+			SrcBlockBuffer[i + 2] = 0xbe;
+			SrcBlockBuffer[i + 3] = 0xef;
 		}
 	
 		buffer.SetBlockTypes(SrcBlockBuffer);
@@ -42,10 +42,10 @@ int main(int argc, char** argv)
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
 		{
-			SrcNibbleBuffer[i+0] = 0xEF;
-			SrcNibbleBuffer[i+1] = 0xDE;
-			SrcNibbleBuffer[i+2] = 0xAD;
-			SrcNibbleBuffer[i+3] = 0xBE;
+			SrcNibbleBuffer[i + 0] = 0xde;
+			SrcNibbleBuffer[i + 1] = 0xad;
+			SrcNibbleBuffer[i + 2] = 0xbe;
+			SrcNibbleBuffer[i + 3] = 0xef;
 		}
 	
 		buffer.SetMetas(SrcNibbleBuffer);
@@ -66,10 +66,10 @@ int main(int argc, char** argv)
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
 		{
-			SrcNibbleBuffer[i+0] = 0xDE;
-			SrcNibbleBuffer[i+1] = 0xAD;
-			SrcNibbleBuffer[i+2] = 0xBE;
-			SrcNibbleBuffer[i+3] = 0xEF;
+			SrcNibbleBuffer[i + 0] = 0xde;
+			SrcNibbleBuffer[i + 1] = 0xad;
+			SrcNibbleBuffer[i + 2] = 0xbe;
+			SrcNibbleBuffer[i + 3] = 0xef;
 		}
 	
 		buffer.SetBlockLight(SrcNibbleBuffer);
@@ -90,10 +90,10 @@ int main(int argc, char** argv)
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
 		{
-			SrcNibbleBuffer[i+0] = 0xAD;
-			SrcNibbleBuffer[i+1] = 0xBE;
-			SrcNibbleBuffer[i+2] = 0xEF;
-			SrcNibbleBuffer[i+3] = 0xDE;
+			SrcNibbleBuffer[i + 0] = 0xde;
+			SrcNibbleBuffer[i + 1] = 0xad;
+			SrcNibbleBuffer[i + 2] = 0xbe;
+			SrcNibbleBuffer[i + 3] = 0xef;
 		}
 	
 		buffer.SetSkyLight(SrcNibbleBuffer);
