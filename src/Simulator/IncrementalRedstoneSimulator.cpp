@@ -1489,41 +1489,36 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 {
 	// Pistons cannot be powered through their front face; this function verifies that a source meets this requirement
 
-	int OldX = a_RelBlockX, OldY = a_RelBlockY, OldZ = a_RelBlockZ;
 	eBlockFace Face = cBlockPistonHandler::MetaDataToDirection(a_Meta);
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
+	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
+	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
 
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ))) { continue; }
 
-		AddFaceDirection(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Face);
+		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face);
 
 		if (!itr->a_SourcePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
 			return true;
 		}
 
-		a_RelBlockX = OldX;
-		a_RelBlockY = OldY;
-		a_RelBlockZ = OldZ;
+		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face, true);
 	}
 
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ))) { continue; }
 
-		AddFaceDirection(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Face);
+		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face);
 
 		if (!itr->a_MiddlePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
 			return true;
 		}
 
-		a_RelBlockX = OldX;
-		a_RelBlockY = OldY;
-		a_RelBlockZ = OldZ;
+		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face, true);
 	}
 	return false; // Source was in front of the piston's front face
 }
