@@ -55,6 +55,7 @@ cChunkData::~cChunkData()
 	for (size_t i = 0; i < NumSections; i++)
 	{
 		Free(m_Sections[i]);
+		m_Sections[i] = NULL;
 	}
 }
 
@@ -93,6 +94,7 @@ cChunkData::~cChunkData()
 			for (size_t i = 0; i < NumSections; i++)
 			{
 				Free(m_Sections[i]);
+				m_Sections[i] = NULL;
 			}
 		}
 		
@@ -101,6 +103,7 @@ cChunkData::~cChunkData()
 		for (size_t i = 0; i < NumSections; i++)
 		{
 			m_Sections[i] = a_Other.m_Sections[i];
+			a_Other.m_Sections[i] = NULL;
 		}
 		a_Other.m_IsOwner = false;
 		return *this;
@@ -333,27 +336,28 @@ cChunkData cChunkData::Copy(void) const
 
 void cChunkData::CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx, size_t a_Length) const
 {
-	int ToSkip = a_Idx;
+	size_t ToSkip = a_Idx;
 	
 	for (size_t i = 0; i < NumSections; i++)
 	{
 		size_t StartPos = 0;
 		if (ToSkip > 0)
 		{
-			ToSkip = std::max(ToSkip - (int)SectionBlockCount, 0);
-			StartPos = SectionBlockCount - ToSkip;
+			StartPos = std::min(ToSkip, +SectionBlockCount);
+			ToSkip -= StartPos;
 		}
-		if (ToSkip < (int)SectionBlockCount)
+		if (StartPos < SectionBlockCount)
 		{
-			size_t ToCopy = std::min(+SectionBlockCount, a_Length);
+			size_t ToCopy = std::min(+SectionBlockCount - StartPos, a_Length);
 			a_Length -= ToCopy;
 			if (m_Sections[i] != NULL)
 			{
-				memcpy(&a_Dest[(i * SectionBlockCount) - a_Idx], (&m_Sections[i]->m_BlockTypes) + StartPos, sizeof(BLOCKTYPE) * (ToCopy - StartPos));
+				BLOCKTYPE * blockbuffer = m_Sections[i]->m_BlockTypes;
+				memcpy(&a_Dest[(i * SectionBlockCount) + StartPos - a_Idx], blockbuffer + StartPos, sizeof(BLOCKTYPE) * ToCopy);
 			}
 			else
 			{
-				memset(&a_Dest[(i * SectionBlockCount) - a_Idx], 0, sizeof(BLOCKTYPE) * (ToCopy - StartPos));
+				memset(&a_Dest[(i * SectionBlockCount) - a_Idx], 0, sizeof(BLOCKTYPE) * ToCopy);
 			}
 		}
 	}
