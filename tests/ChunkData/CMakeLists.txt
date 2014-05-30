@@ -24,3 +24,6 @@ add_executable(arraystocoords-exe ArraytoCoord.cpp)
 target_link_libraries(arraystocoords-exe ChunkBuffer)
 add_test(NAME arraystocoords-test COMMAND arraystocoords-exe)
 
+add_executable(copyblocks-exe CopyBlocks.cpp)
+target_link_libraries(copyblocks-exe ChunkBuffer)
+add_test(NAME copyblocks-test COMMAND copyblocks-exe)
