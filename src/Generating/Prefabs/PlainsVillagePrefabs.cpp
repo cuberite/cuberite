@@ -797,8 +797,9 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		".:  0: 0\n"  /* air */
 		"a:  5: 0\n"  /* wood */
 		"b: 85: 0\n"  /* fence */
-		"c: 50: 2\n"  /* torch */
-		"d: 50: 1\n"  /* torch */
+		"c: 66: 1\n"  /* tracks */
+		"d: 50: 2\n"  /* torch */
+		"e: 50: 1\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -813,7 +814,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*              */
 		/*    *   0123456789 */
 		/*  0 */ "..b....b.."
-		/*  1 */ ".........."
+		/*  1 */ "cccccccccc"
 		/*  2 */ "..b....b.."
 
 		// Level 2
@@ -827,14 +828,12 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/* z\x*              */
 		/*    *   0123456789 */
 		/*  0 */ "..a....a.."
-		/*  1 */ ".cad..cad."
+		/*  1 */ ".dae..dae."
 		/*  2 */ "..a....a..",
 
 		// Connectors:
 		"-3: 0, 1, 1: 4\n"  /* Type -3, direction X- */
-		"3: 0, 1, 1: 4\n"  /* Type 3, direction X- */
-		"3: 9, 1, 1: 5\n"  /* Type 3, direction X+ */
-		"-3: 9, 1, 1: 5\n"  /* Type -3, direction X+ */,
+		"3: 9, 1, 1: 5\n"  /* Type 3, direction X+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -874,6 +873,8 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:  5: 0\n"  /* wood */
+		"b: 66: 0\n"  /* tracks */
+		"c: 66: 1\n"  /* tracks */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -887,11 +888,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 
 		// Level 1
 		/* z\x*   01234 */
-		/*  0 */ "m...m"
-		/*  1 */ ".a.a."
-		/*  2 */ "....."
-		/*  3 */ ".a.a."
-		/*  4 */ "m...m"
+		/*  0 */ "m.b.m"
+		/*  1 */ ".aba."
+		/*  2 */ "ccccc"
+		/*  3 */ ".aba."
+		/*  4 */ "m.b.m"
 
 		// Level 2
 		/* z\x*   01234 */
@@ -929,7 +930,125 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		false,
 
 		// DefaultWeight:
-		5,
+		1,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // MineshaftCrossing
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MineshaftCrossing:
+	// The data has been exported from the gallery Plains, area index 193, ID 657, created by Aloe_vera
+	{
+		// Size:
+		11, 4, 11,  // SizeX = 11, SizeY = 4, SizeZ = 11
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 3, 10,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 66: 0\n"  /* tracks */
+		"c: 85: 0\n"  /* fence */
+		"d: 66: 1\n"  /* tracks */
+		"e: 50: 4\n"  /* torch */
+		"f: 50: 3\n"  /* torch */
+		"g: 50: 2\n"  /* torch */
+		"h: 50: 1\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmaaammmm"
+		/*  1 */ "mmmmaaammmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmmaaammmm"
+		/*  4 */ "aaaaaaaaaaa"
+		/*  5 */ "aaaaaaaaaaa"
+		/*  6 */ "aaaaaaaaaaa"
+		/*  7 */ "mmmmaaammmm"
+		/*  8 */ "mmmmaaammmm"
+		/*  9 */ "mmmmaaammmm"
+		/* 10 */ "mmmmaaammmm"
+
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm.b.mmmm"
+		/*  1 */ "mmmm.b.mmmm"
+		/*  2 */ "mmmmcbcmmmm"
+		/*  3 */ "mmmm.b.mmmm"
+		/*  4 */ "..c..b..c.."
+		/*  5 */ "ddddddddddd"
+		/*  6 */ "..c..b..c.."
+		/*  7 */ "mmmm.b.mmmm"
+		/*  8 */ "mmmmcbcmmmm"
+		/*  9 */ "mmmm.b.mmmm"
+		/* 10 */ "mmmm.b.mmmm"
+
+		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm...mmmm"
+		/*  2 */ "mmmmc.cmmmm"
+		/*  3 */ "mmmm...mmmm"
+		/*  4 */ "..c.....c.."
+		/*  5 */ "..........."
+		/*  6 */ "..c.....c.."
+		/*  7 */ "mmmm...mmmm"
+		/*  8 */ "mmmmc.cmmmm"
+		/*  9 */ "mmmm...mmmm"
+		/* 10 */ "mmmm...mmmm"
+
+		// Level 3
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm.e.mmmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmm.f.mmmm"
+		/*  4 */ "..a.....a.."
+		/*  5 */ ".gah...gah."
+		/*  6 */ "..a.....a.."
+		/*  7 */ "mmmm.e.mmmm"
+		/*  8 */ "mmmmaaammmm"
+		/*  9 */ "mmmm.f.mmmm"
+		/* 10 */ "mmmm...mmmm",
+
+		// Connectors:
+		"3: 5, 1, 0: 2\n"  /* Type 3, direction Z- */
+		"-3: 5, 1, 0: 2\n"  /* Type -3, direction Z- */
+		"3: 0, 1, 5: 4\n"  /* Type 3, direction X- */
+		"-3: 0, 1, 5: 4\n"  /* Type -3, direction X- */
+		"3: 5, 1, 10: 3\n"  /* Type 3, direction Z+ */
+		"-3: 5, 1, 10: 3\n"  /* Type -3, direction Z+ */
+		"3: 10, 1, 5: 5\n"  /* Type 3, direction X+ */
+		"-3: 10, 1, 5: 5\n"  /* Type -3, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		10,
 
 		// DepthWeight:
 		"",
@@ -957,6 +1076,8 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:  5: 0\n"  /* wood */
+		"b: 66: 0\n"  /* tracks */
+		"c: 66: 1\n"  /* tracks */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -970,11 +1091,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 
 		// Level 1
 		/* z\x*   01234 */
-		/*  0 */ "m...m"
-		/*  1 */ ".a.a."
-		/*  2 */ "....."
-		/*  3 */ ".a.a."
-		/*  4 */ "m...m"
+		/*  0 */ "m.b.m"
+		/*  1 */ ".aba."
+		/*  2 */ "ccccc"
+		/*  3 */ ".aba."
+		/*  4 */ "m.b.m"
 
 		// Level 2
 		/* z\x*   01234 */
@@ -1052,7 +1173,7 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		false,
 
 		// DefaultWeight:
-		5,
+		1,
 
 		// DepthWeight:
 		"",
@@ -1063,6 +1184,703 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// MoveToGround:
 		false,
 	},  // MineshaftDoubleCrossing
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MineshaftSpiral:
+	// The data has been exported from the gallery Plains, area index 198, ID 662, created by Aloe_vera
+	{
+		// Size:
+		7, 12, 7,  // SizeX = 7, SizeY = 12, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 11, 6,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 85: 0\n"  /* fence */
+		"c: 66: 4\n"  /* tracks */
+		"d: 66: 0\n"  /* tracks */
+		"e: 66: 6\n"  /* tracks */
+		"f: 66: 2\n"  /* tracks */
+		"g: 50: 1\n"  /* torch */
+		"h: 50: 3\n"  /* torch */
+		"i: 66: 1\n"  /* tracks */
+		"j: 66: 7\n"  /* tracks */
+		"k: 66: 5\n"  /* tracks */
+		"l: 50: 2\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */
+		"n: 66: 3\n"  /* tracks */
+		"o: 66: 8\n"  /* tracks */
+		"p: 50: 4\n"  /* torch */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mmmmmmm"
+		/*  2 */ "mmmmmmm"
+		/*  3 */ "aaabmmm"
+		/*  4 */ "aaammmm"
+		/*  5 */ "aaammmm"
+		/*  6 */ "aaammmm"
+
+		// Level 1
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mmmmmmm"
+		/*  2 */ "aaammmm"
+		/*  3 */ "aaabmmm"
+		/*  4 */ ".c.mmmm"
+		/*  5 */ ".d.mmmm"
+		/*  6 */ ".d.mmmm"
+
+		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ "aaaammm"
+		/*  1 */ "aaaammm"
+		/*  2 */ "aaaammm"
+		/*  3 */ ".c.bmmm"
+		/*  4 */ "...mmmm"
+		/*  5 */ "...mmmm"
+		/*  6 */ "...mmmm"
+
+		// Level 3
+		/* z\x*   0123456 */
+		/*  0 */ "b..aamm"
+		/*  1 */ ".efaamm"
+		/*  2 */ ".d.aamm"
+		/*  3 */ "...bmmm"
+		/*  4 */ "...mmmm"
+		/*  5 */ "...mmmm"
+		/*  6 */ "...mmmm"
+
+		// Level 4
+		/* z\x*   0123456 */
+		/*  0 */ "b...aaa"
+		/*  1 */ "...faaa"
+		/*  2 */ "....aaa"
+		/*  3 */ "...baaa"
+		/*  4 */ "...mmmm"
+		/*  5 */ "mmmmmmm"
+		/*  6 */ "mmmmmmm"
+
+		// Level 5
+		/* z\x*   0123456 */
+		/*  0 */ "ag....b"
+		/*  1 */ "h...ij."
+		/*  2 */ ".....k."
+		/*  3 */ "...baaa"
+		/*  4 */ "mmmmaaa"
+		/*  5 */ "mmmmmmm"
+		/*  6 */ "mmmmmmm"
+
+		// Level 6
+		/* z\x*   0123456 */
+		/*  0 */ "mm....b"
+		/*  1 */ "mm....."
+		/*  2 */ "mm....."
+		/*  3 */ "mmmb.k."
+		/*  4 */ "mmmaaaa"
+		/*  5 */ "mmmaaaa"
+		/*  6 */ "mmmaaaa"
+
+		// Level 7
+		/* z\x*   0123456 */
+		/*  0 */ "mmm..la"
+		/*  1 */ "mmm...h"
+		/*  2 */ "mmm...."
+		/*  3 */ "mmmb..."
+		/*  4 */ "mmaa.d."
+		/*  5 */ "mmaano."
+		/*  6 */ "mmaa..b"
+
+		// Level 8
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mmmmmmm"
+		/*  2 */ "mmmm..."
+		/*  3 */ "mmmb..."
+		/*  4 */ "aaa...."
+		/*  5 */ "aaan..."
+		/*  6 */ "aaa...b"
+
+		// Level 9
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mmmmmmm"
+		/*  2 */ "mmmmmmm"
+		/*  3 */ "mmmb..."
+		/*  4 */ "......."
+		/*  5 */ "iii...p"
+		/*  6 */ ".....la"
+
+		// Level 10
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mmmmmmm"
+		/*  2 */ "mmmmmmm"
+		/*  3 */ "mmmbmmm"
+		/*  4 */ ".....mm"
+		/*  5 */ ".....mm"
+		/*  6 */ ".....mm"
+
+		// Level 11
+		/* z\x*   0123456 */
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mmmmmmm"
+		/*  2 */ "mmmmmmm"
+		/*  3 */ "mmmbmmm"
+		/*  4 */ "....mmm"
+		/*  5 */ "....mmm"
+		/*  6 */ "....mmm",
+
+		// Connectors:
+		"3: 1, 1, 6: 3\n"  /* Type 3, direction Z+ */
+		"-3: 1, 1, 6: 3\n"  /* Type -3, direction Z+ */
+		"3: 0, 9, 5: 4\n"  /* Type 3, direction X- */
+		"-3: 0, 9, 5: 4\n"  /* Type -3, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // MineshaftSpiral
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MineshaftStairs:
+	// The data has been exported from the gallery Plains, area index 195, ID 659, created by Aloe_vera
+	{
+		// Size:
+		7, 8, 3,  // SizeX = 7, SizeY = 8, SizeZ = 3
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		6, 7, 2,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 66: 1\n"  /* tracks */
+		"c: 66: 2\n"  /* tracks */
+		"d: 85: 0\n"  /* fence */
+		"e: 50: 1\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*   0123456 */
+		/*  0 */ "aaammmm"
+		/*  1 */ "aaammmm"
+		/*  2 */ "aaammmm"
+
+		// Level 1
+		/* z\x*   0123456 */
+		/*  0 */ "..aammm"
+		/*  1 */ "bcaammm"
+		/*  2 */ "..aammm"
+
+		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ "...aamm"
+		/*  1 */ "..caamm"
+		/*  2 */ "...aamm"
+
+		// Level 3
+		/* z\x*   0123456 */
+		/*  0 */ "...daam"
+		/*  1 */ "...caam"
+		/*  2 */ "...daam"
+
+		// Level 4
+		/* z\x*   0123456 */
+		/*  0 */ "m..d.aa"
+		/*  1 */ "m...caa"
+		/*  2 */ "m..d.aa"
+
+		// Level 5
+		/* z\x*   0123456 */
+		/*  0 */ "mm.d..."
+		/*  1 */ "mm...bb"
+		/*  2 */ "mm.d..."
+
+		// Level 6
+		/* z\x*   0123456 */
+		/*  0 */ "mmmd..."
+		/*  1 */ "mmm...."
+		/*  2 */ "mmmd..."
+
+		// Level 7
+		/* z\x*   0123456 */
+		/*  0 */ "mmma..."
+		/*  1 */ "mmmae.."
+		/*  2 */ "mmma...",
+
+		// Connectors:
+		"3: 0, 1, 1: 4\n"  /* Type 3, direction X- */
+		"-3: 0, 1, 1: 4\n"  /* Type -3, direction X- */
+		"3: 6, 5, 1: 5\n"  /* Type 3, direction X+ */
+		"-3: 6, 5, 1: 5\n"  /* Type -3, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // MineshaftStairs
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MineshaftStairsCrossing:
+	// The data has been exported from the gallery Plains, area index 199, ID 663, created by Aloe_vera
+	{
+		// Size:
+		11, 12, 11,  // SizeX = 11, SizeY = 12, SizeZ = 11
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 11, 10,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 66: 5\n"  /* tracks */
+		"c: 85: 0\n"  /* fence */
+		"d: 66: 0\n"  /* tracks */
+		"e: 66: 1\n"  /* tracks */
+		"f: 50: 3\n"  /* torch */
+		"g: 50: 2\n"  /* torch */
+		"h: 50: 1\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmaaammmm"
+		/*  1 */ "mmmmaaammmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm.b.mmmm"
+		/*  1 */ "mmmmaaammmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm.b.mmmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmmaaammmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 3
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm...mmmm"
+		/*  2 */ "mmmmcbcmmmm"
+		/*  3 */ "mmmmaaammmm"
+		/*  4 */ "mmmmaaammmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 4
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm...mmmm"
+		/*  2 */ "mmmmc.cmmmm"
+		/*  3 */ "mmmm.b.mmmm"
+		/*  4 */ "aaaaaaaaaaa"
+		/*  5 */ "aaaaaaaaaaa"
+		/*  6 */ "aaaaaaaaaaa"
+		/*  7 */ "mmmmaaammmm"
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 5
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmm...mmmm"
+		/*  2 */ "mmmmc.cmmmm"
+		/*  3 */ "mmmm...mmmm"
+		/*  4 */ "..c..d..c.."
+		/*  5 */ "eeeeeeeeeee"
+		/*  6 */ "..c..b..c.."
+		/*  7 */ "mmmmaaammmm"
+		/*  8 */ "mmmmaaammmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 6
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmmc.cmmmm"
+		/*  3 */ "mmmm...mmmm"
+		/*  4 */ "..c.....c.."
+		/*  5 */ "..........."
+		/*  6 */ "..c.....c.."
+		/*  7 */ "mmmm.b.mmmm"
+		/*  8 */ "mmmmaaammmm"
+		/*  9 */ "mmmmaaammmm"
+		/* 10 */ "mmmmmmmmmmm"
+
+		// Level 7
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmm.f.mmmm"
+		/*  4 */ "..a.....a.."
+		/*  5 */ ".gah...gah."
+		/*  6 */ "..a.....a.."
+		/*  7 */ "mmmm...mmmm"
+		/*  8 */ "mmmmcbcmmmm"
+		/*  9 */ "mmmmaaammmm"
+		/* 10 */ "mmmmaaammmm"
+
+		// Level 8
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmm...mmmm"
+		/*  7 */ "mmmm...mmmm"
+		/*  8 */ "mmmmc.cmmmm"
+		/*  9 */ "mmmm.b.mmmm"
+		/* 10 */ "mmmmaaammmm"
+
+		// Level 9
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmm...mmmm"
+		/*  8 */ "mmmmc.cmmmm"
+		/*  9 */ "mmmm...mmmm"
+		/* 10 */ "mmmm.d.mmmm"
+
+		// Level 10
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmmc.cmmmm"
+		/*  9 */ "mmmm...mmmm"
+		/* 10 */ "mmmm...mmmm"
+
+		// Level 11
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmmaaammmm"
+		/*  9 */ "mmmm.f.mmmm"
+		/* 10 */ "mmmm...mmmm",
+
+		// Connectors:
+		"3: 0, 5, 5: 4\n"  /* Type 3, direction X- */
+		"-3: 0, 5, 5: 4\n"  /* Type -3, direction X- */
+		"3: 10, 5, 5: 5\n"  /* Type 3, direction X+ */
+		"-3: 10, 5, 5: 5\n"  /* Type -3, direction X+ */
+		"3: 5, 9, 10: 3\n"  /* Type 3, direction Z+ */
+		"-3: 5, 9, 10: 3\n"  /* Type -3, direction Z+ */
+		"3: 5, 1, 0: 2\n"  /* Type 3, direction Z- */
+		"-3: 5, 1, 0: 2\n"  /* Type -3, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		30,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // MineshaftStairsCrossing
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MineshaftTee:
+	// The data has been exported from the gallery Plains, area index 194, ID 658, created by Aloe_vera
+	{
+		// Size:
+		11, 4, 7,  // SizeX = 11, SizeY = 4, SizeZ = 7
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 3, 6,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 66: 0\n"  /* tracks */
+		"c: 85: 0\n"  /* fence */
+		"d: 66: 1\n"  /* tracks */
+		"e: 50: 4\n"  /* torch */
+		"f: 50: 3\n"  /* torch */
+		"g: 50: 2\n"  /* torch */
+		"h: 50: 1\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmaaammmm"
+		/*  1 */ "mmmmaaammmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmmaaammmm"
+		/*  4 */ "aaaaaaaaaaa"
+		/*  5 */ "aaaaaaaaaaa"
+		/*  6 */ "aaaaaaaaaaa"
+
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm.b.mmmm"
+		/*  1 */ "mmmm.b.mmmm"
+		/*  2 */ "mmmmcbcmmmm"
+		/*  3 */ "mmmm.b.mmmm"
+		/*  4 */ "..c..b..c.."
+		/*  5 */ "ddddddddddd"
+		/*  6 */ "..c.....c.."
+
+		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm...mmmm"
+		/*  2 */ "mmmmc.cmmmm"
+		/*  3 */ "mmmm...mmmm"
+		/*  4 */ "..c.....c.."
+		/*  5 */ "..........."
+		/*  6 */ "..c.....c.."
+
+		// Level 3
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmm...mmmm"
+		/*  1 */ "mmmm.e.mmmm"
+		/*  2 */ "mmmmaaammmm"
+		/*  3 */ "mmmm.f.mmmm"
+		/*  4 */ "..a.....a.."
+		/*  5 */ ".gah...gah."
+		/*  6 */ "..a.....a..",
+
+		// Connectors:
+		"3: 0, 1, 5: 4\n"  /* Type 3, direction X- */
+		"-3: 0, 1, 5: 4\n"  /* Type -3, direction X- */
+		"3: 5, 1, 0: 2\n"  /* Type 3, direction Z- */
+		"-3: 5, 1, 0: 2\n"  /* Type -3, direction Z- */
+		"3: 10, 1, 5: 5\n"  /* Type 3, direction X+ */
+		"-3: 10, 1, 5: 5\n"  /* Type -3, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		20,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // MineshaftTee
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// MineshaftsCorridor5:
+	// The data has been exported from the gallery Plains, area index 200, ID 664, created by Aloe_vera
+	{
+		// Size:
+		11, 4, 3,  // SizeX = 11, SizeY = 4, SizeZ = 3
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 3, 2,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 85: 0\n"  /* fence */
+		"c: 66: 1\n"  /* tracks */
+		"d: 50: 2\n"  /* torch */
+		"e: 50: 1\n"  /* torch */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "aaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaa"
+
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..b.....b.."
+		/*  1 */ "ccccccccccc"
+		/*  2 */ "..b.....b.."
+
+		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..b.....b.."
+		/*  1 */ "..........."
+		/*  2 */ "..b.....b.."
+
+		// Level 3
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..a.....a.."
+		/*  1 */ ".dae...dae."
+		/*  2 */ "..a.....a..",
+
+		// Connectors:
+		"3: 10, 1, 1: 5\n"  /* Type 3, direction X+ */
+		"-3: 10, 1, 1: 5\n"  /* Type -3, direction X+ */
+		"-3: 0, 1, 1: 4\n"  /* Type -3, direction X- */
+		"3: 0, 1, 1: 4\n"  /* Type 3, direction X- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		false,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // MineshaftsCorridor5
 
 
 
@@ -2770,8 +3588,8 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:  3: 0\n"  /* dirt */
-		"b:  2: 0\n"  /* grass */
+		"a:  2: 0\n"  /* grass */
+		"b:  3: 0\n"  /* dirt */
 		"c:  4: 0\n"  /* cobblestone */
 		"d: 67: 0\n"  /* stairs */
 		"e: 67: 2\n"  /* stairs */
@@ -2796,19 +3614,19 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Level 0
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "abaaaaabbbb"
-		/*  1 */ "baaaaaaaaab"
-		/*  2 */ "baaaaaaaaab"
-		/*  3 */ "baaaaaaaaab"
-		/*  4 */ "baaaaaaaaab"
-		/*  5 */ "baaaaaaaaab"
-		/*  6 */ "baaaaaaaaab"
-		/*  7 */ "baaaaaaaaab"
-		/*  8 */ "bbaaaaaaabb"
-		/*  9 */ "bbaaaaaaabb"
-		/* 10 */ "bbaaaaaaabb"
-		/* 11 */ "bbaaaaaaabb"
-		/* 12 */ "bbaaaaaaabb"
+		/*  0 */ "aaabbbbaaaa"
+		/*  1 */ "abbbbbbbbba"
+		/*  2 */ "abbbbbbbbba"
+		/*  3 */ "abbbbbbbbba"
+		/*  4 */ "abbbbbbbbba"
+		/*  5 */ "abbbbbbbbba"
+		/*  6 */ "abbbbbbbbba"
+		/*  7 */ "abbbbbbbbba"
+		/*  8 */ "aabbbbbbbaa"
+		/*  9 */ "aabbbbbbbaa"
+		/* 10 */ "aabbbbbbbaa"
+		/* 11 */ "aabbbbbbbaa"
+		/* 12 */ "aabbbbbbbaa"
 
 		// Level 1
 		/* z\x*             1 */
@@ -2821,11 +3639,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  5 */ "mcccccccccm"
 		/*  6 */ "mcccccccccm"
 		/*  7 */ "mcccccccccm"
-		/*  8 */ "mmaaaaaaamm"
-		/*  9 */ "mmaaaaaaamm"
-		/* 10 */ "mmaaaaaaamm"
-		/* 11 */ "mmaaaaaaamm"
-		/* 12 */ "mmaaaaaaamm"
+		/*  8 */ "mmbbbbbbbmm"
+		/*  9 */ "mmbbbbbbbmm"
+		/* 10 */ "mmbbbbbbbmm"
+		/* 11 */ "mmbbbbbbbmm"
+		/* 12 */ "mmbbbbbbbmm"
 
 		// Level 2
 		/* z\x*             1 */
@@ -2838,11 +3656,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  5 */ ".cggggcccc."
 		/*  6 */ ".cggggcccc."
 		/*  7 */ ".ccccccccc."
-		/*  8 */ "..bbbbbbb.."
-		/*  9 */ "..bbbbbbb.."
-		/* 10 */ "..bbbbbbb.."
-		/* 11 */ "..bbbbbbb.."
-		/* 12 */ "..bbbbbbb.."
+		/*  8 */ "..aaaaaaa.."
+		/*  9 */ "..aaaaaaa.."
+		/* 10 */ "..aaaaaaa.."
+		/* 11 */ "..aaaaaaa.."
+		/* 12 */ "..aaaaaaa.."
 
 		// Level 3
 		/* z\x*             1 */
