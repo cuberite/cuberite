@@ -135,113 +135,63 @@ public:
 	}
 
 
-	/** Returns the metadata for the opposite door state (open vs closed) */
-	static NIBBLETYPE ChangeStateMetaData(NIBBLETYPE a_MetaData)
+	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		return a_MetaData ^ 4;
+		NIBBLETYPE Meta = GetMetaFromRightDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		return ((Meta & 0x4) != 0);
 	}
 
 
-	static bool IsOpen(cChunkInterface & a_ChunkInterface, int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
+	static NIBBLETYPE GetMetaFromRightDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		BLOCKTYPE Block;
-		NIBBLETYPE Meta;
-		a_ChunkInterface.GetBlockTypeMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Block, Meta);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-		if (!IsDoor(Block))
+		if ((Meta & 0x8) != 0)
 		{
-			return false;
+			NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+			return (DownMeta & 0x7) | 0x8 | (((Meta & 0x1) != 0) ? 16 : 0);
 		}
-
-		return ((Meta & 0x4) == 4);
+		else
+		{
+			NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
+			return (Meta & 0x7) | (((UpMeta & 0x1) != 0) ? 16 : 0);
+		}
 	}
 
 
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
-		BLOCKTYPE Block;
-		NIBBLETYPE Meta;
-		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
+		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = GetMetaFromRightDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 
-		if (!IsDoor(Block) || ((Meta & 0x4) == a_Open))
+		if (!IsDoor(Block))
+		{
+			return;
+		}
+
+		bool Opened = (Meta & 0x4) != 0;
+		if (Opened == a_Open)
 		{
 			return;
 		}
 
 		// Change the door
-		if (a_Open)
+		NIBBLETYPE NewMeta = (Meta & 0x7) ^ 0x4;
+		if ((Meta & 0x8) == 0)
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x4);
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, NewMeta);
 		}
 		else
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0xFFFFFFFB);
-		}
-
-		int OtherPartY = a_BlockY;
-		if (Meta & 0x8)
-		{
-			// Current block is top of the door
-			a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, Block, Meta);
-			if (IsDoor(Block) && !(Meta & 0x8))
-			{
-				OtherPartY--;
-			}
-		}
-		else
-		{
-			// Current block is bottom of the door
-			a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY + 1, a_BlockZ, Block, Meta);
-			if (IsDoor(Block) && (Meta & 0x8))
-			{
-				OtherPartY++;
-			}
-		}
-
-		// Change the other door part
-		if (a_BlockY != OtherPartY)
-		{
-			if (a_Open)
-			{
-				a_ChunkInterface.SetBlockMeta(a_BlockX, OtherPartY, a_BlockZ, Meta | 0x4);
-			}
-			else
-			{
-				a_ChunkInterface.SetBlockMeta(a_BlockX, OtherPartY, a_BlockZ, Meta & 0xFFFFFFFB);
-			}
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ, NewMeta);
 		}
 	}
 
 
 	/** Changes the door at the specified coords from open to close or vice versa */
-	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_X, int a_Y, int a_Z)
+	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_X, a_Y, a_Z);
-
-		a_ChunkInterface.SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData(OldMetaData));
-
-		if (OldMetaData & 8)
-		{
-			// Current block is top of the door
-			BLOCKTYPE  BottomBlock = a_ChunkInterface.GetBlock(a_X, a_Y - 1, a_Z);
-			NIBBLETYPE BottomMeta = a_ChunkInterface.GetBlockMeta(a_X, a_Y - 1, a_Z);
-
-			if (IsDoor(BottomBlock) && !(BottomMeta & 8))
-			{
-				a_ChunkInterface.SetBlockMeta(a_X, a_Y - 1, a_Z, ChangeStateMetaData(BottomMeta));
-			}
-		}
-		else
-		{
-			// Current block is bottom of the door
-			BLOCKTYPE  TopBlock = a_ChunkInterface.GetBlock(a_X, a_Y + 1, a_Z);
-			NIBBLETYPE TopMeta = a_ChunkInterface.GetBlockMeta(a_X, a_Y + 1, a_Z);
-
-			if (IsDoor(TopBlock) && (TopMeta & 8))
-			{
-				a_ChunkInterface.SetBlockMeta(a_X, a_Y + 1, a_Z, ChangeStateMetaData(TopMeta));
-			}
-		}
+		SetOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, !IsOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
 	}
 } ;
 
