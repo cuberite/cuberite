@@ -272,12 +272,18 @@ void inline LOGERROR(const char* a_Format, ...)
 	};
 
 	#ifdef _WIN32
+		#if (defined(_MSC_VER) && defined(_DEBUG))
+			#define DBG_BREAK _CrtDbgBreak()
+		#else
+			#define DBG_BREAK
+		#endif
 		#define REPORT_ERROR(FMT, ...) \
 		{ \
 			AString msg = Printf(FMT, __VA_ARGS__); \
 			puts(msg.c_str()); \
 			fflush(stdout); \
 			OutputDebugStringA(msg.c_str()); \
+			DBG_BREAK; \
 		}
 	#else
 		#define REPORT_ERROR(FMT, ...) \
