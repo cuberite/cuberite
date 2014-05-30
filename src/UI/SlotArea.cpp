@@ -1397,11 +1397,6 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			return;
 		}
 
-		if (a_ClickAction == caDblClick)
-		{
-			return;
-		}
-
 		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
 		{
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
@@ -1419,6 +1414,10 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 		if (!DraggingItem.IsEmpty())
 		{
+			if (a_ClickAction == caDblClick)
+			{
+				return;
+			}
 			if (!DraggingItem.IsEqual(Slot))
 			{
 				return;
