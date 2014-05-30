@@ -103,7 +103,6 @@ cChunkData::~cChunkData()
 		for (size_t i = 0; i < NumSections; i++)
 		{
 			m_Sections[i] = a_Other.m_Sections[i];
-			a_Other.m_Sections[i] = NULL;
 		}
 		a_Other.m_IsOwner = false;
 		return *this;
