@@ -109,14 +109,14 @@ int main(int argc, char** argv)
 		
 		// Zero's
 		buffer.SetBlock(0, 0, 0, 0x0);
-		buffer.SetBlock(0, 0, 1, 0xAB);
+		buffer.SetBlock(0, 0, 1, 0xab);
 		testassert(buffer.GetBlock(0, 0, 0) == 0x0);
-		testassert(buffer.GetBlock(0, 0, 1) == 0xAB);
+		testassert(buffer.GetBlock(0, 0, 1) == 0xab);
 
 		buffer.SetMeta(0, 16, 0, 0x0);
-		buffer.SetMeta(0, 16, 1, 0xC);
+		buffer.SetMeta(0, 16, 1, 0xc);
 		testassert(buffer.GetMeta(0, 16, 0) == 0x0);
-		testassert(buffer.GetMeta(0, 16, 1) == 0xC);
+		testassert(buffer.GetMeta(0, 16, 1) == 0xc);
 	}
 	
 	
