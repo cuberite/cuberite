@@ -271,9 +271,25 @@ void inline LOGERROR(const char* a_Format, ...)
 	{
 	};
 
+	#ifdef _WIN32
+		#define REPORT_ERROR(FMT, ...) \
+		{ \
+			AString msg = Printf(FMT, __VA_ARGS__); \
+			puts(msg.c_str()); \
+			fflush(stdout); \
+			OutputDebugStringA(msg.c_str()); \
+		}
+	#else
+		#define REPORT_ERROR(FMT, ...) \
+		{ \
+			AString msg = Printf(FMT, __VA_ARGS__); \
+			puts(msg.c_str()); \
+			fflush(stdout); \
+		}
+	#endif
 	#define ASSERT(x) do { if (!(x)) { throw cAssertFailure();} } while (0)
-	#define testassert(x) do { if(!(x)) { exit(1); } } while (0)
-	#define CheckAsserts(x) do { try {x} catch (cAssertFailure) { break; }  exit(1); } while (0)
+	#define testassert(x) do { if(!(x)) { REPORT_ERROR("Test failure: %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } } while (0)
+	#define CheckAsserts(x) do { try {x} catch (cAssertFailure) { break; } REPORT_ERROR("Test failure: assert didn't fire for %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } while (0)
 
 #else
 	#ifdef  _DEBUG

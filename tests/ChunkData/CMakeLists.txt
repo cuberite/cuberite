@@ -5,7 +5,7 @@ enable_testing()
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 
 add_definitions(-DTEST_GLOBALS=1)
-add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp)
+add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)
 
 
 add_executable(creatable-exe creatable.cpp)
