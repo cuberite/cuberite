@@ -34,8 +34,8 @@ int main(int argc, char** argv)
 		buffer.SetBlockTypes(SrcBlockBuffer);
 		buffer.CopyBlockTypes(DstBlockBuffer);
 		testassert(memcmp(SrcBlockBuffer, DstBlockBuffer, (16 * 16 * 256) - 1) == 0);
-	
 	}
+	
 	{
 		cChunkData buffer;
 	
@@ -57,9 +57,8 @@ int main(int argc, char** argv)
 		buffer.SetMetas(SrcNibbleBuffer);
 		buffer.CopyMetas(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
-
-	
 	}
+	
 	{
 		cChunkData buffer;
 		
@@ -81,9 +80,8 @@ int main(int argc, char** argv)
 		buffer.SetBlockLight(SrcNibbleBuffer);
 		buffer.CopyBlockLight(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 /2) - 1) == 0);
-	
-		
 	}
+	
 	{
 		cChunkData buffer;
 		
@@ -101,13 +99,12 @@ int main(int argc, char** argv)
 		buffer.CopySkyLight(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
 	
-
 		memset(SrcNibbleBuffer, 0xFF, 16 * 16 * 256 / 2);
 		buffer.SetSkyLight(SrcNibbleBuffer);
 		buffer.CopySkyLight(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
-		
 	}
+	
 	{
 		cChunkData buffer;
 		
@@ -131,4 +128,7 @@ int main(int argc, char** argv)
 		buffer.CopySkyLight(DstNibbleBuffer);
 		testassert(memcmp(SrcNibbleBuffer, DstNibbleBuffer, (16 * 16 * 256 / 2) - 1) == 0);
 	}
+	
+	// All tests successful:
+	return 0;
 }
