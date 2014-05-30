@@ -1441,7 +1441,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 				}
 				case caLeftClick:
 				{
-					DraggingItem = cItem(Slot);
+					DraggingItem = Slot;
 					Slot.Empty();
 					break;
 				}
