@@ -1452,7 +1452,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 					DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
 
-					if (Slot.IsEmpty())
+					if (Slot.m_ItemCount <= 0)
 					{
 						Slot.Empty();
 					}
