@@ -30,15 +30,18 @@ int main(int argc, char ** argv)
 	BLOCKTYPE TestBuffer[5 * cChunkDef::NumBlocks];
 	size_t WritePosIdx = 2 * cChunkDef::NumBlocks;
 	BLOCKTYPE * WritePosition = &TestBuffer[WritePosIdx];
-	for (size_t idx = 0; idx < 5000; idx++)
+	memset(TestBuffer, 0x03, sizeof(TestBuffer));
+	size_t LastReportedStep = 1;
+	for (size_t idx = 0; idx < 5000; idx += 7)
 	{
-		for (size_t len = 1; len < 1000; len += 15)
+		if (idx / 500 != LastReportedStep)
 		{
-			//printf("Testing copying %u blocks from index %u\n", (unsigned)len, (unsigned)idx);
-			
-			//initalize buffer
-			memset(TestBuffer, 0x03, sizeof(TestBuffer));
+			printf("Testing index %u...\n", (unsigned)idx);
+			LastReportedStep = idx / 500;
+		}
 
+		for (size_t len = 3; len < 1000; len += 13)
+		{
 			Data.CopyBlockTypes(WritePosition, idx, len);
 
 			// Verify the data copied:
@@ -56,7 +59,13 @@ int main(int argc, char ** argv)
 			{
 				assert_test(TestBuffer[i] == 0x03);
 			}
-		}
+
+			// Re-initialize the buffer for the next test:
+			for (size_t i = 0; i < len; i++)
+			{
+				WritePosition[i] = 0x03;
+			}
+		}  // for len
 	}  // for idx
 	return 0;
 }
