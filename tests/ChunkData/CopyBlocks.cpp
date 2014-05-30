@@ -30,12 +30,14 @@ int main(int argc, char ** argv)
 	BLOCKTYPE TestBuffer[5 * cChunkDef::NumBlocks];
 	size_t WritePosIdx = 2 * cChunkDef::NumBlocks;
 	BLOCKTYPE * WritePosition = &TestBuffer[WritePosIdx];
-	memset(TestBuffer, 0x03, sizeof(TestBuffer));
 	for (size_t idx = 0; idx < 5000; idx++)
 	{
 		for (size_t len = 1; len < 1000; len += 15)
 		{
-			printf("Testing copying %u blocks from index %u\n", (unsigned)len, (unsigned)idx);
+			//printf("Testing copying %u blocks from index %u\n", (unsigned)len, (unsigned)idx);
+			
+			//initalize buffer
+			memset(TestBuffer, 0x03, sizeof(TestBuffer));
 
 			Data.CopyBlockTypes(WritePosition, idx, len);
 
@@ -45,7 +47,7 @@ int main(int argc, char ** argv)
 				assert_test(WritePosition[i] == 0x01);
 			}
 			// Verify the space before the copied data hasn't been changed:
-			for (size_t i = 0; i < WritePosIdx + idx; i++)
+			for (size_t i = 0; i < WritePosIdx; i++)
 			{
 				assert_test(TestBuffer[i] == 0x03);
 			}
