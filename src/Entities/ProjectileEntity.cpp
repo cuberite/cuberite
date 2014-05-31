@@ -68,8 +68,7 @@ protected:
 			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
 			{
 				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
-				const Vector3i BlockHitPos = Vector3i(Intersection);
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, Face, &BlockHitPos))
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, &Intersection))
 				{
 					return false;
 				}
