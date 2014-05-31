@@ -1472,18 +1472,18 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 	// The data has been exported from the gallery Plains, area index 199, ID 663, created by Aloe_vera
 	{
 		// Size:
-		11, 12, 11,  // SizeX = 11, SizeY = 12, SizeZ = 11
+		11, 12, 12,  // SizeX = 11, SizeY = 12, SizeZ = 12
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		10, 11, 10,  // MaxX, MaxY, MaxZ
+		10, 11, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
 		"a:  5: 0\n"  /* wood */
-		"b: 66: 5\n"  /* tracks */
-		"c: 85: 0\n"  /* fence */
-		"d: 66: 0\n"  /* tracks */
+		"b: 66: 0\n"  /* tracks */
+		"c: 66: 5\n"  /* tracks */
+		"d: 85: 0\n"  /* fence */
 		"e: 66: 1\n"  /* tracks */
 		"f: 50: 3\n"  /* torch */
 		"g: 50: 2\n"  /* torch */
@@ -1496,21 +1496,6 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*    *   01234567890 */
 		/*  0 */ "mmmmaaammmm"
 		/*  1 */ "mmmmaaammmm"
-		/*  2 */ "mmmmmmmmmmm"
-		/*  3 */ "mmmmmmmmmmm"
-		/*  4 */ "mmmmmmmmmmm"
-		/*  5 */ "mmmmmmmmmmm"
-		/*  6 */ "mmmmmmmmmmm"
-		/*  7 */ "mmmmmmmmmmm"
-		/*  8 */ "mmmmmmmmmmm"
-		/*  9 */ "mmmmmmmmmmm"
-		/* 10 */ "mmmmmmmmmmm"
-
-		// Level 1
-		/* z\x*             1 */
-		/*    *   01234567890 */
-		/*  0 */ "mmmm.b.mmmm"
-		/*  1 */ "mmmmaaammmm"
 		/*  2 */ "mmmmaaammmm"
 		/*  3 */ "mmmmmmmmmmm"
 		/*  4 */ "mmmmmmmmmmm"
@@ -1520,12 +1505,13 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  8 */ "mmmmmmmmmmm"
 		/*  9 */ "mmmmmmmmmmm"
 		/* 10 */ "mmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmm"
 
-		// Level 2
+		// Level 1
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "mmmm...mmmm"
-		/*  1 */ "mmmm.b.mmmm"
+		/*  0 */ "mmmm.b.mmmm"
+		/*  1 */ "mmmm.c.mmmm"
 		/*  2 */ "mmmmaaammmm"
 		/*  3 */ "mmmmaaammmm"
 		/*  4 */ "mmmmmmmmmmm"
@@ -1535,13 +1521,14 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  8 */ "mmmmmmmmmmm"
 		/*  9 */ "mmmmmmmmmmm"
 		/* 10 */ "mmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmm"
 
-		// Level 3
+		// Level 2
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "mmmm...mmmm"
 		/*  1 */ "mmmm...mmmm"
-		/*  2 */ "mmmmcbcmmmm"
+		/*  2 */ "mmmm.c.mmmm"
 		/*  3 */ "mmmmaaammmm"
 		/*  4 */ "mmmmaaammmm"
 		/*  5 */ "mmmmmmmmmmm"
@@ -1550,66 +1537,87 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  8 */ "mmmmmmmmmmm"
 		/*  9 */ "mmmmmmmmmmm"
 		/* 10 */ "mmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmm"
 
-		// Level 4
+		// Level 3
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "mmmm...mmmm"
 		/*  1 */ "mmmm...mmmm"
-		/*  2 */ "mmmmc.cmmmm"
-		/*  3 */ "mmmm.b.mmmm"
-		/*  4 */ "aaaaaaaaaaa"
-		/*  5 */ "aaaaaaaaaaa"
-		/*  6 */ "aaaaaaaaaaa"
-		/*  7 */ "mmmmaaammmm"
+		/*  2 */ "mmmm...mmmm"
+		/*  3 */ "mmmmdcdmmmm"
+		/*  4 */ "mmmmaaammmm"
+		/*  5 */ "mmmmaaammmm"
+		/*  6 */ "mmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmm"
 		/*  8 */ "mmmmmmmmmmm"
 		/*  9 */ "mmmmmmmmmmm"
 		/* 10 */ "mmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmm"
+
+		// Level 4
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "mmmm...mmmm"
+		/*  2 */ "mmmm...mmmm"
+		/*  3 */ "mmmmd.dmmmm"
+		/*  4 */ "mmmm.c.mmmm"
+		/*  5 */ "aaaaaaaaaaa"
+		/*  6 */ "aaaaaaaaaaa"
+		/*  7 */ "aaaaaaaaaaa"
+		/*  8 */ "mmmmaaammmm"
+		/*  9 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmm"
 
 		// Level 5
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "mmmmmmmmmmm"
-		/*  1 */ "mmmm...mmmm"
-		/*  2 */ "mmmmc.cmmmm"
-		/*  3 */ "mmmm...mmmm"
-		/*  4 */ "..c..d..c.."
-		/*  5 */ "eeeeeeeeeee"
-		/*  6 */ "..c..b..c.."
-		/*  7 */ "mmmmaaammmm"
+		/*  1 */ "mmmmmmmmmmm"
+		/*  2 */ "mmmm...mmmm"
+		/*  3 */ "mmmmd.dmmmm"
+		/*  4 */ "mmmm...mmmm"
+		/*  5 */ "..d..b..d.."
+		/*  6 */ "eeeeeeeeeee"
+		/*  7 */ "..d..c..d.."
 		/*  8 */ "mmmmaaammmm"
-		/*  9 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmaaammmm"
 		/* 10 */ "mmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmm"
 
 		// Level 6
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "mmmmmmmmmmm"
 		/*  1 */ "mmmmmmmmmmm"
-		/*  2 */ "mmmmc.cmmmm"
-		/*  3 */ "mmmm...mmmm"
-		/*  4 */ "..c.....c.."
-		/*  5 */ "..........."
-		/*  6 */ "..c.....c.."
-		/*  7 */ "mmmm.b.mmmm"
-		/*  8 */ "mmmmaaammmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmd.dmmmm"
+		/*  4 */ "mmmm...mmmm"
+		/*  5 */ "..d.....d.."
+		/*  6 */ "..........."
+		/*  7 */ "..d.....d.."
+		/*  8 */ "mmmm.c.mmmm"
 		/*  9 */ "mmmmaaammmm"
-		/* 10 */ "mmmmmmmmmmm"
+		/* 10 */ "mmmmaaammmm"
+		/* 11 */ "mmmmmmmmmmm"
 
 		// Level 7
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "mmmmmmmmmmm"
 		/*  1 */ "mmmmmmmmmmm"
-		/*  2 */ "mmmmaaammmm"
-		/*  3 */ "mmmm.f.mmmm"
-		/*  4 */ "..a.....a.."
-		/*  5 */ ".gah...gah."
-		/*  6 */ "..a.....a.."
-		/*  7 */ "mmmm...mmmm"
-		/*  8 */ "mmmmcbcmmmm"
-		/*  9 */ "mmmmaaammmm"
+		/*  2 */ "mmmmmmmmmmm"
+		/*  3 */ "mmmmaaammmm"
+		/*  4 */ "mmmm.f.mmmm"
+		/*  5 */ "..a.....a.."
+		/*  6 */ ".gah...gah."
+		/*  7 */ "..a.....a.."
+		/*  8 */ "mmmm...mmmm"
+		/*  9 */ "mmmmdcdmmmm"
 		/* 10 */ "mmmmaaammmm"
+		/* 11 */ "mmmmaaammmm"
 
 		// Level 8
 		/* z\x*             1 */
@@ -1620,11 +1628,12 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  3 */ "mmmmmmmmmmm"
 		/*  4 */ "mmmmmmmmmmm"
 		/*  5 */ "mmmmmmmmmmm"
-		/*  6 */ "mmmm...mmmm"
+		/*  6 */ "mmmmmmmmmmm"
 		/*  7 */ "mmmm...mmmm"
-		/*  8 */ "mmmmc.cmmmm"
-		/*  9 */ "mmmm.b.mmmm"
-		/* 10 */ "mmmmaaammmm"
+		/*  8 */ "mmmm...mmmm"
+		/*  9 */ "mmmmd.dmmmm"
+		/* 10 */ "mmmm.c.mmmm"
+		/* 11 */ "mmmmaaammmm"
 
 		// Level 9
 		/* z\x*             1 */
@@ -1636,10 +1645,11 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  4 */ "mmmmmmmmmmm"
 		/*  5 */ "mmmmmmmmmmm"
 		/*  6 */ "mmmmmmmmmmm"
-		/*  7 */ "mmmm...mmmm"
-		/*  8 */ "mmmmc.cmmmm"
-		/*  9 */ "mmmm...mmmm"
-		/* 10 */ "mmmm.d.mmmm"
+		/*  7 */ "mmmmmmmmmmm"
+		/*  8 */ "mmmm...mmmm"
+		/*  9 */ "mmmmd.dmmmm"
+		/* 10 */ "mmmm...mmmm"
+		/* 11 */ "mmmm.b.mmmm"
 
 		// Level 10
 		/* z\x*             1 */
@@ -1652,9 +1662,10 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  5 */ "mmmmmmmmmmm"
 		/*  6 */ "mmmmmmmmmmm"
 		/*  7 */ "mmmmmmmmmmm"
-		/*  8 */ "mmmmc.cmmmm"
-		/*  9 */ "mmmm...mmmm"
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmd.dmmmm"
 		/* 10 */ "mmmm...mmmm"
+		/* 11 */ "mmmm...mmmm"
 
 		// Level 11
 		/* z\x*             1 */
@@ -1667,19 +1678,20 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*  5 */ "mmmmmmmmmmm"
 		/*  6 */ "mmmmmmmmmmm"
 		/*  7 */ "mmmmmmmmmmm"
-		/*  8 */ "mmmmaaammmm"
-		/*  9 */ "mmmm.f.mmmm"
-		/* 10 */ "mmmm...mmmm",
+		/*  8 */ "mmmmmmmmmmm"
+		/*  9 */ "mmmmaaammmm"
+		/* 10 */ "mmmm.f.mmmm"
+		/* 11 */ "mmmm...mmmm",
 
 		// Connectors:
-		"3: 0, 5, 5: 4\n"  /* Type 3, direction X- */
-		"-3: 0, 5, 5: 4\n"  /* Type -3, direction X- */
-		"3: 10, 5, 5: 5\n"  /* Type 3, direction X+ */
-		"-3: 10, 5, 5: 5\n"  /* Type -3, direction X+ */
-		"3: 5, 9, 10: 3\n"  /* Type 3, direction Z+ */
-		"-3: 5, 9, 10: 3\n"  /* Type -3, direction Z+ */
-		"3: 5, 1, 0: 2\n"  /* Type 3, direction Z- */
-		"-3: 5, 1, 0: 2\n"  /* Type -3, direction Z- */,
+		"3: 0, 5, 6: 4\n"  /* Type 3, direction X- */
+		"-3: 0, 5, 6: 4\n"  /* Type -3, direction X- */
+		"3: 10, 5, 6: 5\n"  /* Type 3, direction X+ */
+		"-3: 10, 5, 6: 5\n"  /* Type -3, direction X+ */
+		"3: 5, 9, 11: 3\n"  /* Type 3, direction Z+ */
+		"-3: 5, 9, 11: 3\n"  /* Type -3, direction Z+ */
+		"3: 5, 1, 1: 2\n"  /* Type 3, direction Z- */
+		"-3: 5, 1, 1: 2\n"  /* Type -3, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -3143,17 +3155,17 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		// Level 0
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "mmmmmmmmmm"
-		/*  1 */ "maaaaammmm"
-		/*  2 */ "maaaaammmm"
-		/*  3 */ "maaaaabbbb"
+		/*  0 */ ".........."
+		/*  1 */ ".aaaaa...."
+		/*  2 */ ".aaaaa...."
+		/*  3 */ ".aaaaabbbb"
 		/*  4 */ "aaaaaabbbb"
 		/*  5 */ "aaaaaabbbb"
 		/*  6 */ "aaaaaabbbb"
-		/*  7 */ "maaaaabbbb"
-		/*  8 */ "maaaaabbbb"
-		/*  9 */ "maaaaammmm"
-		/* 10 */ "mmmmmmmmmm"
+		/*  7 */ ".aaaaabbbb"
+		/*  8 */ ".aaaaabbbb"
+		/*  9 */ ".aaaaa...."
+		/* 10 */ ".........."
 
 		// Level 1
 		/* z\x*              */
