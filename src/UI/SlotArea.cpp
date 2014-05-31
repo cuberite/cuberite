@@ -1397,12 +1397,6 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			return;
 		}
 
-		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
-		{
-			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
-			return;
-		}
-
 		cItem Slot(*GetSlot(a_SlotNum, a_Player));
 		if (!Slot.IsSameType(a_ClickedItem))
 		{
@@ -1411,8 +1405,15 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 			bAsync = true;
 		}
-		cItem & DraggingItem = a_Player.GetDraggingItem();
 
+		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+		{
+			HandleSmeltItem(Slot, a_Player);
+			ShiftClicked(a_Player, a_SlotNum, Slot);
+			return;
+		}
+
+		cItem & DraggingItem = a_Player.GetDraggingItem();
 		if (!DraggingItem.IsEmpty())
 		{
 			if (a_ClickAction == caDblClick)
@@ -1429,6 +1430,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			}
 
 			DraggingItem.m_ItemCount += Slot.m_ItemCount;
+			HandleSmeltItem(Slot, a_Player);
 			Slot.Empty();
 		}
 		else
@@ -1443,6 +1445,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 				case caLeftClick:
 				{
 					DraggingItem = Slot;
+					HandleSmeltItem(Slot, a_Player);
 					Slot.Empty();
 					break;
 				}
@@ -1456,6 +1459,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 					{
 						Slot.Empty();
 					}
+					HandleSmeltItem(DraggingItem, a_Player);
 					break;
 				}
 				default:
