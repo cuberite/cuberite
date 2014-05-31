@@ -163,13 +163,12 @@ public:
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
 		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-
 		if (!IsDoor(Block))
 		{
 			return;
 		}
 
+		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 		bool Opened = (Meta & 0x4) != 0;
 		if (Opened == a_Open)
 		{
