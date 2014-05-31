@@ -727,10 +727,9 @@ void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Mineca
 
 
 
-bool cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
+void cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
 {
 	m_IsLightValid = a_IsLightValid;
-	return a_IsLightValid;  // We want lighting only if it's valid, otherwise don't bother
 }
 
 

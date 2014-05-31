@@ -14,6 +14,7 @@
 #include "WorldStorage.h"
 #include "../Vector3.h"
 #include "json/json.h"
+#include "ChunkDataCallback.h"
 
 
 
@@ -21,7 +22,7 @@
 
 /// Helper class for serializing a chunk into Json
 class cJsonChunkSerializer :
-	public cChunkDataCollector
+	public cChunkDataArrayCollector
 {
 public:
 
@@ -42,7 +43,7 @@ protected:
 	// cChunkDataCollector overrides:
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
-	virtual bool LightIsValid (bool a_IsLightValid) override;
+	virtual void LightIsValid (bool a_IsLightValid) override;
 } ;
 
 

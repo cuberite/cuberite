@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8.2)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
@@ -12,6 +12,10 @@ endif()
 
 if(DEFINED ENV{TRAVIS_MCSERVER_FORCE32})
 	set(FORCE32 $ENV{TRAVIS_MCSERVER_FORCE32})
+endif()
+
+if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})
+	set(BUILD_WITH_COVERAGE $ENV{TRAVIS_BUILD_WITH_COVERAGE})
 endif()
 
 # This has to be done before any flags have been set up.
@@ -68,4 +72,9 @@ include(lib/polarssl.cmake)
 set_exe_flags()
 
 add_subdirectory (src)
+
+if(${SELF_TEST})
+	enable_testing()
+	add_subdirectory (tests)
+endif()
 
