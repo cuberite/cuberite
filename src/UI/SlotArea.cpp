@@ -1484,6 +1484,44 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 
 
+void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			return;
+		}
+	}  // for i - Slots
+}
+
+
+
+
+
 const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
 	UNUSED(a_Player);
