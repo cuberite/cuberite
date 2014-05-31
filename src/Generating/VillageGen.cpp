@@ -147,6 +147,11 @@ public:
 		}
 	}
 	
+	~cVillage()
+	{
+		cPieceGenerator::FreePieces(m_Pieces);
+	}
+	
 protected:
 	/** Seed for the random functions */
 	int m_Seed;
