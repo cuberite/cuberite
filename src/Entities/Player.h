@@ -328,7 +328,7 @@ public:
 	void SetVisible( bool a_bVisible );										// tolua_export
 	bool IsVisible(void) const { return m_bVisible; }									// tolua_export
 
-	bool MoveToWorld(const char * a_WorldName);  // tolua_export
+	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL) override;  // tolua_export
 
 	bool SaveToDisk(void);
 	bool LoadFromDisk(void);

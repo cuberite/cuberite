@@ -39,7 +39,6 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 	{
 		LOGWARN("[Generator] CompositionGen value not set in world.ini, using \"Biomal\".");
 		CompoGenName = "Biomal";
-		a_IniFile.SetValue("Generator", "CompositionGen", CompoGenName);
 	}
 	
 	cTerrainCompositionGen * res = NULL;
@@ -93,7 +92,6 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 	else
 	{
 		LOGWARN("Unknown CompositionGen \"%s\", using \"Biomal\" instead.", CompoGenName.c_str());
-		a_IniFile.DeleteValue("Generator", "CompositionGen");
 		a_IniFile.SetValue("Generator", "CompositionGen", "Biomal");
 		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_HeightGen, a_Seed);
 	}
@@ -291,19 +289,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 	int Seed = m_ChunkGenerator.GetSeed();
 	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
 
-	// Older configuration used "Structures" in addition to "Finishers"; we don't distinguish between the two anymore (#398)
-	// Therefore, we load Structures from the ini file for compatibility, but move its contents over to Finishers:
-	AString Structures = a_IniFile.GetValue("Generator", "Structures", "");
-	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, LavaLakes, OreNests, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
-	if (!Structures.empty())
-	{
-		LOGINFO("[Generator].Structures is deprecated, moving the contents to [Generator].Finishers.");
-		// Structures used to generate before Finishers, so place them first:
-		Structures.append(", ");
-		Finishers = Structures + Finishers;
-		a_IniFile.SetValue("Generator", "Finishers", Finishers);
-	}
-	a_IniFile.DeleteValue("Generator", "Structures");
+	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "");
 
 	// Create all requested finishers:
 	AStringVector Str = StringSplitAndTrim(Finishers, ",");

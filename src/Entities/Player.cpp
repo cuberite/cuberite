@@ -134,7 +134,7 @@ cPlayer::~cPlayer(void)
 
 	SaveToDisk();
 
-	m_World->RemovePlayer( this );
+	m_World->RemovePlayer(this);
 
 	m_ClientHandle = NULL;
 	
@@ -150,8 +150,6 @@ cPlayer::~cPlayer(void)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
-	
-	m_ClientHandle = NULL;
 }
 
 
@@ -952,7 +950,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn();
+	m_ClientHandle->SendRespawn(*GetWorld());
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1574,12 +1572,25 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::MoveToWorld(const char * a_WorldName)
+bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 {
-	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
-	if (World == NULL)
+	cWorld * World;	
+	if (a_World == NULL)
 	{
-		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
+		World = cRoot::Get()->GetWorld(a_WorldName);
+		if (World == NULL)
+		{
+			LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
+			return false;
+		}
+	}
+	else
+	{
+		World = a_World;
+	}
+
+	if (GetWorld() == World)
+	{
 		return false;
 	}
 	
@@ -1588,17 +1599,22 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 	// Remove all links to the old world
 	m_World->RemovePlayer(this);
 	m_ClientHandle->RemoveFromAllChunks();
-	m_World->RemoveEntity(this);
 
 	// If the dimension is different, we can send the respawn packet
 	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
+	bool SendRespawn = OldDimension != World->GetDimension();
+	m_ClientHandle->MoveToWorld(*World, SendRespawn);
 
 	// Add player to all the necessary parts of the new world
 	SetWorld(World);
 	m_ClientHandle->StreamChunks();
 	World->AddEntity(this);
 	World->AddPlayer(this);
+
+	if (SendRespawn)
+	{
+		GetClientHandle()->SendPlayerMoveLook();
+	}
 
 	return true;
 }

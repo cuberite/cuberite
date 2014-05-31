@@ -629,6 +629,7 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			// Handle drowning
 			HandleAir();
 		}
+		DetectPortal();
 
 		// None of the above functions change position, we remain in the chunk of NextChunk
 		HandlePhysics(a_Dt, *NextChunk);
@@ -1033,6 +1034,122 @@ void cEntity::DetectCacti(void)
 	{
 		TakeDamage(dtCactusContact, NULL, 1, 0);
 	}
+}
+
+
+
+
+
+void cEntity::DetectPortal()
+{
+	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	if ((Y > 0) && (Y < cChunkDef::Height))
+	{
+		switch (GetWorld()->GetBlock(X, Y, Z))
+		{
+			case E_BLOCK_NETHER_PORTAL:
+			{
+				switch (GetWorld()->GetDimension())
+				{
+					case dimNether:
+					{
+						AString OverworldName = GetWorld()->GetName().substr(0, GetWorld()->GetName().size() - 7);
+						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
+						cIniFile File;
+						File.ReadFile(OverworldName + "/world.ini");
+						File.SetValue("General", "Dimension", "Overworld");
+						File.WriteFile(OverworldName + "/world.ini");
+
+						MoveToWorld(OverworldName, cRoot::Get()->CreateAndInitializeWorld(OverworldName));
+						break;
+					}
+					case dimOverworld:
+					{
+						AString NetherWorldName = GetWorld()->GetName() + "_nether";
+						cFile::CreateFolder(FILE_IO_PREFIX + NetherWorldName);
+						cIniFile File;
+						File.ReadFile(NetherWorldName + "/world.ini");
+						File.SetValue("General", "Dimension", "Nether");
+						File.WriteFile(NetherWorldName + "/world.ini");
+
+						MoveToWorld(NetherWorldName, cRoot::Get()->CreateAndInitializeWorld(NetherWorldName));
+						break;
+					}
+					default: break;
+				}
+				break;
+			}
+			case E_BLOCK_END_PORTAL:
+			{
+				switch (GetWorld()->GetDimension())
+				{
+					case dimEnd:
+					{
+						AString OverworldName = GetWorld()->GetName().substr(0, GetWorld()->GetName().size() - 4);
+						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
+						cIniFile File;
+						File.ReadFile(OverworldName + "/world.ini");
+						File.SetValue("General", "Dimension", "Overworld");
+						File.WriteFile(OverworldName + "/world.ini");
+
+						MoveToWorld(OverworldName, cRoot::Get()->CreateAndInitializeWorld(OverworldName));
+						break;
+					}
+					case dimOverworld:
+					{
+						AString EndWorldName = GetWorld()->GetName() + "_end";
+						cFile::CreateFolder(FILE_IO_PREFIX + EndWorldName);
+						cIniFile File;
+						File.ReadFile(EndWorldName + "/world.ini");
+						File.SetValue("General", "Dimension", "End");
+						File.WriteFile(EndWorldName + "/world.ini");
+
+						MoveToWorld(EndWorldName, cRoot::Get()->CreateAndInitializeWorld(EndWorldName));
+						break;
+					}
+					default: break;
+				}
+			}
+			default: break;
+		}
+	}
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
+{
+	cWorld * World;
+	if (a_World == NULL)
+	{
+		World = cRoot::Get()->GetWorld(a_WorldName);
+		if (World == NULL)
+		{
+			LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
+			return false;
+		}
+	}
+	else
+	{
+		World = a_World;
+	}
+
+	if (GetWorld() == World)
+	{
+		return false;
+	}
+
+	// Remove all links to the old world
+	GetWorld()->RemoveEntity(this);
+	GetWorld()->BroadcastDestroyEntity(*this);
+
+	// Add to all the necessary parts of the new world
+	SetWorld(World);
+	World->AddEntity(this);
+
+	return true;
 }
 
 

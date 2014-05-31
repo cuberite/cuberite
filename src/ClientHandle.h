@@ -149,7 +149,7 @@ public:
 	void SendPlayerSpawn         (const cPlayer & a_Player);
 	void SendPluginMessage       (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
-	void SendRespawn             (void);
+	void SendRespawn             (const cWorld & a_World);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
 	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);

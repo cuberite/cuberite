@@ -125,7 +125,6 @@ cClientHandle::~cClientHandle()
 		}
 		if (World != NULL)
 		{
-			World->RemovePlayer(m_Player);
 			m_Player->Destroy();
 		}
 		delete m_Player;
@@ -1754,7 +1753,7 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 	
 	if (a_SendRespawnPacket)
 	{
-		SendRespawn();
+		SendRespawn(a_World);
 	}
 
 	cWorld * World = m_Player->GetWorld();
@@ -2373,9 +2372,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(void)
+void cClientHandle::SendRespawn(const cWorld & a_World)
 {
-	m_Protocol->SendRespawn();
+	m_Protocol->SendRespawn(a_World);
 }
 
 

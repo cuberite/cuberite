@@ -323,6 +323,9 @@ public:
 
 	/** Detects the time for application of cacti damage */
 	virtual void DetectCacti(void);
+
+	/** Detects whether we are in a portal block and begins teleportation procedures if so */
+	virtual void DetectPortal(void);
 	
 	/// Handles when the entity is in the void
 	virtual void TickInVoid(cChunk & a_Chunk);
@@ -365,6 +368,9 @@ public:
 	
 	/// Teleports to the coordinates specified
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
+
+	/** Moves entity to specified world */
+	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL);
 	
 	// tolua_end
 	

@@ -571,6 +571,37 @@ void cWorld::Start(void)
 	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 
+	switch (GetDimension())
+	{
+		case dimEnd:
+		{
+			IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
+			IniFile.GetValueSet("Generator", "ConstantBiome", "End");
+			IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
+			IniFile.GetValueSet("Generator", "CompositionGen", "End");
+			break;
+		}
+		case dimOverworld:
+		{
+			IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
+			IniFile.GetValueSet("Generator", "HeightGen", "DistortedHeightmap");
+			IniFile.GetValueSet("Generator", "CompositionGen", "DistortedHeightmap");
+			IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+			break;
+		}
+		case dimNether:
+		{
+			IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
+			IniFile.GetValueSet("Generator", "ConstantBiome", "Nether");
+			IniFile.GetValueSet("Generator", "HeightGen", "Flat");
+			IniFile.GetValueSet("Generator", "FlatHeight", "128");
+			IniFile.GetValueSet("Generator", "CompositionGen", "Nether");
+			IniFile.GetValueSet("Generator", "Finishers", "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
+			break;
+		}
+	}
+
 	// Load allowed mobs:
 	const char * DefaultMonsters = "";
 	switch (m_Dimension)

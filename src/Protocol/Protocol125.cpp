@@ -831,12 +831,12 @@ void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol125::SendRespawn(void)
+void cProtocol125::SendRespawn(const cWorld & a_World)
 {
 	cCSLock Lock(m_CSPacket);
 	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_RESPAWN);
-	WriteInt   ((int)(Player->GetWorld()->GetDimension()));
+	WriteInt   ((int)(a_World.GetDimension()));
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
 	WriteChar  ((char)Player->GetGameMode());
 	WriteShort (256);  // Current world height

@@ -983,11 +983,11 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol172::SendRespawn(void)
+void cProtocol172::SendRespawn(const cWorld & a_World)
 {
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteInt(Player->GetWorld()->GetDimension());
+	Pkt.WriteInt((int)a_World.GetDimension());
 	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteByte((Byte)Player->GetEffectiveGameMode());
 	Pkt.WriteString("default");

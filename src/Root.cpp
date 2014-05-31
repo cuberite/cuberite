@@ -320,7 +320,7 @@ cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName)
 	{
 		return NULL;
 	}
-	cWorld* NewWorld = new cWorld(a_WorldName.c_str());
+	cWorld * NewWorld = new cWorld(a_WorldName.c_str());
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();
 	NewWorld->InitializeSpawn();
@@ -372,7 +372,7 @@ void cRoot::UnloadWorlds(void)
 
 
 
-cWorld* cRoot::GetDefaultWorld()
+cWorld * cRoot::GetDefaultWorld()
 {
 	return m_pDefaultWorld;
 }
@@ -381,12 +381,14 @@ cWorld* cRoot::GetDefaultWorld()
 
 
 
-cWorld* cRoot::GetWorld( const AString & a_WorldName )
+cWorld * cRoot::GetWorld(const AString & a_WorldName)
 {
-	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName );
-	if( itr != m_WorldsByName.end() )
+	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
+	if (itr != m_WorldsByName.end())
+	{
 		return itr->second;
-	return 0;
+	}
+	return NULL;
 }
 
 
@@ -398,9 +400,12 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
-		if (a_Callback.Item(itr->second))
+		if (itr->second != NULL)
 		{
-			return false;
+			if (a_Callback.Item(itr->second))
+			{
+				return false;
+			}
 		}
 	}
 	return true;
