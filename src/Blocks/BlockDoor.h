@@ -137,12 +137,13 @@ public:
 
 	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		NIBBLETYPE Meta = GetMetaFromRightDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 		return ((Meta & 0x4) != 0);
 	}
 
 
-	static NIBBLETYPE GetMetaFromRightDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	/** Read the meta from the true part of the door and returns a meta with all infos include. */
+	static NIBBLETYPE GetTrueDoorMeta(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -162,7 +163,7 @@ public:
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
 		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		NIBBLETYPE Meta = GetMetaFromRightDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 
 		if (!IsDoor(Block))
 		{
