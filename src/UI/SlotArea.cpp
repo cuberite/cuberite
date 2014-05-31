@@ -1400,6 +1400,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
 		{
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
 		}
 
 		cItem Slot(*GetSlot(a_SlotNum, a_Player));
