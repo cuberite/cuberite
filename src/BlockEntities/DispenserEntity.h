@@ -33,7 +33,7 @@ private:
 	void SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind);
 
 	// Returns how to aim the projectile
-	Vector3d GetProjectileLookVector(cChunk & a_Chunk);
+	Vector3d GetShootVector(cChunk & a_Chunk);
 
 	/// If the a_BlockInFront is liquidable and the empty bucket can fit, does the m_Contents processing and returns true
 	bool EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum);

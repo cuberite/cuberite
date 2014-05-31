@@ -198,7 +198,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind)
 {
-	Vector3d Angle = GetProjectileLookVector(a_Chunk);
+	Vector3d Angle = GetShootVector(a_Chunk);
 	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_DispX, a_DispZ);
 
 	double EntityX = 0.5 + (a_DispX + DispChunk->GetPosX() * cChunkDef::Width);
@@ -209,7 +209,7 @@ void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_Di
 
 
 
-Vector3d cDispenserEntity::GetProjectileLookVector(cChunk & a_Chunk)
+Vector3d cDispenserEntity::GetShootVector(cChunk & a_Chunk)
 {
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	int Direction = 0;
