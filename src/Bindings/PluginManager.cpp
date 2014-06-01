@@ -1155,7 +1155,7 @@ bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCrafti
 
 
 
-bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile)
+bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PROJECTILE_HIT_BLOCK);
 	if (Plugins == m_Hooks.end())
@@ -1164,7 +1164,7 @@ bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnProjectileHitBlock(a_Projectile))
+		if ((*itr)->OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos))
 		{
 			return true;
 		}
