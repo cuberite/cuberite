@@ -23,8 +23,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		11, 12, 10,  // SizeX = 11, SizeY = 12, SizeZ = 10
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		10, 11, 9,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		11, 11, 10,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -270,8 +270,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		11, 8, 10,  // SizeX = 11, SizeY = 8, SizeZ = 10
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		10, 7, 9,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		11, 7, 10,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -455,8 +455,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		11, 5, 13,  // SizeX = 11, SizeY = 5, SizeZ = 13
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		10, 4, 12,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		11, 4, 13,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -606,26 +606,28 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		15, 13, 11,  // SizeX = 15, SizeY = 13, SizeZ = 11
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		14, 12, 10,  // MaxX, MaxY, MaxZ
+		-1, 0, -1,  // MinX, MinY, MinZ
+		14, 12, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"A:128: 7\n"  /* sandstonestairs */
-		"B: 44: 1\n"  /* step */
-		"C:128: 2\n"  /* sandstonestairs */
-		"D:128: 0\n"  /* sandstonestairs */
-		"E: 87: 0\n"  /* netherstone */
-		"F:128: 3\n"  /* sandstonestairs */
-		"G: 51: 0\n"  /* fire */
-		"H: 44: 9\n"  /* step */
+		"A:128: 4\n"  /* sandstonestairs */
+		"B:128: 5\n"  /* sandstonestairs */
+		"C:128: 7\n"  /* sandstonestairs */
+		"D: 44: 1\n"  /* step */
+		"E:128: 2\n"  /* sandstonestairs */
+		"F:128: 0\n"  /* sandstonestairs */
+		"G: 87: 0\n"  /* netherstone */
+		"H:128: 3\n"  /* sandstonestairs */
+		"I: 51: 0\n"  /* fire */
+		"J: 44: 9\n"  /* step */
 		"a: 12: 0\n"  /* sand */
 		"b:  5: 0\n"  /* wood */
 		"c: 24: 2\n"  /* sandstone */
 		"d: 24: 0\n"  /* sandstone */
 		"e: 85: 0\n"  /* fence */
 		"f:  5: 1\n"  /* wood */
-		"g: 64: 2\n"  /* wooddoorblock */
+		"g: 64: 6\n"  /* wooddoorblock */
 		"h: 64: 0\n"  /* wooddoorblock */
 		"i: 61: 2\n"  /* furnace */
 		"j:118: 0\n"  /* cauldronblock */
@@ -633,18 +635,18 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"l: 65: 2\n"  /* ladder */
 		"m: 19: 0\n"  /* sponge */
 		"n:101: 0\n"  /* ironbars */
-		"o:140: 0\n"  /* flowerpotblock */
-		"p: 64: 8\n"  /* wooddoorblock */
-		"q: 50: 3\n"  /* torch */
-		"r: 69:12\n"  /* lever */
-		"s: 50: 4\n"  /* torch */
-		"t:128: 6\n"  /* sandstonestairs */
-		"u: 44:10\n"  /* step */
-		"v:128: 1\n"  /* sandstonestairs */
-		"w: 47: 0\n"  /* bookshelf */
-		"x: 96:12\n"  /* trapdoor */
-		"y:128: 4\n"  /* sandstonestairs */
-		"z:128: 5\n"  /* sandstonestairs */,
+		"o: 50: 1\n"  /* torch */
+		"p:140: 0\n"  /* flowerpotblock */
+		"q: 64:12\n"  /* wooddoorblock */
+		"r: 50: 3\n"  /* torch */
+		"s: 64: 8\n"  /* wooddoorblock */
+		"t: 69:12\n"  /* lever */
+		"u: 50: 4\n"  /* torch */
+		"v:128: 6\n"  /* sandstonestairs */
+		"w: 44:10\n"  /* step */
+		"x:128: 1\n"  /* sandstonestairs */
+		"y: 47: 0\n"  /* bookshelf */
+		"z: 96:10\n"  /* trapdoor */,
 
 		// Block data:
 		// Level 0
@@ -681,12 +683,12 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
 		/*  0 */ "....cddnnnddc.."
-		/*  1 */ "....d......od.c"
-		/*  2 */ "....p.......d.q"
-		/*  3 */ "....d.......p.."
-		/*  4 */ "....d.r...l.d.s"
+		/*  1 */ "....do.....pd.c"
+		/*  2 */ "....q.......d.r"
+		/*  3 */ "....d.......s.."
+		/*  4 */ "....d.t...l.d.u"
 		/*  5 */ "....dddd.dddd.c"
-		/*  6 */ "....n.......n.."
+		/*  6 */ "....n..r.r..n.."
 		/*  7 */ "mmmmn.......n.."
 		/*  8 */ "mmmmn.......n.."
 		/*  9 */ "mmmmd.......d.."
@@ -695,32 +697,32 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		// Level 3
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
-		/*  0 */ "....cddtttddc.."
-		/*  1 */ "....duuuuuuuddv"
-		/*  2 */ "....duuuuuuud.."
-		/*  3 */ "....duuuuuuud.."
-		/*  4 */ "....dwwwuuxud.."
-		/*  5 */ "....ddddddddddv"
-		/*  6 */ "....yuuuuuuuz.."
-		/*  7 */ "mmmmyuuuuuuuz.."
-		/*  8 */ "mmmmyuuuuuuuz.."
-		/*  9 */ "mmmmduuuuuuud.."
-		/* 10 */ "mmmmcddAAAddc.."
+		/*  0 */ "....cddvvvddc.."
+		/*  1 */ "....dwwwwwwwddx"
+		/*  2 */ "....dwwwwwwwd.."
+		/*  3 */ "....dwwwwwwwd.."
+		/*  4 */ "....dyyywwzwd.."
+		/*  5 */ "....ddddddddddx"
+		/*  6 */ "....AwwwwwwwB.."
+		/*  7 */ "mmmmAwwwwwwwB.."
+		/*  8 */ "mmmmAwwwwwwwB.."
+		/*  9 */ "mmmmdwwwwwwwd.."
+		/* 10 */ "mmmmcddCCCddc.."
 
 		// Level 4
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
-		/*  0 */ "....dBBBdBBBd.."
-		/*  1 */ "....BcdddddcB.."
-		/*  2 */ "....Bd.....dB.."
-		/*  3 */ "....Bd.....dB.."
-		/*  4 */ "....Bd.....dB.."
+		/*  0 */ "....dDDDdDDDd.."
+		/*  1 */ "....DcdddddcD.."
+		/*  2 */ "....Dd.....dD.."
+		/*  3 */ "....Dd.....dD.."
+		/*  4 */ "....Dd.....dD.."
 		/*  5 */ "....dcdd.ddcd.."
-		/*  6 */ "....B.......B.."
-		/*  7 */ "mmmmB.......B.."
-		/*  8 */ "mmmmB.......B.."
-		/*  9 */ "mmmmB.......B.."
-		/* 10 */ "mmmmdBBBdBBBd.."
+		/*  6 */ "....D.......D.."
+		/*  7 */ "mmmmD.......D.."
+		/*  8 */ "mmmmD.......D.."
+		/*  9 */ "mmmmD.......D.."
+		/* 10 */ "mmmmdDDDdDDDd.."
 
 		// Level 5
 		/* z\x*             11111 */
@@ -741,10 +743,10 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
 		/*  0 */ "..............."
-		/*  1 */ ".....cddtddc..."
-		/*  2 */ ".....yuuuuuz..."
-		/*  3 */ ".....yuuuuuz..."
-		/*  4 */ ".....yuuuuuz..."
+		/*  1 */ ".....cddvddc..."
+		/*  2 */ ".....AwwwwwB..."
+		/*  3 */ ".....AwwwwwB..."
+		/*  4 */ ".....AwwwwwB..."
 		/*  5 */ ".....cdddddc..."
 		/*  6 */ "..............."
 		/*  7 */ "..............."
@@ -756,11 +758,11 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
 		/*  0 */ "..............."
-		/*  1 */ ".....dBBdBBd..."
-		/*  2 */ ".....B.ddd.B..."
+		/*  1 */ ".....dDDdDDd..."
+		/*  2 */ ".....D.ddd.D..."
 		/*  3 */ ".....d.ddd.d..."
-		/*  4 */ ".....B.ddd.B..."
-		/*  5 */ ".....dBBdBBd..."
+		/*  4 */ ".....D.ddd.D..."
+		/*  5 */ ".....dDDdDDd..."
 		/*  6 */ "..............."
 		/*  7 */ "..............."
 		/*  8 */ "..............."
@@ -772,9 +774,9 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*    *   012345678901234 */
 		/*  0 */ "..............."
 		/*  1 */ "..............."
-		/*  2 */ ".......cCc....."
-		/*  3 */ ".......DEv....."
-		/*  4 */ ".......cFc....."
+		/*  2 */ ".......cEc....."
+		/*  3 */ ".......FGx....."
+		/*  4 */ ".......cHc....."
 		/*  5 */ "..............."
 		/*  6 */ "..............."
 		/*  7 */ "..............."
@@ -788,7 +790,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*  0 */ "..............."
 		/*  1 */ "..............."
 		/*  2 */ ".......c.c....."
-		/*  3 */ "........G......"
+		/*  3 */ "........I......"
 		/*  4 */ ".......c.c....."
 		/*  5 */ "..............."
 		/*  6 */ "..............."
@@ -802,9 +804,9 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*    *   012345678901234 */
 		/*  0 */ "..............."
 		/*  1 */ "..............."
-		/*  2 */ ".......ctc....."
-		/*  3 */ ".......y.z....."
-		/*  4 */ ".......cAc....."
+		/*  2 */ ".......cvc....."
+		/*  3 */ ".......A.B....."
+		/*  4 */ ".......cCc....."
 		/*  5 */ "..............."
 		/*  6 */ "..............."
 		/*  7 */ "..............."
@@ -818,7 +820,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*  0 */ "..............."
 		/*  1 */ "..............."
 		/*  2 */ ".......ddd....."
-		/*  3 */ ".......dHd....."
+		/*  3 */ ".......dJd....."
 		/*  4 */ ".......ddd....."
 		/*  5 */ "..............."
 		/*  6 */ "..............."
@@ -832,9 +834,9 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*    *   012345678901234 */
 		/*  0 */ "..............."
 		/*  1 */ "..............."
-		/*  2 */ ".......B.B....."
+		/*  2 */ ".......D.D....."
 		/*  3 */ "..............."
-		/*  4 */ ".......B.B....."
+		/*  4 */ ".......D.D....."
 		/*  5 */ "..............."
 		/*  6 */ "..............."
 		/*  7 */ "..............."
@@ -877,8 +879,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		7, 11, 7,  // SizeX = 7, SizeY = 11, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		6, 10, 6,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		7, 10, 7,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1050,8 +1052,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		5, 5, 7,  // SizeX = 5, SizeY = 5, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		4, 4, 6,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		5, 4, 7,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1160,8 +1162,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		7, 5, 11,  // SizeX = 7, SizeY = 5, SizeZ = 11
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		6, 4, 10,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		7, 4, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1291,8 +1293,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		9, 5, 7,  // SizeX = 9, SizeY = 5, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		8, 4, 6,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		9, 4, 7,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1400,8 +1402,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		5, 5, 11,  // SizeX = 5, SizeY = 5, SizeZ = 11
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		4, 4, 10,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		5, 4, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1428,7 +1430,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"u:128: 5\n"  /* sandstonestairs */
 		"v:128: 7\n"  /* sandstonestairs */
 		"w: 44: 1\n"  /* step */
-		"x: 96: 7\n"  /* trapdoor */,
+		"x: 96: 1\n"  /* trapdoor */,
 
 		// Block data:
 		// Level 0
@@ -1536,8 +1538,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		9, 5, 9,  // SizeX = 9, SizeY = 5, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		8, 4, 8,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		9, 4, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1657,8 +1659,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		9, 5, 9,  // SizeX = 9, SizeY = 5, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		8, 4, 8,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		9, 4, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1783,8 +1785,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		9, 5, 11,  // SizeX = 9, SizeY = 5, SizeZ = 11
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		8, 4, 10,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		9, 4, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -1914,8 +1916,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		5, 8, 7,  // SizeX = 5, SizeY = 8, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		4, 7, 6,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		5, 7, 7,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2054,8 +2056,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		15, 8, 9,  // SizeX = 15, SizeY = 8, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		14, 7, 8,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		15, 7, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2219,8 +2221,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		11, 9, 9,  // SizeX = 11, SizeY = 9, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		10, 8, 8,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		11, 8, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2413,8 +2415,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		12, 10, 11,  // SizeX = 12, SizeY = 10, SizeZ = 11
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		11, 9, 10,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		12, 9, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2441,7 +2443,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"u:128: 5\n"  /* sandstonestairs */
 		"v:128: 7\n"  /* sandstonestairs */
 		"w: 44: 1\n"  /* step */
-		"x: 96: 6\n"  /* trapdoor */
+		"x: 96: 4\n"  /* trapdoor */
 		"y:126: 0\n"  /* woodenslab */
 		"z:128: 4\n"  /* sandstonestairs */,
 
@@ -2631,8 +2633,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		9, 5, 11,  // SizeX = 9, SizeY = 5, SizeZ = 11
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		8, 4, 10,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		9, 4, 11,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -2762,8 +2764,8 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		13, 9, 9,  // SizeX = 13, SizeY = 9, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
-		0, 0, 0,  // MinX, MinY, MinZ
-		12, 8, 8,  // MaxX, MaxY, MaxZ
+		-1, 0, 0,  // MinX, MinY, MinZ
+		13, 8, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
