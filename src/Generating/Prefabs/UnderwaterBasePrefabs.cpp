@@ -16,6 +16,169 @@
 const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// BrokenRoom:
+	// The data has been exported from the gallery Water, area index 49, ID 680, created by STR_Warrior
+	{
+		// Size:
+		14, 7, 12,  // SizeX = 14, SizeY = 7, SizeZ = 12
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		13, 6, 11,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 0\n"  /* wood */
+		"b: 20: 0\n"  /* glass */
+		"c:  5: 5\n"  /* wood */
+		"d:  8: 0\n"  /* water */
+		"e: 64: 4\n"  /* wooddoorblock */
+		"f: 64:12\n"  /* wooddoorblock */
+		"g: 64:13\n"  /* wooddoorblock */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmmmmmmmmmm"
+		/*  1 */ "mmmmaaaammmmmm"
+		/*  2 */ "mmmaabbaammmmm"
+		/*  3 */ "mmaabbbbaammmm"
+		/*  4 */ "maabbbbbbaammm"
+		/*  5 */ "mabbbbbbbbaaac"
+		/*  6 */ "mabbbbbbbbaaac"
+		/*  7 */ "maabbbbbbaammm"
+		/*  8 */ "mmaabbbbaammmm"
+		/*  9 */ "mmmaabbaammmmm"
+		/* 10 */ "mmmmaaaammmmmm"
+		/* 11 */ "mmmmmmmmmmmmmm"
+
+		// Level 1
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmaammmmmmm"
+		/*  1 */ "mmmaaddaammmmm"
+		/*  2 */ "mmaaddddaammmm"
+		/*  3 */ "maaddddddaammm"
+		/*  4 */ "maddddddddaaac"
+		/*  5 */ "adddddddddddde"
+		/*  6 */ "adddddddddddde"
+		/*  7 */ "maddddddddaaac"
+		/*  8 */ "maaddddddaammm"
+		/*  9 */ "mmaaddddaammmm"
+		/* 10 */ "mmmaaddaammmmm"
+		/* 11 */ "mmmmmaammmmmmm"
+
+		// Level 2
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmbbmmmmmmm"
+		/*  1 */ "mmmbb..bbmmmmm"
+		/*  2 */ "mmbb....bbmmmm"
+		/*  3 */ "mbb......bbmmm"
+		/*  4 */ "mb........bbac"
+		/*  5 */ "b............f"
+		/*  6 */ "b............g"
+		/*  7 */ "mb........bbac"
+		/*  8 */ "mbb......bbmmm"
+		/*  9 */ "mmbb....bbmmmm"
+		/* 10 */ "mmmbb..bbmmmmm"
+		/* 11 */ "mmmmmbbmmmmmmm"
+
+		// Level 3
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmbbmmmmmmm"
+		/*  1 */ "mmmbb..bbmmmmm"
+		/*  2 */ "mmbb....bbmmmm"
+		/*  3 */ "mbb......bbmmm"
+		/*  4 */ "mb........bbac"
+		/*  5 */ "b..........bac"
+		/*  6 */ "b..........bac"
+		/*  7 */ "mb........bbac"
+		/*  8 */ "mbb......bbmmm"
+		/*  9 */ "mmbb....bbmmmm"
+		/* 10 */ "mmmbb..bbmmmmm"
+		/* 11 */ "mmmmmbbmmmmmmm"
+
+		// Level 4
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmmmmmmmmmm"
+		/*  1 */ "mmmmm.bmmmmmmm"
+		/*  2 */ "mmmmb..bmmmmmm"
+		/*  3 */ "mmmb....bmmmmm"
+		/*  4 */ "mmb......bmmmm"
+		/*  5 */ "m.........bmmm"
+		/*  6 */ "mb........bmmm"
+		/*  7 */ "mmb......bmmmm"
+		/*  8 */ "mmm.....bmmmmm"
+		/*  9 */ "mmmmb..bmmmmmm"
+		/* 10 */ "mmmmmbbmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmm"
+
+		// Level 5
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmbbmmmmmmm"
+		/*  3 */ "mmmm....mmmmmm"
+		/*  4 */ "mmmb....bmmmmm"
+		/*  5 */ "mmb......bmmmm"
+		/*  6 */ "mmb......bmmmm"
+		/*  7 */ "mmmb.....mmmmm"
+		/*  8 */ "mmmmb..bmmmmmm"
+		/*  9 */ "mmmmmbbmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmm"
+
+		// Level 6
+		/* z\x*             1111 */
+		/*    *   01234567890123 */
+		/*  0 */ "mmmmmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmmmmm"
+		/*  3 */ "mmmmmbbmmmmmmm"
+		/*  4 */ "mmmmbbbbmmmmmm"
+		/*  5 */ "mmmbbbbbbmmmmm"
+		/*  6 */ "mmmbb.bbbmmmmm"
+		/*  7 */ "mmmmbbbbmmmmmm"
+		/*  8 */ "mmmmmbbmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmm",
+
+		// Connectors:
+		"1: 13, 1, 6: 5\n"  /* Type 1, direction X+ */
+		"-1: 13, 1, 5: 5\n"  /* Type -1, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // BrokenRoom
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Corridor16:
 	// The data has been exported from the gallery Water, area index 25, ID 566, created by xoft
 	{
@@ -88,7 +251,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		true,
 
 		// DefaultWeight:
-		2000,
+		500,
 
 		// DepthWeight:
 		"",
@@ -722,7 +885,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  5 */ "mb........bmmm"
 		/*  6 */ "mb........bmmm"
 		/*  7 */ "mmb......bmmmm"
-		/*  8 */ "mmmbb...bmmmmm"
+		/*  8 */ "mmmb....bmmmmm"
 		/*  9 */ "mmmmb..bmmmmmm"
 		/* 10 */ "mmmmmbbmmmmmmm"
 		/* 11 */ "mmmmmmmmmmmmmm"
@@ -740,7 +903,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  5 */ "mmb......bmmmm"
 		/*  6 */ "mmb......bmmmm"
 		/*  7 */ "mmmb....bmmmmm"
-		/*  8 */ "mmmmb.bbmmmmmm"
+		/*  8 */ "mmmmb..bmmmmmm"
 		/*  9 */ "mmmmmbbmmmmmmm"
 		/* 10 */ "mmmmmmmmmmmmmm"
 		/* 11 */ "mmmmmmmmmmmmmm"
@@ -1020,7 +1183,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  7 */ "mc........cm"
 		/*  8 */ "mc........cm"
 		/*  9 */ "mmc......cmm"
-		/* 10 */ "mmmcc...cmmm"
+		/* 10 */ "mmmc....cmmm"
 		/* 11 */ "mmmmc..cmmmm"
 		/* 12 */ "mmmmmccmmmmm"
 		/* 13 */ "mmmmmmmmmmmm"
@@ -1040,7 +1203,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  7 */ "mmc......cmm"
 		/*  8 */ "mmc......cmm"
 		/*  9 */ "mmmc....cmmm"
-		/* 10 */ "mmmmc.ccmmmm"
+		/* 10 */ "mmmmc..cmmmm"
 		/* 11 */ "mmmmmccmmmmm"
 		/* 12 */ "mmmmmmmmmmmm"
 		/* 13 */ "mmmmmmmmmmmm"
@@ -1239,7 +1402,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  7 */ "mmmc........cmmm"
 		/*  8 */ "mmmc........cmmm"
 		/*  9 */ "mmmmc......cmmmm"
-		/* 10 */ "mmmmmcc...cmmmmm"
+		/* 10 */ "mmmmmc....cmmmmm"
 		/* 11 */ "mmmmmmc..cmmmmmm"
 		/* 12 */ "mmmmmmmccmmmmmmm"
 		/* 13 */ "mmmmmmmmmmmmmmmm"
@@ -1259,7 +1422,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  7 */ "mmmmc......cmmmm"
 		/*  8 */ "mmmmc......cmmmm"
 		/*  9 */ "mmmmmc....cmmmmm"
-		/* 10 */ "mmmmmmc.ccmmmmmm"
+		/* 10 */ "mmmmmmc..cmmmmmm"
 		/* 11 */ "mmmmmmmccmmmmmmm"
 		/* 12 */ "mmmmmmmmmmmmmmmm"
 		/* 13 */ "mmmmmmmmmmmmmmmm"
@@ -1420,7 +1583,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  5 */ "mb........bmmm"
 		/*  6 */ "mb........bmmm"
 		/*  7 */ "mmb......bmmmm"
-		/*  8 */ "mmmbb...bmmmmm"
+		/*  8 */ "mmmb....bmmmmm"
 		/*  9 */ "mmmmb..bmmmmmm"
 		/* 10 */ "mmmmmbbmmmmmmm"
 		/* 11 */ "mmmmmmmmmmmmmm"
@@ -1436,7 +1599,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  5 */ "mmb......bmmmm"
 		/*  6 */ "mmb......bmmmm"
 		/*  7 */ "mmmb....bmmmmm"
-		/*  8 */ "mmmmb.bbmmmmmm"
+		/*  8 */ "mmmmb..bmmmmmm"
 		/*  9 */ "mmmmmbbmmmmmmm"
 		/* 10 */ "mmmmmmmmmmmmmm"
 		/* 11 */ "mmmmmmmmmmmmmm"
@@ -1610,7 +1773,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  7 */ "mc........cmmm"
 		/*  8 */ "mc........cmmm"
 		/*  9 */ "mmc......cmmmm"
-		/* 10 */ "mmmcc...cmmmmm"
+		/* 10 */ "mmmc....cmmmmm"
 		/* 11 */ "mmmmc..cmmmmmm"
 		/* 12 */ "mmmmmccmmmmmmm"
 		/* 13 */ "mmmmmmmmmmmmmm"
@@ -1631,7 +1794,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		/*  7 */ "mmc......cmmmm"
 		/*  8 */ "mmc......cmmmm"
 		/*  9 */ "mmmc....cmmmmm"
-		/* 10 */ "mmmmc.ccmmmmmm"
+		/* 10 */ "mmmmc..cmmmmmm"
 		/* 11 */ "mmmmmccmmmmmmm"
 		/* 12 */ "mmmmmmmmmmmmmm"
 		/* 13 */ "mmmmmmmmmmmmmm"
@@ -1684,6 +1847,209 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		// MoveToGround:
 		false,
 	},  // ViewingTee
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// WaterfallRoom:
+	// The data has been exported from the gallery Water, area index 50, ID 681, created by Aloe_vera
+	{
+		// Size:
+		16, 7, 16,  // SizeX = 16, SizeY = 7, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 6, 15,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  5: 5\n"  /* wood */
+		"b:  5: 0\n"  /* wood */
+		"c: 20: 0\n"  /* glass */
+		"d: 64: 3\n"  /* wooddoorblock */
+		"e: 76: 1\n"  /* redstonetorchon */
+		"f: 76: 2\n"  /* redstonetorchon */
+		"g: 64: 2\n"  /* wooddoorblock */
+		"h: 76: 3\n"  /* redstonetorchon */
+		"i: 64: 0\n"  /* wooddoorblock */
+		"j: 76: 4\n"  /* redstonetorchon */
+		"k: 64: 1\n"  /* wooddoorblock */
+		"l: 64: 8\n"  /* wooddoorblock */
+		"m: 19: 0\n"  /* sponge */
+		"n: 64: 9\n"  /* wooddoorblock */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmaammmmmmm"
+		/*  1 */ "mmmmmmmbbmmmmmmm"
+		/*  2 */ "mmmmmmmbbmmmmmmm"
+		/*  3 */ "mmmmmmbbbbmmmmmm"
+		/*  4 */ "mmmmmbbccbbmmmmm"
+		/*  5 */ "mmmmbbccccbbmmmm"
+		/*  6 */ "mmmbbccccccbbmmm"
+		/*  7 */ "abbbcccmmcccbbba"
+		/*  8 */ "abbbcccmmcccbbba"
+		/*  9 */ "mmmbbccccccbbmmm"
+		/* 10 */ "mmmmbbccccbbmmmm"
+		/* 11 */ "mmmmmbbccbbmmmmm"
+		/* 12 */ "mmmmmmbbbbmmmmmm"
+		/* 13 */ "mmmmmmmbbmmmmmmm"
+		/* 14 */ "mmmmmmmbbmmmmmmm"
+		/* 15 */ "mmmmmmmaammmmmmm"
+
+		// Level 1
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmaddammmmmm"
+		/*  1 */ "mmmmmmb..bmmmmmm"
+		/*  2 */ "mmmmmmb..bmmmmmm"
+		/*  3 */ "mmmmmbbefbbmmmmm"
+		/*  4 */ "mmmmbb....bbmmmm"
+		/*  5 */ "mmmbb......bbmmm"
+		/*  6 */ "abbb...cc...bbba"
+		/*  7 */ "g..h..c..c..h..i"
+		/*  8 */ "g..j..c..c..j..i"
+		/*  9 */ "abbb...cc...bbba"
+		/* 10 */ "mmmbb......bbmmm"
+		/* 11 */ "mmmmbb....bbmmmm"
+		/* 12 */ "mmmmmbbefbbmmmmm"
+		/* 13 */ "mmmmmmb..bmmmmmm"
+		/* 14 */ "mmmmmmb..bmmmmmm"
+		/* 15 */ "mmmmmmakkammmmmm"
+
+		// Level 2
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmalnammmmmm"
+		/*  1 */ "mmmmmmb..bmmmmmm"
+		/*  2 */ "mmmmmmc..cmmmmmm"
+		/*  3 */ "mmmmmcc..ccmmmmm"
+		/*  4 */ "mmmmcc....ccmmmm"
+		/*  5 */ "mmmcc......ccmmm"
+		/*  6 */ "abcc........ccba"
+		/*  7 */ "n..............l"
+		/*  8 */ "l..............n"
+		/*  9 */ "abcc........ccba"
+		/* 10 */ "mmmcc......ccmmm"
+		/* 11 */ "mmmmcc....ccmmmm"
+		/* 12 */ "mmmmmcc..ccmmmmm"
+		/* 13 */ "mmmmmmc..cmmmmmm"
+		/* 14 */ "mmmmmmb..bmmmmmm"
+		/* 15 */ "mmmmmmanlammmmmm"
+
+		// Level 3
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmaaaammmmmm"
+		/*  1 */ "mmmmmmbbbbmmmmmm"
+		/*  2 */ "mmmmmmccccmmmmmm"
+		/*  3 */ "mmmmmcc..ccmmmmm"
+		/*  4 */ "mmmmcc....ccmmmm"
+		/*  5 */ "mmmcc......ccmmm"
+		/*  6 */ "abcc........ccba"
+		/*  7 */ "abc..........cba"
+		/*  8 */ "abc..........cba"
+		/*  9 */ "abcc........ccba"
+		/* 10 */ "mmmcc......ccmmm"
+		/* 11 */ "mmmmcc....ccmmmm"
+		/* 12 */ "mmmmmcc..ccmmmmm"
+		/* 13 */ "mmmmmmccccmmmmmm"
+		/* 14 */ "mmmmmmbbbbmmmmmm"
+		/* 15 */ "mmmmmmaaaammmmmm"
+
+		// Level 4
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmmmmmmm"
+		/*  3 */ "mmmmmmmccmmmmmmm"
+		/*  4 */ "mmmmm.c..cmmmmmm"
+		/*  5 */ "mmmmmc....cmmmmm"
+		/*  6 */ "mmmmc......cmmmm"
+		/*  7 */ "mmmc........cmmm"
+		/*  8 */ "mmmc........cmmm"
+		/*  9 */ "mmmmc......cmmmm"
+		/* 10 */ "mmmmmc....cmmmmm"
+		/* 11 */ "mmmmmmc..cmmmmmm"
+		/* 12 */ "mmmmmmmccmmmmmmm"
+		/* 13 */ "mmmmmmmmmmmmmmmm"
+		/* 14 */ "mmmmmmmmmmmmmmmm"
+		/* 15 */ "mmmmmmmmmmmmmmmm"
+
+		// Level 5
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmmmmmmm"
+		/*  4 */ "mmmmmm.ccmmmmmmm"
+		/*  5 */ "mmmmmmc..cmmmmmm"
+		/*  6 */ "mmmmmc....cmmmmm"
+		/*  7 */ "mmmmc......cmmmm"
+		/*  8 */ "mmmmc......cmmmm"
+		/*  9 */ "mmmmmc....cmmmmm"
+		/* 10 */ "mmmmmmc..cmmmmmm"
+		/* 11 */ "mmmmmmmccmmmmmmm"
+		/* 12 */ "mmmmmmmmmmmmmmmm"
+		/* 13 */ "mmmmmmmmmmmmmmmm"
+		/* 14 */ "mmmmmmmmmmmmmmmm"
+		/* 15 */ "mmmmmmmmmmmmmmmm"
+
+		// Level 6
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "mmmmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmmmmmmm"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmccmmmmmmm"
+		/*  6 */ "mmmmmmccccmmmmmm"
+		/*  7 */ "mmmmmcc..ccmmmmm"
+		/*  8 */ "mmmmmcc..ccmmmmm"
+		/*  9 */ "mmmmmmccccmmmmmm"
+		/* 10 */ "mmmmmmmccmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "mmmmmmmmmmmmmmmm"
+		/* 13 */ "mmmmmmmmmmmmmmmm"
+		/* 14 */ "mmmmmmmmmmmmmmmm"
+		/* 15 */ "mmmmmmmmmmmmmmmm",
+
+		// Connectors:
+		"1: 15, 1, 8: 5\n"  /* Type 1, direction X+ */
+		"-1: 15, 1, 7: 5\n"  /* Type -1, direction X+ */
+		"1: 8, 1, 0: 2\n"  /* Type 1, direction Z- */
+		"-1: 7, 1, 0: 2\n"  /* Type -1, direction Z- */
+		"1: 0, 1, 7: 4\n"  /* Type 1, direction X- */
+		"-1: 0, 1, 8: 4\n"  /* Type -1, direction X- */
+		"1: 7, 1, 15: 3\n"  /* Type 1, direction Z+ */
+		"-1: 8, 1, 15: 3\n"  /* Type -1, direction Z+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		5,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // WaterfallRoom
 };  // g_UnderwaterBasePrefabs
 
 
@@ -1773,7 +2139,7 @@ const cPrefab::sDef g_UnderwaterBaseStartingPrefabs[] =
 		/*  4 */ "mmmmcc....ccmmmm"
 		/*  5 */ "mmmcc......ccmmm"
 		/*  6 */ "abbc........cbba"
-		/*  7 */ "h..............h"
+		/*  7 */ "i..............h"
 		/*  8 */ "h..............i"
 		/*  9 */ "abbc........cbba"
 		/* 10 */ "mmmcc......ccmmm"
