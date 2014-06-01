@@ -76,15 +76,15 @@ bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 
 
 
-int cBlockPistonHandler::FirstPassthroughBlock(int pistonX, int pistonY, int pistonZ, NIBBLETYPE pistonmeta, cWorld * a_World)
+int cBlockPistonHandler::FirstPassthroughBlock(int a_PistonX, int a_PistonY, int a_PistonZ, NIBBLETYPE pistonmeta, cWorld * a_World)
 {
 	// Examine each of the 12 blocks ahead of the piston:
 	for (int ret = 0; ret < PISTON_MAX_PUSH_DISTANCE; ret++)
 	{
 		BLOCKTYPE currBlock;
 		NIBBLETYPE currMeta;
-		AddPistonDir(pistonX, pistonY, pistonZ, pistonmeta, 1);
-		a_World->GetBlockTypeMeta(pistonX, pistonY, pistonZ, currBlock, currMeta);
+		AddPistonDir(a_PistonX, a_PistonY, a_PistonZ, pistonmeta, 1);
+		a_World->GetBlockTypeMeta(a_PistonX, a_PistonY, a_PistonZ, currBlock, currMeta);
 		if (CanBreakPush(currBlock))
 		{
 			// This block breaks when pushed, extend up to here
