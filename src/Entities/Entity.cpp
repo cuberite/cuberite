@@ -1093,6 +1093,12 @@ void cEntity::DetectPortal()
 						File.WriteFile(OverworldName + "/world.ini");
 
 						MoveToWorld(OverworldName, cRoot::Get()->CreateAndInitializeWorld(OverworldName));
+
+						if (IsPlayer())
+						{
+							cPlayer * Player = (cPlayer *)this;
+							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+						}
 						break;
 					}
 					case dimOverworld:

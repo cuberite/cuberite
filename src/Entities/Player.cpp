@@ -82,13 +82,13 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	
 	m_PlayerName = a_PlayerName;
 
-	if (!LoadFromDisk())
+	cWorld * World;
+	if (!LoadFromDisk(World))
 	{
 		m_Inventory.Clear();
-		cWorld * DefaultWorld = cRoot::Get()->GetDefaultWorld();
-		SetPosX(DefaultWorld->GetSpawnX());
-		SetPosY(DefaultWorld->GetSpawnY());
-		SetPosZ(DefaultWorld->GetSpawnZ());
+		SetPosX(World->GetSpawnX());
+		SetPosY(World->GetSpawnY());
+		SetPosZ(World->GetSpawnZ());
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -101,11 +101,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 	if (m_GameMode == gmNotSet)
 	{
-		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-		if (World == NULL)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
 		if (World->IsGameModeCreative())
 		{
 			m_CanFly = true;
@@ -955,7 +950,7 @@ void cPlayer::Respawn(void)
 	// Extinguish the fire:
 	StopBurning();
 
-	TeleportToCoords(GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ());
+	TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
 
 	SetVisible(true);
 }
@@ -1614,6 +1609,8 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 	if (SendRespawn)
 	{
 		GetClientHandle()->SendPlayerMoveLook();
+		GetClientHandle()->SendHealth();
+		GetClientHandle()->SendWholeInventory((cWindow &)GetInventory());
 	}
 
 	return true;
@@ -1662,8 +1659,14 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-bool cPlayer::LoadFromDisk()
+bool cPlayer::LoadFromDisk(cWorld * a_World)
 {
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
+	if (a_World == NULL)
+	{
+		a_World = cRoot::Get()->GetDefaultWorld();
+	}
+
 	LoadPermissionsFromDisk();
 
 	// Log player permissions, cause it's what the cool kids do
@@ -1724,6 +1727,9 @@ bool cPlayer::LoadFromDisk()
 	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
 	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
 	m_IsFlying            = root.get("isflying", 0).asBool();
+	m_LastBedPos.x        = root.get("SpawnX", a_World->GetSpawnX()).asInt();
+	m_LastBedPos.y        = root.get("SpawnY", a_World->GetSpawnY()).asInt();
+	m_LastBedPos.z        = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 
@@ -1742,7 +1748,7 @@ bool cPlayer::LoadFromDisk()
 	StatSerializer.Load();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), GetLoadedWorldName().c_str()
 	);
 	
 	return true;
@@ -1784,6 +1790,9 @@ bool cPlayer::SaveToDisk()
 	root["foodExhaustion"] = m_FoodExhaustionLevel;
 	root["world"]          = GetWorld()->GetName();
 	root["isflying"]       = IsFlying();
+	root["SpawnX"]         = GetLastBedPos().x;
+	root["SpawnY"]         = GetLastBedPos().y;
+	root["SpawnZ"]         = GetLastBedPos().z;
 
 	if (m_GameMode == GetWorld()->GetGameMode())
 	{

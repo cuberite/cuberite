@@ -331,7 +331,7 @@ public:
 	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL) override;  // tolua_export
 
 	bool SaveToDisk(void);
-	bool LoadFromDisk(void);
+	bool LoadFromDisk(cWorld * a_World);
 	void LoadPermissionsFromDisk(void);											// tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
@@ -391,11 +391,19 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
+	/** Gets the last position that the player slept in */
+	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
+
+	/** Sets the player's bed (home) position */
+	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos);
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
+
+
 	// tolua_end
 
 	// cEntity overrides:
@@ -449,6 +457,9 @@ protected:
 	cInventory m_Inventory;
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
+
+	/** The player's last saved bed position */
+	Vector3i m_LastBedPos;
 
 	char m_Color;
 
@@ -507,8 +518,6 @@ protected:
 	cTeam * m_Team;
 
 	cStatManager m_Stats;
-
-
 
 	void ResolvePermissions(void);
 	void ResolveGroups(void);
