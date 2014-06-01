@@ -10,3 +10,5 @@ file(GLOB SOURCE
 )
 
 add_library(Entities ${SOURCE})
+
+target_link_libraries(Entities WorldStorage)

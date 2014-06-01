@@ -254,6 +254,9 @@ protected:
 	
 	/// Retrieves the recipe for the specified player from the map, or creates one if not found
 	cCraftingRecipe & GetRecipeForPlayer(cPlayer & a_Player);
+
+	/// Called after an item has been crafted to handle statistics e.t.c.
+	void HandleCraftItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
 
 
@@ -397,6 +400,9 @@ protected:
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+
+	/// Called after an item has been smelted to handle statistics e.t.c.
+	void HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
 
 

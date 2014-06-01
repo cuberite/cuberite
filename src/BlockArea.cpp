@@ -9,7 +9,7 @@
 #include "OSSupport/GZipFile.h"
 #include "Blocks/BlockHandler.h"
 #include "Cuboid.h"
-
+#include "ChunkData.h"
 
 
 
@@ -1835,116 +1835,88 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cBlockArea::cChunkReader::BlockTypes(const BLOCKTYPE * a_BlockTypes)
+void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
 {
-	if (m_Area.m_BlockTypes == NULL)
 	{
-		// Don't want BlockTypes
-		return;
-	}
-	
-	int SizeY = m_Area.m_Size.y;
-	int MinY = m_Origin.y;
-	
-	// SizeX, SizeZ are the dmensions of the block data to copy from the current chunk (size of the geometric union)
-	// OffX, OffZ are the offsets of the current chunk data from the area origin
-	// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
-	int SizeX = cChunkDef::Width;
-	int SizeZ = cChunkDef::Width;
-	int OffX, OffZ;
-	int BaseX, BaseZ;
-	OffX = m_CurrentChunkX * cChunkDef::Width - m_Origin.x;
-	if (OffX < 0)
-	{
-		BaseX = -OffX;
-		SizeX += OffX;  // SizeX is decreased, OffX is negative
-		OffX = 0;
-	}
-	else
-	{
-		BaseX = 0;
-	}
-	OffZ = m_CurrentChunkZ * cChunkDef::Width - m_Origin.z;
-	if (OffZ < 0)
-	{
-		BaseZ = -OffZ;
-		SizeZ += OffZ;  // SizeZ is decreased, OffZ is negative
-		OffZ = 0;
-	}
-	else
-	{
-		BaseZ = 0;
-	}
-	// If the chunk extends beyond the area in the X or Z axis, cut off the Size:
-	if ((m_CurrentChunkX + 1) * cChunkDef::Width > m_Origin.x + m_Area.m_Size.x)
-	{
-		SizeX -= (m_CurrentChunkX + 1) * cChunkDef::Width - (m_Origin.x + m_Area.m_Size.x);
-	}
-	if ((m_CurrentChunkZ + 1) * cChunkDef::Width > m_Origin.z + m_Area.m_Size.z)
-	{
-		SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
-	}
-
-	for (int y = 0; y < SizeY; y++)
-	{
-		int ChunkY = MinY + y;
-		int AreaY = y;
-		for (int z = 0; z < SizeZ; z++)
+		if (m_Area.m_BlockTypes != NULL)
 		{
-			int ChunkZ = BaseZ + z;
-			int AreaZ = OffZ + z;
-			for (int x = 0; x < SizeX; x++)
+			int SizeY = m_Area.m_Size.y;
+			int MinY = m_Origin.y;
+	
+			// SizeX, SizeZ are the dimensions of the block data to copy from the current chunk (size of the geometric union)
+			// OffX, OffZ are the offsets of the current chunk data from the area origin
+			// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
+			int SizeX = cChunkDef::Width;
+			int SizeZ = cChunkDef::Width;
+			int OffX, OffZ;
+			int BaseX, BaseZ;
+			OffX = m_CurrentChunkX * cChunkDef::Width - m_Origin.x;
+			if (OffX < 0)
 			{
-				int ChunkX = BaseX + x;
-				int AreaX = OffX + x;
-				m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = cChunkDef::GetBlock(a_BlockTypes, ChunkX, ChunkY, ChunkZ);
-			}  // for x
-		}  // for z
-	}  // for y
-}
+				BaseX = -OffX;
+				SizeX += OffX;  // SizeX is decreased, OffX is negative
+				OffX = 0;
+			}
+			else
+			{
+				BaseX = 0;
+			}
+			OffZ = m_CurrentChunkZ * cChunkDef::Width - m_Origin.z;
+			if (OffZ < 0)
+			{
+				BaseZ = -OffZ;
+				SizeZ += OffZ;  // SizeZ is decreased, OffZ is negative
+				OffZ = 0;
+			}
+			else
+			{
+				BaseZ = 0;
+			}
+			// If the chunk extends beyond the area in the X or Z axis, cut off the Size:
+			if ((m_CurrentChunkX + 1) * cChunkDef::Width > m_Origin.x + m_Area.m_Size.x)
+			{
+				SizeX -= (m_CurrentChunkX + 1) * cChunkDef::Width - (m_Origin.x + m_Area.m_Size.x);
+			}
+			if ((m_CurrentChunkZ + 1) * cChunkDef::Width > m_Origin.z + m_Area.m_Size.z)
+			{
+				SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
+			}
 
-
-
-
-
-void cBlockArea::cChunkReader::BlockMeta(const NIBBLETYPE * a_BlockMetas)
-{
-	if (m_Area.m_BlockMetas == NULL)
-	{
-		// Don't want metas
-		return;
+			for (int y = 0; y < SizeY; y++)
+			{
+				int ChunkY = MinY + y;
+				int AreaY = y;
+				for (int z = 0; z < SizeZ; z++)
+				{
+					int ChunkZ = BaseZ + z;
+					int AreaZ = OffZ + z;
+					for (int x = 0; x < SizeX; x++)
+					{
+						int ChunkX = BaseX + x;
+						int AreaX = OffX + x;
+						m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock(ChunkX, ChunkY, ChunkZ);
+					}  // for x
+				}  // for z
+			}  // for y
+		}
 	}
-	CopyNibbles(m_Area.m_BlockMetas, a_BlockMetas);
-}
 
-
-
-
-
-void cBlockArea::cChunkReader::BlockLight(const NIBBLETYPE * a_BlockLight)
-{
-	if (m_Area.m_BlockLight == NULL)
+	if (m_Area.m_BlockMetas != NULL)
 	{
-		// Don't want light
-		return;
+		a_BlockBuffer.CopyMetas(m_Area.m_BlockMetas);
 	}
-	CopyNibbles(m_Area.m_BlockLight, a_BlockLight);
-}
 
-
-
-
-
-void cBlockArea::cChunkReader::BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight)
-{
-	if (m_Area.m_BlockSkyLight == NULL)
+	if (m_Area.m_BlockLight != NULL)
 	{
-		// Don't want skylight
-		return;
+		a_BlockBuffer.CopyBlockLight(m_Area.m_BlockLight);
 	}
-	CopyNibbles(m_Area.m_BlockSkyLight, a_BlockSkyLight);
-}
 
+	if (m_Area.m_BlockSkyLight != NULL)
+	{
+		a_BlockBuffer.CopySkyLight(m_Area.m_BlockSkyLight);
+	}
+
+}
 
 
 
@@ -2123,7 +2095,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msOverwrite
 		
 		case cBlockArea::msFillAir:
@@ -2137,7 +2109,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msFillAir
 		
 		case cBlockArea::msImprint:
@@ -2151,7 +2123,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msImprint
 		
 		case cBlockArea::msLake:
@@ -2165,7 +2137,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msLake
 		
 		case cBlockArea::msSpongePrint:
@@ -2179,7 +2151,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msSpongePrint
 
 		case cBlockArea::msDifference:
@@ -2193,7 +2165,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}	// case msDifference
 		
 		case cBlockArea::msMask:
@@ -2207,16 +2179,13 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
 				m_Size.x, m_Size.y, m_Size.z
 			);
-			break;
+			return;
 		}  // case msMask
-		
-		default:
-		{
-			LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
-			ASSERT(!"Unknown block area merge strategy");
-			break;
-		}
 	}  // switch (a_Strategy)
+	
+	LOGWARNING("Unknown block area merge strategy: %d", a_Strategy);
+	ASSERT(!"Unknown block area merge strategy");
+	return;
 }
 
 

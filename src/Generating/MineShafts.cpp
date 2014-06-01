@@ -1283,7 +1283,7 @@ cStructGenMineShafts::cStructGenMineShafts(
 	int a_Seed, int a_GridSize, int a_MaxSystemSize,
 	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
 ) :
-	super(a_Seed, a_GridSize, a_GridSize, 120 + a_MaxSystemSize * 10, 120 + a_MaxSystemSize * 10, 100),
+	super(a_Seed, a_GridSize, a_GridSize, a_MaxSystemSize, a_MaxSystemSize, 100),
 	m_Noise(a_Seed),
 	m_GridSize(a_GridSize),
 	m_MaxSystemSize(a_MaxSystemSize),

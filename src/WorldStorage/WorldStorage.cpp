@@ -243,7 +243,6 @@ void cWorldStorage::Execute(void)
 		bool Success;
 		do
 		{
-			Success = false;
 			if (m_ShouldTerminate)
 			{
 				return;

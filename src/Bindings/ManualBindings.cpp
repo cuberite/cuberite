@@ -2864,8 +2864,8 @@ static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
 	}
 	
 	// Set the type:
-	int MessageType;
-	L.GetStackValue(1, MessageType);
+	int MessageType = mtCustom;
+	L.GetStackValue(2, MessageType);
 	self->SetMessageType((eMessageType)MessageType);
 	
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:

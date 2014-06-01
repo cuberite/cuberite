@@ -11,13 +11,19 @@ Implements the 1.7.x protocol classes:
 #include "json/json.h"
 #include "Protocol17x.h"
 #include "ChunkDataSerializer.h"
+#include "PolarSSL++/Sha1Checksum.h"
+
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
+#include "../StringCompression.h"
+#include "../CompositeChat.h"
+#include "../Statistics.h"
+
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
-#include "../StringCompression.h"
+
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -25,15 +31,15 @@ Implements the 1.7.x protocol classes:
 #include "../Entities/Pickup.h"
 #include "../Entities/Player.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/FireworkEntity.h"
+
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
+
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
-#include "../CompositeChat.h"
-#include "../Entities/ArrowEntity.h"
-#include "../Entities/FireworkEntity.h"
-#include "PolarSSL++/Sha1Checksum.h"
 
 
 
@@ -228,7 +234,8 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 	
 	// Compose the complete Json string to send:
 	Json::Value msg;
-	msg["text"] = "";  // The client crashes without this
+	cWorld * World = m_Client->GetPlayer()->GetWorld();
+	msg["text"] = cClientHandle::FormatMessageType((World == NULL) ? false : World->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
 	const cCompositeChat::cParts & Parts = a_Message.GetParts();
 	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
 	{
@@ -280,6 +287,35 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
 				Cmd["value"] = p.m_Command;
 				Part["clickEvent"] = Cmd;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+
+			case cCompositeChat::ptShowAchievement:
+			{
+				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
+				Part["translate"] = "chat.type.achievement";
+
+				Json::Value Ach;
+				Ach["action"] = "show_achievement";
+				Ach["value"] = p.m_Text;
+				
+				Json::Value AchColourAndName;
+				AchColourAndName["color"] = "green";
+				AchColourAndName["translate"] = p.m_Text;
+				AchColourAndName["hoverEvent"] = Ach;
+
+				Json::Value Extra;
+				Extra.append(AchColourAndName);
+
+				Json::Value Name;
+				Name["text"] = p.m_PlayerName;
+
+				Json::Value With;
+				With.append(Name);
+				With.append(Extra);
+
+				Part["with"] = With;
 				AddChatPartStyle(Part, p.m_Style);
 				break;
 			}
@@ -1169,6 +1205,28 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 
 
 
+void cProtocol172::SendStatistics(const cStatManager & a_Manager)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x37);
+	Pkt.WriteVarInt(statCount); // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
+
+	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	{
+		StatValue Value = a_Manager.GetValue((eStatistic) i);
+
+		const AString & StatName = cStatInfo::GetName((eStatistic) i);
+
+		Pkt.WriteString(StatName);
+		Pkt.WriteVarInt(Value);
+	}
+}
+
+
+
+
+
 void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1843,13 +1901,15 @@ void cProtocol172::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 		case 1:
 		{
 			// Request stats
-			// TODO
+			const cStatManager & Manager = m_Client->GetPlayer()->GetStatManager();
+			SendStatistics(Manager);
+
 			break;
 		}
 		case 2:
 		{
 			// Open Inventory achievement
-			// TODO
+			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
 			break;
 		}
 	}

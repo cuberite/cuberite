@@ -675,6 +675,16 @@ void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Veh
 
 
 
+void cProtocolRecognizer::SendStatistics(const cStatManager & a_Manager)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendStatistics(a_Manager);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Results)
 {
 	ASSERT(m_Protocol != NULL);

@@ -174,7 +174,7 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			{
 				GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			}
-			break;
+			return;
 		}
 		
 		case biTaiga:
@@ -184,14 +184,14 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		{
 			// Conifers
 			GetConiferTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
-			break;
+			return;
 		}
 		
 		case biSwampland:
 		{
 			// Swamp trees:
 			GetSwampTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
-			break;
+			return;
 		}
 		
 		case biJungle:
@@ -207,21 +207,21 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			{
 				GetJungleTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			}
-			break;
+			return;
 		}
 		
 		case biBirchForest:
 		case biBirchForestHills:
 		{
 			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
-			break;
+			return;
 		}
 
 		case biBirchForestM:
 		case biBirchForestHillsM:
 		{
 			GetTallBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
-			break;
+			return;
 		}
 
 		case biRoofedForest:
@@ -257,9 +257,29 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		{
 			// TODO: These need their special trees
 			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
-			break;
+			return;
+		}
+			
+		case biDesert:
+		case biDesertHills:
+		case biRiver:
+		case biBeach:
+		case biHell:
+		case biSky:
+		case biOcean:
+		case biFrozenOcean:
+		case biFrozenRiver:
+		case biVariant:
+		case biNumBiomes:
+		case biNumVariantBiomes:
+		case biInvalidBiome:
+		{
+			// These biomes have no trees, or are non-biome members of the enum.
+			return;
 		}
 	}
+	
+	ASSERT(!"Invalid biome type!");
 }
 
 

@@ -40,7 +40,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 	if (m_IsValid)
 	{
 		LOGWARNING("SSL: Double initialization is not supported.");
-		return POLARSSL_ERR_SSL_MALLOC_FAILED;  // There is no return value well-suited for this, reuse this one.
+		return POLARSSL_ERR_SSL_BAD_INPUT_DATA;  // There is no return value well-suited for this, reuse this one.
 	}
 	
 	// Set the CtrDrbg context, create a new one if needed:
@@ -59,7 +59,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		return res;
 	}
 	ssl_set_endpoint(&m_Ssl, a_IsClient ? SSL_IS_CLIENT : SSL_IS_SERVER);
-	ssl_set_authmode(&m_Ssl, SSL_VERIFY_OPTIONAL);
+	ssl_set_authmode(&m_Ssl, a_IsClient ? SSL_VERIFY_OPTIONAL : SSL_VERIFY_NONE);  // Clients ask for server's cert but don't verify strictly; servers don't ask clients for certs by default
 	ssl_set_rng(&m_Ssl, ctr_drbg_random, &m_CtrDrbg->m_CtrDrbg);
 	ssl_set_bio(&m_Ssl, ReceiveEncrypted, this, SendEncrypted, this);
 	
@@ -69,6 +69,18 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		// so they're disabled until someone needs them
 		ssl_set_dbg(&m_Ssl, &SSLDebugMessage, this);
 		ssl_set_verify(&m_Ssl, &SSLVerifyCert, this);
+		*/
+		
+		/*
+		// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:
+		static const int CipherSuites[] =
+		{
+			TLS_RSA_WITH_RC4_128_MD5,
+			TLS_RSA_WITH_RC4_128_SHA,
+			TLS_RSA_WITH_AES_128_CBC_SHA,
+			0,  // Must be 0-terminated!
+		};
+		ssl_set_ciphersuites(&m_Ssl, CipherSuites);
 		*/
 	#endif
 	
@@ -80,8 +92,56 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 
 
 
+void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cRsaPrivateKeyPtr & a_OwnCertPrivKey)
+{
+	ASSERT(m_IsValid);  // Call Initialize() first
+	
+	// Check that both the cert and the key is valid:
+	if ((a_OwnCert.get() == NULL) || (a_OwnCertPrivKey.get() == NULL))
+	{
+		LOGWARNING("SSL: Own certificate is not valid, skipping the set.");
+		return;
+	}
+	
+	// Make sure we have the cert stored for later, PolarSSL only uses the cert later on
+	m_OwnCert = a_OwnCert;
+	m_OwnCertPrivKey = a_OwnCertPrivKey;
+	
+	// Set into the context:
+	ssl_set_own_cert_rsa(&m_Ssl, m_OwnCert->GetInternal(), m_OwnCertPrivKey->GetInternal());
+}
+
+
+
+
+
+void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cCryptoKeyPtr & a_OwnCertPrivKey)
+{
+	ASSERT(m_IsValid);  // Call Initialize() first
+	
+	// Check that both the cert and the key is valid:
+	if ((a_OwnCert.get() == NULL) || (a_OwnCertPrivKey.get() == NULL))
+	{
+		LOGWARNING("SSL: Own certificate is not valid, skipping the set.");
+		return;
+	}
+	
+	// Make sure we have the cert stored for later, PolarSSL only uses the cert later on
+	m_OwnCert = a_OwnCert;
+	m_OwnCertPrivKey2 = a_OwnCertPrivKey;
+	
+	// Set into the context:
+	ssl_set_own_cert(&m_Ssl, m_OwnCert->GetInternal(), m_OwnCertPrivKey2->GetInternal());
+}
+
+
+
+
+
 void cSslContext::SetCACerts(const cX509CertPtr & a_CACert, const AString & a_ExpectedPeerName)
 {
+	ASSERT(m_IsValid);  // Call Initialize() first
+	
 	// Store the data in our internal buffers, to avoid losing the pointers later on
 	// PolarSSL will need these after this call returns, and the caller may move / delete the data before that:
 	m_ExpectedPeerName = a_ExpectedPeerName;

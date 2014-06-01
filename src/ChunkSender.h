@@ -27,6 +27,7 @@ Note that it may be called by world's BroadcastToChunk() if the client is still 
 
 #include "OSSupport/IsThread.h"
 #include "ChunkDef.h"
+#include "ChunkDataCallback.h"
 
 
 

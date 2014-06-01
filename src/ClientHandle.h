@@ -39,6 +39,7 @@ class cFallingBlock;
 class cItemHandler;
 class cWorld;
 class cCompositeChat;
+class cStatManager;
 
 
 
@@ -79,9 +80,9 @@ public:
 	static AString GenerateOfflineUUID(const AString & a_Username);  // tolua_export
 	
 	/** Formats the type of message with the proper color and prefix for sending to the client. **/
-	AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
+	static AString FormatMessageType(bool ShouldAppendChatPrefixes, eMessageType a_ChatPrefix, const AString & a_AdditionalData);
 	
-	AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
+	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
 
 	void Kick(const AString & a_Reason);		// tolua_export
 	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication
@@ -160,6 +161,7 @@ public:
 	void SendSpawnMob            (const cMonster & a_Mob);
 	void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
 	void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
+	void SendStatistics          (const cStatManager & a_Manager);
 	void SendTabCompletionResults(const AStringVector & a_Results);
 	void SendTeleportEntity      (const cEntity & a_Entity);
 	void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -374,6 +376,9 @@ private:
 	/** Handles the DIG_FINISHED dig packet: */
 	void HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
 
+	/** The clients will receive a finished dig animation */
+	void FinishDigAnimation();
+
 	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
 	AStringVector BreakApartPluginChannels(const AString & a_PluginChannels);
 	
@@ -390,7 +395,7 @@ private:
 	void HandleAnvilItemName(const char * a_Data, size_t a_Length);
 	
 	// cSocketThreads::cCallback overrides:
-	virtual void DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
+	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
 };										// tolua_export

@@ -391,38 +391,41 @@ void cNBTChunkSerializer::AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 
 void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 {
-	const char * EntityClass = NULL;
-	switch (a_Minecart->GetPayload())
-	{
-		case cMinecart::mpNone:    EntityClass = "MinecartRideable"; break;
-		case cMinecart::mpChest:   EntityClass = "MinecartChest";    break;
-		case cMinecart::mpFurnace: EntityClass = "MinecartFurnace";  break;
-		case cMinecart::mpTNT:     EntityClass = "MinecartTNT";      break;
-		case cMinecart::mpHopper:  EntityClass = "MinecartHopper";   break;
-		default:
-		{
-			ASSERT(!"Unhandled minecart payload type");
-			return;
-		}
-	}  // switch (payload)
-	
 	m_Writer.BeginCompound("");
-		AddBasicEntity(a_Minecart, EntityClass);
+	
 		switch (a_Minecart->GetPayload())
 		{
 			case cMinecart::mpChest:
 			{
+				AddBasicEntity(a_Minecart, "MinecartChest");
 				// Add chest contents into the Items tag:
 				AddMinecartChestContents((cMinecartWithChest *)a_Minecart);
 				break;
 			}
-			
 			case cMinecart::mpFurnace:
 			{
+				AddBasicEntity(a_Minecart, "MinecartFurnace");
 				// TODO: Add "Push" and "Fuel" tags
 				break;
 			}
+			case cMinecart::mpHopper:
+			{
+				AddBasicEntity(a_Minecart, "MinecartHopper");
+				// TODO: Add hopper contents?
+				break;
+			}
+			case cMinecart::mpTNT:
+			{
+				AddBasicEntity(a_Minecart, "MinecartTNT");
+				break;
+			}
+			case cMinecart::mpNone:
+			{
+				AddBasicEntity(a_Minecart, "MinecartRideable");
+				break;
+			}
 		}  // switch (Payload)
+	
 	m_Writer.EndCompound();
 }
 
@@ -650,6 +653,13 @@ void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 		case BLOCK_FACE_YP: m_Writer.AddByte("Dir", (unsigned char)1); break;
 		case BLOCK_FACE_ZM: m_Writer.AddByte("Dir", (unsigned char)0); break;
 		case BLOCK_FACE_ZP: m_Writer.AddByte("Dir", (unsigned char)3); break;
+		
+		case BLOCK_FACE_XM:
+		case BLOCK_FACE_XP:
+		case BLOCK_FACE_NONE:
+		{
+			break;
+		}
 	}
 }
 
@@ -717,10 +727,9 @@ void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Mineca
 
 
 
-bool cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
+void cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
 {
 	m_IsLightValid = a_IsLightValid;
-	return a_IsLightValid;  // We want lighting only if it's valid, otherwise don't bother
 }
 
 
