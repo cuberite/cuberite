@@ -1835,87 +1835,133 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cBlockArea::cChunkReader::ChunkData(const cChunkData &  a_BlockBuffer)
+void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 {
-	{
-		if (m_Area.m_BlockTypes != NULL)
-		{
-			int SizeY = m_Area.m_Size.y;
-			int MinY = m_Origin.y;
-	
-			// SizeX, SizeZ are the dimensions of the block data to copy from the current chunk (size of the geometric union)
-			// OffX, OffZ are the offsets of the current chunk data from the area origin
-			// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
-			int SizeX = cChunkDef::Width;
-			int SizeZ = cChunkDef::Width;
-			int OffX, OffZ;
-			int BaseX, BaseZ;
-			OffX = m_CurrentChunkX * cChunkDef::Width - m_Origin.x;
-			if (OffX < 0)
-			{
-				BaseX = -OffX;
-				SizeX += OffX;  // SizeX is decreased, OffX is negative
-				OffX = 0;
-			}
-			else
-			{
-				BaseX = 0;
-			}
-			OffZ = m_CurrentChunkZ * cChunkDef::Width - m_Origin.z;
-			if (OffZ < 0)
-			{
-				BaseZ = -OffZ;
-				SizeZ += OffZ;  // SizeZ is decreased, OffZ is negative
-				OffZ = 0;
-			}
-			else
-			{
-				BaseZ = 0;
-			}
-			// If the chunk extends beyond the area in the X or Z axis, cut off the Size:
-			if ((m_CurrentChunkX + 1) * cChunkDef::Width > m_Origin.x + m_Area.m_Size.x)
-			{
-				SizeX -= (m_CurrentChunkX + 1) * cChunkDef::Width - (m_Origin.x + m_Area.m_Size.x);
-			}
-			if ((m_CurrentChunkZ + 1) * cChunkDef::Width > m_Origin.z + m_Area.m_Size.z)
-			{
-				SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
-			}
+	int SizeY = m_Area.m_Size.y;
+	int MinY = m_Origin.y;
 
-			for (int y = 0; y < SizeY; y++)
+	// SizeX, SizeZ are the dimensions of the block data to copy from the current chunk (size of the geometric union)
+	// OffX, OffZ are the offsets of the current chunk data from the area origin
+	// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
+	int SizeX = cChunkDef::Width;
+	int SizeZ = cChunkDef::Width;
+	int OffX, OffZ;
+	int BaseX, BaseZ;
+	OffX = m_CurrentChunkX * cChunkDef::Width - m_Origin.x;
+	if (OffX < 0)
+	{
+		BaseX = -OffX;
+		SizeX += OffX;  // SizeX is decreased, OffX is negative
+		OffX = 0;
+	}
+	else
+	{
+		BaseX = 0;
+	}
+	OffZ = m_CurrentChunkZ * cChunkDef::Width - m_Origin.z;
+	if (OffZ < 0)
+	{
+		BaseZ = -OffZ;
+		SizeZ += OffZ;  // SizeZ is decreased, OffZ is negative
+		OffZ = 0;
+	}
+	else
+	{
+		BaseZ = 0;
+	}
+	// If the chunk extends beyond the area in the X or Z axis, cut off the Size:
+	if ((m_CurrentChunkX + 1) * cChunkDef::Width > m_Origin.x + m_Area.m_Size.x)
+	{
+		SizeX -= (m_CurrentChunkX + 1) * cChunkDef::Width - (m_Origin.x + m_Area.m_Size.x);
+	}
+	if ((m_CurrentChunkZ + 1) * cChunkDef::Width > m_Origin.z + m_Area.m_Size.z)
+	{
+		SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
+	}
+	
+	// Copy the blocktypes:
+	if (m_Area.m_BlockTypes != NULL)
+	{
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
 			{
-				int ChunkY = MinY + y;
-				int AreaY = y;
-				for (int z = 0; z < SizeZ; z++)
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
 				{
-					int ChunkZ = BaseZ + z;
-					int AreaZ = OffZ + z;
-					for (int x = 0; x < SizeX; x++)
-					{
-						int ChunkX = BaseX + x;
-						int AreaX = OffX + x;
-						m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock(ChunkX, ChunkY, ChunkZ);
-					}  // for x
-				}  // for z
-			}  // for y
-		}
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
 
+	// Copy the block metas:
 	if (m_Area.m_BlockMetas != NULL)
 	{
-		a_BlockBuffer.CopyMetas(m_Area.m_BlockMetas);
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
+			{
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
 
+	// Copy the blocklight:
 	if (m_Area.m_BlockLight != NULL)
 	{
-		a_BlockBuffer.CopyBlockLight(m_Area.m_BlockLight);
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
+			{
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
 
+	// Copy the skylight:
 	if (m_Area.m_BlockSkyLight != NULL)
 	{
-		a_BlockBuffer.CopySkyLight(m_Area.m_BlockSkyLight);
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
+			{
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
-
 }
 
 
