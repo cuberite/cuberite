@@ -109,7 +109,7 @@ biome generator does.</p>
 
 <p>Of course, there are more interesting test scenarios for which multiple biomes must be generated as easy
 as possible. For these special needs, there's a CheckerBoard biome generator. As the name suggests, it
-generates a grid of biomes.</p>
+generates a grid of alternating biomes.</p>
 
 <h3>Voronoi diagram</h3>
 <p>Those two generators were more of a technicality, we need to make something more interesting if we're
@@ -117,7 +117,7 @@ going for a natural look. The Voronoi generator is the first step towards such a
 <a href="http://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> is a construct that creates a
 set of areas where each point in an area is closer to the appropriate seed of the area than the seeds of any
 other area:</p>
-<img src="http://upload.wikimedia.org/wikipedia/commons/8/80/Euclidean_Voronoi_Diagram.png" />
+<img src="img/voronoi.png" />
 
 <p>To generate biomes using this approach, you select random "seeds", assign a biome to each one, and then
 for each "column" of the world you find the seed that is the nearest to that column, and use that seed's
@@ -218,19 +218,24 @@ either add them somewhere into the decision diagram, or we can make the generato
 this:</p>
 <img src="img/multistepmapbiomes.png" />
 
-<p>To decide whether the point is in the ocean, land or mushroom, the generator uses a DistortedVoronoi
-approach where the seeds get the "ocean", "land" and "mushroom" values; special handling is added so that a
-mushroom value is always surrounded by ocean values on all 8 sides:</p>
-<img src="multistepmap1.jpg" />
+<p>To decide whether the point is in the ocean, land or mushroom, the generator first chooses seeds in a grid
+that will be later fed to a DistortedVoronoi algorithm, the seeds get the "ocean" and "land" values. Then it
+considers all the "ocean" seeds that are surrounded by 8 other "ocean" seeds and turns a random few of them
+into "mushroom". This special seed processing makes the mushroom biomes mostly surrounded by ocean. The
+following image shows an example seeds grid that the generator might consider, only the two framed cells are
+allowed to change into mushroom. L = land, O = ocean:</p>
+<img src="img/multistepmapgrid.jpg" />
 
-<p>For the Voronoi cells that are calculated as mushroom, the distance to the nearest-seed is used to
-further shrink the mushroom biome and then to distinguish between mushroom and mushroom-shore:</p>
-<img src="multistepmap2.jpg" />
+<p>Next, the generator calculates the DistortedVoronoi for the seeds. For the areas that are calculated as
+mushroom, the distance to the nearest-seed is used to further shrink the mushroom biome and then to
+distinguish between mushroom and mushroom-shore (image depicts a Voronoi cell for illustration purposes, it
+works similarly with DistortedVoronoi). O = ocean, M = mushroom, MS = mushroom shore:</p>
+<img src="img/multistepmapdistance.jpg" />
 
 <p>The rivers are added only to the areas that have been previously marked as land. A simple 2D Perlin noise
 is used as the base, where its value is between 0 and a configured threshold value, a river is created. This
 creates the rivers in a closed-loop-like shapes, occasionally splitting two branches off:</p>
-<img src="multistepmap3.jpg" />
+<img src="img/perlinrivers.jpg" />
 
 <p>For the leftover land biomes, the two Perlin noises, representing temperature and humidity, are used to
 generate the biomes, as described earlier. Additionally, the temperature map is used to turn the Ocean biome
@@ -239,7 +244,7 @@ into FrozenOcean, and the River biome into FrozenRiver, wherever the temperature
 <h3>Two-level Voronoi</h3>
 <p>The 1.7 MineCraft update brought a completely new terrain generation, which has sparked renewed interest
 in the biome generation. A new, potentially simpler way of generating biomes was found, the two-level
-Voronoi generator.</p>
+DistortedVoronoi generator.</p>
 
 <p>The main idea behind it all is that we create large areas of similar biomes. There are several groups of
 related biomes that can be generated near each other: Desert biomes, Ice biomes, Forest biomes, Mesa biomes.
@@ -253,12 +258,18 @@ the nearest seed's distance, but also the distance to the second-nearest seed; t
 is used as an indicator whether the column is in the "inside" or on the "outskirt" of the smaller Voronoi
 cell. This allows us to give certain biomes an "edge" biome - the Mushroom biome has a MushroomShore edge,
 the ExtremeHills biome have an ExtremeHillsEdge biome on the edge, etc.</p>
-<img src="img/twolevel1.jpg" /><br />
-<img src="img/twolevel2.jpg" /><br />
-<img src="img/twolevel3.jpg" /><br />
+
+<p>The images below illustrate the process with regular Voronoi diagrams, for clarity purposes. The real
+generator uses distortion before querying the small areas.</p>
+<img src="img/twolevellargeareas.jpg" /><br />
+<img src="img/twolevelsmallgrid.jpg" /><br />
+<img src="img/twolevelsmallareas.jpg" /><br />
 
 <p>The following image shows an example output of a TwoLevel biome generator in MCServer:</p>
 <img src="img/twolevelbiomes.png" />
+
+<p>Note that rivers are currently not implemented in this generator in MCServer, but they could be added
+using the same approach as in MultiStepMap - by using a thresholded 2D Perlin noise.</p>
 
 
 
