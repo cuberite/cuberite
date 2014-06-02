@@ -14,7 +14,7 @@ return
 			{ Name = "BlockY", Type = "number", Notes = "The Y-coord where the projectile hit." },
 			{ Name = "BlockZ", Type = "number", Notes = "The Z-coord where the projectile hit." },
 			{ Name = "BlockFace", Type = "number", Notes = "The side of the block where the projectile hit." },
-			{ Name = "BlockHitPos", Type = "Vector3d", Notes = "The exact position where the projectile hit."
+			{ Name = "BlockHitPos", Type = "Vector3d", Notes = "The exact position where the projectile hit." },
 		},
 		Returns = [[
 			If the function returns false or no value, the next plugin's callback is called. If the function
