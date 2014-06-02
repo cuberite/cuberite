@@ -117,6 +117,20 @@ public:
 	};
 
 
+	class cTaskSendBlockToAllPlayers :
+		public cTask
+	{
+	public:
+		cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue);
+
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+
+		std::vector<Vector3i> m_SendQueue;
+	};
+
+
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
 		return "cWorld";
@@ -373,7 +387,7 @@ public:
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed.
 	*/
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates.

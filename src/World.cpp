@@ -1551,9 +1551,9 @@ bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
 
 
 
-void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
-	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_SendToClients);
 }
 
 
@@ -3121,6 +3121,49 @@ void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
 {
 	a_World.UnloadUnusedChunks();
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cWorld::cTaskSendBlockTo
+
+cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue) :
+	m_SendQueue(a_SendQueue)
+{
+}
+
+void cWorld::cTaskSendBlockToAllPlayers::Run(cWorld & a_World)
+{
+	class cPlayerCallback :
+		public cPlayerListCallback
+	{
+	public:
+		cPlayerCallback(std::vector<Vector3i> & a_SendQueue, cWorld & a_World) :
+			m_SendQueue(a_SendQueue),
+			m_World(a_World)
+		{
+		}
+
+		virtual bool Item(cPlayer * a_Player)
+		{
+			for (std::vector<Vector3i>::const_iterator itr = m_SendQueue.begin(); itr != m_SendQueue.end(); ++itr)
+			{
+				m_World.SendBlockTo(itr->x, itr->y, itr->z, a_Player);
+			}
+			return false;
+		}
+
+	private:
+
+		std::vector<Vector3i> m_SendQueue;
+		cWorld & m_World;
+
+	} PlayerCallback(m_SendQueue, a_World);
+
+	a_World.ForEachPlayer(PlayerCallback);
 }
 
 

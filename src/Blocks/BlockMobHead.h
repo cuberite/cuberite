@@ -68,7 +68,7 @@ public:
 		public:
 			cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
 
-		} PlayerCallback(Vector3f(a_BlockX, a_BlockY, a_BlockZ));
+		} PlayerCallback(Vector3f((float)a_BlockX, (float)a_BlockY, (float)a_BlockZ));
 
 		a_World->DoWithMobHeadAt(a_BlockX, a_BlockY, a_BlockZ, CallbackA);
 
