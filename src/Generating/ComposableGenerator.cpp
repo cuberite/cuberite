@@ -25,6 +25,7 @@
 #include "Noise3DGenerator.h"
 #include "POCPieceGenerator.h"
 #include "Ravines.h"
+#include "UnderwaterBaseGen.h"
 #include "VillageGen.h"
 
 
@@ -405,6 +406,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Trees") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
+		}
+		else if (NoCaseCompare(*itr, "UnderwaterBases") == 0)
+		{
+			int GridSize   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
+			int MaxDepth   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
+			int MaxSize    = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
+			m_FinishGens.push_back(new cUnderwaterBaseGen(Seed, GridSize, MaxDepth, MaxSize, *m_BiomeGen));
 		}
 		else if (NoCaseCompare(*itr, "Villages") == 0)
 		{
