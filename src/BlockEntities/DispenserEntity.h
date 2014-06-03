@@ -23,10 +23,10 @@ public:
 	static const char * GetClassStatic(void) { return "cDispenserEntity"; }
 
 	/** Spawns a projectile of the given kind in front of the dispenser */
-	void SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind, Vector3d a_ShootVector); // tolua_export
+	void SpawnProjectileFromDispenser(int & a_BlockX, int & a_BlockY, int & a_BlockZ, cProjectileEntity::eKind a_kind, Vector3d a_ShootVector);
 
 	/** Returns how to aim the projectile */
-	Vector3d GetShootVector(cChunk & a_Chunk); // tolua_export
+	Vector3d GetShootVector(NIBBLETYPE & a_Meta);
 
 private:
 	// cDropSpenser overrides:
@@ -38,7 +38,3 @@ private:
 	/// If the a_BlockInFront is liquidable and the empty bucket can fit, does the m_Contents processing and returns true
 	bool EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum);
 } ;  // tolua_export
-
-
-
-

@@ -146,17 +146,11 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIRE_CHARGE:
 		{
-			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
-			{
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge, GetShootVector(a_Chunk) * 20);
-			}
-			else
-			{
-				Vector3d ShootVector = GetShootVector(a_Chunk);
-				ShootVector = ShootVector * 20;
+			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge, ShootVector);
-			}
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkFireCharge, GetShootVector(Meta) * 20);
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
@@ -165,18 +159,11 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_ARROW:
 		{
-			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
-			{
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow, GetShootVector(a_Chunk) * 20);
-			}
-			else
-			{
-				Vector3d ShootVector = GetShootVector(a_Chunk);
-				ShootVector = ShootVector * 20;
-				ShootVector.y = ShootVector.y + 1;
+			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow, ShootVector);
-			}
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkArrow, GetShootVector(Meta) * 20);
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
@@ -185,18 +172,11 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_SNOWBALL:
 		{
-			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
-			{
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball, GetShootVector(a_Chunk) * 20);
-			}
-			else
-			{
-				Vector3d ShootVector = GetShootVector(a_Chunk);
-				ShootVector = ShootVector * 20;
-				ShootVector.y = ShootVector.y + 1;
+			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball, ShootVector);
-			}
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkSnowball, GetShootVector(Meta) * 20);
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
@@ -205,27 +185,18 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_EGG:
 		{
-			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
-			{
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg, GetShootVector(a_Chunk) * 20);
-			}
-			else
-			{
-				Vector3d ShootVector = GetShootVector(a_Chunk);
-				ShootVector = ShootVector * 20;
-				ShootVector.y = ShootVector.y + 1;
+			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
+			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg, ShootVector);
-			}
-
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkEgg, GetShootVector(Meta) * 20);
 
 			break;
 		}
 
 		case E_ITEM_FIREWORK_ROCKET:
 		{
-			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework, GetShootVector(a_Chunk) * 0);
+			// TODO: Add the fireworks entity
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
@@ -242,55 +213,29 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 
 
-void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind, Vector3d a_ShootVector)
+void cDispenserEntity::SpawnProjectileFromDispenser(int & a_BlockX, int & a_BlockY, int & a_BlockZ, cProjectileEntity::eKind a_kind, Vector3d a_ShootVector)
 {
-	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_DispX, a_DispZ);
+	if(a_kind != E_ITEM_FIRE_CHARGE)
+		a_ShootVector.y = a_ShootVector.y + 1;
 
-	double EntityX = 0.5 + (a_DispX + DispChunk->GetPosX() * cChunkDef::Width);
-	double EntityZ = 0.5 + (a_DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-
-	m_World->CreateProjectile((double) EntityX, (double) a_DispY + 0.5, (double) EntityZ, a_kind, NULL, NULL, &a_ShootVector);
+	m_World->CreateProjectile((double) a_BlockX + 0.5, (double) a_BlockY + 0.5, (double) a_BlockZ + 0.5, a_kind, NULL, NULL, &a_ShootVector);
 }
 
 
-
-Vector3d cDispenserEntity::GetShootVector(cChunk & a_Chunk)
+Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE & a_Meta)
 {
-	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
-	int Direction = 0;
-	Matrix4d m;
-	Vector3d Look;
-
-	switch (Meta)
+	switch(a_Meta)
 	{
-		case E_META_DROPSPENSER_FACING_YP:
-		{
-			m.Init(Vector3d(), 0, 180, 0);
-			Look = m.Transform(Vector3d(0, 1, 0));
+		case E_META_DROPSPENSER_FACING_YP:	return Vector3d(0, 1, 0);		// UP
+		case E_META_DROPSPENSER_FACING_YM:	return Vector3d(0, -1, 0);		// DOWN
 
-			return Look; // UP
-		}
+		case E_META_DROPSPENSER_FACING_XM:	return Vector3d(-1, 0, 0);		// WEST
+		case E_META_DROPSPENSER_FACING_XP:	return Vector3d(1, 0, 0);		// EAST
 
-		case E_META_DROPSPENSER_FACING_YM:
-		{
-			m.Init(Vector3d(), 0, -360, 0);
-			Look = m.Transform(Vector3d(0, -1, 0));
-
-			return Look; // DOWN
-		}
-
-		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break;	// WEST
-		case E_META_DROPSPENSER_FACING_XP: Direction = 270; break;	// EAST
-		case E_META_DROPSPENSER_FACING_ZM: Direction = 180; break;
-		case E_META_DROPSPENSER_FACING_ZP: Direction = 0; break;
+		case E_META_DROPSPENSER_FACING_ZM:	return Vector3d(0, 0, -1);
+		case E_META_DROPSPENSER_FACING_ZP:	return Vector3d(0, 0, 1);
 	}
-
-	m.Init(Vector3d(), 0, Direction, 0);
-	Look = m.Transform(Vector3d(0, 0, 1));
-
-	return Look;
 }
-
 
 
 
