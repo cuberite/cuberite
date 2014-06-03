@@ -1650,13 +1650,6 @@ bool cPlayer::LoadFromDisk()
 {
 	LoadPermissionsFromDisk();
 
-	// Log player permissions, cause it's what the cool kids do
-	LOGINFO("Player %s has permissions:", GetName().c_str() );
-	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
-	{
-		if( itr->second ) LOG(" - %s", itr->first.c_str() );
-	}
-
 	AString SourceFile;
 	Printf(SourceFile, "players/%s.json", GetName().c_str() );
 
