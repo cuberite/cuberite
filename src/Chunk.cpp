@@ -1387,7 +1387,7 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 				int index = MakeIndex( x, y, z );
 				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
-					m_HeightMap[x + z * Width] = (unsigned char)y;
+					m_HeightMap[x + z * Width] = (HEIGHTTYPE)y;
 					break;
 				}
 			}  // for y
@@ -1399,9 +1399,9 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 
 
 
-void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
-	FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
+	FastSetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta, a_SendToClients);
 	
 	// Tick this block and its neighbors:
 	m_ToTickBlocks.push_back(Vector3i(a_RelX, a_RelY, a_RelZ));
@@ -1500,7 +1500,7 @@ void cChunk::QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ)
 
 
 
-void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients)
 {
 	ASSERT(!((a_RelX < 0) || (a_RelX >= Width) || (a_RelY < 0) || (a_RelY >= Height) || (a_RelZ < 0) || (a_RelZ >= Width)));
 
@@ -1517,14 +1517,16 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
-	// The client doesn't need to distinguish between stationary and nonstationary fluids:
-	if (
-		(OldBlockMeta != a_BlockMeta) ||  // Different meta always gets sent to the client
-		!(
-			((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-			((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-			((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-			((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+	if ( // Queue block to be sent only if ...
+		a_SendToClients && // ... we are told to do so AND ...
+		(
+			(OldBlockMeta != a_BlockMeta) || // ... the meta value is different OR ...
+			!( // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
+				((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+				((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+				((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
+				((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+			)
 		)
 	)
 	{
@@ -1548,7 +1550,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	{
 		if (a_BlockType != E_BLOCK_AIR)
 		{
-			m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)a_RelY;
+			m_HeightMap[a_RelX + a_RelZ * Width] = (HEIGHTTYPE)a_RelY;
 		}
 		else
 		{
@@ -1556,7 +1558,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 			{
 				if (GetBlock(a_RelX, y, a_RelZ) != E_BLOCK_AIR)
 				{
-					m_HeightMap[a_RelX + a_RelZ * Width] = (unsigned char)y;
+					m_HeightMap[a_RelX + a_RelZ * Width] = (HEIGHTTYPE)y;
 					break;
 				}
 			}  // for y - column in m_BlockData

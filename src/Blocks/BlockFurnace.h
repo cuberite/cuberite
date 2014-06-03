@@ -3,7 +3,7 @@
 
 #include "BlockEntity.h"
 #include "../World.h"
-#include "../Piston.h"
+#include "../Blocks/BlockPiston.h"
 #include "MetaRotator.h"
 
 
@@ -35,7 +35,7 @@ public:
 		a_BlockType = m_BlockType;
 		
 		// FIXME: Do not use cPiston class for furnace placement!
-		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetYaw(), 0);
+		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player->GetYaw(), 0);
 		
 		return true;
 	}
