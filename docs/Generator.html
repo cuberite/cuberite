@@ -8,7 +8,24 @@
 specific to MCServer, though, it can be viewed as a generic guide to various terrain-generating algorithms,
 with specific implementation notes regarding MCServer.</p>
 
-<h2>Preface: How it's done in real life</h2>
+<p>Contents:
+<ul>
+<li><a href="#preface">Preface: How it's done in real life</a></li>
+<li><a href="#expectedprops">Expected properties</a></li>
+<li><a href="#reversingflow">Reversing the flow</a></li>
+<li><a href="#composablegen">The ComposableGenerator pipeline</a></li>
+<li><a href="#coherentnoise">Using coherent noise</a></li>
+<li><a href="#biomegen">Generating biomes</a></li>
+<li><a href="#heightgen">Terrain height</a></li>
+<li><a href="#compositiongen">Terrain composition</a></li>
+<li><a href="#finishgen">Finishers</a></li>
+</ul>
+</p>
+
+
+<hr />
+
+<a name="preface"><h2>Preface: How it's done in real life</h2></a>
 <p>The nature has many complicated geological, physical and biological processes working on all scales from
 microscopic to planet-wide scale, that have shaped the terrain into what we see today. The tectonic plates
 collide, push mountain ranges up and ocean trenches down. Erosion dulls the sharp shapes. Plantlife takes
@@ -21,7 +38,10 @@ mainly because in the nature everything interacts with everything. If a mountain
 way that the precipitation is carried by the wind to the lands beyond the mountains, thus changing the
 erosion rate there and the vegetation type. </p>
 
-<h2>Expected properties</h2>
+
+<hr />
+
+<a name="expectedprops"><h2>Expected properties</h2></a>
 <p>For a MineCraft-like game terrain generator we need the generator to have several properties:
 <ul>
 <li>The generator must be able to generate terrain in small chunks. This means it must be possible to
@@ -37,8 +57,9 @@ distinction will be discussed later.</li>
 </p>
 
 
+<hr />
 
-<h2>Reversing the flow</h2>
+<a name="reversingflow"><h2>Reversing the flow</h2></a>
 <p>As already mentioned, the nature works basically by generating raw terrain composition, then "applying"
 erosion, vegetation and finally this leads to biomes being formed. Let's now try a somewhat inverse
 approach: First generate biomes, then fit them with appropriate terrain, and finally cover in vegetation
@@ -54,8 +75,9 @@ generate all the vegetation and structures in it, and those can again use the te
 neighboring chunks.</p>
 
 
+<hr />
 
-<h2>The ComposableGenerator pipeline</h2>
+<a name="composablegen"><h2>The ComposableGenerator pipeline</h2></a>
 <p>This leads us directly to the main pipeline that is used for generating terrain in MCServer. For
 technical reasons, the terrain composition step is further subdivided into Height generation and Composition
 generation, and the structures are really called Finishers. For each chunk the generator generates, in this
@@ -77,8 +99,9 @@ have 5 biome generators and 3 height generators and you can let the users mix'n'
 </p>
 
 
+<hr />
 
-<h2>Using coherent noise for the generation</h2>
+<a name="coherentnoise"><h2>Using coherent noise for the generation</h2></a>
 <p>For a great tutorial on coherent noise, see the <a href="http://libnoise.sourceforge.net/">LibNoise
 documentation</a>.</p>
 <p>Coherent noise is a type of noise that has three important properties that we can use to our advantage:
@@ -101,7 +124,9 @@ generated for any number of dimensions.</p>
 
 
 
-<h2>Generating biomes</h2>
+<hr />
+
+<a name="biomegen"><h2>Generating biomes</h2></a>
 <p>The easiest way to generate biomes is to not generate them at all - simply assign a single constant biome
 to everywhere. And indeed there are times when this kind of "generator" is useful - for the MineCraft's Flat
 world type, or for testing purposes, or for tematic maps. In MCServer, this is exactly what the Constant
@@ -272,7 +297,19 @@ generator uses distortion before querying the small areas.</p>
 using the same approach as in MultiStepMap - by using a thresholded 2D Perlin noise.</p>
 
 
+<hr />
 
-<h2>Terrain height</h2>
+<a name="heightgen"><h2>Terrain height</h2></a>
+
+
+<hr />
+
+<a name="compositiongen"><h2>Terrain composition</h2></a>
+
+
+<hr />
+
+<a name="finishgen"><h2>Finishers</h2></a>
+
 </body>
 </html>
