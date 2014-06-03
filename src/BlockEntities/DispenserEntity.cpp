@@ -146,7 +146,18 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIRE_CHARGE:
 		{
-			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge);
+			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
+			{
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge, GetShootVector(a_Chunk) * 20);
+			}
+			else
+			{
+				Vector3d ShootVector = GetShootVector(a_Chunk);
+				ShootVector = ShootVector * 20;
+
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFireCharge, ShootVector);
+			}
+
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
@@ -154,7 +165,19 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_ARROW:
 		{
-			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow);
+			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
+			{
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow, GetShootVector(a_Chunk) * 20);
+			}
+			else
+			{
+				Vector3d ShootVector = GetShootVector(a_Chunk);
+				ShootVector = ShootVector * 20;
+				ShootVector.y = ShootVector.y + 1;
+
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkArrow, ShootVector);
+			}
+
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
@@ -162,8 +185,19 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_SNOWBALL:
 		{
-			// Not working as there is no such entity yet?
-			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball);
+			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
+			{
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball, GetShootVector(a_Chunk) * 20);
+			}
+			else
+			{
+				Vector3d ShootVector = GetShootVector(a_Chunk);
+				ShootVector = ShootVector * 20;
+				ShootVector.y = ShootVector.y + 1;
+
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkSnowball, ShootVector);
+			}
+
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
@@ -171,8 +205,19 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_EGG:
 		{
-			// Not working as there is no such entity yet?
-			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg);
+			if(Meta == E_META_DROPSPENSER_FACING_YP || Meta == E_META_DROPSPENSER_FACING_YM)
+			{
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg, GetShootVector(a_Chunk) * 20);
+			}
+			else
+			{
+				Vector3d ShootVector = GetShootVector(a_Chunk);
+				ShootVector = ShootVector * 20;
+				ShootVector.y = ShootVector.y + 1;
+
+				SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkEgg, ShootVector);
+			}
+
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
@@ -180,7 +225,8 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIREWORK_ROCKET:
 		{
-			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework);
+			SpawnProjectileFromDispenser(a_Chunk, DispX, DispY, DispZ, cProjectileEntity::pkFirework, GetShootVector(a_Chunk) * 0);
+
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
@@ -196,15 +242,14 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 
 
-void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind)
+void cDispenserEntity::SpawnProjectileFromDispenser(cChunk & a_Chunk, int & a_DispX, int & a_DispY, int & a_DispZ, cProjectileEntity::eKind a_kind, Vector3d a_ShootVector)
 {
-	Vector3d Angle = GetShootVector(a_Chunk);
 	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_DispX, a_DispZ);
 
 	double EntityX = 0.5 + (a_DispX + DispChunk->GetPosX() * cChunkDef::Width);
 	double EntityZ = 0.5 + (a_DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
-	m_World->CreateProjectile((double) EntityX, (double) a_DispY + 0.5, (double) EntityZ, a_kind, NULL, NULL, &Angle);
+	m_World->CreateProjectile((double) EntityX, (double) a_DispY + 0.5, (double) EntityZ, a_kind, NULL, NULL, &a_ShootVector);
 }
 
 
@@ -223,7 +268,7 @@ Vector3d cDispenserEntity::GetShootVector(cChunk & a_Chunk)
 			m.Init(Vector3d(), 0, 180, 0);
 			Look = m.Transform(Vector3d(0, 1, 0));
 
-			return Look * 20; // UP
+			return Look; // UP
 		}
 
 		case E_META_DROPSPENSER_FACING_YM:
@@ -231,7 +276,7 @@ Vector3d cDispenserEntity::GetShootVector(cChunk & a_Chunk)
 			m.Init(Vector3d(), 0, -360, 0);
 			Look = m.Transform(Vector3d(0, -1, 0));
 
-			return Look * 20;; // DOWN
+			return Look; // DOWN
 		}
 
 		case E_META_DROPSPENSER_FACING_XM: Direction = 90; break;	// WEST
@@ -243,10 +288,7 @@ Vector3d cDispenserEntity::GetShootVector(cChunk & a_Chunk)
 	m.Init(Vector3d(), 0, Direction, 0);
 	Look = m.Transform(Vector3d(0, 0, 1));
 
-	Vector3d Angle = Look * 20;
-	Angle.y = Angle.y + 1;
-
-	return Angle;
+	return Look;
 }
 
 
