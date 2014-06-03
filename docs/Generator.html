@@ -257,10 +257,14 @@ distinguish between mushroom and mushroom-shore (image depicts a Voronoi cell fo
 works similarly with DistortedVoronoi). O = ocean, M = mushroom, MS = mushroom shore:</p>
 <img src="img/multistepmapdistance.jpg" />
 
+<a name="perlinrivers">
 <p>The rivers are added only to the areas that have been previously marked as land. A simple 2D Perlin noise
 is used as the base, where its value is between 0 and a configured threshold value, a river is created. This
 creates the rivers in a closed-loop-like shapes, occasionally splitting two branches off:</p>
-<img src="img/perlinrivers.jpg" />
+<img src="img/perlinrivers1.jpg" />
+<img src="img/perlinrivers2.jpg" />
+<img src="img/perlinrivers3.jpg" />
+</a>
 
 <p>For the leftover land biomes, the two Perlin noises, representing temperature and humidity, are used to
 generate the biomes, as described earlier. Additionally, the temperature map is used to turn the Ocean biome
