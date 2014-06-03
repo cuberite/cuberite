@@ -1120,7 +1120,7 @@ bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile, int a_Bl
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PROJECTILE_HIT_BLOCK];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, &a_BlockHitPos, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
