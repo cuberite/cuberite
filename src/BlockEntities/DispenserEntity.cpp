@@ -215,7 +215,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 void cDispenserEntity::SpawnProjectileFromDispenser(int & a_BlockX, int & a_BlockY, int & a_BlockZ, cProjectileEntity::eKind a_kind, Vector3d a_ShootVector)
 {
-	if(a_kind != E_ITEM_FIRE_CHARGE)
+	if(a_kind != cProjectileEntity::pkFireCharge)
 		a_ShootVector.y = a_ShootVector.y + 1;
 
 	m_World->CreateProjectile((double) a_BlockX + 0.5, (double) a_BlockY + 0.5, (double) a_BlockZ + 0.5, a_kind, NULL, NULL, &a_ShootVector);
