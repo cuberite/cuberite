@@ -235,6 +235,8 @@ Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE & a_Meta)
 		case E_META_DROPSPENSER_FACING_ZM:	return Vector3d(0, 0, -1);
 		case E_META_DROPSPENSER_FACING_ZP:	return Vector3d(0, 0, 1);
 	}
+
+	return Vector3d(0, 1, 0);
 }
 
 
