@@ -38,7 +38,10 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		// Would dispense into / interact with a non-loaded chunk, ignore the tick
 		return;
 	}
+
 	BLOCKTYPE DispBlock = DispChunk->GetBlock(DispX, DispY, DispZ);
+	int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+	int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
 	// Dispense the item:
 	switch (m_Contents.GetSlot(a_SlotNum).m_ItemType)
@@ -146,10 +149,6 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIRE_CHARGE:
 		{
-			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
-			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-
 			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkFireCharge, GetShootVector(Meta) * 20);
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
@@ -159,10 +158,6 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_ARROW:
 		{
-			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
-			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-
 			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkArrow, GetShootVector(Meta) * 20);
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
@@ -172,10 +167,6 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_SNOWBALL:
 		{
-			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
-			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-
 			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkSnowball, GetShootVector(Meta) * 20);
 
 			m_Contents.ChangeSlotCount(a_SlotNum, -1);
@@ -185,11 +176,9 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_EGG:
 		{
-			cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
-			int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
-			int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-
 			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkEgg, GetShootVector(Meta) * 20);
+
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 
 			break;
 		}
