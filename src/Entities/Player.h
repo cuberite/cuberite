@@ -127,7 +127,7 @@ public:
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
-	/** Returns whether the player is climbing (ladders, vines e.t.c). */
+	/** Returns whether the player is climbing (ladders, vines etc.) */
 	bool IsClimbing(void) const;
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
@@ -330,8 +330,13 @@ public:
 
 	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL) override;  // tolua_export
 
+	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
-	bool LoadFromDisk(cWorld * a_World);
+
+	/** Loads player data from JSON to the object
+	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world
+	*/
+	bool LoadFromDisk(cWorld *& a_World);
 	void LoadPermissionsFromDisk(void);											// tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
@@ -342,8 +347,7 @@ public:
 
 	void SendExperience(void);
 	
-	// In UI windows, the item that the player is dragging:
-	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }
+	/** In UI windows, the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }
 	
 	// In UI windows, when inventory-painting:
