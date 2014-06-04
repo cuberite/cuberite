@@ -332,6 +332,7 @@ public:
 			if (hasChanged)
 			{
 				MarkDirty();
+				m_IsRedstoneDirty = true;
 				
 				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
 			}
@@ -378,10 +379,13 @@ public:
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
+	cRedstoneSimulatorChunkData * GetRedstoneSimulatorQueuedData(void) { return &m_RedstoneSimulatorQueuedData; }
 	cIncrementalRedstoneSimulator::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
 	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; };
 	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; };
 	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; };
+	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
+	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -449,13 +453,16 @@ private:
 	cSandSimulatorChunkData m_SandSimulatorData;
 
 	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
+	cRedstoneSimulatorChunkData m_RedstoneSimulatorQueuedData;
 	cIncrementalRedstoneSimulator::PoweredBlocksList m_RedstoneSimulatorPoweredBlocksList;
 	cIncrementalRedstoneSimulator::LinkedBlocksList m_RedstoneSimulatorLinkedBlocksList;
 	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList m_RedstoneSimulatorSimulatedPlayerToggleableList;
 	cIncrementalRedstoneSimulator::RepeatersDelayList m_RedstoneSimulatorRepeatersDelayList;
 
+	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
+	bool m_IsRedstoneDirty;
 
-	// pick up a random block of this chunk
+	// Pick up a random block of this chunk
 	void getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z);
 	void getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ);
 

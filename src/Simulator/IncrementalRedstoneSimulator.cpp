@@ -89,6 +89,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			itr = PoweredBlocks->erase(itr);
+			a_Chunk->SetIsRedstoneDirty(true);
 			continue;
 		}
 		else if (
@@ -103,6 +104,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			itr = PoweredBlocks->erase(itr);
+			a_Chunk->SetIsRedstoneDirty(true);
 			continue;
 		}
 		++itr;
@@ -118,6 +120,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
+				a_Chunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 			else if (
@@ -131,6 +134,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
+				a_Chunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 		}
@@ -140,6 +144,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
+				a_Chunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 		}
@@ -205,7 +210,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		return;
 	}
 
-	RedstoneSimulatorChunkData->push_back(cCoordWithBlockAndBool(RelX, a_BlockY, RelZ, Block, false));
+	a_Chunk->GetRedstoneSimulatorQueuedData()->push_back(cCoordWithBlockAndBool(RelX, a_BlockY, RelZ, Block, false));
 }
 
 
@@ -214,22 +219,29 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 
 void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
-	// We still attempt to simulate all blocks in the chunk every tick, because of outside influence that needs to be taken into account
-	// For example, repeaters need to be ticked, pressure plates checked for entities, daylight sensor checked for light changes, etc.
-	// The easiest way to make this more efficient is probably just to reduce code within the handlers that put too much strain on server, like getting or setting blocks
-	// A marking dirty system might be a TODO for later on, perhaps
-
 	m_RedstoneSimulatorChunkData = a_Chunk->GetRedstoneSimulatorData();
-	if (m_RedstoneSimulatorChunkData->empty())
+	if (m_RedstoneSimulatorChunkData->empty() && a_Chunk->GetRedstoneSimulatorQueuedData()->empty())
 	{
 		return;
 	}
+
+	m_RedstoneSimulatorChunkData->insert(m_RedstoneSimulatorChunkData->end(), a_Chunk->GetRedstoneSimulatorQueuedData()->begin(), a_Chunk->GetRedstoneSimulatorQueuedData()->end());
+	a_Chunk->GetRedstoneSimulatorQueuedData()->clear();
 
 	m_PoweredBlocks = a_Chunk->GetRedstoneSimulatorPoweredBlocksList();
 	m_RepeatersDelayList = a_Chunk->GetRedstoneSimulatorRepeatersDelayList();
 	m_SimulatedPlayerToggleableBlocks = a_Chunk->GetRedstoneSimulatorSimulatedPlayerToggleableList();
 	m_LinkedPoweredBlocks = a_Chunk->GetRedstoneSimulatorLinkedBlocksList();
 	m_Chunk = a_Chunk;
+	bool ShouldUpdateSimulateOnceBlocks = false;
+
+	if (a_Chunk->IsRedstoneDirty())
+	{
+		// Simulate the majority of devices only if something (blockwise or power-wise) has changed
+		// Make sure to allow the chunk to resimulate after the initial run if there was a power change (ShouldUpdateSimulateOnceBlocks helps to do this)
+		a_Chunk->SetIsRedstoneDirty(false); //
+		ShouldUpdateSimulateOnceBlocks = true;
+	}
 
 	for (cRedstoneSimulatorChunkData::iterator dataitr = m_RedstoneSimulatorChunkData->begin(); dataitr != m_RedstoneSimulatorChunkData->end();)
 	{
@@ -241,63 +253,13 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 
 		switch (dataitr->Data)
 		{
-			case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);	break;
-			case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);	break;
-			case E_BLOCK_FENCE_GATE:            HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
-			case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
-			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
 			case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	break;
-			case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
 			case E_BLOCK_DAYLIGHT_SENSOR:       HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
-			case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
 
-			case E_BLOCK_REDSTONE_TORCH_OFF:
-			case E_BLOCK_REDSTONE_TORCH_ON:
-			{
-				HandleRedstoneTorch(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_WOODEN_BUTTON:
-			{
-				HandleRedstoneButton(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			{
 				HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_PISTON:
-			case E_BLOCK_STICKY_PISTON:
-			{
-				HandlePiston(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_REDSTONE_LAMP_OFF:
-			case E_BLOCK_REDSTONE_LAMP_ON:
-			{
-				HandleRedstoneLamp(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			{
-				HandleDropSpenser(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_WOODEN_DOOR:
-			case E_BLOCK_IRON_DOOR:
-			{
-				HandleDoor(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_ACTIVATOR_RAIL:
-			case E_BLOCK_DETECTOR_RAIL:
-			case E_BLOCK_POWERED_RAIL:
-			{
-				HandleRail(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
 				break;
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
@@ -308,7 +270,66 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 				HandlePressurePlate(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
 				break;
 			}
-			default: LOGD("Unhandled block (!) or unimplemented redstone block: %s", ItemToString(dataitr->Data).c_str()); break;
+			default: break;
+		}
+
+		if (ShouldUpdateSimulateOnceBlocks)
+		{
+			switch (dataitr->Data)
+			{				
+				case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
+				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);	break;
+				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);	break;
+				case E_BLOCK_FENCE_GATE:            HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
+				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
+
+				case E_BLOCK_ACTIVATOR_RAIL:
+				case E_BLOCK_DETECTOR_RAIL:
+				case E_BLOCK_POWERED_RAIL:
+				{
+					HandleRail(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_WOODEN_DOOR:
+				case E_BLOCK_IRON_DOOR:
+				{
+					HandleDoor(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_REDSTONE_LAMP_OFF:
+				case E_BLOCK_REDSTONE_LAMP_ON:
+				{
+					HandleRedstoneLamp(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_DISPENSER:
+				case E_BLOCK_DROPPER:
+				{
+					HandleDropSpenser(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_PISTON:
+				case E_BLOCK_STICKY_PISTON:
+				{
+					HandlePiston(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_REDSTONE_TORCH_OFF:
+				case E_BLOCK_REDSTONE_TORCH_ON:
+				{
+					HandleRedstoneTorch(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_STONE_BUTTON:
+				case E_BLOCK_WOODEN_BUTTON:
+				{
+					HandleRedstoneButton(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				default: break;
+			}
 		}
 		++dataitr;
 	}
@@ -1736,7 +1757,8 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 		return;
 	}
 
-	PoweredBlocksList * Powered = m_Chunk->GetNeighborChunk(BlockX, BlockZ)->GetRedstoneSimulatorPoweredBlocksList();
+	cChunk * Neighbour = m_Chunk->GetNeighborChunk(BlockX, BlockZ);
+	PoweredBlocksList * Powered = Neighbour->GetRedstoneSimulatorPoweredBlocksList();
 	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)  // Check powered list
 	{
 		if (
@@ -1768,6 +1790,8 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	RC.a_SourcePos = Vector3i(SourceX, a_RelSourceY, SourceZ);
 	RC.a_PowerLevel = a_PowerLevel;
 	Powered->push_back(RC);
+	Neighbour->SetIsRedstoneDirty(true);
+	m_Chunk->SetIsRedstoneDirty(true);
 }
 
 
@@ -1807,7 +1831,8 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 		return;
 	}
 
-	LinkedBlocksList * Linked = m_Chunk->GetNeighborChunk(BlockX, BlockZ)->GetRedstoneSimulatorLinkedBlocksList();
+	cChunk * Neighbour = m_Chunk->GetNeighborChunk(BlockX, BlockZ);
+	LinkedBlocksList * Linked = Neighbour->GetRedstoneSimulatorLinkedBlocksList();
 	for (LinkedBlocksList::iterator itr = Linked->begin(); itr != Linked->end(); ++itr)  // Check linked powered list
 	{
 		if (
@@ -1828,6 +1853,8 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	RC.a_SourcePos = Vector3i(SourceX, a_RelSourceY, SourceZ);
 	RC.a_PowerLevel = a_PowerLevel;
 	Linked->push_back(RC);
+	Neighbour->SetIsRedstoneDirty(true);
+	m_Chunk->SetIsRedstoneDirty(true);
 }
 
 
