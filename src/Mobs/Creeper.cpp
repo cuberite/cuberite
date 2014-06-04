@@ -43,7 +43,7 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 		if (m_ExplodingTimer == 30)
 		{
 			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
-			Destroy();
+			Destroy(); // Just in case we aren't killed by the explosion
 		}
 	}
 }
@@ -54,6 +54,12 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
+	if (m_ExplodingTimer == 30)
+	{
+		// Exploded creepers drop naught but charred flesh, which Minecraft doesn't have
+		return;
+	}
+
 	int LootingLevel = 0;
 	if (a_Killer != NULL)
 	{
@@ -65,7 +71,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		if (((cMonster *)((cProjectileEntity *)a_Killer)->GetCreator())->GetMobType() == mtSkeleton)
 		{
-			// 12 music discs. TickRand starts from 0, so range = 11. Disk IDs start at 2256, so add that. There.
+			// 12 music discs. TickRand starts from 0 to 11. Disk IDs start at 2256, so add that. There.
 			AddRandomDropItem(a_Drops, 1, 1, (short)m_World->GetTickRandomNumber(11) + 2256);
 		}
 	}
