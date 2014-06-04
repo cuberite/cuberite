@@ -19,6 +19,7 @@ with specific implementation notes regarding MCServer.</p>
 <li><a href="#heightgen">Terrain height</a></li>
 <li><a href="#compositiongen">Terrain composition</a></li>
 <li><a href="#finishgen">Finishers</a></li>
+<li><a href="#makefaster">Making it all faster</a></li>
 </ul>
 </p>
 
@@ -304,16 +305,69 @@ using the same approach as in MultiStepMap - by using a thresholded 2D Perlin no
 <hr />
 
 <a name="heightgen"><h2>Terrain height</h2></a>
+<p>As with biomes, the easiest way to generate terrain height is not generating at all - assigning a constant
+height value to all columns. This is again useful either for internal tests, and for worlds like MineCraft's
+Flat world.</p>
+
+<p>For a somewhat more realistic landscape, we will employ the good old 2D Perlin noise. We can use it
+directly as a heightmap - each value we get from the noise is stretched into the desired range (usually from
+40 to 120 blocks for regular MineCraft worlds) and used as the height value. However, this doesn't play too
+well with the biomes we've just generated. If the biome says "ocean" and the Perlin noise says "mountain",
+the end result will be unpleasant.</p>
+
+<p>So we want a height generator that is biome-aware. The easiest way of doing this is to have a separate
+generator for each biome. Simply use the biome map to select which generator to use, then ask the appropriate
+generator for the height value. Again, this doesn't work too well - imagine an ExtremeHills biome right next
+to an Ocean biome. If no extra care is taken, the border between these two will be a high wall. The following
+image shows a 2D representation (for simplification purposes) of the problem:</p>
+<img src="img/biomeheights.jpg" />
+
+<p>This requires some further processing. What we need is for the terrain height to be dependent not only on
+the immediate biome for that column, but also on the close surroundings of the column. This is exactly the
+kind of task that averaging is designed for. If we take the area of 9x9 biomes centered around the queried
+column, generate height for each of the biomes therein, sum them up and divide by 81 (the number of biomes
+summed), we will be effectively making a 9-long running average over the terrain, and all the borders will
+suddenly become smooth. The following image shows the situation from the previous paragraph after applying
+the averaging process: </p>
+<img src="img/biomeheightsavg.jpg" />
+
+<p>The approach used in MCServer's Biomal generator is based on this idea, with two slight modifications.
+Instead of using a separate generator for each biome, one generator is used with a different set of input
+parameters for each biomes. These input parameters modify the overall amplitude and frequency of the Perlin
+noise that the generator produces, thus modifying the final terrain with regards to biomes. Additionally, the
+averaging process is weighted - columns closer to the queried column get a more powerful weight in the sum
+than the columns further away. The following image shows the output of MCServer's Biomal terrain height
+generator (each block type represents a different biome - ocean in the front (stone), plains and ice plains
+behind it (lapis, whitewool), extreme hills back right (soulsand), desert hills back left (mossy
+cobble)):</p>
+<img src="img/biomalheights.jpg" />
+
+<p>One key observation about this whole approach is that in order for it to work, the biomes must be
+available for columns outside the currently generated chunk, otherwise the columns at the chunk's edge would
+not be able to properly average their height. This requirement can be fulfilled only by biome generators that
+adhere to the second <a href="#expectedproperties">Expected property</a> - that re-generating will produce
+the same data. If the biome generator returned different data for the same chunk each time it was invoked, it
+would become impossible to apply the averaging.</p>
+
+<p>(TODO: height with variations (N/A in MCS yet)</p>
 
 
 <hr />
 
 <a name="compositiongen"><h2>Terrain composition</h2></a>
+<p>(TODO)</p>
 
 
 <hr />
 
 <a name="finishgen"><h2>Finishers</h2></a>
+<p>(TODO)</p>
+
+
+<hr />
+
+<a name="makefaster"><h2>Making it all faster</h2></a>
+<p>(TODO)</p>
 
 </body>
 </html>
