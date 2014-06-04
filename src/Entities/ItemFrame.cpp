@@ -55,6 +55,7 @@ void cItemFrame::KilledBy(cEntity * a_Killer)
 {
 	if (m_Item.IsEmpty())
 	{
+		SetHealth(0);
 		super::KilledBy(a_Killer);
 		Destroy();
 		return;
@@ -69,8 +70,9 @@ void cItemFrame::KilledBy(cEntity * a_Killer)
 	}
 
 	SetHealth(GetMaxHealth());
-	m_Item.Clear();
+	m_Item.Empty();
 	m_Rotation = 0;
+	SetInvulnerableTicks(0);
 	GetWorld()->BroadcastEntityMetadata(*this);
 }
 
