@@ -181,9 +181,6 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		case E_ITEM_FIREWORK_ROCKET:
 		{
 			// TODO: Add the fireworks entity
-
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
-
 			break;
 		}
 
