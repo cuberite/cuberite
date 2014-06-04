@@ -1610,7 +1610,7 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 	{
 		GetClientHandle()->SendPlayerMoveLook();
 		GetClientHandle()->SendHealth();
-		GetClientHandle()->SendWholeInventory((cWindow &)GetInventory());
+		GetClientHandle()->SendWholeInventory(*GetWindow());
 	}
 
 	return true;

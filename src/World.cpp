@@ -66,6 +66,9 @@ const int TIME_NIGHT_END     = 22812;
 const int TIME_SUNRISE       = 23999;
 const int TIME_SPAWN_DIVISOR =   148;
 
+#define DEFAULT_NETHER_NAME GetName() + "_nether"
+#define DEFAULT_END_NAME GetName() + "_end"
+
 
 
 
@@ -566,6 +569,14 @@ void cWorld::Start(void)
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
+
+	if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
+	{
+		m_bNetherPortalsEnabled = IniFile.GetValueSetB("General", "NetherPortalsEnabled", true);
+		m_NetherWorldName = IniFile.GetValueSet("General", "NetherWorldName", DEFAULT_NETHER_NAME);
+		m_bEndPortalsEnabled = IniFile.GetValueSetB("General", "EndPortalsEnabled", true);
+		m_EndWorldName = IniFile.GetValueSet("General", "EndWorldName", DEFAULT_END_NAME);
+	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
 	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
@@ -734,6 +745,21 @@ void cWorld::Stop(void)
 		}  // for itr - m_Clients[]
 		m_Clients.clear();
 	}
+
+	// Write settings to file; these are all plugin changeable values - keep updated!
+	cIniFile IniFile;
+	IniFile.ReadFile(m_IniFileName);
+		if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
+		{
+			IniFile.SetValueB("General", "NetherPortalsEnabled", m_bNetherPortalsEnabled);
+			IniFile.SetValue("General", "NetherWorldName", m_NetherWorldName);
+			IniFile.SetValueB("General", "EndPortalsEnabled", m_bEndPortalsEnabled);
+			IniFile.SetValue("General", "EndWorldName", m_EndWorldName);
+		}
+		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
+		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
+		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
+	IniFile.WriteFile(m_IniFileName);
 	
 	m_TickThread.Stop();
 	m_Lighting.Stop();

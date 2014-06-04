@@ -1042,6 +1042,11 @@ void cEntity::DetectCacti(void)
 
 void cEntity::DetectPortal()
 {
+	if (!GetWorld()->AreNetherPortalsEnabled() && !GetWorld()->AreEndPortalsEnabled())
+	{
+		return;
+	}
+
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	if ((Y > 0) && (Y < cChunkDef::Height))
 	{
@@ -1049,11 +1054,18 @@ void cEntity::DetectPortal()
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
+				if (!GetWorld()->AreNetherPortalsEnabled())
+				{
+					return;
+				}
+
 				switch (GetWorld()->GetDimension())
 				{
 					case dimNether:
 					{
-						AString OverworldName = GetWorld()->GetName().substr(0, GetWorld()->GetName().size() - 7);
+						cIniFile OwnIni; OwnIni.ReadFile(GetWorld()->GetIniFileName());
+						AString OverworldName = OwnIni.GetValue("General", "OverworldName", cRoot::Get()->GetDefaultWorld()->GetName());
+
 						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
 						cIniFile File;
 						File.ReadFile(OverworldName + "/world.ini");
@@ -1065,14 +1077,14 @@ void cEntity::DetectPortal()
 					}
 					case dimOverworld:
 					{
-						AString NetherWorldName = GetWorld()->GetName() + "_nether";
-						cFile::CreateFolder(FILE_IO_PREFIX + NetherWorldName);
+						cFile::CreateFolder(FILE_IO_PREFIX + GetWorld()->GetNetherWorldName());
 						cIniFile File;
-						File.ReadFile(NetherWorldName + "/world.ini");
+						File.ReadFile(GetWorld()->GetNetherWorldName() + "/world.ini");
 						File.SetValue("General", "Dimension", "Nether");
-						File.WriteFile(NetherWorldName + "/world.ini");
+						File.SetValue("General", "OverworldName", GetWorld()->GetName());
+						File.WriteFile(GetWorld()->GetNetherWorldName() + "/world.ini");
 
-						MoveToWorld(NetherWorldName, cRoot::Get()->CreateAndInitializeWorld(NetherWorldName));
+						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName()));
 						break;
 					}
 					default: break;
@@ -1081,11 +1093,18 @@ void cEntity::DetectPortal()
 			}
 			case E_BLOCK_END_PORTAL:
 			{
+				if (!GetWorld()->AreEndPortalsEnabled())
+				{
+					return;
+				}
+
 				switch (GetWorld()->GetDimension())
 				{
 					case dimEnd:
 					{
-						AString OverworldName = GetWorld()->GetName().substr(0, GetWorld()->GetName().size() - 4);
+						cIniFile OwnIni; OwnIni.ReadFile(GetWorld()->GetIniFileName());
+						AString OverworldName = OwnIni.GetValue("General", "OverworldName", cRoot::Get()->GetDefaultWorld()->GetName());
+
 						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
 						cIniFile File;
 						File.ReadFile(OverworldName + "/world.ini");
@@ -1103,14 +1122,14 @@ void cEntity::DetectPortal()
 					}
 					case dimOverworld:
 					{
-						AString EndWorldName = GetWorld()->GetName() + "_end";
-						cFile::CreateFolder(FILE_IO_PREFIX + EndWorldName);
+						cFile::CreateFolder(FILE_IO_PREFIX + GetWorld()->GetEndWorldName());
 						cIniFile File;
-						File.ReadFile(EndWorldName + "/world.ini");
+						File.ReadFile(GetWorld()->GetEndWorldName() + "/world.ini");
 						File.SetValue("General", "Dimension", "End");
-						File.WriteFile(EndWorldName + "/world.ini");
+						File.SetValue("General", "OverworldName", GetWorld()->GetName());
+						File.WriteFile(GetWorld()->GetEndWorldName() + "/world.ini");
 
-						MoveToWorld(EndWorldName, cRoot::Get()->CreateAndInitializeWorld(EndWorldName));
+						MoveToWorld(GetWorld()->GetEndWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName()));
 						break;
 					}
 					default: break;
@@ -1133,7 +1152,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 		World = cRoot::Get()->GetWorld(a_WorldName);
 		if (World == NULL)
 		{
-			LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
+			LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
 			return false;
 		}
 	}
