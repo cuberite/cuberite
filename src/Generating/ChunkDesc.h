@@ -68,8 +68,6 @@ public:
 	bool IsUsingDefaultHeight(void) const;
 	void SetUseDefaultComposition(bool a_bUseDefaultComposition);
 	bool IsUsingDefaultComposition(void) const;
-	void SetUseDefaultStructures(bool a_bUseDefaultStructures);
-	bool IsUsingDefaultStructures(void) const;
 	void SetUseDefaultFinish(bool a_bUseDefaultFinish);
 	bool IsUsingDefaultFinish(void) const;
 
@@ -214,7 +212,6 @@ private:
 	bool m_bUseDefaultBiomes;
 	bool m_bUseDefaultHeight;
 	bool m_bUseDefaultComposition;
-	bool m_bUseDefaultStructures;
 	bool m_bUseDefaultFinish;
 } ;  // tolua_export
 
