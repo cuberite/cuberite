@@ -588,7 +588,7 @@ void cChunk::Tick(float a_Dt)
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
-		auto itr2 = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID());
+		std::vector<int>::const_iterator itr2 = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID());
 		if (itr2 != m_EntitiesToRemove.end())
 		{
 			itr = m_Entities.erase(itr);
