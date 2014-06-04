@@ -625,7 +625,8 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 
 cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
 	cSlotAreaTemporary(3, a_ParentWindow),
-	m_MaximumCost(0)
+	m_MaximumCost(0),
+	m_StackSizeToBeUsedInRepair(0);
 {
 }
 
@@ -796,6 +797,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		{
 			cItem NewSecondItem(*Item);
 			NewSecondItem.m_ItemCount -= m_StackSizeToBeUsedInRepair;
+			m_StackSizeToBeUsedInRepair = 0;
 			SetSlot(1, a_Player, NewSecondItem);
 		}
 		else
