@@ -61,7 +61,7 @@ public:
 
 	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		if (!a_WorldInterface.IsWeatherWet())
+		if (IsBiomeNoDownfall(a_Chunk.GetBiomeAt(a_RelX, a_RelZ)) || !a_WorldInterface.IsWeatherWet())
 		{
 			return;
 		}

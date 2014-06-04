@@ -869,7 +869,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
-	if (m_World->IsWeatherWet())
+	if (IsBiomeNoDownfall(a_Chunk.GetBiomeAt(POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width, POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width)) || GetWorld()->IsWeatherWet())
 	{
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
