@@ -2454,9 +2454,16 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 	a_Monster.SetDropChanceChestplate(DropChance[2]);
 	a_Monster.SetDropChanceLeggings(DropChance[3]);
 	a_Monster.SetDropChanceBoots(DropChance[4]);
-	bool CanPickUpLoot = (a_NBT.GetByte(a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot")) == 1);
-	a_Monster.SetCanPickUpLoot(CanPickUpLoot);
-	a_Monster.SetHealth(a_NBT.GetShort(a_NBT.FindChildByName(a_TagIdx, "Health")));
+
+	int LootTag = a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot");
+	if (LootTag > 0)
+	{
+		bool CanPickUpLoot = (a_NBT.GetByte(LootTag) == 1);
+		a_Monster.SetCanPickUpLoot(CanPickUpLoot);
+	}
+
+	int HealthTag = a_NBT.FindChildByName(a_TagIdx, "Health");
+	a_Monster.SetHealth(HealthTag > 0 ? a_NBT.GetShort(HealthTag) : a_Monster.GetMaxHealth());
 	return true;
 }
 
