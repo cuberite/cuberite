@@ -17,8 +17,14 @@
 
 	
 
-cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulator(cWorld & a_World)
-	: super(a_World)
+cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulator(cWorld & a_World) :
+	super(a_World),
+	m_RedstoneSimulatorChunkData(),
+	m_PoweredBlocks(),
+	m_LinkedPoweredBlocks(),
+	m_SimulatedPlayerToggleableBlocks(),
+	m_RepeatersDelayList(),
+	m_Chunk()
 {
 }
 

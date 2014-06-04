@@ -854,6 +854,7 @@ void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
 
 cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 	cWindow(wtEnchantment, "Enchant"),
+	m_SlotArea(),
 	m_BlockX(a_BlockX),
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
