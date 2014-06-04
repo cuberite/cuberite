@@ -1063,7 +1063,8 @@ void cEntity::DetectPortal()
 				{
 					case dimNether:
 					{
-						cIniFile OwnIni; OwnIni.ReadFile(GetWorld()->GetIniFileName());
+						cIniFile OwnIni;
+						OwnIni.ReadFile(GetWorld()->GetIniFileName());
 						AString OverworldName = OwnIni.GetValue("General", "OverworldName", cRoot::Get()->GetDefaultWorld()->GetName());
 
 						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
@@ -1102,7 +1103,8 @@ void cEntity::DetectPortal()
 				{
 					case dimEnd:
 					{
-						cIniFile OwnIni; OwnIni.ReadFile(GetWorld()->GetIniFileName());
+						cIniFile OwnIni;
+						OwnIni.ReadFile(GetWorld()->GetIniFileName());
 						AString OverworldName = OwnIni.GetValue("General", "OverworldName", cRoot::Get()->GetDefaultWorld()->GetName());
 
 						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);

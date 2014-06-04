@@ -89,6 +89,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 		SetPosX(World->GetSpawnX());
 		SetPosY(World->GetSpawnY());
 		SetPosZ(World->GetSpawnZ());
+		SetBedPos(Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
