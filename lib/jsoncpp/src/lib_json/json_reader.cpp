@@ -623,7 +623,7 @@ Reader::decodeDouble( Token &token )
    const int bufferSize = 32;
    int count;
    int length = int(token.end_ - token.start_);
-   if ( length <= bufferSize )
+   if ( length < bufferSize )
    {
       Char buffer[bufferSize];
       memcpy( buffer, token.start_, length );
