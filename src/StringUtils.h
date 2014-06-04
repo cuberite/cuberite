@@ -11,6 +11,9 @@
 
 
 
+#include <string>
+
+
 
 
 typedef std::string AString;

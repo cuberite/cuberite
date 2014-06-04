@@ -82,12 +82,24 @@ public:
 		Can be positive or negative.
 		This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
 		int m_AddWeightIfSame;
+		
+		/** If true, the piece will be moved Y-wise so that its first connector is sitting on the terrain.
+		This is used e. g. for village houses. */
+		bool m_MoveToGround;
 	};
 	
+	
+	/** Creates a prefab from the provided definition. */
 	cPrefab(const sDef & a_Def);
+	
+	/** Creates a prefab based on the given BlockArea and allowed rotations. */
+	cPrefab(const cBlockArea & a_Image, int a_AllowedRotations);
 	
 	/** Draws the prefab into the specified chunk, according to the placement stored in the PlacedPiece. */
 	void Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const;
+	
+	/** Draws the prefab into the specified chunks, according to the specified placement and rotations. */
+	void Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumRotations) const;
 	
 	/** Returns true if the prefab has any connector of the specified type. */
 	bool HasConnectorType(int a_ConnectorType) const;
@@ -95,6 +107,22 @@ public:
 	/** Returns the weight (chance) of this prefab generating as the next piece after the specified placed piece.
 	PiecePool implementations can use this for their GetPieceWeight() implementations. */
 	int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector) const;
+	
+	/** Sets the (unmodified) DefaultWeight property for this piece. */
+	void SetDefaultWeight(int a_DefaultWeight);
+	
+	/** Returns the unmodified DefaultWeight property for the piece. */
+	int GetDefaultWeight(void) const { return m_DefaultWeight; }
+	
+	/** Sets the AddWeightIfSame member, that is used to modify the weight when the previous piece is the same prefab */
+	void SetAddWeightIfSame(int a_AddWeightIfSame) { m_AddWeightIfSame = a_AddWeightIfSame; }
+	
+	/** Adds the specified connector to the list of connectors this piece supports. */
+	void AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type);
+	
+	/** Returns whether the prefab should be moved Y-wise to ground before drawing, rather than staying
+	at the coords governed by the connectors. */
+	bool ShouldMoveToGround(void) const { return m_MoveToGround; }
 
 protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
@@ -149,6 +177,10 @@ protected:
 	Can be positive or negative.
 	This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
 	int m_AddWeightIfSame;
+
+	/** If true, the piece will be moved Y-wise so that its first connector is sitting on the terrain.
+	This is used e. g. for village houses. */
+	bool m_MoveToGround;
 	
 	
 	// cPiece overrides:	
@@ -156,6 +188,10 @@ protected:
 	virtual Vector3i GetSize(void) const override;
 	virtual cCuboid GetHitBox(void) const override;
 	virtual bool CanRotateCCW(int a_NumRotations) const override;
+	
+	/** Based on the m_AllowedRotations, adds rotated cBlockAreas to the m_BlockArea array.
+	To be called only from this class's constructor! */
+	void AddRotatedBlockAreas(void);
 	
 	/** Parses the CharMap in the definition into a CharMap binary data used for translating the definition into BlockArea. */
 	void ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef);

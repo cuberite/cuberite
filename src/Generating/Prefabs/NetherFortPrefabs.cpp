@@ -155,6 +155,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BalconyCorridor
 
 
@@ -315,6 +318,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BalconyTee2
 
 
@@ -435,6 +441,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BlazePlatform
 
 
@@ -605,6 +614,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BlazePlatformOverhang
 
 
@@ -805,6 +817,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-1000,
+
+		// MoveToGround:
+		false,
 	},  // BridgeCircleCrossing
 
 
@@ -1006,6 +1021,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BridgeCrossing
 
 
@@ -1100,6 +1118,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BridgeCrumble1
 
 
@@ -1200,6 +1221,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BridgeCrumble2
 
 
@@ -1379,6 +1403,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		1000,
+
+		// MoveToGround:
+		false,
 	},  // BridgeDoubleCrumble
 
 
@@ -1619,6 +1646,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BridgeFunnelDown
 
 
@@ -1948,6 +1978,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BridgeLevelCrossing
 
 
@@ -2067,6 +2100,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		1000,
+
+		// MoveToGround:
+		false,
 	},  // BridgeSegment
 
 
@@ -2227,6 +2263,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // BridgeTee
 
 
@@ -2328,6 +2367,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // Corridor11
 
 
@@ -2429,6 +2471,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // Corridor13
 
 
@@ -2524,6 +2569,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		500,
+
+		// MoveToGround:
+		false,
 	},  // Corridor5
 
 
@@ -2663,6 +2711,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // CorridorCorner5
 
 
@@ -2803,6 +2854,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // CorridorCornerChest5
 
 
@@ -2928,6 +2982,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-50,
+
+		// MoveToGround:
+		false,
 	},  // CorridorCrossing
 
 
@@ -3080,6 +3137,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // CorridorStairs
 
 
@@ -3181,6 +3241,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // DarkCorridor
 
 
@@ -3438,6 +3501,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // LavaStaircase
 
 
@@ -3769,6 +3835,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-1000,
+
+		// MoveToGround:
+		false,
 	},  // LavaStaircaseBig
 
 
@@ -4047,6 +4116,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // LavaStairsBridge
 
 
@@ -4235,6 +4307,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-1000,
+
+		// MoveToGround:
+		false,
 	},  // MidStaircase
 
 
@@ -4378,6 +4453,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // StairsToOpen1
 
 
@@ -4521,6 +4599,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // StairsToOpen2
 
 
@@ -4638,6 +4719,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // Tee2x4
 
 
@@ -4767,6 +4851,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // Tee4x4
 
 
@@ -4863,6 +4950,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-50,
+
+		// MoveToGround:
+		false,
 	},  // TinyCorridorCorner
 
 
@@ -4960,6 +5050,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // TinyCorridorCornerChest
 
 
@@ -5059,6 +5152,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-50,
+
+		// MoveToGround:
+		false,
 	},  // TinyCorridorCrossing
 
 
@@ -5174,6 +5270,9 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 		// AddWeightIfSame:
 		-99,
+
+		// MoveToGround:
+		false,
 	},  // Turret
 };  // g_NetherFortPrefabs
 
@@ -5378,6 +5477,9 @@ const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 
 		// AddWeightIfSame:
 		0,
+
+		// MoveToGround:
+		false,
 	},  // CentralRoom
 };
 

@@ -76,12 +76,12 @@ protected:
 			eBlockFace Face;
 			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
 			{
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile))
+				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, &Intersection))
 				{
 					return false;
 				}
 
-				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
 				m_Projectile->OnHitSolidBlock(Intersection, Face);
 				return true;
 			}

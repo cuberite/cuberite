@@ -301,7 +301,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
-				AddPosY(1.5); // Jump!!
+				AddSpeedY(5.2); // Jump!!
 			}
 		}
 
@@ -310,9 +310,19 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			Distance.y = 0;
 			Distance.Normalize();
-			Distance *= 5;
-			SetSpeedX(Distance.x);
-			SetSpeedZ(Distance.z);
+
+			if (m_bOnGround)
+			{
+				Distance *= 2.5;
+			}
+			else
+			{
+				// Don't let the mob move too much if he's falling.
+				Distance *= 0.25;
+			}
+
+			AddSpeedX(Distance.x);
+			AddSpeedZ(Distance.z);
 
 			if (m_EMState == ESCAPING)
 			{	//Runs Faster when escaping :D otherwise they just walk away

@@ -19,7 +19,6 @@
 class cAesCfb128Decryptor
 {
 public:
-	Byte test;
 	
 	cAesCfb128Decryptor(void);
 	~cAesCfb128Decryptor();

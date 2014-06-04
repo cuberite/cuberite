@@ -173,38 +173,42 @@ public:
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
 	
-	// Push a value onto the stack
+	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);
-	void Push(int a_Value);
-	void Push(double a_Value);
-	void Push(const char * a_Value);
-	void Push(bool a_Value);
-	void Push(cWorld * a_World);
-	void Push(cPlayer * a_Player);
-	void Push(const cPlayer * a_Player);
-	void Push(cEntity * a_Entity);
-	void Push(cProjectileEntity * a_ProjectileEntity);
-	void Push(cMonster * a_Monster);
-	void Push(cItem * a_Item);
-	void Push(cItems * a_Items);
-	void Push(const cItems & a_Items);
-	void Push(cClientHandle * a_ClientHandle);
-	void Push(cPickup * a_Pickup);
-	void Push(cChunkDesc * a_ChunkDesc);
 	void Push(const cCraftingGrid * a_Grid);
 	void Push(const cCraftingRecipe * a_Recipe);
-	void Push(TakeDamageInfo * a_TDI);
-	void Push(cWindow * a_Window);
-	void Push(cPluginLua * a_Plugin);
+	void Push(const char * a_Value);
+	void Push(const cItems & a_Items);
+	void Push(const cPlayer * a_Player);
 	void Push(const HTTPRequest * a_Request);
-	void Push(cWebAdmin * a_WebAdmin);
 	void Push(const HTTPTemplateRequest * a_Request);
+	void Push(const Vector3d & a_Vector);
+
+	// Push a value onto the stack (keep alpha-sorted):
+	void Push(bool a_Value);
+	void Push(cBlockEntity * a_BlockEntity);
+	void Push(cChunkDesc * a_ChunkDesc);
+	void Push(cClientHandle * a_ClientHandle);
+	void Push(cEntity * a_Entity);
+	void Push(cHopperEntity * a_Hopper);
+	void Push(cItem * a_Item);
+	void Push(cItems * a_Items);
+	void Push(cMonster * a_Monster);
+	void Push(cPickup * a_Pickup);
+	void Push(cPlayer * a_Player);
+	void Push(cPluginLua * a_Plugin);
+	void Push(cProjectileEntity * a_ProjectileEntity);
 	void Push(cTNTEntity * a_TNTEntity);
+	void Push(cWebAdmin * a_WebAdmin);
+	void Push(cWindow * a_Window);
+	void Push(cWorld * a_World);
+	void Push(double a_Value);
+	void Push(int a_Value);
+	void Push(TakeDamageInfo * a_TDI);
+	void Push(Vector3d * a_Vector);
 	void Push(Vector3i * a_Vector);
 	void Push(void * a_Ptr);
-	void Push(cHopperEntity * a_Hopper);
-	void Push(cBlockEntity * a_BlockEntity);
 	
 	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, bool & a_Value);

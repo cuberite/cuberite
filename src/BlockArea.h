@@ -14,6 +14,7 @@
 
 #include "ForEachChunkProvider.h"
 #include "Vector3.h"
+#include "ChunkDataCallback.h"
 
 
 
@@ -316,11 +317,8 @@ protected:
 		void CopyNibbles(NIBBLETYPE * a_AreaDst, const NIBBLETYPE * a_ChunkSrc);
 		
 		// cChunkDataCallback overrides:
-		virtual bool Coords       (int a_ChunkX, int a_ChunkZ) override;
-		virtual void BlockTypes   (const BLOCKTYPE *  a_BlockTypes)    override;
-		virtual void BlockMeta    (const NIBBLETYPE * a_BlockMetas)    override;
-		virtual void BlockLight   (const NIBBLETYPE * a_BlockLight)    override;
-		virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override;
+		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
+		virtual void ChunkData(const cChunkData &  a_BlockTypes) override;
 	} ;
 	
 	typedef NIBBLETYPE * NIBBLEARRAY;

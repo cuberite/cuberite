@@ -18,20 +18,17 @@
 class cReader :
 	public cChunkDataCallback
 {
-	virtual void BlockTypes(const BLOCKTYPE * a_Type) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
-		// ROW is a block of 16 Blocks, one whole row is copied at a time (hopefully the compiler will optimize that)
-		// C++ doesn't permit copying arrays, but arrays as a part of a struct is ok :)
-		typedef struct {BLOCKTYPE m_Row[16]; } ROW;
-		ROW * InputRows = (ROW *)a_Type;
-		ROW * OutputRows = (ROW *)m_BlockTypes;
+		BLOCKTYPE * OutputRows = m_BlockTypes;
 		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
 		for (int y = 0; y < cChunkDef::Height; y++)
 		{
 			for (int z = 0; z < cChunkDef::Width; z++)
 			{
-				OutputRows[OutputIdx] = InputRows[InputIdx++];
+				a_ChunkBuffer.CopyBlockTypes(OutputRows + OutputIdx * 16, InputIdx * 16, 16);
+				InputIdx++;
 				OutputIdx += 3;
 			}  // for z
 			// Skip into the next y-level in the 3x3 chunk blob; each level has cChunkDef::Width * 9 rows

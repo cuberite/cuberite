@@ -12,7 +12,6 @@
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
 #include "Item.h"
-#include "Piston.h"
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
 #include "OSSupport/Socket.h"
@@ -1306,7 +1305,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if (!a_ItemHandler.GetPlacementBlockTypeMeta(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 	{
 		// Handler refused the placement, send that information back to the client:
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}

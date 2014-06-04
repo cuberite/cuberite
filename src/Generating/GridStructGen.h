@@ -39,14 +39,6 @@ class cGridStructGen :
 	public cFinishGen
 {
 public:
-	cGridStructGen(
-		int a_Seed,
-		int a_GridSizeX, int a_GridSizeZ,
-		int a_MaxStructureSizeX, int a_MaxStructureSizeZ,
-		size_t a_MaxCacheSize
-	);
-	
-protected:
 	/** Represents a single structure that occupies the grid point. Knows how to draw itself into a chunk. */
 	class cStructure
 	{
@@ -75,6 +67,14 @@ protected:
 	typedef std::list<cStructurePtr> cStructurePtrs;
 	
 	
+	cGridStructGen(
+		int a_Seed,
+		int a_GridSizeX, int a_GridSizeZ,
+		int a_MaxStructureSizeX, int a_MaxStructureSizeZ,
+		size_t a_MaxCacheSize
+	);
+	
+protected:
 	/** Seed for generating the semi-random grid. */
 	int m_Seed;
 	

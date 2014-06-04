@@ -129,6 +129,15 @@ int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const c
 
 
 
+int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
+{
+	return ((const cPrefab &)a_NewPiece).GetDefaultWeight();
+}
+
+
+
+
+
 void cPrefabPiecePool::PiecePlaced(const cPiece & a_Piece)
 {
 	// Do nothing

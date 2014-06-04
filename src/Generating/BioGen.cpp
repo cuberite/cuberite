@@ -212,7 +212,7 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 
 void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 {
-	AStringVector Split = StringSplit(a_Biomes, ",");
+	AStringVector Split = StringSplitAndTrim(a_Biomes, ",");
 
 	// Convert each string in the list into biome:
 	for (AStringVector::const_iterator itr = Split.begin(); itr != Split.end(); ++itr)

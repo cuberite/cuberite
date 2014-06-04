@@ -108,6 +108,9 @@ static const cPrefab::sDef g_TestPrefabDef =
 
 	// AddWeightIfSame:
 	1000,
+	
+	// MoveToGround:
+	false,
 };
 
 static cPrefab g_TestPrefab(g_TestPrefabDef);
@@ -127,7 +130,8 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_MergeStrategy(a_Def.m_MergeStrategy),
 	m_ShouldExtendFloor(a_Def.m_ShouldExtendFloor),
 	m_DefaultWeight(a_Def.m_DefaultWeight),
-	m_AddWeightIfSame(a_Def.m_AddWeightIfSame)
+	m_AddWeightIfSame(a_Def.m_AddWeightIfSame),
+	m_MoveToGround(a_Def.m_MoveToGround)
 {
 	m_BlockArea[0].Create(m_Size);
 	CharMap cm;
@@ -136,6 +140,34 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	ParseConnectors(a_Def.m_Connectors);
 	ParseDepthWeight(a_Def.m_DepthWeight);
 	
+	AddRotatedBlockAreas();
+}
+
+
+
+
+
+cPrefab::cPrefab(const cBlockArea & a_Image, int a_AllowedRotations) :
+	m_Size(a_Image.GetSize()),
+	m_AllowedRotations(a_AllowedRotations),
+	m_MergeStrategy(cBlockArea::msOverwrite),
+	m_ShouldExtendFloor(false),
+	m_DefaultWeight(1),
+	m_AddWeightIfSame(0),
+	m_MoveToGround(false)
+{
+	m_HitBox.p1.Set(0, 0, 0);
+	m_HitBox.p2.Set(m_Size.x - 1, m_Size.y - 1, m_Size.z - 1);
+	m_BlockArea[0].CopyFrom(a_Image);
+	AddRotatedBlockAreas();
+}
+
+
+
+
+
+void cPrefab::AddRotatedBlockAreas(void)
+{
 	// 1 CCW rotation:
 	if ((m_AllowedRotations & 0x01) != 0)
 	{
@@ -165,12 +197,20 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 
 void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 {
+	Draw(a_Dest, a_Placement->GetCoords(), a_Placement->GetNumCCWRotations());
+}
+
+
+
+
+void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumRotations) const
+{
 	// Draw the basic image:
-	Vector3i Placement = a_Placement->GetCoords();
+	Vector3i Placement(a_Placement);
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	const cBlockArea & Image = m_BlockArea[a_Placement->GetNumCCWRotations()];
+	const cBlockArea & Image = m_BlockArea[a_NumRotations];
 	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
@@ -251,6 +291,24 @@ int cPrefab::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cC
 		res += m_AddWeightIfSame;
 	}
 	return res;
+}
+
+
+
+
+
+void cPrefab::SetDefaultWeight(int a_DefaultWeight)
+{
+	m_DefaultWeight = a_DefaultWeight;
+}
+
+
+
+
+
+void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
+{
+	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
 }
 
 

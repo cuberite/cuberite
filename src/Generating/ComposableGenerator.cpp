@@ -25,6 +25,8 @@
 #include "Noise3DGenerator.h"
 #include "POCPieceGenerator.h"
 #include "Ravines.h"
+#include "UnderwaterBaseGen.h"
+#include "VillageGen.h"
 
 
 
@@ -32,6 +34,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cTerrainCompositionGen:
+
 cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed)
 {
 	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
@@ -389,6 +392,22 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Trees") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
+		}
+		else if (NoCaseCompare(*itr, "UnderwaterBases") == 0)
+		{
+			int GridSize   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
+			int MaxDepth   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
+			int MaxSize    = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
+			m_FinishGens.push_back(new cUnderwaterBaseGen(Seed, GridSize, MaxDepth, MaxSize, *m_BiomeGen));
+		}
+		else if (NoCaseCompare(*itr, "Villages") == 0)
+		{
+			int GridSize   = a_IniFile.GetValueSetI("Generator", "VillageGridSize",  384);
+			int MaxDepth   = a_IniFile.GetValueSetI("Generator", "VillageMaxDepth",    2);
+			int MaxSize    = a_IniFile.GetValueSetI("Generator", "VillageMaxSize",   128);
+			int MinDensity = a_IniFile.GetValueSetI("Generator", "VillageMinDensity", 50);
+			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
+			m_FinishGens.push_back(new cVillageGen(Seed, GridSize, MaxDepth, MaxSize, MinDensity, MaxDensity, *m_BiomeGen, *m_HeightGen));
 		}
 		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
