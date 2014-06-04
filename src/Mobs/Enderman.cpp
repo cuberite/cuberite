@@ -42,12 +42,14 @@ public:
 			return false;
 		}
 
-		Direction.Normalize();
 		
 		Vector3d LookVector = a_Player->GetLookVector();
-		LookVector.Normalize();
+		double dot = Direction.Dot(LookVector);
 		
-		if ((Direction - LookVector).SqrLength() > 0.02)
+		// 0.09 rad ~ 5 degrees.
+		// If the players crosshars are 10 degrees from the line linking the endermen
+		// It counts as looking.
+		if (dot > cos(0.09))
 		{
 			return false;
 		}
