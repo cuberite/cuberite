@@ -3,6 +3,7 @@
 
 #include "Enderman.h"
 #include "../Entities/Player.h"
+#include "../Tracer.h"
 
 
 
@@ -51,13 +52,19 @@ public:
 			return false;
 		}
 		
-		// TODO: Don't attack the player if there is a wall between the player and the enderman.
+		cTracer LineOfSight(a_Player->GetWorld());
+		if (LineOfSight.Trace(m_EndermanPos, Direction, (int)Direction.Length()))
+		{
+			// No direct line of sight
+			return false;
+		}
+
 		m_Player = a_Player;
 		return true;
 	}
 	
-	cPlayer * GetPlayer(void) const {return m_Player;}
-	bool HasFoundPlayer(void) const {return (m_Player != NULL);}
+	cPlayer * GetPlayer(void) const { return m_Player; }
+
 protected:
 	cPlayer * m_Player;
 	Vector3d m_EndermanPos;
@@ -92,33 +99,45 @@ void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cEnderman::Tick(float a_Dt, cChunk & a_Chunk)
-{
-	super::Tick(a_Dt, a_Chunk);
-	
+void cEnderman::CheckEventSeePlayer()
+{	
 	if (m_Target != NULL)
 	{
 		return;
 	}
 
 	cPlayerLookCheck Callback(GetPosition());
-	if (!m_World->ForEachPlayer(Callback))
+	if (m_World->ForEachPlayer(Callback))
 	{
 		return;
 	}
+	
+	ASSERT(Callback.GetPlayer() != NULL);
 
-	if (!Callback.HasFoundPlayer())
+	int CX, CZ;
+	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, CX, CZ);
+	if (!GetWorld()->IsChunkLighted(CX, CZ))
 	{
+		GetWorld()->QueueLightChunk(CX, CZ);
 		return;
 	}
 
-	m_bIsScreaming = true;
-	m_Target = Callback.GetPlayer();
-
-	m_World->BroadcastEntityMetadata(*this);
+	if ((GetWorld()->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) - GetWorld()->GetSkyDarkness() < 15) && !Callback.GetPlayer()->IsGameModeCreative())
+	{
+		super::EventSeePlayer(Callback.GetPlayer());
+		m_EMState = CHASING;
+		m_bIsScreaming = true;
+		GetWorld()->BroadcastEntityMetadata(*this);
+	}
 }
 	
 
 
 
 
+void cEnderman::EventLosePlayer()
+{
+	super::EventLosePlayer();
+	m_bIsScreaming = false;
+	GetWorld()->BroadcastEntityMetadata(*this);
+}
