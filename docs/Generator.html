@@ -341,7 +341,7 @@ than the columns further away. The following image shows the output of MCServer'
 generator (each block type represents a different biome - ocean in the front (stone), plains and ice plains
 behind it (lapis, whitewool), extreme hills back right (soulsand), desert hills back left (mossy
 cobble)):</p>
-<img src="img/biomalheights.jpg" />
+<a name="biomalheights"><img src="img/biomalheights.jpg" /></a>
 
 <p>One key observation about this whole approach is that in order for it to work, the biomes must be
 available for columns outside the currently generated chunk, otherwise the columns at the chunk's edge would
@@ -356,6 +356,36 @@ would become impossible to apply the averaging.</p>
 <hr />
 
 <a name="compositiongen"><h2>Terrain composition</h2></a>
+<p>As with the other generators, the composition generator category has its easy and debugging items, too.
+There's the "special" composition of "all the blocks are the same type", which fills the entire column, from
+the bottom to the height, with a single blocktype. This generator is useful when testing the generators in
+the other categories, to speed up the generation by leaving out unnecessary calculations. Another special
+compositor is a similar one, that fills all blocks with the same type, but the type varies for each biome.
+This way it's easy to see the generated biomes and possibly the heights for those biomes, as shown in the
+previous section on the <a href="#biomalheights">height averaging screenshot</a>.</p>
+
+<p>For a natural look, we need to put together a more complicated algorithm. The standard set forth in
+MineCraft is that the top of the world is covered in grass, then there are a few blocks of dirt and finally
+stone. This basic layout is then varied for different biomes - deserts have sand and sandstone instead of the
+grass and dirt layer. Mushroom biomes have mycelium in place of the grass. This per-biome dependency is
+trivial to implement - when compositing, simply use the appropriate layout for the column's biome.</p>
+
+<p>The next change concerns oceans. The generated heightmap doesn't include any waterlevel indication
+whatsoever. So it's up to the terrain compositor to actually decide where to place water. We do this by
+configuration - simply have a value in the config file specifying the sealevel height. The compositor then
+has to add water above any column which has a height lower than that. Additionally, the water needs to
+override per-biome layout selection - we don't want grass blocks to generate under water when the terrain
+height in the plains biome drops below the sealevel accidentally.</p>
+
+<p>The final feature in the compositor is the decision between multiple composition layouts within a single
+biome. A megataiga biome contains patches of non-grass dirt and podzol blocks, and the ocean floor can be
+made of dirt, gravel, sand or clay. A simple 2D Perlin noise can be used to select the layout to use for a
+specific column - simply threshold the noise's value by as many thresholds as there are layout variations,
+and use the layout corresponding to the threshold:</p>
+<img src="img/perlincompositor1.jpg" />
+<img src="img/perlincompositor2.jpg" />
+<img src="img/perlincompositor3.jpg" />
+
 <p>(TODO)</p>
 
 
