@@ -24,6 +24,7 @@
 #include "NetherFortGen.h"
 #include "Noise3DGenerator.h"
 #include "POCPieceGenerator.h"
+#include "RainbowRoadsGen.h"
 #include "Ravines.h"
 #include "UnderwaterBaseGen.h"
 #include "VillageGen.h"
@@ -391,6 +392,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenPreSimulator);
 		}
+		else if (NoCaseCompare(*itr, "RainbowRoads") == 0)
+		{
+			int GridSize = a_IniFile.GetValueSetI("Generator", "RainbowRoadsGridSize", 512);
+			int MaxDepth = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxDepth",  30);
+			int MaxSize  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxSize",  260);
+			m_FinishGens.push_back(new cRainbowRoadsGen(Seed, GridSize, MaxDepth, MaxSize));
+		}
 		else if (NoCaseCompare(*itr, "Ravines") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenRavines(Seed, 128));
@@ -409,9 +417,9 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "UnderwaterBases") == 0)
 		{
-			int GridSize   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
-			int MaxDepth   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
-			int MaxSize    = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
+			int GridSize = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
+			int MaxDepth = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
+			int MaxSize  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
 			m_FinishGens.push_back(new cUnderwaterBaseGen(Seed, GridSize, MaxDepth, MaxSize, *m_BiomeGen));
 		}
 		else if (NoCaseCompare(*itr, "Villages") == 0)
