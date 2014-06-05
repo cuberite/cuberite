@@ -196,7 +196,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 void cDispenserEntity::SpawnProjectileFromDispenser(int & a_BlockX, int & a_BlockY, int & a_BlockZ, cProjectileEntity::eKind a_Kind, Vector3d a_ShootVector)
 {
-	if( a_Kind != cProjectileEntity::pkFireCharge )
+	if (a_Kind != cProjectileEntity::pkFireCharge)
 	{
 		a_ShootVector.y = a_ShootVector.y + 1;
 	}
@@ -209,14 +209,14 @@ Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE & a_Meta)
 {
 	switch(a_Meta)
 	{
-		case E_META_DROPSPENSER_FACING_YP: return Vector3d(0, 1, 0);		// UP
-		case E_META_DROPSPENSER_FACING_YM: return Vector3d(0, -1, 0);		// DOWN
+		case E_META_DROPSPENSER_FACING_YP: return Vector3d( 0,  1,  0);	 // UP
+		case E_META_DROPSPENSER_FACING_YM: return Vector3d( 0, -1,  0);	 // DOWN
 
-		case E_META_DROPSPENSER_FACING_XM: return Vector3d(-1, 0, 0);		// WEST
-		case E_META_DROPSPENSER_FACING_XP: return Vector3d(1, 0, 0);		// EAST
+		case E_META_DROPSPENSER_FACING_XM: return Vector3d(-1,  0,  0);	 // WEST
+		case E_META_DROPSPENSER_FACING_XP: return Vector3d( 1,  0,  0);	 // EAST
 
-		case E_META_DROPSPENSER_FACING_ZM: return Vector3d(0, 0, -1);
-		case E_META_DROPSPENSER_FACING_ZP: return Vector3d(0, 0, 1);
+		case E_META_DROPSPENSER_FACING_ZM: return Vector3d( 0,  0, -1);
+		case E_META_DROPSPENSER_FACING_ZP: return Vector3d( 0,  0,  1);
 	}
 
 	return Vector3d(0, 1, 0);
