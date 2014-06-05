@@ -11,7 +11,6 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
-#include <sstream>
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -571,10 +570,7 @@ void cWorld::Start(void)
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
-
-	std::stringstream ss;
-	ss << m_TimeOfDay;
-	Int64 TimeOfDay = _atoi64(IniFile.GetValueSet("General", "TimeInTicks", ss.str()).c_str());
+	Int64 TimeOfDay               = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
 
 	if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
 	{
@@ -767,10 +763,7 @@ void cWorld::Stop(void)
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
 		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
 		IniFile.SetValueI("General", "Weather", (int)m_Weather);
-
-		std::stringstream ss;
-		ss << m_TimeOfDay;
-		IniFile.SetValue("General", "TimeInTicks", ss.str());
+		IniFile.SetValueI("General", "TimeInTicks", m_TimeOfDay);
 	IniFile.WriteFile(m_IniFileName);
 	
 	m_TickThread.Stop();

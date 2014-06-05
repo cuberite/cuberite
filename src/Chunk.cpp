@@ -580,7 +580,10 @@ void cChunk::Tick(float a_Dt)
 	{
 		// Mobs are tickes inside MobTick (as we don't have to tick them if they are far away from players)
 		// Don't tick things queued to be removed
-		if (!((*itr)->IsMob()) && (std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID()) == m_EntitiesToRemove.end()))
+		if (
+			!((*itr)->IsMob()) &&
+			(std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID()) == m_EntitiesToRemove.end())
+		)
 		{
 			(*itr)->Tick(a_Dt, *this);
 		}
@@ -588,7 +591,7 @@ void cChunk::Tick(float a_Dt)
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
-		std::vector<int>::const_iterator itr2 = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID());
+		std::vector<int>::iterator itr2 = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID());
 		if (itr2 != m_EntitiesToRemove.end())
 		{
 			itr = m_Entities.erase(itr);

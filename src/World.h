@@ -715,7 +715,9 @@ public:
 	bool IsWeatherRain (void) const { return (m_Weather == wRain); }
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 	
-	/** Returns true if the current weather has any precipitation - rain or storm */
+	/** Returns true if the current weather has any precipitation - rain or storm
+	Does not check if biome has no downfall, use cChunk::GetBiomeAt(RelX, RelZ) for that
+	*/
 	virtual bool IsWeatherWet(void) const override { return (m_Weather != wSunny); }
 
 	// tolua_end

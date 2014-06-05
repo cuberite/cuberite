@@ -52,7 +52,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 	m_ChunkSink = &a_ChunkSink;
 
 	MTRand rnd;
-	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", rnd.randInt());
+	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", (int)rnd.randInt());
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
 
 	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
