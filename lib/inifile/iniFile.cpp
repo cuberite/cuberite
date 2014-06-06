@@ -584,7 +584,7 @@ Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename,
 {
 	AString Data;
 	Printf(Data, "%lld", defValue);
-	Astring resultstring = GetValueSet(keyname, valuename, Data);
+	AString resultstring = GetValueSet(keyname, valuename, Data);
 	Int64 result;
 	sscanf(resultstring.c_str(), "%lld", &result);
 	return result;
