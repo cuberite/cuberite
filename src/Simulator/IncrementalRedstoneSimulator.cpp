@@ -209,7 +209,15 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	{
 		return;
 	}
-
+	
+	for (cRedstoneSimulatorChunkData::iterator itr = a_Chunk->GetRedstoneSimulatorQueuedData()->begin(); itr != a_Chunk->GetRedstoneSimulatorQueuedData()->end(); ++itr)
+	{
+		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
+		{
+			// Can't have duplicates in here either, in case something adds the block again before the structure can written to the main chunk data
+			return;
+		}
+	}
 	a_Chunk->GetRedstoneSimulatorQueuedData()->push_back(cCoordWithBlockAndBool(RelX, a_BlockY, RelZ, Block, false));
 }
 
@@ -239,7 +247,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 	{
 		// Simulate the majority of devices only if something (blockwise or power-wise) has changed
 		// Make sure to allow the chunk to resimulate after the initial run if there was a power change (ShouldUpdateSimulateOnceBlocks helps to do this)
-		a_Chunk->SetIsRedstoneDirty(false); //
+		a_Chunk->SetIsRedstoneDirty(false);
 		ShouldUpdateSimulateOnceBlocks = true;
 	}
 
@@ -253,13 +261,24 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 
 		switch (dataitr->Data)
 		{
-			case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	break;
-			case E_BLOCK_DAYLIGHT_SENSOR:       HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
+			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
 
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			{
-				HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+				if (ShouldUpdateSimulateOnceBlocks)
+				{
+					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				for (RepeatersDelayList::const_iterator repeateritr = m_RepeatersDelayList->begin(); repeateritr != m_RepeatersDelayList->end(); ++repeateritr)
+				{
+					if (repeateritr->a_RelBlockPos == Vector3i(dataitr->x, dataitr->y, dataitr->z))
+					{
+						HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+						break;
+					}
+				}
 				break;
 			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
@@ -277,10 +296,11 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 		{
 			switch (dataitr->Data)
 			{				
+				case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	  break;
 				case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
 				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
-				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);	break;
-				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);	break;
+				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);  break;
+				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);  break;
 				case E_BLOCK_FENCE_GATE:            HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
 				case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
 				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
