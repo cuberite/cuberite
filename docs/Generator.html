@@ -404,7 +404,7 @@ and use the layout corresponding to the threshold:</p>
 <p>Much of the terain genertion consists of doing the same thing for every single column or block in a chunk. This
 sort of computation is much faster on a GPU as GPUs are massively parallel. High end GPUs can execute up to 30,000
 threads simultaneously, which would allow them to generate every block in half a chunk in parallel or every column
-in over 100 chunks in parallel. A naive comparison suggests a 800MHz a GPU with 15,000 threads can execute parallel
+in over 100 chunks in parallel. A naive comparison suggests that a 800MHz GPU with 15,000 threads can execute parallel
 code 250 times faster than a 3GHz CPU with 128 bit SIMD. Obviously we want to harness that power.</p>
 </body>
 </html>
