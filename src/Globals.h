@@ -368,6 +368,5 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
-#include "Entities/Effects.h"
 
 
