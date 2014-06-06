@@ -403,6 +403,7 @@ and use the layout corresponding to the threshold:</p>
 <a name="GPU"><h2>Executing on a GPU</h2></a>
 <p>Much of the terain genertion consists of doing the same thing for every single column or block in a chunk. This
 sort of computation is much faster on a GPU as GPUs are massively parallel. High end GPUs can execute up to 30,000
-threads simultaneously, which would allow them to generate every block in three chunks in parallel.</p>
+threads simultaneously, which would allow them to generate every block in half a chunk in parallel or every column
+in over 100 chunks in parallel.</p>
 </body>
 </html>
