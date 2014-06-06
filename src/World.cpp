@@ -570,7 +570,7 @@ void cWorld::Start(void)
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
-	Int64 TimeOfDay               = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
+	m_TimeOfDay               = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
 
 	if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
 	{
