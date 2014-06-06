@@ -449,7 +449,7 @@ bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists)
 {
-	return SetValue(a_Keyname, a_ValueName, Printf("lld", a_Value), a_CreateIfNotExists);
+	return SetValue(a_Keyname, a_ValueName, Printf("%lld", a_Value), a_CreateIfNotExists);
 }
 
 
@@ -584,7 +584,10 @@ Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename,
 {
 	AString Data;
 	Printf(Data, "%lld", defValue);
-	return std::stoll(GetValueSet(keyname, valuename, Data));
+	Astring resultstring = GetValueSet(keyname, valuename, Data);
+	Int64 result;
+	sscanf(resultstring.c_str(), "%lld", &result);
+	return result;
 }
 
 
