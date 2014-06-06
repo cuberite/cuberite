@@ -421,6 +421,9 @@ public:
 		UNUSED(a_Killer);
 	}
 
+	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
+	void SetWorld(cWorld * a_World) { m_World = a_World; }
+
 protected:
 	static cCriticalSection m_CSCount;
 	static int m_EntityCount;
@@ -484,8 +487,6 @@ protected:
 
 
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
-
-	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir();

@@ -250,7 +250,8 @@ public:
 	
 	void SendData(const char * a_Data, size_t a_Size);
 	
-	/** Called when the player moves into a different world; queues sreaming the new chunks */
+	/** Called when the player moves into a different world.
+	Locks the current world, doesn't lock the new world. */
 	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
 	
 	/** Called when the player will enchant a Item */

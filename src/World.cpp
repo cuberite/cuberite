@@ -743,6 +743,17 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 		m_LastTimeUpdate = m_WorldAge;
 	}
 
+	// Add entities waiting in the queue to be added:
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		for (cEntityList::iterator itr = m_EntitiesToAdd.begin(), end = m_EntitiesToAdd.end(); itr != end; ++itr)
+		{
+			(*itr)->SetWorld(this);
+			m_ChunkMap->AddEntity(*itr);
+		}
+		m_EntitiesToAdd.clear();
+	}
+
 	m_ChunkMap->Tick(a_Dt);
 
 	TickClients(a_Dt);
@@ -2808,9 +2819,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 
 
 
+
 void cWorld::AddEntity(cEntity * a_Entity)
 {
-	m_ChunkMap->AddEntity(a_Entity);
+	cCSLock Lock(m_CSEntitiesToAdd);
+	m_EntitiesToAdd.push_back(a_Entity);
 }
 
 
@@ -2819,6 +2832,19 @@ void cWorld::AddEntity(cEntity * a_Entity)
 
 bool cWorld::HasEntity(int a_UniqueID)
 {
+	// Check if the entity is in the queue to be added to the world:
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		for (cEntityList::const_iterator itr = m_EntitiesToAdd.begin(), end = m_EntitiesToAdd.end(); itr != end; ++itr)
+		{
+			if ((*itr)->GetUniqueID() == a_UniqueID)
+			{
+				return true;
+			}
+		}  // for itr - m_EntitiesToAdd[]
+	}
+
+	// Check if the entity is in the chunkmap:
 	return m_ChunkMap->HasEntity(a_UniqueID);
 }
 

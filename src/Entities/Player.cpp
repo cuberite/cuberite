@@ -1595,8 +1595,6 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
 
 	// Add player to all the necessary parts of the new world
-	SetWorld(World);
-	m_ClientHandle->StreamChunks();
 	World->AddEntity(this);
 	World->AddPlayer(this);
 

@@ -301,7 +301,8 @@ public:
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
-	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr */
+	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
+	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
 	void AddEntity(cEntity * a_Entity);
 	
 	bool HasEntity(int a_UniqueID);
@@ -925,6 +926,12 @@ private:
 	
 	/** Clients that are scheduled for adding, waiting for TickClients to add them */
 	cClientHandleList m_ClientsToAdd;
+
+	/** Guards m_EntitiesToAdd */
+	cCriticalSection m_CSEntitiesToAdd;
+
+	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
+	cEntityList m_EntitiesToAdd;
 
 
 	cWorld(const AString & a_WorldName);
