@@ -258,7 +258,7 @@ bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble
 		(m_Sections[Section]->m_BlockMetas[Index / 2] & (0xf0 >> ((Index & 1) * 4))) |  // The untouched nibble
 		((a_Nibble & 0x0f) << ((Index & 1) * 4))  // The nibble being set
 	);
-	return oldval == a_Nibble;
+	return oldval != a_Nibble;
 }
 
 

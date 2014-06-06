@@ -108,7 +108,7 @@ private:
 	/** Handles redstone wire */
 	void HandleRedstoneWire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles repeaters */
-	void HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState);
+	void HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState, RepeatersDelayList::iterator a_Itr);
 	/* ====================== */
 
 	/* ====== DEVICES ====== */
@@ -145,8 +145,8 @@ private:
 	void SetDirectionLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, char a_Direction, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Marks all blocks immediately surrounding a coordinate as powered */
 	void SetAllDirsAsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
-	/** Queues a repeater to be powered or unpowered */
-	void QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
+	/** Queues a repeater to be powered or unpowered and returns if the m_RepeatersDelayList iterators were invalidated */
+	bool QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
 
 	/** Returns if a coordinate is powered or linked powered */
 	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }

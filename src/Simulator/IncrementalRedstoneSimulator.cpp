@@ -266,18 +266,19 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			{
-				if (ShouldUpdateSimulateOnceBlocks)
-				{
-					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-					break;
-				}
-				for (RepeatersDelayList::const_iterator repeateritr = m_RepeatersDelayList->begin(); repeateritr != m_RepeatersDelayList->end(); ++repeateritr)
+				bool FoundItem = false;
+				for (RepeatersDelayList::iterator repeateritr = m_RepeatersDelayList->begin(); repeateritr != m_RepeatersDelayList->end(); ++repeateritr)
 				{
 					if (repeateritr->a_RelBlockPos == Vector3i(dataitr->x, dataitr->y, dataitr->z))
 					{
-						HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+						HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data, repeateritr);
+						FoundItem = true;
 						break;
 					}
+				}
+				if (!FoundItem && ShouldUpdateSimulateOnceBlocks)
+				{
+					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data, m_RepeatersDelayList->end());
 				}
 				break;
 			}
@@ -746,7 +747,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 
 
 
-void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState)
+void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState, RepeatersDelayList::iterator a_Itr)
 {
 	/* Repeater Orientation Mini Guide:
 	===================================
@@ -772,86 +773,98 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
-    	
+    
+	bool WereItrsChanged = false;
 	if (!IsRepeaterLocked(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
 	{
 		bool IsSelfPowered = IsRepeaterPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta);
 		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
 		{
-			QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, true);
+			WereItrsChanged = QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, true);
 		}
 		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
 		{
-			QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, false);
-		}
-	}
-
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
-	{
-		if (!itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
-		{
-			continue;
-		}
-
-		if (itr->a_ElapsedTicks >= itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
-		{
-			if (itr->ShouldPowerOn)
-			{
-				if (!IsOn)
-				{
-					m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // For performance
-				}
-
-				switch (a_Meta & 0x3) // We only want the direction (bottom) bits
-				{
-					case 0x0:
-					{
-						SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-						SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM);
-						break;
-					}
-					case 0x1:
-					{
-						SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-						SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP);
-						break;
-					}
-					case 0x2:
-					{
-						SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-						SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP);
-						break;
-					}
-					case 0x3:
-					{
-						SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-						SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM);
-						break;
-					}
-				}
-
-				// Removal of the data entry will be handled in SimChunk - we still want to continue trying to power blocks, even if our delay time has reached
-				// Otherwise, the power state of blocks in front won't update after we have powered on
-				return;
-			}
-			else
-			{
-				if (IsOn)
-				{
-					m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
-				}
-				m_RepeatersDelayList->erase(itr); // We can remove off repeaters which don't need further updating
-				return;
-			}
+			WereItrsChanged = QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, false);
 		}
 		else
 		{
-			// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
-			// With a world with lots of redstone, the repeaters simply do not delay
-			// I am confounded to say why. Perhaps optimisation failure.
-			LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", itr->a_RelBlockPos.x, itr->a_RelBlockPos.y, itr->a_RelBlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
-			itr->a_ElapsedTicks++;
+			return;
 		}
+	}
+	else
+	{
+		return;
+	}
+
+	if (WereItrsChanged)
+	{
+		for (a_Itr = m_RepeatersDelayList->begin(); a_Itr != m_RepeatersDelayList->end(); ++a_Itr)
+		{
+			if (a_Itr->a_RelBlockPos == Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
+			{
+				break;
+			}
+		}
+	}
+
+	if (a_Itr->a_ElapsedTicks >= a_Itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
+	{
+		if (a_Itr->ShouldPowerOn)
+		{
+			if (!IsOn)
+			{
+				m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // For performance
+			}
+
+			switch (a_Meta & 0x3) // We only want the direction (bottom) bits
+			{
+				case 0x0:
+				{
+					SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM);
+					break;
+				}
+				case 0x1:
+				{
+					SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP);
+					break;
+				}
+				case 0x2:
+				{
+					SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP);
+					break;
+				}
+				case 0x3:
+				{
+					SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM);
+					break;
+				}
+			}
+
+			// Removal of the data entry will be handled in SimChunk - we still want to continue trying to power blocks, even if our delay time has reached
+			// Otherwise, the power state of blocks in front won't update after we have powered on
+			return;
+		}
+		else
+		{
+			if (IsOn)
+			{
+				m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
+			}
+			m_RepeatersDelayList->erase(a_Itr); // We can remove off repeaters which don't need further updating
+			return;
+		}
+	}
+	else
+	{
+		// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
+		// With a world with lots of redstone, the repeaters simply do not delay
+		// I am confounded to say why. Perhaps optimisation failure.
+		LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", a_Itr->a_RelBlockPos.x, a_Itr->a_RelBlockPos.y, a_Itr->a_RelBlockPos.z, a_Itr->a_ElapsedTicks, a_Itr->a_DelayTicks);
+		a_Itr->a_ElapsedTicks++;
 	}
 }
 
@@ -1914,7 +1927,7 @@ void cIncrementalRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_Re
 
 
 
-void cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn)
+bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn)
 {
 	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
 	{
@@ -1922,14 +1935,14 @@ void cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 		{
 			if (ShouldPowerOn == itr->ShouldPowerOn) // We are queued already for the same thing, don't replace entry
 			{
-				return;
+				return false;
 			}
 
 			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
 			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2; // See below for description
 			itr->a_ElapsedTicks = 0;
 			itr->ShouldPowerOn = ShouldPowerOn;
-			return;
+			return false;
 		}
 	}
 
@@ -1944,7 +1957,7 @@ void cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 	RC.a_ElapsedTicks = 0;
 	RC.ShouldPowerOn = ShouldPowerOn;
 	m_RepeatersDelayList->push_back(RC);
-	return;
+	return true;
 }
 
 
