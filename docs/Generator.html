@@ -386,14 +386,129 @@ and use the layout corresponding to the threshold:</p>
 <img src="img/perlincompositor2.jpg" />
 <img src="img/perlincompositor3.jpg" />
 
+<h3>Nether composition</h3>
+<p>So far we've been discussing only the Overworld generator. But MineCraft contains more than that. The
+Nether has a completely different look and feel, and quite different processes are required to generate that.
+Recall that MineCraft's Nether is 128 blocks high, with bedrock both at the top and the bottom. Between these
+two, the terrain looks more like a cavern than a surface. Not surprisingly, the Nether doesn't need a
+complicated height generator, it can use the flat height. However, the terrain composition must take an
+altogether different approach.</p>
+
+<p>The very first idea is to use the Perlin noise, but generate it in 3D, rather than 2D. Then, for each
+block, evaluate the noise value, if below 0, make it air, if not, make it netherrack.
+
+<p>To make it so that the bedrock at the top and at the bottom is never revealed, we can add a value
+increasing the more the Y coord gets towards the bottom or the top. This way the thresholding then guarantees
+that there will be no air anywhere near the bedrock.</p>
+
 <p>(TODO)</p>
 
 
 <hr />
 
 <a name="finishgen"><h2>Finishers</h2></a>
-<p>(TODO)</p>
+<p>Finishers are a vast category of various additions to the terrain generator. They range from very easy
+ones, such as generating snow on top of the terrain in cold biomes, through medium ones, such as growing
+patches of flowers, complicated ones, such as placing trees and generating caves, all the way to very
+complicated ones such as villages and nether fortresses. There is no formal distinction between all these
+"categories", the only thing they have in common is that they take a chunk of blocks and modify it in some
+way.</p>
 
+<h3>Snow</h3>
+<p>Snow is probably the easiest of the finishers. It generates a block of snow on top of each block that is
+on top of the terrain and is not marked as non-snowable. It checks the chunk's heightmap to determine the top
+block, then checks whether the block supports snow on its top. Rails, levers and grass don't support snow,
+for example.</p>
+
+<h3>Ice</h3>
+<p>Another example of an easy finisher. This scans through the world and turn each water block on the surface
+into an ice block if the biome is cold. This means that any water block that is under any kind of other
+block, such as under a tree's leaves, will still stay water. Thus an additional improvement could be made by
+scanning down from the surface block through blocks that we deem as non-surface, such as leaves, torches,
+ladders, fences etc. Note that MCServer currently implements only the easy solution.</p>
+
+<h3>Bottom lava</h3>
+<p>Most worlds in MineCraft have lava lakes at their bottom. Generating these is pretty straightforward: Use
+the user-configured depth and replace all the air blocks below this depth with lava blocks. Note however,
+that this makes this generator dependent on the order in which the finishers are applied. If the mineshafts
+generate before bottom lava, the mineshafts that are below the lava level will get filled with lava. On the
+other hand, if bottom lava is generated before the mineshafts, it is possible for a mineshaft to "drill
+through" a lake of lava. MCServer doesn't try to solve this and instead lets the admin choose whichever they
+prefer.</p>
+
+<h3>Specific foliage</h3>
+<p>There are generators for specific kinds of foliage. The dead bushes in the desert biome and lilypads in
+the swamp biome both share the same generating pattern. They are both specific to a single biome and they
+both require a specific block underneath them in order to generate. Their implementation is simple: pick
+several random columns in the chunk. If the column is of the correct biome and has the correct top block,
+add the foliage block on top.</p>
+
+<p>In order to generate the same set of coordinates when the chunk is re-generated, we use the Perlin noise's
+basis functions (the ones providing the random values for Perlin cell vertices). These basically work as a
+hash function for the coorinates - the same input coordinates generate the same output value. We use the
+chunk's coordinates as two of the coords, and the iteration number as the third coordinate, to generate a
+random number. We then check the biome and the top block at those coordinates, if they allow, we generate the
+foliage block on top.</p>
+
+<p>Another example of specific foliage is the tall grass in the plains biome. There are quite a lot of these
+tall grass blocks, it would be inefficient to generate them using the random-coords approach described above.
+Instead, we will use a 2D Perlin noise again, with a threshold defining where to put the grass and where
+not.</p>
+
+<h3>Small foliage</h3>
+<p>For the flowers, grass, mushrooms in caves etc. we want to use a slightly different algorithm. These
+foliage blocks are customarily generated in small "clumps" - there are several blocks of the same type near
+together. To generate these, we first select random coords, using the coord hash functions, for a center of a
+clump. Then we select the type of block to generate. Finally, we loop over adding a random (coord hash)
+number to the clump center coords to get the block where to generate the foliage block:</p>
+<img src="img/smallfoliageclumps.jpg" />
+
+<p>In order to make the clump more "round" and "centered", we want the offsets to be closer to the clump
+center more often. This is done using a thing called Gaussian function distribution. Instead of having each
+random number generate with the same probability, we want higher probability for the numbers around zero,
+like this:</p>
+<img src="img/gaussprobability.jpg" />
+
+<p>Instead of doing complicated calculations to match this shape exactly, we will use a much easier shape.
+By adding together two random numbers in the same range, we get the probability distribution that has a
+"roof" shape, enough for our needs:</p>
+<img src="img/roofprobability.jpg" />
+
+<p>(For the curious, there is a proof that adding together infinitely many uniform-distributed random number
+produces random numbers with the Gaussian distribution.)</p>
+
+<p>This scheme can be used to produce clumps of flowers, when we select the 2D coords of the clump center on
+the top surface of the terrain. We simply generate the 2D coords of the foliage blocks and use the terrain
+height to find the third coord. If we want to generate clumps of mushrooms in the caves, however, we need to
+generate the clump center coords in 3D and either use 3 offsets for the mushrooms, or use 2 offsets plus
+searching for the closest opening Y-wise in the terrain.</p>
+
+<h3>Springs</h3>
+<p>Water and lava springs are essential for making the underground quite a lot more interesting. They are
+rather easy to generate, but a bit more difficult to get right. Generating simply means that a few random
+locations (obtained by our familiar coord hashing) are checked and if the block type in there is stone. Then
+we see all the horizontal neighbors of the block, plus the block underneath. If all of them except one are
+stone, and the one left is air, our block is suitable for turning into a spring. If there were more air
+neighbors, the spring would look somewhat unnatural; if there were no air neighbors, the spring won't flow
+anywhere, so it would be rather useless.</p>
+
+<p>The difficult part about springs is the amount of them to generate. There should be a few springs on the
+surface, perhaps a bit more in the mountaineous biomes. There should be quite a few more springs underground,
+but there should definitely be more water springs than lava springs in the upper levels of the terrain, while
+there should be more lava springs and almost no water springs near the bottom. To accomodate this, the
+MCServer team has made a tool that scanned through MineCraft's terrain and counted the amount of both types
+of springs in relation to their height. Two curves have been found for the distribution of each type of the
+spring:</p>
+<img src="http://mc-server.xoft.cz/img/vanilla_springs_huge.png" />
+
+<p>MCServer uses an approximation of the above curves to choose the height at which to generate the
+spring.</p>
+
+<!--
+<h3>Caves</h3>
+<p>Caves are definitely one of the main things people notice about MineCraft terrain. There are quite a lot
+of different algorithms available to generate terrain with caves.
+-->
 
 <hr />
 
