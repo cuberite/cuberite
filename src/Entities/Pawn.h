@@ -26,7 +26,8 @@ public:
 	void RemoveEntityEffect(cEntityEffect::eType a_EffectType);
 
 protected:
-	std::map<cEntityEffect::eType, cEntityEffect> m_EntityEffects;
+	typedef std::map<cEntityEffect::eType, cEntityEffect> tEffectMap;
+	tEffectMap m_EntityEffects;
 	
 	virtual void HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect);
 } ;  // tolua_export

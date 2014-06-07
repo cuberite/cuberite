@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Pawn.h"
+#include "../World.h"
 
 
 
@@ -20,7 +21,7 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height)
 void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	// Iterate through this entity's applied effects
-	for (std::map<cEntityEffect::eType, cEntityEffect>::iterator iter = m_EntityEffects.begin();
+	for (tEffectMap::iterator iter = m_EntityEffects.begin();
 		 iter != m_EntityEffects.end();
 		 ++iter)
 	{
@@ -49,7 +50,7 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
 	m_EntityEffects[a_EffectType] = a_Effect;
-	//m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.m_Intensity, a_Effect.m_Ticks);
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.m_Ticks);
 }
 
 
@@ -59,7 +60,7 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_E
 void cPawn::RemoveEntityEffect(cEntityEffect::eType a_EffectType)
 {
 	m_EntityEffects.erase(a_EffectType);
-	//m_World->BroadcastRemoveEntityEffect(*this, a_EffectType);
+	m_World->BroadcastRemoveEntityEffect(*this, a_EffectType);
 }
 
 
