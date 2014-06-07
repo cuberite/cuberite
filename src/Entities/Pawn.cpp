@@ -10,7 +10,7 @@
 
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height)
 	: cEntity(a_EntityType, 0, 0, 0, a_Width, a_Height)
-	, m_EntityEffects(std::map<cEntityEffect::eType, cEntityEffect>())
+	, m_EntityEffects(tEffectMap())
 {
 }
 
@@ -21,20 +21,25 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height)
 void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	// Iterate through this entity's applied effects
-	for (tEffectMap::iterator iter = m_EntityEffects.begin();
-		 iter != m_EntityEffects.end();
-		 ++iter)
+	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)
 	{
+		// Copies values to prevent pesky wrong accesses and erasures
+		cEntityEffect::eType effect_type = iter->first;
+		cEntityEffect &effect_values = iter->second;
+		
 		// Apply entity effect
-		HandleEntityEffects(iter->first, iter->second);
+		HandleEntityEffects(effect_type, effect_values);
 		
 		// Reduce the effect's duration
-		iter->second.m_Ticks--;
+		effect_values.m_Ticks--;
+		
+		// Iterates (must be called before any possible erasure)
+		++iter;
 		
 		// Remove effect if duration has elapsed
-		if (iter->second.m_Ticks <= 0)
+		if (effect_values.m_Ticks <= 0)
 		{
-			RemoveEntityEffect(iter->first);
+			RemoveEntityEffect(effect_type);
 		}
 		
 		// TODO: Check for discrepancies between client and server effect values
