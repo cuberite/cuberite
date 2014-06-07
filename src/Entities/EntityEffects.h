@@ -1,5 +1,7 @@
 #pragma once
 
+class cPawn;
+
 // tolua_begin
 class cEntityEffect {
 public:
@@ -35,8 +37,14 @@ public:
 	/** The duration of the effect */
 	int m_Ticks;
 	
-	/** How strong the effect will be applied */
-	short m_Intensity;
+	/** Returns how strong the effect will be applied */
+	short GetIntensity() { return m_Intensity; }
+	
+	/** Returns the pawn that used this entity effect */
+	cPawn *GetUser() { return m_User; }
+	
+	/** Returns the distance modifier for affecting potency */
+	double GetDistanceModifier() { return m_DistanceModifier; }
 	
 	/**
 	 *  An empty entity effect
@@ -45,9 +53,21 @@ public:
 	
 	/**
 	 *  An entity effect
-	 *  @param a_Ticks      The duration of the effect
-	 *  @param a_Intensity  How strong the effect will be applied
+	 *  @param a_Ticks            The duration of the effect
+	 *  @param a_Intensity        How strong the effect will be applied
+	 *  @param a_User             The pawn that used this entity effect
+	 *  @param a_DistanceModifier The distance modifier for affecting potency, defaults to 1
 	 */
-	cEntityEffect(int a_Ticks, short a_Intensity);
+	cEntityEffect(int a_Ticks, short a_Intensity, cPawn *a_User, double a_DistanceModifier = 1);
+	
+private:
+	/** How strong the effect will be applied */
+	short m_Intensity;
+	
+	/** The pawn that used this entity effect */
+	cPawn *m_User;
+	
+	/** The distance modifier for affecting potency */
+	double m_DistanceModifier;
 };
 // tolua_end
