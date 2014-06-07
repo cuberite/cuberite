@@ -9,7 +9,6 @@
 
 cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height)
 	: cEntity(a_EntityType, 0, 0, 0, a_Width, a_Height)
-	, m_bBurnable(true)
 	, m_EntityEffects(std::map<cEntityEffect::eType, cEntityEffect>())
 {
 }

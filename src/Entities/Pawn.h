@@ -26,7 +26,6 @@ public:
 	void RemoveEntityEffect(cEntityEffect::eType a_EffectType);
 
 protected:
-	bool m_bBurnable;
 	std::map<cEntityEffect::eType, cEntityEffect> m_EntityEffects;
 } ;  // tolua_export
 
