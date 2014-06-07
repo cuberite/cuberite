@@ -82,6 +82,9 @@ public:
 	/** Indicates if this item is food */
 	virtual bool IsFood(void);
 	
+	/** Indicates if this item is drinkable */
+	virtual bool IsDrinkable(void);
+	
 	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void);
 

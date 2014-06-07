@@ -19,6 +19,7 @@
 #include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemDoor.h"
+#include "ItemMilk.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
@@ -119,6 +120,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
+		case E_ITEM_MILK:              return new cItemMilkHandler();
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
@@ -475,7 +477,6 @@ bool cItemHandler::IsFood(void)
 		case E_ITEM_BREAD:
 		case E_ITEM_RAW_PORKCHOP:
 		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_MILK:
 		case E_ITEM_RAW_FISH:
 		case E_ITEM_COOKED_FISH:
 		case E_ITEM_COOKIE:
@@ -490,6 +491,22 @@ bool cItemHandler::IsFood(void)
 		case E_ITEM_POTATO:
 		case E_ITEM_BAKED_POTATO:
 		case E_ITEM_POISONOUS_POTATO:
+		{
+			return true;
+		}
+	}  // switch (m_ItemType)
+	return false;
+}
+
+
+
+
+
+bool cItemHandler::IsDrinkable(void)
+{
+	switch (m_ItemType)
+	{
+		case E_ITEM_MILK:
 		{
 			return true;
 		}

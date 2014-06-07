@@ -552,7 +552,7 @@ void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 
 bool cPlayer::Feed(int a_Food, double a_Saturation)
 {
-	if (m_FoodLevel >= MAX_FOOD_LEVEL)
+	if (IsSatiated())
 	{
 		return false;
 	}

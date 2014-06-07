@@ -72,6 +72,26 @@ void cPawn::RemoveEntityEffect(cEntityEffect::eType a_EffectType)
 
 
 
+void cPawn::ClearEntityEffects()
+{
+	// Iterate through this entity's applied effects
+	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)
+	{
+		// Copy values to prevent pesky wrong erasures
+		cEntityEffect::eType effect_type = iter->first;
+		
+		// Iterates (must be called before any possible erasure)
+		++iter;
+		
+		// Remove effect
+		RemoveEntityEffect(effect_type);
+	}
+}
+
+
+
+
+
 void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
 	switch (a_EffectType)
