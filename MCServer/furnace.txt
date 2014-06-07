@@ -61,18 +61,30 @@
 #--------------------------
 # Fuels
 
-! 263:1    = 1600   # 1 Coal           -> 80 sec
-! 263:1:1  = 1600   # 1 Charcoal       -> 80 sec
-! 42:126:1 = 150    # 1 Halfslab       -> 7.5 seconds
-! 5:1      = 300    # 1 Planks         -> 15 sec
-! 280:1    = 100    # 1 Stick          -> 5 sec
-! 85:1     = 300    # 1 Fence          -> 15 sec
-! 53:1     = 300    # 1 Wooden Stairs  -> 15 sec
-! 58:1     = 300    # 1 Crafting Table -> 15 sec
-! 47:1     = 300    # 1 Bookshelf      -> 15 sec
-! 54:1     = 300    # 1 Chest          -> 15 sec
-! 84:1     = 300    # 1 Jukebox        -> 15 sec
-! 327:1    = 200000 # 1 Lava Bucket    -> 1000 sec
-! 17:1     = 300    # 1 Wood           -> 15 sec
-! 6:1      = 100    # 1 Sapling        -> 5 sec
-! 173:1    = 7400   # 1 Coal Block     -> 370 sec, based on https://github.com/minetest/common/commit/e0f5a6fd6936052756e27a05a2bfdd6aa86b38e1 which is a clone of MC
+! 263:1    = 1600   # 1 Coal            -> 80 sec
+! 263:1:1  = 1600   # 1 Charcoal        -> 80 sec
+! 126:1    = 15     # 1 Halfslab        -> 7.5 sec
+! 5:1      = 300    # 1 Planks          -> 15 sec
+! 280:1    = 100    # 1 Stick           -> 5 sec
+! 85:1     = 300    # 1 Fence           -> 15 sec
+! 53:1     = 300    # 1 Wooden Stairs   -> 15 sec
+! 58:1     = 300    # 1 Crafting Table  -> 15 sec
+! 47:1     = 300    # 1 Bookshelf       -> 15 sec
+! 54:1     = 300    # 1 Chest           -> 15 sec
+! 84:1     = 300    # 1 Jukebox         -> 15 sec
+! 327:1    = 20000  # 1 Lava Bucket     -> 1000 sec
+! 17:1     = 300    # 1 Wood            -> 15 sec
+! 6:1      = 100    # 1 Sapling         -> 5 sec
+! 173:1    = 16000  # 1 Coal Block      -> 800 sec
+! 369:1    = 2400   # 1 Blaze Rod       -> 120 sec
+! 25:1     = 300    # 1 Note Block      -> 15 sec
+! 151:1    = 300    # 1 Daylight Sensor -> 15 sec
+! 107:1    = 300    # 1 Fence Gate      -> 15 sec
+! 167:1    = 300    # 1 Trapdoor        -> 15 sec
+! 146:1    = 300    # 1 Trapped Chest   -> 15 sec
+! 72:1     = 300    # 1 Pressure Plate  -> 15 sec
+! 270:1    = 200    # 1 Wooden Pickaxe  -> 10 sec
+! 271:1    = 200    # 1 Wooden Axe      -> 10 sec
+! 269:1    = 200    # 1 Wooden Shovel   -> 10 sec
+! 290:1    = 200    # 1 Wooden Hoe      -> 10 sec
+! 268:1    = 200    # 1 Wooden Sword    -> 10 sec
