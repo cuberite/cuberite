@@ -577,7 +577,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 			cFastRandom r1;
 			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
 			{
-				a_Player->FoodPoison(300);
+				a_Player->FoodPoison(600); // Give the player food poisoning for 30 seconds.
 			}
 		}
 

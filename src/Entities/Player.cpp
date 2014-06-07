@@ -40,7 +40,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_FoodSaturationLevel(5)
 	, m_FoodTickTimer(0)
 	, m_FoodExhaustionLevel(0)
-	, m_FoodPoisonedTicksRemaining(0)
 	, m_LastJumpHeight(0)
 	, m_LastGroundHeight(0)
 	, m_bTouchGround(false)
@@ -551,15 +550,6 @@ void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 
 
 
-void cPlayer::SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining)
-{
-	m_FoodPoisonedTicksRemaining = a_FoodPoisonedTicksRemaining;
-}
-
-
-
-
-
 bool cPlayer::Feed(int a_Food, double a_Saturation)
 {
 	if (m_FoodLevel >= MAX_FOOD_LEVEL)
@@ -580,16 +570,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 void cPlayer::FoodPoison(int a_NumTicks)
 {
-	bool HasBeenFoodPoisoned = (m_FoodPoisonedTicksRemaining > 0);
-	m_FoodPoisonedTicksRemaining = std::max(m_FoodPoisonedTicksRemaining, a_NumTicks);
-	if (!HasBeenFoodPoisoned)
-	{
-		SendHealth();
-	}
-	else
-	{
-		AddEntityEffect(cEntityEffect::efHunger, cEntityEffect(0, 400)); // Give the player the "Hunger" effect for 20 seconds.
-	}
+	AddEntityEffect(cEntityEffect::efHunger, cEntityEffect(0, a_NumTicks));
 }
 
 

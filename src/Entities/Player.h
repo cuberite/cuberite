@@ -267,7 +267,6 @@ public:
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
 	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
-	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
 	
 	/** Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore */
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
@@ -276,7 +275,6 @@ public:
 	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
 	void SetFoodTickTimer             (int a_FoodTickTimer);
 	void SetFoodExhaustionLevel       (double a_FoodExhaustionLevel);
-	void SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining);
 
 	/** Adds to FoodLevel and FoodSaturationLevel, returns true if any food has been consumed, false if player "full" */
 	bool Feed(int a_Food, double a_Saturation);
@@ -287,7 +285,7 @@ public:
 		m_FoodExhaustionLevel += a_Exhaustion;
 	}
 	
-	/** Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two */
+	/** Starts the food poisoning for the specified amount of ticks */
 	void FoodPoison(int a_NumTicks);
 	
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
@@ -441,9 +439,6 @@ protected:
 	
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
-	
-	/** Number of ticks remaining for the foodpoisoning effect; zero if not foodpoisoned */
-	int m_FoodPoisonedTicksRemaining;
 	
 	float m_LastJumpHeight;
 	float m_LastGroundHeight;
