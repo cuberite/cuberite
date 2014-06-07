@@ -35,6 +35,7 @@
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
+#include "ItemPotion.h"
 #include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
@@ -124,6 +125,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
+		case E_ITEM_POTIONS:           return new cItemPotionHandler();
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
@@ -502,8 +504,10 @@ bool cItemHandler::IsFood(void)
 
 
 
-bool cItemHandler::IsDrinkable(void)
+bool cItemHandler::IsDrinkable(const cItem * a_Item)
 {
+	UNUSED(a_Item);
+	
 	switch (m_ItemType)
 	{
 		case E_ITEM_MILK:

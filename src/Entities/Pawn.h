@@ -21,6 +21,7 @@ public:
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void KilledBy(cEntity * a_Killer) override;
 	
 	/** Applies an entity effect
 	 *  @param a_EffectType The entity effect to apply

@@ -52,8 +52,22 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
+void cPawn::KilledBy(cEntity *a_Killer)
+{
+	ClearEntityEffects();
+}
+
+
+
+
+
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
+	if (a_EffectType == cEntityEffect::efNoEffect)
+	{
+		return;
+	}
+	
 	m_EntityEffects[a_EffectType] = a_Effect;
 	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.m_Ticks);
 }

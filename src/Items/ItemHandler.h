@@ -83,7 +83,7 @@ public:
 	virtual bool IsFood(void);
 	
 	/** Indicates if this item is drinkable */
-	virtual bool IsDrinkable(void);
+	virtual bool IsDrinkable(const cItem * a_Item);
 	
 	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void);

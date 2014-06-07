@@ -9,6 +9,7 @@ public:
 	/** All types of entity effects (numbers correspond to IDs) */
 	enum eType
 	{
+		efNoEffect       = 0,
 		efSpeed          = 1,
 		efSlowness       = 2,
 		efHaste          = 3,
