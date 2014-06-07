@@ -584,12 +584,11 @@ void cPlayer::FoodPoison(int a_NumTicks)
 	m_FoodPoisonedTicksRemaining = std::max(m_FoodPoisonedTicksRemaining, a_NumTicks);
 	if (!HasBeenFoodPoisoned)
 	{
-		m_World->BroadcastRemoveEntityEffect(*this, cEntityEffect::efHunger);
 		SendHealth();
 	}
 	else
 	{
-		m_World->BroadcastEntityEffect(*this, cEntityEffect::efHunger, 0, 400); // Give the player the "Hunger" effect for 20 seconds.
+		AddEntityEffect(cEntityEffect::efHunger, cEntityEffect(0, 400)); // Give the player the "Hunger" effect for 20 seconds.
 	}
 }
 
@@ -1887,6 +1886,43 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 
 
 
+void cPlayer::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+{
+	switch (a_EffectType)
+	{
+		// Effects whose behaviors are overridden
+		case cEntityEffect::efMiningFatigue:
+		{
+			// TODO: Implement me!
+			return;
+		}
+		case cEntityEffect::efHunger:
+		{
+			m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
+			return;
+		}
+		case cEntityEffect::efSaturation:
+		{
+			// Increase saturation 1 per tick, adds 1 for every increase in level
+			m_FoodSaturationLevel += (1 + a_Effect.GetIntensity());
+			return;
+		}
+		
+		// Client-side-only effects
+		case cEntityEffect::efNausia:
+		case cEntityEffect::efNightVision:
+		{
+			return;
+		}
+	}
+	
+	super::HandleEntityEffects(a_EffectType, a_Effect);
+}
+
+
+
+
+
 void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
@@ -1920,17 +1956,6 @@ void cPlayer::HandleFood(void)
 				TakeDamage(dtStarving, NULL, 1, 1, 0);
 			}
 		}
-	}
-	
-	// Apply food poisoning food exhaustion:
-	if (m_FoodPoisonedTicksRemaining > 0)
-	{
-		m_FoodPoisonedTicksRemaining--;
-		m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
-	}
-	else
-	{
-		m_World->BroadcastRemoveEntityEffect(*this, cEntityEffect::efHunger); // Remove the "Hunger" effect.
 	}
 
 	// Apply food exhaustion that has accumulated:

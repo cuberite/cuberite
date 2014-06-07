@@ -526,6 +526,9 @@ protected:
 	/** Stops players from burning in creative mode */
 	virtual void TickBurning(cChunk & a_Chunk) override;
 	
+	/** Called each tick to handle entity effects*/
+	virtual void HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect) override;
+	
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
 
