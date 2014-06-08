@@ -940,6 +940,8 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 void cPlayer::Respawn(void)
 {
+	ASSERT(m_World != NULL);
+
 	m_Health = GetMaxHealth();
 	SetInvulnerableTicks(20);
 	
@@ -952,7 +954,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn();
+	m_ClientHandle->SendRespawn(*m_World);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1583,19 +1585,19 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 		return false;
 	}
 	
-	eDimension OldDimension = m_World->GetDimension();
-	
+	// Send the respawn packet:
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendRespawn(*World);
+	}
+
 	// Remove all links to the old world
 	m_World->RemovePlayer(this);
-	m_ClientHandle->RemoveFromAllChunks();
-	m_World->RemoveEntity(this);
 
 	// If the dimension is different, we can send the respawn packet
 	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
 
-	// Add player to all the necessary parts of the new world
-	World->AddEntity(this);
+	// Queue adding player to the new world, including all the necessary adjustments to the object
 	World->AddPlayer(this);
 
 	return true;

@@ -284,8 +284,15 @@ public:
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
-	void AddPlayer( cPlayer* a_Player );
-	void RemovePlayer( cPlayer* a_Player );
+	/** Adds the player to the world.
+	Uses a queue to store the player object until the Tick thread processes the addition event.
+	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking. */
+	void AddPlayer(cPlayer * a_Player);
+
+	/** Removes the player from the world.
+	Removes the player from the addition queue, too, if appropriate.
+	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore. */
+	void RemovePlayer(cPlayer * a_Player);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -933,6 +940,12 @@ private:
 	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
 	cEntityList m_EntitiesToAdd;
 
+	/** Guards m_PlayersToAdd */
+	cCriticalSection m_CSPlayersToAdd;
+
+	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
+	cPlayerList m_PlayersToAdd;
+
 
 	cWorld(const AString & a_WorldName);
 	virtual ~cWorld();
@@ -970,6 +983,10 @@ private:
 
 	/** Creates a new redstone simulator.*/
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
+
+	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
+	Assumes it is called from the Tick thread. */
+	void AddQueuedPlayers(void);
 }; // tolua_export
 
 

@@ -44,7 +44,7 @@ void cBlaze::Attack(float a_Dt)
 		{
 			return;
 		}
-		if (!FireCharge->Initialize(m_World))
+		if (!FireCharge->Initialize(*m_World))
 		{
 			delete FireCharge;
 			return;

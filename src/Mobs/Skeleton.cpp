@@ -81,7 +81,7 @@ void cSkeleton::Attack(float a_Dt)
 		{
 			return;
 		}
-		if (!Arrow->Initialize(m_World))
+		if (!Arrow->Initialize(*m_World))
 		{
 			delete Arrow;
 			return;

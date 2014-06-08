@@ -133,7 +133,8 @@ typedef unsigned char Byte;
 
 cProtocol125::cProtocol125(cClientHandle * a_Client) :
 	super(a_Client),
-	m_ReceivedData(32 KiB)
+	m_ReceivedData(32 KiB),
+	m_LastSentDimension(dimNotSet)
 {
 }
 
@@ -591,6 +592,7 @@ void cProtocol125::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteByte  (0);  // Unused
 	WriteByte  (60);  // Client list width or something
 	Flush();
+	m_LastSentDimension = a_World.GetDimension();
 }
 
 
@@ -831,16 +833,23 @@ void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol125::SendRespawn(void)
+void cProtocol125::SendRespawn(const cWorld & a_World)
 {
 	cCSLock Lock(m_CSPacket);
+	if (m_LastSentDimension == a_World.GetDimension())
+	{
+		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
+		return;
+	}
 	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_RESPAWN);
-	WriteInt   ((int)(Player->GetWorld()->GetDimension()));
+	WriteInt   (a_World.GetDimension());
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
 	WriteChar  ((char)Player->GetGameMode());
 	WriteShort (256);  // Current world height
 	WriteString("default");
+	Flush();
+	m_LastSentDimension = a_World.GetDimension();
 }
 
 

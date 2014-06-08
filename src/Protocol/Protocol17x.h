@@ -104,7 +104,7 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendRespawn             (void) override;
+	virtual void SendRespawn             (const cWorld & a_World) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
@@ -243,6 +243,10 @@ protected:
 
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
+	
+	/** The dimension that was last sent to a player in a Respawn or Login packet.
+	Used to avoid Respawning into the same dimension, which confuses the client. */
+	eDimension m_LastSentDimension;
 	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */

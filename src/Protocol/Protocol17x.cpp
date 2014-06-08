@@ -92,7 +92,8 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_ReceivedData(32 KiB),
 	m_OutPacketBuffer(64 KiB),
 	m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
-	m_IsEncrypted(false)
+	m_IsEncrypted(false),
+	m_LastSentDimension(dimNotSet)
 {
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
@@ -656,6 +657,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte(std::min(Server->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
+	m_LastSentDimension = a_World.GetDimension();
 	
 	// Send the spawn position:
 	{
@@ -984,14 +986,21 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol172::SendRespawn(void)
+void cProtocol172::SendRespawn(const cWorld & a_World)
 {
+	if (m_LastSentDimension == a_World.GetDimension())
+	{
+		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
+		return;
+	}
+
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteInt(Player->GetWorld()->GetDimension());
+	Pkt.WriteInt(a_World.GetDimension());
 	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteByte((Byte)Player->GetEffectiveGameMode());
 	Pkt.WriteString("default");
+	m_LastSentDimension = a_World.GetDimension();
 }
 
 

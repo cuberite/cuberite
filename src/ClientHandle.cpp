@@ -327,7 +327,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 	// Send experience
 	m_Player->SendExperience();
 	
-	m_Player->Initialize(World);
+	m_Player->Initialize(*World);
 	m_State = csAuthenticated;
 
 	// Query player team
@@ -356,7 +356,7 @@ void cClientHandle::StreamChunks(void)
 	}
 
 	ASSERT(m_Player != NULL);
-	
+
 	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
 	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
 	if ((ChunkPosX == m_LastStreamedChunkX) && (ChunkPosZ == m_LastStreamedChunkZ))
@@ -1753,18 +1753,8 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 
 
 
-void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
+void cClientHandle::RemoveFromWorld(void)
 {
-	UNUSED(a_World);
-	ASSERT(m_Player != NULL);
-	
-	if (a_SendRespawnPacket)
-	{
-		SendRespawn();
-	}
-
-	cWorld * World = m_Player->GetWorld();
-		
 	// Remove all associated chunks:
 	cChunkCoordsList Chunks;
 	{
@@ -1774,7 +1764,6 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 	}
 	for (cChunkCoordsList::iterator itr = Chunks.begin(), end = Chunks.end(); itr != end; ++itr)
 	{
-		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
@@ -2379,9 +2368,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(void)
+void cClientHandle::SendRespawn(const cWorld & a_World)
 {
-	m_Protocol->SendRespawn();
+	m_Protocol->SendRespawn(a_World);
 }
 
 

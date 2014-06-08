@@ -79,7 +79,7 @@ public:
 			};
 
 			cPainting * Painting = new cPainting(gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)].Title, Dir, a_BlockX, a_BlockY, a_BlockZ);
-			Painting->Initialize(a_World);
+			Painting->Initialize(*a_World);
 
 			if (!a_Player->IsGameModeCreative())
 			{
