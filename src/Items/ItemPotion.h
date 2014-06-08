@@ -2,11 +2,17 @@
 #pragma once
 
 #include "../Entities/EntityEffects.h"
+#include "../Entities/SplashPotionEntity.h"
 
 class cItemPotionHandler:
-public cItemHandler
+	public cItemHandler
 {
 	typedef cItemHandler super;
+	
+	int GetPotionName(short a_ItemDamage)
+	{
+		return a_ItemDamage & 63;
+	}
 	
 	cEntityEffect::eType GetEntityEffectType(short a_ItemDamage)
 	{
@@ -118,6 +124,34 @@ public:
 	
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
+		Vector3d Speed = a_Player->GetLookVector() * 10;
+		
+		short potion_damage = a_Item.m_ItemDamage;
+		cProjectileEntity * Projectile = new cSplashPotionEntity(a_Player,
+																 (double)a_BlockX,
+																 (double)a_BlockY,
+																 (double)a_BlockZ,
+																 &Speed,
+																 GetEntityEffectType(potion_damage),
+																 cEntityEffect(GetEntityEffectDuration(potion_damage),
+																			   GetEntityEffectIntensity(potion_damage),
+																			   a_Player),
+																 GetPotionName(potion_damage));
+		if (Projectile == NULL)
+		{
+			return false;
+		}
+		if (!Projectile->Initialize(*a_World))
+		{
+			delete Projectile;
+			return false;
+		}
+		
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+		
 		// Called when potion is a splash potion
 		return true;
 	}

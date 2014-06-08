@@ -18,7 +18,6 @@
 #include "ThrownEnderPearlEntity.h"
 #include "ExpBottleEntity.h"
 #include "ThrownSnowballEntity.h"
-#include "SplashPotionEntity.h"
 #include "FireChargeEntity.h"
 #include "FireworkEntity.h"
 #include "GhastFireballEntity.h"
@@ -252,7 +251,6 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
-		case pkSplashPotion:  return new cSplashPotionEntity    (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkWitherSkull:   return new cWitherSkullEntity     (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{

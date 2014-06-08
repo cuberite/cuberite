@@ -47,6 +47,10 @@ public:
 	/** Returns the distance modifier for affecting potency */
 	double GetDistanceModifier() { return m_DistanceModifier; }
 	
+	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
+	void SetUser(cPawn *a_User)                         { m_User             = a_User;             }
+	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
+	
 	/**
 	 *  An empty entity effect
 	 */

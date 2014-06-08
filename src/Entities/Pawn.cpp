@@ -69,7 +69,8 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_E
 	}
 	
 	m_EntityEffects[a_EffectType] = a_Effect;
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.m_Ticks);
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(),
+								   a_Effect.m_Ticks * a_Effect.GetDistanceModifier());
 }
 
 
@@ -114,7 +115,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 		case cEntityEffect::efInstantHealth:
 		{
 			// Base heal = 6, doubles for every increase in intensity
-			Heal(6 * std::pow(2, a_Effect.GetIntensity()));
+			Heal(6 * std::pow(2, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
 			
 			// TODO: Harms undead
 			return;
@@ -123,7 +124,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 		{
 			// Base damage = 6, doubles for every increase in intensity
 			int damage = 6 * std::pow(2, a_Effect.GetIntensity());
-			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage, 0);
+			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage * a_Effect.GetDistanceModifier(), 0);
 			
 			// TODO: Heals undead
 			return;
