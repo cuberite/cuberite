@@ -1089,18 +1089,25 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cWorld * World = m_Player->GetWorld();
 
 	if (
-		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
+		(
+			(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||  // The block is too far away
+			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+		)
 	)
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		if (a_BlockY < cChunkDef::Height - 1)
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			m_Player->GetInventory().SendEquippedSlot();
 		}
+		if (a_BlockY > 0)
+		{
+			World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+		}
+		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
 
