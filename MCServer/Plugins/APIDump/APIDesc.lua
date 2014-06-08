@@ -1969,7 +1969,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				BroadcastChatSuccess = { Params = "Message", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For success messages." },
 				BroadcastChatWarning = { Params = "Message", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For concerning events, such as plugin reload etc." },
 				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil." },
-				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for the given player." },
+				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for all players with names partially (or fully) matching the name string provided." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
 				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
