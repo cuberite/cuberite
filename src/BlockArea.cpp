@@ -309,6 +309,14 @@ void cBlockArea::Clear(void)
 
 void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 {
+	if ((a_SizeX < 0) || (a_SizeY < 0) || (a_SizeZ < 0))
+	{
+		LOGWARNING("Creating a cBlockArea with a negative size! Call to Create ignored. (%d, %d, %d)",
+			a_SizeX, a_SizeY, a_SizeZ
+		);
+		return;
+	}
+	
 	Clear();
 	int BlockCount = a_SizeX * a_SizeY * a_SizeZ;
 	if ((a_DataTypes & baTypes) != 0)
