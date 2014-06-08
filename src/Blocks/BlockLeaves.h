@@ -47,7 +47,7 @@ public:
 		}
 		
 		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
-		if ((a_BlockMeta & 3) == E_META_LEAVES_APPLE)
+		if ((a_BlockMeta & 3) == E_META_NEWLEAVES_APPLE)
 		{
 			if (rand.NextInt(101) == 0)
 			{
@@ -64,7 +64,7 @@ public:
 		// 0.5% chance of dropping an apple, if the leaves' type is Apple Leaves:
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		cFastRandom rand;
-		if (((Meta & 3) == E_META_LEAVES_APPLE) && (rand.NextInt(201) == 100))
+		if (((Meta & 3) == E_META_NEWLEAVES_APPLE) && (rand.NextInt(201) == 100))
 		{
 			cItems Drops;
 			Drops.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
