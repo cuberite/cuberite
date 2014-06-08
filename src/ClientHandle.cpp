@@ -1101,7 +1101,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
 			m_Player->GetInventory().SendEquippedSlot();
 		}
-		return;
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
