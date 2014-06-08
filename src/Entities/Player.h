@@ -261,7 +261,7 @@ public:
 	void TossPickup(const cItem & a_Item);
 
 	/** Heals the player by the specified amount of HPs (positive only); sends health update */
-	void Heal(int a_Health);
+	virtual void Heal(int a_Health) override;
 	
 	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }

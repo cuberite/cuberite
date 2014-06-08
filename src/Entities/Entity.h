@@ -315,7 +315,7 @@ public:
 	virtual void Killed(cEntity * a_Victim) {}
 
 	/// Heals the specified amount of HPs
-	void Heal(int a_HitPoints);
+	virtual void Heal(int a_HitPoints);
 	
 	/// Returns the health of this entity
 	int GetHealth(void) const { return m_Health; }
