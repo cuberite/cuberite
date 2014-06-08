@@ -124,14 +124,11 @@ public:
 	
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		Vector3d Speed = a_Player->GetLookVector() * 10;
+		Vector3d Pos = a_Player->GetThrowStartPos();
+		Vector3d Speed = a_Player->GetLookVector() * 7;
 		
 		short potion_damage = a_Item.m_ItemDamage;
-		cSplashPotionEntity * Projectile = new cSplashPotionEntity(a_Player,
-																   (double)a_BlockX,
-																   (double)a_BlockY,
-																   (double)a_BlockZ,
-																   &Speed,
+		cSplashPotionEntity *Projectile = new cSplashPotionEntity(a_Player, Pos.x, Pos.y, Pos.z, &Speed,
 																   GetEntityEffectType(potion_damage),
 																   cEntityEffect(GetEntityEffectDuration(potion_damage),
 																				 GetEntityEffectIntensity(potion_damage),
