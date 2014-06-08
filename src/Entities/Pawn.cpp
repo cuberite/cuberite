@@ -63,7 +63,7 @@ void cPawn::KilledBy(cEntity *a_Killer)
 
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
-	if (a_EffectType == cEntityEffect::efNoEffect)
+	if (a_EffectType == cEntityEffect::effNoEffect)
 	{
 		return;
 	}
@@ -112,7 +112,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 	switch (a_EffectType)
 	{
 		// Default effect behaviors
-		case cEntityEffect::efInstantHealth:
+		case cEntityEffect::effInstantHealth:
 		{
 			// Base heal = 6, doubles for every increase in intensity
 			Heal(6 * std::pow(2, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
@@ -120,7 +120,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 			// TODO: Harms undead
 			return;
 		}
-		case cEntityEffect::efInstantDamage:
+		case cEntityEffect::effInstantDamage:
 		{
 			// Base damage = 6, doubles for every increase in intensity
 			int damage = 6 * std::pow(2, a_Effect.GetIntensity());
@@ -129,12 +129,12 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 			// TODO: Heals undead
 			return;
 		}
-		case cEntityEffect::efStrength:
+		case cEntityEffect::effStrength:
 		{
 			// TODO: Implement me!
 			return;
 		}
-		case cEntityEffect::efWeakness:
+		case cEntityEffect::effWeakness:
 		{
 			// Damage reduction = 0.5 damage, multiplied by potion level (Weakness II = 1 damage)
 			//double dmg_reduc = 0.5 * (a_Effect.GetIntensity() + 1);
@@ -143,7 +143,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 			// TODO: Weakened villager zombies can be turned back to villagers with the god apple
 			return;
 		}
-		case cEntityEffect::efRegeneration:
+		case cEntityEffect::effRegeneration:
 		{
 			// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
 			int frequency = std::floor(50.0 / (double)(a_Effect.GetIntensity() + 1));
@@ -158,7 +158,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 			// TODO: Doesn't effect undead
 			return;
 		}
-		case cEntityEffect::efPoison:
+		case cEntityEffect::effPoison:
 		{
 			// Poison frequency = 25 ticks, divided by potion level (Poison II = 25 ticks)
 			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
@@ -177,17 +177,17 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 			// TODO: Doesn't effect undead or spiders
 			return;
 		}
-		case cEntityEffect::efFireResistance:
+		case cEntityEffect::effFireResistance:
 		{
 			// TODO: Implement me!
 			return;
 		}
-		case cEntityEffect::efSpeed:
+		case cEntityEffect::effSpeed:
 		{
 			// TODO: Implement me!
 			return;
 		}
-		case cEntityEffect::efSlowness:
+		case cEntityEffect::effSlowness:
 		{
 			// TODO: Implement me!
 			return;

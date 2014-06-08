@@ -570,7 +570,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 void cPlayer::FoodPoison(int a_NumTicks)
 {
-	AddEntityEffect(cEntityEffect::efHunger, cEntityEffect(a_NumTicks, 0, NULL));
+	AddEntityEffect(cEntityEffect::effHunger, cEntityEffect(a_NumTicks, 0, NULL));
 }
 
 
@@ -1872,17 +1872,17 @@ void cPlayer::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffe
 	switch (a_EffectType)
 	{
 		// Effects whose behaviors are overridden
-		case cEntityEffect::efMiningFatigue:
+		case cEntityEffect::effMiningFatigue:
 		{
 			// TODO: Implement me!
 			return;
 		}
-		case cEntityEffect::efHunger:
+		case cEntityEffect::effHunger:
 		{
 			m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
 			return;
 		}
-		case cEntityEffect::efSaturation:
+		case cEntityEffect::effSaturation:
 		{
 			// Increase saturation 1 per tick, adds 1 for every increase in level
 			m_FoodSaturationLevel += (1 + a_Effect.GetIntensity());
@@ -1890,8 +1890,8 @@ void cPlayer::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffe
 		}
 		
 		// Client-side-only effects
-		case cEntityEffect::efNausia:
-		case cEntityEffect::efNightVision:
+		case cEntityEffect::effNausea:
+		case cEntityEffect::effNightVision:
 		{
 			return;
 		}

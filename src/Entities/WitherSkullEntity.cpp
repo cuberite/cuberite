@@ -8,7 +8,7 @@
 
 
 cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+super(pkWitherSkull, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 {
 	SetSpeed(a_Speed);
 }

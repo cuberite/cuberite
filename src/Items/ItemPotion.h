@@ -20,18 +20,18 @@ class cItemPotionHandler:
 		// For reference: http://minecraft.gamepedia.com/Data_values#.22Potion_effect.22_bits
 		switch (a_ItemDamage & 15)
 		{
-			case 1:  return cEntityEffect::efRegeneration;
-			case 2:  return cEntityEffect::efSpeed;
-			case 3:  return cEntityEffect::efFireResistance;
-			case 4:  return cEntityEffect::efPoison;
-			case 5:  return cEntityEffect::efInstantHealth;
-			case 6:  return cEntityEffect::efNightVision;
-			case 8:  return cEntityEffect::efWeakness;
-			case 9:  return cEntityEffect::efStrength;
-			case 10: return cEntityEffect::efSlowness;
-			case 12: return cEntityEffect::efInstantDamage;
-			case 13: return cEntityEffect::efWaterBreathing;
-			case 14: return cEntityEffect::efInvisibility;
+			case 1:  return cEntityEffect::effRegeneration;
+			case 2:  return cEntityEffect::effSpeed;
+			case 3:  return cEntityEffect::effFireResistance;
+			case 4:  return cEntityEffect::effPoison;
+			case 5:  return cEntityEffect::effInstantHealth;
+			case 6:  return cEntityEffect::effNightVision;
+			case 8:  return cEntityEffect::effWeakness;
+			case 9:  return cEntityEffect::effStrength;
+			case 10: return cEntityEffect::effSlowness;
+			case 12: return cEntityEffect::effInstantDamage;
+			case 13: return cEntityEffect::effWaterBreathing;
+			case 14: return cEntityEffect::effInvisibility;
 			
 			// No effect potions
 			case 0:
@@ -43,7 +43,7 @@ class cItemPotionHandler:
 			}
 		}
 		
-		return cEntityEffect::efNoEffect;
+		return cEntityEffect::effNoEffect;
 	}
 	
 	short GetEntityEffectIntensity(short a_ItemDamage)
@@ -61,26 +61,26 @@ class cItemPotionHandler:
 		
 		switch (GetEntityEffectType(a_ItemDamage))
 		{
-			case cEntityEffect::efRegeneration:
-			case cEntityEffect::efPoison:
+			case cEntityEffect::effRegeneration:
+			case cEntityEffect::effPoison:
 			{
 				base = 900;
 				break;
 			}
 				
-			case cEntityEffect::efSpeed:
-			case cEntityEffect::efFireResistance:
-			case cEntityEffect::efNightVision:
-			case cEntityEffect::efStrength:
-			case cEntityEffect::efWaterBreathing:
-			case cEntityEffect::efInvisibility:
+			case cEntityEffect::effSpeed:
+			case cEntityEffect::effFireResistance:
+			case cEntityEffect::effNightVision:
+			case cEntityEffect::effStrength:
+			case cEntityEffect::effWaterBreathing:
+			case cEntityEffect::effInvisibility:
 			{
 				base = 3600;
 				break;
 			}
 				
-			case cEntityEffect::efWeakness:
-			case cEntityEffect::efSlowness:
+			case cEntityEffect::effWeakness:
+			case cEntityEffect::effSlowness:
 			{
 				base = 1800;
 				break;
@@ -127,16 +127,16 @@ public:
 		Vector3d Speed = a_Player->GetLookVector() * 10;
 		
 		short potion_damage = a_Item.m_ItemDamage;
-		cProjectileEntity * Projectile = new cSplashPotionEntity(a_Player,
-																 (double)a_BlockX,
-																 (double)a_BlockY,
-																 (double)a_BlockZ,
-																 &Speed,
-																 GetEntityEffectType(potion_damage),
-																 cEntityEffect(GetEntityEffectDuration(potion_damage),
-																			   GetEntityEffectIntensity(potion_damage),
-																			   a_Player),
-																 GetPotionName(potion_damage));
+		cSplashPotionEntity * Projectile = new cSplashPotionEntity(a_Player,
+																   (double)a_BlockX,
+																   (double)a_BlockY,
+																   (double)a_BlockZ,
+																   &Speed,
+																   GetEntityEffectType(potion_damage),
+																   cEntityEffect(GetEntityEffectDuration(potion_damage),
+																				 GetEntityEffectIntensity(potion_damage),
+																				 a_Player),
+																   GetPotionName(potion_damage));
 		if (Projectile == NULL)
 		{
 			return false;
