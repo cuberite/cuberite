@@ -7,6 +7,7 @@
 #include "ProjectileEntity.h"
 #include "EntityEffects.h"
 #include "../World.h"
+#include "Entity.h"
 
 
 
@@ -42,12 +43,12 @@ protected:
 	int m_PotionName;
 	
 	class cSplashPotionCallback :
-		public cPlayerListCallback
+		public cEntityCallback
 	{
 	public:
 		cSplashPotionCallback(const Vector3d & a_HitPos, cEntityEffect::eType &a_EntityEffectType, cEntityEffect &a_EntityEffect);
 		
-		virtual bool Item(cPlayer * a_Player) override;
+		virtual bool Item(cEntity *a_Entity) override;
 		
 	private:
 		const Vector3d &m_HitPos;

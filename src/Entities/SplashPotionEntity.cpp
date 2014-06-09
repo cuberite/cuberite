@@ -1,7 +1,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "SplashPotionEntity.h"
-#include "Player.h"
+#include "Pawn.h"
 
 
 
@@ -44,8 +44,7 @@ void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_
 void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 {
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
-	m_World->ForEachPlayer(Callback);
-	// TODO: Should be for each pawn
+	m_World->ForEachEntity(Callback);
 	
 	m_World->BroadcastSoundParticleEffect(2002, a_HitPos.x, a_HitPos.y, a_HitPos.z, m_PotionName);
 }
@@ -66,9 +65,9 @@ cSplashPotionEntity::cSplashPotionCallback::cSplashPotionCallback(const Vector3d
 
 
 
-bool cSplashPotionEntity::cSplashPotionCallback::Item(cPlayer * a_Player)
+bool cSplashPotionEntity::cSplashPotionCallback::Item(cEntity * a_Entity)
 {
-	double distance_splash = (a_Player->GetPosition() - m_HitPos).Length();
+	double distance_splash = (a_Entity->GetPosition() - m_HitPos).Length();
 	if (distance_splash < 20)
 	{
 		// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
@@ -77,7 +76,11 @@ bool cSplashPotionEntity::cSplashPotionCallback::Item(cPlayer * a_Player)
 		if (reduction < 0) reduction = 0;
 		
 		m_EntityEffect.SetDistanceModifier(reduction);
-		a_Player->AddEntityEffect(m_EntityEffectType, m_EntityEffect);
+		
+		if (a_Entity->IsMob() || a_Entity->IsPlayer())
+		{
+			((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect);
+		}
 	}
 	return false;
 }
