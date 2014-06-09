@@ -111,19 +111,19 @@ public:
 		}
 		if ((a_Yaw >= 0) && (a_Yaw < 90))
 		{
-			return 0x0;
+			return 0x00;
 		}
 		else if ((a_Yaw >= 180) && (a_Yaw < 270))
 		{
-			return 0x2;
+			return 0x02;
 		}
 		else if ((a_Yaw >= 90) && (a_Yaw < 180))
 		{
-			return 0x1;
+			return 0x01;
 		}
 		else
 		{
-			return 0x3;
+			return 0x03;
 		}
 	}
 
@@ -137,29 +137,45 @@ public:
 
 	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-		return ((Meta & 0x4) != 0);
+		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		return ((Meta & 0x04) != 0);
 	}
 
 
-	/** Read the meta from the true part of the door and returns a meta with all infos include. */
-	static NIBBLETYPE GetTrueDoorMeta(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	/** Returns the complete meta composed from the both parts of the door as (TopMeta << 4) | BottomMeta
+	The coords may point to either part of the door.
+	The returned value has bit 3 (0x08) set iff the coords point to the top part of the door.
+	Fails gracefully for (invalid) doors on the world's top and bottom. */
+	static NIBBLETYPE GetCompleteDoorMeta(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-		if ((Meta & 0x8) != 0)
+		if ((Meta & 0x08) != 0)
 		{
-			NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
-			return (DownMeta & 0x7) | 0x8 | (((Meta & 0x1) != 0) ? 16 : 0);
+			// The coords are pointing at the top part of the door
+			if (a_BlockX > 0)
+			{
+				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+				return (DownMeta & 0x07) | 0x08 | (Meta << 4);
+			}
+			// This is the top part of the door at the bottommost layer of the world, there's no bottom:
+			return 0x08 | (Meta << 4);
 		}
 		else
 		{
-			NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
-			return (Meta & 0x7) | (((UpMeta & 0x1) != 0) ? 16 : 0);
+			// The coords are pointing at the bottom part of the door
+			if (a_BlockY < cChunkDef::Height - 1)
+			{
+				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
+				return Meta | (UpMeta << 4);
+			}
+			// This is the bottom part of the door at the topmost layer of the world, there's no top:
+			return Meta;
 		}
 	}
 
 
+	/** Sets the door to the specified state. If the door is already in that state, does nothing. */
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
 		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
@@ -168,22 +184,27 @@ public:
 			return;
 		}
 
-		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-		bool Opened = (Meta & 0x4) != 0;
-		if (Opened == a_Open)
+		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		bool IsOpened = ((Meta & 0x04) != 0);
+		if (IsOpened == a_Open)
 		{
 			return;
 		}
 
 		// Change the door
-		NIBBLETYPE NewMeta = (Meta & 0x7) ^ 0x4;
-		if ((Meta & 0x8) == 0)
+		NIBBLETYPE NewMeta = (Meta & 0x07) ^ 0x04;  // Flip the "IsOpen" bit (0x04)
+		if ((Meta & 0x08) == 0)
 		{
+			// The block is the bottom part of the door
 			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, NewMeta);
 		}
 		else
 		{
-			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ, NewMeta);
+			// The block is the top part of the door, set the meta to the corresponding top part
+			if (a_BlockY > 0)
+			{
+				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ, NewMeta);
+			}
 		}
 	}
 
