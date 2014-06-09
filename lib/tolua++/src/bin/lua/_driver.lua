@@ -1,6 +1,6 @@
 
 -- Allow debugging by ZBS, if run under the IDE:
-local mobdebugfound, mobdebug = pcall(require, "blamobdebug")
+local mobdebugfound, mobdebug = pcall(require, "mobdebug")
 if mobdebugfound then mobdebug.start() end
 
 -- The list of valid arguments that the ToLua scripts can process:
