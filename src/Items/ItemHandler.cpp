@@ -504,9 +504,9 @@ bool cItemHandler::IsFood(void)
 
 
 
-bool cItemHandler::IsDrinkable(const cItem * a_Item)
+bool cItemHandler::IsDrinkable(short a_ItemDamage)
 {
-	UNUSED(a_Item);
+	UNUSED(a_ItemDamage);
 	
 	switch (m_ItemType)
 	{

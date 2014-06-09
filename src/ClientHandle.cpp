@@ -850,7 +850,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		case DIG_STATUS_SHOOT_EAT:
 		{
 			cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
-			if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(&m_Player->GetEquippedItem()))
+			if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage))
 			{
 				m_Player->AbortEating();
 				return;
@@ -1176,15 +1176,16 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 	
+	short EquippedDamage = Equipped.m_ItemDamage;
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
 	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(&Equipped)) && !m_Player->IsGameModeCreative())
+	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)) && !m_Player->IsGameModeCreative())
 	{
-		if (m_Player->IsSatiated() && !ItemHandler->IsDrinkable(&Equipped))
+		if (m_Player->IsSatiated() && !ItemHandler->IsDrinkable(EquippedDamage))
 		{
 			// The player is satiated, they cannot eat
 			return;

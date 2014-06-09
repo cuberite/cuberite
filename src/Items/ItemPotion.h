@@ -104,22 +104,17 @@ class cItemPotionHandler:
 		return base * tier_multi * ext_multi * splash_multi;
 	}
 	
-	bool IsDrinkable(short a_ItemDamage)
-	{
-		// Drinkable potion if 13th bit is set
-		// For reference: http://minecraft.gamepedia.com/Potions#Data_value_table
-		return a_ItemDamage & 8192;
-	}
-	
 public:
 	cItemPotionHandler():
 	super(E_ITEM_POTIONS)
 	{
 	}
 	
-	virtual bool IsDrinkable(const cItem * a_Item) override
+	virtual bool IsDrinkable(short a_ItemDamage) override
 	{
-		return IsDrinkable(a_Item->m_ItemDamage);
+		// Drinkable potion if 13th bit is set
+		// For reference: http://minecraft.gamepedia.com/Potions#Data_value_table
+		return a_ItemDamage & 8192;
 	}
 	
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override

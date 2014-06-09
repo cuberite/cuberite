@@ -11,9 +11,9 @@ public:
 	{
 	}
 	
-	virtual bool IsDrinkable(const cItem * a_Item) override
+	virtual bool IsDrinkable(short a_ItemDamage) override
 	{
-		UNUSED(a_Item);
+		UNUSED(a_ItemDamage);
 		return true;
 	}
 	

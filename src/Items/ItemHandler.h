@@ -83,7 +83,7 @@ public:
 	virtual bool IsFood(void);
 	
 	/** Indicates if this item is drinkable */
-	virtual bool IsDrinkable(const cItem * a_Item);
+	virtual bool IsDrinkable(short a_ItemDamage);
 	
 	/** Blocks simply get placed */
 	virtual bool IsPlaceable(void);
@@ -102,7 +102,7 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);
 	
-	/** Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can�t) DEFAULT: False */
+	/** Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can't) DEFAULT: False */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
 	static cItemHandler * GetItemHandler(int a_ItemType);
