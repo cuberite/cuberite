@@ -115,8 +115,6 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 		{
 			// Base heal = 6, doubles for every increase in intensity
 			Heal(6 * std::pow(2, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
-			
-			// TODO: Harms undead
 			return;
 		}
 		case cEntityEffect::effInstantDamage:
@@ -124,8 +122,6 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 			// Base damage = 6, doubles for every increase in intensity
 			int damage = 6 * std::pow(2, a_Effect.GetIntensity());
 			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage * a_Effect.GetDistanceModifier(), 0);
-			
-			// TODO: Heals undead
 			return;
 		}
 		case cEntityEffect::effStrength:
@@ -154,7 +150,6 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 				counter = 0;
 			}
 			
-			// TODO: Doesn't effect undead
 			return;
 		}
 		case cEntityEffect::effPoison:
@@ -173,7 +168,6 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 				counter = 0;
 			}
 			
-			// TODO: Doesn't effect undead or spiders
 			return;
 		}
 		case cEntityEffect::effFireResistance:

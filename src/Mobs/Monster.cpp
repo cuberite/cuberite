@@ -435,6 +435,52 @@ void cMonster::HandleFalling()
 
 
 
+
+void cMonster::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+{
+	switch (a_EffectType)
+	{
+		case cEntityEffect::effPoison:
+		{
+			// Default effect for non-undead mobs and non-spiders
+			if (!IsUndead() && GetMobType() != mtSpider) break;
+			return; // No effect
+		}
+		case cEntityEffect::effRegeneration:
+		{
+			// Default effect for non-undead mobs
+			if (!IsUndead() && GetMobType()) break;
+			return; // No effect
+		}
+		case cEntityEffect::effInstantDamage:
+		{
+			// Default effect for non-undead mobs
+			if (!IsUndead() && GetMobType()) break;
+			
+			// Undead mobs are healed by instant damage
+			// Base heal = 6, doubles for every increase in intensity
+			Heal(6 * std::pow(2, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
+			return;
+		}
+		case cEntityEffect::effInstantHealth:
+		{
+			// Default effect for non-undead mobs
+			if (!IsUndead() && GetMobType()) break;
+			
+			// Undead mobs are damaged by instant health
+			// Base damage = 6, doubles for every increase in intensity
+			int damage = 6 * std::pow(2, a_Effect.GetIntensity());
+			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage * a_Effect.GetDistanceModifier(), 0);
+			return;
+		}
+	}
+	
+	super::HandleEntityEffects(a_EffectType, a_Effect);
+}
+
+
+
+
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
@@ -700,6 +746,25 @@ void cMonster::InStateEscaping(float a_Dt)
 void cMonster::GetMonsterConfig(const AString & a_Name)
 {
 	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
+}
+
+
+
+
+
+bool cMonster::IsUndead(void)
+{
+	switch (GetMobType())
+	{
+		case mtZombie:
+		case mtZombiePigman:
+		case mtSkeleton:
+		case mtWither:
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
