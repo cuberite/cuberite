@@ -123,12 +123,7 @@ public:
 		Vector3d Speed = a_Player->GetLookVector() * 7;
 		
 		short potion_damage = a_Item.m_ItemDamage;
-		cSplashPotionEntity *Projectile = new cSplashPotionEntity(a_Player, Pos.x, Pos.y, Pos.z, &Speed,
-																   GetEntityEffectType(potion_damage),
-																   cEntityEffect(GetEntityEffectDuration(potion_damage),
-																				 GetEntityEffectIntensity(potion_damage),
-																				 a_Player),
-																   GetPotionName(potion_damage));
+		cSplashPotionEntity *Projectile = new cSplashPotionEntity(a_Player, Pos.x, Pos.y, Pos.z, &Speed, GetEntityEffectType(potion_damage), cEntityEffect(GetEntityEffectDuration(potion_damage), GetEntityEffectIntensity(potion_damage), a_Player), GetPotionName(potion_damage));
 		if (Projectile == NULL)
 		{
 			return false;
@@ -152,10 +147,7 @@ public:
 	{
 		// Called when potion is a drinkable potion
 		short potion_damage = a_Item->m_ItemDamage;
-		a_Player->AddEntityEffect(GetEntityEffectType(potion_damage),
-								  cEntityEffect(GetEntityEffectDuration(potion_damage),
-												GetEntityEffectIntensity(potion_damage),
-												a_Player));
+		a_Player->AddEntityEffect(GetEntityEffectType(potion_damage), cEntityEffect(GetEntityEffectDuration(potion_damage), GetEntityEffectIntensity(potion_damage), a_Player));
 		a_Player->GetInventory().RemoveOneEquippedItem();
 		a_Player->GetInventory().AddItem(E_ITEM_GLASS_BOTTLE);
 		return true;

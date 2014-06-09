@@ -69,8 +69,7 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_E
 	}
 	
 	m_EntityEffects[a_EffectType] = a_Effect;
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(),
-								   a_Effect.m_Ticks * a_Effect.GetDistanceModifier());
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.m_Ticks * a_Effect.GetDistanceModifier());
 }
 
 
