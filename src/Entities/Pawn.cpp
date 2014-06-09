@@ -154,7 +154,7 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 		}
 		case cEntityEffect::effPoison:
 		{
-			// Poison frequency = 25 ticks, divided by potion level (Poison II = 25 ticks)
+			// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
 			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
 			
 			static short counter = 0;
@@ -168,6 +168,20 @@ void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect
 				counter = 0;
 			}
 			
+			return;
+		}
+		case cEntityEffect::effWither:
+		{
+			// Poison frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
+			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
+			
+			static short counter = 0;
+			if (++counter >= frequency)
+			{
+				TakeDamage(dtWither, a_Effect.GetUser(), 1, 0);
+				counter = 0;
+			}
+			//TODO: "<Player> withered away>
 			return;
 		}
 		case cEntityEffect::effFireResistance:

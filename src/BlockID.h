@@ -811,6 +811,7 @@ enum eDamageType
 	dtCactusContact,    // Contact with a cactus block
 	dtLavaContact,      // Contact with a lava block
 	dtPoisoning,        // Having the poison effect
+	dtWithering,        // Having the wither effect
 	dtOnFire,           // Being on fire
 	dtFireContact,      // Standing inside a fire block
 	dtInVoid,           // Falling into the Void (Y < 0)
@@ -837,6 +838,7 @@ enum eDamageType
 	dtCacti        = dtCactusContact,
 	dtLava         = dtLavaContact,
 	dtPoison       = dtPoisoning,
+	dtWither       = dtWithering,
 	dtBurning      = dtOnFire,
 	dtInFire       = dtFireContact,
 	dtPlugin       = dtAdmin,

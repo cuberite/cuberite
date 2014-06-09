@@ -432,6 +432,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtStarving:
 		case dtInVoid:
 		case dtPoisoning:
+		case dtWithering:
 		case dtPotionOfHarming:
 		case dtFalling:
 		case dtLightning:
