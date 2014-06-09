@@ -20,12 +20,12 @@ public:
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
 	virtual const char * GetStepSound(void) override;
-	
+
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  override;
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  override;
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  override;
-	
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
@@ -52,7 +52,7 @@ public:
 		return true;
 	}
 
-	
+
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem((m_BlockType == E_BLOCK_WOODEN_DOOR) ? E_ITEM_WOODEN_DOOR : E_ITEM_IRON_DOOR, 1, 0));
@@ -77,8 +77,8 @@ public:
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
-	
-	
+
+
 	bool CanReplaceBlock(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)
@@ -99,7 +99,7 @@ public:
 	}
 
 
-	/// Converts the player's yaw to placed door's blockmeta
+	/** Converts the player's yaw to placed door's blockmeta */
 	inline static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
 		ASSERT((a_Yaw >= -180) && (a_Yaw < 180));
@@ -128,49 +128,70 @@ public:
 	}
 
 
-	/// Returns true if the specified blocktype is any kind of door
+	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoor(BLOCKTYPE a_Block)
 	{
 		return (a_Block == E_BLOCK_WOODEN_DOOR) || (a_Block == E_BLOCK_IRON_DOOR);
 	}
 
 
-	/// Returns the metadata for the opposite door state (open vs closed)
-	static NIBBLETYPE ChangeStateMetaData(NIBBLETYPE a_MetaData)
+	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		return a_MetaData ^ 4;
+		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		return ((Meta & 0x4) != 0);
 	}
 
 
-	/// Changes the door at the specified coords from open to close or vice versa
-	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_X, int a_Y, int a_Z)
+	/** Read the meta from the true part of the door and returns a meta with all infos include. */
+	static NIBBLETYPE GetTrueDoorMeta(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_X, a_Y, a_Z);
+		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-		a_ChunkInterface.SetBlockMeta(a_X, a_Y, a_Z, ChangeStateMetaData(OldMetaData));
-
-		if (OldMetaData & 8)
+		if ((Meta & 0x8) != 0)
 		{
-			// Current block is top of the door
-			BLOCKTYPE  BottomBlock = a_ChunkInterface.GetBlock(a_X, a_Y - 1, a_Z);
-			NIBBLETYPE BottomMeta = a_ChunkInterface.GetBlockMeta(a_X, a_Y - 1, a_Z);
-
-			if (IsDoor(BottomBlock) && !(BottomMeta & 8))
-			{
-				a_ChunkInterface.SetBlockMeta(a_X, a_Y - 1, a_Z, ChangeStateMetaData(BottomMeta));
-			}
+			NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ);
+			return (DownMeta & 0x7) | 0x8 | (((Meta & 0x1) != 0) ? 16 : 0);
 		}
 		else
 		{
-			// Current block is bottom of the door
-			BLOCKTYPE  TopBlock = a_ChunkInterface.GetBlock(a_X, a_Y + 1, a_Z);
-			NIBBLETYPE TopMeta = a_ChunkInterface.GetBlockMeta(a_X, a_Y + 1, a_Z);
-
-			if (IsDoor(TopBlock) && (TopMeta & 8))
-			{
-				a_ChunkInterface.SetBlockMeta(a_X, a_Y + 1, a_Z, ChangeStateMetaData(TopMeta));
-			}
+			NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY + 1, a_BlockZ);
+			return (Meta & 0x7) | (((UpMeta & 0x1) != 0) ? 16 : 0);
 		}
+	}
+
+
+	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
+	{
+		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if (!IsDoor(Block))
+		{
+			return;
+		}
+
+		NIBBLETYPE Meta = GetTrueDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		bool Opened = (Meta & 0x4) != 0;
+		if (Opened == a_Open)
+		{
+			return;
+		}
+
+		// Change the door
+		NIBBLETYPE NewMeta = (Meta & 0x7) ^ 0x4;
+		if ((Meta & 0x8) == 0)
+		{
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, NewMeta);
+		}
+		else
+		{
+			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ, NewMeta);
+		}
+	}
+
+
+	/** Changes the door at the specified coords from open to close or vice versa */
+	static void ChangeDoor(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		SetOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, !IsOpen(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ));
 	}
 } ;
 
