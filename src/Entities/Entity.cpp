@@ -12,6 +12,7 @@
 #include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Player.h"
+#include "BlockArea.h"
 
 
 
@@ -1047,6 +1048,28 @@ void cEntity::DetectPortal()
 		return;
 	}
 
+	class cPortalChunkLoader : public cChunkStay
+	{
+	public:
+		cPortalChunkLoader(cEntity * a_Entity, Vector3i & a_PortalPos) :
+			m_Entity(a_Entity),
+			m_PortalPos(a_PortalPos)
+		{}
+
+	private:
+		virtual bool OnAllChunksAvailable(void) override
+		{
+			m_Entity->CreateExitPortal(m_PortalPos.x, m_PortalPos.y, m_PortalPos.z);
+			return true;
+		}
+
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override {};
+		virtual void OnDisabled(void) override {};
+
+		cEntity * m_Entity;
+		Vector3i m_PortalPos;
+	};
+
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	if ((Y > 0) && (Y < cChunkDef::Height))
 	{
@@ -1061,31 +1084,31 @@ void cEntity::DetectPortal()
 
 				switch (GetWorld()->GetDimension())
 				{
-					case dimNether:
-					{
-						cIniFile OwnIni;
-						OwnIni.ReadFile(GetWorld()->GetIniFileName());
-						AString OverworldName = OwnIni.GetValue("General", "OverworldName", cRoot::Get()->GetDefaultWorld()->GetName());
-
-						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
-						cIniFile File;
-						File.ReadFile(OverworldName + "/world.ini");
-						File.SetValue("General", "Dimension", "Overworld");
-						File.WriteFile(OverworldName + "/world.ini");
-
-						MoveToWorld(OverworldName, cRoot::Get()->CreateAndInitializeWorld(OverworldName));
-						break;
-					}
+					case dimNether: MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName())); break;
 					case dimOverworld:
 					{
-						cFile::CreateFolder(FILE_IO_PREFIX + GetWorld()->GetNetherWorldName());
-						cIniFile File;
-						File.ReadFile(GetWorld()->GetNetherWorldName() + "/world.ini");
-						File.SetValue("General", "Dimension", "Nether");
-						File.SetValue("General", "OverworldName", GetWorld()->GetName());
-						File.WriteFile(GetWorld()->GetNetherWorldName() + "/world.ini");
+						if (IsPlayer())
+						{
+							((cPlayer *)this)->AwardAchievement(achEnterPortal);
+						}
+						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()));
+						
+						cChunkStay * Stay = new cPortalChunkLoader(this, Vector3i(X, Y, Z));
 
-						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName()));
+						int MinChunkX, MaxChunkX;
+						int MinChunkZ, MaxChunkZ;
+						cChunkDef::BlockToChunk(X - 128, Z - 128, MinChunkX, MinChunkZ);
+						cChunkDef::BlockToChunk(X + 128, Z + 128, MaxChunkX, MaxChunkZ);
+
+						for (int OtherMinChunkX = MinChunkX; OtherMinChunkX <= MaxChunkX; ++OtherMinChunkX)
+						{
+							for (int OtherMinChunkZ = MinChunkZ; OtherMinChunkZ <= MaxChunkZ; ++OtherMinChunkZ)
+							{
+								Stay->Add(OtherMinChunkX, OtherMinChunkZ);
+							}
+						}
+						
+						Stay->Enable(*GetWorld()->GetChunkMap());
 						break;
 					}
 					default: break;
@@ -1103,17 +1126,7 @@ void cEntity::DetectPortal()
 				{
 					case dimEnd:
 					{
-						cIniFile OwnIni;
-						OwnIni.ReadFile(GetWorld()->GetIniFileName());
-						AString OverworldName = OwnIni.GetValue("General", "OverworldName", cRoot::Get()->GetDefaultWorld()->GetName());
-
-						cFile::CreateFolder(FILE_IO_PREFIX + OverworldName);
-						cIniFile File;
-						File.ReadFile(OverworldName + "/world.ini");
-						File.SetValue("General", "Dimension", "Overworld");
-						File.WriteFile(OverworldName + "/world.ini");
-
-						MoveToWorld(OverworldName, cRoot::Get()->CreateAndInitializeWorld(OverworldName));
+						MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()));
 
 						if (IsPlayer())
 						{
@@ -1124,14 +1137,11 @@ void cEntity::DetectPortal()
 					}
 					case dimOverworld:
 					{
-						cFile::CreateFolder(FILE_IO_PREFIX + GetWorld()->GetEndWorldName());
-						cIniFile File;
-						File.ReadFile(GetWorld()->GetEndWorldName() + "/world.ini");
-						File.SetValue("General", "Dimension", "End");
-						File.SetValue("General", "OverworldName", GetWorld()->GetName());
-						File.WriteFile(GetWorld()->GetEndWorldName() + "/world.ini");
-
-						MoveToWorld(GetWorld()->GetEndWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName()));
+						if (IsPlayer())
+						{
+							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
+						}
+						MoveToWorld(GetWorld()->GetEndWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()));
 						break;
 					}
 					default: break;
@@ -1140,6 +1150,44 @@ void cEntity::DetectPortal()
 			default: break;
 		}
 	}
+}
+
+
+
+
+
+void cEntity::CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	cBlockArea Area;
+	Area.Read(GetWorld(), a_BlockX - 128, a_BlockX + 128, 0, 128, a_BlockZ - 128, a_BlockZ + 128);
+	for (int x = a_BlockX - 128; x <= a_BlockX + 128; ++x) for (int y = 0; y <= 128; ++y) for (int z = a_BlockZ - 128; z <= a_BlockZ + 128; ++z)
+	{
+		if (
+			(Area.GetBlockType(x, y, z) == E_BLOCK_NETHER_PORTAL) &&
+			(
+				(Area.GetBlockType(x, (int)floor(y + GetHeight()), z) == E_BLOCK_NETHER_PORTAL) ||
+				(Area.GetBlockType(x, (int)floor(y - GetHeight()), z) == E_BLOCK_NETHER_PORTAL)
+			)
+			)
+		{
+			TeleportToCoords(x, y, z);
+			return;
+		}
+	}
+
+	int MinX = std::max(a_BlockX - (int)ceil(GetWidth()), a_BlockX - 2), MaxX = std::max(a_BlockX + (int)ceil(GetWidth()), a_BlockX + 1);
+	int MinY = std::max(a_BlockY - (int)ceil(GetHeight()), a_BlockY - 2), MaxY = std::max(a_BlockY + (int)ceil(GetHeight()), a_BlockY + 1);
+
+	for (int y = MinY; y < MaxY + 1; y += MaxY - MinY) for (int x = MinX; x < MaxX + 1; ++x)
+	{
+		Area.SetBlockType(x, y, a_BlockZ, E_BLOCK_OBSIDIAN);
+	}
+	for (int y = MinY; y < MaxY + 1; ++y) for (int x = MinX; x < MaxX + 1; x += MaxX - MinX)
+	{
+		Area.SetBlockType(x, y, a_BlockZ, E_BLOCK_OBSIDIAN);
+	}
+
+	Area.Write(GetWorld(), MinX, MinY, a_BlockZ);
 }
 
 

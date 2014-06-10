@@ -1859,7 +1859,20 @@ void cChunk::AddEntity(cEntity * a_Entity)
 		MarkDirty();
 	}
 
-	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
+	if (std::find(m_Entities.begin(), m_Entities.end(), a_Entity) != m_Entities.end())
+	{
+		// Not there already
+		std::vector<int>::iterator itr = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), a_Entity->GetUniqueID());
+		if (itr != m_EntitiesToRemove.end())
+		{
+			m_EntitiesToRemove.erase(itr);
+			return;
+		}
+		else
+		{
+			ASSERT(!"Entity already present when AddEntity was called!");
+		}
+	}
 
 	m_Entities.push_back(a_Entity);
 }

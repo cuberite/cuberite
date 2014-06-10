@@ -636,6 +636,9 @@ public:
 
 	AString GetEndWorldName(void) const { return m_EndWorldName; }
 	void SetEndWorldName(const AString & a_Name) { m_EndWorldName = a_Name; }
+
+	AString GetLinkedOverworldName(void) const { return m_OverworldName; }
+	void SetLinkedOverworldName(const AString & a_Name) { m_OverworldName = a_Name; }
 	
 	// tolua_end
 	
@@ -679,7 +682,7 @@ public:
 	void InitializeSpawn(void);
 	
 	/** Starts threads that belong to this world */
-	void Start(void);
+	void Start(bool a_WasDimensionSet = true);
 	
 	/** Stops threads that belong to this world (part of deinit) */
 	void Stop(void);
@@ -816,6 +819,12 @@ private:
 
 
 	AString m_WorldName;
+
+	/** The name of the world that a portal in this world should link to
+	Only has effect if this world is a nether or end world, as it is used by entities to see which world to teleport to when in a portal
+	*/
+	AString m_OverworldName;
+
 	AString m_IniFileName;
 	
 	/** Name of the storage schema used to load and save chunks */
@@ -953,7 +962,7 @@ private:
 	cClientHandleList m_ClientsToAdd;
 
 
-	cWorld(const AString & a_WorldName);
+	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
 	virtual ~cWorld();
 
 	void Tick(float a_Dt, int a_LastTickDurationMSec);

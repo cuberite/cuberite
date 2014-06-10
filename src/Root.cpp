@@ -314,15 +314,15 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 
 
 
-cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName)
+cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
 {
 	if (m_WorldsByName[a_WorldName] != NULL)
 	{
 		return NULL;
 	}
-	cWorld * NewWorld = new cWorld(a_WorldName.c_str());
+	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
 	m_WorldsByName[a_WorldName] = NewWorld;
-	NewWorld->Start();
+	NewWorld->Start(!a_OverworldName.empty());
 	NewWorld->InitializeSpawn();
 	m_PluginManager->CallHookWorldStarted(*NewWorld);
 	return NewWorld;

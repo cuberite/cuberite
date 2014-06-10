@@ -232,7 +232,7 @@ void cWorld::cTickThread::Execute(void)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName) :
+cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName) :
 	m_WorldName(a_WorldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
@@ -253,7 +253,9 @@ cWorld::cWorld(const AString & a_WorldName) :
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this)
+	m_TickThread(*this),
+	m_Dimension(a_Dimension),
+	m_OverworldName(a_OverworldName)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -511,7 +513,7 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::Start(void)
+void cWorld::Start(bool a_WasDimensionSet)
 {
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
@@ -523,8 +525,10 @@ void cWorld::Start(void)
 	{
 		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
 	}
-	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
+
+	AString Dimension = IniFile.GetValueSet("General", "Dimension", a_WasDimensionSet ? DimensionToString(GetDimension()) : "Overworld");
 	m_Dimension = StringToDimension(Dimension);
+	m_OverworldName = IniFile.GetValue("General", "OverworldName", a_WasDimensionSet ? m_OverworldName : "");
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
@@ -570,7 +574,7 @@ void cWorld::Start(void)
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
-	m_TimeOfDay               = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
+	m_TimeOfDay                   = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
 
 	if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
 	{
@@ -758,6 +762,10 @@ void cWorld::Stop(void)
 			IniFile.SetValue("General", "NetherWorldName", m_NetherWorldName);
 			IniFile.SetValueB("General", "EndPortalsEnabled", m_bEndPortalsEnabled);
 			IniFile.SetValue("General", "EndWorldName", m_EndWorldName);
+		}
+		else
+		{
+			IniFile.SetValue("General", "OverworldName", m_OverworldName);
 		}
 		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
