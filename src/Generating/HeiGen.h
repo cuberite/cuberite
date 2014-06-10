@@ -106,6 +106,27 @@ protected:
 
 
 
+class cHeiGenMountains :
+	public cTerrainHeightGen
+{
+public:
+	cHeiGenMountains(int a_Seed);
+	
+protected:
+
+	int m_Seed;
+	cRidgedMultiNoise m_Noise;
+	cPerlinNoise m_Perlin;
+	
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+} ;
+
+
+
+
+
 class cHeiGenBiomal :
 	public cTerrainHeightGen
 {

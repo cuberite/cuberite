@@ -934,6 +934,8 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 void cPlayer::Respawn(void)
 {
+	ASSERT(m_World != NULL);
+
 	m_Health = GetMaxHealth();
 	SetInvulnerableTicks(20);
 	
@@ -1590,24 +1592,22 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 		return false;
 	}
 	
-	eDimension OldDimension = m_World->GetDimension();
-	
+	// Send the respawn packet:
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendRespawn(*World);
+	}
+
 	// Remove all links to the old world
 	m_World->RemovePlayer(this);
-	m_ClientHandle->RemoveFromAllChunks();
 
 	// If the dimension is different, we can send the respawn packet
 	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	bool SendRespawn = OldDimension != World->GetDimension();
-	m_ClientHandle->MoveToWorld(*World, SendRespawn);
 
-	// Add player to all the necessary parts of the new world
-	SetWorld(World);
-	m_ClientHandle->StreamChunks();
-	World->AddEntity(this);
+	// Queue adding player to the new world, including all the necessary adjustments to the object
 	World->AddPlayer(this);
 
-	if (SendRespawn)
+	if (GetWorld()->GetDimension() != World->GetDimension())
 	{
 		GetClientHandle()->SendPlayerMoveLook();
 		GetClientHandle()->SendHealth();

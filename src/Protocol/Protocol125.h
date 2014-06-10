@@ -113,6 +113,10 @@ protected:
 	cByteBuffer m_ReceivedData;  ///< Buffer for the received data
 	
 	AString m_Username;  ///< Stored in ParseHandshake(), compared to Login username
+
+	/** The dimension that was last sent to a player in a Respawn or Login packet.
+	Used to avoid Respawning into the same dimension, which confuses the client. */
+	eDimension m_LastSentDimension;
 	
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 	

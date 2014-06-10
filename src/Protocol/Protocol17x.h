@@ -244,6 +244,10 @@ protected:
 	/** The logfile where the comm is logged, when g_ShouldLogComm is true */
 	cFile m_CommLogFile;
 	
+	/** The dimension that was last sent to a player in a Respawn or Login packet.
+	Used to avoid Respawning into the same dimension, which confuses the client. */
+	eDimension m_LastSentDimension;
+	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(const char * a_Data, size_t a_Size);

@@ -9,8 +9,7 @@
 
 
 cBlaze::cBlaze(void) :
-	// TODO: The size is only a guesstimate, measure in vanilla and fix the size values here
-	super("Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.7, 1.8)
+	super("Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.6, 1.8)
 {
 }
 
@@ -45,7 +44,7 @@ void cBlaze::Attack(float a_Dt)
 		{
 			return;
 		}
-		if (!FireCharge->Initialize(m_World))
+		if (!FireCharge->Initialize(*m_World))
 		{
 			delete FireCharge;
 			return;

@@ -284,8 +284,15 @@ public:
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
-	void AddPlayer( cPlayer* a_Player );
-	void RemovePlayer( cPlayer* a_Player );
+	/** Adds the player to the world.
+	Uses a queue to store the player object until the Tick thread processes the addition event.
+	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking. */
+	void AddPlayer(cPlayer * a_Player);
+
+	/** Removes the player from the world.
+	Removes the player from the addition queue, too, if appropriate.
+	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore. */
+	void RemovePlayer(cPlayer * a_Player);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -301,7 +308,8 @@ public:
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
-	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr */
+	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
+	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
 	void AddEntity(cEntity * a_Entity);
 	
 	bool HasEntity(int a_UniqueID);
@@ -961,6 +969,18 @@ private:
 	/** Clients that are scheduled for adding, waiting for TickClients to add them */
 	cClientHandleList m_ClientsToAdd;
 
+	/** Guards m_EntitiesToAdd */
+	cCriticalSection m_CSEntitiesToAdd;
+
+	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
+	cEntityList m_EntitiesToAdd;
+
+	/** Guards m_PlayersToAdd */
+	cCriticalSection m_CSPlayersToAdd;
+
+	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
+	cPlayerList m_PlayersToAdd;
+
 
 	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
 	virtual ~cWorld();
@@ -998,6 +1018,10 @@ private:
 
 	/** Creates a new redstone simulator.*/
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
+
+	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
+	Assumes it is called from the Tick thread. */
+	void AddQueuedPlayers(void);
 }; // tolua_export
 
 

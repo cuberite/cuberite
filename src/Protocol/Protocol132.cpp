@@ -253,7 +253,7 @@ void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteByte  (0);  // Unused, used to be world height
 	WriteByte  (8);  // Client list width or something
 	Flush();
-	
+	m_LastSentDimension = a_World.GetDimension();
 	SendCompass(a_World);
 }
 

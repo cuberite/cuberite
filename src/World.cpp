@@ -813,6 +813,20 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 		m_LastTimeUpdate = m_WorldAge;
 	}
 
+	// Add entities waiting in the queue to be added:
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		for (cEntityList::iterator itr = m_EntitiesToAdd.begin(), end = m_EntitiesToAdd.end(); itr != end; ++itr)
+		{
+			(*itr)->SetWorld(this);
+			m_ChunkMap->AddEntity(*itr);
+		}
+		m_EntitiesToAdd.clear();
+	}
+
+	// Add players waiting in the queue to be added:
+	AddQueuedPlayers();
+
 	m_ChunkMap->Tick(a_Dt);
 
 	TickClients(a_Dt);
@@ -1701,7 +1715,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, SpeedX, SpeedY, SpeedZ
 		);
-		Pickup->Initialize(this);
+		Pickup->Initialize(*this);
 	}
 }
 
@@ -1722,7 +1736,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 			a_BlockX, a_BlockY, a_BlockZ,
 			*itr, IsPlayerCreated, (float)a_SpeedX, (float)a_SpeedY, (float)a_SpeedZ
 		);
-		Pickup->Initialize(this);
+		Pickup->Initialize(*this);
 	}
 }
 
@@ -1733,7 +1747,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
 	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
-	FallingBlock->Initialize(this);
+	FallingBlock->Initialize(*this);
 	return FallingBlock->GetUniqueID();
 }
 
@@ -1749,7 +1763,7 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 	}
 
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
-	ExpOrb->Initialize(this);
+	ExpOrb->Initialize(*this);
 	return ExpOrb->GetUniqueID();
 }
 
@@ -1772,7 +1786,7 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 			return -1;
 		}
 	}  // switch (a_MinecartType)
-	Minecart->Initialize(this);
+	Minecart->Initialize(*this);
 	return Minecart->GetUniqueID();
 }
 
@@ -1783,7 +1797,7 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
-	TNT->Initialize(this);
+	TNT->Initialize(*this);
 	TNT->SetSpeed(
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1), /** -1, 0, 1 */
 		a_InitialVelocityCoeff * 2,
@@ -2299,7 +2313,7 @@ void cWorld::SetChunkData(
 	// Initialize the entities (outside the m_ChunkMap's CS, to fix FS #347):
 	for (cEntityList::iterator itr = a_Entities.begin(), end = a_Entities.end(); itr != end; ++itr)
 	{
-		(*itr)->Initialize(this);
+		(*itr)->Initialize(*this);
 	}
 	
 	// If a client is requesting this chunk, send it to them:
@@ -2392,23 +2406,8 @@ void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
 
 void cWorld::AddPlayer(cPlayer * a_Player)
 {
-	{
-		cCSLock Lock(m_CSPlayers);
-		
-		ASSERT(std::find(m_Players.begin(), m_Players.end(), a_Player) == m_Players.end());  // Is it already in the list? HOW?
-		
-		m_Players.remove(a_Player);  // Make sure the player is registered only once
-		m_Players.push_back(a_Player);
-	}
-	
-	// Add the player's client to the list of clients to be ticked:
-	if (a_Player->GetClientHandle() != NULL)
-	{
-		cCSLock Lock(m_CSClients);
-		m_ClientsToAdd.push_back(a_Player->GetClientHandle());
-	}
-
-	// The player has already been added to the chunkmap as the entity, do NOT add again!
+	cCSLock Lock(m_CSPlayersToAdd);
+	m_PlayersToAdd.push_back(a_Player);
 }
 
 
@@ -2417,17 +2416,26 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
+
 	m_ChunkMap->RemoveEntity(a_Player);
 	{
+		cCSLock Lock(m_CSPlayersToAdd);
+		m_PlayersToAdd.remove(a_Player);
+	}
+	{
 		cCSLock Lock(m_CSPlayers);
+		LOGD("Removing player \"%s\" from world \"%s\".", a_Player->GetName().c_str(), m_WorldName.c_str());
 		m_Players.remove(a_Player);
 	}
 	
 	// Remove the player's client from the list of clients to be ticked:
-	if (a_Player->GetClientHandle() != NULL)
+	cClientHandle * Client = a_Player->GetClientHandle();
+	if (Client != NULL)
 	{
+		Client->RemoveFromWorld();
+		m_ChunkMap->RemoveClientFromChunks(Client);
 		cCSLock Lock(m_CSClients);
-		m_ClientsToRemove.push_back(a_Player->GetClientHandle());
+		m_ClientsToRemove.push_back(Client);
 	}
 }
 
@@ -2878,9 +2886,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 
 
 
+
 void cWorld::AddEntity(cEntity * a_Entity)
 {
-	m_ChunkMap->AddEntity(a_Entity);
+	cCSLock Lock(m_CSEntitiesToAdd);
+	m_EntitiesToAdd.push_back(a_Entity);
 }
 
 
@@ -2889,6 +2899,19 @@ void cWorld::AddEntity(cEntity * a_Entity)
 
 bool cWorld::HasEntity(int a_UniqueID)
 {
+	// Check if the entity is in the queue to be added to the world:
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		for (cEntityList::const_iterator itr = m_EntitiesToAdd.begin(), end = m_EntitiesToAdd.end(); itr != end; ++itr)
+		{
+			if ((*itr)->GetUniqueID() == a_UniqueID)
+			{
+				return true;
+			}
+		}  // for itr - m_EntitiesToAdd[]
+	}
+
+	// Check if the entity is in the chunkmap:
 	return m_ChunkMap->HasEntity(a_UniqueID);
 }
 
@@ -3021,7 +3044,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 		delete a_Monster;
 		return -1;
 	}
-	if (!a_Monster->Initialize(this))
+	if (!a_Monster->Initialize(*this))
 	{
 		delete a_Monster;
 		return -1;
@@ -3043,7 +3066,7 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 	{
 		return -1;
 	}
-	if (!Projectile->Initialize(this))
+	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
 		return -1;
@@ -3168,6 +3191,60 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	return res;
 }
 
+
+
+
+
+
+void cWorld::AddQueuedPlayers(void)
+{
+	ASSERT(m_TickThread.IsCurrentThread());
+
+	// Grab the list of players to add, it has to be locked to access it:
+	cPlayerList PlayersToAdd;
+	{
+		cCSLock Lock(m_CSPlayersToAdd);
+		std::swap(PlayersToAdd, m_PlayersToAdd);
+	}
+	
+	// Add all the players in the grabbed list:
+	{
+		cCSLock Lock(m_CSPlayers);
+		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
+		{
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
+
+			m_Players.push_back(*itr);
+			(*itr)->SetWorld(this);
+
+			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
+			m_ChunkMap->AddEntityIfNotPresent(*itr);
+		}  // for itr - PlayersToAdd[]
+	}  // Lock(m_CSPlayers)
+
+	// Add all the players' clienthandles:
+	{
+		cCSLock Lock(m_CSClients);
+		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
+		{
+			cClientHandle * Client = (*itr)->GetClientHandle();
+			if (Client != NULL)
+			{
+				m_Clients.push_back(Client);
+			}
+		}  // for itr - PlayersToAdd[]
+	}  // Lock(m_CSClients)
+
+	// Stream chunks to all eligible clients:
+	for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
+	{
+		cClientHandle * Client = (*itr)->GetClientHandle();
+		if (Client != NULL)
+		{
+			Client->StreamChunks();
+		}
+	}  // for itr - PlayersToAdd[]
+}
 
 
 
@@ -3309,7 +3386,6 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
-
 
 
 

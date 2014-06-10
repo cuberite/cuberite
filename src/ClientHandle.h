@@ -250,8 +250,9 @@ public:
 	
 	void SendData(const char * a_Data, size_t a_Size);
 	
-	/** Called when the player moves into a different world; queues sreaming the new chunks */
-	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
+	/** Called when the player moves into a different world.
+	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */
+	void RemoveFromWorld(void);
 	
 	/** Called when the player will enchant a Item */
 	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);

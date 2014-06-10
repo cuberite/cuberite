@@ -240,6 +240,7 @@ template <typename Type> class cItemCallback
 public:
 	/// Called for each item in the internal list; return true to stop the loop, or false to continue enumerating
 	virtual bool Item(Type * a_Type) = 0;
+	virtual ~cItemCallback() {};
 } ;
 
 

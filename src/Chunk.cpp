@@ -1518,6 +1518,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	}
 
 	MarkDirty();
+	m_IsRedstoneDirty = true;
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
