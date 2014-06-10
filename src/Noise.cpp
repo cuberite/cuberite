@@ -1022,7 +1022,7 @@ void cRidgedMultiNoise::Generate2D(
 	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
 	for (int i = 0; i < ArrayCount; i++)
 	{
-		a_Array[i] = abs(a_Workspace[i] * Amplitude);
+		a_Array[i] = fabs(a_Workspace[i] * Amplitude);
 	}
 	
 	// Add each octave:
@@ -1038,7 +1038,7 @@ void cRidgedMultiNoise::Generate2D(
 		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
 		for (int i = 0; i < ArrayCount; i++)
 		{
-			a_Array[i] += abs(a_Workspace[i] * Amplitude);
+			a_Array[i] += fabs(a_Workspace[i] * Amplitude);
 		}
 	}
 	
