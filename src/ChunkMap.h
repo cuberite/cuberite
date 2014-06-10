@@ -199,6 +199,10 @@ public:
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(cEntity * a_Entity);
 	
+	/** Adds the entity to its appropriate chunk, if the entity is not already added.
+	Takes ownership of the entity pointer */
+	void AddEntityIfNotPresent(cEntity * a_Entity);
+	
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(int a_EntityID);
 	

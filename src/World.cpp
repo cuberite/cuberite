@@ -3148,10 +3148,7 @@ void cWorld::AddQueuedPlayers(void)
 			(*itr)->SetWorld(this);
 
 			// Add to chunkmap, if not already there (Spawn vs MoveToWorld):
-			if (!m_ChunkMap->HasEntity((*itr)->GetUniqueID()))
-			{
-				m_ChunkMap->AddEntity(*itr);
-			}
+			m_ChunkMap->AddEntityIfNotPresent(*itr);
 		}  // for itr - PlayersToAdd[]
 	}  // Lock(m_CSPlayers)
 
