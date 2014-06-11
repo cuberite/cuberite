@@ -2538,6 +2538,37 @@ static int tolua_cBlockArea_GetSize(lua_State * tolua_S)
 
 
 
+static int tolua_cBlockArea_GetCoordRange(lua_State * tolua_S)
+{
+	// function cBlockArea::GetCoordRange()
+	// Returns all three sizes of the area, miuns one, so that they represent the maximum coord value
+	// Exported manually because there's no direct C++ equivalent,
+	// plus tolua would generate extra input params for the outputs
+	
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cBlockArea"))
+	{
+		return 0;
+	}
+	
+	cBlockArea * self = (cBlockArea *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetSize'", NULL);
+		return 0;
+	}
+	
+	// Push the three origin coords:
+	lua_pushnumber(tolua_S, self->GetSizeX() - 1);
+	lua_pushnumber(tolua_S, self->GetSizeY() - 1);
+	lua_pushnumber(tolua_S, self->GetSizeZ() - 1);
+	return 3;
+}
+
+
+
+
+
 static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 {
 	// function cBlockArea::LoadFromSchematicFile
@@ -2926,6 +2957,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cBlockArea");
 			tolua_function(tolua_S, "GetBlockTypeMeta",        tolua_cBlockArea_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetCoordRange",           tolua_cBlockArea_GetCoordRange);
 			tolua_function(tolua_S, "GetOrigin",               tolua_cBlockArea_GetOrigin);
 			tolua_function(tolua_S, "GetRelBlockTypeMeta",     tolua_cBlockArea_GetRelBlockTypeMeta);
 			tolua_function(tolua_S, "GetSize",                 tolua_cBlockArea_GetSize);
