@@ -597,7 +597,7 @@ public:
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ) const;
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 	
 	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
 	Doesn't resend the chunk to clients, use ForceSendChunkTo() for that. */
@@ -711,7 +711,7 @@ public:
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 	
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
-	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
@@ -720,7 +720,7 @@ public:
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 	
 	/** Returns true if it is raining at the specified location. This takes into account biomes. */
-	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ) const
+	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
@@ -729,7 +729,7 @@ public:
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 	
 	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
-	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ) const
+	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherStorm() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
@@ -738,7 +738,7 @@ public:
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 	
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
-	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const
+	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
