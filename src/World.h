@@ -708,12 +708,23 @@ public:
 	eWeather GetWeather     (void) const { return m_Weather; };
 	
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
+	bool IsWeatherSunny(int a_BlockX, int a_BlockZ) const {
+		return (m_Weather == wSunny)
+	}
 	bool IsWeatherRain (void) const { return (m_Weather == wRain); }
+	bool IsWeatherRain (int a_BlockX, int a_BlockZ) const {
+		return (m_Weather == wRain) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
+	}
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
+	bool IsWeatherStorm(int a_BlockX, int a_BlockZ) const {
+		return (m_Weather == wStorm) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
+	}
 	
 	/** Returns true if the current weather has any precipitation - rain or storm */
 	bool IsWeatherWet  (void) const { return (m_Weather != wSunny); }
-	
+	bool IsWeatherWet  (int a_BlockX, int a_BlockZ) const {
+		return (m_Weather != wSunny) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
+	}
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
