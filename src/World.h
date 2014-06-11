@@ -710,9 +710,13 @@ public:
 	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 	
-	/** Returns true if it is sunny at the specified location. This takes into accunt biomes. */
+	/** Returns true if it is sunny at the specified location. This takes into accunt biomes.
+	This function is identical to IsWeatherSunny except for two extra parameters that aren't used, but bearbin insists :/
+	*/
 	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
 	{
+		UNUSED(a_BlockX);
+		UNUSED(a_BlockZ);
 		return (m_Weather == wSunny)
 	}
 	
