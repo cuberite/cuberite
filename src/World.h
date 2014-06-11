@@ -707,22 +707,39 @@ public:
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
 	eWeather GetWeather     (void) const { return m_Weather; };
 	
+	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
-	bool IsWeatherSunny(int a_BlockX, int a_BlockZ) const {
+	
+	/** Returns true if it is sunny at the specified location. This takes into accunt biomes. */
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
+	{
 		return (m_Weather == wSunny)
 	}
-	bool IsWeatherRain (void) const { return (m_Weather == wRain); }
-	bool IsWeatherRain (int a_BlockX, int a_BlockZ) const {
+	
+	/** Returns true if the current weather is rain */
+	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
+	
+	/** Returns true if it is raining at the specified location. This takes into accunt biomes. */
+	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ) const
+	{
 		return (m_Weather == wRain) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
 	}
+	
+	/** Returns true if the current weather is stormy */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
-	bool IsWeatherStorm(int a_BlockX, int a_BlockZ) const {
+	
+	/** Returns true if the weather is stormy at the specified location. This takes into accunt biomes. */
+	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ) const
+	{
 		return (m_Weather == wStorm) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
 	}
 	
-	/** Returns true if the current weather has any precipitation - rain or storm */
-	bool IsWeatherWet  (void) const { return (m_Weather != wSunny); }
-	bool IsWeatherWet  (int a_BlockX, int a_BlockZ) const {
+	/** Returns true if the current weather has any precipitation - rain, storm or snow */
+	bool IsWeatherWet(void) const { return (m_Weather != wSunny); }
+	
+	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into accunt biomes. */
+	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const
+	{
 		return (m_Weather != wSunny) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
 	}
 	// tolua_end
