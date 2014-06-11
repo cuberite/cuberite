@@ -10,7 +10,7 @@ I'd say that the important topics are:
 * Differnt types of blocks and how they act.
 * Mobs, what they do and how.
 * Redstone, pistons, and automation.
-* Farming
+* Farming.
 * Fighting, health and the hunger system.
 
 Useful Resources
