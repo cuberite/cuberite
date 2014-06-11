@@ -116,7 +116,8 @@ public:
 		int a_Density,
 		cPiecePool & a_Prefabs,
 		cTerrainHeightGen & a_HeightGen,
-		BLOCKTYPE a_RoadBlock
+		BLOCKTYPE a_RoadBlock,
+		BLOCKTYPE a_WaterRoadBlock
 	) :
 		super(a_OriginX, a_OriginZ),
 		m_Seed(a_Seed),
@@ -126,7 +127,8 @@ public:
 		m_Borders(a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize, a_OriginX + a_MaxSize, 255, a_OriginZ + a_MaxSize),
 		m_Prefabs(a_Prefabs),
 		m_HeightGen(a_HeightGen),
-		m_RoadBlock(a_RoadBlock)
+		m_RoadBlock(a_RoadBlock),
+		m_WaterRoadBlock(a_WaterRoadBlock)
 	{
 		// Generate the pieces for this village; don't care about the Y coord:
 		cBFSPieceGenerator pg(*this, a_Seed);
@@ -179,6 +181,9 @@ protected:
 	
 	/** The block to use for the roads. */
 	BLOCKTYPE m_RoadBlock;
+
+	/** The block used for the roads if the road is on water. */
+	BLOCKTYPE m_WaterRoadBlock;
 	
 	
 	// cGridStructGen::cStructure overrides:
@@ -239,7 +244,14 @@ protected:
 		{
 			for (int x = MinX; x <= MaxX; x++)
 			{
-				a_Chunk.SetBlockType(x, cChunkDef::GetHeight(a_HeightMap, x, z), z, m_RoadBlock);
+				if (IsBlockWater(a_Chunk.GetBlockType(x, cChunkDef::GetHeight(a_HeightMap, x, z), z)))
+				{
+					a_Chunk.SetBlockType(x, cChunkDef::GetHeight(a_HeightMap, x, z), z, m_WaterRoadBlock);
+				}
+				else
+				{
+					a_Chunk.SetBlockType(x, cChunkDef::GetHeight(a_HeightMap, x, z), z, m_RoadBlock);
+				}
 			}
 		}
 	}
@@ -374,6 +386,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	// If just one is not, no village is created, because it's likely that an unfriendly biome is too close
 	cVillagePiecePool * VillagePrefabs = NULL;
 	BLOCKTYPE RoadBlock = E_BLOCK_GRAVEL;
+	BLOCKTYPE WaterRoadBlock = E_BLOCK_PLANKS;
 	int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
 	cVillagePiecePool * PlainsVillage = g_PlainsVillagePools[rnd % ARRAYCOUNT(g_PlainsVillagePools)];
 	cVillagePiecePool * DesertVillage = g_DesertVillagePools[rnd % ARRAYCOUNT(g_DesertVillagePools)];
@@ -422,7 +435,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	{
 		return cStructurePtr();
 	}
-	return cStructurePtr(new cVillage(m_Seed, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *VillagePrefabs, m_HeightGen, RoadBlock));
+	return cStructurePtr(new cVillage(m_Seed, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *VillagePrefabs, m_HeightGen, RoadBlock, WaterRoadBlock));
 }
 
 
