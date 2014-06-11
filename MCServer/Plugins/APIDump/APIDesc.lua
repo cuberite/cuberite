@@ -2299,6 +2299,7 @@ end
 				IsWeatherStorm = { Params = "", Return = "bool", Notes = "Returns true if the current world is stormy." },
 				IsWeatherStormAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location is stormy (takes into account biomes)." },
 				IsWeatherSunny = { Params = "", Return = "bool", Notes = "Returns true if the current weather is sunny." },
+				IsWeatherSunnyAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the current weather is sunny at the specified location (takes into account biomes)." },
 				IsWeatherWet = { Params = "", Return = "bool", Notes = "Returns true if the current world has any precipitation (rain or storm)." },
 				IsWeatherWetAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location has any precipitation (rain or storm) (takes into account biomes)." },
 				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
