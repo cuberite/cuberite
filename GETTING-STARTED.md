@@ -3,7 +3,7 @@ Hello! Thanks for wanting to work on this project :smile:, and I hope that this 
 Minecraft Basics
 ----------------
 
-If you don't play Minecraft or don't have a great knowledge of the basic systems, you should get to know them. The [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki) is quite useful for this task, although some youtubers are also fairly good at teaching the basics and just playing is quite good too. 
+If you don't play Minecraft or don't have a great knowledge of the basic systems, you should get to know them. The [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki) is quite useful for this task, although some youtubers are also fairly good at teaching the basics and just playing is quite good too. It is possabile to contribute without knowing minecraft in detail though.
 
 I'd say that the important topics are:
 
@@ -39,7 +39,7 @@ You'll also need CMake to generate the makefile to build from.
 
 **Windows:**
 
-If you use Windows, your best bet is the MSVC2008 (available as a free download in the Express edition from MS) or MSVS2013 (ditto), solution files for both are currently in the repo.
+If you use Windows, your best bet is the MSVC2008 (available as a free download in the Express edition from MS) or MSVS2013 (ditto), solution files for which can be generated with cmake. You'll also need cmake to generate the project files.
 
 Setting up the Repo
 -------------------
@@ -85,7 +85,7 @@ Basically, the process is:
 
 **Windows:**
 
-You need to first execute the `src/Bindings/AllToLua.bat` script file, then just open the solution file in your MSVC of choice and build.
+You need to first generate a project file with `cmake . -DCMAKE_BUILD_TYPE=DEBUG` then execute the `src/Bindings/AllToLua.bat` script file, then just open the solution file in your MSVC of choice and build.
 
 How to Run
 ----------
@@ -99,18 +99,18 @@ There are a few fairly easy issues for you to get started with, as well as some 
 
 **Easy**:
 
- * #288 
- * #385 
- * #402 
- * #380
- * #503
- * #491
+ * #140
+ * #493
+ * #577
+ * #381
+ * #752
  * Clean up some of the compiler warnings. (Check [Travis CI](http://travis-ci.org/mc-server/MCServer) for a list of them.) With clang, there are over 10000 lines of warnings to clean up.
 
 **More Difficult**:
 
- * #17
- * #398 
+ * #133
+ * #134
+ * #215
 
 You may also want to write some plugins. They are written in lua, with excellent API documentation available via [APIDump](http://mc-server.xoft.cz/LuaAPI). The [Core](https://github.com/mc-server/Core) plugin should also help quite a bit here.
 
