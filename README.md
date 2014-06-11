@@ -1,4 +1,4 @@
-MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer) [![Support via Gittip](http://img.shields.io/gittip/mcs_team.svg)](https://www.gittip.com/mcs_team) [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
+MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer) [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 ========
 
 MCServer is a Minecraft server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API.
