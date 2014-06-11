@@ -220,11 +220,18 @@ public:
 	Vector3d m_Speed;
 
 	// tolua_begin
+	/** Sets the speed of the entity and moves them in the given speed. */
 	virtual void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	/** Sets the speed of the entity and moves them in the given speed. */
 	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	
+	/** Sets the speed for the X axis */
 	virtual void SetSpeedX  (double a_SpeedX);
+	/** Sets the speed for the Y axis */
 	virtual void SetSpeedY  (double a_SpeedY);
+	/** Sets the speed for the Z axis */
 	virtual void SetSpeedZ  (double a_SpeedZ);
+	
 	void SetWidth   (double a_Width);
 	
 	void AddPosX    (double a_AddPosX);

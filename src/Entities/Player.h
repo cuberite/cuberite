@@ -191,14 +191,14 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/** Forces the player to move in the given direction. DEPRECATED! Use SetSpeed instead */
+	/** Forces the player to move in the given direction. 
+	 *  @deprecated Use SetSpeed instead.
+	 */
 	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
 
 	/** Sets the speed of the player and moves them in the given speed. */
 	void SetSpeed           (const Vector3d & a_Speed);
 	virtual void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-	
-	/** Sets the speed for the X, Y or Z axis */
 	virtual void SetSpeedX  (double a_SpeedX) override;
 	virtual void SetSpeedY  (double a_SpeedY) override;
 	virtual void SetSpeedZ  (double a_SpeedZ) override;
