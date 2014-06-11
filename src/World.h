@@ -710,20 +710,16 @@ public:
 	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 	
-	/** Returns true if it is sunny at the specified location. This takes into accunt biomes.
-	This function is identical to IsWeatherSunny except for two extra parameters that aren't used, but bearbin insists :/
-	*/
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
 	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const
 	{
-		UNUSED(a_BlockX);
-		UNUSED(a_BlockZ);
-		return (m_Weather == wSunny);
+		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 	
 	/** Returns true if the current weather is rain */
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 	
-	/** Returns true if it is raining at the specified location. This takes into accunt biomes. */
+	/** Returns true if it is raining at the specified location. This takes into account biomes. */
 	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ) const
 	{
 		return (m_Weather == wRain) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
@@ -732,7 +728,7 @@ public:
 	/** Returns true if the current weather is stormy */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 	
-	/** Returns true if the weather is stormy at the specified location. This takes into accunt biomes. */
+	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
 	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ) const
 	{
 		return (m_Weather == wStorm) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
@@ -741,7 +737,7 @@ public:
 	/** Returns true if the current weather has any precipitation - rain, storm or snow */
 	bool IsWeatherWet(void) const { return (m_Weather != wSunny); }
 	
-	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into accunt biomes. */
+	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
 	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const
 	{
 		return (m_Weather != wSunny) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
