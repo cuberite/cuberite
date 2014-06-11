@@ -64,9 +64,9 @@ protected:
 	int m_CurChunkZ;
 	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
 
-	cBiomeGen &      m_BiomeGen;
-	cHeiGenMesaBryce m_UnderlyingHeiGen;  // This generator provides us with base heightmap (before distortion)
-	cHeiGenCache     m_HeightGen;         // Cache above m_UnderlyingHeiGen
+	cBiomeGen &   m_BiomeGen;
+	cHeiGenBiomal m_UnderlyingHeiGen;  // This generator provides us with base heightmap (before distortion)
+	cHeiGenCache  m_HeightGen;         // Cache above m_UnderlyingHeiGen
 	
 	/// Heightmap for the current chunk, before distortion (from m_HeightGen). Used for optimization.
 	cChunkDef::HeightMap m_CurChunkHeights;

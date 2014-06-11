@@ -47,10 +47,6 @@ cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBio
 	{
 		res = new cEndGen(a_Seed);
 	}
-	else if (NoCaseCompare(HeightGenName, "MesaBryce") == 0)
-	{
-		res = new cHeiGenMesaBryce(a_Seed);
-	}
 	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
 	{
 		res = new cHeiGenMountains(a_Seed);
@@ -364,91 +360,6 @@ void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
 	m_Noise.AddOctave(0.02f, 1.5f);
 
 	m_Perlin.AddOctave(0.01f, 1.5f);
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cHeiGenMesaBryce:
-
-cHeiGenMesaBryce::cHeiGenMesaBryce(int a_Seed) :
-	m_Seed(a_Seed),
-	m_PerlinHFHA(a_Seed),
-	m_PerlinLFLA(a_Seed + 10)
-{
-}
-
-
-
-
-
-void cHeiGenMesaBryce::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
-{
-	NOISE_DATATYPE StartX = (NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width);
-	NOISE_DATATYPE EndX   = (NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + cChunkDef::Width - 1);
-	NOISE_DATATYPE StartZ = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width);
-	NOISE_DATATYPE EndZ   = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + cChunkDef::Width - 1);
-	NOISE_DATATYPE Workspace[16 * 16];
-	NOISE_DATATYPE Noise1[16 * 16];
-	NOISE_DATATYPE Noise2[16 * 16];
-	NOISE_DATATYPE Noise3[16 * 16];
-	m_PerlinHFHA.Generate2D(Noise1, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
-	m_PerlinLFLA.Generate2D(Noise2, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
-	m_PerlinTops.Generate2D(Noise3, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
-	for (int z = 0; z < cChunkDef::Width; z++)
-	{
-		int IdxZ = z * cChunkDef::Width;
-		for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			int idx = IdxZ + x;
-			// int hei = 70 + (int)(std::min(Noise1[idx], Noise2[idx]) * 15);
-			int hei;
-			if (Noise1[idx] > 1.5f)
-			{
-				hei = 83 + (int)floor(Noise3[idx]);
-			}
-			else
-			{
-				hei = 63 + (int)floor(Noise2[idx]);
-			}
-			/*
-			NOISE_DATATYPE v1 = sqrt(sqrt(std::max(Noise1[idx], (NOISE_DATATYPE)0))) - 50;
-			int hei = 60 + (int)floor(std::max(v1, 5 + Noise2[idx]));
-			*/
-			if (hei < 10)
-			{
-				hei = 10;
-			}
-			if (hei > 250)
-			{
-				hei = 250;
-			}
-			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
-		}  // for x
-	}  // for z
-}
-
-
-
-
-
-void cHeiGenMesaBryce::InitializeHeightGen(cIniFile & a_IniFile)
-{
-	// TODO: Read the params from an INI file
-	// m_PerlinHFHA.AddOctave(0.32f, 0.1);
-	/*
-	m_PerlinHFHA.AddOctave(0.13f, 17800000);
-	m_PerlinHFHA.AddOctave(0.12f, 19000000);
-	*/
-	m_PerlinHFHA.AddOctave(0.13f, 2);
-	m_PerlinHFHA.AddOctave(0.12f, 2);
-
-	m_PerlinLFLA.AddOctave(0.04f, 1);
-	m_PerlinLFLA.AddOctave(0.02f, 2);
-
-	m_PerlinTops.AddOctave(0.1f, 8);
 }
 
 

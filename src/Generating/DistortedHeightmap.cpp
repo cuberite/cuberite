@@ -282,7 +282,7 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_OceanFloorSelect(a_Seed + 3000),
 	m_MesaFloor(a_Seed + 4000),
 	m_BiomeGen(a_BiomeGen),
-	m_UnderlyingHeiGen(a_Seed),
+	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
 	m_HeightGen(m_UnderlyingHeiGen, 64),
 	m_IsInitialized(false)
 {
@@ -308,8 +308,6 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 		return;
 	}
 
-	((cTerrainHeightGen &)m_UnderlyingHeiGen).InitializeHeightGen(a_IniFile);
-	
 	// Read the params from the INI file:
 	m_SeaLevel   =                 a_IniFile.GetValueSetI("Generator", "DistortedHeightmapSeaLevel",   62);
 	m_FrequencyX = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyX", 10);

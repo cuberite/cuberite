@@ -127,27 +127,6 @@ protected:
 
 
 
-class cHeiGenMesaBryce :
-	public cTerrainHeightGen
-{
-public:
-	cHeiGenMesaBryce(int a_Seed);
-	
-protected:
-	int m_Seed;
-	cPerlinNoise m_PerlinHFHA;  // HighFrequencyHighAmplitude, for the hills
-	cPerlinNoise m_PerlinLFLA;  // LowFrequencyLowAmplitude, for the floor
-	cPerlinNoise m_PerlinTops;
-
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
-} ;
-
-
-
-
-
 class cHeiGenBiomal :
 	public cTerrainHeightGen
 {
