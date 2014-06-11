@@ -717,7 +717,7 @@ public:
 	{
 		UNUSED(a_BlockX);
 		UNUSED(a_BlockZ);
-		return (m_Weather == wSunny)
+		return (m_Weather == wSunny);
 	}
 	
 	/** Returns true if the current weather is rain */
@@ -726,7 +726,7 @@ public:
 	/** Returns true if it is raining at the specified location. This takes into accunt biomes. */
 	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ) const
 	{
-		return (m_Weather == wRain) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
+		return (m_Weather == wRain) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 	
 	/** Returns true if the current weather is stormy */
@@ -735,7 +735,7 @@ public:
 	/** Returns true if the weather is stormy at the specified location. This takes into accunt biomes. */
 	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ) const
 	{
-		return (m_Weather == wStorm) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
+		return (m_Weather == wStorm) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 	
 	/** Returns true if the current weather has any precipitation - rain, storm or snow */
@@ -744,7 +744,7 @@ public:
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into accunt biomes. */
 	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const
 	{
-		return (m_Weather != wSunny) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)))
+		return (m_Weather != wSunny) && (!IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 	// tolua_end
 
