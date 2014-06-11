@@ -158,6 +158,7 @@ public:
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
 	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
 	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
+	bool IsPawn        (void) const { return (IsMob() || IsPlayer());          }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
 	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
 	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }

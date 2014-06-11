@@ -77,7 +77,7 @@ bool cSplashPotionEntity::cSplashPotionCallback::Item(cEntity * a_Entity)
 		
 		m_EntityEffect.SetDistanceModifier(reduction);
 		
-		if (a_Entity->IsMob() || a_Entity->IsPlayer())
+		if (a_Entity->IsPawn())
 		{
 			((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect);
 		}
