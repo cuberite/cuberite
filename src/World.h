@@ -597,7 +597,7 @@ public:
 	void GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 	
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
-	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
+	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ) const;
 	
 	/** Sets the biome at the specified coords. Returns true if successful, false if not (chunk not loaded).
 	Doesn't resend the chunk to clients, use ForceSendChunkTo() for that. */
