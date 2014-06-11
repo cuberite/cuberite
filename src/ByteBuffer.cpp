@@ -762,7 +762,6 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, size_t a_NumChars)
 	// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
 	CHECK_THREAD;
 	CheckValid();
-	ASSERT(a_NumChars >= 0);
 	AString RawData;
 	if (!ReadString(RawData, a_NumChars * 2))
 	{
