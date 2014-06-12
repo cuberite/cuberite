@@ -2934,6 +2934,7 @@ end
 	{
 		-- No sorting is provided for these, they will be output in the same order as defined here
 		{ FileName = "Writing-a-MCServer-plugin.html", Title = "Writing a MCServer plugin" },
+		{ FileName = "InfoFile.html",                  Title = "Using the Info.lua file" },
 		{ FileName = "SettingUpDecoda.html",           Title = "Setting up the Decoda Lua IDE" },
 		{ FileName = "SettingUpZeroBrane.html",        Title = "Setting up the ZeroBrane Studio Lua IDE" },
 		{ FileName = "UsingChunkStays.html",           Title = "Using ChunkStays" },
