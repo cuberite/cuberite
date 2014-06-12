@@ -3,7 +3,7 @@ Hello! Thanks for wanting to work on this project :smile:, and I hope that this 
 Minecraft Basics
 ----------------
 
-If you don't play Minecraft or don't have a great knowledge of the basic systems, you should get to know them. The [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki) is quite useful for this task, although some youtubers are also fairly good at teaching the basics and just playing is quite good too. It is possabile to contribute without knowing minecraft in detail though.
+If you don't play Minecraft or don't have a great knowledge of the basic systems, you should get to know them. The [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki) is quite useful for this task, although some youtubers are also fairly good at teaching the basics and just playing is quite good too. It is possible to contribute without knowing minecraft in detail though.
 
 I'd say that the important topics are:
 
