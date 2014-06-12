@@ -1051,7 +1051,7 @@ void cEntity::DetectPortal()
 	class cPortalChunkLoader : public cChunkStay
 	{
 	public:
-		cPortalChunkLoader(cEntity * a_Entity, cWorld & a_World, Vector3i & a_PortalPos) :
+		cPortalChunkLoader(cEntity * a_Entity, cWorld & a_World, const Vector3i & a_PortalPos) :
 			m_Entity(a_Entity),
 			m_PortalPos(a_PortalPos),
 			m_World(a_World)
