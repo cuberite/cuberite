@@ -234,6 +234,7 @@ void cWorld::cTickThread::Execute(void)
 
 cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName) :
 	m_WorldName(a_WorldName),
+	m_OverworldName(a_OverworldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef __arm__
@@ -241,6 +242,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #else
 	m_StorageCompressionFactor(6),
 #endif
+	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
@@ -253,9 +255,8 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this),
-	m_Dimension(a_Dimension),
-	m_OverworldName(a_OverworldName)
+	m_TickThread(*this)
+	
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 

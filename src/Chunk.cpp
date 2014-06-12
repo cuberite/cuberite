@@ -71,6 +71,7 @@ cChunk::cChunk(
 	m_IsDirty(false),
 	m_IsSaving(false),
 	m_HasLoadFailed(false),
+	m_EntityTickIteratorData(std::make_pair(false, m_Entities.end())),
 	m_StayCount(0),
 	m_PosX(a_ChunkX),
 	m_PosY(a_ChunkY),
@@ -85,8 +86,7 @@ cChunk::cChunk(
 	m_NeighborZM(a_NeighborZM),
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
-	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
-	m_EntityTickIteratorData(std::make_pair(false, m_Entities.end()))
+	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
 {
 	if (a_NeighborXM != NULL)
 	{
