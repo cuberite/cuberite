@@ -86,7 +86,7 @@ cChunk::cChunk(
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
-	m_EntityTickIteratorData(std::make_pair(false, &m_Entities.end()))
+	m_EntityTickIteratorData(std::make_pair(false, m_Entities.end()))
 {
 	if (a_NeighborXM != NULL)
 	{
@@ -584,12 +584,12 @@ void cChunk::Tick(float a_Dt)
 		// Don't tick things queued to be removed
 		if (!((*itr)->IsMob()))
 		{
-			m_EntityTickIteratorData.second = &itr;
+			m_EntityTickIteratorData.second = itr;
 			(*itr)->Tick(a_Dt, *this);
 
-			if (itr != *m_EntityTickIteratorData.second)
+			if (itr != m_EntityTickIteratorData.second)
 			{
-				itr = *m_EntityTickIteratorData.second;
+				itr = m_EntityTickIteratorData.second;
 			}
 			else
 			{
@@ -1876,7 +1876,7 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 {
 	if (m_EntityTickIteratorData.first)
 	{
-		*m_EntityTickIteratorData.second = m_Entities.erase(*m_EntityTickIteratorData.second);
+		m_EntityTickIteratorData.second = m_Entities.erase(m_EntityTickIteratorData.second);
 	}
 	else
 	{
