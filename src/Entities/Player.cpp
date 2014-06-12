@@ -948,7 +948,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*GetWorld());
+	m_ClientHandle->SendRespawn(GetWorld()->GetDimension());
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1570,7 +1570,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
+bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_ShouldSendRespawn)
 {
 	cWorld * World;	
 	if (a_World == NULL)
@@ -1589,30 +1589,21 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 
 	if (GetWorld() == World)
 	{
+		// Don't move to same world
 		return false;
 	}
 	
 	// Send the respawn packet:
-	if (m_ClientHandle != NULL)
+	if (a_ShouldSendRespawn && (m_ClientHandle != NULL))
 	{
-		m_ClientHandle->SendRespawn(*World);
+		m_ClientHandle->SendRespawn(World->GetDimension());
 	}
 
-	// Remove all links to the old world
+	// Remove player from old world
 	m_World->RemovePlayer(this);
-
-	// If the dimension is different, we can send the respawn packet
-	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	World->AddPlayer(this);
-
-	if (GetWorld()->GetDimension() != World->GetDimension())
-	{
-		GetClientHandle()->SendPlayerMoveLook();
-		GetClientHandle()->SendHealth();
-		GetClientHandle()->SendWholeInventory(*GetWindow());
-	}
 
 	return true;
 }

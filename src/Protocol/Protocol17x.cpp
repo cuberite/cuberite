@@ -986,9 +986,9 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol172::SendRespawn(const cWorld & a_World)
+void cProtocol172::SendRespawn(eDimension a_Dimension)
 {
-	if (m_LastSentDimension == a_World.GetDimension())
+	if (m_LastSentDimension == a_Dimension)
 	{
 		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
 		return;
@@ -996,11 +996,11 @@ void cProtocol172::SendRespawn(const cWorld & a_World)
 
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteInt((int)a_World.GetDimension());
+	Pkt.WriteInt((int)a_Dimension);
 	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteByte((Byte)Player->GetEffectiveGameMode());
 	Pkt.WriteString("default");
-	m_LastSentDimension = a_World.GetDimension();
+	m_LastSentDimension = a_Dimension;
 }
 
 

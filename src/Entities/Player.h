@@ -323,14 +323,14 @@ public:
 
 	virtual void Killed(cEntity * a_Victim) override;
 	
-	void Respawn(void);															// tolua_export
+	void Respawn(void); // tolua_export
 
-	void SetVisible( bool a_bVisible );										// tolua_export
-	bool IsVisible(void) const { return m_bVisible; }									// tolua_export
+	void SetVisible(bool a_bVisible); // tolua_export
+	bool IsVisible(void) const { return m_bVisible; } // tolua_export
 
 	/** Moves the player to the specified world.
 	Returns true if successful, false on failure (world not found). */
-	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL) override;  // tolua_export
+	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL, bool a_ShouldSendRespawn = true) override; // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
@@ -339,7 +339,7 @@ public:
 	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world
 	*/
 	bool LoadFromDisk(cWorld *& a_World);
-	void LoadPermissionsFromDisk(void);											// tolua_export
+	void LoadPermissionsFromDisk(void); // tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 

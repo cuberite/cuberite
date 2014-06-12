@@ -158,10 +158,10 @@ void cProtocol161::SendPlayerMaxSpeed(void)
 
 
 
-void cProtocol161::SendRespawn(const cWorld & a_World)
+void cProtocol161::SendRespawn(eDimension a_Dimension)
 {
 	// Besides sending the respawn, we need to also send the player max speed, otherwise the client reverts to super-fast
-	super::SendRespawn(a_World);
+	super::SendRespawn(a_Dimension);
 	SendPlayerMaxSpeed();
 }
 

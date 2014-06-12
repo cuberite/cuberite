@@ -1051,15 +1051,16 @@ void cEntity::DetectPortal()
 	class cPortalChunkLoader : public cChunkStay
 	{
 	public:
-		cPortalChunkLoader(cEntity * a_Entity, Vector3i & a_PortalPos) :
+		cPortalChunkLoader(cEntity * a_Entity, cWorld & a_World, Vector3i & a_PortalPos) :
 			m_Entity(a_Entity),
-			m_PortalPos(a_PortalPos)
+			m_PortalPos(a_PortalPos),
+			m_World(a_World)
 		{}
 
 	private:
 		virtual bool OnAllChunksAvailable(void) override
 		{
-			m_Entity->CreateExitPortal(m_PortalPos.x, m_PortalPos.y, m_PortalPos.z);
+			cEntity::CreateExitPortal(m_PortalPos.x, m_PortalPos.y, m_PortalPos.z, m_Entity->GetWidth(), m_Entity->GetHeight(), m_World, m_Entity->GetUniqueID());
 			return true;
 		}
 
@@ -1068,6 +1069,7 @@ void cEntity::DetectPortal()
 
 		cEntity * m_Entity;
 		Vector3i m_PortalPos;
+		cWorld & m_World;
 	};
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
@@ -1077,106 +1079,167 @@ void cEntity::DetectPortal()
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
-				if (!GetWorld()->AreNetherPortalsEnabled())
+				if (!GetWorld()->AreNetherPortalsEnabled() || m_PortalCooldownData.second)
 				{
 					return;
 				}
 
+				if (m_PortalCooldownData.first != 80)
+				{
+					m_PortalCooldownData.first++;
+					return;
+				}
+				m_PortalCooldownData.first = 0;
+
 				switch (GetWorld()->GetDimension())
 				{
-					case dimNether: MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName())); break;
+					case dimNether: 
+					{
+						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+
+						if (IsPlayer())
+						{
+							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);
+						}
+						MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+
+						return;
+					}
 					case dimOverworld:
 					{
+						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+
 						if (IsPlayer())
 						{
 							((cPlayer *)this)->AwardAchievement(achEnterPortal);
+							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
 						}
-						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()));
+						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
 						
-						cChunkStay * Stay = new cPortalChunkLoader(this, Vector3i(X, Y, Z));
+						cChunkStay * Stay = new cPortalChunkLoader(this, *cRoot::Get()->GetWorld(GetWorld()->GetNetherWorldName()), Vector3i(X, Y, Z));
 
 						int MinChunkX, MaxChunkX;
 						int MinChunkZ, MaxChunkZ;
 						cChunkDef::BlockToChunk(X - 128, Z - 128, MinChunkX, MinChunkZ);
 						cChunkDef::BlockToChunk(X + 128, Z + 128, MaxChunkX, MaxChunkZ);
 
-						for (int OtherMinChunkX = MinChunkX; OtherMinChunkX <= MaxChunkX; ++OtherMinChunkX)
+						for (int ChunkX = MinChunkX; ChunkX <= MaxChunkX; ++ChunkX)
 						{
-							for (int OtherMinChunkZ = MinChunkZ; OtherMinChunkZ <= MaxChunkZ; ++OtherMinChunkZ)
+							for (int ChunkZ = MinChunkZ; ChunkZ <= MaxChunkZ; ++ChunkZ)
 							{
-								Stay->Add(OtherMinChunkX, OtherMinChunkZ);
+								LOG("Queue %i %i", ChunkX, ChunkZ);
+								Stay->Add(ChunkX, ChunkZ);
 							}
 						}
 						
 						Stay->Enable(*GetWorld()->GetChunkMap());
-						break;
+						return;
 					}
 					default: break;
 				}
-				break;
+				return;
 			}
 			case E_BLOCK_END_PORTAL:
 			{
-				if (!GetWorld()->AreEndPortalsEnabled())
+				if (!GetWorld()->AreEndPortalsEnabled() || m_PortalCooldownData.second)
 				{
 					return;
 				}
+
+				if (m_PortalCooldownData.first != 80)
+				{
+					m_PortalCooldownData.first++;
+					return;
+				}
+				m_PortalCooldownData.first = 0;
 
 				switch (GetWorld()->GetDimension())
 				{
 					case dimEnd:
 					{
-						MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()));
+						m_PortalCooldownData.second = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
 						{
 							cPlayer * Player = (cPlayer *)this;
 							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+							Player->GetClientHandle()->SendRespawn(dimOverworld);
 						}
-						break;
+						MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+
+						return;
 					}
 					case dimOverworld:
 					{
+						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+
 						if (IsPlayer())
 						{
 							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
+							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
 						}
-						MoveToWorld(GetWorld()->GetEndWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()));
-						break;
+						MoveToWorld(GetWorld()->GetEndWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+
+						return;
 					}
 					default: break;
 				}
+				return;
 			}
 			default: break;
 		}
 	}
+
+	// Allow portals to work again
+	m_PortalCooldownData.second = false;
+	m_PortalCooldownData.first = 0;
 }
 
 
 
 
 
-void cEntity::CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cEntity::CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ, double a_EntityWidth, double a_EntityHeight, cWorld & a_World, int a_UniqueIDToTeleport)
 {
 	cBlockArea Area;
-	Area.Read(GetWorld(), a_BlockX - 128, a_BlockX + 128, 0, 128, a_BlockZ - 128, a_BlockZ + 128);
+	Area.Read(&a_World, a_BlockX - 128, a_BlockX + 128, 0, 128, a_BlockZ - 128, a_BlockZ + 128);
 	for (int x = a_BlockX - 128; x <= a_BlockX + 128; ++x) for (int y = 0; y <= 128; ++y) for (int z = a_BlockZ - 128; z <= a_BlockZ + 128; ++z)
 	{
 		if (
 			(Area.GetBlockType(x, y, z) == E_BLOCK_NETHER_PORTAL) &&
 			(
-				(Area.GetBlockType(x, (int)floor(y + GetHeight()), z) == E_BLOCK_NETHER_PORTAL) ||
-				(Area.GetBlockType(x, (int)floor(y - GetHeight()), z) == E_BLOCK_NETHER_PORTAL)
+				(Area.GetBlockType(x, (int)floor(y + a_EntityHeight), z) == E_BLOCK_NETHER_PORTAL) ||
+				(Area.GetBlockType(x, (int)floor(y - a_EntityHeight), z) == E_BLOCK_NETHER_PORTAL)
 			)
 			)
 		{
-			TeleportToCoords(x, y, z);
+			class cTeleportEntityToPortalCallback : public cEntityCallback
+			{
+			public:
+				cTeleportEntityToPortalCallback(int a_X, int a_Y, int a_Z) :
+					m_X(a_X),
+					m_Y(a_Y),
+					m_Z(a_Z)
+				{}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					a_Entity->TeleportToCoords(m_X, m_Y, m_Z);
+					return true;
+				}
+
+			private:
+				int m_X, m_Y, m_Z;
+			};
+
+			cTeleportEntityToPortalCallback TETPC(x, y, z);
+			a_World.DoWithEntityByID(a_UniqueIDToTeleport, TETPC);
 			return;
 		}
 	}
 
-	int MinX = std::max(a_BlockX - (int)ceil(GetWidth()), a_BlockX - 2), MaxX = std::max(a_BlockX + (int)ceil(GetWidth()), a_BlockX + 1);
-	int MinY = std::max(a_BlockY - (int)ceil(GetHeight()), a_BlockY - 2), MaxY = std::max(a_BlockY + (int)ceil(GetHeight()), a_BlockY + 1);
+	int MinX = std::max(a_BlockX - (int)ceil(a_EntityWidth), a_BlockX - 2), MaxX = std::max(a_BlockX + (int)ceil(a_EntityWidth), a_BlockX + 1);
+	int MinY = std::max(a_BlockY - (int)ceil(a_EntityHeight), a_BlockY - 2), MaxY = std::max(a_BlockY + (int)ceil(a_EntityHeight), a_BlockY + 1);
 
 	for (int y = MinY; y < MaxY + 1; y += MaxY - MinY) for (int x = MinX; x < MaxX + 1; ++x)
 	{
@@ -1187,15 +1250,17 @@ void cEntity::CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ)
 		Area.SetBlockType(x, y, a_BlockZ, E_BLOCK_OBSIDIAN);
 	}
 
-	Area.Write(GetWorld(), MinX, MinY, a_BlockZ);
+	Area.Write(&a_World, MinX, MinY, a_BlockZ);
 }
 
 
 
 
 
-bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
+bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_ShouldSendRespawn)
 {
+	UNUSED(a_ShouldSendRespawn);
+
 	cWorld * World;
 	if (a_World == NULL)
 	{
@@ -1213,6 +1278,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 
 	if (GetWorld() == World)
 	{
+		// Don't move to same world
 		return false;
 	}
 
@@ -1220,8 +1286,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World)
 	GetWorld()->RemoveEntity(this);
 	GetWorld()->BroadcastDestroyEntity(*this);
 
-	// Add to all the necessary parts of the new world
-	SetWorld(World);
+	// Queue add to new world
 	World->AddEntity(this);
 
 	return true;

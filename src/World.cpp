@@ -2416,7 +2416,6 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
-
 	m_ChunkMap->RemoveEntity(a_Player);
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
@@ -2424,7 +2423,7 @@ void cWorld::RemovePlayer(cPlayer * a_Player)
 	}
 	{
 		cCSLock Lock(m_CSPlayers);
-		LOGD("Removing player \"%s\" from world \"%s\".", a_Player->GetName().c_str(), m_WorldName.c_str());
+		LOGD("Removing player %s from world \"%s\".", a_Player->GetName().c_str(), m_WorldName.c_str());
 		m_Players.remove(a_Player);
 	}
 	
@@ -3213,7 +3212,8 @@ void cWorld::AddQueuedPlayers(void)
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
 			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
-
+			
+			LOGD("Adding player %s to world \"%s\".", (*itr)->GetName().c_str(), m_WorldName.c_str());
 			m_Players.push_back(*itr);
 			(*itr)->SetWorld(this);
 
@@ -3242,6 +3242,9 @@ void cWorld::AddQueuedPlayers(void)
 		if (Client != NULL)
 		{
 			Client->StreamChunks();
+			Client->SendPlayerMoveLook();
+			Client->SendHealth();
+			Client->SendWholeInventory(*(*itr)->GetWindow());
 		}
 	}  // for itr - PlayersToAdd[]
 }

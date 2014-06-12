@@ -555,10 +555,10 @@ void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a
 
 
 
-void cProtocolRecognizer::SendRespawn(const cWorld & a_World)
+void cProtocolRecognizer::SendRespawn(eDimension a_Dimension)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendRespawn(a_World);
+	m_Protocol->SendRespawn(a_Dimension);
 }
 
 

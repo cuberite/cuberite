@@ -338,7 +338,7 @@ public:
 	virtual void OnFinishedBurning(void);
 
 	/** Creates exit portal at given coordinates */
-	void CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ);
+	static void CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ, double a_EntityWidth, double a_EntityHeight, cWorld & a_World, int a_UniqueIDToTeleport);
 	
 	// tolua_begin
 	
@@ -374,7 +374,7 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Moves entity to specified world */
-	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL);
+	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL, bool a_ShouldSendRespawn = true);
 	
 	// tolua_end
 	
@@ -510,6 +510,12 @@ protected:
 	/** Air level of a mobile */
 	int m_AirLevel;
 	int m_AirTickTimer;
+
+	/** Portal delay timer and cooldown boolean
+	First value is to delay sending the repsawn packet (which triggers the Entering the {Dimension} screen).
+	Second value is to prevent a teleportation loop by ensuring we do not reenter a portal that we came out of.
+	*/
+	std::pair<unsigned short, bool> m_PortalCooldownData;
 	
 private:
 	/** Measured in degrees, [-180, +180) */

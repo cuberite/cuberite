@@ -85,7 +85,8 @@ cChunk::cChunk(
 	m_NeighborZM(a_NeighborZM),
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
-	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
+	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
+	m_EntityTickIteratorData(std::make_pair(false, &m_Entities.end()))
 {
 	if (a_NeighborXM != NULL)
 	{
@@ -576,26 +577,38 @@ void cChunk::Tick(float a_Dt)
 	}
 	
 	// Tick all entities in this chunk (except mobs):
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	m_EntityTickIteratorData.first = true;
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
-		// Mobs are tickes inside MobTick (as we don't have to tick them if they are far away from players)
+		// Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		// Don't tick things queued to be removed
-		if (
-			!((*itr)->IsMob()) &&
-			(std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID()) == m_EntitiesToRemove.end())
-		)
+		if (!((*itr)->IsMob()))
 		{
+			m_EntityTickIteratorData.second = &itr;
 			(*itr)->Tick(a_Dt, *this);
+
+			if (itr != *m_EntityTickIteratorData.second)
+			{
+				itr = *m_EntityTickIteratorData.second;
+			}
+			else
+			{
+				++itr;
+			}
+			continue;
 		}
+		++itr;
 	}  // for itr - m_Entitites[]
+	m_EntityTickIteratorData.first = false;
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
-		std::vector<int>::iterator itr2 = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), (*itr)->GetUniqueID());
-		if (itr2 != m_EntitiesToRemove.end())
+		if ((*itr)->IsDestroyed()) // Remove all entities that were scheduled for removal:
 		{
+			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+			cEntity * ToDelete = *itr;
 			itr = m_Entities.erase(itr);
-			m_EntitiesToRemove.erase(itr2);
+			delete ToDelete;
 		}
 		else if ( // If any entity moved out of the chunk, move it to the neighbor:
 			((*itr)->GetChunkX() != m_PosX) ||
@@ -607,17 +620,7 @@ void cChunk::Tick(float a_Dt)
 		}
 		else
 		{
-			if ((*itr)->IsDestroyed()) // Remove all entities that were scheduled for removal:
-			{
-				LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
-				cEntity * ToDelete = *itr;
-				itr = m_Entities.erase(itr);
-				delete ToDelete;
-			}
-			else
-			{
-				++itr;
-			}
+			++itr;
 		}
 	}  // for itr - m_Entitites[]
 	
@@ -1860,20 +1863,7 @@ void cChunk::AddEntity(cEntity * a_Entity)
 		MarkDirty();
 	}
 
-	if (std::find(m_Entities.begin(), m_Entities.end(), a_Entity) != m_Entities.end())
-	{
-		// Not there already
-		std::vector<int>::iterator itr = std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), a_Entity->GetUniqueID());
-		if (itr != m_EntitiesToRemove.end())
-		{
-			m_EntitiesToRemove.erase(itr);
-			return;
-		}
-		else
-		{
-			ASSERT(!"Entity already present when AddEntity was called!");
-		}
-	}
+	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());
 
 	m_Entities.push_back(a_Entity);
 }
@@ -1884,7 +1874,14 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
-	m_EntitiesToRemove.push_back(a_Entity->GetUniqueID());
+	if (m_EntityTickIteratorData.first)
+	{
+		*m_EntityTickIteratorData.second = m_Entities.erase(*m_EntityTickIteratorData.second);
+	}
+	else
+	{
+		m_Entities.remove(a_Entity);
+	}
 
 	// Mark as dirty if it was a server-generated entity:
 	if (!a_Entity->IsPlayer())
@@ -1899,11 +1896,6 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 bool cChunk::HasEntity(int a_EntityID)
 {
-	if (std::find(m_EntitiesToRemove.begin(), m_EntitiesToRemove.end(), a_EntityID) != m_EntitiesToRemove.end())
-	{
-		return false; // If EntitiesToRemove contains our ID, this chunk doesn't have it, as it should be removed soon
-	}
-
 	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_EntityID)
