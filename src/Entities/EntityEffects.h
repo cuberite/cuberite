@@ -35,8 +35,11 @@ public:
 		effSaturation     = 23,
 	} ;
 	
-	/** The duration of the effect */
+	/** How many ticks this effect has been active for */
 	int m_Ticks;
+	
+	/** Returns the duration of the effect */
+	int GetDuration() { return m_Duration; }
 	
 	/** Returns how strong the effect will be applied */
 	short GetIntensity() { return m_Intensity; }
@@ -47,6 +50,7 @@ public:
 	/** Returns the distance modifier for affecting potency */
 	double GetDistanceModifier() { return m_DistanceModifier; }
 	
+	void SetDuration(int a_Duration)                    { m_Duration         = a_Duration;         }
 	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
 	void SetUser(cPawn *a_User)                         { m_User             = a_User;             }
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
@@ -58,14 +62,17 @@ public:
 	
 	/**
 	 *  An entity effect
-	 *  @param a_Ticks            The duration of the effect
+	 *  @param a_Duration         How long this effect will last
 	 *  @param a_Intensity        How strong the effect will be applied
 	 *  @param a_User             The pawn that used this entity effect
 	 *  @param a_DistanceModifier The distance modifier for affecting potency, defaults to 1
 	 */
-	cEntityEffect(int a_Ticks, short a_Intensity, cPawn *a_User, double a_DistanceModifier = 1);
+	cEntityEffect(int a_Duration, short a_Intensity, cPawn *a_User, double a_DistanceModifier = 1);
 	
 private:
+	/** How long this effect will last */
+	int m_Duration;
+	
 	/** How strong the effect will be applied */
 	short m_Intensity;
 	

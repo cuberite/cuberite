@@ -30,14 +30,14 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 		// Apply entity effect
 		HandleEntityEffect(effect_type, effect_values);
 		
-		// Reduce the effect's duration
-		effect_values.m_Ticks--;
+		// Increase the effect's tick counter
+		effect_values.m_Ticks++;
 		
 		// Iterates (must be called before any possible erasure)
 		++iter;
 		
 		// Remove effect if duration has elapsed
-		if (effect_values.m_Ticks <= 0)
+		if (effect_values.GetDuration() - effect_values.m_Ticks <= 0)
 		{
 			RemoveEntityEffect(effect_type);
 		}
@@ -68,8 +68,9 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_E
 		return;
 	}
 	
+	a_Effect.SetDuration(a_Effect.GetDuration() * a_Effect.GetDistanceModifier());
 	m_EntityEffects[a_EffectType] = a_Effect;
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.m_Ticks * a_Effect.GetDistanceModifier());
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.GetDuration());
 }
 
 
@@ -143,12 +144,9 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
 			int frequency = std::floor(50.0 / (double)(a_Effect.GetIntensity() + 1));
 			
-			// TODO: The counter needs to be specific to one cPawn, make it a member variable.
-			static short counter = 0;
-			if (++counter >= frequency)
+			if (a_Effect.m_Ticks % frequency == 0)
 			{
 				Heal(1);
-				counter = 0;
 			}
 			
 			return;
@@ -158,16 +156,13 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
 			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
 			
-			// TODO: The counter needs to be specific to one cPawn, make it a member variable.
-			static short counter = 0;
-			if (++counter >= frequency)
+			if (a_Effect.m_Ticks % frequency == 0)
 			{
 				// Cannot take poison damage when health is at 1
 				if (GetHealth() > 1)
 				{
 					TakeDamage(dtPoisoning, a_Effect.GetUser(), 1, 0);
 				}
-				counter = 0;
 			}
 			
 			return;
@@ -177,12 +172,9 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			// Poison frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
 			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
 			
-			// TODO: The counter needs to be specific to one cPawn, make it a member variable.
-			static short counter = 0;
-			if (++counter >= frequency)
+			if (a_Effect.m_Ticks % frequency == 0)
 			{
 				TakeDamage(dtWither, a_Effect.GetUser(), 1, 0);
-				counter = 0;
 			}
 			//TODO: "<Player> withered away>
 			return;

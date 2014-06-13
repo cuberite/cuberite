@@ -8,6 +8,7 @@
 
 cEntityEffect::cEntityEffect():
 	m_Ticks(0),
+	m_Duration(0),
 	m_Intensity(0),
 	m_User(NULL),
 	m_DistanceModifier(1)
@@ -19,8 +20,9 @@ cEntityEffect::cEntityEffect():
 
 
 
-cEntityEffect::cEntityEffect(int a_Ticks, short a_Intensity, cPawn *a_User, double a_DistanceModifier):
-	m_Ticks(a_Ticks),
+cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, cPawn *a_User, double a_DistanceModifier):
+	m_Ticks(0),
+	m_Duration(a_Duration),
 	m_Intensity(a_Intensity),
 	m_User(a_User),
 	m_DistanceModifier(a_DistanceModifier)
