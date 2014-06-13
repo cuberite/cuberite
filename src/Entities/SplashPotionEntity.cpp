@@ -79,7 +79,7 @@ bool cSplashPotionEntity::cSplashPotionCallback::Item(cEntity * a_Entity)
 		}
 		
 		m_EntityEffect.SetDistanceModifier(Reduction);
-		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect);
+		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.m_Ticks, m_EntityEffect.GetIntensity(), m_EntityEffect.GetCreator(), Reduction);
 	}
 	return false;
 }

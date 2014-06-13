@@ -62,19 +62,10 @@ void cPawn::KilledBy(cEntity * a_Killer)
 
 
 
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, cPawn * a_User, double a_DistanceModifier)
-{
-	AddEntityEffect(a_EffectType, cEntityEffect(a_EffectDurationTicks, a_EffectIntensity, a_User, a_DistanceModifier));
-}
-
-
-
-
-
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, cPawn * a_Creator, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
-	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Effect.GetDuration(), a_Effect.GetIntensity(), a_Effect.GetUser(), a_Effect.GetDistanceModifier()))
+	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_Creator, a_DistanceModifier))
 	{
 		// A plugin disallows the addition, bail out.
 		return;
@@ -86,9 +77,9 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_E
 		return;
 	}
 	
-	a_Effect.SetDuration(a_Effect.GetDuration() * a_Effect.GetDistanceModifier());
-	m_EntityEffects[a_EffectType] = a_Effect;
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.GetDuration());
+	int EffectDuration = (int)(a_EffectDurationTicks * a_DistanceModifier);
+	m_EntityEffects[a_EffectType] = cEntityEffect(EffectDuration, a_EffectIntensity, a_Creator, a_DistanceModifier);
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_EffectIntensity, EffectDuration);
 }
 
 
@@ -140,7 +131,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 		{
 			// Base damage = 6, doubles for every increase in intensity
 			int damage = (int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
-			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage, 0);
+			TakeDamage(dtPotionOfHarming, a_Effect.GetCreator(), damage, 0);
 			return;
 		}
 		case cEntityEffect::effStrength:
@@ -179,7 +170,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 				// Cannot take poison damage when health is at 1
 				if (GetHealth() > 1)
 				{
-					TakeDamage(dtPoisoning, a_Effect.GetUser(), 1, 0);
+					TakeDamage(dtPoisoning, a_Effect.GetCreator(), 1, 0);
 				}
 			}
 			
@@ -192,7 +183,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			
 			if (a_Effect.m_Ticks % frequency == 0)
 			{
-				TakeDamage(dtWither, a_Effect.GetUser(), 1, 0);
+				TakeDamage(dtWither, a_Effect.GetCreator(), 1, 0);
 			}
 			//TODO: "<Player> withered away>
 			return;

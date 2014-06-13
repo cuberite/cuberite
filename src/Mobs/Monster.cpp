@@ -470,7 +470,7 @@ void cMonster::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffe
 			// Undead mobs are damaged by instant health
 			// Base damage = 6, doubles for every increase in intensity
 			int damage = (int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
-			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage, 0);
+			TakeDamage(dtPotionOfHarming, a_Effect.GetCreator(), damage, 0);
 			return;
 		}
 	}

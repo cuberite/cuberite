@@ -46,14 +46,14 @@ public:
 	short GetIntensity() { return m_Intensity; }
 	
 	/** Returns the pawn that produced this entity effect */
-	cPawn *GetUser() { return m_User; }
+	cPawn *GetCreator() { return m_Creator; }
 	
 	/** Returns the distance modifier for affecting potency */
 	double GetDistanceModifier() { return m_DistanceModifier; }
 	
 	void SetDuration(int a_Duration)                    { m_Duration         = a_Duration;         }
 	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
-	void SetUser(cPawn * a_User)                        { m_User             = a_User;             }
+	void SetCreator(cPawn * a_Creator)                  { m_Creator          = a_Creator;          }
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 	
 	/** Creates an empty entity effect */
@@ -62,9 +62,9 @@ public:
 	/** Creates an entity effect of the specified type
 	@param a_Duration         How long this effect will last, in ticks
 	@param a_Intensity        How strong the effect will be applied
-	@param a_User             The pawn that produced this entity effect
+	@param a_Creator          The pawn that produced this entity effect
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
-	cEntityEffect(int a_Duration, short a_Intensity, cPawn * a_User, double a_DistanceModifier = 1);
+	cEntityEffect(int a_Duration, short a_Intensity, cPawn * a_Creator, double a_DistanceModifier = 1);
 	
 private:
 	/** How long this effect will last, in ticks */
@@ -74,7 +74,7 @@ private:
 	short m_Intensity;
 	
 	/** The pawn that produced this entity effect (threw the potion, etc) */
-	cPawn *m_User;
+	cPawn *m_Creator;
 	
 	/** The distance modifier for affecting potency */
 	double m_DistanceModifier;
