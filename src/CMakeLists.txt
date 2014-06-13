@@ -8,6 +8,91 @@ include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
 
+set(BINDING_DEPENDECIES
+	tolua
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
+	Bindings/LuaFunctions.h
+	Bindings/LuaWindow.h
+	Bindings/Plugin.h
+	Bindings/PluginLua.h
+	Bindings/PluginManager.h
+	Bindings/WebPlugin.h
+	BiomeDef.h
+	BlockArea.h
+	BlockEntities/BlockEntity.h
+	BlockEntities/BlockEntityWithItems.h
+	BlockEntities/ChestEntity.h
+	BlockEntities/DispenserEntity.h
+	BlockEntities/DropSpenserEntity.h
+	BlockEntities/DropperEntity.h
+	BlockEntities/FurnaceEntity.h
+	BlockEntities/HopperEntity.h
+	BlockEntities/JukeboxEntity.h
+	BlockEntities/NoteEntity.h
+	BlockEntities/SignEntity.h
+	BlockEntities/MobHeadEntity.h
+	BlockEntities/FlowerPotEntity.h
+	BlockID.h
+	BoundingBox.h
+	ChatColor.h
+	ChunkDef.h
+	ClientHandle.h
+	CraftingRecipes.h
+	Cuboid.h
+	Defines.h
+	Enchantments.h
+	Entities/Effects.h
+	Entities/Entity.h
+	Entities/Floater.h
+	Entities/Pawn.h
+	Entities/Painting.h
+	Entities/Pickup.h
+	Entities/Player.h
+	Entities/ProjectileEntity.h
+	Entities/ArrowEntity.h
+	Entities/ThrownEggEntity.h
+	Entities/ThrownEnderPearlEntity.h
+	Entities/ExpBottleEntity.h
+	Entities/ThrownSnowballEntity.h
+	Entities/FireChargeEntity.h
+	Entities/FireworkEntity.h
+	Entities/GhastFireballEntity.h
+	Entities/TNTEntity.h
+	Entities/ExpOrb.h
+	Entities/HangingEntity.h
+	Entities/ItemFrame.h
+	Generating/ChunkDesc.h
+	Group.h
+	Inventory.h
+	Item.h
+	ItemGrid.h
+	Mobs/Monster.h
+	OSSupport/File.h
+	Root.h
+	Server.h
+	StringUtils.h
+	Tracer.h
+	UI/Window.h
+	Vector3.h
+	WebAdmin.h
+	World.h
+)
+
+include_directories(Bindings)
+include_directories(.)
+
+ADD_CUSTOM_COMMAND(
+	# add any new generated bindings here
+	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+
+	# command execuded to regerate bindings
+	COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+
+	# add any new generation dependencies here
+	DEPENDS ${BINDING_DEPENDECIES}
+)
 
 if (NOT MSVC)
 
@@ -15,91 +100,7 @@ if (NOT MSVC)
 	
 	# lib dependencies are not included
 	
-	set(BINDING_DEPENDECIES
-		tolua
-		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
-		${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
-		Bindings/LuaFunctions.h
-		Bindings/LuaWindow.h
-		Bindings/Plugin.h
-		Bindings/PluginLua.h
-		Bindings/PluginManager.h
-		Bindings/WebPlugin.h
-		BiomeDef.h
-		BlockArea.h
-		BlockEntities/BlockEntity.h
-		BlockEntities/BlockEntityWithItems.h
-		BlockEntities/ChestEntity.h
-		BlockEntities/DispenserEntity.h
-		BlockEntities/DropSpenserEntity.h
-		BlockEntities/DropperEntity.h
-		BlockEntities/FurnaceEntity.h
-		BlockEntities/HopperEntity.h
-		BlockEntities/JukeboxEntity.h
-		BlockEntities/NoteEntity.h
-		BlockEntities/SignEntity.h
-		BlockEntities/MobHeadEntity.h
-		BlockEntities/FlowerPotEntity.h
-		BlockID.h
-		BoundingBox.h
-		ChatColor.h
-		ChunkDef.h
-		ClientHandle.h
-		CraftingRecipes.h
-		Cuboid.h
-		Defines.h
-		Enchantments.h
-		Entities/Effects.h
-		Entities/Entity.h
-		Entities/Floater.h
-		Entities/Pawn.h
-		Entities/Painting.h
-		Entities/Pickup.h
-		Entities/Player.h
-		Entities/ProjectileEntity.h
-		Entities/ArrowEntity.h
-		Entities/ThrownEggEntity.h
-		Entities/ThrownEnderPearlEntity.h
-		Entities/ExpBottleEntity.h
-		Entities/ThrownSnowballEntity.h
-		Entities/FireChargeEntity.h
-		Entities/FireworkEntity.h
-		Entities/GhastFireballEntity.h
-		Entities/TNTEntity.h
-		Entities/ExpOrb.h
-		Entities/HangingEntity.h
-		Entities/ItemFrame.h
-		Generating/ChunkDesc.h
-		Group.h
-		Inventory.h
-		Item.h
-		ItemGrid.h
-		Mobs/Monster.h
-		OSSupport/File.h
-		Root.h
-		Server.h
-		StringUtils.h
-		Tracer.h
-		UI/Window.h
-		Vector3.h
-		WebAdmin.h
-		World.h
-	)
 	
-	include_directories(Bindings)
-	include_directories(.)
-	
-	ADD_CUSTOM_COMMAND(
-		# add any new generated bindings here
-		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
-	
-		# command execuded to regerate bindings
-		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
-	
-		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDECIES}
-	)
 	#add cpp files here
 	add_library(Bindings
 		Bindings/Bindings
