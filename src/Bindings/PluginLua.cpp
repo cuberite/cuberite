@@ -420,6 +420,26 @@ bool cPluginLua::OnDisconnect(cClientHandle & a_Client, const AString & a_Reason
 
 
 
+bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, cEntity * a_Originator, double a_DistanceModifier)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_ADD_EFFECT];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_Originator, a_DistanceModifier, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1507,6 +1527,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:           return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
 		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
+		case cPluginManager::HOOK_ENTITY_ADD_EFFECT:            return "OnEntityAddEffect";
 		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";

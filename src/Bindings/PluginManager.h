@@ -73,6 +73,7 @@ public:																	// tolua_export
 		HOOK_CRAFTING_NO_RECIPE,
 		HOOK_DISCONNECT,
 		HOOK_PLAYER_ANIMATION,
+		HOOK_ENTITY_ADD_EFFECT,
 		HOOK_EXECUTE_COMMAND,
 		HOOK_EXPLODED,
 		HOOK_EXPLODING,
@@ -173,6 +174,7 @@ public:																	// tolua_export
 	bool CallHookCollectingPickup         (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
+	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, cEntity * a_Originator, double a_DistanceModifier);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);

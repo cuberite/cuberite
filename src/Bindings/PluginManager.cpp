@@ -448,6 +448,27 @@ bool cPluginManager::CallHookDisconnect(cClientHandle & a_Client, const AString 
 
 
 
+bool cPluginManager::CallHookEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, cEntity * a_Originator, double a_DistanceModifier)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_ENTITY_ADD_EFFECT);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityAddEffect(a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_Originator, a_DistanceModifier))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);

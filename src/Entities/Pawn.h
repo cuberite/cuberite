@@ -26,6 +26,7 @@ public:
 	// tolua_begin
 	
 	/** Applies an entity effect
+	Checks with plugins if they allow the addition.
 	@param a_EffectType          The entity effect to apply
 	@param a_EffectDurationTicks The duration of the effect
 	@param a_EffectIntensity     The level of the effect (0 = Potion I, 1 = Potion II, etc)
@@ -35,6 +36,7 @@ public:
 	void AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, cPawn * a_User, double a_DistanceModifier = 1);
 	
 	/** Applies an entity effect
+	Checks with plugins if they allow the addition.
 	@param a_EffectType The entity effect to apply
 	@param a_Effect     The parameters of the effect
 	*/

@@ -3,6 +3,7 @@
 
 #include "Pawn.h"
 #include "../World.h"
+#include "../Bindings/PluginManager.h"
 
 
 
@@ -72,6 +73,14 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurat
 
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
+	// Check if the plugins allow the addition:
+	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Effect.GetDuration(), a_Effect.GetIntensity(), a_Effect.GetUser(), a_Effect.GetDistanceModifier()))
+	{
+		// A plugin disallows the addition, bail out.
+		return;
+	}
+	
+	// No need to add empty effects:
 	if (a_EffectType == cEntityEffect::effNoEffect)
 	{
 		return;
