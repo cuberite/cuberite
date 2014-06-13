@@ -114,14 +114,14 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 		case cEntityEffect::effInstantHealth:
 		{
 			// Base heal = 6, doubles for every increase in intensity
-			Heal(6 * std::pow(2, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
+			Heal((int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier()));
 			return;
 		}
 		case cEntityEffect::effInstantDamage:
 		{
 			// Base damage = 6, doubles for every increase in intensity
-			int damage = 6 * std::pow(2, a_Effect.GetIntensity());
-			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage * a_Effect.GetDistanceModifier(), 0);
+			int damage = (int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
+			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage, 0);
 			return;
 		}
 		case cEntityEffect::effStrength:
@@ -132,7 +132,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 		case cEntityEffect::effWeakness:
 		{
 			// Damage reduction = 0.5 damage, multiplied by potion level (Weakness II = 1 damage)
-			//double dmg_reduc = 0.5 * (a_Effect.GetIntensity() + 1);
+			// double dmg_reduc = 0.5 * (a_Effect.GetIntensity() + 1);
 			
 			// TODO: Implement me!
 			// TODO: Weakened villager zombies can be turned back to villagers with the god apple
@@ -143,6 +143,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
 			int frequency = std::floor(50.0 / (double)(a_Effect.GetIntensity() + 1));
 			
+			// TODO: The counter needs to be specific to one cPawn, make it a member variable.
 			static short counter = 0;
 			if (++counter >= frequency)
 			{
@@ -157,6 +158,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
 			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
 			
+			// TODO: The counter needs to be specific to one cPawn, make it a member variable.
 			static short counter = 0;
 			if (++counter >= frequency)
 			{
@@ -175,6 +177,7 @@ void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect 
 			// Poison frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
 			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
 			
+			// TODO: The counter needs to be specific to one cPawn, make it a member variable.
 			static short counter = 0;
 			if (++counter >= frequency)
 			{

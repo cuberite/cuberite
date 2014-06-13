@@ -57,7 +57,7 @@ class cItemPotionHandler:
 	{
 		// Base duration in ticks
 		int base = 0;
-		double tier_multi = 1, ext_multi = 1, splash_multi = 1;
+		double TierCoeff = 1, ExtCoeff = 1, SplashCoeff = 1;
 		
 		switch (GetEntityEffectType(a_ItemDamage))
 		{
@@ -88,20 +88,20 @@ class cItemPotionHandler:
 		}
 		
 		// If potion is level 2, half the duration. If not, stays the same
-		tier_multi   = GetEntityEffectIntensity(a_ItemDamage) > 0 ? 0.5       : 1;
+		TierCoeff = (GetEntityEffectIntensity(a_ItemDamage) > 0) ? 0.5 : 1;
 		
 		// If potion is extended, multiply duration by 8/3. If not, stays the same
 		// Extended potion if sixth bit is set
-		ext_multi    = a_ItemDamage & 64                          ? (8.0/3.0) : 1;
+		ExtCoeff = (a_ItemDamage & 64) ? (8.0/3.0) : 1;
 		
 		// If potion is splash potion, multiply duration by 3/4. If not, stays the same
-		splash_multi = !IsDrinkable(a_ItemDamage)                 ? 0.75      : 1;
+		SplashCoeff = IsDrinkable(a_ItemDamage) ? 1 : 0.75;
 		
 		// For reference: http://minecraft.gamepedia.com/Data_values#.22Tier.22_bit
 		//                http://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
 		//                http://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
 		
-		return base * tier_multi * ext_multi * splash_multi;
+		return (int)(base * TierCoeff * ExtCoeff * SplashCoeff);
 	}
 	
 public:
@@ -114,7 +114,7 @@ public:
 	{
 		// Drinkable potion if 13th bit is set
 		// For reference: http://minecraft.gamepedia.com/Potions#Data_value_table
-		return a_ItemDamage & 8192;
+		return ((a_ItemDamage & 8192) != 0);
 	}
 	
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
@@ -128,7 +128,7 @@ public:
 		{
 			return false;
 		}
-		if (!Projectile->Initialize(a_World))
+		if (!Projectile->Initialize(*a_World))
 		{
 			delete Projectile;
 			return false;

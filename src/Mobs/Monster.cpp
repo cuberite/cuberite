@@ -459,7 +459,7 @@ void cMonster::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffe
 			
 			// Undead mobs are healed by instant damage
 			// Base heal = 6, doubles for every increase in intensity
-			Heal(6 * std::pow(2, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
+			Heal((int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier()));
 			return;
 		}
 		case cEntityEffect::effInstantHealth:
@@ -469,8 +469,8 @@ void cMonster::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffe
 			
 			// Undead mobs are damaged by instant health
 			// Base damage = 6, doubles for every increase in intensity
-			int damage = 6 * std::pow(2, a_Effect.GetIntensity());
-			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage * a_Effect.GetDistanceModifier(), 0);
+			int damage = (int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
+			TakeDamage(dtPotionOfHarming, a_Effect.GetUser(), damage, 0);
 			return;
 		}
 	}
