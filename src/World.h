@@ -47,7 +47,6 @@ class cFlowerPotEntity;
 class cFurnaceEntity;
 class cNoteEntity;
 class cMobHeadEntity;
-class cMobCensus;
 class cCompositeChat;
 class cCuboid;
 
