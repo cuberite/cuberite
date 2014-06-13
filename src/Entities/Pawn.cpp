@@ -8,9 +8,9 @@
 
 
 
-cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height)
-	: cEntity(a_EntityType, 0, 0, 0, a_Width, a_Height)
-	, m_EntityEffects(tEffectMap())
+cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height):
+	super(a_EntityType, 0, 0, 0, a_Width, a_Height),
+	m_EntityEffects(tEffectMap())
 {
 }
 
@@ -24,22 +24,22 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)
 	{
 		// Copies values to prevent pesky wrong accesses and erasures
-		cEntityEffect::eType effect_type = iter->first;
-		cEntityEffect &effect_values = iter->second;
+		cEntityEffect::eType EffectType = iter->first;
+		cEntityEffect & EffectValues = iter->second;
 		
 		// Apply entity effect
-		HandleEntityEffect(effect_type, effect_values);
+		HandleEntityEffect(EffectType, EffectValues);
 		
-		// Increase the effect's tick counter
-		effect_values.m_Ticks++;
+		// Reduce the effect's duration
+		EffectValues.m_Ticks++;
 		
 		// Iterates (must be called before any possible erasure)
 		++iter;
 		
 		// Remove effect if duration has elapsed
-		if (effect_values.GetDuration() - effect_values.m_Ticks <= 0)
+		if (EffectValues.GetDuration() - EffectValues.m_Ticks <= 0)
 		{
-			RemoveEntityEffect(effect_type);
+			RemoveEntityEffect(EffectType);
 		}
 		
 		// TODO: Check for discrepancies between client and server effect values
@@ -52,7 +52,7 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cPawn::KilledBy(cEntity *a_Killer)
+void cPawn::KilledBy(cEntity * a_Killer)
 {
 	ClearEntityEffects();
 }
@@ -61,16 +61,15 @@ void cPawn::KilledBy(cEntity *a_Killer)
 
 
 
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, double a_DistanceModifier)
 {
 	if (a_EffectType == cEntityEffect::effNoEffect)
 	{
 		return;
 	}
 	
-	a_Effect.SetDuration(a_Effect.GetDuration() * a_Effect.GetDistanceModifier());
-	m_EntityEffects[a_EffectType] = a_Effect;
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.GetDuration());
+	m_EntityEffects[a_EffectType] = cEntityEffect(a_EffectDurationTicks, a_EffectIntensity, this, a_DistanceModifier);
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_EffectIntensity, (short)(a_EffectDurationTicks * a_DistanceModifier));
 }
 
 
@@ -93,13 +92,13 @@ void cPawn::ClearEntityEffects()
 	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)
 	{
 		// Copy values to prevent pesky wrong erasures
-		cEntityEffect::eType effect_type = iter->first;
+		cEntityEffect::eType EffectType = iter->first;
 		
 		// Iterates (must be called before any possible erasure)
 		++iter;
 		
 		// Remove effect
-		RemoveEntityEffect(effect_type);
+		RemoveEntityEffect(EffectType);
 	}
 }
 

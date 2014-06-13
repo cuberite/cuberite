@@ -24,19 +24,21 @@ public:
 	virtual void KilledBy(cEntity * a_Killer) override;
 	
 	// tolua_begin
+	
 	/** Applies an entity effect
-	 *  @param a_EffectType The entity effect to apply
-	 *  @param a_Effect     The parameters of the effect
-	 */
-	void AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect);
+	@param a_EffectType The entity effect to apply
+	@param a_Effect     The parameters of the effect
+	*/
+	void AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, double a_DistanceModifier = 1);
 	
 	/** Removes a currently applied entity effect
-	 *  @param a_EffectType The entity effect to remove
-	 */
+	@param a_EffectType The entity effect to remove
+	*/
 	void RemoveEntityEffect(cEntityEffect::eType a_EffectType);
 	
 	/** Removes all currently applied entity effects (used when drinking milk) */
-	void ClearEntityEffects();
+	void ClearEntityEffects(void);
+	
 	// tolua_end
 
 protected:

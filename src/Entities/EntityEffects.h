@@ -3,7 +3,8 @@
 class cPawn;
 
 // tolua_begin
-class cEntityEffect {
+class cEntityEffect
+{
 public:
 	
 	/** All types of entity effects (numbers correspond to IDs) */
@@ -52,25 +53,21 @@ public:
 	
 	void SetDuration(int a_Duration)                    { m_Duration         = a_Duration;         }
 	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
-	void SetUser(cPawn *a_User)                         { m_User             = a_User;             }
+	void SetUser(cPawn * a_User)                        { m_User             = a_User;             }
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 	
-	/**
-	 *  An empty entity effect
-	 */
-	cEntityEffect();
+	/** Creates an empty entity effect */
+	cEntityEffect(void);
 	
-	/**
-	 *  An entity effect
-	 *  @param a_Duration         How long this effect will last
-	 *  @param a_Intensity        How strong the effect will be applied
-	 *  @param a_User             The pawn that used this entity effect
-	 *  @param a_DistanceModifier The distance modifier for affecting potency, defaults to 1
-	 */
-	cEntityEffect(int a_Duration, short a_Intensity, cPawn *a_User, double a_DistanceModifier = 1);
+	/** Creates an entity effect of the specified type
+	@param a_Duration         How long this effect will last, in ticks
+	@param a_Intensity        How strong the effect will be applied
+	@param a_User             The pawn that used this entity effect
+	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
+	cEntityEffect(int a_Duration, short a_Intensity, cPawn * a_User, double a_DistanceModifier = 1);
 	
 private:
-	/** How long this effect will last */
+	/** How long this effect will last, in ticks */
 	int m_Duration;
 	
 	/** How strong the effect will be applied */
