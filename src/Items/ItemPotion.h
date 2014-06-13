@@ -146,7 +146,7 @@ public:
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
 	{
 		// Called when potion is a drinkable potion
-		a_Player->AddEntityEffect(GetEntityEffectType(a_Item->m_ItemDamage), GetEntityEffectDuration(a_Item->m_ItemDamage), GetEntityEffectIntensity(a_Item->m_ItemDamage));
+		a_Player->AddEntityEffect(GetEntityEffectType(a_Item->m_ItemDamage), GetEntityEffectDuration(a_Item->m_ItemDamage), GetEntityEffectIntensity(a_Item->m_ItemDamage), a_Player);
 		a_Player->GetInventory().RemoveOneEquippedItem();
 		a_Player->GetInventory().AddItem(E_ITEM_GLASS_BOTTLE);
 		return true;

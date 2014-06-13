@@ -61,15 +61,25 @@ void cPawn::KilledBy(cEntity * a_Killer)
 
 
 
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, double a_DistanceModifier)
+void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, cPawn * a_User, double a_DistanceModifier)
+{
+	AddEntityEffect(a_EffectType, cEntityEffect(a_EffectDurationTicks, a_EffectIntensity, a_User, a_DistanceModifier));
+}
+
+
+
+
+
+void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
 	if (a_EffectType == cEntityEffect::effNoEffect)
 	{
 		return;
 	}
 	
-	m_EntityEffects[a_EffectType] = cEntityEffect(a_EffectDurationTicks, a_EffectIntensity, this, a_DistanceModifier);
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_EffectIntensity, (short)(a_EffectDurationTicks * a_DistanceModifier));
+	a_Effect.SetDuration(a_Effect.GetDuration() * a_Effect.GetDistanceModifier());
+	m_EntityEffects[a_EffectType] = a_Effect;
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Effect.GetIntensity(), a_Effect.GetDuration());
 }
 
 

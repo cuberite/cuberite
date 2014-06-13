@@ -34,7 +34,7 @@ void cCaveSpider::Attack(float a_Dt)
 	if (m_Target->IsPawn())
 	{
 		// TODO: Easy = no poison, Medium = 7 seconds, Hard = 15 seconds
-		((cPawn *) m_Target)->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
+		((cPawn *) m_Target)->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0, this);
 	}
 }
 

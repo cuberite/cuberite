@@ -68,7 +68,7 @@ cSplashPotionEntity::cSplashPotionCallback::cSplashPotionCallback(const Vector3d
 bool cSplashPotionEntity::cSplashPotionCallback::Item(cEntity * a_Entity)
 {
 	double SplashDistance = (a_Entity->GetPosition() - m_HitPos).Length();
-	if (SplashDistance < 20)
+	if (SplashDistance < 20 && a_Entity->IsPawn())
 	{
 		// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
 		// TODO: better equation
@@ -78,10 +78,8 @@ bool cSplashPotionEntity::cSplashPotionCallback::Item(cEntity * a_Entity)
 			Reduction = 0;
 		}
 		
-		if (a_Entity->IsPawn())
-		{
-			((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.m_Ticks, m_EntityEffect.GetIntensity(), Reduction);
-		}
+		m_EntityEffect.SetDistanceModifier(Reduction);
+		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect);
 	}
 	return false;
 }

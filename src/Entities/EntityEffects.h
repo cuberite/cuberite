@@ -45,7 +45,7 @@ public:
 	/** Returns how strong the effect will be applied */
 	short GetIntensity() { return m_Intensity; }
 	
-	/** Returns the pawn that used this entity effect */
+	/** Returns the pawn that produced this entity effect */
 	cPawn *GetUser() { return m_User; }
 	
 	/** Returns the distance modifier for affecting potency */
@@ -62,7 +62,7 @@ public:
 	/** Creates an entity effect of the specified type
 	@param a_Duration         How long this effect will last, in ticks
 	@param a_Intensity        How strong the effect will be applied
-	@param a_User             The pawn that used this entity effect
+	@param a_User             The pawn that produced this entity effect
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
 	cEntityEffect(int a_Duration, short a_Intensity, cPawn * a_User, double a_DistanceModifier = 1);
 	
@@ -73,7 +73,7 @@ private:
 	/** How strong the effect will be applied */
 	short m_Intensity;
 	
-	/** The pawn that used this entity effect */
+	/** The pawn that produced this entity effect (threw the potion, etc) */
 	cPawn *m_User;
 	
 	/** The distance modifier for affecting potency */
