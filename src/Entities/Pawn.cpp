@@ -28,7 +28,7 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 		cEntityEffect &effect_values = iter->second;
 		
 		// Apply entity effect
-		HandleEntityEffects(effect_type, effect_values);
+		HandleEntityEffect(effect_type, effect_values);
 		
 		// Reduce the effect's duration
 		effect_values.m_Ticks--;
@@ -106,7 +106,7 @@ void cPawn::ClearEntityEffects()
 
 
 
-void cPawn::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
 	switch (a_EffectType)
 	{

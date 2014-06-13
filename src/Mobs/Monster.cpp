@@ -436,7 +436,7 @@ void cMonster::HandleFalling()
 
 
 
-void cMonster::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+void cMonster::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
 	switch (a_EffectType)
 	{
@@ -475,7 +475,7 @@ void cMonster::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEff
 		}
 	}
 	
-	super::HandleEntityEffects(a_EffectType, a_Effect);
+	super::HandleEntityEffect(a_EffectType, a_Effect);
 }
 
 

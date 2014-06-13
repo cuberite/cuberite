@@ -128,7 +128,7 @@ public:
 		{
 			return false;
 		}
-		if (!Projectile->Initialize(*a_World))
+		if (!Projectile->Initialize(a_World))
 		{
 			delete Projectile;
 			return false;

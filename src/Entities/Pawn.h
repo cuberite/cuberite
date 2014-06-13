@@ -23,6 +23,7 @@ public:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(cEntity * a_Killer) override;
 	
+	// tolua_begin
 	/** Applies an entity effect
 	 *  @param a_EffectType The entity effect to apply
 	 *  @param a_Effect     The parameters of the effect
@@ -36,6 +37,7 @@ public:
 	
 	/** Removes all currently applied entity effects (used when drinking milk) */
 	void ClearEntityEffects();
+	// tolua_end
 
 protected:
 	typedef std::map<cEntityEffect::eType, cEntityEffect> tEffectMap;
@@ -45,7 +47,7 @@ protected:
 	 *  @param a_EffectType The selected entity effect
 	 *  @param a_Effect     The parameters of the selected entity effect
 	 */
-	virtual void HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect);
+	virtual void HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect);
 } ;  // tolua_export
 
 

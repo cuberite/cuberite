@@ -1867,7 +1867,7 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 
 
 
-void cPlayer::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
+void cPlayer::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
 {
 	switch (a_EffectType)
 	{
@@ -1897,7 +1897,7 @@ void cPlayer::HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffe
 		}
 	}
 	
-	super::HandleEntityEffects(a_EffectType, a_Effect);
+	super::HandleEntityEffect(a_EffectType, a_Effect);
 }
 
 

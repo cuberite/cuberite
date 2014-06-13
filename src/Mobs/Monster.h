@@ -225,7 +225,7 @@ protected:
 
 	/* =========================== */
 	
-	virtual void HandleEntityEffects(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect) override;
+	virtual void HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect) override;
 
 	float m_IdleInterval;
 	float m_DestroyTimer;
