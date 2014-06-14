@@ -19,7 +19,7 @@ class cAllocationPool {
 		cAllocationPool(std::auto_ptr<cStarvationCallbacks> a_Callbacks) :
 		m_Callbacks(a_Callbacks)
 		{
-			for(size_t i = 0; i < NumElementsInReserve; i++)
+			for (size_t i = 0; i < NumElementsInReserve; i++)
 			{
 				void * space = malloc(sizeof(T));
 				if (space == NULL)

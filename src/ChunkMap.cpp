@@ -35,7 +35,7 @@
 
 cChunkMap::cChunkMap(cWorld * a_World )
 	: m_World( a_World ),
-	m_Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks>(new cStarvationCallbacks()))
+	m_Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection, 1600>::cStarvationCallbacks>(new cStarvationCallbacks()))
 {
 }
 
