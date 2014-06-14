@@ -13,14 +13,14 @@ public:
 			virtual ~cStarvationCallbacks() {}
 			
 			/** Is called when the reserve buffer starts to be used **/
-			virtual void OnStartingUsingBuffer() = 0;
+			virtual void OnStartUsingReserve() = 0;
 			
 			/** Is called once the reserve buffer has returned to normal size **/
-			virtual void OnStopUsingBuffer() = 0;
+			virtual void OnEndUsingReserve() = 0;
 			
 			/** Is called when the allocation pool is unable to allocate memory. Will be repeatedly
 			called if it does not free sufficient memory **/
-			virtual void OnBufferEmpty() = 0;
+			virtual void OnOutOfReserve() = 0;
 	};
 	
 	virtual ~cAllocationPool() {}
@@ -47,7 +47,7 @@ class cListAllocationPool : public cAllocationPool<T>
 				void * space = malloc(sizeof(T));
 				if (space == NULL)
 				{
-					m_Callbacks->OnStartingUsingBuffer();
+					m_Callbacks->OnStartUsingReserve();
 					break;
 				}
 				m_FreeList.push_front(space);
@@ -74,11 +74,11 @@ class cListAllocationPool : public cAllocationPool<T>
 				}
 				else if (m_FreeList.size() == NumElementsInReserve)
 				{
-					m_Callbacks->OnStartingUsingBuffer();
+					m_Callbacks->OnStartUsingReserve();
 				}
 				else if (m_FreeList.empty())
 				{
-					m_Callbacks->OnBufferEmpty();
+					m_Callbacks->OnOutOfReserve();
 					// Try again until the memory is avalable
 					return Allocate();
 				}
@@ -99,7 +99,7 @@ class cListAllocationPool : public cAllocationPool<T>
 			m_FreeList.push_front(a_ptr);
 			if (m_FreeList.size() == NumElementsInReserve)
 			{
-				m_Callbacks->OnStopUsingBuffer();
+				m_Callbacks->OnEndUsingReserve();
 			}
 		}
 		
