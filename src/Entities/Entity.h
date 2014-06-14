@@ -336,9 +336,6 @@ public:
 	
 	/// Called when the entity finishes burning
 	virtual void OnFinishedBurning(void);
-
-	/** Creates exit portal at given coordinates */
-	static void CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ, double a_EntityWidth, double a_EntityHeight, cWorld & a_World, int a_UniqueIDToTeleport);
 	
 	// tolua_begin
 	

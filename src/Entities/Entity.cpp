@@ -12,7 +12,6 @@
 #include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Player.h"
-#include "BlockArea.h"
 
 
 
@@ -1048,30 +1047,6 @@ void cEntity::DetectPortal()
 		return;
 	}
 
-	class cPortalChunkLoader : public cChunkStay
-	{
-	public:
-		cPortalChunkLoader(cEntity * a_Entity, cWorld & a_World, const Vector3i & a_PortalPos) :
-			m_Entity(a_Entity),
-			m_PortalPos(a_PortalPos),
-			m_World(a_World)
-		{}
-
-	private:
-		virtual bool OnAllChunksAvailable(void) override
-		{
-			cEntity::CreateExitPortal(m_PortalPos.x, m_PortalPos.y, m_PortalPos.z, m_Entity->GetWidth(), m_Entity->GetHeight(), m_World, m_Entity->GetUniqueID());
-			return true;
-		}
-
-		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override {};
-		virtual void OnDisabled(void) override {};
-
-		cEntity * m_Entity;
-		Vector3i m_PortalPos;
-		cWorld & m_World;
-	};
-
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	if ((Y > 0) && (Y < cChunkDef::Height))
 	{
@@ -1115,24 +1090,7 @@ void cEntity::DetectPortal()
 							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
 						}
 						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
-						
-						cChunkStay * Stay = new cPortalChunkLoader(this, *cRoot::Get()->GetWorld(GetWorld()->GetNetherWorldName()), Vector3i(X, Y, Z));
 
-						int MinChunkX, MaxChunkX;
-						int MinChunkZ, MaxChunkZ;
-						cChunkDef::BlockToChunk(X - 128, Z - 128, MinChunkX, MinChunkZ);
-						cChunkDef::BlockToChunk(X + 128, Z + 128, MaxChunkX, MaxChunkZ);
-
-						for (int ChunkX = MinChunkX; ChunkX <= MaxChunkX; ++ChunkX)
-						{
-							for (int ChunkZ = MinChunkZ; ChunkZ <= MaxChunkZ; ++ChunkZ)
-							{
-								LOG("Queue %i %i", ChunkX, ChunkZ);
-								Stay->Add(ChunkX, ChunkZ);
-							}
-						}
-						
-						Stay->Enable(*GetWorld()->GetChunkMap());
 						return;
 					}
 					default: break;
@@ -1193,64 +1151,6 @@ void cEntity::DetectPortal()
 	// Allow portals to work again
 	m_PortalCooldownData.second = false;
 	m_PortalCooldownData.first = 0;
-}
-
-
-
-
-
-void cEntity::CreateExitPortal(int a_BlockX, int a_BlockY, int a_BlockZ, double a_EntityWidth, double a_EntityHeight, cWorld & a_World, int a_UniqueIDToTeleport)
-{
-	cBlockArea Area;
-	Area.Read(&a_World, a_BlockX - 128, a_BlockX + 128, 0, 128, a_BlockZ - 128, a_BlockZ + 128);
-	for (int x = a_BlockX - 128; x <= a_BlockX + 128; ++x) for (int y = 0; y <= 128; ++y) for (int z = a_BlockZ - 128; z <= a_BlockZ + 128; ++z)
-	{
-		if (
-			(Area.GetBlockType(x, y, z) == E_BLOCK_NETHER_PORTAL) &&
-			(
-				(Area.GetBlockType(x, (int)floor(y + a_EntityHeight), z) == E_BLOCK_NETHER_PORTAL) ||
-				(Area.GetBlockType(x, (int)floor(y - a_EntityHeight), z) == E_BLOCK_NETHER_PORTAL)
-			)
-			)
-		{
-			class cTeleportEntityToPortalCallback : public cEntityCallback
-			{
-			public:
-				cTeleportEntityToPortalCallback(int a_X, int a_Y, int a_Z) :
-					m_X(a_X),
-					m_Y(a_Y),
-					m_Z(a_Z)
-				{}
-
-				virtual bool Item(cEntity * a_Entity) override
-				{
-					a_Entity->TeleportToCoords(m_X, m_Y, m_Z);
-					return true;
-				}
-
-			private:
-				int m_X, m_Y, m_Z;
-			};
-
-			cTeleportEntityToPortalCallback TETPC(x, y, z);
-			a_World.DoWithEntityByID(a_UniqueIDToTeleport, TETPC);
-			return;
-		}
-	}
-
-	int MinX = std::max(a_BlockX - (int)ceil(a_EntityWidth), a_BlockX - 2), MaxX = std::max(a_BlockX + (int)ceil(a_EntityWidth), a_BlockX + 1);
-	int MinY = std::max(a_BlockY - (int)ceil(a_EntityHeight), a_BlockY - 2), MaxY = std::max(a_BlockY + (int)ceil(a_EntityHeight), a_BlockY + 1);
-
-	for (int y = MinY; y < MaxY + 1; y += MaxY - MinY) for (int x = MinX; x < MaxX + 1; ++x)
-	{
-		Area.SetBlockType(x, y, a_BlockZ, E_BLOCK_OBSIDIAN);
-	}
-	for (int y = MinY; y < MaxY + 1; ++y) for (int x = MinX; x < MaxX + 1; x += MaxX - MinX)
-	{
-		Area.SetBlockType(x, y, a_BlockZ, E_BLOCK_OBSIDIAN);
-	}
-
-	Area.Write(&a_World, MinX, MinY, a_BlockZ);
 }
 
 
