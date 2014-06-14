@@ -68,7 +68,7 @@ cChunkData::~cChunkData()
 	// auto_ptr style interface for memory management
 	cChunkData::cChunkData(const cChunkData & a_Other) :
 		m_IsOwner(true),
-		m_Pool(other.m_Pool)
+		m_Pool(a_Other.m_Pool)
 	{
 		// Move contents and ownership from a_Other to this, pointer-wise:
 		for (size_t i = 0; i < NumSections; i++)
@@ -107,7 +107,7 @@ cChunkData::~cChunkData()
 			m_Sections[i] = a_Other.m_Sections[i];
 		}
 		a_Other.m_IsOwner = false;
-		ASSERT(&m_Pool == &other.m_Pool);
+		ASSERT(&m_Pool == &a_Other.m_Pool);
 		return *this;
 	}
 	
@@ -327,7 +327,7 @@ cChunkData cChunkData::Copy(void) const
 	{
 		if (m_Sections[i] != NULL)
 		{
-			copy.m_Sections[i] = Allocate();
+			copy.m_Sections[i] = copy.Allocate();
 			*copy.m_Sections[i] = *m_Sections[i];
 		}
 	}
