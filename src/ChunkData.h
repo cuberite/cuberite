@@ -37,7 +37,7 @@ public:
 
 	struct sChunkSection;
 
-	cChunkData(cAllocationPool<cChunkData::sChunkSection, 1600>& a_Pool);
+	cChunkData(cAllocationPool<cChunkData::sChunkSection, 1600> & a_Pool);
 	~cChunkData();
 	
 	#if __cplusplus < 201103L
@@ -96,7 +96,8 @@ public:
 	Allows a_Src to be NULL, in which case it doesn't do anything. */
 	void SetSkyLight(const NIBBLETYPE * a_Src);
 
-	struct sChunkSection {
+	struct sChunkSection
+	{
 		BLOCKTYPE  m_BlockTypes   [SectionHeight * 16 * 16]    ;
 		NIBBLETYPE m_BlockMetas   [SectionHeight * 16 * 16 / 2];
 		NIBBLETYPE m_BlockLight   [SectionHeight * 16 * 16 / 2];
@@ -121,7 +122,7 @@ private:
 	/** Sets the data in the specified section to their default values. */
 	void ZeroSection(sChunkSection * a_Section) const;
 
-	cAllocationPool<cChunkData::sChunkSection, 1600>& m_Pool;
+	cAllocationPool<cChunkData::sChunkSection, 1600> & m_Pool;
 };
 
 

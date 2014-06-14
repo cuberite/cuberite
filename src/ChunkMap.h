@@ -352,7 +352,7 @@ private:
 	{
 	public:
 		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent,
-		            cAllocationPool<cChunkData::sChunkSection, 1600>& a_Pool);
+		            cAllocationPool<cChunkData::sChunkSection, 1600> & a_Pool);
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */

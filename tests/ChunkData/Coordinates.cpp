@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 		#else
 		copy = std::move(copy);
 		#endif
-		testassert(copy.GetBlock(0,0,0) == 0x42);
+		testassert(copy.GetBlock(0, 0, 0) == 0x42);
 	}
 	
 	return 0;

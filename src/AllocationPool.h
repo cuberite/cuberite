@@ -4,7 +4,8 @@
 #include <memory>
 
 template<class T, size_t NumElementsInReserve>
-class cAllocationPool {
+class cAllocationPool 
+{
 	public:
 
 		class cStarvationCallbacks
@@ -17,7 +18,7 @@ class cAllocationPool {
 		};
 		
 		cAllocationPool(std::auto_ptr<cStarvationCallbacks> a_Callbacks) :
-		m_Callbacks(a_Callbacks)
+			m_Callbacks(a_Callbacks)
 		{
 			for (size_t i = 0; i < NumElementsInReserve; i++)
 			{
@@ -40,7 +41,7 @@ class cAllocationPool {
 			}
 		}	
 		
-		T* Allocate()
+		T * Allocate()
 		{
 			if (m_FreeList.size() <= NumElementsInReserve)
 			{
@@ -61,11 +62,11 @@ class cAllocationPool {
 				}
 			}
 			// placement new, used to initalize the object
-			T* ret = new (m_FreeList.front()) T;
+			T * ret = new (m_FreeList.front()) T;
 			m_FreeList.pop_front();
 			return ret;
 		}
-		void Free(T* ptr)
+		void Free(T * ptr)
 		{
 			if (ptr == NULL) 
 			{

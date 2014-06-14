@@ -27,7 +27,7 @@ template <typename T> inline bool IsAllValue(const T * a_Array, size_t a_NumElem
 
 
 
-cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection, 1600>& a_Pool) :
+cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection, 1600> & a_Pool) :
 #if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	m_IsOwner(true),
