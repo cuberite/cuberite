@@ -215,9 +215,7 @@ public:
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
-	// tolua_end
 
-	// tolua_begin
 	/** Sets the speed of the entity, measured in m / sec */
 	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
