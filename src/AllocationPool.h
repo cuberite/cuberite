@@ -11,8 +11,15 @@ public:
 	{
 		public:
 			virtual ~cStarvationCallbacks() {}
+			
+			/** Is called when the reserve buffer starts to be used **/
 			virtual void OnStartingUsingBuffer() = 0;
+			
+			/** Is called once the reserve buffer has returned to normal size **/
 			virtual void OnStopUsingBuffer() = 0;
+			
+			/** Is called when the allocation pool is unable to allocate memory. Will be repeatedly
+			    called if it does not free sufficient memory **/
 			virtual void OnBufferEmpty() = 0;
 	};
 	
