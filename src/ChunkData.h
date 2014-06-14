@@ -111,6 +111,8 @@ private:
 	#endif
 
 	sChunkSection * m_Sections[NumSections];
+
+	cAllocationPool<cChunkData::sChunkSection> & m_Pool;
 	
 	/** Allocates a new section. Entry-point to custom allocators. */
 	sChunkSection * Allocate(void);
@@ -122,7 +124,6 @@ private:
 	/** Sets the data in the specified section to their default values. */
 	void ZeroSection(sChunkSection * a_Section) const;
 
-	cAllocationPool<cChunkData::sChunkSection> & m_Pool;
 };
 
 
