@@ -20,6 +20,12 @@ endif()
 
 # Lua needs to be linked dynamically on Windows and statically on *nix, so that LuaRocks work
 if (WIN32)
+
+	#for compiliers other than msvc we need to tell lua that its building as a dll
+	if (NOT MSVC)
+		add_flags_cxx(-DLUA_BUILD_AS_DLL=1)
+	endif()
+	
 	add_library(lua SHARED ${SOURCE})
 	set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
 

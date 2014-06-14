@@ -3,6 +3,7 @@
 
 #include "Entities/Entity.h"
 #include "ChunkDef.h"
+#include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
@@ -66,6 +67,7 @@ public:
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
 		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP  // Neighbor chunks
 	);
+	cChunk(cChunk & other);
 	~cChunk();
 
 	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk block data is valid (loaded / generated)
@@ -139,7 +141,7 @@ public:
 	
 	cWorld * GetWorld(void) const { return m_World; }
 
-	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );
+	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta ); }
 	
@@ -152,9 +154,9 @@ public:
 	/** Queues all 6 neighbors of the specified block for ticking (m_ToTickQueue). If any are outside the chunk, relays the checking to the proper neighboring chunk */
 	void QueueTickBlockNeighbors(int a_RelX, int a_RelY, int a_RelZ);
 
-	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta );  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const;
-	BLOCKTYPE GetBlock(int a_BlockIdx) const;
+	BLOCKTYPE GetBlock(Vector3i a_cords) const { return GetBlock(a_cords.x, a_cords.y, a_cords.z);}
 	void      GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	void      GetBlockInfo    (int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 	
@@ -320,15 +322,24 @@ public:
 		m_BlockTickZ = a_RelZ;
 	}
 	
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const              { return cChunkDef::GetNibble(m_BlockMeta, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetMeta(int a_BlockIdx) const                                  { return cChunkDef::GetNibble(m_BlockMeta, a_BlockIdx); }
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta) { SetMeta(MakeIndex(a_RelX, a_RelY, a_RelZ), a_Meta); }
-	void SetMeta(int a_BlockIdx, NIBBLETYPE a_Meta);
+	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
+	{
+		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
+	}
+	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+	{
+			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
+			if (hasChanged)
+			{
+				MarkDirty();
+				m_IsRedstoneDirty = true;
+				
+				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+			}
+	}
 
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockLight, a_RelX, a_RelY, a_RelZ); }
-	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_RelX, a_RelY, a_RelZ, true); }
-	inline NIBBLETYPE GetBlockLight(int a_Idx) const {return cChunkDef::GetNibble(m_BlockLight, a_Idx); }
-	inline NIBBLETYPE GetSkyLight  (int a_Idx) const {return cChunkDef::GetNibble(m_BlockSkyLight, a_Idx, true); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ); }
+	inline NIBBLETYPE GetSkyLight  (int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetSkyLight(a_RelX, a_RelY, a_RelZ); }
 	
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case); returns true on success */
 	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
@@ -368,10 +379,13 @@ public:
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
+	cRedstoneSimulatorChunkData * GetRedstoneSimulatorQueuedData(void) { return &m_RedstoneSimulatorQueuedData; }
 	cIncrementalRedstoneSimulator::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
 	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; };
 	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; };
 	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; };
+	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
+	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
@@ -403,8 +417,8 @@ private:
 	bool m_IsSaving;       // True if the chunk is being saved
 	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 	
-	std::vector<unsigned int> m_ToTickBlocks;
-	sSetBlockVector           m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
+	std::vector<Vector3i> m_ToTickBlocks;
+	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
 	
 	sSetBlockQueueVector m_SetBlockQueue;  ///< Block changes that are queued to a specific tick
 	
@@ -420,10 +434,7 @@ private:
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	COMPRESSED_BLOCKTYPE m_BlockTypes;
-	COMPRESSED_NIBBLETYPE m_BlockMeta;
-	COMPRESSED_NIBBLETYPE m_BlockLight;
-	COMPRESSED_NIBBLETYPE m_BlockSkyLight;
+	cChunkData m_ChunkData;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;
@@ -442,13 +453,16 @@ private:
 	cSandSimulatorChunkData m_SandSimulatorData;
 
 	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
+	cRedstoneSimulatorChunkData m_RedstoneSimulatorQueuedData;
 	cIncrementalRedstoneSimulator::PoweredBlocksList m_RedstoneSimulatorPoweredBlocksList;
 	cIncrementalRedstoneSimulator::LinkedBlocksList m_RedstoneSimulatorLinkedBlocksList;
 	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList m_RedstoneSimulatorSimulatedPlayerToggleableList;
 	cIncrementalRedstoneSimulator::RepeatersDelayList m_RedstoneSimulatorRepeatersDelayList;
 
+	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
+	bool m_IsRedstoneDirty;
 
-	// pick up a random block of this chunk
+	// Pick up a random block of this chunk
 	void getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z);
 	void getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ);
 

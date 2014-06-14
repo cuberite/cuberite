@@ -127,6 +127,9 @@ public:
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
+	/** Returns whether the player is climbing (ladders, vines e.t.c). */
+	bool IsClimbing(void) const;
+
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	// tolua_begin
@@ -334,6 +337,8 @@ public:
 	void SetVisible( bool a_bVisible );										// tolua_export
 	bool IsVisible(void) const { return m_bVisible; }									// tolua_export
 
+	/** Moves the player to the specified world.
+	Returns true if successful, false on failure (world not found). */
 	bool MoveToWorld(const char * a_WorldName);  // tolua_export
 
 	bool SaveToDisk(void);

@@ -46,7 +46,7 @@ void cGhast::Attack(float a_Dt)
 		{
 			return;
 		}
-		if (!GhastBall->Initialize(m_World))
+		if (!GhastBall->Initialize(*m_World))
 		{
 			delete GhastBall;
 			return;

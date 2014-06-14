@@ -43,7 +43,7 @@ function HandleRequest_Generation( Request )
 	local Content = ""
 	if (Request.PostParams["AGHRRRR"] ~= nil) then
 		GENERATION_STATE = 0
-		WW_instance:SaveAllChunks()
+		WW_instance:QueueSaveAllChunks()
 		WW_instance:QueueUnloadUnusedChunks()
 		LOGERROR("" .. PLUGIN:GetName() .. " v" .. PLUGIN:GetVersion() .. ": works ABORTED by admin")
 	end

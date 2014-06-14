@@ -9,6 +9,34 @@
 
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cEmptyStructure:
+
+/** A cStructure descendant representing an empty structure.
+Used when the generator descended from cGridStructGen doesn't return any structure, to keep at least the
+Origin coords so that the structure isn't queried over and over again. */
+class cEmptyStructure :
+	public cGridStructGen::cStructure
+{
+	typedef cGridStructGen::cStructure super;
+	
+public:
+	cEmptyStructure(int a_OriginX, int a_OriginZ) :
+		super(a_OriginX, a_OriginZ)
+	{
+	}
+	
+protected:
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
+	{
+		// Do nothing
+	}
+} ;
+
+
+
+
+
 cGridStructGen::cGridStructGen(
 	int a_Seed,
 	int a_GridSizeX, int a_GridSizeZ,
@@ -22,6 +50,15 @@ cGridStructGen::cGridStructGen(
 	m_MaxStructureSizeZ(a_MaxStructureSizeZ),
 	m_MaxCacheSize(a_MaxCacheSize)
 {
+	size_t NumStructuresPerQuery = (size_t)((m_MaxStructureSizeX / m_GridSizeX + 1) * (m_MaxStructureSizeZ / m_GridSizeZ + 1));
+	if (NumStructuresPerQuery > m_MaxCacheSize)
+	{
+		m_MaxCacheSize = NumStructuresPerQuery * 4;
+		LOGINFO(
+			"cGridStructGen: The cache size is too small (%u), increasing the cache size to %u to avoid inefficiency.",
+			(unsigned)a_MaxCacheSize, (unsigned)m_MaxCacheSize
+		);
+	}
 }
 
 
@@ -81,7 +118,12 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 			}  // for itr - a_Structures[]
 			if (!Found)
 			{
-				a_Structures.push_back(CreateStructure(OriginX, OriginZ));
+				cStructurePtr Structure = CreateStructure(OriginX, OriginZ);
+				if (Structure.get() == NULL)
+				{
+					Structure.reset(new cEmptyStructure(OriginX, OriginZ));
+				}
+				a_Structures.push_back(Structure);
 			}
 		}  // for z
 	}  // for x

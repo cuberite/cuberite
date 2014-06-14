@@ -41,7 +41,7 @@ protected:
 	virtual bool OnDecompressedData(const char * a_DecompressedNBT, int a_DataSize) override { return false; }
 	virtual bool OnRealCoords(int a_ChunkX, int a_ChunkZ) override { return false; }
 	virtual bool OnLastUpdate(Int64 a_LastUpdate) override { return false; }
-	virtual bool OnTerrainPopulated(bool a_Populated) override { return !a_Populated; }  // If not populated, we don't want it!
+	virtual bool OnTerrainPopulated(bool a_Populated) override { return false; }  // We don't care about "populated", the biomes are the same
 	virtual bool OnBiomes(const unsigned char * a_BiomeData) override;
 	
 	void StartNewRegion(int a_RegionX, int a_RegionZ);

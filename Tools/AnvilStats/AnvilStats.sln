@@ -1,32 +1,53 @@
-
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnvilStats", "AnvilStats.vcproj", "{CF996A5E-0A86-4004-9710-682B06B5AEBA}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnvilStats", "AnvilStats.vcxproj", "{CF996A5E-0A86-4004-9710-682B06B5AEBA}"
 	ProjectSection(ProjectDependencies) = postProject
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA} = {EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}
+		{B61007AC-B557-4B67-A765-E468C0C3A821} = {B61007AC-B557-4B67-A765-E468C0C3A821}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\VC2008\zlib.vcproj", "{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "..\..\lib\zlib\zlib.vcxproj", "{B61007AC-B557-4B67-A765-E468C0C3A821}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
+		DebugProfile|Win32 = DebugProfile|Win32
+		MinSizeRel|Win32 = MinSizeRel|Win32
 		Release profiled|Win32 = Release profiled|Win32
 		Release|Win32 = Release|Win32
+		ReleaseProfile|Win32 = ReleaseProfile|Win32
+		RelWithDebInfo|Win32 = RelWithDebInfo|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.Debug|Win32.Build.0 = Debug|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.DebugProfile|Win32.ActiveCfg = Debug|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.DebugProfile|Win32.Build.0 = Debug|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.MinSizeRel|Win32.ActiveCfg = Release|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.MinSizeRel|Win32.Build.0 = Release|Win32
 		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.Release profiled|Win32.ActiveCfg = Release profiled|Win32
 		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.Release profiled|Win32.Build.0 = Release profiled|Win32
 		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.Release|Win32.ActiveCfg = Release|Win32
 		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.Release|Win32.Build.0 = Release|Win32
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}.Debug|Win32.Build.0 = Debug|Win32
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}.Release profiled|Win32.ActiveCfg = Release profiled|Win32
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}.Release profiled|Win32.Build.0 = Release profiled|Win32
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}.Release|Win32.ActiveCfg = Release|Win32
-		{EA9D50FD-937A-4EF5-8C37-5F4175AF4FEA}.Release|Win32.Build.0 = Release|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.ReleaseProfile|Win32.ActiveCfg = Release|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.ReleaseProfile|Win32.Build.0 = Release|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.RelWithDebInfo|Win32.ActiveCfg = Release|Win32
+		{CF996A5E-0A86-4004-9710-682B06B5AEBA}.RelWithDebInfo|Win32.Build.0 = Release|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.Debug|Win32.Build.0 = Debug|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.DebugProfile|Win32.ActiveCfg = DebugProfile|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.DebugProfile|Win32.Build.0 = DebugProfile|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.MinSizeRel|Win32.ActiveCfg = MinSizeRel|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.MinSizeRel|Win32.Build.0 = MinSizeRel|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.Release profiled|Win32.ActiveCfg = Release|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.Release profiled|Win32.Build.0 = Release|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.Release|Win32.ActiveCfg = Release|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.Release|Win32.Build.0 = Release|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.ReleaseProfile|Win32.ActiveCfg = ReleaseProfile|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.ReleaseProfile|Win32.Build.0 = ReleaseProfile|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.RelWithDebInfo|Win32.ActiveCfg = RelWithDebInfo|Win32
+		{B61007AC-B557-4B67-A765-E468C0C3A821}.RelWithDebInfo|Win32.Build.0 = RelWithDebInfo|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -60,6 +60,9 @@ static void SetThreadName(DWORD dwThreadID, const char * threadName)
 cIsThread::cIsThread(const AString & iThreadName) :
 	m_ShouldTerminate(false),
 	m_ThreadName(iThreadName),
+	#ifdef _WIN32
+		m_ThreadID(0),
+	#endif
 	m_Handle(NULL_HANDLE)
 {
 }
@@ -83,8 +86,8 @@ bool cIsThread::Start(void)
 	ASSERT(m_Handle == NULL_HANDLE);  // Has already started one thread?
 	#ifdef _WIN32
 		// Create the thread suspended, so that the mHandle variable is valid in the thread procedure
-		DWORD ThreadID = 0;
-		m_Handle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &ThreadID);
+		m_ThreadID = 0;
+		m_Handle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &m_ThreadID);
 		if (m_Handle == NULL)
 		{
 			LOGERROR("ERROR: Could not create thread \"%s\", GLE = %d!", m_ThreadName.c_str(), GetLastError());
@@ -96,7 +99,7 @@ bool cIsThread::Start(void)
 			// Thread naming is available only in MSVC
 			if (!m_ThreadName.empty())
 			{
-				SetThreadName(ThreadID, m_ThreadName.c_str());
+				SetThreadName(m_ThreadID, m_ThreadName.c_str());
 			}
 		#endif  // _DEBUG and _MSC_VER
 		
@@ -171,6 +174,18 @@ unsigned long cIsThread::GetCurrentID(void)
 		return (unsigned long) GetCurrentThreadId();
 	#else
 		return (unsigned long) pthread_self();
+	#endif
+}
+
+
+
+
+bool cIsThread::IsCurrentThread(void) const
+{
+	#ifdef _WIN32
+		return (GetCurrentThreadId() == m_ThreadID);
+	#else
+		return (m_Handle == pthread_self());
 	#endif
 }
 

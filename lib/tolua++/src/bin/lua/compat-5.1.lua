@@ -18,17 +18,16 @@ local function pp_dofile(path)
 			local ret = file:read("*a")
 			file:close()
 
-			ret = string.gsub(ret, "%.%.%.%s*%)", "...) local arg = {n=select('#', ...), ...};")
-
+			ret = string.gsub(ret, "%.%.%.%s*%)$", "...) local arg = {n=select('#', ...), ...};")
+			
 			loaded = true
 			return ret
 		end
 	end
 
-	local f = load(getfile, path)
+	local f, err = load(getfile, path)
 	if not f then
-	
-		error("error loading file "..path)
+		error("error loading file " .. path .. ": " .. err)
 	end
 	return f()
 end

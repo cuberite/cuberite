@@ -100,7 +100,7 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) = 0;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) = 0;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) = 0;
-	virtual void SendRespawn             (void) = 0;
+	virtual void SendRespawn             (const cWorld & a_World) = 0;
 	virtual void SendExperience          (void) = 0;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;

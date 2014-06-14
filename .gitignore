@@ -48,6 +48,7 @@ world_nether
 CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
+CTestTestfile.cmake
 Makefile
 
 *.a

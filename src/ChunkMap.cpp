@@ -219,9 +219,8 @@ bool cChunkMap::LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 		return false;
 	}
 	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockType = Chunk->GetBlock(Index);
-	a_BlockMeta = Chunk->GetMeta(Index);
+	a_BlockType = Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	a_BlockMeta = Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
 	return true;
 }
 
@@ -242,8 +241,7 @@ bool cChunkMap::LockedGetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 		return false;
 	}
 	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockType = Chunk->GetBlock(Index);
+	a_BlockType = Chunk->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	return true;
 }
 
@@ -264,8 +262,7 @@ bool cChunkMap::LockedGetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIB
 		return false;
 	}
 	
-	int Index = cChunkDef::MakeIndexNoCheck(a_BlockX, a_BlockY, a_BlockZ);
-	a_BlockMeta = Chunk->GetMeta(Index);
+	a_BlockMeta = Chunk->GetMeta(a_BlockX, a_BlockY, a_BlockZ);
 	return true;
 }
 
@@ -1255,7 +1252,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 
 
-void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients)
 {
 	cChunkInterface ChunkInterface(this);
 	if (a_BlockType == E_BLOCK_AIR)
@@ -1270,7 +1267,7 @@ void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a
 	cChunkPtr Chunk = GetChunk( ChunkX, ZERO_CHUNK_Y, ChunkZ );
 	if ((Chunk != NULL) && Chunk->IsValid())
 	{
-		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta );
+		Chunk->SetBlock(X, Y, Z, a_BlockType, a_BlockMeta, a_SendToClients);
 		m_World->GetSimulatorManager()->WakeUp(a_BlockX, a_BlockY, a_BlockZ, Chunk);
 	}
 	BlockHandler(a_BlockType)->OnPlaced(ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
@@ -1484,9 +1481,8 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
-		int idx = cChunkDef::MakeIndexNoCheck(itr->x, itr->y, itr->z);
-		itr->BlockType = Chunk->GetBlock(idx);
-		itr->BlockMeta = Chunk->GetMeta(idx);
+		itr->BlockType = Chunk->GetBlock(itr->x, itr->y, itr->z);
+		itr->BlockMeta = Chunk->GetMeta(itr->x, itr->y, itr->z);
 	}
 	return res;
 }
@@ -1663,6 +1659,30 @@ void cChunkMap::AddEntity(cEntity * a_Entity)
 		return;
 	}
 	Chunk->AddEntity(a_Entity);
+}
+
+
+
+
+
+void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
+	if (
+		(Chunk == NULL) ||  // Chunk not present at all
+		(!Chunk->IsValid() && !a_Entity->IsPlayer())  // Chunk present, but no valid data; players need to spawn in such chunks (#953)
+	)
+	{
+		LOGWARNING("Entity at %p (%s, ID %d) spawning in a non-existent chunk, the entity is lost.",
+			a_Entity, a_Entity->GetClass(), a_Entity->GetUniqueID()
+		);
+		return;
+	}
+	if (!Chunk->HasEntity(a_Entity->GetUniqueID()))
+	{
+		Chunk->AddEntity(a_Entity);
+	}
 }
 
 

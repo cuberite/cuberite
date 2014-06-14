@@ -107,10 +107,16 @@ void cServer::cTickThread::Execute(void)
 cServer::cServer(void) :
 	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client IPv4"),
 	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client IPv6"),
+	m_PlayerCount(0),
+	m_PlayerCountDiff(0),
+	m_ClientViewDistance(0),
 	m_bIsConnected(false),
 	m_bRestarting(false),
 	m_RCONServer(*this),
-	m_TickThread(*this)
+	m_MaxPlayers(0),
+	m_bIsHardcore(false),
+	m_TickThread(*this),
+	m_ShouldAuthenticate(false)
 {
 }
 

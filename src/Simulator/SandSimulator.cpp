@@ -60,7 +60,7 @@ void cSandSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			);
 			*/
 			cFallingBlock * FallingBlock = new cFallingBlock(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
-			FallingBlock->Initialize(&m_World);
+			FallingBlock->Initialize(m_World);
 			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
 		}
 	}

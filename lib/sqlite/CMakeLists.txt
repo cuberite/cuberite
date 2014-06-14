@@ -17,6 +17,10 @@ if (WIN32)
 	source_group("Sources" FILES ${SOURCE})
 endif()
 
+# FreeBSD requires us to define this to get POSIX 2001 standard
+if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
+	add_flags_cxx(-D__POSIX_VISIBLE=200112)
+endif()
 
 add_library(sqlite ${SOURCE})
 

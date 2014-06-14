@@ -377,7 +377,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 	}
 
 	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
-		m_PlayerName.c_str(), a_Xp_delta, m_CurrentXp);
+		GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
@@ -391,7 +391,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 
 void cPlayer::StartChargingBow(void)
 {
-	LOGD("Player \"%s\" started charging their bow", m_PlayerName.c_str());
+	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
 	m_BowCharge = 0;
 }
@@ -402,7 +402,7 @@ void cPlayer::StartChargingBow(void)
 
 int cPlayer::FinishChargingBow(void)
 {
-	LOGD("Player \"%s\" finished charging their bow at a charge of %d", m_PlayerName.c_str(), m_BowCharge);
+	LOGD("Player \"%s\" finished charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	int res = m_BowCharge;
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
@@ -415,7 +415,7 @@ int cPlayer::FinishChargingBow(void)
 
 void cPlayer::CancelChargingBow(void)
 {
-	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", m_PlayerName.c_str(), m_BowCharge);
+	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
 }
@@ -456,8 +456,18 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	else
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
+
+		if (Dist >= 2.0) // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
+		{
+			// Increment statistic
+			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
+		}
+
 		int Damage = (int)(Dist - 3.f);
-		if (m_LastJumpHeight > m_LastGroundHeight) Damage++;
+		if (m_LastJumpHeight > m_LastGroundHeight)
+		{
+			Damage++;
+		}
 		m_LastJumpHeight = (float)GetPosY();
 
 		if (Damage > 0)
@@ -930,6 +940,8 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 void cPlayer::Respawn(void)
 {
+	ASSERT(m_World != NULL);
+
 	m_Health = GetMaxHealth();
 	SetInvulnerableTicks(20);
 	
@@ -942,7 +954,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn();
+	m_ClientHandle->SendRespawn(*m_World);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1169,8 +1181,8 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	{
 		// First time, announce it
 		cCompositeChat Msg;
-		Msg.AddTextPart(m_PlayerName + " has just earned the achievement ");
-		Msg.AddTextPart(cStatInfo::GetName(a_Ach)); // TODO 2014-05-12 xdot: Use the proper cCompositeChat part (cAchievement)
+		Msg.SetMessageType(mtSuccess);
+		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
 		m_World->BroadcastChat(Msg);
 
 		// Increment the statistic
@@ -1370,7 +1382,7 @@ void cPlayer::AddToGroup( const AString & a_GroupName )
 {
 	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
 	m_Groups.push_back( Group );
-	LOGD("Added %s to group %s", m_PlayerName.c_str(), a_GroupName.c_str() );
+	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str() );
 	ResolveGroups();
 	ResolvePermissions();
 }
@@ -1394,13 +1406,13 @@ void cPlayer::RemoveFromGroup( const AString & a_GroupName )
 
 	if( bRemoved )
 	{
-		LOGD("Removed %s from group %s", m_PlayerName.c_str(), a_GroupName.c_str() );
+		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str() );
 		ResolveGroups();
 		ResolvePermissions();
 	}
 	else
 	{
-		LOGWARN("Tried to remove %s from group %s but was not in that group", m_PlayerName.c_str(), a_GroupName.c_str() );
+		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str() );
 	}
 }
 
@@ -1506,7 +1518,7 @@ void cPlayer::ResolveGroups()
 		if( AllGroups.find( CurrentGroup ) != AllGroups.end() )
 		{
 			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
-				m_PlayerName.c_str(), CurrentGroup->GetName().c_str()
+				GetName().c_str(), CurrentGroup->GetName().c_str()
 			);
 		}
 		else
@@ -1518,7 +1530,7 @@ void cPlayer::ResolveGroups()
 			{
 				if( AllGroups.find( *itr ) != AllGroups.end() )
 				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", m_PlayerName.c_str(), (*itr)->GetName().c_str() );
+					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str() );
 					continue;
 				}
 				ToIterate.push_back( *itr );
@@ -1638,21 +1650,19 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 		return false;
 	}
 	
-	eDimension OldDimension = m_World->GetDimension();
-	
+	// Send the respawn packet:
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendRespawn(*World);
+	}
+
 	// Remove all links to the old world
 	m_World->RemovePlayer(this);
-	m_ClientHandle->RemoveFromAllChunks();
-	m_World->RemoveEntity(this);
 
 	// If the dimension is different, we can send the respawn packet
 	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
 
-	// Add player to all the necessary parts of the new world
-	SetWorld(World);
-	m_ClientHandle->StreamChunks();
-	World->AddEntity(this);
+	// Queue adding player to the new world, including all the necessary adjustments to the object
 	World->AddPlayer(this);
 
 	return true;
@@ -1670,19 +1680,19 @@ void cPlayer::LoadPermissionsFromDisk()
 	cIniFile IniFile;
 	if (IniFile.ReadFile("users.ini"))
 	{
-		AString Groups = IniFile.GetValueSet(m_PlayerName, "Groups", "Default");
+		AString Groups = IniFile.GetValueSet(GetName(), "Groups", "Default");
 		AStringVector Split = StringSplitAndTrim(Groups, ",");
 
 		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
 		{
 			if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
 			{
-				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), m_PlayerName.c_str());
+				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), GetName().c_str());
 			}
 			AddToGroup(*itr);
 		}
 
-		AString Color = IniFile.GetValue(m_PlayerName, "Color", "-");
+		AString Color = IniFile.GetValue(GetName(), "Color", "-");
 		if (!Color.empty())
 		{
 			m_Color = Color[0];
@@ -1691,7 +1701,7 @@ void cPlayer::LoadPermissionsFromDisk()
 	else
 	{
 		cGroupManager::GenerateDefaultUsersIni(IniFile);
-		IniFile.AddValue("Groups", m_PlayerName, "Default");
+		IniFile.AddValue("Groups", GetName(), "Default");
 		AddToGroup("Default");
 	}
 	IniFile.WriteFile("users.ini");
@@ -1705,15 +1715,8 @@ bool cPlayer::LoadFromDisk()
 {
 	LoadPermissionsFromDisk();
 
-	// Log player permissions, cause it's what the cool kids do
-	LOGINFO("Player %s has permissions:", m_PlayerName.c_str() );
-	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
-	{
-		if( itr->second ) LOG(" - %s", itr->first.c_str() );
-	}
-
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
+	Printf(SourceFile, "players/%s.json", GetName().c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmRead))
@@ -1781,7 +1784,7 @@ bool cPlayer::LoadFromDisk()
 	StatSerializer.Load();
 	
 	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		m_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
 	);
 	
 	return true;
@@ -1837,12 +1840,12 @@ bool cPlayer::SaveToDisk()
 	std::string JsonData = writer.write(root);
 
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", m_PlayerName.c_str() );
+	Printf(SourceFile, "players/%s.json", GetName().c_str() );
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", m_PlayerName.c_str(), SourceFile.c_str());
+		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", GetName().c_str(), SourceFile.c_str());
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
@@ -1853,10 +1856,10 @@ bool cPlayer::SaveToDisk()
 
 	// Save the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
-	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), m_PlayerName, &m_Stats);
+	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
-		LOGERROR("Could not save stats for player %s", m_PlayerName.c_str());
+		LOGERROR("Could not save stats for player %s", GetName().c_str());
 		return false;
 	}
 
@@ -2016,31 +2019,64 @@ void cPlayer::HandleFloater()
 
 
 
+bool cPlayer::IsClimbing(void) const
+{
+	int PosX = POSX_TOINT;
+	int PosY = POSY_TOINT;
+	int PosZ = POSZ_TOINT;
+
+	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	{
+		return false;
+	}
+
+	BLOCKTYPE Block = m_World->GetBlock(PosX, PosY, PosZ);
+	switch (Block)
+	{
+		case E_BLOCK_LADDER:
+		case E_BLOCK_VINES:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
+
 void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 {
 	StatValue Value = (StatValue)floor(a_DeltaPos.Length() * 100 + 0.5);
 
 	if (m_AttachedTo == NULL)
 	{
-		int PosX = POSX_TOINT;
-		int PosY = POSY_TOINT;
-		int PosZ = POSZ_TOINT;
-
-		BLOCKTYPE Block;
-		NIBBLETYPE Meta;
-		if (!m_World->GetBlockTypeMeta(PosX, PosY, PosZ, Block, Meta))
+		if (IsClimbing())
 		{
-			return;
+			if (a_DeltaPos.y > 0.0) // Going up
+			{
+				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
+			}
 		}
-
-		if ((Block == E_BLOCK_LADDER) && (a_DeltaPos.y > 0.0)) // Going up
+		else if (IsSubmerged())
 		{
-			m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
+			m_Stats.AddValue(statDistDove, Value);
+		}
+		else if (IsSwimming())
+		{
+			m_Stats.AddValue(statDistSwum, Value);
+		}
+		else if (IsOnGround())
+		{
+			m_Stats.AddValue(statDistWalked, Value);
 		}
 		else
 		{
-			// TODO 2014-05-12 xdot: Other types
-			m_Stats.AddValue(statDistWalked, Value);
+			if (Value >= 25) // Ignore small/slow movement
+			{
+				m_Stats.AddValue(statDistFlown, Value);
+			}
 		}
 	}
 	else

@@ -524,7 +524,7 @@ function Declaration (s,kind,is_parameter)
  end
 
  -- check the form: mod type* name
- local s1 = gsub(s,"(%b\[\])",function (n) return gsub(n,'%*','\1') end)
+ local s1 = gsub(s,"(%b%[%])",function (n) return gsub(n,'%*','\1') end)
  t = split_c_tokens(s1,'%*')
  if t.n == 2 then
   t[2] = gsub(t[2],'\1','%*') -- restore * in dimension expression

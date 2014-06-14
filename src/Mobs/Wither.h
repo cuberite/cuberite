@@ -25,10 +25,11 @@ public:
 	bool IsArmored(void) const;
 	
 	// cEntity overrides
-	virtual bool Initialize(cWorld * a_World) override;
+	virtual bool Initialize(cWorld & a_World) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void KilledBy(cEntity * a_Killer) override;
 
 private:
 
