@@ -403,9 +403,18 @@ private:
 	class cStarvationCallbacks
 		: public cAllocationPool<cChunkData::sChunkSection,1600>::cStarvationCallbacks
 	{
-		virtual void OnStartingUsingBuffer() {}
-		virtual void OnStopUsingBuffer() {}
-		virtual void OnBufferEmpty() {}
+		virtual void OnStartingUsingBuffer()
+		{
+			LOG("Using backup memory buffer");
+		}
+		virtual void OnStopUsingBuffer()
+		{
+			LOG("Stoped using backup memory buffer");
+		}
+		virtual void OnBufferEmpty()
+		{
+			LOG("Out of Memory");
+		}
 	};
 	
 	typedef std::list<cChunkLayer *> cChunkLayerList;
