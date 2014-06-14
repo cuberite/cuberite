@@ -19,7 +19,7 @@ public:
 			virtual void OnStopUsingBuffer() = 0;
 			
 			/** Is called when the allocation pool is unable to allocate memory. Will be repeatedly
-			    called if it does not free sufficient memory **/
+			called if it does not free sufficient memory **/
 			virtual void OnBufferEmpty() = 0;
 	};
 	
@@ -33,7 +33,7 @@ public:
 };
 
 /** Allocates memory storing unused elements in a linked list. Keeps at least NumElementsInReserve
-    elements in the list unless malloc fails so that the program has a reserve to handle OOM.**/
+elements in the list unless malloc fails so that the program has a reserve to handle OOM.**/
 template<class T, size_t NumElementsInReserve>
 class cListAllocationPool : public cAllocationPool<T>
 {
