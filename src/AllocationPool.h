@@ -18,10 +18,15 @@ public:
 	
 	virtual ~cAllocationPool() {}
 	
+	/** Allocates a pointer to T **/
 	virtual T * Allocate() = 0;
+	
+	/** Frees the pointer passed in a_ptr, invalidating it **/
 	virtual void Free(T * a_ptr) = 0;
 };
 
+/** Allocates memory storing unused elements in a linked list. Keeps at least NumElementsInReserve
+    elements in the list unless malloc fails so that the program has a reserve to handle OOM.**/
 template<class T, size_t NumElementsInReserve>
 class cListAllocationPool : public cAllocationPool<T>
 {
