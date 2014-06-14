@@ -351,8 +351,11 @@ private:
 	class cChunkLayer
 	{
 	public:
-		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent,
-		            cAllocationPool<cChunkData::sChunkSection> & a_Pool);
+		cChunkLayer(
+			int a_LayerX, int a_LayerZ, 
+			cChunkMap * a_Parent,
+			cAllocationPool<cChunkData::sChunkSection> & a_Pool
+		);
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */

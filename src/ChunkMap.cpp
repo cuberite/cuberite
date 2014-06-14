@@ -2677,8 +2677,11 @@ void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap::cChunkLayer:
 
-cChunkMap::cChunkLayer::cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent,
-		                            cAllocationPool<cChunkData::sChunkSection> & a_Pool)
+cChunkMap::cChunkLayer::cChunkLayer(
+	int a_LayerX, int a_LayerZ, 
+	cChunkMap * a_Parent,
+	cAllocationPool<cChunkData::sChunkSection> & a_Pool
+)
 	: m_LayerX( a_LayerX )
 	, m_LayerZ( a_LayerZ )
 	, m_Parent( a_Parent )
