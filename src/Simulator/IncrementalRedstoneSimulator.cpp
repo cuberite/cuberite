@@ -65,6 +65,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		RelX = a_BlockX - a_OtherChunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_OtherChunk->GetPosZ() * cChunkDef::Width;
 		a_OtherChunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
+		a_OtherChunk->SetIsRedstoneDirty(true);
 	}
 	else
 	{
@@ -199,6 +200,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			}
 			else
 			{
+				itr->DataTwo = false;
 				itr->Data = Block; // Update block information
 			}
 			return;
@@ -802,11 +804,15 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 		{
 			if (a_Itr->a_RelBlockPos == Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
 			{
+				// Leave a_Itr at where we found the entry
 				break;
 			}
 		}
 	}
 
+	// a_Itr may be passed with m_RepeatersDelayList::end, however, we can guarantee this iterator is always valid because...
+	// ...QueueRepeaterPowerChange is called to add an entry (and the above code updates iterator). However, if the repeater was locked or something similar...
+	// ...we will never get here because of the returns.
 	if (a_Itr->a_ElapsedTicks >= a_Itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
 	{
 		if (a_Itr->ShouldPowerOn)

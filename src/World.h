@@ -47,7 +47,6 @@ class cFlowerPotEntity;
 class cFurnaceEntity;
 class cNoteEntity;
 class cMobHeadEntity;
-class cMobCensus;
 class cCompositeChat;
 class cCuboid;
 
@@ -722,14 +721,41 @@ public:
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
 	eWeather GetWeather     (void) const { return m_Weather; };
 	
+	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
-	bool IsWeatherRain (void) const { return (m_Weather == wRain); }
-	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 	
-	/** Returns true if the current weather has any precipitation - rain or storm
-	Does not check if biome has no downfall, use cChunk::GetBiomeAt(RelX, RelZ) for that
-	*/
-	virtual bool IsWeatherWet(void) const override { return (m_Weather != wSunny); }
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
+	
+	/** Returns true if the current weather is rain */
+	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
+	
+	/** Returns true if it is raining at the specified location. This takes into account biomes. */
+	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
+	
+	/** Returns true if the current weather is stormy */
+	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
+
+	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
+	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherStorm() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
+	
+	/** Returns true if the current weather has any precipitation - rain, storm or snow */
+	virtual bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
+	
+	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
 
 	// tolua_end
 
