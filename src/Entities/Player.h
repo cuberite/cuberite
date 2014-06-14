@@ -328,6 +328,8 @@ public:
 	void SetVisible( bool a_bVisible );										// tolua_export
 	bool IsVisible(void) const { return m_bVisible; }									// tolua_export
 
+	/** Moves the player to the specified world.
+	Returns true if successful, false on failure (world not found). */
 	bool MoveToWorld(const char * a_WorldName);  // tolua_export
 
 	bool SaveToDisk(void);

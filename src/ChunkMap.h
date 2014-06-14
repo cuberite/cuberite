@@ -153,7 +153,7 @@ public:
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockMeta);
-	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
+	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);
 	void       QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
@@ -198,6 +198,10 @@ public:
 
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(cEntity * a_Entity);
+	
+	/** Adds the entity to its appropriate chunk, if the entity is not already added.
+	Takes ownership of the entity pointer */
+	void AddEntityIfNotPresent(cEntity * a_Entity);
 	
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(int a_EntityID);

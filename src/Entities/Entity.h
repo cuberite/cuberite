@@ -146,8 +146,9 @@ public:
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
 
-	/// Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed)
-	virtual bool Initialize(cWorld * a_World);
+	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
+	Adds the entity to the world. */
+	virtual bool Initialize(cWorld & a_World);
 
 	// tolua_begin
 	
@@ -421,6 +422,9 @@ public:
 		UNUSED(a_Killer);
 	}
 
+	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
+	void SetWorld(cWorld * a_World) { m_World = a_World; }
+
 protected:
 	static cCriticalSection m_CSCount;
 	static int m_EntityCount;
@@ -484,8 +488,6 @@ protected:
 
 
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
-
-	void SetWorld(cWorld * a_World) { m_World = a_World; }
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir();

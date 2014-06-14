@@ -92,7 +92,8 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_ReceivedData(32 KiB),
 	m_OutPacketBuffer(64 KiB),
 	m_OutPacketLenBuffer(20),  // 20 bytes is more than enough for one VarInt
-	m_IsEncrypted(false)
+	m_IsEncrypted(false),
+	m_LastSentDimension(dimNotSet)
 {
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
@@ -234,7 +235,8 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 	
 	// Compose the complete Json string to send:
 	Json::Value msg;
-	msg["text"] = "";  // The client crashes without this
+	cWorld * World = m_Client->GetPlayer()->GetWorld();
+	msg["text"] = cClientHandle::FormatMessageType((World == NULL) ? false : World->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
 	const cCompositeChat::cParts & Parts = a_Message.GetParts();
 	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
 	{
@@ -286,6 +288,35 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
 				Cmd["value"] = p.m_Command;
 				Part["clickEvent"] = Cmd;
+				AddChatPartStyle(Part, p.m_Style);
+				break;
+			}
+
+			case cCompositeChat::ptShowAchievement:
+			{
+				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
+				Part["translate"] = "chat.type.achievement";
+
+				Json::Value Ach;
+				Ach["action"] = "show_achievement";
+				Ach["value"] = p.m_Text;
+				
+				Json::Value AchColourAndName;
+				AchColourAndName["color"] = "green";
+				AchColourAndName["translate"] = p.m_Text;
+				AchColourAndName["hoverEvent"] = Ach;
+
+				Json::Value Extra;
+				Extra.append(AchColourAndName);
+
+				Json::Value Name;
+				Name["text"] = p.m_PlayerName;
+
+				Json::Value With;
+				With.append(Name);
+				With.append(Extra);
+
+				Part["with"] = With;
 				AddChatPartStyle(Part, p.m_Style);
 				break;
 			}
@@ -626,6 +657,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte(std::min(Server->GetMaxPlayers(), 60));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
+	m_LastSentDimension = a_World.GetDimension();
 	
 	// Send the spawn position:
 	{
@@ -954,14 +986,21 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol172::SendRespawn(void)
+void cProtocol172::SendRespawn(const cWorld & a_World)
 {
+	if (m_LastSentDimension == a_World.GetDimension())
+	{
+		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
+		return;
+	}
+
 	cPacketizer Pkt(*this, 0x07);  // Respawn packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteInt(Player->GetWorld()->GetDimension());
+	Pkt.WriteInt(a_World.GetDimension());
 	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 	Pkt.WriteByte((Byte)Player->GetEffectiveGameMode());
 	Pkt.WriteString("default");
+	m_LastSentDimension = a_World.GetDimension();
 }
 
 

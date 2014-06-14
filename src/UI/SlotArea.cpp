@@ -625,7 +625,8 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 
 cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
 	cSlotAreaTemporary(3, a_ParentWindow),
-	m_MaximumCost(0)
+	m_MaximumCost(0),
+	m_StackSizeToBeUsedInRepair(0)
 {
 }
 
@@ -796,6 +797,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 		{
 			cItem NewSecondItem(*Item);
 			NewSecondItem.m_ItemCount -= m_StackSizeToBeUsedInRepair;
+			m_StackSizeToBeUsedInRepair = 0;
 			SetSlot(1, a_Player, NewSecondItem);
 		}
 		else
@@ -1381,14 +1383,141 @@ cSlotAreaFurnace::~cSlotAreaFurnace()
 
 void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-	
 	if (m_Furnace == NULL)
 	{
 		LOGERROR("cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
 		ASSERT(!"cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
 		return;
 	}
+
+	if (a_SlotNum == 2)
+	{
+		bool bAsync = false;
+		if (GetSlot(a_SlotNum, a_Player) == NULL)
+		{
+			LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+			return;
+		}
+
+		cItem Slot(*GetSlot(a_SlotNum, a_Player));
+		if (!Slot.IsSameType(a_ClickedItem))
+		{
+			LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+			LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+			bAsync = true;
+		}
+
+		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+		{
+			HandleSmeltItem(Slot, a_Player);
+			ShiftClicked(a_Player, a_SlotNum, Slot);
+			return;
+		}
+
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		if (!DraggingItem.IsEmpty())
+		{
+			if (a_ClickAction == caDblClick)
+			{
+				return;
+			}
+			if (!DraggingItem.IsEqual(Slot))
+			{
+				return;
+			}
+			if ((DraggingItem.m_ItemCount + Slot.m_ItemCount) > Slot.GetMaxStackSize())
+			{
+				return;
+			}
+
+			DraggingItem.m_ItemCount += Slot.m_ItemCount;
+			HandleSmeltItem(Slot, a_Player);
+			Slot.Empty();
+		}
+		else
+		{
+			switch (a_ClickAction)
+			{
+				case caDblClick:
+				{
+					DblClicked(a_Player, a_SlotNum);
+					return;
+				}
+				case caLeftClick:
+				{
+					DraggingItem = Slot;
+					HandleSmeltItem(Slot, a_Player);
+					Slot.Empty();
+					break;
+				}
+				case caRightClick:
+				{
+					DraggingItem = Slot.CopyOne();
+					DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
+					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
+
+					if (Slot.m_ItemCount <= 0)
+					{
+						Slot.Empty();
+					}
+					HandleSmeltItem(DraggingItem, a_Player);
+					break;
+				}
+				default:
+				{
+					ASSERT(!"Unhandled click type!");
+				}
+			}
+		}
+
+		SetSlot(a_SlotNum, a_Player, Slot);
+		if (bAsync)
+		{
+			m_ParentWindow.BroadcastWholeWindow();
+		}
+		return;
+	}
+
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+}
+
+
+
+
+
+void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			return;
+		}
+	}  // for i - Slots
 }
 
 
@@ -1397,6 +1526,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
+	UNUSED(a_Player);
 	// a_SlotNum ranges from 0 to 2, query the items from the underlying furnace:
 	return &(m_Furnace->GetSlot(a_SlotNum));
 }
@@ -1407,6 +1537,7 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
+	UNUSED(a_Player);
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 
@@ -1416,6 +1547,7 @@ void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & 
 
 void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
+	UNUSED(a_SlotNum);
 	// Something has changed in the window, broadcast the entire window to all clients
 	ASSERT(a_ItemGrid == &(m_Furnace->GetContents()));
 

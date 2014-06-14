@@ -129,9 +129,9 @@ const char * cEntity::GetParentClass(void) const
 
 
 
-bool cEntity::Initialize(cWorld * a_World)
+bool cEntity::Initialize(cWorld & a_World)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(*a_World, *this))
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
 	{
 		return false;
 	}
@@ -144,13 +144,13 @@ bool cEntity::Initialize(cWorld * a_World)
 	*/
 	
 	m_IsInitialized = true;
-	m_World = a_World;
+	m_World = &a_World;
 	m_World->AddEntity(this);
 	
-	cPluginManager::Get()->CallHookSpawnedEntity(*a_World, *this);
+	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
 	
 	// Spawn the entity on the clients:
-	a_World->BroadcastSpawnEntity(*this);
+	a_World.BroadcastSpawnEntity(*this);
 	
 	return true;
 }
@@ -1023,11 +1023,12 @@ void cEntity::DetectCacti(void)
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	double w = m_Width / 2;
 	if (
-		(((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
-		(((GetPosX() - (X - 1)) - 1 < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
+		((Y > 0) && (Y < cChunkDef::Height)) &&
+		((((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
+		((GetPosX() - X < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
 		(((Z + 1) - GetPosZ() < w) && (GetWorld()->GetBlock(X, Y, Z + 1) == E_BLOCK_CACTUS)) ||
-		(((GetPosZ() - (Z - 1)) - 1 < w) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS)) ||
-		(((Y > 0) && (Y < cChunkDef::Height)) && ((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS)))
+		((GetPosZ() - Z < w) && (GetWorld()->GetBlock(X, Y, Z - 1) == E_BLOCK_CACTUS)) ||
+		(((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS))))
 		)
 	{
 		TakeDamage(dtCactusContact, NULL, 1, 0);

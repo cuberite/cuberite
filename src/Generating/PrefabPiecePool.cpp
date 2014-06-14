@@ -26,6 +26,34 @@ cPrefabPiecePool::cPrefabPiecePool(
 
 
 
+cPrefabPiecePool::~cPrefabPiecePool()
+{
+	Clear();
+}
+
+
+
+
+
+void cPrefabPiecePool::Clear(void)
+{
+	m_PiecesByConnector.clear();
+	for (cPieces::iterator itr = m_AllPieces.begin(), end = m_AllPieces.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_AllPieces.clear();
+	for (cPieces::iterator itr = m_StartingPieces.begin(), end = m_StartingPieces.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_StartingPieces.clear();
+}
+
+
+
+
+
 void cPrefabPiecePool::AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_NumPieceDefs)
 {
 	ASSERT(a_PieceDefs != NULL);
@@ -95,6 +123,15 @@ cPieces cPrefabPiecePool::GetStartingPieces(void)
 int cPrefabPiecePool::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece)
 {
 	return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
+}
+
+
+
+
+
+int cPrefabPiecePool::GetStartingPieceWeight(const cPiece & a_NewPiece)
+{
+	return ((const cPrefab &)a_NewPiece).GetDefaultWeight();
 }
 
 

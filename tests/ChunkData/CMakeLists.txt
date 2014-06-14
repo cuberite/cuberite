@@ -5,7 +5,7 @@ enable_testing()
 include_directories(${CMAKE_SOURCE_DIR}/src/)
 
 add_definitions(-DTEST_GLOBALS=1)
-add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp)
+add_library(ChunkBuffer ${CMAKE_SOURCE_DIR}/src/ChunkData.cpp ${CMAKE_SOURCE_DIR}/src/StringUtils.cpp)
 
 
 add_executable(creatable-exe creatable.cpp)
@@ -24,3 +24,6 @@ add_executable(arraystocoords-exe ArraytoCoord.cpp)
 target_link_libraries(arraystocoords-exe ChunkBuffer)
 add_test(NAME arraystocoords-test COMMAND arraystocoords-exe)
 
+add_executable(copyblocks-exe CopyBlocks.cpp)
+target_link_libraries(copyblocks-exe ChunkBuffer)
+add_test(NAME copyblocks-test COMMAND copyblocks-exe)

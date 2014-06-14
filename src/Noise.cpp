@@ -854,7 +854,7 @@ void cPerlinNoise::Generate2D(
 	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
 	for (int i = 0; i < ArrayCount; i++)
 	{
-		a_Array[i] *= Amplitude;
+		a_Array[i] = a_Workspace[i] * Amplitude;
 	}
 	
 	// Add each octave:
@@ -897,6 +897,174 @@ void cPerlinNoise::Generate3D(
 	{
 		// No work to be done
 		ASSERT(!"Perlin: No octaves to generate!");
+		return;
+	}
+	
+	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
+	if (ShouldFreeWorkspace)
+	{
+		a_Workspace = new NOISE_DATATYPE[ArrayCount];
+	}
+	
+	// Generate the first octave directly into array:
+	const cOctave & FirstOctave = m_Octaves.front();
+
+	FirstOctave.m_Noise.Generate3D(
+		a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
+		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
+		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
+		a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
+	);
+	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
+	for (int i = 0; i < ArrayCount; i++)
+	{
+		a_Array[i] = a_Workspace[i] * Amplitude;
+	}
+	
+	// Add each octave:
+	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
+	{
+		// Generate cubic noise for the octave:
+		itr->m_Noise.Generate3D(
+			a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
+			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
+			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency,
+			a_StartZ * itr->m_Frequency, a_EndZ * itr->m_Frequency
+		);
+		// Add the cubic noise into the output:
+		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
+		for (int i = 0; i < ArrayCount; i++)
+		{
+			a_Array[i] += a_Workspace[i] * Amplitude;
+		}
+	}
+	
+	if (ShouldFreeWorkspace)
+	{
+		delete[] a_Workspace;
+	}
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cRidgedMultiNoise:
+
+cRidgedMultiNoise::cRidgedMultiNoise(void) :
+	m_Seed(0)
+{
+}
+
+
+
+
+
+cRidgedMultiNoise::cRidgedMultiNoise(int a_Seed) :
+	m_Seed(a_Seed)
+{
+}
+
+
+
+
+
+void cRidgedMultiNoise::SetSeed(int a_Seed)
+{
+	m_Seed = a_Seed;
+}
+
+
+
+
+
+void cRidgedMultiNoise::AddOctave(float a_Frequency, float a_Amplitude)
+{
+	m_Octaves.push_back(cOctave(m_Seed * ((int)m_Octaves.size() + 4) * 4 + 1024, a_Frequency, a_Amplitude));
+}
+
+
+
+
+
+void cRidgedMultiNoise::Generate2D(
+	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
+) const
+{
+	if (m_Octaves.empty())
+	{
+		// No work to be done
+		ASSERT(!"RidgedMulti: No octaves to generate!");
+		return;
+	}
+	
+	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	int ArrayCount = a_SizeX * a_SizeY;
+	if (ShouldFreeWorkspace)
+	{
+		a_Workspace = new NOISE_DATATYPE[ArrayCount];
+	}
+	
+	// Generate the first octave directly into array:
+	const cOctave & FirstOctave = m_Octaves.front();
+	
+	FirstOctave.m_Noise.Generate2D(
+		a_Workspace, a_SizeX, a_SizeY,
+		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
+		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
+	);
+	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
+	for (int i = 0; i < ArrayCount; i++)
+	{
+		a_Array[i] = fabs(a_Workspace[i] * Amplitude);
+	}
+	
+	// Add each octave:
+	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
+	{
+		// Generate cubic noise for the octave:
+		itr->m_Noise.Generate2D(
+			a_Workspace, a_SizeX, a_SizeY,
+			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
+			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency
+		);
+		// Add the cubic noise into the output:
+		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
+		for (int i = 0; i < ArrayCount; i++)
+		{
+			a_Array[i] += fabs(a_Workspace[i] * Amplitude);
+		}
+	}
+	
+	if (ShouldFreeWorkspace)
+	{
+		delete[] a_Workspace;
+	}
+}
+
+
+
+
+
+void cRidgedMultiNoise::Generate3D(
+	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
+	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
+) const
+{
+	if (m_Octaves.empty())
+	{
+		// No work to be done
+		ASSERT(!"RidgedMulti: No octaves to generate!");
 		return;
 	}
 	

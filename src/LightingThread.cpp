@@ -27,7 +27,7 @@ class cReader :
 		{
 			for (int z = 0; z < cChunkDef::Width; z++)
 			{
-				a_ChunkBuffer.CopyBlocks(OutputRows + OutputIdx * 16, InputIdx * 16, 16);
+				a_ChunkBuffer.CopyBlockTypes(OutputRows + OutputIdx * 16, InputIdx * 16, 16);
 				InputIdx++;
 				OutputIdx += 3;
 			}  // for z

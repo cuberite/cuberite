@@ -72,7 +72,7 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendRespawn             (void) override;
+	virtual void SendRespawn             (const cWorld & a_World) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb &  a_ExpOrb) override;
 	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
@@ -113,6 +113,10 @@ protected:
 	cByteBuffer m_ReceivedData;  ///< Buffer for the received data
 	
 	AString m_Username;  ///< Stored in ParseHandshake(), compared to Login username
+
+	/** The dimension that was last sent to a player in a Respawn or Login packet.
+	Used to avoid Respawning into the same dimension, which confuses the client. */
+	eDimension m_LastSentDimension;
 	
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 	
