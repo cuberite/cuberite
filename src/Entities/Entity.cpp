@@ -1076,6 +1076,17 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 
 
 
+void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
+	
+	WrapSpeed();
+}
+
+
+
+
+
 void cEntity::HandleAir(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
@@ -1428,9 +1439,7 @@ void cEntity::SetRoll(double a_Roll)
 
 void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
-	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-	
-	WrapSpeed();
+	DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -1438,9 +1447,7 @@ void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 void cEntity::SetSpeedX(double a_SpeedX)
 {
-	m_Speed.x = a_SpeedX;
-	
-	WrapSpeed();
+	SetSpeed(a_SpeedX, m_Speed.y, m_Speed.z);
 }
 
 
@@ -1448,9 +1455,7 @@ void cEntity::SetSpeedX(double a_SpeedX)
 
 void cEntity::SetSpeedY(double a_SpeedY)
 {
-	m_Speed.y = a_SpeedY;
-	
-	WrapSpeed();
+	SetSpeed(m_Speed.x, a_SpeedY, m_Speed.z);
 }
 
 
@@ -1458,9 +1463,7 @@ void cEntity::SetSpeedY(double a_SpeedY)
 
 void cEntity::SetSpeedZ(double a_SpeedZ)
 {
-	m_Speed.z = a_SpeedZ;
-	
-	WrapSpeed();
+	SetSpeed(m_Speed.x, m_Speed.y, a_SpeedZ);
 }
 
 

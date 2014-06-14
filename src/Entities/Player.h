@@ -195,16 +195,8 @@ public:
 	void LoginSetGameMode(eGameMode a_GameMode);
 
 	/** Forces the player to move in the given direction. 
-	 *  @deprecated Use SetSpeed instead.
-	 */
+	@deprecated Use SetSpeed instead. */
 	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
-
-	/** Sets the speed of the player and moves them in the given speed. */
-	void SetSpeed           (const Vector3d & a_Speed);
-	virtual void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
-	virtual void SetSpeedX  (double a_SpeedX) override;
-	virtual void SetSpeedY  (double a_SpeedY) override;
-	virtual void SetSpeedZ  (double a_SpeedZ) override;
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
@@ -520,6 +512,9 @@ protected:
 	cStatManager m_Stats;
 
 
+
+	/** Sets the speed and sends it to the client, so that they are forced to move so. */
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
 	void ResolvePermissions(void);
 	void ResolveGroups(void);

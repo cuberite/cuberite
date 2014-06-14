@@ -1257,70 +1257,16 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
 	SetSpeed(a_Speed);
-	m_ClientHandle->SendEntityVelocity(*this);
 }
 
 
 
 
 
-void cPlayer::SetSpeed(const Vector3d & a_Speed)
+void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 {
-	m_Speed.Set(a_Speed.x, a_Speed.y, a_Speed.z);
-	WrapSpeed();
-	
-	// Send the speed to the client so he actualy moves
-	m_ClientHandle->SendEntityVelocity(*this);
-}
+	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 
-
-
-
-
-void cPlayer::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
-{
-	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-	WrapSpeed();
-
-	// Send the speed to the client so he actualy moves
-	m_ClientHandle->SendEntityVelocity(*this);
-}
-
-
-
-
-
-void cPlayer::SetSpeedX(double a_SpeedX)
-{
-	m_Speed.x = a_SpeedX;
-	WrapSpeed();
-		
-	// Send the speed to the client so he actualy moves
-	m_ClientHandle->SendEntityVelocity(*this);
-}
-
-
-
-
-
-void cPlayer::SetSpeedY(double a_SpeedY)
-{
-	m_Speed.y = a_SpeedY;
-	WrapSpeed();
-		
-	// Send the speed to the client so he actualy moves
-	m_ClientHandle->SendEntityVelocity(*this);
-}
-
-
-
-
-
-void cPlayer::SetSpeedZ(double a_SpeedZ)
-{
-	m_Speed.z = a_SpeedZ;
-	WrapSpeed();
-		
 	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
 }
