@@ -3,21 +3,31 @@
 
 #include <memory>
 
+template<class T>
+class cAllocationPool
+{
+public:
+	class cStarvationCallbacks
+	{
+		public:
+			virtual ~cStarvationCallbacks() {}
+			virtual void OnStartingUsingBuffer() = 0;
+			virtual void OnStopUsingBuffer() = 0;
+			virtual void OnBufferEmpty() = 0;
+	};
+	
+	virtual ~cAllocationPool() {}
+	
+	virtual T * Allocate() = 0;
+	virtual void Free(T * a_ptr) = 0;
+};
+
 template<class T, size_t NumElementsInReserve>
-class cAllocationPool 
+class cListAllocationPool : public cAllocationPool<T>
 {
 	public:
-
-		class cStarvationCallbacks
-		{
-			public:
-				virtual ~cStarvationCallbacks() {}
-				virtual void OnStartingUsingBuffer() = 0;
-				virtual void OnStopUsingBuffer() = 0;
-				virtual void OnBufferEmpty() = 0;
-		};
 		
-		cAllocationPool(std::auto_ptr<cStarvationCallbacks> a_Callbacks) :
+		cListAllocationPool(std::auto_ptr<typename cAllocationPool<T>::cStarvationCallbacks> a_Callbacks) :
 			m_Callbacks(a_Callbacks)
 		{
 			for (size_t i = 0; i < NumElementsInReserve; i++)
@@ -32,7 +42,7 @@ class cAllocationPool
 			}
 		}
 		
-		~cAllocationPool()
+		virtual ~cListAllocationPool()
 		{
 			while (!m_FreeList.empty())
 			{
@@ -41,7 +51,7 @@ class cAllocationPool
 			}
 		}	
 		
-		T * Allocate()
+		virtual T * Allocate() override
 		{
 			if (m_FreeList.size() <= NumElementsInReserve)
 			{
@@ -66,15 +76,15 @@ class cAllocationPool
 			m_FreeList.pop_front();
 			return ret;
 		}
-		void Free(T * ptr)
+		virtual void Free(T * a_ptr) override
 		{
-			if (ptr == NULL) 
+			if (a_ptr == NULL) 
 			{
 				return;
 			}
 			// placement destruct.
-			ptr->~T();
-			m_FreeList.push_front(ptr);
+			a_ptr->~T();
+			m_FreeList.push_front(a_ptr);
 			if (m_FreeList.size() == NumElementsInReserve)
 			{
 				m_Callbacks->OnStopUsingBuffer();
@@ -83,5 +93,5 @@ class cAllocationPool
 		
 	private:
 		std::list<void *> m_FreeList;
-		std::auto_ptr<cStarvationCallbacks> m_Callbacks;
+		std::auto_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;
 };

@@ -37,7 +37,7 @@ public:
 
 	struct sChunkSection;
 
-	cChunkData(cAllocationPool<cChunkData::sChunkSection, 1600> & a_Pool);
+	cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool);
 	~cChunkData();
 	
 	#if __cplusplus < 201103L
@@ -122,7 +122,7 @@ private:
 	/** Sets the data in the specified section to their default values. */
 	void ZeroSection(sChunkSection * a_Section) const;
 
-	cAllocationPool<cChunkData::sChunkSection, 1600> & m_Pool;
+	cAllocationPool<cChunkData::sChunkSection> & m_Pool;
 };
 
 

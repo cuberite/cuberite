@@ -65,7 +65,7 @@ cChunk::cChunk(
 	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
-	cAllocationPool<cChunkData::sChunkSection, 1600> & a_Pool
+	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ) :
 	m_IsValid(false),
 	m_IsLightValid(false),

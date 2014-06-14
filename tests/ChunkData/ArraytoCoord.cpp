@@ -6,14 +6,19 @@
 
 int main(int argc, char** argv)
 {
-	class cStarvationCallbacks
-		: public cAllocationPool<cChunkData::sChunkSection, 1600>::cStarvationCallbacks
-	{
-		virtual void OnStartingUsingBuffer() {}
-		virtual void OnStopUsingBuffer() {}
-		virtual void OnBufferEmpty() {}
-	};
-	cAllocationPool<cChunkData::sChunkSection, 1600> Pool(std::auto_ptr<cAllocationPool<cChunkData::sChunkSection, 1600>::cStarvationCallbacks>(new cStarvationCallbacks()));
+	class cMockAllocationPool
+		: public cAllocationPool<cChunkData::sChunkSection>
+ 	{
+		virtual cChunkData::sChunkSection * Allocate()
+		{
+			return new cChunkData::sChunkSection();
+		}
+		
+		virtual void Free(cChunkData::sChunkSection * a_Ptr)
+		{
+			delete a_Ptr;
+		}
+	} Pool;
 	{
 	
 		// Test first segment
