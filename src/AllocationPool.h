@@ -3,7 +3,7 @@
 
 #include <memory>
 
-template<class T, size_t BufferSize>
+template<class T, size_t NumElementsInReserve>
 class cAllocationPool {
 	public:
 
@@ -32,14 +32,14 @@ class cAllocationPool {
 		
 		T* Allocate()
 		{
-			if (m_FreeList.size() <= BufferSize)
+			if (m_FreeList.size() <= NumElementsInReserve)
 			{
 				void * space = malloc(sizeof(T));
 				if (space != NULL)
 				{
 					return new(space) T;
 				}
-				else if (m_FreeList.size() == BufferSize)
+				else if (m_FreeList.size() == NumElementsInReserve)
 				{
 					m_Callbacks->OnStartingUsingBuffer();
 				}
@@ -64,7 +64,7 @@ class cAllocationPool {
 			// placement destruct.
 			ptr->~T();
 			m_FreeList.push_front(ptr);
-			if (m_FreeList.size() == BufferSize)
+			if (m_FreeList.size() == NumElementsInReserve)
 			{
 				m_Callbacks->OnStopUsingBuffer();
 			}
