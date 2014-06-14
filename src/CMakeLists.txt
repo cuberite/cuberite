@@ -157,6 +157,9 @@ else ()
 	)
 	source_group("" FILES ${SOURCE})
 
+	LIST(APPEND SOURCE "Bindings/Bindings.cpp" "Bindings/Bindings.h")
+	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
+
 	# Add all subfolders as solution-folders:
 	list(APPEND FOLDERS "Resources")
 	list(APPEND FOLDERS "Bindings")
