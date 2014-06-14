@@ -37,9 +37,9 @@ public:
 
 	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
 
-	/** Returns true if the current weather has any precipitation - rain or storm
-	Does not check if biome has no downfall, use cChunk::GetBiomeAt(RelX, RelZ) for that
-	*/
-	virtual bool IsWeatherWet(void) const = 0;
+	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
 
+	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
+	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
 };

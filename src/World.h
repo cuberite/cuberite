@@ -180,7 +180,7 @@ public:
 	virtual eDimension GetDimension(void) const { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	int GetHeight(int a_BlockX, int a_BlockZ);
+	virtual int GetHeight(int a_BlockX, int a_BlockZ);
 	
 	// tolua_end
 
@@ -749,10 +749,10 @@ public:
 	}
 	
 	/** Returns true if the current weather has any precipitation - rain, storm or snow */
-	virtual bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
+	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 	
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
-	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
