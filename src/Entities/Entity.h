@@ -215,11 +215,22 @@ public:
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
-	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
-	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
-	void SetSpeedX  (double a_SpeedX);
-	void SetSpeedY  (double a_SpeedY);
-	void SetSpeedZ  (double a_SpeedZ);
+
+	/** Sets the speed of the entity, measured in m / sec */
+	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	
+	/** Sets the speed of the entity, measured in m / sec */
+	void SetSpeed(const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	
+	/** Sets the speed in the X axis, leaving the other speed components intact. Measured in m / sec. */
+	void SetSpeedX(double a_SpeedX);
+	
+	/** Sets the speed in the Y axis, leaving the other speed components intact. Measured in m / sec. */
+	void SetSpeedY(double a_SpeedY);
+	
+	/** Sets the speed in the Z axis, leaving the other speed components intact. Measured in m / sec. */
+	void SetSpeedZ(double a_SpeedZ);
+	
 	void SetWidth   (double a_Width);
 	
 	void AddPosX    (double a_AddPosX);
@@ -429,6 +440,9 @@ protected:
 	static cCriticalSection m_CSCount;
 	static int m_EntityCount;
 	
+	/** Measured in meter/second (m/s) */
+	Vector3d m_Speed;
+
 	int m_UniqueID;
 	
 	int m_Health;
@@ -486,11 +500,15 @@ protected:
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
 
-
+	
+	/** Does the actual speed-setting. The default implementation just sets the member variable value;
+	overrides can provide further processing, such as forcing players to move at the given speed. */
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
-	virtual void HandleAir();
+	virtual void HandleAir(void);
 	
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
@@ -505,9 +523,6 @@ protected:
 private:
 	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
-	
-	/** Measured in meter/second (m/s) */
-	Vector3d m_Speed;
 	
 	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
