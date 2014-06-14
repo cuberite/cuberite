@@ -156,7 +156,7 @@ private:
 	bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Returns if a coordinate was marked as simulated (for blocks toggleable by players) */
 	bool AreCoordsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool IsCurrentStatePowered);
-	/** Returns if a repeater is powered */
+	/** Returns if a repeater is powered by testing for power sources behind the repeater */
 	bool IsRepeaterPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta);
 	/** Returns if a repeater is locked */
 	bool IsRepeaterLocked(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta);
