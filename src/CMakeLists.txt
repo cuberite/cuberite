@@ -149,16 +149,6 @@ if (NOT MSVC)
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
-	# Generate the Bindings if they don't exist:
-	if (NOT EXISTS "${PROJECT_SOURCE_DIR}/Bindings/Bindings.cpp")
-		message("Bindings.cpp not found, generating now")
-		set(tolua_executable ${PROJECT_SOURCE_DIR}/Bindings/tolua++.exe)
-		execute_process(
-			COMMAND ${tolua_executable} -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Bindings
-		)
-	endif()
-
 	# Get all files in this folder:
 	file(GLOB_RECURSE SOURCE
 		"*.cpp"
