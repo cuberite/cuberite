@@ -179,14 +179,9 @@ void cEntity::WrapRotation(void)
 
 void cEntity::WrapSpeed(void)
 {
-	// There shoudn't be a need for flipping the flag on because this function is called 
-	// after any update, so the flag is already turned on
-	if       (m_Speed.x > 78.0f)   m_Speed.x  =  78.0f;
-	else if  (m_Speed.x < -78.0f)  m_Speed.x  = -78.0f;
-	if       (m_Speed.y > 78.0f)   m_Speed.y  =  78.0f;
-	else if  (m_Speed.y < -78.0f)  m_Speed.y  = -78.0f;
-	if       (m_Speed.z > 78.0f)   m_Speed.z  =  78.0f;
-	else if  (m_Speed.z < -78.0f)  m_Speed.z  = -78.0f;
+	m_Speed.x = Clamp(m_Speed.x, -78.0, 78.0);
+	m_Speed.y = Clamp(m_Speed.y, -78.0, 78.0);
+	m_Speed.z = Clamp(m_Speed.z, -78.0, 78.0);
 }
 
 
