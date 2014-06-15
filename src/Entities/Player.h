@@ -462,7 +462,6 @@ protected:
 	cItem m_DraggingItem;
 
 	long long m_LastPlayerListTime;
-	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second
 
 	cClientHandle * m_ClientHandle;
 	
@@ -542,6 +541,10 @@ protected:
 	/** Flag representing whether the player is currently in a bed
 	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
 	bool m_bIsInBed;
+
+	/** How long till the player's inventory will be saved
+	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
+	unsigned int m_TicksUntilNextSave;
 
 } ; // tolua_export
 
