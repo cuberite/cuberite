@@ -22,7 +22,7 @@ class cUnderwaterBaseGen :
 	typedef cGridStructGen super;
 	
 public:
-	cUnderwaterBaseGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSize, cBiomeGen & a_BiomeGen);
+	cUnderwaterBaseGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, cBiomeGen & a_BiomeGen);
 
 protected:
 	class cUnderwaterBase;  // fwd: UnderwaterBaseGen.cpp
@@ -42,7 +42,7 @@ protected:
 
 
 	// cGridStructGen overrides:
-	virtual cStructurePtr CreateStructure(int a_OriginX, int a_OriginZ) override;
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 

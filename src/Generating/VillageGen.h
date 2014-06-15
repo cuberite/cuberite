@@ -21,7 +21,7 @@ class cVillageGen :
 {
 	typedef cGridStructGen super;
 public:
-	cVillageGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSize, int a_MinDensity, int a_MaxDensity, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
+	cVillageGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, int a_MinDensity, int a_MaxDensity, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
 
 protected:
 	class cVillage;  // fwd: VillageGen.cpp
@@ -49,7 +49,7 @@ protected:
 
 
 	// cGridStructGen overrides:
-	virtual cStructurePtr CreateStructure(int a_OriginX, int a_OriginZ) override;
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 

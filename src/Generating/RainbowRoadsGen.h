@@ -22,7 +22,7 @@ class cRainbowRoadsGen :
 	typedef cGridStructGen super;
 	
 public:
-	cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSize);
+	cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize);
 
 protected:
 	class cRainbowRoads;  // fwd: RainbowRoadsGen.cpp
@@ -39,7 +39,7 @@ protected:
 
 
 	// cGridStructGen overrides:
-	virtual cStructurePtr CreateStructure(int a_OriginX, int a_OriginZ) override;
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 

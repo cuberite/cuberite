@@ -110,6 +110,7 @@ class cVillageGen::cVillage :
 public:
 	cVillage(
 		int a_Seed,
+		int a_GridX, int a_GridZ,
 		int a_OriginX, int a_OriginZ,
 		int a_MaxRoadDepth,
 		int a_MaxSize,
@@ -119,7 +120,7 @@ public:
 		BLOCKTYPE a_RoadBlock,
 		BLOCKTYPE a_WaterRoadBlock
 	) :
-		super(a_OriginX, a_OriginZ),
+		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
 		m_MaxSize(a_MaxSize),
@@ -358,8 +359,8 @@ static cVillagePiecePool * g_PlainsVillagePools[] =
 
 
 
-cVillageGen::cVillageGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSize, int a_MinDensity, int a_MaxDensity, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 100),
+cVillageGen::cVillageGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, int a_MinDensity, int a_MaxDensity, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen) :
+	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
 	m_Noise(a_Seed + 1000),
 	m_MaxDepth(a_MaxDepth),
 	m_MaxSize(a_MaxSize),
@@ -374,7 +375,7 @@ cVillageGen::cVillageGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSi
 
 
 
-cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
 	// Generate the biomes for the chunk surrounding the origin:
 	int ChunkX, ChunkZ;
@@ -435,7 +436,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_OriginX, int a_
 	{
 		return cStructurePtr();
 	}
-	return cStructurePtr(new cVillage(m_Seed, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *VillagePrefabs, m_HeightGen, RoadBlock, WaterRoadBlock));
+	return cStructurePtr(new cVillage(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *VillagePrefabs, m_HeightGen, RoadBlock, WaterRoadBlock));
 }
 
 
