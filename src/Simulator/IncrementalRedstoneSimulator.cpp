@@ -59,19 +59,21 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	int RelZ = 0;	
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
+	cChunk * Chunk;
 
 	if (a_OtherChunk != NULL)
 	{
 		RelX = a_BlockX - a_OtherChunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_OtherChunk->GetPosZ() * cChunkDef::Width;
 		a_OtherChunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
-		a_OtherChunk->SetIsRedstoneDirty(true);
+		Chunk = a_OtherChunk;
 	}
 	else
 	{
 		RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 		a_Chunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
+		Chunk = a_Chunk;
 	}
 
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
@@ -90,7 +92,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			itr = PoweredBlocks->erase(itr);
-			a_Chunk->SetIsRedstoneDirty(true);
+			Chunk->SetIsRedstoneDirty(true);
 			continue;
 		}
 		else if (
@@ -105,8 +107,24 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			itr = PoweredBlocks->erase(itr);
-			a_Chunk->SetIsRedstoneDirty(true);
+			Chunk->SetIsRedstoneDirty(true);
 			continue;
+		}
+		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
+		{
+			if (!m_World.IsChunkLighted(Chunk->GetPosX(), Chunk->GetPosZ()))
+			{
+				m_World.QueueLightChunk(Chunk->GetPosX(), Chunk->GetPosZ());
+			}
+			else
+			{
+				if (Chunk->GetTimeAlteredLight(Chunk->GetSkyLight(RelX, a_BlockY + 1, RelZ)) <= 7)
+				{
+					itr = PoweredBlocks->erase(itr);
+					Chunk->SetIsRedstoneDirty(true);
+					continue;
+				}
+			}
 		}
 		++itr;
 	}
@@ -121,7 +139,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
-				a_Chunk->SetIsRedstoneDirty(true);
+				Chunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 			else if (
@@ -135,7 +153,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
-				a_Chunk->SetIsRedstoneDirty(true);
+				Chunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 		}
@@ -145,7 +163,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
-				a_Chunk->SetIsRedstoneDirty(true);
+				Chunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 		}
@@ -1144,6 +1162,10 @@ void cIncrementalRedstoneSimulator::HandleDaylightSensor(int a_RelBlockX, int a_
 		if (SkyLight > 8)
 		{
 			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+		}
+		else
+		{
+			WakeUp(BlockX, a_RelBlockY, BlockZ, m_Chunk);
 		}
 	}
 }
