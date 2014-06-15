@@ -806,12 +806,12 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 		{
 			WereItrsChanged = QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, false);
 		}
-		else if (a_Itr != m_RepeatersDelayList->end())
+		else if (a_Itr == m_RepeatersDelayList->end())
 		{
 			return;
 		}
 	}
-	else if (a_Itr != m_RepeatersDelayList->end())
+	else if (a_Itr == m_RepeatersDelayList->end())
 	{
 		return;
 	}
