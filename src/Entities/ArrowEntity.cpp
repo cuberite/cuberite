@@ -114,7 +114,14 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
 	// Broadcast successful hit sound
-	m_World->BroadcastSoundEffect("random.successful_hit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect(
+		"random.successful_hit",
+		(int)std::floor(GetPosX() * 8.0),
+		(int)std::floor(GetPosY() * 8.0),
+		(int)std::floor(GetPosZ() * 8.0),
+		0.5,
+		(float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64)
+	);
 	
 	Destroy();
 }
@@ -141,7 +148,14 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 		m_bIsCollected = true;
 
 		cFastRandom Random;
-		m_World->BroadcastSoundEffect("random.pop", (int)std::floor(GetPosX() * 8.0), (int)std::floor(GetPosY() * 8), (int)std::floor(GetPosZ() * 8), 0.2F, ((Random.NextFloat(1.0F) - Random.NextFloat(1.0F)) * 0.7F + 1.0F) * 2.0F);
+		m_World->BroadcastSoundEffect(
+			"random.pop",
+			(int)std::floor(GetPosX() * 8.0),
+			(int)std::floor(GetPosY() * 8),
+			(int)std::floor(GetPosZ() * 8),
+			0.2F,
+			((Random.NextFloat(1.0F) - Random.NextFloat(1.0F)) * 0.7F + 1.0F) * 2.0F
+		);
 	}
 }
 
