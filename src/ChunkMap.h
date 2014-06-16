@@ -450,7 +450,7 @@ private:
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;
 
-	std::auto_ptr<cAllocationPool<cChunkData::sChunkSection>> m_Pool;
+	std::auto_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
