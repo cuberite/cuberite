@@ -355,12 +355,8 @@ AString DimensionToString(eDimension a_Dimension)
 	} DimensionMap[] =
 	{
 		{ dimOverworld, "Overworld" },
-		{ dimOverworld, "Normal" },
-		{ dimOverworld, "World" },
 		{ dimNether, "Nether" },
-		{ dimNether, "Hell" },  // Alternate name for Nether
 		{ dimEnd, "End" },
-		{ dimEnd, "Sky" },  // Old name for End
 	};
 
 	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)

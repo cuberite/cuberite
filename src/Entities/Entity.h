@@ -509,7 +509,7 @@ protected:
 	int m_AirTickTimer;
 
 	/** Portal delay timer and cooldown boolean
-	First value is to delay sending the repsawn packet (which triggers the Entering the {Dimension} screen).
+	First value is to delay sending the respawn packet (which triggers the Entering the {Dimension} screen).
 	Second value is to prevent a teleportation loop by ensuring we do not reenter a portal that we came out of.
 	*/
 	std::pair<unsigned short, bool> m_PortalCooldownData;

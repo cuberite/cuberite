@@ -335,10 +335,11 @@ public:
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
 
+	typedef cWorld * cWorldPtr;
 	/** Loads player data from JSON to the object
 	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world
 	*/
-	bool LoadFromDisk(cWorld *& a_World);
+	bool LoadFromDisk(cWorldPtr & a_World);
 	void LoadPermissionsFromDisk(void); // tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }

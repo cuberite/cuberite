@@ -1651,7 +1651,7 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-bool cPlayer::LoadFromDisk(cWorld *& a_World)
+bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
 	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
 	if (a_World == NULL)
