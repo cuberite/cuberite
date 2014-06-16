@@ -20,18 +20,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 32, ID 173, created by Aloe_vera
 	{
 		// Size:
-		12, 5, 10,  // SizeX = 12, SizeY = 5, SizeZ = 10
+		12, 6, 10,  // SizeX = 12, SizeY = 6, SizeZ = 10
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		11, 4, 9,  // MaxX, MaxY, MaxZ
+		11, 5, 9,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 2\n"  /* sandstonestairs */
-		"b:128: 1\n"  /* sandstonestairs */
-		"c:128: 0\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e:128: 3\n"  /* sandstonestairs */
 		"f:171:15\n"  /* carpet */
 		"g: 64: 6\n"  /* wooddoorblock */
@@ -54,32 +54,46 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Level 0
 		/* z\x*             11 */
 		/*    *   012345678901 */
-		/*  0 */ "aaaaaab....."
-		/*  1 */ "cdddddddddd."
-		/*  2 */ "cdddddddddd."
-		/*  3 */ "cdddddddddd."
-		/*  4 */ "cdddddddddd."
-		/*  5 */ "edddddddddd."
-		/*  6 */ ".dddddddddd."
-		/*  7 */ ".dddddddddd."
-		/*  8 */ ".dddddddddd."
-		/*  9 */ "............"
+		/*  0 */ "aaaaaaammmmm"
+		/*  1 */ "aaaaaaaaaaam"
+		/*  2 */ "aaaaaaaaaaam"
+		/*  3 */ "aaaaaaaaaaam"
+		/*  4 */ "aaaaaaaaaaam"
+		/*  5 */ "aaaaaaaaaaam"
+		/*  6 */ "maaaaaaaaaam"
+		/*  7 */ "maaaaaaaaaam"
+		/*  8 */ "maaaaaaaaaam"
+		/*  9 */ "mmmmmmmmmmmm"
 
 		// Level 1
 		/* z\x*             11 */
 		/*    *   012345678901 */
-		/*  0 */ "............"
-		/*  1 */ ".d....ddddd."
-		/*  2 */ "......dfffd."
-		/*  3 */ "......ghfhd."
-		/*  4 */ "......diiid."
-		/*  5 */ ".d....dhfhd."
-		/*  6 */ ".djddjdfffd."
-		/*  7 */ ".ddkkddl..d."
-		/*  8 */ ".dddddddddd."
+		/*  0 */ "bcccccd....."
+		/*  1 */ "baaaaaaaaaa."
+		/*  2 */ "baaaaaaaaaa."
+		/*  3 */ "baaaaaaaaaa."
+		/*  4 */ "baaaaaaaaaa."
+		/*  5 */ "eaaaaaaaaaa."
+		/*  6 */ ".aaaaaaaaaa."
+		/*  7 */ ".aaaaaaaaaa."
+		/*  8 */ ".aaaaaaaaaa."
 		/*  9 */ "............"
 
 		// Level 2
+		/* z\x*             11 */
+		/*    *   012345678901 */
+		/*  0 */ "............"
+		/*  1 */ ".a....aaaaa."
+		/*  2 */ "......afffa."
+		/*  3 */ "......ghfha."
+		/*  4 */ "......aiiia."
+		/*  5 */ ".a....ahfha."
+		/*  6 */ ".ajaajafffa."
+		/*  7 */ ".aakkaal..a."
+		/*  8 */ ".aaaaaaaaaa."
+		/*  9 */ "............"
+
+		// Level 3
 		/* z\x*             11 */
 		/*    *   012345678901 */
 		/*  0 */ "............"
@@ -93,36 +107,36 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  8 */ ".nnn.nnn.nn."
 		/*  9 */ "............"
 
-		// Level 3
-		/* z\x*             11 */
-		/*    *   012345678901 */
-		/*  0 */ "............"
-		/*  1 */ ".d....ddddd."
-		/*  2 */ "......d...d."
-		/*  3 */ "......d...d."
-		/*  4 */ "......dp..d."
-		/*  5 */ ".d....d...d."
-		/*  6 */ ".dqqqqd...d."
-		/*  7 */ ".d....d...d."
-		/*  8 */ ".dddddddddd."
-		/*  9 */ "............"
-
 		// Level 4
 		/* z\x*             11 */
 		/*    *   012345678901 */
+		/*  0 */ "............"
+		/*  1 */ ".a....aaaaa."
+		/*  2 */ "......a...a."
+		/*  3 */ "......a...a."
+		/*  4 */ "......ap..a."
+		/*  5 */ ".a....a...a."
+		/*  6 */ ".aqqqqa...a."
+		/*  7 */ ".a....a...a."
+		/*  8 */ ".aaaaaaaaaa."
+		/*  9 */ "............"
+
+		// Level 5
+		/* z\x*             11 */
+		/*    *   012345678901 */
 		/*  0 */ "rsssssssssss"
-		/*  1 */ "rddddddddddt"
-		/*  2 */ "rddddddddddt"
-		/*  3 */ "rddddddddddt"
-		/*  4 */ "rddddddddddt"
-		/*  5 */ "rddddddddddt"
-		/*  6 */ "rddddddddddt"
-		/*  7 */ "rddddddddddt"
-		/*  8 */ "rddddddddddt"
+		/*  1 */ "raaaaaaaaaat"
+		/*  2 */ "raaaaaaaaaat"
+		/*  3 */ "raaaaaaaaaat"
+		/*  4 */ "raaaaaaaaaat"
+		/*  5 */ "raaaaaaaaaat"
+		/*  6 */ "raaaaaaaaaat"
+		/*  7 */ "raaaaaaaaaat"
+		/*  8 */ "raaaaaaaaaat"
 		/*  9 */ "uuuuuuuuuuut",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -153,18 +167,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 31, ID 172, created by Aloe_vera
 	{
 		// Size:
-		13, 5, 9,  // SizeX = 13, SizeY = 5, SizeZ = 9
+		13, 6, 9,  // SizeX = 13, SizeY = 6, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		12, 4, 8,  // MaxX, MaxY, MaxZ
+		12, 5, 8,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:15\n"  /* carpet */
@@ -185,30 +199,43 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Level 0
 		/* z\x*             111 */
 		/*    *   0123456789012 */
-		/*  0 */ "..abc........"
-		/*  1 */ ".ddddddddddd."
-		/*  2 */ ".ddddddddddd."
-		/*  3 */ ".ddddddddddd."
-		/*  4 */ ".ddddddddddd."
-		/*  5 */ ".ddddddddddd."
-		/*  6 */ ".ddddddddddd."
-		/*  7 */ ".ddddddddddd."
-		/*  8 */ "............."
+		/*  0 */ "mmaaammmmmmmm"
+		/*  1 */ "maaaaaaaaaaam"
+		/*  2 */ "maaaaaaaaaaam"
+		/*  3 */ "maaaaaaaaaaam"
+		/*  4 */ "maaaaaaaaaaam"
+		/*  5 */ "maaaaaaaaaaam"
+		/*  6 */ "maaaaaaaaaaam"
+		/*  7 */ "maaaaaaaaaaam"
+		/*  8 */ "mmmmmmmmmmmmm"
 
 		// Level 1
 		/* z\x*             111 */
 		/*    *   0123456789012 */
-		/*  0 */ "............."
-		/*  1 */ ".ddedddddddd."
-		/*  2 */ ".dffgggggffd."
-		/*  3 */ ".dfghhhhhgfd."
-		/*  4 */ ".dfghfffhgfd."
-		/*  5 */ ".dfghhhhhgfd."
-		/*  6 */ ".dffgggggffd."
-		/*  7 */ ".ddddddddddd."
+		/*  0 */ "..bcd........"
+		/*  1 */ ".aaaaaaaaaaa."
+		/*  2 */ ".aaaaaaaaaaa."
+		/*  3 */ ".aaaaaaaaaaa."
+		/*  4 */ ".aaaaaaaaaaa."
+		/*  5 */ ".aaaaaaaaaaa."
+		/*  6 */ ".aaaaaaaaaaa."
+		/*  7 */ ".aaaaaaaaaaa."
 		/*  8 */ "............."
 
 		// Level 2
+		/* z\x*             111 */
+		/*    *   0123456789012 */
+		/*  0 */ "............."
+		/*  1 */ ".aaeaaaaaaaa."
+		/*  2 */ ".affgggggffa."
+		/*  3 */ ".afghhhhhgfa."
+		/*  4 */ ".afghfffhgfa."
+		/*  5 */ ".afghhhhhgfa."
+		/*  6 */ ".affgggggffa."
+		/*  7 */ ".aaaaaaaaaaa."
+		/*  8 */ "............."
+
+		// Level 3
 		/* z\x*             111 */
 		/*    *   0123456789012 */
 		/*  0 */ "............."
@@ -221,34 +248,34 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  7 */ ".ii.ii.ii.ii."
 		/*  8 */ "............."
 
-		// Level 3
-		/* z\x*             111 */
-		/*    *   0123456789012 */
-		/*  0 */ "............."
-		/*  1 */ ".ddddddddddd."
-		/*  2 */ ".d..k..k...d."
-		/*  3 */ ".d.........d."
-		/*  4 */ ".dl.......nd."
-		/*  5 */ ".d.........d."
-		/*  6 */ ".d....o....d."
-		/*  7 */ ".ddddddddddd."
-		/*  8 */ "............."
-
 		// Level 4
 		/* z\x*             111 */
 		/*    *   0123456789012 */
+		/*  0 */ "............."
+		/*  1 */ ".aaaaaaaaaaa."
+		/*  2 */ ".a..k..k...a."
+		/*  3 */ ".a.........a."
+		/*  4 */ ".al.......na."
+		/*  5 */ ".a.........a."
+		/*  6 */ ".a....o....a."
+		/*  7 */ ".aaaaaaaaaaa."
+		/*  8 */ "............."
+
+		// Level 5
+		/* z\x*             111 */
+		/*    *   0123456789012 */
 		/*  0 */ "pqqqqqqqqqqqq"
-		/*  1 */ "pdddddddddddr"
-		/*  2 */ "pdddddddddddr"
-		/*  3 */ "pdddddddddddr"
-		/*  4 */ "pdddddddddddr"
-		/*  5 */ "pdddddddddddr"
-		/*  6 */ "pdddddddddddr"
-		/*  7 */ "pdddddddddddr"
+		/*  1 */ "paaaaaaaaaaar"
+		/*  2 */ "paaaaaaaaaaar"
+		/*  3 */ "paaaaaaaaaaar"
+		/*  4 */ "paaaaaaaaaaar"
+		/*  5 */ "paaaaaaaaaaar"
+		/*  6 */ "paaaaaaaaaaar"
+		/*  7 */ "paaaaaaaaaaar"
 		/*  8 */ "ssssssssssssr",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -279,18 +306,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 25, ID 166, created by Aloe_vera
 	{
 		// Size:
-		7, 5, 6,  // SizeX = 7, SizeY = 5, SizeZ = 6
+		7, 6, 6,  // SizeX = 7, SizeY = 6, SizeZ = 6
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		6, 4, 5,  // MaxX, MaxY, MaxZ
+		6, 5, 5,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:14\n"  /* carpet */
@@ -306,23 +333,32 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Block data:
 		// Level 0
 		/* z\x*   0123456 */
-		/*  0 */ "..abc.."
-		/*  1 */ ".ddddd."
-		/*  2 */ ".ddddd."
-		/*  3 */ ".ddddd."
-		/*  4 */ ".ddddd."
-		/*  5 */ "......."
+		/*  0 */ "mmaaamm"
+		/*  1 */ "maaaaam"
+		/*  2 */ "maaaaam"
+		/*  3 */ "maaaaam"
+		/*  4 */ "maaaaam"
+		/*  5 */ "mmmmmmm"
 
 		// Level 1
 		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".ddedd."
-		/*  2 */ ".dfgfd."
-		/*  3 */ ".dfgfd."
-		/*  4 */ ".ddddd."
+		/*  0 */ "..bcd.."
+		/*  1 */ ".aaaaa."
+		/*  2 */ ".aaaaa."
+		/*  3 */ ".aaaaa."
+		/*  4 */ ".aaaaa."
 		/*  5 */ "......."
 
 		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".aaeaa."
+		/*  2 */ ".afgfa."
+		/*  3 */ ".afgfa."
+		/*  4 */ ".aaaaa."
+		/*  5 */ "......."
+
+		// Level 3
 		/* z\x*   0123456 */
 		/*  0 */ "......."
 		/*  1 */ ".hhihh."
@@ -331,26 +367,26 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  4 */ ".hh.hh."
 		/*  5 */ "......."
 
-		// Level 3
-		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".ddddd."
-		/*  2 */ ".dj.jd."
-		/*  3 */ ".d...d."
-		/*  4 */ ".ddddd."
-		/*  5 */ "......."
-
 		// Level 4
 		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".aaaaa."
+		/*  2 */ ".aj.ja."
+		/*  3 */ ".a...a."
+		/*  4 */ ".aaaaa."
+		/*  5 */ "......."
+
+		// Level 5
+		/* z\x*   0123456 */
 		/*  0 */ "kllllln"
-		/*  1 */ "kdddddn"
-		/*  2 */ "kdddddn"
-		/*  3 */ "kdddddn"
-		/*  4 */ "kdddddn"
+		/*  1 */ "kaaaaan"
+		/*  2 */ "kaaaaan"
+		/*  3 */ "kaaaaan"
+		/*  4 */ "kaaaaan"
 		/*  5 */ "oooooon",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -381,18 +417,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 26, ID 167, created by Aloe_vera
 	{
 		// Size:
-		7, 5, 7,  // SizeX = 7, SizeY = 5, SizeZ = 7
+		7, 6, 7,  // SizeX = 7, SizeY = 6, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		6, 4, 6,  // MaxX, MaxY, MaxZ
+		6, 5, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:15\n"  /* carpet */
@@ -409,25 +445,35 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Block data:
 		// Level 0
 		/* z\x*   0123456 */
-		/*  0 */ "..abc.."
-		/*  1 */ ".ddddd."
-		/*  2 */ ".ddddd."
-		/*  3 */ ".ddddd."
-		/*  4 */ ".ddddd."
-		/*  5 */ ".ddddd."
-		/*  6 */ "......."
+		/*  0 */ "mmaaamm"
+		/*  1 */ "maaaaam"
+		/*  2 */ "maaaaam"
+		/*  3 */ "maaaaam"
+		/*  4 */ "maaaaam"
+		/*  5 */ "maaaaam"
+		/*  6 */ "mmmmmmm"
 
 		// Level 1
 		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".ddedd."
-		/*  2 */ ".dfffd."
-		/*  3 */ ".dghgd."
-		/*  4 */ ".dfffd."
-		/*  5 */ ".ddddd."
+		/*  0 */ "..bcd.."
+		/*  1 */ ".aaaaa."
+		/*  2 */ ".aaaaa."
+		/*  3 */ ".aaaaa."
+		/*  4 */ ".aaaaa."
+		/*  5 */ ".aaaaa."
 		/*  6 */ "......."
 
 		// Level 2
+		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".aaeaa."
+		/*  2 */ ".afffa."
+		/*  3 */ ".aghga."
+		/*  4 */ ".afffa."
+		/*  5 */ ".aaaaa."
+		/*  6 */ "......."
+
+		// Level 3
 		/* z\x*   0123456 */
 		/*  0 */ "......."
 		/*  1 */ ".iijii."
@@ -437,28 +483,28 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  5 */ ".ii.ii."
 		/*  6 */ "......."
 
-		// Level 3
-		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".ddddd."
-		/*  2 */ ".dk.kd."
-		/*  3 */ ".d...d."
-		/*  4 */ ".d...d."
-		/*  5 */ ".ddddd."
-		/*  6 */ "......."
-
 		// Level 4
 		/* z\x*   0123456 */
+		/*  0 */ "......."
+		/*  1 */ ".aaaaa."
+		/*  2 */ ".ak.ka."
+		/*  3 */ ".a...a."
+		/*  4 */ ".a...a."
+		/*  5 */ ".aaaaa."
+		/*  6 */ "......."
+
+		// Level 5
+		/* z\x*   0123456 */
 		/*  0 */ "lnnnnno"
-		/*  1 */ "ldddddo"
-		/*  2 */ "ldddddo"
-		/*  3 */ "ldddddo"
-		/*  4 */ "ldddddo"
-		/*  5 */ "ldddddo"
+		/*  1 */ "laaaaao"
+		/*  2 */ "laaaaao"
+		/*  3 */ "laaaaao"
+		/*  4 */ "laaaaao"
+		/*  5 */ "laaaaao"
 		/*  6 */ "ppppppo",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -489,18 +535,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 27, ID 168, created by Aloe_vera
 	{
 		// Size:
-		9, 5, 7,  // SizeX = 9, SizeY = 5, SizeZ = 7
+		9, 6, 7,  // SizeX = 9, SizeY = 6, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		8, 4, 6,  // MaxX, MaxY, MaxZ
+		8, 5, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171:14\n"  /* carpet */
 		"g:171: 0\n"  /* carpet */
@@ -517,25 +563,35 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Block data:
 		// Level 0
 		/* z\x*   012345678 */
-		/*  0 */ "..abc...."
-		/*  1 */ ".ddddddd."
-		/*  2 */ ".ddddddd."
-		/*  3 */ ".ddddddd."
-		/*  4 */ ".ddddddd."
-		/*  5 */ ".ddddddd."
-		/*  6 */ "........."
+		/*  0 */ "mmaaammmm"
+		/*  1 */ "maaaaaaam"
+		/*  2 */ "maaaaaaam"
+		/*  3 */ "maaaaaaam"
+		/*  4 */ "maaaaaaam"
+		/*  5 */ "maaaaaaam"
+		/*  6 */ "mmmmmmmmm"
 
 		// Level 1
 		/* z\x*   012345678 */
-		/*  0 */ "........."
-		/*  1 */ ".ddedddd."
-		/*  2 */ ".dfffffd."
-		/*  3 */ ".dghhhgd."
-		/*  4 */ ".dfffffd."
-		/*  5 */ ".ddddddd."
+		/*  0 */ "..bcd...."
+		/*  1 */ ".aaaaaaa."
+		/*  2 */ ".aaaaaaa."
+		/*  3 */ ".aaaaaaa."
+		/*  4 */ ".aaaaaaa."
+		/*  5 */ ".aaaaaaa."
 		/*  6 */ "........."
 
 		// Level 2
+		/* z\x*   012345678 */
+		/*  0 */ "........."
+		/*  1 */ ".aaeaaaa."
+		/*  2 */ ".afffffa."
+		/*  3 */ ".aghhhga."
+		/*  4 */ ".afffffa."
+		/*  5 */ ".aaaaaaa."
+		/*  6 */ "........."
+
+		// Level 3
 		/* z\x*   012345678 */
 		/*  0 */ "........."
 		/*  1 */ ".iiji.ii."
@@ -545,28 +601,28 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  5 */ ".iii.iii."
 		/*  6 */ "........."
 
-		// Level 3
-		/* z\x*   012345678 */
-		/*  0 */ "........."
-		/*  1 */ ".ddddddd."
-		/*  2 */ ".dk.k..d."
-		/*  3 */ ".d.....d."
-		/*  4 */ ".d.....d."
-		/*  5 */ ".ddddddd."
-		/*  6 */ "........."
-
 		// Level 4
 		/* z\x*   012345678 */
+		/*  0 */ "........."
+		/*  1 */ ".aaaaaaa."
+		/*  2 */ ".ak.k..a."
+		/*  3 */ ".a.....a."
+		/*  4 */ ".a.....a."
+		/*  5 */ ".aaaaaaa."
+		/*  6 */ "........."
+
+		// Level 5
+		/* z\x*   012345678 */
 		/*  0 */ "lnnnnnnnn"
-		/*  1 */ "ldddddddo"
-		/*  2 */ "ldddddddo"
-		/*  3 */ "ldddddddo"
-		/*  4 */ "ldddddddo"
-		/*  5 */ "ldddddddo"
+		/*  1 */ "laaaaaaao"
+		/*  2 */ "laaaaaaao"
+		/*  3 */ "laaaaaaao"
+		/*  4 */ "laaaaaaao"
+		/*  5 */ "laaaaaaao"
 		/*  6 */ "ppppppppo",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -597,18 +653,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 28, ID 169, created by Aloe_vera
 	{
 		// Size:
-		10, 5, 7,  // SizeX = 10, SizeY = 5, SizeZ = 7
+		10, 6, 7,  // SizeX = 10, SizeY = 6, SizeZ = 7
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		9, 4, 6,  // MaxX, MaxY, MaxZ
+		9, 5, 6,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:14\n"  /* carpet */
@@ -626,26 +682,37 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Level 0
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "..abc....."
-		/*  1 */ ".dddddddd."
-		/*  2 */ ".dddddddd."
-		/*  3 */ ".dddddddd."
-		/*  4 */ ".dddddddd."
-		/*  5 */ ".dddddddd."
-		/*  6 */ ".........."
+		/*  0 */ "mmaaammmmm"
+		/*  1 */ "maaaaaaaam"
+		/*  2 */ "maaaaaaaam"
+		/*  3 */ "maaaaaaaam"
+		/*  4 */ "maaaaaaaam"
+		/*  5 */ "maaaaaaaam"
+		/*  6 */ "mmmmmmmmmm"
 
 		// Level 1
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ ".........."
-		/*  1 */ ".ddeddddd."
-		/*  2 */ ".dfghhgfd."
-		/*  3 */ ".dfhffhfd."
-		/*  4 */ ".dfghhgfd."
-		/*  5 */ ".dddddddd."
+		/*  0 */ "..bcd....."
+		/*  1 */ ".aaaaaaaa."
+		/*  2 */ ".aaaaaaaa."
+		/*  3 */ ".aaaaaaaa."
+		/*  4 */ ".aaaaaaaa."
+		/*  5 */ ".aaaaaaaa."
 		/*  6 */ ".........."
 
 		// Level 2
+		/* z\x*              */
+		/*    *   0123456789 */
+		/*  0 */ ".........."
+		/*  1 */ ".aaeaaaaa."
+		/*  2 */ ".afghhgfa."
+		/*  3 */ ".afhffhfa."
+		/*  4 */ ".afghhgfa."
+		/*  5 */ ".aaaaaaaa."
+		/*  6 */ ".........."
+
+		// Level 3
 		/* z\x*              */
 		/*    *   0123456789 */
 		/*  0 */ ".........."
@@ -656,30 +723,30 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  5 */ ".ii.ii.ii."
 		/*  6 */ ".........."
 
-		// Level 3
-		/* z\x*              */
-		/*    *   0123456789 */
-		/*  0 */ ".........."
-		/*  1 */ ".dddddddd."
-		/*  2 */ ".dk.k...d."
-		/*  3 */ ".d......d."
-		/*  4 */ ".d......d."
-		/*  5 */ ".dddddddd."
-		/*  6 */ ".........."
-
 		// Level 4
 		/* z\x*              */
 		/*    *   0123456789 */
+		/*  0 */ ".........."
+		/*  1 */ ".aaaaaaaa."
+		/*  2 */ ".ak.k...a."
+		/*  3 */ ".a......a."
+		/*  4 */ ".a......a."
+		/*  5 */ ".aaaaaaaa."
+		/*  6 */ ".........."
+
+		// Level 5
+		/* z\x*              */
+		/*    *   0123456789 */
 		/*  0 */ "lnnnnnnnnn"
-		/*  1 */ "lddddddddo"
-		/*  2 */ "lddddddddo"
-		/*  3 */ "lddddddddo"
-		/*  4 */ "lddddddddo"
-		/*  5 */ "lddddddddo"
+		/*  1 */ "laaaaaaaao"
+		/*  2 */ "laaaaaaaao"
+		/*  3 */ "laaaaaaaao"
+		/*  4 */ "laaaaaaaao"
+		/*  5 */ "laaaaaaaao"
 		/*  6 */ "pppppppppo",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -710,18 +777,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 29, ID 170, created by Aloe_vera
 	{
 		// Size:
-		10, 5, 9,  // SizeX = 10, SizeY = 5, SizeZ = 9
+		10, 6, 9,  // SizeX = 10, SizeY = 6, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		9, 4, 8,  // MaxX, MaxY, MaxZ
+		9, 5, 8,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:14\n"  /* carpet */
@@ -741,30 +808,43 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Level 0
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ "..abc....."
-		/*  1 */ ".dddddddd."
-		/*  2 */ ".dddddddd."
-		/*  3 */ ".dddddddd."
-		/*  4 */ ".dddddddd."
-		/*  5 */ ".dddddddd."
-		/*  6 */ ".dddddddd."
-		/*  7 */ ".dddddddd."
-		/*  8 */ ".........."
+		/*  0 */ "mmaaammmmm"
+		/*  1 */ "maaaaaaaam"
+		/*  2 */ "maaaaaaaam"
+		/*  3 */ "maaaaaaaam"
+		/*  4 */ "maaaaaaaam"
+		/*  5 */ "maaaaaaaam"
+		/*  6 */ "maaaaaaaam"
+		/*  7 */ "maaaaaaaam"
+		/*  8 */ "mmmmmmmmmm"
 
 		// Level 1
 		/* z\x*              */
 		/*    *   0123456789 */
-		/*  0 */ ".........."
-		/*  1 */ ".ddeddddd."
-		/*  2 */ ".dfghhgfd."
-		/*  3 */ ".dfhffhfd."
-		/*  4 */ ".dfhgghfd."
-		/*  5 */ ".dfhffhfd."
-		/*  6 */ ".dfghhgfd."
-		/*  7 */ ".dddddddd."
+		/*  0 */ "..bcd....."
+		/*  1 */ ".aaaaaaaa."
+		/*  2 */ ".aaaaaaaa."
+		/*  3 */ ".aaaaaaaa."
+		/*  4 */ ".aaaaaaaa."
+		/*  5 */ ".aaaaaaaa."
+		/*  6 */ ".aaaaaaaa."
+		/*  7 */ ".aaaaaaaa."
 		/*  8 */ ".........."
 
 		// Level 2
+		/* z\x*              */
+		/*    *   0123456789 */
+		/*  0 */ ".........."
+		/*  1 */ ".aaeaaaaa."
+		/*  2 */ ".afghhgfa."
+		/*  3 */ ".afhffhfa."
+		/*  4 */ ".afhgghfa."
+		/*  5 */ ".afhffhfa."
+		/*  6 */ ".afghhgfa."
+		/*  7 */ ".aaaaaaaa."
+		/*  8 */ ".........."
+
+		// Level 3
 		/* z\x*              */
 		/*    *   0123456789 */
 		/*  0 */ ".........."
@@ -777,34 +857,34 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  7 */ ".ii.ii.ii."
 		/*  8 */ ".........."
 
-		// Level 3
-		/* z\x*              */
-		/*    *   0123456789 */
-		/*  0 */ ".........."
-		/*  1 */ ".dddddddd."
-		/*  2 */ ".d..k...d."
-		/*  3 */ ".d......d."
-		/*  4 */ ".dl....nd."
-		/*  5 */ ".d......d."
-		/*  6 */ ".d......d."
-		/*  7 */ ".dddddddd."
-		/*  8 */ ".........."
-
 		// Level 4
 		/* z\x*              */
 		/*    *   0123456789 */
+		/*  0 */ ".........."
+		/*  1 */ ".aaaaaaaa."
+		/*  2 */ ".a..k...a."
+		/*  3 */ ".a......a."
+		/*  4 */ ".al....na."
+		/*  5 */ ".a......a."
+		/*  6 */ ".a......a."
+		/*  7 */ ".aaaaaaaa."
+		/*  8 */ ".........."
+
+		// Level 5
+		/* z\x*              */
+		/*    *   0123456789 */
 		/*  0 */ "oppppppppp"
-		/*  1 */ "oddddddddq"
-		/*  2 */ "oddddddddq"
-		/*  3 */ "oddddddddq"
-		/*  4 */ "oddddddddq"
-		/*  5 */ "oddddddddq"
-		/*  6 */ "oddddddddq"
-		/*  7 */ "oddddddddq"
+		/*  1 */ "oaaaaaaaaq"
+		/*  2 */ "oaaaaaaaaq"
+		/*  3 */ "oaaaaaaaaq"
+		/*  4 */ "oaaaaaaaaq"
+		/*  5 */ "oaaaaaaaaq"
+		/*  6 */ "oaaaaaaaaq"
+		/*  7 */ "oaaaaaaaaq"
 		/*  8 */ "rrrrrrrrrq",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -835,18 +915,18 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 	// The data has been exported from the gallery Desert, area index 30, ID 171, created by Aloe_vera
 	{
 		// Size:
-		11, 5, 9,  // SizeX = 11, SizeY = 5, SizeZ = 9
+		11, 6, 9,  // SizeX = 11, SizeY = 6, SizeZ = 9
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		10, 4, 8,  // MaxX, MaxY, MaxZ
+		10, 5, 8,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
-		"a:128: 0\n"  /* sandstonestairs */
-		"b:128: 2\n"  /* sandstonestairs */
-		"c:128: 1\n"  /* sandstonestairs */
-		"d: 24: 0\n"  /* sandstone */
+		"a: 24: 0\n"  /* sandstone */
+		"b:128: 0\n"  /* sandstonestairs */
+		"c:128: 2\n"  /* sandstonestairs */
+		"d:128: 1\n"  /* sandstonestairs */
 		"e: 64: 7\n"  /* wooddoorblock */
 		"f:171: 0\n"  /* carpet */
 		"g:171:15\n"  /* carpet */
@@ -867,30 +947,43 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		// Level 0
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "..abc......"
-		/*  1 */ ".ddddddddd."
-		/*  2 */ ".ddddddddd."
-		/*  3 */ ".ddddddddd."
-		/*  4 */ ".ddddddddd."
-		/*  5 */ ".ddddddddd."
-		/*  6 */ ".ddddddddd."
-		/*  7 */ ".ddddddddd."
-		/*  8 */ "..........."
+		/*  0 */ "mmaaammmmmm"
+		/*  1 */ "maaaaaaaaam"
+		/*  2 */ "maaaaaaaaam"
+		/*  3 */ "maaaaaaaaam"
+		/*  4 */ "maaaaaaaaam"
+		/*  5 */ "maaaaaaaaam"
+		/*  6 */ "maaaaaaaaam"
+		/*  7 */ "maaaaaaaaam"
+		/*  8 */ "mmmmmmmmmmm"
 
 		// Level 1
 		/* z\x*             1 */
 		/*    *   01234567890 */
-		/*  0 */ "..........."
-		/*  1 */ ".ddedddddd."
-		/*  2 */ ".dffgggffd."
-		/*  3 */ ".dfghhhgfd."
-		/*  4 */ ".dfghfhgfd."
-		/*  5 */ ".dfghhhgfd."
-		/*  6 */ ".dffgggffd."
-		/*  7 */ ".ddddddddd."
+		/*  0 */ "..bcd......"
+		/*  1 */ ".aaaaaaaaa."
+		/*  2 */ ".aaaaaaaaa."
+		/*  3 */ ".aaaaaaaaa."
+		/*  4 */ ".aaaaaaaaa."
+		/*  5 */ ".aaaaaaaaa."
+		/*  6 */ ".aaaaaaaaa."
+		/*  7 */ ".aaaaaaaaa."
 		/*  8 */ "..........."
 
 		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".aaeaaaaaa."
+		/*  2 */ ".affgggffa."
+		/*  3 */ ".afghhhgfa."
+		/*  4 */ ".afghfhgfa."
+		/*  5 */ ".afghhhgfa."
+		/*  6 */ ".affgggffa."
+		/*  7 */ ".aaaaaaaaa."
+		/*  8 */ "..........."
+
+		// Level 3
 		/* z\x*             1 */
 		/*    *   01234567890 */
 		/*  0 */ "..........."
@@ -903,34 +996,34 @@ const cPrefab::sDef g_SandFlatRoofVillagePrefabs[] =
 		/*  7 */ ".ii.iii.ii."
 		/*  8 */ "..........."
 
-		// Level 3
-		/* z\x*             1 */
-		/*    *   01234567890 */
-		/*  0 */ "..........."
-		/*  1 */ ".ddddddddd."
-		/*  2 */ ".d..k....d."
-		/*  3 */ ".d.......d."
-		/*  4 */ ".dl.....nd."
-		/*  5 */ ".d.......d."
-		/*  6 */ ".d...o...d."
-		/*  7 */ ".ddddddddd."
-		/*  8 */ "..........."
-
 		// Level 4
 		/* z\x*             1 */
 		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".aaaaaaaaa."
+		/*  2 */ ".a..k....a."
+		/*  3 */ ".a.......a."
+		/*  4 */ ".al.....na."
+		/*  5 */ ".a.......a."
+		/*  6 */ ".a...o...a."
+		/*  7 */ ".aaaaaaaaa."
+		/*  8 */ "..........."
+
+		// Level 5
+		/* z\x*             1 */
+		/*    *   01234567890 */
 		/*  0 */ "pqqqqqqqqqq"
-		/*  1 */ "pdddddddddr"
-		/*  2 */ "pdddddddddr"
-		/*  3 */ "pdddddddddr"
-		/*  4 */ "pdddddddddr"
-		/*  5 */ "pdddddddddr"
-		/*  6 */ "pdddddddddr"
-		/*  7 */ "pdddddddddr"
+		/*  1 */ "paaaaaaaaar"
+		/*  2 */ "paaaaaaaaar"
+		/*  3 */ "paaaaaaaaar"
+		/*  4 */ "paaaaaaaaar"
+		/*  5 */ "paaaaaaaaar"
+		/*  6 */ "paaaaaaaaar"
+		/*  7 */ "paaaaaaaaar"
 		/*  8 */ "ssssssssssr",
 
 		// Connectors:
-		"-1: 3, 0, 0: 2\n"  /* Type -1, direction Z- */,
+		"-1: 3, 1, 0: 2\n"  /* Type -1, direction Z- */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */

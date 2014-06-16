@@ -22,6 +22,12 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
+// 6000 ticks or 5 minutes
+#define PLAYER_INVENTORY_SAVE_INTERVAL 6000
+
+// 1000 = once per second
+#define PLAYER_LIST_TIME_MS 1000
+
 
 
 
@@ -64,6 +70,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_BowCharge(0)
 	, m_FloaterID(-1)
 	, m_Team(NULL)
+	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -250,7 +257,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
 	cTimer t1;
-	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
+	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
@@ -259,6 +266,16 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	if (IsFlying())
 	{
 		m_LastGroundHeight = (float)GetPosY();
+	}
+
+	if (m_TicksUntilNextSave == 0)
+	{
+		SaveToDisk();
+		m_TicksUntilNextSave = PLAYER_INVENTORY_SAVE_INTERVAL;
+	}
+	else
+	{
+		m_TicksUntilNextSave--;
 	}
 }
 
@@ -1257,6 +1274,17 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
 	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+
+	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
 }
 

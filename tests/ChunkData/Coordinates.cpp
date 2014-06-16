@@ -6,8 +6,21 @@
 
 int main(int argc, char** argv)
 {
+	class cMockAllocationPool
+		: public cAllocationPool<cChunkData::sChunkSection>
+ 	{
+		virtual cChunkData::sChunkSection * Allocate()
+		{
+			return new cChunkData::sChunkSection();
+		}
+		
+		virtual void Free(cChunkData::sChunkSection * a_Ptr)
+		{
+			delete a_Ptr;
+		}
+	} Pool;
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		// Empty chunks
 		buffer.SetBlock(0, 0, 0, 0xAB);
@@ -105,7 +118,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		// Zero's
 		buffer.SetBlock(0, 0, 0, 0x0);
@@ -122,9 +135,9 @@ int main(int argc, char** argv)
 	
 	{
 		// Operator =
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		buffer.SetBlock(0, 0, 0, 0x42);
-		cChunkData copy;
+		cChunkData copy(Pool);
 		#if __cplusplus < 201103L
 		copy = buffer;
 		#else

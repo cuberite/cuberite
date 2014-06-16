@@ -194,7 +194,8 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/** Forces the player to move in the given direction. */
+	/** Forces the player to move in the given direction. 
+	@deprecated Use SetSpeed instead. */
 	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
@@ -461,7 +462,6 @@ protected:
 	cItem m_DraggingItem;
 
 	long long m_LastPlayerListTime;
-	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second
 
 	cClientHandle * m_ClientHandle;
 	
@@ -512,6 +512,9 @@ protected:
 
 
 
+	/** Sets the speed and sends it to the client, so that they are forced to move so. */
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
+
 	void ResolvePermissions(void);
 	void ResolveGroups(void);
 
@@ -538,6 +541,10 @@ protected:
 	/** Flag representing whether the player is currently in a bed
 	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
 	bool m_bIsInBed;
+
+	/** How long till the player's inventory will be saved
+	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
+	unsigned int m_TicksUntilNextSave;
 
 } ; // tolua_export
 

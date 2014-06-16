@@ -29,11 +29,12 @@ class cRainbowRoadsGen::cRainbowRoads :
 public:
 	cRainbowRoads(
 		int a_Seed,
+		int a_GridX, int a_GridZ,
 		int a_OriginX, int a_OriginZ,
 		int a_MaxDepth,
 		int a_MaxSize
 	) :
-		super(a_OriginX, a_OriginZ),
+		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
 		m_MaxSize(a_MaxSize),
@@ -92,8 +93,8 @@ protected:
 
 
 
-cRainbowRoadsGen::cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxDepth, int a_MaxSize) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 100),
+cRainbowRoadsGen::cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize) :
+	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
 	m_Noise(a_Seed + 9000),
 	m_MaxDepth(a_MaxDepth),
 	m_MaxSize(a_MaxSize)
@@ -104,10 +105,10 @@ cRainbowRoadsGen::cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxDepth, i
 
 
 
-cGridStructGen::cStructurePtr cRainbowRoadsGen::CreateStructure(int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cRainbowRoadsGen::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
 	// Create a base based on the chosen prefabs:
-	return cStructurePtr(new cRainbowRoads(m_Seed, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize));
+	return cStructurePtr(new cRainbowRoads(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize));
 }
 
 

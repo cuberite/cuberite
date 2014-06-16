@@ -23,7 +23,7 @@ class cNetherFortGen :
 	typedef cGridStructGen super;
 	
 public:
-	cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth);
+	cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth);
 	
 protected:
 	friend class cNetherFortPerfTest;  // fwd: NetherFortGen.cpp
@@ -37,7 +37,7 @@ protected:
 	
 
 	// cGridStructGen overrides:
-	virtual cStructurePtr CreateStructure(int a_OriginX, int a_OriginZ) override;
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 
