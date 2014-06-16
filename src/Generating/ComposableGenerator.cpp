@@ -449,7 +449,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			int Size      = a_IniFile.GetValueSetI("Generator", "WormNestCavesSize", 64);
 			int Grid      = a_IniFile.GetValueSetI("Generator", "WormNestCavesGrid", 96);
-			int MaxOffset = a_IniFile.GetValueSetI("Generator", "NetherFortMaxOffset", 32);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "WormNestMaxOffset", 32);
 			m_FinishGens.push_back(new cStructGenWormNestCaves(Seed, Size, Grid, MaxOffset));
 		}
 		else
