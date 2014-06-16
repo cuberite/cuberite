@@ -499,20 +499,9 @@ void cIncrementalRedstoneSimulator::HandleRedstoneLever(int a_RelBlockX, int a_R
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 
 		eBlockFace Dir = cBlockLeverHandler::BlockMetaDataToBlockFace(Meta);
-		switch (Dir) // Now, flip the direction into the type used by SetBlockLinkedPowered()
-		{
-			case BLOCK_FACE_YP: Dir = BLOCK_FACE_YM; break;
-			case BLOCK_FACE_XP: Dir = BLOCK_FACE_XM; break;
-			case BLOCK_FACE_ZP: Dir = BLOCK_FACE_ZM; break;
-			case BLOCK_FACE_YM: Dir = BLOCK_FACE_YP; break;
-			case BLOCK_FACE_XM: Dir = BLOCK_FACE_XP; break;
-			case BLOCK_FACE_ZM :Dir = BLOCK_FACE_ZP; break;
-			default:
-			{
-				ASSERT(!"Unhandled lever metadata!");
-				return;
-			}
-		}
+		
+		Dir = ReverseBlockFace(Dir);
+		
 		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Dir);
 	}
 }
