@@ -23,7 +23,7 @@ class cReader :
 		BLOCKTYPE * OutputRows = m_BlockTypes;
 		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
-		int MaxHeight = std::min(cChunkDef::Height, m_MaxHeight + 16);  // Need 16 blocks above the highest
+		int MaxHeight = std::min(+cChunkDef::Height, m_MaxHeight + 16);  // Need 16 blocks above the highest
 		for (int y = 0; y < MaxHeight; y++)
 		{
 			for (int z = 0; z < cChunkDef::Width; z++)
