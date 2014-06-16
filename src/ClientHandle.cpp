@@ -1089,15 +1089,52 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	);
 	
 	cWorld * World = m_Player->GetWorld();
-	m_NumBlockChangeInteractionsThisTick++;
 
+	if (
+		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+	)
+	{
+		if (a_BlockFace != BLOCK_FACE_NONE)
+		{
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+			m_Player->GetInventory().SendEquippedSlot();
+		}
+		return;
+	}
+
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+	{
+		// A plugin doesn't agree with the action, replace the block on the client and quit:
+		cChunkInterface ChunkInterface(World->GetChunkMap());
+		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		
+		if (a_BlockFace != BLOCK_FACE_NONE)
+		{
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+			m_Player->GetInventory().SendEquippedSlot();
+		}
+		return;
+	}
+
+	m_NumBlockChangeInteractionsThisTick++;
+	
 	if (!CheckBlockInteractionsRate())
 	{
 		Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
 		return;
 	}
-
+	
 	const cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
+
 	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType) && (a_HeldItem.m_ItemType != -1))
 	{
 		// Only compare ItemType, not meta (torches have different metas)
@@ -1120,46 +1157,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	NIBBLETYPE BlockMeta;
 	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
-
-	if (
-		(
-			BlockHandler->IsUseable() ||
-			(ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
-		) &&
-		(
-			(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
-		)
-	)
-	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			m_Player->GetInventory().SendEquippedSlot();
-		}
-		return;
-	}
-
-	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-	{
-		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		cChunkInterface ChunkInterface(World->GetChunkMap());
-		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			m_Player->GetInventory().SendEquippedSlot();
-		}
-		return;
-	}
 	
 	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 	{
@@ -1173,6 +1170,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 		return;
 	}
+	
+	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
 	
 	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{
