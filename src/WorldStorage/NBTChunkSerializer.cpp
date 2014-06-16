@@ -614,11 +614,6 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			case cProjectileEntity::pkWitherSkull:
 			case cProjectileEntity::pkEnderPearl:
 			{
-				m_Writer.BeginList("Motion", TAG_Double);
-					m_Writer.AddDouble("", a_Projectile->GetSpeedX());
-					m_Writer.AddDouble("", a_Projectile->GetSpeedY());
-					m_Writer.AddDouble("", a_Projectile->GetSpeedZ());
-				m_Writer.EndList();
 				break;
 			}
 			default:
