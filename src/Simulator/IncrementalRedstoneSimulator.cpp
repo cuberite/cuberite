@@ -546,8 +546,7 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_RelBlockX, int a_RelBl
 {
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-	cChunkInterface ChunkInterface(m_World.GetChunkMap());
-	NIBBLETYPE MetaData = ChunkInterface.GetBlockMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	NIBBLETYPE MetaData = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 
 	if (AreCoordsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
 	{
