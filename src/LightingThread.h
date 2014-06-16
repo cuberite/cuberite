@@ -108,6 +108,9 @@ protected:
 	cEvent m_evtItemAdded;    // Set when queue is appended, or to stop the thread
 	cEvent m_evtQueueEmpty;   // Set when the queue gets empty
 	
+	/** The highest block in the current 3x3 chunk data */
+	HEIGHTTYPE m_MaxHeight;
+	
 	
 	// Buffers for the 3x3 chunk data
 	// These buffers alone are 1.7 MiB in size, therefore they cannot be located on the stack safely - some architectures may have only 1 MiB for stack, or even less
@@ -136,14 +139,18 @@ protected:
 	/** Lights the entire chunk. If neighbor chunks don't exist, touches them and re-queues the chunk */
 	void LightChunk(cLightingChunkStay & a_Item);
 	
-	/** Prepares m_BlockTypes and m_HeightMap data; returns false if any of the chunks fail. Zeroes out the light arrays */
-	bool ReadChunks(int a_ChunkX, int a_ChunkZ);
+	/** Prepares m_BlockTypes and m_HeightMap data; zeroes out the light arrays */
+	void ReadChunks(int a_ChunkX, int a_ChunkZ);
 	
 	/** Uses m_HeightMap to initialize the m_SkyLight[] data; fills in seeds for the skylight */
 	void PrepareSkyLight(void);
 	
 	/** Uses m_BlockTypes to initialize the m_BlockLight[] data; fills in seeds for the blocklight */
 	void PrepareBlockLight(void);
+	
+	/** Same as PrepareBlockLight(), but uses a different traversal scheme; possibly better perf cache-wise.
+	To be compared in perf benchmarks. */
+	void PrepareBlockLight2(void);
 	
 	/** Calculates light in the light array specified, using stored seeds */
 	void CalcLight(NIBBLETYPE * a_Light);
