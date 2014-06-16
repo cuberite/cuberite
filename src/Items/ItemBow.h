@@ -70,7 +70,6 @@ public:
 		}
 
 		cFastRandom Random;
-		a_Player->GetWorld()->BroadcastSpawnEntity(*Arrow);
 		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", (int)std::floor(a_Player->GetPosX() * 8.0), (int)std::floor(a_Player->GetPosY() * 8.0), (int)std::floor(a_Player->GetPosZ() * 8.0), 1.0F, 1.0F / (Random.NextFloat(1.0F) * 0.4F + 1.2F) + (float)Force * 0.5F);
 
 		if (!a_Player->IsGameModeCreative())
