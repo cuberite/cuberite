@@ -6,8 +6,21 @@
 
 int main(int argc, char** argv)
 {
+	class cMockAllocationPool
+		: public cAllocationPool<cChunkData::sChunkSection>
+ 	{
+		virtual cChunkData::sChunkSection * Allocate()
+		{
+			return new cChunkData::sChunkSection();
+		}
+		
+		virtual void Free(cChunkData::sChunkSection * a_Ptr)
+		{
+			delete a_Ptr;
+		}
+	} Pool;
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 	
 		buffer.SetBlock(3, 1, 4, 0xDE);
 		buffer.SetMeta(3, 1, 4, 0xA);
@@ -37,7 +50,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 	
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -60,7 +73,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -83,7 +96,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		NIBBLETYPE SrcNibbleBuffer[16 * 16 * 256 / 2];
 		for (int i = 0; i < 16 * 16 * 256 / 2; i += 4)
@@ -106,7 +119,7 @@ int main(int argc, char** argv)
 	}
 	
 	{
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 		
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, 16 * 16 * 256);

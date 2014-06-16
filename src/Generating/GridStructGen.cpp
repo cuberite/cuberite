@@ -21,8 +21,8 @@ class cEmptyStructure :
 	typedef cGridStructGen::cStructure super;
 	
 public:
-	cEmptyStructure(int a_OriginX, int a_OriginZ) :
-		super(a_OriginX, a_OriginZ)
+	cEmptyStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
+		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
 	{
 	}
 	
@@ -40,17 +40,20 @@ protected:
 cGridStructGen::cGridStructGen(
 	int a_Seed,
 	int a_GridSizeX, int a_GridSizeZ,
+	int a_MaxOffsetX, int a_MaxOffsetZ,
 	int a_MaxStructureSizeX, int a_MaxStructureSizeZ,
 	size_t a_MaxCacheSize
 ) :
-	m_Seed(a_Seed),
+	m_Noise(a_Seed),
 	m_GridSizeX(a_GridSizeX),
 	m_GridSizeZ(a_GridSizeZ),
+	m_MaxOffsetX(a_MaxOffsetX),
+	m_MaxOffsetZ(a_MaxOffsetZ),
 	m_MaxStructureSizeX(a_MaxStructureSizeX),
 	m_MaxStructureSizeZ(a_MaxStructureSizeZ),
 	m_MaxCacheSize(a_MaxCacheSize)
 {
-	size_t NumStructuresPerQuery = (size_t)((m_MaxStructureSizeX / m_GridSizeX + 1) * (m_MaxStructureSizeZ / m_GridSizeZ + 1));
+	size_t NumStructuresPerQuery = (size_t)(((m_MaxStructureSizeX + m_MaxOffsetX) / m_GridSizeX + 1) * ((m_MaxStructureSizeZ + m_MaxOffsetZ) / m_GridSizeZ + 1));
 	if (NumStructuresPerQuery > m_MaxCacheSize)
 	{
 		m_MaxCacheSize = NumStructuresPerQuery * 4;
@@ -68,10 +71,10 @@ cGridStructGen::cGridStructGen(
 void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructurePtrs & a_Structures)
 {
 	// Calculate the min and max grid coords of the structures to be returned:
-	int MinBlockX = a_ChunkX * cChunkDef::Width - m_MaxStructureSizeX;
-	int MinBlockZ = a_ChunkZ * cChunkDef::Width - m_MaxStructureSizeZ;
-	int MaxBlockX = a_ChunkX * cChunkDef::Width + m_MaxStructureSizeX + cChunkDef::Width - 1;
-	int MaxBlockZ = a_ChunkZ * cChunkDef::Width + m_MaxStructureSizeZ + cChunkDef::Width - 1;
+	int MinBlockX = a_ChunkX * cChunkDef::Width - m_MaxStructureSizeX - m_MaxOffsetX;
+	int MinBlockZ = a_ChunkZ * cChunkDef::Width - m_MaxStructureSizeZ - m_MaxOffsetZ;
+	int MaxBlockX = a_ChunkX * cChunkDef::Width + m_MaxStructureSizeX + m_MaxOffsetX + cChunkDef::Width - 1;
+	int MaxBlockZ = a_ChunkZ * cChunkDef::Width + m_MaxStructureSizeZ + m_MaxOffsetZ + cChunkDef::Width - 1;
 	int MinGridX = MinBlockX / m_GridSizeX;
 	int MinGridZ = MinBlockZ / m_GridSizeZ;
 	int MaxGridX = (MaxBlockX + m_GridSizeX - 1) / m_GridSizeX;
@@ -103,14 +106,14 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 	// Create those structures that haven't been in the cache:
 	for (int x = MinGridX; x < MaxGridX; x++)
 	{
-		int OriginX = x * m_GridSizeX;
+		int GridX = x * m_GridSizeX;
 		for (int z = MinGridZ; z < MaxGridZ; z++)
 		{
-			int OriginZ = z * m_GridSizeZ;
+			int GridZ = z * m_GridSizeZ;
 			bool Found = false;
 			for (cStructurePtrs::const_iterator itr = a_Structures.begin(), end = a_Structures.end(); itr != end; ++itr)
 			{
-				if (((*itr)->m_OriginX == OriginX) && ((*itr)->m_OriginZ == OriginZ))
+				if (((*itr)->m_GridX == GridX) && ((*itr)->m_GridZ == GridZ))
 				{
 					Found = true;
 					break;
@@ -118,10 +121,12 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 			}  // for itr - a_Structures[]
 			if (!Found)
 			{
-				cStructurePtr Structure = CreateStructure(OriginX, OriginZ);
+				int OriginX = GridX + ((m_Noise.IntNoise2DInt(GridX + 3, GridZ + 5) / 7) % (m_MaxOffsetX * 2)) - m_MaxOffsetX;
+				int OriginZ = GridZ + ((m_Noise.IntNoise2DInt(GridX + 5, GridZ + 3) / 7) % (m_MaxOffsetZ * 2)) - m_MaxOffsetZ;
+				cStructurePtr Structure = CreateStructure(GridX, GridZ, OriginX, OriginZ);
 				if (Structure.get() == NULL)
 				{
-					Structure.reset(new cEmptyStructure(OriginX, OriginZ));
+					Structure.reset(new cEmptyStructure(GridX, GridZ, OriginX, OriginZ));
 				}
 				a_Structures.push_back(Structure);
 			}

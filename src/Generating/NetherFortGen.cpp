@@ -26,8 +26,8 @@ public:
 	cPlacedPieces m_Pieces;
 
 
-	cNetherFort(cNetherFortGen & a_ParentGen, int a_OriginX, int a_OriginZ, int a_GridSize, int a_MaxDepth, int a_Seed) :
-		super(a_OriginX, a_OriginZ),
+	cNetherFort(cNetherFortGen & a_ParentGen, int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_GridSize, int a_MaxDepth, int a_Seed) :
+		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_ParentGen(a_ParentGen),
 		m_GridSize(a_GridSize),
 		m_Seed(a_Seed)
@@ -108,8 +108,8 @@ cPrefabPiecePool cNetherFortGen::m_PiecePool(g_NetherFortPrefabs, g_NetherFortPr
 
 
 
-cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxDepth * 10, a_MaxDepth * 10, 200),
+cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth) :
+	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxDepth * 10, a_MaxDepth * 10, 200),
 	m_MaxDepth(a_MaxDepth)
 {
 	/*
@@ -124,8 +124,11 @@ cNetherFortGen::cNetherFortGen(int a_Seed, int a_GridSize, int a_MaxDepth) :
 
 
 
-cGridStructGen::cStructurePtr cNetherFortGen::CreateStructure(int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cNetherFortGen::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
-	return cStructurePtr(new cNetherFort(*this, a_OriginX, a_OriginZ, m_GridSizeX, m_MaxDepth, m_Seed));
+	return cStructurePtr(new cNetherFort(*this, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_GridSizeX, m_MaxDepth, m_Seed));
 }
+
+
+
 

@@ -65,7 +65,8 @@ public:
 	cChunk(
 		int a_ChunkX, int a_ChunkY, int a_ChunkZ,   // Chunk coords
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
-		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP  // Neighbor chunks
+		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
+		cAllocationPool<cChunkData::sChunkSection> & a_Pool
 	);
 	cChunk(cChunk & other);
 	~cChunk();
