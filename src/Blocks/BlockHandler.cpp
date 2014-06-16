@@ -56,6 +56,7 @@
 #include "BlockPlanks.h"
 #include "BlockPortal.h"
 #include "BlockPumpkin.h"
+#include "BlockPressurePlate.h"
 #include "BlockQuartz.h"
 #include "BlockRail.h"
 #include "BlockRedstone.h"
@@ -134,6 +135,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
 		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HEAD:                  return new cBlockMobHeadHandler         (a_BlockType);
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
 		case E_BLOCK_ICE:                   return new cBlockIceHandler             (a_BlockType);
 		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);
@@ -149,6 +151,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_LILY_PAD:              return new cBlockLilypadHandler         (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
@@ -192,6 +195,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STONE:                 return new cBlockStoneHandler           (a_BlockType);
 		case E_BLOCK_STONE_BRICK_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STONE_BUTTON:          return new cBlockButtonHandler          (a_BlockType);
+		case E_BLOCK_STONE_PRESSURE_PLATE:  return new cBlockPressurePlateHandler   (a_BlockType);
 		case E_BLOCK_STONE_SLAB:            return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_SUGARCANE:             return new cBlockSugarcaneHandler       (a_BlockType);
 		case E_BLOCK_TALL_GRASS:            return new cBlockTallGrassHandler       (a_BlockType);
@@ -203,6 +207,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_WOODEN_BUTTON:         return new cBlockButtonHandler          (a_BlockType);
 		case E_BLOCK_WOODEN_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_WOODEN_PRESSURE_PLATE: return new cBlockPressurePlateHandler   (a_BlockType);
 		case E_BLOCK_WOODEN_SLAB:           return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_WOODEN_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_WOOL:                  return new cBlockClothHandler           (a_BlockType);
