@@ -31,4 +31,8 @@ public:
 
 		return (BlockBelow == E_BLOCK_FENCE_GATE || BlockBelow == E_BLOCK_FENCE || cBlockInfo::IsSolid(BlockBelow));
 	}
-};
+} ;
+
+
+
+
