@@ -549,26 +549,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneButton(int a_RelBlockX, int a_
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 		
 		eBlockFace Dir = cBlockButtonHandler::BlockMetaDataToBlockFace(Meta);
-		switch (Dir) // Now, flip the direction into the type used by SetBlockLinkedPowered()
-		{
-			case BLOCK_FACE_XP:
-			case BLOCK_FACE_ZP:
-			{
-				Dir--;
-				break;
-			}
-			case BLOCK_FACE_XM:
-			case BLOCK_FACE_ZM:
-			{
-				Dir++;
-				break;
-			}
-			default:
-			{
-				ASSERT(!"Unhandled button metadata!");
-				return;
-			}
-		}
+		Dir = ReverseBlockFace(Dir);
 		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Dir);
 	}
 }
