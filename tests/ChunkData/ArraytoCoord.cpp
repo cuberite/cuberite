@@ -6,9 +6,23 @@
 
 int main(int argc, char** argv)
 {
+	class cMockAllocationPool
+		: public cAllocationPool<cChunkData::sChunkSection>
+ 	{
+		virtual cChunkData::sChunkSection * Allocate()
+		{
+			return new cChunkData::sChunkSection();
+		}
+		
+		virtual void Free(cChunkData::sChunkSection * a_Ptr)
+		{
+			delete a_Ptr;
+		}
+	} Pool;
 	{
+	
 		// Test first segment
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, sizeof(SrcBlockBuffer));
@@ -35,7 +49,7 @@ int main(int argc, char** argv)
 	
 	{
 		// test following segment
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, sizeof(SrcBlockBuffer));
@@ -62,7 +76,7 @@ int main(int argc, char** argv)
 	
 	{
 		// test zeros
-		cChunkData buffer;
+		cChunkData buffer(Pool);
 
 		BLOCKTYPE SrcBlockBuffer[16 * 16 * 256];
 		memset(SrcBlockBuffer, 0x00, sizeof(SrcBlockBuffer));

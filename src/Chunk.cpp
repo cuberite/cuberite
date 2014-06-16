@@ -64,7 +64,8 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 cChunk::cChunk(
 	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 	cChunkMap * a_ChunkMap, cWorld * a_World,
-	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP
+	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
+	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ) :
 	m_IsValid(false),
 	m_IsLightValid(false),
@@ -77,6 +78,7 @@ cChunk::cChunk(
 	m_PosZ(a_ChunkZ),
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
+	m_ChunkData(a_Pool),
 	m_BlockTickX(0),
 	m_BlockTickY(0),
 	m_BlockTickZ(0),
