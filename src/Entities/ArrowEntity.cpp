@@ -120,7 +120,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		(int)std::floor(GetPosY() * 8.0),
 		(int)std::floor(GetPosZ() * 8.0),
 		0.5F,
-		(float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64)
+		0.75F + ((float)((GetUniqueID() * 23) % 32)) / 64F
 	);
 	
 	Destroy();
