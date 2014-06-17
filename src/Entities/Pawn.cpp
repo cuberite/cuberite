@@ -26,19 +26,15 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		// Copies values to prevent pesky wrong accesses and erasures
 		cEntityEffect::eType EffectType = iter->first;
-		cEntityEffect & EffectValues = iter->second;
+		cEntityEffect * Effect = iter->second;
 		
-		// Apply entity effect
-		HandleEntityEffect(EffectType, EffectValues);
-		
-		// Reduce the effect's duration
-		EffectValues.m_Ticks++;
+		Effect->OnTick(*this);
 		
 		// Iterates (must be called before any possible erasure)
 		++iter;
 		
 		// Remove effect if duration has elapsed
-		if (EffectValues.GetDuration() - EffectValues.m_Ticks <= 0)
+		if (Effect->GetDuration() - Effect->GetTicks() <= 0)
 		{
 			RemoveEntityEffect(EffectType);
 		}
@@ -62,10 +58,10 @@ void cPawn::KilledBy(cEntity * a_Killer)
 
 
 
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, cPawn * a_Creator, double a_DistanceModifier)
+void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, cPawn * a_Creator, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
-	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_Creator, a_DistanceModifier))
+	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_Creator, a_DistanceModifier))
 	{
 		// A plugin disallows the addition, bail out.
 		return;
@@ -76,10 +72,11 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurat
 	{
 		return;
 	}
+	a_Duration = (int)(a_Duration * a_DistanceModifier);
 	
-	int EffectDuration = (int)(a_EffectDurationTicks * a_DistanceModifier);
-	m_EntityEffects[a_EffectType] = cEntityEffect(EffectDuration, a_EffectIntensity, a_Creator, a_DistanceModifier);
-	m_World->BroadcastEntityEffect(*this, a_EffectType, a_EffectIntensity, EffectDuration);
+	m_EntityEffects[a_EffectType] = cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
+	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
+	m_EntityEffects[a_EffectType]->OnActivate(*this);
 }
 
 
@@ -88,8 +85,10 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurat
 
 void cPawn::RemoveEntityEffect(cEntityEffect::eType a_EffectType)
 {
-	m_EntityEffects.erase(a_EffectType);
 	m_World->BroadcastRemoveEntityEffect(*this, a_EffectType);
+	m_EntityEffects[a_EffectType]->OnDeactivate(*this);
+	delete m_EntityEffects[a_EffectType];
+	m_EntityEffects.erase(a_EffectType);
 }
 
 
@@ -109,99 +108,5 @@ void cPawn::ClearEntityEffects()
 		
 		// Remove effect
 		RemoveEntityEffect(EffectType);
-	}
-}
-
-
-
-
-
-void cPawn::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
-{
-	switch (a_EffectType)
-	{
-		// Default effect behaviors
-		case cEntityEffect::effInstantHealth:
-		{
-			// Base heal = 6, doubles for every increase in intensity
-			Heal((int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier()));
-			return;
-		}
-		case cEntityEffect::effInstantDamage:
-		{
-			// Base damage = 6, doubles for every increase in intensity
-			int damage = (int)(6 * std::pow(2.0, a_Effect.GetIntensity()) * a_Effect.GetDistanceModifier());
-			TakeDamage(dtPotionOfHarming, a_Effect.GetCreator(), damage, 0);
-			return;
-		}
-		case cEntityEffect::effStrength:
-		{
-			// TODO: Implement me!
-			return;
-		}
-		case cEntityEffect::effWeakness:
-		{
-			// Damage reduction = 0.5 damage, multiplied by potion level (Weakness II = 1 damage)
-			// double dmg_reduc = 0.5 * (a_Effect.GetIntensity() + 1);
-			
-			// TODO: Implement me!
-			// TODO: Weakened villager zombies can be turned back to villagers with the god apple
-			return;
-		}
-		case cEntityEffect::effRegeneration:
-		{
-			// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
-			int frequency = std::floor(50.0 / (double)(a_Effect.GetIntensity() + 1));
-			
-			if (a_Effect.m_Ticks % frequency == 0)
-			{
-				Heal(1);
-			}
-			
-			return;
-		}
-		case cEntityEffect::effPoison:
-		{
-			// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
-			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
-			
-			if (a_Effect.m_Ticks % frequency == 0)
-			{
-				// Cannot take poison damage when health is at 1
-				if (GetHealth() > 1)
-				{
-					TakeDamage(dtPoisoning, a_Effect.GetCreator(), 1, 0);
-				}
-			}
-			
-			return;
-		}
-		case cEntityEffect::effWither:
-		{
-			// Poison frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
-			int frequency = std::floor(25.0 / (double)(a_Effect.GetIntensity() + 1));
-			
-			if (a_Effect.m_Ticks % frequency == 0)
-			{
-				TakeDamage(dtWither, a_Effect.GetCreator(), 1, 0);
-			}
-			//TODO: "<Player> withered away>
-			return;
-		}
-		case cEntityEffect::effFireResistance:
-		{
-			// TODO: Implement me!
-			return;
-		}
-		case cEntityEffect::effSpeed:
-		{
-			// TODO: Implement me!
-			return;
-		}
-		case cEntityEffect::effSlowness:
-		{
-			// TODO: Implement me!
-			return;
-		}
 	}
 }

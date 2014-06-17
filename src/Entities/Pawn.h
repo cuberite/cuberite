@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Entity.h"
-#include "EntityEffects.h"
+#include "EntityEffect.h"
 
 
 
@@ -46,14 +46,8 @@ public:
 	// tolua_end
 
 protected:
-	typedef std::map<cEntityEffect::eType, cEntityEffect> tEffectMap;
+	typedef std::map<cEntityEffect::eType, cEntityEffect *> tEffectMap;
 	tEffectMap m_EntityEffects;
-	
-	/** Applies entity effect effects
-	 *  @param a_EffectType The selected entity effect
-	 *  @param a_Effect     The parameters of the selected entity effect
-	 */
-	virtual void HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect);
 } ;  // tolua_export
 
 

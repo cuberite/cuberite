@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "../Entities/EntityEffects.h"
+#include "../Entities/EntityEffect.h"
 #include "../Entities/SplashPotionEntity.h"
 
 class cItemPotionHandler:

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ProjectileEntity.h"
-#include "EntityEffects.h"
+#include "EntityEffect.h"
 #include "../World.h"
 #include "Entity.h"
 

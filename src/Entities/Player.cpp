@@ -1867,43 +1867,6 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 
 
 
-void cPlayer::HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect)
-{
-	switch (a_EffectType)
-	{
-		// Effects whose behaviors are overridden
-		case cEntityEffect::effMiningFatigue:
-		{
-			// TODO: Implement me!
-			return;
-		}
-		case cEntityEffect::effHunger:
-		{
-			m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
-			return;
-		}
-		case cEntityEffect::effSaturation:
-		{
-			// Increase saturation 1 per tick, adds 1 for every increase in level
-			m_FoodSaturationLevel += (1 + a_Effect.GetIntensity());
-			return;
-		}
-		
-		// Client-side-only effects
-		case cEntityEffect::effNausea:
-		case cEntityEffect::effNightVision:
-		{
-			return;
-		}
-	}
-	
-	super::HandleEntityEffect(a_EffectType, a_Effect);
-}
-
-
-
-
-
 void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger

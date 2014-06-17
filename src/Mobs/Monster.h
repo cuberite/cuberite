@@ -224,8 +224,6 @@ protected:
 	int m_LastGroundHeight;
 
 	/* =========================== */
-	
-	virtual void HandleEntityEffect(cEntityEffect::eType a_EffectType, cEntityEffect a_Effect) override;
 
 	float m_IdleInterval;
 	float m_DestroyTimer;
