@@ -58,6 +58,13 @@ public:																	// tolua_export
 	// Called each tick
 	virtual void Tick(float a_Dt);
 
+	enum CommandResult
+	{
+		crExecuted,
+		crUnknownCommand,
+		crError,
+	} ;
+
 	// tolua_begin
 	enum PluginHook
 	{
@@ -322,12 +329,7 @@ private:
 	bool AddPlugin(cPlugin * a_Plugin);
 
 	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns true if the command is executed. */
-	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions, bool & a_WasCommandForbidden);	
-	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
-	{
-		bool DummyBoolean = false;
-		return HandleCommand(a_Player, a_Command, a_ShouldCheckPermissions, DummyBoolean);
-	}
+	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);	
 } ; // tolua_export
 
 
