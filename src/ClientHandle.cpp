@@ -955,6 +955,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockZ = a_BlockZ;
 
 	// Check for clickthrough-blocks:
+	/* When the user breaks a fire block, the client send the wrong block location.
+	We must find the right block with the face direction. */
 	if (a_BlockFace != BLOCK_FACE_NONE)
 	{
 		int pX = a_BlockX;
