@@ -119,8 +119,8 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 		(int)std::floor(GetPosX() * 8.0),
 		(int)std::floor(GetPosY() * 8.0),
 		(int)std::floor(GetPosZ() * 8.0),
-		0.5F,
-		0.75F + ((float)((GetUniqueID() * 23) % 32)) / 64F
+		0.5f,
+		0.75f + ((float)((GetUniqueID() * 23) % 32)) / 64.0f
 	);
 	
 	Destroy();
@@ -134,7 +134,7 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 {
 	if (m_IsInGround && !m_bIsCollected && CanPickup(*a_Dest))
 	{
-		if (m_PickupState == 1)
+		if (m_PickupState == psInSurvivalOrCreative)
 		{
 			int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
 			if (NumAdded == 0)
