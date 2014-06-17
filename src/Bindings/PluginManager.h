@@ -63,6 +63,8 @@ public:																	// tolua_export
 		crExecuted,
 		crUnknownCommand,
 		crError,
+		crBlocked,
+		crNoPermission,
 	} ;
 
 	// tolua_begin

@@ -1334,7 +1334,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 	if (CallHookExecuteCommand(a_Player, Split))
 	{
 		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player->GetName().c_str(), Split[0].c_str());
-		return crError;
+		return crBlocked;
 	}
 
 	if (
@@ -1345,7 +1345,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 	{
 		a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
-		return crError;
+		return crNoPermission;
 	}
 
 	ASSERT(cmd->second.m_Plugin != NULL);
