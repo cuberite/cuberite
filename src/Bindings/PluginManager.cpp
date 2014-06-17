@@ -1356,7 +1356,13 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 
 	ASSERT(cmd->second.m_Plugin != NULL);
 
-	return cmd->second.m_Plugin->HandleCommand(Split, a_Player);
+	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player))
+	{
+		a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", Split[0].c_str()));
+		return true; // The command handler was found and executed, so we return true.
+	}
+
+	return true;
 }
 
 
