@@ -27,9 +27,9 @@ public:
 		{
 			return false;
 		}
-		BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 
-		return (BlockBelow == E_BLOCK_FENCE_GATE || BlockBelow == E_BLOCK_FENCE || cBlockInfo::IsSolid(BlockBelow));
+		BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		return ((BlockBelow == E_BLOCK_FENCE_GATE) || (BlockBelow == E_BLOCK_FENCE) || cBlockInfo::IsSolid(BlockBelow));
 	}
 } ;
 
