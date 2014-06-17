@@ -248,7 +248,8 @@ public:
 
 	/** Creates and generates the entire system */
 	cMineShaftSystem(
-		int a_OriginX, int a_OriginZ, int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
+		int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ,
+		int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
 		int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 	);
 
@@ -278,10 +279,11 @@ public:
 // cStructGenMineShafts::cMineShaftSystem:
 
 cStructGenMineShafts::cMineShaftSystem::cMineShaftSystem(
-	int a_OriginX, int a_OriginZ, int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
+	int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ,
+	int a_GridSize, int a_MaxSystemSize, cNoise & a_Noise,
 	int a_ProbLevelCorridor, int a_ProbLevelCrossing, int a_ProbLevelStaircase
 ) :
-	super(a_OriginX, a_OriginZ),
+	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_GridSize(a_GridSize),
 	m_MaxRecursion(8),  // TODO: settable
 	m_ProbLevelCorridor(a_ProbLevelCorridor),
@@ -1280,10 +1282,10 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 // cStructGenMineShafts:
 
 cStructGenMineShafts::cStructGenMineShafts(
-	int a_Seed, int a_GridSize, int a_MaxSystemSize,
+	int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxSystemSize,
 	int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
 ) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxSystemSize, a_MaxSystemSize, 100),
+	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSystemSize, a_MaxSystemSize, 100),
 	m_Noise(a_Seed),
 	m_GridSize(a_GridSize),
 	m_MaxSystemSize(a_MaxSystemSize),
@@ -1297,9 +1299,9 @@ cStructGenMineShafts::cStructGenMineShafts(
 
 
 
-cGridStructGen::cStructurePtr cStructGenMineShafts::CreateStructure(int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cStructGenMineShafts::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
-	return cStructurePtr(new cMineShaftSystem(a_OriginX, a_OriginZ, m_GridSize, m_MaxSystemSize, m_Noise, m_ProbLevelCorridor, m_ProbLevelCrossing, m_ProbLevelStaircase));
+	return cStructurePtr(new cMineShaftSystem(a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_GridSize, m_MaxSystemSize, m_Noise, m_ProbLevelCorridor, m_ProbLevelCrossing, m_ProbLevelStaircase));
 }
 
 

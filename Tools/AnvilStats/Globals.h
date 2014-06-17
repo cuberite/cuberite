@@ -24,6 +24,15 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	
+	#define FORMATSTRING(formatIndex, va_argsIndex)
+
+	// MSVC has its own custom version of zu format
+	#define SIZE_T_FMT "%Iu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
+	#define SIZE_T_FMT_HEX "%Ix"
+	
+	#define NORETURN      __declspec(noreturn)
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -39,6 +48,14 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
+
+	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
+
+	#define SIZE_T_FMT "%zu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
+	#define SIZE_T_FMT_HEX "%zx"
+	
+	#define NORETURN      __attribute((__noreturn__))
 
 #else
 
@@ -194,6 +211,8 @@ typedef unsigned short     UInt16;
 /// Faster than (int)floorf((float)x / (float)div)
 #define FAST_FLOOR_DIV( x, div ) ( (x) < 0 ? (((int)x / div) - 1) : ((int)x / div) )
 
+#define TOLUA_TEMPLATE_BIND(...)
+
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef  _DEBUG
 	#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
@@ -203,6 +222,8 @@ typedef unsigned short     UInt16;
 
 // Pretty much the same as ASSERT() but stays in Release builds
 #define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
+
+typedef unsigned char Byte;
 
 
 
@@ -223,6 +244,7 @@ public:
 // Common headers (part 2, with macros):
 #include "../../src/ChunkDef.h"
 #include "../../src/BlockID.h"
+
 
 
 

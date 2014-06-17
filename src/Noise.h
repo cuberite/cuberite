@@ -192,6 +192,70 @@ protected:
 
 
 
+class cRidgedMultiNoise
+{
+public:
+	cRidgedMultiNoise(void);
+	cRidgedMultiNoise(int a_Seed);
+	
+	
+	void SetSeed(int a_Seed);
+	
+	void AddOctave(NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude);
+	
+	void Generate1D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
+		int a_SizeX,                                     ///< Count of the array
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	) const;
+	
+	
+	void Generate2D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	) const;
+	
+	
+	void Generate3D(
+		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
+	) const;
+	
+protected:
+	class cOctave
+	{
+	public:
+		cCubicNoise m_Noise;
+		
+		NOISE_DATATYPE m_Frequency;  // Coord multiplier
+		NOISE_DATATYPE m_Amplitude;  // Value multiplier
+		
+		cOctave(int a_Seed, NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude) :
+			m_Noise(a_Seed),
+			m_Frequency(a_Frequency),
+			m_Amplitude(a_Amplitude)
+		{
+		}
+	} ;
+	
+	typedef std::vector<cOctave> cOctaves;
+	
+	int      m_Seed;
+	cOctaves m_Octaves;
+} ;
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Inline function definitions:
 // These need to be in the header, otherwise linker error occur in MSVC

@@ -12,7 +12,6 @@
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
 #include "Item.h"
-#include "Piston.h"
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
 #include "OSSupport/Socket.h"
@@ -328,7 +327,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 	// Send experience
 	m_Player->SendExperience();
 	
-	m_Player->Initialize(World);
+	m_Player->Initialize(*World);
 	m_State = csAuthenticated;
 
 	// Query player team
@@ -357,7 +356,7 @@ void cClientHandle::StreamChunks(void)
 	}
 
 	ASSERT(m_Player != NULL);
-	
+
 	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
 	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
 	if ((ChunkPosX == m_LastStreamedChunkX) && (ChunkPosZ == m_LastStreamedChunkZ))
@@ -1094,18 +1093,25 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cWorld * World = m_Player->GetWorld();
 
 	if (
-		(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
+		(
+			(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||  // The block is too far away
+			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
+		)
 	)
 	{
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		if (a_BlockY < cChunkDef::Height - 1)
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			m_Player->GetInventory().SendEquippedSlot();
 		}
+		if (a_BlockY > 0)
+		{
+			World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+		}
+		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
 
@@ -1311,7 +1317,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if (!a_ItemHandler.GetPlacementBlockTypeMeta(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 	{
 		// Handler refused the placement, send that information back to the client:
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockY, m_Player);
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		m_Player->GetInventory().SendEquippedSlot();
 		return;
 	}
@@ -1751,18 +1757,8 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 
 
 
-void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
+void cClientHandle::RemoveFromWorld(void)
 {
-	UNUSED(a_World);
-	ASSERT(m_Player != NULL);
-	
-	if (a_SendRespawnPacket)
-	{
-		SendRespawn();
-	}
-
-	cWorld * World = m_Player->GetWorld();
-		
 	// Remove all associated chunks:
 	cChunkCoordsList Chunks;
 	{
@@ -1772,7 +1768,6 @@ void cClientHandle::MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket)
 	}
 	for (cChunkCoordsList::iterator itr = Chunks.begin(), end = Chunks.end(); itr != end; ++itr)
 	{
-		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
@@ -2377,9 +2372,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(void)
+void cClientHandle::SendRespawn(const cWorld & a_World)
 {
-	m_Protocol->SendRespawn();
+	m_Protocol->SendRespawn(a_World);
 }
 
 

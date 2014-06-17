@@ -109,7 +109,7 @@ bool cSpringStats::OnSectionsFinished(void)
 			int Base = BaseY + z * 16;
 			for (int x = 1; x < 15; x++)
 			{
-				if (cChunkDef::GetNibble(m_BlockMetas, Base + x) != 0)
+				if (cChunkDef::GetNibble(m_BlockMetas, x, y, z) != 0)
 				{
 					// Not a source block
 					continue;

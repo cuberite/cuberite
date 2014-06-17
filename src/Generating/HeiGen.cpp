@@ -47,6 +47,10 @@ cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBio
 	{
 		res = new cEndGen(a_Seed);
 	}
+	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
+	{
+		res = new cHeiGenMountains(a_Seed);
+	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
 		res = new cNoise3DComposable(a_Seed);
@@ -294,6 +298,68 @@ void cHeiGenClassic::InitializeHeightGen(cIniFile & a_IniFile)
 	m_HeightAmp1  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp1",  1.0);
 	m_HeightAmp2  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp2",  0.5);
 	m_HeightAmp3  = (float)a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3",  0.5);
+}
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cHeiGenMountains:
+
+cHeiGenMountains::cHeiGenMountains(int a_Seed) :
+	m_Seed(a_Seed),
+	m_Noise(a_Seed)
+{
+}
+
+
+
+
+
+void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+{
+	NOISE_DATATYPE StartX = (NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width);
+	NOISE_DATATYPE EndX   = (NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + cChunkDef::Width - 1);
+	NOISE_DATATYPE StartZ = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width);
+	NOISE_DATATYPE EndZ   = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + cChunkDef::Width - 1);
+	NOISE_DATATYPE Workspace[16 * 16];
+	NOISE_DATATYPE Noise[16 * 16];
+	NOISE_DATATYPE PerlinNoise[16 * 16];
+	m_Noise.Generate2D(Noise, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
+	m_Perlin.Generate2D(PerlinNoise, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		int IdxZ = z * cChunkDef::Width;
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int idx = IdxZ + x;
+			int hei = 100 - (int)((Noise[idx] + PerlinNoise[idx]) * 15);
+			if (hei < 10)
+			{
+				hei = 10;
+			}
+			if (hei > 250)
+			{
+				hei = 250;
+			}
+			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
+{
+	// TODO: Read the params from an INI file
+	m_Noise.AddOctave(0.1f,  0.1f);
+	m_Noise.AddOctave(0.05f, 0.5f);
+	m_Noise.AddOctave(0.02f, 1.5f);
+
+	m_Perlin.AddOctave(0.01f, 1.5f);
 }
 
 

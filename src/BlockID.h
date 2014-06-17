@@ -790,6 +790,7 @@ enum eDimension
 	dimNether    = -1,
 	dimOverworld = 0,
 	dimEnd       = 1,
+	dimNotSet    = 255,  // For things that need an "indeterminate" state, such as cProtocol's LastSentDimension
 } ;
 
 

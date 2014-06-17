@@ -48,6 +48,9 @@ public:
 	/// Returns the OS-dependent thread ID for the caller's thread
 	static unsigned long GetCurrentID(void);
 
+	/** Returns true if the thread calling this function is the thread contained within this object. */
+	bool IsCurrentThread(void) const;
+
 protected:
 	AString m_ThreadName;
 	
@@ -60,6 +63,7 @@ protected:
 
 	#ifdef _WIN32
 	
+		DWORD m_ThreadID;
 		HANDLE m_Handle;
 		
 		static DWORD __stdcall thrExecute(LPVOID a_Param)

@@ -231,7 +231,7 @@ public:
 		else
 		{
 			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), 100 + a_World->GetTickRandomNumber(800) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100));
-			Floater->Initialize(a_World);
+			Floater->Initialize(*a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}
 		return true;

@@ -47,7 +47,6 @@ class cFlowerPotEntity;
 class cFurnaceEntity;
 class cNoteEntity;
 class cMobHeadEntity;
-class cMobCensus;
 class cCompositeChat;
 class cCuboid;
 
@@ -114,6 +113,20 @@ public:
 	protected:
 		// cTask overrides:
 		virtual void Run(cWorld & a_World) override;
+	};
+
+
+	class cTaskSendBlockToAllPlayers :
+		public cTask
+	{
+	public:
+		cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue);
+
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+
+		std::vector<Vector3i> m_SendQueue;
 	};
 
 
@@ -270,8 +283,15 @@ public:
 	
 	void CollectPickupsByPlayer(cPlayer * a_Player);
 
-	void AddPlayer( cPlayer* a_Player );
-	void RemovePlayer( cPlayer* a_Player );
+	/** Adds the player to the world.
+	Uses a queue to store the player object until the Tick thread processes the addition event.
+	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking. */
+	void AddPlayer(cPlayer * a_Player);
+
+	/** Removes the player from the world.
+	Removes the player from the addition queue, too, if appropriate.
+	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore. */
+	void RemovePlayer(cPlayer * a_Player);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -287,7 +307,8 @@ public:
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
-	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr */
+	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
+	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
 	void AddEntity(cEntity * a_Entity);
 	
 	bool HasEntity(int a_UniqueID);
@@ -373,7 +394,7 @@ public:
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed.
 	*/
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates.
@@ -685,13 +706,41 @@ public:
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
 	eWeather GetWeather     (void) const { return m_Weather; };
 	
+	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
-	bool IsWeatherRain (void) const { return (m_Weather == wRain); }
+	
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
+	
+	/** Returns true if the current weather is rain */
+	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
+	
+	/** Returns true if it is raining at the specified location. This takes into account biomes. */
+	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
+	
+	/** Returns true if the current weather is stormy */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
 	
-	/** Returns true if the current weather has any precipitation - rain or storm */
-	bool IsWeatherWet  (void) const { return (m_Weather != wSunny); }
+	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
+	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherStorm() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
 	
+	/** Returns true if the current weather has any precipitation - rain, storm or snow */
+	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
+	
+	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+	{
+		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
+	}
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
@@ -912,6 +961,18 @@ private:
 	/** Clients that are scheduled for adding, waiting for TickClients to add them */
 	cClientHandleList m_ClientsToAdd;
 
+	/** Guards m_EntitiesToAdd */
+	cCriticalSection m_CSEntitiesToAdd;
+
+	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
+	cEntityList m_EntitiesToAdd;
+
+	/** Guards m_PlayersToAdd */
+	cCriticalSection m_CSPlayersToAdd;
+
+	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
+	cPlayerList m_PlayersToAdd;
+
 
 	cWorld(const AString & a_WorldName);
 	virtual ~cWorld();
@@ -949,6 +1010,10 @@ private:
 
 	/** Creates a new redstone simulator.*/
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
+
+	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
+	Assumes it is called from the Tick thread. */
+	void AddQueuedPlayers(void);
 }; // tolua_export
 
 

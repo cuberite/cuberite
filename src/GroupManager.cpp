@@ -123,7 +123,7 @@ bool cGroupManager::LoadGroups()
 		IniFile.SetValue("Owner", "Permissions", "*", true);
 		IniFile.SetValue("Owner", "Color", "2", true);
 
-		IniFile.SetValue("Moderator", "Permissions", "core.time,core.item,core.teleport,core.ban,core.unban,core.save-all,core.toggledownfall");
+		IniFile.SetValue("Moderator", "Permissions", "core.time,core.item,core.tpa,core.tpaccept,core.ban,core.unban,core.save-all,core.toggledownfall");
 		IniFile.SetValue("Moderator", "Color", "2", true);
 		IniFile.SetValue("Moderator", "Inherits", "Player", true);
 

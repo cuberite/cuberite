@@ -22,6 +22,12 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 
+// 6000 ticks or 5 minutes
+#define PLAYER_INVENTORY_SAVE_INTERVAL 6000
+
+// 1000 = once per second
+#define PLAYER_LIST_TIME_MS 1000
+
 
 
 
@@ -64,6 +70,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_BowCharge(0)
 	, m_FloaterID(-1)
 	, m_Team(NULL)
+	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -250,7 +257,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
 	cTimer t1;
-	if (m_LastPlayerListTime + cPlayer::PLAYER_LIST_TIME_MS <= t1.GetNowTime())
+	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
 		m_World->SendPlayerList(this);
 		m_LastPlayerListTime = t1.GetNowTime();
@@ -259,6 +266,16 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	if (IsFlying())
 	{
 		m_LastGroundHeight = (float)GetPosY();
+	}
+
+	if (m_TicksUntilNextSave == 0)
+	{
+		SaveToDisk();
+		m_TicksUntilNextSave = PLAYER_INVENTORY_SAVE_INTERVAL;
+	}
+	else
+	{
+		m_TicksUntilNextSave--;
 	}
 }
 
@@ -940,6 +957,8 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 void cPlayer::Respawn(void)
 {
+	ASSERT(m_World != NULL);
+
 	m_Health = GetMaxHealth();
 	SetInvulnerableTicks(20);
 	
@@ -952,7 +971,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn();
+	m_ClientHandle->SendRespawn(*m_World);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1255,6 +1274,17 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
 {
 	SetSpeed(a_Speed);
+}
+
+
+
+
+
+void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+{
+	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+
+	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
 }
 
@@ -1583,21 +1613,19 @@ bool cPlayer::MoveToWorld(const char * a_WorldName)
 		return false;
 	}
 	
-	eDimension OldDimension = m_World->GetDimension();
-	
+	// Send the respawn packet:
+	if (m_ClientHandle != NULL)
+	{
+		m_ClientHandle->SendRespawn(*World);
+	}
+
 	// Remove all links to the old world
 	m_World->RemovePlayer(this);
-	m_ClientHandle->RemoveFromAllChunks();
-	m_World->RemoveEntity(this);
 
 	// If the dimension is different, we can send the respawn packet
 	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
-	m_ClientHandle->MoveToWorld(*World, (OldDimension != World->GetDimension()));
 
-	// Add player to all the necessary parts of the new world
-	SetWorld(World);
-	m_ClientHandle->StreamChunks();
-	World->AddEntity(this);
+	// Queue adding player to the new world, including all the necessary adjustments to the object
 	World->AddPlayer(this);
 
 	return true;
@@ -1649,13 +1677,6 @@ void cPlayer::LoadPermissionsFromDisk()
 bool cPlayer::LoadFromDisk()
 {
 	LoadPermissionsFromDisk();
-
-	// Log player permissions, cause it's what the cool kids do
-	LOGINFO("Player %s has permissions:", GetName().c_str() );
-	for( PermissionMap::iterator itr = m_ResolvedPermissions.begin(); itr != m_ResolvedPermissions.end(); ++itr )
-	{
-		if( itr->second ) LOG(" - %s", itr->first.c_str() );
-	}
 
 	AString SourceFile;
 	Printf(SourceFile, "players/%s.json", GetName().c_str() );

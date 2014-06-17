@@ -11,7 +11,8 @@
 
 
 
-cCallbackSslContext::cCallbackSslContext(void)
+cCallbackSslContext::cCallbackSslContext(void) :
+	m_Callbacks(NULL)
 {
 	// Nothing needed, but the constructor needs to exist so
 }

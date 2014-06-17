@@ -149,7 +149,7 @@ public:
 	void SendPlayerSpawn         (const cPlayer & a_Player);
 	void SendPluginMessage       (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
-	void SendRespawn             (void);
+	void SendRespawn             (const cWorld & a_World);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
 	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
@@ -250,8 +250,9 @@ public:
 	
 	void SendData(const char * a_Data, size_t a_Size);
 	
-	/** Called when the player moves into a different world; queues sreaming the new chunks */
-	void MoveToWorld(cWorld & a_World, bool a_SendRespawnPacket);
+	/** Called when the player moves into a different world.
+	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */
+	void RemoveFromWorld(void);
 	
 	/** Called when the player will enchant a Item */
 	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);

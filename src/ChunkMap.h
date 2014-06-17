@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "ChunkDef.h"
+
+#include "ChunkDataCallback.h"
 
 
 
@@ -152,7 +153,7 @@ public:
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockMeta);
-	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
+	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);
 	void       QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
@@ -197,6 +198,10 @@ public:
 
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(cEntity * a_Entity);
+	
+	/** Adds the entity to its appropriate chunk, if the entity is not already added.
+	Takes ownership of the entity pointer */
+	void AddEntityIfNotPresent(cEntity * a_Entity);
 	
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(int a_EntityID);
@@ -346,7 +351,11 @@ private:
 	class cChunkLayer
 	{
 	public:
-		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent);
+		cChunkLayer(
+			int a_LayerX, int a_LayerZ, 
+			cChunkMap * a_Parent,
+			cAllocationPool<cChunkData::sChunkSection> & a_Pool
+		);
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
@@ -390,6 +399,25 @@ private:
 		int m_LayerZ;
 		cChunkMap * m_Parent;
 		int m_NumChunksLoaded;
+		
+		cAllocationPool<cChunkData::sChunkSection> & m_Pool;
+	};
+	
+	class cStarvationCallbacks
+		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
+	{
+		virtual void OnStartUsingReserve() override
+		{
+			LOG("Using backup memory buffer");
+		}
+		virtual void OnEndUsingReserve() override
+		{
+			LOG("Stoped using backup memory buffer");
+		}
+		virtual void OnOutOfReserve() override
+		{
+			LOG("Out of Memory");
+		}
 	};
 	
 	typedef std::list<cChunkLayer *> cChunkLayerList;
@@ -421,6 +449,8 @@ private:
 	
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;
+
+	std::auto_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
