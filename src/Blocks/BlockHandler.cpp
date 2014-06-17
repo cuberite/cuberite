@@ -131,6 +131,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLOWSTONE:             return new cBlockGlowstoneHandler       (a_BlockType);
 		case E_BLOCK_GOLD_ORE:              return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_GLASS:                 return new cBlockGlassHandler           (a_BlockType);
+		case E_BLOCK_GLASS_PANE:            return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
 		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
@@ -189,6 +190,8 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SIGN_POST:             return new cBlockSignHandler            (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
+		case E_BLOCK_STAINED_GLASS:         return new cBlockGlassHandler           (a_BlockType);
+		case E_BLOCK_STAINED_GLASS_PANE:    return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_STATIONARY_LAVA:       return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_STATIONARY_WATER:      return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_STICKY_PISTON:         return new cBlockPistonHandler          (a_BlockType);
