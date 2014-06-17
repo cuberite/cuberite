@@ -34,11 +34,11 @@ public:
 		{
 			virtual bool Item(cBlockEntity * a_BlockEntity)
 			{
-				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
-				if (MobHeadEntity == NULL)
+				if (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD)
 				{
 					return false;
 				}
+				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
 				
 				cItems Pickups;
 				Pickups.Add(E_ITEM_HEAD, 1, (short) MobHeadEntity->GetType());
@@ -73,13 +73,13 @@ public:
 		{
 			bool m_IsWither;
 			
-			virtual bool Item (cBlockEntity * a_BlockEntity)
+			virtual bool Item(cBlockEntity * a_BlockEntity)
 			{
-				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
-				if (MobHeadEntity == NULL)
+				if (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD)
 				{
 					return false;
 				}
+				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
 
 				m_IsWither = (MobHeadEntity->GetType() == SKULL_TYPE_WITHER);
 				return false;
@@ -205,13 +205,13 @@ public:
 			NIBBLETYPE m_OldBlockMeta;
 			NIBBLETYPE m_NewBlockMeta;
 			
-			virtual bool Item (cBlockEntity * a_BlockEntity)
+			virtual bool Item(cBlockEntity * a_BlockEntity)
 			{
-				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
-				if (MobHeadEntity == NULL)
+				if (a_BlockEntity->GetBlockType() != E_BLOCK_HEAD)
 				{
 					return false;
 				}
+				cMobHeadEntity * MobHeadEntity = static_cast<cMobHeadEntity*>(a_BlockEntity);
 
 				int Rotation = 0;
 				if (m_NewBlockMeta == 1)
