@@ -954,6 +954,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
+	// Check for clickthrough-blocks:
 	if (a_BlockFace != BLOCK_FACE_NONE)
 	{
 		int pX = a_BlockX;
