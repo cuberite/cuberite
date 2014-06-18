@@ -57,7 +57,8 @@ public:																	// tolua_export
 
 	// Called each tick
 	virtual void Tick(float a_Dt);
-
+	
+	// tolua_begin
 	enum CommandResult
 	{
 		crExecuted,
@@ -67,7 +68,6 @@ public:																	// tolua_export
 		crNoPermission,
 	} ;
 
-	// tolua_begin
 	enum PluginHook
 	{
 		HOOK_BLOCK_SPREAD,
@@ -254,10 +254,10 @@ public:																	// tolua_export
 	AString GetCommandPermission(const AString & a_Command);  // tolua_export
 	
 	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns true if executed. */
-	bool ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
+	CommandResult ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
 	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns true if executed (false if not found) */
-	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
+	CommandResult ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
 	/** Removes all console command bindings that the specified plugin has made */
 	void RemovePluginConsoleCommands(cPlugin * a_Plugin);

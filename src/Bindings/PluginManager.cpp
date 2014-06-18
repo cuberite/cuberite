@@ -1553,18 +1553,18 @@ AString cPluginManager::GetCommandPermission(const AString & a_Command)
 
 
 
-bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
-	return (HandleCommand(a_Player, a_Command, true) == crExecuted);
+	return HandleCommand(a_Player, a_Command, true);
 }
 
 
 
 
 
-bool cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
-	return (HandleCommand(a_Player, a_Command, false) == crExecuted);
+	return HandleCommand(a_Player, a_Command, false);
 }
 
 
