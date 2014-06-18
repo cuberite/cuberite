@@ -80,6 +80,7 @@ public:
 		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			a_BlockType = GetDoubleSlabType(m_BlockType);
+			a_BlockMeta = a_BlockMeta & 0x7;
 		}
 
 		return true;
