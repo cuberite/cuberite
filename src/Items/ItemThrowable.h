@@ -31,6 +31,17 @@ public:
 		Vector3d Pos = a_Player->GetThrowStartPos();
 		Vector3d Speed = a_Player->GetLookVector() * m_SpeedCoeff;
 
+		// Play sound
+		cFastRandom Random;
+		a_World->BroadcastSoundEffect(
+			"random.bow",
+			(int)std::floor(a_Player->GetPosX() * 8.0),
+			(int)std::floor((a_Player->GetPosY() - a_Player->GetHeight()) * 8.0),
+			(int)std::floor(a_Player->GetPosZ() * 8.0),
+			0.5F,
+			0.4F / (Random.NextFloat(1.0F) * 0.4F + 0.8F)
+		);
+
 		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, a_Player->GetEquippedItem(), &Speed) < 0)
 		{
 			return false;
