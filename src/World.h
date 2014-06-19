@@ -830,6 +830,7 @@ private:
 		virtual ~cScheduledTask()
 		{
 			delete m_Task;
+			m_Task = NULL;
 		}
 	};
 

@@ -146,6 +146,7 @@ cPlayer::~cPlayer(void)
 	m_ClientHandle = NULL;
 	
 	delete m_InventoryWindow;
+	m_InventoryWindow = NULL;
 	
 	LOGD("Player %p deleted", this);
 }

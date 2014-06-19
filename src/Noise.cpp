@@ -877,6 +877,7 @@ void cPerlinNoise::Generate2D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
+		a_Workspace = NULL;
 	}
 }
 
@@ -943,6 +944,7 @@ void cPerlinNoise::Generate3D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
+		a_Workspace = NULL;
 	}
 }
 
@@ -1045,6 +1047,7 @@ void cRidgedMultiNoise::Generate2D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
+		a_Workspace = NULL;
 	}
 }
 
@@ -1111,6 +1114,7 @@ void cRidgedMultiNoise::Generate3D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
+		a_Workspace = NULL;
 	}
 }
 

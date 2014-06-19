@@ -152,7 +152,9 @@ cChunk::~cChunk()
 		m_NeighborZP->m_NeighborZM = NULL;
 	}
 	delete m_WaterSimulatorData;
+	m_WaterSimulatorData = NULL;
 	delete m_LavaSimulatorData;
+	m_LavaSimulatorData = NULL;
 }
 
 
@@ -596,6 +598,7 @@ void cChunk::Tick(float a_Dt)
 				cEntity * ToDelete = *itr;
 				itr = m_Entities.erase(itr);
 				delete ToDelete;
+				ToDelete = NULL;
 				continue;
 			}
 			++itr;
@@ -1417,6 +1420,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		BlockEntity->Destroy();
 		RemoveBlockEntity(BlockEntity);
 		delete BlockEntity;
+		BlockEntity = NULL;
 	}
 	
 	// If the new block is a block entity, create the entity object:

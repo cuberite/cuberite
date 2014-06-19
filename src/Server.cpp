@@ -326,6 +326,7 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", ClientIP.c_str());
 		a_Socket.CloseSocket();
 		delete NewHandle;
+		NewHandle = NULL;
 		return;
 	}
 	

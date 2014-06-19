@@ -135,7 +135,9 @@ cBioGenCache::cBioGenCache(cBiomeGen * a_BioGenToCache, int a_CacheSize) :
 cBioGenCache::~cBioGenCache()
 {
 	delete[] m_CacheData;
+	m_CacheData = NULL;
 	delete[] m_CacheOrder;
+	m_CacheOrder = NULL;
 }
 
 

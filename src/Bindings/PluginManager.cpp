@@ -1467,6 +1467,7 @@ void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 		a_Plugin->OnDisable();
 	}
 	delete a_Plugin;
+	a_Plugin = NULL;
 }
 
 
