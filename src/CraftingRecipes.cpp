@@ -59,6 +59,7 @@ cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 cCraftingGrid::~cCraftingGrid()
 {
 	delete[] m_Items;
+	m_Items = NULL;
 }
 
 

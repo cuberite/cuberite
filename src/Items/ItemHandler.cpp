@@ -260,6 +260,7 @@ void cItemHandler::Deinit()
 	for(int i = 0; i < 2267; i++)
 	{
 		delete m_ItemHandler[i];
+		m_ItemHandler[i] = NULL;
 	}
 	memset(m_ItemHandler, 0, sizeof(m_ItemHandler));  // Don't leave any dangling pointers around, just in case
 	m_HandlerInitialized = false;

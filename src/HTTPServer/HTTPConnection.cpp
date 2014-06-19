@@ -28,6 +28,7 @@ cHTTPConnection::~cHTTPConnection()
 {
 	// LOGD("HTTP: Connection deleting: %p", this);
 	delete m_CurrentRequest;
+	m_CurrentRequest = NULL;
 }
 
 

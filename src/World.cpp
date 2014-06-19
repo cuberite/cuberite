@@ -267,12 +267,12 @@ cWorld::cWorld(const AString & a_WorldName) :
 
 cWorld::~cWorld()
 {
-	delete m_SimulatorManager;
-	delete m_SandSimulator;
-	delete m_WaterSimulator;
-	delete m_LavaSimulator;
-	delete m_FireSimulator;
-	delete m_RedstoneSimulator;
+	delete m_SimulatorManager;   m_SimulatorManager  = NULL;
+	delete m_SandSimulator;      m_SandSimulator     = NULL;
+	delete m_WaterSimulator;     m_WaterSimulator    = NULL;
+	delete m_LavaSimulator;      m_LavaSimulator     = NULL;
+	delete m_FireSimulator;      m_FireSimulator     = NULL;
+	delete m_RedstoneSimulator;  m_RedstoneSimulator = NULL;
 
 	UnloadUnusedChunks();
 	
@@ -2972,11 +2972,13 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
 		delete a_Monster;
+		a_Monster = NULL;
 		return -1;
 	}
 	if (!a_Monster->Initialize(*this))
 	{
 		delete a_Monster;
+		a_Monster = NULL;
 		return -1;
 	}
 	BroadcastSpawnEntity(*a_Monster);
@@ -2999,6 +3001,7 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
+		Projectile = NULL;
 		return -1;
 	}
 	return Projectile->GetUniqueID();

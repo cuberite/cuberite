@@ -34,6 +34,7 @@ cBlockInfo::cBlockInfo()
 cBlockInfo::~cBlockInfo()
 {
 	delete m_Handler;
+	m_Handler = NULL;
 }
 
 

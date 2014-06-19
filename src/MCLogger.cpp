@@ -57,6 +57,7 @@ cMCLogger::~cMCLogger()
 {
 	m_Log->Log("--- Stopped Log ---\n");
 	delete m_Log;
+	m_Log = NULL;
 	if (this == s_MCLogger)
 	{
 		s_MCLogger = NULL;
