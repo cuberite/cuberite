@@ -469,6 +469,9 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		a_Writer.AddByte("MCSIsLightValid", 1);
 	}
 	
+	// Store the flag that the chunk has all the ores, trees, dungeons etc. MCS chunks are always complete.
+	a_Writer.AddByte("TerrainPopulated", 1);
+	
 	a_Writer.EndCompound();  // "Level"
 	return true;
 }
