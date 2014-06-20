@@ -261,7 +261,12 @@ protected:
 	/// The noise used to distort the inupt Z coord
 	cPerlinNoise m_DistortZ;
 	
-	cNoise m_Noise;
+	cNoise m_Noise1;
+	cNoise m_Noise2;
+	cNoise m_Noise3;
+	cNoise m_Noise4;
+	cNoise m_Noise5;
+	cNoise m_Noise6;
 
 
 	// cBiomeGen overrides:
