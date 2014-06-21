@@ -64,7 +64,8 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 cChunk::cChunk(
 	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
 	cChunkMap * a_ChunkMap, cWorld * a_World,
-	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP
+	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
+	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ) :
 	m_IsValid(false),
 	m_IsLightValid(false),
@@ -77,6 +78,7 @@ cChunk::cChunk(
 	m_PosZ(a_ChunkZ),
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
+	m_ChunkData(a_Pool),
 	m_BlockTickX(0),
 	m_BlockTickY(0),
 	m_BlockTickZ(0),
@@ -150,7 +152,9 @@ cChunk::~cChunk()
 		m_NeighborZP->m_NeighborZM = NULL;
 	}
 	delete m_WaterSimulatorData;
+	m_WaterSimulatorData = NULL;
 	delete m_LavaSimulatorData;
+	m_LavaSimulatorData = NULL;
 }
 
 
@@ -597,7 +601,7 @@ void cChunk::Tick(float a_Dt)
 			itr = m_Entities.erase(itr);
 			delete ToDelete;
 		}
-		else if ((*itr)->IsTravellingThroughPortal())
+		else if ((*itr)->IsTravellingThroughPortal()) // Remove all entities that are travelling to another world
 		{
 			MarkDirty();
 			(*itr)->SetIsTravellingThroughPortal(false);
@@ -1416,6 +1420,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		BlockEntity->Destroy();
 		RemoveBlockEntity(BlockEntity);
 		delete BlockEntity;
+		BlockEntity = NULL;
 	}
 	
 	// If the new block is a block entity, create the entity object:

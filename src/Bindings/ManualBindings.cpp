@@ -1765,6 +1765,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	if (!ChunkStay->AddChunks(2))
 	{
 		delete ChunkStay;
+		ChunkStay = NULL;
 		return 0;
 	}
 

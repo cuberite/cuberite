@@ -1571,6 +1571,7 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 		LOGWARNING("Plugin %s tried to add a hook %d with bad handler function.", GetName().c_str(), a_HookType);
 		m_LuaState.LogStackTrace();
 		delete Ref;
+		Ref = NULL;
 		return false;
 	}
 	

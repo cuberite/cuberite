@@ -23,7 +23,7 @@ class cStructGenMineShafts :
 
 public:
 	cStructGenMineShafts(
-		int a_Seed, int a_GridSize, int a_MaxSystemSize,
+		int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxSystemSize,
 		int a_ChanceCorridor, int a_ChanceCrossing, int a_ChanceStaircase
 	);
 	
@@ -43,7 +43,7 @@ protected:
 	int    m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing
 	
 	// cGridStructGen overrides:
-	virtual cStructurePtr CreateStructure(int a_OriginX, int a_OriginZ) override;
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 

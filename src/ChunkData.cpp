@@ -27,11 +27,12 @@ template <typename T> inline bool IsAllValue(const T * a_Array, size_t a_NumElem
 
 
 
-cChunkData::cChunkData(void)
+cChunkData::cChunkData(cAllocationPool<cChunkData::sChunkSection> & a_Pool) :
 #if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
-	: m_IsOwner(true)
+	m_IsOwner(true),
 #endif
+	m_Pool(a_Pool)
 {
 	for (size_t i = 0; i < NumSections; i++)
 	{
@@ -66,7 +67,8 @@ cChunkData::~cChunkData()
 #if __cplusplus < 201103L
 	// auto_ptr style interface for memory management
 	cChunkData::cChunkData(const cChunkData & a_Other) :
-		m_IsOwner(true)
+		m_IsOwner(true),
+		m_Pool(a_Other.m_Pool)
 	{
 		// Move contents and ownership from a_Other to this, pointer-wise:
 		for (size_t i = 0; i < NumSections; i++)
@@ -97,7 +99,7 @@ cChunkData::~cChunkData()
 				m_Sections[i] = NULL;
 			}
 		}
-		
+
 		// Move contents and ownership from a_Other to this, pointer-wise:
 		m_IsOwner = true;
 		for (size_t i = 0; i < NumSections; i++)
@@ -105,13 +107,15 @@ cChunkData::~cChunkData()
 			m_Sections[i] = a_Other.m_Sections[i];
 		}
 		a_Other.m_IsOwner = false;
+		ASSERT(&m_Pool == &a_Other.m_Pool);
 		return *this;
 	}
 	
 #else
 
 	// unique_ptr style interface for memory management
-	cChunkData::cChunkData(cChunkData && other)
+	cChunkData::cChunkData(cChunkData && other) :
+	m_Pool(other.m_Pool)
 	{
 		for (size_t i = 0; i < NumSections; i++)
 		{
@@ -128,6 +132,7 @@ cChunkData::~cChunkData()
 	{
 		if (&other != this)
 		{
+			ASSERT(&m_Pool == &other.m_Pool);
 			for (size_t i = 0; i < NumSections; i++)
 			{
 				Free(m_Sections[i]);
@@ -317,12 +322,12 @@ NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 
 cChunkData cChunkData::Copy(void) const
 {
-	cChunkData copy;
+	cChunkData copy(m_Pool);
 	for (size_t i = 0; i < NumSections; i++)
 	{
 		if (m_Sections[i] != NULL)
 		{
-			copy.m_Sections[i] = Allocate();
+			copy.m_Sections[i] = copy.Allocate();
 			*copy.m_Sections[i] = *m_Sections[i];
 		}
 	}
@@ -561,8 +566,7 @@ void cChunkData::SetSkyLight(const NIBBLETYPE * a_Src)
 
 cChunkData::sChunkSection * cChunkData::Allocate(void)
 {
-	// TODO: Use an allocation pool
-	return new cChunkData::sChunkSection;
+	return m_Pool.Allocate();
 }
 
 
@@ -571,8 +575,7 @@ cChunkData::sChunkSection * cChunkData::Allocate(void)
 
 void cChunkData::Free(cChunkData::sChunkSection * a_Section)
 {
-	// TODO: Use an allocation pool
-	delete a_Section;
+	m_Pool.Free(a_Section);
 }
 
 

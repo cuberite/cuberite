@@ -26,6 +26,7 @@
 #include "POCPieceGenerator.h"
 #include "RainbowRoadsGen.h"
 #include "Ravines.h"
+#include "TestRailsGen.h"
 #include "UnderwaterBaseGen.h"
 #include "VillageGen.h"
 
@@ -343,12 +344,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "MineShafts") == 0)
 		{
 			int GridSize        = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize",        512);
+			int MaxOffset       = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxOffset",       256);
 			int MaxSystemSize   = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize",   160);
 			int ChanceCorridor  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCorridor",  600);
 			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
 			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
 			m_FinishGens.push_back(new cStructGenMineShafts(
-				Seed, GridSize, MaxSystemSize,
+				Seed, GridSize, MaxOffset, MaxSystemSize,
 				ChanceCorridor, ChanceCrossing, ChanceStaircase
 			));
 		}
@@ -362,9 +364,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "NetherForts") == 0)
 		{
-			int GridSize = a_IniFile.GetValueSetI("Generator", "NetherFortsGridSize", 512);
-			int MaxDepth = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
-			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxDepth));
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "NetherFortsGridSize", 512);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "NetherFortMaxOffset", 128);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
+			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxOffset, MaxDepth));
 		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
@@ -380,10 +383,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "RainbowRoads") == 0)
 		{
-			int GridSize = a_IniFile.GetValueSetI("Generator", "RainbowRoadsGridSize", 512);
-			int MaxDepth = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxDepth",  30);
-			int MaxSize  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxSize",  260);
-			m_FinishGens.push_back(new cRainbowRoadsGen(Seed, GridSize, MaxDepth, MaxSize));
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsGridSize", 512);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxOffset", 128);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxDepth",  30);
+			int MaxSize   = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxSize",  260);
+			m_FinishGens.push_back(new cRainbowRoadsGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize));
 		}
 		else if (NoCaseCompare(*itr, "Ravines") == 0)
 		{
@@ -397,25 +401,31 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
 		}
+		else if (NoCaseCompare(*itr, "TestRails") == 0)
+		{
+			m_FinishGens.push_back(new cTestRailsGen(Seed, 100, 1, 7, 50));
+		}
 		else if (NoCaseCompare(*itr, "Trees") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
 		}
 		else if (NoCaseCompare(*itr, "UnderwaterBases") == 0)
 		{
-			int GridSize = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
-			int MaxDepth = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
-			int MaxSize  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
-			m_FinishGens.push_back(new cUnderwaterBaseGen(Seed, GridSize, MaxDepth, MaxSize, *m_BiomeGen));
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxOffset", 128);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
+			int MaxSize   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
+			m_FinishGens.push_back(new cUnderwaterBaseGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, *m_BiomeGen));
 		}
 		else if (NoCaseCompare(*itr, "Villages") == 0)
 		{
 			int GridSize   = a_IniFile.GetValueSetI("Generator", "VillageGridSize",  384);
+			int MaxOffset  = a_IniFile.GetValueSetI("Generator", "VillageMaxOffset", 128);
 			int MaxDepth   = a_IniFile.GetValueSetI("Generator", "VillageMaxDepth",    2);
 			int MaxSize    = a_IniFile.GetValueSetI("Generator", "VillageMaxSize",   128);
 			int MinDensity = a_IniFile.GetValueSetI("Generator", "VillageMinDensity", 50);
 			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
-			m_FinishGens.push_back(new cVillageGen(Seed, GridSize, MaxDepth, MaxSize, MinDensity, MaxDensity, *m_BiomeGen, *m_HeightGen));
+			m_FinishGens.push_back(new cVillageGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, *m_BiomeGen, *m_HeightGen));
 		}
 		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
@@ -428,7 +438,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "WormNestCaves") == 0)
 		{
-			m_FinishGens.push_back(new cStructGenWormNestCaves(Seed));
+			int Size      = a_IniFile.GetValueSetI("Generator", "WormNestCavesSize", 64);
+			int Grid      = a_IniFile.GetValueSetI("Generator", "WormNestCavesGrid", 96);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "WormNestMaxOffset", 32);
+			m_FinishGens.push_back(new cStructGenWormNestCaves(Seed, Size, Grid, MaxOffset));
 		}
 		else
 		{

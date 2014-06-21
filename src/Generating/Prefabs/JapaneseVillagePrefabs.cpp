@@ -130,6 +130,176 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Farm:
+	// The data has been exported from the gallery Plains, area index 166, ID 554, created by Aloe_vera
+	{
+		// Size:
+		11, 7, 13,  // SizeX = 11, SizeY = 7, SizeZ = 13
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		10, 6, 12,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:  3: 0\n"  /* dirt */
+		"b: 60: 7\n"  /* tilleddirt */
+		"c:  8: 0\n"  /* water */
+		"d: 43: 0\n"  /* doubleslab */
+		"e: 44: 0\n"  /* step */
+		"f: 59: 7\n"  /* crops */
+		"g: 83: 0\n"  /* reedblock */
+		"h:113: 0\n"  /* netherbrickfence */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "maaaaaaaaam"
+		/*  2 */ "maaaaaaaaam"
+		/*  3 */ "maaaaaaaaam"
+		/*  4 */ "maaaaaaaaam"
+		/*  5 */ "maaaaaaaaam"
+		/*  6 */ "maaaaaaaaam"
+		/*  7 */ "maaaaaaaaam"
+		/*  8 */ "maaaaaaaaam"
+		/*  9 */ "maaaaaaaaam"
+		/* 10 */ "maaaaaaaaam"
+		/* 11 */ "maaaaaaaaam"
+		/* 12 */ "mmmmmmmmmmm"
+
+		// Level 1
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "mmmmmmmmmmm"
+		/*  1 */ "maaaaaaaaam"
+		/*  2 */ "mabbbbbbbam"
+		/*  3 */ "mabbbbbbbam"
+		/*  4 */ "mabbbbbbbam"
+		/*  5 */ "mabbbbbbbam"
+		/*  6 */ "mabcccccaam"
+		/*  7 */ "mabbbbbbbam"
+		/*  8 */ "mabbbbbbbam"
+		/*  9 */ "mabbbbbbbam"
+		/* 10 */ "mabbbbbbbam"
+		/* 11 */ "maaaaaaaaam"
+		/* 12 */ "mmmmmmmmmmm"
+
+		// Level 2
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".deeeeeeed."
+		/*  2 */ ".efffffffe."
+		/*  3 */ ".efffffffe."
+		/*  4 */ ".efffffffe."
+		/*  5 */ ".efgggggfe."
+		/*  6 */ ".eg.....ge."
+		/*  7 */ ".efgggggfe."
+		/*  8 */ ".efffffffe."
+		/*  9 */ ".efffffffe."
+		/* 10 */ ".efffffffe."
+		/* 11 */ ".deeeeeeed."
+		/* 12 */ "..........."
+
+		// Level 3
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".h.......h."
+		/*  2 */ "..........."
+		/*  3 */ "..........."
+		/*  4 */ "..........."
+		/*  5 */ "...ggggg..."
+		/*  6 */ "..g.....g.."
+		/*  7 */ "...ggggg..."
+		/*  8 */ "..........."
+		/*  9 */ "..........."
+		/* 10 */ "..........."
+		/* 11 */ ".h.......h."
+		/* 12 */ "..........."
+
+		// Level 4
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".h.......h."
+		/*  2 */ "..........."
+		/*  3 */ "..........."
+		/*  4 */ "..........."
+		/*  5 */ "...ggggg..."
+		/*  6 */ "..g.....g.."
+		/*  7 */ "...ggggg..."
+		/*  8 */ "..........."
+		/*  9 */ "..........."
+		/* 10 */ "..........."
+		/* 11 */ ".h.......h."
+		/* 12 */ "..........."
+
+		// Level 5
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ "..........."
+		/*  1 */ ".h.......h."
+		/*  2 */ "..........."
+		/*  3 */ "..........."
+		/*  4 */ "..........."
+		/*  5 */ "..........."
+		/*  6 */ "..........."
+		/*  7 */ "..........."
+		/*  8 */ "..........."
+		/*  9 */ "..........."
+		/* 10 */ "..........."
+		/* 11 */ ".h.......h."
+		/* 12 */ "..........."
+
+		// Level 6
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ ".h.......h."
+		/*  1 */ "hhh.....hhh"
+		/*  2 */ ".h.......h."
+		/*  3 */ "..........."
+		/*  4 */ "..........."
+		/*  5 */ "..........."
+		/*  6 */ "..........."
+		/*  7 */ "..........."
+		/*  8 */ "..........."
+		/*  9 */ "..........."
+		/* 10 */ ".h.......h."
+		/* 11 */ "hhh.....hhh"
+		/* 12 */ ".h.......h.",
+
+		// Connectors:
+		"-1: 10, 2, 6: 5\n"  /* Type -1, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		100,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // Farm
+
+
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Forge:
 	// The data has been exported from the gallery Plains, area index 79, ID 145, created by Aloe_vera
 	{
@@ -2025,12 +2195,12 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// Level 1
 		/* z\x*   0123456 */
-		/*  0 */ "bbbbbbb"
-		/*  1 */ "bbbbbbb"
-		/*  2 */ "bbbbbbb"
-		/*  3 */ "bbbabbb"
-		/*  4 */ "bbbbbbb"
-		/*  5 */ "bbbbbbb"
+		/*  0 */ "bmmmmmm"
+		/*  1 */ "bmmmmmm"
+		/*  2 */ "bmmmmmm"
+		/*  3 */ "bmmmmmm"
+		/*  4 */ "bmmmmmm"
+		/*  5 */ "bmmmmmm"
 		/*  6 */ "bbbbbbb"
 
 		// Level 2
@@ -3005,159 +3175,157 @@ const cPrefab::sDef g_JapaneseVillageStartingPrefabs[] =
 		"a:  1: 0\n"  /* stone */
 		"b:  4: 0\n"  /* cobblestone */
 		"c:  8: 0\n"  /* water */
-		"d:  3: 0\n"  /* dirt */
-		"e:  2: 0\n"  /* grass */
-		"f: 13: 0\n"  /* gravel */
-		"g: 67: 1\n"  /* stairs */
-		"h: 67: 2\n"  /* stairs */
-		"i: 67: 0\n"  /* stairs */
-		"j: 67: 3\n"  /* stairs */
-		"k: 85: 0\n"  /* fence */
-		"l: 44: 8\n"  /* step */
-		"m: 19: 0\n"  /* sponge */
-		"n: 44: 0\n"  /* step */
-		"o: 43: 0\n"  /* doubleslab */,
+		"d: 13: 0\n"  /* gravel */
+		"e: 67: 1\n"  /* stairs */
+		"f: 67: 2\n"  /* stairs */
+		"g: 67: 0\n"  /* stairs */
+		"h: 67: 3\n"  /* stairs */
+		"i: 85: 0\n"  /* fence */
+		"j: 44: 8\n"  /* step */
+		"k: 44: 0\n"  /* step */
+		"l: 43: 0\n"  /* doubleslab */
+		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
 		// Level 0
 		/* z\x*   0123456 */
-		/*  0 */ "aaaaaaa"
-		/*  1 */ "aaaaaaa"
-		/*  2 */ "aaaaaaa"
-		/*  3 */ "aaaaaaa"
-		/*  4 */ "aaaaaaa"
-		/*  5 */ "aaaaaaa"
-		/*  6 */ "aaaaaaa"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "maaaaam"
+		/*  2 */ "maaaaam"
+		/*  3 */ "maaaaam"
+		/*  4 */ "maaaaam"
+		/*  5 */ "maaaaam"
+		/*  6 */ "mmmmmmm"
 
 		// Level 1
 		/* z\x*   0123456 */
-		/*  0 */ "aaaaaaa"
-		/*  1 */ "abbbbba"
-		/*  2 */ "abcc.ba"
-		/*  3 */ "abcccba"
-		/*  4 */ "abcccba"
-		/*  5 */ "abbbbba"
-		/*  6 */ "aaaaaaa"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "mbcc.bm"
+		/*  3 */ "mbcccbm"
+		/*  4 */ "mbcccbm"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmmmmmm"
 
 		// Level 2
 		/* z\x*   0123456 */
-		/*  0 */ "aaaaaaa"
-		/*  1 */ "abbbbba"
-		/*  2 */ "abcccba"
-		/*  3 */ "abcccba"
-		/*  4 */ "abcccba"
-		/*  5 */ "abbbbba"
-		/*  6 */ "aaaaaaa"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "mbcccbm"
+		/*  3 */ "mbcccbm"
+		/*  4 */ "mbcccbm"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmmmmmm"
 
 		// Level 3
 		/* z\x*   0123456 */
-		/*  0 */ "aaaaaaa"
-		/*  1 */ "abbbbba"
-		/*  2 */ "abcccba"
-		/*  3 */ "abcccba"
-		/*  4 */ "abcccba"
-		/*  5 */ "abbbbba"
-		/*  6 */ "aaaaaaa"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "mbcccbm"
+		/*  3 */ "mbcccbm"
+		/*  4 */ "mbcccbm"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmmmmmm"
 
 		// Level 4
 		/* z\x*   0123456 */
-		/*  0 */ "aaaaaaa"
-		/*  1 */ "abbbbba"
-		/*  2 */ "abcccba"
-		/*  3 */ "abcccba"
-		/*  4 */ "abcccba"
-		/*  5 */ "abbbbba"
-		/*  6 */ "aaaaaaa"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "mbcccbm"
+		/*  3 */ "mbcccbm"
+		/*  4 */ "mbcccbm"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmmmmmm"
 
 		// Level 5
 		/* z\x*   0123456 */
-		/*  0 */ "ddddddd"
-		/*  1 */ "dbbbbbd"
-		/*  2 */ "dbcccbd"
-		/*  3 */ "dbcccbd"
-		/*  4 */ "dbcccbd"
-		/*  5 */ "dbbbbbd"
-		/*  6 */ "ddddddd"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "mbcccbm"
+		/*  3 */ "mbcccbm"
+		/*  4 */ "mbcccbm"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmmmmmm"
 
 		// Level 6
 		/* z\x*   0123456 */
-		/*  0 */ "ddddddd"
-		/*  1 */ "dbbbbbd"
-		/*  2 */ "dbcccbd"
-		/*  3 */ "dbcccbd"
-		/*  4 */ "dbcccbd"
-		/*  5 */ "dbbbbbd"
-		/*  6 */ "ddddddd"
+		/*  0 */ "mmmmmmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "mbcccbm"
+		/*  3 */ "mbcccbm"
+		/*  4 */ "mbcccbm"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmmmmmm"
 
 		// Level 7
 		/* z\x*   0123456 */
-		/*  0 */ "ddddddd"
-		/*  1 */ "dbbbbbd"
-		/*  2 */ "dbcccbd"
-		/*  3 */ "dbcccbd"
-		/*  4 */ "dbcccbd"
-		/*  5 */ "dbbbbbd"
-		/*  6 */ "ddddddd"
+		/*  0 */ "mmbbbmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "bbcccbb"
+		/*  3 */ "bbcccbb"
+		/*  4 */ "bbcccbb"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmbbbmm"
 
 		// Level 8
 		/* z\x*   0123456 */
-		/*  0 */ "eefffee"
-		/*  1 */ "ebbbbbe"
-		/*  2 */ "fbcccbf"
-		/*  3 */ "fbcccbf"
-		/*  4 */ "fbcccbf"
-		/*  5 */ "ebbbbbe"
-		/*  6 */ "eefffee"
+		/*  0 */ "mmdddmm"
+		/*  1 */ "mbbbbbm"
+		/*  2 */ "dbcccbd"
+		/*  3 */ "dbcccbd"
+		/*  4 */ "dbcccbd"
+		/*  5 */ "mbbbbbm"
+		/*  6 */ "mmdddmm"
 
 		// Level 9
 		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".bghib."
-		/*  2 */ ".j...j."
-		/*  3 */ ".i...g."
-		/*  4 */ ".h...h."
-		/*  5 */ ".bgjib."
-		/*  6 */ "......."
+		/*  0 */ "mm...mm"
+		/*  1 */ "mbefgbm"
+		/*  2 */ ".h...h."
+		/*  3 */ ".g...e."
+		/*  4 */ ".f...f."
+		/*  5 */ "mbehgbm"
+		/*  6 */ "mm...mm"
 
 		// Level 10
 		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".k...k."
+		/*  0 */ "mm...mm"
+		/*  1 */ "mi...im"
 		/*  2 */ "......."
 		/*  3 */ "......."
 		/*  4 */ "......."
-		/*  5 */ ".k...k."
-		/*  6 */ "......."
+		/*  5 */ "mi...im"
+		/*  6 */ "mm...mm"
 
 		// Level 11
 		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ ".k...k."
+		/*  0 */ "mm...mm"
+		/*  1 */ "mi...im"
 		/*  2 */ "......."
 		/*  3 */ "......."
 		/*  4 */ "......."
-		/*  5 */ ".k...k."
-		/*  6 */ "......."
+		/*  5 */ "mi...im"
+		/*  6 */ "mm...mm"
 
 		// Level 12
 		/* z\x*   0123456 */
-		/*  0 */ ".lnnnl."
-		/*  1 */ "loooool"
-		/*  2 */ "nooooon"
-		/*  3 */ "nooooon"
-		/*  4 */ "nooooon"
-		/*  5 */ "loooool"
-		/*  6 */ ".lnnnl."
+		/*  0 */ "mjkkkjm"
+		/*  1 */ "jlllllj"
+		/*  2 */ "klllllk"
+		/*  3 */ "klllllk"
+		/*  4 */ "klllllk"
+		/*  5 */ "jlllllj"
+		/*  6 */ "mjkkkjm"
 
 		// Level 13
 		/* z\x*   0123456 */
-		/*  0 */ "n.....n"
+		/*  0 */ "k.....k"
 		/*  1 */ "......."
-		/*  2 */ "..nnn.."
-		/*  3 */ "..non.."
-		/*  4 */ "..nnn.."
+		/*  2 */ "..kkk.."
+		/*  3 */ "..klk.."
+		/*  4 */ "..kkk.."
 		/*  5 */ "......."
-		/*  6 */ "n.....n",
+		/*  6 */ "k.....k",
 
 		// Connectors:
 		"2: 0, 9, 3: 4\n"  /* Type 2, direction X- */

@@ -69,6 +69,7 @@ public:
 		if (!Arrow->Initialize(*a_Player->GetWorld()))
 		{
 			delete Arrow;
+			Arrow = NULL;
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSpawnEntity(*Arrow);

@@ -125,7 +125,7 @@ public:
 	int m_BlockX;
 	int m_BlockZ;
 
-	cCaveSystem(int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
+	cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
 	~cCaveSystem();
 
 protected:
@@ -574,8 +574,8 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves::cCaveSystem:
 
-cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
-	super(a_OriginX, a_OriginZ),
+cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
+	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_Size(a_Size)
 {
 	int Num = 1 + a_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) % 3;
@@ -690,9 +690,9 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves:
 
-cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
-	return cStructurePtr(new cCaveSystem(a_OriginX, a_OriginZ, m_MaxOffset, m_Size, m_Noise));
+	return cStructurePtr(new cCaveSystem(a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxOffset, m_Size, m_Noise));
 }
 
 

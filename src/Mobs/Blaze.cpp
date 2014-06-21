@@ -47,6 +47,7 @@ void cBlaze::Attack(float a_Dt)
 		if (!FireCharge->Initialize(*m_World))
 		{
 			delete FireCharge;
+			FireCharge = NULL;
 			return;
 		}
 		m_World->BroadcastSpawnEntity(*FireCharge);

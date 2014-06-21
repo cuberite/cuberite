@@ -6,6 +6,12 @@
 
 class cItems;
 
+typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
+
+
+
+
+
 class cWorldInterface
 {
 public:
@@ -28,6 +34,9 @@ public:
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
 	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) = 0;
+
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
+	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) = 0;
 
 	/** Sends the block on those coords to the player */
 	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player) = 0;

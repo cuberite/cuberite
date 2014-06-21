@@ -82,17 +82,36 @@ set(BINDING_DEPENDECIES
 include_directories(Bindings)
 include_directories(.)
 
-ADD_CUSTOM_COMMAND(
-	# add any new generated bindings here
-	OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+if (WIN32)
+	ADD_CUSTOM_COMMAND(
+		# add any new generated bindings here
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
 
-	# command execuded to regerate bindings
-	COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
+		COMMAND copy /y ..\\..\\MCServer\\lua51.dll .
 
-	# add any new generation dependencies here
-	DEPENDS ${BINDING_DEPENDECIES}
-)
+		# Regenerate bindings:
+		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+
+		# add any new generation dependencies here
+		DEPENDS ${BINDING_DEPENDECIES}
+	)
+else ()
+	ADD_CUSTOM_COMMAND(
+		# add any new generated bindings here
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+
+		# Regenerate bindings:
+		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+
+		# add any new generation dependencies here
+		DEPENDS ${BINDING_DEPENDECIES}
+	)
+endif ()
+set_source_files_properties(Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
+set_source_files_properties(Bindings/Bindings.h PROPERTIES GENERATED TRUE)
 
 if (NOT MSVC)
 
@@ -149,16 +168,6 @@ if (NOT MSVC)
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
-	# Generate the Bindings if they don't exist:
-	if (NOT EXISTS "${PROJECT_SOURCE_DIR}/Bindings/Bindings.cpp")
-		message("Bindings.cpp not found, generating now")
-		set(tolua_executable ${PROJECT_SOURCE_DIR}/Bindings/tolua++.exe)
-		execute_process(
-			COMMAND ${tolua_executable} -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Bindings
-		)
-	endif()
-
 	# Get all files in this folder:
 	file(GLOB_RECURSE SOURCE
 		"*.cpp"
@@ -166,6 +175,9 @@ else ()
 		"*.pkg"
 	)
 	source_group("" FILES ${SOURCE})
+
+	LIST(APPEND SOURCE "Bindings/Bindings.cpp" "Bindings/Bindings.h")
+	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
 	# Add all subfolders as solution-folders:
 	list(APPEND FOLDERS "Resources")

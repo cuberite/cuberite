@@ -61,7 +61,7 @@ class cStructGenRavines::cRavine :
 	
 public:
 	
-	cRavine(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise);
+	cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise);
 	
 	#ifdef _DEBUG
 	/// Exports itself as a SVG line definition
@@ -81,7 +81,7 @@ protected:
 // cStructGenRavines:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
-	super(a_Seed, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
+	super(a_Seed, a_Size, a_Size, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
 	m_Noise(a_Seed),
 	m_Size(a_Size)
 {
@@ -91,9 +91,9 @@ cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
 
 
 
-cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
-	return cStructurePtr(new cRavine(a_OriginX, a_OriginZ, m_Size, m_Noise));
+	return cStructurePtr(new cRavine(a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_Size, m_Noise));
 }
 
 
@@ -104,8 +104,8 @@ cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_OriginX, 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines::cRavine
 
-cStructGenRavines::cRavine::cRavine(int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise) :
-	super(a_OriginX, a_OriginZ)
+cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise) :
+	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
 {
 	// Calculate the ravine shape-defining points:
 	GenerateBaseDefPoints(a_OriginX, a_OriginZ, a_Size, a_Noise);

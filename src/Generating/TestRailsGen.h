@@ -1,7 +1,7 @@
 
-// RainbowRoadsGen.h
+// TestRailsGen.h
 
-// Declares the cRainbowRoadsGen class representing the underwater base generator
+// Declares the cTestRailsGen class representing the testing rails generator
 
 
 
@@ -16,16 +16,16 @@
 
 
 
-class cRainbowRoadsGen :
+class cTestRailsGen :
 	public cGridStructGen
 {
 	typedef cGridStructGen super;
 	
 public:
-	cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize);
+	cTestRailsGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize);
 
 protected:
-	class cRainbowRoads;  // fwd: RainbowRoadsGen.cpp
+	class cTestRails;  // fwd: TestRailsGen.cpp
 
 
 	/** The noise used for generating random numbers */

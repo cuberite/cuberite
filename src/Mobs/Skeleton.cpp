@@ -84,6 +84,7 @@ void cSkeleton::Attack(float a_Dt)
 		if (!Arrow->Initialize(*m_World))
 		{
 			delete Arrow;
+			Arrow = NULL;
 			return;
 		}
 		m_World->BroadcastSpawnEntity(*Arrow);

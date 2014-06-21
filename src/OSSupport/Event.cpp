@@ -71,6 +71,7 @@ cEvent::~cEvent()
 	{
 		sem_destroy(m_Event);
 		delete m_Event;
+		m_Event = NULL;
 	}
 #endif
 }

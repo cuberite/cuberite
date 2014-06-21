@@ -36,8 +36,8 @@ public:
 		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
 		*/
 
-		a_BlockY--; // Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockX, a_BlockY, a_BlockZ, a_ChunkInterface, a_WorldInterface);
+		// a_BlockY - 1: Because we want the block below the fire
+		FindAndSetPortalFrame(a_BlockX, a_BlockY - 1, a_BlockZ, a_ChunkInterface, a_WorldInterface);
 	}
 
 	virtual void OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override

@@ -524,6 +524,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	// Delete any request data assigned to the request:
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
 	delete Data;
+	Data = NULL;
 }
 
 

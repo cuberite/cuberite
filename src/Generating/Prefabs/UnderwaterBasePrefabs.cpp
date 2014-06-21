@@ -366,7 +366,7 @@ const cPrefab::sDef g_UnderwaterBasePrefabs[] =
 		true,
 
 		// DefaultWeight:
-		100,
+		200,
 
 		// DepthWeight:
 		"",

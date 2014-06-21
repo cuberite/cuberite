@@ -49,6 +49,7 @@ void cGhast::Attack(float a_Dt)
 		if (!GhastBall->Initialize(*m_World))
 		{
 			delete GhastBall;
+			GhastBall = NULL;
 			return;
 		}
 		m_World->BroadcastSpawnEntity(*GhastBall);

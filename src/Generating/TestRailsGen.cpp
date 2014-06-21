@@ -1,33 +1,33 @@
 
-// RainbowRoadsGen.cpp
+// TestRailsGen.cpp
 
-// Implements the cRainbowRoadsGen class representing the rainbow road generator
+// Implements the cTestRailsGen class representing the testing rails generator
 
 #include "Globals.h"
-#include "RainbowRoadsGen.h"
-#include "Prefabs/RainbowRoadPrefabs.h"
+#include "TestRailsGen.h"
+#include "Prefabs/TestRailsPrefabs.h"
 #include "PieceGenerator.h"
 
 
 
 
 
-static cPrefabPiecePool g_RainbowRoads(g_RainbowRoadPrefabs, g_RainbowRoadPrefabsCount, g_RainbowRoadStartingPrefabs, g_RainbowRoadStartingPrefabsCount);
+static cPrefabPiecePool g_TestRails(g_TestRailsPrefabs, g_TestRailsPrefabsCount, g_TestRailsStartingPrefabs, g_TestRailsStartingPrefabsCount);
 
 
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cRainbowRoadsGen::cRainbowRoads:
+// cTestRailsGen::cTestRails:
 
-class cRainbowRoadsGen::cRainbowRoads :
+class cTestRailsGen::cTestRails :
 	public cGridStructGen::cStructure
 {
 	typedef cGridStructGen::cStructure super;
 	
 public:
-	cRainbowRoads(
+	cTestRails(
 		int a_Seed,
 		int a_GridX, int a_GridZ,
 		int a_OriginX, int a_OriginZ,
@@ -40,16 +40,16 @@ public:
 		m_MaxSize(a_MaxSize),
 		m_Borders(a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize, a_OriginX + a_MaxSize, 255, a_OriginZ + a_MaxSize)
 	{
-		// Generate the pieces for this base:
-		cBFSPieceGenerator pg(g_RainbowRoads, a_Seed);
-		pg.PlacePieces(a_OriginX, 190, a_OriginZ, a_MaxDepth, m_Pieces);
+		// Generate the pieces for this test:
+		cBFSPieceGenerator pg(g_TestRails, a_Seed);
+		pg.PlacePieces(a_OriginX, 150, a_OriginZ, a_MaxDepth, m_Pieces);
 		if (m_Pieces.empty())
 		{
 			return;
 		}
 	}
 	
-	~cRainbowRoads()
+	~cTestRails()
 	{
 		cPieceGenerator::FreePieces(m_Pieces);
 	}
@@ -61,13 +61,13 @@ protected:
 	/** The noise used as a pseudo-random generator */
 	cNoise m_Noise;
 	
-	/** Maximum size, in X/Z blocks, of the village (radius from the origin) */
+	/** Maximum size, in X/Z blocks, of the structure (radius from the origin) */
 	int m_MaxSize;
 	
-	/** Borders of the vilalge - no item may reach out of this cuboid. */
+	/** Borders of the structure - no item may reach out of this cuboid. */
 	cCuboid m_Borders;
 	
-	/** The village pieces, placed by the generator. */
+	/** The rails pieces, placed by the generator. */
 	cPlacedPieces m_Pieces;
 	
 	
@@ -87,15 +87,15 @@ protected:
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cRainbowRoadsGen:
+// cTestRailsGen:
 
 
 
 
 
-cRainbowRoadsGen::cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize) :
+cTestRailsGen::cTestRailsGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
-	m_Noise(a_Seed + 9000),
+	m_Noise(a_Seed + 1000),
 	m_MaxDepth(a_MaxDepth),
 	m_MaxSize(a_MaxSize)
 {
@@ -105,10 +105,10 @@ cRainbowRoadsGen::cRainbowRoadsGen(int a_Seed, int a_GridSize, int a_MaxOffset, 
 
 
 
-cGridStructGen::cStructurePtr cRainbowRoadsGen::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cTestRailsGen::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
 	// Create a base based on the chosen prefabs:
-	return cStructurePtr(new cRainbowRoads(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize));
+	return cStructurePtr(new cTestRails(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize));
 }
 
 
