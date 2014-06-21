@@ -102,7 +102,6 @@ void cFurnaceRecipe::ReloadRecipes(void)
 			F.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
 			F.BurnTime = IBurnTime;
 			m_pState->Fuel.push_back(F);
-			printf("%i %i %i %i\n", IItemID, IItemCount, IItemHealth, IBurnTime);
 			continue;
 		}
 		else if (isdigit(ParsingLine[0])) // Recipes start with a numeral :)
