@@ -350,7 +350,7 @@ public:
 
 	void SendExperience(void);
 	
-	/** In UI windows, the item that the player is dragging */
+	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }
 	
 	// In UI windows, when inventory-painting:
@@ -398,7 +398,9 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
-	/** Gets the last position that the player slept in */
+	/** Gets the last position that the player slept in
+	This is initialised to the world spawn point if the player has not slept in a bed as of yet
+	*/
 	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
 
 	/** Sets the player's bed (home) position */

@@ -1034,7 +1034,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
 		!IsOnFire() &&                                               // Not already burning
-		(IsBiomeNoDownfall(a_Chunk.GetBiomeAt(RelX, RelZ)) || !GetWorld()->IsWeatherWet()) // Not raining
+		GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT)           // Not raining
 	)
 	{
 		// Burn for 100 ticks, then decide again
