@@ -88,8 +88,8 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 	for (cStructurePtrs::iterator itr = m_Cache.begin(), end = m_Cache.end(); itr != end;)
 	{
 		if (
-			((*itr)->m_OriginX >= MinX) && ((*itr)->m_OriginX < MaxX) &&
-			((*itr)->m_OriginZ >= MinZ) && ((*itr)->m_OriginZ < MaxZ)
+			((*itr)->m_GridX >= MinX) && ((*itr)->m_GridX < MaxX) &&
+			((*itr)->m_GridZ >= MinZ) && ((*itr)->m_GridZ < MaxZ)
 		)
 		{
 			// want
