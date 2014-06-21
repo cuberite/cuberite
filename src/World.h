@@ -313,9 +313,6 @@ public:
 	
 	bool HasEntity(int a_UniqueID);
 	
-	/** Removes the entity, the entity ptr ownership is assumed taken by the caller */
-	void RemoveEntity(cEntity * a_Entity);
-	
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 	

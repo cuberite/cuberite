@@ -374,6 +374,12 @@ public:
 	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL, bool a_ShouldSendRespawn = true);
 	
 	// tolua_end
+
+	/** Returns if the entity is travelling through a portal. Set to true by MoveToWorld and to false when the entity is removed by the old chunk */
+	bool IsTravellingThroughPortal(void) const { return m_IsTravellingThroughPortal; }
+
+	/** Sets if the entity has begun travelling through a portal or not */
+	void SetIsTravellingThroughPortal(bool a_Flag) { m_IsTravellingThroughPortal = a_Flag; }
 	
 	/// Updates clients of changes in the entity.
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
@@ -470,6 +476,9 @@ protected:
 	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
 	bool m_IsInitialized;
 
+	/** True when entity is being moved across worlds, false anytime else */
+	bool m_IsTravellingThroughPortal;
+
 	eEntityType m_EntityType;
 	
 	cWorld * m_World;
@@ -491,7 +500,6 @@ protected:
 	
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
-
 
 	virtual void Destroyed(void) {} // Called after the entity has been destroyed
 

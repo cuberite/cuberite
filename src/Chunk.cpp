@@ -71,7 +71,6 @@ cChunk::cChunk(
 	m_IsDirty(false),
 	m_IsSaving(false),
 	m_HasLoadFailed(false),
-	m_EntityTickIteratorData(std::make_pair(false, m_Entities.end())),
 	m_StayCount(0),
 	m_PosX(a_ChunkX),
 	m_PosY(a_ChunkY),
@@ -577,44 +576,39 @@ void cChunk::Tick(float a_Dt)
 	}
 	
 	// Tick all entities in this chunk (except mobs):
-	m_EntityTickIteratorData.first = true;
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		// Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		// Don't tick things queued to be removed
 		if (!((*itr)->IsMob()))
 		{
-			m_EntityTickIteratorData.second = itr;
 			(*itr)->Tick(a_Dt, *this);
-
-			if (itr != m_EntityTickIteratorData.second)
-			{
-				itr = m_EntityTickIteratorData.second;
-			}
-			else
-			{
-				++itr;
-			}
 			continue;
 		}
-		++itr;
 	}  // for itr - m_Entitites[]
-	m_EntityTickIteratorData.first = false;
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
 		if ((*itr)->IsDestroyed()) // Remove all entities that were scheduled for removal:
 		{
 			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+			MarkDirty();
 			cEntity * ToDelete = *itr;
 			itr = m_Entities.erase(itr);
 			delete ToDelete;
+		}
+		else if ((*itr)->IsTravellingThroughPortal())
+		{
+			MarkDirty();
+			(*itr)->SetIsTravellingThroughPortal(false);
+			itr = m_Entities.erase(itr);
 		}
 		else if ( // If any entity moved out of the chunk, move it to the neighbor:
 			((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ)
 		)
 		{
+			MarkDirty();
 			MoveEntityToNewChunk(*itr);
 			itr = m_Entities.erase(itr);
 		}
@@ -1874,14 +1868,7 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
-	if (m_EntityTickIteratorData.first)
-	{
-		m_EntityTickIteratorData.second = m_Entities.erase(m_EntityTickIteratorData.second);
-	}
-	else
-	{
-		m_Entities.remove(a_Entity);
-	}
+	m_Entities.remove(a_Entity);
 
 	// Mark as dirty if it was a server-generated entity:
 	if (!a_Entity->IsPlayer())

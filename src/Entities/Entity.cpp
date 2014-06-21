@@ -57,6 +57,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Width(a_Width)
 	, m_Height(a_Height)
 	, m_InvulnerableTicks(0)
+	, m_IsTravellingThroughPortal(false)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -1183,7 +1184,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	}
 
 	// Remove all links to the old world
-	GetWorld()->RemoveEntity(this);
+	SetIsTravellingThroughPortal(true); // cChunk handles entity removal
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	// Queue add to new world

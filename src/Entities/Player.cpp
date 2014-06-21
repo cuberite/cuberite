@@ -1600,6 +1600,7 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	}
 
 	// Remove player from the old world
+	SetIsTravellingThroughPortal(true); // cChunk handles entity removal
 	m_World->RemovePlayer(this);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object

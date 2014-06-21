@@ -2417,7 +2417,10 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
-	m_ChunkMap->RemoveEntity(a_Player);
+	if (!a_Player->IsTravellingThroughPortal())
+	{
+		m_ChunkMap->RemoveEntity(a_Player);
+	}
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
 		m_PlayersToAdd.remove(a_Player);
@@ -2913,15 +2916,6 @@ bool cWorld::HasEntity(int a_UniqueID)
 
 	// Check if the entity is in the chunkmap:
 	return m_ChunkMap->HasEntity(a_UniqueID);
-}
-
-
-
-
-
-void cWorld::RemoveEntity(cEntity * a_Entity)
-{
-	m_ChunkMap->RemoveEntity(a_Entity);
 }
 
 
