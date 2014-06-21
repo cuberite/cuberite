@@ -37,6 +37,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Gravity(-9.81f)
 	, m_LastPos(a_X, a_Y, a_Z)
 	, m_IsInitialized(false)
+	, m_IsTravellingThroughPortal(false)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
 	, m_IsFireproof(false)
@@ -57,7 +58,6 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Width(a_Width)
 	, m_Height(a_Height)
 	, m_InvulnerableTicks(0)
-	, m_IsTravellingThroughPortal(false)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
