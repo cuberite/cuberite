@@ -232,6 +232,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 
 AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 {
+	// Online UUIDs are always version 4 (random)
+	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
+	// This guarantees that they will never collide with an online UUID and can be distinguished.
 	// Proper format for a version 3 UUID is:
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	
@@ -248,6 +251,32 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	UUID.insert(23, "-");
 	
 	return UUID;
+}
+
+
+
+
+
+bool cClientHandle::IsUUIDOnline(const AString & a_UUID)
+{
+	// Online UUIDs are always version 4 (random)
+	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
+	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// The version-specifying char is at pos #12 of raw UUID, pos #14 in dashed-UUID.
+	switch (a_UUID.size())
+	{
+		case 32:
+		{
+			// This is the UUID format without dashes, the version char is at pos #12:
+			return (a_UUID[12] == '4');
+		}
+		case 36:
+		{
+			// This is the UUID format with dashes, the version char is at pos #14:
+			return (a_UUID[14] == '4');
+		}
+	}
+	return false;
 }
 
 
