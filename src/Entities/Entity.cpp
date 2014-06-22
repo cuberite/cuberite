@@ -255,8 +255,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::SetYawFromSpeed(void)
 {
-	const double EPS = 0.0000001;
-	if ((abs(m_Speed.x) < EPS) && (abs(m_Speed.z) < EPS))
+	if ((abs(m_Speed.x) < std::numeric_limits<double>::epsilon()) && (abs(m_Speed.z) < std::numeric_limits<double>::epsilon()))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetYaw(0);
@@ -1236,7 +1235,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 	if (GetWorld()->GetWorldAge() % 2 == 0)
 	{
 		double SpeedSqr = GetSpeed().SqrLength();
-		if (SpeedSqr == 0.0)
+		if (SpeedSqr < std::numeric_limits<double>::epsilon())
 		{
 			// Speed is zero, send this to clients once only as well as an absolute position
 			if (!m_bHasSentNoSpeed)
@@ -1476,8 +1475,7 @@ void cEntity::SetWidth(double a_Width)
 
 void cEntity::AddPosX(double a_AddPosX)
 {
-	m_Pos.x += a_AddPosX;
-	
+	m_Pos.x += a_AddPosX;	
 }
 
 
@@ -1485,8 +1483,7 @@ void cEntity::AddPosX(double a_AddPosX)
 
 void cEntity::AddPosY(double a_AddPosY)
 {
-	m_Pos.y += a_AddPosY;
-	
+	m_Pos.y += a_AddPosY;	
 }
 
 
@@ -1494,8 +1491,7 @@ void cEntity::AddPosY(double a_AddPosY)
 
 void cEntity::AddPosZ(double a_AddPosZ)
 {
-	m_Pos.z += a_AddPosZ;
-	
+	m_Pos.z += a_AddPosZ;	
 }
 
 
@@ -1505,8 +1501,7 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 {
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
-	m_Pos.z += a_AddPosZ;
-	
+	m_Pos.z += a_AddPosZ;	
 }
 
 
