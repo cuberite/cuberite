@@ -42,7 +42,7 @@ private:
 	void ClearRecipes(void);
 
 	/** Calls LOGWARN with the line, position, and error */
-	inline static void PrintParseError(unsigned int a_Line, size_t a_Position, const AString & a_CharactersMissing);
+	static void PrintParseError(unsigned int a_Line, size_t a_Position, const AString & a_CharactersMissing);
 
 	/** Reads a number from a string given, starting at a given position and ending at a delimiter given
 	Updates beginning position to the delimiter found + 1, and updates the value to the one read
@@ -60,7 +60,7 @@ private:
 	static bool ReadOptionalNumbers(AString::size_type & a_Begin, const AString & a_DelimiterOne, const AString & a_DelimiterTwo, const AString & a_Text, unsigned int a_Line, int & a_ValueOne, int & a_ValueTwo, bool a_IsLastValue = false);
 
 	/** Uses std::all_of to determine if a string contains only digits */
-	inline static bool DoesStringContainOnlyNumbers(const AString & a_String);
+	static bool DoesStringContainOnlyNumbers(const AString & a_String);
 
 
 	struct sFurnaceRecipeState;
