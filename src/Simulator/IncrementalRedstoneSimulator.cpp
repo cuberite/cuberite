@@ -348,6 +348,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 				case E_BLOCK_REDSTONE_REPEATER_ON:
 				{
 					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
 				}
 				case E_BLOCK_REDSTONE_TORCH_OFF:
 				case E_BLOCK_REDSTONE_TORCH_ON:
@@ -763,7 +764,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 
 void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 {
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); itr++)
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end();)
 	{
 
 		if (itr->a_ElapsedTicks >= itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
@@ -809,7 +810,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 			{
 				m_Chunk->SetBlock(RelBlockX, RelBlockY, RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, Meta);
 			}
-			m_RepeatersDelayList->erase(itr);
+			itr = m_RepeatersDelayList->erase(itr);
 		}
 		else
 		{
@@ -818,6 +819,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 			// I am confounded to say why. Perhaps optimisation failure.
 			LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", itr->a_RelBlockPos.x, itr->a_RelBlockPos.y, itr->a_RelBlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
 			itr->a_ElapsedTicks++;
+			itr++;
 		}
 	}
 }
