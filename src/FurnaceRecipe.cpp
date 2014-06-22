@@ -137,7 +137,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 
 void cFurnaceRecipe::PrintParseError(unsigned int a_Line, size_t a_Position, const AString & a_CharactersMissing)
 {
-	LOGWARN("Error parsing furnace recipes at line %i pos %i: missing '%s'", a_Line, a_Position, a_CharactersMissing.c_str());
+	LOGWARN("Error parsing furnace recipes at line %i pos " SIZE_T_FMT ": missing '%s'", a_Line, a_Position, a_CharactersMissing.c_str());
 }
 
 
@@ -179,7 +179,7 @@ bool cFurnaceRecipe::ReadMandatoryNumber(AString::size_type & a_Begin, const ASt
 
 bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const AString & a_DelimiterOne, const AString & a_DelimiterTwo, const AString & a_Text, unsigned int a_Line, int & a_ValueOne, int & a_ValueTwo, bool a_IsLastValue)
 {
-	unsigned int End, Begin = a_Begin;
+	AString::size_type End, Begin = a_Begin;
 
 	End = a_Text.find_first_of(a_DelimiterOne, Begin);
 	if (End != AString::npos)
