@@ -57,7 +57,6 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	std::ifstream f(FURNACE_RECIPE_FILE, std::ios::in);
 	if (!f.good())
 	{
-		f.close();
 		LOG("Could not open the furnace recipes file \"%s\"", FURNACE_RECIPE_FILE);
 		return;
 	}
@@ -126,7 +125,6 @@ void cFurnaceRecipe::ReloadRecipes(void)
 			m_pState->Recipes.push_back(R);
 		}
 	}
-	f.close();
 
 	LOG("Loaded " SIZE_T_FMT " furnace recipes and " SIZE_T_FMT " fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
 }
@@ -146,6 +144,7 @@ void cFurnaceRecipe::PrintParseError(unsigned int a_Line, size_t a_Position, con
 
 bool cFurnaceRecipe::ReadMandatoryNumber(AString::size_type & a_Begin, const AString & a_Delimiter, const AString & a_Text, unsigned int a_Line, int & a_Value, bool a_IsLastValue)
 {
+	// TODO: replace atoi with std::stoi
 	AString::size_type End;
 	if (a_IsLastValue)
 	{
@@ -167,7 +166,7 @@ bool cFurnaceRecipe::ReadMandatoryNumber(AString::size_type & a_Begin, const ASt
 		PrintParseError(a_Line, a_Begin, "number");
 		return false;
 	}
-	a_Value = std::stoi(a_Text.substr(a_Begin, End - a_Begin));
+	a_Value = atoi(a_Text.substr(a_Begin, End - a_Begin).c_str());
 
 	a_Begin = End + 1; // Jump over delimiter
 	return true;
@@ -179,6 +178,7 @@ bool cFurnaceRecipe::ReadMandatoryNumber(AString::size_type & a_Begin, const ASt
 
 bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const AString & a_DelimiterOne, const AString & a_DelimiterTwo, const AString & a_Text, unsigned int a_Line, int & a_ValueOne, int & a_ValueTwo, bool a_IsLastValue)
 {
+	// TODO: replace atoi with std::stoi
 	unsigned int End, Begin = a_Begin;
 
 	End = a_Text.find_first_of(a_DelimiterOne, Begin);
@@ -186,7 +186,7 @@ bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const ASt
 	{
 		if (DoesStringContainOnlyNumbers(a_Text.substr(Begin, End - Begin)))
 		{
-			a_ValueOne = std::stoi(a_Text.substr(Begin, End - Begin));
+			a_ValueOne = std::atoi(a_Text.substr(Begin, End - Begin).c_str());
 			Begin = End + 1;
 
 			if (a_IsLastValue)
@@ -209,7 +209,7 @@ bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const ASt
 				PrintParseError(a_Line, Begin, "number");
 				return false;
 			}
-			a_ValueTwo = std::stoi(a_Text.substr(Begin, End - Begin));
+			a_ValueTwo = atoi(a_Text.substr(Begin, End - Begin).c_str());
 
 			a_Begin = End + 1; // Jump over delimiter
 			return true;
@@ -229,7 +229,8 @@ bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const ASt
 
 bool cFurnaceRecipe::DoesStringContainOnlyNumbers(const AString & a_String)
 {
-	return std::all_of(a_String.begin(), a_String.end(), isdigit);
+	// TODO: replace this with std::all_of(a_String.begin(), a_String.end(), isdigit)
+	return a_String.find_first_not_of("0123456789") == AString::npos;
 }
 
 
