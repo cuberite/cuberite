@@ -45,9 +45,16 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 
 void cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
+	UNUSED(a_WorldInterface);
+	UNUSED(a_BlockFace);
+	UNUSED(a_CursorX);
+	UNUSED(a_CursorY);
+	UNUSED(a_CursorZ);
+
 	if (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_WOODEN_DOOR)
 	{
 		ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+		a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
 	}
 }
 
