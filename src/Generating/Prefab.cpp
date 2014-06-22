@@ -211,6 +211,17 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
 	const cBlockArea & Image = m_BlockArea[a_NumRotations];
+	
+	// If the placement is outside this chunk, bail out:
+	if (
+		(Placement.x > cChunkDef::Width) || (Placement.x + Image.GetSizeX() < 0) ||
+		(Placement.z > cChunkDef::Width) || (Placement.z + Image.GetSizeZ() < 0)
+	)
+	{
+		return;
+	}
+	
+	// Write the image:
 	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
