@@ -343,6 +343,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 				case E_BLOCK_REDSTONE_REPEATER_ON:
 				{
 					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
 				}
 				case E_BLOCK_REDSTONE_TORCH_OFF:
 				case E_BLOCK_REDSTONE_TORCH_ON:
