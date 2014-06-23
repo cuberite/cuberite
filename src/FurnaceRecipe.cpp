@@ -230,7 +230,7 @@ bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const ASt
 bool cFurnaceRecipe::DoesStringContainOnlyNumbers(const AString & a_String)
 {
 	// TODO: replace this with std::all_of(a_String.begin(), a_String.end(), isdigit)
-	return a_String.find_first_not_of("0123456789") == AString::npos;
+	return (a_String.find_first_not_of("0123456789") == AString::npos);
 }
 
 
