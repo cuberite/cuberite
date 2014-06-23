@@ -85,6 +85,91 @@
 
 
 
+/*
+// Tests the meta rotation and mirroring.
+// Note that the cMetaRotator needs to have its assert paths disabled for this test to work!
+static class cBlockHandlerRotationTester
+{
+public:
+	cBlockHandlerRotationTester(void)
+	{
+		printf("Performing block handlers test...\n");
+		for (BLOCKTYPE Type = 0; Type < E_BLOCK_MAX_TYPE_ID; Type++)
+		{
+			cBlockHandler * Handler = cBlockInfo::GetHandler(Type);
+			if (Handler == NULL)
+			{
+				printf("NULL handler for block type %d!\n", Type);
+				continue;
+			}
+			AString BlockName = ItemTypeToString(Type);
+			for (NIBBLETYPE Meta = 0; Meta < 16; Meta++)
+			{
+				// Test the CW / CCW rotations:
+				NIBBLETYPE TestMeta;
+				TestMeta = Handler->MetaRotateCW(Handler->MetaRotateCW(Handler->MetaRotateCW(Handler->MetaRotateCW(Meta))));
+				if (TestMeta != Meta)
+				{
+					// 4 CW rotations should produce no change in the meta
+					printf("Handler for blocktype %d (%s) fails CW 4-rotation test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				TestMeta = Handler->MetaRotateCCW(Handler->MetaRotateCCW(Handler->MetaRotateCCW(Handler->MetaRotateCCW(Meta))));
+				if (TestMeta != Meta)
+				{
+					// 4 CCW rotations should produce no change in the meta
+					printf("Handler for blocktype %d (%s) fails CCW 4-rotation test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				TestMeta = Handler->MetaRotateCCW(Handler->MetaRotateCW(Meta));
+				if (TestMeta != Meta)
+				{
+					// CCW rotation of a CW rotation should produce no change in the meta
+					printf("Handler for blocktype %d (%s) fails CCW(CW) rotation test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				TestMeta = Handler->MetaRotateCW(Handler->MetaRotateCCW(Meta));
+				if (TestMeta != Meta)
+				{
+					// CW rotation of a CCW rotation should produce no change in the meta
+					printf("Handler for blocktype %d (%s) fails CW(CCW) rotation test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				
+				// Test the mirroring:
+				TestMeta = Handler->MetaMirrorXY(Handler->MetaMirrorXY(Meta));
+				if (TestMeta != Meta)
+				{
+					// Double-mirroring should produce the same meta:
+					printf("Handler for blocktype %d (%s) fails XY mirror test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				TestMeta = Handler->MetaMirrorXZ(Handler->MetaMirrorXZ(Meta));
+				if (TestMeta != Meta)
+				{
+					// Double-mirroring should produce the same meta:
+					printf("Handler for blocktype %d (%s) fails XZ mirror test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				TestMeta = Handler->MetaMirrorYZ(Handler->MetaMirrorYZ(Meta));
+				if (TestMeta != Meta)
+				{
+					// Double-mirroring should produce the same meta:
+					printf("Handler for blocktype %d (%s) fails YZ mirror test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+				
+				// Test mirror-rotating:
+				TestMeta = Handler->MetaRotateCW(Handler->MetaRotateCW(Handler->MetaMirrorXY(Handler->MetaMirrorYZ(Meta))));
+				if (TestMeta != Meta)
+				{
+					// 2 CW rotations should be the same as XY, YZ mirroring:
+					printf("Handler for blocktype %d (%s) fails rotation-mirror test for meta %d: got back %d\n", Type, BlockName.c_str(), Meta, TestMeta);
+				}
+			}
+		}  // for Type
+		printf("Block handlers test complete.\n");
+	}
+} g_BlockHandlerRotationTester;
+//*/
+
+
+
+
+
 cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
 	switch(a_BlockType)
@@ -175,7 +260,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_QUARTZ_BLOCK:          return new cBlockQuartzHandler          (a_BlockType);
 		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
-		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType); // We need this to change pickups to an off lamp; else 1.7+ clients crash
+		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_REPEATER_OFF: return new cBlockRedstoneRepeaterHandler(a_BlockType);
@@ -207,7 +292,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TRAPDOOR:              return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_TNT:                   return new cBlockTNTHandler             (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
-		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);
+		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);  // TODO: This needs a special handler
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_WOODEN_BUTTON:         return new cBlockButtonHandler          (a_BlockType);
 		case E_BLOCK_WOODEN_DOOR:           return new cBlockDoorHandler            (a_BlockType);
