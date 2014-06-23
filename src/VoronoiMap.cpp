@@ -14,7 +14,9 @@ cVoronoiMap::cVoronoiMap(int a_Seed, int a_CellSize) :
 	m_Noise1(a_Seed + 1),
 	m_Noise2(a_Seed + 2),
 	m_Noise3(a_Seed + 3),
-	m_CellSize(a_CellSize)
+	m_CellSize(a_CellSize),
+	m_CurrentCellX(9999999),  // Cell coords that are definitely out of the range for normal generator, so that the first query will overwrite them
+	m_CurrentCellZ(9999999)
 {
 }
 
