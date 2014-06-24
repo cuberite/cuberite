@@ -64,6 +64,10 @@ add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 add_subdirectory(lib/md5/)
 
+if (WIN32)
+	add_subdirectory(lib/luaproxy/)
+endif()
+
 
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
 # (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
