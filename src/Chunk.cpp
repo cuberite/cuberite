@@ -1616,6 +1616,12 @@ void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
 
 cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	// Check that the query coords are within chunk bounds:
+	ASSERT(a_BlockX >= m_PosX * cChunkDef::Width);
+	ASSERT(a_BlockX < m_PosX * cChunkDef::Width + cChunkDef::Width);
+	ASSERT(a_BlockZ >= m_PosZ * cChunkDef::Width);
+	ASSERT(a_BlockZ < m_PosZ * cChunkDef::Width + cChunkDef::Width);
+
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		if (
