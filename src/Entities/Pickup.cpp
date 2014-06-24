@@ -38,11 +38,15 @@ public:
 		Vector3d EntityPos = a_Entity->GetPosition();
 		double Distance = (EntityPos - m_Position).Length();
 
-		if ((Distance < 1.2) && ((cPickup *)a_Entity)->GetItem().IsEqual(m_Pickup->GetItem()))
+		cItem & Item = ((cPickup *)a_Entity)->GetItem();
+		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()))
 		{
-			m_Pickup->GetItem().AddCount(((cPickup *)a_Entity)->GetItem().m_ItemCount);
-			a_Entity->Destroy();
-			m_FoundMatchingPickup = true;
+			if ((Item.m_ItemCount + m_Pickup->GetItem().m_ItemCount) <= Item.GetMaxStackSize())
+			{
+				m_Pickup->GetItem().AddCount(Item.m_ItemCount);
+				a_Entity->Destroy();
+				m_FoundMatchingPickup = true;
+			}
 		}
 		return false;
 	}
