@@ -41,12 +41,29 @@ public:
 		cItem & Item = ((cPickup *)a_Entity)->GetItem();
 		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()))
 		{
-			if ((Item.m_ItemCount + m_Pickup->GetItem().m_ItemCount) <= Item.GetMaxStackSize())
+			char CombineCount = Item.m_ItemCount;
+			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
 			{
-				m_Pickup->GetItem().AddCount(Item.m_ItemCount);
-				a_Entity->Destroy();
-				m_FoundMatchingPickup = true;
+				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
 			}
+
+			if (CombineCount <= 0)
+			{
+				return false;
+			}
+
+			m_Pickup->GetItem().AddCount(CombineCount);
+			Item.m_ItemCount -= CombineCount;
+
+			if (Item.m_ItemCount <= 0)
+			{
+				a_Entity->Destroy();
+			}
+			else
+			{
+				a_Entity->GetWorld()->BroadcastEntityMetadata(*a_Entity);
+			}
+			m_FoundMatchingPickup = true;
 		}
 		return false;
 	}
