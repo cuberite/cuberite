@@ -1461,13 +1461,6 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		return;
 	}
-
-	// Load health:
-	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	if (Health > 0)
-	{
-		Pickup->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
-	}
 	
 	// Load age:
 	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
@@ -1511,13 +1504,6 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
 	{
 		return;
-	}
-
-	// Load Health:
-	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	if (Health > 0)
-	{
-		ExpOrb->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
 	}
 
 	// Load Age:
@@ -2437,6 +2423,13 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	}
 	a_Entity.SetYaw(Rotation[0]);
 	a_Entity.SetRoll(Rotation[1]);
+
+	// Load health:
+	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	if (Health > 0)
+	{
+		a_Entity.SetHealth(a_NBT.GetShort(Health));
+	}
 	
 	return true;
 }

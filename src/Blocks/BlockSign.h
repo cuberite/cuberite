@@ -75,13 +75,13 @@ public:
 
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
-		return (++a_Meta) & 0x0F;
+		return (a_Meta + 4) & 0x0f;
 	}
 
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
-		return (--a_Meta) & 0x0F;
+		return (a_Meta + 12) & 0x0f;
 	}
 
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
@@ -90,7 +90,7 @@ public:
 
 		//  There are 16 meta values which correspond to different directions.
 		//  These values are equated to angles on a circle; 0x08 = 180 degrees.
-		return (a_Meta < 0x08) ? 0x08 + a_Meta : 0x08 - a_Meta;
+		return (a_Meta < 0x08) ? (0x08 + a_Meta) : (0x08 - a_Meta);
 	}
 
 

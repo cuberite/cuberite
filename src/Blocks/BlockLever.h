@@ -7,12 +7,13 @@
 
 
 class cBlockLeverHandler :
-	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x02, 0x03, 0x01, false>
+	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
-	typedef cMetaRotator<cBlockHandler, 0x07, 0x04, 0x02, 0x03, 0x01, false> super;
+	typedef cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false> super;
+	
 public:
-	cBlockLeverHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x07, 0x04, 0x02, 0x03, 0x01, false>(a_BlockType)
+	cBlockLeverHandler(BLOCKTYPE a_BlockType) :
+		super(a_BlockType)
 	{
 	}
 	
@@ -132,7 +133,7 @@ public:
 			case 0x05: return 0x06;  // Ground rotation
 			case 0x06: return 0x05;
 
-			default:  return super::MetaRotateCCW(a_Meta);  // Wall Rotation
+			default:  return super::MetaRotateCW(a_Meta);  // Wall Rotation
 		}
 	}
 } ;

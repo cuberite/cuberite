@@ -122,6 +122,13 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 
 void cChestEntity::OpenNewWindow(void)
 {
+	// TODO: cats are an obstruction
+	if ((GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
+	{
+		// Obstruction, don't open
+		return;
+	}
+
 	// Callback for opening together with neighbor chest:
 	class cOpenDouble :
 		public cChestCallback
@@ -135,6 +142,12 @@ void cChestEntity::OpenNewWindow(void)
 		
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
+			if ((a_Chest->GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
+			{
+				// Obstruction, don't open
+				return false;
+			}
+
 			// The primary chest should eb the one with lesser X or Z coord:
 			cChestEntity * Primary = a_Chest;
 			cChestEntity * Secondary = m_ThisChest;
