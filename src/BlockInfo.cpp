@@ -9,6 +9,7 @@
 
 
 cBlockInfo cBlockInfo::ms_Info[256];
+static bool g_IsBlockInfoInitialized = false;
 
 
 
@@ -43,6 +44,11 @@ cBlockInfo::~cBlockInfo()
 
 cBlockInfo & cBlockInfo::Get(BLOCKTYPE a_Type)
 {
+	if (!g_IsBlockInfoInitialized)
+	{
+		cBlockInfo::Initialize();
+		g_IsBlockInfoInitialized = true;
+	}
 	return ms_Info[a_Type];
 }
 
@@ -444,21 +450,6 @@ void cBlockInfo::Initialize(void)
 	ms_Info[E_BLOCK_STONE               ].m_FullyOccupiesVoxel = true;
 	ms_Info[E_BLOCK_STONE_BRICKS        ].m_FullyOccupiesVoxel = true;
 }
-
-
-
-
-
-// This is actually just some code that needs to run at program startup, so it is wrapped into a global var's constructor:
-class cBlockInfoInitializer
-{
-public:
-	cBlockInfoInitializer(void)
-	{
-		cBlockInfo::Initialize();
-	}
-} BlockInfoInitializer;
-
 
 
 
