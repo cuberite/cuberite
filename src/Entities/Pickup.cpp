@@ -30,7 +30,7 @@ public:
 
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() == m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
+		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
 		{
 			return false;
 		}
@@ -150,7 +150,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				}
 			}
 
-			if (!IsDestroyed()) // Don't try to combine if someone has tried to combine me
+			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize())) // Don't try to combine if someone has tried to combine me
 			{
 				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
 				m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
@@ -227,7 +227,7 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
 		m_World->BroadcastSoundEffect("random.pop",(int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-		if (m_Item.m_ItemCount == 0)
+		if (m_Item.m_ItemCount <= 0)
 		{
 			// All of the pickup has been collected, schedule the pickup for destroying
 			m_bCollected = true;
