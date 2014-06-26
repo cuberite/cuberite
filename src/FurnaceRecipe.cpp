@@ -68,7 +68,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	while (std::getline(f, ParsingLine))
 	{
 		LineNum++;
-		TrimString(ParsingLine);
+		ParsingLine = TrimString(ParsingLine);
 		if (ParsingLine.empty())
 		{
 			continue;
