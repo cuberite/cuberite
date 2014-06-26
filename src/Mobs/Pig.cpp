@@ -78,3 +78,23 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 
 
 
+
+
+void cPig::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	super::Tick(a_Dt, a_Chunk);
+
+	// If the attachee player is holding a carrot-on-stick, let them drive this pig:
+	if (m_bIsSaddled && (m_Attachee != NULL))
+	{
+		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == E_ITEM_CARROT_ON_STICK))
+		{
+			MoveToPosition((m_Attachee->GetPosition()) + (m_Attachee->GetLookVector()*10));
+			m_bMovingToDestination = true;
+		}
+	}
+}
+
+
+
+
