@@ -68,7 +68,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	while (std::getline(f, ParsingLine))
 	{
 		LineNum++;
-		ParsingLine = TrimString(ParsingLine);
+		ParsingLine.erase(std::remove_if(ParsingLine.begin(), ParsingLine.end(), isspace), ParsingLine.end());  // Remove ALL whitespace from the line
 		if (ParsingLine.empty())
 		{
 			continue;
