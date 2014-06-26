@@ -134,6 +134,7 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 {
 	if (m_IsInGround && !m_bIsCollected && CanPickup(*a_Dest))
 	{
+		// The arrow won't added to the inventory, when the player is creative
 		if (!a_Dest->IsGameModeCreative())
 		{
 			int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
