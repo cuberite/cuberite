@@ -41,6 +41,14 @@ public:
 private:
 	void ClearRecipes(void);
 
+	/** Parses the fuel contained in the line, adds it to m_pState's fuels.
+	Logs a warning to the console on input error. */
+	void AddFuelFromLine(const AString & a_Line, int a_LineNum);
+
+	/** Parses the recipe contained in the line, adds it to m_pState's recipes.
+	Logs a warning to the console on input error. */
+	void AddRecipeFromLine(const AString & a_Line, int a_LineNum);
+
 	/** Calls LOGWARN with the line, position, and error */
 	static void PrintParseError(unsigned int a_Line, size_t a_Position, const AString & a_CharactersMissing);
 

@@ -58,16 +58,16 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	std::ifstream f(FURNACE_RECIPE_FILE, std::ios::in);
 	if (!f.good())
 	{
-		LOG("Could not open the furnace recipes file \"%s\"", FURNACE_RECIPE_FILE);
+		LOG("Could not open the furnace recipes file \"%s\". No furnace recipes are available.", FURNACE_RECIPE_FILE);
 		return;
 	}
 	
-	unsigned int Line = 0;
+	unsigned int LineNum = 0;
 	AString ParsingLine;
 
 	while (std::getline(f, ParsingLine))
 	{
-		Line++;
+		LineNum++;
 		TrimString(ParsingLine);
 		if (ParsingLine.empty())
 		{
@@ -84,74 +84,74 @@ void cFurnaceRecipe::ReloadRecipes(void)
 
 			case '!':
 			{
-				// Fuel
-				int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
-				AString::size_type BeginPos = 1; // Begin at one after exclamation mark (bang)
-
-				if (
-					!ReadMandatoryNumber(BeginPos, ":", ParsingLine, Line, IItemID) ||                       // Read item ID
-					!ReadOptionalNumbers(BeginPos, ":", "=", ParsingLine, Line, IItemCount, IItemHealth) ||  // Read item count (and optionally health)
-					!ReadMandatoryNumber(BeginPos, "0123456789", ParsingLine, Line, IBurnTime, true)         // Read item burn time - last value
-				)
-				{
-					break;
-				}
-
-				// Add to fuel list:
-				Fuel F;
-				F.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
-				F.BurnTime = IBurnTime;
-				m_pState->Fuel.push_back(F);
-				break;
-			}
-
-			case '0':
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-			{
-				// Recipe
-				int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
-				int OItemID = 0, OItemCount = 0, OItemHealth = 0;
-				AString::size_type BeginPos = 0; // Begin at start of line
-
-				if (
-					!ReadMandatoryNumber(BeginPos, ":", ParsingLine, Line, IItemID) ||                                  // Read item ID
-					!ReadOptionalNumbers(BeginPos, ":", "@", ParsingLine, Line, IItemCount, IItemHealth) ||             // Read item count (and optionally health)
-					!ReadMandatoryNumber(BeginPos, "=", ParsingLine, Line, IBurnTime) ||                                // Read item burn time
-					!ReadMandatoryNumber(BeginPos, ":", ParsingLine, Line, OItemID) ||                                  // Read result ID
-					!ReadOptionalNumbers(BeginPos, ":", "012456789", ParsingLine, Line, OItemCount, OItemHealth, true)  // Read result count (and optionally health) - last value
-				)
-				{
-					break;
-				}
-
-				// Add to recipe list
-				Recipe R;
-				R.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
-				R.Out = new cItem((ENUM_ITEM_ID)OItemID, (char)OItemCount, (short)OItemHealth);
-				R.CookTime = IBurnTime;
-				m_pState->Recipes.push_back(R);
+				AddFuelFromLine(ParsingLine, LineNum);
 				break;
 			}
 
 			default:
 			{
-				LOGWARNING("Error in furnace recipes at line %d: Unexpected text: \"%s\". Ignoring line.",
-					Line, ParsingLine.c_str()
-				);
+				AddRecipeFromLine(ParsingLine, LineNum);
 				break;
 			}
 		}  // switch (ParsingLine[0])
 	}  // while (getline(ParsingLine))
 
 	LOG("Loaded " SIZE_T_FMT " furnace recipes and " SIZE_T_FMT " fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
+}
+
+
+
+
+
+void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, int a_LineNum)
+{
+	// Fuel
+	int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
+	AString::size_type BeginPos = 1; // Begin at one after exclamation mark (bang)
+
+	if (
+		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, IItemID) ||                       // Read item ID
+		!ReadOptionalNumbers(BeginPos, ":", "=", a_Line, a_LineNum, IItemCount, IItemHealth) ||  // Read item count (and optionally health)
+		!ReadMandatoryNumber(BeginPos, "0123456789", a_Line, a_LineNum, IBurnTime, true)         // Read item burn time - last value
+	)
+	{
+		return;
+	}
+
+	// Add to fuel list:
+	Fuel F;
+	F.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
+	F.BurnTime = IBurnTime;
+	m_pState->Fuel.push_back(F);
+}
+
+
+
+
+
+void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, int a_LineNum)
+{
+	int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
+	int OItemID = 0, OItemCount = 0, OItemHealth = 0;
+	AString::size_type BeginPos = 0; // Begin at start of line
+
+	if (
+		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, IItemID) ||                                  // Read item ID
+		!ReadOptionalNumbers(BeginPos, ":", "@", a_Line, a_LineNum, IItemCount, IItemHealth) ||             // Read item count (and optionally health)
+		!ReadMandatoryNumber(BeginPos, "=", a_Line, a_LineNum, IBurnTime) ||                                // Read item burn time
+		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, OItemID) ||                                  // Read result ID
+		!ReadOptionalNumbers(BeginPos, ":", "012456789", a_Line, a_LineNum, OItemCount, OItemHealth, true)  // Read result count (and optionally health) - last value
+	)
+	{
+		return;
+	}
+
+	// Add to recipe list
+	Recipe R;
+	R.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
+	R.Out = new cItem((ENUM_ITEM_ID)OItemID, (char)OItemCount, (short)OItemHealth);
+	R.CookTime = IBurnTime;
+	m_pState->Recipes.push_back(R);
 }
 
 
