@@ -94,7 +94,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 					!ReadMandatoryNumber(BeginPos, "0123456789", ParsingLine, Line, IBurnTime, true)         // Read item burn time - last value
 				)
 				{
-					return;
+					break;
 				}
 
 				// Add to fuel list:
@@ -129,7 +129,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 					!ReadOptionalNumbers(BeginPos, ":", "012456789", ParsingLine, Line, OItemCount, OItemHealth, true)  // Read result count (and optionally health) - last value
 				)
 				{
-					return;
+					break;
 				}
 
 				// Add to recipe list
