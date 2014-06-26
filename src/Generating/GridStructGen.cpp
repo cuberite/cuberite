@@ -53,6 +53,16 @@ cGridStructGen::cGridStructGen(
 	m_MaxStructureSizeZ(a_MaxStructureSizeZ),
 	m_MaxCacheSize(a_MaxCacheSize)
 {
+	if (m_GridSizeX == 0)
+	{
+		LOG("Grid Size cannot be zero, setting to 1");
+		m_GridSizeX = 1;
+	}
+	if (m_GridSizeZ == 0)
+	{
+		LOG("Grid Size cannot be zero, setting to 1");
+		m_GridSizeZ = 1;
+	}
 	size_t NumStructuresPerQuery = (size_t)(((m_MaxStructureSizeX + m_MaxOffsetX) / m_GridSizeX + 1) * ((m_MaxStructureSizeZ + m_MaxOffsetZ) / m_GridSizeZ + 1));
 	if (NumStructuresPerQuery > m_MaxCacheSize)
 	{
