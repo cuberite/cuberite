@@ -41,7 +41,7 @@ public:
 		cItem & Item = ((cPickup *)a_Entity)->GetItem();
 		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()))
 		{
-			char CombineCount = Item.m_ItemCount;
+			short CombineCount = Item.m_ItemCount;
 			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
 			{
 				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
@@ -150,7 +150,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				}
 			}
 
-			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize())) // Don't try to combine if someone has tried to combine me
+			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize())) // Don't combine into an already full pickup
 			{
 				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
 				m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
