@@ -66,6 +66,7 @@ public:
 		if (!Arrow->Initialize(*a_Player->GetWorld()))
 		{
 			delete Arrow;
+			Arrow = NULL;
 			return;
 		}
 

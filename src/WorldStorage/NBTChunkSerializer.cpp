@@ -345,6 +345,7 @@ void cNBTChunkSerializer::AddBasicEntity(cEntity * a_Entity, const AString & a_C
 		m_Writer.AddDouble("", a_Entity->GetYaw());
 		m_Writer.AddDouble("", a_Entity->GetPitch());
 	m_Writer.EndList();
+	m_Writer.AddShort("Health", a_Entity->GetHealth());
 }
 
 
@@ -575,7 +576,6 @@ void cNBTChunkSerializer::AddPickupEntity(cPickup * a_Pickup)
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Pickup, "Item");
 		AddItem(a_Pickup->GetItem(), -1, "Item");
-		m_Writer.AddShort("Health", (Int16)(unsigned char)a_Pickup->GetHealth());
 		m_Writer.AddShort("Age",    (Int16)a_Pickup->GetAge());
 	m_Writer.EndCompound();
 }
@@ -608,17 +608,12 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			case cProjectileEntity::pkGhastFireball:
 			{
 				m_Writer.AddInt("ExplosionPower", 1);
-				// fall-through:
+				break;
 			}
 			case cProjectileEntity::pkFireCharge:
 			case cProjectileEntity::pkWitherSkull:
 			case cProjectileEntity::pkEnderPearl:
 			{
-				m_Writer.BeginList("Motion", TAG_Double);
-					m_Writer.AddDouble("", a_Projectile->GetSpeedX());
-					m_Writer.AddDouble("", a_Projectile->GetSpeedY());
-					m_Writer.AddDouble("", a_Projectile->GetSpeedZ());
-				m_Writer.EndList();
 				break;
 			}
 			default:
@@ -683,7 +678,6 @@ void cNBTChunkSerializer::AddExpOrbEntity(cExpOrb * a_ExpOrb)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_ExpOrb, "XPOrb");
-		m_Writer.AddShort("Health", (Int16)(unsigned char)a_ExpOrb->GetHealth());
 		m_Writer.AddShort("Age", (Int16)a_ExpOrb->GetAge());
 		m_Writer.AddShort("Value", (Int16)a_ExpOrb->GetReward());
 	m_Writer.EndCompound();

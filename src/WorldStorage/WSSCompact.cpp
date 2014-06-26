@@ -473,6 +473,7 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 		{
 			LOGERROR("ERROR READING %s FROM FILE %s (line %d); file offset %d", "Header", m_FileName.c_str(), __LINE__, f.Tell());
 			delete Header;
+			Header = NULL;
 			return;
 		}
 		m_ChunkHeaders.push_back(Header);

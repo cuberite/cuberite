@@ -28,6 +28,7 @@ cItemGrid::cItemGrid(int a_Width, int a_Height) :
 cItemGrid::~cItemGrid()
 {
 	delete[] m_Slots;
+	m_Slots = NULL;
 }
 
 

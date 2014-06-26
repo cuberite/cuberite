@@ -36,10 +36,6 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 		{
 			TotalDamage = 3;
 		}
-		else if (MobType == cMonster::mtEnderDragon)
-		{
-			TotalDamage = 1;
-		}
 	}
 	// TODO: If entity is Ender Crystal, destroy it
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);

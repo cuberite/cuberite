@@ -66,11 +66,13 @@ cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_Thre
 cThread::~cThread()
 {
 	delete m_Event;
+	m_Event = NULL;
 	
 	if( m_StopEvent )
 	{
 		m_StopEvent->Wait();
 		delete m_StopEvent;
+		m_StopEvent = NULL;
 	}
 }
 

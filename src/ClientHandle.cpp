@@ -232,6 +232,9 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 
 AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 {
+	// Online UUIDs are always version 4 (random)
+	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
+	// This guarantees that they will never collide with an online UUID and can be distinguished.
 	// Proper format for a version 3 UUID is:
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	
@@ -248,6 +251,32 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	UUID.insert(23, "-");
 	
 	return UUID;
+}
+
+
+
+
+
+bool cClientHandle::IsUUIDOnline(const AString & a_UUID)
+{
+	// Online UUIDs are always version 4 (random)
+	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
+	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// The version-specifying char is at pos #12 of raw UUID, pos #14 in dashed-UUID.
+	switch (a_UUID.size())
+	{
+		case 32:
+		{
+			// This is the UUID format without dashes, the version char is at pos #12:
+			return (a_UUID[12] == '4');
+		}
+		case 36:
+		{
+			// This is the UUID format with dashes, the version char is at pos #14:
+			return (a_UUID[14] == '4');
+		}
+	}
+	return false;
 }
 
 
@@ -953,6 +982,26 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
+	// Check for clickthrough-blocks:
+	/* When the user breaks a fire block, the client send the wrong block location.
+	We must find the right block with the face direction. */
+	if (a_BlockFace != BLOCK_FACE_NONE)
+	{
+		int pX = a_BlockX;
+		int pY = a_BlockY;
+		int pZ = a_BlockZ;
+
+		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
+		cBlockHandler * Handler = cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(pX, pY, pZ));
+
+		if (Handler->IsClickedThrough())
+		{
+			cChunkInterface ChunkInterface(m_Player->GetWorld()->GetChunkMap());
+			Handler->OnDigging(ChunkInterface, *m_Player->GetWorld(), m_Player, pX, pY, pZ);
+			return;
+		}
+	}
+
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
 		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
@@ -979,22 +1028,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-	// Check for clickthrough-blocks:
-	if (a_BlockFace != BLOCK_FACE_NONE)
-	{
-		int pX = a_BlockX;
-		int pY = a_BlockY;
-		int pZ = a_BlockZ;
-
-		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
-
-		if (Handler->IsClickedThrough())
-		{
-			Handler->OnDigging(ChunkInterface, *World, m_Player, pX, pY, pZ);
-		}
-	}
 }
 
 

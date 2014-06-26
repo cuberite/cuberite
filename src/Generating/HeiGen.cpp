@@ -142,7 +142,9 @@ cHeiGenCache::cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize)
 cHeiGenCache::~cHeiGenCache()
 {
 	delete[] m_CacheData;
+	m_CacheData = NULL;
 	delete[] m_CacheOrder;
+	m_CacheOrder = NULL;
 }
 
 

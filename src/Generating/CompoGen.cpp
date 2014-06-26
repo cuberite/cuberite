@@ -672,7 +672,9 @@ cCompoGenCache::cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_Cach
 cCompoGenCache::~cCompoGenCache()
 {
 	delete[] m_CacheData;
+	m_CacheData = NULL;
 	delete[] m_CacheOrder;
+	m_CacheOrder = NULL;
 }
 
 

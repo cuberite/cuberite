@@ -35,8 +35,8 @@ class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
 
-typedef std::list<cClientHandle *>  cClientHandleList;
-typedef cChunk * cChunkPtr;
+typedef std::list<cClientHandle *>         cClientHandleList;
+typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;

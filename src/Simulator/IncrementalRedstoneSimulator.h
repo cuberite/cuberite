@@ -108,7 +108,9 @@ private:
 	/** Handles redstone wire */
 	void HandleRedstoneWire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles repeaters */
-	void HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState, RepeatersDelayList::iterator a_Itr);
+	void HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState);
+	/** Handles delayed updates to Repeaters **/
+	void HandleRedstoneRepeaterDelays();
 	/* ====================== */
 
 	/* ====== DEVICES ====== */

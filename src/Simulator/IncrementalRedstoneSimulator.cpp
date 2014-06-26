@@ -59,21 +59,20 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	int RelZ = 0;	
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	cChunk * Chunk;
+	cChunk * OtherChunk = a_Chunk;
 
 	if (a_OtherChunk != NULL)
 	{
 		RelX = a_BlockX - a_OtherChunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_OtherChunk->GetPosZ() * cChunkDef::Width;
 		a_OtherChunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
-		Chunk = a_OtherChunk;
+		OtherChunk = a_OtherChunk;
 	}
 	else
 	{
 		RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 		a_Chunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
-		Chunk = a_Chunk;
 	}
 
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
@@ -92,7 +91,8 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			itr = PoweredBlocks->erase(itr);
-			Chunk->SetIsRedstoneDirty(true);
+			a_Chunk->SetIsRedstoneDirty(true);
+			OtherChunk->SetIsRedstoneDirty(true);
 			continue;
 		}
 		else if (
@@ -107,21 +107,23 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 			itr = PoweredBlocks->erase(itr);
-			Chunk->SetIsRedstoneDirty(true);
+			a_Chunk->SetIsRedstoneDirty(true);
+			OtherChunk->SetIsRedstoneDirty(true);
 			continue;
 		}
 		else if (Block == E_BLOCK_DAYLIGHT_SENSOR)
 		{
-			if (!m_World.IsChunkLighted(Chunk->GetPosX(), Chunk->GetPosZ()))
+			if (!m_World.IsChunkLighted(OtherChunk->GetPosX(), OtherChunk->GetPosZ()))
 			{
-				m_World.QueueLightChunk(Chunk->GetPosX(), Chunk->GetPosZ());
+				m_World.QueueLightChunk(OtherChunk->GetPosX(), OtherChunk->GetPosZ());
 			}
 			else
 			{
-				if (Chunk->GetTimeAlteredLight(Chunk->GetSkyLight(RelX, a_BlockY + 1, RelZ)) <= 7)
+				if (OtherChunk->GetTimeAlteredLight(OtherChunk->GetSkyLight(RelX, a_BlockY + 1, RelZ)) <= 7)
 				{
 					itr = PoweredBlocks->erase(itr);
-					Chunk->SetIsRedstoneDirty(true);
+					a_Chunk->SetIsRedstoneDirty(true);
+					OtherChunk->SetIsRedstoneDirty(true);
 					continue;
 				}
 			}
@@ -139,7 +141,8 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
-				Chunk->SetIsRedstoneDirty(true);
+				a_Chunk->SetIsRedstoneDirty(true);
+				OtherChunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 			else if (
@@ -153,7 +156,8 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
-				Chunk->SetIsRedstoneDirty(true);
+				a_Chunk->SetIsRedstoneDirty(true);
+				OtherChunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 		}
@@ -163,7 +167,8 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
 				itr = LinkedPoweredBlocks->erase(itr);
-				Chunk->SetIsRedstoneDirty(true);
+				a_Chunk->SetIsRedstoneDirty(true);
+				OtherChunk->SetIsRedstoneDirty(true);
 				continue;
 			}
 		}
@@ -271,6 +276,8 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 		ShouldUpdateSimulateOnceBlocks = true;
 	}
 
+	HandleRedstoneRepeaterDelays();
+
 	for (cRedstoneSimulatorChunkData::iterator dataitr = m_RedstoneSimulatorChunkData->begin(); dataitr != m_RedstoneSimulatorChunkData->end();)
 	{
 		if (dataitr->DataTwo)
@@ -282,26 +289,6 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 		switch (dataitr->Data)
 		{
 			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
-
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			{
-				bool FoundItem = false;
-				for (RepeatersDelayList::iterator repeateritr = m_RepeatersDelayList->begin(); repeateritr != m_RepeatersDelayList->end(); ++repeateritr)
-				{
-					if (repeateritr->a_RelBlockPos == Vector3i(dataitr->x, dataitr->y, dataitr->z))
-					{
-						HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data, repeateritr);
-						FoundItem = true;
-						break;
-					}
-				}
-				if (!FoundItem && ShouldUpdateSimulateOnceBlocks)
-				{
-					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data, m_RepeatersDelayList->end());
-				}
-				break;
-			}
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
@@ -355,6 +342,12 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 				case E_BLOCK_STICKY_PISTON:
 				{
 					HandlePiston(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_REDSTONE_REPEATER_OFF:
+				case E_BLOCK_REDSTONE_REPEATER_ON:
+				{
+					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
 					break;
 				}
 				case E_BLOCK_REDSTONE_TORCH_OFF:
@@ -511,29 +504,10 @@ void cIncrementalRedstoneSimulator::HandleRedstoneLever(int a_RelBlockX, int a_R
 	{
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 
-		NIBBLETYPE Dir = cBlockLeverHandler::BlockMetaDataToBlockFace(Meta);
-		switch (Dir) // Now, flip the direction into the type used by SetBlockLinkedPowered()
-		{
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_XP:
-			case BLOCK_FACE_ZP:
-			{
-				Dir--;
-				break;
-			}
-			case BLOCK_FACE_XM:
-			case BLOCK_FACE_ZM:
-			case BLOCK_FACE_YM:
-			{
-				Dir++;
-				break;
-			}
-			default:
-			{
-				ASSERT(!"Unhandled lever metadata!");
-				return;
-			}
-		}
+		eBlockFace Dir = cBlockLeverHandler::BlockMetaDataToBlockFace(Meta);
+		
+		Dir = ReverseBlockFace(Dir);
+		
 		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Dir);
 	}
 }
@@ -546,15 +520,17 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_RelBlockX, int a_RelBl
 {
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-	cChunkInterface ChunkInterface(m_World.GetChunkMap());
-	NIBBLETYPE MetaData = ChunkInterface.GetBlockMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	NIBBLETYPE MetaData = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 
 	if (AreCoordsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
 	{
 		if (!AreCoordsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true))
 		{
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MetaData | 0x4);
-			m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			if ((MetaData & 0x4) == 0)
+			{
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MetaData | 0x4);
+				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true);
 		}
 	}
@@ -562,8 +538,11 @@ void cIncrementalRedstoneSimulator::HandleFenceGate(int a_RelBlockX, int a_RelBl
 	{
 		if (!AreCoordsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, false))
 		{
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MetaData & 0xFFFFFFFB);
-			m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			if ((MetaData & 0x4) != 0)
+			{
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MetaData & ~0x04);
+				m_Chunk->BroadcastSoundParticleEffect(1003, BlockX, a_RelBlockY, BlockZ, 0);
+			}
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, false);
 		}
 	}
@@ -580,27 +559,8 @@ void cIncrementalRedstoneSimulator::HandleRedstoneButton(int a_RelBlockX, int a_
 	{
 		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 		
-		NIBBLETYPE Dir = cBlockButtonHandler::BlockMetaDataToBlockFace(Meta);
-		switch (Dir) // Now, flip the direction into the type used by SetBlockLinkedPowered()
-		{
-			case BLOCK_FACE_XP:
-			case BLOCK_FACE_ZP:
-			{
-				Dir--;
-				break;
-			}
-			case BLOCK_FACE_XM:
-			case BLOCK_FACE_ZM:
-			{
-				Dir++;
-				break;
-			}
-			default:
-			{
-				ASSERT(!"Unhandled button metadata!");
-				return;
-			}
-		}
+		eBlockFace Dir = cBlockButtonHandler::BlockMetaDataToBlockFace(Meta);
+		Dir = ReverseBlockFace(Dir);
 		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Dir);
 	}
 }
@@ -767,7 +727,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 
 
 
-void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState, RepeatersDelayList::iterator a_Itr)
+void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState)
 {
 	/* Repeater Orientation Mini Guide:
 	===================================
@@ -794,101 +754,79 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 	NIBBLETYPE a_Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
     
-	bool WereItrsChanged = false;
 	if (!IsRepeaterLocked(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
 	{
 		bool IsSelfPowered = IsRepeaterPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta);
 		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
 		{
-			WereItrsChanged = QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, true);
+			QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, true);
 		}
 		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
 		{
-			WereItrsChanged = QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, false);
-		}
-		else if (a_Itr == m_RepeatersDelayList->end())
-		{
-			return;
+			QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, false);
 		}
 	}
-	else if (a_Itr == m_RepeatersDelayList->end())
-	{
-		return;
-	}
+}
 
-	if (WereItrsChanged)
+void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
+{
+	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end();)
 	{
-		for (a_Itr = m_RepeatersDelayList->begin(); a_Itr != m_RepeatersDelayList->end(); ++a_Itr)
+
+		if (itr->a_ElapsedTicks >= itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
 		{
-			if (a_Itr->a_RelBlockPos == Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
+			int RelBlockX = itr->a_RelBlockPos.x;
+			int RelBlockY = itr->a_RelBlockPos.y;
+			int RelBlockZ = itr->a_RelBlockPos.z;
+			NIBBLETYPE Meta = m_Chunk->GetMeta(RelBlockX, RelBlockY, RelBlockZ);
+			if (itr->ShouldPowerOn)
 			{
-				// Leave a_Itr at where we found the entry
-				break;
-			}
-		}
-	}
+		
+				m_Chunk->SetBlock(itr->a_RelBlockPos, E_BLOCK_REDSTONE_REPEATER_ON, Meta); // For performance
 
-	// a_Itr may be passed with m_RepeatersDelayList::end, however, we can guarantee this iterator is always valid because...
-	// ...QueueRepeaterPowerChange is called to add an entry (and the above code updates iterator). However, if the repeater was locked or something similar...
-	// ...we will never get here because of the returns.
-	if (a_Itr->a_ElapsedTicks >= a_Itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
-	{
-		if (a_Itr->ShouldPowerOn)
-		{
-			if (!IsOn)
-			{
-				m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_REPEATER_ON, a_Meta); // For performance
-			}
-
-			switch (a_Meta & 0x3) // We only want the direction (bottom) bits
-			{
-				case 0x0:
+				switch (Meta & 0x3) // We only want the direction (bottom) bits
 				{
-					SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM);
-					break;
-				}
-				case 0x1:
-				{
-					SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP);
-					break;
-				}
-				case 0x2:
-				{
-					SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP);
-					break;
-				}
-				case 0x3:
-				{
-					SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-					SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM);
-					break;
+					case 0x0:
+					{
+						SetBlockPowered(RelBlockX, RelBlockY, RelBlockZ - 1, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_ZM);
+						break;
+					}
+					case 0x1:
+					{
+						SetBlockPowered(RelBlockX + 1, RelBlockY, RelBlockZ, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_XP);
+						break;
+					}
+					case 0x2:
+					{
+						SetBlockPowered(RelBlockX, RelBlockY, RelBlockZ + 1, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_ZP);
+						break;
+					}
+					case 0x3:
+					{
+						SetBlockPowered(RelBlockX - 1, RelBlockY, RelBlockZ, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_XM);
+						break;
+					}
 				}
 			}
-
-			// Removal of the data entry will be handled in SimChunk - we still want to continue trying to power blocks, even if our delay time has reached
-			// Otherwise, the power state of blocks in front won't update after we have powered on
-			return;
+			else
+			{
+				m_Chunk->SetBlock(RelBlockX, RelBlockY, RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, Meta);
+			}
+			itr = m_RepeatersDelayList->erase(itr);
 		}
 		else
 		{
-			if (IsOn)
-			{
-				m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, a_Meta);
-			}
-			m_RepeatersDelayList->erase(a_Itr); // We can remove off repeaters which don't need further updating
-			return;
+			// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
+			// With a world with lots of redstone, the repeaters simply do not delay
+			// I am confounded to say why. Perhaps optimisation failure.
+			LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", itr->a_RelBlockPos.x, itr->a_RelBlockPos.y, itr->a_RelBlockPos.z, itr->a_ElapsedTicks, itr->a_DelayTicks);
+			itr->a_ElapsedTicks++;
+			itr++;
 		}
-	}
-	else
-	{
-		// Apparently, incrementing ticks only works reliably here, and not in SimChunk;
-		// With a world with lots of redstone, the repeaters simply do not delay
-		// I am confounded to say why. Perhaps optimisation failure.
-		LOGD("Incremented a repeater @ {%i %i %i} | Elapsed ticks: %i | Target delay: %i", a_Itr->a_RelBlockPos.x, a_Itr->a_RelBlockPos.y, a_Itr->a_RelBlockPos.z, a_Itr->a_ElapsedTicks, a_Itr->a_DelayTicks);
-		a_Itr->a_ElapsedTicks++;
 	}
 }
 
@@ -1147,19 +1085,17 @@ void cIncrementalRedstoneSimulator::HandleNoteBlock(int a_RelBlockX, int a_RelBl
 
 void cIncrementalRedstoneSimulator::HandleDaylightSensor(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	int a_ChunkX, a_ChunkZ;
-	cChunkDef::BlockToChunk(a_RelBlockX, a_RelBlockZ, a_ChunkX, a_ChunkZ);
+	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX, BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 
-	if (!m_World.IsChunkLighted(a_ChunkX, a_ChunkZ))
+	if (!m_World.IsChunkLighted(ChunkX, ChunkZ))
 	{
-		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ);
+		m_World.QueueLightChunk(ChunkX, ChunkZ);
 	}
 	else
 	{
-		int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-		int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-		NIBBLETYPE SkyLight = m_Chunk->GetTimeAlteredLight(m_World.GetBlockSkyLight(BlockX, a_RelBlockY + 1, BlockZ));
-		if (SkyLight > 8)
+		if (m_Chunk->GetTimeAlteredLight(m_World.GetBlockSkyLight(BlockX, a_RelBlockY + 1, BlockZ)) > 8)
 		{
 			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 		}
