@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "ArrowEntity.h"
 #include "../Chunk.h"
+#include "FastRandom.h"
 
 
 
@@ -24,9 +25,9 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
-		 m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		 GetYaw(), GetPitch()
-		 );
+		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
+		GetYaw(), GetPitch()
+	);
 }
 
 
@@ -44,6 +45,10 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_bIsCollected(false),
 	m_HitBlockPos(0, 0, 0)
 {
+	if (a_Player.IsGameModeCreative())
+	{
+		m_PickupState = psInCreative;
+	}
 }
 
 
@@ -109,7 +114,14 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
 	// Broadcast successful hit sound
-	m_World->BroadcastSoundEffect("random.successful_hit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect(
+		"random.successful_hit",
+		(int)std::floor(GetPosX() * 8.0),
+		(int)std::floor(GetPosY() * 8.0),
+		(int)std::floor(GetPosZ() * 8.0),
+		0.5f,
+		0.75f + ((float)((GetUniqueID() * 23) % 32)) / 64.0f
+	);
 	
 	Destroy();
 }
@@ -120,16 +132,33 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 
 void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 {
-	if ((m_IsInGround) && (!m_bIsCollected) && (CanPickup(*a_Dest)))
+	if (m_IsInGround && !m_bIsCollected && CanPickup(*a_Dest))
 	{
-		int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
-		if (NumAdded > 0) // Only play effects if there was space in inventory
+		// Do not add the arrow to the inventory when the player is in creative:
+		if (!a_Dest->IsGameModeCreative())
 		{
-			m_World->BroadcastCollectPickup((const cPickup &)*this, *a_Dest);
-			// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-			m_World->BroadcastSoundEffect("random.pop", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-			m_bIsCollected = true;
+			int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
+			if (NumAdded == 0)
+			{
+				// No space in the inventory
+				return;
+			}
 		}
+		
+		// TODO: BroadcastCollectPickup needs a cPickup, which we don't have
+		// m_World->BroadcastCollectPickup(*this, *a_Dest);
+
+		m_bIsCollected = true;
+
+		cFastRandom Random;
+		m_World->BroadcastSoundEffect(
+			"random.pop",
+			(int)std::floor(GetPosX() * 8.0),
+			(int)std::floor(GetPosY() * 8),
+			(int)std::floor(GetPosZ() * 8),
+			0.2F,
+			((Random.NextFloat(1.0F) - Random.NextFloat(1.0F)) * 0.7F + 1.0F) * 2.0F
+		);
 	}
 }
 
