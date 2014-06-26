@@ -134,7 +134,7 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 {
 	if (m_IsInGround && !m_bIsCollected && CanPickup(*a_Dest))
 	{
-		if (m_PickupState == psInSurvivalOrCreative)
+		if (!a_Dest->IsGameModeCreative())
 		{
 			int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
 			if (NumAdded == 0)
