@@ -27,10 +27,12 @@ endmacro()
 
 macro(set_flags)
 	# Add coverage processing, if requested:
-	if (${CMAKE_BUILD_TYPE} STREQUAL "COVERAGE")
-		message("Including CodeCoverage")
-		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/")
-		include(CodeCoverage)
+	if (NOT MSVC)
+		if (${CMAKE_BUILD_TYPE} STREQUAL "COVERAGE")
+			message("Including CodeCoverage")
+			set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/")
+			include(CodeCoverage)
+		endif()
 	endif()
 
 	# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
