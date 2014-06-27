@@ -1090,7 +1090,10 @@ void cEntity::HandleAir(void)
 
 	if (IsSubmerged())
 	{
-		SetSpeedY(1); // Float in the water
+		if (!IsPlayer()) // Players control themselves
+		{
+			SetSpeedY(1); // Float in the water
+		}
 
 		// Either reduce air level or damage player
 		if (m_AirLevel < 1)
