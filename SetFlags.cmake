@@ -28,6 +28,7 @@ endmacro()
 macro(set_flags)
 	# Add coverage processing, if requested:
 	if (BUILD_WITH_COVERAGE)
+		message("Including CodeCoverage")
 		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/")
 		include(CodeCoverage)
 	endif()
