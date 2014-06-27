@@ -26,10 +26,14 @@ endmacro()
 
 
 macro(set_flags)
-	# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
-	if (NOT MSVC)
+	# Add coverage processing, if requested:
+	if (BUILD_WITH_COVERAGE)
 		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/lib/cmake-coverage/")
 		include(CodeCoverage)
+	endif()
+
+	# Add the preprocessor macros used for distinguishing between debug and release builds (CMake does this automatically for MSVC):
+	if (NOT MSVC)
 		set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -D_DEBUG")
 		set(CMAKE_C_FLAGS_DEBUG      "${CMAKE_C_FLAGS_DEBUG}      -D_DEBUG")
 		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -D_DEBUG")
