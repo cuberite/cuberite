@@ -134,7 +134,7 @@ if (NOT MSVC)
 		Bindings/WebPlugin
 	)
 
-	target_link_libraries(Bindings lua sqlite tolualib)
+	target_link_libraries(Bindings lua sqlite tolualib polarssl)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
