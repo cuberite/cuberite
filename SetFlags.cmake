@@ -63,12 +63,16 @@ macro(set_flags)
 
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
-		add_flags_cxx("-pthread")
+		if (UNIX)
+			add_flags_cxx("-pthread")
+		endif()
+
+		# Make CLang use C++11, otherwise MSVC2008-supported extensions don't work ("override" keyword etc.):
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS}         -std=c++11")
-			set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}   -std=c++11")
+			set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
+			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
 			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
-			set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++11")
+			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
 		endif()
 
 		# We use a signed char (fixes #640 on RasPi)
