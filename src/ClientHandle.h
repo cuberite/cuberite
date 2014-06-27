@@ -123,7 +123,7 @@ public:
 	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                (const cCompositeChat & a_Message);
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
+	void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);
 	void SendDisconnect          (const AString & a_Reason);
 	void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ);

@@ -64,7 +64,7 @@ public:
 	virtual void SendChat                (const AString & a_Message) = 0;
 	virtual void SendChat                (const cCompositeChat & a_Message) = 0;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
-	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
+	virtual void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) = 0;
 	virtual void SendDisconnect          (const AString & a_Reason) = 0;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)

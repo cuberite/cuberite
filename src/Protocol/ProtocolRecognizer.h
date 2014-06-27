@@ -71,7 +71,7 @@ public:
 	virtual void SendChat                (const AString & a_Message) override;
 	virtual void SendChat                (const cCompositeChat & a_Message) override;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) override;
+	virtual void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
 	virtual void SendDisconnect          (const AString & a_Reason) override;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)

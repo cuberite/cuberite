@@ -351,12 +351,12 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 
 
-void cProtocol172::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocol172::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x0d);  // Collect Item packet
-	Pkt.WriteInt(a_Pickup.GetUniqueID());
+	Pkt.WriteInt(a_Entity.GetUniqueID());
 	Pkt.WriteInt(a_Player.GetUniqueID());
 }
 

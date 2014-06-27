@@ -2077,9 +2077,9 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 
 
 
-void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
-	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+	m_Protocol->SendCollectEntity(a_Entity, a_Player);
 }
 
 

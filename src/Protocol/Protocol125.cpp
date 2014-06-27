@@ -274,11 +274,11 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 
 
-void cProtocol125::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocol125::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_COLLECT_PICKUP);
-	WriteInt (a_Pickup.GetUniqueID());
+	WriteInt (a_Entity.GetUniqueID());
 	WriteInt (a_Player.GetUniqueID());
 	Flush();
 }

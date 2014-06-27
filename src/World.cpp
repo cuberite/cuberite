@@ -1877,9 +1877,18 @@ void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer
 
 
 
+void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Exclude);
+}
+
+
+
+
+
 void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastCollectPickup(a_Pickup, a_Player, a_Exclude);
+	m_ChunkMap->BroadcastCollectEntity(a_Pickup, a_Player, a_Exclude);
 }
 
 
