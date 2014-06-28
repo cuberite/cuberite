@@ -361,7 +361,7 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			EntityCollisionCallback.GetHitEntity()->GetClass(),
 			HitPos.x, HitPos.y, HitPos.z,
 			EntityCollisionCallback.GetMinCoeff()
-			);
+		);
 
 		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
 	}
