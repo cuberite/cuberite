@@ -1085,12 +1085,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 void cClientHandle::FinishDigAnimation()
 {
-	if (
-		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
-		(m_LastDigBlockX == -1) ||
-		(m_LastDigBlockY == -1) ||
-		(m_LastDigBlockZ == -1)
-	)
+	if (!m_HasStartedDigging) // Hasn't received the DIG_STARTED packet
 	{
 		return;
 	}
