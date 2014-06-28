@@ -102,6 +102,11 @@ private:
 	void HandleDaylightSensor(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles pressure plates */
 	void HandlePressurePlate(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyType);
+	/** Handles tripwire hooks
+	Performs correct meta and power setting for self by going in the direction it faces and looking for a continous line of tripwire bounded by another oppositely facing hook
+	If this line is complete, it verifies that at least on wire reports an entity is on top (via its meta), and performs its task
+	*/
+	void HandleTripwireHook(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/* ==================== */
 
 	/* ====== CARRIERS ====== */
@@ -134,6 +139,8 @@ private:
 	void HandleFenceGate(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles noteblocks */
 	void HandleNoteBlock(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
+	/** Handles tripwires */
+	void HandleTripwire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/* ===================== */
 
 	/* ====== Helper functions ====== */
@@ -271,6 +278,7 @@ private:
 			case E_BLOCK_TNT:
 			case E_BLOCK_TRAPDOOR:
 			case E_BLOCK_TRIPWIRE_HOOK:
+			case E_BLOCK_TRIPWIRE:
 			case E_BLOCK_WOODEN_BUTTON:
 			case E_BLOCK_WOODEN_DOOR:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:

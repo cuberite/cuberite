@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncrementalRedstoneSimulator.h"
+#include "BoundingBox.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -12,10 +13,13 @@
 #include "../Blocks/BlockButton.h"
 #include "../Blocks/BlockLever.h"
 #include "../Blocks/BlockPiston.h"
+#include "../Blocks/BlockTripwireHook.h"
+
+#define WAKE_SIMULATOR_IF_DIRTY(a_Chunk, a_BlockX, a_BlockY, a_BlockZ) if (a_Chunk->IsRedstoneDirty()) WakeUp(a_BlockX, a_BlockY, a_BlockZ, a_Chunk);
 
 
 
-	
+
 
 cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulator(cWorld & a_World) :
 	super(a_World),
@@ -99,10 +103,11 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			// Changeable sources
 			((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
 			((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
-			((Block == E_BLOCK_DETECTOR_RAIL) && (Meta & 0x08) == 0) ||
+			((Block == E_BLOCK_DETECTOR_RAIL) && ((Meta & 0x08) == 0)) ||
 			(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
 			(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0)) ||
-			(((Block == E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE) || (Block == E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE)) && (Meta == 0))
+			(((Block == E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE) || (Block == E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE)) && (Meta == 0)) ||
+			((Block == E_BLOCK_TRIPWIRE_HOOK) && ((Meta & 0x08) == 0))
 			)
 		{
 			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
@@ -289,6 +294,9 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 		switch (dataitr->Data)
 		{
 			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
+			case E_BLOCK_TRIPWIRE:        HandleTripwire(dataitr->x, dataitr->y, dataitr->z);       break;
+			case E_BLOCK_TRIPWIRE_HOOK:   HandleTripwireHook(dataitr->x, dataitr->y, dataitr->z);   break;
+
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
@@ -1120,7 +1128,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		{
 			// MCS feature - stone pressure plates can only be triggered by players :D
-			cPlayer * a_Player = m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, (float)a_RelBlockY, BlockZ + 0.5f), 0.7f, false);
+			cPlayer * a_Player = m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, (float)a_RelBlockY, BlockZ + 0.5f), 0.5f, false);
 
 			if (a_Player != NULL)
 			{
@@ -1131,7 +1139,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			else
 			{
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
-				m_World.WakeUpSimulators(BlockX, a_RelBlockY, BlockZ);
+				WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
 			}
 			break;
 		}
@@ -1155,7 +1163,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
 					double Distance = (EntityPos - BlockPos).Length();
 
-					if (Distance <= 0.7)
+					if (Distance <= 0.5)
 					{
 						m_NumberOfEntities++;
 					}
@@ -1177,7 +1185,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			};
 
 			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
-			m_World.ForEachEntity(PressurePlateCallback);
+			m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
 
 			unsigned char Power;
 			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
@@ -1198,7 +1206,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-				m_World.WakeUpSimulators(BlockX, a_RelBlockY, BlockZ);
+				WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
 			}
 
 			break;
@@ -1223,7 +1231,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
 					double Distance = (EntityPos - BlockPos).Length();
 
-					if (Distance <= 0.7)
+					if (Distance <= 0.5)
 					{
 						m_NumberOfEntities++;
 					}
@@ -1232,7 +1240,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 
 				bool GetPowerLevel(unsigned char & a_PowerLevel) const
 				{
-					a_PowerLevel = std::min((int)ceil(m_NumberOfEntities / (float)10), MAX_POWER_LEVEL);
+					a_PowerLevel = std::min((int)ceil(m_NumberOfEntities / 10.f), MAX_POWER_LEVEL);
 					return (a_PowerLevel > 0);
 				}
 
@@ -1245,7 +1253,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			};
 
 			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
-			m_World.ForEachEntity(PressurePlateCallback);
+			m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
 
 			unsigned char Power;
 			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
@@ -1266,7 +1274,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-				m_World.WakeUpSimulators(BlockX, a_RelBlockY, BlockZ);
+				WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
 			}
 
 			break;
@@ -1291,7 +1299,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
 					double Distance = (EntityPos - BlockPos).Length();
 
-					if (Distance <= 0.7)
+					if (Distance <= 0.5)
 					{
 						m_FoundEntity = true;
 						return true; // Break out, we only need to know for plates that at least one entity is on top
@@ -1313,7 +1321,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			} ;
 
 			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
-			m_World.ForEachEntity(PressurePlateCallback);
+			m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
 
 			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 			if (PressurePlateCallback.FoundEntity())
@@ -1333,7 +1341,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-				m_World.WakeUpSimulators(BlockX, a_RelBlockY, BlockZ);
+				WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
 			}
 			break;
 		}
@@ -1342,6 +1350,131 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(a_MyType).c_str());
 			break;
 		}
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::HandleTripwireHook(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
+{
+	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
+	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
+	int RelX = a_RelBlockX, RelZ = a_RelBlockZ;
+	bool FoundActivated = false;
+	eBlockFace FaceToGoTowards = cBlockTripwireHookHandler::MetadataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ));
+
+	for (int i = 0; i < 40; ++i) // Tripwires can be connected up to 40 blocks
+	{
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+
+		AddFaceDirection(RelX, a_RelBlockY, RelZ, FaceToGoTowards);
+		m_Chunk->UnboundedRelGetBlock(RelX, a_RelBlockY, RelZ, Type, Meta);
+
+		if (Type == E_BLOCK_TRIPWIRE)
+		{
+			if (Meta == 0x1)
+			{
+				FoundActivated = true;
+			}
+		}
+		else if (Type == E_BLOCK_TRIPWIRE_HOOK)
+		{
+			if (ReverseBlockFace(cBlockTripwireHookHandler::MetadataToDirection(Meta)) == FaceToGoTowards)
+			{
+				// Other hook not facing in opposite direction
+				break;
+			}
+			else
+			{
+				// Tripwire hook not connected at all, AND away all the power state bits
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x3);
+				WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
+				return;
+			}
+		}
+		else
+		{
+			// Tripwire hook not connected at all, AND away all the power state bits
+			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x3);
+			WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
+			return;
+		}
+	}
+
+	if (FoundActivated)
+	{
+		// Connected and activated, set the 3rd and 4th highest bits
+		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) | 0xC);
+		SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	}
+	else
+	{
+		// Connected but not activated, AND away the highest bit
+		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, (m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7) | 0x4);
+		WAKE_SIMULATOR_IF_DIRTY(m_Chunk, BlockX, a_RelBlockY, BlockZ);
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::HandleTripwire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
+{
+	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
+	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
+
+	class cTripwireCallback :
+		public cEntityCallback
+	{
+	public:
+		cTripwireCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+			m_FoundEntity(false),
+			m_X(a_BlockX),
+			m_Y(a_BlockY),
+			m_Z(a_BlockZ)
+		{
+		}
+
+		virtual bool Item(cEntity * a_Entity) override
+		{
+			cBoundingBox bbWire(m_X, m_X + 1, m_Y, m_Y + 0.1, m_Z, m_Z + 1);
+			cBoundingBox bbEntity(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+
+			if (bbEntity.DoesIntersect(bbWire))
+			{
+				m_FoundEntity = true;
+				return true; // One entity is sufficient to trigger the wire
+			}
+			return false;
+		}
+
+		bool FoundEntity(void) const
+		{
+			return m_FoundEntity;
+		}
+
+	protected:
+		bool m_FoundEntity;
+
+		int m_X;
+		int m_Y;
+		int m_Z;
+	};
+
+	cTripwireCallback TripwireCallback(BlockX, a_RelBlockY, BlockZ);
+	m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), TripwireCallback);
+
+	if (TripwireCallback.FoundEntity())
+	{
+		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x1);
+	}
+	else
+	{
+		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
 	}
 }
 
