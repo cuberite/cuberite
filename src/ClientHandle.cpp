@@ -361,6 +361,9 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 	// Send scoreboard data
 	World->GetScoreBoard().SendTo(*this);
 
+	// Send statistics
+	SendStatistics(m_Player->GetStatManager());
+
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
 	cTimer t1;

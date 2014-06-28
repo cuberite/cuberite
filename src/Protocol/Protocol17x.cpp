@@ -1221,10 +1221,9 @@ void cProtocol172::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, 0x37);
 	Pkt.WriteVarInt(statCount); // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
-	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	for (size_t i = 0; i < (size_t)statCount; ++i)
 	{
 		StatValue Value = a_Manager.GetValue((eStatistic) i);
-
 		const AString & StatName = cStatInfo::GetName((eStatistic) i);
 
 		Pkt.WriteString(StatName);
