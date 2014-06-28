@@ -24,7 +24,10 @@ public:
 	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_WHEAT); }
 
 	bool IsSheared(void) const { return m_IsSheared; }
+	void SetSheared(bool a_IsSheared) { m_IsSheared = a_IsSheared; }
+
 	int GetFurColor(void) const { return m_WoolColor; }
+	void SetFurColor(bool a_WoolColor) { m_WoolColor = a_WoolColor; }
 
 private:
 	

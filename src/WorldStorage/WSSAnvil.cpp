@@ -2073,10 +2073,11 @@ void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
-
-	if (ColorIdx < 0) { return; }
-
-	int Color = (int)a_NBT.GetByte(ColorIdx);
+	int Color = -1;
+	if (ColorIdx > 0)
+	{
+		Color = (int)a_NBT.GetByte(ColorIdx);
+	}
 
 	std::auto_ptr<cSheep> Monster(new cSheep(Color));
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
@@ -2087,6 +2088,12 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
+	}
+
+	int ShearedIdx = a_NBT.FindChildByName(a_TagIdx, "Sheared");
+	if (ShearedIdx > 0)
+	{
+		Monster.get()->SetSheared((bool)a_NBT.GetByte(ShearedIdx));
 	}
 
 	a_Entities.push_back(Monster.release());
