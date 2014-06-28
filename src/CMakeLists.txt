@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
@@ -119,7 +119,8 @@ if (NOT MSVC)
 	
 	# lib dependencies are not included
 	
-	
+	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
+
 	#add cpp files here
 	add_library(Bindings
 		Bindings/Bindings
@@ -134,7 +135,7 @@ if (NOT MSVC)
 		Bindings/WebPlugin
 	)
 
-	target_link_libraries(Bindings lua sqlite tolualib)
+	target_link_libraries(Bindings lua sqlite tolualib polarssl)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
@@ -260,4 +261,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp polarssl zlib lua sqlite)
+target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib lua sqlite)
