@@ -4,7 +4,7 @@
 #include "ManualBindings.h"
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
-#include "polarssl\md5.h"
+#include "polarssl/md5.h"
 #include "Plugin.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
