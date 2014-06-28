@@ -13,7 +13,7 @@ class cSheep :
 	typedef cPassiveMonster super;
 	
 public:
-	cSheep(int a_Color);
+	cSheep(int a_Color = -1);
 	
 	CLASS_PROTODEF(cSheep);
 	

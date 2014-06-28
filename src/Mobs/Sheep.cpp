@@ -5,6 +5,7 @@
 #include "../BlockID.h"
 #include "../Entities/Player.h"
 #include "../World.h"
+#include "FastRandom.h"
 
 
 
@@ -16,6 +17,43 @@ cSheep::cSheep(int a_Color) :
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
 {
+	// Generate random wool color.
+	if (m_WoolColor == -1)
+	{
+		cFastRandom Random;
+		int Chance = Random.NextInt(101);
+
+		if (Chance <= 81)
+		{
+			// White
+			m_WoolColor = 0;
+		}
+		else if (Chance <= 86)
+		{
+			// Black
+			m_WoolColor = 15;
+		}
+		else if (Chance <= 91)
+		{
+			// Grey
+			m_WoolColor = 7;
+		}
+		else if (Chance <= 96)
+		{
+			// Light grey
+			m_WoolColor = 8;
+		}
+		else if (Chance <= 99)
+		{
+			// Brown
+			m_WoolColor = 12;
+		}
+		else
+		{
+			// Pink
+			m_WoolColor = 6;
+		}
+	}
 }
 
 
@@ -37,7 +75,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && (!m_IsSheared))
+	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
@@ -51,6 +89,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
 		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		m_World->BroadcastSoundEffect("mob.sheep.shear", POSX_TOINT * 8, POSY_TOINT * 8, POSZ_TOINT * 8, 1.0f, 1.0f);
 	}
 	else if ((EquippedItem.m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
 	{
