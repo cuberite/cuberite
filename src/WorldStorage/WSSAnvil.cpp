@@ -2093,7 +2093,7 @@ void cWSSAnvil::LoadSheepFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int ShearedIdx = a_NBT.FindChildByName(a_TagIdx, "Sheared");
 	if (ShearedIdx > 0)
 	{
-		Monster.get()->SetSheared((bool)a_NBT.GetByte(ShearedIdx));
+		Monster->SetSheared(a_NBT.GetByte(ShearedIdx) != 0);
 	}
 
 	a_Entities.push_back(Monster.release());
