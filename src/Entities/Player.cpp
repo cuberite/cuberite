@@ -1913,7 +1913,7 @@ void cPlayer::HandleFood(void)
 		{
 			m_FoodTickTimer = 0;
 
-			if (m_FoodLevel >= 17)
+			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
