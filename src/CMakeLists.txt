@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
