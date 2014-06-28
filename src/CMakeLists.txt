@@ -119,7 +119,8 @@ if (NOT MSVC)
 	
 	# lib dependencies are not included
 	
-	
+	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
+
 	#add cpp files here
 	add_library(Bindings
 		Bindings/Bindings
