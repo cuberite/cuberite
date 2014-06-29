@@ -2397,9 +2397,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(const cWorld & a_World)
+void cClientHandle::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_World);
+	m_Protocol->SendRespawn(a_World, a_ShouldIgnoreDimensionChecks);
 }
 
 

@@ -976,7 +976,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*m_World);
+	m_ClientHandle->SendRespawn(*m_World, true);
 	
 	// Extinguish the fire:
 	StopBurning();
