@@ -11,6 +11,7 @@
 #include "FastNBT.h"
 
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
@@ -182,6 +183,18 @@ void cNBTChunkSerializer::AddChestEntity(cChestEntity * a_Entity)
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddEnderChestEntity(cEnderChestEntity * a_Entity)
+{	
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Entity, "EnderChest");
+		// No need to store anything more
 	m_Writer.EndCompound();
 }
 
@@ -820,6 +833,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)        a_Entity); break;
 		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
 		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;
+		case E_BLOCK_ENDER_CHEST:   AddEnderChestEntity  ((cEnderChestEntity *)   a_Entity); break;
 		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)    a_Entity); break;
 		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
 		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;

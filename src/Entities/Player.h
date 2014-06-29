@@ -124,6 +124,9 @@ public:
 	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
+
+	/** Gets the contents of the player's associated enderchest */
+	cItemGrid & GetEnderChestContents(void) { return m_EnderChestContents; }
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
@@ -449,7 +452,13 @@ protected:
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
+
+	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
+
+	/** An item grid that stores the player specific enderchest contents */
+	cItemGrid m_EnderChestContents;
+
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
@@ -509,8 +518,6 @@ protected:
 	cTeam * m_Team;
 
 	cStatManager m_Stats;
-
-
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;

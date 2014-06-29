@@ -16,6 +16,7 @@
 #include "../StringCompression.h"
 
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
@@ -584,6 +585,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
 		}
+		else if (strncmp(a_NBT.GetData(sID), "EnderChest", a_NBT.GetDataLength(sID)) == 0)
+		{
+
+		}
 		else if (strncmp(a_NBT.GetData(sID), "Control", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadCommandBlockFromNBT(a_BlockEntities, a_NBT, Child);
@@ -756,6 +761,22 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World));
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
 	a_BlockEntities.push_back(Chest.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadEnderChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+	std::auto_ptr<cEnderChestEntity> EnderChest(new cEnderChestEntity(x, y, z, m_World));
+	a_BlockEntities.push_back(EnderChest.release());
 }
 
 

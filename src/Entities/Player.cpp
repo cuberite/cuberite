@@ -8,6 +8,7 @@
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"
 #include "../Root.h"
@@ -46,6 +47,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_bTouchGround(false)
 	, m_Stance(0.0)
 	, m_Inventory(*this)
+	, m_EnderChestContents(9, 3)
 	, m_CurrentWindow(NULL)
 	, m_InventoryWindow(NULL)
 	, m_Color('-')
@@ -1743,6 +1745,7 @@ bool cPlayer::LoadFromDisk()
 	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
+	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
 
@@ -1780,10 +1783,14 @@ bool cPlayer::SaveToDisk()
 	Json::Value JSON_Inventory;
 	m_Inventory.SaveToJson(JSON_Inventory);
 
+	Json::Value JSON_EnderChestInventory;
+	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
+
 	Json::Value root;
 	root["position"]       = JSON_PlayerPosition;
 	root["rotation"]       = JSON_PlayerRotation;
 	root["inventory"]      = JSON_Inventory;
+	root["enderchestinventory"] = JSON_EnderChestInventory;
 	root["health"]         = m_Health;
 	root["xpTotal"]        = m_LifetimeTotalXp;
 	root["xpCurrent"]      = m_CurrentXp;
