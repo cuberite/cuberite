@@ -241,9 +241,11 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// Generate an md5 checksum, and use it as base for the ID:
 	unsigned char MD5[16];
 	md5((const unsigned char *)a_Username.c_str(), a_Username.length(), MD5);
+	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
+	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
 	return Printf("%02x%02x%02x%02x-%02x%02x-3%01x%02x-8%01x%02x-%02x%02x%02x%02x%02x%02x",
-		MD5[0],  MD5[1],  MD5[2], MD5[3],
-		MD5[4],  MD5[5],  MD5[6], MD5[7],
+		MD5[0],  MD5[1],  MD5[2],  MD5[3],
+		MD5[4],  MD5[5],  MD5[6],  MD5[7],
 		MD5[8],  MD5[9],  MD5[10], MD5[11],
 		MD5[12], MD5[13], MD5[14], MD5[15]
 	);
