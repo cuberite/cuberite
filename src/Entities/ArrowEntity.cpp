@@ -69,7 +69,9 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Vector3d Hit = a_HitPos;
-	Hit += GetSpeed() / 700; // Make arrow sink into block a little
+	Vector3d SinkMovement = GetSpeed() / 800;
+	SinkMovement.Clamp(0.001, 0.001, 0.001, 0.05, 0.05, 0.05);
+	Hit += SinkMovement; // Make arrow sink into block a little
 
 	super::OnHitSolidBlock(Hit, a_HitFace);
 	int X = (int)floor(Hit.x), Y = (int)floor(Hit.y), Z = (int)floor(Hit.z);

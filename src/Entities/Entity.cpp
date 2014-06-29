@@ -255,7 +255,8 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::SetYawFromSpeed(void)
 {
-	if ((abs(m_Speed.x) < std::numeric_limits<double>::epsilon()) && (abs(m_Speed.z) < std::numeric_limits<double>::epsilon()))
+	const double EPS = 0.0000001;
+	if ((abs(m_Speed.x) < EPS) && (abs(m_Speed.z) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetYaw(0);
@@ -1235,7 +1236,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 	if (GetWorld()->GetWorldAge() % 2 == 0)
 	{
 		double SpeedSqr = GetSpeed().SqrLength();
-		if (SpeedSqr < std::numeric_limits<double>::epsilon())
+		if (SpeedSqr == 0.0)
 		{
 			// Speed is zero, send this to clients once only as well as an absolute position
 			if (!m_bHasSentNoSpeed)

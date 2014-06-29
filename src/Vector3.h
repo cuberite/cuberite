@@ -274,6 +274,14 @@ public:
 		return (a_X - x) / (a_OtherEnd.x - x);
 	}
 
+	/** Clamps each value in the vector to within a specified range */
+	inline void Clamp(T a_MinX, T a_MinY, T a_MinZ, T a_MaxX, T a_MaxY, T a_MaxZ)
+	{
+		x = Clamp(x, (T)copysign(a_MinX, x), (T)copysign(a_MaxX, x));
+		y = Clamp(y, (T)copysign(a_MinY, y), (T)copysign(a_MaxY, y));
+		z = Clamp(z, (T)copysign(a_MinZ, z), (T)copysign(a_MaxZ, z));
+	}
+
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;
 
@@ -287,6 +295,12 @@ protected:
 	static T Abs(T a_Value)
 	{
 		return (a_Value < 0) ? -a_Value : a_Value;
+	}
+
+	/** Clamp X to the specified range.	*/
+	T Clamp(T a_Value, T a_Min, T a_Max)
+	{
+		return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
 	}
 };
 // tolua_end
