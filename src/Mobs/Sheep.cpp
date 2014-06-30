@@ -20,39 +20,12 @@ cSheep::cSheep(int a_Color) :
 	// Generate random wool color.
 	if (m_WoolColor == -1)
 	{
-		cFastRandom Random;
-		int Chance = Random.NextInt(101);
+		m_WoolColor = GenerateNaturalRandomColor();
+	}
 
-		if (Chance <= 81)
-		{
-			// White
-			m_WoolColor = 0;
-		}
-		else if (Chance <= 86)
-		{
-			// Black
-			m_WoolColor = 15;
-		}
-		else if (Chance <= 91)
-		{
-			// Grey
-			m_WoolColor = 7;
-		}
-		else if (Chance <= 96)
-		{
-			// Light grey
-			m_WoolColor = 8;
-		}
-		else if (Chance <= 99)
-		{
-			// Brown
-			m_WoolColor = 12;
-		}
-		else
-		{
-			// Pink
-			m_WoolColor = 6;
-		}
+	if ((m_WoolColor < 0) || (m_WoolColor > 15))
+	{
+		m_WoolColor = 0;
 	}
 }
 
@@ -145,6 +118,41 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 				m_TimeToStopEating = 40;
 			}
 		}
+	}
+}
+
+
+
+
+
+NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
+{
+	cFastRandom Random;
+	int Chance = Random.NextInt(101);
+
+	if (Chance <= 81)
+	{
+		return E_META_WOOL_WHITE;
+	}
+	else if (Chance <= 86)
+	{
+		return E_META_WOOL_BLACK;
+	}
+	else if (Chance <= 91)
+	{
+		return E_META_WOOL_GRAY;
+	}
+	else if (Chance <= 96)
+	{
+		return E_META_WOOL_LIGHTGRAY;
+	}
+	else if (Chance <= 99)
+	{
+		return E_META_WOOL_BROWN;
+	}
+	else
+	{
+		return E_META_WOOL_PINK;
 	}
 }
 
