@@ -47,7 +47,7 @@ public:
 		double dot = Direction.Dot(LookVector);
 		
 		// 0.09 rad ~ 5 degrees.
-		// If the players crosshars are 10 degrees from the line linking the endermen
+		// If the players crosshair is within 5 degrees of the endermen
 		// It counts as looking.
 		if (dot > cos(0.09))
 		{
