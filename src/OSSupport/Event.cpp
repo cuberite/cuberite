@@ -18,7 +18,7 @@ cEvent::cEvent(void)
 	m_Event = CreateEvent(NULL, FALSE, FALSE, NULL);
 	if (m_Event == NULL)
 	{
-		LOGERROR("cEvent: cannot create event, GLE = %d. Aborting server.", GetLastError());
+		LOGERROR("cEvent: cannot create event, GLE = %u. Aborting server.", (unsigned)GetLastError());
 		abort();
 	}
 #else  // *nix
@@ -86,7 +86,7 @@ void cEvent::Wait(void)
 		DWORD res = WaitForSingleObject(m_Event, INFINITE);
 		if (res != WAIT_OBJECT_0)
 		{
-			LOGWARN("cEvent: waiting for the event failed: %d, GLE = %d. Continuing, but server may be unstable.", res, GetLastError());
+			LOGWARN("cEvent: waiting for the event failed: %u, GLE = %u. Continuing, but server may be unstable.", (unsigned)res, (unsigned)GetLastError());
 		}
 	#else
 		int res = sem_wait(m_Event);
@@ -107,7 +107,7 @@ void cEvent::Set(void)
 	#ifdef _WIN32
 		if (!SetEvent(m_Event))
 		{
-			LOGWARN("cEvent: Could not set cEvent: GLE = %d", GetLastError());
+			LOGWARN("cEvent: Could not set cEvent: GLE = %u", (unsigned)GetLastError());
 		}
 	#else
 		int res = sem_post(m_Event);
