@@ -87,6 +87,7 @@ public:																	// tolua_export
 		HOOK_PLAYER_EATING,
 		HOOK_PLAYER_FISHED,
 		HOOK_PLAYER_FISHING,
+		HOOK_PLAYER_FOOD_LEVEL_CHANGE,
 		HOOK_PLAYER_JOINED,
 		HOOK_PLAYER_LEFT_CLICK,
 		HOOK_PLAYER_MOVING,
@@ -188,6 +189,7 @@ public:																	// tolua_export
 	bool CallHookPlayerEating             (cPlayer & a_Player);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems a_Reward);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
+	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int & a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerMoving             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);

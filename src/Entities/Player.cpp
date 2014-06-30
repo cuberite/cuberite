@@ -37,9 +37,9 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: super(etPlayer, 0.6, 1.8)
 	, m_bVisible(true)
 	, m_FoodLevel(MAX_FOOD_LEVEL)
-	, m_FoodSaturationLevel(5)
+	, m_FoodSaturationLevel(5.0)
 	, m_FoodTickTimer(0)
-	, m_FoodExhaustionLevel(0)
+	, m_FoodExhaustionLevel(0.0)
 	, m_FoodPoisonedTicksRemaining(0)
 	, m_LastJumpHeight(0)
 	, m_LastGroundHeight(0)
@@ -521,7 +521,15 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	m_FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	a_FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, a_FoodLevel))
+	{
+		m_FoodSaturationLevel = 5.0;
+		return;
+	}
+	
+	m_FoodLevel = a_FoodLevel;
 	SendHealth();
 }
 
@@ -571,11 +579,9 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 	{
 		return false;
 	}
-	
-	m_FoodLevel = std::min(a_Food + m_FoodLevel, (int)MAX_FOOD_LEVEL);
-	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, (double)m_FoodLevel);
-	
-	SendHealth();
+
+	SetFoodSaturationLevel(m_FoodSaturationLevel + a_Saturation);
+	SetFoodLevel(m_FoodLevel + a_Food);
 	return true;
 }
 
@@ -969,7 +975,7 @@ void cPlayer::Respawn(void)
 	
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
-	m_FoodSaturationLevel = 5;
+	m_FoodSaturationLevel = 5.0;
 
 	// Reset Experience
 	m_CurrentXp = 0;
@@ -1895,16 +1901,13 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
-	
+
 	if (IsGameModeCreative())
 	{
 		// Hunger is disabled for Creative
 		return;
 	}
-	
-	// Remember the food level before processing, for later comparison
-	int LastFoodLevel = m_FoodLevel;
-	
+
 	// Heal or damage, based on the food level, using the m_FoodTickTimer:
 	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
 	{
@@ -1917,7 +1920,7 @@ void cPlayer::HandleFood(void)
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
-				m_FoodExhaustionLevel += 3;
+				m_FoodExhaustionLevel += 3.0;
 			}
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
@@ -1926,7 +1929,7 @@ void cPlayer::HandleFood(void)
 			}
 		}
 	}
-	
+
 	// Apply food poisoning food exhaustion:
 	if (m_FoodPoisonedTicksRemaining > 0)
 	{
@@ -1939,23 +1942,18 @@ void cPlayer::HandleFood(void)
 	}
 
 	// Apply food exhaustion that has accumulated:
-	if (m_FoodExhaustionLevel >= 4)
+	if (m_FoodExhaustionLevel >= 4.0)
 	{
-		m_FoodExhaustionLevel -= 4;
+		m_FoodExhaustionLevel -= 4.0;
 
-		if (m_FoodSaturationLevel >= 1)
+		if (m_FoodSaturationLevel >= 1.0)
 		{
-			m_FoodSaturationLevel -= 1;
+			m_FoodSaturationLevel -= 1.0;
 		}
 		else
 		{
-			m_FoodLevel = std::max(m_FoodLevel - 1, 0);
+			SetFoodLevel(m_FoodLevel - 1);
 		}
-	}
-	
-	if (m_FoodLevel != LastFoodLevel)
-	{
-		SendHealth();
 	}
 }
 
