@@ -1223,9 +1223,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		{
 			// A plugin won't let us eat, abort (send the proper packets to the client, too):
 			m_Player->AbortEating();
-			return;
 		}
-		return;
 	}
 	else
 	{
