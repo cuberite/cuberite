@@ -46,7 +46,7 @@ file(GLOB BIN_SOURCE
 
 add_executable(tolua ${BIN_SOURCE})
 add_library(tolualib ${LIB_SOURCE})
-target_link_library(tolualib lua)
+target_link_libraries(tolualib lua)
 
 #m is the standard math librarys
 if(UNIX)
