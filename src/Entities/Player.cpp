@@ -521,15 +521,15 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	a_FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, a_FoodLevel))
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
 		m_FoodSaturationLevel = 5.0;
 		return;
 	}
 	
-	m_FoodLevel = a_FoodLevel;
+	m_FoodLevel = FoodLevel;
 	SendHealth();
 }
 

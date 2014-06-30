@@ -722,7 +722,7 @@ bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int & a_NewFoodLeve
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FOOD_LEVEL_CHANGE];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_NewFoodLevel, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, a_NewFoodLevel, cLuaState::Return, res, a_NewFoodLevel);
 		if (res)
 		{
 			return true;
