@@ -74,8 +74,9 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	Hit += SinkMovement; // Make arrow sink into block a little
 
 	super::OnHitSolidBlock(Hit, a_HitFace);
-	int X = (int)floor(Hit.x), Y = (int)floor(Hit.y), Z = (int)floor(Hit.z);
-	
+	Hit.Floor();
+
+	int X = Hit.x, Y = Hit.y, Z = Hit.z;	
 	m_HitBlockPos = Vector3i(X, Y, Z);
 	
 	// Broadcast arrow hit sound
