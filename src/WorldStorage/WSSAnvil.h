@@ -134,7 +134,6 @@ protected:
 	void LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int s_SlotOffset = 0);
 	
 	void LoadChestFromNBT       (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadEnderChestFromNBT  (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDispenserFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadDropperFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFlowerPotFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);

@@ -21,7 +21,6 @@ class cEntity;
 class cBlockEntity;
 class cBoat;
 class cChestEntity;
-class cEnderChestEntity;
 class cCommandBlockEntity;
 class cDispenserEntity;
 class cDropperEntity;
@@ -94,7 +93,6 @@ protected:
 	// Block entities:
 	void AddBasicTileEntity(cBlockEntity *     a_Entity, const char * a_EntityTypeID);
 	void AddChestEntity    (cChestEntity *     a_Entity);
-	void AddEnderChestEntity(cEnderChestEntity * a_Entity);
 	void AddDispenserEntity(cDispenserEntity * a_Entity);
 	void AddDropperEntity  (cDropperEntity *   a_Entity);
 	void AddFurnaceEntity  (cFurnaceEntity *   a_Furnace);
