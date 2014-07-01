@@ -64,7 +64,7 @@ public:
 	virtual void SendChat                (const AString & a_Message) = 0;
 	virtual void SendChat                (const cCompositeChat & a_Message) = 0;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) = 0;
-	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) = 0;
+	virtual void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player) = 0;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) = 0;
 	virtual void SendDisconnect          (const AString & a_Reason) = 0;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
@@ -100,7 +100,7 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) = 0;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) = 0;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) = 0;
-	virtual void SendRespawn             (const cWorld & a_World) = 0;
+	virtual void SendRespawn             (const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks = false) = 0;
 	virtual void SendExperience          (void) = 0;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;

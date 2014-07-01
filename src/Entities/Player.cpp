@@ -1,4 +1,4 @@
-﻿
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
@@ -412,6 +412,7 @@ void cPlayer::StartChargingBow(void)
 	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
 	m_BowCharge = 0;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
 }
 
 
@@ -424,6 +425,8 @@ int cPlayer::FinishChargingBow(void)
 	int res = m_BowCharge;
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
+
 	return res;
 }
 
@@ -436,6 +439,7 @@ void cPlayer::CancelChargingBow(void)
 	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
 }
 
 
@@ -972,7 +976,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*m_World);
+	m_ClientHandle->SendRespawn(*m_World, true);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1909,7 +1913,7 @@ void cPlayer::HandleFood(void)
 		{
 			m_FoodTickTimer = 0;
 
-			if (m_FoodLevel >= 17)
+			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);

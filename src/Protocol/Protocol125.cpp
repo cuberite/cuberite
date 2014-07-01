@@ -274,11 +274,11 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 
 
-void cProtocol125::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocol125::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_COLLECT_PICKUP);
-	WriteInt (a_Pickup.GetUniqueID());
+	WriteInt (a_Entity.GetUniqueID());
 	WriteInt (a_Player.GetUniqueID());
 	Flush();
 }
@@ -833,12 +833,12 @@ void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol125::SendRespawn(const cWorld & a_World)
+void cProtocol125::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
 {
 	cCSLock Lock(m_CSPacket);
-	if (m_LastSentDimension == a_World.GetDimension())
+	if ((m_LastSentDimension == a_World.GetDimension()) && !a_ShouldIgnoreDimensionChecks)
 	{
-		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
+		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do (unless we are respawning from death)
 		return;
 	}
 	cPlayer * Player = m_Client->GetPlayer();

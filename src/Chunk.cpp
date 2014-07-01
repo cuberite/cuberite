@@ -2701,7 +2701,7 @@ void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClie
 
 
 
-void cChunk::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
@@ -2709,7 +2709,7 @@ void cChunk::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_
 		{
 			continue;
 		}
-		(*itr)->SendCollectPickup(a_Pickup, a_Player);
+		(*itr)->SendCollectEntity(a_Entity, a_Player);
 	}  // for itr - LoadedByClient[]
 }
 

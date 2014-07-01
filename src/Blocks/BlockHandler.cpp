@@ -65,6 +65,8 @@
 #include "BlockRedstoneRepeater.h"
 #include "BlockRedstoneTorch.h"
 #include "BlockTNT.h"
+#include "BlockTripwire.h"
+#include "BlockTripwireHook.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSideways.h"
@@ -291,6 +293,8 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
 		case E_BLOCK_TRAPDOOR:              return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_TNT:                   return new cBlockTNTHandler             (a_BlockType);
+		case E_BLOCK_TRIPWIRE:              return new cBlockTripwireHandler        (a_BlockType);
+		case E_BLOCK_TRIPWIRE_HOOK:         return new cBlockTripwireHookHandler    (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);  // TODO: This needs a special handler
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);

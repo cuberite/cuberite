@@ -30,7 +30,7 @@ public:
 
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() == m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
+		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
 		{
 			return false;
 		}
@@ -38,10 +38,31 @@ public:
 		Vector3d EntityPos = a_Entity->GetPosition();
 		double Distance = (EntityPos - m_Position).Length();
 
-		if ((Distance < 1.2) && ((cPickup *)a_Entity)->GetItem().IsEqual(m_Pickup->GetItem()))
+		cItem & Item = ((cPickup *)a_Entity)->GetItem();
+		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()))
 		{
-			m_Pickup->GetItem().AddCount(((cPickup *)a_Entity)->GetItem().m_ItemCount);
-			a_Entity->Destroy();
+			short CombineCount = Item.m_ItemCount;
+			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
+			{
+				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
+			}
+
+			if (CombineCount <= 0)
+			{
+				return false;
+			}
+
+			m_Pickup->GetItem().AddCount((char)CombineCount);
+			Item.m_ItemCount -= CombineCount;
+
+			if (Item.m_ItemCount <= 0)
+			{
+				a_Entity->Destroy();
+			}
+			else
+			{
+				a_Entity->GetWorld()->BroadcastEntityMetadata(*a_Entity);
+			}
 			m_FoundMatchingPickup = true;
 		}
 		return false;
@@ -129,7 +150,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				}
 			}
 
-			if (!IsDestroyed()) // Don't try to combine if someone has tried to combine me
+			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize())) // Don't combine into an already full pickup
 			{
 				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
 				m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
@@ -206,7 +227,7 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		m_World->BroadcastCollectPickup(*this, *a_Dest);
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
 		m_World->BroadcastSoundEffect("random.pop",(int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-		if (m_Item.m_ItemCount == 0)
+		if (m_Item.m_ItemCount <= 0)
 		{
 			// All of the pickup has been collected, schedule the pickup for destroying
 			m_bCollected = true;

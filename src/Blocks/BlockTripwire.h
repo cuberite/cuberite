@@ -7,20 +7,25 @@
 
 
 
-class cBlockStoneHandler :
+class cBlockTripwireHandler :
 	public cBlockHandler
 {
 public:
-	cBlockStoneHandler(BLOCKTYPE a_BlockType)
+	cBlockTripwireHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_COBBLESTONE, 1, 0));
+		a_Pickups.push_back(cItem(E_ITEM_STRING, 1, 0));
 	}
-} ;
+
+	virtual const char * GetStepSound(void) override
+	{
+		return "";
+	}
+};
 
 
 

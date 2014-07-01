@@ -351,12 +351,12 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 
 
-void cProtocol172::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocol172::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x0d);  // Collect Item packet
-	Pkt.WriteInt(a_Pickup.GetUniqueID());
+	Pkt.WriteInt(a_Entity.GetUniqueID());
 	Pkt.WriteInt(a_Player.GetUniqueID());
 }
 
@@ -986,11 +986,11 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol172::SendRespawn(const cWorld & a_World)
+void cProtocol172::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
 {
-	if (m_LastSentDimension == a_World.GetDimension())
+	if ((m_LastSentDimension == a_World.GetDimension()) && !a_ShouldIgnoreDimensionChecks)
 	{
-		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
+		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do (unless we are respawning from death)
 		return;
 	}
 
@@ -1221,10 +1221,9 @@ void cProtocol172::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, 0x37);
 	Pkt.WriteVarInt(statCount); // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
-	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	for (size_t i = 0; i < (size_t)statCount; ++i)
 	{
 		StatValue Value = a_Manager.GetValue((eStatistic) i);
-
 		const AString & StatName = cStatInfo::GetName((eStatistic) i);
 
 		Pkt.WriteString(StatName);

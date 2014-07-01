@@ -404,7 +404,7 @@ public:
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const { return IsEating(); }
+	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
 
 	virtual void Detach(void);
 	

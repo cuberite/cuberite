@@ -123,7 +123,7 @@ public:
 	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                (const cCompositeChat & a_Message);
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
+	void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);
 	void SendDisconnect          (const AString & a_Reason);
 	void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -156,7 +156,7 @@ public:
 	void SendPlayerSpawn         (const cPlayer & a_Player);
 	void SendPluginMessage       (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
-	void SendRespawn             (const cWorld & a_World);
+	void SendRespawn             (const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks = false);
 	void SendExperience          (void);
 	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
 	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);

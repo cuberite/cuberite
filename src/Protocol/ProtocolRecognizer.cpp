@@ -181,10 +181,10 @@ void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSe
 
 
 
-void cProtocolRecognizer::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+	m_Protocol->SendCollectEntity(a_Entity, a_Player);
 }
 
 
@@ -556,10 +556,10 @@ void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a
 
 
 
-void cProtocolRecognizer::SendRespawn(const cWorld & a_World)
+void cProtocolRecognizer::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendRespawn(a_World);
+	m_Protocol->SendRespawn(a_World, a_ShouldIgnoreDimensionChecks);
 }
 
 
