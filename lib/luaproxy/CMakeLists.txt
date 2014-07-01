@@ -23,14 +23,17 @@ if (WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS_DEBUG      "${CMAKE_EXE_LINKER_FLAGS_DEBUG}      /NOENTRY /DEF:lua5.1.def /MANIFEST:NO")
 		set(CMAKE_SHARED_LINKER_FLAGS_DEBUG   "${CMAKE_SHARED_LINKER_FLAGS_DEBUG}   /NOENTRY /DEF:lua5.1.def /MANIFEST:NO")
 		set(CMAKE_MODULE_LINKER_FLAGS_DEBUG   "${CMAKE_MODULE_LINKER_FLAGS_DEBUG}   /NOENTRY /DEF:lua5.1.def /MANIFEST:NO")
+	elseif (MINGW)
+		# MinGW requires no further flags and has been tested
 	else()
-		message ("This code has not been tested on your compiler. Please report your success or failure in the forum.")
+		message ("LuaProxy: This cmake code has not been tested on your compiler. Please report your success or failure in the forum.")
 	endif()
 
 	add_library(luaproxy SHARED "lua5.1.def" "Dummy.c")
 	set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/MCServer)
 	set_target_properties(luaproxy PROPERTIES
 		OUTPUT_NAME "lua5.1"
+		PREFIX ""
 	)
 	target_link_libraries(luaproxy lua)
 
