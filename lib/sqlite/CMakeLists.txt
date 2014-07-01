@@ -29,7 +29,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 endif()
 
 add_library(sqlite ${SOURCE})
+target_link_libraries(sqlite lua)
 
 if (UNIX)
-	target_link_libraries(sqlite ${DYNAMIC_LOADER} lua)
+	target_link_libraries(sqlite ${DYNAMIC_LOADER})
 endif()
