@@ -1714,7 +1714,7 @@ bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer 
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
 	cCSLock Lock(m_CriticalSection);
-	bool res;
+	bool res = false;
 	m_LuaState.Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
 	return res;
 }
