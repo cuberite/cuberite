@@ -69,14 +69,18 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Vector3d Hit = a_HitPos;
-	Vector3d SinkMovement = GetSpeed() / 800;
-	SinkMovement.Clamp(0.001, 0.001, 0.001, 0.05, 0.05, 0.05);
+	Vector3d SinkMovement = GetSpeed() / 800; // Base value for arrow penetration
+	SinkMovement = Clamp( // Adjust the movement so that fast arrows don't go through blocks (though in reality they would, in addition to exploding into fragments :P)
+		SinkMovement,
+		(SinkMovement * 0.001) / SinkMovement.Length(),
+		(SinkMovement * 0.05) / SinkMovement.Length()
+		);
 	Hit += SinkMovement; // Make arrow sink into block a little
 
 	super::OnHitSolidBlock(Hit, a_HitFace);
-	Hit.Floor();
+	Vector3i BlockHit = Hit.Floor();
 
-	int X = Hit.x, Y = Hit.y, Z = Hit.z;	
+	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
 	m_HitBlockPos = Vector3i(X, Y, Z);
 	
 	// Broadcast arrow hit sound

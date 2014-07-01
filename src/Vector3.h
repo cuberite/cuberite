@@ -135,19 +135,13 @@ public:
 	}
 
 	/** Runs each value of the vector through std::floor() */
-	inline void Floor(void)
+	inline Vector3<T> Floor(void) const
 	{
-		x = (T)floor(x);
-		y = (T)floor(y);
-		z = (T)floor(z);
-	}
-
-	/** Clamps each value in the vector to within a specified range */
-	inline void Clamp(T a_MinX, T a_MinY, T a_MinZ, T a_MaxX, T a_MaxY, T a_MaxZ)
-	{
-		x = Clamp(x, (T)copysign(a_MinX, x), (T)copysign(a_MaxX, x));
-		y = Clamp(y, (T)copysign(a_MinY, y), (T)copysign(a_MaxY, y));
-		z = Clamp(z, (T)copysign(a_MinZ, z), (T)copysign(a_MaxZ, z));
+		return Vector3<T>(
+			(T)floor(x),
+			(T)floor(y),
+			(T)floor(z)
+		);
 	}
 
 	// tolua_end
@@ -160,6 +154,16 @@ public:
 	inline bool operator == (const Vector3<T> & a_Rhs) const
 	{
 		return Equals(a_Rhs);
+	}
+
+	inline bool operator > (const Vector3<T> & a_Rhs) const
+	{
+		return (SqrLength() > a_Rhs.SqrLength());
+	}
+
+	inline bool operator < (const Vector3<T> & a_Rhs) const
+	{
+		return (SqrLength() < a_Rhs.SqrLength());
 	}
 
 	inline void operator += (const Vector3<T> & a_Rhs)
@@ -305,11 +309,6 @@ protected:
 		return (a_Value < 0) ? -a_Value : a_Value;
 	}
 
-	/** Clamp X to the specified range.	*/
-	T Clamp(T a_Value, T a_Min, T a_Max)
-	{
-		return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
-	}
 };
 // tolua_end
 
