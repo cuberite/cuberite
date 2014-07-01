@@ -170,7 +170,7 @@ void cWindow::Clicked(
 	const cItem & a_ClickedItem
 )
 {
-    	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (a_WindowID != m_WindowID)
 	{
 		LOGWARNING("%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.", __FUNCTION__, m_WindowID, a_WindowID, a_Player.GetName().c_str());

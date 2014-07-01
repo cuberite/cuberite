@@ -63,7 +63,7 @@ cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
-	if (a_ItemType < 0)
+	if ((a_ItemType < 0) || ((unsigned long)a_ItemType >= ARRAYCOUNT(m_ItemHandler)))
 	{
 		// Either nothing (-1), or bad value, both cases should return the air handler
 		if (a_ItemType < -1)
