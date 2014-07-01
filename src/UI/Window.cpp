@@ -170,7 +170,13 @@ void cWindow::Clicked(
 	const cItem & a_ClickedItem
 )
 {
-    	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	if (!IsValidItem(a_ClickedItem.m_ItemType) && !IsValidBlock(a_ClickedItem.m_ItemType))
+	{
+		LOGWARNING("%s: Player \"%s\" clicked to a non-existing item; ignoring click.", __FUNCTION__, a_Player.GetName().c_str());
+		return;
+	}
+
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (a_WindowID != m_WindowID)
 	{
 		LOGWARNING("%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.", __FUNCTION__, m_WindowID, a_WindowID, a_Player.GetName().c_str());
