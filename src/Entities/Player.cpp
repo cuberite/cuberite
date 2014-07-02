@@ -1787,20 +1787,20 @@ bool cPlayer::SaveToDisk()
 	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
 
 	Json::Value root;
-	root["position"]       = JSON_PlayerPosition;
-	root["rotation"]       = JSON_PlayerRotation;
-	root["inventory"]      = JSON_Inventory;
+	root["position"]            = JSON_PlayerPosition;
+	root["rotation"]            = JSON_PlayerRotation;
+	root["inventory"]           = JSON_Inventory;
 	root["enderchestinventory"] = JSON_EnderChestInventory;
-	root["health"]         = m_Health;
-	root["xpTotal"]        = m_LifetimeTotalXp;
-	root["xpCurrent"]      = m_CurrentXp;
-	root["air"]            = m_AirLevel;
-	root["food"]           = m_FoodLevel;
-	root["foodSaturation"] = m_FoodSaturationLevel;
-	root["foodTickTimer"]  = m_FoodTickTimer;
-	root["foodExhaustion"] = m_FoodExhaustionLevel;
-	root["world"]          = GetWorld()->GetName();
-	root["isflying"]       = IsFlying();
+	root["health"]              = m_Health;
+	root["xpTotal"]             = m_LifetimeTotalXp;
+	root["xpCurrent"]           = m_CurrentXp;
+	root["air"]                 = m_AirLevel;
+	root["food"]                = m_FoodLevel;
+	root["foodSaturation"]      = m_FoodSaturationLevel;
+	root["foodTickTimer"]       = m_FoodTickTimer;
+	root["foodExhaustion"]      = m_FoodExhaustionLevel;
+	root["world"]               = GetWorld()->GetName();
+	root["isflying"]            = IsFlying();
 
 	if (m_GameMode == GetWorld()->GetGameMode())
 	{
