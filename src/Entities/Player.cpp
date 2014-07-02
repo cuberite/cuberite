@@ -71,6 +71,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_FloaterID(-1)
 	, m_Team(NULL)
 	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
+	, m_bIsTeleporting(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -225,7 +226,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (GetPosition() != m_LastPos) // Change in position from last tick?
+	if (!GetPosition().EqualsEps(m_LastPos, 0.01)) // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
@@ -970,6 +971,7 @@ void cPlayer::Respawn(void)
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
 	m_FoodSaturationLevel = 5;
+	m_FoodExhaustionLevel = 0;
 
 	// Reset Experience
 	m_CurrentXp = 0;
@@ -1226,6 +1228,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	SetPosition(a_PosX, a_PosY, a_PosZ);
 	m_LastGroundHeight = (float)a_PosY;
 	m_LastJumpHeight = (float)a_PosY;
+	m_bIsTeleporting = true;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 	m_ClientHandle->SendPlayerMoveLook();
@@ -2077,6 +2080,11 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 {
 	if (IsGameModeCreative())
 	{
+		return;
+	}
+	if (m_bIsTeleporting)
+	{
+		m_bIsTeleporting = false;
 		return;
 	}
 

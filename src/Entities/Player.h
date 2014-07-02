@@ -546,6 +546,11 @@ protected:
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
 	unsigned int m_TicksUntilNextSave;
 
+	/** Flag used by food handling system to determine whether a teleport has just happened
+	Will not apply food penalties if found to be true; will set to false after processing
+	*/
+	bool m_bIsTeleporting;
+
 } ; // tolua_export
 
 
