@@ -1341,8 +1341,7 @@ cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWind
 
 const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
-	// a_SlotNum ranges from 0 to 26, use that to index the chest entity's inventory directly:
-	return &(m_EnderChest->GetSlot(a_SlotNum));
+	return &(a_Player.GetEnderChestContents().GetSlot(a_SlotNum));
 }
 
 
@@ -1351,7 +1350,7 @@ const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, cPlayer & a_Player) co
 
 void cSlotAreaEnderChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	m_EnderChest->SetSlot(a_SlotNum, a_Item);
+	a_Player.GetEnderChestContents().SetSlot(a_SlotNum, a_Item);
 }
 
 

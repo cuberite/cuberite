@@ -145,8 +145,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 	{
 		int NumSlots = (*itr)->GetNumSlots();
 		for (int i = 0; i < NumSlots; i++)
-		{
-			
+		{			
 			const cItem * Item = (*itr)->GetSlot(i, a_Player);
 			if (Item == NULL)
 			{
@@ -1017,6 +1016,7 @@ cEnderChestWindow::~cEnderChestWindow()
 	// Send out the chest-close packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_ENDER_CHEST);
 
+	// Play the closing sound
 	m_World->BroadcastSoundEffect("random.chestclosed", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
 }
 

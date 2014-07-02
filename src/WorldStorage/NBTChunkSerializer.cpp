@@ -820,6 +820,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)        a_Entity); break;
 		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
 		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;
+		case E_BLOCK_ENDER_CHEST:   /* No need to be saved */                                break;
 		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)    a_Entity); break;
 		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
 		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;
