@@ -1700,7 +1700,7 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 		{
 			continue;
 		}
-		a_PowerLevel = itr->a_PowerLevel;
+		a_PowerLevel = std::max(itr->a_PowerLevel , a_PowerLevel); // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
 	}
 
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr) // Check linked powered list
@@ -1709,7 +1709,7 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 		{
 			continue;
 		}
-		a_PowerLevel = itr->a_PowerLevel;
+		a_PowerLevel = std::max(itr->a_PowerLevel, a_PowerLevel);
 	}
 
 	return (a_PowerLevel != 0); // Answer the inital question: is the wire powered?
