@@ -695,6 +695,25 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
+{
+	FIND_HOOK(HOOK_PLAYER_FOOD_LEVEL_CHANGE);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFoodLevelChange(a_Player, a_NewFoodLevel))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems a_Reward)
 {
 	FIND_HOOK(HOOK_PLAYER_FISHED);
