@@ -58,8 +58,14 @@ public:
 	
 	/// Sets the IsCritical flag
 	void SetIsCritical(bool a_IsCritical) { m_IsCritical = a_IsCritical; }
+
+	/** Gets the block arrow is in */
+	Vector3i GetBlockHit(void) const { return m_HitBlockPos; }
 	
 	// tolua_end
+
+	/** Sets the block arrow is in */
+	void SetBlockHit(const Vector3i & a_BlockHit) { m_HitBlockPos = a_BlockHit; }
 	
 protected:
 	

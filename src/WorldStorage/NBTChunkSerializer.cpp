@@ -589,20 +589,19 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
 		Vector3d Pos = a_Projectile->GetPosition();
-		m_Writer.AddShort("xTile",  (Int16)floor(Pos.x));
-		m_Writer.AddShort("yTile",  (Int16)floor(Pos.y));
-		m_Writer.AddShort("zTile",  (Int16)floor(Pos.z));
-		m_Writer.AddShort("inTile", 0);  // TODO: Query the block type
-		m_Writer.AddShort("shake",  0);  // TODO: Any shake?
-		m_Writer.AddByte ("inGround", a_Projectile->IsInGround() ? 1 : 0);
+		m_Writer.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
 		
 		switch (a_Projectile->GetProjectileKind())
 		{
 			case cProjectileEntity::pkArrow:
 			{
-				m_Writer.AddByte("inData",   0);  // TODO: Query the block meta (is it needed?)
-				m_Writer.AddByte("pickup",   ((cArrowEntity *)a_Projectile)->GetPickupState());
-				m_Writer.AddDouble("damage", ((cArrowEntity *)a_Projectile)->GetDamageCoeff());
+				cArrowEntity * Arrow = (cArrowEntity *)a_Projectile;
+
+				m_Writer.AddInt("xTile", (Int16)Arrow->GetBlockHit().x);
+				m_Writer.AddInt("yTile", (Int16)Arrow->GetBlockHit().y);
+				m_Writer.AddInt("zTile", (Int16)Arrow->GetBlockHit().z);
+				m_Writer.AddByte("pickup",   Arrow->GetPickupState());
+				m_Writer.AddDouble("damage", Arrow->GetDamageCoeff());
 				break;
 			}
 			case cProjectileEntity::pkGhastFireball:
