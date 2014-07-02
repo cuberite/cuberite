@@ -88,7 +88,7 @@ if (WIN32)
 		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
 
 		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND copy /y ..\\..\\MCServer\\lua51.dll .
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ..\\..\\MCServer\\lua51.dll .\\lua51.dll
 
 		# Regenerate bindings:
 		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
