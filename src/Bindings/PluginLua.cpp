@@ -715,14 +715,14 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int & a_NewFoodLevel)
+bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FOOD_LEVEL_CHANGE];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_NewFoodLevel, cLuaState::Return, res, a_NewFoodLevel);
+		m_LuaState.Call((int)(**itr), &a_Player, a_NewFoodLevel, cLuaState::Return, res);
 		if (res)
 		{
 			return true;

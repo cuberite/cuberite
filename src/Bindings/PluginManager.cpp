@@ -695,7 +695,7 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int & a_NewFoodLevel)
+bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 {
 	FIND_HOOK(HOOK_PLAYER_FOOD_LEVEL_CHANGE);
 	VERIFY_HOOK;
