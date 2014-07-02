@@ -46,4 +46,7 @@ public:
 
 	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
 
+	/** Wakes up the simulators for the specified block */
+	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
+
 };
