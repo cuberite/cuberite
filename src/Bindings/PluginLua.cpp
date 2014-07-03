@@ -1347,18 +1347,15 @@ bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	int NewWeather = a_NewWeather;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WEATHER_CHANGING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_World, NewWeather, cLuaState::Return, res, NewWeather);
+		m_LuaState.Call((int)(**itr), &a_World, a_NewWeather, cLuaState::Return, res, a_NewWeather);
 		if (res)
 		{
-			a_NewWeather = (eWeather)NewWeather;
 			return true;
 		}
 	}
-	a_NewWeather = (eWeather)NewWeather;
 	return false;
 }
 

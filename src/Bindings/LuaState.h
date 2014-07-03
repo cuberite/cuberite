@@ -30,6 +30,7 @@ extern "C"
 }
 
 #include "../Vector3.h"
+#include "../Defines.h"
 
 
 
@@ -221,6 +222,10 @@ public:
 	
 	/** Retrieve value at a_StackPos, if it is a valid number. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, double & a_Value);
+	
+	/** Retrieve value at a_StackPos, if it is a valid number, converting and clamping it to eWeather.
+	If not, a_Value is unchanged. */
+	void GetStackValue(int a_StackPos, eWeather & a_Value);
 	
 
 	/** Call any 0-param 0-return Lua function in a single line: */
