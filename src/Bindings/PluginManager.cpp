@@ -257,9 +257,13 @@ bool cPluginManager::CallHookBlockToPickups(
 
 bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 {
-	if (HandleCommand(a_Player, a_Message, true) != crUnknownCommand)  // We use HandleCommand as opposed to ExecuteCommand to accomodate the need to the WasCommandForbidden bool
+	switch (HandleCommand(a_Player, a_Message, true))
 	{
-		return true;  // Chat message was handled as command
+		case crExecuted: return true;
+		case crError: a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str())); return true;
+		case crBlocked: return true; // The plugin that blocked the command probably wants to send a message to the player.
+		case crNoPermission: a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str())); return true;
+		case crUnknownCommand: break;
 	}
 
 	// Check if it was a standard command (starts with a slash)
@@ -1343,7 +1347,6 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 		!a_Player->HasPermission(cmd->second.m_Permission)
 	)
 	{
-		a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
 		return crNoPermission;
 	}
@@ -1352,7 +1355,6 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 
 	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player))
 	{
-		a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", Split[0].c_str()));
 		return crError;
 	}
 
