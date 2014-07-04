@@ -257,17 +257,44 @@ bool cPluginManager::CallHookBlockToPickups(
 
 bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 {
+	// Check if the message contains a command, execute it:
 	switch (HandleCommand(a_Player, a_Message, true))
 	{
-		case crExecuted: return true;
-		case crError: a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str())); return true;
-		case crBlocked: return true; // The plugin that blocked the command probably wants to send a message to the player.
-		case crNoPermission: a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str())); return true;
-		case crUnknownCommand: break;
+		case crExecuted:
+		{
+			// The command has executed successfully
+			return true;
+		}
+		
+		case crBlocked:
+		{
+			// The command was blocked by a plugin using HOOK_EXECUTE_COMMAND
+			// The plugin has most likely sent a message to the player already
+			return true;
+		}
+		
+		case crError:
+		{
+			// An error in the plugin has prevented the command from executing. Report the error to the player:
+			a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			return true;
+		}
+		
+		case crNoPermission:
+		{
+			// The player is not allowed to execute this command
+			a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			return true;
+		}
+
+		case crUnknownCommand:
+		{
+			// This was not a known command, keep processing as a message
+			break;
+		}
 	}
 
-	// Check if it was a standard command (starts with a slash)
-	// If it was, we know that it was completely unrecognised
+	// Check if the message is a command (starts with a slash). If it is, we know that it wasn't recognised:
 	if (!a_Message.empty() && (a_Message[0] == '/'))
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
