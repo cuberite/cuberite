@@ -216,7 +216,10 @@ protected:
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :
 	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : ""),
+	m_CreatorData(
+		((a_Creator != NULL) ? a_Creator->GetUniqueID() : -1),
+		((a_Creator != NULL) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : "")
+	),
 	m_IsInGround(false)
 {
 }
@@ -298,7 +301,7 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 
 cEntity * cProjectileEntity::GetCreator()
 {
-	if (m_CreatorData.m_Name.empty())
+	if (m_CreatorData.m_Name.empty() && (m_CreatorData.m_UniqueID >= 1))
 	{
 		class cProjectileCreatorCallback : public cEntityCallback
 		{
@@ -328,7 +331,7 @@ cEntity * cProjectileEntity::GetCreator()
 		GetWorld()->DoWithEntityByID(m_CreatorData.m_UniqueID, PCC);
 		return PCC.GetEntity();
 	}
-	else
+	else if (!m_CreatorData.m_Name.empty())
 	{
 		class cProjectileCreatorCallbackForPlayers : public cPlayerListCallback
 		{
@@ -358,6 +361,8 @@ cEntity * cProjectileEntity::GetCreator()
 		GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, PCCFP);
 		return PCCFP.GetEntity();
 	}
+
+	return NULL;
 }
 
 
