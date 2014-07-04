@@ -889,9 +889,9 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::KilledBy(cEntity * a_Killer)
+void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 
 	if (m_Health > 0)
 	{
@@ -915,19 +915,40 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
-	if (a_Killer == NULL)
+	if (a_TDI.Attacker == NULL)
 	{
-		GetWorld()->BroadcastChatDeath(Printf("%s was killed by environmental damage", GetName().c_str()));
+		AString DamageText;
+		switch (a_TDI.DamageType)
+		{
+			case dtRangedAttack: DamageText = "was shot"; break;
+			case dtLightning: DamageText = "was plasmified by lightining"; break;
+			case dtFalling: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
+			case dtDrowning: DamageText = "drowned"; break;
+			case dtSuffocating: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
+			case dtStarving: DamageText = "forgot the importance of food"; break;
+			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
+			case dtLavaContact: DamageText = "was melted by lava"; break;
+			case dtPoisoning: DamageText = "died from septicaemia"; break;
+			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
+			case dtFireContact: DamageText = "burnt themselves to death"; break;
+			case dtInVoid: DamageText = "somehow fell out of the world"; break;
+			case dtPotionOfHarming: DamageText = "was magicked to death"; break;
+			case dtEnderPearl: DamageText = "misused an ender pearl"; break;
+			case dtAdmin: DamageText = "was administrator'd"; break;
+			case dtExplosion: DamageText = "blew up"; break;
+			default: DamageText = "died, somehow; we've no idea how though"; break;
+		}
+		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
 	}
-	else if (a_Killer->IsPlayer())
+	else if (a_TDI.Attacker->IsPlayer())
 	{
-		cPlayer * Killer = (cPlayer *)a_Killer;
+		cPlayer * Killer = (cPlayer *)a_TDI.Attacker;
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
 	}
 	else
 	{
-		AString KillerClass = a_Killer->GetClass();
+		AString KillerClass = a_TDI.Attacker->GetClass();
 		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));

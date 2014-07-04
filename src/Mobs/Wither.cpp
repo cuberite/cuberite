@@ -103,9 +103,9 @@ void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cWither::KilledBy(cEntity * a_Killer)
+void cWither::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 
 	class cPlayerCallback : public cPlayerListCallback
 	{
