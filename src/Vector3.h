@@ -137,7 +137,7 @@ public:
 	/** Runs each value of the vector through std::floor() */
 	inline Vector3<int> Floor(void) const
 	{
-		return Vector3i(
+		return Vector3<int>(
 			(int)floor(x),
 			(int)floor(y),
 			(int)floor(z)
