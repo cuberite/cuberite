@@ -20,7 +20,7 @@ cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, do
 
 void cThrownSnowballEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
-	m_DestroyTimer = 5;
+	m_DestroyTimer = 2;
 }
 
 

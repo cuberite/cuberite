@@ -41,7 +41,10 @@ protected:
 				return;
 			}
 		}
-		else { super::Tick(a_Dt, a_Chunk); }
+		else
+		{
+			super::Tick(a_Dt, a_Chunk);
+		}
 	}
 	
 	/** Teleports the creator where the ender pearl lands */

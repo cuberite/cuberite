@@ -41,7 +41,10 @@ protected:
 				return;
 			}
 		}
-		else { super::Tick(a_Dt, a_Chunk); }
+		else
+		{
+			super::Tick(a_Dt, a_Chunk);
+		}
 	}
 	
 	// Randomly decides whether to spawn a chicken where the egg lands.

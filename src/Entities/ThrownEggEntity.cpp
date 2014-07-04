@@ -22,7 +22,7 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 {
 	TrySpawnChicken(a_HitPos);
 	
-	m_DestroyTimer = 5;
+	m_DestroyTimer = 2;
 }
 
 

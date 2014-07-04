@@ -22,7 +22,7 @@ void cThrownEnderPearlEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockF
 	// TODO: Tweak a_HitPos based on block face.
 	TeleportCreator(a_HitPos);
 	
-	m_DestroyTimer = 5;
+	m_DestroyTimer = 2;
 }
 
 

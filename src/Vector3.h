@@ -135,12 +135,12 @@ public:
 	}
 
 	/** Runs each value of the vector through std::floor() */
-	inline Vector3<T> Floor(void) const
+	inline Vector3<int> Floor(void) const
 	{
-		return Vector3<T>(
-			(T)floor(x),
-			(T)floor(y),
-			(T)floor(z)
+		return Vector3i(
+			(int)floor(x),
+			(int)floor(y),
+			(int)floor(z)
 		);
 	}
 
