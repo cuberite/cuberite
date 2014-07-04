@@ -2776,10 +2776,8 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 void cWorld::SaveAllChunks(void)
 {
-	LOGINFO("Saving all chunks...");
 	m_LastSave = m_WorldAge;
 	m_ChunkMap->SaveAllChunks();
-	m_Storage.QueueSavedMessage();
 }
 
 
