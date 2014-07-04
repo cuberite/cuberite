@@ -64,7 +64,7 @@ public:
 	
 	// tolua_end
 
-	/** Sets the block arrow is in */
+	/** Sets the block arrow is in. To be used by the MCA loader only! */
 	void SetBlockHit(const Vector3i & a_BlockHit) { m_HitBlockPos = a_BlockHit; }
 	
 protected:
