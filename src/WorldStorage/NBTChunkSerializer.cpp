@@ -619,14 +619,11 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			{
 				ASSERT(!"Unsaved projectile entity!");
 			}
-		}  // switch (ProjectileKind)
-		cEntity * Creator = a_Projectile->GetCreator();
-		if (Creator != NULL)
+		}  // switch (ProjectileKind)		
+
+		if (!a_Projectile->GetCreatorName().empty())
 		{
-			if (Creator->GetEntityType() == cEntity::etPlayer)
-			{
-				m_Writer.AddString("ownerName", ((cPlayer *)Creator)->GetName());
-			}
+			m_Writer.AddString("ownerName", a_Projectile->GetCreatorName());
 		}
 	m_Writer.EndCompound();
 }

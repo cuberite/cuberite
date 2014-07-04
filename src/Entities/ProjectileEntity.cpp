@@ -21,6 +21,7 @@
 #include "FireChargeEntity.h"
 #include "FireworkEntity.h"
 #include "GhastFireballEntity.h"
+#include "Player.h"
 
 
 
@@ -215,7 +216,7 @@ protected:
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :
 	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_Creator(a_Creator),
+	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : ""),
 	m_IsInGround(false)
 {
 }
@@ -227,7 +228,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height) :
 	super(etProjectile, a_Pos.x, a_Pos.y, a_Pos.z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_Creator(a_Creator),
+	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : ""),
 	m_IsInGround(false)
 {
 	SetSpeed(a_Speed);
@@ -295,6 +296,74 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 
 
 
+cEntity * cProjectileEntity::GetCreator()
+{
+	if (m_CreatorData.m_Name.empty())
+	{
+		class cProjectileCreatorCallback : public cEntityCallback
+		{
+		public:
+			cProjectileCreatorCallback(void) :
+				m_Entity(NULL)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				m_Entity = a_Entity;
+				return true;
+			}
+
+			cEntity * GetEntity(void)
+			{
+				return m_Entity;
+			}
+
+		private:
+
+			cEntity * m_Entity;
+		};
+
+		cProjectileCreatorCallback PCC;
+		GetWorld()->DoWithEntityByID(m_CreatorData.m_UniqueID, PCC);
+		return PCC.GetEntity();
+	}
+	else
+	{
+		class cProjectileCreatorCallbackForPlayers : public cPlayerListCallback
+		{
+		public:
+			cProjectileCreatorCallbackForPlayers(void) :
+				m_Entity(NULL)
+			{
+			}
+
+			virtual bool Item(cPlayer * a_Entity) override
+			{
+				m_Entity = a_Entity;
+				return true;
+			}
+
+			cPlayer * GetEntity(void)
+			{
+				return m_Entity;
+			}
+
+		private:
+
+			cPlayer * m_Entity;
+		};
+
+		cProjectileCreatorCallbackForPlayers PCCFP;
+		GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, PCCFP);
+		return PCCFP.GetEntity();
+	}
+}
+
+
+
+
+
 AString cProjectileEntity::GetMCAClassName(void) const
 {
 	switch (m_ProjectileKind)
@@ -304,7 +373,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkEgg:           return "Egg";
 		case pkGhastFireball: return "Fireball";
 		case pkFireCharge:    return "SmallFireball";
-		case pkEnderPearl:    return "ThrownEnderPearl";
+		case pkEnderPearl:    return "ThrownEnderpearl";
 		case pkExpBottle:     return "ThrownExpBottle";
 		case pkSplashPotion:  return "ThrownPotion";
 		case pkWitherSkull:   return "WitherSkull";

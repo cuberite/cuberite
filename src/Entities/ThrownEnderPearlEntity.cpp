@@ -46,10 +46,12 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d 
 
 void cThrownEnderPearlEntity::TeleportCreator(const Vector3d & a_HitPos)
 {
+	cEntity * Creator = GetCreator();
+
 	// Teleport the creator here, make them take 5 damage:
-	if (m_Creator != NULL)
+	if (Creator != NULL)
 	{
-		m_Creator->TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
-		m_Creator->TakeDamage(dtEnderPearl, this, 5, 0);
+		Creator->TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
+		Creator->TakeDamage(dtEnderPearl, this, 5, 0);
 	}
 }
