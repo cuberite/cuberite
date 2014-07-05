@@ -66,10 +66,10 @@ public:
 	/// Returns the kind of the projectile (fast class identification)
 	eKind GetProjectileKind(void) const { return m_ProjectileKind; }
 	
-	/** Returns the entity who created this projectile through running its Unique ID through cWorld::DoWithEntityByID()
-	May return NULL; do not store the returned pointer outside the scope of the tick thread!
+	/** Returns the unique ID of the entity who created this projectile
+	May return an ID <0
 	*/
-	cEntity * GetCreator(void);
+	int GetCreatorUniqueID(void) { return m_CreatorData.m_UniqueID; }
 
 	/** Returns the name of the player that created the projectile
 	Will be empty for non-player creators

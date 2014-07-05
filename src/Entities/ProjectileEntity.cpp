@@ -142,7 +142,7 @@ public:
 	{
 		if (
 			(a_Entity == m_Projectile) ||          // Do not check collisions with self
-			(a_Entity == m_Projectile->GetCreator())  // Do not check whoever shot the projectile
+			(a_Entity->GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
 		)
 		{
 			// TODO: Don't check creator only for the first 5 ticks
@@ -293,76 +293,6 @@ void cProjectileEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_
 	);
 
 	m_IsInGround = true;
-}
-
-
-
-
-
-cEntity * cProjectileEntity::GetCreator()
-{
-	if (m_CreatorData.m_Name.empty() && (m_CreatorData.m_UniqueID >= 1))
-	{
-		class cProjectileCreatorCallback : public cEntityCallback
-		{
-		public:
-			cProjectileCreatorCallback(void) :
-				m_Entity(NULL)
-			{
-			}
-
-			virtual bool Item(cEntity * a_Entity) override
-			{
-				m_Entity = a_Entity;
-				return true;
-			}
-
-			cEntity * GetEntity(void)
-			{
-				return m_Entity;
-			}
-
-		private:
-
-			cEntity * m_Entity;
-		};
-
-		cProjectileCreatorCallback PCC;
-		GetWorld()->DoWithEntityByID(m_CreatorData.m_UniqueID, PCC);
-		return PCC.GetEntity();
-	}
-	else if (!m_CreatorData.m_Name.empty())
-	{
-		class cProjectileCreatorCallbackForPlayers : public cPlayerListCallback
-		{
-		public:
-			cProjectileCreatorCallbackForPlayers(void) :
-				m_Entity(NULL)
-			{
-			}
-
-			virtual bool Item(cPlayer * a_Entity) override
-			{
-				m_Entity = a_Entity;
-				return true;
-			}
-
-			cPlayer * GetEntity(void)
-			{
-				return m_Entity;
-			}
-
-		private:
-
-			cPlayer * m_Entity;
-		};
-
-		cProjectileCreatorCallbackForPlayers PCCFP;
-		GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, PCCFP);
-		return PCCFP.GetEntity();
-	}
-
-	return NULL;
 }
 
 
