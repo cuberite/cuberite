@@ -71,6 +71,12 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			MiddleClicked(a_Player, a_SlotNum);
 			return;
 		}
+		case caDropKey:
+		case caCtrlDropKey:
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
 		default:
 		{
 			break;
@@ -243,6 +249,34 @@ void cSlotArea::MiddleClicked(cPlayer & a_Player, int a_SlotNum)
 
 	DraggingItem = Slot;
 	DraggingItem.m_ItemCount = DraggingItem.GetMaxStackSize();
+}
+
+
+
+
+
+void cSlotArea::DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack)
+{
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (Slot.IsEmpty())
+	{
+		return;
+	}
+
+	cItem ItemToDrop = Slot.CopyOne();
+	if (a_DropStack)
+	{
+		ItemToDrop.m_ItemCount = Slot.m_ItemCount;
+	}
+
+	Slot.m_ItemCount -= ItemToDrop.m_ItemCount;
+	if (Slot.m_ItemCount <= 0)
+	{
+		Slot.Empty();
+	}
+	SetSlot(a_SlotNum, a_Player, Slot);
+
+	a_Player.TossPickup(ItemToDrop);
 }
 
 
@@ -446,6 +480,10 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction 
 		{
 			ShiftClickedResult(a_Player);
 		}
+		else if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClickedResult(a_Player);
+		}
 		else
 		{
 			ClickedResult(a_Player);
@@ -594,6 +632,27 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 
 
 
+void cSlotAreaCrafting::DropClickedResult(cPlayer & a_Player)
+{
+	// Get the current recipe:
+	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
+	const cItem & Result = Recipe.GetResult();
+
+	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
+	cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
+
+	a_Player.TossPickup(Result);
+	Recipe.ConsumeIngredients(Grid);
+	Grid.CopyToItems(PlayerSlots);
+
+	HandleCraftItem(Result, a_Player);
+	UpdateRecipe(a_Player);
+}
+
+
+
+
+
 void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 {
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
@@ -696,6 +755,16 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		case caMiddleClick:
 		{
 			MiddleClicked(a_Player, a_SlotNum);
+			return;
+		}
+		case caDropKey:
+		case caCtrlDropKey:
+		{
+			if (CanTakeResultItem(a_Player))
+			{
+				DropClicked(a_Player, a_SlotNum, true);
+				OnTakeResult(a_Player);
+			}
 			return;
 		}
 		default:
@@ -1453,17 +1522,32 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			bAsync = true;
 		}
 
-		if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+		switch (a_ClickAction)
 		{
-			HandleSmeltItem(Slot, a_Player);
-			ShiftClicked(a_Player, a_SlotNum, Slot);
-			return;
-		}
-
-		if (a_ClickAction == caMiddleClick)
-		{
-			MiddleClicked(a_Player, a_SlotNum);
-			return;
+			case caShiftLeftClick:
+			case caShiftRightClick:
+			{
+				HandleSmeltItem(Slot, a_Player);
+				ShiftClicked(a_Player, a_SlotNum, Slot);
+				return;
+			}
+			case caMiddleClick:
+			{
+				MiddleClicked(a_Player, a_SlotNum);
+				return;
+			}
+			case caDropKey:
+			case caCtrlDropKey:
+			{
+				DropClicked(a_Player, a_SlotNum, (a_SlotNum == caCtrlDropKey));
+				Slot.m_ItemCount = Slot.m_ItemCount - GetSlot(a_SlotNum, a_Player)->m_ItemCount;
+				HandleSmeltItem(Slot, a_Player);
+				return;
+			}
+			default:
+			{
+				break;
+			}
 		}
 
 		cItem & DraggingItem = a_Player.GetDraggingItem();
@@ -1641,6 +1725,12 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 {
 	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
 	{
+		if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
+		
 		// Creative inventory must treat a_ClickedItem as a DraggedItem instead, replacing the inventory slot with it
 		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
 		return;

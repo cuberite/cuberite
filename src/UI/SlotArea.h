@@ -53,6 +53,9 @@ public:
 	/** Called from Clicked when the action is a middleclick */
 	virtual void MiddleClicked(cPlayer & a_Player, int a_SlotNum);
 
+	/** Called from Clicked when the action is a drop click. */
+	virtual void DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack);
+
 	/// Called when a new player opens the same parent window. The window already tracks the player. CS-locked.
 	virtual void OnPlayerAdded(cPlayer & a_Player);
 	
@@ -251,6 +254,9 @@ protected:
 	
 	/// Handles a shift-click in the result slot. Crafts using the current recipe until it changes or no more space for result.
 	void ShiftClickedResult(cPlayer & a_Player);
+
+	/** Handles a drop-click in the result slot. */
+	void DropClickedResult(cPlayer & a_Player);
 	
 	/// Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the specified player
 	void UpdateRecipe(cPlayer & a_Player);
