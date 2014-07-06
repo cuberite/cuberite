@@ -157,6 +157,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (a_Chunk.GetBlock(m_RelX, m_PosY + 1, m_RelZ))
 	{
+		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		{
 			// Chests have special handling because of double-chests
@@ -322,6 +323,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (DestChunk->GetBlock(OutRelX, OutY, OutRelZ))
 	{
+		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		{
 			// Chests have special handling because of double-chests
@@ -395,13 +397,17 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		int x = m_RelX + Coords[i].x;
 		int z = m_RelZ + Coords[i].z;
 		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
-		if (
-			(Neighbor == NULL) ||
-			(Neighbor->GetBlock(x, m_PosY + 1, z) != E_BLOCK_CHEST)
-		)
+		if (Neighbor == NULL)
 		{
 			continue;
 		}
+
+		BLOCKTYPE Block = Neighbor->GetBlock(x, m_PosY + 1, z);
+		if ((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST))
+		{
+			continue;
+		}
+
 		Chest = (cChestEntity *)Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
 		if (Chest == NULL)
 		{
@@ -572,13 +578,17 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		int x = RelX + Coords[i].x;
 		int z = RelZ + Coords[i].z;
 		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
-		if (
-			(Neighbor == NULL) ||
-			(Neighbor->GetBlock(x, a_BlockY, z) != E_BLOCK_CHEST)
-		)
+		if (Neighbor == NULL)
 		{
 			continue;
 		}
+
+		BLOCKTYPE Block = Neighbor->GetBlock(x, a_BlockY, z);
+		if ((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST))
+		{
+			continue;
+		}
+
 		Chest = (cChestEntity *)Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z);
 		if (Chest == NULL)
 		{

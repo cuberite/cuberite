@@ -11,8 +11,9 @@
 
 
 
-cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World)
+cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type) :
+	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+	m_ActivePlayers(0)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
@@ -113,7 +114,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 	// The few false positives aren't much to worry about
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
-	m_World->MarkChunkDirty(ChunkX, ChunkZ);
+	m_World->MarkChunkDirty(ChunkX, ChunkZ, true);
 }
 
 

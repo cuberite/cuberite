@@ -1297,6 +1297,7 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_BEACON:
+					case E_BLOCK_TRAPPED_CHEST:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
@@ -1427,6 +1428,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEACON:
+		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:
@@ -2121,7 +2123,7 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 		{
 			continue;
 		}
-		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
+		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST) /* Trapped chests use normal chests' handlers */)
 		{
 			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
 			return false;
@@ -2501,8 +2503,8 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 	{
 		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
-		int BlockY, ChunkX, ChunkZ;
-		AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+		int ChunkX, ChunkZ;
+		BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 		return m_ChunkMap->GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	}
 

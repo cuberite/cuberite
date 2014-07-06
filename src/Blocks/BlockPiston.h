@@ -104,6 +104,7 @@ private:
 			case E_BLOCK_ENCHANTMENT_TABLE:
 			case E_BLOCK_END_PORTAL:
 			case E_BLOCK_END_PORTAL_FRAME:
+			// Ender chests can totally be pushed/pulled in MCS :)
 			case E_BLOCK_FURNACE:
 			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_HOPPER:
@@ -113,6 +114,7 @@ private:
 			case E_BLOCK_NOTE_BLOCK:
 			case E_BLOCK_OBSIDIAN:
 			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_TRAPPED_CHEST:
 			{
 				return false;
 			}
@@ -126,24 +128,10 @@ private:
 		return true;
 	}
 
-	/// Returns true if the specified block can be pushed by a piston and broken / replaced
-	static inline bool CanBreakPush(BLOCKTYPE a_BlockType) { return cBlockInfo::IsPistonBreakable(a_BlockType); }
-
 	/// Returns true if the specified block can be pulled by a sticky piston
 	static inline bool CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		switch (a_BlockType)
-		{
-			case E_BLOCK_LAVA:
-			case E_BLOCK_STATIONARY_LAVA:
-			case E_BLOCK_STATIONARY_WATER:
-			case E_BLOCK_WATER:
-			{
-				return false;
-			}
-		}
-
-		if (CanBreakPush(a_BlockType))
+		if (cBlockInfo::IsPistonBreakable(a_BlockType))
 		{
 			return false; // CanBreakPush returns true, but we need false to prevent pulling
 		}

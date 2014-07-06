@@ -389,8 +389,8 @@ void cWorld::InitializeSpawn(void)
 		IniFile.WriteFile(m_IniFileName);
 	}
 
-	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
-	BlockToChunk((int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ);
+	int ChunkX = 0, ChunkZ = 0;
+	cChunkDef::BlockToChunk((int)m_SpawnX, (int)m_SpawnZ, ChunkX, ChunkZ);
 	
 	// For the debugging builds, don't make the server build too much world upon start:
 	#if defined(_DEBUG) || defined(ANDROID_NDK)
@@ -2191,9 +2191,18 @@ void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 
 
 
-void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
+void cWorld::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkZ);
+	m_ChunkMap->MarkRedstoneDirty(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
+{
+	m_ChunkMap->MarkChunkDirty(a_ChunkX, a_ChunkZ, a_MarkRedstoneDirty);
 }
 
 
