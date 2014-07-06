@@ -232,6 +232,7 @@ public:
 	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void DblClicked     (cPlayer & a_Player, int a_SlotNum);
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+	virtual void SetSlot        (int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 	// Distributing items into this area is completely disabled
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;

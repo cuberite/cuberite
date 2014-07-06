@@ -468,6 +468,20 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
+void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	// Update the recipe after setting the slot, if the slot is not the result slot:
+	super::SetSlot(a_SlotNum, a_Player, a_Item);
+	if (a_SlotNum != 0)
+	{
+		UpdateRecipe(a_Player);
+	}
+}
+
+
+
+
+
 void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
 {
 	UNUSED(a_ItemStack);
@@ -545,16 +559,20 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 		// Distribute the result, this time for real:
 		ResultCopy = Result;
 		m_ParentWindow.DistributeStack(ResultCopy, a_Player, this, true);
-		
+
 		// Remove the ingredients from the crafting grid and update the recipe:
 		cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
 		cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
 		Recipe.ConsumeIngredients(Grid);
 		Grid.CopyToItems(PlayerSlots);
 		UpdateRecipe(a_Player);
+
+		// Broadcast the window, we sometimes move items to different locations than Vanilla, causing needless desyncs:
+		m_ParentWindow.BroadcastWholeWindow();
+		
+		// If the recipe has changed, bail out:
 		if (!Recipe.GetResult().IsEqual(Result))
 		{
-			// The recipe has changed, bail out
 			return;
 		}
 	}
