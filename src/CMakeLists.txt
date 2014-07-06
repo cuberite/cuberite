@@ -12,6 +12,7 @@ set(BINDING_DEPENDECIES
 	tolua
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
+	Bindings/gen_LuaState_Call.lua
 	Bindings/LuaFunctions.h
 	Bindings/LuaWindow.h
 	Bindings/Plugin.h
@@ -79,13 +80,19 @@ set(BINDING_DEPENDECIES
 	World.h
 )
 
+# List all the files that are generated as part of the Bindings build process
+set (BINDING_OUTPUTS
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/LuaState_Call.inc
+)
+
 include_directories(Bindings)
 include_directories(.)
 
 if (WIN32)
 	ADD_CUSTOM_COMMAND(
-		# add any new generated bindings here
-		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+		OUTPUT ${BINDING_OUTPUTS}
 
 		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ../../MCServer/lua51.dll ./lua51.dll
