@@ -69,15 +69,15 @@ protected:
 		if (cBlockInfo::IsSolid(a_BlockType))
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1); // Bounding box of the block hit
-			const Vector3d LineStart = m_Projectile->GetPosition(); // Start point for the imaginary line that goes through the block hit
-			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed(); // End point for the imaginary line that goes through the block hit
-			double LineCoeff = 0; // Used to calculate where along the line an intersection with the bounding box occurs
-			eBlockFace Face; // Face hit
+			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+			const Vector3d LineStart = m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
+			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
+			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+			eBlockFace Face;  // Face hit
 
 			if (bb.CalcLineIntersection(LineStart, LineEnd, LineCoeff, Face))
 			{
-				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff; // Point where projectile goes into the hit block
+				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
 				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, &Intersection))
 				{
