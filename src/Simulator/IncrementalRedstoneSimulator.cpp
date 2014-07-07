@@ -101,8 +101,6 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 			((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
 			((Block == E_BLOCK_DETECTOR_RAIL) && ((Meta & 0x08) == 0)) ||
 			(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
-			(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0)) ||
-			(((Block == E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE) || (Block == E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE)) && (Meta == 0)) ||
 			((Block == E_BLOCK_TRIPWIRE_HOOK) && ((Meta & 0x08) == 0))
 			)
 		{
@@ -129,9 +127,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 				// Things that can send power through a block but which depends on meta
 				((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
 				((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
-				(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
-				(((Block == E_BLOCK_STONE_PRESSURE_PLATE) || (Block == E_BLOCK_WOODEN_PRESSURE_PLATE)) && (Meta == 0)) ||
-				(((Block == E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE) || (Block == E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE)) && (Meta == 0))
+				(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta)))
 				)
 			{
 				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
@@ -1241,7 +1237,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+				SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
 			}
 
 			break;
@@ -1308,7 +1304,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+				SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
 			}
 			break;
 		}
@@ -1907,7 +1903,7 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 		}
 	}
 
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)  // Check powered list
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)  // Check powered list
 	{
 		if (			
 			itr->a_BlockPos.Equals(Vector3i(SourceX, a_RelSourceY, SourceZ)) &&
