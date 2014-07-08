@@ -294,7 +294,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		0,
 
 		// MoveToGround:
-		false,
+		true,
 	},  // Farm
 
 

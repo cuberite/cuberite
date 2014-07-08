@@ -58,9 +58,9 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"o: 50: 4\n"  /* torch */
 		"p: 13: 0\n"  /* gravel */
 		"q:  5: 0\n"  /* wood */
-		"r: 96:12\n"  /* trapdoor */
+		"r: 96: 8\n"  /* trapdoor */
 		"s:128: 5\n"  /* sandstonestairs */
-		"t:107: 0\n"  /* fencegate */
+		"t:107: 2\n"  /* fencegate */
 		"u:128: 4\n"  /* sandstonestairs */
 		"v:134: 3\n"  /* 134 */
 		"w: 85: 0\n"  /* fence */
@@ -288,7 +288,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"d: 13: 0\n"  /* gravel */
 		"e:  5: 0\n"  /* wood */
 		"f:128: 5\n"  /* sandstonestairs */
-		"g:107: 0\n"  /* fencegate */
+		"g:107: 2\n"  /* fencegate */
 		"h:128: 4\n"  /* sandstonestairs */
 		"i:134: 1\n"  /* 134 */
 		"j:134: 3\n"  /* 134 */
@@ -298,7 +298,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"n:134: 5\n"  /* 134 */
 		"o:134: 7\n"  /* 134 */
 		"p:134: 4\n"  /* 134 */
-		"q:107: 5\n"  /* fencegate */
+		"q:107: 1\n"  /* fencegate */
 		"r: 64: 1\n"  /* wooddoorblock */
 		"s: 65: 3\n"  /* ladder */
 		"t: 50: 3\n"  /* torch */
@@ -2195,7 +2195,7 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		0,
 
 		// MoveToGround:
-		false,
+		true,
 	},  // LittleHouse8
 
 
