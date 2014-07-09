@@ -365,7 +365,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
 	a_Info[E_BLOCK_MELON_STEM          ].m_IsSolid = false;
 	a_Info[E_BLOCK_NETHER_PORTAL       ].m_IsSolid = false;
-	a_Info[E_BLOCK_PISTON_EXTENSION    ].m_IsSolid = false;
 	a_Info[E_BLOCK_POTATOES            ].m_IsSolid = false;
 	a_Info[E_BLOCK_POWERED_RAIL        ].m_IsSolid = false;
 	a_Info[E_BLOCK_RAIL                ].m_IsSolid = false;

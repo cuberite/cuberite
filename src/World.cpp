@@ -1886,15 +1886,6 @@ void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 
 
 
-void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastCollectEntity(a_Pickup, a_Player, a_Exclude);
-}
-
-
-
-
-
 void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
