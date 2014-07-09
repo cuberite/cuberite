@@ -41,7 +41,7 @@ public:
 	
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_BlockFace > 0)
+		if (a_BlockFace < 0)
 		{
 			return false;
 		}
