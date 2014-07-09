@@ -1642,6 +1642,15 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		Arrow->SetDamageCoeff(a_NBT.GetDouble(DamageIdx));
 	}
 	
+	// Load block hit:
+	int InBlockXIdx = a_NBT.FindChildByName(a_TagIdx, "xTile");
+	int InBlockYIdx = a_NBT.FindChildByName(a_TagIdx, "yTile");
+	int InBlockZIdx = a_NBT.FindChildByName(a_TagIdx, "zTile");
+	if ((InBlockXIdx > 0) && (InBlockYIdx > 0) && (InBlockZIdx > 0))
+	{
+		Arrow->SetBlockHit(Vector3i(a_NBT.GetInt(InBlockXIdx), a_NBT.GetInt(InBlockYIdx), a_NBT.GetInt(InBlockZIdx)));
+	}
+	
 	// Store the new arrow in the entities list:
 	a_Entities.push_back(Arrow.release());
 }
@@ -2473,8 +2482,6 @@ bool cWSSAnvil::LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cP
 		IsInGround = (a_NBT.GetByte(InGroundIdx) != 0);
 	}
 	a_Entity.SetIsInGround(IsInGround);
-	
-	// TODO: Load inTile, TileCoords
 	
 	return true;
 }

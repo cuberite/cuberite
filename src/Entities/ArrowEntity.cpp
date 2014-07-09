@@ -72,26 +72,24 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
-{
-	if (a_HitFace == BLOCK_FACE_NONE) { return; }
-	
-	super::OnHitSolidBlock(a_HitPos, a_HitFace);
-	int a_X = (int)a_HitPos.x, a_Y = (int)a_HitPos.y, a_Z = (int)a_HitPos.z;
-	
-	switch (a_HitFace)
+{	
+	if (GetSpeed().EqualsEps(Vector3d(0, 0, 0), 0.0000001))
 	{
-		case BLOCK_FACE_XM: // Strangely, bounding boxes / block tracers return the actual block for these two directions, so AddFace not needed
-		case BLOCK_FACE_YM:
-		{
-			break;
-		}
-		default: AddFaceDirection(a_X, a_Y, a_Z, a_HitFace, true);
+		SetSpeed(GetLookVector().NormalizeCopy() * 0.1); // Ensure that no division by zero happens later
 	}
-	
-	m_HitBlockPos = Vector3i(a_X, a_Y, a_Z);
+
+	Vector3d Hit = a_HitPos;
+	Vector3d SinkMovement = (GetSpeed() / 800);
+	Hit += (SinkMovement * 0.01) / SinkMovement.Length(); // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
+
+	super::OnHitSolidBlock(Hit, a_HitFace);
+	Vector3i BlockHit = Hit.Floor();
+
+	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
+	m_HitBlockPos = Vector3i(X, Y, Z);
 	
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("random.bowhit", X * 8, Y * 8, Z * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 }
 
 
@@ -99,13 +97,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
-{
-	if (!a_EntityHit.IsMob() && !a_EntityHit.IsMinecart() && !a_EntityHit.IsPlayer() && !a_EntityHit.IsBoat())
-	{
-		// Not an entity that interacts with an arrow
-		return;
-	}
-	
+{	
 	int Damage = (int)(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
 	if (m_IsCritical)
 	{
@@ -194,7 +186,7 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		
 		if (!m_HasTeleported) // Sent a teleport already, don't do again
 		{
-			if (m_HitGroundTimer > 1000.f) // Send after a second, could be less, but just in case
+			if (m_HitGroundTimer > 500.f) // Send after half a second, could be less, but just in case
 			{
 				m_World->BroadcastTeleportEntity(*this);
 				m_HasTeleported = true;
