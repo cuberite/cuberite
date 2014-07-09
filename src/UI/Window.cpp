@@ -178,6 +178,7 @@ void cWindow::Clicked(
 
 	switch (a_ClickAction)
 	{
+		case caLeftClickOutside:
 		case caRightClickOutside:
 		{
 			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
@@ -190,25 +191,16 @@ void cWindow::Clicked(
 				a_Player.TossPickup(a_ClickedItem);
 			}
 
-			// Toss one of the dragged items:
-			a_Player.TossHeldItem();
-			return;
-		}
-		case caLeftClickOutside:
-		{
-			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
+			if (a_ClickAction == caLeftClickOutside)
 			{
-				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
-				return;
+				// Toss all dragged items:
+				a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 			}
-
-			if (a_Player.IsGameModeCreative())
+			else
 			{
-				a_Player.TossPickup(a_ClickedItem);
+				// Toss one of the dragged items:
+				a_Player.TossHeldItem();
 			}
-
-			// Toss all dragged items:
-			a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 			return;
 		}
 		case caLeftClickOutsideHoldNothing:
