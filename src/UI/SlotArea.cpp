@@ -77,6 +77,19 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
 			return;
 		}
+		case caNumber1:
+		case caNumber2:
+		case caNumber3:
+		case caNumber4:
+		case caNumber5:
+		case caNumber6:
+		case caNumber7:
+		case caNumber8:
+		case caNumber9:
+		{
+			NumberClicked(a_Player, a_SlotNum, a_ClickAction);
+			return;
+		}
 		default:
 		{
 			break;
@@ -277,6 +290,31 @@ void cSlotArea::DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack)
 	SetSlot(a_SlotNum, a_Player, Slot);
 
 	a_Player.TossPickup(ItemToDrop);
+}
+
+
+
+
+
+void cSlotArea::NumberClicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction)
+{
+	if ((a_ClickAction < caNumber1) || (a_ClickAction > caNumber9))
+	{
+		return;
+	}
+
+	int HotbarSlot = (int)a_ClickAction - (int)caNumber1;
+	cItem ItemInHotbar(a_Player.GetInventory().GetHotbarSlot(HotbarSlot));
+	cItem ItemInSlot(*GetSlot(a_SlotNum, a_Player));
+
+	// The items are equal. Do nothing.
+	if (ItemInHotbar.IsEqual(ItemInSlot))
+	{
+		return;
+	}
+
+	a_Player.GetInventory().SetHotbarSlot(HotbarSlot, ItemInSlot);
+	SetSlot(a_SlotNum, a_Player, ItemInHotbar);
 }
 
 
