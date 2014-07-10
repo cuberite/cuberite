@@ -2426,6 +2426,23 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 
 
 
+bool cChunkMap::ForEachLoadedChunk(cChunkCoordsCallback & a_Callback)
+{
+        cCSLock Lock(m_CSLayers);
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		if (!(*itr)->ForEachLoadedChunk(a_Callback))
+                {
+                    return false;
+                }
+	}
+	return true;
+}
+
+
+
+
+
 bool cChunkMap::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	// Convert block coords to chunks coords:
@@ -2872,6 +2889,25 @@ bool cChunkMap::cChunkLayer::HasEntity(int a_EntityID)
 		}
 	}
 	return false;
+}
+
+
+
+
+
+bool cChunkMap::cChunkLayer::ForEachLoadedChunk(cChunkCoordsCallback & a_Callback)
+{
+        for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
+	{
+		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid())
+		{
+			if (a_Callback.Item(m_Chunks[i].GetPosX(), m_Chunks[i].GetPosZ()))
+                        {
+                                return false;
+                        }
+		}
+	}
+	return true;
 }
 
 
