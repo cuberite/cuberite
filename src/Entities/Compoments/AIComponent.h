@@ -1,11 +1,11 @@
 #pragma once
-
-#include "../Entity.h"
+#include "../Entities/Entity.h"
+#include "../Mobs/Monster.h"
 
 class cAIComponent
 {
 protected:
-	cEntity * m_Self;
+	cMonster * m_Self;
 public:
 	cAIComponent(cEntity * a_Entity) : m_Self(a_Entity){}
 	
