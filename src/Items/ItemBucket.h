@@ -100,19 +100,19 @@ public:
 			return false;
 		}
 		
+		BLOCKTYPE CurrentBlock;
 		Vector3i BlockPos;
-		if (!GetPlaceableBlockFromTrace(a_World, a_Player, BlockPos))
+		if (!GetPlaceableBlockFromTrace(a_World, a_Player, BlockPos, CurrentBlock))
 		{
 			return false;
 		}
 		
-		BLOCKTYPE CurrentBlock = a_World->GetBlock(BlockPos);
 		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
 		if (!CanWashAway)
 		{
 			// The block pointed at cannot be washed away, so put fluid on top of it / on its sides
-			//AddFaceDirection(BlockPos.x, BlockPos.y, BlockPos.z, a_BlockFace);
-			CurrentBlock = a_World->GetBlock(BlockPos);
+			// AddFaceDirection(BlockPos.x, BlockPos.y, BlockPos.z, a_BlockFace);
+			// CurrentBlock = a_World->GetBlock(BlockPos);
 		}
 		if (
 			!CanWashAway && 
@@ -161,7 +161,7 @@ public:
 	}
 
 
-	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & BlockPos)
+	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos)
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
@@ -204,19 +204,20 @@ public:
 		}
 
 
-		BlockPos.Set(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z);
+		a_BlockPos = Callbacks.m_Pos;
 		return true;
 	}
         
         
-        bool GetPlaceableBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & BlockPos)
+        bool GetPlaceableBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
 		{
 		public:
-			Vector3i  m_Pos;
-			bool      m_HasHitLastBlock;
+			Vector3i   m_Pos;
+			bool       m_HasHitLastBlock;
+			BLOCKTYPE  m_LastBlock;
 			
 
 			cCallbacks(void) :
@@ -226,15 +227,16 @@ public:
 			
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
-                                if (a_BlockType != E_BLOCK_AIR)
-                                {
-                                        m_HasHitLastBlock = true;
-                                        return true;
-                                }
-                                
-                                m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
-                                
-                                return false;
+				if (a_BlockType != E_BLOCK_AIR)
+				{
+					m_HasHitLastBlock = true;
+					return true;
+				}
+				
+				m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+				m_LastBlock = a_BlockType;
+				
+				return false;
 			}
 		} Callbacks;
 
@@ -249,8 +251,8 @@ public:
 			return false;
 		}
 
-
-		BlockPos.Set(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z);
+		a_BlockPos = Callbacks.m_Pos;
+		a_BlockType = Callbacks.m_LastBlock;
 		return true;
 	}
 };
