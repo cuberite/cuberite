@@ -41,6 +41,7 @@ public:
 	
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
+	
 	virtual ~cPlayer();
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
@@ -337,7 +338,15 @@ public:
 	bool MoveToWorld(const char * a_WorldName);  // tolua_export
 
 	bool SaveToDisk(void);
+	
+	/** Loads the player data from the disk file.
+	Returns true on success, false on failure. */
 	bool LoadFromDisk(void);
+	
+	/** Loads the player data from the specified file.
+	Returns true on success, false on failure. */
+	bool LoadFromFile(const AString & a_FileName);
+	
 	void LoadPermissionsFromDisk(void);											// tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }

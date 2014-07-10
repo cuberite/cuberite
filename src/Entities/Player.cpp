@@ -75,11 +75,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
 	, m_bIsTeleporting(false)
 {
-	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
-		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
-		this, GetUniqueID()
-	);
-	
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
@@ -1690,53 +1685,70 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-bool cPlayer::LoadFromDisk()
+
+bool cPlayer::LoadFromDisk(void)
 {
 	LoadPermissionsFromDisk();
 
 	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str() );
+	Printf(SourceFile, "players/%s.json", GetName().c_str());
+	
+	bool res = LoadFromFile(SourceFile);
+	if (res)
+	{
+		return true;
+	}
+}
 
+
+
+
+
+bool cPlayer::LoadFromFile(const AString & a_FileName)
+{
+	// Load the data from the file:
 	cFile f;
-	if (!f.Open(SourceFile, cFile::fmRead))
+	if (!f.Open(a_FileName, cFile::fmRead))
 	{
 		// This is a new player whom we haven't seen yet, bail out, let them have the defaults
 		return false;
 	}
-
 	AString buffer;
 	if (f.ReadRestOfFile(buffer) != f.GetSize())
 	{
-		LOGWARNING("Cannot read player data from file \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Cannot read player data from file \"%s\"", a_FileName.c_str());
 		return false;
 	}
-	f.Close(); //cool kids play nice
+	f.Close();
 
+	// Parse the JSON format:
 	Json::Value root;
 	Json::Reader reader;
 	if (!reader.parse(buffer, root, false))
 	{
-		LOGWARNING("Cannot parse player data in file \"%s\", player will be reset", SourceFile.c_str());
+		LOGWARNING("Cannot parse player data in file \"%s\"", a_FileName.c_str());
+		return false;
 	}
 
+	// Load the player data:
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if (JSON_PlayerPosition.size() == 3)
 	{
-		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
-		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
-		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
+		SetPosX(JSON_PlayerPosition[(unsigned)0].asDouble());
+		SetPosY(JSON_PlayerPosition[(unsigned)1].asDouble());
+		SetPosZ(JSON_PlayerPosition[(unsigned)2].asDouble());
 		m_LastPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetYaw      ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
-		SetPitch    ((float)JSON_PlayerRotation[(unsigned int)1].asDouble());
-		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
+		SetYaw      ((float)JSON_PlayerRotation[(unsigned)0].asDouble());
+		SetPitch    ((float)JSON_PlayerRotation[(unsigned)1].asDouble());
+		SetRoll     ((float)JSON_PlayerRotation[(unsigned)2].asDouble());
 	}
 
-	m_Health              = root.get("health", 0).asInt();
+	m_Health              = root.get("health",         0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
@@ -1763,8 +1775,8 @@ bool cPlayer::LoadFromDisk()
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	StatSerializer.Load();
 	
-	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+	LOGD("Player \"%s\" was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
+		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
 	);
 	
 	return true;
