@@ -105,7 +105,7 @@ public:
                 {
                         return false;
                 }
-		
+                
 		BLOCKTYPE CurrentBlock = a_World->GetBlock(BlockPos);
 		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
 		if (!CanWashAway)
