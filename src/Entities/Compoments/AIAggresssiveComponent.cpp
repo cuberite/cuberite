@@ -1,4 +1,8 @@
-#include "AIAgressiveComponent.h"
+
+#include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "AIAggressiveComponent.h"
+#include "../Entities/Player.h"
+#include "../Tracer.h"
 
 
 
@@ -18,10 +22,10 @@ void cAIAggressiveComponent::Tick(float a_Dt, cChunk & a_Chunk)
 	if (m_Target == NULL)
 		return;
 
-	cTracer LineOfSight(GetWorld());
-	Vector3d AttackDirection(m_Target->GetPosition() - GetPosition());
+	cTracer LineOfSight(m_Self->GetWorld());
+	Vector3d AttackDirection(m_Target->GetPosition() - m_Self->GetPosition());
 
-	if (ReachedFinalDestination() && !LineOfSight.Trace(GetPosition(), AttackDirection, (int)AttackDirection.Length()))
+	if (ReachedFinalDestination() && !LineOfSight.Trace(m_Self->GetPosition(), AttackDirection, (int)AttackDirection.Length()))
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
 		Attack(a_Dt / 1000);
@@ -38,10 +42,10 @@ void cAIAggressiveComponent::Attack(float a_Dt)
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		attack_interval = 0.0f;
-		m_Target->TakeDamage(dtMobAttack, m_Self, m_AttackDamage, 0);
+		m_Target->TakeDamage(dtMobAttack, m_Self, m_Self->GetAttackDamage(), 0);
 	}
 
-	m_Self->SetAttackInterval(attack_interval)
+	m_Self->SetAttackInterval(attack_interval);
 }
 
 
@@ -61,12 +65,37 @@ bool cAIAggressiveComponent::IsMovingToTargetPosition()
 }
 
 
+bool cAIAggressiveComponent::ReachedFinalDestination()
+{
+	if ((m_Self->GetPosition() - m_Self->m_FinalDestination).Length() <= m_Self->GetAttackRange())
+	{
+		return true;
+	}
+	
+	return false;
+}
+
+
 /// Event Checkers
+//Checks to see if EventSeePlayer should be fired
+//monster sez: Do I see the player
+void cAIAggressiveComponent::CheckEventSeePlayer(void)
+{
+	// TODO: Rewrite this to use cWorld's DoWithPlayers()
+	cPlayer * Closest = m_Self->GetWorld()->FindClosestPlayer(m_Self->GetPosition(), (float)m_Self->GetSightDistance(), false);
+
+	if (Closest != NULL)
+	{
+		EventSeePlayer(Closest);
+	}
+}
+
+
 void cAIAggressiveComponent::CheckEventLostPlayer(void)
 {	
 	if (m_Target != NULL)
 	{
-		if ((m_Target->GetPosition() - GetPosition()).Length() > m_Self->GetSightDistance())
+		if ((m_Target->GetPosition() - m_Self->GetPosition()).Length() > m_Self->GetSightDistance())
 		{
 			EventLosePlayer();
 		}
@@ -79,7 +108,7 @@ void cAIAggressiveComponent::CheckEventLostPlayer(void)
 
 
 /// Event Handlers
-void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
+void cAIAggressiveComponent::EventSeePlayer(cEntity * a_Entity)
 {
 	if (!((cPlayer *)a_Entity)->IsGameModeCreative())
 	{
@@ -97,9 +126,8 @@ void cAIAggressiveComponent::EventLosePlayer(void)
 
 
 /// State Logic
-void cAggressiveMonster::InStateChasing(float a_Dt)
+void cAIAggressiveComponent::InStateChasing(float a_Dt)
 {
-	super::InStateChasing(a_Dt);
 
 	if (m_Target != NULL)
 	{
