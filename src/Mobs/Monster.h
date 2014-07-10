@@ -71,6 +71,8 @@ public:
 	} ;
 	
 	// tolua_end
+	/** Coordinates for the ultimate, final destination. */
+	Vector3d m_FinalDestination;
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
@@ -117,6 +119,8 @@ public:
 	int GetAttackRate() { return (int)m_AttackRate; }
 	int GetAttackInterval() { return (int)m_AttackInterval; }
 	int GetSightDistance() { return m_SightDistance; }
+	int GetAttackDamage() { return m_AttackDamage; }
+	int GetAttackRange() { return m_AttackRange; }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
 	void SetAttackInterval(float a_AttackInterval) { m_AttackInterval = a_AttackInterval; }
 	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
@@ -174,8 +178,6 @@ protected:
 	cEntity * m_Target;
 	/** Coordinates of the next position that should be reached */
 	Vector3d m_Destination;
-	/** Coordinates for the ultimate, final destination. */
-	Vector3d m_FinalDestination;
 	/** Returns if the ultimate, final destination has been reached */
 	bool ReachedFinalDestination(void);
 
