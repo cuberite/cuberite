@@ -5,7 +5,8 @@
 #include "Item.h"
 
 #include <fstream>
-#include <sstream>
+
+#define FURNACE_RECIPE_FILE "furnace.txt"
 
 
 
@@ -42,6 +43,7 @@ cFurnaceRecipe::~cFurnaceRecipe()
 {
 	ClearRecipes();
 	delete m_pState;
+	m_pState = NULL;
 }
 
 
@@ -53,128 +55,207 @@ void cFurnaceRecipe::ReloadRecipes(void)
 	ClearRecipes();
 	LOGD("Loading furnace recipes...");
 
-	std::ifstream f;
-	char a_File[] = "furnace.txt";
-	f.open(a_File, std::ios::in);
-
+	std::ifstream f(FURNACE_RECIPE_FILE, std::ios::in);
 	if (!f.good())
 	{
-		f.close();
-		LOG("Could not open the furnace recipes file \"%s\"", a_File);
+		LOG("Could not open the furnace recipes file \"%s\". No furnace recipes are available.", FURNACE_RECIPE_FILE);
+		return;
+	}
+	
+	unsigned int LineNum = 0;
+	AString ParsingLine;
+
+	while (std::getline(f, ParsingLine))
+	{
+		LineNum++;
+		ParsingLine.erase(std::remove_if(ParsingLine.begin(), ParsingLine.end(), isspace), ParsingLine.end());  // Remove ALL whitespace from the line
+		if (ParsingLine.empty())
+		{
+			continue;
+		}
+
+		switch (ParsingLine[0])
+		{
+			case '#':
+			{
+				// Comment
+				break;
+			}
+
+			case '!':
+			{
+				AddFuelFromLine(ParsingLine, LineNum);
+				break;
+			}
+
+			default:
+			{
+				AddRecipeFromLine(ParsingLine, LineNum);
+				break;
+			}
+		}  // switch (ParsingLine[0])
+	}  // while (getline(ParsingLine))
+
+	LOG("Loaded " SIZE_T_FMT " furnace recipes and " SIZE_T_FMT " fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
+}
+
+
+
+
+
+void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, int a_LineNum)
+{
+	// Fuel
+	int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
+	AString::size_type BeginPos = 1; // Begin at one after exclamation mark (bang)
+
+	if (
+		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, IItemID) ||                       // Read item ID
+		!ReadOptionalNumbers(BeginPos, ":", "=", a_Line, a_LineNum, IItemCount, IItemHealth) ||  // Read item count (and optionally health)
+		!ReadMandatoryNumber(BeginPos, "0123456789", a_Line, a_LineNum, IBurnTime, true)         // Read item burn time - last value
+	)
+	{
 		return;
 	}
 
-	// TODO: Replace this messy parse with a high-level-structured one (ReadLine / ProcessLine)
-	bool bSyntaxError = false;
-	while (f.good())
+	// Add to fuel list:
+	Fuel F;
+	F.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
+	F.BurnTime = IBurnTime;
+	m_pState->Fuel.push_back(F);
+}
+
+
+
+
+
+void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, int a_LineNum)
+{
+	int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
+	int OItemID = 0, OItemCount = 0, OItemHealth = 0;
+	AString::size_type BeginPos = 0; // Begin at start of line
+
+	if (
+		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, IItemID) ||                                  // Read item ID
+		!ReadOptionalNumbers(BeginPos, ":", "@", a_Line, a_LineNum, IItemCount, IItemHealth) ||             // Read item count (and optionally health)
+		!ReadMandatoryNumber(BeginPos, "=", a_Line, a_LineNum, IBurnTime) ||                                // Read item burn time
+		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, OItemID) ||                                  // Read result ID
+		!ReadOptionalNumbers(BeginPos, ":", "012456789", a_Line, a_LineNum, OItemCount, OItemHealth, true)  // Read result count (and optionally health) - last value
+	)
 	{
-		char c;
+		return;
+	}
 
-		//////////////////////////////////////////////////////////////////////////
-		// comments
-		f >> c;
-		f.unget();
-		if( c == '#' )
+	// Add to recipe list
+	Recipe R;
+	R.In = new cItem((ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth);
+	R.Out = new cItem((ENUM_ITEM_ID)OItemID, (char)OItemCount, (short)OItemHealth);
+	R.CookTime = IBurnTime;
+	m_pState->Recipes.push_back(R);
+}
+
+
+
+
+
+void cFurnaceRecipe::PrintParseError(unsigned int a_Line, size_t a_Position, const AString & a_CharactersMissing)
+{
+	LOGWARN("Error parsing furnace recipes at line %i pos " SIZE_T_FMT ": missing '%s'", a_Line, a_Position, a_CharactersMissing.c_str());
+}
+
+
+
+
+
+bool cFurnaceRecipe::ReadMandatoryNumber(AString::size_type & a_Begin, const AString & a_Delimiter, const AString & a_Text, unsigned int a_Line, int & a_Value, bool a_IsLastValue)
+{
+	// TODO: replace atoi with std::stoi
+	AString::size_type End;
+	if (a_IsLastValue)
+	{
+		End = a_Text.find_first_not_of(a_Delimiter, a_Begin);
+	}
+	else
+	{
+		End = a_Text.find_first_of(a_Delimiter, a_Begin);
+		if (End == AString::npos)
 		{
-			while( f.good() && c != '\n' )
+			PrintParseError(a_Line, a_Begin, a_Delimiter);
+			return false;
+		}
+	}
+	
+	// stoi won't throw an exception if the string is alphanumeric, we should check for this
+	if (!DoesStringContainOnlyNumbers(a_Text.substr(a_Begin, End - a_Begin)))
+	{
+		PrintParseError(a_Line, a_Begin, "number");
+		return false;
+	}
+	a_Value = atoi(a_Text.substr(a_Begin, End - a_Begin).c_str());
+
+	a_Begin = End + 1; // Jump over delimiter
+	return true;
+}
+
+
+
+
+
+bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const AString & a_DelimiterOne, const AString & a_DelimiterTwo, const AString & a_Text, unsigned int a_Line, int & a_ValueOne, int & a_ValueTwo, bool a_IsLastValue)
+{
+	// TODO: replace atoi with std::stoi
+	AString::size_type End, Begin = a_Begin;
+
+	End = a_Text.find_first_of(a_DelimiterOne, Begin);
+	if (End != AString::npos)
+	{
+		if (DoesStringContainOnlyNumbers(a_Text.substr(Begin, End - Begin)))
+		{
+			a_ValueOne = std::atoi(a_Text.substr(Begin, End - Begin).c_str());
+			Begin = End + 1;
+
+			if (a_IsLastValue)
 			{
-				f.get( c );
+				End = a_Text.find_first_not_of(a_DelimiterTwo, Begin);
 			}
-			continue;
-		}
-
-
-		//////////////////////////////////////////////////////////////////////////
-		// Line breaks
-		f.get( c );
-		while( f.good() && ( c == '\n' || c == '\r' ) ) { f.get( c ); }
-		if (f.eof())
-		{
-			break;
-		}
-		f.unget();
-
-		//////////////////////////////////////////////////////////////////////////
-		// Check for fuel
-		f >> c;
-		if( c == '!' ) // It's fuel :)
-		{
-			// Read item
-			int IItemID = 0, IItemCount = 0, IItemHealth = 0;
-			f >> IItemID;
-			f >> c; if( c != ':' ) { bSyntaxError = true; break; }
-			f >> IItemCount;
-
-			// Optional health
-			f >> c; 
-			if( c != ':' ) 
-				f.unget();
 			else
 			{
-				f >> IItemHealth;
+				End = a_Text.find_first_of(a_DelimiterTwo, Begin);
+				if (End == AString::npos)
+				{
+					PrintParseError(a_Line, Begin, a_DelimiterTwo);
+					return false;
+				}
 			}
 
-			// Burn time
-			int BurnTime;
-			f >> c; if( c != '=' ) { bSyntaxError = true; break; }
-			f >> BurnTime;
+			// stoi won't throw an exception if the string is alphanumeric, we should check for this
+			if (!DoesStringContainOnlyNumbers(a_Text.substr(Begin, End - Begin)))
+			{
+				PrintParseError(a_Line, Begin, "number");
+				return false;
+			}
+			a_ValueTwo = atoi(a_Text.substr(Begin, End - Begin).c_str());
 
-			// Add to fuel list
-			Fuel F;
-			F.In = new cItem( (ENUM_ITEM_ID) IItemID, (char)IItemCount, (short)IItemHealth );
-			F.BurnTime = BurnTime;
-			m_pState->Fuel.push_back( F );
-			continue;
+			a_Begin = End + 1; // Jump over delimiter
+			return true;
 		}
-		f.unget();
-
-		//////////////////////////////////////////////////////////////////////////
-		// Read items
-		int IItemID = 0, IItemCount = 0, IItemHealth = 0;
-		f >> IItemID;
-		f >> c; if( c != ':' ) { bSyntaxError = true; break; }
-		f >> IItemCount;
-
-		// Optional health
-		f >> c; 
-		if( c != ':' ) 
-			f.unget();
 		else
 		{
-			f >> IItemHealth;
+			return ReadMandatoryNumber(a_Begin, a_DelimiterTwo, a_Text, a_Line, a_ValueOne, a_IsLastValue);
 		}
-
-		int CookTime;
-		f >> c; if( c != '@' ) { bSyntaxError = true; break; }
-		f >> CookTime;
-
-		int OItemID = 0, OItemCount = 0, OItemHealth = 0;
-		f >> c; if( c != '=' ) { bSyntaxError = true; break; }
-		f >> OItemID;
-		f >> c; if( c != ':' ) { bSyntaxError = true; break; }
-		f >> OItemCount;
-
-		// Optional health
-		f >> c; 
-		if( c != ':' ) 
-			f.unget();
-		else
-		{
-			f >> OItemHealth;
-		}
-
-		// Add to recipe list
-		Recipe R;
-		R.In = new cItem( (ENUM_ITEM_ID)IItemID, (char)IItemCount, (short)IItemHealth );
-		R.Out = new cItem( (ENUM_ITEM_ID)OItemID, (char)OItemCount, (short)OItemHealth );
-		R.CookTime = CookTime;
-		m_pState->Recipes.push_back( R );
 	}
-	if (bSyntaxError)
-	{
-		LOGERROR("ERROR: FurnaceRecipe, syntax error" );
-	}
-	LOG("Loaded " SIZE_T_FMT " furnace recipes and " SIZE_T_FMT " fuels", m_pState->Recipes.size(), m_pState->Fuel.size());
+	
+	return ReadMandatoryNumber(a_Begin, a_DelimiterTwo, a_Text, a_Line, a_ValueOne, a_IsLastValue);
+}
+
+
+
+
+
+bool cFurnaceRecipe::DoesStringContainOnlyNumbers(const AString & a_String)
+{
+	// TODO: replace this with std::all_of(a_String.begin(), a_String.end(), isdigit)
+	return (a_String.find_first_not_of("0123456789") == AString::npos);
 }
 
 
@@ -187,7 +268,9 @@ void cFurnaceRecipe::ClearRecipes(void)
 	{
 		Recipe R = *itr;
 		delete R.In;
+		R.In = NULL;
 		delete R.Out;
+		R.Out = NULL;
 	}
 	m_pState->Recipes.clear();
 
@@ -195,6 +278,7 @@ void cFurnaceRecipe::ClearRecipes(void)
 	{
 		Fuel F = *itr;
 		delete F.In;
+		F.In = NULL;
 	}
 	m_pState->Fuel.clear();
 }

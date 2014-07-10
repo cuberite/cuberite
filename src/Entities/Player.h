@@ -124,6 +124,9 @@ public:
 	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
+
+	/** Gets the contents of the player's associated enderchest */
+	cItemGrid & GetEnderChestContents(void) { return m_EnderChestContents; }
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
@@ -402,7 +405,7 @@ public:
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const { return IsEating(); }
+	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
 
 	virtual void Detach(void);
 	
@@ -444,7 +447,13 @@ protected:
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
+
+	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
+
+	/** An item grid that stores the player specific enderchest contents */
+	cItemGrid m_EnderChestContents;
+
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
@@ -505,8 +514,6 @@ protected:
 
 	cStatManager m_Stats;
 
-
-
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
@@ -540,6 +547,11 @@ protected:
 	/** How long till the player's inventory will be saved
 	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
 	unsigned int m_TicksUntilNextSave;
+
+	/** Flag used by food handling system to determine whether a teleport has just happened
+	Will not apply food penalties if found to be true; will set to false after processing
+	*/
+	bool m_bIsTeleporting;
 
 } ; // tolua_export
 

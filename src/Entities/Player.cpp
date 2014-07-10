@@ -1,4 +1,4 @@
-﻿
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
@@ -8,6 +8,7 @@
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"
 #include "../Root.h"
@@ -37,14 +38,15 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	: super(etPlayer, 0.6, 1.8)
 	, m_bVisible(true)
 	, m_FoodLevel(MAX_FOOD_LEVEL)
-	, m_FoodSaturationLevel(5)
+	, m_FoodSaturationLevel(5.0)
 	, m_FoodTickTimer(0)
-	, m_FoodExhaustionLevel(0)
+	, m_FoodExhaustionLevel(0.0)
 	, m_LastJumpHeight(0)
 	, m_LastGroundHeight(0)
 	, m_bTouchGround(false)
 	, m_Stance(0.0)
 	, m_Inventory(*this)
+	, m_EnderChestContents(9, 3)
 	, m_CurrentWindow(NULL)
 	, m_InventoryWindow(NULL)
 	, m_Color('-')
@@ -70,6 +72,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	, m_FloaterID(-1)
 	, m_Team(NULL)
 	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
+	, m_bIsTeleporting(false)
 {
 	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
 		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
@@ -145,6 +148,7 @@ cPlayer::~cPlayer(void)
 	m_ClientHandle = NULL;
 	
 	delete m_InventoryWindow;
+	m_InventoryWindow = NULL;
 	
 	LOGD("Player %p deleted", this);
 }
@@ -223,7 +227,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (GetPosition() != m_LastPos) // Change in position from last tick?
+	if (!GetPosition().EqualsEps(m_LastPos, 0.01)) // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
@@ -410,6 +414,7 @@ void cPlayer::StartChargingBow(void)
 	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
 	m_BowCharge = 0;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
 }
 
 
@@ -422,6 +427,8 @@ int cPlayer::FinishChargingBow(void)
 	int res = m_BowCharge;
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
+
 	return res;
 }
 
@@ -434,6 +441,7 @@ void cPlayer::CancelChargingBow(void)
 	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
 }
 
 
@@ -515,7 +523,15 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	m_FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
+	{
+		m_FoodSaturationLevel = 5.0;
+		return;
+	}
+	
+	m_FoodLevel = FoodLevel;
 	SendHealth();
 }
 
@@ -556,11 +572,9 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 	{
 		return false;
 	}
-	
-	m_FoodLevel = std::min(a_Food + m_FoodLevel, (int)MAX_FOOD_LEVEL);
-	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, (double)m_FoodLevel);
-	
-	SendHealth();
+
+	SetFoodSaturationLevel(m_FoodSaturationLevel + a_Saturation);
+	SetFoodLevel(m_FoodLevel + a_Food);
 	return true;
 }
 
@@ -944,14 +958,15 @@ void cPlayer::Respawn(void)
 	
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
-	m_FoodSaturationLevel = 5;
+	m_FoodSaturationLevel = 5.0;
+	m_FoodExhaustionLevel = 0.0;
 
 	// Reset Experience
 	m_CurrentXp = 0;
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*m_World);
+	m_ClientHandle->SendRespawn(*m_World, true);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1201,6 +1216,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	SetPosition(a_PosX, a_PosY, a_PosZ);
 	m_LastGroundHeight = (float)a_PosY;
 	m_LastJumpHeight = (float)a_PosY;
+	m_bIsTeleporting = true;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 	m_ClientHandle->SendPlayerMoveLook();
@@ -1718,6 +1734,7 @@ bool cPlayer::LoadFromDisk()
 	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
+	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
 
@@ -1755,20 +1772,24 @@ bool cPlayer::SaveToDisk()
 	Json::Value JSON_Inventory;
 	m_Inventory.SaveToJson(JSON_Inventory);
 
+	Json::Value JSON_EnderChestInventory;
+	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
+
 	Json::Value root;
-	root["position"]       = JSON_PlayerPosition;
-	root["rotation"]       = JSON_PlayerRotation;
-	root["inventory"]      = JSON_Inventory;
-	root["health"]         = m_Health;
-	root["xpTotal"]        = m_LifetimeTotalXp;
-	root["xpCurrent"]      = m_CurrentXp;
-	root["air"]            = m_AirLevel;
-	root["food"]           = m_FoodLevel;
-	root["foodSaturation"] = m_FoodSaturationLevel;
-	root["foodTickTimer"]  = m_FoodTickTimer;
-	root["foodExhaustion"] = m_FoodExhaustionLevel;
-	root["world"]          = GetWorld()->GetName();
-	root["isflying"]       = IsFlying();
+	root["position"]            = JSON_PlayerPosition;
+	root["rotation"]            = JSON_PlayerRotation;
+	root["inventory"]           = JSON_Inventory;
+	root["enderchestinventory"] = JSON_EnderChestInventory;
+	root["health"]              = m_Health;
+	root["xpTotal"]             = m_LifetimeTotalXp;
+	root["xpCurrent"]           = m_CurrentXp;
+	root["air"]                 = m_AirLevel;
+	root["food"]                = m_FoodLevel;
+	root["foodSaturation"]      = m_FoodSaturationLevel;
+	root["foodTickTimer"]       = m_FoodTickTimer;
+	root["foodExhaustion"]      = m_FoodExhaustionLevel;
+	root["world"]               = GetWorld()->GetName();
+	root["isflying"]            = IsFlying();
 
 	if (m_GameMode == GetWorld()->GetGameMode())
 	{
@@ -1870,16 +1891,13 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
-	
+
 	if (IsGameModeCreative())
 	{
 		// Hunger is disabled for Creative
 		return;
 	}
-	
-	// Remember the food level before processing, for later comparison
-	int LastFoodLevel = m_FoodLevel;
-	
+
 	// Heal or damage, based on the food level, using the m_FoodTickTimer:
 	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
 	{
@@ -1888,11 +1906,11 @@ void cPlayer::HandleFood(void)
 		{
 			m_FoodTickTimer = 0;
 
-			if (m_FoodLevel >= 17)
+			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
-				m_FoodExhaustionLevel += 3;
+				m_FoodExhaustionLevel += 3.0;
 			}
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
@@ -1903,23 +1921,18 @@ void cPlayer::HandleFood(void)
 	}
 
 	// Apply food exhaustion that has accumulated:
-	if (m_FoodExhaustionLevel >= 4)
+	if (m_FoodExhaustionLevel >= 4.0)
 	{
-		m_FoodExhaustionLevel -= 4;
+		m_FoodExhaustionLevel -= 4.0;
 
-		if (m_FoodSaturationLevel >= 1)
+		if (m_FoodSaturationLevel >= 1.0)
 		{
-			m_FoodSaturationLevel -= 1;
+			m_FoodSaturationLevel -= 1.0;
 		}
 		else
 		{
-			m_FoodLevel = std::max(m_FoodLevel - 1, 0);
+			SetFoodLevel(m_FoodLevel - 1);
 		}
-	}
-	
-	if (m_FoodLevel != LastFoodLevel)
-	{
-		SendHealth();
 	}
 }
 
@@ -2041,6 +2054,11 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 {
 	if (IsGameModeCreative())
 	{
+		return;
+	}
+	if (m_bIsTeleporting)
+	{
+		m_bIsTeleporting = false;
 		return;
 	}
 

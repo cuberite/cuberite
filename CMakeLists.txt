@@ -62,7 +62,10 @@ add_subdirectory(lib/tolua++/)
 add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
-add_subdirectory(lib/md5/)
+
+if (WIN32)
+	add_subdirectory(lib/luaproxy/)
+endif()
 
 
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used

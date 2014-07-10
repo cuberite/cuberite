@@ -206,7 +206,7 @@ public:
 	// tolua_end
 
 	void BroadcastChunkData              (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
-	void BroadcastCollectPickup          (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectEntity          (const cEntity & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity          (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEffect           (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEquipment        (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
@@ -485,7 +485,7 @@ public:
 	double GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
@@ -532,7 +532,7 @@ public:
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;  // tolua_export
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -830,6 +830,7 @@ private:
 		virtual ~cScheduledTask()
 		{
 			delete m_Task;
+			m_Task = NULL;
 		}
 	};
 

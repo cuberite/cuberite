@@ -295,9 +295,9 @@ cBlockArea::~cBlockArea()
 
 void cBlockArea::Clear(void)
 {
-	delete[] m_BlockTypes;    m_BlockTypes = NULL;
-	delete[] m_BlockMetas;    m_BlockMetas = NULL;
-	delete[] m_BlockLight;    m_BlockLight = NULL;
+	delete[] m_BlockTypes;    m_BlockTypes    = NULL;
+	delete[] m_BlockMetas;    m_BlockMetas    = NULL;
+	delete[] m_BlockLight;    m_BlockLight    = NULL;
 	delete[] m_BlockSkyLight; m_BlockSkyLight = NULL;
 	m_Origin.Set(0, 0, 0);
 	m_Size.Set(0, 0, 0);
@@ -1013,8 +1013,8 @@ void cBlockArea::RotateCCW(void)
 	}  // for x
 	std::swap(m_BlockTypes, NewTypes);
 	std::swap(m_BlockMetas, NewMetas);
-	delete[] NewTypes;
-	delete[] NewMetas;
+	delete[] NewTypes;   NewTypes = NULL;
+	delete[] NewMetas;   NewMetas = NULL;
 
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1058,8 +1058,8 @@ void cBlockArea::RotateCW(void)
 	}  // for x
 	std::swap(m_BlockTypes, NewTypes);
 	std::swap(m_BlockMetas, NewMetas);
-	delete[] NewTypes;
-	delete[] NewMetas;
+	delete[] NewTypes;   NewTypes = NULL;
+	delete[] NewMetas;   NewMetas = NULL;
 
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1206,7 +1206,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 			}  // for z
 		}  // for x
 		std::swap(m_BlockTypes, NewTypes);
-		delete[] NewTypes;
+		delete[] NewTypes;   NewTypes = NULL;
 	}
 	if (HasBlockMetas())
 	{
@@ -1224,7 +1224,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 			}  // for z
 		}  // for x
 		std::swap(m_BlockMetas, NewMetas);
-		delete[] NewMetas;
+		delete[] NewMetas;   NewMetas = NULL;
 	}
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1251,7 +1251,7 @@ void cBlockArea::RotateCWNoMeta(void)
 			}  // for x
 		}  // for z
 		std::swap(m_BlockTypes, NewTypes);
-		delete[] NewTypes;
+		delete[] NewTypes;   NewTypes = NULL;
 	}
 	if (HasBlockMetas())
 	{
@@ -1269,7 +1269,7 @@ void cBlockArea::RotateCWNoMeta(void)
 			}  // for x
 		}  // for z
 		std::swap(m_BlockMetas, NewMetas);
-		delete[] NewMetas;
+		delete[] NewMetas;   NewMetas = NULL;
 	}
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1658,6 +1658,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		if (m_BlockMetas == NULL)
 		{
 			delete[] m_BlockTypes;
+			m_BlockTypes = NULL;
 			return false;
 		}
 	}
@@ -1667,7 +1668,9 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		if (m_BlockLight == NULL)
 		{
 			delete[] m_BlockMetas;
+			m_BlockMetas = NULL;
 			delete[] m_BlockTypes;
+			m_BlockTypes = NULL;
 			return false;
 		}
 	}
@@ -1677,8 +1680,11 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		if (m_BlockSkyLight == NULL)
 		{
 			delete[] m_BlockLight;
+			m_BlockLight = NULL;
 			delete[] m_BlockMetas;
+			m_BlockMetas = NULL;
 			delete[] m_BlockTypes;
+			m_BlockTypes = NULL;
 			return false;
 		}
 	}

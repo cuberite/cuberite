@@ -469,6 +469,9 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		a_Writer.AddByte("MCSIsLightValid", 1);
 	}
 	
+	// Store the flag that the chunk has all the ores, trees, dungeons etc. MCS chunks are always complete.
+	a_Writer.AddByte("TerrainPopulated", 1);
+	
 	a_Writer.EndCompound();  // "Level"
 	return true;
 }
@@ -1458,13 +1461,6 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		return;
 	}
-
-	// Load health:
-	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	if (Health > 0)
-	{
-		Pickup->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
-	}
 	
 	// Load age:
 	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
@@ -1508,13 +1504,6 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
 	{
 		return;
-	}
-
-	// Load Health:
-	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	if (Health > 0)
-	{
-		ExpOrb->SetHealth((int) (a_NBT.GetShort(Health) & 0xFF));
 	}
 
 	// Load Age:
@@ -1651,6 +1640,15 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	if (DamageIdx > 0)
 	{
 		Arrow->SetDamageCoeff(a_NBT.GetDouble(DamageIdx));
+	}
+	
+	// Load block hit:
+	int InBlockXIdx = a_NBT.FindChildByName(a_TagIdx, "xTile");
+	int InBlockYIdx = a_NBT.FindChildByName(a_TagIdx, "yTile");
+	int InBlockZIdx = a_NBT.FindChildByName(a_TagIdx, "zTile");
+	if ((InBlockXIdx > 0) && (InBlockYIdx > 0) && (InBlockZIdx > 0))
+	{
+		Arrow->SetBlockHit(Vector3i(a_NBT.GetInt(InBlockXIdx), a_NBT.GetInt(InBlockYIdx), a_NBT.GetInt(InBlockZIdx)));
 	}
 	
 	// Store the new arrow in the entities list:
@@ -2434,6 +2432,13 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 	}
 	a_Entity.SetYaw(Rotation[0]);
 	a_Entity.SetRoll(Rotation[1]);
+
+	// Load health:
+	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
+	if (Health > 0)
+	{
+		a_Entity.SetHealth(a_NBT.GetShort(Health));
+	}
 	
 	return true;
 }
@@ -2477,8 +2482,6 @@ bool cWSSAnvil::LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cP
 		IsInGround = (a_NBT.GetByte(InGroundIdx) != 0);
 	}
 	a_Entity.SetIsInGround(IsInGround);
-	
-	// TODO: Load inTile, TileCoords
 	
 	return true;
 }

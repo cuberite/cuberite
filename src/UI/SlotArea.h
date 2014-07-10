@@ -46,10 +46,19 @@ public:
 	
 	/// Called from Clicked when the action is a shiftclick (left or right)
 	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem);
-	
+
 	/// Called from Clicked when the action is a caDblClick
 	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum);
-	
+
+	/** Called from Clicked when the action is a middleclick */
+	virtual void MiddleClicked(cPlayer & a_Player, int a_SlotNum);
+
+	/** Called from Clicked when the action is a drop click. */
+	virtual void DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack);
+
+	/** Called from Clicked when the action is a number click. */
+	virtual void NumberClicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction);
+
 	/// Called when a new player opens the same parent window. The window already tracks the player. CS-locked.
 	virtual void OnPlayerAdded(cPlayer & a_Player);
 	
@@ -232,9 +241,11 @@ public:
 	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void DblClicked     (cPlayer & a_Player, int a_SlotNum);
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+	virtual void SetSlot        (int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 	// Distributing items into this area is completely disabled
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
 
 protected:
 	/// Maps player's EntityID -> current recipe; not a std::map because cCraftingGrid needs proper constructor params
@@ -248,7 +259,10 @@ protected:
 	
 	/// Handles a shift-click in the result slot. Crafts using the current recipe until it changes or no more space for result.
 	void ShiftClickedResult(cPlayer & a_Player);
-	
+
+	/** Handles a drop-click in the result slot. */
+	void DropClickedResult(cPlayer & a_Player);
+
 	/// Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the specified player
 	void UpdateRecipe(cPlayer & a_Player);
 	

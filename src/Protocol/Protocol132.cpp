@@ -188,19 +188,19 @@ void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 
 
-void cProtocol132::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocol132::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_COLLECT_PICKUP);
-	WriteInt (a_Pickup.GetUniqueID());
+	WriteInt (a_Entity.GetUniqueID());
 	WriteInt (a_Player.GetUniqueID());
 	Flush();
 	
 	// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
 	SendSoundEffect(
 		"random.pop",
-		(int)(a_Pickup.GetPosX() * 8), (int)(a_Pickup.GetPosY() * 8), (int)(a_Pickup.GetPosZ() * 8),
-		0.5, (float)(0.75 + ((float)((a_Pickup.GetUniqueID() * 23) % 32)) / 64)
+		(int)(a_Entity.GetPosX() * 8), (int)(a_Entity.GetPosY() * 8), (int)(a_Entity.GetPosZ() * 8),
+		0.5, (float)(0.75 + ((float)((a_Entity.GetUniqueID() * 23) % 32)) / 64)
 	);
 }
 

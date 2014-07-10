@@ -30,10 +30,12 @@ cGroupManager::~cGroupManager()
 	for( GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr )
 	{
 		delete itr->second;
+		itr->second = NULL;
 	}
 	m_pState->Groups.clear();
 
 	delete m_pState;
+	m_pState = NULL;
 }
 
 

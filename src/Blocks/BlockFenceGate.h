@@ -45,6 +45,7 @@ public:
 			// Standing aside - use last direction
 			a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, OldMetaData);
 		}
+		a_Player->GetWorld()->BroadcastSoundParticleEffect(1003, a_BlockX, a_BlockY, a_BlockZ, 0, a_Player->GetClientHandle());
 	}
 
 

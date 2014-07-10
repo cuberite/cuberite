@@ -152,7 +152,9 @@ cChunk::~cChunk()
 		m_NeighborZP->m_NeighborZM = NULL;
 	}
 	delete m_WaterSimulatorData;
+	m_WaterSimulatorData = NULL;
 	delete m_LavaSimulatorData;
+	m_LavaSimulatorData = NULL;
 }
 
 
@@ -596,6 +598,7 @@ void cChunk::Tick(float a_Dt)
 				cEntity * ToDelete = *itr;
 				itr = m_Entities.erase(itr);
 				delete ToDelete;
+				ToDelete = NULL;
 				continue;
 			}
 			++itr;
@@ -1417,6 +1420,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		BlockEntity->Destroy();
 		RemoveBlockEntity(BlockEntity);
 		delete BlockEntity;
+		BlockEntity = NULL;
 	}
 	
 	// If the new block is a block entity, create the entity object:
@@ -1612,6 +1616,12 @@ void cChunk::AddBlockEntity(cBlockEntity * a_BlockEntity)
 
 cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	// Check that the query coords are within chunk bounds:
+	ASSERT(a_BlockX >= m_PosX * cChunkDef::Width);
+	ASSERT(a_BlockX < m_PosX * cChunkDef::Width + cChunkDef::Width);
+	ASSERT(a_BlockZ >= m_PosZ * cChunkDef::Width);
+	ASSERT(a_BlockZ < m_PosZ * cChunkDef::Width + cChunkDef::Width);
+
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		if (
@@ -2691,7 +2701,7 @@ void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClie
 
 
 
-void cChunk::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
 	{
@@ -2699,7 +2709,7 @@ void cChunk::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_
 		{
 			continue;
 		}
-		(*itr)->SendCollectPickup(a_Pickup, a_Player);
+		(*itr)->SendCollectEntity(a_Entity, a_Player);
 	}  // for itr - LoadedByClient[]
 }
 

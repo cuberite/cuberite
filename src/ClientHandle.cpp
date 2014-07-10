@@ -30,7 +30,7 @@
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
 
-#include "md5/md5.h"
+#include "polarssl/md5.h"
 
 
 
@@ -232,22 +232,49 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 
 AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 {
+	// Online UUIDs are always version 4 (random)
+	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
+	// This guarantees that they will never collide with an online UUID and can be distinguished.
 	// Proper format for a version 3 UUID is:
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	
 	// Generate an md5 checksum, and use it as base for the ID:
-	MD5 Checksum(a_Username);
-	AString UUID = Checksum.hexdigest();
-	UUID[12] = '3';  // Version 3 UUID
-	UUID[16] = '8';  // Variant 1 UUID
-	
-	// Now the digest doesn't have the UUID slashes, but the client requires them, so add them into the appropriate positions:
-	UUID.insert(8, "-");
-	UUID.insert(13, "-");
-	UUID.insert(18, "-");
-	UUID.insert(23, "-");
-	
-	return UUID;
+	unsigned char MD5[16];
+	md5((const unsigned char *)a_Username.c_str(), a_Username.length(), MD5);
+	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
+	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
+	return Printf("%02x%02x%02x%02x-%02x%02x-3%01x%02x-8%01x%02x-%02x%02x%02x%02x%02x%02x",
+		MD5[0],  MD5[1],  MD5[2],  MD5[3],
+		MD5[4],  MD5[5],  MD5[6],  MD5[7],
+		MD5[8],  MD5[9],  MD5[10], MD5[11],
+		MD5[12], MD5[13], MD5[14], MD5[15]
+	);
+}
+
+
+
+
+
+bool cClientHandle::IsUUIDOnline(const AString & a_UUID)
+{
+	// Online UUIDs are always version 4 (random)
+	// We use Version 3 (MD5 hash) UUIDs for the offline UUIDs
+	// This guarantees that they will never collide with an online UUID and can be distinguished.
+	// The version-specifying char is at pos #12 of raw UUID, pos #14 in dashed-UUID.
+	switch (a_UUID.size())
+	{
+		case 32:
+		{
+			// This is the UUID format without dashes, the version char is at pos #12:
+			return (a_UUID[12] == '4');
+		}
+		case 36:
+		{
+			// This is the UUID format with dashes, the version char is at pos #14:
+			return (a_UUID[14] == '4');
+		}
+	}
+	return false;
 }
 
 
@@ -335,6 +362,9 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 
 	// Send scoreboard data
 	World->GetScoreBoard().SendTo(*this);
+
+	// Send statistics
+	SendStatistics(m_Player->GetStatManager());
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
@@ -953,6 +983,26 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
 
+	// Check for clickthrough-blocks:
+	/* When the user breaks a fire block, the client send the wrong block location.
+	We must find the right block with the face direction. */
+	if (a_BlockFace != BLOCK_FACE_NONE)
+	{
+		int pX = a_BlockX;
+		int pY = a_BlockY;
+		int pZ = a_BlockZ;
+
+		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
+		cBlockHandler * Handler = cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(pX, pY, pZ));
+
+		if (Handler->IsClickedThrough())
+		{
+			cChunkInterface ChunkInterface(m_Player->GetWorld()->GetChunkMap());
+			Handler->OnDigging(ChunkInterface, *m_Player->GetWorld(), m_Player, pX, pY, pZ);
+			return;
+		}
+	}
+
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
 		cBlockInfo::IsOneHitDig(a_OldBlock)  // One-hit blocks get destroyed immediately, too
@@ -979,22 +1029,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 	ItemHandler->OnDiggingBlock(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-	// Check for clickthrough-blocks:
-	if (a_BlockFace != BLOCK_FACE_NONE)
-	{
-		int pX = a_BlockX;
-		int pY = a_BlockY;
-		int pZ = a_BlockZ;
-
-		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		Handler = cBlockInfo::GetHandler(World->GetBlock(pX, pY, pZ));
-
-		if (Handler->IsClickedThrough())
-		{
-			Handler->OnDigging(ChunkInterface, *World, m_Player, pX, pY, pZ);
-		}
-	}
 }
 
 
@@ -1052,12 +1086,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 void cClientHandle::FinishDigAnimation()
 {
-	if (
-		!m_HasStartedDigging ||           // Hasn't received the DIG_STARTED packet
-		(m_LastDigBlockX == -1) ||
-		(m_LastDigBlockY == -1) ||
-		(m_LastDigBlockZ == -1)
-	)
+	if (!m_HasStartedDigging) // Hasn't received the DIG_STARTED packet
 	{
 		return;
 	}
@@ -1195,9 +1224,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		{
 			// A plugin won't let us eat, abort (send the proper packets to the client, too):
 			m_Player->AbortEating();
-			return;
 		}
-		return;
 	}
 	else
 	{
@@ -2045,9 +2072,9 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 
 
 
-void cClientHandle::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cClientHandle::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
-	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+	m_Protocol->SendCollectEntity(a_Entity, a_Player);
 }
 
 
@@ -2369,9 +2396,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(const cWorld & a_World)
+void cClientHandle::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_World);
+	m_Protocol->SendRespawn(a_World, a_ShouldIgnoreDimensionChecks);
 }
 
 

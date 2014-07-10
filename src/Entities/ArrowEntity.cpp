@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "ArrowEntity.h"
 #include "../Chunk.h"
+#include "FastRandom.h"
 
 
 
@@ -24,9 +25,9 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
-		 m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
-		 GetYaw(), GetPitch()
-		 );
+		m_UniqueID, GetSpeedX(), GetSpeedY(), GetSpeedZ(),
+		GetYaw(), GetPitch()
+	);
 }
 
 
@@ -44,6 +45,10 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_bIsCollected(false),
 	m_HitBlockPos(0, 0, 0)
 {
+	if (a_Player.IsGameModeCreative())
+	{
+		m_PickupState = psInCreative;
+	}
 }
 
 
@@ -67,26 +72,24 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
-{
-	if (a_HitFace == BLOCK_FACE_NONE) { return; }
-	
-	super::OnHitSolidBlock(a_HitPos, a_HitFace);
-	int a_X = (int)a_HitPos.x, a_Y = (int)a_HitPos.y, a_Z = (int)a_HitPos.z;
-	
-	switch (a_HitFace)
+{	
+	if (GetSpeed().EqualsEps(Vector3d(0, 0, 0), 0.0000001))
 	{
-		case BLOCK_FACE_XM: // Strangely, bounding boxes / block tracers return the actual block for these two directions, so AddFace not needed
-		case BLOCK_FACE_YM:
-		{
-			break;
-		}
-		default: AddFaceDirection(a_X, a_Y, a_Z, a_HitFace, true);
+		SetSpeed(GetLookVector().NormalizeCopy() * 0.1); // Ensure that no division by zero happens later
 	}
-	
-	m_HitBlockPos = Vector3i(a_X, a_Y, a_Z);
+
+	Vector3d Hit = a_HitPos;
+	Vector3d SinkMovement = (GetSpeed() / 800);
+	Hit += (SinkMovement * 0.01) / SinkMovement.Length(); // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
+
+	super::OnHitSolidBlock(Hit, a_HitFace);
+	Vector3i BlockHit = Hit.Floor();
+
+	int X = BlockHit.x, Y = BlockHit.y, Z = BlockHit.z;
+	m_HitBlockPos = Vector3i(X, Y, Z);
 	
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("random.bowhit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("random.bowhit", X * 8, Y * 8, Z * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 }
 
 
@@ -94,13 +97,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
-{
-	if (!a_EntityHit.IsMob() && !a_EntityHit.IsMinecart() && !a_EntityHit.IsPlayer() && !a_EntityHit.IsBoat())
-	{
-		// Not an entity that interacts with an arrow
-		return;
-	}
-	
+{	
 	int Damage = (int)(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
 	if (m_IsCritical)
 	{
@@ -109,7 +106,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
 	// Broadcast successful hit sound
-	m_World->BroadcastSoundEffect("random.successful_hit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect("random.successful_hit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	
 	Destroy();
 }
@@ -120,16 +117,22 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 
 void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 {
-	if ((m_IsInGround) && (!m_bIsCollected) && (CanPickup(*a_Dest)))
+	if (m_IsInGround && !m_bIsCollected && CanPickup(*a_Dest))
 	{
-		int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
-		if (NumAdded > 0) // Only play effects if there was space in inventory
+		// Do not add the arrow to the inventory when the player is in creative:
+		if (!a_Dest->IsGameModeCreative())
 		{
-			m_World->BroadcastCollectPickup((const cPickup &)*this, *a_Dest);
-			// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-			m_World->BroadcastSoundEffect("random.pop", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
-			m_bIsCollected = true;
+			int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
+			if (NumAdded == 0)
+			{
+				// No space in the inventory
+				return;
+			}
 		}
+
+		GetWorld()->BroadcastCollectEntity(*this, *a_Dest);
+		GetWorld()->BroadcastSoundEffect("random.pop", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_bIsCollected = true;
 	}
 }
 
@@ -165,7 +168,7 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		
 		if (!m_HasTeleported) // Sent a teleport already, don't do again
 		{
-			if (m_HitGroundTimer > 1000.f) // Send after a second, could be less, but just in case
+			if (m_HitGroundTimer > 500.f) // Send after half a second, could be less, but just in case
 			{
 				m_World->BroadcastTeleportEntity(*this);
 				m_HasTeleported = true;

@@ -267,12 +267,12 @@ cWorld::cWorld(const AString & a_WorldName) :
 
 cWorld::~cWorld()
 {
-	delete m_SimulatorManager;
-	delete m_SandSimulator;
-	delete m_WaterSimulator;
-	delete m_LavaSimulator;
-	delete m_FireSimulator;
-	delete m_RedstoneSimulator;
+	delete m_SimulatorManager;   m_SimulatorManager  = NULL;
+	delete m_SandSimulator;      m_SandSimulator     = NULL;
+	delete m_WaterSimulator;     m_WaterSimulator    = NULL;
+	delete m_LavaSimulator;      m_LavaSimulator     = NULL;
+	delete m_FireSimulator;      m_FireSimulator     = NULL;
+	delete m_RedstoneSimulator;  m_RedstoneSimulator = NULL;
 
 	UnloadUnusedChunks();
 	
@@ -1877,9 +1877,9 @@ void cWorld::BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer
 
 
 
-void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastCollectPickup(a_Pickup, a_Player, a_Exclude);
+	m_ChunkMap->BroadcastCollectEntity(a_Entity, a_Player, a_Exclude);
 }
 
 
@@ -2767,10 +2767,8 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 void cWorld::SaveAllChunks(void)
 {
-	LOGINFO("Saving all chunks...");
 	m_LastSave = m_WorldAge;
 	m_ChunkMap->SaveAllChunks();
-	m_Storage.QueueSavedMessage();
 }
 
 
@@ -2972,11 +2970,13 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
 		delete a_Monster;
+		a_Monster = NULL;
 		return -1;
 	}
 	if (!a_Monster->Initialize(*this))
 	{
 		delete a_Monster;
+		a_Monster = NULL;
 		return -1;
 	}
 	BroadcastSpawnEntity(*a_Monster);
@@ -2999,6 +2999,7 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
+		Projectile = NULL;
 		return -1;
 	}
 	return Projectile->GetUniqueID();

@@ -37,6 +37,7 @@ public:
 			if (!ItemFrame->Initialize(*a_World))
 			{
 				delete ItemFrame;
+				ItemFrame = NULL;
 				return false;
 			}
 

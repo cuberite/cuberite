@@ -35,8 +35,8 @@ class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
 
-typedef std::list<cClientHandle *>  cClientHandleList;
-typedef cChunk * cChunkPtr;
+typedef std::list<cClientHandle *>         cClientHandleList;
+typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
@@ -70,6 +70,7 @@ public:
 	void BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
 	void BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);

@@ -217,14 +217,20 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 {
 	ASSERT(a_NewMeta <= 8);  // Invalid meta values
 	ASSERT(a_NewMeta > 0);  // Source blocks aren't spread
-	
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	if (!a_NearChunk->UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta))
+
+	a_NearChunk = a_NearChunk->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
+	if ((a_NearChunk == NULL) || (!a_NearChunk->IsValid()))
 	{
 		// Chunk not available
 		return;
 	}
+
+	const int BlockX = a_NearChunk->GetPosX() * cChunkDef::Width + a_RelX;
+	const int BlockZ = a_NearChunk->GetPosZ() * cChunkDef::Width + a_RelZ;
+	
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	a_NearChunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, BlockType, BlockMeta);
 	
 	if (IsAllowedBlock(BlockType))
 	{
@@ -246,15 +252,9 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				a_RelX, a_RelY, a_RelZ,
 				ItemTypeToString(NewBlock).c_str()
 			);
-			a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
+			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			int BaseX = a_NearChunk->GetPosX() * cChunkDef::Width;
-			int BaseZ = a_NearChunk->GetPosZ() * cChunkDef::Width;
-
-			BaseX += a_RelX;
-			BaseZ += a_RelZ;
-
-			a_NearChunk->BroadcastSoundEffect("random.fizz", BaseX * 8, a_RelY * 8, BaseZ * 8, 0.5f, 1.5f);
+			a_NearChunk->BroadcastSoundEffect("random.fizz", BlockX * 8, a_RelY * 8, BlockZ * 8, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -267,15 +267,9 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 			FLOG("  Water flowing into lava, turning lava at rel {%d, %d, %d} into %s", 
 				a_RelX, a_RelY, a_RelZ, ItemTypeToString(NewBlock).c_str()
 			);
-			a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
+			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			int BaseX = a_NearChunk->GetPosX() * cChunkDef::Width;
-			int BaseZ = a_NearChunk->GetPosZ() * cChunkDef::Width;
-
-			BaseX += a_RelX;
-			BaseZ += a_RelZ;
-
-			a_NearChunk->BroadcastSoundEffect("random.fizz", BaseX * 8, a_RelY * 8, BaseZ * 8, 0.5f, 1.5f);
+			a_NearChunk->BroadcastSoundEffect("random.fizz", BlockX * 8, a_RelY * 8, BlockZ * 8, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -303,21 +297,17 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				m_World,
 				PluginInterface,
 				NULL, 
-				a_NearChunk->GetPosX() * cChunkDef::Width + a_RelX, 
+				BlockX, 
 				a_RelY,
-				a_NearChunk->GetPosZ() * cChunkDef::Width + a_RelZ
+				BlockZ
 			);
 		}
 	}  // if (CanWashAway)
-	
+
 	// Spread:
-	FLOG("  Spreading to {%d, %d, %d} with meta %d", 
-		a_NearChunk->GetPosX() * cChunkDef::Width + a_RelX,
-		a_RelY,
-		a_NearChunk->GetPosZ() * cChunkDef::Width + a_RelZ,
-		a_NewMeta
-	);
-	a_NearChunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
+	FLOG("  Spreading to {%d, %d, %d} with meta %d", BlockX, a_RelY, BlockZ, a_NewMeta);
+	a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
+	m_World.GetSimulatorManager()->WakeUp(BlockX, a_RelY, BlockZ, a_NearChunk);
 
 	HardenBlock(a_NearChunk, a_RelX, a_RelY, a_RelZ, m_FluidBlock, a_NewMeta);
 }
@@ -409,13 +399,13 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY
 		if (a_Meta == 0)
 		{
 			// Source lava block
-			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
+			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_OBSIDIAN, 0);
 			return true;
 		}
 		// Ignore last lava level
 		else if (a_Meta <= 4)
 		{
-			a_Chunk->UnboundedRelSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
+			a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_COBBLESTONE, 0);
 			return true;
 		}
 	}

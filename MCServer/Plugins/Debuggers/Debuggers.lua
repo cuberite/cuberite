@@ -346,7 +346,7 @@ end
 
 function OnUsingBlazeRod(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, CursorY, CursorZ)
 	-- Magic rod of query: show block types and metas for both neighbors of the pointed face
-	local Type, Meta, Valid = Player:GetWorld():GetBlockTypeMeta(BlockX, BlockY, BlockZ, Type, Meta);
+	local Valid, Type, Meta = Player:GetWorld():GetBlockTypeMeta(BlockX, BlockY, BlockZ);
 
 	if (Type == E_BLOCK_AIR) then
 		Player:SendMessage(cChatColor.LightGray .. "Block {" .. BlockX .. ", " .. BlockY .. ", " .. BlockZ .. "}: air:" .. Meta);
@@ -356,7 +356,7 @@ function OnUsingBlazeRod(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cur
 	end
 	
 	local X, Y, Z = AddFaceDirection(BlockX, BlockY, BlockZ, BlockFace);
-	Valid, Type, Meta = Player:GetWorld():GetBlockTypeMeta(X, Y, Z, Type, Meta);
+	Valid, Type, Meta = Player:GetWorld():GetBlockTypeMeta(X, Y, Z);
 	if (Type == E_BLOCK_AIR) then
 		Player:SendMessage(cChatColor.LightGray .. "Block {" .. X .. ", " .. Y .. ", " .. Z .. "}: air:" .. Meta);
 	else

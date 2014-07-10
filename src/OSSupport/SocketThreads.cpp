@@ -61,6 +61,7 @@ bool cSocketThreads::AddClient(const cSocket & a_Socket, cCallback * a_Client)
 		// There was an error launching the thread (but it was already logged along with the reason)
 		LOGERROR("A new cSocketThread failed to start");
 		delete Thread;
+		Thread = NULL;
 		return false;
 	}
 	Thread->AddClient(a_Socket, a_Client);

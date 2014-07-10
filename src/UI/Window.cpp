@@ -145,8 +145,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 	{
 		int NumSlots = (*itr)->GetNumSlots();
 		for (int i = 0; i < NumSlots; i++)
-		{
-			
+		{			
 			const cItem * Item = (*itr)->GetSlot(i, a_Player);
 			if (Item == NULL)
 			{
@@ -170,7 +169,7 @@ void cWindow::Clicked(
 	const cItem & a_ClickedItem
 )
 {
-    	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
+	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (a_WindowID != m_WindowID)
 	{
 		LOGWARNING("%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.", __FUNCTION__, m_WindowID, a_WindowID, a_Player.GetName().c_str());
@@ -179,6 +178,7 @@ void cWindow::Clicked(
 
 	switch (a_ClickAction)
 	{
+		case caLeftClickOutside:
 		case caRightClickOutside:
 		{
 			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
@@ -191,25 +191,16 @@ void cWindow::Clicked(
 				a_Player.TossPickup(a_ClickedItem);
 			}
 
-			// Toss one of the dragged items:
-			a_Player.TossHeldItem();
-			return;
-		}
-		case caLeftClickOutside:
-		{
-			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
+			if (a_ClickAction == caLeftClickOutside)
 			{
-				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
-				return;
+				// Toss all dragged items:
+				a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 			}
-
-			if (a_Player.IsGameModeCreative())
+			else
 			{
-				a_Player.TossPickup(a_ClickedItem);
+				// Toss one of the dragged items:
+				a_Player.TossHeldItem();
 			}
-
-			// Toss all dragged items:
-			a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
 			return;
 		}
 		case caLeftClickOutsideHoldNothing:
@@ -1017,6 +1008,7 @@ cEnderChestWindow::~cEnderChestWindow()
 	// Send out the chest-close packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_ENDER_CHEST);
 
+	// Play the closing sound
 	m_World->BroadcastSoundEffect("random.chestclosed", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
 }
 

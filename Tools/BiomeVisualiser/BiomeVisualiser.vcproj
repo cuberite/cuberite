@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1250"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="BiomeVisualiser"
 	ProjectGUID="{6DF3D88B-AD47-45B6-B831-1BDE74F86B5C}"
 	RootNamespace="BiomeVisualiser"
@@ -328,6 +328,14 @@
 				Name="Shared"
 				>
 				<File
+					RelativePath="..\..\src\BiomeDef.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\BiomeDef.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\BlockID.cpp"
 					>
 				</File>
@@ -353,6 +361,14 @@
 				</File>
 				<File
 					RelativePath="..\..\src\WorldStorage\FastNBT.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\FastRandom.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\FastRandom.h"
 					>
 				</File>
 				<File

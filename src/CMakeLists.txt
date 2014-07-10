@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/")
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/jsoncpp/include")
-include_directories (SYSTEM "${PROJECT_SOURCE_DIR}/../lib/polarssl/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
 set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
@@ -12,6 +12,7 @@ set(BINDING_DEPENDECIES
 	tolua
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
+	Bindings/gen_LuaState_Call.lua
 	Bindings/LuaFunctions.h
 	Bindings/LuaWindow.h
 	Bindings/Plugin.h
@@ -79,16 +80,22 @@ set(BINDING_DEPENDECIES
 	World.h
 )
 
+# List all the files that are generated as part of the Bindings build process
+set (BINDING_OUTPUTS
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/LuaState_Call.inc
+)
+
 include_directories(Bindings)
 include_directories(.)
 
 if (WIN32)
 	ADD_CUSTOM_COMMAND(
-		# add any new generated bindings here
-		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
+		OUTPUT ${BINDING_OUTPUTS}
 
 		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND copy /y ..\\..\\MCServer\\lua51.dll .
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ../../MCServer/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
 		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
@@ -119,7 +126,8 @@ if (NOT MSVC)
 	
 	# lib dependencies are not included
 	
-	
+	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
+
 	#add cpp files here
 	add_library(Bindings
 		Bindings/Bindings
@@ -134,7 +142,7 @@ if (NOT MSVC)
 		Bindings/WebPlugin
 	)
 
-	target_link_libraries(Bindings lua sqlite tolualib)
+	target_link_libraries(Bindings lua sqlite tolualib polarssl)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
@@ -260,4 +268,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} md5 luaexpat iniFile jsoncpp polarssl zlib lua sqlite)
+target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib sqlite lua)

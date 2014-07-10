@@ -4,7 +4,7 @@
 #include "ManualBindings.h"
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
-
+#include "polarssl/md5.h"
 #include "Plugin.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
@@ -25,7 +25,6 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
-#include "md5/md5.h"
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
@@ -1765,6 +1764,7 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 	if (!ChunkStay->AddChunks(2))
 	{
 		delete ChunkStay;
+		ChunkStay = NULL;
 		return 0;
 	}
 
@@ -2000,9 +2000,11 @@ static int tolua_cPlugin_Call(lua_State * tolua_S)
 
 static int tolua_md5(lua_State* tolua_S)
 {
-	std::string SourceString = tolua_tostring(tolua_S, 1, 0);
-	std::string CryptedString = md5( SourceString );
-	tolua_pushstring( tolua_S, CryptedString.c_str() );
+	unsigned char Output[16];
+	size_t len = 0;
+	const unsigned char * SourceString = (const unsigned char *)lua_tolstring(tolua_S, 1, &len);
+	md5(SourceString, len, Output);
+	lua_pushlstring(tolua_S, (const char *)Output, ARRAYCOUNT(Output));
 	return 1;
 }
 
