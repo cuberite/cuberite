@@ -3015,7 +3015,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachEntityInChunk",      tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",     tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",             tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
-                        tolua_function(tolua_S, "ForEachLoadedChunk",        tolua_ForEach<cWorld, int, int, &cWorld::ForEachLoadedChunk>);
+			tolua_function(tolua_S, "ForEachLoadedChunk",        tolua_ForEach<cWorld, int, int, &cWorld::ForEachLoadedChunk>);
 			tolua_function(tolua_S, "GetBlockInfo",              tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
