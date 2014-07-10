@@ -99,13 +99,13 @@ public:
 		{
 			return false;
 		}
-                
-                Vector3i BlockPos;
-                if (!GetPlaceableBlockFromTrace(a_World, a_Player, BlockPos))
-                {
-                        return false;
-                }
-                
+		
+		Vector3i BlockPos;
+		if (!GetPlaceableBlockFromTrace(a_World, a_Player, BlockPos))
+		{
+			return false;
+		}
+		
 		BLOCKTYPE CurrentBlock = a_World->GetBlock(BlockPos);
 		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
 		if (!CanWashAway)
