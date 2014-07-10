@@ -3,6 +3,7 @@
 
 class cAIAgressiveComponent : public cAIComponent {
 protected:
+	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	cEntity * m_Target;
 public:
 	cAIAgressiveComponent(cMonster * a_Monster) : cAIComponent(a_Monster), m_Target(null){}
@@ -14,5 +15,8 @@ public:
 	virtual void Attack(float a_Dt);
 
 protected:
+	virtual void EventLosePlayer(void);
+	virtual void CheckEventLostPlayer(void);
+	
 	bool IsMovingToTargetPosition();
 }
