@@ -116,6 +116,7 @@ public:
 	
 	int GetAttackRate() { return (int)m_AttackRate; }
 	int GetAttackInterval() { return (int)m_AttackInterval; }
+	int GetSightDistance() { return m_SightDistance; }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
 	void SetAttackInterval(float a_AttackInterval) { m_AttackInterval = a_AttackInterval; }
 	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
