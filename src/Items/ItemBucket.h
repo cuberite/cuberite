@@ -41,7 +41,7 @@ public:
 	
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_BlockFace < 0)
+		if (a_BlockFace > 0)
 		{
 			return false;
 		}
@@ -95,18 +95,24 @@ public:
 
 	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock)
 	{			
-		if (a_BlockFace < 0)
+		if (a_BlockFace > 0)
 		{
 			return false;
 		}
+                
+                Vector3i BlockPos;
+                if (!GetPlaceableBlockFromTrace(a_World, a_Player, BlockPos))
+                {
+                        return false;
+                }
 		
-		BLOCKTYPE CurrentBlock = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE CurrentBlock = a_World->GetBlock(BlockPos);
 		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
 		if (!CanWashAway)
 		{
 			// The block pointed at cannot be washed away, so put fluid on top of it / on its sides
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			CurrentBlock = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			//AddFaceDirection(BlockPos.x, BlockPos.y, BlockPos.z, a_BlockFace);
+			CurrentBlock = a_World->GetBlock(BlockPos);
 		}
 		if (
 			!CanWashAway && 
@@ -149,7 +155,7 @@ public:
 			}
 		}
 
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FluidBlock, 0);
+		a_World->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 		
 		return true;
 	}
@@ -201,5 +207,50 @@ public:
 		BlockPos.Set(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z);
 		return true;
 	}
+        
+        
+        bool GetPlaceableBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & BlockPos)
+	{
+		class cCallbacks :
+			public cBlockTracer::cCallbacks
+		{
+		public:
+			Vector3i  m_Pos;
+			bool      m_HasHitLastBlock;
+			
 
+			cCallbacks(void) :
+				m_HasHitLastBlock(false)
+			{
+			}
+			
+			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			{
+                                if (a_BlockType != E_BLOCK_AIR)
+                                {
+                                        m_HasHitLastBlock = true;
+                                        return true;
+                                }
+                                
+                                m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+                                
+                                return false;
+			}
+		} Callbacks;
+
+		cLineBlockTracer Tracer(*a_World, Callbacks);
+		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
+		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
+
+		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+
+		if (!Callbacks.m_HasHitLastBlock)
+		{
+			return false;
+		}
+
+
+		BlockPos.Set(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z);
+		return true;
+	}
 };
