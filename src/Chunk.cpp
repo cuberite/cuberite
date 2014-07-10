@@ -87,7 +87,8 @@ cChunk::cChunk(
 	m_NeighborZM(a_NeighborZM),
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
-	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
+	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
+	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != NULL)
 	{
@@ -1641,6 +1642,31 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+bool cChunk::ShouldBeTicked(void) const
+{
+	return (HasAnyClients() || (m_AlwaysTicked > 0));
+}
+
+
+
+
+
+void cChunk::SetAlwaysTicked(bool a_AlwaysTicked)
+{
+	if (a_AlwaysTicked)
+	{
+		m_AlwaysTicked += 1;
+	}
+	else
+	{
+		m_AlwaysTicked -= 1;
+	}
+}
+
+
+
+
+
 void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 {
 	cBlockEntity * be = GetBlockEntity(a_X, a_Y, a_Z);
@@ -1852,7 +1878,7 @@ bool cChunk::HasClient( cClientHandle* a_Client )
 
 
 
-bool cChunk::HasAnyClients(void)
+bool cChunk::HasAnyClients(void) const
 {
 	return !m_LoadedByClient.empty();
 }

@@ -3033,6 +3033,15 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 
 
 
+void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
+{
+	m_ChunkMap->SetChunkAlwaysTicked(a_ChunkX, a_ChunkZ, a_AlwaysTicked);
+}
+
+
+
+
+
 cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "");
