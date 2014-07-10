@@ -1698,6 +1698,8 @@ bool cPlayer::LoadFromDisk(void)
 	{
 		return true;
 	}
+	
+	return false;
 }
 
 
