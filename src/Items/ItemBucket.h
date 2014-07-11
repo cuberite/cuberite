@@ -41,7 +41,7 @@ public:
 	
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_BlockFace > 0)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
@@ -95,35 +95,15 @@ public:
 
 	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock)
 	{			
-		if (a_BlockFace > 0)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
 		
 		BLOCKTYPE CurrentBlock;
 		Vector3i BlockPos;
-		if (!GetPlaceableBlockFromTrace(a_World, a_Player, BlockPos, CurrentBlock))
+		if (!GetPlacementCoordsFromTrace(a_World, a_Player, BlockPos, CurrentBlock))
 		{
-			return false;
-		}
-		
-		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
-		if (!CanWashAway)
-		{
-			// The block pointed at cannot be washed away, so put fluid on top of it / on its sides
-			// AddFaceDirection(BlockPos.x, BlockPos.y, BlockPos.z, a_BlockFace);
-			// CurrentBlock = a_World->GetBlock(BlockPos);
-		}
-		if (
-			!CanWashAway && 
-			(CurrentBlock != E_BLOCK_AIR) && 
-			(CurrentBlock != E_BLOCK_WATER) &&
-			(CurrentBlock != E_BLOCK_STATIONARY_WATER) &&
-			(CurrentBlock != E_BLOCK_LAVA) &&
-			(CurrentBlock != E_BLOCK_STATIONARY_LAVA)
-		)
-		{
-			// Cannot place water here
 			return false;
 		}
 		
@@ -144,6 +124,7 @@ public:
 		}
 		
 		// Wash away anything that was there prior to placing:
+		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
 		if (CanWashAway)
 		{
 			cBlockHandler * Handler = BlockHandler(CurrentBlock);
@@ -209,7 +190,7 @@ public:
 	}
         
         
-        bool GetPlaceableBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
+        bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
@@ -229,6 +210,17 @@ public:
 			{
 				if (a_BlockType != E_BLOCK_AIR)
 				{
+					bool CanWashAway = cFluidSimulator::CanWashAway(m_LastBlock);
+					if (
+						!CanWashAway &&
+						(m_LastBlock != E_BLOCK_AIR) && 
+						!IsBlockWater(m_LastBlock) &&
+						!IsBlockLava(m_LastBlock)
+					)
+					{
+						return true;
+					}
+					
 					m_HasHitLastBlock = true;
 					return true;
 				}
