@@ -1698,8 +1698,8 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char & a_PowerLevel)
 {
 	a_PowerLevel = 0;
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
+	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
+	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
 
 	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr) // Check powered list
 	{
@@ -1713,6 +1713,14 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr) // Check linked powered list
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		{
+			continue;
+		}
+
+		BLOCKTYPE Type = E_BLOCK_AIR;
+		int RelSourceX = itr->a_SourcePos.x - m_Chunk->GetPosX() * cChunkDef::Width;
+		int RelSourceZ = itr->a_SourcePos.z - m_Chunk->GetPosZ() * cChunkDef::Width;
+		if (!m_Chunk->UnboundedRelGetBlockType(RelSourceX, itr->a_SourcePos.y, RelSourceZ, Type) || (Type == E_BLOCK_REDSTONE_WIRE))
 		{
 			continue;
 		}
@@ -1888,9 +1896,9 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	int SourceX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelSourceX;
 	int SourceZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelSourceZ;
 
-	cChunk * Neighbour = m_Chunk->GetNeighborChunk(BlockX, BlockZ);
-	PoweredBlocksList * Powered = Neighbour->GetRedstoneSimulatorPoweredBlocksList();
-	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)  // Check powered list
+	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ); // Adjust coordinates for the later call using these values
+	PoweredBlocksList * Powered = Neighbour->GetRedstoneSimulatorPoweredBlocksList(); // We need to insert the value into the chunk who owns the block position
+	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)
 	{
 		if (
 			itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)) &&
@@ -1903,7 +1911,8 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 		}
 	}
 
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)  // Check powered list
+	// No need to get neighbouring chunk as we can guarantee that when something is powering us, the entry will be in our chunk
+	for (PoweredBlocksList::iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
 		if (			
 			itr->a_BlockPos.Equals(Vector3i(SourceX, a_RelSourceY, SourceZ)) &&
@@ -1958,15 +1967,6 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	int SourceX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelSourceX;
 	int SourceZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelSourceZ;
 
-	BLOCKTYPE DestBlock = 0;
-	if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ, DestBlock))
-	{
-		return;
-	}
-	if ((DestBlock == E_BLOCK_REDSTONE_WIRE) && (m_Chunk->GetBlock(a_RelSourceX, a_RelSourceY, a_RelSourceZ) == E_BLOCK_REDSTONE_WIRE))
-	{
-		return;
-	}
 	if (!IsViableMiddleBlock(a_MiddleBlock))
 	{
 		return;
