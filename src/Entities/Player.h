@@ -528,6 +528,24 @@ protected:
 
 	cStatManager m_Stats;
 
+	/** Flag representing whether the player is currently in a bed
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
+	bool m_bIsInBed;
+
+	/** How long till the player's inventory will be saved
+	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
+	unsigned int m_TicksUntilNextSave;
+
+	/** Flag used by food handling system to determine whether a teleport has just happened
+	Will not apply food penalties if found to be true; will set to false after processing
+	*/
+	bool m_bIsTeleporting;
+	
+	/** The UUID of the player, as read from the ClientHandle.
+	If no ClientHandle is given, the UUID is initialized to empty. */
+	AString m_UUID;
+
+
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
@@ -554,19 +572,9 @@ protected:
 	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
 	void ApplyFoodExhaustionFromMovement();
 
-	/** Flag representing whether the player is currently in a bed
-	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
-	bool m_bIsInBed;
-
-	/** How long till the player's inventory will be saved
-	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
-	unsigned int m_TicksUntilNextSave;
-
-	/** Flag used by food handling system to determine whether a teleport has just happened
-	Will not apply food penalties if found to be true; will set to false after processing
-	*/
-	bool m_bIsTeleporting;
-
+	/** Returns the filename for the player data based on the UUID given.
+	This can be used both for online and offline UUIDs. */
+	AString GetUUIDFileName(const AString & a_UUID);
 } ; // tolua_export
 
 

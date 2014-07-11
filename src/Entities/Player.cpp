@@ -34,46 +34,47 @@
 
 
 
-cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: super(etPlayer, 0.6, 1.8)
-	, m_bVisible(true)
-	, m_FoodLevel(MAX_FOOD_LEVEL)
-	, m_FoodSaturationLevel(5.0)
-	, m_FoodTickTimer(0)
-	, m_FoodExhaustionLevel(0.0)
-	, m_FoodPoisonedTicksRemaining(0)
-	, m_LastJumpHeight(0)
-	, m_LastGroundHeight(0)
-	, m_bTouchGround(false)
-	, m_Stance(0.0)
-	, m_Inventory(*this)
-	, m_EnderChestContents(9, 3)
-	, m_CurrentWindow(NULL)
-	, m_InventoryWindow(NULL)
-	, m_Color('-')
-	, m_GameMode(eGameMode_NotSet)
-	, m_IP("")
-	, m_ClientHandle(a_Client)
-	, m_NormalMaxSpeed(1.0)
-	, m_SprintingMaxSpeed(1.3)
-	, m_FlyingMaxSpeed(1.0)
-	, m_IsCrouched(false)
-	, m_IsSprinting(false)
-	, m_IsFlying(false)
-	, m_IsSwimming(false)
-	, m_IsSubmerged(false)
-	, m_IsFishing(false)
-	, m_CanFly(false)
-	, m_EatingFinishTick(-1)
-	, m_LifetimeTotalXp(0)
-	, m_CurrentXp(0)
-	, m_bDirtyExperience(false)
-	, m_IsChargingBow(false)
-	, m_BowCharge(0)
-	, m_FloaterID(-1)
-	, m_Team(NULL)
-	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
-	, m_bIsTeleporting(false)
+cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
+	super(etPlayer, 0.6, 1.8),
+	m_bVisible(true),
+	m_FoodLevel(MAX_FOOD_LEVEL),
+	m_FoodSaturationLevel(5.0),
+	m_FoodTickTimer(0),
+	m_FoodExhaustionLevel(0.0),
+	m_FoodPoisonedTicksRemaining(0),
+	m_LastJumpHeight(0),
+	m_LastGroundHeight(0),
+	m_bTouchGround(false),
+	m_Stance(0.0),
+	m_Inventory(*this),
+	m_EnderChestContents(9, 3),
+	m_CurrentWindow(NULL),
+	m_InventoryWindow(NULL),
+	m_Color('-'),
+	m_GameMode(eGameMode_NotSet),
+	m_IP(""),
+	m_ClientHandle(a_Client),
+	m_NormalMaxSpeed(1.0),
+	m_SprintingMaxSpeed(1.3),
+	m_FlyingMaxSpeed(1.0),
+	m_IsCrouched(false),
+	m_IsSprinting(false),
+	m_IsFlying(false),
+	m_IsSwimming(false),
+	m_IsSubmerged(false),
+	m_IsFishing(false),
+	m_CanFly(false),
+	m_EatingFinishTick(-1),
+	m_LifetimeTotalXp(0),
+	m_CurrentXp(0),
+	m_bDirtyExperience(false),
+	m_IsChargingBow(false),
+	m_BowCharge(0),
+	m_FloaterID(-1),
+	m_Team(NULL),
+	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
+	m_bIsTeleporting(false),
+	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : "")
 {
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -1690,15 +1691,42 @@ bool cPlayer::LoadFromDisk(void)
 {
 	LoadPermissionsFromDisk();
 
-	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str());
-	
-	bool res = LoadFromFile(SourceFile);
+	// Load from the UUID file:
+	bool res = LoadFromFile(GetUUIDFileName(m_UUID));
 	if (res)
 	{
 		return true;
 	}
 	
+	// Load from the offline UUID file, if allowed:
+	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
+	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
+	{
+		res = LoadFromFile(GetUUIDFileName(OfflineUUID));
+		if (res)
+		{
+			return true;
+		}
+	}
+	
+	// Load from the old-style name-based file, if allowed:
+	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
+	{
+		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
+		res = LoadFromFile(OldStyleFileName);
+		if (res)
+		{
+			// Save in new format and remove the old file
+			SaveToDisk();
+			cFile::Delete(OldStyleFileName);
+			return true;
+		}
+	}
+	
+	// None of the files loaded successfully
+	LOGD("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
+		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str()
+	);
 	return false;
 }
 
@@ -1791,6 +1819,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 bool cPlayer::SaveToDisk()
 {
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players"));
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
@@ -1822,33 +1851,45 @@ bool cPlayer::SaveToDisk()
 	root["foodSaturation"]      = m_FoodSaturationLevel;
 	root["foodTickTimer"]       = m_FoodTickTimer;
 	root["foodExhaustion"]      = m_FoodExhaustionLevel;
-	root["world"]               = GetWorld()->GetName();
 	root["isflying"]            = IsFlying();
-
-	if (m_GameMode == GetWorld()->GetGameMode())
+	root["lastknownname"]       = GetName();
+	if (m_World != NULL)
 	{
-		root["gamemode"] = (int) eGameMode_NotSet;
+		root["world"] = m_World->GetName();
+		if (m_GameMode == m_World->GetGameMode())
+		{
+			root["gamemode"] = (int) eGameMode_NotSet;
+		}
+		else
+		{
+			root["gamemode"] = (int) m_GameMode;
+		}
 	}
 	else
 	{
-		root["gamemode"] = (int) m_GameMode;
+		// This happens if the player is saved to new format after loading from the old format
+		root["world"]    = m_LoadedWorldName;
+		root["gamemode"] = (int) eGameMode_NotSet;
 	}
 
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write(root);
 
-	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str() );
+	AString SourceFile = GetUUIDFileName(m_UUID);
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", GetName().c_str(), SourceFile.c_str());
+		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot open file. Player will lose their progress.",
+			GetName().c_str(), SourceFile.c_str()
+		);
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
 	{
-		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot save data. Player will lose their progress. ",
+			GetName().c_str(), SourceFile.c_str()
+		); 
 		return false;
 	}
 
@@ -1857,7 +1898,7 @@ bool cPlayer::SaveToDisk()
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
-		LOGERROR("Could not save stats for player %s", GetName().c_str());
+		LOGWARNING("Could not save stats for player %s", GetName().c_str());
 		return false;
 	}
 
@@ -2165,6 +2206,22 @@ void cPlayer::Detach()
 			}
 		}
 	}
+}
+
+
+
+
+
+AString cPlayer::GetUUIDFileName(const AString & a_UUID)
+{
+	ASSERT(a_UUID.size() == 36);
+	
+	AString res("players/");
+	res.append(a_UUID, 0, 2);
+	res.push_back('/');
+	res.append(a_UUID, 2, AString::npos);
+	res.append(".json");
+	return res;
 }
 
 
