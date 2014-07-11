@@ -817,10 +817,10 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	// Add tile-entity into NBT:
 	switch (a_Entity->GetBlockType())
 	{
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_CHEST:         AddChestEntity((cChestEntity *)a_Entity, a_Entity->GetBlockType()); break;
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_FURNACE:       AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
+		case E_BLOCK_CHEST:
+		case E_BLOCK_TRAPPED_CHEST: AddChestEntity((cChestEntity *)a_Entity, a_Entity->GetBlockType()); break;
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity((cFurnaceEntity *)a_Entity); break;
 
 		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
 		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;

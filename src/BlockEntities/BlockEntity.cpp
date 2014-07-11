@@ -27,10 +27,10 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 {
 	switch (a_BlockType)
 	{
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_CHEST:         return new cChestEntity       (a_BlockX, a_BlockY, a_BlockZ, a_World, a_BlockType);
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_FURNACE:       return new cFurnaceEntity     (a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_World);
+		case E_BLOCK_CHEST:
+		case E_BLOCK_TRAPPED_CHEST: return new cChestEntity       (a_BlockX, a_BlockY, a_BlockZ, a_World, a_BlockType);
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:   return new cFurnaceEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_World);
 
 		case E_BLOCK_BEACON:        return new cBeaconEntity      (a_BlockX, a_BlockY, a_BlockZ, a_World);
 		case E_BLOCK_COMMAND_BLOCK: return new cCommandBlockEntity(a_BlockX, a_BlockY, a_BlockZ, a_World);

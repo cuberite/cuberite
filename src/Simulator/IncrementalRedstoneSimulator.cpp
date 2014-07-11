@@ -68,7 +68,10 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		RelX = a_BlockX - a_OtherChunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_OtherChunk->GetPosZ() * cChunkDef::Width;
 		a_OtherChunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
-		a_Chunk->SetIsRedstoneDirty(true); // When the second paramter is present, it means that the first belongs to a neighbouring chunk of the coordinates - alert this chunk for changes
+
+		// If a_OtherChunk is passed (not NULL), it is the chunk that had a block change, and a_Chunk will be the neighbouring chunk of that block
+		// Because said neighbouring chunk does not know of this change but still needs to update its redstone, we set it to dirty
+		a_Chunk->SetIsRedstoneDirty(true);
 	}
 	else
 	{
