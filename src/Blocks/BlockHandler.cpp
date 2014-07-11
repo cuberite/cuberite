@@ -176,12 +176,13 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
 	switch(a_BlockType)
 	{
-		// Block handlers, alphabetically sorted:		
+		// Duplicate block handlers (two blocks use one handler), alphabetically sorted:	
 		case E_BLOCK_CHEST:
 		case E_BLOCK_TRAPPED_CHEST:         return new cBlockChestHandler(a_BlockType);
 		case E_BLOCK_FURNACE:
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler(a_BlockType);
 
+		// Block handlers, alphabetically sorted:	
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);

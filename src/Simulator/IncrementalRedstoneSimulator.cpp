@@ -1915,6 +1915,7 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	}
 
 	// No need to get neighbouring chunk as we can guarantee that when something is powering us, the entry will be in our chunk
+	// TODO: on C++11 support, change this to a llama function pased to a std::remove_if
 	for (PoweredBlocksList::iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
 		if (			
@@ -2077,6 +2078,8 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 
 void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_SourceX, int a_SourceY, int a_SourceZ, cChunk * a_Chunk, bool a_IsFirstCall)
 {
+	// TODO: on C++11 support, change both of these to llama functions pased to a std::remove_if
+
 	for (PoweredBlocksList::iterator itr = a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->begin(); itr != a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->end();)
 	{
 		if (itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ)))
