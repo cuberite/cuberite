@@ -1692,8 +1692,7 @@ bool cPlayer::LoadFromDisk(void)
 	LoadPermissionsFromDisk();
 
 	// Load from the UUID file:
-	bool res = LoadFromFile(GetUUIDFileName(m_UUID));
-	if (res)
+	if (LoadFromFile(GetUUIDFileName(m_UUID)))
 	{
 		return true;
 	}
@@ -1702,8 +1701,7 @@ bool cPlayer::LoadFromDisk(void)
 	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
 	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
 	{
-		res = LoadFromFile(GetUUIDFileName(OfflineUUID));
-		if (res)
+		if (LoadFromFile(GetUUIDFileName(OfflineUUID)))
 		{
 			return true;
 		}
@@ -1713,18 +1711,19 @@ bool cPlayer::LoadFromDisk(void)
 	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
 	{
 		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
-		res = LoadFromFile(OldStyleFileName);
-		if (res)
+		if (LoadFromFile(OldStyleFileName))
 		{
 			// Save in new format and remove the old file
-			SaveToDisk();
-			cFile::Delete(OldStyleFileName);
+			if (SaveToDisk())
+			{
+				cFile::Delete(OldStyleFileName);
+			}
 			return true;
 		}
 	}
 	
 	// None of the files loaded successfully
-	LOGD("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
+	LOG("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
 		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str()
 	);
 	return false;
