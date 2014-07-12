@@ -15,8 +15,9 @@ class cSheep :
 public:
 
 	/** The number is the color of the sheep.
-	0-15 are the normal colors, if you type -1 the server
-	automatically chooses the right color for the sheep when spawned. */
+	Use E_META_WOOL_* constants for the wool color.
+	If you type -1, the server will generate a random color
+	with the GenerateNaturalRandomColor() function. */
 	cSheep(int a_Color = -1);
 
 	CLASS_PROTODEF(cSheep);
@@ -27,7 +28,8 @@ public:
 
 	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_WHEAT); }
 
-	/** Generates a random color for the sheep, like Mojang it does. */
+	/** Generates a random color for the sheep like the vanilla server.
+	The percent's where used are from the wiki: http://minecraft.gamepedia.com/Sheep#Breeding */
 	static NIBBLETYPE GenerateNaturalRandomColor(void);
 
 	bool IsSheared(void) const { return m_IsSheared; }
