@@ -27,6 +27,14 @@ public:
 	
 	cSplashPotionEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed, cEntityEffect::eType a_EntityEffectType, cEntityEffect a_EntityEffect, int a_PotionName);
 	
+	cEntityEffect::eType GetEntityEffectType() { return m_EntityEffectType; }
+	cEntityEffect GetEntityEffect()            { return m_EntityEffect; }
+	int GetPotionName()                        { return m_PotionName; }
+	
+	void SetEntityEffectType(cEntityEffect::eType a_EntityEffectType) { m_EntityEffectType = a_EntityEffectType; }
+	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
+	void SetPotionName(int a_PotionName) { m_PotionName = a_PotionName; }
+	
 protected:
 	
 	// cProjectileEntity overrides:

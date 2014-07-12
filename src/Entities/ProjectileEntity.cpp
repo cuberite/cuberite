@@ -312,7 +312,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkFireCharge:    return "SmallFireball";
 		case pkEnderPearl:    return "ThrownEnderpearl";
 		case pkExpBottle:     return "ThrownExpBottle";
-		case pkSplashPotion:  return "ThrownPotion";
+		case pkSplashPotion:  return "SplashPotion";
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
