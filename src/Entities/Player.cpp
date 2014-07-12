@@ -8,6 +8,7 @@
 #include "../World.h"
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
 #include "../GroupManager.h"
 #include "../Group.h"
 #include "../Root.h"
@@ -33,50 +34,48 @@
 
 
 
-cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: super(etPlayer, 0.6, 1.8)
-	, m_bVisible(true)
-	, m_FoodLevel(MAX_FOOD_LEVEL)
-	, m_FoodSaturationLevel(5)
-	, m_FoodTickTimer(0)
-	, m_FoodExhaustionLevel(0)
-	, m_FoodPoisonedTicksRemaining(0)
-	, m_LastJumpHeight(0)
-	, m_LastGroundHeight(0)
-	, m_bTouchGround(false)
-	, m_Stance(0.0)
-	, m_Inventory(*this)
-	, m_CurrentWindow(NULL)
-	, m_InventoryWindow(NULL)
-	, m_Color('-')
-	, m_GameMode(eGameMode_NotSet)
-	, m_IP("")
-	, m_ClientHandle(a_Client)
-	, m_NormalMaxSpeed(1.0)
-	, m_SprintingMaxSpeed(1.3)
-	, m_FlyingMaxSpeed(1.0)
-	, m_IsCrouched(false)
-	, m_IsSprinting(false)
-	, m_IsFlying(false)
-	, m_IsSwimming(false)
-	, m_IsSubmerged(false)
-	, m_IsFishing(false)
-	, m_CanFly(false)
-	, m_EatingFinishTick(-1)
-	, m_LifetimeTotalXp(0)
-	, m_CurrentXp(0)
-	, m_bDirtyExperience(false)
-	, m_IsChargingBow(false)
-	, m_BowCharge(0)
-	, m_FloaterID(-1)
-	, m_Team(NULL)
-	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
+cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
+	super(etPlayer, 0.6, 1.8),
+	m_bVisible(true),
+	m_FoodLevel(MAX_FOOD_LEVEL),
+	m_FoodSaturationLevel(5.0),
+	m_FoodTickTimer(0),
+	m_FoodExhaustionLevel(0.0),
+	m_FoodPoisonedTicksRemaining(0),
+	m_LastJumpHeight(0),
+	m_LastGroundHeight(0),
+	m_bTouchGround(false),
+	m_Stance(0.0),
+	m_Inventory(*this),
+	m_EnderChestContents(9, 3),
+	m_CurrentWindow(NULL),
+	m_InventoryWindow(NULL),
+	m_Color('-'),
+	m_GameMode(eGameMode_NotSet),
+	m_IP(""),
+	m_ClientHandle(a_Client),
+	m_NormalMaxSpeed(1.0),
+	m_SprintingMaxSpeed(1.3),
+	m_FlyingMaxSpeed(1.0),
+	m_IsCrouched(false),
+	m_IsSprinting(false),
+	m_IsFlying(false),
+	m_IsSwimming(false),
+	m_IsSubmerged(false),
+	m_IsFishing(false),
+	m_CanFly(false),
+	m_EatingFinishTick(-1),
+	m_LifetimeTotalXp(0),
+	m_CurrentXp(0),
+	m_bDirtyExperience(false),
+	m_IsChargingBow(false),
+	m_BowCharge(0),
+	m_FloaterID(-1),
+	m_Team(NULL),
+	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
+	m_bIsTeleporting(false),
+	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : "")
 {
-	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
-		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
-		this, GetUniqueID()
-	);
-	
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
@@ -225,7 +224,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (GetPosition() != m_LastPos) // Change in position from last tick?
+	if (!GetPosition().EqualsEps(m_LastPos, 0.01)) // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
@@ -521,7 +520,15 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	m_FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+
+	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
+	{
+		m_FoodSaturationLevel = 5.0;
+		return;
+	}
+	
+	m_FoodLevel = FoodLevel;
 	SendHealth();
 }
 
@@ -571,11 +578,9 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 	{
 		return false;
 	}
-	
-	m_FoodLevel = std::min(a_Food + m_FoodLevel, (int)MAX_FOOD_LEVEL);
-	m_FoodSaturationLevel = std::min(m_FoodSaturationLevel + a_Saturation, (double)m_FoodLevel);
-	
-	SendHealth();
+
+	SetFoodSaturationLevel(m_FoodSaturationLevel + a_Saturation);
+	SetFoodLevel(m_FoodLevel + a_Food);
 	return true;
 }
 
@@ -969,14 +974,15 @@ void cPlayer::Respawn(void)
 	
 	// Reset food level:
 	m_FoodLevel = MAX_FOOD_LEVEL;
-	m_FoodSaturationLevel = 5;
+	m_FoodSaturationLevel = 5.0;
+	m_FoodExhaustionLevel = 0.0;
 
 	// Reset Experience
 	m_CurrentXp = 0;
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*m_World);
+	m_ClientHandle->SendRespawn(*m_World, true);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1226,6 +1232,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 	SetPosition(a_PosX, a_PosY, a_PosZ);
 	m_LastGroundHeight = (float)a_PosY;
 	m_LastJumpHeight = (float)a_PosY;
+	m_bIsTeleporting = true;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
 	m_ClientHandle->SendPlayerMoveLook();
@@ -1679,53 +1686,98 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-bool cPlayer::LoadFromDisk()
+
+bool cPlayer::LoadFromDisk(void)
 {
 	LoadPermissionsFromDisk();
 
-	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str() );
+	// Load from the UUID file:
+	if (LoadFromFile(GetUUIDFileName(m_UUID)))
+	{
+		return true;
+	}
+	
+	// Load from the offline UUID file, if allowed:
+	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
+	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
+	{
+		if (LoadFromFile(GetUUIDFileName(OfflineUUID)))
+		{
+			return true;
+		}
+	}
+	
+	// Load from the old-style name-based file, if allowed:
+	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
+	{
+		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
+		if (LoadFromFile(OldStyleFileName))
+		{
+			// Save in new format and remove the old file
+			if (SaveToDisk())
+			{
+				cFile::Delete(OldStyleFileName);
+			}
+			return true;
+		}
+	}
+	
+	// None of the files loaded successfully
+	LOG("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
+		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str()
+	);
+	return false;
+}
 
+
+
+
+
+bool cPlayer::LoadFromFile(const AString & a_FileName)
+{
+	// Load the data from the file:
 	cFile f;
-	if (!f.Open(SourceFile, cFile::fmRead))
+	if (!f.Open(a_FileName, cFile::fmRead))
 	{
 		// This is a new player whom we haven't seen yet, bail out, let them have the defaults
 		return false;
 	}
-
 	AString buffer;
 	if (f.ReadRestOfFile(buffer) != f.GetSize())
 	{
-		LOGWARNING("Cannot read player data from file \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Cannot read player data from file \"%s\"", a_FileName.c_str());
 		return false;
 	}
-	f.Close(); //cool kids play nice
+	f.Close();
 
+	// Parse the JSON format:
 	Json::Value root;
 	Json::Reader reader;
 	if (!reader.parse(buffer, root, false))
 	{
-		LOGWARNING("Cannot parse player data in file \"%s\", player will be reset", SourceFile.c_str());
+		LOGWARNING("Cannot parse player data in file \"%s\"", a_FileName.c_str());
+		return false;
 	}
 
+	// Load the player data:
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if (JSON_PlayerPosition.size() == 3)
 	{
-		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
-		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
-		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
+		SetPosX(JSON_PlayerPosition[(unsigned)0].asDouble());
+		SetPosY(JSON_PlayerPosition[(unsigned)1].asDouble());
+		SetPosZ(JSON_PlayerPosition[(unsigned)2].asDouble());
 		m_LastPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetYaw      ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
-		SetPitch    ((float)JSON_PlayerRotation[(unsigned int)1].asDouble());
-		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
+		SetYaw      ((float)JSON_PlayerRotation[(unsigned)0].asDouble());
+		SetPitch    ((float)JSON_PlayerRotation[(unsigned)1].asDouble());
+		SetRoll     ((float)JSON_PlayerRotation[(unsigned)2].asDouble());
 	}
 
-	m_Health              = root.get("health", 0).asInt();
+	m_Health              = root.get("health",         0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
@@ -1743,6 +1795,7 @@ bool cPlayer::LoadFromDisk()
 	}
 	
 	m_Inventory.LoadFromJson(root["inventory"]);
+	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
 
@@ -1751,8 +1804,8 @@ bool cPlayer::LoadFromDisk()
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	StatSerializer.Load();
 	
-	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+	LOGD("Player \"%s\" was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
+		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
 	);
 	
 	return true;
@@ -1765,6 +1818,7 @@ bool cPlayer::LoadFromDisk()
 bool cPlayer::SaveToDisk()
 {
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players"));
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
@@ -1780,45 +1834,61 @@ bool cPlayer::SaveToDisk()
 	Json::Value JSON_Inventory;
 	m_Inventory.SaveToJson(JSON_Inventory);
 
-	Json::Value root;
-	root["position"]       = JSON_PlayerPosition;
-	root["rotation"]       = JSON_PlayerRotation;
-	root["inventory"]      = JSON_Inventory;
-	root["health"]         = m_Health;
-	root["xpTotal"]        = m_LifetimeTotalXp;
-	root["xpCurrent"]      = m_CurrentXp;
-	root["air"]            = m_AirLevel;
-	root["food"]           = m_FoodLevel;
-	root["foodSaturation"] = m_FoodSaturationLevel;
-	root["foodTickTimer"]  = m_FoodTickTimer;
-	root["foodExhaustion"] = m_FoodExhaustionLevel;
-	root["world"]          = GetWorld()->GetName();
-	root["isflying"]       = IsFlying();
+	Json::Value JSON_EnderChestInventory;
+	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
 
-	if (m_GameMode == GetWorld()->GetGameMode())
+	Json::Value root;
+	root["position"]            = JSON_PlayerPosition;
+	root["rotation"]            = JSON_PlayerRotation;
+	root["inventory"]           = JSON_Inventory;
+	root["enderchestinventory"] = JSON_EnderChestInventory;
+	root["health"]              = m_Health;
+	root["xpTotal"]             = m_LifetimeTotalXp;
+	root["xpCurrent"]           = m_CurrentXp;
+	root["air"]                 = m_AirLevel;
+	root["food"]                = m_FoodLevel;
+	root["foodSaturation"]      = m_FoodSaturationLevel;
+	root["foodTickTimer"]       = m_FoodTickTimer;
+	root["foodExhaustion"]      = m_FoodExhaustionLevel;
+	root["isflying"]            = IsFlying();
+	root["lastknownname"]       = GetName();
+	if (m_World != NULL)
 	{
-		root["gamemode"] = (int) eGameMode_NotSet;
+		root["world"] = m_World->GetName();
+		if (m_GameMode == m_World->GetGameMode())
+		{
+			root["gamemode"] = (int) eGameMode_NotSet;
+		}
+		else
+		{
+			root["gamemode"] = (int) m_GameMode;
+		}
 	}
 	else
 	{
-		root["gamemode"] = (int) m_GameMode;
+		// This happens if the player is saved to new format after loading from the old format
+		root["world"]    = m_LoadedWorldName;
+		root["gamemode"] = (int) eGameMode_NotSet;
 	}
 
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write(root);
 
-	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str() );
+	AString SourceFile = GetUUIDFileName(m_UUID);
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", GetName().c_str(), SourceFile.c_str());
+		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot open file. Player will lose their progress.",
+			GetName().c_str(), SourceFile.c_str()
+		);
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
 	{
-		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot save data. Player will lose their progress. ",
+			GetName().c_str(), SourceFile.c_str()
+		); 
 		return false;
 	}
 
@@ -1827,7 +1897,7 @@ bool cPlayer::SaveToDisk()
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
-		LOGERROR("Could not save stats for player %s", GetName().c_str());
+		LOGWARNING("Could not save stats for player %s", GetName().c_str());
 		return false;
 	}
 
@@ -1895,16 +1965,13 @@ void cPlayer::TickBurning(cChunk & a_Chunk)
 void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
-	
+
 	if (IsGameModeCreative())
 	{
 		// Hunger is disabled for Creative
 		return;
 	}
-	
-	// Remember the food level before processing, for later comparison
-	int LastFoodLevel = m_FoodLevel;
-	
+
 	// Heal or damage, based on the food level, using the m_FoodTickTimer:
 	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
 	{
@@ -1913,11 +1980,11 @@ void cPlayer::HandleFood(void)
 		{
 			m_FoodTickTimer = 0;
 
-			if (m_FoodLevel >= 17)
+			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
-				m_FoodExhaustionLevel += 3;
+				m_FoodExhaustionLevel += 3.0;
 			}
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
@@ -1926,7 +1993,7 @@ void cPlayer::HandleFood(void)
 			}
 		}
 	}
-	
+
 	// Apply food poisoning food exhaustion:
 	if (m_FoodPoisonedTicksRemaining > 0)
 	{
@@ -1939,23 +2006,18 @@ void cPlayer::HandleFood(void)
 	}
 
 	// Apply food exhaustion that has accumulated:
-	if (m_FoodExhaustionLevel >= 4)
+	if (m_FoodExhaustionLevel >= 4.0)
 	{
-		m_FoodExhaustionLevel -= 4;
+		m_FoodExhaustionLevel -= 4.0;
 
-		if (m_FoodSaturationLevel >= 1)
+		if (m_FoodSaturationLevel >= 1.0)
 		{
-			m_FoodSaturationLevel -= 1;
+			m_FoodSaturationLevel -= 1.0;
 		}
 		else
 		{
-			m_FoodLevel = std::max(m_FoodLevel - 1, 0);
+			SetFoodLevel(m_FoodLevel - 1);
 		}
-	}
-	
-	if (m_FoodLevel != LastFoodLevel)
-	{
-		SendHealth();
 	}
 }
 
@@ -2079,6 +2141,11 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	{
 		return;
 	}
+	if (m_bIsTeleporting)
+	{
+		m_bIsTeleporting = false;
+		return;
+	}
 
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)
@@ -2138,6 +2205,22 @@ void cPlayer::Detach()
 			}
 		}
 	}
+}
+
+
+
+
+
+AString cPlayer::GetUUIDFileName(const AString & a_UUID)
+{
+	ASSERT(a_UUID.size() == 36);
+	
+	AString res("players/");
+	res.append(a_UUID, 0, 2);
+	res.push_back('/');
+	res.append(a_UUID, 2, AString::npos);
+	res.append(".json");
+	return res;
 }
 
 

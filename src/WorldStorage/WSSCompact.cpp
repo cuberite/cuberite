@@ -273,7 +273,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 	{
 		for (Json::Value::iterator itr = AllChests.begin(); itr != AllChests.end(); ++itr )
 		{
-			std::auto_ptr<cChestEntity> ChestEntity(new cChestEntity(0, 0, 0, a_World));
+			std::auto_ptr<cChestEntity> ChestEntity(new cChestEntity(0, 0, 0, a_World, E_BLOCK_CHEST));
 			if (!ChestEntity->LoadFromJson(*itr))
 			{
 				LOGWARNING("ERROR READING CHEST FROM JSON!" );

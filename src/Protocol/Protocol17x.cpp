@@ -986,11 +986,11 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol172::SendRespawn(const cWorld & a_World)
+void cProtocol172::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
 {
-	if (m_LastSentDimension == a_World.GetDimension())
+	if ((m_LastSentDimension == a_World.GetDimension()) && !a_ShouldIgnoreDimensionChecks)
 	{
-		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do
+		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do (unless we are respawning from death)
 		return;
 	}
 
@@ -1221,10 +1221,9 @@ void cProtocol172::SendStatistics(const cStatManager & a_Manager)
 	cPacketizer Pkt(*this, 0x37);
 	Pkt.WriteVarInt(statCount); // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
-	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
+	for (size_t i = 0; i < (size_t)statCount; ++i)
 	{
 		StatValue Value = a_Manager.GetValue((eStatistic) i);
-
 		const AString & StatName = cStatInfo::GetName((eStatistic) i);
 
 		Pkt.WriteString(StatName);
@@ -2334,7 +2333,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a newline, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a grave accent/backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;

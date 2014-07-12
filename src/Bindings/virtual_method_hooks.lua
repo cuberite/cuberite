@@ -3,6 +3,20 @@ local disable_virtual_hooks = true
 local enable_pure_virtual = true
 local default_private_access = false
 
+
+
+
+
+-- Code generators used by the build
+-- Note that these are not exactly needed for the bindings, but rather we
+-- misuse tolua's Lua engine to process files for us
+dofile("gen_LuaState_Call.lua")
+
+
+
+
+
+
 local access = {public = 0, protected = 1, private = 2}
 
 function preparse_hook(p)

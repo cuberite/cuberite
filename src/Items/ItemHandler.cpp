@@ -44,6 +44,7 @@
 #include "ItemSign.h"
 #include "ItemMobHead.h"
 #include "ItemSpawnEgg.h"
+#include "ItemString.h"
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
 
@@ -62,7 +63,7 @@ cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
-	if (a_ItemType < 0)
+	if ((a_ItemType < 0) || ((unsigned long)a_ItemType >= ARRAYCOUNT(m_ItemHandler)))
 	{
 		// Either nothing (-1), or bad value, both cases should return the air handler
 		if (a_ItemType < -1)
@@ -129,6 +130,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_HEAD:              return new cItemMobHeadHandler(a_ItemType);
 		case E_ITEM_SNOWBALL:          return new cItemSnowballHandler();
 		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
+		case E_ITEM_STRING:            return new cItemStringHandler(a_ItemType);
 		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);
 		
 		case E_ITEM_WOODEN_HOE:

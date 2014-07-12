@@ -22,7 +22,8 @@ public:
 		// Flip the ON bit on/off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x08);
 
-		a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LEVER, Meta); // SetMeta doesn't work for unpowering levers, so setblock
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
+		a_WorldInterface.WakeUpSimulators(a_BlockX, a_BlockY, a_BlockZ);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("random.click", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 	}
 
@@ -104,7 +105,7 @@ public:
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
 		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
+		return (a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn);
 	}
 
 

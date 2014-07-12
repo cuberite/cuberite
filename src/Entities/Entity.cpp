@@ -1090,7 +1090,10 @@ void cEntity::HandleAir(void)
 
 	if (IsSubmerged())
 	{
-		SetSpeedY(1); // Float in the water
+		if (!IsPlayer()) // Players control themselves
+		{
+			SetSpeedY(1); // Float in the water
+		}
 
 		// Either reduce air level or damage player
 		if (m_AirLevel < 1)
@@ -1476,8 +1479,7 @@ void cEntity::SetWidth(double a_Width)
 
 void cEntity::AddPosX(double a_AddPosX)
 {
-	m_Pos.x += a_AddPosX;
-	
+	m_Pos.x += a_AddPosX;	
 }
 
 
@@ -1485,8 +1487,7 @@ void cEntity::AddPosX(double a_AddPosX)
 
 void cEntity::AddPosY(double a_AddPosY)
 {
-	m_Pos.y += a_AddPosY;
-	
+	m_Pos.y += a_AddPosY;	
 }
 
 
@@ -1494,8 +1495,7 @@ void cEntity::AddPosY(double a_AddPosY)
 
 void cEntity::AddPosZ(double a_AddPosZ)
 {
-	m_Pos.z += a_AddPosZ;
-	
+	m_Pos.z += a_AddPosZ;	
 }
 
 
@@ -1505,8 +1505,7 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 {
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
-	m_Pos.z += a_AddPosZ;
-	
+	m_Pos.z += a_AddPosZ;	
 }
 
 

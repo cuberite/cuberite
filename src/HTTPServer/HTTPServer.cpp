@@ -179,6 +179,8 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 	
 	// Open up requested ports:
 	bool HasAnyPort;
+	m_ListenThreadIPv4.SetReuseAddr(true);
+	m_ListenThreadIPv6.SetReuseAddr(true);
 	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
 	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
 	if (!HasAnyPort)

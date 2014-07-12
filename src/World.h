@@ -207,7 +207,6 @@ public:
 
 	void BroadcastChunkData              (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectEntity          (const cEntity & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
-	void BroadcastCollectPickup          (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity          (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEffect           (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEquipment        (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
@@ -242,7 +241,8 @@ public:
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 	
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 	
@@ -486,7 +486,7 @@ public:
 	double GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ);
+	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
@@ -635,18 +635,6 @@ public:
 	
 	// tolua_end
 	
-	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
-	{
-		// TODO: Use floor() instead of weird if statements
-		// Also fix Y
-		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/cChunkDef::Width;
-		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
-		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunkDef::Width;
-		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
-	}
-
 	/** Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead */
 	void SaveAllChunks(void);
 	
@@ -773,6 +761,13 @@ public:
 
 	/** Get the current darkness level based on the time */
 	NIBBLETYPE GetSkyDarkness() { return m_SkyDarkness; }
+	
+	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
+	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
+	whether it has any clients or not.
+	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
+	as at least one requests is active the chunk will be ticked). */
+	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
 private:
 

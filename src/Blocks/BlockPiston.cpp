@@ -85,7 +85,7 @@ int cBlockPistonHandler::FirstPassthroughBlock(int a_PistonX, int a_PistonY, int
 		NIBBLETYPE currMeta;
 		AddPistonDir(a_PistonX, a_PistonY, a_PistonZ, pistonmeta, 1);
 		a_World->GetBlockTypeMeta(a_PistonX, a_PistonY, a_PistonZ, currBlock, currMeta);
-		if (CanBreakPush(currBlock))
+		if (cBlockInfo::IsPistonBreakable(currBlock))
 		{
 			// This block breaks when pushed, extend up to here
 			return ret;

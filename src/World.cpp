@@ -389,8 +389,8 @@ void cWorld::InitializeSpawn(void)
 		IniFile.WriteFile(m_IniFileName);
 	}
 
-	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
-	BlockToChunk((int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ);
+	int ChunkX = 0, ChunkZ = 0;
+	cChunkDef::BlockToChunk((int)m_SpawnX, (int)m_SpawnZ, ChunkX, ChunkZ);
 	
 	// For the debugging builds, don't make the server build too much world upon start:
 	#if defined(_DEBUG) || defined(ANDROID_NDK)
@@ -1886,15 +1886,6 @@ void cWorld::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 
 
 
-void cWorld::BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude)
-{
-	m_ChunkMap->BroadcastCollectEntity(a_Pickup, a_Player, a_Exclude);
-}
-
-
-
-
-
 void cWorld::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastDestroyEntity(a_Entity, a_Exclude);
@@ -2191,9 +2182,18 @@ void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 
 
 
-void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
+void cWorld::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkZ);
+	m_ChunkMap->MarkRedstoneDirty(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
+{
+	m_ChunkMap->MarkChunkDirty(a_ChunkX, a_ChunkZ, a_MarkRedstoneDirty);
 }
 
 
@@ -2776,10 +2776,8 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 void cWorld::SaveAllChunks(void)
 {
-	LOGINFO("Saving all chunks...");
 	m_LastSave = m_WorldAge;
 	m_ChunkMap->SaveAllChunks();
-	m_Storage.QueueSavedMessage();
 }
 
 
@@ -3038,6 +3036,15 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 		
 		a_Results.push_back(PlayerName); // Match!
 	}
+}
+
+
+
+
+
+void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
+{
+	m_ChunkMap->SetChunkAlwaysTicked(a_ChunkX, a_ChunkZ, a_AlwaysTicked);
 }
 
 

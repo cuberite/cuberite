@@ -65,6 +65,8 @@
 #include "BlockRedstoneRepeater.h"
 #include "BlockRedstoneTorch.h"
 #include "BlockTNT.h"
+#include "BlockTripwire.h"
+#include "BlockTripwireHook.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSideways.h"
@@ -174,7 +176,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
 	switch(a_BlockType)
 	{
-		// Block handlers, alphabetically sorted:
+		// Block handlers, alphabetically sorted:	
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
@@ -236,9 +238,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_LILY_PAD:              return new cBlockLilypadHandler         (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
@@ -291,6 +293,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
 		case E_BLOCK_TRAPDOOR:              return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_TNT:                   return new cBlockTNTHandler             (a_BlockType);
+		case E_BLOCK_TRAPPED_CHEST:         return new cBlockChestHandler           (a_BlockType);
+		case E_BLOCK_TRIPWIRE:              return new cBlockTripwireHandler        (a_BlockType);
+		case E_BLOCK_TRIPWIRE_HOOK:         return new cBlockTripwireHookHandler    (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);  // TODO: This needs a special handler
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);

@@ -67,9 +67,27 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
 
-	if ((a_Killer != NULL) && (a_Killer->IsProjectile()))
+	if ((a_Killer != NULL) && a_Killer->IsProjectile() && (((cProjectileEntity *)a_Killer)->GetCreatorUniqueID() >= 0))
 	{
-		if (((cMonster *)((cProjectileEntity *)a_Killer)->GetCreator())->GetMobType() == mtSkeleton)
+		class cProjectileCreatorCallback : public cEntityCallback
+		{
+		public:
+			cProjectileCreatorCallback(void)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				if (a_Entity->IsMob() && ((cMonster *)a_Entity)->GetMobType() == mtSkeleton)
+				{
+					return true;
+				}
+				return false;
+			}
+		};
+
+		cProjectileCreatorCallback PCC;
+		if (GetWorld()->DoWithEntityByID(((cProjectileEntity *)a_Killer)->GetCreatorUniqueID(), PCC))
 		{
 			// 12 music discs. TickRand starts from 0 to 11. Disk IDs start at 2256, so add that. There.
 			AddRandomDropItem(a_Drops, 1, 1, (short)m_World->GetTickRandomNumber(11) + 2256);

@@ -356,6 +356,8 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		"e:  8: 0\n"  /* water */
 		"f: 50: 5\n"  /* torch */
 		"g: 59: 7\n"  /* crops */
+		"h: 59: 0\n"  /* crops */
+		"i: 59: 1\n"  /* crops */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -403,12 +405,12 @@ const cPrefab::sDef g_PlainsVillagePrefabs[] =
 		/*    *   012345678901234 */
 		/*  0 */ "f.....f.f.....f"
 		/*  1 */ ".gg.gg...gg.gg."
-		/*  2 */ ".g...g...gg.gg."
-		/*  3 */ ".g.......gg.gg."
-		/*  4 */ ".gg..g...gg.gg."
-		/*  5 */ ".gg..g...gg.gg."
-		/*  6 */ "..g..g...gg.gg."
-		/*  7 */ "..g.g....gg.gg."
+		/*  2 */ ".gh.hg...gg.gg."
+		/*  3 */ ".gh.ih...gg.gg."
+		/*  4 */ ".gg.hg...gg.gg."
+		/*  5 */ ".gg.hg...gg.gg."
+		/*  6 */ ".ig.hg...gg.gg."
+		/*  7 */ ".hg.gh...gg.gg."
 		/*  8 */ "f.....f.f.....f"
 
 		// Level 4

@@ -200,11 +200,16 @@ public:
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
 	/** Adds a client to the chunk; returns true if added, false if already there */
-	bool AddClient    (cClientHandle* a_Client );
+	bool AddClient(cClientHandle * a_Client);
 	
-	void RemoveClient (cClientHandle* a_Client );
-	bool HasClient    (cClientHandle* a_Client );
-	bool HasAnyClients(void);  // Returns true if theres any client in the chunk; false otherwise
+	/** Removes the specified client from the chunk; ignored if client not in chunk. */
+	void RemoveClient(cClientHandle * a_Client);
+	
+	/** Returns true if the specified client is present in this chunk. */
+	bool HasClient(cClientHandle * a_Client);
+	
+	/** Returns true if theres any client in the chunk; false otherwise */
+	bool HasAnyClients(void) const;
 
 	void AddEntity(cEntity * a_Entity);
 	void RemoveEntity(cEntity * a_Entity);
@@ -390,6 +395,17 @@ public:
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
+	
+	/** Returns true if the chunk should be ticked in the tick-thread.
+	Checks if there are any clients and if the always-tick flag is set */
+	bool ShouldBeTicked(void) const;
+	
+	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter.
+	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
+	whether it has any clients or not.
+	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
+	as at least one requests is active the chunk will be ticked). */
+	void SetAlwaysTicked(bool a_AlwaysTicked);
 
 private:
 
@@ -462,10 +478,16 @@ private:
 
 	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
 	bool m_IsRedstoneDirty;
+	
+	/** If greater than zero, the chunk is ticked even if it has no clients.
+	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
+	This is the support for plugin-accessible chunk tick forcing. */
+	int m_AlwaysTicked;
+	
 
 	// Pick up a random block of this chunk
-	void getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z);
-	void getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ);
+	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
+	void GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ);
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);

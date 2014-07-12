@@ -101,6 +101,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NEW_LEAVES          ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_SIGN_POST           ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_TORCH               ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_TRAPPED_CHEST       ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_TRIPWIRE            ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_VINES               ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_WALLSIGN            ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_WOODEN_DOOR         ].m_SpreadLightFalloff = 1;
@@ -160,6 +163,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STATIONARY_WATER    ].m_Transparent = true;
 	a_Info[E_BLOCK_STONE_BUTTON        ].m_Transparent = true;
 	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_Transparent = true;
+	a_Info[E_BLOCK_TRAPPED_CHEST       ].m_Transparent = true;
+	a_Info[E_BLOCK_TRIPWIRE            ].m_Transparent = true;
+	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_Transparent = true;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_Transparent = true;
 	a_Info[E_BLOCK_TORCH               ].m_Transparent = true;
 	a_Info[E_BLOCK_VINES               ].m_Transparent = true;
@@ -197,6 +203,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_TNT                 ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_OneHitDig = true;
 	a_Info[E_BLOCK_TORCH               ].m_OneHitDig = true;
+	a_Info[E_BLOCK_TRIPWIRE            ].m_OneHitDig = true;
 
 
 	// Blocks that break when pushed by piston:
@@ -239,6 +246,8 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_PistonBreakable = true;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_TORCH               ].m_PistonBreakable = true;
+	a_Info[E_BLOCK_TRIPWIRE            ].m_PistonBreakable = true;
+	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_VINES               ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_WATER               ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_WOODEN_BUTTON       ].m_PistonBreakable = true;
@@ -280,6 +289,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_TALL_GRASS          ].m_IsSnowable = false;
 	a_Info[E_BLOCK_TNT                 ].m_IsSnowable = false;
 	a_Info[E_BLOCK_TORCH               ].m_IsSnowable = false;
+	a_Info[E_BLOCK_TRAPPED_CHEST       ].m_IsSnowable = false;
+	a_Info[E_BLOCK_TRIPWIRE            ].m_IsSnowable = false;
+	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_IsSnowable = false;
 	a_Info[E_BLOCK_VINES               ].m_IsSnowable = false;
 	a_Info[E_BLOCK_WALLSIGN            ].m_IsSnowable = false;
 	a_Info[E_BLOCK_WATER               ].m_IsSnowable = false;
@@ -356,7 +368,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
 	a_Info[E_BLOCK_MELON_STEM          ].m_IsSolid = false;
 	a_Info[E_BLOCK_NETHER_PORTAL       ].m_IsSolid = false;
-	a_Info[E_BLOCK_PISTON_EXTENSION    ].m_IsSolid = false;
 	a_Info[E_BLOCK_POTATOES            ].m_IsSolid = false;
 	a_Info[E_BLOCK_POWERED_RAIL        ].m_IsSolid = false;
 	a_Info[E_BLOCK_RAIL                ].m_IsSolid = false;

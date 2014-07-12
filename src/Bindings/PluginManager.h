@@ -57,8 +57,17 @@ public:																	// tolua_export
 
 	// Called each tick
 	virtual void Tick(float a_Dt);
-
+	
 	// tolua_begin
+	enum CommandResult
+	{
+		crExecuted,
+		crUnknownCommand,
+		crError,
+		crBlocked,
+		crNoPermission,
+	} ;
+
 	enum PluginHook
 	{
 		HOOK_BLOCK_SPREAD,
@@ -87,6 +96,7 @@ public:																	// tolua_export
 		HOOK_PLAYER_EATING,
 		HOOK_PLAYER_FISHED,
 		HOOK_PLAYER_FISHING,
+		HOOK_PLAYER_FOOD_LEVEL_CHANGE,
 		HOOK_PLAYER_JOINED,
 		HOOK_PLAYER_LEFT_CLICK,
 		HOOK_PLAYER_MOVING,
@@ -188,6 +198,7 @@ public:																	// tolua_export
 	bool CallHookPlayerEating             (cPlayer & a_Player);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems a_Reward);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
+	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerMoving             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
@@ -244,11 +255,11 @@ public:																	// tolua_export
 	/** Returns the permission needed for the specified command; empty string if command not found */
 	AString GetCommandPermission(const AString & a_Command);  // tolua_export
 	
-	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns true if executed. */
-	bool ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
+	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns crExecuted if executed. */
+	CommandResult ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
-	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns true if executed (false if not found) */
-	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
+	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns crExecuted if executed. */
+	CommandResult ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
 	/** Removes all console command bindings that the specified plugin has made */
 	void RemovePluginConsoleCommands(cPlugin * a_Plugin);
@@ -321,13 +332,8 @@ private:
 	/** Adds the plugin into the internal list of plugins and initializes it. If initialization fails, the plugin is removed again. */
 	bool AddPlugin(cPlugin * a_Plugin);
 
-	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns true if the command is handled. */
-	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions, bool & a_WasCommandForbidden);	
-	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
-	{
-		bool DummyBoolean = false;
-		return HandleCommand(a_Player, a_Command, a_ShouldCheckPermissions, DummyBoolean);
-	}
+	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
+	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);	
 } ; // tolua_export
 
 

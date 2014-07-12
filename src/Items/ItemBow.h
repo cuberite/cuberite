@@ -55,7 +55,7 @@ public:
 			// Too little force, ignore the shot
 			return;
 		}
-		Force = std::max(Force, 1.0);
+		Force = std::min(Force, 1.0);
 
 		// Create the arrow entity:
 		cArrowEntity * Arrow = new cArrowEntity(*a_Player, Force * 2);
@@ -70,16 +70,7 @@ public:
 			return;
 		}
 
-		cFastRandom Random;
-		a_Player->GetWorld()->BroadcastSoundEffect(
-			"random.bow",
-			(int)std::floor(a_Player->GetPosX() * 8.0),
-			(int)std::floor(a_Player->GetPosY() * 8.0),
-			(int)std::floor(a_Player->GetPosZ() * 8.0),
-			1.0F,
-			1.0F / (Random.NextFloat(1.0F) * 0.4F + 1.2F) + (float)Force * 0.5F
-		);
-
+		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", (int)a_Player->GetPosX() * 8, (int)a_Player->GetPosY() * 8, (int)a_Player->GetPosZ() * 8, 0.5, (float)Force);
 		if (!a_Player->IsGameModeCreative())
 		{
 			a_Player->UseEquippedItem();

@@ -154,7 +154,11 @@ public:
 
 		if (
 			(BlockInQuestion == E_BLOCK_GLASS) ||
+			(BlockInQuestion == E_BLOCK_STAINED_GLASS) ||
 			(BlockInQuestion == E_BLOCK_FENCE) ||
+			(BlockInQuestion == E_BLOCK_SOULSAND) ||
+			(BlockInQuestion == E_BLOCK_MOB_SPAWNER) ||
+			(BlockInQuestion == E_BLOCK_END_PORTAL_FRAME) || // Actual vanilla behaviour
 			(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
 			(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)
 			)

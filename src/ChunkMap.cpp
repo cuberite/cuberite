@@ -847,7 +847,22 @@ void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_M
 
 
 
-void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
+void cChunkMap::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->SetIsRedstoneDirty(true);
+}
+
+
+
+
+
+void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
@@ -856,6 +871,10 @@ void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
 		return;
 	}
 	Chunk->MarkDirty();
+	if (a_MarkRedstoneDirty)
+	{
+		Chunk->SetIsRedstoneDirty(true);
+	}
 }
 
 
@@ -2674,6 +2693,20 @@ void cChunkMap::QueueTickBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if (Chunk != NULL)
+	{
+		Chunk->SetAlwaysTicked(a_AlwaysTicked);
+	}
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap::cChunkLayer:
 
@@ -2788,12 +2821,14 @@ void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 
 
+
+
 void cChunkMap::cChunkLayer::Tick(float a_Dt)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
-		// Only tick chunks that are valid and have clients:
-		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
+		// Only tick chunks that are valid and should be ticked:
+		if ((m_Chunks[i] != NULL) && m_Chunks[i]->IsValid() && m_Chunks[i]->ShouldBeTicked())
 		{
 			m_Chunks[i]->Tick(a_Dt);
 		}

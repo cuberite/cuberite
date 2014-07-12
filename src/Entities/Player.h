@@ -41,6 +41,7 @@ public:
 	
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
+	
 	virtual ~cPlayer();
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
@@ -124,6 +125,9 @@ public:
 	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
+
+	/** Gets the contents of the player's associated enderchest */
+	cItemGrid & GetEnderChestContents(void) { return m_EnderChestContents; }
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
@@ -334,7 +338,15 @@ public:
 	bool MoveToWorld(const char * a_WorldName);  // tolua_export
 
 	bool SaveToDisk(void);
+	
+	/** Loads the player data from the disk file.
+	Returns true on success, false on failure. */
 	bool LoadFromDisk(void);
+	
+	/** Loads the player data from the specified file.
+	Returns true on success, false on failure. */
+	bool LoadFromFile(const AString & a_FileName);
+	
 	void LoadPermissionsFromDisk(void);											// tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
@@ -449,7 +461,13 @@ protected:
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
+
+	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
+
+	/** An item grid that stores the player specific enderchest contents */
+	cItemGrid m_EnderChestContents;
+
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
 
@@ -510,6 +528,22 @@ protected:
 
 	cStatManager m_Stats;
 
+	/** Flag representing whether the player is currently in a bed
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
+	bool m_bIsInBed;
+
+	/** How long till the player's inventory will be saved
+	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
+	unsigned int m_TicksUntilNextSave;
+
+	/** Flag used by food handling system to determine whether a teleport has just happened
+	Will not apply food penalties if found to be true; will set to false after processing
+	*/
+	bool m_bIsTeleporting;
+	
+	/** The UUID of the player, as read from the ClientHandle.
+	If no ClientHandle is given, the UUID is initialized to empty. */
+	AString m_UUID;
 
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
@@ -538,14 +572,9 @@ protected:
 	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
 	void ApplyFoodExhaustionFromMovement();
 
-	/** Flag representing whether the player is currently in a bed
-	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
-	bool m_bIsInBed;
-
-	/** How long till the player's inventory will be saved
-	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
-	unsigned int m_TicksUntilNextSave;
-
+	/** Returns the filename for the player data based on the UUID given.
+	This can be used both for online and offline UUIDs. */
+	AString GetUUIDFileName(const AString & a_UUID);
 } ; // tolua_export
 
 

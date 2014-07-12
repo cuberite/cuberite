@@ -106,7 +106,8 @@ public:
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
-	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty  (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 	
@@ -339,6 +340,13 @@ public:
 	
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
 	cCriticalSection & GetCS(void) { return m_CSLayers; }
+	
+	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
+	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
+	whether it has any clients or not.
+	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
+	as at least one requests is active the chunk will be ticked). */
+	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked);
 
 private:
 
