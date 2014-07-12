@@ -241,7 +241,8 @@ public:
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 	
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 	
@@ -634,18 +635,6 @@ public:
 	
 	// tolua_end
 	
-	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
-	{
-		// TODO: Use floor() instead of weird if statements
-		// Also fix Y
-		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/cChunkDef::Width;
-		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
-		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunkDef::Width;
-		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
-	}
-
 	/** Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead */
 	void SaveAllChunks(void);
 	

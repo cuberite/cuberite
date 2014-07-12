@@ -582,7 +582,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		}
 		if (strncmp(a_NBT.GetData(sID), "Chest", a_NBT.GetDataLength(sID)) == 0)
 		{
-			LoadChestFromNBT(a_BlockEntities, a_NBT, Child);
+			LoadChestFromNBT(a_BlockEntities, a_NBT, Child, E_BLOCK_CHEST);
 		}
 		else if (strncmp(a_NBT.GetData(sID), "Control", a_NBT.GetDataLength(sID)) == 0)
 		{
@@ -623,6 +623,10 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		else if (strncmp(a_NBT.GetData(sID), "Trap", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadDispenserFromNBT(a_BlockEntities, a_NBT, Child);
+		}
+		else if (strncmp(a_NBT.GetData(sID), "TrappedChest", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadChestFromNBT(a_BlockEntities, a_NBT, Child, E_BLOCK_TRAPPED_CHEST);
 		}
 		// TODO: Other block entities
 	}  // for Child - tag children
@@ -740,7 +744,7 @@ void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a
 
 
 
-void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_ChestType)
 {
 	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
 	int x, y, z;
@@ -753,7 +757,7 @@ void cWSSAnvil::LoadChestFromNBT(cBlockEntityList & a_BlockEntities, const cPars
 	{
 		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
-	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World));
+	std::auto_ptr<cChestEntity> Chest(new cChestEntity(x, y, z, m_World, a_ChestType));
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
 	a_BlockEntities.push_back(Chest.release());
 }

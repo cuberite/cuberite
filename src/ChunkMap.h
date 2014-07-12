@@ -106,7 +106,8 @@ public:
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
-	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty  (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 	

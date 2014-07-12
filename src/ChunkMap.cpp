@@ -847,7 +847,22 @@ void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_M
 
 
 
-void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
+void cChunkMap::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->SetIsRedstoneDirty(true);
+}
+
+
+
+
+
+void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
@@ -856,6 +871,10 @@ void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
 		return;
 	}
 	Chunk->MarkDirty();
+	if (a_MarkRedstoneDirty)
+	{
+		Chunk->SetIsRedstoneDirty(true);
+	}
 }
 
 
