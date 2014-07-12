@@ -13,7 +13,7 @@
 
 cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type) :
 	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
-	m_ActivePlayers(0)
+	m_NumActivePlayers(0)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }

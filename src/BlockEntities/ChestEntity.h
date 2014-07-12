@@ -34,7 +34,7 @@ public:
 	
 	// tolua_end
 	
-	/// Constructor used for normal operation
+	/** Constructor used for normal operation */
 	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);
 	
 	virtual ~cChestEntity();
@@ -48,19 +48,20 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 	
-	/// Opens a new chest window for this chest. Scans for neighbors to open a double chest window, if appropriate.
+	/** Opens a new chest window for this chest.
+	Scans for neighbors to open a double chest window, if appropriate. */
 	void OpenNewWindow(void);
 
 	/** Gets the number of players who currently have this chest open */
-	int GetNumberOfPlayers(void) const { return m_ActivePlayers; }
+	int GetNumberOfPlayers(void) const { return m_NumActivePlayers; }
 
-	/** Gets the number of players who currently have this chest open */
-	void SetNumberOfPlayers(int a_Amount) { m_ActivePlayers = a_Amount; }
+	/** Sets the number of players who currently have this chest open */
+	void SetNumberOfPlayers(int a_NumActivePlayers) { m_NumActivePlayers = a_NumActivePlayers; }
 
 private:
 
-	/** Holds the number of players who currently have this chest open */
-	int m_ActivePlayers;
+	/** Number of players who currently have this chest open */
+	int m_NumActivePlayers;
 } ;  // tolua_export
 
 
