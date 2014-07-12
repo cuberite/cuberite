@@ -1918,7 +1918,7 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	// TODO: on C++11 support, change this to a llama function pased to a std::remove_if
 	for (PoweredBlocksList::iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
-		if (			
+		if (
 			itr->a_BlockPos.Equals(Vector3i(SourceX, a_RelSourceY, SourceZ)) &&
 			itr->a_SourcePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)) &&
 			(m_Chunk->GetBlock(a_RelSourceX, a_RelSourceY, a_RelSourceZ) == E_BLOCK_REDSTONE_WIRE)

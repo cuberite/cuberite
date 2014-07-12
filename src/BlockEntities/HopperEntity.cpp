@@ -380,7 +380,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		return true;
 	}
 	
-	// Check if the chest is a double-chest, if so, try to move from there:
+	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
 	static const struct
 	{
 		int x, z;
@@ -403,7 +403,11 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		}
 
 		BLOCKTYPE Block = Neighbor->GetBlock(x, m_PosY + 1, z);
-		if ((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST))
+		if (
+			((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST)) ||
+			((Block == E_BLOCK_CHEST) && (Chest->GetBlockType() != E_BLOCK_CHEST)) ||
+			((Block == E_BLOCK_TRAPPED_CHEST) && (Chest->GetBlockType() != E_BLOCK_TRAPPED_CHEST))
+			)
 		{
 			continue;
 		}
@@ -556,10 +560,11 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 	}
 	if (MoveItemsToGrid(*Chest))
 	{
+		// Chest block directly connected was not full
 		return true;
 	}
 
-	// Check if the chest is a double-chest, if so, try to move into the other half:
+	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
 	static const struct
 	{
 		int x, z;
@@ -584,7 +589,11 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		}
 
 		BLOCKTYPE Block = Neighbor->GetBlock(x, a_BlockY, z);
-		if ((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST))
+		if (
+			((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST)) ||
+			((Block == E_BLOCK_CHEST) && (Chest->GetBlockType() != E_BLOCK_CHEST)) ||
+			((Block == E_BLOCK_TRAPPED_CHEST) && (Chest->GetBlockType() != E_BLOCK_TRAPPED_CHEST))
+			)
 		{
 			continue;
 		}

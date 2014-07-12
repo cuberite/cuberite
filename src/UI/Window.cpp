@@ -1010,7 +1010,7 @@ bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 cChestWindow::~cChestWindow()
 {
 	// Send out the chest-close packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_CHEST /* Client apparently doesn't mind if we give this to trapped chests as well */);
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, m_PrimaryChest->GetBlockType());
 
 	m_World->BroadcastSoundEffect("random.chestclosed", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
 }
