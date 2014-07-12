@@ -112,7 +112,17 @@ public:												// tolua_export
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
+	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
+	
+	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
+	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
+	bool ShouldLoadOfflinePlayerData(void) const { return m_ShouldLoadOfflinePlayerData; }
+	
+	/** Returns true if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
+	This allows a seamless transition from name-based to UUID-based player storage.
+	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
+	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
 	
 private:
 
@@ -204,6 +214,16 @@ private:
 	This setting is the same as the "online-mode" setting in Vanilla. */
 	bool m_ShouldAuthenticate;
 	
+	/** True if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
+	This allows transitions from an offline (no-auth) server to an online one.
+	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
+	bool m_ShouldLoadOfflinePlayerData;
+	
+	/** True if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
+	This allows a seamless transition from name-based to UUID-based player storage.
+	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
+	bool m_ShouldLoadNamedPlayerData;
+
 
 	cServer(void);
 

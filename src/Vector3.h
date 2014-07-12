@@ -316,6 +316,15 @@ protected:
 
 
 
+template <> inline Vector3<int> Vector3<int>::Floor(void) const
+{
+	return *this;
+}
+
+
+
+
+
 template <typename T>
 const double Vector3<T>::EPS = 0.000001;
 

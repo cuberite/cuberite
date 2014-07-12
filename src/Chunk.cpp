@@ -87,7 +87,8 @@ cChunk::cChunk(
 	m_NeighborZM(a_NeighborZM),
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
-	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData())
+	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
+	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != NULL)
 	{
@@ -463,7 +464,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 
 
 
-void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
+void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
 {
 	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
 	int Random = m_World->GetTickRandomNumber(0x00ffffff);
@@ -479,12 +480,12 @@ void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a
 
 
 
-void cChunk::getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z)
+void cChunk::GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z)
 {
 	// MG TODO : check if this kind of optimization (only one random call) is still needed
 	// MG TODO : if so propagate it
 
-	getThreeRandomNumber(a_X, a_Y, a_Z, Width, Height-2, Width);
+	GetThreeRandomNumbers(a_X, a_Y, a_Z, Width, Height - 2, Width);
 	a_Y++;
 }
 
@@ -494,65 +495,68 @@ void cChunk::getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z)
 
 void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 {
-	int Center_X,Center_Y,Center_Z;
-	getRandomBlockCoords(Center_X,Center_Y,Center_Z);
+	int CenterX, CenterY, CenterZ;
+	GetRandomBlockCoords(CenterX, CenterY, CenterZ);
 
-	BLOCKTYPE PackCenterBlock = GetBlock(Center_X, Center_Y, Center_Z);
-	if (a_MobSpawner.CheckPackCenter(PackCenterBlock))
+	BLOCKTYPE PackCenterBlock = GetBlock(CenterX, CenterY, CenterZ);
+	if (!a_MobSpawner.CheckPackCenter(PackCenterBlock))
 	{
-		a_MobSpawner.NewPack();
-		int NumberOfTries = 0;
-		int NumberOfSuccess = 0;
-		int MaxNbOfSuccess = 4; // this can be changed during the process for Wolves and Ghass
-		while (NumberOfTries < 12 && NumberOfSuccess < MaxNbOfSuccess)
-		{
-			const int HorizontalRange = 20; // MG TODO : relocate
-			const int VerticalRange = 0; // MG TODO : relocate
-			int Try_X, Try_Y, Try_Z;
-			getThreeRandomNumber(Try_X, Try_Y, Try_Z, 2*HorizontalRange+1 , 2*VerticalRange+1 , 2*HorizontalRange+1);
-			Try_X -= HorizontalRange;
-			Try_Y -= VerticalRange;
-			Try_Z -= HorizontalRange;
-			Try_X += Center_X;
-			Try_Y += Center_Y;
-			Try_Z += Center_Z;
-
-			ASSERT(Try_Y > 0);
-			ASSERT(Try_Y < cChunkDef::Height-1);
-			
-			EMCSBiome Biome = m_ChunkMap->GetBiomeAt (Try_X, Try_Z);
-			// MG TODO :
-			// Moon cycle (for slime)
-			// check player and playerspawn presence < 24 blocks
-			// check mobs presence on the block
-
-			// MG TODO : check that "Level" really means Y
-			
-			/*
-			NIBBLETYPE SkyLight = 0;
-
-			NIBBLETYPE BlockLight = 0;
-			*/
-
-			if (IsLightValid())
-			{
-				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, MaxNbOfSuccess);
-				if (newMob)
-				{
-					int WorldX, WorldY, WorldZ;
-					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
-					double ActualX = WorldX + 0.5;
-					double ActualZ = WorldZ + 0.5;
-					newMob->SetPosition(ActualX, WorldY, ActualZ);
-					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
-					NumberOfSuccess++;
-				}
-			}
-			
-			NumberOfTries++;
-		}
+		return;
 	}
+	
+	a_MobSpawner.NewPack();
+	int NumberOfTries = 0;
+	int NumberOfSuccess = 0;
+	int MaxNbOfSuccess = 4;  // This can be changed during the process for Wolves and Ghasts
+	while ((NumberOfTries < 12) && (NumberOfSuccess < MaxNbOfSuccess))
+	{
+		const int HorizontalRange = 20;  // MG TODO : relocate
+		const int VerticalRange = 0;     // MG TODO : relocate
+		int TryX, TryY, TryZ;
+		GetThreeRandomNumbers(TryX, TryY, TryZ, 2 * HorizontalRange + 1, 2 * VerticalRange + 1, 2 * HorizontalRange + 1);
+		TryX -= HorizontalRange;
+		TryY -= VerticalRange;
+		TryZ -= HorizontalRange;
+		TryX += CenterX;
+		TryY += CenterY;
+		TryZ += CenterZ;
 
+		ASSERT(TryY > 0);
+		ASSERT(TryY < cChunkDef::Height - 1);
+		
+		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(TryX, TryZ);
+		// MG TODO :
+		// Moon cycle (for slime)
+		// check player and playerspawn presence < 24 blocks
+		// check mobs presence on the block
+
+		// MG TODO : check that "Level" really means Y
+		
+		/*
+		NIBBLETYPE SkyLight = 0;
+
+		NIBBLETYPE BlockLight = 0;
+		*/
+
+		NumberOfTries++;
+		if (!IsLightValid())
+		{
+			continue;
+		}
+		
+		cEntity * newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
+		if (newMob == NULL)
+		{
+			continue;
+		}
+		int WorldX, WorldY, WorldZ;
+		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
+		double ActualX = WorldX + 0.5;
+		double ActualZ = WorldZ + 0.5;
+		newMob->SetPosition(ActualX, WorldY, ActualZ);
+		LOGD("Spawning %s #%i at {%d, %d, %d}", newMob->GetClass(), newMob->GetUniqueID(), WorldX, WorldY, WorldZ);
+		NumberOfSuccess++;
+	}  // while (retry)
 }
 
 
@@ -1641,6 +1645,31 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
+bool cChunk::ShouldBeTicked(void) const
+{
+	return (HasAnyClients() || (m_AlwaysTicked > 0));
+}
+
+
+
+
+
+void cChunk::SetAlwaysTicked(bool a_AlwaysTicked)
+{
+	if (a_AlwaysTicked)
+	{
+		m_AlwaysTicked += 1;
+	}
+	else
+	{
+		m_AlwaysTicked -= 1;
+	}
+}
+
+
+
+
+
 void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 {
 	cBlockEntity * be = GetBlockEntity(a_X, a_Y, a_Z);
@@ -1852,7 +1881,7 @@ bool cChunk::HasClient( cClientHandle* a_Client )
 
 
 
-bool cChunk::HasAnyClients(void)
+bool cChunk::HasAnyClients(void) const
 {
 	return !m_LoadedByClient.empty();
 }

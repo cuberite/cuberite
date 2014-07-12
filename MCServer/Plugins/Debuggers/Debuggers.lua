@@ -31,6 +31,8 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined);
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
+	PM:AddHook(cPluginManager.HOOK_CHUNK_UNLOADING,              OnChunkUnloading);
+	PM:AddHook(cPluginManager.HOOK_WORLD_STARTED,                OnWorldStarted);
 
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
@@ -1382,10 +1384,36 @@ end
 
 
 function OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockHitPos)
+	-- Test projectile hooks by setting the blocks they hit on fire:
 	local BlockX, BlockY, BlockZ = AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace)
 	local World = a_Projectile:GetWorld()
 	
 	World:SetBlock(BlockX, BlockY, BlockZ, E_BLOCK_FIRE, 0)
+end
+
+
+
+
+
+function OnChunkUnloading(a_World, a_ChunkX, a_ChunkZ)
+	-- Do not let chunk [0, 0] unload, so that it continues ticking [cWorld:SetChunkAlwaysTicked() test]
+	if ((a_ChunkX == 0) and (a_ChunkZ == 0)) then
+		return true
+	end
+end
+
+
+
+
+
+function OnWorldStarted(a_World)
+	-- Make the chunk [0, 0] in every world keep ticking [cWorld:SetChunkAlwaysTicked() test]
+	a_World:ChunkStay({{0, 0}}, nil,
+		function()
+			-- The chunk is loaded, make it always tick:
+			a_World:SetChunkAlwaysTicked(0, 0, true)
+		end
+	)
 end
 
 
