@@ -205,7 +205,7 @@ public:
 					m_ReplacedBlock = a_BlockType;
 					if (!cFluidSimulator::CanWashAway(a_BlockType))
 					{
-						AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, (eBlockFace)a_EntryFace);  // Was a unwashawayable block, can't overwrite it!
+						AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, (eBlockFace)a_EntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}
 					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);  // (Block could be washed away, replace it)
 					return true;  // Abort tracing
