@@ -40,9 +40,6 @@
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
-/** How many ticks before the socket is closed after the client is destroyed (#31) */
-static const int TICKS_BEFORE_CLOSE = 20;
-
 
 
 
@@ -79,7 +76,6 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_PingID(1),
 	m_BlockDigAnimStage(-1),
 	m_HasStartedDigging(false),
-	m_TicksSinceDestruction(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
@@ -104,7 +100,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 
 cClientHandle::~cClientHandle()
 {
-	ASSERT(m_State >= csDestroyedWaiting);  // Has Destroy() been called?
+	ASSERT(m_State == csDestroyed);  // Has Destroy() been called?
 	
 	LOGD("Deleting client \"%s\" at %p", GetUsername().c_str(), this);
 
@@ -169,7 +165,7 @@ void cClientHandle::Destroy(void)
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
 	}
-	m_State = csDestroyedWaiting;
+	m_State = csDestroyed;
 }
 
 
@@ -1823,18 +1819,7 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 
 void cClientHandle::Tick(float a_Dt)
-{
-	// Handle clients that are waiting for final close while destroyed:
-	if (m_State == csDestroyedWaiting)
-	{
-		m_TicksSinceDestruction += 1;  // This field is misused for the timeout counting
-		if (m_TicksSinceDestruction > TICKS_BEFORE_CLOSE)
-		{
-			m_State = csDestroyed;
-		}
-		return;
-	}
-	
+{	
 	// Process received network data:
 	AString IncomingData;
 	{
@@ -1900,15 +1885,7 @@ void cClientHandle::Tick(float a_Dt)
 
 
 void cClientHandle::ServerTick(float a_Dt)
-{
-	// Handle clients that are waiting for final close while destroyed:
-	if (m_State == csDestroyedWaiting)
-	{
-		// Do not wait while the client is not in the world, simply cut them off.
-		m_State = csDestroyed;
-		return;
-	}
-	
+{	
 	// Process received network data:
 	AString IncomingData;
 	{
