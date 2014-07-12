@@ -41,7 +41,7 @@ public:
 	
 	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 	{
-		if (a_BlockFace > 0)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
@@ -95,29 +95,15 @@ public:
 
 	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock)
 	{			
-		if (a_BlockFace < 0)
+		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
 		
-		BLOCKTYPE CurrentBlock = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
-		if (!CanWashAway)
+		BLOCKTYPE CurrentBlock;
+		Vector3i BlockPos;
+		if (!GetPlacementCoordsFromTrace(a_World, a_Player, BlockPos, CurrentBlock))
 		{
-			// The block pointed at cannot be washed away, so put fluid on top of it / on its sides
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			CurrentBlock = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		}
-		if (
-			!CanWashAway && 
-			(CurrentBlock != E_BLOCK_AIR) && 
-			(CurrentBlock != E_BLOCK_WATER) &&
-			(CurrentBlock != E_BLOCK_STATIONARY_WATER) &&
-			(CurrentBlock != E_BLOCK_LAVA) &&
-			(CurrentBlock != E_BLOCK_STATIONARY_LAVA)
-		)
-		{
-			// Cannot place water here
 			return false;
 		}
 		
@@ -138,7 +124,7 @@ public:
 		}
 		
 		// Wash away anything that was there prior to placing:
-		if (CanWashAway)
+		if (cFluidSimulator::CanWashAway(CurrentBlock))
 		{
 			cBlockHandler * Handler = BlockHandler(CurrentBlock);
 			if (Handler->DoesDropOnUnsuitable())
@@ -149,13 +135,13 @@ public:
 			}
 		}
 
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FluidBlock, 0);
+		a_World->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 		
 		return true;
 	}
 
 
-	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & BlockPos)
+	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos)
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
@@ -198,8 +184,66 @@ public:
 		}
 
 
-		BlockPos.Set(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z);
+		a_BlockPos = Callbacks.m_Pos;
 		return true;
 	}
+	
+	
+	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
+	{
+		class cCallbacks :
+			public cBlockTracer::cCallbacks
+		{
+		public:
+			Vector3i   m_Pos;
+			bool       m_HasHitLastBlock;
+			BLOCKTYPE  m_LastBlock;
+			
 
+			cCallbacks(void) :
+				m_HasHitLastBlock(false)
+			{
+			}
+			
+			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			{
+				if (a_BlockType != E_BLOCK_AIR)
+				{
+					bool CanWashAway = cFluidSimulator::CanWashAway(m_LastBlock);
+					if (
+						!CanWashAway &&
+						(m_LastBlock != E_BLOCK_AIR) && 
+						!IsBlockWater(m_LastBlock) &&
+						!IsBlockLava(m_LastBlock)
+					)
+					{
+						return true;
+					}
+					
+					m_HasHitLastBlock = true;
+					return true;
+				}
+				
+				m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
+				m_LastBlock = a_BlockType;
+				
+				return false;
+			}
+		} Callbacks;
+
+		cLineBlockTracer Tracer(*a_World, Callbacks);
+		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
+		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
+
+		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
+
+		if (!Callbacks.m_HasHitLastBlock)
+		{
+			return false;
+		}
+
+		a_BlockPos = Callbacks.m_Pos;
+		a_BlockType = Callbacks.m_LastBlock;
+		return true;
+	}
 };
