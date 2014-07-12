@@ -403,12 +403,9 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		}
 
 		BLOCKTYPE Block = Neighbor->GetBlock(x, m_PosY + 1, z);
-		if (
-			((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST)) ||
-			((Block == E_BLOCK_CHEST) && (Chest->GetBlockType() != E_BLOCK_CHEST)) ||
-			((Block == E_BLOCK_TRAPPED_CHEST) && (Chest->GetBlockType() != E_BLOCK_TRAPPED_CHEST))
-			)
+		if (Block != Chest->GetBlockType())
 		{
+			// Not the same kind of chest
 			continue;
 		}
 
@@ -589,12 +586,9 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		}
 
 		BLOCKTYPE Block = Neighbor->GetBlock(x, a_BlockY, z);
-		if (
-			((Block != E_BLOCK_CHEST) && (Block != E_BLOCK_TRAPPED_CHEST)) ||
-			((Block == E_BLOCK_CHEST) && (Chest->GetBlockType() != E_BLOCK_CHEST)) ||
-			((Block == E_BLOCK_TRAPPED_CHEST) && (Chest->GetBlockType() != E_BLOCK_TRAPPED_CHEST))
-			)
+		if (Block != Chest->GetBlockType())
 		{
+			// Not the same kind of chest
 			continue;
 		}
 
