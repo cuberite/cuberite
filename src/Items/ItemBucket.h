@@ -196,54 +196,37 @@ public:
 		{
 		public:
 			Vector3i   m_Pos;
-			bool       m_HasHitLastBlock;
-			BLOCKTYPE  m_LastBlock;
-			
-
-			cCallbacks(void) :
-				m_HasHitLastBlock(false)
-			{
-			}
+			BLOCKTYPE  m_ReplacedBlock;
 			
 			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 			{
 				if (a_BlockType != E_BLOCK_AIR)
 				{
-					bool CanWashAway = cFluidSimulator::CanWashAway(m_LastBlock);
-					if (
-						!CanWashAway &&
-						(m_LastBlock != E_BLOCK_AIR) && 
-						!IsBlockWater(m_LastBlock) &&
-						!IsBlockLava(m_LastBlock)
-					)
+					m_ReplacedBlock = a_BlockType;
+					if (!cFluidSimulator::CanWashAway(a_BlockType))
 					{
-						return true;
+						AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, (eBlockFace)a_EntryFace);  // Was a unwashawayable block, can't overwrite it!
 					}
-					
-					m_HasHitLastBlock = true;
-					return true;
-				}
-				
-				m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);
-				m_LastBlock = a_BlockType;
-				
+					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);  // (Block could be washed away, replace it)
+					return true;  // Abort tracing
+				}				
 				return false;
 			}
 		} Callbacks;
 
 		cLineBlockTracer Tracer(*a_World, Callbacks);
 		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
+		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);		
 
-		Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z);
-
-		if (!Callbacks.m_HasHitLastBlock)
+		// cTracer::Trace returns true when whole line was traversed. By returning true when we hit something, we ensure that this never happens if liquid could be placed
+		// Use this to judge whether the position is valid
+		if (!Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
 		{
-			return false;
+			a_BlockPos = Callbacks.m_Pos;
+			a_BlockType = Callbacks.m_ReplacedBlock;
+			return true;
 		}
 
-		a_BlockPos = Callbacks.m_Pos;
-		a_BlockType = Callbacks.m_LastBlock;
-		return true;
+		return false;		
 	}
 };
