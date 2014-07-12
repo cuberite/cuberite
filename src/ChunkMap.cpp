@@ -1278,7 +1278,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 
 
-void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients)
+void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
 	cChunkInterface ChunkInterface(this);
 	if (a_BlockType == E_BLOCK_AIR)
@@ -1303,7 +1303,7 @@ void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a
 
 
 
-void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
+void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
