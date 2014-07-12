@@ -11,7 +11,6 @@ cEntityEffect::cEntityEffect():
 	m_Ticks(0),
 	m_Duration(0),
 	m_Intensity(0),
-	m_Creator(NULL),
 	m_DistanceModifier(1)
 {
 	
@@ -21,11 +20,10 @@ cEntityEffect::cEntityEffect():
 
 
 
-cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, cPawn *a_Creator, double a_DistanceModifier):
+cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, double a_DistanceModifier):
 	m_Ticks(0),
 	m_Duration(a_Duration),
 	m_Intensity(a_Intensity),
-	m_Creator(a_Creator),
 	m_DistanceModifier(a_DistanceModifier)
 {
 	
@@ -44,35 +42,35 @@ cEntityEffect::~cEntityEffect()
 
 
 
-cEntityEffect * cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, cPawn * a_Creator, double a_DistanceModifier)
+cEntityEffect * cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
 {
 	switch (a_EffectType)
 	{
-		case cEntityEffect::effNoEffect:       return new cEntityEffect              (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
+		case cEntityEffect::effNoEffect:       return new cEntityEffect              (a_Duration, a_Intensity, a_DistanceModifier);
 		
-		case cEntityEffect::effAbsorption:     return new cEntityEffectAbsorption    (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effBlindness:      return new cEntityEffectBlindness     (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effFireResistance: return new cEntityEffectFireResistance(a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effHaste:          return new cEntityEffectHaste         (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effHealthBoost:    return new cEntityEffectHealthBoost   (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effHunger:         return new cEntityEffectHunger        (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effInstantDamage:  return new cEntityEffectInstantDamage (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effInstantHealth:  return new cEntityEffectInstantHealth (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effInvisibility:   return new cEntityEffectInvisibility  (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effJumpBoost:      return new cEntityEffectJumpBoost     (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effMiningFatigue:  return new cEntityEffectMiningFatigue (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effNausea:         return new cEntityEffectNausea        (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effNightVision:    return new cEntityEffectNightVision   (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effPoison:         return new cEntityEffectPoison        (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effRegeneration:   return new cEntityEffectRegeneration  (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effResistance:     return new cEntityEffectResistance    (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effSaturation:     return new cEntityEffectSaturation    (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effSlowness:       return new cEntityEffectSlowness      (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effSpeed:          return new cEntityEffectSpeed         (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effStrength:       return new cEntityEffectStrength      (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effWaterBreathing: return new cEntityEffectWaterBreathing(a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effWeakness:       return new cEntityEffectWeakness      (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
-		case cEntityEffect::effWither:         return new cEntityEffectWither        (a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
+		case cEntityEffect::effAbsorption:     return new cEntityEffectAbsorption    (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effBlindness:      return new cEntityEffectBlindness     (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effFireResistance: return new cEntityEffectFireResistance(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effHaste:          return new cEntityEffectHaste         (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effHealthBoost:    return new cEntityEffectHealthBoost   (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effHunger:         return new cEntityEffectHunger        (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effInstantDamage:  return new cEntityEffectInstantDamage (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effInstantHealth:  return new cEntityEffectInstantHealth (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effInvisibility:   return new cEntityEffectInvisibility  (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effJumpBoost:      return new cEntityEffectJumpBoost     (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effMiningFatigue:  return new cEntityEffectMiningFatigue (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effNausea:         return new cEntityEffectNausea        (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effNightVision:    return new cEntityEffectNightVision   (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effPoison:         return new cEntityEffectPoison        (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effRegeneration:   return new cEntityEffectRegeneration  (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effResistance:     return new cEntityEffectResistance    (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effSaturation:     return new cEntityEffectSaturation    (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effSlowness:       return new cEntityEffectSlowness      (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effSpeed:          return new cEntityEffectSpeed         (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effStrength:       return new cEntityEffectStrength      (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effWaterBreathing: return new cEntityEffectWaterBreathing(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effWeakness:       return new cEntityEffectWeakness      (a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effWither:         return new cEntityEffectWither        (a_Duration, a_Intensity, a_DistanceModifier);
 	}
 	
 	ASSERT(!"Unhandled entity effect type!");
@@ -120,7 +118,7 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 	{
 		if (((cMonster &) a_Target).IsUndead())
 		{
-			a_Target.TakeDamage(dtPotionOfHarming, m_Creator, amount, 0);
+			a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 			return;
 		}
 	}
@@ -147,7 +145,7 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 			return;
 		}
 	}
-	a_Target.TakeDamage(dtPotionOfHarming, m_Creator, amount, 0);
+	a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 }
 
 
@@ -248,7 +246,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		// Cannot take poison damage when health is at 1
 		if (a_Target.GetHealth() > 1)
 		{
-			a_Target.TakeDamage(dtPoisoning, m_Creator, 1, 0);
+			a_Target.TakeDamage(dtPoisoning, NULL, 1, 0);
 		}
 	}
 }
@@ -269,7 +267,7 @@ void cEntityEffectWither::OnTick(cPawn & a_Target)
 
 	if (m_Ticks % frequency == 0)
 	{
-		a_Target.TakeDamage(dtWither, m_Creator, 1, 0);
+		a_Target.TakeDamage(dtWither, NULL, 1, 0);
 	}
 	//TODO: "<Player> withered away>
 }

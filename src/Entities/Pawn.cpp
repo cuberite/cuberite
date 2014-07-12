@@ -52,16 +52,17 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 void cPawn::KilledBy(cEntity * a_Killer)
 {
 	ClearEntityEffects();
+	super::KilledBy(a_Killer);
 }
 
 
 
 
 
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, cPawn * a_Creator, double a_DistanceModifier)
+void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
-	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_Creator, a_DistanceModifier))
+	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
 	{
 		// A plugin disallows the addition, bail out.
 		return;
@@ -74,7 +75,7 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 	}
 	a_Duration = (int)(a_Duration * a_DistanceModifier);
 	
-	m_EntityEffects[a_EffectType] = cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_Creator, a_DistanceModifier);
+	m_EntityEffects[a_EffectType] = cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier);
 	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
 	m_EntityEffects[a_EffectType]->OnActivate(*this);
 }

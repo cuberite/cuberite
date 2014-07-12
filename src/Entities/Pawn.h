@@ -30,10 +30,9 @@ public:
 	@param a_EffectType          The entity effect to apply
 	@param a_EffectDurationTicks The duration of the effect
 	@param a_EffectIntensity     The level of the effect (0 = Potion I, 1 = Potion II, etc)
-	@param a_Creator             The pawn that produced the effect (e.g. threw the potion)
 	@param a_DistanceModifier    The scalar multiplied to the potion duration, only applies to splash potions)
 	*/
-	void AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, cPawn * a_Creator, double a_DistanceModifier = 1);
+	void AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, double a_DistanceModifier = 1);
 	
 	/** Removes a currently applied entity effect
 	@param a_EffectType The entity effect to remove
