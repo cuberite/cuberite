@@ -124,8 +124,7 @@ public:
 		}
 		
 		// Wash away anything that was there prior to placing:
-		bool CanWashAway = cFluidSimulator::CanWashAway(CurrentBlock);
-		if (CanWashAway)
+		if (cFluidSimulator::CanWashAway(CurrentBlock))
 		{
 			cBlockHandler * Handler = BlockHandler(CurrentBlock);
 			if (Handler->DoesDropOnUnsuitable())
@@ -188,9 +187,9 @@ public:
 		a_BlockPos = Callbacks.m_Pos;
 		return true;
 	}
-        
-        
-        bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
+	
+	
+	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
