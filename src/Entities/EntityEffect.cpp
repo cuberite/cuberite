@@ -33,9 +33,26 @@ cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, double a_Distanc
 
 
 
-cEntityEffect::~cEntityEffect()
+cEntityEffect::cEntityEffect(const cEntityEffect & a_OtherEffect):
+	m_Ticks(a_OtherEffect.m_Ticks),
+	m_Duration(a_OtherEffect.m_Duration),
+	m_Intensity(a_OtherEffect.m_Intensity),
+	m_DistanceModifier(a_OtherEffect.m_DistanceModifier)
 {
 	
+}
+
+
+
+
+
+cEntityEffect & cEntityEffect::operator=(cEntityEffect a_OtherEffect)
+{
+	std::swap(m_Ticks, a_OtherEffect.m_Ticks);
+	std::swap(m_Duration, a_OtherEffect.m_Duration);
+	std::swap(m_Intensity, a_OtherEffect.m_Intensity);
+	std::swap(m_DistanceModifier, a_OtherEffect.m_DistanceModifier);
+	return *this;
 }
 
 
@@ -84,22 +101,6 @@ void cEntityEffect::OnTick(cPawn & a_Target)
 {
 	// Reduce the effect's duration
 	++m_Ticks;
-}
-
-
-
-
-
-void cEntityEffect::OnActivate(cPawn & a_Target)
-{
-}
-
-
-
-
-
-void cEntityEffect::OnDeactivate(cPawn & a_Target)
-{
 }
 
 

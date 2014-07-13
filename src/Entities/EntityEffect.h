@@ -45,7 +45,15 @@ public:
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
 	cEntityEffect(int a_Duration, short a_Intensity, double a_DistanceModifier = 1);
 	
-	virtual ~cEntityEffect(void);
+	/** Creates an entity effect by copying another
+	@param a_OtherEffect      The other effect to copy */
+	cEntityEffect(const cEntityEffect & a_OtherEffect);
+	
+	/** Creates an entity effect by copying another
+	@param a_OtherEffect      The other effect to copy */
+	cEntityEffect & operator=(cEntityEffect a_OtherEffect);
+	
+	virtual ~cEntityEffect(void) {};
 	
 	/** Creates a pointer to the proper entity effect from the effect type
 	@warning This function creates raw pointers that must be manually managed.
@@ -70,8 +78,8 @@ public:
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 	
 	virtual void OnTick(cPawn & a_Target);
-	virtual void OnActivate(cPawn & a_Target);
-	virtual void OnDeactivate(cPawn & a_Target);
+	virtual void OnActivate(cPawn & a_Target) { }
+	virtual void OnDeactivate(cPawn & a_Target) { }
 	
 protected:
 	/** How many ticks this effect has been active for */
