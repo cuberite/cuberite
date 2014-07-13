@@ -474,32 +474,6 @@ bool cItemHandler::IsTool()
 
 bool cItemHandler::IsFood(void)
 {
-	switch (m_ItemType)
-	{
-		case E_ITEM_RED_APPLE:
-		case E_ITEM_GOLDEN_APPLE:
-		case E_ITEM_MUSHROOM_SOUP:
-		case E_ITEM_BREAD:
-		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_RAW_FISH:
-		case E_ITEM_COOKED_FISH:
-		case E_ITEM_COOKIE:
-		case E_ITEM_MELON_SLICE:
-		case E_ITEM_RAW_BEEF:
-		case E_ITEM_STEAK:
-		case E_ITEM_RAW_CHICKEN:
-		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_ROTTEN_FLESH:
-		case E_ITEM_SPIDER_EYE:
-		case E_ITEM_CARROT:
-		case E_ITEM_POTATO:
-		case E_ITEM_BAKED_POTATO:
-		case E_ITEM_POISONOUS_POTATO:
-		{
-			return true;
-		}
-	}  // switch (m_ItemType)
 	return false;
 }
 
@@ -511,13 +485,6 @@ bool cItemHandler::IsDrinkable(short a_ItemDamage)
 {
 	UNUSED(a_ItemDamage);
 	
-	switch (m_ItemType)
-	{
-		case E_ITEM_MILK:
-		{
-			return true;
-		}
-	}  // switch (m_ItemType)
 	return false;
 }
 
