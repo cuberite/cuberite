@@ -1530,7 +1530,7 @@ void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if (Chunk != NULL && Chunk->IsValid())
+	if ((Chunk != NULL) && (Chunk->IsValid()))
 	{
 		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player->GetClientHandle());
 	}
