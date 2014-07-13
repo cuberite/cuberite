@@ -881,7 +881,7 @@ void cIncrementalRedstoneSimulator::HandleTNT(int a_RelBlockX, int a_RelBlockY, 
 
 	if (AreCoordsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
 	{
-		m_Chunk->BroadcastSoundEffect("game.tnt.primed", BlockX * 8, a_RelBlockY * 8, BlockZ * 8, 0.5f, 0.6f);
+		m_Chunk->BroadcastSoundEffect("game.tnt.primed", (double)BlockX, (double)a_RelBlockY, (double)BlockZ, 0.5f, 0.6f);
 		m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_AIR, 0);
 		m_World.SpawnPrimedTNT(BlockX + 0.5, a_RelBlockY + 0.5, BlockZ + 0.5);  // 80 ticks to boom
 	}
@@ -1159,7 +1159,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
-					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
 				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Power);
@@ -1169,7 +1169,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
-					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
 				SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
@@ -1227,7 +1227,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
-					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
 				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Power);
@@ -1237,7 +1237,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
-					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
 				SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
@@ -1294,7 +1294,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 				if (Meta == E_META_PRESSURE_PLATE_RAISED)
 				{
-					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.5F);
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
 				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
@@ -1304,7 +1304,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			{
 				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
 				{
-					m_Chunk->BroadcastSoundEffect("random.click", (int)((BlockX + 0.5) * 8.0), (int)((a_RelBlockY + 0.1) * 8.0), (int)((BlockZ + 0.5) * 8.0), 0.3F, 0.6F);
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
 				}
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
 				SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);

@@ -134,7 +134,7 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			if (m_CountDownTime <= 0)
 			{
-				m_World->BroadcastSoundEffect("random.splash", (int) floor(GetPosX() * 8), (int) floor(GetPosY() * 8), (int) floor(GetPosZ() * 8), 1, 1);
+				m_World->BroadcastSoundEffect("random.splash", GetPosX(), GetPosY(), GetPosZ(), 1, 1);
 				SetPosY(GetPosY() - 1);
 				m_CanPickupItem = true;
 				m_PickupCountDown = 20;

@@ -162,7 +162,7 @@ public:
 	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
+	void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob            (const cMonster & a_Mob);

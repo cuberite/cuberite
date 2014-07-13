@@ -53,7 +53,7 @@ public:
 	virtual void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendLogin               (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
-	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
+	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;
 	virtual void SendTabCompletionResults(const AStringVector & a_Results) override;

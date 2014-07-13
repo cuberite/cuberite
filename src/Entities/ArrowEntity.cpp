@@ -89,7 +89,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	m_HitBlockPos = Vector3i(X, Y, Z);
 	
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("random.bowhit", X * 8, Y * 8, Z * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 }
 
 
@@ -106,7 +106,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("random.successful_hit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	
 	Destroy();
 }
@@ -131,7 +131,7 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, *a_Dest);
-		GetWorld()->BroadcastSoundEffect("random.pop", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
 }
