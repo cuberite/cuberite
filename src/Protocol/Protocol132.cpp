@@ -280,16 +280,12 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol132::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
-	int SrcX = std::floor(a_X * 8.0);
-	int SrcY = std::floor(a_Y * 8.0);
-	int SrcZ = std::floor(a_Z * 8.0);
-
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_SOUND_EFFECT);
 	WriteString (a_SoundName);
-	WriteInt    (SrcX);
-	WriteInt    (SrcY);
-	WriteInt    (SrcZ);
+	WriteInt    ((int)(a_X * 8.0));
+	WriteInt    ((int)(a_Y * 8.0));
+	WriteInt    ((int)(a_Z * 8.0));
 	WriteFloat  (a_Volume);
 	WriteChar   ((char)(a_Pitch * 63.0f));
 	Flush();

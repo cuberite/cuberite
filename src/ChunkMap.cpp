@@ -652,7 +652,7 @@ void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, double a_X, do
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(std::floor(a_X), std::floor(a_Z), ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk((int)std::floor(a_X), (int)std::floor(a_Z), ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{

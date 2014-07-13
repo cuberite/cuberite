@@ -1088,15 +1088,11 @@ void cProtocol172::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	int SrcX = std::floor(a_X * 8.0);
-	int SrcY = std::floor(a_Y * 8.0);
-	int SrcZ = std::floor(a_Z * 8.0);
-
 	cPacketizer Pkt(*this, 0x29);  // Sound Effect packet
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteInt(SrcX);
-	Pkt.WriteInt(SrcY);
-	Pkt.WriteInt(SrcZ);
+	Pkt.WriteInt((int)(a_X * 8.0));
+	Pkt.WriteInt((int)(a_Y * 8.0));
+	Pkt.WriteInt((int)(a_Z * 8.0));
 	Pkt.WriteFloat(a_Volume);
 	Pkt.WriteByte((Byte)(a_Pitch * 63));
 }
