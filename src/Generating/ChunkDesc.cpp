@@ -311,7 +311,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelY = 0;
 	}
-	else if (a_MinRelY >= cChunkDef::Height)
+	else if (a_MaxRelY >= cChunkDef::Height)
 	{
 		LOGWARNING("%s: MaxRelY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MaxRelY = cChunkDef::Height - 1;
