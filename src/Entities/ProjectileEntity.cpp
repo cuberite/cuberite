@@ -243,7 +243,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 
 
 
-cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed)
+cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	Vector3d Speed;
 	if (a_Speed != NULL)
@@ -262,12 +262,13 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{
-			if (a_Item.m_FireworkItem.m_Colours.empty())
+			ASSERT(a_Item != NULL);
+			if (a_Item->m_FireworkItem.m_Colours.empty())
 			{
 				return NULL;
 			}
 
-			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, a_Item);
+			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
 		}
 	}
 	
