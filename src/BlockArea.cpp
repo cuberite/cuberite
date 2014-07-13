@@ -59,7 +59,7 @@ void InternalMergeBlocks(
 				}
 				else
 				{
-					BLOCKTYPE FakeDestMeta = 0;
+					NIBBLETYPE FakeDestMeta = 0;
 					Combinator(a_DstTypes[DstIdx], a_SrcTypes[SrcIdx], FakeDestMeta, (NIBBLETYPE)0);
 				}
 				++DstIdx;
