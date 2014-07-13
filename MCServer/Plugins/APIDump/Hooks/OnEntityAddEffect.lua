@@ -18,7 +18,6 @@ return
 			{ Name = "EffectType", Type = "number", Notes = "The type of the effect to be added. One of the effXXX constants." },
 			{ Name = "EffectDuration", Type = "number", Notes = "The duration of the effect to be added, in ticks." },
 			{ Name = "EffectIntensity", Type = "number", Notes = "The intensity (level) of the effect to be added. " },
-			{ Name = "Originator", Type = "{{cEntity}}", Notes = "The entity who originated the effect (threw the potion, the cavespider that used poison bite, etc.) May be nil if there's no originator associated with the effect. " },
 			{ Name = "DistanceModifier", Type = "number", Notes = "The modifier for the effect intensity, based on distance. Used mainly for splash potions." },
 		},
 		Returns = [[
