@@ -368,13 +368,13 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 /// Moves items from a chest (dblchest) above the hopper into this hopper. Returns true if contents have changed.
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
-	cChestEntity * Chest = (cChestEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ);
-	if (Chest == NULL)
+	cChestEntity * MainChest = (cChestEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ);
+	if (MainChest == NULL)
 	{
 		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
 		return false;
 	}
-	if (MoveItemsFromGrid(*Chest))
+	if (MoveItemsFromGrid(*MainChest))
 	{
 		// Moved the item from the chest directly above the hopper
 		return true;
@@ -403,20 +403,20 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		}
 
 		BLOCKTYPE Block = Neighbor->GetBlock(x, m_PosY + 1, z);
-		if (Block != Chest->GetBlockType())
+		if (Block != MainChest->GetBlockType())
 		{
 			// Not the same kind of chest
 			continue;
 		}
 
-		Chest = (cChestEntity *)Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
-		if (Chest == NULL)
+		cChestEntity * SideChest = (cChestEntity *)Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
+		if (SideChest == NULL)
 		{
 			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
 		}
 		else
 		{
-			if (MoveItemsFromGrid(*Chest))
+			if (MoveItemsFromGrid(*SideChest))
 			{
 				return true;
 			}
