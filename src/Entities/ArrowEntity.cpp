@@ -79,8 +79,8 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	}
 
 	Vector3d Hit = a_HitPos;
-	Vector3d SinkMovement = (GetSpeed() / 800);
-	Hit += (SinkMovement * 0.01) / SinkMovement.Length(); // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
+	Vector3d SinkMovement = (GetSpeed() / 1000);
+	Hit += SinkMovement * (0.0005 / SinkMovement.Length()); // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
 
 	super::OnHitSolidBlock(Hit, a_HitFace);
 	Vector3i BlockHit = Hit.Floor();
