@@ -220,7 +220,7 @@ class cEntityEffectNausea:
 	typedef cEntityEffect super;
 public:
 	cEntityEffectNausea(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
-	super(a_Duration, a_Intensity, a_DistanceModifier)
+		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
 };

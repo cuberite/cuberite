@@ -113,15 +113,12 @@ void cEntityEffect::OnTick(cPawn & a_Target)
 void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
-	int amount = (int)(6 * std::pow(2.0, m_Intensity) * m_DistanceModifier);
+	int amount = (int)(6 * (1 << m_Intensity) * m_DistanceModifier);
 	
-	if (a_Target.IsMob())
+	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
 	{
-		if (((cMonster &) a_Target).IsUndead())
-		{
-			a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
-			return;
-		}
+		a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+		return;
 	}
 	a_Target.Heal(amount);
 }
@@ -136,15 +133,12 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
-	int amount = (int)(6 * std::pow(2.0, m_Intensity) * m_DistanceModifier);
+	int amount = (int)(6 * (1 << m_Intensity) * m_DistanceModifier);
 	
-	if (a_Target.IsMob())
+	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
 	{
-		if (((cMonster &) a_Target).IsUndead())
-		{
-			a_Target.Heal(amount);
-			return;
-		}
+		a_Target.Heal(amount);
+		return;
 	}
 	a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 }
@@ -160,18 +154,15 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
 
-	if (a_Target.IsMob())
+	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
 	{
-		if (((cMonster &) a_Target).IsUndead())
-		{
-			return;
-		}
+		return;
 	}
 	
 	// Regen frequency = 50 ticks, divided by potion level (Regen II = 25 ticks)
 	int frequency = (int) std::floor(50.0 / (double)(m_Intensity + 1));
 	
-	if (m_Ticks % frequency != 0)
+	if ((m_Ticks % frequency) != 0)
 	{
 		return;
 	}
@@ -231,9 +222,9 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		cMonster & Target = (cMonster &) a_Target;
 		
 		// Doesn't effect undead mobs, spiders
-		if (Target.IsUndead()
-			|| Target.GetMobType() == cMonster::mtSpider
-			|| Target.GetMobType() == cMonster::mtCaveSpider)
+		if ((Target.IsUndead())
+		|| (Target.GetMobType() == cMonster::mtSpider)
+		|| (Target.GetMobType() == cMonster::mtCaveSpider))
 		{
 			return;
 		}
@@ -242,7 +233,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 	// Poison frequency = 25 ticks, divided by potion level (Poison II = 12 ticks)
 	int frequency = (int) std::floor(25.0 / (double)(m_Intensity + 1));
 	
-	if (m_Ticks % frequency == 0)
+	if ((m_Ticks % frequency) == 0)
 	{
 		// Cannot take poison damage when health is at 1
 		if (a_Target.GetHealth() > 1)
@@ -266,7 +257,7 @@ void cEntityEffectWither::OnTick(cPawn & a_Target)
 	// Poison frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
 	int frequency = (int) std::floor(25.0 / (double)(m_Intensity + 1));
 
-	if (m_Ticks % frequency == 0)
+	if ((m_Ticks % frequency) == 0)
 	{
 		a_Target.TakeDamage(dtWither, NULL, 1, 0);
 	}

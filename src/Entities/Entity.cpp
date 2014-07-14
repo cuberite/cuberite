@@ -311,10 +311,13 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
-		if (!Player->IsOnGround() && (a_TDI.DamageType == dtAttack || a_TDI.DamageType == dtArrowAttack))
+		if (!Player->IsOnGround())
 		{
-			a_TDI.FinalDamage += 2;
-			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
+			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
+			{
+				a_TDI.FinalDamage += 2;
+				m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
+			}
 		}
 
 		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
