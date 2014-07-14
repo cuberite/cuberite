@@ -8,16 +8,20 @@
 
 
 class cBlockMyceliumHandler :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
 public:
 	cBlockMyceliumHandler(BLOCKTYPE a_BlockType)
-		: cClearMetaOnDrop<cBlockHandler>(a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
 	}
 
 	// TODO: Add Mycel Spread
 
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
+	}
 	
 	virtual const char * GetStepSound(void) override
 	{

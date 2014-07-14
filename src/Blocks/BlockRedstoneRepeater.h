@@ -4,16 +4,16 @@
 #include "BlockHandler.h"
 #include "Chunk.h"
 #include "MetaRotator.h"
-#include "ClearMetaOnDrop.h"
+
 
 
 
 class cBlockRedstoneRepeaterHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true> >
+	public cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>
 {
 public:
 	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType)
-		: cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true> >(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03, true>(a_BlockType)
 	{
 	}
 
@@ -41,6 +41,13 @@ public:
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+	}
+
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		// Reset meta to 0
+		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_REPEATER, 1, 0));
 	}
 
 
