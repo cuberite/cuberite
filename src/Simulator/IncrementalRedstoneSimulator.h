@@ -162,9 +162,9 @@ private:
 	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
 
 	/** Returns if a coordinate is powered or linked powered */
-	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
+	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
 	/** Returns if a coordinate is in the directly powered blocks list */
-	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
+	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk);
 	/** Returns if a coordinate is in the indirectly powered blocks list */
 	bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Returns if a coordinate was marked as simulated (for blocks toggleable by players) */

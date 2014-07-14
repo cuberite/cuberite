@@ -396,7 +396,13 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
 		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true); // Inverse true to get the block torch is on
 
-		if (AreCoordsDirectlyPowered(X, Y, Z))
+		cChunk * Neighbour = m_Chunk->GetRelNeighborChunk(X, Z);
+		if ((Neighbour == NULL) || !Neighbour->IsValid())
+		{
+			return;
+		}
+
+		if (AreCoordsDirectlyPowered(X, Y, Z, Neighbour))
 		{
 			// There was a match, torch goes off
 			m_Chunk->SetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_BLOCK_REDSTONE_TORCH_OFF, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ));
@@ -445,9 +451,15 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		// Check if the block the torch is on is powered		
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
 		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true); // Inverse true to get the block torch is on
-
+		
+		cChunk * Neighbour = m_Chunk->GetRelNeighborChunk(X, Z);
+		if ((Neighbour == NULL) || !Neighbour->IsValid())
+		{
+			return;
+		}
+		
 		// See if off state torch can be turned on again
-		if (AreCoordsDirectlyPowered(X, Y, Z))
+		if (AreCoordsDirectlyPowered(X, Y, Z, Neighbour))
 		{
 			return; // Something matches, torch still powered
 		}
@@ -1492,13 +1504,14 @@ void cIncrementalRedstoneSimulator::HandleTripwire(int a_RelBlockX, int a_RelBlo
 
 
 
-bool cIncrementalRedstoneSimulator::AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
+bool cIncrementalRedstoneSimulator::AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk)
 {
+	// Torches want to access neighbour's data when on a wall, hence the extra chunk parameter
+
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
-	PoweredBlocksList * Powered = m_Chunk->GetNeighborChunk(BlockX, BlockZ)->GetRedstoneSimulatorPoweredBlocksList(); // Torches want to access neighbour's data when on a wall
-	for (PoweredBlocksList::const_iterator itr = Powered->begin(); itr != Powered->end(); ++itr) // Check powered list
+	for (PoweredBlocksList::const_iterator itr = a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->begin(); itr != a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->end(); ++itr) // Check powered list
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
@@ -1900,6 +1913,11 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	int SourceZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelSourceZ;
 
 	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ); // Adjust coordinates for the later call using these values
+	if ((Neighbour == NULL) || !Neighbour->IsValid())
+	{
+		return;
+	}
+
 	PoweredBlocksList * Powered = Neighbour->GetRedstoneSimulatorPoweredBlocksList(); // We need to insert the value into the chunk who owns the block position
 	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)
 	{
@@ -1977,6 +1995,11 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	}
 
 	cChunk * Neighbour = m_Chunk->GetNeighborChunk(BlockX, BlockZ);
+	if ((Neighbour == NULL) || !Neighbour->IsValid())
+	{
+		return;
+	}
+
 	LinkedBlocksList * Linked = Neighbour->GetRedstoneSimulatorLinkedBlocksList();
 	for (LinkedBlocksList::iterator itr = Linked->begin(); itr != Linked->end(); ++itr)  // Check linked powered list
 	{
