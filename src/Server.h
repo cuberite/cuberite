@@ -37,7 +37,7 @@
 class cPlayer;
 class cClientHandle;
 class cIniFile;
-class cCommandOutputCallback ;
+class cCommandOutputCallback;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 
@@ -83,7 +83,7 @@ public:												// tolua_export
 	void Shutdown(void);
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator to auth the specified user
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const AString & a_Properties);  // Called by cAuthenticator to auth the specified user
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 	

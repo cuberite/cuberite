@@ -89,7 +89,7 @@ public:
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	
 	/// Called by cAuthenticator to auth the specified user
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const AString & a_Properties = "");
 	
 	/// Executes commands queued in the command queue
 	void TickCommands(void);

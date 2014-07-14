@@ -67,6 +67,8 @@ public:
 
 	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
 	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+
+	const AString & GetProperties(void) const { return m_Properties; }
 	
 	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
 	This is used for the offline (non-auth) mode, when there's no UUID source.
@@ -92,7 +94,7 @@ public:
 	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
 
 	void Kick(const AString & a_Reason);		// tolua_export
-	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication
+	void Authenticate(const AString & a_Name, const AString & a_UUID, const AString & a_Properties);  // Called by cAuthenticator when the user passes authentication
 
 	void StreamChunks(void);
 	
@@ -280,6 +282,7 @@ private:
 
 	AString m_Username;
 	AString m_Password;
+	AString m_Properties;
 
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to

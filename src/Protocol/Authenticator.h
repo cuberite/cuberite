@@ -73,13 +73,18 @@ private:
 
 	AString m_Server;
 	AString m_Address;
+	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 
 	/** cIsThread override: */
 	virtual void Execute(void) override;
 
+	bool ConnectSecurelyToAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Data, AString & a_Response);
+
 	/** Returns true if the user authenticated okay, false on error; iLevel is the recursion deptht (bails out if too deep) */
 	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID);
+
+	bool GetPlayerProperties(const AString & a_UUID, AString & a_Properties);
 };
 
 
