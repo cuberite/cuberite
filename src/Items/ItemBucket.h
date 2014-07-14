@@ -203,7 +203,7 @@ public:
 				if (a_BlockType != E_BLOCK_AIR)
 				{
 					m_ReplacedBlock = a_BlockType;
-					if (!cFluidSimulator::CanWashAway(a_BlockType))
+					if (!cFluidSimulator::CanWashAway(a_BlockType) && !IsBlockLiquid(a_BlockType))
 					{
 						AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, (eBlockFace)a_EntryFace);  // Was an unwashawayable block, can't overwrite it!
 					}
