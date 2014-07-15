@@ -1854,14 +1854,14 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						case E_BLOCK_STATIONARY_WATER:
 						{
 							// Turn into simulated water:
-							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_WATER, 0);
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_WATER);
 							break;
 						}
 
 						case E_BLOCK_STATIONARY_LAVA:
 						{
 							// Turn into simulated lava:
-							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_LAVA, 0);
+							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_LAVA);
 							break;
 						}
 
