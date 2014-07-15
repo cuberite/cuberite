@@ -41,21 +41,27 @@ public:
 	}
 
 
-	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)  // tolua_export
-	{  // tolua_export
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.Add(m_BlockType, 1, 0); // Reset meta
+	}
+
+
+	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
+	{
 		switch (a_Direction)
 		{
 			case BLOCK_FACE_ZM: return 0x2;
 			case BLOCK_FACE_ZP: return 0x3;
 			case BLOCK_FACE_XM: return 0x4;
 			case BLOCK_FACE_XP: return 0x5;
-			default:  return 0x2;
+			default:            return 0x2;
 		}
-	}  // tolua_export
+	}
 
 
-	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
-	{														// tolua_export
+	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
+	{
 		switch (a_MetaData)
 		{
 			case 0x2: return BLOCK_FACE_ZM;
@@ -64,10 +70,10 @@ public:
 			case 0x5: return BLOCK_FACE_XP;
 			default:  return BLOCK_FACE_ZM;
 		}
-	}  // tolua_export
+	}
 
 
-	/// Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure
+	/** Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure */
 	static eBlockFace FindSuitableBlockFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int FaceInt = BLOCK_FACE_ZM; FaceInt <= BLOCK_FACE_XP; FaceInt++)

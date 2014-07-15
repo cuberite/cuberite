@@ -389,8 +389,8 @@ void cWorld::InitializeSpawn(void)
 		IniFile.WriteFile(m_IniFileName);
 	}
 
-	int ChunkX = 0, ChunkY = 0, ChunkZ = 0;
-	BlockToChunk((int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ, ChunkX, ChunkY, ChunkZ);
+	int ChunkX = 0, ChunkZ = 0;
+	cChunkDef::BlockToChunk((int)m_SpawnX, (int)m_SpawnZ, ChunkX, ChunkZ);
 	
 	// For the debugging builds, don't make the server build too much world upon start:
 	#if defined(_DEBUG) || defined(ANDROID_NDK)
@@ -1088,7 +1088,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
-	BroadcastSoundEffect("random.explode", (int)floor(a_BlockX * 8), (int)floor(a_BlockY * 8), (int)floor(a_BlockZ * 8), 1.0f, 0.6f);
+	BroadcastSoundEffect("random.explode", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.6f);
 	{
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2074,9 +2074,9 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 
 
 
-void cWorld::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch, a_Exclude);
+	m_ChunkMap->BroadcastSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch, a_Exclude);
 }
 
 
@@ -2182,9 +2182,18 @@ void cWorld::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHa
 
 
 
-void cWorld::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
+void cWorld::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->MarkChunkDirty (a_ChunkX, a_ChunkZ);
+	m_ChunkMap->MarkRedstoneDirty(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+void cWorld::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
+{
+	m_ChunkMap->MarkChunkDirty(a_ChunkX, a_ChunkZ, a_MarkRedstoneDirty);
 }
 
 
@@ -2989,7 +2998,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem & a_Item, const Vector3d * a_Speed)
+int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == NULL)

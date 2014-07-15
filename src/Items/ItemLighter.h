@@ -52,8 +52,8 @@ public:
 			case E_BLOCK_TNT:
 			{
 				// Activate the TNT:
-				a_World->BroadcastSoundEffect("game.tnt.primed", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 1.0f);
-				a_World->SetBlock(a_BlockX,a_BlockY,a_BlockZ, E_BLOCK_AIR, 0);
+				a_World->BroadcastSoundEffect("game.tnt.primed", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 1.0f);
+				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 				a_World->SpawnPrimedTNT(a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5);  // 80 ticks to boom
 				break;
 			}
@@ -68,7 +68,7 @@ public:
 				if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
 				{
 					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
-					a_World->BroadcastSoundEffect("fire.ignite", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0F, 1.04F);
+					a_World->BroadcastSoundEffect("fire.ignite", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0F, 1.04F);
 					break;
 				}
 			}

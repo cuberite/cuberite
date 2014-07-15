@@ -262,7 +262,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	AString HexDump;
 	if (Response.compare(0, prefix.size(), prefix))
 	{
-		LOGINFO("User \"%s\" failed to auth, bad http status line received", a_UserName.c_str());
+		LOGINFO("User %s failed to auth, bad http status line received", a_UserName.c_str());
 		LOG("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return false;
 	}
@@ -271,7 +271,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	size_t idxHeadersEnd = Response.find("\r\n\r\n");
 	if (idxHeadersEnd == AString::npos)
 	{
-		LOGINFO("User \"%s\" failed to authenticate, bad http response header received", a_UserName.c_str());
+		LOGINFO("User %s failed to authenticate, bad http response header received", a_UserName.c_str());
 		LOG("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
 		return false;
 	}

@@ -22,6 +22,8 @@ function Initialize(Plugin)
 	Plugin:SetVersion(1);
 	
 	cPluginManager.AddHook(cPluginManager.HOOK_PLAYER_USED_ITEM, OnPlayerUsedItem);
+
+	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion());
 	return true;
 end
 
@@ -36,8 +38,8 @@ function OnPlayerUsedItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 		return false;
 	end;
 
-	if (Player:HasPermission("diamondmover.move") == false) then
-		return true;
+	if (not Player:HasPermission("diamondmover.move")) then
+		return false;
 	end;
 
 	-- Rclk with a diamond to push in the direction the player is facing
@@ -56,7 +58,7 @@ function OnPlayerUsedItem(Player, BlockX, BlockY, BlockZ, BlockFace, CursorX, Cu
 			if (PlayerPitch > 70) then  -- looking down
 				BlockY = BlockY - 1;
 			else
-				local PlayerRot = Player:GetRotation() + 180;  -- Convert [-180, 180] into [0, 360] for simpler conditions
+				local PlayerRot = Player:GetYaw() + 180;  -- Convert [-180, 180] into [0, 360] for simpler conditions
 				if ((PlayerRot < 45) or (PlayerRot > 315)) then
 					BlockZ = BlockZ - 1;
 				else

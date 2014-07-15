@@ -479,7 +479,7 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if (!m_SoundHurt.empty() && (m_Health > 0))
 	{
-		m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 
 	if (a_TDI.Attacker != NULL)
@@ -498,7 +498,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 	super::KilledBy(a_Killer);
 	if (m_SoundHurt != "")
 	{
-		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 	int Reward;
 	switch (m_MobType)
@@ -920,7 +920,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
 		case mtPig:           toReturn = new cPig();                      break;
-		case mtSheep:         toReturn = new cSheep (Random.NextInt(15)); break; // Colour parameter
+		case mtSheep:         toReturn = new cSheep();                    break;
 		case mtSilverfish:    toReturn = new cSilverfish();               break;
 		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
 		case mtSpider:        toReturn = new cSpider();                   break;

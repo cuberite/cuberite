@@ -224,7 +224,7 @@ public:
 	void BroadcastScoreboardObjective    (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void BroadcastScoreUpdate            (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void BroadcastDisplayObjective       (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void BroadcastSoundEffect            (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export a_Src coords are Block * 8
+	void BroadcastSoundEffect            (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export
 	void BroadcastSoundParticleEffect    (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
 	void BroadcastSpawnEntity            (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTeleportEntity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
@@ -241,7 +241,8 @@ public:
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 	
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 	
@@ -634,18 +635,6 @@ public:
 	
 	// tolua_end
 	
-	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
-	{
-		// TODO: Use floor() instead of weird if statements
-		// Also fix Y
-		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/cChunkDef::Width;
-		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
-		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunkDef::Width;
-		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
-	}
-
 	/** Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead */
 	void SaveAllChunks(void);
 	
@@ -762,7 +751,7 @@ public:
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
 	Item parameter used currently for Fireworks to correctly set entity metadata based on item metadata
 	*/
-	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem & a_Item, const Vector3d * a_Speed = NULL);  // tolua_export
+	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = NULL);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }

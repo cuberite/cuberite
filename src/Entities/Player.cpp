@@ -1917,7 +1917,7 @@ void cPlayer::UseEquippedItem(void)
 
 	if (GetInventory().DamageEquippedItem())
 	{
-		m_World->BroadcastSoundEffect("random.break", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	}
 }
 

@@ -647,19 +647,19 @@ void cChunkMap::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_Effe
 
 
 
-void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_SrcX / 8, a_SrcZ / 8, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk((int)std::floor(a_X), (int)std::floor(a_Z), ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, 0, ChunkZ);
 	if (Chunk == NULL)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch, a_Exclude);
+	Chunk->BroadcastSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch, a_Exclude);
 }
 
 
@@ -847,7 +847,22 @@ void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_M
 
 
 
-void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
+void cChunkMap::MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	if ((Chunk == NULL) || !Chunk->IsValid())
+	{
+		return;
+	}
+	Chunk->SetIsRedstoneDirty(true);
+}
+
+
+
+
+
+void cChunkMap::MarkChunkDirty(int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty)
 {
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
@@ -856,6 +871,10 @@ void cChunkMap::MarkChunkDirty (int a_ChunkX, int a_ChunkZ)
 		return;
 	}
 	Chunk->MarkDirty();
+	if (a_MarkRedstoneDirty)
+	{
+		Chunk->SetIsRedstoneDirty(true);
+	}
 }
 
 
@@ -1259,7 +1278,7 @@ void cChunkMap::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYP
 
 
 
-void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients)
+void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
 	cChunkInterface ChunkInterface(this);
 	if (a_BlockType == E_BLOCK_AIR)
@@ -1284,7 +1303,7 @@ void cChunkMap::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a
 
 
 
-void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
+void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);
@@ -1530,7 +1549,7 @@ void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player)
 	
 	cCSLock Lock(m_CSLayers);
 	cChunkPtr Chunk = GetChunk(ChunkX, ZERO_CHUNK_Y, ChunkZ);
-	if (Chunk->IsValid())
+	if ((Chunk != NULL) && (Chunk->IsValid()))
 	{
 		Chunk->SendBlockTo(a_X, a_Y, a_Z, a_Player->GetClientHandle());
 	}

@@ -162,7 +162,7 @@ public:
 	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
+	void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob            (const cMonster & a_Mob);
@@ -325,9 +325,6 @@ private:
 	int m_LastDigBlockX;
 	int m_LastDigBlockY;
 	int m_LastDigBlockZ;
-	
-	/** Used while csDestroyedWaiting for counting the ticks until the connection is closed */
-	int m_TicksSinceDestruction;
 
 	enum eState
 	{
@@ -338,7 +335,6 @@ private:
  		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           ///< Normal gameplay
 		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
-		csDestroyedWaiting,  ///< The client has been destroyed, but is still kept so that the Kick packet is delivered (#31)
 		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
 		
 		// TODO: Add Kicking here as well

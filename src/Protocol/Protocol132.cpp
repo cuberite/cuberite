@@ -195,13 +195,6 @@ void cProtocol132::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a
 	WriteInt (a_Entity.GetUniqueID());
 	WriteInt (a_Player.GetUniqueID());
 	Flush();
-	
-	// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-	SendSoundEffect(
-		"random.pop",
-		(int)(a_Entity.GetPosX() * 8), (int)(a_Entity.GetPosY() * 8), (int)(a_Entity.GetPosZ() * 8),
-		0.5, (float)(0.75 + ((float)((a_Entity.GetUniqueID() * 23) % 32)) / 64)
-	);
 }
 
 
@@ -285,14 +278,14 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol132::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+void cProtocol132::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_SOUND_EFFECT);
 	WriteString (a_SoundName);
-	WriteInt    (a_SrcX);
-	WriteInt    (a_SrcY);
-	WriteInt    (a_SrcZ);
+	WriteInt    ((int)(a_X * 8.0));
+	WriteInt    ((int)(a_Y * 8.0));
+	WriteInt    ((int)(a_Z * 8.0));
 	WriteFloat  (a_Volume);
 	WriteChar   ((char)(a_Pitch * 63.0f));
 	Flush();

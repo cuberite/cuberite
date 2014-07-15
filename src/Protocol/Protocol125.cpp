@@ -899,7 +899,7 @@ void cProtocol125::SendScoreboardObjective(const AString & a_Name, const AString
 
 
 
-void cProtocol125::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+void cProtocol125::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	// Not needed in this protocol version
 }
