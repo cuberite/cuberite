@@ -223,7 +223,8 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		cMonster & Target = (cMonster &) a_Target;
 		
 		// Doesn't effect undead mobs, spiders
-		if (Target.IsUndead() ||
+		if (
+			Target.IsUndead() ||
 			(Target.GetMobType() == cMonster::mtSpider) ||
 			(Target.GetMobType() == cMonster::mtCaveSpider)
 		)
