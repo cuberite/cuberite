@@ -7,7 +7,7 @@ class cEntityEffect
 {
 public:
 	
-	/** All types of entity effects (numbers correspond to IDs) */
+	/** All types of entity effects (numbers correspond to protocol / storage types) */
 	enum eType
 	{
 		effNoEffect       = 0,
@@ -66,21 +66,30 @@ public:
 	static cEntityEffect * CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
 	
 	/** Returns how many ticks this effect has been active for */
-	int GetTicks() { return m_Ticks; }
+	int GetTicks(void) const { return m_Ticks; }
+	
 	/** Returns the duration of the effect */
-	int GetDuration() { return m_Duration; }
+	int GetDuration(void) const { return m_Duration; }
+	
 	/** Returns how strong the effect will be applied */
-	short GetIntensity() { return m_Intensity; }
+	short GetIntensity(void) const { return m_Intensity; }
+	
 	/** Returns the distance modifier for affecting potency */
-	double GetDistanceModifier() { return m_DistanceModifier; }
+	double GetDistanceModifier(void) const { return m_DistanceModifier; }
 	
 	void SetTicks(int a_Ticks)                          { m_Ticks            = a_Ticks;            }
 	void SetDuration(int a_Duration)                    { m_Duration         = a_Duration;         }
 	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 	
+	/** Called on each tick.
+	By default increases the m_Ticks, descendants may override to provide additional processing. */
 	virtual void OnTick(cPawn & a_Target);
+	
+	/** Called when the effect is first added to an entity */
 	virtual void OnActivate(cPawn & a_Target) { }
+	
+	/** Called when the effect is removed from an entity */
 	virtual void OnDeactivate(cPawn & a_Target) { }
 	
 protected:

@@ -7,11 +7,77 @@
 
 
 
-cSplashPotionEntity::cSplashPotionEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed, cEntityEffect::eType a_EntityEffectType, cEntityEffect a_EntityEffect, int a_PotionName) :
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSplashPotionEntityCallback:
+
+/** Used to distribute the splashed potion effect among nearby entities */
+class cSplashPotionCallback :
+	public cEntityCallback
+{
+public:
+	/** Creates the callback.
+	@param a_HitPos            The position where the splash potion has splashed
+	@param a_EntityEffectType  The effect type of the potion
+	@param a_EntityEffect      The effect description */
+	cSplashPotionCallback(const Vector3d & a_HitPos, cEntityEffect::eType a_EntityEffectType, const cEntityEffect & a_EntityEffect) :
+		m_HitPos(a_HitPos),
+		m_EntityEffectType(a_EntityEffectType),
+		m_EntityEffect(a_EntityEffect)
+	{
+	}
+	
+	/** Called by cWorld::ForEachEntity(), adds the stored entity effect to the entity, if it is close enough. */
+	virtual bool Item(cEntity * a_Entity) override
+	{
+		double SplashDistance = (a_Entity->GetPosition() - m_HitPos).Length();
+		if (SplashDistance >= 20)
+		{
+			// Too far away
+			return false;
+		}
+		if (!a_Entity->IsPawn())
+		{
+			// Not an entity that can take effects
+			return false;
+		}
+
+		// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
+		// TODO: better equation
+		double Reduction = -0.25 * SplashDistance + 1.0;
+		if (Reduction < 0)
+		{
+			Reduction = 0;
+		}
+		
+		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
+		return false;
+	}
+
+private:
+	const Vector3d & m_HitPos;
+	cEntityEffect::eType m_EntityEffectType;
+	const cEntityEffect & m_EntityEffect;
+};
+	
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cSplashPotionEntity:
+
+cSplashPotionEntity::cSplashPotionEntity(
+	cEntity * a_Creator,
+	double a_X, double a_Y, double a_Z,
+	const Vector3d & a_Speed,
+	cEntityEffect::eType a_EntityEffectType,
+	cEntityEffect a_EntityEffect,
+	int a_PotionParticleType
+) :
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
 	m_EntityEffectType(a_EntityEffectType),
 	m_EntityEffect(a_EntityEffect),
-	m_PotionName(a_PotionName)
+	m_PotionParticleType(a_PotionParticleType)
 {
 	SetSpeed(a_Speed);
 }
@@ -46,42 +112,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
 	
-	m_World->BroadcastSoundParticleEffect(2002, a_HitPos.x, a_HitPos.y, a_HitPos.z, m_PotionName);
-}
-
-
-
-
-
-cSplashPotionEntity::cSplashPotionCallback::cSplashPotionCallback(const Vector3d & a_HitPos, cEntityEffect::eType &a_EntityEffectType, cEntityEffect &a_EntityEffect):
-	m_HitPos(a_HitPos),
-	m_EntityEffectType(a_EntityEffectType),
-	m_EntityEffect(a_EntityEffect)
-{
-	
-}
-
-
-
-
-
-bool cSplashPotionEntity::cSplashPotionCallback::Item(cEntity * a_Entity)
-{
-	double SplashDistance = (a_Entity->GetPosition() - m_HitPos).Length();
-	if (SplashDistance < 20 && a_Entity->IsPawn())
-	{
-		// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
-		// TODO: better equation
-		double Reduction = -0.25 * SplashDistance + 1.0;
-		if (Reduction < 0)
-		{
-			Reduction = 0;
-		}
-		
-		m_EntityEffect.SetDistanceModifier(Reduction);
-		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
-	}
-	return false;
+	m_World->BroadcastSoundParticleEffect(2002, a_HitPos.x, a_HitPos.y, a_HitPos.z, m_PotionParticleType);
 }
 
 

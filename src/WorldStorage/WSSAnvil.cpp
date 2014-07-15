@@ -1681,7 +1681,7 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 	
 	SplashPotion->SetEntityEffectType((cEntityEffect::eType) a_NBT.FindChildByName(a_TagIdx, "EffectType"));
 	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, EffectIntensity, EffectDistanceModifier));
-	SplashPotion->SetPotionName(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
+	SplashPotion->SetPotionParticleType(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
 	
 	// Store the new splash potion in the entities list:
 	a_Entities.push_back(SplashPotion.release());
