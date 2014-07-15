@@ -44,6 +44,7 @@ cGridStructGen::cGridStructGen(
 	int a_MaxStructureSizeX, int a_MaxStructureSizeZ,
 	size_t a_MaxCacheSize
 ) :
+	m_Seed(a_Seed),
 	m_Noise(a_Seed),
 	m_GridSizeX(a_GridSizeX),
 	m_GridSizeZ(a_GridSizeZ),
