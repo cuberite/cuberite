@@ -236,6 +236,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_Transparent = true;
 	a_Info[E_BLOCK_MELON_STEM          ].m_Transparent = true;
 	a_Info[E_BLOCK_MOB_SPAWNER         ].m_Transparent = true;
+	a_Info[E_BLOCK_NETHER_BRICK_FENCE  ].m_Transparent = true;
 	a_Info[E_BLOCK_NETHER_PORTAL       ].m_Transparent = true;
 	a_Info[E_BLOCK_NETHER_WART         ].m_Transparent = true;
 	a_Info[E_BLOCK_NEW_LEAVES          ].m_Transparent = true;
