@@ -10,9 +10,10 @@
 class cBlockLilypadHandler :
 	public cClearMetaOnDrop<cBlockHandler>
 {
+typedef cClearMetaOnDrop<cBlockHandler> super;
 public:
 	cBlockLilypadHandler(BLOCKTYPE a_BlockType)
-		: cClearMetaOnDrop<cBlockHandler>(a_BlockType)
+		: super(a_BlockType)
 	{
 	}
 };

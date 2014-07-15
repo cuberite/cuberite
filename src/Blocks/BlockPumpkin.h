@@ -8,9 +8,10 @@
 class cBlockPumpkinHandler :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false> >
 {
+typedef cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false> > super;
 public:
 	cBlockPumpkinHandler(BLOCKTYPE a_BlockType)
-		: cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false> >(a_BlockType)
+		: super(a_BlockType)
 	{
 	}
 	
