@@ -109,8 +109,8 @@ void cEntityEffect::OnTick(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Instant Health
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectInstantHealth:
+
 void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
@@ -118,7 +118,7 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 	
 	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
 	{
-		a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+		a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 		return;
 	}
 	a_Target.Heal(amount);
@@ -129,8 +129,8 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Instant Damage
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectInstantDamage:
+
 void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 {
 	// Base amount = 6, doubles for every increase in intensity
@@ -141,7 +141,7 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 		a_Target.Heal(amount);
 		return;
 	}
-	a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0); // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+	a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 }
 
 
@@ -149,8 +149,8 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Regeneration
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectRegeneration:
+
 void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
@@ -176,8 +176,8 @@ void cEntityEffectRegeneration::OnTick(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Hunger
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectHunger:
+
 void cEntityEffectHunger::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
@@ -185,7 +185,7 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = (cPlayer &) a_Target;
-		Target.SetFoodExhaustionLevel(Target.GetFoodExhaustionLevel() + 0.025); // 0.5 per second = 0.025 per tick
+		Target.SetFoodExhaustionLevel(Target.GetFoodExhaustionLevel() + 0.025);  // 0.5 per second = 0.025 per tick
 	}
 }
 
@@ -194,8 +194,8 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Weakness
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectWeakness:
+
 void cEntityEffectWeakness::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
@@ -212,8 +212,8 @@ void cEntityEffectWeakness::OnTick(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Poison
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectPoison:
+
 void cEntityEffectPoison::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
@@ -223,9 +223,10 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		cMonster & Target = (cMonster &) a_Target;
 		
 		// Doesn't effect undead mobs, spiders
-		if ((Target.IsUndead())
-		|| (Target.GetMobType() == cMonster::mtSpider)
-		|| (Target.GetMobType() == cMonster::mtCaveSpider))
+		if (Target.IsUndead() ||
+			(Target.GetMobType() == cMonster::mtSpider) ||
+			(Target.GetMobType() == cMonster::mtCaveSpider)
+		)
 		{
 			return;
 		}
@@ -249,20 +250,19 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Wither
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectWither:
+
 void cEntityEffectWither::OnTick(cPawn & a_Target)
 {
 	super::OnTick(a_Target);
 	
-	// Poison frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
+	// Damage frequency = 40 ticks, divided by effect level (Wither II = 20 ticks)
 	int frequency = (int) std::floor(25.0 / (double)(m_Intensity + 1));
 
 	if ((m_Ticks % frequency) == 0)
 	{
 		a_Target.TakeDamage(dtWither, NULL, 1, 0);
 	}
-	//TODO: "<Player> withered away>
 }
 
 
@@ -270,13 +270,17 @@ void cEntityEffectWither::OnTick(cPawn & a_Target)
 
 
 /////////////////////////////////////////////////////////////////////////
-// Saturation
-/////////////////////////////////////////////////////////////////////////
+// cEntityEffectSaturation:
+
 void cEntityEffectSaturation::OnTick(cPawn & a_Target)
 {
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = (cPlayer &) a_Target;
-		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity)); // Increase saturation 1 per tick, adds 1 for every increase in level
+		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
+
+
+
+
