@@ -486,21 +486,16 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 
 
 	// Nonsolid blocks:
-	a_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_IsSolid = false;
 	a_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_IsSolid = false;
 	a_Info[E_BLOCK_AIR                 ].m_IsSolid = false;
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_IsSolid = false;
-	a_Info[E_BLOCK_BIRCH_WOOD_STAIRS   ].m_IsSolid = false;
 	a_Info[E_BLOCK_BRICK_STAIRS        ].m_IsSolid = false;
 	a_Info[E_BLOCK_BROWN_MUSHROOM      ].m_IsSolid = false;
 	a_Info[E_BLOCK_CAKE                ].m_IsSolid = false;
-	a_Info[E_BLOCK_CARPET              ].m_IsSolid = false;
 	a_Info[E_BLOCK_CARROTS             ].m_IsSolid = false;
-	a_Info[E_BLOCK_COBBLESTONE_STAIRS  ].m_IsSolid = false;
 	a_Info[E_BLOCK_COBWEB              ].m_IsSolid = false;
 	a_Info[E_BLOCK_CROPS               ].m_IsSolid = false;
 	a_Info[E_BLOCK_DANDELION           ].m_IsSolid = false;
-	a_Info[E_BLOCK_DARK_OAK_WOOD_STAIRS].m_IsSolid = false;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSolid = false;
 	a_Info[E_BLOCK_END_PORTAL          ].m_IsSolid = false;
 	a_Info[E_BLOCK_FENCE               ].m_IsSolid = false;
@@ -508,30 +503,24 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_FIRE                ].m_IsSolid = false;
 	a_Info[E_BLOCK_FLOWER              ].m_IsSolid = false;
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
-	a_Info[E_BLOCK_JUNGLE_WOOD_STAIRS  ].m_IsSolid = false;
 	a_Info[E_BLOCK_LAVA                ].m_IsSolid = false;
 	a_Info[E_BLOCK_LEVER               ].m_IsSolid = false;
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
 	a_Info[E_BLOCK_MELON_STEM          ].m_IsSolid = false;
-	a_Info[E_BLOCK_NETHER_BRICK_STAIRS ].m_IsSolid = false;
 	a_Info[E_BLOCK_NETHER_PORTAL       ].m_IsSolid = false;
 	a_Info[E_BLOCK_POTATOES            ].m_IsSolid = false;
 	a_Info[E_BLOCK_POWERED_RAIL        ].m_IsSolid = false;
-	a_Info[E_BLOCK_QUARTZ_STAIRS       ].m_IsSolid = false;
 	a_Info[E_BLOCK_RAIL                ].m_IsSolid = false;
 	a_Info[E_BLOCK_REDSTONE_TORCH_OFF  ].m_IsSolid = false;
 	a_Info[E_BLOCK_REDSTONE_TORCH_ON   ].m_IsSolid = false;
 	a_Info[E_BLOCK_REDSTONE_WIRE       ].m_IsSolid = false;
 	a_Info[E_BLOCK_RED_MUSHROOM        ].m_IsSolid = false;
 	a_Info[E_BLOCK_REEDS               ].m_IsSolid = false;
-	a_Info[E_BLOCK_SANDSTONE_STAIRS    ].m_IsSolid = false;
 	a_Info[E_BLOCK_SAPLING             ].m_IsSolid = false;
 	a_Info[E_BLOCK_SIGN_POST           ].m_IsSolid = false;
 	a_Info[E_BLOCK_SNOW                ].m_IsSolid = false;
-	a_Info[E_BLOCK_SPRUCE_WOOD_STAIRS  ].m_IsSolid = false;
 	a_Info[E_BLOCK_STATIONARY_LAVA     ].m_IsSolid = false;
 	a_Info[E_BLOCK_STATIONARY_WATER    ].m_IsSolid = false;
-	a_Info[E_BLOCK_STONE_BRICK_STAIRS  ].m_IsSolid = false;
 	a_Info[E_BLOCK_STONE_BUTTON        ].m_IsSolid = false;
 	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_IsSolid = false;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_IsSolid = false;
@@ -543,7 +532,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_WOODEN_BUTTON       ].m_IsSolid = false;
 	a_Info[E_BLOCK_WOODEN_PRESSURE_PLATE].m_IsSolid = false;
 	a_Info[E_BLOCK_WOODEN_SLAB         ].m_IsSolid = false;
-	a_Info[E_BLOCK_WOODEN_STAIRS       ].m_IsSolid = false;
 
 
 	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:
