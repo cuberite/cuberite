@@ -91,6 +91,7 @@ cEntityEffect * cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectT
 	}
 	
 	ASSERT(!"Unhandled entity effect type!");
+	return NULL;
 }
 
 
