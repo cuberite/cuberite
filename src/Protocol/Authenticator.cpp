@@ -115,7 +115,8 @@ void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, co
 {
 	if (!m_ShouldAuthenticate)
 	{
-		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, cClientHandle::GenerateOfflineUUID(a_UserName));
+		Json::Value Value;
+		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, cClientHandle::GenerateOfflineUUID(a_UserName), Value);
 		return;
 	}
 
@@ -177,7 +178,7 @@ void cAuthenticator::Execute(void)
 		AString UUID;
 		if (AuthWithYggdrasil(NewUserName, ServerID, UUID))
 		{
-			AString Properties;
+			Json::Value Properties;
 			if (!GetPlayerProperties(UUID, Properties))
 			{
 				LOGINFO("User %s authenticated with UUID %s but property getting failed", NewUserName.c_str(), UUID.c_str());
@@ -329,7 +330,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 
 
-bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, AString & a_Properties)
+bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a_Properties)
 {
 	LOGD("Trying to get properties for user %s", a_UUID.c_str());
 
@@ -383,6 +384,10 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, AString & a_Pro
 		return false;
 	}
 
-	a_Properties = root["properties"].toStyledString();
+	a_Properties = root["properties"];
 	return true;
 }
+
+
+
+

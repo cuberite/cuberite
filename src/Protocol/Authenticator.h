@@ -23,6 +23,11 @@
 // fwd: "cRoot.h"
 class cRoot;
 
+namespace Json
+{
+	class Value;
+}
+
 
 
 
@@ -79,12 +84,14 @@ private:
 	/** cIsThread override: */
 	virtual void Execute(void) override;
 
+	/** Connects to a hostname using SSL, sends given data, and sets the response, returning whether all was successful or not */
 	bool ConnectSecurelyToAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Data, AString & a_Response);
 
 	/** Returns true if the user authenticated okay, false on error; iLevel is the recursion deptht (bails out if too deep) */
 	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID);
 
-	bool GetPlayerProperties(const AString & a_UUID, AString & a_Properties);
+	/** Gets the properties, such as skin, of a player based on their UUID via Mojang's API */
+	bool GetPlayerProperties(const AString & a_UUID, Json::Value & a_Properties);
 };
 
 

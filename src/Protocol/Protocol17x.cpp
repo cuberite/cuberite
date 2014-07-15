@@ -3016,12 +3016,8 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
 	Pkt.WriteString(a_Player.GetName());
 
-	Json::Value root;
-	Json::Reader reader;
-	reader.parse(m_Client->GetProperties(), root);
-
-	Pkt.WriteVarInt(root.size());
-	for (Json::Value::iterator itr = root.begin(); itr != root.end(); ++itr)
+	Pkt.WriteVarInt(m_Client->GetProperties().size());
+	for (Json::Value::iterator itr = m_Client->GetProperties().begin(); itr != m_Client->GetProperties().end(); ++itr)
 	{
 		Pkt.WriteString(((Json::Value)*itr).get("name", "").toStyledString());
 		Pkt.WriteString(((Json::Value)*itr).get("value", "").toStyledString());
