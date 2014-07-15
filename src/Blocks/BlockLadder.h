@@ -3,17 +3,19 @@
 
 #include "BlockHandler.h"
 #include "../World.h"
+#include "ClearMetaOnDrop.h"
 
 
 
 
 
 class cBlockLadderHandler :
-	public cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> >
 {
+	typedef cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> > super; 
 public:
 	cBlockLadderHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+		: super(a_BlockType)
 	{
 	}	
 

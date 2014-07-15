@@ -94,7 +94,6 @@ private:
 		switch (a_BlockType)
 		{
 			case E_BLOCK_ANVIL:
-			case E_BLOCK_BED:
 			case E_BLOCK_BEDROCK:
 			case E_BLOCK_BREWING_STAND:
 			case E_BLOCK_CHEST:
