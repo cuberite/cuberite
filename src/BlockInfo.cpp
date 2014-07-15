@@ -489,7 +489,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_IsSolid = false;
 	a_Info[E_BLOCK_AIR                 ].m_IsSolid = false;
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_IsSolid = false;
-	a_Info[E_BLOCK_BRICK_STAIRS        ].m_IsSolid = false;
 	a_Info[E_BLOCK_BROWN_MUSHROOM      ].m_IsSolid = false;
 	a_Info[E_BLOCK_CAKE                ].m_IsSolid = false;
 	a_Info[E_BLOCK_CARROTS             ].m_IsSolid = false;
