@@ -290,17 +290,18 @@ void cClientHandle::Kick(const AString & a_Reason)
 
 
 
-void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
+void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	if (m_State != csAuthenticating)
 	{
 		return;
 	}
 	
-	ASSERT( m_Player == NULL );
+	ASSERT(m_Player == NULL);
 
 	m_Username = a_Name;
 	m_UUID = a_UUID;
+	m_Properties = a_Properties;
 	
 	// Send login success (if the protocol supports it):
 	m_Protocol->SendLoginSuccess();
@@ -324,7 +325,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
 		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
-		LOGINFO("Player %s has joined the game.", m_Username.c_str());
+		LOGINFO("Player %s has joined the game", m_Username.c_str());
 	}
 	
 	m_ConfirmPosition = m_Player->GetPosition();
