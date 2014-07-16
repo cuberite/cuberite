@@ -17,7 +17,6 @@
 
 #define DEFAULT_AUTH_SERVER "sessionserver.mojang.com"
 #define DEFAULT_AUTH_ADDRESS "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%"
-#define DEFAULT_PROPERTIES_ADDRESS "/session/minecraft/profile/%UUID%"
 
 /** This is the data of the root certs for Starfield Technologies, the CA that signed sessionserver.mojang.com's cert:
 Downloaded from http://certs.starfieldtech.com/repository/ */
@@ -81,7 +80,6 @@ cAuthenticator::cAuthenticator(void) :
 	super("cAuthenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
-	m_PropertiesAddress(DEFAULT_PROPERTIES_ADDRESS),
 	m_ShouldAuthenticate(true)
 {
 }
@@ -103,7 +101,6 @@ void cAuthenticator::ReadINI(cIniFile & IniFile)
 {
 	m_Server = IniFile.GetValueSet("Authentication", "Server", DEFAULT_AUTH_SERVER);
 	m_Address = IniFile.GetValueSet("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
-	m_PropertiesAddress = IniFile.GetValueSet("Authentication", "PlayerPropertiesAddress", DEFAULT_PROPERTIES_ADDRESS);
 	m_ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
 }
 
@@ -176,27 +173,10 @@ void cAuthenticator::Execute(void)
 
 		AString NewUserName = UserName;
 		AString UUID;
-		if (AuthWithYggdrasil(NewUserName, ServerID, UUID))
+		Json::Value Properties;
+		if (AuthWithYggdrasil(NewUserName, ServerID, UUID, Properties))
 		{
-			Json::Value Properties;
-			if (!GetPlayerProperties(UUID, Properties))
-			{
-				LOGINFO("User %s authenticated with UUID %s but property getting failed", NewUserName.c_str(), UUID.c_str());
-			}
-			else
-			{
-				LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.c_str());
-			}
-
-			// If the UUID doesn't contain the hashes, insert them at the proper places:
-			if (UUID.size() == 32)
-			{
-				UUID.insert(8, "-");
-				UUID.insert(13, "-");
-				UUID.insert(18, "-");
-				UUID.insert(23, "-");
-			}
-
+			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.c_str());
 			cRoot::Get()->AuthenticateUser(ClientID, NewUserName, UUID, Properties);
 		}
 		else
@@ -266,7 +246,7 @@ bool cAuthenticator::ConnectSecurelyToAddress(const AString & a_CACerts, const A
 
 
 
-bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID)
+bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties)
 {
 	LOGD("Trying to authenticate user %s", a_UserName.c_str());	
 
@@ -322,6 +302,16 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	}
 	a_UserName = root.get("name", "Unknown").asString();
 	a_UUID = root.get("id", "").asString();
+	a_Properties = root["properties"];
+
+	// If the UUID doesn't contain the hashes, insert them at the proper places:
+	if (a_UUID.size() == 32)
+	{
+		a_UUID.insert(8, "-");
+		a_UUID.insert(13, "-");
+		a_UUID.insert(18, "-");
+		a_UUID.insert(23, "-");
+	}
 
 	return true;
 }
@@ -329,6 +319,13 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 
 
+
+/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration lines for DEFAULT_PROPERTIES_ADDRESS
+
+#define DEFAULT_PROPERTIES_ADDRESS "/session/minecraft/profile/%UUID%"
+
+// Gets the properties, such as skin, of a player based on their UUID via Mojang's API
+bool GetPlayerProperties(const AString & a_UUID, Json::Value & a_Properties);
 
 bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a_Properties)
 {
@@ -376,6 +373,7 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	{
 		return false;
 	}
+
 	Json::Value root;
 	Json::Reader reader;
 	if (!reader.parse(Response, root, false))
@@ -387,7 +385,4 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	a_Properties = root["properties"];
 	return true;
 }
-
-
-
-
+*/
