@@ -528,7 +528,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 {
 	m_Health = 0;
 
-	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI);
+	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI.Attacker, a_TDI);
 	
 	if (m_Health > 0)
 	{
