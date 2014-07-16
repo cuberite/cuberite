@@ -190,7 +190,7 @@ void cAuthenticator::Execute(void)
 
 
 
-bool cAuthenticator::ConnectSecurelyToAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Data, AString & a_Response)
+bool cAuthenticator::SecureGetFromAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Data, AString & a_Response)
 {
 	// Connect the socket:
 	cBlockingSslClientSocket Socket;
@@ -263,7 +263,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	Request += "\r\n";
 
 	AString Response;
-	if (!ConnectSecurelyToAddress(gStarfieldCACert, m_Server, Request, Response))
+	if (!SecureGetFromAddress(gStarfieldCACert, m_Server, Request, Response))
 	{
 		return false;
 	}

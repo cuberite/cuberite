@@ -85,7 +85,7 @@ private:
 	virtual void Execute(void) override;
 
 	/** Connects to a hostname using SSL, sends given data, and sets the response, returning whether all was successful or not */
-	bool ConnectSecurelyToAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Request, AString & a_Response);
+	bool SecureGetFromAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Request, AString & a_Response);
 
 	/** Returns true if the user authenticated okay, false on error
 	Sets the username, UUID, and properties (i.e. skin) fields
