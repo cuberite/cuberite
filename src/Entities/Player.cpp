@@ -2141,6 +2141,8 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	{
 		return;
 	}
+
+	// If we have just teleported, apply no exhaustion
 	if (m_bIsTeleporting)
 	{
 		m_bIsTeleporting = false;
@@ -2149,6 +2151,13 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)
+	{
+		return;
+	}
+
+	// Process exhaustion every two ticks as that is how frequently m_LastPos is updated
+	// Otherwise, we apply exhaustion for a 'movement' every tick, one of which is an already processed value
+	if (GetWorld()->GetWorldAge() % 2 != 0)
 	{
 		return;
 	}
