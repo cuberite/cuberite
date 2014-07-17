@@ -1146,10 +1146,7 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 	m_MaxHealth = a_MaxHealth;
 
 	// Reset health, if too high:
-	if (m_Health > a_MaxHealth)
-	{
-		m_Health = a_MaxHealth;
-	}
+	m_Health = std::min(m_Health, a_MaxHealth);
 }
 
 
