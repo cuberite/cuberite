@@ -2707,9 +2707,10 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
 			// It gets half the maximum health, and takes it away from the current health minus the half health:
-			/* Health: 5 | 3 - (5 - 3) = 1 (shake power)
-			   Health: 3 | 3 - (3 - 3) = 3
-			   Health: 1 | 3 - (1 - 3) = 5
+			/*
+			Health: 5 | 3 - (5 - 3) = 1 (shake power)
+			Health: 3 | 3 - (3 - 3) = 3
+			Health: 1 | 3 - (1 - 3) = 5
 			*/
 			WriteInt((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4);
 			WriteByte(0x52);

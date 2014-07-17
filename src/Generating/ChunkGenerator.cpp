@@ -228,10 +228,10 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 
-		cChunkCoords coords = m_Queue.front();		// Get next coord from queue
-		m_Queue.erase( m_Queue.begin() );	// Remove coordinate from queue
+		cChunkCoords coords = m_Queue.front();  // Get next coord from queue
+		m_Queue.erase( m_Queue.begin() );  // Remove coordinate from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
-		Lock.Unlock();			// Unlock ASAP
+		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
 
 		// Display perf info once in a while:

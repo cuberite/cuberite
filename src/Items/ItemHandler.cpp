@@ -459,13 +459,13 @@ bool cItemHandler::IsTool()
 {
 	// TODO: Rewrite this to list all tools specifically
 	return
-		   (m_ItemType >= 256 && m_ItemType <= 259)
-		|| (m_ItemType == 261)
-		|| (m_ItemType >= 267 && m_ItemType <= 279)
-		|| (m_ItemType >= 283 && m_ItemType <= 286)
-		|| (m_ItemType >= 290 && m_ItemType <= 294)
-		|| (m_ItemType == 325)
-		|| (m_ItemType == 346);
+		((m_ItemType >= 256) && (m_ItemType <= 259)) ||
+		(m_ItemType == 261) ||
+		((m_ItemType >= 267) && (m_ItemType <= 279)) ||
+		((m_ItemType >= 283) && (m_ItemType <= 286)) ||
+		((m_ItemType >= 290) && (m_ItemType <= 294)) ||
+		(m_ItemType == 325) ||
+		(m_ItemType == 346);
 }
 
 

@@ -85,7 +85,7 @@ protected:
 
 
 cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	:	cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
+	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
 	, m_Timer(0.f)
 	, m_Item(a_Item)
 	, m_bCollected(false)

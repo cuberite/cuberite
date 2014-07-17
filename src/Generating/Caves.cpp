@@ -555,14 +555,14 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 {
 	AString SVG;
 	SVG.reserve(m_Points.size() * 20 + 200);
-  AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
-  char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
-  for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
-  {
+	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
+	char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
+	for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
+	{
 		AppendPrintf(SVG, "%c %d,%d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
 		Prefix = 'L';
-  }
-  SVG.append("\"/>\n");
+	}
+	SVG.append("\"/>\n");
 	return SVG;
 }
 #endif  // _DEBUG

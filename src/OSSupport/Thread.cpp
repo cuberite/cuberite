@@ -91,7 +91,7 @@ void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 		LOGERROR("ERROR: Could not create thread!");
 #else
 	DWORD ThreadID = 0;
-	HANDLE hThread = CreateThread(	0  // security
+	HANDLE hThread = CreateThread(NULL  // security
 		,0  // stack size
 		, (LPTHREAD_START_ROUTINE) MyThread  // function name
 		,this  // parameters

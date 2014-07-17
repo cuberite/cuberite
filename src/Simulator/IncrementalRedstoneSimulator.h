@@ -294,7 +294,7 @@ private:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_PISTON:
 			{
-				 return true;
+				return true;
 			}
 			default: return false;
 		}

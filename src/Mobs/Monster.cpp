@@ -325,7 +325,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			AddSpeedZ(Distance.z);
 
 			if (m_EMState == ESCAPING)
-			{	// Runs Faster when escaping :D otherwise they just walk away
+			{  // Runs Faster when escaping :D otherwise they just walk away
 				SetSpeedX (GetSpeedX() * 2.f);
 				SetSpeedZ (GetSpeedZ() * 2.f);
 			}

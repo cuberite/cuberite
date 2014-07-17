@@ -6,7 +6,7 @@
 
 
 cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
-	:	cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
+	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
 	, m_Reward(a_Reward)
 	, m_Timer(0.f)
 {
@@ -19,7 +19,7 @@ cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 
 
 cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
-	:	cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
+	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
 	, m_Reward(a_Reward)
 	, m_Timer(0.f)
 {

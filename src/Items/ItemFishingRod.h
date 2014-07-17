@@ -63,7 +63,7 @@ class cSweepEntityCallback :
 {
 public:
 	cSweepEntityCallback(Vector3d a_PlayerPos) :
-	  m_PlayerPos(a_PlayerPos)
+		m_PlayerPos(a_PlayerPos)
 	{
 	}
 

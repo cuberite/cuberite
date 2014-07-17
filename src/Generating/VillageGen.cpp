@@ -95,7 +95,7 @@ public:
 		
 		return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 	}
-}	;
+};
 
 
 

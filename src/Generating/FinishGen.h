@@ -199,7 +199,7 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	/// Tries to place a spring at the specified coords, checks neighbors. Returns true	if successful
+	/// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
 	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
 } ;
 

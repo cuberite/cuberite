@@ -10,7 +10,7 @@
 
 
 cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z)
-	:	cEntity(a_EntityType, a_X, a_Y, a_Z, 0.8, 0.8)
+	: cEntity(a_EntityType, a_X, a_Y, a_Z, 0.8, 0.8)
 	, m_BlockFace(a_BlockFace)
 {
 	SetMaxHealth(1);

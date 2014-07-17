@@ -760,7 +760,7 @@ void cProtocol125::SendPlayerMoveLook(void)
 	);
 	*/
 
-	WriteByte	(PACKET_PLAYER_MOVE_LOOK);
+	WriteByte(PACKET_PLAYER_MOVE_LOOK);
 	cPlayer * Player = m_Client->GetPlayer();
 	WriteDouble(Player->GetPosX());
 	WriteDouble(Player->GetStance() + 0.03);  // Add a small amount so that the player doesn't start inside a block
@@ -1005,10 +1005,10 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 void cProtocol125::SendStatistics(const cStatManager & a_Manager)
 {
 	/* NOTE:
-	 * Versions prior to minecraft 1.7 use an incremental statistic sync
-	 * method. The current setup does not allow us to implement that, because
-	 * of performance considerations.
-	 */
+	Versions prior to minecraft 1.7 use an incremental statistic sync
+	method. The current setup does not allow us to implement that, because
+	of performance considerations.
+	*/
 #if 0
 	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
 	{
@@ -1121,7 +1121,7 @@ void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_USE_BED);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(0);	// Unknown byte only 0 has been observed
+	WriteByte(0);  // Unknown byte only 0 has been observed
 	WriteInt (a_BlockX);
 	WriteByte((Byte)a_BlockY);
 	WriteInt (a_BlockZ);
@@ -1344,11 +1344,11 @@ int cProtocol125::ParseArmAnim(void)
 
 int cProtocol125::ParseBlockDig(void)
 {
-	HANDLE_PACKET_READ(ReadChar,	char, Status);
+	HANDLE_PACKET_READ(ReadChar,  char, Status);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
-	HANDLE_PACKET_READ(ReadByte,	Byte, PosY);
+	HANDLE_PACKET_READ(ReadByte,  Byte, PosY);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
-	HANDLE_PACKET_READ(ReadChar,	char, BlockFace);
+	HANDLE_PACKET_READ(ReadChar,  char, BlockFace);
 	m_Client->HandleLeftClick(PosX, PosY, PosZ, static_cast<eBlockFace>(BlockFace), Status);
 	return PARSE_OK;
 }

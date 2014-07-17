@@ -1347,7 +1347,7 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);	// Destroy on all clients
+		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);  // Destroy on all clients
 	}
 }
 
@@ -1455,7 +1455,7 @@ bool cPlayer::IsInGroup( const AString & a_Group )
 
 void cPlayer::ResolvePermissions()
 {
-	m_ResolvedPermissions.clear();	// Start with an empty map yo~
+	m_ResolvedPermissions.clear();  // Start with an empty map
 
 	// Copy all player specific permissions into the resolved permissions map
 	for( PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr )
@@ -1483,7 +1483,7 @@ void cPlayer::ResolveGroups()
 	m_ResolvedGroups.clear();
 
 	// Get a complete resolved list of all groups the player is in
-	std::map< cGroup*, bool > AllGroups;	// Use a map, because it's faster than iterating through a list to find duplicates
+	std::map< cGroup*, bool > AllGroups;  // Use a map, because it's faster than iterating through a list to find duplicates
 	GroupList ToIterate;
 	for( GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr )
 	{
@@ -1501,7 +1501,7 @@ void cPlayer::ResolveGroups()
 		else
 		{
 			AllGroups[ CurrentGroup ] = true;
-			m_ResolvedGroups.push_back( CurrentGroup );	// Add group to resolved list
+			m_ResolvedGroups.push_back( CurrentGroup );  // Add group to resolved list
 			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
 			for( cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr )
 			{

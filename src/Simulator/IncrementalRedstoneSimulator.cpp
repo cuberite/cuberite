@@ -739,7 +739,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 	// Create a variable holding my meta to avoid multiple lookups.
 	NIBBLETYPE a_Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
-    
+
 	if (!IsRepeaterLocked(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta))  // If we're locked, change nothing. Otherwise:
 	{
 		bool IsSelfPowered = IsRepeaterPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta);

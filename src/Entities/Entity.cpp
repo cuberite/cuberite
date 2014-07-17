@@ -345,7 +345,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		switch (KnockbackLevel)
 		{
 			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
-			case 2:	AdditionalSpeed.Set(8, 0.3, 8); break;
+			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
 			default: break;
 		}
 		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
