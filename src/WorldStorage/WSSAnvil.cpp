@@ -36,6 +36,7 @@
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ArrowEntity.h"
+#include "../Entities/SplashPotionEntity.h"
 #include "../Entities/ThrownEggEntity.h"
 #include "../Entities/ThrownEnderPearlEntity.h"
 #include "../Entities/ThrownSnowballEntity.h"
@@ -1156,6 +1157,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadArrowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "SplashPotion", a_IDTagLength) == 0)
+	{
+		LoadSplashPotionFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "Snowball", a_IDTagLength) == 0)
 	{
 		LoadSnowballFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1657,6 +1662,29 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	
 	// Store the new arrow in the entities list:
 	a_Entities.push_back(Arrow.release());
+}
+
+
+
+
+void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cEntityEffect::effNoEffect, cEntityEffect(), 0));
+	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	int EffectDuration         = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
+	int EffectIntensity        = a_NBT.FindChildByName(a_TagIdx, "EffectIntensity");
+	int EffectDistanceModifier = a_NBT.FindChildByName(a_TagIdx, "EffectDistanceModifier");
+	
+	SplashPotion->SetEntityEffectType((cEntityEffect::eType) a_NBT.FindChildByName(a_TagIdx, "EffectType"));
+	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, EffectIntensity, EffectDistanceModifier));
+	SplashPotion->SetPotionParticleType(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
+	
+	// Store the new splash potion in the entities list:
+	a_Entities.push_back(SplashPotion.release());
 }
 
 

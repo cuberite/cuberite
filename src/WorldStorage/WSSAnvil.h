@@ -163,6 +163,7 @@ protected:
 	void LoadMinecartHFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 
 	void LoadArrowFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadSplashPotionFromNBT    (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadSnowballFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadEggFromNBT             (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadFireballFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);

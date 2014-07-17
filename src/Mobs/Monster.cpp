@@ -435,6 +435,7 @@ void cMonster::HandleFalling()
 
 
 
+
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
@@ -700,6 +701,25 @@ void cMonster::InStateEscaping(float a_Dt)
 void cMonster::GetMonsterConfig(const AString & a_Name)
 {
 	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
+}
+
+
+
+
+
+bool cMonster::IsUndead(void)
+{
+	switch (GetMobType())
+	{
+		case mtZombie:
+		case mtZombiePigman:
+		case mtSkeleton:
+		case mtWither:
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 

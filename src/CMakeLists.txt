@@ -43,7 +43,7 @@ set(BINDING_DEPENDECIES
 	Cuboid.h
 	Defines.h
 	Enchantments.h
-	Entities/Effects.h
+	Entities/EntityEffect.h
 	Entities/Entity.h
 	Entities/Floater.h
 	Entities/Pawn.h

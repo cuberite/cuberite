@@ -158,6 +158,7 @@ public:
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
 	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
 	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
+	bool IsPawn        (void) const { return (IsMob() || IsPlayer());          }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
 	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
 	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }
@@ -315,7 +316,7 @@ public:
 	virtual void Killed(cEntity * a_Victim) {}
 
 	/// Heals the specified amount of HPs
-	void Heal(int a_HitPoints);
+	virtual void Heal(int a_HitPoints);
 	
 	/// Returns the health of this entity
 	int GetHealth(void) const { return m_Health; }

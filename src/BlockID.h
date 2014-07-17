@@ -319,7 +319,8 @@ enum ENUM_ITEM_ID
 	E_ITEM_GHAST_TEAR = 370,
 	E_ITEM_GOLD_NUGGET = 371,
 	E_ITEM_NETHER_WART = 372,
-	E_ITEM_POTIONS = 373,
+	E_ITEM_POTION = 373,
+	E_ITEM_POTIONS = 373,  // OBSOLETE, use E_ITEM_POTION instead
 	E_ITEM_GLASS_BOTTLE = 374,
 	E_ITEM_SPIDER_EYE = 375,
 	E_ITEM_FERMENTED_SPIDER_EYE = 376,
@@ -811,6 +812,7 @@ enum eDamageType
 	dtCactusContact,    // Contact with a cactus block
 	dtLavaContact,      // Contact with a lava block
 	dtPoisoning,        // Having the poison effect
+	dtWithering,        // Having the wither effect
 	dtOnFire,           // Being on fire
 	dtFireContact,      // Standing inside a fire block
 	dtInVoid,           // Falling into the Void (Y < 0)
@@ -837,6 +839,7 @@ enum eDamageType
 	dtCacti        = dtCactusContact,
 	dtLava         = dtLavaContact,
 	dtPoison       = dtPoisoning,
+	dtWither       = dtWithering,
 	dtBurning      = dtOnFire,
 	dtInFire       = dtFireContact,
 	dtPlugin       = dtAdmin,

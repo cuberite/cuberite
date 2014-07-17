@@ -107,6 +107,9 @@ public:
 	/// Reads the monster configuration for the specified monster name and assigns it to this object.
 	void GetMonsterConfig(const AString & a_Name);
 	
+	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
+	bool IsUndead(void);
+	
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);
 	
@@ -178,6 +181,7 @@ protected:
 
 	/** Stores if mobile is currently moving towards the ultimate, final destination */
 	bool m_bMovingToDestination;
+	
 	/** Finds the first non-air block position (not the highest, as cWorld::GetHeight does)
 		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
 		If current Y is solid, goes up to find first nonsolid block, and returns that */

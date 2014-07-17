@@ -46,6 +46,7 @@ class cTNTEntity;
 class cExpOrb;
 class cHangingEntity;
 class cItemFrame;
+class cEntityEffect;
 
 
 

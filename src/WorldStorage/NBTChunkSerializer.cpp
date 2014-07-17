@@ -29,6 +29,7 @@
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ArrowEntity.h"
+#include "../Entities/SplashPotionEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
@@ -603,6 +604,16 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 				m_Writer.AddByte("pickup",   Arrow->GetPickupState());
 				m_Writer.AddDouble("damage", Arrow->GetDamageCoeff());
 				break;
+			}
+			case cProjectileEntity::pkSplashPotion:
+			{
+				cSplashPotionEntity * Potion = (cSplashPotionEntity *)a_Projectile;
+				
+				m_Writer.AddInt("EffectType",               (Int16)Potion->GetEntityEffectType());
+				m_Writer.AddInt("EffectDuration",           (Int16)Potion->GetEntityEffect().GetDuration());
+				m_Writer.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
+				m_Writer.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
+				m_Writer.AddInt("PotionName",                Potion->GetPotionParticleType());
 			}
 			case cProjectileEntity::pkGhastFireball:
 			{

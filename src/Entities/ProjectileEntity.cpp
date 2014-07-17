@@ -21,6 +21,7 @@
 #include "FireChargeEntity.h"
 #include "FireworkEntity.h"
 #include "GhastFireballEntity.h"
+#include "WitherSkullEntity.h"
 #include "Player.h"
 
 
@@ -260,6 +261,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkWitherSkull:   return new cWitherSkullEntity     (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{
 			ASSERT(a_Item != NULL);
@@ -311,7 +313,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkFireCharge:    return "SmallFireball";
 		case pkEnderPearl:    return "ThrownEnderpearl";
 		case pkExpBottle:     return "ThrownExpBottle";
-		case pkSplashPotion:  return "ThrownPotion";
+		case pkSplashPotion:  return "SplashPotion";
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?

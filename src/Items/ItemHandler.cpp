@@ -19,6 +19,7 @@
 #include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemDoor.h"
+#include "ItemMilk.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
@@ -34,6 +35,7 @@
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
+#include "ItemPotion.h"
 #include "ItemThrowable.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
@@ -120,9 +122,11 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
+		case E_ITEM_MILK:              return new cItemMilkHandler();
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
+		case E_ITEM_POTIONS:           return new cItemPotionHandler();
 		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
 		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
 		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
@@ -470,33 +474,17 @@ bool cItemHandler::IsTool()
 
 bool cItemHandler::IsFood(void)
 {
-	switch (m_ItemType)
-	{
-		case E_ITEM_RED_APPLE:
-		case E_ITEM_GOLDEN_APPLE:
-		case E_ITEM_MUSHROOM_SOUP:
-		case E_ITEM_BREAD:
-		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_COOKED_PORKCHOP:
-		case E_ITEM_MILK:
-		case E_ITEM_RAW_FISH:
-		case E_ITEM_COOKED_FISH:
-		case E_ITEM_COOKIE:
-		case E_ITEM_MELON_SLICE:
-		case E_ITEM_RAW_BEEF:
-		case E_ITEM_STEAK:
-		case E_ITEM_RAW_CHICKEN:
-		case E_ITEM_COOKED_CHICKEN:
-		case E_ITEM_ROTTEN_FLESH:
-		case E_ITEM_SPIDER_EYE:
-		case E_ITEM_CARROT:
-		case E_ITEM_POTATO:
-		case E_ITEM_BAKED_POTATO:
-		case E_ITEM_POISONOUS_POTATO:
-		{
-			return true;
-		}
-	}  // switch (m_ItemType)
+	return false;
+}
+
+
+
+
+
+bool cItemHandler::IsDrinkable(short a_ItemDamage)
+{
+	UNUSED(a_ItemDamage);
+	
 	return false;
 }
 
@@ -580,7 +568,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 			cFastRandom r1;
 			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
 			{
-				a_Player->FoodPoison(300);
+				a_Player->FoodPoison(600); // Give the player food poisoning for 30 seconds.
 			}
 		}
 
