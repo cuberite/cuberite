@@ -4,6 +4,7 @@
 #include "Skeleton.h"
 #include "../World.h"
 #include "../Entities/ArrowEntity.h"
+#include "ClientHandle.h"
 
 
 
@@ -90,3 +91,17 @@ void cSkeleton::Attack(float a_Dt)
 		m_AttackInterval = 0.0;
 	}
 }
+
+
+
+
+
+void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
+{
+	super::SpawnOn(a_ClientHandle);
+	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_BOW));
+}
+
+
+
+
