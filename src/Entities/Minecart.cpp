@@ -493,7 +493,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 				SetSpeedY(-GetSpeedX());
 			}
 			break;
-		}		
+		}
 		case E_META_RAIL_ASCEND_XP:  // ASCEND WEST
 		{
 			SetYaw(180);
@@ -513,7 +513,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 				}
 			}
 			break;
-		}			
+		}
 		case E_META_RAIL_ASCEND_ZM:  // ASCEND NORTH
 		{
 			SetYaw(270);
@@ -787,7 +787,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 				}
 			}
 			break;
-		}			
+		}
 		case E_META_RAIL_CURVED_ZM_XM:
 		case E_META_RAIL_CURVED_ZM_XP:
 		case E_META_RAIL_CURVED_ZP_XM:
@@ -883,7 +883,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 				}
 			}
 			return true;
-		}			
+		}
 		case E_META_RAIL_CURVED_ZM_XM:
 		case E_META_RAIL_CURVED_ZM_XP:
 		case E_META_RAIL_CURVED_ZP_XM:

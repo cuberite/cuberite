@@ -630,7 +630,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			{
 				ASSERT(!"Unsaved projectile entity!");
 			}
-		}  // switch (ProjectileKind)		
+		}  // switch (ProjectileKind)
 
 		if (!a_Projectile->GetCreatorName().empty())
 		{

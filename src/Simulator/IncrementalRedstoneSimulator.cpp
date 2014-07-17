@@ -281,7 +281,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 		if (ShouldUpdateSimulateOnceBlocks)
 		{
 			switch (dataitr->Data)
-			{				
+			{
 				case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	  break;
 				case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
 				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
@@ -392,7 +392,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 
 	if (a_MyState == E_BLOCK_REDSTONE_TORCH_ON)
 	{
-		// Check if the block the torch is on is powered		
+		// Check if the block the torch is on is powered
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
 		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 
@@ -448,7 +448,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 	}
 	else
 	{
-		// Check if the block the torch is on is powered		
+		// Check if the block the torch is on is powered
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
 		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 		
@@ -803,7 +803,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 			}
 			else if (Block != E_BLOCK_REDSTONE_REPEATER_OFF)
 			{
-				m_Chunk->SetBlock(RelBlockX, RelBlockY, RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, Meta);				
+				m_Chunk->SetBlock(RelBlockX, RelBlockY, RelBlockZ, E_BLOCK_REDSTONE_REPEATER_OFF, Meta);
 			}
 			itr = m_RepeatersDelayList->erase(itr);
 		}

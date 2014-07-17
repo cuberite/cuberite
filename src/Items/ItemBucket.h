@@ -94,7 +94,7 @@ public:
 
 
 	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock)
-	{			
+	{
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
@@ -209,14 +209,14 @@ public:
 					}
 					m_Pos.Set(a_BlockX, a_BlockY, a_BlockZ);  // (Block could be washed away, replace it)
 					return true;  // Abort tracing
-				}				
+				}
 				return false;
 			}
 		} Callbacks;
 
 		cLineBlockTracer Tracer(*a_World, Callbacks);
 		Vector3d Start(a_Player->GetEyePosition());
-		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);		
+		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
 		// cTracer::Trace returns true when whole line was traversed. By returning true when we hit something, we ensure that this never happens if liquid could be placed
 		// Use this to judge whether the position is valid
@@ -227,6 +227,6 @@ public:
 			return true;
 		}
 
-		return false;		
+		return false;
 	}
 };

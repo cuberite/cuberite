@@ -145,7 +145,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 	{
 		int NumSlots = (*itr)->GetNumSlots();
 		for (int i = 0; i < NumSlots; i++)
-		{			
+		{
 			const cItem * Item = (*itr)->GetSlot(i, a_Player);
 			if (Item == NULL)
 			{

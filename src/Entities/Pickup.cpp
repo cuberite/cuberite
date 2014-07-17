@@ -143,7 +143,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				m_bCollected = true;
 				m_Timer = 0;  // We have to reset the timer.
 				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
-				if (m_Timer > 500.f)  
+				if (m_Timer > 500.f)
 				{
 					Destroy(true);
 					return;

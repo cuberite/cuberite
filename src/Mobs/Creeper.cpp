@@ -37,7 +37,7 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bIsBlowing)
 		{
-			m_ExplodingTimer += 1;			
+			m_ExplodingTimer += 1;
 		}
 
 		if (m_ExplodingTimer == 30)

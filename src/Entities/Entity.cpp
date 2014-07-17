@@ -640,7 +640,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
-		// Outside of the world		
+		// Outside of the world
 		AddSpeedY(m_Gravity * a_Dt);
 		AddPosition(GetSpeed() * a_Dt);
 		return;
@@ -858,7 +858,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
 			m_TicksLeftBurning = 0;
-		}		
+		}
 	}
 	
 	// Do the burning damage:

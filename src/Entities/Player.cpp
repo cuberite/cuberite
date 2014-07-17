@@ -497,7 +497,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			
 			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
-		}		
+		}
 
 		m_LastGroundHeight = (float)GetPosY();
 	}
