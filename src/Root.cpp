@@ -105,7 +105,7 @@ void cRoot::Start(void)
 	#ifdef _WIN32
 	HWND hwnd = GetConsoleWindow();
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
-	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED); // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
+	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
 
 	cDeadlockDetect dd;
@@ -202,7 +202,7 @@ void cRoot::Start(void)
 
 		LOG("Startup complete, took %lld ms!", finishmseconds);
 		#ifdef _WIN32
-		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED); // Re-enable close button
+		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
 		while (!m_bStop && !m_bRestart && !g_TERMINATE_EVENT_RAISED)  // These are modified by external threads
@@ -607,7 +607,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 				m_BestRating = Rating;
 				++m_NumMatches;
 			}
-			if (Rating == m_NameLength) // Perfect match
+			if (Rating == m_NameLength)  // Perfect match
 			{
 				return true;
 			}

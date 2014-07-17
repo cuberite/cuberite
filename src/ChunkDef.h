@@ -138,9 +138,9 @@ public:
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width); // 1.2 is XZY
+			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width); // 1.1 is YZX
+			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
 		#endif
 	}
 

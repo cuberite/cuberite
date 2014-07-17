@@ -14,18 +14,18 @@
 	#pragma warning(disable:4481)
 
 	// Disable some warnings that we don't care about:
-	#pragma warning(disable:4100) // Unreferenced formal parameter
+	#pragma warning(disable:4100)  // Unreferenced formal parameter
 
 	// Useful warnings from warning level 4:
-	#pragma warning(3 : 4127) // Conditional expression is constant
-	#pragma warning(3 : 4189) // Local variable is initialized but not referenced
-	#pragma warning(3 : 4245) // Conversion from 'type1' to 'type2', signed/unsigned mismatch
-	#pragma warning(3 : 4310) // Cast truncates constant value
-	#pragma warning(3 : 4389) // Signed/unsigned mismatch
-	#pragma warning(3 : 4505) // Unreferenced local function has been removed
-	#pragma warning(3 : 4701) // Potentially unitialized local variable used
-	#pragma warning(3 : 4702) // Unreachable code
-	#pragma warning(3 : 4706) // Assignment within conditional expression
+	#pragma warning(3 : 4127)  // Conditional expression is constant
+	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
+	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed/unsigned mismatch
+	#pragma warning(3 : 4310)  // Cast truncates constant value
+	#pragma warning(3 : 4389)  // Signed/unsigned mismatch
+	#pragma warning(3 : 4505)  // Unreferenced local function has been removed
+	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
+	#pragma warning(3 : 4702)  // Unreachable code
+	#pragma warning(3 : 4706)  // Assignment within conditional expression
 	
 	// Disabling this warning, because we know what we're doing when we're doing this:
 	#pragma warning(disable: 4355)  // 'this' used in initializer list
@@ -34,7 +34,7 @@
 	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
 	
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
-	// #pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
+	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
 	#define OBSOLETE __declspec(deprecated)
 

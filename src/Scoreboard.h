@@ -118,7 +118,7 @@ private:
 	friend class cScoreboardSerializer;
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 
@@ -197,7 +197,7 @@ private:
 	friend class cScoreboardSerializer;
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 
@@ -301,7 +301,7 @@ private:
 	friend class cScoreboardSerializer;
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 

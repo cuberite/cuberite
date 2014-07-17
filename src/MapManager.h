@@ -43,14 +43,14 @@ public:
 	Returns true if the map was found and the callback called, false if map not found.
 	Callback return value is ignored.
 	*/
-	bool DoWithMap(int a_ID, cMapCallback & a_Callback); // Exported in ManualBindings.cpp
+	bool DoWithMap(int a_ID, cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each map.
 	Returns true if all maps processed, false if the callback aborted by returning true.
 	*/
 	bool ForEachMap(cMapCallback & a_Callback);
 
-	size_t GetNumMaps(void) const; // tolua_export
+	size_t GetNumMaps(void) const;  // tolua_export
 
 	/** Loads the map data from the disk */
 	void LoadMapData(void);
@@ -69,7 +69,7 @@ private:
 
 	cWorld * m_World;
 
-}; // tolua_export
+};  // tolua_export
 
 
 

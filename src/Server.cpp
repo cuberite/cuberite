@@ -202,7 +202,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png"))); // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -213,7 +213,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
 	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
-	if (cSocket::WSAStartup() != 0) // Only does anything on Windows, but whatever
+	if (cSocket::WSAStartup() != 0)  // Only does anything on Windows, but whatever
 	{
 		LOGERROR("WSAStartup() != 0");
 		return false;
@@ -409,7 +409,7 @@ void cServer::TickClients(float a_Dt)
 	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
 	{
 		delete *itr;
-	} // for itr - RemoveClients[]
+	}  // for itr - RemoveClients[]
 }
 
 

@@ -375,17 +375,15 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::InitializeSpawn(void)
 {
-	if (!m_IsSpawnExplicitlySet) // Check if spawn position was already explicitly set or not
+	if (!m_IsSpawnExplicitlySet)
 	{
-		GenerateRandomSpawn(); // Generate random solid-land coordinate and then write it to the world configuration
-
+		// Spawn position wasn't already explicitly set, enerate random solid-land coordinate and then write it to the world configuration:
+		GenerateRandomSpawn();
 		cIniFile IniFile;
 		IniFile.ReadFile(m_IniFileName);
-
 		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX);
 		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY);
 		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ);
-
 		IniFile.WriteFile(m_IniFileName);
 	}
 
@@ -648,7 +646,7 @@ void cWorld::GenerateRandomSpawn(void)
 
 	while (IsBlockWaterOrIce(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ)))
 	{
-		if ((GetTickRandomNumber(4) % 2) == 0) // Randomise whether to increment X or Z coords
+		if ((GetTickRandomNumber(4) % 2) == 0)  // Randomise whether to increment X or Z coords
 		{
 			m_SpawnX += cChunkDef::Width;
 		}
@@ -658,7 +656,7 @@ void cWorld::GenerateRandomSpawn(void)
 		}
 	}
 
-	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // 1.6f to accomodate player height
+	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f;  // 1.6f to accomodate player height
 
 	LOGD("Generated random spawnpoint %i %i %i", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
 }
@@ -770,12 +768,12 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 
 	m_ChunkMap->FastSetQueuedBlocks();
 
-	if (m_WorldAge - m_LastSave > 60 * 5 * 20) // Save each 5 minutes
+	if (m_WorldAge - m_LastSave > 60 * 5 * 20)  // Save each 5 minutes
 	{
 		SaveAllChunks();
 	}
 
-	if (m_WorldAge - m_LastUnload > 10 * 20) // Unload every 10 seconds
+	if (m_WorldAge - m_LastUnload > 10 * 20)  // Unload every 10 seconds
 	{
 		UnloadUnusedChunks();
 	}
@@ -861,8 +859,8 @@ void cWorld::TickMobs(float a_Dt)
 					SpawnMobFinalize(*itr2);
 				}
 			}
-		} // for i - AllFamilies[]
-	} // if (Spawning enabled)
+		}  // for i - AllFamilies[]
+	}  // if (Spawning enabled)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
@@ -972,7 +970,7 @@ void cWorld::TickClients(float a_Dt)
 	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
 	{
 		delete *itr;
-	} // for itr - RemoveClients[]
+	}  // for itr - RemoveClients[]
 }
 
 
@@ -3026,18 +3024,18 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		size_t LastSpace = a_Text.find_last_of(" "); // Find the position of the last space
+		size_t LastSpace = a_Text.find_last_of(" ");  // Find the position of the last space
 		
-		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); // Find the last word
+		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length());  // Find the last word
 		AString PlayerName ((*itr)->GetName());
-		size_t Found = PlayerName.find(LastWord); // Try to find last word in playername
+		size_t Found = PlayerName.find(LastWord);  // Try to find last word in playername
 		
 		if (Found == AString::npos)
 		{
-			continue; // No match
+			continue;  // No match
 		}
 		
-		a_Results.push_back(PlayerName); // Match!
+		a_Results.push_back(PlayerName);  // Match!
 	}
 }
 

@@ -22,7 +22,7 @@ typedef std::vector<int> cSlotNums;
 /// Experience Orb setup
 enum
 {
-	//open to suggestion on naming convention here :)
+	// Open to suggestion on naming convention here :)
 	MAX_EXPERIENCE_ORB_SIZE = 2000
 } ;
 

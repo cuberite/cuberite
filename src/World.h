@@ -218,14 +218,14 @@ public:
 	void BroadcastEntityStatus           (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;
-	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL); // tolua_export
+	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastPlayerListItem         (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect     (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
 	void BroadcastScoreboardObjective    (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void BroadcastScoreUpdate            (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void BroadcastDisplayObjective       (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void BroadcastSoundEffect            (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export
-	void BroadcastSoundParticleEffect    (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
+	void BroadcastSoundParticleEffect    (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastSpawnEntity            (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTeleportEntity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt            (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
@@ -859,7 +859,7 @@ private:
 	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
-	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster; // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster) // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
 
@@ -1011,7 +1011,7 @@ private:
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */
 	void AddQueuedPlayers(void);
-}; // tolua_export
+};  // tolua_export
 
 
 

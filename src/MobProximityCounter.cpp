@@ -61,7 +61,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 		{
 			if ((a_DistanceMin == 1) || (itr->first > a_DistanceMin))
 			{
-				toReturn.m_Begin = itr; // this is the first one with distance > a_DistanceMin;
+				toReturn.m_Begin = itr;  // This is the first one with distance > a_DistanceMin;
 			}
 		}
 
@@ -69,7 +69,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 		{
 			if ((a_DistanceMax != 1) && (itr->first > a_DistanceMax))
 			{
-				toReturn.m_End = itr; // this is just after the last one with distance < a_DistanceMax
+				toReturn.m_End = itr;  // This is just after the last one with distance < a_DistanceMax
 				// Note : if we are not going through this, it's ok, toReturn.m_End will be end();
 				break;
 			}

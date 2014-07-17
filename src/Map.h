@@ -256,7 +256,7 @@ private:
 
 	friend class cMapSerializer;
 
-}; // tolua_export
+};  // tolua_export
 
 
 

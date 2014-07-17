@@ -448,7 +448,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 	Vector3d currentPosition;
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		//LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if ((*itr)->IsMob())
 		{
 			cMonster& Monster = (cMonster&)(**itr);
@@ -698,13 +698,13 @@ void cChunk::ProcessQueuedSetBlocks(void)
 	{
 		if (itr->m_Tick <= CurrTick)
 		{
-			if (itr->m_PreviousType != E_BLOCK_AIR) // PreviousType defaults to 0 if not specified
+			if (itr->m_PreviousType != E_BLOCK_AIR)  // PreviousType defaults to 0 if not specified
 			{
 				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
 				{
 					// Current world age is bigger than/equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
-					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta); // SetMeta doesn't send to client
+					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);  // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
 					LOGD("Successfully set queued block - previous and current types matched");
 				}
@@ -810,7 +810,7 @@ void cChunk::TickBlocks(void)
 
 		if (m_BlockTickY > cChunkDef::GetHeight(m_HeightMap, m_BlockTickX, m_BlockTickZ))
 		{
-			continue; // It's all air up here
+			continue;  // It's all air up here
 		}
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
@@ -1530,11 +1530,11 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
-	if ( // Queue block to be sent only if ...
-		a_SendToClients && // ... we are told to do so AND ...
+	if (                                  // Queue block to be sent only if ...
+		a_SendToClients &&                  // ... we are told to do so AND ...
 		(
-			(OldBlockMeta != a_BlockMeta) || // ... the meta value is different OR ...
-			!( // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
+			(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
+			!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
 				((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
 				((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
 				((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
@@ -1727,7 +1727,7 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 	{
 		if ((!(*itr)->IsPickup()) && (!(*itr)->IsProjectile()))
 		{
-			continue; // Only pickups and projectiles
+			continue;  // Only pickups and projectiles can be picked up
 		}
 		float DiffX = (float)((*itr)->GetPosX() - PosX );
 		float DiffY = (float)((*itr)->GetPosY() - PosY );
@@ -2152,7 +2152,7 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 		{
 			continue;
 		}
-		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST)) // Trapped chests use normal chests' handlers
+		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST))  // Trapped chests use normal chests' handlers
 		{
 			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
 			return false;
@@ -2481,7 +2481,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 	)
 	{
 		ASSERT(!"GetBlock(x, y, z) out of bounds!");
-		return 0; // Clip
+		return 0;  // Clip
 	}
 
 	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);

@@ -493,7 +493,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 				if( NumFree >= a_Item.m_ItemCount )
 				{
 
-					//printf("1. Adding %i items ( free: %i )\n", a_Item.m_ItemCount, NumFree );
+					// printf("1. Adding %i items ( free: %i )\n", a_Item.m_ItemCount, NumFree );
 					m_Slots[i + a_Offset].m_ItemCount += a_Item.m_ItemCount;
 					a_Item.m_ItemCount = 0;
 					a_bChangedSlots[i + a_Offset] = true;
@@ -501,7 +501,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 				}
 				else
 				{
-					//printf("2. Adding %i items\n", NumFree );
+					// printf("2. Adding %i items\n", NumFree );
 					m_Slots[i + a_Offset].m_ItemCount += (char)NumFree;
 					a_Item.m_ItemCount -= (char)NumFree;
 					a_bChangedSlots[i + a_Offset] = true;
