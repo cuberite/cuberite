@@ -186,7 +186,7 @@ public:
 	// Accessors used by cChunkGenerator::Generator descendants:
 	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }
 	inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *((cChunkDef::BlockTypes *)m_BlockArea.GetBlockTypes()); }
-	// CANNOT, different compression! 
+	// CANNOT, different compression!
 	// inline cChunkDef::BlockNibbles & GetBlockMetas            (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
 	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *((BlockNibbleBytes *)m_BlockArea.GetBlockMetas()); }
 	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }

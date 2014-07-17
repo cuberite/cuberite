@@ -52,7 +52,7 @@ public:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace);
 	
 	/// Called by the physics blocktracer when the entity hits another entity
-	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) 
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		UNUSED(a_EntityHit);
 		UNUSED(a_HitPos);
@@ -89,7 +89,7 @@ public:
 	
 protected:
 
-	/** A structure that stores the Entity ID and Playername of the projectile's creator 
+	/** A structure that stores the Entity ID and Playername of the projectile's creator
 	Used to migitate invalid pointers caused by the creator being destroyed
 	*/
 	struct CreatorData

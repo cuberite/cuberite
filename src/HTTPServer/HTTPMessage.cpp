@@ -139,7 +139,7 @@ AString cHTTPRequest::GetBareURL(void) const
 
 
 size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
-{	
+{
 	m_IncomingHeaderData.append(a_Data, a_Size);
 	size_t IdxEnd = m_IncomingHeaderData.size();
 

@@ -1026,7 +1026,7 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x11);	
+	cPacketizer Pkt(*this, 0x11);
 	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
 	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
 	Pkt.WriteInt((int) a_ExpOrb.GetPosY());

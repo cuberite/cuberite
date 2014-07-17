@@ -382,7 +382,7 @@ void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 {
-	// 1.3.2 requires player inventory slots to be sent as SetSlot packets, 
+	// 1.3.2 requires player inventory slots to be sent as SetSlot packets,
 	// otherwise it sometimes fails to update the window
 	
 	// Send the entire window:

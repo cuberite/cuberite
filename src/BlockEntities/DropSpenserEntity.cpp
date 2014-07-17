@@ -99,7 +99,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	}
 	m_World->BroadcastSoundParticleEffect(2000, m_PosX, m_PosY, m_PosZ, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
-}	
+}
 
 
 

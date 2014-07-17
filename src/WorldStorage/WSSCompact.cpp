@@ -603,7 +603,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, (size_t)UncompressedSize);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d decompressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 					);
@@ -627,7 +627,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		char ConvertedData[cChunkDef::BlockDataSize];
 		int Index = 0;
 		unsigned int InChunkOffset = 0;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) 
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )
 		{
 			for( int y = 0; y < 128; ++y )
 			{
@@ -683,7 +683,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData, m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d compressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -747,7 +747,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, (size_t)UncompressedSize);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d decompressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 					);
@@ -819,7 +819,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData, m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d compressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 					);
@@ -863,7 +863,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 	int errorcode = UncompressString(a_Data.data(), a_Data.size(), UncompressedData, (size_t)a_UncompressedSize);
 	if (errorcode != Z_OK)
 	{
-		LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+		LOGERROR("Error %d decompressing data for chunk [%d, %d]",
 			errorcode,
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);

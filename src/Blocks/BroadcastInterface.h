@@ -1,7 +1,7 @@
 
 #pragma once
 
-class cBroadcastInterface 
+class cBroadcastInterface
 {
 public:
 	virtual ~cBroadcastInterface() {}

@@ -59,7 +59,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	// Use that Chunk pointer to get a relative position
 
 	int RelX = 0;
-	int RelZ = 0;	
+	int RelZ = 0;
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
 
@@ -821,7 +821,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 
 
 void cIncrementalRedstoneSimulator::HandlePiston(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
-{	
+{
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
@@ -1518,7 +1518,7 @@ bool cIncrementalRedstoneSimulator::AreCoordsDirectlyPowered(int a_RelBlockX, in
 			return true;
 		}
 	}
-	return false;	
+	return false;
 }
 
 
@@ -1616,7 +1616,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_RelBlockX, int a_Rel
 
 
 bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta)
-{	
+{
 	switch (a_Meta & 0x3)  // We only want the 'direction' part of our metadata
 	{
 		// If the repeater is looking up or down (If parallel to the Z axis)
@@ -1648,14 +1648,14 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 			// Check if southern(down) neighbor is a powered on repeater who is facing us
 			BLOCKTYPE Block = 0;
 			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
-			{ 
+			{
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1) & 0x3;
 				if (OtherRepeaterDir == 0x0) { return true; }  // If so,  am latched/locked
 			}
 			
 			// Check if northern(up) neighbor is a powered on repeater who is facing us
 			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
-			{ 
+			{
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1) & 0x3;
 				if (OtherRepeaterDir == 0x2) { return true; }  // If so, I am latched/locked
 			}
@@ -2082,7 +2082,7 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 	}
 
 	// Self not in list, add self to list
-	sRepeatersDelayList RC;	
+	sRepeatersDelayList RC;
 	RC.a_RelBlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	
 	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)

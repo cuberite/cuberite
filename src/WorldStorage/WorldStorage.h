@@ -95,7 +95,7 @@ protected:
 
 		bool operator==(const sChunkLoad other) const
 		{
-			return this->m_ChunkX == other.m_ChunkX && 
+			return this->m_ChunkX == other.m_ChunkX &&
 				this->m_ChunkY == other.m_ChunkY &&
 				this->m_ChunkZ == other.m_ChunkZ;
 		}
@@ -103,7 +103,7 @@ protected:
 
 	struct FuncTable {
 		static void Delete(sChunkLoad) {};
-		static void Combine(sChunkLoad& a_orig, const sChunkLoad a_new) 
+		static void Combine(sChunkLoad& a_orig, const sChunkLoad a_new)
 		{
 			a_orig.m_Generate |= a_new.m_Generate;
 		};

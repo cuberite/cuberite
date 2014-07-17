@@ -1,7 +1,7 @@
 
 // ProtocolRecognizer.h
 
-// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple 
+// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
 // protocol versions and redirects everything to them
 
 

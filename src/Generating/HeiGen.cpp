@@ -267,7 +267,7 @@ float cHeiGenClassic::GetNoise(float x, float y)
 
 void cHeiGenClassic::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		const float zz = (float)(a_ChunkZ * cChunkDef::Width + z);
 		for (int x = 0; x < cChunkDef::Width; x++)

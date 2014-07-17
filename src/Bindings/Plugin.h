@@ -42,10 +42,7 @@ public:
 	// Called each tick
 	virtual void Tick(float a_Dt) = 0;
 
-	/**
-	 * On all these functions, return true if you want to override default behavior and not call other plugins on that callback.
-	 * You can also return false, so default behavior is used.
-	 **/
+	/** Calls the specified hook with the params given. Returns the bool that the hook callback returns.*/
 	virtual bool OnBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) = 0;
 	virtual bool OnBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) = 0;
 	virtual bool OnChat                     (cPlayer * a_Player, AString & a_Message) = 0;
@@ -152,7 +149,7 @@ private:
 	int m_Version;
 
 	AString m_Directory;
-};	// tolua_export
+};  // tolua_export
 
 
 

@@ -55,7 +55,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			switch (m_Type)
 			{
-				case vtFarmer: 
+				case vtFarmer:
 				{
 					HandleFarmerPlaceCrops();
 				}

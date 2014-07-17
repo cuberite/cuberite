@@ -398,7 +398,7 @@ void cProtocol125::SendEntityMetadata(const cEntity & a_Entity)
 	else
 	{
 		WriteEntityMetadata(a_Entity);
-	}	
+	}
 	WriteByte(0x7f);
 
 	Flush();
@@ -2110,7 +2110,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			int Appearance = 0;
 			Appearance = ((const cHorse &)a_Mob).GetHorseColor();  // Mask FF
 			Appearance |= ((const cHorse &)a_Mob).GetHorseStyle() * 256;  // Mask FF00, so multiply by 256
-			WriteInt(Appearance);	
+			WriteInt(Appearance);
 
 			WriteByte(0x56);
 			WriteInt(((const cHorse &)a_Mob).GetHorseArmour());  // Horshey armour

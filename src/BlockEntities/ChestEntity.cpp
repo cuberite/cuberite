@@ -177,7 +177,7 @@ void cChestEntity::OpenNewWindow(void)
 		return;
 	}
 
-	// There is no chest neighbor, open a single-chest window:	
+	// There is no chest neighbor, open a single-chest window:
 	OpenWindow(new cChestWindow(this));
 }
 

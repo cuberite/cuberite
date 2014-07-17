@@ -1,7 +1,7 @@
 
 // ProtocolRecognizer.cpp
 
-// Implements the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple 
+// Implements the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
 // protocol versions and redirects everything to them
 
 #include "Globals.h"
@@ -828,7 +828,7 @@ void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 
 bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
-	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and 
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and
 	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
 	
 	// The first packet should be a Handshake, 0x02:
@@ -1021,7 +1021,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 		case PROTO_VERSION_1_3_2:
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
-			Printf(Reply, "%s%s%i%s%i", 
+			Printf(Reply, "%s%s%i%s%i",
 				Server->GetDescription().c_str(),
 				cChatColor::Delimiter.c_str(),
 				Server->GetNumPlayers(),

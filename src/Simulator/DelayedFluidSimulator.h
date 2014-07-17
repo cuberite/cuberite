@@ -50,7 +50,7 @@ class cDelayedFluidSimulator :
 {
 	typedef cFluidSimulator super;
 
-public:	
+public:
 	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
 	
 	// cSimulator overrides:

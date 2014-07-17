@@ -214,7 +214,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 	// Generate small foliage (1-block):
 	
 	// TODO: Update heightmap with 1-block-tall foliage
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 		const float zz = (float)BlockZ;
@@ -678,7 +678,7 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	AString HeightDistribution = a_IniFile.GetValueSet(SectionName, "HeightDistribution", DefaultHeightDistribution);
 	if (!m_HeightDistribution.SetDefString(HeightDistribution) || (m_HeightDistribution.GetSum() <= 0))
 	{
-		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".", 
+		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".",
 			(a_Fluid == E_BLOCK_WATER) ? "Water" : "Lava",
 			DefaultHeightDistribution.c_str()
 		);

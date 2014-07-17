@@ -1486,7 +1486,7 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
 	{
 		m_DisablePluginList.push_back(itr->second);
-		itr->second = NULL;	// Get rid of this thing right away
+		itr->second = NULL;  // Get rid of this thing right away
 		return true;
 	}
 	return false;

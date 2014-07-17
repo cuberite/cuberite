@@ -100,10 +100,10 @@ public:
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		cBlockArea Area;
 		if (!Area.Read(
-			a_Chunk.GetWorld(), 
-			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE, 
-			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE, 
-			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE, 
+			a_Chunk.GetWorld(),
+			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE,
+			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE,
+			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE,
 			cBlockArea::baTypes)
 		)
 		{

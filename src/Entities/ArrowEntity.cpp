@@ -72,7 +72,7 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
-{	
+{
 	if (GetSpeed().EqualsEps(Vector3d(0, 0, 0), 0.0000001))
 	{
 		SetSpeed(GetLookVector().NormalizeCopy() * 0.1);  // Ensure that no division by zero happens later
@@ -97,7 +97,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
-{	
+{
 	int Damage = (int)(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
 	if (m_IsCritical)
 	{

@@ -5,11 +5,11 @@
 
 /*
 The fast parser parses the data into a vector of cFastNBTTag structures. These structures describe the NBT tree,
-but themselves are allocated in a vector, thus minimizing reallocation. 
+but themselves are allocated in a vector, thus minimizing reallocation.
 The structures have a minimal constructor, setting all member "pointers" to "invalid".
 
 The fast writer doesn't need a NBT tree structure built beforehand, it is commanded to open, append and close tags
-(just like XML); it keeps the internal tag stack and reports errors in usage. 
+(just like XML); it keeps the internal tag stack and reports errors in usage.
 It directly outputs a string containing the serialized NBT data.
 */
 
@@ -173,7 +173,7 @@ public:
 	}
 	
 	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
-	inline unsigned char GetByte(int a_Tag) const 
+	inline unsigned char GetByte(int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Byte);
 		return (unsigned char)(m_Data[(size_t)m_Tags[(size_t)a_Tag].m_DataStart]);

@@ -1,7 +1,7 @@
 
 // PieceGenerator.cpp
 
-// Implements the cBFSPieceGenerator class and cDFSPieceGenerator class 
+// Implements the cBFSPieceGenerator class and cDFSPieceGenerator class
 // representing base classes for generating structures composed of individual "pieces"
 
 #include "Globals.h"

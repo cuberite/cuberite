@@ -32,7 +32,7 @@ int cBeaconEntity::GetPyramidLevel(void)
 	}
 
 	Area.Read(
-		m_World, 
+		m_World,
 		GetPosX() - 4, GetPosX() + 4,
 		MinY, MaxY,
 		GetPosZ() - 4, GetPosZ() + 4,

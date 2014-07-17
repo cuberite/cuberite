@@ -176,7 +176,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
 	switch(a_BlockType)
 	{
-		// Block handlers, alphabetically sorted:	
+		// Block handlers, alphabetically sorted:
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
@@ -327,7 +327,7 @@ cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 
 bool cBlockHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )

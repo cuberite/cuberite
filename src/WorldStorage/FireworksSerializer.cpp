@@ -98,7 +98,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 						// Divide by four as data length returned in bytes
 						size_t DataLength = a_NBT.GetDataLength(explosiontag);
 						// round to the next highest multiple of four
-						DataLength -= DataLength % 4; 
+						DataLength -= DataLength % 4;
 						if (DataLength == 0)
 						{
 							continue;
@@ -114,7 +114,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					{
 						size_t DataLength = a_NBT.GetDataLength(explosiontag) / 4;
 						// round to the next highest multiple of four
-						DataLength -= DataLength % 4; 
+						DataLength -= DataLength % 4;
 						if (DataLength == 0)
 						{
 							continue;

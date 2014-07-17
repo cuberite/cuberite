@@ -340,7 +340,7 @@ float cPlayer::GetXpPercentage()
 	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
 	short int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)(m_CurrentXp - currentLevel_XpBase) / 
+	return (float)(m_CurrentXp - currentLevel_XpBase) /
 		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
@@ -392,7 +392,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d",
 		GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
@@ -1278,7 +1278,7 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 	// TODO: Add a slight random change (+-0.0075 in each direction)
 	
 	return res * a_SpeedCoeff;
-}	
+}
 
 
 
@@ -1311,7 +1311,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	{
 		// When attached to an entity, the client sends position packets with weird coords:
 		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
-		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while 
+		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while
 		// the client may still send more of these nonsensical packets.
 		if (m_AttachedTo != NULL)
 		{
@@ -1889,7 +1889,7 @@ bool cPlayer::SaveToDisk()
 	{
 		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot save data. Player will lose their progress. ",
 			GetName().c_str(), SourceFile.c_str()
-		); 
+		);
 		return false;
 	}
 

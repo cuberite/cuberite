@@ -104,7 +104,7 @@ void cBoat::Tick(float a_Dt, cChunk & a_Chunk)
 	if (IsBlockWater(m_World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT)))
 	{
 		if (GetSpeedY() < 2)
-		{	
+		{
 			AddSpeedY(0.2);
 		}
 	}

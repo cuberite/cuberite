@@ -74,7 +74,7 @@ cEntity::~cEntity()
 	
 	/*
 	// DEBUG:
-	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p", 
+	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
 		m_UniqueID,
 		m_Pos.x, m_Pos.y, m_Pos.z,
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
@@ -1090,7 +1090,7 @@ void cEntity::HandleAir(void)
 		{
 			if (m_AirTickTimer < 1)
 			{
-				// Damage player 
+				// Damage player
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
 				// Reset timer
 				m_AirTickTimer = DROWNING_TICKS;
@@ -1382,8 +1382,8 @@ void cEntity::SetMass(double a_Mass)
 	}
 	else
 	{
-		// Make sure that mass is not zero. 1g is the default because we 
-		// have to choose a number. It's perfectly legal to have a mass 
+		// Make sure that mass is not zero. 1g is the default because we
+		// have to choose a number. It's perfectly legal to have a mass
 		// less than 1g as long as is NOT equal or less than zero.
 		m_Mass = 0.001;
 	}
@@ -1469,7 +1469,7 @@ void cEntity::SetWidth(double a_Width)
 
 void cEntity::AddPosX(double a_AddPosX)
 {
-	m_Pos.x += a_AddPosX;	
+	m_Pos.x += a_AddPosX;
 }
 
 
@@ -1477,7 +1477,7 @@ void cEntity::AddPosX(double a_AddPosX)
 
 void cEntity::AddPosY(double a_AddPosY)
 {
-	m_Pos.y += a_AddPosY;	
+	m_Pos.y += a_AddPosY;
 }
 
 
@@ -1485,7 +1485,7 @@ void cEntity::AddPosY(double a_AddPosY)
 
 void cEntity::AddPosZ(double a_AddPosZ)
 {
-	m_Pos.z += a_AddPosZ;	
+	m_Pos.z += a_AddPosZ;
 }
 
 
@@ -1495,7 +1495,7 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 {
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
-	m_Pos.z += a_AddPosZ;	
+	m_Pos.z += a_AddPosZ;
 }
 
 
@@ -1505,7 +1505,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 {
 	m_Speed.x += a_AddSpeedX;
 	m_Speed.y += a_AddSpeedY;
-	m_Speed.z += a_AddSpeedZ;	
+	m_Speed.z += a_AddSpeedZ;
 	WrapSpeed();
 }
 
@@ -1515,7 +1515,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 
 void cEntity::AddSpeedX(double a_AddSpeedX)
 {
-	m_Speed.x += a_AddSpeedX;	
+	m_Speed.x += a_AddSpeedX;
 	WrapSpeed();
 }
 
@@ -1525,7 +1525,7 @@ void cEntity::AddSpeedX(double a_AddSpeedX)
 
 void cEntity::AddSpeedY(double a_AddSpeedY)
 {
-	m_Speed.y += a_AddSpeedY;	
+	m_Speed.y += a_AddSpeedY;
 	WrapSpeed();
 }
 
@@ -1535,7 +1535,7 @@ void cEntity::AddSpeedY(double a_AddSpeedY)
 
 void cEntity::AddSpeedZ(double a_AddSpeedZ)
 {
-	m_Speed.z += a_AddSpeedZ;	
+	m_Speed.z += a_AddSpeedZ;
 	WrapSpeed();
 }
 
@@ -1590,7 +1590,7 @@ Vector3d cEntity::GetLookVector(void) const
 // Set position
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
-	m_Pos.Set(a_PosX, a_PosY, a_PosZ);	
+	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
 }
 
 
@@ -1599,7 +1599,7 @@ void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::SetPosX(double a_PosX)
 {
-	m_Pos.x = a_PosX;	
+	m_Pos.x = a_PosX;
 }
 
 
@@ -1608,7 +1608,7 @@ void cEntity::SetPosX(double a_PosX)
 
 void cEntity::SetPosY(double a_PosY)
 {
-	m_Pos.y = a_PosY;	
+	m_Pos.y = a_PosY;
 }
 
 

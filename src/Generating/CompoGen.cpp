@@ -68,7 +68,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	static BLOCKTYPE Blocks[] =
 	{
 		E_BLOCK_STONE,
-		E_BLOCK_COBBLESTONE, 
+		E_BLOCK_COBBLESTONE,
 		E_BLOCK_LOG,
 		E_BLOCK_PLANKS,
 		E_BLOCK_SANDSTONE,
@@ -563,7 +563,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	{
 		//*
 		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
-			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) * 
+			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) *
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) /
 			256;
 		//*/

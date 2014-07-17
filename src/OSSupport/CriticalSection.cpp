@@ -108,7 +108,7 @@ bool cCriticalSection::IsLockedByCurrentThread(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cCSLock
 
-cCSLock::cCSLock(cCriticalSection * a_CS) 
+cCSLock::cCSLock(cCriticalSection * a_CS)
 	: m_CS(a_CS)
 	, m_IsLocked(false)
 {
@@ -119,7 +119,7 @@ cCSLock::cCSLock(cCriticalSection * a_CS)
 
 
 
-cCSLock::cCSLock(cCriticalSection & a_CS) 
+cCSLock::cCSLock(cCriticalSection & a_CS)
 	: m_CS(&a_CS)
 	, m_IsLocked(false)
 {

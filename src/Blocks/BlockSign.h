@@ -59,7 +59,7 @@ public:
 			}
 		}
 		return 0x2;
-	}	
+	}
 
 
 	virtual void OnPlacedByPlayer(

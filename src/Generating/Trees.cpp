@@ -83,7 +83,7 @@ static const sCoords BigO4[] =  // Part of Big Jungle tree
 
 
 
-typedef struct 
+typedef struct
 {
 	const sCoords * Coords;
 	size_t          Count;
@@ -203,7 +203,7 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			{
 				GetAppleBushImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			}
-			else 
+			else
 			{
 				GetJungleTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			}
@@ -598,11 +598,11 @@ void GetPineTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise
 	}
 	int h = a_BlockY + TrunkHeight + 2;
 
-	// Top layer - just a single leaves block:	
+	// Top layer - just a single leaves block:
 	a_OtherBlocks.push_back(sSetBlock(a_BlockX, h, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
 	h--;
 
-	// One more layer is above the trunk, push the central leaves:	
+	// One more layer is above the trunk, push the central leaves:
 	a_OtherBlocks.push_back(sSetBlock(a_BlockX, h, a_BlockZ, E_BLOCK_LEAVES, E_META_LEAVES_CONIFER));
 
 	// Layers expanding in size, then collapsing again:

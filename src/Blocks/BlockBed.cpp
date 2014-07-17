@@ -116,7 +116,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 				if (Meta & 0x8)
 				{
-					// Is pillow	
+					// Is pillow
 					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
 				}
 				else
@@ -142,7 +142,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					a_WorldInterface.SetTimeOfDay(0);
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0xB);  // Where 0xB = 1011, and zero is to make sure 'occupied' bit is always unset
 				}
-			}			
+			}
 		}
 		else
 		{

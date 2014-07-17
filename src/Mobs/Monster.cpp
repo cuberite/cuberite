@@ -353,13 +353,13 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			// If enemy passive we ignore checks for player visibility
 			InStateIdle(a_Dt);
 			break;
-		}	
+		}
 		case CHASING:
 		{
 			// If we do not see a player anymore skip chasing action
 			InStateChasing(a_Dt);
 			break;
-		}	
+		}
 		case ESCAPING:
 		{
 			InStateEscaping(a_Dt);
@@ -588,7 +588,7 @@ void cMonster::CheckEventSeePlayer(void)
 
 
 void cMonster::CheckEventLostPlayer(void)
-{	
+{
 	if (m_Target != NULL)
 	{
 		if ((m_Target->GetPosition() - GetPosition()).Length() > m_SightDistance)

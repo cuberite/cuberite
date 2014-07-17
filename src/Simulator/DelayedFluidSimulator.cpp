@@ -131,7 +131,7 @@ void cDelayedFluidSimulator::Simulate(float a_Dt)
 
 
 void cDelayedFluidSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
-{	
+{
 	void * ChunkDataRaw = (m_FluidBlock == E_BLOCK_WATER) ? a_Chunk->GetWaterSimulatorData() : a_Chunk->GetLavaSimulatorData();
 	cDelayedFluidSimulatorChunkData * ChunkData = (cDelayedFluidSimulatorChunkData *)ChunkDataRaw;
 	cDelayedFluidSimulatorChunkData::cSlot & Slot = ChunkData->m_Slots[m_SimSlotNum];

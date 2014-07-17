@@ -33,9 +33,7 @@
 
 
 
-/****************************
- * Better error reporting for Lua
- **/
+// Better error reporting for Lua
 static int tolua_do_error(lua_State* L, const char * a_pMsg, tolua_Error * a_pToLuaError)
 {
 	// Retrieve current function name
@@ -81,10 +79,7 @@ static int lua_do_error(lua_State* L, const char * a_pFormat, ...)
 
 
 
-/****************************
- * Lua bound functions with special return types
- **/
-
+// Lua bound functions with special return types
 static int tolua_StringSplit(lua_State * tolua_S)
 {
 	cLuaState LuaState(tolua_S);
@@ -557,10 +552,12 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 
 
 
-template< class Ty1,
-          class Ty2,
-          bool (Ty1::*Func1)(int, int, cItemCallback<Ty2> &) >
-static int tolua_ForEachInChunk(lua_State* tolua_S)
+template<
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(int, int, cItemCallback<Ty2> &)
+>
+static int tolua_ForEachInChunk(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
 	if ((NumArgs != 3) && (NumArgs != 4))
@@ -651,9 +648,11 @@ static int tolua_ForEachInChunk(lua_State* tolua_S)
 
 
 
-template< class Ty1,
-          class Ty2,
-          bool (Ty1::*Func1)(cItemCallback<Ty2> &) >
+template<
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(cItemCallback<Ty2> &)
+>
 static int tolua_ForEach(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */

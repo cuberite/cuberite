@@ -10,7 +10,7 @@
 
 
 
-// The number of NBT tags that are reserved when an NBT parsing is started. 
+// The number of NBT tags that are reserved when an NBT parsing is started.
 // You can override this by using a cmdline define
 #ifndef NBT_RESERVE_SIZE
 	#define NBT_RESERVE_SIZE 200
@@ -69,7 +69,7 @@ bool cParsedNBT::Parse(void)
 	
 	m_Pos = 1;
 	
-	RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength)); 
+	RETURN_FALSE_IF_FALSE(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
 	RETURN_FALSE_IF_FALSE(ReadCompound());
 	
 	return true;

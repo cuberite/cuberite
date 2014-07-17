@@ -458,7 +458,7 @@ char cItemHandler::GetMaxStackSize(void)
 bool cItemHandler::IsTool()
 {
 	// TODO: Rewrite this to list all tools specifically
-	return 
+	return
 		   (m_ItemType >= 256 && m_ItemType <= 259)
 		|| (m_ItemType == 261)
 		|| (m_ItemType >= 267 && m_ItemType <= 279)
@@ -525,7 +525,7 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 
 bool cItemHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
@@ -542,7 +542,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, a_Player,
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 		a_CursorX, a_CursorY, a_CursorZ,
 		a_BlockType, a_BlockMeta
 	);

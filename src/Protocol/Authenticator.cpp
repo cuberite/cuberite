@@ -248,7 +248,7 @@ bool cAuthenticator::SecureGetFromAddress(const AString & a_CACerts, const AStri
 
 bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties)
 {
-	LOGD("Trying to authenticate user %s", a_UserName.c_str());	
+	LOGD("Trying to authenticate user %s", a_UserName.c_str());
 
 	// Create the GET request:
 	AString ActualAddress = m_Address;

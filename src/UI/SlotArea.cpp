@@ -36,8 +36,8 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	/*
-	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s", 
-		GetNumSlots(), a_SlotNum, 
+	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s",
+		GetNumSlots(), a_SlotNum,
 		ItemToFullString(a_ClickedItem).c_str(),
 		ItemToFullString(*GetSlot(a_SlotNum, a_Player)).c_str()
 	);
@@ -1280,7 +1280,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		}
 		
 		case caLeftClick:
-		{	
+		{
 			// Left-clicked
 			if (DraggingItem.IsEmpty())
 			{

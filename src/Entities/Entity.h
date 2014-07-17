@@ -428,7 +428,7 @@ public:
 	virtual void OnRightClicked(cPlayer &) {};
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) 
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL)
 	{
 		UNUSED(a_Drops);
 		UNUSED(a_Killer);

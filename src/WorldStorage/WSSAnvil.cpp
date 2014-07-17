@@ -56,7 +56,7 @@ thus making skylight visible in Minutor's Lighting mode
 */
 // #define DEBUG_SKYLIGHT
 
-/** Maximum number of MCA files that are cached in memory. 
+/** Maximum number of MCA files that are cached in memory.
 Since only the header is actually in the memory, this number can be high, but still, each file means an OS FS handle.
 */
 #define MAX_MCA_FILES 32
@@ -393,7 +393,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	
 	m_World->SetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-		BlockTypes, MetaData, 
+		BlockTypes, MetaData,
 		IsLightValid ? BlockLight : NULL,
 		IsLightValid ? SkyLight : NULL,
 		NULL, Biomes,
@@ -449,7 +449,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		const char * BlockLight  = (const char *)(Serializer.m_BlockSkyLight);
 	#else
 		const char * BlockLight  = (const char *)(Serializer.m_BlockLight);
-	#endif 
+	#endif
 	const char * BlockSkyLight = (const char *)(Serializer.m_BlockSkyLight);
 	for (int Y = 0; Y < 16; Y++)
 	{
@@ -463,7 +463,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	}
 	a_Writer.EndList();  // "Sections"
 	
-	// Store the information that the lighting is valid. 
+	// Store the information that the lighting is valid.
 	// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
 	if (Serializer.IsLightValid())
 	{
@@ -2363,8 +2363,8 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
-	if (OwnerIdx > 0) 
-	{ 
+	if (OwnerIdx > 0)
+	{
 		AString OwnerName = a_NBT.GetString(OwnerIdx);
 		if (OwnerName != "")
 		{

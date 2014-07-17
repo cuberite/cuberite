@@ -164,7 +164,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 
 
 void cWindow::Clicked(
-	cPlayer & a_Player, 
+	cPlayer & a_Player,
 	int a_WindowID, short a_SlotNum, eClickAction a_ClickAction,
 	const cItem & a_ClickedItem
 )
