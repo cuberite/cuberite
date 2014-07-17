@@ -49,10 +49,10 @@ void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cPawn::KilledBy(cEntity * a_Killer)
+void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 {
 	ClearEntityEffects();
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 }
 
 
