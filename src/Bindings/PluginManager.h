@@ -191,7 +191,7 @@ public:																	// tolua_export
 	bool CallHookHandshake                (cClientHandle * a_ClientHandle, const AString & a_Username);
 	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
+	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

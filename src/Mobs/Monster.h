@@ -90,7 +90,7 @@ public:
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	
-	virtual void KilledBy(cEntity * a_Killer) override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual void MoveToPosition(const Vector3d & a_Position); // tolua_export

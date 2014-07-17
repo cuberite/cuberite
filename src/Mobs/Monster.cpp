@@ -493,9 +493,9 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cMonster::KilledBy(cEntity * a_Killer)
+void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 	if (m_SoundHurt != "")
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
@@ -559,7 +559,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 			break;
 		}
 	}
-	if ((a_Killer != NULL) && (!IsBaby()))
+	if ((a_TDI.Attacker != NULL) && (!IsBaby()))
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}

@@ -322,7 +322,7 @@ public:
 	/** Aborts the current eating operation */
 	void AbortEating(void);
 	
-	virtual void KilledBy(cEntity * a_Killer) override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual void Killed(cEntity * a_Victim) override;
 	

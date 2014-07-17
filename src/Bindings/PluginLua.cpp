@@ -595,14 +595,14 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 
 
 
-bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_KILLING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, &a_TDI, cLuaState::Return, res);
 		if (res)
 		{
 			return true;

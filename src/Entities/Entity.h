@@ -310,7 +310,7 @@ public:
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
 	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)
-	virtual void KilledBy(cEntity * a_Killer);
+	virtual void KilledBy(TakeDamageInfo & a_TDI);
 
 	/// Called when the entity kills another entity
 	virtual void Killed(cEntity * a_Victim) {}

@@ -609,14 +609,14 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
-bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
 	FIND_HOOK(HOOK_KILLING);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnKilling(a_Victim, a_Killer))
+		if ((*itr)->OnKilling(a_Victim, a_Killer, a_TDI))
 		{
 			return true;
 		}

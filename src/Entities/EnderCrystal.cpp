@@ -42,9 +42,9 @@ void cEnderCrystal::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cEnderCrystal::KilledBy(cEntity * a_Killer)
+void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 
 	m_World->DoExplosionAt(6.0, GetPosX(), GetPosY(), GetPosZ(), true, esEnderCrystal, this);
 
