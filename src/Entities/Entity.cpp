@@ -334,36 +334,21 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{
-		int KnockbackLevel = 0;
-		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
+		int KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);  // More common enchantment
+		if (KnockbackLevel < 1)
 		{
+			// We support punch on swords and vice versa! :)
 			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
 		}
-		else
-		{
-			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
-		}
 
-		Vector3d additionalSpeed(0, 0, 0);
+		Vector3d AdditionalSpeed(0, 0, 0);
 		switch (KnockbackLevel)
 		{
-			case 1:
-			{
-				additionalSpeed.Set(5, .3, 5);
-				break;
-			}
-			case 2:
-			{
-				additionalSpeed.Set(8, .3, 8);
-				break;
-			}
-			default:
-			{
-				additionalSpeed.Set(2, .3, 2);
-				break;
-			}
+			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
+			case 2:	AdditionalSpeed.Set(8, 0.3, 8); break;
+			default: break;
 		}
-		AddSpeed(a_TDI.Knockback * additionalSpeed);
+		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
