@@ -580,7 +580,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 void cPlayer::FoodPoison(int a_NumTicks)
 {
-	AddEntityEffect(cEntityEffect::effHunger, a_NumTicks, 0, NULL);
+	AddEntityEffect(cEntityEffect::effHunger, a_NumTicks, 0, 1);
 }
 
 
