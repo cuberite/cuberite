@@ -11,7 +11,13 @@
 
 /// Creates a slime of the specified size; size is 1 .. 3, with 1 being the smallest
 cSlime::cSlime(int a_Size) :
-	super("Slime", mtSlime, Printf("mob.slime.%s", GetSizeName(a_Size).c_str()), Printf("mob.slime.%s", GetSizeName(a_Size).c_str()), 0.6 * a_Size, 0.6 * a_Size),
+	super("Slime",
+		mtSlime,
+		Printf("mob.slime.%s", GetSizeName(a_Size).c_str()),
+		Printf("mob.slime.%s", GetSizeName(a_Size).c_str()),
+		0.6 * a_Size,
+		0.6 * a_Size
+	),
 	m_Size(a_Size)
 {
 	SetMaxHealth(a_Size * a_Size);
@@ -72,9 +78,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 			cSlime * NewSlime = new cSlime(m_Size / 2);
 			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
-			NewSlime->SetYaw(Random.NextFloat(2.0f) * 360.0f);
-			NewSlime->SetPitch(0.0f);
-
+			NewSlime->SetYaw(Random.NextFloat(1.0f) * 360.0f);
 			m_World->SpawnMobFinalize(NewSlime);
 		}
 	}
@@ -85,7 +89,7 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
-const AString & cSlime::GetSizeName(int a_Size)
+const AString cSlime::GetSizeName(int a_Size) const
 {
 	if (a_Size > 1)
 	{

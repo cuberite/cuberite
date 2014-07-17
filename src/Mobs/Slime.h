@@ -23,7 +23,7 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	int GetSize(void) const { return m_Size; }
-	const AString & GetSizeName(int a_Size);
+	const AString GetSizeName(int a_Size) const;
 	
 protected:
 
