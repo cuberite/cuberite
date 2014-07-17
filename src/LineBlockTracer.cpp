@@ -203,6 +203,15 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 			m_Callbacks->OnNoChunk();
 			return false;
 		}
+
+		// Move to next block
+		if (!MoveToNextBlock())
+		{
+			// We've reached the end
+			m_Callbacks->OnNoMoreHits();
+			return true;
+		}
+
 		if (a_Chunk->IsValid())
 		{
 			BLOCKTYPE BlockType;
@@ -223,14 +232,6 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 				// The callback terminated the trace
 				return false;
 			}
-		}
-		
-		// Move to next block
-		if (!MoveToNextBlock())
-		{
-			// We've reached the end
-			m_Callbacks->OnNoMoreHits();
-			return true;
 		}
 		
 		// Update the current chunk

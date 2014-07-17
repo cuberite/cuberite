@@ -215,7 +215,7 @@ public:
 		} Callbacks;
 
 		cLineBlockTracer Tracer(*a_World, Callbacks);
-		Vector3d Start(a_Player->GetEyePosition() + a_Player->GetLookVector());
+		Vector3d Start(a_Player->GetEyePosition());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);		
 
 		// cTracer::Trace returns true when whole line was traversed. By returning true when we hit something, we ensure that this never happens if liquid could be placed

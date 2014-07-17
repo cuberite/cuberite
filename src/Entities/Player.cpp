@@ -129,7 +129,7 @@ cPlayer::~cPlayer(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 	{
 		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
-		LOGINFO("Player %s has left the game.", GetName().c_str());
+		LOGINFO("Player %s has left the game", GetName().c_str());
 	}
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), this, GetUniqueID());
@@ -1784,7 +1784,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	StatSerializer.Load();
 	
-	LOGD("Player \"%s\" was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
+	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
 		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
 	);
 	
@@ -2110,6 +2110,8 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	{
 		return;
 	}
+
+	// If we have just teleported, apply no exhaustion
 	if (m_bIsTeleporting)
 	{
 		m_bIsTeleporting = false;
@@ -2118,6 +2120,13 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)
+	{
+		return;
+	}
+
+	// Process exhaustion every two ticks as that is how frequently m_LastPos is updated
+	// Otherwise, we apply exhaustion for a 'movement' every tick, one of which is an already processed value
+	if (GetWorld()->GetWorldAge() % 2 != 0)
 	{
 		return;
 	}

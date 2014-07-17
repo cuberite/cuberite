@@ -2101,6 +2101,13 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 
 void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_SourceX, int a_SourceY, int a_SourceZ, cChunk * a_Chunk, bool a_IsFirstCall)
 {
+	if (!a_IsFirstCall) // The neighbouring chunks passed when this parameter is false may be invalid
+	{
+		if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+		{
+			return;
+		}
+	}
 	// TODO: on C++11 support, change both of these to llama functions pased to a std::remove_if
 
 	for (PoweredBlocksList::iterator itr = a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->begin(); itr != a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->end();)

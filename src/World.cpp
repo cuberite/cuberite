@@ -2363,7 +2363,7 @@ void cWorld::RemovePlayer(cPlayer * a_Player)
 	}
 	{
 		cCSLock Lock(m_CSPlayers);
-		LOGD("Removing player \"%s\" from world \"%s\".", a_Player->GetName().c_str(), m_WorldName.c_str());
+		LOGD("Removing player %s from world \"%s\"", a_Player->GetName().c_str(), m_WorldName.c_str());
 		m_Players.remove(a_Player);
 	}
 	

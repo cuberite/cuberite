@@ -37,9 +37,14 @@
 class cPlayer;
 class cClientHandle;
 class cIniFile;
-class cCommandOutputCallback ;
+class cCommandOutputCallback;
 
 typedef std::list<cClientHandle *> cClientHandleList;
+
+namespace Json
+{
+	class Value;
+}
 
 
 
@@ -83,7 +88,9 @@ public:												// tolua_export
 	void Shutdown(void);
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator to auth the specified user
+	
+	/** Authenticates the specified user, called by cAuthenticator */
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 	

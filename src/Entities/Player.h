@@ -447,7 +447,7 @@ protected:
 	double m_FoodSaturationLevel;
 	
 	/** Count-up to the healing or damaging action, based on m_FoodLevel */
-	int   m_FoodTickTimer;
+	int m_FoodTickTimer;
 	
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;

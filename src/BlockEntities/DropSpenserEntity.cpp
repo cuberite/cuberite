@@ -42,7 +42,7 @@ cDropSpenserEntity::~cDropSpenserEntity()
 
 void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction)
 {
-	switch (a_Direction)
+	switch (a_Direction & 0x07) // Vanilla uses the 8th bit to determine power state - we don't
 	{
 		case E_META_DROPSPENSER_FACING_YM: a_BlockY--; return;
 		case E_META_DROPSPENSER_FACING_YP: a_BlockY++; return;
