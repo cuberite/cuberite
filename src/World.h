@@ -140,7 +140,7 @@ public:
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 	
 	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
-	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; } 
+	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
@@ -301,10 +301,10 @@ public:
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
-	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
-	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true); 
+	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
@@ -365,10 +365,10 @@ public:
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);  // Exported in ManualBindings.cpp
 	
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be NULL. Returns true if sign text changed. Same as SetSignLines() */
-	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);	// Exported in ManualBindings.cpp
+	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
-	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);	// tolua_export
+	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
 
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
@@ -377,10 +377,10 @@ public:
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
 	/** Regenerate the given chunk: */
-	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
+	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
 	/** Generates the given chunk, if not already generated */
-	void GenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */
 	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = NULL);

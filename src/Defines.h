@@ -512,7 +512,7 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 	}
 	else
 	{
-		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;		
+		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
 	}
 
 	a_Pitch = atan2(a_Y, r) * 180 / PI;

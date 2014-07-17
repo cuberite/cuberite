@@ -48,7 +48,7 @@ class cStatManager;
 
 class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
-{											// tolua_export
+{  // tolua_export
 public:
 	
 #if defined(ANDROID_NDK)
@@ -64,9 +64,9 @@ public:
 
 	const AString & GetIPString(void) const { return m_IPString; }
 	
-	cPlayer * GetPlayer(void) { return m_Player; }	// tolua_export
+	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 
-	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
+	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
 	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
@@ -246,8 +246,8 @@ public:
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
-		int a_BlockX, int a_BlockY, int a_BlockZ, 
-		const AString & a_Line1, const AString & a_Line2, 
+		int a_BlockX, int a_BlockY, int a_BlockZ,
+		const AString & a_Line1, const AString & a_Line2,
 		const AString & a_Line3, const AString & a_Line4
 	);
 	void HandleUnmount          (void);
@@ -338,7 +338,7 @@ private:
 		csAuthenticating,    ///< The client has logged in, waiting for external authentication
 		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
 		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
- 		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           ///< Normal gameplay
 		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
 		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
@@ -408,7 +408,7 @@ private:
 	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
-};										// tolua_export
+};  // tolua_export
 
 
 

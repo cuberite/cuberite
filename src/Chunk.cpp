@@ -62,7 +62,7 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 // cChunk:
 
 cChunk::cChunk(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
@@ -443,7 +443,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 	{
 		currentPlayer = (*itr)->GetPlayer();
 		playerPositions.push_back(&(currentPlayer->GetPosition()));
-	} 
+	}
 
 	Vector3d currentPosition;
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
@@ -895,7 +895,7 @@ void cChunk::ApplyWeatherToTop()
 				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
 			}
 			else if (
-					(m_World->IsDeepSnowEnabled()) && 
+					(m_World->IsDeepSnowEnabled()) &&
 					(
 						(TopBlock == E_BLOCK_RED_ROSE) ||
 						(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
@@ -944,10 +944,10 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ + 1, BlockType[2], BlockMeta);
 	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ - 1, BlockType[3], BlockMeta);
 	if (
-		!IsValid || 
-		(BlockType[0] == ProduceType) || 
-		(BlockType[1] == ProduceType) || 
-		(BlockType[2] == ProduceType) || 
+		!IsValid ||
+		(BlockType[0] == ProduceType) ||
+		(BlockType[1] == ProduceType) ||
+		(BlockType[2] == ProduceType) ||
 		(BlockType[3] == ProduceType)
 	)
 	{
@@ -1229,7 +1229,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 	}
 	Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 	return true;
-}	
+}
 
 
 
@@ -2294,7 +2294,7 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 			}
 		}  // switch (BlockType)
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cFurnaceEntity *)*itr))
 		{
 			return false;
@@ -2326,7 +2326,7 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here
 		if (a_Callback.Item((cNoteEntity *)*itr))
 		{
 			return false;
@@ -2358,7 +2358,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cCommandBlockEntity *)*itr))
 		{
 			return false;
@@ -2390,7 +2390,7 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cMobHeadEntity *)*itr))
 		{
 			return false;
@@ -2422,7 +2422,7 @@ bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here
 		if (a_Callback.Item((cFlowerPotEntity *)*itr))
 		{
 			return false;
@@ -2475,7 +2475,7 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	if (
-		(a_RelX < 0) || (a_RelX >= Width) || 
+		(a_RelX < 0) || (a_RelX >= Width) ||
 		(a_RelY < 0) || (a_RelY >= Height) ||
 		(a_RelZ < 0) || (a_RelZ >= Width)
 	)

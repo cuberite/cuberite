@@ -27,11 +27,11 @@ protected :
 		cChunk& m_Chunk;
 	};
 
-public : 
+public :
 	typedef std::map<cEntity*,sDistanceAndChunk> tMonsterToDistance;
 	typedef std::multimap<double,sMonsterAndChunk> tDistanceToMonster;
 
-protected : 
+protected :
 	// this map is filled during collection phase, it will be later transformed into DistanceToMonster
 	tMonsterToDistance m_MonsterToDistance;
 
@@ -41,7 +41,7 @@ protected :
 	// this are the collected chunks. Used to determinate the number of elligible chunk for spawning.
 	std::set<cChunk*> m_EligibleForSpawnChunks;
 
-protected : 
+protected :
 	// transform monsterToDistance map (that was usefull for collecting) into distanceToMonster
 	// that will be usefull for picking up.
 	void convertMaps();

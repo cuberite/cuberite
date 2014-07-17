@@ -99,7 +99,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate", 
+			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate",
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
@@ -2226,7 +2226,7 @@ void cWorld::SetChunkData(
 	const NIBBLETYPE * a_BlockSkyLight,
 	const cChunkDef::HeightMap * a_HeightMap,
 	const cChunkDef::BiomeMap  * a_BiomeMap,
-	cEntityList & a_Entities, 
+	cEntityList & a_Entities,
 	cBlockEntityList & a_BlockEntities,
 	bool a_MarkDirty
 )
@@ -2242,7 +2242,7 @@ void cWorld::SetChunkData(
 	}
 	
 	m_ChunkMap->SetChunkData(
-		a_ChunkX, a_ChunkZ, 
+		a_ChunkX, a_ChunkZ,
 		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
 		a_HeightMap, *Biomes,
 		a_BlockEntities,
@@ -2872,7 +2872,7 @@ void cWorld::RemoveEntity(cEntity * a_Entity)
 unsigned int cWorld::GetNumPlayers(void)
 {
 	cCSLock Lock(m_CSPlayers);
-	return m_Players.size(); 
+	return m_Players.size();
 }
 */
 
@@ -2920,7 +2920,7 @@ void cWorld::TickQueuedBlocks(void)
 		}
 		else
 		{
-			m_BlockTickQueue.push_back(Block);	// Keep the block in the queue
+			m_BlockTickQueue.push_back(Block);  // Keep the block in the queue
 		}
 	}  // for itr - m_BlockTickQueueCopy[]
 }

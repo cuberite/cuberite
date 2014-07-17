@@ -29,7 +29,7 @@ public :
 	// return the number of mobs for this family
 	int GetNumberOfCollectedMobs(cMonster::eFamily a_Family);
 
-protected : 
+protected :
 	std::map<cMonster::eFamily, std::set<cMonster *> > m_Mobs;
 
 } ;

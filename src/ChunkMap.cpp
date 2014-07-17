@@ -2711,7 +2711,7 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 // cChunkMap::cChunkLayer:
 
 cChunkMap::cChunkLayer::cChunkLayer(
-	int a_LayerX, int a_LayerZ, 
+	int a_LayerX, int a_LayerZ,
 	cChunkMap * a_Parent,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 )
@@ -2923,7 +2923,7 @@ int cChunkMap::cChunkLayer::GetNumChunksLoaded(void) const
 			NumChunks++;
 		}
 	}  // for i - m_Chunks[]
-	return NumChunks; 
+	return NumChunks;
 }
 
 
@@ -2994,7 +2994,7 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 void cChunkMap::FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CSFastSetBlock);
-	m_FastSetBlockQueue.push_back(sSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)); 
+	m_FastSetBlockQueue.push_back(sSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta));
 }
 
 

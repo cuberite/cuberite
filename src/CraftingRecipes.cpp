@@ -135,7 +135,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 {
 	if ((a_Grid.m_Width != m_Width) || (a_Grid.m_Height != m_Height))
 	{
-		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)", 
+		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)",
 			a_Grid.m_Width, a_Grid.m_Height, m_Width, m_Height
 		);
 	}
@@ -196,7 +196,7 @@ void cCraftingGrid::Dump(void)
 		#ifdef _DEBUG
 		int idx = x + m_Width * y;
 		#endif
-		LOGD("Slot (%d, %d): Type %d, health %d, count %d", 
+		LOGD("Slot (%d, %d): Type %d, health %d, count %d",
 			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
 		);
 	}
@@ -250,7 +250,7 @@ void cCraftingRecipe::Dump(void)
 {
 	LOGD("Recipe ingredients:");
 	m_Ingredients.Dump();
-	LOGD("Result: Type %d, health %d, count %d", 
+	LOGD("Result: Type %d, health %d, count %d",
 		m_Result.m_ItemType, m_Result.m_ItemDamage, m_Result.m_ItemCount
 	);
 }
@@ -665,7 +665,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		
 		const cItem & Item = itrS->m_Item;
 		if (
-			(itrS->x >= a_GridWidth) || 
+			(itrS->x >= a_GridWidth) ||
 			(itrS->y >= a_GridHeight) ||
 			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
 			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items

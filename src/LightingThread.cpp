@@ -495,7 +495,7 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 
 
 void cLightingThread::CalcLightStep(
-	NIBBLETYPE * a_Light, 
+	NIBBLETYPE * a_Light,
 	int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 	int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 )

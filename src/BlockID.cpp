@@ -286,7 +286,7 @@ int StringToMobType(const AString & a_MobString)
 		{cMonster::mtMooshroom,    "Mooshroom"},
 		{cMonster::mtSnowGolem,    "SnowGolem"},
 		{cMonster::mtOcelot,       "Ocelot"},
-		{cMonster::mtIronGolem,    "IronGolem"}, 
+		{cMonster::mtIronGolem,    "IronGolem"},
 		{cMonster::mtVillager,     "Villager"},
 	};
 	for (size_t i = 0; i < ARRAYCOUNT(MobMap); i++)

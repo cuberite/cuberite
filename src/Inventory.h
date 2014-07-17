@@ -183,7 +183,7 @@ protected:
 	
 	// cItemGrid::cListener override:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-};	// tolua_export
+};  // tolua_export
 
 
 

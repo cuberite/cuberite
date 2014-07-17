@@ -22,8 +22,8 @@ It will help us when the new chunk format comes out and we need to patch everyth
 #define ZERO_CHUNK_Y 0
 
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
-#define AXIS_ORDER_YZX 1	// Original (1.1-)
-#define AXIS_ORDER_XZY 2	// New (1.2+)
+#define AXIS_ORDER_YZX 1  // Original (1.1-)
+#define AXIS_ORDER_XZY 2  // New (1.2+)
 #define AXIS_ORDER AXIS_ORDER_XZY
 
 
@@ -72,7 +72,7 @@ public:
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
 	
-	/** The type used for any biomemap operations and storage inside MCServer, 
+	/** The type used for any biomemap operations and storage inside MCServer,
 	using MCServer biomes (need not correspond to client representation!)
 	idx = x + Width * z  // Need to verify this with the protocol spec, currently unknown!
 	*/
@@ -148,17 +148,17 @@ public:
 	inline static Vector3i IndexToCoordinate( unsigned int index )
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
-			return Vector3i(								// 1.2
-				index % cChunkDef::Width,						// X
-				index / (cChunkDef::Width * cChunkDef::Width),		// Y
-				(index / cChunkDef::Width) % cChunkDef::Width		// Z
-				);
+			return Vector3i(  // 1.2
+				index % cChunkDef::Width,                       // X
+				index / (cChunkDef::Width * cChunkDef::Width),  // Y
+				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return Vector3i(								// 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),		// X
-				index % cChunkDef::Height,						// Y
-				(index / cChunkDef::Height) % cChunkDef::Width		// Z
-				);
+			return Vector3i(  // 1.1
+				index / (cChunkDef::Height * cChunkDef::Width),  // X
+				index % cChunkDef::Height,                       // Y
+				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+			);
 		#endif
 	}
 

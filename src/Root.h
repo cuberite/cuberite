@@ -36,20 +36,24 @@ namespace Json
 
 
 /// The root of the object hierarchy
-class cRoot	// tolua_export
-{			// tolua_export
+// tolua_begin
+class cRoot
+{
 public:
-	static cRoot * Get() { return s_Root; }							// tolua_export
+	static cRoot * Get() { return s_Root; }
+	// tolua_end
 
 	cRoot(void);
 	~cRoot();
 
 	void Start(void);
 
-	cServer * GetServer(void) { return m_Server; }						// tolua_export
-	cWorld *  GetDefaultWorld(void);										// tolua_export
-	cWorld *  GetWorld(const AString & a_WorldName);				// tolua_export
-	cWorld *  CreateAndInitializeWorld(const AString & a_WorldName); // tolua_export
+	// tolua_begin
+	cServer * GetServer(void) { return m_Server; }
+	cWorld *  GetDefaultWorld(void);
+	cWorld *  GetWorld(const AString & a_WorldName);
+	cWorld *  CreateAndInitializeWorld(const AString & a_WorldName);
+	// tolua_end
 	
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
@@ -106,13 +110,13 @@ public:
 	void SaveAllChunks(void);  // tolua_export
 	
 	/// Reloads all the groups
-	void ReloadGroups(void); // tolua_export
+	void ReloadGroups(void);  // tolua_export
 	
 	/// Calls the callback for each player in all worlds
-	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
-	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin
 	
@@ -202,8 +206,8 @@ private:
 
 	static void InputThread(void* a_Params);
 	
-	static cRoot*	s_Root;
-};	// tolua_export
+	static cRoot* s_Root;
+};  // tolua_export
 
 
 

@@ -15,8 +15,8 @@
 
 	// Disable some warnings that we don't care about:
 	#pragma warning(disable:4100) // Unreferenced formal parameter
-    
-    // Useful warnings from warning level 4:
+
+	// Useful warnings from warning level 4:
 	#pragma warning(3 : 4127) // Conditional expression is constant
 	#pragma warning(3 : 4189) // Local variable is initialized but not referenced
 	#pragma warning(3 : 4245) // Conversion from 'type1' to 'type2', signed/unsigned mismatch
@@ -58,8 +58,8 @@
 
 	// override is part of c++11
 	#if __cplusplus < 201103L
-  		#define override
-	#endif	
+		#define override
+	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
 
@@ -145,7 +145,7 @@ class SizeChecker;
 template <typename T, size_t Size>
 class SizeChecker<T, Size, true>
 {
-  T v;
+	T v;
 };
 
 template class SizeChecker<Int64, 8>;

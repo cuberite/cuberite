@@ -118,7 +118,7 @@ public:
 	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
 	*/
 	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ, 
+		int a_ChunkX, int a_ChunkZ,
 		const BLOCKTYPE * a_BlockTypes,
 		const NIBBLETYPE * a_BlockMeta,
 		const NIBBLETYPE * a_BlockLight,
@@ -361,7 +361,7 @@ private:
 	{
 	public:
 		cChunkLayer(
-			int a_LayerX, int a_LayerZ, 
+			int a_LayerX, int a_LayerZ,
 			cChunkMap * a_Parent,
 			cAllocationPool<cChunkData::sChunkSection> & a_Pool
 		);
@@ -384,7 +384,7 @@ private:
 		void UnloadUnusedChunks(void);
 		
 		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
-		void CollectMobCensus(cMobCensus& a_ToFill);		
+		void CollectMobCensus(cMobCensus& a_ToFill);
 		/** Try to Spawn Monsters inside all Chunks */
 		void SpawnMobs(cMobSpawner& a_MobSpawner);
 

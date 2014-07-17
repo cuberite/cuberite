@@ -85,7 +85,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
-	s_ClientCount++;	// Not protected by CS because clients are always constructed from the same thread
+	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
 
 	cTimer t1;
@@ -531,7 +531,7 @@ void cClientHandle::HandlePing(void)
 	AString Reply;
 	const cServer & Server = *cRoot::Get()->GetServer();
 
-	Printf(Reply, "%s%s%i%s%i", 
+	Printf(Reply, "%s%s%i%s%i",
 		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
 		Server.GetNumPlayers(),
@@ -1169,7 +1169,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType) && (a_HeldItem.m_ItemType != -1))
 	{
 		// Only compare ItemType, not meta (torches have different metas)
-		// The -1 check is there because sometimes the client sends -1 instead of the held item 
+		// The -1 check is there because sometimes the client sends -1 instead of the held item
 		//  ( http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502 )
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
@@ -1390,7 +1390,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color = AString("@") + Color[2];
 	}
 	else
-	{ 
+	{
 		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
@@ -1449,7 +1449,7 @@ void cClientHandle::HandleAnimation(char a_Animation)
 			a_Animation--; // Offset by -1
 			break;
 		}
-		case 5: 
+		case 5:
 		case 6:
 		case 7:
 		{
@@ -1517,8 +1517,8 @@ void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAc
 
 
 void cClientHandle::HandleUpdateSign(
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	const AString & a_Line1, const AString & a_Line2, 
+	int a_BlockX, int a_BlockY, int a_BlockZ,
+	const AString & a_Line1, const AString & a_Line2,
 	const AString & a_Line3, const AString & a_Line4
 )
 {
@@ -1821,7 +1821,7 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 
 void cClientHandle::Tick(float a_Dt)
-{	
+{
 	// Process received network data:
 	AString IncomingData;
 	{
@@ -1887,7 +1887,7 @@ void cClientHandle::Tick(float a_Dt)
 
 
 void cClientHandle::ServerTick(float a_Dt)
-{	
+{
 	// Process received network data:
 	AString IncomingData;
 	{
@@ -2345,7 +2345,7 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 		return;
 	}
 	
-	LOGD("Spawning player \"%s\" on client \"%s\" @ %s", 
+	LOGD("Spawning player \"%s\" on client \"%s\" @ %s",
 		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
 	);
 	

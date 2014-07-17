@@ -100,7 +100,7 @@ protected:
 	cNoise m_Noise;  // Used for integral rnd values
 
 	#ifdef _DEBUG
-		// Statistics on the noise-space coords:	
+		// Statistics on the noise-space coords:
 		static int m_NumSingleX;
 		static int m_NumSingleXY;
 		static int m_NumSingleY;

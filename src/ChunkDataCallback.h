@@ -25,8 +25,8 @@ public:
 
 	virtual ~cChunkDataCallback() {}
 
-	/** Called before any other callbacks to inform of the current coords 
-	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
+	/** Called before any other callbacks to inform of the current coords
+	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()).
 	If false is returned, the chunk is skipped.
 	*/
 	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; };

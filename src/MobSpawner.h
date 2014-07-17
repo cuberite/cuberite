@@ -51,7 +51,7 @@ public :
 	typedef const std::set<cMonster *> tSpawnedContainer;
 	tSpawnedContainer & getSpawned(void);
 
-protected : 
+protected :
 	// return true if specified type of mob can spawn on specified block
 	bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
 
@@ -62,7 +62,7 @@ protected :
 	// add toAdd inside toAddIn, if toAdd is in m_AllowedTypes
 	void addIfAllowed(cMonster::eType toAdd, std::set<cMonster::eType> & toAddIn);
 
-protected : 
+protected :
 	cMonster::eFamily m_MonsterFamily;
 	std::set<cMonster::eType> m_AllowedTypes;
 	bool m_NewPack;

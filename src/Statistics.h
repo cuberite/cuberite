@@ -62,7 +62,7 @@ enum eStatistic
 	statDistDove,
 	statDistMinecart,
 	statDistBoat,
-	statDistPig,	
+	statDistPig,
 	statDistHorse,
 	statJumps,
 	statItemsDropped,
@@ -143,10 +143,9 @@ public:
 	/** Reset everything. */
 	void Reset();
 
-	/** Increment the specified stat.
-	 *
-	 * Returns the new value.
-	 */
+	/** Increments the specified stat.
+	Returns the new value.
+	*/
 	StatValue AddValue(const eStatistic a_Stat, const StatValue a_Delta = 1);
 
 	// tolua_end

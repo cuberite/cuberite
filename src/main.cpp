@@ -49,7 +49,7 @@ bool g_ShouldLogCommOut;
 
 
 
-void NonCtrlHandler(int a_Signal) 
+void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
 	g_TERMINATE_EVENT_RAISED = true;
@@ -277,7 +277,7 @@ int main( int argc, char **argv )
 	try
 	#endif
 	{
-		cRoot Root;	
+		cRoot Root;
 		Root.Start();
 	}
 	#if !defined(ANDROID_NDK)

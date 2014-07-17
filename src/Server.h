@@ -50,10 +50,10 @@ namespace Json
 
 
 
-class cServer										// tolua_export
+class cServer  // tolua_export
 	: public cListenThread::cCallback
-{													// tolua_export
-public:												// tolua_export
+{        // tolua_export
+public:  // tolua_export
 
 	virtual ~cServer() {}
 	bool InitServer(cIniFile & a_SettingsIni);
@@ -149,7 +149,7 @@ private:
 		
 		virtual void Execute(void);
 		
-	public:	
+	public:
 	
 		cNotifyWriteThread(void);
 		~cNotifyWriteThread();

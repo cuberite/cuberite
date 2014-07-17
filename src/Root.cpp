@@ -84,7 +84,7 @@ void cRoot::InputThread(void * a_Params)
 		AString Command;
 		std::getline(std::cin, Command);
 		if (!Command.empty())
-		{			
+		{
 			self.ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
@@ -194,7 +194,7 @@ void cRoot::Start(void)
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
+		m_InputThread->Start( false );  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -687,7 +687,7 @@ int cRoot::GetVirtualRAMUsage(void)
 			&t_info_count
 		))
 		{
-		    return (int)(t_info.virtual_size / 1024);
+			return (int)(t_info.virtual_size / 1024);
 		}
 		return -1;
 	#else
@@ -739,7 +739,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 			&t_info_count
 		))
 		{
-		    return (int)(t_info.resident_size / 1024);
+			return (int)(t_info.resident_size / 1024);
 		}
 		return -1;
 	#else
