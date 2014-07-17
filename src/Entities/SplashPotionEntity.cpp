@@ -112,7 +112,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
 	
-	m_World->BroadcastSoundParticleEffect(2002, a_HitPos.x, a_HitPos.y, a_HitPos.z, m_PotionParticleType);
+	m_World->BroadcastSoundParticleEffect(2002, (int)a_HitPos.x, (int)a_HitPos.y, (int)a_HitPos.z, m_PotionParticleType);
 }
 
 
