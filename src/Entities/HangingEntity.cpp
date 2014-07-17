@@ -28,14 +28,14 @@ void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 	// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
 	switch (m_BlockFace)
 	{
-		case BLOCK_FACE_ZP: break; // Initialised to zero
+		case BLOCK_FACE_ZP: break;  // Initialised to zero
 		case BLOCK_FACE_ZM: Dir = 2; break;
 		case BLOCK_FACE_XM: Dir = 1; break;
 		case BLOCK_FACE_XP: Dir = 3; break;
 		default: ASSERT(!"Unhandled block face when trying to spawn item frame!"); return;
 	}
 
-	if ((Dir == 0) || (Dir == 2)) // Probably a client bug, but two directions are flipped and contrary to the norm, so we do -180
+	if ((Dir == 0) || (Dir == 2))  // Probably a client bug, but two directions are flipped and contrary to the norm, so we do -180
 	{
 		SetYaw((Dir * 90) - 180);
 	}

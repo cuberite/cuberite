@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	//~cRedstoneNoopSimulator();
+	// ~cRedstoneNoopSimulator();
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override 

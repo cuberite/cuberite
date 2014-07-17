@@ -120,4 +120,4 @@ protected:
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-} ; // tolua_export
+} ;  // tolua_export

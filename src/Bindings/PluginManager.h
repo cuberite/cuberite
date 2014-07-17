@@ -336,7 +336,7 @@ private:
 
 	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
 	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);	
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

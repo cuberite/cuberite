@@ -61,13 +61,13 @@ public:
 
 	enum eFamily
 	{
-		mfHostile  = 0, // Spider, Zombies ...
-		mfPassive  = 1, // Cows, Pigs
-		mfAmbient  = 2, // Bats
-		mfWater    = 3, // Squid
+		mfHostile  = 0,  // Spider, Zombies ...
+		mfPassive  = 1,  // Cows, Pigs
+		mfAmbient  = 2,  // Bats
+		mfWater    = 3,  // Squid
 
 		mfNoSpawn,
-		mfUnhandled, // Nothing. Be sure this is the last and the others are in order
+		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
 	} ;
 	
 	// tolua_end
@@ -93,7 +93,7 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual void MoveToPosition(const Vector3f & a_Position);
-	virtual void MoveToPosition(const Vector3d & a_Position); // tolua_export
+	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 	virtual bool ReachedDestination(void);
 	
 	// tolua_begin
@@ -265,7 +265,7 @@ protected:
 	void AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel);
 	
 
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

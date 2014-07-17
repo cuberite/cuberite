@@ -31,7 +31,7 @@ public:
 			a_CursorX, a_CursorY, a_CursorZ,
 			a_BlockType, a_BlockMeta
 		);
-		a_BlockMeta = a_BlockMeta | 0x4;  //0x4 bit set means this is a player-placed leaves block, not to be decayed
+		a_BlockMeta = a_BlockMeta | 0x4;  // 0x4 bit set means this is a player-placed leaves block, not to be decayed
 		return res;
 	}
 } ;

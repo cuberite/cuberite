@@ -362,7 +362,7 @@ char cItemHandler::GetMaxStackSize(void)
 		return 64;
 	}
 	
-	switch (m_ItemType) //sorted by id
+	switch (m_ItemType)
 	{
 		case E_ITEM_ARROW:                return 64;
 		case E_ITEM_BAKED_POTATO:         return 64;
@@ -568,7 +568,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 			cFastRandom r1;
 			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
 			{
-				a_Player->FoodPoison(600); // Give the player food poisoning for 30 seconds.
+				a_Player->FoodPoison(600);  // Give the player food poisoning for 30 seconds.
 			}
 		}
 

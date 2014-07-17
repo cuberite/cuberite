@@ -71,7 +71,7 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 		{
 			for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
 			{
-				if( (*itr)->SafeTitle.compare( Split[2] ) == 0 ) // This is the one! Rawr
+				if( (*itr)->SafeTitle.compare( Split[2] ) == 0 )  // This is the one! Rawr
 				{
 					Tab = *itr;
 					break;

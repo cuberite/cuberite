@@ -2065,7 +2065,7 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 	{
 		lua_pushstring(tolua_S, it->first.c_str() );
 		tolua_pushusertype(tolua_S, &(it->second), "HTTPFormData" );
-		//lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size() ); // Might contain binary data
+		// lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size() );  // Might contain binary data
 		lua_settable(tolua_S, top);
 	}
 
@@ -2114,7 +2114,7 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 	{
 		const AString & FancyName = iter->first;
 		const AString & WebName = iter->second;
-		tolua_pushstring( tolua_S, WebName.c_str() ); // Because the WebName is supposed to be unique, use it as key
+		tolua_pushstring( tolua_S, WebName.c_str() );  // Because the WebName is supposed to be unique, use it as key
 		tolua_pushstring( tolua_S, FancyName.c_str() );
 		//
 		lua_rawset(tolua_S, -3);

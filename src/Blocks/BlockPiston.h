@@ -132,7 +132,7 @@ private:
 	{
 		if (cBlockInfo::IsPistonBreakable(a_BlockType))
 		{
-			return false; // CanBreakPush returns true, but we need false to prevent pulling
+			return false;  // CanBreakPush returns true, but we need false to prevent pulling
 		}
 		
 		return CanPush(a_BlockType, a_BlockMeta);

@@ -190,16 +190,16 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	cRedstoneSimulatorChunkData * RedstoneSimulatorChunkData = a_Chunk->GetRedstoneSimulatorData();
 	for (cRedstoneSimulatorChunkData::iterator itr = RedstoneSimulatorChunkData->begin(); itr != RedstoneSimulatorChunkData->end(); ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ)) // We are at an entry matching the current (changed) block
+		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))  // We are at an entry matching the current (changed) block
 		{
 			if (!IsAllowedBlock(Block))
 			{
-				itr->DataTwo = true; // The new blocktype is not redstone; it must be queued to be removed from this list
+				itr->DataTwo = true;  // The new blocktype is not redstone; it must be queued to be removed from this list
 			}
 			else
 			{
 				itr->DataTwo = false;
-				itr->Data = Block; // Update block information
+				itr->Data = Block;  // Update block information
 			}
 			return;
 		}
@@ -378,7 +378,7 @@ void cIncrementalRedstoneSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_Blo
 
 void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState)
 {
-	static const struct // Define which directions the torch can power
+	static const struct  // Define which directions the torch can power
 	{
 		int x, y, z;
 	} gCrossCoords[] =
@@ -394,7 +394,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 	{
 		// Check if the block the torch is on is powered		
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
-		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true); // Inverse true to get the block torch is on
+		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 
 		cChunk * Neighbour = m_Chunk->GetRelNeighborChunk(X, Z);
 		if ((Neighbour == NULL) || !Neighbour->IsValid())
@@ -417,11 +417,11 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 			{
 				continue;
 			}
-			if (i + 1 < ARRAYCOUNT(gCrossCoords)) // Sides of torch, not top (top is last)
+			if (i + 1 < ARRAYCOUNT(gCrossCoords))  // Sides of torch, not top (top is last)
 			{
 				if (
-					IsMechanism(Type) && // Is it a mechanism? Not block/other torch etc.
-					(!Vector3i(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY + gCrossCoords[i].y, a_RelBlockZ + gCrossCoords[i].z).Equals(Vector3i(X, Y, Z))) // CAN'T power block is that it is on
+					IsMechanism(Type) &&  // Is it a mechanism? Not block/other torch etc.
+					(!Vector3i(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY + gCrossCoords[i].y, a_RelBlockZ + gCrossCoords[i].z).Equals(Vector3i(X, Y, Z)))  // CAN'T power block is that it is on
 					)
 				{
 					SetBlockPowered(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY + gCrossCoords[i].y, a_RelBlockZ + gCrossCoords[i].z, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
@@ -436,11 +436,11 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 			}
 		}
 
-		if (m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) != 0x5) // Is torch standing on ground? If NOT (i.e. on wall), power block beneath
+		if (m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) != 0x5)  // Is torch standing on ground? If NOT (i.e. on wall), power block beneath
 		{
 			BLOCKTYPE Type = m_Chunk->GetBlock(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ);
 
-			if (IsMechanism(Type)) // Still can't make a normal block powered though!
+			if (IsMechanism(Type))  // Still can't make a normal block powered though!
 			{
 				SetBlockPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 			}
@@ -450,7 +450,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 	{
 		// Check if the block the torch is on is powered		
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
-		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true); // Inverse true to get the block torch is on
+		AddFaceDirection(X, Y, Z, cBlockTorchHandler::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 		
 		cChunk * Neighbour = m_Chunk->GetRelNeighborChunk(X, Z);
 		if ((Neighbour == NULL) || !Neighbour->IsValid())
@@ -461,7 +461,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		// See if off state torch can be turned on again
 		if (AreCoordsDirectlyPowered(X, Y, Z, Neighbour))
 		{
-			return; // Something matches, torch still powered
+			return;  // Something matches, torch still powered
 		}
 
 		// Block torch on not powered, can be turned on again!
@@ -476,7 +476,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 void cIncrementalRedstoneSimulator::HandleRedstoneBlock(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
 	SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-	SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ); // Set self as powered
+	SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ);  // Set self as powered
 }
 
 
@@ -557,7 +557,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneButton(int a_RelBlockX, int a_
 
 void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	static const struct // Define which directions the wire can receive power from
+	static const struct  // Define which directions the wire can receive power from
 	{
 		int x, y, z;
 	} gCrossCoords[] =
@@ -576,7 +576,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 		{ 0,-1, -1}, /* Wires one lower, surrounding self stop */
 	} ;
 
-	static const struct // Define which directions the wire will check for repeater prescence
+	static const struct  // Define which directions the wire will check for repeater prescence
 	{
 		int x, y, z;
 	} gSideCoords[] =
@@ -608,9 +608,9 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 
 	MyPower--;
 
-	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through all directions to transfer or receive power
+	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)  // Loop through all directions to transfer or receive power
 	{
-		if ((i >= 4) && (i <= 7)) // If we are currently checking for wire surrounding ourself one block above...
+		if ((i >= 4) && (i <= 7))  // If we are currently checking for wire surrounding ourself one block above...
 		{
 			BLOCKTYPE Type = 0;
 			if (a_RelBlockY + 1 >= cChunkDef::Height)
@@ -621,12 +621,12 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 			{
 				continue;
 			}
-			if (cBlockInfo::IsSolid(Type)) // If there is something solid above us (wire cut off)...
+			if (cBlockInfo::IsSolid(Type))  // If there is something solid above us (wire cut off)...
 			{
-				continue; // We don't receive power from that wire
+				continue;  // We don't receive power from that wire
 			}
 		}
-		else if ((i >= 8) && (i <= 11)) // See above, but this is for wire below us
+		else if ((i >= 8) && (i <= 11))  // See above, but this is for wire below us
 		{
 			BLOCKTYPE Type = 0;
 			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY, a_RelBlockZ + gCrossCoords[i].z, Type))
@@ -650,7 +650,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 		}
 	}
 
-	for (size_t i = 0; i < ARRAYCOUNT(gSideCoords); i++) // Look for repeaters immediately surrounding self and try to power them
+	for (size_t i = 0; i < ARRAYCOUNT(gSideCoords); i++)  // Look for repeaters immediately surrounding self and try to power them
 	{
 		BLOCKTYPE Type = 0;
 		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + gSideCoords[i].x, a_RelBlockY + gSideCoords[i].y, a_RelBlockZ + gSideCoords[i].z, Type))
@@ -740,14 +740,14 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 	NIBBLETYPE a_Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	bool IsOn = (a_MyState == E_BLOCK_REDSTONE_REPEATER_ON);
     
-	if (!IsRepeaterLocked(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta)) // If we're locked, change nothing. Otherwise:
+	if (!IsRepeaterLocked(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta))  // If we're locked, change nothing. Otherwise:
 	{
 		bool IsSelfPowered = IsRepeaterPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta);
-		if (IsSelfPowered && !IsOn) // Queue a power change if powered, but not on and not locked.
+		if (IsSelfPowered && !IsOn)  // Queue a power change if powered, but not on and not locked.
 		{
 			QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, true);
 		}
-		else if (!IsSelfPowered && IsOn) // Queue a power change if unpowered, on, and not locked.
+		else if (!IsSelfPowered && IsOn)  // Queue a power change if unpowered, on, and not locked.
 		{
 			QueueRepeaterPowerChange(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_Meta, false);
 		}
@@ -758,7 +758,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 {
 	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end();)
 	{
-		if (itr->a_ElapsedTicks >= itr->a_DelayTicks) // Has the elapsed ticks reached the target ticks?
+		if (itr->a_ElapsedTicks >= itr->a_DelayTicks)  // Has the elapsed ticks reached the target ticks?
 		{
 			int RelBlockX = itr->a_RelBlockPos.x;
 			int RelBlockY = itr->a_RelBlockPos.y;
@@ -768,12 +768,12 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 			m_Chunk->GetBlockTypeMeta(RelBlockX, RelBlockY, RelBlockZ, Block, Meta);
 			if (itr->ShouldPowerOn)
 			{
-				if (Block != E_BLOCK_REDSTONE_REPEATER_ON) // For performance
+				if (Block != E_BLOCK_REDSTONE_REPEATER_ON)  // For performance
 				{
 					m_Chunk->SetBlock(itr->a_RelBlockPos, E_BLOCK_REDSTONE_REPEATER_ON, Meta);
 				}
 
-				switch (Meta & 0x3) // We only want the direction (bottom) bits
+				switch (Meta & 0x3)  // We only want the direction (bottom) bits
 				{
 					case 0x0:
 					{
@@ -825,7 +825,7 @@ void cIncrementalRedstoneSimulator::HandlePiston(int a_RelBlockX, int a_RelBlock
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
-	if (IsPistonPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7)) // We only want the bottom three bits (4th controls extended-ness)
+	if (IsPistonPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7))  // We only want the bottom three bits (4th controls extended-ness)
 	{
 		cBlockPistonHandler::ExtendPiston(BlockX, a_RelBlockY, BlockZ, &m_World);
 	}
@@ -1280,7 +1280,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 					if (Distance <= 0.5)
 					{
 						m_FoundEntity = true;
-						return true; // Break out, we only need to know for plates that at least one entity is on top
+						return true;  // Break out, we only need to know for plates that at least one entity is on top
 					}
 					return false;
 				}
@@ -1343,7 +1343,7 @@ void cIncrementalRedstoneSimulator::HandleTripwireHook(int a_RelBlockX, int a_Re
 	bool FoundActivated = false;
 	eBlockFace FaceToGoTowards = cBlockTripwireHookHandler::MetadataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ));
 
-	for (int i = 0; i < 40; ++i) // Tripwires can be connected up to 40 blocks
+	for (int i = 0; i < 40; ++i)  // Tripwires can be connected up to 40 blocks
 	{
 		BLOCKTYPE Type;
 		NIBBLETYPE Meta;
@@ -1469,7 +1469,7 @@ void cIncrementalRedstoneSimulator::HandleTripwire(int a_RelBlockX, int a_RelBlo
 			if (bbEntity.DoesIntersect(bbWire))
 			{
 				m_FoundEntity = true;
-				return true; // One entity is sufficient to trigger the wire
+				return true;  // One entity is sufficient to trigger the wire
 			}
 			return false;
 		}
@@ -1511,7 +1511,7 @@ bool cIncrementalRedstoneSimulator::AreCoordsDirectlyPowered(int a_RelBlockX, in
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
-	for (PoweredBlocksList::const_iterator itr = a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->begin(); itr != a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->end(); ++itr) // Check powered list
+	for (PoweredBlocksList::const_iterator itr = a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->begin(); itr != a_Chunk->GetRedstoneSimulatorPoweredBlocksList()->end(); ++itr)  // Check powered list
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
@@ -1530,7 +1530,7 @@ bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_RelBlockX, int 
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr) // Check linked powered list
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)  // Check linked powered list
 	{
 		if (itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
@@ -1608,7 +1608,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_RelBlockX, int a_Rel
 			}
 		}
 	}
-	return false; // Couldn't find power source behind repeater
+	return false;  // Couldn't find power source behind repeater
 }
 
 
@@ -1617,7 +1617,7 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_RelBlockX, int a_Rel
 
 bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta)
 {	
-	switch (a_Meta & 0x3) // We only want the 'direction' part of our metadata
+	switch (a_Meta & 0x3)  // We only want the 'direction' part of our metadata
 	{
 		// If the repeater is looking up or down (If parallel to the Z axis)
 		case 0x0:
@@ -1625,17 +1625,17 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 		{
 			// Check if eastern(right) neighbor is a powered on repeater who is facing us
 			BLOCKTYPE Block = 0;
-			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON)) // Is right neighbor a powered repeater?
+			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))  // Is right neighbor a powered repeater?
 			{
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ) & 0x3;
-				if (OtherRepeaterDir == 0x3) { return true; } // If so, I am latched/locked
+				if (OtherRepeaterDir == 0x3) { return true; }  // If so, I am latched/locked
 			}
 
 			// Check if western(left) neighbor is a powered on repeater who is facing us
 			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX -1, a_RelBlockY, a_RelBlockZ) & 0x3;
-				if (OtherRepeaterDir == 0x1) { return true; } // If so, I am latched/locked
+				if (OtherRepeaterDir == 0x1) { return true; }  // If so, I am latched/locked
 			}
 
 			break;
@@ -1650,21 +1650,21 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{ 
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1) & 0x3;
-				if (OtherRepeaterDir == 0x0) { return true; } // If so,  am latched/locked
+				if (OtherRepeaterDir == 0x0) { return true; }  // If so,  am latched/locked
 			}
 			
 			// Check if northern(up) neighbor is a powered on repeater who is facing us
 			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{ 
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1) & 0x3;
-				if (OtherRepeaterDir == 0x2) { return true; } // If so, I am latched/locked
+				if (OtherRepeaterDir == 0x2) { return true; }  // If so, I am latched/locked
 			}
 
 			break;
 		}
 	}
 
-	return false; // None of the checks succeeded, I am not a locked repeater
+	return false;  // None of the checks succeeded, I am not a locked repeater
 }
 
 
@@ -1705,7 +1705,7 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 
 		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face, true);
 	}
-	return false; // Source was in front of the piston's front face
+	return false;  // Source was in front of the piston's front face
 }
 
 
@@ -1717,16 +1717,16 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
 	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
 
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr) // Check powered list
+	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)  // Check powered list
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
 			continue;
 		}
-		a_PowerLevel = std::max(itr->a_PowerLevel , a_PowerLevel); // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
+		a_PowerLevel = std::max(itr->a_PowerLevel , a_PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
 	}
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr) // Check linked powered list
+	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)  // Check linked powered list
 	{
 		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
 		{
@@ -1743,7 +1743,7 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 		a_PowerLevel = std::max(itr->a_PowerLevel, a_PowerLevel);
 	}
 
-	return (a_PowerLevel != 0); // Answer the inital question: is the wire powered?
+	return (a_PowerLevel != 0);  // Answer the inital question: is the wire powered?
 }
 
 
@@ -1756,17 +1756,17 @@ bool cIncrementalRedstoneSimulator::AreCoordsSimulated(int a_RelBlockX, int a_Re
 	{
 		if (itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
-			if (itr->WasLastStatePowered != IsCurrentStatePowered) // Was the last power state different to the current?
+			if (itr->WasLastStatePowered != IsCurrentStatePowered)  // Was the last power state different to the current?
 			{
-				return false; // It was, coordinates are no longer simulated
+				return false;  // It was, coordinates are no longer simulated
 			}
 			else
 			{
-				return true; // It wasn't, don't resimulate block, and allow players to toggle
+				return true;  // It wasn't, don't resimulate block, and allow players to toggle
 			}
 		}
 	}
-	return false; // Block wasn't even in the list, not simulated
+	return false;  // Block wasn't even in the list, not simulated
 }
 
 
@@ -1870,7 +1870,7 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_RelBlockX, i
 		}
 		default:
 		{
-			ASSERT(!"Unhandled face direction when attempting to set blocks as linked powered!"); // Zombies, that wasn't supposed to happen...
+			ASSERT(!"Unhandled face direction when attempting to set blocks as linked powered!");  // Zombies, that wasn't supposed to happen...
 			break;
 		}
 	}
@@ -1895,7 +1895,7 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_RelBlockX, int a_R
 		{ 0, -1, 0 }
 	};
 
-	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++) // Loop through struct to power all directions
+	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)  // Loop through struct to power all directions
 	{
 		SetBlockPowered(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY + gCrossCoords[i].y, a_RelBlockZ + gCrossCoords[i].z, a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_PowerLevel);
 	}
@@ -1912,13 +1912,13 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	int SourceX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelSourceX;
 	int SourceZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelSourceZ;
 
-	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ); // Adjust coordinates for the later call using these values
+	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ);  // Adjust coordinates for the later call using these values
 	if ((Neighbour == NULL) || !Neighbour->IsValid())
 	{
 		return;
 	}
 
-	PoweredBlocksList * Powered = Neighbour->GetRedstoneSimulatorPoweredBlocksList(); // We need to insert the value into the chunk who owns the block position
+	PoweredBlocksList * Powered = Neighbour->GetRedstoneSimulatorPoweredBlocksList();  // We need to insert the value into the chunk who owns the block position
 	for (PoweredBlocksList::iterator itr = Powered->begin(); itr != Powered->end(); ++itr)
 	{
 		if (
@@ -1950,7 +1950,7 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 			{
 				if (Meta < a_PowerLevel)
 				{
-					m_PoweredBlocks->erase(itr); // Powering source with higher power level, allow it
+					m_PoweredBlocks->erase(itr);  // Powering source with higher power level, allow it
 					break;
 				}
 				else
@@ -2068,13 +2068,13 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 	{
 		if (itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
-			if (ShouldPowerOn == itr->ShouldPowerOn) // We are queued already for the same thing, don't replace entry
+			if (ShouldPowerOn == itr->ShouldPowerOn)  // We are queued already for the same thing, don't replace entry
 			{
 				return false;
 			}
 
 			// Already in here (normal to allow repeater to continue on powering and updating blocks in front) - just update info and quit
-			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2; // See below for description
+			itr->a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;  // See below for description
 			itr->a_ElapsedTicks = 0;
 			itr->ShouldPowerOn = ShouldPowerOn;
 			return false;
@@ -2086,7 +2086,7 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 	RC.a_RelBlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	
 	// Gets the top two bits (delay time), shifts them into the lower two bits, and adds one (meta 0 = 1 tick; 1 = 2 etc.)
-	// * 2 because in MCS, 1 redstone tick = 1 world tick, but in Vanilla, 1 redstone tick = 2 world ticks, and we need to maintain compatibility
+	// Multiply by 2 because in MCS, 1 redstone tick = 1 world tick, but in Vanilla, 1 redstone tick = 2 world ticks, and we need to maintain compatibility
 	RC.a_DelayTicks = (((a_Meta & 0xC) >> 0x2) + 1) * 2;
 
 	RC.a_ElapsedTicks = 0;
@@ -2101,7 +2101,7 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 
 void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_SourceX, int a_SourceY, int a_SourceZ, cChunk * a_Chunk, bool a_IsFirstCall)
 {
-	if (!a_IsFirstCall) // The neighbouring chunks passed when this parameter is false may be invalid
+	if (!a_IsFirstCall)  // The neighbouring chunks passed when this parameter is false may be invalid
 	{
 		if ((a_Chunk == NULL) || !a_Chunk->IsValid())
 		{

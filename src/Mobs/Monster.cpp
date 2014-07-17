@@ -62,7 +62,7 @@ static const struct
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
 cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
@@ -120,7 +120,7 @@ void cMonster::TickPathFinding()
 	std::vector<Vector3d> m_PotentialCoordinates;
 	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
 
-	static const struct // Define which directions to try to move to
+	static const struct  // Define which directions to try to move to
 	{
 		int x, z;
 	} gCrossCoords[] =
@@ -301,12 +301,12 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
-				AddSpeedY(5.2); // Jump!!
+				AddSpeedY(5.2);  // Jump!!
 			}
 		}
 
 		Vector3f Distance = m_Destination - GetPosition();
-		if(!ReachedDestination() && !ReachedFinalDestination()) // If we haven't reached any sort of destination, move
+		if(!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
 			Distance.Normalize();
@@ -325,20 +325,20 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			AddSpeedZ(Distance.z);
 
 			if (m_EMState == ESCAPING)
-			{	//Runs Faster when escaping :D otherwise they just walk away
+			{	// Runs Faster when escaping :D otherwise they just walk away
 				SetSpeedX (GetSpeedX() * 2.f);
 				SetSpeedZ (GetSpeedZ() * 2.f);
 			}
 		}
 		else
 		{
-			if (ReachedFinalDestination()) // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
+			if (ReachedFinalDestination())  // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
 			{
 				FinishPathFinding();
 			}
 			else
 			{
-				TickPathFinding(); // We have reached the next point in our path, calculate another point
+				TickPathFinding();  // We have reached the next point in our path, calculate another point
 			}
 		}
 	}
@@ -570,8 +570,8 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
-//Checks to see if EventSeePlayer should be fired
-//monster sez: Do I see the player
+// Checks to see if EventSeePlayer should be fired
+// monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
@@ -631,7 +631,7 @@ void cMonster::InStateIdle(float a_Dt)
 {
 	if (m_bMovingToDestination)
 	{
-		return; // Still getting there
+		return;  // Still getting there
 	}
 
 	m_IdleInterval += a_Dt;
@@ -640,7 +640,7 @@ void cMonster::InStateIdle(float a_Dt)
 	{
 		// At this interval the results are predictable
 		int rem = m_World->GetTickRandomNumber(6) + 1;
-		m_IdleInterval -= 1; // So nothing gets dropped when the server hangs for a few seconds
+		m_IdleInterval -= 1;  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
 		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
@@ -928,7 +928,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtWitch:         toReturn = new cWitch();                    break;
 		case mtWither:	      toReturn = new cWither();                   break;
 		case mtWolf:          toReturn = new cWolf();                     break;
-		case mtZombie:        toReturn = new cZombie(false);              break; // TODO: Infected zombie parameter
+		case mtZombie:        toReturn = new cZombie(false);              break;  // TODO: Infected zombie parameter
 		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
 		default:
 		{

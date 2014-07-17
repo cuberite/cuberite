@@ -870,7 +870,7 @@ private:
 	bool m_VillagersShouldHarvestCrops;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
-	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	 // Second is for safely removing the objects from the queue
+	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;  // Second is for safely removing the objects from the queue
 
 	cSimulatorManager *  m_SimulatorManager;
 	cSandSimulator *     m_SandSimulator;

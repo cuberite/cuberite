@@ -55,7 +55,7 @@ enum
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol161:
 
 cProtocol161::cProtocol161(cClientHandle * a_Client) :
@@ -202,11 +202,11 @@ int cProtocol161::ParseEntityAction(void)
 	
 	switch (ActionID)
 	{
-		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
-		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
-		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
-		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
-		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break;  // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break;  // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break;  // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break;  // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break;  // Stop sprinting
 	}
 
 	return PARSE_OK;
@@ -282,7 +282,7 @@ int cProtocol161::ParsePacket(unsigned char a_PacketType)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol162:
 
 cProtocol162::cProtocol162(cClientHandle * a_Client) :

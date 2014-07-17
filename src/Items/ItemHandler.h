@@ -60,7 +60,7 @@ public:
 	{
 		double Saturation;
 		int    FoodLevel;
-		int    PoisonChance;	 // 0 - 100, in percent. 0 = no chance of poisoning, 100 = sure poisoning
+		int    PoisonChance;	  // 0 - 100, in percent. 0 = no chance of poisoning, 100 = sure poisoning
 
 		FoodInfo(int a_FoodLevel, double a_Saturation, int a_PoisonChance = 0) :
 			Saturation(a_Saturation),
@@ -112,11 +112,11 @@ public:
 	
 protected:
 	int m_ItemType;
-	static cItemHandler *CreateItemHandler(int m_ItemType);
+	static cItemHandler * CreateItemHandler(int m_ItemType);
 
 	static cItemHandler * m_ItemHandler[E_ITEM_LAST + 1];
-	static bool m_HandlerInitialized;	//used to detect if the itemhandlers are initialized
+	static bool m_HandlerInitialized;  // used to detect if the itemhandlers are initialized
 };
 
-//Short function
+// Short function
 inline cItemHandler *ItemHandler(int a_ItemType) { return cItemHandler::GetItemHandler(a_ItemType); }

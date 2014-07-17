@@ -45,7 +45,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.Add(m_BlockType, 1, 0); // Reset meta
+		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta
 	}
 
 

@@ -506,7 +506,7 @@ protected:
 	overrides can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
-	virtual void Destroyed(void) {} // Called after the entity has been destroyed
+	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);

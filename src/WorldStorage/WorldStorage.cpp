@@ -35,7 +35,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
@@ -96,7 +96,7 @@ void cWorldStorage::WaitForFinish(void)
 	
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
-	m_Event.Set(); // Wake up the thread if waiting
+	m_Event.Set();  // Wake up the thread if waiting
 	super::Wait();
 	LOG("World storage thread finished");
 }

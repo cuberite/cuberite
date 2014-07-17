@@ -113,7 +113,7 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	BroadcastMovementUpdate(); //Notify clients of position
+	BroadcastMovementUpdate();  // Notify clients of position
 
 	m_Timer += a_Dt;
 	
@@ -150,10 +150,10 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				}
 			}
 
-			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize())) // Don't combine into an already full pickup
+			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine into an already full pickup
 			{
 				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
-				m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
+				m_World->ForEachEntity(PickupCombiningCallback);  // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
 				if (PickupCombiningCallback.FoundMatchingPickup())
 				{
 					m_World->BroadcastEntityMetadata(*this);
@@ -176,7 +176,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (GetPosY() < VOID_BOUNDARY) // Out of this world and no more visible!
+	if (GetPosY() < VOID_BOUNDARY)  // Out of this world and no more visible!
 	{
 		Destroy(true);
 		return;
@@ -194,14 +194,14 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 	if (m_bCollected)
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", m_UniqueID, a_Dest->GetName().c_str());
-		return false; // It's already collected!
+		return false;  // It's already collected!
 	}
 	
 	// Two seconds if player created the pickup (vomiting), half a second if anything else
 	if (m_Timer < (m_bIsPlayerCreated ? 2000.f : 500.f))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", m_UniqueID, a_Dest->GetName().c_str());
-		return false; // Not old enough
+		return false;  // Not old enough
 	}
 
 	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))

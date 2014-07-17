@@ -66,7 +66,7 @@ static const sCoords BigO3[] =
 	          {-2,  3}, {-1,  3}, {0,  3}, {1,  3}, {2,  3},
 } ;
 
-static const sCoords BigO4[] = // Part of Big Jungle tree
+static const sCoords BigO4[] =  // Part of Big Jungle tree
 {
 	                    {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4},
 	          {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3},
@@ -773,10 +773,10 @@ void GetSmallJungleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & 
 	
 	a_LogBlocks.reserve(Height);
 	a_OtherBlocks.reserve(
-		2 * ARRAYCOUNT(BigO3) +      // O3 layer, 2x
-		2 * ARRAYCOUNT(BigO2) +      // O2 layer, 2x
-		ARRAYCOUNT(BigO1) + 1 +      // Plus on the top
-		Height * ARRAYCOUNT(Vines) + // Vines
+		2 * ARRAYCOUNT(BigO3) +       // O3 layer, 2x
+		2 * ARRAYCOUNT(BigO2) +       // O2 layer, 2x
+		ARRAYCOUNT(BigO1) + 1 +       // Plus on the top
+		Height * ARRAYCOUNT(Vines) +  // Vines
 		50  // some safety
 	);
 	

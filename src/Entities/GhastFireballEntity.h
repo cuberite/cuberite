@@ -35,4 +35,4 @@ protected:
 	
 	// TODO: Deflecting the fireballs by arrow- or sword- hits
 	
-} ; // tolua_export
+} ;  // tolua_export

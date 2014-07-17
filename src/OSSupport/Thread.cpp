@@ -91,12 +91,12 @@ void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 		LOGERROR("ERROR: Could not create thread!");
 #else
 	DWORD ThreadID = 0;
-	HANDLE hThread = CreateThread(	0 // security
-		,0 // stack size
-		, (LPTHREAD_START_ROUTINE) MyThread // function name
-		,this // parameters
-		,0 // flags
-		,&ThreadID ); // thread id
+	HANDLE hThread = CreateThread(	0  // security
+		,0  // stack size
+		, (LPTHREAD_START_ROUTINE) MyThread  // function name
+		,this  // parameters
+		,0  // flags
+		,&ThreadID );  // thread id
 	CloseHandle( hThread );
 
 	#ifdef _MSC_VER

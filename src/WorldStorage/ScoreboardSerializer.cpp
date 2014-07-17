@@ -117,7 +117,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 		a_Writer.EndCompound();
 	}
 
-	a_Writer.EndList(); // Objectives
+	a_Writer.EndList();  // Objectives
 
 	a_Writer.BeginList("PlayerScores", TAG_Compound);
 
@@ -138,7 +138,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 		}
 	}
 
-	a_Writer.EndList(); // PlayerScores
+	a_Writer.EndList();  // PlayerScores
 
 	a_Writer.BeginList("Teams", TAG_Compound);
 	
@@ -169,7 +169,7 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 		a_Writer.EndCompound();
 	}
 
-	a_Writer.EndList(); // Teams
+	a_Writer.EndList();  // Teams
 
 	a_Writer.BeginCompound("DisplaySlots");
 
@@ -182,9 +182,9 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsName);
 	a_Writer.AddString("slot_2", (Objective == NULL) ? "" : Objective->GetName());
 
-	a_Writer.EndCompound(); // DisplaySlots
+	a_Writer.EndCompound();  // DisplaySlots
 
-	a_Writer.EndCompound(); // Data
+	a_Writer.EndCompound();  // Data
 }
 
 

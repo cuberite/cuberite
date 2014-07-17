@@ -74,7 +74,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return 0x0; // No idea, give a special meta (button in centre of block)
+				return 0x0;  // No idea, give a special meta (button in centre of block)
 			}
 		}
 	}

@@ -71,7 +71,7 @@ enum
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol132:
 
 cProtocol132::cProtocol132(cClientHandle * a_Client) :
@@ -476,7 +476,7 @@ int cProtocol132::ParseHandshake(void)
 
 	if (!m_Client->HandleHandshake( m_Username ))
 	{
-		return PARSE_OK; // Player is not allowed into the server
+		return PARSE_OK;  // Player is not allowed into the server
 	}
 
 	// Send a 0xfd Encryption Key Request http://wiki.vg/Protocol#0xFD

@@ -47,12 +47,12 @@ public:
 	{
 		if ((a_Player->GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < 7))
 		{
-			return true; // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
+			return true;  // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
 		}
 
 		if (a_Meta == 0)
 		{
-			return true; // If at normal snowfall height (lowest), we ignore collision
+			return true;  // If at normal snowfall height (lowest), we ignore collision
 		}
 
 		return false;

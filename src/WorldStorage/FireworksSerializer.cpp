@@ -72,7 +72,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 			for (int explosiontag = a_NBT.GetFirstChild(a_TagIdx); explosiontag >= 0; explosiontag = a_NBT.GetNextSibling(explosiontag))
 			{
 				eTagType TagType = a_NBT.GetType(explosiontag);
-				if (TagType == TAG_Byte) // Custon name tag
+				if (TagType == TAG_Byte)  // Custon name tag
 				{
 					AString ExplosionName = a_NBT.GetName(explosiontag);
 
@@ -135,7 +135,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 			for (int fireworkstag = a_NBT.GetFirstChild(a_TagIdx); fireworkstag >= 0; fireworkstag = a_NBT.GetNextSibling(fireworkstag))
 			{
 				eTagType TagType = a_NBT.GetType(fireworkstag);
-				if (TagType == TAG_Byte) // Custon name tag
+				if (TagType == TAG_Byte)  // Custon name tag
 				{
 					if (a_NBT.GetName(fireworkstag) == "Flight")
 					{

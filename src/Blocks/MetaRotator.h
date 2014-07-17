@@ -6,7 +6,7 @@
 
 // MSVC generates warnings for the templated AssertIfNotMatched parameter conditions, so disable it:
 #ifdef _MSC_VER
-	#pragma warning(disable: 4127) // Conditional expression is constant
+	#pragma warning(disable: 4127)  // Conditional expression is constant
 #endif
 
 

@@ -25,7 +25,7 @@ extern "C"
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPluginLua:
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
@@ -1670,7 +1670,7 @@ AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
 	sWebPluginTab * Tab = 0;
 	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
-		if ((*itr)->SafeTitle.compare(SafeTabName) == 0) // This is the one! Rawr
+		if ((*itr)->SafeTitle.compare(SafeTabName) == 0)  // This is the one! Rawr
 		{
 			Tab = *itr;
 			break;

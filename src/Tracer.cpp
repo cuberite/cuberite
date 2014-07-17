@@ -273,28 +273,40 @@ int LinesCross(float x0,float y0,float x1,float y1,float x2,float y2,float x3,fl
 //            2 = the segment lies in the plane
 int cTracer::intersect3D_SegmentPlane( const Vector3f & a_Origin, const Vector3f & a_End, const Vector3f & a_PlanePos, const Vector3f & a_PlaneNormal )
 {
-	Vector3f    u = a_End - a_Origin;//a_Ray.P1 - S.P0;
-	Vector3f    w = a_Origin - a_PlanePos;//S.P0 - Pn.V0;
+	Vector3f    u = a_End - a_Origin;       // a_Ray.P1 - S.P0;
+	Vector3f    w = a_Origin - a_PlanePos;  // S.P0 - Pn.V0;
 
-	float     D = a_PlaneNormal.Dot( u );//dot(Pn.n, u);
-	float     N = -(a_PlaneNormal.Dot( w ) );//-dot(a_Plane.n, w);
+	float     D = a_PlaneNormal.Dot( u );      // dot(Pn.n, u);
+	float     N = -(a_PlaneNormal.Dot( w ) );  // -dot(a_Plane.n, w);
 
 	const float EPSILON = 0.0001f;
-	if (fabs(D) < EPSILON) {          // segment is parallel to plane
-		if (N == 0)                     // segment lies in plane
+	if (fabs(D) < EPSILON)
+	{
+		// segment is parallel to plane
+		if (N == 0)
+		{
+			// segment lies in plane
 			return 2;
-		return 0;                   // no intersection
+		}
+		return 0;  // no intersection
 	}
+	
 	// they are not parallel
 	// compute intersect param
 	float sI = N / D;
 	if (sI < 0 || sI > 1)
-		return 0;                       // no intersection
+	{
+		return 0;  // no intersection
+	}
 
-	// Vector3f I ( a_Ray->GetOrigin() + sI * u );//S.P0 + sI * u;                 // compute segment intersect point
+	// Vector3f I ( a_Ray->GetOrigin() + sI * u );// S.P0 + sI * u;  // compute segment intersect point
 	RealHit = a_Origin + u * sI;
 	return 1;
 }
+
+
+
+
 
 int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Vector3i & a_BlockPos)
 {
@@ -302,7 +314,9 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	char BlockID = m_World->GetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 
 	if( BlockID == E_BLOCK_AIR || IsBlockWater(BlockID))
+	{
 		return 0;
+	}
 
 	Vector3f BlockPos;
 	BlockPos = Vector3f(SmallBlockPos);

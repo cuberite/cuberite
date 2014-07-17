@@ -49,7 +49,7 @@ public:
 		Vector3i BlockPos;
 		if (!GetBlockFromTrace(a_World, a_Player, BlockPos))
 		{
-			return false; // Nothing in range.
+			return false;  // Nothing in range.
 		}
 
 		if (a_World->GetBlockMeta(BlockPos.x, BlockPos.y, BlockPos.z) != 0)
@@ -160,7 +160,7 @@ public:
 			{
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
-					if (a_BlockMeta != 0) // GetBlockFromTrace is called for scooping up fluids; the hit block should be a source
+					if (a_BlockMeta != 0)  // GetBlockFromTrace is called for scooping up fluids; the hit block should be a source
 					{
 						return false;
 					}

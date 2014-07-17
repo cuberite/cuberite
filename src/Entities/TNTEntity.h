@@ -38,7 +38,7 @@ public:
 	
 protected:
 	int m_FuseTicks;      ///< How much ticks is left, while the tnt will explode
-}; // tolua_export
+};  // tolua_export
 
 
 

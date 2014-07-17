@@ -25,7 +25,7 @@ public:
 
 	virtual bool IsFood(void) override
 	{
-		switch (m_ItemType) // Special cases, both a seed and food
+		switch (m_ItemType)  // Special cases, both a seed and food
 		{
 			case E_ITEM_CARROT:
 			case E_ITEM_POTATO: return true;

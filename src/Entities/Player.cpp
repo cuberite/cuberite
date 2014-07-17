@@ -223,7 +223,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (!GetPosition().EqualsEps(m_LastPos, 0.01)) // Non negligible change in position from last tick?
+	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
@@ -284,19 +284,19 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 short cPlayer::CalcLevelFromXp(short a_XpTotal)
 {
-	//level 0 to 15
+	// level 0 to 15
 	if(a_XpTotal <= XP_TO_LEVEL15)
 	{
 		return a_XpTotal / XP_PER_LEVEL_TO15;
 	}
 
-	//level 30+
+	// level 30+
 	if(a_XpTotal > XP_TO_LEVEL30)
 	{
 		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
-	//level 16 to 30
+	// level 16 to 30
 	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
 }
 
@@ -306,19 +306,19 @@ short cPlayer::CalcLevelFromXp(short a_XpTotal)
 
 short cPlayer::XpForLevel(short a_Level)
 {
-	//level 0 to 15
+	// level 0 to 15
 	if(a_Level <= 15)
 	{
 		return a_Level * XP_PER_LEVEL_TO15;
 	}
 
-	//level 30+
+	// level 30+
 	if(a_Level >= 31)
 	{
 		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
 	}
 
-	//level 16 to 30
+	// level 16 to 30
 	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
 }
 
@@ -353,7 +353,7 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 	if(!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
-		return false; //oops, they gave us a dodgey number
+		return false;  // oops, they gave us a dodgey number
 	}
 
 	m_CurrentXp = a_CurrentXp;
@@ -375,7 +375,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		// Value was bad, abort and report
 		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.",
 			a_Xp_delta);
-		return -1; // Should we instead just return the current Xp?
+		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
@@ -477,7 +477,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
 
-		if (Dist >= 2.0) // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
+		if (Dist >= 2.0)  // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
 		{
 			// Increment statistic
 			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
@@ -623,7 +623,7 @@ void cPlayer::FinishEating(void)
 
 	GetInventory().RemoveOneEquippedItem();
 
-	//if the food is mushroom soup, return a bowl to the inventory
+	// if the food is mushroom soup, return a bowl to the inventory
 	if( Item.m_ItemType == E_ITEM_MUSHROOM_SOUP ) {
 		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
 		GetInventory().AddItem(emptyBowl, true, true);
@@ -871,10 +871,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (m_Health > 0)
 	{
-		return; //  not dead yet =]
+		return;  //  not dead yet =]
 	}
 
-	m_bVisible = false; // So new clients don't see the player
+	m_bVisible = false;  // So new clients don't see the player
 
 	// Puke out all the items
 	cItems Pickups;
@@ -925,7 +925,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	else
 	{
 		AString KillerClass = a_TDI.Attacker->GetClass();
-		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
@@ -1338,7 +1338,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
-	if (a_bVisible && !m_bVisible) // Make visible
+	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
 		m_World->BroadcastSpawnEntity(*this);
@@ -1420,7 +1420,7 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 				{
 					if( OtherSplit[i].compare( Split[i] ) != 0 )
 					{
-						if( OtherSplit[i].compare("*") == 0 ) return true; // WildCard man!! WildCard!
+						if( OtherSplit[i].compare("*") == 0 ) return true;  // WildCard man!! WildCard!
 						break;
 					}
 				}
@@ -1548,7 +1548,7 @@ void cPlayer::TossEquippedItem(char a_Amount)
 		char NewAmount = a_Amount;
 		if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
 		{
-			NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
+			NewAmount = GetInventory().GetEquippedItem().m_ItemCount;  // Drop only what's there
 		}
 
 		GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
@@ -1610,7 +1610,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because created by player
 }
 
 
@@ -1931,7 +1931,7 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 void cPlayer::UseEquippedItem(void)
 {
-	if (IsGameModeCreative()) // No damage in creative
+	if (IsGameModeCreative())  // No damage in creative
 	{
 		return;
 	}
@@ -2074,7 +2074,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 	{
 		if (IsClimbing())
 		{
-			if (a_DeltaPos.y > 0.0) // Going up
+			if (a_DeltaPos.y > 0.0)  // Going up
 			{
 				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
 			}
@@ -2093,7 +2093,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		}
 		else
 		{
-			if (Value >= 25) // Ignore small/slow movement
+			if (Value >= 25)  // Ignore small/slow movement
 			{
 				m_Stats.AddValue(statDistFlown, Value);
 			}

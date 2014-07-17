@@ -40,12 +40,12 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenNetherClumpFoliage:
 
 void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1; // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
+	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1;  // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
 	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.1;
 	
 	NOISE_DATATYPE Val1 = m_Noise.CubicNoise2D((float) (ChunkX * ChunkZ * 0.01f), (float) (ChunkZ / ChunkX * 0.01f));
@@ -125,7 +125,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			float zz = (float) a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = a_RelY - 2; y < a_RelY + 2; y++)
 			{
-				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) // Don't replace non air blocks.
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)  // Don't replace non air blocks.
 				{
 					continue;
 				}
@@ -136,7 +136,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 					continue;
 				}
 
-				if (IsFireBlock) // don't place fire on non-forever burning blocks.
+				if (IsFireBlock)  // don't place fire on non-forever burning blocks.
 				{
 					if (!cFireSimulator::DoesBurnForever(BlockBelow))
 					{
@@ -159,7 +159,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
 bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)
@@ -309,7 +309,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSnow:
 
 void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -345,7 +345,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenIce:
 
 void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -385,7 +385,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenLilypads:
 
 int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
@@ -447,7 +447,7 @@ void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenBottomLava:
 
 void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -470,7 +470,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenPreSimulator:
 
 cFinishGenPreSimulator::cFinishGenPreSimulator(void)
@@ -637,7 +637,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenFluidSprings:
 
 cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :

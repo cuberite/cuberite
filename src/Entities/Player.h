@@ -174,7 +174,7 @@ public:
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, NULL if none */
-	cTeam * GetTeam(void) { return m_Team; } // tolua_export
+	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
 	/** Sets the player team, NULL if none */
 	void SetTeam(cTeam * a_Team);
@@ -200,7 +200,7 @@ public:
 
 	/** Forces the player to move in the given direction. 
 	@deprecated Use SetSpeed instead. */
-	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
+	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
@@ -570,7 +570,7 @@ protected:
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

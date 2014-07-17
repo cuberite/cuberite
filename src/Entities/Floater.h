@@ -14,7 +14,7 @@ class cFloater :
 	typedef cEntity super;
 	
 public:
-	//tolua_end
+	// tolua_end
 
 	CLASS_PROTODEF(cFloater);
 
@@ -43,4 +43,4 @@ protected:
 	// Entity IDs
 	int m_PlayerID;
 	int m_AttachedMobID;
-} ; // tolua_export
+} ;  // tolua_export

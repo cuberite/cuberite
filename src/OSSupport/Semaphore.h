@@ -9,7 +9,7 @@ public:
 	void Wait();
 	void Signal();
 private:
-	void* m_Handle; // HANDLE pointer
+	void* m_Handle;  // HANDLE pointer
 
 #ifndef _WIN32
 	bool m_bNamed;

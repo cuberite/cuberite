@@ -17,13 +17,15 @@
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cFloaterCallback
 class cFloaterCallback :
 	public cEntityCallback
 {
 public:
-	cFloaterCallback(void) : 
+	cFloaterCallback(void) :
 		m_CanPickup(false),
 		m_AttachedMobID(-1)
 	{
@@ -49,8 +51,13 @@ protected:
 	Vector3d m_Pos;
 } ;
 
-////////////////////////////////////////////////////////////////////////////
-// cSweepEntityCallback
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSweepEntityCallback:
+
 class cSweepEntityCallback :
 	public cEntityCallback
 {
@@ -70,6 +77,8 @@ public:
 protected:
 	Vector3d m_PlayerPos;
 } ;
+
+
 
 
 
@@ -106,19 +115,19 @@ public:
 			{
 				cItems Drops;
 				int ItemCategory = a_World->GetTickRandomNumber(99);
-				if (ItemCategory <= 4) // Treasures 5%
+				if (ItemCategory <= 4)  // Treasures 5%
 				{
 					int Treasure = a_World->GetTickRandomNumber(5);
 					switch (Treasure)
 					{
 						case 0:
 						{
-							Drops.Add(cItem(E_ITEM_BOW)); // TODO: Enchantments
+							Drops.Add(cItem(E_ITEM_BOW));  // TODO: Enchantments
 							break;
 						}
 						case 1:
 						{
-							Drops.Add(cItem(E_ITEM_BOOK)); // TODO: Enchanted book
+							Drops.Add(cItem(E_ITEM_BOOK));  // TODO: Enchanted book
 							break;
 						}
 						case 2:
@@ -237,3 +246,7 @@ public:
 		return true;
 	}
 } ;
+
+
+
+

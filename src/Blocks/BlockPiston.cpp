@@ -235,7 +235,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cBlockPistonHeadHandler:
 
 cBlockPistonHeadHandler::cBlockPistonHeadHandler(void) :
@@ -262,7 +262,7 @@ void cBlockPistonHeadHandler::OnDestroyedByPlayer(cChunkInterface & a_ChunkInter
 		a_ChunkInterface.DigBlock(a_WorldInterface, newX, newY, newZ);
 		if (a_Player->IsGameModeCreative())
 		{
-			return; // No pickups if creative
+			return;  // No pickups if creative
 		}
 
 		cItems Pickups;

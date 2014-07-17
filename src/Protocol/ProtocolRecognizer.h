@@ -139,8 +139,8 @@ public:
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 protected:
-	cProtocol * m_Protocol;  //< The recognized protocol
-	cByteBuffer m_Buffer;    //< Buffer for the incoming data until we recognize the protocol
+	cProtocol * m_Protocol;  ///< The recognized protocol
+	cByteBuffer m_Buffer;    ///< Buffer for the incoming data until we recognize the protocol
 	
 	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
 	bool TryRecognizeProtocol(void);

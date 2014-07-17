@@ -39,7 +39,7 @@ static int tolua_get_AllToLua_g_BlockLightValue(lua_State* tolua_S)
 	tolua_pushnumber(tolua_S,(lua_Number)cBlockInfo::GetLightValue((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -65,7 +65,7 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 	tolua_pushnumber(tolua_S, (lua_Number)cBlockInfo::GetSpreadLightFalloff((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -91,7 +91,7 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, cBlockInfo::IsTransparent((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -117,7 +117,7 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, cBlockInfo::IsOneHitDig((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -143,7 +143,7 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, cBlockInfo::IsPistonBreakable((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -169,7 +169,7 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, cBlockInfo::IsSnowable((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -195,7 +195,7 @@ static int tolua_get_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, cBlockInfo::RequiresSpecialTool((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -221,7 +221,7 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, (bool)cBlockInfo::IsSolid((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 
@@ -247,7 +247,7 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 	tolua_pushboolean(tolua_S, (bool)cBlockInfo::FullyOccupiesVoxel((BLOCKTYPE)BlockType));
 	return 1;
 }
-#endif //#ifndef TOLUA_DISABLE
+#endif  // #ifndef TOLUA_DISABLE
 
 
 

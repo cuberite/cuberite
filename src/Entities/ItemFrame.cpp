@@ -43,7 +43,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 
-	GetWorld()->BroadcastEntityMetadata(*this); // Update clients
+	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
 }
 
 

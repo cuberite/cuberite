@@ -36,10 +36,10 @@ cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* 
 	}
 #else
 	m_Handle = CreateSemaphore(
-		NULL, // security attribute
-		a_InitialCount, // initial count
-		a_MaxCount, // maximum count
-		0 // name (optional)
+		NULL,  // security attribute
+		a_InitialCount,  // initial count
+		a_MaxCount,  // maximum count
+		0  // name (optional)
 		);
 #endif
 }

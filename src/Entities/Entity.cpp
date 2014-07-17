@@ -272,7 +272,7 @@ void cEntity::SetYawFromSpeed(void)
 void cEntity::SetPitchFromSpeed(void)
 {
 	const double EPS = 0.0000001;
-	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z); // Speed XZ-plane component
+	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
 	if ((abs(xz) < EPS) && (abs(m_Speed.y) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
@@ -316,7 +316,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage += 2;
-				m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
+				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
 			}
 		}
 
@@ -332,7 +332,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL)) // Knockback for only players and mobs
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{
 		int KnockbackLevel = 0;
 		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
@@ -767,11 +767,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		NextSpeed.x *= 0.25;
 		NextSpeed.z *= 0.25;
 	}
-					
-	//Get water direction
+
+	// Get water direction
 	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
-	m_WaterSpeed *= 0.9f;		//Reduce speed each tick
+	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
 
 	switch(WaterDir)
 	{
@@ -828,7 +828,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-				if (Tracer.HitNormal.y == 1) // Hit BLOCK_FACE_YP, we are on the ground
+				if (Tracer.HitNormal.y == 1)  // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
@@ -1095,9 +1095,9 @@ void cEntity::HandleAir(void)
 
 	if (IsSubmerged())
 	{
-		if (!IsPlayer()) // Players control themselves
+		if (!IsPlayer())  // Players control themselves
 		{
-			SetSpeedY(1); // Float in the water
+			SetSpeedY(1);  // Float in the water
 		}
 
 		// Either reduce air level or damage player
@@ -1266,9 +1266,9 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		int DiffY = (int)(floor(GetPosY() * 32.0) - floor(m_LastPos.y * 32.0));
 		int DiffZ = (int)(floor(GetPosZ() * 32.0) - floor(m_LastPos.z * 32.0));
 
-		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0)) // Have we moved?
+		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127)) // Limitations of a Byte
+			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
 			{
 				// Difference within Byte limitations, use a relative move packet
 				if (m_bDirtyOrientation)
@@ -1288,7 +1288,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			{
 				// Too big a movement, do a teleport
 				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastPos = GetPosition(); // See above
+				m_LastPos = GetPosition();  // See above
 				m_bDirtyOrientation = false;
 			}
 		}
@@ -1587,7 +1587,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 
 
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
 Vector3d cEntity::GetLookVector(void) const
 {
@@ -1601,7 +1601,7 @@ Vector3d cEntity::GetLookVector(void) const
 
 
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Set position
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
