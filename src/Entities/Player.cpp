@@ -905,6 +905,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
 			case dtLavaContact: DamageText = "was melted by lava"; break;
 			case dtPoisoning: DamageText = "died from septicaemia"; break;
+			case dtWithering: DamageText = "is a husk of their former selves"
 			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
 			case dtFireContact: DamageText = "burnt themselves to death"; break;
 			case dtInVoid: DamageText = "somehow fell out of the world"; break;
