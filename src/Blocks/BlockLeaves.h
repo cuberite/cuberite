@@ -43,11 +43,17 @@ public:
 		// Only the first 2 bits contain the display information, the others are for growing
 		if (rand.NextInt(6) == 0)
 		{
-			a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 3));
+			a_Pickups.push_back(
+				cItem(
+					E_BLOCK_SAPLING,
+					1,
+					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : (2 << (a_BlockMeta & 0x01)) // Old leaves - 3 bits contain display; new leaves - 1st bit, shifted left two for saplings to understand
+				)
+			);
 		}
 		
 		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
-		if ((a_BlockMeta & 3) == E_META_LEAVES_APPLE)
+		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
 			if (rand.NextInt(101) == 0)
 			{
