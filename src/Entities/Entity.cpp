@@ -368,7 +368,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if (m_Health <= 0)
 	{
-		KilledBy(a_TDI.Attacker);
+		KilledBy(a_TDI);
 
 		if (a_TDI.Attacker != NULL)
 		{
@@ -524,11 +524,11 @@ double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 
 
 
-void cEntity::KilledBy(cEntity * a_Killer)
+void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 {
 	m_Health = 0;
 
-	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_Killer);
+	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI.Attacker, a_TDI);
 	
 	if (m_Health > 0)
 	{
@@ -538,7 +538,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 
 	// Drop loot:
 	cItems Drops;
-	GetDrops(Drops, a_Killer);
+	GetDrops(Drops, a_TDI.Attacker);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 
 	m_World->BroadcastEntityStatus(*this, esGenericDead);
