@@ -102,15 +102,6 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryT
 {
 	cItem ToAdd(a_Item);
 	int res = 0;
-	if (ItemCategory::IsArmor(a_Item.m_ItemType))
-	{
-		res = m_ArmorSlots.AddItem(ToAdd, a_AllowNewStacks);
-		ToAdd.m_ItemCount -= res;
-		if (ToAdd.m_ItemCount == 0)
-		{
-			return res;
-		}
-	}
 
 	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks, a_tryToFillEquippedFirst ? m_EquippedSlotNum : -1);
 	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;

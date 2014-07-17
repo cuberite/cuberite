@@ -1866,6 +1866,19 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
+	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
+	{
+		if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
+		
+		// Creative inventory must treat a_ClickedItem as a DraggedItem instead, replacing the inventory slot with it
+		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
+		return;
+	}
+
 	bool bAsync = false;
 	if (GetSlot(a_SlotNum, a_Player) == NULL)
 	{
