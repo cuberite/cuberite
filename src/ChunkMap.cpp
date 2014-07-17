@@ -1837,7 +1837,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							// Activate the TNT, with a random fuse between 10 to 30 game ticks
 							int FuseTime = 10 + m_World->GetTickRandomNumber(20);
 							m_World->SpawnPrimedTNT(a_BlockX + x + 0.5, a_BlockY + y + 0.5, a_BlockZ + z + 0.5, FuseTime);
-							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
 							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 							break;
 						}
@@ -1894,7 +1894,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 								m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
 							}
 
-							area.SetBlockType(bx + x, by + y, bz + z, E_BLOCK_AIR);
+							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
 							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 							break;
 							
