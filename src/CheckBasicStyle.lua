@@ -6,13 +6,16 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Tabs for indentation, spaces for alignment
 	- Trailing whitespace on non-empty lines
 	- Two spaces between code and line-end comment ("//")
-	- (TODO) Spaces around +, -, (cannot check /, * or & due to their other usage - comment, ptr deref, address-of)
+	- Spaces after comma, not before (except in #define argument list)
 	- (TODO) Spaces before *, /, &
-	- (TODO) Spaces after ,
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
 	- (TODO) Braces not on the end of line
 	- (TODO) Line dividers (////...) exactly 80 slashes
+	- (TODO) Not using "* "-style doxy comments continuation lines
+	
+Violations that cannot be checked easily:
+	- Spaces around "+" (there are things like "a++", "++a", "a += 1", "X+", "stack +1" and ascii-drawn tables)
 	
 Reports all violations on stdout in a form that is readable by Visual Studio's parser, so that dblclicking
 the line brings the editor directly to the violation.
@@ -85,6 +88,45 @@ end
 
 
 
+--- Searches for the specified pattern, if found, reports it as a violation with the given message
+local function ReportViolationIfFound(a_Line, a_FileName, a_LineNum, a_Pattern, a_Message)
+	local patStart, patEnd = a_Line:find(a_Pattern)
+	if not(patStart) then
+		return
+	end
+	ReportViolation(a_FileName, a_LineNum, a_Message .. "(" .. patStart .. " .. " .. patEnd .. ")")
+end
+
+
+
+
+
+local g_ViolationPatterns =
+{
+	-- Check against indenting using spaces:
+	{"^\t* +", "Indenting with a space"},
+	
+	-- Check against alignment using tabs:
+	{"[^%s]\t+[^%s]", "Aligning with a tab"},
+	
+	-- Check against trailing whitespace:
+	{"[^%s]%s+\n", "Trailing whitespace"},
+	
+	-- Check that all "//"-style comments have at least two spaces in front (unless alone on line):
+	{"[^%s] //", "Needs at least two spaces in front of a \"//\"-style comment"},
+	
+	-- Check that all "//"-style comments have at least one spaces after:
+	{"%s//[^%s/*<]", "Needs a space after a \"//\"-style comment"},
+	
+	-- Check that all commas have spaces after them and not in front of them:
+	{" ,", "Extra space before a \",\""},
+	{"^\t*[^#].*,[^%s]", "Needs a space after a \",\""},  -- Anywhere except lines starting with "#" - avoid #define params
+}
+
+
+
+
+
 --- Processes one file
 local function ProcessFile(a_FileName)
 	assert(type(a_FileName) == "string")
@@ -113,26 +155,11 @@ local function ProcessFile(a_FileName)
 	all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
 	string.gsub(all .. "\n", "[^\n]*\n",  -- Iterate over each line, while preserving empty lines
 		function(a_Line)
-			-- Check against indenting using spaces:
-			if (a_Line:find("^\t* +")) then  -- Find any number of tabs at the start of line (incl 0), followed by a space
-				ReportViolation(a_FileName, lineCounter, "Indenting with a space")
+			-- Check against each violation pattern:
+			for _, pat in ipairs(g_ViolationPatterns) do
+				ReportViolationIfFound(a_Line, a_FileName, lineCounter, pat[1], pat[2])
 			end
-			-- Check against alignment using tabs:
-			if (a_Line:find("[^%s]\t+[^%s]")) then  -- Find any number of tabs after non-whitespace followed by non-whitespace
-				ReportViolation(a_FileName, lineCounter, "Aligning with a tab")
-			end
-			-- Check against trailing whitespace:
-			if (a_Line:find("[^%s]%s+\n")) then  -- Find any whitespace after non-whitespace at the end of line
-				ReportViolation(a_FileName, lineCounter, "Trailing whitespace")
-			end
-			-- Check that all "//"-style comments have at least two spaces in front (unless alone on line):
-			if (a_Line:find("[^%s] //")) then
-				ReportViolation(a_FileName, lineCounter, "Needs at least two spaces in front of a \"//\"-style comment")
-			end
-			-- Check that all "//"-style comments have at least one spaces after:
-			if (a_Line:find("%s//[^%s/*<]")) then
-				ReportViolation(a_FileName, lineCounter, "Needs a space after a \"//\"-style comment")
-			end
+
 			lineCounter = lineCounter + 1
 		end
 	)
