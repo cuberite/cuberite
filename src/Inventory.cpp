@@ -151,6 +151,24 @@ int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a
 
 
 
+int cInventory::RemoveItem(const cItem & a_ItemStack)
+{
+	int RemovedItems = m_HotbarSlots.RemoveItem(a_ItemStack);
+
+	if (RemovedItems < a_ItemStack.m_ItemCount)
+	{
+		cItem Temp(a_ItemStack);
+		Temp.m_ItemCount -= RemovedItems;
+		RemovedItems += m_InventorySlots.RemoveItem(Temp);
+	}
+
+	return RemovedItems;
+}
+
+
+
+
+
 bool cInventory::RemoveOneEquippedItem(void)
 {
 	if (m_HotbarSlots.GetSlot(m_EquippedSlotNum).IsEmpty())
