@@ -1107,18 +1107,21 @@ end
 
 
 function HandleRMItem(a_Split, a_Player)
-	if ((#a_Split ~= 2) and (#a_Split ~= 3)) then
+	-- Check params:
+	if (a_Split[2] == nil) then
 		a_Player:SendMessage("Usage: /rmitem <Item> [Count]")
 		return true
 	end
 
+	-- Parse the item type:
 	local Item = cItem()
 	if (not StringToItem(a_Split[2], Item)) then
 		a_Player:SendMessageFailure(a_Split[2] .. " isn't a valid item")
 		return true
 	end
 
-	if (#a_Split == 3) then
+	-- Parse the optional item count
+	if (a_Split[3] ~= nil) then
 		local Count = tonumber(a_Split[3])
 		if (Count == nil) then
 			a_Player:SendMessageFailure(a_Split[3] .. " isn't a valid number")
@@ -1128,8 +1131,9 @@ function HandleRMItem(a_Split, a_Player)
 		Item.m_ItemCount = Count
 	end
 
-	local RemovedItems = a_Player:GetInventory():RemoveItem(Item)
-	a_Player:SendMessageSuccess("Removed " .. RemovedItems .. " Items!")
+	-- Remove the item:
+	local NumRemovedItems = a_Player:GetInventory():RemoveItem(Item)
+	a_Player:SendMessageSuccess("Removed " .. NumRemovedItems .. " Items!")
 	return true
 end
 
