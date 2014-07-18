@@ -60,6 +60,8 @@ SET (HDRS
 	ThrownSnowballEntity.h
 	WitherSkullEntity.h)
 
-add_library(Entities ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(Entities ${SRCS} ${HDRS})
 
-target_link_libraries(Entities WorldStorage)
+	target_link_libraries(Entities WorldStorage)
+endif()

@@ -73,4 +73,6 @@ SET (HDRS
 	Zombie.h
 	ZombiePigman.h)
 
-add_library(Mobs ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(Mobs ${SRCS} ${HDRS})
+endif()

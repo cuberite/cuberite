@@ -39,4 +39,6 @@ SET (HDRS
 	NoteEntity.h
 	SignEntity.h)
 
-add_library(BlockEntities ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(BlockEntities ${SRCS} ${HDRS})
+endif()

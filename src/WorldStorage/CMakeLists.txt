@@ -30,6 +30,8 @@ SET (HDRS
 	WSSCompact.h
 	WorldStorage.h)
 
-add_library(WorldStorage ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(WorldStorage ${SRCS} ${HDRS})
 
-target_link_libraries(WorldStorage OSSupport)
+	target_link_libraries(WorldStorage OSSupport)
+endif()

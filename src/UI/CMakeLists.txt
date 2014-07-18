@@ -13,4 +13,6 @@ SET (HDRS
 	Window.h
 	WindowOwner.h)
 
-add_library(UI ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(UI ${SRCS} ${HDRS})
+endif()

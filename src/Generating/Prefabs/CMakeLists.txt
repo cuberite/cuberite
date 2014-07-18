@@ -26,6 +26,8 @@ SET (HDRS
 	TestRailsPrefabs.h
 	UnderwaterBasePrefabs.h)
 
-add_library(Generating_Prefabs ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(Generating_Prefabs ${SRCS} ${HDRS})
 
-target_link_libraries(Generating_Prefabs OSSupport iniFile Blocks)
+	target_link_libraries(Generating_Prefabs OSSupport iniFile Blocks)
+endif()

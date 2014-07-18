@@ -51,4 +51,6 @@ SET (HDRS
 	ItemSword.h
 	ItemThrowable.h)
 
-add_library(Items ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(Items ${SRCS} ${HDRS})
+endif()

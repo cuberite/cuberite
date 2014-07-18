@@ -58,6 +58,8 @@ SET (HDRS
 	UnderwaterBaseGen.h
 	VillageGen.h)
 
-add_library(Generating ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(Generating ${SRCS} ${HDRS})
 
-target_link_libraries(Generating OSSupport iniFile Blocks)
+	target_link_libraries(Generating OSSupport iniFile Blocks)
+endif()

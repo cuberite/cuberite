@@ -35,8 +35,10 @@ SET (HDRS
 	Thread.h
 	Timer.h)
 
-add_library(OSSupport ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(OSSupport ${SRCS} ${HDRS})
 
-if(UNIX)
-	target_link_libraries(OSSupport pthread)
+	if(UNIX)
+		target_link_libraries(OSSupport pthread)
+	endif()
 endif()

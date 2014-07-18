@@ -27,4 +27,6 @@ SET (HDRS
 	Protocol17x.h
 	ProtocolRecognizer.h)
 
-add_library(Protocol ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(Protocol ${SRCS} ${HDRS})
+endif()

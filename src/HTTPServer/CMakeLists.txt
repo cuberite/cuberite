@@ -24,4 +24,6 @@ SET (HDRS
 	NameValueParser.h
 	SslHTTPConnection.h)
 
-add_library(HTTPServer ${SRCS} ${HDRS})
+if(NOT MSVC)
+	add_library(HTTPServer ${SRCS} ${HDRS})
+endif()
