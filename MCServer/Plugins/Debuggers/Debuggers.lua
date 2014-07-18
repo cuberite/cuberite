@@ -60,9 +60,10 @@ function Initialize(Plugin)
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
-	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
-	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one")
-	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z")
+	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings");
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
+	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z");
+	PM:BindCommand("/rmitem",  "debuggers", HandleRMItem,          "- Remove the specified item from the inventory.");
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -533,7 +534,7 @@ function OnTakeDamage(Receiver, TDI)
 	-- Receiver is cPawn
 	-- TDI is TakeDamageInfo
 
-	LOG(Receiver:GetClass() .. " was dealt " .. DamageTypeToString(TDI.DamageType) .. " damage: Raw " .. TDI.RawDamage .. ", Final " .. TDI.FinalDamage .. " (" .. (TDI.RawDamage - TDI.FinalDamage) .. " covered by armor)");
+	-- LOG(Receiver:GetClass() .. " was dealt " .. DamageTypeToString(TDI.DamageType) .. " damage: Raw " .. TDI.RawDamage .. ", Final " .. TDI.FinalDamage .. " (" .. (TDI.RawDamage - TDI.FinalDamage) .. " covered by armor)");
 	return false;
 end
 
@@ -1098,6 +1099,37 @@ function HandleSched(a_Split, a_Player)
 		end
 	)
 	
+	return true
+end
+
+
+
+
+
+function HandleRMItem(a_Split, a_Player)
+	if ((#a_Split ~= 2) and (#a_Split ~= 3)) then
+		a_Player:SendMessage("Usage: /rmitem <Item> [Count]")
+		return true
+	end
+
+	local Item = cItem()
+	if (not StringToItem(a_Split[2], Item)) then
+		a_Player:SendMessageFailure(a_Split[2] .. " isn't a valid item")
+		return true
+	end
+
+	if (#a_Split == 3) then
+		local Count = tonumber(a_Split[3])
+		if (Count == nil) then
+			a_Player:SendMessageFailure(a_Split[3] .. " isn't a valid number")
+			return true
+		end
+
+		Item.m_ItemCount = Count
+	end
+
+	local RemovedItems = a_Player:GetInventory():RemoveItem(Item)
+	a_Player:SendMessageSuccess("Removed " .. RemovedItems .. " Items!")
 	return true
 end
 

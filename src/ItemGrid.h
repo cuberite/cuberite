@@ -96,6 +96,9 @@ public:
 	Returns the total number of items that fit.
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
+
+	/** Remove the specified item with the specified amount from the inventory. Returns the amount from the items were was removed. */
+	int RemoveItem(const cItem & a_ItemStack);
 	
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
