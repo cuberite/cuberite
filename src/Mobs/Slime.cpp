@@ -9,7 +9,6 @@
 
 
 
-/// Creates a slime of the specified size; size is 1 .. 3, with 1 being the smallest
 cSlime::cSlime(int a_Size) :
 	super("Slime",
 		mtSlime,
@@ -36,7 +35,8 @@ void cSlime::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
 
-	if (GetSize() == 1)
+	// Only slimes with the size 1 can drop slimeballs.
+	if (m_Size == 1)
 	{
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_SLIMEBALL);
 	}

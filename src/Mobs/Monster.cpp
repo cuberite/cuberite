@@ -867,7 +867,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(Random.NextInt(2) + 1);
+			toReturn = new cSlime(1 << Random.NextInt(3));
 			break;
 		}
 		case mtSkeleton:
