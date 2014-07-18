@@ -105,8 +105,8 @@ void cServer::cTickThread::Execute(void)
 // cServer:
 
 cServer::cServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client IPv6"),
+	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client"),
+	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client"),
 	m_PlayerCount(0),
 	m_PlayerCountDiff(0),
 	m_ClientViewDistance(0),
