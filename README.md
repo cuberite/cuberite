@@ -5,7 +5,7 @@ MCServer is a Minecraft server that is written in C++ and designed to be efficie
 
 MCServer can run on PCs, Macs, and *nix. This includes android phones and tablets as well as Raspberry Pis. 
 
-We currently support the protocol from Minecraft 1.2 all the way up to Minecraft 1.7.9.
+We currently support the protocol from Minecraft 1.2 all the way up to Minecraft 1.7.10.
 
 Installation
 ------------
