@@ -97,7 +97,8 @@ public:
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
 
-	/** Remove the specified item with the specified amount from the inventory. Returns the amount from the items were was removed. */
+	/** Removes the specified item from the grid, as many as possible, up to a_ItemStack.m_ItemCount.
+	Returns the number of items that were removed. */
 	int RemoveItem(const cItem & a_ItemStack);
 	
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.

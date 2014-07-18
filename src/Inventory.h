@@ -86,7 +86,8 @@ public:
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst);
 
-	/** Remove the specified item with the specified amount from the inventory. Returns the amount from the items were was removed. */
+	/** Removes the specified item from the inventory, as many as possible, up to a_ItemStack.m_ItemCount.
+	Returns the number of items that were removed. */
 	int RemoveItem(const cItem & a_ItemStack);
 
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
