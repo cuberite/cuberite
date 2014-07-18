@@ -496,9 +496,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_CROPS               ].m_IsSolid = false;
 	a_Info[E_BLOCK_DANDELION           ].m_IsSolid = false;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSolid = false;
-	a_Info[E_BLOCK_END_PORTAL          ].m_IsSolid = false;
-	a_Info[E_BLOCK_FENCE               ].m_IsSolid = false;
-	a_Info[E_BLOCK_FENCE_GATE          ].m_IsSolid = false;
 	a_Info[E_BLOCK_FIRE                ].m_IsSolid = false;
 	a_Info[E_BLOCK_FLOWER              ].m_IsSolid = false;
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;
@@ -530,7 +527,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_WATER               ].m_IsSolid = false;
 	a_Info[E_BLOCK_WOODEN_BUTTON       ].m_IsSolid = false;
 	a_Info[E_BLOCK_WOODEN_PRESSURE_PLATE].m_IsSolid = false;
-	a_Info[E_BLOCK_WOODEN_SLAB         ].m_IsSolid = false;
 
 
 	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:

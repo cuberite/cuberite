@@ -48,7 +48,7 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSkeleton::MoveToPosition(const Vector3f & a_Position)
+void cSkeleton::MoveToPosition(const Vector3d & a_Position)
 {
 	// If the destination is sufficiently skylight challenged AND the skeleton isn't on fire then block the movement
 	if (

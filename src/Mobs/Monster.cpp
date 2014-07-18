@@ -115,8 +115,6 @@ void cMonster::TickPathFinding()
 	const int PosY = POSY_TOINT;
 	const int PosZ = POSZ_TOINT;
 
-	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
-
 	std::vector<Vector3d> m_PotentialCoordinates;
 	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
 
@@ -201,19 +199,6 @@ void cMonster::TickPathFinding()
 
 
 
-void cMonster::MoveToPosition(const Vector3f & a_Position)
-{
-	FinishPathFinding();
-
-	m_FinalDestination = a_Position;
-	m_bMovingToDestination = true;
-	TickPathFinding();
-}
-
-
-
-
-
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 	FinishPathFinding();
@@ -227,15 +212,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 
 bool cMonster::IsCoordinateInTraversedList(Vector3i a_Coords)
 {
-	for (std::vector<Vector3i>::const_iterator itr = m_TraversedCoordinates.begin(); itr != m_TraversedCoordinates.end(); ++itr)
-	{
-		if (itr->Equals(a_Coords))
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return (std::find(m_TraversedCoordinates.begin(), m_TraversedCoordinates.end(), a_Coords) != m_TraversedCoordinates.end());
 }
 
 
@@ -296,8 +273,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bOnGround)
 		{
-			m_Destination.y = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
-
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;

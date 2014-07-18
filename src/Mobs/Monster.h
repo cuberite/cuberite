@@ -92,7 +92,6 @@ public:
 	
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 	virtual bool ReachedDestination(void);
 	
