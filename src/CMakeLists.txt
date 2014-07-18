@@ -5,8 +5,10 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
-set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
-set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
+set(FOLDERS
+	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++
+	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs
+)
 
 set(BINDING_DEPENDECIES
 	tolua
@@ -261,9 +263,11 @@ endif ()
 
 
 if (NOT MSVC)
-	target_link_libraries(${EXECUTABLE} OSSupport HTTPServer Bindings Items Blocks)
-	target_link_libraries(${EXECUTABLE} Protocol Generating Generating_Prefabs WorldStorage)
-	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities PolarSSL++)
+	target_link_libraries(${EXECUTABLE}
+		OSSupport HTTPServer Bindings Items Blocks
+		Protocol Generating Generating_Prefabs WorldStorage
+		Mobs Entities Simulator UI BlockEntities PolarSSL++
+	)
 endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
