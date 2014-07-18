@@ -1209,11 +1209,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)) && !m_Player->IsGameModeCreative())
+	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
 	{
-		if (m_Player->IsSatiated() && !ItemHandler->IsDrinkable(EquippedDamage))
+		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&
+			ItemHandler->IsFood())
 		{
-			// The player is satiated, they cannot eat
+			// The player is satiated or in creative, and trying to eat
 			return;
 		}
 		m_Player->StartEating();
