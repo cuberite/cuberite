@@ -326,11 +326,6 @@ public:
 
 	virtual void Killed(cEntity * a_Victim) override;
 
-	void Respawn(void); // tolua_export
-
-	void SetVisible(bool a_bVisible); // tolua_export
-	bool IsVisible(void) const { return m_bVisible; } // tolua_export
-
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible );  // tolua_export
@@ -352,7 +347,7 @@ Takes a (NULL) cWorld pointer which it will assign a value to based on either th
 	
 	/** Loads the player data from the specified file.
 	Returns true on success, false on failure. */
-	bool LoadFromFile(const AString & a_FileName);
+	bool LoadFromFile(const AString & a_FileName, cWorld * a_World);
 	
 	void LoadPermissionsFromDisk(void);  // tolua_export
 
@@ -544,8 +539,6 @@ protected:
 
 	cStatManager m_Stats;
 
-<<<<<<< HEAD
-=======
 	/** Flag representing whether the player is currently in a bed
 	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
 	bool m_bIsInBed;
@@ -563,8 +556,6 @@ protected:
 	If no ClientHandle is given, the UUID is initialized to empty. */
 	AString m_UUID;
 
-
->>>>>>> master
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 

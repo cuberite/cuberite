@@ -630,12 +630,6 @@ public:
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 
-	bool AreNetherPortalsEnabled(void) const { return m_bNetherPortalsEnabled; }
-	void SetNetherPortalsEnabled(bool a_Flag) { m_bNetherPortalsEnabled = a_Flag; }
-
-	bool AreEndPortalsEnabled(void) const { return m_bEndPortalsEnabled; }
-	void SetEndPortalsEnabled(bool a_Flag) { m_bEndPortalsEnabled = a_Flag; }
-
 	AString GetNetherWorldName(void) const { return m_NetherWorldName; }
 	void SetNetherWorldName(const AString & a_Name) { m_NetherWorldName = a_Name; }
 
@@ -937,12 +931,6 @@ private:
 	See the eShrapnelLevel enumeration for details
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
-
-	/** Whether nether portals teleport entities */
-	bool m_bNetherPortalsEnabled;
-
-	/** Whether end portals teleport entities */
-	bool m_bEndPortalsEnabled;
 
 	/** Name of the nether world */
 	AString m_NetherWorldName;

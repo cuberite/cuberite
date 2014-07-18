@@ -1028,7 +1028,7 @@ void cEntity::DetectCacti(void)
 
 void cEntity::DetectPortal()
 {
-	if (!GetWorld()->AreNetherPortalsEnabled() && !GetWorld()->AreEndPortalsEnabled())
+	if (!GetWorld()->GetNetherWorldName().empty() && !GetWorld()->GetEndWorldName().empty())
 	{
 		return;
 	}
@@ -1040,7 +1040,7 @@ void cEntity::DetectPortal()
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
-				if (!GetWorld()->AreNetherPortalsEnabled() || m_PortalCooldownData.second)
+				if (GetWorld()->GetNetherWorldName().empty() || m_PortalCooldownData.second)
 				{
 					return;
 				}
@@ -1085,7 +1085,7 @@ void cEntity::DetectPortal()
 			}
 			case E_BLOCK_END_PORTAL:
 			{
-				if (!GetWorld()->AreEndPortalsEnabled() || m_PortalCooldownData.second)
+				if (GetWorld()->GetNetherWorldName().empty() || m_PortalCooldownData.second)
 				{
 					return;
 				}

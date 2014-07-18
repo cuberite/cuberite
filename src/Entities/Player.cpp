@@ -1695,12 +1695,7 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-<<<<<<< HEAD
 bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
-=======
-
-bool cPlayer::LoadFromDisk(void)
->>>>>>> master
 {
 	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
 	if (a_World == NULL)
@@ -1711,7 +1706,7 @@ bool cPlayer::LoadFromDisk(void)
 	LoadPermissionsFromDisk();
 
 	// Load from the UUID file:
-	if (LoadFromFile(GetUUIDFileName(m_UUID)))
+	if (LoadFromFile(GetUUIDFileName(m_UUID), a_World))
 	{
 		return true;
 	}
@@ -1720,7 +1715,7 @@ bool cPlayer::LoadFromDisk(void)
 	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
 	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
 	{
-		if (LoadFromFile(GetUUIDFileName(OfflineUUID)))
+		if (LoadFromFile(GetUUIDFileName(OfflineUUID), a_World))
 		{
 			return true;
 		}
@@ -1730,7 +1725,7 @@ bool cPlayer::LoadFromDisk(void)
 	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
 	{
 		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
-		if (LoadFromFile(OldStyleFileName))
+		if (LoadFromFile(OldStyleFileName, a_World))
 		{
 			// Save in new format and remove the old file
 			if (SaveToDisk())
@@ -1752,7 +1747,7 @@ bool cPlayer::LoadFromDisk(void)
 
 
 
-bool cPlayer::LoadFromFile(const AString & a_FileName)
+bool cPlayer::LoadFromFile(const AString & a_FileName, cWorld * a_World)
 {
 	// Load the data from the file:
 	cFile f;
@@ -1860,28 +1855,6 @@ bool cPlayer::SaveToDisk()
 	cEnderChestEntity::SaveToJson(JSON_EnderChestInventory, m_EnderChestContents);
 
 	Json::Value root;
-<<<<<<< HEAD
-	root["position"]       = JSON_PlayerPosition;
-	root["rotation"]       = JSON_PlayerRotation;
-	root["inventory"]      = JSON_Inventory;
-	root["health"]         = m_Health;
-	root["xpTotal"]        = m_LifetimeTotalXp;
-	root["xpCurrent"]      = m_CurrentXp;
-	root["air"]            = m_AirLevel;
-	root["food"]           = m_FoodLevel;
-	root["foodSaturation"] = m_FoodSaturationLevel;
-	root["foodTickTimer"]  = m_FoodTickTimer;
-	root["foodExhaustion"] = m_FoodExhaustionLevel;
-	root["world"]          = GetWorld()->GetName();
-	root["isflying"]       = IsFlying();
-	root["SpawnX"]         = GetLastBedPos().x;
-	root["SpawnY"]         = GetLastBedPos().y;
-	root["SpawnZ"]         = GetLastBedPos().z;
-
-	if (m_GameMode == GetWorld()->GetGameMode())
-	{
-		root["gamemode"] = (int) eGameMode_NotSet;
-=======
 	root["position"]            = JSON_PlayerPosition;
 	root["rotation"]            = JSON_PlayerRotation;
 	root["inventory"]           = JSON_Inventory;
@@ -1896,6 +1869,10 @@ bool cPlayer::SaveToDisk()
 	root["foodExhaustion"]      = m_FoodExhaustionLevel;
 	root["isflying"]            = IsFlying();
 	root["lastknownname"]       = GetName();
+	root["SpawnX"]              = GetLastBedPos().x;
+	root["SpawnY"]              = GetLastBedPos().y;
+	root["SpawnZ"]              = GetLastBedPos().z;
+
 	if (m_World != NULL)
 	{
 		root["world"] = m_World->GetName();
@@ -1907,7 +1884,6 @@ bool cPlayer::SaveToDisk()
 		{
 			root["gamemode"] = (int) m_GameMode;
 		}
->>>>>>> master
 	}
 	else
 	{

@@ -527,7 +527,7 @@ void cWorld::Start(bool a_WasDimensionSet)
 
 	AString Dimension = IniFile.GetValueSet("General", "Dimension", a_WasDimensionSet ? DimensionToString(GetDimension()) : "Overworld");
 	m_Dimension = StringToDimension(Dimension);
-	m_OverworldName = IniFile.GetValue("General", "OverworldName", a_WasDimensionSet ? m_OverworldName : "");
+	m_OverworldName = IniFile.GetValue("LinkedWorlds", "OverworldName", a_WasDimensionSet ? m_OverworldName : "");
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
@@ -577,10 +577,8 @@ void cWorld::Start(bool a_WasDimensionSet)
 
 	if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
 	{
-		m_bNetherPortalsEnabled = IniFile.GetValueSetB("General", "NetherPortalsEnabled", true);
-		m_NetherWorldName = IniFile.GetValueSet("General", "NetherWorldName", DEFAULT_NETHER_NAME);
-		m_bEndPortalsEnabled = IniFile.GetValueSetB("General", "EndPortalsEnabled", true);
-		m_EndWorldName = IniFile.GetValueSet("General", "EndWorldName", DEFAULT_END_NAME);
+		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", DEFAULT_NETHER_NAME);
+		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", DEFAULT_END_NAME);
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
@@ -757,14 +755,12 @@ void cWorld::Stop(void)
 	IniFile.ReadFile(m_IniFileName);
 		if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
 		{
-			IniFile.SetValueB("General", "NetherPortalsEnabled", m_bNetherPortalsEnabled);
-			IniFile.SetValue("General", "NetherWorldName", m_NetherWorldName);
-			IniFile.SetValueB("General", "EndPortalsEnabled", m_bEndPortalsEnabled);
-			IniFile.SetValue("General", "EndWorldName", m_EndWorldName);
+			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_NetherWorldName);
+			IniFile.SetValue("LinkedWorlds", "EndWorldName", m_EndWorldName);
 		}
 		else
 		{
-			IniFile.SetValue("General", "OverworldName", m_OverworldName);
+			IniFile.SetValue("LinkedWorlds", "OverworldName", m_OverworldName);
 		}
 		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
