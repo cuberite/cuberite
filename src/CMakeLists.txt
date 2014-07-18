@@ -82,6 +82,131 @@ set(BINDING_DEPENDECIES
 	World.h
 )
 
+SET (SRCS
+	BiomeDef.cpp
+	BlockArea.cpp
+	BlockID.cpp
+	BlockInfo.cpp
+	BoundingBox.cpp
+	ByteBuffer.cpp
+	ChatColor.cpp
+	Chunk.cpp
+	ChunkData.cpp
+	ChunkMap.cpp
+	ChunkSender.cpp
+	ChunkStay.cpp
+	ClientHandle.cpp
+	CommandOutput.cpp
+	CompositeChat.cpp
+	CraftingRecipes.cpp
+	Cuboid.cpp
+	DeadlockDetect.cpp
+	Enchantments.cpp
+	FastRandom.cpp
+	FurnaceRecipe.cpp
+	Globals.cpp
+	Group.cpp
+	GroupManager.cpp
+	Inventory.cpp
+	Item.cpp
+	ItemGrid.cpp
+	LightingThread.cpp
+	LineBlockTracer.cpp
+	LinearInterpolation.cpp
+	Log.cpp
+	MCLogger.cpp
+	Map.cpp
+	MapManager.cpp
+	MobCensus.cpp
+	MobFamilyCollecter.cpp
+	MobProximityCounter.cpp
+	MobSpawner.cpp
+	MonsterConfig.cpp
+	Noise.cpp
+	ProbabDistrib.cpp
+	RCONServer.cpp
+	Root.cpp
+	Scoreboard.cpp
+	Server.cpp
+	Statistics.cpp
+	StringCompression.cpp
+	StringUtils.cpp
+	Tracer.cpp
+	VoronoiMap.cpp
+	WebAdmin.cpp
+	World.cpp
+	main.cpp)
+
+SET (HDRS
+	AllocationPool.h
+	BiomeDef.h
+	BlockArea.h
+	BlockID.h
+	BlockInServerPluginInterface.h
+	BlockInfo.h
+	BlockTracer.h
+	BoundingBox.h
+	ByteBuffer.h
+	ChatColor.h
+	Chunk.h
+	ChunkData.h
+	ChunkDataCallback.h
+	ChunkDef.h
+	ChunkMap.h
+	ChunkSender.h
+	ChunkStay.h
+	ClientHandle.h
+	CommandOutput.h
+	CompositeChat.h
+	CraftingRecipes.h
+	Cuboid.h
+	DeadlockDetect.h
+	Defines.h
+	Enchantments.h
+	Endianness.h
+	FastRandom.h
+	ForEachChunkProvider.h
+	FurnaceRecipe.h
+	Globals.h
+	Group.h
+	GroupManager.h
+	Inventory.h
+	Item.h
+	ItemGrid.h
+	LeakFinder.h
+	LightingThread.h
+	LineBlockTracer.h
+	LinearInterpolation.h
+	LinearUpscale.h
+	Log.h
+	MCLogger.h
+	Map.h
+	MapManager.h
+	Matrix4.h
+	MemoryLeak.h
+	MersenneTwister.h
+	MobCensus.h
+	MobFamilyCollecter.h
+	MobProximityCounter.h
+	MobSpawner.h
+	MonsterConfig.h
+	Noise.h
+	ProbabDistrib.h
+	RCONServer.h
+	Root.h
+	Scoreboard.h
+	Server.h
+	StackWalker.h
+	Statistics.h
+	StringCompression.h
+	StringUtils.h
+	Tracer.h
+	Vector3.h
+	VoronoiMap.h
+	WebAdmin.h
+	World.h
+	XMLParser.h)
+
 # List all the files that are generated as part of the Bindings build process
 set (BINDING_OUTPUTS
 	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp
@@ -159,38 +284,21 @@ if (NOT MSVC)
 		add_subdirectory(${folder})
 	endforeach(folder)
 
-	file(GLOB SOURCE
-		"*.cpp"
-		"*.h"
-	)
-
-	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
+	list(APPEND SOURCE "${SRCS}")
+	list(APPEND SOURCE "${HDRS}")
 
 	# If building a windows version, but not using MSVC, add the resources directly to the makefile:
 	if (WIN32)
-		FILE(GLOB ResourceFiles
-			"Resources/*.rc"
-		)
-		list(APPEND SOURCE "${ResourceFiles}")
+		list(APPEND SOURCE "Resources/MCServer.rc")
 	endif()
 
 
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
-	# Get all files in this folder:
-	file(GLOB_RECURSE SOURCE
-		"*.cpp"
-		"*.h"
-		"*.pkg"
-	)
-	source_group("" FILES ${SOURCE})
-
-	LIST(APPEND SOURCE "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
 	# Add all subfolders as solution-folders:
-	list(APPEND FOLDERS "Resources")
 	list(APPEND FOLDERS "Bindings")
 	function(includefolder PATH)
 		FILE(GLOB FOLDER_FILES
@@ -204,8 +312,28 @@ else ()
 	endfunction(includefolder)
 
 	foreach(folder ${FOLDERS})
+		add_subdirectory(${folder})
 		includefolder(${folder})
+
+		# Get all source files in this folder:
+		get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
+		foreach (src ${FOLDER_SRCS})
+			list(APPEND SOURCE "${folder}/${src}")
+		endforeach(src)
+
+		# Get all headers in this folder:
+		get_directory_property(FOLDER_HDRS DIRECTORY ${folder} DEFINITION HDRS)
+		foreach (hdr ${FOLDER_HDRS})
+			list(APPEND SOURCE "${folder}/${hdr}")
+		endforeach(hdr)
 	endforeach(folder)
+
+	list(APPEND SOURCE "${SRCS}")
+	list(APPEND SOURCE "${HDRS}")
+	list(APPEND SOURCE "Bindings/AllToLua.pkg")
+
+	includefolder("Resources")
+	source_group("" FILES ${SOURCE})
 
 	include_directories("${PROJECT_SOURCE_DIR}")
 
