@@ -12,9 +12,11 @@
 class cBlockSignPostHandler :
 	public cBlockHandler
 {
+	typedef cBlockHandler super;
+	
 public:
-	cBlockSignPostHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockSignPostHandler(BLOCKTYPE a_BlockType) :
+		super(a_BlockType)
 	{
 	}
 
@@ -78,22 +80,23 @@ public:
 		return (a_Meta + 12) & 0x0f;
 	}
 
+
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
-		//  Mirrors signs over the XY plane (North-South Mirroring)
+		// Mirrors signs over the XY plane (North-South Mirroring)
 
-		//  There are 16 meta values which correspond to different directions.
-		//  These values are equated to angles on a circle; 0x08 = 180 degrees.
+		// There are 16 meta values which correspond to different directions.
+		// These values are equated to angles on a circle; 0x08 = 180 degrees.
 		return (a_Meta < 0x08) ? (0x08 + a_Meta) : (0x08 - a_Meta);
 	}
 
 
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
-		//  Mirrors signs over the YZ plane (East-West Mirroring)
+		// Mirrors signs over the YZ plane (East-West Mirroring)
 
-		//  There are 16 meta values which correspond to different directions.
-		//  These values are equated to angles on a circle; 0x10 = 360 degrees.
+		// There are 16 meta values which correspond to different directions.
+		// These values are equated to angles on a circle; 0x10 = 360 degrees.
 		return 0x10 - a_Meta;
 	}
 } ;

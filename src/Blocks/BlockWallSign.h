@@ -13,9 +13,10 @@ class cBlockWallSignHandler :
 	public cBlockHandler
 {
 	typedef cBlockHandler super;
+
 public:
-	cBlockWallSignHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockWallSignHandler(BLOCKTYPE a_BlockType) :
+		super(a_BlockType)
 	{
 	}
 
@@ -53,15 +54,15 @@ public:
 	}
 
 
-	virtual void GetBlockCoordsBehindTheSign(NIBBLETYPE a_BlockMeta, int & a_BlockX, int & a_BlockZ)
+	static void GetBlockCoordsBehindTheSign(NIBBLETYPE a_BlockMeta, int & a_BlockX, int & a_BlockZ)
 	{
 		switch (a_BlockMeta)
 		{
-			case 2:     a_BlockZ++;     break;
-			case 3:     a_BlockZ--;     break;
-			case 4:     a_BlockX++;     break;
-			case 5:     a_BlockX--;     break;
-			default:    break;
+			case 2:  a_BlockZ++; break;
+			case 3:  a_BlockZ--; break;
+			case 4:  a_BlockX++; break;
+			case 5:  a_BlockX--; break;
+			default: break;
 		}
 	}
 
