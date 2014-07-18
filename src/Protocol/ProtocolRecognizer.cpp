@@ -953,7 +953,6 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
 {
 	UInt32 PacketType;
-	UInt32 NumBytesRead = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -972,7 +971,6 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	{
 		return false;
 	}
-	NumBytesRead -= (UInt32)m_Buffer.GetReadableSpace();
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
