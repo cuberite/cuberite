@@ -6,7 +6,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include"
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
 set(FOLDERS
-	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++
+	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
 	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs
 )
 
@@ -250,26 +250,14 @@ set_source_files_properties(Bindings/Bindings.h PROPERTIES GENERATED TRUE)
 if (NOT MSVC)
 
 	# Bindings need to reference other folders, so they are done here instead
-	
+
 	# lib dependencies are not included
-	
+
 	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
-	#add cpp files here
-	add_library(Bindings
-		Bindings/Bindings
-		Bindings/DeprecatedBindings
-		Bindings/LuaChunkStay
-		Bindings/LuaState
-		Bindings/LuaWindow
-		Bindings/ManualBindings
-		Bindings/Plugin
-		Bindings/PluginLua
-		Bindings/PluginManager
-		Bindings/WebPlugin
-	)
-
-	target_link_libraries(Bindings lua sqlite tolualib polarssl)
+	foreach(folder ${FOLDERS})
+		add_subdirectory(${folder})
+	endforeach(folder)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
@@ -279,10 +267,6 @@ if (NOT MSVC)
 	endforeach()
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
-
-	foreach(folder ${FOLDERS})
-		add_subdirectory(${folder})
-	endforeach(folder)
 
 	list(APPEND SOURCE "${SRCS}")
 	list(APPEND SOURCE "${HDRS}")
@@ -299,7 +283,6 @@ else ()
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
 	# Add all subfolders as solution-folders:
-	list(APPEND FOLDERS "Bindings")
 	function(includefolder PATH)
 		FILE(GLOB FOLDER_FILES
 			"${PATH}/*.cpp"

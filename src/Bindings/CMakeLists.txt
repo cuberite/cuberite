@@ -30,3 +30,9 @@ SET (HDRS
     WebPlugin.h
     tolua++.h
 )
+
+if(NOT MSVC)
+    add_library(Bindings ${SRCS} ${HDRS})
+
+    target_link_libraries(Bindings lua sqlite tolualib polarssl)
+endif()
