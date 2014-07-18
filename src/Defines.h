@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "ChatColor.h"
 #include <limits>
 #include <cmath>
 

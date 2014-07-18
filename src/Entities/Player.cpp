@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
+#include "../ChatColor.h"
 #include "../Server.h"
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
