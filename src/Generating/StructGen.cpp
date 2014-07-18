@@ -484,7 +484,6 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 		const int BubbleY = 4 + (Rnd & 0x01);  // 4 .. 5
 		Rnd >>= 1;
 		const int BubbleZ = BubbleR + (Rnd % Range);
-		Rnd >>= 4;
 		const int HalfR = BubbleR / 2;  // 1 .. 2
 		const int RSquared = BubbleR * BubbleR;
 		for (int y = -HalfR; y <= HalfR; y++)

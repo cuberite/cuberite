@@ -997,7 +997,6 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 			BoundingBox.p2.y -= 4;
 		}
 	}
-	rnd >>= 2;
 	switch (a_Direction)
 	{
 		case dirXP: BoundingBox.p2.x += 4; BoundingBox.p1.z -= 2; BoundingBox.p2.z += 2; break;
