@@ -10,7 +10,6 @@ class cLog;
 
 
 
-// tolua_begin
 class cMCLogger
 {
 public:
@@ -27,9 +26,9 @@ public:
 	cMCLogger(void);
 	
 	/** Creates a logger with the specified filename inside "logs" folder */
-	cMCLogger(const AString & a_FileName);  // tolua_export
+	cMCLogger(const AString & a_FileName);
 	
-	~cMCLogger();													// tolua_export
+	~cMCLogger();
 
 	void Log  (const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
 	void Info (const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
@@ -37,7 +36,7 @@ public:
 	void Error(const char * a_Format, va_list a_ArgList) FORMATSTRING(2, 0);
 
 	/** Logs the simple text message at the specified log level. */
-	void LogSimple(const char * a_Text, eLogLevel a_LogLevel = llRegular);  // tolua_export
+	void LogSimple(const char * a_Text, eLogLevel a_LogLevel = llRegular);
 
 	static cMCLogger * GetInstance();
 private:
@@ -63,7 +62,7 @@ private:
 	
 	/// Common initialization for all constructors, creates a logfile with the specified name and assigns s_MCLogger to this
 	void InitLog(const AString & a_FileName);
-};																	// tolua_export
+};
 
 
 

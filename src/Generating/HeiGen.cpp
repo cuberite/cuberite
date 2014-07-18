@@ -16,7 +16,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cTerrainHeightGen:
 
 cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBiomeGen & a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
@@ -91,7 +91,7 @@ cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBio
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeiGenFlat:
 
 void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
@@ -115,7 +115,7 @@ void cHeiGenFlat::InitializeHeightGen(cIniFile & a_IniFile)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeiGenCache:
 
 cHeiGenCache::cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize) :
@@ -234,7 +234,7 @@ bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_Rel
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeiGenClassic:
 
 cHeiGenClassic::cHeiGenClassic(int a_Seed) :
@@ -255,7 +255,7 @@ float cHeiGenClassic::GetNoise(float x, float y)
 
 	float height = m_Noise.CubicNoise2D(x * 0.1f, y * 0.1f ) * 2;
 
-	float flatness = ((m_Noise.CubicNoise2D(x * 0.5f, y * 0.5f) + 1.f) * 0.5f) * 1.1f; // 0 ... 1.5
+	float flatness = ((m_Noise.CubicNoise2D(x * 0.5f, y * 0.5f) + 1.f) * 0.5f) * 1.1f;  // 0 ... 1.5
 	flatness *= flatness * flatness;
 
 	return (oct1 + oct2 + oct3) * flatness + height;
@@ -267,7 +267,7 @@ float cHeiGenClassic::GetNoise(float x, float y)
 
 void cHeiGenClassic::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
 {
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		const float zz = (float)(a_ChunkZ * cChunkDef::Width + z);
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -283,7 +283,7 @@ void cHeiGenClassic::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightM
 			{
 				hei = 250;
 			}
-			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
+			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
 }
@@ -306,7 +306,7 @@ void cHeiGenClassic::InitializeHeightGen(cIniFile & a_IniFile)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeiGenMountains:
 
 cHeiGenMountains::cHeiGenMountains(int a_Seed) :
@@ -345,7 +345,7 @@ void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heigh
 			{
 				hei = 250;
 			}
-			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
+			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
 }
@@ -368,7 +368,7 @@ void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHeiGenBiomal:
 
 const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] =

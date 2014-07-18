@@ -84,7 +84,7 @@ void cRoot::InputThread(void * a_Params)
 		AString Command;
 		std::getline(std::cin, Command);
 		if (!Command.empty())
-		{			
+		{
 			self.ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
@@ -105,7 +105,7 @@ void cRoot::Start(void)
 	#ifdef _WIN32
 	HWND hwnd = GetConsoleWindow();
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
-	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED); // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
+	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
 
 	cDeadlockDetect dd;
@@ -194,7 +194,7 @@ void cRoot::Start(void)
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
 		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
+		m_InputThread->Start( false );  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -202,7 +202,7 @@ void cRoot::Start(void)
 
 		LOG("Startup complete, took %lld ms!", finishmseconds);
 		#ifdef _WIN32
-		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED); // Re-enable close button
+		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
 		while (!m_bStop && !m_bRestart && !g_TERMINATE_EVENT_RAISED)  // These are modified by external threads
@@ -504,9 +504,9 @@ void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID)
+void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID);
+	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID, a_Properties);
 }
 
 
@@ -612,7 +612,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 				m_BestRating = Rating;
 				++m_NumMatches;
 			}
-			if (Rating == m_NameLength) // Perfect match
+			if (Rating == m_NameLength)  // Perfect match
 			{
 				return true;
 			}
@@ -692,7 +692,7 @@ int cRoot::GetVirtualRAMUsage(void)
 			&t_info_count
 		))
 		{
-		    return (int)(t_info.virtual_size / 1024);
+			return (int)(t_info.virtual_size / 1024);
 		}
 		return -1;
 	#else
@@ -744,7 +744,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 			&t_info_count
 		))
 		{
-		    return (int)(t_info.resident_size / 1024);
+			return (int)(t_info.resident_size / 1024);
 		}
 		return -1;
 	#else

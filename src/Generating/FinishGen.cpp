@@ -40,12 +40,12 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenNetherClumpFoliage:
 
 void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1; // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
+	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1;  // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
 	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.1;
 	
 	NOISE_DATATYPE Val1 = m_Noise.CubicNoise2D((float) (ChunkX * ChunkZ * 0.01f), (float) (ChunkZ / ChunkX * 0.01f));
@@ -134,7 +134,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 					continue;
 				}
 
-				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) // Don't replace non air blocks.
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)  // Don't replace non air blocks.
 				{
 					continue;
 				}
@@ -145,7 +145,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 					continue;
 				}
 
-				if (IsFireBlock) // don't place fire on non-forever burning blocks.
+				if (IsFireBlock)  // don't place fire on non-forever burning blocks.
 				{
 					if (!cFireSimulator::DoesBurnForever(BlockBelow))
 					{
@@ -168,7 +168,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
 bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)
@@ -202,8 +202,8 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 	if (
 		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
 		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX    , a_RelY, a_RelZ - 1)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX    , a_RelY, a_RelZ + 1))
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ - 1)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ + 1))
 	)
 	{
 		return false;
@@ -223,7 +223,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 	// Generate small foliage (1-block):
 	
 	// TODO: Update heightmap with 1-block-tall foliage
-	for (int z = 0; z < cChunkDef::Width; z++) 
+	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 		const float zz = (float)BlockZ;
@@ -318,7 +318,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSnow:
 
 void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -354,7 +354,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenIce:
 
 void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -394,7 +394,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenLilypads:
 
 int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
@@ -456,7 +456,7 @@ void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenBottomLava:
 
 void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -479,7 +479,7 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenPreSimulator:
 
 cFinishGenPreSimulator::cFinishGenPreSimulator(void)
@@ -646,7 +646,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenFluidSprings:
 
 cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :
@@ -687,7 +687,7 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	AString HeightDistribution = a_IniFile.GetValueSet(SectionName, "HeightDistribution", DefaultHeightDistribution);
 	if (!m_HeightDistribution.SetDefString(HeightDistribution) || (m_HeightDistribution.GetSum() <= 0))
 	{
-		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".", 
+		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".",
 			(a_Fluid == E_BLOCK_WATER) ? "Water" : "Lava",
 			DefaultHeightDistribution.c_str()
 		);

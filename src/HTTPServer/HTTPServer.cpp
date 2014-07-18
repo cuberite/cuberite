@@ -118,12 +118,12 @@ class cDebugCallbacks :
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPServer:
 
 cHTTPServer::cHTTPServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
+	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer"),
+	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer"),
 	m_Callbacks(NULL)
 {
 }
@@ -179,6 +179,8 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 	
 	// Open up requested ports:
 	bool HasAnyPort;
+	m_ListenThreadIPv4.SetReuseAddr(true);
+	m_ListenThreadIPv6.SetReuseAddr(true);
 	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
 	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
 	if (!HasAnyPort)

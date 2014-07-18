@@ -6,7 +6,7 @@
 
 // MSVC generates warnings for the templated AssertIfNotMatched parameter conditions, so disable it:
 #ifdef _MSC_VER
-	#pragma warning(disable: 4127) // Conditional expression is constant
+	#pragma warning(disable: 4127)  // Conditional expression is constant
 #endif
 
 
@@ -47,8 +47,8 @@ NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatc
 	NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 	switch (a_Meta & BitMask)
 	{
-		case South: return West  | OtherMeta; 
-		case West:  return North | OtherMeta; 
+		case South: return West  | OtherMeta;
+		case West:  return North | OtherMeta;
 		case North: return East  | OtherMeta;
 		case East:  return South | OtherMeta;
 	}
@@ -69,7 +69,7 @@ NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatc
 	NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 	switch (a_Meta & BitMask)
 	{
-		case South: return East  | OtherMeta; 
+		case South: return East  | OtherMeta;
 		case East:  return North | OtherMeta;
 		case North: return West  | OtherMeta;
 		case West:  return South | OtherMeta;

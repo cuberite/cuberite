@@ -11,7 +11,7 @@
 class cExpOrb :
 	public cEntity
 {
-	typedef cExpOrb super;
+	typedef cEntity super;
 	
 public:
 	// tolua_end

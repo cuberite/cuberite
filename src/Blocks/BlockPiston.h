@@ -17,7 +17,7 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override;
@@ -75,7 +75,7 @@ public:
 				return BLOCK_FACE_NONE;
 			}
 		}
-	}	
+	}
 
 	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
@@ -94,7 +94,6 @@ private:
 		switch (a_BlockType)
 		{
 			case E_BLOCK_ANVIL:
-			case E_BLOCK_BED:
 			case E_BLOCK_BEDROCK:
 			case E_BLOCK_BREWING_STAND:
 			case E_BLOCK_CHEST:
@@ -104,6 +103,7 @@ private:
 			case E_BLOCK_ENCHANTMENT_TABLE:
 			case E_BLOCK_END_PORTAL:
 			case E_BLOCK_END_PORTAL_FRAME:
+			// Notice the lack of an E_BLOCK_ENDER_CHEST here; its because ender chests can totally be pushed/pulled in MCS :)
 			case E_BLOCK_FURNACE:
 			case E_BLOCK_LIT_FURNACE:
 			case E_BLOCK_HOPPER:
@@ -113,6 +113,7 @@ private:
 			case E_BLOCK_NOTE_BLOCK:
 			case E_BLOCK_OBSIDIAN:
 			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_TRAPPED_CHEST:
 			{
 				return false;
 			}
@@ -126,26 +127,12 @@ private:
 		return true;
 	}
 
-	/// Returns true if the specified block can be pushed by a piston and broken / replaced
-	static inline bool CanBreakPush(BLOCKTYPE a_BlockType) { return cBlockInfo::IsPistonBreakable(a_BlockType); }
-
 	/// Returns true if the specified block can be pulled by a sticky piston
 	static inline bool CanPull(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		switch (a_BlockType)
+		if (cBlockInfo::IsPistonBreakable(a_BlockType))
 		{
-			case E_BLOCK_LAVA:
-			case E_BLOCK_STATIONARY_LAVA:
-			case E_BLOCK_STATIONARY_WATER:
-			case E_BLOCK_WATER:
-			{
-				return false;
-			}
-		}
-
-		if (CanBreakPush(a_BlockType))
-		{
-			return false; // CanBreakPush returns true, but we need false to prevent pulling
+			return false;  // CanBreakPush returns true, but we need false to prevent pulling
 		}
 		
 		return CanPush(a_BlockType, a_BlockMeta);

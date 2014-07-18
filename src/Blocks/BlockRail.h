@@ -31,7 +31,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -140,7 +140,7 @@ public:
 	{
 		NIBBLETYPE Meta = 0;
 		char RailsCnt = 0;
-		bool Neighbors[8]; // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
+		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
 		memset(Neighbors, 0, sizeof(Neighbors));
 		Neighbors[0] = (IsUnstable(a_ChunkInterface, a_BlockX + 1, a_BlockY, a_BlockZ) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN));
 		Neighbors[1] = (IsUnstable(a_ChunkInterface, a_BlockX - 1, a_BlockY, a_BlockZ) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST, E_PURE_DOWN));
@@ -223,7 +223,7 @@ public:
 			case E_META_RAIL_ZM_ZP:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_DOWN) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_DOWN) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH, E_PURE_DOWN)
 				)
 				{
@@ -235,7 +235,7 @@ public:
 			case E_META_RAIL_XM_XP:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST, E_PURE_DOWN) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST, E_PURE_DOWN)
 				)
 				{
@@ -247,7 +247,7 @@ public:
 			case E_META_RAIL_ASCEND_XP:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_EAST) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_EAST) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)
 				)
 				{
@@ -259,7 +259,7 @@ public:
 			case E_META_RAIL_ASCEND_XM:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_WEST)
 				)
 				{
@@ -271,7 +271,7 @@ public:
 			case E_META_RAIL_ASCEND_ZM:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH)
 				)
 				{
@@ -283,7 +283,7 @@ public:
 			case E_META_RAIL_ASCEND_ZP:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_SOUTH)
 				)
 				{
@@ -295,7 +295,7 @@ public:
 			case E_META_RAIL_CURVED_ZP_XP:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST)
 				)
 				{
@@ -307,7 +307,7 @@ public:
 			case E_META_RAIL_CURVED_ZP_XM:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_SOUTH) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)
 				)
 				{
@@ -319,7 +319,7 @@ public:
 			case E_META_RAIL_CURVED_ZM_XM:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_WEST)
 				)
 				{
@@ -331,7 +331,7 @@ public:
 			case E_META_RAIL_CURVED_ZM_XP:
 			{
 				if (
-					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) || 
+					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_NORTH) ||
 					IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, BLOCK_FACE_EAST)
 				)
 				{

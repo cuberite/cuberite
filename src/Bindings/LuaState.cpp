@@ -40,7 +40,7 @@ const cLuaState::cRet cLuaState::Return = {};
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
@@ -811,6 +811,18 @@ void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = (eWeather)Clamp((int)tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal), (int)wSunny, (int)wThunderstorm);
+	}
+}
+
+
+
+
+
 bool cLuaState::CallFunction(int a_NumResults)
 {
 	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -1359,7 +1371,7 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
 cLuaState::cRef::cRef(void) :

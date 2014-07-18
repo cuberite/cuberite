@@ -181,7 +181,7 @@ void cPrefab::AddRotatedBlockAreas(void)
 		m_BlockArea[2].CopyFrom(m_BlockArea[0]);
 		m_BlockArea[2].MirrorXY();
 		m_BlockArea[2].MirrorYZ();
-	}	
+	}
 	
 	// 3 CCW rotations = 1 CW rotation:
 	if ((m_AllowedRotations & 0x04) != 0)

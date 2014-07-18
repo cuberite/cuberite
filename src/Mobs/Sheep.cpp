@@ -5,6 +5,7 @@
 #include "../BlockID.h"
 #include "../Entities/Player.h"
 #include "../World.h"
+#include "FastRandom.h"
 
 
 
@@ -16,6 +17,16 @@ cSheep::cSheep(int a_Color) :
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
 {
+	// Generate random wool color.
+	if (m_WoolColor == -1)
+	{
+		m_WoolColor = GenerateNaturalRandomColor();
+	}
+
+	if ((m_WoolColor < 0) || (m_WoolColor > 15))
+	{
+		m_WoolColor = 0;
+	}
 }
 
 
@@ -37,7 +48,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && (!m_IsSheared))
+	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
@@ -51,6 +62,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		int NumDrops = m_World->GetTickRandomNumber(2) + 1;
 		Drops.push_back(cItem(E_BLOCK_WOOL, NumDrops, m_WoolColor));
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
+		m_World->BroadcastSoundEffect("mob.sheep.shear", GetPosX(), GetPosY(), GetPosZ(), 1.0f, 1.0f);
 	}
 	else if ((EquippedItem.m_ItemType == E_ITEM_DYE) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
 	{
@@ -81,12 +93,12 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_TimeToStopEating > 0)
 	{
-		m_bMovingToDestination = false; // The sheep should not move when he's eating
+		m_bMovingToDestination = false;  // The sheep should not move when he's eating
 		m_TimeToStopEating--;
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS) // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
 				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
@@ -106,6 +118,41 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 				m_TimeToStopEating = 40;
 			}
 		}
+	}
+}
+
+
+
+
+
+NIBBLETYPE cSheep::GenerateNaturalRandomColor(void)
+{
+	cFastRandom Random;
+	int Chance = Random.NextInt(101);
+
+	if (Chance <= 81)
+	{
+		return E_META_WOOL_WHITE;
+	}
+	else if (Chance <= 86)
+	{
+		return E_META_WOOL_BLACK;
+	}
+	else if (Chance <= 91)
+	{
+		return E_META_WOOL_GRAY;
+	}
+	else if (Chance <= 96)
+	{
+		return E_META_WOOL_LIGHTGRAY;
+	}
+	else if (Chance <= 99)
+	{
+		return E_META_WOOL_BROWN;
+	}
+	else
+	{
+		return E_META_WOOL_PINK;
 	}
 }
 

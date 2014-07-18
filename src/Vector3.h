@@ -3,7 +3,7 @@
 
 
 
-#define _USE_MATH_DEFINES // Enable non-standard math defines (MSVC)
+#define _USE_MATH_DEFINES  // Enable non-standard math defines (MSVC)
 #include <math.h>
 #include <list>
 #include <vector>
@@ -134,6 +134,16 @@ public:
 		z += a_Diff.z;
 	}
 
+	/** Runs each value of the vector through std::floor() */
+	inline Vector3<int> Floor(void) const
+	{
+		return Vector3<int>(
+			(int)floor(x),
+			(int)floor(y),
+			(int)floor(z)
+		);
+	}
+
 	// tolua_end
 
 	inline bool operator != (const Vector3<T> & a_Rhs) const
@@ -144,6 +154,16 @@ public:
 	inline bool operator == (const Vector3<T> & a_Rhs) const
 	{
 		return Equals(a_Rhs);
+	}
+
+	inline bool operator > (const Vector3<T> & a_Rhs) const
+	{
+		return (SqrLength() > a_Rhs.SqrLength());
+	}
+
+	inline bool operator < (const Vector3<T> & a_Rhs) const
+	{
+		return (SqrLength() < a_Rhs.SqrLength());
 	}
 
 	inline void operator += (const Vector3<T> & a_Rhs)
@@ -288,8 +308,18 @@ protected:
 	{
 		return (a_Value < 0) ? -a_Value : a_Value;
 	}
+
 };
 // tolua_end
+
+
+
+
+
+template <> inline Vector3<int> Vector3<int>::Floor(void) const
+{
+	return *this;
+}
 
 
 

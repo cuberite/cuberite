@@ -244,7 +244,7 @@ cSocket cSocket::AcceptIPv6(void)
 			// Windows XP doesn't have inet_ntop, so we need to improvise. And MSVC has different headers than GCC
 			#ifdef _MSC_VER
 				// MSVC version
-				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x",
 					from.sin6_addr.u.Word[0],
 					from.sin6_addr.u.Word[1],
 					from.sin6_addr.u.Word[2],
@@ -256,7 +256,7 @@ cSocket cSocket::AcceptIPv6(void)
 				);
 			#else  // _MSC_VER
 				// MinGW
-				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x",
 					from.sin6_addr.s6_addr16[0],
 					from.sin6_addr.s6_addr16[1],
 					from.sin6_addr.s6_addr16[2],

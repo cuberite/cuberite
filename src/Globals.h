@@ -14,18 +14,18 @@
 	#pragma warning(disable:4481)
 
 	// Disable some warnings that we don't care about:
-	#pragma warning(disable:4100) // Unreferenced formal parameter
-    
-    // Useful warnings from warning level 4:
-	#pragma warning(3 : 4127) // Conditional expression is constant
-	#pragma warning(3 : 4189) // Local variable is initialized but not referenced
-	#pragma warning(3 : 4245) // Conversion from 'type1' to 'type2', signed/unsigned mismatch
-	#pragma warning(3 : 4310) // Cast truncates constant value
-	#pragma warning(3 : 4389) // Signed/unsigned mismatch
-	#pragma warning(3 : 4505) // Unreferenced local function has been removed
-	#pragma warning(3 : 4701) // Potentially unitialized local variable used
-	#pragma warning(3 : 4702) // Unreachable code
-	#pragma warning(3 : 4706) // Assignment within conditional expression
+	#pragma warning(disable:4100)  // Unreferenced formal parameter
+
+	// Useful warnings from warning level 4:
+	#pragma warning(3 : 4127)  // Conditional expression is constant
+	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
+	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed/unsigned mismatch
+	#pragma warning(3 : 4310)  // Cast truncates constant value
+	#pragma warning(3 : 4389)  // Signed/unsigned mismatch
+	#pragma warning(3 : 4505)  // Unreferenced local function has been removed
+	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
+	#pragma warning(3 : 4702)  // Unreachable code
+	#pragma warning(3 : 4706)  // Assignment within conditional expression
 	
 	// Disabling this warning, because we know what we're doing when we're doing this:
 	#pragma warning(disable: 4355)  // 'this' used in initializer list
@@ -34,7 +34,7 @@
 	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
 	
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
-	// #pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
+	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
 	#define OBSOLETE __declspec(deprecated)
 
@@ -58,8 +58,8 @@
 
 	// override is part of c++11
 	#if __cplusplus < 201103L
-  		#define override
-	#endif	
+		#define override
+	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
 
@@ -71,9 +71,24 @@
 	
 	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
 
-	#define SIZE_T_FMT "%zu"
-	#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
-	#define SIZE_T_FMT_HEX "%zx"
+	#if defined(_WIN32)
+		// We're compiling on MinGW, which uses an old MSVCRT library that has no support for size_t printfing.
+		// We need direct size formats:
+		#if defined(_WIN64)
+			#define SIZE_T_FMT "%I64u"
+			#define SIZE_T_FMT_PRECISION(x) "%" #x "I64u"
+			#define SIZE_T_FMT_HEX "%I64x"
+		#else
+			#define SIZE_T_FMT "%u"
+			#define SIZE_T_FMT_PRECISION(x) "%" #x "u"
+			#define SIZE_T_FMT_HEX "%x"
+		#endif
+	#else
+		// We're compiling on Linux, so we can use libc's size_t printf format:
+		#define SIZE_T_FMT "%zu"
+		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
+		#define SIZE_T_FMT_HEX "%zx"
+	#endif
 	
 	#define NORETURN      __attribute((__noreturn__))
 
@@ -130,7 +145,7 @@ class SizeChecker;
 template <typename T, size_t Size>
 class SizeChecker<T, Size, true>
 {
-  T v;
+	T v;
 };
 
 template class SizeChecker<Int64, 8>;
@@ -368,6 +383,5 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
-#include "Entities/Effects.h"
 
 

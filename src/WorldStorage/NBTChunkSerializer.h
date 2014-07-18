@@ -46,6 +46,7 @@ class cTNTEntity;
 class cExpOrb;
 class cHangingEntity;
 class cItemFrame;
+class cEntityEffect;
 
 
 
@@ -92,7 +93,7 @@ protected:
 	
 	// Block entities:
 	void AddBasicTileEntity(cBlockEntity *     a_Entity, const char * a_EntityTypeID);
-	void AddChestEntity    (cChestEntity *     a_Entity);
+	void AddChestEntity    (cChestEntity *     a_Entity, BLOCKTYPE a_ChestType);
 	void AddDispenserEntity(cDispenserEntity * a_Entity);
 	void AddDropperEntity  (cDropperEntity *   a_Entity);
 	void AddFurnaceEntity  (cFurnaceEntity *   a_Furnace);

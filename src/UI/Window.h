@@ -36,12 +36,12 @@ typedef std::vector<cSlotArea *> cSlotAreas;
 
 // tolua_begin
 
-/** 
+/**
 Represents a UI window.
 
 Each window has a list of players that are currently using it
 When there's no player using a window, it is destroyed.
-A window consists of several areas of slots with similar functionality - for example the crafting grid area, or 
+A window consists of several areas of slots with similar functionality - for example the crafting grid area, or
 the inventory area. Each area knows what its slots are (GetSlot() function) and can handle mouse clicks.
 The window acts only as a top-level container for those areas, redirecting the click events to the correct areas.
 Inventory painting, introduced in 1.5, is handled by the window, too
@@ -109,12 +109,12 @@ public:
 
 	/// Handles a click event from a player
 	void Clicked(
-		cPlayer & a_Player, int a_WindowID, 
+		cPlayer & a_Player, int a_WindowID,
 		short a_SlotNum, eClickAction a_ClickAction,
 		const cItem & a_ClickedItem
 	);
 
-	void OpenedByPlayer(cPlayer & a_Player);
+	virtual void OpenedByPlayer(cPlayer & a_Player);
 	
 	/// Called when a player closes this window; notifies all slot areas. Returns true if close accepted
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse);
@@ -327,10 +327,15 @@ public:
 	cChestWindow(cChestEntity * a_Chest);
 	cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest);
 	~cChestWindow();
+
+	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
+	virtual void OpenedByPlayer(cPlayer & a_Player) override;
 	
 protected:
 	cWorld * m_World;
 	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the chest, for the window-close packet
+	cChestEntity * m_PrimaryChest;
+	cChestEntity * m_SecondaryChest;
 } ;
 
 

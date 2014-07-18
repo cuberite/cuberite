@@ -3,7 +3,7 @@
 
 
 
-#define _USE_MATH_DEFINES // Enable non-standard math defines (MSVC)
+#define _USE_MATH_DEFINES  // Enable non-standard math defines (MSVC)
 #include <math.h>
 
 
@@ -104,7 +104,7 @@ public:
 	}
 
 	inline void Translate(const Vector3<T> & a_Pos)
-	{ 
+	{
 		cell[3]  += a_Pos.x;
 		cell[7]  += a_Pos.y;
 		cell[11] += a_Pos.z;

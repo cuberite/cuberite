@@ -90,7 +90,7 @@ bool cIsThread::Start(void)
 		m_Handle = CreateThread(NULL, 0, thrExecute, this, CREATE_SUSPENDED, &m_ThreadID);
 		if (m_Handle == NULL)
 		{
-			LOGERROR("ERROR: Could not create thread \"%s\", GLE = %d!", m_ThreadName.c_str(), GetLastError());
+			LOGERROR("ERROR: Could not create thread \"%s\", GLE = %u!", m_ThreadName.c_str(), (unsigned)GetLastError());
 			return false;
 		}
 		ResumeThread(m_Handle);

@@ -99,7 +99,7 @@ public:
 protected:
 
 	cItem m_Content;
-	int m_Height; 
+	int m_Height;
 } ;
 
 

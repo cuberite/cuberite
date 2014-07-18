@@ -16,18 +16,8 @@ class cBlockHandler;
 class cBlockInfo
 {
 public:
-	// tolua_end
 
-	cBlockInfo();
-
-	~cBlockInfo();
-
-	/** (Re-)Initializes the internal BlockInfo structures. */
-	static void Initialize(void);
-
-	// tolua_begin
-
-	/** Returns the associated BlockInfo structure. */
+	/** Returns the associated BlockInfo structure for the specified block type. */
 	static cBlockInfo & Get(BLOCKTYPE a_Type);
 
 
@@ -79,14 +69,19 @@ public:
 
 	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler;             }
 
-
 protected:
+	/** Storage for all the BlockInfo structures. */
+	typedef cBlockInfo cBlockInfoArray[256];
 
-	// TODO xdot: Change to std::vector to support dynamic block IDs
-	static cBlockInfo ms_Info[256];
+	/** Creates a default BlockInfo structure, initializes all values to their defaults */
+	cBlockInfo();
 
+	/** Cleans up the stored values */
+	~cBlockInfo();
 
-}; // tolua_export
+	/** Initializes the specified BlockInfo structures with block-specific values. */
+	static void Initialize(cBlockInfoArray & a_BlockInfos);
+};  // tolua_export
 
 
 

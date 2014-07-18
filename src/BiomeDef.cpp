@@ -15,7 +15,7 @@ static struct {
 	const char * m_String;
 } g_BiomeMap[] =
 {
-	{biOcean,            "Ocean"} ,
+	{biOcean,            "Ocean"},
 	{biPlains,           "Plains"},
 	{biDesert,           "Desert"},
 	{biExtremeHills,     "ExtremeHills"},

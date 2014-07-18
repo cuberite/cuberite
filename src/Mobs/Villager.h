@@ -37,9 +37,8 @@ public:
 	/** return true if the given blocktype are: crops, potatoes or carrots.*/
 	bool IsBlockFarmable(BLOCKTYPE a_BlockType);
 
-	//////////////////////////////////////////////////////////////////
 	// Farmer functions
-	/** It searches in a 11x7x11 area for crops. If it found some it will navigate to them.*/
+	/** Searches in a 11x7x11 area for crops. If it found some it will navigate to them.*/
 	void HandleFarmerPrepareFarmCrops();
 
 	/** Looks if the farmer has reached it's destination, and if it's still crops and the destination is closer then 2 blocks it will harvest them.*/
@@ -49,7 +48,7 @@ public:
 	void HandleFarmerPlaceCrops();
 
 	// Get and set functions.
-	int      GetVilType(void)              const { return m_Type; }	
+	int      GetVilType(void)              const { return m_Type; }
 	Vector3i GetCropsPos(void)             const { return m_CropsPos; }
 	bool     DoesHaveActionActivated(void) const { return m_VillagerAction; }
 

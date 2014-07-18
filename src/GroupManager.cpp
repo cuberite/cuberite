@@ -145,7 +145,7 @@ bool cGroupManager::LoadGroups()
 		AString KeyName = IniFile.GetKeyName(i);
 		cGroup * Group = GetGroup(KeyName.c_str());
 		
-		Group->ClearPermission(); // Needed in case the groups are reloaded.
+		Group->ClearPermission();  // Needed in case the groups are reloaded.
 
 		LOGD("Loading group %s", KeyName.c_str());
 

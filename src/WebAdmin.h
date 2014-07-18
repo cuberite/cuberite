@@ -60,11 +60,11 @@ struct HTTPRequest
 	StringStringMap Params;     // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method) */
-	StringStringMap PostParams; // >> EXPORTED IN MANUALBINDINGS <<
+	StringStringMap PostParams;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Same as PostParams */
 	FormDataMap FormData;       // >> EXPORTED IN MANUALBINDINGS <<
-} ; // tolua_export
+} ;  // tolua_export
 
 
 
@@ -120,7 +120,7 @@ public:
 	void RemovePlugin(cWebPlugin * a_Plugin);
 
 	// TODO: Convert this to the auto-locking callback mechanism used for looping players in worlds and such
-	PluginList GetPlugins() const { return m_Plugins; } // >> EXPORTED IN MANUALBINDINGS <<
+	PluginList GetPlugins() const { return m_Plugins; }  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin
 
@@ -218,7 +218,7 @@ protected:
 	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
 	virtual void OnRequestBody    (cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override;
 	virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

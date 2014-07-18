@@ -1,7 +1,7 @@
 
 // ProtocolRecognizer.cpp
 
-// Implements the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple 
+// Implements the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
 // protocol versions and redirects everything to them
 
 #include "Globals.h"
@@ -181,10 +181,10 @@ void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSe
 
 
 
-void cProtocolRecognizer::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+	m_Protocol->SendCollectEntity(a_Entity, a_Player);
 }
 
 
@@ -556,10 +556,10 @@ void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a
 
 
 
-void cProtocolRecognizer::SendRespawn(eDimension a_Dimension)
+void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendRespawn(a_Dimension);
+	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 
@@ -616,10 +616,10 @@ void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cSco
 
 
 
-void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+	m_Protocol->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
 }
 
 
@@ -828,7 +828,7 @@ void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 
 bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
-	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and 
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and
 	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
 	
 	// The first packet should be a Handshake, 0x02:
@@ -953,7 +953,6 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
 {
 	UInt32 PacketType;
-	UInt32 NumBytesRead = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -972,7 +971,6 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	{
 		return false;
 	}
-	NumBytesRead -= (UInt32)m_Buffer.GetReadableSpace();
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
@@ -1021,7 +1019,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 		case PROTO_VERSION_1_3_2:
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
-			Printf(Reply, "%s%s%i%s%i", 
+			Printf(Reply, "%s%s%i%s%i",
 				Server->GetDescription().c_str(),
 				cChatColor::Delimiter.c_str(),
 				Server->GetNumPlayers(),

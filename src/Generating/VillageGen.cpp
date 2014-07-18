@@ -95,7 +95,7 @@ public:
 		
 		return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 	}
-}	;
+};
 
 
 
@@ -333,7 +333,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cVillageGen:
 
 static cVillagePiecePool g_SandVillage(g_SandVillagePrefabs, g_SandVillagePrefabsCount, g_SandVillageStartingPrefabs, g_SandVillageStartingPrefabsCount);

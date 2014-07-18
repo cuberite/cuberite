@@ -6,13 +6,16 @@
 
 
 class cBlockPumpkinHandler :
-	public cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false> >
 {
+	typedef cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false> > super;
 public:
-	cBlockPumpkinHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x07, 0x02, 0x03, 0x00, 0x01, false>(a_BlockType)
+
+	cBlockPumpkinHandler(BLOCKTYPE a_BlockType) :
+		super(a_BlockType)
 	{
 	}
+
 	
 	virtual void OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
 	{
@@ -73,14 +76,14 @@ public:
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 2, a_BlockZ,     E_BLOCK_AIR, 0);
 			
 			// Spawn the golem:
-			a_WorldInterface.SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem); 
+			a_WorldInterface.SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtIronGolem);
 		}
 	}
 
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override

@@ -6,10 +6,7 @@
 
 
 
-#ifndef STRINGUTILS_H_INCLUDED
-#define STRINGUTILS_H_INCLUDED
-
-
+#pragma once
 
 #include <string>
 
@@ -97,11 +94,6 @@ extern int GetBEInt(const char * a_Mem);
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
 // If you have any other string helper functions, declare them here
-
-
-
-
-#endif		// STRINGUTILS_H_INCLUDED
 
 
 

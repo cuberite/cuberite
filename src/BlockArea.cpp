@@ -28,10 +28,10 @@ typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 // This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
 /// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
-template<bool MetasValid, CombinatorFunc Combinator> 
+template<bool MetasValid, CombinatorFunc Combinator>
 void InternalMergeBlocks(
 	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
-	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas, 
+	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas,
 	int a_SizeX, int a_SizeY, int a_SizeZ,
 	int a_SrcOffX, int a_SrcOffY, int a_SrcOffZ,
 	int a_DstOffX, int a_DstOffY, int a_DstOffZ,
@@ -59,7 +59,7 @@ void InternalMergeBlocks(
 				}
 				else
 				{
-					BLOCKTYPE FakeDestMeta = 0;
+					NIBBLETYPE FakeDestMeta = 0;
 					Combinator(a_DstTypes[DstIdx], a_SrcTypes[SrcIdx], FakeDestMeta, (NIBBLETYPE)0);
 				}
 				++DstIdx;
@@ -136,7 +136,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 		return;
 	}
 
-	// Air is always hollowed out	
+	// Air is always hollowed out
 	if (a_SrcType == E_BLOCK_AIR)
 	{
 		a_DstType = E_BLOCK_AIR;
@@ -269,7 +269,7 @@ void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cBlockArea:
 
 cBlockArea::cBlockArea(void) :
@@ -781,7 +781,7 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
+void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ,
 	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 )
@@ -1759,7 +1759,7 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cBlockArea::cChunkReader:
 
 cBlockArea::cChunkReader::cChunkReader(cBlockArea & a_Area) :
@@ -2226,7 +2226,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				m_Size.x, m_Size.y, m_Size.z
 			);
 			return;
-		}	// case msDifference
+		}  // case msDifference
 		
 		case cBlockArea::msMask:
 		{

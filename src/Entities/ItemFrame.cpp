@@ -10,7 +10,7 @@
 
 
 cItemFrame::cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z)
-	:	cHangingEntity(etItemFrame, a_BlockFace, a_X, a_Y, a_Z)
+	: cHangingEntity(etItemFrame, a_BlockFace, a_X, a_Y, a_Z)
 	, m_Item(E_BLOCK_AIR)
 	, m_Rotation(0)
 {
@@ -43,7 +43,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 
-	GetWorld()->BroadcastEntityMetadata(*this); // Update clients
+	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
 }
 
 
@@ -51,17 +51,17 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cItemFrame::KilledBy(cEntity * a_Killer)
+void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 {
 	if (m_Item.IsEmpty())
 	{
 		SetHealth(0);
-		super::KilledBy(a_Killer);
+		super::KilledBy(a_TDI);
 		Destroy();
 		return;
 	}
 
-	if ((a_Killer != NULL) && a_Killer->IsPlayer() && !((cPlayer *)a_Killer)->IsGameModeCreative())
+	if ((a_TDI.Attacker != NULL) && a_TDI.Attacker->IsPlayer() && !((cPlayer *)a_TDI.Attacker)->IsGameModeCreative())
 	{
 		cItems Item;
 		Item.push_back(m_Item);

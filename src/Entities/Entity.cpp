@@ -75,7 +75,7 @@ cEntity::~cEntity()
 	
 	/*
 	// DEBUG:
-	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p", 
+	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
 		m_UniqueID,
 		m_Pos.x, m_Pos.y, m_Pos.z,
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
@@ -273,7 +273,7 @@ void cEntity::SetYawFromSpeed(void)
 void cEntity::SetPitchFromSpeed(void)
 {
 	const double EPS = 0.0000001;
-	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z); // Speed XZ-plane component
+	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
 	if ((abs(xz) < EPS) && (abs(m_Speed.y) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
@@ -311,10 +311,14 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		cPlayer * Player = (cPlayer *)a_TDI.Attacker;
 
 		// IsOnGround() only is false if the player is moving downwards
-		if (!Player->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		if (!Player->IsOnGround())
 		{
-			a_TDI.FinalDamage += 2;
-			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
+			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
+			{
+				a_TDI.FinalDamage += 2;
+				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+			}
 		}
 
 		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
@@ -329,38 +333,23 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_Health = 0;
 	}
 
-	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL)) // Knockback for only players and mobs
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{
-		int KnockbackLevel = 0;
-		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
+		int KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);  // More common enchantment
+		if (KnockbackLevel < 1)
 		{
+			// We support punch on swords and vice versa! :)
 			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
 		}
-		else
-		{
-			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
-		}
 
-		Vector3d additionalSpeed(0, 0, 0);
+		Vector3d AdditionalSpeed(0, 0, 0);
 		switch (KnockbackLevel)
 		{
-			case 1:
-			{
-				additionalSpeed.Set(5, .3, 5);
-				break;
-			}
-			case 2:
-			{
-				additionalSpeed.Set(8, .3, 8);
-				break;
-			}
-			default:
-			{
-				additionalSpeed.Set(2, .3, 2);
-				break;
-			}
+			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
+			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
+			default: break;
 		}
-		AddSpeed(a_TDI.Knockback * additionalSpeed);
+		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -369,7 +358,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if (m_Health <= 0)
 	{
-		KilledBy(a_TDI.Attacker);
+		KilledBy(a_TDI);
 
 		if (a_TDI.Attacker != NULL)
 		{
@@ -432,6 +421,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtStarving:
 		case dtInVoid:
 		case dtPoisoning:
+		case dtWithering:
 		case dtPotionOfHarming:
 		case dtFalling:
 		case dtLightning:
@@ -525,11 +515,11 @@ double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 
 
 
-void cEntity::KilledBy(cEntity * a_Killer)
+void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 {
 	m_Health = 0;
 
-	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_Killer);
+	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI.Attacker, a_TDI);
 	
 	if (m_Health > 0)
 	{
@@ -539,7 +529,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 
 	// Drop loot:
 	cItems Drops;
-	GetDrops(Drops, a_Killer);
+	GetDrops(Drops, a_TDI.Attacker);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 
 	m_World->BroadcastEntityStatus(*this, esGenericDead);
@@ -652,7 +642,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
-		// Outside of the world		
+		// Outside of the world
 		AddSpeedY(m_Gravity * a_Dt);
 		AddPosition(GetSpeed() * a_Dt);
 		return;
@@ -764,11 +754,11 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		NextSpeed.x *= 0.25;
 		NextSpeed.z *= 0.25;
 	}
-					
-	//Get water direction
+
+	// Get water direction
 	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
-	m_WaterSpeed *= 0.9f;		//Reduce speed each tick
+	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
 
 	switch(WaterDir)
 	{
@@ -825,7 +815,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-				if (Tracer.HitNormal.y == 1) // Hit BLOCK_FACE_YP, we are on the ground
+				if (Tracer.HitNormal.y == 1)  // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
@@ -870,7 +860,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
 			m_TicksLeftBurning = 0;
-		}		
+		}
 	}
 	
 	// Do the burning damage:
@@ -1248,14 +1238,17 @@ void cEntity::HandleAir(void)
 
 	if (IsSubmerged())
 	{
-		SetSpeedY(1); // Float in the water
+		if (!IsPlayer())  // Players control themselves
+		{
+			SetSpeedY(1);  // Float in the water
+		}
 
 		// Either reduce air level or damage player
 		if (m_AirLevel < 1)
 		{
 			if (m_AirTickTimer < 1)
 			{
-				// Damage player 
+				// Damage player
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
 				// Reset timer
 				m_AirTickTimer = DROWNING_TICKS;
@@ -1416,9 +1409,9 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		int DiffY = (int)(floor(GetPosY() * 32.0) - floor(m_LastPos.y * 32.0));
 		int DiffZ = (int)(floor(GetPosZ() * 32.0) - floor(m_LastPos.z * 32.0));
 
-		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0)) // Have we moved?
+		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127)) // Limitations of a Byte
+			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
 			{
 				// Difference within Byte limitations, use a relative move packet
 				if (m_bDirtyOrientation)
@@ -1438,7 +1431,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			{
 				// Too big a movement, do a teleport
 				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastPos = GetPosition(); // See above
+				m_LastPos = GetPosition();  // See above
 				m_bDirtyOrientation = false;
 			}
 		}
@@ -1547,8 +1540,8 @@ void cEntity::SetMass(double a_Mass)
 	}
 	else
 	{
-		// Make sure that mass is not zero. 1g is the default because we 
-		// have to choose a number. It's perfectly legal to have a mass 
+		// Make sure that mass is not zero. 1g is the default because we
+		// have to choose a number. It's perfectly legal to have a mass
 		// less than 1g as long as is NOT equal or less than zero.
 		m_Mass = 0.001;
 	}
@@ -1635,7 +1628,6 @@ void cEntity::SetWidth(double a_Width)
 void cEntity::AddPosX(double a_AddPosX)
 {
 	m_Pos.x += a_AddPosX;
-	
 }
 
 
@@ -1644,7 +1636,6 @@ void cEntity::AddPosX(double a_AddPosX)
 void cEntity::AddPosY(double a_AddPosY)
 {
 	m_Pos.y += a_AddPosY;
-	
 }
 
 
@@ -1653,7 +1644,6 @@ void cEntity::AddPosY(double a_AddPosY)
 void cEntity::AddPosZ(double a_AddPosZ)
 {
 	m_Pos.z += a_AddPosZ;
-	
 }
 
 
@@ -1664,7 +1654,6 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
 	m_Pos.z += a_AddPosZ;
-	
 }
 
 
@@ -1674,7 +1663,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 {
 	m_Speed.x += a_AddSpeedX;
 	m_Speed.y += a_AddSpeedY;
-	m_Speed.z += a_AddSpeedZ;	
+	m_Speed.z += a_AddSpeedZ;
 	WrapSpeed();
 }
 
@@ -1684,7 +1673,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 
 void cEntity::AddSpeedX(double a_AddSpeedX)
 {
-	m_Speed.x += a_AddSpeedX;	
+	m_Speed.x += a_AddSpeedX;
 	WrapSpeed();
 }
 
@@ -1694,7 +1683,7 @@ void cEntity::AddSpeedX(double a_AddSpeedX)
 
 void cEntity::AddSpeedY(double a_AddSpeedY)
 {
-	m_Speed.y += a_AddSpeedY;	
+	m_Speed.y += a_AddSpeedY;
 	WrapSpeed();
 }
 
@@ -1704,7 +1693,7 @@ void cEntity::AddSpeedY(double a_AddSpeedY)
 
 void cEntity::AddSpeedZ(double a_AddSpeedZ)
 {
-	m_Speed.z += a_AddSpeedZ;	
+	m_Speed.z += a_AddSpeedZ;
 	WrapSpeed();
 }
 
@@ -1741,7 +1730,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 
 
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
 Vector3d cEntity::GetLookVector(void) const
 {
@@ -1755,11 +1744,11 @@ Vector3d cEntity::GetLookVector(void) const
 
 
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Set position
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
-	m_Pos.Set(a_PosX, a_PosY, a_PosZ);	
+	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
 }
 
 
@@ -1768,7 +1757,7 @@ void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::SetPosX(double a_PosX)
 {
-	m_Pos.x = a_PosX;	
+	m_Pos.x = a_PosX;
 }
 
 
@@ -1777,7 +1766,7 @@ void cEntity::SetPosX(double a_PosX)
 
 void cEntity::SetPosY(double a_PosY)
 {
-	m_Pos.y = a_PosY;	
+	m_Pos.y = a_PosY;
 }
 
 

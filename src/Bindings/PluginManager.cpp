@@ -257,18 +257,44 @@ bool cPluginManager::CallHookBlockToPickups(
 
 bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 {
-	bool WasCommandForbidden = false;
-	if (HandleCommand(a_Player, a_Message, true, WasCommandForbidden))  // We use HandleCommand as opposed to ExecuteCommand to accomodate the need to the WasCommandForbidden bool
+	// Check if the message contains a command, execute it:
+	switch (HandleCommand(a_Player, a_Message, true))
 	{
-		return true;  // Chat message was handled as command
-	}
-	else if (WasCommandForbidden) // Couldn't be handled as command, was it because of insufficient permissions?
-	{
-		return true;  // Yes - message was sent in HandleCommand, abort
+		case crExecuted:
+		{
+			// The command has executed successfully
+			return true;
+		}
+		
+		case crBlocked:
+		{
+			// The command was blocked by a plugin using HOOK_EXECUTE_COMMAND
+			// The plugin has most likely sent a message to the player already
+			return true;
+		}
+		
+		case crError:
+		{
+			// An error in the plugin has prevented the command from executing. Report the error to the player:
+			a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			return true;
+		}
+		
+		case crNoPermission:
+		{
+			// The player is not allowed to execute this command
+			a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			return true;
+		}
+
+		case crUnknownCommand:
+		{
+			// This was not a known command, keep processing as a message
+			break;
+		}
 	}
 
-	// Check if it was a standard command (starts with a slash)
-	// If it was, we know that it was completely unrecognised (WasCommandForbidden == false)
+	// Check if the message is a command (starts with a slash). If it is, we know that it wasn't recognised:
 	if (!a_Message.empty() && (a_Message[0] == '/'))
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
@@ -448,6 +474,27 @@ bool cPluginManager::CallHookDisconnect(cClientHandle & a_Client, const AString 
 
 
 
+bool cPluginManager::CallHookEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_ENTITY_ADD_EFFECT);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityAddEffect(a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_DistanceModifier))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
@@ -562,14 +609,14 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
-bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
 	FIND_HOOK(HOOK_KILLING);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnKilling(a_Victim, a_Killer))
+		if ((*itr)->OnKilling(a_Victim, a_Killer, a_TDI))
 		{
 			return true;
 		}
@@ -684,6 +731,25 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerEating(a_Player))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
+{
+	FIND_HOOK(HOOK_PLAYER_FOOD_LEVEL_CHANGE);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFoodLevelChange(a_Player, a_NewFoodLevel))
 		{
 			return true;
 		}
@@ -1318,28 +1384,28 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt, int a_LastT
 
 
 
-bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions, bool & a_WasCommandForbidden)
+cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
 	ASSERT(a_Player != NULL);
 
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
-		return false;
+		return crUnknownCommand;
 	}
 
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
 	{
 		// Command not found
-		return false;
+		return crUnknownCommand;
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
 	if (CallHookExecuteCommand(a_Player, Split))
 	{
 		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player->GetName().c_str(), Split[0].c_str());
-		return false;
+		return crBlocked;
 	}
 
 	if (
@@ -1348,15 +1414,18 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 		!a_Player->HasPermission(cmd->second.m_Permission)
 	)
 	{
-		a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
-		a_WasCommandForbidden = true;
-		return false;
+		return crNoPermission;
 	}
 
 	ASSERT(cmd->second.m_Plugin != NULL);
 
-	return cmd->second.m_Plugin->HandleCommand(Split, a_Player);
+	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player))
+	{
+		return crError;
+	}
+
+	return crExecuted;
 }
 
 
@@ -1417,7 +1486,7 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
 	{
 		m_DisablePluginList.push_back(itr->second);
-		itr->second = NULL;	// Get rid of this thing right away
+		itr->second = NULL;  // Get rid of this thing right away
 		return true;
 	}
 	return false;
@@ -1554,7 +1623,7 @@ AString cPluginManager::GetCommandPermission(const AString & a_Command)
 
 
 
-bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, true);
 }
@@ -1563,7 +1632,7 @@ bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Comman
 
 
 
-bool cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, false);
 }

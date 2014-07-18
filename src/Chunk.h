@@ -87,7 +87,7 @@ public:
 	3. Mark the chunk as saved (MarkSaved() )
 	If anywhere inside this sequence another thread mmodifies the chunk, the chunk will not get marked as saved in MarkSaved()
 	*/
-	void MarkSaving(void);  // Marks the chunk as being saved. 
+	void MarkSaving(void);  // Marks the chunk as being saved.
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
 	void MarkLoadFailed(void);  // Marks the chunk as failed to load. Ignored is the chunk is already valid
@@ -97,7 +97,7 @@ public:
 	
 	/** Sets all chunk data */
 	void SetAllData(
-		const BLOCKTYPE *  a_BlockTypes, 
+		const BLOCKTYPE *  a_BlockTypes,
 		const NIBBLETYPE * a_BlockMeta,
 		const NIBBLETYPE * a_BlockLight,
 		const NIBBLETYPE * a_BlockSkyLight,
@@ -200,11 +200,16 @@ public:
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
 	/** Adds a client to the chunk; returns true if added, false if already there */
-	bool AddClient    (cClientHandle* a_Client );
+	bool AddClient(cClientHandle * a_Client);
 	
-	void RemoveClient (cClientHandle* a_Client );
-	bool HasClient    (cClientHandle* a_Client );
-	bool HasAnyClients(void);  // Returns true if theres any client in the chunk; false otherwise
+	/** Removes the specified client from the chunk; ignored if client not in chunk. */
+	void RemoveClient(cClientHandle * a_Client);
+	
+	/** Returns true if the specified client is present in this chunk. */
+	bool HasClient(cClientHandle * a_Client);
+	
+	/** Returns true if theres any client in the chunk; false otherwise */
+	bool HasAnyClients(void) const;
 
 	void AddEntity(cEntity * a_Entity);
 	void RemoveEntity(cEntity * a_Entity);
@@ -269,7 +274,6 @@ public:
 
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
-	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	// Broadcast various packets to all clients of this chunk:
@@ -279,7 +283,7 @@ public:
 	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastChunkData          (cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
-	void BroadcastCollectPickup      (const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectEntity      (const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity      (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEffect       (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEquipment    (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
@@ -293,7 +297,7 @@ public:
 	void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
-	void BroadcastSoundEffect        (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);  // a_Src coords are Block * 8
+	void BroadcastSoundEffect        (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
@@ -390,6 +394,17 @@ public:
 
 	cBlockEntity * GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * GetBlockEntity(const Vector3i & a_BlockPos) { return GetBlockEntity(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z); }
+	
+	/** Returns true if the chunk should be ticked in the tick-thread.
+	Checks if there are any clients and if the always-tick flag is set */
+	bool ShouldBeTicked(void) const;
+	
+	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter.
+	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
+	whether it has any clients or not.
+	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
+	as at least one requests is active the chunk will be ticked). */
+	void SetAlwaysTicked(bool a_AlwaysTicked);
 
 private:
 
@@ -462,10 +477,16 @@ private:
 
 	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
 	bool m_IsRedstoneDirty;
+	
+	/** If greater than zero, the chunk is ticked even if it has no clients.
+	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
+	This is the support for plugin-accessible chunk tick forcing. */
+	int m_AlwaysTicked;
+	
 
 	// Pick up a random block of this chunk
-	void getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z);
-	void getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ);
+	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
+	void GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ);
 
 	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
 	void AddBlockEntity   (cBlockEntity * a_BlockEntity);

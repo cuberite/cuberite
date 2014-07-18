@@ -42,7 +42,7 @@ cDropSpenserEntity::~cDropSpenserEntity()
 
 void cDropSpenserEntity::AddDropSpenserDir(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_Direction)
 {
-	switch (a_Direction)
+	switch (a_Direction & 0x07)  // Vanilla uses the 8th bit to determine power state - we don't
 	{
 		case E_META_DROPSPENSER_FACING_YM: a_BlockY--; return;
 		case E_META_DROPSPENSER_FACING_YP: a_BlockY++; return;
@@ -90,7 +90,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	int SmokeDir = 0;
 	switch (Meta)
 	{
-		case E_META_DROPSPENSER_FACING_YP: SmokeDir = 4; break; // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
+		case E_META_DROPSPENSER_FACING_YP: SmokeDir = 4; break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
 		case E_META_DROPSPENSER_FACING_YM: SmokeDir = 4; break;
 		case E_META_DROPSPENSER_FACING_XM: SmokeDir = 3; break;
 		case E_META_DROPSPENSER_FACING_XP: SmokeDir = 5; break;
@@ -99,7 +99,7 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	}
 	m_World->BroadcastSoundParticleEffect(2000, m_PosX, m_PosY, m_PosZ, SmokeDir);
 	m_World->BroadcastSoundEffect("random.click", m_PosX * 8, m_PosY * 8, m_PosZ * 8, 1.0f, 1.0f);
-}	
+}
 
 
 
@@ -235,7 +235,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	cItems Pickups;
 	Pickups.push_back(m_Contents.RemoveOneItem(a_SlotNum));
 
-	const int PickupSpeed = m_World->GetTickRandomNumber(4) + 2; // At least 2, at most 6
+	const int PickupSpeed = m_World->GetTickRandomNumber(4) + 2;  // At least 2, at most 6
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
 	switch (Meta)
 	{
@@ -249,7 +249,7 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 	double MicroX, MicroY, MicroZ;
 	MicroX = DispX + 0.5;
-	MicroY = DispY + 0.4; // Slightly less than half, to accomodate actual texture hole on DropSpenser
+	MicroY = DispY + 0.4;  // Slightly less than half, to accomodate actual texture hole on DropSpenser
 	MicroZ = DispZ + 0.5;
 
 

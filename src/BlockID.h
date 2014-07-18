@@ -171,12 +171,12 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_DROPPER = 158,
 	E_BLOCK_STAINED_CLAY = 159,
 	E_BLOCK_STAINED_GLASS_PANE = 160,
-	E_BLOCK_NEW_LEAVES = 161, // Acacia and Dark Oak IDs in Minecraft 1.7.x
+	E_BLOCK_NEW_LEAVES = 161,  // Acacia and Dark Oak IDs in Minecraft 1.7.x
 	E_BLOCK_NEW_LOG = 162,
 	E_BLOCK_ACACIA_WOOD_STAIRS = 163,
 	E_BLOCK_DARK_OAK_WOOD_STAIRS = 164,
 	E_BLOCK_HAY_BALE = 170,
-	E_BLOCK_CARPET = 171,	
+	E_BLOCK_CARPET = 171,
 	E_BLOCK_HARDENED_CLAY = 172,
 	E_BLOCK_BLOCK_OF_COAL = 173,
 	E_BLOCK_PACKED_ICE = 174,
@@ -187,7 +187,7 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 	
-	// Synonym or ID compatibility	
+	// Synonym or ID compatibility
 	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
 	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
 	E_BLOCK_LOCKED_CHEST = E_BLOCK_STAINED_GLASS,
@@ -319,7 +319,8 @@ enum ENUM_ITEM_ID
 	E_ITEM_GHAST_TEAR = 370,
 	E_ITEM_GOLD_NUGGET = 371,
 	E_ITEM_NETHER_WART = 372,
-	E_ITEM_POTIONS = 373,
+	E_ITEM_POTION = 373,
+	E_ITEM_POTIONS = 373,  // OBSOLETE, use E_ITEM_POTION instead
 	E_ITEM_GLASS_BOTTLE = 374,
 	E_ITEM_SPIDER_EYE = 375,
 	E_ITEM_FERMENTED_SPIDER_EYE = 376,
@@ -398,7 +399,7 @@ enum
 	// Please keep this list alpha-sorted by the blocktype / itemtype part
 	// then number-sorted for the same block / item
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Block metas:
 
 	// E_BLOCK_BIG_FLOWER metas
@@ -677,7 +678,7 @@ enum
 	E_META_WOOL_RED        = 14,
 	E_META_WOOL_BLACK      = 15,
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Item metas:
 	
 	// E_ITEM_COAL metas:
@@ -811,6 +812,7 @@ enum eDamageType
 	dtCactusContact,    // Contact with a cactus block
 	dtLavaContact,      // Contact with a lava block
 	dtPoisoning,        // Having the poison effect
+	dtWithering,        // Having the wither effect
 	dtOnFire,           // Being on fire
 	dtFireContact,      // Standing inside a fire block
 	dtInVoid,           // Falling into the Void (Y < 0)
@@ -837,6 +839,7 @@ enum eDamageType
 	dtCacti        = dtCactusContact,
 	dtLava         = dtLavaContact,
 	dtPoison       = dtPoisoning,
+	dtWither       = dtWithering,
 	dtBurning      = dtOnFire,
 	dtInFire       = dtFireContact,
 	dtPlugin       = dtAdmin,

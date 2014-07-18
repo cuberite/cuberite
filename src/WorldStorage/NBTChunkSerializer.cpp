@@ -29,6 +29,7 @@
 #include "../Entities/Minecart.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/ArrowEntity.h"
+#include "../Entities/SplashPotionEntity.h"
 #include "../Entities/TNTEntity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
@@ -175,10 +176,10 @@ void cNBTChunkSerializer::AddBasicTileEntity(cBlockEntity * a_Entity, const char
 
 
 
-void cNBTChunkSerializer::AddChestEntity(cChestEntity * a_Entity)
+void cNBTChunkSerializer::AddChestEntity(cChestEntity * a_Entity, BLOCKTYPE a_ChestType)
 {
 	m_Writer.BeginCompound("");
-		AddBasicTileEntity(a_Entity, "Chest");
+		AddBasicTileEntity(a_Entity, (a_ChestType == E_BLOCK_CHEST) ? "Chest" : "TrappedChest");
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();
@@ -278,7 +279,7 @@ void cNBTChunkSerializer::AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock
 		m_Writer.AddString("Command",      a_CmdBlock->GetCommand());
 		m_Writer.AddInt   ("SuccessCount", a_CmdBlock->GetResult());
 		m_Writer.AddString("LastOutput",   a_CmdBlock->GetLastOutput());
-		m_Writer.AddByte  ("TrackOutput",  1); // TODO 2014-01-18 xdot: Figure out what TrackOutput is and save it.
+		m_Writer.AddByte  ("TrackOutput",  1);  // TODO 2014-01-18 xdot: Figure out what TrackOutput is and save it.
 	m_Writer.EndCompound();
 }
 
@@ -590,21 +591,30 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
 		Vector3d Pos = a_Projectile->GetPosition();
-		m_Writer.AddShort("xTile",  (Int16)floor(Pos.x));
-		m_Writer.AddShort("yTile",  (Int16)floor(Pos.y));
-		m_Writer.AddShort("zTile",  (Int16)floor(Pos.z));
-		m_Writer.AddShort("inTile", 0);  // TODO: Query the block type
-		m_Writer.AddShort("shake",  0);  // TODO: Any shake?
-		m_Writer.AddByte ("inGround", a_Projectile->IsInGround() ? 1 : 0);
+		m_Writer.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
 		
 		switch (a_Projectile->GetProjectileKind())
 		{
 			case cProjectileEntity::pkArrow:
 			{
-				m_Writer.AddByte("inData",   0);  // TODO: Query the block meta (is it needed?)
-				m_Writer.AddByte("pickup",   ((cArrowEntity *)a_Projectile)->GetPickupState());
-				m_Writer.AddDouble("damage", ((cArrowEntity *)a_Projectile)->GetDamageCoeff());
+				cArrowEntity * Arrow = (cArrowEntity *)a_Projectile;
+
+				m_Writer.AddInt("xTile", (Int16)Arrow->GetBlockHit().x);
+				m_Writer.AddInt("yTile", (Int16)Arrow->GetBlockHit().y);
+				m_Writer.AddInt("zTile", (Int16)Arrow->GetBlockHit().z);
+				m_Writer.AddByte("pickup",   Arrow->GetPickupState());
+				m_Writer.AddDouble("damage", Arrow->GetDamageCoeff());
 				break;
+			}
+			case cProjectileEntity::pkSplashPotion:
+			{
+				cSplashPotionEntity * Potion = (cSplashPotionEntity *)a_Projectile;
+				
+				m_Writer.AddInt("EffectType",               (Int16)Potion->GetEntityEffectType());
+				m_Writer.AddInt("EffectDuration",           (Int16)Potion->GetEntityEffect().GetDuration());
+				m_Writer.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
+				m_Writer.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
+				m_Writer.AddInt("PotionName",                Potion->GetPotionParticleType());
 			}
 			case cProjectileEntity::pkGhastFireball:
 			{
@@ -622,13 +632,10 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 				ASSERT(!"Unsaved projectile entity!");
 			}
 		}  // switch (ProjectileKind)
-		cEntity * Creator = a_Projectile->GetCreator();
-		if (Creator != NULL)
+
+		if (!a_Projectile->GetCreatorName().empty())
 		{
-			if (Creator->GetEntityType() == cEntity::etPlayer)
-			{
-				m_Writer.AddString("ownerName", ((cPlayer *)Creator)->GetName());
-			}
+			m_Writer.AddString("ownerName", a_Projectile->GetCreatorName());
 		}
 	m_Writer.EndCompound();
 }
@@ -818,18 +825,21 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	// Add tile-entity into NBT:
 	switch (a_Entity->GetBlockType())
 	{
-		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)        a_Entity); break;
-		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)    a_Entity); break;
-		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)      a_Entity); break;
-		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)    a_Entity); break;
-		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)      a_Entity); break;
-		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)       a_Entity); break;
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_WALLSIGN:      AddSignEntity        ((cSignEntity *)         a_Entity); break;
-		case E_BLOCK_HEAD:          AddMobHeadEntity     ((cMobHeadEntity *)      a_Entity); break;
-		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)         a_Entity); break;
-		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)      a_Entity); break;
-		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *) a_Entity); break;
+		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)       a_Entity, a_Entity->GetBlockType()); break;
+		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *)a_Entity); break;
+		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)   a_Entity); break;
+		case E_BLOCK_DROPPER:       AddDropperEntity     ((cDropperEntity *)     a_Entity); break;
+		case E_BLOCK_ENDER_CHEST:   /* No data to be saved */                               break;
+		case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   ((cFlowerPotEntity *)   a_Entity); break;
+		case E_BLOCK_FURNACE:       AddFurnaceEntity     ((cFurnaceEntity *)     a_Entity); break;
+		case E_BLOCK_HEAD:          AddMobHeadEntity     ((cMobHeadEntity *)     a_Entity); break;
+		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)      a_Entity); break;
+		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)     a_Entity); break;
+		case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity     ((cFurnaceEntity *)     a_Entity); break;
+		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)        a_Entity); break;
+		case E_BLOCK_SIGN_POST:     AddSignEntity        ((cSignEntity *)        a_Entity); break;
+		case E_BLOCK_TRAPPED_CHEST: AddChestEntity       ((cChestEntity *)       a_Entity, a_Entity->GetBlockType()); break;
+		case E_BLOCK_WALLSIGN:      AddSignEntity        ((cSignEntity *)        a_Entity); break;
 
 		default:
 		{

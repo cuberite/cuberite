@@ -21,7 +21,7 @@ public:
 		return m_ChunkMap->GetBlock(a_BlockX,a_BlockY,a_BlockZ);
 	}
 	BLOCKTYPE GetBlock(const Vector3i & a_Pos)
-	{ 
+	{
 		return GetBlock(a_Pos.x, a_Pos.y, a_Pos.z);
 	}
 	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)

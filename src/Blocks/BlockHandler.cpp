@@ -65,6 +65,8 @@
 #include "BlockRedstoneRepeater.h"
 #include "BlockRedstoneTorch.h"
 #include "BlockTNT.h"
+#include "BlockTripwire.h"
+#include "BlockTripwireHook.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSideways.h"
@@ -209,7 +211,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_EMERALD_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_ENCHANTMENT_TABLE:     return new cBlockEnchantmentTableHandler(a_BlockType);
 		case E_BLOCK_ENDER_CHEST:           return new cBlockEnderchestHandler      (a_BlockType);
-		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler        (           );
+		case E_BLOCK_FARMLAND:              return new cBlockFarmlandHandler        (a_BlockType);
 		case E_BLOCK_FENCE_GATE:            return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_FIRE:                  return new cBlockFireHandler            (a_BlockType);
 		case E_BLOCK_FLOWER_POT:            return new cBlockFlowerPotHandler       (a_BlockType);
@@ -236,9 +238,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LAPIS_ORE:             return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_LAVA:                  return new cBlockLavaHandler            (a_BlockType);
 		case E_BLOCK_LEAVES:                return new cBlockLeavesHandler          (a_BlockType);
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_LILY_PAD:              return new cBlockLilypadHandler         (a_BlockType);
 		case E_BLOCK_LIT_FURNACE:           return new cBlockFurnaceHandler         (a_BlockType);
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
@@ -291,6 +293,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TORCH:                 return new cBlockTorchHandler           (a_BlockType);
 		case E_BLOCK_TRAPDOOR:              return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_TNT:                   return new cBlockTNTHandler             (a_BlockType);
+		case E_BLOCK_TRAPPED_CHEST:         return new cBlockChestHandler           (a_BlockType);
+		case E_BLOCK_TRIPWIRE:              return new cBlockTripwireHandler        (a_BlockType);
+		case E_BLOCK_TRIPWIRE_HOOK:         return new cBlockTripwireHookHandler    (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
 		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);  // TODO: This needs a special handler
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
@@ -322,7 +327,7 @@ cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
 
 bool cBlockHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )

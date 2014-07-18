@@ -22,7 +22,7 @@ const unsigned int QUEUE_SKIP_LIMIT = 500;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChunkGenerator:
 
 cChunkGenerator::cChunkGenerator(void) :
@@ -228,10 +228,10 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 
-		cChunkCoords coords = m_Queue.front();		// Get next coord from queue
-		m_Queue.erase( m_Queue.begin() );	// Remove coordinate from queue
+		cChunkCoords coords = m_Queue.front();  // Get next coord from queue
+		m_Queue.erase( m_Queue.begin() );  // Remove coordinate from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
-		Lock.Unlock();			// Unlock ASAP
+		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
 
 		// Display perf info once in a while:
@@ -290,7 +290,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChunkGenerator::cGenerator:
 
 cChunkGenerator::cGenerator::cGenerator(cChunkGenerator & a_ChunkGenerator) :

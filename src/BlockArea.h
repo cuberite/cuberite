@@ -175,7 +175,7 @@ public:
 	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
 	
 	/** Fills a cuboid inside the block area with the specified data */
-	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
+	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
@@ -357,7 +357,7 @@ protected:
 
 	/** Sets the specified datatypes at the specified location. */
 	void RelSetData(
-		int a_RelX, int a_RelY, int a_RelZ, 
+		int a_RelX, int a_RelY, int a_RelZ,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 		NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 	);

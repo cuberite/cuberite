@@ -391,7 +391,7 @@ AString cWebAdmin::GetDefaultPage(void)
 	Content += "<h4>Players:</h4><ul>";
 
 	cPlayerAccum PlayerAccum;
-	cWorld * World = cRoot::Get()->GetDefaultWorld(); // TODO - Create a list of worlds and players
+	cWorld * World = cRoot::Get()->GetDefaultWorld();  // TODO - Create a list of worlds and players
 	if( World != NULL )
 	{
 		World->ForEachPlayer(PlayerAccum);
@@ -531,7 +531,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWebAdmin::cWebadminRequestData
 
 void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)

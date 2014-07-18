@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "ChatColor.h"
 #include <limits>
 #include <cmath>
 
@@ -22,7 +21,7 @@ typedef std::vector<int> cSlotNums;
 /// Experience Orb setup
 enum
 {
-	//open to suggestion on naming convention here :)
+	// Open to suggestion on naming convention here :)
 	MAX_EXPERIENCE_ORB_SIZE = 2000
 } ;
 
@@ -512,7 +511,7 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 	}
 	else
 	{
-		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;		
+		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
 	}
 
 	a_Pitch = atan2(a_Y, r) * 180 / PI;

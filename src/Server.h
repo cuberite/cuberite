@@ -37,18 +37,23 @@
 class cPlayer;
 class cClientHandle;
 class cIniFile;
-class cCommandOutputCallback ;
+class cCommandOutputCallback;
 
 typedef std::list<cClientHandle *> cClientHandleList;
 
+namespace Json
+{
+	class Value;
+}
 
 
 
 
-class cServer										// tolua_export
+
+class cServer  // tolua_export
 	: public cListenThread::cCallback
-{													// tolua_export
-public:												// tolua_export
+{        // tolua_export
+public:  // tolua_export
 
 	virtual ~cServer() {}
 	bool InitServer(cIniFile & a_SettingsIni);
@@ -83,7 +88,9 @@ public:												// tolua_export
 	void Shutdown(void);
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator to auth the specified user
+	
+	/** Authenticates the specified user, called by cAuthenticator */
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 	
@@ -112,11 +119,21 @@ public:												// tolua_export
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
+	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
+	
+	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
+	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
+	bool ShouldLoadOfflinePlayerData(void) const { return m_ShouldLoadOfflinePlayerData; }
+	
+	/** Returns true if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
+	This allows a seamless transition from name-based to UUID-based player storage.
+	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
+	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
 	
 private:
 
-	friend class cRoot; // so cRoot can create and destroy cServer
+	friend class cRoot;  // so cRoot can create and destroy cServer
 	
 	/** When NotifyClientWrite() is called, it is queued for this thread to process (to avoid deadlocks between cSocketThreads, cClientHandle and cChunkMap) */
 	class cNotifyWriteThread :
@@ -132,7 +149,7 @@ private:
 		
 		virtual void Execute(void);
 		
-	public:	
+	public:
 	
 		cNotifyWriteThread(void);
 		~cNotifyWriteThread();
@@ -177,7 +194,7 @@ private:
 	
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
-	bool m_bIsConnected; // true - connected false - not connected
+	bool m_bIsConnected;  // true - connected false - not connected
 
 	bool m_bRestarting;
 	
@@ -204,6 +221,16 @@ private:
 	This setting is the same as the "online-mode" setting in Vanilla. */
 	bool m_ShouldAuthenticate;
 	
+	/** True if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
+	This allows transitions from an offline (no-auth) server to an online one.
+	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
+	bool m_ShouldLoadOfflinePlayerData;
+	
+	/** True if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
+	This allows a seamless transition from name-based to UUID-based player storage.
+	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
+	bool m_ShouldLoadNamedPlayerData;
+
 
 	cServer(void);
 
@@ -217,7 +244,7 @@ private:
 
 	// cListenThread::cCallback overrides:
 	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
-}; // tolua_export
+};  // tolua_export
 
 
 

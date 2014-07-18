@@ -38,7 +38,7 @@ public:
 	Assumes both cuboids are sorted. */
 	bool DoesIntersect(const cCuboid & a_Other) const;
 
-	bool IsInside(const Vector3i & v)	const
+	bool IsInside(const Vector3i & v) const
 	{
 		return (
 			(v.x >= p1.x) && (v.x <= p2.x) &&
@@ -47,7 +47,7 @@ public:
 		);
 	}
 
-	bool IsInside(int a_X, int a_Y, int a_Z)	const
+	bool IsInside(int a_X, int a_Y, int a_Z) const
 	{
 		return (
 			(a_X >= p1.x) && (a_X <= p2.x) &&

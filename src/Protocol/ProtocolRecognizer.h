@@ -1,7 +1,7 @@
 
 // ProtocolRecognizer.h
 
-// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple 
+// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
 // protocol versions and redirects everything to them
 
 
@@ -71,7 +71,7 @@ public:
 	virtual void SendChat                (const AString & a_Message) override;
 	virtual void SendChat                (const cCompositeChat & a_Message) override;
 	virtual void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
-	virtual void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player) override;
+	virtual void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
 	virtual void SendDisconnect          (const AString & a_Reason) override;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
@@ -107,13 +107,13 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendRespawn             (eDimension a_Dimension) override;
+	virtual void SendRespawn             (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
 	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
-	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;
+	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;
@@ -139,8 +139,8 @@ public:
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 protected:
-	cProtocol * m_Protocol;  //< The recognized protocol
-	cByteBuffer m_Buffer;    //< Buffer for the incoming data until we recognize the protocol
+	cProtocol * m_Protocol;  ///< The recognized protocol
+	cByteBuffer m_Buffer;    ///< Buffer for the incoming data until we recognize the protocol
 	
 	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
 	bool TryRecognizeProtocol(void);

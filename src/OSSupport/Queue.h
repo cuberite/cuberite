@@ -21,7 +21,7 @@ cQueueFuncs and is used as the default behavior.
 
 /// This empty struct allows for the callback functions to be inlined
 template<class T>
-struct cQueueFuncs 
+struct cQueueFuncs
 {
 public:
 
@@ -88,7 +88,7 @@ public:
 		cCSLock Lock(m_CS);
 		if (m_Contents.size() == 0)
 		{
-			return false; 
+			return false;
 		}
 		item = m_Contents.front();
 		m_Contents.pop_front();

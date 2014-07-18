@@ -1691,6 +1691,9 @@ a_Player:OpenWindow(Window);
 				TakeDamage = { Return = "" },
 				KilledBy = { Return = "" },
 				GetHealth = { Return = "number" },
+				AddEntityEffect = { Params = "EffectType, {{cEntityEffect}}", Return = "", Notes = "Applies an entity effect" },
+				RemoveEntityEffect = { Params = "EffectType", Return = "", Notes = "Removes a currently applied entity effect" },
+				ClearEntityEffects = { Return = "", Notes = "Removes all currently applied entity effects" },
 			},
 			Inherits = "cEntity",
 		},  -- cPawn
@@ -1875,9 +1878,9 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				CallPlugin = { Params = "PluginName, FunctionName, [FunctionArgs...]", Return = "[FunctionRets]", Notes = "(STATIC) Calls the specified function in the specified plugin, passing all the given arguments to it. If it succeeds, it returns all the values returned by that function. If it fails, returns no value at all. Note that only strings, numbers, bools, nils and classes can be used for parameters and return values; tables and functions cannot be copied across plugins." },
 				DisablePlugin = { Params = "PluginName", Return = "bool", Notes = "Disables a plugin specified by its name. Returns true if the plugin was disabled, false if it wasn't found or wasn't active." },
-				ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Executes the command as if given by the specified Player. Checks permissions. Returns true if executed." },
+				ExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "{{cPluginManager#CommandResult|CommandResult}}", Notes = "Executes the command as if given by the specified Player. Checks permissions." },
 				FindPlugins = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
-				ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "bool", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
+				ForceExecuteCommand = { Params = "{{cPlayer|Player}}, CommandStr", Return = "{{cPluginManager#CommandResult|CommandResult}}", Notes = "Same as ExecuteCommand, but doesn't check permissions" },
 				ForEachCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function(Command, Permission, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
 				ForEachConsoleCommand = { Params = "CallbackFn", Return = "bool", Notes = "Calls the CallbackFn function for each command that has been bound using BindConsoleCommand(). The CallbackFn has the following signature: <pre class=\"prettyprint lang-lua\">function (Command, HelpString)</pre>. If the callback returns true, the enumeration is aborted and this API function returns false; if it returns false or no value, the enumeration continues with the next command, and the API function returns true." },
 				Get = { Params = "", Return = "cPluginManager", Notes = "(STATIC) Returns the single instance of the plugin manager" },
@@ -1893,8 +1896,23 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				LogStackTrace = { Params = "", Return = "", Notes = "(STATIC) Logs a current stack trace of the Lua engine to the server console log. Same format as is used when the plugin fails." },
 				ReloadPlugins = { Params = "", Return = "", Notes = "Reloads all active plugins" },
 			},
+			ConstantGroups=
+			{
+				CommandResult =
+				{
+					Include = "^cr.*",
+					TextBefore = [[
+						Results that the (Force)ExecuteCommand return. This gives information if the command is executed or not and the reason.
+					]],
+				},
+			},
 			Constants =
 			{
+				crBlocked = { Notes = "When a plugin stopped the command using the OnExecuteCommand hook" },
+				crError = { Notes = "When the command handler for the given command results in an error" },
+				crExecuted = { Notes = "When the command is successfully executed." },
+				crNoPermission = { Notes = "When the player doesn't have permission to execute the given command." },
+				crUnknownCommand = { Notes = "When the given command doesn't exist." },
 				HOOK_BLOCK_SPREAD = { Notes = "Called when a block spreads based on world conditions" },
 				HOOK_BLOCK_TO_PICKUPS = { Notes = "Called when a block has been dug and is being converted to pickups. The server has provided the default pickups and the plugins may modify them." },
 				HOOK_CHAT = { Notes = "Called when a client sends a chat message that is not a command. The plugin may modify the chat message" },
@@ -2325,6 +2343,7 @@ end
 					{ Params = "BlockX, BlockY, BlockZ, BlockMeta", Return = "", Notes = "Sets the meta for the block at the specified coords." },
 					{ Params = "{{Vector3i|BlockCoords}}, BlockMeta", Return = "", Notes = "Sets the meta for the block at the specified coords." },
 				},
+				SetChunkAlwaysTicked = { Params = "ChunkX, ChunkZ, IsAlwaysTicked", Return = "", Notes = "Sets the chunk to always be ticked even when it doesn't contain any clients. IsAlwaysTicked set to true turns forced ticking on, set to false turns it off. Every call with 'true' should be paired with a later call with 'false', otherwise the ticking won't stop. Multiple actions can request ticking independently, the ticking will continue until the last call with 'false'. Note that when the chunk unloads, it loses the value of this flag." },
 				SetNextBlockTick = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Sets the blockticking to start at the specified block in the next tick." },
 				SetCommandBlockCommand = { Params = "BlockX, BlockY, BlockZ, Command", Return = "bool", Notes = "Sets the command to be executed in a command block at the specified coordinates. Returns if command was changed." },
 				SetCommandBlocksEnabled = { Params = "IsEnabled (bool)", Return = "", Notes = "Sets whether command blocks should be enabled on the (entire) server." },

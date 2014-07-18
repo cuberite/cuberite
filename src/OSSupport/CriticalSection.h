@@ -47,7 +47,7 @@ class cCSLock
 	cCriticalSection * m_CS;
 
 	// Unlike a cCriticalSection, this object should be used from a single thread, therefore access to m_IsLocked is not threadsafe
-	// In Windows, it is an error to call cCriticalSection::Unlock() multiple times if the lock is not held, 
+	// In Windows, it is an error to call cCriticalSection::Unlock() multiple times if the lock is not held,
 	// therefore we need to check this value whether we are locked or not.
 	bool m_IsLocked;
 	

@@ -44,14 +44,13 @@ file(GLOB BIN_SOURCE
     "src/bin/*.c"
 )
 
-
-
 add_executable(tolua ${BIN_SOURCE})
 add_library(tolualib ${LIB_SOURCE})
+target_link_libraries(tolualib lua)
 
 #m is the standard math librarys
 if(UNIX)
 target_link_libraries(tolua m ${DYNAMIC_LOADER})
 endif()
 
-target_link_libraries(tolua lua tolualib)
+target_link_libraries(tolua tolualib lua)

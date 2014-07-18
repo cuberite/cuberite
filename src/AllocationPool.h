@@ -61,7 +61,7 @@ class cListAllocationPool : public cAllocationPool<T>
 				free (m_FreeList.front());
 				m_FreeList.pop_front();
 			}
-		}	
+		}
 		
 		virtual T * Allocate() override
 		{
@@ -90,7 +90,7 @@ class cListAllocationPool : public cAllocationPool<T>
 		}
 		virtual void Free(T * a_ptr) override
 		{
-			if (a_ptr == NULL) 
+			if (a_ptr == NULL)
 			{
 				return;
 			}
@@ -107,3 +107,7 @@ class cListAllocationPool : public cAllocationPool<T>
 		std::list<void *> m_FreeList;
 		std::auto_ptr<typename cAllocationPool<T>::cStarvationCallbacks> m_Callbacks;
 };
+
+
+
+

@@ -20,6 +20,7 @@
 #include "Map.h"
 #include "Enchantments.h"
 #include "UI/SlotArea.h"
+#include "json/json.h"
 
 
 
@@ -47,7 +48,7 @@ class cStatManager;
 
 class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
-{											// tolua_export
+{  // tolua_export
 public:
 	
 #if defined(ANDROID_NDK)
@@ -63,10 +64,12 @@ public:
 
 	const AString & GetIPString(void) const { return m_IPString; }
 	
-	cPlayer * GetPlayer(void) { return m_Player; }	// tolua_export
+	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 
-	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
+	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
 	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+
+	const Json::Value & GetProperties(void) const { return m_Properties; }
 	
 	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
 	This is used for the offline (non-auth) mode, when there's no UUID source.
@@ -91,8 +94,10 @@ public:
 	
 	static AString FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2);
 
-	void Kick(const AString & a_Reason);		// tolua_export
-	void Authenticate(const AString & a_Name, const AString & a_UUID);  // Called by cAuthenticator when the user passes authentication
+	void Kick(const AString & a_Reason);  // tolua_export
+
+	/** Authenticates the specified user, called by cAuthenticator */
+	void Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
 	void StreamChunks(void);
 	
@@ -118,12 +123,12 @@ public:
 	void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void SendBlockAction         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
-	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta); // tolua_export
+	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                (const cCompositeChat & a_Message);
 	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectPickup       (const cPickup & a_Pickup, const cPlayer & a_Player);
+	void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity       (const cEntity & a_Entity);
 	void SendDisconnect          (const AString & a_Reason);
 	void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -162,7 +167,7 @@ public:
 	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch);  // a_Src coords are Block * 8
+	void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob            (const cMonster & a_Mob);
@@ -241,8 +246,8 @@ public:
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
-		int a_BlockX, int a_BlockY, int a_BlockZ, 
-		const AString & a_Line1, const AString & a_Line2, 
+		int a_BlockX, int a_BlockY, int a_BlockZ,
+		const AString & a_Line1, const AString & a_Line2,
 		const AString & a_Line3, const AString & a_Line4
 	);
 	void HandleUnmount          (void);
@@ -266,20 +271,20 @@ public:
 	
 private:
 
-	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
-	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
-
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
-	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
+	/** Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 ) */
+	int m_ViewDistance;
 	
-	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight. 2 is the minimum, since foliage is generated 1 step behind chunk terrain generation
+	/** Server generates this many chunks AHEAD of player sight. */
+	static const int GENERATEDISTANCE = 2;
 	
 	AString m_IPString;
 
 	AString m_Username;
 	AString m_Password;
+	Json::Value m_Properties;
 
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
@@ -311,7 +316,7 @@ private:
 	int   m_PingID;
 	long long m_PingStartTime;
 	long long m_LastPingTime;
-	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
+	static const unsigned short PING_TIME_MS = 1000;  // Vanilla sends 1 per 20 ticks (1 second or every 1000 ms)
 	
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
@@ -325,9 +330,6 @@ private:
 	int m_LastDigBlockX;
 	int m_LastDigBlockY;
 	int m_LastDigBlockZ;
-	
-	/** Used while csDestroyedWaiting for counting the ticks until the connection is closed */
-	int m_TicksSinceDestruction;
 
 	enum eState
 	{
@@ -335,10 +337,9 @@ private:
 		csAuthenticating,    ///< The client has logged in, waiting for external authentication
 		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
 		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
- 		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           ///< Normal gameplay
 		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
-		csDestroyedWaiting,  ///< The client has been destroyed, but is still kept so that the Kick packet is delivered (#31)
 		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
 		
 		// TODO: Add Kicking here as well
@@ -371,6 +372,9 @@ private:
 	/** The plugin channels that the client has registered. */
 	cChannels m_PluginChannels;
 
+
+	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
+	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
@@ -406,7 +410,7 @@ private:
 	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
-};										// tolua_export
+};  // tolua_export
 
 
 

@@ -26,6 +26,7 @@ cloc.xsl
 ## Eclipse
 .cproject
 .project
+*.cbp
 
 # world inside source
 ChunkWorx.ini

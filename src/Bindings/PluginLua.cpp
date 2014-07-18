@@ -25,7 +25,7 @@ extern "C"
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPluginLua:
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
@@ -78,7 +78,7 @@ bool cPluginLua::Initialize(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
-	{	
+	{
 		m_LuaState.Create();
 		m_LuaState.RegisterAPILibs();
 		
@@ -420,6 +420,26 @@ bool cPluginLua::OnDisconnect(cClientHandle & a_Client, const AString & a_Reason
 
 
 
+bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_ADD_EFFECT];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_DistanceModifier, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -575,14 +595,14 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 
 
 
-bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_KILLING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, &a_TDI, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -703,6 +723,26 @@ bool cPluginLua::OnPlayerEating(cPlayer & a_Player)
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
 		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FOOD_LEVEL_CHANGE];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, a_NewFoodLevel, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -975,7 +1015,7 @@ bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
+bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -1254,8 +1294,8 @@ bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 
 
 bool cPluginLua::OnUpdatedSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	cWorld * a_World,
+	int a_BlockX, int a_BlockY, int a_BlockZ,
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
 	cPlayer * a_Player
 )
@@ -1279,8 +1319,8 @@ bool cPluginLua::OnUpdatedSign(
 
 
 bool cPluginLua::OnUpdatingSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	cWorld * a_World,
+	int a_BlockX, int a_BlockY, int a_BlockZ,
 	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
 	cPlayer * a_Player
 )
@@ -1327,18 +1367,15 @@ bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	int NewWeather = a_NewWeather;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WEATHER_CHANGING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_World, NewWeather, cLuaState::Return, res, NewWeather);
+		m_LuaState.Call((int)(**itr), &a_World, a_NewWeather, cLuaState::Return, res, a_NewWeather);
 		if (res)
 		{
-			a_NewWeather = (eWeather)NewWeather;
 			return true;
 		}
 	}
-	a_NewWeather = (eWeather)NewWeather;
 	return false;
 }
 
@@ -1480,7 +1517,7 @@ bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 		return true;
 	}
 	
-	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.", 
+	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.",
 		GetName().c_str(), a_HookType, FnName
 	);
 	m_LuaState.LogStackTrace();
@@ -1507,6 +1544,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:           return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
 		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
+		case cPluginManager::HOOK_ENTITY_ADD_EFFECT:            return "OnEntityAddEffect";
 		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
@@ -1632,7 +1670,7 @@ AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
 	sWebPluginTab * Tab = 0;
 	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
-		if ((*itr)->SafeTitle.compare(SafeTabName) == 0) // This is the one! Rawr
+		if ((*itr)->SafeTitle.compare(SafeTabName) == 0)  // This is the one! Rawr
 		{
 			Tab = *itr;
 			break;
@@ -1714,7 +1752,7 @@ bool cPluginLua::CallbackWindowClosing(int a_FnRef, cWindow & a_Window, cPlayer 
 	ASSERT(a_FnRef != LUA_REFNIL);
 	
 	cCSLock Lock(m_CriticalSection);
-	bool res;
+	bool res = false;
 	m_LuaState.Call(a_FnRef, &a_Window, &a_Player, a_CanRefuse, cLuaState::Return, res);
 	return res;
 }

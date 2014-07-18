@@ -36,7 +36,7 @@ public:
 	TabList & GetTabs() { return m_Tabs; }
 
 	typedef std::list< std::pair<AString, AString> > TabNameList;
-	TabNameList GetTabNames(); // >> EXPORTED IN MANUALBINDINGS <<
+	TabNameList GetTabNames();  // >> EXPORTED IN MANUALBINDINGS <<
 	std::pair< AString, AString > GetTabNameForRequest(const HTTPRequest* a_Request );
 
 private:

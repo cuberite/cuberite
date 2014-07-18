@@ -4,7 +4,7 @@
 #include "ManualBindings.h"
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
-
+#include "polarssl/md5.h"
 #include "Plugin.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
@@ -25,7 +25,6 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
-#include "md5/md5.h"
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
@@ -34,9 +33,7 @@
 
 
 
-/****************************
- * Better error reporting for Lua
- **/
+// Better error reporting for Lua
 static int tolua_do_error(lua_State* L, const char * a_pMsg, tolua_Error * a_pToLuaError)
 {
 	// Retrieve current function name
@@ -82,10 +79,7 @@ static int lua_do_error(lua_State* L, const char * a_pFormat, ...)
 
 
 
-/****************************
- * Lua bound functions with special return types
- **/
-
+// Lua bound functions with special return types
 static int tolua_StringSplit(lua_State * tolua_S)
 {
 	cLuaState LuaState(tolua_S);
@@ -558,10 +552,12 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 
 
 
-template< class Ty1,
-          class Ty2,
-          bool (Ty1::*Func1)(int, int, cItemCallback<Ty2> &) >
-static int tolua_ForEachInChunk(lua_State* tolua_S)
+template<
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(int, int, cItemCallback<Ty2> &)
+>
+static int tolua_ForEachInChunk(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
 	if ((NumArgs != 3) && (NumArgs != 4))
@@ -652,9 +648,11 @@ static int tolua_ForEachInChunk(lua_State* tolua_S)
 
 
 
-template< class Ty1,
-          class Ty2,
-          bool (Ty1::*Func1)(cItemCallback<Ty2> &) >
+template<
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(cItemCallback<Ty2> &)
+>
 static int tolua_ForEach(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
@@ -2001,9 +1999,11 @@ static int tolua_cPlugin_Call(lua_State * tolua_S)
 
 static int tolua_md5(lua_State* tolua_S)
 {
-	std::string SourceString = tolua_tostring(tolua_S, 1, 0);
-	std::string CryptedString = md5( SourceString );
-	tolua_pushstring( tolua_S, CryptedString.c_str() );
+	unsigned char Output[16];
+	size_t len = 0;
+	const unsigned char * SourceString = (const unsigned char *)lua_tolstring(tolua_S, 1, &len);
+	md5(SourceString, len, Output);
+	lua_pushlstring(tolua_S, (const char *)Output, ARRAYCOUNT(Output));
 	return 1;
 }
 
@@ -2064,7 +2064,7 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 	{
 		lua_pushstring(tolua_S, it->first.c_str() );
 		tolua_pushusertype(tolua_S, &(it->second), "HTTPFormData" );
-		//lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size() ); // Might contain binary data
+		// lua_pushlstring(tolua_S, it->second.Value.c_str(), it->second.Value.size() );  // Might contain binary data
 		lua_settable(tolua_S, top);
 	}
 
@@ -2113,7 +2113,7 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 	{
 		const AString & FancyName = iter->first;
 		const AString & WebName = iter->second;
-		tolua_pushstring( tolua_S, WebName.c_str() ); // Because the WebName is supposed to be unique, use it as key
+		tolua_pushstring( tolua_S, WebName.c_str() );  // Because the WebName is supposed to be unique, use it as key
 		tolua_pushstring( tolua_S, FancyName.c_str() );
 		//
 		lua_rawset(tolua_S, -3);

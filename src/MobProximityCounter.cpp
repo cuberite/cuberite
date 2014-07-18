@@ -8,7 +8,7 @@
 
 void cMobProximityCounter::CollectMob(cEntity& a_Monster, cChunk& a_Chunk, double a_Distance)
 {
-//	LOGD("Collecting monster %s, with distance %f",a_Monster->GetClass(),a_Distance);
+	// LOGD("Collecting monster %s, with distance %f",a_Monster->GetClass(),a_Distance);
 	tMonsterToDistance::iterator it = m_MonsterToDistance.find(&a_Monster);
 	if (it == m_MonsterToDistance.end())
 	{
@@ -61,7 +61,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 		{
 			if ((a_DistanceMin == 1) || (itr->first > a_DistanceMin))
 			{
-				toReturn.m_Begin = itr; // this is the first one with distance > a_DistanceMin;
+				toReturn.m_Begin = itr;  // This is the first one with distance > a_DistanceMin;
 			}
 		}
 
@@ -69,7 +69,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 		{
 			if ((a_DistanceMax != 1) && (itr->first > a_DistanceMax))
 			{
-				toReturn.m_End = itr; // this is just after the last one with distance < a_DistanceMax
+				toReturn.m_End = itr;  // This is just after the last one with distance < a_DistanceMax
 				// Note : if we are not going through this, it's ok, toReturn.m_End will be end();
 				break;
 			}

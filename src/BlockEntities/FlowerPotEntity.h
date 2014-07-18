@@ -27,7 +27,7 @@ namespace Json
 
 // tolua_begin
 
-class cFlowerPotEntity : 
+class cFlowerPotEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
@@ -53,7 +53,7 @@ public:
 	cItem GetItem(void) const { return m_Item; }
 	
 	/** Set the item in the flower pot */
-	void SetItem(const cItem a_Item) { m_Item = a_Item; }
+	void SetItem(const cItem & a_Item) { m_Item = a_Item; }
 	
 	// tolua_end
 	

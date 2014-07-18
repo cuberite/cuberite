@@ -105,15 +105,15 @@ protected:
 		
 		int           m_NumDirty;  // Number of chunks that were written into m_DataContents but not into the file
 
-		Vector3i      m_ChunkSize; // Is related to m_ChunkVersion
+		Vector3i      m_ChunkSize;  // Is related to m_ChunkVersion
 		char          m_ChunkVersion;
 		char          m_PakVersion;
 		
 		bool SaveChunkToData(const cChunkCoords & a_Chunk, cWorld * a_World);  // Saves the chunk to m_DataContents, updates headers and m_NumDirty
 		void SynchronizeFile(void);  // Writes m_DataContents along with the headers to file, resets m_NumDirty
 
-		void UpdateChunk1To2(void); // Height from 128 to 256
-		void UpdateChunk2To3(void); // Axis order from YZX to XZY
+		void UpdateChunk1To2(void);  // Height from 128 to 256
+		void UpdateChunk2To3(void);  // Axis order from YZX to XZY
 	} ;
 	
 	typedef std::list<cPAKFile *> cPAKFiles;

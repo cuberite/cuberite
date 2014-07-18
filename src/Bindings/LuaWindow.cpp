@@ -7,13 +7,13 @@
 #include "../UI/SlotArea.h"
 #include "PluginLua.h"
 #include "../Entities/Player.h"
-#include "lua/src/lauxlib.h" // Needed for LUA_REFNIL
+#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaWindow:
 
 cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title) :

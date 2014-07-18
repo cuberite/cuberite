@@ -19,7 +19,7 @@ namespace Json
 
 // tolua_begin
 
-class cJukeboxEntity : 
+class cJukeboxEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
