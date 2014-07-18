@@ -724,7 +724,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 
 	X Axis ---->
 
-	Repeater directions, values from a cWorld::GetBlockMeta(a_RelBlockX , a_RelBlockY, a_RelBlockZ) lookup:
+	Repeater directions, values from a cWorld::GetBlockMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) lookup:
 
 	East (Right) (X+): 0x1
 	West (Left) (X-): 0x3
@@ -1723,7 +1723,7 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 		{
 			continue;
 		}
-		a_PowerLevel = std::max(itr->a_PowerLevel , a_PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
+		a_PowerLevel = std::max(itr->a_PowerLevel, a_PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
 	}
 
 	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)  // Check linked powered list

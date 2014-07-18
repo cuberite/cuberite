@@ -283,7 +283,7 @@ void cHeiGenClassic::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightM
 			{
 				hei = 250;
 			}
-			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
+			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
 }
@@ -345,7 +345,7 @@ void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heigh
 			{
 				hei = 250;
 			}
-			cChunkDef::SetHeight(a_HeightMap, x , z, hei);
+			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
 }
