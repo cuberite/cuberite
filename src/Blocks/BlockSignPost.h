@@ -9,25 +9,36 @@
 
 
 
-class cBlockSignHandler :
+class cBlockSignPostHandler :
 	public cBlockHandler
 {
 public:
-	cBlockSignHandler(BLOCKTYPE a_BlockType)
+	cBlockSignPostHandler(BLOCKTYPE a_BlockType)
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
-	
+
 
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
+	}
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	{
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+
+		return (cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 
 
@@ -42,23 +53,6 @@ public:
 		a_Rotation = (a_Rotation / 360) * 16;
 		
 		return ((char)a_Rotation) % 16;
-	}
-	
-	
-	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
-	{
-		switch (a_Direction)
-		{
-			case 0x2: return 0x2;
-			case 0x3: return 0x3;
-			case 0x4: return 0x4;
-			case 0x5: return 0x5;
-			default:
-			{
-				break;
-			}
-		}
-		return 0x2;
 	}
 
 

@@ -70,7 +70,7 @@
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSideways.h"
-#include "BlockSign.h"
+#include "BlockSignPost.h"
 #include "BlockSlab.h"
 #include "BlockSnow.h"
 #include "BlockStairs.h"
@@ -81,6 +81,7 @@
 #include "BlockTorch.h"
 #include "BlockTrapdoor.h"
 #include "BlockVine.h"
+#include "BlockWallSign.h"
 #include "BlockWorkbench.h"
 
 
@@ -275,7 +276,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
 		case E_BLOCK_SANDSTONE_STAIRS:      return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
-		case E_BLOCK_SIGN_POST:             return new cBlockSignHandler            (a_BlockType);
+		case E_BLOCK_SIGN_POST:             return new cBlockSignPostHandler        (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STAINED_GLASS:         return new cBlockGlassHandler           (a_BlockType);
@@ -297,7 +298,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_TRIPWIRE:              return new cBlockTripwireHandler        (a_BlockType);
 		case E_BLOCK_TRIPWIRE_HOOK:         return new cBlockTripwireHookHandler    (a_BlockType);
 		case E_BLOCK_VINES:                 return new cBlockVineHandler            (a_BlockType);
-		case E_BLOCK_WALLSIGN:              return new cBlockSignHandler            (a_BlockType);  // TODO: This needs a special handler
+		case E_BLOCK_WALLSIGN:              return new cBlockWallSignHandler        (a_BlockType);
 		case E_BLOCK_WATER:                 return new cBlockFluidHandler           (a_BlockType);
 		case E_BLOCK_WOODEN_BUTTON:         return new cBlockButtonHandler          (a_BlockType);
 		case E_BLOCK_WOODEN_DOOR:           return new cBlockDoorHandler            (a_BlockType);
