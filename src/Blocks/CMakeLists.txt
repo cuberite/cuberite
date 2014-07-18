@@ -75,7 +75,7 @@ SET (HDRS
 	BlockSand.h
 	BlockSapling.h
 	BlockSideways.h
-	BlockSign.h
+	BlockSignPost.h
 	BlockSlab.h
 	BlockSnow.h
 	BlockStairs.h
@@ -89,6 +89,7 @@ SET (HDRS
 	BlockTripwire.h
 	BlockTripwireHook.h
 	BlockVine.h
+	BlockWallSign.h
 	BlockWorkbench.h
 	BroadcastInterface.h
 	ChunkInterface.h

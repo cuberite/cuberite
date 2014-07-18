@@ -248,16 +248,9 @@ set_source_files_properties(Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
 set_source_files_properties(Bindings/Bindings.h PROPERTIES GENERATED TRUE)
 
 if (NOT MSVC)
-
 	# Bindings need to reference other folders, so they are done here instead
-
 	# lib dependencies are not included
-
 	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
-
-	foreach(folder ${FOLDERS})
-		add_subdirectory(${folder})
-	endforeach(folder)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
@@ -268,6 +261,10 @@ if (NOT MSVC)
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
 
+	foreach(folder ${FOLDERS})
+		add_subdirectory(${folder})
+	endforeach(folder)
+
 	list(APPEND SOURCE "${SRCS}")
 	list(APPEND SOURCE "${HDRS}")
 
@@ -275,8 +272,6 @@ if (NOT MSVC)
 	if (WIN32)
 		list(APPEND SOURCE "Resources/MCServer.rc")
 	endif()
-
-
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
