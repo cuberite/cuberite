@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "BlockHandler.h"
+#include "../Entities/Player.h"
 #include "Chunk.h"
 
 
@@ -8,12 +10,36 @@
 
 
 class cBlockWallSignHandler :
-	public cBlockSignPostHandler
+	public cBlockHandler
 {
+	typedef cBlockHandler super;
 public:
 	cBlockWallSignHandler(BLOCKTYPE a_BlockType)
-		: cBlockSignPostHandler(a_BlockType)
+		: cBlockHandler(a_BlockType)
 	{
+	}
+
+
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
+	}
+
+
+	virtual const char * GetStepSound(void) override
+	{
+		return "step.wood";
+	}
+
+
+	virtual void OnPlacedByPlayer(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	) override
+	{
+		a_Player->GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 	}
 
 
