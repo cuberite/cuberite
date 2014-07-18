@@ -867,13 +867,13 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(1 << Random.NextInt(3));
+			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(Random.NextInt(1) == 0 ? false : true);
+			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
 			break;
 		}
 		case mtVillager:

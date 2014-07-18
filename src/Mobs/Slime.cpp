@@ -48,9 +48,9 @@ void cSlime::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSlime::Attack(float a_Dt)
 {
-	if (m_Size != 1)
+	if (m_Size > 1)
 	{
-		// Only slimes with the size 2 and 3 attacks a player.
+		// Only slimes larger than size 1 attack a player.
 		super::Attack(a_Dt);
 	}
 }
