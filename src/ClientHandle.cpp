@@ -210,11 +210,11 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		{
 			if (ShouldAppendChatPrefixes)
 			{
-				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue, a_AdditionalData.c_str(), cChatColor::White, cChatColor::Italic);
 			}
 			else
 			{
-				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
 			}
 		}
 	}
@@ -533,9 +533,9 @@ void cClientHandle::HandlePing(void)
 
 	Printf(Reply, "%s%s%i%s%i",
 		Server.GetDescription().c_str(),
-		cChatColor::Delimiter.c_str(),
+		cChatColor::Delimiter,
 		Server.GetNumPlayers(),
-		cChatColor::Delimiter.c_str(),
+		cChatColor::Delimiter,
 		Server.GetMaxPlayers()
 	);
 	Kick(Reply);

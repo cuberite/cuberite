@@ -1021,9 +1021,9 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i",
 				Server->GetDescription().c_str(),
-				cChatColor::Delimiter.c_str(),
+				cChatColor::Delimiter,
 				Server->GetNumPlayers(),
-				cChatColor::Delimiter.c_str(),
+				cChatColor::Delimiter,
 				Server->GetMaxPlayers()
 			);
 			break;
