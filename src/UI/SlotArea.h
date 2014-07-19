@@ -161,7 +161,7 @@ public:
 	/** Called when a player clicks in the window. Parameters taken from the click packet. */
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 
-	bool CanPlaceInSlot(int a_SlotNum, const cItem & a_Item);
+	static bool CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item);
 } ;
 
 

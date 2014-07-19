@@ -1926,7 +1926,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		return;
 	}
 
-	if (DraggingItem.IsEmpty() || CanPlaceInSlot(a_SlotNum, DraggingItem))
+	if (DraggingItem.IsEmpty() || CanPlaceArmorInSlot(a_SlotNum, DraggingItem))
 	{
 		// Swap contents
 		cItem tmp(DraggingItem);
@@ -1945,7 +1945,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 
 
 
-bool cSlotAreaArmor::CanPlaceInSlot(int a_SlotNum, const cItem & a_Item)
+bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 {
 	switch (a_SlotNum)
 	{

@@ -103,6 +103,19 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryT
 	cItem ToAdd(a_Item);
 	int res = 0;
 
+	// When the item is a armor, try to set it directly to the armor slot.
+	if (ItemCategory::IsArmor(a_Item.m_ItemType))
+	{
+		for (size_t i = 0; i < (size_t)m_ArmorSlots.GetNumSlots(); i++)
+		{
+			if (m_ArmorSlots.GetSlot(i).IsEmpty() && cSlotAreaArmor::CanPlaceArmorInSlot(i, a_Item))
+			{
+				m_ArmorSlots.SetSlot(i, a_Item);
+				return a_Item.m_ItemCount;
+			}
+		}
+	}
+
 	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks, a_tryToFillEquippedFirst ? m_EquippedSlotNum : -1);
 	ToAdd.m_ItemCount = a_Item.m_ItemCount - res;
 	if (ToAdd.m_ItemCount == 0)
