@@ -154,18 +154,18 @@ static cDistortedHeightmap::sBlockInfo tbOFRedSand[] =
 ////////////////////////////////////////////////////////////////////////////////
 // Individual patterns to use:
 
-static cPattern patGrass    (tbGrass,     ARRAYCOUNT(tbGrass));
-static cPattern patSand     (tbSand,      ARRAYCOUNT(tbSand));
-static cPattern patDirt     (tbDirt,      ARRAYCOUNT(tbDirt));
-static cPattern patPodzol   (tbPodzol,    ARRAYCOUNT(tbPodzol));
-static cPattern patGrassLess(tbGrassLess, ARRAYCOUNT(tbGrassLess));
-static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
-static cPattern patGravel   (tbGravel,    ARRAYCOUNT(tbGravel));
-static cPattern patStone    (tbStone,     ARRAYCOUNT(tbStone));
+static cPattern patGrass(void)     { return cPattern(tbGrass,     ARRAYCOUNT(tbGrass));     }
+static cPattern patSand(void)      { return cPattern(tbSand,      ARRAYCOUNT(tbSand));      }
+static cPattern patDirt(void)      { return cPattern(tbDirt,      ARRAYCOUNT(tbDirt));      }
+static cPattern patPodzol(void)    { return cPattern(tbPodzol,    ARRAYCOUNT(tbPodzol));    }
+static cPattern patGrassLess(void) { return cPattern(tbGrassLess, ARRAYCOUNT(tbGrassLess)); }
+static cPattern patMycelium(void)  { return cPattern(tbMycelium,  ARRAYCOUNT(tbMycelium));  }
+static cPattern patGravel(void)    { return cPattern(tbGravel,    ARRAYCOUNT(tbGravel));    }
+static cPattern patStone(void)     { return cPattern(tbStone,     ARRAYCOUNT(tbStone));     }
 
-static cPattern patOFSand   (tbOFSand,    ARRAYCOUNT(tbOFSand));
-static cPattern patOFClay   (tbOFClay,    ARRAYCOUNT(tbOFClay));
-static cPattern patOFRedSand(tbOFRedSand, ARRAYCOUNT(tbOFRedSand));
+static cPattern patOFSand(void)    { return cPattern(tbOFSand,    ARRAYCOUNT(tbOFSand));    }
+static cPattern patOFClay(void)    { return cPattern(tbOFClay,    ARRAYCOUNT(tbOFClay));    }
+static cPattern patOFRedSand(void) { return cPattern(tbOFRedSand, ARRAYCOUNT(tbOFRedSand)); }
 
 
 
@@ -702,7 +702,7 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biSavannaM:
 		case biSavannaPlateauM:
 		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patGrass.Get());
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patGrass().Get());
 			return;
 		}
 
@@ -715,7 +715,7 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
 			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
+			const sBlockInfo * Pattern = (Val < -0.9) ? patGrassLess().Get() : ((Val > 0) ? patPodzol().Get() : patGrass().Get());
 			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
@@ -725,14 +725,14 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biDesertM:
 		case biBeach:
 		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patSand.Get());
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patSand().Get());
 			return;
 		}
 		
 		case biMushroomIsland:
 		case biMushroomShore:
 		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patMycelium.Get());
+			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patMycelium().Get());
 			return;
 		}
 
@@ -757,7 +757,7 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
 			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.1) ? patStone.Get() : patGrass.Get();
+			const sBlockInfo * Pattern = (Val < -0.1) ? patStone().Get() : patGrass().Get();
 			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
@@ -769,7 +769,7 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
 			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.9) ? patStone.Get() : ((Val > 0) ? patGravel.Get() : patGrass.Get());
+			const sBlockInfo * Pattern = (Val < -0.9) ? patStone().Get() : ((Val > 0) ? patGravel().Get() : patGrass().Get());
 			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
@@ -839,7 +839,7 @@ void cDistortedHeightmap::FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, i
 	if (Top < m_SeaLevel)
 	{
 		// The terrain is below sealevel, handle as regular ocean:
-		FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patOFRedSand.Get());
+		FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patOFRedSand().Get());
 		return;
 	}
 
@@ -920,15 +920,15 @@ const cDistortedHeightmap::sBlockInfo * cDistortedHeightmap::ChooseOceanFloorPat
 	NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
 	if (Val < -0.95)
 	{
-		return patOFClay.Get();
+		return patOFClay().Get();
 	}
 	else if (Val < 0)
 	{
-		return patOFSand.Get();
+		return patOFSand().Get();
 	}
 	else
 	{
-		return patDirt.Get();
+		return patDirt().Get();
 	}
 }
 
