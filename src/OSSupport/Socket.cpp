@@ -25,15 +25,6 @@ cSocket::cSocket(xSocket a_Socket)
 
 
 
-cSocket::~cSocket()
-{
-	// Do NOT close the socket; this class is an API wrapper, not a RAII!
-}
-
-
-
-
-
 cSocket::operator cSocket::xSocket() const
 {
 	return m_Socket;

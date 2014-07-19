@@ -11,9 +11,9 @@
 	#include <dbghelp.h>
 #endif  // _MSC_VER
 
-// Here, we have some ALL CAPS variables, to give the impression that this is deeeep, gritty programming :P
-bool g_TERMINATE_EVENT_RAISED = false;  // If something has told the server to stop; checked periodically in cRoot
-bool g_SERVER_TERMINATED = false;  // Set to true when the server terminates, so our CTRL handler can then tell Windows to close the console
+
+bool cRoot::m_TerminateEventRaised = false;  // If something has told the server to stop; checked periodically in cRoot
+static bool g_ServerTerminated = false;  // Set to true when the server terminates, so our CTRL handler can then tell the OS to close the console
 
 
 
@@ -52,7 +52,7 @@ bool g_ShouldLogCommOut;
 void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
-	g_TERMINATE_EVENT_RAISED = true;
+	cRoot::m_TerminateEventRaised = true;
 
 	switch (a_Signal)
 	{
@@ -155,12 +155,12 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 // Handle CTRL events in windows, including console window close
 BOOL CtrlHandler(DWORD fdwCtrlType)
 {
-	g_TERMINATE_EVENT_RAISED = true;
+	cRoot::m_TerminateEventRaised = true;
 	LOGD("Terminate event raised from the Windows CtrlHandler");
 
 	if (fdwCtrlType == CTRL_CLOSE_EVENT)  // Console window closed via 'x' button, Windows will try to close immediately, therefore...
 	{
-		while (!g_SERVER_TERMINATED) { cSleep::MilliSleep(100); }  // Delay as much as possible to try to get the server to shut down cleanly
+		while (!g_ServerTerminated) { cSleep::MilliSleep(100); }  // Delay as much as possible to try to get the server to shut down cleanly
 	}
 
 	return TRUE;
@@ -296,7 +296,7 @@ int main( int argc, char **argv )
 	DeinitLeakFinder();
 	#endif
 
-	g_SERVER_TERMINATED = true;
+	g_ServerTerminated = true;
 
 	return EXIT_SUCCESS;
 }

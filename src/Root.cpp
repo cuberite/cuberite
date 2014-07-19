@@ -30,8 +30,6 @@
 	#include <mach/mach.h>
 #endif
 
-extern bool g_TERMINATE_EVENT_RAISED;
-
 
 
 
@@ -79,7 +77,7 @@ void cRoot::InputThread(void * a_Params)
 
 	cLogCommandOutputCallback Output;
 	
-	while (!self.m_bStop && !self.m_bRestart && !g_TERMINATE_EVENT_RAISED && std::cin.good())
+	while (!self.m_bStop && !self.m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
 		std::getline(std::cin, Command);
@@ -89,7 +87,7 @@ void cRoot::InputThread(void * a_Params)
 		}
 	}
 
-	if (g_TERMINATE_EVENT_RAISED || !std::cin.good())
+	if (m_TerminateEventRaised || !std::cin.good())
 	{
 		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
 		self.m_bStop = true;
@@ -205,12 +203,12 @@ void cRoot::Start(void)
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
-		while (!m_bStop && !m_bRestart && !g_TERMINATE_EVENT_RAISED)  // These are modified by external threads
+		while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
 		{
 			cSleep::MilliSleep(1000);
 		}
 
-		if (g_TERMINATE_EVENT_RAISED)
+		if (m_TerminateEventRaised)
 		{
 			m_bStop = true;
 		}
