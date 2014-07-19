@@ -414,11 +414,7 @@ void cMonster::HandleFalling()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
-
-	if (PosY < 0)
-		PosY = 0;
-	else if (PosY > cChunkDef::Height)
-		PosY = cChunkDef::Height;
+	PosY = Clamp(PosY, 0, cChunkDef::Height);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{

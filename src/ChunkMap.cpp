@@ -1951,10 +1951,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			double FinalDamage = (((1 / AbsoluteEntityPos.x) + (1 / AbsoluteEntityPos.y) + (1 / AbsoluteEntityPos.z)) * 2) * m_ExplosionSize;
 
 			// Clip damage values
-			if (FinalDamage > a_Entity->GetMaxHealth())
-				FinalDamage = a_Entity->GetMaxHealth();
-			else if (FinalDamage < 0)
-				FinalDamage = 0;
+			FinalDamage = Clamp(FinalDamage, 0.0, (double)a_Entity->GetMaxHealth());
 
 			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock())  // Don't apply damage to other TNT entities and falling blocks, they should be invincible
 			{

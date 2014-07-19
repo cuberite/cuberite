@@ -470,18 +470,7 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 {
 	int Y = a_BlockY;
 	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	if (Y < 0)
-	{
-		a_BlockY = 0;
-	}
-	else if (Y > 255)
-	{
-		a_BlockY = 255;
-	}
-	else
-	{
-		a_BlockY = (unsigned char)Y;
-	}
+	a_BlockY = Clamp<unsigned char>(Y, 0, 255);
 }
 
 

@@ -382,10 +382,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	if (m_CurrentXp < 0)
-	{
-		m_CurrentXp = 0;
-	}
+	m_CurrentXp = std::max<short int>(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
