@@ -101,9 +101,10 @@ protected:
 		}
 	} ;
 
-	struct FuncTable {
+	struct FuncTable
+	{
 		static void Delete(sChunkLoad) {};
-		static void Combine(sChunkLoad& a_orig, const sChunkLoad a_new)
+		static void Combine(sChunkLoad & a_orig, const sChunkLoad a_new)
 		{
 			a_orig.m_Generate |= a_new.m_Generate;
 		};

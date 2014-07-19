@@ -30,7 +30,8 @@
 #include <sstream>
 #include <iostream>
 
-extern "C" {
+extern "C"
+{
 	#include "zlib/zlib.h"
 }
 

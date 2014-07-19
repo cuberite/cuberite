@@ -103,7 +103,8 @@ public:
 	
 protected:
 	/// Results of packet-parsing:
-	enum {
+	enum
+	{
 		PARSE_OK         =  1,
 		PARSE_ERROR      = -1,
 		PARSE_UNKNOWN    = -2,

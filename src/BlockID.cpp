@@ -255,7 +255,8 @@ AString ItemToFullString(const cItem & a_Item)
 
 int StringToMobType(const AString & a_MobString)
 {
-	static struct {
+	static struct
+	{
 		int m_MobType;
 		const char * m_String;
 	} MobMap [] =

@@ -55,7 +55,8 @@ public :
 	// return the mobs that are within the range of distance of the closest player they are
 	// that means that if a mob is 30 m from a player and 150 m from another one. It will be
 	// in the range [0..50] but not in [100..200]
-	struct sIterablePair{
+	struct sIterablePair
+	{
 		tDistanceToMonster::const_iterator m_Begin;
 		tDistanceToMonster::const_iterator m_End;
 		int m_Count;

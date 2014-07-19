@@ -22,7 +22,8 @@ class cHopperEntity :
 	typedef cBlockEntityWithItems super;
 
 public:
-	enum {
+	enum
+	{
 		ContentsHeight = 1,
 		ContentsWidth  = 5,
 		TICKS_PER_TRANSFER = 8,  ///< How many ticks at minimum between two item transfers to or from the hopper
