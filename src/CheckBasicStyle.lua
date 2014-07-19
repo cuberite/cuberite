@@ -6,13 +6,13 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Tabs for indentation, spaces for alignment
 	- Trailing whitespace on non-empty lines
 	- Two spaces between code and line-end comment ("//")
-	- Spaces after comma, not before (except in #define argument list)
+	- Spaces after comma, not before
 	- (TODO) Spaces before *, /, &
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
 	- (TODO) Braces not on the end of line
 	- (TODO) Line dividers (////...) exactly 80 slashes
-	- (TODO) Not using "* "-style doxy comments continuation lines
+	- (TODO) Not using "* "-style doxy comment continuation lines
 	
 Violations that cannot be checked easily:
 	- Spaces around "+" (there are things like "a++", "++a", "a += 1", "X+", "stack +1" and ascii-drawn tables)
@@ -79,8 +79,8 @@ local g_NumViolations = 0
 --- Reports one violation
 -- Pretty-prints the message
 -- Also increments g_NumViolations
-local function ReportViolation(a_FileName, a_LineNumber, a_Message)
-	print(a_FileName .. "(" .. a_LineNumber .. "): " .. a_Message)
+local function ReportViolation(a_FileName, a_LineNumber, a_PatStart, a_PatEnd, a_Message)
+	print(a_FileName .. "(" .. a_LineNumber .. "): " .. a_PatStart .. " .. " .. a_PatEnd .. ": " .. a_Message)
 	g_NumViolations = g_NumViolations + 1
 end
 
@@ -94,7 +94,7 @@ local function ReportViolationIfFound(a_Line, a_FileName, a_LineNum, a_Pattern, 
 	if not(patStart) then
 		return
 	end
-	ReportViolation(a_FileName, a_LineNum, a_Message .. "(" .. patStart .. " .. " .. patEnd .. ")")
+	ReportViolation(a_FileName, a_LineNum, patStart, patEnd, a_Message)
 end
 
 
@@ -120,7 +120,7 @@ local g_ViolationPatterns =
 	
 	-- Check that all commas have spaces after them and not in front of them:
 	{" ,", "Extra space before a \",\""},
-	{"^\t*[^#].*,[^%s]", "Needs a space after a \",\""},  -- Anywhere except lines starting with "#" - avoid #define params
+	{",[^%s\"%%]", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
 }
 
 
