@@ -1712,16 +1712,16 @@ void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	// Send the response:
-	AString Response = "{\"version\":{\"name\":\"1.7.2\",\"protocol\":4},\"players\":{";
+	AString Response = "{\"version\":{\"name\":\"1.7.2\", \"protocol\":4}, \"players\":{";
 	cServer * Server = cRoot::Get()->GetServer();
-	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
+	AppendPrintf(Response, "\"max\":%u, \"online\":%u, \"sample\":[]},",
 		Server->GetMaxPlayers(),
 		Server->GetNumPlayers()
 	);
 	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
 		Server->GetDescription().c_str()
 	);
-	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
 		Server->GetFaviconData().c_str()
 	);
 	Response.append("}");
@@ -3047,15 +3047,15 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	// Send the response:
-	AString Response = "{\"version\":{\"name\":\"1.7.6\",\"protocol\":5},\"players\":{";
-	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
+	AString Response = "{\"version\": {\"name\": \"1.7.6\", \"protocol\":5}, \"players\": {";
+	AppendPrintf(Response, "\"max\": %u, \"online\": %u, \"sample\": []},",
 		cRoot::Get()->GetServer()->GetMaxPlayers(),
 		cRoot::Get()->GetServer()->GetNumPlayers()
 	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
+	AppendPrintf(Response, "\"description\": {\"text\": \"%s\"},",
 		cRoot::Get()->GetServer()->GetDescription().c_str()
 	);
-	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
 		cRoot::Get()->GetServer()->GetFaviconData().c_str()
 	);
 	Response.append("}");
