@@ -570,12 +570,13 @@ void cWorld::Start(void)
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 
 	// Load allowed mobs:
-	const char * DefaultMonsters = "";
+	AString DefaultMonsters;
 	switch (m_Dimension)
 	{
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = "enderman"; break;
+		case dimNotSet:    break;
 	}
 	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
 	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
