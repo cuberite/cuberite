@@ -30,8 +30,6 @@
 	#include <mach/mach.h>
 #endif
 
-extern bool g_TERMINATE_EVENT_RAISED;
-
 
 
 
