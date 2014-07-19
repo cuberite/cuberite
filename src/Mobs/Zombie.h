@@ -19,8 +19,10 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void MoveToPosition(const Vector3d & a_Position) override;
 
-	bool IsVillagerZombie(void) const {return m_IsVillagerZombie; }
-	bool IsConverting    (void) const {return m_IsConverting; }
+	virtual bool IsUndead(void) override { return true; }
+	
+	bool IsVillagerZombie(void) const { return m_IsVillagerZombie; }
+	bool IsConverting    (void) const { return m_IsConverting; }
 
 private:
 

@@ -680,16 +680,6 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 bool cMonster::IsUndead(void)
 {
-	switch (GetMobType())
-	{
-		case mtZombie:
-		case mtZombiePigman:
-		case mtSkeleton:
-		case mtWither:
-		{
-			return true;
-		}
-	}
 	return false;
 }
 

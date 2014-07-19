@@ -107,7 +107,7 @@ public:
 	void GetMonsterConfig(const AString & a_Name);
 	
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
-	bool IsUndead(void);
+	virtual bool IsUndead(void);
 	
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);
