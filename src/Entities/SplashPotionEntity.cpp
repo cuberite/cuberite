@@ -48,10 +48,7 @@ public:
 		// y = -0.25x + 1, where x is the distance from the player. Approximation for potion splash.
 		// TODO: better equation
 		double Reduction = -0.25 * SplashDistance + 1.0;
-		if (Reduction < 0)
-		{
-			Reduction = 0;
-		}
+		Reduction = std::max(Reduction, 0.0);
 		
 		((cPawn *) a_Entity)->AddEntityEffect(m_EntityEffectType, m_EntityEffect.GetDuration(), m_EntityEffect.GetIntensity(), Reduction);
 		return false;

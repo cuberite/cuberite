@@ -327,10 +327,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	
 	// TODO: Apply damage to armor
 	
-	if (m_Health < 0)
-	{
-		m_Health = 0;
-	}
+	m_Health = std::max(m_Health, 0);
 
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{
