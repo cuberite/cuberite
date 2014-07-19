@@ -7,10 +7,11 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Trailing whitespace on non-empty lines
 	- Two spaces between code and line-end comment ("//")
 	- Spaces after comma, not before
+	- Opening braces not at the end of a code line
+	- (TODO) Spaces after if, for, while
 	- (TODO) Spaces before *, /, &
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
-	- (TODO) Braces not on the end of line
 	- (TODO) Line dividers (////...) exactly 80 slashes
 	- (TODO) Not using "* "-style doxy comment continuation lines
 	
@@ -121,6 +122,9 @@ local g_ViolationPatterns =
 	-- Check that all commas have spaces after them and not in front of them:
 	{" ,", "Extra space before a \",\""},
 	{",[^%s\"%%]", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
+	
+	-- Check that opening braces are not at the end of a code line:
+	{"[^%s].-{\n?$", "Brace should be on a separate line"},
 }
 
 
@@ -145,7 +149,7 @@ local function ProcessFile(a_FileName)
 	if ((lastChar ~= 13) and (lastChar ~= 10)) then
 		local numLines = 1
 		string.gsub(all, "\n", function() numLines = numLines + 1 end)  -- Count the number of line-ends
-		ReportViolation(a_FileName, numLines, "Missing empty line at file end")
+		ReportViolation(a_FileName, numLines, 1, 1, "Missing empty line at file end")
 		return
 	end
 	
