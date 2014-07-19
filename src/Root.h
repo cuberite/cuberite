@@ -40,7 +40,7 @@ namespace Json
 class cRoot
 {
 public:
-	static bool g_TERMINATE_EVENT_RAISED;
+	static bool m_TerminateEventRaised;
 	
 	static cRoot * Get() { return s_Root; }
 	// tolua_end
