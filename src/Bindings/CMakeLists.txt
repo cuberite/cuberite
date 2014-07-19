@@ -112,7 +112,7 @@ set(BINDING_DEPENDECIES
     ../World.h
 )
 
-if (NOT WIN32)
+if (NOT MSVC)
     ADD_CUSTOM_COMMAND(
         # add any new generated bindings here
         OUTPUT ${BINDING_OUTPUTS}

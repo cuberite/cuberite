@@ -230,7 +230,7 @@ endif()
 
 set(EXECUTABLE MCServer)
 
-if (WIN32)
+if (MSVC)
 	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
@@ -241,8 +241,8 @@ if (WIN32)
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
 
 		# Regenerate bindings:
-		COMMAND tolua -L Bindings/virtual_method_hooks.lua -o Bindings/Bindings.cpp -H Bindings/Bindings.h Bindings/AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here
 		DEPENDS ${BINDING_DEPENDECIES}
