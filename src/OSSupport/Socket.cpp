@@ -138,7 +138,7 @@ int cSocket::WSAStartup(void)
 #ifdef _WIN32
 	WSADATA wsaData;
 	memset(&wsaData, 0, sizeof(wsaData));
-	return ::WSAStartup(MAKEWORD(2, 2),&wsaData);
+	return ::WSAStartup(MAKEWORD(2, 2), &wsaData);
 #else
 	return 0;
 #endif

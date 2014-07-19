@@ -958,7 +958,7 @@ tolua_lerror:
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
 	// Exported manually, because tolua would require the out-only param a_Height to be used when calling
-	// Takes (a_World,) a_BlockX, a_BlockZ
+	// Takes a_World, a_BlockX, a_BlockZ
 	// Returns Height, IsValid
 	#ifndef TOLUA_RELEASE
 	tolua_Error tolua_err;
@@ -1926,12 +1926,12 @@ static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 	int Reference = LUA_REFNIL;
 
 	if (
-		tolua_isstring(tolua_S, 2, 0, &tolua_err ) &&
-		lua_isfunction(tolua_S, 3 )
+		tolua_isstring(tolua_S, 2, 0, &tolua_err) &&
+		lua_isfunction(tolua_S, 3)
 	)
 	{
 		Reference = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		Title = ((std::string)  tolua_tocppstring(tolua_S,2,0));
+		Title = ((std::string)tolua_tocppstring(tolua_S, 2, 0));
 	}
 	else
 	{
@@ -2591,7 +2591,7 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * tolua_S)
 	}
 
 	AString Filename = tolua_tostring(tolua_S, 2, 0);
-	bool res = cSchematicFileSerializer::LoadFromSchematicFile(*self,Filename);
+	bool res = cSchematicFileSerializer::LoadFromSchematicFile(*self, Filename);
 	tolua_pushboolean(tolua_S, res);
 	return 1;
 }
@@ -2651,7 +2651,7 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * tolua_S)
 		return 0;
 	}
 	AString Filename = tolua_tostring(tolua_S, 2, 0);
-	bool res = cSchematicFileSerializer::SaveToSchematicFile(*self,Filename);
+	bool res = cSchematicFileSerializer::SaveToSchematicFile(*self, Filename);
 	tolua_pushboolean(tolua_S, res);
 	return 1;
 }
@@ -3065,13 +3065,13 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "AddWebTab", tolua_cPluginLua_AddWebTab);
 		tolua_endmodule(tolua_S);
 
-		tolua_cclass(tolua_S,"HTTPRequest","HTTPRequest","",NULL);
-		tolua_beginmodule(tolua_S,"HTTPRequest");
-			// tolua_variable(tolua_S,"Method",tolua_get_HTTPRequest_Method,tolua_set_HTTPRequest_Method);
-			// tolua_variable(tolua_S,"Path",tolua_get_HTTPRequest_Path,tolua_set_HTTPRequest_Path);
-			tolua_variable(tolua_S,"FormData",tolua_get_HTTPRequest_FormData,0);
-			tolua_variable(tolua_S,"Params",tolua_get_HTTPRequest_Params,0);
-			tolua_variable(tolua_S,"PostParams",tolua_get_HTTPRequest_PostParams,0);
+		tolua_cclass(tolua_S, "HTTPRequest", "HTTPRequest", "", NULL);
+		tolua_beginmodule(tolua_S, "HTTPRequest");
+			// tolua_variable(tolua_S, "Method", tolua_get_HTTPRequest_Method, tolua_set_HTTPRequest_Method);
+			// tolua_variable(tolua_S, "Path", tolua_get_HTTPRequest_Path, tolua_set_HTTPRequest_Path);
+			tolua_variable(tolua_S, "FormData", tolua_get_HTTPRequest_FormData, 0);
+			tolua_variable(tolua_S, "Params", tolua_get_HTTPRequest_Params, 0);
+			tolua_variable(tolua_S, "PostParams", tolua_get_HTTPRequest_PostParams, 0);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebAdmin");

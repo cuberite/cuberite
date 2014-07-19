@@ -109,7 +109,7 @@ protected:
 		};
 	};
 
-	typedef cQueue<sChunkLoad,FuncTable> sChunkLoadQueue;
+	typedef cQueue<sChunkLoad, FuncTable> sChunkLoadQueue;
 	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;

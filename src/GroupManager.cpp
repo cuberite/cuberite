@@ -125,7 +125,7 @@ bool cGroupManager::LoadGroups()
 		IniFile.SetValue("Owner", "Permissions", "*", true);
 		IniFile.SetValue("Owner", "Color", "2", true);
 
-		IniFile.SetValue("Moderator", "Permissions", "core.time,core.item,core.tpa,core.tpaccept,core.ban,core.unban,core.save-all,core.toggledownfall");
+		IniFile.SetValue("Moderator", "Permissions", "core.time, core.item, core.tpa, core.tpaccept, core.ban, core.unban, core.save-all, core.toggledownfall");
 		IniFile.SetValue("Moderator", "Color", "2", true);
 		IniFile.SetValue("Moderator", "Inherits", "Player", true);
 
@@ -133,7 +133,7 @@ bool cGroupManager::LoadGroups()
 		IniFile.SetValue("Player", "Color", "f", true);
 		IniFile.SetValue("Player", "Inherits", "Default", true);
 
-		IniFile.SetValue("Default", "Permissions", "core.help,core.plugins,core.spawn,core.worlds,core.back,core.motd,core.build,core.locate,core.viewdistance", true);
+		IniFile.SetValue("Default", "Permissions", "core.help, core.plugins, core.spawn, core.worlds, core.back, core.motd, core.build, core.locate, core.viewdistance", true);
 		IniFile.SetValue("Default", "Color", "f", true);
 
 		IniFile.WriteFile("groups.ini");

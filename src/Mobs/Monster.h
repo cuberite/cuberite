@@ -73,7 +73,7 @@ public:
 	// tolua_end
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
-	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
+	enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
 	
 	/** Creates the mob object.
 	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()

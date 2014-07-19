@@ -1070,7 +1070,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(2001, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -1361,7 +1361,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	NewBlock->OnPlacedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
 	World->BroadcastSoundEffect(NewBlock->GetStepSound(), (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.8f);

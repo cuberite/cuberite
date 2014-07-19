@@ -103,7 +103,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface,int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		// TODO: Use AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
 		eBlockFace BlockFace = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));

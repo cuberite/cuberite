@@ -28,8 +28,8 @@ protected :
 	};
 
 public :
-	typedef std::map<cEntity*,sDistanceAndChunk> tMonsterToDistance;
-	typedef std::multimap<double,sMonsterAndChunk> tDistanceToMonster;
+	typedef std::map<cEntity*, sDistanceAndChunk> tMonsterToDistance;
+	typedef std::multimap<double, sMonsterAndChunk> tDistanceToMonster;
 
 protected :
 	// this map is filled during collection phase, it will be later transformed into DistanceToMonster

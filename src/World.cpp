@@ -2469,7 +2469,7 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 		{
 			if (a_CheckLineOfSight)
 			{
-				if(!LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
+				if(!LineOfSight.Trace(a_Pos, (Pos - a_Pos), (int)(Pos - a_Pos).Length()))
 				{
 					ClosestDistance = Distance;
 					ClosestPlayer = *itr;

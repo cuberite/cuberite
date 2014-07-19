@@ -559,7 +559,7 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 	char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
 	{
-		AppendPrintf(SVG, "%c %d,%d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
+		AppendPrintf(SVG, "%c %d, %d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
 		Prefix = 'L';
 	}
 	SVG.append("\"/>\n");

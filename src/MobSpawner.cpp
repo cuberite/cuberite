@@ -8,7 +8,7 @@
 
 
 
-cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonster::eType>& a_AllowedTypes) :
+cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<cMonster::eType>& a_AllowedTypes) :
 	m_MonsterFamily(a_MonsterFamily),
 	m_NewPack(true),
 	m_MobType(cMonster::mtInvalidType)

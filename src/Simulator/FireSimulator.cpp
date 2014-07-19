@@ -98,7 +98,7 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 		int x = itr->x;
 		int y = itr->y;
 		int z = itr->z;
-		BLOCKTYPE BlockType = a_Chunk->GetBlock(x,y,z);
+		BLOCKTYPE BlockType = a_Chunk->GetBlock(x, y, z);
 
 		if (!IsAllowedBlock(BlockType))
 		{

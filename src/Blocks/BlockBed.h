@@ -16,7 +16,7 @@ class cBlockBedHandler :
 {
 public:
 	cBlockBedHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01,true>(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
 	{
 	}
 

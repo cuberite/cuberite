@@ -92,11 +92,11 @@ void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 #else
 	DWORD ThreadID = 0;
 	HANDLE hThread = CreateThread(NULL  // security
-		,0  // stack size
+		, 0  // stack size
 		, (LPTHREAD_START_ROUTINE) MyThread  // function name
-		,this  // parameters
-		,0  // flags
-		,&ThreadID );  // thread id
+		, this  // parameters
+		, 0  // flags
+		, &ThreadID );  // thread id
 	CloseHandle( hThread );
 
 	#ifdef _MSC_VER

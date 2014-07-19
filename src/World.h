@@ -859,7 +859,7 @@ private:
 	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
-	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+	std::map<cMonster::eFamily, Int64> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
 

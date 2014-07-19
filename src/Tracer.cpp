@@ -18,11 +18,11 @@ cTracer::cTracer(cWorld * a_World)
 	: m_World(a_World)
 {
 	m_NormalTable[0].Set(-1, 0, 0);
-	m_NormalTable[1].Set( 0, 0,-1);
+	m_NormalTable[1].Set( 0, 0, -1);
 	m_NormalTable[2].Set( 1, 0, 0);
 	m_NormalTable[3].Set( 0, 0, 1);
 	m_NormalTable[4].Set( 0, 1, 0);
-	m_NormalTable[5].Set( 0,-1, 0);
+	m_NormalTable[5].Set( 0, -1, 0);
 }
 
 
@@ -245,7 +245,7 @@ bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int
 
 
 // return 1 = hit, other is not hit
-int LinesCross(float x0,float y0,float x1,float y1,float x2,float y2,float x3,float y3)
+int LinesCross(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3)
 {
 	// float linx, liny;
 

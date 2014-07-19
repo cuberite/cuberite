@@ -18,7 +18,7 @@ public:
 
 	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		return m_ChunkMap->GetBlock(a_BlockX,a_BlockY,a_BlockZ);
+		return m_ChunkMap->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	BLOCKTYPE GetBlock(const Vector3i & a_Pos)
 	{

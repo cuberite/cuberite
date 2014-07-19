@@ -180,7 +180,7 @@ BLOCKTYPE cChunkGenerator::GetIniBlock(cIniFile & a_IniFile, const AString & a_S
 	BLOCKTYPE Block = BlockStringToType(BlockType);
 	if (Block < 0)
 	{
-		LOGWARN("[%s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(),a_Default.c_str());
+		LOGWARN("[%s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(), a_Default.c_str());
 		return BlockStringToType(a_Default);
 	}
 	return Block;

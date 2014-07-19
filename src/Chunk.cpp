@@ -455,7 +455,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 			currentPosition = Monster.GetPosition();
 			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
 			{
-				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
+				toFill.CollectMob(Monster, *this, (currentPosition - **itr2).SqrLength());
 			}
 		}
 	}  // for itr - m_Entitites[]
@@ -464,7 +464,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 
 
 
-void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
+void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ)
 {
 	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
 	int Random = m_World->GetTickRandomNumber(0x00ffffff);
@@ -638,7 +638,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
-	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface,*this, a_RelX, a_RelY, a_RelZ);
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelX, a_RelY, a_RelZ);
 }
 
 
