@@ -31,22 +31,22 @@ public:
 		const Vector3d & a_Speed,
 		cEntityEffect::eType a_EntityEffectType,
 		cEntityEffect a_EntityEffect,
-		int a_PotionParticleType
+		int a_PotionColor
 	);
 	
-	cEntityEffect::eType GetEntityEffectType  (void) const { return m_EntityEffectType; }
-	cEntityEffect        GetEntityEffect      (void) const { return m_EntityEffect; }
-	int                  GetPotionParticleType(void) const { return m_PotionParticleType; }
+	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
+	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
+	int                  GetPotionColor(void)      const { return m_PotionColor; }
 	
 	void SetEntityEffectType(cEntityEffect::eType a_EntityEffectType) { m_EntityEffectType = a_EntityEffectType; }
 	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
-	void SetPotionParticleType(int a_PotionParticleType) { m_PotionParticleType = a_PotionParticleType; }
+	void SetPotionColor(int a_PotionColor) { m_PotionColor = a_PotionColor; }
 	
 protected:
 	
 	cEntityEffect::eType m_EntityEffectType;
 	cEntityEffect m_EntityEffect;
-	int m_PotionParticleType;
+	int m_PotionColor;
 	
 
 	// cProjectileEntity overrides:

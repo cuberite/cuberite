@@ -76,12 +76,12 @@ cSplashPotionEntity::cSplashPotionEntity(
 	const Vector3d & a_Speed,
 	cEntityEffect::eType a_EntityEffectType,
 	cEntityEffect a_EntityEffect,
-	int a_PotionParticleType
+	int a_PotionColor
 ) :
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
 	m_EntityEffectType(a_EntityEffectType),
 	m_EntityEffect(a_EntityEffect),
-	m_PotionParticleType(a_PotionParticleType)
+	m_PotionColor(a_PotionColor)
 {
 	SetSpeed(a_Speed);
 }
@@ -116,7 +116,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
 	
-	m_World->BroadcastSoundParticleEffect(2002, (int)a_HitPos.x, (int)a_HitPos.y, (int)a_HitPos.z, m_PotionParticleType);
+	m_World->BroadcastSoundParticleEffect(2002, (int)a_HitPos.x, (int)a_HitPos.y, (int)a_HitPos.z, m_PotionColor);
 }
 
 
@@ -125,7 +125,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 
 void cSplashPotionEntity::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendSpawnObject(*this, 73, m_PotionParticleType, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnObject(*this, 73, m_PotionColor, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
 	a_Client.SendEntityMetadata(*this);
 }
 
