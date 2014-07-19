@@ -17,8 +17,8 @@ public:
 	}
 	
 
-	/** Returns the potion particle type (used by the client for visuals), based on the potion's damage value */
-	static int GetPotionParticleType(short a_ItemDamage)
+	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
+	static int GetPotionColor(short a_ItemDamage)
 	{
 		// Lowest six bits
 		return (a_ItemDamage & 0x3f);
@@ -156,7 +156,7 @@ public:
 		cSplashPotionEntity * Projectile = new cSplashPotionEntity(
 			a_Player, Pos.x, Pos.y, Pos.z, Speed,
 			GetEntityEffectType(PotionDamage), cEntityEffect(GetEntityEffectDuration(PotionDamage),
-			GetEntityEffectIntensity(PotionDamage)), GetPotionParticleType(PotionDamage)
+			GetEntityEffectIntensity(PotionDamage)), GetPotionColor(PotionDamage)
 		);
 		if (Projectile == NULL)
 		{
