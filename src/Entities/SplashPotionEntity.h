@@ -56,4 +56,6 @@ protected:
 	/** Splashes the potion, fires its particle effects and sounds
 	@param a_HitPos     The position where the potion will splash */
 	void Splash(const Vector3d & a_HitPos);
+	
+	virtual void SpawnOn(cClientHandle & a_Client) override;
 } ;  // tolua_export
