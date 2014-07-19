@@ -4,11 +4,30 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../../")
 
-file(GLOB SOURCE
-    "*.cpp"
-    "*.h"
-)
+SET (SRCS
+	AlchemistVillagePrefabs.cpp
+	JapaneseVillagePrefabs.cpp
+	NetherFortPrefabs.cpp
+	PlainsVillagePrefabs.cpp
+	RainbowRoadPrefabs.cpp
+	SandFlatRoofVillagePrefabs.cpp
+	SandVillagePrefabs.cpp
+	TestRailsPrefabs.cpp
+	UnderwaterBasePrefabs.cpp)
 
-add_library(Generating_Prefabs ${SOURCE})
+SET (HDRS
+	AlchemistVillagePrefabs.h
+	JapaneseVillagePrefabs.h
+	NetherFortPrefabs.h
+	PlainsVillagePrefabs.h
+	RainbowRoadPrefabs.h
+	SandFlatRoofVillagePrefabs.h
+	SandVillagePrefabs.h
+	TestRailsPrefabs.h
+	UnderwaterBasePrefabs.h)
 
-target_link_libraries(Generating_Prefabs OSSupport iniFile Blocks)
+if(NOT MSVC)
+	add_library(Generating_Prefabs ${SRCS} ${HDRS})
+
+	target_link_libraries(Generating_Prefabs OSSupport iniFile Blocks)
+endif()
