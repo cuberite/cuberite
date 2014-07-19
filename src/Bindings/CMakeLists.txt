@@ -112,21 +112,7 @@ set(BINDING_DEPENDECIES
     ../World.h
 )
 
-if (WIN32)
-    ADD_CUSTOM_COMMAND(
-        OUTPUT ${BINDING_OUTPUTS}
-
-        # Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ../../MCServer/lua51.dll ./lua51.dll
-
-        # Regenerate bindings:
-        COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-
-        # add any new generation dependencies here
-        DEPENDS ${BINDING_DEPENDECIES}
-    )
-else ()
+if (NOT WIN32)
     ADD_CUSTOM_COMMAND(
         # add any new generated bindings here
         OUTPUT ${BINDING_OUTPUTS}
