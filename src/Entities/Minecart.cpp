@@ -103,21 +103,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 
 void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	char SubType = 0;
-	switch (m_Payload)
-	{
-		case mpNone:    SubType = 0; break;
-		case mpChest:   SubType = 1; break;
-		case mpFurnace: SubType = 2; break;
-		case mpTNT:     SubType = 3; break;
-		case mpHopper:  SubType = 5; break;
-		default:
-		{
-			ASSERT(!"Unknown payload, cannot spawn on client");
-			return;
-		}
-	}
-	a_ClientHandle.SendSpawnVehicle(*this, 10, SubType);  // 10 = Minecarts, SubType = What type of Minecart
+	a_ClientHandle.SendSpawnVehicle(*this, 10, (char)m_Payload);  // 10 = Minecarts
 	a_ClientHandle.SendEntityMetadata(*this);
 }
 
