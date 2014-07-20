@@ -78,7 +78,8 @@ cSplashPotionEntity::cSplashPotionEntity(
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
 	m_EntityEffectType(a_EntityEffectType),
 	m_EntityEffect(a_EntityEffect),
-	m_PotionColor(a_PotionColor)
+	m_PotionColor(a_PotionColor),
+	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);
 }
@@ -90,7 +91,7 @@ cSplashPotionEntity::cSplashPotionEntity(
 void cSplashPotionEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	Splash(a_HitPos);
-	Destroy();
+	m_DestroyTimer = 2;
 }
 
 
@@ -101,7 +102,7 @@ void cSplashPotionEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_
 {
 	a_EntityHit.TakeDamage(dtRangedAttack, this, 0, 1);
 	Splash(a_HitPos);
-	Destroy(true);
+	m_DestroyTimer = 5;
 }
 
 
