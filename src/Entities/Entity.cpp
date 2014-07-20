@@ -37,7 +37,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Gravity(-9.81f)
 	, m_LastPos(a_X, a_Y, a_Z)
 	, m_IsInitialized(false)
-	, m_IsTravellingThroughPortal(false)
+	, m_WorldTravellingFrom(NULL)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
 	, m_IsFireproof(false)
@@ -1028,10 +1028,11 @@ void cEntity::DetectCacti(void)
 
 void cEntity::DetectPortal()
 {
-	if (!GetWorld()->GetNetherWorldName().empty() && !GetWorld()->GetEndWorldName().empty())
+	if (GetWorld()->GetDimension() == dimOverworld)
 	{
-		return;
+		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty()) { return; }
 	}
+	else if (GetWorld()->GetLinkedOverworldName().empty()) { return; }
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	if ((Y > 0) && (Y < cChunkDef::Height))
@@ -1040,7 +1041,7 @@ void cEntity::DetectPortal()
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
-				if (GetWorld()->GetNetherWorldName().empty() || m_PortalCooldownData.second)
+				if (m_PortalCooldownData.second)
 				{
 					return;
 				}
@@ -1054,8 +1055,13 @@ void cEntity::DetectPortal()
 
 				switch (GetWorld()->GetDimension())
 				{
-					case dimNether: 
+					case dimNether:
 					{
+						if (GetWorld()->GetLinkedOverworldName().empty())
+						{
+							return;
+						}
+
 						m_PortalCooldownData.second = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
@@ -1068,6 +1074,11 @@ void cEntity::DetectPortal()
 					}
 					case dimOverworld:
 					{
+						if (GetWorld()->GetNetherWorldName().empty())
+						{
+							return;
+						}
+
 						m_PortalCooldownData.second = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
@@ -1079,28 +1090,25 @@ void cEntity::DetectPortal()
 
 						return;
 					}
-					default: break;
+					default: return;
 				}
-				return;
 			}
 			case E_BLOCK_END_PORTAL:
 			{
-				if (GetWorld()->GetNetherWorldName().empty() || m_PortalCooldownData.second)
+				if (m_PortalCooldownData.second)
 				{
 					return;
 				}
-
-				if (m_PortalCooldownData.first != 80)
-				{
-					m_PortalCooldownData.first++;
-					return;
-				}
-				m_PortalCooldownData.first = 0;
 
 				switch (GetWorld()->GetDimension())
 				{
 					case dimEnd:
 					{
+						if (GetWorld()->GetLinkedOverworldName().empty())
+						{
+							return;
+						}
+
 						m_PortalCooldownData.second = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
@@ -1115,6 +1123,11 @@ void cEntity::DetectPortal()
 					}
 					case dimOverworld:
 					{
+						if (GetWorld()->GetEndWorldName().empty())
+						{
+							return;
+						}
+
 						m_PortalCooldownData.second = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
@@ -1126,9 +1139,8 @@ void cEntity::DetectPortal()
 
 						return;
 					}
-					default: break;
+					default: return;
 				}
-				return;
 			}
 			default: break;
 		}
@@ -1169,7 +1181,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	}
 
 	// Remove all links to the old world
-	SetIsTravellingThroughPortal(true); // cChunk handles entity removal
+	SetWorldTravellingFrom(GetWorld()); // cChunk handles entity removal
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	// Queue add to new world

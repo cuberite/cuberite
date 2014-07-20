@@ -340,14 +340,17 @@ public:
 
 	typedef cWorld * cWorldPtr;
 	
-	/** Loads the player data from the disk file.
-Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world
-	Returns true on success, false on failure. */
+	/** Loads the player data from the disk file
+	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world by calling LoadFromFile()
+	Returns true on success, false on failure
+	*/
 	bool LoadFromDisk(cWorldPtr & a_World);
 	
-	/** Loads the player data from the specified file.
-	Returns true on success, false on failure. */
-	bool LoadFromFile(const AString & a_FileName, cWorld * a_World);
+	/** Loads the player data from the specified file
+	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world
+	Returns true on success, false on failure
+	*/
+	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 	
 	void LoadPermissionsFromDisk(void);  // tolua_export
 

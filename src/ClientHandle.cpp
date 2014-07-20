@@ -120,6 +120,8 @@ cClientHandle::~cClientHandle()
 		}
 		if (World != NULL)
 		{
+			m_Player->SetWorldTravellingFrom(NULL); // Make sure that the player entity is actually removed
+			World->RemovePlayer(m_Player); // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
 			m_Player->Destroy();
 		}
 		delete m_Player;

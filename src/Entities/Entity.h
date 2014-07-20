@@ -387,11 +387,11 @@ public:
 	
 	// tolua_end
 
-	/** Returns if the entity is travelling through a portal. Set to true by MoveToWorld and to false when the entity is removed by the old chunk */
-	bool IsTravellingThroughPortal(void) const { return m_IsTravellingThroughPortal; }
+	/** Returns if the entity is travelling away from a specified world */
+	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
 
-	/** Sets if the entity has begun travelling through a portal or not */
-	void SetIsTravellingThroughPortal(bool a_Flag) { m_IsTravellingThroughPortal = a_Flag; }
+	/** Sets the world the entity will be leaving */
+	void SetWorldTravellingFrom(cWorld * a_World) { (m_WorldTravellingFrom = a_World); }
 	
 	/// Updates clients of changes in the entity.
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
@@ -491,8 +491,11 @@ protected:
 	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
 	bool m_IsInitialized;
 
-	/** True when entity is being moved across worlds, false anytime else */
-	bool m_IsTravellingThroughPortal;
+	/** World entity is travelling from
+	Set by MoveToWorld and back to NULL when the entity is removed by the old chunk
+	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it
+	*/
+	cWorld * m_WorldTravellingFrom;
 
 	eEntityType m_EntityType;
 	

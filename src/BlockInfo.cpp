@@ -496,6 +496,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_CROPS               ].m_IsSolid = false;
 	a_Info[E_BLOCK_DANDELION           ].m_IsSolid = false;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSolid = false;
+	a_Info[E_BLOCK_END_PORTAL          ].m_IsSolid = false;
 	a_Info[E_BLOCK_FIRE                ].m_IsSolid = false;
 	a_Info[E_BLOCK_FLOWER              ].m_IsSolid = false;
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_IsSolid = false;

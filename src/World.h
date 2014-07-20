@@ -669,7 +669,7 @@ public:
 	void InitializeSpawn(void);
 	
 	/** Starts threads that belong to this world */
-	void Start(bool a_WasDimensionSet = true);
+	void Start();
 	
 	/** Stops threads that belong to this world (part of deinit) */
 	void Stop(void);

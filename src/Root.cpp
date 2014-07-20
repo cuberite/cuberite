@@ -322,7 +322,7 @@ cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension
 	}
 	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
 	m_WorldsByName[a_WorldName] = NewWorld;
-	NewWorld->Start(!a_OverworldName.empty());
+	NewWorld->Start();
 	NewWorld->InitializeSpawn();
 	m_PluginManager->CallHookWorldStarted(*NewWorld);
 	return NewWorld;
@@ -381,12 +381,17 @@ cWorld * cRoot::GetDefaultWorld()
 
 
 
-cWorld * cRoot::GetWorld(const AString & a_WorldName)
+cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
 {
 	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
 	if (itr != m_WorldsByName.end())
 	{
 		return itr->second;
+	}
+
+	if (a_SearchForFolder && cFile::IsFolder(FILE_IO_PREFIX + a_WorldName))
+	{
+		return CreateAndInitializeWorld(a_WorldName);
 	}
 	return NULL;
 }

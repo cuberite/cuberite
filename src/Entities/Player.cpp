@@ -88,7 +88,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	
 	m_PlayerName = a_PlayerName;
 
-	cWorld * World;
+	cWorld * World = NULL;
 	if (!LoadFromDisk(World))
 	{
 		m_Inventory.Clear();
@@ -135,8 +135,6 @@ cPlayer::~cPlayer(void)
 	cRoot::Get()->GetServer()->PlayerDestroying(this);
 
 	SaveToDisk();
-
-	m_World->RemovePlayer(this);
 
 	m_ClientHandle = NULL;
 	
@@ -979,7 +977,7 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(GetWorld()->GetDimension());
+	m_ClientHandle->SendRespawn(GetWorld()->GetDimension(), true);
 	
 	// Extinguish the fire:
 	StopBurning();
@@ -1643,11 +1641,12 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	}
 
 	// Remove player from the old world
-	SetIsTravellingThroughPortal(true); // cChunk handles entity removal
-	m_World->RemovePlayer(this);
+	SetWorldTravellingFrom(GetWorld()); // cChunk handles entity removal
+	GetWorld()->RemovePlayer(this);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	World->AddPlayer(this);
+	SetWorld(World);
 
 	return true;
 }
@@ -1697,12 +1696,6 @@ void cPlayer::LoadPermissionsFromDisk()
 
 bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-	if (a_World == NULL)
-	{
-		a_World = cRoot::Get()->GetDefaultWorld();
-	}
-
 	LoadPermissionsFromDisk();
 
 	// Load from the UUID file:
@@ -1740,6 +1733,11 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 	LOG("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
 		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str()
 	);
+
+	if (a_World == NULL)
+	{
+		a_World = cRoot::Get()->GetDefaultWorld();
+	}
 	return false;
 }
 
@@ -1747,7 +1745,7 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 
 
 
-bool cPlayer::LoadFromFile(const AString & a_FileName, cWorld * a_World)
+bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 {
 	// Load the data from the file:
 	cFile f;
@@ -1800,9 +1798,6 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorld * a_World)
 	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
 	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
 	m_IsFlying            = root.get("isflying", 0).asBool();
-	m_LastBedPos.x        = root.get("SpawnX", a_World->GetSpawnX()).asInt();
-	m_LastBedPos.y        = root.get("SpawnY", a_World->GetSpawnY()).asInt();
-	m_LastBedPos.z        = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 
@@ -1815,6 +1810,11 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorld * a_World)
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), true);
+
+	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
+	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
+	m_LastBedPos.z = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
 
 	// Load the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
@@ -1822,7 +1822,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorld * a_World)
 	StatSerializer.Load();
 	
 	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), a_World->GetName().c_str()
 	);
 	
 	return true;
@@ -1834,7 +1834,6 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorld * a_World)
 
 bool cPlayer::SaveToDisk()
 {
-	cFile::CreateFolder(FILE_IO_PREFIX + AString("players"));
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data

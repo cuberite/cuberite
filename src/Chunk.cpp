@@ -591,7 +591,6 @@ void cChunk::Tick(float a_Dt)
 		if (!((*itr)->IsMob()))
 		{
 			(*itr)->Tick(a_Dt, *this);
-			continue;
 		}
 	}  // for itr - m_Entitites[]
 	
@@ -605,10 +604,10 @@ void cChunk::Tick(float a_Dt)
 			itr = m_Entities.erase(itr);
 			delete ToDelete;
 		}
-		else if ((*itr)->IsTravellingThroughPortal()) // Remove all entities that are travelling to another world
+		else if ((*itr)->IsWorldTravellingFrom(m_World)) // Remove all entities that are travelling to another world
 		{
 			MarkDirty();
-			(*itr)->SetIsTravellingThroughPortal(false);
+			(*itr)->SetWorldTravellingFrom(NULL);
 			itr = m_Entities.erase(itr);
 		}
 		else if ( // If any entity moved out of the chunk, move it to the neighbor:

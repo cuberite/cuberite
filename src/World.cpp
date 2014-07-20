@@ -512,7 +512,7 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::Start(bool a_WasDimensionSet)
+void cWorld::Start()
 {
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
@@ -523,11 +523,15 @@ void cWorld::Start(bool a_WasDimensionSet)
 	if (!IniFile.ReadFile(m_IniFileName))
 	{
 		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+
+		// TODO: More descriptions for each key
+		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
+		IniFile.AddKeyComment("LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
 	}
 
-	AString Dimension = IniFile.GetValueSet("General", "Dimension", a_WasDimensionSet ? DimensionToString(GetDimension()) : "Overworld");
-	m_Dimension = StringToDimension(Dimension);
-	m_OverworldName = IniFile.GetValue("LinkedWorlds", "OverworldName", a_WasDimensionSet ? m_OverworldName : "");
+	// The presence of a configuration value overrides everything
+	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
+	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
@@ -535,8 +539,8 @@ void cWorld::Start(bool a_WasDimensionSet)
 	(
 		(KeyNum >= 0) &&
 		(
-			(IniFile.FindValue(KeyNum, "X") >= 0) ||
-			(IniFile.FindValue(KeyNum, "Y") >= 0) ||
+			(IniFile.FindValue(KeyNum, "X") >= 0) &&
+			(IniFile.FindValue(KeyNum, "Y") >= 0) &&
 			(IniFile.FindValue(KeyNum, "Z") >= 0)
 		)
 	);
@@ -575,10 +579,14 @@ void cWorld::Start(bool a_WasDimensionSet)
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
 	m_TimeOfDay                   = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
 
-	if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
+	if (GetDimension() == dimOverworld)
 	{
 		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", DEFAULT_NETHER_NAME);
 		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", DEFAULT_END_NAME);
+	}
+	else
+	{
+		m_OverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
@@ -2420,7 +2428,7 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
-	if (!a_Player->IsTravellingThroughPortal())
+	if (!a_Player->IsWorldTravellingFrom(this))
 	{
 		m_ChunkMap->RemoveEntity(a_Player);
 	}
