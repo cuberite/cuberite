@@ -614,6 +614,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 				m_Writer.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
 				m_Writer.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
 				m_Writer.AddInt("PotionName",                Potion->GetPotionColor());
+				break;
 			}
 			case cProjectileEntity::pkGhastFireball:
 			{
