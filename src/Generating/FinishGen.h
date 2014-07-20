@@ -82,22 +82,22 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	float GetBiomeDensity(EMCSBiome a_Biome)
+	int GetBiomeDensity(EMCSBiome a_Biome)
 	{
 		switch (a_Biome)
 		{
-			case biSavanna:
-			case biSavannaM:
-			case biSavannaPlateau:
-			case biSavannaPlateauM:
-			case biPlains:
-			{
-				return 0.4f;
-			}
-			default:
-			{
-				return -0.6f;
-			}
+		case biSavanna:
+		case biSavannaM:
+		case biSavannaPlateau:
+		case biSavannaPlateauM:
+		case biPlains:
+		{
+						 return 70;
+		}
+		default:
+		{
+				   return 20;
+		}
 		}
 	}
 };
