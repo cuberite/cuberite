@@ -486,12 +486,12 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 		return;
 	}
 
-	if( m_ChunkVersion == 1 )  // Convert chunks to version 2
+	if (m_ChunkVersion == 1 )  // Convert chunks to version 2
 	{
 		UpdateChunk1To2();
 	}
 #if AXIS_ORDER == AXIS_ORDER_XZY
-	if( m_ChunkVersion == 2 )  // Convert chunks to version 3
+	if (m_ChunkVersion == 2 )  // Convert chunks to version 3
 	{
 		UpdateChunk2To3();
 	}
@@ -574,7 +574,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 	{
 		sChunkHeader * Header = *itr;
 
-		if( ChunksConverted % 32 == 0 )
+		if (ChunksConverted % 32 == 0 )
 		{
 			LOGINFO("Updating \"%s\" version 1 to version 2: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
@@ -627,9 +627,9 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		char ConvertedData[cChunkDef::BlockDataSize];
 		int Index = 0;
 		unsigned int InChunkOffset = 0;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z )
 		{
-			for( int y = 0; y < 128; ++y )
+			for (int y = 0; y < 128; ++y )
 			{
 				ConvertedData[Index++] = UncompressedData[y + z * 128 + x * 128 * 16 + InChunkOffset];
 			}
@@ -638,9 +638,9 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			Index += 128;
 		}
 		InChunkOffset += (16 * 128 * 16);
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )  // Metadata
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z )  // Metadata
 		{
-			for( int y = 0; y < 64; ++y )
+			for (int y = 0; y < 64; ++y )
 			{
 				ConvertedData[Index++] = UncompressedData[y + z * 64 + x * 64 * 16 + InChunkOffset];
 			}
@@ -648,9 +648,9 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			Index += 64;
 		}
 		InChunkOffset += (16 * 128 * 16) / 2;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )  // Block light
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z )  // Block light
 		{
-			for( int y = 0; y < 64; ++y )
+			for (int y = 0; y < 64; ++y )
 			{
 				ConvertedData[Index++] = UncompressedData[y + z * 64 + x * 64 * 16 + InChunkOffset];
 			}
@@ -658,9 +658,9 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			Index += 64;
 		}
 		InChunkOffset += (16*128*16)/2;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )  // Sky light
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z )  // Sky light
 		{
-			for( int y = 0; y < 64; ++y )
+			for (int y = 0; y < 64; ++y )
 			{
 				ConvertedData[Index++] = UncompressedData[y + z * 64 + x * 64 * 16 + InChunkOffset];
 			}
@@ -718,7 +718,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 	{
 		sChunkHeader * Header = *itr;
 
-		if( ChunksConverted % 32 == 0 )
+		if (ChunksConverted % 32 == 0 )
 		{
 			LOGINFO("Updating \"%s\" version 2 to version 3: " SIZE_T_FMT  " %%", m_FileName.c_str(), (ChunksConverted * 100) / m_ChunkHeaders.size() );
 		}
@@ -774,7 +774,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
 
 		unsigned int InChunkOffset = 0;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )  // YZX Loop order is important, in 1.1 Y was first then Z then X
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z ) for (int y = 0; y < 256; ++y )  // YZX Loop order is important, in 1.1 Y was first then Z then X
 		{
 			ConvertedData[ MAKE_3_INDEX(x, y, z) ] = UncompressedData[InChunkOffset];
 			++InChunkOffset;
@@ -782,7 +782,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 
 		
 		unsigned int index2 = 0;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z ) for (int y = 0; y < 256; ++y )
 		{
 			ConvertedData[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
 			++index2;
@@ -790,7 +790,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		InChunkOffset += index2 / 2;
 		index2 = 0;
 
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z ) for (int y = 0; y < 256; ++y )
 		{
 			ConvertedData[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
 			++index2;
@@ -798,7 +798,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		InChunkOffset += index2 / 2;
 		index2 = 0;
 
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )
+		for (int x = 0; x < 16; ++x ) for (int z = 0; z < 16; ++z ) for (int y = 0; y < 256; ++y )
 		{
 			ConvertedData[ InChunkOffset + MAKE_3_INDEX(x, y, z)/2 ] |= ( (UncompressedData[ InChunkOffset + index2/2 ] >> ((index2&1)*4) ) & 0x0f ) << ((x&1)*4);
 			++index2;
@@ -887,7 +887,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 	{
 		Json::Value root;   // will contain the root value after parsing.
 		Json::Reader reader;
-		if ( !reader.parse( UncompressedData.data() + cChunkDef::BlockDataSize, root, false ) )
+		if (!reader.parse( UncompressedData.data() + cChunkDef::BlockDataSize, root, false ) )
 		{
 			LOGERROR("Failed to parse trailing JSON in chunk [%d, %d]!",
 				a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
@@ -970,7 +970,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	// Compress the data:
 	AString CompressedData;
 	int errorcode = CompressString(Data.data(), Data.size(), CompressedData, m_CompressionFactor);
-	if ( errorcode != Z_OK )
+	if (errorcode != Z_OK )
 	{
 		LOGERROR("Error %i compressing data for chunk [%d, %d, %d]", errorcode, a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);
 		return false;

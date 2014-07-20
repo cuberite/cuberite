@@ -59,7 +59,7 @@ cLog * cLog::GetInstance()
 
 void cLog::CloseLog()
 {
-	if( m_File )
+	if (m_File )
 		fclose (m_File);
 	m_File = 0;
 }
@@ -70,7 +70,7 @@ void cLog::CloseLog()
 
 void cLog::OpenLog( const char* a_FileName )
 {
-	if(m_File) fclose (m_File);
+	if (m_File) fclose (m_File);
 	#ifdef _MSC_VER
 	fopen_s( &m_File, a_FileName, "a+" );
 	#else
@@ -85,11 +85,11 @@ void cLog::OpenLog( const char* a_FileName )
 void cLog::ClearLog()
 {
 	#ifdef _MSC_VER
-	if( fopen_s( &m_File, "log.txt", "w" ) == 0)
+	if (fopen_s( &m_File, "log.txt", "w" ) == 0)
 		fclose (m_File);
 	#else
 	m_File = fopen("log.txt", "w" );
-	if( m_File )
+	if (m_File )
 		fclose (m_File);
 	#endif
 	m_File = NULL;

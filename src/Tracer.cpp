@@ -59,7 +59,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	step.z = (int) SigNum(dir.z);
 
 	// normalize the direction vector
-	if( dir.SqrLength() > 0.f ) dir.Normalize();
+	if (dir.SqrLength() > 0.f ) dir.Normalize();
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
@@ -192,7 +192,7 @@ bool cTracer::Trace( const Vector3f & a_Start, const Vector3f & a_Direction, int
 
 		if (step.y > 0.0f)
 		{
-			if(pos.y >= end1.y)
+			if (pos.y >= end1.y)
 			{
 				reachedY = true;
 			}
@@ -313,7 +313,7 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	Vector3i SmallBlockPos = a_BlockPos;
 	char BlockID = m_World->GetBlock( a_BlockPos.x, a_BlockPos.y, a_BlockPos.z );
 
-	if( BlockID == E_BLOCK_AIR || IsBlockWater(BlockID))
+	if (BlockID == E_BLOCK_AIR || IsBlockWater(BlockID))
 	{
 		return 0;
 	}
@@ -328,10 +328,10 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 	if (dot < 0)
 	{
 		int Lines = LinesCross( start.x, start.y, end.x, end.y, BlockPos.x, BlockPos.y, BlockPos.x, BlockPos.y + 1 );
-		if(Lines == 1)
+		if (Lines == 1)
 		{
 			Lines = LinesCross( start.x, start.z, end.x, end.z, BlockPos.x, BlockPos.z, BlockPos.x, BlockPos.z + 1 );
-			if(Lines == 1)
+			if (Lines == 1)
 			{
 				intersect3D_SegmentPlane( start, end, BlockPos, Vector3f(-1, 0, 0) );
 				return 1;
@@ -339,13 +339,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 		}
 	}
 	dot = Look.Dot( Vector3f(0, 0, -1) );  // second face normal is z -1
-	if(dot < 0)
+	if (dot < 0)
 	{
 		int Lines = LinesCross( start.z, start.y, end.z, end.y, BlockPos.z, BlockPos.y, BlockPos.z, BlockPos.y + 1 );
-		if(Lines == 1)
+		if (Lines == 1)
 		{
 			Lines = LinesCross( start.z, start.x, end.z, end.x, BlockPos.z, BlockPos.x, BlockPos.z, BlockPos.x + 1 );
-			if(Lines == 1)
+			if (Lines == 1)
 			{
 				intersect3D_SegmentPlane( start, end, BlockPos, Vector3f(0, 0, -1) );
 				return 2;
@@ -353,13 +353,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 		}
 	}
 	dot = Look.Dot( Vector3f(1, 0, 0) );  // third face normal is x 1
-	if(dot < 0)
+	if (dot < 0)
 	{
 		int Lines = LinesCross( start.x, start.y, end.x, end.y, BlockPos.x + 1, BlockPos.y, BlockPos.x + 1, BlockPos.y + 1 );
-		if(Lines == 1)
+		if (Lines == 1)
 		{
 			Lines = LinesCross( start.x, start.z, end.x, end.z, BlockPos.x + 1, BlockPos.z, BlockPos.x + 1, BlockPos.z + 1 );
-			if(Lines == 1)
+			if (Lines == 1)
 			{
 				intersect3D_SegmentPlane( start, end, BlockPos + Vector3f(1, 0, 0), Vector3f(1, 0, 0) );
 				return 3;
@@ -367,13 +367,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 		}
 	}
 	dot = Look.Dot( Vector3f(0, 0, 1) );  // fourth face normal is z 1
-	if(dot < 0)
+	if (dot < 0)
 	{
 		int Lines = LinesCross( start.z, start.y, end.z, end.y, BlockPos.z + 1, BlockPos.y, BlockPos.z + 1, BlockPos.y + 1 );
-		if(Lines == 1)
+		if (Lines == 1)
 		{
 			Lines = LinesCross( start.z, start.x, end.z, end.x, BlockPos.z + 1, BlockPos.x, BlockPos.z + 1, BlockPos.x + 1 );
-			if(Lines == 1)
+			if (Lines == 1)
 			{
 				intersect3D_SegmentPlane( start, end, BlockPos + Vector3f(0, 0, 1), Vector3f(0, 0, 1) );
 				return 4;
@@ -381,13 +381,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 		}
 	}
 	dot = Look.Dot( Vector3f(0, 1, 0) );  // fifth face normal is y 1
-	if(dot < 0)
+	if (dot < 0)
 	{
 		int Lines = LinesCross( start.y, start.x, end.y, end.x, BlockPos.y + 1, BlockPos.x, BlockPos.y + 1, BlockPos.x + 1 );
-		if(Lines == 1)
+		if (Lines == 1)
 		{
 			Lines = LinesCross( start.y, start.z, end.y, end.z, BlockPos.y + 1, BlockPos.z, BlockPos.y + 1, BlockPos.z + 1 );
-			if(Lines == 1)
+			if (Lines == 1)
 			{
 				intersect3D_SegmentPlane( start, end, BlockPos + Vector3f(0, 1, 0), Vector3f(0, 1, 0) );
 				return 5;
@@ -395,13 +395,13 @@ int cTracer::GetHitNormal(const Vector3f & start, const Vector3f & end, const Ve
 		}
 	}
 	dot = Look.Dot( Vector3f(0, -1, 0) );  // sixth face normal is y -1
-	if(dot < 0)
+	if (dot < 0)
 	{
 		int Lines = LinesCross( start.y, start.x, end.y, end.x, BlockPos.y, BlockPos.x, BlockPos.y, BlockPos.x + 1 );
-		if(Lines == 1)
+		if (Lines == 1)
 		{
 			Lines = LinesCross( start.y, start.z, end.y, end.z, BlockPos.y, BlockPos.z, BlockPos.y, BlockPos.z + 1 );
-			if(Lines == 1)
+			if (Lines == 1)
 			{
 				intersect3D_SegmentPlane( start, end, BlockPos, Vector3f(0, -1, 0) );
 				return 6;

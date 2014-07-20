@@ -53,7 +53,7 @@ cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_Thre
 	, m_Event( new cEvent() )
 	, m_StopEvent( 0 )
 {
-	if( a_ThreadName )
+	if (a_ThreadName )
 	{
 		m_ThreadName.assign(a_ThreadName);
 	}
@@ -68,7 +68,7 @@ cThread::~cThread()
 	delete m_Event;
 	m_Event = NULL;
 	
-	if( m_StopEvent )
+	if (m_StopEvent )
 	{
 		m_StopEvent->Wait();
 		delete m_StopEvent;
@@ -82,12 +82,12 @@ cThread::~cThread()
 
 void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 {
-	if( a_bWaitOnDelete )
+	if (a_bWaitOnDelete )
 		m_StopEvent = new cEvent();
 
 #ifndef _WIN32
 	pthread_t SndThread;
-	if( pthread_create( &SndThread, NULL, MyThread, this) )
+	if (pthread_create( &SndThread, NULL, MyThread, this) )
 		LOGERROR("ERROR: Could not create thread!");
 #else
 	DWORD ThreadID = 0;
@@ -132,6 +132,6 @@ void *cThread::MyThread( void *a_Param )
 
 	ThreadFunction( ThreadParam );
 
-	if( StopEvent ) StopEvent->Set();
+	if (StopEvent ) StopEvent->Set();
 	return 0;
 }

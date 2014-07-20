@@ -1434,7 +1434,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 
 cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin ) const
 {
-	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
+	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
 		if (itr->second == NULL ) continue;
 		if (itr->second->GetName().compare(a_Plugin) == 0)

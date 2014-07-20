@@ -359,7 +359,7 @@ void cRoot::StopWorlds(void)
 void cRoot::UnloadWorlds(void)
 {
 	m_pDefaultWorld = NULL;
-	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		delete itr->second;
 	}
@@ -382,7 +382,7 @@ cWorld* cRoot::GetDefaultWorld()
 cWorld* cRoot::GetWorld( const AString & a_WorldName )
 {
 	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName );
-	if( itr != m_WorldsByName.end() )
+	if (itr != m_WorldsByName.end() )
 		return itr->second;
 	return 0;
 }
@@ -509,7 +509,7 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AStri
 int cRoot::GetTotalChunkCount(void)
 {
 	int res = 0;
-	for ( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
 	{
 		res += itr->second->GetNumChunks();
 	}

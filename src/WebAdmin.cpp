@@ -392,7 +392,7 @@ AString cWebAdmin::GetDefaultPage(void)
 
 	cPlayerAccum PlayerAccum;
 	cWorld * World = cRoot::Get()->GetDefaultWorld();  // TODO - Create a list of worlds and players
-	if( World != NULL )
+	if (World != NULL )
 	{
 		World->ForEachPlayer(PlayerAccum);
 		Content.append(PlayerAccum.m_Contents);

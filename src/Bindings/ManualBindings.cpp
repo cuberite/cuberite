@@ -656,12 +656,12 @@ template<
 static int tolua_ForEach(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if( NumArgs != 1 && NumArgs != 2)
+	if ((NumArgs != 1) && (NumArgs != 2))
 	{
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Requires 1 or 2 arguments, got %i", NumArgs);
 	}
 
-	Ty1 * self = (Ty1 *)  tolua_tousertype(tolua_S, 1, NULL);
+	Ty1 * self = (Ty1 *)tolua_tousertype(tolua_S, 1, NULL);
 	if (self == NULL)
 	{
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
@@ -1360,7 +1360,7 @@ static int tolua_cPluginManager_AddHook(lua_State * tolua_S)
 static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if( NumArgs != 1)
+	if (NumArgs != 1)
 	{
 		LOGWARN("Error in function call 'ForEachCommand': Requires 1 argument, got %i", NumArgs);
 		return 0;
@@ -1437,7 +1437,7 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if( NumArgs != 1)
+	if (NumArgs != 1)
 	{
 		LOGWARN("Error in function call 'ForEachConsoleCommand': Requires 1 argument, got %i", NumArgs);
 		return 0;
@@ -1938,16 +1938,16 @@ static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 		return tolua_do_error(tolua_S, "#ferror calling function '#funcname#'", &tolua_err);
 	}
 
-	if( Reference != LUA_REFNIL )
+	if (Reference != LUA_REFNIL)
 	{
-		if( !self->AddWebTab( Title.c_str(), tolua_S, Reference ) )
+		if (!self->AddWebTab(Title.c_str(), tolua_S, Reference))
 		{
-			luaL_unref( tolua_S, LUA_REGISTRYINDEX, Reference );
+			luaL_unref(tolua_S, LUA_REGISTRYINDEX, Reference);
 		}
 	}
 	else
 	{
-		LOGERROR("ERROR: cPluginLua:AddWebTab invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str() );
+		LOGWARNING("cPluginLua:AddWebTab: invalid function reference in 2nd argument (Title: \"%s\")", Title.c_str());
 	}
 
 	return 0;
@@ -2016,7 +2016,7 @@ static int tolua_push_StringStringMap(lua_State* tolua_S, std::map< std::string,
 	lua_newtable(tolua_S);
 	int top = lua_gettop(tolua_S);
 
-	for( std::map< std::string, std::string >::iterator it = a_StringStringMap.begin(); it != a_StringStringMap.end(); ++it )
+	for (std::map<std::string, std::string>::iterator it = a_StringStringMap.begin(); it != a_StringStringMap.end(); ++it)
 	{
 		const char* key = it->first.c_str();
 		const char* value = it->second.c_str();
@@ -2060,7 +2060,7 @@ static int tolua_get_HTTPRequest_FormData(lua_State* tolua_S)
 	lua_newtable(tolua_S);
 	int top = lua_gettop(tolua_S);
 
-	for( std::map< std::string, HTTPFormData >::iterator it = FormData.begin(); it != FormData.end(); ++it )
+	for (std::map<std::string, HTTPFormData>::iterator it = FormData.begin(); it != FormData.end(); ++it)
 	{
 		lua_pushstring(tolua_S, it->first.c_str() );
 		tolua_pushusertype(tolua_S, &(it->second), "HTTPFormData" );
@@ -2109,7 +2109,7 @@ static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 	lua_newtable(tolua_S);
 	int index = 1;
 	cWebPlugin::TabNameList::const_iterator iter = TabNames.begin();
-	while(iter != TabNames.end())
+	while (iter != TabNames.end())
 	{
 		const AString & FancyName = iter->first;
 		const AString & WebName = iter->second;

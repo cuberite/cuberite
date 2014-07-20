@@ -25,7 +25,7 @@ AString GetOSErrorString( int a_ErrNo )
 	#if !defined(__APPLE__) && ( _GNU_SOURCE ) && !defined(ANDROID_NDK)  // GNU version of strerror_r()
 	
 	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res != NULL )
+	if (res != NULL )
 	{
 		Printf(Out, "%d: %s", a_ErrNo, res);
 		return Out;
@@ -34,7 +34,7 @@ AString GetOSErrorString( int a_ErrNo )
 	#else  // XSI version of strerror_r():
 	
 	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res == 0 )
+	if (res == 0 )
 	{
 		Printf(Out, "%d: %s", a_ErrNo, buffer);
 		return Out;

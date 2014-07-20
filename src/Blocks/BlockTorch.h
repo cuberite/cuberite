@@ -99,7 +99,7 @@ public:
 
 	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, eBlockFace a_BlockFace)
 	{
-		if ( !cBlockInfo::FullyOccupiesVoxel(a_BlockType) )
+		if (!cBlockInfo::FullyOccupiesVoxel(a_BlockType) )
 		{
 			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright (for glass, etc.); exceptions won't even be sent by client, no need to handle
 		}
@@ -119,7 +119,8 @@ public:
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, true);
 			BLOCKTYPE BlockInQuestion = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 
-			if (  // If on a block that can only hold a torch if torch is standing on it, return that face
+			// If on a block that can only hold a torch if torch is standing on it, return that face
+			if (
 				((BlockInQuestion == E_BLOCK_GLASS) ||
 				(BlockInQuestion == E_BLOCK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
@@ -167,7 +168,7 @@ public:
 			// No need to check for upright orientation, it was done when the torch was placed
 			return true;
 		}
-		else if ( !cBlockInfo::FullyOccupiesVoxel(BlockInQuestion) )
+		else if (!cBlockInfo::FullyOccupiesVoxel(BlockInQuestion) )
 		{
 			return false;
 		}

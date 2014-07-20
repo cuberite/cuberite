@@ -631,7 +631,7 @@ void cServer::Shutdown(void)
 	cRoot::Get()->SaveAllChunks();
 
 	cCSLock Lock(m_CSClients);
-	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )
 	{
 		(*itr)->Destroy();
 		delete *itr;

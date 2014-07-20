@@ -27,7 +27,7 @@ struct cGroupManager::sGroupManagerState
 
 cGroupManager::~cGroupManager()
 {
-	for( GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr )
+	for (GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr )
 	{
 		delete itr->second;
 		itr->second = NULL;
@@ -211,7 +211,7 @@ bool cGroupManager::ExistsGroup( const AString & a_Name )
 cGroup* cGroupManager::GetGroup( const AString & a_Name )
 {
 	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
-	if( itr != m_pState->Groups.end() )
+	if (itr != m_pState->Groups.end() )
 	{
 		return itr->second;
 	}
