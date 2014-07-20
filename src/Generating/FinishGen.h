@@ -92,14 +92,14 @@ protected:
 			case biSavannaPlateauM:
 			case biPlains:
 			{
-				return 0.0;
+				return 0.0f;
 			}
 			default:
 			{
-				return -0.4;
+				return -0.4f;
 			}
 		}
-		return -0.3;
+		return -0.3f;
 	}
 };
 

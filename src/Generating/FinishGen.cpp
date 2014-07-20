@@ -170,8 +170,7 @@ void cFinishGenFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		for (int z = 1; z < cChunkDef::Width; z++)
 		{
 			int zz = z + a_ChunkDesc.GetChunkZ();
-			//if (true)
-			if (m_Noise.CubicNoise2D((float) xx + m_Noise.CubicNoise1D(xx), zz + m_Noise.CubicNoise1D(zz)) < GetBiomeDensity(a_ChunkDesc.GetBiome(x, z)))
+			if (m_Noise.CubicNoise2D((float) xx + m_Noise.CubicNoise1D(xx), (float) zz + m_Noise.CubicNoise1D(zz)) < GetBiomeDensity(a_ChunkDesc.GetBiome(x, z)))
 			{
 				for (int y = a_ChunkDesc.GetHeight(x, z) + 1; y >= 1; y--)
 				{
