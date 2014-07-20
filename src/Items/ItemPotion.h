@@ -63,9 +63,11 @@ public:
 			return false;
 		}
 		
-		a_Player->AddEntityEffect(cEntityEffect::GetPotionEffectType(PotionDamage),
-								  cEntityEffect::GetPotionEffectDuration(PotionDamage),
-								  cEntityEffect::GetPotionEffectIntensity(PotionDamage));
+		a_Player->AddEntityEffect(
+			cEntityEffect::GetPotionEffectType(PotionDamage),
+			cEntityEffect::GetPotionEffectDuration(PotionDamage),
+			cEntityEffect::GetPotionEffectIntensity(PotionDamage)
+		);
 		a_Player->GetInventory().RemoveOneEquippedItem();
 		a_Player->GetInventory().AddItem(E_ITEM_GLASS_BOTTLE);
 		return true;

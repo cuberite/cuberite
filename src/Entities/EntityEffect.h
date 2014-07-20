@@ -44,8 +44,7 @@ public:
 	static cEntityEffect::eType GetPotionEffectType(short a_ItemDamage);
 	
 	
-	/** Retrieves the intensity level from the potion's damage value.
-	 Returns 0 for level I potions, 1 for level II potions. */
+	/** Retrieves the intensity level from the potion's damage value. Returns 0 for level I potions, 1 for level II potions. */
 	static short GetPotionEffectIntensity(short a_ItemDamage);
 	
 	

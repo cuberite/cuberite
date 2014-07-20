@@ -38,7 +38,7 @@ cEntityEffect::eType cEntityEffect::GetPotionEffectType(short a_ItemDamage)
 		case 0x0d: return cEntityEffect::effWaterBreathing;
 		case 0x0e: return cEntityEffect::effInvisibility;
 			
-			// No effect potions
+		// No effect potions
 		case 0x00:
 		case 0x07:
 		case 0x0b:  // Will be potion of leaping in 1.8
