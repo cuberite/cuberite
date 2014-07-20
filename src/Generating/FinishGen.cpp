@@ -162,24 +162,42 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenFoliage:
 
-void cFinishGenFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
+void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	for (int x = 1; x < cChunkDef::Width; x++)
+	for (int x = 0; x < cChunkDef::Width; x++)
 	{
-		int xx = x + a_ChunkDesc.GetChunkX();
-		for (int z = 1; z < cChunkDef::Width; z++)
+		float xx = (float) x + a_ChunkDesc.GetChunkX();
+		for (int z = 0; z < cChunkDef::Width; z++)
 		{
-			int zz = z + a_ChunkDesc.GetChunkZ();
-			if (m_Noise.CubicNoise2D((float) xx + m_Noise.CubicNoise1D(xx), (float) zz + m_Noise.CubicNoise1D(zz)) < GetBiomeDensity(a_ChunkDesc.GetBiome(x, z)))
+			float zz = (float) z + a_ChunkDesc.GetChunkZ();
+			float BiomeDensity = GetBiomeDensity(a_ChunkDesc.GetBiome(x, z));
+			if (m_Noise.CubicNoise2D(xx + m_Noise.CubicNoise1D(xx), zz + m_Noise.CubicNoise1D(zz)) < BiomeDensity)
 			{
 				for (int y = a_ChunkDesc.GetHeight(x, z) + 1; y >= 1; y--)
 				{
 					if (
 						(a_ChunkDesc.GetBlockType(x, y, z) == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x, y - 1, z) == E_BLOCK_GRASS)
+						((a_ChunkDesc.GetBlockType(x, y - 1, z) == E_BLOCK_GRASS) || (a_ChunkDesc.GetBlockType(x, y - 1, z) == E_BLOCK_DIRT))
 					)
 					{
-						a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, m_Noise.CubicNoise2D(xx * 100, zz * 100) > -0.2 ? 1 : 2);
+						float GrassType = m_Noise.CubicNoise2D(xx * 50, zz * 50);
+						if (GrassType < 0.2f)
+						{
+							a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 1);
+						}
+						else if (GrassType < 0.8f)
+						{
+							a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
+						}
+						else
+						{
+							if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
+							{
+								NIBBLETYPE Meta = m_Noise.CubicNoise2D(xx * 100, zz * 100) > -0.5f ? 2 : 3;
+								a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
+								a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
+							}
+						}
 					}
 				}
 			}

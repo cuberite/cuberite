@@ -338,10 +338,6 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
 			m_FinishGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
 		}
-		else if (NoCaseCompare(*itr, "Foliage") == 0)
-		{
-			m_FinishGens.push_back(new cFinishGenFoliage(Seed));
-		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenIce);
@@ -418,6 +414,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "SprinkleFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
+		}
+		else if (NoCaseCompare(*itr, "TallGrass") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenTallGrass(Seed));
 		}
 		else if (NoCaseCompare(*itr, "TestRails") == 0)
 		{

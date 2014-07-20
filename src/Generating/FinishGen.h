@@ -69,11 +69,11 @@ protected:
 
 
 
-class cFinishGenFoliage :
+class cFinishGenTallGrass :
 	public cFinishGen
 {
 public:
-	cFinishGenFoliage(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
+	cFinishGenTallGrass(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
 
 protected:
 	cNoise m_Noise;
@@ -92,14 +92,13 @@ protected:
 			case biSavannaPlateauM:
 			case biPlains:
 			{
-				return 0.0f;
+				return 0.4f;
 			}
 			default:
 			{
-				return -0.4f;
+				return -0.6f;
 			}
 		}
-		return -0.3f;
 	}
 };
 
