@@ -160,6 +160,38 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// cFinishGenFoliage:
+
+void cFinishGenFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	for (int x = 1; x < cChunkDef::Width; x++)
+	{
+		int xx = x + a_ChunkDesc.GetChunkX();
+		for (int z = 1; z < cChunkDef::Width; z++)
+		{
+			int zz = z + a_ChunkDesc.GetChunkZ();
+			//if (true)
+			if (m_Noise.CubicNoise2D((float) xx + m_Noise.CubicNoise1D(xx), zz + m_Noise.CubicNoise1D(zz)) < GetBiomeDensity(a_ChunkDesc.GetBiome(x, z)))
+			{
+				for (int y = a_ChunkDesc.GetHeight(x, z) + 1; y >= 1; y--)
+				{
+					if (
+						(a_ChunkDesc.GetBlockType(x, y, z) == E_BLOCK_AIR) &&
+						(a_ChunkDesc.GetBlockType(x, y - 1, z) == E_BLOCK_GRASS)
+					)
+					{
+						a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, m_Noise.CubicNoise2D(xx * 100, zz * 100) > -0.2 ? 1 : 2);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
 bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)

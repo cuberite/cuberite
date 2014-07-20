@@ -69,6 +69,44 @@ protected:
 
 
 
+class cFinishGenFoliage :
+	public cFinishGen
+{
+public:
+	cFinishGenFoliage(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
+
+protected:
+	cNoise m_Noise;
+	int m_Seed;
+
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+	float GetBiomeDensity(EMCSBiome a_Biome)
+	{
+		switch (a_Biome)
+		{
+			case biSavanna:
+			case biSavannaM:
+			case biSavannaPlateau:
+			case biSavannaPlateauM:
+			case biPlains:
+			{
+				return 0.0;
+			}
+			default:
+			{
+				return -0.4;
+			}
+		}
+		return -0.3;
+	}
+};
+
+
+
+
+
 class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {
