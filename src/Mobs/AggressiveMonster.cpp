@@ -42,7 +42,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 			MoveToPosition(m_Target->GetPosition());
 		}
 	}
-} 
+}
 
 
 

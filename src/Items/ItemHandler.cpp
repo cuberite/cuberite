@@ -359,7 +359,7 @@ char cItemHandler::GetMaxStackSize(void)
 		return 64;
 	}
 	
-	switch (m_ItemType) //sorted by id
+	switch (m_ItemType)
 	{
 		case E_ITEM_ARROW:                return 64;
 		case E_ITEM_BAKED_POTATO:         return 64;
@@ -455,14 +455,14 @@ char cItemHandler::GetMaxStackSize(void)
 bool cItemHandler::IsTool()
 {
 	// TODO: Rewrite this to list all tools specifically
-	return 
-		   (m_ItemType >= 256 && m_ItemType <= 259)
-		|| (m_ItemType == 261)
-		|| (m_ItemType >= 267 && m_ItemType <= 279)
-		|| (m_ItemType >= 283 && m_ItemType <= 286)
-		|| (m_ItemType >= 290 && m_ItemType <= 294)
-		|| (m_ItemType == 325)
-		|| (m_ItemType == 346);
+	return
+		((m_ItemType >= 256) && (m_ItemType <= 259)) ||
+		(m_ItemType == 261) ||
+		((m_ItemType >= 267) && (m_ItemType <= 279)) ||
+		((m_ItemType >= 283) && (m_ItemType <= 286)) ||
+		((m_ItemType >= 290) && (m_ItemType <= 294)) ||
+		(m_ItemType == 325) ||
+		(m_ItemType == 346);
 }
 
 
@@ -522,7 +522,7 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 
 bool cItemHandler::GetPlacementBlockTypeMeta(
 	cWorld * a_World, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 	int a_CursorX, int a_CursorY, int a_CursorZ,
 	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 )
@@ -539,7 +539,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, a_Player,
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
 		a_CursorX, a_CursorY, a_CursorZ,
 		a_BlockType, a_BlockMeta
 	);
@@ -565,7 +565,7 @@ bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 			cFastRandom r1;
 			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
 			{
-				a_Player->FoodPoison(600); // Give the player food poisoning for 30 seconds.
+				a_Player->FoodPoison(600);  // Give the player food poisoning for 30 seconds.
 			}
 		}
 

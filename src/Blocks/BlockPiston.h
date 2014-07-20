@@ -17,7 +17,7 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override;
@@ -75,7 +75,7 @@ public:
 				return BLOCK_FACE_NONE;
 			}
 		}
-	}	
+	}
 
 	static void ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	static void RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
@@ -132,7 +132,7 @@ private:
 	{
 		if (cBlockInfo::IsPistonBreakable(a_BlockType))
 		{
-			return false; // CanBreakPush returns true, but we need false to prevent pulling
+			return false;  // CanBreakPush returns true, but we need false to prevent pulling
 		}
 		
 		return CanPush(a_BlockType, a_BlockMeta);

@@ -77,7 +77,7 @@ protected:
 
 	/** Initializes the specified BlockInfo structures with block-specific values. */
 	static void Initialize(cBlockInfoArray & a_BlockInfos);
-}; // tolua_export
+};  // tolua_export
 
 
 

@@ -28,7 +28,7 @@ enum ENUM_NOTE_INSTRUMENTS
 
 // tolua_begin
 
-class cNoteEntity : 
+class cNoteEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;

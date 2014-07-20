@@ -85,7 +85,7 @@ protected:
 
 
 cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	:	cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
+	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
 	, m_Timer(0.f)
 	, m_Item(a_Item)
 	, m_bCollected(false)
@@ -113,7 +113,7 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	BroadcastMovementUpdate(); //Notify clients of position
+	BroadcastMovementUpdate();  // Notify clients of position
 
 	m_Timer += a_Dt;
 	
@@ -143,17 +143,17 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				m_bCollected = true;
 				m_Timer = 0;  // We have to reset the timer.
 				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
-				if (m_Timer > 500.f)  
+				if (m_Timer > 500.f)
 				{
 					Destroy(true);
 					return;
 				}
 			}
 
-			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize())) // Don't combine into an already full pickup
+			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine into an already full pickup
 			{
 				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
-				m_World->ForEachEntity(PickupCombiningCallback); // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
+				m_World->ForEachEntity(PickupCombiningCallback);  // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
 				if (PickupCombiningCallback.FoundMatchingPickup())
 				{
 					m_World->BroadcastEntityMetadata(*this);
@@ -176,7 +176,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if (GetPosY() < VOID_BOUNDARY) // Out of this world and no more visible!
+	if (GetPosY() < VOID_BOUNDARY)  // Out of this world and no more visible!
 	{
 		Destroy(true);
 		return;
@@ -194,14 +194,14 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 	if (m_bCollected)
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", m_UniqueID, a_Dest->GetName().c_str());
-		return false; // It's already collected!
+		return false;  // It's already collected!
 	}
 	
 	// Two seconds if player created the pickup (vomiting), half a second if anything else
 	if (m_Timer < (m_bIsPlayerCreated ? 2000.f : 500.f))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", m_UniqueID, a_Dest->GetName().c_str());
-		return false; // Not old enough
+		return false;  // Not old enough
 	}
 
 	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))

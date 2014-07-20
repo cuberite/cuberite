@@ -40,7 +40,7 @@ const cLuaState::cRet cLuaState::Return = {};
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
@@ -1336,9 +1336,8 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
 	
-	
 	// Format string consisting only of %s is used to appease the compiler
-	LOGD("%s",(a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	LOGD("%s", (a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;
@@ -1371,7 +1370,7 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
 cLuaState::cRef::cRef(void) :

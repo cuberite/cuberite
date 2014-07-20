@@ -233,13 +233,13 @@ AString & StrToLower(AString & s)
 int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER
-	// MSVC has stricmp that compares case-insensitive:
-	return _stricmp(s1.c_str(), s2.c_str());
-	#else 
-	// Do it the hard way:
-	AString s1Copy(s1);
-	AString s2Copy(s2);
-	return StrToUpper(s1Copy).compare(StrToUpper(s2Copy));
+		// MSVC has stricmp that compares case-insensitive:
+		return _stricmp(s1.c_str(), s2.c_str());
+	#else
+		// Do it the hard way:
+		AString s1Copy(s1);
+		AString s2Copy(s2);
+		return StrToUpper(s1Copy).compare(StrToUpper(s2Copy));
 	#endif  // else _MSC_VER
 }
 
@@ -339,16 +339,16 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 // UTF-8 conversion code adapted from:
 //  http://stackoverflow.com/questions/2867123/convert-utf-16-to-utf-8-under-windows-and-linux-in-c
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Begin of Unicode, Inc.'s code / information
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /*
 Notice from the original file:
 * Copyright 2001-2004 Unicode, Inc.
-* 
+*
 * Disclaimer
-* 
+*
 * This source code is provided as is by Unicode, Inc. No claims are
 * made as to fitness for any particular purpose. No warranties of any
 * kind are expressed or implied. The recipient agrees to determine
@@ -356,9 +356,9 @@ Notice from the original file:
 * purchased on magnetic or optical media from Unicode, Inc., the
 * sole remedy for any claim will be exchange of defective media
 * within 90 days of receipt.
-* 
+*
 * Limitations on Rights to Redistribute This Code
-* 
+*
 * Unicode, Inc. hereby grants the right to freely use the information
 * supplied in this file in the creation of products supporting the
 * Unicode Standard, and to make copies of this file in any form
@@ -378,13 +378,13 @@ Notice from the original file:
 
 static const char trailingBytesForUTF8[256] =
 {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,  3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5
 };
 
@@ -394,7 +394,7 @@ static const char trailingBytesForUTF8[256] =
 
 static const unsigned int offsetsFromUTF8[6] =
 {
-	0x00000000UL, 0x00003080UL, 0x000E2080UL, 
+	0x00000000UL, 0x00003080UL, 0x000E2080UL,
 	0x03C82080UL, 0xFA082080UL, 0x82082080UL
 };
 
@@ -502,27 +502,27 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 	return a_UTF16;
 }
 
-/* ---------------------------------------------------------------------
-
-    Note A.
-    The fall-through switches in UTF-8 reading code save a
-    temp variable, some decrements & conditionals.  The switches
-    are equivalent to the following loop:
-    {
-        int tmpBytesToRead = extraBytesToRead+1;
-        do {
-        ch += *source++;
-        --tmpBytesToRead;
-        if (tmpBytesToRead) ch <<= 6;
-        } while (tmpBytesToRead > 0);
-    }
-
-   ---------------------------------------------------------------------
+/*
+---------------------------------------------------------------------
+Note A.
+The fall-through switches in UTF-8 reading code save a
+temp variable, some decrements & conditionals.  The switches
+are equivalent to the following loop:
+{
+	int tmpBytesToRead = extraBytesToRead + 1;
+	do
+	{
+		ch += *source++;
+		--tmpBytesToRead;
+		if (tmpBytesToRead) ch <<= 6;
+	} while (tmpBytesToRead > 0);
+}
+---------------------------------------------------------------------
 */
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // End of Unicode, Inc.'s code / information
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -761,7 +761,7 @@ AString Base64Decode(const AString & a_Base64String)
 		{
 			switch (o & 7)
 			{
-				case 0:	res[o >> 3] |= (c << 2); break;
+				case 0: res[o >> 3] |= (c << 2); break;
 				case 6: res[o >> 3] |= (c >> 4); res[(o >> 3) + 1] |= (c << 4); break;
 				case 4: res[o >> 3] |= (c >> 2); res[(o >> 3) + 1] |= (c << 6); break;
 				case 2: res[o >> 3] |= c; break;
@@ -785,11 +785,12 @@ AString Base64Decode(const AString & a_Base64String)
 
 AString Base64Encode(const AString & a_Input)
 {
-	static const char BASE64[64] = {
-		'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
-		'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
-		'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
-		'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/'
+	static const char BASE64[64] =
+	{
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
+		'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+		'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 	};
 
 	AString output;

@@ -279,7 +279,7 @@ void cNBTChunkSerializer::AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock
 		m_Writer.AddString("Command",      a_CmdBlock->GetCommand());
 		m_Writer.AddInt   ("SuccessCount", a_CmdBlock->GetResult());
 		m_Writer.AddString("LastOutput",   a_CmdBlock->GetLastOutput());
-		m_Writer.AddByte  ("TrackOutput",  1); // TODO 2014-01-18 xdot: Figure out what TrackOutput is and save it.
+		m_Writer.AddByte  ("TrackOutput",  1);  // TODO 2014-01-18 xdot: Figure out what TrackOutput is and save it.
 	m_Writer.EndCompound();
 }
 
@@ -613,7 +613,8 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 				m_Writer.AddInt("EffectDuration",           (Int16)Potion->GetEntityEffect().GetDuration());
 				m_Writer.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
 				m_Writer.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
-				m_Writer.AddInt("PotionName",                Potion->GetPotionParticleType());
+				m_Writer.AddInt("PotionName",                Potion->GetPotionColor());
+				break;
 			}
 			case cProjectileEntity::pkGhastFireball:
 			{
@@ -630,7 +631,7 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			{
 				ASSERT(!"Unsaved projectile entity!");
 			}
-		}  // switch (ProjectileKind)		
+		}  // switch (ProjectileKind)
 
 		if (!a_Projectile->GetCreatorName().empty())
 		{

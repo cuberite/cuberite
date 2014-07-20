@@ -20,7 +20,7 @@
 #include "Entities/Pickup.h"
 
 #ifndef _WIN32
-	#include <cstdlib> // abs
+	#include <cstdlib>  // abs
 #endif
 
 #include "zlib/zlib.h"
@@ -33,14 +33,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkMap:
 
-cChunkMap::cChunkMap(cWorld * a_World )
-	: m_World( a_World ),
+cChunkMap::cChunkMap(cWorld * a_World) :
+	m_World(a_World),
 	m_Pool(
 		new cListAllocationPool<cChunkData::sChunkSection, 1600>(
 			std::auto_ptr<cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks>(
-				new cStarvationCallbacks())
+				new cStarvationCallbacks()
 			)
 		)
+	)
 {
 
 }
@@ -1875,15 +1876,15 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 						default:
 						{
-							if (m_World->GetTickRandomNumber(100) <= 25) // 25% chance of pickups
+							if (m_World->GetTickRandomNumber(100) <= 25)  // 25% chance of pickups
 							{
 								cItems Drops;
 								cBlockHandler * Handler = BlockHandler(Block);
 
-								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z)); // Stone becomes cobblestone, coal ore becomes coal, etc.
+								Handler->ConvertToPickups(Drops, area.GetBlockMeta(bx + x, by + y, bz + z));  // Stone becomes cobblestone, coal ore becomes coal, etc.
 								m_World->SpawnItemPickups(Drops, bx + x, by + y, bz + z);
 							}
-							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20)) // 20% chance of flinging stuff around
+							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20))  // 20% chance of flinging stuff around
 							{
 								if (!cBlockInfo::FullyOccupiesVoxel(Block))
 								{
@@ -1923,7 +1924,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		{
 			if (a_Entity->IsPickup())
 			{
-				if (((cPickup *)a_Entity)->GetAge() < 20) // If pickup age is smaller than one second, it is invincible (so we don't kill pickups that were just spawned)
+				if (((cPickup *)a_Entity)->GetAge() < 20)  // If pickup age is smaller than one second, it is invincible (so we don't kill pickups that were just spawned)
 				{
 					return false;
 				}
@@ -1932,7 +1933,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			Vector3d EntityPos = a_Entity->GetPosition();
 			cBoundingBox bbEntity(EntityPos, a_Entity->GetWidth() / 2, a_Entity->GetHeight());
 
-			if (!m_bbTNT.IsInside(bbEntity)) // IsInside actually acts like DoesSurround
+			if (!m_bbTNT.IsInside(bbEntity))  // IsInside actually acts like DoesSurround
 			{
 				return false;
 			}
@@ -1950,12 +1951,9 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 			double FinalDamage = (((1 / AbsoluteEntityPos.x) + (1 / AbsoluteEntityPos.y) + (1 / AbsoluteEntityPos.z)) * 2) * m_ExplosionSize;
 
 			// Clip damage values
-			if (FinalDamage > a_Entity->GetMaxHealth())
-				FinalDamage = a_Entity->GetMaxHealth();
-			else if (FinalDamage < 0)
-				FinalDamage = 0;
+			FinalDamage = Clamp(FinalDamage, 0.0, (double)a_Entity->GetMaxHealth());
 
-			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock()) // Don't apply damage to other TNT entities and falling blocks, they should be invincible
+			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock())  // Don't apply damage to other TNT entities and falling blocks, they should be invincible
 			{
 				a_Entity->TakeDamage(dtExplosion, NULL, (int)FinalDamage, 0);
 			}
@@ -2713,7 +2711,7 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 // cChunkMap::cChunkLayer:
 
 cChunkMap::cChunkLayer::cChunkLayer(
-	int a_LayerX, int a_LayerZ, 
+	int a_LayerX, int a_LayerZ,
 	cChunkMap * a_Parent,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 )
@@ -2735,7 +2733,7 @@ cChunkMap::cChunkLayer::~cChunkLayer()
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); ++i)
 	{
 		delete m_Chunks[i];
-		m_Chunks[i] = NULL;  // // Must zero out, because further chunk deletions query the chunkmap for entities and that would touch deleted data
+		m_Chunks[i] = NULL;  // Must zero out, because further chunk deletions query the chunkmap for entities and that would touch deleted data
 	}  // for i - m_Chunks[]
 }
 
@@ -2761,8 +2759,8 @@ cChunkPtr cChunkMap::cChunkLayer::GetChunk( int a_ChunkX, int a_ChunkY, int a_Ch
 	{
 		cChunk * neixm = (LocalX > 0)              ? m_Chunks[Index - 1]          : m_Parent->FindChunk(a_ChunkX - 1, a_ChunkZ);
 		cChunk * neixp = (LocalX < LAYER_SIZE - 1) ? m_Chunks[Index + 1]          : m_Parent->FindChunk(a_ChunkX + 1, a_ChunkZ);
-		cChunk * neizm = (LocalZ > 0)              ? m_Chunks[Index - LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX    , a_ChunkZ - 1);
-		cChunk * neizp = (LocalZ < LAYER_SIZE - 1) ? m_Chunks[Index + LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX    , a_ChunkZ + 1);
+		cChunk * neizm = (LocalZ > 0)              ? m_Chunks[Index - LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX,     a_ChunkZ - 1);
+		cChunk * neizp = (LocalZ < LAYER_SIZE - 1) ? m_Chunks[Index + LAYER_SIZE] : m_Parent->FindChunk(a_ChunkX,     a_ChunkZ + 1);
 		m_Chunks[Index] = new cChunk(a_ChunkX, 0, a_ChunkZ, m_Parent, m_Parent->GetWorld(), neixm, neixp, neizm, neizp, m_Pool);
 	}
 	return m_Chunks[Index];
@@ -2925,7 +2923,7 @@ int cChunkMap::cChunkLayer::GetNumChunksLoaded(void) const
 			NumChunks++;
 		}
 	}  // for i - m_Chunks[]
-	return NumChunks; 
+	return NumChunks;
 }
 
 
@@ -2996,7 +2994,7 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 void cChunkMap::FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CSFastSetBlock);
-	m_FastSetBlockQueue.push_back(sSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta)); 
+	m_FastSetBlockQueue.push_back(sSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta));
 }
 
 

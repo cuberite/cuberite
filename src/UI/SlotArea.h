@@ -135,7 +135,7 @@ class cSlotAreaHotBar :
 	typedef cSlotAreaInventoryBase super;
 	
 public:
-	cSlotAreaHotBar(cWindow & a_ParentWindow)	:
+	cSlotAreaHotBar(cWindow & a_ParentWindow) :
 		cSlotAreaInventoryBase(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
 	{
 	}
@@ -150,7 +150,7 @@ class cSlotAreaArmor :
 	public cSlotAreaInventoryBase
 {
 public:
-	cSlotAreaArmor(cWindow & a_ParentWindow)	:
+	cSlotAreaArmor(cWindow & a_ParentWindow) :
 		cSlotAreaInventoryBase(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
 	{
 	}

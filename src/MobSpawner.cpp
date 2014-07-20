@@ -8,7 +8,7 @@
 
 
 
-cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonster::eType>& a_AllowedTypes) :
+cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<cMonster::eType>& a_AllowedTypes) :
 	m_MonsterFamily(a_MonsterFamily),
 	m_NewPack(true),
 	m_MobType(cMonster::mtInvalidType)
@@ -91,7 +91,7 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 			addIfAllowed(cMonster::mtCow, allowedMobs);
 			addIfAllowed(cMonster::mtChicken, allowedMobs);
 			addIfAllowed(cMonster::mtEnderman, allowedMobs);
-			addIfAllowed(cMonster::mtSlime, allowedMobs);	// MG TODO : much more complicated rule
+			addIfAllowed(cMonster::mtSlime, allowedMobs);  // MG TODO : much more complicated rule
 			
 			if (a_Biome == biForest || a_Biome == biForestHills || a_Biome == biTaiga  || a_Biome == biTaigaHills)
 			{

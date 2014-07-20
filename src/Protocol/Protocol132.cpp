@@ -71,7 +71,7 @@ enum
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol132:
 
 cProtocol132::cProtocol132(cClientHandle * a_Client) :
@@ -382,7 +382,7 @@ void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 {
-	// 1.3.2 requires player inventory slots to be sent as SetSlot packets, 
+	// 1.3.2 requires player inventory slots to be sent as SetSlot packets,
 	// otherwise it sometimes fails to update the window
 	
 	// Send the entire window:
@@ -476,7 +476,7 @@ int cProtocol132::ParseHandshake(void)
 
 	if (!m_Client->HandleHandshake( m_Username ))
 	{
-		return PARSE_OK; // Player is not allowed into the server
+		return PARSE_OK;  // Player is not allowed into the server
 	}
 
 	// Send a 0xfd Encryption Key Request http://wiki.vg/Protocol#0xFD

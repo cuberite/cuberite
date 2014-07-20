@@ -62,7 +62,7 @@ static const struct
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
 cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
@@ -115,12 +115,10 @@ void cMonster::TickPathFinding()
 	const int PosY = POSY_TOINT;
 	const int PosZ = POSZ_TOINT;
 
-	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
-
 	std::vector<Vector3d> m_PotentialCoordinates;
 	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
 
-	static const struct // Define which directions to try to move to
+	static const struct  // Define which directions to try to move to
 	{
 		int x, z;
 	} gCrossCoords[] =
@@ -128,7 +126,7 @@ void cMonster::TickPathFinding()
 		{ 1, 0},
 		{-1, 0},
 		{ 0, 1},
-		{ 0,-1},
+		{ 0, -1},
 	} ;
 	
 	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
@@ -201,19 +199,6 @@ void cMonster::TickPathFinding()
 
 
 
-void cMonster::MoveToPosition(const Vector3f & a_Position)
-{
-	FinishPathFinding();
-
-	m_FinalDestination = a_Position;
-	m_bMovingToDestination = true;
-	TickPathFinding();
-}
-
-
-
-
-
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 	FinishPathFinding();
@@ -227,15 +212,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 
 bool cMonster::IsCoordinateInTraversedList(Vector3i a_Coords)
 {
-	for (std::vector<Vector3i>::const_iterator itr = m_TraversedCoordinates.begin(); itr != m_TraversedCoordinates.end(); ++itr)
-	{
-		if (itr->Equals(a_Coords))
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return (std::find(m_TraversedCoordinates.begin(), m_TraversedCoordinates.end(), a_Coords) != m_TraversedCoordinates.end());
 }
 
 
@@ -296,17 +273,15 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bOnGround)
 		{
-			m_Destination.y = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
-
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
-				AddSpeedY(5.2); // Jump!!
+				AddSpeedY(5.2);  // Jump!!
 			}
 		}
 
 		Vector3f Distance = m_Destination - GetPosition();
-		if(!ReachedDestination() && !ReachedFinalDestination()) // If we haven't reached any sort of destination, move
+		if(!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
 			Distance.Normalize();
@@ -325,20 +300,20 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			AddSpeedZ(Distance.z);
 
 			if (m_EMState == ESCAPING)
-			{	//Runs Faster when escaping :D otherwise they just walk away
+			{  // Runs Faster when escaping :D otherwise they just walk away
 				SetSpeedX (GetSpeedX() * 2.f);
 				SetSpeedZ (GetSpeedZ() * 2.f);
 			}
 		}
 		else
 		{
-			if (ReachedFinalDestination()) // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
+			if (ReachedFinalDestination())  // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
 			{
 				FinishPathFinding();
 			}
 			else
 			{
-				TickPathFinding(); // We have reached the next point in our path, calculate another point
+				TickPathFinding();  // We have reached the next point in our path, calculate another point
 			}
 		}
 	}
@@ -353,13 +328,13 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			// If enemy passive we ignore checks for player visibility
 			InStateIdle(a_Dt);
 			break;
-		}	
+		}
 		case CHASING:
 		{
 			// If we do not see a player anymore skip chasing action
 			InStateChasing(a_Dt);
 			break;
-		}	
+		}
 		case ESCAPING:
 		{
 			InStateEscaping(a_Dt);
@@ -439,11 +414,7 @@ void cMonster::HandleFalling()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
-
-	if (PosY < 0)
-		PosY = 0;
-	else if (PosY > cChunkDef::Height)
-		PosY = cChunkDef::Height;
+	PosY = Clamp(PosY, 0, cChunkDef::Height);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{
@@ -570,8 +541,8 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
-//Checks to see if EventSeePlayer should be fired
-//monster sez: Do I see the player
+// Checks to see if EventSeePlayer should be fired
+// monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
@@ -588,7 +559,7 @@ void cMonster::CheckEventSeePlayer(void)
 
 
 void cMonster::CheckEventLostPlayer(void)
-{	
+{
 	if (m_Target != NULL)
 	{
 		if ((m_Target->GetPosition() - GetPosition()).Length() > m_SightDistance)
@@ -631,7 +602,7 @@ void cMonster::InStateIdle(float a_Dt)
 {
 	if (m_bMovingToDestination)
 	{
-		return; // Still getting there
+		return;  // Still getting there
 	}
 
 	m_IdleInterval += a_Dt;
@@ -640,7 +611,7 @@ void cMonster::InStateIdle(float a_Dt)
 	{
 		// At this interval the results are predictable
 		int rem = m_World->GetTickRandomNumber(6) + 1;
-		m_IdleInterval -= 1; // So nothing gets dropped when the server hangs for a few seconds
+		m_IdleInterval -= 1;  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
 		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
@@ -709,16 +680,6 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 bool cMonster::IsUndead(void)
 {
-	switch (GetMobType())
-	{
-		case mtZombie:
-		case mtZombiePigman:
-		case mtSkeleton:
-		case mtWither:
-		{
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -867,13 +828,13 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(Random.NextInt(2) + 1);
+			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(Random.NextInt(1) == 0 ? false : true);
+			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
 			break;
 		}
 		case mtVillager:
@@ -928,7 +889,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtWitch:         toReturn = new cWitch();                    break;
 		case mtWither:	      toReturn = new cWither();                   break;
 		case mtWolf:          toReturn = new cWolf();                     break;
-		case mtZombie:        toReturn = new cZombie(false);              break; // TODO: Infected zombie parameter
+		case mtZombie:        toReturn = new cZombie(false);              break;  // TODO: Infected zombie parameter
 		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
 		default:
 		{

@@ -25,7 +25,7 @@ public:
 
 	virtual bool IsPlaceable(void) override
 	{
-		return false; // Set as not placeable so OnItemUse is called
+		return false;  // Set as not placeable so OnItemUse is called
 	}
 
 
@@ -57,7 +57,7 @@ public:
 			{
 				if (IsBlockWater(a_CBBlockType))
 				{
-					if ((a_CBBlockMeta != 0) || (a_CBEntryFace == BLOCK_FACE_NONE)) // The hit block should be a source. The FACE_NONE check is clicking whilst submerged
+					if ((a_CBBlockMeta != 0) || (a_CBEntryFace == BLOCK_FACE_NONE))  // The hit block should be a source. The FACE_NONE check is clicking whilst submerged
 					{
 						return false;
 					}

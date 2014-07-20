@@ -9,25 +9,38 @@
 
 
 
-class cBlockSignHandler :
+class cBlockSignPostHandler :
 	public cBlockHandler
 {
+	typedef cBlockHandler super;
+	
 public:
-	cBlockSignHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+	cBlockSignPostHandler(BLOCKTYPE a_BlockType) :
+		super(a_BlockType)
 	{
 	}
-	
+
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
-	
+
 
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
+	}
+
+
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	{
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+
+		return (cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 
 
@@ -43,23 +56,6 @@ public:
 		
 		return ((char)a_Rotation) % 16;
 	}
-	
-	
-	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
-	{
-		switch (a_Direction)
-		{
-			case 0x2: return 0x2;
-			case 0x3: return 0x3;
-			case 0x4: return 0x4;
-			case 0x5: return 0x5;
-			default:
-			{
-				break;
-			}
-		}
-		return 0x2;
-	}	
 
 
 	virtual void OnPlacedByPlayer(
@@ -84,22 +80,23 @@ public:
 		return (a_Meta + 12) & 0x0f;
 	}
 
+
 	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
-		//  Mirrors signs over the XY plane (North-South Mirroring)
+		// Mirrors signs over the XY plane (North-South Mirroring)
 
-		//  There are 16 meta values which correspond to different directions.
-		//  These values are equated to angles on a circle; 0x08 = 180 degrees.
+		// There are 16 meta values which correspond to different directions.
+		// These values are equated to angles on a circle; 0x08 = 180 degrees.
 		return (a_Meta < 0x08) ? (0x08 + a_Meta) : (0x08 - a_Meta);
 	}
 
 
 	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
-		//  Mirrors signs over the YZ plane (East-West Mirroring)
+		// Mirrors signs over the YZ plane (East-West Mirroring)
 
-		//  There are 16 meta values which correspond to different directions.
-		//  These values are equated to angles on a circle; 0x10 = 360 degrees.
+		// There are 16 meta values which correspond to different directions.
+		// These values are equated to angles on a circle; 0x10 = 360 degrees.
 		return 0x10 - a_Meta;
 	}
 } ;

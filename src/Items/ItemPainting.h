@@ -27,9 +27,9 @@ public:
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir); // Make sure block that will be occupied is free
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir);  // Make sure block that will be occupied is free
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir, true); // We want the clicked block, so go back again
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir, true);  // We want the clicked block, so go back again
 
 		if (Block == E_BLOCK_AIR)
 		{
@@ -38,14 +38,14 @@ public:
 			// The client uses different values for painting directions and block faces. Our constants are for the block faces, so we convert them here to painting faces
 			switch (a_Dir)
 			{
-				case BLOCK_FACE_ZP: break; // Initialised to zero
+				case BLOCK_FACE_ZP: break;  // Initialised to zero
 				case BLOCK_FACE_ZM: Dir = 2; break;
 				case BLOCK_FACE_XM: Dir = 1; break;
 				case BLOCK_FACE_XP: Dir = 3; break;
 				default: ASSERT(!"Unhandled block face when trying spawn painting!"); return false;
 			}
 
-			static const struct // Define all the possible painting titles
+			static const struct  // Define all the possible painting titles
 			{
 				AString Title;
 			} gPaintingTitlesList[] =

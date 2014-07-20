@@ -25,7 +25,7 @@ extern "C"
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPluginLua:
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
@@ -78,7 +78,7 @@ bool cPluginLua::Initialize(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
-	{	
+	{
 		m_LuaState.Create();
 		m_LuaState.RegisterAPILibs();
 		
@@ -1015,7 +1015,7 @@ bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
+bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -1294,8 +1294,8 @@ bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 
 
 bool cPluginLua::OnUpdatedSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	cWorld * a_World,
+	int a_BlockX, int a_BlockY, int a_BlockZ,
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
 	cPlayer * a_Player
 )
@@ -1319,8 +1319,8 @@ bool cPluginLua::OnUpdatedSign(
 
 
 bool cPluginLua::OnUpdatingSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	cWorld * a_World,
+	int a_BlockX, int a_BlockY, int a_BlockZ,
 	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
 	cPlayer * a_Player
 )
@@ -1517,7 +1517,7 @@ bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 		return true;
 	}
 	
-	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.", 
+	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.",
 		GetName().c_str(), a_HookType, FnName
 	);
 	m_LuaState.LogStackTrace();
@@ -1670,7 +1670,7 @@ AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
 	sWebPluginTab * Tab = 0;
 	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
-		if ((*itr)->SafeTitle.compare(SafeTabName) == 0) // This is the one! Rawr
+		if ((*itr)->SafeTitle.compare(SafeTabName) == 0)  // This is the one! Rawr
 		{
 			Tab = *itr;
 			break;

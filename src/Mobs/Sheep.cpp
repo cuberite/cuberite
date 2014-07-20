@@ -93,12 +93,12 @@ void cSheep::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_TimeToStopEating > 0)
 	{
-		m_bMovingToDestination = false; // The sheep should not move when he's eating
+		m_bMovingToDestination = false;  // The sheep should not move when he's eating
 		m_TimeToStopEating--;
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS) // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
 				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);

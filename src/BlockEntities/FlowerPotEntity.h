@@ -27,7 +27,7 @@ namespace Json
 
 // tolua_begin
 
-class cFlowerPotEntity : 
+class cFlowerPotEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;

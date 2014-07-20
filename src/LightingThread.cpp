@@ -84,7 +84,7 @@ public:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLightingThread:
 
 cLightingThread::cLightingThread(void) :
@@ -495,7 +495,7 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 
 
 void cLightingThread::CalcLightStep(
-	NIBBLETYPE * a_Light, 
+	NIBBLETYPE * a_Light,
 	int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 	int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 )
@@ -582,7 +582,7 @@ void cLightingThread::QueueChunkStay(cLightingChunkStay & a_ChunkStay)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLightingThread::cLightingChunkStay:
 
 cLightingThread::cLightingChunkStay::cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter) :

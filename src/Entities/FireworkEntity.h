@@ -37,4 +37,4 @@ private:
 	int m_ExplodeTimer;
 	cItem m_FireworkItem;
 	
-}; // tolua_export
+};  // tolua_export

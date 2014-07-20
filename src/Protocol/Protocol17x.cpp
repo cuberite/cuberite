@@ -81,7 +81,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol172:
 
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
@@ -651,7 +651,7 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteInt(a_Player.GetUniqueID());
-		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0)); // Hardcore flag bit 4
+		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteByte(std::min(Server->GetMaxPlayers(), 60));
@@ -807,7 +807,7 @@ void cProtocol172::SendPlayerAbilities(void)
 	if (Player->IsGameModeCreative())
 	{
 		Flags |= 0x01;
-		Flags |= 0x08; // Godmode, used for creative
+		Flags |= 0x08;  // Godmode, used for creative
 	}
 	if (Player->IsFlying())
 	{
@@ -1026,7 +1026,7 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x11);	
+	cPacketizer Pkt(*this, 0x11);
 	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
 	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
 	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
@@ -1130,7 +1130,7 @@ void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 16)); // Or 0x10
+	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 16));  // Or 0x10
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
@@ -1219,7 +1219,7 @@ void cProtocol172::SendStatistics(const cStatManager & a_Manager)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x37);
-	Pkt.WriteVarInt(statCount); // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
+	Pkt.WriteVarInt(statCount);  // TODO 2014-05-11 xdot: Optimization: Send "dirty" statistics only
 
 	for (size_t i = 0; i < (size_t)statCount; ++i)
 	{
@@ -1326,10 +1326,10 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_MOB_SPAWNER:   Action = 1; break; // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK: Action = 2; break; // Update command block text
-		case E_BLOCK_HEAD:          Action = 4; break; // Update Mobhead entity
-		case E_BLOCK_FLOWER_POT:    Action = 5; break; // Update flower pot
+		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2; break;  // Update command block text
+		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
+		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
 	}
 	Pkt.WriteByte(Action);
@@ -1656,7 +1656,7 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
 				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return true;
 				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
-				case 0x0f: // Confirm transaction - not used in MCS
+				case 0x0f:  // Confirm transaction - not used in MCS
 				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x11: HandlePacketEnchantItem            (a_ByteBuffer); return true;
 				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
@@ -1712,16 +1712,16 @@ void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	// Send the response:
-	AString Response = "{\"version\":{\"name\":\"1.7.2\",\"protocol\":4},\"players\":{";
+	AString Response = "{\"version\":{\"name\":\"1.7.2\", \"protocol\":4}, \"players\":{";
 	cServer * Server = cRoot::Get()->GetServer();
-	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
+	AppendPrintf(Response, "\"max\":%u, \"online\":%u, \"sample\":[]},",
 		Server->GetMaxPlayers(),
 		Server->GetNumPlayers()
 	);
 	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
 		Server->GetDescription().c_str()
 	);
-	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
 		Server->GetFaviconData().c_str()
 	);
 	Response.append("}");
@@ -1950,11 +1950,11 @@ void cProtocol172::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 	switch (Action)
 	{
-		case 1: m_Client->HandleEntityCrouch(PlayerID, true);     break; // Crouch
-		case 2: m_Client->HandleEntityCrouch(PlayerID, false);    break; // Uncrouch
-		case 3: m_Client->HandleEntityLeaveBed(PlayerID);         break; // Leave Bed
-		case 4: m_Client->HandleEntitySprinting(PlayerID, true);  break; // Start sprinting
-		case 5: m_Client->HandleEntitySprinting(PlayerID, false); break; // Stop sprinting
+		case 1: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
+		case 2: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
 	}
 }
 
@@ -2311,7 +2311,7 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 		{
 			case TAG_List:
 			{
-				if ((TagName == "ench") || (TagName == "StoredEnchantments")) // Enchantments tags
+				if ((TagName == "ench") || (TagName == "StoredEnchantments"))  // Enchantments tags
 				{
 					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 				}
@@ -2319,21 +2319,21 @@ void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 			}
 			case TAG_Compound:
 			{
-				if (TagName == "display") // Custom name and lore tag
+				if (TagName == "display")  // Custom name and lore tag
 				{
 					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
 					{
-						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name")) // Custon name tag
+						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
 							a_Item.m_CustomName = NBT.GetString(displaytag);
 						}
-						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore")) // Lore tag
+						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
 							AString Lore;
 
-							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag)) // Loop through array of strings
+							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
-								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str()); // Append the lore with a grave accent/backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
+								AppendPrintf(Lore, "%s`", NBT.GetString(loretag).c_str());  // Append the lore with a grave accent/backtick, used internally by MCS to display a new line in the client; don't forget to c_str ;)
 							}
 
 							a_Item.m_Lore = Lore;
@@ -2463,7 +2463,7 @@ void cProtocol172::AddChatPartStyle(Json::Value & a_Value, const AString & a_Par
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol172::cPacketizer:
 
 cProtocol172::cPacketizer::~cPacketizer()
@@ -2533,7 +2533,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments,Writer, TagName);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty())
 	{
@@ -2585,7 +2585,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 		{
 			cCommandBlockEntity & CommandBlockEntity = (cCommandBlockEntity &)a_BlockEntity;
 
-			Writer.AddByte("TrackOutput", 1); // Neither I nor the MC wiki has any idea about this
+			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
 			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
 			Writer.AddInt("x", CommandBlockEntity.GetPosX());
 			Writer.AddInt("y", CommandBlockEntity.GetPosY());
@@ -2595,7 +2595,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
 			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
 			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 
 			if (!CommandBlockEntity.GetLastOutput().empty())
 			{
@@ -2616,7 +2616,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
 			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 			Writer.AddString("ExtraType", MobHeadEntity.GetOwner().c_str());
-			Writer.AddString("id", "Skull"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
 		case E_BLOCK_FLOWER_POT:
@@ -2628,7 +2628,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
 			Writer.AddInt("Item", (Int32) FlowerPotEntity.GetItem().m_ItemType);
 			Writer.AddInt("Data", (Int32) FlowerPotEntity.GetItem().m_ItemDamage);
-			Writer.AddString("id", "FlowerPot"); // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
 		default: break;
@@ -2707,15 +2707,16 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
 			// It gets half the maximum health, and takes it away from the current health minus the half health:
-			/* Health: 5 | 3 - (5 - 3) = 1 (shake power)
-			   Health: 3 | 3 - (3 - 3) = 3
-			   Health: 1 | 3 - (1 - 3) = 5
+			/*
+			Health: 5 | 3 - (5 - 3) = 1 (shake power)
+			Health: 3 | 3 - (3 - 3) = 3
+			Health: 1 | 3 - (1 - 3) = 5
 			*/
 			WriteInt((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4);
 			WriteByte(0x52);
-			WriteInt(1); // Shaking direction, doesn't seem to affect anything
+			WriteInt(1);  // Shaking direction, doesn't seem to affect anything
 			WriteByte(0x73);
-			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
+			WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10));  // Damage taken / shake effect multiplyer
 			
 			if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpNone)
 			{
@@ -2903,9 +2904,9 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 
 		case cMonster::mtWither:
 		{
-			WriteByte(0x54); // Int at index 20
+			WriteByte(0x54);  // Int at index 20
 			WriteInt(((const cWither &)a_Mob).GetWitherInvulnerableTicks());
-			WriteByte(0x66); // Float at index 6
+			WriteByte(0x66);  // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
@@ -2985,7 +2986,7 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 		return;
 	}
 
-	//const cMonster & Mob = (const cMonster &)a_Entity;
+	// const cMonster & Mob = (const cMonster &)a_Entity;
 
 	// TODO: Send properties and modifiers based on the mob type
 	
@@ -2996,7 +2997,7 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol176:
 
 cProtocol176::cProtocol176(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
@@ -3046,15 +3047,15 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	// Send the response:
-	AString Response = "{\"version\":{\"name\":\"1.7.6\",\"protocol\":5},\"players\":{";
-	AppendPrintf(Response, "\"max\":%u,\"online\":%u,\"sample\":[]},",
+	AString Response = "{\"version\": {\"name\": \"1.7.6\", \"protocol\":5}, \"players\": {";
+	AppendPrintf(Response, "\"max\": %u, \"online\": %u, \"sample\": []},",
 		cRoot::Get()->GetServer()->GetMaxPlayers(),
 		cRoot::Get()->GetServer()->GetNumPlayers()
 	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
+	AppendPrintf(Response, "\"description\": {\"text\": \"%s\"},",
 		cRoot::Get()->GetServer()->GetDescription().c_str()
 	);
-	AppendPrintf(Response, "\"favicon\":\"data:image/png;base64,%s\"",
+	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
 		cRoot::Get()->GetServer()->GetFaviconData().c_str()
 	);
 	Response.append("}");

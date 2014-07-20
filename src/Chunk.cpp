@@ -41,7 +41,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // sSetBlock:
 
 sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )  // absolute block position
@@ -58,11 +58,11 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChunk:
 
 cChunk::cChunk(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
@@ -443,19 +443,19 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 	{
 		currentPlayer = (*itr)->GetPlayer();
 		playerPositions.push_back(&(currentPlayer->GetPosition()));
-	} 
+	}
 
 	Vector3d currentPosition;
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		//LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if ((*itr)->IsMob())
 		{
 			cMonster& Monster = (cMonster&)(**itr);
 			currentPosition = Monster.GetPosition();
 			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
 			{
-				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
+				toFill.CollectMob(Monster, *this, (currentPosition - **itr2).SqrLength());
 			}
 		}
 	}  // for itr - m_Entitites[]
@@ -464,7 +464,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 
 
 
-void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
+void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ)
 {
 	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
 	int Random = m_World->GetTickRandomNumber(0x00ffffff);
@@ -638,7 +638,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
-	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface,*this, a_RelX, a_RelY, a_RelZ);
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -698,13 +698,13 @@ void cChunk::ProcessQueuedSetBlocks(void)
 	{
 		if (itr->m_Tick <= CurrTick)
 		{
-			if (itr->m_PreviousType != E_BLOCK_AIR) // PreviousType defaults to 0 if not specified
+			if (itr->m_PreviousType != E_BLOCK_AIR)  // PreviousType defaults to 0 if not specified
 			{
 				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
 				{
 					// Current world age is bigger than/equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
-					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta); // SetMeta doesn't send to client
+					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);  // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
 					LOGD("Successfully set queued block - previous and current types matched");
 				}
@@ -810,7 +810,7 @@ void cChunk::TickBlocks(void)
 
 		if (m_BlockTickY > cChunkDef::GetHeight(m_HeightMap, m_BlockTickX, m_BlockTickZ))
 		{
-			continue; // It's all air up here
+			continue;  // It's all air up here
 		}
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
@@ -895,7 +895,7 @@ void cChunk::ApplyWeatherToTop()
 				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
 			}
 			else if (
-					(m_World->IsDeepSnowEnabled()) && 
+					(m_World->IsDeepSnowEnabled()) &&
 					(
 						(TopBlock == E_BLOCK_RED_ROSE) ||
 						(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
@@ -944,10 +944,10 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ + 1, BlockType[2], BlockMeta);
 	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ - 1, BlockType[3], BlockMeta);
 	if (
-		!IsValid || 
-		(BlockType[0] == ProduceType) || 
-		(BlockType[1] == ProduceType) || 
-		(BlockType[2] == ProduceType) || 
+		!IsValid ||
+		(BlockType[0] == ProduceType) ||
+		(BlockType[1] == ProduceType) ||
+		(BlockType[2] == ProduceType) ||
 		(BlockType[3] == ProduceType)
 	)
 	{
@@ -1229,7 +1229,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 	}
 	Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 	return true;
-}	
+}
 
 
 
@@ -1530,11 +1530,11 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
-	if ( // Queue block to be sent only if ...
-		a_SendToClients && // ... we are told to do so AND ...
+	if (                                  // Queue block to be sent only if ...
+		a_SendToClients &&                  // ... we are told to do so AND ...
 		(
-			(OldBlockMeta != a_BlockMeta) || // ... the meta value is different OR ...
-			!( // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
+			(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
+			!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
 				((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
 				((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
 				((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
@@ -1727,7 +1727,7 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 	{
 		if ((!(*itr)->IsPickup()) && (!(*itr)->IsProjectile()))
 		{
-			continue; // Only pickups and projectiles
+			continue;  // Only pickups and projectiles can be picked up
 		}
 		float DiffX = (float)((*itr)->GetPosX() - PosX );
 		float DiffY = (float)((*itr)->GetPosY() - PosY );
@@ -2152,7 +2152,7 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 		{
 			continue;
 		}
-		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST)) // Trapped chests use normal chests' handlers
+		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST))  // Trapped chests use normal chests' handlers
 		{
 			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
 			return false;
@@ -2294,7 +2294,7 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 			}
 		}  // switch (BlockType)
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cFurnaceEntity *)*itr))
 		{
 			return false;
@@ -2326,7 +2326,7 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here
 		if (a_Callback.Item((cNoteEntity *)*itr))
 		{
 			return false;
@@ -2358,7 +2358,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cCommandBlockEntity *)*itr))
 		{
 			return false;
@@ -2390,7 +2390,7 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cMobHeadEntity *)*itr))
 		{
 			return false;
@@ -2422,7 +2422,7 @@ bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here
 		if (a_Callback.Item((cFlowerPotEntity *)*itr))
 		{
 			return false;
@@ -2475,13 +2475,13 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	if (
-		(a_RelX < 0) || (a_RelX >= Width) || 
+		(a_RelX < 0) || (a_RelX >= Width) ||
 		(a_RelY < 0) || (a_RelY >= Height) ||
 		(a_RelZ < 0) || (a_RelZ >= Width)
 	)
 	{
 		ASSERT(!"GetBlock(x, y, z) out of bounds!");
-		return 0; // Clip
+		return 0;  // Clip
 	}
 
 	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);

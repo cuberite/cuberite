@@ -27,12 +27,12 @@ public:
 
 	cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
 
-	cItem &       GetItem(void)       {return m_Item; } // tolua_export
+	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	bool CollectedBy(cPlayer * a_Dest);					// tolua_export
+	bool CollectedBy(cPlayer * a_Dest);  // tolua_export
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
@@ -46,7 +46,7 @@ public:
 	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
 
 	/** Returns true if created by player (i.e. vomiting), used for determining picking-up delay time */
-	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; } // tolua_export
+	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; }  // tolua_export
 
 private:
 

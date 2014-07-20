@@ -48,7 +48,7 @@ class cStatManager;
 
 class cClientHandle :  // tolua_export
 	public cSocketThreads::cCallback
-{											// tolua_export
+{  // tolua_export
 public:
 	
 #if defined(ANDROID_NDK)
@@ -64,9 +64,9 @@ public:
 
 	const AString & GetIPString(void) const { return m_IPString; }
 	
-	cPlayer * GetPlayer(void) { return m_Player; }	// tolua_export
+	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 
-	const AString & GetUUID(void) const { return m_UUID; } // tolua_export
+	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
 	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
@@ -123,7 +123,7 @@ public:
 	void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void SendBlockAction         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
 	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
-	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta); // tolua_export
+	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChat                (const cCompositeChat & a_Message);
@@ -246,8 +246,8 @@ public:
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
-		int a_BlockX, int a_BlockY, int a_BlockZ, 
-		const AString & a_Line1, const AString & a_Line2, 
+		int a_BlockX, int a_BlockY, int a_BlockZ,
+		const AString & a_Line1, const AString & a_Line2,
 		const AString & a_Line3, const AString & a_Line4
 	);
 	void HandleUnmount          (void);
@@ -271,15 +271,14 @@ public:
 	
 private:
 
-	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
-	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
-
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
-	int m_ViewDistance;  // Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 )
+	/** Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 ) */
+	int m_ViewDistance;
 	
-	static const int GENERATEDISTANCE = 2; // Server generates this many chunks AHEAD of player sight. 2 is the minimum, since foliage is generated 1 step behind chunk terrain generation
+	/** Server generates this many chunks AHEAD of player sight. */
+	static const int GENERATEDISTANCE = 2;
 	
 	AString m_IPString;
 
@@ -317,7 +316,7 @@ private:
 	int   m_PingID;
 	long long m_PingStartTime;
 	long long m_LastPingTime;
-	static const unsigned short PING_TIME_MS = 1000; //minecraft sends 1 per 20 ticks (1 second or every 1000 ms)
+	static const unsigned short PING_TIME_MS = 1000;  // Vanilla sends 1 per 20 ticks (1 second or every 1000 ms)
 	
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
@@ -338,7 +337,7 @@ private:
 		csAuthenticating,    ///< The client has logged in, waiting for external authentication
 		csAuthenticated,     ///< The client has been authenticated, will start streaming chunks in the next tick
 		csDownloadingWorld,  ///< The client is waiting for chunks, we're waiting for the loader to provide and send them
- 		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
+		csConfirmingPos,     ///< The client has been sent the position packet, waiting for them to repeat the position back
 		csPlaying,           ///< Normal gameplay
 		csDestroying,        ///< The client is being destroyed, don't queue any more packets / don't add to chunks
 		csDestroyed,         ///< The client has been destroyed, the destructor is to be called from the owner thread
@@ -374,6 +373,9 @@ private:
 	cChannels m_PluginChannels;
 
 
+	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
+	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);
+
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
 	
@@ -408,7 +410,7 @@ private:
 	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
-};										// tolua_export
+};  // tolua_export
 
 
 

@@ -55,7 +55,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			switch (m_Type)
 			{
-				case vtFarmer: 
+				case vtFarmer:
 				{
 					HandleFarmerPlaceCrops();
 				}
@@ -138,8 +138,8 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
 			MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
 			return;
-		} // for Y loop.
-	} // Repeat the procces 5 times.
+		}  // for Y loop.
+	}  // Repeat the procces 5 times.
 }
 
 

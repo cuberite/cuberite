@@ -16,10 +16,10 @@ class cEnderChestEntity :
 {
 	typedef cBlockEntity super;
 	
-public:	
+public:
 	// tolua_end
 	
-	cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);	
+	cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cEnderChestEntity();
 
 	static const char * GetClassStatic(void) { return "cEnderChestEntity"; }

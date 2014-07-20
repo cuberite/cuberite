@@ -46,7 +46,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -74,7 +74,7 @@ public:
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return 0x0; // No idea, give a special meta (button in centre of block)
+				return 0x0;  // No idea, give a special meta (button in centre of block)
 			}
 		}
 	}

@@ -60,7 +60,7 @@ int cClientHandle::s_ClientCount = 0;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
@@ -85,7 +85,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
-	s_ClientCount++;	// Not protected by CS because clients are always constructed from the same thread
+	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
 
 	cTimer t1;
@@ -531,7 +531,7 @@ void cClientHandle::HandlePing(void)
 	AString Reply;
 	const cServer & Server = *cRoot::Get()->GetServer();
 
-	Printf(Reply, "%s%s%i%s%i", 
+	Printf(Reply, "%s%s%i%s%i",
 		Server.GetDescription().c_str(),
 		cChatColor::Delimiter.c_str(),
 		Server.GetNumPlayers(),
@@ -589,7 +589,7 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 
 void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed)
 {
-	UNUSED(FlyingSpeed); // Ignore the client values for these
+	UNUSED(FlyingSpeed);  // Ignore the client values for these
 	UNUSED(WalkingSpeed);
 
 	m_Player->SetCanFly(a_CanFly);
@@ -668,7 +668,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		if (HasPluginChannel(a_Channel))
 		{
 			SendPluginMessage("UNREGISTER", a_Channel);
-			return; // Can't register again if already taken - kinda defeats the point of plugin messaging!
+			return;  // Can't register again if already taken - kinda defeats the point of plugin messaging!
 		}
 
 		RegisterPluginChannels(BreakApartPluginChannels(a_Message));
@@ -842,7 +842,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	if (
-		((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED)) && // Only do a radius check for block destruction - things like pickup tossing send coordinates that are to be ignored
+		((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED)) &&  // Only do a radius check for block destruction - things like pickup tossing send coordinates that are to be ignored
 		((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
 		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
 		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
@@ -926,7 +926,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
 			}
-			m_Player->TossEquippedItem(64); // Toss entire slot - if there aren't enough items, the maximum will be ejected
+			m_Player->TossEquippedItem(64);  // Toss entire slot - if there aren't enough items, the maximum will be ejected
 			return;
 		}
 
@@ -989,7 +989,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		int pY = a_BlockY;
 		int pZ = a_BlockZ;
 
-		AddFaceDirection(pX, pY, pZ, a_BlockFace); // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
+		AddFaceDirection(pX, pY, pZ, a_BlockFace);  // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
 		cBlockHandler * Handler = cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(pX, pY, pZ));
 
 		if (Handler->IsClickedThrough())
@@ -1070,7 +1070,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(2001, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -1083,7 +1083,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 void cClientHandle::FinishDigAnimation()
 {
-	if (!m_HasStartedDigging) // Hasn't received the DIG_STARTED packet
+	if (!m_HasStartedDigging)  // Hasn't received the DIG_STARTED packet
 	{
 		return;
 	}
@@ -1169,7 +1169,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType) && (a_HeldItem.m_ItemType != -1))
 	{
 		// Only compare ItemType, not meta (torches have different metas)
-		// The -1 check is there because sometimes the client sends -1 instead of the held item 
+		// The -1 check is there because sometimes the client sends -1 instead of the held item
 		//  ( http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502 )
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
@@ -1209,11 +1209,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)) && !m_Player->IsGameModeCreative())
+	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
 	{
-		if (m_Player->IsSatiated() && !ItemHandler->IsDrinkable(EquippedDamage))
+		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&
+			ItemHandler->IsFood())
 		{
-			// The player is satiated, they cannot eat
+			// The player is satiated or in creative, and trying to eat
 			return;
 		}
 		m_Player->StartEating();
@@ -1360,7 +1361,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	NewBlock->OnPlacedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
 	World->BroadcastSoundEffect(NewBlock->GetStepSound(), (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.8f);
@@ -1390,7 +1391,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 		Color = AString("@") + Color[2];
 	}
 	else
-	{ 
+	{
 		Color.clear();
 	}
 	Msg.AddTextPart(AString("<") + m_Player->GetName() + "> ", Color);
@@ -1441,23 +1442,25 @@ void cClientHandle::HandleAnimation(char a_Animation)
 	// Because the animation ID sent to servers by clients are different to those sent back, we need this
 	switch (a_Animation)
 	{
-		case 0: // No animation - wiki.vg doesn't say that client has something specific for it, so I suppose it will just become -1
+		case 0:  // No animation - wiki.vg doesn't say that client has something specific for it, so I suppose it will just become -1
 		case 1:
 		case 2:
 		case 3:
 		{
-			a_Animation--; // Offset by -1
+			a_Animation--;  // Offset by -1
 			break;
 		}
-		case 5: 
+		case 5:
 		case 6:
 		case 7:
 		{
-			a_Animation -= 2; // Offset by -2
+			a_Animation -= 2;  // Offset by -2
 			break;
 		}
-		default: // Anything else is the same
+		default:  // Anything else is the same
+		{
 			break;
+		}
 	}
 
 	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
@@ -1517,8 +1520,8 @@ void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAc
 
 
 void cClientHandle::HandleUpdateSign(
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
-	const AString & a_Line1, const AString & a_Line2, 
+	int a_BlockX, int a_BlockY, int a_BlockZ,
+	const AString & a_Line1, const AString & a_Line2,
 	const AString & a_Line3, const AString & a_Line4
 )
 {
@@ -1821,7 +1824,7 @@ bool cClientHandle::CheckBlockInteractionsRate(void)
 
 
 void cClientHandle::Tick(float a_Dt)
-{	
+{
 	// Process received network data:
 	AString IncomingData;
 	{
@@ -1887,7 +1890,7 @@ void cClientHandle::Tick(float a_Dt)
 
 
 void cClientHandle::ServerTick(float a_Dt)
-{	
+{
 	// Process received network data:
 	AString IncomingData;
 	{
@@ -2345,7 +2348,7 @@ void cClientHandle::SendPlayerSpawn(const cPlayer & a_Player)
 		return;
 	}
 	
-	LOGD("Spawning player \"%s\" on client \"%s\" @ %s", 
+	LOGD("Spawning player \"%s\" on client \"%s\" @ %s",
 		a_Player.GetName().c_str(), GetPlayer()->GetName().c_str(), GetIPString().c_str()
 	);
 	
@@ -2473,7 +2476,7 @@ void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType,
 
 
 
-void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) // VehicleSubType is specific to Minecarts
+void cClientHandle::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)  // VehicleSubType is specific to Minecarts
 {
 	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }

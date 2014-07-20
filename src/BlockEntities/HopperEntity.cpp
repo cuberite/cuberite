@@ -219,7 +219,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 			}
 
 			Vector3f EntityPos = a_Entity->GetPosition();
-			Vector3f BlockPos(m_Pos.x + 0.5f, (float)m_Pos.y + 1, m_Pos.z + 0.5f); // One block above hopper, and search from center outwards
+			Vector3f BlockPos(m_Pos.x + 0.5f, (float)m_Pos.y + 1, m_Pos.z + 0.5f);  // One block above hopper, and search from center outwards
 			double Distance = (EntityPos - BlockPos).Length();
 
 			if (Distance < 0.5)
@@ -243,7 +243,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 				{
 					m_bFoundPickupsAbove = true;
 					m_Contents.SetSlot(i, Item);
-					a_Pickup->Destroy(); // Kill pickup
+					a_Pickup->Destroy();  // Kill pickup
 
 					return true;
 				}
@@ -253,11 +253,11 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 					int PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
 					
-					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount; // Set count to however many items were added
+					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount;  // Set count to however many items were added
 					
 					if (Item.IsEmpty())
 					{
-						a_Pickup->Destroy(); // Kill pickup if all items were added
+						a_Pickup->Destroy();  // Kill pickup if all items were added
 					}
 					return true;
 				}

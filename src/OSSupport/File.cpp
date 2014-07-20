@@ -81,7 +81,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
 #else
 	m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
-#endif // _WIN32
+#endif  // _WIN32
 
 	if ((m_File == NULL) && (iMode == fmReadWrite))
 	{
@@ -94,7 +94,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
 #else
 		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
-#endif // _WIN32
+#endif  // _WIN32
 
 	}
 	return (m_File != NULL);

@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
+#include "../ChatColor.h"
 #include "../Server.h"
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
@@ -223,7 +224,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (!GetPosition().EqualsEps(m_LastPos, 0.01)) // Non negligible change in position from last tick?
+	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
@@ -284,19 +285,19 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 short cPlayer::CalcLevelFromXp(short a_XpTotal)
 {
-	//level 0 to 15
+	// level 0 to 15
 	if(a_XpTotal <= XP_TO_LEVEL15)
 	{
 		return a_XpTotal / XP_PER_LEVEL_TO15;
 	}
 
-	//level 30+
+	// level 30+
 	if(a_XpTotal > XP_TO_LEVEL30)
 	{
 		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
-	//level 16 to 30
+	// level 16 to 30
 	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
 }
 
@@ -306,19 +307,19 @@ short cPlayer::CalcLevelFromXp(short a_XpTotal)
 
 short cPlayer::XpForLevel(short a_Level)
 {
-	//level 0 to 15
+	// level 0 to 15
 	if(a_Level <= 15)
 	{
 		return a_Level * XP_PER_LEVEL_TO15;
 	}
 
-	//level 30+
+	// level 30+
 	if(a_Level >= 31)
 	{
 		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
 	}
 
-	//level 16 to 30
+	// level 16 to 30
 	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
 }
 
@@ -340,7 +341,7 @@ float cPlayer::GetXpPercentage()
 	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
 	short int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)(m_CurrentXp - currentLevel_XpBase) / 
+	return (float)(m_CurrentXp - currentLevel_XpBase) /
 		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
@@ -353,7 +354,7 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 	if(!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
-		return false; //oops, they gave us a dodgey number
+		return false;  // oops, they gave us a dodgey number
 	}
 
 	m_CurrentXp = a_CurrentXp;
@@ -375,16 +376,13 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		// Value was bad, abort and report
 		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.",
 			a_Xp_delta);
-		return -1; // Should we instead just return the current Xp?
+		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	if (m_CurrentXp < 0)
-	{
-		m_CurrentXp = 0;
-	}
+	m_CurrentXp = std::max<short int>(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -392,7 +390,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d",
 		GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
@@ -477,7 +475,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
 
-		if (Dist >= 2.0) // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
+		if (Dist >= 2.0)  // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
 		{
 			// Increment statistic
 			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
@@ -497,7 +495,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			
 			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
-		}		
+		}
 
 		m_LastGroundHeight = (float)GetPosY();
 	}
@@ -580,7 +578,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 void cPlayer::FoodPoison(int a_NumTicks)
 {
-	AddEntityEffect(cEntityEffect::effHunger, a_NumTicks, 0, NULL);
+	AddEntityEffect(cEntityEffect::effHunger, a_NumTicks, 0, 1);
 }
 
 
@@ -623,8 +621,9 @@ void cPlayer::FinishEating(void)
 
 	GetInventory().RemoveOneEquippedItem();
 
-	//if the food is mushroom soup, return a bowl to the inventory
-	if( Item.m_ItemType == E_ITEM_MUSHROOM_SOUP ) {
+	// if the food is mushroom soup, return a bowl to the inventory
+	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
+	{
 		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
 		GetInventory().AddItem(emptyBowl, true, true);
 	}
@@ -871,10 +870,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (m_Health > 0)
 	{
-		return; //  not dead yet =]
+		return;  //  not dead yet =]
 	}
 
-	m_bVisible = false; // So new clients don't see the player
+	m_bVisible = false;  // So new clients don't see the player
 
 	// Puke out all the items
 	cItems Pickups;
@@ -905,6 +904,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
 			case dtLavaContact: DamageText = "was melted by lava"; break;
 			case dtPoisoning: DamageText = "died from septicaemia"; break;
+			case dtWithering: DamageText = "is a husk of their former selves"; break;
 			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
 			case dtFireContact: DamageText = "burnt themselves to death"; break;
 			case dtInVoid: DamageText = "somehow fell out of the world"; break;
@@ -925,7 +925,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	else
 	{
 		AString KillerClass = a_TDI.Attacker->GetClass();
-		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
@@ -1278,7 +1278,7 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 	// TODO: Add a slight random change (+-0.0075 in each direction)
 	
 	return res * a_SpeedCoeff;
-}	
+}
 
 
 
@@ -1311,7 +1311,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	{
 		// When attached to an entity, the client sends position packets with weird coords:
 		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
-		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while 
+		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while
 		// the client may still send more of these nonsensical packets.
 		if (m_AttachedTo != NULL)
 		{
@@ -1338,7 +1338,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
-	if (a_bVisible && !m_bVisible) // Make visible
+	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
 		m_World->BroadcastSpawnEntity(*this);
@@ -1346,7 +1346,7 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);	// Destroy on all clients
+		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);  // Destroy on all clients
 	}
 }
 
@@ -1420,7 +1420,7 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 				{
 					if( OtherSplit[i].compare( Split[i] ) != 0 )
 					{
-						if( OtherSplit[i].compare("*") == 0 ) return true; // WildCard man!! WildCard!
+						if( OtherSplit[i].compare("*") == 0 ) return true;  // WildCard man!! WildCard!
 						break;
 					}
 				}
@@ -1454,7 +1454,7 @@ bool cPlayer::IsInGroup( const AString & a_Group )
 
 void cPlayer::ResolvePermissions()
 {
-	m_ResolvedPermissions.clear();	// Start with an empty map yo~
+	m_ResolvedPermissions.clear();  // Start with an empty map
 
 	// Copy all player specific permissions into the resolved permissions map
 	for( PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr )
@@ -1482,7 +1482,7 @@ void cPlayer::ResolveGroups()
 	m_ResolvedGroups.clear();
 
 	// Get a complete resolved list of all groups the player is in
-	std::map< cGroup*, bool > AllGroups;	// Use a map, because it's faster than iterating through a list to find duplicates
+	std::map< cGroup*, bool > AllGroups;  // Use a map, because it's faster than iterating through a list to find duplicates
 	GroupList ToIterate;
 	for( GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr )
 	{
@@ -1500,7 +1500,7 @@ void cPlayer::ResolveGroups()
 		else
 		{
 			AllGroups[ CurrentGroup ] = true;
-			m_ResolvedGroups.push_back( CurrentGroup );	// Add group to resolved list
+			m_ResolvedGroups.push_back( CurrentGroup );  // Add group to resolved list
 			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
 			for( cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr )
 			{
@@ -1548,7 +1548,7 @@ void cPlayer::TossEquippedItem(char a_Amount)
 		char NewAmount = a_Amount;
 		if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
 		{
-			NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
+			NewAmount = GetInventory().GetEquippedItem().m_ItemCount;  // Drop only what's there
 		}
 
 		GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
@@ -1610,7 +1610,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because created by player
 }
 
 
@@ -1889,7 +1889,7 @@ bool cPlayer::SaveToDisk()
 	{
 		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot save data. Player will lose their progress. ",
 			GetName().c_str(), SourceFile.c_str()
-		); 
+		);
 		return false;
 	}
 
@@ -1931,7 +1931,7 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 void cPlayer::UseEquippedItem(void)
 {
-	if (IsGameModeCreative()) // No damage in creative
+	if (IsGameModeCreative())  // No damage in creative
 	{
 		return;
 	}
@@ -2074,7 +2074,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 	{
 		if (IsClimbing())
 		{
-			if (a_DeltaPos.y > 0.0) // Going up
+			if (a_DeltaPos.y > 0.0)  // Going up
 			{
 				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
 			}
@@ -2093,7 +2093,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		}
 		else
 		{
-			if (Value >= 25) // Ignore small/slow movement
+			if (Value >= 25)  // Ignore small/slow movement
 			{
 				m_Stats.AddValue(statDistFlown, Value);
 			}

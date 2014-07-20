@@ -398,7 +398,7 @@ void cProtocol125::SendEntityMetadata(const cEntity & a_Entity)
 	else
 	{
 		WriteEntityMetadata(a_Entity);
-	}	
+	}
 	WriteByte(0x7f);
 
 	Flush();
@@ -473,7 +473,7 @@ void cProtocol125::SendEntityVelocity(const cEntity & a_Entity)
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_ENTITY_VELOCITY);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteShort((short) (a_Entity.GetSpeedX() * 400)); //400 = 8000 / 20 
+	WriteShort((short) (a_Entity.GetSpeedX() * 400));  // 400 = 8000 / 20
 	WriteShort((short) (a_Entity.GetSpeedY() * 400));
 	WriteShort((short) (a_Entity.GetSpeedZ() * 400));
 	Flush();
@@ -760,7 +760,7 @@ void cProtocol125::SendPlayerMoveLook(void)
 	);
 	*/
 
-	WriteByte	(PACKET_PLAYER_MOVE_LOOK);
+	WriteByte(PACKET_PLAYER_MOVE_LOOK);
 	cPlayer * Player = m_Client->GetPlayer();
 	WriteDouble(Player->GetPosX());
 	WriteDouble(Player->GetStance() + 0.03);  // Add a small amount so that the player doesn't start inside a block
@@ -1005,10 +1005,10 @@ void cProtocol125::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 void cProtocol125::SendStatistics(const cStatManager & a_Manager)
 {
 	/* NOTE:
-	 * Versions prior to minecraft 1.7 use an incremental statistic sync
-	 * method. The current setup does not allow us to implement that, because
-	 * of performance considerations.
-	 */
+	Versions prior to minecraft 1.7 use an incremental statistic sync
+	method. The current setup does not allow us to implement that, because
+	of performance considerations.
+	*/
 #if 0
 	for (unsigned int i = 0; i < (unsigned int)statCount; ++i)
 	{
@@ -1121,7 +1121,7 @@ void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_USE_BED);
 	WriteInt (a_Entity.GetUniqueID());
-	WriteByte(0);	// Unknown byte only 0 has been observed
+	WriteByte(0);  // Unknown byte only 0 has been observed
 	WriteInt (a_BlockX);
 	WriteByte((Byte)a_BlockY);
 	WriteInt (a_BlockZ);
@@ -1344,11 +1344,11 @@ int cProtocol125::ParseArmAnim(void)
 
 int cProtocol125::ParseBlockDig(void)
 {
-	HANDLE_PACKET_READ(ReadChar,	char, Status);
+	HANDLE_PACKET_READ(ReadChar,  char, Status);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosX);
-	HANDLE_PACKET_READ(ReadByte,	Byte, PosY);
+	HANDLE_PACKET_READ(ReadByte,  Byte, PosY);
 	HANDLE_PACKET_READ(ReadBEInt, int,  PosZ);
-	HANDLE_PACKET_READ(ReadChar,	char, BlockFace);
+	HANDLE_PACKET_READ(ReadChar,  char, BlockFace);
 	m_Client->HandleLeftClick(PosX, PosY, PosZ, static_cast<eBlockFace>(BlockFace), Status);
 	return PARSE_OK;
 }
@@ -1426,11 +1426,11 @@ int cProtocol125::ParseEntityAction(void)
 
 	switch (ActionID)
 	{
-		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
-		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
-		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
-		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
-		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break;  // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break;  // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break;  // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break;  // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break;  // Stop sprinting
 	}
 
 	return PARSE_OK;
@@ -1444,7 +1444,7 @@ int cProtocol125::ParseHandshake(void)
 {
 	HANDLE_PACKET_READ(ReadBEUTF16String16, AString, Username);
 
-	AStringVector UserData = StringSplit(Username, ";"); // "FakeTruth;localhost:25565"
+	AStringVector UserData = StringSplit(Username, ";");  // "FakeTruth;localhost:25565"
 	if (UserData.empty())
 	{
 		m_Client->Kick("Did not receive username");
@@ -1456,7 +1456,7 @@ int cProtocol125::ParseHandshake(void)
 
 	if (!m_Client->HandleHandshake( m_Username ))
 	{
-		return PARSE_OK; // Player is not allowed into the server
+		return PARSE_OK;  // Player is not allowed into the server
 	}
 
 	SendHandshake(cRoot::Get()->GetServer()->GetServerID());
@@ -1918,20 +1918,20 @@ void cProtocol125::WriteEntityMetadata(const cEntity & a_Entity)
 		// No idea how Mojang makes their carts shakey shakey, so here is a complicated one-liner expression that does something similar
 		WriteInt( (((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4 );
 		WriteByte(0x52);
-		WriteInt(1); // Shaking direction, doesn't seem to affect anything
+		WriteInt(1);  // Shaking direction, doesn't seem to affect anything
 		WriteByte(0x73);
-		WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10)); // Damage taken / shake effect multiplyer
+		WriteFloat((float)(((const cMinecart &)a_Entity).LastDamage() + 10));  // Damage taken / shake effect multiplyer
 		
 		if (((cMinecart &)a_Entity).GetPayload() == cMinecart::mpFurnace)
 		{
 			WriteByte(0x10);
-			WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0); // Fueled?
+			WriteByte(((const cMinecartWithFurnace &)a_Entity).IsFueled() ? 1 : 0);  // Fueled?
 		}
 	}
 	else if ((a_Entity.IsProjectile() && ((cProjectileEntity &)a_Entity).GetProjectileKind() == cProjectileEntity::pkArrow))
 	{
 		WriteByte(0x10);
-		WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0); // Critical hitting arrow?
+		WriteByte(((const cArrowEntity &)a_Entity).IsCritical() ? 1 : 0);  // Critical hitting arrow?
 	}
 }
 
@@ -1946,43 +1946,43 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtCreeper:
 		{
 			WriteByte(0x10);
-			WriteChar(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1); // Blowing up?
+			WriteChar(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);  // Blowing up?
 			WriteByte(0x11);
-			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0); // Lightning-charged?
+			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0);  // Lightning-charged?
 			break;
 		}
 		case cMonster::mtBat:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0); // Upside down?
+			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);  // Upside down?
 			break;
 		}
 		case cMonster::mtPig:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0); // Saddled?
+			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);  // Saddled?
 			break;
 		}
 		case cMonster::mtVillager:
 		{
 			WriteByte(0x50);
-			WriteInt(((const cVillager &)a_Mob).GetVilType()); // What sort of TESTIFICATE?
+			WriteInt(((const cVillager &)a_Mob).GetVilType());  // What sort of TESTIFICATE?
 			break;
 		}
 		case cMonster::mtZombie:
 		{
 			WriteByte(0xC);
-			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0); // Babby zombie?
+			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);  // Baby zombie?
 			WriteByte(0xD);
-			WriteByte(((const cZombie &)a_Mob).IsVillagerZombie() ? 1 : 0); // Converted zombie?
+			WriteByte(((const cZombie &)a_Mob).IsVillagerZombie() ? 1 : 0);  // Converted zombie?
 			WriteByte(0xE);
-			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0); // Converted-but-converting-back zombllager?
+			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0);  // Converted-but-converting-back zombllager?
 			break;
 		}
 		case cMonster::mtGhast:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cGhast &)a_Mob).IsCharging()); // About to eject un flamé-bol? :P
+			WriteByte(((const cGhast &)a_Mob).IsCharging());  // About to spit a flameball?
 			break;
 		}
 		case cMonster::mtWolf:
@@ -2004,9 +2004,9 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(WolfStatus);
 
 			WriteByte(0x72);
-			WriteFloat((float)(a_Mob.GetHealth())); // Tail health-o-meter (only shown when tamed, by the way)
+			WriteFloat((float)(a_Mob.GetHealth()));  // Tail health-o-meter (only shown when tamed, by the way)
 			WriteByte(0x13);
-			WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0); // Ultra cute mode?
+			WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0);  // Ultra cute mode?
 			break;
 		}
 		case cMonster::mtSheep:
@@ -2028,30 +2028,30 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtEnderman:
 		{
 			WriteByte(0x10);
-			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock())); // Block that he stole from your house
+			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));  // Block that he stole from your house
 			WriteByte(0x11);
-			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta())); // Meta of block that he stole from your house
+			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta()));  // Meta of block that he stole from your house
 			WriteByte(0x12);
-			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0); // Screaming at your face?
+			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0);  // Screaming at your face?
 			break;
 		}
 		case cMonster::mtSkeleton:
 		{
 			WriteByte(0xD);
-			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0); // It's a skeleton, but it's not
+			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);  // It's a skeleton, but it's not
 			break;
 		}
 		case cMonster::mtWitch:
 		{
 			WriteByte(0x15);
-			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0); // Aggravated? Doesn't seem to do anything
+			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);  // Aggravated? Doesn't seem to do anything
 			break;
 		}
 		case cMonster::mtWither:
 		{
-			WriteByte(0x54); // Int at index 20
+			WriteByte(0x54);  // Int at index 20
 			WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
-			WriteByte(0x66); // Float at index 6
+			WriteByte(0x66);  // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
@@ -2061,11 +2061,11 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(0x10);
 			if (a_Mob.GetMobType() == cMonster::mtSlime)
 			{
-				WriteByte((Byte)((const cSlime &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+				WriteByte((Byte)((const cSlime &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
 			else
 			{
-				WriteByte((Byte)((const cMagmaCube &)a_Mob).GetSize()); // Size of slime - HEWGE, meh, cute BABBY SLIME
+				WriteByte((Byte)((const cMagmaCube &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
 			break;
 		}
@@ -2086,7 +2086,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			}
 			if (((const cHorse &)a_Mob).IsBaby())
 			{
-				Flags |= 0x10; // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
+				Flags |= 0x10;  // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
 			}
 			if (((const cHorse &)a_Mob).IsEating())
 			{
@@ -2104,16 +2104,16 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteInt(Flags);
 
 			WriteByte(0x13);
-			WriteByte((Byte)((const cHorse &)a_Mob).GetHorseType()); // Type of horse (donkey, chestnut, etc.)
+			WriteByte((Byte)((const cHorse &)a_Mob).GetHorseType());  // Type of horse (donkey, chestnut, etc.)
 
 			WriteByte(0x54);
 			int Appearance = 0;
-			Appearance = ((const cHorse &)a_Mob).GetHorseColor(); // Mask FF
-			Appearance |= ((const cHorse &)a_Mob).GetHorseStyle() * 256; // Mask FF00, so multiply by 256
-			WriteInt(Appearance);	
+			Appearance = ((const cHorse &)a_Mob).GetHorseColor();  // Mask FF
+			Appearance |= ((const cHorse &)a_Mob).GetHorseStyle() * 256;  // Mask FF00, so multiply by 256
+			WriteInt(Appearance);
 
 			WriteByte(0x56);
-			WriteInt(((const cHorse &)a_Mob).GetHorseArmour()); // Horshey armour
+			WriteInt(((const cHorse &)a_Mob).GetHorseArmour());  // Horshey armour
 			break;
 		}
 		default:

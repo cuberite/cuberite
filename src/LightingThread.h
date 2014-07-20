@@ -16,7 +16,7 @@ Lighting is calculated in a flood-fill fashion:
 The seeds need two fast operations:
 	- Check if a block at [x, y, z] is already a seed
 	- Get the next seed in the row
-For that reason it is stored in two arrays, one stores a bool saying a seed is in that position, 
+For that reason it is stored in two arrays, one stores a bool saying a seed is in that position,
 the other is an array of seed coords, encoded as a single int.
 Step 2 needs two separate storages for old seeds and new seeds, so there are two actual storages for that purpose,
 their content is swapped after each full step-2-cycle.
@@ -82,7 +82,7 @@ protected:
 		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter);
 		
 	protected:
-		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override 
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
 		{
 			UNUSED(a_ChunkX);
 			UNUSED(a_ChunkZ);
@@ -157,7 +157,7 @@ protected:
 	
 	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
-		NIBBLETYPE * a_Light, 
+		NIBBLETYPE * a_Light,
 		int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
@@ -166,7 +166,7 @@ protected:
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
 	
 	inline void PropagateLight(
-		NIBBLETYPE * a_Light, 
+		NIBBLETYPE * a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	)

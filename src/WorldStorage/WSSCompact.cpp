@@ -48,7 +48,7 @@ const int MAX_DIRTY_CHUNKS = 16;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cJsonChunkSerializer:
 
 cJsonChunkSerializer::cJsonChunkSerializer(void) :
@@ -120,7 +120,7 @@ void cJsonChunkSerializer::LightIsValid(bool a_IsLightValid)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWSSCompact:
 
 cWSSCompact::~cWSSCompact()
@@ -411,7 +411,7 @@ void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_En
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWSSCompact::cPAKFile
 
 #define READ(Var) \
@@ -427,7 +427,7 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 	m_LayerX(a_LayerX),
 	m_LayerZ(a_LayerZ),
 	m_NumDirty(0),
-	m_ChunkVersion( CHUNK_VERSION ), // Init with latest version
+	m_ChunkVersion( CHUNK_VERSION ),  // Init with latest version
 	m_PakVersion( PAK_VERSION )
 {
 	cFile f;
@@ -486,12 +486,12 @@ cWSSCompact::cPAKFile::cPAKFile(const AString & a_FileName, int a_LayerX, int a_
 		return;
 	}
 
-	if( m_ChunkVersion == 1 ) // Convert chunks to version 2
+	if( m_ChunkVersion == 1 )  // Convert chunks to version 2
 	{
 		UpdateChunk1To2();
 	}
 #if AXIS_ORDER == AXIS_ORDER_XZY
-	if( m_ChunkVersion == 2 ) // Convert chunks to version 3
+	if( m_ChunkVersion == 2 )  // Convert chunks to version 3
 	{
 		UpdateChunk2To3();
 	}
@@ -586,7 +586,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		Offset += Header->m_CompressedSize;
 
 		// Crude data integrity check:
-		int ExpectedSize = (16*128*16)*2 + (16*128*16)/2; // For version 1
+		int ExpectedSize = (16*128*16)*2 + (16*128*16)/2;  // For version 1
 		if (UncompressedSize < ExpectedSize)
 		{
 			LOGWARNING("Chunk [%d, %d] has too short decompressed data (%d bytes out of %d needed), erasing",
@@ -603,7 +603,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, (size_t)UncompressedSize);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d decompressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 					);
@@ -627,7 +627,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 		char ConvertedData[cChunkDef::BlockDataSize];
 		int Index = 0;
 		unsigned int InChunkOffset = 0;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) 
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )
 		{
 			for( int y = 0; y < 128; ++y )
 			{
@@ -638,7 +638,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			Index += 128;
 		}
 		InChunkOffset += (16 * 128 * 16);
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Metadata
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )  // Metadata
 		{
 			for( int y = 0; y < 64; ++y )
 			{
@@ -648,7 +648,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			Index += 64;
 		}
 		InChunkOffset += (16 * 128 * 16) / 2;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Block light
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )  // Block light
 		{
 			for( int y = 0; y < 64; ++y )
 			{
@@ -658,7 +658,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			Index += 64;
 		}
 		InChunkOffset += (16*128*16)/2;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) // Sky light
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z )  // Sky light
 		{
 			for( int y = 0; y < 64; ++y )
 			{
@@ -683,7 +683,7 @@ void cWSSCompact::cPAKFile::UpdateChunk1To2()
 			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData, m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d compressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 				);
@@ -747,7 +747,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			int errorcode = UncompressString(Data.data(), Data.size(), UncompressedData, (size_t)UncompressedSize);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d decompressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 					);
@@ -774,7 +774,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 		#define MAKE_3_INDEX( x, y, z ) ( x + (z * 16) + (y * 16 * 16) )
 
 		unsigned int InChunkOffset = 0;
-		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y ) // YZX Loop order is important, in 1.1 Y was first then Z then X
+		for( int x = 0; x < 16; ++x ) for( int z = 0; z < 16; ++z ) for( int y = 0; y < 256; ++y )  // YZX Loop order is important, in 1.1 Y was first then Z then X
 		{
 			ConvertedData[ MAKE_3_INDEX(x, y, z) ] = UncompressedData[InChunkOffset];
 			++InChunkOffset;
@@ -819,7 +819,7 @@ void cWSSCompact::cPAKFile::UpdateChunk2To3()
 			int errorcode = CompressString(Converted.data(), Converted.size(), CompressedData, m_CompressionFactor);
 			if (errorcode != Z_OK)
 			{
-				LOGERROR("Error %d compressing data for chunk [%d, %d]", 
+				LOGERROR("Error %d compressing data for chunk [%d, %d]",
 					errorcode,
 					Header->m_ChunkX, Header->m_ChunkZ
 					);
@@ -863,7 +863,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 	int errorcode = UncompressString(a_Data.data(), a_Data.size(), UncompressedData, (size_t)a_UncompressedSize);
 	if (errorcode != Z_OK)
 	{
-		LOGERROR("Error %d decompressing data for chunk [%d, %d]", 
+		LOGERROR("Error %d decompressing data for chunk [%d, %d]",
 			errorcode,
 			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ
 		);

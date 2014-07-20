@@ -56,7 +56,7 @@ thus making skylight visible in Minutor's Lighting mode
 */
 // #define DEBUG_SKYLIGHT
 
-/** Maximum number of MCA files that are cached in memory. 
+/** Maximum number of MCA files that are cached in memory.
 Since only the header is actually in the memory, this number can be high, but still, each file means an OS FS handle.
 */
 #define MAX_MCA_FILES 32
@@ -69,7 +69,7 @@ Since only the header is actually in the memory, this number can be high, but st
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil:
 
 cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
@@ -393,7 +393,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	
 	m_World->SetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
-		BlockTypes, MetaData, 
+		BlockTypes, MetaData,
 		IsLightValid ? BlockLight : NULL,
 		IsLightValid ? SkyLight : NULL,
 		NULL, Biomes,
@@ -449,7 +449,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		const char * BlockLight  = (const char *)(Serializer.m_BlockSkyLight);
 	#else
 		const char * BlockLight  = (const char *)(Serializer.m_BlockLight);
-	#endif 
+	#endif
 	const char * BlockSkyLight = (const char *)(Serializer.m_BlockSkyLight);
 	for (int Y = 0; Y < 16; Y++)
 	{
@@ -463,7 +463,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	}
 	a_Writer.EndList();  // "Sections"
 	
-	// Store the information that the lighting is valid. 
+	// Store the information that the lighting is valid.
 	// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
 	if (Serializer.IsLightValid())
 	{
@@ -1356,7 +1356,7 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cRideableMinecart> Minecart(new cRideableMinecart(0, 0, 0, cItem(), 1)); // TODO: Load the block and the height
+	std::auto_ptr<cRideableMinecart> Minecart(new cRideableMinecart(0, 0, 0, cItem(), 1));  // TODO: Load the block and the height
 	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1465,7 +1465,7 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 	
-	std::auto_ptr<cPickup> Pickup(new cPickup(0, 0, 0, Item, false)); // Pickup delay doesn't matter, just say false
+	std::auto_ptr<cPickup> Pickup(new cPickup(0, 0, 0, Item, false));  // Pickup delay doesn't matter, just say false
 	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1681,7 +1681,7 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 	
 	SplashPotion->SetEntityEffectType((cEntityEffect::eType) a_NBT.FindChildByName(a_TagIdx, "EffectType"));
 	SplashPotion->SetEntityEffect(cEntityEffect(EffectDuration, EffectIntensity, EffectDistanceModifier));
-	SplashPotion->SetPotionParticleType(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
+	SplashPotion->SetPotionColor(a_NBT.FindChildByName(a_TagIdx, "PotionName"));
 	
 	// Store the new splash potion in the entities list:
 	a_Entities.push_back(SplashPotion.release());
@@ -2363,8 +2363,8 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		return;
 	}
 	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
-	if (OwnerIdx > 0) 
-	{ 
+	if (OwnerIdx > 0)
+	{
 		AString OwnerName = a_NBT.GetString(OwnerIdx);
 		if (OwnerName != "")
 		{
@@ -2592,7 +2592,7 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWSSAnvil::cMCAFile:
 
 cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_RegionZ) :

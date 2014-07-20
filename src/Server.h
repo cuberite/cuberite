@@ -50,10 +50,10 @@ namespace Json
 
 
 
-class cServer										// tolua_export
+class cServer  // tolua_export
 	: public cListenThread::cCallback
-{													// tolua_export
-public:												// tolua_export
+{        // tolua_export
+public:  // tolua_export
 
 	virtual ~cServer() {}
 	bool InitServer(cIniFile & a_SettingsIni);
@@ -133,7 +133,7 @@ public:												// tolua_export
 	
 private:
 
-	friend class cRoot; // so cRoot can create and destroy cServer
+	friend class cRoot;  // so cRoot can create and destroy cServer
 	
 	/** When NotifyClientWrite() is called, it is queued for this thread to process (to avoid deadlocks between cSocketThreads, cClientHandle and cChunkMap) */
 	class cNotifyWriteThread :
@@ -149,7 +149,7 @@ private:
 		
 		virtual void Execute(void);
 		
-	public:	
+	public:
 	
 		cNotifyWriteThread(void);
 		~cNotifyWriteThread();
@@ -194,7 +194,7 @@ private:
 	
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
-	bool m_bIsConnected; // true - connected false - not connected
+	bool m_bIsConnected;  // true - connected false - not connected
 
 	bool m_bRestarting;
 	
@@ -244,7 +244,7 @@ private:
 
 	// cListenThread::cCallback overrides:
 	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
-}; // tolua_export
+};  // tolua_export
 
 
 

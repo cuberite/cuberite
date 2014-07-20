@@ -55,4 +55,4 @@ private:
 	/** Time in ticks to wait for the hit animation to begin before destroying */
 	int m_DestroyTimer;
 	
-} ; // tolua_export
+} ;  // tolua_export

@@ -87,7 +87,7 @@ public:
 	3. Mark the chunk as saved (MarkSaved() )
 	If anywhere inside this sequence another thread mmodifies the chunk, the chunk will not get marked as saved in MarkSaved()
 	*/
-	void MarkSaving(void);  // Marks the chunk as being saved. 
+	void MarkSaving(void);  // Marks the chunk as being saved.
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
 	void MarkLoadFailed(void);  // Marks the chunk as failed to load. Ignored is the chunk is already valid
@@ -97,7 +97,7 @@ public:
 	
 	/** Sets all chunk data */
 	void SetAllData(
-		const BLOCKTYPE *  a_BlockTypes, 
+		const BLOCKTYPE *  a_BlockTypes,
 		const NIBBLETYPE * a_BlockMeta,
 		const NIBBLETYPE * a_BlockLight,
 		const NIBBLETYPE * a_BlockSkyLight,
@@ -274,7 +274,6 @@ public:
 
 	void UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
 
-	void CalculateLighting(); // Recalculate right now
 	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	// Broadcast various packets to all clients of this chunk:

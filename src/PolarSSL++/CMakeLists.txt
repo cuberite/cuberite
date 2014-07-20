@@ -3,7 +3,7 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-set(SOURCES
+set(SRCS
 	AesCfb128Decryptor.cpp
 	AesCfb128Encryptor.cpp
 	BlockingSslClientSocket.cpp
@@ -18,7 +18,7 @@ set(SOURCES
 	X509Cert.cpp
 )
 
-set(HEADERS
+set(HDRS
 	AesCfb128Decryptor.h
 	AesCfb128Encryptor.h
 	BlockingSslClientSocket.h
@@ -33,8 +33,10 @@ set(HEADERS
 	X509Cert.h
 )
 
-add_library(PolarSSL++ ${SOURCES} ${HEADERS})
+if(NOT MSVC)
+	add_library(PolarSSL++ ${SRCS} ${HDRS})
 
-if (UNIX)
-	target_link_libraries(PolarSSL++ polarssl)
+	if (UNIX)
+		target_link_libraries(PolarSSL++ polarssl)
+	endif()
 endif()

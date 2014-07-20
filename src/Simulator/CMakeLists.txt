@@ -4,9 +4,34 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-file(GLOB SOURCE
-    "*.cpp"
-    "*.h"
-)
+SET (SRCS
+	DelayedFluidSimulator.cpp
+	FireSimulator.cpp
+	FloodyFluidSimulator.cpp
+	FluidSimulator.cpp
+	IncrementalRedstoneSimulator.cpp
+	RedstoneSimulator.cpp
+	SandSimulator.cpp
+	Simulator.cpp
+	SimulatorManager.cpp
+	VanillaFluidSimulator.cpp
+	VaporizeFluidSimulator.cpp)
 
-add_library(Simulator ${SOURCE})
+SET (HDRS
+	DelayedFluidSimulator.h
+	FireSimulator.h
+	FloodyFluidSimulator.h
+	FluidSimulator.h
+	IncrementalRedstoneSimulator.h
+	NoopFluidSimulator.h
+	NoopRedstoneSimulator.h
+	RedstoneSimulator.h
+	SandSimulator.h
+	Simulator.h
+	SimulatorManager.h
+	VanillaFluidSimulator.h
+	VaporizeFluidSimulator.h)
+
+if(NOT MSVC)
+	add_library(Simulator ${SRCS} ${HDRS})
+endif()

@@ -23,13 +23,14 @@ class cMinecart :
 public:
 	CLASS_PROTODEF(cMinecart);
 	
+	/** Minecart payload, values correspond to packet subtype */
 	enum ePayload
 	{
-		mpNone,     // Empty minecart, ridable by player or mobs
-		mpChest,    // Minecart-with-chest, can store a grid of 3*8 items
-		mpFurnace,  // Minecart-with-furnace, can be powered
-		mpTNT,      // Minecart-with-TNT, can be blown up with activator rail
-		mpHopper,   // Minecart-with-hopper, can be hopper
+		mpNone    = 0,  // Empty minecart, ridable by player or mobs
+		mpChest   = 1,  // Minecart-with-chest, can store a grid of 3*8 items
+		mpFurnace = 2,  // Minecart-with-furnace, can be powered
+		mpTNT     = 3,  // Minecart-with-TNT, can be blown up with activator rail
+		mpHopper  = 5,  // Minecart-with-hopper, can be hopper
 		// TODO: Spawner minecarts, (and possibly any block in a minecart with NBT editing)
 	} ;
 	
@@ -99,7 +100,7 @@ public:
 protected:
 
 	cItem m_Content;
-	int m_Height; 
+	int m_Height;
 } ;
 
 

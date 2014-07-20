@@ -1,7 +1,7 @@
 
 // PieceGenerator.h
 
-// Declares the cBFSPieceGenerator class and cDFSPieceGenerator class 
+// Declares the cBFSPieceGenerator class and cDFSPieceGenerator class
 // representing base classes for generating structures composed of individual "pieces"
 
 /*
@@ -251,7 +251,7 @@ protected:
 		const cPiece::cConnector & a_ExistingConnector,  // The existing connector
 		const Vector3i & a_ToPos,                        // The position on which the new connector should be placed
 		const cPiece & a_Piece,                          // The new piece
-		const cPiece::cConnector & a_NewConnector,       // The connector of the new piece 
+		const cPiece::cConnector & a_NewConnector,       // The connector of the new piece
 		int a_NumCCWRotations,                           // Number of rotations for the new piece to align the connector
 		const cPlacedPieces & a_OutPieces                // All the already-placed pieces to check
 	);

@@ -86,6 +86,10 @@ public:
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst);
 
+	/** Removes the specified item from the inventory, as many as possible, up to a_ItemStack.m_ItemCount.
+	Returns the number of items that were removed. */
+	int RemoveItem(const cItem & a_ItemStack);
+
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
 	bool RemoveOneEquippedItem(void);
 	
@@ -183,7 +187,7 @@ protected:
 	
 	// cItemGrid::cListener override:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-};	// tolua_export
+};  // tolua_export
 
 
 

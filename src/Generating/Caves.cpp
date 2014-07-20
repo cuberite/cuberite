@@ -151,7 +151,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCaveTunnel:
 
 cCaveTunnel::cCaveTunnel(
@@ -555,14 +555,14 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 {
 	AString SVG;
 	SVG.reserve(m_Points.size() * 20 + 200);
-  AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
-  char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
-  for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
-  {
-		AppendPrintf(SVG, "%c %d,%d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
+	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
+	char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
+	for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
+	{
+		AppendPrintf(SVG, "%c %d, %d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
 		Prefix = 'L';
-  }
-  SVG.append("\"/>\n");
+	}
+	SVG.append("\"/>\n");
 	return SVG;
 }
 #endif  // _DEBUG
@@ -571,7 +571,7 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves::cCaveSystem:
 
 cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
@@ -687,7 +687,7 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves:
 
 cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
@@ -700,7 +700,7 @@ cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_Gri
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenMarbleCaves:
 
 static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
@@ -752,7 +752,7 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenDualRidgeCaves:
 
 void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)

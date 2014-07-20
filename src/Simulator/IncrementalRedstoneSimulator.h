@@ -38,33 +38,33 @@ private:
 
 	#define MAX_POWER_LEVEL 15
 
-	struct sPoweredBlocks // Define structure of the directly powered blocks list
+	struct sPoweredBlocks  // Define structure of the directly powered blocks list
 	{
-		Vector3i a_BlockPos; // Position of powered block
-		Vector3i a_SourcePos; // Position of source powering the block at a_BlockPos
+		Vector3i a_BlockPos;  // Position of powered block
+		Vector3i a_SourcePos;  // Position of source powering the block at a_BlockPos
 		unsigned char a_PowerLevel;
 	};
 
-	struct sLinkedPoweredBlocks // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
+	struct sLinkedPoweredBlocks  // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
 	{
 		Vector3i a_BlockPos;
-		Vector3i a_MiddlePos; // Position of block that is betwixt a source and the destination
+		Vector3i a_MiddlePos;  // Position of block that is betwixt a source and the destination
 		Vector3i a_SourcePos;
 		unsigned char a_PowerLevel;
 	};
 
-	struct sSimulatedPlayerToggleableList // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
+	struct sSimulatedPlayerToggleableList  // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
 	{
 		Vector3i a_RelBlockPos;
-		bool WasLastStatePowered; // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
+		bool WasLastStatePowered;  // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
 	};
 
-	struct sRepeatersDelayList // Define structure of list containing repeaters' delay states
+	struct sRepeatersDelayList  // Define structure of list containing repeaters' delay states
 	{
 		Vector3i a_RelBlockPos;
-		unsigned char a_DelayTicks; // For how many ticks should the repeater delay
-		unsigned char a_ElapsedTicks; // How much of the previous has been elapsed?
-		bool ShouldPowerOn; // What happens when the delay time is fulfilled?
+		unsigned char a_DelayTicks;  // For how many ticks should the repeater delay
+		unsigned char a_ElapsedTicks;  // How much of the previous has been elapsed?
+		bool ShouldPowerOn;  // What happens when the delay time is fulfilled?
 	};
 
 public:
@@ -294,7 +294,7 @@ private:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_PISTON:
 			{
-				 return true;
+				return true;
 			}
 			default: return false;
 		}
@@ -302,7 +302,7 @@ private:
 
 	inline static bool AreCoordsOnChunkBoundary(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		return ( // Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
+		return (  // Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
 			((a_BlockX % cChunkDef::Width) <= 1) ||
 			((a_BlockX % cChunkDef::Width) >= 14) ||
 			((a_BlockZ % cChunkDef::Width) <= 1) ||

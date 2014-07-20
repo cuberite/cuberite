@@ -118,12 +118,12 @@ class cDebugCallbacks :
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPServer:
 
 cHTTPServer::cHTTPServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer IPv6"),
+	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer"),
+	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer"),
 	m_Callbacks(NULL)
 {
 }

@@ -15,7 +15,7 @@ void cBlockBedHandler::OnPlacedByPlayer(
 	if (a_BlockMeta < 8)
 	{
 		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
-		a_ChunkInterface.SetBlock(a_WorldInterface,a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
+		a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
 	}
 }
 
@@ -116,22 +116,22 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 				if (Meta & 0x8)
 				{
-					// Is pillow	
+					// Is pillow
 					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
 				}
 				else
 				{
 					// Is foot end
-					VERIFY((Meta & 0x4) != 0x4); // Occupied flag should never be set, else our compilator (intended) is broken
+					VERIFY((Meta & 0x4) != 0x4);  // Occupied flag should never be set, else our compilator (intended) is broken
 
 					PillowDirection = MetaDataToDirection(Meta & 0x7);
-					if (a_ChunkInterface.GetBlock(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z) == E_BLOCK_BED) // Must always use pillow location for sleeping
+					if (a_ChunkInterface.GetBlock(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z) == E_BLOCK_BED)  // Must always use pillow location for sleeping
 					{
 						a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z);
 					}
 				}
 
-				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x4); // Where 0x4 = occupied bit
+				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x4);  // Where 0x4 = occupied bit
 				a_Player->SetIsInBed(true);
 
 				cTimeFastForwardTester Tester;
@@ -140,9 +140,9 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					cPlayerBedStateUnsetter Unsetter(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_WorldInterface);
 					a_WorldInterface.ForEachPlayer(Unsetter);
 					a_WorldInterface.SetTimeOfDay(0);
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0xB); // Where 0xB = 1011, and zero is to make sure 'occupied' bit is always unset
+					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0xB);  // Where 0xB = 1011, and zero is to make sure 'occupied' bit is always unset
 				}
-			}			
+			}
 		}
 		else
 		{

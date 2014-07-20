@@ -25,12 +25,12 @@ public:
 
 	virtual bool IsFood(void) override
 	{
-		switch (m_ItemType) // Special cases, both a seed and food
+		switch (m_ItemType)  // Special cases, both a seed and food
 		{
 			case E_ITEM_CARROT:
 			case E_ITEM_POTATO: return true;
 			default:            return false;
-		}	
+		}
 	}
 
 	virtual FoodInfo GetFoodInfo(void) override
@@ -40,12 +40,12 @@ public:
 			case E_ITEM_CARROT: return FoodInfo(4, 4.8);
 			case E_ITEM_POTATO: return FoodInfo(1, 0.6);
 			default:            return FoodInfo(0, 0);
-		}		
+		}
 	}
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override

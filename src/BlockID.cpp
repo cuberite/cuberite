@@ -255,7 +255,8 @@ AString ItemToFullString(const cItem & a_Item)
 
 int StringToMobType(const AString & a_MobString)
 {
-	static struct {
+	static struct
+	{
 		int m_MobType;
 		const char * m_String;
 	} MobMap [] =
@@ -286,7 +287,7 @@ int StringToMobType(const AString & a_MobString)
 		{cMonster::mtMooshroom,    "Mooshroom"},
 		{cMonster::mtSnowGolem,    "SnowGolem"},
 		{cMonster::mtOcelot,       "Ocelot"},
-		{cMonster::mtIronGolem,    "IronGolem"}, 
+		{cMonster::mtIronGolem,    "IronGolem"},
 		{cMonster::mtVillager,     "Villager"},
 	};
 	for (size_t i = 0; i < ARRAYCOUNT(MobMap); i++)

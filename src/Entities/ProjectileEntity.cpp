@@ -35,7 +35,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
 class cProjectileTracerCallback :
@@ -122,7 +122,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntityCollisionCallback:
 
 class cProjectileEntityCollisionCallback :
@@ -146,9 +146,11 @@ public:
 			(a_Entity->GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
 		)
 		{
-			// TODO: Don't check creator only for the first 5 ticks
-			// so that arrows stuck in ground and dug up can hurt the player
-			return false;
+			// Don't check creator only for the first 5 ticks so that projectiles can collide with the creator
+			if (m_Projectile->GetTicksAlive() <= 5)
+			{
+				return false;
+			}
 		}
 		
 		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
@@ -211,7 +213,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :

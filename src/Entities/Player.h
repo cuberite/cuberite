@@ -119,11 +119,11 @@ public:
 
 	void SetTouchGround( bool a_bTouchGround );
 	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
-	double GetEyeHeight(void) const;													// tolua_export
-	Vector3d GetEyePosition(void) const;												// tolua_export
+	double GetEyeHeight(void) const;  // tolua_export
+	Vector3d GetEyePosition(void) const;  // tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
-	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
+	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 
 	/** Gets the contents of the player's associated enderchest */
@@ -174,7 +174,7 @@ public:
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, NULL if none */
-	cTeam * GetTeam(void) { return m_Team; } // tolua_export
+	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
 	/** Sets the player team, NULL if none */
 	void SetTeam(cTeam * a_Team);
@@ -198,9 +198,9 @@ public:
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/** Forces the player to move in the given direction. 
+	/** Forces the player to move in the given direction.
 	@deprecated Use SetSpeed instead. */
-	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
+	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
@@ -239,15 +239,15 @@ public:
 	typedef std::list< std::string > StringList;
 
 	/** Adds a player to existing group or creates a new group when it doesn't exist */
-	void AddToGroup( const AString & a_GroupName );							// tolua_export
+	void AddToGroup( const AString & a_GroupName );  // tolua_export
 	
 	/** Removes a player from the group, resolves permissions and group inheritance (case sensitive) */
-	void RemoveFromGroup( const AString & a_GroupName );					// tolua_export
+	void RemoveFromGroup( const AString & a_GroupName );  // tolua_export
 	
-	bool HasPermission( const AString & a_Permission );						// tolua_export
-	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
-	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
-	bool IsInGroup( const AString & a_Group );								// tolua_export
+	bool HasPermission( const AString & a_Permission );  // tolua_export
+	const GroupList & GetGroups() { return m_Groups; }  // >> EXPORTED IN MANUALBINDINGS <<
+	StringList GetResolvedPermissions();  // >> EXPORTED IN MANUALBINDINGS <<
+	bool IsInGroup( const AString & a_Group );  // tolua_export
 
 	// tolua_begin
 	
@@ -326,10 +326,10 @@ public:
 
 	virtual void Killed(cEntity * a_Victim) override;
 	
-	void Respawn(void);															// tolua_export
+	void Respawn(void);  // tolua_export
 
-	void SetVisible( bool a_bVisible );										// tolua_export
-	bool IsVisible(void) const { return m_bVisible; }									// tolua_export
+	void SetVisible( bool a_bVisible );  // tolua_export
+	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
 	/** Moves the player to the specified world.
 	Returns true if successful, false on failure (world not found). */
@@ -345,7 +345,7 @@ public:
 	Returns true on success, false on failure. */
 	bool LoadFromFile(const AString & a_FileName);
 	
-	void LoadPermissionsFromDisk(void);											// tolua_export
+	void LoadPermissionsFromDisk(void);  // tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
@@ -430,7 +430,7 @@ protected:
 	AString m_LoadedWorldName;
 
 	/** Xp Level stuff */
-	enum 
+	enum
 	{
 		XP_TO_LEVEL15 = 255,
 		XP_PER_LEVEL_TO15 = 17,
@@ -570,7 +570,7 @@ protected:
 	/** Returns the filename for the player data based on the UUID given.
 	This can be used both for online and offline UUIDs. */
 	AString GetUUIDFileName(const AString & a_UUID);
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

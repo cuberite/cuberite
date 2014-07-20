@@ -145,7 +145,7 @@ public:
 
 	// cWebPlugin and WebAdmin stuff
 	virtual AString HandleWebRequest(const HTTPRequest * a_Request ) override;
-	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);  // >> EXPORTED IN MANUALBINDINGS <<
 	
 	/** Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindCommand(const AString & a_Command, int a_FnRef);

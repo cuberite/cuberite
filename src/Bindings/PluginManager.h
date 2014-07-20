@@ -51,10 +51,12 @@ class cBlockEntityWithItems;
 
 
 
-class cPluginManager													// tolua_export
-{																		// tolua_export
-public:																	// tolua_export
-
+// tolua_begin
+class cPluginManager
+{
+public:
+	// tolua_end
+	
 	// Called each tick
 	virtual void Tick(float a_Dt);
 	
@@ -157,15 +159,17 @@ public:																	// tolua_export
 	
 	
 	/** Returns the instance of the Plugin Manager (there is only ever one) */
-	static cPluginManager * Get(void);							// tolua_export
+	static cPluginManager * Get(void);  // tolua_export
 
 	typedef std::map< AString, cPlugin * > PluginMap;
 	typedef std::list< cPlugin * > PluginList;
-	cPlugin * GetPlugin( const AString & a_Plugin ) const;				// tolua_export
-	const PluginMap & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
+	cPlugin * GetPlugin( const AString & a_Plugin ) const;  // tolua_export
+	const PluginMap & GetAllPlugins() const;  // >> EXPORTED IN MANUALBINDINGS <<
 
-	void FindPlugins();													// tolua_export
-	void ReloadPlugins();												// tolua_export
+	// tolua_begin
+	void FindPlugins();
+	void ReloadPlugins();
+	// tolua_end
 	
 	/** Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
@@ -335,8 +339,8 @@ private:
 	bool AddPlugin(cPlugin * a_Plugin);
 
 	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
-	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);	
-} ; // tolua_export
+	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
+} ;  // tolua_export
 
 
 

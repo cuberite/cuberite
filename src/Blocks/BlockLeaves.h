@@ -11,7 +11,7 @@
 // Leaves can be this many blocks that away (inclusive) from the log not to decay
 #define LEAVES_CHECK_DISTANCE 6
 
-#define PROCESS_NEIGHBOR(x,y,z) \
+#define PROCESS_NEIGHBOR(x, y, z) \
 	switch (a_Area.GetBlockType(x, y, z)) \
 	{ \
 		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
@@ -82,7 +82,7 @@ public:
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);  // Unset 0x8 bit so it gets checked for decay
 	}
 	
 	
@@ -106,10 +106,10 @@ public:
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		cBlockArea Area;
 		if (!Area.Read(
-			a_Chunk.GetWorld(), 
-			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE, 
-			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE, 
-			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE, 
+			a_Chunk.GetWorld(),
+			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE,
+			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE,
+			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE,
 			cBlockArea::baTypes)
 		)
 		{

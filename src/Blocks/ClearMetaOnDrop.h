@@ -4,7 +4,7 @@
 // mixin for use to clear meta values when the block is converted to a pickup
 
 // Usage: inherit from this class, passing the parent class as the parameter Base
-// For example to use in class Foo which should inherit Bar use 
+// For example to use in class Foo which should inherit Bar use
 // class Foo : public cClearMetaOnDrop<Bar>;
 
 template<class Base>

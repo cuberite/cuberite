@@ -70,7 +70,7 @@ const int TIME_SPAWN_DIVISOR =   148;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorldLoadProgress:
 
 /// A simple thread that displays the progress of world loading / saving in cWorld::InitializeSpawn()
@@ -99,7 +99,7 @@ protected:
 	{
 		for (;;)
 		{
-			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate", 
+			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate",
 				m_World->GetStorage().GetLoadQueueLength(),
 				m_World->GetGenerator().GetQueueLength()
 			);
@@ -122,7 +122,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorldLightingProgress:
 
 /// A simple thread that displays the progress of world lighting in cWorld::InitializeSpawn()
@@ -172,7 +172,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld::cLock:
 
 cWorld::cLock::cLock(cWorld & a_World) :
@@ -184,7 +184,7 @@ cWorld::cLock::cLock(cWorld & a_World) :
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTickThread:
 
 cWorld::cTickThread::cTickThread(cWorld & a_World) :
@@ -226,7 +226,7 @@ void cWorld::cTickThread::Execute(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
 cWorld::cWorld(const AString & a_WorldName) :
@@ -375,17 +375,15 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cWorld::InitializeSpawn(void)
 {
-	if (!m_IsSpawnExplicitlySet) // Check if spawn position was already explicitly set or not
+	if (!m_IsSpawnExplicitlySet)
 	{
-		GenerateRandomSpawn(); // Generate random solid-land coordinate and then write it to the world configuration
-
+		// Spawn position wasn't already explicitly set, enerate random solid-land coordinate and then write it to the world configuration:
+		GenerateRandomSpawn();
 		cIniFile IniFile;
 		IniFile.ReadFile(m_IniFileName);
-
 		IniFile.SetValueF("SpawnPosition", "X", m_SpawnX);
 		IniFile.SetValueF("SpawnPosition", "Y", m_SpawnY);
 		IniFile.SetValueF("SpawnPosition", "Z", m_SpawnZ);
-
 		IniFile.WriteFile(m_IniFileName);
 	}
 
@@ -572,12 +570,13 @@ void cWorld::Start(void)
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 
 	// Load allowed mobs:
-	const char * DefaultMonsters = "";
+	AString DefaultMonsters;
 	switch (m_Dimension)
 	{
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = "enderman"; break;
+		case dimNotSet:    break;
 	}
 	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
 	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
@@ -648,7 +647,7 @@ void cWorld::GenerateRandomSpawn(void)
 
 	while (IsBlockWaterOrIce(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ)))
 	{
-		if ((GetTickRandomNumber(4) % 2) == 0) // Randomise whether to increment X or Z coords
+		if ((GetTickRandomNumber(4) % 2) == 0)  // Randomise whether to increment X or Z coords
 		{
 			m_SpawnX += cChunkDef::Width;
 		}
@@ -658,7 +657,7 @@ void cWorld::GenerateRandomSpawn(void)
 		}
 	}
 
-	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f; // 1.6f to accomodate player height
+	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f;  // 1.6f to accomodate player height
 
 	LOGD("Generated random spawnpoint %i %i %i", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
 }
@@ -770,12 +769,12 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 
 	m_ChunkMap->FastSetQueuedBlocks();
 
-	if (m_WorldAge - m_LastSave > 60 * 5 * 20) // Save each 5 minutes
+	if (m_WorldAge - m_LastSave > 60 * 5 * 20)  // Save each 5 minutes
 	{
 		SaveAllChunks();
 	}
 
-	if (m_WorldAge - m_LastUnload > 10 * 20) // Unload every 10 seconds
+	if (m_WorldAge - m_LastUnload > 10 * 20)  // Unload every 10 seconds
 	{
 		UnloadUnusedChunks();
 	}
@@ -861,8 +860,8 @@ void cWorld::TickMobs(float a_Dt)
 					SpawnMobFinalize(*itr2);
 				}
 			}
-		} // for i - AllFamilies[]
-	} // if (Spawning enabled)
+		}  // for i - AllFamilies[]
+	}  // if (Spawning enabled)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
@@ -972,7 +971,7 @@ void cWorld::TickClients(float a_Dt)
 	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
 	{
 		delete *itr;
-	} // for itr - RemoveClients[]
+	}  // for itr - RemoveClients[]
 }
 
 
@@ -2226,7 +2225,7 @@ void cWorld::SetChunkData(
 	const NIBBLETYPE * a_BlockSkyLight,
 	const cChunkDef::HeightMap * a_HeightMap,
 	const cChunkDef::BiomeMap  * a_BiomeMap,
-	cEntityList & a_Entities, 
+	cEntityList & a_Entities,
 	cBlockEntityList & a_BlockEntities,
 	bool a_MarkDirty
 )
@@ -2242,7 +2241,7 @@ void cWorld::SetChunkData(
 	}
 	
 	m_ChunkMap->SetChunkData(
-		a_ChunkX, a_ChunkZ, 
+		a_ChunkX, a_ChunkZ,
 		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
 		a_HeightMap, *Biomes,
 		a_BlockEntities,
@@ -2470,7 +2469,7 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 		{
 			if (a_CheckLineOfSight)
 			{
-				if(!LineOfSight.Trace(a_Pos,(Pos - a_Pos),(int)(Pos - a_Pos).Length()))
+				if(!LineOfSight.Trace(a_Pos, (Pos - a_Pos), (int)(Pos - a_Pos).Length()))
 				{
 					ClosestDistance = Distance;
 					ClosestPlayer = *itr;
@@ -2872,7 +2871,7 @@ void cWorld::RemoveEntity(cEntity * a_Entity)
 unsigned int cWorld::GetNumPlayers(void)
 {
 	cCSLock Lock(m_CSPlayers);
-	return m_Players.size(); 
+	return m_Players.size();
 }
 */
 
@@ -2916,11 +2915,11 @@ void cWorld::TickQueuedBlocks(void)
 		{
 			// TODO: Handle the case when the chunk is already unloaded
 			m_ChunkMap->TickBlock(Block->X, Block->Y, Block->Z);
-			delete Block;	 // We don't have to remove it from the vector, this will happen automatically on the next tick
+			delete Block;  // We don't have to remove it from the vector, this will happen automatically on the next tick
 		}
 		else
 		{
-			m_BlockTickQueue.push_back(Block);	// Keep the block in the queue
+			m_BlockTickQueue.push_back(Block);  // Keep the block in the queue
 		}
 	}  // for itr - m_BlockTickQueueCopy[]
 }
@@ -3026,18 +3025,18 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		size_t LastSpace = a_Text.find_last_of(" "); // Find the position of the last space
+		size_t LastSpace = a_Text.find_last_of(" ");  // Find the position of the last space
 		
-		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length()); // Find the last word
+		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length());  // Find the last word
 		AString PlayerName ((*itr)->GetName());
-		size_t Found = PlayerName.find(LastWord); // Try to find last word in playername
+		size_t Found = PlayerName.find(LastWord);  // Try to find last word in playername
 		
 		if (Found == AString::npos)
 		{
-			continue; // No match
+			continue;  // No match
 		}
 		
-		a_Results.push_back(PlayerName); // Match!
+		a_Results.push_back(PlayerName);  // Match!
 	}
 }
 
@@ -3202,7 +3201,7 @@ void cWorld::AddQueuedPlayers(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSaveAllChunks:
 
 void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
@@ -3214,7 +3213,7 @@ void cWorld::cTaskSaveAllChunks::Run(cWorld & a_World)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskUnloadUnusedChunks
 
 void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
@@ -3226,7 +3225,7 @@ void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSendBlockTo
 
 cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue) :
@@ -3269,7 +3268,7 @@ void cWorld::cTaskSendBlockToAllPlayers::Run(cWorld & a_World)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorld::cChunkGeneratorCallbacks:
 
 cWorld::cChunkGeneratorCallbacks::cChunkGeneratorCallbacks(cWorld & a_World) :

@@ -183,7 +183,7 @@ protected:
 	bool m_MoveToGround;
 	
 	
-	// cPiece overrides:	
+	// cPiece overrides:
 	virtual cConnectors GetConnectors(void) const override;
 	virtual Vector3i GetSize(void) const override;
 	virtual cCuboid GetHitBox(void) const override;

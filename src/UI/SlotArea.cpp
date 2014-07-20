@@ -20,7 +20,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotArea:
 
 cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
@@ -36,8 +36,8 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	/*
-	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s", 
-		GetNumSlots(), a_SlotNum, 
+	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s",
+		GetNumSlots(), a_SlotNum,
 		ItemToFullString(a_ClickedItem).c_str(),
 		ItemToFullString(*GetSlot(a_SlotNum, a_Player)).c_str()
 	);
@@ -108,9 +108,9 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		case caRightClick:
 		{
-			if (DraggingItem.m_ItemType <= 0) // Empty-handed?
+			if (DraggingItem.m_ItemType <= 0)  // Empty-handed?
 			{
-				DraggingItem = Slot.CopyOne(); // Obtain copy of slot to preserve lore, enchantments, etc.
+				DraggingItem = Slot.CopyOne();  // Obtain copy of slot to preserve lore, enchantments, etc.
 
 				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
@@ -128,7 +128,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				{
 					char OldSlotCount = Slot.m_ItemCount;
 
-					Slot = DraggingItem.CopyOne(); // See above
+					Slot = DraggingItem.CopyOne();  // See above
 					OldSlotCount++;
 					Slot.m_ItemCount = OldSlotCount;
 
@@ -409,7 +409,7 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaChest:
 
 cSlotAreaChest::cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow) :
@@ -441,7 +441,7 @@ void cSlotAreaChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaDoubleChest:
 
 cSlotAreaDoubleChest::cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEntity * a_BottomChest, cWindow & a_ParentWindow) :
@@ -488,7 +488,7 @@ void cSlotAreaDoubleChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cIte
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaCrafting:
 
 cSlotAreaCrafting::cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow) :
@@ -764,7 +764,7 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaAnvil:
 
 cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
@@ -1191,7 +1191,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnchanting:
 
 cSlotAreaEnchanting::cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow) :
@@ -1280,7 +1280,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		}
 		
 		case caLeftClick:
-		{	
+		{
 			// Left-clicked
 			if (DraggingItem.IsEmpty())
 			{
@@ -1496,7 +1496,7 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld * a_World)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnderChest:
 
 cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWindow & a_ParentWindow) :
@@ -1527,7 +1527,7 @@ void cSlotAreaEnderChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaFurnace:
 
 cSlotAreaFurnace::cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow) :
@@ -1763,7 +1763,7 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaInventoryBase:
 
 cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow) :
@@ -1819,7 +1819,7 @@ void cSlotAreaInventoryBase::SetSlot(int a_SlotNum, cPlayer & a_Player, const cI
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaArmor:
 
 void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
@@ -1948,7 +1948,7 @@ bool cSlotAreaArmor::CanPlaceInSlot(int a_SlotNum, const cItem & a_Item)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaItemGrid:
 
 cSlotAreaItemGrid::cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow) :
@@ -1999,7 +1999,7 @@ void cSlotAreaItemGrid::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaTemporary:
 
 cSlotAreaTemporary::cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow) :
@@ -2104,7 +2104,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-a_Player.GetYaw(), a_Player.GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because player created
+	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because player created
 }
 
 

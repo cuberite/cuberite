@@ -100,7 +100,7 @@ protected:
 	cNoise m_Noise;  // Used for integral rnd values
 
 	#ifdef _DEBUG
-		// Statistics on the noise-space coords:	
+		// Statistics on the noise-space coords:
 		static int m_NumSingleX;
 		static int m_NumSingleXY;
 		static int m_NumSingleY;
@@ -256,7 +256,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Inline function definitions:
 // These need to be in the header, otherwise linker error occur in MSVC
 
@@ -361,7 +361,7 @@ NOISE_DATATYPE cNoise::LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B,
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Global functions:
 
 extern void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase);

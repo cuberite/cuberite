@@ -34,7 +34,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cTerrainCompositionGen:
 
 cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed)
@@ -114,7 +114,7 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cComposableGenerator:
 
 cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
@@ -234,7 +234,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	{
 		if (CacheSize < 4)
 		{
-			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d", 
+			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
 				CacheSize, 4
 			);
 			CacheSize = 4;
@@ -252,7 +252,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
-	m_HeightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, *m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);	
+	m_HeightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, *m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
 	
 	// Add a cache, if requested:
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
@@ -260,7 +260,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 	{
 		if (CacheSize < 4)
 		{
-			LOGWARNING("Heightgen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d", 
+			LOGWARNING("Heightgen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
 				CacheSize, 4
 			);
 			CacheSize = 4;
