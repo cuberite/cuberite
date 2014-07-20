@@ -7,6 +7,130 @@
 
 
 
+
+int cEntityEffect::GetPotionColor(short a_ItemDamage)
+{
+	// Lowest six bits
+	return (a_ItemDamage & 0x3f);
+}
+
+
+
+
+
+cEntityEffect::eType cEntityEffect::GetPotionEffectType(short a_ItemDamage)
+{
+	// Lowest four bits
+	// Potion effect bits are different from entity effect values
+	// For reference: http://minecraft.gamepedia.com/Data_values#.22Potion_effect.22_bits
+	switch (a_ItemDamage & 0x0f)
+	{
+		case 0x01: return cEntityEffect::effRegeneration;
+		case 0x02: return cEntityEffect::effSpeed;
+		case 0x03: return cEntityEffect::effFireResistance;
+		case 0x04: return cEntityEffect::effPoison;
+		case 0x05: return cEntityEffect::effInstantHealth;
+		case 0x06: return cEntityEffect::effNightVision;
+		case 0x08: return cEntityEffect::effWeakness;
+		case 0x09: return cEntityEffect::effStrength;
+		case 0x0a: return cEntityEffect::effSlowness;
+		case 0x0c: return cEntityEffect::effInstantDamage;
+		case 0x0d: return cEntityEffect::effWaterBreathing;
+		case 0x0e: return cEntityEffect::effInvisibility;
+			
+			// No effect potions
+		case 0x00:
+		case 0x07:
+		case 0x0b:  // Will be potion of leaping in 1.8
+		case 0x0f:
+		{
+			break;
+		}
+	}
+	return cEntityEffect::effNoEffect;
+}
+
+
+
+
+
+short cEntityEffect::GetPotionEffectIntensity(short a_ItemDamage)
+{
+	// Level II potion if the fifth lowest bit is set
+	return ((a_ItemDamage & 0x20) != 0) ? 1 : 0;
+}
+
+
+
+
+
+int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
+{
+	// Base duration in ticks
+	int base = 0;
+	double TierCoeff = 1, ExtCoeff = 1, SplashCoeff = 1;
+	
+	switch (GetPotionEffectType(a_ItemDamage))
+	{
+		case cEntityEffect::effRegeneration:
+		case cEntityEffect::effPoison:
+		{
+			base = 900;
+			break;
+		}
+			
+		case cEntityEffect::effSpeed:
+		case cEntityEffect::effFireResistance:
+		case cEntityEffect::effNightVision:
+		case cEntityEffect::effStrength:
+		case cEntityEffect::effWaterBreathing:
+		case cEntityEffect::effInvisibility:
+		{
+			base = 3600;
+			break;
+		}
+			
+		case cEntityEffect::effWeakness:
+		case cEntityEffect::effSlowness:
+		{
+			base = 1800;
+			break;
+		}
+	}
+	
+	// If potion is level II, half the duration. If not, stays the same
+	TierCoeff = (GetPotionEffectIntensity(a_ItemDamage) > 0) ? 0.5 : 1;
+	
+	// If potion is extended, multiply duration by 8/3. If not, stays the same
+	// Extended potion if sixth lowest bit is set
+	ExtCoeff = (a_ItemDamage & 0x40) ? (8.0 / 3.0) : 1;
+	
+	// If potion is splash potion, multiply duration by 3/4. If not, stays the same
+	SplashCoeff = IsPotionDrinkable(a_ItemDamage) ? 1 : 0.75;
+	
+	// Ref.:
+	//   http://minecraft.gamepedia.com/Data_values#.22Tier.22_bit
+	//   http://minecraft.gamepedia.com/Data_values#.22Extended_duration.22_bit
+	//   http://minecraft.gamepedia.com/Data_values#.22Splash_potion.22_bit
+	
+	return (int)(base * TierCoeff * ExtCoeff * SplashCoeff);
+}
+
+
+
+
+
+bool cEntityEffect::IsPotionDrinkable(short a_ItemDamage)
+{
+	// Drinkable potion if 13th lowest bit is set
+	// Ref.: http://minecraft.gamepedia.com/Potions#Data_value_table
+	return ((a_ItemDamage & 0x2000) != 0);
+}
+
+
+
+
+
 cEntityEffect::cEntityEffect():
 	m_Ticks(0),
 	m_Duration(0),

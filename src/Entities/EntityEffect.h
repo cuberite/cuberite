@@ -36,6 +36,25 @@ public:
 		effSaturation     = 23,
 	} ;
 	
+	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
+	static int GetPotionColor(short a_ItemDamage);
+	
+	
+	/** Translates the potion's damage value into the entity effect that the potion gives */
+	static cEntityEffect::eType GetPotionEffectType(short a_ItemDamage);
+	
+	
+	/** Retrieves the intensity level from the potion's damage value.
+	 Returns 0 for level I potions, 1 for level II potions. */
+	static short GetPotionEffectIntensity(short a_ItemDamage);
+	
+	
+	/** Returns the effect duration, in ticks, based on the potion's damage value */
+	static int GetPotionEffectDuration(short a_ItemDamage);
+	
+	/** Returns true if the potion with the given damage is drinkable */
+	static bool IsPotionDrinkable(short a_ItemDamage);
+	
 	// tolua_end
 	
 	/** Creates an empty entity effect */

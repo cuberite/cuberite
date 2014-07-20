@@ -1670,7 +1670,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cEntityEffect::effNoEffect, cEntityEffect(), 0));
+	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cItem()));
 	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
 	{
 		return;
