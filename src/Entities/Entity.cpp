@@ -49,6 +49,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_IsSubmerged(false)
 	, m_AirLevel(0)
 	, m_AirTickTimer(0)
+	, m_TicksAlive(0)
 	, m_HeadYaw(0.0)
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
@@ -559,6 +560,8 @@ void cEntity::SetHealth(int a_Health)
 
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	m_TicksAlive++;
+	
 	if (m_InvulnerableTicks > 0)
 	{
 		m_InvulnerableTicks--;
