@@ -27,7 +27,7 @@ struct cGroupManager::sGroupManagerState
 
 cGroupManager::~cGroupManager()
 {
-	for (GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr )
+	for (GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr)
 	{
 		delete itr->second;
 		itr->second = NULL;
@@ -43,7 +43,7 @@ cGroupManager::~cGroupManager()
 
 
 cGroupManager::cGroupManager()
-	: m_pState( new sGroupManagerState )
+	: m_pState( new sGroupManagerState)
 {
 	LOGD("-- Loading Groups --");
 	
@@ -198,20 +198,20 @@ bool cGroupManager::LoadGroups()
 
 
 
-bool cGroupManager::ExistsGroup( const AString & a_Name )
+bool cGroupManager::ExistsGroup( const AString & a_Name)
 {
-	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
-	return ( itr != m_pState->Groups.end() );
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name);
+	return ( itr != m_pState->Groups.end());
 }
 
 
 
 
 
-cGroup* cGroupManager::GetGroup( const AString & a_Name )
+cGroup* cGroupManager::GetGroup( const AString & a_Name)
 {
-	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
-	if (itr != m_pState->Groups.end() )
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name);
+	if (itr != m_pState->Groups.end())
 	{
 		return itr->second;
 	}

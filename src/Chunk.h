@@ -82,9 +82,9 @@ public:
 	
 	/*
 	To save a chunk, the WSSchema must:
-	1. Mark the chunk as being saved (MarkSaving() )
+	1. Mark the chunk as being saved (MarkSaving())
 	2. Get the chunk's data using GetAllData()
-	3. Mark the chunk as saved (MarkSaved() )
+	3. Mark the chunk as saved (MarkSaved())
 	If anywhere inside this sequence another thread mmodifies the chunk, the chunk will not get marked as saved in MarkSaved()
 	*/
 	void MarkSaving(void);  // Marks the chunk as being saved.
@@ -144,7 +144,7 @@ public:
 
 	void SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
-	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta ); }
+	void SetBlock( const Vector3i & a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { SetBlock( a_RelBlockPos.x, a_RelBlockPos.y, a_RelBlockPos.z, a_BlockType, a_BlockMeta); }
 	
 	/** Queues a block change till the specified world tick */
 	void QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
@@ -195,7 +195,7 @@ public:
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
-	int  GetHeight( int a_X, int a_Z );
+	int  GetHeight( int a_X, int a_Z);
 
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
@@ -301,7 +301,7 @@ public:
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawnEntity        (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
@@ -311,7 +311,7 @@ public:
 	}
 	
 	void     PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a_BlockX, int & a_BlockY, int & a_BlockZ);
-	Vector3i PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ );
+	Vector3i PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ);
 
 	inline void MarkDirty(void)
 	{

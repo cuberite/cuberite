@@ -14,12 +14,12 @@ public:
 	~cGroup() {}
 
 	// tolua_begin
-	void SetName( const AString & a_Name ) { m_Name = a_Name; }
+	void SetName( const AString & a_Name) { m_Name = a_Name; }
 	const AString & GetName() const { return m_Name; }
-	void SetColor( const AString & a_Color ) { m_Color = a_Color; }
-	void AddCommand( const AString & a_Command );
-	void AddPermission( const AString & a_Permission );
-	void InheritFrom( cGroup* a_Group );
+	void SetColor( const AString & a_Color) { m_Color = a_Color; }
+	void AddCommand( const AString & a_Command);
+	void AddPermission( const AString & a_Permission);
+	void InheritFrom( cGroup* a_Group);
 	// tolua_end
 
 	typedef std::map< AString, bool > PermissionMap;

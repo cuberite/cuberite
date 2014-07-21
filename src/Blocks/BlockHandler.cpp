@@ -175,7 +175,7 @@ public:
 
 cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 {
-	switch(a_BlockType)
+	switch (a_BlockType)
 	{
 		// Block handlers, alphabetically sorted:
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
@@ -254,7 +254,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
-		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler      (           );
+		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler;
 		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);
 		case E_BLOCK_POTATOES:              return new cBlockCropsHandler           (a_BlockType);
 		case E_BLOCK_POWERED_RAIL:          return new cBlockRailHandler            (a_BlockType);

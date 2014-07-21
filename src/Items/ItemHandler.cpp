@@ -94,7 +94,7 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 
 cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 {
-	switch(a_ItemType)
+	switch (a_ItemType)
 	{
 		default:                       return new cItemHandler(a_ItemType);
 		

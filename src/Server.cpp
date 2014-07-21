@@ -398,7 +398,7 @@ void cServer::TickClients(float a_Dt)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				// Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
+				// Remove the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
 				RemoveClients.push_back(*itr);
 				itr = m_Clients.erase(itr);
 				continue;
@@ -631,7 +631,7 @@ void cServer::Shutdown(void)
 	cRoot::Get()->SaveAllChunks();
 
 	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		(*itr)->Destroy();
 		delete *itr;

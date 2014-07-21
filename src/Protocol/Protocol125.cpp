@@ -1116,7 +1116,7 @@ void cProtocol125::SendUpdateSign(
 
 
 
-void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_USE_BED);
@@ -1135,7 +1135,7 @@ void cProtocol125::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 void cProtocol125::SendWeather(eWeather a_Weather)
 {
 	cCSLock Lock(m_CSPacket);
-	switch( a_Weather )
+	switch (a_Weather)
 	{
 		case eWeather_Sunny:
 		{
@@ -1454,7 +1454,7 @@ int cProtocol125::ParseHandshake(void)
 
 	LOGD("HANDSHAKE %s", Username.c_str());
 
-	if (!m_Client->HandleHandshake( m_Username ))
+	if (!m_Client->HandleHandshake( m_Username))
 	{
 		return PARSE_OK;  // Player is not allowed into the server
 	}
@@ -1916,7 +1916,7 @@ void cProtocol125::WriteEntityMetadata(const cEntity & a_Entity)
 	{
 		WriteByte(0x51);
 		// No idea how Mojang makes their carts shakey shakey, so here is a complicated one-liner expression that does something similar
-		WriteInt( (((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4 );
+		WriteInt( (((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * ((const cMinecart &)a_Entity).LastDamage()) * 4);
 		WriteByte(0x52);
 		WriteInt(1);  // Shaking direction, doesn't seem to affect anything
 		WriteByte(0x73);

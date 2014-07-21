@@ -59,7 +59,7 @@ public:
 
 	static char MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
-		switch(a_MetaData)
+		switch (a_MetaData)
 		{
 			case 0x1: return BLOCK_FACE_NORTH;
 			case 0x4: return BLOCK_FACE_SOUTH;

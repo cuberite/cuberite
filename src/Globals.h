@@ -272,12 +272,12 @@ void inline LOGERROR(const char* a_Format, ...)
 /// Evaluates to the number of elements in an array (compile-time!)
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
+/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)")
 #define KiB * 1024
 #define MiB * 1024 * 1024
 
 /// Faster than (int)floorf((float)x / (float)div)
-#define FAST_FLOOR_DIV( x, div ) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
+#define FAST_FLOOR_DIV( x, div) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef TEST_GLOBALS
@@ -314,14 +314,14 @@ void inline LOGERROR(const char* a_Format, ...)
 
 #else
 	#ifdef  _DEBUG
-		#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
+		#define ASSERT( x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), assert(0), 0))
 	#else
 		#define ASSERT(x) ((void)(x))
 	#endif
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
+#define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST

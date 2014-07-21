@@ -1170,7 +1170,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Only compare ItemType, not meta (torches have different metas)
 		// The -1 check is there because sometimes the client sends -1 instead of the held item
-		//  ( http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502 )
+		// Ref.: http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
 		);
@@ -2562,7 +2562,7 @@ void cClientHandle::SendUpdateSign(
 
 
 
-void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
@@ -2624,7 +2624,7 @@ const AString & cClientHandle::GetUsername(void) const
 
 
 
-void cClientHandle::SetUsername( const AString & a_Username )
+void cClientHandle::SetUsername( const AString & a_Username)
 {
 	m_Username = a_Username;
 }

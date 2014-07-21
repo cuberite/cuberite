@@ -162,11 +162,11 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 
 void cItem::FromJson(const Json::Value & a_Value)
 {
-	m_ItemType = (ENUM_ITEM_ID)a_Value.get("ID", -1 ).asInt();
+	m_ItemType = (ENUM_ITEM_ID)a_Value.get("ID", -1).asInt();
 	if (m_ItemType > 0)
 	{
-		m_ItemCount = (char)a_Value.get("Count", -1 ).asInt();
-		m_ItemDamage = (short)a_Value.get("Health", -1 ).asInt();
+		m_ItemCount = (char)a_Value.get("Count", -1).asInt();
+		m_ItemDamage = (short)a_Value.get("Health", -1).asInt();
 		m_Enchantments.Clear();
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
 		m_CustomName = a_Value.get("Name", "").asString();

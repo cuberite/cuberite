@@ -30,7 +30,7 @@ struct cFurnaceRecipe::sFurnaceRecipeState
 
 
 cFurnaceRecipe::cFurnaceRecipe()
-	: m_pState( new sFurnaceRecipeState )
+	: m_pState( new sFurnaceRecipeState)
 {
 	ReloadRecipes();
 }

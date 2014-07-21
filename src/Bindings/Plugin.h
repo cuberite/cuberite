@@ -33,7 +33,7 @@ class cPlugin
 public:
 	// tolua_end
 	
-	cPlugin( const AString & a_PluginDirectory );
+	cPlugin( const AString & a_PluginDirectory);
 	virtual ~cPlugin();
 	
 	virtual void OnDisable(void) {}
@@ -141,7 +141,7 @@ public:
 		E_SQUIRREL,  // OBSOLETE, but kept in place to remind us of the horrors lurking in the history
 	};
 	PluginLanguage GetLanguage() { return m_Language; }
-	void SetLanguage( PluginLanguage a_Language ) { m_Language = a_Language; }
+	void SetLanguage( PluginLanguage a_Language) { m_Language = a_Language; }
 
 private:
 	PluginLanguage m_Language;

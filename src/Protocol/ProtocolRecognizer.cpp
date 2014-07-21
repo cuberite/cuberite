@@ -756,7 +756,7 @@ void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_Block
 
 
 
-void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);

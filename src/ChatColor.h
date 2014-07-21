@@ -31,14 +31,14 @@ public:
 	static const char * Yellow;
 	static const char * White;
 
-	// Styles ( source: http://wiki.vg/Chat )
+	// Styles
+	// source: http://wiki.vg/Chat
 	static const char * Random;
 	static const char * Bold;
 	static const char * Strikethrough;
 	static const char * Underlined;
 	static const char * Italic;
 	static const char * Plain;
-
 };
 
 // tolua_end

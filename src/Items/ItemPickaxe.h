@@ -17,7 +17,7 @@ public:
 
 	char PickaxeLevel()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
 			case E_ITEM_WOODEN_PICKAXE:  return 1;
 			case E_ITEM_GOLD_PICKAXE:    return 1;
@@ -31,7 +31,7 @@ public:
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_OBSIDIAN:
 			{

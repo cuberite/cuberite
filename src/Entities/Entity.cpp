@@ -648,7 +648,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
 	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
@@ -758,7 +758,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
 
-	switch(WaterDir)
+	switch (WaterDir)
 	{
 		case X_PLUS:
 			m_WaterSpeed.x = 0.2f;

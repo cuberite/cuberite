@@ -141,7 +141,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 		SkyLight = a_Chunk->GetTimeAlteredLight(SkyLight);
 
-		switch(a_MobType)
+		switch (a_MobType)
 		{
 			case cMonster::mtSquid:
 			{

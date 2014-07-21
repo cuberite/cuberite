@@ -79,7 +79,7 @@ public:
 	virtual void SaveToJson  (Json::Value & a_Value) = 0;
 	
 	/// Called when a player uses this entity; should open the UI window
-	virtual void UsedBy( cPlayer * a_Player ) = 0;
+	virtual void UsedBy( cPlayer * a_Player) = 0;
 	
 	/** Sends the packet defining the block entity to the client specified.
 	To send to all eligible clients, use cWorld::BroadcastBlockEntity()

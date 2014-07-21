@@ -60,7 +60,7 @@ public:
 
 	static const int LAYER_SIZE = 32;
 
-	cChunkMap(cWorld* a_World );
+	cChunkMap(cWorld* a_World);
 	~cChunkMap();
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
@@ -89,7 +89,7 @@ public:
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -289,7 +289,7 @@ public:
 	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
-	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() ) */
+	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk()) */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
@@ -368,7 +368,7 @@ private:
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 		
 		/** Returns the specified chunk, or NULL if not created yet */
 		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);

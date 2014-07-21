@@ -703,10 +703,10 @@ cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_Gri
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenMarbleCaves:
 
-static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise )
+static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise)
 {
 	static const float PI_2 = 1.57079633f;
-	float oct1 = (a_Noise.CubicNoise3D(x * 0.1f, y * 0.1f, z * 0.1f )) * 4;
+	float oct1 = (a_Noise.CubicNoise3D(x * 0.1f, y * 0.1f, z * 0.1f)) * 4;
 
 	oct1 = oct1 * oct1 * oct1;
 	if (oct1 < 0.f)  oct1 = PI_2;
@@ -730,7 +730,7 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 			const float xx = (float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x);
 
 			int Top = a_ChunkDesc.GetHeight(x, z);
-			for (int y = 1; y < Top; ++y )
+			for (int y = 1; y < Top; ++y)
 			{
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_STONE)
 				{

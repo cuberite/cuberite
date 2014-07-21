@@ -239,14 +239,14 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 			
 			const float xx = (float)BlockX;
-			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f );
-			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f );
+			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f);
+			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f);
 			switch (a_ChunkDesc.GetBlockType(x, Top, z))
 			{
 				case E_BLOCK_GRASS:
 				{
-					float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10 );
-					float val4 = m_Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20 );
+					float val3 = m_Noise.CubicNoise2D(xx * 0.01f + 10, zz * 0.01f + 10);
+					float val4 = m_Noise.CubicNoise2D(xx * 0.05f + 20, zz * 0.05f + 20);
 					if (val1 + val2 > 0.2f)
 					{
 						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_YELLOW_FLOWER);

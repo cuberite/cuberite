@@ -617,7 +617,7 @@ void cWorld::Start(void)
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
 
 	m_Lighting.Start(this);
-	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor );
+	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
 	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
 	m_ChunkSender.Start(this);
 	m_TickThread.Start();

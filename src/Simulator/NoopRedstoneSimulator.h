@@ -28,7 +28,7 @@ public:
 		UNUSED(a_ChunkZ);
 		UNUSED(a_Chunk);
 	}
-	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType ) override { return false; }
+	virtual bool IsAllowedBlock( BLOCKTYPE a_BlockType) override { return false; }
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override
 	{
 		UNUSED(a_BlockX);
