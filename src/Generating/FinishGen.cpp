@@ -160,6 +160,65 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cFinishGenTallGrass:
+
+void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	for (int x = 0; x < cChunkDef::Width; x++)
+	{
+		int xx = x + a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int zz = z + a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+			int BiomeDensity = GetBiomeDensity(a_ChunkDesc.GetBiome(x, z));
+
+			// Choose if we want to place long grass here. If not then bail out:
+			if ((m_Noise.IntNoise2DInt(xx + m_Noise.IntNoise1DInt(xx), zz + m_Noise.IntNoise1DInt(zz)) / 7 % 100) > BiomeDensity)
+			{
+				continue;
+			}
+			
+			// Get the top block + 1. This is the place where the grass would finaly be placed:
+			int y = a_ChunkDesc.GetHeight(x, z) + 1;
+
+			// Check if long grass can be placed:
+			if (
+				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
+				((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) && (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
+				)
+			{
+				continue;
+			}
+
+			// Choose what long grass meta we should use:
+			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
+			if (GrassType < 60)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 1);
+			}
+			else if (GrassType < 90)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
+			}
+			else
+			{
+				// If double long grass we have to choose what type we should use:
+				if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
+				{
+					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 2 : 3;
+					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
+					a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
 bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)

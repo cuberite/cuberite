@@ -415,6 +415,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
 		}
+		else if (NoCaseCompare(*itr, "TallGrass") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenTallGrass(Seed));
+		}
 		else if (NoCaseCompare(*itr, "TestRails") == 0)
 		{
 			m_FinishGens.push_back(new cTestRailsGen(Seed, 100, 1, 7, 50));
