@@ -1,3 +1,4 @@
+#!/usr/bin/env lua
 
 -- CheckBasicStyle.lua
 
