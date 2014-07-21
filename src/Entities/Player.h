@@ -333,7 +333,7 @@ public:
 
 	/** Moves the player to the specified world.
 	Returns true if successful, false on failure (world not found). */
-	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL, bool a_ShouldSendRespawn = true) override; // tolua_export
+	virtual bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) override; // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);

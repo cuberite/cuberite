@@ -924,7 +924,7 @@ extern int StringToMobType(const AString & a_MobString);
 extern eDimension StringToDimension(const AString & a_DimensionString);
 
 /** Translates a dimension enum to dimension string.
-Takes a string and returns "Overworld" on failure
+Takes an eDimension enum value and returns "Overworld" on failure
 */
 extern AString DimensionToString(eDimension a_Dimension);
 

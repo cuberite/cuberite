@@ -382,16 +382,19 @@ public:
 	/// Teleports to the coordinates specified
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
-	/** Moves entity to specified world */
-	virtual bool MoveToWorld(const AString & a_WorldName, cWorld * a_World = NULL, bool a_ShouldSendRespawn = true);
+	/** Moves entity to specified world, taking a world pointer */
+	virtual bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
+
+	/** Moves entity to specified world, taking a world name */
+	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 	
 	// tolua_end
 
 	/** Returns if the entity is travelling away from a specified world */
-	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
+	bool IsWorldTravellingFrom(cWorld * a_World) const { return m_WorldTravellingFrom == a_World; }
 
 	/** Sets the world the entity will be leaving */
-	void SetWorldTravellingFrom(cWorld * a_World) { (m_WorldTravellingFrom = a_World); }
+	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
 	
 	/// Updates clients of changes in the entity.
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
@@ -538,11 +541,20 @@ protected:
 	int m_AirLevel;
 	int m_AirTickTimer;
 
-	/** Portal delay timer and cooldown boolean
-	First value is to delay sending the respawn packet (which triggers the Entering the {Dimension} screen).
-	Second value is to prevent a teleportation loop by ensuring we do not reenter a portal that we came out of.
-	*/
-	std::pair<unsigned short, bool> m_PortalCooldownData;
+	/** Structure storing the portal delay timer and cooldown boolean */
+	struct sPortalCooldownData
+	{
+		/** Ticks since entry of portal, used to delay teleportation */
+		unsigned short m_TicksDelayed;
+
+		/** Whether the entity has just exited the portal, and should therefore not be teleported again
+		This prevents teleportation loops, and is reset when the entity has moved out of the portal
+		*/
+		bool m_ShouldPreventTeleportation;
+	};
+
+	/** Portal delay timer and cooldown boolean data */
+	sPortalCooldownData m_PortalCooldownData;
 	
 private:
 	/** Measured in degrees, [-180, +180) */

@@ -1611,24 +1611,9 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_ShouldSendRespawn)
+bool cPlayer::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
-	cWorld * World;	
-	if (a_World == NULL)
-	{
-		World = cRoot::Get()->GetWorld(a_WorldName);
-		if (World == NULL)
-		{
-			LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
-			return false;
-		}
-	}
-	else
-	{
-		World = a_World;
-	}
-
-	if (GetWorld() == World)
+	if (GetWorld() == a_World)
 	{
 		// Don't move to same world
 		return false;
@@ -1637,7 +1622,7 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	// Send the respawn packet:
 	if (a_ShouldSendRespawn && (m_ClientHandle != NULL))
 	{
-		m_ClientHandle->SendRespawn(World->GetDimension());
+		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
 
 	// Remove player from the old world
@@ -1645,8 +1630,8 @@ bool cPlayer::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	GetWorld()->RemovePlayer(this);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
-	World->AddPlayer(this);
-	SetWorld(World);
+	a_World->AddPlayer(this);
+	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	return true;
 }

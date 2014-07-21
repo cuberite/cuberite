@@ -2427,7 +2427,6 @@ bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinCh
 	{
 		for (int x = a_MinChunkX; x <= a_MaxChunkX; x++)
 		{
-			LOG("Request %i %i", x, z);
 			cChunkPtr Chunk = GetChunkNoLoad(x, ZERO_CHUNK_Y, z);
 			if ((Chunk == NULL) || (!Chunk->IsValid()))
 			{

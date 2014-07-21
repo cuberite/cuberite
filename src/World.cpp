@@ -512,7 +512,7 @@ void cWorld::InitializeSpawn(void)
 
 
 
-void cWorld::Start()
+void cWorld::Start(void)
 {
 	m_SpawnX = 0;
 	m_SpawnY = cChunkDef::Height;
@@ -594,61 +594,8 @@ void cWorld::Start()
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 	m_Weather          = (eWeather)      Clamp(Weather,          (int)wSunny,     (int)wStorm);
 
-	switch (GetDimension())
-	{
-		case dimEnd:
-		{
-			IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
-			IniFile.GetValueSet("Generator", "ConstantBiome", "End");
-			IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
-			IniFile.GetValueSet("Generator", "CompositionGen", "End");
-			break;
-		}
-		case dimOverworld:
-		{
-			IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
-			IniFile.GetValueSet("Generator", "HeightGen", "DistortedHeightmap");
-			IniFile.GetValueSet("Generator", "CompositionGen", "DistortedHeightmap");
-			IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
-			break;
-		}
-		case dimNether:
-		{
-			IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
-			IniFile.GetValueSet("Generator", "ConstantBiome", "Nether");
-			IniFile.GetValueSet("Generator", "HeightGen", "Flat");
-			IniFile.GetValueSet("Generator", "FlatHeight", "128");
-			IniFile.GetValueSet("Generator", "CompositionGen", "Nether");
-			IniFile.GetValueSet("Generator", "Finishers", "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
-			IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
-			break;
-		}
-	}
-
-	// Load allowed mobs:
-	const char * DefaultMonsters = "";
-	switch (m_Dimension)
-	{
-		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
-		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
-		case dimEnd:       DefaultMonsters = "enderman"; break;
-	}
-	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
-	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
-	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
-	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
-	{
-		cMonster::eType ToAdd = cMonster::StringToMobType(*itr);
-		if (ToAdd != cMonster::mtInvalidType)
-		{
-			m_AllowedMobs.insert(ToAdd);
-			LOGD("Allowed mob: %s", itr->c_str());
-		}
-		else
-		{
-			LOG("World \"%s\": Unknown mob type: %s", m_WorldName.c_str(), itr->c_str());
-		}
-	}
+	InitialiseGeneratorDefaults(IniFile);
+	InitialiseAndLoadMobSpawningValues(IniFile);
 
 	m_ChunkMap = new cChunkMap(this);
 	
@@ -739,6 +686,82 @@ eWeather cWorld::ChooseNewWeather()
 	LOGWARNING("Unknown current weather: %d. Setting sunny.", m_Weather);
 	ASSERT(!"Unknown weather");
 	return eWeather_Sunny;
+}
+
+
+
+
+
+void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
+{
+	switch (GetDimension())
+	{
+		case dimEnd:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome", "End");
+			a_IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
+			break;
+		}
+		case dimOverworld:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
+			a_IniFile.GetValueSet("Generator", "HeightGen", "DistortedHeightmap");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "DistortedHeightmap");
+			a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+			break;
+		}
+		case dimNether:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome", "Nether");
+			a_IniFile.GetValueSet("Generator", "HeightGen", "Flat");
+			a_IniFile.GetValueSet("Generator", "FlatHeight", "128");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "Nether");
+			a_IniFile.GetValueSet("Generator", "Finishers", "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
+{
+	AString DefaultMonsters;
+	switch (m_Dimension)
+	{
+		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
+		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
+		case dimEnd:       DefaultMonsters = "enderman"; break;
+	}
+	
+	m_bAnimals = a_IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
+	AString AllMonsters = a_IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
+
+	if (!m_bAnimals)
+	{
+		return;
+	}
+
+	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
+	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
+	{
+		cMonster::eType ToAdd = cMonster::StringToMobType(*itr);
+		if (ToAdd != cMonster::mtInvalidType)
+		{
+			m_AllowedMobs.insert(ToAdd);
+			LOGD("Allowed mob: %s", itr->c_str());
+		}
+		else
+		{
+			LOG("World \"%s\": Unknown mob type: %s", m_WorldName.c_str(), itr->c_str());
+		}
+	}
 }
 
 

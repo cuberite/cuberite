@@ -596,7 +596,7 @@ void cChunk::Tick(float a_Dt)
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
-		if ((*itr)->IsDestroyed()) // Remove all entities that were scheduled for removal:
+		if ((*itr)->IsDestroyed())  // Remove all entities that were scheduled for removal:
 		{
 			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 			MarkDirty();
@@ -604,13 +604,13 @@ void cChunk::Tick(float a_Dt)
 			itr = m_Entities.erase(itr);
 			delete ToDelete;
 		}
-		else if ((*itr)->IsWorldTravellingFrom(m_World)) // Remove all entities that are travelling to another world
+		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove all entities that are travelling to another world
 		{
 			MarkDirty();
 			(*itr)->SetWorldTravellingFrom(NULL);
 			itr = m_Entities.erase(itr);
 		}
-		else if ( // If any entity moved out of the chunk, move it to the neighbor:
+		else if (  // If any entity moved out of the chunk, move it to the neighbor:
 			((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ)
 		)

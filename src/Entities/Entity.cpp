@@ -1030,9 +1030,15 @@ void cEntity::DetectPortal()
 {
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
-		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty()) { return; }
+		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty())
+		{
+			return;
+		}
 	}
-	else if (GetWorld()->GetLinkedOverworldName().empty()) { return; }
+	else if (GetWorld()->GetLinkedOverworldName().empty())
+	{
+		return;
+	}
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	if ((Y > 0) && (Y < cChunkDef::Height))
@@ -1041,17 +1047,17 @@ void cEntity::DetectPortal()
 		{
 			case E_BLOCK_NETHER_PORTAL:
 			{
-				if (m_PortalCooldownData.second)
+				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
 					return;
 				}
 
-				if (m_PortalCooldownData.first != 80)
+				if (IsPlayer() && !((cPlayer *)this)->IsGameModeCreative() && m_PortalCooldownData.m_TicksDelayed != 80)
 				{
-					m_PortalCooldownData.first++;
+					m_PortalCooldownData.m_TicksDelayed++;
 					return;
 				}
-				m_PortalCooldownData.first = 0;
+				m_PortalCooldownData.m_TicksDelayed = 0;
 
 				switch (GetWorld()->GetDimension())
 				{
@@ -1062,13 +1068,13 @@ void cEntity::DetectPortal()
 							return;
 						}
 
-						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
 						{
 							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);
 						}
-						MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+						MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
 
 						return;
 					}
@@ -1079,14 +1085,14 @@ void cEntity::DetectPortal()
 							return;
 						}
 
-						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
 						{
 							((cPlayer *)this)->AwardAchievement(achEnterPortal);
 							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
 						}
-						MoveToWorld(GetWorld()->GetNetherWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+						MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
 
 						return;
 					}
@@ -1095,7 +1101,7 @@ void cEntity::DetectPortal()
 			}
 			case E_BLOCK_END_PORTAL:
 			{
-				if (m_PortalCooldownData.second)
+				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
 				{
 					return;
 				}
@@ -1109,7 +1115,7 @@ void cEntity::DetectPortal()
 							return;
 						}
 
-						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
 						{
@@ -1117,7 +1123,7 @@ void cEntity::DetectPortal()
 							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
 							Player->GetClientHandle()->SendRespawn(dimOverworld);
 						}
-						MoveToWorld(GetWorld()->GetLinkedOverworldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+						MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
 
 						return;
 					}
@@ -1128,14 +1134,14 @@ void cEntity::DetectPortal()
 							return;
 						}
 
-						m_PortalCooldownData.second = true; // Stop portals from working on respawn
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true; // Stop portals from working on respawn
 
 						if (IsPlayer())
 						{
 							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
 							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
 						}
-						MoveToWorld(GetWorld()->GetEndWorldName(), cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+						MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
 
 						return;
 					}
@@ -1147,34 +1153,20 @@ void cEntity::DetectPortal()
 	}
 
 	// Allow portals to work again
-	m_PortalCooldownData.second = false;
-	m_PortalCooldownData.first = 0;
+	m_PortalCooldownData.m_ShouldPreventTeleportation = false;
+	m_PortalCooldownData.m_ShouldPreventTeleportation = 0;
 }
 
 
 
 
 
-bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_ShouldSendRespawn)
+bool cEntity::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
 	UNUSED(a_ShouldSendRespawn);
+	ASSERT(a_World == NULL);
 
-	cWorld * World;
-	if (a_World == NULL)
-	{
-		World = cRoot::Get()->GetWorld(a_WorldName);
-		if (World == NULL)
-		{
-			LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
-			return false;
-		}
-	}
-	else
-	{
-		World = a_World;
-	}
-
-	if (GetWorld() == World)
+	if (GetWorld() == a_World)
 	{
 		// Don't move to same world
 		return false;
@@ -1185,9 +1177,25 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, cWorld * a_World, bool a_
 	GetWorld()->BroadcastDestroyEntity(*this);
 
 	// Queue add to new world
-	World->AddEntity(this);
+	a_World->AddEntity(this);
 
 	return true;
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
+{
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == NULL)
+	{
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
+		return false;
+	}
+
+	return MoveToWorld(World, a_ShouldSendRespawn);
 }
 
 

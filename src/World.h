@@ -1030,6 +1030,13 @@ private:
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */
 	void AddQueuedPlayers(void);
+
+	/** Sets generator values to dimension specific defaults, if those values do not exist */
+	void InitialiseGeneratorDefaults(cIniFile & a_IniFile);
+
+	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
+	void InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile);
+
 };  // tolua_export
 
 
