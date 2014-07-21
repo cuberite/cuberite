@@ -178,36 +178,36 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 			
-			for (int y = a_ChunkDesc.GetHeight(x, z) + 1; y >= 1; y--)
-			{
-				// Check if long grass can be placed.
-				if (
-					(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
-					((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) && (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
-					)
-				{
-					continue;
-				}
+			// Get the top block + 1. This is the place where the grass would finaly be placed.
+			int y = a_ChunkDesc.GetHeight(x, z) + 1;
 
-				// Choose what long grass meta we should use.
-				int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
-				if (GrassType < 60)
+			// Check if long grass can be placed.
+			if (
+				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
+				((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) && (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
+				)
+			{
+				continue;
+			}
+
+			// Choose what long grass meta we should use.
+			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
+			if (GrassType < 60)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 1);
+			}
+			else if (GrassType < 90)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
+			}
+			else
+			{
+				// If double long grass we have to choose what type we should use.
+				if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 1);
-				}
-				else if (GrassType < 90)
-				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
-				}
-				else
-				{
-					// If double long grass we have to choose what type we should use.
-					if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
-					{
-						NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 2 : 3;
-						a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
-						a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
-					}
+					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 2 : 3;
+					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
+					a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
 				}
 			}
 		}
