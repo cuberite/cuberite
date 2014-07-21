@@ -675,6 +675,8 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biForestHills:
 		case biTaigaHills:
 		case biExtremeHillsEdge:
+		case biExtremeHillsPlus:
+		case biExtremeHills:
 		case biJungle:
 		case biJungleHills:
 		case biJungleEdge:
@@ -747,18 +749,6 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			// instead, they provide a "from bottom" pattern with varying base height,
 			// usually 4 blocks below the ocean level
 			FillColumnMesa(a_ChunkDesc, a_RelX, a_RelZ);
-			return;
-		}
-
-		case biExtremeHillsPlus:
-		case biExtremeHills:
-		{
-			// Select the pattern to use - stone or grass:
-			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.1) ? patStone.Get() : patGrass.Get();
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
 
