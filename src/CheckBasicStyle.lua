@@ -131,12 +131,13 @@ local g_ViolationPatterns =
 	{"for%(", "Needs a space after \"for\""},
 	{"while%(", "Needs a space after \"while\""},
 	{"switch%(", "Needs a space after \"switch\""},
+	{"catch%(", "Needs a space after \"catch\""},
 	
 	-- No space after keyword's parenthesis:
 	{"[^%a#]if %( ", "Remove the space after \"(\""},
 	{"for %( ", "Remove the space after \"(\""},
 	{"while %( ", "Remove the space after \"(\""},
-	{"switch %( ", "Remove the space after \"(\""},
+	{"catch %( ", "Remove the space after \"(\""},
 	
 	-- No space before a closing parenthesis:
 	{" %)", "Remove the space before \")\""},

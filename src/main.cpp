@@ -281,11 +281,11 @@ int main( int argc, char **argv)
 		Root.Start();
 	}
 	#if !defined(ANDROID_NDK)
-	catch( std::exception& e)
+	catch (std::exception & e)
 	{
 		LOGERROR("Standard exception: %s", e.what());
 	}
-	catch( ...)
+	catch (...)
 	{
 		LOGERROR("Unknown exception!");
 	}
