@@ -86,18 +86,18 @@ protected:
 	{
 		switch (a_Biome)
 		{
-		case biSavanna:
-		case biSavannaM:
-		case biSavannaPlateau:
-		case biSavannaPlateauM:
-		case biPlains:
-		{
-						 return 70;
-		}
-		default:
-		{
-				   return 20;
-		}
+			case biSavanna:
+			case biSavannaM:
+			case biSavannaPlateau:
+			case biSavannaPlateauM:
+			case biPlains:
+			{
+				return 70;
+			}
+			default:
+			{
+				return 20;
+			}
 		}
 	}
 };
