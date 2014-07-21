@@ -8,7 +8,7 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Two spaces between code and line-end comment ("//")
 	- Spaces after comma, not before
 	- Opening braces not at the end of a code line
-	- (TODO) Spaces after if, for, while
+	- Spaces after if, for, while
 	- (TODO) Spaces before *, /, &
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
@@ -125,6 +125,21 @@ local g_ViolationPatterns =
 	
 	-- Check that opening braces are not at the end of a code line:
 	{"[^%s].-{\n?$", "Brace should be on a separate line"},
+	
+	-- Space after keywords:
+	{"[^_]if%(", "Needs a space after \"if\""},
+	{"for%(", "Needs a space after \"for\""},
+	{"while%(", "Needs a space after \"while\""},
+	{"switch%(", "Needs a space after \"switch\""},
+	
+	-- No space after keyword's parenthesis:
+	{"[^%a#]if %( ", "Remove the space after \"(\""},
+	{"for %( ", "Remove the space after \"(\""},
+	{"while %( ", "Remove the space after \"(\""},
+	{"switch %( ", "Remove the space after \"(\""},
+	
+	-- No space before a closing parenthesis:
+	{" %)", "Remove the space before \")\""},
 }
 
 
