@@ -16,7 +16,7 @@ class cWolf :
 public:
 	cWolf(void);
 
-	CLASS_PROTODEF(cWolf);
+	CLASS_PROTODEF(cWolf)
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;

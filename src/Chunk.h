@@ -380,9 +380,9 @@ public:
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorQueuedData(void) { return &m_RedstoneSimulatorQueuedData; }
 	cIncrementalRedstoneSimulator::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
-	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; };
-	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; };
-	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; };
+	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; }
+	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; }
+	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; }
 	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
 	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 

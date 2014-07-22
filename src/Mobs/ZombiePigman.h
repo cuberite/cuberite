@@ -14,7 +14,7 @@ class cZombiePigman :
 public:
 	cZombiePigman(void);
 
-	CLASS_PROTODEF(cZombiePigman);
+	CLASS_PROTODEF(cZombiePigman)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;

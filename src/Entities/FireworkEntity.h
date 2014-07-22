@@ -21,7 +21,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cFireworkEntity);
+	CLASS_PROTODEF(cFireworkEntity)
 	
 	cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item);
 	const cItem & GetItem(void) const { return m_FireworkItem; }

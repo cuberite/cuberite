@@ -20,7 +20,7 @@ class cFallingBlock :
 	typedef cEntity super;
 	
 public:
-	CLASS_PROTODEF(cFallingBlock);
+	CLASS_PROTODEF(cFallingBlock)
 
 	/// Creates a new falling block. a_BlockPosition is expected in world coords
 	cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);

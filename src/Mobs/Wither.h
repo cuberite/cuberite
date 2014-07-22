@@ -15,7 +15,7 @@ class cWither :
 public:
 	cWither(void);
 
-	CLASS_PROTODEF(cWither);
+	CLASS_PROTODEF(cWither)
 
 	unsigned int GetWitherInvulnerableTicks(void) const { return m_WitherInvulnerableTicks; }
 
