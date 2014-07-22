@@ -61,7 +61,7 @@ cWorldStorage::~cWorldStorage()
 
 
 
-bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor )
+bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor)
 {
 	m_World = a_World;
 	m_StorageSchemaName = a_StorageSchemaName;
@@ -163,7 +163,7 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ,true));
+	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, true));
 }
 
 
@@ -182,8 +182,8 @@ void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSAnvil    (m_World,a_StorageCompressionFactor));
-	m_Schemas.push_back(new cWSSCompact  (m_World,a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSCompact  (m_World, a_StorageCompressionFactor));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	

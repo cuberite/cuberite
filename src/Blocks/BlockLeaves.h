@@ -11,7 +11,7 @@
 // Leaves can be this many blocks that away (inclusive) from the log not to decay
 #define LEAVES_CHECK_DISTANCE 6
 
-#define PROCESS_NEIGHBOR(x,y,z) \
+#define PROCESS_NEIGHBOR(x, y, z) \
 	switch (a_Area.GetBlockType(x, y, z)) \
 	{ \
 		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \

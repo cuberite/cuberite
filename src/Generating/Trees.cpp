@@ -10,13 +10,6 @@
 
 
 
-// DEBUG:
-int gTotalLargeJungleTrees = 0;
-int gOversizeLargeJungleTrees = 0;
-
-
-
-
 
 typedef struct
 {
@@ -109,6 +102,7 @@ inline void PushCoordBlocks(int a_BlockX, int a_Height, int a_BlockZ, sSetBlockV
 		a_Blocks.push_back(sSetBlock(a_BlockX + a_Coords[i].x, a_Height, a_BlockZ + a_Coords[i].z, a_BlockType, a_Meta));
 	}
 }
+
 
 
 

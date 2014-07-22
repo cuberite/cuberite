@@ -570,10 +570,10 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 		{-1, 1,  0},
 		{ 0, 1,  1},
 		{ 0, 1, -1}, /* Wires one higher, surrounding self stop */
-		{ 1,-1,  0}, /* Wires one lower, surrounding self start */
-		{-1,-1,  0},
-		{ 0,-1,  1},
-		{ 0,-1, -1}, /* Wires one lower, surrounding self stop */
+		{ 1, -1,  0}, /* Wires one lower, surrounding self start */
+		{-1, -1,  0},
+		{ 0, -1,  1},
+		{ 0, -1, -1}, /* Wires one lower, surrounding self stop */
 	} ;
 
 	static const struct  // Define which directions the wire will check for repeater prescence
@@ -584,7 +584,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 		{ 1, 0, 0 },
 		{-1, 0, 0 },
 		{ 0, 0, 1 },
-		{ 0, 0,-1 },
+		{ 0, 0, -1 },
 		{ 0, 1, 0 },
 	};
 

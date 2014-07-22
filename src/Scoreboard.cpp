@@ -45,7 +45,8 @@ AString cObjective::TypeToString(eType a_Type)
 
 cObjective::eType cObjective::StringToType(const AString & a_Name)
 {
-	static struct {
+	static struct
+	{
 		eType m_Type;
 		const char * m_String;
 	} TypeMap [] =

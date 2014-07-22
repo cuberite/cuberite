@@ -30,7 +30,8 @@
 #include <sstream>
 #include <iostream>
 
-extern "C" {
+extern "C"
+{
 	#include "zlib/zlib.h"
 }
 
@@ -221,12 +222,14 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 
 	bool HasAnyPorts = false;
 	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
+	m_ListenThreadIPv4.SetReuseAddr(true);
 	if (m_ListenThreadIPv4.Initialize(Ports))
 	{
 		HasAnyPorts = true;
 	}
 
 	Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
+	m_ListenThreadIPv6.SetReuseAddr(true);
 	if (m_ListenThreadIPv6.Initialize(Ports))
 	{
 		HasAnyPorts = true;
@@ -395,7 +398,7 @@ void cServer::TickClients(float a_Dt)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				// Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
+				// Remove the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
 				RemoveClients.push_back(*itr);
 				itr = m_Clients.erase(itr);
 				continue;
@@ -628,7 +631,7 @@ void cServer::Shutdown(void)
 	cRoot::Get()->SaveAllChunks();
 
 	cCSLock Lock(m_CSClients);
-	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		(*itr)->Destroy();
 		delete *itr;

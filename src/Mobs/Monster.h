@@ -73,7 +73,7 @@ public:
 	// tolua_end
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
-	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
+	enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
 	
 	/** Creates the mob object.
 	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
@@ -107,7 +107,7 @@ public:
 	void GetMonsterConfig(const AString & a_Name);
 	
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
-	bool IsUndead(void);
+	virtual bool IsUndead(void);
 	
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);

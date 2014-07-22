@@ -126,7 +126,7 @@ void cMonster::TickPathFinding()
 		{ 1, 0},
 		{-1, 0},
 		{ 0, 1},
-		{ 0,-1},
+		{ 0, -1},
 	} ;
 	
 	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
@@ -281,7 +281,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 
 		Vector3f Distance = m_Destination - GetPosition();
-		if(!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
+		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
 			Distance.Normalize();
@@ -414,11 +414,7 @@ void cMonster::HandleFalling()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
-
-	if (PosY < 0)
-		PosY = 0;
-	else if (PosY > cChunkDef::Height)
-		PosY = cChunkDef::Height;
+	PosY = Clamp(PosY, 0, cChunkDef::Height);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{
@@ -684,16 +680,6 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 bool cMonster::IsUndead(void)
 {
-	switch (GetMobType())
-	{
-		case mtZombie:
-		case mtZombiePigman:
-		case mtSkeleton:
-		case mtWither:
-		{
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -842,13 +828,13 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(Random.NextInt(2) + 1);
+			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(Random.NextInt(1) == 0 ? false : true);
+			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
 			break;
 		}
 		case mtVillager:

@@ -474,7 +474,7 @@ int cProtocol132::ParseHandshake(void)
 	HANDLE_PACKET_READ(ReadBEInt,           int,     ServerPort);
 	m_Username = Username;
 
-	if (!m_Client->HandleHandshake( m_Username ))
+	if (!m_Client->HandleHandshake( m_Username))
 	{
 		return PARSE_OK;  // Player is not allowed into the server
 	}

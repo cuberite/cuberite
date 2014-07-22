@@ -1,3 +1,4 @@
+#!/usr/bin/env lua
 
 -- CheckBasicStyle.lua
 
@@ -6,13 +7,14 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Tabs for indentation, spaces for alignment
 	- Trailing whitespace on non-empty lines
 	- Two spaces between code and line-end comment ("//")
-	- Spaces after comma, not before (except in #define argument list)
+	- Spaces after comma, not before
+	- Opening braces not at the end of a code line
+	- Spaces after if, for, while
 	- (TODO) Spaces before *, /, &
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
-	- (TODO) Braces not on the end of line
 	- (TODO) Line dividers (////...) exactly 80 slashes
-	- (TODO) Not using "* "-style doxy comments continuation lines
+	- (TODO) Not using "* "-style doxy comment continuation lines
 	
 Violations that cannot be checked easily:
 	- Spaces around "+" (there are things like "a++", "++a", "a += 1", "X+", "stack +1" and ascii-drawn tables)
@@ -22,21 +24,7 @@ the line brings the editor directly to the violation.
 
 Returns 0 on success, 1 on internal failure, 2 if any violations found
 
-This script requires LuaFileSystem to be available in the current Lua interpreter.
 --]]
-
-
-
-
-
--- Check that LFS is installed:
-local hasLfs = pcall(require, "lfs")
-if not(hasLfs) then
-	print("This script requires LuaFileSystem to be installed")
-	os.exit(1)
-end
-local lfs = require("lfs")
-assert(lfs ~= nil)
 
 
 
@@ -52,13 +40,12 @@ local g_ShouldProcessExt =
 --- The list of files not to be processed:
 local g_IgnoredFiles =
 {
-	"./Bindings/Bindings.cpp",
-	"./Bindings/DeprecatedBindings.cpp",
-	"./LeakFinder.cpp",
-	"./LeakFinder.h",
-	"./MersenneTwister.h",
-	"./StackWalker.cpp",
-	"./StackWalker.h",
+	"Bindings/Bindings.cpp",
+	"LeakFinder.cpp",
+	"LeakFinder.h",
+	"MersenneTwister.h",
+	"StackWalker.cpp",
+	"StackWalker.h",
 }
 
 --- The list of files not to be processed, as a dictionary (filename => true), built from g_IgnoredFiles
@@ -79,8 +66,8 @@ local g_NumViolations = 0
 --- Reports one violation
 -- Pretty-prints the message
 -- Also increments g_NumViolations
-local function ReportViolation(a_FileName, a_LineNumber, a_Message)
-	print(a_FileName .. "(" .. a_LineNumber .. "): " .. a_Message)
+local function ReportViolation(a_FileName, a_LineNumber, a_PatStart, a_PatEnd, a_Message)
+	print(a_FileName .. "(" .. a_LineNumber .. "): " .. a_PatStart .. " .. " .. a_PatEnd .. ": " .. a_Message)
 	g_NumViolations = g_NumViolations + 1
 end
 
@@ -94,7 +81,7 @@ local function ReportViolationIfFound(a_Line, a_FileName, a_LineNum, a_Pattern, 
 	if not(patStart) then
 		return
 	end
-	ReportViolation(a_FileName, a_LineNum, a_Message .. "(" .. patStart .. " .. " .. patEnd .. ")")
+	ReportViolation(a_FileName, a_LineNum, patStart, patEnd, a_Message)
 end
 
 
@@ -120,7 +107,26 @@ local g_ViolationPatterns =
 	
 	-- Check that all commas have spaces after them and not in front of them:
 	{" ,", "Extra space before a \",\""},
-	{"^\t*[^#].*,[^%s]", "Needs a space after a \",\""},  -- Anywhere except lines starting with "#" - avoid #define params
+	{",[^%s\"%%]", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
+	
+	-- Check that opening braces are not at the end of a code line:
+	{"[^%s].-{\n?$", "Brace should be on a separate line"},
+	
+	-- Space after keywords:
+	{"[^_]if%(", "Needs a space after \"if\""},
+	{"for%(", "Needs a space after \"for\""},
+	{"while%(", "Needs a space after \"while\""},
+	{"switch%(", "Needs a space after \"switch\""},
+	{"catch%(", "Needs a space after \"catch\""},
+	
+	-- No space after keyword's parenthesis:
+	{"[^%a#]if %( ", "Remove the space after \"(\""},
+	{"for %( ", "Remove the space after \"(\""},
+	{"while %( ", "Remove the space after \"(\""},
+	{"catch %( ", "Remove the space after \"(\""},
+	
+	-- No space before a closing parenthesis:
+	{" %)", "Remove the space before \")\""},
 }
 
 
@@ -145,7 +151,7 @@ local function ProcessFile(a_FileName)
 	if ((lastChar ~= 13) and (lastChar ~= 10)) then
 		local numLines = 1
 		string.gsub(all, "\n", function() numLines = numLines + 1 end)  -- Count the number of line-ends
-		ReportViolation(a_FileName, numLines, "Missing empty line at file end")
+		ReportViolation(a_FileName, numLines, 1, 1, "Missing empty line at file end")
 		return
 	end
 	
@@ -178,17 +184,6 @@ local function ProcessItem(a_ItemName)
 		return
 	end
 	
-	-- If the item is a folder, recurse:
-	local attrs = lfs.attributes(a_ItemName)
-	if (attrs and (attrs.mode == "directory")) then
-		for fnam in lfs.dir(a_ItemName) do
-			if ((fnam ~= ".") and (fnam ~= "..")) then
-				ProcessItem(a_ItemName .. "/" .. fnam)
-			end
-		end
-		return
-	end
-	
 	local ext = a_ItemName:match("%.([^/%.]-)$")
 	if (g_ShouldProcessExt[ext]) then
 		ProcessFile(a_ItemName)
@@ -199,8 +194,10 @@ end
 
 
 
--- Process the entire current folder:
-ProcessItem(".")
+-- Process all files in the AllFiles.lst file (generated by cmake):
+for fnam in io.lines("AllFiles.lst") do
+	ProcessItem(fnam)
+end
 
 -- Report final verdict:
 print("Number of violations found: " .. g_NumViolations)

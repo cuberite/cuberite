@@ -7,7 +7,7 @@
 
 
 
-void cGroup::AddCommand( const AString & a_Command )
+void cGroup::AddCommand( const AString & a_Command)
 {
 	m_Commands[ a_Command ] = true;
 }
@@ -16,7 +16,7 @@ void cGroup::AddCommand( const AString & a_Command )
 
 
 
-void cGroup::AddPermission( const AString & a_Permission )
+void cGroup::AddPermission( const AString & a_Permission)
 {
 	m_Permissions[ a_Permission ] = true;
 }
@@ -25,10 +25,10 @@ void cGroup::AddPermission( const AString & a_Permission )
 
 
 
-void cGroup::InheritFrom( cGroup* a_Group )
+void cGroup::InheritFrom( cGroup* a_Group)
 {
-	m_Inherits.remove( a_Group );
-	m_Inherits.push_back( a_Group );
+	m_Inherits.remove( a_Group);
+	m_Inherits.push_back( a_Group);
 }
 
 

@@ -30,7 +30,7 @@ void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 void cSnowGolem::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	if (IsBiomeNoDownfall(m_World->GetBiomeAt((int) floor(GetPosX()), (int) floor(GetPosZ())) ))
+	if (IsBiomeNoDownfall(m_World->GetBiomeAt((int) floor(GetPosX()), (int) floor(GetPosZ()))))
 	{
 		TakeDamage(*this);
 	}

@@ -319,9 +319,9 @@ void cWindow::OwnerDestroyed()
 	// Close window for each player. Note that the last one needs special handling
 	while (m_OpenedBy.size() > 1)
 	{
-		(*m_OpenedBy.begin() )->CloseWindow();
+		(*m_OpenedBy.begin())->CloseWindow();
 	}
-	(*m_OpenedBy.begin() )->CloseWindow();
+	(*m_OpenedBy.begin())->CloseWindow();
 }
 
 

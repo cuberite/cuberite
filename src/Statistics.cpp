@@ -7,7 +7,8 @@
 
 
 
-cStatInfo cStatInfo::ms_Info[statCount] = {
+cStatInfo cStatInfo::ms_Info[statCount] =
+{
 	// The order must match the order of enum eStatistic
 
 	// http://minecraft.gamepedia.com/Achievements

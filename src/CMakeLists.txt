@@ -5,144 +5,148 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
-set(FOLDERS OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++)
-set(FOLDERS ${FOLDERS} WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs)
+set(FOLDERS
+	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
+	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs
+)
 
-set(BINDING_DEPENDECIES
-	tolua
-	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/virtual_method_hooks.lua
-	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/AllToLua.pkg
-	Bindings/gen_LuaState_Call.lua
-	Bindings/LuaFunctions.h
-	Bindings/LuaWindow.h
-	Bindings/Plugin.h
-	Bindings/PluginLua.h
-	Bindings/PluginManager.h
-	Bindings/WebPlugin.h
+SET (SRCS
+	BiomeDef.cpp
+	BlockArea.cpp
+	BlockID.cpp
+	BlockInfo.cpp
+	BoundingBox.cpp
+	ByteBuffer.cpp
+	ChatColor.cpp
+	Chunk.cpp
+	ChunkData.cpp
+	ChunkMap.cpp
+	ChunkSender.cpp
+	ChunkStay.cpp
+	ClientHandle.cpp
+	CommandOutput.cpp
+	CompositeChat.cpp
+	CraftingRecipes.cpp
+	Cuboid.cpp
+	DeadlockDetect.cpp
+	Enchantments.cpp
+	FastRandom.cpp
+	FurnaceRecipe.cpp
+	Globals.cpp
+	Group.cpp
+	GroupManager.cpp
+	Inventory.cpp
+	Item.cpp
+	ItemGrid.cpp
+	LightingThread.cpp
+	LineBlockTracer.cpp
+	LinearInterpolation.cpp
+	Log.cpp
+	MCLogger.cpp
+	Map.cpp
+	MapManager.cpp
+	MobCensus.cpp
+	MobFamilyCollecter.cpp
+	MobProximityCounter.cpp
+	MobSpawner.cpp
+	MonsterConfig.cpp
+	Noise.cpp
+	ProbabDistrib.cpp
+	RCONServer.cpp
+	Root.cpp
+	Scoreboard.cpp
+	Server.cpp
+	Statistics.cpp
+	StringCompression.cpp
+	StringUtils.cpp
+	Tracer.cpp
+	VoronoiMap.cpp
+	WebAdmin.cpp
+	World.cpp
+	main.cpp)
+
+SET (HDRS
+	AllocationPool.h
 	BiomeDef.h
 	BlockArea.h
-	BlockEntities/BlockEntity.h
-	BlockEntities/BlockEntityWithItems.h
-	BlockEntities/ChestEntity.h
-	BlockEntities/DispenserEntity.h
-	BlockEntities/DropSpenserEntity.h
-	BlockEntities/DropperEntity.h
-	BlockEntities/FurnaceEntity.h
-	BlockEntities/HopperEntity.h
-	BlockEntities/JukeboxEntity.h
-	BlockEntities/NoteEntity.h
-	BlockEntities/SignEntity.h
-	BlockEntities/MobHeadEntity.h
-	BlockEntities/FlowerPotEntity.h
 	BlockID.h
+	BlockInServerPluginInterface.h
+	BlockInfo.h
+	BlockTracer.h
 	BoundingBox.h
+	ByteBuffer.h
 	ChatColor.h
+	Chunk.h
+	ChunkData.h
+	ChunkDataCallback.h
 	ChunkDef.h
+	ChunkMap.h
+	ChunkSender.h
+	ChunkStay.h
 	ClientHandle.h
+	CommandOutput.h
+	CompositeChat.h
 	CraftingRecipes.h
 	Cuboid.h
+	DeadlockDetect.h
 	Defines.h
 	Enchantments.h
-	Entities/EntityEffect.h
-	Entities/Entity.h
-	Entities/Floater.h
-	Entities/Pawn.h
-	Entities/Painting.h
-	Entities/Pickup.h
-	Entities/Player.h
-	Entities/ProjectileEntity.h
-	Entities/ArrowEntity.h
-	Entities/ThrownEggEntity.h
-	Entities/ThrownEnderPearlEntity.h
-	Entities/ExpBottleEntity.h
-	Entities/ThrownSnowballEntity.h
-	Entities/FireChargeEntity.h
-	Entities/FireworkEntity.h
-	Entities/GhastFireballEntity.h
-	Entities/TNTEntity.h
-	Entities/ExpOrb.h
-	Entities/HangingEntity.h
-	Entities/ItemFrame.h
-	Generating/ChunkDesc.h
+	Endianness.h
+	FastRandom.h
+	ForEachChunkProvider.h
+	FurnaceRecipe.h
+	Globals.h
 	Group.h
+	GroupManager.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
-	Mobs/Monster.h
-	OSSupport/File.h
+	LeakFinder.h
+	LightingThread.h
+	LineBlockTracer.h
+	LinearInterpolation.h
+	LinearUpscale.h
+	Log.h
+	MCLogger.h
+	Map.h
+	MapManager.h
+	Matrix4.h
+	MemoryLeak.h
+	MersenneTwister.h
+	MobCensus.h
+	MobFamilyCollecter.h
+	MobProximityCounter.h
+	MobSpawner.h
+	MonsterConfig.h
+	Noise.h
+	ProbabDistrib.h
+	RCONServer.h
 	Root.h
+	Scoreboard.h
 	Server.h
+	StackWalker.h
+	Statistics.h
+	StringCompression.h
 	StringUtils.h
 	Tracer.h
-	UI/Window.h
 	Vector3.h
+	VoronoiMap.h
 	WebAdmin.h
 	World.h
-)
+	XMLParser.h)
 
-# List all the files that are generated as part of the Bindings build process
-set (BINDING_OUTPUTS
-	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
-	${CMAKE_CURRENT_SOURCE_DIR}/Bindings/LuaState_Call.inc
-)
-
-include_directories(Bindings)
-include_directories(.)
-
-if (WIN32)
-	ADD_CUSTOM_COMMAND(
-		OUTPUT ${BINDING_OUTPUTS}
-
-		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different ../../MCServer/lua51.dll ./lua51.dll
-
-		# Regenerate bindings:
-		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
-
-		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDECIES}
-	)
-else ()
-	ADD_CUSTOM_COMMAND(
-		# add any new generated bindings here
-		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.cpp ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/Bindings.h
-
-		# Regenerate bindings:
-		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
-		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
-
-		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDECIES}
-	)
-endif ()
-set_source_files_properties(Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
-set_source_files_properties(Bindings/Bindings.h PROPERTIES GENERATED TRUE)
+include_directories(".")
 
 if (NOT MSVC)
-
 	# Bindings need to reference other folders, so they are done here instead
-	
 	# lib dependencies are not included
-	
 	include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
 
-	#add cpp files here
-	add_library(Bindings
-		Bindings/Bindings
-		Bindings/DeprecatedBindings
-		Bindings/LuaChunkStay
-		Bindings/LuaState
-		Bindings/LuaWindow
-		Bindings/ManualBindings
-		Bindings/Plugin
-		Bindings/PluginLua
-		Bindings/PluginManager
-		Bindings/WebPlugin
-	)
+	foreach(folder ${FOLDERS})
+		add_subdirectory(${folder})
+	endforeach(folder)
 
-	target_link_libraries(Bindings lua sqlite tolualib polarssl)
+	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
 	#clear file
 	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
@@ -153,43 +157,19 @@ if (NOT MSVC)
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
 
-	foreach(folder ${FOLDERS})
-		add_subdirectory(${folder})
-	endforeach(folder)
-
-	file(GLOB SOURCE
-		"*.cpp"
-		"*.h"
-	)
-
-	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/StackWalker.cpp" "${PROJECT_SOURCE_DIR}/LeakFinder.cpp")
+	list(APPEND SOURCE "${SRCS}")
+	list(APPEND SOURCE "${HDRS}")
 
 	# If building a windows version, but not using MSVC, add the resources directly to the makefile:
 	if (WIN32)
-		FILE(GLOB ResourceFiles
-			"Resources/*.rc"
-		)
-		list(APPEND SOURCE "${ResourceFiles}")
+		list(APPEND SOURCE "Resources/MCServer.rc")
 	endif()
-
-
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
 
-	# Get all files in this folder:
-	file(GLOB_RECURSE SOURCE
-		"*.cpp"
-		"*.h"
-		"*.pkg"
-	)
-	source_group("" FILES ${SOURCE})
-
-	LIST(APPEND SOURCE "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
 	# Add all subfolders as solution-folders:
-	list(APPEND FOLDERS "Resources")
-	list(APPEND FOLDERS "Bindings")
 	function(includefolder PATH)
 		FILE(GLOB FOLDER_FILES
 			"${PATH}/*.cpp"
@@ -202,8 +182,28 @@ else ()
 	endfunction(includefolder)
 
 	foreach(folder ${FOLDERS})
+		add_subdirectory(${folder})
 		includefolder(${folder})
+
+		# Get all source files in this folder:
+		get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
+		foreach (src ${FOLDER_SRCS})
+			list(APPEND SOURCE "${folder}/${src}")
+		endforeach(src)
+
+		# Get all headers in this folder:
+		get_directory_property(FOLDER_HDRS DIRECTORY ${folder} DEFINITION HDRS)
+		foreach (hdr ${FOLDER_HDRS})
+			list(APPEND SOURCE "${folder}/${hdr}")
+		endforeach(hdr)
 	endforeach(folder)
+
+	list(APPEND SOURCE "${SRCS}")
+	list(APPEND SOURCE "${HDRS}")
+	list(APPEND SOURCE "Bindings/AllToLua.pkg")
+
+	includefolder("Resources")
+	source_group("" FILES ${SOURCE})
 
 	include_directories("${PROJECT_SOURCE_DIR}")
 
@@ -228,7 +228,46 @@ else ()
 	set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /DEBUG")
 endif()
 
+
+# Generate a list of all source files:
+set(ALLFILES "")
+foreach(folder ${FOLDERS})
+	get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
+	foreach (src ${FOLDER_SRCS})
+		list(APPEND ALLFILES "${folder}/${src}")
+	endforeach(src)
+
+	get_directory_property(FOLDER_HDRS DIRECTORY ${folder} DEFINITION HDRS)
+	foreach (hdr ${FOLDER_HDRS})
+		list(APPEND ALLFILES "${folder}/${hdr}")
+	endforeach(hdr)
+endforeach(folder)
+foreach(arg ${ALLFILES})
+	set(ALLFILESLINES "${ALLFILESLINES}${arg}\n")
+endforeach()
+FILE(WRITE "AllFiles.lst" "${ALLFILESLINES}")
+
+
 set(EXECUTABLE MCServer)
+
+if (MSVC)
+	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
+	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
+
+	ADD_CUSTOM_COMMAND(
+		OUTPUT ${BINDING_OUTPUTS}
+
+		# Copy the Lua DLL into the Bindings folder, so that tolua can run from there:
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/MCServer/lua51.dll ./lua51.dll
+
+		# Regenerate bindings:
+		COMMAND tolua -L virtual_method_hooks.lua -o Bindings.cpp -H Bindings.h AllToLua.pkg
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
+
+		# add any new generation dependencies here
+		DEPENDS ${BINDING_DEPENDECIES}
+	)
+endif()
 
 add_executable(${EXECUTABLE} ${SOURCE})
 
@@ -261,9 +300,11 @@ endif ()
 
 
 if (NOT MSVC)
-	target_link_libraries(${EXECUTABLE} OSSupport HTTPServer Bindings Items Blocks)
-	target_link_libraries(${EXECUTABLE} Protocol Generating Generating_Prefabs WorldStorage)
-	target_link_libraries(${EXECUTABLE} Mobs Entities Simulator UI BlockEntities PolarSSL++)
+	target_link_libraries(${EXECUTABLE}
+		OSSupport HTTPServer Bindings Items Blocks
+		Protocol Generating Generating_Prefabs WorldStorage
+		Mobs Entities Simulator UI BlockEntities PolarSSL++
+	)
 endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)

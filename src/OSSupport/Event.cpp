@@ -32,7 +32,7 @@ cEvent::cEvent(void)
 
 		AString EventName;
 		Printf(EventName, "cEvent%p", this);
-		m_Event = sem_open(EventName.c_str(), O_CREAT, 777, 0 );
+		m_Event = sem_open(EventName.c_str(), O_CREAT, 777, 0);
 		if (m_Event == SEM_FAILED)
 		{
 			AString error = GetOSErrorString(errno);
@@ -90,7 +90,7 @@ void cEvent::Wait(void)
 		}
 	#else
 		int res = sem_wait(m_Event);
-		if (res != 0 )
+		if (res != 0)
 		{
 			AString error = GetOSErrorString(errno);
 			LOGWARN("cEvent: waiting for the event failed: %i, err = %s. Continuing, but server may be unstable.", res, error.c_str());

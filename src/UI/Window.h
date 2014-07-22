@@ -77,7 +77,7 @@ public:
 	int GetWindowType(void) const { return m_WindowType; }  // tolua_export
 
 	cWindowOwner * GetOwner(void) { return m_Owner; }
-	void SetOwner( cWindowOwner * a_Owner ) { m_Owner = a_Owner; }
+	void SetOwner( cWindowOwner * a_Owner) { m_Owner = a_Owner; }
 	
 	/// Returns the total number of slots
 	int GetNumSlots(void) const;
@@ -134,7 +134,7 @@ public:
 	// tolua_begin
 	
 	const AString & GetWindowTitle() const { return m_WindowTitle; }
-	void SetWindowTitle(const AString & a_WindowTitle ) { m_WindowTitle = a_WindowTitle; }
+	void SetWindowTitle(const AString & a_WindowTitle) { m_WindowTitle = a_WindowTitle; }
 	
 	/// Sends the UpdateWindowProperty (0x69) packet to all clients of the window
 	virtual void SetProperty(int a_Property, int a_Value);

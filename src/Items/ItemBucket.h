@@ -117,7 +117,7 @@ public:
 				return false;
 			}
 			cItem Item(E_ITEM_BUCKET, 1);
-			if (!a_Player->GetInventory().AddItem(Item,true,true))
+			if (!a_Player->GetInventory().AddItem(Item, true, true))
 			{
 				return false;
 			}

@@ -151,6 +151,24 @@ int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a
 
 
 
+int cInventory::RemoveItem(const cItem & a_ItemStack)
+{
+	int RemovedItems = m_HotbarSlots.RemoveItem(a_ItemStack);
+
+	if (RemovedItems < a_ItemStack.m_ItemCount)
+	{
+		cItem Temp(a_ItemStack);
+		Temp.m_ItemCount -= RemovedItems;
+		RemovedItems += m_InventorySlots.RemoveItem(Temp);
+	}
+
+	return RemovedItems;
+}
+
+
+
+
+
 bool cInventory::RemoveOneEquippedItem(void)
 {
 	if (m_HotbarSlots.GetSlot(m_EquippedSlotNum).IsEmpty())
@@ -479,21 +497,21 @@ int cInventory::ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum)
 
 
 #if 0
-bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */ )
+bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */)
 {
 	// Fill already present stacks
-	if( a_Mode < 2 )
+	if (a_Mode < 2)
 	{
 		int MaxStackSize = cItemHandler::GetItemHandler(a_Item.m_ItemType)->GetMaxStackSize();
-		for(int i = 0; i < a_Size; i++)
+		for (int i = 0; i < a_Size; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemDamage == a_Item.m_ItemDamage )
+			if (m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemDamage == a_Item.m_ItemDamage)
 			{
 				int NumFree = MaxStackSize - m_Slots[i + a_Offset].m_ItemCount;
-				if( NumFree >= a_Item.m_ItemCount )
+				if (NumFree >= a_Item.m_ItemCount)
 				{
 
-					// printf("1. Adding %i items ( free: %i )\n", a_Item.m_ItemCount, NumFree );
+					// printf("1. Adding %i items ( free: %i)\n", a_Item.m_ItemCount, NumFree);
 					m_Slots[i + a_Offset].m_ItemCount += a_Item.m_ItemCount;
 					a_Item.m_ItemCount = 0;
 					a_bChangedSlots[i + a_Offset] = true;
@@ -501,7 +519,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 				}
 				else
 				{
-					// printf("2. Adding %i items\n", NumFree );
+					// printf("2. Adding %i items\n", NumFree);
 					m_Slots[i + a_Offset].m_ItemCount += (char)NumFree;
 					a_Item.m_ItemCount -= (char)NumFree;
 					a_bChangedSlots[i + a_Offset] = true;
@@ -510,12 +528,12 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 		}
 	}
 
-	if( a_Mode > 0 )
+	if (a_Mode > 0)
 	{
 		// If we got more left, find first empty slot
-		for(int i = 0; i < a_Size && a_Item.m_ItemCount > 0; i++)
+		for (int i = 0; i < a_Size && a_Item.m_ItemCount > 0; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemType == -1 )
+			if (m_Slots[i + a_Offset].m_ItemType == -1)
 			{
 				m_Slots[i + a_Offset] = a_Item;
 				a_Item.m_ItemCount = 0;

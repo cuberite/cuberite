@@ -50,6 +50,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_IsSubmerged(false)
 	, m_AirLevel(0)
 	, m_AirTickTimer(0)
+	, m_TicksAlive(0)
 	, m_HeadYaw(0.0)
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
@@ -328,10 +329,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	
 	// TODO: Apply damage to armor
 	
-	if (m_Health < 0)
-	{
-		m_Health = 0;
-	}
+	m_Health = std::max(m_Health, 0);
 
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{
@@ -563,6 +561,8 @@ void cEntity::SetHealth(int a_Health)
 
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	m_TicksAlive++;
+	
 	if (m_InvulnerableTicks > 0)
 	{
 		m_InvulnerableTicks--;
@@ -650,7 +650,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
 	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
@@ -760,7 +760,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
 
-	switch(WaterDir)
+	switch (WaterDir)
 	{
 		case X_PLUS:
 			m_WaterSpeed.x = 0.2f;
@@ -1324,10 +1324,7 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 	m_MaxHealth = a_MaxHealth;
 
 	// Reset health, if too high:
-	if (m_Health > a_MaxHealth)
-	{
-		m_Health = a_MaxHealth;
-	}
+	m_Health = std::min(m_Health, a_MaxHealth);
 }
 
 
