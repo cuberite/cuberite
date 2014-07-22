@@ -579,6 +579,11 @@ void cWorld::Start(void)
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
 	m_TimeOfDay                   = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
 
+	if (GetDimension() == dimOverworld)
+	{
+		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", DEFAULT_NETHER_NAME);
+		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", DEFAULT_END_NAME);
+	}
 	else
 	{
 		m_OverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
