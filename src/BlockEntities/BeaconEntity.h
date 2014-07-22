@@ -33,7 +33,7 @@ public:
 	static bool IsMineralBlock(BLOCKTYPE a_BlockType);
 	
 	// cBlockEntity overrides:
-	virtual void SaveToJson(Json::Value& a_Value )  override;
+	virtual void SaveToJson(Json::Value& a_Value)  override;
 	virtual void SendTo(cClientHandle & a_Client)   override;
 	virtual void UsedBy(cPlayer * a_Player)         override;
 	virtual bool Tick(float a_Dt, cChunk & /* a_Chunk */) override;

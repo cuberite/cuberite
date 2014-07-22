@@ -253,7 +253,7 @@ float cHeiGenClassic::GetNoise(float x, float y)
 	float oct2 = m_Noise.CubicNoise2D(x * m_HeightFreq2, y * m_HeightFreq2) * m_HeightAmp2;
 	float oct3 = m_Noise.CubicNoise2D(x * m_HeightFreq3, y * m_HeightFreq3) * m_HeightAmp3;
 
-	float height = m_Noise.CubicNoise2D(x * 0.1f, y * 0.1f ) * 2;
+	float height = m_Noise.CubicNoise2D(x * 0.1f, y * 0.1f) * 2;
 
 	float flatness = ((m_Noise.CubicNoise2D(x * 0.5f, y * 0.5f) + 1.f) * 0.5f) * 1.1f;  // 0 ... 1.5
 	flatness *= flatness * flatness;

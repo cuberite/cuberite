@@ -617,7 +617,7 @@ void cWorld::Start(void)
 	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
 
 	m_Lighting.Start(this);
-	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor );
+	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
 	m_Generator.Start(m_GeneratorCallbacks, m_GeneratorCallbacks, IniFile);
 	m_ChunkSender.Start(this);
 	m_TickThread.Start();
@@ -865,14 +865,14 @@ void cWorld::TickMobs(float a_Dt)
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
+	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allCloseEnoughToMoveMobs.m_Begin; itr != allCloseEnoughToMoveMobs.m_End; ++itr)
 	{
 		itr->second.m_Monster.Tick(a_Dt, itr->second.m_Chunk);
 	}
 
 	// remove too far mobs
 	cMobProximityCounter::sIterablePair allTooFarMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(128 * 16, -1);// MG TODO : deal with this magic number (the 16 is the size of a block)
-	for(cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; ++itr)
+	for (cMobProximityCounter::tDistanceToMonster::const_iterator itr = allTooFarMobs.m_Begin; itr != allTooFarMobs.m_End; ++itr)
 	{
 		itr->second.m_Monster.Destroy(true);
 	}
@@ -2469,7 +2469,7 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 		{
 			if (a_CheckLineOfSight)
 			{
-				if(!LineOfSight.Trace(a_Pos, (Pos - a_Pos), (int)(Pos - a_Pos).Length()))
+				if (!LineOfSight.Trace(a_Pos, (Pos - a_Pos), (int)(Pos - a_Pos).Length()))
 				{
 					ClosestDistance = Distance;
 					ClosestPlayer = *itr;

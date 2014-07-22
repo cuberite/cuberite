@@ -1587,7 +1587,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			ASSERT(!"Read wrong number of bytes!");
 			m_Client->PacketError(PacketType);
 		}
-	}  // for(ever)
+	}  // for (ever)
 	
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))

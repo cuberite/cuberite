@@ -141,7 +141,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 		SkyLight = a_Chunk->GetTimeAlteredLight(SkyLight);
 
-		switch(a_MobType)
+		switch (a_MobType)
 		{
 			case cMonster::mtSquid:
 			{
@@ -208,7 +208,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				bool HasFloor = false;
 				for (int x = 0; x < 2; ++x)
 				{
-					for(int z = 0; z < 2; ++z)
+					for (int z = 0; z < 2; ++z)
 					{
 						CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY, a_RelZ + z, TargetBlock);
 						CanSpawn = CanSpawn && (TargetBlock == E_BLOCK_AIR);

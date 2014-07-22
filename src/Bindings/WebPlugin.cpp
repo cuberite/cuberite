@@ -45,12 +45,12 @@ cWebPlugin::~cWebPlugin()
 std::list<std::pair<AString, AString> > cWebPlugin::GetTabNames(void)
 {
 	std::list< std::pair< AString, AString > > NameList;
-	for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
+	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
 		std::pair< AString, AString > StringPair;
 		StringPair.first = (*itr)->Title;
 		StringPair.second = (*itr)->SafeTitle;
-		NameList.push_back( StringPair );
+		NameList.push_back( StringPair);
 	}
 	return NameList;
 }
@@ -69,7 +69,7 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 		sWebPluginTab * Tab = NULL;
 		if (Split.size() > 2)  // If we got the tab name, show that page
 		{
-			for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
+			for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 			{
 				if ((*itr)->SafeTitle.compare(Split[2]) == 0)  // This is the one!
 				{
@@ -80,7 +80,7 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 		}
 		else  // Otherwise show the first tab
 		{
-			if( GetTabs().size() > 0 )
+			if (GetTabs().size() > 0)
 				Tab = *GetTabs().begin();
 		}
 
@@ -100,14 +100,14 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 AString cWebPlugin::SafeString(const AString & a_String)
 {
 	AString RetVal;
-	for( unsigned int i = 0; i < a_String.size(); ++i )
+	for (unsigned int i = 0; i < a_String.size(); ++i)
 	{
 		char c = a_String[i];
-		if( c == ' ' )
+		if (c == ' ')
 		{
 			c = '_';
 		}
-		RetVal.push_back( c );
+		RetVal.push_back( c);
 	}
 	return RetVal;
 }

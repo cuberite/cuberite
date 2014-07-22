@@ -191,8 +191,8 @@ void cRoot::Start(void)
 
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
-		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
+		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread");
+		m_InputThread->Start( false);  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -269,12 +269,12 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 {
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
+	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
 	unsigned int KeyNum = IniFile.FindKey("Worlds");
-	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum );
+	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum);
 	if (NumWorlds <= 0)
 	{
 		return;
@@ -283,18 +283,18 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 	bool FoundAdditionalWorlds = false;
 	for (unsigned int i = 0; i < NumWorlds; i++)
 	{
-		AString ValueName = IniFile.GetValueName(KeyNum, i );
+		AString ValueName = IniFile.GetValueName(KeyNum, i);
 		if (ValueName.compare("World") != 0)
 		{
 			continue;
 		}
-		AString WorldName = IniFile.GetValue(KeyNum, i );
+		AString WorldName = IniFile.GetValue(KeyNum, i);
 		if (WorldName.empty())
 		{
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld* NewWorld = new cWorld( WorldName.c_str() );
+		cWorld* NewWorld = new cWorld( WorldName.c_str());
 		m_WorldsByName[ WorldName ] = NewWorld;
 	}  // for i - Worlds
 
@@ -359,7 +359,7 @@ void cRoot::StopWorlds(void)
 void cRoot::UnloadWorlds(void)
 {
 	m_pDefaultWorld = NULL;
-	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		delete itr->second;
 	}
@@ -379,10 +379,10 @@ cWorld* cRoot::GetDefaultWorld()
 
 
 
-cWorld* cRoot::GetWorld( const AString & a_WorldName )
+cWorld* cRoot::GetWorld( const AString & a_WorldName)
 {
-	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName );
-	if( itr != m_WorldsByName.end() )
+	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName);
+	if (itr != m_WorldsByName.end())
 		return itr->second;
 	return 0;
 }
@@ -509,7 +509,7 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AStri
 int cRoot::GetTotalChunkCount(void)
 {
 	int res = 0;
-	for ( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		res += itr->second->GetNumChunks();
 	}

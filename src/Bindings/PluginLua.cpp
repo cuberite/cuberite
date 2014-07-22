@@ -1655,7 +1655,7 @@ int cPluginLua::CallFunctionFromForeignState(
 
 
 
-AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
+AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request)
 {
 	cCSLock Lock(m_CriticalSection);
 	std::string RetVal = "";

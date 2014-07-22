@@ -281,7 +281,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 
 		Vector3f Distance = m_Destination - GetPosition();
-		if(!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
+		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
 			Distance.Normalize();

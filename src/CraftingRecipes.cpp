@@ -582,7 +582,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	// Get the real bounds of the crafting grid:
 	int GridLeft = MAX_GRID_WIDTH, GridTop = MAX_GRID_HEIGHT;
 	int GridRight = 0,  GridBottom = 0;
-	for (int y = 0; y < a_GridHeight; y++ ) for(int x = 0; x < a_GridWidth; x++)
+	for (int y = 0; y < a_GridHeight; y++) for (int x = 0; x < a_GridWidth; x++)
 	{
 		if (!a_CraftingGrid[x + y * a_GridWidth].IsEmpty())
 		{

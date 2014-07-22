@@ -3,7 +3,7 @@
 
 #include "Errors.h"
 
-AString GetOSErrorString( int a_ErrNo )
+AString GetOSErrorString( int a_ErrNo)
 {
 	char buffer[ 1024 ];
 	AString Out;
@@ -22,10 +22,10 @@ AString GetOSErrorString( int a_ErrNo )
 	
 	// According to http://linux.die.net/man/3/strerror_r there are two versions of strerror_r():
 	
-	#if !defined(__APPLE__) && ( _GNU_SOURCE ) && !defined(ANDROID_NDK)  // GNU version of strerror_r()
+	#if !defined(__APPLE__) && ( _GNU_SOURCE) && !defined(ANDROID_NDK)  // GNU version of strerror_r()
 	
-	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res != NULL )
+	char * res = strerror_r( errno, buffer, ARRAYCOUNT(buffer));
+	if (res != NULL)
 	{
 		Printf(Out, "%d: %s", a_ErrNo, res);
 		return Out;
@@ -33,8 +33,8 @@ AString GetOSErrorString( int a_ErrNo )
 	
 	#else  // XSI version of strerror_r():
 	
-	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer) );
-	if( res == 0 )
+	int res = strerror_r( errno, buffer, ARRAYCOUNT(buffer));
+	if (res == 0)
 	{
 		Printf(Out, "%d: %s", a_ErrNo, buffer);
 		return Out;

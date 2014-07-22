@@ -234,7 +234,7 @@ void LOG(const char* a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
-	cMCLogger::GetInstance()->Log( a_Format, argList );
+	cMCLogger::GetInstance()->Log( a_Format, argList);
 	va_end(argList);
 }
 
@@ -242,7 +242,7 @@ void LOGINFO(const char* a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
-	cMCLogger::GetInstance()->Info( a_Format, argList );
+	cMCLogger::GetInstance()->Info( a_Format, argList);
 	va_end(argList);
 }
 
@@ -250,7 +250,7 @@ void LOGWARN(const char* a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
-	cMCLogger::GetInstance()->Warn( a_Format, argList );
+	cMCLogger::GetInstance()->Warn( a_Format, argList);
 	va_end(argList);
 }
 
@@ -258,7 +258,7 @@ void LOGERROR(const char* a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
-	cMCLogger::GetInstance()->Error( a_Format, argList );
+	cMCLogger::GetInstance()->Error( a_Format, argList);
 	va_end(argList);
 }
 

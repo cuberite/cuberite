@@ -174,7 +174,7 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 ////////////////////////////////////////////////////////////////////////////////
 // main:
 
-int main( int argc, char **argv )
+int main( int argc, char **argv)
 {
 	UNUSED(argc);
 	UNUSED(argv);
@@ -218,7 +218,7 @@ int main( int argc, char **argv )
 	#endif
 	
 	#if defined(_DEBUG) && defined(_MSC_VER)
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
 	// _X: The simple built-in CRT leak finder - simply break when allocating the Nth block ({N} is listed in the leak output)
 	// Only useful when the leak is in the same sequence all the time
@@ -281,11 +281,11 @@ int main( int argc, char **argv )
 		Root.Start();
 	}
 	#if !defined(ANDROID_NDK)
-	catch( std::exception& e )
+	catch (std::exception & e)
 	{
-		LOGERROR("Standard exception: %s", e.what() );
+		LOGERROR("Standard exception: %s", e.what());
 	}
-	catch( ... )
+	catch (...)
 	{
 		LOGERROR("Unknown exception!");
 	}

@@ -756,7 +756,7 @@ void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_Block
 
 
 
-void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
@@ -1021,9 +1021,9 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i",
 				Server->GetDescription().c_str(),
-				cChatColor::Delimiter.c_str(),
+				cChatColor::Delimiter,
 				Server->GetNumPlayers(),
-				cChatColor::Delimiter.c_str(),
+				cChatColor::Delimiter,
 				Server->GetMaxPlayers()
 			);
 			break;

@@ -159,18 +159,18 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	{
 		Vector3i *Pos = (*it);
 		char BlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
-		if(IsAllowedBlock(BlockID))
+		if (IsAllowedBlock(BlockID))
 		{
 			char Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
 
-			if(Meta > LowestPoint)
+			if (Meta > LowestPoint)
 			{
 				LowestPoint = Meta;
 				X = Pos->x;
 				Z = Pos->z;
 			}
 		}
-		else if(BlockID == E_BLOCK_AIR)
+		else if (BlockID == E_BLOCK_AIR)
 		{
 			LowestPoint = 9;  // This always dominates
 			X = Pos->x;

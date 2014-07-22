@@ -3,7 +3,7 @@
 class cSemaphore
 {
 public:
-	cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount = 0 );
+	cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount = 0);
 	~cSemaphore();
 
 	void Wait();

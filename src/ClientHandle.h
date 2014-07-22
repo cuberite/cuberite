@@ -181,7 +181,7 @@ public:
 	void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-	void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 	void SendWeather             (eWeather a_Weather);
 	void SendWholeInventory      (const cWindow & a_Window);
 	void SendWindowClose         (const cWindow & a_Window);
@@ -190,7 +190,7 @@ public:
 
 	// tolua_begin
 	const AString & GetUsername(void) const;
-	void SetUsername( const AString & a_Username );
+	void SetUsername( const AString & a_Username);
 	
 	inline short GetPing(void) const { return m_Ping; }
 	
@@ -274,7 +274,7 @@ private:
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
-	/** Number of chunks the player can see in each direction; 4 is the minimum ( http://wiki.vg/Protocol_FAQ#.E2.80.A6all_connecting_clients_spasm_and_jerk_uncontrollably.21 ) */
+	/** Number of chunks the player can see in each direction */
 	int m_ViewDistance;
 	
 	/** Server generates this many chunks AHEAD of player sight. */

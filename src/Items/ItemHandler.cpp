@@ -94,7 +94,7 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 
 cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 {
-	switch(a_ItemType)
+	switch (a_ItemType)
 	{
 		default:                       return new cItemHandler(a_ItemType);
 		
@@ -263,7 +263,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 
 void cItemHandler::Deinit()
 {
-	for(int i = 0; i < 2267; i++)
+	for (int i = 0; i < 2267; i++)
 	{
 		delete m_ItemHandler[i];
 		m_ItemHandler[i] = NULL;

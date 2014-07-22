@@ -27,8 +27,8 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ );
-	Vector3i Direction = MetaDataToDirection( OldMeta & 0x7 );
+	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ);
+	Vector3i Direction = MetaDataToDirection( OldMeta & 0x7);
 	if (OldMeta & 0x8)
 	{
 		// Was pillow

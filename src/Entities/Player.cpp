@@ -140,7 +140,7 @@ cPlayer::~cPlayer(void)
 
 	SaveToDisk();
 
-	m_World->RemovePlayer( this );
+	m_World->RemovePlayer( this);
 
 	m_ClientHandle = NULL;
 	
@@ -173,11 +173,11 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	}
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
-	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
-	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
-	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
-	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
-	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
+	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());
+	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots());
+	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings());
+	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate());
+	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet());
 }
 
 
@@ -286,19 +286,19 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 short cPlayer::CalcLevelFromXp(short a_XpTotal)
 {
 	// level 0 to 15
-	if(a_XpTotal <= XP_TO_LEVEL15)
+	if (a_XpTotal <= XP_TO_LEVEL15)
 	{
 		return a_XpTotal / XP_PER_LEVEL_TO15;
 	}
 
 	// level 30+
-	if(a_XpTotal > XP_TO_LEVEL30)
+	if (a_XpTotal > XP_TO_LEVEL30)
 	{
 		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
 	// level 16 to 30
-	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
+	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3;
 }
 
 
@@ -308,19 +308,19 @@ short cPlayer::CalcLevelFromXp(short a_XpTotal)
 short cPlayer::XpForLevel(short a_Level)
 {
 	// level 0 to 15
-	if(a_Level <= 15)
+	if (a_Level <= 15)
 	{
 		return a_Level * XP_PER_LEVEL_TO15;
 	}
 
 	// level 30+
-	if(a_Level >= 31)
+	if (a_Level >= 31)
 	{
-		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
+		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220);
 	}
 
 	// level 16 to 30
-	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
+	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360);
 }
 
 
@@ -351,7 +351,7 @@ float cPlayer::GetXpPercentage()
 
 bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 {
-	if(!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false;  // oops, they gave us a dodgey number
@@ -1007,7 +1007,7 @@ double cPlayer::GetEyeHeight(void) const
 
 Vector3d cPlayer::GetEyePosition(void) const
 {
-	return Vector3d( GetPosX(), m_Stance, GetPosZ() );
+	return Vector3d( GetPosX(), m_Stance, GetPosZ());
 }
 
 
@@ -1169,7 +1169,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 
 
 
-void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
+void cPlayer::LoginSetGameMode( eGameMode a_GameMode)
 {
 	m_GameMode = a_GameMode;
 }
@@ -1305,7 +1305,7 @@ void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 
 
-void cPlayer::MoveTo( const Vector3d & a_NewPos )
+void cPlayer::MoveTo( const Vector3d & a_NewPos)
 {
 	if ((a_NewPos.y < -990) && (GetPosY() > -100))
 	{
@@ -1328,7 +1328,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	Vector3d DeltaPos = a_NewPos - GetPosition();
 	UpdateMovementStats(DeltaPos);
 	
-	SetPosition( a_NewPos );
+	SetPosition( a_NewPos);
 	SetStance(a_NewPos.y + 1.62);
 }
 
@@ -1354,11 +1354,11 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
-void cPlayer::AddToGroup( const AString & a_GroupName )
+void cPlayer::AddToGroup( const AString & a_GroupName)
 {
-	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
-	m_Groups.push_back( Group );
-	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str() );
+	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName);
+	m_Groups.push_back( Group);
+	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str());
 	ResolveGroups();
 	ResolvePermissions();
 }
@@ -1367,28 +1367,28 @@ void cPlayer::AddToGroup( const AString & a_GroupName )
 
 
 
-void cPlayer::RemoveFromGroup( const AString & a_GroupName )
+void cPlayer::RemoveFromGroup( const AString & a_GroupName)
 {
 	bool bRemoved = false;
-	for( GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr )
+	for (GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr)
 	{
-		if( (*itr)->GetName().compare(a_GroupName ) == 0 )
+		if ((*itr)->GetName().compare(a_GroupName) == 0)
 		{
-			m_Groups.erase( itr );
+			m_Groups.erase( itr);
 			bRemoved = true;
 			break;
 		}
 	}
 
-	if( bRemoved )
+	if (bRemoved)
 	{
-		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str() );
+		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str());
 		ResolveGroups();
 		ResolvePermissions();
 	}
 	else
 	{
-		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str() );
+		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str());
 	}
 }
 
@@ -1404,30 +1404,30 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 		return true;
 	}
 	
-	AStringVector Split = StringSplit( a_Permission, "." );
+	AStringVector Split = StringSplit( a_Permission, ".");
 	PermissionMap Possibilities = m_ResolvedPermissions;
 	// Now search the namespaces
-	while( Possibilities.begin() != Possibilities.end() )
+	while (Possibilities.begin() != Possibilities.end())
 	{
 		PermissionMap::iterator itr = Possibilities.begin();
-		if( itr->second )
+		if (itr->second)
 		{
-			AStringVector OtherSplit = StringSplit( itr->first, "." );
-			if( OtherSplit.size() <= Split.size() )
+			AStringVector OtherSplit = StringSplit( itr->first, ".");
+			if (OtherSplit.size() <= Split.size())
 			{
 				unsigned int i;
-				for( i = 0; i < OtherSplit.size(); ++i )
+				for (i = 0; i < OtherSplit.size(); ++i)
 				{
-					if( OtherSplit[i].compare( Split[i] ) != 0 )
+					if (OtherSplit[i].compare( Split[i]) != 0)
 					{
-						if( OtherSplit[i].compare("*") == 0 ) return true;  // WildCard man!! WildCard!
+						if (OtherSplit[i].compare("*") == 0) return true;  // WildCard man!! WildCard!
 						break;
 					}
 				}
-				if( i == Split.size() ) return true;
+				if (i == Split.size()) return true;
 			}
 		}
-		Possibilities.erase( itr );
+		Possibilities.erase( itr);
 	}
 
 	// Nothing that matched :(
@@ -1438,11 +1438,11 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 
 
 
-bool cPlayer::IsInGroup( const AString & a_Group )
+bool cPlayer::IsInGroup( const AString & a_Group)
 {
-	for( GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr )
+	for (GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr)
 	{
-		if( a_Group.compare( (*itr)->GetName().c_str() ) == 0 )
+		if (a_Group.compare( (*itr)->GetName().c_str()) == 0)
 			return true;
 	}
 	return false;
@@ -1457,15 +1457,15 @@ void cPlayer::ResolvePermissions()
 	m_ResolvedPermissions.clear();  // Start with an empty map
 
 	// Copy all player specific permissions into the resolved permissions map
-	for( PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr )
+	for (PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr)
 	{
 		m_ResolvedPermissions[ itr->first ] = itr->second;
 	}
 
-	for( GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr )
+	for (GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr)
 	{
 		const cGroup::PermissionMap & Permissions = (*GroupItr)->GetPermissions();
-		for( cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr )
+		for (cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr)
 		{
 			m_ResolvedPermissions[ itr->first ] = itr->second;
 		}
@@ -1484,14 +1484,14 @@ void cPlayer::ResolveGroups()
 	// Get a complete resolved list of all groups the player is in
 	std::map< cGroup*, bool > AllGroups;  // Use a map, because it's faster than iterating through a list to find duplicates
 	GroupList ToIterate;
-	for( GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr )
+	for (GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr)
 	{
-		ToIterate.push_back( *GroupItr );
+		ToIterate.push_back( *GroupItr);
 	}
-	while( ToIterate.begin() != ToIterate.end() )
+	while (ToIterate.begin() != ToIterate.end())
 	{
 		cGroup* CurrentGroup = *ToIterate.begin();
-		if( AllGroups.find( CurrentGroup ) != AllGroups.end() )
+		if (AllGroups.find( CurrentGroup) != AllGroups.end())
 		{
 			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
 				GetName().c_str(), CurrentGroup->GetName().c_str()
@@ -1500,19 +1500,19 @@ void cPlayer::ResolveGroups()
 		else
 		{
 			AllGroups[ CurrentGroup ] = true;
-			m_ResolvedGroups.push_back( CurrentGroup );  // Add group to resolved list
+			m_ResolvedGroups.push_back( CurrentGroup);  // Add group to resolved list
 			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
-			for( cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr )
+			for (cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr)
 			{
-				if( AllGroups.find( *itr ) != AllGroups.end() )
+				if (AllGroups.find( *itr) != AllGroups.end())
 				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str() );
+					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str());
 					continue;
 				}
-				ToIterate.push_back( *itr );
+				ToIterate.push_back( *itr);
 			}
 		}
-		ToIterate.erase( ToIterate.begin() );
+		ToIterate.erase( ToIterate.begin());
 	}
 }
 
@@ -1522,12 +1522,12 @@ void cPlayer::ResolveGroups()
 
 AString cPlayer::GetColor(void) const
 {
-	if ( m_Color != '-' )
+	if (m_Color != '-')
 	{
-		return cChatColor::Color + m_Color;
+		return cChatColor::Delimiter + m_Color;
 	}
 
-	if ( m_Groups.size() < 1 )
+	if (m_Groups.size() < 1)
 	{
 		return cChatColor::White;
 	}
@@ -1914,11 +1914,11 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 	StringList Permissions;
 
 	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
-	for( PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr )
+	for (PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr)
 	{
 		if (itr->second)
 		{
-			Permissions.push_back( itr->first );
+			Permissions.push_back( itr->first);
 		}
 	}
 

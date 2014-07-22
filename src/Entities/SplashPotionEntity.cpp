@@ -33,15 +33,16 @@ public:
 	/** Called by cWorld::ForEachEntity(), adds the stored entity effect to the entity, if it is close enough. */
 	virtual bool Item(cEntity * a_Entity) override
 	{
+		if (!a_Entity->IsPawn())
+		{
+			// Not an entity that can take effects
+			return false;
+		}
+
 		double SplashDistance = (a_Entity->GetPosition() - m_HitPos).Length();
 		if (SplashDistance >= 20)
 		{
 			// Too far away
-			return false;
-		}
-		if (!a_Entity->IsPawn())
-		{
-			// Not an entity that can take effects
 			return false;
 		}
 
@@ -114,7 +115,7 @@ void cSplashPotionEntity::Splash(const Vector3d & a_HitPos)
 	cSplashPotionCallback Callback(a_HitPos, m_EntityEffectType, m_EntityEffect);
 	m_World->ForEachEntity(Callback);
 	
-	m_World->BroadcastSoundParticleEffect(2002, (int)a_HitPos.x, (int)a_HitPos.y, (int)a_HitPos.z, m_PotionColor);
+	m_World->BroadcastSoundParticleEffect(2002, (int)floor(a_HitPos.x), (int)floor(a_HitPos.y), (int)floor(a_HitPos.z), m_PotionColor);
 }
 
 

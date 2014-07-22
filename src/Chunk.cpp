@@ -44,12 +44,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // sSetBlock:
 
-sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )  // absolute block position
-	: x( a_BlockX )
-	, y( a_BlockY )
-	, z( a_BlockZ )
-	, BlockType( a_BlockType )
-	, BlockMeta( a_BlockMeta )
+sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)  // absolute block position
+	: x( a_BlockX)
+	, y( a_BlockY)
+	, z( a_BlockZ)
+	, BlockType( a_BlockType)
+	, BlockMeta( a_BlockMeta)
 {
 	cChunkDef::AbsoluteToRelative(x, y, z, ChunkX, ChunkZ);
 }
@@ -116,7 +116,7 @@ cChunk::~cChunk()
 {
 	cPluginManager::Get()->CallHookChunkUnloaded(m_World, m_PosX, m_PosZ);
 	
-	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId() );
+	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 	
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
@@ -781,7 +781,7 @@ void cChunk::CheckBlocks()
 void cChunk::TickBlocks(void)
 {
 	// Tick dem blocks
-	// _X: We must limit the random number or else we get a nasty int overflow bug ( http://forum.mc-server.org/showthread.php?tid=457 )
+	// _X: We must limit the random number or else we get a nasty int overflow bug - http://forum.mc-server.org/showthread.php?tid=457
 	int RandomX = m_World->GetTickRandomNumber(0x00ffffff);
 	int RandomY = m_World->GetTickRandomNumber(0x00ffffff);
 	int RandomZ = m_World->GetTickRandomNumber(0x00ffffff);
@@ -1394,7 +1394,7 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 		{
 			for (int y = Height - 1; y > -1; y--)
 			{
-				int index = MakeIndex( x, y, z );
+				int index = MakeIndex( x, y, z);
 				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * Width] = (HEIGHTTYPE)y;
@@ -1530,11 +1530,12 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
-	if (                                  // Queue block to be sent only if ...
+	// Queue block to be sent only if ...
+	if (
 		a_SendToClients &&                  // ... we are told to do so AND ...
 		(
 			(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
-			!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
+			!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them):
 				((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
 				((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
 				((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
@@ -1729,9 +1730,9 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 		{
 			continue;  // Only pickups and projectiles can be picked up
 		}
-		float DiffX = (float)((*itr)->GetPosX() - PosX );
-		float DiffY = (float)((*itr)->GetPosY() - PosY );
-		float DiffZ = (float)((*itr)->GetPosZ() - PosZ );
+		float DiffX = (float)((*itr)->GetPosX() - PosX);
+		float DiffY = (float)((*itr)->GetPosY() - PosY);
+		float DiffZ = (float)((*itr)->GetPosZ() - PosZ);
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
@@ -1793,7 +1794,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 
 
 
-void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
+void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity)
 {
 	MarkDirty();
 	m_BlockEntities.remove(a_BlockEntity);
@@ -1813,9 +1814,9 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 			return false;
 		}
 	}
-	m_LoadedByClient.push_back( a_Client );
+	m_LoadedByClient.push_back( a_Client);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		/*
 		// DEBUG:
@@ -1834,7 +1835,7 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 
 
-void cChunk::RemoveClient( cClientHandle* a_Client )
+void cChunk::RemoveClient( cClientHandle* a_Client)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1847,7 +1848,7 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 
 		if (!a_Client->IsDestroyed())
 		{
-			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
+			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 			{
 				/*
 				// DEBUG:
@@ -1867,7 +1868,7 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 
 
 
-bool cChunk::HasClient( cClientHandle* a_Client )
+bool cChunk::HasClient( cClientHandle* a_Client)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2652,7 +2653,7 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 
 void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		(*itr)->SendAttachEntity(a_Entity, a_Vehicle);
 	}  // for itr - LoadedByClient[]
@@ -2664,7 +2665,7 @@ void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_V
 
 void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2680,7 +2681,7 @@ void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2702,7 +2703,7 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	{
 		return;
 	}
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2718,7 +2719,7 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2734,7 +2735,7 @@ void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClie
 
 void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2750,7 +2751,7 @@ void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 
 void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2766,7 +2767,7 @@ void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 
 void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2782,7 +2783,7 @@ void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int
 
 void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2798,7 +2799,7 @@ void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2814,7 +2815,7 @@ void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2830,7 +2831,7 @@ void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle *
 
 void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2846,7 +2847,7 @@ void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2862,7 +2863,7 @@ void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char 
 
 void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2878,7 +2879,7 @@ void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, c
 
 void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2894,7 +2895,7 @@ void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, cons
 
 void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2910,7 +2911,7 @@ void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2926,7 +2927,7 @@ void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation
 
 void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2942,7 +2943,7 @@ void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_Src
 
 void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2958,7 +2959,7 @@ void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2974,7 +2975,7 @@ void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, doubl
 
 void cChunk::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2990,7 +2991,7 @@ void cChunk::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY
 
 void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -3006,7 +3007,7 @@ void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Ex
 
 void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -3020,9 +3021,9 @@ void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		(*itr)->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 	}  // for itr - LoadedByClient[]

@@ -65,6 +65,7 @@ lib/tolua++/tolua
 src/Bindings/Bindings.*
 src/Bindings/BindingDependecies.txt
 MCServer.dir/
+src/AllFiles.lst
 
 #win32 cmake stuff
 *.vcxproj
