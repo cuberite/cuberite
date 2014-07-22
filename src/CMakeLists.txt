@@ -265,7 +265,7 @@ if (MSVC)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDECIES}
+		DEPENDS ${BINDING_DEPENDENCIES}
 	)
 endif()
 
