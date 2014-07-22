@@ -39,7 +39,7 @@ set (BINDING_OUTPUTS
     ${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Call.inc
 )
 
-set(BINDING_DEPENDECIES
+set(BINDING_DEPENDENCIES
     tolua
     ../Bindings/virtual_method_hooks.lua
     ../Bindings/AllToLua.pkg
@@ -122,7 +122,7 @@ if (NOT MSVC)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 
         # add any new generation dependencies here
-        DEPENDS ${BINDING_DEPENDECIES}
+        DEPENDS ${BINDING_DEPENDENCIES}
     )
 endif ()
 set_source_files_properties(Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
