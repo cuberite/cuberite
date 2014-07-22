@@ -39,9 +39,6 @@ public:
 	/** Can this block hold snow atop? */
 	bool m_IsSnowable;
 
-	/** Does this block require a tool to drop? */
-	bool m_RequiresSpecialTool;
-
 	/** Is this block solid (player cannot walk through)? */
 	bool m_IsSolid;
 
@@ -61,7 +58,6 @@ public:
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
-	inline static bool RequiresSpecialTool        (BLOCKTYPE a_Type) { return Get(a_Type).m_RequiresSpecialTool; }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
 
