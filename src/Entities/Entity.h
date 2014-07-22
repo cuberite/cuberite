@@ -337,8 +337,10 @@ public:
 	/** Detects the time for application of cacti damage */
 	virtual void DetectCacti(void);
 
-	/** Detects whether we are in a portal block and begins teleportation procedures if so */
-	virtual void DetectPortal(void);
+	/** Detects whether we are in a portal block and begins teleportation procedures if so
+	Returns true if MoveToWorld() was called, false if not
+	*/
+	virtual bool DetectPortal(void);
 	
 	/// Handles when the entity is in the void
 	virtual void TickInVoid(cChunk & a_Chunk);

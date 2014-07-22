@@ -583,19 +583,14 @@ void cChunk::Tick(float a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 	
-	// Tick all entities in this chunk (except mobs):
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
-	{
-		// Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
-		// Don't tick things queued to be removed
-		if (!((*itr)->IsMob()))
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	{		
+		if (!((*itr)->IsMob()))  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		{
+			// Tick all entities in this chunk (except mobs):
 			(*itr)->Tick(a_Dt, *this);
 		}
-	}  // for itr - m_Entitites[]
-	
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
-	{
+
 		if ((*itr)->IsDestroyed())  // Remove all entities that were scheduled for removal:
 		{
 			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
@@ -604,7 +599,7 @@ void cChunk::Tick(float a_Dt)
 			itr = m_Entities.erase(itr);
 			delete ToDelete;
 		}
-		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove all entities that are travelling to another world
+		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove all entities that are travelling to another world:
 		{
 			MarkDirty();
 			(*itr)->SetWorldTravellingFrom(NULL);
@@ -1899,7 +1894,7 @@ void cChunk::AddEntity(cEntity * a_Entity)
 		MarkDirty();
 	}
 
-	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());
+	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
 
 	m_Entities.push_back(a_Entity);
 }

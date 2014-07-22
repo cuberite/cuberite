@@ -95,7 +95,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 		SetPosX(World->GetSpawnX());
 		SetPosY(World->GetSpawnY());
 		SetPosZ(World->GetSpawnZ());
-		SetBedPos(Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()));
+		SetBedPos(Vector3i((int)World->GetSpawnX(), (int)World->GetSpawnY(), (int)World->GetSpawnZ()));
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -1611,6 +1611,8 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 bool cPlayer::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
+	ASSERT(a_World != NULL);
+
 	if (GetWorld() == a_World)
 	{
 		// Don't move to same world
@@ -1624,7 +1626,7 @@ bool cPlayer::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	}
 
 	// Remove player from the old world
-	SetWorldTravellingFrom(GetWorld()); // cChunk handles entity removal
+	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
 	GetWorld()->RemovePlayer(this);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object

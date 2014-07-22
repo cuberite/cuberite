@@ -314,10 +314,12 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 
 cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
 {
-	if (m_WorldsByName[a_WorldName] != NULL)
+	cWorld * World = m_WorldsByName[a_WorldName];
+	if (World != NULL)
 	{
-		return NULL;
+		return World;
 	}
+
 	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();

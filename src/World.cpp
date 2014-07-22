@@ -255,8 +255,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this)
-	
+	m_TickThread(*this)	
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -526,7 +525,7 @@ void cWorld::Start(void)
 
 		// TODO: More descriptions for each key
 		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
-		IniFile.AddKeyComment("LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
+		IniFile.AddKeyComment(" LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
 	}
 
 	// The presence of a configuration value overrides everything
@@ -784,7 +783,7 @@ void cWorld::Stop(void)
 	// Write settings to file; these are all plugin changeable values - keep updated!
 	cIniFile IniFile;
 	IniFile.ReadFile(m_IniFileName);
-		if ((GetDimension() != dimNether) && (GetDimension() != dimEnd))
+		if (GetDimension() == dimOverworld)
 		{
 			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_NetherWorldName);
 			IniFile.SetValue("LinkedWorlds", "EndWorldName", m_EndWorldName);
@@ -1040,11 +1039,7 @@ void cWorld::TickClients(float a_Dt)
 		// Add clients scheduled for adding:
 		for (cClientHandleList::iterator itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
 		{
-			if (std::find(m_Clients.begin(), m_Clients.end(), *itr) != m_Clients.end())
-			{
-				ASSERT(!"Adding a client that is already in the clientlist");
-				continue;
-			}
+			ASSERT(std::find(m_Clients.begin(), m_Clients.end(), *itr) == m_Clients.end());
 			m_Clients.push_back(*itr);
 		}  // for itr - m_ClientsToRemove[]
 		m_ClientsToAdd.clear();
@@ -3253,9 +3248,9 @@ void cWorld::AddQueuedPlayers(void)
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
-			
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?			
 			LOGD("Adding player %s to world \"%s\".", (*itr)->GetName().c_str(), m_WorldName.c_str());
+
 			m_Players.push_back(*itr);
 			(*itr)->SetWorld(this);
 

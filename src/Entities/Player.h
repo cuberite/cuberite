@@ -424,7 +424,6 @@ public:
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
 
-
 	// tolua_end
 
 	// cEntity overrides:
