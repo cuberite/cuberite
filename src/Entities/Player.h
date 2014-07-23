@@ -333,7 +333,7 @@ public:
 
 	/** Moves the player to the specified world.
 	Returns true if successful, false on failure (world not found). */
-	virtual bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) override; // tolua_export
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn) override;
 
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
@@ -341,13 +341,13 @@ public:
 	typedef cWorld * cWorldPtr;
 	
 	/** Loads the player data from the disk file
-	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world by calling LoadFromFile()
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
 	Returns true on success, false on failure
 	*/
 	bool LoadFromDisk(cWorldPtr & a_World);
 	
 	/** Loads the player data from the specified file
-	Takes a (NULL) cWorld pointer which it will assign a value to based on either the loaded world or default world
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
 	Returns true on success, false on failure
 	*/
 	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);

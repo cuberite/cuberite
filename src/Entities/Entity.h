@@ -385,15 +385,17 @@ public:
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Moves entity to specified world, taking a world pointer */
-	virtual bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true);
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) { return DoMoveToWorld(a_World, a_ShouldSendRespawn); }
 
 	/** Moves entity to specified world, taking a world name */
 	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 	
 	// tolua_end
 
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn);
+
 	/** Returns if the entity is travelling away from a specified world */
-	bool IsWorldTravellingFrom(cWorld * a_World) const { return m_WorldTravellingFrom == a_World; }
+	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
 
 	/** Sets the world the entity will be leaving */
 	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
@@ -500,7 +502,7 @@ protected:
 	bool m_IsInitialized;
 
 	/** World entity is travelling from
-	Set by MoveToWorld and back to NULL when the entity is removed by the old chunk
+	Set to a valid world pointer by MoveToWorld; reset to NULL when the entity is removed from the old world
 	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it
 	*/
 	cWorld * m_WorldTravellingFrom;

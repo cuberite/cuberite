@@ -66,9 +66,6 @@ const int TIME_NIGHT_END     = 22812;
 const int TIME_SUNRISE       = 23999;
 const int TIME_SPAWN_DIVISOR =   148;
 
-#define DEFAULT_NETHER_NAME GetName() + "_nether"
-#define DEFAULT_END_NAME GetName() + "_end"
-
 
 
 
@@ -255,7 +252,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this)	
+	m_TickThread(*this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -580,8 +577,8 @@ void cWorld::Start(void)
 
 	if (GetDimension() == dimOverworld)
 	{
-		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", DEFAULT_NETHER_NAME);
-		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", DEFAULT_END_NAME);
+		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
+		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", GetName() + "_end");
 	}
 	else
 	{

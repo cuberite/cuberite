@@ -1609,7 +1609,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
 	ASSERT(a_World != NULL);
 
