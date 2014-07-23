@@ -19,6 +19,13 @@ class cPlayer;
 class cItemHandler
 {
 public:
+
+	enum eDurabilityLostAction
+	{
+		dlaBreakBlock,
+		dlaAttackEntity,
+	};
+
 	cItemHandler(int a_ItemType);
 	
 	/** Force virtual destructor */
@@ -48,11 +55,17 @@ public:
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 	
 	/** Called when the player destroys a block using this item. This also calls the drop function for the destroyed block */
-	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_X, int a_Y, int a_Z);
+	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Called when a player attacks a other entity. */
+	virtual void OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity);
 	
 	/** Called after the player has eaten this item. */
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
-	
+
+	/** Get the durability lost which the item will get, when a specified action was performed. */
+	virtual short GetDurabilityLostWithThatAction(eDurabilityLostAction a_Action);
+
 	/** Returns the maximum stack size for a given item */
 	virtual char GetMaxStackSize(void);
 

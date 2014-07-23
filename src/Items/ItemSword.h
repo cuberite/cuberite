@@ -12,17 +12,19 @@
 class cItemSwordHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemSwordHandler(int a_ItemType)
 	: cItemHandler(a_ItemType)
 	{
-
 	}
-	
+
+
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
 		return (a_BlockType == E_BLOCK_COBWEB);
 	}
+
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
 	{
@@ -35,6 +37,17 @@ public:
 			case E_ITEM_DIAMOND_SWORD: return (a_ItemType == E_ITEM_DIAMOND);
 		}
 		return false;
+	}
+
+
+	virtual short GetDurabilityLostWithThatAction(eDurabilityLostAction a_Action) override
+	{
+		switch (a_Action)
+		{
+			case dlaAttackEntity: return 1;
+			case dlaBreakBlock:   return 2;
+		}
+		return 0;
 	}
 } ;
 

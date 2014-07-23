@@ -222,12 +222,6 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 		return;
 	}
 	Grid->SetSlot(GridSlotNum, a_Item);
-
-	// Broadcast the Equipped Item, if the Slot is changed.
-	if ((Grid == &m_HotbarSlots) && (m_EquippedSlotNum == (a_SlotNum - invHotbarOffset)))
-	{
-		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, a_Item, m_Owner.GetClientHandle());
-	}
 }
 
 
@@ -391,6 +385,10 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d", __FUNCTION__, a_SlotNum, invNumSlots - 1);
+		return false;
+	}
+	if (a_Amount <= 0)
+	{
 		return false;
 	}
 	
@@ -712,6 +710,12 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 			m_Owner, ArmorSlotNumToEntityEquipmentID(a_SlotNum),
 			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
 		);
+	}
+
+	// Broadcast the Equipped Item, if the Slot is changed.
+	if ((a_ItemGrid == &m_HotbarSlots) && (m_EquippedSlotNum == a_SlotNum))
+	{
+		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, GetEquippedItem(), m_Owner.GetClientHandle());
 	}
 	
 	// Convert the grid-local a_SlotNum to our global SlotNum:

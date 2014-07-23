@@ -1929,14 +1929,14 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 
 
-void cPlayer::UseEquippedItem(void)
+void cPlayer::UseEquippedItem(int a_Amount)
 {
 	if (IsGameModeCreative())  // No damage in creative
 	{
 		return;
 	}
 
-	if (GetInventory().DamageEquippedItem())
+	if (GetInventory().DamageEquippedItem(a_Amount))
 	{
 		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	}

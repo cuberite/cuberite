@@ -454,6 +454,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_DOUBLE_STONE_SLAB   ].m_RequiresSpecialTool = true;
 	a_Info[E_BLOCK_EMERALD_ORE         ].m_RequiresSpecialTool = true;
 	a_Info[E_BLOCK_END_STONE           ].m_RequiresSpecialTool = true;
+	a_Info[E_BLOCK_VINES               ].m_RequiresSpecialTool = true;
 	a_Info[E_BLOCK_GOLD_BLOCK          ].m_RequiresSpecialTool = true;
 	a_Info[E_BLOCK_GOLD_ORE            ].m_RequiresSpecialTool = true;
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_RequiresSpecialTool = true;

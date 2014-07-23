@@ -12,6 +12,7 @@
 #include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Player.h"
+#include "Items/ItemHandler.h"
 
 
 
@@ -289,11 +290,6 @@ void cEntity::SetPitchFromSpeed(void)
 
 bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
-	{
-		return false;
-	}
-
 	if (m_Health <= 0)
 	{
 		// Can't take damage if already dead
@@ -306,9 +302,16 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
+	{
+		return false;
+	}
+
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = (cPlayer *)a_TDI.Attacker;
+
+		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)

@@ -335,8 +335,21 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
-	
-	a_Player->UseEquippedItem();
+
+	if (!cBlockInfo::IsOneHitDig(Block))
+	{
+		a_Player->UseEquippedItem(GetDurabilityLostWithThatAction(dlaBreakBlock));
+	}
+}
+
+
+
+
+
+void cItemHandler::OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity)
+{
+	UNUSED(a_AttackedEntity);
+	a_Attacker->UseEquippedItem(GetDurabilityLostWithThatAction(dlaAttackEntity));
 }
 
 
@@ -348,6 +361,20 @@ void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_I
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_Item);
+}
+
+
+
+
+
+short cItemHandler::GetDurabilityLostWithThatAction(eDurabilityLostAction a_Action)
+{
+	switch (a_Action)
+	{
+		case dlaAttackEntity: return 2;
+		case dlaBreakBlock:   return 1;
+	}
+	return 0;
 }
 
 
@@ -505,6 +532,7 @@ bool cItemHandler::IsPlaceable(void)
 
 bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
 {
+	UNUSED(a_ItemType);
 	return false;
 }
 
