@@ -56,8 +56,8 @@ public:
 #else
 	static const int DEFAULT_VIEW_DISTANCE = 10;
 #endif
-	static const int MAX_VIEW_DISTANCE = 15;
-	static const int MIN_VIEW_DISTANCE = 3;
+	static const int MAX_VIEW_DISTANCE = 32;
+	static const int MIN_VIEW_DISTANCE = 1;
 	
 	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
 	virtual ~cClientHandle();
