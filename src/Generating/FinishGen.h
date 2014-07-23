@@ -94,6 +94,17 @@ protected:
 			{
 				return 70;
 			}
+
+			case biExtremeHillsEdge:
+			case biExtremeHillsPlus:
+			case biExtremeHills:
+			case biExtremeHillsPlusM:
+			case biExtremeHillsM:
+			case biIceMountains:
+			{
+				return 3;
+			}
+
 			default:
 			{
 				return 20;
