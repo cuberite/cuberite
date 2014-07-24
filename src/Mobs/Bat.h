@@ -15,7 +15,7 @@ class cBat :
 public:
 	cBat(void);
 
-	CLASS_PROTODEF(cBat);
+	CLASS_PROTODEF(cBat)
 	
 	bool IsHanging(void) const {return false; }
 } ;

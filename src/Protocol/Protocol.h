@@ -138,7 +138,7 @@ protected:
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 	
 	/// Called after writing each packet, enables descendants to flush their buffers
-	virtual void Flush(void) {};
+	virtual void Flush(void) {}
 	
 	// Helpers for writing partial packet data, write using SendData()
 	void WriteByte(Byte a_Value)

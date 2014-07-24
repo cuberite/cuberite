@@ -28,7 +28,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cArrowEntity);
+	CLASS_PROTODEF(cArrowEntity)
 	
 	/// Creates a new arrow with psNoPickup state and default damage modifier coeff
 	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);

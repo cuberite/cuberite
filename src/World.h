@@ -96,7 +96,7 @@ public:
 	class cTask
 	{
 	public:
-		virtual ~cTask(){};
+		virtual ~cTask() {}
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
@@ -645,7 +645,7 @@ public:
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
-	inline int GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
+	inline int GetGeneratorQueueLength     (void) { return m_Generator.GetQueueLength();   }    // tolua_export
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
@@ -677,13 +677,13 @@ public:
 	void CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/** Sets the specified weather; resets weather interval; asks and notifies plugins of the change */
-	void SetWeather     (eWeather a_NewWeather);
+	void SetWeather(eWeather a_NewWeather);
 	
 	/** Forces a weather change in the next game tick */
-	void ChangeWeather  (void);
+	void ChangeWeather(void);
 	
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
-	eWeather GetWeather     (void) const { return m_Weather; };
+	eWeather GetWeather(void) const { return m_Weather; }
 	
 	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
@@ -698,7 +698,7 @@ public:
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 	
 	/** Returns true if it is raining at the specified location. This takes into account biomes. */
-	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ)
+	bool IsWeatherRainAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}

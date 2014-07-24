@@ -16,7 +16,7 @@ class cHangingEntity :
 
 public:
 
-	CLASS_PROTODEF(cHangingEntity);
+	CLASS_PROTODEF(cHangingEntity)
 
 	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
 	
@@ -38,7 +38,7 @@ public:
 private:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override {};
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override {}
 
 	eBlockFace m_BlockFace;
 

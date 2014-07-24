@@ -82,7 +82,7 @@ public:
 	*/
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
-	CLASS_PROTODEF(cMonster);
+	CLASS_PROTODEF(cMonster)
 	
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 

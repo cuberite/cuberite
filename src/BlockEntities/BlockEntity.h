@@ -38,9 +38,9 @@ protected:
 public:
 	// tolua_end
 	
-	virtual ~cBlockEntity() {};  // force a virtual destructor in all descendants
+	virtual ~cBlockEntity() {}  // force a virtual destructor in all descendants
 	
-	virtual void Destroy(void) {};
+	virtual void Destroy(void) {}
 	
 	void SetWorld(cWorld * a_World)
 	{

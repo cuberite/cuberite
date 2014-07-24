@@ -15,7 +15,7 @@ class cHorse :
 public:
 	cHorse(int Type, int Color, int Style, int TameTimes);
 
-	CLASS_PROTODEF(cHorse);
+	CLASS_PROTODEF(cHorse)
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
