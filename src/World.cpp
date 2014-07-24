@@ -2975,21 +2975,31 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eTyp
 
 int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 {
+	// Invalid cMonster object. Bail out.
 	if (!a_Monster)
+	{
 		return -1;
+	}
+
+	// Give the mob  full health.
 	a_Monster->SetHealth(a_Monster->GetMaxHealth());
+
+	// A plugin doesn't agree with the spawn. bail out.
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
 		delete a_Monster;
 		a_Monster = NULL;
 		return -1;
 	}
+
+	// Initialize the monster into the current world.
 	if (!a_Monster->Initialize(*this))
 	{
 		delete a_Monster;
 		a_Monster = NULL;
 		return -1;
 	}
+
 	BroadcastSpawnEntity(*a_Monster);
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
 
