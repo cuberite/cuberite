@@ -18,6 +18,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
+#include "../SetChunkData.h"
 
 
 
@@ -911,7 +912,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 	NIBBLETYPE * BlockLight = (NIBBLETYPE *)(BlockData + LightOffset);
 	NIBBLETYPE * SkyLight   = (NIBBLETYPE *)(BlockData + SkyLightOffset);
 	
-	a_World->SetChunkData(
+	a_World->QueueSetChunkData(cSetChunkDataPtr(new cSetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockData, MetaData,
 		IsLightValid ? BlockLight : NULL,
@@ -919,7 +920,7 @@ bool cWSSCompact::LoadChunkFromData(const cChunkCoords & a_Chunk, int a_Uncompre
 		NULL, NULL,
 		Entities, BlockEntities,
 		false
-	);
+	)));
 
 	return true;
 }

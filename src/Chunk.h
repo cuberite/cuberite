@@ -95,16 +95,10 @@ public:
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
 	void GetAllData(cChunkDataCallback & a_Callback);
 	
-	/** Sets all chunk data */
-	void SetAllData(
-		const BLOCKTYPE *  a_BlockTypes,
-		const NIBBLETYPE * a_BlockMeta,
-		const NIBBLETYPE * a_BlockLight,
-		const NIBBLETYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		const cChunkDef::BiomeMap &  a_BiomeMap,
-		cBlockEntityList & a_BlockEntities
-	);
+	/** Sets all chunk data as either loaded from the storage or generated.
+	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
+	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk. */
+	void SetAllData(cSetChunkData & a_SetChunkData);
 	
 	void SetLight(
 		const cChunkDef::BlockNibbles & a_BlockLight,
@@ -386,9 +380,9 @@ public:
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorQueuedData(void) { return &m_RedstoneSimulatorQueuedData; }
 	cIncrementalRedstoneSimulator::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
-	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; };
-	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; };
-	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; };
+	cIncrementalRedstoneSimulator::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; }
+	cIncrementalRedstoneSimulator::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; }
+	cIncrementalRedstoneSimulator::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; }
 	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
 	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 

@@ -15,7 +15,7 @@ class cIronGolem :
 public:
 	cIronGolem(void);
 
-	CLASS_PROTODEF(cIronGolem);
+	CLASS_PROTODEF(cIronGolem)
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 

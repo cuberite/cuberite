@@ -21,7 +21,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cExpBottleEntity);
+	CLASS_PROTODEF(cExpBottleEntity)
 	
 	cExpBottleEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
 	

@@ -115,10 +115,10 @@ public:
 	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) = 0;
 	
 	/// All bound commands are to be removed, do any language-dependent cleanup here
-	virtual void ClearCommands(void) {} ;
+	virtual void ClearCommands(void) {}
 	
 	/// All bound console commands are to be removed, do any language-dependent cleanup here
-	virtual void ClearConsoleCommands(void) {} ;
+	virtual void ClearConsoleCommands(void) {}
 	
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }

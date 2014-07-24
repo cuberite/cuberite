@@ -34,6 +34,7 @@
 #include "MobCensus.h"
 #include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"
+#include "SetChunkData.h"
 
 #include "json/json.h"
 
@@ -265,41 +266,34 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 
 
-void cChunk::SetAllData(
-	const BLOCKTYPE *  a_BlockTypes,
-	const NIBBLETYPE * a_BlockMeta,
-	const NIBBLETYPE * a_BlockLight,
-	const NIBBLETYPE * a_BlockSkyLight,
-	const HeightMap *  a_HeightMap,
-	const BiomeMap &   a_BiomeMap,
-	cBlockEntityList & a_BlockEntities
-)
+void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 {
-	memcpy(m_BiomeMap, a_BiomeMap, sizeof(m_BiomeMap));
-
-	if (a_HeightMap != NULL)
-	{
-		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
-	}
-
-	if (a_HeightMap == NULL)
-	{
-		CalculateHeightmap(a_BlockTypes);
-	}
-
-	m_ChunkData.SetBlockTypes(a_BlockTypes);
-	m_ChunkData.SetMetas(a_BlockMeta);
-	m_ChunkData.SetBlockLight(a_BlockLight);
-	m_ChunkData.SetSkyLight(a_BlockSkyLight);
+	ASSERT(a_SetChunkData.IsHeightMapValid());
+	ASSERT(a_SetChunkData.AreBiomesValid());
 	
-	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
+	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
+	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
+
+	m_ChunkData.SetBlockTypes(a_SetChunkData.GetBlockTypes());
+	m_ChunkData.SetMetas(a_SetChunkData.GetBlockMetas());
+	if (a_SetChunkData.IsLightValid())
+	{
+		m_ChunkData.SetBlockLight(a_SetChunkData.GetBlockLight());
+		m_ChunkData.SetSkyLight(a_SetChunkData.GetSkyLight());
+		m_IsLightValid = true;
+	}
+	else
+	{
+		m_IsLightValid = false;
+	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		delete *itr;
 	}
-	std::swap(a_BlockEntities, m_BlockEntities);
+	m_BlockEntities.clear();
+	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
 	
 	// Set all block entities' World variable:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)

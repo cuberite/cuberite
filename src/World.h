@@ -49,8 +49,13 @@ class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
 class cCuboid;
+class cSetChunkData;
+
 
 typedef std::list< cPlayer * > cPlayerList;
+
+typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
+typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
 typedef cItemCallback<cEntity>             cEntityCallback;
@@ -91,7 +96,7 @@ public:
 	class cTask
 	{
 	public:
-		virtual ~cTask(){};
+		virtual ~cTask() {}
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
@@ -246,24 +251,9 @@ public:
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 	
-	/** Sets the chunk data as either loaded from the storage or generated.
-	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
-	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
-	a_HeightMap is optional, if not present, will be calculated.
-	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
-	*/
-	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ,
-		const BLOCKTYPE *  a_BlockTypes,
-		const NIBBLETYPE * a_BlockMeta,
-		const NIBBLETYPE * a_BlockLight,
-		const NIBBLETYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		const cChunkDef::BiomeMap  * a_BiomeMap,
-		cEntityList & a_Entities,
-		cBlockEntityList & a_BlockEntities,
-		bool a_MarkDirty
-	);
+	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
+	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
+	void QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData);
 	
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -655,7 +645,7 @@ public:
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
-	inline int GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
+	inline int GetGeneratorQueueLength     (void) { return m_Generator.GetQueueLength();   }    // tolua_export
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
@@ -687,13 +677,13 @@ public:
 	void CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/** Sets the specified weather; resets weather interval; asks and notifies plugins of the change */
-	void SetWeather     (eWeather a_NewWeather);
+	void SetWeather(eWeather a_NewWeather);
 	
 	/** Forces a weather change in the next game tick */
-	void ChangeWeather  (void);
+	void ChangeWeather(void);
 	
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
-	eWeather GetWeather     (void) const { return m_Weather; };
+	eWeather GetWeather(void) const { return m_Weather; }
 	
 	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
@@ -708,7 +698,7 @@ public:
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 	
 	/** Returns true if it is raining at the specified location. This takes into account biomes. */
-	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ)
+	bool IsWeatherRainAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
@@ -969,6 +959,12 @@ private:
 
 	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
 	cPlayerList m_PlayersToAdd;
+	
+	/** CS protecting m_SetChunkDataQueue. */
+	cCriticalSection m_CSSetChunkDataQueue;
+	
+	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
+	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
 	cWorld(const AString & a_WorldName);
@@ -1011,6 +1007,10 @@ private:
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */
 	void AddQueuedPlayers(void);
+
+	/** Sets the specified chunk data into the chunkmap. Called in the tick thread.
+	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
+	void SetChunkData(cSetChunkData & a_SetChunkData);
 };  // tolua_export
 
 

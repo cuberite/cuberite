@@ -14,7 +14,7 @@ class cZombie :
 public:
 	cZombie(bool a_IsVillagerZombie);
 
-	CLASS_PROTODEF(cZombie);
+	CLASS_PROTODEF(cZombie)
 	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void MoveToPosition(const Vector3d & a_Position) override;
