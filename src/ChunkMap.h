@@ -34,6 +34,7 @@ class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
+class cSetChunkData;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
@@ -112,22 +113,11 @@ public:
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the chunk data as either loaded from the storage or generated.
-	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
-	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
-	a_HeightMap is optional, if not present, will be calculated.
-	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
+	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
+	If MarkDirty is set, the chunk is set as dirty (used after generating)
+	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk.
 	*/
-	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ,
-		const BLOCKTYPE * a_BlockTypes,
-		const NIBBLETYPE * a_BlockMeta,
-		const NIBBLETYPE * a_BlockLight,
-		const NIBBLETYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		const cChunkDef::BiomeMap &  a_BiomeMap,
-		cBlockEntityList & a_BlockEntities,
-		bool a_MarkDirty
-	);
+	void SetChunkData(cSetChunkData & a_SetChunkData);
 	
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,

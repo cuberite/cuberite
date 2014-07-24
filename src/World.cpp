@@ -11,6 +11,7 @@
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
+#include "SetChunkData.h"
 
 // Serializers
 #include "WorldStorage/ScoreboardSerializer.h"
@@ -718,6 +719,17 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 {
 	// Call the plugins
 	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
+	
+	// Set any chunk data that has been queued for setting:
+	cSetChunkDataPtrs SetChunkDataQueue;
+	{
+		cCSLock Lock(m_CSSetChunkDataQueue);
+		std::swap(SetChunkDataQueue, m_SetChunkDataQueue);
+	}
+	for (cSetChunkDataPtrs::iterator itr = SetChunkDataQueue.begin(), end = SetChunkDataQueue.end(); itr != end; ++itr)
+	{
+		SetChunkData(**itr);
+	}  // for itr - SetChunkDataQueue[]
 	
 	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
@@ -2217,47 +2229,59 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cWorld::SetChunkData(
-	int a_ChunkX, int a_ChunkZ,
-	const BLOCKTYPE * a_BlockTypes,
-	const NIBBLETYPE * a_BlockMeta,
-	const NIBBLETYPE * a_BlockLight,
-	const NIBBLETYPE * a_BlockSkyLight,
-	const cChunkDef::HeightMap * a_HeightMap,
-	const cChunkDef::BiomeMap  * a_BiomeMap,
-	cEntityList & a_Entities,
-	cBlockEntityList & a_BlockEntities,
-	bool a_MarkDirty
-)
+void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
 {
 	// Validate biomes, if needed:
-	cChunkDef::BiomeMap BiomeMap;
-	const cChunkDef::BiomeMap * Biomes = a_BiomeMap;
-	if (a_BiomeMap == NULL)
+	if (!a_SetChunkData->AreBiomesValid())
 	{
 		// The biomes are not assigned, get them from the generator:
-		Biomes = &BiomeMap;
-		m_Generator.GenerateBiomes(a_ChunkX, a_ChunkZ, BiomeMap);
+		m_Generator.GenerateBiomes(a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ(), a_SetChunkData->GetBiomes());
+		a_SetChunkData->MarkBiomesValid();
 	}
 	
-	m_ChunkMap->SetChunkData(
-		a_ChunkX, a_ChunkZ,
-		a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight,
-		a_HeightMap, *Biomes,
-		a_BlockEntities,
-		a_MarkDirty
-	);
+	// Validate heightmap, if needed:
+	if (!a_SetChunkData->IsHeightMapValid())
+	{
+		a_SetChunkData->CalculateHeightMap();
+	}
+	
+	// Store a copy of the data in the queue:
+	// TODO: If the queue is too large, wait for it to get processed. Not likely, though.
+	cCSLock Lock(m_CSSetChunkDataQueue);
+	m_SetChunkDataQueue.push_back(a_SetChunkData);
+}
+
+
+
+
+
+void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
+{
+	ASSERT(a_SetChunkData.AreBiomesValid());
+	ASSERT(a_SetChunkData.IsHeightMapValid());
+	
+	m_ChunkMap->SetChunkData(a_SetChunkData);
 	
 	// Initialize the entities (outside the m_ChunkMap's CS, to fix FS #347):
-	for (cEntityList::iterator itr = a_Entities.begin(), end = a_Entities.end(); itr != end; ++itr)
+	cEntityList Entities;
+	std::swap(a_SetChunkData.GetEntities(), Entities);
+	for (cEntityList::iterator itr = Entities.begin(), end = Entities.end(); itr != end; ++itr)
 	{
 		(*itr)->Initialize(*this);
 	}
 	
 	// If a client is requesting this chunk, send it to them:
-	if (m_ChunkMap->HasChunkAnyClients(a_ChunkX, a_ChunkZ))
+	int ChunkX = a_SetChunkData.GetChunkX();
+	int ChunkZ = a_SetChunkData.GetChunkZ();
+	if (m_ChunkMap->HasChunkAnyClients(ChunkX, ChunkZ))
 	{
-		m_ChunkSender.ChunkReady(a_ChunkX, a_ChunkZ);
+		m_ChunkSender.ChunkReady(ChunkX, ChunkZ);
+	}
+
+	// Save the chunk right after generating, so that we don't have to generate it again on next run
+	if (a_SetChunkData.ShouldMarkDirty())
+	{
+		m_Storage.QueueSaveChunk(ChunkX, 0, ChunkZ);
 	}
 }
 
@@ -3295,17 +3319,14 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	m_World->SetChunkData(
+	m_World->QueueSetChunkData(cSetChunkDataPtr(new cSetChunkData(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
 		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
 		true
-	);
-
-	// Save the chunk right after generating, so that we don't have to generate it again on next run
-	m_World->GetStorage().QueueSaveChunk(a_ChunkDesc.GetChunkX(), 0, a_ChunkDesc.GetChunkZ());
+	)));
 }
 
 
