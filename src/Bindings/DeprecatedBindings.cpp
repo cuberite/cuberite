@@ -175,6 +175,32 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 
 
 
+/* get function: g_BlockRequiresSpecialTool */
+#ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockRequiresSpecialTool
+static int tolua_get_AllToLua_g_BlockRequiresSpecialTool(lua_State* tolua_S)
+{
+	int BlockType;
+	#ifndef TOLUA_RELEASE
+	{
+		tolua_Error tolua_err;
+		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+	}
+	#endif
+	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
+	if ((BlockType < 0) || (BlockType > E_BLOCK_MAX_TYPE_ID))
+	{
+		tolua_error(tolua_S, "array indexing out of range.", NULL);
+	}
+	tolua_pushboolean(tolua_S, cBlockInfo::RequiresSpecialTool((BLOCKTYPE)BlockType));
+	return 1;
+}
+#endif  // #ifndef TOLUA_DISABLE
+
+
+
+
+
 /* get function: g_BlockIsSolid */
 #ifndef TOLUA_DISABLE_tolua_get_AllToLua_g_BlockIsSolid
 static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
@@ -237,6 +263,7 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_array(tolua_S, "g_BlockOneHitDig",           tolua_get_AllToLua_g_BlockOneHitDig,           NULL);
 	tolua_array(tolua_S, "g_BlockPistonBreakable",     tolua_get_AllToLua_g_BlockPistonBreakable,     NULL);
 	tolua_array(tolua_S, "g_BlockIsSnowable",          tolua_get_AllToLua_g_BlockIsSnowable,          NULL);
+	tolua_array(tolua_S, "g_BlockRequiresSpecialTool", tolua_get_AllToLua_g_BlockRequiresSpecialTool, NULL);
 	tolua_array(tolua_S, "g_BlockIsSolid",             tolua_get_AllToLua_g_BlockIsSolid,             NULL);
 	tolua_array(tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  NULL);
 

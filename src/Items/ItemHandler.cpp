@@ -328,9 +328,12 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 	if (a_Player->IsGameModeSurvival())
 	{
-		cChunkInterface ChunkInterface(a_World->GetChunkMap());
-		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
+		if (!cBlockInfo::RequiresSpecialTool(Block) || CanHarvestBlock(Block))
+		{
+			cChunkInterface ChunkInterface(a_World->GetChunkMap());
+			cBlockInServerPluginInterface PluginInterface(*a_World);
+			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+		}
 	}
 	
 	a_Player->UseEquippedItem();
