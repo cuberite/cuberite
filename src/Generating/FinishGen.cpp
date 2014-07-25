@@ -45,42 +45,14 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1;  // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
-	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.1;
-	
-	NOISE_DATATYPE Val1 = m_Noise.IntNoise2D((int) (ChunkX * ChunkZ * 0.01f), (int) (ChunkZ / ChunkX * 0.01f));
-	NOISE_DATATYPE Val2 = m_Noise.IntNoise2D((int) (ChunkX / ChunkZ / 0.01f), (int) (ChunkZ * ChunkX / 0.01f));
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	if (Val1 < 0)
-	{
-		Val1 = -Val1;
-	}
-	
-	if (Val2 < 0)
-	{
-		Val2 = -Val2;
-	}
+	int Val1 = m_Noise.IntNoise2DInt(ChunkX ^ ChunkZ, ChunkZ + ChunkX);
+	int Val2 = m_Noise.IntNoise2DInt(ChunkZ ^ ChunkX, ChunkZ - ChunkX);
 
-	int PosX, PosZ;
-	// Calculate PosX
-	if (Val1 <= 1)
-	{
-		PosX = (int) floor(Val1 * 16);
-	}
-	else
-	{
-		PosX = (int) floor(16 / Val1);
-	}
-	
-	// Calculate PosZ
-	if (Val2 <= 1)
-	{
-		PosZ = (int) floor(Val2 * 16);
-	}
-	else
-	{
-		PosZ = (int) floor(16 / Val2);
-	}
+	int PosX = Val1 % 16;
+	int PosZ = Val2 % 16;
 
 	for (int y = 1; y < cChunkDef::Height; y++)
 	{
