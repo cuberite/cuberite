@@ -44,7 +44,7 @@ public:
 	}
 
 
-	virtual short GetDurabilityLostWithThatAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
 		switch (a_Action)
 		{

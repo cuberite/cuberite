@@ -335,7 +335,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 	if (!cBlockInfo::IsOneHitDig(Block))
 	{
-		a_Player->UseEquippedItem(GetDurabilityLostWithThatAction(dlaBreakBlock));
+		a_Player->UseEquippedItem(GetDurabilityLossByAction(dlaBreakBlock));
 	}
 }
 
@@ -346,7 +346,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 void cItemHandler::OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity)
 {
 	UNUSED(a_AttackedEntity);
-	a_Attacker->UseEquippedItem(GetDurabilityLostWithThatAction(dlaAttackEntity));
+	a_Attacker->UseEquippedItem(GetDurabilityLossByAction(dlaAttackEntity));
 }
 
 
@@ -364,7 +364,7 @@ void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_I
 
 
 
-short cItemHandler::GetDurabilityLostWithThatAction(eDurabilityLostAction a_Action)
+short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction a_Action)
 {
 	switch (a_Action)
 	{

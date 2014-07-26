@@ -64,7 +64,7 @@ public:
 	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item);
 
 	/** Get the durability lost which the item will get, when a specified action was performed. */
-	virtual short GetDurabilityLostWithThatAction(eDurabilityLostAction a_Action);
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action);
 
 	/** Returns the maximum stack size for a given item */
 	virtual char GetMaxStackSize(void);
