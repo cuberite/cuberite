@@ -16,7 +16,6 @@ public:
 	cItemSwordHandler(int a_ItemType)
 	: cItemHandler(a_ItemType)
 	{
-
 	}
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override

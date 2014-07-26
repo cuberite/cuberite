@@ -345,6 +345,39 @@ int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_P
 
 
 
+int cItemGrid::RemoveItem(const cItem & a_ItemStack)
+{
+	int NumLeft = a_ItemStack.m_ItemCount;
+
+	for (int i = 0; i < m_NumSlots; i++)
+	{
+		if (NumLeft <= 0)
+		{
+			break;
+		}
+
+		if (m_Slots[i].IsEqual(a_ItemStack))
+		{
+			int NumToRemove = std::min(NumLeft, (int)m_Slots[i].m_ItemCount);
+			NumLeft -= NumToRemove;
+			m_Slots[i].m_ItemCount -= NumToRemove;
+
+			if (m_Slots[i].m_ItemCount <= 0)
+			{
+				m_Slots[i].Empty();
+			}
+
+			TriggerListeners(i);
+		}
+	}
+
+	return (a_ItemStack.m_ItemCount - NumLeft);
+}
+
+
+
+
+
 int cItemGrid::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 {
 	if ((a_SlotNum < 0) || (a_SlotNum >= m_NumSlots))

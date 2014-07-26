@@ -27,7 +27,8 @@ class cChestEntity :
 	typedef cBlockEntityWithItems super;
 	
 public:
-	enum {
+	enum
+	{
 		ContentsHeight = 3,
 		ContentsWidth  = 9,
 	} ;

@@ -6,7 +6,7 @@
 /*
 The whole thing is a thread that runs in a loop, waiting for either:
 	"finished chunks" (ChunkReady()), or
-	"chunks to send" (QueueSendChunkTo() )
+	"chunks to send" (QueueSendChunkTo())
 to come to a queue.
 And once they do, it requests the chunk data and sends it all away, either
 	broadcasting (ChunkReady), or

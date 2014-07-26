@@ -210,11 +210,11 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		{
 			if (ShouldAppendChatPrefixes)
 			{
-				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue.c_str(), a_AdditionalData.c_str(), cChatColor::White.c_str(), cChatColor::Italic.c_str());
+				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue, a_AdditionalData.c_str(), cChatColor::White, cChatColor::Italic);
 			}
 			else
 			{
-				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue.c_str());
+				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
 			}
 		}
 	}
@@ -533,9 +533,9 @@ void cClientHandle::HandlePing(void)
 
 	Printf(Reply, "%s%s%i%s%i",
 		Server.GetDescription().c_str(),
-		cChatColor::Delimiter.c_str(),
+		cChatColor::Delimiter,
 		Server.GetNumPlayers(),
-		cChatColor::Delimiter.c_str(),
+		cChatColor::Delimiter,
 		Server.GetMaxPlayers()
 	);
 	Kick(Reply);
@@ -1070,7 +1070,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
+	BlockHandler(a_OldBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
 	World->BroadcastSoundParticleEffect(2001, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
@@ -1170,7 +1170,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		// Only compare ItemType, not meta (torches have different metas)
 		// The -1 check is there because sometimes the client sends -1 instead of the held item
-		//  ( http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502 )
+		// Ref.: http://forum.mc-server.org/showthread.php?tid=549&pid=4502#pid4502
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
 		);
@@ -1209,11 +1209,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
 	}
-	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)) && !m_Player->IsGameModeCreative())
+	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
 	{
-		if (m_Player->IsSatiated() && !ItemHandler->IsDrinkable(EquippedDamage))
+		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&
+			ItemHandler->IsFood())
 		{
-			// The player is satiated, they cannot eat
+			// The player is satiated or in creative, and trying to eat
 			return;
 		}
 		m_Player->StartEating();
@@ -1360,7 +1361,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
 	cChunkInterface ChunkInterface(World->GetChunkMap());
-	NewBlock->OnPlacedByPlayer(ChunkInterface,*World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
 	World->BroadcastSoundEffect(NewBlock->GetStepSound(), (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.8f);
@@ -2561,7 +2562,7 @@ void cClientHandle::SendUpdateSign(
 
 
 
-void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cClientHandle::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
@@ -2623,7 +2624,7 @@ const AString & cClientHandle::GetUsername(void) const
 
 
 
-void cClientHandle::SetUsername( const AString & a_Username )
+void cClientHandle::SetUsername( const AString & a_Username)
 {
 	m_Username = a_Username;
 }

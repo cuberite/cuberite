@@ -120,7 +120,7 @@ public:
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) = 0;
 	virtual void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity) = 0;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
-	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) = 0;
+	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
 	virtual void SendWeather             (eWeather a_Weather) = 0;
 	virtual void SendWholeInventory      (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose         (const cWindow    & a_Window) = 0;
@@ -138,7 +138,7 @@ protected:
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 	
 	/// Called after writing each packet, enables descendants to flush their buffers
-	virtual void Flush(void) {};
+	virtual void Flush(void) {}
 	
 	// Helpers for writing partial packet data, write using SendData()
 	void WriteByte(Byte a_Value)

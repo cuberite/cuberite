@@ -26,7 +26,7 @@ public:
 
 	virtual FoodInfo GetFoodInfo(void) override
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
 			// Please keep alpha-sorted.
 			case E_ITEM_BAKED_POTATO:     return FoodInfo(6, 7.2);

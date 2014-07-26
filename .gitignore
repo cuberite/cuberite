@@ -15,6 +15,7 @@ cloc.xsl
 *.suo
 /EveryNight.cmd
 /UploadLuaAPI.cmd
+AllFiles.lst
 
 # IDE Stuff
 ## Sublime Text
@@ -65,6 +66,7 @@ lib/tolua++/tolua
 src/Bindings/Bindings.*
 src/Bindings/BindingDependecies.txt
 MCServer.dir/
+src/AllFiles.lst
 
 #win32 cmake stuff
 *.vcxproj

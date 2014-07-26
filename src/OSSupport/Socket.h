@@ -41,7 +41,6 @@ public:
 
 	cSocket(void) : m_Socket(INVALID_SOCKET) {}
 	cSocket(xSocket a_Socket);
-	~cSocket();
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
 	void CloseSocket(void);

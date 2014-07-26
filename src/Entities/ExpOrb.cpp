@@ -62,9 +62,9 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 		a_Distance.Normalize();
 		a_Distance *= ((float) (5.5 - Distance));
-		SetSpeedX( a_Distance.x );
-		SetSpeedY( a_Distance.y );
-		SetSpeedZ( a_Distance.z );
+		SetSpeedX( a_Distance.x);
+		SetSpeedY( a_Distance.y);
+		SetSpeedZ( a_Distance.z);
 		BroadcastMovementUpdate();
 	}
 	HandlePhysics(a_Dt, a_Chunk);

@@ -19,9 +19,9 @@ public:
 	// tolua_begin
 	virtual const AString GetWebTitle(void) const = 0;
 	
-	virtual AString HandleWebRequest(const HTTPRequest * a_Request ) = 0;
+	virtual AString HandleWebRequest(const HTTPRequest * a_Request) = 0;
 
-	static AString SafeString( const AString & a_String );
+	static AString SafeString( const AString & a_String);
 	// tolua_end
 
 	struct sWebPluginTab
@@ -37,7 +37,7 @@ public:
 
 	typedef std::list< std::pair<AString, AString> > TabNameList;
 	TabNameList GetTabNames();  // >> EXPORTED IN MANUALBINDINGS <<
-	std::pair< AString, AString > GetTabNameForRequest(const HTTPRequest* a_Request );
+	std::pair< AString, AString > GetTabNameForRequest(const HTTPRequest* a_Request);
 
 private:
 	TabList m_Tabs;

@@ -48,7 +48,7 @@ public:
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); };
+	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the curently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
@@ -117,8 +117,8 @@ public:
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
-	void SetTouchGround( bool a_bTouchGround );
-	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
+	void SetTouchGround( bool a_bTouchGround);
+	inline void SetStance( const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
@@ -239,15 +239,15 @@ public:
 	typedef std::list< std::string > StringList;
 
 	/** Adds a player to existing group or creates a new group when it doesn't exist */
-	void AddToGroup( const AString & a_GroupName );  // tolua_export
+	void AddToGroup( const AString & a_GroupName);  // tolua_export
 	
 	/** Removes a player from the group, resolves permissions and group inheritance (case sensitive) */
-	void RemoveFromGroup( const AString & a_GroupName );  // tolua_export
+	void RemoveFromGroup( const AString & a_GroupName);  // tolua_export
 	
-	bool HasPermission( const AString & a_Permission );  // tolua_export
+	bool HasPermission( const AString & a_Permission);  // tolua_export
 	const GroupList & GetGroups() { return m_Groups; }  // >> EXPORTED IN MANUALBINDINGS <<
 	StringList GetResolvedPermissions();  // >> EXPORTED IN MANUALBINDINGS <<
-	bool IsInGroup( const AString & a_Group );  // tolua_export
+	bool IsInGroup( const AString & a_Group);  // tolua_export
 
 	// tolua_begin
 	
@@ -328,7 +328,7 @@ public:
 	
 	void Respawn(void);  // tolua_export
 
-	void SetVisible( bool a_bVisible );  // tolua_export
+	void SetVisible( bool a_bVisible);  // tolua_export
 	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
 
 	/** Moves the player to the specified world.

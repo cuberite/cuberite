@@ -15,7 +15,7 @@ class cEnderCrystal :
 	typedef cEntity super;
 
 public:
-	CLASS_PROTODEF(cEnderCrystal);
+	CLASS_PROTODEF(cEnderCrystal)
 
 	cEnderCrystal(double a_X, double a_Y, double a_Z);
 

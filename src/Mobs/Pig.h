@@ -15,7 +15,7 @@ class cPig :
 public:
 	cPig(void);
 
-	CLASS_PROTODEF(cPig);
+	CLASS_PROTODEF(cPig)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;

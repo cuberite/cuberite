@@ -100,7 +100,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 	{
 		case wcsRecvHeaders:
 		{
-			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth() )
+			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth())
 			break;
 		}
 		

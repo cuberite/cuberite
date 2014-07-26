@@ -115,8 +115,6 @@ void cMonster::TickPathFinding()
 	const int PosY = POSY_TOINT;
 	const int PosZ = POSZ_TOINT;
 
-	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
-
 	std::vector<Vector3d> m_PotentialCoordinates;
 	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
 
@@ -128,7 +126,7 @@ void cMonster::TickPathFinding()
 		{ 1, 0},
 		{-1, 0},
 		{ 0, 1},
-		{ 0,-1},
+		{ 0, -1},
 	} ;
 	
 	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
@@ -201,19 +199,6 @@ void cMonster::TickPathFinding()
 
 
 
-void cMonster::MoveToPosition(const Vector3f & a_Position)
-{
-	FinishPathFinding();
-
-	m_FinalDestination = a_Position;
-	m_bMovingToDestination = true;
-	TickPathFinding();
-}
-
-
-
-
-
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 	FinishPathFinding();
@@ -227,15 +212,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 
 bool cMonster::IsCoordinateInTraversedList(Vector3i a_Coords)
 {
-	for (std::vector<Vector3i>::const_iterator itr = m_TraversedCoordinates.begin(); itr != m_TraversedCoordinates.end(); ++itr)
-	{
-		if (itr->Equals(a_Coords))
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return (std::find(m_TraversedCoordinates.begin(), m_TraversedCoordinates.end(), a_Coords) != m_TraversedCoordinates.end());
 }
 
 
@@ -296,8 +273,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bOnGround)
 		{
-			m_Destination.y = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
-
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
@@ -306,7 +281,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 
 		Vector3f Distance = m_Destination - GetPosition();
-		if(!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
+		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
 			Distance.Normalize();
@@ -439,11 +414,7 @@ void cMonster::HandleFalling()
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
-
-	if (PosY < 0)
-		PosY = 0;
-	else if (PosY > cChunkDef::Height)
-		PosY = cChunkDef::Height;
+	PosY = Clamp(PosY, 0, cChunkDef::Height);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{
@@ -709,16 +680,6 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 bool cMonster::IsUndead(void)
 {
-	switch (GetMobType())
-	{
-		case mtZombie:
-		case mtZombiePigman:
-		case mtSkeleton:
-		case mtWither:
-		{
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -867,13 +828,13 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(Random.NextInt(2) + 1);
+			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(Random.NextInt(1) == 0 ? false : true);
+			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
 			break;
 		}
 		case mtVillager:

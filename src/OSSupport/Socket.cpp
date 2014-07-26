@@ -25,15 +25,6 @@ cSocket::cSocket(xSocket a_Socket)
 
 
 
-cSocket::~cSocket()
-{
-	// Do NOT close the socket; this class is an API wrapper, not a RAII!
-}
-
-
-
-
-
 cSocket::operator cSocket::xSocket() const
 {
 	return m_Socket;
@@ -138,7 +129,7 @@ int cSocket::WSAStartup(void)
 #ifdef _WIN32
 	WSADATA wsaData;
 	memset(&wsaData, 0, sizeof(wsaData));
-	return ::WSAStartup(MAKEWORD(2, 2),&wsaData);
+	return ::WSAStartup(MAKEWORD(2, 2), &wsaData);
 #else
 	return 0;
 #endif

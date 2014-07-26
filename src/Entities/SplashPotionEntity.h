@@ -23,7 +23,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cSplashPotionEntity);
+	CLASS_PROTODEF(cSplashPotionEntity)
 	
 	cSplashPotionEntity(
 		cEntity * a_Creator,
@@ -31,29 +31,51 @@ public:
 		const Vector3d & a_Speed,
 		cEntityEffect::eType a_EntityEffectType,
 		cEntityEffect a_EntityEffect,
-		int a_PotionParticleType
+		int a_PotionColor
 	);
 	
-	cEntityEffect::eType GetEntityEffectType  (void) const { return m_EntityEffectType; }
-	cEntityEffect        GetEntityEffect      (void) const { return m_EntityEffect; }
-	int                  GetPotionParticleType(void) const { return m_PotionParticleType; }
+	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
+	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
+	int                  GetPotionColor(void)      const { return m_PotionColor; }
 	
 	void SetEntityEffectType(cEntityEffect::eType a_EntityEffectType) { m_EntityEffectType = a_EntityEffectType; }
 	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
-	void SetPotionParticleType(int a_PotionParticleType) { m_PotionParticleType = a_PotionParticleType; }
+	void SetPotionColor(int a_PotionColor) { m_PotionColor = a_PotionColor; }
 	
 protected:
 	
 	cEntityEffect::eType m_EntityEffectType;
 	cEntityEffect m_EntityEffect;
-	int m_PotionParticleType;
+	int m_PotionColor;
 	
 
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void Tick           (float a_Dt, cChunk & a_Chunk) override
+	{
+		if (m_DestroyTimer > 0)
+		{
+			m_DestroyTimer--;
+			if (m_DestroyTimer == 0)
+			{
+				Destroy();
+				return;
+			}
+		}
+		else
+		{
+			super::Tick(a_Dt, a_Chunk);
+		}
+	}
 	
 	/** Splashes the potion, fires its particle effects and sounds
 	@param a_HitPos     The position where the potion will splash */
 	void Splash(const Vector3d & a_HitPos);
+	
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+
+private:
+	/** Time in ticks to wait for the hit animation to begin before destroying */
+	int m_DestroyTimer;
 } ;  // tolua_export

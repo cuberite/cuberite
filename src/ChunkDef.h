@@ -92,7 +92,7 @@ public:
 
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
-	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
+	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
 	{
 		UNUSED(a_Y);
 		BlockToChunk(a_X, a_Z, a_ChunkX, a_ChunkZ);
@@ -118,7 +118,7 @@ public:
 	}
 
 
-	inline static int MakeIndex(int x, int y, int z )
+	inline static int MakeIndex(int x, int y, int z)
 	{
 		if (
 			(x < Width)  && (x > -1) &&
@@ -145,7 +145,7 @@ public:
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index )
+	inline static Vector3i IndexToCoordinate( unsigned int index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			return Vector3i(  // 1.2
@@ -357,7 +357,7 @@ struct sSetBlock
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 
-	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );  // absolute block position
+	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // absolute block position
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		x(a_X), y(a_Y), z(a_Z),
 		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),

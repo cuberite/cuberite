@@ -101,15 +101,16 @@ protected:
 		}
 	} ;
 
-	struct FuncTable {
-		static void Delete(sChunkLoad) {};
-		static void Combine(sChunkLoad& a_orig, const sChunkLoad a_new)
+	struct FuncTable
+	{
+		static void Delete(sChunkLoad) {}
+		static void Combine(sChunkLoad & a_orig, const sChunkLoad a_new)
 		{
 			a_orig.m_Generate |= a_new.m_Generate;
-		};
+		}
 	};
 
-	typedef cQueue<sChunkLoad,FuncTable> sChunkLoadQueue;
+	typedef cQueue<sChunkLoad, FuncTable> sChunkLoadQueue;
 	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;

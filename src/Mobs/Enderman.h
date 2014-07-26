@@ -15,7 +15,7 @@ class cEnderman :
 public:
 	cEnderman(void);
 
-	CLASS_PROTODEF(cEnderman);
+	CLASS_PROTODEF(cEnderman)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 

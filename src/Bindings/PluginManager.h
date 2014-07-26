@@ -163,7 +163,7 @@ public:
 
 	typedef std::map< AString, cPlugin * > PluginMap;
 	typedef std::list< cPlugin * > PluginList;
-	cPlugin * GetPlugin( const AString & a_Plugin ) const;  // tolua_export
+	cPlugin * GetPlugin( const AString & a_Plugin) const;  // tolua_export
 	const PluginMap & GetAllPlugins() const;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin

@@ -96,6 +96,10 @@ public:
 	Returns the total number of items that fit.
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritarySlot = -1);
+
+	/** Removes the specified item from the grid, as many as possible, up to a_ItemStack.m_ItemCount.
+	Returns the number of items that were removed. */
+	int RemoveItem(const cItem & a_ItemStack);
 	
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.

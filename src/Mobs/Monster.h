@@ -73,16 +73,16 @@ public:
 	// tolua_end
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
-	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
+	enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
 	
 	/** Creates the mob object.
-	* If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
-	* a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22))
-	* a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
+	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
+	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
+	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
-	CLASS_PROTODEF(cMonster);
+	CLASS_PROTODEF(cMonster)
 	
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -92,7 +92,6 @@ public:
 	
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void MoveToPosition(const Vector3f & a_Position);
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 	virtual bool ReachedDestination(void);
 	
@@ -108,7 +107,7 @@ public:
 	void GetMonsterConfig(const AString & a_Name);
 	
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
-	bool IsUndead(void);
+	virtual bool IsUndead(void);
 	
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);

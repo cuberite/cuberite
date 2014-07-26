@@ -2367,9 +2367,9 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		"a: 24: 2\n"  /* sandstone */
 		"b:  4: 0\n"  /* cobblestone */
 		"c: 24: 0\n"  /* sandstone */
-		"d: 12: 0\n"  /* sand */
-		"e: 13: 0\n"  /* gravel */
-		"f:  5: 0\n"  /* wood */
+		"d: 13: 0\n"  /* gravel */
+		"e:  5: 0\n"  /* wood */
+		"f: 12: 0\n"  /* sand */
 		"g: 64: 3\n"  /* wooddoorblock */
 		"h: 85: 0\n"  /* fence */
 		"i: 64: 0\n"  /* wooddoorblock */
@@ -2392,26 +2392,26 @@ const cPrefab::sDef g_AlchemistVillagePrefabs[] =
 		/*    *   012345678901234 */
 		/*  0 */ "mmmabbbammmmmmm"
 		/*  1 */ "mmmmbbbmmmmmmmm"
-		/*  2 */ "acccccccccadddd"
-		/*  3 */ "cccccccccccdddd"
-		/*  4 */ "cccccccccccdddd"
-		/*  5 */ "cccccccccccdddd"
-		/*  6 */ "cccccccccccdddd"
-		/*  7 */ "cccccccccccdddd"
-		/*  8 */ "acccccccccadddd"
+		/*  2 */ "acccccccccacccc"
+		/*  3 */ "ccccccccccccccc"
+		/*  4 */ "ccccccccccccccc"
+		/*  5 */ "ccccccccccccccc"
+		/*  6 */ "ccccccccccccccc"
+		/*  7 */ "ccccccccccccccc"
+		/*  8 */ "acccccccccacccc"
 
 		// Level 1
 		/* z\x*             11111 */
 		/*    *   012345678901234 */
-		/*  0 */ "mmmaeeeammmmmmm"
-		/*  1 */ "mmmmeeemmmmmmmm"
-		/*  2 */ "accccfccccadddd"
-		/*  3 */ "cfffffffffcdddd"
-		/*  4 */ "cfffffffffcdddd"
-		/*  5 */ "cffffffffffdddd"
-		/*  6 */ "cfffffffffcdddd"
-		/*  7 */ "cfffffffffcdddd"
-		/*  8 */ "acccccccccadddd"
+		/*  0 */ "mmmadddammmmmmm"
+		/*  1 */ "mmmmdddmmmmmmmm"
+		/*  2 */ "acccceccccaffff"
+		/*  3 */ "ceeeeeeeeecffff"
+		/*  4 */ "ceeeeeeeeecffff"
+		/*  5 */ "ceeeeeeeeeeffff"
+		/*  6 */ "ceeeeeeeeecffff"
+		/*  7 */ "ceeeeeeeeecffff"
+		/*  8 */ "acccccccccaffff"
 
 		// Level 2
 		/* z\x*             11111 */

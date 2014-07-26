@@ -169,8 +169,8 @@ void cChestEntity::OpenNewWindow(void)
 	if (
 		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     OpenDbl) ||
 		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX    , m_PosY, m_PosZ - 1, OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX    , m_PosY, m_PosZ + 1, OpenDbl)
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ - 1, OpenDbl) ||
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ + 1, OpenDbl)
 	)
 	{
 		// The double-chest window has been opened in the callback

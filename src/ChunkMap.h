@@ -34,6 +34,7 @@ class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
+class cSetChunkData;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
@@ -60,7 +61,7 @@ public:
 
 	static const int LAYER_SIZE = 32;
 
-	cChunkMap(cWorld* a_World );
+	cChunkMap(cWorld* a_World);
 	~cChunkMap();
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
@@ -89,7 +90,7 @@ public:
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -112,22 +113,11 @@ public:
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the chunk data as either loaded from the storage or generated.
-	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
-	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
-	a_HeightMap is optional, if not present, will be calculated.
-	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
+	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
+	If MarkDirty is set, the chunk is set as dirty (used after generating)
+	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk.
 	*/
-	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ,
-		const BLOCKTYPE * a_BlockTypes,
-		const NIBBLETYPE * a_BlockMeta,
-		const NIBBLETYPE * a_BlockLight,
-		const NIBBLETYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		const cChunkDef::BiomeMap &  a_BiomeMap,
-		cBlockEntityList & a_BlockEntities,
-		bool a_MarkDirty
-	);
+	void SetChunkData(cSetChunkData & a_SetChunkData);
 	
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -289,7 +279,7 @@ public:
 	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
-	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() ) */
+	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk()) */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
@@ -368,7 +358,7 @@ private:
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 		
 		/** Returns the specified chunk, or NULL if not created yet */
 		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);

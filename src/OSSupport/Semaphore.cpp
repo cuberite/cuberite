@@ -5,9 +5,9 @@
 
 
 
-cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* = 0 */ )
+cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* = 0 */)
 #ifndef _WIN32
-	: m_bNamed( false )
+	: m_bNamed( false)
 #endif
 {
 #ifndef _WIN32
@@ -20,15 +20,15 @@ cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* 
 		m_bNamed = true;
 
 		AString Name;
-		Printf(Name, "cSemaphore%p", this );
+		Printf(Name, "cSemaphore%p", this);
 		m_Handle = sem_open(Name.c_str(), O_CREAT, 777, a_InitialCount);
-		if( m_Handle == SEM_FAILED )
+		if (m_Handle == SEM_FAILED)
 		{
-			LOG("ERROR: Could not create Semaphore. (%i)", errno );
+			LOG("ERROR: Could not create Semaphore. (%i)", errno);
 		}
 		else
 		{
-			if( sem_unlink(Name.c_str()) != 0 )
+			if (sem_unlink(Name.c_str()) != 0)
 			{
 				LOG("ERROR: Could not unlink cSemaphore. (%i)", errno);
 			}
@@ -51,18 +51,18 @@ cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* 
 cSemaphore::~cSemaphore()
 {
 #ifdef _WIN32
-	CloseHandle( m_Handle );
+	CloseHandle( m_Handle);
 #else
-	if( m_bNamed )
+	if (m_bNamed)
 	{
-		if( sem_close( (sem_t*)m_Handle ) != 0 )
+		if (sem_close( (sem_t*)m_Handle) != 0)
 		{
 			LOG("ERROR: Could not close cSemaphore. (%i)", errno);
 		}
 	}
 	else
 	{
-		sem_destroy( (sem_t*)m_Handle );
+		sem_destroy( (sem_t*)m_Handle);
 		delete (sem_t*)m_Handle;
 	}
 	m_Handle = 0;
@@ -77,7 +77,7 @@ cSemaphore::~cSemaphore()
 void cSemaphore::Wait()
 {
 #ifndef _WIN32
-	if( sem_wait( (sem_t*)m_Handle ) != 0)
+	if (sem_wait( (sem_t*)m_Handle) != 0)
 	{
 		LOG("ERROR: Could not wait for cSemaphore. (%i)", errno);
 	}
@@ -93,12 +93,12 @@ void cSemaphore::Wait()
 void cSemaphore::Signal()
 {
 #ifndef _WIN32
-	if( sem_post( (sem_t*)m_Handle ) != 0 )
+	if (sem_post( (sem_t*)m_Handle) != 0)
 	{
 		LOG("ERROR: Could not signal cSemaphore. (%i)", errno);
 	}
 #else
-	ReleaseSemaphore( m_Handle, 1, NULL );
+	ReleaseSemaphore( m_Handle, 1, NULL);
 #endif
 }
 

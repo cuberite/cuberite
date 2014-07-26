@@ -86,6 +86,10 @@ public:
 	*/
 	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a_tryToFillEquippedFirst);
 
+	/** Removes the specified item from the inventory, as many as possible, up to a_ItemStack.m_ItemCount.
+	Returns the number of items that were removed. */
+	int RemoveItem(const cItem & a_ItemStack);
+
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
 	bool RemoveOneEquippedItem(void);
 	
@@ -165,7 +169,7 @@ public:
 	bool LoadFromJson(Json::Value & a_Value);
 
 protected:
-	bool AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode = 0 );
+	bool AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode = 0);
 	
 	cItemGrid m_ArmorSlots;
 	cItemGrid m_InventorySlots;

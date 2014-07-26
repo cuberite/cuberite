@@ -10,12 +10,13 @@
 
 
 // The "map" used for biome <-> string conversions:
-static struct {
+static struct
+{
 	EMCSBiome    m_Biome;
 	const char * m_String;
 } g_BiomeMap[] =
 {
-	{biOcean,            "Ocean"} ,
+	{biOcean,            "Ocean"},
 	{biPlains,           "Plains"},
 	{biDesert,           "Desert"},
 	{biExtremeHills,     "ExtremeHills"},

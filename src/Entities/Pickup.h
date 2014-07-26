@@ -23,7 +23,7 @@ class cPickup :
 public:
 	// tolua_end
 
-	CLASS_PROTODEF(cPickup);
+	CLASS_PROTODEF(cPickup)
 
 	cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
 

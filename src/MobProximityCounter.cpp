@@ -8,12 +8,12 @@
 
 void cMobProximityCounter::CollectMob(cEntity& a_Monster, cChunk& a_Chunk, double a_Distance)
 {
-	// LOGD("Collecting monster %s, with distance %f",a_Monster->GetClass(),a_Distance);
+	// LOGD("Collecting monster %s, with distance %f", a_Monster->GetClass(), a_Distance);
 	tMonsterToDistance::iterator it = m_MonsterToDistance.find(&a_Monster);
 	if (it == m_MonsterToDistance.end())
 	{
-		sDistanceAndChunk newDistanceAndChunk(a_Distance,a_Chunk);
-		std::pair<tMonsterToDistance::iterator,bool> result = m_MonsterToDistance.insert(tMonsterToDistance::value_type(&a_Monster,newDistanceAndChunk));
+		sDistanceAndChunk newDistanceAndChunk(a_Distance, a_Chunk);
+		std::pair<tMonsterToDistance::iterator, bool> result = m_MonsterToDistance.insert(tMonsterToDistance::value_type(&a_Monster, newDistanceAndChunk));
 		if (!result.second)
 		{
 			ASSERT(!"A collected Monster was not found inside distance map using find(), but insert() said there already is a key for it");
@@ -34,9 +34,9 @@ void cMobProximityCounter::CollectMob(cEntity& a_Monster, cChunk& a_Chunk, doubl
 
 void cMobProximityCounter::convertMaps()
 {
-	for(tMonsterToDistance::const_iterator itr = m_MonsterToDistance.begin(); itr != m_MonsterToDistance.end(); ++itr)
+	for (tMonsterToDistance::const_iterator itr = m_MonsterToDistance.begin(); itr != m_MonsterToDistance.end(); ++itr)
 	{
-		m_DistanceToMonster.insert(tDistanceToMonster::value_type(itr->second.m_Distance,sMonsterAndChunk(*itr->first,*itr->second.m_Chunk)));
+		m_DistanceToMonster.insert(tDistanceToMonster::value_type(itr->second.m_Distance, sMonsterAndChunk(*itr->first, *itr->second.m_Chunk)));
 	}
 }
 
@@ -55,7 +55,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 		convertMaps();
 	}
 
-	for(tDistanceToMonster::const_iterator itr = m_DistanceToMonster.begin(); itr != m_DistanceToMonster.end(); ++itr)
+	for (tDistanceToMonster::const_iterator itr = m_DistanceToMonster.begin(); itr != m_DistanceToMonster.end(); ++itr)
 	{
 		if (toReturn.m_Begin == m_DistanceToMonster.end())
 		{

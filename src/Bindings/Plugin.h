@@ -33,7 +33,7 @@ class cPlugin
 public:
 	// tolua_end
 	
-	cPlugin( const AString & a_PluginDirectory );
+	cPlugin( const AString & a_PluginDirectory);
 	virtual ~cPlugin();
 	
 	virtual void OnDisable(void) {}
@@ -115,10 +115,10 @@ public:
 	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) = 0;
 	
 	/// All bound commands are to be removed, do any language-dependent cleanup here
-	virtual void ClearCommands(void) {} ;
+	virtual void ClearCommands(void) {}
 	
 	/// All bound console commands are to be removed, do any language-dependent cleanup here
-	virtual void ClearConsoleCommands(void) {} ;
+	virtual void ClearConsoleCommands(void) {}
 	
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }
@@ -141,7 +141,7 @@ public:
 		E_SQUIRREL,  // OBSOLETE, but kept in place to remind us of the horrors lurking in the history
 	};
 	PluginLanguage GetLanguage() { return m_Language; }
-	void SetLanguage( PluginLanguage a_Language ) { m_Language = a_Language; }
+	void SetLanguage( PluginLanguage a_Language) { m_Language = a_Language; }
 
 private:
 	PluginLanguage m_Language;

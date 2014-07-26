@@ -15,7 +15,7 @@ class cPainting :
 	typedef cEntity super;
 
 public:
-	CLASS_PROTODEF(cPainting);
+	CLASS_PROTODEF(cPainting)
 
 	cPainting(const AString & a_Name, int a_Direction, double a_X, double a_Y, double a_Z);
 	const AString & GetName(void) const { return m_Name; }  // tolua_export

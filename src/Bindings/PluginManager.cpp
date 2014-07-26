@@ -72,7 +72,7 @@ void cPluginManager::FindPlugins(void)
 		{
 			PluginMap::iterator thiz = itr;
 			++thiz;
-			m_Plugins.erase( itr );
+			m_Plugins.erase( itr);
 			itr = thiz;
 			continue;
 		}
@@ -1432,11 +1432,11 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 
 
 
-cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin ) const
+cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin) const
 {
-	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
+	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
-		if (itr->second == NULL ) continue;
+		if (itr->second == NULL) continue;
 		if (itr->second->GetName().compare(a_Plugin) == 0)
 		{
 			return itr->second;

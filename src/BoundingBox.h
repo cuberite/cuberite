@@ -49,7 +49,7 @@ public:
 	bool IsInside(const Vector3d & a_Point);
 	
 	/// Returns true if the point is inside the bounding box
-	bool IsInside(double a_X, double a_Y,double a_Z);
+	bool IsInside(double a_X, double a_Y, double a_Z);
 	
 	/// Returns true if a_Other is inside this bounding box
 	bool IsInside(cBoundingBox & a_Other);

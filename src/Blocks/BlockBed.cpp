@@ -15,7 +15,7 @@ void cBlockBedHandler::OnPlacedByPlayer(
 	if (a_BlockMeta < 8)
 	{
 		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
-		a_ChunkInterface.SetBlock(a_WorldInterface,a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
+		a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
 	}
 }
 
@@ -27,8 +27,8 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ );
-	Vector3i Direction = MetaDataToDirection( OldMeta & 0x7 );
+	Vector3i ThisPos( a_BlockX, a_BlockY, a_BlockZ);
+	Vector3i Direction = MetaDataToDirection( OldMeta & 0x7);
 	if (OldMeta & 0x8)
 	{
 		// Was pillow

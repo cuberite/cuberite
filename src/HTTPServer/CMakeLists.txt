@@ -4,9 +4,26 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-file(GLOB SOURCE
-    "*.cpp"
-    "*.h"
-)
+SET (SRCS
+	EnvelopeParser.cpp
+	HTTPConnection.cpp
+	HTTPFormParser.cpp
+	HTTPMessage.cpp
+	HTTPServer.cpp
+	MultipartParser.cpp
+	NameValueParser.cpp
+	SslHTTPConnection.cpp)
 
-add_library(HTTPServer ${SOURCE})
+SET (HDRS
+	EnvelopeParser.h
+	HTTPConnection.h
+	HTTPFormParser.h
+	HTTPMessage.h
+	HTTPServer.h
+	MultipartParser.h
+	NameValueParser.h
+	SslHTTPConnection.h)
+
+if(NOT MSVC)
+	add_library(HTTPServer ${SRCS} ${HDRS})
+endif()
