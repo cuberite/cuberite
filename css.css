@@ -1,17 +1,14 @@
-html { height: 100%; }
-
 body
 {
-	padding: 0px 20px 20px 20px;
 	font-family: Calibri, Helvetica;
-	height: 100%;
-}
-.wrapper
-{
-	min-height: 100%;
 }
 
-.navhr { margin-top: -8px; }
+header
+{
+	margin: 0 auto;
+	text-align: center;
+	vertical-align: middle;
+}
 
 h1
 {
@@ -25,76 +22,57 @@ h2
 	margin-top: -30px;
 	font-family: Segoe UI Light, Helvetica;
 	font-size: 20px;
-	font-weight: normal;	
+	font-weight: normal;
 }
 
 .logo
 {
-	float: left;
-	margin-right: 20px;
 	height: 256px;
 	width: 256px;
 }
 
-nav { float: right; }
-.nav
-{
-	margin-top: -32.5px;
-	list-style: none;
-}
-.nav li
-{
-	padding-left: 10px;
-	padding-right: 10px;
-	border: 1px solid black;
-	border-bottom: none;
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
-	display: inline;
-	font-size: 20px;
-	transition: all 300ms;
-	margin-left: 1.5px;
-	vertical-align: 6px;
-}
-.nav li:hover { background-color: lightgrey; }
 .nav a:link, .buildstatusanddonatelink:link { text-decoration: none; }
 
-.downloadbox
+#nodownload
 {
-	border: 2px solid lightblue;
-	background-color: lightblue;
-	border-radius: 5px;
-	width: 500px;
-	height: 300px;
-	margin-left: auto;
-	margin-right: auto;
-	clear: left;
-	display: inline-table;
-}
-@media screen and (max-width: 1360px)
-{
-	.downloadbox { display: table; }
-	.nav
-	{
-		margin-top: -15.5px;
-	}
-	.nav li
-	{
-		border-bottom: 1px solid black;
-		border-radius: 5px;
-	}
-	nav { float: none; }
-	.navhr { margin-top: 0; }
+	font-size: 1;
+	transition: 300ms all;
 }
 .downloadosimage
 {
 	width: 90px;
 	height: 90px;
-	display: block;
+	display: inline-block;
 	margin-left: auto;
 	margin-right: auto;
 	padding-top: 5px;
 	padding-bottom: 5px;
+}
+.downloadblock
+{
+	position: absolute;
+	left: 0;
+    right: 0;
+	top: -50px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: -40px;
+	opacity: 0;
+	width: 80px;
+	height: 70px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	background-color: grey;
+	border-radius: 30px;
+	transition: 300ms all;
+	text-align: center;
+	overflow: hidden;
+}
+.downloaditem
+{
+	padding: 5px 5px;
+	vertical-align: top;
+	display: inline-block;
 }
 .downloadicon
 {
@@ -103,11 +81,6 @@ nav { float: right; }
 	margin-right: auto;
 	width: 40px;
 	height: 40px;
-}
-
-footer
-{
-	border-top: 1px dotted black;
 }
 
 .buildstatusanddonatebutton { display: inline; }

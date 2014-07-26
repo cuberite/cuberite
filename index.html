@@ -2,6 +2,56 @@
 
 <html>
 
+	<script>
+		var CurrentlyOpen = false;
+		var PreviousOS;
+		var Timeout;
+		
+		function ToggleDownloadPane(OS)
+		{
+			if (CurrentlyOpen && (typeof PreviousOS !== "undefined") && (OS !== PreviousOS))
+			{
+				ToggleDownloadPane(PreviousOS);
+				return;
+			}
+			
+			PreviousOS = OS;
+			var Overlay;
+			var NoDownloadText = document.getElementById("nodownload");
+			
+			switch (OS)
+			{
+				case "Windows": Overlay = document.getElementById("downloadblockwindows"); break;
+				case "Linux": Overlay = document.getElementById("downloadblocklinux"); break;
+				case "Macintosh": Overlay = document.getElementById("downloadblockmacintosh"); break;
+				case "Git": Overlay = document.getElementById("downloadblockgit"); break;
+			}
+			
+			if (CurrentlyOpen)
+			{
+				Timeout = setTimeout(function() { Overlay.style.position = "absolute"; }, 200);
+				NoDownloadText.style.opacity = 100;
+			}
+			else
+			{
+				clearTimeout(Timeout);
+				Overlay.style.position = "relative";
+				NoDownloadText.style.opacity = 0;
+			}
+			
+			Overlay.style.opacity = (Overlay.style.opacity == 0) ? 100 : 0;
+			CurrentlyOpen = CurrentlyOpen ? false : true;
+			
+			switch (OS)
+			{
+				case "Git": Overlay.style.width = (Overlay.style.width == "630px") ? "80px" : "630px"; break;
+				case "Linux": Overlay.style.width = (Overlay.style.width == "470px") ? "80px" : "470px"; break;
+				case "Windows": Overlay.style.width = (Overlay.style.width == "260px") ? "80px" : "260px"; break;
+				case "Macintosh": Overlay.style.width = (Overlay.style.width == "160px") ? "80px" : "160px"; break;
+			}
+		}
+	</script>
+
 	<head>
 
 		<meta charset="UTF-8">
@@ -20,137 +70,45 @@
 		<header>
 			<img src="https://raw.githubusercontent.com/mc-server/MCServer/master/src/Resources/icon_256.png" alt="MCServer Logo" class="logo">
 			<h1>MCServer</h1>
-			<h2>MCServer - A Custom Minecraft Server</h2>
+			<h2>A custom Minecraft server written completely in C++. It's a fast, lightweight, and awesome replacement for 	Vanilla.</h2>
 		</header>
 		
-		<nav>
-			<ul class="nav">
-				<li class="nav"><a href="/">Home</a></li>
-				<li class="nav"><a href="https://github.com/mc-server/MCServer">GitHub</a></li>
-				<li class="nav"><a href="http://forum.mc-server.org">Forums</a></li>
-				<li class="nav"><a href="http://mc-server.xoft.cz/LuaAPI/">API&nbsp;Documentation</a></li>
-			</ul>
-		</nav>
-
-		<hr class="navhr">
-		
-		<div class="wrapper">
-		
-			<p>
-				MCServer is a custom Minecraft server, written completely in C++.
-				It's designed to be a fast, lightweight, awesome and easy to use replacement for the original server.
-			</p>
-			
-			<p>
-				Below, you can download the current version for your operating system.
-				MCServer supports Windows, Mac OSX, Linux, Solaris and FreeBSD. 
-				If your platform is not listed, then there is probably a bug to add compatibility or your operating system is too obscure.
-			</p>
-			
-			<hr>
-			
-			<table class="downloadbox">
-				<tr><td style="margin: 0 auto;"><h3>Download Executables</h3></td></tr>
-				<tr>
-					<td>					
-						<div style="text-align: center;"><b>Linux 32-bit</b></div>
-						<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="images/linux.svg" alt="Linux" class="downloadosimage"/>
-							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>
-					</td>
-					<td>
-						<div style="text-align: center;"><b>Linux 64-bit</b></div>
-						<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86-64/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="images/linux.svg" alt="Linux" class="downloadosimage"/>
-							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>
-					</td>
-					<td>
-						<div style="text-align: center;"><b>Windows 32-bit</b></div>
-						<a href="http://mc-server.xoft.cz">
-							<img src="images/windows.svg" alt="Windows" class="downloadosimage"/>
-							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<div style="text-align: center;"><b>Macintosh 64-bit</b></div>
-						<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&amp;id=EAC2A6E3A23C4250%21109">
-							<img src="images/mac.svg" alt="Macintosh" class="downloadosimage"/>
-							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>
-					</td>
-					<td>
-						<div style="text-align: center;"><b>Raspbian Hard Float</b></div>
-						<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="images/raspi.svg" alt="Raspbian" class="downloadosimage"/>
-							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>
-					</td>
-					<td>
-						<div style="text-align: center;"><b>Raspbian Soft Float</b></div>
-						<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar">
-							<img src="images/raspi.svg" alt="Raspbian" class="downloadosimage"/>
-							<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>
-					</td>			
-				</tr>
-			</table>
-			
-			&nbsp;
-			
-			<table class="downloadbox">
-				<tr><td style="margin: 0 auto;" colspan=4><h3>Download Source Code</h3>
-						MCServer is an Open-Source project, and thus you can always download the latest version from
-						<a href="https://github.com/mc-server/MCServer">our GitHub repository</a> and compile the binaries yourself.<br/>
-						See GitHub repository for compiling instructions
-				</td></tr>
-				<tr>
-					<td>
-						<div style="text-align: center;"><b>Zip Source Download</b><br/>
-						</div>
-						<img src="images/github.svg" alt="Source Code" class="downloadosimage"/>
-						<a href="http://github.com/mc-server/MCServer/archive/master.zip">
-							<img src="images/downloadicon.svg" alt="Download Zip" class="downloadicon"/>
-						</a>
-		
-					</td>
-					<td>
-						<div style="text-align: center;"><b>Tar Source Download</b><br/>
-						</div>
-						<img src="images/github.svg" alt="Source Code" class="downloadosimage"/>
-						<a href="http://github.com/mc-server/MCServer/archive/master.tar.gz">
-							<img src="images/downloadicon.svg" alt="Download Tarball" class="downloadicon"/>
-						</a>
-					</td>
-					<td>
-						<div style="text-align: center;"><b>GitHub for Windows Clone</b><br/>
-						Use this link if you have <a href="https://windows.github.com">GitHub for Windows</a> installed.
-						</div>
-						<a href="github-windows://github.com/mc-server/MCServer.git">
-							<img src="images/githubforwindows.svg" alt="Github for Windows" class="downloadosimage"/>
-							<img src="images/gitdownloadicon.svg" alt="Download Icon" class="downloadicon"/>
-						</a>						
-					</td>
-					<td>
-						<div style="text-align: center;"><b>Git Clone Address</b><br/>
-						For any other style of Git that you might be using.
-						</div>
-						<input type="text" readonly="readonly" value="https://github.com/mc-server/MCServer">
-						<input type="text" readonly="readonly" value="git://github.com/mc-server/MCServer">
-						<img src="images/terminal.svg" alt="Github for Haters of Art (HoF - as in Astrid HoFferson)" class="downloadosimage">
-					</td>
-				</tr>
-			</table>
-			
-			&nbsp;
-		
+		<div style="text-align: center;" class="nav">
+			<a href="#" onclick="ToggleDownloadPane('Linux')"><img src="images/linux.svg" alt="Linux" class="downloadosimage"/></a>				
+			<a href="#" onclick="ToggleDownloadPane('Windows')"><img src="images/windows.svg" alt="Windows" class="downloadosimage"/></a>
+			<a href="#" onclick="ToggleDownloadPane('Macintosh')"><img src="images/mac.svg" alt="Macintosh" class="downloadosimage"/></a>
+			<a href="#" onclick="ToggleDownloadPane('Git')"><img src="images/githubforwindows.svg" alt="Github for Windows" class="downloadosimage"/></a>
+			<div id="nodownload"><font size="1">No download? There's probably a bug to add compatibility, or your OS is too obscure.<br /><br /></font></div>
 		</div>
+			
+		<div id="downloadblocklinux" class="downloadblock">
+			<div class="downloaditem">Linux 32 bit&nbsp;&nbsp;&nbsp;<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Linux 64 bit&nbsp;&nbsp;&nbsp;<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86-64/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">RasPi Hardfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">RasPi Softfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+		</div>
+		<div id="downloadblockwindows" class="downloadblock">
+			<div class="downloaditem">Windows 32 bit<a href="http://mc-server.xoft.cz"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Windows 64 bit<img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></div>
+		</div>
+		<div id="downloadblockmacintosh" class="downloadblock">
+			<div class="downloaditem">Macintosh 64 bit<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&amp;id=EAC2A6E3A23C4250%21109"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+		</div>
+		<div id="downloadblockgit" class="downloadblock">
+			<div class="downloaditem">Zipped Source&nbsp;&nbsp;&nbsp;<a href="http://github.com/mc-server/MCServer/archive/master.zip"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Tarballed Source<a href="http://github.com/mc-server/MCServer/archive/master.tar.gz"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Github for Windows Clone<a href="github-windows://github.com/mc-server/MCServer.git"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Git Clone<br/><input type="text" readonly="readonly" value="https://github.com/mc-server/MCServer"><br /><input type="text" readonly="readonly" value="git://github.com/mc-server/MCServer"></div>
+		</div>
+		
+		<nav style="text-align: center;" class="nav">
+			<a href="https://github.com/mc-server/MCServer">GitHub</a> •
+			<a href="http://forum.mc-server.org">Forums</a> •
+			<a href="http://mc-server.xoft.cz/LuaAPI">API&nbsp;Documentation</a> •
+			<a href="http://leekspin.com">Spin ya leeks</a>
+		</nav>
     
 		<footer>
-			<p style="text-align: center;">&copy; MCServer Contributors</p>
 			<div style="text-align: center">
 				<a href="https://travis-ci.org/mc-server/MCServer" class="buildstatusanddonatelink"><img src="https://travis-ci.org/mc-server/MCServer.svg?branch=master" alt="Build Status" class="buildstatusanddonatebutton"></a>
 				<a href="http://tip4commit.com/projects/74" class="buildstatusanddonatelink"><img src="http://tip4commit.com/projects/74.svg" alt="Donate Bitcoins!" class="buildstatusanddonatebutton"></a>
