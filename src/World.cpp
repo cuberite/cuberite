@@ -522,6 +522,9 @@ void cWorld::Start(void)
 	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
 	m_Dimension = StringToDimension(Dimension);
 
+	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
+	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
+
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
 	m_IsSpawnExplicitlySet =
