@@ -1,6 +1,7 @@
 
 #pragma once
 
+#undef  ntohll
 #define ntohll(x) ((((UInt64)ntohl((u_long)x)) << 32) + ntohl(x >> 32))
 
 
