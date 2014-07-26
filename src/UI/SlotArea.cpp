@@ -1866,6 +1866,19 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
+	// When the player is in creative mode, the client sends the new item as a_ClickedItem, not the current item in the slot.
+	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
+	{
+		if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
+		
+		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
+		return;
+	}
+
 	bool bAsync = false;
 	if (GetSlot(a_SlotNum, a_Player) == NULL)
 	{
@@ -1913,7 +1926,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		return;
 	}
 
-	if (DraggingItem.IsEmpty() || CanPlaceInSlot(a_SlotNum, DraggingItem))
+	if (DraggingItem.IsEmpty() || CanPlaceArmorInSlot(a_SlotNum, DraggingItem))
 	{
 		// Swap contents
 		cItem tmp(DraggingItem);
@@ -1932,7 +1945,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 
 
 
-bool cSlotAreaArmor::CanPlaceInSlot(int a_SlotNum, const cItem & a_Item)
+bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 {
 	switch (a_SlotNum)
 	{
