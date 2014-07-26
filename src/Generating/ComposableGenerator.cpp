@@ -26,6 +26,7 @@
 #include "POCPieceGenerator.h"
 #include "RainbowRoadsGen.h"
 #include "Ravines.h"
+#include "RoughRavines.h"
 #include "TestRailsGen.h"
 #include "UnderwaterBaseGen.h"
 #include "VillageGen.h"
@@ -397,15 +398,22 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "RainbowRoads") == 0)
 		{
-			int GridSize  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsGridSize", 512);
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsGridSize",  512);
 			int MaxOffset = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxOffset", 128);
-			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxDepth",  30);
-			int MaxSize   = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxSize",  260);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxDepth",   30);
+			int MaxSize   = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxSize",   260);
 			m_FinishGens.push_back(new cRainbowRoadsGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize));
 		}
 		else if (NoCaseCompare(*itr, "Ravines") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenRavines(Seed, 128));
+		}
+		else if (NoCaseCompare(*itr, "RoughRavines") == 0)
+		{
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "RoughRavinesGridSize",  256);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxOffset", 128);
+			int MaxSize   = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxSize",    64);
+			m_FinishGens.push_back(new cRoughRavines(Seed, MaxSize, GridSize, MaxOffset));
 		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{
