@@ -72,17 +72,18 @@ cSplashPotionEntity::cSplashPotionEntity(
 	cEntity * a_Creator,
 	double a_X, double a_Y, double a_Z,
 	const Vector3d & a_Speed,
-	cEntityEffect::eType a_EntityEffectType,
-	cEntityEffect a_EntityEffect,
-	int a_PotionColor
+	const cItem & a_Item
 ) :
 	super(pkSplashPotion, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
-	m_EntityEffectType(a_EntityEffectType),
-	m_EntityEffect(a_EntityEffect),
-	m_PotionColor(a_PotionColor),
 	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);
+	m_EntityEffectType = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
+	m_EntityEffect = cEntityEffect(
+		cEntityEffect::GetPotionEffectDuration(a_Item.m_ItemDamage),
+		cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage)
+	);
+	m_PotionColor = cEntityEffect::GetPotionColor(a_Item.m_ItemDamage);
 }
 
 
