@@ -29,7 +29,7 @@ public:
 		cEntity * a_Creator,
 		double a_X, double a_Y, double a_Z,
 		const Vector3d & a_Speed,
-		cItem a_Item
+		const cItem & a_Item
 	);
 	
 	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
