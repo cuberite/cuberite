@@ -24,7 +24,6 @@
 				case "Windows": Overlay = document.getElementById("downloadblockwindows"); break;
 				case "Linux": Overlay = document.getElementById("downloadblocklinux"); break;
 				case "Macintosh": Overlay = document.getElementById("downloadblockmacintosh"); break;
-				case "Git": Overlay = document.getElementById("downloadblockgit"); break;
 			}
 			
 			if (CurrentlyOpen)
@@ -44,7 +43,6 @@
 			
 			switch (OS)
 			{
-				case "Git": Overlay.style.width = (Overlay.style.width == "630px") ? "80px" : "630px"; break;
 				case "Linux": Overlay.style.width = (Overlay.style.width == "470px") ? "80px" : "470px"; break;
 				case "Windows": Overlay.style.width = (Overlay.style.width == "260px") ? "80px" : "260px"; break;
 				case "Macintosh": Overlay.style.width = (Overlay.style.width == "160px") ? "80px" : "160px"; break;
@@ -87,20 +85,16 @@
 			<div class="downloaditem">RasPi Hardfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 			<div class="downloaditem">RasPi Softfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 		</div>
+		
 		<div id="downloadblockwindows" class="downloadblock">
 			<div class="downloaditem">Windows 32 bit<a href="http://mc-server.xoft.cz"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 			<div class="downloaditem">Windows 64 bit<a href="http://1drv.ms/1oqd3K4"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 		</div>
+		
 		<div id="downloadblockmacintosh" class="downloadblock">
 			<div class="downloaditem">Macintosh 64 bit<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&amp;id=EAC2A6E3A23C4250%21109"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 		</div>
-		<!--<div id="downloadblockgit" class="downloadblock">
-			<div class="downloaditem">Zipped Source&nbsp;&nbsp;&nbsp;<a href="http://github.com/mc-server/MCServer/archive/master.zip"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
-			<div class="downloaditem">Tarballed Source<a href="http://github.com/mc-server/MCServer/archive/master.tar.gz"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
-			<div class="downloaditem">Github for Windows Clone<a href="github-windows://github.com/mc-server/MCServer.git"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
-			<div class="downloaditem">Git Clone<br/><input type="text" readonly="readonly" value="https://github.com/mc-server/MCServer"><br /><input type="text" readonly="readonly" value="git://github.com/mc-server/MCServer"></div>
-		</div>-->
-		
+
 		<nav style="text-align: center;" class="nav">
 			<a href="https://github.com/mc-server/MCServer">GitHub</a> &middot;
 			<a href="http://forum.mc-server.org">Forums</a> &middot;
