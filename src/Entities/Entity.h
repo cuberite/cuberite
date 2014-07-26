@@ -428,7 +428,7 @@ public:
 	// tolua_end
 	
 	/// Called when the specified player right-clicks this entity
-	virtual void OnRightClicked(cPlayer &) {};
+	virtual void OnRightClicked(cPlayer &) {}
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL)

@@ -15,7 +15,7 @@ class cGhast :
 public:
 	cGhast(void);
 
-	CLASS_PROTODEF(cGhast);
+	CLASS_PROTODEF(cGhast)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void Attack(float a_Dt) override;

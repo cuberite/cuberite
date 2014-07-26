@@ -15,6 +15,7 @@ cloc.xsl
 *.suo
 /EveryNight.cmd
 /UploadLuaAPI.cmd
+AllFiles.lst
 
 # IDE Stuff
 ## Sublime Text

@@ -408,39 +408,6 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_Bl
 
 
 
-
-void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer *a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
-{
-}
-
-
-
-
-
 void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 {
 	// Setting the meta to a_BlockMeta keeps most textures. The few other blocks have to override this.
@@ -451,11 +418,23 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 
 
 
-void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop, bool a_DropVerbatim)
 {
 	cItems Pickups;
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-	ConvertToPickups(Pickups, Meta);
+
+	if (a_CanDrop)
+	{
+		if (!a_DropVerbatim)
+		{
+			ConvertToPickups(Pickups, Meta);
+		}
+		else
+		{
+			// TODO: Add a proper overridable function for this
+			Pickups.Add(m_BlockType, 1, Meta);
+		}
+	}
 	
 	// Allow plugins to modify the pickups:
 	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);

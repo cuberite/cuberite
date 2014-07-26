@@ -328,12 +328,9 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 
 	if (a_Player->IsGameModeSurvival())
 	{
-		if (!BlockRequiresSpecialTool(Block) || CanHarvestBlock(Block))
-		{
-			cChunkInterface ChunkInterface(a_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*a_World);
-			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
-		}
+		cChunkInterface ChunkInterface(a_World->GetChunkMap());
+		cBlockInServerPluginInterface PluginInterface(*a_World);
+		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block), a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0);
 	}
 
 	if (!cBlockInfo::IsOneHitDig(Block))
@@ -542,9 +539,50 @@ bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
 
 bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 {
-	UNUSED(a_BlockType);
-	
-	return false;
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ANVIL:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_FURNACE:
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_COAL_ORE:
+		case E_BLOCK_STONE:
+		case E_BLOCK_COBBLESTONE:
+		case E_BLOCK_END_STONE:
+		case E_BLOCK_MOSSY_COBBLESTONE:
+		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_SANDSTONE:
+		case E_BLOCK_STONE_BRICKS:
+		case E_BLOCK_NETHER_BRICK:
+		case E_BLOCK_NETHERRACK:
+		case E_BLOCK_STONE_SLAB:
+		case E_BLOCK_DOUBLE_STONE_SLAB:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_BRICK:
+		case E_BLOCK_COBBLESTONE_STAIRS:
+		case E_BLOCK_COBBLESTONE_WALL:
+		case E_BLOCK_STONE_BRICK_STAIRS:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_CAULDRON:
+		case E_BLOCK_OBSIDIAN:
+		case E_BLOCK_DIAMOND_BLOCK:
+		case E_BLOCK_DIAMOND_ORE:
+		case E_BLOCK_GOLD_BLOCK:
+		case E_BLOCK_GOLD_ORE:
+		case E_BLOCK_REDSTONE_ORE:
+		case E_BLOCK_REDSTONE_ORE_GLOWING:
+		case E_BLOCK_EMERALD_ORE:
+		case E_BLOCK_IRON_BLOCK:
+		case E_BLOCK_IRON_ORE:
+		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_LAPIS_BLOCK:
+		case E_BLOCK_SNOW:
+		case E_BLOCK_VINES:
+		{
+			return false;
+		}
+		default: return true;
+	}
 }
 
 

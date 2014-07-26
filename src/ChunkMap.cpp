@@ -16,6 +16,7 @@
 #include "MobCensus.h"
 #include "MobSpawner.h"
 #include "BoundingBox.h"
+#include "SetChunkData.h"
 
 #include "Entities/Pickup.h"
 
@@ -912,28 +913,20 @@ void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::SetChunkData(
-	int a_ChunkX, int a_ChunkZ,
-	const BLOCKTYPE *  a_BlockTypes,
-	const NIBBLETYPE * a_BlockMeta,
-	const NIBBLETYPE * a_BlockLight,
-	const NIBBLETYPE * a_BlockSkyLight,
-	const cChunkDef::HeightMap * a_HeightMap,
-	const cChunkDef::BiomeMap &  a_BiomeMap,
-	cBlockEntityList & a_BlockEntities,
-	bool a_MarkDirty
-)
+void cChunkMap::SetChunkData(cSetChunkData & a_SetChunkData)
 {
+	int ChunkX = a_SetChunkData.GetChunkX();
+	int ChunkZ = a_SetChunkData.GetChunkZ();
 	{
 		cCSLock Lock(m_CSLayers);
-		cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+		cChunkPtr Chunk = GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 		if (Chunk == NULL)
 		{
 			return;
 		}
-		Chunk->SetAllData(a_BlockTypes, a_BlockMeta, a_BlockLight, a_BlockSkyLight, a_HeightMap, a_BiomeMap, a_BlockEntities);
+		Chunk->SetAllData(a_SetChunkData);
 		
-		if (a_MarkDirty)
+		if (a_SetChunkData.ShouldMarkDirty())
 		{
 			Chunk->MarkDirty();
 		}
@@ -942,7 +935,7 @@ void cChunkMap::SetChunkData(
 		cChunkStays ToBeDisabled;
 		for (cChunkStays::iterator itr = m_ChunkStays.begin(), end = m_ChunkStays.end(); itr != end; ++itr)
 		{
-			if ((*itr)->ChunkAvailable(a_ChunkX, a_ChunkZ))
+			if ((*itr)->ChunkAvailable(ChunkX, ChunkZ))
 			{
 				// The chunkstay wants to be disabled, add it to a list of to-be-disabled chunkstays for later processing:
 				ToBeDisabled.push_back(*itr);
@@ -957,7 +950,7 @@ void cChunkMap::SetChunkData(
 	}
 
 	// Notify plugins of the chunk becoming available
-	cPluginManager::Get()->CallHookChunkAvailable(m_World, a_ChunkX, a_ChunkZ);
+	cPluginManager::Get()->CallHookChunkAvailable(m_World, ChunkX, ChunkZ);
 }
 
 

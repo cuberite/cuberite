@@ -59,7 +59,7 @@ public:
 				return true;
 			}
 		}  // switch (a_BlockType)
-		return false;
+		return super::CanHarvestBlock(a_BlockType);
 	}
 
 

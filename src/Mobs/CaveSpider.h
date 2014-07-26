@@ -14,7 +14,7 @@ class cCaveSpider :
 public:
 	cCaveSpider(void);
 
-	CLASS_PROTODEF(cCaveSpider);
+	CLASS_PROTODEF(cCaveSpider)
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void Attack(float a_Dt) override;

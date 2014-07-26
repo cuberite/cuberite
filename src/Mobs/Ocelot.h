@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	CLASS_PROTODEF(cOcelot);
+	CLASS_PROTODEF(cOcelot)
 } ;
 
 

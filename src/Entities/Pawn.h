@@ -16,7 +16,7 @@ class cPawn :
 	typedef cEntity super;
 	
 public:
-	CLASS_PROTODEF(cPawn);
+	CLASS_PROTODEF(cPawn)
 
 	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
 	

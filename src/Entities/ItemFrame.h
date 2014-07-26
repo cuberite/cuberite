@@ -16,7 +16,7 @@ class cItemFrame :
 
 public:
 
-	CLASS_PROTODEF(cItemFrame);
+	CLASS_PROTODEF(cItemFrame)
 
 	cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
 
@@ -24,7 +24,7 @@ public:
 	const cItem & GetItem(void) { return m_Item; }                  // tolua_export
 
 	/** Set the item in the frame */
-	void SetItem(cItem & a_Item) { m_Item = a_Item; };              // tolua_export
+	void SetItem(cItem & a_Item) { m_Item = a_Item; }               // tolua_export
 
 	/** Returns the rotation from the item in the frame */
 	Byte GetRotation(void) const { return m_Rotation; }             // tolua_export

@@ -23,7 +23,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cSplashPotionEntity);
+	CLASS_PROTODEF(cSplashPotionEntity)
 	
 	cSplashPotionEntity(
 		cEntity * a_Creator,

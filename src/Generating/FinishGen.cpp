@@ -45,42 +45,14 @@ static inline bool IsWater(BLOCKTYPE a_BlockType)
 
 void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	double ChunkX = a_ChunkDesc.GetChunkX() + 0.1;  // We can't devide through 0 so lets add 0.1 to all the chunk coordinates.
-	double ChunkZ = a_ChunkDesc.GetChunkZ() + 0.1;
-	
-	NOISE_DATATYPE Val1 = m_Noise.CubicNoise2D((float) (ChunkX * ChunkZ * 0.01f), (float) (ChunkZ / ChunkX * 0.01f));
-	NOISE_DATATYPE Val2 = m_Noise.CubicNoise2D((float) (ChunkX / ChunkZ / 0.01f), (float) (ChunkZ * ChunkX / 0.01f));
+	int ChunkX = a_ChunkDesc.GetChunkX();
+	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	if (Val1 < 0)
-	{
-		Val1 = -Val1;
-	}
-	
-	if (Val2 < 0)
-	{
-		Val2 = -Val2;
-	}
+	int Val1 = m_Noise.IntNoise2DInt(ChunkX ^ ChunkZ, ChunkZ + ChunkX);
+	int Val2 = m_Noise.IntNoise2DInt(ChunkZ ^ ChunkX, ChunkZ - ChunkX);
 
-	int PosX, PosZ;
-	// Calculate PosX
-	if (Val1 <= 1)
-	{
-		PosX = (int) floor(Val1 * 16);
-	}
-	else
-	{
-		PosX = (int) floor(16 / Val1);
-	}
-	
-	// Calculate PosZ
-	if (Val2 <= 1)
-	{
-		PosZ = (int) floor(Val2 * 16);
-	}
-	else
-	{
-		PosZ = (int) floor(16 / Val2);
-	}
+	int PosX = Val1 % 16;
+	int PosZ = Val2 % 16;
 
 	for (int y = 1; y < cChunkDef::Height; y++)
 	{
@@ -88,12 +60,14 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			continue;
 		}
+
 		if (!cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(PosX, y - 1, PosZ)))  // Only place on solid blocks
 		{
 			continue;
 		}
 		
-		NOISE_DATATYPE BlockType = m_Noise.CubicNoise1D((float) (ChunkX * ChunkZ) / (y * 0.1f));
+		// Choose what block to use.
+		NOISE_DATATYPE BlockType = m_Noise.IntNoise3D((int) ChunkX, y, (int) ChunkZ);
 		if (BlockType < -0.7)
 		{
 			TryPlaceClump(a_ChunkDesc, PosX, y, PosZ, E_BLOCK_BROWN_MUSHROOM);
@@ -119,12 +93,17 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 
 	for (int x = a_RelX - 4; x < a_RelX + 4; x++)
 	{
-		float xx = (float) a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
+		int xx = a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
 		for (int z = a_RelZ - 4; z < a_RelZ + 4; z++)
 		{
-			float zz = (float) a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
+			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = a_RelY - 2; y < a_RelY + 2; y++)
 			{
+				if ((y < 1) || (y > cChunkDef::Height))
+				{
+					continue;
+				}
+
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)  // Don't replace non air blocks.
 				{
 					continue;
@@ -144,11 +123,69 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 					}
 				}
 
-
-				NOISE_DATATYPE Val = m_Noise.CubicNoise2D(xx, zz);
-				if (Val < -0.70)
+				NOISE_DATATYPE Val = m_Noise.IntNoise2D(xx, zz);
+				if (Val < -0.5)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, a_Block);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cFinishGenTallGrass:
+
+void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	for (int x = 0; x < cChunkDef::Width; x++)
+	{
+		int xx = x + a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int zz = z + a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+			int BiomeDensity = GetBiomeDensity(a_ChunkDesc.GetBiome(x, z));
+
+			// Choose if we want to place long grass here. If not then bail out:
+			if ((m_Noise.IntNoise2DInt(xx + m_Noise.IntNoise1DInt(xx), zz + m_Noise.IntNoise1DInt(zz)) / 7 % 100) > BiomeDensity)
+			{
+				continue;
+			}
+			
+			// Get the top block + 1. This is the place where the grass would finaly be placed:
+			int y = a_ChunkDesc.GetHeight(x, z) + 1;
+
+			// Check if long grass can be placed:
+			if (
+				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
+				((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) && (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
+				)
+			{
+				continue;
+			}
+
+			// Choose what long grass meta we should use:
+			int GrassType = m_Noise.IntNoise2DInt(xx * 50, zz * 50) / 7 % 100;
+			if (GrassType < 60)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 1);
+			}
+			else if (GrassType < 90)
+			{
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_TALL_GRASS, 2);
+			}
+			else
+			{
+				// If double long grass we have to choose what type we should use:
+				if (a_ChunkDesc.GetBlockType(x, y + 1, z) == E_BLOCK_AIR)
+				{
+					NIBBLETYPE Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? 2 : 3;
+					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_BIG_FLOWER, Meta);
+					a_ChunkDesc.SetBlockTypeMeta(x, y + 1, z, E_BLOCK_BIG_FLOWER, 8);
 				}
 			}
 		}

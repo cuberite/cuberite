@@ -56,6 +56,7 @@ SET (SRCS
 	Root.cpp
 	Scoreboard.cpp
 	Server.cpp
+	SetChunkData.cpp
 	Statistics.cpp
 	StringCompression.cpp
 	StringUtils.cpp
@@ -124,6 +125,7 @@ SET (HDRS
 	Root.h
 	Scoreboard.h
 	Server.h
+	SetChunkData.h
 	StackWalker.h
 	Statistics.h
 	StringCompression.h
@@ -265,7 +267,7 @@ if (MSVC)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDECIES}
+		DEPENDS ${BINDING_DEPENDENCIES}
 	)
 endif()
 

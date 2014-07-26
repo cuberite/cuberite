@@ -14,7 +14,7 @@ class cTNTEntity :
 	
 public:
 	// tolua_end
-	CLASS_PROTODEF(cTNTEntity);
+	CLASS_PROTODEF(cTNTEntity)
 
 	cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks = 80);
 	cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks = 80);

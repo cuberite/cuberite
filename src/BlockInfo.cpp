@@ -15,7 +15,6 @@ cBlockInfo::cBlockInfo()
 	, m_OneHitDig(false)
 	, m_PistonBreakable(false)
 	, m_IsSnowable(false)
-	, m_RequiresSpecialTool(false)
 	, m_IsSolid(true)
 	, m_FullyOccupiesVoxel(false)
 	, m_Handler(NULL)
@@ -439,52 +438,6 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STONE_BRICKS        ].m_IsSnowable = true;
 	a_Info[E_BLOCK_TNT                 ].m_IsSnowable = true;
 	a_Info[E_BLOCK_WOOL                ].m_IsSnowable = true;
-
-
-	// Blocks that don't drop without a special tool:
-	a_Info[E_BLOCK_BRICK               ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_CAULDRON            ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_COAL_ORE            ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_COBBLESTONE         ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_COBBLESTONE_WALL    ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_COBBLESTONE_STAIRS  ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_COBWEB              ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_DIAMOND_BLOCK       ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_DIAMOND_ORE         ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_DOUBLE_STONE_SLAB   ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_EMERALD_ORE         ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_END_STONE           ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_VINES               ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_GOLD_BLOCK          ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_GOLD_ORE            ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_IRON_BLOCK          ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_IRON_ORE            ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_LAPIS_BLOCK         ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_LAPIS_ORE           ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_LEAVES              ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_MOSSY_COBBLESTONE   ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_NETHERRACK          ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_NETHER_BRICK        ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_NETHER_BRICK_STAIRS ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_OBSIDIAN            ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_REDSTONE_ORE        ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_REDSTONE_ORE_GLOWING].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_SANDSTONE           ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_SANDSTONE_STAIRS    ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_SNOW                ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_STONE               ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_STONE_BRICKS        ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_STONE_BRICK_STAIRS  ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_STONE_SLAB          ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_VINES               ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_FURNACE             ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_LIT_FURNACE         ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_ANVIL               ].m_RequiresSpecialTool = true;
-	a_Info[E_BLOCK_ENCHANTMENT_TABLE   ].m_RequiresSpecialTool = true;
-
 
 	// Nonsolid blocks:
 	a_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_IsSolid = false;

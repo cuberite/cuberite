@@ -470,7 +470,7 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 {
 	int Y = a_BlockY;
 	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	a_BlockY = Clamp<unsigned char>(Y, 0, 255);
+	a_BlockY = Clamp<unsigned char>((unsigned char)Y, 0, 255);
 }
 
 
@@ -713,15 +713,6 @@ namespace ItemCategory
 }
 
 // tolua_end
-
-
-inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
-{
-	if (!IsValidBlock(a_BlockType)) return false;
-	return cBlockInfo::RequiresSpecialTool(a_BlockType);
-}
-
-
 
 
 
