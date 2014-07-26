@@ -1866,7 +1866,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
-	// Creative inventory must treat a_ClickedItem as a DraggedItem instead, replacing the inventory slot with it
+	// When the player is in creative mode, the client sends the new item as a_ClickedItem, not the current item in the slot.
 	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
 	{
 		if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
