@@ -12,6 +12,7 @@
 class cItemShearsHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemShearsHandler(int a_ItemType) :
 		cItemHandler(a_ItemType)
@@ -30,8 +31,12 @@ public:
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if ((Block == E_BLOCK_LEAVES) || (Block == E_BLOCK_NEW_LEAVES))
 		{
+			NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+			cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
+
 			cItems Drops;
-			Drops.push_back(cItem(Block, 1, a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) & 0x03));
+			Handler->ConvertToPickups(Drops, Meta);
+			Drops.push_back(cItem(Block, 1, Meta & 3));
 			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
@@ -54,7 +59,25 @@ public:
 				return true;
 			}
 		}  // switch (a_BlockType)
-		return false;
+		return super::CanHarvestBlock(a_BlockType);
+	}
+
+
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	{
+		return 0;
+	}
+
+
+	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
+
+		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if ((Block == E_BLOCK_TRIPWIRE) || (Block == E_BLOCK_VINES))
+		{
+			a_Player->UseEquippedItem();
+		}
 	}
 } ;
 

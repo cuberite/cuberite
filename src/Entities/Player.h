@@ -349,7 +349,7 @@ public:
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
-	void UseEquippedItem(void);
+	void UseEquippedItem(int a_Amount = 1);
 	
 	void SendHealth(void);
 

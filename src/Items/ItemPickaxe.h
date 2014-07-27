@@ -8,6 +8,7 @@
 class cItemPickaxeHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemPickaxeHandler(int a_ItemType)
 	: cItemHandler(a_ItemType)
@@ -84,7 +85,7 @@ public:
 				return PickaxeLevel() >= 1;
 			}
 		}
-		return false;
+		return super::CanHarvestBlock(a_BlockType);
 	}
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override

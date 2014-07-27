@@ -52,11 +52,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 	{
 		m_IsSheared = true;
 		m_World->BroadcastEntityMetadata(*this);
-
-		if (!a_Player.IsGameModeCreative())
-		{
-			a_Player.UseEquippedItem();
-		}
+		a_Player.UseEquippedItem();
 
 		cItems Drops;
 		int NumDrops = m_World->GetTickRandomNumber(2) + 1;

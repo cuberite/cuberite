@@ -14,6 +14,7 @@
 
 class cItemShovelHandler : public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemShovelHandler(int a_ItemType)
 		: cItemHandler(a_ItemType)
@@ -39,7 +40,11 @@ public:
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		return (a_BlockType == E_BLOCK_SNOW);
+		if (a_BlockType == E_BLOCK_SNOW)
+		{
+			return true;
+		}
+		return super::CanHarvestBlock(a_BlockType);
 	}
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
