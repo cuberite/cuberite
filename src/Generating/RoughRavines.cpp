@@ -22,6 +22,7 @@ class cRoughRavine :
 public:
 	cRoughRavine(int a_Seed, int a_Size, float a_CenterWidth, float a_Roughness, int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
 		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+		m_Seed(a_Seed + 100),
 		m_Noise(a_Seed + 100),
 		m_Roughness(a_Roughness)
 	{
@@ -41,6 +42,9 @@ public:
 		// Calculate the points in between, recursively:
 		SubdivideLine(0, Half);
 		SubdivideLine(Half, Max);
+		
+		// Initialize the per-height radius modifiers:
+		InitPerHeightRadius(a_GridX, a_GridZ);
 	}
 	
 protected:
@@ -63,6 +67,8 @@ protected:
 	};
 	typedef std::vector<sRavineDefPoint> sRavineDefPoints;
 	
+	int m_Seed;
+	
 	cNoise m_Noise;
 	
 	int m_MaxSize;
@@ -70,6 +76,9 @@ protected:
 	sRavineDefPoints m_DefPoints;
 	
 	float m_Roughness;
+	
+	/** Number to add to the radius based on the height. This creates the "ledges" in the ravine walls. */
+	float m_PerHeightRadius[cChunkDef::Height];
 	
 	
 	/** Recursively subdivides the line between the points of the specified index.
@@ -114,6 +123,29 @@ protected:
 	}
 	
 	
+	void InitPerHeightRadius(int a_GridX, int a_GridZ)
+	{
+		int h = 0;
+		while (h < cChunkDef::Height)
+		{
+			m_Noise.SetSeed(m_Seed + h);
+			int rnd = m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 13;
+			int NumBlocks = (rnd % 3) + 2;
+			rnd = rnd / 4;
+			float Val = (float)(rnd % 256) / 128 - 1;  // Random float in range [-1, +1]
+			if (h + NumBlocks > cChunkDef::Height)
+			{
+				NumBlocks = cChunkDef::Height - h;
+			}
+			for (int i = 0; i < NumBlocks; i++)
+			{
+				m_PerHeightRadius[h + i] = Val;
+			}
+			h += NumBlocks;
+		}
+	}
+	
+	
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
 	{
 		int BlockStartX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
@@ -123,18 +155,20 @@ protected:
 		for (sRavineDefPoints::const_iterator itr = m_DefPoints.begin(), end = m_DefPoints.end(); itr != end; ++itr)
 		{
 			if (
-				(ceilf (itr->m_X + itr->m_Radius) < BlockStartX) ||
-				(floorf(itr->m_X - itr->m_Radius) > BlockEndX) ||
-				(ceilf (itr->m_Z + itr->m_Radius) < BlockStartZ) ||
-				(floorf(itr->m_Z - itr->m_Radius) > BlockEndZ)
+				(ceilf (itr->m_X + itr->m_Radius + 2) < BlockStartX) ||
+				(floorf(itr->m_X - itr->m_Radius - 2) > BlockEndX) ||
+				(ceilf (itr->m_Z + itr->m_Radius + 2) < BlockStartZ) ||
+				(floorf(itr->m_Z - itr->m_Radius - 2) > BlockEndZ)
 			)
 			{
 				// Cannot intersect, bail out early
 				continue;
 			}
 			
-			// Carve out a cylinder around the xz point, m_Radius in diameter, from Bottom to Top:
-			float RadiusSq = itr->m_Radius * itr->m_Radius;  // instead of doing sqrt for each distance, we do sqr of the radius
+			// Carve out a cylinder around the xz point, up to (m_Radius + 2) in diameter, from Bottom to Top:
+			// On each height level, use m_PerHeightRadius[] to modify the actual radius used
+			// EnlargedRadiusSq is the square of the radius enlarged by the maximum m_PerHeightRadius offset - anything outside it will never be touched.
+			float RadiusSq = (itr->m_Radius + 2) * (itr->m_Radius + 2);
 			float DifX = BlockStartX - itr->m_X;  // substitution for faster calc
 			float DifZ = BlockStartZ - itr->m_Z;  // substitution for faster calc
 			for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
@@ -147,37 +181,44 @@ protected:
 				}
 				#endif  // _DEBUG
 				
+				// If the column is outside the enlarged radius, bail out completely
 				float DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
-				if (DistSq <= RadiusSq)
+				if (DistSq > RadiusSq)
 				{
-					int Top = std::min((int)ceilf(itr->m_Top), +cChunkDef::Height);
-					for (int y = std::max((int)floorf(itr->m_Bottom), 1); y <= Top; y++)
-					{
-						switch (a_ChunkDesc.GetBlockType(x, y, z))
-						{
-							// Only carve out these specific block types
-							case E_BLOCK_DIRT:
-							case E_BLOCK_GRASS:
-							case E_BLOCK_STONE:
-							case E_BLOCK_COBBLESTONE:
-							case E_BLOCK_GRAVEL:
-							case E_BLOCK_SAND:
-							case E_BLOCK_SANDSTONE:
-							case E_BLOCK_NETHERRACK:
-							case E_BLOCK_COAL_ORE:
-							case E_BLOCK_IRON_ORE:
-							case E_BLOCK_GOLD_ORE:
-							case E_BLOCK_DIAMOND_ORE:
-							case E_BLOCK_REDSTONE_ORE:
-							case E_BLOCK_REDSTONE_ORE_GLOWING:
-							{
-								a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
-								break;
-							}
-							default: break;
-						}
-					}
+					continue;
 				}
+				
+				int Top = std::min((int)ceilf(itr->m_Top), +cChunkDef::Height);
+				for (int y = std::max((int)floorf(itr->m_Bottom), 1); y <= Top; y++)
+				{
+					if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)
+					{
+						continue;
+					}
+					switch (a_ChunkDesc.GetBlockType(x, y, z))
+					{
+						// Only carve out these specific block types
+						case E_BLOCK_DIRT:
+						case E_BLOCK_GRASS:
+						case E_BLOCK_STONE:
+						case E_BLOCK_COBBLESTONE:
+						case E_BLOCK_GRAVEL:
+						case E_BLOCK_SAND:
+						case E_BLOCK_SANDSTONE:
+						case E_BLOCK_NETHERRACK:
+						case E_BLOCK_COAL_ORE:
+						case E_BLOCK_IRON_ORE:
+						case E_BLOCK_GOLD_ORE:
+						case E_BLOCK_DIAMOND_ORE:
+						case E_BLOCK_REDSTONE_ORE:
+						case E_BLOCK_REDSTONE_ORE_GLOWING:
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+							break;
+						}
+						default: break;
+					}  // switch (BlockType)
+				}  // for y
 			}  // for x, z - a_BlockTypes
 		}  // for itr - m_Points[]
 	}
