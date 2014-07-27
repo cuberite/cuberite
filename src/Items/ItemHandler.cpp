@@ -366,7 +366,7 @@ void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_I
 
 short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction a_Action)
 {
-	switch (a_Action)
+	switch ((int)a_Action)
 	{
 		case dlaAttackEntity: return 2;
 		case dlaBreakBlock:   return 1;
