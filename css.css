@@ -60,10 +60,10 @@ h2
 	opacity: 0;
 	width: 80px;
 	height: 70px;
-	padding-top: 5px;
+	padding-top: 10px;
 	padding-bottom: 5px;
 	background-color: grey;
-	border-radius: 30px;
+	border-radius: 20px;
 	transition: 300ms all;
 	text-align: center;
 	overflow: hidden;
