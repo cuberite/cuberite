@@ -91,19 +91,50 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 {
 	bool IsFireBlock = a_Block == E_BLOCK_FIRE;
 
-	for (int x = a_RelX - 4; x < a_RelX + 4; x++)
+	int MinX = a_RelX - 4;
+	if (MinX < 0)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	{
+		MinX = 0;
+	}
+
+	int MaxX = a_RelX + 4;
+	if (MaxX > cChunkDef::Width)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	{
+		MaxX = cChunkDef::Width;
+	}
+
+	int MinZ = a_RelZ - 4;
+	if (MinZ < 0)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	{
+		MinZ = 0;
+	}
+
+	int MaxZ = a_RelZ + 4;
+	if (MaxZ > cChunkDef::Width)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	{
+		MaxZ = cChunkDef::Width;
+	}
+
+	int MinY = a_RelY - 2;
+	if (MinY < 0)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	{
+		MinY = 0;
+	}
+
+	int MaxY = a_RelY + 2;
+	if (MaxY > cChunkDef::Height)  // Check if the coordinate is outside the chunk. If it it then adjust it.
+	{
+		MaxY = cChunkDef::Height;
+	}
+
+	for (int x = MinX; x < MaxX; x++)
 	{
 		int xx = a_ChunkDesc.GetChunkX() * cChunkDef::Width + x;
-		for (int z = a_RelZ - 4; z < a_RelZ + 4; z++)
+		for (int z = MinZ; z < MaxZ; z++)
 		{
 			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
-			for (int y = a_RelY - 2; y < a_RelY + 2; y++)
+			for (int y = MinY; y < MaxY; y++)
 			{
-				if ((y < 1) || (y > cChunkDef::Height))
-				{
-					continue;
-				}
-
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)  // Don't replace non air blocks.
 				{
 					continue;
