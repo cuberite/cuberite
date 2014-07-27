@@ -20,7 +20,13 @@ class cRoughRavine :
 	typedef cGridStructGen::cStructure super;
 	
 public:
-	cRoughRavine(int a_Seed, int a_Size, float a_CenterWidth, float a_Roughness, int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
+	cRoughRavine(
+		int a_Seed, int a_Size,
+		float a_CenterWidth, float a_Roughness,
+		float a_FloorHeightEdge1,   float a_FloorHeightEdge2,   float a_FloorHeightCenter,
+		float a_CeilingHeightEdge1, float a_CeilingHeightEdge2, float a_CeilingHeightCenter,
+		int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ
+	) :
 		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed + 100),
 		m_Noise(a_Seed + 100),
@@ -35,9 +41,9 @@ public:
 		float Angle = (float)rnd;  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
 		float OfsX = sin(Angle) * Len;
 		float OfsZ = cos(Angle) * Len;
-		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             42, 34);
-		m_DefPoints[Half].Set((float)a_OriginX, (float)a_OriginZ, a_CenterWidth, 62, 16);
-		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             44, 32);
+		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             a_CeilingHeightEdge1,  a_FloorHeightEdge1);
+		m_DefPoints[Half].Set((float)a_OriginX, (float)a_OriginZ, a_CenterWidth, a_CeilingHeightCenter, a_FloorHeightCenter);
+		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             a_CeilingHeightEdge2,  a_FloorHeightEdge2);
 		
 		// Calculate the points in between, recursively:
 		SubdivideLine(0, Half);
@@ -235,7 +241,11 @@ cRoughRavines::cRoughRavines(
 	int a_Seed,
 	int a_MaxSize, int a_MinSize,
 	float a_MaxCenterWidth, float a_MinCenterWidth,
-	float a_MaxRoughness, float a_MinRoughness,
+	float a_MaxRoughness,   float a_MinRoughness,
+	float a_MaxFloorHeightEdge,     float a_MinFloorHeightEdge,
+	float a_MaxFloorHeightCenter,   float a_MinFloorHeightCenter,
+	float a_MaxCeilingHeightEdge,   float a_MinCeilingHeightEdge,
+	float a_MaxCeilingHeightCenter, float a_MinCeilingHeightCenter,
 	int a_GridSize, int a_MaxOffset
 ) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 64),
@@ -245,7 +255,15 @@ cRoughRavines::cRoughRavines(
 	m_MaxCenterWidth(a_MaxCenterWidth),
 	m_MinCenterWidth(a_MinCenterWidth),
 	m_MaxRoughness(a_MaxRoughness),
-	m_MinRoughness(a_MinRoughness)
+	m_MinRoughness(a_MinRoughness),
+	m_MaxFloorHeightEdge(a_MaxFloorHeightEdge),
+	m_MinFloorHeightEdge(a_MinFloorHeightEdge),
+	m_MaxFloorHeightCenter(a_MaxFloorHeightCenter),
+	m_MinFloorHeightCenter(a_MinFloorHeightCenter),
+	m_MaxCeilingHeightEdge(a_MaxCeilingHeightEdge),
+	m_MinCeilingHeightEdge(a_MinCeilingHeightEdge),
+	m_MaxCeilingHeightCenter(a_MaxCeilingHeightCenter),
+	m_MinCeilingHeightCenter(a_MinCeilingHeightCenter)
 {
 	if (m_MinSize > m_MaxSize)
 	{
@@ -274,10 +292,25 @@ cRoughRavines::cRoughRavines(
 
 cGridStructGen::cStructurePtr cRoughRavines::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
+	// Pick a random value for each of the ravine's parameters:
 	int Size = m_MinSize + (m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 7) % (m_MaxSize - m_MinSize);  // Random int from m_MinSize to m_MaxSize
-	float CenterWidth = m_MinCenterWidth + abs(m_Noise.IntNoise2D(a_GridX, a_GridZ + 10)) * (m_MaxCenterWidth - m_MinCenterWidth);  // Random float from m_MinCenterWidth to m_MaxCenterWidth
-	float Roughness = m_MinRoughness + abs(m_Noise.IntNoise2D(a_GridX + 10, a_GridZ)) * (m_MaxRoughness - m_MinRoughness);  // Random float from m_MinRoughness to m_MaxRoughness
-	return cStructurePtr(new cRoughRavine(m_Seed, Size, CenterWidth, Roughness, a_GridX, a_GridZ, a_OriginX, a_OriginZ));
+	float CenterWidth         = m_Noise.IntNoise2DInRange(a_GridX + 10, a_GridZ, m_MinCenterWidth,         m_MaxCenterWidth);
+	float Roughness           = m_Noise.IntNoise2DInRange(a_GridX + 20, a_GridZ, m_MinRoughness,           m_MaxRoughness);
+	float FloorHeightEdge1    = m_Noise.IntNoise2DInRange(a_GridX + 30, a_GridZ, m_MinFloorHeightEdge,     m_MaxFloorHeightEdge);
+	float FloorHeightEdge2    = m_Noise.IntNoise2DInRange(a_GridX + 40, a_GridZ, m_MinFloorHeightEdge,     m_MaxFloorHeightEdge);
+	float FloorHeightCenter   = m_Noise.IntNoise2DInRange(a_GridX + 50, a_GridZ, m_MinFloorHeightCenter,   m_MaxFloorHeightCenter);
+	float CeilingHeightEdge1  = m_Noise.IntNoise2DInRange(a_GridX + 60, a_GridZ, m_MinCeilingHeightEdge,   m_MaxCeilingHeightEdge);
+	float CeilingHeightEdge2  = m_Noise.IntNoise2DInRange(a_GridX + 70, a_GridZ, m_MinCeilingHeightEdge,   m_MaxCeilingHeightEdge);
+	float CeilingHeightCenter = m_Noise.IntNoise2DInRange(a_GridX + 80, a_GridZ, m_MinCeilingHeightCenter, m_MaxCeilingHeightCenter);
+	
+	// Create a ravine:
+	return cStructurePtr(new cRoughRavine(
+		m_Seed,
+		Size, CenterWidth, Roughness,
+		FloorHeightEdge1,   FloorHeightEdge2,   FloorHeightCenter,
+		CeilingHeightEdge1, CeilingHeightEdge2, CeilingHeightCenter,
+		a_GridX, a_GridZ, a_OriginX, a_OriginZ
+	));
 }
 
 

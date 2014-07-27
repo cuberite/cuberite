@@ -410,18 +410,30 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "RoughRavines") == 0)
 		{
-			int GridSize          = a_IniFile.GetValueSetI("Generator", "RoughRavinesGridSize",      256);
-			int MaxOffset         = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxOffset",     128);
-			int MaxSize           = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxSize",       128);
-			int MinSize           = a_IniFile.GetValueSetI("Generator", "RoughRavinesMinSize",        64);
-			double MaxCenterWidth = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCenterWidth",  8);
-			double MinCenterWidth = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCenterWidth",  2);
-			double MaxRoughness   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxRoughness",    0.2);
-			double MinRoughness   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinRoughness",    0.05);
+			int GridSize                  = a_IniFile.GetValueSetI("Generator", "RoughRavinesGridSize",              256);
+			int MaxOffset                 = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxOffset",             128);
+			int MaxSize                   = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxSize",               128);
+			int MinSize                   = a_IniFile.GetValueSetI("Generator", "RoughRavinesMinSize",                64);
+			double MaxCenterWidth         = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCenterWidth",          8);
+			double MinCenterWidth         = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCenterWidth",          2);
+			double MaxRoughness           = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxRoughness",            0.2);
+			double MinRoughness           = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinRoughness",            0.05);
+			double MaxFloorHeightEdge     = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxFloorHeightEdge",      8);
+			double MinFloorHeightEdge     = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinFloorHeightEdge",     30);
+			double MaxFloorHeightCenter   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxFloorHeightCenter",   20);
+			double MinFloorHeightCenter   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinFloorHeightCenter",    6);
+			double MaxCeilingHeightEdge   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCeilingHeightEdge",   56);
+			double MinCeilingHeightEdge   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightEdge",   38);
+			double MaxCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCeilingHeightCenter", 58);
+			double MinCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightCenter", 36);
 			m_FinishGens.push_back(new cRoughRavines(
 				Seed, MaxSize, MinSize,
-				(float)MaxCenterWidth, (float)MinCenterWidth,
-				(float)MaxRoughness, (float)MinRoughness,
+				(float)MaxCenterWidth,         (float)MinCenterWidth,
+				(float)MaxRoughness,           (float)MinRoughness,
+				(float)MaxFloorHeightEdge,     (float)MinFloorHeightEdge,
+				(float)MaxFloorHeightCenter,   (float)MinFloorHeightCenter,
+				(float)MaxCeilingHeightEdge,   (float)MinCeilingHeightEdge,
+				(float)MaxCeilingHeightCenter, (float)MinCeilingHeightCenter,
 				GridSize, MaxOffset
 			));
 		}
