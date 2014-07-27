@@ -1773,7 +1773,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		true,
 
 		// DefaultWeight:
-		100,
+		20,
 
 		// DepthWeight:
 		"",
@@ -5015,7 +5015,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		true,
 
 		// DefaultWeight:
-		100,
+		20,
 
 		// DepthWeight:
 		"",
