@@ -153,7 +153,7 @@ bool cGroupManager::LoadGroups()
 		AString Color = IniFile.GetValue(KeyName, "Color", "-");
 		if ((Color != "-") && (Color.length() >= 1))
 		{
-			Group->SetColor(cChatColor::Delimiter + Color);
+			Group->SetColor(cChatColor::Delimiter + AString(&Color[0]));
 		}
 		else
 		{
