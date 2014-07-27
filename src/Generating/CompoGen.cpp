@@ -631,7 +631,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 		int Height = a_ChunkDesc.GetHeight(x, z);
 		a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_BEDROCK);
-		// int CeilingDisguiseHeight = Height - 2 - (m_Noise1.IntNoise2DInt(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x, a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) % 3);
+
 		NOISE_DATATYPE CeilingDisguise = (m_Noise1.CubicNoise2D((float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10, (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10));
 		if (CeilingDisguise < 0)
 		{
