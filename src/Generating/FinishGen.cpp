@@ -141,7 +141,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 				}
 
 				BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
-				if (!cBlockInfo::IsSolid(BlockBelow))  // Only place on solid blocks
+				if (!cBlockInfo::FullyOccupiesVoxel(BlockBelow))  // Only place on solid blocks
 				{
 					continue;
 				}
