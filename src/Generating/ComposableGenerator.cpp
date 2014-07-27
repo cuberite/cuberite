@@ -410,10 +410,20 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "RoughRavines") == 0)
 		{
-			int GridSize  = a_IniFile.GetValueSetI("Generator", "RoughRavinesGridSize",  256);
-			int MaxOffset = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxOffset", 128);
-			int MaxSize   = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxSize",    64);
-			m_FinishGens.push_back(new cRoughRavines(Seed, MaxSize, GridSize, MaxOffset));
+			int GridSize          = a_IniFile.GetValueSetI("Generator", "RoughRavinesGridSize",      256);
+			int MaxOffset         = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxOffset",     128);
+			int MaxSize           = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxSize",       128);
+			int MinSize           = a_IniFile.GetValueSetI("Generator", "RoughRavinesMinSize",        64);
+			double MaxCenterWidth = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCenterWidth",  8);
+			double MinCenterWidth = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCenterWidth",  2);
+			double MaxRoughness   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxRoughness",    0.2);
+			double MinRoughness   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinRoughness",    0.05);
+			m_FinishGens.push_back(new cRoughRavines(
+				Seed, MaxSize, MinSize,
+				(float)MaxCenterWidth, (float)MinCenterWidth,
+				(float)MaxRoughness, (float)MinRoughness,
+				GridSize, MaxOffset
+			));
 		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{

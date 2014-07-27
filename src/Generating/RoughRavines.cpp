@@ -20,27 +20,27 @@ class cRoughRavine :
 	typedef cGridStructGen::cStructure super;
 	
 public:
-	cRoughRavine(int a_Seed, int a_MaxSize, int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
+	cRoughRavine(int a_Seed, int a_Size, float a_CenterWidth, float a_Roughness, int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
 		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Noise(a_Seed + 100),
-		m_MaxSize(a_MaxSize)
+		m_Roughness(a_Roughness)
 	{
 		// Create the basic structure - 2 lines meeting at the centerpoint:
-		m_DefPoints.resize(a_MaxSize + 1);
-		int Half = a_MaxSize / 2;  // m_DefPoints[Half] will be the centerpoint
+		int Max = 2 * a_Size;
+		int Half = a_Size;  // m_DefPoints[Half] will be the centerpoint
+		m_DefPoints.resize(Max + 1);
 		int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 7;
-		float Len = (float)(3 * a_MaxSize / 4 + rnd % (a_MaxSize / 4));  // Random number between 3 / 4 * a_MaxSize and a_MaxSize
-		rnd = rnd / a_MaxSize;
+		float Len = (float)a_Size;
 		float Angle = (float)rnd;  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
 		float OfsX = sin(Angle) * Len;
 		float OfsZ = cos(Angle) * Len;
-		m_DefPoints[0].Set        (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,        42, 34);
-		m_DefPoints[Half].Set     ((float)a_OriginX, (float)a_OriginZ, Len / 10, 62, 16);
-		m_DefPoints[a_MaxSize].Set(a_OriginX + OfsX, a_OriginZ + OfsZ, 1,        44, 32);
+		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             42, 34);
+		m_DefPoints[Half].Set((float)a_OriginX, (float)a_OriginZ, a_CenterWidth, 62, 16);
+		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             44, 32);
 		
 		// Calculate the points in between, recursively:
 		SubdivideLine(0, Half);
-		SubdivideLine(Half, a_MaxSize);
+		SubdivideLine(Half, Max);
 	}
 	
 protected:
@@ -69,6 +69,8 @@ protected:
 	
 	sRavineDefPoints m_DefPoints;
 	
+	float m_Roughness;
+	
 	
 	/** Recursively subdivides the line between the points of the specified index.
 	Sets the midpoint to the center of the line plus or minus a random offset, then calls itself for each half
@@ -89,13 +91,13 @@ protected:
 		float dz = p2.m_Z - p1.m_Z;
 		if ((m_Noise.IntNoise2DInt((int)MidX, (int)MidZ) / 11) % 2 == 0)
 		{
-			MidX += dz / 10;
-			MidZ -= dx / 10;
+			MidX += dz * m_Roughness;
+			MidZ -= dx * m_Roughness;
 		}
 		else
 		{
-			MidX -= dz / 10;
-			MidZ += dx / 10;
+			MidX -= dz * m_Roughness;
+			MidZ += dx * m_Roughness;
 		}
 		int MidIdx = (a_Idx1 + a_Idx2) / 2;
 		m_DefPoints[MidIdx].Set(MidX, MidZ, MidR, MidT, MidB);
@@ -188,15 +190,40 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cRoughRavines:
 
-cRoughRavines::cRoughRavines(int a_Seed, int a_MaxSize, int a_GridSize, int a_MaxOffset) :
+cRoughRavines::cRoughRavines(
+	int a_Seed,
+	int a_MaxSize, int a_MinSize,
+	float a_MaxCenterWidth, float a_MinCenterWidth,
+	float a_MaxRoughness, float a_MinRoughness,
+	int a_GridSize, int a_MaxOffset
+) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 64),
 	m_Seed(a_Seed),
-	m_MaxSize(a_MaxSize)
+	m_MaxSize(a_MaxSize),
+	m_MinSize(a_MinSize),
+	m_MaxCenterWidth(a_MaxCenterWidth),
+	m_MinCenterWidth(a_MinCenterWidth),
+	m_MaxRoughness(a_MaxRoughness),
+	m_MinRoughness(a_MinRoughness)
 {
-	if (m_MaxSize < 1)
+	if (m_MinSize > m_MaxSize)
+	{
+		std::swap(m_MinSize, m_MaxSize);
+		std::swap(a_MinSize, a_MaxSize);
+	}
+	if (m_MaxSize < 16)
 	{
 		m_MaxSize = 16;
 		LOGWARNING("RoughRavines: MaxSize too small, adjusting request from %d to %d", a_MaxSize, m_MaxSize);
+	}
+	if (m_MinSize < 16)
+	{
+		m_MinSize = 16;
+		LOGWARNING("RoughRavines: MinSize too small, adjusting request from %d to %d", a_MinSize, m_MinSize);
+	}
+	if (m_MinSize == m_MaxSize)
+	{
+		m_MaxSize = m_MinSize + 1;
 	}
 }
 
@@ -206,7 +233,10 @@ cRoughRavines::cRoughRavines(int a_Seed, int a_MaxSize, int a_GridSize, int a_Ma
 
 cGridStructGen::cStructurePtr cRoughRavines::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
-	return cStructurePtr(new cRoughRavine(m_Seed, m_MaxSize, a_GridX, a_GridZ, a_OriginX, a_OriginZ));
+	int Size = m_MinSize + (m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 7) % (m_MaxSize - m_MinSize);  // Random int from m_MinSize to m_MaxSize
+	float CenterWidth = m_MinCenterWidth + abs(m_Noise.IntNoise2D(a_GridX, a_GridZ + 10)) * (m_MaxCenterWidth - m_MinCenterWidth);  // Random float from m_MinCenterWidth to m_MaxCenterWidth
+	float Roughness = m_MinRoughness + abs(m_Noise.IntNoise2D(a_GridX + 10, a_GridZ)) * (m_MaxRoughness - m_MinRoughness);  // Random float from m_MinRoughness to m_MaxRoughness
+	return cStructurePtr(new cRoughRavine(m_Seed, Size, CenterWidth, Roughness, a_GridX, a_GridZ, a_OriginX, a_OriginZ));
 }
 
 
