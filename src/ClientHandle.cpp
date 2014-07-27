@@ -1973,28 +1973,17 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
-	bool ShouldAppendChatPrefixes = true;
-	
-	if (GetPlayer()->GetWorld() == NULL)
+	cWorld * World = GetPlayer()->GetWorld();
+	if (World == NULL)
 	{
-		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
 		if (World == NULL)
 		{
 			World = cRoot::Get()->GetDefaultWorld();
 		}
-
-		if (!World->ShouldUseChatPrefixes())
-		{
-			ShouldAppendChatPrefixes = false;
-		}
-	}
-	else if (!GetPlayer()->GetWorld()->ShouldUseChatPrefixes())
-	{
-		ShouldAppendChatPrefixes = false;
 	}
 
-	AString Message = FormatMessageType(ShouldAppendChatPrefixes, a_ChatPrefix, a_AdditionalData);
-
+	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
 	m_Protocol->SendChat(Message.append(a_Message));
 }
 
