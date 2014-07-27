@@ -5,6 +5,12 @@
 
 #pragma once
 
+#include <cmath>
+
+
+
+
+
 // Some settings
 #define NOISE_DATATYPE float
 
