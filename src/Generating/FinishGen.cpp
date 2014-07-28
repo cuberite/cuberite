@@ -456,12 +456,12 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenLilypads:
 
-int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
+int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	int res = 0;
 	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
-		if (a_BiomeMap[i] == m_Biome)
+		if (IsAllowedBiome(a_BiomeMap[i]))
 		{
 			res++;
 		}
@@ -473,7 +473,7 @@ int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap &
 
 
 
-void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
+void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Add Lilypads on top of water surface in Swampland
 
@@ -486,11 +486,13 @@ void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 		int z = (m_Noise.IntNoise3DInt(ChunkX - ChunkZ, i, ChunkZ) / 11) % cChunkDef::Width;
 
 		// Place the block at {x, z} if possible:
-		if (a_ChunkDesc.GetBiome(x, z) != m_Biome)
+		EMCSBiome Biome = a_ChunkDesc.GetBiome(x, z);
+		if (!IsAllowedBiome(Biome))
 		{
 			// Incorrect biome
 			continue;
 		}
+
 		int Height = a_ChunkDesc.GetHeight(x, z);
 		if (Height >= cChunkDef::Height)
 		{
@@ -502,13 +504,16 @@ void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 			// Not an empty block
 			continue;
 		}
+
 		BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, Height, z);
-		if ((BlockBelow == m_AllowedBelow1) || (BlockBelow == m_AllowedBelow2))
+		if (!IsAllowedBlockBelow(BlockBelow))
 		{
-			a_ChunkDesc.SetBlockType(x, Height + 1, z, m_BlockType);
-			a_ChunkDesc.SetHeight(x, z, Height + 1);
+			continue;
 		}
-	}  // for i
+
+		a_ChunkDesc.SetBlockType(x, Height + 1, z, m_BlockType);
+		a_ChunkDesc.SetHeight(x, z, Height + 1);
+	}
 }
 
 

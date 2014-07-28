@@ -143,32 +143,62 @@ Used for:
 - Lilypads finisher
 - DeadBushes finisher
 */
-class cFinishGenSingleBiomeSingleTopBlock :
+class cFinishGenSingleTopBlock :
 	public cFinishGen
 {
 public:
-	cFinishGenSingleBiomeSingleTopBlock(
-		int a_Seed, BLOCKTYPE a_BlockType, EMCSBiome a_Biome, int a_Amount,
-		BLOCKTYPE a_AllowedBelow1, BLOCKTYPE a_AllowedBelow2
+
+	typedef std::vector<BLOCKTYPE> BlockList;
+	typedef std::vector<EMCSBiome> BiomeList;
+
+	cFinishGenSingleTopBlock(
+		int a_Seed, BLOCKTYPE a_BlockType, BiomeList a_Biomes, int a_Amount,
+		BlockList a_AllowedBelow
 	) :
 		m_Noise(a_Seed),
 		m_BlockType(a_BlockType),
-		m_Biome(a_Biome),
+		m_Biomes(a_Biomes),
 		m_Amount(a_Amount),
-		m_AllowedBelow1(a_AllowedBelow1),
-		m_AllowedBelow2(a_AllowedBelow2)
+		m_AllowedBelow(a_AllowedBelow)
 	{
 	}
 	
 protected:
 	cNoise m_Noise;
 	BLOCKTYPE m_BlockType;
-	EMCSBiome m_Biome;
 	int       m_Amount;         ///< Relative amount of blocks to try adding. 1 = one block per 256 biome columns.
-	BLOCKTYPE m_AllowedBelow1;  ///< First  of the two blocktypes that are allowed below m_BlockType
-	BLOCKTYPE m_AllowedBelow2;  ///< Second of the two blocktypes that are allowed below m_BlockType
+
+	BlockList m_AllowedBelow;
+	BiomeList m_Biomes;
 	
 	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
+
+	// Returns true if the given biome is a biome that is allowed.
+	bool IsAllowedBiome(EMCSBiome a_Biome)
+	{
+		for (BiomeList::iterator itr = m_Biomes.begin(); itr != m_Biomes.end(); ++itr)
+		{
+			if (a_Biome == *itr)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// Returns true if the given blocktype may be below m_BlockType
+	bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
+	{
+		for (BlockList::iterator itr = m_AllowedBelow.begin(); itr != m_AllowedBelow.end(); ++itr)
+		{
+			if (*itr == a_BlockBelow)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
