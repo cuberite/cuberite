@@ -147,9 +147,12 @@ class cFinishGenSingleTopBlock :
 	public cFinishGen
 {
 public:
-
 	typedef std::vector<BLOCKTYPE> BlockList;
+	bool m_IsAllowedBelow[256];
+
 	typedef std::vector<EMCSBiome> BiomeList;
+	bool m_IsBiomeAllowed[256];
+
 
 	cFinishGenSingleTopBlock(
 		int a_Seed, BLOCKTYPE a_BlockType, BiomeList a_Biomes, int a_Amount,
@@ -157,46 +160,38 @@ public:
 	) :
 		m_Noise(a_Seed),
 		m_BlockType(a_BlockType),
-		m_Biomes(a_Biomes),
-		m_Amount(a_Amount),
-		m_AllowedBelow(a_AllowedBelow)
+		m_Amount(a_Amount)
 	{
+		// Load the allowed blocks into m_IsAllowedBelow
+		for (BlockList::iterator itr = a_AllowedBelow.begin(); itr != a_AllowedBelow.end(); ++itr)
+		{
+			m_IsAllowedBelow[*itr] = true;
+		}
+
+		// Load the allowed biomes into m_IsBiomeAllowed
+		for (BiomeList::iterator itr = a_Biomes.begin(); itr != a_Biomes.end(); ++itr)
+		{
+			m_IsBiomeAllowed[*itr] = true;
+		}
 	}
 	
 protected:
 	cNoise m_Noise;
 	BLOCKTYPE m_BlockType;
 	int       m_Amount;         ///< Relative amount of blocks to try adding. 1 = one block per 256 biome columns.
-
-	BlockList m_AllowedBelow;
-	BiomeList m_Biomes;
 	
 	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
 
 	// Returns true if the given biome is a biome that is allowed.
-	bool IsAllowedBiome(EMCSBiome a_Biome)
+	inline bool IsAllowedBiome(EMCSBiome a_Biome)
 	{
-		for (BiomeList::iterator itr = m_Biomes.begin(); itr != m_Biomes.end(); ++itr)
-		{
-			if (a_Biome == *itr)
-			{
-				return true;
-			}
-		}
-		return false;
+		return m_IsBiomeAllowed[a_Biome];
 	}
 
 	// Returns true if the given blocktype may be below m_BlockType
-	bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
+	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
 	{
-		for (BlockList::iterator itr = m_AllowedBelow.begin(); itr != m_AllowedBelow.end(); ++itr)
-		{
-			if (*itr == a_BlockBelow)
-			{
-				return true;
-			}
-		}
-		return false;
+		return m_IsAllowedBelow[a_BlockBelow];
 	}
 
 	
