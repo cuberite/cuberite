@@ -52,6 +52,12 @@ public:
 
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
+	
+	/** Converts the player names into UUIDs.
+	a_PlayerName[idx] will be converted to UUID and returned as idx-th value
+	The UUID will be empty on error.
+	Blocking operation, do not use in world-tick thread! */
+	AStringVector GetUUIDsFromPlayerNames(const AStringVector & a_PlayerName);
 
 private:
 
@@ -76,8 +82,22 @@ private:
 	cUserList        m_Queue;
 	cEvent           m_QueueNonempty;
 
+	/** The server that is to be contacted for auth / UUID conversions */
 	AString m_Server;
+	
+	/** The URL to use for auth, without server part.
+	%USERNAME% will be replaced with actual user name.
+	%SERVERID% will be replaced with server's ID.
+	For example "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%". */
 	AString m_Address;
+	
+	/** The server to connect to when converting player names to UUIDs. For example "api.mojang.com". */
+	AString m_NameToUUIDServer;
+	
+	/** The URL to use for converting player names to UUIDs, without server part.
+	For example "/profiles/page/1". */
+	AString m_NameToUUIDAddress;
+	
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 

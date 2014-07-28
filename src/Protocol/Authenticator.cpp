@@ -17,6 +17,8 @@
 
 #define DEFAULT_AUTH_SERVER "sessionserver.mojang.com"
 #define DEFAULT_AUTH_ADDRESS "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%"
+#define DEFAULT_NAME_TO_UUID_SERVER "api.mojang.com"
+#define DEFAULT_NAME_TO_UUID_ADDRESS "/profiles/minecraft"
 
 /** This is the data of the root certs for Starfield Technologies, the CA that signed sessionserver.mojang.com's cert:
 Downloaded from http://certs.starfieldtech.com/repository/ */
@@ -83,6 +85,8 @@ cAuthenticator::cAuthenticator(void) :
 	super("cAuthenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
+	m_NameToUUIDServer(DEFAULT_NAME_TO_UUID_SERVER),
+	m_NameToUUIDAddress(DEFAULT_NAME_TO_UUID_ADDRESS),
 	m_ShouldAuthenticate(true)
 {
 }
@@ -102,9 +106,11 @@ cAuthenticator::~cAuthenticator()
 
 void cAuthenticator::ReadINI(cIniFile & IniFile)
 {
-	m_Server = IniFile.GetValueSet("Authentication", "Server", DEFAULT_AUTH_SERVER);
-	m_Address = IniFile.GetValueSet("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
+	m_Server             = IniFile.GetValueSet ("Authentication", "Server", DEFAULT_AUTH_SERVER);
+	m_Address            = IniFile.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
 	m_ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
+	m_NameToUUIDServer   = IniFile.GetValueSet ("Authentication", "NameToUUIDServer", DEFAULT_NAME_TO_UUID_SERVER);
+	m_NameToUUIDAddress  = IniFile.GetValueSet ("Authentication", "NameToUUIDAddress", DEFAULT_NAME_TO_UUID_ADDRESS);
 }
 
 
@@ -145,6 +151,93 @@ void cAuthenticator::Stop(void)
 	m_ShouldTerminate = true;
 	m_QueueNonempty.Set();
 	Wait();
+}
+
+
+
+
+
+AStringVector cAuthenticator::GetUUIDsFromPlayerNames(const AStringVector & a_PlayerNames)
+{
+	AStringVector res;
+	
+	// Create the request body - a JSON containing all the playernames:
+	Json::Value root;
+	for (AStringVector::const_iterator itr = a_PlayerNames.begin(), end = a_PlayerNames.end(); itr != end; ++itr)
+	{
+		Json::Value req(*itr);
+		root.append(req);
+	}  // for itr - a_PlayerNames[]
+	Json::FastWriter Writer;
+	AString RequestBody = Writer.write(root);
+	
+	// Create the HTTP request:
+	AString Request;
+	Request += "POST " + m_NameToUUIDAddress + " HTTP/1.1\r\n";
+	Request += "Host: " + m_NameToUUIDServer + "\r\n";
+	Request += "User-Agent: MCServer\r\n";
+	Request += "Connection: close\r\n";
+	Request += "Content-Type: application/json\r\n";
+	Request += Printf("Content-Length: %u\r\n", (unsigned)RequestBody.length());
+	Request += "\r\n";
+	Request += RequestBody;
+
+	// Get the response from the server:
+	AString Response;
+	if (!SecureGetFromAddress(StarfieldCACert(), m_NameToUUIDServer, Request, Response))
+	{
+		return res;
+	}
+
+	// Check the HTTP status line:
+	const AString Prefix("HTTP/1.1 200 OK");
+	AString HexDump;
+	if (Response.compare(0, Prefix.size(), Prefix))
+	{
+		LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
+		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return res;
+	}
+
+	// Erase the HTTP headers from the response:
+	size_t idxHeadersEnd = Response.find("\r\n\r\n");
+	if (idxHeadersEnd == AString::npos)
+	{
+		LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
+		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return res;
+	}
+	Response.erase(0, idxHeadersEnd + 4);
+	
+	// Parse the returned string into Json:
+	Json::Reader reader;
+	if (!reader.parse(Response, root, false) || !root.isArray())
+	{
+		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON!", __FUNCTION__);
+		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return res;
+	}
+	
+	// Fill in the resulting array; do not expect to get the UUIDs in the same order as the inputs:
+	size_t len = a_PlayerNames.size();
+	size_t JsonCount = root.size();
+	res.resize(len);
+	for (size_t idx = 0; idx < len; idx++)  // For each input username...
+	{
+		const AString & InputName = a_PlayerNames[idx];
+		for (size_t IdxJson = 0; IdxJson < JsonCount; ++IdxJson)
+		{
+			Json::Value & Val = root[IdxJson];
+			AString JsonName = Val.get("name", "").asString();
+			if (NoCaseCompare(JsonName, InputName) == 0)
+			{
+				res[idx] = Val.get("id", "").asString();
+				break;
+			}
+		}  // for IdxJson - root[]
+	}  // for idx - a_PlayerNames[] / res[]
+	
+	return res;
 }
 
 
@@ -307,7 +400,7 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	a_UUID = root.get("id", "").asString();
 	a_Properties = root["properties"];
 
-	// If the UUID doesn't contain the hashes, insert them at the proper places:
+	// If the UUID doesn't contain the dashes, insert them at the proper places:
 	if (a_UUID.size() == 32)
 	{
 		a_UUID.insert(8, "-");
