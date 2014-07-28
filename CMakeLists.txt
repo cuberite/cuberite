@@ -72,6 +72,12 @@ add_subdirectory(lib/SQLiteCpp/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 
+# Add proper include directories so that SQLiteCpp can find SQLite3:
+get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
+set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
+message("SQLiteCpp includes: " "${SQLITECPP_INCLUDES}")
+set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
+
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
 endif()
