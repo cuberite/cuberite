@@ -330,6 +330,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			AllowedBiomes.push_back(biDesertM);
 			AllowedBiomes.push_back(biMesa);
 			AllowedBiomes.push_back(biMesaBryce);
+			AllowedBiomes.push_back(biMesaPlateau);
 			AllowedBiomes.push_back(biMesaPlateauF);
 			AllowedBiomes.push_back(biMesaPlateauFM);
 			AllowedBiomes.push_back(biMesaPlateauM);
