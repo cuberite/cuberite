@@ -53,6 +53,14 @@ endif()
 
 project (MCServer)
 
+# Set options for SQLiteCpp, disable all their tests and lints:
+set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
+set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis tool."          FORCE)
+set(SQLITECPP_RUN_DOXYGEN     OFF CACHE BOOL "Run Doxygen C++ documentation tool."             FORCE)
+set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                                 FORCE)
+set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
+set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
+
 # Include all the libraries:
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
@@ -60,6 +68,7 @@ add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/)
 add_subdirectory(lib/sqlite/)
+add_subdirectory(lib/SQLiteCpp/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
 
