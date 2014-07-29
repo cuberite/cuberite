@@ -2189,7 +2189,7 @@ static int tolua_cClientHandle_GetUUIDsFromPlayerNames(lua_State * L)
 	lua_newtable(L);  // stack index 3
 	
 	// Get the UUIDs:
-	AStringVector UUIDs = cRoot::Get()->GetAuthenticator().GetUUIDsFromPlayerNames(PlayerNames);
+	AStringVector UUIDs = cRoot::Get()->GetMojangAPI().GetUUIDsFromPlayerNames(PlayerNames);
 	if (UUIDs.size() != PlayerNames.size())
 	{
 		// A hard error has occured while processing the request, no UUIDs were returned. Return an empty table:

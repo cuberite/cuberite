@@ -11,8 +11,6 @@
 
 
 #pragma once
-#ifndef CAUTHENTICATOR_H_INCLUDED
-#define CAUTHENTICATOR_H_INCLUDED
 
 #include "../OSSupport/IsThread.h"
 
@@ -53,12 +51,6 @@ public:
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
 	
-	/** Converts the player names into UUIDs.
-	a_PlayerName[idx] will be converted to UUID and returned as idx-th value
-	The UUID will be empty on error.
-	Blocking operation, do not use in world-tick thread! */
-	AStringVector GetUUIDsFromPlayerNames(const AStringVector & a_PlayerName);
-
 private:
 
 	class cUser
@@ -91,33 +83,16 @@ private:
 	For example "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%". */
 	AString m_Address;
 	
-	/** The server to connect to when converting player names to UUIDs. For example "api.mojang.com". */
-	AString m_NameToUUIDServer;
-	
-	/** The URL to use for converting player names to UUIDs, without server part.
-	For example "/profiles/page/1". */
-	AString m_NameToUUIDAddress;
-	
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 
 	/** cIsThread override: */
 	virtual void Execute(void) override;
 
-	/** Connects to a hostname using SSL, sends given data, and sets the response, returning whether all was successful or not */
-	bool SecureGetFromAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Request, AString & a_Response);
-
 	/** Returns true if the user authenticated okay, false on error
-	Sets the username, UUID, and properties (i.e. skin) fields
-	*/
+	Returns the case-corrected username, UUID, and properties (eg. skin). */
 	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties);
 };
-
-
-
-
-
-#endif  // CAUTHENTICATOR_H_INCLUDED
 
 
 
