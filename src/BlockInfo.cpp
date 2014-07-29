@@ -567,6 +567,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_REDSTONE_ORE_GLOWING].m_CanBeTerraformed = true;
 	a_Info[E_BLOCK_SAND                ].m_CanBeTerraformed = true;
 	a_Info[E_BLOCK_SANDSTONE           ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_SOULSAND            ].m_CanBeTerraformed = true;
 	a_Info[E_BLOCK_STAINED_CLAY        ].m_CanBeTerraformed = true;
 	a_Info[E_BLOCK_STONE               ].m_CanBeTerraformed = true;
 }
