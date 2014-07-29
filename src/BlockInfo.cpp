@@ -17,6 +17,7 @@ cBlockInfo::cBlockInfo()
 	, m_IsSnowable(false)
 	, m_IsSolid(true)
 	, m_FullyOccupiesVoxel(false)
+	, m_CanBeTerraformed(false)
 	, m_Handler(NULL)
 {}
 
@@ -548,6 +549,26 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STONE               ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_STONE_BRICKS        ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_WOOL                ].m_FullyOccupiesVoxel = true;
+
+
+	// Blocks that can be terraformed
+	a_Info[E_BLOCK_COAL_ORE            ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_COBBLESTONE         ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_DIAMOND_ORE         ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_DIRT                ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_GOLD_ORE            ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_GRASS               ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_GRAVEL              ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_HARDENED_CLAY       ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_IRON_ORE            ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_MYCELIUM            ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_NETHERRACK          ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_REDSTONE_ORE        ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_REDSTONE_ORE_GLOWING].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_SAND                ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_SANDSTONE           ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_STAINED_CLAY        ].m_CanBeTerraformed = true;
+	a_Info[E_BLOCK_STONE               ].m_CanBeTerraformed = true;
 }
 
 
