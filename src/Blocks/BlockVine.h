@@ -44,6 +44,13 @@ public:
 	}
 
 
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		// Reset meta to 0
+		a_Pickups.push_back(cItem(E_BLOCK_VINES, 1, 0));
+	}
+
+
 	static NIBBLETYPE DirectionToMetaData(char a_BlockFace)
 	{
 		switch (a_BlockFace)

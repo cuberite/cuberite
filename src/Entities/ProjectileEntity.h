@@ -41,7 +41,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cProjectileEntity);
+	CLASS_PROTODEF(cProjectileEntity)
 
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);

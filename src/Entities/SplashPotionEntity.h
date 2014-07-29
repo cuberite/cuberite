@@ -23,15 +23,13 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cSplashPotionEntity);
+	CLASS_PROTODEF(cSplashPotionEntity)
 	
 	cSplashPotionEntity(
 		cEntity * a_Creator,
 		double a_X, double a_Y, double a_Z,
 		const Vector3d & a_Speed,
-		cEntityEffect::eType a_EntityEffectType,
-		cEntityEffect a_EntityEffect,
-		int a_PotionColor
+		const cItem & a_Item
 	);
 	
 	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }

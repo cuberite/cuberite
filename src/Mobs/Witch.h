@@ -16,7 +16,7 @@ class cWitch :
 public:
 	cWitch();
 
-	CLASS_PROTODEF(cWitch);
+	CLASS_PROTODEF(cWitch)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 

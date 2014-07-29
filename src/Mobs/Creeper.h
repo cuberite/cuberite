@@ -15,7 +15,7 @@ class cCreeper :
 public:
 	cCreeper(void);
 
-	CLASS_PROTODEF(cCreeper);
+	CLASS_PROTODEF(cCreeper)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;

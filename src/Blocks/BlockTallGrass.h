@@ -43,8 +43,9 @@ public:
 			cItems Pickups;
 			Pickups.Add(E_BLOCK_TALL_GRASS, 1, Meta);
 			a_WorldInterface.SpawnItemPickups(Pickups, a_BlockX, a_BlockY, a_BlockZ);
+
+			a_Player->UseEquippedItem();
 		}
-		a_Player->UseEquippedItem();
 	}
 
 

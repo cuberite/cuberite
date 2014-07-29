@@ -14,6 +14,7 @@
 #include "../Item.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
+#include "../SetChunkData.h"
 
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
@@ -391,7 +392,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	}  // for y
 	//*/
 	
-	m_World->SetChunkData(
+	m_World->QueueSetChunkData(cSetChunkDataPtr(new cSetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockTypes, MetaData,
 		IsLightValid ? BlockLight : NULL,
@@ -399,7 +400,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		NULL, Biomes,
 		Entities, BlockEntities,
 		false
-	);
+	)));
 	return true;
 }
 
@@ -1669,7 +1670,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cEntityEffect::effNoEffect, cEntityEffect(), 0));
+	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cItem()));
 	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
 	{
 		return;

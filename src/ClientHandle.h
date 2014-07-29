@@ -56,8 +56,8 @@ public:
 #else
 	static const int DEFAULT_VIEW_DISTANCE = 10;
 #endif
-	static const int MAX_VIEW_DISTANCE = 15;
-	static const int MIN_VIEW_DISTANCE = 3;
+	static const int MAX_VIEW_DISTANCE = 32;
+	static const int MIN_VIEW_DISTANCE = 1;
 	
 	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
 	virtual ~cClientHandle();
@@ -151,7 +151,7 @@ public:
 	void SendMapInfo             (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn       (const cPainting & a_Painting);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
-	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);
+	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);  // tolua_export
 	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);
 	void SendPlayerAbilities     (void);
 	void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline);

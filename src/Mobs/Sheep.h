@@ -20,7 +20,7 @@ public:
 	with the GenerateNaturalRandomColor() function. */
 	cSheep(int a_Color = -1);
 
-	CLASS_PROTODEF(cSheep);
+	CLASS_PROTODEF(cSheep)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;

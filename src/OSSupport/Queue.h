@@ -26,14 +26,14 @@ struct cQueueFuncs
 public:
 
 	/// Called when an Item is deleted from the queue without being returned
-	static void Delete(T) {};
+	static void Delete(T) {}
 	
 	/// Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted
 	static void Combine(T & a_existing, const T & a_new)
 	{
 		UNUSED(a_existing);
 		UNUSED(a_new);
-	};
+	}
 };
 
 

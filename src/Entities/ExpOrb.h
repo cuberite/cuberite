@@ -16,7 +16,7 @@ class cExpOrb :
 public:
 	// tolua_end
 
-	CLASS_PROTODEF(cExpOrb);
+	CLASS_PROTODEF(cExpOrb)
 
 	cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward);
 	cExpOrb(const Vector3d & a_Pos, int a_Reward);

@@ -32,7 +32,7 @@ public:
 		UNUSED(a_ChunkX);
 		UNUSED(a_ChunkZ);
 		UNUSED(a_Chunk);
-	};
+	}
 	
 	/// Called when a block changes
 	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);

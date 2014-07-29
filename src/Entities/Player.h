@@ -48,7 +48,7 @@ public:
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); };
+	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the curently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
@@ -356,7 +356,7 @@ public:
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
-	void UseEquippedItem(void);
+	void UseEquippedItem(int a_Amount = 1);
 	
 	void SendHealth(void);
 

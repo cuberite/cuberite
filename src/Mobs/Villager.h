@@ -27,7 +27,7 @@ public:
 
 	cVillager(eVillagerType VillagerType);
 
-	CLASS_PROTODEF(cVillager);
+	CLASS_PROTODEF(cVillager)
 
 	// cEntity overrides
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
