@@ -161,13 +161,25 @@ public:
 		m_Noise(a_Seed),
 		m_BlockType(a_BlockType),
 		m_Amount(a_Amount)
-	{
+	{	
+		// Initialize all the block types.
+		for (int idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
+		{
+			m_IsAllowedBelow[idx] = false;
+		}
+		
 		// Load the allowed blocks into m_IsAllowedBelow
 		for (BlockList::iterator itr = a_AllowedBelow.begin(); itr != a_AllowedBelow.end(); ++itr)
 		{
 			m_IsAllowedBelow[*itr] = true;
 		}
-
+		
+		// Initialize all the biome types.
+		for (int idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
+		{
+			m_IsBiomeAllowed[idx] = false;
+		}
+		
 		// Load the allowed biomes into m_IsBiomeAllowed
 		for (BiomeList::iterator itr = a_Biomes.begin(); itr != a_Biomes.end(); ++itr)
 		{
