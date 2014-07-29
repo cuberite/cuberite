@@ -454,7 +454,7 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cFinishGenLilypads:
+// cFinishGenSingleTopBlock:
 
 int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
