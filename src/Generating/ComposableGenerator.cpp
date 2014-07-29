@@ -324,7 +324,25 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "DeadBushes") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, biDesert, 2, E_BLOCK_SAND, E_BLOCK_SAND));
+			// A list with all the allowed biomes.
+			cFinishGenSingleTopBlock::BiomeList AllowedBiomes;
+			AllowedBiomes.push_back(biDesert);
+			AllowedBiomes.push_back(biDesertHills);
+			AllowedBiomes.push_back(biDesertM);
+			AllowedBiomes.push_back(biMesa);
+			AllowedBiomes.push_back(biMesaBryce);
+			AllowedBiomes.push_back(biMesaPlateau);
+			AllowedBiomes.push_back(biMesaPlateauF);
+			AllowedBiomes.push_back(biMesaPlateauFM);
+			AllowedBiomes.push_back(biMesaPlateauM);
+
+			// A list with all the allowed blocks that can be below the dead bush.
+			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
+			AllowedBlocks.push_back(E_BLOCK_SAND);
+			AllowedBlocks.push_back(E_BLOCK_HARDENED_CLAY);
+			AllowedBlocks.push_back(E_BLOCK_STAINED_CLAY);
+
+			m_FinishGens.push_back(new cFinishGenSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, AllowedBiomes, 2, AllowedBlocks));
 		}
 		else if (NoCaseCompare(*itr, "DirectOverhangs") == 0)
 		{
@@ -371,7 +389,17 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_LILY_PAD, biSwampland, 4, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER));
+			// A list with all the allowed biomes.
+			cFinishGenSingleTopBlock::BiomeList AllowedBiomes;
+			AllowedBiomes.push_back(biSwampland);
+			AllowedBiomes.push_back(biSwamplandM);
+
+			// A list with all the allowed blocks that can be below the lilypad.
+			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
+			AllowedBlocks.push_back(E_BLOCK_WATER);
+			AllowedBlocks.push_back(E_BLOCK_STATIONARY_WATER);
+
+			m_FinishGens.push_back(new cFinishGenSingleTopBlock(Seed, E_BLOCK_LILY_PAD, AllowedBiomes, 4, AllowedBlocks));
 		}
 		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
 		{
