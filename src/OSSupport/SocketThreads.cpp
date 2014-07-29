@@ -13,7 +13,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSocketThreads:
 
 cSocketThreads::cSocketThreads(void)
@@ -61,6 +61,7 @@ bool cSocketThreads::AddClient(const cSocket & a_Socket, cCallback * a_Client)
 		// There was an error launching the thread (but it was already logged along with the reason)
 		LOGERROR("A new cSocketThread failed to start");
 		delete Thread;
+		Thread = NULL;
 		return false;
 	}
 	Thread->AddClient(a_Socket, a_Client);
@@ -406,7 +407,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 		timeval Timeout;
 		Timeout.tv_sec = 5;
 		Timeout.tv_usec = 0;
-		if (select(Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
+		if (select((int)Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
 		{
 			LOG("select() call failed in cSocketThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;

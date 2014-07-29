@@ -27,7 +27,7 @@ void cVaporizeFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ,
 		return;
 	}
 	int RelX = a_BlockX - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;	
+	int RelZ = a_BlockZ - a_Chunk->GetPosZ() * cChunkDef::Width;
 	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_BlockY, RelZ);
 	if (
 		(BlockType == m_FluidBlock) ||
@@ -35,7 +35,7 @@ void cVaporizeFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ,
 	)
 	{
 		a_Chunk->SetBlock(RelX, a_BlockY, RelZ, E_BLOCK_AIR, 0);
-		a_Chunk->BroadcastSoundEffect("random.fizz", a_BlockX * 8, a_BlockY * 8, a_BlockZ * 8, 1.0f, 0.6f);
+		a_Chunk->BroadcastSoundEffect("random.fizz", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.6f);
 	}
 }
 

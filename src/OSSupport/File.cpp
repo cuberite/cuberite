@@ -7,6 +7,9 @@
 
 #include "File.h"
 #include <fstream>
+#ifdef _WIN32
+	#include <share.h>  // for _SH_DENYWRITE
+#endif  // _WIN32
 
 
 
@@ -75,10 +78,10 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	}
 
 #ifdef _WIN32
-	fopen_s(&m_File, (FILE_IO_PREFIX + iFileName).c_str(), Mode);
+	m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
 #else
 	m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
-#endif // _WIN32
+#endif  // _WIN32
 
 	if ((m_File == NULL) && (iMode == fmReadWrite))
 	{
@@ -88,10 +91,10 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		// Simply re-open for read-writing, erasing existing contents:
 
 #ifdef _WIN32
-		fopen_s(&m_File, (FILE_IO_PREFIX + iFileName).c_str(), "wb+");
+		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
 #else
 		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
-#endif // _WIN32
+#endif  // _WIN32
 
 	}
 	return (m_File != NULL);
@@ -143,7 +146,7 @@ bool cFile::IsEOF(void) const
 
 
 
-int cFile::Read (void * iBuffer, int iNumBytes)
+int cFile::Read (void * iBuffer, size_t iNumBytes)
 {
 	ASSERT(IsOpen());
 	
@@ -159,7 +162,7 @@ int cFile::Read (void * iBuffer, int iNumBytes)
 
 
 
-int cFile::Write(const void * iBuffer, int iNumBytes)
+int cFile::Write(const void * iBuffer, size_t iNumBytes)
 {
 	ASSERT(IsOpen());
 	

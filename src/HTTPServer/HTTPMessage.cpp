@@ -20,7 +20,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPMessage:
 
 cHTTPMessage::cHTTPMessage(eKind a_Kind) :
@@ -64,7 +64,7 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPRequest:
 
 cHTTPRequest::cHTTPRequest(void) :
@@ -139,7 +139,7 @@ AString cHTTPRequest::GetBareURL(void) const
 
 
 size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
-{	
+{
 	m_IncomingHeaderData.append(a_Data, a_Size);
 	size_t IdxEnd = m_IncomingHeaderData.size();
 
@@ -201,7 +201,7 @@ size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
 					return AString::npos;
 				}
 				// Check that there's HTTP/version at the end
-				if (strncmp(a_Data + URLEnd + 1, "HTTP/1.", 7) != 0)
+				if (strncmp(m_IncomingHeaderData.c_str() + URLEnd + 1, "HTTP/1.", 7) != 0)
 				{
 					m_IsValid = false;
 					return AString::npos;
@@ -248,7 +248,7 @@ void cHTTPRequest::OnHeaderLine(const AString & a_Key, const AString & a_Value)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPResponse:
 
 cHTTPResponse::cHTTPResponse(void) :

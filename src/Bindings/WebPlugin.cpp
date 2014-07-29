@@ -45,12 +45,12 @@ cWebPlugin::~cWebPlugin()
 std::list<std::pair<AString, AString> > cWebPlugin::GetTabNames(void)
 {
 	std::list< std::pair< AString, AString > > NameList;
-	for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
+	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
 		std::pair< AString, AString > StringPair;
 		StringPair.first = (*itr)->Title;
 		StringPair.second = (*itr)->SafeTitle;
-		NameList.push_back( StringPair );
+		NameList.push_back( StringPair);
 	}
 	return NameList;
 }
@@ -64,27 +64,27 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 	std::pair< AString, AString > Names;
 	AStringVector Split = StringSplit(a_Request->Path, "/");
 
-	if( Split.size() > 1 )
+	if (Split.size() > 1)
 	{
-		sWebPluginTab* Tab = 0;
-		if( Split.size() > 2 )	// If we got the tab name, show that page
+		sWebPluginTab * Tab = NULL;
+		if (Split.size() > 2)  // If we got the tab name, show that page
 		{
-			for( TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr )
+			for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 			{
-				if( (*itr)->SafeTitle.compare( Split[2] ) == 0 ) // This is the one! Rawr
+				if ((*itr)->SafeTitle.compare(Split[2]) == 0)  // This is the one!
 				{
 					Tab = *itr;
 					break;
 				}
 			}
 		}
-		else	// Otherwise show the first tab
+		else  // Otherwise show the first tab
 		{
-			if( GetTabs().size() > 0 )
+			if (GetTabs().size() > 0)
 				Tab = *GetTabs().begin();
 		}
 
-		if( Tab )
+		if (Tab != NULL)
 		{
 			Names.first = Tab->Title;
 			Names.second = Tab->SafeTitle;
@@ -97,17 +97,21 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 
 
 
-AString cWebPlugin::SafeString( const AString & a_String )
+AString cWebPlugin::SafeString(const AString & a_String)
 {
 	AString RetVal;
-	for( unsigned int i = 0; i < a_String.size(); ++i )
+	for (unsigned int i = 0; i < a_String.size(); ++i)
 	{
 		char c = a_String[i];
-		if( c == ' ' ) 
+		if (c == ' ')
 		{
 			c = '_';
 		}
-		RetVal.push_back( c );
+		RetVal.push_back( c);
 	}
 	return RetVal;
 }
+
+
+
+

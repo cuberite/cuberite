@@ -24,14 +24,20 @@
 #include "NetherFortGen.h"
 #include "Noise3DGenerator.h"
 #include "POCPieceGenerator.h"
+#include "RainbowRoadsGen.h"
 #include "Ravines.h"
+#include "RoughRavines.h"
+#include "TestRailsGen.h"
+#include "UnderwaterBaseGen.h"
+#include "VillageGen.h"
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cTerrainCompositionGen:
+
 cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed)
 {
 	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
@@ -39,7 +45,6 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 	{
 		LOGWARN("[Generator] CompositionGen value not set in world.ini, using \"Biomal\".");
 		CompoGenName = "Biomal";
-		a_IniFile.SetValue("Generator", "CompositionGen", CompoGenName);
 	}
 	
 	cTerrainCompositionGen * res = NULL;
@@ -93,7 +98,6 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 	else
 	{
 		LOGWARN("Unknown CompositionGen \"%s\", using \"Biomal\" instead.", CompoGenName.c_str());
-		a_IniFile.DeleteValue("Generator", "CompositionGen");
 		a_IniFile.SetValue("Generator", "CompositionGen", "Biomal");
 		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_HeightGen, a_Seed);
 	}
@@ -109,7 +113,7 @@ cTerrainCompositionGen * cTerrainCompositionGen::CreateCompositionGen(cIniFile &
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cComposableGenerator:
 
 cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
@@ -229,7 +233,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	{
 		if (CacheSize < 4)
 		{
-			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d", 
+			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
 				CacheSize, 4
 			);
 			CacheSize = 4;
@@ -247,7 +251,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
-	m_HeightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, *m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);	
+	m_HeightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, *m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
 	
 	// Add a cache, if requested:
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
@@ -255,7 +259,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 	{
 		if (CacheSize < 4)
 		{
-			LOGWARNING("Heightgen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d", 
+			LOGWARNING("Heightgen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
 				CacheSize, 4
 			);
 			CacheSize = 4;
@@ -291,19 +295,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 	int Seed = m_ChunkGenerator.GetSeed();
 	eDimension Dimension = StringToDimension(a_IniFile.GetValue("General", "Dimension", "Overworld"));
 
-	// Older configuration used "Structures" in addition to "Finishers"; we don't distinguish between the two anymore (#398)
-	// Therefore, we load Structures from the ini file for compatibility, but move its contents over to Finishers:
-	AString Structures = a_IniFile.GetValue("Generator", "Structures", "");
-	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, LavaLakes, OreNests, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
-	if (!Structures.empty())
-	{
-		LOGINFO("[Generator].Structures is deprecated, moving the contents to [Generator].Finishers.");
-		// Structures used to generate before Finishers, so place them first:
-		Structures.append(", ");
-		Finishers = Structures + Finishers;
-		a_IniFile.SetValue("Generator", "Finishers", Finishers);
-	}
-	a_IniFile.DeleteValue("Generator", "Structures");
+	AString Finishers = a_IniFile.GetValueSet("Generator", "Finishers", "");
 
 	// Create all requested finishers:
 	AStringVector Str = StringSplitAndTrim(Finishers, ",");
@@ -318,7 +310,25 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "DeadBushes") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, biDesert, 2, E_BLOCK_SAND, E_BLOCK_SAND));
+			// A list with all the allowed biomes.
+			cFinishGenSingleTopBlock::BiomeList AllowedBiomes;
+			AllowedBiomes.push_back(biDesert);
+			AllowedBiomes.push_back(biDesertHills);
+			AllowedBiomes.push_back(biDesertM);
+			AllowedBiomes.push_back(biMesa);
+			AllowedBiomes.push_back(biMesaBryce);
+			AllowedBiomes.push_back(biMesaPlateau);
+			AllowedBiomes.push_back(biMesaPlateauF);
+			AllowedBiomes.push_back(biMesaPlateauFM);
+			AllowedBiomes.push_back(biMesaPlateauM);
+
+			// A list with all the allowed blocks that can be below the dead bush.
+			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
+			AllowedBlocks.push_back(E_BLOCK_SAND);
+			AllowedBlocks.push_back(E_BLOCK_HARDENED_CLAY);
+			AllowedBlocks.push_back(E_BLOCK_STAINED_CLAY);
+
+			m_FinishGens.push_back(new cFinishGenSingleTopBlock(Seed, E_BLOCK_DEAD_BUSH, AllowedBiomes, 2, AllowedBlocks));
 		}
 		else if (NoCaseCompare(*itr, "DirectOverhangs") == 0)
 		{
@@ -353,18 +363,29 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "MineShafts") == 0)
 		{
 			int GridSize        = a_IniFile.GetValueSetI("Generator", "MineShaftsGridSize",        512);
+			int MaxOffset       = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxOffset",       256);
 			int MaxSystemSize   = a_IniFile.GetValueSetI("Generator", "MineShaftsMaxSystemSize",   160);
 			int ChanceCorridor  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCorridor",  600);
 			int ChanceCrossing  = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceCrossing",  200);
 			int ChanceStaircase = a_IniFile.GetValueSetI("Generator", "MineShaftsChanceStaircase", 200);
 			m_FinishGens.push_back(new cStructGenMineShafts(
-				Seed, GridSize, MaxSystemSize,
+				Seed, GridSize, MaxOffset, MaxSystemSize,
 				ChanceCorridor, ChanceCrossing, ChanceStaircase
 			));
 		}
 		else if (NoCaseCompare(*itr, "Lilypads") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenSingleBiomeSingleTopBlock(Seed, E_BLOCK_LILY_PAD, biSwampland, 4, E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER));
+			// A list with all the allowed biomes.
+			cFinishGenSingleTopBlock::BiomeList AllowedBiomes;
+			AllowedBiomes.push_back(biSwampland);
+			AllowedBiomes.push_back(biSwamplandM);
+
+			// A list with all the allowed blocks that can be below the lilypad.
+			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
+			AllowedBlocks.push_back(E_BLOCK_WATER);
+			AllowedBlocks.push_back(E_BLOCK_STATIONARY_WATER);
+
+			m_FinishGens.push_back(new cFinishGenSingleTopBlock(Seed, E_BLOCK_LILY_PAD, AllowedBiomes, 4, AllowedBlocks));
 		}
 		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
 		{
@@ -372,9 +393,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "NetherForts") == 0)
 		{
-			int GridSize = a_IniFile.GetValueSetI("Generator", "NetherFortsGridSize", 512);
-			int MaxDepth = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
-			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxDepth));
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "NetherFortsGridSize", 512);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "NetherFortMaxOffset", 128);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
+			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxOffset, MaxDepth));
 		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
@@ -388,9 +410,46 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenPreSimulator);
 		}
+		else if (NoCaseCompare(*itr, "RainbowRoads") == 0)
+		{
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsGridSize",  512);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxOffset", 128);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxDepth",   30);
+			int MaxSize   = a_IniFile.GetValueSetI("Generator", "RainbowRoadsMaxSize",   260);
+			m_FinishGens.push_back(new cRainbowRoadsGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize));
+		}
 		else if (NoCaseCompare(*itr, "Ravines") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenRavines(Seed, 128));
+		}
+		else if (NoCaseCompare(*itr, "RoughRavines") == 0)
+		{
+			int GridSize                  = a_IniFile.GetValueSetI("Generator", "RoughRavinesGridSize",              256);
+			int MaxOffset                 = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxOffset",             128);
+			int MaxSize                   = a_IniFile.GetValueSetI("Generator", "RoughRavinesMaxSize",               128);
+			int MinSize                   = a_IniFile.GetValueSetI("Generator", "RoughRavinesMinSize",                64);
+			double MaxCenterWidth         = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCenterWidth",          8);
+			double MinCenterWidth         = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCenterWidth",          2);
+			double MaxRoughness           = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxRoughness",            0.2);
+			double MinRoughness           = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinRoughness",            0.05);
+			double MaxFloorHeightEdge     = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxFloorHeightEdge",      8);
+			double MinFloorHeightEdge     = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinFloorHeightEdge",     30);
+			double MaxFloorHeightCenter   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxFloorHeightCenter",   20);
+			double MinFloorHeightCenter   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinFloorHeightCenter",    6);
+			double MaxCeilingHeightEdge   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCeilingHeightEdge",   56);
+			double MinCeilingHeightEdge   = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightEdge",   38);
+			double MaxCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMaxCeilingHeightCenter", 58);
+			double MinCeilingHeightCenter = a_IniFile.GetValueSetF("Generator", "RoughRavinesMinCeilingHeightCenter", 36);
+			m_FinishGens.push_back(new cRoughRavines(
+				Seed, MaxSize, MinSize,
+				(float)MaxCenterWidth,         (float)MinCenterWidth,
+				(float)MaxRoughness,           (float)MinRoughness,
+				(float)MaxFloorHeightEdge,     (float)MinFloorHeightEdge,
+				(float)MaxFloorHeightCenter,   (float)MinFloorHeightCenter,
+				(float)MaxCeilingHeightEdge,   (float)MinCeilingHeightEdge,
+				(float)MaxCeilingHeightCenter, (float)MinCeilingHeightCenter,
+				GridSize, MaxOffset
+			));
 		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{
@@ -400,9 +459,35 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			m_FinishGens.push_back(new cFinishGenSprinkleFoliage(Seed));
 		}
+		else if (NoCaseCompare(*itr, "TallGrass") == 0)
+		{
+			m_FinishGens.push_back(new cFinishGenTallGrass(Seed));
+		}
+		else if (NoCaseCompare(*itr, "TestRails") == 0)
+		{
+			m_FinishGens.push_back(new cTestRailsGen(Seed, 100, 1, 7, 50));
+		}
 		else if (NoCaseCompare(*itr, "Trees") == 0)
 		{
 			m_FinishGens.push_back(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen));
+		}
+		else if (NoCaseCompare(*itr, "UnderwaterBases") == 0)
+		{
+			int GridSize  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseGridSize", 1024);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxOffset", 128);
+			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
+			int MaxSize   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
+			m_FinishGens.push_back(new cUnderwaterBaseGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, *m_BiomeGen));
+		}
+		else if (NoCaseCompare(*itr, "Villages") == 0)
+		{
+			int GridSize   = a_IniFile.GetValueSetI("Generator", "VillageGridSize",  384);
+			int MaxOffset  = a_IniFile.GetValueSetI("Generator", "VillageMaxOffset", 128);
+			int MaxDepth   = a_IniFile.GetValueSetI("Generator", "VillageMaxDepth",    2);
+			int MaxSize    = a_IniFile.GetValueSetI("Generator", "VillageMaxSize",   128);
+			int MinDensity = a_IniFile.GetValueSetI("Generator", "VillageMinDensity", 50);
+			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
+			m_FinishGens.push_back(new cVillageGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, *m_BiomeGen, *m_HeightGen));
 		}
 		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
@@ -415,7 +500,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "WormNestCaves") == 0)
 		{
-			m_FinishGens.push_back(new cStructGenWormNestCaves(Seed));
+			int Size      = a_IniFile.GetValueSetI("Generator", "WormNestCavesSize", 64);
+			int Grid      = a_IniFile.GetValueSetI("Generator", "WormNestCavesGrid", 96);
+			int MaxOffset = a_IniFile.GetValueSetI("Generator", "WormNestMaxOffset", 32);
+			m_FinishGens.push_back(new cStructGenWormNestCaves(Seed, Size, Grid, MaxOffset));
 		}
 		else
 		{

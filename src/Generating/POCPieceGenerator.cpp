@@ -150,7 +150,7 @@ static void DebugPieces(const cPlacedPieces & a_Pieces)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPOCPieceGenerator:
 
 cPOCPieceGenerator::cPOCPieceGenerator(int a_Seed) :
@@ -186,6 +186,11 @@ cPOCPieceGenerator::cPOCPieceGenerator(int a_Seed) :
 cPOCPieceGenerator::~cPOCPieceGenerator()
 {
 	cPieceGenerator::FreePieces(m_Pieces);
+	for (cPieces::iterator itr = m_AvailPieces.begin(), end = m_AvailPieces.end(); itr != end; ++itr)
+	{
+		delete *itr;
+	}
+	m_AvailPieces.clear();
 }
 
 

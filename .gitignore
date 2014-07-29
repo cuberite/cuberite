@@ -15,6 +15,7 @@ cloc.xsl
 *.suo
 /EveryNight.cmd
 /UploadLuaAPI.cmd
+AllFiles.lst
 
 # IDE Stuff
 ## Sublime Text
@@ -26,6 +27,7 @@ cloc.xsl
 ## Eclipse
 .cproject
 .project
+*.cbp
 
 # world inside source
 ChunkWorx.ini
@@ -48,6 +50,7 @@ world_nether
 CMakeFiles/
 cmake_install.cmake
 CMakeCache.txt
+CTestTestfile.cmake
 Makefile
 
 *.a
@@ -63,6 +66,7 @@ lib/tolua++/tolua
 src/Bindings/Bindings.*
 src/Bindings/BindingDependecies.txt
 MCServer.dir/
+src/AllFiles.lst
 
 #win32 cmake stuff
 *.vcxproj

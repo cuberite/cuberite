@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../Inventory.h"
+#include "Window.h"
 
 
 
@@ -45,10 +46,19 @@ public:
 	
 	/// Called from Clicked when the action is a shiftclick (left or right)
 	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem);
-	
+
 	/// Called from Clicked when the action is a caDblClick
 	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum);
-	
+
+	/** Called from Clicked when the action is a middleclick */
+	virtual void MiddleClicked(cPlayer & a_Player, int a_SlotNum);
+
+	/** Called from Clicked when the action is a drop click. */
+	virtual void DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack);
+
+	/** Called from Clicked when the action is a number click. */
+	virtual void NumberClicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction);
+
 	/// Called when a new player opens the same parent window. The window already tracks the player. CS-locked.
 	virtual void OnPlayerAdded(cPlayer & a_Player);
 	
@@ -125,7 +135,7 @@ class cSlotAreaHotBar :
 	typedef cSlotAreaInventoryBase super;
 	
 public:
-	cSlotAreaHotBar(cWindow & a_ParentWindow)	:
+	cSlotAreaHotBar(cWindow & a_ParentWindow) :
 		cSlotAreaInventoryBase(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
 	{
 	}
@@ -140,7 +150,7 @@ class cSlotAreaArmor :
 	public cSlotAreaInventoryBase
 {
 public:
-	cSlotAreaArmor(cWindow & a_ParentWindow)	:
+	cSlotAreaArmor(cWindow & a_ParentWindow) :
 		cSlotAreaInventoryBase(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
 	{
 	}
@@ -151,7 +161,7 @@ public:
 	/** Called when a player clicks in the window. Parameters taken from the click packet. */
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 
-	bool CanPlaceInSlot(int a_SlotNum, const cItem & a_Item);
+	static bool CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item);
 } ;
 
 
@@ -231,9 +241,11 @@ public:
 	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void DblClicked     (cPlayer & a_Player, int a_SlotNum);
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+	virtual void SetSlot        (int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
 	// Distributing items into this area is completely disabled
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
 
 protected:
 	/// Maps player's EntityID -> current recipe; not a std::map because cCraftingGrid needs proper constructor params
@@ -247,12 +259,55 @@ protected:
 	
 	/// Handles a shift-click in the result slot. Crafts using the current recipe until it changes or no more space for result.
 	void ShiftClickedResult(cPlayer & a_Player);
-	
+
+	/** Handles a drop-click in the result slot. */
+	void DropClickedResult(cPlayer & a_Player);
+
 	/// Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the specified player
 	void UpdateRecipe(cPlayer & a_Player);
 	
 	/// Retrieves the recipe for the specified player from the map, or creates one if not found
 	cCraftingRecipe & GetRecipeForPlayer(cPlayer & a_Player);
+
+	/// Called after an item has been crafted to handle statistics e.t.c.
+	void HandleCraftItem(const cItem & a_Result, cPlayer & a_Player);
+} ;
+
+
+
+
+
+class cSlotAreaAnvil :
+	public cSlotAreaTemporary
+{
+	typedef cSlotAreaTemporary super;
+
+public:
+	cSlotAreaAnvil(cAnvilWindow & a_ParentWindow);
+
+	// cSlotArea overrides:
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem) override;
+	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+
+	// cSlotAreaTemporary overrides:
+	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
+
+	/** Can the player take the item from the slot? */
+	bool CanTakeResultItem(cPlayer & a_Player);
+
+	/** This function will call, when the player take the item from the slot. */
+	void OnTakeResult(cPlayer & a_Player);
+
+	/** Handles a click in the item slot. */
+	void UpdateResult(cPlayer & a_Player);
+
+protected:
+	/** The maximum cost of repairing/renaming in the anvil. */
+	int m_MaximumCost;
+
+	/** The stack size of the second item where was used for repair */
+	char m_StackSizeToBeUsedInRepair;
 } ;
 
 
@@ -351,6 +406,7 @@ public:
 	virtual ~cSlotAreaFurnace();
 	
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 	
@@ -359,6 +415,9 @@ protected:
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+
+	/// Called after an item has been smelted to handle statistics e.t.c.
+	void HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
 
 

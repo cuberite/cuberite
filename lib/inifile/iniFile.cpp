@@ -243,7 +243,7 @@ int cIniFile::FindKey(const AString & a_KeyName) const
 	{
 		if (CheckCase(names[keyID]) == CaseKeyName)
 		{
-			return keyID;
+			return (int)keyID;
 		}
 	}
 	return noID;
@@ -279,7 +279,7 @@ int cIniFile::AddKeyName(const AString & keyname)
 {
 	names.resize(names.size() + 1, keyname);
 	keys.resize(keys.size() + 1);
-	return names.size() - 1;
+	return (int)names.size() - 1;
 }
 
 
@@ -447,6 +447,15 @@ bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 
 
+bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists)
+{
+	return SetValue(a_Keyname, a_ValueName, Printf("%lld", a_Value), a_CreateIfNotExists);
+}
+
+
+
+
+
 bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName, double const a_Value, const bool a_CreateIfNotExists)
 {
 	return SetValue(a_KeyName, a_ValueName, Printf("%f", a_Value), a_CreateIfNotExists);
@@ -571,6 +580,24 @@ int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, c
 
 
 
+Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const Int64 defValue)
+{
+	AString Data;
+	Printf(Data, "%lld", defValue);
+	AString resultstring = GetValueSet(keyname, valuename, Data);
+	Int64 result = defValue;
+#ifdef _WIN32
+	sscanf_s(resultstring.c_str(), "%lld", &result);
+#else
+	sscanf(resultstring.c_str(), "%lld", &result);
+#endif
+	return result;
+}
+
+
+
+
+
 bool cIniFile::DeleteValueByID(const int keyID, const int valueID)
 {
 	if ((keyID < (int)keys.size()) && (valueID < (int)keys[keyID].names.size()))
@@ -683,7 +710,7 @@ int cIniFile::GetNumKeyComments(const int keyID) const
 {
 	if (keyID < (int)keys.size())
 	{
-		return keys[keyID].comments.size();
+		return (int)keys[keyID].comments.size();
 	}
 	return 0;
 }

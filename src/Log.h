@@ -6,7 +6,7 @@
 
 
 class cLog
-{	// tolua_export
+{
 private:
 	FILE * m_File;
 	static cLog * s_Log;
@@ -23,7 +23,7 @@ public:
 	void ClearLog();
 	static cLog* GetInstance();
 };
-// tolua_end
+
 
 
 

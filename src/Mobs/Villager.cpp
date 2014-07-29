@@ -23,9 +23,13 @@ cVillager::cVillager(eVillagerType VillagerType) :
 
 
 
-void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
 	if ((a_TDI.Attacker != NULL) && a_TDI.Attacker->IsPlayer())
 	{
 		if (m_World->GetTickRandomNumber(5) == 3)
@@ -33,6 +37,7 @@ void cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
 		}
 	}
+	return true;
 }
 
 
@@ -50,7 +55,7 @@ void cVillager::Tick(float a_Dt, cChunk & a_Chunk)
 		{
 			switch (m_Type)
 			{
-				case vtFarmer: 
+				case vtFarmer:
 				{
 					HandleFarmerPlaceCrops();
 				}
@@ -133,8 +138,8 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 			m_CropsPos = Vector3i((int) GetPosX() + X - 5, (int) GetPosY() + Y - 3, (int) GetPosZ() + Z - 5);
 			MoveToPosition(Vector3f((float) (m_CropsPos.x + 0.5), (float) m_CropsPos.y, (float) (m_CropsPos.z + 0.5)));
 			return;
-		} // for Y loop.
-	} // Repeat the procces 5 times.
+		}  // for Y loop.
+	}  // Repeat the procces 5 times.
 }
 
 

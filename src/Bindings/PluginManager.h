@@ -51,14 +51,25 @@ class cBlockEntityWithItems;
 
 
 
-class cPluginManager													// tolua_export
-{																		// tolua_export
-public:																	// tolua_export
-
+// tolua_begin
+class cPluginManager
+{
+public:
+	// tolua_end
+	
 	// Called each tick
 	virtual void Tick(float a_Dt);
-
+	
 	// tolua_begin
+	enum CommandResult
+	{
+		crExecuted,
+		crUnknownCommand,
+		crError,
+		crBlocked,
+		crNoPermission,
+	} ;
+
 	enum PluginHook
 	{
 		HOOK_BLOCK_SPREAD,
@@ -73,6 +84,7 @@ public:																	// tolua_export
 		HOOK_CRAFTING_NO_RECIPE,
 		HOOK_DISCONNECT,
 		HOOK_PLAYER_ANIMATION,
+		HOOK_ENTITY_ADD_EFFECT,
 		HOOK_EXECUTE_COMMAND,
 		HOOK_EXPLODED,
 		HOOK_EXPLODING,
@@ -87,6 +99,7 @@ public:																	// tolua_export
 		HOOK_PLAYER_EATING,
 		HOOK_PLAYER_FISHED,
 		HOOK_PLAYER_FISHING,
+		HOOK_PLAYER_FOOD_LEVEL_CHANGE,
 		HOOK_PLAYER_JOINED,
 		HOOK_PLAYER_LEFT_CLICK,
 		HOOK_PLAYER_MOVING,
@@ -146,20 +159,22 @@ public:																	// tolua_export
 	
 	
 	/** Returns the instance of the Plugin Manager (there is only ever one) */
-	static cPluginManager * Get(void);							// tolua_export
+	static cPluginManager * Get(void);  // tolua_export
 
 	typedef std::map< AString, cPlugin * > PluginMap;
 	typedef std::list< cPlugin * > PluginList;
-	cPlugin * GetPlugin( const AString & a_Plugin ) const;				// tolua_export
-	const PluginMap & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
+	cPlugin * GetPlugin( const AString & a_Plugin) const;  // tolua_export
+	const PluginMap & GetAllPlugins() const;  // >> EXPORTED IN MANUALBINDINGS <<
 
-	void FindPlugins();													// tolua_export
-	void ReloadPlugins();												// tolua_export
+	// tolua_begin
+	void FindPlugins();
+	void ReloadPlugins();
+	// tolua_end
 	
 	/** Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
 
-	unsigned int GetNumPlugins() const;  // tolua_export
+	size_t GetNumPlugins() const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
@@ -172,14 +187,15 @@ public:																	// tolua_export
 	bool CallHookChunkUnloading           (cWorld * a_World, int a_ChunkX, int a_ChunkZ);
 	bool CallHookCollectingPickup         (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	bool CallHookDisconnect               (cPlayer * a_Player, const AString & a_Reason);
+	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
+	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle * a_ClientHandle, const AString & a_Username);
 	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
+	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -188,6 +204,7 @@ public:																	// tolua_export
 	bool CallHookPlayerEating             (cPlayer & a_Player);
 	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems a_Reward);
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
+	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
 	bool CallHookPlayerMoving             (cPlayer & a_Player);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
@@ -206,7 +223,7 @@ public:																	// tolua_export
 	bool CallHookPluginsLoaded            (void);
 	bool CallHookPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
-	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile);
+	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
 	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
@@ -244,11 +261,11 @@ public:																	// tolua_export
 	/** Returns the permission needed for the specified command; empty string if command not found */
 	AString GetCommandPermission(const AString & a_Command);  // tolua_export
 	
-	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns true if executed. */
-	bool ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
+	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns crExecuted if executed. */
+	CommandResult ExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
-	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns true if executed (false if not found) */
-	bool ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
+	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns crExecuted if executed. */
+	CommandResult ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command);  // tolua_export
 	
 	/** Removes all console command bindings that the specified plugin has made */
 	void RemovePluginConsoleCommands(cPlugin * a_Plugin);
@@ -321,14 +338,9 @@ private:
 	/** Adds the plugin into the internal list of plugins and initializes it. If initialization fails, the plugin is removed again. */
 	bool AddPlugin(cPlugin * a_Plugin);
 
-	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns true if the command is handled. */
-	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions, bool & a_WasCommandForbidden);	
-	bool HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
-	{
-		bool DummyBoolean = false;
-		return HandleCommand(a_Player, a_Command, a_ShouldCheckPermissions, DummyBoolean);
-	}
-} ; // tolua_export
+	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
+	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
+} ;  // tolua_export
 
 
 

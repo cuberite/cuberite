@@ -118,7 +118,7 @@ private:
 	friend class cScoreboardSerializer;
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 
@@ -153,7 +153,7 @@ public:
 	// tolua_begin
 
 	/** Returns the number of registered players */
-	unsigned int GetNumPlayers(void) const;
+	size_t GetNumPlayers(void) const;
 
 	bool AllowsFriendlyFire(void)      const { return m_AllowsFriendlyFire; }
 	bool CanSeeFriendlyInvisible(void) const { return m_CanSeeFriendlyInvisible; }
@@ -197,7 +197,7 @@ private:
 	friend class cScoreboardSerializer;
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 
@@ -248,9 +248,9 @@ public:
 
 	cObjective * GetObjectiveIn(eDisplaySlot a_Slot);
 
-	unsigned int GetNumObjectives(void) const;
+	size_t GetNumObjectives(void) const;
 
-	unsigned int GetNumTeams(void) const;
+	size_t GetNumTeams(void) const;
 
 	void AddPlayerScore(const AString & a_Name, cObjective::eType a_Type, cObjective::Score a_Value = 1);
 
@@ -259,25 +259,22 @@ public:
 	/** Send this scoreboard to the specified client */
 	void SendTo(cClientHandle & a_Client);
 
-	cTeam * QueryPlayerTeam(const AString & a_Name); // WARNING: O(n logn)
+	cTeam * QueryPlayerTeam(const AString & a_Name);  // WARNING: O(n logn)
 
-	/** Execute callback for each objective with the specified type 
-	 *
-	 * Returns true if all objectives processed, false if the callback aborted by returning true.
-	 */
+	/** Execute callback for each objective with the specified type
+	Returns true if all objectives processed, false if the callback aborted by returning true.
+	*/
 	bool ForEachObjectiveWith(cObjective::eType a_Type, cObjectiveCallback& a_Callback);
 
 	/** Execute callback for each objective.
-	 *
-	 * Returns true if all objectives have been processed, false if the callback aborted by returning true.
-	 */
-	bool ForEachObjective(cObjectiveCallback& a_Callback); // Exported in ManualBindings.cpp
+	Returns true if all objectives have been processed, false if the callback aborted by returning true.
+	*/
+	bool ForEachObjective(cObjectiveCallback& a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Execute callback for each team.
-	 *
-	 * Returns true if all teams have been processed, false if the callback aborted by returning true.
-	 */
-	bool ForEachTeam(cTeamCallback& a_Callback); // Exported in ManualBindings.cpp
+	Returns true if all teams have been processed, false if the callback aborted by returning true.
+	*/
+	bool ForEachTeam(cTeamCallback& a_Callback);  // Exported in ManualBindings.cpp
 
 	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 
@@ -304,7 +301,7 @@ private:
 	friend class cScoreboardSerializer;
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 

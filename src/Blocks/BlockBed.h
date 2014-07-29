@@ -16,7 +16,7 @@ class cBlockBedHandler :
 {
 public:
 	cBlockBedHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01,true>(a_BlockType)
+		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
 	{
 	}
 
@@ -37,6 +37,13 @@ public:
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_ITEM_BED, 1, 0));
 	}
+
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
+
 
 
 	// Bed specific helper functions

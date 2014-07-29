@@ -21,6 +21,9 @@
 #include "FireChargeEntity.h"
 #include "FireworkEntity.h"
 #include "GhastFireballEntity.h"
+#include "WitherSkullEntity.h"
+#include "SplashPotionEntity.h"
+#include "Player.h"
 
 
 
@@ -33,7 +36,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
 class cProjectileTracerCallback :
@@ -67,21 +70,22 @@ protected:
 		
 		if (cBlockInfo::IsSolid(a_BlockType))
 		{
-			// The projectile hit a solid block
-			// Calculate the exact hit coords:
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);
-			Vector3d Line1 = m_Projectile->GetPosition();
-			Vector3d Line2 = Line1 + m_Projectile->GetSpeed();
-			double LineCoeff = 0;
-			eBlockFace Face;
-			if (bb.CalcLineIntersection(Line1, Line2, LineCoeff, Face))
+			// The projectile hit a solid block, calculate the exact hit coords:
+			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+			const Vector3d LineStart = m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
+			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
+			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+			eBlockFace Face;  // Face hit
+
+			if (bb.CalcLineIntersection(LineStart, LineEnd, LineCoeff, Face))
 			{
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile))
+				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
+
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, &Intersection))
 				{
 					return false;
 				}
 
-				Vector3d Intersection = Line1 + m_Projectile->GetSpeed() * LineCoeff;
 				m_Projectile->OnHitSolidBlock(Intersection, Face);
 				return true;
 			}
@@ -119,7 +123,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntityCollisionCallback:
 
 class cProjectileEntityCollisionCallback :
@@ -140,12 +144,14 @@ public:
 	{
 		if (
 			(a_Entity == m_Projectile) ||          // Do not check collisions with self
-			(a_Entity == m_Projectile->GetCreator())  // Do not check whoever shot the projectile
+			(a_Entity->GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
 		)
 		{
-			// TODO: Don't check creator only for the first 5 ticks
-			// so that arrows stuck in ground and dug up can hurt the player
-			return false;
+			// Don't check creator only for the first 5 ticks so that projectiles can collide with the creator
+			if (m_Projectile->GetTicksAlive() <= 5)
+			{
+				return false;
+			}
 		}
 		
 		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
@@ -161,7 +167,12 @@ public:
 			return false;
 		}
 
-		// TODO: Some entities don't interact with the projectiles (pickups, falling blocks)
+		if (!a_Entity->IsMob() && !a_Entity->IsMinecart() && !a_Entity->IsPlayer() && !a_Entity->IsBoat())
+		{
+			// Not an entity that interacts with a projectile
+			return false;
+		}
+
 		if (cPluginManager::Get()->CallHookProjectileHitEntity(*m_Projectile, *a_Entity))
 		{
 			// A plugin disagreed.
@@ -203,13 +214,16 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :
 	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_Creator(a_Creator),
+	m_CreatorData(
+		((a_Creator != NULL) ? a_Creator->GetUniqueID() : -1),
+		((a_Creator != NULL) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : "")
+	),
 	m_IsInGround(false)
 {
 }
@@ -221,7 +235,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height) :
 	super(etProjectile, a_Pos.x, a_Pos.y, a_Pos.z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_Creator(a_Creator),
+	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : ""),
 	m_IsInGround(false)
 {
 	SetSpeed(a_Speed);
@@ -233,7 +247,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 
 
 
-cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed)
+cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	Vector3d Speed;
 	if (a_Speed != NULL)
@@ -250,14 +264,17 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkSplashPotion:  return new cSplashPotionEntity    (a_Creator, a_X, a_Y, a_Z, Speed, *a_Item);
+		case pkWitherSkull:   return new cWitherSkullEntity     (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{
-			if (a_Item.m_FireworkItem.m_Colours.empty())
+			ASSERT(a_Item != NULL);
+			if (a_Item->m_FireworkItem.m_Colours.empty())
 			{
 				return NULL;
 			}
 
-			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, a_Item);
+			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
 		}
 	}
 	
@@ -298,9 +315,9 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkEgg:           return "Egg";
 		case pkGhastFireball: return "Fireball";
 		case pkFireCharge:    return "SmallFireball";
-		case pkEnderPearl:    return "ThrownEnderPearl";
+		case pkEnderPearl:    return "ThrownEnderpearl";
 		case pkExpBottle:     return "ThrownExpBottle";
-		case pkSplashPotion:  return "ThrownPotion";
+		case pkSplashPotion:  return "SplashPotion";
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
@@ -316,8 +333,9 @@ AString cProjectileEntity::GetMCAClassName(void) const
 void cProjectileEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-
-	if (GetProjectileKind() != pkArrow) // See cArrow::Tick
+	
+	// TODO: see BroadcastMovementUpdate; RelativeMove packet jerkiness affects projectiles too (cause of sympton described in cArrowEntity::Tick())
+	if (GetProjectileKind() != pkArrow)
 	{
 		BroadcastMovementUpdate();
 	}
@@ -335,19 +353,10 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	
-	Vector3d PerTickSpeed = GetSpeed() / 20;
-	Vector3d Pos = GetPosition();
-	
-	// Trace the tick's worth of movement as a line:
-	Vector3d NextPos = Pos + PerTickSpeed;
-	cProjectileTracerCallback TracerCallback(this);
-	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
-	{
-		// Something has been hit, abort all other processing
-		return;
-	}
-	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
-	
+	const Vector3d PerTickSpeed = GetSpeed() / 20;
+	const Vector3d Pos = GetPosition();
+	const Vector3d NextPos = Pos + PerTickSpeed;
+
 	// Test for entity collisions:
 	cProjectileEntityCollisionCallback EntityCollisionCallback(this, Pos, NextPos);
 	a_Chunk.ForEachEntity(EntityCollisionCallback);
@@ -364,10 +373,19 @@ void cProjectileEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			HitPos.x, HitPos.y, HitPos.z,
 			EntityCollisionCallback.GetMinCoeff()
 		);
-		
+
 		OnHitEntity(*(EntityCollisionCallback.GetHitEntity()), HitPos);
 	}
 	// TODO: Test the entities in the neighboring chunks, too
+	
+	// Trace the tick's worth of movement as a line:
+	cProjectileTracerCallback TracerCallback(this);
+	if (!cLineBlockTracer::Trace(*m_World, TracerCallback, Pos, NextPos))
+	{
+		// Something has been hit, abort all other processing
+		return;
+	}
+	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
 
 	// Update the position:
 	SetPosition(NextPos);

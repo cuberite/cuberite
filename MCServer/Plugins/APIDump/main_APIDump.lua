@@ -27,10 +27,14 @@ local function LoadAPIFiles(a_Folder, a_DstTable)
 		-- We only want .lua files from the folder:
 		if (cFile:IsFile(FileName) and fnam:match(".*%.lua$")) then
 			local TablesFn, Err = loadfile(FileName);
-			if (TablesFn == nil) then
+			if (type(TablesFn) ~= "function") then
 				LOGWARNING("Cannot load API descriptions from " .. FileName .. ", Lua error '" .. Err .. "'.");
 			else
 				local Tables = TablesFn();
+				if (type(Tables) ~= "table") then
+					LOGWARNING("Cannot load API descriptions from " .. FileName .. ", returned object is not a table (" .. type(Tables) .. ").");
+					break
+				end
 				for k, cls in pairs(Tables) do
 					a_DstTable[k] = cls;
 				end

@@ -15,7 +15,7 @@ class cSnowGolem :
 public:
 	cSnowGolem(void);
 
-	CLASS_PROTODEF(cSnowGolem);
+	CLASS_PROTODEF(cSnowGolem)
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;

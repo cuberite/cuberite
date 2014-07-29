@@ -7,6 +7,7 @@
 #include "Connection.h"
 #include "Server.h"
 #include <iostream>
+#include "PolarSSL++/CryptoKey.h"
 
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
@@ -471,7 +472,7 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
 	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
 	const Byte * Data = (const Byte *)a_Data;
@@ -495,7 +496,7 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryp
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
 {
 	AString All;
 	a_Data.ReadAll(All);
@@ -2899,7 +2900,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	Byte SharedSecret[16];
 	Byte EncryptedSecret[128];
 	memset(SharedSecret, 0, sizeof(SharedSecret));  // Use all zeroes for the initial secret
-	cPublicKey PubKey(a_ServerPublicKey);
+	cCryptoKey PubKey(a_ServerPublicKey);
 	int res = PubKey.Encrypt(SharedSecret, sizeof(SharedSecret), EncryptedSecret, sizeof(EncryptedSecret));
 	if (res < 0)
 	{

@@ -21,8 +21,19 @@ static bool DoIntervalsIntersect(int a_Min1, int a_Max1, int a_Min2, int a_Max2)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCuboid:
+
+cCuboid & cCuboid::operator=(cCuboid a_Other)
+{
+	std::swap(p1, a_Other.p1);
+	std::swap(p2, a_Other.p2);
+	return *this;
+}
+
+
+
+
 
 void cCuboid::Assign(int a_X1, int a_Y1, int a_Z1, int a_X2, int a_Y2, int a_Z2)
 {

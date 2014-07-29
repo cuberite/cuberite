@@ -32,7 +32,7 @@ int cBeaconEntity::GetPyramidLevel(void)
 	}
 
 	Area.Read(
-		m_World, 
+		m_World,
 		GetPosX() - 4, GetPosX() + 4,
 		MinY, MaxY,
 		GetPosZ() - 4, GetPosZ() + 4,
@@ -66,7 +66,7 @@ int cBeaconEntity::GetPyramidLevel(void)
 
 bool cBeaconEntity::IsMineralBlock(BLOCKTYPE a_BlockType)
 {
-	switch(a_BlockType)
+	switch (a_BlockType)
 	{
 		case E_BLOCK_DIAMOND_BLOCK:
 		case E_BLOCK_GOLD_BLOCK:

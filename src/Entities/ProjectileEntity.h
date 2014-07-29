@@ -41,18 +41,18 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cProjectileEntity);
+	CLASS_PROTODEF(cProjectileEntity)
 
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
 	
-	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed = NULL);
+	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed = NULL);
 	
 	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace);
 	
 	/// Called by the physics blocktracer when the entity hits another entity
-	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) 
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		UNUSED(a_EntityHit);
 		UNUSED(a_HitPos);
@@ -66,8 +66,15 @@ public:
 	/// Returns the kind of the projectile (fast class identification)
 	eKind GetProjectileKind(void) const { return m_ProjectileKind; }
 	
-	/// Returns the entity who created this projectile; may be NULL
-	cEntity * GetCreator(void) { return m_Creator; }
+	/** Returns the unique ID of the entity who created this projectile
+	May return an ID <0
+	*/
+	int GetCreatorUniqueID(void) { return m_CreatorData.m_UniqueID; }
+
+	/** Returns the name of the player that created the projectile
+	Will be empty for non-player creators
+	*/
+	AString GetCreatorName(void) const { return m_CreatorData.m_Name; }
 	
 	/// Returns the string that is used as the entity type (class name) in MCA files
 	AString GetMCAClassName(void) const;
@@ -81,10 +88,29 @@ public:
 	void SetIsInGround(bool a_IsInGround) { m_IsInGround = a_IsInGround; }
 	
 protected:
+
+	/** A structure that stores the Entity ID and Playername of the projectile's creator
+	Used to migitate invalid pointers caused by the creator being destroyed
+	*/
+	struct CreatorData
+	{
+		CreatorData(int a_UniqueID, const AString & a_Name) :
+			m_UniqueID(a_UniqueID),
+			m_Name(a_Name)
+		{
+		}
+
+		const int m_UniqueID;
+		AString m_Name;
+	};
+
+	/** The type of projectile I am */
 	eKind m_ProjectileKind;
 	
-	/// The entity who has created this projectile; may be NULL (e. g. for dispensers)
-	cEntity * m_Creator;
+	/** The structure for containing the entity ID and name who has created this projectile
+	The ID and/or name may be NULL (e.g. for dispensers/mobs)
+	*/
+	CreatorData m_CreatorData;
 	
 	/// True if the projectile has hit the ground and is stuck there
 	bool m_IsInGround;
@@ -94,4 +120,4 @@ protected:
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-} ; // tolua_export
+} ;  // tolua_export

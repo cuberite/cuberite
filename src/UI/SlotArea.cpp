@@ -20,7 +20,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotArea:
 
 cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
@@ -36,8 +36,8 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	/*
-	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s", 
-		GetNumSlots(), a_SlotNum, 
+	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s",
+		GetNumSlots(), a_SlotNum,
 		ItemToFullString(a_ClickedItem).c_str(),
 		ItemToFullString(*GetSlot(a_SlotNum, a_Player)).c_str()
 	);
@@ -60,10 +60,33 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
 			return;
 		}
-		
 		case caDblClick:
 		{
 			DblClicked(a_Player, a_SlotNum);
+			return;
+		}
+		case caMiddleClick:
+		{
+			MiddleClicked(a_Player, a_SlotNum);
+			return;
+		}
+		case caDropKey:
+		case caCtrlDropKey:
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
+		case caNumber1:
+		case caNumber2:
+		case caNumber3:
+		case caNumber4:
+		case caNumber5:
+		case caNumber6:
+		case caNumber7:
+		case caNumber8:
+		case caNumber9:
+		{
+			NumberClicked(a_Player, a_SlotNum, a_ClickAction);
 			return;
 		}
 		default:
@@ -85,9 +108,9 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		case caRightClick:
 		{
-			if (DraggingItem.m_ItemType <= 0) // Empty-handed?
+			if (DraggingItem.m_ItemType <= 0)  // Empty-handed?
 			{
-				DraggingItem = Slot.CopyOne(); // Obtain copy of slot to preserve lore, enchantments, etc.
+				DraggingItem = Slot.CopyOne();  // Obtain copy of slot to preserve lore, enchantments, etc.
 
 				DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
 				Slot.m_ItemCount -= DraggingItem.m_ItemCount;
@@ -105,7 +128,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 				{
 					char OldSlotCount = Slot.m_ItemCount;
 
-					Slot = DraggingItem.CopyOne(); // See above
+					Slot = DraggingItem.CopyOne();  // See above
 					OldSlotCount++;
 					Slot.m_ItemCount = OldSlotCount;
 
@@ -226,6 +249,77 @@ void cSlotArea::DblClicked(cPlayer & a_Player, int a_SlotNum)
 
 
 
+void cSlotArea::MiddleClicked(cPlayer & a_Player, int a_SlotNum)
+{
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+
+	if (!a_Player.IsGameModeCreative() || Slot.IsEmpty() || !DraggingItem.IsEmpty())
+	{
+		return;
+	}
+
+	DraggingItem = Slot;
+	DraggingItem.m_ItemCount = DraggingItem.GetMaxStackSize();
+}
+
+
+
+
+
+void cSlotArea::DropClicked(cPlayer & a_Player, int a_SlotNum, bool a_DropStack)
+{
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (Slot.IsEmpty())
+	{
+		return;
+	}
+
+	cItem ItemToDrop = Slot.CopyOne();
+	if (a_DropStack)
+	{
+		ItemToDrop.m_ItemCount = Slot.m_ItemCount;
+	}
+
+	Slot.m_ItemCount -= ItemToDrop.m_ItemCount;
+	if (Slot.m_ItemCount <= 0)
+	{
+		Slot.Empty();
+	}
+	SetSlot(a_SlotNum, a_Player, Slot);
+
+	a_Player.TossPickup(ItemToDrop);
+}
+
+
+
+
+
+void cSlotArea::NumberClicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction)
+{
+	if ((a_ClickAction < caNumber1) || (a_ClickAction > caNumber9))
+	{
+		return;
+	}
+
+	int HotbarSlot = (int)a_ClickAction - (int)caNumber1;
+	cItem ItemInHotbar(a_Player.GetInventory().GetHotbarSlot(HotbarSlot));
+	cItem ItemInSlot(*GetSlot(a_SlotNum, a_Player));
+
+	// The items are equal. Do nothing.
+	if (ItemInHotbar.IsEqual(ItemInSlot))
+	{
+		return;
+	}
+
+	a_Player.GetInventory().SetHotbarSlot(HotbarSlot, ItemInSlot);
+	SetSlot(a_SlotNum, a_Player, ItemInHotbar);
+}
+
+
+
+
+
 void cSlotArea::OnPlayerAdded(cPlayer & a_Player)
 {
 	UNUSED(a_Player);
@@ -244,7 +338,7 @@ void cSlotArea::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
+void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
@@ -264,7 +358,7 @@ void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_
 		{
 			NumFit = a_ItemStack.m_ItemCount;
 		}
-		if (a_Apply)
+		if (a_ShouldApply)
 		{
 			cItem NewSlot(a_ItemStack);
 			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
@@ -315,7 +409,7 @@ bool cSlotArea::CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaChest:
 
 cSlotAreaChest::cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow) :
@@ -347,7 +441,7 @@ void cSlotAreaChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaDoubleChest:
 
 cSlotAreaDoubleChest::cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEntity * a_BottomChest, cWindow & a_ParentWindow) :
@@ -394,7 +488,7 @@ void cSlotAreaDoubleChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cIte
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaCrafting:
 
 cSlotAreaCrafting::cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow) :
@@ -410,6 +504,12 @@ cSlotAreaCrafting::cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow) :
 
 void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
+	if (a_ClickAction == caMiddleClick)
+	{
+		MiddleClicked(a_Player, a_SlotNum);
+		return;
+	}
+
 	// Override for craft result slot
 	if (a_SlotNum == 0)
 	{
@@ -417,12 +517,17 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction 
 		{
 			ShiftClickedResult(a_Player);
 		}
+		else if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClickedResult(a_Player);
+		}
 		else
 		{
 			ClickedResult(a_Player);
 		}
 		return;
 	}
+
 	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 	UpdateRecipe(a_Player);
 }
@@ -468,6 +573,20 @@ void cSlotAreaCrafting::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
+void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	// Update the recipe after setting the slot, if the slot is not the result slot:
+	super::SetSlot(a_SlotNum, a_Player, a_Item);
+	if (a_SlotNum != 0)
+	{
+		UpdateRecipe(a_Player);
+	}
+}
+
+
+
+
+
 void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
 {
 	UNUSED(a_ItemStack);
@@ -496,6 +615,8 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 		DraggingItem = Result;
 		Recipe.ConsumeIngredients(Grid);
 		Grid.CopyToItems(PlayerSlots);
+
+		HandleCraftItem(Result, a_Player);
 	}
 	else if (DraggingItem.IsEqual(Result))
 	{
@@ -505,6 +626,8 @@ void cSlotAreaCrafting::ClickedResult(cPlayer & a_Player)
 			DraggingItem.m_ItemCount += Result.m_ItemCount;
 			Recipe.ConsumeIngredients(Grid);
 			Grid.CopyToItems(PlayerSlots);
+
+			HandleCraftItem(Result, a_Player);
 		}
 	}
 
@@ -541,19 +664,44 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 		// Distribute the result, this time for real:
 		ResultCopy = Result;
 		m_ParentWindow.DistributeStack(ResultCopy, a_Player, this, true);
-		
+
 		// Remove the ingredients from the crafting grid and update the recipe:
 		cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
 		cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
 		Recipe.ConsumeIngredients(Grid);
 		Grid.CopyToItems(PlayerSlots);
 		UpdateRecipe(a_Player);
+
+		// Broadcast the window, we sometimes move items to different locations than Vanilla, causing needless desyncs:
+		m_ParentWindow.BroadcastWholeWindow();
+		
+		// If the recipe has changed, bail out:
 		if (!Recipe.GetResult().IsEqual(Result))
 		{
-			// The recipe has changed, bail out
 			return;
 		}
 	}
+}
+
+
+
+
+
+void cSlotAreaCrafting::DropClickedResult(cPlayer & a_Player)
+{
+	// Get the current recipe:
+	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
+	const cItem & Result = Recipe.GetResult();
+
+	cItem * PlayerSlots = GetPlayerSlots(a_Player) + 1;
+	cCraftingGrid Grid(PlayerSlots, m_GridSize, m_GridSize);
+
+	a_Player.TossPickup(Result);
+	Recipe.ConsumeIngredients(Grid);
+	Grid.CopyToItems(PlayerSlots);
+
+	HandleCraftItem(Result, a_Player);
+	UpdateRecipe(a_Player);
 }
 
 
@@ -594,8 +742,456 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 
 
+void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Player)
+{
+	switch (a_Result.m_ItemType)
+	{
+		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(achCraftWorkbench);    break;
+		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(achCraftFurnace);      break;
+		case E_BLOCK_CAKE:              a_Player.AwardAchievement(achBakeCake);          break;
+		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(achCraftEnchantTable); break;
+		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(achBookshelf);         break;
+		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(achCraftPickaxe);      break;
+		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(achCraftSword);        break;
+		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(achCraftBetterPick);   break;
+		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(achCraftHoe);          break;
+		case E_ITEM_BREAD:              a_Player.AwardAchievement(achMakeBread);         break;
+		default: break;
+	}
+}
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaAnvil:
+
+cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
+	cSlotAreaTemporary(3, a_ParentWindow),
+	m_MaximumCost(0),
+	m_StackSizeToBeUsedInRepair(0)
+{
+}
+
+
+
+
+
+void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
+	if (a_SlotNum != 2)
+	{
+		super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+		UpdateResult(a_Player);
+		return;
+	}
+
+	bool bAsync = false;
+	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	{
+		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		return;
+	}
+
+	switch (a_ClickAction)
+	{
+		case caDblClick:
+		{
+			return;
+		}
+		case caShiftLeftClick:
+		case caShiftRightClick:
+		{
+			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
+		}
+		case caMiddleClick:
+		{
+			MiddleClicked(a_Player, a_SlotNum);
+			return;
+		}
+		case caDropKey:
+		case caCtrlDropKey:
+		{
+			if (CanTakeResultItem(a_Player))
+			{
+				DropClicked(a_Player, a_SlotNum, true);
+				OnTakeResult(a_Player);
+			}
+			return;
+		}
+		default:
+		{
+			break;
+		}
+	}
+
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (!Slot.IsSameType(a_ClickedItem))
+	{
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		bAsync = true;
+	}
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+
+	if (Slot.IsEmpty())
+	{
+		return;
+	}
+	if (!DraggingItem.IsEmpty())
+	{
+		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= cItemHandler::GetItemHandler(Slot)->GetMaxStackSize())))
+		{
+			return;
+		}
+	}
+
+	if (!CanTakeResultItem(a_Player))
+	{
+		return;
+	}
+
+	cItem NewItem = cItem(Slot);
+	NewItem.m_ItemCount += DraggingItem.m_ItemCount;
+
+	Slot.Empty();
+	DraggingItem.Empty();
+	SetSlot(a_SlotNum, a_Player, Slot);
+
+	DraggingItem = NewItem;
+	OnTakeResult(a_Player);
+
+	if (bAsync)
+	{
+		m_ParentWindow.BroadcastWholeWindow();
+	}
+}
+
+
+
+
+
+void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+{
+	if (a_SlotNum != 2)
+	{
+		super::ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		UpdateResult(a_Player);
+		return;
+	}
+
+	// Make a copy of the slot, distribute it among the other areas, then update the slot to contain the leftover:
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+
+	if (Slot.IsEmpty() || !CanTakeResultItem(a_Player))
+	{
+		return;
+	}
+
+	m_ParentWindow.DistributeStack(Slot, a_Player, this, true);
+	if (Slot.IsEmpty())
+	{
+		Slot.Empty();
+		OnTakeResult(a_Player);
+	}
+	SetSlot(a_SlotNum, a_Player, Slot);
+	
+	// Some clients try to guess our actions and not always right (armor slots in 1.2.5), so we fix them:
+	m_ParentWindow.BroadcastWholeWindow();
+}
+
+
+
+
+
+void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			UpdateResult(a_Player);
+			return;
+		}
+	}  // for i - Slots
+	UpdateResult(a_Player);
+}
+
+
+
+
+
+void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
+{
+	if (!a_Player.IsGameModeCreative())
+	{
+		a_Player.DeltaExperience(-cPlayer::XpForLevel(m_MaximumCost));
+	}
+	SetSlot(0, a_Player, cItem());
+
+	if (m_StackSizeToBeUsedInRepair > 0)
+	{
+		const cItem * Item = GetSlot(1, a_Player);
+		if (!Item->IsEmpty() && (Item->m_ItemCount > m_StackSizeToBeUsedInRepair))
+		{
+			cItem NewSecondItem(*Item);
+			NewSecondItem.m_ItemCount -= m_StackSizeToBeUsedInRepair;
+			m_StackSizeToBeUsedInRepair = 0;
+			SetSlot(1, a_Player, NewSecondItem);
+		}
+		else
+		{
+			SetSlot(1, a_Player, cItem());
+		}
+	}
+	else
+	{
+		SetSlot(1, a_Player, cItem());
+	}
+	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+
+	m_MaximumCost = 0;
+	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", NULL);
+
+	int PosX, PosY, PosZ;
+	((cAnvilWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
+
+	BLOCKTYPE Block;
+	NIBBLETYPE BlockMeta;
+	a_Player.GetWorld()->GetBlockTypeMeta(PosX, PosY, PosZ, Block, BlockMeta);
+
+	cFastRandom Random;
+	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && (Random.NextFloat(1.0F) < 0.12F))
+	{
+		NIBBLETYPE Orientation = BlockMeta & 0x3;
+		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
+		++AnvilDamage;
+
+		if (AnvilDamage > 2)
+		{
+			// Anvil will break
+			a_Player.GetWorld()->SetBlock(PosX, PosY, PosZ, E_BLOCK_AIR, (NIBBLETYPE)0);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(1020, PosX, PosY, PosZ, 0);
+			a_Player.CloseWindow(false);
+		}
+		else
+		{
+			a_Player.GetWorld()->SetBlockMeta(PosX, PosY, PosZ, Orientation | (AnvilDamage << 2));
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
+		}
+	}
+	else
+	{
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(1021, PosX, PosY, PosZ, 0);
+	}
+}
+
+
+
+
+
+bool cSlotAreaAnvil::CanTakeResultItem(cPlayer & a_Player)
+{
+	return (
+			(
+				a_Player.IsGameModeCreative() ||              // Is the player in gamemode?
+				(a_Player.GetXpLevel() >= m_MaximumCost)      // or the player have enough exp?
+			) &&
+			(!GetSlot(2, a_Player)->IsEmpty()) &&             // Is a item in the result slot?
+			(m_MaximumCost > 0)                               // When no maximum cost is set, the item isn't set from the UpdateResult() method and can't be a valid enchanting result.
+	);
+}
+
+
+
+
+
+void cSlotAreaAnvil::OnPlayerRemoved(cPlayer & a_Player)
+{
+	TossItems(a_Player, 0, 2);
+	super::OnPlayerRemoved(a_Player);
+}
+
+
+
+
+
+void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
+{
+	cItem Input(*GetSlot(0, a_Player));
+	cItem SecondInput(*GetSlot(1, a_Player));
+	cItem Output(*GetSlot(2, a_Player));
+	
+	if (Input.IsEmpty() && !Output.IsEmpty())
+	{
+		Output.Empty();
+		SetSlot(2, a_Player, Output);
+		m_ParentWindow.SetProperty(0, 0, a_Player);
+		return;
+	}
+
+	m_MaximumCost = 0;
+	m_StackSizeToBeUsedInRepair = 0;
+	int RepairCost = Input.m_RepairCost;
+	int NeedExp = 0;
+	bool IsEnchantBook = false;
+	if (!SecondInput.IsEmpty())
+	{
+		IsEnchantBook = (SecondInput.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+		
+		RepairCost += SecondInput.m_RepairCost;
+		if (Input.IsDamageable() && cItemHandler::GetItemHandler(Input)->CanRepairWithRawMaterial(SecondInput.m_ItemType))
+		{
+			// Tool and armor repair with special item (iron / gold / diamond / ...)
+			int DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
+			if (DamageDiff <= 0)
+			{
+				// No enchantment
+				Output.Empty();
+				SetSlot(2, a_Player, Output);
+				m_ParentWindow.SetProperty(0, 0, a_Player);
+				return;
+			}
+
+			int x = 0;
+			while ((DamageDiff > 0) && (x < SecondInput.m_ItemCount))
+			{
+				Input.m_ItemDamage -= DamageDiff;
+				NeedExp += std::max(1, DamageDiff / 100) + (int)Input.m_Enchantments.Count();
+				DamageDiff = std::min((int)Input.m_ItemDamage, (int)Input.GetMaxDamage() / 4);
+
+				++x;
+			}
+			m_StackSizeToBeUsedInRepair = x;
+		}
+		else
+		{
+			// Tool and armor repair with two tools / armors
+			if (!IsEnchantBook && (!Input.IsSameType(SecondInput) || !Input.IsDamageable()))
+			{
+				// No enchantment
+				Output.Empty();
+				SetSlot(2, a_Player, Output);
+				m_ParentWindow.SetProperty(0, 0, a_Player);
+				return;
+			}
+
+			if ((Input.GetMaxDamage() > 0) && !IsEnchantBook)
+			{
+				int FirstDamageDiff = Input.GetMaxDamage() - Input.m_ItemDamage;
+				int SecondDamageDiff = SecondInput.GetMaxDamage() - SecondInput.m_ItemDamage;
+				int Damage = SecondDamageDiff + Input.GetMaxDamage() * 12 / 100;
+
+				int NewItemDamage = Input.GetMaxDamage() - (FirstDamageDiff + Damage);
+				if (NewItemDamage > 0)
+				{
+					NewItemDamage = 0;
+				}
+
+				if (NewItemDamage < Input.m_ItemDamage)
+				{
+					Input.m_ItemDamage = NewItemDamage;
+					NeedExp += std::max(1, Damage / 100);
+				}
+			}
+
+			// TODO: Add enchantments.
+		}
+	}
+
+	int NameChangeExp = 0;
+	const AString & RepairedItemName = ((cAnvilWindow*)&m_ParentWindow)->GetRepairedItemName();
+	if (RepairedItemName.empty())
+	{
+		// Remove custom name
+		if (!Input.m_CustomName.empty())
+		{
+			NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+			NeedExp += NameChangeExp;
+			Input.m_CustomName = "";
+		}
+	}
+	else if (RepairedItemName != Input.m_CustomName)
+	{
+		// Change custom name
+		NameChangeExp = (Input.IsDamageable()) ? 7 : (Input.m_ItemCount * 5);
+		NeedExp += NameChangeExp;
+
+		if (!Input.m_CustomName.empty())
+		{
+			RepairCost += NameChangeExp / 2;
+		}
+
+		Input.m_CustomName = RepairedItemName;
+	}
+
+	// TODO: Add enchantment exp cost.
+
+	m_MaximumCost = RepairCost + NeedExp;
+
+	if (NeedExp < 0)
+	{
+		Input.Empty();
+	}
+
+	if ((NameChangeExp == NeedExp) && (NameChangeExp > 0) && (m_MaximumCost >= 40))
+	{
+		m_MaximumCost = 39;
+	}
+	if (m_MaximumCost >= 40 && !a_Player.IsGameModeCreative())
+	{
+		Input.Empty();
+	}
+
+	if (!Input.IsEmpty())
+	{
+		RepairCost = std::max(Input.m_RepairCost, SecondInput.m_RepairCost);
+		if (!Input.m_CustomName.empty())
+		{
+			RepairCost -= 9;
+		}
+		RepairCost = std::max(RepairCost, 0);
+		RepairCost += 2;
+		Input.m_RepairCost = RepairCost;
+	}
+
+	SetSlot(2, a_Player, Input);
+	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnchanting:
 
 cSlotAreaEnchanting::cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow) :
@@ -627,10 +1223,14 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
 			return;
 		}
-		
 		case caDblClick:
 		{
 			DblClicked(a_Player, a_SlotNum);
+			return;
+		}
+		case caMiddleClick:
+		{
+			MiddleClicked(a_Player, a_SlotNum);
 			return;
 		}
 		default:
@@ -680,7 +1280,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		}
 		
 		case caLeftClick:
-		{	
+		{
 			// Left-clicked
 			if (DraggingItem.IsEmpty())
 			{
@@ -896,7 +1496,7 @@ int cSlotAreaEnchanting::GetBookshelvesCount(cWorld * a_World)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnderChest:
 
 cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWindow & a_ParentWindow) :
@@ -911,8 +1511,7 @@ cSlotAreaEnderChest::cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWind
 
 const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
-	// a_SlotNum ranges from 0 to 26, use that to index the chest entity's inventory directly:
-	return &(m_EnderChest->GetSlot(a_SlotNum));
+	return &(a_Player.GetEnderChestContents().GetSlot(a_SlotNum));
 }
 
 
@@ -921,14 +1520,14 @@ const cItem * cSlotAreaEnderChest::GetSlot(int a_SlotNum, cPlayer & a_Player) co
 
 void cSlotAreaEnderChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
-	m_EnderChest->SetSlot(a_SlotNum, a_Item);
+	a_Player.GetEnderChestContents().SetSlot(a_SlotNum, a_Item);
 }
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaFurnace:
 
 cSlotAreaFurnace::cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow) :
@@ -953,14 +1552,162 @@ cSlotAreaFurnace::~cSlotAreaFurnace()
 
 void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
-	
 	if (m_Furnace == NULL)
 	{
 		LOGERROR("cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
 		ASSERT(!"cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
 		return;
 	}
+
+	if (a_SlotNum == 2)
+	{
+		bool bAsync = false;
+		if (GetSlot(a_SlotNum, a_Player) == NULL)
+		{
+			LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+			return;
+		}
+
+		cItem Slot(*GetSlot(a_SlotNum, a_Player));
+		if (!Slot.IsSameType(a_ClickedItem))
+		{
+			LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+			LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+			bAsync = true;
+		}
+
+		switch (a_ClickAction)
+		{
+			case caShiftLeftClick:
+			case caShiftRightClick:
+			{
+				HandleSmeltItem(Slot, a_Player);
+				ShiftClicked(a_Player, a_SlotNum, Slot);
+				return;
+			}
+			case caMiddleClick:
+			{
+				MiddleClicked(a_Player, a_SlotNum);
+				return;
+			}
+			case caDropKey:
+			case caCtrlDropKey:
+			{
+				DropClicked(a_Player, a_SlotNum, (a_SlotNum == caCtrlDropKey));
+				Slot.m_ItemCount = Slot.m_ItemCount - GetSlot(a_SlotNum, a_Player)->m_ItemCount;
+				HandleSmeltItem(Slot, a_Player);
+				return;
+			}
+			default:
+			{
+				break;
+			}
+		}
+
+		cItem & DraggingItem = a_Player.GetDraggingItem();
+		if (!DraggingItem.IsEmpty())
+		{
+			if (a_ClickAction == caDblClick)
+			{
+				return;
+			}
+			if (!DraggingItem.IsEqual(Slot))
+			{
+				return;
+			}
+			if ((DraggingItem.m_ItemCount + Slot.m_ItemCount) > Slot.GetMaxStackSize())
+			{
+				return;
+			}
+
+			DraggingItem.m_ItemCount += Slot.m_ItemCount;
+			HandleSmeltItem(Slot, a_Player);
+			Slot.Empty();
+		}
+		else
+		{
+			switch (a_ClickAction)
+			{
+				case caDblClick:
+				{
+					DblClicked(a_Player, a_SlotNum);
+					return;
+				}
+				case caLeftClick:
+				{
+					DraggingItem = Slot;
+					HandleSmeltItem(Slot, a_Player);
+					Slot.Empty();
+					break;
+				}
+				case caRightClick:
+				{
+					DraggingItem = Slot.CopyOne();
+					DraggingItem.m_ItemCount = (char)(((float)Slot.m_ItemCount) / 2.f + 0.5f);
+					Slot.m_ItemCount -= DraggingItem.m_ItemCount;
+
+					if (Slot.m_ItemCount <= 0)
+					{
+						Slot.Empty();
+					}
+					HandleSmeltItem(DraggingItem, a_Player);
+					break;
+				}
+				default:
+				{
+					ASSERT(!"Unhandled click type!");
+				}
+			}
+		}
+
+		SetSlot(a_SlotNum, a_Player, Slot);
+		if (bAsync)
+		{
+			m_ParentWindow.BroadcastWholeWindow();
+		}
+		return;
+	}
+
+	super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+}
+
+
+
+
+
+void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		const cItem * Slot = GetSlot(i, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		if (NumFit > a_ItemStack.m_ItemCount)
+		{
+			NumFit = a_ItemStack.m_ItemCount;
+		}
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(i, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			return;
+		}
+	}  // for i - Slots
 }
 
 
@@ -969,6 +1716,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 {
+	UNUSED(a_Player);
 	// a_SlotNum ranges from 0 to 2, query the items from the underlying furnace:
 	return &(m_Furnace->GetSlot(a_SlotNum));
 }
@@ -979,6 +1727,7 @@ const cItem * cSlotAreaFurnace::GetSlot(int a_SlotNum, cPlayer & a_Player) const
 
 void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
 {
+	UNUSED(a_Player);
 	m_Furnace->SetSlot(a_SlotNum, a_Item);
 }
 
@@ -988,9 +1737,10 @@ void cSlotAreaFurnace::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & 
 
 void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
+	UNUSED(a_SlotNum);
 	// Something has changed in the window, broadcast the entire window to all clients
 	ASSERT(a_ItemGrid == &(m_Furnace->GetContents()));
-	
+
 	m_ParentWindow.BroadcastWholeWindow();
 }
 
@@ -998,7 +1748,22 @@ void cSlotAreaFurnace::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player)
+{
+	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
+	switch (a_Result.m_ItemType)
+	{
+		case E_ITEM_IRON:        a_Player.AwardAchievement(achAcquireIron); break;
+		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(achCookFish);    break;
+		default: break;
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaInventoryBase:
 
 cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow) :
@@ -1015,6 +1780,12 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 {
 	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
 	{
+		if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
+		
 		// Creative inventory must treat a_ClickedItem as a DraggedItem instead, replacing the inventory slot with it
 		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
 		return;
@@ -1048,7 +1819,7 @@ void cSlotAreaInventoryBase::SetSlot(int a_SlotNum, cPlayer & a_Player, const cI
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaArmor:
 
 void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
@@ -1095,6 +1866,19 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
+	// When the player is in creative mode, the client sends the new item as a_ClickedItem, not the current item in the slot.
+	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
+	{
+		if ((a_ClickAction == caDropKey) || (a_ClickAction == caCtrlDropKey))
+		{
+			DropClicked(a_Player, a_SlotNum, (a_ClickAction == caCtrlDropKey));
+			return;
+		}
+		
+		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
+		return;
+	}
+
 	bool bAsync = false;
 	if (GetSlot(a_SlotNum, a_Player) == NULL)
 	{
@@ -1102,16 +1886,28 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		return;
 	}
 
-	if ((a_ClickAction == caShiftLeftClick) || (a_ClickAction == caShiftRightClick))
+	switch (a_ClickAction)
 	{
-		ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
-		return;
-	}
-
-	// Armors haven't a dbl click
-	if (a_ClickAction == caDblClick)
-	{
-		return;
+		case caDblClick:
+		{
+			// Armors haven't a dbl click
+			return;
+		}
+		case caShiftLeftClick:
+		case caShiftRightClick:
+		{
+			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
+		}
+		case caMiddleClick:
+		{
+			MiddleClicked(a_Player, a_SlotNum);
+			return;
+		}
+		default:
+		{
+			break;
+		}
 	}
 
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
@@ -1130,7 +1926,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		return;
 	}
 
-	if (DraggingItem.IsEmpty() || CanPlaceInSlot(a_SlotNum, DraggingItem))
+	if (DraggingItem.IsEmpty() || CanPlaceArmorInSlot(a_SlotNum, DraggingItem))
 	{
 		// Swap contents
 		cItem tmp(DraggingItem);
@@ -1149,7 +1945,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 
 
 
-bool cSlotAreaArmor::CanPlaceInSlot(int a_SlotNum, const cItem & a_Item)
+bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 {
 	switch (a_SlotNum)
 	{
@@ -1165,7 +1961,7 @@ bool cSlotAreaArmor::CanPlaceInSlot(int a_SlotNum, const cItem & a_Item)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaItemGrid:
 
 cSlotAreaItemGrid::cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow) :
@@ -1216,7 +2012,7 @@ void cSlotAreaItemGrid::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaTemporary:
 
 cSlotAreaTemporary::cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow) :
@@ -1321,7 +2117,7 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-a_Player.GetYaw(), a_Player.GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because player created
+	a_Player.GetWorld()->SpawnItemPickups(Drops, a_Player.GetPosX(), a_Player.GetPosY() + 1.6f, a_Player.GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because player created
 }
 
 

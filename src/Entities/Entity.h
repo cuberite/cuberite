@@ -146,8 +146,9 @@ public:
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
 
-	/// Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed)
-	virtual bool Initialize(cWorld * a_World);
+	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
+	Adds the entity to the world. */
+	virtual bool Initialize(cWorld & a_World);
 
 	// tolua_begin
 	
@@ -157,6 +158,7 @@ public:
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
 	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
 	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
+	bool IsPawn        (void) const { return (IsMob() || IsPlayer());          }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
 	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
 	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }
@@ -214,20 +216,31 @@ public:
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
-	void SetSpeed   (double a_SpeedX, double a_SpeedY, double a_SpeedZ);
-	void SetSpeed   (const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
-	void SetSpeedX  (double a_SpeedX);
-	void SetSpeedY  (double a_SpeedY);
-	void SetSpeedZ  (double a_SpeedZ);
+
+	/** Sets the speed of the entity, measured in m / sec */
+	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	
+	/** Sets the speed of the entity, measured in m / sec */
+	void SetSpeed(const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	
+	/** Sets the speed in the X axis, leaving the other speed components intact. Measured in m / sec. */
+	void SetSpeedX(double a_SpeedX);
+	
+	/** Sets the speed in the Y axis, leaving the other speed components intact. Measured in m / sec. */
+	void SetSpeedY(double a_SpeedY);
+	
+	/** Sets the speed in the Z axis, leaving the other speed components intact. Measured in m / sec. */
+	void SetSpeedZ(double a_SpeedZ);
+	
 	void SetWidth   (double a_Width);
 	
 	void AddPosX    (double a_AddPosX);
 	void AddPosY    (double a_AddPosY);
 	void AddPosZ    (double a_AddPosZ);
 	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ);
-	void AddPosition(const Vector3d & a_AddPos) { AddPosition(a_AddPos.x,a_AddPos.y,a_AddPos.z);}
+	void AddPosition(const Vector3d & a_AddPos) { AddPosition(a_AddPos.x, a_AddPos.y, a_AddPos.z); }
 	void AddSpeed   (double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ);
-	void AddSpeed   (const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x,a_AddSpeed.y,a_AddSpeed.z);}
+	void AddSpeed   (const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x, a_AddSpeed.y, a_AddSpeed.z); }
 	void AddSpeedX  (double a_AddSpeedX);
 	void AddSpeedY  (double a_AddSpeedY);
 	void AddSpeedZ  (double a_AddSpeedZ);
@@ -262,8 +275,10 @@ public:
 	
 	// tolua_end
 	
-	/// Makes this entity take damage specified in the a_TDI. The TDI is sent through plugins first, then applied
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI);
+	/** Makes this entity take damage specified in the a_TDI.
+	The TDI is sent through plugins first, then applied.
+	If it returns false, the entity hasn't receive any damage. */
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI);
 	
 	// tolua_begin
 
@@ -295,10 +310,13 @@ public:
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
 	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)
-	virtual void KilledBy(cEntity * a_Killer);
+	virtual void KilledBy(TakeDamageInfo & a_TDI);
+
+	/// Called when the entity kills another entity
+	virtual void Killed(cEntity * a_Victim) {}
 
 	/// Heals the specified amount of HPs
-	void Heal(int a_HitPoints);
+	virtual void Heal(int a_HitPoints);
 	
 	/// Returns the health of this entity
 	int GetHealth(void) const { return m_Health; }
@@ -315,6 +333,14 @@ public:
 	
 	/// Updates the state related to this entity being on fire
 	virtual void TickBurning(cChunk & a_Chunk);
+
+	/** Detects the time for application of cacti damage */
+	virtual void DetectCacti(void);
+
+	/** Detects whether we are in a portal block and begins teleportation procedures if so
+	Returns true if MoveToWorld() was called, false if not
+	*/
+	virtual bool DetectPortal(void);
 	
 	/// Handles when the entity is in the void
 	virtual void TickInVoid(cChunk & a_Chunk);
@@ -357,8 +383,22 @@ public:
 	
 	/// Teleports to the coordinates specified
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
+
+	/** Moves entity to specified world, taking a world pointer */
+	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) { return DoMoveToWorld(a_World, a_ShouldSendRespawn); }
+
+	/** Moves entity to specified world, taking a world name */
+	bool MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn = true);
 	
 	// tolua_end
+
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn);
+
+	/** Returns if the entity is travelling away from a specified world */
+	bool IsWorldTravellingFrom(cWorld * a_World) const { return (m_WorldTravellingFrom == a_World); }
+
+	/** Sets the world the entity will be leaving */
+	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
 	
 	/// Updates clients of changes in the entity.
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
@@ -394,23 +434,38 @@ public:
 	virtual bool IsSubmerged(void) const{ return m_IsSubmerged; }
 	/** Gets remaining air of a monster */
 	int GetAirLevel(void) const { return m_AirLevel; }
+
+	/** Gets number of ticks this entity has existed for */
+	long int GetTicksAlive(void) const { return m_TicksAlive; }
+	
+	/** Gets the invulnerable ticks from the entity */
+	int GetInvulnerableTicks(void) const { return m_InvulnerableTicks; }
+
+	/** Set the invulnerable ticks from the entity */
+	void SetInvulnerableTicks(int a_InvulnerableTicks) { m_InvulnerableTicks = a_InvulnerableTicks; }
 	
 	// tolua_end
 	
 	/// Called when the specified player right-clicks this entity
-	virtual void OnRightClicked(cPlayer &) {};
+	virtual void OnRightClicked(cPlayer &) {}
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) 
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL)
 	{
 		UNUSED(a_Drops);
 		UNUSED(a_Killer);
 	}
 
+	/** Sets the internal world pointer to a new cWorld, doesn't update anything else. */
+	void SetWorld(cWorld * a_World) { m_World = a_World; }
+
 protected:
 	static cCriticalSection m_CSCount;
 	static int m_EntityCount;
 	
+	/** Measured in meter/second (m/s) */
+	Vector3d m_Speed;
+
 	int m_UniqueID;
 	
 	int m_Health;
@@ -422,22 +477,35 @@ protected:
 	/// The entity which is attached to this entity (rider), NULL if none
 	cEntity * m_Attachee;
 
-	// Flags that signal that we haven't updated the clients with the latest.
-	bool     m_bDirtyHead;
-	bool     m_bDirtyOrientation;
-	bool     m_bDirtyPosition;
-	bool     m_bDirtySpeed;
-
-	bool     m_bOnGround;
-	float    m_Gravity;
+	/** Stores whether head yaw has been set manually */
+	bool m_bDirtyHead;
 	
-	// Last Position.
-	double m_LastPosX, m_LastPosY, m_LastPosZ;
+	/** Stores whether our yaw/pitch/roll (body orientation) has been set manually */
+	bool m_bDirtyOrientation;
+	
+	/** Stores whether we have sent a Velocity packet with a speed of zero (no speed) to the client
+	Ensures that said packet is sent only once */
+	bool m_bHasSentNoSpeed;
 
-	// This variables keep track of the last time a packet was sent
-	Int64 m_TimeLastTeleportPacket, m_TimeLastMoveReltPacket, m_TimeLastSpeedPacket;  // In ticks
+	/** Stores if the entity is on the ground */
+	bool m_bOnGround;
+	
+	/** Stores gravity that is applied to an entity every tick
+	For realistic effects, this should be negative. For spaaaaaaace, this can be zero or even positive */
+	float m_Gravity;
+	
+	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
+	Only updated if cEntity::BroadcastMovementUpdate() is called! */
+	Vector3d m_LastPos;
 
-	bool m_IsInitialized;  // Is set to true when it's initialized, until it's destroyed (Initialize() till Destroy() )
+	/** True when entity is initialised (Initialize()) and false when destroyed pending deletion (Destroy()) */
+	bool m_IsInitialized;
+
+	/** World entity is travelling from
+	Set to a valid world pointer by MoveToWorld; reset to NULL when the entity is removed from the old world
+	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it
+	*/
+	cWorld * m_WorldTravellingFrom;
 
 	eEntityType m_EntityType;
 	
@@ -445,7 +513,7 @@ protected:
 	
 	/// Whether the entity is capable of taking fire or lava damage.
 	bool m_IsFireproof;
-    
+
 	/// Time, in ticks, since the last damage dealt by being on fire. Valid only if on fire (IsOnFire())
 	int m_TicksSinceLastBurnDamage;
 	
@@ -460,13 +528,16 @@ protected:
 	
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
-
-	virtual void Destroyed(void) {} // Called after the entity has been destroyed
-
-	void SetWorld(cWorld * a_World) { m_World = a_World; }
+	
+	/** Does the actual speed-setting. The default implementation just sets the member variable value;
+	overrides can provide further processing, such as forcing players to move at the given speed. */
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	
+	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
-	virtual void HandleAir();
+	virtual void HandleAir(void);
+	
 	/** Called once per tick to set IsSwimming and IsSubmerged */
 	virtual void SetSwimState(cChunk & a_Chunk);
 
@@ -476,31 +547,50 @@ protected:
 	/** Air level of a mobile */
 	int m_AirLevel;
 	int m_AirTickTimer;
+
+	/** Structure storing the portal delay timer and cooldown boolean */
+	struct sPortalCooldownData
+	{
+		/** Ticks since entry of portal, used to delay teleportation */
+		unsigned short m_TicksDelayed;
+
+		/** Whether the entity has just exited the portal, and should therefore not be teleported again
+		This prevents teleportation loops, and is reset when the entity has moved out of the portal
+		*/
+		bool m_ShouldPreventTeleportation;
+	};
+
+	/** Portal delay timer and cooldown boolean data */
+	sPortalCooldownData m_PortalCooldownData;
+	
+	/** The number of ticks this entity has been alive for */
+	long int m_TicksAlive;
 	
 private:
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	double   m_HeadYaw;
 	
-	// Measured in meter/second (m/s)
-	Vector3d m_Speed;
-	
-	// Measured in degrees, [-180, +180)
+	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
 	
-	/// Position of the entity's XZ center and Y bottom
+	/** Position of the entity's XZ center and Y bottom */
 	Vector3d m_Pos;
 	
-	// Measured in meter / second
+	/** Measured in meter / second */
 	Vector3d m_WaterSpeed;
 	
-	// Measured in Kilograms (Kg)
+	/** Measured in Kilograms (Kg) */
 	double m_Mass;
 	
-	/// Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
 	double m_Width;
 	
-	/// Height of the entity (Y axis)
+	/** Height of the entity (Y axis) */
 	double m_Height;
+
+	/** If a player hit a entity, the entity receive a invulnerable of 10 ticks.
+	While this ticks, a player can't hit this entity. */
+	int m_InvulnerableTicks;
 } ;  // tolua_export
 
 typedef std::list<cEntity *> cEntityList;

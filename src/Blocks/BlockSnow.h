@@ -19,7 +19,7 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -33,8 +33,8 @@ public:
 		if ((BlockBeforePlacement == E_BLOCK_SNOW) && (MetaBeforePlacement < 7))
 		{
 			// Only increment if:
-			//	A snow block was already there (not first time placement) AND
-			//	Height is smaller than 7, the maximum possible height
+			//  - A snow block was already there (not first time placement) AND
+			//  - Height is smaller than 7, the maximum possible height
 			MetaBeforePlacement++;
 		}
 		
@@ -47,12 +47,12 @@ public:
 	{
 		if ((a_Player->GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < 7))
 		{
-			return true; // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
+			return true;  // If a player is holding a (thin) snow block and it's size can be increased, return collision ignored
 		}
 
 		if (a_Meta == 0)
 		{
-			return true; // If at normal snowfall height (lowest), we ignore collision
+			return true;  // If at normal snowfall height (lowest), we ignore collision
 		}
 
 		return false;

@@ -157,6 +157,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 	bool res = false;
 	switch (a_Chunk.GetBlock(m_RelX, m_PosY + 1, m_RelZ))
 	{
+		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		{
 			// Chests have special handling because of double-chests
@@ -218,7 +219,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 			}
 
 			Vector3f EntityPos = a_Entity->GetPosition();
-			Vector3f BlockPos(m_Pos.x + 0.5f, (float)m_Pos.y + 1, m_Pos.z + 0.5f); // One block above hopper, and search from center outwards
+			Vector3f BlockPos(m_Pos.x + 0.5f, (float)m_Pos.y + 1, m_Pos.z + 0.5f);  // One block above hopper, and search from center outwards
 			double Distance = (EntityPos - BlockPos).Length();
 
 			if (Distance < 0.5)
@@ -242,7 +243,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 				{
 					m_bFoundPickupsAbove = true;
 					m_Contents.SetSlot(i, Item);
-					a_Pickup->Destroy(); // Kill pickup
+					a_Pickup->Destroy();  // Kill pickup
 
 					return true;
 				}
@@ -252,11 +253,11 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 					int PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
 					
-					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount; // Set count to however many items were added
+					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount;  // Set count to however many items were added
 					
 					if (Item.IsEmpty())
 					{
-						a_Pickup->Destroy(); // Kill pickup if all items were added
+						a_Pickup->Destroy();  // Kill pickup if all items were added
 					}
 					return true;
 				}
@@ -294,23 +295,24 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 		return false;
 	}
 	
-	int bx, by, bz;
+	// Get the coords of the block where to output items:
+	int OutX, OutY, OutZ;
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
-	if (!GetOutputBlockPos(Meta, bx, by, bz))
+	if (!GetOutputBlockPos(Meta, OutX, OutY, OutZ))
 	{
 		// Not attached to another container
 		return false;
 	}
-	if (by < 0)
+	if (OutY < 0)
 	{
 		// Cannot output below the zero-th block level
 		return false;
 	}
 	
 	// Convert coords to relative:
-	int rx = bx - a_Chunk.GetPosX() * cChunkDef::Width;
-	int rz = bz - a_Chunk.GetPosZ() * cChunkDef::Width;
-	cChunk * DestChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(rx, rz);
+	int OutRelX = OutX - a_Chunk.GetPosX() * cChunkDef::Width;
+	int OutRelZ = OutZ - a_Chunk.GetPosZ() * cChunkDef::Width;
+	cChunk * DestChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(OutRelX, OutRelZ);
 	if (DestChunk == NULL)
 	{
 		// The destination chunk has been unloaded, don't tick
@@ -319,26 +321,33 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	
 	// Call proper moving function, based on the blocktype present at the coords:
 	bool res = false;
-	switch (DestChunk->GetBlock(rx, by, rz))
+	switch (DestChunk->GetBlock(OutRelX, OutY, OutRelZ))
 	{
+		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		{
 			// Chests have special handling because of double-chests
-			res = MoveItemsToChest(*DestChunk, bx, by, bz);
+			res = MoveItemsToChest(*DestChunk, OutX, OutY, OutZ);
 			break;
 		}
 		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_FURNACE:
 		{
 			// Furnaces have special handling because of the direction-to-slot relation
-			res = MoveItemsToFurnace(*DestChunk, bx, by, bz, Meta);
+			res = MoveItemsToFurnace(*DestChunk, OutX, OutY, OutZ, Meta);
 			break;
 		}
 		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DROPPER:
 		case E_BLOCK_HOPPER:
 		{
-			res = MoveItemsToGrid(*(cBlockEntityWithItems *)DestChunk->GetBlockEntity(bx, by, bz));
+			cBlockEntityWithItems * BlockEntity = (cBlockEntityWithItems *)DestChunk->GetBlockEntity(OutX, OutY, OutZ);
+			if (BlockEntity == NULL)
+			{
+				LOGWARNING("%s: A block entity was not found where expected at {%d, %d, %d}", __FUNCTION__, OutX, OutY, OutZ);
+				return false;
+			}
+			res = MoveItemsToGrid(*BlockEntity);
 			break;
 		}
 	}
@@ -359,13 +368,19 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 /// Moves items from a chest (dblchest) above the hopper into this hopper. Returns true if contents have changed.
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
-	if (MoveItemsFromGrid(*(cChestEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ)))
+	cChestEntity * MainChest = (cChestEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ);
+	if (MainChest == NULL)
+	{
+		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
+		return false;
+	}
+	if (MoveItemsFromGrid(*MainChest))
 	{
 		// Moved the item from the chest directly above the hopper
 		return true;
 	}
 	
-	// Check if the chest is a double-chest, if so, try to move from there:
+	// Check if the chest is a double-chest (chest directly above was empty), if so, try to move from there:
 	static const struct
 	{
 		int x, z;
@@ -382,16 +397,29 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		int x = m_RelX + Coords[i].x;
 		int z = m_RelZ + Coords[i].z;
 		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
-		if (
-			(Neighbor == NULL) ||
-			(Neighbor->GetBlock(x, m_PosY + 1, z) != E_BLOCK_CHEST)
-		)
+		if (Neighbor == NULL)
 		{
 			continue;
 		}
-		if (MoveItemsFromGrid(*(cChestEntity *)Neighbor->GetBlockEntity(x, m_PosY, z)))
+
+		BLOCKTYPE Block = Neighbor->GetBlock(x, m_PosY + 1, z);
+		if (Block != MainChest->GetBlockType())
 		{
-			return true;
+			// Not the same kind of chest
+			continue;
+		}
+
+		cChestEntity * SideChest = (cChestEntity *)Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
+		if (SideChest == NULL)
+		{
+			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
+		}
+		else
+		{
+			if (MoveItemsFromGrid(*SideChest))
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -408,7 +436,11 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 {
 	cFurnaceEntity * Furnace = (cFurnaceEntity *)a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ);
-	ASSERT(Furnace != NULL);
+	if (Furnace == NULL)
+	{
+		LOGWARNING("%s: A furnace entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
+		return false;
+	}
 	
 	// Try move from the output slot:
 	if (MoveItemsFromSlot(*Furnace, cFurnaceEntity::fsOutput, true))
@@ -517,12 +549,19 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Try the chest directly connected to the hopper:
-	if (MoveItemsToGrid(*(cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ)))
+	cChestEntity * Chest = (cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (Chest == NULL)
 	{
+		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, a_BlockX, a_BlockY, a_BlockZ);
+		return false;
+	}
+	if (MoveItemsToGrid(*Chest))
+	{
+		// Chest block directly connected was not full
 		return true;
 	}
 
-	// Check if the chest is a double-chest, if so, try to move into the other half:
+	// Check if the chest is a double-chest (chest block directly connected was full), if so, try to move into the other half:
 	static const struct
 	{
 		int x, z;
@@ -534,19 +573,32 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		{0, 1},
 		{0, -1},
 	} ;
+	int RelX = a_BlockX - a_Chunk.GetPosX() * cChunkDef::Width;
+	int RelZ = a_BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width;
 	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
-		int x = m_RelX + Coords[i].x;
-		int z = m_RelZ + Coords[i].z;
+		int x = RelX + Coords[i].x;
+		int z = RelZ + Coords[i].z;
 		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
-		if (
-			(Neighbor == NULL) ||
-			(Neighbor->GetBlock(x, m_PosY + 1, z) != E_BLOCK_CHEST)
-		)
+		if (Neighbor == NULL)
 		{
 			continue;
 		}
-		if (MoveItemsToGrid(*(cChestEntity *)Neighbor->GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ)))
+
+		BLOCKTYPE Block = Neighbor->GetBlock(x, a_BlockY, z);
+		if (Block != Chest->GetBlockType())
+		{
+			// Not the same kind of chest
+			continue;
+		}
+
+		Chest = (cChestEntity *)Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z);
+		if (Chest == NULL)
+		{
+			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d} (%d, %d)", __FUNCTION__, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z, x, z);
+			continue;
+		}
+		if (MoveItemsToGrid(*Chest))
 		{
 			return true;
 		}

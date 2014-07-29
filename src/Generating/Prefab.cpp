@@ -108,6 +108,9 @@ static const cPrefab::sDef g_TestPrefabDef =
 
 	// AddWeightIfSame:
 	1000,
+	
+	// MoveToGround:
+	false,
 };
 
 static cPrefab g_TestPrefab(g_TestPrefabDef);
@@ -127,7 +130,8 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	m_MergeStrategy(a_Def.m_MergeStrategy),
 	m_ShouldExtendFloor(a_Def.m_ShouldExtendFloor),
 	m_DefaultWeight(a_Def.m_DefaultWeight),
-	m_AddWeightIfSame(a_Def.m_AddWeightIfSame)
+	m_AddWeightIfSame(a_Def.m_AddWeightIfSame),
+	m_MoveToGround(a_Def.m_MoveToGround)
 {
 	m_BlockArea[0].Create(m_Size);
 	CharMap cm;
@@ -136,6 +140,34 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 	ParseConnectors(a_Def.m_Connectors);
 	ParseDepthWeight(a_Def.m_DepthWeight);
 	
+	AddRotatedBlockAreas();
+}
+
+
+
+
+
+cPrefab::cPrefab(const cBlockArea & a_Image, int a_AllowedRotations) :
+	m_Size(a_Image.GetSize()),
+	m_AllowedRotations(a_AllowedRotations),
+	m_MergeStrategy(cBlockArea::msOverwrite),
+	m_ShouldExtendFloor(false),
+	m_DefaultWeight(1),
+	m_AddWeightIfSame(0),
+	m_MoveToGround(false)
+{
+	m_HitBox.p1.Set(0, 0, 0);
+	m_HitBox.p2.Set(m_Size.x - 1, m_Size.y - 1, m_Size.z - 1);
+	m_BlockArea[0].CopyFrom(a_Image);
+	AddRotatedBlockAreas();
+}
+
+
+
+
+
+void cPrefab::AddRotatedBlockAreas(void)
+{
 	// 1 CCW rotation:
 	if ((m_AllowedRotations & 0x01) != 0)
 	{
@@ -149,7 +181,7 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 		m_BlockArea[2].CopyFrom(m_BlockArea[0]);
 		m_BlockArea[2].MirrorXY();
 		m_BlockArea[2].MirrorYZ();
-	}	
+	}
 	
 	// 3 CCW rotations = 1 CW rotation:
 	if ((m_AllowedRotations & 0x04) != 0)
@@ -165,53 +197,75 @@ cPrefab::cPrefab(const cPrefab::sDef & a_Def) :
 
 void cPrefab::Draw(cChunkDesc & a_Dest, const cPlacedPiece * a_Placement) const
 {
+	Draw(a_Dest, a_Placement->GetCoords(), a_Placement->GetNumCCWRotations());
+}
+
+
+
+
+void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumRotations) const
+{
 	// Draw the basic image:
-	Vector3i Placement = a_Placement->GetCoords();
+	Vector3i Placement(a_Placement);
 	int ChunkStartX = a_Dest.GetChunkX() * cChunkDef::Width;
 	int ChunkStartZ = a_Dest.GetChunkZ() * cChunkDef::Width;
 	Placement.Move(-ChunkStartX, 0, -ChunkStartZ);
-	const cBlockArea & Image = m_BlockArea[a_Placement->GetNumCCWRotations()];
+	const cBlockArea & Image = m_BlockArea[a_NumRotations];
+	
+	// If the placement is outside this chunk, bail out:
+	if (
+		(Placement.x > cChunkDef::Width) || (Placement.x + Image.GetSizeX() < 0) ||
+		(Placement.z > cChunkDef::Width) || (Placement.z + Image.GetSizeZ() < 0)
+	)
+	{
+		return;
+	}
+	
+	// Write the image:
 	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
 	
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
-	int MaxX = Image.GetSizeX();
-	int MaxZ = Image.GetSizeZ();
-	for (int z = 0; z < MaxZ; z++)
+	if (m_ShouldExtendFloor)
 	{
-		int RelZ = Placement.z + z;
-		if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
+		int MaxX = Image.GetSizeX();
+		int MaxZ = Image.GetSizeZ();
+		for (int z = 0; z < MaxZ; z++)
 		{
-			// Z coord outside the chunk
-			continue;
-		}
-		for (int x = 0; x < MaxX; x++)
-		{
-			int RelX = Placement.x + x;
-			if ((RelX < 0) || (RelX >= cChunkDef::Width))
+			int RelZ = Placement.z + z;
+			if ((RelZ < 0) || (RelZ >= cChunkDef::Width))
 			{
-				// X coord outside the chunk
+				// Z coord outside the chunk
 				continue;
 			}
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
-			Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
-			if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+			for (int x = 0; x < MaxX; x++)
 			{
-				// Do not expand air nor sponge blocks
-				continue;
-			}
-			for (int y = Placement.y - 1; y >= 0; y--)
-			{
-				BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
-				if (ExistingBlock != E_BLOCK_AIR)
+				int RelX = Placement.x + x;
+				if ((RelX < 0) || (RelX >= cChunkDef::Width))
 				{
-					// End the expansion for this column, reached the end
-					break;
+					// X coord outside the chunk
+					continue;
 				}
-				a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
-			}  // for y
-		}  // for x
-	}  // for z
+				BLOCKTYPE BlockType;
+				NIBBLETYPE BlockMeta;
+				Image.GetRelBlockTypeMeta(x, 0, z, BlockType, BlockMeta);
+				if ((BlockType == E_BLOCK_AIR) || (BlockType == E_BLOCK_SPONGE))
+				{
+					// Do not expand air nor sponge blocks
+					continue;
+				}
+				for (int y = Placement.y - 1; y >= 0; y--)
+				{
+					BLOCKTYPE ExistingBlock = a_Dest.GetBlockType(RelX, y, RelZ);
+					if (ExistingBlock != E_BLOCK_AIR)
+					{
+						// End the expansion for this column, reached the end
+						break;
+					}
+					a_Dest.SetBlockTypeMeta(RelX, y, RelZ, BlockType, BlockMeta);
+				}  // for y
+			}  // for x
+		}  // for z
+	}
 }
 
 
@@ -254,6 +308,24 @@ int cPrefab::GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cC
 
 
 
+void cPrefab::SetDefaultWeight(int a_DefaultWeight)
+{
+	m_DefaultWeight = a_DefaultWeight;
+}
+
+
+
+
+
+void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Direction, int a_Type)
+{
+	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
+}
+
+
+
+
+
 void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 {
 	ASSERT(a_CharMapDef != NULL);
@@ -283,7 +355,7 @@ void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 		if ((NumElements >= 3) && !CharDef[2].empty())
 		{
 			BlockMeta = (NIBBLETYPE)atoi(CharDef[2].c_str());
-			ASSERT((BlockMeta >= 0) && (BlockMeta <= 15));
+			ASSERT((BlockMeta <= 15));
 		}
 		a_CharMapOut[Src].m_BlockMeta = BlockMeta;
 	}  // for itr - Lines[]

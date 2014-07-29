@@ -33,7 +33,7 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -80,6 +80,7 @@ public:
 		if (IsAnySlabType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ)))
 		{
 			a_BlockType = GetDoubleSlabType(m_BlockType);
+			a_BlockMeta = a_BlockMeta & 0x7;
 		}
 
 		return true;
@@ -95,6 +96,12 @@ public:
 		}
 		ASSERT(!"Unhandled slab type!");
 		return "";
+	}
+
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return ((a_Meta & 0x8) != 0);
 	}
 
 	
@@ -117,6 +124,12 @@ public:
 		return E_BLOCK_AIR;
 	}
 	
+	
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	{
+		// Toggle the 4th bit - up / down:
+		return (a_Meta ^ 0x08);
+	}
 } ;
 
 
@@ -159,15 +172,6 @@ public:
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return "";
-	}
-
-
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
-	{
-		NIBBLETYPE OtherMeta = a_Meta & 0x07;  // Contains unrelated meta data.
-
-		// 8th bit is up/down.  1 right-side-up, 0 is up-side-down.
-		return (a_Meta & 0x08) ? 0x00 + OtherMeta : 0x01 + OtherMeta;
 	}
 } ;
 

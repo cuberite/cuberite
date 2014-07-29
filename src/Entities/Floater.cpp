@@ -11,7 +11,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFloaterEntityCollisionCallback
 class cFloaterEntityCollisionCallback :
 	public cEntityCallback
@@ -75,7 +75,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFloaterCheckEntityExist
 class cFloaterCheckEntityExist :
 	public cEntityCallback
@@ -130,18 +130,18 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 	HandlePhysics(a_Dt, a_Chunk);
 	if (IsBlockWater(m_World->GetBlock((int) GetPosX(), (int) GetPosY(), (int) GetPosZ())) && m_World->GetBlockMeta((int) GetPosX(), (int) GetPosY(), (int) GetPosZ()) == 0)
 	{
-		if ((!m_CanPickupItem) && (m_AttachedMobID == -1)) // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
+		if ((!m_CanPickupItem) && (m_AttachedMobID == -1))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
 			if (m_CountDownTime <= 0)
 			{
-				m_World->BroadcastSoundEffect("random.splash", (int) floor(GetPosX() * 8), (int) floor(GetPosY() * 8), (int) floor(GetPosZ() * 8), 1, 1);
+				m_World->BroadcastSoundEffect("random.splash", GetPosX(), GetPosY(), GetPosZ(), 1, 1);
 				SetPosY(GetPosY() - 1);
 				m_CanPickupItem = true;
 				m_PickupCountDown = 20;
 				m_CountDownTime = 100 + m_World->GetTickRandomNumber(800);
 				LOGD("Floater %i can be picked up", GetUniqueID());
 			}
-			else if (m_CountDownTime == 20) // Calculate the position where the particles should spawn and start producing them.
+			else if (m_CountDownTime == 20)  // Calculate the position where the particles should spawn and start producing them.
 			{
 				LOGD("Started producing particles for floater %i", GetUniqueID());
 				m_ParticlePos.Set(GetPosX() + (-4 + m_World->GetTickRandomNumber(8)), GetPosY(), GetPosZ() + (-4 + m_World->GetTickRandomNumber(8)));
@@ -156,12 +156,12 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 			m_CountDownTime--;
 			if (m_World->GetHeight((int) GetPosX(), (int) GetPosZ()) == (int) GetPosY())
 			{
-				if (m_World->IsWeatherWet() && m_World->GetTickRandomNumber(3) == 0) // 25% chance of an extra countdown when being rained on.
+				if (m_World->IsWeatherWet() && m_World->GetTickRandomNumber(3) == 0)  // 25% chance of an extra countdown when being rained on.
 				{
 					m_CountDownTime--;
 				}
 			}
-			else // if the floater is underground it has a 50% chance of not decreasing the countdown.
+			else  // if the floater is underground it has a 50% chance of not decreasing the countdown.
 			{
 				if (m_World->GetTickRandomNumber(1) == 0)
 				{
@@ -190,21 +190,21 @@ void cFloater::Tick(float a_Dt, cChunk & a_Chunk)
 		if (Callback.HasHit())
 		{
 			AttachTo(Callback.GetHitEntity());
-			Callback.GetHitEntity()->TakeDamage(*this); // TODO: the player attacked the mob not the floater.
+			Callback.GetHitEntity()->TakeDamage(*this);  // TODO: the player attacked the mob not the floater.
 			m_AttachedMobID = Callback.GetHitEntity()->GetUniqueID();
 		}
 	}
 
 	cFloaterCheckEntityExist EntityCallback;
 	m_World->DoWithEntityByID(m_PlayerID, EntityCallback);
-	if (!EntityCallback.DoesExist()) // The owner doesn't exist anymore. Destroy the floater entity.
+	if (!EntityCallback.DoesExist())  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
 		Destroy(true);
 	}
 
 	if (m_AttachedMobID != -1)
 	{
-		m_World->DoWithEntityByID(m_AttachedMobID, EntityCallback); // The mob the floater was attached to doesn't exist anymore.
+		m_World->DoWithEntityByID(m_AttachedMobID, EntityCallback);  // The mob the floater was attached to doesn't exist anymore.
 		if (!EntityCallback.DoesExist())
 		{
 			m_AttachedMobID = -1;

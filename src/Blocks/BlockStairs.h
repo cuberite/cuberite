@@ -20,7 +20,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -77,10 +77,15 @@ public:
 		// Reset meta to 0
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return true;
+	}
 	
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
-		a_Rotation += 90 + 45; // So its not aligned with axis
+		a_Rotation += 90 + 45;  // So its not aligned with axis
 		if (a_Rotation > 360)
 		{
 			a_Rotation -= 360;

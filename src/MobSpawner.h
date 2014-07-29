@@ -6,7 +6,7 @@
 #include "ChunkDef.h"
 #include "Chunk.h"
 #include "FastRandom.h"
-#include "Mobs/Monster.h" //this is a side-effect of keeping Mobfamily inside Monster class. I'd prefer to keep both (Mobfamily and Monster) inside a "Monster" namespace MG TODO : do it
+#include "Mobs/Monster.h"  // This is a side-effect of keeping Mobfamily inside Monster class. I'd prefer to keep both (Mobfamily and Monster) inside a "Monster" namespace MG TODO : do it
 
 
 
@@ -51,7 +51,7 @@ public :
 	typedef const std::set<cMonster *> tSpawnedContainer;
 	tSpawnedContainer & getSpawned(void);
 
-protected : 
+protected :
 	// return true if specified type of mob can spawn on specified block
 	bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
 
@@ -62,7 +62,7 @@ protected :
 	// add toAdd inside toAddIn, if toAdd is in m_AllowedTypes
 	void addIfAllowed(cMonster::eType toAdd, std::set<cMonster::eType> & toAddIn);
 
-protected : 
+protected :
 	cMonster::eFamily m_MonsterFamily;
 	std::set<cMonster::eType> m_AllowedTypes;
 	bool m_NewPack;

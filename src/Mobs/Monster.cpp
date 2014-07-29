@@ -46,8 +46,8 @@ static const struct
 	{cMonster::mtSheep,        "sheep"},
 	{cMonster::mtSilverfish,   "silverfish"},
 	{cMonster::mtSkeleton,     "skeleton"},
-	{cMonster::mtSnowGolem,    "snowgolem"},
 	{cMonster::mtSlime,        "slime"},
+	{cMonster::mtSnowGolem,    "snowgolem"},
 	{cMonster::mtSpider,       "spider"},
 	{cMonster::mtSquid,        "squid"},
 	{cMonster::mtVillager,     "villager"},
@@ -62,7 +62,7 @@ static const struct
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
 cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
@@ -115,12 +115,10 @@ void cMonster::TickPathFinding()
 	const int PosY = POSY_TOINT;
 	const int PosZ = POSZ_TOINT;
 
-	m_FinalDestination.y = (double)FindFirstNonAirBlockPosition(m_FinalDestination.x, m_FinalDestination.z);
-
 	std::vector<Vector3d> m_PotentialCoordinates;
 	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
 
-	static const struct // Define which directions to try to move to
+	static const struct  // Define which directions to try to move to
 	{
 		int x, z;
 	} gCrossCoords[] =
@@ -128,7 +126,7 @@ void cMonster::TickPathFinding()
 		{ 1, 0},
 		{-1, 0},
 		{ 0, 1},
-		{ 0,-1},
+		{ 0, -1},
 	} ;
 	
 	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
@@ -201,19 +199,6 @@ void cMonster::TickPathFinding()
 
 
 
-void cMonster::MoveToPosition(const Vector3f & a_Position)
-{
-	FinishPathFinding();
-
-	m_FinalDestination = a_Position;
-	m_bMovingToDestination = true;
-	TickPathFinding();
-}
-
-
-
-
-
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 	FinishPathFinding();
@@ -227,15 +212,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 
 bool cMonster::IsCoordinateInTraversedList(Vector3i a_Coords)
 {
-	for (std::vector<Vector3i>::const_iterator itr = m_TraversedCoordinates.begin(); itr != m_TraversedCoordinates.end(); ++itr)
-	{
-		if (itr->Equals(a_Coords))
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return (std::find(m_TraversedCoordinates.begin(), m_TraversedCoordinates.end(), a_Coords) != m_TraversedCoordinates.end());
 }
 
 
@@ -296,39 +273,47 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bOnGround)
 		{
-			m_Destination.y = FindFirstNonAirBlockPosition(m_Destination.x, m_Destination.z);
-
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
-				AddPosY(1.5); // Jump!!
+				AddSpeedY(5.2);  // Jump!!
 			}
 		}
 
 		Vector3f Distance = m_Destination - GetPosition();
-		if(!ReachedDestination() && !ReachedFinalDestination()) // If we haven't reached any sort of destination, move
+		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
 			Distance.Normalize();
-			Distance *= 5;
-			SetSpeedX(Distance.x);
-			SetSpeedZ(Distance.z);
+
+			if (m_bOnGround)
+			{
+				Distance *= 2.5;
+			}
+			else
+			{
+				// Don't let the mob move too much if he's falling.
+				Distance *= 0.25;
+			}
+
+			AddSpeedX(Distance.x);
+			AddSpeedZ(Distance.z);
 
 			if (m_EMState == ESCAPING)
-			{	//Runs Faster when escaping :D otherwise they just walk away
+			{  // Runs Faster when escaping :D otherwise they just walk away
 				SetSpeedX (GetSpeedX() * 2.f);
 				SetSpeedZ (GetSpeedZ() * 2.f);
 			}
 		}
 		else
 		{
-			if (ReachedFinalDestination()) // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
+			if (ReachedFinalDestination())  // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
 			{
 				FinishPathFinding();
 			}
 			else
 			{
-				TickPathFinding(); // We have reached the next point in our path, calculate another point
+				TickPathFinding();  // We have reached the next point in our path, calculate another point
 			}
 		}
 	}
@@ -343,18 +328,20 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			// If enemy passive we ignore checks for player visibility
 			InStateIdle(a_Dt);
 			break;
-		}	
+		}
 		case CHASING:
 		{
 			// If we do not see a player anymore skip chasing action
 			InStateChasing(a_Dt);
 			break;
-		}	
+		}
 		case ESCAPING:
 		{
 			InStateEscaping(a_Dt);
 			break;
 		}
+			
+		case ATTACKING: break;
 	}  // switch (m_EMState)
 
 	BroadcastMovementUpdate();
@@ -423,14 +410,11 @@ void cMonster::HandleFalling()
 
 
 
+
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
 	int PosY = POSY_TOINT;
-
-	if (PosY < 0)
-		PosY = 0;
-	else if (PosY > cChunkDef::Height)
-		PosY = cChunkDef::Height;
+	PosY = Clamp(PosY, 0, cChunkDef::Height);
 
 	if (!cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 	{
@@ -457,29 +441,35 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 
 
 
-void cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 
-	if((m_SoundHurt != "") && (m_Health > 0))
-		m_World->BroadcastSoundEffect(m_SoundHurt, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+	if (!m_SoundHurt.empty() && (m_Health > 0))
+	{
+		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
+	}
 
 	if (a_TDI.Attacker != NULL)
 	{
 		m_Target = a_TDI.Attacker;
 	}
+	return true;
 }
 
 
 
 
 
-void cMonster::KilledBy(cEntity * a_Killer)
+void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 	if (m_SoundHurt != "")
 	{
-		m_World->BroadcastSoundEffect(m_SoundDeath, (int)(GetPosX() * 8), (int)(GetPosY() * 8), (int)(GetPosZ() * 8), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 	int Reward;
 	switch (m_MobType)
@@ -540,7 +530,7 @@ void cMonster::KilledBy(cEntity * a_Killer)
 			break;
 		}
 	}
-	if ((a_Killer != NULL) && (!IsBaby()))
+	if ((a_TDI.Attacker != NULL) && (!IsBaby()))
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
@@ -551,8 +541,8 @@ void cMonster::KilledBy(cEntity * a_Killer)
 
 
 
-//Checks to see if EventSeePlayer should be fired
-//monster sez: Do I see the player
+// Checks to see if EventSeePlayer should be fired
+// monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(void)
 {
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
@@ -569,7 +559,7 @@ void cMonster::CheckEventSeePlayer(void)
 
 
 void cMonster::CheckEventLostPlayer(void)
-{	
+{
 	if (m_Target != NULL)
 	{
 		if ((m_Target->GetPosition() - GetPosition()).Length() > m_SightDistance)
@@ -612,7 +602,7 @@ void cMonster::InStateIdle(float a_Dt)
 {
 	if (m_bMovingToDestination)
 	{
-		return; // Still getting there
+		return;  // Still getting there
 	}
 
 	m_IdleInterval += a_Dt;
@@ -621,7 +611,7 @@ void cMonster::InStateIdle(float a_Dt)
 	{
 		// At this interval the results are predictable
 		int rem = m_World->GetTickRandomNumber(6) + 1;
-		m_IdleInterval -= 1; // So nothing gets dropped when the server hangs for a few seconds
+		m_IdleInterval -= 1;  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
 		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
@@ -682,6 +672,15 @@ void cMonster::InStateEscaping(float a_Dt)
 void cMonster::GetMonsterConfig(const AString & a_Name)
 {
 	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
+}
+
+
+
+
+
+bool cMonster::IsUndead(void)
+{
+	return false;
 }
 
 
@@ -823,15 +822,19 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 	switch (a_MobType)
 	{
 		case mtMagmaCube:
+		{
+			toReturn = new cMagmaCube(Random.NextInt(2) + 1);
+			break;
+		}
 		case mtSlime:
 		{
-			toReturn = new cSlime(Random.NextInt(2) + 1);
+			toReturn = new cSlime(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSkeleton:
 		{
 			// TODO: Actual detection of spawning in Nether
-			toReturn = new cSkeleton(Random.NextInt(1) == 0 ? false : true);
+			toReturn = new cSkeleton((Random.NextInt(1) == 0) ? false : true);
 			break;
 		}
 		case mtVillager:
@@ -878,7 +881,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
 		case mtPig:           toReturn = new cPig();                      break;
-		case mtSheep:         toReturn = new cSheep (Random.NextInt(15)); break; // Colour parameter
+		case mtSheep:         toReturn = new cSheep();                    break;
 		case mtSilverfish:    toReturn = new cSilverfish();               break;
 		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
 		case mtSpider:        toReturn = new cSpider();                   break;
@@ -886,7 +889,7 @@ cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
 		case mtWitch:         toReturn = new cWitch();                    break;
 		case mtWither:	      toReturn = new cWither();                   break;
 		case mtWolf:          toReturn = new cWolf();                     break;
-		case mtZombie:        toReturn = new cZombie(false);              break; // TODO: Infected zombie parameter
+		case mtZombie:        toReturn = new cZombie(false);              break;  // TODO: Infected zombie parameter
 		case mtZombiePigman:  toReturn = new cZombiePigman();             break;
 		default:
 		{
@@ -1012,7 +1015,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
 		!IsOnFire() &&                                               // Not already burning
-		(GetWorld()->GetWeather() != eWeather_Rain)                  // Not raining
+		GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT)           // Not raining
 	)
 	{
 		// Burn for 100 ticks, then decide again

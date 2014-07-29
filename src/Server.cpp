@@ -30,7 +30,8 @@
 #include <sstream>
 #include <iostream>
 
-extern "C" {
+extern "C"
+{
 	#include "zlib/zlib.h"
 }
 
@@ -60,7 +61,7 @@ typedef std::list< cClientHandle* > ClientList;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
@@ -101,16 +102,22 @@ void cServer::cTickThread::Execute(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cServer:
 
 cServer::cServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client IPv4"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client IPv6"),
+	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client"),
+	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client"),
+	m_PlayerCount(0),
+	m_PlayerCountDiff(0),
+	m_ClientViewDistance(0),
 	m_bIsConnected(false),
 	m_bRestarting(false),
 	m_RCONServer(*this),
-	m_TickThread(*this)
+	m_MaxPlayers(0),
+	m_bIsHardcore(false),
+	m_TickThread(*this),
+	m_ShouldAuthenticate(false)
 {
 }
 
@@ -196,7 +203,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png"))); // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(FILE_IO_PREFIX + AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -207,7 +214,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
 	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
-	if (cSocket::WSAStartup() != 0) // Only does anything on Windows, but whatever
+	if (cSocket::WSAStartup() != 0)  // Only does anything on Windows, but whatever
 	{
 		LOGERROR("WSAStartup() != 0");
 		return false;
@@ -251,6 +258,9 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 		m_ServerID = sid.str();
 		m_ServerID.resize(16, '0');
 	}
+	
+	m_ShouldLoadOfflinePlayerData = a_SettingsIni.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
+	m_ShouldLoadNamedPlayerData   = a_SettingsIni.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 	
 	m_ClientViewDistance = a_SettingsIni.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
 	if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
@@ -320,6 +330,7 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", ClientIP.c_str());
 		a_Socket.CloseSocket();
 		delete NewHandle;
+		NewHandle = NULL;
 		return;
 	}
 	
@@ -387,7 +398,7 @@ void cServer::TickClients(float a_Dt)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				// Remove the client later, when CS is not held, to avoid deadlock ( http://forum.mc-server.org/showthread.php?tid=374 )
+				// Remove the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
 				RemoveClients.push_back(*itr);
 				itr = m_Clients.erase(itr);
 				continue;
@@ -401,7 +412,7 @@ void cServer::TickClients(float a_Dt)
 	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
 	{
 		delete *itr;
-	} // for itr - RemoveClients[]
+	}  // for itr - RemoveClients[]
 }
 
 
@@ -476,7 +487,37 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
-	
+	if (split[0] == "load")
+	{
+		if (split.size() > 1)
+		{
+			cPluginManager::Get()->LoadPlugin(split[1]);
+
+			return;
+		}
+		else
+		{
+			a_Output.Out("No plugin given! Command: load <pluginname>");
+			a_Output.Finished();
+			return;
+		}
+	}
+
+	if (split[0] == "unload")
+	{
+		if (split.size() > 1)
+		{
+			cPluginManager::Get()->RemovePlugin(cPluginManager::Get()->GetPlugin(split[1]));
+			return;
+		}
+		else
+		{
+			a_Output.Out("No plugin given! Command: unload <pluginname>");
+			a_Output.Finished();
+			return;
+		}
+	}
+
 	// There is currently no way a plugin can do these (and probably won't ever be):
 	if (split[0].compare("chunkstats") == 0)
 	{
@@ -567,6 +608,9 @@ void cServer::BindBuiltInConsoleCommands(void)
 	PlgMgr->BindConsoleCommand("restart", NULL, " - Restarts the server cleanly");
 	PlgMgr->BindConsoleCommand("stop", NULL, " - Stops the server cleanly");
 	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("load <pluginname>", NULL, " - Adds and enables the specified plugin");
+	PlgMgr->BindConsoleCommand("unload <pluginname>", NULL, " - Disables the specified plugin");
+
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif
@@ -587,7 +631,7 @@ void cServer::Shutdown(void)
 	cRoot::Get()->SaveAllChunks();
 
 	cCSLock Lock(m_CSClients);
-	for( ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr )
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		(*itr)->Destroy();
 		delete *itr;
@@ -615,14 +659,14 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID)
+void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	cCSLock Lock(m_CSClients);
 	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Authenticate(a_Name, a_UUID);
+			(*itr)->Authenticate(a_Name, a_UUID, a_Properties);
 			return;
 		}
 	}  // for itr - m_Clients[]
@@ -632,7 +676,7 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cServer::cNotifyWriteThread:
 
 cServer::cNotifyWriteThread::cNotifyWriteThread(void) :

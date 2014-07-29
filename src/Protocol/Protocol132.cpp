@@ -18,19 +18,7 @@
 #include "../WorldStorage/FastNBT.h"
 #include "../WorldStorage/EnchantmentSerializer.h"
 #include "../StringCompression.h"
-
-#ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	#pragma warning(disable:4244)
-	#pragma warning(disable:4231)
-	#pragma warning(disable:4189)
-	#pragma warning(disable:4702)
-#endif
-
-#ifdef _MSC_VER
-	#pragma warning(pop)
-#endif
+#include "PolarSSL++/Sha1Checksum.h"
 
 
 
@@ -83,7 +71,7 @@ enum
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol132:
 
 cProtocol132::cProtocol132(cClientHandle * a_Client) :
@@ -200,20 +188,13 @@ void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 
 
-void cProtocol132::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocol132::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_COLLECT_PICKUP);
-	WriteInt (a_Pickup.GetUniqueID());
+	WriteInt (a_Entity.GetUniqueID());
 	WriteInt (a_Player.GetUniqueID());
 	Flush();
-	
-	// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-	SendSoundEffect(
-		"random.pop",
-		(int)(a_Pickup.GetPosX() * 8), (int)(a_Pickup.GetPosY() * 8), (int)(a_Pickup.GetPosZ() * 8),
-		0.5, (float)(0.75 + ((float)((a_Pickup.GetUniqueID() * 23) % 32)) / 64)
-	);
 }
 
 
@@ -265,7 +246,7 @@ void cProtocol132::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	WriteByte  (0);  // Unused, used to be world height
 	WriteByte  (8);  // Client list width or something
 	Flush();
-	
+	m_LastSentDimension = a_World.GetDimension();
 	SendCompass(a_World);
 }
 
@@ -297,14 +278,14 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol132::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+void cProtocol132::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte   (PACKET_SOUND_EFFECT);
 	WriteString (a_SoundName);
-	WriteInt    (a_SrcX);
-	WriteInt    (a_SrcY);
-	WriteInt    (a_SrcZ);
+	WriteInt    ((int)(a_X * 8.0));
+	WriteInt    ((int)(a_Y * 8.0));
+	WriteInt    ((int)(a_Z * 8.0));
 	WriteFloat  (a_Volume);
 	WriteChar   ((char)(a_Pitch * 63.0f));
 	Flush();
@@ -401,7 +382,7 @@ void cProtocol132::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cProtocol132::SendWholeInventory(const cWindow & a_Window)
 {
-	// 1.3.2 requires player inventory slots to be sent as SetSlot packets, 
+	// 1.3.2 requires player inventory slots to be sent as SetSlot packets,
 	// otherwise it sometimes fails to update the window
 	
 	// Send the entire window:
@@ -493,9 +474,9 @@ int cProtocol132::ParseHandshake(void)
 	HANDLE_PACKET_READ(ReadBEInt,           int,     ServerPort);
 	m_Username = Username;
 
-	if (!m_Client->HandleHandshake( m_Username ))
+	if (!m_Client->HandleHandshake( m_Username))
 	{
-		return PARSE_OK; // Player is not allowed into the server
+		return PARSE_OK;  // Player is not allowed into the server
 	}
 
 	// Send a 0xfd Encryption Key Request http://wiki.vg/Protocol#0xFD
@@ -819,7 +800,7 @@ void cProtocol132::SendEncryptionKeyRequest(void)
 void cProtocol132::HandleEncryptionKeyResponse(const AString & a_EncKey, const AString & a_EncNonce)
 {
 	// Decrypt EncNonce using privkey
-	cRSAPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
+	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 
 	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
 	int res = rsaDecryptor.Decrypt((const Byte *)a_EncNonce.data(), a_EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
@@ -876,7 +857,7 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	m_IsEncrypted = true;
 	
 	// Prepare the m_AuthServerID:
-	cSHA1Checksum Checksum;
+	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	AString ServerID = Server->GetServerID();
 	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
@@ -884,7 +865,7 @@ void cProtocol132::StartEncryption(const Byte * a_Key)
 	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
-	cSHA1Checksum::DigestToJava(Digest, m_AuthServerID);
+	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
 
 

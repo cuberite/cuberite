@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include "BlockID.h"
-#include "Mobs/Monster.h" //this is a side-effect of keeping Mobfamily inside Monster class. I'd prefer to keep both (Mobfamily and Monster) inside a "Monster" namespace MG TODO : do it
+#include "Mobs/Monster.h"  // This is a side-effect of keeping Mobfamily inside Monster class. I'd prefer to keep both (Mobfamily and Monster) inside a "Monster" namespace MG TODO : do it
 
 
 
@@ -29,7 +29,7 @@ public :
 	// return the number of mobs for this family
 	int GetNumberOfCollectedMobs(cMonster::eFamily a_Family);
 
-protected : 
+protected :
 	std::map<cMonster::eFamily, std::set<cMonster *> > m_Mobs;
 
 } ;

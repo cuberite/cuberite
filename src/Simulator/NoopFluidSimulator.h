@@ -27,7 +27,7 @@ public:
 	}
 
 	// cSimulator overrides:
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override 
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override
 	{
 		UNUSED(a_BlockX);
 		UNUSED(a_BlockY);

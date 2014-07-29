@@ -17,7 +17,7 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 
-	}	
+	}
 	
 		
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
@@ -48,6 +48,12 @@ public:
 			}
 		}
 		super::Check(a_ChunkInterface, a_PluginInterface, a_RelX, a_RelY, a_RelZ, a_Chunk);
+	}
+
+
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	{
+		return false;
 	}
 } ;
 

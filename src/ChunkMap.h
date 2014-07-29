@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "ChunkDef.h"
+
+#include "ChunkDataCallback.h"
 
 
 
@@ -33,9 +34,10 @@ class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
+class cSetChunkData;
 
-typedef std::list<cClientHandle *>  cClientHandleList;
-typedef cChunk * cChunkPtr;
+typedef std::list<cClientHandle *>         cClientHandleList;
+typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
@@ -59,7 +61,7 @@ public:
 
 	static const int LAYER_SIZE = 32;
 
-	cChunkMap(cWorld* a_World );
+	cChunkMap(cWorld* a_World);
 	~cChunkMap();
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
@@ -69,6 +71,7 @@ public:
 	void BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude = NULL);
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
 	void BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
 	void BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
@@ -83,11 +86,11 @@ public:
 	void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL);
 	void BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
-	void BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // a_Src coords are Block * 8
+	void BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ );
+	void BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
@@ -104,27 +107,17 @@ public:
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
-	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty  (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the chunk data as either loaded from the storage or generated.
-	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
-	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
-	a_HeightMap is optional, if not present, will be calculated.
-	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
+	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
+	If MarkDirty is set, the chunk is set as dirty (used after generating)
+	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk.
 	*/
-	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ, 
-		const BLOCKTYPE * a_BlockTypes,
-		const NIBBLETYPE * a_BlockMeta,
-		const NIBBLETYPE * a_BlockLight,
-		const NIBBLETYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		const cChunkDef::BiomeMap &  a_BiomeMap,
-		cBlockEntityList & a_BlockEntities,
-		bool a_MarkDirty
-	);
+	void SetChunkData(cSetChunkData & a_SetChunkData);
 	
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -151,9 +144,9 @@ public:
 	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
-	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockMeta);
-	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);
-	void       QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
+	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta);
+	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
+	void       QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 
@@ -197,6 +190,10 @@ public:
 
 	/** Adds the entity to its appropriate chunk, takes ownership of the entity pointer */
 	void AddEntity(cEntity * a_Entity);
+	
+	/** Adds the entity to its appropriate chunk, if the entity is not already added.
+	Takes ownership of the entity pointer */
+	void AddEntityIfNotPresent(cEntity * a_Entity);
 	
 	/** Returns true if the entity with specified ID is present in the chunks */
 	bool HasEntity(int a_EntityID);
@@ -282,7 +279,7 @@ public:
 	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	
-	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk() ) */
+	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk()) */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
@@ -333,6 +330,13 @@ public:
 	
 	/** Returns the CS for locking the chunkmap; only cWorld::cLock may use this function! */
 	cCriticalSection & GetCS(void) { return m_CSLayers; }
+	
+	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
+	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
+	whether it has any clients or not.
+	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
+	as at least one requests is active the chunk will be ticked). */
+	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked);
 
 private:
 
@@ -346,11 +350,15 @@ private:
 	class cChunkLayer
 	{
 	public:
-		cChunkLayer(int a_LayerX, int a_LayerZ, cChunkMap * a_Parent);
+		cChunkLayer(
+			int a_LayerX, int a_LayerZ,
+			cChunkMap * a_Parent,
+			cAllocationPool<cChunkData::sChunkSection> & a_Pool
+		);
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ );
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 		
 		/** Returns the specified chunk, or NULL if not created yet */
 		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
@@ -366,7 +374,7 @@ private:
 		void UnloadUnusedChunks(void);
 		
 		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
-		void CollectMobCensus(cMobCensus& a_ToFill);		
+		void CollectMobCensus(cMobCensus& a_ToFill);
 		/** Try to Spawn Monsters inside all Chunks */
 		void SpawnMobs(cMobSpawner& a_MobSpawner);
 
@@ -390,6 +398,25 @@ private:
 		int m_LayerZ;
 		cChunkMap * m_Parent;
 		int m_NumChunksLoaded;
+		
+		cAllocationPool<cChunkData::sChunkSection> & m_Pool;
+	};
+	
+	class cStarvationCallbacks
+		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
+	{
+		virtual void OnStartUsingReserve() override
+		{
+			LOG("Using backup memory buffer");
+		}
+		virtual void OnEndUsingReserve() override
+		{
+			LOG("Stoped using backup memory buffer");
+		}
+		virtual void OnOutOfReserve() override
+		{
+			LOG("Out of Memory");
+		}
 	};
 	
 	typedef std::list<cChunkLayer *> cChunkLayerList;
@@ -421,6 +448,8 @@ private:
 	
 	/** The cChunkStay descendants that are currently enabled in this chunkmap */
 	cChunkStays m_ChunkStays;
+
+	std::auto_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
 	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
 	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate

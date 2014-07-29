@@ -22,8 +22,8 @@ It will help us when the new chunk format comes out and we need to patch everyth
 #define ZERO_CHUNK_Y 0
 
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
-#define AXIS_ORDER_YZX 1	// Original (1.1-)
-#define AXIS_ORDER_XZY 2	// New (1.2+)
+#define AXIS_ORDER_YZX 1  // Original (1.1-)
+#define AXIS_ORDER_XZY 2  // New (1.2+)
 #define AXIS_ORDER AXIS_ORDER_XZY
 
 
@@ -72,7 +72,7 @@ public:
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
 	
-	/** The type used for any biomemap operations and storage inside MCServer, 
+	/** The type used for any biomemap operations and storage inside MCServer,
 	using MCServer biomes (need not correspond to client representation!)
 	idx = x + Width * z  // Need to verify this with the protocol spec, currently unknown!
 	*/
@@ -92,7 +92,7 @@ public:
 
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
-	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
+	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
 	{
 		UNUSED(a_Y);
 		BlockToChunk(a_X, a_Z, a_ChunkX, a_ChunkZ);
@@ -118,7 +118,7 @@ public:
 	}
 
 
-	inline static int MakeIndex(int x, int y, int z )
+	inline static int MakeIndex(int x, int y, int z)
 	{
 		if (
 			(x < Width)  && (x > -1) &&
@@ -138,27 +138,27 @@ public:
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width); // 1.2 is XZY
+			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width); // 1.1 is YZX
+			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
 		#endif
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index )
+	inline static Vector3i IndexToCoordinate( unsigned int index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
-			return Vector3i(								// 1.2
-				index % cChunkDef::Width,						// X
-				index / (cChunkDef::Width * cChunkDef::Width),		// Y
-				(index / cChunkDef::Width) % cChunkDef::Width		// Z
-				);
+			return Vector3i(  // 1.2
+				index % cChunkDef::Width,                       // X
+				index / (cChunkDef::Width * cChunkDef::Width),  // Y
+				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return Vector3i(								// 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),		// X
-				index % cChunkDef::Height,						// Y
-				(index / cChunkDef::Height) % cChunkDef::Width		// Z
-				);
+			return Vector3i(  // 1.1
+				index / (cChunkDef::Height * cChunkDef::Width),  // X
+				index % cChunkDef::Height,                       // Y
+				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+			);
 		#endif
 	}
 
@@ -246,8 +246,8 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			int Index = MakeIndexNoCheck(x, y, z);
-			if ((size_t)(Index / 2) >= a_Buffer.size())
+			size_t Index = (size_t)MakeIndexNoCheck(x, y, z);
+			if ((Index / 2) >= a_Buffer.size())
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
@@ -281,7 +281,7 @@ public:
 		{
 			a_Buffer.resize((size_t)((a_BlockIdx / 2) + 1));
 		}
-		a_Buffer[(size_t)(a_BlockIdx / 2)] = PackNibble(a_Buffer, a_BlockIdx, a_Nibble);
+		a_Buffer[(size_t)(a_BlockIdx / 2)] = PackNibble(a_Buffer, (size_t)a_BlockIdx, a_Nibble);
 	}
 
 
@@ -297,19 +297,19 @@ public:
 			return;
 		}
 
-		int Index = MakeIndexNoCheck(x, y, z);
-		if ((size_t)(Index / 2) >= a_Buffer.size())
+		size_t Index = (size_t)MakeIndexNoCheck(x, y, z);
+		if ((Index / 2) >= a_Buffer.size())
 		{
-			a_Buffer.resize((size_t)((Index / 2) + 1));
+			a_Buffer.resize(((Index / 2) + 1));
 		}
-		a_Buffer[(size_t)(Index / 2)] = PackNibble(a_Buffer, Index, a_Nibble);
+		a_Buffer[(Index / 2)] = PackNibble(a_Buffer, Index, a_Nibble);
 	}
 
 
 private:
 
 
-	inline static NIBBLETYPE PackNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int a_Index, NIBBLETYPE a_Nibble)
+	inline static NIBBLETYPE PackNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, size_t a_Index, NIBBLETYPE a_Nibble)
 	{
 		return static_cast<NIBBLETYPE>(
 			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
@@ -318,142 +318,12 @@ private:
 	}
 
 
-	inline static NIBBLETYPE ExpandNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, int a_Index)
+	inline static NIBBLETYPE ExpandNibble(const COMPRESSED_NIBBLETYPE & a_Buffer, size_t a_Index)
 	{
 		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
 	}
 
 
-} ;
-
-
-
-
-
-/** Interface class used for getting data out of a chunk using the GetAllData() function.
-Implementation must use the pointers immediately and NOT store any of them for later use
-The virtual methods are called in the same order as they're declared here.
-*/
-class cChunkDataCallback abstract
-{
-public:
-
-	virtual ~cChunkDataCallback() {}
-
-	/** Called before any other callbacks to inform of the current coords 
-	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
-	If false is returned, the chunk is skipped.
-	*/
-	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; };
-	
-	/// Called once to provide heightmap data
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {UNUSED(a_HeightMap); };
-	
-	/// Called once to provide biome data
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) {UNUSED(a_BiomeMap); };
-	
-	/// Called once to export block types
-	virtual void BlockTypes   (const BLOCKTYPE * a_Type) {UNUSED(a_Type); };
-	
-	/// Called once to export block meta
-	virtual void BlockMeta    (const NIBBLETYPE * a_Meta) {UNUSED(a_Meta); };
-	
-	/// Called once to let know if the chunk lighting is valid. Return value is used to control if BlockLight() and BlockSkyLight() are called next (if true)
-	virtual bool LightIsValid(bool a_IsLightValid) {UNUSED(a_IsLightValid); return true; };
-
-	/// Called once to export block light
-	virtual void BlockLight   (const NIBBLETYPE * a_BlockLight) {UNUSED(a_BlockLight); };
-	
-	/// Called once to export sky light
-	virtual void BlockSkyLight(const NIBBLETYPE * a_SkyLight) {UNUSED(a_SkyLight); };
-	
-	/// Called for each entity in the chunk
-	virtual void Entity(cEntity * a_Entity) {UNUSED(a_Entity); };
-	
-	/// Called for each blockentity in the chunk
-	virtual void BlockEntity(cBlockEntity * a_Entity) {UNUSED(a_Entity); };
-} ;
-
-
-
-
-
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer
-*/
-class cChunkDataCollector :
-	public cChunkDataCallback
-{
-public:
-
-	// Must be unsigned char instead of BLOCKTYPE or NIBBLETYPE, because it houses both.
-	unsigned char m_BlockData[cChunkDef::BlockDataSize];
-
-protected:
-
-	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
-	{
-		memcpy(m_BlockData, a_BlockTypes, sizeof(cChunkDef::BlockTypes));
-	}
-
-
-	virtual void BlockMeta(const NIBBLETYPE * a_BlockMeta) override
-	{
-		memcpy(m_BlockData + cChunkDef::NumBlocks, a_BlockMeta, cChunkDef::NumBlocks / 2);
-	}
-
-
-	virtual void BlockLight(const NIBBLETYPE * a_BlockLight) override
-	{
-		memcpy(m_BlockData + 3 * cChunkDef::NumBlocks / 2, a_BlockLight, cChunkDef::NumBlocks / 2);
-	}
-
-
-	virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override
-	{
-		memcpy(m_BlockData + 2 * cChunkDef::NumBlocks, a_BlockSkyLight, cChunkDef::NumBlocks / 2);
-	}
-} ;
-
-
-
-
-
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a separate buffers
-*/
-class cChunkDataSeparateCollector :
-	public cChunkDataCallback
-{
-public:
-
-	cChunkDef::BlockTypes   m_BlockTypes;
-	cChunkDef::BlockNibbles m_BlockMetas;
-	cChunkDef::BlockNibbles m_BlockLight;
-	cChunkDef::BlockNibbles m_BlockSkyLight;
-
-protected:
-
-	virtual void BlockTypes(const BLOCKTYPE * a_BlockTypes) override
-	{
-		memcpy(m_BlockTypes, a_BlockTypes, sizeof(m_BlockTypes));
-	}
-
-
-	virtual void BlockMeta(const NIBBLETYPE * a_BlockMeta) override
-	{
-		memcpy(m_BlockMetas, a_BlockMeta, sizeof(m_BlockMetas));
-	}
-
-
-	virtual void BlockLight(const NIBBLETYPE * a_BlockLight) override
-	{
-		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
-	}
-
-
-	virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override
-	{
-		memcpy(m_BlockSkyLight, a_BlockSkyLight, sizeof(m_BlockSkyLight));
-	}
 } ;
 
 
@@ -487,7 +357,7 @@ struct sSetBlock
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 
-	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );  // absolute block position
+	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // absolute block position
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		x(a_X), y(a_Y), z(a_Z),
 		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),

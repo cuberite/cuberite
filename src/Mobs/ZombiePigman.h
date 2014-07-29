@@ -14,10 +14,12 @@ class cZombiePigman :
 public:
 	cZombiePigman(void);
 
-	CLASS_PROTODEF(cZombiePigman);
+	CLASS_PROTODEF(cZombiePigman)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-	virtual void KilledBy(cEntity * a_Killer) override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	
+	virtual bool IsUndead(void) override { return true; }
 } ;
 
 

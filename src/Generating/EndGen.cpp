@@ -29,7 +29,7 @@ enum
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cEndGen:
 
 cEndGen::cEndGen(int a_Seed) :
@@ -50,7 +50,7 @@ cEndGen::cEndGen(int a_Seed) :
 
 
 
-void cEndGen::Initialize(cIniFile & a_IniFile)
+void cEndGen::InitializeCompoGen(cIniFile & a_IniFile)
 {
 	m_IslandSizeX = a_IniFile.GetValueSetI("Generator", "EndGenIslandSizeX", m_IslandSizeX);
 	m_IslandSizeY = a_IniFile.GetValueSetI("Generator", "EndGenIslandSizeY", m_IslandSizeY);

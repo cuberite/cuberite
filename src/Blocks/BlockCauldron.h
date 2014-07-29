@@ -58,6 +58,24 @@ public:
 	{
 		return true;
 	}
+
+	virtual void OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	{
+		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+		if (!a_WorldInterface.IsWeatherWetAt(BlockX, BlockZ) || (a_RelY != a_WorldInterface.GetHeight(BlockX, BlockZ)))
+		{
+			// It's not raining at our current location or we do not have a direct view of the sky
+			// We cannot eat the rain :(
+			return;
+		}
+
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		if (Meta < 3)
+		{
+			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta + 1);
+		}
+	}
 } ;
 
 

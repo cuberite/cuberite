@@ -28,7 +28,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cArrowEntity);
+	CLASS_PROTODEF(cArrowEntity)
 	
 	/// Creates a new arrow with psNoPickup state and default damage modifier coeff
 	cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
@@ -58,8 +58,14 @@ public:
 	
 	/// Sets the IsCritical flag
 	void SetIsCritical(bool a_IsCritical) { m_IsCritical = a_IsCritical; }
+
+	/** Gets the block arrow is in */
+	Vector3i GetBlockHit(void) const { return m_HitBlockPos; }
 	
 	// tolua_end
+
+	/** Sets the block arrow is in. To be used by the MCA loader only! */
+	void SetBlockHit(const Vector3i & a_BlockHit) { m_HitBlockPos = a_BlockHit; }
 	
 protected:
 	
@@ -93,4 +99,4 @@ protected:
 	virtual void CollectedBy(cPlayer * a_Player) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
-}; // tolua_export
+};  // tolua_export

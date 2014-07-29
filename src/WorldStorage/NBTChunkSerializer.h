@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../ChunkDef.h"
+#include "ChunkDataCallback.h"
 
 
 
@@ -46,6 +46,7 @@ class cTNTEntity;
 class cExpOrb;
 class cHangingEntity;
 class cItemFrame;
+class cEntityEffect;
 
 
 
@@ -92,7 +93,7 @@ protected:
 	
 	// Block entities:
 	void AddBasicTileEntity(cBlockEntity *     a_Entity, const char * a_EntityTypeID);
-	void AddChestEntity    (cChestEntity *     a_Entity);
+	void AddChestEntity    (cChestEntity *     a_Entity, BLOCKTYPE a_ChestType);
 	void AddDispenserEntity(cDispenserEntity * a_Entity);
 	void AddDropperEntity  (cDropperEntity *   a_Entity);
 	void AddFurnaceEntity  (cFurnaceEntity *   a_Furnace);
@@ -121,7 +122,7 @@ protected:
 	void AddMinecartChestContents(cMinecartWithChest * a_Minecart);
 	
 	// cChunkDataSeparateCollector overrides:
-	virtual bool LightIsValid(bool a_IsLightValid) override;
+	virtual void LightIsValid(bool a_IsLightValid) override;
 	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override;
 	virtual void Entity(cEntity * a_Entity) override;
 	virtual void BlockEntity(cBlockEntity * a_Entity) override;

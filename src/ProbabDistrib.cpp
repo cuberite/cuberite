@@ -118,7 +118,7 @@ int cProbabDistrib::MapValue(int a_OrigValue) const
 	size_t Hi = m_Cumulative.size() - 1;
 	while (Hi - Lo > 1)
 	{
-		int Mid = (Lo + Hi) / 2;
+		size_t Mid = (Lo + Hi) / 2;
 		int MidProbab = m_Cumulative[Mid].m_Probability;
 		if (MidProbab < a_OrigValue)
 		{

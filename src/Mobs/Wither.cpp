@@ -2,7 +2,9 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Wither.h"
+
 #include "../World.h"
+#include "../Entities/Player.h"
 
 
 
@@ -10,7 +12,7 @@
 
 cWither::cWither(void) :
 	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0),
-	m_InvulnerableTicks(220)
+	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
 }
@@ -28,7 +30,7 @@ bool cWither::IsArmored(void) const
 
 
 
-bool cWither::Initialize(cWorld * a_World)
+bool cWither::Initialize(cWorld & a_World)
 {
 	// Set health before BroadcastSpawnEntity()
 	SetHealth(GetMaxHealth() / 3);
@@ -40,24 +42,24 @@ bool cWither::Initialize(cWorld * a_World)
 
 
 
-void cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (a_TDI.DamageType == dtDrowning)
 	{
-		return;
+		return false;
 	}
 
-	if (m_InvulnerableTicks > 0)
+	if (m_WitherInvulnerableTicks > 0)
 	{
-		return;
+		return false;
 	}
 
 	if (IsArmored() && (a_TDI.DamageType == dtRangedAttack))
 	{
-		return;
+		return false;
 	}
 
-	super::DoTakeDamage(a_TDI);
+	return super::DoTakeDamage(a_TDI);
 }
 
 
@@ -68,16 +70,16 @@ void cWither::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	if (m_InvulnerableTicks > 0)
+	if (m_WitherInvulnerableTicks > 0)
 	{
-		unsigned int NewTicks = m_InvulnerableTicks - 1;
+		unsigned int NewTicks = m_WitherInvulnerableTicks - 1;
 
 		if (NewTicks == 0)
 		{
 			m_World->DoExplosionAt(7.0, GetPosX(), GetPosY(), GetPosZ(), false, esWitherBirth, this);
 		}
 
-		m_InvulnerableTicks = NewTicks;
+		m_WitherInvulnerableTicks = NewTicks;
 
 		if ((NewTicks % 10) == 0)
 		{
@@ -95,6 +97,38 @@ void cWither::Tick(float a_Dt, cChunk & a_Chunk)
 void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	AddRandomDropItem(a_Drops, 1, 1, E_ITEM_NETHER_STAR);
+}
+
+
+
+
+
+void cWither::KilledBy(TakeDamageInfo & a_TDI)
+{
+	super::KilledBy(a_TDI);
+
+	class cPlayerCallback : public cPlayerListCallback
+	{
+		Vector3f m_Pos;
+
+		virtual bool Item(cPlayer * a_Player)
+		{
+			// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
+			double Dist = (a_Player->GetPosition() - m_Pos).Length();
+			if (Dist < 50.0)
+			{
+				// If player is close, award achievement
+				a_Player->AwardAchievement(achKillWither);
+			}
+			return false;
+		}
+
+	public:
+		cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
+
+	} PlayerCallback(GetPosition());
+
+	m_World->ForEachPlayer(PlayerCallback);
 }
 
 

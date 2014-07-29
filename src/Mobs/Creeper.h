@@ -15,10 +15,10 @@ class cCreeper :
 public:
 	cCreeper(void);
 
-	CLASS_PROTODEF(cCreeper);
+	CLASS_PROTODEF(cCreeper)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-	virtual void DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Attack(float a_Dt) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;

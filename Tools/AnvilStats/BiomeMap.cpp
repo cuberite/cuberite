@@ -5,38 +5,7 @@
 
 #include "Globals.h"
 #include "BiomeMap.h"
-
-
-
-
-
-static const int g_BiomePalette[] =
-{
-	// ARGB:
-	0xff0000ff, /* Ocean */
-	0xff00cf3f, /* Plains */
-	0xffffff00, /* Desert */
-	0xff7f7f7f, /* Extreme Hills */
-	0xff00cf00, /* Forest */
-	0xff007f3f, /* Taiga */
-	0xff3f7f00, /* Swampland */
-	0xff003fff, /* River */
-	0xff7f0000, /* Hell */
-	0xff007fff, /* Sky */
-	0xff3f3fff, /* Frozen Ocean */
-	0xff3f3fff, /* Frozen River */
-	0xff7fffcf, /* Ice Plains */
-	0xff3fcf7f, /* Ice Mountains */
-	0xffcf00cf, /* Mushroom Island */
-	0xff7f00ff, /* Mushroom Island Shore */
-	0xffffff3f, /* Beach */
-	0xffcfcf00, /* Desert Hills */
-	0xff00cf3f, /* Forest Hills */
-	0xff006f1f, /* Taiga Hills */
-	0xff7f8f7f, /* Extreme Hills Edge */
-	0xff004f00, /* Jungle */
-	0xff003f00, /* Jungle Hills */
-} ;
+#include "../BiomeVisualiser/BiomeColors.h"
 
 
 
@@ -139,7 +108,7 @@ void cBiomeMap::StartNewRegion(int a_RegionX, int a_RegionZ)
 			unsigned char * BiomeRow = (unsigned char *)m_Biomes + z * 512;
 			for (int x = 0; x < 512; x++)
 			{
-				RowData[x] = g_BiomePalette[BiomeRow[x]];
+				RowData[x] = g_BiomeColors[BiomeRow[x]];
 			}
 			f.Write(RowData, sizeof(RowData));
 		}  // for z

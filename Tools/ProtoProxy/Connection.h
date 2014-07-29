@@ -11,6 +11,8 @@
 
 #include "ByteBuffer.h"
 #include "OSSupport/Timer.h"
+#include "PolarSSL++/AesCfb128Decryptor.h"
+#include "PolarSSL++/AesCfb128Encryptor.h"
 
 
 
@@ -66,8 +68,8 @@ protected:
 	cByteBuffer m_ClientBuffer;
 	cByteBuffer m_ServerBuffer;
 	
-	cAESCFBDecryptor m_ServerDecryptor;
-	cAESCFBEncryptor m_ServerEncryptor;
+	cAesCfb128Decryptor m_ServerDecryptor;
+	cAesCfb128Encryptor m_ServerEncryptor;
 
 	AString m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
 	
@@ -109,10 +111,10 @@ protected:
 	bool SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a_Peer);
 	
 	/// Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false
-	bool SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer);
+	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer);
 	
 	/// Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false
-	bool SendEncryptedData(SOCKET a_Socket, cAESCFBEncryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer);
+	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer);
 	
 	/// Decodes packets coming from the client, sends appropriate counterparts to the server; returns false if the connection is to be dropped
 	bool DecodeClientsPackets(const char * a_Data, int a_Size);

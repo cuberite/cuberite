@@ -3,17 +3,17 @@
 
 #include "Root.h"
 
-#include <exception> //std::exception
-#include <csignal>   //std::signal
-#include <stdlib.h>  //exit()
+#include <exception>
+#include <csignal>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
 	#include <dbghelp.h>
 #endif  // _MSC_VER
 
-// Here, we have some ALL CAPS variables, to give the impression that this is deeeep, gritty programming :P
-bool g_TERMINATE_EVENT_RAISED = false; // If something has told the server to stop; checked periodically in cRoot
-bool g_SERVER_TERMINATED = false; // Set to true when the server terminates, so our CTRL handler can then tell Windows to close the console
+
+bool cRoot::m_TerminateEventRaised = false;  // If something has told the server to stop; checked periodically in cRoot
+static bool g_ServerTerminated = false;  // Set to true when the server terminates, so our CTRL handler can then tell the OS to close the console
 
 
 
@@ -49,10 +49,10 @@ bool g_ShouldLogCommOut;
 
 
 
-void NonCtrlHandler(int a_Signal) 
+void NonCtrlHandler(int a_Signal)
 {
 	LOGD("Terminate event raised from std::signal");
-	g_TERMINATE_EVENT_RAISED = true;
+	cRoot::m_TerminateEventRaised = true;
 
 	switch (a_Signal)
 	{
@@ -61,7 +61,7 @@ void NonCtrlHandler(int a_Signal)
 			std::signal(SIGSEGV, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGSEGV: Segmentation fault");
-			exit(EXIT_FAILURE);
+			abort();
 		}
 		case SIGABRT:
 		#ifdef SIGABRT_COMPAT
@@ -71,12 +71,12 @@ void NonCtrlHandler(int a_Signal)
 			std::signal(a_Signal, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
-			exit(EXIT_FAILURE);
+			abort();
 		}
 		case SIGINT:
 		case SIGTERM:
 		{
-			std::signal(a_Signal, SIG_IGN); // Server is shutting down, wait for it...
+			std::signal(a_Signal, SIG_IGN);  // Server is shutting down, wait for it...
 			break;
 		}
 		default: break;
@@ -88,7 +88,7 @@ void NonCtrlHandler(int a_Signal)
 
 
 #if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Windows 32-bit stuff: when the server crashes, create a "dump file" containing the callstack of each thread and some variables; let the user send us that crash file for analysis
 
 typedef BOOL  (WINAPI *pMiniDumpWriteDump)(
@@ -155,12 +155,12 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 // Handle CTRL events in windows, including console window close
 BOOL CtrlHandler(DWORD fdwCtrlType)
 {
-	g_TERMINATE_EVENT_RAISED = true;
+	cRoot::m_TerminateEventRaised = true;
 	LOGD("Terminate event raised from the Windows CtrlHandler");
 
-	if (fdwCtrlType == CTRL_CLOSE_EVENT) // Console window closed via 'x' button, Windows will try to close immediately, therefore...
+	if (fdwCtrlType == CTRL_CLOSE_EVENT)  // Console window closed via 'x' button, Windows will try to close immediately, therefore...
 	{
-		while (!g_SERVER_TERMINATED) { cSleep::MilliSleep(100); } // Delay as much as possible to try to get the server to shut down cleanly
+		while (!g_ServerTerminated) { cSleep::MilliSleep(100); }  // Delay as much as possible to try to get the server to shut down cleanly
 	}
 
 	return TRUE;
@@ -171,10 +171,10 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // main:
 
-int main( int argc, char **argv )
+int main( int argc, char **argv)
 {
 	UNUSED(argc);
 	UNUSED(argv);
@@ -218,7 +218,7 @@ int main( int argc, char **argv )
 	#endif
 	
 	#if defined(_DEBUG) && defined(_MSC_VER)
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
 	// _X: The simple built-in CRT leak finder - simply break when allocating the Nth block ({N} is listed in the leak output)
 	// Only useful when the leak is in the same sequence all the time
@@ -233,7 +233,7 @@ int main( int argc, char **argv )
 	std::signal(SIGABRT, NonCtrlHandler);
 	#ifdef SIGABRT_COMPAT
 	std::signal(SIGABRT_COMPAT, NonCtrlHandler);
-	#endif // SIGABRT_COMPAT
+	#endif  // SIGABRT_COMPAT
 	#endif
 
 	// DEBUG: test the dumpfile creation:
@@ -277,15 +277,15 @@ int main( int argc, char **argv )
 	try
 	#endif
 	{
-		cRoot Root;	
+		cRoot Root;
 		Root.Start();
 	}
 	#if !defined(ANDROID_NDK)
-	catch( std::exception& e )
+	catch (std::exception & e)
 	{
-		LOGERROR("Standard exception: %s", e.what() );
+		LOGERROR("Standard exception: %s", e.what());
 	}
-	catch( ... )
+	catch (...)
 	{
 		LOGERROR("Unknown exception!");
 	}
@@ -296,7 +296,7 @@ int main( int argc, char **argv )
 	DeinitLeakFinder();
 	#endif
 
-	g_SERVER_TERMINATED = true;
+	g_ServerTerminated = true;
 
 	return EXIT_SUCCESS;
 }

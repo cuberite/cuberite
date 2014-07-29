@@ -41,7 +41,6 @@ public:
 
 	cSocket(void) : m_Socket(INVALID_SOCKET) {}
 	cSocket(xSocket a_Socket);
-	~cSocket();
 
 	bool IsValid(void) const { return IsValidSocket(m_Socket); }
 	void CloseSocket(void);
@@ -110,8 +109,8 @@ public:
 	/// Connects to the specified host or string IP address and port, using IPv4. Returns true if successful.
 	bool ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Port);
 	
-	int Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags);
-	int Send   (const char * a_Buffer, unsigned int a_Length);
+	int Receive(char * a_Buffer, size_t a_Length, unsigned int a_Flags);
+	int Send   (const char * a_Buffer, size_t a_Length);
 	
 	unsigned short GetPort(void) const;  // Returns 0 on failure
 

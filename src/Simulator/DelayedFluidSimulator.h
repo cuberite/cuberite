@@ -50,7 +50,7 @@ class cDelayedFluidSimulator :
 {
 	typedef cFluidSimulator super;
 
-public:	
+public:
 	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
 	
 	// cSimulator overrides:
@@ -70,7 +70,7 @@ protected:
 	/*
 	Slots:
 	| 0 | 1 | ... | m_AddSlotNum | m_SimSlotNum | ... | m_TickDelay - 1 |
-	        adding blocks here ^ | ^ simulating here
+	|       adding blocks here ^ | ^ simulating here
 	*/
 	
 	/// Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation.

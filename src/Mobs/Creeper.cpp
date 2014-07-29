@@ -37,13 +37,13 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bIsBlowing)
 		{
-			m_ExplodingTimer += 1;			
+			m_ExplodingTimer += 1;
 		}
 
 		if (m_ExplodingTimer == 30)
 		{
 			m_World->DoExplosionAt((m_bIsCharged ? 5 : 3), GetPosX(), GetPosY(), GetPosZ(), false, esMonster, this);
-			Destroy();
+			Destroy();  // Just in case we aren't killed by the explosion
 		}
 	}
 }
@@ -54,6 +54,12 @@ void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
+	if (m_ExplodingTimer == 30)
+	{
+		// Exploded creepers drop naught but charred flesh, which Minecraft doesn't have
+		return;
+	}
+
 	int LootingLevel = 0;
 	if (a_Killer != NULL)
 	{
@@ -61,11 +67,29 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
 
-	if ((a_Killer != NULL) && (a_Killer->IsProjectile()))
+	if ((a_Killer != NULL) && a_Killer->IsProjectile() && (((cProjectileEntity *)a_Killer)->GetCreatorUniqueID() >= 0))
 	{
-		if (((cMonster *)((cProjectileEntity *)a_Killer)->GetCreator())->GetMobType() == mtSkeleton)
+		class cProjectileCreatorCallback : public cEntityCallback
 		{
-			// 12 music discs. TickRand starts from 0, so range = 11. Disk IDs start at 2256, so add that. There.
+		public:
+			cProjectileCreatorCallback(void)
+			{
+			}
+
+			virtual bool Item(cEntity * a_Entity) override
+			{
+				if (a_Entity->IsMob() && ((cMonster *)a_Entity)->GetMobType() == mtSkeleton)
+				{
+					return true;
+				}
+				return false;
+			}
+		};
+
+		cProjectileCreatorCallback PCC;
+		if (GetWorld()->DoWithEntityByID(((cProjectileEntity *)a_Killer)->GetCreatorUniqueID(), PCC))
+		{
+			// 12 music discs. TickRand starts from 0 to 11. Disk IDs start at 2256, so add that. There.
 			AddRandomDropItem(a_Drops, 1, 1, (short)m_World->GetTickRandomNumber(11) + 2256);
 		}
 	}
@@ -75,9 +99,12 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
+bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	super::DoTakeDamage(a_TDI);
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
 
 	if (a_TDI.DamageType == dtLightning)
 	{
@@ -85,6 +112,7 @@ void cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 
 	m_World->BroadcastEntityMetadata(*this);
+	return true;
 }
 
 
@@ -97,7 +125,7 @@ void cCreeper::Attack(float a_Dt)
 
 	if (!m_bIsBlowing)
 	{
-		m_World->BroadcastSoundEffect("game.tnt.primed", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("game.tnt.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 	}
@@ -115,7 +143,7 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.UseEquippedItem();
 		}
-		m_World->BroadcastSoundEffect("game.tnt.primed", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("game.tnt.primed", GetPosX(), GetPosY(), GetPosZ(), 1.f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 		m_BurnedWithFlintAndSteel = true;

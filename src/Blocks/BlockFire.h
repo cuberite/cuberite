@@ -36,8 +36,8 @@ public:
 		- Loop through boundary variables, and fill with portal blocks based on Dir with meta from Dir
 		*/
 
-		a_BlockY--; // Because we want the block below the fire
-		FindAndSetPortalFrame(a_BlockX, a_BlockY, a_BlockZ, a_ChunkInterface, a_WorldInterface);
+		// a_BlockY - 1: Because we want the block below the fire
+		FindAndSetPortalFrame(a_BlockX, a_BlockY - 1, a_BlockZ, a_ChunkInterface, a_WorldInterface);
 	}
 
 	virtual void OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
@@ -68,7 +68,6 @@ public:
 		{
 			return 0;
 		}
-
 		
 		for (int newY = Y + 1; newY < cChunkDef::Height; newY++)
 		{
@@ -84,7 +83,7 @@ public:
 				// This is because the frame is a solid obsidian pillar
 				if ((MaxY != 0) && (newY == Y + 1))
 				{
-					return EvaluatePortalBorder(X, newY, Z, MaxY, a_ChunkInterface);
+					return EvaluatePortalBorder(X, newY, Z, MaxY, a_ChunkInterface) ? -1 /* -1 = found a frame */ : 0;
 				}
 				else
 				{
@@ -99,27 +98,27 @@ public:
 	}
 
 	/// Evaluates if coords have a valid border on top, based on MaxY
-	int EvaluatePortalBorder(int X, int FoundObsidianY, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
+	bool EvaluatePortalBorder(int X, int FoundObsidianY, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
 	{
-		for (int checkBorder = FoundObsidianY + 1; checkBorder <= MaxY - 1; checkBorder++) // FoundObsidianY + 1: FoundObsidianY has already been checked in FindObsidianCeiling; MaxY - 1: portal doesn't need corners
+		for (int checkBorder = FoundObsidianY + 1; checkBorder <= MaxY - 1; checkBorder++)  // FoundObsidianY + 1: FoundObsidianY has already been checked in FindObsidianCeiling; MaxY - 1: portal doesn't need corners
 		{
 			if (a_ChunkInterface.GetBlock(X, checkBorder, Z) != E_BLOCK_OBSIDIAN)
 			{
 				// Base obsidian, base + 1 obsidian, base + x NOT obsidian -> not complete portal
-				return 0;
+				return false;
 			}
 		}
 		// Everything was obsidian, found a border!
-		return -1; // Return -1 for a frame border
+		return true;
 	}
 
 	/// Finds entire frame in any direction with the coordinates of a base block and fills hole with nether portal (START HERE)
 	void FindAndSetPortalFrame(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
 	{
-		int MaxY = FindObsidianCeiling(X, Y, Z, a_ChunkInterface); // Get topmost obsidian block as reference for all other checks
-		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1; // Duplicate XZ values, add/subtract one as we've checked the original already the line above
+		int MaxY = FindObsidianCeiling(X, Y, Z, a_ChunkInterface);  // Get topmost obsidian block as reference for all other checks
+		int X1 = X + 1, Z1 = Z + 1, X2 = X - 1, Z2 = Z - 1;  // Duplicate XZ values, add/subtract one as we've checked the original already the line above
 
-		if (MaxY == 0) // Oh noes! Not a portal coordinate :(
+		if (MaxY == 0)  // Oh noes! Not a portal coordinate :(
 		{
 			return;
 		}
@@ -128,11 +127,11 @@ public:
 		{
 			if (!FindPortalSliceZ(X, Y, Z1, Z2, MaxY, a_ChunkInterface))
 			{
-				return; // No eligible portal construct, abort abort abort!!
+				return;  // No eligible portal construct, abort abort abort!!
 			}
 		}
 
-		for (int Height = Y + 1; Height <= MaxY - 1; Height++) // Loop through boundary to set portal blocks
+		for (int Height = Y + 1; Height <= MaxY - 1; Height++)  // Loop through boundary to set portal blocks
 		{
 			for (int Width = XZM; Width <= XZP; Width++)
 			{
@@ -154,23 +153,23 @@ public:
 	/// Takes coordinates of base block and Y coord of target obsidian ceiling
 	bool FindPortalSliceX(int X1, int X2, int Y, int Z, int MaxY, cChunkInterface & a_ChunkInterface)
 	{
-		Dir = 1; // Set assumed direction (will change if portal turns out to be facing the other direction)
+		Dir = 1;  // Set assumed direction (will change if portal turns out to be facing the other direction)
 		bool FoundFrameXP = false, FoundFrameXM = false;
-		for (; ((a_ChunkInterface.GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++) // Check XP for obsidian blocks, exempting corners
+		for (; ((a_ChunkInterface.GetBlock(X1, Y, Z) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X1, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X1++)  // Check XP for obsidian blocks, exempting corners
 		{
 			int Value = FindObsidianCeiling(X1, Y, Z, a_ChunkInterface, MaxY);
-			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, a_ChunkInterface, MaxY); // For corners without obsidian
-			if ((Value == -1) || (ValueTwo == -1)) // FindObsidianCeiling returns -1 upon frame-find
+			int ValueTwo = FindObsidianCeiling(X1, Y + 1, Z, a_ChunkInterface, MaxY);  // For corners without obsidian
+			if ((Value == -1) || (ValueTwo == -1))  // FindObsidianCeiling returns -1 upon frame-find
 			{
-				FoundFrameXP = true; // Found a frame border in this direction, proceed in other direction (don't go further)
+				FoundFrameXP = true;  // Found a frame border in this direction, proceed in other direction (don't go further)
 				break;
 			}
-			else if ((Value != MaxY) && (ValueTwo != MaxY)) // Make sure that there is a valid portal 'slice'
+			else if ((Value != MaxY) && (ValueTwo != MaxY))  // Make sure that there is a valid portal 'slice'
 			{
-				return false; // Not valid slice, no portal can be formed
+				return false;  // Not valid slice, no portal can be formed
 			}
-		} XZP = X1 - 1; // Set boundary of frame interior, note that for some reason, the loop of X and the loop of Z go to different numbers, hence -1 here and -2 there
-		for (; ((a_ChunkInterface.GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--) // Go the other direction (XM)
+		} XZP = X1 - 1;  // Set boundary of frame interior
+		for (; ((a_ChunkInterface.GetBlock(X2, Y, Z) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X2, Y + 1, Z) == E_BLOCK_OBSIDIAN)); X2--)  // Go the other direction (XM)
 		{
 			int Value = FindObsidianCeiling(X2, Y, Z, a_ChunkInterface, MaxY);
 			int ValueTwo = FindObsidianCeiling(X2, Y + 1, Z, a_ChunkInterface, MaxY);
@@ -183,7 +182,7 @@ public:
 			{
 				return false;
 			}
-		} XZM = X2 + 1; // Set boundary, see previous
+		} XZM = X2 + 1;  // Set boundary, see previous
 		return (FoundFrameXP && FoundFrameXM);
 	}
 
@@ -199,13 +198,13 @@ public:
 			if ((Value == -1) || (ValueTwo == -1))
 			{
 				FoundFrameZP = true;
-				continue;
+				break;
 			}
 			else if ((Value != MaxY) && (ValueTwo != MaxY))
 			{
 				return false;
 			}
-		} XZP = Z1 - 2;
+		} XZP = Z1 - 1;
 		for (; ((a_ChunkInterface.GetBlock(X, Y, Z2) == E_BLOCK_OBSIDIAN) || (a_ChunkInterface.GetBlock(X, Y + 1, Z2) == E_BLOCK_OBSIDIAN)); Z2--)
 		{
 			int Value = FindObsidianCeiling(X, Y, Z2, a_ChunkInterface, MaxY);
@@ -213,13 +212,13 @@ public:
 			if ((Value == -1) || (ValueTwo == -1))
 			{
 				FoundFrameZM = true;
-				continue;
+				break;
 			}
 			else if ((Value != MaxY) && (ValueTwo != MaxY))
 			{
 				return false;
 			}
-		} XZM = Z2 + 2;
+		} XZM = Z2 + 1;
 		return (FoundFrameZP && FoundFrameZM);
 	}
 };

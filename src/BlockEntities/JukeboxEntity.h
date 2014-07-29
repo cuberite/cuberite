@@ -19,7 +19,7 @@ namespace Json
 
 // tolua_begin
 
-class cJukeboxEntity : 
+class cJukeboxEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
@@ -58,7 +58,7 @@ public:
 	static const char * GetClassStatic(void) { return "cJukeboxEntity"; }
 	
 	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void SendTo(cClientHandle &) override { };
+	virtual void SendTo(cClientHandle &) override {}
 
 private:
 	int m_Record;

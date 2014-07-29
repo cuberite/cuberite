@@ -70,7 +70,7 @@ public:
 				return false;
 			}
 		}  // switch (m_ItemType)
-		Minecart->Initialize(a_World);
+		Minecart->Initialize(*a_World);
 
 		if (!a_Player->IsGameModeCreative())
 		{
@@ -78,7 +78,7 @@ public:
 		}
 		return true;
 	}
-	
+
 } ;
 
 

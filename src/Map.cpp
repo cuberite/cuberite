@@ -200,8 +200,8 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 	int BlockX = m_CenterX + ((a_X - (m_Width  / 2)) * PixelWidth);
 	int BlockZ = m_CenterZ + ((a_Z - (m_Height / 2)) * PixelWidth);
 
-	int ChunkX, ChunkY, ChunkZ;
-	m_World->BlockToChunk(BlockX, 0, BlockZ, ChunkX, ChunkY, ChunkZ);
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 
 	int RelX = BlockX - (ChunkX * cChunkDef::Width);
 	int RelZ = BlockZ - (ChunkZ * cChunkDef::Width);
@@ -614,7 +614,7 @@ unsigned int cMap::GetNumPixels(void) const
 
 
 
-unsigned int cMap::GetNumDecorators(void) const
+size_t cMap::GetNumDecorators(void) const
 {
 	return m_Decorators.size();
 }

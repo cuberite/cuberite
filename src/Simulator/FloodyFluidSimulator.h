@@ -48,16 +48,13 @@ protected:
 	bool CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
 
 	/** Checks if the specified block should harden (Water/Lava interaction) and if so, converts it to a suitable block.
-	 *
-	 * Returns whether the block was changed or not.
-	 */
+	Returns whether the block was changed or not. */
 	bool HardenBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta);
 
-	/** Spread water to neighbors.
-	 *
-	 * May be overridden to provide more sophisticated algorithms.
-	 */
-	virtual void Spread(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta);
+	/** Spread fluid to XZ neighbors.
+	The coords are of the block currently being processed; a_NewMeta is the new meta for the new fluid block.
+	Descendants may overridde to provide more sophisticated algorithms. */
+	virtual void SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta);
 } ;
 
 

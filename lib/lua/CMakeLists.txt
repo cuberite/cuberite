@@ -11,12 +11,13 @@ file(GLOB SOURCE
 list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/src/lua.c" "${PROJECT_SOURCE_DIR}/src/luac.c")
 
 # add headers to MSVC project files:
-if (WIN32)
+if (MSVC)
 	file(GLOB HEADERS "src/*.h")
 	list(REMOVE_ITEM SOURCE "${PROJECT_SOURCE_DIR}/src/lua.h" "${PROJECT_SOURCE_DIR}/src/luac.h")
 	set(SOURCE ${SOURCE} ${HEADERS})
 	source_group("Sources" FILES ${SOURCE})
 endif()
+
 
 # Lua needs to be linked dynamically on Windows and statically on *nix, so that LuaRocks work
 if (WIN32)
@@ -47,7 +48,7 @@ if (WIN32)
 		)
 	endif()
 
-	set_target_properties(lua PROPERTIES OUTPUT_NAME "lua51")
+	set_target_properties(lua PROPERTIES OUTPUT_NAME "lua51" PREFIX "")
 
 	# NOTE: The DLL for each configuration is stored at the same place, thus overwriting each other.
 	# This is known, however such behavior is needed for LuaRocks - they always load "lua5.1.dll" or "lua51.dll"
@@ -56,6 +57,7 @@ if (WIN32)
 else()
 	add_library(lua ${SOURCE})
 endif()
+
 
 # Tell Lua what dynamic loader to use (for LuaRocks):
 if (UNIX)

@@ -17,13 +17,15 @@
 
 
 
-/////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cFloaterCallback
 class cFloaterCallback :
 	public cEntityCallback
 {
 public:
-	cFloaterCallback(void) : 
+	cFloaterCallback(void) :
 		m_CanPickup(false),
 		m_AttachedMobID(-1)
 	{
@@ -49,14 +51,19 @@ protected:
 	Vector3d m_Pos;
 } ;
 
-////////////////////////////////////////////////////////////////////////////
-// cSweepEntityCallback
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSweepEntityCallback:
+
 class cSweepEntityCallback :
 	public cEntityCallback
 {
 public:
 	cSweepEntityCallback(Vector3d a_PlayerPos) :
-	  m_PlayerPos(a_PlayerPos)
+		m_PlayerPos(a_PlayerPos)
 	{
 	}
 
@@ -70,6 +77,8 @@ public:
 protected:
 	Vector3d m_PlayerPos;
 } ;
+
+
 
 
 
@@ -106,19 +115,19 @@ public:
 			{
 				cItems Drops;
 				int ItemCategory = a_World->GetTickRandomNumber(99);
-				if (ItemCategory <= 4) // Treasures 5%
+				if (ItemCategory <= 4)  // Treasures 5%
 				{
 					int Treasure = a_World->GetTickRandomNumber(5);
 					switch (Treasure)
 					{
 						case 0:
 						{
-							Drops.Add(cItem(E_ITEM_BOW)); // TODO: Enchantments
+							Drops.Add(cItem(E_ITEM_BOW));  // TODO: Enchantments
 							break;
 						}
 						case 1:
 						{
-							Drops.Add(cItem(E_ITEM_BOOK)); // TODO: Enchanted book
+							Drops.Add(cItem(E_ITEM_BOOK));  // TODO: Enchanted book
 							break;
 						}
 						case 2:
@@ -142,6 +151,8 @@ public:
 							break;
 						}
 					}
+
+					a_Player->GetStatManager().AddValue(statTreasureFished, 1);
 				}
 				else if (ItemCategory <= 14)  // Junk 10%
 				{
@@ -190,6 +201,8 @@ public:
 					{
 						Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
 					}
+
+					a_Player->GetStatManager().AddValue(statJunkFished, 1);
 				}
 				else  // Fish
 				{
@@ -197,7 +210,7 @@ public:
 					if (FishType <= 1)  // Clownfish has a 2% chance of spawning
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
-					} 
+					}
 					else if (FishType <= 12)  // Pufferfish has a 13% chance of spawning
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
@@ -210,6 +223,8 @@ public:
 					{
 						Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
 					}
+
+					a_Player->GetStatManager().AddValue(statFishCaught, 1);
 				}
 
 				if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(*a_Player, Drops))
@@ -225,9 +240,13 @@ public:
 		else
 		{
 			cFloater * Floater = new cFloater(a_Player->GetPosX(), a_Player->GetStance(), a_Player->GetPosZ(), a_Player->GetLookVector() * 15, a_Player->GetUniqueID(), 100 + a_World->GetTickRandomNumber(800) - (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100));
-			Floater->Initialize(a_World);
+			Floater->Initialize(*a_World);
 			a_Player->SetIsFishing(true, Floater->GetUniqueID());
 		}
 		return true;
 	}
 } ;
+
+
+
+

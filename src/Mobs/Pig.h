@@ -15,10 +15,11 @@ class cPig :
 public:
 	cPig(void);
 
-	CLASS_PROTODEF(cPig);
+	CLASS_PROTODEF(cPig)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_CARROT); }
 

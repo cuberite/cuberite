@@ -40,6 +40,7 @@ public:
 		m_ItemDamage(0),
 		m_CustomName(""),
 		m_Lore(""),
+		m_RepairCost(0),
 		m_FireworkItem()
 	{
 	}
@@ -60,11 +61,12 @@ public:
 		m_Enchantments(a_Enchantments),
 		m_CustomName  (a_CustomName),
 		m_Lore        (a_Lore),
+		m_RepairCost  (0),
 		m_FireworkItem()
 	{
 		if (!IsValidItem(m_ItemType))
 		{
-			if (m_ItemType != E_BLOCK_AIR)
+			if ((m_ItemType != E_BLOCK_AIR) && (m_ItemType != E_ITEM_EMPTY))
 			{
 				LOGWARNING("%s: creating an invalid item type (%d), resetting to empty.", __FUNCTION__, a_ItemType);
 			}
@@ -72,6 +74,10 @@ public:
 		}
 	}
 	
+	
+	// The constructor is disabled in code, because the compiler generates it anyway,
+	// but it needs to stay because ToLua needs to generate the binding for it
+	#if 0
 	
 	/** Creates an exact copy of the item */
 	cItem(const cItem & a_CopyFrom) :
@@ -81,9 +87,12 @@ public:
 		m_Enchantments(a_CopyFrom.m_Enchantments),
 		m_CustomName  (a_CopyFrom.m_CustomName),
 		m_Lore        (a_CopyFrom.m_Lore),
+		m_RepairCost  (a_CopyFrom.m_RepairCost),
 		m_FireworkItem(a_CopyFrom.m_FireworkItem)
 	{
 	}
+	
+	#endif
 	
 	
 	void Empty(void)
@@ -94,6 +103,7 @@ public:
 		m_Enchantments.Clear();
 		m_CustomName = "";
 		m_Lore = "";
+		m_RepairCost = 0;
 		m_FireworkItem.EmptyData();
 	}
 	
@@ -103,6 +113,7 @@ public:
 		m_ItemType = E_ITEM_EMPTY;
 		m_ItemCount = 0;
 		m_ItemDamage = 0;
+		m_RepairCost = 0;
 	}
 	
 	
@@ -139,7 +150,7 @@ public:
 
 
 	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
-	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }	
+	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
@@ -173,25 +184,26 @@ public:
 	void FromJson(const Json::Value & a_Value);
 	
 	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
-	static bool IsEnchantable(short a_ItemType); // tolua_export
+	static bool IsEnchantable(short a_ItemType);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
-	int GetEnchantability(); // tolua_export
+	int GetEnchantability();  // tolua_export
 
 	/** Enchants the item using the specified number of XP levels.
 	Returns true if item enchanted, false if not. */
-	bool EnchantByXPLevels(int a_NumXPLevels); // tolua_export
+	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
 
 	// tolua_begin
 	
-	short         m_ItemType;
-	char          m_ItemCount;
-	short         m_ItemDamage;
-	cEnchantments m_Enchantments;
-	AString       m_CustomName;
-	AString       m_Lore;
+	short          m_ItemType;
+	char           m_ItemCount;
+	short          m_ItemDamage;
+	cEnchantments  m_Enchantments;
+	AString        m_CustomName;
+	AString        m_Lore;
 
-	cFireworkItem m_FireworkItem;
+	int            m_RepairCost;
+	cFireworkItem  m_FireworkItem;
 };
 // tolua_end
 
@@ -216,7 +228,7 @@ public:
 	void    Add   (const cItem & a_Item) {push_back(a_Item); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
-	size_t  Size  (void) {return size(); }
+	size_t  Size  (void) const { return size(); }
 	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
 
 	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)

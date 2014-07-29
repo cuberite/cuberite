@@ -35,7 +35,7 @@ struct cMonsterConfig::sMonsterConfigState
 
 
 cMonsterConfig::cMonsterConfig(void)
-	: m_pState( new sMonsterConfigState )
+	: m_pState( new sMonsterConfigState)
 {
 	Initialize();
 }
@@ -47,6 +47,7 @@ cMonsterConfig::cMonsterConfig(void)
 cMonsterConfig::~cMonsterConfig()
 {
 	delete m_pState;
+	m_pState = NULL;
 }
 
 

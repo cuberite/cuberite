@@ -3,8 +3,10 @@
 
 
 
-#define _USE_MATH_DEFINES // Enable non-standard math defines (MSVC)
+#define _USE_MATH_DEFINES  // Enable non-standard math defines (MSVC)
 #include <math.h>
+#include <list>
+#include <vector>
 
 
 
@@ -39,7 +41,6 @@ public:
 	template <typename _T>
 	Vector3(const Vector3<_T> * a_Rhs) : x(a_Rhs->x), y(a_Rhs->y), z(a_Rhs->z) {}
 	// tolua_begin
-
 
 	inline void Set(T a_x, T a_y, T a_z)
 	{
@@ -105,18 +106,18 @@ public:
 
 	inline bool Equals(const Vector3<T> & a_Rhs) const
 	{
-		return x == a_Rhs.x && y == a_Rhs.y && z == a_Rhs.z;
+		// Perform a bitwise comparison of the contents - we want to know whether this object is exactly equal
+		// To perform EPS-based comparison, use the EqualsEps() function
+		return (
+			(memcmp(&x, &a_Rhs.x, sizeof(x)) == 0) &&
+			(memcmp(&y, &a_Rhs.y, sizeof(y)) == 0) &&
+			(memcmp(&z, &a_Rhs.z, sizeof(z)) == 0)
+		);
 	}
-
-	inline bool operator == (const Vector3<T> & a_Rhs) const
+	
+	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
 	{
-		return Equals(a_Rhs);
-	}
-
-	inline bool operator < (const Vector3<T> & a_Rhs)
-	{
-		// return (x < a_Rhs.x) && (y < a_Rhs.y) && (z < a_Rhs.z); ?
-		return (x < a_Rhs.x) || (x == a_Rhs.x && y < a_Rhs.y) || (x == a_Rhs.x && y == a_Rhs.y && z < a_Rhs.z);
+		return (Abs(x - a_Rhs.x) < a_Eps) && (Abs(y - a_Rhs.y) < a_Eps) && (Abs(z - a_Rhs.z) < a_Eps);
 	}
 
 	inline void Move(T a_X, T a_Y, T a_Z)
@@ -133,7 +134,37 @@ public:
 		z += a_Diff.z;
 	}
 
+	/** Runs each value of the vector through std::floor() */
+	inline Vector3<int> Floor(void) const
+	{
+		return Vector3<int>(
+			(int)floor(x),
+			(int)floor(y),
+			(int)floor(z)
+		);
+	}
+
 	// tolua_end
+
+	inline bool operator != (const Vector3<T> & a_Rhs) const
+	{
+		return !Equals(a_Rhs);
+	}
+
+	inline bool operator == (const Vector3<T> & a_Rhs) const
+	{
+		return Equals(a_Rhs);
+	}
+
+	inline bool operator > (const Vector3<T> & a_Rhs) const
+	{
+		return (SqrLength() > a_Rhs.SqrLength());
+	}
+
+	inline bool operator < (const Vector3<T> & a_Rhs) const
+	{
+		return (SqrLength() < a_Rhs.SqrLength());
+	}
 
 	inline void operator += (const Vector3<T> & a_Rhs)
 	{
@@ -163,8 +194,16 @@ public:
 		z *= a_v;
 	}
 
-	// tolua_begin
+	inline Vector3<T> & operator = (const Vector3<T> & a_Rhs)
+	{
+		x = a_Rhs.x;
+		y = a_Rhs.y;
+		z = a_Rhs.z;
+		return *this;
+	}
 
+	// tolua_begin
+	
 	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
 	{
 		return Vector3<T>(
@@ -217,7 +256,7 @@ public:
 	*/
 	inline double LineCoeffToXYPlane(const Vector3<T> & a_OtherEnd, T a_Z) const
 	{
-		if (abs(z - a_OtherEnd.z) < EPS)
+		if (Abs(z - a_OtherEnd.z) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -232,7 +271,7 @@ public:
 	*/
 	inline double LineCoeffToXZPlane(const Vector3<T> & a_OtherEnd, T a_Y) const
 	{
-		if (abs(y - a_OtherEnd.y) < EPS)
+		if (Abs(y - a_OtherEnd.y) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -247,7 +286,7 @@ public:
 	*/
 	inline double LineCoeffToYZPlane(const Vector3<T> & a_OtherEnd, T a_X) const
 	{
-		if (abs(x - a_OtherEnd.x) < EPS)
+		if (Abs(x - a_OtherEnd.x) < EPS)
 		{
 			return NO_INTERSECTION;
 		}
@@ -260,9 +299,27 @@ public:
 
 	/** Return value of LineCoeffToPlane() if the line is parallel to the plane. */
 	static const double NO_INTERSECTION;
+	
+protected:
+
+	/** Returns the absolute value of the given argument.
+	Templatized because the standard library differentiates between abs() and fabs(). */
+	static T Abs(T a_Value)
+	{
+		return (a_Value < 0) ? -a_Value : a_Value;
+	}
 
 };
 // tolua_end
+
+
+
+
+
+template <> inline Vector3<int> Vector3<int>::Floor(void) const
+{
+	return *this;
+}
 
 
 

@@ -72,7 +72,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 			for (int explosiontag = a_NBT.GetFirstChild(a_TagIdx); explosiontag >= 0; explosiontag = a_NBT.GetNextSibling(explosiontag))
 			{
 				eTagType TagType = a_NBT.GetType(explosiontag);
-				if (TagType == TAG_Byte) // Custon name tag
+				if (TagType == TAG_Byte)  // Custon name tag
 				{
 					AString ExplosionName = a_NBT.GetName(explosiontag);
 
@@ -96,32 +96,32 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					if (ExplosionName == "Colors")
 					{
 						// Divide by four as data length returned in bytes
-						int DataLength = a_NBT.GetDataLength(explosiontag);
+						size_t DataLength = a_NBT.GetDataLength(explosiontag);
 						// round to the next highest multiple of four
-						DataLength -= DataLength % 4; 
+						DataLength -= DataLength % 4;
 						if (DataLength == 0)
 						{
 							continue;
 						}
 
 						const char * ColourData = (a_NBT.GetData(explosiontag));
-						for (int i = 0; i < DataLength; i += 4 /* Size of network int*/)
+						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
 						}
 					}
 					else if (ExplosionName == "FadeColors")
 					{
-						int DataLength = a_NBT.GetDataLength(explosiontag) / 4;
+						size_t DataLength = a_NBT.GetDataLength(explosiontag) / 4;
 						// round to the next highest multiple of four
-						DataLength -= DataLength % 4; 
+						DataLength -= DataLength % 4;
 						if (DataLength == 0)
 						{
 							continue;
 						}
 
 						const char * FadeColourData = (a_NBT.GetData(explosiontag));
-						for (int i = 0; i < DataLength; i += 4 /* Size of network int*/)
+						for (size_t i = 0; i < DataLength; i += 4)
 						{
 							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));
 						}
@@ -135,7 +135,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 			for (int fireworkstag = a_NBT.GetFirstChild(a_TagIdx); fireworkstag >= 0; fireworkstag = a_NBT.GetNextSibling(fireworkstag))
 			{
 				eTagType TagType = a_NBT.GetType(fireworkstag);
-				if (TagType == TAG_Byte) // Custon name tag
+				if (TagType == TAG_Byte)  // Custon name tag
 				{
 					if (a_NBT.GetName(fireworkstag) == "Flight")
 					{

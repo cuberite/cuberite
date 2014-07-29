@@ -25,15 +25,6 @@ cSocket::cSocket(xSocket a_Socket)
 
 
 
-cSocket::~cSocket()
-{
-	// Do NOT close the socket; this class is an API wrapper, not a RAII!
-}
-
-
-
-
-
 cSocket::operator cSocket::xSocket() const
 {
 	return m_Socket;
@@ -138,7 +129,7 @@ int cSocket::WSAStartup(void)
 #ifdef _WIN32
 	WSADATA wsaData;
 	memset(&wsaData, 0, sizeof(wsaData));
-	return ::WSAStartup(MAKEWORD(2, 2),&wsaData);
+	return ::WSAStartup(MAKEWORD(2, 2), &wsaData);
 #else
 	return 0;
 #endif
@@ -244,7 +235,7 @@ cSocket cSocket::AcceptIPv6(void)
 			// Windows XP doesn't have inet_ntop, so we need to improvise. And MSVC has different headers than GCC
 			#ifdef _MSC_VER
 				// MSVC version
-				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x",
 					from.sin6_addr.u.Word[0],
 					from.sin6_addr.u.Word[1],
 					from.sin6_addr.u.Word[2],
@@ -256,7 +247,7 @@ cSocket cSocket::AcceptIPv6(void)
 				);
 			#else  // _MSC_VER
 				// MinGW
-				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x", 
+				Printf(SClient.m_IPString, "%x:%x:%x:%x:%x:%x:%x:%x",
 					from.sin6_addr.s6_addr16[0],
 					from.sin6_addr.s6_addr16[1],
 					from.sin6_addr.s6_addr16[2],
@@ -295,7 +286,7 @@ bool cSocket::ConnectToLocalhostIPv4(unsigned short a_Port)
 
 bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Port)
 {
-	// First try IP Address string to hostent conversion, because it's faster
+	// First try IP Address string to hostent conversion, because it's faster and local:
 	unsigned long addr = inet_addr(a_HostNameOrAddr.c_str());
 	if (addr == INADDR_NONE)
 	{
@@ -307,10 +298,16 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 			CloseSocket();
 			return false;
 		}
-		// Should be optimised to a single word copy
 		memcpy(&addr, hp->h_addr, hp->h_length);
 	}
 
+	// If the socket is not created yet, create one:
+	if (!IsValid())
+	{
+		m_Socket = socket((int)IPv4, SOCK_STREAM, 0);
+	}
+	
+	// Connect the socket:
 	sockaddr_in server;
 	server.sin_addr.s_addr = addr;
 	server.sin_family = AF_INET;
@@ -322,18 +319,18 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 
 
 
-int cSocket::Receive(char * a_Buffer, unsigned int a_Length, unsigned int a_Flags)
+int cSocket::Receive(char * a_Buffer, size_t a_Length, unsigned int a_Flags)
 {
-	return recv(m_Socket, a_Buffer, a_Length, a_Flags);
+	return recv(m_Socket, a_Buffer, (int)a_Length, a_Flags);
 }
 
 
 
 
 
-int cSocket::Send(const char * a_Buffer, unsigned int a_Length)
+int cSocket::Send(const char * a_Buffer, size_t a_Length)
 {
-	return send(m_Socket, a_Buffer, a_Length, MSG_NOSIGNAL);
+	return send(m_Socket, a_Buffer, (int)a_Length, MSG_NOSIGNAL);
 }
 
 

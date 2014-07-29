@@ -55,13 +55,13 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // The following template has been modified from code available at
 // http://www.codeproject.com/Articles/1847/C-Wrappers-for-the-Expat-XML-Parser
 // It uses templates to remove the virtual function call penalty (both size and speed) for each callback
 
 /* Usage:
-1, Declare a subclass: 
+1, Declare a subclass:
 	class CMyParser : public CExpatImpl<CMyParser>
 2, Declare handlers that you want in that subclass:
 	void CMyParser::OnEndElement(const XML_Char * iTagName);
@@ -318,7 +318,7 @@ protected:
 	void EnableEndDoctypeDeclHandler (bool fEnable = true)
 	{
 		assert (m_p != NULL);
-		XML_SetEndDoctypeDeclHandler (m_p, 
+		XML_SetEndDoctypeDeclHandler (m_p,
 			fEnable ? EndDoctypeDeclHandler : NULL);
 	}
 
@@ -336,7 +336,7 @@ public:
 
 	// @cmember Get last error
 
-	enum XML_Error GetErrorCode () 
+	enum XML_Error GetErrorCode ()
 	{
 		assert (m_p != NULL);
 		return XML_GetErrorCode (m_p);
@@ -344,7 +344,7 @@ public:
 
 	// @cmember Get the current byte index
 
-	long GetCurrentByteIndex () 
+	long GetCurrentByteIndex ()
 	{
 		assert (m_p != NULL);
 		return XML_GetCurrentByteIndex (m_p);
@@ -352,7 +352,7 @@ public:
 
 	// @cmember Get the current line number
 
-	int GetCurrentLineNumber () 
+	int GetCurrentLineNumber ()
 	{
 		assert (m_p != NULL);
 		return XML_GetCurrentLineNumber (m_p);
@@ -360,7 +360,7 @@ public:
 
 	// @cmember Get the current column number
 
-	int GetCurrentColumnNumber () 
+	int GetCurrentColumnNumber ()
 	{
 		assert (m_p != NULL);
 		return XML_GetCurrentColumnNumber (m_p);
@@ -368,7 +368,7 @@ public:
 
 	// @cmember Get the current byte count
 
-	int GetCurrentByteCount () 
+	int GetCurrentByteCount ()
 	{
 		assert (m_p != NULL);
 		return XML_GetCurrentByteCount (m_p);
@@ -384,7 +384,7 @@ public:
 
 	// @cmember Get last error string
 
-	const XML_LChar *GetErrorString () 
+	const XML_LChar *GetErrorString ()
 	{
 		return XML_ErrorString (GetErrorCode ());
 	}
@@ -411,7 +411,7 @@ public:
 
 	// @cmember Get last error string
 
-	static const XML_LChar *GetErrorString (enum XML_Error nError) 
+	static const XML_LChar *GetErrorString (enum XML_Error nError)
 	{
 		return XML_ErrorString (nError);
 	}
@@ -443,7 +443,7 @@ public:
 
 	// @cmember Processing instruction handler
 
-	void OnProcessingInstruction (const XML_Char *pszTarget, 
+	void OnProcessingInstruction (const XML_Char *pszTarget,
 		const XML_Char *pszData)
 	{
 		return;
@@ -495,7 +495,7 @@ public:
 	
 	// @cmember Start namespace declaration handler
 	
-	void OnStartNamespaceDecl (const XML_Char *pszPrefix, 
+	void OnStartNamespaceDecl (const XML_Char *pszPrefix,
 		const XML_Char *pszURI)
 	{
 		return;
@@ -518,7 +518,7 @@ public:
 
 	// @cmember Start DOCTYPE declaration handler
 
-	void OnStartDoctypeDecl (const XML_Char *pszDoctypeName, 
+	void OnStartDoctypeDecl (const XML_Char *pszDoctypeName,
 		const XML_Char *pszSysID, const XML_Char *pszPubID,
 		bool fHasInternalSubset)
 	{
@@ -607,7 +607,7 @@ protected:
 
 	// @cmember Default wrapper
 	
-	static void __cdecl DefaultHandler (void *pUserData, 
+	static void __cdecl DefaultHandler (void *pUserData,
 		const XML_Char *pszData, int nLength)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
@@ -616,12 +616,12 @@ protected:
 	
 	// @cmember External entity ref wrapper
 	
-	static int __cdecl ExternalEntityRefHandler (void *pUserData, 
-		const XML_Char *pszContext, const XML_Char *pszBase, 
+	static int __cdecl ExternalEntityRefHandler (void *pUserData,
+		const XML_Char *pszContext, const XML_Char *pszBase,
 		const XML_Char *pszSystemID, const XML_Char *pszPublicID)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
-		return pThis ->OnExternalEntityRef (pszContext, 
+		return pThis ->OnExternalEntityRef (pszContext,
 			pszBase, pszSystemID, pszPublicID) ? 1 : 0;
 	}
 	
@@ -660,12 +660,12 @@ protected:
 	// @cmember Start Doctype declaration wrapper
 
 	static void __cdecl StartDoctypeDeclHandler (
-		void *pUserData, const XML_Char *pszDoctypeName, const XML_Char *pszSysID, 
+		void *pUserData, const XML_Char *pszDoctypeName, const XML_Char *pszSysID,
 		const XML_Char *pszPubID, int nHasInternalSubset
 	)
 	{
 		_T *pThis = static_cast <_T *> ((CExpatImpl <_T> *) pUserData);
-		pThis ->OnStartDoctypeDecl (pszDoctypeName, pszSysID, 
+		pThis ->OnStartDoctypeDecl (pszDoctypeName, pszSysID,
 			pszPubID, nHasInternalSubset != 0);
 	}
 

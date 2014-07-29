@@ -160,7 +160,7 @@ bool cFurnaceEntity::LoadFromJson(const Json::Value & a_Value)
 
 
 
-void cFurnaceEntity::SaveToJson( Json::Value& a_Value )
+void cFurnaceEntity::SaveToJson( Json::Value& a_Value)
 {
 	a_Value["x"] = m_PosX;
 	a_Value["y"] = m_PosY;

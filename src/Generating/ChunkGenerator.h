@@ -44,7 +44,7 @@ public:
 	{
 	public:
 		cGenerator(cChunkGenerator & a_ChunkGenerator);
-		virtual ~cGenerator() {} ;  // Force a virtual destructor
+		virtual ~cGenerator() {}  // Force a virtual destructor
 
 		/// Called to initialize the generator on server startup.
 		virtual void Initialize(cIniFile & a_IniFile);

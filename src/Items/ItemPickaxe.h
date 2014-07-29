@@ -8,6 +8,7 @@
 class cItemPickaxeHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemPickaxeHandler(int a_ItemType)
 	: cItemHandler(a_ItemType)
@@ -17,7 +18,7 @@ public:
 
 	char PickaxeLevel()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
 			case E_ITEM_WOODEN_PICKAXE:  return 1;
 			case E_ITEM_GOLD_PICKAXE:    return 1;
@@ -31,7 +32,7 @@ public:
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_OBSIDIAN:
 			{
@@ -76,12 +77,26 @@ public:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_BRICK:
 			case E_BLOCK_COBBLESTONE_STAIRS:
+			case E_BLOCK_COBBLESTONE_WALL:
 			case E_BLOCK_STONE_BRICK_STAIRS:
 			case E_BLOCK_NETHER_BRICK_STAIRS:
 			case E_BLOCK_CAULDRON:
 			{
 				return PickaxeLevel() >= 1;
 			}
+		}
+		return super::CanHarvestBlock(a_BlockType);
+	}
+
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	{
+		switch (m_ItemType)
+		{
+			case E_ITEM_WOODEN_PICKAXE:  return (a_ItemType == E_BLOCK_PLANKS);
+			case E_ITEM_STONE_PICKAXE:   return (a_ItemType == E_BLOCK_COBBLESTONE);
+			case E_ITEM_IRON_PICKAXE:    return (a_ItemType == E_ITEM_IRON);
+			case E_ITEM_GOLD_PICKAXE:    return (a_ItemType == E_ITEM_GOLD);
+			case E_ITEM_DIAMOND_PICKAXE: return (a_ItemType == E_ITEM_DIAMOND);
 		}
 		return false;
 	}

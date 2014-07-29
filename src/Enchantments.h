@@ -40,7 +40,7 @@ Serialization will never put zero-level enchantments into the stringspec and wil
 class cEnchantments
 {
 public:
-	/** Individual enchantment IDs, corresponding to their NBT IDs ( http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs )
+	/** Individual enchantment IDs, corresponding to their NBT IDs: http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs
 	*/
 	
 	enum
@@ -83,6 +83,9 @@ public:
 	
 	/** Adds enchantments in the stringspec; if a specified enchantment already exists, overwrites it */
 	void AddFromString(const AString & a_StringSpec);
+	
+	/** Get the count of enchantments */
+	size_t Count(void);
 	
 	/** Serializes all the enchantments into a string */
 	AString ToString(void) const;

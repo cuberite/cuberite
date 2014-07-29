@@ -28,7 +28,7 @@ enum ENUM_NOTE_INSTRUMENTS
 
 // tolua_begin
 
-class cNoteEntity : 
+class cNoteEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
@@ -52,7 +52,7 @@ public:
 	// tolua_end
 	
 	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void SendTo(cClientHandle &) override { };
+	virtual void SendTo(cClientHandle &) override {}
 
 	static const char * GetClassStatic(void) { return "cNoteEntity"; }
 

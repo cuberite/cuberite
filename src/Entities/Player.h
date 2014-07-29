@@ -7,6 +7,8 @@
 #include "../World.h"
 #include "../ClientHandle.h"
 
+#include "../Statistics.h"
+
 
 
 
@@ -39,13 +41,14 @@ public:
 	
 
 	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
+	
 	virtual ~cPlayer();
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); };
+	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the curently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
@@ -114,16 +117,22 @@ public:
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
-	void SetTouchGround( bool a_bTouchGround );
-	inline void SetStance( const double a_Stance ) { m_Stance = a_Stance; }
-	double GetEyeHeight(void) const;													// tolua_export
-	Vector3d GetEyePosition(void) const;												// tolua_export
+	void SetTouchGround( bool a_bTouchGround);
+	inline void SetStance( const double a_Stance) { m_Stance = a_Stance; }
+	double GetEyeHeight(void) const;  // tolua_export
+	Vector3d GetEyePosition(void) const;  // tolua_export
 	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
 	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
-	inline cInventory &       GetInventory(void)       { return m_Inventory; }	// tolua_export
+	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
+
+	/** Gets the contents of the player's associated enderchest */
+	cItemGrid & GetEnderChestContents(void) { return m_EnderChestContents; }
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
+
+	/** Returns whether the player is climbing (ladders, vines etc.) */
+	bool IsClimbing(void) const;
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
@@ -165,7 +174,7 @@ public:
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, NULL if none */
-	cTeam * GetTeam(void) { return m_Team; } // tolua_export
+	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
 	/** Sets the player team, NULL if none */
 	void SetTeam(cTeam * a_Team);
@@ -174,14 +183,24 @@ public:
 	cTeam * UpdateTeam(void);
 
 	// tolua_end
+
+	/** Return the associated statistic and achievement manager. */
+	cStatManager & GetStatManager() { return m_Stats; }
+
+	/** Awards the player an achievement.
+	If all prerequisites are met, this method will award the achievement and will broadcast a chat message.
+	If the achievement has been already awarded to the player, this method will just increment the stat counter.
+	Returns the _new_ stat value. (0 = Could not award achievement) */
+	unsigned int AwardAchievement(const eStatistic a_Ach);
 	
 	void SetIP(const AString & a_IP);
 	
 	// Sets the current gamemode, doesn't check validity, doesn't send update packets to client
 	void LoginSetGameMode(eGameMode a_GameMode);
 
-	/** Forces the player to move in the given direction. */
-	void ForceSetSpeed(const Vector3d & a_Speed); // tolua_export
+	/** Forces the player to move in the given direction.
+	@deprecated Use SetSpeed instead. */
+	void ForceSetSpeed(const Vector3d & a_Speed);  // tolua_export
 
 	/** Tries to move to a new position, with attachment-related checks (y == -999) */
 	void MoveTo(const Vector3d & a_NewPos);  // tolua_export
@@ -220,15 +239,15 @@ public:
 	typedef std::list< std::string > StringList;
 
 	/** Adds a player to existing group or creates a new group when it doesn't exist */
-	void AddToGroup( const AString & a_GroupName );							// tolua_export
+	void AddToGroup( const AString & a_GroupName);  // tolua_export
 	
 	/** Removes a player from the group, resolves permissions and group inheritance (case sensitive) */
-	void RemoveFromGroup( const AString & a_GroupName );					// tolua_export
+	void RemoveFromGroup( const AString & a_GroupName);  // tolua_export
 	
-	bool HasPermission( const AString & a_Permission );						// tolua_export
-	const GroupList & GetGroups() { return m_Groups; }						// >> EXPORTED IN MANUALBINDINGS <<
-	StringList GetResolvedPermissions();									// >> EXPORTED IN MANUALBINDINGS <<
-	bool IsInGroup( const AString & a_Group );								// tolua_export
+	bool HasPermission( const AString & a_Permission);  // tolua_export
+	const GroupList & GetGroups() { return m_Groups; }  // >> EXPORTED IN MANUALBINDINGS <<
+	StringList GetResolvedPermissions();  // >> EXPORTED IN MANUALBINDINGS <<
+	bool IsInGroup( const AString & a_Group);  // tolua_export
 
 	// tolua_begin
 	
@@ -246,13 +265,12 @@ public:
 	void TossPickup(const cItem & a_Item);
 
 	/** Heals the player by the specified amount of HPs (positive only); sends health update */
-	void Heal(int a_Health);
+	virtual void Heal(int a_Health) override;
 	
 	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
 	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
 	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
-	int    GetFoodPoisonedTicksRemaining(void) const { return m_FoodPoisonedTicksRemaining; }
 	
 	/** Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore */
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
@@ -261,7 +279,6 @@ public:
 	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
 	void SetFoodTickTimer             (int a_FoodTickTimer);
 	void SetFoodExhaustionLevel       (double a_FoodExhaustionLevel);
-	void SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining);
 
 	/** Adds to FoodLevel and FoodSaturationLevel, returns true if any food has been consumed, false if player "full" */
 	bool Feed(int a_Food, double a_Saturation);
@@ -272,7 +289,7 @@ public:
 		m_FoodExhaustionLevel += a_Exhaustion;
 	}
 	
-	/** Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two */
+	/** Starts the food poisoning for the specified amount of ticks */
 	void FoodPoison(int a_NumTicks);
 	
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
@@ -305,29 +322,47 @@ public:
 	/** Aborts the current eating operation */
 	void AbortEating(void);
 	
-	virtual void KilledBy(cEntity * a_Killer) override;
-	
-	void Respawn(void);															// tolua_export
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	void SetVisible( bool a_bVisible );										// tolua_export
-	bool IsVisible(void) const { return m_bVisible; }									// tolua_export
+	virtual void Killed(cEntity * a_Victim) override;
 
-	bool MoveToWorld(const char * a_WorldName);  // tolua_export
+	void Respawn(void);  // tolua_export
 
+	void SetVisible( bool a_bVisible);  // tolua_export
+	bool IsVisible(void) const { return m_bVisible; }  // tolua_export
+
+	/** Moves the player to the specified world.
+	Returns true if successful, false on failure (world not found). */
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn) override;
+
+	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
-	bool LoadFromDisk(void);
-	void LoadPermissionsFromDisk(void);											// tolua_export
+
+	typedef cWorld * cWorldPtr;
+	
+	/** Loads the player data from the disk file
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
+	Returns true on success, false on failure
+	*/
+	bool LoadFromDisk(cWorldPtr & a_World);
+	
+	/** Loads the player data from the specified file
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
+	Returns true on success, false on failure
+	*/
+	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
+	
+	void LoadPermissionsFromDisk(void);  // tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
-	void UseEquippedItem(void);
+	void UseEquippedItem(int a_Amount = 1);
 	
 	void SendHealth(void);
 
 	void SendExperience(void);
 	
-	// In UI windows, the item that the player is dragging:
-	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }
+	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }
 	
 	// In UI windows, when inventory-painting:
@@ -375,14 +410,26 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
+	/** Gets the last position that the player slept in
+	This is initialised to the world spawn point if the player has not slept in a bed as of yet
+	*/
+	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
+
+	/** Sets the player's bed (home) position */
+	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+
+	/** Update movement-related statistics. */
+	void UpdateMovementStats(const Vector3d & a_DeltaPos);
+
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
+
 	// tolua_end
 
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
-	virtual bool IsRclking  (void) const { return IsEating(); }
+	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
 
 	virtual void Detach(void);
 	
@@ -398,7 +445,7 @@ protected:
 	AString m_LoadedWorldName;
 
 	/** Xp Level stuff */
-	enum 
+	enum
 	{
 		XP_TO_LEVEL15 = 255,
 		XP_PER_LEVEL_TO15 = 17,
@@ -415,24 +462,27 @@ protected:
 	double m_FoodSaturationLevel;
 	
 	/** Count-up to the healing or damaging action, based on m_FoodLevel */
-	int   m_FoodTickTimer;
+	int m_FoodTickTimer;
 	
 	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
 	double m_FoodExhaustionLevel;
-	
-	/** Number of ticks remaining for the foodpoisoning effect; zero if not foodpoisoned */
-	int m_FoodPoisonedTicksRemaining;
-	
-	/** Last position that has been recorded for food-related processing: */
-	Vector3d m_LastFoodPos;
 	
 	float m_LastJumpHeight;
 	float m_LastGroundHeight;
 	bool m_bTouchGround;
 	double m_Stance;
+
+	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
 	cInventory m_Inventory;
+
+	/** An item grid that stores the player specific enderchest contents */
+	cItemGrid m_EnderChestContents;
+
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
+
+	/** The player's last saved bed position */
+	Vector3i m_LastBedPos;
 
 	char m_Color;
 
@@ -443,7 +493,6 @@ protected:
 	cItem m_DraggingItem;
 
 	long long m_LastPlayerListTime;
-	static const unsigned short PLAYER_LIST_TIME_MS = 1000; // 1000 = once per second
 
 	cClientHandle * m_ClientHandle;
 	
@@ -490,7 +539,27 @@ protected:
 
 	cTeam * m_Team;
 
+	cStatManager m_Stats;
 
+	/** Flag representing whether the player is currently in a bed
+	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
+	bool m_bIsInBed;
+
+	/** How long till the player's inventory will be saved
+	Default save interval is #defined in PLAYER_INVENTORY_SAVE_INTERVAL */
+	unsigned int m_TicksUntilNextSave;
+
+	/** Flag used by food handling system to determine whether a teleport has just happened
+	Will not apply food penalties if found to be true; will set to false after processing
+	*/
+	bool m_bIsTeleporting;
+	
+	/** The UUID of the player, as read from the ClientHandle.
+	If no ClientHandle is given, the UUID is initialized to empty. */
+	AString m_UUID;
+
+	/** Sets the speed and sends it to the client, so that they are forced to move so. */
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
 	void ResolvePermissions(void);
 	void ResolveGroups(void);
@@ -498,7 +567,7 @@ protected:
 	virtual void Destroyed(void);
 
 	/** Filters out damage for creative mode/friendly fire */
-	virtual void DoTakeDamage(TakeDamageInfo & TDI) override;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 
 	/** Stops players from burning in creative mode */
 	virtual void TickBurning(cChunk & a_Chunk) override;
@@ -509,14 +578,16 @@ protected:
 	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
 	void HandleFloater(void);
 
+	/** Tosses a list of items. */
+	void TossItems(const cItems & a_Items);
+
 	/** Adds food exhaustion based on the difference between Pos and LastPos, sprinting status and swimming (in water block) */
 	void ApplyFoodExhaustionFromMovement();
 
-	/** Flag representing whether the player is currently in a bed
-	Set by a right click on unoccupied bed, unset by a time fast forward or teleport */
-	bool m_bIsInBed;
-
-} ; // tolua_export
+	/** Returns the filename for the player data based on the UUID given.
+	This can be used both for online and offline UUIDs. */
+	AString GetUUIDFileName(const AString & a_UUID);
+} ;  // tolua_export
 
 
 

@@ -42,7 +42,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 			MoveToPosition(m_Target->GetPosition());
 		}
 	}
-} 
+}
 
 
 
@@ -95,12 +95,14 @@ void cAggressiveMonster::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
 
-	if ((m_Target != NULL) && (m_AttackInterval > 3.0))
+	if ((m_Target == NULL) || (m_AttackInterval < 3.0))
 	{
-		// Setting this higher gives us more wiggle room for attackrate
-		m_AttackInterval = 0.0;
-		m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+		return;
 	}
+	
+	// Setting this higher gives us more wiggle room for attackrate
+	m_AttackInterval = 0.0;
+	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
 }
 
 
@@ -108,14 +110,13 @@ void cAggressiveMonster::Attack(float a_Dt)
 
 bool cAggressiveMonster::IsMovingToTargetPosition()
 {
-	static const float epsilon = 0.000000000001f;
 	// Difference between destination x and target x is negligible (to 10^-12 precision)
-	if (fabsf((float)m_FinalDestination.x - (float)m_Target->GetPosX()) < epsilon)
+	if (fabsf((float)m_FinalDestination.x - (float)m_Target->GetPosX()) < std::numeric_limits<float>::epsilon())
 	{
 		return false;
 	}
 	// Difference between destination z and target z is negligible (to 10^-12 precision)
-	else if (fabsf((float)m_FinalDestination.z - (float)m_Target->GetPosZ()) > epsilon)
+	else if (fabsf((float)m_FinalDestination.z - (float)m_Target->GetPosZ()) > std::numeric_limits<float>::epsilon())
 	{
 		return false;
 	}

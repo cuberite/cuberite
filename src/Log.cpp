@@ -17,7 +17,7 @@
 
 cLog* cLog::s_Log = NULL;
 
-cLog::cLog(const AString & a_FileName )
+cLog::cLog(const AString & a_FileName)
 	: m_File(NULL)
 {
 	s_Log = this;
@@ -25,7 +25,7 @@ cLog::cLog(const AString & a_FileName )
 	// create logs directory
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 
-	OpenLog((FILE_IO_PREFIX + AString("logs/") + a_FileName).c_str() );
+	OpenLog((FILE_IO_PREFIX + AString("logs/") + a_FileName).c_str());
 }
 
 
@@ -59,7 +59,7 @@ cLog * cLog::GetInstance()
 
 void cLog::CloseLog()
 {
-	if( m_File )
+	if (m_File)
 		fclose (m_File);
 	m_File = 0;
 }
@@ -68,13 +68,13 @@ void cLog::CloseLog()
 
 
 
-void cLog::OpenLog( const char* a_FileName )
+void cLog::OpenLog( const char* a_FileName)
 {
-	if(m_File) fclose (m_File);
+	if (m_File) fclose (m_File);
 	#ifdef _MSC_VER
-	fopen_s( &m_File, a_FileName, "a+" );
+	fopen_s( &m_File, a_FileName, "a+");
 	#else
-	m_File = fopen(a_FileName, "a+" );
+	m_File = fopen(a_FileName, "a+");
 	#endif
 }
 
@@ -85,11 +85,11 @@ void cLog::OpenLog( const char* a_FileName )
 void cLog::ClearLog()
 {
 	#ifdef _MSC_VER
-	if( fopen_s( &m_File, "log.txt", "w" ) == 0)
+	if (fopen_s( &m_File, "log.txt", "w") == 0)
 		fclose (m_File);
 	#else
-	m_File = fopen("log.txt", "w" );
-	if( m_File )
+	m_File = fopen("log.txt", "w");
+	if (m_File)
 		fclose (m_File);
 	#endif
 	m_File = NULL;
@@ -105,15 +105,15 @@ void cLog::Log(const char * a_Format, va_list argList)
 	AppendVPrintf(Message, a_Format, argList);
 
 	time_t rawtime;
-	time ( &rawtime );
+	time ( &rawtime);
 	
 	struct tm* timeinfo;
 #ifdef _MSC_VER
 	struct tm timeinforeal;
 	timeinfo = &timeinforeal;
-	localtime_s(timeinfo, &rawtime );
+	localtime_s(timeinfo, &rawtime);
 #else
-	timeinfo = localtime( &rawtime );
+	timeinfo = localtime( &rawtime);
 #endif
 
 	AString Line;
@@ -130,9 +130,9 @@ void cLog::Log(const char * a_Format, va_list argList)
 
 	// Print to console:
 #if defined(ANDROID_NDK)
-	//__android_log_vprint(ANDROID_LOG_ERROR,"MCServer", a_Format, argList);
-	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str() );
-	//CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line );
+	// __android_log_vprint(ANDROID_LOG_ERROR, "MCServer", a_Format, argList);
+	__android_log_print(ANDROID_LOG_ERROR, "MCServer", "%s", Line.c_str());
+	// CallJavaFunction_Void_String(g_JavaThread, "AddToLog", Line);
 #else
 	printf("%s", Line.c_str());
 #endif

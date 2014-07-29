@@ -45,7 +45,8 @@ AString cObjective::TypeToString(eType a_Type)
 
 cObjective::eType cObjective::StringToType(const AString & a_Name)
 {
-	static struct {
+	static struct
+	{
 		eType m_Type;
 		const char * m_String;
 	} TypeMap [] =
@@ -197,15 +198,18 @@ void cObjective::SendTo(cClientHandle & a_Client)
 
 
 
-cTeam::cTeam(const AString & a_Name, const AString & a_DisplayName,
-	     const AString & a_Prefix, const AString & a_Suffix)
+cTeam::cTeam(
+	const AString & a_Name, const AString & a_DisplayName,
+	const AString & a_Prefix, const AString & a_Suffix
+)
 	: m_AllowsFriendlyFire(true)
 	, m_CanSeeFriendlyInvisible(false)
 	, m_DisplayName(a_DisplayName)
 	, m_Name(a_Name)
 	, m_Prefix(a_Prefix)
 	, m_Suffix(a_Suffix)
-{}
+{
+}
 
 
 
@@ -261,7 +265,7 @@ void cTeam::SetDisplayName(const AString & a_Name)
 
 
 
-unsigned int cTeam::GetNumPlayers(void) const
+size_t cTeam::GetNumPlayers(void) const
 {
 	return m_Players.size();
 }
@@ -569,7 +573,7 @@ void cScoreboard::SendTo(cClientHandle & a_Client)
 
 
 
-unsigned int cScoreboard::GetNumObjectives(void) const
+size_t cScoreboard::GetNumObjectives(void) const
 {
 	return m_Objectives.size();
 }
@@ -578,7 +582,7 @@ unsigned int cScoreboard::GetNumObjectives(void) const
 
 
 
-unsigned int cScoreboard::GetNumTeams(void) const
+size_t cScoreboard::GetNumTeams(void) const
 {
 	return m_Teams.size();
 }

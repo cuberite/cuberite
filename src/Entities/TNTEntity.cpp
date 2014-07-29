@@ -30,8 +30,6 @@ cTNTEntity::cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks) :
 void cTNTEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	a_ClientHandle.SendSpawnObject(*this, 50, 1, 0, 0);  // 50 means TNT
-	m_bDirtyPosition = false;
-	m_bDirtySpeed = false;
 	m_bDirtyOrientation = false;
 	m_bDirtyHead = false;
 }
@@ -44,7 +42,7 @@ void cTNTEntity::Explode(void)
 {
 	m_FuseTicks = 0;
 	Destroy(true);
-	LOGD("BOOM at {%f,%f,%f}", GetPosX(), GetPosY(), GetPosZ());
+	LOGD("BOOM at {%f, %f, %f}", GetPosX(), GetPosY(), GetPosZ());
 	m_World->DoExplosionAt(4.0, GetPosX() + 0.49, GetPosY() + 0.49, GetPosZ() + 0.49, true, esPrimedTNT, this);
 }
 

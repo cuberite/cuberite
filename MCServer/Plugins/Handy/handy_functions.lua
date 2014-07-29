@@ -6,7 +6,7 @@ function GetHandyVersion()
 	return HANDY_VERSION
 end
 -- Checks if handy is in proper version
-function CheckForRequiedVersion( inVersion )
+function CheckForRequiredVersion( inVersion )
 	if( inVersion > HANDY_VERSION ) then		return false	end
 	return true
 end

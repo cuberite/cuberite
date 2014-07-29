@@ -11,8 +11,9 @@
 
 
 
-cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_CHEST, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World)
+cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type) :
+	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
+	m_NumActivePlayers(0)
 {
 	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
@@ -113,7 +114,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 	// The few false positives aren't much to worry about
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(m_PosX, m_PosZ, ChunkX, ChunkZ);
-	m_World->MarkChunkDirty(ChunkX, ChunkZ);
+	m_World->MarkChunkDirty(ChunkX, ChunkZ, true);
 }
 
 
@@ -122,6 +123,13 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 
 void cChestEntity::OpenNewWindow(void)
 {
+	// TODO: cats are an obstruction
+	if ((GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
+	{
+		// Obstruction, don't open
+		return;
+	}
+
 	// Callback for opening together with neighbor chest:
 	class cOpenDouble :
 		public cChestCallback
@@ -135,6 +143,12 @@ void cChestEntity::OpenNewWindow(void)
 		
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
+			if ((a_Chest->GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
+			{
+				// Obstruction, don't open
+				return false;
+			}
+
 			// The primary chest should eb the one with lesser X or Z coord:
 			cChestEntity * Primary = a_Chest;
 			cChestEntity * Secondary = m_ThisChest;
@@ -155,15 +169,15 @@ void cChestEntity::OpenNewWindow(void)
 	if (
 		m_World->DoWithChestAt(m_PosX - 1, m_PosY, m_PosZ,     OpenDbl) ||
 		m_World->DoWithChestAt(m_PosX + 1, m_PosY, m_PosZ,     OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX    , m_PosY, m_PosZ - 1, OpenDbl) ||
-		m_World->DoWithChestAt(m_PosX    , m_PosY, m_PosZ + 1, OpenDbl)
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ - 1, OpenDbl) ||
+		m_World->DoWithChestAt(m_PosX,     m_PosY, m_PosZ + 1, OpenDbl)
 	)
 	{
 		// The double-chest window has been opened in the callback
 		return;
 	}
 
-	// There is no chest neighbor, open a single-chest window:	
+	// There is no chest neighbor, open a single-chest window:
 	OpenWindow(new cChestWindow(this));
 }
 

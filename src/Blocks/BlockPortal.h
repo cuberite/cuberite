@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../Mobs/Monster.h"
 
 
 
@@ -18,7 +19,7 @@ public:
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -35,15 +36,28 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return; // No pickups
+		return;  // No pickups
 	}
 
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	{
+		cFastRandom Random;
+		if (Random.NextInt(2000) != 0)
+		{
+			return;
+		}
+
+		int PosX = a_Chunk.GetPosX() * 16 + a_RelX;
+		int PosZ = a_Chunk.GetPosZ() * 16 + a_RelZ;
+
+		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, cMonster::mtZombiePigman);
+	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if ((a_RelY - 1 < 0) || (a_RelY + 1 > cChunkDef::Height))
 		{
-			return false; // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
+			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
 		}
 
 		switch (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ))
@@ -56,7 +70,7 @@ public:
 				} PortalCheck[] =
 				{
 					{ 0, 1,  0},
-					{ 0,-1,  0},
+					{ 0, -1,  0},
 					{ 1, 0,  0},
 					{-1, 0,  0},
 				} ;
@@ -81,7 +95,7 @@ public:
 				} PortalCheck[] =
 				{
 					{ 0, 1,  0},
-					{ 0,-1,  0},
+					{ 0, -1,  0},
 					{ 0, 0, -1},
 					{ 0, 0,  1},
 				} ;

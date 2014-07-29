@@ -12,6 +12,9 @@
 #include "../OSSupport/ListenThread.h"
 #include "../OSSupport/SocketThreads.h"
 #include "inifile/iniFile.h"
+#include "PolarSSL++/RsaPrivateKey.h"
+#include "PolarSSL++/CryptoKey.h"
+#include "PolarSSL++/X509Cert.h"
 
 
 
@@ -66,6 +69,7 @@ public:
 	
 protected:
 	friend class cHTTPConnection;
+	friend class cSslHTTPConnection;
 	
 	cListenThread m_ListenThreadIPv4;
 	cListenThread m_ListenThreadIPv6;
@@ -77,6 +81,12 @@ protected:
 	
 	/// The callbacks to call for various events
 	cCallbacks * m_Callbacks;
+	
+	/** The server certificate to use for the SSL connections */
+	cX509CertPtr m_Cert;
+	
+	/** The private key for m_Cert. */
+	cCryptoKeyPtr m_CertPrivKey;
 	
 
 	// cListenThread::cCallback overrides:
