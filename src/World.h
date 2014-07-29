@@ -185,7 +185,7 @@ public:
 	virtual eDimension GetDimension(void) const { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	int GetHeight(int a_BlockX, int a_BlockZ);
+	virtual int GetHeight(int a_BlockX, int a_BlockZ);
 	
 	// tolua_end
 
@@ -303,9 +303,6 @@ public:
 	void AddEntity(cEntity * a_Entity);
 	
 	bool HasEntity(int a_UniqueID);
-	
-	/** Removes the entity, the entity ptr ownership is assumed taken by the caller */
-	void RemoveEntity(cEntity * a_Entity);
 	
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -622,6 +619,15 @@ public:
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
+
+	AString GetNetherWorldName(void) const { return m_NetherWorldName; }
+	void SetNetherWorldName(const AString & a_Name) { m_NetherWorldName = a_Name; }
+
+	AString GetEndWorldName(void) const { return m_EndWorldName; }
+	void SetEndWorldName(const AString & a_Name) { m_EndWorldName = a_Name; }
+
+	AString GetLinkedOverworldName(void) const { return m_OverworldName; }
+	void SetLinkedOverworldName(const AString & a_Name) { m_OverworldName = a_Name; }
 	
 	// tolua_end
 	
@@ -705,7 +711,7 @@ public:
 	
 	/** Returns true if the current weather is stormy */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
-	
+
 	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
 	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ)
 	{
@@ -716,10 +722,11 @@ public:
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 	
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
-	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
+
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
@@ -824,6 +831,12 @@ private:
 
 
 	AString m_WorldName;
+
+	/** The name of the world that a portal in this world should link to
+	Only has effect if this world is a nether or end world, as it is used by entities to see which world to teleport to when in a portal
+	*/
+	AString m_OverworldName;
+
 	AString m_IniFileName;
 	
 	/** Name of the storage schema used to load and save chunks */
@@ -908,6 +921,12 @@ private:
 	See the eShrapnelLevel enumeration for details
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
+
+	/** Name of the nether world */
+	AString m_NetherWorldName;
+
+	/** Name of the end world */
+	AString m_EndWorldName;
 	
 
 	cChunkGenerator  m_Generator;
@@ -967,7 +986,7 @@ private:
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
-	cWorld(const AString & a_WorldName);
+	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
 	virtual ~cWorld();
 
 	void Tick(float a_Dt, int a_LastTickDurationMSec);
@@ -1008,9 +1027,16 @@ private:
 	Assumes it is called from the Tick thread. */
 	void AddQueuedPlayers(void);
 
+	/** Sets generator values to dimension specific defaults, if those values do not exist */
+	void InitialiseGeneratorDefaults(cIniFile & a_IniFile);
+
+	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
+	void InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile);
+
 	/** Sets the specified chunk data into the chunkmap. Called in the tick thread.
 	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
 	void SetChunkData(cSetChunkData & a_SetChunkData);
+
 };  // tolua_export
 
 

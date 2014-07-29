@@ -95,7 +95,7 @@ void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 
 void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "Plains");
+	AString Biome = a_IniFile.GetValueSet("Generator", "ConstantBiome", "");
 	m_Biome = StringToBiome(Biome);
 	if (m_Biome == biInvalidBiome)
 	{

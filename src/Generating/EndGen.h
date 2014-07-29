@@ -23,8 +23,6 @@ class cEndGen :
 public:
 	cEndGen(int a_Seed);
 	
-	void Initialize(cIniFile & a_IniFile);
-	
 protected:
 
 	/// Seed for the noise
@@ -66,4 +64,5 @@ protected:
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;

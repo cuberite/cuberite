@@ -20,7 +20,6 @@ cChunkDesc::cChunkDesc(int a_ChunkX, int a_ChunkZ) :
 	m_bUseDefaultBiomes(true),
 	m_bUseDefaultHeight(true),
 	m_bUseDefaultComposition(true),
-	m_bUseDefaultStructures(true),
 	m_bUseDefaultFinish(true)
 {
 	m_BlockArea.Create(cChunkDef::Width, cChunkDef::Height, cChunkDef::Width);
@@ -201,26 +200,6 @@ void cChunkDesc::SetUseDefaultComposition(bool a_bUseDefaultComposition)
 bool cChunkDesc::IsUsingDefaultComposition(void) const
 {
 	return m_bUseDefaultComposition;
-}
-
-
-
-
-
-void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
-{
-	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
-	m_bUseDefaultStructures = a_bUseDefaultStructures;
-}
-
-
-
-
-
-bool cChunkDesc::IsUsingDefaultStructures(void) const
-{
-	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
-	return m_bUseDefaultStructures;
 }
 
 

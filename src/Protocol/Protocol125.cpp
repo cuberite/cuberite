@@ -833,23 +833,23 @@ void cProtocol125::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
-void cProtocol125::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
+void cProtocol125::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	cCSLock Lock(m_CSPacket);
-	if ((m_LastSentDimension == a_World.GetDimension()) && !a_ShouldIgnoreDimensionChecks)
+	if ((m_LastSentDimension == a_Dimension) && !a_ShouldIgnoreDimensionChecks)
 	{
 		// Must not send a respawn for the world with the same dimension, the client goes cuckoo if we do (unless we are respawning from death)
 		return;
 	}
 	cPlayer * Player = m_Client->GetPlayer();
 	WriteByte  (PACKET_RESPAWN);
-	WriteInt   (a_World.GetDimension());
+	WriteInt   ((int)(a_Dimension));
 	WriteByte  (2);  // TODO: Difficulty; 2 = Normal
 	WriteChar  ((char)Player->GetGameMode());
 	WriteShort (256);  // Current world height
 	WriteString("default");
 	Flush();
-	m_LastSentDimension = a_World.GetDimension();
+	m_LastSentDimension = a_Dimension;
 }
 
 

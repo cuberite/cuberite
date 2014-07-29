@@ -241,7 +241,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(m_Random.NextInt(2, a_Biome) == 0)
 				);
 			}
-			
+
+			case cMonster::mtMagmaCube:
 			case cMonster::mtSlime:
 			{
 				return (

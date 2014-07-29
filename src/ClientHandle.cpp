@@ -120,7 +120,8 @@ cClientHandle::~cClientHandle()
 		}
 		if (World != NULL)
 		{
-			World->RemovePlayer(m_Player);
+			m_Player->SetWorldTravellingFrom(NULL);  // Make sure that the player entity is actually removed
+			World->RemovePlayer(m_Player);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
 			m_Player->Destroy();
 		}
 		delete m_Player;
@@ -1795,8 +1796,7 @@ void cClientHandle::RemoveFromWorld(void)
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
-	// StreamChunks() called in cPlayer::MoveToWorld() after new world has been set
-	// Meanwhile here, we set last streamed values to bogus ones so everything is resent
+	// Here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 	m_HasSentPlayerChunk = false;
@@ -2377,9 +2377,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
+void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_World, a_ShouldIgnoreDimensionChecks);
+	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 

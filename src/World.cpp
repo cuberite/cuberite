@@ -230,8 +230,9 @@ void cWorld::cTickThread::Execute(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName) :
+cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName) :
 	m_WorldName(a_WorldName),
+	m_OverworldName(a_OverworldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef __arm__
@@ -239,6 +240,7 @@ cWorld::cWorld(const AString & a_WorldName) :
 #else
 	m_StorageCompressionFactor(6),
 #endif
+	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
@@ -518,9 +520,15 @@ void cWorld::Start(void)
 	if (!IniFile.ReadFile(m_IniFileName))
 	{
 		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+
+		// TODO: More descriptions for each key
+		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
+		IniFile.AddKeyComment(" LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
 	}
-	AString Dimension = IniFile.GetValueSet("General", "Dimension", "Overworld");
-	m_Dimension = StringToDimension(Dimension);
+
+	// The presence of a configuration value overrides everything
+	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
+	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
 
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
@@ -528,8 +536,8 @@ void cWorld::Start(void)
 	(
 		(KeyNum >= 0) &&
 		(
-			(IniFile.FindValue(KeyNum, "X") >= 0) ||
-			(IniFile.FindValue(KeyNum, "Y") >= 0) ||
+			(IniFile.FindValue(KeyNum, "X") >= 0) &&
+			(IniFile.FindValue(KeyNum, "Y") >= 0) &&
 			(IniFile.FindValue(KeyNum, "Z") >= 0)
 		)
 	);
@@ -565,36 +573,26 @@ void cWorld::Start(void)
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
+	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
+	m_TimeOfDay                   = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
+
+	if (GetDimension() == dimOverworld)
+	{
+		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
+		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", GetName() + "_end");
+	}
+	else
+	{
+		m_OverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
+	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
 	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
+	m_Weather          = (eWeather)      Clamp(Weather,          (int)wSunny,     (int)wStorm);
 
-	// Load allowed mobs:
-	AString DefaultMonsters;
-	switch (m_Dimension)
-	{
-		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
-		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
-		case dimEnd:       DefaultMonsters = "enderman"; break;
-		case dimNotSet:    break;
-	}
-	m_bAnimals = IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
-	AString AllMonsters = IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
-	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
-	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
-	{
-		cMonster::eType ToAdd = cMonster::StringToMobType(*itr);
-		if (ToAdd != cMonster::mtInvalidType)
-		{
-			m_AllowedMobs.insert(ToAdd);
-			LOGD("Allowed mob: %s", itr->c_str());
-		}
-		else
-		{
-			LOG("World \"%s\": Unknown mob type: %s", m_WorldName.c_str(), itr->c_str());
-		}
-	}
+	InitialiseGeneratorDefaults(IniFile);
+	InitialiseAndLoadMobSpawningValues(IniFile);
 
 	m_ChunkMap = new cChunkMap(this);
 	
@@ -691,6 +689,82 @@ eWeather cWorld::ChooseNewWeather()
 
 
 
+void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
+{
+	switch (GetDimension())
+	{
+		case dimEnd:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome", "End");
+			a_IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
+			break;
+		}
+		case dimOverworld:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
+			a_IniFile.GetValueSet("Generator", "HeightGen", "DistortedHeightmap");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "DistortedHeightmap");
+			a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+			break;
+		}
+		case dimNether:
+		{
+			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome", "Nether");
+			a_IniFile.GetValueSet("Generator", "HeightGen", "Flat");
+			a_IniFile.GetValueSet("Generator", "FlatHeight", "128");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "Nether");
+			a_IniFile.GetValueSet("Generator", "Finishers", "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
+{
+	AString DefaultMonsters;
+	switch (m_Dimension)
+	{
+		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
+		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
+		case dimEnd:       DefaultMonsters = "enderman"; break;
+	}
+	
+	m_bAnimals = a_IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
+	AString AllMonsters = a_IniFile.GetValueSet("Monsters", "Types", DefaultMonsters);
+
+	if (!m_bAnimals)
+	{
+		return;
+	}
+
+	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
+	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
+	{
+		cMonster::eType ToAdd = cMonster::StringToMobType(*itr);
+		if (ToAdd != cMonster::mtInvalidType)
+		{
+			m_AllowedMobs.insert(ToAdd);
+			LOGD("Allowed mob: %s", itr->c_str());
+		}
+		else
+		{
+			LOG("World \"%s\": Unknown mob type: %s", m_WorldName.c_str(), itr->c_str());
+		}
+	}
+}
+
+
+
+
+
 void cWorld::Stop(void)
 {
 	// Delete the clients that have been in this world:
@@ -703,6 +777,25 @@ void cWorld::Stop(void)
 		}  // for itr - m_Clients[]
 		m_Clients.clear();
 	}
+
+	// Write settings to file; these are all plugin changeable values - keep updated!
+	cIniFile IniFile;
+	IniFile.ReadFile(m_IniFileName);
+		if (GetDimension() == dimOverworld)
+		{
+			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_NetherWorldName);
+			IniFile.SetValue("LinkedWorlds", "EndWorldName", m_EndWorldName);
+		}
+		else
+		{
+			IniFile.SetValue("LinkedWorlds", "OverworldName", m_OverworldName);
+		}
+		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
+		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
+		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
+		IniFile.SetValueI("General", "Weather", (int)m_Weather);
+		IniFile.SetValueI("General", "TimeInTicks", m_TimeOfDay);
+	IniFile.WriteFile(m_IniFileName);
 	
 	m_TickThread.Stop();
 	m_Lighting.Stop();
@@ -955,11 +1048,7 @@ void cWorld::TickClients(float a_Dt)
 		// Add clients scheduled for adding:
 		for (cClientHandleList::iterator itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
 		{
-			if (std::find(m_Clients.begin(), m_Clients.end(), *itr) != m_Clients.end())
-			{
-				ASSERT(!"Adding a client that is already in the clientlist");
-				continue;
-			}
+			ASSERT(std::find(m_Clients.begin(), m_Clients.end(), *itr) == m_Clients.end());
 			m_Clients.push_back(*itr);
 		}  // for itr - m_ClientsToRemove[]
 		m_ClientsToAdd.clear();
@@ -2378,8 +2467,10 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 void cWorld::RemovePlayer(cPlayer * a_Player)
 {
-
-	m_ChunkMap->RemoveEntity(a_Player);
+	if (!a_Player->IsWorldTravellingFrom(this))
+	{
+		m_ChunkMap->RemoveEntity(a_Player);
+	}
 	{
 		cCSLock Lock(m_CSPlayersToAdd);
 		m_PlayersToAdd.remove(a_Player);
@@ -2882,15 +2973,6 @@ bool cWorld::HasEntity(int a_UniqueID)
 
 
 
-void cWorld::RemoveEntity(cEntity * a_Entity)
-{
-	m_ChunkMap->RemoveEntity(a_Entity);
-}
-
-
-
-
-
 /*
 unsigned int cWorld::GetNumPlayers(void)
 {
@@ -3197,7 +3279,8 @@ void cWorld::AddQueuedPlayers(void)
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?			
+			LOGD("Adding player %s to world \"%s\".", (*itr)->GetName().c_str(), m_WorldName.c_str());
 
 			m_Players.push_back(*itr);
 			(*itr)->SetWorld(this);
@@ -3227,6 +3310,9 @@ void cWorld::AddQueuedPlayers(void)
 		if (Client != NULL)
 		{
 			Client->StreamChunks();
+			Client->SendPlayerMoveLook();
+			Client->SendHealth();
+			Client->SendWholeInventory(*(*itr)->GetWindow());
 		}
 	}  // for itr - PlayersToAdd[]
 }

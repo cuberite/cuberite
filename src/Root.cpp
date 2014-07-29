@@ -312,13 +312,15 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 
 
 
-cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName)
+cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
 {
-	if (m_WorldsByName[a_WorldName] != NULL)
+	cWorld * World = m_WorldsByName[a_WorldName];
+	if (World != NULL)
 	{
-		return NULL;
+		return World;
 	}
-	cWorld* NewWorld = new cWorld(a_WorldName.c_str());
+
+	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();
 	NewWorld->InitializeSpawn();
@@ -370,7 +372,7 @@ void cRoot::UnloadWorlds(void)
 
 
 
-cWorld* cRoot::GetDefaultWorld()
+cWorld * cRoot::GetDefaultWorld()
 {
 	return m_pDefaultWorld;
 }
@@ -379,12 +381,19 @@ cWorld* cRoot::GetDefaultWorld()
 
 
 
-cWorld* cRoot::GetWorld( const AString & a_WorldName)
+cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
 {
-	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName);
+	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
 	if (itr != m_WorldsByName.end())
+	{
 		return itr->second;
-	return 0;
+	}
+
+	if (a_SearchForFolder && cFile::IsFolder(FILE_IO_PREFIX + a_WorldName))
+	{
+		return CreateAndInitializeWorld(a_WorldName);
+	}
+	return NULL;
 }
 
 
@@ -396,9 +405,12 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
-		if (a_Callback.Item(itr->second))
+		if (itr->second != NULL)
 		{
-			return false;
+			if (a_Callback.Item(itr->second))
+			{
+				return false;
+			}
 		}
 	}
 	return true;

@@ -108,7 +108,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 			if (Meta & 0x4)
 			{
-				a_Player->SendMessageFailure("This bed is occupied.");
+				a_Player->SendMessageFailure("This bed is occupied");
 			}
 			else
 			{
@@ -133,6 +133,8 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x4);  // Where 0x4 = occupied bit
 				a_Player->SetIsInBed(true);
+				a_Player->SetBedPos(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+				a_Player->SendMessageSuccess("Home position set successfully");
 
 				cTimeFastForwardTester Tester;
 				if (a_WorldInterface.ForEachPlayer(Tester))

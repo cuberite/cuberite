@@ -38,6 +38,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Gravity(-9.81f)
 	, m_LastPos(a_X, a_Y, a_Z)
 	, m_IsInitialized(false)
+	, m_WorldTravellingFrom(NULL)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
 	, m_IsFireproof(false)
@@ -617,9 +618,12 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			// Handle drowning
 			HandleAir();
 		}
-
-		// None of the above functions change position, we remain in the chunk of NextChunk
-		HandlePhysics(a_Dt, *NextChunk);
+		
+		if (!DetectPortal())  // Our chunk is invalid if we have moved to another world
+		{
+			// None of the above functions changed position, we remain in the chunk of NextChunk
+			HandlePhysics(a_Dt, *NextChunk);
+		}
 	}
 }
 
@@ -856,7 +860,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
-	if (m_World->IsWeatherWet())
+	if (GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT))
 	{
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
@@ -1021,6 +1025,184 @@ void cEntity::DetectCacti(void)
 	{
 		TakeDamage(dtCactusContact, NULL, 1, 0);
 	}
+}
+
+
+
+
+
+bool cEntity::DetectPortal()
+{
+	if (GetWorld()->GetDimension() == dimOverworld)
+	{
+		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty())
+		{
+			// Teleportation to either dimension not enabled, don't bother proceeding
+			return false;
+		}
+	}
+	else if (GetWorld()->GetLinkedOverworldName().empty())
+	{
+		// Overworld teleportation disabled, abort
+		return false;
+	}
+
+	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	if ((Y > 0) && (Y < cChunkDef::Height))
+	{
+		switch (GetWorld()->GetBlock(X, Y, Z))
+		{
+			case E_BLOCK_NETHER_PORTAL:
+			{
+				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
+				{
+					// Just exited a portal, don't teleport again
+					return false;
+				}
+
+				if (IsPlayer() && !((cPlayer *)this)->IsGameModeCreative() && m_PortalCooldownData.m_TicksDelayed != 80)
+				{
+					// Delay teleportation for four seconds if the entity is a non-creative player
+					m_PortalCooldownData.m_TicksDelayed++;
+					return false;
+				}
+				m_PortalCooldownData.m_TicksDelayed = 0;
+
+				switch (GetWorld()->GetDimension())
+				{
+					case dimNether:
+					{
+						if (GetWorld()->GetLinkedOverworldName().empty())
+						{
+							return false;
+						}
+
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
+
+						if (IsPlayer())
+						{
+							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
+						}
+						
+						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+					}
+					case dimOverworld:
+					{
+						if (GetWorld()->GetNetherWorldName().empty())
+						{
+							return false;
+						}
+
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+						if (IsPlayer())
+						{
+							((cPlayer *)this)->AwardAchievement(achEnterPortal);
+							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
+						}
+						
+						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+					}
+					default: return false;
+				}
+			}
+			case E_BLOCK_END_PORTAL:
+			{
+				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
+				{
+					return false;
+				}
+
+				switch (GetWorld()->GetDimension())
+				{
+					case dimEnd:
+					{
+						if (GetWorld()->GetLinkedOverworldName().empty())
+						{
+							return false;
+						}
+
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+						if (IsPlayer())
+						{
+							cPlayer * Player = (cPlayer *)this;
+							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+							Player->GetClientHandle()->SendRespawn(dimOverworld);
+						}
+
+						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+					}
+					case dimOverworld:
+					{
+						if (GetWorld()->GetEndWorldName().empty())
+						{
+							return false;
+						}
+
+						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+						if (IsPlayer())
+						{
+							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
+							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
+						}
+
+						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+					}
+					default: return false;
+				}
+			}
+			default: break;
+		}
+	}
+
+	// Allow portals to work again
+	m_PortalCooldownData.m_ShouldPreventTeleportation = false;
+	m_PortalCooldownData.m_TicksDelayed = 0;
+	return false;
+}
+
+
+
+
+
+bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+{
+	UNUSED(a_ShouldSendRespawn);
+	ASSERT(a_World != NULL);
+
+	if (GetWorld() == a_World)
+	{
+		// Don't move to same world
+		return false;
+	}
+
+	// Remove all links to the old world
+	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
+	GetWorld()->BroadcastDestroyEntity(*this);
+
+	// Queue add to new world
+	a_World->AddEntity(this);
+	SetWorld(a_World);
+
+	return true;
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
+{
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == NULL)
+	{
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
+		return false;
+	}
+
+	return DoMoveToWorld(World, a_ShouldSendRespawn);
 }
 
 

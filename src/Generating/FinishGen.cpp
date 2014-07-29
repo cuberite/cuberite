@@ -135,6 +135,15 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = MinY; y < MaxY; y++)
 			{
+				if (
+					((x < 0) || (x >= cChunkDef::Width)) ||
+					((y < 0) || (y >= cChunkDef::Height)) ||
+					((z < 0) || (z >= cChunkDef::Width))
+					)
+				{
+					continue;
+				}
+
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)  // Don't replace non air blocks.
 				{
 					continue;
