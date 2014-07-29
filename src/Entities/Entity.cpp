@@ -617,7 +617,7 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 			// Handle drowning
 			HandleAir();
-		}		
+		}
 		
 		if (!DetectPortal())  // Our chunk is invalid if we have moved to another world
 		{
@@ -1129,7 +1129,7 @@ bool cEntity::DetectPortal()
 							cPlayer * Player = (cPlayer *)this;
 							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
 							Player->GetClientHandle()->SendRespawn(dimOverworld);
-						}						
+						}
 
 						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
 					}
@@ -1146,7 +1146,7 @@ bool cEntity::DetectPortal()
 						{
 							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
 							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
-						}						
+						}
 
 						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
 					}
