@@ -335,7 +335,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			AllowedBiomes.push_back(biMesaPlateauFM);
 			AllowedBiomes.push_back(biMesaPlateauM);
 
-			// A list with all the allowed blocks that can be below the lilypad.
+			// A list with all the allowed blocks that can be below the dead bush.
 			cFinishGenSingleTopBlock::BlockList AllowedBlocks;
 			AllowedBlocks.push_back(E_BLOCK_SAND);
 			AllowedBlocks.push_back(E_BLOCK_HARDENED_CLAY);

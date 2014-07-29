@@ -161,7 +161,7 @@ public:
 		m_Noise(a_Seed),
 		m_BlockType(a_BlockType),
 		m_Amount(a_Amount)
-	{	
+	{
 		// Initialize all the block types.
 		for (int idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
 		{
