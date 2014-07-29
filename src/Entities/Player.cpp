@@ -1627,7 +1627,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 
 	// Remove player from the old world
 	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
-	GetWorld()->RemovePlayer(this);
+	GetWorld()->RemovePlayer(this, false);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	a_World->AddPlayer(this);

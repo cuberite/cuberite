@@ -2465,10 +2465,12 @@ void cWorld::AddPlayer(cPlayer * a_Player)
 
 
 
-void cWorld::RemovePlayer(cPlayer * a_Player)
+void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 {
-	if (!a_Player->IsWorldTravellingFrom(this))
+	if (a_RemoveFromChunk)
 	{
+		// To prevent iterator invalidations when an entity goes through a portal and calls this function whilst being ticked by cChunk
+		// we should not change cChunk's entity list if asked not to
 		m_ChunkMap->RemoveEntity(a_Player);
 	}
 	{

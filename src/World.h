@@ -281,8 +281,9 @@ public:
 
 	/** Removes the player from the world.
 	Removes the player from the addition queue, too, if appropriate.
-	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore. */
-	void RemovePlayer(cPlayer * a_Player);
+	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
+	@param a_RemoveFromChunk determines if the entity should be removed from its chunk as well. Should be false when ticking from cChunk. */
+	void RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
