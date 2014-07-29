@@ -25,6 +25,7 @@ SET (SRCS
 	PrefabPiecePool.cpp
 	RainbowRoadsGen.cpp
 	Ravines.cpp
+	RoughRavines.cpp
 	StructGen.cpp
 	TestRailsGen.cpp
 	Trees.cpp
@@ -52,6 +53,7 @@ SET (HDRS
 	PrefabPiecePool.h
 	RainbowRoadsGen.h
 	Ravines.h
+	RoughRavines.h
 	StructGen.h
 	TestRailsGen.h
 	Trees.h

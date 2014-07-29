@@ -5,6 +5,12 @@
 
 #pragma once
 
+#include <cmath>
+
+
+
+
+
 // Some settings
 #define NOISE_DATATYPE float
 
@@ -32,6 +38,12 @@ public:
 	INLINE NOISE_DATATYPE IntNoise1D(int a_X) const;
 	INLINE NOISE_DATATYPE IntNoise2D(int a_X, int a_Y) const;
 	INLINE NOISE_DATATYPE IntNoise3D(int a_X, int a_Y, int a_Z) const;
+
+	// Return a float number in the specified range:
+	INLINE NOISE_DATATYPE IntNoise2DInRange(int a_X, int a_Y, float a_Min, float a_Max) const
+	{
+		return a_Min + std::abs(IntNoise2D(a_X, a_Y)) * (a_Max - a_Min);
+	}
 
 	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of occurrence. Divide by 8 to rectify.
 	INLINE int IntNoise1DInt(int a_X) const;
