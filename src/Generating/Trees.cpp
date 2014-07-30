@@ -412,10 +412,10 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 
 void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	// Calculate a height
+	// Pick a height
 	int Height = 5 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 11) % 4;
 
-	// Creat the trunk
+	// Create the trunk
 	for (int i = 0; i < Height; i++)
 	{
 		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
