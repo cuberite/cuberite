@@ -16,6 +16,7 @@
 #include "../StringCompression.h"
 #include "../SetChunkData.h"
 
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -582,7 +583,11 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		{
 			continue;
 		}
-		if (strncmp(a_NBT.GetData(sID), "Chest", a_NBT.GetDataLength(sID)) == 0)
+		if (strncmp(a_NBT.GetData(sID), "Beacon", a_NBT.GetDataLength(sID)) == 0)
+		{
+			LoadBeaconFromNBT(a_BlockEntities, a_NBT, Child);
+		}
+		else if (strncmp(a_NBT.GetData(sID), "Chest", a_NBT.GetDataLength(sID)) == 0)
 		{
 			LoadChestFromNBT(a_BlockEntities, a_NBT, Child, E_BLOCK_CHEST);
 		}
@@ -740,6 +745,49 @@ void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a
 			a_ItemGrid.SetSlot(SlotNum, Item);
 		}
 	}  // for itr - ItemDefs[]
+}
+
+
+
+
+
+void cWSSAnvil::LoadBeaconFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	ASSERT(a_NBT.GetType(a_TagIdx) == TAG_Compound);
+	int x, y, z;
+	if (!GetBlockEntityNBTPos(a_NBT, a_TagIdx, x, y, z))
+	{
+		return;
+	}
+
+	std::auto_ptr<cBeaconEntity> Beacon(new cBeaconEntity(x, y, z, m_World));
+
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Levels");
+	if (CurrentLine >= 0)
+	{
+		Beacon->SetBeaconLevel((char)a_NBT.GetInt(CurrentLine));
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Primary");
+	if (CurrentLine >= 0)
+	{
+		Beacon->SelectPrimaryPotion((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
+	}
+
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Secondary");
+	if (CurrentLine >= 0)
+	{
+		Beacon->SelectSecondaryPotion((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
+	}
+
+	// We are better than mojang, we load/save the beacon inventory!
+	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
+	if ((Items >= 0) && (a_NBT.GetType(Items) == TAG_List))
+	{
+		LoadItemGridFromNBT(Beacon->GetContents(), a_NBT, Items);
+	}
+
+	a_BlockEntities.push_back(Beacon.release());
 }
 
 
