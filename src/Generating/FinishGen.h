@@ -163,7 +163,7 @@ public:
 		m_Amount(a_Amount)
 	{
 		// Initialize all the block types.
-		for (unsigned long idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
+		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
 		{
 			m_IsAllowedBelow[idx] = false;
 		}
@@ -175,7 +175,7 @@ public:
 		}
 		
 		// Initialize all the biome types.
-		for (unsigned long idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
+		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
 		{
 			m_IsBiomeAllowed[idx] = false;
 		}
