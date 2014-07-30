@@ -45,6 +45,9 @@ public:
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
 
+	/** Can a finisher change it? */
+	bool m_CanBeTerraformed;
+
 	// tolua_end
 
 	/** Associated block handler. */
@@ -60,6 +63,7 @@ public:
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
+	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 
 	// tolua_end
 

@@ -201,29 +201,11 @@ protected:
 					{
 						continue;
 					}
-					switch (a_ChunkDesc.GetBlockType(x, y, z))
+
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
 					{
-						// Only carve out these specific block types
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						case E_BLOCK_STONE:
-						case E_BLOCK_COBBLESTONE:
-						case E_BLOCK_GRAVEL:
-						case E_BLOCK_SAND:
-						case E_BLOCK_SANDSTONE:
-						case E_BLOCK_NETHERRACK:
-						case E_BLOCK_COAL_ORE:
-						case E_BLOCK_IRON_ORE:
-						case E_BLOCK_GOLD_ORE:
-						case E_BLOCK_DIAMOND_ORE:
-						case E_BLOCK_REDSTONE_ORE:
-						case E_BLOCK_REDSTONE_ORE_GLOWING:
-						{
-							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
-							break;
-						}
-						default: break;
-					}  // switch (BlockType)
+						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+					}
 				}  // for y
 			}  // for x, z - a_BlockTypes
 		}  // for itr - m_Points[]
