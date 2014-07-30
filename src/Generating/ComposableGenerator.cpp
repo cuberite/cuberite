@@ -408,7 +408,12 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "PreSimulator") == 0)
 		{
-			m_FinishGens.push_back(new cFinishGenPreSimulator);
+			// Load the settings
+			bool PreSimulateFallingBlocks = a_IniFile.GetValueSetB("Generator", "PreSimulatorFallingBlocks", true);
+			bool PreSimulateWater         = a_IniFile.GetValueSetB("Generator", "PreSimulatorWater", true);
+			bool PreSimulateLava          = a_IniFile.GetValueSetB("Generator", "PreSimulatorLava", true);
+
+			m_FinishGens.push_back(new cFinishGenPreSimulator(PreSimulateFallingBlocks, PreSimulateWater, PreSimulateLava));
 		}
 		else if (NoCaseCompare(*itr, "RainbowRoads") == 0)
 		{

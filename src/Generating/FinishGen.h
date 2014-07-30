@@ -240,9 +240,14 @@ class cFinishGenPreSimulator :
 	public cFinishGen
 {
 public:
-	cFinishGenPreSimulator(void);
+	cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava);
 	
 protected:
+
+	bool m_PreSimulateFallingBlocks;
+	bool m_PreSimulateWater;
+	bool m_PreSimulateLava;
+
 	// Drops hanging sand and gravel down to the ground, recalculates heightmap
 	void CollapseSandGravel(
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
