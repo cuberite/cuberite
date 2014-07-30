@@ -41,6 +41,7 @@ class cEntity;
 class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
+class cBeaconEntity;
 class cChestEntity;
 class cDispenserEntity;
 class cFlowerPotEntity;
@@ -59,6 +60,7 @@ typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
 
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
 typedef cItemCallback<cEntity>             cEntityCallback;
+typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
@@ -522,6 +524,9 @@ public:
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp
+
+	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
+	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Exported in ManualBindings.cpp

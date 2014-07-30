@@ -53,6 +53,7 @@ set(BINDING_DEPENDENCIES
     ../Bindings/WebPlugin.h
     ../BiomeDef.h
     ../BlockArea.h
+	../BlockEntities/BeaconEntity.h
     ../BlockEntities/BlockEntity.h
     ../BlockEntities/BlockEntityWithItems.h
     ../BlockEntities/ChestEntity.h

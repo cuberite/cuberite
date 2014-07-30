@@ -16,6 +16,7 @@
 #include "../WebAdmin.h"
 #include "../ClientHandle.h"
 #include "../BlockArea.h"
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -2996,6 +2997,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_beginmodule(tolua_S, "cWorld");
 			tolua_function(tolua_S, "ChunkStay",                 tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",       tolua_DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
+			tolua_function(tolua_S, "DoWithBeaconAt",            tolua_DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);
 			tolua_function(tolua_S, "DoWithChestAt",             tolua_DoWithXYZ<cWorld, cChestEntity,        &cWorld::DoWithChestAt>);
 			tolua_function(tolua_S, "DoWithDispenserAt",         tolua_DoWithXYZ<cWorld, cDispenserEntity,    &cWorld::DoWithDispenserAt>);
 			tolua_function(tolua_S, "DoWithDropSpenserAt",       tolua_DoWithXYZ<cWorld, cDropSpenserEntity,  &cWorld::DoWithDropSpenserAt>);

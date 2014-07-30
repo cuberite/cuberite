@@ -121,10 +121,8 @@ bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLe
 
 bool cBeaconEntity::SelectPrimaryPotion(cEntityEffect::eType a_Potion)
 {
-	LOG("SelectPrimaryPotion!");
 	if (!IsValidPotion(a_Potion, m_BeaconLevel))
 	{
-		LOG("FALLSE!");
 		return false;
 	}
 

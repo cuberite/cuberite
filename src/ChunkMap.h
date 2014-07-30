@@ -19,6 +19,7 @@ class MTRand;
 class cChunkStay;
 class cChunk;
 class cPlayer;
+class cBeaconEntity;
 class cChestEntity;
 class cDispenserEntity;
 class cDropperEntity;
@@ -40,6 +41,7 @@ typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
 typedef cItemCallback<cEntity>             cEntityCallback;
 typedef cItemCallback<cBlockEntity>        cBlockEntityCallback;
+typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cDropperEntity>      cDropperCallback;
@@ -233,6 +235,9 @@ public:
 	
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
+
+	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
+	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
