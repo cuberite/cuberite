@@ -116,15 +116,7 @@ void cEnderman::CheckEventSeePlayer()
 	
 	ASSERT(Callback.GetPlayer() != NULL);
 
-	int CX, CZ;
-	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, CX, CZ);
-	if (!GetWorld()->IsChunkLighted(CX, CZ))
-	{
-		GetWorld()->QueueLightChunk(CX, CZ);
-		return;
-	}
-
-	if ((GetWorld()->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) - GetWorld()->GetSkyDarkness() < 15) && !Callback.GetPlayer()->IsGameModeCreative())
+	if (!Callback.GetPlayer()->IsGameModeCreative())
 	{
 		super::EventSeePlayer(Callback.GetPlayer());
 		m_EMState = CHASING;
