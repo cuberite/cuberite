@@ -233,9 +233,14 @@ bool cMojangAPI::SecureRequest(const AString & a_ServerName, const AString & a_R
 
 AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 {
+	// Note: we only check the string's length, not the actual content
 	switch (a_UUID.size())
 	{
-		case 32: return a_UUID;
+		case 32:
+		{
+			// Already is a short UUID
+			return a_UUID;
+		}
 		
 		case 36: 
 		{
@@ -260,12 +265,18 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 
 AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 {
+	// Note: we only check the string's length, not the actual content
 	switch (a_UUID.size())
 	{
-		case 36: return a_UUID;
+		case 36:
+		{
+			// Already is a dashed UUID
+			return a_UUID;
+		}
 		
 		case 32: 
 		{
+			// Insert dashes at the proper positions:
 			AString res;
 			res.reserve(36);
 			res.append(a_UUID, 0, 8);
