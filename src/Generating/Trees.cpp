@@ -863,7 +863,7 @@ void GetRoofedForestTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise &
 		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO4, ARRAYCOUNT(BigO4), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
 		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
 		hei++;
-	}  // for i - 2*
+	}  // for i < 2
 
 	// The top leaves layer is a BigO3 with leaves in the middle and possibly corners:
 	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
