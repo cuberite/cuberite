@@ -621,6 +621,10 @@ public:
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 
+	bool ShouldBroadcastDeathMessages(void) const { return m_BroadcastDeathMessages; }
+	bool ShouldBroadcastAchievementMessages(void) const { return m_BroadcastAchievementMessages; }
+
+
 	AString GetNetherWorldName(void) const { return m_NetherWorldName; }
 	void SetNetherWorldName(const AString & a_Name) { m_NetherWorldName = a_Name; }
 
@@ -855,6 +859,9 @@ private:
 	double m_SpawnX;
 	double m_SpawnY;
 	double m_SpawnZ;
+
+	bool m_BroadcastDeathMessages;
+	bool m_BroadcastAchievementMessages;
 
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.

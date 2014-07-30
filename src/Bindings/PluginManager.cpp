@@ -124,30 +124,44 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	// Check if the Plugins section exists.
 	int KeyNum = a_SettingsIni.FindKey("Plugins");
 
-	// If it does, how many plugins are there?
-	int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
-
 	if (KeyNum == -1)
 	{
 		InsertDefaultPlugins(a_SettingsIni);
+		KeyNum = a_SettingsIni.FindKey("Plugins");
 	}
-	else if (NumPlugins > 0)
+
+	// How many plugins are there?
+	int NumPlugins = a_SettingsIni.GetNumValues(KeyNum);
+
+	for (int i = 0; i < NumPlugins; i++)
 	{
-		for (int i = 0; i < NumPlugins; i++)
+		AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
+		if (ValueName.compare("Plugin") == 0)
 		{
-			AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
-			if (ValueName.compare("Plugin") == 0)
+			AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
+			if (!PluginFile.empty())
 			{
-				AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
-				if (!PluginFile.empty())
+				if (m_Plugins.find(PluginFile) != m_Plugins.end())
 				{
-					if (m_Plugins.find(PluginFile) != m_Plugins.end())
-					{
-						LoadPlugin(PluginFile);
-					}
+					LoadPlugin(PluginFile);
 				}
 			}
 		}
+	}
+
+
+	// Remove invalid plugins from the PluginMap.
+	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
+	{
+		if (itr->second == NULL)
+		{
+			PluginMap::iterator thiz = itr;
+			++thiz;
+			m_Plugins.erase(itr);
+			itr = thiz;
+			continue;
+		}
+		++itr;
 	}
 
 	size_t NumLoadedPlugins = GetNumPlugins();
@@ -155,13 +169,13 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	{
 		LOG("-- No Plugins Loaded --");
 	}
-	else if (NumLoadedPlugins > 1)
+	else if (NumLoadedPlugins == 1)
 	{
-		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
+		LOG("-- Loaded 1 Plugin --");
 	}
 	else
 	{
-		LOG("-- Loaded 1 Plugin --");
+		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
 	}
 	CallHookPluginsLoaded();
 }

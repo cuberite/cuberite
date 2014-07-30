@@ -882,7 +882,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
-	if (a_TDI.Attacker == NULL)
+	if ((a_TDI.Attacker == NULL) && m_World->ShouldBroadcastDeathMessages())
 	{
 		AString DamageText;
 		switch (a_TDI.DamageType)
@@ -1200,11 +1200,13 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	}
 	else
 	{
-		// First time, announce it
-		cCompositeChat Msg;
-		Msg.SetMessageType(mtSuccess);
-		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
-		m_World->BroadcastChat(Msg);
+		if (m_World->ShouldBroadcastAchievementMessages())
+		{
+			cCompositeChat Msg;
+			Msg.SetMessageType(mtSuccess);
+			Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
+			m_World->BroadcastChat(Msg);
+		}
 
 		// Increment the statistic
 		StatValue New = m_Stats.AddValue(a_Ach);

@@ -269,12 +269,12 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 {
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str());
+	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
 	unsigned int KeyNum = IniFile.FindKey("Worlds");
-	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum);
+	unsigned int NumWorlds = IniFile.GetNumValues(KeyNum);
 	if (NumWorlds <= 0)
 	{
 		return;
