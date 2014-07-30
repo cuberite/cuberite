@@ -31,6 +31,7 @@
 #include "Items/ItemSword.h"
 
 #include "polarssl/md5.h"
+#include "BlockEntities/BeaconEntity.h"
 
 
 
@@ -659,6 +660,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
 	}
+	else if (a_Channel == "MC|Beacon")
+	{
+		HandleBeaconSelection(a_Message.c_str(), a_Message.size());
+	}
 	else if (a_Channel == "MC|ItemName")
 	{
 		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
@@ -740,6 +745,55 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 	{
 		m_PluginChannels.erase(*itr);
 	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
+{
+	if (a_Length < 14)
+	{
+		SendChat("Failure setting beacon selection; bad request", mtFailure);
+		LOGD("Malformed MC|Beacon packet.");
+		return;
+	}
+
+	cWindow * Window = m_Player->GetWindow();
+	if ((Window == NULL) || (Window->GetWindowType() != cWindow::wtBeacon))
+	{
+		return;
+	}
+	cBeaconWindow * BeaconWindow = (cBeaconWindow *) Window;
+
+	if (Window->GetSlot(*m_Player, 0)->IsEmpty())
+	{
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	int PrimaryPotionID, SecondaryPotionID;
+	Buffer.ReadBEInt(PrimaryPotionID);
+	Buffer.ReadBEInt(SecondaryPotionID);
+
+	cEntityEffect::eType PrimaryPotion = cEntityEffect::effNoEffect;
+	if ((PrimaryPotionID >= 0) && (PrimaryPotionID <= (int)cEntityEffect::effSaturation))
+	{
+		PrimaryPotion = (cEntityEffect::eType)PrimaryPotionID;
+	}
+
+	cEntityEffect::eType SecondaryPotion = cEntityEffect::effNoEffect;
+	if ((SecondaryPotionID >= 0) && (SecondaryPotionID <= (int)cEntityEffect::effSaturation))
+	{
+		SecondaryPotion = (cEntityEffect::eType)SecondaryPotionID;
+	}
+
+	Window->SetSlot(*m_Player, 0, cItem());
+	BeaconWindow->GetBeaconEntity()->SelectPrimaryPotion(PrimaryPotion);
+	BeaconWindow->GetBeaconEntity()->SelectSecondaryPotion(SecondaryPotion);
 }
 
 

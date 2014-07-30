@@ -23,6 +23,7 @@ class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
+class cBeaconEntity;
 class cSlotArea;
 class cSlotAreaAnvil;
 class cWorld;
@@ -252,6 +253,26 @@ protected:
 	cSlotAreaAnvil * m_AnvilSlotArea;
 	AString m_RepairedItemName;
 	int m_BlockX, m_BlockY, m_BlockZ;
+} ;
+
+
+
+
+
+class cBeaconWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon);
+
+	cBeaconEntity * GetBeaconEntity(void) const { return m_Beacon; }
+
+	// cWindow Overrides:
+	virtual void OpenedByPlayer(cPlayer & a_Player) override;
+
+protected:
+	cBeaconEntity * m_Beacon;
 } ;
 
 

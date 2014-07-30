@@ -9,6 +9,7 @@
 #include "../Entities/Pickup.h"
 #include "../Inventory.h"
 #include "../Items/ItemHandler.h"
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
@@ -834,6 +835,36 @@ void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
 	a_PosX = m_BlockX;
 	a_PosY = m_BlockY;
 	a_PosZ = m_BlockZ;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cBeaconWindow:
+
+cBeaconWindow::cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon) :
+	cWindow(wtBeacon, "Beacon"),
+	m_Beacon(a_Beacon)
+{
+	m_ShouldDistributeToHotbarFirst = true;
+	m_SlotAreas.push_back(new cSlotAreaBeacon(m_Beacon, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cBeaconWindow::OpenedByPlayer(cPlayer & a_Player)
+{
+	super::OpenedByPlayer(a_Player);
+
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 0, m_Beacon->GetBeaconLevel());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, m_Beacon->GetPrimaryPotion());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 2, m_Beacon->GetSecondaryPotion());
 }
 
 

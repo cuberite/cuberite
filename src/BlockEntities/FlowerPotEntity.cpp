@@ -1,7 +1,7 @@
 
 // FlowerPotEntity.cpp
 
-// Implements the cFlowerPotEntity class representing a single sign in the world
+// Implements the cFlowerPotEntity class representing a single flower pot in the world
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "json/json.h"

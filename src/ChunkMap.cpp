@@ -1839,6 +1839,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 						}
 						
 						case E_BLOCK_OBSIDIAN:
+						case E_BLOCK_BEACON:
 						case E_BLOCK_BEDROCK:
 						case E_BLOCK_WATER:
 						case E_BLOCK_LAVA:
