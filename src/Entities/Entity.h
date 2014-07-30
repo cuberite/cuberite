@@ -128,20 +128,20 @@ public:
 		esFireworkExploding      = 17,
 	} ;
 	
-	enum
-	{
-		FIRE_TICKS_PER_DAMAGE = 10,  ///< How many ticks to wait between damaging an entity when it stands in fire
-		FIRE_DAMAGE = 1,             ///< How much damage to deal when standing in fire
-		LAVA_TICKS_PER_DAMAGE = 10,  ///< How many ticks to wait between damaging an entity when it stands in lava
-		LAVA_DAMAGE = 5,             ///< How much damage to deal when standing in lava
-		BURN_TICKS_PER_DAMAGE = 20,  ///< How many ticks to wait between damaging an entity when it is burning
-		BURN_DAMAGE = 1,             ///< How much damage to deal when the entity is burning
-		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
-		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
-		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
-		VOID_BOUNDARY = -46,         ///< At what position Y to begin applying void damage
-		FALL_DAMAGE_HEIGHT = 4       ///< At what position Y fall damage is applied
-	} ;
+	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
+	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
+	static const int LAVA_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in lava
+	static const int LAVA_DAMAGE           = 5;    ///< Damage to deal when standing in lava
+	static const int BURN_TICKS_PER_DAMAGE = 20;   ///< Ticks to wait between damaging an entity when it is burning
+	static const int BURN_DAMAGE           = 1;    ///< Damage to deal when the entity is burning
+	
+	static const int BURN_TICKS            = 200;  ///< Ticks to keep an entity burning after it has stood in lava / fire
+	
+	static const int MAX_AIR_LEVEL         = 300;  ///< Maximum air an entity can have
+	static const int DROWNING_TICKS        = 20;   ///< Number of ticks per heart of damage
+	
+	static const int VOID_BOUNDARY         = -46;  ///< Y position to begin applying void damage
+	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
