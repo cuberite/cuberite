@@ -125,8 +125,8 @@ if (NOT MSVC)
         DEPENDS ${BINDING_DEPENDENCIES}
     )
 endif ()
-set_source_files_properties(Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
-set_source_files_properties(Bindings/Bindings.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.h PROPERTIES GENERATED TRUE)
 
 if(NOT MSVC)
     add_library(Bindings ${SRCS} ${HDRS})
