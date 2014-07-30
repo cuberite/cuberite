@@ -127,6 +127,12 @@ bool cBeaconEntity::SelectPrimaryPotion(cEntityEffect::eType a_Potion)
 	}
 
 	m_PrimaryPotion = a_Potion;
+
+	// Send window update:
+	if (GetWindow() != NULL)
+	{
+		GetWindow()->SetProperty(1, m_PrimaryPotion);
+	}
 	return true;
 }
 
@@ -142,6 +148,12 @@ bool cBeaconEntity::SelectSecondaryPotion(cEntityEffect::eType a_Potion)
 	}
 
 	m_SecondaryPotion = a_Potion;
+
+	// Send window update:
+	if (GetWindow() != NULL)
+	{
+		GetWindow()->SetProperty(2, m_SecondaryPotion);
+	}
 	return true;
 }
 
@@ -189,6 +201,8 @@ bool cBeaconEntity::IsMineralBlock(BLOCKTYPE a_BlockType)
 
 void cBeaconEntity::UpdateBeacon(void)
 {
+	int OldBeaconLevel = m_BeaconLevel;
+
 	if (IsBeaconBlocked())
 	{
 		m_IsActive = false;
@@ -198,6 +212,15 @@ void cBeaconEntity::UpdateBeacon(void)
 	{
 		m_BeaconLevel = CalculatePyramidLevel();
 		m_IsActive = (m_BeaconLevel > 0);
+	}
+
+	if (m_BeaconLevel != OldBeaconLevel)
+	{
+		// Send window update:
+		if (GetWindow() != NULL)
+		{
+			GetWindow()->SetProperty(0, m_BeaconLevel);
+		}
 	}
 
 	// TODO: Add achievement
