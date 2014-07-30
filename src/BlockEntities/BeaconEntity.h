@@ -49,8 +49,8 @@ public:
 	/** Returns the beacon level. (0 - 4) */
 	char GetBeaconLevel(void) const { return m_BeaconLevel; }
 
-	char GetPrimaryPotion(void) const { return m_PrimaryPotion; }
-	char GetSecondaryPotion(void) const { return m_SecondaryPotion; }
+	cEntityEffect::eType GetPrimaryPotion(void) const { return m_PrimaryPotion; }
+	cEntityEffect::eType GetSecondaryPotion(void) const { return m_SecondaryPotion; }
 
 	/** Select the primary potion. Returns false when the potion is invalid.*/
 	bool SelectPrimaryPotion(cEntityEffect::eType a_Potion);
