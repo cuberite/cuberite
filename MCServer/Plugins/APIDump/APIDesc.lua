@@ -1619,7 +1619,13 @@ a_Player:OpenWindow(Window);
 				Mojang uses two formats for UUIDs, short and dashed. MCServer works with short UUIDs internally, but
 				will convert to dashed UUIDs where needed - in the protocol login for example. The MakeUUIDShort()
 				and MakeUUIDDashed() functions are provided for plugins to use for conversion between the two
-				formats.
+				formats.</p>
+				<p>
+				This class will cache values returned by the API service. The cache will hold the values for 7 days
+				by default, after that, they will no longer be available. This is in order to not let the server get
+				banned from using the API service, since they are rate-limited to 600 queries per 10 minutes. The
+				cache contents also gets updated whenever a player successfully joins, since that makes the server
+				contact the API service, too, and retrieve the relevant data.</p>
 			]],
 			Functions =
 			{
