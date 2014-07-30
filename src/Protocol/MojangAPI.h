@@ -15,9 +15,12 @@
 
 
 
+// tolua_begin
 class cMojangAPI
 {
 public:
+	// tolua_end
+	
 	cMojangAPI(void);
 	~cMojangAPI();
 	
@@ -30,6 +33,8 @@ public:
 	Returns true if all was successful, false on failure. */
 	static bool SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response);
 	
+	// tolua_begin
+	
 	/** Converts the given UUID to its short form (32 bytes, no dashes).
 	Logs a warning and returns empty string if not a UUID. */
 	static AString MakeUUIDShort(const AString & a_UUID);
@@ -38,16 +43,22 @@ public:
 	Logs a warning and returns empty string if not a UUID. */
 	static AString MakeUUIDDashed(const AString & a_UUID);
 
+	// tolua_end
+	
 	/** Converts the player names into UUIDs.
 	a_PlayerName[idx] will be converted to UUID and returned as idx-th value
 	The UUID will be empty on error.
 	Blocking operation, do not use in world-tick thread! */
 	AStringVector GetUUIDsFromPlayerNames(const AStringVector & a_PlayerName);
 	
+	// tolua_begin
+	
 	/** Called by the Authenticator to add a PlayerName -> UUID mapping that it has received from
 	authenticating a user. This adds the cache item and "refreshes" it if existing, adjusting its datetime
 	stamp to now. */
 	void AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID);
+	
+	// tolua_end
 
 protected:
 	struct sUUIDRecord
@@ -95,7 +106,7 @@ protected:
 	Names that are not valid are not added into the cache.
 	ASSUMEs that a_PlayerNames contains lowercased player names. */
 	void CacheNamesToUUIDs(const AStringVector & a_PlayerNames);
-} ;
+} ;  // tolua_export
 
 
 

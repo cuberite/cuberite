@@ -2157,11 +2157,11 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
-static int tolua_cClientHandle_GetUUIDsFromPlayerNames(lua_State * L)
+static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 {
 	cLuaState S(L);
 	if (
-		!S.CheckParamUserTable(1, "cClientHandle") ||
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
 		!S.CheckParamTable(2) ||
 		!S.CheckParamEnd(3)
 	)
@@ -3144,9 +3144,12 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_constant(tolua_S, "MAX_VIEW_DISTANCE",       cClientHandle::MAX_VIEW_DISTANCE);
 			tolua_constant(tolua_S, "MIN_VIEW_DISTANCE",       cClientHandle::MIN_VIEW_DISTANCE);
 			tolua_function(tolua_S, "SendPluginMessage",       tolua_cClientHandle_SendPluginMessage);
-			tolua_function(tolua_S, "GetUUIDsFromPlayerNames", tolua_cClientHandle_GetUUIDsFromPlayerNames);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cMojangAPI");
+			tolua_function(tolua_S, "GetUUIDsFromPlayerNames", tolua_cMojangAPI_GetUUIDsFromPlayerNames);
+		tolua_endmodule(tolua_S);
+		
 		tolua_beginmodule(tolua_S, "cItemGrid");
 			tolua_function(tolua_S, "GetSlotCoords", Lua_ItemGrid_GetSlotCoords);
 		tolua_endmodule(tolua_S);
