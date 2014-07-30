@@ -304,7 +304,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 	try
 	{
 		// Open up the SQLite DB:
-		SQLite::Database db("NameToUUID.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		
 		// Clean up old entries:
@@ -341,7 +341,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 	try
 	{
 		// Open up the SQLite DB:
-		SQLite::Database db("NameToUUID.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		
 		// Remove all entries:
