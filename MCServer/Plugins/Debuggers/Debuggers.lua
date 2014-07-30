@@ -287,7 +287,7 @@ function TestUUIDFromName()
 		"nonexistent_player",
 	}
 	-- WARNING: Blocking operation! DO NOT USE IN TICK THREAD!
-	local UUIDs = cClientHandle:GetUUIDsFromPlayerNames(PlayerNames)
+	local UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames)
 	
 	-- Log the results:
 	for _, name in ipairs(PlayerNames) do
@@ -298,6 +298,15 @@ function TestUUIDFromName()
 			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
 		end
 	end
+	
+	-- Test once more with the same players, valid-only. This should go directly from cache, so fast.
+	LOG("Testing again with the same valid players...")
+	local ValidPlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(ValidPlayerNames);
 	
 	LOG("UUID-from-Name resolution test finished.")
 end
