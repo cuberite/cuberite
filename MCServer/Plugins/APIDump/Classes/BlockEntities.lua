@@ -50,6 +50,32 @@ return
 		},
 	},
 
+	cBeaconEntity =
+	{
+		Desc = [[
+			A beacon entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a beacon
+			in the world.
+		]],
+
+		Inherits = "cBlockEntityWithItems",
+
+		Functions =
+		{
+			IsActive = { Params = "", Return = "bool", Notes = "Is the beacon active?" },
+			GetBeaconLevel = { Params = "", Return = "number", Notes = "Returns the beacon level. (0 - 4)" },
+			GetPrimaryPotion = { Params = "", Return = "EffectType", Notes = "Returns the primary potion." },
+			GetSecondaryPotion = { Params = "", Return = "EffectType", Notes = "Returns the secondary potion." },
+			SelectPrimaryPotion = { Params = "EffectType", Return = "bool", Notes = "Select the primary potion. Returns false when the potion is invalid." },
+			SelectSecondaryPotion = { Params = "EffectType", Return = "bool", Notes = "Select the secondary potion. Returns false when the potion is invalid." },
+			CalculatePyramidLevel = { Params = "", Return = "number", Notes = "Calculate the amount of layers the pyramid below the beacon has." },
+			IsBeaconBlocked = { Params = "", Return = "bool", Notes = "Is the beacon blocked by non-transparent blocks that are higher than the beacon?" },
+			UpdateBeacon = { Params = "", Return = "", Notes = "Update the beacon." },
+			GiveEffects = { Params = "", Return = "", Notes = "Give the near-players the effects." },
+			IsMineralBlock = { Params = "BLOCKTYPE", Return = "bool", Notes = "Returns true if the block is a diamond block, a golden block, an iron block or an emerald block." },
+			IsValidPotion = { Params = "EffectType", Return = "bool", Notes = "Returns true if the potion can be used." },
+		},
+	},
+
 	cChestEntity =
 	{
 		Desc = [[
