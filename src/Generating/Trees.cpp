@@ -830,8 +830,6 @@ void GetRoofedForestTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise &
 	// Create branches
 	for (int i = 0; i < 3; i++)
 	{
-		//int x = (a_Noise.IntNoise3D(a_BlockX + 32 * a_Seq, a_BlockY * i, a_BlockZ + 32 * a_Seq) < 0 ? -1 : 2);
-		//int z = (a_Noise.IntNoise3D(a_BlockX - 32 * a_Seq, a_BlockY * i, a_BlockZ - 32 * a_Seq) < 0 ? -1 : 2);
 		int x = (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY * i, a_BlockZ + 32 * a_Seq) % 3) - 1;
 		int z = (a_Noise.IntNoise3DInt(a_BlockX - 32 * a_Seq, a_BlockY * i, a_BlockZ - 32 * a_Seq) % 3) - 1;
 
@@ -841,11 +839,11 @@ void GetRoofedForestTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise &
 			NOISE_DATATYPE Val1 = a_Noise.IntNoise2D(x, z);
 			if (Val1 < 0)
 			{
-				x = a_BlockX + (Val1 < -0.5) ? -1 : 3;
+				x = a_BlockX + ((Val1 < -0.5) ? -1 : 3);
 			}
 			else
 			{
-				z = a_BlockZ + (Val1 < 0.5) ? -1 : 3;
+				z = a_BlockZ + ((Val1 < 0.5) ? -1 : 3);
 			}
 		}
 
