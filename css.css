@@ -52,18 +52,15 @@ h2
 {
 	position: absolute;
 	left: 0;
-    right: 0;
+	right: 0;
 	top: -50px;
 	margin-left: auto;
 	margin-right: auto;
 	margin-bottom: -40px;
-	opacity: 0;
 	width: 80px;
 	height: 70px;
 	padding-top: 10px;
 	padding-bottom: 5px;
-	background-color: grey;
-	border-radius: 20px;
 	transition: 300ms all;
 	text-align: center;
 	overflow: hidden;
