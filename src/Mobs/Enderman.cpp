@@ -116,6 +116,23 @@ void cEnderman::CheckEventSeePlayer()
 	
 	ASSERT(Callback.GetPlayer() != NULL);
 
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
+
+	 // Check if the chunk the enderman is in is lit.
+	if (!m_World->IsChunkLighted(ChunkX, ChunkZ))
+	{
+		m_World->QueueLightChunk(ChunkX, ChunkZ);
+		return;
+	}
+
+	// Enderman only attack if the skylight is higher than 6 
+	if (m_World->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) <= 7)
+	{
+		// TODO: Teleport the enderman to a random spot.
+		return;
+	}
+
 	if (!Callback.GetPlayer()->IsGameModeCreative())
 	{
 		super::EventSeePlayer(Callback.GetPlayer());
