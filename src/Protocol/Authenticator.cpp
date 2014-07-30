@@ -188,20 +188,11 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 		return false;
 	}
 	a_UserName = root.get("name", "Unknown").asString();
-	a_UUID = root.get("id", "").asString();
+	a_UUID = cMojangAPI::MakeUUIDShort(root.get("id", "").asString());
 	a_Properties = root["properties"];
 	
 	// Store the player's UUID in the NameToUUID map in MojangAPI:
 	cRoot::Get()->GetMojangAPI().AddPlayerNameToUUIDMapping(a_UserName, a_UUID);
-
-	// If the UUID doesn't contain the dashes, insert them at the proper places:
-	if (a_UUID.size() == 32)
-	{
-		a_UUID.insert(8, "-");
-		a_UUID.insert(13, "-");
-		a_UUID.insert(18, "-");
-		a_UUID.insert(23, "-");
-	}
 
 	return true;
 }

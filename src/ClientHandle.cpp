@@ -233,13 +233,14 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// This guarantees that they will never collide with an online UUID and can be distinguished.
 	// Proper format for a version 3 UUID is:
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
+	// Note that we generate a short UUID (without the dashes)
 	
 	// Generate an md5 checksum, and use it as base for the ID:
 	unsigned char MD5[16];
 	md5((const unsigned char *)a_Username.c_str(), a_Username.length(), MD5);
 	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
 	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
-	return Printf("%02x%02x%02x%02x-%02x%02x-3%01x%02x-8%01x%02x-%02x%02x%02x%02x%02x%02x",
+	return Printf("%02x%02x%02x%02x%02x%02x3%01x%02x8%01x%02x%02x%02x%02x%02x%02x%02x",
 		MD5[0],  MD5[1],  MD5[2],  MD5[3],
 		MD5[4],  MD5[5],  MD5[6],  MD5[7],
 		MD5[8],  MD5[9],  MD5[10], MD5[11],

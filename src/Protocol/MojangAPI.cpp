@@ -18,12 +18,16 @@
 /** The maximum age for items to be kept in the cache. Any item older than this will be removed. */
 const Int64 MAX_AGE = 7 * 24 * 60 * 60;  // 7 days ago
 
+/** The maximum number of names to send in a single query */
+const int MAX_PER_QUERY = 100;
+
 
 
 
 
 #define DEFAULT_NAME_TO_UUID_SERVER "api.mojang.com"
 #define DEFAULT_NAME_TO_UUID_ADDRESS "/profiles/minecraft"
+
 
 
 
@@ -161,9 +165,10 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
 	AString lcName(a_PlayerName);
+	AString UUID = MakeUUIDShort(a_UUID);
 	Int64 Now = time(NULL);
 	cCSLock Lock(m_CSNameToUUID);
-	m_NameToUUID[StrToLower(lcName)] = sUUIDRecord(a_PlayerName, a_UUID, Now);
+	m_NameToUUID[StrToLower(lcName)] = sUUIDRecord(a_PlayerName, UUID, Now);
 }
 
 
@@ -234,8 +239,14 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 		
 		case 36: 
 		{
+			// Remove the dashes from the string:
 			AString res;
-			// TODO
+			res.reserve(32);
+			res.append(a_UUID, 0, 8);
+			res.append(a_UUID, 9, 4);
+			res.append(a_UUID, 14, 4);
+			res.append(a_UUID, 19, 4);
+			res.append(a_UUID, 24, 12);
 			return res;
 		}
 	}
@@ -256,7 +267,16 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 		case 32: 
 		{
 			AString res;
-			// TODO
+			res.reserve(36);
+			res.append(a_UUID, 0, 8);
+			res.push_back('-');
+			res.append(a_UUID, 8, 4);
+			res.push_back('-');
+			res.append(a_UUID, 12, 4);
+			res.push_back('-');
+			res.append(a_UUID, 16, 4);
+			res.push_back('-');
+			res.append(a_UUID, 20, 12);
 			return res;
 		}
 	}
@@ -362,11 +382,11 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 	
 	while (!NamesToQuery.empty())
 	{
-		// Create the request body - a JSON containing up to 100 playernames:
+		// Create the request body - a JSON containing up to MAX_PER_QUERY playernames:
 		Json::Value root;
 		int Count = 0;
 		AStringVector::iterator itr = NamesToQuery.begin(), end = NamesToQuery.end();
-		for (; (itr != end) && (Count < 100); ++itr, ++Count)
+		for (; (itr != end) && (Count < MAX_PER_QUERY); ++itr, ++Count)
 		{
 			Json::Value req(*itr);
 			root.append(req);
@@ -377,7 +397,7 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 	
 		// Create the HTTP request:
 		AString Request;
-		Request += "POST " + m_NameToUUIDAddress + " HTTP/1.0\r\n";
+		Request += "POST " + m_NameToUUIDAddress + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
 		Request += "Host: " + m_NameToUUIDServer + "\r\n";
 		Request += "User-Agent: MCServer\r\n";
 		Request += "Connection: close\r\n";
@@ -430,7 +450,7 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 		{
 			Json::Value & Val = root[idx];
 			AString JsonName = Val.get("name", "").asString();
-			AString JsonUUID = Val.get("id", "").asString();
+			AString JsonUUID = MakeUUIDShort(Val.get("id", "").asString());
 			if (JsonUUID.empty())
 			{
 				continue;
