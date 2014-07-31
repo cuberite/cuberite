@@ -63,12 +63,12 @@ public:  // tolua_export
 	const AString & GetDescription(void) const {return m_Description; }
 
 	// Player counts:
-	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
+	int  GetMaxPlayers(void) const { return m_MaxPlayers; }
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	// Hardcore mode or not:
-	bool IsHardcore(void) const {return m_bIsHardcore; }
+	bool IsHardcore(void) const { return m_bIsHardcore; }
 
 	// tolua_end
 

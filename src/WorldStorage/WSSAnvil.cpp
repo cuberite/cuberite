@@ -2475,10 +2475,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 
 	// Load health:
 	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	if (Health > 0)
-	{
-		a_Entity.SetHealth(a_NBT.GetShort(Health));
-	}
+	a_Entity.SetHealth(Health > 0 ? a_NBT.GetShort(Health) : a_Entity.GetMaxHealth());
 	
 	return true;
 }
@@ -2499,8 +2496,14 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 	a_Monster.SetDropChanceChestplate(DropChance[2]);
 	a_Monster.SetDropChanceLeggings(DropChance[3]);
 	a_Monster.SetDropChanceBoots(DropChance[4]);
-	bool CanPickUpLoot = (a_NBT.GetByte(a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot")) == 1);
-	a_Monster.SetCanPickUpLoot(CanPickUpLoot);
+
+	int LootTag = a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot");
+	if (LootTag > 0)
+	{
+		bool CanPickUpLoot = (a_NBT.GetByte(LootTag) == 1);
+		a_Monster.SetCanPickUpLoot(CanPickUpLoot);
+	}
+
 	return true;
 }
 

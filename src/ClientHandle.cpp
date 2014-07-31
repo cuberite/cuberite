@@ -120,7 +120,7 @@ cClientHandle::~cClientHandle()
 		}
 		if (World != NULL)
 		{
-			World->RemovePlayer(m_Player);
+			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
 			m_Player->Destroy();
 		}
 		delete m_Player;
@@ -1796,8 +1796,7 @@ void cClientHandle::RemoveFromWorld(void)
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 	
-	// StreamChunks() called in cPlayer::MoveToWorld() after new world has been set
-	// Meanwhile here, we set last streamed values to bogus ones so everything is resent
+	// Here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
 	m_HasSentPlayerChunk = false;
@@ -1974,28 +1973,17 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
-	bool ShouldAppendChatPrefixes = true;
-	
-	if (GetPlayer()->GetWorld() == NULL)
+	cWorld * World = GetPlayer()->GetWorld();
+	if (World == NULL)
 	{
-		cWorld * World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
+		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
 		if (World == NULL)
 		{
 			World = cRoot::Get()->GetDefaultWorld();
 		}
-
-		if (!World->ShouldUseChatPrefixes())
-		{
-			ShouldAppendChatPrefixes = false;
-		}
-	}
-	else if (!GetPlayer()->GetWorld()->ShouldUseChatPrefixes())
-	{
-		ShouldAppendChatPrefixes = false;
 	}
 
-	AString Message = FormatMessageType(ShouldAppendChatPrefixes, a_ChatPrefix, a_AdditionalData);
-
+	AString Message = FormatMessageType(World->ShouldUseChatPrefixes(), a_ChatPrefix, a_AdditionalData);
 	m_Protocol->SendChat(Message.append(a_Message));
 }
 
@@ -2378,9 +2366,9 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
-void cClientHandle::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
+void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	m_Protocol->SendRespawn(a_World, a_ShouldIgnoreDimensionChecks);
+	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 

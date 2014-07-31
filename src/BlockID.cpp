@@ -346,6 +346,37 @@ eDimension StringToDimension(const AString & a_DimensionString)
 
 
 
+AString DimensionToString(eDimension a_Dimension)
+{
+	// Decode using a built-in map:
+	static struct
+	{
+		eDimension m_Dimension;
+		const char * m_String;
+	} DimensionMap[] =
+	{
+		{ dimOverworld, "Overworld" },
+		{ dimNether, "Nether" },
+		{ dimEnd, "End" },
+	};
+
+	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
+	{
+		if (DimensionMap[i].m_Dimension == a_Dimension)
+		{
+			return DimensionMap[i].m_String;
+		}
+	}  // for i - DimensionMap[]
+
+	// Not found
+	LOGWARNING("Unknown dimension: \"%i\". Setting to Overworld", (int)a_Dimension);
+	return "Overworld";
+}
+
+
+
+
+
 /// Translates damage type constant to a string representation (built-in).
 AString DamageTypeToString(eDamageType a_DamageType)
 {

@@ -920,8 +920,13 @@ extern AString ItemToFullString(const cItem & a_Item);
 /// Translates a mob string ("ocelot") to mobtype (E_ENTITY_TYPE_OCELOT)
 extern int StringToMobType(const AString & a_MobString);
 
-/// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns -1000 on failure
+/// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure
 extern eDimension StringToDimension(const AString & a_DimensionString);
+
+/** Translates a dimension enum to dimension string.
+Takes an eDimension enum value and returns "Overworld" on failure
+*/
+extern AString DimensionToString(eDimension a_Dimension);
 
 /// Translates damage type constant to a string representation (built-in).
 extern AString DamageTypeToString(eDamageType a_DamageType);

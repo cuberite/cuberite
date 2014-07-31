@@ -332,8 +332,21 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 		cBlockInServerPluginInterface PluginInterface(*a_World);
 		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block), a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0);
 	}
-	
-	a_Player->UseEquippedItem();
+
+	if (!cBlockInfo::IsOneHitDig(Block))
+	{
+		a_Player->UseEquippedItem(GetDurabilityLossByAction(dlaBreakBlock));
+	}
+}
+
+
+
+
+
+void cItemHandler::OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity)
+{
+	UNUSED(a_AttackedEntity);
+	a_Attacker->UseEquippedItem(GetDurabilityLossByAction(dlaAttackEntity));
 }
 
 
@@ -345,6 +358,20 @@ void cItemHandler::OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_I
 	UNUSED(a_World);
 	UNUSED(a_Player);
 	UNUSED(a_Item);
+}
+
+
+
+
+
+short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction a_Action)
+{
+	switch ((int)a_Action)
+	{
+		case dlaAttackEntity: return 2;
+		case dlaBreakBlock:   return 1;
+	}
+	return 0;
 }
 
 
@@ -502,6 +529,7 @@ bool cItemHandler::IsPlaceable(void)
 
 bool cItemHandler::CanRepairWithRawMaterial(short a_ItemType)
 {
+	UNUSED(a_ItemType);
 	return false;
 }
 
@@ -548,6 +576,8 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_IRON_ORE:
 		case E_BLOCK_LAPIS_ORE:
 		case E_BLOCK_LAPIS_BLOCK:
+		case E_BLOCK_SNOW:
+		case E_BLOCK_VINES:
 		{
 			return false;
 		}

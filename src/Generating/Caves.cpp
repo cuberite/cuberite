@@ -497,29 +497,9 @@ void cCaveTunnel::ProcessChunk(
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
 				if (4 * SqDist <= SqRad)
 				{
-					switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
+					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes, x, y, z)))
 					{
-						// Only carve out these specific block types
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						case E_BLOCK_STONE:
-						case E_BLOCK_COBBLESTONE:
-						case E_BLOCK_GRAVEL:
-						case E_BLOCK_SAND:
-						case E_BLOCK_SANDSTONE:
-						case E_BLOCK_SOULSAND:
-						case E_BLOCK_NETHERRACK:
-						case E_BLOCK_COAL_ORE:
-						case E_BLOCK_IRON_ORE:
-						case E_BLOCK_GOLD_ORE:
-						case E_BLOCK_DIAMOND_ORE:
-						case E_BLOCK_REDSTONE_ORE:
-						case E_BLOCK_REDSTONE_ORE_GLOWING:
-						{
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
-							break;
-						}
-						default: break;
+						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 					}
 				}
 			}  // for y

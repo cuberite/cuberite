@@ -131,7 +131,7 @@ public:
 	
 	inline const cItem & GetEquippedItem(void) const { return GetInventory().GetEquippedItem(); }  // tolua_export
 
-	/** Returns whether the player is climbing (ladders, vines e.t.c). */
+	/** Returns whether the player is climbing (ladders, vines etc.) */
 	bool IsClimbing(void) const;
 
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
@@ -325,7 +325,7 @@ public:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual void Killed(cEntity * a_Victim) override;
-	
+
 	void Respawn(void);  // tolua_export
 
 	void SetVisible( bool a_bVisible);  // tolua_export
@@ -333,30 +333,36 @@ public:
 
 	/** Moves the player to the specified world.
 	Returns true if successful, false on failure (world not found). */
-	bool MoveToWorld(const char * a_WorldName);  // tolua_export
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn) override;
 
+	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
+
+	typedef cWorld * cWorldPtr;
 	
-	/** Loads the player data from the disk file.
-	Returns true on success, false on failure. */
-	bool LoadFromDisk(void);
+	/** Loads the player data from the disk file
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile()
+	Returns true on success, false on failure
+	*/
+	bool LoadFromDisk(cWorldPtr & a_World);
 	
-	/** Loads the player data from the specified file.
-	Returns true on success, false on failure. */
-	bool LoadFromFile(const AString & a_FileName);
+	/** Loads the player data from the specified file
+	Sets a_World to the world where the player will spawn, based on the stored world name or the default world
+	Returns true on success, false on failure
+	*/
+	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 	
 	void LoadPermissionsFromDisk(void);  // tolua_export
 
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
-	void UseEquippedItem(void);
+	void UseEquippedItem(int a_Amount = 1);
 	
 	void SendHealth(void);
 
 	void SendExperience(void);
 	
-	// In UI windows, the item that the player is dragging:
-	bool IsDraggingItem(void) const { return !m_DraggingItem.IsEmpty(); }
+	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }
 	
 	// In UI windows, when inventory-painting:
@@ -404,11 +410,20 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
+	/** Gets the last position that the player slept in
+	This is initialised to the world spawn point if the player has not slept in a bed as of yet
+	*/
+	Vector3i GetLastBedPos(void) const { return m_LastBedPos; }
+
+	/** Sets the player's bed (home) position */
+	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos);
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
+
 	// tolua_end
 
 	// cEntity overrides:
@@ -465,6 +480,9 @@ protected:
 
 	cWindow * m_CurrentWindow;
 	cWindow * m_InventoryWindow;
+
+	/** The player's last saved bed position */
+	Vector3i m_LastBedPos;
 
 	char m_Color;
 
@@ -539,7 +557,6 @@ protected:
 	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
 	If no ClientHandle is given, the UUID is initialized to empty. */
 	AString m_UUID;
-
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;

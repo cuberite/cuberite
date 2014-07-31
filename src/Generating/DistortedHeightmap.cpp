@@ -809,7 +809,7 @@ void cDistortedHeightmap::FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX
 		}
 		
 		// Select the ocean-floor pattern to use:
-		a_Pattern = ChooseOceanFloorPattern(a_RelX, a_RelZ);
+		a_Pattern = a_ChunkDesc.GetBiome(a_RelX, a_RelZ) == biDeepOcean ? patGravel.Get() : ChooseOceanFloorPattern(a_RelX, a_RelZ);
 		HasHadWater = true;
 	}  // for y
 	a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);

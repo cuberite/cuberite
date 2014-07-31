@@ -577,39 +577,34 @@ void cChunk::Tick(float a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 	
-	// Tick all entities in this chunk (except mobs):
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
-	{
-		// Mobs are tickes inside MobTick (as we don't have to tick them if they are far away from players)
-		if (!((*itr)->IsMob()))
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
+	{		
+		if (!((*itr)->IsMob()))  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		{
+			// Tick all entities in this chunk (except mobs):
 			(*itr)->Tick(a_Dt, *this);
 		}
-	}  // for itr - m_Entitites[]
-	
-	// Remove all entities that were scheduled for removal:
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
-	{
-			if ((*itr)->IsDestroyed())
-			{
-				LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
-				cEntity * ToDelete = *itr;
-				itr = m_Entities.erase(itr);
-				delete ToDelete;
-				ToDelete = NULL;
-				continue;
-			}
-			++itr;
-	}  // for itr - m_Entitites[]
-	
-	// If any entity moved out of the chunk, move it to the neighbor:
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
-	{
-		if (
+
+		if ((*itr)->IsDestroyed())  // Remove all entities that were scheduled for removal:
+		{
+			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+			MarkDirty();
+			cEntity * ToDelete = *itr;
+			itr = m_Entities.erase(itr);
+			delete ToDelete;
+		}
+		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove all entities that are travelling to another world:
+		{
+			MarkDirty();
+			(*itr)->SetWorldTravellingFrom(NULL);
+			itr = m_Entities.erase(itr);
+		}
+		else if (  // If any entity moved out of the chunk, move it to the neighbor:
 			((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ)
 		)
 		{
+			MarkDirty();
 			MoveEntityToNewChunk(*itr);
 			itr = m_Entities.erase(itr);
 		}
@@ -617,7 +612,7 @@ void cChunk::Tick(float a_Dt)
 		{
 			++itr;
 		}
-	}
+	}  // for itr - m_Entitites[]
 	
 	ApplyWeatherToTop();
 }
@@ -902,7 +897,6 @@ void cChunk::ApplyWeatherToTop()
 			}
 			break;
 		}  // case (snowy biomes)
-		// TODO: Rainy biomes should check for farmland and cauldrons
 		default:
 		{
 			break;
@@ -1798,7 +1792,7 @@ void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity)
 
 
 
-bool cChunk::AddClient(cClientHandle* a_Client)
+bool cChunk::AddClient(cClientHandle * a_Client)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1829,7 +1823,7 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 
 
-void cChunk::RemoveClient( cClientHandle* a_Client)
+void cChunk::RemoveClient(cClientHandle * a_Client)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1837,7 +1831,7 @@ void cChunk::RemoveClient( cClientHandle* a_Client)
 		{
 			continue;
 		}
-		
+
 		m_LoadedByClient.erase(itr);
 
 		if (!a_Client->IsDestroyed())
@@ -1862,7 +1856,7 @@ void cChunk::RemoveClient( cClientHandle* a_Client)
 
 
 
-bool cChunk::HasClient( cClientHandle* a_Client)
+bool cChunk::HasClient(cClientHandle * a_Client)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1893,9 +1887,9 @@ void cChunk::AddEntity(cEntity * a_Entity)
 	{
 		MarkDirty();
 	}
-	
+
 	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
-	
+
 	m_Entities.push_back(a_Entity);
 }
 
@@ -1905,17 +1899,12 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
-	size_t SizeBefore = m_Entities.size();
 	m_Entities.remove(a_Entity);
-	size_t SizeAfter = m_Entities.size();
-	
-	if (SizeBefore != SizeAfter)
+
+	// Mark as dirty if it was a server-generated entity:
+	if (!a_Entity->IsPlayer())
 	{
-		// Mark as dirty if it was a server-generated entity:
-		if (!a_Entity->IsPlayer())
-		{
-			MarkDirty();
-		}
+		MarkDirty();
 	}
 }
 

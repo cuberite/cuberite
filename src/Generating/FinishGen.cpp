@@ -135,13 +135,22 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = MinY; y < MaxY; y++)
 			{
+				if (
+					((x < 0) || (x >= cChunkDef::Width)) ||
+					((y < 0) || (y >= cChunkDef::Height)) ||
+					((z < 0) || (z >= cChunkDef::Width))
+					)
+				{
+					continue;
+				}
+
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)  // Don't replace non air blocks.
 				{
 					continue;
 				}
 
 				BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
-				if (!cBlockInfo::IsSolid(BlockBelow))  // Only place on solid blocks
+				if (!cBlockInfo::FullyOccupiesVoxel(BlockBelow))  // Only place on solid blocks
 				{
 					continue;
 				}
@@ -454,14 +463,14 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cFinishGenLilypads:
+// cFinishGenSingleTopBlock:
 
-int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
+int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	int res = 0;
 	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
 	{
-		if (a_BiomeMap[i] == m_Biome)
+		if (IsAllowedBiome(a_BiomeMap[i]))
 		{
 			res++;
 		}
@@ -473,7 +482,7 @@ int cFinishGenSingleBiomeSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap &
 
 
 
-void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
+void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Add Lilypads on top of water surface in Swampland
 
@@ -486,11 +495,13 @@ void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 		int z = (m_Noise.IntNoise3DInt(ChunkX - ChunkZ, i, ChunkZ) / 11) % cChunkDef::Width;
 
 		// Place the block at {x, z} if possible:
-		if (a_ChunkDesc.GetBiome(x, z) != m_Biome)
+		EMCSBiome Biome = a_ChunkDesc.GetBiome(x, z);
+		if (!IsAllowedBiome(Biome))
 		{
 			// Incorrect biome
 			continue;
 		}
+
 		int Height = a_ChunkDesc.GetHeight(x, z);
 		if (Height >= cChunkDef::Height)
 		{
@@ -502,13 +513,16 @@ void cFinishGenSingleBiomeSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 			// Not an empty block
 			continue;
 		}
+
 		BLOCKTYPE BlockBelow = a_ChunkDesc.GetBlockType(x, Height, z);
-		if ((BlockBelow == m_AllowedBelow1) || (BlockBelow == m_AllowedBelow2))
+		if (!IsAllowedBlockBelow(BlockBelow))
 		{
-			a_ChunkDesc.SetBlockType(x, Height + 1, z, m_BlockType);
-			a_ChunkDesc.SetHeight(x, z, Height + 1);
+			continue;
 		}
-	}  // for i
+
+		a_ChunkDesc.SetBlockType(x, Height + 1, z, m_BlockType);
+		a_ChunkDesc.SetHeight(x, z, Height + 1);
+	}
 }
 
 
@@ -541,7 +555,10 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenPreSimulator:
 
-cFinishGenPreSimulator::cFinishGenPreSimulator(void)
+cFinishGenPreSimulator::cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava) :
+	m_PreSimulateFallingBlocks(a_PreSimulateFallingBlocks),
+	m_PreSimulateWater(a_PreSimulateWater),
+	m_PreSimulateLava(a_PreSimulateLava)
 {
 	// Nothing needed yet
 }
@@ -552,9 +569,20 @@ cFinishGenPreSimulator::cFinishGenPreSimulator(void)
 
 void cFinishGenPreSimulator::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	CollapseSandGravel(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
-	StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	if (m_PreSimulateFallingBlocks)
+	{
+		CollapseSandGravel(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
+	}
+
+	if (m_PreSimulateWater)
+	{
+		StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	}
+
+	if (m_PreSimulateLava)
+	{
+		StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_LAVA, E_BLOCK_STATIONARY_LAVA);
+	}
 	// TODO: other operations
 }
 

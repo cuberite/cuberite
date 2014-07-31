@@ -153,10 +153,10 @@ if (NOT MSVC)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
 	#clear file
-	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
-	foreach(dependecy ${BINDING_DEPENDECIES})
-		#write each dependecy on a seperate line
-		file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt "${dependecy}\n")
+	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependencies.txt)
+	foreach(dependency ${BINDING_DEPENDENCIES})
+		#write each dependency on a seperate line
+		file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependencies.txt "${dependency}\n")
 	endforeach()
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")

@@ -88,13 +88,14 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	
 	m_PlayerName = a_PlayerName;
 
-	if (!LoadFromDisk())
+	cWorld * World = NULL;
+	if (!LoadFromDisk(World))
 	{
 		m_Inventory.Clear();
-		cWorld * DefaultWorld = cRoot::Get()->GetDefaultWorld();
-		SetPosX(DefaultWorld->GetSpawnX());
-		SetPosY(DefaultWorld->GetSpawnY());
-		SetPosZ(DefaultWorld->GetSpawnZ());
+		SetPosX(World->GetSpawnX());
+		SetPosY(World->GetSpawnY());
+		SetPosZ(World->GetSpawnZ());
+		SetBedPos(Vector3i((int)World->GetSpawnX(), (int)World->GetSpawnY(), (int)World->GetSpawnZ()));
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -107,11 +108,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 
 	if (m_GameMode == gmNotSet)
 	{
-		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-		if (World == NULL)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
 		if (World->IsGameModeCreative())
 		{
 			m_CanFly = true;
@@ -140,8 +136,6 @@ cPlayer::~cPlayer(void)
 
 	SaveToDisk();
 
-	m_World->RemovePlayer( this);
-
 	m_ClientHandle = NULL;
 	
 	delete m_InventoryWindow;
@@ -157,8 +151,6 @@ cPlayer::~cPlayer(void)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
-	
-	m_ClientHandle = NULL;
 }
 
 
@@ -890,7 +882,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
-	if (a_TDI.Attacker == NULL)
+	if ((a_TDI.Attacker == NULL) && m_World->ShouldBroadcastDeathMessages())
 	{
 		AString DamageText;
 		switch (a_TDI.DamageType)
@@ -983,12 +975,12 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*m_World, true);
+	m_ClientHandle->SendRespawn(GetWorld()->GetDimension(), true);
 	
 	// Extinguish the fire:
 	StopBurning();
 
-	TeleportToCoords(GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ());
+	TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
 
 	SetVisible(true);
 }
@@ -1208,11 +1200,13 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	}
 	else
 	{
-		// First time, announce it
-		cCompositeChat Msg;
-		Msg.SetMessageType(mtSuccess);
-		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
-		m_World->BroadcastChat(Msg);
+		if (m_World->ShouldBroadcastAchievementMessages())
+		{
+			cCompositeChat Msg;
+			Msg.SetMessageType(mtSuccess);
+			Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
+			m_World->BroadcastChat(Msg);
+		}
 
 		// Increment the statistic
 		StatValue New = m_Stats.AddValue(a_Ach);
@@ -1617,29 +1611,29 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 
 
-bool cPlayer::MoveToWorld(const char * a_WorldName)
+bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
-	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
-	if (World == NULL)
+	ASSERT(a_World != NULL);
+
+	if (GetWorld() == a_World)
 	{
-		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
+		// Don't move to same world
 		return false;
 	}
 	
 	// Send the respawn packet:
-	if (m_ClientHandle != NULL)
+	if (a_ShouldSendRespawn && (m_ClientHandle != NULL))
 	{
-		m_ClientHandle->SendRespawn(*World);
+		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
 
-	// Remove all links to the old world
-	m_World->RemovePlayer(this);
-
-	// If the dimension is different, we can send the respawn packet
-	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
+	// Remove player from the old world
+	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
+	GetWorld()->RemovePlayer(this, false);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
-	World->AddPlayer(this);
+	a_World->AddPlayer(this);
+	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	return true;
 }
@@ -1687,13 +1681,12 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-
-bool cPlayer::LoadFromDisk(void)
+bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
 	LoadPermissionsFromDisk();
 
 	// Load from the UUID file:
-	if (LoadFromFile(GetUUIDFileName(m_UUID)))
+	if (LoadFromFile(GetUUIDFileName(m_UUID), a_World))
 	{
 		return true;
 	}
@@ -1704,7 +1697,7 @@ bool cPlayer::LoadFromDisk(void)
 	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
 	{
 		OfflineUsage = "";
-		if (LoadFromFile(GetUUIDFileName(OfflineUUID)))
+		if (LoadFromFile(GetUUIDFileName(OfflineUUID), a_World))
 		{
 			return true;
 		}
@@ -1714,7 +1707,7 @@ bool cPlayer::LoadFromDisk(void)
 	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
 	{
 		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
-		if (LoadFromFile(OldStyleFileName))
+		if (LoadFromFile(OldStyleFileName, a_World))
 		{
 			// Save in new format and remove the old file
 			if (SaveToDisk())
@@ -1729,6 +1722,11 @@ bool cPlayer::LoadFromDisk(void)
 	LOG("Player data file not found for %s (%s, offline %s%s), will be reset to defaults.",
 		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str(), OfflineUsage
 	);
+
+	if (a_World == NULL)
+	{
+		a_World = cRoot::Get()->GetDefaultWorld();
+	}
 	return false;
 }
 
@@ -1736,7 +1734,7 @@ bool cPlayer::LoadFromDisk(void)
 
 
 
-bool cPlayer::LoadFromFile(const AString & a_FileName)
+bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 {
 	// Load the data from the file:
 	cFile f;
@@ -1801,6 +1799,11 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), true);
+
+	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
+	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
+	m_LastBedPos.z = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
 
 	// Load the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
@@ -1808,7 +1811,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 	StatSerializer.Load();
 	
 	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), a_World->GetName().c_str()
 	);
 	
 	return true;
@@ -1820,7 +1823,6 @@ bool cPlayer::LoadFromFile(const AString & a_FileName)
 
 bool cPlayer::SaveToDisk()
 {
-	cFile::CreateFolder(FILE_IO_PREFIX + AString("players"));
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
@@ -1855,6 +1857,10 @@ bool cPlayer::SaveToDisk()
 	root["foodExhaustion"]      = m_FoodExhaustionLevel;
 	root["isflying"]            = IsFlying();
 	root["lastknownname"]       = GetName();
+	root["SpawnX"]              = GetLastBedPos().x;
+	root["SpawnY"]              = GetLastBedPos().y;
+	root["SpawnZ"]              = GetLastBedPos().z;
+
 	if (m_World != NULL)
 	{
 		root["world"] = m_World->GetName();
@@ -1931,14 +1937,14 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 
 
-void cPlayer::UseEquippedItem(void)
+void cPlayer::UseEquippedItem(int a_Amount)
 {
 	if (IsGameModeCreative())  // No damage in creative
 	{
 		return;
 	}
 
-	if (GetInventory().DamageEquippedItem())
+	if (GetInventory().DamageEquippedItem(a_Amount))
 	{
 		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	}

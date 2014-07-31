@@ -104,7 +104,7 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendRespawn             (const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks = false) override;
+	virtual void SendRespawn             (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
 	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
