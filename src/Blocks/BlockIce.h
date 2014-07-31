@@ -32,7 +32,7 @@ public:
 		}
 
 		BLOCKTYPE BlockBelow = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
-		if (!cBlockInfo::IsSolid(BlockBelow) && !IsBlockLava(BlockBelow) && !IsBlockWater(BlockBelow))
+		if (!cBlockInfo::FullyOccupiesVoxel(BlockBelow) && !IsBlockLiquid(BlockBelow))
 		{
 			return;
 		}
