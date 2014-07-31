@@ -245,7 +245,7 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 			return a_UUID;
 		}
 		
-		case 36: 
+		case 36:
 		{
 			// Remove the dashes from the string:
 			AString res;
@@ -277,7 +277,7 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 			return a_UUID;
 		}
 		
-		case 32: 
+		case 32:
 		{
 			// Insert dashes at the proper positions:
 			AString res;
