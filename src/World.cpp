@@ -3176,17 +3176,17 @@ void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicke
 
 cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
-	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "");
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "Incremental");
 
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] RedstoneSimulator not present or empty in %s, using the default of \"incremental\".", GetIniFileName().c_str());
-		SimulatorName = "incremental";
+		LOGWARNING("[Physics] RedstoneSimulator not present or empty in %s, using the default of \"Incremental\".", GetIniFileName().c_str());
+		SimulatorName = "Incremental";
 	}
 	
 	cRedstoneSimulator * res = NULL;
 
-	if (NoCaseCompare(SimulatorName, "incremental") == 0)
+	if (NoCaseCompare(SimulatorName, "Incremental") == 0)
 	{
 		res = new cIncrementalRedstoneSimulator(*this);
 	}
@@ -3210,7 +3210,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
 	AString SimulatorSectionName;
 	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
-	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "Vanilla");
 	if (SimulatorName.empty())
 	{
 		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Vanilla\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
