@@ -22,7 +22,7 @@ public:
 
 	virtual bool Item(cPlayer * a_Player) override
 	{
-		// Don't check players who are in creative gamemode.
+		// Don't check players who are in creative gamemode
 		if (a_Player->IsGameModeCreative())
 		{
 			return false;
@@ -30,13 +30,13 @@ public:
 		
 		Vector3d Direction = m_EndermanPos - a_Player->GetPosition();
 		
-		// Don't check players who are more then 64 blocks away.
+		// Don't check players who are more then 64 blocks away
 		if (Direction.SqrLength() > 64)
 		{
 			return false;
 		}
 		
-		// Don't check if the player has a pumpkin on his head.
+		// Don't check if the player has a pumpkin on his head
 		if (a_Player->GetEquippedHelmet().m_ItemType == E_BLOCK_PUMPKIN)
 		{
 			return false;
@@ -46,9 +46,8 @@ public:
 		Vector3d LookVector = a_Player->GetLookVector();
 		double dot = Direction.Dot(LookVector);
 		
-		// 0.09 rad ~ 5 degrees.
-		// If the players crosshair is within 5 degrees of the endermen
-		// It counts as looking.
+		// 0.09 rad ~ 5 degrees
+		// If the player's crosshair is within 5 degrees of the enderman, it counts as looking
 		if (dot > cos(0.09))
 		{
 			return false;
@@ -119,17 +118,17 @@ void cEnderman::CheckEventSeePlayer()
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
 
-	 // Check if the chunk the enderman is in is lit.
+	 // Check if the chunk the enderman is in is lit
 	if (!m_World->IsChunkLighted(ChunkX, ChunkZ))
 	{
 		m_World->QueueLightChunk(ChunkX, ChunkZ);
 		return;
 	}
 
-	// Enderman only attack if the skylight is higher than 6 
+	// Enderman only attack if the skylight is higher than 7 
 	if (m_World->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) <= 7)
 	{
-		// TODO: Teleport the enderman to a random spot.
+		// TODO: Teleport the enderman to a random spot
 		return;
 	}
 
