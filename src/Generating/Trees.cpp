@@ -218,7 +218,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			return;
 		}
 
-		case biRoofedForest:
 		case biColdTaiga:
 		case biColdTaigaHills:
 		case biMegaTaiga:
@@ -238,7 +237,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biIcePlainsSpikes:
 		case biJungleM:
 		case biJungleEdgeM:
-		case biRoofedForestM:
 		case biColdTaigaM:
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
@@ -251,6 +249,13 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		{
 			// TODO: These need their special trees
 			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			return;
+		}
+
+		case biRoofedForest:
+		case biRoofedForestM:
+		{
+			GetDarkoakTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			return;
 		}
 			
@@ -407,7 +412,60 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 
 void GetDarkoakTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	// TODO
+	// Pick a height
+	int Height = 5 + (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY, a_BlockZ + 32 * a_Seq) / 11) % 4;
+
+	// Create the trunk
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+		a_LogBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY + i, a_BlockZ, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ + 1, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+		a_LogBlocks.push_back(sSetBlock(a_BlockX + 1, a_BlockY + i, a_BlockZ + 1, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+	}
+
+	// Create branches
+	for (int i = 0; i < 3; i++)
+	{
+		int x = (a_Noise.IntNoise3DInt(a_BlockX + 32 * a_Seq, a_BlockY * i, a_BlockZ + 32 * a_Seq) % 3) - 1;
+		int z = (a_Noise.IntNoise3DInt(a_BlockX - 32 * a_Seq, a_BlockY * i, a_BlockZ - 32 * a_Seq) % 3) - 1;
+
+		// The branches would end up in the trunk.
+		if ((x >= a_BlockX) && (x <= a_BlockX + 1) && (z >= a_BlockZ) && (z <= a_BlockZ + 1))
+		{
+			NOISE_DATATYPE Val1 = a_Noise.IntNoise2D(x, z);
+			if (Val1 < 0)
+			{
+				x = a_BlockX + ((Val1 < -0.5) ? -1 : 3);
+			}
+			else
+			{
+				z = a_BlockZ + ((Val1 < 0.5) ? -1 : 3);
+			}
+		}
+
+		int y = Height - (a_Noise.IntNoise3DInt(a_BlockX + x, a_BlockY * i, a_BlockZ - z) % (Height - (Height / 4)));
+
+		for (int Y = y; Y < Height; Y++)
+		{
+			a_LogBlocks.push_back(sSetBlock(a_BlockX + x, a_BlockY + Y, a_BlockZ + z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_DARK_OAK_WOOD));
+		}
+	}
+
+	int hei = a_BlockY + Height - 2;
+
+	// The lower two leaves layers are BigO4 with log in the middle and possibly corners:
+	for (int i = 0; i < 2; i++)
+	{
+		PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO4, ARRAYCOUNT(BigO4), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
+		PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
+		hei++;
+	}  // for i < 2
+
+	// The top leaves layer is a BigO3 with leaves in the middle and possibly corners:
+	PushCoordBlocks(a_BlockX, hei, a_BlockZ, a_OtherBlocks, BigO3, ARRAYCOUNT(BigO3), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
+	PushCornerBlocks(a_BlockX, hei, a_BlockZ, a_Seq, a_Noise, 0x5fffffff, a_OtherBlocks, 3, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD);
+	a_OtherBlocks.push_back(sSetBlock(a_BlockX, hei, a_BlockZ, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_DARK_OAK_WOOD));
 }
 
 
