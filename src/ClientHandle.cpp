@@ -3,6 +3,7 @@
 #include "ClientHandle.h"
 #include "Server.h"
 #include "World.h"
+#include "Statistics.h"
 #include "Entities/Pickup.h"
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
