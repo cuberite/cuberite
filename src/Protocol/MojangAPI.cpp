@@ -120,8 +120,8 @@ cMojangAPI::~cMojangAPI()
 
 void cMojangAPI::Start(cIniFile & a_SettingsIni)
 {
-	m_NameToUUIDServer   = a_SettingsIni.GetValueSet("Authentication", "NameToUUIDServer",  DEFAULT_NAME_TO_UUID_SERVER);
-	m_NameToUUIDAddress  = a_SettingsIni.GetValueSet("Authentication", "NameToUUIDAddress", DEFAULT_NAME_TO_UUID_ADDRESS);
+	m_NameToUUIDServer   = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDServer",  DEFAULT_NAME_TO_UUID_SERVER);
+	m_NameToUUIDAddress  = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDAddress", DEFAULT_NAME_TO_UUID_ADDRESS);
 	LoadCachesFromDisk();
 }
 
