@@ -7,6 +7,7 @@
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
+#include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
@@ -31,7 +32,6 @@
 #include "Items/ItemSword.h"
 
 #include "polarssl/md5.h"
-#include "BlockEntities/BeaconEntity.h"
 
 
 
@@ -775,25 +775,25 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 	cByteBuffer Buffer(a_Length);
 	Buffer.Write(a_Data, a_Length);
 
-	int PrimaryPotionID, SecondaryPotionID;
-	Buffer.ReadBEInt(PrimaryPotionID);
-	Buffer.ReadBEInt(SecondaryPotionID);
+	int PrimaryEffectID, SecondaryEffectID;
+	Buffer.ReadBEInt(PrimaryEffectID);
+	Buffer.ReadBEInt(SecondaryEffectID);
 
-	cEntityEffect::eType PrimaryPotion = cEntityEffect::effNoEffect;
-	if ((PrimaryPotionID >= 0) && (PrimaryPotionID <= (int)cEntityEffect::effSaturation))
+	cEntityEffect::eType PrimaryEffect = cEntityEffect::effNoEffect;
+	if ((PrimaryEffectID >= 0) && (PrimaryEffectID <= (int)cEntityEffect::effSaturation))
 	{
-		PrimaryPotion = (cEntityEffect::eType)PrimaryPotionID;
+		PrimaryEffect = (cEntityEffect::eType)PrimaryEffectID;
 	}
 
-	cEntityEffect::eType SecondaryPotion = cEntityEffect::effNoEffect;
-	if ((SecondaryPotionID >= 0) && (SecondaryPotionID <= (int)cEntityEffect::effSaturation))
+	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
+	if ((SecondaryEffectID >= 0) && (SecondaryEffectID <= (int)cEntityEffect::effSaturation))
 	{
-		SecondaryPotion = (cEntityEffect::eType)SecondaryPotionID;
+		SecondaryEffect = (cEntityEffect::eType)SecondaryEffectID;
 	}
 
 	Window->SetSlot(*m_Player, 0, cItem());
-	BeaconWindow->GetBeaconEntity()->SelectPrimaryPotion(PrimaryPotion);
-	BeaconWindow->GetBeaconEntity()->SelectSecondaryPotion(SecondaryPotion);
+	BeaconWindow->GetBeaconEntity()->SelectPrimaryEffect(PrimaryEffect);
+	BeaconWindow->GetBeaconEntity()->SelectSecondaryEffect(SecondaryEffect);
 }
 
 

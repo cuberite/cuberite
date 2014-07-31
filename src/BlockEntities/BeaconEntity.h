@@ -52,14 +52,14 @@ public:
 	/** Returns the beacon level. (0 - 4) */
 	char GetBeaconLevel(void) const { return m_BeaconLevel; }
 
-	cEntityEffect::eType GetPrimaryPotion(void) const { return m_PrimaryPotion; }
-	cEntityEffect::eType GetSecondaryPotion(void) const { return m_SecondaryPotion; }
+	cEntityEffect::eType GetPrimaryEffect(void) const { return m_PrimaryEffect; }
+	cEntityEffect::eType GetSecondaryEffect(void) const { return m_SecondaryEffect; }
 
 	/** Select the primary potion. Returns false when the potion is invalid.*/
-	bool SelectPrimaryPotion(cEntityEffect::eType a_Potion);
+	bool SelectPrimaryEffect(cEntityEffect::eType a_Effect);
 
 	/** Select the secondary potion. Returns false when the potion is invalid. */
-	bool SelectSecondaryPotion(cEntityEffect::eType a_Potion);
+	bool SelectSecondaryEffect(cEntityEffect::eType a_Effect);
 
 	/** Calculate the amount of layers the pyramid below the beacon has. */
 	char CalculatePyramidLevel(void);
@@ -77,7 +77,7 @@ public:
 	static bool IsMineralBlock(BLOCKTYPE a_BlockType);
 
 	/** Returns true if the potion can be used. */
-	static bool IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLevel);
+	static bool IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLevel);
 
 	// tolua_end
 
@@ -85,7 +85,7 @@ protected:
 	bool m_IsActive;
 	char m_BeaconLevel;
 
-	cEntityEffect::eType m_PrimaryPotion, m_SecondaryPotion;
+	cEntityEffect::eType m_PrimaryEffect, m_SecondaryEffect;
 } ;  // tolua_export
 
 

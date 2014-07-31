@@ -182,8 +182,8 @@ void cNBTChunkSerializer::AddBeaconEntity(cBeaconEntity * a_Entity)
 	m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_Entity, "Beacon");
 		m_Writer.AddInt("Levels", a_Entity->GetBeaconLevel());
-		m_Writer.AddInt("Primary", (int)a_Entity->GetPrimaryPotion());
-		m_Writer.AddInt("Secondary", (int)a_Entity->GetSecondaryPotion());
+		m_Writer.AddInt("Primary", (int)a_Entity->GetPrimaryEffect());
+		m_Writer.AddInt("Secondary", (int)a_Entity->GetSecondaryEffect());
 		m_Writer.BeginList("Items", TAG_Compound);
 			AddItemGrid(a_Entity->GetContents());
 		m_Writer.EndList();

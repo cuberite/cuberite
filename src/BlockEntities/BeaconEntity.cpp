@@ -13,8 +13,8 @@ cBeaconEntity::cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * 
 	: super(E_BLOCK_BEACON, a_BlockX, a_BlockY, a_BlockZ, 1, 1, a_World)
 	, m_IsActive(false)
 	, m_BeaconLevel(0)
-	, m_PrimaryPotion(cEntityEffect::effNoEffect)
-	, m_SecondaryPotion(cEntityEffect::effNoEffect)
+	, m_PrimaryEffect(cEntityEffect::effNoEffect)
+	, m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
 	UpdateBeacon();
 }
@@ -62,9 +62,9 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 
 
 
-bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLevel)
+bool cBeaconEntity::IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLevel)
 {
-	if (a_Potion == cEntityEffect::effNoEffect)
+	if (a_Effect == cEntityEffect::effNoEffect)
 	{
 		return true;
 	}
@@ -74,7 +74,7 @@ bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLe
 		case 4:
 		{
 			// Beacon level 4
-			if (a_Potion == cEntityEffect::effRegeneration)
+			if (a_Effect == cEntityEffect::effRegeneration)
 			{
 				return true;
 			}
@@ -82,7 +82,7 @@ bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLe
 		case 3:
 		{
 			// Beacon level 3
-			if (a_Potion == cEntityEffect::effStrength)
+			if (a_Effect == cEntityEffect::effStrength)
 			{
 				return true;
 			}
@@ -90,7 +90,7 @@ bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLe
 		case 2:
 		{
 			// Beacon level 2
-			switch (a_Potion)
+			switch (a_Effect)
 			{
 				case cEntityEffect::effResistance:
 				case cEntityEffect::effJumpBoost:
@@ -102,7 +102,7 @@ bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLe
 		case 1:
 		{
 			// Beacon level 1
-			switch (a_Potion)
+			switch (a_Effect)
 			{
 				case cEntityEffect::effSpeed:
 				case cEntityEffect::effHaste:
@@ -119,19 +119,19 @@ bool cBeaconEntity::IsValidPotion(cEntityEffect::eType a_Potion, char a_BeaconLe
 
 
 
-bool cBeaconEntity::SelectPrimaryPotion(cEntityEffect::eType a_Potion)
+bool cBeaconEntity::SelectPrimaryEffect(cEntityEffect::eType a_Effect)
 {
-	if (!IsValidPotion(a_Potion, m_BeaconLevel))
+	if (!IsValidEffect(a_Effect, m_BeaconLevel))
 	{
 		return false;
 	}
 
-	m_PrimaryPotion = a_Potion;
+	m_PrimaryEffect = a_Effect;
 
 	// Send window update:
 	if (GetWindow() != NULL)
 	{
-		GetWindow()->SetProperty(1, m_PrimaryPotion);
+		GetWindow()->SetProperty(1, m_PrimaryEffect);
 	}
 	return true;
 }
@@ -140,19 +140,19 @@ bool cBeaconEntity::SelectPrimaryPotion(cEntityEffect::eType a_Potion)
 
 
 
-bool cBeaconEntity::SelectSecondaryPotion(cEntityEffect::eType a_Potion)
+bool cBeaconEntity::SelectSecondaryEffect(cEntityEffect::eType a_Effect)
 {
-	if (!IsValidPotion(a_Potion, m_BeaconLevel))
+	if (!IsValidEffect(a_Effect, m_BeaconLevel))
 	{
 		return false;
 	}
 
-	m_SecondaryPotion = a_Potion;
+	m_SecondaryEffect = a_Effect;
 
 	// Send window update:
 	if (GetWindow() != NULL)
 	{
-		GetWindow()->SetProperty(2, m_SecondaryPotion);
+		GetWindow()->SetProperty(2, m_SecondaryEffect);
 	}
 	return true;
 }
@@ -163,17 +163,15 @@ bool cBeaconEntity::SelectSecondaryPotion(cEntityEffect::eType a_Potion)
 
 bool cBeaconEntity::IsBeaconBlocked(void)
 {
-	bool IsBlocked = false;
 	for (int Y = m_PosY; Y < cChunkDef::Height; ++Y)
 	{
 		BLOCKTYPE Block = m_World->GetBlock(m_PosX, Y, m_PosZ);
 		if (!cBlockInfo::IsTransparent(Block))
 		{
-			IsBlocked = true;
-			break;
+			return true;
 		}
 	}
-	return IsBlocked;
+	return false;
 }
 
 
@@ -239,22 +237,22 @@ void cBeaconEntity::GiveEffects(void)
 
 	int Radius = m_BeaconLevel * 10 + 10;
 	short EffectLevel = 0;
-	if ((m_BeaconLevel >= 4) && (m_PrimaryPotion == m_SecondaryPotion))
+	if ((m_BeaconLevel >= 4) && (m_PrimaryEffect == m_SecondaryEffect))
 	{
 		EffectLevel = 1;
 	}
 
-	cEntityEffect::eType SecondaryPotion = cEntityEffect::effNoEffect;
-	if ((m_BeaconLevel >= 4) && (m_PrimaryPotion != m_SecondaryPotion) && (m_SecondaryPotion > 0))
+	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
+	if ((m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0))
 	{
-		SecondaryPotion = m_SecondaryPotion;
+		SecondaryEffect = m_SecondaryEffect;
 	}
 
 	class cPlayerCallback : public cPlayerListCallback
 	{
 		int m_Radius;
 		int m_PosX, m_PosY, m_PosZ;
-		cEntityEffect::eType m_PrimaryPotion, m_SecondaryPotion;
+		cEntityEffect::eType m_PrimaryEffect, m_SecondaryEffect;
 		short m_EffectLevel;
 
 		virtual bool Item(cPlayer * a_Player)
@@ -269,28 +267,28 @@ void cBeaconEntity::GiveEffects(void)
 			Vector3d BeaconPosition = Vector3d(m_PosX, m_PosY, m_PosZ);
 			if ((PlayerPosition - BeaconPosition).Length() <= m_Radius)
 			{
-				a_Player->AddEntityEffect(m_PrimaryPotion, 180, m_EffectLevel);
+				a_Player->AddEntityEffect(m_PrimaryEffect, 180, m_EffectLevel);
 
-				if (m_SecondaryPotion != cEntityEffect::effNoEffect)
+				if (m_SecondaryEffect != cEntityEffect::effNoEffect)
 				{
-					a_Player->AddEntityEffect(m_SecondaryPotion, 180, 0);
+					a_Player->AddEntityEffect(m_SecondaryEffect, 180, 0);
 				}
 			}
 			return false;
 		}
 
 	public:
-		cPlayerCallback(int a_Radius, int a_PosX, int a_PosY, int a_PosZ, cEntityEffect::eType a_PrimaryPotion, cEntityEffect::eType a_SecondaryPotion, short a_EffectLevel)
+		cPlayerCallback(int a_Radius, int a_PosX, int a_PosY, int a_PosZ, cEntityEffect::eType a_PrimaryEffect, cEntityEffect::eType a_SecondaryEffect, short a_EffectLevel)
 			: m_Radius(a_Radius)
 			, m_PosX(a_PosX)
 			, m_PosY(a_PosY)
 			, m_PosZ(a_PosZ)
-			, m_PrimaryPotion(a_PrimaryPotion)
-			, m_SecondaryPotion(a_SecondaryPotion)
+			, m_PrimaryEffect(a_PrimaryEffect)
+			, m_SecondaryEffect(a_SecondaryEffect)
 			, m_EffectLevel(a_EffectLevel)
 		{};
 
-	} PlayerCallback(Radius, m_PosX, m_PosY, m_PosZ, m_PrimaryPotion, SecondaryPotion, EffectLevel);
+	} PlayerCallback(Radius, m_PosX, m_PosY, m_PosZ, m_PrimaryEffect, SecondaryEffect, EffectLevel);
 	GetWorld()->ForEachPlayer(PlayerCallback);
 }
 
@@ -353,17 +351,17 @@ bool cBeaconEntity::LoadFromJson(const Json::Value & a_Value)
 	}
 
 	m_BeaconLevel = (char)a_Value.get("Level", 0).asInt();
-	int PrimaryPotion = a_Value.get("PrimaryPotion", 0).asInt();
-	int SecondaryPotion = a_Value.get("SecondaryPotion", 0).asInt();
+	int PrimaryEffect = a_Value.get("PrimaryEffect", 0).asInt();
+	int SecondaryEffect = a_Value.get("SecondaryEffect", 0).asInt();
 
-	if ((PrimaryPotion >= 0) && (PrimaryPotion <= (int)cEntityEffect::effSaturation))
+	if ((PrimaryEffect >= 0) && (PrimaryEffect <= (int)cEntityEffect::effSaturation))
 	{
-		m_PrimaryPotion = (cEntityEffect::eType)PrimaryPotion;
+		m_PrimaryEffect = (cEntityEffect::eType)PrimaryEffect;
 	}
 
-	if ((SecondaryPotion >= 0) && (SecondaryPotion <= (int)cEntityEffect::effSaturation))
+	if ((SecondaryEffect >= 0) && (SecondaryEffect <= (int)cEntityEffect::effSaturation))
 	{
-		m_SecondaryPotion = (cEntityEffect::eType)SecondaryPotion;
+		m_SecondaryEffect = (cEntityEffect::eType)SecondaryEffect;
 	}
 
 	return true;
@@ -390,8 +388,8 @@ void cBeaconEntity::SaveToJson(Json::Value& a_Value)
 	a_Value["Slots"] = AllSlots;
 
 	a_Value["Level"] = m_BeaconLevel;
-	a_Value["PrimaryPotion"] = (int)m_PrimaryPotion;
-	a_Value["SecondaryPotion"] = (int)m_SecondaryPotion;
+	a_Value["PrimaryEffect"] = (int)m_PrimaryEffect;
+	a_Value["SecondaryEffect"] = (int)m_SecondaryEffect;
 }
 
 

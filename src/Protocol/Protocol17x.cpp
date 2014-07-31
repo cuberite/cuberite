@@ -2590,8 +2590,8 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddInt("x", BeaconEntity.GetPosX());
 			Writer.AddInt("y", BeaconEntity.GetPosY());
 			Writer.AddInt("z", BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary", BeaconEntity.GetPrimaryPotion());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryPotion());
+			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
+			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
 			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
 			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;

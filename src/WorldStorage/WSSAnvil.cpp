@@ -771,13 +771,13 @@ void cWSSAnvil::LoadBeaconFromNBT(cBlockEntityList & a_BlockEntities, const cPar
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Primary");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SelectPrimaryPotion((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
+		Beacon->SelectPrimaryEffect((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
 	}
 
 	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Secondary");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SelectSecondaryPotion((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
+		Beacon->SelectSecondaryEffect((cEntityEffect::eType)a_NBT.GetInt(CurrentLine));
 	}
 
 	// We are better than mojang, we load/save the beacon inventory!
