@@ -73,10 +73,13 @@ bool cBeaconEntity::IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLe
 		case cEntityEffect::effSpeed:        return (a_BeaconLevel >= 1);
 		case cEntityEffect::effHaste:        return (a_BeaconLevel >= 1);
 		case cEntityEffect::effNoEffect:     return true;
-	}
 
-	LOGD("%s: Invalid beacon effect: %d", __FUNCTION__, (int)a_Effect);
-	return false;
+		default:
+		{
+			LOGD("%s: Invalid beacon effect: %d", __FUNCTION__, (int)a_Effect);
+			return false;
+		}
+	}
 }
 
 
