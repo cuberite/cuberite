@@ -55,11 +55,11 @@ public:
 	cEntityEffect::eType GetPrimaryEffect(void) const { return m_PrimaryEffect; }
 	cEntityEffect::eType GetSecondaryEffect(void) const { return m_SecondaryEffect; }
 
-	/** Select the primary effect. Returns false when the effect is invalid.*/
-	bool SelectPrimaryEffect(cEntityEffect::eType a_Effect);
+	/** Sets the primary effect. Returns false when the effect is invalid. */
+	bool SetPrimaryEffect(cEntityEffect::eType a_Effect);
 
-	/** Select the secondary effect. Returns false when the effect is invalid. */
-	bool SelectSecondaryEffect(cEntityEffect::eType a_Effect);
+	/** Sets the secondary effect. Returns false when the effect is invalid. */
+	bool SetSecondaryEffect(cEntityEffect::eType a_Effect);
 
 	/** Calculate the amount of layers the pyramid below the beacon has. */
 	char CalculatePyramidLevel(void);

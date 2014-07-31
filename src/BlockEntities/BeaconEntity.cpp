@@ -64,54 +64,18 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 
 bool cBeaconEntity::IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLevel)
 {
-	if (a_Effect == cEntityEffect::effNoEffect)
+	switch (a_Effect)
 	{
-		return true;
+		case cEntityEffect::effRegeneration: return (a_BeaconLevel >= 4);
+		case cEntityEffect::effStrength:     return (a_BeaconLevel >= 3);
+		case cEntityEffect::effResistance:   return (a_BeaconLevel >= 2);
+		case cEntityEffect::effJumpBoost:    return (a_BeaconLevel >= 2);
+		case cEntityEffect::effSpeed:        return (a_BeaconLevel >= 1);
+		case cEntityEffect::effHaste:        return (a_BeaconLevel >= 1);
+		case cEntityEffect::effNoEffect:     return true;
 	}
 
-	switch (a_BeaconLevel)
-	{
-		case 4:
-		{
-			// Beacon level 4
-			if (a_Effect == cEntityEffect::effRegeneration)
-			{
-				return true;
-			}
-		}
-		case 3:
-		{
-			// Beacon level 3
-			if (a_Effect == cEntityEffect::effStrength)
-			{
-				return true;
-			}
-		}
-		case 2:
-		{
-			// Beacon level 2
-			switch (a_Effect)
-			{
-				case cEntityEffect::effResistance:
-				case cEntityEffect::effJumpBoost:
-				{
-					return true;
-				}
-			}
-		}
-		case 1:
-		{
-			// Beacon level 1
-			switch (a_Effect)
-			{
-				case cEntityEffect::effSpeed:
-				case cEntityEffect::effHaste:
-				{
-					return true;
-				}
-			}
-		}
-	}
+	LOGD("%s: Invalid beacon effect: %d", __FUNCTION__, (int)a_Effect);
 	return false;
 }
 
@@ -119,7 +83,7 @@ bool cBeaconEntity::IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLe
 
 
 
-bool cBeaconEntity::SelectPrimaryEffect(cEntityEffect::eType a_Effect)
+bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 {
 	if (!IsValidEffect(a_Effect, m_BeaconLevel))
 	{
@@ -140,7 +104,7 @@ bool cBeaconEntity::SelectPrimaryEffect(cEntityEffect::eType a_Effect)
 
 
 
-bool cBeaconEntity::SelectSecondaryEffect(cEntityEffect::eType a_Effect)
+bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 {
 	if (!IsValidEffect(a_Effect, m_BeaconLevel))
 	{

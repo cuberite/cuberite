@@ -792,8 +792,8 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 	}
 
 	Window->SetSlot(*m_Player, 0, cItem());
-	BeaconWindow->GetBeaconEntity()->SelectPrimaryEffect(PrimaryEffect);
-	BeaconWindow->GetBeaconEntity()->SelectSecondaryEffect(SecondaryEffect);
+	BeaconWindow->GetBeaconEntity()->SetPrimaryEffect(PrimaryEffect);
+	BeaconWindow->GetBeaconEntity()->SetSecondaryEffect(SecondaryEffect);
 }
 
 
