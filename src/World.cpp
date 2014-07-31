@@ -3176,7 +3176,7 @@ void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicke
 
 cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
-	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "");
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "incremental");
 
 	if (SimulatorName.empty())
 	{
@@ -3210,7 +3210,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
 	AString SimulatorSectionName;
 	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
-	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "");
+	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, "Vanilla");
 	if (SimulatorName.empty())
 	{
 		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"Vanilla\".", SimulatorNameKey.c_str(), GetIniFileName().c_str());
