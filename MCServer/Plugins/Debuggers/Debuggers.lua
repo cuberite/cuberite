@@ -307,8 +307,38 @@ function TestUUIDFromName()
 		"aloe_vera",
 	}
 	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(ValidPlayerNames);
+
+	-- Log the results:
+	for _, name in ipairs(ValidPlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	-- Test yet again, cache-only:
+	LOG("Testing once more, cache only...")
+	local PlayerNames3 =
+	{
+		"xoft",
+		"aloe_vera",
+		"notch",  -- Valid player name, but not cached (most likely :)
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames3, true)
 	
-	LOG("UUID-from-Name resolution test finished.")
+	-- Log the results:
+	for _, name in ipairs(PlayerNames3) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	LOG("UUID-from-Name resolution tests finished.")
 end
 
 

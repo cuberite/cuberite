@@ -50,8 +50,10 @@ public:
 	/** Converts the player names into UUIDs.
 	a_PlayerName[idx] will be converted to UUID and returned as idx-th value
 	The UUID will be empty on error.
-	Blocking operation, do not use in world-tick thread! */
-	AStringVector GetUUIDsFromPlayerNames(const AStringVector & a_PlayerName);
+	If a_UseOnlyCached is true, only the cached values are returned.
+	If a_UseOnlyCached is false, the names not found in the cache are looked up online, which is a blocking
+	operation, do not use this in world-tick thread! */
+	AStringVector GetUUIDsFromPlayerNames(const AStringVector & a_PlayerName, bool a_UseOnlyCached = false);
 	
 	// tolua_begin
 	

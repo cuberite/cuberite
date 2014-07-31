@@ -2163,7 +2163,7 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 	if (
 		!S.CheckParamUserTable(1, "cMojangAPI") ||
 		!S.CheckParamTable(2) ||
-		!S.CheckParamEnd(3)
+		!S.CheckParamEnd(4)
 	)
 	{
 		return 0;
@@ -2177,19 +2177,27 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 	{
 		lua_rawgeti(L, 2, i);
 		AString Name;
-		S.GetStackValue(3, Name);
+		S.GetStackValue(-1, Name);
 		if (!Name.empty())
 		{
 			PlayerNames.push_back(Name);
 		}
 		lua_pop(L, 1);
 	}
+	
+	// If the UseOnlyCached param was given, read it; default to false
+	bool ShouldUseCacheOnly = false;
+	if (lua_gettop(L) == 3)
+	{
+		ShouldUseCacheOnly = (lua_toboolean(L, 3) != 0);
+		lua_pop(L, 1);
+	}
 
 	// Push the output table onto the stack:
-	lua_newtable(L);  // stack index 3
+	lua_newtable(L);
 	
 	// Get the UUIDs:
-	AStringVector UUIDs = cRoot::Get()->GetMojangAPI().GetUUIDsFromPlayerNames(PlayerNames);
+	AStringVector UUIDs = cRoot::Get()->GetMojangAPI().GetUUIDsFromPlayerNames(PlayerNames, ShouldUseCacheOnly);
 	if (UUIDs.size() != PlayerNames.size())
 	{
 		// A hard error has occured while processing the request, no UUIDs were returned. Return an empty table:
@@ -2197,7 +2205,8 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 	}
 	
 	// Convert to output table, PlayerName -> UUID:
-	for (int i = 0; i < NumNames; i++)
+	size_t len = UUIDs.size();
+	for (size_t i = 0; i < len; i++)
 	{
 		if (UUIDs[i].empty())
 		{

@@ -129,7 +129,7 @@ void cMojangAPI::Start(cIniFile & a_SettingsIni)
 
 
 
-AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_PlayerNames)
+AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_PlayerNames, bool a_UseOnlyCached)
 {
 	// Convert all playernames to lowercase:
 	AStringVector PlayerNames;
@@ -140,7 +140,10 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 	}  // for itr - a_PlayerNames[]
 	
 	// Request the cache to populate any names not yet contained:
-	CacheNamesToUUIDs(PlayerNames);
+	if (!a_UseOnlyCached)
+	{
+		CacheNamesToUUIDs(PlayerNames);
+	}
 	
 	// Retrieve from cache:
 	size_t idx = 0;
