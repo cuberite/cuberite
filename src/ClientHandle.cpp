@@ -634,6 +634,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 		if (!m_Player->IsSwimming())
 		{
+			m_Player->GetStatManager().AddValue(eStatistic::statJumps, 1);
 			m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
 		}
 	}
@@ -1067,6 +1068,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		return;
 	}
 
+	m_Player->AddFoodExhaustion(0.025);
 	ItemHandler->OnBlockDestroyed(World, m_Player, m_Player->GetEquippedItem(), a_BlockX, a_BlockY, a_BlockZ);
 	// The ItemHandler is also responsible for spawning the pickups
 	cChunkInterface ChunkInterface(World->GetChunkMap());
@@ -1212,7 +1214,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
 	{
 		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&
-			ItemHandler->IsFood())
+			ItemHandler->IsFood() && (Equipped.m_ItemType != E_ITEM_GOLDEN_APPLE))
 		{
 			// The player is satiated or in creative, and trying to eat
 			return;

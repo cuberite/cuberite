@@ -545,7 +545,7 @@ void cPlayer::SetFoodTickTimer(int a_FoodTickTimer)
 
 void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 {
-	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodExhaustionLevel, 4.0));
+	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodExhaustionLevel, 40.0));
 }
 
 
@@ -562,6 +562,18 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 	SetFoodSaturationLevel(m_FoodSaturationLevel + a_Saturation);
 	SetFoodLevel(m_FoodLevel + a_Food);
 	return true;
+}
+
+
+
+
+
+void cPlayer::AddFoodExhaustion(double a_Exhaustion)
+{
+	if (!IsGameModeCreative())
+	{
+		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion, 40.0);
+	}
 }
 
 
@@ -1979,19 +1991,34 @@ void cPlayer::HandleFood(void)
 		return;
 	}
 
+	// Apply food exhaustion that has accumulated:
+	if (m_FoodExhaustionLevel > 4.0)
+	{
+		m_FoodExhaustionLevel -= 4.0;
+
+		if (m_FoodSaturationLevel > 0.0)
+		{
+			m_FoodSaturationLevel = std::max(m_FoodSaturationLevel - 1.0, 0.0);
+		}
+		else
+		{
+			SetFoodLevel(m_FoodLevel - 1);
+		}
+	}
+
 	// Heal or damage, based on the food level, using the m_FoodTickTimer:
-	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
+	if ((m_FoodLevel >= 18) || (m_FoodLevel <= 0))
 	{
 		m_FoodTickTimer++;
 		if (m_FoodTickTimer >= 80)
 		{
 			m_FoodTickTimer = 0;
 
-			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
+			if ((m_FoodLevel >= 18) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
-				m_FoodExhaustionLevel += 3.0;
+				AddFoodExhaustion(3.0);
 			}
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
@@ -2000,20 +2027,9 @@ void cPlayer::HandleFood(void)
 			}
 		}
 	}
-
-	// Apply food exhaustion that has accumulated:
-	if (m_FoodExhaustionLevel >= 4.0)
+	else
 	{
-		m_FoodExhaustionLevel -= 4.0;
-
-		if (m_FoodSaturationLevel >= 1.0)
-		{
-			m_FoodSaturationLevel -= 1.0;
-		}
-		else
-		{
-			SetFoodLevel(m_FoodLevel - 1);
-		}
+		m_FoodTickTimer = 0;
 	}
 }
 
@@ -2088,14 +2104,17 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		else if (IsSubmerged())
 		{
 			m_Stats.AddValue(statDistDove, Value);
+			AddFoodExhaustion(0.00015 * (double)Value);
 		}
 		else if (IsSwimming())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
+			AddFoodExhaustion(0.00015 * (double)Value);
 		}
 		else if (IsOnGround())
 		{
 			m_Stats.AddValue(statDistWalked, Value);
+			AddFoodExhaustion((m_IsSprinting ? 0.001 : 0.0001) * (double)Value);
 		}
 		else
 		{

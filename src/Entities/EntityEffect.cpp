@@ -309,7 +309,7 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = (cPlayer &) a_Target;
-		Target.SetFoodExhaustionLevel(Target.GetFoodExhaustionLevel() + 0.025);  // 0.5 per second = 0.025 per tick
+		Target.AddFoodExhaustion(0.025 * ((double)GetIntensity() + 1.0));  // 0.5 per second = 0.025 per tick
 	}
 }
 
