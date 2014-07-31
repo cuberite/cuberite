@@ -1700,8 +1700,10 @@ bool cPlayer::LoadFromDisk(void)
 	
 	// Load from the offline UUID file, if allowed:
 	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
+	const char * OfflineUsage = " (unused)";
 	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
 	{
+		OfflineUsage = "";
 		if (LoadFromFile(GetUUIDFileName(OfflineUUID)))
 		{
 			return true;
@@ -1724,8 +1726,8 @@ bool cPlayer::LoadFromDisk(void)
 	}
 	
 	// None of the files loaded successfully
-	LOG("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
-		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str()
+	LOG("Player data file not found for %s (%s, offline %s%s), will be reset to defaults.",
+		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str(), OfflineUsage
 	);
 	return false;
 }
@@ -2212,12 +2214,13 @@ void cPlayer::Detach()
 
 AString cPlayer::GetUUIDFileName(const AString & a_UUID)
 {
-	ASSERT(a_UUID.size() == 36);
+	AString UUID = cMojangAPI::MakeUUIDDashed(a_UUID);
+	ASSERT(UUID.length() == 36);
 	
 	AString res("players/");
-	res.append(a_UUID, 0, 2);
+	res.append(UUID, 0, 2);
 	res.push_back('/');
-	res.append(a_UUID, 2, AString::npos);
+	res.append(UUID, 2, AString::npos);
 	res.append(".json");
 	return res;
 }
