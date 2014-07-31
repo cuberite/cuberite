@@ -55,10 +55,10 @@ public:
 	cEntityEffect::eType GetPrimaryEffect(void) const { return m_PrimaryEffect; }
 	cEntityEffect::eType GetSecondaryEffect(void) const { return m_SecondaryEffect; }
 
-	/** Select the primary potion. Returns false when the potion is invalid.*/
+	/** Select the primary effect. Returns false when the effect is invalid.*/
 	bool SelectPrimaryEffect(cEntityEffect::eType a_Effect);
 
-	/** Select the secondary potion. Returns false when the potion is invalid. */
+	/** Select the secondary effect. Returns false when the effect is invalid. */
 	bool SelectSecondaryEffect(cEntityEffect::eType a_Effect);
 
 	/** Calculate the amount of layers the pyramid below the beacon has. */
@@ -76,7 +76,7 @@ public:
 	/** Returns true if the block is a diamond block, a golden block, an iron block or an emerald block. */
 	static bool IsMineralBlock(BLOCKTYPE a_BlockType);
 
-	/** Returns true if the potion can be used. */
+	/** Returns true if the effect can be used. */
 	static bool IsValidEffect(cEntityEffect::eType a_Effect, char a_BeaconLevel);
 
 	// tolua_end
