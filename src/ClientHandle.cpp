@@ -3,7 +3,6 @@
 #include "ClientHandle.h"
 #include "Server.h"
 #include "World.h"
-#include "Statistics.h"
 #include "Entities/Pickup.h"
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
@@ -635,7 +634,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 		if (!m_Player->IsSwimming())
 		{
-			m_Player->GetStatManager().AddValue(eStatistic::statJumps, 1);
+			m_Player->GetStatManager().AddValue(statJumps, 1);
 			m_Player->AddFoodExhaustion(m_Player->IsSprinting() ? 0.8 : 0.2);
 		}
 	}
