@@ -578,8 +578,7 @@ void cWorld::Start(void)
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
-	m_TimeOfDay                   = IniFile.GetValueSetI("General",       "TimeInTicks",                 m_TimeOfDay);
-
+	
 	if (GetDimension() == dimOverworld)
 	{
 		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
@@ -597,6 +596,7 @@ void cWorld::Start(void)
 
 	InitialiseGeneratorDefaults(IniFile);
 	InitialiseAndLoadMobSpawningValues(IniFile);
+	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", m_TimeOfDay));
 
 	m_ChunkMap = new cChunkMap(this);
 	
@@ -3153,21 +3153,47 @@ int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProje
 
 void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Results)
 {
+	typedef std::pair<AString::size_type, AString> pair_t;
+	size_t LastSpace = a_Text.find_last_of(" ");  // Find the position of the last space
+	AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length());  // Find the last word
+
+	if (LastWord.empty())
+	{
+		return;
+	}
+
+	std::vector<pair_t> UsernamesByWeight;
+
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
-		size_t LastSpace = a_Text.find_last_of(" ");  // Find the position of the last space
-		
-		AString LastWord = a_Text.substr(LastSpace + 1, a_Text.length());  // Find the last word
 		AString PlayerName ((*itr)->GetName());
-		size_t Found = PlayerName.find(LastWord);  // Try to find last word in playername
+		AString::size_type Found = PlayerName.find(LastWord);  // Try to find last word in playername
 		
 		if (Found == AString::npos)
 		{
 			continue;  // No match
 		}
 		
-		a_Results.push_back(PlayerName);  // Match!
+		UsernamesByWeight.push_back(std::make_pair(Found, PlayerName));  // Match! Store it with the position of the match as a weight
+	}
+	Lock.Unlock();
+
+	std::sort(UsernamesByWeight.begin(), UsernamesByWeight.end());  // Sort lexicographically (by the first value, then second), so higher weights (usernames with match closer to start) come first (#1274)
+
+	/* TODO: Uncomment once migrated to C++11
+	std::transform(
+		UsernamesByWeight.begin(),
+		UsernamesByWeight.end(),
+		std::back_inserter(a_Results),
+		[](const pair_t & p) { return p.first; }
+	);
+	*/
+
+	a_Results.reserve(UsernamesByWeight.size());
+	for (std::vector<pair_t>::const_iterator itr = UsernamesByWeight.begin(); itr != UsernamesByWeight.end(); ++itr)
+	{
+		a_Results.push_back(itr->second);
 	}
 }
 
