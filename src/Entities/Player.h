@@ -284,10 +284,7 @@ public:
 	bool Feed(int a_Food, double a_Saturation);
 
 	/** Adds the specified exhaustion to m_FoodExhaustion. Expects only positive values. */
-	void AddFoodExhaustion(double a_Exhaustion)
-	{
-		m_FoodExhaustionLevel += a_Exhaustion;
-	}
+	void AddFoodExhaustion(double a_Exhaustion);
 	
 	/** Starts the food poisoning for the specified amount of ticks */
 	void FoodPoison(int a_NumTicks);

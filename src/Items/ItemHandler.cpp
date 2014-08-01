@@ -25,6 +25,7 @@
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
+#include "ItemGoldenApple.h"
 #include "ItemItemFrame.h"
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
@@ -106,7 +107,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOAT:              return new cItemBoatHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
-		case E_ITEM_BOW:               return new cItemBowHandler;
+		case E_ITEM_BOW:               return new cItemBowHandler();
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAKE:              return new cItemCakeHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
@@ -120,6 +121,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_GOLDEN_APPLE:      return new cItemGoldenAppleHandler();
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_MILK:              return new cItemMilkHandler();
@@ -212,7 +214,6 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COOKED_FISH:
 		case E_ITEM_COOKED_PORKCHOP:
 		case E_ITEM_COOKIE:
-		case E_ITEM_GOLDEN_APPLE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
 		case E_ITEM_MUSHROOM_SOUP:
@@ -619,29 +620,39 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 
 
+bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance)
+{
+	return false;
+}
+
+
+
+
+
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
-	
-	FoodInfo Info = GetFoodInfo();
 
+	FoodInfo Info = GetFoodInfo();
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
 	{
 		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
-		
-		// If consumed and there's chance of foodpoisoning, do it:
-		if (Success && (Info.PoisonChance > 0))
+
+		// Give effects
+		cEntityEffect::eType EffectType;
+		int EffectDurationTicks;
+		short EffectIntensity;
+		float Chance;
+		if (Success && GetEatEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance))
 		{
 			cFastRandom r1;
-			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
+			if (r1.NextFloat() < Chance)
 			{
-				a_Player->FoodPoison(600);  // Give the player food poisoning for 30 seconds.
+				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance);
 			}
 		}
-
 		return Success;
 	}
-
 	return false;
 }
 
