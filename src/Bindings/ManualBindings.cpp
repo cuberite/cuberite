@@ -27,6 +27,7 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../LineBlockTracer.h"
+#include "../Protocol/Authenticator.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
 
@@ -2157,6 +2158,72 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
+static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamTable(2) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	// Convert the input table into AStringVector:
+	AStringVector PlayerNames;
+	int NumNames = luaL_getn(L, 2);
+	PlayerNames.reserve(NumNames);
+	for (int i = 1; i <= NumNames; i++)
+	{
+		lua_rawgeti(L, 2, i);
+		AString Name;
+		S.GetStackValue(-1, Name);
+		if (!Name.empty())
+		{
+			PlayerNames.push_back(Name);
+		}
+		lua_pop(L, 1);
+	}
+	
+	// If the UseOnlyCached param was given, read it; default to false
+	bool ShouldUseCacheOnly = false;
+	if (lua_gettop(L) == 3)
+	{
+		ShouldUseCacheOnly = (lua_toboolean(L, 3) != 0);
+		lua_pop(L, 1);
+	}
+
+	// Push the output table onto the stack:
+	lua_newtable(L);
+	
+	// Get the UUIDs:
+	AStringVector UUIDs = cRoot::Get()->GetMojangAPI().GetUUIDsFromPlayerNames(PlayerNames, ShouldUseCacheOnly);
+	if (UUIDs.size() != PlayerNames.size())
+	{
+		// A hard error has occured while processing the request, no UUIDs were returned. Return an empty table:
+		return 1;
+	}
+	
+	// Convert to output table, PlayerName -> UUID:
+	size_t len = UUIDs.size();
+	for (size_t i = 0; i < len; i++)
+	{
+		if (UUIDs[i].empty())
+		{
+			// No UUID was provided for PlayerName[i], skip it in the resulting table
+			continue;
+		}
+		lua_pushlstring(L, UUIDs[i].c_str(), UUIDs[i].length());
+		lua_setfield(L, 3, PlayerNames[i].c_str());
+	}
+	return 1;
+}
+
+
+
+
+
 static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 {
 	tolua_Error tolua_err;
@@ -3090,6 +3157,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "SendPluginMessage", tolua_cClientHandle_SendPluginMessage);
 		tolua_endmodule(tolua_S);
 
+		tolua_beginmodule(tolua_S, "cMojangAPI");
+			tolua_function(tolua_S, "GetUUIDsFromPlayerNames", tolua_cMojangAPI_GetUUIDsFromPlayerNames);
+		tolua_endmodule(tolua_S);
+		
 		tolua_beginmodule(tolua_S, "cItemGrid");
 			tolua_function(tolua_S, "GetSlotCoords", Lua_ItemGrid_GetSlotCoords);
 		tolua_endmodule(tolua_S);

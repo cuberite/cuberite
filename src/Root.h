@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Protocol/Authenticator.h"
+#include "Protocol/MojangAPI.h"
 #include "HTTPServer/HTTPServer.h"
 #include "Defines.h"
 
@@ -87,6 +88,7 @@ public:
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
+	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }        // tolua_export
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -191,6 +193,7 @@ private:
 	cWebAdmin *        m_WebAdmin;
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
+	cMojangAPI         m_MojangAPI;
 	cHTTPServer        m_HTTPServer;
 
 	cMCLogger *      m_Log;

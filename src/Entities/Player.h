@@ -551,7 +551,7 @@ protected:
 	*/
 	bool m_bIsTeleporting;
 	
-	/** The UUID of the player, as read from the ClientHandle.
+	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
 	If no ClientHandle is given, the UUID is initialized to empty. */
 	AString m_UUID;
 

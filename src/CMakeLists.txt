@@ -138,6 +138,8 @@ SET (HDRS
 	XMLParser.h)
 
 include_directories(".")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
 
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
@@ -311,4 +313,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib sqlite lua)
+target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib sqlite lua SQLiteCpp)

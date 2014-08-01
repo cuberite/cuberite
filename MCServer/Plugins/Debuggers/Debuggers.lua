@@ -80,6 +80,7 @@ function Initialize(Plugin)
 	
 	TestBlockAreasString()
 	TestStringBase64()
+	TestUUIDFromName()
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -269,6 +270,75 @@ function TestStringBase64()
 	local UnBase64 = Base64Decode(Base64)
 	
 	assert(UnBase64 == s)
+end
+
+
+
+
+
+function TestUUIDFromName()
+	LOG("Testing UUID-from-Name resolution...")
+	
+	-- Test by querying a few existing names, along with a non-existent one:
+	local PlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+		"nonexistent_player",
+	}
+	-- WARNING: Blocking operation! DO NOT USE IN TICK THREAD!
+	local UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames)
+	
+	-- Log the results:
+	for _, name in ipairs(PlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+	
+	-- Test once more with the same players, valid-only. This should go directly from cache, so fast.
+	LOG("Testing again with the same valid players...")
+	local ValidPlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(ValidPlayerNames);
+
+	-- Log the results:
+	for _, name in ipairs(ValidPlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	-- Test yet again, cache-only:
+	LOG("Testing once more, cache only...")
+	local PlayerNames3 =
+	{
+		"xoft",
+		"aloe_vera",
+		"notch",  -- Valid player name, but not cached (most likely :)
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames3, true)
+	
+	-- Log the results:
+	for _, name in ipairs(PlayerNames3) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	LOG("UUID-from-Name resolution tests finished.")
 end
 
 
