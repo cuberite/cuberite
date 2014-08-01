@@ -5,6 +5,7 @@
 #include "Globals.h"
 #include "SlotArea.h"
 #include "../Entities/Player.h"
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
@@ -1186,6 +1187,200 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
 }
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaBeacon:
+
+cSlotAreaBeacon::cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow) :
+	cSlotArea(1, a_ParentWindow),
+	m_Beacon(a_Beacon)
+{
+	m_Beacon->GetContents().AddListener(*this);
+}
+
+
+
+
+
+cSlotAreaBeacon::~cSlotAreaBeacon()
+{
+	m_Beacon->GetContents().RemoveListener(*this);
+}
+
+
+
+
+bool cSlotAreaBeacon::IsPlaceableItem(short a_ItemType)
+{
+	switch (a_ItemType)
+	{
+		case E_ITEM_EMERALD:
+		case E_ITEM_DIAMOND:
+		case E_ITEM_GOLD:
+		case E_ITEM_IRON:
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+{
+	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
+
+	bool bAsync = false;
+	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	{
+		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		return;
+	}
+
+	switch (a_ClickAction)
+	{
+		case caShiftLeftClick:
+		case caShiftRightClick:
+		{
+			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			return;
+		}
+		case caMiddleClick:
+		{
+			MiddleClicked(a_Player, a_SlotNum);
+			return;
+		}
+		case caDropKey:
+		case caCtrlDropKey:
+		{
+			DropClicked(a_Player, a_SlotNum, false);
+			return;
+		}
+		case caNumber1:
+		case caNumber2:
+		case caNumber3:
+		case caNumber4:
+		case caNumber5:
+		case caNumber6:
+		case caNumber7:
+		case caNumber8:
+		case caNumber9:
+		{
+			NumberClicked(a_Player, a_SlotNum, a_ClickAction);
+			return;
+		}
+		default:
+		{
+			break;
+		}
+	}
+
+	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	if (!Slot.IsSameType(a_ClickedItem))
+	{
+		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
+		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
+		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
+		bAsync = true;
+	}
+	cItem & DraggingItem = a_Player.GetDraggingItem();
+
+	if (DraggingItem.IsEmpty())
+	{
+		DraggingItem = Slot;
+		Slot.Empty();
+	}
+	else if (Slot.IsEmpty())
+	{
+		if (!IsPlaceableItem(DraggingItem.m_ItemType))
+		{
+			return;
+		}
+		
+		Slot = DraggingItem.CopyOne();
+		DraggingItem.m_ItemCount -= 1;
+		if (DraggingItem.m_ItemCount <= 0)
+		{
+			DraggingItem.Empty();
+		}
+	}
+	else if (DraggingItem.m_ItemCount == 1)
+	{
+		if (!IsPlaceableItem(DraggingItem.m_ItemCount))
+		{
+			return;
+		}
+
+		// Switch contents
+		cItem tmp(DraggingItem);
+		DraggingItem = Slot;
+		Slot = tmp;
+	}
+
+	SetSlot(a_SlotNum, a_Player, Slot);
+	if (bAsync)
+	{
+		m_ParentWindow.BroadcastWholeWindow();
+	}
+}
+
+
+
+
+
+void cSlotAreaBeacon::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+{
+	const cItem * Slot = GetSlot(0, a_Player);
+	if (!Slot->IsEmpty() || !IsPlaceableItem(a_ItemStack.m_ItemType) || (a_ItemStack.m_ItemCount != 1))
+	{
+		return;
+	}
+
+	if (a_ShouldApply)
+	{
+		SetSlot(0, a_Player, a_ItemStack.CopyOne());
+	}
+	a_ItemStack.Empty();
+}
+
+
+
+
+
+const cItem * cSlotAreaBeacon::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	UNUSED(a_Player);
+	return &(m_Beacon->GetSlot(a_SlotNum));
+}
+
+
+
+
+
+void cSlotAreaBeacon::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	UNUSED(a_Player);
+	m_Beacon->SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+void cSlotAreaBeacon::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+{
+	UNUSED(a_SlotNum);
+	// Something has changed in the window, broadcast the entire window to all clients
+	ASSERT(a_ItemGrid == &(m_Beacon->GetContents()));
+
+	m_ParentWindow.BroadcastWholeWindow();
+}
 
 
 

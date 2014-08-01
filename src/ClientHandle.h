@@ -399,7 +399,10 @@ private:
 	
 	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
-	
+
+	/** Handles the "MC|Beacon" plugin message */
+	void HandleBeaconSelection(const char * a_Data, size_t a_Length);
+
 	/** Handles the "MC|AdvCdm" plugin message */
 	void HandleCommandBlockMessage(const char * a_Data, size_t a_Length);
 

@@ -9,6 +9,7 @@
 #include "zlib/zlib.h"
 #include "json/json.h"
 #include "../StringCompression.h"
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -75,6 +76,7 @@ void cJsonChunkSerializer::BlockEntity(cBlockEntity * a_BlockEntity)
 	const char * SaveInto = NULL;
 	switch (a_BlockEntity->GetBlockType())
 	{
+		case E_BLOCK_BEACON:        SaveInto = "Beacons";       break;
 		case E_BLOCK_CHEST:         SaveInto = "Chests";        break;
 		case E_BLOCK_DISPENSER:     SaveInto = "Dispensers";    break;
 		case E_BLOCK_DROPPER:       SaveInto = "Droppers";      break;
@@ -268,6 +270,24 @@ bool cWSSCompact::EraseChunkData(const cChunkCoords & a_Chunk)
 
 void cWSSCompact::LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World)
 {
+	// Load beacon:
+	Json::Value AllBeacons = a_Value.get("Beacons", Json::nullValue);
+	if (!AllBeacons.empty())
+	{
+		for (Json::Value::iterator itr = AllBeacons.begin(); itr != AllBeacons.end(); ++itr)
+		{
+			std::auto_ptr<cBeaconEntity> BeaconEntity(new cBeaconEntity(0, 0, 0, a_World));
+			if (!BeaconEntity->LoadFromJson(*itr))
+			{
+				LOGWARNING("ERROR READING BEACON FROM JSON!");
+			}
+			else
+			{
+				a_BlockEntities.push_back(BeaconEntity.release());
+			}
+		}  // for itr - AllBeacons[]
+	}
+
 	// Load chests:
 	Json::Value AllChests = a_Value.get("Chests", Json::nullValue);
 	if (!AllChests.empty())

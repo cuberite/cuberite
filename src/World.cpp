@@ -25,6 +25,7 @@
 #include "Entities/TNTEntity.h"
 
 #include "BlockEntities/CommandBlockEntity.h"
+#include "BlockEntities/BeaconEntity.h"
 
 // Simulators:
 #include "Simulator/SimulatorManager.h"
@@ -1226,6 +1227,15 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 bool cWorld::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
+}
+
+
+
+
+
+bool cWorld::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback& a_Callback)
+{
+	return m_ChunkMap->DoWithBeaconAt(a_BlockX, a_BlockY, a_BlockZ, a_Callback);
 }
 
 

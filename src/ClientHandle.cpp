@@ -7,6 +7,7 @@
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
+#include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
@@ -659,6 +660,10 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		// Client <-> Server branding exchange
 		SendPluginMessage("MC|Brand", "MCServer");
 	}
+	else if (a_Channel == "MC|Beacon")
+	{
+		HandleBeaconSelection(a_Message.c_str(), a_Message.size());
+	}
 	else if (a_Channel == "MC|ItemName")
 	{
 		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
@@ -740,6 +745,55 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 	{
 		m_PluginChannels.erase(*itr);
 	}  // for itr - a_ChannelList[]
+}
+
+
+
+
+
+void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
+{
+	if (a_Length < 14)
+	{
+		SendChat("Failure setting beacon selection; bad request", mtFailure);
+		LOGD("Malformed MC|Beacon packet.");
+		return;
+	}
+
+	cWindow * Window = m_Player->GetWindow();
+	if ((Window == NULL) || (Window->GetWindowType() != cWindow::wtBeacon))
+	{
+		return;
+	}
+	cBeaconWindow * BeaconWindow = (cBeaconWindow *) Window;
+
+	if (Window->GetSlot(*m_Player, 0)->IsEmpty())
+	{
+		return;
+	}
+
+	cByteBuffer Buffer(a_Length);
+	Buffer.Write(a_Data, a_Length);
+
+	int PrimaryEffectID, SecondaryEffectID;
+	Buffer.ReadBEInt(PrimaryEffectID);
+	Buffer.ReadBEInt(SecondaryEffectID);
+
+	cEntityEffect::eType PrimaryEffect = cEntityEffect::effNoEffect;
+	if ((PrimaryEffectID >= 0) && (PrimaryEffectID <= (int)cEntityEffect::effSaturation))
+	{
+		PrimaryEffect = (cEntityEffect::eType)PrimaryEffectID;
+	}
+
+	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
+	if ((SecondaryEffectID >= 0) && (SecondaryEffectID <= (int)cEntityEffect::effSaturation))
+	{
+		SecondaryEffect = (cEntityEffect::eType)SecondaryEffectID;
+	}
+
+	Window->SetSlot(*m_Player, 0, cItem());
+	BeaconWindow->GetBeaconEntity()->SetPrimaryEffect(PrimaryEffect);
+	BeaconWindow->GetBeaconEntity()->SetSecondaryEffect(SecondaryEffect);
 }
 
 

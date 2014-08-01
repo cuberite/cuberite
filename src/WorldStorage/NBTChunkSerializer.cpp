@@ -10,6 +10,7 @@
 #include "../StringCompression.h"
 #include "FastNBT.h"
 
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
@@ -170,6 +171,23 @@ void cNBTChunkSerializer::AddBasicTileEntity(cBlockEntity * a_Entity, const char
 	m_Writer.AddInt   ("y",  a_Entity->GetPosY());
 	m_Writer.AddInt   ("z",  a_Entity->GetPosZ());
 	m_Writer.AddString("id", a_EntityTypeID);
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddBeaconEntity(cBeaconEntity * a_Entity)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_Entity, "Beacon");
+		m_Writer.AddInt("Levels", a_Entity->GetBeaconLevel());
+		m_Writer.AddInt("Primary", (int)a_Entity->GetPrimaryEffect());
+		m_Writer.AddInt("Secondary", (int)a_Entity->GetSecondaryEffect());
+		m_Writer.BeginList("Items", TAG_Compound);
+			AddItemGrid(a_Entity->GetContents());
+		m_Writer.EndList();
+	m_Writer.EndCompound();
 }
 
 
@@ -825,6 +843,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 	// Add tile-entity into NBT:
 	switch (a_Entity->GetBlockType())
 	{
+		case E_BLOCK_BEACON:        AddBeaconEntity      ((cBeaconEntity *)      a_Entity); break;
 		case E_BLOCK_CHEST:         AddChestEntity       ((cChestEntity *)       a_Entity, a_Entity->GetBlockType()); break;
 		case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity((cCommandBlockEntity *)a_Entity); break;
 		case E_BLOCK_DISPENSER:     AddDispenserEntity   ((cDispenserEntity *)   a_Entity); break;
