@@ -90,6 +90,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 {
 	if (!IsValidEffect(a_Effect, m_BeaconLevel))
 	{
+		m_PrimaryEffect = cEntityEffect::effNoEffect;
 		return false;
 	}
 
@@ -111,6 +112,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 {
 	if (!IsValidEffect(a_Effect, m_BeaconLevel))
 	{
+		m_SecondaryEffect = cEntityEffect::effNoEffect;
 		return false;
 	}
 

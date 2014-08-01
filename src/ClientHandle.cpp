@@ -795,7 +795,22 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 
 	Window->SetSlot(*m_Player, 0, cItem());
 	BeaconWindow->GetBeaconEntity()->SetPrimaryEffect(PrimaryEffect);
-	BeaconWindow->GetBeaconEntity()->SetSecondaryEffect(SecondaryEffect);
+
+	// Valid effect check. Vanilla don't check this, but we do it :)
+	if (
+		(SecondaryEffect == cEntityEffect::effNoEffect) ||
+		(SecondaryEffect == cEntityEffect::effRegeneration) ||
+		(SecondaryEffect == BeaconWindow->GetBeaconEntity()->GetPrimaryEffect())
+	)
+	{
+		BeaconWindow->GetBeaconEntity()->SetSecondaryEffect(SecondaryEffect);
+	}
+	else
+	{
+		BeaconWindow->GetBeaconEntity()->SetSecondaryEffect(cEntityEffect::effNoEffect);
+	}
+
+	m_Player->CloseWindow(true);
 }
 
 
