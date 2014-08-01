@@ -14,9 +14,10 @@ class cPlayerLookCheck :
 	public cPlayerListCallback
 {
 public:
-	cPlayerLookCheck(Vector3d a_EndermanPos) :
+	cPlayerLookCheck(Vector3d a_EndermanPos, int a_SightDistance) :
 		m_Player(NULL),
-		m_EndermanPos(a_EndermanPos)
+		m_EndermanPos(a_EndermanPos),
+		m_SightDistance(a_SightDistance)
 	{
 	}
 
@@ -30,8 +31,8 @@ public:
 		
 		Vector3d Direction = m_EndermanPos - a_Player->GetPosition();
 		
-		// Don't check players who are more then 64 blocks away
-		if (Direction.SqrLength() > 64)
+		// Don't check players who are more then SightDistance (64) blocks away
+		if (Direction.Length() > m_SightDistance)
 		{
 			return false;
 		}
@@ -48,7 +49,7 @@ public:
 		
 		// 0.09 rad ~ 5 degrees
 		// If the player's crosshair is within 5 degrees of the enderman, it counts as looking
-		if (dot > cos(0.09))
+		if (dot <= cos(0.09))
 		{
 			return false;
 		}
@@ -69,6 +70,7 @@ public:
 protected:
 	cPlayer * m_Player;
 	Vector3d m_EndermanPos;
+	int m_SightDistance;
 } ;
 
 
@@ -107,7 +109,7 @@ void cEnderman::CheckEventSeePlayer()
 		return;
 	}
 
-	cPlayerLookCheck Callback(GetPosition());
+	cPlayerLookCheck Callback(GetPosition(), m_SightDistance);
 	if (m_World->ForEachPlayer(Callback))
 	{
 		return;
@@ -115,20 +117,10 @@ void cEnderman::CheckEventSeePlayer()
 	
 	ASSERT(Callback.GetPlayer() != NULL);
 
-	int ChunkX, ChunkZ;
-	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
-
-	 // Check if the chunk the enderman is in is lit
-	if (!m_World->IsChunkLighted(ChunkX, ChunkZ))
+	if (!CheckLight())
 	{
-		m_World->QueueLightChunk(ChunkX, ChunkZ);
-		return;
-	}
-
-	// Enderman only attack if the skylight is higher than 7 
-	if (m_World->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) <= 7)
-	{
-		// TODO: Teleport the enderman to a random spot
+		// Insufficient light for enderman to become aggravated
+		// TODO: Teleport to a suitable location
 		return;
 	}
 
@@ -138,6 +130,19 @@ void cEnderman::CheckEventSeePlayer()
 		m_EMState = CHASING;
 		m_bIsScreaming = true;
 		GetWorld()->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cEnderman::CheckEventLostPlayer(void)
+{
+	super::CheckEventLostPlayer();
+	if (!CheckLight())
+	{
+		EventLosePlayer();
 	}
 }
 	
@@ -150,4 +155,29 @@ void cEnderman::EventLosePlayer()
 	super::EventLosePlayer();
 	m_bIsScreaming = false;
 	GetWorld()->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+bool cEnderman::CheckLight()
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
+
+	// Check if the chunk the enderman is in is lit
+	if (!m_World->IsChunkLighted(ChunkX, ChunkZ))
+	{
+		m_World->QueueLightChunk(ChunkX, ChunkZ);
+		return true;
+	}
+
+	// Enderman only attack if the skylight is lower or equal to 8
+	if (m_World->GetBlockSkyLight(POSX_TOINT, POSY_TOINT, POSZ_TOINT) - GetWorld()->GetSkyDarkness() > 8)
+	{
+		return false;
+	}
+
+	return true;
 }

@@ -276,7 +276,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
-				AddSpeedY(5.2);  // Jump!!
+
+				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
+				AddPosY(1.2);  // Jump!!
 			}
 		}
 
