@@ -181,6 +181,7 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			return;
 		}
 		
+		case biSwamplandM:
 		case biSwampland:
 		{
 			// Swamp trees:
@@ -233,7 +234,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biExtremeHillsM:
 		case biFlowerForest:
 		case biTaigaM:
-		case biSwamplandM:
 		case biIcePlainsSpikes:
 		case biJungleM:
 		case biJungleEdgeM:

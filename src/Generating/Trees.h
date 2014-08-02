@@ -28,6 +28,7 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 #define CASE_TREE_ALLOWED_BLOCKS \
 	case E_BLOCK_AIR: \
 	case E_BLOCK_LEAVES: \
+	case E_BLOCK_NEW_LEAVES: \
 	case E_BLOCK_SNOW: \
 	case E_BLOCK_TALL_GRASS: \
 	case E_BLOCK_DEAD_BUSH: \
@@ -40,6 +41,7 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 	/* case E_BLOCK_LEAVES: LEAVES are a special case, they can be overwritten only by log. Handled in cChunkMap::ReplaceTreeBlocks(). */ \
 	case E_BLOCK_SNOW: \
 	case E_BLOCK_TALL_GRASS: \
+	case E_BLOCK_BIG_FLOWER: \
 	case E_BLOCK_DEAD_BUSH: \
 	case E_BLOCK_SAPLING: \
 	case E_BLOCK_VINES
