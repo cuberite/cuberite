@@ -1263,7 +1263,7 @@ void cEntity::HandleAir(void)
 
 		if (m_AirLevel <= 0)
 		{
-			// Either reduce air level or damage player
+			// Runs the air tick timer to check whether the player should be damaged
 			if (m_AirTickTimer <= 0)
 			{
 				// Damage player
