@@ -15,6 +15,7 @@
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "../SetChunkData.h"
+#include "../Root.h"
 
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
@@ -48,6 +49,8 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+
+#include "../Protocol/MojangAPI.h"
 
 
 
@@ -2411,16 +2414,9 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	{
 		return;
 	}
-	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
-	if (OwnerIdx > 0)
-	{
-		AString OwnerName = a_NBT.GetString(OwnerIdx);
-		if (OwnerName != "")
-		{
-			Monster->SetOwner(OwnerName);
-			Monster->SetIsTame(true);
-		}
-	}
+	
+	LoadWolfOwner(*Monster.get(), a_NBT, a_TagIdx);
+
 	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
 	if (SittingIdx > 0)
 	{
@@ -2486,6 +2482,59 @@ void cWSSAnvil::LoadPigZombieFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 
 	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// Load the owner information. OwnerUUID or Owner may be specified, possibly both:
+	AString OwnerUUID, OwnerName;
+	int OwnerUUIDIdx = a_NBT.FindChildByName(a_TagIdx, "OwnerUUID");
+	if (OwnerUUIDIdx > 0)
+	{
+		OwnerUUID = cMojangAPI::MakeUUIDShort(a_NBT.GetString(OwnerUUIDIdx));
+	}
+	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
+	if (OwnerIdx > 0)
+	{
+		OwnerName = a_NBT.GetString(OwnerIdx);
+	}
+	if (OwnerName.empty() && OwnerUUID.empty())
+	{
+		// There is no owner, bail out:
+		return;
+	}
+	
+	// Convert name to UUID, if needed:
+	if (OwnerUUID.empty())
+	{
+		// This wolf has only playername stored (pre-1.7.6), look up the UUID
+		// The lookup is blocking, but we're running in a separate thread, so it's ok
+		OwnerUUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(OwnerName);
+		if (OwnerUUID.empty())
+		{
+			// Not a known player, un-tame the wolf by bailing out
+			return;
+		}
+	}
+	
+	// Convert UUID to name, if needed:
+	if (OwnerName.empty())
+	{
+		// The lookup is blocking, but we're running in a separate thread, so it's ok
+		OwnerName = cRoot::Get()->GetMojangAPI().GetPlayerNameFromUUID(OwnerUUID);
+		if (OwnerName.empty())
+		{
+			// Not a known player, un-tame the wolf by bailing out
+			return;
+		}
+	}
+	
+	a_Wolf.SetOwner(OwnerName, OwnerUUID);
+	a_Wolf.SetIsTame(true);
 }
 
 

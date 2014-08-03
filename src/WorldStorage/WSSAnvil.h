@@ -21,6 +21,7 @@ class cItemGrid;
 
 class cProjectileEntity;
 class cHangingEntity;
+class cWolf;
 
 
 
@@ -200,6 +201,9 @@ protected:
 	void LoadWolfFromNBT            (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadZombieFromNBT          (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadPigZombieFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	
+	/** Loads the wolf's owner information from the NBT into the specified wolf entity. */
+	void LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads entity common data from the NBT compound; returns true if successful
 	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);
