@@ -34,6 +34,8 @@ public:
 	{
 		*this = a_Rhs;
 	}
+	
+	// tolua_end
 
 	inline Matrix4 & operator = (const Matrix4 & a_Rhs)
 	{
@@ -43,6 +45,8 @@ public:
 		}
 		return *this;
 	}
+	
+	// tolua_begin
 
 	inline T & operator [] (int a_N)
 	{

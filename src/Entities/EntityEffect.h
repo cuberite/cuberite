@@ -71,7 +71,7 @@ public:
 	
 	/** Creates an entity effect by copying another
 	@param a_OtherEffect      The other effect to copy */
-	cEntityEffect & operator=(cEntityEffect a_OtherEffect);
+	cEntityEffect & operator =(cEntityEffect a_OtherEffect);
 	
 	virtual ~cEntityEffect(void) {}
 	

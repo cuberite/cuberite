@@ -156,11 +156,11 @@ template class SizeChecker<UInt64, 8>;
 template class SizeChecker<UInt32, 4>;
 template class SizeChecker<UInt16, 2>;
 
-// A macro to disallow the copy constructor and operator= functions
+// A macro to disallow the copy constructor and operator = functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
 	TypeName(const TypeName &); \
-	void operator=(const TypeName &)
+	void operator =(const TypeName &)
 
 // A macro that is used to mark unused function parameters, to avoid pedantic warnings in gcc
 #define UNUSED(X) (void)(X)

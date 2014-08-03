@@ -170,7 +170,7 @@ cEntityEffect::cEntityEffect(const cEntityEffect & a_OtherEffect):
 
 
 
-cEntityEffect & cEntityEffect::operator=(cEntityEffect a_OtherEffect)
+cEntityEffect & cEntityEffect::operator =(cEntityEffect a_OtherEffect)
 {
 	std::swap(m_Ticks, a_OtherEffect.m_Ticks);
 	std::swap(m_Duration, a_OtherEffect.m_Duration);

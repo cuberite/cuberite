@@ -17,7 +17,7 @@ class cBlockIDMap
 	// Making the map case-insensitive:
 	struct Comparator
 	{
-		bool operator()(const AString & a_Item1, const AString & a_Item2) const
+		bool operator ()(const AString & a_Item1, const AString & a_Item2) const
 		{
 			return (NoCaseCompare(a_Item1, a_Item2) > 0);
 		}

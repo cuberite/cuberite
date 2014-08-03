@@ -93,7 +93,7 @@ protected:
 		
 		sChunkLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ), m_Generate(a_Generate) {}
 
-		bool operator==(const sChunkLoad other) const
+		bool operator ==(const sChunkLoad other) const
 		{
 			return this->m_ChunkX == other.m_ChunkX &&
 				this->m_ChunkY == other.m_ChunkY &&
