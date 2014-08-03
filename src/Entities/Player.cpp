@@ -580,15 +580,6 @@ void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 
 
 
-void cPlayer::FoodPoison(int a_NumTicks)
-{
-	AddEntityEffect(cEntityEffect::effHunger, a_NumTicks, 0, 1);
-}
-
-
-
-
-
 void cPlayer::StartEating(void)
 {
 	// Set the timer:
