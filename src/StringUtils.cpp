@@ -230,6 +230,21 @@ AString & StrToLower(AString & s)
 
 
 
+AString StrToLower(const AString & s)
+{
+	AString res;
+	res.resize(s.size());
+	for (AString::iterator itr = res.begin(), end = res.end(); itr != end; ++itr)
+	{
+		*itr = (char)tolower(*itr);
+	}
+	return res;
+}
+
+
+
+
+
 int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER
