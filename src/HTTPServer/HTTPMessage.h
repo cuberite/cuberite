@@ -18,7 +18,7 @@
 class cHTTPMessage
 {
 public:
-	enum
+	enum eStatus
 	{
 		HTTP_OK = 200,
 		HTTP_BAD_REQUEST = 400,

@@ -39,8 +39,8 @@ public:
 	enum
 	{
 		invArmorCount      = 4,
-		invInventoryCount = 9 * 3,
-		invHotbarCount    = 9,
+		invInventoryCount  = 9 * 3,
+		invHotbarCount     = 9,
 		
 		invArmorOffset     = 0,
 		invInventoryOffset = invArmorOffset     + invArmorCount,
