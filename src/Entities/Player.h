@@ -417,6 +417,9 @@ public:
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
+	
+	/** Returns the UUID (short format) that has been read from the client, or empty string if not available. */
+	const AString & GetUUID(void) const { return m_UUID; }
 
 	// tolua_end
 
