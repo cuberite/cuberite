@@ -3032,15 +3032,14 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
 	Pkt.WriteString(a_Player.GetName());
 
-	const Json::Value & Properties = m_Client->GetProperties();
-	const Json::Value::const_iterator End = Properties.end();
+	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt(Properties.size());
 
-	for (Json::Value::iterator itr = Properties.begin(); itr != End; ++itr)
+	for (Json::Value::iterator itr = Properties.begin(); itr != Properties.end(); ++itr)
 	{
-		Pkt.WriteString(((Json::Value)*itr).get("name", "").toStyledString());
-		Pkt.WriteString(((Json::Value)*itr).get("value", "").toStyledString());
-		Pkt.WriteString(((Json::Value)*itr).get("signature", "").toStyledString());
+		Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
+		Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
+		Pkt.WriteString(((Json::Value)*itr).get("signature", "").asString());
 	}
 
 	Pkt.WriteFPInt(a_Player.GetPosX());
