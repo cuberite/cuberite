@@ -543,10 +543,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 void cEntity::Heal(int a_HitPoints)
 {
 	m_Health += a_HitPoints;
-	if (m_Health > m_MaxHealth)
-	{
-		m_Health = m_MaxHealth;
-	}
+	m_Health = std::min(m_Health, m_MaxHealth);
 }
 
 
@@ -555,7 +552,7 @@ void cEntity::Heal(int a_HitPoints)
 
 void cEntity::SetHealth(int a_Health)
 {
-	m_Health = std::max(0, std::min(m_MaxHealth, a_Health));
+	m_Health = Clamp(a_Health, 0, m_MaxHealth);
 }
 
 
@@ -1264,10 +1261,10 @@ void cEntity::HandleAir(void)
 			SetSpeedY(1);  // Float in the water
 		}
 
-		// Either reduce air level or damage player
-		if (m_AirLevel < 1)
+		if (m_AirLevel <= 0)
 		{
-			if (m_AirTickTimer < 1)
+			// Either reduce air level or damage player
+			if (m_AirTickTimer <= 0)
 			{
 				// Damage player
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
@@ -1552,17 +1549,10 @@ void cEntity::SetHeight(double a_Height)
 
 void cEntity::SetMass(double a_Mass)
 {
-	if (a_Mass > 0)
-	{
-		m_Mass = a_Mass;
-	}
-	else
-	{
-		// Make sure that mass is not zero. 1g is the default because we
-		// have to choose a number. It's perfectly legal to have a mass
-		// less than 1g as long as is NOT equal or less than zero.
-		m_Mass = 0.001;
-	}
+	// Make sure that mass is not zero. 1g is the default because we
+	// have to choose a number. It's perfectly legal to have a mass
+	// less than 1g as long as is NOT equal or less than zero.
+	m_Mass = std::max(a_Mass, 0.001);
 }
 
 

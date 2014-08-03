@@ -527,7 +527,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 
 void cPlayer::SetFoodSaturationLevel(double a_FoodSaturationLevel)
 {
-	m_FoodSaturationLevel = std::max(0.0, std::min(a_FoodSaturationLevel, (double)m_FoodLevel));
+	m_FoodSaturationLevel = Clamp(a_FoodSaturationLevel, 0.0, (double) m_FoodLevel);
 }
 
 
@@ -545,7 +545,7 @@ void cPlayer::SetFoodTickTimer(int a_FoodTickTimer)
 
 void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 {
-	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodExhaustionLevel, 40.0));
+	m_FoodExhaustionLevel = Clamp(a_FoodExhaustionLevel, 0.0, 40.0);
 }
 
 
@@ -700,16 +700,13 @@ double cPlayer::GetMaxSpeed(void) const
 	{
 		return m_FlyingMaxSpeed;
 	}
+	else if (m_IsSprinting)
+	{
+		return m_SprintingMaxSpeed;
+	}
 	else
 	{
-		if (m_IsSprinting)
-		{
-			return m_SprintingMaxSpeed;
-		}
-		else
-		{
-			return m_NormalMaxSpeed;
-		}
+		return m_NormalMaxSpeed;
 	}
 }
 
