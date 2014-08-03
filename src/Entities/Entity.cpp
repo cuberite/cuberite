@@ -1068,42 +1068,38 @@ bool cEntity::DetectPortal()
 				}
 				m_PortalCooldownData.m_TicksDelayed = 0;
 
-				switch (GetWorld()->GetDimension())
+				if (GetWorld()->GetDimension() == dimNether)
 				{
-					case dimNether:
+					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
-						if (GetWorld()->GetLinkedOverworldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
-
-						if (IsPlayer())
-						{
-							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
-						}
-						
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+						return false;
 					}
-					case dimOverworld:
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
+
+					if (IsPlayer())
 					{
-						if (GetWorld()->GetNetherWorldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-						if (IsPlayer())
-						{
-							((cPlayer *)this)->AwardAchievement(achEnterPortal);
-							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
-						}
-						
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
 					}
-					default: return false;
+					
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+				}
+				else
+				{
+					if (GetWorld()->GetNetherWorldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->AwardAchievement(achEnterPortal);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
+					}
+					
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
 				}
 			}
 			case E_BLOCK_END_PORTAL:
@@ -1113,45 +1109,43 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
-				switch (GetWorld()->GetDimension())
+				if (GetWorld()->GetDimension() == dimEnd)
 				{
-					case dimEnd:
+					
+					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
-						if (GetWorld()->GetLinkedOverworldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-						if (IsPlayer())
-						{
-							cPlayer * Player = (cPlayer *)this;
-							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
-							Player->GetClientHandle()->SendRespawn(dimOverworld);
-						}
-
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+						return false;
 					}
-					case dimOverworld:
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
 					{
-						if (GetWorld()->GetEndWorldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-						if (IsPlayer())
-						{
-							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
-							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
-						}
-
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+						cPlayer * Player = (cPlayer *)this;
+						Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+						Player->GetClientHandle()->SendRespawn(dimOverworld);
 					}
-					default: return false;
+
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
 				}
+				else
+				{
+					if (GetWorld()->GetEndWorldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
+					}
+
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+				}
+				
 			}
 			default: break;
 		}
