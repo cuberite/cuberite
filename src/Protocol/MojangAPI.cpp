@@ -129,6 +129,34 @@ void cMojangAPI::Start(cIniFile & a_SettingsIni)
 
 
 
+AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_UseOnlyCached)
+{
+	// Convert the playername to lowercase:
+	AString lcPlayerName(a_PlayerName);
+	StrToLower(lcPlayerName);
+	
+	// Request the cache to populate any names not yet contained:
+	if (!a_UseOnlyCached)
+	{
+		AStringVector PlayerNames;
+		PlayerNames.push_back(lcPlayerName);
+		CacheNamesToUUIDs(PlayerNames);
+	}
+	
+	// Retrieve from cache:
+	cNameToUUIDMap::const_iterator itr = m_NameToUUID.find(lcPlayerName);
+	if (itr == m_NameToUUID.end())
+	{
+		// No UUID found
+		return "";
+	}
+	return itr->second.m_PlayerName;
+}
+
+
+
+
+
 AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_PlayerNames, bool a_UseOnlyCached)
 {
 	// Convert all playernames to lowercase:

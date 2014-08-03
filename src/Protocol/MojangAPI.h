@@ -45,6 +45,13 @@ public:
 	Note: only checks the string's length, not the actual content. */
 	static AString MakeUUIDDashed(const AString & a_UUID);
 
+	/** Converts a player name into a UUID.
+	The UUID will be empty on error.
+	If a_UseOnlyCached is true, the function only consults the cached values.
+	If a_UseOnlyCached is false and the name is not found in the cache, it is looked up online, which is a blocking
+	operation, do not use this in world-tick thread! */
+	AString GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_UseOnlyCached = false);
+	
 	// tolua_end
 	
 	/** Converts the player names into UUIDs.
