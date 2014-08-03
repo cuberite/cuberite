@@ -290,16 +290,16 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 			if (m_bOnGround)
 			{
-				Distance *= 2.5;
+				Distance *= 2.5f;
 			}
 			else if (IsSwimming())
 			{
-				Distance *= 1.3;
+				Distance *= 1.3f;
 			}
 			else
 			{
 				// Don't let the mob move too much if he's falling.
-				Distance *= 0.25;
+				Distance *= 0.25f;
 			}
 
 			AddSpeedX(Distance.x);
