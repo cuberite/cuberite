@@ -1613,8 +1613,7 @@ a_Player:OpenWindow(Window);
 				some of these calls will wait for a response from the network, and so shouldn't be used while the
 				server is fully running (or at least when there are players connected) to avoid percepted lag.</p>
 				<p>
-				Some functions are static and do not require an instance to be called. For others, you need to get
-				the singleton instance of this class using {{cRoot}}'s GetMojangAPI() function.</p>
+				All the functions are static, call them using the <code>cMojangAPI:Function()</code> convention.</p>
 				<p>
 				Mojang uses two formats for UUIDs, short and dashed. MCServer works with short UUIDs internally, but
 				will convert to dashed UUIDs where needed - in the protocol login for example. The MakeUUIDShort()
@@ -1629,11 +1628,12 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				AddPlayerNameToUUIDMapping = { Params = "PlayerName, UUID", Return = "", Notes = "Adds the specified PlayerName-to-UUID mapping into the cache, with current timestamp." },
-				GetUUIDFromPlayerName = { Params = "PlayerName, [UseOnlyCached]", Return = "UUID", Notes = "Returns the UUID that corresponds to the given playername, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the playername is not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
-				GetUUIDsFromPlayerNames = { Params = "PlayerNames, [UseOnlyCached]", Return = "table", Notes = "Returns a table that contains the map, 'PlayerName' -> 'UUID', for all valid playernames in the input array-table. PlayerNames not recognized will not be set in the returned map. If UseOnlyCached is false (the default), queries the Mojang servers for the results that are not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
-				MakeUUIDDashed = { Params = "UUID", Return = "DashedUUID", Notes = "(STATIC) Converts the UUID to a dashed format (\"01234567-8901-2345-6789-012345678901\"). Accepts both dashed and short UUIDs. Logs a warning and returns an empty string if UUID format not recognized." },
-				MakeUUIDShort = { Params = "UUID", Return = "ShortUUID", Notes = "(STATIC) Converts the UUID to a short format (without dashes, \"01234567890123456789012345678901\"). Accepts both dashed and short UUIDs. Logs a warning and returns an empty string if UUID format not recognized." },
+				AddPlayerNameToUUIDMapping = { Params = "PlayerName, UUID", Return = "", Notes = "(STATIC) Adds the specified PlayerName-to-UUID mapping into the cache, with current timestamp. Accepts both short or dashed UUIDs. " },
+				GetPlayerNameFromUUID = { Params = "UUID, [UseOnlyCached]", Return = "PlayerName", Notes = "(STATIC) Returns the playername that corresponds to the given UUID, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the UUID is not in the cache. The UUID can be either short or dashed. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
+				GetUUIDFromPlayerName = { Params = "PlayerName, [UseOnlyCached]", Return = "UUID", Notes = "(STATIC) Returns the (short) UUID that corresponds to the given playername, or an empty string on error. If UseOnlyCached is false (the default), queries the Mojang servers if the playername is not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
+				GetUUIDsFromPlayerNames = { Params = "PlayerNames, [UseOnlyCached]", Return = "table", Notes = "(STATIC) Returns a table that contains the map, 'PlayerName' -> '(short) UUID', for all valid playernames in the input array-table. PlayerNames not recognized will not be set in the returned map. If UseOnlyCached is false (the default), queries the Mojang servers for the results that are not in the cache. <br /><b>WARNING</b>: Do NOT use this function with UseOnlyCached set to false while the server is running. Only use it when the server is starting up (inside the Initialize() method), otherwise you will lag the server severely." },
+				MakeUUIDDashed = { Params = "UUID", Return = "DashedUUID", Notes = "(STATIC) Converts the UUID to a dashed format (\"01234567-8901-2345-6789-012345678901\"). Accepts both dashed or short UUIDs. Logs a warning and returns an empty string if UUID format not recognized." },
+				MakeUUIDShort = { Params = "UUID", Return = "ShortUUID", Notes = "(STATIC) Converts the UUID to a short format (without dashes, \"01234567890123456789012345678901\"). Accepts both dashed or short UUIDs. Logs a warning and returns an empty string if UUID format not recognized." },
 			},
 
 		},
@@ -2017,7 +2017,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			]],
 			Functions =
 			{
-				Get = { Params = "", Return = "Root object", Notes = "(STATIC)This function returns the cRoot object." },
 				BroadcastChat = { Params = "Message", Return = "", Notes = "Broadcasts a message to every player in the server. No formatting is done by the server." },
 				BroadcastChatFailure = { Params = "Message", Return = "", Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a command that failed to run because of insufficient permissions, etc." },
 				BroadcastChatFatal = { Params = "Message", Return = "", Notes = "Prepends Red [FATAL] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a plugin that crashed, or similar." },
@@ -2028,12 +2027,12 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for all players with names partially (or fully) matching the name string provided." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
+				Get = { Params = "", Return = "Root object", Notes = "(STATIC)This function returns the cRoot object." },
 				GetCraftingRecipes = { Params = "", Return = "{{cCraftingRecipe|cCraftingRecipe}}", Notes = "Returns the CraftingRecipes object" },
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
 				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
 				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
 				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
-				GetMojangAPI = { Params = "", Return = "{{cMojangAPI}}", Notes = "Returns the {{cMojangAPI}} object." },
 				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },

@@ -191,8 +191,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	a_UUID = cMojangAPI::MakeUUIDShort(root.get("id", "").asString());
 	a_Properties = root["properties"];
 	
-	// Store the player's UUID in the NameToUUID map in MojangAPI:
-	cRoot::Get()->GetMojangAPI().AddPlayerNameToUUIDMapping(a_UserName, a_UUID);
+	// Store the player's profile in the MojangAPI caches:
+	cRoot::Get()->GetMojangAPI().AddPlayerProfile(a_UserName, a_UUID, a_Properties);
 
 	return true;
 }

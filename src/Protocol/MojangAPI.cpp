@@ -25,8 +25,10 @@ const int MAX_PER_QUERY = 100;
 
 
 
-#define DEFAULT_NAME_TO_UUID_SERVER "api.mojang.com"
-#define DEFAULT_NAME_TO_UUID_ADDRESS "/profiles/minecraft"
+#define DEFAULT_NAME_TO_UUID_SERVER     "api.mojang.com"
+#define DEFAULT_NAME_TO_UUID_ADDRESS    "/profiles/minecraft"
+#define DEFAULT_UUID_TO_PROFILE_SERVER  "sessionserver.mojang.com"
+#define DEFAULT_UUID_TO_PROFILE_ADDRESS "/session/minecraft/profile/%UUID%?unsigned=false"
 
 
 
@@ -97,11 +99,65 @@ static const AString & StarfieldCACert(void)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cMojangAPI::sProfile:
+
+cMojangAPI::sProfile::sProfile(
+	const AString & a_PlayerName,
+	const AString & a_UUID,
+	const Json::Value & a_Properties,
+	Int64 a_DateTime
+) :
+	m_PlayerName(a_PlayerName),
+	m_UUID(a_UUID),
+	m_Textures(),
+	m_TexturesSignature(),
+	m_DateTime(a_DateTime)
+{
+	/*
+	Example a_Profile contents:
+	"properties":
+	[
+		{
+			"name": "textures",
+			"value": "eyJ0aW1lc3RhbXAiOjE0MDcwNzAzMjEyNzEsInByb2ZpbGVJZCI6ImIxY2FmMjQyMDJhODQxYTc4MDU1YTA3OWM0NjBlZWU3IiwicHJvZmlsZU5hbWUiOiJ4b2Z0IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iNzc5YmFiZjVhNTg3Zjk0OGFkNjc0N2VhOTEyNzU0MjliNjg4Mjk1YWUzYzA3YmQwZTJmNWJmNGQwNTIifX19",
+			"signature": "XCty+jGEF39hEPrPhYNnCX087kPaoCjYruzYI/DS4nkL5hbjnkSM5Rh15hnUyv/FHhC8OF5rif3D1tQjtMI19KSVaXoUFXpbJM8/+PB8GDgEbX8Fc3u9nYkzOcM/xfxdYsFAdFhLQMkvase/BZLSuPhdy9DdI+TCrO7xuSTZfYmmwVuWo3w5gCY+mSIAnqltnOzaOOTcly75xvO0WYpVk7nJdnR2tvSi0wfrQPDrIg/uzhX7p0SnDqijmBU4QaNez/TNKiFxy69dAzt0RSotlQzqkDbyVKhhv9a4eY8h3pXi4UMftKEj4FAKczxLImkukJXuOn5NN15/Q+le0rJVBC60/xjKIVzltEsMN6qjWD0lQjey7WEL+4pGhCVuWY5KzuZjFvgqszuJTFz7lo+bcHiceldJtea8/fa02eTRObZvdLxbWC9ZfFY0IhpOVKfcLdno/ddDMNMQMi5kMrJ8MZZ/PcW1w5n7MMGWPGCla1kOaC55AL0QYSMGRVEZqgU9wXI5M7sHGZKGM4mWxkbEJYBkpI/p3GyxWgV6v33ZWlsz65TqlNrR1gCLaoFCm7Sif8NqPBZUAONHYon0roXhin/DyEanS93WV6i6FC1Wisscjq2AcvnOlgTo/5nN/1QsMbjNumuMGo37sqjRqlXoPb8zEUbAhhztYuJjEfQ2Rd8="
+		}
+	]
+	*/
+	
+	// Parse the Textures and TexturesSignature from the Profile:
+	if (!a_Properties.isArray())
+	{
+		// Properties is not a valid array, bail out
+		return;
+	}
+	Json::UInt Size = a_Properties.size();
+	for (Json::UInt i = 0; i < Size; i++)
+	{
+		const Json::Value & Prop = a_Properties[i];
+		AString PropName = Prop.get("name", "").asString();
+		if (PropName != "textures")
+		{
+			continue;
+		}
+		m_Textures = Prop.get("value", "").asString();
+		m_TexturesSignature = Prop.get("signature", "").asString();
+		break;
+	}  // for i - Properties[]
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cMojangAPI:
 
 cMojangAPI::cMojangAPI(void) :
 	m_NameToUUIDServer(DEFAULT_NAME_TO_UUID_SERVER),
-	m_NameToUUIDAddress(DEFAULT_NAME_TO_UUID_ADDRESS)
+	m_NameToUUIDAddress(DEFAULT_NAME_TO_UUID_ADDRESS),
+	m_UUIDToProfileServer(DEFAULT_UUID_TO_PROFILE_SERVER),
+	m_UUIDToProfileAddress(DEFAULT_UUID_TO_PROFILE_ADDRESS)
 {
 }
 
@@ -120,8 +176,10 @@ cMojangAPI::~cMojangAPI()
 
 void cMojangAPI::Start(cIniFile & a_SettingsIni)
 {
-	m_NameToUUIDServer   = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDServer",  DEFAULT_NAME_TO_UUID_SERVER);
-	m_NameToUUIDAddress  = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDAddress", DEFAULT_NAME_TO_UUID_ADDRESS);
+	m_NameToUUIDServer     = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDServer",     DEFAULT_NAME_TO_UUID_SERVER);
+	m_NameToUUIDAddress    = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDAddress",    DEFAULT_NAME_TO_UUID_ADDRESS);
+	m_UUIDToProfileServer  = a_SettingsIni.GetValueSet("MojangAPI", "UUIDToProfileServer",  DEFAULT_UUID_TO_PROFILE_SERVER);
+	m_UUIDToProfileAddress = a_SettingsIni.GetValueSet("MojangAPI", "UUIDToProfileAddress", DEFAULT_UUID_TO_PROFILE_ADDRESS);
 	LoadCachesFromDisk();
 }
 
@@ -135,7 +193,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 	AString lcPlayerName(a_PlayerName);
 	StrToLower(lcPlayerName);
 	
-	// Request the cache to populate any names not yet contained:
+	// Request the cache to query the name if not yet cached:
 	if (!a_UseOnlyCached)
 	{
 		AStringVector PlayerNames;
@@ -144,13 +202,52 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 	}
 	
 	// Retrieve from cache:
-	cNameToUUIDMap::const_iterator itr = m_NameToUUID.find(lcPlayerName);
+	cCSLock Lock(m_CSNameToUUID);
+	cProfileMap::const_iterator itr = m_NameToUUID.find(lcPlayerName);
 	if (itr == m_NameToUUID.end())
 	{
 		// No UUID found
 		return "";
 	}
 	return itr->second.m_PlayerName;
+}
+
+
+
+
+
+AString cMojangAPI::GetPlayerNameFromUUID(const AString & a_UUID, bool a_UseOnlyCached)
+{
+	// Normalize the UUID to lowercase short format that is used as the map key:
+	AString UUID = StrToLower(MakeUUIDShort(a_UUID));
+	
+	// Retrieve from caches:
+	{
+		cCSLock Lock(m_CSUUIDToProfile);
+		cProfileMap::const_iterator itr = m_UUIDToProfile.find(UUID);
+		if (itr != m_UUIDToProfile.end())
+		{
+			return itr->second.m_PlayerName;
+		}
+	}
+	{
+		cCSLock Lock(m_CSUUIDToName);
+		cProfileMap::const_iterator itr = m_UUIDToName.find(UUID);
+		if (itr != m_UUIDToName.end())
+		{
+			return itr->second.m_PlayerName;
+		}
+	}
+
+	// Name not yet cached, request cache and retry:
+	if (!a_UseOnlyCached)
+	{
+		CacheUUIDToProfile(UUID);
+		return GetPlayerNameFromUUID(a_UUID, true);
+	}
+	
+	// No value found, none queried. Return an error:
+	return "";
 }
 
 
@@ -180,7 +277,7 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 	cCSLock Lock(m_CSNameToUUID);
 	for (AStringVector::const_iterator itr = PlayerNames.begin(), end = PlayerNames.end(); itr != end; ++itr, ++idx)
 	{
-		cNameToUUIDMap::const_iterator itrN = m_NameToUUID.find(*itr);
+		cProfileMap::const_iterator itrN = m_NameToUUID.find(*itr);
 		if (itrN != m_NameToUUID.end())
 		{
 			res[idx] = itrN->second.m_UUID;
@@ -196,10 +293,39 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
 	AString lcName(a_PlayerName);
-	AString UUID = MakeUUIDShort(a_UUID);
+	AString UUID = StrToLower(MakeUUIDShort(a_UUID));
 	Int64 Now = time(NULL);
-	cCSLock Lock(m_CSNameToUUID);
-	m_NameToUUID[StrToLower(lcName)] = sUUIDRecord(a_PlayerName, UUID, Now);
+	{
+		cCSLock Lock(m_CSNameToUUID);
+		m_NameToUUID[StrToLower(lcName)] = sProfile(a_PlayerName, UUID, "", "", Now);
+	}
+	{
+		cCSLock Lock(m_CSUUIDToName);
+		m_UUIDToName[UUID] = sProfile(a_PlayerName, UUID, "", "", Now);
+	}
+}
+
+
+
+
+
+void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const AString & a_UUID, const Json::Value & a_Properties)
+{
+	AString lcName(a_PlayerName);
+	AString UUID = StrToLower(MakeUUIDShort(a_UUID));
+	Int64 Now = time(NULL);
+	{
+		cCSLock Lock(m_CSNameToUUID);
+		m_NameToUUID[StrToLower(lcName)] = sProfile(a_PlayerName, UUID, "", "", Now);
+	}
+	{
+		cCSLock Lock(m_CSUUIDToName);
+		m_UUIDToName[UUID] = sProfile(a_PlayerName, UUID, "", "", Now);
+	}
+	{
+		cCSLock Lock(m_CSUUIDToProfile);
+		m_UUIDToProfile[UUID] = sProfile(a_PlayerName, UUID, a_Properties, Now);
+	}
 }
 
 
@@ -337,6 +463,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 		// Open up the SQLite DB:
 		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
+		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
 		
 		// Clean up old entries:
 		{
@@ -345,16 +472,40 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			stmt.bind(1, LimitDateTime);
 			stmt.exec();
 		}
-		
-		// Retrieve all remaining entries::
-		SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
-		while (stmt.executeStep())
 		{
-			AString PlayerName = stmt.getColumn(0);
-			AString UUID       = stmt.getColumn(1);
-			Int64 DateTime     = stmt.getColumn(2);
-			AString lcPlayerName = PlayerName;
-			m_NameToUUID[StrToLower(lcPlayerName)] = sUUIDRecord(PlayerName, UUID, DateTime);
+			SQLite::Statement stmt(db, "DELETE FROM UUIDToProfile WHERE DateTime < ?");
+			Int64 LimitDateTime = time(NULL) - MAX_AGE;
+			stmt.bind(1, LimitDateTime);
+			stmt.exec();
+		}
+		
+		// Retrieve all remaining entries:
+		{
+			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
+			while (stmt.executeStep())
+			{
+				AString PlayerName = stmt.getColumn(0);
+				AString UUID       = stmt.getColumn(1);
+				Int64 DateTime     = stmt.getColumn(2);
+				AString lcPlayerName = PlayerName;
+				UUID = StrToLower(MakeUUIDShort(UUID));
+				m_NameToUUID[StrToLower(lcPlayerName)] = sProfile(PlayerName, UUID, "", "", DateTime);
+				m_UUIDToName[UUID] = sProfile(PlayerName, UUID, "", "", DateTime);
+			}
+		}
+		{
+			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, Textures, TexturesSignature, DateTime FROM UUIDToProfile");
+			while (stmt.executeStep())
+			{
+				AString PlayerName        = stmt.getColumn(0);
+				AString UUID              = stmt.getColumn(1);
+				AString Textures          = stmt.getColumn(2);
+				AString TexturesSignature = stmt.getColumn(2);
+				Int64 DateTime            = stmt.getColumn(4);
+				AString lcPlayerName = PlayerName;
+				UUID = StrToLower(MakeUUIDShort(UUID));
+				m_UUIDToProfile[StrToLower(lcPlayerName)] = sProfile(PlayerName, UUID, Textures, TexturesSignature, DateTime);
+			}
 		}
 	}
 	catch (const SQLite::Exception & ex)
@@ -374,26 +525,51 @@ void cMojangAPI::SaveCachesToDisk(void)
 		// Open up the SQLite DB:
 		SQLite::Database db("MojangAPI.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
+		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
 		
 		// Remove all entries:
 		db.exec("DELETE FROM PlayerNameToUUID");
+		db.exec("DELETE FROM UUIDToProfile");
 		
-		// Save all cache entries:
-		SQLite::Statement stmt(db, "INSERT INTO PlayerNameToUUID(PlayerName, UUID, DateTime) VALUES (?, ?, ?)");
+		// Save all cache entries - m_PlayerNameToUUID:
 		Int64 LimitDateTime = time(NULL) - MAX_AGE;
-		cCSLock Lock(m_CSNameToUUID);
-		for (cNameToUUIDMap::const_iterator itr = m_NameToUUID.begin(), end = m_NameToUUID.end(); itr != end; ++itr)
 		{
-			if (itr->second.m_DateTime < LimitDateTime)
+			SQLite::Statement stmt(db, "INSERT INTO PlayerNameToUUID(PlayerName, UUID, DateTime) VALUES (?, ?, ?)");
+			cCSLock Lock(m_CSNameToUUID);
+			for (cProfileMap::const_iterator itr = m_NameToUUID.begin(), end = m_NameToUUID.end(); itr != end; ++itr)
 			{
-				// This item is too old, do not save
-				continue;
+				if (itr->second.m_DateTime < LimitDateTime)
+				{
+					// This item is too old, do not save
+					continue;
+				}
+				stmt.bind(1, itr->second.m_PlayerName);
+				stmt.bind(2, itr->second.m_UUID);
+				stmt.bind(3, itr->second.m_DateTime);
+				stmt.exec();
+				stmt.reset();
 			}
-			stmt.bind(1, itr->second.m_PlayerName);
-			stmt.bind(2, itr->second.m_UUID);
-			stmt.bind(3, itr->second.m_DateTime);
-			stmt.exec();
-			stmt.reset();
+		}
+
+		// Save all cache entries - m_UUIDToProfile:
+		{
+			SQLite::Statement stmt(db, "INSERT INTO UUIDToProfile(UUID, PlayerName, Textures, TexturesSignature, DateTime) VALUES (?, ?, ?, ?, ?)");
+			cCSLock Lock(m_CSUUIDToProfile);
+			for (cProfileMap::const_iterator itr = m_UUIDToProfile.begin(), end = m_UUIDToProfile.end(); itr != end; ++itr)
+			{
+				if (itr->second.m_DateTime < LimitDateTime)
+				{
+					// This item is too old, do not save
+					continue;
+				}
+				stmt.bind(1, itr->second.m_UUID);
+				stmt.bind(2, itr->second.m_PlayerName);
+				stmt.bind(3, itr->second.m_Textures);
+				stmt.bind(4, itr->second.m_TexturesSignature);
+				stmt.bind(5, itr->second.m_DateTime);
+				stmt.exec();
+				stmt.reset();
+			}
 		}
 	}
 	catch (const SQLite::Exception & ex)
@@ -487,20 +663,143 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 		// Store the returned results into cache:
 		size_t JsonCount = root.size();
 		Int64 Now = time(NULL);
-		cCSLock Lock(m_CSNameToUUID);
-		for (size_t idx = 0; idx < JsonCount; ++idx)
 		{
-			Json::Value & Val = root[idx];
-			AString JsonName = Val.get("name", "").asString();
-			AString JsonUUID = MakeUUIDShort(Val.get("id", "").asString());
-			if (JsonUUID.empty())
+			cCSLock Lock(m_CSNameToUUID);
+			for (size_t idx = 0; idx < JsonCount; ++idx)
 			{
-				continue;
-			}
-			AString lcName = JsonName;
-			m_NameToUUID[StrToLower(lcName)] = sUUIDRecord(JsonName, JsonUUID, Now);
-		}  // for idx - root[]
+				Json::Value & Val = root[idx];
+				AString JsonName = Val.get("name", "").asString();
+				AString JsonUUID = StrToLower(MakeUUIDShort(Val.get("id", "").asString()));
+				if (JsonUUID.empty())
+				{
+					continue;
+				}
+				AString lcName = JsonName;
+				m_NameToUUID[StrToLower(lcName)] = sProfile(JsonName, JsonUUID, "", "", Now);
+			}  // for idx - root[]
+		}  // cCSLock (m_CSNameToUUID)
+		
+		// Also cache the UUIDToName:
+		{
+			cCSLock Lock(m_CSUUIDToName);
+			for (size_t idx = 0; idx < JsonCount; ++idx)
+			{
+				Json::Value & Val = root[idx];
+				AString JsonName = Val.get("name", "").asString();
+				AString JsonUUID = StrToLower(MakeUUIDShort(Val.get("id", "").asString()));
+				if (JsonUUID.empty())
+				{
+					continue;
+				}
+				m_UUIDToName[JsonUUID] = sProfile(JsonName, JsonUUID, "", "", Now);
+			}  // for idx - root[]
+		}
 	}  // while (!NamesToQuery.empty())
+}
+
+
+
+
+
+void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
+{
+	ASSERT(a_UUID.size() == 32);
+	
+	// Check if already present:
+	{
+		if (m_UUIDToProfile.find(a_UUID) != m_UUIDToProfile.end())
+		{
+			return;
+		}
+	}
+	
+	// Create the request address:
+	AString Address = m_UUIDToProfileAddress;
+	ReplaceString(Address, "%UUID%", a_UUID);
+	
+	// Create the HTTP request:
+	AString Request;
+	Request += "GET " + Address + " HTTP/1.0\r\n";  // We need to use HTTP 1.0 because we don't handle Chunked transfer encoding
+	Request += "Host: " + m_UUIDToProfileServer + "\r\n";
+	Request += "User-Agent: MCServer\r\n";
+	Request += "Connection: close\r\n";
+	Request += "Content-Length: 0\r\n";
+	Request += "\r\n";
+
+	// Get the response from the server:
+	AString Response;
+	if (!SecureRequest(m_UUIDToProfileServer, Request, Response))
+	{
+		return;
+	}
+
+	// Check the HTTP status line:
+	const AString Prefix("HTTP/1.1 200 OK");
+	AString HexDump;
+	if (Response.compare(0, Prefix.size(), Prefix))
+	{
+		LOGINFO("%s failed: bad HTTP status line received", __FUNCTION__);
+		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return;
+	}
+
+	// Erase the HTTP headers from the response:
+	size_t idxHeadersEnd = Response.find("\r\n\r\n");
+	if (idxHeadersEnd == AString::npos)
+	{
+		LOGINFO("%s failed: bad HTTP response header received", __FUNCTION__);
+		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return;
+	}
+	Response.erase(0, idxHeadersEnd + 4);
+	
+	// Parse the returned string into Json:
+	Json::Reader reader;
+	Json::Value root;
+	if (!reader.parse(Response, root, false) || !root.isObject())
+	{
+		LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON!", __FUNCTION__);
+		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+		return;
+	}
+
+	/* Example response:
+	{
+		"id": "b1caf24202a841a78055a079c460eee7",
+		"name": "xoft",
+		"properties":
+		[
+			{
+				"name": "textures",
+				"value": "eyJ0aW1lc3RhbXAiOjE0MDcwNzAzMjEyNzEsInByb2ZpbGVJZCI6ImIxY2FmMjQyMDJhODQxYTc4MDU1YTA3OWM0NjBlZWU3IiwicHJvZmlsZU5hbWUiOiJ4b2Z0IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iNzc5YmFiZjVhNTg3Zjk0OGFkNjc0N2VhOTEyNzU0MjliNjg4Mjk1YWUzYzA3YmQwZTJmNWJmNGQwNTIifX19",
+				"signature": "XCty+jGEF39hEPrPhYNnCX087kPaoCjYruzYI/DS4nkL5hbjnkSM5Rh15hnUyv/FHhC8OF5rif3D1tQjtMI19KSVaXoUFXpbJM8/+PB8GDgEbX8Fc3u9nYkzOcM/xfxdYsFAdFhLQMkvase/BZLSuPhdy9DdI+TCrO7xuSTZfYmmwVuWo3w5gCY+mSIAnqltnOzaOOTcly75xvO0WYpVk7nJdnR2tvSi0wfrQPDrIg/uzhX7p0SnDqijmBU4QaNez/TNKiFxy69dAzt0RSotlQzqkDbyVKhhv9a4eY8h3pXi4UMftKEj4FAKczxLImkukJXuOn5NN15/Q+le0rJVBC60/xjKIVzltEsMN6qjWD0lQjey7WEL+4pGhCVuWY5KzuZjFvgqszuJTFz7lo+bcHiceldJtea8/fa02eTRObZvdLxbWC9ZfFY0IhpOVKfcLdno/ddDMNMQMi5kMrJ8MZZ/PcW1w5n7MMGWPGCla1kOaC55AL0QYSMGRVEZqgU9wXI5M7sHGZKGM4mWxkbEJYBkpI/p3GyxWgV6v33ZWlsz65TqlNrR1gCLaoFCm7Sif8NqPBZUAONHYon0roXhin/DyEanS93WV6i6FC1Wisscjq2AcvnOlgTo/5nN/1QsMbjNumuMGo37sqjRqlXoPb8zEUbAhhztYuJjEfQ2Rd8="
+			}
+		]
+	}
+	*/
+
+	// Store the returned result into caches:
+	AString PlayerName = root.get("name", "").asString();
+	if (PlayerName.empty())
+	{
+		// No valid playername, bail out
+		return;
+	}
+	Json::Value Properties = root.get("properties", "");
+	Int64 Now = time(NULL);
+	{
+		cCSLock Lock(m_CSUUIDToProfile);
+		m_UUIDToProfile[a_UUID] = sProfile(PlayerName, a_UUID, Properties, Now);
+	}
+	{
+		cCSLock Lock(m_CSUUIDToName);
+		m_UUIDToName[a_UUID] = sProfile(PlayerName, a_UUID, Properties, Now);
+	}
+	{
+		AString lcPlayerName(PlayerName);
+		cCSLock Lock(m_CSNameToUUID);
+		m_NameToUUID[StrToLower(lcPlayerName)] = sProfile(PlayerName, a_UUID, Properties, Now);
+	}
 }
 
 

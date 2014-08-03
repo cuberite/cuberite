@@ -2158,6 +2158,99 @@ static int tolua_cClientHandle_SendPluginMessage(lua_State * L)
 
 
 
+static int tolua_cMojangAPI_AddPlayerNameToUUIDMapping(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamString(3) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	// Retrieve the parameters:
+	AString UUID, PlayerName;
+	S.GetStackValue(2, PlayerName);
+	S.GetStackValue(3, UUID);
+	
+	// Store in the cache:
+	cRoot::Get()->GetMojangAPI().AddPlayerNameToUUIDMapping(PlayerName, UUID);
+	return 0;
+}
+
+
+
+
+
+static int tolua_cMojangAPI_GetPlayerNameFromUUID(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	AString UUID;
+	S.GetStackValue(2, UUID);
+	
+	// If the UseOnlyCached param was given, read it; default to false
+	bool ShouldUseCacheOnly = false;
+	if (lua_gettop(L) == 3)
+	{
+		ShouldUseCacheOnly = (lua_toboolean(L, 3) != 0);
+		lua_pop(L, 1);
+	}
+
+	// Return the PlayerName:
+	AString PlayerName = cRoot::Get()->GetMojangAPI().GetPlayerNameFromUUID(UUID, ShouldUseCacheOnly);
+	S.Push(PlayerName);
+	return 1;
+}
+
+
+
+
+
+static int tolua_cMojangAPI_GetUUIDFromPlayerName(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	AString PlayerName;
+	S.GetStackValue(2, PlayerName);
+	
+	// If the UseOnlyCached param was given, read it; default to false
+	bool ShouldUseCacheOnly = false;
+	if (lua_gettop(L) == 3)
+	{
+		ShouldUseCacheOnly = (lua_toboolean(L, 3) != 0);
+		lua_pop(L, 1);
+	}
+
+	// Return the UUID:
+	AString UUID = cRoot::Get()->GetMojangAPI().GetUUIDFromPlayerName(PlayerName, ShouldUseCacheOnly);
+	S.Push(UUID);
+	return 1;
+}
+
+
+
+
+
 static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 {
 	cLuaState S(L);
@@ -3158,7 +3251,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cMojangAPI");
-			tolua_function(tolua_S, "GetUUIDsFromPlayerNames", tolua_cMojangAPI_GetUUIDsFromPlayerNames);
+			tolua_function(tolua_S, "AddPlayerNameToUUIDMapping", tolua_cMojangAPI_AddPlayerNameToUUIDMapping);
+			tolua_function(tolua_S, "GetPlayerNameFromUUID",      tolua_cMojangAPI_GetPlayerNameFromUUID);
+			tolua_function(tolua_S, "GetUUIDFromPlayerName",      tolua_cMojangAPI_GetUUIDFromPlayerName);
+			tolua_function(tolua_S, "GetUUIDsFromPlayerNames",    tolua_cMojangAPI_GetUUIDsFromPlayerNames);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cItemGrid");

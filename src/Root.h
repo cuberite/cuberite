@@ -88,7 +88,7 @@ public:
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
-	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }        // tolua_export
+	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
