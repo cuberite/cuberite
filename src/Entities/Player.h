@@ -286,9 +286,6 @@ public:
 	/** Adds the specified exhaustion to m_FoodExhaustion. Expects only positive values. */
 	void AddFoodExhaustion(double a_Exhaustion);
 	
-	/** Starts the food poisoning for the specified amount of ticks */
-	void FoodPoison(int a_NumTicks);
-	
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
 	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
 	

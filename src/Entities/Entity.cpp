@@ -543,10 +543,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 void cEntity::Heal(int a_HitPoints)
 {
 	m_Health += a_HitPoints;
-	if (m_Health > m_MaxHealth)
-	{
-		m_Health = m_MaxHealth;
-	}
+	m_Health = std::min(m_Health, m_MaxHealth);
 }
 
 
@@ -555,7 +552,7 @@ void cEntity::Heal(int a_HitPoints)
 
 void cEntity::SetHealth(int a_Health)
 {
-	m_Health = std::max(0, std::min(m_MaxHealth, a_Health));
+	m_Health = Clamp(a_Health, 0, m_MaxHealth);
 }
 
 
@@ -1068,42 +1065,38 @@ bool cEntity::DetectPortal()
 				}
 				m_PortalCooldownData.m_TicksDelayed = 0;
 
-				switch (GetWorld()->GetDimension())
+				if (GetWorld()->GetDimension() == dimNether)
 				{
-					case dimNether:
+					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
-						if (GetWorld()->GetLinkedOverworldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
-
-						if (IsPlayer())
-						{
-							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
-						}
-						
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+						return false;
 					}
-					case dimOverworld:
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
+
+					if (IsPlayer())
 					{
-						if (GetWorld()->GetNetherWorldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-						if (IsPlayer())
-						{
-							((cPlayer *)this)->AwardAchievement(achEnterPortal);
-							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
-						}
-						
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
 					}
-					default: return false;
+					
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+				}
+				else
+				{
+					if (GetWorld()->GetNetherWorldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->AwardAchievement(achEnterPortal);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
+					}
+					
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
 				}
 			}
 			case E_BLOCK_END_PORTAL:
@@ -1113,45 +1106,43 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
-				switch (GetWorld()->GetDimension())
+				if (GetWorld()->GetDimension() == dimEnd)
 				{
-					case dimEnd:
+					
+					if (GetWorld()->GetLinkedOverworldName().empty())
 					{
-						if (GetWorld()->GetLinkedOverworldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-						if (IsPlayer())
-						{
-							cPlayer * Player = (cPlayer *)this;
-							Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
-							Player->GetClientHandle()->SendRespawn(dimOverworld);
-						}
-
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+						return false;
 					}
-					case dimOverworld:
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
 					{
-						if (GetWorld()->GetEndWorldName().empty())
-						{
-							return false;
-						}
-
-						m_PortalCooldownData.m_ShouldPreventTeleportation = true;
-
-						if (IsPlayer())
-						{
-							((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
-							((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
-						}
-
-						return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+						cPlayer * Player = (cPlayer *)this;
+						Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+						Player->GetClientHandle()->SendRespawn(dimOverworld);
 					}
-					default: return false;
+
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
 				}
+				else
+				{
+					if (GetWorld()->GetEndWorldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
+					}
+
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+				}
+				
 			}
 			default: break;
 		}
@@ -1270,10 +1261,10 @@ void cEntity::HandleAir(void)
 			SetSpeedY(1);  // Float in the water
 		}
 
-		// Either reduce air level or damage player
-		if (m_AirLevel < 1)
+		if (m_AirLevel <= 0)
 		{
-			if (m_AirTickTimer < 1)
+			// Runs the air tick timer to check whether the player should be damaged
+			if (m_AirTickTimer <= 0)
 			{
 				// Damage player
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
@@ -1558,17 +1549,10 @@ void cEntity::SetHeight(double a_Height)
 
 void cEntity::SetMass(double a_Mass)
 {
-	if (a_Mass > 0)
-	{
-		m_Mass = a_Mass;
-	}
-	else
-	{
-		// Make sure that mass is not zero. 1g is the default because we
-		// have to choose a number. It's perfectly legal to have a mass
-		// less than 1g as long as is NOT equal or less than zero.
-		m_Mass = 0.001;
-	}
+	// Make sure that mass is not zero. 1g is the default because we
+	// have to choose a number. It's perfectly legal to have a mass
+	// less than 1g as long as is NOT equal or less than zero.
+	m_Mass = std::max(a_Mass, 0.001);
 }
 
 
