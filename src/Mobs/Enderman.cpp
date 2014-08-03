@@ -103,7 +103,7 @@ void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 void cEnderman::CheckEventSeePlayer()
-{	
+{
 	if (m_Target != NULL)
 	{
 		return;
