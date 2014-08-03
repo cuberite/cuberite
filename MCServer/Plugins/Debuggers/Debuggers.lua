@@ -339,6 +339,13 @@ function TestUUIDFromName()
 	end
 
 	LOG("UUID-from-Name resolution tests finished.")
+	
+	LOG("Performing a Name-from-UUID test...")
+	-- local NameToTest = "aloe_vera"
+	local NameToTest = "xoft"
+	local Name = cMojangAPI:GetPlayerNameFromUUID(UUIDs[NameToTest])
+	LOG("Name(" .. UUIDs[NameToTest] .. ") = '" .. Name .. "', expected '" .. NameToTest .. "'.")
+	LOG("Name-from-UUID test finished.")
 end
 
 
