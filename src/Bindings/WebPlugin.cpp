@@ -81,7 +81,9 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 		else  // Otherwise show the first tab
 		{
 			if (GetTabs().size() > 0)
+			{
 				Tab = *GetTabs().begin();
+			}
 		}
 
 		if (Tab != NULL)

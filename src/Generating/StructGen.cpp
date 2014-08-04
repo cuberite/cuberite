@@ -585,10 +585,10 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 		// First update the high floor:
 		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 		{
-			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] = (
 				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
-				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
-				256;
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) / 256
+			);
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 		

@@ -847,7 +847,7 @@ void cIncrementalRedstoneSimulator::HandleDropSpenser(int a_RelBlockX, int a_Rel
 		bool m_IsPowered;
 	public:
 		cSetPowerToDropSpenser(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
-				
+
 		virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
 		{
 			a_DropSpenser->SetRedstonePower(m_IsPowered);
@@ -948,7 +948,7 @@ void cIncrementalRedstoneSimulator::HandleCommandBlock(int a_RelBlockX, int a_Re
 		bool m_IsPowered;
 	public:
 		cSetPowerToCommandBlock(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
-				
+
 		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
 		{
 			a_CommandBlock->SetRedstonePower(m_IsPowered);
@@ -1844,7 +1844,7 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_RelBlockX, i
 			{
 				return;
 			}
-						
+
 			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 2, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
 			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
 			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);

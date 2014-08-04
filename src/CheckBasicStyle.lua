@@ -11,11 +11,11 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Opening braces not at the end of a code line
 	- Spaces after if, for, while
 	- Line dividers (////...) exactly 80 slashes
+	- Multi-level indent change
 	- (TODO) Spaces before *, /, &
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
 	- (TODO) Not using "* "-style doxy comment continuation lines
-	- (TODO) Multi-level indent change
 	
 Violations that cannot be checked easily:
 	- Spaces around "+" (there are things like "a++", "++a", "a += 1", "X+", "stack +1" and ascii-drawn tables)
@@ -159,6 +159,7 @@ local function ProcessFile(a_FileName)
 	-- Process each line separately:
 	-- Ref.: http://stackoverflow.com/questions/10416869/iterate-over-possibly-empty-lines-in-a-way-that-matches-the-expectations-of-exis
 	local lineCounter = 1
+	local lastIndentLevel = 0
 	all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
 	string.gsub(all .. "\n", "[^\n]*\n",  -- Iterate over each line, while preserving empty lines
 		function(a_Line)
@@ -167,6 +168,7 @@ local function ProcessFile(a_FileName)
 				ReportViolationIfFound(a_Line, a_FileName, lineCounter, pat[1], pat[2])
 			end
 			
+			-- Check that divider comments are well formed - 80 slashes plus optional indent:
 			local dividerStart, dividerEnd = a_Line:find("/////*")
 			if (dividerStart) then
 				if (dividerEnd ~= dividerStart + 79) then
@@ -180,6 +182,19 @@ local function ProcessFile(a_FileName)
 						ReportViolation(a_FileName, lineCounter, 1, 80, "Divider comment shouldn't have any extra text around it")
 					end
 				end
+			end
+			
+			-- Check the indent level change from the last line, if it's too much, report:
+			local indentStart, indentEnd = a_Line:find("\t+")
+			local indentLevel = 0
+			if (indentStart) then
+				indentLevel = indentEnd - indentStart
+			end
+			if (indentLevel > 0) then
+				if ((lastIndentLevel - indentLevel >= 2) or (lastIndentLevel - indentLevel <= -2)) then
+					ReportViolation(a_FileName, lineCounter, 1, indentStart or 1, "Indent changed more than a single level between the previous line and this one: from " .. lastIndentLevel .. " to " .. indentLevel)
+				end
+				lastIndentLevel = indentLevel
 			end
 
 			lineCounter = lineCounter + 1

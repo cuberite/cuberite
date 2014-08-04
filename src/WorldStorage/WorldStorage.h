@@ -95,9 +95,11 @@ protected:
 
 		bool operator ==(const sChunkLoad other) const
 		{
-			return this->m_ChunkX == other.m_ChunkX &&
-				this->m_ChunkY == other.m_ChunkY &&
-				this->m_ChunkZ == other.m_ChunkZ;
+			return (
+				(this->m_ChunkX == other.m_ChunkX) &&
+				(this->m_ChunkY == other.m_ChunkY) &&
+				(this->m_ChunkZ == other.m_ChunkZ)
+			);
 		}
 	} ;
 

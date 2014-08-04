@@ -24,7 +24,7 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace,
 void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	int Dir = 0;
-			
+
 	// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
 	switch (m_BlockFace)
 	{
