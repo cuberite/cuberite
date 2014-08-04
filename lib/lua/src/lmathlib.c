@@ -182,12 +182,16 @@ static int math_clamp (lua_State *L) {
 	lua_Number dmin = luaL_checknumber(L, 1);
 	lua_Number dvalue = luaL_checknumber(L, 2);
 	lua_Number dmax = luaL_checknumber(L, 3);
-	if (dvalue < dmin) {
+
+	if (dvalue < dmin)
+	{
 		dvalue = dmin;
 	}
-	if (dvalue > dmax) {
+	if (dvalue > dmax)
+	{
 		dvalue = dmax;
 	}
+
 	lua_pushnumber(L, dvalue);
 	return 1;
 	
