@@ -43,10 +43,13 @@ extern AStringVector StringSplitAndTrim(const AString & str, const AString & del
 extern AString TrimString(const AString & str);  // tolua_export
 
 /// In-place string conversion to uppercase; returns the same string
-extern AString & StrToUpper(AString & s);
+extern AString & InPlaceUppercase(AString & s);
 
 /// In-place string conversion to lowercase; returns the same string
-extern AString & StrToLower(AString & s);
+extern AString & InPlaceLowercase(AString & s);
+
+/** Returns an upper-cased copy of the string */
+extern AString StrToUpper(const AString & s);
 
 /** Returns a lower-cased copy of the string */
 extern AString StrToLower(const AString & s);

@@ -718,8 +718,7 @@ AString cMonster::MobTypeToString(cMonster::eType a_MobType)
 
 cMonster::eType cMonster::StringToMobType(const AString & a_Name)
 {
-	AString lcName(a_Name);
-	StrToLower(lcName);
+	AString lcName = StrToLower(a_Name);
 	
 	// Binary-search for the lowercase name:
 	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames) - 1;

@@ -35,8 +35,7 @@ cHTTPMessage::cHTTPMessage(eKind a_Kind) :
 
 void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 {
-	AString Key = a_Key;
-	StrToLower(Key);
+	AString Key = StrToLower(a_Key);
 	cNameValueMap::iterator itr = m_Headers.find(Key);
 	if (itr == m_Headers.end())
 	{
