@@ -570,8 +570,14 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case cMonster::mtWolf:
 			{
 				const cWolf & Wolf = *((cWolf *)a_Monster);
-				m_Writer.AddString("Owner",     Wolf.GetOwnerName());
-				m_Writer.AddString("OwnerUUID", Wolf.GetOwnerUUID());
+				if (!Wolf.GetOwnerName().empty())
+				{
+					m_Writer.AddString("Owner", Wolf.GetOwnerName());
+				}
+				if (!Wolf.GetOwnerUUID().empty())
+				{
+					m_Writer.AddString("OwnerUUID", Wolf.GetOwnerUUID());
+				}
 				m_Writer.AddByte("Sitting",     Wolf.IsSitting() ? 1 : 0);
 				m_Writer.AddByte("Angry",       Wolf.IsAngry() ? 1 : 0);
 				m_Writer.AddInt("CollarColor",  Wolf.GetCollarColor());
