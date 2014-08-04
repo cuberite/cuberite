@@ -208,7 +208,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 		// No UUID found
 		return "";
 	}
-	return itr->second.m_PlayerName;
+	return itr->second.m_UUID;
 }
 
 
