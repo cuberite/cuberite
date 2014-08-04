@@ -13,7 +13,7 @@ separate the arguments from the return values, a special type of cLuaState::cRet
 
 
 
-print("Generating LuaState_Call.inc...")
+print("Generating LuaState_Call.inc . . .")
 
 
 
@@ -189,7 +189,7 @@ f:close()
 
 
 
-print("LuaState_Call.inc generated")
+print("LuaState_Call.inc generated.")
 
 
 
