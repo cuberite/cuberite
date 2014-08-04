@@ -57,7 +57,7 @@ public:
 		}
 		Force = std::min(Force, 1.0);
 
-		// Has the player a arrow?
+		// Does the player have an arrow?
 		if (!a_Player->IsGameModeCreative() && !a_Player->GetInventory().HasItems(cItem(E_ITEM_ARROW)))
 		{
 			return;
