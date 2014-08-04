@@ -190,8 +190,7 @@ void cMojangAPI::Start(cIniFile & a_SettingsIni)
 AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_UseOnlyCached)
 {
 	// Convert the playername to lowercase:
-	AString lcPlayerName(a_PlayerName);
-	StrToLower(lcPlayerName);
+	AString lcPlayerName = StrToLower(a_PlayerName);
 	
 	// Request the cache to query the name if not yet cached:
 	if (!a_UseOnlyCached)
@@ -219,7 +218,7 @@ AString cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_U
 AString cMojangAPI::GetPlayerNameFromUUID(const AString & a_UUID, bool a_UseOnlyCached)
 {
 	// Normalize the UUID to lowercase short format that is used as the map key:
-	AString UUID = StrToLower(MakeUUIDShort(a_UUID));
+	AString UUID = MakeUUIDShort(a_UUID);
 	
 	// Retrieve from caches:
 	{
@@ -260,8 +259,7 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 	AStringVector PlayerNames;
 	for (AStringVector::const_iterator itr = a_PlayerNames.begin(), end = a_PlayerNames.end(); itr != end; ++itr)
 	{
-		AString Lower(*itr);
-		PlayerNames.push_back(StrToLower(Lower));
+		PlayerNames.push_back(StrToLower(*itr));
 	}  // for itr - a_PlayerNames[]
 	
 	// Request the cache to populate any names not yet contained:
@@ -292,12 +290,11 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
-	AString lcName(a_PlayerName);
-	AString UUID = StrToLower(MakeUUIDShort(a_UUID));
+	AString UUID = MakeUUIDShort(a_UUID);
 	Int64 Now = time(NULL);
 	{
 		cCSLock Lock(m_CSNameToUUID);
-		m_NameToUUID[StrToLower(lcName)] = sProfile(a_PlayerName, UUID, "", "", Now);
+		m_NameToUUID[StrToLower(a_PlayerName)] = sProfile(a_PlayerName, UUID, "", "", Now);
 	}
 	{
 		cCSLock Lock(m_CSUUIDToName);
@@ -311,12 +308,11 @@ void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const 
 
 void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	AString lcName(a_PlayerName);
-	AString UUID = StrToLower(MakeUUIDShort(a_UUID));
+	AString UUID = MakeUUIDShort(a_UUID);
 	Int64 Now = time(NULL);
 	{
 		cCSLock Lock(m_CSNameToUUID);
-		m_NameToUUID[StrToLower(lcName)] = sProfile(a_PlayerName, UUID, "", "", Now);
+		m_NameToUUID[StrToLower(a_PlayerName)] = sProfile(a_PlayerName, UUID, "", "", Now);
 	}
 	{
 		cCSLock Lock(m_CSUUIDToName);
@@ -395,13 +391,13 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 	{
 		case 32:
 		{
-			// Already is a short UUID
-			return a_UUID;
+			// Already is a short UUID, only lowercase
+			return StrToLower(a_UUID);
 		}
 		
 		case 36:
 		{
-			// Remove the dashes from the string:
+			// Remove the dashes from the string by appending together the parts between them:
 			AString res;
 			res.reserve(32);
 			res.append(a_UUID, 0, 8);
@@ -409,7 +405,7 @@ AString cMojangAPI::MakeUUIDShort(const AString & a_UUID)
 			res.append(a_UUID, 14, 4);
 			res.append(a_UUID, 19, 4);
 			res.append(a_UUID, 24, 12);
-			return res;
+			return StrToLower(res);
 		}
 	}
 	LOGWARNING("%s: Not an UUID: \"%s\".", __FUNCTION__, a_UUID.c_str());
@@ -427,8 +423,8 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 	{
 		case 36:
 		{
-			// Already is a dashed UUID
-			return a_UUID;
+			// Already is a dashed UUID, only lowercase
+			return StrToLower(a_UUID);
 		}
 		
 		case 32:
@@ -445,7 +441,7 @@ AString cMojangAPI::MakeUUIDDashed(const AString & a_UUID)
 			res.append(a_UUID, 16, 4);
 			res.push_back('-');
 			res.append(a_UUID, 20, 12);
-			return res;
+			return StrToLower(res);
 		}
 	}
 	LOGWARNING("%s: Not an UUID: \"%s\".", __FUNCTION__, a_UUID.c_str());
@@ -487,9 +483,8 @@ void cMojangAPI::LoadCachesFromDisk(void)
 				AString PlayerName = stmt.getColumn(0);
 				AString UUID       = stmt.getColumn(1);
 				Int64 DateTime     = stmt.getColumn(2);
-				AString lcPlayerName = PlayerName;
-				UUID = StrToLower(MakeUUIDShort(UUID));
-				m_NameToUUID[StrToLower(lcPlayerName)] = sProfile(PlayerName, UUID, "", "", DateTime);
+				UUID = MakeUUIDShort(UUID);
+				m_NameToUUID[StrToLower(PlayerName)] = sProfile(PlayerName, UUID, "", "", DateTime);
 				m_UUIDToName[UUID] = sProfile(PlayerName, UUID, "", "", DateTime);
 			}
 		}
@@ -502,9 +497,8 @@ void cMojangAPI::LoadCachesFromDisk(void)
 				AString Textures          = stmt.getColumn(2);
 				AString TexturesSignature = stmt.getColumn(2);
 				Int64 DateTime            = stmt.getColumn(4);
-				AString lcPlayerName = PlayerName;
-				UUID = StrToLower(MakeUUIDShort(UUID));
-				m_UUIDToProfile[StrToLower(lcPlayerName)] = sProfile(PlayerName, UUID, Textures, TexturesSignature, DateTime);
+				UUID = MakeUUIDShort(UUID);
+				m_UUIDToProfile[UUID] = sProfile(PlayerName, UUID, Textures, TexturesSignature, DateTime);
 			}
 		}
 	}
@@ -669,13 +663,12 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 			{
 				Json::Value & Val = root[idx];
 				AString JsonName = Val.get("name", "").asString();
-				AString JsonUUID = StrToLower(MakeUUIDShort(Val.get("id", "").asString()));
+				AString JsonUUID = MakeUUIDShort(Val.get("id", "").asString());
 				if (JsonUUID.empty())
 				{
 					continue;
 				}
-				AString lcName = JsonName;
-				m_NameToUUID[StrToLower(lcName)] = sProfile(JsonName, JsonUUID, "", "", Now);
+				m_NameToUUID[StrToLower(JsonName)] = sProfile(JsonName, JsonUUID, "", "", Now);
 			}  // for idx - root[]
 		}  // cCSLock (m_CSNameToUUID)
 		
@@ -686,7 +679,7 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 			{
 				Json::Value & Val = root[idx];
 				AString JsonName = Val.get("name", "").asString();
-				AString JsonUUID = StrToLower(MakeUUIDShort(Val.get("id", "").asString()));
+				AString JsonUUID = MakeUUIDShort(Val.get("id", "").asString());
 				if (JsonUUID.empty())
 				{
 					continue;
@@ -796,9 +789,8 @@ void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 		m_UUIDToName[a_UUID] = sProfile(PlayerName, a_UUID, Properties, Now);
 	}
 	{
-		AString lcPlayerName(PlayerName);
 		cCSLock Lock(m_CSNameToUUID);
-		m_NameToUUID[StrToLower(lcPlayerName)] = sProfile(PlayerName, a_UUID, Properties, Now);
+		m_NameToUUID[StrToLower(PlayerName)] = sProfile(PlayerName, a_UUID, Properties, Now);
 	}
 }
 

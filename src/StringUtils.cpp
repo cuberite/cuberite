@@ -196,9 +196,9 @@ AString TrimString(const AString & str)
 
 
 
-AString & StrToUpper(AString & s)
+AString & InPlaceLowercase(AString & s)
 {
-	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 	return s;
 }
 
@@ -206,9 +206,9 @@ AString & StrToUpper(AString & s)
 
 
 
-AString & StrToLower(AString & s)
+AString & InPlaceUppercase(AString & s)
 {
-	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 	return s;
 }
 
@@ -227,16 +227,25 @@ AString StrToLower(const AString & s)
 
 
 
+AString StrToUpper(const AString & s)
+{
+	AString res(s);
+	std::transform(res.begin(), res.end(), res.begin(), ::toupper);
+	return res;
+}
+
+
+
+
+
 int NoCaseCompare(const AString & s1, const AString & s2)
 {
 	#ifdef _MSC_VER
 		// MSVC has stricmp that compares case-insensitive:
 		return _stricmp(s1.c_str(), s2.c_str());
 	#else
-		// Do it the hard way:
-		AString s1Copy(s1);
-		AString s2Copy(s2);
-		return StrToUpper(s1Copy).compare(StrToUpper(s2Copy));
+		// Do it the hard way - convert both strings to lowercase:
+		return StrToLower(s1).compare(StrToLower(s2));
 	#endif  // else _MSC_VER
 }
 

@@ -40,12 +40,12 @@ public:
 	
 	// tolua_begin
 	
-	/** Converts the given UUID to its short form (32 bytes, no dashes).
+	/** Normalizes the given UUID to its short form (32 bytes, no dashes, lowercase).
 	Logs a warning and returns empty string if not a UUID.
 	Note: only checks the string's length, not the actual content. */
 	static AString MakeUUIDShort(const AString & a_UUID);
 	
-	/** Converts the given UUID to its dashed form (36 bytes, 4 dashes).
+	/** Normalizes the given UUID to its dashed form (36 bytes, 4 dashes, lowercase).
 	Logs a warning and returns empty string if not a UUID.
 	Note: only checks the string's length, not the actual content. */
 	static AString MakeUUIDDashed(const AString & a_UUID);
