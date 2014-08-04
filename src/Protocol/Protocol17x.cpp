@@ -3035,7 +3035,7 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt(Properties.size());
 
-	for (Json::Value::iterator itr = Properties.begin(); itr != Properties.end(); ++itr)
+	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
 	{
 		Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
 		Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
