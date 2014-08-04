@@ -2495,7 +2495,7 @@ void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_Ta
 	int OwnerUUIDIdx = a_NBT.FindChildByName(a_TagIdx, "OwnerUUID");
 	if (OwnerUUIDIdx > 0)
 	{
-		OwnerUUID = cMojangAPI::MakeUUIDShort(a_NBT.GetString(OwnerUUIDIdx));
+		OwnerUUID = a_NBT.GetString(OwnerUUIDIdx);
 	}
 	int OwnerIdx = a_NBT.FindChildByName(a_TagIdx, "Owner");
 	if (OwnerIdx > 0)
@@ -2519,6 +2519,11 @@ void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_Ta
 			// Not a known player, un-tame the wolf by bailing out
 			return;
 		}
+	}
+	else
+	{
+		// Normalize the UUID:
+		OwnerUUID = cMojangAPI::MakeUUIDShort(OwnerUUID);
 	}
 	
 	// Convert UUID to name, if needed:
