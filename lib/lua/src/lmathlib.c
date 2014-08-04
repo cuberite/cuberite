@@ -178,6 +178,22 @@ static int math_max (lua_State *L) {
 }
 
 
+static int math_clamp (lua_State *L) {
+	lua_Number dmin = luaL_checknumber(L, 1);
+	lua_Number dvalue = luaL_checknumber(L, 2);
+	lua_Number dmax = luaL_checknumber(L, 3);
+	if (dvalue < dmin) {
+		dvalue = dmin;
+	}
+	if (dvalue > dmax) {
+		dvalue = dmax;
+	}
+	lua_pushnumber(L, dvalue);
+	return 1;
+	
+}
+
+
 static int math_random (lua_State *L) {
   /* the `%' avoids the (rare) case of r==1, and is needed also because on
      some systems (SunOS!) `rand()' may return a value larger than RAND_MAX */
@@ -219,6 +235,7 @@ static const luaL_Reg mathlib[] = {
   {"atan2", math_atan2},
   {"atan",  math_atan},
   {"ceil",  math_ceil},
+  {"clamp", math_clamp},
   {"cosh",   math_cosh},
   {"cos",   math_cos},
   {"deg",   math_deg},
