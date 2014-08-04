@@ -820,7 +820,7 @@ void cProtocol172::SendPlayerAbilities(void)
 	}
 	Pkt.WriteByte(Flags);
 	Pkt.WriteFloat((float)(0.05 * Player->GetFlyingMaxSpeed()));
-	Pkt.WriteFloat((float)(0.1 * Player->GetMaxSpeed()));
+	Pkt.WriteFloat((float)(0.1 * Player->GetNormalMaxSpeed()));
 }
 
 
