@@ -244,9 +244,9 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	Vector3d Heading(0, 0, 0);
 	if (a_Attacker != NULL)
 	{
-		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 10 : 8);
+		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
+		Heading.y = 1.6;
 	}
-	Heading.y = 2;
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
 	DoTakeDamage(TDI);
@@ -731,21 +731,19 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		NextSpeed.y += fallspeed;
 	}
-	else
+
+	// Friction
+	if (NextSpeed.SqrLength() > 0.0004f)
 	{
-		// Friction
-		if (NextSpeed.SqrLength() > 0.0004f)
+		NextSpeed.x *= 0.7f / (1 + a_Dt);
+		if (fabs(NextSpeed.x) < 0.05)
 		{
-			NextSpeed.x *= 0.7f / (1 + a_Dt);
-			if (fabs(NextSpeed.x) < 0.05)
-			{
-				NextSpeed.x = 0;
-			}
-			NextSpeed.z *= 0.7f / (1 + a_Dt);
-			if (fabs(NextSpeed.z) < 0.05)
-			{
-				NextSpeed.z = 0;
-			}
+			NextSpeed.x = 0;
+		}
+		NextSpeed.z *= 0.7f / (1 + a_Dt);
+		if (fabs(NextSpeed.z) < 0.05)
+		{
+			NextSpeed.z = 0;
 		}
 	}
 

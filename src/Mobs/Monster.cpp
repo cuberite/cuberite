@@ -290,22 +290,30 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 			if (m_bOnGround)
 			{
-				Distance *= 2.5;
+				Distance *= 2.5f;
+			}
+			else if (IsSwimming())
+			{
+				Distance *= 1.3f;
 			}
 			else
 			{
 				// Don't let the mob move too much if he's falling.
-				Distance *= 0.25;
+				Distance *= 0.25f;
 			}
 
 			AddSpeedX(Distance.x);
 			AddSpeedZ(Distance.z);
 
+			// It's too buggy!
+			/*
 			if (m_EMState == ESCAPING)
-			{  // Runs Faster when escaping :D otherwise they just walk away
+			{
+				// Runs Faster when escaping :D otherwise they just walk away
 				SetSpeedX (GetSpeedX() * 2.f);
 				SetSpeedZ (GetSpeedZ() * 2.f);
 			}
+			*/
 		}
 		else
 		{
