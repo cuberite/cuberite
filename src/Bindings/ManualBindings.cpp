@@ -82,6 +82,33 @@ static int lua_do_error(lua_State* L, const char * a_pFormat, ...)
 
 
 // Lua bound functions with special return types
+static int tolua_Clamp(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	int NumArgs = lua_gettop(LuaState);
+	if (NumArgs != 3)
+	{
+		return lua_do_error(LuaState, "Error in function call '#funcname#': Requires 3 arguments, got %i", NumArgs);
+	}
+
+	if (!lua_isnumber(LuaState, 1) || !lua_isnumber(LuaState, 2) || !lua_isnumber(LuaState, 3))
+	{
+		return lua_do_error(LuaState, "Error in function call '#funcname#': Expected a number for parameters #1, #2 and #3");
+	}
+
+	lua_Number Number = tolua_tonumber(LuaState, 1, 0);
+	lua_Number Min = tolua_tonumber(LuaState, 2, 0);
+	lua_Number Max = tolua_tonumber(LuaState, 3, 0);
+
+	lua_Number Result = Clamp(Number, Min, Max);
+	LuaState.Push(Result);
+	return 1;
+}
+
+
+
+
+
 static int tolua_StringSplit(lua_State * tolua_S)
 {
 	cLuaState LuaState(tolua_S);
@@ -3103,6 +3130,7 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, NULL);
+		tolua_function(tolua_S, "Clamp",              tolua_Clamp);
 		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
 		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
 		tolua_function(tolua_S, "LOG",                tolua_LOG);

@@ -2760,15 +2760,16 @@ end
 			Functions =
 			{
 				AddFaceDirection = {Params = "BlockX, BlockY, BlockZ, BlockFace, [IsInverse]", Return = "BlockX, BlockY, BlockZ", Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}"},
-				BlockFaceToString = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "string", Notes = "Returns the string representation of the {{Globals#BlockFaces|eBlockFace}} constant. Uses the axis-direction-based names, such as BLOCK_FACE_XP." },
+				BlockFaceToString = {Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "string", Notes = "Returns the string representation of the {{Globals#BlockFaces|eBlockFace}} constant. Uses the axis-direction-based names, such as BLOCK_FACE_XP." },
 				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
+				Clamp = {Params = "Number, Min, Max", Return = "number", Notes = "Clamp the number to the specified range."},
 				ClickActionToString = {Params = "{{Globals#ClickAction|ClickAction}}", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
 				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
 				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
 				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
 				GetIniItemSet = { Params = "IniFile, SectionName, KeyName, DefaultValue", Return = "{{cItem}}", Notes = "Returns the item that has been read from the specified INI file value. If the value is not present in the INI file, the DefaultValue is stored in the file and parsed as the result. Returns empty item if the value cannot be parsed. " },
 				GetTime = {Return = "number", Notes = "Returns the current OS time, as a unix time stamp (number of seconds since Jan 1, 1970)"},
-				IsBiomeNoDownfall = { Params = "Biome", Return = "bool", Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms." },
+				IsBiomeNoDownfall = {Params = "Biome", Return = "bool", Notes = "Returns true if the biome is 'dry', that is, there is no precipitation during rains and storms." },
 				IsValidBlock = {Params = "BlockType", Return = "bool", Notes = "Returns true if BlockType is a known block type"},
 				IsValidItem = {Params = "ItemType", Return = "bool", Notes = "Returns true if ItemType is a known item type"},
 				ItemToFullString = {Params = "{{cItem|cItem}}", Return = "string", Notes = "Returns the string representation of the item, in the format 'ItemTypeText:ItemDamage * Count'"},
