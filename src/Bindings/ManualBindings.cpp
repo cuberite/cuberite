@@ -96,8 +96,8 @@ static int tolua_Clamp(lua_State * tolua_S)
 		return lua_do_error(LuaState, "Error in function call '#funcname#': Expected a number for parameters #1, #2 and #3");
 	}
 
-	int Min = (int)tolua_tonumber(LuaState, 1, 0);
-	int Number = (int)tolua_tonumber(LuaState, 2, 0);
+	int Number = (int)tolua_tonumber(LuaState, 1, 0);
+	int Min = (int)tolua_tonumber(LuaState, 2, 0);
 	int Max = (int)tolua_tonumber(LuaState, 3, 0);
 
 	int Result = std::min(std::max(Min, Number), Max);
