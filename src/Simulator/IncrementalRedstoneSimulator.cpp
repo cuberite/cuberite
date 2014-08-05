@@ -4,7 +4,6 @@
 #include "IncrementalRedstoneSimulator.h"
 #include "BoundingBox.h"
 #include "../BlockEntities/RedstonePoweredEntity.h"
-#include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../Entities/Pickup.h"
@@ -1033,25 +1032,21 @@ void cIncrementalRedstoneSimulator::HandleNoteBlock(int a_RelBlockX, int a_RelBl
 		if (!AreCoordsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true))
 		{
 			class cSetPowerToNoteBlock :
-				public cNoteBlockCallback
+				public cRedstonePoweredCallback
 			{
-				bool m_IsPowered;
 			public:
-				cSetPowerToNoteBlock(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
+				cSetPowerToNoteBlock() {}
 
-				virtual bool Item(cNoteEntity * a_NoteBlock) override
+				virtual bool Item(cRedstonePoweredEntity * a_NoteBlock) override
 				{
-					if (m_IsPowered)
-					{
-						a_NoteBlock->MakeSound();
-					}
+					a_NoteBlock->SetRedstonePower(true);
 					return false;
 				}
-			} NoteBlockSP(m_bAreCoordsPowered);
+			} NoteBlockSP;
 
 			int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 			int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-			m_Chunk->DoWithNoteBlockAt(BlockX, a_RelBlockY, BlockZ, NoteBlockSP);
+			m_Chunk->DoWithRedstonePoweredEntityAt(BlockX, a_RelBlockY, BlockZ, NoteBlockSP);
 			SetPlayerToggleableBlockAsSimulated(a_RelBlockX, a_RelBlockY, a_RelBlockZ, true);
 		}
 	}
