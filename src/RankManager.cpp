@@ -70,11 +70,11 @@ cRankManager::cRankManager(void) :
 	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
 {
 	// Create the DB tables, if they don't exist:
-	m_DB.exec("CREATE TABLE IF NOT EXISTS Rank (RankID, Name, MsgPrefix, MsgPostfix, MsgNameColorCode)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS PlayerRank (PlayerUUID, PlayerName, RankID)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionGroup (GroupID, Name)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermissionGroups (RankID, GroupID)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionItem (GroupID, Permission)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS Rank (RankID INTEGER PRIMARY KEY, Name, MsgPrefix, MsgPostfix, MsgNameColorCode)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS PlayerRank (PlayerUUID, PlayerName, RankID INTEGER)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionGroup (GroupID INTEGER PRIMARY KEY, Name)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermissionGroups (RankID INTEGER, GroupID INTEGER)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionItem (GroupID INTEGER, Permission)");
 	
 	// TODO: Check if tables empty, add some defaults then
 }
