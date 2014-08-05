@@ -96,11 +96,11 @@ static int tolua_Clamp(lua_State * tolua_S)
 		return lua_do_error(LuaState, "Error in function call '#funcname#': Expected a number for parameters #1, #2 and #3");
 	}
 
-	int Number = (int)tolua_tonumber(LuaState, 1, 0);
-	int Min = (int)tolua_tonumber(LuaState, 2, 0);
-	int Max = (int)tolua_tonumber(LuaState, 3, 0);
+	lua_Number Number = tolua_tonumber(LuaState, 1, 0);
+	lua_Number Min = tolua_tonumber(LuaState, 2, 0);
+	lua_Number Max = tolua_tonumber(LuaState, 3, 0);
 
-	int Result = std::min(std::max(Min, Number), Max);
+	lua_Number Result = Clamp(Number, Min, Max);
 	LuaState.Push(Result);
 	return 1;
 }
