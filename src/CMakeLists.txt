@@ -52,6 +52,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	Noise.cpp
 	ProbabDistrib.cpp
+	RankManager.cpp
 	RCONServer.cpp
 	Root.cpp
 	Scoreboard.cpp
@@ -121,6 +122,7 @@ SET (HDRS
 	MonsterConfig.h
 	Noise.h
 	ProbabDistrib.h
+	RankManager.h
 	RCONServer.h
 	Root.h
 	Scoreboard.h
