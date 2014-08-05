@@ -47,12 +47,17 @@ public:
 	void GetPlayerMsgVisuals(
 		const AString & a_PlayerUUID,
 		AString & a_MsgPrefix,
-		AString & a_MsgPostfix,
+		AString & a_MsgSuffix,
 		AString & a_MsgNameColorCode
 	);
 	
 	/** Adds a new rank. No action if the rank already exists. */
-	void AddRank(const AString & a_RankName);
+	void AddRank(
+		const AString & a_RankName,
+		const AString & a_MsgPrefix,
+		const AString & a_MsgSuffix,
+		const AString & a_MsgNameColorCode
+	);
 	
 	/** Adds a new permission group. No action if such a group already exists. */
 	void AddPermissionGroup(const AString & a_GroupName);
@@ -93,6 +98,13 @@ public:
 	cPlayer instances manually. */
 	void SetPlayerRank(const AString & a_PlayerUUID, const AString & a_RankName);
 	
+	/** Sets the message visuals of an existing rank. No action if the rank name is not found. */
+	void SetRankVisuals(
+		const AString & a_RankName,
+		const AString & a_MsgPrefix,
+		const AString & a_MsgSuffix,
+		const AString & a_MsgNameColorCode
+	);
 protected:
 
 	SQLite::Database m_DB;
