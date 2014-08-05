@@ -71,6 +71,7 @@ asin = function (x) return math.deg(math.asin(x)) end
 atan = function (x) return math.deg(math.atan(x)) end
 atan2 = function (x,y) return math.deg(math.atan2(x,y)) end
 ceil = math.ceil
+clamp = function (low,n,high) return math.min(math.max(n, low), high) end
 cos = function (x) return math.cos(math.rad(x)) end
 deg = math.deg
 exp = math.exp
