@@ -11,7 +11,7 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-
+#include "RedstonePoweredEntity.h"
 
 
 
@@ -30,7 +30,8 @@ class cServer;
 
 // tolua_begin
 class cDropSpenserEntity :
-	public cBlockEntityWithItems
+	public cBlockEntityWithItems,
+	public cRedstonePoweredEntity
 {
 	typedef cBlockEntityWithItems super;
 
@@ -65,7 +66,7 @@ public:
 	void Activate(void);
 	
 	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
-	void SetRedstonePower(bool a_IsPowered);
+	virtual void SetRedstonePower(bool a_IsPowered) override;
 	
 	// tolua_end
 

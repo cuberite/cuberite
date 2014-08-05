@@ -3,11 +3,10 @@
 
 #include "IncrementalRedstoneSimulator.h"
 #include "BoundingBox.h"
-#include "../BlockEntities/DropSpenserEntity.h"
+#include "../BlockEntities/RedstonePoweredEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
-#include "../Entities/TNTEntity.h"
 #include "../Entities/Pickup.h"
 #include "../Blocks/BlockTorch.h"
 #include "../Blocks/BlockDoor.h"
@@ -842,13 +841,13 @@ void cIncrementalRedstoneSimulator::HandlePiston(int a_RelBlockX, int a_RelBlock
 void cIncrementalRedstoneSimulator::HandleDropSpenser(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
 	class cSetPowerToDropSpenser :
-		public cDropSpenserCallback
+		public cRedstonePoweredCallback
 	{
 		bool m_IsPowered;
 	public:
 		cSetPowerToDropSpenser(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
 
-		virtual bool Item(cDropSpenserEntity * a_DropSpenser) override
+		virtual bool Item(cRedstonePoweredEntity * a_DropSpenser) override
 		{
 			a_DropSpenser->SetRedstonePower(m_IsPowered);
 			return false;
@@ -857,7 +856,7 @@ void cIncrementalRedstoneSimulator::HandleDropSpenser(int a_RelBlockX, int a_Rel
 
 	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
 	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-	m_Chunk->DoWithDropSpenserAt(BlockX, a_RelBlockY, BlockZ, DrSpSP);
+	m_Chunk->DoWithRedstonePoweredEntityAt(BlockX, a_RelBlockY, BlockZ, DrSpSP);
 }
 
 
