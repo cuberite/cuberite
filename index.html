@@ -28,17 +28,15 @@
 			
 			if (CurrentlyOpen)
 			{
-				Timeout = setTimeout(function() { Overlay.style.position = "absolute"; }, 200);
-				NoDownloadText.style.opacity = 100;
+				NoDownloadText.className = NoDownloadText.className.replace(/\s*notdisplayed/g, '');
+				Overlay.className += " notdisplayed";
 			}
 			else
 			{
 				clearTimeout(Timeout);
-				Overlay.style.position = "relative";
-				NoDownloadText.style.opacity = 0;
+				NoDownloadText.className += " notdisplayed";
+				Overlay.className = Overlay.className.replace(/\s*notdisplayed/g, '');
 			}
-			
-			Overlay.style.opacity = (Overlay.style.opacity == 0) ? 100 : 0;
 			CurrentlyOpen = CurrentlyOpen ? false : true;
 			
 			switch (OS)
@@ -79,19 +77,19 @@
 			<div id="nodownload" style="font-size: 10px"><br>Is your platform not listed? File an issue to add compatibility on <a href="https://github.com/mc-server/MCServer/issues/new">GitHub</a>.<br><br></div>
 		</div>
 			
-		<div id="downloadblocklinux" class="downloadblock">
+		<div id="downloadblocklinux" class="downloadblock notdisplayed">
 			<div class="downloaditem">Linux 32 bit&nbsp;&nbsp;&nbsp;<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 			<div class="downloaditem">Linux 64 bit&nbsp;&nbsp;&nbsp;<a href="http://ci.bearbin.net/job/MCServer%20Linux-x86-64/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 			<div class="downloaditem">RasPi Hardfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 			<div class="downloaditem">RasPi Softfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 		</div>
 		
-		<div id="downloadblockwindows" class="downloadblock">
+		<div id="downloadblockwindows" class="downloadblock notdisplayed">
 			<div class="downloaditem">Windows 32 bit<a href="http://mc-server.xoft.cz"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 			<div class="downloaditem">Windows 64 bit<a href="http://1drv.ms/1oqd3K4"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 		</div>
 		
-		<div id="downloadblockmacintosh" class="downloadblock">
+		<div id="downloadblockmacintosh" class="downloadblock notdisplayed">
 			<div class="downloaditem">Macintosh 64 bit<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&amp;id=EAC2A6E3A23C4250%21109"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
 		</div>
 

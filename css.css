@@ -48,15 +48,12 @@ h2
 	padding-top: 5px;
 	padding-bottom: 5px;
 }
+
 .downloadblock
 {
-	position: absolute;
-	left: 0;
-	right: 0;
-	top: -50px;
+	position: relative;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: -40px;
 	width: 80px;
 	height: 70px;
 	padding-top: 10px;
@@ -64,6 +61,11 @@ h2
 	transition: 300ms all;
 	text-align: center;
 	overflow: hidden;
+}
+
+.notdisplayed
+{
+	display: none;
 }
 .downloaditem
 {
