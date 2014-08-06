@@ -2142,10 +2142,10 @@ bool cChunk::DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_Blo
 			case E_BLOCK_DROPPER:
 			case E_BLOCK_DISPENSER:
 			case E_BLOCK_NOTE_BLOCK:
-			break;
+				break;
 			default:
-			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
-			return false;
+				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+				return false;
 		}
 		
 		if (a_Callback.Item((cRedstonePoweredEntity *)*itr))

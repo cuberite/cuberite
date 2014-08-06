@@ -61,7 +61,10 @@ public:
 	
 	virtual void SetRedstonePower(bool a_Value)
 	{
-		if (a_Value) MakeSound();
+		if (a_Value)
+		{
+			MakeSound();
+		}
 	}
 
 	static const char * GetClassStatic(void) { return "cNoteEntity"; }
