@@ -920,6 +920,10 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	)
 	{
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))->IsClickedThrough())
+		{
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);
+		}
 		return;
 	}
 
@@ -928,6 +932,10 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))->IsClickedThrough())
+		{
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);
+		}
 		return;
 	}
 
