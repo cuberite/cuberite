@@ -243,6 +243,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #endif
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
+	m_DoDaylightCycle(true),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
@@ -827,28 +828,32 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	{
 		SetChunkData(**itr);
 	}  // for itr - SetChunkDataQueue[]
-	
-	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
-	m_TimeOfDaySecs += (double)a_Dt / 1000.0;
-
-	// Wrap time of day each 20 minutes (1200 seconds)
-	if (m_TimeOfDaySecs > 1200.0)
-	{
-		m_TimeOfDaySecs -= 1200.0;
-	}
-
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
-	m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
 
-	// Updates the sky darkness based on current time of day
-	UpdateSkyDarkness();
-
-	// Broadcast time update every 40 ticks (2 seconds)
-	if (m_LastTimeUpdate < m_WorldAge - 40)
+	if (m_DoDaylightCycle)
 	{
-		BroadcastTimeUpdate();
-		m_LastTimeUpdate = m_WorldAge;
+		// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+		m_TimeOfDaySecs += (double)a_Dt / 1000.0;
+
+		// Wrap time of day each 20 minutes (1200 seconds)
+		if (m_TimeOfDaySecs > 1200.0)
+		{
+			m_TimeOfDaySecs -= 1200.0;
+		}
+
+		m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
+
+		// Updates the sky darkness based on current time of day
+		UpdateSkyDarkness();
+
+		// Broadcast time update every 40 ticks (2 seconds)
+		if (m_LastTimeUpdate < m_WorldAge - 40)
+		{
+			BroadcastTimeUpdate();
+			m_LastTimeUpdate = m_WorldAge;
+		}
 	}
 
 	// Add entities waiting in the queue to be added:
@@ -2243,6 +2248,16 @@ void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
+	int TimeOfDay = m_TimeOfDay;
+	if (!m_DoDaylightCycle)
+	{
+		TimeOfDay *= -1;
+		if (TimeOfDay == 0)
+		{
+			TimeOfDay = -1;
+		}
+	}
+
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
@@ -2251,7 +2266,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay);
+		ch->SendTimeUpdate(m_WorldAge, TimeOfDay);
 	}
 }
 

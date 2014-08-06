@@ -342,7 +342,16 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	}
 
 	// Send time
-	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay());
+	Int64 TimeOfDay = World->GetTimeOfDay();
+	if (!World->IsDaylightCycleEnabled())
+	{
+		TimeOfDay *= -1;
+		if (TimeOfDay == 0)
+		{
+			TimeOfDay = -1;
+		}
+	}
+	m_Protocol->SendTimeUpdate(World->GetWorldAge(), TimeOfDay);
 
 	// Send contents of the inventory window
 	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
