@@ -507,7 +507,6 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 	int ItemX = ((int)tolua_tonumber(tolua_S, 2, 0));
 	int ItemY = ((int)tolua_tonumber(tolua_S, 3, 0));
 	int ItemZ = ((int)tolua_tonumber(tolua_S, 4, 0));
-	LOG("x %i y %i z %i", ItemX, ItemY, ItemZ);
 	if (!lua_isfunction( tolua_S, 5))
 	{
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #4");
