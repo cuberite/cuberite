@@ -30,8 +30,10 @@ enum ENUM_NOTE_INSTRUMENTS
 // tolua_begin
 
 class cNoteEntity :
-	public cBlockEntity,
-	public cRedstonePoweredEntity
+	public cBlockEntity
+	// tolua_end
+	, public cRedstonePoweredEntity
+	// tolua_begin
 {
 	typedef cBlockEntity super;
 public:

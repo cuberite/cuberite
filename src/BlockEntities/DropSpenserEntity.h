@@ -30,8 +30,10 @@ class cServer;
 
 // tolua_begin
 class cDropSpenserEntity :
-	public cBlockEntityWithItems,
-	public cRedstonePoweredEntity
+	public cBlockEntityWithItems
+	// tolua_end
+	, public cRedstonePoweredEntity
+	// tolua_begin
 {
 	typedef cBlockEntityWithItems super;
 
@@ -65,10 +67,10 @@ public:
 	/// Sets the dropspenser to dropspense an item in the next tick
 	void Activate(void);
 	
+	// tolua_end
+	
 	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
 	virtual void SetRedstonePower(bool a_IsPowered) override;
-	
-	// tolua_end
 
 protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
