@@ -81,6 +81,7 @@ function Initialize(Plugin)
 	TestBlockAreasString()
 	TestStringBase64()
 	TestUUIDFromName()
+	TestRankMgr()
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -346,6 +347,18 @@ function TestUUIDFromName()
 	local Name = cMojangAPI:GetPlayerNameFromUUID(UUIDs[NameToTest])
 	LOG("Name(" .. UUIDs[NameToTest] .. ") = '" .. Name .. "', expected '" .. NameToTest .. "'.")
 	LOG("Name-from-UUID test finished.")
+end
+
+
+
+
+
+function TestRankMgr()
+	LOG("Testing the rank manager")
+	cRankManager:AddRank("LuaRank")
+	cRankManager:AddGroup("LuaTestGroup")
+	cRankManager:AddGroupToRank("LuaTestGroup", "LuaRank")
+	cRankManager:AddPermissionToGroup("luaperm", "LuaTestGroup")
 end
 
 
