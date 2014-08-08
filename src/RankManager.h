@@ -68,7 +68,7 @@ public:
 	/** Adds the specified permission group to the specified rank.
 	Fails if the rank or group names are not found.
 	Returns true if successful, false on error. */
-	bool AddGroupToRank(const AString & a_RankName, const AString & a_GroupName);
+	bool AddGroupToRank(const AString & a_GroupName, const AString & a_RankName);
 	
 	/** Adds the specified permission to the specified permission group.
 	Fails if the permission group name is not found.
@@ -113,6 +113,22 @@ public:
 		const AString & a_MsgSuffix,
 		const AString & a_MsgNameColorCode
 	);
+	
+	/** Returns true iff the specified rank exists in the DB. */
+	bool RankExists(const AString & a_RankName);
+	
+	/** Returns true iff the specified group exists in the DB. */
+	bool GroupExists(const AString & a_GroupName);
+	
+	/** Returns true iff the specified player has a rank assigned to them in the DB. */
+	bool IsPlayerRankSet(const AString & a_PlayerUUID);
+	
+	/** Returns true iff the specified rank contains the specified group. */
+	bool IsGroupInRank(const AString & a_GroupName, const AString & a_RankName);
+	
+	/** Returns true iff the specified group contains the specified permission. */
+	bool IsPermissionInGroup(const AString & a_Permission, const AString & a_GroupName);
+	
 protected:
 
 	SQLite::Database m_DB;
