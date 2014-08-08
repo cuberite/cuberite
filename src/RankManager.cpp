@@ -13,7 +13,7 @@
 
 
 
-/*
+//*
 // This code is for internal testing while developing the cRankManager class
 static class cRankMgrTest
 {
@@ -38,7 +38,7 @@ public:
 		std::cout << "  Rank: '" << m_Mgr.GetPlayerRankName(UUID) << "'." << std::endl;
 
 		// List all the permission groups for the player:
-		AStringVector Groups = m_Mgr.GetPlayerPermissionGroups(UUID);
+		AStringVector Groups = m_Mgr.GetPlayerGroups(UUID);
 		std::cout << "  Groups(" << Groups.size() << "):" << std::endl;
 		for (AStringVector::const_iterator itr = Groups.begin(), end = Groups.end(); itr != end; ++itr)
 		{
@@ -72,9 +72,9 @@ cRankManager::cRankManager(void) :
 	// Create the DB tables, if they don't exist:
 	m_DB.exec("CREATE TABLE IF NOT EXISTS Rank (RankID INTEGER PRIMARY KEY, Name, MsgPrefix, MsgPostfix, MsgNameColorCode)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PlayerRank (PlayerUUID, PlayerName, RankID INTEGER)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionGroup (GroupID INTEGER PRIMARY KEY, Name)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermissionGroups (RankID INTEGER, GroupID INTEGER)");
-	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionItem (GroupID INTEGER, Permission)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS PermGroup (PermGroupID INTEGER PRIMARY KEY, Name)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermGroup (RankID INTEGER, PermGroupID INTEGER)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionItem (PermGroupID INTEGER, Permission)");
 	
 	// TODO: Check if tables empty, add some defaults then
 }
@@ -100,15 +100,15 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 
 
 
-AStringVector cRankManager::GetPlayerPermissionGroups(const AString & a_PlayerUUID)
+AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 {
 	// Prepare the DB statement:
 	SQLite::Statement stmt(m_DB,
-		"SELECT PermissionGroup.Name FROM PermissionGroup "
-			"LEFT JOIN RankPermissionGroups "
-				"ON PermissionGroup.GroupID = RankPermissionGroups.GroupID "
+		"SELECT Group.Name FROM Group "
+			"LEFT JOIN RankGroups "
+				"ON Group.GroupID = RankGroups.GroupID "
 			"LEFT JOIN PlayerRank "
-				"ON PlayerRank.RankID = RankPermissionGroups.RankID "
+				"ON PlayerRank.RankID = RankGroups.RankID "
 		"WHERE PlayerRank.PlayerUUID = ?"
 	);
 	stmt.bind(1, a_PlayerUUID);
@@ -131,10 +131,10 @@ AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 	// Prepare the DB statement:
 	SQLite::Statement stmt(m_DB,
 		"SELECT PermissionItem.Permission FROM PermissionItem "
-			"LEFT JOIN RankPermissionGroups "
-				"ON PermissionItem.GroupID = RankPermissionGroups.GroupID "
+			"LEFT JOIN RankGroups "
+				"ON PermissionItem.GroupID = RankGroups.GroupID "
 			"LEFT JOIN PlayerRank "
-				"ON PlayerRank.RankID = RankPermissionGroups.RankID "
+				"ON PlayerRank.RankID = RankGroups.RankID "
 		"WHERE PlayerRank.PlayerUUID = ?"
 	);
 	stmt.bind(1, a_PlayerUUID);
