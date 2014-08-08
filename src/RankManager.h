@@ -49,8 +49,9 @@ public:
 	/** Returns all the distinct permissions that are stored in the DB. */
 	AStringVector GetAllPermissions(void);
 	
-	/** Returns the message visuals (prefix, postfix, color) for the specified player. */
-	void GetPlayerMsgVisuals(
+	/** Returns the message visuals (prefix, postfix, color) for the specified player.
+	Returns true if the visuals were read from the DB, false if not (player not found etc). */
+	bool GetPlayerMsgVisuals(
 		const AString & a_PlayerUUID,
 		AString & a_MsgPrefix,
 		AString & a_MsgSuffix,
@@ -79,7 +80,9 @@ public:
 	bool AddPermissionToGroup(const AString & a_Permission, const AString & a_GroupName);
 	
 	/** Removes the specified rank.
-	All players assigned to that rank will be re-assigned to a_ReplacementRankName, unless it is empty. */
+	All players assigned to that rank will be re-assigned to a_ReplacementRankName.
+	If a_ReplacementRankName is empty or not a valid rank, the player will be removed from the DB,
+	which means they will receive the default rank the next time they are queried. */
 	void RemoveRank(const AString & a_RankName, const AString & a_ReplacementRankName);
 	
 	/** Removes the specified group completely.
@@ -88,7 +91,7 @@ public:
 	
 	/** Removes the specified group from the specified rank.
 	The group will stay defined, even if no rank is using it. */
-	void RemoveGroupFromRank(const AString & a_RankName, const AString & a_GroupName);
+	void RemoveGroupFromRank(const AString & a_GroupName, const AString & a_RankName);
 	
 	/** Removes the specified permission from the specified group. */
 	void RemovePermissionFromGroup(const AString & a_Permission, const AString & a_GroupName);
@@ -104,10 +107,11 @@ public:
 	bool RenameGroup(const AString & a_OldName, const AString & a_NewName);
 	
 	/** Sets the specified player's rank.
-	If the player already had rank assigned to them, it is overwritten with the new rank.
+	If the player already had rank assigned to them, it is overwritten with the new rank and name.
 	Note that this doesn't change the cPlayer if the player is already connected, you need to update all the
-	cPlayer instances manually. */
-	void SetPlayerRank(const AString & a_PlayerUUID, const AString & a_RankName);
+	cPlayer instances manually.
+	The PlayerName is provided for reference, so that GetRankPlayerNames() can work. */
+	void SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName);
 	
 	/** Sets the message visuals of an existing rank. No action if the rank name is not found. */
 	void SetRankVisuals(

@@ -11,7 +11,7 @@
 
 
 
-//*
+/*
 // This code is for internal testing while developing the cRankManager class
 static class cRankMgrTest
 {
@@ -30,30 +30,35 @@ public:
 		
 		// Add a rank, a few groups and permissions and set the player to use them:
 		LOG("Adding data...");
-		m_Mgr.AddRank("TestRank", "[test]", "[/test]", "7");
+		m_Mgr.AddRank("TestRank1", "[test]", "[/test]", "7");
+		m_Mgr.AddRank("TestRank2", "[t2]", "[/t2]", "8");
 		m_Mgr.AddGroup("TestGroup1");
 		m_Mgr.AddGroup("TestGroup2");
-		m_Mgr.AddGroupToRank("TestGroup1", "TestRank");
-		m_Mgr.AddGroupToRank("TestGroup2", "TestRank");
+		m_Mgr.AddGroupToRank("TestGroup1", "TestRank1");
+		m_Mgr.AddGroupToRank("TestGroup2", "TestRank1");
+		m_Mgr.AddGroupToRank("TestGroup2", "TestRank2");
 		m_Mgr.AddPermissionToGroup("testpermission1.1", "TestGroup1");
 		m_Mgr.AddPermissionToGroup("testpermission1.2", "TestGroup1");
+		m_Mgr.AddPermissionToGroup("testpermission1.3", "TestGroup1");
+		m_Mgr.AddPermissionToGroup("common", "TestGroup1");
 		m_Mgr.AddPermissionToGroup("testpermission2.1", "TestGroup2");
-		m_Mgr.SetPlayerRank(UUID, "TestRank");
+		m_Mgr.AddPermissionToGroup("common", "TestGroup2");
+		m_Mgr.SetPlayerRank(UUID, "xoft", "TestRank1");
 		
 		// Test the added data:
 		LOG("Testing the added data:");
-		LOG("IsGroupInRank(TestGroup1, TestRank) = %s", m_Mgr.IsGroupInRank("TestGroup1", "TestRank") ? "true" : "false");
-		LOG("IsGroupInRank(TestGroup3, TestRank) = %s", m_Mgr.IsGroupInRank("TestGroup3", "TestRank") ? "true" : "false");
-		LOG("IsPermissionInGroup(testpermission1.2, TestGroup1) = %s", m_Mgr.IsPermissionInGroup("testpermission1.2", "TestGroup1") ? "true" : "false");
-		LOG("IsPermissionInGroup(testpermission1.2, TestGroup2) = %s", m_Mgr.IsPermissionInGroup("testpermission1.2", "TestGroup2") ? "true" : "false");
-		LOG("IsPermissionInGroup(testpermission1.3, TestGroup2) = %s", m_Mgr.IsPermissionInGroup("testpermission1.3", "TestGroup2") ? "true" : "false");
+		LOG("IsGroupInRank(TestGroup1, TestRank1) = %s", m_Mgr.IsGroupInRank("TestGroup1", "TestRank1") ? "true" : "false");
+		LOG("IsGroupInRank(TestGroup3, TestRank1) = %s", m_Mgr.IsGroupInRank("TestGroup3", "TestRank1") ? "true" : "false");
+		LOG("IsPermissionInGroup(testpermission1.2, TestGroup1) = %s", m_Mgr.IsPermissionInGroup("testpermission1.2", "TestGroup1") ? "true" : "false");  // Existing permission, in group
+		LOG("IsPermissionInGroup(testpermission1.2, TestGroup2) = %s", m_Mgr.IsPermissionInGroup("testpermission1.2", "TestGroup2") ? "true" : "false");  // Existing permission, not in group
+		LOG("IsPermissionInGroup(testpermission1.9, TestGroup2) = %s", m_Mgr.IsPermissionInGroup("testpermission1.9", "TestGroup2") ? "true" : "false");  // Non-existing permission
 		LOG("IsPlayerRankSet(%s) = %s",  UUID.c_str(), m_Mgr.IsPlayerRankSet(UUID) ? "true" : "false");
 		LOG("IsPlayerRankSet(%s1) = %s", UUID.c_str(), m_Mgr.IsPlayerRankSet(UUID + "1") ? "true" : "false");
 		LOG("GroupExists(TestGroup1) = %s", m_Mgr.GroupExists("TestGroup1") ? "true" : "false");
 		LOG("GroupExists(TestGroup3) = %s", m_Mgr.GroupExists("TestGroup3") ? "true" : "false");
-		LOG("RankExists(TestRank) = %s",        m_Mgr.RankExists("TestRank") ? "true" : "false");
+		LOG("RankExists(TestRank1) = %s",        m_Mgr.RankExists("TestRank1") ? "true" : "false");
 		LOG("RankExists(NonexistentRank) = %s", m_Mgr.RankExists("NonexistentRank") ? "true" : "false");
-		ReportRankGroups("TestRank");
+		ReportRankGroups("TestRank1");
 		ReportRankGroups("NonexistentRank");
 		ReportGroupPermissions("TestGroup1");
 		ReportGroupPermissions("NonexistentGroup");
@@ -64,7 +69,65 @@ public:
 		// Test the assignments above:
 		LOG("After-assignment test:");
 		ReportPlayer(UUID);
+		
+		// Test removing a permission from a group:
+		LOG("Removing permission testpermission1.3 from group TestGroup1.");
+		m_Mgr.RemovePermissionFromGroup("testpermission1.3", "TestGroup1");
+		ReportGroupPermissions("TestGroup1");
+		LOG("Removing permission common from group TestGroup1.");
+		m_Mgr.RemovePermissionFromGroup("common", "TestGroup1");
+		ReportGroupPermissions("TestGroup1");  // Check that it's not present
+		ReportGroupPermissions("TestGroup2");  // Check that it's still present here
+		
+		// Test removing a group from rank:
+		LOG("Removing group TestGroup2 from rank TestRank1.");
+		m_Mgr.RemoveGroupFromRank("TestGroup2", "TestRank1");
+		ReportRankGroups("TestRank1");
+		LOG("Removing group TestGroup3 from rank TestRank1.");
+		m_Mgr.RemoveGroupFromRank("TestGroup3", "TestRank1");
+		ReportRankGroups("TestRank1");
+		
+		// Test re-adding the groups:
+		LOG("Re-adding groups to TestRank1.");
+		m_Mgr.AddGroupToRank("TestGroup1", "TestRank1");
+		m_Mgr.AddGroupToRank("TestGroup2", "TestRank1");
+		ReportRankGroups("TestRank1");
+		
+		// Test removing a group altogether:
+		LOG("Removing group TestGroup2");
+		m_Mgr.RemoveGroup("TestGroup2");
+		ReportAll();
+		
+		// Test removing a rank:
+		LOG("Removing rank TestRank2, replacing with rank TestRank1.");
+		m_Mgr.RemoveRank("TestRank2", "TestRank1");
+		ReportAll();
+		LOG("Removing rank Test altogether.");
+		m_Mgr.RemoveRank("Test", "");
+		ReportAll();
 
+		// Test renaming a rank:
+		LOG("Renaming rank TestRank1 to Test");
+		m_Mgr.RenameRank("TestRank1", "Test");
+		ReportRankGroups("TestRank1");
+		ReportRankGroups("Test");
+		LOG("Player after renaming:");
+		ReportPlayer(UUID);
+		
+		// Test renaming a group:
+		LOG("Renaming group TestGroup1 to Test");
+		m_Mgr.RenameGroup("TestGroup1", "Test");
+		ReportGroupPermissions("TestGroup1");
+		ReportGroupPermissions("Test");
+		LOG("Player after renaming:");
+		ReportPlayer(UUID);
+		m_Mgr.RenameGroup("Test", "TestGroup1");
+
+		// Test removing the rank in favor of another one:
+		m_Mgr.RemoveRank("Test", "TestRank2");
+		LOG("After-removal test:");
+		ReportPlayer(UUID);
+		
 		LOG("Done.");
 	}
 	
@@ -238,7 +301,7 @@ AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 	{
 		// Prepare the DB statement:
 		SQLite::Statement stmt(m_DB,
-			"SELECT PermissionItem.Permission FROM PermissionItem "
+			"SELECT DISTINCT(PermissionItem.Permission) FROM PermissionItem "
 				"LEFT JOIN RankPermGroup "
 					"ON PermissionItem.PermGroupID = RankPermGroup.PermGroupID "
 				"LEFT JOIN PlayerRank "
@@ -396,7 +459,7 @@ AStringVector cRankManager::GetAllPermissions(void)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB, "SELECT Permission FROM PermissionItem");
+		SQLite::Statement stmt(m_DB, "SELECT DISTINCT(Permission) FROM PermissionItem");
 		while (stmt.executeStep())
 		{
 			res.push_back(stmt.getColumn(0).getText());
@@ -413,17 +476,43 @@ AStringVector cRankManager::GetAllPermissions(void)
 
 
 
-void cRankManager::GetPlayerMsgVisuals(
+bool cRankManager::GetPlayerMsgVisuals(
 	const AString & a_PlayerUUID,
 	AString & a_MsgPrefix,
 	AString & a_MsgSuffix,
 	AString & a_MsgNameColorCode
 )
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
-	a_MsgPrefix = Printf("%s: DummyPrefix", __FUNCTION__);
-	a_MsgSuffix = Printf("%s: DummySuffix", __FUNCTION__);
-	a_MsgNameColorCode = Printf("%s: DummyMsgNameColorCode", __FUNCTION__);
+	AStringVector res;
+	try
+	{
+		SQLite::Statement stmt(m_DB,
+			"SELECT Rank.MsgPrefix, Rank.MsgSuffix, Rank.MsgNameColorCode FROM Rank "
+				"LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID "
+			"WHERE PlayerRank.PlayerUUID = ?"
+		);
+		stmt.bind(1, a_PlayerUUID);
+		if (!stmt.executeStep())
+		{
+			LOGD("%s: Player UUID %s not found in the DB, returning empty values.", __FUNCTION__, a_PlayerUUID.c_str());
+			a_MsgPrefix.clear();
+			a_MsgSuffix.clear();
+			a_MsgNameColorCode.clear();
+			return false;
+		}
+		a_MsgPrefix = stmt.getColumn(0).getText();
+		a_MsgSuffix = stmt.getColumn(1).getText();
+		a_MsgNameColorCode = stmt.getColumn(2).getText();
+		return true;
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get ranks from DB: %s. Returning empty values.", __FUNCTION__, ex.what());
+	}
+	a_MsgPrefix.clear();
+	a_MsgSuffix.clear();
+	a_MsgNameColorCode.clear();
+	return false;
 }
 
 
@@ -659,7 +748,73 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 
 void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_ReplacementRankName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	AStringVector res;
+	try
+	{
+		// Wrap everything into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Get the RankID for the rank being removed:
+		int RemoveRankID;
+		{
+			SQLite::Statement stmt(m_DB, "SELECT RankID FROM Rank WHERE Name = ?");
+			stmt.bind(1, a_RankName);
+			if (!stmt.executeStep())
+			{
+				LOGINFO("%s: Rank %s was not found. Skipping.", __FUNCTION__, a_RankName.c_str());
+				return;
+			}
+			RemoveRankID = stmt.getColumn(0).getInt();
+		}
+		
+		// Get the RankID for the replacement rank:
+		int ReplacementRankID = -1;
+		{
+			SQLite::Statement stmt(m_DB, "SELECT RankID FROM Rank WHERE Name = ?");
+			stmt.bind(1, a_ReplacementRankName);
+			if (stmt.executeStep())
+			{
+				ReplacementRankID = stmt.getColumn(0).getInt();
+			}
+		}
+		
+		// Remove the rank's bindings to groups:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM RankPermGroup WHERE RankID = ?");
+			stmt.bind(1, RemoveRankID);
+			stmt.exec();
+		}
+		
+		// Adjust players:
+		if (ReplacementRankID == -1)
+		{
+			// No replacement, just delete all the players that have the rank:
+			SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank WHERE RankID = ?");
+			stmt.bind(1, RemoveRankID);
+			stmt.exec();
+		}
+		else
+		{
+			// Replacement available, change all the player records:
+			SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET RankID = ? WHERE RankID = ?");
+			stmt.bind(1, ReplacementRankID);
+			stmt.bind(2, RemoveRankID);
+			stmt.exec();
+		}
+		
+		// Remove the rank from the DB:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM Rank WHERE RankID = ?");
+			stmt.bind(1, RemoveRankID);
+			stmt.exec();
+		}
+		
+		trans.commit();
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove rank from DB: %s", __FUNCTION__, ex.what());
+	}
 }
 
 
@@ -668,16 +823,105 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 
 void cRankManager::RemoveGroup(const AString & a_GroupName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	try
+	{
+		// Wrap everything into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Get the ID of the group:
+		int GroupID;
+		{
+			SQLite::Statement stmt(m_DB, "SELECT PermGroupID FROM PermGroup WHERE Name = ?");
+			stmt.bind(1, a_GroupName);
+			if (!stmt.executeStep())
+			{
+				LOGINFO("%s: Group %s was not found, skipping.", __FUNCTION__, a_GroupName.c_str());
+				return;
+			}
+			GroupID = stmt.getColumn(0).getInt();
+		}
+		
+		// Remove all permissions from the group:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM PermissionItem WHERE PermGroupID = ?");
+			stmt.bind(1, GroupID);
+			stmt.exec();
+		}
+		
+		// Remove the group from all ranks that contain it:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM RankPermGroup WHERE PermGroupID = ?");
+			stmt.bind(1, GroupID);
+			stmt.exec();
+		}
+		
+		// Remove the group itself:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM PermGroup WHERE PermGroupID = ?");
+			stmt.bind(1, GroupID);
+			stmt.exec();
+		}
+		
+		trans.commit();
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove group %s from DB: %s", __FUNCTION__, a_GroupName.c_str(), ex.what());
+	}
 }
 
 
 
 
 
-void cRankManager::RemoveGroupFromRank(const AString & a_RankName, const AString & a_GroupName)
+void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AString & a_RankName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	try
+	{
+		// Wrap everything into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Get the IDs of the group and the rank:
+		int GroupID, RankID;
+		{
+			SQLite::Statement stmt(m_DB,
+				"SELECT PermGroup.PermGroupID, Rank.RankID FROM PermGroup "
+					"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermGroup.PermGroupID "
+					"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+				"WHERE PermGroup.Name = ? AND Rank.Name = ?"
+			);
+			stmt.bind(1, a_GroupName);
+			stmt.bind(2, a_RankName);
+			if (!stmt.executeStep())
+			{
+				LOGINFO("%s: Group %s was not found in rank %s, skipping.", __FUNCTION__, a_GroupName.c_str(), a_RankName.c_str());
+				return;
+			}
+			GroupID = stmt.getColumn(0).getInt();
+			RankID = stmt.getColumn(1).getInt();
+		}
+		
+		// Remove the group from all ranks that contain it:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM RankPermGroup WHERE PermGroupID = ?");
+			stmt.bind(1, GroupID);
+			stmt.exec();
+		}
+		
+		// Remove the group-to-rank binding:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM RankPermGroup WHERE PermGroupID = ? AND RankID = ?");
+			stmt.bind(1, GroupID);
+			stmt.bind(1, RankID);
+			stmt.exec();
+		}
+		
+		trans.commit();
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove group %s from rank %s in the DB: %s", __FUNCTION__, a_GroupName.c_str(), a_RankName.c_str(), ex.what());
+	}
 }
 
 
@@ -686,7 +930,40 @@ void cRankManager::RemoveGroupFromRank(const AString & a_RankName, const AString
 
 void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const AString & a_GroupName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	try
+	{
+		// Wrap everything into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Get the ID of the group:
+		int GroupID;
+		{
+			SQLite::Statement stmt(m_DB, "SELECT PermGroupID FROM PermGroup WHERE Name = ?");
+			stmt.bind(1, a_GroupName);
+			if (!stmt.executeStep())
+			{
+				LOGINFO("%s: Group %s was not found, skipping.", __FUNCTION__, a_GroupName.c_str());
+				return;
+			}
+			GroupID = stmt.getColumn(0).getInt();
+		}
+		
+		// Remove the permission from the group:
+		{
+			SQLite::Statement stmt(m_DB, "DELETE FROM PermissionItem WHERE PermGroupID = ? AND Permission = ?");
+			stmt.bind(1, GroupID);
+			stmt.bind(2, a_Permission);
+			stmt.exec();
+		}
+		
+		trans.commit();
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove permission %s from group %s in DB: %s",
+			__FUNCTION__, a_Permission.c_str(), a_GroupName.c_str(), ex.what()
+		);
+	}
 }
 
 
@@ -695,7 +972,39 @@ void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const
 
 bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	try
+	{
+		// Wrap everything into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Check that NewName doesn't exist:
+		{
+			SQLite::Statement stmt(m_DB, "SELECT RankID FROM Rank WHERE Name = ?");
+			stmt.bind(1, a_NewName);
+			if (stmt.executeStep())
+			{
+				LOGD("%s: Rank %s is already present, cannot rename %s", __FUNCTION__, a_NewName.c_str(), a_OldName.c_str());
+				return false;
+			}
+		}
+		
+		// Rename:
+		bool res;
+		{
+			SQLite::Statement stmt(m_DB, "UPDATE Rank SET Name = ? WHERE Name = ?");
+			stmt.bind(1, a_NewName);
+			stmt.bind(2, a_OldName);
+			res = (stmt.exec() > 0);
+		}
+		
+		trans.commit();
+		return res;
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to rename rank %s to %s in DB: %s",
+			__FUNCTION__, a_OldName.c_str(), a_NewName.c_str(), ex.what());
+	}
 	return false;
 }
 
@@ -705,7 +1014,39 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 
 bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	try
+	{
+		// Wrap everything into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Check that NewName doesn't exist:
+		{
+			SQLite::Statement stmt(m_DB, "SELECT PermGroupID FROM PermGroup WHERE Name = ?");
+			stmt.bind(1, a_NewName);
+			if (stmt.executeStep())
+			{
+				LOGD("%s: Group %s is already present, cannot rename %s", __FUNCTION__, a_NewName.c_str(), a_OldName.c_str());
+				return false;
+			}
+		}
+		
+		// Rename:
+		bool res;
+		{
+			SQLite::Statement stmt(m_DB, "UPDATE PermGroup SET Name = ? WHERE Name = ?");
+			stmt.bind(1, a_NewName);
+			stmt.bind(2, a_OldName);
+			res = (stmt.exec() > 0);
+		}
+		
+		trans.commit();
+		return res;
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to rename group %s to %s in DB: %s",
+			__FUNCTION__, a_OldName.c_str(), a_NewName.c_str(), ex.what());
+	}
 	return false;
 }
 
@@ -713,7 +1054,7 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 
 
 
-void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a_RankName)
+void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName)
 {
 	try
 	{
@@ -735,9 +1076,10 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 		
 		// Update the player's rank, if already in DB:
 		{
-			SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET RankID = ? WHERE PlayerUUID = ?");
+			SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET RankID = ?, PlayerName = ? WHERE PlayerUUID = ?");
 			stmt.bind(1, RankID);
-			stmt.bind(2, a_PlayerUUID);
+			stmt.bind(2, a_PlayerName);
+			stmt.bind(3, a_PlayerUUID);
 			if (stmt.exec() > 0)
 			{
 				// Successfully updated the player's rank
@@ -747,9 +1089,10 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 		}
 		
 		// The player is not yet in the DB, add them:
-		SQLite::Statement stmt(m_DB, "INSERT INTO PlayerRank (RankID, PlayerUUID) VALUES (?, ?)");
+		SQLite::Statement stmt(m_DB, "INSERT INTO PlayerRank (RankID, PlayerUUID, PlayerName) VALUES (?, ?, ?)");
 		stmt.bind(1, RankID);
 		stmt.bind(2, a_PlayerUUID);
+		stmt.bind(3, a_PlayerName);
 		if (stmt.exec() > 0)
 		{
 			// Successfully added the player
@@ -780,7 +1123,23 @@ void cRankManager::SetRankVisuals(
 	const AString & a_MsgNameColorCode
 )
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+	AStringVector res;
+	try
+	{
+		SQLite::Statement stmt(m_DB, "UPDATE Rank SET MsgPrefix = ?, MsgSuffix = ?, MsgNameColorCode = ? WHERE Name = ?");
+		stmt.bind(1, a_MsgPrefix);
+		stmt.bind(2, a_MsgSuffix);
+		stmt.bind(1, a_MsgNameColorCode);
+		stmt.bind(2, a_RankName);
+		if (!stmt.executeStep())
+		{
+			LOGINFO("%s: Rank %s not found, visuals not set.", __FUNCTION__, a_RankName.c_str());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get ranks from DB: %s", __FUNCTION__, ex.what());
+	}
 }
 
 
