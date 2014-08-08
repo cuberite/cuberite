@@ -28,13 +28,16 @@ public:
 	/** Returns the permissions that the specified player has assigned to them. */
 	AStringVector GetPlayerPermissions(const AString & a_PlayerUUID);
 	
-	/** Returns the names of groups that the specified rank has assigned to it. */
+	/** Returns the names of groups that the specified rank has assigned to it.
+	Returns an empty vector if the rank doesn't exist. */
 	AStringVector GetRankGroups(const AString & a_RankName);
 	
-	/** Returns the permissions that the specified group has assigned to it. */
+	/** Returns the permissions that the specified group has assigned to it.
+	Returns an empty vector if the group doesn't exist. */
 	AStringVector GetGroupPermissions(const AString & a_GroupName);
 	
-	/** Returns all permissions that the specified rank has assigned to it, through all its groups. */
+	/** Returns all permissions that the specified rank has assigned to it, through all its groups.
+	Returns an empty vector if the rank doesn't exist. Any non-existent groups are ignored. */
 	AStringVector GetRankPermissions(const AString & a_RankName);
 	
 	/** Returns the names of all defined ranks. */

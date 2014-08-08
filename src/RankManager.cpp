@@ -11,7 +11,7 @@
 
 
 
-/*
+//*
 // This code is for internal testing while developing the cRankManager class
 static class cRankMgrTest
 {
@@ -53,6 +53,13 @@ public:
 		LOG("GroupExists(TestGroup3) = %s", m_Mgr.GroupExists("TestGroup3") ? "true" : "false");
 		LOG("RankExists(TestRank) = %s",        m_Mgr.RankExists("TestRank") ? "true" : "false");
 		LOG("RankExists(NonexistentRank) = %s", m_Mgr.RankExists("NonexistentRank") ? "true" : "false");
+		ReportRankGroups("TestRank");
+		ReportRankGroups("NonexistentRank");
+		ReportGroupPermissions("TestGroup1");
+		ReportGroupPermissions("NonexistentGroup");
+		
+		// Report the contents of the DB:
+		ReportAll();
 		
 		// Test the assignments above:
 		LOG("After-assignment test:");
@@ -61,6 +68,35 @@ public:
 		LOG("Done.");
 	}
 	
+	
+	void ReportAll(void)
+	{
+		// Report all ranks:
+		AStringVector Ranks = m_Mgr.GetAllRanks();
+		LOG("All ranks (%u):", (unsigned)Ranks.size());
+		for (AStringVector::const_iterator itr = Ranks.begin(), end = Ranks.end(); itr != end; ++itr)
+		{
+			LOG("  '%s'", itr->c_str());
+		}
+		
+		// Report all groups:
+		AStringVector Groups = m_Mgr.GetAllGroups();
+		LOG("All groups (%u):", (unsigned)Groups.size());
+		for (AStringVector::const_iterator itr = Groups.begin(), end = Groups.end(); itr != end; ++itr)
+		{
+			LOG("  '%s'", itr->c_str());
+		}
+		
+		// Report all permissions:
+		AStringVector Permissions = m_Mgr.GetAllPermissions();
+		LOG("All permissions (%u):", (unsigned)Permissions.size());
+		for (AStringVector::const_iterator itr = Permissions.begin(), end = Permissions.end(); itr != end; ++itr)
+		{
+			LOG("  '%s'", itr->c_str());
+		}
+	}
+	
+	
 	void ReportPlayer(const AString & a_PlayerUUID)
 	{
 		// Get the player's UUID and rank:
@@ -68,7 +104,7 @@ public:
 
 		// List all the permission groups for the player:
 		AStringVector Groups = m_Mgr.GetPlayerGroups(a_PlayerUUID);
-		LOG("  Groups(%u):", (unsigned)Groups.size());
+		LOG("  Groups (%u):", (unsigned)Groups.size());
 		for (AStringVector::const_iterator itr = Groups.begin(), end = Groups.end(); itr != end; ++itr)
 		{
 			LOG("    '%s'" , itr->c_str());
@@ -76,11 +112,39 @@ public:
 		
 		// List all the permissions for the player:
 		AStringVector Permissions = m_Mgr.GetPlayerPermissions(a_PlayerUUID);
-		LOG("  Permissions(%u):", (unsigned)Permissions.size());
+		LOG("  Permissions (%u):", (unsigned)Permissions.size());
 		for (AStringVector::const_iterator itr = Permissions.begin(), end = Permissions.end(); itr != end; ++itr)
 		{
 			LOG("    '%s'", itr->c_str());
 		}  // for itr - Groups[]
+	}
+	
+	
+	void ReportRankGroups(const AString & a_RankName)
+	{
+		AStringVector Groups = m_Mgr.GetRankGroups(a_RankName);
+		LOG("Groups in rank %s: %u", a_RankName.c_str(), (unsigned)Groups.size());
+		for (AStringVector::const_iterator itr = Groups.begin(), end = Groups.end(); itr != end; ++itr)
+		{
+			LOG("  '%s'", itr->c_str());
+		}
+		AStringVector Permissions = m_Mgr.GetRankPermissions(a_RankName);
+		LOG("Permissions in rank %s: %u", a_RankName.c_str(), (unsigned)Permissions.size());
+		for (AStringVector::const_iterator itr = Permissions.begin(), end = Permissions.end(); itr != end; ++itr)
+		{
+			LOG("  '%s'", itr->c_str());
+		}
+	}
+	
+
+	void ReportGroupPermissions(const AString & a_GroupName)
+	{
+		AStringVector Permissions = m_Mgr.GetGroupPermissions(a_GroupName);
+		LOG("Permissions in group %s: %u", a_GroupName.c_str(), (unsigned)Permissions.size());
+		for (AStringVector::const_iterator itr = Permissions.begin(), end = Permissions.end(); itr != end; ++itr)
+		{
+			LOG("  '%s'", itr->c_str());
+		}
 	}
 	
 protected:
@@ -202,9 +266,25 @@ AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 
 AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 	AStringVector res;
-	res.push_back(Printf("%s: DummyGroup", __FUNCTION__));
+	try
+	{
+		SQLite::Statement stmt(m_DB,
+			"SELECT PermGroup.Name FROM PermGroup "
+				"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermGroup.PermGroupID "
+				"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+			"WHERE Rank.Name = ?"
+		);
+		stmt.bind(1, a_RankName);
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get rank groups from DB: %s", __FUNCTION__, ex.what());
+	}
 	return res;
 }
 
@@ -214,9 +294,24 @@ AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 
 AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 	AStringVector res;
-	res.push_back(Printf("%s: DummyPermission", __FUNCTION__));
+	try
+	{
+		SQLite::Statement stmt(m_DB,
+			"SELECT PermissionItem.Permission FROM PermissionItem "
+				"LEFT JOIN PermGroup ON PermGroup.PermGroupID = PermissionItem.PermGroupID "
+			"WHERE PermGroup.Name = ?"
+		);
+		stmt.bind(1, a_GroupName);
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get group permissions from DB: %s", __FUNCTION__, ex.what());
+	}
 	return res;
 }
 
@@ -226,9 +321,25 @@ AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 
 AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 	AStringVector res;
-	res.push_back(Printf("%s: DummyPermission", __FUNCTION__));
+	try
+	{
+		SQLite::Statement stmt(m_DB,
+			"SELECT PermissionItem.Permission FROM PermissionItem "
+				"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermissionItem.PermGroupID "
+				"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+			"WHERE Rank.Name = ?"
+		);
+		stmt.bind(1, a_RankName);
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get rank permissions from DB: %s", __FUNCTION__, ex.what());
+	}
 	return res;
 }
 
@@ -238,9 +349,19 @@ AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 
 AStringVector cRankManager::GetAllRanks(void)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 	AStringVector res;
-	res.push_back(Printf("%s: DummyRank", __FUNCTION__));
+	try
+	{
+		SQLite::Statement stmt(m_DB, "SELECT Name FROM Rank");
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get ranks from DB: %s", __FUNCTION__, ex.what());
+	}
 	return res;
 }
 
@@ -250,9 +371,19 @@ AStringVector cRankManager::GetAllRanks(void)
 
 AStringVector cRankManager::GetAllGroups(void)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 	AStringVector res;
-	res.push_back(Printf("%s: DummyGroup", __FUNCTION__));
+	try
+	{
+		SQLite::Statement stmt(m_DB, "SELECT Name FROM PermGroup");
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get groups from DB: %s", __FUNCTION__, ex.what());
+	}
 	return res;
 }
 
@@ -262,9 +393,19 @@ AStringVector cRankManager::GetAllGroups(void)
 
 AStringVector cRankManager::GetAllPermissions(void)
 {
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 	AStringVector res;
-	res.push_back(Printf("%s: DummyPermission", __FUNCTION__));
+	try
+	{
+		SQLite::Statement stmt(m_DB, "SELECT Permission FROM PermissionItem");
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get permissions from DB: %s", __FUNCTION__, ex.what());
+	}
 	return res;
 }
 
