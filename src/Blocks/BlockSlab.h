@@ -119,6 +119,9 @@ public:
 			return;
 		}
 
+		/* Sends the slab back to the client.
+		The normal back sending adds the block face to the locations, but this don't work because the Y-Coordinate with the block face
+		is one higher than the real slab position. */
 		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 	
