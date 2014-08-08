@@ -11,6 +11,7 @@ SET (SRCS
     LuaState.cpp
     LuaWindow.cpp
     ManualBindings.cpp
+    ManualBindings_RankManager.cpp
     Plugin.cpp
     PluginLua.cpp
     PluginManager.cpp

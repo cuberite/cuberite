@@ -3262,6 +3262,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_function(tolua_S, "md5", tolua_md5);
+		
+		BindRankManager(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }
