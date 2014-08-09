@@ -121,6 +121,15 @@ public:
 		const AString & a_MsgNameColorCode
 	);
 	
+	/** Returns the message visuals of an existing rank.
+	Returns true if successful, false on error (rank doesn't exist). */
+	bool GetRankVisuals(
+		const AString & a_RankName,
+		AString & a_MsgPrefix,
+		AString & a_MsgSuffix,
+		AString & a_MsgNameColorCode
+	);
+	
 	/** Returns true iff the specified rank exists in the DB. */
 	bool RankExists(const AString & a_RankName);
 	

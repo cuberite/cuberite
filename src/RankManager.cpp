@@ -1123,14 +1123,13 @@ void cRankManager::SetRankVisuals(
 	const AString & a_MsgNameColorCode
 )
 {
-	AStringVector res;
 	try
 	{
 		SQLite::Statement stmt(m_DB, "UPDATE Rank SET MsgPrefix = ?, MsgSuffix = ?, MsgNameColorCode = ? WHERE Name = ?");
 		stmt.bind(1, a_MsgPrefix);
 		stmt.bind(2, a_MsgSuffix);
-		stmt.bind(1, a_MsgNameColorCode);
-		stmt.bind(2, a_RankName);
+		stmt.bind(3, a_MsgNameColorCode);
+		stmt.bind(4, a_RankName);
 		if (!stmt.executeStep())
 		{
 			LOGINFO("%s: Rank %s not found, visuals not set.", __FUNCTION__, a_RankName.c_str());
@@ -1140,6 +1139,38 @@ void cRankManager::SetRankVisuals(
 	{
 		LOGWARNING("%s: Failed to get ranks from DB: %s", __FUNCTION__, ex.what());
 	}
+}
+
+
+
+
+
+bool cRankManager::GetRankVisuals(
+	const AString & a_RankName,
+	AString & a_MsgPrefix,
+	AString & a_MsgSuffix,
+	AString & a_MsgNameColorCode
+)
+{
+	try
+	{
+		SQLite::Statement stmt(m_DB, "SELECT MsgPrefix, MsgSuffix, MsgNameColorCode FROM Rank WHERE Name = ?");
+		stmt.bind(1, a_RankName);
+		if (!stmt.executeStep())
+		{
+			// Rank not found
+			return false;
+		}
+		a_MsgPrefix = stmt.getColumn(0).getText();
+		a_MsgSuffix = stmt.getColumn(1).getText();
+		a_MsgNameColorCode = stmt.getColumn(2).getText();
+		return true;
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get ranks from DB: %s", __FUNCTION__, ex.what());
+	}
+	return false;
 }
 
 
