@@ -80,8 +80,8 @@ function Initialize(Plugin)
 	
 	TestBlockAreasString()
 	TestStringBase64()
-	TestUUIDFromName()
-	TestRankMgr()
+	-- TestUUIDFromName()
+	-- TestRankMgr()
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
