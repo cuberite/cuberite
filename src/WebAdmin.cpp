@@ -444,6 +444,38 @@ AString cWebAdmin::GetHTMLEscapedString(const AString & a_Input)
 
 
 
+AString cWebAdmin::GetURLEncodedString(const AString & a_Input)
+{
+	// Translation table from nibble to hex:
+	static const char Hex[] = "0123456789abcdef";
+	
+	// Preallocate the output to match input:
+	AString dst;
+	size_t len = a_Input.length();
+	dst.reserve(len);
+	
+	// Loop over input and substitute whatever is needed:
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = a_Input[i];
+		if (isalnum(ch) || (ch == '-') || (ch == '_') || (ch == '.') || (ch == '~'))
+		{
+			dst.push_back(ch);
+		}
+		else
+		{
+			dst.push_back('%');
+			dst.push_back(Hex[(ch >> 4) & 0x0f]);
+			dst.push_back(Hex[ch & 0x0f]);
+		}
+	}  // for i - a_Input[]
+	return dst;
+}
+
+
+
+
+
 AString cWebAdmin::GetBaseURL(const AStringVector & a_URLSplit)
 {
 	AString BaseURL = "./";
