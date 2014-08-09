@@ -2128,6 +2128,62 @@ static int tolua_cWebAdmin_GetPlugins(lua_State * tolua_S)
 
 
 
+/** Binding for cWebAdmin::GetHTMLEscapedString.
+Manual code required because ToLua generates an extra return value */
+static int tolua_AllToLua_cWebAdmin_GetHTMLEscapedString(lua_State * tolua_S)
+{
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		!S.CheckParamUserTable(1, "cWebAdmin") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the parameters:
+	AString Input;
+	S.GetStackValue(2, Input);
+	
+	// Convert and return:
+	S.Push(cWebAdmin::GetHTMLEscapedString(Input));
+	return 1;
+}
+
+
+
+
+
+/** Binding for cWebAdmin::GetURLEncodedString.
+Manual code required because ToLua generates an extra return value */
+static int tolua_AllToLua_cWebAdmin_GetURLEncodedString(lua_State * tolua_S)
+{
+	// Check the param types:
+	cLuaState S(tolua_S);
+	if (
+		!S.CheckParamUserTable(1, "cWebAdmin") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the parameters:
+	AString Input;
+	S.GetStackValue(2, Input);
+	
+	// Convert and return:
+	S.Push(cWebAdmin::GetURLEncodedString(Input));
+	return 1;
+}
+
+
+
+
+
 static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 {
 	cWebPlugin* self = (cWebPlugin*)  tolua_tousertype(tolua_S, 1, NULL);
@@ -3264,7 +3320,9 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebAdmin");
-			tolua_function(tolua_S, "GetPlugins", tolua_cWebAdmin_GetPlugins);
+			tolua_function(tolua_S, "GetHTMLEscapedString", tolua_AllToLua_cWebAdmin_GetHTMLEscapedString);
+			tolua_function(tolua_S, "GetPlugins",           tolua_cWebAdmin_GetPlugins);
+			tolua_function(tolua_S, "GetURLEncodedString",  tolua_AllToLua_cWebAdmin_GetURLEncodedString);
 		tolua_endmodule(tolua_S);
 
 		tolua_beginmodule(tolua_S, "cWebPlugin");
