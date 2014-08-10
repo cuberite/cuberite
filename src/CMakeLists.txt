@@ -43,7 +43,6 @@ SET (SRCS
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
 	Listeners.cpp
-	Log.cpp
 	LogDispacher.cpp
 	Map.cpp
 	MapManager.cpp
@@ -109,7 +108,6 @@ SET (HDRS
 	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
-	Log.h
 	LogDispacher.h
 	Map.h
 	MapManager.h

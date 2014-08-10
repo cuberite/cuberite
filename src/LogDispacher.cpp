@@ -1,7 +1,6 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Log.h"
 #include "OSSupport/IsThread.h"
 
 

@@ -2,10 +2,6 @@
 #pragma once
 
 
-
-class cLog;
-
-
 namespace Logger
 {
 

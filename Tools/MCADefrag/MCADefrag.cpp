@@ -5,7 +5,8 @@
 
 #include "Globals.h"
 #include "MCADefrag.h"
-#include "MCLogger.h"
+#include "LogDispacher.h"
+#include "Listeners.h"
 #include "zlib/zlib.h"
 
 
@@ -21,7 +22,13 @@ static const Byte g_Zeroes[4096] = {0};
 
 int main(int argc, char ** argv)
 {
-	new cMCLogger(Printf("Defrag_%08x.log", time(NULL)));
+	Logger::cLoggerListener * consoleLogListener = Logger::MakeConsoleListener();
+	Logger::cLoggerListener * fileLogListener = new Logger::cFileListener();
+	Logger::GetInstance().AttachListener(consoleLogListener);
+	Logger::GetInstance().AttachListener(fileLogListener);
+	
+	Logger::InitiateMultithreading();
+	
 	cMCADefrag Defrag;
 	if (!Defrag.Init(argc, argv))
 	{
@@ -29,6 +36,11 @@ int main(int argc, char ** argv)
 	}
 	
 	Defrag.Run();
+	
+	Logger::GetInstance().DetachListener(consoleLogListener);
+	delete consoleLogListener;
+	Logger::GetInstance().DetachListener(fileLogListener);
+	delete fileLogListener;
 	
 	return 0;
 }

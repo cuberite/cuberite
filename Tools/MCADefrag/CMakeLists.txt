@@ -39,14 +39,12 @@ set_exe_flags()
 set(SHARED_SRC
 	../../src/StringCompression.cpp
 	../../src/StringUtils.cpp
-	../../src/Log.cpp
-	../../src/MCLogger.cpp
+	../../src/Listeners.cpp
+	../../src/LogDispacher.cpp
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h
 	../../src/StringUtils.h
-	../../src/Log.h
-	../../src/MCLogger.h
 )
 flatten_files(SHARED_SRC)
 flatten_files(SHARED_HDR)
