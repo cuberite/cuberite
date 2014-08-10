@@ -387,6 +387,28 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			m_FinishGens.push_back(new cFinishGenSingleTopBlock(Seed, E_BLOCK_LILY_PAD, AllowedBiomes, 4, AllowedBlocks));
 		}
+		else if (NoCaseCompare(*itr, "NaturalPatches") == 0)
+		{
+			cStructGenOreNests::OreList Ores;
+
+			// Dirt vein
+			cStructGenOreNests::OreInfo DirtVein;
+			DirtVein.BlockType = E_BLOCK_DIRT;
+			DirtVein.MaxHeight = 127;
+			DirtVein.NumNests = 20;
+			DirtVein.NestSize = 32;
+			Ores.push_back(DirtVein);
+
+			// Gravel vein
+			cStructGenOreNests::OreInfo GravelVein;
+			GravelVein.BlockType = E_BLOCK_DIRT;
+			GravelVein.MaxHeight = 127;
+			GravelVein.NumNests = 20;
+			GravelVein.NestSize = 32;
+			Ores.push_back(GravelVein);
+
+			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_STONE));
+		}
 		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
