@@ -243,7 +243,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #endif
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
-	m_CycleDaylight(true),
+	m_IsDaylightCycleEnabled(true),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
@@ -832,7 +832,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
 
-	if (m_CycleDaylight)
+	if (m_IsDaylightCycleEnabled)
 	{
 		// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
 		m_TimeOfDaySecs += (double)a_Dt / 1000.0;
@@ -2249,7 +2249,7 @@ void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
 	int TimeOfDay = m_TimeOfDay;
-	if (!m_CycleDaylight)
+	if (!m_IsDaylightCycleEnabled)
 	{
 		TimeOfDay *= -1;
 		if (TimeOfDay == 0)
