@@ -906,6 +906,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		}
 		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
 	}
+	else if (a_TDI.Attacker == NULL)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
+	{
+		// no-op
+	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
 		cPlayer * Killer = (cPlayer *)a_TDI.Attacker;
