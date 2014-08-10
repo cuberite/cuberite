@@ -601,7 +601,6 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -619,8 +618,8 @@ void cPlayer::FinishEating(void)
 	// if the food is mushroom soup, return a bowl to the inventory
 	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
 	{
-		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
-		GetInventory().AddItem(emptyBowl, true, true);
+		cItem EmptyBowl(E_ITEM_BOWL);
+		GetInventory().AddItem(EmptyBowl, true, true);
 	}
 }
 
@@ -631,7 +630,6 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
