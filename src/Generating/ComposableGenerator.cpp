@@ -400,7 +400,57 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
-			m_FinishGens.push_back(new cStructGenOreNests(Seed));
+			cStructGenOreNests::OreList Ores;
+
+			// Coal vein
+			cStructGenOreNests::OreInfo CoalVein;
+			CoalVein.BlockType = E_BLOCK_COAL_ORE;
+			CoalVein.MaxHeight = 127;
+			CoalVein.NumNests  = 50;
+			CoalVein.NestSize  = 10;
+			Ores.push_back(CoalVein);
+
+			// Iron vein
+			cStructGenOreNests::OreInfo IronVein;
+			IronVein.BlockType = E_BLOCK_IRON_ORE;
+			IronVein.MaxHeight = 64;
+			IronVein.NumNests  = 14;
+			IronVein.NestSize  = 6;
+			Ores.push_back(IronVein);
+
+			// Gold vein
+			cStructGenOreNests::OreInfo GoldVein;
+			GoldVein.BlockType = E_BLOCK_GOLD_ORE;
+			GoldVein.MaxHeight = 32;
+			GoldVein.NumNests = 2;
+			GoldVein.NestSize = 6;
+			Ores.push_back(GoldVein);
+
+			// Redstone vein
+			cStructGenOreNests::OreInfo RedstoneVein;
+			RedstoneVein.BlockType = E_BLOCK_REDSTONE_ORE;
+			RedstoneVein.MaxHeight = 16;
+			RedstoneVein.NumNests = 4;
+			RedstoneVein.NestSize = 6;
+			Ores.push_back(RedstoneVein);
+
+			// Lapis vein
+			cStructGenOreNests::OreInfo LapisVein;
+			LapisVein.BlockType = E_BLOCK_LAPIS_ORE;
+			LapisVein.MaxHeight = 30;
+			LapisVein.NumNests = 2;
+			LapisVein.NestSize = 5;
+			Ores.push_back(LapisVein);
+
+			// Diamond vein
+			cStructGenOreNests::OreInfo DiamondVein;
+			DiamondVein.BlockType = E_BLOCK_DIAMOND_ORE;
+			DiamondVein.MaxHeight = 15;
+			DiamondVein.NumNests = 1;
+			DiamondVein.NestSize = 4;
+			Ores.push_back(DiamondVein);
+
+			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_STONE));
 		}
 		else if (NoCaseCompare(*itr, "POCPieces") == 0)
 		{
