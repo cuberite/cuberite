@@ -45,7 +45,6 @@ set(BINDING_DEPENDENCIES
     ../Bindings/AllToLua.pkg
     ../Bindings/gen_LuaState_Call.lua
     ../Bindings/LuaFunctions.h
-    ../Bindings/LuaState_Call.inc
     ../Bindings/LuaWindow.h
     ../Bindings/Plugin.h
     ../Bindings/PluginLua.h
@@ -128,6 +127,7 @@ if (NOT MSVC)
 endif ()
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/LuaState_Call.inc PROPERTIES GENERATED TRUE)
 
 if(NOT MSVC)
     add_library(Bindings ${SRCS} ${HDRS})
