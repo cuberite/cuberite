@@ -294,6 +294,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_OneHitDig = true;
 	a_Info[E_BLOCK_LILY_PAD            ].m_OneHitDig = true;
 	a_Info[E_BLOCK_MELON_STEM          ].m_OneHitDig = true;
+	a_Info[E_BLOCK_NETHER_WART         ].m_OneHitDig = true;
 	a_Info[E_BLOCK_POTATOES            ].m_OneHitDig = true;
 	a_Info[E_BLOCK_PUMPKIN_STEM        ].m_OneHitDig = true;
 	a_Info[E_BLOCK_REDSTONE_REPEATER_OFF].m_OneHitDig = true;
