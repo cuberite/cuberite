@@ -276,7 +276,7 @@ void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 	int seq = 1;
 	
 	// Generate the ores from the ore list.
-	for (OreList::iterator itr = m_OreList.begin(); itr != m_OreList.end(); ++itr)
+	for (OreList::const_iterator itr = m_OreList.begin(); itr != m_OreList.end(); ++itr)
 	{
 		GenerateOre(ChunkX, ChunkZ, itr->BlockType, itr->MaxHeight, itr->NumNests, itr->NestSize, BlockTypes, seq);
 		seq++;

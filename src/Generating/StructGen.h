@@ -78,16 +78,16 @@ class cStructGenOreNests :
 public:
 	struct OreInfo
 	{
-		BLOCKTYPE BlockType; // The type of the nest.
-		int       MaxHeight; // The highest possible a nest can occur
-		int       NumNests;  // How many nests per chunk
-		int       NestSize;  // The amount of blocks a nest can have.
+		BLOCKTYPE BlockType;  // The type of the nest.
+		int       MaxHeight;  // The highest possible a nest can occur
+		int       NumNests;   // How many nests per chunk
+		int       NestSize;   // The amount of blocks a nest can have.
 	};
 
 	typedef std::vector<OreInfo> OreList;
 
-	cStructGenOreNests(int a_Seed, OreList a_OreList, BLOCKTYPE a_ToReplace) : 
-		m_Noise(a_Seed), 
+	cStructGenOreNests(int a_Seed, OreList a_OreList, BLOCKTYPE a_ToReplace) :
+		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_OreList(a_OreList),
 		m_ToReplace(a_ToReplace)
@@ -97,7 +97,7 @@ protected:
 	cNoise  m_Noise;
 	int     m_Seed;
 
-	OreList m_OreList; // A list of possible ores.
+	OreList   m_OreList;  // A list of possible ores.
 	BLOCKTYPE m_ToReplace;
 	
 	// cFinishGen override:

@@ -424,13 +424,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			cStructGenOreNests::OreList Ores;
 
-			// Quarts vein
-			cStructGenOreNests::OreInfo QuartsVein;
-			QuartsVein.BlockType = E_BLOCK_NETHER_QUARTZ_ORE;
-			QuartsVein.MaxHeight = 255;
-			QuartsVein.NumNests = 80;
-			QuartsVein.NestSize = 8;
-			Ores.push_back(QuartsVein);
+			// Quartz vein
+			cStructGenOreNests::OreInfo QuartzVein;
+			QuartzVein.BlockType = E_BLOCK_NETHER_QUARTZ_ORE;
+			QuartzVein.MaxHeight = 255;
+			QuartzVein.NumNests = 80;
+			QuartzVein.NestSize = 8;
+			Ores.push_back(QuartzVein);
 
 			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_NETHERRACK));
 
