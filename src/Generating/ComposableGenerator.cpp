@@ -398,6 +398,21 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
 			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxOffset, MaxDepth));
 		}
+		else if (NoCaseCompare(*itr, "NetherOreNests") == 0)
+		{
+			cStructGenOreNests::OreList Ores;
+
+			// Quarts vein
+			cStructGenOreNests::OreInfo QuartsVein;
+			QuartsVein.BlockType = E_BLOCK_NETHER_QUARTZ_ORE;
+			QuartsVein.MaxHeight = 255;
+			QuartsVein.NumNests = 80;
+			QuartsVein.NestSize = 8;
+			Ores.push_back(QuartsVein);
+
+			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_NETHERRACK));
+
+		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
 			cStructGenOreNests::OreList Ores;
