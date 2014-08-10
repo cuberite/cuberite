@@ -2250,13 +2250,6 @@ void cWorld::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
-	int TimeOfDay = m_TimeOfDay;
-	if (!m_IsDaylightCycleEnabled)
-	{
-		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
-		TimeOfDay = std::min(-TimeOfDay, -1);
-	}
-
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
@@ -2265,7 +2258,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		ch->SendTimeUpdate(m_WorldAge, TimeOfDay);
+		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay, m_IsDaylightCycleEnabled);
 	}
 }
 

@@ -716,10 +716,10 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
 
 
