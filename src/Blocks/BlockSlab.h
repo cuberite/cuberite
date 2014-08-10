@@ -110,6 +110,18 @@ public:
 	{
 		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB));
 	}
+
+
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player->GetEquippedItem().m_ItemType != (short)m_BlockType))
+		{
+			return;
+		}
+
+		// Sends the slab back to the client. It's to refuse a doubleslab placement.
+		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+	}
 	
 	
 	/// Converts the single-slab blocktype to its equivalent double-slab blocktype
