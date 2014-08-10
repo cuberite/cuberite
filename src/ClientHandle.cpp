@@ -341,15 +341,12 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		m_Protocol->SendWeather(World->GetWeather());
 	}
 
-	// Send time
+	// Send time:
 	Int64 TimeOfDay = World->GetTimeOfDay();
 	if (!World->IsDaylightCycleEnabled())
 	{
-		TimeOfDay *= -1;
-		if (TimeOfDay == 0)
-		{
-			TimeOfDay = -1;
-		}
+		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
+		TimeOfDay = std::min(-TimeOfDay, -1);
 	}
 	m_Protocol->SendTimeUpdate(World->GetWorldAge(), TimeOfDay);
 

@@ -2253,11 +2253,8 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 	int TimeOfDay = m_TimeOfDay;
 	if (!m_IsDaylightCycleEnabled)
 	{
-		TimeOfDay *= -1;
-		if (TimeOfDay == 0)
-		{
-			TimeOfDay = -1;
-		}
+		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
+		TimeOfDay = std::min(-TimeOfDay, -1);
 	}
 
 	cCSLock Lock(m_CSPlayers);
