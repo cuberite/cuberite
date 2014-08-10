@@ -196,7 +196,7 @@ public:
 	
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
-	static cMCLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+	static Logger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
 	
 protected:
 	/** All the parts that */

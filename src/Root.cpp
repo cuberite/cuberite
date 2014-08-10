@@ -18,6 +18,7 @@
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
+#include "Listeners.h"
 
 #include "inifile/iniFile.h"
 
@@ -51,7 +52,6 @@ cRoot::cRoot(void) :
 	m_FurnaceRecipe(NULL),
 	m_WebAdmin(NULL),
 	m_PluginManager(NULL),
-	m_Log(NULL),
 	m_bStop(false),
 	m_bRestart(false)
 {
@@ -105,10 +105,15 @@ void cRoot::Start(void)
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
 	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
+	
+	Logger::cLoggerListener * consoleLogListener = Logger::MakeConsoleListener();
+	Logger::cLoggerListener * fileLogListener = new Logger::cFileListener();
+	Logger::GetInstance().AttachListener(consoleLogListener);
+	Logger::GetInstance().AttachListener(fileLogListener);
+	
+	LOG("--- Started Log ---\n");
 
 	cDeadlockDetect dd;
-	delete m_Log;
-	m_Log = new cMCLogger();
 
 	m_bStop = false;
 	while (!m_bStop)
@@ -249,8 +254,13 @@ void cRoot::Start(void)
 		delete m_Server; m_Server = NULL;
 		LOG("Shutdown successful!");
 	}
-
-	delete m_Log; m_Log = NULL;
+	
+	LOG("--- Stopped Log ---");
+	
+	Logger::GetInstance().DetachListener(consoleLogListener);
+	delete consoleLogListener;
+	Logger::GetInstance().DetachListener(fileLogListener);
+	delete fileLogListener;
 }
 
 
@@ -274,15 +284,15 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
-	unsigned int KeyNum = IniFile.FindKey("Worlds");
-	unsigned int NumWorlds = IniFile.GetNumValues(KeyNum);
+	int KeyNum = IniFile.FindKey("Worlds");
+	int NumWorlds = IniFile.GetNumValues(KeyNum);
 	if (NumWorlds <= 0)
 	{
 		return;
 	}
 	
 	bool FoundAdditionalWorlds = false;
-	for (unsigned int i = 0; i < NumWorlds; i++)
+	for (int i = 0; i < NumWorlds; i++)
 	{
 		AString ValueName = IniFile.GetValueName(KeyNum, i);
 		if (ValueName.compare("World") != 0)
