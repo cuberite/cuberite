@@ -40,11 +40,6 @@ public:
 		FindAndSetPortalFrame(a_BlockX, a_BlockY - 1, a_BlockZ, a_ChunkInterface, a_WorldInterface);
 	}
 
-	virtual void OnDigging(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		a_ChunkInterface.DigBlock(a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
-	}
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// No pickups from this block
