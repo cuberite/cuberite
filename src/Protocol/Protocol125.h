@@ -103,7 +103,7 @@ public:
 	
 protected:
 	/// Results of packet-parsing:
-	enum
+	enum eParseResult
 	{
 		PARSE_OK         =  1,
 		PARSE_ERROR      = -1,

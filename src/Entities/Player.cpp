@@ -33,6 +33,15 @@
 
 
 
+const int cPlayer::MAX_HEALTH = 20;
+
+const int cPlayer::MAX_FOOD_LEVEL = 20;
+
+/** Number of ticks it takes to eat an item */
+const int cPlayer::EATING_TICKS = 30;
+
+
+
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
@@ -509,7 +518,7 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
