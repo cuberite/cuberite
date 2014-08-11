@@ -57,8 +57,8 @@ static int tolua_cRankManager_AddGroupToRank(lua_State * L)
 	S.GetStackValues(2, GroupName, RankName);
 	
 	// Add the group to the rank:
-	cRoot::Get()->GetRankManager().AddGroupToRank(GroupName, RankName);
-	return 0;
+	S.Push(cRoot::Get()->GetRankManager().AddGroupToRank(GroupName, RankName));
+	return 1;
 }
 
 
@@ -287,7 +287,10 @@ static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
 	
 	// Get the permissions:
 	AString MsgPrefix, MsgSuffix, MsgNameColorCode;
-	cRoot::Get()->GetRankManager().GetPlayerMsgVisuals(PlayerUUID, MsgPrefix, MsgSuffix, MsgNameColorCode);
+	if (!cRoot::Get()->GetRankManager().GetPlayerMsgVisuals(PlayerUUID, MsgPrefix, MsgSuffix, MsgNameColorCode))
+	{
+		return 0;
+	}
 	
 	// Push the results:
 	S.Push(MsgPrefix);
