@@ -33,6 +33,15 @@
 
 
 
+const int cPlayer::MAX_HEALTH = 20;
+
+const int cPlayer::MAX_FOOD_LEVEL = 20;
+
+/** Number of ticks it takes to eat an item */
+const int cPlayer::EATING_TICKS = 30;
+
+
+
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :

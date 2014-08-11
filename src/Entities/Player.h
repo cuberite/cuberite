@@ -29,12 +29,12 @@ class cPlayer :
 	typedef cPawn super;
 	
 public:
-	static const int MAX_HEALTH = 20;
+	static const int MAX_HEALTH;
 	
-	static const int MAX_FOOD_LEVEL = 20;
+	static const int MAX_FOOD_LEVEL;
 	
 	/** Number of ticks it takes to eat an item */
-	static const int EATING_TICKS = 30;
+	static const int EATING_TICKS;
 	
 	// tolua_end
 	
