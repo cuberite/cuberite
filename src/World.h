@@ -145,7 +145,17 @@ public:
 	// tolua_begin
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
-	
+
+	/** Is the daylight cyclus enabled? */
+	virtual bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
+
+	/** Sets the daylight cyclus to true/false. */
+	virtual void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
+	{
+		m_IsDaylightCycleEnabled = a_IsDaylightCycleEnabled;
+		BroadcastTimeUpdate();
+	}
+
 	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
 	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
@@ -158,6 +168,7 @@ public:
 	{
 		m_TimeOfDay = a_TimeOfDay;
 		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
+		UpdateSkyDarkness();
 		BroadcastTimeUpdate();
 	}
 	
@@ -868,6 +879,7 @@ private:
 	bool m_BroadcastDeathMessages;
 	bool m_BroadcastAchievementMessages;
 
+	bool   m_IsDaylightCycleEnabled;
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
 	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs

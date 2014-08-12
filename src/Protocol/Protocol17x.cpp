@@ -1289,9 +1289,14 @@ void cProtocol172::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	if (!a_DoDaylightCycle)
+	{
+		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
+		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
+	}
 	
 	cPacketizer Pkt(*this, 0x03);
 	Pkt.WriteInt64(a_WorldAge);

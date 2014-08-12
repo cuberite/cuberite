@@ -243,6 +243,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #endif
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
+	m_IsDaylightCycleEnabled(true),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
@@ -576,6 +577,7 @@ void cWorld::Start(void)
 	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
+	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
 	
@@ -797,6 +799,7 @@ void cWorld::Stop(void)
 		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
 		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
+		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
 		IniFile.SetValueI("General", "Weather", (int)m_Weather);
 		IniFile.SetValueI("General", "TimeInTicks", m_TimeOfDay);
 	IniFile.WriteFile(m_IniFileName);
@@ -827,28 +830,32 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	{
 		SetChunkData(**itr);
 	}  // for itr - SetChunkDataQueue[]
-	
-	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
-	m_TimeOfDaySecs += (double)a_Dt / 1000.0;
-
-	// Wrap time of day each 20 minutes (1200 seconds)
-	if (m_TimeOfDaySecs > 1200.0)
-	{
-		m_TimeOfDaySecs -= 1200.0;
-	}
-
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
-	m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
 
-	// Updates the sky darkness based on current time of day
-	UpdateSkyDarkness();
-
-	// Broadcast time update every 40 ticks (2 seconds)
-	if (m_LastTimeUpdate < m_WorldAge - 40)
+	if (m_IsDaylightCycleEnabled)
 	{
-		BroadcastTimeUpdate();
-		m_LastTimeUpdate = m_WorldAge;
+		// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+		m_TimeOfDaySecs += (double)a_Dt / 1000.0;
+
+		// Wrap time of day each 20 minutes (1200 seconds)
+		if (m_TimeOfDaySecs > 1200.0)
+		{
+			m_TimeOfDaySecs -= 1200.0;
+		}
+
+		m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
+
+		// Updates the sky darkness based on current time of day
+		UpdateSkyDarkness();
+
+		// Broadcast time update every 40 ticks (2 seconds)
+		if (m_LastTimeUpdate < m_WorldAge - 40)
+		{
+			BroadcastTimeUpdate();
+			m_LastTimeUpdate = m_WorldAge;
+		}
 	}
 
 	// Add entities waiting in the queue to be added:
@@ -2251,7 +2258,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay);
+		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay, m_IsDaylightCycleEnabled);
 	}
 }
 
