@@ -40,8 +40,8 @@ set(SHARED_SRC
 	../../src/PolarSSL++/CtrDrbgContext.cpp
 	../../src/PolarSSL++/EntropyContext.cpp
 	../../src/PolarSSL++/RsaPrivateKey.cpp
-	../../src/Listeners.cpp
-	../../src/LogDispacher.cpp
+	../../src/LoggerListeners.cpp
+	../../src/Logger.cpp
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h

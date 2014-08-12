@@ -42,8 +42,8 @@ SET (SRCS
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
-	Listeners.cpp
-	LogDispacher.cpp
+	LoggerListeners.cpp
+	Logger.cpp
 	Map.cpp
 	MapManager.cpp
 	MobCensus.cpp
@@ -108,7 +108,8 @@ SET (HDRS
 	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
-	LogDispacher.h
+	Logger.h
+	LoggerListeners.h
 	Map.h
 	MapManager.h
 	Matrix4.h

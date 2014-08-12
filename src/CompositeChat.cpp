@@ -353,23 +353,23 @@ AString cCompositeChat::ExtractText(void) const
 
 
 
-Logger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
+cLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
 {
 	switch (a_MessageType)
 	{
-		case mtCustom:         return Logger::llRegular;
-		case mtFailure:        return Logger::llWarning;
-		case mtInformation:    return Logger::llInfo;
-		case mtSuccess:        return Logger::llRegular;
-		case mtWarning:        return Logger::llWarning;
-		case mtFatal:          return Logger::llError;
-		case mtDeath:          return Logger::llRegular;
-		case mtPrivateMessage: return Logger::llRegular;
-		case mtJoin:           return Logger::llRegular;
-		case mtLeave:          return Logger::llRegular;
+		case mtCustom:         return cLogger::llRegular;
+		case mtFailure:        return cLogger::llWarning;
+		case mtInformation:    return cLogger::llInfo;
+		case mtSuccess:        return cLogger::llRegular;
+		case mtWarning:        return cLogger::llWarning;
+		case mtFatal:          return cLogger::llError;
+		case mtDeath:          return cLogger::llRegular;
+		case mtPrivateMessage: return cLogger::llRegular;
+		case mtJoin:           return cLogger::llRegular;
+		case mtLeave:          return cLogger::llRegular;
 	}
 	ASSERT(!"Unhandled MessageType");
-	return Logger::llError;
+	return cLogger::llError;
 }
 
 

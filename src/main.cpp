@@ -273,7 +273,7 @@ int main( int argc, char **argv)
 		}
 	}  // for i - argv[]
 	
-	Logger::InitiateMultithreading();
+	cLogger::InitiateMultithreading();
 	
 	#if !defined(ANDROID_NDK)
 	try

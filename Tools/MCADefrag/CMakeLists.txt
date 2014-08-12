@@ -39,8 +39,8 @@ set_exe_flags()
 set(SHARED_SRC
 	../../src/StringCompression.cpp
 	../../src/StringUtils.cpp
-	../../src/Listeners.cpp
-	../../src/LogDispacher.cpp
+	../../src/LoggerListeners.cpp
+	../../src/Logger.cpp
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h

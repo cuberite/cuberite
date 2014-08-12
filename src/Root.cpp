@@ -18,7 +18,7 @@
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
-#include "Listeners.h"
+#include "LoggerListeners.h"
 
 #include "inifile/iniFile.h"
 
@@ -106,10 +106,10 @@ void cRoot::Start(void)
 	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
 	
-	Logger::cLoggerListener * consoleLogListener = Logger::MakeConsoleListener();
-	Logger::cLoggerListener * fileLogListener = new Logger::cFileListener();
-	Logger::GetInstance().AttachListener(consoleLogListener);
-	Logger::GetInstance().AttachListener(fileLogListener);
+	cLogger::cListener * consoleLogListener = MakeConsoleListener();
+	cLogger::cListener * fileLogListener = new cFileListener();
+	cLogger::GetInstance().AttachListener(consoleLogListener);
+	cLogger::GetInstance().AttachListener(fileLogListener);
 	
 	LOG("--- Started Log ---\n");
 
@@ -257,9 +257,9 @@ void cRoot::Start(void)
 	
 	LOG("--- Stopped Log ---");
 	
-	Logger::GetInstance().DetachListener(consoleLogListener);
+	cLogger::GetInstance().DetachListener(consoleLogListener);
 	delete consoleLogListener;
-	Logger::GetInstance().DetachListener(fileLogListener);
+	cLogger::GetInstance().DetachListener(fileLogListener);
 	delete fileLogListener;
 }
 
