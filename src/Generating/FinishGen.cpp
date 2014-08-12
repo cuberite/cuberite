@@ -484,8 +484,6 @@ int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap
 
 void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	// Add Lilypads on top of water surface in Swampland
-
 	int NumToGen = GetNumToGen(a_ChunkDesc.GetBiomeMap());
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();

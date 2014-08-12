@@ -33,6 +33,15 @@
 
 
 
+const int cPlayer::MAX_HEALTH = 20;
+
+const int cPlayer::MAX_FOOD_LEVEL = 20;
+
+/** Number of ticks it takes to eat an item */
+const int cPlayer::EATING_TICKS = 30;
+
+
+
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
@@ -509,7 +518,7 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
@@ -601,7 +610,6 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -619,8 +627,8 @@ void cPlayer::FinishEating(void)
 	// if the food is mushroom soup, return a bowl to the inventory
 	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
 	{
-		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
-		GetInventory().AddItem(emptyBowl, true, true);
+		cItem EmptyBowl(E_ITEM_BOWL);
+		GetInventory().AddItem(EmptyBowl, true, true);
 	}
 }
 
@@ -631,7 +639,6 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -907,6 +914,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			default: DamageText = "died, somehow; we've no idea how though"; break;
 		}
 		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
+	}
+	else if (a_TDI.Attacker == NULL)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
+	{
+		// no-op
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{

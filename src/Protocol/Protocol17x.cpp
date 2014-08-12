@@ -48,7 +48,10 @@ Implements the 1.7.x protocol classes:
 
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	ByteBuf.Proc(Var);
+	if (!ByteBuf.Proc(Var))\
+	{\
+		return;\
+	}
 
 
 
@@ -1700,8 +1703,7 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 
 void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
-	Int64 Timestamp;
-	a_ByteBuffer.ReadBEInt64(Timestamp);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Timestamp);
 	
 	cPacketizer Pkt(*this, 0x01);  // Ping packet
 	Pkt.WriteInt64(Timestamp);
@@ -2054,7 +2056,10 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
 	AString Data;
-	a_ByteBuffer.ReadString(Data, Length);
+	if (!a_ByteBuffer.ReadString(Data, Length))
+	{
+		return;
+	}
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 

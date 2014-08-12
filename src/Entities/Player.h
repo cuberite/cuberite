@@ -29,12 +29,13 @@ class cPlayer :
 	typedef cPawn super;
 	
 public:
-	enum
-	{
-		MAX_HEALTH = 20,
-		MAX_FOOD_LEVEL = 20,
-		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
-	} ;
+	static const int MAX_HEALTH;
+	
+	static const int MAX_FOOD_LEVEL;
+	
+	/** Number of ticks it takes to eat an item */
+	static const int EATING_TICKS;
+	
 	// tolua_end
 	
 	CLASS_PROTODEF(cPlayer)
