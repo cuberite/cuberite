@@ -871,11 +871,79 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			return true;
 		}
 		case E_META_RAIL_CURVED_ZM_XM:
-		case E_META_RAIL_CURVED_ZM_XP:
-		case E_META_RAIL_CURVED_ZP_XM:
 		case E_META_RAIL_CURVED_ZP_XP:
 		{
-			// TODO - simply can't be bothered right now
+			Vector3d Distance(
+				MinecartCollisionCallback.GetCollidedEntityPosition().x - GetPosX(),
+				0,
+				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
+			);
+
+			if ( Distance.z == 0. ) Distance.z = 0.0001;
+						if (  ((Distance.z>=0)&&((Distance.x/Distance.z)>=1)) || ((Distance.z<0)&&((Distance.x/Distance.z)<=1)) )
+			{
+				if ( (-GetSpeedX() * 0.4) < 0.01 )
+				{
+					AddSpeedX( -4/sqrt(2) );
+					AddSpeedZ( 4/sqrt(2) );
+				}
+				else
+				{
+					SetSpeedX( -GetSpeedX() * 0.4 );
+					SetSpeedZ( GetSpeedZ() * 0.4 );
+				}
+			}
+			else
+			{
+				if ((GetSpeedX() * 0.4) < 0.01)
+				{
+					AddSpeedX( 4/sqrt(2) );
+					AddSpeedZ( -4/sqrt(2) );
+				}
+				else
+				{
+					SetSpeedX( GetSpeedX() * 0.4 );
+					SetSpeedZ( -GetSpeedZ() * 0.4 );
+				}
+			}
+			break;
+		}
+		case E_META_RAIL_CURVED_ZM_XP:
+		case E_META_RAIL_CURVED_ZP_XM:
+		{
+			Vector3d Distance(
+				MinecartCollisionCallback.GetCollidedEntityPosition().x - GetPosX(),
+				0,
+				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
+			);
+
+			if ( Distance.z == 0. ) Distance.z = 0.0001;
+			if (  ((Distance.z>=0)&&((Distance.x/Distance.z)<=-1)) || ((Distance.z<0)&&((Distance.x/Distance.z)>=-1)) )
+			{
+				if ( (GetSpeedX() * 0.4) < 0.01 )
+				{
+					AddSpeedX( 4/sqrt(2) );
+					AddSpeedZ( 4/sqrt(2) );
+				}
+				else
+				{
+					SetSpeedX( GetSpeedX() * 0.4 );
+					SetSpeedZ( GetSpeedZ() * 0.4 );
+				}
+			}
+			else
+			{
+				if ((-GetSpeedX() * 0.4) < 0.01)
+				{
+					AddSpeedX( -4/sqrt(2) );
+					AddSpeedZ( -4/sqrt(2) );
+				}
+				else
+				{
+					SetSpeedX( -GetSpeedX() * 0.4 );
+					SetSpeedZ( -GetSpeedZ() * 0.4 );
+				}
+			}
 			break;
 		}
 		default: break;
