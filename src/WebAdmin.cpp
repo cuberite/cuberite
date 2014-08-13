@@ -159,28 +159,6 @@ void cWebAdmin::Stop(void)
 
 
 
-AString cWebAdmin::GetTemplate()
-{
-	AString retVal = "";
-
-	char SourceFile[] = "webadmin/template.html";
-
-	cFile f;
-	if (!f.Open(SourceFile, cFile::fmRead))
-	{
-		return "";
-	}
-
-	// copy the file into the buffer:
-	f.ReadRestOfFile(retVal);
-
-	return retVal;
-}
-
-
-
-
-
 void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	if (!a_Request.HasAuth())
