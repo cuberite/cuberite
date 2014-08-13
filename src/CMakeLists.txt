@@ -234,7 +234,7 @@ endif()
 
 
 # Generate a list of all source files:
-set(ALLFILES "")
+set(ALLFILES "${SRCS}" "${HDRS}")
 foreach(folder ${FOLDERS})
 	get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
 	foreach (src ${FOLDER_SRCS})

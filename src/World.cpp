@@ -3327,7 +3327,7 @@ void cWorld::AddQueuedPlayers(void)
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?			
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
 			LOGD("Adding player %s to world \"%s\".", (*itr)->GetName().c_str(), m_WorldName.c_str());
 
 			m_Players.push_back(*itr);
