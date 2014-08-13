@@ -6,6 +6,8 @@
 #include "Globals.h"
 #include "RankManager.h"
 #include "SQLiteCpp/Transaction.h"
+#include "inifile/iniFile.h"
+#include "Protocol/MojangAPI.h"
 
 
 
@@ -219,9 +221,367 @@ protected:
 
 
 
-cRankManager::cRankManager(void) :
-	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE)
+////////////////////////////////////////////////////////////////////////////////
+/** Migrates from groups.ini and users.ini into the rankmanager DB */
+class cRankManagerIniMigrator
 {
+public:
+	cRankManagerIniMigrator(cRankManager & a_RankManager, cMojangAPI & a_MojangAPI) :
+		m_RankManager(a_RankManager),
+		m_MojangAPI(a_MojangAPI)
+	{
+	}
+	
+	
+	
+	/** Performs the complete migration from INI files to DB. */
+	bool Migrate(void)
+	{
+		LOGD("Reading groups...");
+		if (!ReadGroups())
+		{
+			return false;
+		}
+		LOGD("Cleaning groups inheritance...");
+		CleanGroupInheritance();
+		LOGD("Creating groups...");
+		CreateGroups();
+
+		LOGD("Reading users...");
+		if (!ReadUsers())
+		{
+			return false;
+		}
+		LOGD("Cleaning user groups...");
+		CleanUserGroups();
+		LOGD("Resolving user UUIDs...");
+		ResolveUserUUIDs();
+		
+		LOGD("Setting ranks...");
+		SetRanks();
+		
+		return true;
+	}
+	
+protected:
+
+	/** Container for a group read from an INI file. */
+	struct sGroup
+	{
+		AString m_Name;
+		AString m_Color;
+		AStringVector m_Inherits;
+		AStringVector m_Permissions;
+		
+		sGroup(void) {}
+		
+		sGroup(const AString & a_Name, const AString & a_Color, const AStringVector & a_Inherits, const AStringVector & a_Permissions):
+			m_Name(a_Name),
+			m_Color(a_Color),
+			m_Inherits(a_Inherits),
+			m_Permissions(a_Permissions)
+		{
+		}
+	};
+	typedef std::map<AString, sGroup> sGroupMap;
+	
+	
+	/** Container for a single user read from an INI file. */
+	struct sUser
+	{
+		AString m_Name;
+		AStringVector m_Groups;
+		
+		/** Assigned by ResolveUserUUIDs() */
+		AString m_UUID;
+		
+		
+		sUser(void) {}
+		
+		sUser(const AString & a_Name, const AStringVector & a_Groups):
+			m_Name(a_Name),
+			m_Groups(a_Groups)
+		{
+		}
+	};
+	typedef std::map<AString, sUser> sUserMap;
+	
+	typedef std::map<AString, AString> cStringMap;
+	
+	
+	/** The parent Rank manager where we will create the groups, ranks and players */
+	cRankManager & m_RankManager;
+	
+	/** The player name to UUID resolver */
+	cMojangAPI & m_MojangAPI;
+	
+	/** List of all groups read from the ini file */
+	sGroupMap m_Groups;
+	
+	/** List of all players read from the ini file. */
+	sUserMap  m_Users;
+	
+	/** Maps lists of groups to rank names.
+	Each group list is either a simple "<Group>" if there's only one group,
+	or "<PrimaryGroup>,<FirstSecondaryGroup>,<SecondSecondaryGroup>...", where the secondary groups are
+	lowercased and  alpha-sorted. This makes the group lists comparable for equivalence, simply by comparing
+	their string names.
+	The ranks are named "<Group>" for single-group players, and "AutoMigratedRank_N" for the composite ranks,
+	where N is a unique number. */
+	cStringMap m_GroupsToRanks;
+
+	
+	
+	/** Reads the groups from the "groups.ini" file into m_Groups */
+	bool ReadGroups(void)
+	{
+		// Read the file:
+		cIniFile Groups;
+		if (!Groups.ReadFile("groups.ini"))
+		{
+			return false;
+		}
+		
+		// Read all the groups into a map:
+		int NumGroups = Groups.GetNumKeys();
+		for (int i = 0; i < NumGroups; i++)
+		{
+			AString GroupName = Groups.GetKeyName(i);
+			AString lcGroupName = StrToLower(GroupName);
+			if (m_Groups.find(lcGroupName) != m_Groups.end())
+			{
+				LOGINFO("groups.ini contains a duplicate definition of group %s, ignoring the latter.", GroupName.c_str());
+				continue;
+			}
+			m_Groups[lcGroupName] = sGroup(
+				GroupName,
+				Groups.GetValue(GroupName, "Color", ""),
+				StringSplitAndTrim(Groups.GetValue(GroupName, "Inherits"), ","),
+				StringSplitAndTrim(Groups.GetValue(GroupName, "Permissions"), ",")
+			);
+		}  // for i - Groups' keys
+		return true;
+	}
+	
+
+	
+	/** Removes non-existent groups from all the groups' inheritance */
+	void CleanGroupInheritance(void)
+	{
+		for (sGroupMap::iterator itrG = m_Groups.begin(), endG = m_Groups.end(); itrG != endG; ++itrG)
+		{
+			AStringVector & Inherits = itrG->second.m_Inherits;
+			for (AStringVector::iterator itrI = Inherits.begin(); itrI != Inherits.end();)
+			{
+				AString lcInherits = StrToLower(*itrI);
+				if (m_Groups.find(lcInherits) != m_Groups.end())
+				{
+					// Inherited group exists, continue checking the next one
+					++itrI;
+					continue;
+				}
+				// Inherited group doesn't exist, remove it from the list:
+				LOGWARNING("RankMigrator: Group \"%s\" inherits from a non-existent group \"%s\", this inheritance will be ignored.",
+					itrG->second.m_Name.c_str(), itrI->c_str()
+				);
+				AStringVector::iterator itrI2 = itrI;
+				++itrI2;
+				Inherits.erase(itrI);
+				itrI = itrI2;
+			}  // for itrI - Inherits[]
+		}  // for itrG - m_Groups[]
+	}
+
+	
+	
+	/** Reads the users from the "users.ini" file into m_Users */
+	bool ReadUsers(void)
+	{
+		// Read the file:
+		cIniFile Users;
+		if (!Users.ReadFile("users.ini"))
+		{
+			return false;
+		}
+		
+		// Read all the users into a map:
+		int NumUsers = Users.GetNumKeys();
+		for (int i = 0; i < NumUsers; i++)
+		{
+			AString UserName = Users.GetKeyName(i);
+			AString lcUserName = StrToLower(UserName);
+			if (m_Users.find(lcUserName) != m_Users.end())
+			{
+				LOGINFO("users.ini contains a duplicate definition of user %s, ignoring the latter.", UserName.c_str());
+				continue;
+			}
+			m_Users[lcUserName] = sUser(
+				UserName,
+				StringSplitAndTrim(Users.GetValue(UserName, "Groups", ""), ",")
+			);
+		}  // for i - Users' keys
+		return true;
+	}
+	
+	
+	
+	/** Removes non-existent groups from each user's definition. */
+	void CleanUserGroups(void)
+	{
+		for (sUserMap::iterator itrU = m_Users.begin(), endU = m_Users.end(); itrU != endU; ++itrU)
+		{
+			AStringVector & Groups = itrU->second.m_Groups;
+			for (AStringVector::iterator itrG = Groups.begin(); itrG != Groups.end();)
+			{
+				AString lcGroup = StrToLower(*itrG);
+				if (m_Groups.find(lcGroup) != m_Groups.end())
+				{
+					// Assigned group exists, continue checking the next one
+					++itrG;
+					continue;
+				}
+				// Assigned  group doesn't exist, remove it from the list:
+				LOGWARNING("RankMigrator: User \"%s\" is assigned a non-existent group \"%s\", this assignment will be ignored.",
+					itrU->second.m_Name.c_str(), itrG->c_str()
+				);
+				AStringVector::iterator itrG2 = itrG;
+				++itrG2;
+				Groups.erase(itrG);
+				itrG = itrG2;
+			}  // for itrG - Groups[]
+		}  // for itrU - m_Users[]
+	}
+	
+	
+	
+	/** Creates groups based on m_Groups.
+	Ignores group inheritance. */
+	void CreateGroups(void)
+	{
+		// Create each group, with its permissions:
+		for (sGroupMap::const_iterator itr = m_Groups.begin(), end = m_Groups.end(); itr != end; ++itr)
+		{
+			m_RankManager.AddGroup(itr->second.m_Name);
+			m_RankManager.AddPermissionsToGroup(itr->second.m_Permissions, itr->second.m_Name);
+		}  // for itr - m_Groups[]
+	}
+	
+	
+	/** Resolves the UUID of each user in m_Users.
+	If a user doesn't resolve, they are removed and logged in the console. */
+	void ResolveUserUUIDs(void)
+	{
+		// Resolve all PlayerNames at once (the API doesn't like single-name queries):
+		AStringVector PlayerNames;
+		for (sUserMap::const_iterator itr = m_Users.begin(), end = m_Users.end(); itr != end; ++itr)
+		{
+			PlayerNames.push_back(itr->second.m_Name);
+		}
+		m_MojangAPI.GetUUIDsFromPlayerNames(PlayerNames);
+		
+		// Assign the UUIDs back to players, remove those not resolved:
+		for (sUserMap::iterator itr = m_Users.begin(); itr != m_Users.end(); )
+		{
+			AString UUID = m_MojangAPI.GetUUIDFromPlayerName(itr->second.m_Name);
+			if (UUID.empty())
+			{
+				LOGWARNING("RankMigrator: Cannot resolve player %s to UUID, player will be left unranked", itr->second.m_Name.c_str());
+				sUserMap::iterator itr2 = itr;
+				++itr2;
+				m_Users.erase(itr);
+				itr = itr2;
+			}
+			else
+			{
+				itr->second.m_UUID = UUID;
+				++itr;
+			}
+		}
+	}
+	
+	
+	
+	/** Adds the specified groups to the specified ranks. Recurses on the groups' inheritance. */
+	void AddGroupsToRank(const AStringVector & a_Groups, const AString & a_RankName)
+	{
+		for (AStringVector::const_iterator itr = a_Groups.begin(), end = a_Groups.end(); itr != end; ++itr)
+		{
+			// Normalize the group name:
+			sGroup & Group = m_Groups[StrToLower(*itr)];
+			
+			// Avoid loops, check if the group is already added:
+			if (m_RankManager.IsGroupInRank(Group.m_Name, a_RankName))
+			{
+				continue;
+			}
+			
+			// Add the group, and all the groups it inherits from recursively:
+			m_RankManager.AddGroupToRank(Group.m_Name, a_RankName);
+			AddGroupsToRank(Group.m_Inherits, a_RankName);
+		}  // for itr - a_Groups[]
+	}
+	
+	
+	
+	/** Creates a rank for each player, based on the master groups they are assigned. */
+	void SetRanks(void)
+	{
+		for (sUserMap::const_iterator itr = m_Users.begin(), end = m_Users.end(); itr != end; ++itr)
+		{
+			// Ignore users with no groups:
+			const AStringVector & Groups = itr->second.m_Groups;
+			if (Groups.empty())
+			{
+				LOGWARNING("RankMigrator: Player %s has no groups assigned to them, skipping the player.", itr->second.m_Name.c_str());
+				continue;
+			}
+			
+			// Compose the rank name out of group names:
+			AString RankName;
+			for (AStringVector::const_iterator itrG = Groups.begin(), endG = Groups.end(); itrG != endG; ++itrG)
+			{
+				AString GroupName = m_Groups[StrToLower(*itrG)].m_Name;  // Normalize group name
+				if (!RankName.empty())
+				{
+					RankName.push_back(',');
+				}
+				RankName.append(GroupName);
+			}  // for itrG - Groups[]
+			
+			// Create the rank, with al its groups:
+			if (!m_RankManager.RankExists(RankName))
+			{
+				m_RankManager.AddRank(RankName, "", "", m_Groups[StrToLower(Groups[0])].m_Color);
+				AddGroupsToRank(Groups, RankName);
+			}
+			
+			// Set the rank to the user:
+			m_RankManager.SetPlayerRank(itr->second.m_UUID, itr->second.m_Name, RankName);
+		}  // for itr - m_Users[]
+	}
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cRankManager:
+
+cRankManager::cRankManager(void) :
+	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
+	m_IsInitialized(false)
+{
+}
+
+
+
+
+
+void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
+{
+	ASSERT(!m_IsInitialized);  // Calling Initialize for the second time?
+	
 	// Create the DB tables, if they don't exist:
 	m_DB.exec("CREATE TABLE IF NOT EXISTS Rank (RankID INTEGER PRIMARY KEY, Name, MsgPrefix, MsgSuffix, MsgNameColorCode)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PlayerRank (PlayerUUID, PlayerName, RankID INTEGER)");
@@ -229,6 +589,22 @@ cRankManager::cRankManager(void) :
 	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermGroup (RankID INTEGER, PermGroupID INTEGER)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionItem (PermGroupID INTEGER, Permission)");
 	
+	m_IsInitialized = true;
+	
+	// Check if tables empty, migrate from ini files then
+	if (AreDBTablesEmpty())
+	{
+		LOGINFO("There are no ranks, migrating old-style INI files to new DB ranks...");
+		LOGINFO("(This might take a while)");
+		cRankManagerIniMigrator Migrator(*this, a_MojangAPI);
+		if (Migrator.Migrate())
+		{
+			LOGINFO("Ranks migrated.");
+			return;
+		}
+	}
+	
+	// Migration failed.
 	// TODO: Check if tables empty, add some defaults then
 }
 
@@ -238,6 +614,8 @@ cRankManager::cRankManager(void) :
 
 AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT Rank.Name FROM Rank LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID WHERE PlayerRank.PlayerUUID = ?");
@@ -263,6 +641,8 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 
 AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -296,6 +676,8 @@ AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 
 AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -329,6 +711,8 @@ AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 
 AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -357,6 +741,8 @@ AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 
 AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -384,6 +770,8 @@ AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 
 AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -412,6 +800,8 @@ AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 
 AStringVector cRankManager::GetAllRanks(void)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -434,6 +824,8 @@ AStringVector cRankManager::GetAllRanks(void)
 
 AStringVector cRankManager::GetAllGroups(void)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -456,6 +848,8 @@ AStringVector cRankManager::GetAllGroups(void)
 
 AStringVector cRankManager::GetAllPermissions(void)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -483,6 +877,8 @@ bool cRankManager::GetPlayerMsgVisuals(
 	AString & a_MsgNameColorCode
 )
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -526,6 +922,8 @@ void cRankManager::AddRank(
 	const AString & a_MsgNameColorCode
 )
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Check if such a rank name is already used:
@@ -566,6 +964,8 @@ void cRankManager::AddRank(
 
 void cRankManager::AddGroup(const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Check if such a rank name is already used:
@@ -603,6 +1003,8 @@ void cRankManager::AddGroup(const AString & a_GroupName)
 
 bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Transaction trans(m_DB);
@@ -680,6 +1082,8 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 
 bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrapp the entire operation into a transaction:
@@ -746,8 +1150,83 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 
 
 
+bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, const AString & a_GroupName)
+{
+	ASSERT(m_IsInitialized);
+	
+	try
+	{
+		// Wrapp the entire operation into a transaction:
+		SQLite::Transaction trans(m_DB);
+		
+		// Get the group's ID:
+		int GroupID;
+		{
+			SQLite::Statement stmt(m_DB, "SELECT PermGroupID FROM PermGroup WHERE Name = ?");
+			stmt.bind(1, a_GroupName);
+			if (!stmt.executeStep())
+			{
+				LOGWARNING("%s: No such group (%s), aborting.", __FUNCTION__, a_GroupName.c_str());
+				return false;
+			}
+			GroupID = stmt.getColumn(0).getInt();
+		}
+		
+		for (AStringVector::const_iterator itr = a_Permissions.begin(), end = a_Permissions.end(); itr != end; ++itr)
+		{
+			// Check if the permission is already present:
+			{
+				SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM PermissionItem WHERE PermGroupID = ? AND Permission = ?");
+				stmt.bind(1, GroupID);
+				stmt.bind(2, *itr);
+				if (!stmt.executeStep())
+				{
+					LOGWARNING("%s: Failed to check binding between permission %s and group %s, aborting.", __FUNCTION__, itr->c_str(), a_GroupName.c_str());
+					return false;
+				}
+				if (stmt.getColumn(0).getInt() > 0)
+				{
+					LOGD("%s: Permission %s is already present in group %s, skipping and returning success.",
+						__FUNCTION__, itr->c_str(), a_GroupName.c_str()
+					);
+					continue;
+				}
+			}
+			
+			// Add the permission:
+			{
+				SQLite::Statement stmt(m_DB, "INSERT INTO PermissionItem (Permission, PermGroupID) VALUES (?, ?)");
+				stmt.bind(1, *itr);
+				stmt.bind(2, GroupID);
+				if (stmt.exec() <= 0)
+				{
+					LOGWARNING("%s: Failed to add permission %s to group %s, skipping.", __FUNCTION__, itr->c_str(), a_GroupName.c_str());
+					continue;
+				}
+			}
+		}  // for itr - a_Permissions[]
+		
+		// Adding succeeded:
+		trans.commit();
+		return true;
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to add permissions to group %s: %s",
+			__FUNCTION__, a_GroupName.c_str(), ex.what()
+		);
+	}
+	return false;
+}
+
+
+
+
+
 void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_ReplacementRankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	AStringVector res;
 	try
 	{
@@ -823,6 +1302,8 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 
 void cRankManager::RemoveGroup(const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrap everything into a transaction:
@@ -876,6 +1357,8 @@ void cRankManager::RemoveGroup(const AString & a_GroupName)
 
 void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrap everything into a transaction:
@@ -930,6 +1413,8 @@ void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AStrin
 
 void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrap everything into a transaction:
@@ -972,6 +1457,8 @@ void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const
 
 bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrap everything into a transaction:
@@ -1014,6 +1501,8 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 
 bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrap everything into a transaction:
@@ -1056,6 +1545,8 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 
 void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		// Wrap the entire operation into a transaction:
@@ -1123,6 +1614,8 @@ void cRankManager::SetRankVisuals(
 	const AString & a_MsgNameColorCode
 )
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB, "UPDATE Rank SET MsgPrefix = ?, MsgSuffix = ?, MsgNameColorCode = ? WHERE Name = ?");
@@ -1152,6 +1645,8 @@ bool cRankManager::GetRankVisuals(
 	AString & a_MsgNameColorCode
 )
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT MsgPrefix, MsgSuffix, MsgNameColorCode FROM Rank WHERE Name = ?");
@@ -1179,6 +1674,8 @@ bool cRankManager::GetRankVisuals(
 
 bool cRankManager::RankExists(const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT * FROM Rank WHERE Name = ?");
@@ -1202,6 +1699,8 @@ bool cRankManager::RankExists(const AString & a_RankName)
 
 bool cRankManager::GroupExists(const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT * FROM PermGroup WHERE Name = ?");
@@ -1225,6 +1724,8 @@ bool cRankManager::GroupExists(const AString & a_GroupName)
 
 bool cRankManager::IsPlayerRankSet(const AString & a_PlayerUUID)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB, "SELECT * FROM PlayerRank WHERE PlayerUUID = ?");
@@ -1248,6 +1749,8 @@ bool cRankManager::IsPlayerRankSet(const AString & a_PlayerUUID)
 
 bool cRankManager::IsGroupInRank(const AString & a_GroupName, const AString & a_RankName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB,
@@ -1277,6 +1780,8 @@ bool cRankManager::IsGroupInRank(const AString & a_GroupName, const AString & a_
 
 bool cRankManager::IsPermissionInGroup(const AString & a_Permission, const AString & a_GroupName)
 {
+	ASSERT(m_IsInitialized);
+	
 	try
 	{
 		SQLite::Statement stmt(m_DB,
@@ -1291,6 +1796,39 @@ bool cRankManager::IsPermissionInGroup(const AString & a_Permission, const AStri
 			// The permission is in the group
 			return true;
 		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to query DB: %s", __FUNCTION__, ex.what());
+	}
+	return false;
+}
+
+
+
+
+
+bool cRankManager::AreDBTablesEmpty(void)
+{
+	return (
+		IsDBTableEmpty("Rank") &&
+		IsDBTableEmpty("PlayerRank") &&
+		IsDBTableEmpty("PermGroup") &&
+		IsDBTableEmpty("RankPermGroup") &&
+		IsDBTableEmpty("PermissionItem")
+	);
+}
+
+
+
+
+
+bool cRankManager::IsDBTableEmpty(const AString & a_TableName)
+{
+	try
+	{
+		SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM " + a_TableName);
+		return (stmt.executeStep() && (stmt.getColumn(0).getInt() == 0));
 	}
 	catch (const SQLite::Exception & ex)
 	{

@@ -14,10 +14,21 @@
 
 
 
+class cMojangAPI;
+
+
+
+
+
 class cRankManager
 {
 public:
+	/** Creates the rank manager. Needs to be initialized before other use. */
 	cRankManager(void);
+	
+	/** Initializes the rank manager. Performs migration and default-setting if no data is found in the DB.
+	The a_MojangAPI param is used when migrating from old ini files, to look up player UUIDs. */
+	void Initialize(cMojangAPI & a_MojangAPI);
 	
 	/** Returns the name of the rank that the specified player has assigned to them. */
 	AString GetPlayerRankName(const AString & a_PlayerUUID);
@@ -78,6 +89,11 @@ public:
 	Fails if the permission group name is not found.
 	Returns true if successful, false on error. */
 	bool AddPermissionToGroup(const AString & a_Permission, const AString & a_GroupName);
+	
+	/** Adds the specified permissions to the specified permission group.
+	Fails if the permission group name is not found.
+	Returns true if successful, false on error. */
+	bool AddPermissionsToGroup(const AStringVector & a_Permissions, const AString & a_GroupName);
 	
 	/** Removes the specified rank.
 	All players assigned to that rank will be re-assigned to a_ReplacementRankName.
@@ -147,7 +163,19 @@ public:
 	
 protected:
 
+	/** The database storage for all the data. */
 	SQLite::Database m_DB;
+	
+	/** Set to true once the manager is initialized. */
+	bool m_IsInitialized;
+	
+	
+	/** Returns true if all the DB tables are empty, indicating a fresh new install. */
+	bool AreDBTablesEmpty(void);
+	
+	/** Returns true iff the specified DB table is empty.
+	If there's an error while querying, returns false. */
+	bool IsDBTableEmpty(const AString & a_TableName);
 } ;
 
 
