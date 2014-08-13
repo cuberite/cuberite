@@ -290,31 +290,31 @@ cFileListener::cFileListener(void)
 
 void cFileListener::Log(AString a_Message, cLogger::eLogLevel a_LogLevel)
 {
-	const char * LogLevelPrefix = "U ";
+	const char * LogLevelPrefix = "Unkn ";
 	switch (a_LogLevel)
 	{
 		case cLogger::llRegular:
 		{
-			LogLevelPrefix = "  ";
+			LogLevelPrefix = "     ";
 			break;
 		}
 		case cLogger::llInfo:
 		{
-			LogLevelPrefix = "i ";
+			LogLevelPrefix = "info ";
 			break;
 		}
 		case cLogger::llWarning:
 		{
-			LogLevelPrefix = "W ";
+			LogLevelPrefix = "Warn ";
 			break;
 		}
 		case cLogger::llError:
 		{
-			LogLevelPrefix = "E ";
+			LogLevelPrefix = "Err  ";
 			break;
 		}
 	}
-	m_File.Printf("%s: %s", LogLevelPrefix, a_Message.c_str());
+	m_File.Printf("%s%s", LogLevelPrefix, a_Message.c_str());
 }
 
 
