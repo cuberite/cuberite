@@ -341,8 +341,8 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		m_Protocol->SendWeather(World->GetWeather());
 	}
 
-	// Send time
-	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay());
+	// Send time:
+	m_Protocol->SendTimeUpdate(World->GetWorldAge(), World->GetTimeOfDay(), World->IsDaylightCycleEnabled());
 
 	// Send contents of the inventory window
 	m_Protocol->SendWholeInventory(*m_Player->GetWindow());
@@ -2589,9 +2589,9 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
 
 

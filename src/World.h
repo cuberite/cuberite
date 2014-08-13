@@ -145,7 +145,17 @@ public:
 	// tolua_begin
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
-	
+
+	/** Is the daylight cyclus enabled? */
+	virtual bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
+
+	/** Sets the daylight cyclus to true/false. */
+	virtual void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
+	{
+		m_IsDaylightCycleEnabled = a_IsDaylightCycleEnabled;
+		BroadcastTimeUpdate();
+	}
+
 	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
 	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
@@ -158,6 +168,7 @@ public:
 	{
 		m_TimeOfDay = a_TimeOfDay;
 		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
+		UpdateSkyDarkness();
 		BroadcastTimeUpdate();
 	}
 	
@@ -224,7 +235,7 @@ public:
 	void BroadcastEntityRelMoveLook      (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityStatus           (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override; // tolua_export
+	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;  // tolua_export
 	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastPlayerListItem         (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect     (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
@@ -868,6 +879,7 @@ private:
 	bool m_BroadcastDeathMessages;
 	bool m_BroadcastAchievementMessages;
 
+	bool   m_IsDaylightCycleEnabled;
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
 	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs

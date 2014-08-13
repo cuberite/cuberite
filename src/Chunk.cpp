@@ -579,7 +579,7 @@ void cChunk::Tick(float a_Dt)
 	}
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
-	{		
+	{
 		if (!((*itr)->IsMob()))  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		{
 			// Tick all entities in this chunk (except mobs):
@@ -594,17 +594,19 @@ void cChunk::Tick(float a_Dt)
 			itr = m_Entities.erase(itr);
 			delete ToDelete;
 		}
-		else if ((*itr)->IsWorldTravellingFrom(m_World))  // Remove all entities that are travelling to another world:
+		else if ((*itr)->IsWorldTravellingFrom(m_World))
 		{
+			// Remove all entities that are travelling to another world
 			MarkDirty();
 			(*itr)->SetWorldTravellingFrom(NULL);
 			itr = m_Entities.erase(itr);
 		}
-		else if (  // If any entity moved out of the chunk, move it to the neighbor:
+		else if (
 			((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ)
 		)
 		{
+			// The entity moved out of the chunk, move it to the neighbor
 			MarkDirty();
 			MoveEntityToNewChunk(*itr);
 			itr = m_Entities.erase(itr);
@@ -885,14 +887,14 @@ void cChunk::ApplyWeatherToTop()
 				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
 			}
 			else if (
-					(m_World->IsDeepSnowEnabled()) &&
-					(
-						(TopBlock == E_BLOCK_RED_ROSE) ||
-						(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
-						(TopBlock == E_BLOCK_RED_MUSHROOM) ||
-						(TopBlock == E_BLOCK_BROWN_MUSHROOM)
-					)
+				(m_World->IsDeepSnowEnabled()) &&
+				(
+					(TopBlock == E_BLOCK_RED_ROSE) ||
+					(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
+					(TopBlock == E_BLOCK_RED_MUSHROOM) ||
+					(TopBlock == E_BLOCK_BROWN_MUSHROOM)
 				)
+			)
 			{
 				SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
 			}
@@ -2142,10 +2144,14 @@ bool cChunk::DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_Blo
 			case E_BLOCK_DROPPER:
 			case E_BLOCK_DISPENSER:
 			case E_BLOCK_NOTE_BLOCK:
+			{
 				break;
+			}
 			default:
+			{
 				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
 				return false;
+			}
 		}
 		
 		if (a_Callback.Item((cRedstonePoweredEntity *)*itr))

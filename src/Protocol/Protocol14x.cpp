@@ -130,8 +130,14 @@ void cProtocol142::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 
 
 
-void cProtocol142::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocol142::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
+	if (!a_DoDaylightCycle)
+	{
+		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
+		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
+	}
+
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_TIME);
 	WriteInt64(a_WorldAge);

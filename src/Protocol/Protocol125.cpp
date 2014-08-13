@@ -1072,8 +1072,11 @@ void cProtocol125::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocol125::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocol125::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
+	// This protocol doesn't support a_DoDaylightCycle on false.
+	UNUSED(a_DoDaylightCycle);
+
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_TIME);
 	// Use a_WorldAge for daycount, and a_TimeOfDay for the proper time of day:
