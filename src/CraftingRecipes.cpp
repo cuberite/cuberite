@@ -392,8 +392,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	}
 	if (ResultSplit.size() > 1)
 	{
-		Recipe->m_Result.m_ItemCount = atoi(ResultSplit[1].c_str());
-		if (Recipe->m_Result.m_ItemCount == 0)
+		if (!StringToInteger<char>(ResultSplit[1].c_str(), Recipe->m_Result.m_ItemCount))
 		{
 			LOGWARNING("crafting.txt: line %d: Cannot parse result count, ignoring the recipe.", a_LineNum);
 			LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
@@ -445,8 +444,7 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
-		a_Item.m_ItemDamage = atoi(Damage.c_str());
-		if ((a_Item.m_ItemDamage == 0) && (Damage.compare("0") != 0))
+		if (!StringToInteger<short>(Damage.c_str(), a_Item.m_ItemDamage))
 		{
 			// Parsing the number failed
 			return false;
