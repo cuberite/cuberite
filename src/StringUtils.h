@@ -100,12 +100,12 @@ extern int GetBEInt(const char * a_Mem);
 /// Writes four bytes to the specified memory location so that they interpret as BigEndian int
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
-/// Parses any integer type. Checks bounds and 
+/// Parses any integer type. Checks bounds and returns errors out of band.
 template<class T>
-bool StringToInteger(AString a_str, T& a_Num)
+bool StringToInteger(const AString& a_str, T& a_Num)
 {
 	size_t i = 0;
-	T positive = true;
+	bool positive = true;
 	T result = 0;
 	if (a_str[0] == '+')
 	{
@@ -118,7 +118,7 @@ bool StringToInteger(AString a_str, T& a_Num)
 	}
 	if (positive)
 	{
-		for(; i <= a_str.size(); i++)
+		for(size_t size = a_str.size(); i < size; i++)
 		{
 			if ((a_str[i] <= '0') || (a_str[i] >= '9'))
 			{
@@ -139,7 +139,7 @@ bool StringToInteger(AString a_str, T& a_Num)
 	}
 	else
 	{
-		for(; i <= a_str.size(); i++)
+		for(size_t size = a_str.size(); i < size; i++)
 		{
 			if ((a_str[i] <= '0') || (a_str[i] >= '9'))
 			{
