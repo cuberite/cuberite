@@ -83,7 +83,7 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
 	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
@@ -228,7 +228,7 @@ void cCraftingRecipe::Clear(void)
 
 
 
-void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 }

@@ -33,7 +33,7 @@ public:
 	int     GetWidth (void) const {return m_Width; }
 	int     GetHeight(void) const {return m_Height; }
 	cItem & GetItem  (int x, int y) const;
-	void    SetItem  (int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth);
+	void    SetItem  (int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth);
 	void    SetItem  (int x, int y, const cItem & a_Item);
 	void    Clear    (void);
 	
@@ -72,13 +72,13 @@ public:
 	int           GetIngredientsHeight(void) const {return m_Ingredients.GetHeight(); }
 	cItem &       GetIngredient       (int x, int y) const {return m_Ingredients.GetItem(x, y); }
 	const cItem & GetResult           (void) const {return m_Result; }
-	void          SetResult           (ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth);
+	void          SetResult           (ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth);
 	void          SetResult           (const cItem & a_Item)
 	{
 		m_Result = a_Item;
 	}
 	
-	void          SetIngredient       (int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+	void          SetIngredient       (int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 	{
 		m_Ingredients.SetItem(x, y, a_ItemType, a_ItemCount, a_ItemHealth);
 	}
