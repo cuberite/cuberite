@@ -879,8 +879,12 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
 			);
 
-			if ( Distance.z == 0. ) Distance.z = 0.0001;
-						if (  ((Distance.z>=0)&&((Distance.x/Distance.z)>=1)) || ((Distance.z<0)&&((Distance.x/Distance.z)<=1)) )
+			if ( Distance.z == 0. )
+			{
+			Distance.z = 0.0001;
+			}
+			
+			if (  ((Distance.z>=0)&&((Distance.x/Distance.z)>=1)) || ((Distance.z<0)&&((Distance.x/Distance.z)<=1)) )
 			{
 				if ( (-GetSpeedX() * 0.4) < 0.01 )
 				{
@@ -917,7 +921,11 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
 			);
 
-			if ( Distance.z == 0. ) Distance.z = 0.0001;
+			if ( Distance.z == 0. )
+			{
+				Distance.z = 0.0001;
+			}
+
 			if (  ((Distance.z>=0)&&((Distance.x/Distance.z)<=-1)) || ((Distance.z<0)&&((Distance.x/Distance.z)>=-1)) )
 			{
 				if ( (GetSpeedX() * 0.4) < 0.01 )
