@@ -881,9 +881,9 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 
 			if ( Distance.z == 0. )
 			{
-			Distance.z = 0.0001;
+				Distance.z = 0.0001;
 			}
-			
+
 			if (  ((Distance.z>=0)&&((Distance.x/Distance.z)>=1)) || ((Distance.z<0)&&((Distance.x/Distance.z)<=1)) )
 			{
 				if ( (-GetSpeedX() * 0.4) < 0.01 )
