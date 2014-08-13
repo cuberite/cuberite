@@ -176,9 +176,9 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	}
 
 	// Check if the contents should be wrapped in the template:
-	AString URL = a_Request.GetBareURL();
-	ASSERT(URL.length() > 0);
-	bool ShouldWrapInTemplate = ((URL.length() > 1) && (URL[1] != '~'));
+	AString BareURL = a_Request.GetBareURL();
+	ASSERT(BareURL.length() > 0);
+	bool ShouldWrapInTemplate = ((BareURL.length() > 1) && (BareURL[1] != '~'));
 
 	// Retrieve the request data:
 	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
@@ -193,7 +193,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	HTTPTemplateRequest TemplateRequest;
 	TemplateRequest.Request.Username = a_Request.GetAuthUsername();
 	TemplateRequest.Request.Method = a_Request.GetMethod();
-	TemplateRequest.Request.Path = URL.substr(1);
+	TemplateRequest.Request.Path = BareURL.substr(1);
 
 	if (Data->m_Form.Finish())
 	{
@@ -236,7 +236,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		return;
 	}
 
-	AString BaseURL = GetBaseURL(URL);
+	AString BaseURL = GetBaseURL(BareURL);
 	AString Menu;
 	Template = "{CONTENT}";
 	AString FoundPlugin;
