@@ -324,7 +324,11 @@ void cCraftingRecipes::LoadRecipes(void)
 		return;
 	}
 	AString Everything;
-	f.ReadRestOfFile(Everything);
+	if (!f.ReadRestOfFile(Everything))
+	{
+		LOGWARNING("Cannot read file \"crafting.txt\", no crafting recipes will be available!");
+		return;
+	}
 	f.Close();
 	
 	// Split it into lines, then process each line as a single recipe:
