@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "RankManager.h"
-#include "SQLiteCpp/Transaction.h"
 #include "inifile/iniFile.h"
 #include "Protocol/MojangAPI.h"
 
@@ -237,6 +236,8 @@ public:
 	/** Performs the complete migration from INI files to DB. */
 	bool Migrate(void)
 	{
+		cRankManager::cMassChangeLock Lock(m_RankManager);
+		
 		LOGD("Reading groups...");
 		if (!ReadGroups())
 		{
@@ -615,6 +616,7 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -642,6 +644,7 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -677,6 +680,7 @@ AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -712,6 +716,7 @@ AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -742,6 +747,7 @@ AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -771,6 +777,7 @@ AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -801,6 +808,7 @@ AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 AStringVector cRankManager::GetAllRanks(void)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -825,6 +833,7 @@ AStringVector cRankManager::GetAllRanks(void)
 AStringVector cRankManager::GetAllGroups(void)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -849,6 +858,7 @@ AStringVector cRankManager::GetAllGroups(void)
 AStringVector cRankManager::GetAllPermissions(void)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -878,6 +888,7 @@ bool cRankManager::GetPlayerMsgVisuals(
 )
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
@@ -923,6 +934,7 @@ void cRankManager::AddRank(
 )
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -965,10 +977,11 @@ void cRankManager::AddRank(
 void cRankManager::AddGroup(const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Check if such a rank name is already used:
+		// Check if such a group name is already used:
 		{
 			SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM PermGroup WHERE Name = ?");
 			stmt.bind(1, a_GroupName);
@@ -982,7 +995,7 @@ void cRankManager::AddGroup(const AString & a_GroupName)
 			}
 		}
 		
-		// Insert a new rank:
+		// Insert a new group:
 		SQLite::Statement stmt(m_DB, "INSERT INTO PermGroup (Name) VALUES (?)");
 		stmt.bind(1, a_GroupName);
 		if (stmt.exec() <= 0)
@@ -1001,16 +1014,58 @@ void cRankManager::AddGroup(const AString & a_GroupName)
 
 
 
-bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a_RankName)
+void cRankManager::AddGroups(const AStringVector & a_GroupNames)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		SQLite::Transaction trans(m_DB);
-		int GroupID, RankID;
-		
+		for (AStringVector::const_iterator itr = a_GroupNames.begin(), end = a_GroupNames.end(); itr != end; ++itr)
+		{
+			// Check if such the group name is already used:
+			{
+				SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM PermGroup WHERE Name = ?");
+				stmt.bind(1, *itr);
+				if (stmt.executeStep())
+				{
+					if (stmt.getColumn(0).getInt() > 0)
+					{
+						// Group already exists, do nothing:
+						return;
+					}
+				}
+			}
+			
+			// Insert a new group:
+			SQLite::Statement stmt(m_DB, "INSERT INTO PermGroup (Name) VALUES (?)");
+			stmt.bind(1, *itr);
+			if (stmt.exec() <= 0)
+			{
+				LOGWARNING("%s: Failed to add a new group \"%s\".", __FUNCTION__, itr->c_str());
+				return;
+			}
+		}  // for itr - a_GroupNames[]
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to add new groups: %s", __FUNCTION__, ex.what());
+	}
+}
+
+
+
+
+
+bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a_RankName)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+	
+	try
+	{
 		// Get the group's ID:
+		int GroupID;
 		{
 			SQLite::Statement stmt(m_DB, "SELECT PermGroupID FROM PermGroup WHERE Name = ?");
 			stmt.bind(1, a_GroupName);
@@ -1023,6 +1078,7 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 		}
 		
 		// Get the rank's ID:
+		int RankID;
 		{
 			SQLite::Statement stmt(m_DB, "SELECT RankID FROM Rank WHERE Name = ?");
 			stmt.bind(1, a_RankName);
@@ -1066,7 +1122,6 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 		}
 		
 		// Adding succeeded:
-		trans.commit();
 		return true;
 	}
 	catch (const SQLite::Exception & ex)
@@ -1083,12 +1138,10 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrapp the entire operation into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the group's ID:
 		int GroupID;
 		{
@@ -1134,7 +1187,6 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 		}
 		
 		// Adding succeeded:
-		trans.commit();
 		return true;
 	}
 	catch (const SQLite::Exception & ex)
@@ -1153,12 +1205,10 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrapp the entire operation into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the group's ID:
 		int GroupID;
 		{
@@ -1207,7 +1257,6 @@ bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, co
 		}  // for itr - a_Permissions[]
 		
 		// Adding succeeded:
-		trans.commit();
 		return true;
 	}
 	catch (const SQLite::Exception & ex)
@@ -1226,13 +1275,11 @@ bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, co
 void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_ReplacementRankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	AStringVector res;
 	try
 	{
-		// Wrap everything into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the RankID for the rank being removed:
 		int RemoveRankID;
 		{
@@ -1287,8 +1334,6 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 			stmt.bind(1, RemoveRankID);
 			stmt.exec();
 		}
-		
-		trans.commit();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1303,12 +1348,10 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 void cRankManager::RemoveGroup(const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrap everything into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the ID of the group:
 		int GroupID;
 		{
@@ -1342,8 +1385,6 @@ void cRankManager::RemoveGroup(const AString & a_GroupName)
 			stmt.bind(1, GroupID);
 			stmt.exec();
 		}
-		
-		trans.commit();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1358,12 +1399,10 @@ void cRankManager::RemoveGroup(const AString & a_GroupName)
 void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrap everything into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the IDs of the group and the rank:
 		int GroupID, RankID;
 		{
@@ -1398,8 +1437,6 @@ void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AStrin
 			stmt.bind(1, RankID);
 			stmt.exec();
 		}
-		
-		trans.commit();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1414,12 +1451,10 @@ void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AStrin
 void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrap everything into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the ID of the group:
 		int GroupID;
 		{
@@ -1440,8 +1475,6 @@ void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const
 			stmt.bind(2, a_Permission);
 			stmt.exec();
 		}
-		
-		trans.commit();
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1458,12 +1491,10 @@ void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const
 bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrap everything into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Check that NewName doesn't exist:
 		{
 			SQLite::Statement stmt(m_DB, "SELECT RankID FROM Rank WHERE Name = ?");
@@ -1484,7 +1515,6 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 			res = (stmt.exec() > 0);
 		}
 		
-		trans.commit();
 		return res;
 	}
 	catch (const SQLite::Exception & ex)
@@ -1502,12 +1532,10 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrap everything into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Check that NewName doesn't exist:
 		{
 			SQLite::Statement stmt(m_DB, "SELECT PermGroupID FROM PermGroup WHERE Name = ?");
@@ -1528,7 +1556,6 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 			res = (stmt.exec() > 0);
 		}
 		
-		trans.commit();
 		return res;
 	}
 	catch (const SQLite::Exception & ex)
@@ -1546,12 +1573,10 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
-		// Wrap the entire operation into a transaction:
-		SQLite::Transaction trans(m_DB);
-		
 		// Get the rank ID:
 		int RankID;
 		{
@@ -1574,7 +1599,6 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 			if (stmt.exec() > 0)
 			{
 				// Successfully updated the player's rank
-				trans.commit();
 				return;
 			}
 		}
@@ -1587,7 +1611,6 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 		if (stmt.exec() > 0)
 		{
 			// Successfully added the player
-			trans.commit();
 			return;
 		}
 		
@@ -1615,6 +1638,7 @@ void cRankManager::SetRankVisuals(
 )
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -1646,6 +1670,7 @@ bool cRankManager::GetRankVisuals(
 )
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -1675,6 +1700,7 @@ bool cRankManager::GetRankVisuals(
 bool cRankManager::RankExists(const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -1700,6 +1726,7 @@ bool cRankManager::RankExists(const AString & a_RankName)
 bool cRankManager::GroupExists(const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -1725,6 +1752,7 @@ bool cRankManager::GroupExists(const AString & a_GroupName)
 bool cRankManager::IsPlayerRankSet(const AString & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -1750,6 +1778,7 @@ bool cRankManager::IsPlayerRankSet(const AString & a_PlayerUUID)
 bool cRankManager::IsGroupInRank(const AString & a_GroupName, const AString & a_RankName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{
@@ -1781,6 +1810,7 @@ bool cRankManager::IsGroupInRank(const AString & a_GroupName, const AString & a_
 bool cRankManager::IsPermissionInGroup(const AString & a_Permission, const AString & a_GroupName)
 {
 	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
 	
 	try
 	{

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "SQLiteCpp/Database.h"
+#include "SQLiteCpp/Transaction.h"
 
 
 
@@ -23,6 +24,29 @@ class cMojangAPI;
 class cRankManager
 {
 public:
+	/** Acquire this lock to perform mass changes.
+	Improves performance by wrapping everything into a transaction.
+	Makes sure that no other thread is accessing the DB. */
+	class cMassChangeLock
+	{
+	public:
+		cMassChangeLock(cRankManager & a_RankManager) :
+			m_Lock(a_RankManager.m_CS),
+			m_Transaction(a_RankManager.m_DB)
+		{
+		}
+		
+		~cMassChangeLock()
+		{
+			m_Transaction.commit();
+		}
+		
+	protected:
+		cCSLock m_Lock;
+		SQLite::Transaction m_Transaction;
+	};
+	
+	
 	/** Creates the rank manager. Needs to be initialized before other use. */
 	cRankManager(void);
 	
@@ -79,6 +103,9 @@ public:
 	
 	/** Adds a new permission group. No action if such a group already exists. */
 	void AddGroup(const AString & a_GroupName);
+	
+	/** Bulk-adds groups. Group names that already exist are silently skipped. */
+	void AddGroups(const AStringVector & a_GroupNames);
 	
 	/** Adds the specified permission group to the specified rank.
 	Fails if the rank or group names are not found.
@@ -163,8 +190,11 @@ public:
 	
 protected:
 
-	/** The database storage for all the data. */
+	/** The database storage for all the data. Protected by m_CS. */
 	SQLite::Database m_DB;
+	
+	/** The mutex protecting m_DB against multi-threaded access. */
+	cCriticalSection m_CS;
 	
 	/** Set to true once the manager is initialized. */
 	bool m_IsInitialized;
