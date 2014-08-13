@@ -879,14 +879,15 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
 			);
 
-			if ( Distance.z == 0. )
+			if (Distance.z == 0.)
 			{
 				Distance.z = 0.0001;
 			}
 
-			if (  ((Distance.z>=0)&&((Distance.x/Distance.z)>=1)) || ((Distance.z<0)&&((Distance.x/Distance.z)<=1)) )
+			if (((Distance.z >= 0) && ((Distance.x / Distance.z) >= 1)) ||
+				((Distance.z<0) && ((Distance.x / Distance.z) <= 1)))
 			{
-				if ( (-GetSpeedX() * 0.4) < 0.01 )
+				if ((-GetSpeedX() * 0.4) < 0.01)
 				{
 					AddSpeedX( -4/sqrt(2) );
 					AddSpeedZ( 4/sqrt(2) );
@@ -897,18 +898,15 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 					SetSpeedZ( GetSpeedZ() * 0.4 );
 				}
 			}
+			else if ((GetSpeedX() * 0.4) < 0.01)
+			{
+				AddSpeedX( 4/sqrt(2) );
+				AddSpeedZ( -4/sqrt(2) );
+			}
 			else
 			{
-				if ((GetSpeedX() * 0.4) < 0.01)
-				{
-					AddSpeedX( 4/sqrt(2) );
-					AddSpeedZ( -4/sqrt(2) );
-				}
-				else
-				{
-					SetSpeedX( GetSpeedX() * 0.4 );
-					SetSpeedZ( -GetSpeedZ() * 0.4 );
-				}
+				SetSpeedX( GetSpeedX() * 0.4 );
+				SetSpeedZ( -GetSpeedZ() * 0.4 );
 			}
 			break;
 		}
@@ -921,14 +919,15 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
 			);
 
-			if ( Distance.z == 0. )
+			if (Distance.z == 0.)
 			{
 				Distance.z = 0.0001;
 			}
 
-			if (  ((Distance.z>=0)&&((Distance.x/Distance.z)<=-1)) || ((Distance.z<0)&&((Distance.x/Distance.z)>=-1)) )
+			if (((Distance.z >= 0) && ((Distance.x / Distance.z) <= -1)) ||
+				((Distance.z<0) && ((Distance.x / Distance.z) >= -1)))
 			{
-				if ( (GetSpeedX() * 0.4) < 0.01 )
+				if ((GetSpeedX() * 0.4) < 0.01)
 				{
 					AddSpeedX( 4/sqrt(2) );
 					AddSpeedZ( 4/sqrt(2) );
@@ -939,18 +938,15 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 					SetSpeedZ( GetSpeedZ() * 0.4 );
 				}
 			}
+			else if ((-GetSpeedX() * 0.4) < 0.01)
+			{
+				AddSpeedX( -4/sqrt(2) );
+				AddSpeedZ( -4/sqrt(2) );
+			}
 			else
 			{
-				if ((-GetSpeedX() * 0.4) < 0.01)
-				{
-					AddSpeedX( -4/sqrt(2) );
-					AddSpeedZ( -4/sqrt(2) );
-				}
-				else
-				{
-					SetSpeedX( -GetSpeedX() * 0.4 );
-					SetSpeedZ( -GetSpeedZ() * 0.4 );
-				}
+				SetSpeedX( -GetSpeedX() * 0.4 );
+				SetSpeedZ( -GetSpeedZ() * 0.4 );
 			}
 			break;
 		}
