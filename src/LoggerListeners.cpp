@@ -17,6 +17,7 @@
 	class cColouredConsoleListener
 		: public cLogger::cListener
 	{
+	protected:
 	
 		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) = 0;
 		virtual void SetDefaultLogColour() = 0;
@@ -24,7 +25,7 @@
 		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 		{
 			SetLogColour(a_LogLevel);
-			puts(a_Message.c_str());
+			fputs(a_Message.c_str(), stdout);
 			SetDefaultLogColour();
 		}
 	};
@@ -46,7 +47,7 @@
 		{
 		}
 		
-		#ifdef DEBUG
+		#ifdef _DEBUG
 			virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 			{
 				super::Log(a_Message, a_LogLevel);
@@ -289,31 +290,31 @@ cFileListener::cFileListener(void)
 
 void cFileListener::Log(AString a_Message, cLogger::eLogLevel a_LogLevel)
 {
-	AString LogLevelString;
+	const char * LogLevelPrefix = "U ";
 	switch (a_LogLevel)
 	{
 		case cLogger::llRegular:
 		{
-			LogLevelString = "Log";
+			LogLevelPrefix = "  ";
 			break;
 		}
 		case cLogger::llInfo:
 		{
-			LogLevelString = "Info";
+			LogLevelPrefix = "i ";
 			break;
 		}
 		case cLogger::llWarning:
 		{
-			LogLevelString = "Warning";
+			LogLevelPrefix = "W ";
 			break;
 		}
 		case cLogger::llError:
 		{
-			LogLevelString = "Error";
+			LogLevelPrefix = "E ";
 			break;
 		}
 	}
-	m_File.Printf("%s: %s", LogLevelString.c_str(), a_Message.c_str());
+	m_File.Printf("%s: %s", LogLevelPrefix, a_Message.c_str());
 }
 
 
