@@ -873,80 +873,70 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_CURVED_ZM_XM:
 		case E_META_RAIL_CURVED_ZP_XP:
 		{
-			Vector3d Distance(
-				MinecartCollisionCallback.GetCollidedEntityPosition().x - GetPosX(),
-				0,
-				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
-			);
+			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
-			if (Distance.z == 0.)
-			{
-				Distance.z = 0.0001;
-			}
+			Distance.z = std::max(Distance.z, 0.001);
 
-			if (((Distance.z >= 0) && ((Distance.x / Distance.z) >= 1)) ||
-				((Distance.z<0) && ((Distance.x / Distance.z) <= 1)))
+			if (
+				((Distance.z > 0) && ((Distance.x / Distance.z) >= 1)) ||
+				((Distance.z < 0) && ((Distance.x / Distance.z) <= 1))
+			)
 			{
 				if ((-GetSpeedX() * 0.4) < 0.01)
 				{
-					AddSpeedX( -4/sqrt(2) );
-					AddSpeedZ( 4/sqrt(2) );
+					AddSpeedX(-4/sqrt(2));
+					AddSpeedZ(4/sqrt(2));
 				}
 				else
 				{
-					SetSpeedX( -GetSpeedX() * 0.4 );
-					SetSpeedZ( GetSpeedZ() * 0.4 );
+					SetSpeedX(-GetSpeedX() * 0.4);
+					SetSpeedZ(GetSpeedZ() * 0.4);
 				}
 			}
 			else if ((GetSpeedX() * 0.4) < 0.01)
 			{
-				AddSpeedX( 4/sqrt(2) );
-				AddSpeedZ( -4/sqrt(2) );
+				AddSpeedX(4/sqrt(2));
+				AddSpeedZ(-4/sqrt(2));
 			}
 			else
 			{
-				SetSpeedX( GetSpeedX() * 0.4 );
-				SetSpeedZ( -GetSpeedZ() * 0.4 );
+				SetSpeedX(GetSpeedX() * 0.4);
+				SetSpeedZ(-GetSpeedZ() * 0.4);
 			}
 			break;
 		}
 		case E_META_RAIL_CURVED_ZM_XP:
 		case E_META_RAIL_CURVED_ZP_XM:
 		{
-			Vector3d Distance(
-				MinecartCollisionCallback.GetCollidedEntityPosition().x - GetPosX(),
-				0,
-				MinecartCollisionCallback.GetCollidedEntityPosition().z - GetPosZ()
-			);
+			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
-			if (Distance.z == 0.)
-			{
-				Distance.z = 0.0001;
-			}
+			Distance.z = std::max(Distance.z, 0.001);
 
-			if (((Distance.z >= 0) && ((Distance.x / Distance.z) <= -1)) ||
-				((Distance.z<0) && ((Distance.x / Distance.z) >= -1)))
+			if (
+				((Distance.z > 0) && ((Distance.x / Distance.z) <= -1)) ||
+				((Distance.z < 0) && ((Distance.x / Distance.z) >= -1))
+			)
 			{
 				if ((GetSpeedX() * 0.4) < 0.01)
 				{
-					AddSpeedX( 4/sqrt(2) );
-					AddSpeedZ( 4/sqrt(2) );
+					AddSpeedX(4/sqrt(2));
+					AddSpeedZ(4/sqrt(2));
 				}
 				else
 				{
-					SetSpeedX( GetSpeedX() * 0.4 );
-					SetSpeedZ( GetSpeedZ() * 0.4 );
+					SetSpeedX(GetSpeedX() * 0.4);
+					SetSpeedZ(GetSpeedZ() * 0.4);
 				}
 			}
 			else if ((-GetSpeedX() * 0.4) < 0.01)
 			{
-				AddSpeedX( -4/sqrt(2) );
-				AddSpeedZ( -4/sqrt(2) );
+				AddSpeedX(-4/sqrt(2));
+				AddSpeedZ(-4/sqrt(2));
 			}
 			else
 			{
-				SetSpeedX( -GetSpeedX() * 0.4 );
-				SetSpeedZ( -GetSpeedZ() * 0.4 );
+				SetSpeedX(-GetSpeedX() * 0.4);
+				SetSpeedZ(-GetSpeedZ() * 0.4);
 			}
 			break;
 		}
