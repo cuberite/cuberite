@@ -259,7 +259,7 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 	size_t DataSize = GetSize() - Tell();
 	
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Contents.assign((size_t)DataSize, '\0');
+	a_Contents.assign(DataSize, '\0');
 	return Read((void *)a_Contents.data(), DataSize);
 }
 
