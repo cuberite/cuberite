@@ -875,17 +875,23 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		{
 			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
+			// Prevent division by small numbers
 			Distance.z = std::max(Distance.z, 0.001);
 
+			/* Check to which side the minecart is to be pushed.
+			Let's consider a z-x-coordinate system where the minecart is the center (0/0).
+			The minecart moves along the line z = -x, the perpendicular line to this is z = x.
+			In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located.
+			*/
 			if (
 				((Distance.z > 0) && ((Distance.x / Distance.z) >= 1)) ||
 				((Distance.z < 0) && ((Distance.x / Distance.z) <= 1))
 			)
 			{
-				if ((-GetSpeedX() * 0.4) < 0.01)
+				if ((-GetSpeedX() * 0.4 / sqrt(2)) < 0.01)
 				{
-					AddSpeedX(-4/sqrt(2));
-					AddSpeedZ(4/sqrt(2));
+					AddSpeedX(-4 / sqrt(2));
+					AddSpeedZ(4 / sqrt(2));
 				}
 				else
 				{
@@ -893,10 +899,10 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 					SetSpeedZ(GetSpeedZ() * 0.4);
 				}
 			}
-			else if ((GetSpeedX() * 0.4) < 0.01)
+			else if ((GetSpeedX() * 0.4 / sqrt(2)) < 0.01)
 			{
-				AddSpeedX(4/sqrt(2));
-				AddSpeedZ(-4/sqrt(2));
+				AddSpeedX(4 / sqrt(2));
+				AddSpeedZ(-4 / sqrt(2));
 			}
 			else
 			{
@@ -910,8 +916,13 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 		{
 			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
+			// Prevent division by small numbers
 			Distance.z = std::max(Distance.z, 0.001);
 
+			/* Check to which side the minecart is to be pushed.
+			Let's consider a z-x-coordinate system where the minecart is the center (0/0).
+			The minecart moves along the line z = x, the perpendicular line to this is z = -x.
+			In order to decide to which side the minecart is to be pushed, it must be checked on what side of the perpendicular line the pushing entity is located. */
 			if (
 				((Distance.z > 0) && ((Distance.x / Distance.z) <= -1)) ||
 				((Distance.z < 0) && ((Distance.x / Distance.z) >= -1))
@@ -919,8 +930,8 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			{
 				if ((GetSpeedX() * 0.4) < 0.01)
 				{
-					AddSpeedX(4/sqrt(2));
-					AddSpeedZ(4/sqrt(2));
+					AddSpeedX(4 / sqrt(2));
+					AddSpeedZ(4 / sqrt(2));
 				}
 				else
 				{
@@ -930,8 +941,8 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			}
 			else if ((-GetSpeedX() * 0.4) < 0.01)
 			{
-				AddSpeedX(-4/sqrt(2));
-				AddSpeedZ(-4/sqrt(2));
+				AddSpeedX(-4 / sqrt(2));
+				AddSpeedZ(-4 / sqrt(2));
 			}
 			else
 			{
