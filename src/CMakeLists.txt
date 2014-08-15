@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
+
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
@@ -41,8 +42,8 @@ SET (SRCS
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
-	Log.cpp
-	MCLogger.cpp
+	LoggerListeners.cpp
+	Logger.cpp
 	Map.cpp
 	MapManager.cpp
 	MobCensus.cpp
@@ -107,8 +108,8 @@ SET (HDRS
 	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
-	Log.h
-	MCLogger.h
+	Logger.h
+	LoggerListeners.h
 	Map.h
 	MapManager.h
 	Matrix4.h

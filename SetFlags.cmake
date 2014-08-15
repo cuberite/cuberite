@@ -1,3 +1,5 @@
+
+
 macro (add_flags_lnk FLAGS)
 	set(CMAKE_EXE_LINKER_FLAGS             "${CMAKE_EXE_LINKER_FLAGS}             ${FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG       "${CMAKE_EXE_LINKER_FLAGS_DEBUG}       ${FLAGS}")
