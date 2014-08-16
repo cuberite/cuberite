@@ -225,16 +225,24 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
+	bool CanMove = true;
 	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
-		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
+		{
+			CanMove = false;
+			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
+		}
 		m_ClientHandle->StreamChunks();
 	}
 
-	BroadcastMovementUpdate(m_ClientHandle);
+	if (CanMove)
+	{
+		BroadcastMovementUpdate(m_ClientHandle);
+	}
 
 	if (m_Health > 0)  // make sure player is alive
 	{
