@@ -892,7 +892,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
 
-	m_Stats.AddValue(statItemsDropped, Pickups.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -1618,7 +1618,7 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
-	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
