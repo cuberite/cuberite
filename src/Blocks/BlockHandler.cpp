@@ -424,15 +424,12 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 	cItems Pickups;
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	// Thanks to daniel0916
-	cPlayer * Player = (cPlayer *)a_Digger;
-	cEnchantments Enchantments = Player->GetInventory().GetEquippedItem().m_Enchantments;
-		
 	if (a_CanDrop)
 	{
 		if (!a_DropVerbatim)
 		{
-			if (Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0)
+			cEnchantments Enchantments = a_Digger->GetEquippedWeapon().m_Enchantments;
+			if ((Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0) && (a_Digger->IsPlayer()))
 			{
 				switch (m_BlockType)
 				{

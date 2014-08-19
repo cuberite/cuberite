@@ -316,7 +316,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
-		// Thanks to daniel0916
 		cEnchantments Enchantments = Player->GetEquippedItem().m_Enchantments;
 		
 		int SharpnessLevel = Enchantments.GetLevel(cEnchantments::enchSharpness);
