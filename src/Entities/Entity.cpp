@@ -384,11 +384,10 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case cMonster::mtGhast:
 					case cMonster::mtZombiePigman:
 					case cMonster::mtMagmaCube:
-					{
-						
+					{					
 						break;
 					};
-					default:StartBurning(BurnTicks * 20);
+					default: StartBurning(BurnTicks * 20);
 				}
 			}
 
