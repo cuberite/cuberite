@@ -35,6 +35,7 @@ public:
 		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		NIBBLETYPE NewMetaData = PlayerYawToMetaData(a_Player->GetYaw());
 		OldMetaData ^= 4;  // Toggle the gate
+
 		if ((OldMetaData & 1) == (NewMetaData & 1))
 		{
 			// Standing in front of the gate - apply new direction
