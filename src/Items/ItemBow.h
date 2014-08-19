@@ -84,7 +84,7 @@ public:
 			}
 			else
 			{
-				Arrow->SetPickupState(cArrowEntity::ePickupState::psNoPickup);
+				Arrow->SetPickupState(cArrowEntity::psNoPickup);
 			}
 			
 
