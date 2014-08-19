@@ -316,8 +316,68 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
-		if (!Player->IsOnGround())
+		
+		cEnchantments Enchantments = Player->GetEquippedItem().m_Enchantments;
+		
+		int SharpnessLevel = Enchantments.GetLevel(cEnchantments::enchSharpness);
+		int SmiteLevel = Enchantments.GetLevel(cEnchantments::enchSmite);
+		int BaneOfArthropodsLevel = Enchantments.GetLevel(cEnchantments::enchBaneOfArthropods);
+
+		if (SharpnessLevel > 0)
 		{
+			a_TDI.RawDamage += 1.25 * SharpnessLevel;
+		}
+		else if (SmiteLevel > 0)
+		{
+			if (IsMob())
+			{
+				cMonster * Monster = (cMonster *)this;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtSkeleton:
+					case cMonster::mtZombie:
+					case cMonster::mtWither:
+					case cMonster::mtZombiePigman:
+					{
+						a_TDI.RawDamage += 2.5 * SmiteLevel;
+						break;
+					}
+				}
+			}
+		}
+		else if (BaneOfArthropodsLevel > 0)
+		{
+			if (IsMob())
+			{
+				cMonster * Monster = (cMonster *)this;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtSpider:
+					case cMonster::mtCaveSpider:
+					case cMonster::mtSilverfish:
+					{
+						a_TDI.RawDamage += 2.5 * BaneOfArthropodsLevel;
+						break;
+					}
+				}
+			}
+		}
+
+		int FireAspectLevel = Enchantments.GetLevel(cEnchantments::enchFireAspect);
+		if (FireAspectLevel > 0)
+		{
+			int BurnTicks = 3;
+
+			if (FireAspectLevel > 1)
+			{
+				BurnTicks += 4 * (FireAspectLevel - 1);
+			}
+
+			StartBurning(BurnTicks * 20);
+		}
+	
+		if (!Player->IsOnGround())
+		{		
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage += 2;

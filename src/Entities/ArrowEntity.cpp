@@ -18,6 +18,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	m_HitGroundTimer(0),
 	m_HasTeleported(false),
 	m_bIsCollected(false),
+	m_Creator(a_Creator),
 	m_HitBlockPos(Vector3i(0, 0, 0))
 {
 	SetSpeed(a_Speed);
@@ -43,6 +44,7 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	m_HitGroundTimer(0),
 	m_HasTeleported(false),
 	m_bIsCollected(false),
+	m_Creator(&a_Player),
 	m_HitBlockPos(0, 0, 0)
 {
 	if (a_Player.IsGameModeCreative())
@@ -68,9 +70,6 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 }
 
 
-
-
-
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
 	if (GetSpeed().EqualsEps(Vector3d(0, 0, 0), 0.0000001))
@@ -90,6 +89,13 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+
+	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && (m_TicksLeftBurning > 0))
+	{
+		m_World->SetBlock(X, Y, Z, E_BLOCK_AIR, 0);
+		m_World->SpawnPrimedTNT(X, Y, Z);
+	}
+
 }
 
 
@@ -103,8 +109,22 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
 	}
+	LOGD("Arrow hit an entity");
+
+	int PowerLevel = m_Creator->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPower);
+	if (PowerLevel > 0)
+	{
+		LOGD("Arrow hit an entity 2");
+		int ExtraDamage = 0.25 * (PowerLevel + 1);
+		Damage += ceil(ExtraDamage);
+	}
 	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
+	if (m_TicksLeftBurning > 0)
+	{
+		a_EntityHit.StartBurning(100);
+	}
+
 	// Broadcast successful hit sound
 	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	
