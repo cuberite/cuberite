@@ -109,18 +109,32 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
 	}
-	LOGD("Arrow hit an entity");
 
 	int PowerLevel = m_Creator->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPower);
 	if (PowerLevel > 0)
 	{
-		LOGD("Arrow hit an entity 2");
 		int ExtraDamage = 0.25 * (PowerLevel + 1);
 		Damage += ceil(ExtraDamage);
 	}
-	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
+
+	int KnockbackAmount = 1;
+	int PunchLevel = m_Creator->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
+	if (PunchLevel > 0)
+	{
+		Vector3f LookVector = m_Creator->GetLookVector();
+		Vector3f FinalSpeed = Vector3f(0, 0, 0);
+		switch (PunchLevel)
+		{
+			case 1: FinalSpeed = LookVector * Vector3d(5, 0.3, 5);
+			case 2: FinalSpeed = LookVector * Vector3d(8, 0.3, 8);
+			default: break;
+		}
+		a_EntityHit.SetSpeed(FinalSpeed);
+	}
+
+	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);
 	
-	if (m_TicksLeftBurning > 0)
+	if ((m_TicksLeftBurning > 0 && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming()))
 	{
 		a_EntityHit.StartBurning(100);
 	}

@@ -91,6 +91,7 @@ protected:
 	/// If true, the arrow is in the process of being collected - don't go to anyone else
 	bool m_bIsCollected;
 
+	// Stores the creator from that arrow
 	cEntity * m_Creator;
 
 	/// Stores the block position that arrow is lodged into, sets m_IsInGround to false if it becomes air

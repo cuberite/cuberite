@@ -316,7 +316,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
-		
+		// Thanks to daniel0916
 		cEnchantments Enchantments = Player->GetEquippedItem().m_Enchantments;
 		
 		int SharpnessLevel = Enchantments.GetLevel(cEnchantments::enchSharpness);
@@ -372,8 +372,27 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			{
 				BurnTicks += 4 * (FireAspectLevel - 1);
 			}
+			if (!IsMob() && !IsSubmerged() && !IsSwimming())
+			{
+				StartBurning(BurnTicks * 20);
+			}
+			else if (IsMob() && !IsSubmerged() && !IsSwimming())
+			{
+				cMonster * Monster = (cMonster *)this;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtGhast:
+					case cMonster::mtZombiePigman:
+					case cMonster::mtMagmaCube:
+					{
+						
+						break;
+					};
+					default:StartBurning(BurnTicks * 20);
+				}
+			}
 
-			StartBurning(BurnTicks * 20);
+			
 		}
 	
 		if (!Player->IsOnGround())
@@ -410,7 +429,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
 			default: break;
 		}
-		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
+		SetSpeed(a_TDI.Knockback + AdditionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
