@@ -1,14 +1,15 @@
 #pragma once
-#include "../Entities/Entity.h"
 
-class cMonster;
+class cNewMonster;
+class cEntity;
+class cChunk;
 
 class cAIComponent
 {
 protected:
-	cMonster * m_Self;
+	cNewMonster * m_Self;
 public:
-	cAIComponent(cMonster * a_Entity);
+	cAIComponent(cNewMonster * a_Entity);
 	virtual ~cAIComponent(){}
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk){}
