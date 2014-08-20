@@ -18,10 +18,10 @@ public:
 
 	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		return m_ChunkMap->GetBlock(a_BlockX,a_BlockY,a_BlockZ);
+		return m_ChunkMap->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 	}
 	BLOCKTYPE GetBlock(const Vector3i & a_Pos)
-	{ 
+	{
 		return GetBlock(a_Pos.x, a_Pos.y, a_Pos.z);
 	}
 	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
@@ -61,9 +61,9 @@ public:
 		m_ChunkMap->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	}
 	
-	void FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )
+	void FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta );
+		FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta);
 	}
 
 	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ)

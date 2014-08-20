@@ -57,6 +57,12 @@ public:
 		}
 		Force = std::min(Force, 1.0);
 
+		// Does the player have an arrow?
+		if (!a_Player->IsGameModeCreative() && !a_Player->GetInventory().HasItems(cItem(E_ITEM_ARROW)))
+		{
+			return;
+		}
+
 		// Create the arrow entity:
 		cArrowEntity * Arrow = new cArrowEntity(*a_Player, Force * 2);
 		if (Arrow == NULL)
@@ -70,9 +76,13 @@ public:
 			return;
 		}
 
-		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", (int)a_Player->GetPosX() * 8, (int)a_Player->GetPosY() * 8, (int)a_Player->GetPosZ() * 8, 0.5, (float)Force);
+		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), 0.5, (float)Force);
 		if (!a_Player->IsGameModeCreative())
 		{
+			if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchInfinity) == 0)
+			{
+				a_Player->GetInventory().RemoveItem(cItem(E_ITEM_ARROW));
+			}
 			a_Player->UseEquippedItem();
 		}
 	}

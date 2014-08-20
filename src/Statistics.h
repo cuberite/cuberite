@@ -62,7 +62,7 @@ enum eStatistic
 	statDistDove,
 	statDistMinecart,
 	statDistBoat,
-	statDistPig,	
+	statDistPig,
 	statDistHorse,
 	statJumps,
 	statItemsDropped,
@@ -118,7 +118,7 @@ private:
 
 
 /* Signed (?) integral value. */
-typedef int StatValue; // tolua_export
+typedef int StatValue;  // tolua_export
 
 
 
@@ -143,10 +143,9 @@ public:
 	/** Reset everything. */
 	void Reset();
 
-	/** Increment the specified stat.
-	 *
-	 * Returns the new value.
-	 */
+	/** Increments the specified stat.
+	Returns the new value.
+	*/
 	StatValue AddValue(const eStatistic a_Stat, const StatValue a_Delta = 1);
 
 	// tolua_end
@@ -158,7 +157,7 @@ private:
 	// TODO 10-05-2014 xdot: Use, mine, craft statistics
 
 
-}; // tolua_export
+};  // tolua_export
 
 
 

@@ -51,10 +51,12 @@ class cBlockEntityWithItems;
 
 
 
-class cPluginManager													// tolua_export
-{																		// tolua_export
-public:																	// tolua_export
-
+// tolua_begin
+class cPluginManager
+{
+public:
+	// tolua_end
+	
 	// Called each tick
 	virtual void Tick(float a_Dt);
 	
@@ -82,6 +84,7 @@ public:																	// tolua_export
 		HOOK_CRAFTING_NO_RECIPE,
 		HOOK_DISCONNECT,
 		HOOK_PLAYER_ANIMATION,
+		HOOK_ENTITY_ADD_EFFECT,
 		HOOK_EXECUTE_COMMAND,
 		HOOK_EXPLODED,
 		HOOK_EXPLODING,
@@ -156,15 +159,17 @@ public:																	// tolua_export
 	
 	
 	/** Returns the instance of the Plugin Manager (there is only ever one) */
-	static cPluginManager * Get(void);							// tolua_export
+	static cPluginManager * Get(void);  // tolua_export
 
 	typedef std::map< AString, cPlugin * > PluginMap;
 	typedef std::list< cPlugin * > PluginList;
-	cPlugin * GetPlugin( const AString & a_Plugin ) const;				// tolua_export
-	const PluginMap & GetAllPlugins() const;							// >> EXPORTED IN MANUALBINDINGS <<
+	cPlugin * GetPlugin( const AString & a_Plugin) const;  // tolua_export
+	const PluginMap & GetAllPlugins() const;  // >> EXPORTED IN MANUALBINDINGS <<
 
-	void FindPlugins();													// tolua_export
-	void ReloadPlugins();												// tolua_export
+	// tolua_begin
+	void FindPlugins();
+	void ReloadPlugins();
+	// tolua_end
 	
 	/** Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
@@ -183,13 +188,14 @@ public:																	// tolua_export
 	bool CallHookCollectingPickup         (cPlayer * a_Player, cPickup & a_Pickup);
 	bool CallHookCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
+	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle * a_ClientHandle, const AString & a_Username);
 	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer);
+	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -200,7 +206,7 @@ public:																	// tolua_export
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
-	bool CallHookPlayerMoving             (cPlayer & a_Player);
+	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -333,8 +339,8 @@ private:
 	bool AddPlugin(cPlugin * a_Plugin);
 
 	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
-	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);	
-} ; // tolua_export
+	cPluginManager::CommandResult HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
+} ;  // tolua_export
 
 
 

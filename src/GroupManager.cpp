@@ -27,7 +27,7 @@ struct cGroupManager::sGroupManagerState
 
 cGroupManager::~cGroupManager()
 {
-	for( GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr )
+	for (GroupMap::iterator itr = m_pState->Groups.begin(); itr != m_pState->Groups.end(); ++itr)
 	{
 		delete itr->second;
 		itr->second = NULL;
@@ -43,7 +43,7 @@ cGroupManager::~cGroupManager()
 
 
 cGroupManager::cGroupManager()
-	: m_pState( new sGroupManagerState )
+	: m_pState( new sGroupManagerState)
 {
 	LOGD("-- Loading Groups --");
 	
@@ -125,7 +125,7 @@ bool cGroupManager::LoadGroups()
 		IniFile.SetValue("Owner", "Permissions", "*", true);
 		IniFile.SetValue("Owner", "Color", "2", true);
 
-		IniFile.SetValue("Moderator", "Permissions", "core.time,core.item,core.tpa,core.tpaccept,core.ban,core.unban,core.save-all,core.toggledownfall");
+		IniFile.SetValue("Moderator", "Permissions", "core.time, core.item, core.tpa, core.tpaccept, core.ban, core.unban, core.save-all, core.toggledownfall");
 		IniFile.SetValue("Moderator", "Color", "2", true);
 		IniFile.SetValue("Moderator", "Inherits", "Player", true);
 
@@ -133,7 +133,7 @@ bool cGroupManager::LoadGroups()
 		IniFile.SetValue("Player", "Color", "f", true);
 		IniFile.SetValue("Player", "Inherits", "Default", true);
 
-		IniFile.SetValue("Default", "Permissions", "core.help,core.plugins,core.spawn,core.worlds,core.back,core.motd,core.build,core.locate,core.viewdistance", true);
+		IniFile.SetValue("Default", "Permissions", "core.help, core.plugins, core.spawn, core.worlds, core.back, core.motd, core.build, core.locate, core.viewdistance", true);
 		IniFile.SetValue("Default", "Color", "f", true);
 
 		IniFile.WriteFile("groups.ini");
@@ -145,7 +145,7 @@ bool cGroupManager::LoadGroups()
 		AString KeyName = IniFile.GetKeyName(i);
 		cGroup * Group = GetGroup(KeyName.c_str());
 		
-		Group->ClearPermission(); // Needed in case the groups are reloaded.
+		Group->ClearPermission();  // Needed in case the groups are reloaded.
 
 		LOGD("Loading group %s", KeyName.c_str());
 
@@ -153,7 +153,7 @@ bool cGroupManager::LoadGroups()
 		AString Color = IniFile.GetValue(KeyName, "Color", "-");
 		if ((Color != "-") && (Color.length() >= 1))
 		{
-			Group->SetColor(cChatColor::Color + Color[0]);
+			Group->SetColor(AString(cChatColor::Delimiter) + Color[0]);
 		}
 		else
 		{
@@ -198,20 +198,20 @@ bool cGroupManager::LoadGroups()
 
 
 
-bool cGroupManager::ExistsGroup( const AString & a_Name )
+bool cGroupManager::ExistsGroup( const AString & a_Name)
 {
-	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
-	return ( itr != m_pState->Groups.end() );
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name);
+	return ( itr != m_pState->Groups.end());
 }
 
 
 
 
 
-cGroup* cGroupManager::GetGroup( const AString & a_Name )
+cGroup* cGroupManager::GetGroup( const AString & a_Name)
 {
-	GroupMap::iterator itr = m_pState->Groups.find( a_Name );
-	if( itr != m_pState->Groups.end() )
+	GroupMap::iterator itr = m_pState->Groups.find( a_Name);
+	if (itr != m_pState->Groups.end())
 	{
 		return itr->second;
 	}

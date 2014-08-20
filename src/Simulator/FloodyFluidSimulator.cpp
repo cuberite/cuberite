@@ -48,7 +48,7 @@ cFloodyFluidSimulator::cFloodyFluidSimulator(
 
 void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	FLOG("Simulating block {%d, %d, %d}: block %d, meta %d", 
+	FLOG("Simulating block {%d, %d, %d}: block %d, meta %d",
 		a_Chunk->GetPosX() * cChunkDef::Width + a_RelX, a_RelY, a_Chunk->GetPosZ() * cChunkDef::Width + a_RelZ,
 		a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ),
 		a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ)
@@ -248,13 +248,13 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		{
 			// Lava flowing into water, change to stone / cobblestone based on direction:
 			BLOCKTYPE NewBlock = (a_NewMeta == 8) ? E_BLOCK_STONE : E_BLOCK_COBBLESTONE;
-			FLOG("  Lava flowing into water, turning water at rel {%d, %d, %d} into stone", 
+			FLOG("  Lava flowing into water, turning water at rel {%d, %d, %d} into stone",
 				a_RelX, a_RelY, a_RelZ,
 				ItemTypeToString(NewBlock).c_str()
 			);
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			a_NearChunk->BroadcastSoundEffect("random.fizz", BlockX * 8, a_RelY * 8, BlockZ * 8, 0.5f, 1.5f);
+			a_NearChunk->BroadcastSoundEffect("random.fizz", (double)BlockX, (double)a_RelY, (double)BlockZ, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -264,12 +264,12 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		{
 			// Water flowing into lava, change to cobblestone / obsidian based on dest block:
 			BLOCKTYPE NewBlock = (BlockMeta == 0) ? E_BLOCK_OBSIDIAN : E_BLOCK_COBBLESTONE;
-			FLOG("  Water flowing into lava, turning lava at rel {%d, %d, %d} into %s", 
+			FLOG("  Water flowing into lava, turning lava at rel {%d, %d, %d} into %s",
 				a_RelX, a_RelY, a_RelZ, ItemTypeToString(NewBlock).c_str()
 			);
 			a_NearChunk->SetBlock(a_RelX, a_RelY, a_RelZ, NewBlock, 0);
 
-			a_NearChunk->BroadcastSoundEffect("random.fizz", BlockX * 8, a_RelY * 8, BlockZ * 8, 0.5f, 1.5f);
+			a_NearChunk->BroadcastSoundEffect("random.fizz", (double)BlockX, (double)a_RelY, (double)BlockZ, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -296,8 +296,8 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				ChunkInterface,
 				m_World,
 				PluginInterface,
-				NULL, 
-				BlockX, 
+				NULL,
+				BlockX,
 				a_RelY,
 				BlockZ
 			);

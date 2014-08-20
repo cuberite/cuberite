@@ -16,13 +16,6 @@ public:
 	{
 	}
 
-
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
-	{
-		a_Pickups.push_back(cItem(E_BLOCK_WOOL, 1, a_BlockMeta));
-	}
-
-
 	virtual const char * GetStepSound(void) override
 	{
 		return "step.cloth";

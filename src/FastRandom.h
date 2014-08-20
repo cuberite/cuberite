@@ -44,6 +44,9 @@ public:
 	/// Returns a random float in the range [0 .. a_Range]; a_Range must be less than 1M; a_Salt is additional source of randomness
 	float NextFloat(float a_Range, int a_Salt);
 
+	/** Returns a random float between 0 and 1. */
+	float NextFloat(void) { return NextFloat(1); };
+
 	/** Returns a random int in the range [a_Begin .. a_End] */
 	int GenerateRandomInteger(int a_Begin, int a_End);
 	

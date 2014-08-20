@@ -14,18 +14,18 @@
 	#pragma warning(disable:4481)
 
 	// Disable some warnings that we don't care about:
-	#pragma warning(disable:4100) // Unreferenced formal parameter
-    
-    // Useful warnings from warning level 4:
-	#pragma warning(3 : 4127) // Conditional expression is constant
-	#pragma warning(3 : 4189) // Local variable is initialized but not referenced
-	#pragma warning(3 : 4245) // Conversion from 'type1' to 'type2', signed/unsigned mismatch
-	#pragma warning(3 : 4310) // Cast truncates constant value
-	#pragma warning(3 : 4389) // Signed/unsigned mismatch
-	#pragma warning(3 : 4505) // Unreferenced local function has been removed
-	#pragma warning(3 : 4701) // Potentially unitialized local variable used
-	#pragma warning(3 : 4702) // Unreachable code
-	#pragma warning(3 : 4706) // Assignment within conditional expression
+	#pragma warning(disable:4100)  // Unreferenced formal parameter
+
+	// Useful warnings from warning level 4:
+	#pragma warning(3 : 4127)  // Conditional expression is constant
+	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
+	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed/unsigned mismatch
+	#pragma warning(3 : 4310)  // Cast truncates constant value
+	#pragma warning(3 : 4389)  // Signed/unsigned mismatch
+	#pragma warning(3 : 4505)  // Unreferenced local function has been removed
+	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
+	#pragma warning(3 : 4702)  // Unreachable code
+	#pragma warning(3 : 4706)  // Assignment within conditional expression
 	
 	// Disabling this warning, because we know what we're doing when we're doing this:
 	#pragma warning(disable: 4355)  // 'this' used in initializer list
@@ -34,7 +34,7 @@
 	#pragma warning(disable: 4512)  // 'class': assignment operator could not be generated - reported for each class that has a reference-type member
 	
 	// 2014_01_06 xoft: Disabled this warning because MSVC is stupid and reports it in obviously wrong places
-	// #pragma warning(3 : 4244) // Conversion from 'type1' to 'type2', possible loss of data
+	// #pragma warning(3 : 4244)  // Conversion from 'type1' to 'type2', possible loss of data
 
 	#define OBSOLETE __declspec(deprecated)
 
@@ -58,8 +58,8 @@
 
 	// override is part of c++11
 	#if __cplusplus < 201103L
-  		#define override
-	#endif	
+		#define override
+	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
 
@@ -145,7 +145,7 @@ class SizeChecker;
 template <typename T, size_t Size>
 class SizeChecker<T, Size, true>
 {
-  T v;
+	T v;
 };
 
 template class SizeChecker<Int64, 8>;
@@ -156,11 +156,11 @@ template class SizeChecker<UInt64, 8>;
 template class SizeChecker<UInt32, 4>;
 template class SizeChecker<UInt16, 2>;
 
-// A macro to disallow the copy constructor and operator= functions
+// A macro to disallow the copy constructor and operator = functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
 	TypeName(const TypeName &); \
-	void operator=(const TypeName &)
+	void operator =(const TypeName &)
 
 // A macro that is used to mark unused function parameters, to avoid pedantic warnings in gcc
 #define UNUSED(X) (void)(X)
@@ -249,10 +249,10 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/Event.h"
 	#include "OSSupport/Thread.h"
 	#include "OSSupport/File.h"
-	#include "MCLogger.h"
+	#include "Logger.h"
 #else
 	// Logging functions
-void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1,2);
+void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
 
 void inline LOGERROR(const char* a_Format, ...)
 {
@@ -272,12 +272,12 @@ void inline LOGERROR(const char* a_Format, ...)
 /// Evaluates to the number of elements in an array (compile-time!)
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
-/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)" )
+/// Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)")
 #define KiB * 1024
 #define MiB * 1024 * 1024
 
 /// Faster than (int)floorf((float)x / (float)div)
-#define FAST_FLOOR_DIV( x, div ) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
+#define FAST_FLOOR_DIV( x, div) (((x) - (((x) < 0) ? ((div) - 1) : 0)) / (div))
 
 // Own version of assert() that writes failed assertions to the log for review
 #ifdef TEST_GLOBALS
@@ -309,19 +309,19 @@ void inline LOGERROR(const char* a_Format, ...)
 		}
 	#endif
 	#define ASSERT(x) do { if (!(x)) { throw cAssertFailure();} } while (0)
-	#define testassert(x) do { if(!(x)) { REPORT_ERROR("Test failure: %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } } while (0)
+	#define testassert(x) do { if (!(x)) { REPORT_ERROR("Test failure: %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } } while (0)
 	#define CheckAsserts(x) do { try {x} catch (cAssertFailure) { break; } REPORT_ERROR("Test failure: assert didn't fire for %s, file %s, line %d\n", #x, __FILE__, __LINE__); exit(1); } while (0)
 
 #else
 	#ifdef  _DEBUG
-		#define ASSERT( x ) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), assert(0), 0 ) )
+		#define ASSERT( x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), assert(0), 0))
 	#else
 		#define ASSERT(x) ((void)(x))
 	#endif
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY( x ) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__ ), exit(1), 0 ) )
+#define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST
@@ -383,6 +383,5 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
-#include "Entities/Effects.h"
 
 

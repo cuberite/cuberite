@@ -12,6 +12,7 @@
 #include "../Bindings/PluginManager.h"
 #include "../Tracer.h"
 #include "Player.h"
+#include "Items/ItemHandler.h"
 
 
 
@@ -37,6 +38,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Gravity(-9.81f)
 	, m_LastPos(a_X, a_Y, a_Z)
 	, m_IsInitialized(false)
+	, m_WorldTravellingFrom(NULL)
 	, m_EntityType(a_EntityType)
 	, m_World(NULL)
 	, m_IsFireproof(false)
@@ -49,6 +51,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_IsSubmerged(false)
 	, m_AirLevel(0)
 	, m_AirTickTimer(0)
+	, m_TicksAlive(0)
 	, m_HeadYaw(0.0)
 	, m_Rot(0.0, 0.0, 0.0)
 	, m_Pos(a_X, a_Y, a_Z)
@@ -74,7 +77,7 @@ cEntity::~cEntity()
 	
 	/*
 	// DEBUG:
-	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p", 
+	LOGD("Deleting entity %d at pos {%.2f, %.2f, %.2f} ~ [%d, %d]; ptr %p",
 		m_UniqueID,
 		m_Pos.x, m_Pos.y, m_Pos.z,
 		(int)(m_Pos.x / cChunkDef::Width), (int)(m_Pos.z / cChunkDef::Width),
@@ -241,9 +244,9 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	Vector3d Heading(0, 0, 0);
 	if (a_Attacker != NULL)
 	{
-		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 10 : 8);
+		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
+		Heading.y = 1.6;
 	}
-	Heading.y = 2;
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
 	DoTakeDamage(TDI);
@@ -272,7 +275,7 @@ void cEntity::SetYawFromSpeed(void)
 void cEntity::SetPitchFromSpeed(void)
 {
 	const double EPS = 0.0000001;
-	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z); // Speed XZ-plane component
+	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
 	if ((abs(xz) < EPS) && (abs(m_Speed.y) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
@@ -288,11 +291,6 @@ void cEntity::SetPitchFromSpeed(void)
 
 bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
-	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
-	{
-		return false;
-	}
-
 	if (m_Health <= 0)
 	{
 		// Can't take damage if already dead
@@ -305,15 +303,26 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
+	{
+		return false;
+	}
+
 	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = (cPlayer *)a_TDI.Attacker;
 
+		Player->GetEquippedItem().GetHandler()->OnEntityAttack(Player, this);
+
 		// IsOnGround() only is false if the player is moving downwards
-		if (!Player->IsOnGround()) // TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
+		if (!Player->IsOnGround())
 		{
-			a_TDI.FinalDamage += 2;
-			m_World->BroadcastEntityAnimation(*this, 4); // Critical hit
+			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
+			{
+				a_TDI.FinalDamage += 2;
+				m_World->BroadcastEntityAnimation(*this, 4);  // Critical hit
+			}
 		}
 
 		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
@@ -323,43 +332,25 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	
 	// TODO: Apply damage to armor
 	
-	if (m_Health < 0)
-	{
-		m_Health = 0;
-	}
+	m_Health = std::max(m_Health, 0);
 
-	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL)) // Knockback for only players and mobs
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{
-		int KnockbackLevel = 0;
-		if (a_TDI.Attacker->GetEquippedWeapon().m_ItemType == E_ITEM_BOW)
+		int KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);  // More common enchantment
+		if (KnockbackLevel < 1)
 		{
+			// We support punch on swords and vice versa! :)
 			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchPunch);
 		}
-		else
-		{
-			KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);
-		}
 
-		Vector3d additionalSpeed(0, 0, 0);
+		Vector3d AdditionalSpeed(0, 0, 0);
 		switch (KnockbackLevel)
 		{
-			case 1:
-			{
-				additionalSpeed.Set(5, .3, 5);
-				break;
-			}
-			case 2:
-			{
-				additionalSpeed.Set(8, .3, 8);
-				break;
-			}
-			default:
-			{
-				additionalSpeed.Set(2, .3, 2);
-				break;
-			}
+			case 1: AdditionalSpeed.Set(5, 0.3, 5); break;
+			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
+			default: break;
 		}
-		AddSpeed(a_TDI.Knockback * additionalSpeed);
+		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -368,7 +359,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if (m_Health <= 0)
 	{
-		KilledBy(a_TDI.Attacker);
+		KilledBy(a_TDI);
 
 		if (a_TDI.Attacker != NULL)
 		{
@@ -431,6 +422,7 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 		case dtStarving:
 		case dtInVoid:
 		case dtPoisoning:
+		case dtWithering:
 		case dtPotionOfHarming:
 		case dtFalling:
 		case dtLightning:
@@ -524,11 +516,11 @@ double cEntity::GetKnockbackAmountAgainst(const cEntity & a_Receiver)
 
 
 
-void cEntity::KilledBy(cEntity * a_Killer)
+void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 {
 	m_Health = 0;
 
-	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_Killer);
+	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI.Attacker, a_TDI);
 	
 	if (m_Health > 0)
 	{
@@ -538,7 +530,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 
 	// Drop loot:
 	cItems Drops;
-	GetDrops(Drops, a_Killer);
+	GetDrops(Drops, a_TDI.Attacker);
 	m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ());
 
 	m_World->BroadcastEntityStatus(*this, esGenericDead);
@@ -551,10 +543,7 @@ void cEntity::KilledBy(cEntity * a_Killer)
 void cEntity::Heal(int a_HitPoints)
 {
 	m_Health += a_HitPoints;
-	if (m_Health > m_MaxHealth)
-	{
-		m_Health = m_MaxHealth;
-	}
+	m_Health = std::min(m_Health, m_MaxHealth);
 }
 
 
@@ -563,7 +552,7 @@ void cEntity::Heal(int a_HitPoints)
 
 void cEntity::SetHealth(int a_Health)
 {
-	m_Health = std::max(0, std::min(m_MaxHealth, a_Health));
+	m_Health = Clamp(a_Health, 0, m_MaxHealth);
 }
 
 
@@ -572,6 +561,8 @@ void cEntity::SetHealth(int a_Health)
 
 void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	m_TicksAlive++;
+	
 	if (m_InvulnerableTicks > 0)
 	{
 		m_InvulnerableTicks--;
@@ -624,9 +615,12 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			// Handle drowning
 			HandleAir();
 		}
-
-		// None of the above functions change position, we remain in the chunk of NextChunk
-		HandlePhysics(a_Dt, *NextChunk);
+		
+		if (!DetectPortal())  // Our chunk is invalid if we have moved to another world
+		{
+			// None of the above functions changed position, we remain in the chunk of NextChunk
+			HandlePhysics(a_Dt, *NextChunk);
+		}
 	}
 }
 
@@ -650,7 +644,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
-		// Outside of the world		
+		// Outside of the world
 		AddSpeedY(m_Gravity * a_Dt);
 		AddPosition(GetSpeed() * a_Dt);
 		return;
@@ -658,7 +652,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ );
+	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
 	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
@@ -737,21 +731,19 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		NextSpeed.y += fallspeed;
 	}
-	else
+
+	// Friction
+	if (NextSpeed.SqrLength() > 0.0004f)
 	{
-		// Friction
-		if (NextSpeed.SqrLength() > 0.0004f)
+		NextSpeed.x *= 0.7f / (1 + a_Dt);
+		if (fabs(NextSpeed.x) < 0.05)
 		{
-			NextSpeed.x *= 0.7f / (1 + a_Dt);
-			if (fabs(NextSpeed.x) < 0.05)
-			{
-				NextSpeed.x = 0;
-			}
-			NextSpeed.z *= 0.7f / (1 + a_Dt);
-			if (fabs(NextSpeed.z) < 0.05)
-			{
-				NextSpeed.z = 0;
-			}
+			NextSpeed.x = 0;
+		}
+		NextSpeed.z *= 0.7f / (1 + a_Dt);
+		if (fabs(NextSpeed.z) < 0.05)
+		{
+			NextSpeed.z = 0;
 		}
 	}
 
@@ -762,13 +754,13 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		NextSpeed.x *= 0.25;
 		NextSpeed.z *= 0.25;
 	}
-					
-	//Get water direction
+
+	// Get water direction
 	Direction WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
 
-	m_WaterSpeed *= 0.9f;		//Reduce speed each tick
+	m_WaterSpeed *= 0.9f;  // Reduce speed each tick
 
-	switch(WaterDir)
+	switch (WaterDir)
 	{
 		case X_PLUS:
 			m_WaterSpeed.x = 0.2f;
@@ -823,7 +815,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-				if (Tracer.HitNormal.y == 1) // Hit BLOCK_FACE_YP, we are on the ground
+				if (Tracer.HitNormal.y == 1)  // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
@@ -863,12 +855,12 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 	// Remember the current burning state:
 	bool HasBeenBurning = (m_TicksLeftBurning > 0);
 
-	if (m_World->IsWeatherWet())
+	if (GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT))
 	{
 		if (POSY_TOINT > m_World->GetHeight(POSX_TOINT, POSZ_TOINT))
 		{
 			m_TicksLeftBurning = 0;
-		}		
+		}
 	}
 	
 	// Do the burning damage:
@@ -1034,6 +1026,178 @@ void cEntity::DetectCacti(void)
 
 
 
+bool cEntity::DetectPortal()
+{
+	if (GetWorld()->GetDimension() == dimOverworld)
+	{
+		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty())
+		{
+			// Teleportation to either dimension not enabled, don't bother proceeding
+			return false;
+		}
+	}
+	else if (GetWorld()->GetLinkedOverworldName().empty())
+	{
+		// Overworld teleportation disabled, abort
+		return false;
+	}
+
+	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
+	if ((Y > 0) && (Y < cChunkDef::Height))
+	{
+		switch (GetWorld()->GetBlock(X, Y, Z))
+		{
+			case E_BLOCK_NETHER_PORTAL:
+			{
+				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
+				{
+					// Just exited a portal, don't teleport again
+					return false;
+				}
+
+				if (IsPlayer() && !((cPlayer *)this)->IsGameModeCreative() && m_PortalCooldownData.m_TicksDelayed != 80)
+				{
+					// Delay teleportation for four seconds if the entity is a non-creative player
+					m_PortalCooldownData.m_TicksDelayed++;
+					return false;
+				}
+				m_PortalCooldownData.m_TicksDelayed = 0;
+
+				if (GetWorld()->GetDimension() == dimNether)
+				{
+					if (GetWorld()->GetLinkedOverworldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;  // Stop portals from working on respawn
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimOverworld);  // Send a respawn packet before world is loaded/generated so the client isn't left in limbo
+					}
+					
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+				}
+				else
+				{
+					if (GetWorld()->GetNetherWorldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->AwardAchievement(achEnterPortal);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
+					}
+					
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+				}
+			}
+			case E_BLOCK_END_PORTAL:
+			{
+				if (m_PortalCooldownData.m_ShouldPreventTeleportation)
+				{
+					return false;
+				}
+
+				if (GetWorld()->GetDimension() == dimEnd)
+				{
+					
+					if (GetWorld()->GetLinkedOverworldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						cPlayer * Player = (cPlayer *)this;
+						Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+						Player->GetClientHandle()->SendRespawn(dimOverworld);
+					}
+
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedOverworldName()), false);
+				}
+				else
+				{
+					if (GetWorld()->GetEndWorldName().empty())
+					{
+						return false;
+					}
+
+					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
+
+					if (IsPlayer())
+					{
+						((cPlayer *)this)->AwardAchievement(achEnterTheEnd);
+						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
+					}
+
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+				}
+				
+			}
+			default: break;
+		}
+	}
+
+	// Allow portals to work again
+	m_PortalCooldownData.m_ShouldPreventTeleportation = false;
+	m_PortalCooldownData.m_TicksDelayed = 0;
+	return false;
+}
+
+
+
+
+
+bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
+{
+	UNUSED(a_ShouldSendRespawn);
+	ASSERT(a_World != NULL);
+
+	if (GetWorld() == a_World)
+	{
+		// Don't move to same world
+		return false;
+	}
+
+	// Remove all links to the old world
+	SetWorldTravellingFrom(GetWorld());  // cChunk::Tick() handles entity removal
+	GetWorld()->BroadcastDestroyEntity(*this);
+
+	// Queue add to new world
+	a_World->AddEntity(this);
+	SetWorld(a_World);
+
+	return true;
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
+{
+	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
+	if (World == NULL)
+	{
+		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
+		return false;
+	}
+
+	return DoMoveToWorld(World, a_ShouldSendRespawn);
+}
+
+
+
+
+
 void cEntity::SetSwimState(cChunk & a_Chunk)
 {
 	int RelY = (int)floor(GetPosY() + 0.1);
@@ -1090,17 +1254,17 @@ void cEntity::HandleAir(void)
 
 	if (IsSubmerged())
 	{
-		if (!IsPlayer()) // Players control themselves
+		if (!IsPlayer())  // Players control themselves
 		{
-			SetSpeedY(1); // Float in the water
+			SetSpeedY(1);  // Float in the water
 		}
 
-		// Either reduce air level or damage player
-		if (m_AirLevel < 1)
+		if (m_AirLevel <= 0)
 		{
-			if (m_AirTickTimer < 1)
+			// Runs the air tick timer to check whether the player should be damaged
+			if (m_AirTickTimer <= 0)
 			{
-				// Damage player 
+				// Damage player
 				TakeDamage(dtDrowning, NULL, 1, 1, 0);
 				// Reset timer
 				m_AirTickTimer = DROWNING_TICKS;
@@ -1156,10 +1320,7 @@ void cEntity::SetMaxHealth(int a_MaxHealth)
 	m_MaxHealth = a_MaxHealth;
 
 	// Reset health, if too high:
-	if (m_Health > a_MaxHealth)
-	{
-		m_Health = a_MaxHealth;
-	}
+	m_Health = std::min(m_Health, a_MaxHealth);
 }
 
 
@@ -1261,9 +1422,9 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		int DiffY = (int)(floor(GetPosY() * 32.0) - floor(m_LastPos.y * 32.0));
 		int DiffZ = (int)(floor(GetPosZ() * 32.0) - floor(m_LastPos.z * 32.0));
 
-		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0)) // Have we moved?
+		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127)) // Limitations of a Byte
+			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
 			{
 				// Difference within Byte limitations, use a relative move packet
 				if (m_bDirtyOrientation)
@@ -1283,7 +1444,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 			{
 				// Too big a movement, do a teleport
 				m_World->BroadcastTeleportEntity(*this, a_Exclude);
-				m_LastPos = GetPosition(); // See above
+				m_LastPos = GetPosition();  // See above
 				m_bDirtyOrientation = false;
 			}
 		}
@@ -1386,17 +1547,10 @@ void cEntity::SetHeight(double a_Height)
 
 void cEntity::SetMass(double a_Mass)
 {
-	if (a_Mass > 0)
-	{
-		m_Mass = a_Mass;
-	}
-	else
-	{
-		// Make sure that mass is not zero. 1g is the default because we 
-		// have to choose a number. It's perfectly legal to have a mass 
-		// less than 1g as long as is NOT equal or less than zero.
-		m_Mass = 0.001;
-	}
+	// Make sure that mass is not zero. 1g is the default because we
+	// have to choose a number. It's perfectly legal to have a mass
+	// less than 1g as long as is NOT equal or less than zero.
+	m_Mass = std::max(a_Mass, 0.001);
 }
 
 
@@ -1479,7 +1633,7 @@ void cEntity::SetWidth(double a_Width)
 
 void cEntity::AddPosX(double a_AddPosX)
 {
-	m_Pos.x += a_AddPosX;	
+	m_Pos.x += a_AddPosX;
 }
 
 
@@ -1487,7 +1641,7 @@ void cEntity::AddPosX(double a_AddPosX)
 
 void cEntity::AddPosY(double a_AddPosY)
 {
-	m_Pos.y += a_AddPosY;	
+	m_Pos.y += a_AddPosY;
 }
 
 
@@ -1495,7 +1649,7 @@ void cEntity::AddPosY(double a_AddPosY)
 
 void cEntity::AddPosZ(double a_AddPosZ)
 {
-	m_Pos.z += a_AddPosZ;	
+	m_Pos.z += a_AddPosZ;
 }
 
 
@@ -1505,7 +1659,7 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 {
 	m_Pos.x += a_AddPosX;
 	m_Pos.y += a_AddPosY;
-	m_Pos.z += a_AddPosZ;	
+	m_Pos.z += a_AddPosZ;
 }
 
 
@@ -1515,7 +1669,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 {
 	m_Speed.x += a_AddSpeedX;
 	m_Speed.y += a_AddSpeedY;
-	m_Speed.z += a_AddSpeedZ;	
+	m_Speed.z += a_AddSpeedZ;
 	WrapSpeed();
 }
 
@@ -1525,7 +1679,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 
 void cEntity::AddSpeedX(double a_AddSpeedX)
 {
-	m_Speed.x += a_AddSpeedX;	
+	m_Speed.x += a_AddSpeedX;
 	WrapSpeed();
 }
 
@@ -1535,7 +1689,7 @@ void cEntity::AddSpeedX(double a_AddSpeedX)
 
 void cEntity::AddSpeedY(double a_AddSpeedY)
 {
-	m_Speed.y += a_AddSpeedY;	
+	m_Speed.y += a_AddSpeedY;
 	WrapSpeed();
 }
 
@@ -1545,7 +1699,7 @@ void cEntity::AddSpeedY(double a_AddSpeedY)
 
 void cEntity::AddSpeedZ(double a_AddSpeedZ)
 {
-	m_Speed.z += a_AddSpeedZ;	
+	m_Speed.z += a_AddSpeedZ;
 	WrapSpeed();
 }
 
@@ -1582,7 +1736,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 
 
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Get look vector (this is NOT a rotation!)
 Vector3d cEntity::GetLookVector(void) const
 {
@@ -1596,11 +1750,11 @@ Vector3d cEntity::GetLookVector(void) const
 
 
 
-//////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Set position
 void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 {
-	m_Pos.Set(a_PosX, a_PosY, a_PosZ);	
+	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
 }
 
 
@@ -1609,7 +1763,7 @@ void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
 
 void cEntity::SetPosX(double a_PosX)
 {
-	m_Pos.x = a_PosX;	
+	m_Pos.x = a_PosX;
 }
 
 
@@ -1618,7 +1772,7 @@ void cEntity::SetPosX(double a_PosX)
 
 void cEntity::SetPosY(double a_PosY)
 {
-	m_Pos.y = a_PosY;	
+	m_Pos.y = a_PosY;
 }
 
 

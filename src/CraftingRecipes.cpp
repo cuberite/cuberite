@@ -12,7 +12,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingGrid:
 
 cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
@@ -135,7 +135,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 {
 	if ((a_Grid.m_Width != m_Width) || (a_Grid.m_Height != m_Height))
 	{
-		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)", 
+		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)",
 			a_Grid.m_Width, a_Grid.m_Height, m_Width, m_Height
 		);
 	}
@@ -196,7 +196,7 @@ void cCraftingGrid::Dump(void)
 		#ifdef _DEBUG
 		int idx = x + m_Width * y;
 		#endif
-		LOGD("Slot (%d, %d): Type %d, health %d, count %d", 
+		LOGD("Slot (%d, %d): Type %d, health %d, count %d",
 			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
 		);
 	}
@@ -206,7 +206,7 @@ void cCraftingGrid::Dump(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingRecipe:
 
 cCraftingRecipe::cCraftingRecipe(const cCraftingGrid & a_CraftingGrid) :
@@ -250,7 +250,7 @@ void cCraftingRecipe::Dump(void)
 {
 	LOGD("Recipe ingredients:");
 	m_Ingredients.Dump();
-	LOGD("Result: Type %d, health %d, count %d", 
+	LOGD("Result: Type %d, health %d, count %d",
 		m_Result.m_ItemType, m_Result.m_ItemDamage, m_Result.m_ItemCount
 	);
 }
@@ -259,7 +259,7 @@ void cCraftingRecipe::Dump(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingRecipes:
 
 cCraftingRecipes::cCraftingRecipes(void)
@@ -582,7 +582,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	// Get the real bounds of the crafting grid:
 	int GridLeft = MAX_GRID_WIDTH, GridTop = MAX_GRID_HEIGHT;
 	int GridRight = 0,  GridBottom = 0;
-	for (int y = 0; y < a_GridHeight; y++ ) for(int x = 0; x < a_GridWidth; x++)
+	for (int y = 0; y < a_GridHeight; y++) for (int x = 0; x < a_GridWidth; x++)
 	{
 		if (!a_CraftingGrid[x + y * a_GridWidth].IsEmpty())
 		{
@@ -665,7 +665,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		
 		const cItem & Item = itrS->m_Item;
 		if (
-			(itrS->x >= a_GridWidth) || 
+			(itrS->x >= a_GridWidth) ||
 			(itrS->y >= a_GridHeight) ||
 			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
 			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
@@ -838,7 +838,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
 				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
 				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
-				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break; // ermahgerd BARD ardmins
+				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break;  // ermahgerd BARD ardmins
 			}
 		}
 

@@ -21,7 +21,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cGhastFireballEntity);
+	CLASS_PROTODEF(cGhastFireballEntity)
 	
 	cGhastFireballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
 	
@@ -35,4 +35,4 @@ protected:
 	
 	// TODO: Deflecting the fireballs by arrow- or sword- hits
 	
-} ; // tolua_export
+} ;  // tolua_export

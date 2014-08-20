@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Protocol/Authenticator.h"
+#include "Protocol/MojangAPI.h"
 #include "HTTPServer/HTTPServer.h"
 #include "Defines.h"
 
@@ -26,25 +27,45 @@ class cCompositeChat;
 typedef cItemCallback<cPlayer> cPlayerListCallback;
 typedef cItemCallback<cWorld>  cWorldListCallback;
 
+namespace Json
+{
+	class Value;
+}
+
 
 
 
 
 /// The root of the object hierarchy
-class cRoot	// tolua_export
-{			// tolua_export
+// tolua_begin
+class cRoot
+{
 public:
-	static cRoot * Get() { return s_Root; }							// tolua_export
+	static bool m_TerminateEventRaised;
+	
+	static cRoot * Get() { return s_Root; }
+	// tolua_end
 
 	cRoot(void);
 	~cRoot();
 
 	void Start(void);
 
-	cServer * GetServer(void) { return m_Server; }						// tolua_export
-	cWorld *  GetDefaultWorld(void);										// tolua_export
-	cWorld *  GetWorld(const AString & a_WorldName);				// tolua_export
-	cWorld *  CreateAndInitializeWorld(const AString & a_WorldName); // tolua_export
+	// tolua_begin
+	cServer * GetServer(void) { return m_Server; }
+	cWorld *  GetDefaultWorld(void);
+
+	/** Returns a pointer to the world specified
+	If no world of that name was currently loaded and a_SearchForFolder was true, it will consult cFile::IsFolder() to see if a world folder of that name exists and if so, initialise a world based on that name
+	*/
+	cWorld * GetWorld(const AString & a_WorldName, bool a_SearchForFolder = false);
+
+	/** Returns a pointer to a world of specified name - will search loaded worlds first, then create anew if not found
+	The dimension parameter is used to create a world with a specific dimension
+	a_OverworldName should be set for non-overworld dimensions if one wishes that world to link back to an overworld via portals
+	*/
+	cWorld * CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
+	// tolua_end
 	
 	/// Calls the callback for each world; returns true if the callback didn't abort (return true)
 	bool ForEachWorld(cWorldListCallback & a_Callback);  // >> Exported in ManualBindings <<
@@ -67,6 +88,7 @@ public:
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
+	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -89,7 +111,7 @@ public:
 	void KickUser(int a_ClientID, const AString & a_Reason);
 	
 	/// Called by cAuthenticator to auth the specified user
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID);
+	void AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 	
 	/// Executes commands queued in the command queue
 	void TickCommands(void);
@@ -101,13 +123,13 @@ public:
 	void SaveAllChunks(void);  // tolua_export
 	
 	/// Reloads all the groups
-	void ReloadGroups(void); // tolua_export
+	void ReloadGroups(void);  // tolua_export
 	
 	/// Calls the callback for each player in all worlds
-	bool ForEachPlayer(cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
-	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin
 	
@@ -171,9 +193,8 @@ private:
 	cWebAdmin *        m_WebAdmin;
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
+	cMojangAPI         m_MojangAPI;
 	cHTTPServer        m_HTTPServer;
-
-	cMCLogger *      m_Log;
 
 	bool m_bStop;
 	bool m_bRestart;
@@ -197,8 +218,8 @@ private:
 
 	static void InputThread(void* a_Params);
 	
-	static cRoot*	s_Root;
-};	// tolua_export
+	static cRoot* s_Root;
+};  // tolua_export
 
 
 

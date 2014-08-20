@@ -40,10 +40,10 @@ Serialization will never put zero-level enchantments into the stringspec and wil
 class cEnchantments
 {
 public:
-	/** Individual enchantment IDs, corresponding to their NBT IDs ( http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs )
+	/** Individual enchantment IDs, corresponding to their NBT IDs: http://www.minecraftwiki.net/wiki/Data_Values#Enchantment_IDs
 	*/
 	
-	enum
+	enum eEnchantment
 	{
 		enchProtection           = 0,
 		enchFireProtection       = 1,

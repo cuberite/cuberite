@@ -55,7 +55,7 @@ enum
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol161:
 
 cProtocol161::cProtocol161(cClientHandle * a_Client) :
@@ -158,10 +158,10 @@ void cProtocol161::SendPlayerMaxSpeed(void)
 
 
 
-void cProtocol161::SendRespawn(const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks)
+void cProtocol161::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	// Besides sending the respawn, we need to also send the player max speed, otherwise the client reverts to super-fast
-	super::SendRespawn(a_World, a_ShouldIgnoreDimensionChecks);
+	super::SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 	SendPlayerMaxSpeed();
 }
 
@@ -202,11 +202,11 @@ int cProtocol161::ParseEntityAction(void)
 	
 	switch (ActionID)
 	{
-		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break; // Crouch
-		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break; // Uncrouch
-		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break; // Leave Bed
-		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break; // Start sprinting
-		case 5: m_Client->HandleEntitySprinting(EntityID, false); break; // Stop sprinting
+		case 1: m_Client->HandleEntityCrouch(EntityID, true);     break;  // Crouch
+		case 2: m_Client->HandleEntityCrouch(EntityID, false);    break;  // Uncrouch
+		case 3: m_Client->HandleEntityLeaveBed(EntityID);         break;  // Leave Bed
+		case 4: m_Client->HandleEntitySprinting(EntityID, true);  break;  // Start sprinting
+		case 5: m_Client->HandleEntitySprinting(EntityID, false); break;  // Stop sprinting
 	}
 
 	return PARSE_OK;
@@ -282,7 +282,7 @@ int cProtocol161::ParsePacket(unsigned char a_PacketType)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProtocol162:
 
 cProtocol162::cProtocol162(cClientHandle * a_Client) :

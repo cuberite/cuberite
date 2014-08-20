@@ -15,6 +15,7 @@
 
 class cWindow;
 class cPlayer;
+class cBeaconEntity;
 class cChestEntity;
 class cDropSpenserEntity;
 class cEnderChestEntity;
@@ -135,7 +136,7 @@ class cSlotAreaHotBar :
 	typedef cSlotAreaInventoryBase super;
 	
 public:
-	cSlotAreaHotBar(cWindow & a_ParentWindow)	:
+	cSlotAreaHotBar(cWindow & a_ParentWindow) :
 		cSlotAreaInventoryBase(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
 	{
 	}
@@ -150,7 +151,7 @@ class cSlotAreaArmor :
 	public cSlotAreaInventoryBase
 {
 public:
-	cSlotAreaArmor(cWindow & a_ParentWindow)	:
+	cSlotAreaArmor(cWindow & a_ParentWindow) :
 		cSlotAreaInventoryBase(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
 	{
 	}
@@ -161,7 +162,7 @@ public:
 	/** Called when a player clicks in the window. Parameters taken from the click packet. */
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 
-	bool CanPlaceInSlot(int a_SlotNum, const cItem & a_Item);
+	static bool CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item);
 } ;
 
 
@@ -308,6 +309,34 @@ protected:
 
 	/** The stack size of the second item where was used for repair */
 	char m_StackSizeToBeUsedInRepair;
+} ;
+
+
+
+
+
+class cSlotAreaBeacon :
+	public cSlotArea,
+	public cItemGrid::cListener
+{
+	typedef cSlotArea super;
+	
+public:
+	cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow);
+	virtual ~cSlotAreaBeacon();
+
+	bool IsPlaceableItem(short a_ItemType);
+	
+	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+protected:
+	cBeaconEntity * m_Beacon;
+
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 } ;
 
 

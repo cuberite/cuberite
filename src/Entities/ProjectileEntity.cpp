@@ -21,6 +21,8 @@
 #include "FireChargeEntity.h"
 #include "FireworkEntity.h"
 #include "GhastFireballEntity.h"
+#include "WitherSkullEntity.h"
+#include "SplashPotionEntity.h"
 #include "Player.h"
 
 
@@ -34,7 +36,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
 class cProjectileTracerCallback :
@@ -121,7 +123,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntityCollisionCallback:
 
 class cProjectileEntityCollisionCallback :
@@ -145,9 +147,11 @@ public:
 			(a_Entity->GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
 		)
 		{
-			// TODO: Don't check creator only for the first 5 ticks
-			// so that arrows stuck in ground and dug up can hurt the player
-			return false;
+			// Don't check creator only for the first 5 ticks so that projectiles can collide with the creator
+			if (m_Projectile->GetTicksAlive() <= 5)
+			{
+				return false;
+			}
 		}
 		
 		cBoundingBox EntBox(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
@@ -210,7 +214,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height) :
@@ -243,7 +247,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 
 
 
-cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed)
+cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	Vector3d Speed;
 	if (a_Speed != NULL)
@@ -260,14 +264,17 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkGhastFireball: return new cGhastFireballEntity   (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFireCharge:    return new cFireChargeEntity      (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkExpBottle:     return new cExpBottleEntity       (a_Creator, a_X, a_Y, a_Z, Speed);
+		case pkSplashPotion:  return new cSplashPotionEntity    (a_Creator, a_X, a_Y, a_Z, Speed, *a_Item);
+		case pkWitherSkull:   return new cWitherSkullEntity     (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{
-			if (a_Item.m_FireworkItem.m_Colours.empty())
+			ASSERT(a_Item != NULL);
+			if (a_Item->m_FireworkItem.m_Colours.empty())
 			{
 				return NULL;
 			}
 
-			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, a_Item);
+			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
 		}
 	}
 	
@@ -310,7 +317,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkFireCharge:    return "SmallFireball";
 		case pkEnderPearl:    return "ThrownEnderpearl";
 		case pkExpBottle:     return "ThrownExpBottle";
-		case pkSplashPotion:  return "ThrownPotion";
+		case pkSplashPotion:  return "SplashPotion";
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
 		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?

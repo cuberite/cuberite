@@ -9,6 +9,7 @@
 #include "../Entities/Pickup.h"
 #include "../Inventory.h"
 #include "../Items/ItemHandler.h"
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
@@ -145,7 +146,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 	{
 		int NumSlots = (*itr)->GetNumSlots();
 		for (int i = 0; i < NumSlots; i++)
-		{			
+		{
 			const cItem * Item = (*itr)->GetSlot(i, a_Player);
 			if (Item == NULL)
 			{
@@ -164,7 +165,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 
 
 void cWindow::Clicked(
-	cPlayer & a_Player, 
+	cPlayer & a_Player,
 	int a_WindowID, short a_SlotNum, eClickAction a_ClickAction,
 	const cItem & a_ClickedItem
 )
@@ -274,7 +275,7 @@ void cWindow::OpenedByPlayer(cPlayer & a_Player)
 bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 {
 	// Checks whether the player is still holding an item
-	if (a_Player.IsDraggingItem())
+	if (!a_Player.GetDraggingItem().IsEmpty())
 	{
 		LOGD("Player holds item! Dropping it...");
 		a_Player.TossHeldItem(a_Player.GetDraggingItem().m_ItemCount);
@@ -319,9 +320,9 @@ void cWindow::OwnerDestroyed()
 	// Close window for each player. Note that the last one needs special handling
 	while (m_OpenedBy.size() > 1)
 	{
-		(*m_OpenedBy.begin() )->CloseWindow();
+		(*m_OpenedBy.begin())->CloseWindow();
 	}
-	(*m_OpenedBy.begin() )->CloseWindow();
+	(*m_OpenedBy.begin())->CloseWindow();
 }
 
 
@@ -763,7 +764,7 @@ void cWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cInventoryWindow:
 
 cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
@@ -780,7 +781,7 @@ cInventoryWindow::cInventoryWindow(cPlayer & a_Player) :
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingWindow:
 
 cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
@@ -795,7 +796,7 @@ cCraftingWindow::cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cAnvilWindow:
 
 cAnvilWindow::cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
@@ -840,7 +841,37 @@ void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// cBeaconWindow:
+
+cBeaconWindow::cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon) :
+	cWindow(wtBeacon, "Beacon"),
+	m_Beacon(a_Beacon)
+{
+	m_ShouldDistributeToHotbarFirst = true;
+	m_SlotAreas.push_back(new cSlotAreaBeacon(m_Beacon, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cBeaconWindow::OpenedByPlayer(cPlayer & a_Player)
+{
+	super::OpenedByPlayer(a_Player);
+
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 0, m_Beacon->GetBeaconLevel());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, m_Beacon->GetPrimaryEffect());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 2, m_Beacon->GetSecondaryEffect());
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cEnchantingWindow:
 
 cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
@@ -901,25 +932,27 @@ void cEnchantingWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChestWindow:
 
 cChestWindow::cChestWindow(cChestEntity * a_Chest) :
-	cWindow(wtChest, "Chest"),
+	cWindow(wtChest, (a_Chest->GetBlockType() == E_BLOCK_CHEST) ? "Chest" : "Trapped Chest"),
 	m_World(a_Chest->GetWorld()),
 	m_BlockX(a_Chest->GetPosX()),
 	m_BlockY(a_Chest->GetPosY()),
-	m_BlockZ(a_Chest->GetPosZ())
+	m_BlockZ(a_Chest->GetPosZ()),
+	m_PrimaryChest(a_Chest),
+	m_SecondaryChest(NULL)
 {
 	m_SlotAreas.push_back(new cSlotAreaChest(a_Chest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 	
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("random.chestopen", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+	m_World->BroadcastSoundEffect("random.chestopen", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
 
 	// Send out the chest-open packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_CHEST);
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, a_Chest->GetBlockType());
 }
 
 
@@ -927,11 +960,13 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 
 
 cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest) :
-	cWindow(wtChest, "Double Chest"),
+	cWindow(wtChest, (a_PrimaryChest->GetBlockType() == E_BLOCK_CHEST) ? "Double Chest" : "Double Trapped Chest"),
 	m_World(a_PrimaryChest->GetWorld()),
 	m_BlockX(a_PrimaryChest->GetPosX()),
 	m_BlockY(a_PrimaryChest->GetPosY()),
-	m_BlockZ(a_PrimaryChest->GetPosZ())
+	m_BlockZ(a_PrimaryChest->GetPosZ()),
+	m_PrimaryChest(a_PrimaryChest),
+	m_SecondaryChest(a_SecondaryChest)
 {
 	m_SlotAreas.push_back(new cSlotAreaDoubleChest(a_PrimaryChest, a_SecondaryChest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -940,10 +975,55 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 	m_ShouldDistributeToHotbarFirst = false;
 	
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("random.chestopen", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+	m_World->BroadcastSoundEffect("random.chestopen", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
 
 	// Send out the chest-open packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_CHEST);
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, a_PrimaryChest->GetBlockType());
+}
+
+
+
+
+
+void cChestWindow::OpenedByPlayer(cPlayer & a_Player)
+{
+	int ChunkX, ChunkZ;
+
+	m_PrimaryChest->SetNumberOfPlayers(m_PrimaryChest->GetNumberOfPlayers() + 1);
+	cChunkDef::BlockToChunk(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosZ(), ChunkX, ChunkZ);
+	m_PrimaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+
+	if (m_SecondaryChest != NULL)
+	{
+		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() + 1);
+		cChunkDef::BlockToChunk(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosZ(), ChunkX, ChunkZ);
+		m_SecondaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+	}
+
+	cWindow::OpenedByPlayer(a_Player);
+}
+
+
+
+
+
+bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
+{
+	int ChunkX, ChunkZ;
+
+	m_PrimaryChest->SetNumberOfPlayers(m_PrimaryChest->GetNumberOfPlayers() - 1);
+	cChunkDef::BlockToChunk(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosZ(), ChunkX, ChunkZ);
+	m_PrimaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+
+	if (m_SecondaryChest != NULL)
+	{
+		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() - 1);
+		cChunkDef::BlockToChunk(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosZ(), ChunkX, ChunkZ);
+		m_SecondaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
+	}
+
+	cWindow::ClosedByPlayer(a_Player, a_CanRefuse);
+	return true;
 }
 
 
@@ -953,20 +1033,20 @@ cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_Secon
 cChestWindow::~cChestWindow()
 {
 	// Send out the chest-close packet:
-	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_CHEST);
+	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, m_PrimaryChest->GetBlockType());
 
-	m_World->BroadcastSoundEffect("random.chestclosed", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+	m_World->BroadcastSoundEffect("random.chestclosed", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
 }
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cDropSpenserWindow:
 
 cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
-	cWindow(wtDropSpenser, "Dropspenser")
+	cWindow(wtDropSpenser, (a_DropSpenser->GetBlockType() == E_BLOCK_DISPENSER) ? "Dispenser" : "Dropper")
 {
 	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(a_DropSpenser->GetContents(), *this));
@@ -978,7 +1058,7 @@ cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ,
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cEnderChestWindow:
 
 cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
@@ -993,7 +1073,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 	
 	// Play the opening sound:
-	m_World->BroadcastSoundEffect("random.chestopen", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+	m_World->BroadcastSoundEffect("random.chestopen", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
 
 	// Send out the chest-open packet:
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_ENDER_CHEST);
@@ -1009,14 +1089,14 @@ cEnderChestWindow::~cEnderChestWindow()
 	m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_ENDER_CHEST);
 
 	// Play the closing sound
-	m_World->BroadcastSoundEffect("random.chestclosed", m_BlockX * 8, m_BlockY * 8, m_BlockZ * 8, 1, 1);
+	m_World->BroadcastSoundEffect("random.chestclosed", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
 }
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHopperWindow:
 
 cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper) :
@@ -1032,7 +1112,7 @@ cHopperWindow::cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEn
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cFurnaceWindow:
 
 cFurnaceWindow::cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace) :

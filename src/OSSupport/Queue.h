@@ -21,19 +21,19 @@ cQueueFuncs and is used as the default behavior.
 
 /// This empty struct allows for the callback functions to be inlined
 template<class T>
-struct cQueueFuncs 
+struct cQueueFuncs
 {
 public:
 
 	/// Called when an Item is deleted from the queue without being returned
-	static void Delete(T) {};
+	static void Delete(T) {}
 	
 	/// Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted
 	static void Combine(T & a_existing, const T & a_new)
 	{
 		UNUSED(a_existing);
 		UNUSED(a_new);
-	};
+	}
 };
 
 
@@ -88,7 +88,7 @@ public:
 		cCSLock Lock(m_CS);
 		if (m_Contents.size() == 0)
 		{
-			return false; 
+			return false;
 		}
 		item = m_Contents.front();
 		m_Contents.pop_front();

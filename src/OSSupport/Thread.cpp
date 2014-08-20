@@ -47,13 +47,13 @@ static void SetThreadName(DWORD dwThreadID, const char * threadName)
 
 
 
-cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_ThreadName /* = 0 */ )
-	: m_ThreadFunction( a_ThreadFunction )
-	, m_Param( a_Param )
-	, m_Event( new cEvent() )
-	, m_StopEvent( 0 )
+cThread::cThread( ThreadFunc a_ThreadFunction, void* a_Param, const char* a_ThreadName /* = 0 */)
+	: m_ThreadFunction( a_ThreadFunction)
+	, m_Param( a_Param)
+	, m_Event( new cEvent())
+	, m_StopEvent( 0)
 {
-	if( a_ThreadName )
+	if (a_ThreadName)
 	{
 		m_ThreadName.assign(a_ThreadName);
 	}
@@ -68,7 +68,7 @@ cThread::~cThread()
 	delete m_Event;
 	m_Event = NULL;
 	
-	if( m_StopEvent )
+	if (m_StopEvent)
 	{
 		m_StopEvent->Wait();
 		delete m_StopEvent;
@@ -80,24 +80,24 @@ cThread::~cThread()
 
 
 
-void cThread::Start( bool a_bWaitOnDelete /* = true */ )
+void cThread::Start( bool a_bWaitOnDelete /* = true */)
 {
-	if( a_bWaitOnDelete )
+	if (a_bWaitOnDelete)
 		m_StopEvent = new cEvent();
 
 #ifndef _WIN32
 	pthread_t SndThread;
-	if( pthread_create( &SndThread, NULL, MyThread, this) )
+	if (pthread_create( &SndThread, NULL, MyThread, this))
 		LOGERROR("ERROR: Could not create thread!");
 #else
 	DWORD ThreadID = 0;
-	HANDLE hThread = CreateThread(	0 // security
-		,0 // stack size
-		, (LPTHREAD_START_ROUTINE) MyThread // function name
-		,this // parameters
-		,0 // flags
-		,&ThreadID ); // thread id
-	CloseHandle( hThread );
+	HANDLE hThread = CreateThread(NULL  // security
+		, 0  // stack size
+		, (LPTHREAD_START_ROUTINE) MyThread  // function name
+		, this  // parameters
+		, 0  // flags
+		, &ThreadID);  // thread id
+	CloseHandle( hThread);
 
 	#ifdef _MSC_VER
 	if (!m_ThreadName.empty())
@@ -116,9 +116,9 @@ void cThread::Start( bool a_bWaitOnDelete /* = true */ )
 
 
 #ifdef _WIN32
-unsigned long cThread::MyThread(void* a_Param )
+unsigned long cThread::MyThread(void* a_Param)
 #else
-void *cThread::MyThread( void *a_Param )
+void *cThread::MyThread( void *a_Param)
 #endif
 {
 	cThread* self = (cThread*)a_Param;
@@ -130,8 +130,8 @@ void *cThread::MyThread( void *a_Param )
 	// Set event to let other thread know this thread has been created and it's safe to delete the cThread object
 	self->m_Event->Set();
 
-	ThreadFunction( ThreadParam );
+	ThreadFunction( ThreadParam);
 
-	if( StopEvent ) StopEvent->Set();
+	if (StopEvent) StopEvent->Set();
 	return 0;
 }

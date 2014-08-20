@@ -104,8 +104,8 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendRespawn             (const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks = false) override;
-	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;  // a_Src coords are Block * 8
+	virtual void SendRespawn             (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
+	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
 	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
@@ -120,11 +120,11 @@ public:
 	virtual void SendTabCompletionResults(const AStringVector & a_Results) override;
 	virtual void SendTeleportEntity      (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
+	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
+	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
 	virtual void SendWholeInventory      (const cWindow & a_Window) override;
 	virtual void SendWindowClose         (const cWindow & a_Window) override;

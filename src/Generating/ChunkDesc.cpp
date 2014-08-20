@@ -20,7 +20,6 @@ cChunkDesc::cChunkDesc(int a_ChunkX, int a_ChunkZ) :
 	m_bUseDefaultBiomes(true),
 	m_bUseDefaultHeight(true),
 	m_bUseDefaultComposition(true),
-	m_bUseDefaultStructures(true),
 	m_bUseDefaultFinish(true)
 {
 	m_BlockArea.Create(cChunkDef::Width, cChunkDef::Height, cChunkDef::Width);
@@ -207,26 +206,6 @@ bool cChunkDesc::IsUsingDefaultComposition(void) const
 
 
 
-void cChunkDesc::SetUseDefaultStructures(bool a_bUseDefaultStructures)
-{
-	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
-	m_bUseDefaultStructures = a_bUseDefaultStructures;
-}
-
-
-
-
-
-bool cChunkDesc::IsUsingDefaultStructures(void) const
-{
-	LOGWARNING("%s: Structures are no longer accounted for, use Finishers instead", __FUNCTION__);
-	return m_bUseDefaultStructures;
-}
-
-
-
-
-
 void cChunkDesc::SetUseDefaultFinish(bool a_bUseDefaultFinish)
 {
 	m_bUseDefaultFinish = a_bUseDefaultFinish;
@@ -290,7 +269,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelX less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelX = 0;
 	}
-	else if (a_MinRelX >= cChunkDef::Width)
+	else if (a_MaxRelX >= cChunkDef::Width)
 	{
 		LOGWARNING("%s: MaxRelX more than chunk width, adjusting to chunk width", __FUNCTION__);
 		a_MaxRelX = cChunkDef::Width - 1;
@@ -311,7 +290,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelY = 0;
 	}
-	else if (a_MinRelY >= cChunkDef::Height)
+	else if (a_MaxRelY >= cChunkDef::Height)
 	{
 		LOGWARNING("%s: MaxRelY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MaxRelY = cChunkDef::Height - 1;
@@ -332,7 +311,7 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelZ less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelZ = 0;
 	}
-	else if (a_MinRelZ >= cChunkDef::Width)
+	else if (a_MaxRelZ >= cChunkDef::Width)
 	{
 		LOGWARNING("%s: MaxRelZ more than chunk width, adjusting to chunk width", __FUNCTION__);
 		a_MaxRelZ = cChunkDef::Width - 1;

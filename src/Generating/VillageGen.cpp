@@ -95,7 +95,7 @@ public:
 		
 		return ((const cPrefab &)a_NewPiece).GetPieceWeight(a_PlacedPiece, a_ExistingConnector);
 	}
-}	;
+};
 
 
 
@@ -168,7 +168,7 @@ protected:
 	/** The density for this village. Used to refrain from populating all house connectors. Range [0, 100] */
 	int m_Density;
 	
-	/** Borders of the vilalge - no item may reach out of this cuboid. */
+	/** Borders of the village - no item may reach out of this cuboid. */
 	cCuboid m_Borders;
 	
 	/** Prefabs to use for buildings */
@@ -333,7 +333,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cVillageGen:
 
 static cVillagePiecePool g_SandVillage(g_SandVillagePrefabs, g_SandVillagePrefabsCount, g_SandVillageStartingPrefabs, g_SandVillageStartingPrefabsCount);

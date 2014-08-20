@@ -11,7 +11,7 @@
 // Leaves can be this many blocks that away (inclusive) from the log not to decay
 #define LEAVES_CHECK_DISTANCE 6
 
-#define PROCESS_NEIGHBOR(x,y,z) \
+#define PROCESS_NEIGHBOR(x, y, z) \
 	switch (a_Area.GetBlockType(x, y, z)) \
 	{ \
 		case E_BLOCK_LEAVES: a_Area.SetBlockType(x, y, z, (BLOCKTYPE)(E_BLOCK_SPONGE + i + 1)); break; \
@@ -40,14 +40,20 @@ public:
 	{
 		cFastRandom rand;
 
-		// Only the first 2 bits contain the display information, the others are for growing
+		// Old leaves - 3 bits contain display; new leaves - 1st bit, shifted left two for saplings to understand
 		if (rand.NextInt(6) == 0)
 		{
-			a_Pickups.push_back(cItem(E_BLOCK_SAPLING, 1, a_BlockMeta & 3));
+			a_Pickups.push_back(
+				cItem(
+					E_BLOCK_SAPLING,
+					1,
+					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : (2 << (a_BlockMeta & 0x01))
+				)
+			);
 		}
 		
 		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
-		if ((a_BlockMeta & 3) == E_META_LEAVES_APPLE)
+		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
 			if (rand.NextInt(101) == 0)
 			{
@@ -55,28 +61,12 @@ public:
 			}
 		}
 	}
-
-
-	void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
-	{
-		cBlockHandler::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
-		
-		// 0.5% chance of dropping an apple, if the leaves' type is Apple Leaves:
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		cFastRandom rand;
-		if (((Meta & 3) == E_META_LEAVES_APPLE) && (rand.NextInt(201) == 100))
-		{
-			cItems Drops;
-			Drops.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
-			a_WorldInterface.SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
-		}
-	}
 	
 	
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);	 // Unset 0x8 bit so it gets checked for decay
+		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x7);  // Unset 0x8 bit so it gets checked for decay
 	}
 	
 	
@@ -100,10 +90,10 @@ public:
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
 		cBlockArea Area;
 		if (!Area.Read(
-			a_Chunk.GetWorld(), 
-			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE, 
-			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE, 
-			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE, 
+			a_Chunk.GetWorld(),
+			BlockX - LEAVES_CHECK_DISTANCE, BlockX + LEAVES_CHECK_DISTANCE,
+			a_RelY - LEAVES_CHECK_DISTANCE, a_RelY + LEAVES_CHECK_DISTANCE,
+			BlockZ - LEAVES_CHECK_DISTANCE, BlockZ + LEAVES_CHECK_DISTANCE,
 			cBlockArea::baTypes)
 		)
 		{

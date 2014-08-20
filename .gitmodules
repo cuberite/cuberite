@@ -10,3 +10,6 @@
 [submodule "lib/polarssl"]
 	path = lib/polarssl
 	url = https://github.com/mc-server/polarssl
+[submodule "lib/SQLiteCpp"]
+	path = lib/SQLiteCpp
+	url = https://github.com/mc-server/SQLiteCpp.git

@@ -41,18 +41,18 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cProjectileEntity);
+	CLASS_PROTODEF(cProjectileEntity)
 
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height);
 	
-	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item, const Vector3d * a_Speed = NULL);
+	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed = NULL);
 	
 	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace);
 	
 	/// Called by the physics blocktracer when the entity hits another entity
-	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) 
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		UNUSED(a_EntityHit);
 		UNUSED(a_HitPos);
@@ -89,7 +89,7 @@ public:
 	
 protected:
 
-	/** A structure that stores the Entity ID and Playername of the projectile's creator 
+	/** A structure that stores the Entity ID and Playername of the projectile's creator
 	Used to migitate invalid pointers caused by the creator being destroyed
 	*/
 	struct CreatorData
@@ -120,4 +120,4 @@ protected:
 	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-} ; // tolua_export
+} ;  // tolua_export

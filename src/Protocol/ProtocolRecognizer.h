@@ -1,7 +1,7 @@
 
 // ProtocolRecognizer.h
 
-// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple 
+// Interfaces to the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
 // protocol versions and redirects everything to them
 
 
@@ -107,13 +107,13 @@ public:
 	virtual void SendPlayerSpawn         (const cPlayer & a_Player) override;
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendRespawn             (const cWorld & a_World, bool a_ShouldIgnoreDimensionChecks = false) override;
+	virtual void SendRespawn             (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
 	virtual void SendExperience          (void) override;
 	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
 	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
-	virtual void SendSoundEffect         (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch) override;
+	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;
@@ -123,11 +123,11 @@ public:
 	virtual void SendTabCompletionResults(const AStringVector & a_Results) override;
 	virtual void SendTeleportEntity      (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay) override;
+	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ ) override;
+	virtual void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void SendWeather             (eWeather a_Weather) override;
 	virtual void SendWholeInventory      (const cWindow & a_Window) override;
 	virtual void SendWindowClose         (const cWindow & a_Window) override;
@@ -139,8 +139,8 @@ public:
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
 protected:
-	cProtocol * m_Protocol;  //< The recognized protocol
-	cByteBuffer m_Buffer;    //< Buffer for the incoming data until we recognize the protocol
+	cProtocol * m_Protocol;  ///< The recognized protocol
+	cByteBuffer m_Buffer;    ///< Buffer for the incoming data until we recognize the protocol
 	
 	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
 	bool TryRecognizeProtocol(void);

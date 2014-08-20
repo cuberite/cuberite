@@ -24,7 +24,7 @@ public:
 	
 	virtual cBroadcastInterface & GetBroadcastManager() = 0;
 	
-	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0; 
+	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0;
 	
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;
@@ -45,6 +45,12 @@ public:
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
 
 	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
+
+	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
+
+	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
+	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;

@@ -33,7 +33,7 @@ class cPlugin
 public:
 	// tolua_end
 	
-	cPlugin( const AString & a_PluginDirectory );
+	cPlugin( const AString & a_PluginDirectory);
 	virtual ~cPlugin();
 	
 	virtual void OnDisable(void) {}
@@ -42,10 +42,7 @@ public:
 	// Called each tick
 	virtual void Tick(float a_Dt) = 0;
 
-	/**
-	 * On all these functions, return true if you want to override default behavior and not call other plugins on that callback.
-	 * You can also return false, so default behavior is used.
-	 **/
+	/** Calls the specified hook with the params given. Returns the bool that the hook callback returns.*/
 	virtual bool OnBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) = 0;
 	virtual bool OnBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) = 0;
 	virtual bool OnChat                     (cPlayer * a_Player, AString & a_Message) = 0;
@@ -57,13 +54,14 @@ public:
 	virtual bool OnCollectingPickup         (cPlayer * a_Player, cPickup * a_Pickup) = 0;
 	virtual bool OnCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) = 0;
 	virtual bool OnDisconnect               (cClientHandle & a_Client, const AString & a_Reason) = 0;
+	virtual bool OnEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) = 0;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split) = 0;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) = 0;
 	virtual bool OnHandshake                (cClientHandle * a_Client, const AString & a_Username) = 0;
 	virtual bool OnHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum) = 0;
 	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) = 0;
-	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer) = 0;
+	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) = 0;
 	virtual bool OnLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) = 0;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) = 0;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
@@ -75,7 +73,7 @@ public:
 	virtual bool OnPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) = 0;
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) = 0;
-	virtual bool OnPlayerMoved              (cPlayer & a_Player) = 0;
+	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition) = 0;
 	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) = 0;
@@ -117,10 +115,10 @@ public:
 	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) = 0;
 	
 	/// All bound commands are to be removed, do any language-dependent cleanup here
-	virtual void ClearCommands(void) {} ;
+	virtual void ClearCommands(void) {}
 	
 	/// All bound console commands are to be removed, do any language-dependent cleanup here
-	virtual void ClearConsoleCommands(void) {} ;
+	virtual void ClearConsoleCommands(void) {}
 	
 	// tolua_begin
 	const AString & GetName(void) const  { return m_Name; }
@@ -143,7 +141,7 @@ public:
 		E_SQUIRREL,  // OBSOLETE, but kept in place to remind us of the horrors lurking in the history
 	};
 	PluginLanguage GetLanguage() { return m_Language; }
-	void SetLanguage( PluginLanguage a_Language ) { m_Language = a_Language; }
+	void SetLanguage( PluginLanguage a_Language) { m_Language = a_Language; }
 
 private:
 	PluginLanguage m_Language;
@@ -151,7 +149,7 @@ private:
 	int m_Version;
 
 	AString m_Directory;
-};	// tolua_export
+};  // tolua_export
 
 
 

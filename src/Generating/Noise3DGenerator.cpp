@@ -61,7 +61,7 @@ public:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cNoise3DGenerator:
 
 cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
@@ -342,7 +342,7 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cNoise3DComposable:
 
 cNoise3DComposable::cNoise3DComposable(int a_Seed) :
@@ -412,11 +412,12 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 			for (int x = 0; x < 17; x += UPSCALE_X)
 			{
 				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-				CurFloor[x + 17 * z] =
+				CurFloor[x + 17 * z] = (
 					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
 					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
 					m_Noise3.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2 +
-					AddHeight / Height[x + 17 * z];
+					AddHeight / Height[x + 17 * z]
+				);
 			}
 		}
 		// Linear-interpolate this XZ floor:

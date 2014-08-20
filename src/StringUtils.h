@@ -6,13 +6,9 @@
 
 
 
-#ifndef STRINGUTILS_H_INCLUDED
-#define STRINGUTILS_H_INCLUDED
-
-
+#pragma once
 
 #include <string>
-
 
 
 
@@ -46,10 +42,16 @@ extern AStringVector StringSplitAndTrim(const AString & str, const AString & del
 extern AString TrimString(const AString & str);  // tolua_export
 
 /// In-place string conversion to uppercase; returns the same string
-extern AString & StrToUpper(AString & s);
+extern AString & InPlaceUppercase(AString & s);
 
 /// In-place string conversion to lowercase; returns the same string
-extern AString & StrToLower(AString & s);
+extern AString & InPlaceLowercase(AString & s);
+
+/** Returns an upper-cased copy of the string */
+extern AString StrToUpper(const AString & s);
+
+/** Returns a lower-cased copy of the string */
+extern AString StrToLower(const AString & s);
 
 /// Case-insensitive string comparison; returns 0 if the strings are the same
 extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
@@ -97,11 +99,6 @@ extern int GetBEInt(const char * a_Mem);
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
 // If you have any other string helper functions, declare them here
-
-
-
-
-#endif		// STRINGUTILS_H_INCLUDED
 
 
 

@@ -269,7 +269,7 @@ int cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, i
 int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_PrioritarySlot)
 {
 	int NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	int MaxStack = a_ItemStack.GetMaxStackSize();
 
 	// Try prioritarySlot first:
 	if (
@@ -284,7 +284,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 	}
 
 	// Scan existing stacks:
-	for (int i = m_NumSlots - 1; i >= 0; i--)
+	for (int i = 0; i < m_NumSlots; i++)
 	{
 		if (m_Slots[i].IsEqual(a_ItemStack))
 		{
@@ -302,7 +302,7 @@ int cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priorit
 		return (a_ItemStack.m_ItemCount - NumLeft);
 	}
 	
-	for (int i = m_NumSlots - 1; i >= 0; i--)
+	for (int i = 0; i < m_NumSlots; i++)
 	{
 		if (m_Slots[i].IsEmpty())
 		{
@@ -339,6 +339,39 @@ int cItemGrid::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, int a_P
 		TotalAdded += NumAdded;
 	}
 	return TotalAdded;
+}
+
+
+
+
+
+int cItemGrid::RemoveItem(const cItem & a_ItemStack)
+{
+	int NumLeft = a_ItemStack.m_ItemCount;
+
+	for (int i = 0; i < m_NumSlots; i++)
+	{
+		if (NumLeft <= 0)
+		{
+			break;
+		}
+
+		if (m_Slots[i].IsEqual(a_ItemStack))
+		{
+			int NumToRemove = std::min(NumLeft, (int)m_Slots[i].m_ItemCount);
+			NumLeft -= NumToRemove;
+			m_Slots[i].m_ItemCount -= NumToRemove;
+
+			if (m_Slots[i].m_ItemCount <= 0)
+			{
+				m_Slots[i].Empty();
+			}
+
+			TriggerListeners(i);
+		}
+	}
+
+	return (a_ItemStack.m_ItemCount - NumLeft);
 }
 
 

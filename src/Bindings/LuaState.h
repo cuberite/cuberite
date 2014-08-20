@@ -128,7 +128,7 @@ public:
 
 
 	/** Creates a new instance. The LuaState is not initialized.
-	a_SubsystemName is used for reporting problems in the console, it is "plugin %s" for plugins, 
+	a_SubsystemName is used for reporting problems in the console, it is "plugin %s" for plugins,
 	or "LuaScript" for the cLuaScript template
 	*/
 	cLuaState(const AString & a_SubsystemName);

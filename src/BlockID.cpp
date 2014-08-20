@@ -17,7 +17,7 @@ class cBlockIDMap
 	// Making the map case-insensitive:
 	struct Comparator
 	{
-		bool operator()(const AString & a_Item1, const AString & a_Item2) const
+		bool operator ()(const AString & a_Item1, const AString & a_Item2) const
 		{
 			return (NoCaseCompare(a_Item1, a_Item2) > 0);
 		}
@@ -255,7 +255,8 @@ AString ItemToFullString(const cItem & a_Item)
 
 int StringToMobType(const AString & a_MobString)
 {
-	static struct {
+	static struct
+	{
 		int m_MobType;
 		const char * m_String;
 	} MobMap [] =
@@ -286,7 +287,7 @@ int StringToMobType(const AString & a_MobString)
 		{cMonster::mtMooshroom,    "Mooshroom"},
 		{cMonster::mtSnowGolem,    "SnowGolem"},
 		{cMonster::mtOcelot,       "Ocelot"},
-		{cMonster::mtIronGolem,    "IronGolem"}, 
+		{cMonster::mtIronGolem,    "IronGolem"},
 		{cMonster::mtVillager,     "Villager"},
 	};
 	for (size_t i = 0; i < ARRAYCOUNT(MobMap); i++)
@@ -345,6 +346,37 @@ eDimension StringToDimension(const AString & a_DimensionString)
 
 
 
+AString DimensionToString(eDimension a_Dimension)
+{
+	// Decode using a built-in map:
+	static struct
+	{
+		eDimension m_Dimension;
+		const char * m_String;
+	} DimensionMap[] =
+	{
+		{ dimOverworld, "Overworld" },
+		{ dimNether, "Nether" },
+		{ dimEnd, "End" },
+	};
+
+	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
+	{
+		if (DimensionMap[i].m_Dimension == a_Dimension)
+		{
+			return DimensionMap[i].m_String;
+		}
+	}  // for i - DimensionMap[]
+
+	// Not found
+	LOGWARNING("Unknown dimension: \"%i\". Setting to Overworld", (int)a_Dimension);
+	return "Overworld";
+}
+
+
+
+
+
 /// Translates damage type constant to a string representation (built-in).
 AString DamageTypeToString(eDamageType a_DamageType)
 {
@@ -363,6 +395,7 @@ AString DamageTypeToString(eDamageType a_DamageType)
 		case dtLightning:       return "dtLightning";
 		case dtOnFire:          return "dtOnFire";
 		case dtPoisoning:       return "dtPoisoning";
+		case dtWithering:       return "dtWithering";
 		case dtPotionOfHarming: return "dtPotionOfHarming";
 		case dtRangedAttack:    return "dtRangedAttack";
 		case dtStarving:        return "dtStarving";
@@ -408,6 +441,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtCactusContact,   "dtCactusContact"},
 		{ dtLavaContact,     "dtLavaContact"},
 		{ dtPoisoning,       "dtPoisoning"},
+		{ dtWithering,       "dtWithering"},
 		{ dtOnFire,          "dtOnFire"},
 		{ dtFireContact,     "dtFireContact"},
 		{ dtInVoid,          "dtInVoid"},
@@ -433,6 +467,7 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 		{ dtCactusContact, "dtCacti"},
 		{ dtLavaContact,   "dtLava"},
 		{ dtPoisoning,     "dtPoison"},
+		{ dtWithering,     "dtWither"},
 		{ dtOnFire,        "dtBurning"},
 		{ dtFireContact,   "dtInFire"},
 		{ dtAdmin,         "dtPlugin"},

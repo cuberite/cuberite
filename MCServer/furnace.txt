@@ -88,3 +88,4 @@
 ! 269:1    = 200    # 1 Wooden Shovel   -> 10 sec
 ! 290:1    = 200    # 1 Wooden Hoe      -> 10 sec
 ! 268:1    = 200    # 1 Wooden Sword    -> 10 sec
+

@@ -15,7 +15,7 @@
 
 const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 {
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Arch:
 	// The data has been exported from the gallery Plains, area index 144, ID 488, created by Aloe_vera
 	{
@@ -129,16 +129,16 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Farm:
 	// The data has been exported from the gallery Plains, area index 166, ID 554, created by Aloe_vera
 	{
 		// Size:
-		11, 7, 13,  // SizeX = 11, SizeY = 7, SizeZ = 13
+		11, 8, 13,  // SizeX = 11, SizeY = 8, SizeZ = 13
 
 		// Hitbox (relative to bounding box):
 		0, 0, 0,  // MinX, MinY, MinZ
-		10, 6, 12,  // MaxX, MaxY, MaxZ
+		10, 7, 12,  // MaxX, MaxY, MaxZ
 
 		// Block definitions:
 		".:  0: 0\n"  /* air */
@@ -150,6 +150,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		"f: 59: 7\n"  /* crops */
 		"g: 83: 0\n"  /* reedblock */
 		"h:113: 0\n"  /* netherbrickfence */
+		"i: 50: 5\n"  /* torch */
 		"m: 19: 0\n"  /* sponge */,
 
 		// Block data:
@@ -270,7 +271,24 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 		/*  9 */ "..........."
 		/* 10 */ ".h.......h."
 		/* 11 */ "hhh.....hhh"
-		/* 12 */ ".h.......h.",
+		/* 12 */ ".h.......h."
+
+		// Level 7
+		/* z\x*             1 */
+		/*    *   01234567890 */
+		/*  0 */ ".i.......i."
+		/*  1 */ "i.i.....i.i"
+		/*  2 */ ".i.......i."
+		/*  3 */ "..........."
+		/*  4 */ "..........."
+		/*  5 */ "..........."
+		/*  6 */ "..........."
+		/*  7 */ "..........."
+		/*  8 */ "..........."
+		/*  9 */ "..........."
+		/* 10 */ ".i.......i."
+		/* 11 */ "i.i.....i.i"
+		/* 12 */ ".i.......i.",
 
 		// Connectors:
 		"-1: 10, 2, 6: 5\n"  /* Type -1, direction X+ */,
@@ -299,7 +317,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Forge:
 	// The data has been exported from the gallery Plains, area index 79, ID 145, created by Aloe_vera
 	{
@@ -565,7 +583,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Garden2:
 	// The data has been exported from the gallery Plains, area index 147, ID 491, created by Aloe_vera
 	{
@@ -717,7 +735,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseMid:
 	// The data has been exported from the gallery Plains, area index 62, ID 119, created by Aloe_vera
 	{
@@ -893,7 +911,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseSmall:
 	// The data has been exported from the gallery Plains, area index 68, ID 131, created by Aloe_vera
 	{
@@ -1004,7 +1022,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseSmallDblWithDoor:
 	// The data has been exported from the gallery Plains, area index 113, ID 265, created by Aloe_vera
 	{
@@ -1128,7 +1146,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseSmallDouble:
 	// The data has been exported from the gallery Plains, area index 72, ID 135, created by Aloe_vera
 	{
@@ -1249,7 +1267,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseSmallWithDoor:
 	// The data has been exported from the gallery Plains, area index 112, ID 264, created by Aloe_vera
 	{
@@ -1362,7 +1380,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseWide:
 	// The data has been exported from the gallery Plains, area index 64, ID 121, created by STR_Warrior
 	{
@@ -1510,7 +1528,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseWithGarden:
 	// The data has been exported from the gallery Plains, area index 67, ID 130, created by Aloe_vera
 	{
@@ -1756,7 +1774,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseWithSakura1:
 	// The data has been exported from the gallery Plains, area index 75, ID 141, created by Aloe_vera
 	{
@@ -1950,7 +1968,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HouseWithSpa:
 	// The data has been exported from the gallery Plains, area index 73, ID 139, created by Aloe_vera
 	{
@@ -2158,7 +2176,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// MediumSakuraTree:
 	// The data has been exported from the gallery Plains, area index 146, ID 490, created by STR_Warrior
 	{
@@ -2195,33 +2213,33 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 		// Level 1
 		/* z\x*   0123456 */
-		/*  0 */ "bmmmmmm"
-		/*  1 */ "bmmmmmm"
-		/*  2 */ "bmmmmmm"
-		/*  3 */ "bmmmmmm"
-		/*  4 */ "bmmmmmm"
-		/*  5 */ "bmmmmmm"
+		/*  0 */ "bbbbbbb"
+		/*  1 */ "bbbbbbb"
+		/*  2 */ "bbbbbbb"
+		/*  3 */ "bbbabbb"
+		/*  4 */ "bbbbbbb"
+		/*  5 */ "bbbbbbb"
 		/*  6 */ "bbbbbbb"
 
 		// Level 2
 		/* z\x*   0123456 */
-		/*  0 */ "......."
-		/*  1 */ "..c.c.."
+		/*  0 */ "mm...mm"
+		/*  1 */ "m.c...m"
 		/*  2 */ ".dccdc."
 		/*  3 */ "..cefc."
 		/*  4 */ ".ccfgh."
-		/*  5 */ "..ccc.."
-		/*  6 */ "......."
+		/*  5 */ "m.ccc.m"
+		/*  6 */ "mm...mm"
 
 		// Level 3
 		/* z\x*   0123456 */
-		/*  0 */ "......."
+		/*  0 */ "m.....m"
 		/*  1 */ "......."
 		/*  2 */ "......."
 		/*  3 */ "...e..."
 		/*  4 */ "......."
 		/*  5 */ "......."
-		/*  6 */ "......."
+		/*  6 */ "m.....m"
 
 		// Level 4
 		/* z\x*   0123456 */
@@ -2312,7 +2330,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Restaurant:
 	// The data has been exported from the gallery Plains, area index 61, ID 117, created by Aloe_vera
 	{
@@ -2566,7 +2584,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// SakuraDouble:
 	// The data has been exported from the gallery Plains, area index 76, ID 142, created by Aloe_vera
 	{
@@ -2697,7 +2715,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// SakuraSmall:
 	// The data has been exported from the gallery Plains, area index 145, ID 489, created by Aloe_vera
 	{
@@ -2808,7 +2826,7 @@ const cPrefab::sDef g_JapaneseVillagePrefabs[] =
 
 const cPrefab::sDef g_JapaneseVillageStartingPrefabs[] =
 {
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// HighTemple:
 	// The data has been exported from the gallery Plains, area index 70, ID 133, created by Aloe_vera
 	{
@@ -3159,7 +3177,7 @@ const cPrefab::sDef g_JapaneseVillageStartingPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Well:
 	// The data has been exported from the gallery Plains, area index 143, ID 487, created by STR_Warrior
 	{

@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifndef _WIN32
@@ -11,6 +12,7 @@
 #include "Server.h"
 #include "zlib/zlib.h"
 #include "Defines.h"
+#include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/DispenserEntity.h"
 #include "BlockEntities/DropperEntity.h"
@@ -34,6 +36,7 @@
 #include "MobCensus.h"
 #include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"
+#include "SetChunkData.h"
 
 #include "json/json.h"
 
@@ -41,15 +44,15 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // sSetBlock:
 
-sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta )  // absolute block position
-	: x( a_BlockX )
-	, y( a_BlockY )
-	, z( a_BlockZ )
-	, BlockType( a_BlockType )
-	, BlockMeta( a_BlockMeta )
+sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)  // absolute block position
+	: x( a_BlockX)
+	, y( a_BlockY)
+	, z( a_BlockZ)
+	, BlockType( a_BlockType)
+	, BlockMeta( a_BlockMeta)
 {
 	cChunkDef::AbsoluteToRelative(x, y, z, ChunkX, ChunkZ);
 }
@@ -58,11 +61,11 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChunk:
 
 cChunk::cChunk(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ, 
+	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
@@ -116,7 +119,7 @@ cChunk::~cChunk()
 {
 	cPluginManager::Get()->CallHookChunkUnloaded(m_World, m_PosX, m_PosZ);
 	
-	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId() );
+	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 	
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
@@ -265,41 +268,34 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 
 
 
-void cChunk::SetAllData(
-	const BLOCKTYPE *  a_BlockTypes,
-	const NIBBLETYPE * a_BlockMeta,
-	const NIBBLETYPE * a_BlockLight,
-	const NIBBLETYPE * a_BlockSkyLight,
-	const HeightMap *  a_HeightMap,
-	const BiomeMap &   a_BiomeMap,
-	cBlockEntityList & a_BlockEntities
-)
+void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 {
-	memcpy(m_BiomeMap, a_BiomeMap, sizeof(m_BiomeMap));
-
-	if (a_HeightMap != NULL)
-	{
-		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
-	}
-
-	if (a_HeightMap == NULL)
-	{
-		CalculateHeightmap(a_BlockTypes);
-	}
-
-	m_ChunkData.SetBlockTypes(a_BlockTypes);
-	m_ChunkData.SetMetas(a_BlockMeta);
-	m_ChunkData.SetBlockLight(a_BlockLight);
-	m_ChunkData.SetSkyLight(a_BlockSkyLight);
+	ASSERT(a_SetChunkData.IsHeightMapValid());
+	ASSERT(a_SetChunkData.AreBiomesValid());
 	
-	m_IsLightValid = (a_BlockLight != NULL) && (a_BlockSkyLight != NULL);
+	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
+	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
+
+	m_ChunkData.SetBlockTypes(a_SetChunkData.GetBlockTypes());
+	m_ChunkData.SetMetas(a_SetChunkData.GetBlockMetas());
+	if (a_SetChunkData.IsLightValid())
+	{
+		m_ChunkData.SetBlockLight(a_SetChunkData.GetBlockLight());
+		m_ChunkData.SetSkyLight(a_SetChunkData.GetSkyLight());
+		m_IsLightValid = true;
+	}
+	else
+	{
+		m_IsLightValid = false;
+	}
 
 	// Clear the block entities present - either the loader / saver has better, or we'll create empty ones:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
 		delete *itr;
 	}
-	std::swap(a_BlockEntities, m_BlockEntities);
+	m_BlockEntities.clear();
+	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
 	
 	// Set all block entities' World variable:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
@@ -443,19 +439,19 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 	{
 		currentPlayer = (*itr)->GetPlayer();
 		playerPositions.push_back(&(currentPlayer->GetPosition()));
-	} 
+	}
 
 	Vector3d currentPosition;
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
-		//LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if ((*itr)->IsMob())
 		{
 			cMonster& Monster = (cMonster&)(**itr);
 			currentPosition = Monster.GetPosition();
 			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
 			{
-				toFill.CollectMob(Monster,*this,(currentPosition-**itr2).SqrLength());
+				toFill.CollectMob(Monster, *this, (currentPosition - **itr2).SqrLength());
 			}
 		}
 	}  // for itr - m_Entitites[]
@@ -464,7 +460,7 @@ void cChunk::CollectMobCensus(cMobCensus& toFill)
 
 
 
-void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a_MaxY, int a_MaxZ)
+void cChunk::GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ)
 {
 	ASSERT(a_MaxX * a_MaxY * a_MaxZ * 8 < 0x00ffffff);
 	int Random = m_World->GetTickRandomNumber(0x00ffffff);
@@ -480,12 +476,12 @@ void cChunk::getThreeRandomNumber(int& a_X, int& a_Y, int& a_Z,int a_MaxX, int a
 
 
 
-void cChunk::getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z)
+void cChunk::GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z)
 {
 	// MG TODO : check if this kind of optimization (only one random call) is still needed
 	// MG TODO : if so propagate it
 
-	getThreeRandomNumber(a_X, a_Y, a_Z, Width, Height-2, Width);
+	GetThreeRandomNumbers(a_X, a_Y, a_Z, Width, Height - 2, Width);
 	a_Y++;
 }
 
@@ -495,65 +491,68 @@ void cChunk::getRandomBlockCoords(int& a_X, int& a_Y, int& a_Z)
 
 void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 {
-	int Center_X,Center_Y,Center_Z;
-	getRandomBlockCoords(Center_X,Center_Y,Center_Z);
+	int CenterX, CenterY, CenterZ;
+	GetRandomBlockCoords(CenterX, CenterY, CenterZ);
 
-	BLOCKTYPE PackCenterBlock = GetBlock(Center_X, Center_Y, Center_Z);
-	if (a_MobSpawner.CheckPackCenter(PackCenterBlock))
+	BLOCKTYPE PackCenterBlock = GetBlock(CenterX, CenterY, CenterZ);
+	if (!a_MobSpawner.CheckPackCenter(PackCenterBlock))
 	{
-		a_MobSpawner.NewPack();
-		int NumberOfTries = 0;
-		int NumberOfSuccess = 0;
-		int MaxNbOfSuccess = 4; // this can be changed during the process for Wolves and Ghass
-		while (NumberOfTries < 12 && NumberOfSuccess < MaxNbOfSuccess)
-		{
-			const int HorizontalRange = 20; // MG TODO : relocate
-			const int VerticalRange = 0; // MG TODO : relocate
-			int Try_X, Try_Y, Try_Z;
-			getThreeRandomNumber(Try_X, Try_Y, Try_Z, 2*HorizontalRange+1 , 2*VerticalRange+1 , 2*HorizontalRange+1);
-			Try_X -= HorizontalRange;
-			Try_Y -= VerticalRange;
-			Try_Z -= HorizontalRange;
-			Try_X += Center_X;
-			Try_Y += Center_Y;
-			Try_Z += Center_Z;
-
-			ASSERT(Try_Y > 0);
-			ASSERT(Try_Y < cChunkDef::Height-1);
-			
-			EMCSBiome Biome = m_ChunkMap->GetBiomeAt (Try_X, Try_Z);
-			// MG TODO :
-			// Moon cycle (for slime)
-			// check player and playerspawn presence < 24 blocks
-			// check mobs presence on the block
-
-			// MG TODO : check that "Level" really means Y
-			
-			/*
-			NIBBLETYPE SkyLight = 0;
-
-			NIBBLETYPE BlockLight = 0;
-			*/
-
-			if (IsLightValid())
-			{
-				cEntity* newMob = a_MobSpawner.TryToSpawnHere(this, Try_X, Try_Y, Try_Z, Biome, MaxNbOfSuccess);
-				if (newMob)
-				{
-					int WorldX, WorldY, WorldZ;
-					PositionToWorldPosition(Try_X, Try_Y, Try_Z, WorldX, WorldY, WorldZ);
-					double ActualX = WorldX + 0.5;
-					double ActualZ = WorldZ + 0.5;
-					newMob->SetPosition(ActualX, WorldY, ActualZ);
-					LOGD("Spawning %s #%i at %d,%d,%d",newMob->GetClass(),newMob->GetUniqueID(),WorldX, WorldY, WorldZ);
-					NumberOfSuccess++;
-				}
-			}
-			
-			NumberOfTries++;
-		}
+		return;
 	}
+	
+	a_MobSpawner.NewPack();
+	int NumberOfTries = 0;
+	int NumberOfSuccess = 0;
+	int MaxNbOfSuccess = 4;  // This can be changed during the process for Wolves and Ghasts
+	while ((NumberOfTries < 12) && (NumberOfSuccess < MaxNbOfSuccess))
+	{
+		const int HorizontalRange = 20;  // MG TODO : relocate
+		const int VerticalRange = 0;     // MG TODO : relocate
+		int TryX, TryY, TryZ;
+		GetThreeRandomNumbers(TryX, TryY, TryZ, 2 * HorizontalRange + 1, 2 * VerticalRange + 1, 2 * HorizontalRange + 1);
+		TryX -= HorizontalRange;
+		TryY -= VerticalRange;
+		TryZ -= HorizontalRange;
+		TryX += CenterX;
+		TryY += CenterY;
+		TryZ += CenterZ;
 
+		ASSERT(TryY > 0);
+		ASSERT(TryY < cChunkDef::Height - 1);
+		
+		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(TryX, TryZ);
+		// MG TODO :
+		// Moon cycle (for slime)
+		// check player and playerspawn presence < 24 blocks
+		// check mobs presence on the block
+
+		// MG TODO : check that "Level" really means Y
+		
+		/*
+		NIBBLETYPE SkyLight = 0;
+
+		NIBBLETYPE BlockLight = 0;
+		*/
+
+		NumberOfTries++;
+		if (!IsLightValid())
+		{
+			continue;
+		}
+		
+		cEntity * newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
+		if (newMob == NULL)
+		{
+			continue;
+		}
+		int WorldX, WorldY, WorldZ;
+		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
+		double ActualX = WorldX + 0.5;
+		double ActualZ = WorldZ + 0.5;
+		newMob->SetPosition(ActualX, WorldY, ActualZ);
+		LOGD("Spawning %s #%i at {%d, %d, %d}", newMob->GetClass(), newMob->GetUniqueID(), WorldX, WorldY, WorldZ);
+		NumberOfSuccess++;
+	}  // while (retry)
 }
 
 
@@ -580,39 +579,36 @@ void cChunk::Tick(float a_Dt)
 		m_IsDirty = (*itr)->Tick(a_Dt, *this) | m_IsDirty;
 	}
 	
-	// Tick all entities in this chunk (except mobs):
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
 	{
-		// Mobs are tickes inside MobTick (as we don't have to tick them if they are far away from players)
-		if (!((*itr)->IsMob()))
+		if (!((*itr)->IsMob()))  // Mobs are ticked inside cWorld::TickMobs() (as we don't have to tick them if they are far away from players)
 		{
+			// Tick all entities in this chunk (except mobs):
 			(*itr)->Tick(a_Dt, *this);
 		}
-	}  // for itr - m_Entitites[]
-	
-	// Remove all entities that were scheduled for removal:
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
-	{
-			if ((*itr)->IsDestroyed())
-			{
-				LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
-				cEntity * ToDelete = *itr;
-				itr = m_Entities.erase(itr);
-				delete ToDelete;
-				ToDelete = NULL;
-				continue;
-			}
-			++itr;
-	}  // for itr - m_Entitites[]
-	
-	// If any entity moved out of the chunk, move it to the neighbor:
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end();)
-	{
-		if (
+
+		if ((*itr)->IsDestroyed())  // Remove all entities that were scheduled for removal:
+		{
+			LOGD("Destroying entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
+			MarkDirty();
+			cEntity * ToDelete = *itr;
+			itr = m_Entities.erase(itr);
+			delete ToDelete;
+		}
+		else if ((*itr)->IsWorldTravellingFrom(m_World))
+		{
+			// Remove all entities that are travelling to another world
+			MarkDirty();
+			(*itr)->SetWorldTravellingFrom(NULL);
+			itr = m_Entities.erase(itr);
+		}
+		else if (
 			((*itr)->GetChunkX() != m_PosX) ||
 			((*itr)->GetChunkZ() != m_PosZ)
 		)
 		{
+			// The entity moved out of the chunk, move it to the neighbor
+			MarkDirty();
 			MoveEntityToNewChunk(*itr);
 			itr = m_Entities.erase(itr);
 		}
@@ -620,7 +616,7 @@ void cChunk::Tick(float a_Dt)
 		{
 			++itr;
 		}
-	}
+	}  // for itr - m_Entitites[]
 	
 	ApplyWeatherToTop();
 }
@@ -635,7 +631,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
-	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface,*this, a_RelX, a_RelY, a_RelZ);
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -695,13 +691,13 @@ void cChunk::ProcessQueuedSetBlocks(void)
 	{
 		if (itr->m_Tick <= CurrTick)
 		{
-			if (itr->m_PreviousType != E_BLOCK_AIR) // PreviousType defaults to 0 if not specified
+			if (itr->m_PreviousType != E_BLOCK_AIR)  // PreviousType defaults to 0 if not specified
 			{
 				if (GetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ) == itr->m_PreviousType)
 				{
 					// Current world age is bigger than/equal to target world age - delay time reached AND
 					// Previous block type was the same as current block type (to prevent duplication)
-					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta); // SetMeta doesn't send to client
+					SetBlock(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);  // SetMeta doesn't send to client
 					itr = m_SetBlockQueue.erase(itr);
 					LOGD("Successfully set queued block - previous and current types matched");
 				}
@@ -778,7 +774,7 @@ void cChunk::CheckBlocks()
 void cChunk::TickBlocks(void)
 {
 	// Tick dem blocks
-	// _X: We must limit the random number or else we get a nasty int overflow bug ( http://forum.mc-server.org/showthread.php?tid=457 )
+	// _X: We must limit the random number or else we get a nasty int overflow bug - http://forum.mc-server.org/showthread.php?tid=457
 	int RandomX = m_World->GetTickRandomNumber(0x00ffffff);
 	int RandomY = m_World->GetTickRandomNumber(0x00ffffff);
 	int RandomZ = m_World->GetTickRandomNumber(0x00ffffff);
@@ -807,7 +803,7 @@ void cChunk::TickBlocks(void)
 
 		if (m_BlockTickY > cChunkDef::GetHeight(m_HeightMap, m_BlockTickX, m_BlockTickZ))
 		{
-			continue; // It's all air up here
+			continue;  // It's all air up here
 		}
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
@@ -892,20 +888,19 @@ void cChunk::ApplyWeatherToTop()
 				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
 			}
 			else if (
-					(m_World->IsDeepSnowEnabled()) && 
-					(
-						(TopBlock == E_BLOCK_RED_ROSE) ||
-						(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
-						(TopBlock == E_BLOCK_RED_MUSHROOM) ||
-						(TopBlock == E_BLOCK_BROWN_MUSHROOM)
-					)
+				(m_World->IsDeepSnowEnabled()) &&
+				(
+					(TopBlock == E_BLOCK_RED_ROSE) ||
+					(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
+					(TopBlock == E_BLOCK_RED_MUSHROOM) ||
+					(TopBlock == E_BLOCK_BROWN_MUSHROOM)
 				)
+			)
 			{
 				SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
 			}
 			break;
 		}  // case (snowy biomes)
-		// TODO: Rainy biomes should check for farmland and cauldrons
 		default:
 		{
 			break;
@@ -941,10 +936,10 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ + 1, BlockType[2], BlockMeta);
 	IsValid = IsValid && UnboundedRelGetBlock(a_RelX,     a_RelY, a_RelZ - 1, BlockType[3], BlockMeta);
 	if (
-		!IsValid || 
-		(BlockType[0] == ProduceType) || 
-		(BlockType[1] == ProduceType) || 
-		(BlockType[2] == ProduceType) || 
+		!IsValid ||
+		(BlockType[0] == ProduceType) ||
+		(BlockType[1] == ProduceType) ||
+		(BlockType[2] == ProduceType) ||
 		(BlockType[3] == ProduceType)
 	)
 	{
@@ -1226,7 +1221,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 	}
 	Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 	return true;
-}	
+}
 
 
 
@@ -1298,6 +1293,7 @@ void cChunk::CreateBlockEntities(void)
 				switch (BlockType)
 				{
 					case E_BLOCK_BEACON:
+					case E_BLOCK_TRAPPED_CHEST:
 					case E_BLOCK_CHEST:
 					case E_BLOCK_COMMAND_BLOCK:
 					case E_BLOCK_DISPENSER:
@@ -1390,7 +1386,7 @@ void cChunk::CalculateHeightmap(const BLOCKTYPE * a_BlockTypes)
 		{
 			for (int y = Height - 1; y > -1; y--)
 			{
-				int index = MakeIndex( x, y, z );
+				int index = MakeIndex( x, y, z);
 				if (a_BlockTypes[index] != E_BLOCK_AIR)
 				{
 					m_HeightMap[x + z * Width] = (HEIGHTTYPE)y;
@@ -1428,6 +1424,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	switch (a_BlockType)
 	{
 		case E_BLOCK_BEACON:
+		case E_BLOCK_TRAPPED_CHEST:
 		case E_BLOCK_CHEST:
 		case E_BLOCK_COMMAND_BLOCK:
 		case E_BLOCK_DISPENSER:
@@ -1525,11 +1522,12 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 
 	m_ChunkData.SetBlock(a_RelX, a_RelY, a_RelZ, a_BlockType);
 
-	if ( // Queue block to be sent only if ...
-		a_SendToClients && // ... we are told to do so AND ...
+	// Queue block to be sent only if ...
+	if (
+		a_SendToClients &&                  // ... we are told to do so AND ...
 		(
-			(OldBlockMeta != a_BlockMeta) || // ... the meta value is different OR ...
-			!( // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them); see below for specifics:
+			(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
+			!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them):
 				((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
 				((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
 				((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
@@ -1722,11 +1720,11 @@ void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 	{
 		if ((!(*itr)->IsPickup()) && (!(*itr)->IsProjectile()))
 		{
-			continue; // Only pickups and projectiles
+			continue;  // Only pickups and projectiles can be picked up
 		}
-		float DiffX = (float)((*itr)->GetPosX() - PosX );
-		float DiffY = (float)((*itr)->GetPosY() - PosY );
-		float DiffZ = (float)((*itr)->GetPosZ() - PosZ );
+		float DiffX = (float)((*itr)->GetPosX() - PosX);
+		float DiffY = (float)((*itr)->GetPosY() - PosY);
+		float DiffZ = (float)((*itr)->GetPosZ() - PosZ);
 		float SqrDist = DiffX * DiffX + DiffY * DiffY + DiffZ * DiffZ;
 		if (SqrDist < 1.5f * 1.5f)  // 1.5 block
 		{
@@ -1788,7 +1786,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 
 
 
-void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
+void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity)
 {
 	MarkDirty();
 	m_BlockEntities.remove(a_BlockEntity);
@@ -1798,7 +1796,7 @@ void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity )
 
 
 
-bool cChunk::AddClient(cClientHandle* a_Client)
+bool cChunk::AddClient(cClientHandle * a_Client)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1808,9 +1806,9 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 			return false;
 		}
 	}
-	m_LoadedByClient.push_back( a_Client );
+	m_LoadedByClient.push_back( a_Client);
 
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
+	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		/*
 		// DEBUG:
@@ -1829,7 +1827,7 @@ bool cChunk::AddClient(cClientHandle* a_Client)
 
 
 
-void cChunk::RemoveClient( cClientHandle* a_Client )
+void cChunk::RemoveClient(cClientHandle * a_Client)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1837,12 +1835,12 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 		{
 			continue;
 		}
-		
+
 		m_LoadedByClient.erase(itr);
 
 		if (!a_Client->IsDestroyed())
 		{
-			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr )
+			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 			{
 				/*
 				// DEBUG:
@@ -1862,7 +1860,7 @@ void cChunk::RemoveClient( cClientHandle* a_Client )
 
 
 
-bool cChunk::HasClient( cClientHandle* a_Client )
+bool cChunk::HasClient(cClientHandle * a_Client)
 {
 	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -1893,9 +1891,9 @@ void cChunk::AddEntity(cEntity * a_Entity)
 	{
 		MarkDirty();
 	}
-	
+
 	ASSERT(std::find(m_Entities.begin(), m_Entities.end(), a_Entity) == m_Entities.end());  // Not there already
-	
+
 	m_Entities.push_back(a_Entity);
 }
 
@@ -1905,17 +1903,12 @@ void cChunk::AddEntity(cEntity * a_Entity)
 
 void cChunk::RemoveEntity(cEntity * a_Entity)
 {
-	size_t SizeBefore = m_Entities.size();
 	m_Entities.remove(a_Entity);
-	size_t SizeAfter = m_Entities.size();
-	
-	if (SizeBefore != SizeAfter)
+
+	// Mark as dirty if it was a server-generated entity:
+	if (!a_Entity->IsPlayer())
 	{
-		// Mark as dirty if it was a server-generated entity:
-		if (!a_Entity->IsPlayer())
-		{
-			MarkDirty();
-		}
+		MarkDirty();
 	}
 }
 
@@ -2137,6 +2130,77 @@ bool cChunk::DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBloc
 
 
 
+bool cChunk::DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cRedstonePoweredCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		switch ((*itr)->GetBlockType())
+		{
+			case E_BLOCK_DROPPER:
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_NOTE_BLOCK:
+			{
+				break;
+			}
+			default:
+			{
+				// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+				return false;
+			}
+		}
+		
+		if (a_Callback.Item((cRedstonePoweredEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+bool cChunk::DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback)
+{
+	// The blockentity list is locked by the parent chunkmap's CS
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(), itr2 = itr; itr != m_BlockEntities.end(); itr = itr2)
+	{
+		++itr2;
+		if (((*itr)->GetPosX() != a_BlockX) || ((*itr)->GetPosY() != a_BlockY) || ((*itr)->GetPosZ() != a_BlockZ))
+		{
+			continue;
+		}
+		if ((*itr)->GetBlockType() != E_BLOCK_BEACON)
+		{
+			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
+			return false;
+		}
+		
+		// The correct block entity is here
+		if (a_Callback.Item((cBeaconEntity *)*itr))
+		{
+			return false;
+		}
+		return true;
+	}  // for itr - m_BlockEntitites[]
+	
+	// Not found:
+	return false;
+}
+
+
+
+
+
 bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback)
 {
 	// The blockentity list is locked by the parent chunkmap's CS
@@ -2147,7 +2211,7 @@ bool cChunk::DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallb
 		{
 			continue;
 		}
-		if ((*itr)->GetBlockType() != E_BLOCK_CHEST)
+		if (((*itr)->GetBlockType() != E_BLOCK_CHEST) && ((*itr)->GetBlockType() != E_BLOCK_TRAPPED_CHEST))  // Trapped chests use normal chests' handlers
 		{
 			// There is a block entity here, but of different type. No other block entity can be here, so we can safely bail out
 			return false;
@@ -2289,7 +2353,7 @@ bool cChunk::DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceC
 			}
 		}  // switch (BlockType)
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cFurnaceEntity *)*itr))
 		{
 			return false;
@@ -2321,7 +2385,7 @@ bool cChunk::DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBl
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here
 		if (a_Callback.Item((cNoteEntity *)*itr))
 		{
 			return false;
@@ -2353,7 +2417,7 @@ bool cChunk::DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCom
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cCommandBlockEntity *)*itr))
 		{
 			return false;
@@ -2385,7 +2449,7 @@ bool cChunk::DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadC
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here,
 		if (a_Callback.Item((cMobHeadEntity *)*itr))
 		{
 			return false;
@@ -2417,7 +2481,7 @@ bool cChunk::DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlower
 			return false;
 		}
 		
-		// The correct block entity is here, 
+		// The correct block entity is here
 		if (a_Callback.Item((cFlowerPotEntity *)*itr))
 		{
 			return false;
@@ -2470,13 +2534,13 @@ bool cChunk::GetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_
 BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	if (
-		(a_RelX < 0) || (a_RelX >= Width) || 
+		(a_RelX < 0) || (a_RelX >= Width) ||
 		(a_RelY < 0) || (a_RelY >= Height) ||
 		(a_RelZ < 0) || (a_RelZ >= Width)
 	)
 	{
 		ASSERT(!"GetBlock(x, y, z) out of bounds!");
-		return 0; // Clip
+		return 0;  // Clip
 	}
 
 	return m_ChunkData.GetBlock(a_RelX, a_RelY, a_RelZ);
@@ -2527,8 +2591,8 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 	{
 		int BlockX = m_PosX * cChunkDef::Width + a_RelX;
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
-		int BlockY, ChunkX, ChunkZ;
-		AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
+		int ChunkX, ChunkZ;
+		BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 		return m_ChunkMap->GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
 	}
 
@@ -2647,7 +2711,7 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 
 void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		(*itr)->SendAttachEntity(a_Entity, a_Vehicle);
 	}  // for itr - LoadedByClient[]
@@ -2659,7 +2723,7 @@ void cChunk::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_V
 
 void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2675,7 +2739,7 @@ void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2697,7 +2761,7 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	{
 		return;
 	}
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2713,7 +2777,7 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2729,7 +2793,7 @@ void cChunk::BroadcastChunkData(cChunkDataSerializer & a_Serializer, const cClie
 
 void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2745,7 +2809,7 @@ void cChunk::BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_
 
 void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2761,7 +2825,7 @@ void cChunk::BroadcastDestroyEntity(const cEntity & a_Entity, const cClientHandl
 
 void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2777,7 +2841,7 @@ void cChunk::BroadcastEntityEffect(const cEntity & a_Entity, int a_EffectID, int
 
 void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2793,7 +2857,7 @@ void cChunk::BroadcastEntityEquipment(const cEntity & a_Entity, short a_SlotNum,
 
 void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2809,7 +2873,7 @@ void cChunk::BroadcastEntityHeadLook(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2825,7 +2889,7 @@ void cChunk::BroadcastEntityLook(const cEntity & a_Entity, const cClientHandle *
 
 void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2841,7 +2905,7 @@ void cChunk::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2857,7 +2921,7 @@ void cChunk::BroadcastEntityRelMove(const cEntity & a_Entity, char a_RelX, char 
 
 void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2873,7 +2937,7 @@ void cChunk::BroadcastEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, c
 
 void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2889,7 +2953,7 @@ void cChunk::BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, cons
 
 void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2905,7 +2969,7 @@ void cChunk::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::const_iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2921,7 +2985,7 @@ void cChunk::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation
 
 void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2937,7 +3001,7 @@ void cChunk::BroadcastParticleEffect(const AString & a_ParticleName, float a_Src
 
 void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2951,15 +3015,15 @@ void cChunk::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cChunk::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cChunk::BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
 			continue;
 		}
-		(*itr)->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+		(*itr)->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
 	}  // for itr - LoadedByClient[]
 }
 
@@ -2969,7 +3033,7 @@ void cChunk::BroadcastSoundEffect(const AString & a_SoundName, int a_SrcX, int a
 
 void cChunk::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -2985,7 +3049,7 @@ void cChunk::BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY
 
 void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -3001,7 +3065,7 @@ void cChunk::BroadcastSpawnEntity(cEntity & a_Entity, const cClientHandle * a_Ex
 
 void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		if (*itr == a_Exclude)
 		{
@@ -3015,9 +3079,9 @@ void cChunk::BroadcastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 
 
 
-void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr )
+	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
 		(*itr)->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 	}  // for itr - LoadedByClient[]

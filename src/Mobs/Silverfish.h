@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	CLASS_PROTODEF(cSilverfish);
+	CLASS_PROTODEF(cSilverfish)
 } ;
 
 

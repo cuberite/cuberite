@@ -4,9 +4,15 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-file(GLOB SOURCE
-    "*.cpp"
-    "*.h"
-)
+SET (SRCS
+	SlotArea.cpp
+	Window.cpp)
 
-add_library(UI ${SOURCE})
+SET (HDRS
+	SlotArea.h
+	Window.h
+	WindowOwner.h)
+
+if(NOT MSVC)
+	add_library(UI ${SRCS} ${HDRS})
+endif()

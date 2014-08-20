@@ -191,7 +191,7 @@ bool cBoundingBox::IsInside(const Vector3d & a_Point)
 
 
 
-bool cBoundingBox::IsInside(double a_X, double a_Y,double a_Z)
+bool cBoundingBox::IsInside(double a_X, double a_Y, double a_Z)
 {
 	return IsInside(m_Min, m_Max, a_X, a_Y, a_Z);
 }

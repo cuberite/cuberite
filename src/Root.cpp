@@ -18,6 +18,7 @@
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
+#include "LoggerListeners.h"
 
 #include "inifile/iniFile.h"
 
@@ -29,8 +30,6 @@
 #elif defined(__APPLE__)
 	#include <mach/mach.h>
 #endif
-
-extern bool g_TERMINATE_EVENT_RAISED;
 
 
 
@@ -53,7 +52,6 @@ cRoot::cRoot(void) :
 	m_FurnaceRecipe(NULL),
 	m_WebAdmin(NULL),
 	m_PluginManager(NULL),
-	m_Log(NULL),
 	m_bStop(false),
 	m_bRestart(false)
 {
@@ -79,17 +77,17 @@ void cRoot::InputThread(void * a_Params)
 
 	cLogCommandOutputCallback Output;
 	
-	while (!self.m_bStop && !self.m_bRestart && !g_TERMINATE_EVENT_RAISED && std::cin.good())
+	while (!self.m_bStop && !self.m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
 		std::getline(std::cin, Command);
 		if (!Command.empty())
-		{			
+		{
 			self.ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
 
-	if (g_TERMINATE_EVENT_RAISED || !std::cin.good())
+	if (m_TerminateEventRaised || !std::cin.good())
 	{
 		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
 		self.m_bStop = true;
@@ -105,12 +103,17 @@ void cRoot::Start(void)
 	#ifdef _WIN32
 	HWND hwnd = GetConsoleWindow();
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
-	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED); // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
+	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
+	
+	cLogger::cListener * consoleLogListener = MakeConsoleListener();
+	cLogger::cListener * fileLogListener = new cFileListener();
+	cLogger::GetInstance().AttachListener(consoleLogListener);
+	cLogger::GetInstance().AttachListener(fileLogListener);
+	
+	LOG("--- Started Log ---\n");
 
 	cDeadlockDetect dd;
-	delete m_Log;
-	m_Log = new cMCLogger();
 
 	m_bStop = false;
 	while (!m_bStop)
@@ -147,6 +150,7 @@ void cRoot::Start(void)
 		}
 
 		LOG("Starting server...");
+		m_MojangAPI.Start(IniFile);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
 		if (!m_Server->InitServer(IniFile))
 		{
 			LOGERROR("Failure starting server, aborting...");
@@ -193,8 +197,8 @@ void cRoot::Start(void)
 
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
-		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread" );
-		m_InputThread->Start( false );	// We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
+		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread");
+		m_InputThread->Start( false);  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -202,15 +206,15 @@ void cRoot::Start(void)
 
 		LOG("Startup complete, took %lld ms!", finishmseconds);
 		#ifdef _WIN32
-		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED); // Re-enable close button
+		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
-		while (!m_bStop && !m_bRestart && !g_TERMINATE_EVENT_RAISED)  // These are modified by external threads
+		while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
 		{
 			cSleep::MilliSleep(1000);
 		}
 
-		if (g_TERMINATE_EVENT_RAISED)
+		if (m_TerminateEventRaised)
 		{
 			m_bStop = true;
 		}
@@ -250,8 +254,13 @@ void cRoot::Start(void)
 		delete m_Server; m_Server = NULL;
 		LOG("Shutdown successful!");
 	}
-
-	delete m_Log; m_Log = NULL;
+	
+	LOG("--- Stopped Log ---");
+	
+	cLogger::GetInstance().DetachListener(consoleLogListener);
+	delete consoleLogListener;
+	cLogger::GetInstance().DetachListener(fileLogListener);
+	delete fileLogListener;
 }
 
 
@@ -271,32 +280,32 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 {
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str() );
+	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
-	unsigned int KeyNum = IniFile.FindKey("Worlds");
-	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum );
+	int KeyNum = IniFile.FindKey("Worlds");
+	int NumWorlds = IniFile.GetNumValues(KeyNum);
 	if (NumWorlds <= 0)
 	{
 		return;
 	}
 	
 	bool FoundAdditionalWorlds = false;
-	for (unsigned int i = 0; i < NumWorlds; i++)
+	for (int i = 0; i < NumWorlds; i++)
 	{
-		AString ValueName = IniFile.GetValueName(KeyNum, i );
+		AString ValueName = IniFile.GetValueName(KeyNum, i);
 		if (ValueName.compare("World") != 0)
 		{
 			continue;
 		}
-		AString WorldName = IniFile.GetValue(KeyNum, i );
+		AString WorldName = IniFile.GetValue(KeyNum, i);
 		if (WorldName.empty())
 		{
 			continue;
 		}
 		FoundAdditionalWorlds = true;
-		cWorld* NewWorld = new cWorld( WorldName.c_str() );
+		cWorld* NewWorld = new cWorld( WorldName.c_str());
 		m_WorldsByName[ WorldName ] = NewWorld;
 	}  // for i - Worlds
 
@@ -314,13 +323,15 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 
 
 
-cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName)
+cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
 {
-	if (m_WorldsByName[a_WorldName] != NULL)
+	cWorld * World = m_WorldsByName[a_WorldName];
+	if (World != NULL)
 	{
-		return NULL;
+		return World;
 	}
-	cWorld* NewWorld = new cWorld(a_WorldName.c_str());
+
+	cWorld * NewWorld = new cWorld(a_WorldName.c_str(), a_Dimension, a_OverworldName);
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();
 	NewWorld->InitializeSpawn();
@@ -361,7 +372,7 @@ void cRoot::StopWorlds(void)
 void cRoot::UnloadWorlds(void)
 {
 	m_pDefaultWorld = NULL;
-	for( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		delete itr->second;
 	}
@@ -372,7 +383,7 @@ void cRoot::UnloadWorlds(void)
 
 
 
-cWorld* cRoot::GetDefaultWorld()
+cWorld * cRoot::GetDefaultWorld()
 {
 	return m_pDefaultWorld;
 }
@@ -381,12 +392,19 @@ cWorld* cRoot::GetDefaultWorld()
 
 
 
-cWorld* cRoot::GetWorld( const AString & a_WorldName )
+cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
 {
-	WorldMap::iterator itr = m_WorldsByName.find( a_WorldName );
-	if( itr != m_WorldsByName.end() )
+	WorldMap::iterator itr = m_WorldsByName.find(a_WorldName);
+	if (itr != m_WorldsByName.end())
+	{
 		return itr->second;
-	return 0;
+	}
+
+	if (a_SearchForFolder && cFile::IsFolder(FILE_IO_PREFIX + a_WorldName))
+	{
+		return CreateAndInitializeWorld(a_WorldName);
+	}
+	return NULL;
 }
 
 
@@ -398,9 +416,12 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
-		if (a_Callback.Item(itr->second))
+		if (itr->second != NULL)
 		{
-			return false;
+			if (a_Callback.Item(itr->second))
+			{
+				return false;
+			}
 		}
 	}
 	return true;
@@ -499,9 +520,9 @@ void cRoot::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID)
+void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
-	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID);
+	m_Server->AuthenticateUser(a_ClientID, a_Name, a_UUID, a_Properties);
 }
 
 
@@ -511,7 +532,7 @@ void cRoot::AuthenticateUser(int a_ClientID, const AString & a_Name, const AStri
 int cRoot::GetTotalChunkCount(void)
 {
 	int res = 0;
-	for ( WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr )
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		res += itr->second->GetNumChunks();
 	}
@@ -607,7 +628,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 				m_BestRating = Rating;
 				++m_NumMatches;
 			}
-			if (Rating == m_NameLength) // Perfect match
+			if (Rating == m_NameLength)  // Perfect match
 			{
 				return true;
 			}
@@ -687,7 +708,7 @@ int cRoot::GetVirtualRAMUsage(void)
 			&t_info_count
 		))
 		{
-		    return (int)(t_info.virtual_size / 1024);
+			return (int)(t_info.virtual_size / 1024);
 		}
 		return -1;
 	#else
@@ -739,7 +760,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 			&t_info_count
 		))
 		{
-		    return (int)(t_info.resident_size / 1024);
+			return (int)(t_info.resident_size / 1024);
 		}
 		return -1;
 	#else

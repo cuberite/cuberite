@@ -5,6 +5,12 @@
 
 #pragma once
 
+#include <cmath>
+
+
+
+
+
 // Some settings
 #define NOISE_DATATYPE float
 
@@ -32,6 +38,12 @@ public:
 	INLINE NOISE_DATATYPE IntNoise1D(int a_X) const;
 	INLINE NOISE_DATATYPE IntNoise2D(int a_X, int a_Y) const;
 	INLINE NOISE_DATATYPE IntNoise3D(int a_X, int a_Y, int a_Z) const;
+
+	// Return a float number in the specified range:
+	INLINE NOISE_DATATYPE IntNoise2DInRange(int a_X, int a_Y, float a_Min, float a_Max) const
+	{
+		return a_Min + std::abs(IntNoise2D(a_X, a_Y)) * (a_Max - a_Min);
+	}
 
 	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of occurrence. Divide by 8 to rectify.
 	INLINE int IntNoise1DInt(int a_X) const;
@@ -100,7 +112,7 @@ protected:
 	cNoise m_Noise;  // Used for integral rnd values
 
 	#ifdef _DEBUG
-		// Statistics on the noise-space coords:	
+		// Statistics on the noise-space coords:
 		static int m_NumSingleX;
 		static int m_NumSingleXY;
 		static int m_NumSingleY;
@@ -256,7 +268,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Inline function definitions:
 // These need to be in the header, otherwise linker error occur in MSVC
 
@@ -361,7 +373,7 @@ NOISE_DATATYPE cNoise::LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B,
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Global functions:
 
 extern void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase);

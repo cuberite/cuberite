@@ -30,7 +30,7 @@ struct cFurnaceRecipe::sFurnaceRecipeState
 
 
 cFurnaceRecipe::cFurnaceRecipe()
-	: m_pState( new sFurnaceRecipeState )
+	: m_pState( new sFurnaceRecipeState)
 {
 	ReloadRecipes();
 }
@@ -107,7 +107,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, int a_LineNum)
 {
 	// Fuel
 	int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
-	AString::size_type BeginPos = 1; // Begin at one after exclamation mark (bang)
+	AString::size_type BeginPos = 1;  // Begin at one after exclamation mark (bang)
 
 	if (
 		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, IItemID) ||                       // Read item ID
@@ -133,7 +133,7 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, int a_LineNum)
 {
 	int IItemID = 0, IItemCount = 0, IItemHealth = 0, IBurnTime = 0;
 	int OItemID = 0, OItemCount = 0, OItemHealth = 0;
-	AString::size_type BeginPos = 0; // Begin at start of line
+	AString::size_type BeginPos = 0;  // Begin at start of line
 
 	if (
 		!ReadMandatoryNumber(BeginPos, ":", a_Line, a_LineNum, IItemID) ||                                  // Read item ID
@@ -193,7 +193,7 @@ bool cFurnaceRecipe::ReadMandatoryNumber(AString::size_type & a_Begin, const ASt
 	}
 	a_Value = atoi(a_Text.substr(a_Begin, End - a_Begin).c_str());
 
-	a_Begin = End + 1; // Jump over delimiter
+	a_Begin = End + 1;  // Jump over delimiter
 	return true;
 }
 
@@ -236,7 +236,7 @@ bool cFurnaceRecipe::ReadOptionalNumbers(AString::size_type & a_Begin, const ASt
 			}
 			a_ValueTwo = atoi(a_Text.substr(Begin, End - Begin).c_str());
 
-			a_Begin = End + 1; // Jump over delimiter
+			a_Begin = End + 1;  // Jump over delimiter
 			return true;
 		}
 		else

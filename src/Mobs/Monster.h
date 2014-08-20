@@ -61,28 +61,28 @@ public:
 
 	enum eFamily
 	{
-		mfHostile  = 0, // Spider, Zombies ...
-		mfPassive  = 1, // Cows, Pigs
-		mfAmbient  = 2, // Bats
-		mfWater    = 3, // Squid
+		mfHostile  = 0,  // Spider, Zombies ...
+		mfPassive  = 1,  // Cows, Pigs
+		mfAmbient  = 2,  // Bats
+		mfWater    = 3,  // Squid
 
 		mfNoSpawn,
-		mfUnhandled, // Nothing. Be sure this is the last and the others are in order
+		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
 	} ;
 	
 	// tolua_end
 	
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
-	enum MPersonality{PASSIVE,AGGRESSIVE,COWARDLY} m_EMPersonality;
+	enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
 	
 	/** Creates the mob object.
-	* If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
-	* a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs , 2012_12_22))
-	* a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
+	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
+	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
+	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
-	CLASS_PROTODEF(cMonster);
+	CLASS_PROTODEF(cMonster)
 	
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -90,10 +90,9 @@ public:
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	
-	virtual void KilledBy(cEntity * a_Killer) override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void MoveToPosition(const Vector3f & a_Position);
-	virtual void MoveToPosition(const Vector3d & a_Position); // tolua_export
+	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 	virtual bool ReachedDestination(void);
 	
 	// tolua_begin
@@ -106,6 +105,9 @@ public:
 	
 	/// Reads the monster configuration for the specified monster name and assigns it to this object.
 	void GetMonsterConfig(const AString & a_Name);
+	
+	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
+	virtual bool IsUndead(void);
 	
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);
@@ -178,6 +180,7 @@ protected:
 
 	/** Stores if mobile is currently moving towards the ultimate, final destination */
 	bool m_bMovingToDestination;
+	
 	/** Finds the first non-air block position (not the highest, as cWorld::GetHeight does)
 		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
 		If current Y is solid, goes up to find first nonsolid block, and returns that */
@@ -229,7 +232,7 @@ protected:
 	AString m_SoundHurt;
 	AString m_SoundDeath;
 
-	float m_AttackRate;	
+	float m_AttackRate;
 	int m_AttackDamage;
 	int m_AttackRange;
 	float m_AttackInterval;
@@ -246,13 +249,13 @@ protected:
 	bool m_BurnsInDaylight;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);	
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
 	
 	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops*/
-	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);	
+	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);
 	
 	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops*/
-	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel); 
+	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel);
 	
 	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if piccked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop*/
 	void AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel);
@@ -261,7 +264,7 @@ protected:
 	void AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel);
 	
 
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

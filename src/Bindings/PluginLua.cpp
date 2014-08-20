@@ -25,7 +25,7 @@ extern "C"
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPluginLua:
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory) :
@@ -78,7 +78,7 @@ bool cPluginLua::Initialize(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
-	{	
+	{
 		m_LuaState.Create();
 		m_LuaState.RegisterAPILibs();
 		
@@ -420,6 +420,26 @@ bool cPluginLua::OnDisconnect(cClientHandle & a_Client, const AString & a_Reason
 
 
 
+bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_ENTITY_ADD_EFFECT];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_DistanceModifier, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -575,14 +595,14 @@ bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 
 
 
-bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_KILLING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Victim, a_Killer, &a_TDI, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -815,14 +835,14 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoved(cPlayer & a_Player)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_MOVING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_OldPosition, &a_NewPosition, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -995,7 +1015,7 @@ bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) 
+bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
@@ -1274,8 +1294,8 @@ bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 
 
 bool cPluginLua::OnUpdatedSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	cWorld * a_World,
+	int a_BlockX, int a_BlockY, int a_BlockZ,
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
 	cPlayer * a_Player
 )
@@ -1299,8 +1319,8 @@ bool cPluginLua::OnUpdatedSign(
 
 
 bool cPluginLua::OnUpdatingSign(
-	cWorld * a_World, 
-	int a_BlockX, int a_BlockY, int a_BlockZ, 
+	cWorld * a_World,
+	int a_BlockX, int a_BlockY, int a_BlockZ,
 	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
 	cPlayer * a_Player
 )
@@ -1497,7 +1517,7 @@ bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 		return true;
 	}
 	
-	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.", 
+	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.",
 		GetName().c_str(), a_HookType, FnName
 	);
 	m_LuaState.LogStackTrace();
@@ -1524,6 +1544,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_CRAFTING_NO_RECIPE:           return "OnCraftingNoRecipe";
 		case cPluginManager::HOOK_DISCONNECT:                   return "OnDisconnect";
 		case cPluginManager::HOOK_PLAYER_ANIMATION:             return "OnPlayerAnimation";
+		case cPluginManager::HOOK_ENTITY_ADD_EFFECT:            return "OnEntityAddEffect";
 		case cPluginManager::HOOK_EXECUTE_COMMAND:              return "OnExecuteCommand";
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
@@ -1634,7 +1655,7 @@ int cPluginLua::CallFunctionFromForeignState(
 
 
 
-AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
+AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request)
 {
 	cCSLock Lock(m_CriticalSection);
 	std::string RetVal = "";
@@ -1649,7 +1670,7 @@ AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request )
 	sWebPluginTab * Tab = 0;
 	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
 	{
-		if ((*itr)->SafeTitle.compare(SafeTabName) == 0) // This is the one! Rawr
+		if ((*itr)->SafeTitle.compare(SafeTabName) == 0)  // This is the one! Rawr
 		{
 			Tab = *itr;
 			break;

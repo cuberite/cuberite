@@ -39,14 +39,14 @@ public:
 	/** Can this block hold snow atop? */
 	bool m_IsSnowable;
 
-	/** Does this block require a tool to drop? */
-	bool m_RequiresSpecialTool;
-
 	/** Is this block solid (player cannot walk through)? */
 	bool m_IsSolid;
 
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
+
+	/** Can a finisher change it? */
+	bool m_CanBeTerraformed;
 
 	// tolua_end
 
@@ -61,9 +61,9 @@ public:
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
-	inline static bool RequiresSpecialTool        (BLOCKTYPE a_Type) { return Get(a_Type).m_RequiresSpecialTool; }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
+	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 
 	// tolua_end
 
@@ -81,7 +81,7 @@ protected:
 
 	/** Initializes the specified BlockInfo structures with block-specific values. */
 	static void Initialize(cBlockInfoArray & a_BlockInfos);
-}; // tolua_export
+};  // tolua_export
 
 
 

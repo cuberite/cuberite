@@ -27,9 +27,9 @@ public:
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir); // Make sure block that will be occupied is free
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir);  // Make sure block that will be occupied is free
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir, true); // We want the clicked block, so go back again
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir, true);  // We want the clicked block, so go back again
 
 		if (Block == E_BLOCK_AIR)
 		{

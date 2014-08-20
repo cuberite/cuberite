@@ -15,7 +15,7 @@ class cWither :
 public:
 	cWither(void);
 
-	CLASS_PROTODEF(cWither);
+	CLASS_PROTODEF(cWither)
 
 	unsigned int GetWitherInvulnerableTicks(void) const { return m_WitherInvulnerableTicks; }
 
@@ -29,7 +29,9 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void KilledBy(cEntity * a_Killer) override;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	
+	virtual bool IsUndead(void) override { return true; }
 
 private:
 

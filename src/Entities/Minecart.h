@@ -21,15 +21,16 @@ class cMinecart :
 	typedef cEntity super;
 	
 public:
-	CLASS_PROTODEF(cMinecart);
+	CLASS_PROTODEF(cMinecart)
 	
+	/** Minecart payload, values correspond to packet subtype */
 	enum ePayload
 	{
-		mpNone,     // Empty minecart, ridable by player or mobs
-		mpChest,    // Minecart-with-chest, can store a grid of 3*8 items
-		mpFurnace,  // Minecart-with-furnace, can be powered
-		mpTNT,      // Minecart-with-TNT, can be blown up with activator rail
-		mpHopper,   // Minecart-with-hopper, can be hopper
+		mpNone    = 0,  // Empty minecart, ridable by player or mobs
+		mpChest   = 1,  // Minecart-with-chest, can store a grid of 3*8 items
+		mpFurnace = 2,  // Minecart-with-furnace, can be powered
+		mpTNT     = 3,  // Minecart-with-TNT, can be blown up with activator rail
+		mpHopper  = 5,  // Minecart-with-hopper, can be hopper
 		// TODO: Spawner minecarts, (and possibly any block in a minecart with NBT editing)
 	} ;
 	
@@ -88,7 +89,7 @@ class cRideableMinecart :
 	typedef cMinecart super;
 	
 public:
-	CLASS_PROTODEF(cRideableMinecart);
+	CLASS_PROTODEF(cRideableMinecart)
 	
 	cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
 
@@ -99,7 +100,7 @@ public:
 protected:
 
 	cItem m_Content;
-	int m_Height; 
+	int m_Height;
 } ;
 
 
@@ -112,7 +113,7 @@ class cMinecartWithChest :
 	typedef cMinecart super;
 	
 public:
-	CLASS_PROTODEF(cMinecartWithChest);
+	CLASS_PROTODEF(cMinecartWithChest)
 	
 	/// Number of item slots in the chest
 	static const int NumSlots = 9 * 3;
@@ -143,7 +144,7 @@ class cMinecartWithFurnace :
 	typedef cMinecart super;
 	
 public:
-	CLASS_PROTODEF(cMinecartWithFurnace);
+	CLASS_PROTODEF(cMinecartWithFurnace)
 	
 	cMinecartWithFurnace(double a_X, double a_Y, double a_Z);
 	
@@ -175,7 +176,7 @@ class cMinecartWithTNT :
 	typedef cMinecart super;
 	
 public:
-	CLASS_PROTODEF(cMinecartWithTNT);
+	CLASS_PROTODEF(cMinecartWithTNT)
 	
 	cMinecartWithTNT(double a_X, double a_Y, double a_Z);
 } ;
@@ -190,7 +191,7 @@ class cMinecartWithHopper :
 	typedef cMinecart super;
 	
 public:
-	CLASS_PROTODEF(cMinecartWithHopper);
+	CLASS_PROTODEF(cMinecartWithHopper)
 	
 	cMinecartWithHopper(double a_X, double a_Y, double a_Z);
 } ;

@@ -38,33 +38,33 @@ private:
 
 	#define MAX_POWER_LEVEL 15
 
-	struct sPoweredBlocks // Define structure of the directly powered blocks list
+	struct sPoweredBlocks  // Define structure of the directly powered blocks list
 	{
-		Vector3i a_BlockPos; // Position of powered block
-		Vector3i a_SourcePos; // Position of source powering the block at a_BlockPos
+		Vector3i a_BlockPos;  // Position of powered block
+		Vector3i a_SourcePos;  // Position of source powering the block at a_BlockPos
 		unsigned char a_PowerLevel;
 	};
 
-	struct sLinkedPoweredBlocks // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
+	struct sLinkedPoweredBlocks  // Define structure of the indirectly powered blocks list (i.e. repeaters powering through a block to the block at the other side)
 	{
 		Vector3i a_BlockPos;
-		Vector3i a_MiddlePos; // Position of block that is betwixt a source and the destination
+		Vector3i a_MiddlePos;  // Position of block that is betwixt a source and the destination
 		Vector3i a_SourcePos;
 		unsigned char a_PowerLevel;
 	};
 
-	struct sSimulatedPlayerToggleableList // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
+	struct sSimulatedPlayerToggleableList  // Define structure of the list containing simulate-on-update blocks (such as trapdoors that respond once to a block update, and can be toggled by a player)
 	{
 		Vector3i a_RelBlockPos;
-		bool WasLastStatePowered; // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
+		bool WasLastStatePowered;  // Was the last state powered or not? Determines whether a source update has happened and if I should resimulate
 	};
 
-	struct sRepeatersDelayList // Define structure of list containing repeaters' delay states
+	struct sRepeatersDelayList  // Define structure of list containing repeaters' delay states
 	{
 		Vector3i a_RelBlockPos;
-		unsigned char a_DelayTicks; // For how many ticks should the repeater delay
-		unsigned char a_ElapsedTicks; // How much of the previous has been elapsed?
-		bool ShouldPowerOn; // What happens when the delay time is fulfilled?
+		unsigned char a_DelayTicks;  // For how many ticks should the repeater delay
+		unsigned char a_ElapsedTicks;  // How much of the previous has been elapsed?
+		bool ShouldPowerOn;  // What happens when the delay time is fulfilled?
 	};
 
 public:
@@ -107,6 +107,8 @@ private:
 	If this line is complete, it verifies that at least on wire reports an entity is on top (via its meta), and performs its task
 	*/
 	void HandleTripwireHook(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
+	/** Handles trapped chests */
+	void HandleTrappedChest(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/* ==================== */
 
 	/* ====== CARRIERS ====== */
@@ -114,8 +116,6 @@ private:
 	void HandleRedstoneWire(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Handles repeaters */
 	void HandleRedstoneRepeater(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, BLOCKTYPE a_MyState);
-	/** Handles delayed updates to Repeaters **/
-	void HandleRedstoneRepeaterDelays();
 	/* ====================== */
 
 	/* ====== DEVICES ====== */
@@ -156,11 +156,15 @@ private:
 	void SetAllDirsAsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	/** Queues a repeater to be powered or unpowered and returns if the m_RepeatersDelayList iterators were invalidated */
 	bool QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn);
+	/** Removes a block from the Powered and LinkedPowered lists
+	Used for variable sources such as tripwire hooks, daylight sensors, and trapped chests
+	*/
+	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
 
 	/** Returns if a coordinate is powered or linked powered */
-	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
+	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
 	/** Returns if a coordinate is in the directly powered blocks list */
-	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
+	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk);
 	/** Returns if a coordinate is in the indirectly powered blocks list */
 	bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Returns if a coordinate was marked as simulated (for blocks toggleable by players) */
@@ -174,7 +178,8 @@ private:
 	/** Returns if a wire is powered
 	The only diffence between this and a normal AreCoordsPowered is that this function checks for a wire powering another wire */
 	bool IsWirePowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char & a_PowerLevel);
-
+	/** Handles delayed updates to repeaters **/
+	void HandleRedstoneRepeaterDelays(void);
 
 	/** Returns if lever metadata marks it as emitting power */
 	bool IsLeverOn(NIBBLETYPE a_BlockMeta);
@@ -186,7 +191,9 @@ private:
 	/** Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation */
 	inline static bool IsViableMiddleBlock(BLOCKTYPE Block) { return cBlockInfo::FullyOccupiesVoxel(Block); }
 
-	/** Returns if a block is a mechanism (something that accepts power and does something) */
+	/** Returns if a block is a mechanism (something that accepts power and does something)
+	Used by torches to determine if they power a block whilst not standing on the ground
+	*/
 	inline static bool IsMechanism(BLOCKTYPE Block)
 	{
 		switch (Block)
@@ -209,6 +216,7 @@ private:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
 			case E_BLOCK_POWERED_RAIL:
+			case E_BLOCK_REDSTONE_WIRE:
 			{
 				return true;
 			}
@@ -235,6 +243,7 @@ private:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_TRAPPED_CHEST:
 			{
 				return true;
 			}
@@ -277,6 +286,7 @@ private:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
 			case E_BLOCK_TNT:
 			case E_BLOCK_TRAPDOOR:
+			case E_BLOCK_TRAPPED_CHEST:
 			case E_BLOCK_TRIPWIRE_HOOK:
 			case E_BLOCK_TRIPWIRE:
 			case E_BLOCK_WOODEN_BUTTON:
@@ -284,10 +294,20 @@ private:
 			case E_BLOCK_WOODEN_PRESSURE_PLATE:
 			case E_BLOCK_PISTON:
 			{
-				 return true;
+				return true;
 			}
 			default: return false;
 		}
+	}
+
+	inline static bool AreCoordsOnChunkBoundary(int a_BlockX, int a_BlockY, int a_BlockZ)
+	{
+		return (  // Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
+			((a_BlockX % cChunkDef::Width) <= 1) ||
+			((a_BlockX % cChunkDef::Width) >= 14) ||
+			((a_BlockZ % cChunkDef::Width) <= 1) ||
+			((a_BlockZ % cChunkDef::Width) >= 14)
+		);
 	}
 };
 

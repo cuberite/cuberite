@@ -12,46 +12,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// cStructGenOreNests configuration:
-
-const int MAX_HEIGHT_COAL = 127;
-const int NUM_NESTS_COAL = 50;
-const int NEST_SIZE_COAL = 10;
-
-const int MAX_HEIGHT_IRON = 64;
-const int NUM_NESTS_IRON = 14;
-const int NEST_SIZE_IRON = 6;
-
-const int MAX_HEIGHT_REDSTONE = 16;
-const int NUM_NESTS_REDSTONE = 4;
-const int NEST_SIZE_REDSTONE = 6;
-
-const int MAX_HEIGHT_GOLD = 32;
-const int NUM_NESTS_GOLD = 2;
-const int NEST_SIZE_GOLD = 6;
-
-const int MAX_HEIGHT_DIAMOND = 15;
-const int NUM_NESTS_DIAMOND = 1;
-const int NEST_SIZE_DIAMOND = 4;
-
-const int MAX_HEIGHT_LAPIS = 30;
-const int NUM_NESTS_LAPIS = 2;
-const int NEST_SIZE_LAPIS = 5;
-
-const int MAX_HEIGHT_DIRT = 127;
-const int NUM_NESTS_DIRT = 20;
-const int NEST_SIZE_DIRT = 32;
-
-const int MAX_HEIGHT_GRAVEL = 70;
-const int NUM_NESTS_GRAVEL = 15;
-const int NEST_SIZE_GRAVEL = 32;
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 
 void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -151,7 +112,7 @@ void cStructGenTrees::GenerateSingleTree(
 	sSetBlockVector TreeLogs, TreeOther;
 	GetTreeImageByBiome(
 		a_ChunkX * cChunkDef::Width + x, Height + 1, a_ChunkZ * cChunkDef::Width + z,
-		m_Noise, a_Seq, 
+		m_Noise, a_Seq,
 		a_ChunkDesc.GetBiome(x, z),
 		TreeLogs, TreeOther
 	);
@@ -181,7 +142,7 @@ void cStructGenTrees::GenerateSingleTree(
 	}
 	
 	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeOther, a_OutsideOther);
-	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeLogs,  a_OutsideLogs);	
+	ApplyTreeImage(a_ChunkX, a_ChunkZ, a_ChunkDesc, TreeLogs,  a_OutsideLogs);
 }
 
 
@@ -303,7 +264,7 @@ int cStructGenTrees::GetNumTrees(
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenOreNests:
 
 void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -311,14 +272,15 @@ void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_COAL_ORE,     MAX_HEIGHT_COAL,     NUM_NESTS_COAL,     NEST_SIZE_COAL,     BlockTypes, 1);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_IRON_ORE,     MAX_HEIGHT_IRON,     NUM_NESTS_IRON,     NEST_SIZE_IRON,     BlockTypes, 2);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_REDSTONE_ORE, MAX_HEIGHT_REDSTONE, NUM_NESTS_REDSTONE, NEST_SIZE_REDSTONE, BlockTypes, 3);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     BlockTypes, 4);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  BlockTypes, 5);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_LAPIS_ORE,    MAX_HEIGHT_LAPIS,    NUM_NESTS_LAPIS,    NEST_SIZE_LAPIS,    BlockTypes, 6);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_DIRT,         MAX_HEIGHT_DIRT,     NUM_NESTS_DIRT,     NEST_SIZE_DIRT,     BlockTypes, 10);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_GRAVEL,       MAX_HEIGHT_GRAVEL,   NUM_NESTS_GRAVEL,   NEST_SIZE_GRAVEL,   BlockTypes, 11);
+
+	int seq = 1;
+	
+	// Generate the ores from the ore list.
+	for (OreList::const_iterator itr = m_OreList.begin(); itr != m_OreList.end(); ++itr)
+	{
+		GenerateOre(ChunkX, ChunkZ, itr->BlockType, itr->MaxHeight, itr->NumNests, itr->NestSize, BlockTypes, seq);
+		seq++;
+	}
 }
 
 
@@ -376,7 +338,7 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 						}
 
 						int Index = cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ);
-						if (a_BlockTypes[Index] == E_BLOCK_STONE)
+						if (a_BlockTypes[Index] == m_ToReplace)
 						{
 							a_BlockTypes[Index] = a_OreType;
 						}
@@ -410,7 +372,7 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenLakes:
 
 void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -484,7 +446,6 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 		const int BubbleY = 4 + (Rnd & 0x01);  // 4 .. 5
 		Rnd >>= 1;
 		const int BubbleZ = BubbleR + (Rnd % Range);
-		Rnd >>= 4;
 		const int HalfR = BubbleR / 2;  // 1 .. 2
 		const int RSquared = BubbleR * BubbleR;
 		for (int y = -HalfR; y <= HalfR; y++)
@@ -500,7 +461,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 					continue;
 				}
 				int IdxYZ = BubbleX + IdxY + (BubbleZ + z) * 16;
-				for (int x = -BubbleR; x <= BubbleR; x++) 
+				for (int x = -BubbleR; x <= BubbleR; x++)
 				{
 					if (x * x + DistYZ < RSquared)
 					{
@@ -511,10 +472,10 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 		}  // for y
 	}  // for i - bubbles
 
-	// Turn air in the bottom half into liquid:	
+	// Turn air in the bottom half into liquid:
 	for (int y = 0; y < 4; y++)
 	{
-		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++) 
+		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
 			if (BlockTypes[x + z * 16 + y * 16 * 16] == E_BLOCK_AIR)
 			{
@@ -532,7 +493,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenDirectOverhangs:
 
 cStructGenDirectOverhangs::cStructGenDirectOverhangs(int a_Seed) :
@@ -573,8 +534,8 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	// Interpolate the lowest floor:
 	for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 	{
-		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] = 
-			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) * 
+		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) *
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, BaseY, BaseZ + INTERPOL_Z * z) /
 			256;
 	}  // for x, z - FloorLo[]
@@ -586,10 +547,10 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 		// First update the high floor:
 		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 		{
-			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] = (
 				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
-				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
-				256;
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) / 256
+			);
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 		
@@ -648,7 +609,7 @@ bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenDistortedMembraneOverhangs:
 
 cStructGenDistortedMembraneOverhangs::cStructGenDistortedMembraneOverhangs(int a_Seed) :

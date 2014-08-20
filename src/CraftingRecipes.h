@@ -127,7 +127,7 @@ protected:
 	typedef std::vector<cRecipeSlot> cRecipeSlots;
 	
 	/** A single recipe, stored. Each recipe is normalized right after parsing (NormalizeIngredients())
-	A normalized recipe starts at (0,0)
+	A normalized recipe starts at (0, 0)
 	*/
 	struct cRecipe
 	{

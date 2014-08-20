@@ -27,11 +27,11 @@ protected :
 		cChunk& m_Chunk;
 	};
 
-public : 
-	typedef std::map<cEntity*,sDistanceAndChunk> tMonsterToDistance;
-	typedef std::multimap<double,sMonsterAndChunk> tDistanceToMonster;
+public :
+	typedef std::map<cEntity*, sDistanceAndChunk> tMonsterToDistance;
+	typedef std::multimap<double, sMonsterAndChunk> tDistanceToMonster;
 
-protected : 
+protected :
 	// this map is filled during collection phase, it will be later transformed into DistanceToMonster
 	tMonsterToDistance m_MonsterToDistance;
 
@@ -41,7 +41,7 @@ protected :
 	// this are the collected chunks. Used to determinate the number of elligible chunk for spawning.
 	std::set<cChunk*> m_EligibleForSpawnChunks;
 
-protected : 
+protected :
 	// transform monsterToDistance map (that was usefull for collecting) into distanceToMonster
 	// that will be usefull for picking up.
 	void convertMaps();
@@ -55,7 +55,8 @@ public :
 	// return the mobs that are within the range of distance of the closest player they are
 	// that means that if a mob is 30 m from a player and 150 m from another one. It will be
 	// in the range [0..50] but not in [100..200]
-	struct sIterablePair{
+	struct sIterablePair
+	{
 		tDistanceToMonster::const_iterator m_Begin;
 		tDistanceToMonster::const_iterator m_End;
 		int m_Count;

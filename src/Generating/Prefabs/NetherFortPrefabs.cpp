@@ -15,7 +15,7 @@
 
 const cPrefab::sDef g_NetherFortPrefabs[] =
 {
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BalconyCorridor:
 	// The data has been exported from the gallery Nether, area index 37, ID 288, created by Aloe_vera
 	{
@@ -162,7 +162,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BalconyTee2:
 	// The data has been exported from the gallery Nether, area index 38, ID 289, created by Aloe_vera
 	{
@@ -325,7 +325,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BlazePlatform:
 	// The data has been exported from the gallery Nether, area index 26, ID 276, created by tonibm1999
 	{
@@ -448,7 +448,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BlazePlatformOverhang:
 	// The data has been exported from the gallery Nether, area index 20, ID 162, created by STR_Warrior
 	{
@@ -621,7 +621,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeCircleCrossing:
 	// The data has been exported from the gallery Nether, area index 49, ID 308, created by Aloe_vera
 	{
@@ -824,7 +824,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeCrossing:
 	// The data has been exported from the gallery Nether, area index 17, ID 159, created by Aloe_vera
 	{
@@ -1028,7 +1028,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeCrumble1:
 	// The data has been exported from the gallery Nether, area index 19, ID 161, created by Aloe_vera
 	{
@@ -1125,7 +1125,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeCrumble2:
 	// The data has been exported from the gallery Nether, area index 18, ID 160, created by Aloe_vera
 	{
@@ -1228,7 +1228,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeDoubleCrumble:
 	// The data has been exported from the gallery Nether, area index 46, ID 305, created by STR_Warrior
 	{
@@ -1410,7 +1410,384 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	// BridgeDoubleStairs:
+	// The data has been exported from the gallery Nether, area index 115, ID 810, created by STR_Warrior
+	{
+		// Size:
+		15, 16, 16,  // SizeX = 15, SizeY = 16, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		14, 15, 15,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:114: 7\n"  /* netherbrickstairs */
+		"c:114: 6\n"  /* netherbrickstairs */
+		"d:114: 4\n"  /* netherbrickstairs */
+		"e:114: 5\n"  /* netherbrickstairs */
+		"f:114: 2\n"  /* netherbrickstairs */
+		"g:114: 3\n"  /* netherbrickstairs */
+		"h:114: 1\n"  /* netherbrickstairs */
+		"i: 44:14\n"  /* step */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmaaam"
+		/*  1 */ "aammmmmmmmmaaaa"
+		/*  2 */ "aammmmmmmmmmmma"
+		/*  3 */ "aammmmmmmmmmmma"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+		/* 12 */ "aammmmmmmmmmmma"
+		/* 13 */ "aammmmmmmmmmmma"
+		/* 14 */ "aammmmmmmmmaaaa"
+		/* 15 */ "mmmmmmmmmmmaaam"
+
+		// Level 1
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmaaam"
+		/*  1 */ "aammmmmmmmmaaaa"
+		/*  2 */ "aammmmmmmmmmmma"
+		/*  3 */ "aammmmmmmmmmmma"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+		/* 12 */ "aammmmmmmmmmmma"
+		/* 13 */ "aammmmmmmmmmmma"
+		/* 14 */ "aammmmmmmmmaaaa"
+		/* 15 */ "mmmmmmmmmmmaaam"
+
+		// Level 2
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmaaam"
+		/*  1 */ "aammmmmmmmmaaaa"
+		/*  2 */ "aammmmmmmmmmmma"
+		/*  3 */ "aammmmmmmmmmmma"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+		/* 12 */ "aammmmmmmmmmmma"
+		/* 13 */ "aammmmmmmmmmmma"
+		/* 14 */ "aammmmmmmmmaaaa"
+		/* 15 */ "mmmmmmmmmmmaaam"
+
+		// Level 3
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmaaam"
+		/*  1 */ "aammmmmmmmmaaaa"
+		/*  2 */ "aammmmmmmmmbbba"
+		/*  3 */ "aammmmmmmmmmmma"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+		/* 12 */ "aammmmmmmmmmmma"
+		/* 13 */ "aammmmmmmmmccca"
+		/* 14 */ "aammmmmmmmmaaaa"
+		/* 15 */ "mmmmmmmmmmmaaam"
+
+		// Level 4
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmaaam"
+		/*  1 */ "aammmmmmmmmaaaa"
+		/*  2 */ "aammmmmmmmmaaaa"
+		/*  3 */ "aammmmmmmmmbbba"
+		/*  4 */ "mmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmm"
+		/* 12 */ "aammmmmmmmmccca"
+		/* 13 */ "aammmmmmmmmaaaa"
+		/* 14 */ "aammmmmmmmmaaaa"
+		/* 15 */ "mmmmmmmmmmmaaam"
+
+		// Level 5
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmdaaae"
+		/*  1 */ "aammmmmmmmdaaaa"
+		/*  2 */ "aammmmmmmmdaaaa"
+		/*  3 */ "aammmmmmmmdaaaa"
+		/*  4 */ "mmmmmmmmmmdaaae"
+		/*  5 */ "mmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmdaaae"
+		/* 12 */ "aammmmmmmmdaaaa"
+		/* 13 */ "aammmmmmmmdaaaa"
+		/* 14 */ "aammmmmmmmdaaaa"
+		/* 15 */ "mmmmmmmmmmdaaae"
+
+		// Level 6
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmaaaaa"
+		/*  1 */ "aammmmmmmmaaaaa"
+		/*  2 */ "aammmmmmmmaaaaa"
+		/*  3 */ "aammmmmmmmaaaaa"
+		/*  4 */ "mmmmmmmmmmaaaaa"
+		/*  5 */ "mmmmmmmmmmdaaae"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmdaaae"
+		/* 11 */ "mmmmmmmmmmaaaaa"
+		/* 12 */ "aammmmmmmmaaaaa"
+		/* 13 */ "aammmmmmmmaaaaa"
+		/* 14 */ "aammmmmmmmaaaaa"
+		/* 15 */ "mmmmmmmmmmaaaaa"
+
+		// Level 7
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmma...a"
+		/*  1 */ "aammmmmmmma...a"
+		/*  2 */ "aammmmmmmma...a"
+		/*  3 */ "aammmmmmmma...a"
+		/*  4 */ "mmmmmmmmmmafffa"
+		/*  5 */ "mmmmmmmmmaaaaaa"
+		/*  6 */ "mmmmmmmmmaaaaae"
+		/*  7 */ "mmmmmmmmmaaaaae"
+		/*  8 */ "mmmmmmmmmaaaaae"
+		/*  9 */ "mmmmmmmmmaaaaae"
+		/* 10 */ "mmmmmmmmmaaaaaa"
+		/* 11 */ "mmmmmmmmmmaggga"
+		/* 12 */ "aammmmmmmma...a"
+		/* 13 */ "aammmmmmmma...a"
+		/* 14 */ "aammmmmmmma...a"
+		/* 15 */ "mmmmmmmmmma...a"
+
+		// Level 8
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmm...m"
+		/*  1 */ "aammmmmmmma...a"
+		/*  2 */ "aammmmmmmma...a"
+		/*  3 */ "aammmmmmmma...a"
+		/*  4 */ "mmmmmmmmmma...a"
+		/*  5 */ "mmmmmmmmmaafffa"
+		/*  6 */ "mmmmmmmmaaaaaaa"
+		/*  7 */ "mmmmmmmmaaaaaaa"
+		/*  8 */ "mmmmmmmmaaaaaaa"
+		/*  9 */ "mmmmmmmmaaaaaaa"
+		/* 10 */ "mmmmmmmmmaaggga"
+		/* 11 */ "mmmmmmmmmma...a"
+		/* 12 */ "aammmmmmmma...a"
+		/* 13 */ "aammmmmmmma...a"
+		/* 14 */ "aammmmmmmma...a"
+		/* 15 */ "mmmmmmmmmmm...m"
+
+		// Level 9
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmm...m"
+		/*  1 */ "aaemmmmmmma...a"
+		/*  2 */ "aaemmmmmmma...a"
+		/*  3 */ "aaemmmmmmma...a"
+		/*  4 */ "mmmmmmmmmma...a"
+		/*  5 */ "mmmmmmmmmaa...a"
+		/*  6 */ "mmmmaaaaah....a"
+		/*  7 */ "mmmmaaaaah....a"
+		/*  8 */ "mmmmaaaaah....a"
+		/*  9 */ "mmmmaaaaah....a"
+		/* 10 */ "mmmmmmmmmaa...a"
+		/* 11 */ "mmmmmmmmmma...a"
+		/* 12 */ "aaemmmmmmma...a"
+		/* 13 */ "aaemmmmmmma...a"
+		/* 14 */ "aaemmmmmmma...a"
+		/* 15 */ "mmmmmmmmmmm...m"
+
+		// Level 10
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "aaaeimmmmmammma"
+		/*  2 */ "aaaeimmmmmammma"
+		/*  3 */ "aaaeimmmmma...a"
+		/*  4 */ "mmmmmmmmmmm...m"
+		/*  5 */ "mmmmaaaaaam...m"
+		/*  6 */ "mmmmaaaah.....m"
+		/*  7 */ "mmmmaaaah.....m"
+		/*  8 */ "mmmmaaaah.....m"
+		/*  9 */ "mmmmaaaah.....m"
+		/* 10 */ "mmmmaaaaaam...m"
+		/* 11 */ "mmmmmmmmmmm...m"
+		/* 12 */ "aaaeimmmmma...a"
+		/* 13 */ "aaaeimmmmmammma"
+		/* 14 */ "aaaeimmmmmammma"
+		/* 15 */ "mmmmmmmmmmmmmmm"
+
+		// Level 11
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "ccccccccccccccc"
+		/*  1 */ "aaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaa"
+		/*  4 */ "bbbbaaaaabbbbbb"
+		/*  5 */ "mmmmagggamm...m"
+		/*  6 */ "mmmma.........m"
+		/*  7 */ "mmmma.........m"
+		/*  8 */ "mmmma.........m"
+		/*  9 */ "mmmma.........m"
+		/* 10 */ "mmmmafffamm...m"
+		/* 11 */ "ccccaaaahcccccc"
+		/* 12 */ "aaaaaaaaaaaaaaa"
+		/* 13 */ "aaaaaaaaaaaaaaa"
+		/* 14 */ "aaaaaaaaaaaaaaa"
+		/* 15 */ "bbbbbbbbbbbbbbb"
+
+		// Level 12
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "aaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaa"
+		/*  4 */ "aaaaagggaaaaaaa"
+		/*  5 */ "mmmma...ammmmmm"
+		/*  6 */ "mmmma.........m"
+		/*  7 */ "mmmmm.........m"
+		/*  8 */ "mmmmm.........m"
+		/*  9 */ "mmmma.........m"
+		/* 10 */ "mmmma...ammmmmm"
+		/* 11 */ "aaaaafffaaaaaaa"
+		/* 12 */ "aaaaaaaaaaaaaaa"
+		/* 13 */ "aaaaaaaaaaaaaaa"
+		/* 14 */ "aaaaaaaaaaaaaaa"
+		/* 15 */ "aaaaaaaaaaaaaaa"
+
+		// Level 13
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "aaaaaaaaaaaaaaa"
+		/*  1 */ "..............."
+		/*  2 */ "..............."
+		/*  3 */ "..............."
+		/*  4 */ "aaaaa...aaaaaaa"
+		/*  5 */ "mmmma...ammmmmm"
+		/*  6 */ "mmmmm.....mmmmm"
+		/*  7 */ "mmmmm.....mmmmm"
+		/*  8 */ "mmmmm.....mmmmm"
+		/*  9 */ "mmmmm.....mmmmm"
+		/* 10 */ "mmmma...ammmmmm"
+		/* 11 */ "aaaaa...aaaaaaa"
+		/* 12 */ "..............."
+		/* 13 */ "..............."
+		/* 14 */ "..............."
+		/* 15 */ "aaaaaaaaaaaaaaa"
+
+		// Level 14
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "..............."
+		/*  2 */ "..............."
+		/*  3 */ "..............."
+		/*  4 */ "mmmmm...mmmmmmm"
+		/*  5 */ "mmmmm...mmmmmmm"
+		/*  6 */ "mmmmm...mmmmmmm"
+		/*  7 */ "mmmmm...mmmmmmm"
+		/*  8 */ "mmmmm...mmmmmmm"
+		/*  9 */ "mmmmm...mmmmmmm"
+		/* 10 */ "mmmmm...mmmmmmm"
+		/* 11 */ "mmmmm...mmmmmmm"
+		/* 12 */ "..............."
+		/* 13 */ "..............."
+		/* 14 */ "..............."
+		/* 15 */ "mmmmmmmmmmmmmmm"
+
+		// Level 15
+		/* z\x*             11111 */
+		/*    *   012345678901234 */
+		/*  0 */ "mmmmmmmmmmmmmmm"
+		/*  1 */ "..............."
+		/*  2 */ "..............."
+		/*  3 */ "..............."
+		/*  4 */ "mmmmm...mmmmmmm"
+		/*  5 */ "mmmmm...mmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmm...mmmmmmm"
+		/* 11 */ "mmmmm...mmmmmmm"
+		/* 12 */ "..............."
+		/* 13 */ "..............."
+		/* 14 */ "..............."
+		/* 15 */ "mmmmmmmmmmmmmmm",
+
+		// Connectors:
+		"0: 0, 13, 13: 4\n"  /* Type 0, direction X- */
+		"0: 14, 13, 13: 5\n"  /* Type 0, direction X+ */
+		"0: 0, 13, 2: 4\n"  /* Type 0, direction X- */
+		"0: 14, 13, 2: 5\n"  /* Type 0, direction X+ */
+		"0: 12, 7, 15: 3\n"  /* Type 0, direction Z+ */
+		"0: 12, 7, 0: 2\n"  /* Type 0, direction Z- */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		20,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // BridgeDoubleStairs
+
+
+
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeFunnelDown:
 	// The data has been exported from the gallery Nether, area index 0, ID 2, created by Aloe_vera
 	{
@@ -1653,7 +2030,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeLevelCrossing:
 	// The data has been exported from the gallery Nether, area index 61, ID 321, created by Aloe_vera
 	{
@@ -1985,7 +2362,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeSegment:
 	// The data has been exported from the gallery Nether, area index 16, ID 158, created by Aloe_vera
 	{
@@ -2107,7 +2484,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// BridgeTee:
 	// The data has been exported from the gallery Nether, area index 39, ID 290, created by STR_Warrior
 	{
@@ -2270,7 +2647,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Corridor11:
 	// The data has been exported from the gallery Nether, area index 36, ID 287, created by Aloe_vera
 	{
@@ -2374,7 +2751,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Corridor13:
 	// The data has been exported from the gallery Nether, area index 35, ID 286, created by Aloe_vera
 	{
@@ -2478,7 +2855,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Corridor5:
 	// The data has been exported from the gallery Nether, area index 65, ID 330, created by xoft
 	{
@@ -2576,7 +2953,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// CorridorCorner5:
 	// The data has been exported from the gallery Nether, area index 10, ID 40, created by xoft
 	{
@@ -2606,12 +2983,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  2 */ "aaaaaaaaaaa"
 		/*  3 */ "aaaaaaaaaaa"
 		/*  4 */ "aaaaaaaaaaa"
-		/*  5 */ "aaaaa......"
-		/*  6 */ "aaaaa......"
-		/*  7 */ "aaaaa......"
-		/*  8 */ "aaaaa......"
-		/*  9 */ "aaaaa......"
-		/* 10 */ "aaaaa......"
+		/*  5 */ "aaaaammmmmm"
+		/*  6 */ "aaaaammmmmm"
+		/*  7 */ "aaaaammmmmm"
+		/*  8 */ "aaaaammmmmm"
+		/*  9 */ "aaaaammmmmm"
+		/* 10 */ "aaaaammmmmm"
 
 		// Level 1
 		/* z\x*             1 */
@@ -2621,12 +2998,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  2 */ "a.........."
 		/*  3 */ "a.........."
 		/*  4 */ "a...aaaaaaa"
-		/*  5 */ "a...a......"
-		/*  6 */ "a...a......"
-		/*  7 */ "a...a......"
-		/*  8 */ "a...a......"
-		/*  9 */ "a...a......"
-		/* 10 */ "a...a......"
+		/*  5 */ "a...ammmmmm"
+		/*  6 */ "a...ammmmmm"
+		/*  7 */ "a...ammmmmm"
+		/*  8 */ "a...ammmmmm"
+		/*  9 */ "a...ammmmmm"
+		/* 10 */ "a...ammmmmm"
 
 		// Level 2
 		/* z\x*             1 */
@@ -2636,12 +3013,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  2 */ "a.........."
 		/*  3 */ "b.........."
 		/*  4 */ "a...abababa"
-		/*  5 */ "b...b......"
-		/*  6 */ "a...a......"
-		/*  7 */ "b...b......"
-		/*  8 */ "a...a......"
-		/*  9 */ "b...b......"
-		/* 10 */ "a...a......"
+		/*  5 */ "b...bmmmmmm"
+		/*  6 */ "a...ammmmmm"
+		/*  7 */ "b...bmmmmmm"
+		/*  8 */ "a...ammmmmm"
+		/*  9 */ "b...bmmmmmm"
+		/* 10 */ "a...ammmmmm"
 
 		// Level 3
 		/* z\x*             1 */
@@ -2651,12 +3028,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  2 */ "a.........."
 		/*  3 */ "b.........."
 		/*  4 */ "a...abababa"
-		/*  5 */ "b...b......"
-		/*  6 */ "a...a......"
-		/*  7 */ "b...b......"
-		/*  8 */ "a...a......"
-		/*  9 */ "b...b......"
-		/* 10 */ "a...a......"
+		/*  5 */ "b...bmmmmmm"
+		/*  6 */ "a...ammmmmm"
+		/*  7 */ "b...bmmmmmm"
+		/*  8 */ "a...ammmmmm"
+		/*  9 */ "b...bmmmmmm"
+		/* 10 */ "a...ammmmmm"
 
 		// Level 4
 		/* z\x*             1 */
@@ -2666,12 +3043,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  2 */ "a.........."
 		/*  3 */ "b.........."
 		/*  4 */ "a...abababa"
-		/*  5 */ "b...b......"
-		/*  6 */ "a...a......"
-		/*  7 */ "b...b......"
-		/*  8 */ "a...a......"
-		/*  9 */ "b...b......"
-		/* 10 */ "a...a......"
+		/*  5 */ "b...bmmmmmm"
+		/*  6 */ "a...ammmmmm"
+		/*  7 */ "b...bmmmmmm"
+		/*  8 */ "a...ammmmmm"
+		/*  9 */ "b...bmmmmmm"
+		/* 10 */ "a...ammmmmm"
 
 		// Level 5
 		/* z\x*             1 */
@@ -2681,12 +3058,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/*  2 */ "daaaaaaaaaa"
 		/*  3 */ "daaaaaaaaaa"
 		/*  4 */ "daaaeeeeeee"
-		/*  5 */ "daaaf......"
-		/*  6 */ "daaaf......"
-		/*  7 */ "daaaf......"
-		/*  8 */ "daaaf......"
-		/*  9 */ "daaaf......"
-		/* 10 */ "daaaf......",
+		/*  5 */ "daaafmmmmmm"
+		/*  6 */ "daaafmmmmmm"
+		/*  7 */ "daaafmmmmmm"
+		/*  8 */ "daaafmmmmmm"
+		/*  9 */ "daaafmmmmmm"
+		/* 10 */ "daaafmmmmmm",
 
 		// Connectors:
 		"1: 2, 1, 10: 3\n"  /* Type 1, direction Z+ */
@@ -2718,7 +3095,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// CorridorCornerChest5:
 	// The data has been exported from the gallery Nether, area index 42, ID 293, created by STR_Warrior
 	{
@@ -2861,7 +3238,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// CorridorCrossing:
 	// The data has been exported from the gallery Nether, area index 63, ID 328, created by xoft
 	{
@@ -2989,7 +3366,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// CorridorStairs:
 	// The data has been exported from the gallery Nether, area index 12, ID 42, created by xoft
 	{
@@ -3144,7 +3521,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// DarkCorridor:
 	// The data has been exported from the gallery Nether, area index 3, ID 30, created by STR_Warrior
 	{
@@ -3248,7 +3625,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// LavaStaircase:
 	// The data has been exported from the gallery Nether, area index 28, ID 278, created by Aloe_vera
 	{
@@ -3508,7 +3885,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// LavaStaircaseBig:
 	// The data has been exported from the gallery Nether, area index 31, ID 282, created by STR_Warrior
 	{
@@ -3842,7 +4219,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// LavaStairsBridge:
 	// The data has been exported from the gallery Nether, area index 30, ID 281, created by STR_Warrior
 	{
@@ -4097,7 +4474,12 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 		/* 14 */ "abbaabbaabbaabba",
 
 		// Connectors:
-		"",
+		"1: 0, 6, 7: 4\n"  /* Type 1, direction X- */
+		"-1: 0, 6, 7: 4\n"  /* Type -1, direction X- */
+		"1: 9, 1, 0: 2\n"  /* Type 1, direction Z- */
+		"-1: 9, 1, 0: 2\n"  /* Type -1, direction Z- */
+		"1: 9, 1, 14: 3\n"  /* Type 1, direction Z+ */
+		"-1: 9, 1, 14: 3\n"  /* Type -1, direction Z+ */,
 
 		// AllowedRotations:
 		7,  /* 1, 2, 3 CCW rotation allowed */
@@ -4123,7 +4505,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// MidStaircase:
 	// The data has been exported from the gallery Nether, area index 23, ID 165, created by Aloe_vera
 	{
@@ -4314,7 +4696,340 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	// SlabbedBridgeStairs:
+	// The data has been exported from the gallery Nether, area index 116, ID 811, created by Aloe_vera
+	{
+		// Size:
+		16, 14, 16,  // SizeX = 16, SizeY = 14, SizeZ = 16
+
+		// Hitbox (relative to bounding box):
+		0, 0, 0,  // MinX, MinY, MinZ
+		15, 13, 15,  // MaxX, MaxY, MaxZ
+
+		// Block definitions:
+		".:  0: 0\n"  /* air */
+		"a:112: 0\n"  /* netherbrick */
+		"b:114: 5\n"  /* netherbrickstairs */
+		"c:114: 4\n"  /* netherbrickstairs */
+		"d: 44:14\n"  /* step */
+		"e:114: 6\n"  /* netherbrickstairs */
+		"f:114: 7\n"  /* netherbrickstairs */
+		"g: 44: 6\n"  /* step */
+		"m: 19: 0\n"  /* sponge */,
+
+		// Block data:
+		// Level 0
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "aammmmmmmmmmmmaa"
+		/*  2 */ "aammmmmmmmmmmmaa"
+		/*  3 */ "aammmmmmmmmmmmaa"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 1
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "aabmmmmmmmmmmcaa"
+		/*  2 */ "aabmmmmmmmmmmcaa"
+		/*  3 */ "aabmmmmmmmmmmcaa"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 2
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmmmmm"
+		/*  1 */ "aaabdmmmmmmdcaaa"
+		/*  2 */ "aaabdmmmmmmdcaaa"
+		/*  3 */ "aaabdmmmmmmdcaaa"
+		/*  4 */ "mmmmmmmmmmmmmmmm"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 3
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "eeeeeeeeeeeeeeee"
+		/*  1 */ "aaaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaaa"
+		/*  4 */ "ffffffffffffffff"
+		/*  5 */ "mmmmmmmmmmmmmmmm"
+		/*  6 */ "mmmmmmmmmmmmmmmm"
+		/*  7 */ "mmmmmmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 4
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "aaaaaaaaaaaaaaaa"
+		/*  1 */ "aaaaaaaaaaaaaaaa"
+		/*  2 */ "aaaaaaaaaaaaaaaa"
+		/*  3 */ "aaaaaaaaaaaaaaaa"
+		/*  4 */ "aaaaaaaaaaaaaaaa"
+		/*  5 */ "faaabmmmmmmmmmmm"
+		/*  6 */ "caaabmmmmmmmmmmm"
+		/*  7 */ "caaabmmmmmmmmmmm"
+		/*  8 */ "mmmmmmmmmmmmmmmm"
+		/*  9 */ "mmmmmmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 5
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "aaaaaaaaaaaaaaaa"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "................"
+		/*  4 */ "a...aaaaaaaaaaaa"
+		/*  5 */ "agggammmmmmmmmmm"
+		/*  6 */ "aaaaammmmmmmmmmm"
+		/*  7 */ "aaaaammmmmmmmmmm"
+		/*  8 */ "caaabmmmmmmmmmmm"
+		/*  9 */ "caaabmmmmmmmmmmm"
+		/* 10 */ "mmmmmmmmmmmmmmmm"
+		/* 11 */ "mmmmmmmmmmmmmmmm"
+		/* 12 */ "maaammmmmmmmmmmm"
+		/* 13 */ "maaammmmmmmmmmmm"
+		/* 14 */ "maaammmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 6
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmaaam"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "................"
+		/*  4 */ "m...mmmmmmmmaaam"
+		/*  5 */ "a...ammmmmmmmmmm"
+		/*  6 */ "a...ammmmmmmmmmm"
+		/*  7 */ "agggammmmmmmmmmm"
+		/*  8 */ "aaaaammmmmmmmmmm"
+		/*  9 */ "aaaaammmmmmmmmmm"
+		/* 10 */ "caaabmmmmmmmmmmm"
+		/* 11 */ "caaabmmmmmmmmmmm"
+		/* 12 */ "maaabmmmmmmmmmmm"
+		/* 13 */ "maaabmmmmmmmmmmm"
+		/* 14 */ "maaafmmmmmmmaaam"
+		/* 15 */ "mmmmmmmmmmmmaaam"
+
+		// Level 7
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmaaam"
+		/*  1 */ "................"
+		/*  2 */ "................"
+		/*  3 */ "................"
+		/*  4 */ "m...mmmmmmmmaaam"
+		/*  5 */ "m...mmmmmmmmmmmm"
+		/*  6 */ "m...mmmmmmmmmmmm"
+		/*  7 */ "a...ammmmmmmmmmm"
+		/*  8 */ "a...ammmmmmmmmmm"
+		/*  9 */ "agggammmmmmmmmmm"
+		/* 10 */ "aaaaammmmmmmmmmm"
+		/* 11 */ "aaaaaeemmmmmmmmm"
+		/* 12 */ "caaaaaammmmmmmmm"
+		/* 13 */ "caaaaaammmmmmmmm"
+		/* 14 */ "caaaaaammmmmaaam"
+		/* 15 */ "fffffffmmmmmaaam"
+
+		// Level 8
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmmaaam"
+		/*  1 */ "mmmmmmmmmmmmmmmm"
+		/*  2 */ "mmmmmmmmmmmmmmmm"
+		/*  3 */ "mmmmmmmmmmmmmmmm"
+		/*  4 */ "m...mmmmmmmmaaam"
+		/*  5 */ "m...mmmmmmmmmmmm"
+		/*  6 */ "m...mmmmmmmmmmmm"
+		/*  7 */ "m...mmmmmmmmmmmm"
+		/*  8 */ "m...mmmmmmmmmmmm"
+		/*  9 */ "a...ammmmmmmmmmm"
+		/* 10 */ "a...ammmmmmmmmmm"
+		/* 11 */ "a...aaaeemmmmmmm"
+		/* 12 */ "a....gaaammmmmmm"
+		/* 13 */ "a....gaaammmmmmm"
+		/* 14 */ "a....gaaammmaaam"
+		/* 15 */ "aaaaaaaffmmmaaam"
+
+		// Level 9
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmcaaab"
+		/*  1 */ "mmmmmmmmmmmcaaab"
+		/*  2 */ "mmmmmmmmmmmcaaab"
+		/*  3 */ "mmmmmmmmmmmcaaab"
+		/*  4 */ "mmmmmmmmmmmcaaab"
+		/*  5 */ "mmmmmmmmmmmcaaab"
+		/*  6 */ "m...mmmmmmmcaaab"
+		/*  7 */ "m...mmmmmmmcaaab"
+		/*  8 */ "m...mmmmmmmcaaab"
+		/*  9 */ "m...mmmmmmmcaaab"
+		/* 10 */ "m...mmmmmmmcaaab"
+		/* 11 */ "m...maaaaeecaaab"
+		/* 12 */ "m......gaaaaaaab"
+		/* 13 */ "m......gaaaaaaab"
+		/* 14 */ "m......gaaaaaaab"
+		/* 15 */ "mmmmmaaaafffaaab"
+
+		// Level 10
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmaaaaa"
+		/*  1 */ "mmmmmmmmmmmaaaaa"
+		/*  2 */ "mmmmmmmmmmmaaaaa"
+		/*  3 */ "mmmmmmmmmmmaaaaa"
+		/*  4 */ "mmmmmmmmmmmaaaaa"
+		/*  5 */ "mmmmmmmmmmmaaaaa"
+		/*  6 */ "mmmmmmmmmmmaaaaa"
+		/*  7 */ "mmmmmmmmmmmaaaaa"
+		/*  8 */ "m...mmmmmmmaaaaa"
+		/*  9 */ "m...mmmmmmmaaaaa"
+		/* 10 */ "m...mmmmmmmaaaaa"
+		/* 11 */ "m...mmmaaaaaaaaa"
+		/* 12 */ "m........gaaaaaa"
+		/* 13 */ "m........gaaaaaa"
+		/* 14 */ "m........gaaaaaa"
+		/* 15 */ "mmmmmmmaaaaaaaaa"
+
+		// Level 11
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmma...a"
+		/*  1 */ "mmmmmmmmmmma...a"
+		/*  2 */ "mmmmmmmmmmma...a"
+		/*  3 */ "mmmmmmmmmmma...a"
+		/*  4 */ "mmmmmmmmmmma...a"
+		/*  5 */ "mmmmmmmmmmma...a"
+		/*  6 */ "mmmmmmmmmmma...a"
+		/*  7 */ "mmmmmmmmmmma...a"
+		/*  8 */ "mmmmmmmmmmma...a"
+		/*  9 */ "mmmmmmmmmmma...a"
+		/* 10 */ "mmmmmmmmmmma...a"
+		/* 11 */ "mmmmmmmmmaaa...a"
+		/* 12 */ "mmmm...........a"
+		/* 13 */ "mmmm...........a"
+		/* 14 */ "mmmm...........a"
+		/* 15 */ "mmmmmmmmmaaa...a"
+
+		// Level 12
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmm...m"
+		/*  1 */ "mmmmmmmmmmmm...m"
+		/*  2 */ "mmmmmmmmmmmm...m"
+		/*  3 */ "mmmmmmmmmmmm...m"
+		/*  4 */ "mmmmmmmmmmmm...m"
+		/*  5 */ "mmmmmmmmmmmm...m"
+		/*  6 */ "mmmmmmmmmmmm...m"
+		/*  7 */ "mmmmmmmmmmmm...m"
+		/*  8 */ "mmmmmmmmmmmm...m"
+		/*  9 */ "mmmmmmmmmmmm...m"
+		/* 10 */ "mmmmmmmmmmmm...m"
+		/* 11 */ "mmmmmmmmmmmm...m"
+		/* 12 */ "mmmmmm.........m"
+		/* 13 */ "mmmmmm.........m"
+		/* 14 */ "mmmmmm.........m"
+		/* 15 */ "mmmmmmmmmmmm...m"
+
+		// Level 13
+		/* z\x*             111111 */
+		/*    *   0123456789012345 */
+		/*  0 */ "mmmmmmmmmmmm...m"
+		/*  1 */ "mmmmmmmmmmmm...m"
+		/*  2 */ "mmmmmmmmmmmm...m"
+		/*  3 */ "mmmmmmmmmmmm...m"
+		/*  4 */ "mmmmmmmmmmmm...m"
+		/*  5 */ "mmmmmmmmmmmm...m"
+		/*  6 */ "mmmmmmmmmmmm...m"
+		/*  7 */ "mmmmmmmmmmmm...m"
+		/*  8 */ "mmmmmmmmmmmm...m"
+		/*  9 */ "mmmmmmmmmmmm...m"
+		/* 10 */ "mmmmmmmmmmmm...m"
+		/* 11 */ "mmmmmmmmmmmm...m"
+		/* 12 */ "mmmmmmmm.......m"
+		/* 13 */ "mmmmmmmm.......m"
+		/* 14 */ "mmmmmmmm.......m"
+		/* 15 */ "mmmmmmmmmmmm...m",
+
+		// Connectors:
+		"0: 13, 11, 0: 2\n"  /* Type 0, direction Z- */
+		"0: 13, 11, 15: 3\n"  /* Type 0, direction Z+ */
+		"0: 0, 5, 2: 4\n"  /* Type 0, direction X- */
+		"0: 15, 5, 2: 5\n"  /* Type 0, direction X+ */,
+
+		// AllowedRotations:
+		7,  /* 1, 2, 3 CCW rotation allowed */
+
+		// Merge strategy:
+		cBlockArea::msSpongePrint,
+
+		// ShouldExtendFloor:
+		true,
+
+		// DefaultWeight:
+		20,
+
+		// DepthWeight:
+		"",
+
+		// AddWeightIfSame:
+		0,
+
+		// MoveToGround:
+		false,
+	},  // SlabbedBridgeStairs
+
+
+
+	////////////////////////////////////////////////////////////////////////////////
 	// StairsToOpen1:
 	// The data has been exported from the gallery Nether, area index 27, ID 277, created by Aloe_vera
 	{
@@ -4460,7 +5175,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// StairsToOpen2:
 	// The data has been exported from the gallery Nether, area index 8, ID 35, created by xoft
 	{
@@ -4606,7 +5321,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Tee2x4:
 	// The data has been exported from the gallery Nether, area index 40, ID 291, created by Aloe_vera
 	{
@@ -4726,7 +5441,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Tee4x4:
 	// The data has been exported from the gallery Nether, area index 41, ID 292, created by Aloe_vera
 	{
@@ -4858,7 +5573,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// TinyCorridorCorner:
 	// The data has been exported from the gallery Nether, area index 66, ID 331, created by xoft
 	{
@@ -4957,7 +5672,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// TinyCorridorCornerChest:
 	// The data has been exported from the gallery Nether, area index 67, ID 332, created by Aloe_vera
 	{
@@ -5057,7 +5772,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// TinyCorridorCrossing:
 	// The data has been exported from the gallery Nether, area index 64, ID 329, created by xoft
 	{
@@ -5159,7 +5874,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// Turret:
 	// The data has been exported from the gallery Nether, area index 7, ID 34, created by xoft
 	{
@@ -5283,7 +5998,7 @@ const cPrefab::sDef g_NetherFortPrefabs[] =
 
 const cPrefab::sDef g_NetherFortStartingPrefabs[] =
 {
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
 	// CentralRoom:
 	// The data has been exported from the gallery Nether, area index 22, ID 164, created by Aloe_vera
 	{

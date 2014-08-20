@@ -21,7 +21,7 @@ public:
 	
 	// tolua_end
 	
-	CLASS_PROTODEF(cThrownEggEntity);
+	CLASS_PROTODEF(cThrownEggEntity)
 	
 	cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
 	
@@ -55,4 +55,4 @@ private:
 	/** Time in ticks to wait for the hit animation to begin before destroying */
 	int m_DestroyTimer;
 	
-} ; // tolua_export
+} ;  // tolua_export

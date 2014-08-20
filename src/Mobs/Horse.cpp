@@ -63,7 +63,7 @@ void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
 				m_Attachee->Detach();
 				m_bIsRearing = true;
 			}
-		}		
+		}
 		else
 		{
 			m_bIsTame = true;

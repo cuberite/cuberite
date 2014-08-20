@@ -102,13 +102,17 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks, bool a_tryT
 {
 	cItem ToAdd(a_Item);
 	int res = 0;
+
+	// When the item is a armor, try to set it directly to the armor slot.
 	if (ItemCategory::IsArmor(a_Item.m_ItemType))
 	{
-		res = m_ArmorSlots.AddItem(ToAdd, a_AllowNewStacks);
-		ToAdd.m_ItemCount -= res;
-		if (ToAdd.m_ItemCount == 0)
+		for (size_t i = 0; i < (size_t)m_ArmorSlots.GetNumSlots(); i++)
 		{
-			return res;
+			if (m_ArmorSlots.GetSlot(i).IsEmpty() && cSlotAreaArmor::CanPlaceArmorInSlot(i, a_Item))
+			{
+				m_ArmorSlots.SetSlot(i, a_Item);
+				return a_Item.m_ItemCount;
+			}
 		}
 	}
 
@@ -145,6 +149,24 @@ int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks, bool a
 		TotalAdded += NumAdded;
 	}
 	return TotalAdded;
+}
+
+
+
+
+
+int cInventory::RemoveItem(const cItem & a_ItemStack)
+{
+	int RemovedItems = m_HotbarSlots.RemoveItem(a_ItemStack);
+
+	if (RemovedItems < a_ItemStack.m_ItemCount)
+	{
+		cItem Temp(a_ItemStack);
+		Temp.m_ItemCount -= RemovedItems;
+		RemovedItems += m_InventorySlots.RemoveItem(Temp);
+	}
+
+	return RemovedItems;
 }
 
 
@@ -204,12 +226,6 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 		return;
 	}
 	Grid->SetSlot(GridSlotNum, a_Item);
-
-	// Broadcast the Equipped Item, if the Slot is changed.
-	if ((Grid == &m_HotbarSlots) && (m_EquippedSlotNum == (a_SlotNum - invHotbarOffset)))
-	{
-		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, a_Item, m_Owner.GetClientHandle());
-	}
 }
 
 
@@ -375,6 +391,10 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d", __FUNCTION__, a_SlotNum, invNumSlots - 1);
 		return false;
 	}
+	if (a_Amount <= 0)
+	{
+		return false;
+	}
 	
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
@@ -479,21 +499,21 @@ int cInventory::ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum)
 
 
 #if 0
-bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */ )
+bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */)
 {
 	// Fill already present stacks
-	if( a_Mode < 2 )
+	if (a_Mode < 2)
 	{
 		int MaxStackSize = cItemHandler::GetItemHandler(a_Item.m_ItemType)->GetMaxStackSize();
-		for(int i = 0; i < a_Size; i++)
+		for (int i = 0; i < a_Size; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemDamage == a_Item.m_ItemDamage )
+			if (m_Slots[i + a_Offset].m_ItemType == a_Item.m_ItemType && m_Slots[i + a_Offset].m_ItemCount < MaxStackSize && m_Slots[i + a_Offset].m_ItemDamage == a_Item.m_ItemDamage)
 			{
 				int NumFree = MaxStackSize - m_Slots[i + a_Offset].m_ItemCount;
-				if( NumFree >= a_Item.m_ItemCount )
+				if (NumFree >= a_Item.m_ItemCount)
 				{
 
-					//printf("1. Adding %i items ( free: %i )\n", a_Item.m_ItemCount, NumFree );
+					// printf("1. Adding %i items ( free: %i)\n", a_Item.m_ItemCount, NumFree);
 					m_Slots[i + a_Offset].m_ItemCount += a_Item.m_ItemCount;
 					a_Item.m_ItemCount = 0;
 					a_bChangedSlots[i + a_Offset] = true;
@@ -501,7 +521,7 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 				}
 				else
 				{
-					//printf("2. Adding %i items\n", NumFree );
+					// printf("2. Adding %i items\n", NumFree);
 					m_Slots[i + a_Offset].m_ItemCount += (char)NumFree;
 					a_Item.m_ItemCount -= (char)NumFree;
 					a_bChangedSlots[i + a_Offset] = true;
@@ -510,12 +530,12 @@ bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size,
 		}
 	}
 
-	if( a_Mode > 0 )
+	if (a_Mode > 0)
 	{
 		// If we got more left, find first empty slot
-		for(int i = 0; i < a_Size && a_Item.m_ItemCount > 0; i++)
+		for (int i = 0; i < a_Size && a_Item.m_ItemCount > 0; i++)
 		{
-			if( m_Slots[i + a_Offset].m_ItemType == -1 )
+			if (m_Slots[i + a_Offset].m_ItemType == -1)
 			{
 				m_Slots[i + a_Offset] = a_Item;
 				a_Item.m_ItemCount = 0;
@@ -694,6 +714,12 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 			m_Owner, ArmorSlotNumToEntityEquipmentID(a_SlotNum),
 			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
 		);
+	}
+
+	// Broadcast the Equipped Item, if the Slot is changed.
+	if ((a_ItemGrid == &m_HotbarSlots) && (m_EquippedSlotNum == a_SlotNum))
+	{
+		m_Owner.GetWorld()->BroadcastEntityEquipment(m_Owner, 0, GetEquippedItem(), m_Owner.GetClientHandle());
 	}
 	
 	// Convert the grid-local a_SlotNum to our global SlotNum:

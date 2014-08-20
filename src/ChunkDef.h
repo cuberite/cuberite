@@ -22,8 +22,8 @@ It will help us when the new chunk format comes out and we need to patch everyth
 #define ZERO_CHUNK_Y 0
 
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
-#define AXIS_ORDER_YZX 1	// Original (1.1-)
-#define AXIS_ORDER_XZY 2	// New (1.2+)
+#define AXIS_ORDER_YZX 1  // Original (1.1-)
+#define AXIS_ORDER_XZY 2  // New (1.2+)
 #define AXIS_ORDER AXIS_ORDER_XZY
 
 
@@ -72,7 +72,7 @@ public:
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
 	
-	/** The type used for any biomemap operations and storage inside MCServer, 
+	/** The type used for any biomemap operations and storage inside MCServer,
 	using MCServer biomes (need not correspond to client representation!)
 	idx = x + Width * z  // Need to verify this with the protocol spec, currently unknown!
 	*/
@@ -92,7 +92,7 @@ public:
 
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
-	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ )
+	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
 	{
 		UNUSED(a_Y);
 		BlockToChunk(a_X, a_Z, a_ChunkX, a_ChunkZ);
@@ -118,7 +118,7 @@ public:
 	}
 
 
-	inline static int MakeIndex(int x, int y, int z )
+	inline static int MakeIndex(int x, int y, int z)
 	{
 		if (
 			(x < Width)  && (x > -1) &&
@@ -138,27 +138,27 @@ public:
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
 			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width); // 1.2 is XZY
+			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width); // 1.1 is YZX
+			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
 		#endif
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index )
+	inline static Vector3i IndexToCoordinate( unsigned int index)
 	{
 		#if AXIS_ORDER == AXIS_ORDER_XZY
-			return Vector3i(								// 1.2
-				index % cChunkDef::Width,						// X
-				index / (cChunkDef::Width * cChunkDef::Width),		// Y
-				(index / cChunkDef::Width) % cChunkDef::Width		// Z
-				);
+			return Vector3i(  // 1.2
+				index % cChunkDef::Width,                       // X
+				index / (cChunkDef::Width * cChunkDef::Width),  // Y
+				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+			);
 		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return Vector3i(								// 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),		// X
-				index % cChunkDef::Height,						// Y
-				(index / cChunkDef::Height) % cChunkDef::Width		// Z
-				);
+			return Vector3i(  // 1.1
+				index / (cChunkDef::Height * cChunkDef::Width),  // X
+				index % cChunkDef::Height,                       // Y
+				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+			);
 		#endif
 	}
 
@@ -357,7 +357,7 @@ struct sSetBlock
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 
-	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta );  // absolute block position
+	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // absolute block position
 	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
 		x(a_X), y(a_Y), z(a_Z),
 		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),

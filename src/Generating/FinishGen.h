@@ -69,6 +69,54 @@ protected:
 
 
 
+class cFinishGenTallGrass :
+	public cFinishGen
+{
+public:
+	cFinishGenTallGrass(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
+
+protected:
+	cNoise m_Noise;
+	int m_Seed;
+
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+	int GetBiomeDensity(EMCSBiome a_Biome)
+	{
+		switch (a_Biome)
+		{
+			case biSavanna:
+			case biSavannaM:
+			case biSavannaPlateau:
+			case biSavannaPlateauM:
+			case biPlains:
+			{
+				return 70;
+			}
+
+			case biExtremeHillsEdge:
+			case biExtremeHillsPlus:
+			case biExtremeHills:
+			case biExtremeHillsPlusM:
+			case biExtremeHillsM:
+			case biIceMountains:
+			{
+				return 3;
+			}
+
+			default:
+			{
+				return 20;
+			}
+		}
+	}
+};
+
+
+
+
+
 class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {
@@ -95,32 +143,69 @@ Used for:
 - Lilypads finisher
 - DeadBushes finisher
 */
-class cFinishGenSingleBiomeSingleTopBlock :
+class cFinishGenSingleTopBlock :
 	public cFinishGen
 {
 public:
-	cFinishGenSingleBiomeSingleTopBlock(
-		int a_Seed, BLOCKTYPE a_BlockType, EMCSBiome a_Biome, int a_Amount,
-		BLOCKTYPE a_AllowedBelow1, BLOCKTYPE a_AllowedBelow2
+	typedef std::vector<BLOCKTYPE> BlockList;
+	bool m_IsAllowedBelow[256];
+
+	typedef std::vector<EMCSBiome> BiomeList;
+	bool m_IsBiomeAllowed[256];
+
+
+	cFinishGenSingleTopBlock(
+		int a_Seed, BLOCKTYPE a_BlockType, BiomeList a_Biomes, int a_Amount,
+		BlockList a_AllowedBelow
 	) :
 		m_Noise(a_Seed),
 		m_BlockType(a_BlockType),
-		m_Biome(a_Biome),
-		m_Amount(a_Amount),
-		m_AllowedBelow1(a_AllowedBelow1),
-		m_AllowedBelow2(a_AllowedBelow2)
+		m_Amount(a_Amount)
 	{
+		// Initialize all the block types.
+		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
+		{
+			m_IsAllowedBelow[idx] = false;
+		}
+		
+		// Load the allowed blocks into m_IsAllowedBelow
+		for (BlockList::iterator itr = a_AllowedBelow.begin(); itr != a_AllowedBelow.end(); ++itr)
+		{
+			m_IsAllowedBelow[*itr] = true;
+		}
+		
+		// Initialize all the biome types.
+		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
+		{
+			m_IsBiomeAllowed[idx] = false;
+		}
+		
+		// Load the allowed biomes into m_IsBiomeAllowed
+		for (BiomeList::iterator itr = a_Biomes.begin(); itr != a_Biomes.end(); ++itr)
+		{
+			m_IsBiomeAllowed[*itr] = true;
+		}
 	}
 	
 protected:
 	cNoise m_Noise;
 	BLOCKTYPE m_BlockType;
-	EMCSBiome m_Biome;
 	int       m_Amount;         ///< Relative amount of blocks to try adding. 1 = one block per 256 biome columns.
-	BLOCKTYPE m_AllowedBelow1;  ///< First  of the two blocktypes that are allowed below m_BlockType
-	BLOCKTYPE m_AllowedBelow2;  ///< Second of the two blocktypes that are allowed below m_BlockType
 	
 	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
+
+	// Returns true if the given biome is a biome that is allowed.
+	inline bool IsAllowedBiome(EMCSBiome a_Biome)
+	{
+		return m_IsBiomeAllowed[a_Biome];
+	}
+
+	// Returns true if the given blocktype may be below m_BlockType
+	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
+	{
+		return m_IsAllowedBelow[a_BlockBelow];
+	}
+
 	
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
@@ -155,9 +240,14 @@ class cFinishGenPreSimulator :
 	public cFinishGen
 {
 public:
-	cFinishGenPreSimulator(void);
+	cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava);
 	
 protected:
+
+	bool m_PreSimulateFallingBlocks;
+	bool m_PreSimulateWater;
+	bool m_PreSimulateLava;
+
 	// Drops hanging sand and gravel down to the ground, recalculates heightmap
 	void CollapseSandGravel(
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
@@ -199,7 +289,7 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	/// Tries to place a spring at the specified coords, checks neighbors. Returns true	if successful
+	/// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
 	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
 } ;
 

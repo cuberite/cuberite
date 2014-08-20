@@ -72,15 +72,15 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
-{	
+{
 	if (GetSpeed().EqualsEps(Vector3d(0, 0, 0), 0.0000001))
 	{
-		SetSpeed(GetLookVector().NormalizeCopy() * 0.1); // Ensure that no division by zero happens later
+		SetSpeed(GetLookVector().NormalizeCopy() * 0.1);  // Ensure that no division by zero happens later
 	}
 
 	Vector3d Hit = a_HitPos;
-	Vector3d SinkMovement = (GetSpeed() / 800);
-	Hit += (SinkMovement * 0.01) / SinkMovement.Length(); // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
+	Vector3d SinkMovement = (GetSpeed() / 1000);
+	Hit += SinkMovement * (0.0005 / SinkMovement.Length());  // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
 
 	super::OnHitSolidBlock(Hit, a_HitFace);
 	Vector3i BlockHit = Hit.Floor();
@@ -89,7 +89,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	m_HitBlockPos = Vector3i(X, Y, Z);
 	
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("random.bowhit", X * 8, Y * 8, Z * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 }
 
 
@@ -97,7 +97,7 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 
 
 void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
-{	
+{
 	int Damage = (int)(GetSpeed().Length() / 20 * m_DamageCoeff + 0.5);
 	if (m_IsCritical)
 	{
@@ -106,7 +106,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
 	
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("random.successful_hit", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	
 	Destroy();
 }
@@ -131,7 +131,7 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, *a_Dest);
-		GetWorld()->BroadcastSoundEffect("random.pop", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
 }
@@ -166,9 +166,9 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		// We can afford to do this because xoft's algorithm for trajectory is near perfect, so things are pretty close anyway without sync
 		// Besides, this seems to be what the vanilla server does, note how arrows teleport half a second after they hit to the server position
 		
-		if (!m_HasTeleported) // Sent a teleport already, don't do again
+		if (!m_HasTeleported)  // Sent a teleport already, don't do again
 		{
-			if (m_HitGroundTimer > 500.f) // Send after half a second, could be less, but just in case
+			if (m_HitGroundTimer > 500.f)  // Send after half a second, could be less, but just in case
 			{
 				m_World->BroadcastTeleportEntity(*this);
 				m_HasTeleported = true;
@@ -189,9 +189,9 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			return;
 		}
 		
-		if (Chunk->GetBlock(RelPosX, m_HitBlockPos.y, RelPosZ) == E_BLOCK_AIR) // Block attached to was destroyed?
+		if (Chunk->GetBlock(RelPosX, m_HitBlockPos.y, RelPosZ) == E_BLOCK_AIR)  // Block attached to was destroyed?
 		{
-			m_IsInGround = false; // Yes, begin simulating physics again
+			m_IsInGround = false;  // Yes, begin simulating physics again
 		}
 	}
 }

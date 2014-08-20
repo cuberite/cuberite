@@ -41,6 +41,7 @@ class cEntity;
 class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
+class cBeaconEntity;
 class cChestEntity;
 class cDispenserEntity;
 class cFlowerPotEntity;
@@ -49,11 +50,17 @@ class cNoteEntity;
 class cMobHeadEntity;
 class cCompositeChat;
 class cCuboid;
+class cSetChunkData;
+
 
 typedef std::list< cPlayer * > cPlayerList;
 
+typedef SharedPtr<cSetChunkData> cSetChunkDataPtr;  // TODO: Change to unique_ptr once we go C++11
+typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
+
 typedef cItemCallback<cPlayer>             cPlayerListCallback;
 typedef cItemCallback<cEntity>             cEntityCallback;
+typedef cItemCallback<cBeaconEntity>       cBeaconCallback;
 typedef cItemCallback<cChestEntity>        cChestCallback;
 typedef cItemCallback<cDispenserEntity>    cDispenserCallback;
 typedef cItemCallback<cFurnaceEntity>      cFurnaceCallback;
@@ -91,7 +98,7 @@ public:
 	class cTask
 	{
 	public:
-		virtual ~cTask(){};
+		virtual ~cTask() {}
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
@@ -138,9 +145,19 @@ public:
 	// tolua_begin
 
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
-	
+
+	/** Is the daylight cyclus enabled? */
+	virtual bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
+
+	/** Sets the daylight cyclus to true/false. */
+	virtual void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
+	{
+		m_IsDaylightCycleEnabled = a_IsDaylightCycleEnabled;
+		BroadcastTimeUpdate();
+	}
+
 	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
-	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; } 
+	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
@@ -151,6 +168,7 @@ public:
 	{
 		m_TimeOfDay = a_TimeOfDay;
 		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
+		UpdateSkyDarkness();
 		BroadcastTimeUpdate();
 	}
 	
@@ -180,7 +198,7 @@ public:
 	virtual eDimension GetDimension(void) const { return m_Dimension; }
 
 	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	int GetHeight(int a_BlockX, int a_BlockZ);
+	virtual int GetHeight(int a_BlockX, int a_BlockZ);
 	
 	// tolua_end
 
@@ -217,15 +235,15 @@ public:
 	void BroadcastEntityRelMoveLook      (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityStatus           (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;
-	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL); // tolua_export
+	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;  // tolua_export
+	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastPlayerListItem         (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect     (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
 	void BroadcastScoreboardObjective    (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void BroadcastScoreUpdate            (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void BroadcastDisplayObjective       (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void BroadcastSoundEffect            (const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export a_Src coords are Block * 8
-	void BroadcastSoundParticleEffect    (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL); // tolua_export
+	void BroadcastSoundEffect            (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export
+	void BroadcastSoundParticleEffect    (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastSpawnEntity            (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTeleportEntity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt            (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
@@ -241,28 +259,14 @@ public:
 	/** If there is a block entity at the specified coords, sends it to the client specified */
 	void SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 	
-	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ);
+	void MarkRedstoneDirty(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty (int a_ChunkX, int a_ChunkZ, bool a_MarkRedstoneDirty = false);
 	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 	
-	/** Sets the chunk data as either loaded from the storage or generated.
-	a_BlockLight and a_BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
-	a_BiomeMap is optional, if not present, biomes will be calculated by the generator
-	a_HeightMap is optional, if not present, will be calculated.
-	If a_MarkDirty is set, the chunk is set as dirty (used after generating)
-	*/
-	void SetChunkData(
-		int a_ChunkX, int a_ChunkZ,
-		const BLOCKTYPE *  a_BlockTypes,
-		const NIBBLETYPE * a_BlockMeta,
-		const NIBBLETYPE * a_BlockLight,
-		const NIBBLETYPE * a_BlockSkyLight,
-		const cChunkDef::HeightMap * a_HeightMap,
-		const cChunkDef::BiomeMap  * a_BiomeMap,
-		cEntityList & a_Entities,
-		cBlockEntityList & a_BlockEntities,
-		bool a_MarkDirty
-	);
+	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
+	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
+	void QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData);
 	
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -290,8 +294,9 @@ public:
 
 	/** Removes the player from the world.
 	Removes the player from the addition queue, too, if appropriate.
-	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore. */
-	void RemovePlayer(cPlayer * a_Player);
+	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
+	@param a_RemoveFromChunk determines if the entity should be removed from its chunk as well. Should be false when ticking from cChunk. */
+	void RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -300,10 +305,10 @@ public:
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
-	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);	// >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 	
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
-	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true); 
+	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 	
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
@@ -312,9 +317,6 @@ public:
 	void AddEntity(cEntity * a_Entity);
 	
 	bool HasEntity(int a_UniqueID);
-	
-	/** Removes the entity, the entity ptr ownership is assumed taken by the caller */
-	void RemoveEntity(cEntity * a_Entity);
 	
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -364,10 +366,10 @@ public:
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);  // Exported in ManualBindings.cpp
 	
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be NULL. Returns true if sign text changed. Same as SetSignLines() */
-	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);	// Exported in ManualBindings.cpp
+	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
-	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);	// tolua_export
+	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
 
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
@@ -376,10 +378,10 @@ public:
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
 	/** Regenerate the given chunk: */
-	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
+	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
 	/** Generates the given chunk, if not already generated */
-	void GenerateChunk(int a_ChunkX, int a_ChunkZ);													// tolua_export
+	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */
 	void QueueLightChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = NULL);
@@ -435,10 +437,10 @@ public:
 	// tolua_begin
 	
 	// Vector3i variants:
-	void       FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta ) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta ); }
-	BLOCKTYPE  GetBlock    (const Vector3i & a_Pos ) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z ); }
-	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos ) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z ); }
-	void       SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData ) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData ); }
+	void       FastSetBlock(const Vector3i & a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) { FastSetBlock( a_Pos.x, a_Pos.y, a_Pos.z, a_BlockType, a_BlockMeta); }
+	BLOCKTYPE  GetBlock    (const Vector3i & a_Pos) { return GetBlock( a_Pos.x, a_Pos.y, a_Pos.z); }
+	NIBBLETYPE GetBlockMeta(const Vector3i & a_Pos) { return GetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z); }
+	void       SetBlockMeta(const Vector3i & a_Pos, NIBBLETYPE a_MetaData) { SetBlockMeta( a_Pos.x, a_Pos.y, a_Pos.z, a_MetaData); }
 	// tolua_end
 	
 	/** Writes the block area into the specified coords.
@@ -533,6 +535,9 @@ public:
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp
+
+	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
+	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -631,21 +636,22 @@ public:
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
+
+	bool ShouldBroadcastDeathMessages(void) const { return m_BroadcastDeathMessages; }
+	bool ShouldBroadcastAchievementMessages(void) const { return m_BroadcastAchievementMessages; }
+
+
+	AString GetNetherWorldName(void) const { return m_NetherWorldName; }
+	void SetNetherWorldName(const AString & a_Name) { m_NetherWorldName = a_Name; }
+
+	AString GetEndWorldName(void) const { return m_EndWorldName; }
+	void SetEndWorldName(const AString & a_Name) { m_EndWorldName = a_Name; }
+
+	AString GetLinkedOverworldName(void) const { return m_OverworldName; }
+	void SetLinkedOverworldName(const AString & a_Name) { m_OverworldName = a_Name; }
 	
 	// tolua_end
 	
-	inline static void BlockToChunk( int a_X, int a_Y, int a_Z, int & a_ChunkX, int & a_ChunkY, int & a_ChunkZ )
-	{
-		// TODO: Use floor() instead of weird if statements
-		// Also fix Y
-		(void)a_Y; // not unused anymore
-		a_ChunkX = a_X/cChunkDef::Width;
-		if(a_X < 0 && a_X % cChunkDef::Width != 0) a_ChunkX--;
-		a_ChunkY = 0;
-		a_ChunkZ = a_Z/cChunkDef::Width;
-		if(a_Z < 0 && a_Z % cChunkDef::Width != 0) a_ChunkZ--;
-	}
-
 	/** Saves all chunks immediately. Dangerous interface, may deadlock, use QueueSaveAllChunks() instead */
 	void SaveAllChunks(void);
 	
@@ -666,7 +672,7 @@ public:
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
-	inline int GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
+	inline int GetGeneratorQueueLength     (void) { return m_Generator.GetQueueLength();   }    // tolua_export
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
@@ -698,13 +704,13 @@ public:
 	void CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
 	/** Sets the specified weather; resets weather interval; asks and notifies plugins of the change */
-	void SetWeather     (eWeather a_NewWeather);
+	void SetWeather(eWeather a_NewWeather);
 	
 	/** Forces a weather change in the next game tick */
-	void ChangeWeather  (void);
+	void ChangeWeather(void);
 	
 	/** Returns the current weather. Instead of comparing values directly to the weather constants, use IsWeatherXXX() functions, if possible */
-	eWeather GetWeather     (void) const { return m_Weather; };
+	eWeather GetWeather(void) const { return m_Weather; }
 	
 	/** Returns true if the current weather is sun */
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
@@ -719,14 +725,14 @@ public:
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
 	
 	/** Returns true if it is raining at the specified location. This takes into account biomes. */
-	bool IsWeatherRainAt (int a_BlockX, int a_BlockZ)
+	bool IsWeatherRainAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherRain() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
 	
 	/** Returns true if the current weather is stormy */
 	bool IsWeatherStorm(void) const { return (m_Weather == wStorm); }
-	
+
 	/** Returns true if the weather is stormy at the specified location. This takes into account biomes. */
 	bool IsWeatherStormAt(int a_BlockX, int a_BlockZ)
 	{
@@ -737,10 +743,11 @@ public:
 	bool IsWeatherWet(void) const { return !IsWeatherSunny(); }
 	
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
-	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ)
 	{
 		return (IsWeatherWet() && !IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
 	}
+
 	// tolua_end
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
@@ -762,7 +769,7 @@ public:
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
 	Item parameter used currently for Fireworks to correctly set entity metadata based on item metadata
 	*/
-	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem & a_Item, const Vector3d * a_Speed = NULL);  // tolua_export
+	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = NULL);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
 	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
@@ -845,6 +852,12 @@ private:
 
 
 	AString m_WorldName;
+
+	/** The name of the world that a portal in this world should link to
+	Only has effect if this world is a nether or end world, as it is used by entities to see which world to teleport to when in a portal
+	*/
+	AString m_OverworldName;
+
 	AString m_IniFileName;
 	
 	/** Name of the storage schema used to load and save chunks */
@@ -863,6 +876,10 @@ private:
 	double m_SpawnY;
 	double m_SpawnZ;
 
+	bool m_BroadcastDeathMessages;
+	bool m_BroadcastAchievementMessages;
+
+	bool   m_IsDaylightCycleEnabled;
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
 	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
@@ -870,7 +887,7 @@ private:
 	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
-	std::map<cMonster::eFamily,Int64> m_LastSpawnMonster; // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster) // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+	std::map<cMonster::eFamily, Int64> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
 
@@ -881,7 +898,7 @@ private:
 	bool m_VillagersShouldHarvestCrops;
 	
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
-	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;	 // Second is for safely removing the objects from the queue
+	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;  // Second is for safely removing the objects from the queue
 
 	cSimulatorManager *  m_SimulatorManager;
 	cSandSimulator *     m_SandSimulator;
@@ -929,6 +946,12 @@ private:
 	See the eShrapnelLevel enumeration for details
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
+
+	/** Name of the nether world */
+	AString m_NetherWorldName;
+
+	/** Name of the end world */
+	AString m_EndWorldName;
 	
 
 	cChunkGenerator  m_Generator;
@@ -980,9 +1003,15 @@ private:
 
 	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
 	cPlayerList m_PlayersToAdd;
+	
+	/** CS protecting m_SetChunkDataQueue. */
+	cCriticalSection m_CSSetChunkDataQueue;
+	
+	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
+	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
-	cWorld(const AString & a_WorldName);
+	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
 	virtual ~cWorld();
 
 	void Tick(float a_Dt, int a_LastTickDurationMSec);
@@ -1022,7 +1051,18 @@ private:
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */
 	void AddQueuedPlayers(void);
-}; // tolua_export
+
+	/** Sets generator values to dimension specific defaults, if those values do not exist */
+	void InitialiseGeneratorDefaults(cIniFile & a_IniFile);
+
+	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
+	void InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile);
+
+	/** Sets the specified chunk data into the chunkmap. Called in the tick thread.
+	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
+	void SetChunkData(cSetChunkData & a_SetChunkData);
+
+};  // tolua_export
 
 
 

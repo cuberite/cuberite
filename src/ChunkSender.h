@@ -6,17 +6,17 @@
 /*
 The whole thing is a thread that runs in a loop, waiting for either:
 	"finished chunks" (ChunkReady()), or
-	"chunks to send" (QueueSendChunkTo() ) 
-to come to a queue. 
+	"chunks to send" (QueueSendChunkTo())
+to come to a queue.
 And once they do, it requests the chunk data and sends it all away, either
 	broadcasting (ChunkReady), or
 	sends to a specific client (QueueSendChunkTo)
 Chunk data is queried using the cChunkDataCallback interface.
 It is cached inside the ChunkSender object during the query and then processed after the query ends.
-Note that the data needs to be compressed only *after* the query finishes, 
+Note that the data needs to be compressed only *after* the query finishes,
 because the query callbacks run with ChunkMap's CS locked.
 
-A client may remove itself from all direct requests(QueueSendChunkTo()) by calling RemoveClient(); 
+A client may remove itself from all direct requests(QueueSendChunkTo()) by calling RemoveClient();
 this ensures that the client's Send() won't be called anymore by ChunkSender.
 Note that it may be called by world's BroadcastToChunk() if the client is still in the chunk.
 */
@@ -110,7 +110,7 @@ protected:
 		bool operator ==(const sSendChunk & a_Other)
 		{
 			return (
-				(a_Other.m_ChunkX == m_ChunkX) && 
+				(a_Other.m_ChunkX == m_ChunkX) &&
 				(a_Other.m_ChunkY == m_ChunkY) &&
 				(a_Other.m_ChunkZ == m_ChunkZ) &&
 				(a_Other.m_Client == m_Client)

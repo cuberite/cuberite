@@ -60,9 +60,10 @@ function Initialize(Plugin)
 	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
 	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
 	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
-	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings")
-	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one")
-	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z")
+	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings");
+	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
+	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z");
+	PM:BindCommand("/rmitem",  "debuggers", HandleRMItem,          "- Remove the specified item from the inventory.");
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -79,6 +80,7 @@ function Initialize(Plugin)
 	
 	TestBlockAreasString()
 	TestStringBase64()
+	TestUUIDFromName()
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -268,6 +270,82 @@ function TestStringBase64()
 	local UnBase64 = Base64Decode(Base64)
 	
 	assert(UnBase64 == s)
+end
+
+
+
+
+
+function TestUUIDFromName()
+	LOG("Testing UUID-from-Name resolution...")
+	
+	-- Test by querying a few existing names, along with a non-existent one:
+	local PlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+		"nonexistent_player",
+	}
+	-- WARNING: Blocking operation! DO NOT USE IN TICK THREAD!
+	local UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames)
+	
+	-- Log the results:
+	for _, name in ipairs(PlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+	
+	-- Test once more with the same players, valid-only. This should go directly from cache, so fast.
+	LOG("Testing again with the same valid players...")
+	local ValidPlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(ValidPlayerNames);
+
+	-- Log the results:
+	for _, name in ipairs(ValidPlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	-- Test yet again, cache-only:
+	LOG("Testing once more, cache only...")
+	local PlayerNames3 =
+	{
+		"xoft",
+		"aloe_vera",
+		"notch",  -- Valid player name, but not cached (most likely :)
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames3, true)
+	
+	-- Log the results:
+	for _, name in ipairs(PlayerNames3) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	LOG("UUID-from-Name resolution tests finished.")
+	
+	LOG("Performing a Name-from-UUID test...")
+	-- local NameToTest = "aloe_vera"
+	local NameToTest = "xoft"
+	local Name = cMojangAPI:GetPlayerNameFromUUID(UUIDs[NameToTest])
+	LOG("Name(" .. UUIDs[NameToTest] .. ") = '" .. Name .. "', expected '" .. NameToTest .. "'.")
+	LOG("Name-from-UUID test finished.")
 end
 
 
@@ -533,7 +611,7 @@ function OnTakeDamage(Receiver, TDI)
 	-- Receiver is cPawn
 	-- TDI is TakeDamageInfo
 
-	LOG(Receiver:GetClass() .. " was dealt " .. DamageTypeToString(TDI.DamageType) .. " damage: Raw " .. TDI.RawDamage .. ", Final " .. TDI.FinalDamage .. " (" .. (TDI.RawDamage - TDI.FinalDamage) .. " covered by armor)");
+	-- LOG(Receiver:GetClass() .. " was dealt " .. DamageTypeToString(TDI.DamageType) .. " damage: Raw " .. TDI.RawDamage .. ", Final " .. TDI.FinalDamage .. " (" .. (TDI.RawDamage - TDI.FinalDamage) .. " covered by armor)");
 	return false;
 end
 
@@ -1098,6 +1176,41 @@ function HandleSched(a_Split, a_Player)
 		end
 	)
 	
+	return true
+end
+
+
+
+
+
+function HandleRMItem(a_Split, a_Player)
+	-- Check params:
+	if (a_Split[2] == nil) then
+		a_Player:SendMessage("Usage: /rmitem <Item> [Count]")
+		return true
+	end
+
+	-- Parse the item type:
+	local Item = cItem()
+	if (not StringToItem(a_Split[2], Item)) then
+		a_Player:SendMessageFailure(a_Split[2] .. " isn't a valid item")
+		return true
+	end
+
+	-- Parse the optional item count
+	if (a_Split[3] ~= nil) then
+		local Count = tonumber(a_Split[3])
+		if (Count == nil) then
+			a_Player:SendMessageFailure(a_Split[3] .. " isn't a valid number")
+			return true
+		end
+
+		Item.m_ItemCount = Count
+	end
+
+	-- Remove the item:
+	local NumRemovedItems = a_Player:GetInventory():RemoveItem(Item)
+	a_Player:SendMessageSuccess("Removed " .. NumRemovedItems .. " Items!")
 	return true
 end
 

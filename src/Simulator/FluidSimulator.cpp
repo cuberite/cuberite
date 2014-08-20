@@ -125,31 +125,31 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 		return NONE;
 	}
 	BLOCKTYPE BlockID = m_World.GetBlock(a_X, a_Y, a_Z);
-	if (!IsAllowedBlock(BlockID))	// No Fluid -> No Flowing direction :D
+	if (!IsAllowedBlock(BlockID))  // No Fluid -> No Flowing direction :D
 	{
 		return NONE;
 	}
 
 	/*
 	Disabled because of causing problems and being useless atm
-	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);		//If there is nothing or fluid below it -> dominating flow is down :D
+	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);  // If there is nothing or fluid below it -> dominating flow is down :D
 	if (BlockBelow == E_BLOCK_AIR || IsAllowedBlock(BlockBelow))
 		return Y_MINUS;
 	*/
 
-	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);	//Current Block Meta so only lower points will be counted
-	int X = 0, Z = 0;									//Lowest Pos will be stored here
+	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
+	int X = 0, Z = 0;  // Lowest Pos will be stored here
 
-	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)		//check for upper block to flow because this also affects the flowing direction
+	if (IsAllowedBlock(m_World.GetBlock(a_X, a_Y + 1, a_Z)) && a_Over)  // check for upper block to flow because this also affects the flowing direction
 	{
 		return GetFlowingDirection(a_X, a_Y + 1, a_Z, false);
 	}
 
 	std::vector< Vector3i * > Points;
 
-	Points.reserve(4);	//Already allocate 4 places :D
+	Points.reserve(4);  // Already allocate 4 places :D
 
-	//add blocks around the checking pos
+	// add blocks around the checking pos
 	Points.push_back(new Vector3i(a_X - 1, a_Y, a_Z));
 	Points.push_back(new Vector3i(a_X + 1, a_Y, a_Z));
 	Points.push_back(new Vector3i(a_X, a_Y, a_Z + 1));
@@ -159,20 +159,20 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	{
 		Vector3i *Pos = (*it);
 		char BlockID = m_World.GetBlock(Pos->x, Pos->y, Pos->z);
-		if(IsAllowedBlock(BlockID))
+		if (IsAllowedBlock(BlockID))
 		{
 			char Meta = m_World.GetBlockMeta(Pos->x, Pos->y, Pos->z);
 
-			if(Meta > LowestPoint)
+			if (Meta > LowestPoint)
 			{
 				LowestPoint = Meta;
 				X = Pos->x;
 				Z = Pos->z;
 			}
 		}
-		else if(BlockID == E_BLOCK_AIR)
+		else if (BlockID == E_BLOCK_AIR)
 		{
-			LowestPoint = 9;		//This always dominates
+			LowestPoint = 9;  // This always dominates
 			X = Pos->x;
 			Z = Pos->z;
 		

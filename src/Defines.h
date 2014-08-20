@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "ChatColor.h"
 #include <limits>
 #include <cmath>
 
@@ -22,7 +21,7 @@ typedef std::vector<int> cSlotNums;
 /// Experience Orb setup
 enum
 {
-	//open to suggestion on naming convention here :)
+	// Open to suggestion on naming convention here :)
 	MAX_EXPERIENCE_ORB_SIZE = 2000
 } ;
 
@@ -471,18 +470,7 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 {
 	int Y = a_BlockY;
 	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	if (Y < 0)
-	{
-		a_BlockY = 0;
-	}
-	else if (Y > 255)
-	{
-		a_BlockY = 255;
-	}
-	else
-	{
-		a_BlockY = (unsigned char)Y;
-	}
+	a_BlockY = Clamp<unsigned char>((unsigned char)Y, 0, 255);
 }
 
 
@@ -491,9 +479,9 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 
 inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a_Y, double & a_Z)
 {
-	// 	a_X = sinf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
-	// 	a_Y = -sinf ( a_Pitch / 180 * PI );
-	// 	a_Z = -cosf ( a_Pan / 180 * PI ) * cosf ( a_Pitch / 180 * PI );
+	// 	a_X = sinf ( a_Pan / 180 * PI) * cosf ( a_Pitch / 180 * PI);
+	// 	a_Y = -sinf ( a_Pitch / 180 * PI);
+	// 	a_Z = -cosf ( a_Pan / 180 * PI) * cosf ( a_Pitch / 180 * PI);
 	a_X = cos(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
 	a_Y = sin(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
 	a_Z = sin(a_Pitch / 180 * PI);
@@ -512,7 +500,7 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 	}
 	else
 	{
-		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;		
+		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
 	}
 
 	a_Pitch = atan2(a_Y, r) * 180 / PI;
@@ -531,7 +519,7 @@ inline float GetSignf(float a_Val)
 
 
 
-inline float GetSpecialSignf( float a_Val )
+inline float GetSpecialSignf( float a_Val)
 {
 	return (a_Val <= 0.f) ? -1.f : 1.f;
 }
@@ -652,11 +640,11 @@ namespace ItemCategory
 
 	inline bool IsTool(short a_ItemID)
 	{
-		return IsPickaxe( a_ItemID )
-			|| IsAxe    ( a_ItemID )
-			|| IsSword  ( a_ItemID )
-			|| IsHoe    ( a_ItemID )
-			|| IsShovel ( a_ItemID );
+		return IsPickaxe( a_ItemID)
+			|| IsAxe    ( a_ItemID)
+			|| IsSword  ( a_ItemID)
+			|| IsHoe    ( a_ItemID)
+			|| IsShovel ( a_ItemID);
 	}
 	
 	
@@ -725,15 +713,6 @@ namespace ItemCategory
 }
 
 // tolua_end
-
-
-inline bool BlockRequiresSpecialTool(BLOCKTYPE a_BlockType)
-{
-	if(!IsValidBlock(a_BlockType)) return false;
-	return cBlockInfo::RequiresSpecialTool(a_BlockType);
-}
-
-
 
 
 

@@ -77,7 +77,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
@@ -101,7 +101,7 @@ cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_GridX, in
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines::cRavine
 
 cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise) :
@@ -283,38 +283,38 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const
 {
 	AString SVG;
-  AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
-  char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
-  for (cRavDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
-  {
-		AppendPrintf(SVG, "%c %d,%d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
+	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
+	char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
+	for (cRavDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
+	{
+		AppendPrintf(SVG, "%c %d, %d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
 		Prefix = 'L';
-  }
-  SVG.append("\"/>\n");
-  
-  // Base point highlight:
-  AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
+	}
+	SVG.append("\"/>\n");
+
+	// Base point highlight:
+	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d, %d L %d, %d\"/>\n",
 		a_OffsetX + m_OriginX - 5, a_OffsetZ + m_OriginZ, a_OffsetX + m_OriginX + 5, a_OffsetZ + m_OriginZ
 	);
-  AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
+	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M %d, %d L %d, %d\"/>\n",
 		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ - 5, a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ + 5
 	);
 	
 	// A gray line from the base point to the first point of the ravine, for identification:
-  AppendPrintf(SVG, "<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M %d,%d L %d,%d\"/>\n",
+	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M %d, %d L %d, %d\"/>\n",
 		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ, a_OffsetX + m_Points.front().m_BlockX, a_OffsetZ + m_Points.front().m_BlockZ
 	);
 	
 	// Offset guides:
 	if (a_OffsetX > 0)
 	{
-		AppendPrintf(SVG, "<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M %d,0 L %d,1024\"/>\n",
+		AppendPrintf(SVG, "<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M %d, 0 L %d, 1024\"/>\n",
 			a_OffsetX, a_OffsetX
 		);
 	}
 	if (a_OffsetZ > 0)
 	{
-		AppendPrintf(SVG, "<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M 0,%d L 1024,%d\"/>\n",
+		AppendPrintf(SVG, "<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M 0, %d L 1024, %d\"/>\n",
 			a_OffsetZ, a_OffsetZ
 		);
 	}

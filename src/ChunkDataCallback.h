@@ -25,29 +25,29 @@ public:
 
 	virtual ~cChunkDataCallback() {}
 
-	/** Called before any other callbacks to inform of the current coords 
-	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()). 
+	/** Called before any other callbacks to inform of the current coords
+	(only in processes where multiple chunks can be processed, such as cWorld::ForEachChunkInRect()).
 	If false is returned, the chunk is skipped.
 	*/
-	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; };
+	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; }
 	
 	/// Called once to provide heightmap data
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) {UNUSED(a_HeightMap); };
+	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) { UNUSED(a_HeightMap); }
 	
 	/// Called once to provide biome data
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) {UNUSED(a_BiomeMap); };
+	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) { UNUSED(a_BiomeMap); }
 	
 	/// Called once to let know if the chunk lighting is valid. Return value is ignored
-	virtual void LightIsValid(bool a_IsLightValid) {UNUSED(a_IsLightValid); };
+	virtual void LightIsValid(bool a_IsLightValid) { UNUSED(a_IsLightValid); }
 	
 	/// Called once to export block info
-	virtual void ChunkData(const cChunkData & a_Buffer) {UNUSED(a_Buffer); };
+	virtual void ChunkData(const cChunkData & a_Buffer) { UNUSED(a_Buffer); }
 	
 	/// Called for each entity in the chunk
-	virtual void Entity(cEntity * a_Entity) {UNUSED(a_Entity); };
+	virtual void Entity(cEntity * a_Entity) { UNUSED(a_Entity); }
 	
 	/// Called for each blockentity in the chunk
-	virtual void BlockEntity(cBlockEntity * a_Entity) {UNUSED(a_Entity); };
+	virtual void BlockEntity(cBlockEntity * a_Entity) { UNUSED(a_Entity); }
 } ;
 
 

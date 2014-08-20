@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
+#include "../ChatColor.h"
 #include "../Server.h"
 #include "../UI/Window.h"
 #include "../UI/WindowOwner.h"
@@ -32,54 +33,58 @@
 
 
 
+const int cPlayer::MAX_HEALTH = 20;
+
+const int cPlayer::MAX_FOOD_LEVEL = 20;
+
+/** Number of ticks it takes to eat an item */
+const int cPlayer::EATING_TICKS = 30;
 
 
-cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
-	: super(etPlayer, 0.6, 1.8)
-	, m_bVisible(true)
-	, m_FoodLevel(MAX_FOOD_LEVEL)
-	, m_FoodSaturationLevel(5.0)
-	, m_FoodTickTimer(0)
-	, m_FoodExhaustionLevel(0.0)
-	, m_FoodPoisonedTicksRemaining(0)
-	, m_LastJumpHeight(0)
-	, m_LastGroundHeight(0)
-	, m_bTouchGround(false)
-	, m_Stance(0.0)
-	, m_Inventory(*this)
-	, m_EnderChestContents(9, 3)
-	, m_CurrentWindow(NULL)
-	, m_InventoryWindow(NULL)
-	, m_Color('-')
-	, m_GameMode(eGameMode_NotSet)
-	, m_IP("")
-	, m_ClientHandle(a_Client)
-	, m_NormalMaxSpeed(1.0)
-	, m_SprintingMaxSpeed(1.3)
-	, m_FlyingMaxSpeed(1.0)
-	, m_IsCrouched(false)
-	, m_IsSprinting(false)
-	, m_IsFlying(false)
-	, m_IsSwimming(false)
-	, m_IsSubmerged(false)
-	, m_IsFishing(false)
-	, m_CanFly(false)
-	, m_EatingFinishTick(-1)
-	, m_LifetimeTotalXp(0)
-	, m_CurrentXp(0)
-	, m_bDirtyExperience(false)
-	, m_IsChargingBow(false)
-	, m_BowCharge(0)
-	, m_FloaterID(-1)
-	, m_Team(NULL)
-	, m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL)
-	, m_bIsTeleporting(false)
+
+
+
+cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
+	super(etPlayer, 0.6, 1.8),
+	m_bVisible(true),
+	m_FoodLevel(MAX_FOOD_LEVEL),
+	m_FoodSaturationLevel(5.0),
+	m_FoodTickTimer(0),
+	m_FoodExhaustionLevel(0.0),
+	m_LastJumpHeight(0),
+	m_LastGroundHeight(0),
+	m_bTouchGround(false),
+	m_Stance(0.0),
+	m_Inventory(*this),
+	m_EnderChestContents(9, 3),
+	m_CurrentWindow(NULL),
+	m_InventoryWindow(NULL),
+	m_Color('-'),
+	m_GameMode(eGameMode_NotSet),
+	m_IP(""),
+	m_ClientHandle(a_Client),
+	m_NormalMaxSpeed(1.0),
+	m_SprintingMaxSpeed(1.3),
+	m_FlyingMaxSpeed(1.0),
+	m_IsCrouched(false),
+	m_IsSprinting(false),
+	m_IsFlying(false),
+	m_IsSwimming(false),
+	m_IsSubmerged(false),
+	m_IsFishing(false),
+	m_CanFly(false),
+	m_EatingFinishTick(-1),
+	m_LifetimeTotalXp(0),
+	m_CurrentXp(0),
+	m_bDirtyExperience(false),
+	m_IsChargingBow(false),
+	m_BowCharge(0),
+	m_FloaterID(-1),
+	m_Team(NULL),
+	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
+	m_bIsTeleporting(false),
+	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : "")
 {
-	LOGD("Created a player object for \"%s\" @ \"%s\" at %p, ID %d", 
-		a_PlayerName.c_str(), a_Client->GetIPString().c_str(),
-		this, GetUniqueID()
-	);
-	
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
 	m_InventoryWindow->OpenedByPlayer(*this);
@@ -92,13 +97,14 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 	
 	m_PlayerName = a_PlayerName;
 
-	if (!LoadFromDisk())
+	cWorld * World = NULL;
+	if (!LoadFromDisk(World))
 	{
 		m_Inventory.Clear();
-		cWorld * DefaultWorld = cRoot::Get()->GetDefaultWorld();
-		SetPosX(DefaultWorld->GetSpawnX());
-		SetPosY(DefaultWorld->GetSpawnY());
-		SetPosZ(DefaultWorld->GetSpawnZ());
+		SetPosX(World->GetSpawnX());
+		SetPosY(World->GetSpawnY());
+		SetPosZ(World->GetSpawnZ());
+		SetBedPos(Vector3i((int)World->GetSpawnX(), (int)World->GetSpawnY(), (int)World->GetSpawnZ()));
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
@@ -111,11 +117,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName)
 
 	if (m_GameMode == gmNotSet)
 	{
-		cWorld * World = cRoot::Get()->GetWorld(GetLoadedWorldName());
-		if (World == NULL)
-		{
-			World = cRoot::Get()->GetDefaultWorld();
-		}
 		if (World->IsGameModeCreative())
 		{
 			m_CanFly = true;
@@ -134,7 +135,7 @@ cPlayer::~cPlayer(void)
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 	{
 		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
-		LOGINFO("Player %s has left the game.", GetName().c_str());
+		LOGINFO("Player %s has left the game", GetName().c_str());
 	}
 
 	LOGD("Deleting cPlayer \"%s\" at %p, ID %d", GetName().c_str(), this, GetUniqueID());
@@ -143,8 +144,6 @@ cPlayer::~cPlayer(void)
 	cRoot::Get()->GetServer()->PlayerDestroying(this);
 
 	SaveToDisk();
-
-	m_World->RemovePlayer( this );
 
 	m_ClientHandle = NULL;
 	
@@ -161,8 +160,6 @@ cPlayer::~cPlayer(void)
 void cPlayer::Destroyed()
 {
 	CloseWindow(false);
-	
-	m_ClientHandle = NULL;
 }
 
 
@@ -177,11 +174,11 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 	}
 	a_Client.SendPlayerSpawn(*this);
 	a_Client.SendEntityHeadLook(*this);
-	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem() );
-	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots() );
-	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings() );
-	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate() );
-	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet() );
+	a_Client.SendEntityEquipment(*this, 0, m_Inventory.GetEquippedItem());
+	a_Client.SendEntityEquipment(*this, 1, m_Inventory.GetEquippedBoots());
+	a_Client.SendEntityEquipment(*this, 2, m_Inventory.GetEquippedLeggings());
+	a_Client.SendEntityEquipment(*this, 3, m_Inventory.GetEquippedChestplate());
+	a_Client.SendEntityEquipment(*this, 4, m_Inventory.GetEquippedHelmet());
 }
 
 
@@ -228,16 +225,24 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
-	if (!GetPosition().EqualsEps(m_LastPos, 0.01)) // Non negligible change in position from last tick?
+	bool CanMove = true;
+	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
-		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
+		{
+			CanMove = false;
+			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
+		}
 		m_ClientHandle->StreamChunks();
 	}
 
-	BroadcastMovementUpdate(m_ClientHandle);
+	if (CanMove)
+	{
+		BroadcastMovementUpdate(m_ClientHandle);
+	}
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -289,20 +294,20 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 short cPlayer::CalcLevelFromXp(short a_XpTotal)
 {
-	//level 0 to 15
-	if(a_XpTotal <= XP_TO_LEVEL15)
+	// level 0 to 15
+	if (a_XpTotal <= XP_TO_LEVEL15)
 	{
 		return a_XpTotal / XP_PER_LEVEL_TO15;
 	}
 
-	//level 30+
-	if(a_XpTotal > XP_TO_LEVEL30)
+	// level 30+
+	if (a_XpTotal > XP_TO_LEVEL30)
 	{
 		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
-	//level 16 to 30
-	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal )))) / 3;
+	// level 16 to 30
+	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3;
 }
 
 
@@ -311,20 +316,20 @@ short cPlayer::CalcLevelFromXp(short a_XpTotal)
 
 short cPlayer::XpForLevel(short a_Level)
 {
-	//level 0 to 15
-	if(a_Level <= 15)
+	// level 0 to 15
+	if (a_Level <= 15)
 	{
 		return a_Level * XP_PER_LEVEL_TO15;
 	}
 
-	//level 30+
-	if(a_Level >= 31)
+	// level 30+
+	if (a_Level >= 31)
 	{
-		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220 );
+		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220);
 	}
 
-	//level 16 to 30
-	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360 );
+	// level 16 to 30
+	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360);
 }
 
 
@@ -345,7 +350,7 @@ float cPlayer::GetXpPercentage()
 	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
 	short int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)(m_CurrentXp - currentLevel_XpBase) / 
+	return (float)(m_CurrentXp - currentLevel_XpBase) /
 		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
@@ -355,10 +360,10 @@ float cPlayer::GetXpPercentage()
 
 bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 {
-	if(!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
-		return false; //oops, they gave us a dodgey number
+		return false;  // oops, they gave us a dodgey number
 	}
 
 	m_CurrentXp = a_CurrentXp;
@@ -380,16 +385,13 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		// Value was bad, abort and report
 		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.",
 			a_Xp_delta);
-		return -1; // Should we instead just return the current Xp?
+		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	if (m_CurrentXp < 0)
-	{
-		m_CurrentXp = 0;
-	}
+	m_CurrentXp = std::max<short int>(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -397,7 +399,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", 
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d",
 		GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
@@ -482,7 +484,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	{
 		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
 
-		if (Dist >= 2.0) // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
+		if (Dist >= 2.0)  // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
 		{
 			// Increment statistic
 			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
@@ -502,7 +504,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			
 			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
-		}		
+		}
 
 		m_LastGroundHeight = (float)GetPosY();
 	}
@@ -524,7 +526,7 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
@@ -542,7 +544,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 
 void cPlayer::SetFoodSaturationLevel(double a_FoodSaturationLevel)
 {
-	m_FoodSaturationLevel = std::max(0.0, std::min(a_FoodSaturationLevel, (double)m_FoodLevel));
+	m_FoodSaturationLevel = Clamp(a_FoodSaturationLevel, 0.0, (double) m_FoodLevel);
 }
 
 
@@ -560,16 +562,7 @@ void cPlayer::SetFoodTickTimer(int a_FoodTickTimer)
 
 void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 {
-	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodExhaustionLevel, 4.0));
-}
-
-
-
-
-
-void cPlayer::SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining)
-{
-	m_FoodPoisonedTicksRemaining = a_FoodPoisonedTicksRemaining;
+	m_FoodExhaustionLevel = Clamp(a_FoodExhaustionLevel, 0.0, 40.0);
 }
 
 
@@ -578,7 +571,7 @@ void cPlayer::SetFoodPoisonedTicksRemaining(int a_FoodPoisonedTicksRemaining)
 
 bool cPlayer::Feed(int a_Food, double a_Saturation)
 {
-	if (m_FoodLevel >= MAX_FOOD_LEVEL)
+	if (IsSatiated())
 	{
 		return false;
 	}
@@ -592,18 +585,11 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 
 
-void cPlayer::FoodPoison(int a_NumTicks)
+void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 {
-	bool HasBeenFoodPoisoned = (m_FoodPoisonedTicksRemaining > 0);
-	m_FoodPoisonedTicksRemaining = std::max(m_FoodPoisonedTicksRemaining, a_NumTicks);
-	if (!HasBeenFoodPoisoned)
+	if (!IsGameModeCreative())
 	{
-		m_World->BroadcastRemoveEntityEffect(*this, E_EFFECT_HUNGER);
-		SendHealth();
-	}
-	else
-	{
-		m_World->BroadcastEntityEffect(*this, E_EFFECT_HUNGER, 0, 400); // Give the player the "Hunger" effect for 20 seconds.
+		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion, 40.0);
 	}
 }
 
@@ -632,7 +618,6 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -647,10 +632,11 @@ void cPlayer::FinishEating(void)
 
 	GetInventory().RemoveOneEquippedItem();
 
-	//if the food is mushroom soup, return a bowl to the inventory
-	if( Item.m_ItemType == E_ITEM_MUSHROOM_SOUP ) {
-		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
-		GetInventory().AddItem(emptyBowl, true, true);
+	// if the food is mushroom soup, return a bowl to the inventory
+	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
+	{
+		cItem EmptyBowl(E_ITEM_BOWL);
+		GetInventory().AddItem(EmptyBowl, true, true);
 	}
 }
 
@@ -661,7 +647,6 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -730,16 +715,13 @@ double cPlayer::GetMaxSpeed(void) const
 	{
 		return m_FlyingMaxSpeed;
 	}
+	else if (m_IsSprinting)
+	{
+		return m_SprintingMaxSpeed;
+	}
 	else
 	{
-		if (m_IsSprinting)
-		{
-			return m_SprintingMaxSpeed;
-		}
-		else
-		{
-			return m_NormalMaxSpeed;
-		}
+		return m_NormalMaxSpeed;
 	}
 }
 
@@ -889,16 +871,16 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPlayer::KilledBy(cEntity * a_Killer)
+void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 {
-	super::KilledBy(a_Killer);
+	super::KilledBy(a_TDI);
 
 	if (m_Health > 0)
 	{
-		return; //  not dead yet =]
+		return;  //  not dead yet =]
 	}
 
-	m_bVisible = false; // So new clients don't see the player
+	m_bVisible = false;  // So new clients don't see the player
 
 	// Puke out all the items
 	cItems Pickups;
@@ -910,25 +892,51 @@ void cPlayer::KilledBy(cEntity * a_Killer)
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
 
-	m_Stats.AddValue(statItemsDropped, Pickups.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
-	if (a_Killer == NULL)
+	if ((a_TDI.Attacker == NULL) && m_World->ShouldBroadcastDeathMessages())
 	{
-		GetWorld()->BroadcastChatDeath(Printf("%s was killed by environmental damage", GetName().c_str()));
+		AString DamageText;
+		switch (a_TDI.DamageType)
+		{
+			case dtRangedAttack: DamageText = "was shot"; break;
+			case dtLightning: DamageText = "was plasmified by lightining"; break;
+			case dtFalling: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "fell to death" : "hit the ground too hard"; break;
+			case dtDrowning: DamageText = "drowned"; break;
+			case dtSuffocating: DamageText = (GetWorld()->GetTickRandomNumber(10) % 2 == 0) ? "git merge'd into a block" : "fused with a block"; break;
+			case dtStarving: DamageText = "forgot the importance of food"; break;
+			case dtCactusContact: DamageText = "was impaled on a cactus"; break;
+			case dtLavaContact: DamageText = "was melted by lava"; break;
+			case dtPoisoning: DamageText = "died from septicaemia"; break;
+			case dtWithering: DamageText = "is a husk of their former selves"; break;
+			case dtOnFire: DamageText = "forgot to stop, drop, and roll"; break;
+			case dtFireContact: DamageText = "burnt themselves to death"; break;
+			case dtInVoid: DamageText = "somehow fell out of the world"; break;
+			case dtPotionOfHarming: DamageText = "was magicked to death"; break;
+			case dtEnderPearl: DamageText = "misused an ender pearl"; break;
+			case dtAdmin: DamageText = "was administrator'd"; break;
+			case dtExplosion: DamageText = "blew up"; break;
+			default: DamageText = "died, somehow; we've no idea how though"; break;
+		}
+		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
 	}
-	else if (a_Killer->IsPlayer())
+	else if (a_TDI.Attacker == NULL)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
 	{
-		cPlayer * Killer = (cPlayer *)a_Killer;
+		// no-op
+	}
+	else if (a_TDI.Attacker->IsPlayer())
+	{
+		cPlayer * Killer = (cPlayer *)a_TDI.Attacker;
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by %s", GetName().c_str(), Killer->GetName().c_str()));
 	}
 	else
 	{
-		AString KillerClass = a_Killer->GetClass();
-		KillerClass.erase(KillerClass.begin()); // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
+		AString KillerClass = a_TDI.Attacker->GetClass();
+		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
 
 		GetWorld()->BroadcastChatDeath(Printf("%s was killed by a %s", GetName().c_str(), KillerClass.c_str()));
 	}
@@ -986,12 +994,12 @@ void cPlayer::Respawn(void)
 	m_LifetimeTotalXp = 0;
 	// ToDo: send score to client? How?
 
-	m_ClientHandle->SendRespawn(*m_World, true);
+	m_ClientHandle->SendRespawn(GetWorld()->GetDimension(), true);
 	
 	// Extinguish the fire:
 	StopBurning();
 
-	TeleportToCoords(GetWorld()->GetSpawnX(), GetWorld()->GetSpawnY(), GetWorld()->GetSpawnZ());
+	TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
 
 	SetVisible(true);
 }
@@ -1010,7 +1018,7 @@ double cPlayer::GetEyeHeight(void) const
 
 Vector3d cPlayer::GetEyePosition(void) const
 {
-	return Vector3d( GetPosX(), m_Stance, GetPosZ() );
+	return Vector3d( GetPosX(), m_Stance, GetPosZ());
 }
 
 
@@ -1172,7 +1180,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 
 
 
-void cPlayer::LoginSetGameMode( eGameMode a_GameMode )
+void cPlayer::LoginSetGameMode( eGameMode a_GameMode)
 {
 	m_GameMode = a_GameMode;
 }
@@ -1211,11 +1219,13 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	}
 	else
 	{
-		// First time, announce it
-		cCompositeChat Msg;
-		Msg.SetMessageType(mtSuccess);
-		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
-		m_World->BroadcastChat(Msg);
+		if (m_World->ShouldBroadcastAchievementMessages())
+		{
+			cCompositeChat Msg;
+			Msg.SetMessageType(mtSuccess);
+			Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
+			m_World->BroadcastChat(Msg);
+		}
 
 		// Increment the statistic
 		StatValue New = m_Stats.AddValue(a_Ach);
@@ -1281,7 +1291,7 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 	// TODO: Add a slight random change (+-0.0075 in each direction)
 	
 	return res * a_SpeedCoeff;
-}	
+}
 
 
 
@@ -1308,13 +1318,13 @@ void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 
 
-void cPlayer::MoveTo( const Vector3d & a_NewPos )
+void cPlayer::MoveTo( const Vector3d & a_NewPos)
 {
 	if ((a_NewPos.y < -990) && (GetPosY() > -100))
 	{
 		// When attached to an entity, the client sends position packets with weird coords:
 		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
-		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while 
+		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while
 		// the client may still send more of these nonsensical packets.
 		if (m_AttachedTo != NULL)
 		{
@@ -1331,7 +1341,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 	Vector3d DeltaPos = a_NewPos - GetPosition();
 	UpdateMovementStats(DeltaPos);
 	
-	SetPosition( a_NewPos );
+	SetPosition( a_NewPos);
 	SetStance(a_NewPos.y + 1.62);
 }
 
@@ -1341,7 +1351,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos )
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
-	if (a_bVisible && !m_bVisible) // Make visible
+	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
 		m_World->BroadcastSpawnEntity(*this);
@@ -1349,7 +1359,7 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);	// Destroy on all clients
+		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);  // Destroy on all clients
 	}
 }
 
@@ -1357,11 +1367,11 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
-void cPlayer::AddToGroup( const AString & a_GroupName )
+void cPlayer::AddToGroup( const AString & a_GroupName)
 {
-	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName );
-	m_Groups.push_back( Group );
-	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str() );
+	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName);
+	m_Groups.push_back( Group);
+	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str());
 	ResolveGroups();
 	ResolvePermissions();
 }
@@ -1370,28 +1380,28 @@ void cPlayer::AddToGroup( const AString & a_GroupName )
 
 
 
-void cPlayer::RemoveFromGroup( const AString & a_GroupName )
+void cPlayer::RemoveFromGroup( const AString & a_GroupName)
 {
 	bool bRemoved = false;
-	for( GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr )
+	for (GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr)
 	{
-		if( (*itr)->GetName().compare(a_GroupName ) == 0 )
+		if ((*itr)->GetName().compare(a_GroupName) == 0)
 		{
-			m_Groups.erase( itr );
+			m_Groups.erase( itr);
 			bRemoved = true;
 			break;
 		}
 	}
 
-	if( bRemoved )
+	if (bRemoved)
 	{
-		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str() );
+		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str());
 		ResolveGroups();
 		ResolvePermissions();
 	}
 	else
 	{
-		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str() );
+		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str());
 	}
 }
 
@@ -1407,30 +1417,30 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 		return true;
 	}
 	
-	AStringVector Split = StringSplit( a_Permission, "." );
+	AStringVector Split = StringSplit( a_Permission, ".");
 	PermissionMap Possibilities = m_ResolvedPermissions;
 	// Now search the namespaces
-	while( Possibilities.begin() != Possibilities.end() )
+	while (Possibilities.begin() != Possibilities.end())
 	{
 		PermissionMap::iterator itr = Possibilities.begin();
-		if( itr->second )
+		if (itr->second)
 		{
-			AStringVector OtherSplit = StringSplit( itr->first, "." );
-			if( OtherSplit.size() <= Split.size() )
+			AStringVector OtherSplit = StringSplit( itr->first, ".");
+			if (OtherSplit.size() <= Split.size())
 			{
 				unsigned int i;
-				for( i = 0; i < OtherSplit.size(); ++i )
+				for (i = 0; i < OtherSplit.size(); ++i)
 				{
-					if( OtherSplit[i].compare( Split[i] ) != 0 )
+					if (OtherSplit[i].compare( Split[i]) != 0)
 					{
-						if( OtherSplit[i].compare("*") == 0 ) return true; // WildCard man!! WildCard!
+						if (OtherSplit[i].compare("*") == 0) return true;  // WildCard man!! WildCard!
 						break;
 					}
 				}
-				if( i == Split.size() ) return true;
+				if (i == Split.size()) return true;
 			}
 		}
-		Possibilities.erase( itr );
+		Possibilities.erase( itr);
 	}
 
 	// Nothing that matched :(
@@ -1441,11 +1451,11 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 
 
 
-bool cPlayer::IsInGroup( const AString & a_Group )
+bool cPlayer::IsInGroup( const AString & a_Group)
 {
-	for( GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr )
+	for (GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr)
 	{
-		if( a_Group.compare( (*itr)->GetName().c_str() ) == 0 )
+		if (a_Group.compare( (*itr)->GetName().c_str()) == 0)
 			return true;
 	}
 	return false;
@@ -1457,18 +1467,18 @@ bool cPlayer::IsInGroup( const AString & a_Group )
 
 void cPlayer::ResolvePermissions()
 {
-	m_ResolvedPermissions.clear();	// Start with an empty map yo~
+	m_ResolvedPermissions.clear();  // Start with an empty map
 
 	// Copy all player specific permissions into the resolved permissions map
-	for( PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr )
+	for (PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr)
 	{
 		m_ResolvedPermissions[ itr->first ] = itr->second;
 	}
 
-	for( GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr )
+	for (GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr)
 	{
 		const cGroup::PermissionMap & Permissions = (*GroupItr)->GetPermissions();
-		for( cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr )
+		for (cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr)
 		{
 			m_ResolvedPermissions[ itr->first ] = itr->second;
 		}
@@ -1485,16 +1495,16 @@ void cPlayer::ResolveGroups()
 	m_ResolvedGroups.clear();
 
 	// Get a complete resolved list of all groups the player is in
-	std::map< cGroup*, bool > AllGroups;	// Use a map, because it's faster than iterating through a list to find duplicates
+	std::map< cGroup*, bool > AllGroups;  // Use a map, because it's faster than iterating through a list to find duplicates
 	GroupList ToIterate;
-	for( GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr )
+	for (GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr)
 	{
-		ToIterate.push_back( *GroupItr );
+		ToIterate.push_back( *GroupItr);
 	}
-	while( ToIterate.begin() != ToIterate.end() )
+	while (ToIterate.begin() != ToIterate.end())
 	{
 		cGroup* CurrentGroup = *ToIterate.begin();
-		if( AllGroups.find( CurrentGroup ) != AllGroups.end() )
+		if (AllGroups.find( CurrentGroup) != AllGroups.end())
 		{
 			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
 				GetName().c_str(), CurrentGroup->GetName().c_str()
@@ -1503,19 +1513,19 @@ void cPlayer::ResolveGroups()
 		else
 		{
 			AllGroups[ CurrentGroup ] = true;
-			m_ResolvedGroups.push_back( CurrentGroup );	// Add group to resolved list
+			m_ResolvedGroups.push_back( CurrentGroup);  // Add group to resolved list
 			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
-			for( cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr )
+			for (cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr)
 			{
-				if( AllGroups.find( *itr ) != AllGroups.end() )
+				if (AllGroups.find( *itr) != AllGroups.end())
 				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str() );
+					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str());
 					continue;
 				}
-				ToIterate.push_back( *itr );
+				ToIterate.push_back( *itr);
 			}
 		}
-		ToIterate.erase( ToIterate.begin() );
+		ToIterate.erase( ToIterate.begin());
 	}
 }
 
@@ -1525,12 +1535,12 @@ void cPlayer::ResolveGroups()
 
 AString cPlayer::GetColor(void) const
 {
-	if ( m_Color != '-' )
+	if (m_Color != '-')
 	{
-		return cChatColor::Color + m_Color;
+		return cChatColor::Delimiter + m_Color;
 	}
 
-	if ( m_Groups.size() < 1 )
+	if (m_Groups.size() < 1)
 	{
 		return cChatColor::White;
 	}
@@ -1551,7 +1561,7 @@ void cPlayer::TossEquippedItem(char a_Amount)
 		char NewAmount = a_Amount;
 		if (NewAmount > GetInventory().GetEquippedItem().m_ItemCount)
 		{
-			NewAmount = GetInventory().GetEquippedItem().m_ItemCount; // Drop only what's there
+			NewAmount = GetInventory().GetEquippedItem().m_ItemCount;  // Drop only what's there
 		}
 
 		GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
@@ -1608,41 +1618,41 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
-	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
 	vY = -vY * 2 + 1.f;
-	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true); // 'true' because created by player
+	m_World->SpawnItemPickups(a_Items, GetPosX(), GetEyeHeight(), GetPosZ(), vX * 3, vY * 3, vZ * 3, true);  // 'true' because created by player
 }
 
 
 
 
 
-bool cPlayer::MoveToWorld(const char * a_WorldName)
+bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
-	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
-	if (World == NULL)
+	ASSERT(a_World != NULL);
+
+	if (GetWorld() == a_World)
 	{
-		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName);
+		// Don't move to same world
 		return false;
 	}
 	
 	// Send the respawn packet:
-	if (m_ClientHandle != NULL)
+	if (a_ShouldSendRespawn && (m_ClientHandle != NULL))
 	{
-		m_ClientHandle->SendRespawn(*World);
+		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
 
-	// Remove all links to the old world
-	m_World->RemovePlayer(this);
-
-	// If the dimension is different, we can send the respawn packet
-	// http://wiki.vg/Protocol#0x09 says "don't send if dimension is the same" as of 2013_07_02
+	// Remove player from the old world
+	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
+	GetWorld()->RemovePlayer(this, false);
 
 	// Queue adding player to the new world, including all the necessary adjustments to the object
-	World->AddPlayer(this);
+	a_World->AddPlayer(this);
+	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
 	return true;
 }
@@ -1690,53 +1700,104 @@ void cPlayer::LoadPermissionsFromDisk()
 
 
 
-bool cPlayer::LoadFromDisk()
+bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
 	LoadPermissionsFromDisk();
 
-	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str() );
+	// Load from the UUID file:
+	if (LoadFromFile(GetUUIDFileName(m_UUID), a_World))
+	{
+		return true;
+	}
+	
+	// Load from the offline UUID file, if allowed:
+	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
+	const char * OfflineUsage = " (unused)";
+	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
+	{
+		OfflineUsage = "";
+		if (LoadFromFile(GetUUIDFileName(OfflineUUID), a_World))
+		{
+			return true;
+		}
+	}
+	
+	// Load from the old-style name-based file, if allowed:
+	if (cRoot::Get()->GetServer()->ShouldLoadNamedPlayerData())
+	{
+		AString OldStyleFileName = Printf("players/%s.json", GetName().c_str());
+		if (LoadFromFile(OldStyleFileName, a_World))
+		{
+			// Save in new format and remove the old file
+			if (SaveToDisk())
+			{
+				cFile::Delete(OldStyleFileName);
+			}
+			return true;
+		}
+	}
+	
+	// None of the files loaded successfully
+	LOG("Player data file not found for %s (%s, offline %s%s), will be reset to defaults.",
+		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str(), OfflineUsage
+	);
 
+	if (a_World == NULL)
+	{
+		a_World = cRoot::Get()->GetDefaultWorld();
+	}
+	return false;
+}
+
+
+
+
+
+bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
+{
+	// Load the data from the file:
 	cFile f;
-	if (!f.Open(SourceFile, cFile::fmRead))
+	if (!f.Open(a_FileName, cFile::fmRead))
 	{
 		// This is a new player whom we haven't seen yet, bail out, let them have the defaults
 		return false;
 	}
-
 	AString buffer;
 	if (f.ReadRestOfFile(buffer) != f.GetSize())
 	{
-		LOGWARNING("Cannot read player data from file \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Cannot read player data from file \"%s\"", a_FileName.c_str());
 		return false;
 	}
-	f.Close(); //cool kids play nice
+	f.Close();
 
+	// Parse the JSON format:
 	Json::Value root;
 	Json::Reader reader;
 	if (!reader.parse(buffer, root, false))
 	{
-		LOGWARNING("Cannot parse player data in file \"%s\", player will be reset", SourceFile.c_str());
+		LOGWARNING("Cannot parse player data in file \"%s\"", a_FileName.c_str());
+		return false;
 	}
 
+	// Load the player data:
 	Json::Value & JSON_PlayerPosition = root["position"];
 	if (JSON_PlayerPosition.size() == 3)
 	{
-		SetPosX(JSON_PlayerPosition[(unsigned int)0].asDouble());
-		SetPosY(JSON_PlayerPosition[(unsigned int)1].asDouble());
-		SetPosZ(JSON_PlayerPosition[(unsigned int)2].asDouble());
+		SetPosX(JSON_PlayerPosition[(unsigned)0].asDouble());
+		SetPosY(JSON_PlayerPosition[(unsigned)1].asDouble());
+		SetPosZ(JSON_PlayerPosition[(unsigned)2].asDouble());
 		m_LastPos = GetPosition();
 	}
 
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetYaw      ((float)JSON_PlayerRotation[(unsigned int)0].asDouble());
-		SetPitch    ((float)JSON_PlayerRotation[(unsigned int)1].asDouble());
-		SetRoll     ((float)JSON_PlayerRotation[(unsigned int)2].asDouble());
+		SetYaw      ((float)JSON_PlayerRotation[(unsigned)0].asDouble());
+		SetPitch    ((float)JSON_PlayerRotation[(unsigned)1].asDouble());
+		SetRoll     ((float)JSON_PlayerRotation[(unsigned)2].asDouble());
 	}
 
-	m_Health              = root.get("health", 0).asInt();
+	m_Health              = root.get("health",         0).asInt();
 	m_AirLevel            = root.get("air",            MAX_AIR_LEVEL).asInt();
 	m_FoodLevel           = root.get("food",           MAX_FOOD_LEVEL).asInt();
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
@@ -1757,14 +1818,19 @@ bool cPlayer::LoadFromDisk()
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), true);
+
+	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
+	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
+	m_LastBedPos.z = root.get("SpawnZ", a_World->GetSpawnZ()).asInt();
 
 	// Load the player stats.
 	// We use the default world name (like bukkit) because stats are shared between dimensions/worlds.
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	StatSerializer.Load();
 	
-	LOGD("Player \"%s\" was read from file, spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
-		GetName().c_str(), GetPosX(), GetPosY(), GetPosZ(), m_LoadedWorldName.c_str()
+	LOGD("Player %s was read from file \"%s\", spawning at {%.2f, %.2f, %.2f} in world \"%s\"",
+		GetName().c_str(), a_FileName.c_str(), GetPosX(), GetPosY(), GetPosZ(), a_World->GetName().c_str()
 	);
 	
 	return true;
@@ -1776,7 +1842,8 @@ bool cPlayer::LoadFromDisk()
 
 bool cPlayer::SaveToDisk()
 {
-	cFile::CreateFolder(FILE_IO_PREFIX + AString("players"));
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/"));  // Create the "players" folder, if it doesn't exist yet (#1268)
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
 	Json::Value JSON_PlayerPosition;
@@ -1808,33 +1875,49 @@ bool cPlayer::SaveToDisk()
 	root["foodSaturation"]      = m_FoodSaturationLevel;
 	root["foodTickTimer"]       = m_FoodTickTimer;
 	root["foodExhaustion"]      = m_FoodExhaustionLevel;
-	root["world"]               = GetWorld()->GetName();
 	root["isflying"]            = IsFlying();
+	root["lastknownname"]       = GetName();
+	root["SpawnX"]              = GetLastBedPos().x;
+	root["SpawnY"]              = GetLastBedPos().y;
+	root["SpawnZ"]              = GetLastBedPos().z;
 
-	if (m_GameMode == GetWorld()->GetGameMode())
+	if (m_World != NULL)
 	{
-		root["gamemode"] = (int) eGameMode_NotSet;
+		root["world"] = m_World->GetName();
+		if (m_GameMode == m_World->GetGameMode())
+		{
+			root["gamemode"] = (int) eGameMode_NotSet;
+		}
+		else
+		{
+			root["gamemode"] = (int) m_GameMode;
+		}
 	}
 	else
 	{
-		root["gamemode"] = (int) m_GameMode;
+		// This happens if the player is saved to new format after loading from the old format
+		root["world"]    = m_LoadedWorldName;
+		root["gamemode"] = (int) eGameMode_NotSet;
 	}
 
 	Json::StyledWriter writer;
 	std::string JsonData = writer.write(root);
 
-	AString SourceFile;
-	Printf(SourceFile, "players/%s.json", GetName().c_str() );
+	AString SourceFile = GetUUIDFileName(m_UUID);
 
 	cFile f;
 	if (!f.Open(SourceFile, cFile::fmWrite))
 	{
-		LOGERROR("ERROR WRITING PLAYER \"%s\" TO FILE \"%s\" - cannot open file", GetName().c_str(), SourceFile.c_str());
+		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot open file. Player will lose their progress.",
+			GetName().c_str(), SourceFile.c_str()
+		);
 		return false;
 	}
 	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
 	{
-		LOGERROR("ERROR WRITING PLAYER JSON TO FILE \"%s\"", SourceFile.c_str()); 
+		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot save data. Player will lose their progress. ",
+			GetName().c_str(), SourceFile.c_str()
+		);
 		return false;
 	}
 
@@ -1843,7 +1926,7 @@ bool cPlayer::SaveToDisk()
 	cStatSerializer StatSerializer(cRoot::Get()->GetDefaultWorld()->GetName(), GetName(), &m_Stats);
 	if (!StatSerializer.Save())
 	{
-		LOGERROR("Could not save stats for player %s", GetName().c_str());
+		LOGWARNING("Could not save stats for player %s", GetName().c_str());
 		return false;
 	}
 
@@ -1859,11 +1942,11 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 	StringList Permissions;
 
 	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
-	for( PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr )
+	for (PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr)
 	{
 		if (itr->second)
 		{
-			Permissions.push_back( itr->first );
+			Permissions.push_back( itr->first);
 		}
 	}
 
@@ -1874,16 +1957,16 @@ cPlayer::StringList cPlayer::GetResolvedPermissions()
 
 
 
-void cPlayer::UseEquippedItem(void)
+void cPlayer::UseEquippedItem(int a_Amount)
 {
-	if (IsGameModeCreative()) // No damage in creative
+	if (IsGameModeCreative())  // No damage in creative
 	{
 		return;
 	}
 
-	if (GetInventory().DamageEquippedItem())
+	if (GetInventory().DamageEquippedItem(a_Amount))
 	{
-		m_World->BroadcastSoundEffect("random.break", (int)GetPosX() * 8, (int)GetPosY() * 8, (int)GetPosZ() * 8, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	}
 }
 
@@ -1918,19 +2001,34 @@ void cPlayer::HandleFood(void)
 		return;
 	}
 
+	// Apply food exhaustion that has accumulated:
+	if (m_FoodExhaustionLevel > 4.0)
+	{
+		m_FoodExhaustionLevel -= 4.0;
+
+		if (m_FoodSaturationLevel > 0.0)
+		{
+			m_FoodSaturationLevel = std::max(m_FoodSaturationLevel - 1.0, 0.0);
+		}
+		else
+		{
+			SetFoodLevel(m_FoodLevel - 1);
+		}
+	}
+
 	// Heal or damage, based on the food level, using the m_FoodTickTimer:
-	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
+	if ((m_FoodLevel >= 18) || (m_FoodLevel <= 0))
 	{
 		m_FoodTickTimer++;
 		if (m_FoodTickTimer >= 80)
 		{
 			m_FoodTickTimer = 0;
 
-			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
+			if ((m_FoodLevel >= 18) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
-				m_FoodExhaustionLevel += 3.0;
+				AddFoodExhaustion(3.0);
 			}
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
@@ -1939,31 +2037,9 @@ void cPlayer::HandleFood(void)
 			}
 		}
 	}
-
-	// Apply food poisoning food exhaustion:
-	if (m_FoodPoisonedTicksRemaining > 0)
-	{
-		m_FoodPoisonedTicksRemaining--;
-		m_FoodExhaustionLevel += 0.025;  // 0.5 per second = 0.025 per tick
-	}
 	else
 	{
-		m_World->BroadcastRemoveEntityEffect(*this, E_EFFECT_HUNGER); // Remove the "Hunger" effect.
-	}
-
-	// Apply food exhaustion that has accumulated:
-	if (m_FoodExhaustionLevel >= 4.0)
-	{
-		m_FoodExhaustionLevel -= 4.0;
-
-		if (m_FoodSaturationLevel >= 1.0)
-		{
-			m_FoodSaturationLevel -= 1.0;
-		}
-		else
-		{
-			SetFoodLevel(m_FoodLevel - 1);
-		}
+		m_FoodTickTimer = 0;
 	}
 }
 
@@ -2030,7 +2106,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 	{
 		if (IsClimbing())
 		{
-			if (a_DeltaPos.y > 0.0) // Going up
+			if (a_DeltaPos.y > 0.0)  // Going up
 			{
 				m_Stats.AddValue(statDistClimbed, (StatValue)floor(a_DeltaPos.y * 100 + 0.5));
 			}
@@ -2038,18 +2114,21 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		else if (IsSubmerged())
 		{
 			m_Stats.AddValue(statDistDove, Value);
+			AddFoodExhaustion(0.00015 * (double)Value);
 		}
 		else if (IsSwimming())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
+			AddFoodExhaustion(0.00015 * (double)Value);
 		}
 		else if (IsOnGround())
 		{
 			m_Stats.AddValue(statDistWalked, Value);
+			AddFoodExhaustion((m_IsSprinting ? 0.001 : 0.0001) * (double)Value);
 		}
 		else
 		{
-			if (Value >= 25) // Ignore small/slow movement
+			if (Value >= 25)  // Ignore small/slow movement
 			{
 				m_Stats.AddValue(statDistFlown, Value);
 			}
@@ -2087,6 +2166,8 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	{
 		return;
 	}
+
+	// If we have just teleported, apply no exhaustion
 	if (m_bIsTeleporting)
 	{
 		m_bIsTeleporting = false;
@@ -2095,6 +2176,13 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 
 	// If riding anything, apply no food exhaustion
 	if (m_AttachedTo != NULL)
+	{
+		return;
+	}
+
+	// Process exhaustion every two ticks as that is how frequently m_LastPos is updated
+	// Otherwise, we apply exhaustion for a 'movement' every tick, one of which is an already processed value
+	if (GetWorld()->GetWorldAge() % 2 != 0)
 	{
 		return;
 	}
@@ -2151,6 +2239,23 @@ void cPlayer::Detach()
 			}
 		}
 	}
+}
+
+
+
+
+
+AString cPlayer::GetUUIDFileName(const AString & a_UUID)
+{
+	AString UUID = cMojangAPI::MakeUUIDDashed(a_UUID);
+	ASSERT(UUID.length() == 36);
+	
+	AString res("players/");
+	res.append(UUID, 0, 2);
+	res.push_back('/');
+	res.append(UUID, 2, AString::npos);
+	res.append(".json");
+	return res;
 }
 
 

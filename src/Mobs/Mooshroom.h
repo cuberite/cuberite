@@ -15,7 +15,7 @@ class cMooshroom :
 public:
 	cMooshroom(void);
 
-	CLASS_PROTODEF(cMooshroom);
+	CLASS_PROTODEF(cMooshroom)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;

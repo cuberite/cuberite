@@ -18,7 +18,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompoGenSameBlock:
 
 void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc)
@@ -60,7 +60,7 @@ void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompoGenDebugBiomes:
 
 void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
@@ -68,7 +68,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	static BLOCKTYPE Blocks[] =
 	{
 		E_BLOCK_STONE,
-		E_BLOCK_COBBLESTONE, 
+		E_BLOCK_COBBLESTONE,
 		E_BLOCK_LOG,
 		E_BLOCK_PLANKS,
 		E_BLOCK_SANDSTONE,
@@ -111,7 +111,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompoGenClassic:
 
 cCompoGenClassic::cCompoGenClassic(void) :
@@ -209,7 +209,7 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompoGenBiomal:
 
 void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
@@ -526,7 +526,7 @@ void cCompoGenBiomal::FillColumnPattern(int a_RelX, int a_RelZ, int a_Height, cC
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompoGenNether:
 
 cCompoGenNether::cCompoGenNether(int a_Seed) :
@@ -563,7 +563,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	{
 		//*
 		FloorLo[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
-			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) * 
+			m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) *
 			m_Noise2.IntNoise3DInt(BaseX + INTERPOL_X * x, 0, BaseZ + INTERPOL_Z * z) /
 			256;
 		//*/
@@ -628,7 +628,22 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 	{
 		a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
-		a_ChunkDesc.SetBlockType(x, a_ChunkDesc.GetHeight(x, z), z, E_BLOCK_BEDROCK);
+
+		int Height = a_ChunkDesc.GetHeight(x, z);
+		a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_BEDROCK);
+
+		NOISE_DATATYPE CeilingDisguise = (m_Noise1.CubicNoise2D((float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10, (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10));
+		if (CeilingDisguise < 0)
+		{
+			CeilingDisguise = -CeilingDisguise;
+		}
+
+		int CeilingDisguiseHeight = Height - 2 - (int)CeilingDisguise * 3;
+
+		for (int y = Height - 1; y > CeilingDisguiseHeight; y--)
+		{
+			a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_NETHERRACK);
+		}
 	}
 }
 
@@ -645,7 +660,7 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompoGenCache:
 
 cCompoGenCache::cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_CacheSize) :

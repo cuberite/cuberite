@@ -15,7 +15,7 @@ class cSpider :
 public:
 	cSpider(void);
 
-	CLASS_PROTODEF(cSpider);
+	CLASS_PROTODEF(cSpider)
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 } ;
