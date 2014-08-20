@@ -1,4 +1,3 @@
-
 cmake_minimum_required (VERSION 2.6)
 project (MCServer)
 
@@ -9,5 +8,4 @@ file(GLOB SOURCE
     "*.h"
 )
 
-add_library(Mobs ${SOURCE})
-add_subdirectory(Components)
+add_library(Components ${SOURCE})
