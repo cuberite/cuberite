@@ -42,7 +42,6 @@ Implements the 1.7.x protocol classes:
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "Bindings/PluginManager.h"
-#include "lua/src/llex.h"
 
 
 
