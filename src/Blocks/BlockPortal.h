@@ -36,7 +36,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		return;  // No pickups
+		// No pickups
 	}
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
@@ -47,15 +47,15 @@ public:
 			return;
 		}
 
-		int PosX = a_Chunk.GetPosX() * 16 + a_RelX;
-		int PosZ = a_Chunk.GetPosZ() * 16 + a_RelZ;
+		int PosX = a_Chunk.GetPosX() * cChunkDef::Width + a_RelX;
+		int PosZ = a_Chunk.GetPosZ() * cChunkDef::Width + a_RelZ;
 
 		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, cMonster::mtZombiePigman);
 	}
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if ((a_RelY - 1 < 0) || (a_RelY + 1 > cChunkDef::Height))
+		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
 		{
 			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
 		}
