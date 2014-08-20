@@ -2172,10 +2172,11 @@ end
 			{
 				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
 				GetMaxPlayers = { Return = "number", Notes = "Returns the max amount of players who can join the server." },
-				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
 				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },
 				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
 				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
+				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
+				ShouldAuthenticate = { Params = "", Return = "bool", Notes = "Returns true iff the server is set to authenticate players (\"online mode\")." },
 			},
 		},  -- cServer
 
