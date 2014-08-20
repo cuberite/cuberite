@@ -399,41 +399,6 @@ static int tolua_cRankManager_GetRankGroups(lua_State * L)
 
 
 
-/** Binds cRankManager::GetRankVisuals */
-static int tolua_cRankManager_GetRankVisuals(lua_State * L)
-{
-	// function signature:
-	// cRankManager:GetRankVisuals(RankName) -> MsgPrefix, MsgSuffix, MsgNameColorCode
-	
-	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
-	{
-		return 0;
-	}
-	
-	// Get the params:
-	AString RankName;
-	S.GetStackValue(2, RankName);
-	
-	// Get the visuals:
-	AString MsgPrefix, MsgSuffix, MsgNameColorCode;
-	cRoot::Get()->GetRankManager().GetRankVisuals(RankName, MsgPrefix, MsgSuffix, MsgNameColorCode);
-	
-	// Push the results:
-	S.Push(MsgPrefix);
-	S.Push(MsgSuffix);
-	S.Push(MsgNameColorCode);
-	return 3;
-}
-
-
-
-
-
 /** Binds cRankManager::GetRankPermissions */
 static int tolua_cRankManager_GetRankPermissions(lua_State * L)
 {
@@ -460,6 +425,45 @@ static int tolua_cRankManager_GetRankPermissions(lua_State * L)
 	// Push the results:
 	S.Push(Permissions);
 	return 1;
+}
+
+
+
+
+
+/** Binds cRankManager::GetRankVisuals */
+static int tolua_cRankManager_GetRankVisuals(lua_State * L)
+{
+	// function signature:
+	// cRankManager:GetRankVisuals(RankName) -> MsgPrefix, MsgSuffix, MsgNameColorCode
+	
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString RankName;
+	S.GetStackValue(2, RankName);
+	
+	// Get the visuals:
+	AString MsgPrefix, MsgSuffix, MsgNameColorCode;
+	if (!cRoot::Get()->GetRankManager().GetRankVisuals(RankName, MsgPrefix, MsgSuffix, MsgNameColorCode))
+	{
+		// No such rank, return nothing:
+		return 0;
+	}
+	
+	// Push the results:
+	S.Push(MsgPrefix);
+	S.Push(MsgSuffix);
+	S.Push(MsgNameColorCode);
+	return 3;
 }
 
 
@@ -886,8 +890,8 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "GetPlayerPermissions",      tolua_cRankManager_GetPlayerPermissions);
 		tolua_function(tolua_S, "GetPlayerRankName",         tolua_cRankManager_GetPlayerRankName);
 		tolua_function(tolua_S, "GetRankGroups",             tolua_cRankManager_GetRankGroups);
-		tolua_function(tolua_S, "GetRankVisuals",            tolua_cRankManager_GetRankVisuals);
 		tolua_function(tolua_S, "GetRankPermissions",        tolua_cRankManager_GetRankPermissions);
+		tolua_function(tolua_S, "GetRankVisuals",            tolua_cRankManager_GetRankVisuals);
 		tolua_function(tolua_S, "GroupExists",               tolua_cRankManager_GroupExists);
 		tolua_function(tolua_S, "IsGroupInRank",             tolua_cRankManager_IsGroupInRank);
 		tolua_function(tolua_S, "IsPermissionInGroup",       tolua_cRankManager_IsPermissionInGroup);
