@@ -54,9 +54,13 @@ public:
 		mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
 	};
 
-	cNewMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 protected:
-	eType m_MobType;
+	eType  m_MobType;
+public:
+	cNewMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	eType  GetMobType() const { return m_MobType; }
+protected:
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;
