@@ -1189,14 +1189,14 @@ bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectil
 
 
 
-bool cPluginManager::CallHookServerPing(const AString & a_Username, AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+bool cPluginManager::CallHookServerPing(AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
 {
 	FIND_HOOK(HOOK_SERVER_PING);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnServerPing(a_Username, a_Motd, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon))
+		if ((*itr)->OnServerPing(a_Motd, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon))
 		{
 			return true;
 		}

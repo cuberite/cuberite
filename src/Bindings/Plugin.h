@@ -91,7 +91,7 @@ public:
 	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) = 0;
 	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos) = 0;
 	virtual bool OnProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) = 0;
-	virtual bool OnServerPing               (const AString & a_Username, AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon) = 0;
+	virtual bool OnServerPing               (AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon) = 0;
 	virtual bool OnSpawnedEntity            (cWorld & a_World, cEntity & a_Entity) = 0;
 	virtual bool OnSpawnedMonster           (cWorld & a_World, cMonster & a_Monster) = 0;
 	virtual bool OnSpawningEntity           (cWorld & a_World, cEntity & a_Entity) = 0;

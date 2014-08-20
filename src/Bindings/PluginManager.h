@@ -226,7 +226,7 @@ public:
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
 	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
-	bool CallHookServerPing               (const AString & a_Username, AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon);
+	bool CallHookServerPing               (AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
 	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);
