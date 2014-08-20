@@ -1721,7 +1721,7 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	int NumPlayers = Server->GetNumPlayers();
 	int MaxPlayers = Server->GetMaxPlayers();
 	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(Motd, NumPlayers, MaxPlayers, Favicon);
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
 	Json::Value Version;
@@ -3091,7 +3091,7 @@ void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	int NumPlayers = Server->GetNumPlayers();
 	int MaxPlayers = Server->GetMaxPlayers();
 	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(Motd, NumPlayers, MaxPlayers, Favicon);
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
 	Json::Value Version;

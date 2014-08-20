@@ -18,6 +18,7 @@
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -1017,6 +1018,8 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 	AString Motd = Server->GetDescription();
 	int NumPlayers = Server->GetNumPlayers();
 	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
 
 	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
