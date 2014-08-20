@@ -115,9 +115,7 @@ public:
 	virtual void InStateEscaping(float a_Dt);
 	
 	int GetAttackRate() { return (int)m_AttackRate; }
-	int GetAttackInterval() { return (int)m_AttackInterval; }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
-	void SetAttackInterval(float a_AttackInterval) { m_AttackInterval = a_AttackInterval; }
 	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
