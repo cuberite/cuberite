@@ -83,8 +83,8 @@ static int tolua_cRankManager_AddPermissionToGroup(lua_State * L)
 	S.GetStackValues(2, Permission, GroupName);
 	
 	// Add the group to the rank:
-	cRoot::Get()->GetRankManager().AddPermissionToGroup(Permission, GroupName);
-	return 0;
+	S.Push(cRoot::Get()->GetRankManager().AddPermissionToGroup(Permission, GroupName));
+	return 1;
 }
 
 
