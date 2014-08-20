@@ -1189,6 +1189,25 @@ bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectil
 
 
 
+bool cPluginManager::CallHookServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+{
+	FIND_HOOK(HOOK_SERVER_PING);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnServerPing(a_ClientHandle, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
 	FIND_HOOK(HOOK_SPAWNED_ENTITY);

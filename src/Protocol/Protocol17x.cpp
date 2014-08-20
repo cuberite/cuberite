@@ -41,6 +41,7 @@ Implements the 1.7.x protocol classes:
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -1720,21 +1721,41 @@ void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
-	// Send the response:
-	AString Response = "{\"version\":{\"name\":\"1.7.2\", \"protocol\":4}, \"players\":{";
 	cServer * Server = cRoot::Get()->GetServer();
-	AppendPrintf(Response, "\"max\":%u, \"online\":%u, \"sample\":[]},",
-		Server->GetMaxPlayers(),
-		Server->GetNumPlayers()
-	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
-		Server->GetDescription().c_str()
-	);
-	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
-		Server->GetFaviconData().c_str()
-	);
-	Response.append("}");
-	
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "1.7.2";
+	Version["protocol"] = 4;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
 }
@@ -3070,20 +3091,41 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
-	// Send the response:
-	AString Response = "{\"version\": {\"name\": \"1.7.6\", \"protocol\":5}, \"players\": {";
-	AppendPrintf(Response, "\"max\": %u, \"online\": %u, \"sample\": []},",
-		cRoot::Get()->GetServer()->GetMaxPlayers(),
-		cRoot::Get()->GetServer()->GetNumPlayers()
-	);
-	AppendPrintf(Response, "\"description\": {\"text\": \"%s\"},",
-		cRoot::Get()->GetServer()->GetDescription().c_str()
-	);
-	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
-		cRoot::Get()->GetServer()->GetFaviconData().c_str()
-	);
-	Response.append("}");
-	
+	cServer * Server = cRoot::Get()->GetServer();
+	AString Motd = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "1.7.6";
+	Version["protocol"] = 5;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = Motd.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
 }

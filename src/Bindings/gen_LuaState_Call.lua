@@ -56,6 +56,7 @@ local Combinations =
 	-- Special combinations:
 	{7, 3},
 	{8, 3},
+	{5, 5},
 	{9, 5},
 }
 
