@@ -8,6 +8,10 @@ cNewMonster::cNewMonster(const AString & a_ConfigName, eType a_MobType, const AS
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
 {
+	m_AI = new cAIComponent(this);
+	m_Attack = new cAttackComponent(this);
+	m_Environment = new cEnvironmentComponent(this);
+	m_Movement = new cMovementComponent(this);
 }
 
 void cNewMonster::SpawnOn(cClientHandle & a_Client)

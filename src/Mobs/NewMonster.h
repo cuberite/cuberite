@@ -64,4 +64,9 @@ protected:
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;
+
+	cAIComponent * m_AI;
+	cAttackComponent * m_Attack;
+	cEnvironmentComponent * m_Environment;
+	cMovementComponent * m_Movement;
 };
