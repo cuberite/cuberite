@@ -416,12 +416,12 @@ public:
 	/** Returns the UUID (short format) that has been read from the client, or empty string if not available. */
 	const AString & GetUUID(void) const { return m_UUID; }
 
-	// tolua_end
-
 	/** (Re)loads the rank and permissions from the cRankManager.
 	Expects the m_UUID member to be valid.
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
+
+	// tolua_end
 
 	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
