@@ -1717,11 +1717,11 @@ void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
 	cServer * Server = cRoot::Get()->GetServer();
-	AString Motd = Server->GetDescription();
+	AString ServerDescription = Server->GetDescription();
 	int NumPlayers = Server->GetNumPlayers();
 	int MaxPlayers = Server->GetMaxPlayers();
 	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
 
 	// Version:
 	Json::Value Version;
@@ -1736,7 +1736,7 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Description:
 	Json::Value Description;
-	Description["text"] = Motd.c_str();
+	Description["text"] = ServerDescription.c_str();
 
 	// Create the response:
 	Json::Value ResponseValue;

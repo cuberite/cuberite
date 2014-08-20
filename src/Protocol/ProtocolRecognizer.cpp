@@ -1015,11 +1015,11 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 	AString Reply;
 	cServer * Server = cRoot::Get()->GetServer();
 
-	AString Motd = Server->GetDescription();
+	AString ServerDescription = Server->GetDescription();
 	int NumPlayers = Server->GetNumPlayers();
 	int MaxPlayers = Server->GetMaxPlayers();
 	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
 
 	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
@@ -1028,7 +1028,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i",
-				Motd.c_str(),
+				ServerDescription.c_str(),
 				cChatColor::Delimiter,
 				NumPlayers,
 				cChatColor::Delimiter,
@@ -1072,7 +1072,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			Reply.push_back(0);
 			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
-			Reply.append(Motd);
+			Reply.append(ServerDescription);
 			Reply.push_back(0);
 			Reply.append(Printf("%d", NumPlayers));
 			Reply.push_back(0);

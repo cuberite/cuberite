@@ -1193,14 +1193,14 @@ bool cPluginLua::OnProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity
 
 
 
-bool cPluginLua::OnServerPing(cClientHandle & a_ClientHandle, AString & a_Motd, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+bool cPluginLua::OnServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_SERVER_PING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_ClientHandle, a_Motd, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon, cLuaState::Return, res, a_Motd, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon);
+		m_LuaState.Call((int)(**itr), &a_ClientHandle, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon, cLuaState::Return, res, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon);
 		if (res)
 		{
 			return true;
