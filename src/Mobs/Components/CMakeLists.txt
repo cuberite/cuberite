@@ -7,5 +7,6 @@ file(GLOB SOURCE
     "*.cpp"
     "*.h"
 )
-
-add_library(Components ${SOURCE})
+if(NOT MSVC)
+	add_library(Components ${SOURCE})
+endif()
