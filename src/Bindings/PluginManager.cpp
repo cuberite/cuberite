@@ -849,14 +849,14 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
 {
 	FIND_HOOK(HOOK_PLAYER_MOVING);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPlayerMoved(a_Player))
+		if ((*itr)->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition))
 		{
 			return true;
 		}

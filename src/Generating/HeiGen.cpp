@@ -432,7 +432,7 @@ const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] =
 	/* biExtremeHillsM        */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 131
 	/* biFlowerForest         */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 132
 	/* biTaigaM               */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 133
-	/* biSwamplandM           */ { 1.0f,   2.0f,  1.10f,     5.0f,  0.01f,    8.0f,  60},  // 134
+	/* biSwamplandM           */ { 1.0f,   3.0f,  1.10f,     7.0f,  0.01f,   0.01f,  60},  // 134
 	
 	// Biomes 135 .. 139 unused, 5 empty placeholders here:
 	{}, {}, {}, {}, {},                                                                    // 135 .. 139

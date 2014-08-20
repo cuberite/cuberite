@@ -57,8 +57,6 @@ SET (HDRS
 	BlockMushroom.h
 	BlockMycelium.h
 	BlockNetherWart.h
-	BlockNewLeaves.h
-	BlockNote.h
 	BlockOre.h
 	BlockPiston.h
 	BlockPlanks.h

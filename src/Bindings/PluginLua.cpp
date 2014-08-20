@@ -835,14 +835,14 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoved(cPlayer & a_Player)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_MOVING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_OldPosition, &a_NewPosition, cLuaState::Return, res);
 		if (res)
 		{
 			return true;

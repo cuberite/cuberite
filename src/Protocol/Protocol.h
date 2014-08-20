@@ -116,7 +116,7 @@ public:
 	virtual void SendTabCompletionResults(const AStringVector & a_Results) = 0;
 	virtual void SendTeleportEntity      (const cEntity & a_Entity) = 0;
 	virtual void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
-	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay) = 0;
+	virtual void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) = 0;
 	virtual void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ) = 0;
 	virtual void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity) = 0;
 	virtual void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;

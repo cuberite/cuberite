@@ -196,8 +196,6 @@ private:
 	cMojangAPI         m_MojangAPI;
 	cHTTPServer        m_HTTPServer;
 
-	cMCLogger *      m_Log;
-
 	bool m_bStop;
 	bool m_bRestart;
 
