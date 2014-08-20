@@ -20,6 +20,7 @@ SET (SRCS
 	IronGolem.cpp
 	MagmaCube.cpp
 	Monster.cpp
+	NewMonster.cpp
 	Mooshroom.cpp
 	PassiveAggressiveMonster.cpp
 	PassiveMonster.cpp
@@ -54,6 +55,7 @@ SET (HDRS
 	IronGolem.h
 	MagmaCube.h
 	Monster.h
+	NewMonster.h
 	Mooshroom.h
 	Ocelot.h
 	PassiveAggressiveMonster.h
