@@ -1,3 +1,6 @@
 #pragma once
 
-#include "AIAggressiveComponent.h"
+#include "AIComponent.h"
+#include "AttackComponent.h"
+#include "EnvironmentComponent.h"
+#include "MovementComponent.h"
