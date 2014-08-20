@@ -28,6 +28,7 @@ class cPickup;
 class cPainting;
 class cWorld;
 class cMonster;
+class cNewMonster;
 class cChunkDataSerializer;
 class cFallingBlock;
 class cCompositeChat;
@@ -110,6 +111,7 @@ public:
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) = 0;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) = 0;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) = 0;
+	virtual void SendSpawnMob            (const cNewMonster & a_Mob) = 0;
 	virtual void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) = 0;
 	virtual void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) = 0;
 	virtual void SendStatistics          (const cStatManager & a_Manager) = 0;

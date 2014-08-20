@@ -114,6 +114,7 @@ public:
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;
+	virtual void SendSpawnMob            (const cNewMonster & a_Mob) override;
 	virtual void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override;
 	virtual void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 	virtual void SendStatistics          (const cStatManager & a_Manager) override;
@@ -209,6 +210,7 @@ protected:
 		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
 		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
 		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
+		void WriteMobMetadata(const cNewMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
 		void WriteEntityProperties(const cEntity & a_Entity);  // Writes the entity properties for the specified entity, including the Count field
 		void WriteBlockEntity(const cBlockEntity & a_BlockEntity);
 		
