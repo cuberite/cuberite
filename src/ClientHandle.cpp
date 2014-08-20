@@ -2535,6 +2535,15 @@ void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 
 
 
+void cClientHandle::SendSpawnMob(const cNewMonster & a_Mob)
+{
+	m_Protocol->SendSpawnMob(a_Mob);
+}
+
+
+
+
+
 void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
 	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
