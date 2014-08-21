@@ -11,7 +11,6 @@
 #include "World.h"
 #include "ChunkDef.h"
 #include "Bindings/PluginManager.h"
-#include "GroupManager.h"
 #include "ChatColor.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
@@ -469,25 +468,17 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		PrintHelp(split, a_Output);
 		return;
 	}
-	if (split[0] == "reload")
-	{
-		cPluginManager::Get()->ReloadPlugins();
-		cRoot::Get()->ReloadGroups();
-		return;
-	}
-	if (split[0] == "reloadplugins")
+	else if (split[0] == "reload")
 	{
 		cPluginManager::Get()->ReloadPlugins();
 		return;
 	}
-	if (split[0] == "reloadgroups")
+	else if (split[0] == "reloadplugins")
 	{
-		cRoot::Get()->ReloadGroups();
-		a_Output.Out("Groups reloaded!");
-		a_Output.Finished();
+		cPluginManager::Get()->ReloadPlugins();
 		return;
 	}
-	if (split[0] == "load")
+	else if (split[0] == "load")
 	{
 		if (split.size() > 1)
 		{
@@ -502,8 +493,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 			return;
 		}
 	}
-
-	if (split[0] == "unload")
+	else if (split[0] == "unload")
 	{
 		if (split.size() > 1)
 		{
@@ -519,21 +509,21 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 
 	// There is currently no way a plugin can do these (and probably won't ever be):
-	if (split[0].compare("chunkstats") == 0)
+	else if (split[0].compare("chunkstats") == 0)
 	{
 		cRoot::Get()->LogChunkStats(a_Output);
 		a_Output.Finished();
 		return;
 	}
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	if (split[0].compare("dumpmem") == 0)
+	else if (split[0].compare("dumpmem") == 0)
 	{
 		LeakFinderXmlOutput Output("memdump.xml");
 		DumpUsedMemory(&Output);
 		return;
 	}
 	
-	if (split[0].compare("killmem") == 0)
+	else if (split[0].compare("killmem") == 0)
 	{
 		for (;;)
 		{
@@ -542,7 +532,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	#endif
 
-	if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
+	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
 	{
 		a_Output.Finished();
 		return;

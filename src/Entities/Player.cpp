@@ -10,8 +10,6 @@
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
-#include "../GroupManager.h"
-#include "../Group.h"
 #include "../Root.h"
 #include "../OSSupport/Timer.h"
 #include "../Chunk.h"

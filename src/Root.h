@@ -14,7 +14,6 @@
 // fwd:
 class cThread;
 class cMonsterConfig;
-class cGroupManager;
 class cCraftingRecipes;
 class cFurnaceRecipe;
 class cWebAdmin;
@@ -79,7 +78,6 @@ public:
 	
 	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
 
-	cGroupManager *    GetGroupManager   (void) { return m_GroupManager; }     // tolua_export
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
 	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
 	
@@ -123,9 +121,6 @@ public:
 	
 	/// Saves all chunks in all worlds
 	void SaveAllChunks(void);  // tolua_export
-	
-	/// Reloads all the groups
-	void ReloadGroups(void);  // tolua_export
 	
 	/// Calls the callback for each player in all worlds
 	bool ForEachPlayer(cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
@@ -189,7 +184,6 @@ private:
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
 
-	cGroupManager *    m_GroupManager;
 	cCraftingRecipes * m_CraftingRecipes;
 	cFurnaceRecipe *   m_FurnaceRecipe;
 	cWebAdmin *        m_WebAdmin;

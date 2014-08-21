@@ -6,7 +6,6 @@
 #include "World.h"
 #include "WebAdmin.h"
 #include "FurnaceRecipe.h"
-#include "GroupManager.h"
 #include "CraftingRecipes.h"
 #include "Bindings/PluginManager.h"
 #include "MonsterConfig.h"
@@ -46,7 +45,6 @@ cRoot::cRoot(void) :
 	m_InputThread(NULL),
 	m_Server(NULL),
 	m_MonsterConfig(NULL),
-	m_GroupManager(NULL),
 	m_CraftingRecipes(NULL),
 	m_FurnaceRecipe(NULL),
 	m_WebAdmin(NULL),
@@ -157,7 +155,6 @@ void cRoot::Start(void)
 
 		LOGD("Loading settings...");
 		m_RankManager.Initialize(m_MojangAPI);
-		m_GroupManager    = new cGroupManager();
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
@@ -236,8 +233,6 @@ void cRoot::Start(void)
 		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
-		LOGD("Forgetting groups...");
-		delete m_GroupManager; m_GroupManager = NULL;
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
@@ -540,17 +535,6 @@ void cRoot::SaveAllChunks(void)
 	{
 		itr->second->QueueSaveAllChunks();
 	}
-}
-
-
-
-
-
-void cRoot::ReloadGroups(void)
-{
-	LOG("Reload groups ...");
-	m_GroupManager->LoadGroups();
-	m_GroupManager->CheckUsers();
 }
 
 

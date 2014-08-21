@@ -33,8 +33,6 @@ SET (SRCS
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
-	Group.cpp
-	GroupManager.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
@@ -98,8 +96,6 @@ SET (HDRS
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
-	Group.h
-	GroupManager.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
