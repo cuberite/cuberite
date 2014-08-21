@@ -2155,68 +2155,68 @@ void cProtocol125::WriteMobMetadata(const cNewMonster & a_Mob)
 	{
 		case cNewMonster::mtCreeper:
 		{
-			// WriteByte(0x10);
-			// WriteChar(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);  // Blowing up?
-			// WriteByte(0x11);
-			// WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0);  // Lightning-charged?
+			WriteByte(0x10);
+			WriteChar(((const cNewCreeper &)a_Mob).IsBlowing() ? 1 : -1);  // Blowing up?
+			WriteByte(0x11);
+			WriteByte(((const cNewCreeper &)a_Mob).IsCharged() ? 1 : 0);  // Lightning-charged?
 			break;
 		}
 		case cNewMonster::mtBat:
 		{
-			// WriteByte(0x10);
-			// WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);  // Upside down?
+			WriteByte(0x10);
+			WriteByte(((const cNewBat &)a_Mob).IsHanging() ? 1 : 0);  // Upside down?
 			break;
 		}
 		case cNewMonster::mtPig:
 		{
-			// WriteByte(0x10);
-			// WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);  // Saddled?
+			WriteByte(0x10);
+			WriteByte(((const cNewPig &)a_Mob).IsSaddled() ? 1 : 0);  // Saddled?
 			break;
 		}
 		case cNewMonster::mtVillager:
 		{
-			// WriteByte(0x50);
-			// WriteInt(((const cVillager &)a_Mob).GetVilType());  // What sort of TESTIFICATE?
+			WriteByte(0x50);
+			WriteInt(((const cNewVillager &)a_Mob).GetVilType());  // What sort of TESTIFICATE?
 			break;
 		}
 		case cNewMonster::mtZombie:
 		{
-			// WriteByte(0xC);
-			// WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);  // Baby zombie?
-			// WriteByte(0xD);
-			// WriteByte(((const cZombie &)a_Mob).IsVillagerZombie() ? 1 : 0);  // Converted zombie?
-			// WriteByte(0xE);
-			// WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0);  // Converted-but-converting-back zombllager?
+			WriteByte(0xC);
+			WriteByte(((const cNewZombie &)a_Mob).IsBaby() ? 1 : 0);  // Baby zombie?
+			WriteByte(0xD);
+			WriteByte(((const cNewZombie &)a_Mob).IsVillagerZombie() ? 1 : 0);  // Converted zombie?
+			WriteByte(0xE);
+			WriteByte(((const cNewZombie &)a_Mob).IsConverting() ? 1 : 0);  // Converted-but-converting-back zombllager?
 			break;
 		}
 		case cNewMonster::mtGhast:
 		{
-			// WriteByte(0x10);
-			// WriteByte(((const cGhast &)a_Mob).IsCharging());  // About to spit a flameball?
+			WriteByte(0x10);
+			WriteByte(((const cNewGhast &)a_Mob).IsCharging());  // About to spit a flameball?
 			break;
 		}
 		case cNewMonster::mtWolf:
 		{
-			// Byte WolfStatus = 0;
-			// if (((const cWolf &)a_Mob).IsSitting())
-			// {
-			// 	WolfStatus |= 0x1;
-			// }
-			// if (((const cWolf &)a_Mob).IsAngry())
-			// {
-			// 	WolfStatus |= 0x2;
-			// }
-			// if (((const cWolf &)a_Mob).IsTame())
-			// {
-			// 	WolfStatus |= 0x4;
-			// }
-			// WriteByte(0x10);
-			// WriteByte(WolfStatus);
+			Byte WolfStatus = 0;
+			if (((const cNewWolf &)a_Mob).IsSitting())
+			{
+				WolfStatus |= 0x1;
+			}
+			if (((const cNewWolf &)a_Mob).IsAngry())
+			{
+				WolfStatus |= 0x2;
+			}
+			if (((const cNewWolf &)a_Mob).IsTame())
+			{
+				WolfStatus |= 0x4;
+			}
+			WriteByte(0x10);
+			WriteByte(WolfStatus);
 
-			// WriteByte(0x72);
-			// WriteFloat((float)(a_Mob.GetHealth()));  // Tail health-o-meter (only shown when tamed, by the way)
-			// WriteByte(0x13);
-			// WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0);  // Ultra cute mode?
+			WriteByte(0x72);
+			WriteFloat((float)(a_Mob.GetHealth()));  // Tail health-o-meter (only shown when tamed, by the way)
+			WriteByte(0x13);
+			WriteByte(((const cNewWolf &)a_Mob).IsBegging() ? 1 : 0);  // Ultra cute mode?
 			break;
 		}
 		case cNewMonster::mtSheep:
@@ -2224,106 +2224,106 @@ void cProtocol125::WriteMobMetadata(const cNewMonster & a_Mob)
 			// [1](1111)
 			// [] = Is sheared? () = Color, from 0 to 15
 
-			// WriteByte(0x10);
-			// Byte SheepMetadata = 0;
-			// SheepMetadata = (Byte)((const cSheep &)a_Mob).GetFurColor();
+			WriteByte(0x10);
+			Byte SheepMetadata = 0;
+			SheepMetadata = (Byte)((const cNewSheep &)a_Mob).GetFurColor();
 
-			// if (((const cSheep &)a_Mob).IsSheared())
-			// {
-			// 	SheepMetadata |= 0x16;
-			// }
-			// WriteByte(SheepMetadata);
+			if (((const cNewSheep &)a_Mob).IsSheared())
+			{
+				SheepMetadata |= 0x16;
+			}
+			WriteByte(SheepMetadata);
 			break;
 		}
 		case cNewMonster::mtEnderman:
 		{
-			// WriteByte(0x10);
-			// WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));  // Block that he stole from your house
-			// WriteByte(0x11);
-			// WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta()));  // Meta of block that he stole from your house
-			// WriteByte(0x12);
-			// WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0);  // Screaming at your face?
+			WriteByte(0x10);
+			WriteByte((Byte)(((const cNewEnderman &)a_Mob).GetCarriedBlock()));  // Block that he stole from your house
+			WriteByte(0x11);
+			WriteByte((Byte)(((const cNewEnderman &)a_Mob).GetCarriedMeta()));  // Meta of block that he stole from your house
+			WriteByte(0x12);
+			WriteByte(((const cNewEnderman &)a_Mob).IsScreaming() ? 1 : 0);  // Screaming at your face?
 			break;
 		}
 		case cNewMonster::mtSkeleton:
 		{
-			// WriteByte(0xD);
-			// WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);  // It's a skeleton, but it's not
+			WriteByte(0xD);
+			WriteByte(((const cNewSkeleton &)a_Mob).IsWither() ? 1 : 0);  // It's a skeleton, but it's not
 			break;
 		}
 		case cNewMonster::mtWitch:
 		{
-			// WriteByte(0x15);
-			// WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);  // Aggravated? Doesn't seem to do anything
+			WriteByte(0x15);
+			WriteByte(((const cNewWitch &)a_Mob).IsAngry() ? 1 : 0);  // Aggravated? Doesn't seem to do anything
 			break;
 		}
 		case cNewMonster::mtWither:
 		{
-			// WriteByte(0x54);  // Int at index 20
-			// WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
-			// WriteByte(0x66);  // Float at index 6
-			// WriteFloat((float)(a_Mob.GetHealth()));
+			WriteByte(0x54);  // Int at index 20
+			WriteInt((Int32)((const cNewWither &)a_Mob).GetWitherInvulnerableTicks());
+			WriteByte(0x66);  // Float at index 6
+			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
 		case cNewMonster::mtSlime:
 		case cNewMonster::mtMagmaCube:
 		{
-			// WriteByte(0x10);
-			// if (a_Mob.GetMobType() == cMonster::mtSlime)
-			// {
-			// 	WriteByte((Byte)((const cSlime &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
-			// }
-			// else
-			// {
-			// 	WriteByte((Byte)((const cMagmaCube &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
-			// }
+			WriteByte(0x10);
+			if (a_Mob.GetMobType() == cNewMonster::mtSlime)
+			{
+				WriteByte((Byte)((const cNewSlime &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
+			}
+			else
+			{
+				WriteByte((Byte)((const cNewMagmaCube &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
+			}
 			break;
 		}
 		case cNewMonster::mtHorse:
 		{
-			// int Flags = 0;
-			// if (((const cHorse &)a_Mob).IsTame())
-			// {
-			// 	Flags |= 0x2;
-			// }
-			// if (((const cHorse &)a_Mob).IsSaddled())
-			// {
-			// 	Flags |= 0x4;
-			// }
-			// if (((const cHorse &)a_Mob).IsChested())
-			// {
-			// 	Flags |= 0x8;
-			// }
-			// if (((const cHorse &)a_Mob).IsBaby())
-			// {
-			// 	Flags |= 0x10;  // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
-			// }
-			// if (((const cHorse &)a_Mob).IsEating())
-			// {
-			// 	Flags |= 0x20;
-			// }
-			// if (((const cHorse &)a_Mob).IsRearing())
-			// {
-			// 	Flags |= 0x40;
-			// }
-			// if (((const cHorse &)a_Mob).IsMthOpen())
-			// {
-			// 	Flags |= 0x80;
-			// }
-			// WriteByte(0x50);
-			// WriteInt(Flags);
+			int Flags = 0;
+			if (((const cNewHorse &)a_Mob).IsTame())
+			{
+				Flags |= 0x2;
+			}
+			if (((const cNewHorse &)a_Mob).IsSaddled())
+			{
+				Flags |= 0x4;
+			}
+			if (((const cNewHorse &)a_Mob).IsChested())
+			{
+				Flags |= 0x8;
+			}
+			if (((const cNewHorse &)a_Mob).IsBaby())
+			{
+				Flags |= 0x10;  // IsBred flag, according to wiki.vg - don't think it does anything in multiplayer
+			}
+			if (((const cNewHorse &)a_Mob).IsEating())
+			{
+				Flags |= 0x20;
+			}
+			if (((const cNewHorse &)a_Mob).IsRearing())
+			{
+				Flags |= 0x40;
+			}
+			if (((const cNewHorse &)a_Mob).IsMthOpen())
+			{
+				Flags |= 0x80;
+			}
+			WriteByte(0x50);
+			WriteInt(Flags);
 
-			// WriteByte(0x13);
-			// WriteByte((Byte)((const cHorse &)a_Mob).GetHorseType());  // Type of horse (donkey, chestnut, etc.)
+			WriteByte(0x13);
+			WriteByte((Byte)((const cNewHorse &)a_Mob).GetHorseType());  // Type of horse (donkey, chestnut, etc.)
 
-			// WriteByte(0x54);
-			// int Appearance = 0;
-			// Appearance = ((const cHorse &)a_Mob).GetHorseColor();  // Mask FF
-			// Appearance |= ((const cHorse &)a_Mob).GetHorseStyle() * 256;  // Mask FF00, so multiply by 256
-			// WriteInt(Appearance);
+			WriteByte(0x54);
+			int Appearance = 0;
+			Appearance = ((const cNewHorse &)a_Mob).GetHorseColor();  // Mask FF
+			Appearance |= ((const cNewHorse &)a_Mob).GetHorseStyle() * 256;  // Mask FF00, so multiply by 256
+			WriteInt(Appearance);
 
-			// WriteByte(0x56);
-			// WriteInt(((const cHorse &)a_Mob).GetHorseArmour());  // Horshey armour
+			WriteByte(0x56);
+			WriteInt(((const cNewHorse &)a_Mob).GetHorseArmour());  // Horshey armour
 			break;
 		}
 		default:

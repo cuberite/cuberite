@@ -60,6 +60,8 @@ public:
 	cNewMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	eType  GetMobType() const { return m_MobType; }
+	virtual bool IsBaby    (void) const { return false; }
+	virtual bool IsTame    (void) const { return false; }
 protected:
 
 

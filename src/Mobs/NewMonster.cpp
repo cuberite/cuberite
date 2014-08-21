@@ -13,6 +13,13 @@ cNewMonster::cNewMonster(const AString & a_ConfigName, eType a_MobType, const AS
 	m_Attack = new cAttackComponent(this);
 	m_Environment = new cEnvironmentComponent(this);
 	m_Movement = new cMovementComponent(this);
+
+	// Temporary placement till I figure out where to put it
+	m_DropChanceWeapon = 0.0f;
+	m_DropChanceHelmet = 0.0f;
+	m_DropChanceChestplate = 0.0f;
+	m_DropChanceLeggings = 0.0f;
+	m_DropChanceBoots = 0.0f;
 }
 
 

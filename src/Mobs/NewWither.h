@@ -19,6 +19,7 @@ public:
 
 	/** Returns whether the wither is invulnerable to arrows. */
 	bool IsArmored(void) const;
+	int GetWitherInvulnerableTicks() const { return 0; }
 	
 	// cEntity overrides
 	virtual bool Initialize(cWorld & a_World) override;
