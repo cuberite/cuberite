@@ -11,7 +11,8 @@
 
 
 cWither::cWither(void) :
-	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0)
+	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0),
+	m_WitherInvulnerableTicks(0)
 {
 	SetMaxHealth(300);
 }

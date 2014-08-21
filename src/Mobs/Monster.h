@@ -54,14 +54,75 @@ public:
 		mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
 	};
 
+	enum eFamily
+	{
+		mfHostile  = 0,  // Spider, Zombies ...
+		mfPassive  = 1,  // Cows, Pigs
+		mfAmbient  = 2,  // Bats
+		mfWater    = 3,  // Squid
+
+		mfNoSpawn,
+		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
+	} ;
+
 protected:
 	eType  m_MobType;
 public:
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	eType  GetMobType() const { return m_MobType; }
+
+	// Type Function
 	virtual bool IsBaby    (void) const { return false; }
 	virtual bool IsTame    (void) const { return false; }
+	virtual bool IsUndead  (void) const { return false; }
+
+	// Get Functions - Temporary
+
+	AString GetOwnerName  (void) const { return m_OwnerName; }
+	AString GetOwnerUUID  (void) const { return m_OwnerUUID; }
+	float   GetDropChanceBoots() { return m_DropChanceBoots; }
+	float   GetDropChanceHelmet() { return m_DropChanceHelmet; }
+	float   GetDropChanceChestplate() { return m_DropChanceChestplate; }
+	float   GetDropChanceLeggings() { return m_DropChanceLeggings; }
+	float   GetDropChanceWeapon() { return m_DropChanceWeapon; }
+	eFamily GetMobFamily() { return mfPassive; }
+
+	// Set Functions - Temporary
+	void    SetDropChanceBoots(float a_Chance) {  m_DropChanceBoots = a_Chance; }
+	void    SetDropChanceHelmet(float a_Chance) {  m_DropChanceHelmet = a_Chance; }
+	void    SetDropChanceChestplate(float a_Chance) {  m_DropChanceChestplate = a_Chance; }
+	void    SetDropChanceLeggings(float a_Chance) {  m_DropChanceLeggings = a_Chance; }
+	void    SetDropChanceWeapon(float a_Chance) { m_DropChanceWeapon = a_Chance; }
+	void    SetIsTame(bool m_Tame) {}
+	void    SetOwner(AString a_Name, AString a_UUID) { m_OwnerName = a_Name; m_OwnerUUID = a_UUID; }
+
+	// Ability Functions
+	bool CanPickUpLoot() { return false; }
+	void SetCanPickUpLoot(bool a_Looting) {}
+
+	// Static Functions
+	// tolua_begin
+	
+	/// Translates MobType enum to a string, empty string if unknown
+	static AString MobTypeToString(eType a_MobType);
+	
+	/// Translates MobType string to the enum, mtInvalidType if not recognized
+	static eType StringToMobType(const AString & a_MobTypeName);
+	
+	/// Returns the mob family based on the type
+	static eFamily FamilyFromType(eType a_MobType);
+
+	/// Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family
+	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
+
+	// tolua_end
+	
+	/** Creates a new object of the specified mob.
+	a_MobType is the type of the mob to be created
+	Asserts and returns null if mob type is not specified
+	*/
+	static cMonster * NewMonsterFromType(eType a_MobType);
 protected:
 
 
@@ -95,4 +156,8 @@ protected:
 	float m_DropChanceChestplate;
 	float m_DropChanceLeggings;
 	float m_DropChanceBoots;
+
+
+	AString m_OwnerName;
+	AString m_OwnerUUID;
 };
