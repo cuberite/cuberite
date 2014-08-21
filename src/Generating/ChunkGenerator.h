@@ -71,7 +71,7 @@ public:
 		virtual ~cPluginInterface() {}
 		
 		/** Called when the chunk is about to be generated.
-		The generator may be partly or fully /*override*/n by the implementation
+		The generator may be partly or fully overridden by the implementation
 		*/
 		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) = 0;
 		

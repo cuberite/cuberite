@@ -7,7 +7,7 @@
 /*
 Usage:
 To have a new thread, declare a class descending from cIsClass.
-Then /*override*/ its Execute() method to provide your thread processing.
+Then override its Execute() method to provide your thread processing.
 In the descending class' constructor call the Start() method to start the thread once you're finished with initialization.
 */
 
@@ -29,7 +29,7 @@ protected:
 	/// This is the main thread entrypoint
 	virtual void Execute(void) = 0;
 
-	/// The /*override*/n Execute() method should check this value periodically and terminate if this is true
+	/// The overridden Execute() method should check this value periodically and terminate if this is true
 	volatile bool m_ShouldTerminate;
 	
 public:

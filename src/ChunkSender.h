@@ -152,10 +152,10 @@ protected:
 	sBlockCoords  m_BlockEntities;  // Coords of the block entities to send
 	// TODO: sEntityIDs    m_Entities;       // Entity-IDs of the entities to send
 	
-	// cIsThread /*override*/:
-	virtual void Execute(void) /*override*/;
+	// cIsThread override:
+	virtual void Execute(void) override;
 	
-	// cChunkDataCollector /*override*/s:
+	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
 	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) /*override*/;
 	virtual void Entity       (cEntity *      a_Entity) /*override*/;
