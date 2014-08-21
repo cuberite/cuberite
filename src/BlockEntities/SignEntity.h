@@ -38,7 +38,7 @@ public:
 	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
 
 	bool LoadFromJson( const Json::Value& a_Value);
-	virtual void SaveToJson(Json::Value& a_Value) override;
+	virtual void SaveToJson(Json::Value& a_Value) /*override*/;
 
 	// tolua_begin
 	
@@ -53,8 +53,8 @@ public:
 	
 	// tolua_end
 	
-	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual void UsedBy(cPlayer * a_Player) /*override*/;
+	virtual void SendTo(cClientHandle & a_Client) /*override*/;
 
 	static const char * GetClassStatic(void) { return "cSignEntity"; }
 	

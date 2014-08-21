@@ -70,9 +70,9 @@ protected:
 	bool m_IsConnected;
 	
 	
-	// cCallbackSslContext::cDataCallbacks overrides:
-	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
-	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
+	// cCallbackSslContext::cDataCallbacks /*override*/s:
+	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) /*override*/;
+	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) /*override*/;
 } ;
 
 

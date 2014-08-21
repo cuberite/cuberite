@@ -16,7 +16,7 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		// todo: Drop Ender Chest if using silk touch pickaxe
 		a_Pickups.push_back(cItem(E_BLOCK_OBSIDIAN, 8, 0));
@@ -27,14 +27,14 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-		) override
+		) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
 
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "step.stone";
 	}

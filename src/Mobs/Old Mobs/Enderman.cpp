@@ -21,7 +21,7 @@ public:
 	{
 	}
 
-	virtual bool Item(cPlayer * a_Player) override
+	virtual bool Item(cPlayer * a_Player) /*override*/
 	{
 		// Don't check players who are in creative gamemode
 		if (a_Player->IsGameModeCreative())

@@ -16,10 +16,10 @@ public:
 
 	CLASS_PROTODEF(cZombiePigman)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) /*override*/;
 	
-	virtual bool IsUndead(void) override { return true; }
+	virtual bool IsUndead(void) /*override*/ { return true; }
 } ;
 
 

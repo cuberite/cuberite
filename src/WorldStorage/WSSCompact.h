@@ -40,10 +40,10 @@ protected:
 	Json::Value m_Root;
 	bool m_HasJsonData;
 	
-	// cChunkDataCollector overrides:
-	virtual void Entity       (cEntity *      a_Entity) override;
-	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
-	virtual void LightIsValid (bool a_IsLightValid) override;
+	// cChunkDataCollector /*override*/s:
+	virtual void Entity       (cEntity *      a_Entity) /*override*/;
+	virtual void BlockEntity  (cBlockEntity * a_Entity) /*override*/;
+	virtual void LightIsValid (bool a_IsLightValid) /*override*/;
 } ;
 
 
@@ -140,10 +140,10 @@ protected:
 		
 	void LoadEntitiesFromJson(Json::Value & a_Value, cEntityList & a_Entities, cBlockEntityList & a_BlockEntities, cWorld * a_World);
 
-	// cWSSchema overrides:
-	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
-	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
-	virtual const AString GetName(void) const override {return "compact"; }
+	// cWSSchema /*override*/s:
+	virtual bool LoadChunk(const cChunkCoords & a_Chunk) /*override*/;
+	virtual bool SaveChunk(const cChunkCoords & a_Chunk) /*override*/;
+	virtual const AString GetName(void) const /*override*/ {return "compact"; }
 } ;
 
 

@@ -409,7 +409,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_Bl
 
 void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 {
-	// Setting the meta to a_BlockMeta keeps most textures. The few other blocks have to override this.
+	// Setting the meta to a_BlockMeta keeps most textures. The few other blocks have to /*override*/ this.
 	a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta));
 }
 

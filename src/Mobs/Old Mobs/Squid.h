@@ -15,15 +15,15 @@ class cSquid :
 public:
 	cSquid();
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
 
 	CLASS_PROTODEF(cSquid)
 	
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
 
 	// Squids do not drown (or float)
-	virtual void HandleAir(void) override {}
-	virtual void SetSwimState(cChunk & a_Chunk) override {}
+	virtual void HandleAir(void) /*override*/ {}
+	virtual void SetSwimState(cChunk & a_Chunk) /*override*/ {}
 } ;
 
 

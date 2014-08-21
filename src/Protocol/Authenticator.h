@@ -86,8 +86,8 @@ private:
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 
-	/** cIsThread override: */
-	virtual void Execute(void) override;
+	/** cIsThread /*override*/: */
+	virtual void Execute(void) /*override*/;
 
 	/** Returns true if the user authenticated okay, false on error
 	Returns the case-corrected username, UUID, and properties (eg. skin). */

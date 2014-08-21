@@ -45,7 +45,7 @@ public:
 	virtual ~cNoteEntity() {}
 
 	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
+	virtual void SaveToJson(Json::Value & a_Value) /*override*/;
 
 	// tolua_begin
 	
@@ -56,8 +56,8 @@ public:
 	
 	// tolua_end
 	
-	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void SendTo(cClientHandle &) override {}
+	virtual void UsedBy(cPlayer * a_Player) /*override*/;
+	virtual void SendTo(cClientHandle &) /*override*/ {}
 	
 	virtual void SetRedstonePower(bool a_Value)
 	{

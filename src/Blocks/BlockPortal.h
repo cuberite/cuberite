@@ -22,7 +22,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		// We set to zero so MCS doesn't stop you from building weird portals like vanilla does
 		// CanBeAt doesn't do anything if meta is zero
@@ -34,12 +34,12 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		// No pickups
 	}
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) /*override*/
 	{
 		cFastRandom Random;
 		if (Random.NextInt(2000) != 0)
@@ -53,7 +53,7 @@ public:
 		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, cMonster::mtZombiePigman);
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
 	{
 		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
 		{

@@ -14,10 +14,10 @@ class cSandSimulator :
 public:
 	cSandSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
-	// cSimulator overrides:
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
+	// cSimulator /*override*/s:
+	virtual void Simulate(float a_Dt) /*override*/ { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) /*override*/;
+	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) /*override*/;
 	
 	/// Returns true if a falling-able block can start falling through the specified block type
 	static bool CanStartFallingThrough(BLOCKTYPE a_BlockType);
@@ -46,7 +46,7 @@ protected:
 	
 	int  m_TotalBlocks;    // Total number of blocks currently in the queue for simulating
 	
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) /*override*/;
 	
 	/// Performs the instant fall of the block - removes it from top, Finishes it at the bottom
 	void DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);

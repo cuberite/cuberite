@@ -51,13 +51,13 @@ public:
 	{
 	}
 	
-	// cCommandOutputCallback overrides:
-	virtual void Out(const AString & a_Text) override
+	// cCommandOutputCallback /*override*/s:
+	virtual void Out(const AString & a_Text) /*override*/
 	{
 		m_Buffer.append(a_Text);
 	}
 	
-	virtual void Finished(void) override
+	virtual void Finished(void) /*override*/
 	{
 		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, (int)m_Buffer.size(), m_Buffer.c_str());
 		delete this;

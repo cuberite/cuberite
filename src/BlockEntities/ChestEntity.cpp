@@ -141,7 +141,7 @@ void cChestEntity::OpenNewWindow(void)
 		{
 		}
 		
-		virtual bool Item(cChestEntity * a_Chest) override
+		virtual bool Item(cChestEntity * a_Chest) /*override*/
 		{
 			if ((a_Chest->GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
 			{

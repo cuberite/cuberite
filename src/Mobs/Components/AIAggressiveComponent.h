@@ -9,7 +9,7 @@ protected:
 public:
 	cAIAggressiveComponent(cMonster * a_Monster);
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
 	
 	virtual void Attack(float a_Dt);
 };

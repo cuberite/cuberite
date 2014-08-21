@@ -152,7 +152,7 @@ protected:
 	}
 	
 	
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) /*override*/
 	{
 		int BlockStartX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockStartZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;

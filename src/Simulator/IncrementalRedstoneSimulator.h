@@ -19,10 +19,10 @@ public:
 	cIncrementalRedstoneSimulator(cWorld & a_World);
 	~cIncrementalRedstoneSimulator();
 
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override { return IsRedstone(a_BlockType); }
-	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void Simulate(float a_Dt) /*override*/ { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) /*override*/;
+	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) /*override*/ { return IsRedstone(a_BlockType); }
+	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) /*override*/;
 
 	enum eRedstoneDirection
 	{
@@ -82,7 +82,7 @@ private:
 	SimulatedPlayerToggleableList * m_SimulatedPlayerToggleableBlocks;
 	RepeatersDelayList * m_RepeatersDelayList;
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override { RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk); }
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) /*override*/ { RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk); }
 	void RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk = NULL);
 	cChunk * m_Chunk;
 

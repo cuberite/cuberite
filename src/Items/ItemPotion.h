@@ -17,8 +17,8 @@ public:
 	}
 	
 
-	// cItemHandler overrides:
-	virtual bool IsDrinkable(short a_ItemDamage) override
+	// cItemHandler /*override*/s:
+	virtual bool IsDrinkable(short a_ItemDamage) /*override*/
 	{
 		// Drinkable potion if 13th lowest bit is set
 		// Ref.: http://minecraft.gamepedia.com/Potions#Data_value_table
@@ -26,7 +26,7 @@ public:
 	}
 
 	
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) /*override*/
 	{
 		short PotionDamage = a_Item.m_ItemDamage;
 		
@@ -53,7 +53,7 @@ public:
 	}
 	
 	
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) /*override*/
 	{
 		short PotionDamage = a_Item->m_ItemDamage;
 		

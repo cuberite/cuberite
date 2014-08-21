@@ -23,7 +23,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RepeaterRotationToMetaData(a_Player->GetYaw());
@@ -31,39 +31,39 @@ public:
 	}
 
 
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) /*override*/
 	{
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, ((a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) + 0x04) & 0x0f));
 	}
 
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) /*override*/
 	{
 		UNUSED(a_ChunkInterface);
 		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_REPEATER, 1, 0));
 	}
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) /*override*/
 	{
 		return true;
 	}
 	
 	
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
 	{
 		return ((a_RelY > 0) && cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "step.wood";
 	}

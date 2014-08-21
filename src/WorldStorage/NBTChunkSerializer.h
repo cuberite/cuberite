@@ -123,11 +123,11 @@ protected:
 	
 	void AddMinecartChestContents(cMinecartWithChest * a_Minecart);
 	
-	// cChunkDataSeparateCollector overrides:
-	virtual void LightIsValid(bool a_IsLightValid) override;
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override;
-	virtual void Entity(cEntity * a_Entity) override;
-	virtual void BlockEntity(cBlockEntity * a_Entity) override;
+	// cChunkDataSeparateCollector /*override*/s:
+	virtual void LightIsValid(bool a_IsLightValid) /*override*/;
+	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) /*override*/;
+	virtual void Entity(cEntity * a_Entity) /*override*/;
+	virtual void BlockEntity(cBlockEntity * a_Entity) /*override*/;
 } ;  // class cNBTChunkSerializer
 
 

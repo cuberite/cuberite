@@ -27,10 +27,10 @@ public:
 	
 protected:
 	
-	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
-	virtual void Tick           (float a_Dt, cChunk & a_Chunk) override
+	// cProjectileEntity /*override*/s:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) /*override*/;
+	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) /*override*/;
+	virtual void Tick           (float a_Dt, cChunk & a_Chunk) /*override*/
 	{
 		if (m_DestroyTimer > 0)
 		{

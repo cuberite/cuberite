@@ -22,7 +22,7 @@ public:
 
 	CLASS_PROTODEF(cSheep)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
 
 	/** Generates a random color for the sheep like the vanilla server.
 	The percent's where used are from the wiki: http://minecraft.gamepedia.com/Sheep#Breeding */

@@ -31,10 +31,10 @@ public:
 	
 	virtual ~cMetaRotator() {}
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta)  override;
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  override;
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  override;
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  override;
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta)  /*override*/;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  /*override*/;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  /*override*/;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  /*override*/;
 };
 
 

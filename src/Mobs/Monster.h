@@ -71,7 +71,7 @@ protected:
 	eType  m_MobType;
 public:
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
 
 	// Type Function
 	virtual bool IsBaby    (void) const { return false; }

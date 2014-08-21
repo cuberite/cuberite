@@ -2,7 +2,7 @@
 // Minecart.cpp
 
 // Implements the cMinecart class representing a minecart in the world
-// Handles physics when a minecart is on any type of rail (overrides simulator in Entity.cpp)
+// Handles physics when a minecart is on any type of rail (/*override*/s simulator in Entity.cpp)
 // Indiana Jones!
 
 #include "Globals.h"
@@ -34,7 +34,7 @@ public:
 	{
 	}
 
-	virtual bool Item(cEntity * a_Entity) override
+	virtual bool Item(cEntity * a_Entity) /*override*/
 	{
 		ASSERT(a_Entity != NULL);
 
@@ -177,7 +177,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	else
 	{
 		// Not on rail, default physics
-		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
+		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics /*override*/s this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
 		super::HandlePhysics(a_Dt, *Chunk);
 	}
 

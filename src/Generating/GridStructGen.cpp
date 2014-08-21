@@ -27,7 +27,7 @@ public:
 	}
 	
 protected:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) /*override*/
 	{
 		// Do nothing
 	}

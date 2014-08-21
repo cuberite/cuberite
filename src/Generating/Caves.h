@@ -29,8 +29,8 @@ protected:
 
 	int m_Seed;
 	
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -55,8 +55,8 @@ protected:
 	int    m_Seed;
 	float  m_Threshold;
 	
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -85,8 +85,8 @@ protected:
 	int          m_MaxOffset;  // maximum offset of the cave nest origin from the grid cell the nest belongs to
 	int          m_Grid;  // average spacing of the nests
 
-	// cGridStructGen override:
-	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
+	// cGridStructGen /*override*/:
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) /*override*/;
 } ;
 
 

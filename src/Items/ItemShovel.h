@@ -21,7 +21,7 @@ public:
 	{
 	}
 
-	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) /*override*/
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if (Block == E_BLOCK_SNOW)
@@ -37,7 +37,7 @@ public:
 		return false;
 	}
 	
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) /*override*/
 	{
 		if (a_BlockType == E_BLOCK_SNOW)
 		{
@@ -46,7 +46,7 @@ public:
 		return super::CanHarvestBlock(a_BlockType);
 	}
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) /*override*/
 	{
 		switch (m_ItemType)
 		{

@@ -27,8 +27,8 @@ class cFinishGenSnow :
 	public cFinishGen
 {
 protected:
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -39,8 +39,8 @@ class cFinishGenIce :
 	public cFinishGen
 {
 protected:
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -62,7 +62,7 @@ protected:
 	int    m_Seed;
 
 	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -79,8 +79,8 @@ protected:
 	cNoise m_Noise;
 	int m_Seed;
 
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 
 	int GetBiomeDensity(EMCSBiome a_Biome)
 	{
@@ -130,8 +130,8 @@ protected:
 	/// Tries to place sugarcane at the coords specified, returns true if successful
 	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);
 	
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -207,8 +207,8 @@ protected:
 	}
 
 	
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -228,8 +228,8 @@ public:
 protected:
 	int m_Level;
 	
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -265,8 +265,8 @@ protected:
 		BLOCKTYPE a_StationaryFluid
 	);
 
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -286,8 +286,8 @@ protected:
 	BLOCKTYPE      m_Fluid;
 	int            m_Chance;  ///< Chance, [0..100], that a spring will be generated in a chunk
 
-	// cFinishGen override:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 
 	/// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
 	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);

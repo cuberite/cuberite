@@ -157,7 +157,7 @@ private:
 		sSlot m_Slots[MAX_SLOTS];
 		int   m_NumSlots;  // Number of slots actually used
 		
-		virtual void Execute(void) override;
+		virtual void Execute(void) /*override*/;
 		
 		/** Prepares the Read and Write socket sets for select()
 		Puts all sockets into the read set, along with m_ControlSocket1.

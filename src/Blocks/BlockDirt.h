@@ -19,13 +19,13 @@ public:
 	}
 
 	
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
 	}
 	
 	
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) /*override*/
 	{
 		if (m_BlockType != E_BLOCK_GRASS)
 		{
@@ -90,7 +90,7 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "step.gravel";
 	}

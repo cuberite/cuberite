@@ -28,7 +28,7 @@ class cDebugCallbacks :
 	public cHTTPServer::cCallbacks,
 	protected cHTTPFormParser::cCallbacks
 {
-		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
+		virtual void OnRequestBegun(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) /*override*/
 		{
 			UNUSED(a_Connection);
 			
@@ -39,7 +39,7 @@ class cDebugCallbacks :
 		}
 		
 		
-		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override
+		virtual void OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) /*override*/
 		{
 			UNUSED(a_Connection);
 			
@@ -51,7 +51,7 @@ class cDebugCallbacks :
 		}
 		
 		
-		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
+		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) /*override*/
 		{
 			cHTTPFormParser * FormParser = (cHTTPFormParser *)(a_Request.GetUserData());
 			if (FormParser != NULL)
@@ -95,19 +95,19 @@ class cDebugCallbacks :
 		}
 		
 		
-		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) override
+		virtual void OnFileStart(cHTTPFormParser & a_Parser, const AString & a_FileName) /*override*/
 		{
 			// TODO
 		}
 		
 		
-		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, size_t a_Size) override
+		virtual void OnFileData(cHTTPFormParser & a_Parser, const char * a_Data, size_t a_Size) /*override*/
 		{
 			// TODO
 		}
 		
 
-		virtual void OnFileEnd(cHTTPFormParser & a_Parser) override
+		virtual void OnFileEnd(cHTTPFormParser & a_Parser) /*override*/
 		{
 			// TODO
 		}

@@ -63,7 +63,7 @@ class cListAllocationPool : public cAllocationPool<T>
 			}
 		}
 		
-		virtual T * Allocate() override
+		virtual T * Allocate() /*override*/
 		{
 			if (m_FreeList.size() <= NumElementsInReserve)
 			{
@@ -88,7 +88,7 @@ class cListAllocationPool : public cAllocationPool<T>
 			m_FreeList.pop_front();
 			return ret;
 		}
-		virtual void Free(T * a_ptr) override
+		virtual void Free(T * a_ptr) /*override*/
 		{
 			if (a_ptr == NULL)
 			{

@@ -2057,7 +2057,7 @@ void cPlayer::HandleFloater()
 		public cEntityCallback
 	{
 	public:
-		virtual bool Item(cEntity * a_Entity) override
+		virtual bool Item(cEntity * a_Entity) /*override*/
 		{
 			a_Entity->Destroy(true);
 			return true;

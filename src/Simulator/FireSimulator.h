@@ -22,10 +22,10 @@ public:
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
 	~cFireSimulator();
 
-	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+	virtual void Simulate(float a_Dt) /*override*/ { UNUSED(a_Dt);}  // not used
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) /*override*/;
 
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
+	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) /*override*/;
 
 	static bool IsFuel   (BLOCKTYPE a_BlockType);
 	static bool DoesBurnForever(BLOCKTYPE a_BlockType);
@@ -44,7 +44,7 @@ protected:
 	int m_ReplaceFuelChance;
 	
 	
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) /*override*/;
 	
 	/// Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels
 	int GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);

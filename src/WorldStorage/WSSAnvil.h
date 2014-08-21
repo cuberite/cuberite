@@ -229,10 +229,10 @@ protected:
 	/// Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer
 	void CopyNBTData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, char * a_Destination, size_t a_Length);
 		
-	// cWSSchema overrides:
-	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override;
-	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override;
-	virtual const AString GetName(void) const override {return "anvil"; }
+	// cWSSchema /*override*/s:
+	virtual bool LoadChunk(const cChunkCoords & a_Chunk) /*override*/;
+	virtual bool SaveChunk(const cChunkCoords & a_Chunk) /*override*/;
+	virtual const AString GetName(void) const /*override*/ {return "anvil"; }
 } ;
 
 

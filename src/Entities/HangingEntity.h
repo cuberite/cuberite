@@ -37,8 +37,8 @@ public:
 
 private:
 
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override {}
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/ {}
 
 	eBlockFace m_BlockFace;
 

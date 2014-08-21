@@ -25,7 +25,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		if (!LadderCanBePlacedAt(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
 		{
@@ -43,7 +43,7 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta
 	}
@@ -103,7 +103,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
 	{
 		// TODO: Use AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
 		eBlockFace BlockFace = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
@@ -113,7 +113,7 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "step.wood";
 	}

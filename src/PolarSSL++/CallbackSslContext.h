@@ -54,9 +54,9 @@ protected:
 	/** The callbacks to use to send and receive SSL peer data */
 	cDataCallbacks * m_Callbacks;
 
-	// cSslContext overrides:
-	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
-	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
+	// cSslContext /*override*/s:
+	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) /*override*/;
+	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) /*override*/;
 };
 
 

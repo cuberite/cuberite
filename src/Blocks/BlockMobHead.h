@@ -17,12 +17,12 @@ public:
 	{
 	}
 	
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		// The drop spawn is in OnDestroyed method
 	}
 	
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
 	{
 		if (a_Player->IsGameModeCreative())
 		{
@@ -197,7 +197,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
+	) /*override*/
 	{
 		class cCallback : public cBlockEntityCallback
 		{

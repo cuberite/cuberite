@@ -126,11 +126,11 @@ protected:
 	const sBlockInfo * ChooseOceanFloorPattern(int a_RelX, int a_RelZ);
 	
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) /*override*/;
 
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 } ;

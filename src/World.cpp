@@ -98,7 +98,7 @@ protected:
 
 	cWorld * m_World;
 	
-	virtual void Execute(void) override
+	virtual void Execute(void) /*override*/
 	{
 		for (;;)
 		{
@@ -150,7 +150,7 @@ protected:
 
 	cLightingThread * m_Lighting;
 	
-	virtual void Execute(void) override
+	virtual void Execute(void) /*override*/
 	{
 		for (;;)
 		{
@@ -459,7 +459,7 @@ void cWorld::InitializeSpawn(void)
 	class cTracerCallbacks :
 		public cBlockTracer::cCallbacks
 	{
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) /*override*/
 		{
 			LOGD("Block {%d, %d, %d}: %d:%d (%s)",
 				a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta,
@@ -468,7 +468,7 @@ void cWorld::InitializeSpawn(void)
 			return false;
 		}
 		
-		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) override
+		virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
 		{
 			LOGD("Block {%d, %d, %d}: no data available",
 				a_BlockX, a_BlockY, a_BlockZ
@@ -476,19 +476,19 @@ void cWorld::InitializeSpawn(void)
 			return false;
 		}
 
-		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+		virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) /*override*/
 		{
 			LOGD("Out of world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
 			return false;
 		}
 
-		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
+		virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) /*override*/
 		{
 			LOGD("Into world at {%f, %f, %f}", a_BlockX, a_BlockY, a_BlockZ);
 			return false;
 		}
 
-		virtual void OnNoMoreHits(void) override
+		virtual void OnNoMoreHits(void) /*override*/
 		{
 			LOGD("No more hits");
 		}
@@ -529,7 +529,7 @@ void cWorld::Start(void)
 		IniFile.AddKeyComment(" LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
 	}
 
-	// The presence of a configuration value overrides everything
+	// The presence of a configuration value /*override*/s everything
 	// If no configuration value is found, GetDimension() is written to file and the variable is written to again to ensure that cosmic rays haven't sneakily changed its value
 	m_Dimension = StringToDimension(IniFile.GetValueSet("General", "Dimension", DimensionToString(GetDimension())));
 
@@ -2811,7 +2811,7 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 	public:
 		cUpdateCommandBlock(const AString & a_Command) : m_Command(a_Command) {}
 			
-		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) /*override*/
 		{
 			a_CommandBlock->SetCommand(m_Command);
 			return false;

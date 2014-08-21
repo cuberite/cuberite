@@ -25,7 +25,7 @@ public:
 		m_HitEntity(NULL)
 	{
 	}
-	virtual bool Item(cEntity * a_Entity) override
+	virtual bool Item(cEntity * a_Entity) /*override*/
 	{
 		if (!a_Entity->IsMob())  // Floaters can only pull mobs not other entities.
 		{
@@ -86,7 +86,7 @@ public:
 	{
 	}
 
-	bool Item(cEntity * a_Entity) override
+	bool Item(cEntity * a_Entity) /*override*/
 	{
 		m_EntityExists = true;
 		return false;

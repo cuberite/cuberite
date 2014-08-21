@@ -143,8 +143,8 @@ protected:
 	/// Returns a radius based on the location provided.
 	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
 
-	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
+	// cGridStructGen::cStructure /*override*/s:
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 

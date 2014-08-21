@@ -17,7 +17,7 @@ public:
 	{
 	}
 	
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) /*override*/
 	{
 		// Flip the ON bit on/off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x08);
@@ -28,14 +28,14 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		// Reset meta to 0
 		a_Pickups.push_back(cItem(E_BLOCK_LEVER, 1, 0));
 	}
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) /*override*/
 	{
 		return true;
 	}
@@ -46,7 +46,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
@@ -70,7 +70,7 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "step.wood";
 	}
@@ -97,7 +97,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
 	{
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
@@ -109,7 +109,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) /*override*/
 	{
 		switch (a_Meta)
 		{
@@ -124,7 +124,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) /*override*/
 	{
 		switch (a_Meta)
 		{

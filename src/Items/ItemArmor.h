@@ -18,7 +18,7 @@ public:
 	}
 
 	/** Move the armor to the armor slot of the player's inventory */
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) /*override*/
 	{
 		int SlotNum;
 		if (ItemCategory::IsHelmet(a_Item.m_ItemType))
@@ -60,7 +60,7 @@ public:
 		return true;
 	}
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) /*override*/
 	{
 		switch (m_ItemType)
 		{

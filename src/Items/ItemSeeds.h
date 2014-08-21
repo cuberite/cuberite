@@ -18,12 +18,12 @@ public:
 
 	}
 
-	virtual bool IsPlaceable(void) override
+	virtual bool IsPlaceable(void) /*override*/
 	{
 		return true;
 	}
 
-	virtual bool IsFood(void) override
+	virtual bool IsFood(void) /*override*/
 	{
 		switch (m_ItemType)  // Special cases, both a seed and food
 		{
@@ -33,7 +33,7 @@ public:
 		}
 	}
 
-	virtual FoodInfo GetFoodInfo(void) override
+	virtual FoodInfo GetFoodInfo(void) /*override*/
 	{
 		switch (m_ItemType)
 		{
@@ -48,7 +48,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		if (a_BlockFace != BLOCK_FACE_TOP)
 		{

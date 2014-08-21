@@ -20,19 +20,19 @@ public:
 	}
 	
 		
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		// No pickups
 	}
 	
 	
-	virtual bool DoesIgnoreBuildCollision(void) override
+	virtual bool DoesIgnoreBuildCollision(void) /*override*/
 	{
 		return true;
 	}
 	
 	
-	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
+	virtual void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) /*override*/
 	{
 		switch (m_BlockType)
 		{
@@ -51,7 +51,7 @@ public:
 	}
 
 
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) /*override*/
 	{
 		return false;
 	}
@@ -74,7 +74,7 @@ public:
 	
 	
 	/// Called to tick the block
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) /*override*/
 	{
 		if (a_Chunk.GetWorld()->ShouldLavaSpawnFire())
 		{

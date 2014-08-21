@@ -9,7 +9,7 @@
 
 /** Interface for a callback that receives command output
 The Out() function is called for any output the command has produced.
-Descendants override that function to provide specific processing of the output.
+Descendants /*override*/ that function to provide specific processing of the output.
 */
 class cCommandOutputCallback
 {
@@ -34,8 +34,8 @@ public:
 class cNullCommandOutputCallback :
 	public cCommandOutputCallback
 {
-	// cCommandOutputCallback overrides:
-	virtual void Out(const AString & a_Text) override
+	// cCommandOutputCallback /*override*/s:
+	virtual void Out(const AString & a_Text) /*override*/
 	{
 		// Do nothing
 		UNUSED(a_Text);
@@ -52,9 +52,9 @@ class cLogCommandOutputCallback :
 	public cCommandOutputCallback
 {
 public:
-	// cCommandOutputCallback overrides:
-	virtual void Out(const AString & a_Text) override;
-	virtual void Finished(void) override;
+	// cCommandOutputCallback /*override*/s:
+	virtual void Out(const AString & a_Text) /*override*/;
+	virtual void Finished(void) /*override*/;
 	
 protected:
 	/// Output is stored here until the command finishes processing
@@ -71,7 +71,7 @@ class cLogCommandDeleteSelfOutputCallback :
 {
 	typedef cLogCommandOutputCallback super;
 	
-	virtual void Finished(void) override
+	virtual void Finished(void) /*override*/
 	{
 		super::Finished();
 		delete this;

@@ -25,7 +25,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		
@@ -72,7 +72,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
+	) /*override*/
 	{
 		// Check if this forms a doublechest, if so, need to adjust the meta:
 		cBlockArea Area;
@@ -107,12 +107,12 @@ public:
 	}
 	
 	
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "step.wood";
 	}
 	
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
 	{
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
@@ -226,7 +226,7 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}

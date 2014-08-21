@@ -90,16 +90,16 @@ protected:
 	size_t m_CurrentRequestBodyRemaining;
 	
 	
-	// cSocketThreads::cCallback overrides:
+	// cSocketThreads::cCallback /*override*/s:
 	/** Data is received from the client.
 	Returns true if the connection has been closed as the result of parsing the data. */
-	virtual bool DataReceived(const char * a_Data, size_t a_Size) override;
+	virtual bool DataReceived(const char * a_Data, size_t a_Size) /*override*/;
 	
 	/** Data can be sent to client */
-	virtual void GetOutgoingData(AString & a_Data) override;
+	virtual void GetOutgoingData(AString & a_Data) /*override*/;
 	
 	/** The socket has been closed for any reason */
-	virtual void SocketClosed(void) override;
+	virtual void SocketClosed(void) /*override*/;
 } ;
 
 typedef std::vector<cHTTPConnection *> cHTTPConnections;

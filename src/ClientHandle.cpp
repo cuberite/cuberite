@@ -1623,7 +1623,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 		class cRclkEntity : public cEntityCallback
 		{
 			cPlayer & m_Player;
-			virtual bool Item(cEntity * a_Entity) override
+			virtual bool Item(cEntity * a_Entity) /*override*/
 			{
 				if (cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity))
 				{
@@ -1644,7 +1644,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 	// If it is a left click, attack the entity:
 	class cDamageEntity : public cEntityCallback
 	{
-		virtual bool Item(cEntity * a_Entity) override
+		virtual bool Item(cEntity * a_Entity) /*override*/
 		{
 			if (!a_Entity->GetWorld()->IsPVPEnabled())
 			{

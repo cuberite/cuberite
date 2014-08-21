@@ -71,8 +71,8 @@ protected:
 	cPlacedPieces m_Pieces;
 	
 	
-	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override
+	// cGridStructGen::cStructure /*override*/s:
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) /*override*/
 	{
 		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{

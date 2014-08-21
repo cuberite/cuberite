@@ -95,9 +95,9 @@ class cMineShaftDirtRoom :
 public:
 	cMineShaftDirtRoom(cStructGenMineShafts::cMineShaftSystem & a_Parent, cNoise & a_Noise);
 
-	// cMineShaft overrides:
-	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
-	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
+	// cMineShaft /*override*/s:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) /*override*/;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -136,9 +136,9 @@ protected:
 		cNoise & a_Noise
 	);
 
-	// cMineShaft overrides:
-	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
-	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
+	// cMineShaft /*override*/s:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) /*override*/;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) /*override*/;
 
 	/// Places a chest, if the corridor has one
 	void PlaceChest(cChunkDesc & a_ChunkDesc);
@@ -176,9 +176,9 @@ public:
 protected:
 	cMineShaftCrossing(cStructGenMineShafts::cMineShaftSystem & a_ParentSystem, const cCuboid & a_BoundingBox);
 
-	// cMineShaft overrides:
-	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
-	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
+	// cMineShaft /*override*/s:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) /*override*/;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -219,9 +219,9 @@ protected:
 		eSlope a_Slope
 	);
 
-	// cMineShaft overrides:
-	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) override;
-	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) override;
+	// cMineShaft /*override*/s:
+	virtual void AppendBranches(int a_RecursionLevel, cNoise & a_Noise) /*override*/;
+	virtual void ProcessChunk(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -267,7 +267,7 @@ public:
 	/** Returns true if none of the objects in m_MineShafts intersect with the specified bounding box and the bounding box is valid */
 	bool CanAppend(const cCuboid & a_BoundingBox);
 
-	// cGridStructGen::cStructure overrides:
+	// cGridStructGen::cStructure /*override*/s:
 	virtual void DrawIntoChunk(cChunkDesc & a_Chunk);
 } ;
 

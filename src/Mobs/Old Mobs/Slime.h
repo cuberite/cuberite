@@ -18,10 +18,10 @@ public:
 
 	CLASS_PROTODEF(cSlime)
 
-	// cAggressiveMonster overrides:
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
-	virtual void Attack(float a_Dt) override;
-	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	// cAggressiveMonster /*override*/s:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
+	virtual void Attack(float a_Dt) /*override*/;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) /*override*/;
 
 	int GetSize(void) const { return m_Size; }
 	

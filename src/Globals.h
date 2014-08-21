@@ -10,7 +10,7 @@
 
 // Compiler-dependent stuff:
 #if defined(_MSC_VER)
-	// MSVC produces warning C4481 on the override keyword usage, so disable the warning altogether
+	// MSVC produces warning C4481 on the /*override*/ keyword usage, so disable the warning altogether
 	#pragma warning(disable:4481)
 
 	// Disable some warnings that we don't care about:
@@ -56,9 +56,9 @@
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// override is part of c++11
+	// /*override*/ is part of c++11
 	#if __cplusplus < 201103L
-		#define override
+		#define /*override*/
 	#endif
 
 	#define OBSOLETE __attribute__((deprecated))
@@ -103,7 +103,7 @@
 	#define abstract
 
 	// Mark virtual methods as overriding (forcing them to have a virtual function of the same signature in the base class)
-	#define override
+	#define /*override*/
 
 	// Mark functions as obsolete, so that their usage results in a compile-time warning
 	#define OBSOLETE

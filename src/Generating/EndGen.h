@@ -59,10 +59,10 @@ protected:
 	/// Returns true if the chunk is outside of the island's dimensions
 	bool IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ);
 		
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
 
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 } ;

@@ -24,10 +24,10 @@ public:
 
 	static const char * GetClassStatic(void) { return "cEnderChestEntity"; }
 	
-	// cBlockEntity overrides:
-	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void SaveToJson(Json::Value & a_Value) override { UNUSED(a_Value); }
-	virtual void SendTo(cClientHandle & a_Client) override { UNUSED(a_Client); }
+	// cBlockEntity /*override*/s:
+	virtual void UsedBy(cPlayer * a_Player) /*override*/;
+	virtual void SaveToJson(Json::Value & a_Value) /*override*/ { UNUSED(a_Value); }
+	virtual void SendTo(cClientHandle & a_Client) /*override*/ { UNUSED(a_Client); }
 
 	static void LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid);
 	static void SaveToJson(Json::Value & a_Value, const cItemGrid & a_Grid);

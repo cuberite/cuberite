@@ -30,11 +30,11 @@ public:
 	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
 
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
 
 	bool CollectedBy(cPlayer * a_Dest);  // tolua_export
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
 
 	/** Returns the number of ticks that this entity has existed */
 	int GetAge(void) const { return (int)(m_Timer / 50); }     // tolua_export

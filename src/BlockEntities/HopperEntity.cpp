@@ -209,7 +209,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 		{
 		}
 
-		virtual bool Item(cEntity * a_Entity) override
+		virtual bool Item(cEntity * a_Entity) /*override*/
 		{
 			ASSERT(a_Entity != NULL);
 

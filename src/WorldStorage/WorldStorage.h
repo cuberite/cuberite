@@ -128,7 +128,7 @@ protected:
 	
 	void InitSchemas(int a_StorageCompressionFactor);
 	
-	virtual void Execute(void) override;
+	virtual void Execute(void) /*override*/;
 	
 	cEvent m_Event;       // Set when there's any addition to the queues
 

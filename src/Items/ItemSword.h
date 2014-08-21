@@ -20,7 +20,7 @@ public:
 	}
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) /*override*/
 	{
 		if (a_BlockType == E_BLOCK_COBWEB)
 		{
@@ -30,7 +30,7 @@ public:
 	}
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) /*override*/
 	{
 		switch (m_ItemType)
 		{
@@ -44,7 +44,7 @@ public:
 	}
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) /*override*/
 	{
 		switch ((int)a_Action)
 		{

@@ -81,12 +81,12 @@ protected:
 	/// The Lua reference for the callback to call when a slot has changed
 	int m_OnSlotChangedFnRef;
 	
-	// cWindow overrides:
-	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
-	virtual void Destroy(void) override;
+	// cWindow /*override*/s:
+	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) /*override*/;
+	virtual void Destroy(void) /*override*/;
 	
-	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	// cItemGrid::cListener /*override*/s:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) /*override*/;
 } ;  // tolua_export
 
 

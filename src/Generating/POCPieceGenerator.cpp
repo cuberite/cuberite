@@ -105,23 +105,23 @@ protected:
 	int m_Height;
 	cConnectors m_Connectors;
 	
-	// cPiece overrides:
-	virtual cConnectors GetConnectors(void) const override
+	// cPiece /*override*/s:
+	virtual cConnectors GetConnectors(void) const /*override*/
 	{
 		return m_Connectors;
 	}
 	
-	virtual Vector3i GetSize(void) const override
+	virtual Vector3i GetSize(void) const /*override*/
 	{
 		return Vector3i(m_SizeXZ, m_Height, m_SizeXZ);
 	}
 	
-	virtual cCuboid GetHitBox(void) const override
+	virtual cCuboid GetHitBox(void) const /*override*/
 	{
 		return cCuboid(0, 0, 0, m_SizeXZ - 1, m_Height - 1, m_SizeXZ - 1);
 	}
 	
-	virtual bool CanRotateCCW(int a_NumRotations) const override
+	virtual bool CanRotateCCW(int a_NumRotations) const /*override*/
 	{
 		return true;
 	}

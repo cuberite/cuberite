@@ -66,7 +66,7 @@ int cVoronoiMap::GetValueAt(int a_X, int a_Y, int & a_MinDist1, int & a_MinDist2
 	// Get 5x5 neighboring cell seeds, compare distance to each. Return the value in the minumim-distance cell
 	int MinDist = m_CellSize * m_CellSize * 16;  // There has to be a cell closer than this
 	int MinDist2 = MinDist;
-	int res = 0;  // Will be overriden
+	int res = 0;  // Will be /*override*/n
 	for (int x = 0; x < 5; x++)
 	{
 		for (int z = 0; z < 5; z++)

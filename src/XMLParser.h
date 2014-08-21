@@ -3,7 +3,7 @@
 
 // Interfaces to the CXMLParser class representing the base class for XML parsing
 
-// To use, derive a class from this base and override its OnStartElement(), OnEndElement() and OnCharacters() functions
+// To use, derive a class from this base and /*override*/ its OnStartElement(), OnEndElement() and OnCharacters() functions
 
 
 

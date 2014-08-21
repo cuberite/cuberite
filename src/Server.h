@@ -171,8 +171,8 @@ private:
 	protected:
 		cServer & m_Server;
 		
-		// cIsThread overrides:
-		virtual void Execute(void) override;
+		// cIsThread /*override*/s:
+		virtual void Execute(void) /*override*/;
 	} ;
 	
 	
@@ -242,8 +242,8 @@ private:
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
 
-	// cListenThread::cCallback overrides:
-	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
+	// cListenThread::cCallback /*override*/s:
+	virtual void OnConnectionAccepted(cSocket & a_Socket) /*override*/;
 };  // tolua_export
 
 

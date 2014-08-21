@@ -10,11 +10,11 @@
 
 // Place this macro in the public section of each cEntity descendant class and you're done :)
 #define CLASS_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const override\
+	virtual bool IsA(const char * a_ClassName) const /*override*/\
 	{ \
 		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
 	} \
-	virtual const char * GetClass(void) const override \
+	virtual const char * GetClass(void) const /*override*/ \
 	{ \
 		return #classname; \
 	} \
@@ -22,7 +22,7 @@
 	{ \
 		return #classname; \
 	} \
-	virtual const char * GetParentClass(void) const override \
+	virtual const char * GetParentClass(void) const /*override*/ \
 	{ \
 		return super::GetClass(); \
 	}
@@ -371,7 +371,7 @@ public:
 	
 	// tolua_end
 
-	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
+	/** Descendants /*override*/ this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
 	*/
 	virtual void SpawnOn(cClientHandle & a_Client) = 0;
@@ -420,7 +420,7 @@ public:
 	
 	// tolua_begin
 	
-	// COMMON metadata flags; descendants may override the defaults:
+	// COMMON metadata flags; descendants may /*override*/ the defaults:
 	virtual bool IsOnFire   (void) const {return (m_TicksLeftBurning > 0); }
 	virtual bool IsCrouched (void) const {return false; }
 	virtual bool IsRiding   (void) const {return false; }
@@ -530,7 +530,7 @@ protected:
 	int m_TicksSinceLastVoidDamage;
 	
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
-	overrides can provide further processing, such as forcing players to move at the given speed. */
+	/*override*/s can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed

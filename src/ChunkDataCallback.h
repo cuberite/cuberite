@@ -65,7 +65,7 @@ public:
 
 protected:
 
-	virtual void ChunkData(const cChunkData & a_BlockData) override
+	virtual void ChunkData(const cChunkData & a_BlockData) /*override*/
 	{
 		m_BlockData = a_BlockData.Copy();
 	}
@@ -87,7 +87,7 @@ public:
 
 protected:
 
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) /*override*/
 	{
 		a_ChunkBuffer.CopyBlockTypes(m_BlockData);
 		a_ChunkBuffer.CopyMetas(m_BlockData + cChunkDef::NumBlocks);
@@ -113,7 +113,7 @@ public:
 
 protected:
 
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) /*override*/
 	{
 		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes);
 		a_ChunkBuffer.CopyMetas(m_BlockMetas);

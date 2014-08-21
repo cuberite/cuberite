@@ -115,9 +115,9 @@ protected:
 	/// True if the projectile has hit the ground and is stuck there
 	bool m_IsInGround;
 		
-	// cEntity overrides:
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
-	virtual void SpawnOn(cClientHandle & a_Client) override;
+	// cEntity /*override*/s:
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void SpawnOn(cClientHandle & a_Client) /*override*/;
 	
 } ;  // tolua_export

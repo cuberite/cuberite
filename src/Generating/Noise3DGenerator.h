@@ -24,9 +24,9 @@ public:
 	cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator);
 	virtual ~cNoise3DGenerator();
 	
-	virtual void Initialize(cIniFile & a_IniFile) override;
-	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) override;
+	virtual void Initialize(cIniFile & a_IniFile) /*override*/;
+	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
+	virtual void DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a_ChunkDesc) /*override*/;
 	
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
@@ -94,11 +94,11 @@ protected:
 	/// Generates the 3D noise array used for terrain generation, unless the LastChunk coords are equal to coords given
 	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
 
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 

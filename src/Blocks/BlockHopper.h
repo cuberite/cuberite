@@ -22,7 +22,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		
@@ -41,7 +41,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) /*override*/
 	{
 		// Bit 0x08 is a flag.  Lowest three bits are position.  0x08 == 1000
 		NIBBLETYPE OtherMeta = a_Meta & 0x08;

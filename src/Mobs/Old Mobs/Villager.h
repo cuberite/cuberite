@@ -29,9 +29,9 @@ public:
 
 	CLASS_PROTODEF(cVillager)
 
-	// cEntity overrides
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-	virtual void Tick        (float a_Dt, cChunk & a_Chunk) override;
+	// cEntity /*override*/s
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) /*override*/;
+	virtual void Tick        (float a_Dt, cChunk & a_Chunk) /*override*/;
 
 	// cVillager functions
 	/** return true if the given blocktype are: crops, potatoes or carrots.*/

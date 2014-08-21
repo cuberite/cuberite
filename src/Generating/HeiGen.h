@@ -31,9 +31,9 @@ protected:
 
 	int m_Height;
 
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) /*override*/;
 } ;
 
 
@@ -48,9 +48,9 @@ public:
 	cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize);  // Doesn't take ownership of a_HeiGenToCache
 	~cHeiGenCache();
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) /*override*/;
 	
 	/// Retrieves height at the specified point in the cache, returns true if found, false if not found
 	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
@@ -97,9 +97,9 @@ protected:
 	
 	float GetNoise(float x, float y);
 
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) /*override*/;
 } ;
 
 
@@ -118,9 +118,9 @@ protected:
 	cRidgedMultiNoise m_Noise;
 	cPerlinNoise m_Perlin;
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) /*override*/;
 } ;
 
 
@@ -154,9 +154,9 @@ protected:
 	} ;
 	static const sGenParam m_GenParam[256];
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+	// cTerrainHeightGen /*override*/s:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) /*override*/;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) /*override*/;
 	
 	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
 } ;

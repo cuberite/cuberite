@@ -210,7 +210,7 @@ protected:
 	
 	
 	/** Adds a_AddStyle to a_Style; overwrites the existing style if appropriate.
-	If the style already contains something that a_AddStyle overrides, it is erased first. */
+	If the style already contains something that a_AddStyle /*override*/s, it is erased first. */
 	void AddStyle(AString & a_Style, const AString & a_AddStyle);
 } ;  // tolua_export
 

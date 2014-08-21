@@ -101,7 +101,7 @@ public:
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 	
 	/** Called on each tick.
-	By default increases the m_Ticks, descendants may override to provide additional processing. */
+	By default increases the m_Ticks, descendants may /*override*/ to provide additional processing. */
 	virtual void OnTick(cPawn & a_Target);
 	
 	/** Called when the effect is first added to an entity */
@@ -213,7 +213,7 @@ public:
 	{
 	}
 	
-	virtual void OnActivate(cPawn & a_Target) override;
+	virtual void OnActivate(cPawn & a_Target) /*override*/;
 };
 
 
@@ -230,7 +230,7 @@ public:
 	{
 	}
 	
-	virtual void OnActivate(cPawn & a_Target) override;
+	virtual void OnActivate(cPawn & a_Target) /*override*/;
 };
 
 
@@ -277,7 +277,7 @@ public:
 	{
 	}
 	
-	virtual void OnTick(cPawn & a_Target) override;
+	virtual void OnTick(cPawn & a_Target) /*override*/;
 };
 
 
@@ -384,8 +384,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect overrides:
-	virtual void OnTick(cPawn & a_Target) override;
+	// cEntityEffect /*override*/s:
+	virtual void OnTick(cPawn & a_Target) /*override*/;
 };
 
 
@@ -402,8 +402,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect overrides:
-	virtual void OnTick(cPawn & a_Target) override;
+	// cEntityEffect /*override*/s:
+	virtual void OnTick(cPawn & a_Target) /*override*/;
 };
 
 
@@ -420,8 +420,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect overrides:
-	virtual void OnTick(cPawn & a_Target) override;
+	// cEntityEffect /*override*/s:
+	virtual void OnTick(cPawn & a_Target) /*override*/;
 };
 
 
@@ -438,8 +438,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect overrides:
-	virtual void OnTick(cPawn & a_Target) override;
+	// cEntityEffect /*override*/s:
+	virtual void OnTick(cPawn & a_Target) /*override*/;
 };
 
 
@@ -486,7 +486,7 @@ public:
 	{
 	}
 	
-	virtual void OnTick(cPawn & a_Target) override;
+	virtual void OnTick(cPawn & a_Target) /*override*/;
 };
 
 

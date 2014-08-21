@@ -37,9 +37,9 @@ protected:
 	BLOCKTYPE m_BlockType;
 	bool      m_IsBedrocked;
 	
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 } ;
 
 
@@ -54,8 +54,8 @@ public:
 	
 protected:
 	
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 
@@ -80,9 +80,9 @@ protected:
 	BLOCKTYPE m_BlockBeachBottom;
 	BLOCKTYPE m_BlockSea;
 	
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 } ;
 
 
@@ -104,9 +104,9 @@ protected:
 	cNoise m_Noise;
 	int    m_SeaLevel;
 	
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 	
 	void FillColumnGrass    (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
 	void FillColumnClay     (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
@@ -135,9 +135,9 @@ protected:
 	
 	int m_Threshold;
 	
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/s:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 } ;
 
 
@@ -152,9 +152,9 @@ public:
 	cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
 	~cCompoGenCache();
 	
-	// cTerrainCompositionGen override:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
+	// cTerrainCompositionGen /*override*/:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) /*override*/;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) /*override*/;
 	
 protected:
 

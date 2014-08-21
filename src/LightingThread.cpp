@@ -18,7 +18,7 @@
 class cReader :
 	public cChunkDataCallback
 {
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) /*override*/
 	{
 		BLOCKTYPE * OutputRows = m_BlockTypes;
 		int InputIdx = 0;
@@ -39,7 +39,7 @@ class cReader :
 	}  // BlockTypes()
 	
 	
-	virtual void HeightMap(const cChunkDef::HeightMap * a_Heightmap) override
+	virtual void HeightMap(const cChunkDef::HeightMap * a_Heightmap) /*override*/
 	{
 		// Copy the entire heightmap, distribute it into the 3x3 chunk blob:
 		typedef struct {HEIGHTTYPE m_Row[16]; } ROW;

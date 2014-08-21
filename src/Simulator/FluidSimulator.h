@@ -43,8 +43,8 @@ class cFluidSimulator :
 public:
 	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
-	// cSimulator overrides:
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
+	// cSimulator /*override*/s:
+	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) /*override*/;
 	
 	/// Gets the flowing direction. If a_Over is true also the block over the current block affects the direction (standard)
 	virtual Direction GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over = true);

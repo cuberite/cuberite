@@ -28,7 +28,7 @@ public:
 	
 	
 	
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) /*override*/
 	{
 		if ((a_Dir != BLOCK_FACE_YM) && (a_Dir != BLOCK_FACE_NONE))
 		{
@@ -47,7 +47,7 @@ public:
 			{
 			}
 			
-			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) override
+			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) /*override*/
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{

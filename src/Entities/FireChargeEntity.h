@@ -29,8 +29,8 @@ protected:
 	
 	void Explode(int a_BlockX, int a_BlockY, int a_BlockZ);
 	
-	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	// cProjectileEntity /*override*/s:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) /*override*/;
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) /*override*/;
 	
 } ;  // tolua_export

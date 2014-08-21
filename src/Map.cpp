@@ -219,7 +219,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 		cCalculatePixelCb(cMap * a_Map, int a_RelX, int a_RelZ)
 			: m_Map(a_Map), m_RelX(a_RelX), m_RelZ(a_RelZ), m_PixelData(E_BASE_COLOR_TRANSPARENT) {}
 
-		virtual bool Item(cChunk * a_Chunk) override
+		virtual bool Item(cChunk * a_Chunk) /*override*/
 		{
 			if (a_Chunk == NULL)
 			{

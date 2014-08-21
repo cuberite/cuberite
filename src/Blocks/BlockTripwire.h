@@ -16,12 +16,12 @@ public:
 	{
 	}
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		a_Pickups.push_back(cItem(E_ITEM_STRING, 1, 0));
 	}
 
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		return "";
 	}

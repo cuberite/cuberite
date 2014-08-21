@@ -25,7 +25,7 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		a_Pickups.push_back(cItem(m_BlockType, 1, a_BlockMeta & 0x7));
 	}
@@ -36,7 +36,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		NIBBLETYPE Meta = (NIBBLETYPE) a_Player->GetEquippedItem().m_ItemDamage;
@@ -87,7 +87,7 @@ public:
 	}
 	
 	
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		switch (m_BlockType)
 		{
@@ -99,7 +99,7 @@ public:
 	}
 
 
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) /*override*/
 	{
 		return ((a_Meta & 0x8) != 0);
 	}
@@ -112,7 +112,7 @@ public:
 	}
 
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) /*override*/
 	{
 		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player->GetEquippedItem().m_ItemType != (short)m_BlockType))
 		{
@@ -137,7 +137,7 @@ public:
 	}
 	
 	
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) /*override*/
 	{
 		// Toggle the 4th bit - up / down:
 		return (a_Meta ^ 0x08);
@@ -158,7 +158,7 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
 		a_Pickups.push_back(cItem(Block, 2, a_BlockMeta & 0x7));
@@ -175,7 +175,7 @@ public:
 		return a_BlockType;
 	}
 	
-	virtual const char * GetStepSound(void) override
+	virtual const char * GetStepSound(void) /*override*/
 	{
 		switch (m_BlockType)
 		{

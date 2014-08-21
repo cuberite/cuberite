@@ -1914,7 +1914,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 		{
 		}
 
-		virtual bool Item(cEntity * a_Entity) override
+		virtual bool Item(cEntity * a_Entity) /*override*/
 		{
 			if (a_Entity->IsPickup())
 			{

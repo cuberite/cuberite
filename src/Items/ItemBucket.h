@@ -22,7 +22,7 @@ public:
 
 	}
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) /*override*/
 	{
 		switch (m_ItemType)
 		{
@@ -156,7 +156,7 @@ public:
 			{
 			}
 			
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) /*override*/
 			{
 				if (IsBlockWater(a_BlockType) || IsBlockLava(a_BlockType))
 				{
@@ -198,7 +198,7 @@ public:
 			Vector3i   m_Pos;
 			BLOCKTYPE  m_ReplacedBlock;
 			
-			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+			virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) /*override*/
 			{
 				if (a_BlockType != E_BLOCK_AIR)
 				{

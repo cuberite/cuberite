@@ -18,7 +18,7 @@ public:
 	}
 
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) /*override*/
 	{
 		// Feed the player:
 		FoodInfo Info = GetFoodInfo();
@@ -40,13 +40,13 @@ public:
 	}
 
 
-	virtual FoodInfo GetFoodInfo(void) override
+	virtual FoodInfo GetFoodInfo(void) /*override*/
 	{
 		return FoodInfo(4, 9.6);
 	}
 
 
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) override
+	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) /*override*/
 	{
 		return false;
 	}

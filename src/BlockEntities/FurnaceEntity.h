@@ -48,11 +48,11 @@ public:
 
 	bool LoadFromJson(const Json::Value & a_Value);
 	
-	// cBlockEntity overrides:
-	virtual void SaveToJson(Json::Value & a_Value) override;
-	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void UsedBy(cPlayer * a_Player) override;
+	// cBlockEntity /*override*/s:
+	virtual void SaveToJson(Json::Value & a_Value) /*override*/;
+	virtual void SendTo(cClientHandle & a_Client) /*override*/;
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void UsedBy(cPlayer * a_Player) /*override*/;
 
 	/// Restarts cooking. Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active. Returns true if cooking.
 	bool ContinueCooking(void);
@@ -152,8 +152,8 @@ protected:
 	/// Sets the m_IsCooking variable, updates the furnace block type based on the value
 	void SetIsCooking(bool a_IsCooking);
 	
-	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	// cItemGrid::cListener /*override*/s:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) /*override*/;
 	
 } ;  // tolua_export
 

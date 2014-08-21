@@ -30,7 +30,7 @@ public:
 		}
 	}
 	
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) /*override*/
 	{
 		switch (a_BlockType)
 		{
@@ -88,7 +88,7 @@ public:
 		return super::CanHarvestBlock(a_BlockType);
 	}
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) /*override*/
 	{
 		switch (m_ItemType)
 		{

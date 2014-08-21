@@ -43,7 +43,7 @@ public:
 		m_Contents.AddListener(*this);
 	}
 	
-	virtual void Destroy(void) override
+	virtual void Destroy(void) /*override*/
 	{
 		// Drop the contents as pickups:
 		ASSERT(m_World != NULL);
@@ -72,7 +72,7 @@ public:
 protected:
 	cItemGrid m_Contents;
 	
-	// cItemGrid::cListener overrides:
+	// cItemGrid::cListener /*override*/s:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
 	{
 		UNUSED(a_SlotNum);

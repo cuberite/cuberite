@@ -69,8 +69,8 @@ public:
 	#endif  // _DEBUG
 
 protected:
-	// cGridStructGen::cStructure overrides:
-	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
+	// cGridStructGen::cStructure /*override*/s:
+	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) /*override*/;
 } ;
 
 

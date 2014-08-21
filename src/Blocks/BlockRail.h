@@ -34,7 +34,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	) /*override*/
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
@@ -42,7 +42,7 @@ public:
 	}
 
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 
@@ -59,7 +59,7 @@ public:
 	}
 
 
-	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
 	{
 		super::OnDestroyed(a_ChunkInterface, a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ);
 
@@ -76,7 +76,7 @@ public:
 	}
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ) && (Meta != FindMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ)))
@@ -86,13 +86,13 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
 	{
 		super::ConvertToPickups(a_Pickups, 0);
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
 	{
 		if (a_RelY <= 0)
 		{
@@ -437,7 +437,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) /*override*/
 	{
 		// Bit 0x08 is a flag when a_Meta is in the range 0x00--0x05 and 0x0A--0x0F.
 		// Bit 0x08 specifies direction when a_Meta is in the range 0x06-0x09.
@@ -474,7 +474,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) /*override*/
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
@@ -510,7 +510,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) /*override*/
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
@@ -541,7 +541,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) /*override*/
 	{
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))

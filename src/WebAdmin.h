@@ -171,20 +171,20 @@ protected:
 		{
 		}
 
-		// cRequestData overrides:
-		virtual void OnBody(const char * a_Data, size_t a_Size) override;
+		// cRequestData /*override*/s:
+		virtual void OnBody(const char * a_Data, size_t a_Size) /*override*/;
 
-		// cHTTPFormParser::cCallbacks overrides. Files are ignored:
-		virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override
+		// cHTTPFormParser::cCallbacks /*override*/s. Files are ignored:
+		virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) /*override*/
 		{
 			UNUSED(a_FileName);
 		}
-		virtual void OnFileData(cHTTPFormParser &, const char * a_Data, size_t a_Size) override
+		virtual void OnFileData(cHTTPFormParser &, const char * a_Data, size_t a_Size) /*override*/
 		{
 			UNUSED(a_Data);
 			UNUSED(a_Size);
 		}
-		virtual void OnFileEnd(cHTTPFormParser &) override {}
+		virtual void OnFileEnd(cHTTPFormParser &) /*override*/ {}
 	} ;
 
 
@@ -214,10 +214,10 @@ protected:
 	/** Handles requests for the root page */
 	void HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 
-	// cHTTPServer::cCallbacks overrides:
-	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
-	virtual void OnRequestBody    (cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override;
-	virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
+	// cHTTPServer::cCallbacks /*override*/s:
+	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) /*override*/;
+	virtual void OnRequestBody    (cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) /*override*/;
+	virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) /*override*/;
 } ;  // tolua_export
 
 

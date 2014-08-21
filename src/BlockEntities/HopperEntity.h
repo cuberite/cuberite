@@ -47,11 +47,11 @@ protected:
 	Int64 m_LastMoveItemsInTick;
 	Int64 m_LastMoveItemsOutTick;
 
-	// cBlockEntity overrides:
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void SaveToJson(Json::Value & a_Value) override;
-	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual void UsedBy(cPlayer * a_Player) override;
+	// cBlockEntity /*override*/s:
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void SaveToJson(Json::Value & a_Value) /*override*/;
+	virtual void SendTo(cClientHandle & a_Client) /*override*/;
+	virtual void UsedBy(cPlayer * a_Player) /*override*/;
 	
 	/// Opens a new chest window for this chest. Scans for neighbors to open a double chest window, if appropriate.
 	void OpenNewWindow(void);

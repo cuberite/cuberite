@@ -81,7 +81,7 @@ public:
 		m_BlockEntity = a_BlockEntity;
 	}
 	
-	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override
+	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) /*override*/
 	{
 		a_BlockX = m_BlockEntity->GetPosX();
 		a_BlockY = m_BlockEntity->GetPosY();
@@ -113,7 +113,7 @@ public:
 		m_Entity = a_Entity;
 	}
 
-	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override
+	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) /*override*/
 	{
 		a_BlockX = (int)floor(m_Entity->GetPosX() + 0.5);
 		a_BlockY = (int)floor(m_Entity->GetPosY() + 0.5);

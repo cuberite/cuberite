@@ -410,15 +410,15 @@ private:
 	class cStarvationCallbacks
 		: public cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
 	{
-		virtual void OnStartUsingReserve() override
+		virtual void OnStartUsingReserve() /*override*/
 		{
 			LOG("Using backup memory buffer");
 		}
-		virtual void OnEndUsingReserve() override
+		virtual void OnEndUsingReserve() /*override*/
 		{
 			LOG("Stoped using backup memory buffer");
 		}
-		virtual void OnOutOfReserve() override
+		virtual void OnOutOfReserve() /*override*/
 		{
 			LOG("Out of Memory");
 		}

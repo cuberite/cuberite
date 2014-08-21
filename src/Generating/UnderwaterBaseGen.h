@@ -41,8 +41,8 @@ protected:
 	cBiomeGen & m_BiomeGen;
 
 
-	// cGridStructGen overrides:
-	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
+	// cGridStructGen /*override*/s:
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) /*override*/;
 } ;
 
 

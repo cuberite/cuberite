@@ -38,14 +38,14 @@ protected:
 	cCuboid m_Bounds;
 
 
-	// cFinishGen overrides:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen /*override*/s:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
 	
-	// cPiecePool overrides:
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
-	virtual cPieces GetStartingPieces(void) override;
-	virtual void PiecePlaced(const cPiece & a_Piece) override;
-	virtual void Reset(void) override;
+	// cPiecePool /*override*/s:
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) /*override*/;
+	virtual cPieces GetStartingPieces(void) /*override*/;
+	virtual void PiecePlaced(const cPiece & a_Piece) /*override*/;
+	virtual void Reset(void) /*override*/;
 } ;
 
 

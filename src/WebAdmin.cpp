@@ -23,7 +23,7 @@
 class cPlayerAccum :
 	public cPlayerListCallback
 {
-	virtual bool Item(cPlayer * a_Player) override
+	virtual bool Item(cPlayer * a_Player) /*override*/
 	{
 		m_Contents.append("<li>");
 		m_Contents.append(a_Player->GetName());

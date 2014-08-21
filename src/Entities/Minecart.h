@@ -34,11 +34,11 @@ public:
 		// TODO: Spawner minecarts, (and possibly any block in a minecart with NBT editing)
 	} ;
 	
-	// cEntity overrides:
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-	virtual void Destroyed() override;
+	// cEntity /*override*/s:
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) /*override*/;
+	virtual void Destroyed() /*override*/;
 	
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
@@ -95,8 +95,8 @@ public:
 
 	const cItem & GetContent(void) const {return m_Content;}
 	int GetBlockHeight(void) const {return m_Height;}
-	// cEntity overrides:
-	virtual void OnRightClicked(cPlayer & a_Player) override;
+	// cEntity /*override*/s:
+	virtual void OnRightClicked(cPlayer & a_Player) /*override*/;
 protected:
 
 	cItem m_Content;
@@ -130,8 +130,8 @@ protected:
 	/// The chest contents:
 	cItem m_Items[NumSlots];
 	
-	// cEntity overrides:
-	virtual void OnRightClicked(cPlayer & a_Player) override;
+	// cEntity /*override*/s:
+	virtual void OnRightClicked(cPlayer & a_Player) /*override*/;
 } ;
 
 
@@ -148,9 +148,9 @@ public:
 	
 	cMinecartWithFurnace(double a_X, double a_Y, double a_Z);
 	
-	// cEntity overrides:
-	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	// cEntity /*override*/s:
+	virtual void OnRightClicked(cPlayer & a_Player) /*override*/;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
 
 	// Set functions.
 	void SetIsFueled(bool a_IsFueled, int a_FueledTimeLeft = -1) {m_IsFueled = a_IsFueled; m_FueledTimeLeft = a_FueledTimeLeft;}
