@@ -13,6 +13,9 @@
 cSetChunkData::cSetChunkData(int a_ChunkX, int a_ChunkZ, bool a_ShouldMarkDirty) :
 	m_ChunkX(a_ChunkX),
 	m_ChunkZ(a_ChunkZ),
+	m_IsLightValid(false),
+	m_IsHeightMapValid(false),
+	m_AreBiomesValid(false),
 	m_ShouldMarkDirty(a_ShouldMarkDirty)
 {
 }
