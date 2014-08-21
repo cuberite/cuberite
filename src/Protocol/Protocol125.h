@@ -174,7 +174,6 @@ protected:
 
 	/// Writes mobile entity metadata
 	void WriteMobMetadata(const cMonster & a_Mob);
-	void WriteMobMetadata(const cNewMonster & a_Mob);
 } ;
 
 

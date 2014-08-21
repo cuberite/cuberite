@@ -28,7 +28,6 @@ class cPickup;
 class cPainting;
 class cWorld;
 class cMonster;
-class cNewMonster;
 class cChunkDataSerializer;
 class cFallingBlock;
 class cCompositeChat;

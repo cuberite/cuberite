@@ -656,16 +656,6 @@ void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocolRecognizer::SendSpawnMob(const cNewMonster & a_Mob)
-{
-	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSpawnMob(a_Mob);
-}
-
-
-
-
-
 void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
 	ASSERT(m_Protocol != NULL);

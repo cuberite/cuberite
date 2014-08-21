@@ -209,7 +209,6 @@ protected:
 		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
 		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
 		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
-		void WriteMobMetadata(const cNewMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
 		void WriteEntityProperties(const cEntity & a_Entity);  // Writes the entity properties for the specified entity, including the Count field
 		void WriteBlockEntity(const cBlockEntity & a_BlockEntity);
 		
