@@ -15,6 +15,7 @@
 class cClientHandle;
 class cWorld;
 
+
 class cMonster : public cPawn {
 	typedef cPawn super;
 public:
@@ -65,12 +66,12 @@ public:
 		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
 	} ;
 
+
 protected:
 	eType  m_MobType;
 public:
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	eType  GetMobType() const { return m_MobType; }
 
 	// Type Function
 	virtual bool IsBaby    (void) const { return false; }
@@ -86,7 +87,10 @@ public:
 	float   GetDropChanceChestplate() { return m_DropChanceChestplate; }
 	float   GetDropChanceLeggings() { return m_DropChanceLeggings; }
 	float   GetDropChanceWeapon() { return m_DropChanceWeapon; }
+	// tolua_begin
+	eType  GetMobType() const { return m_MobType; }
 	eFamily GetMobFamily() { return mfPassive; }
+	// tolua_end
 
 	// Set Functions - Temporary
 	void    SetDropChanceBoots(float a_Chance) {  m_DropChanceBoots = a_Chance; }
