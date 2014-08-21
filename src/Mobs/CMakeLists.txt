@@ -70,4 +70,3 @@ SET (HDRS
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
 endif()
-add_subdirectory(Components)

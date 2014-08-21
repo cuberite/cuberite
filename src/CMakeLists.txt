@@ -8,7 +8,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include
 
 set(FOLDERS
 	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
-	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs
+	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs Mobs/Components
 )
 
 SET (SRCS
@@ -307,9 +307,8 @@ endif ()
 if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE}
 		OSSupport HTTPServer Bindings Items Blocks
-		Protocol Generating Generating_Prefabs WorldStorage
+		Protocol Generating Generating_Prefabs WorldStorage Components
 		Mobs Entities Simulator UI BlockEntities PolarSSL++
-		Components
 	)
 endif ()
 if (WIN32)
