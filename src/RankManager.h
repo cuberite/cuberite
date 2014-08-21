@@ -49,6 +49,8 @@ public:
 	
 	/** Creates the rank manager. Needs to be initialized before other use. */
 	cRankManager(void);
+
+	~cRankManager();
 	
 	/** Initializes the rank manager. Performs migration and default-setting if no data is found in the DB.
 	The a_MojangAPI param is used when migrating from old ini files, to look up player UUIDs. */
@@ -194,6 +196,9 @@ public:
 	/** Returns true iff the specified group contains the specified permission. */
 	bool IsPermissionInGroup(const AString & a_Permission, const AString & a_GroupName);
 	
+	/** Called by cMojangAPI whenever the playername-uuid pairing is discovered. Updates the DB. */
+	void NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID);
+	
 protected:
 
 	/** The database storage for all the data. Protected by m_CS. */
@@ -204,6 +209,10 @@ protected:
 	
 	/** Set to true once the manager is initialized. */
 	bool m_IsInitialized;
+
+	/** The MojangAPI instance that is used for translating playernames to UUIDs.
+	Set in Initialize(), may be NULL. */
+	cMojangAPI * m_MojangAPI;
 	
 	
 	/** Returns true if all the DB tables are empty, indicating a fresh new install. */

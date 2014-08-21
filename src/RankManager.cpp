@@ -365,8 +365,21 @@ protected:
 
 cRankManager::cRankManager(void) :
 	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
-	m_IsInitialized(false)
+	m_IsInitialized(false),
+	m_MojangAPI(NULL)
 {
+}
+
+
+
+
+
+cRankManager::~cRankManager()
+{
+	if (m_MojangAPI != NULL)
+	{
+		m_MojangAPI->SetRankManager(NULL);
+	}
 }
 
 
@@ -386,6 +399,8 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 	
 	m_IsInitialized = true;
 	
+	a_MojangAPI.SetRankManager(this);
+
 	// Check if tables empty, migrate from ini files then
 	if (AreDBTablesEmpty())
 	{
@@ -1649,6 +1664,28 @@ bool cRankManager::IsPermissionInGroup(const AString & a_Permission, const AStri
 		LOGWARNING("%s: Failed to query DB: %s", __FUNCTION__, ex.what());
 	}
 	return false;
+}
+
+
+
+
+
+void cRankManager::NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try
+	{
+		SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET PlayerName = ? WHERE PlayerUUID = ?");
+		stmt.bind(1, a_PlayerName);
+		stmt.bind(2, a_UUID);
+		stmt.exec();
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to update DB: %s", __FUNCTION__, ex.what());
+	}
 }
 
 
