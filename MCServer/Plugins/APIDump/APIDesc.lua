@@ -942,24 +942,6 @@ cFile:Delete("/usr/bin/virus.exe");
 			Inherits = "cEntity",
 		},
 		
-		cGroup =
-		{
-			Desc = [[
-				This class represents a group {{cPlayer|players}} can be in. Groups define the permissions players
-				have, and optionally the color of their name in the chat.
-			]],
-			Functions =
-			{
-				SetName = { Return = "" },
-				GetName = { Return = "string" },
-				SetColor = { Return = "" },
-				GetColor = { Return = "string" },
-				AddCommand = { Return = "" },
-				AddPermission = { Return = "" },
-				InheritFrom = { Return = "" },
-			},
-		},  -- cGroup
-
 		cIniFile =
 		{
 			Desc = [[
@@ -1760,7 +1742,6 @@ a_Player:OpenWindow(Window);
 			Functions =
 			{
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
-				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
 				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
@@ -1770,7 +1751,7 @@ a_Player:OpenWindow(Window);
 				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
 				ForceSetSpeed = { Params = "{{Vector3d|Direction}}", Notes = "Forces the player to move to the given direction." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
-				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
+				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code." },
 				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
 				GetEffectiveGameMode = { Params = "", Return = "{{Globals#GameMode|GameMode}}", Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead." },
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
@@ -1784,7 +1765,6 @@ a_Player:OpenWindow(Window);
 				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
 				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
 				GetGameMode = { Return = "{{Globals#GameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
-				GetGroups = { Return = "array-table of {{cGroup}}", Notes = "Returns all the groups that this player is member of, as a table. The groups are stored in the array part of the table, beginning with index 1."},
 				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
 				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
 				GetMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status." },
@@ -1807,15 +1787,13 @@ a_Player:OpenWindow(Window);
 				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
 				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world." },
-				IsInGroup = { Params = "GroupNameString", Return = "bool", Notes = "Returns true if the player is a member of the specified group." },
 				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the player is on ground (not falling, not jumping, not flying)" },
 				IsSatiated = { Params = "", Return = "bool", Notes = "Returns true if the player is satiated (cannot eat)." },
 				IsVisible = { Params = "", Return = "bool", Notes = "Returns true if the player is visible to other players" },
-				LoadPermissionsFromDisk = { Params = "", Return = "", Notes = "Reloads the player's permissions from the disk. This loses any temporary changes made to the player's groups." },
+				LoadRank = { Params = "", Return = "", Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank." },
 				MoveTo = { Params = "{{Vector3d|NewPosition}}", Return = "Tries to move the player into the specified position." },
 				MoveToWorld = { Params = "WorldName", Return = "bool", Return = "Moves the player to the specified world. Returns true if successful." },
 				OpenWindow = { Params = "{{cWindow|Window}}", Return = "", Notes = "Opens the specified UI window for the player." },
-				RemoveFromGroup = { Params = "GroupName", Return = "", Notes = "Temporarily removes the player from the specified group. This change is lost when the player disconnects." },
 				Respawn = { Params = "", Return = "", Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet." },
 				SendMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player." },
 				SendMessageFailure = { Params = "Message", Return = "", Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For a command that failed to run because of insufficient permissions, etc." },
@@ -2088,7 +2066,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
 				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
 				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
-				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
 				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
