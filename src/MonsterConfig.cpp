@@ -90,10 +90,10 @@ void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Na
 	{
 		if (itr->m_Name.compare(a_Name) == 0)
 		{
-			a_Monster->SetAttackDamage (itr->m_AttackDamage);
-			a_Monster->SetAttackRange  (itr->m_AttackRange);
-			a_Monster->SetSightDistance(itr->m_SightDistance);
-			a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
+			// a_Monster->SetAttackDamage (itr->m_AttackDamage);
+			// a_Monster->SetAttackRange  (itr->m_AttackRange);
+			// a_Monster->SetSightDistance(itr->m_SightDistance);
+			// a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
 			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
 			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
 			return;
