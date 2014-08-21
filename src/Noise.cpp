@@ -146,6 +146,8 @@ cCubicCell2D::cCubicCell2D(
 ) :
 	m_Noise(a_Noise),
 	m_WorkRnds(&m_Workspace1),
+	m_CurFloorX(0),
+	m_CurFloorY(0),
 	m_Array(a_Array),
 	m_SizeX(a_SizeX),
 	m_SizeY(a_SizeY),
@@ -300,6 +302,9 @@ cCubicCell3D::cCubicCell3D(
 ) :
 	m_Noise(a_Noise),
 	m_WorkRnds(&m_Workspace1),
+	m_CurFloorX(0),
+	m_CurFloorY(0),
+	m_CurFloorZ(0),
 	m_Array(a_Array),
 	m_SizeX(a_SizeX),
 	m_SizeY(a_SizeY),

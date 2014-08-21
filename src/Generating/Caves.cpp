@@ -166,6 +166,9 @@ cCaveTunnel::cCaveTunnel(
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
 		// Don't bother detailing this cave, it's under the world anyway
+		m_MinBlockX = m_MaxBlockX = 0;
+		m_MinBlockY = m_MaxBlockY = -1;
+		m_MinBlockZ = m_MaxBlockZ = 0;
 		return;
 	}
 

@@ -117,7 +117,9 @@ cServer::cServer(void) :
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
 	m_TickThread(*this),
-	m_ShouldAuthenticate(false)
+	m_ShouldAuthenticate(false),
+	m_ShouldLoadOfflinePlayerData(false),
+	m_ShouldLoadNamedPlayerData(true)
 {
 }
 
