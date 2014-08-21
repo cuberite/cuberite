@@ -36,7 +36,34 @@ SET (SRCS
 	Wither.cpp
 	Wolf.cpp
 	Zombie.cpp
-	ZombiePigman.cpp)
+	ZombiePigman.cpp
+	NewBat.cpp
+	NewBlaze.cpp
+	NewCaveSpider.cpp
+	NewChicken.cpp
+	NewCow.cpp
+	NewCreeper.cpp
+	NewEnderDragon.cpp
+	NewEnderman.cpp
+	NewGhast.cpp
+	NewGiant.cpp
+	NewHorse.cpp
+	NewIronGolem.cpp
+	NewMagmaCube.cpp
+	NewMooshroom.cpp
+	NewPig.cpp
+	NewSheep.cpp
+	NewSkeleton.cpp
+	NewSlime.cpp
+	NewSnowGolem.cpp
+	NewSpider.cpp
+	NewSquid.cpp
+	NewVillager.cpp
+	NewWitch.cpp
+	NewWither.cpp
+	NewWolf.cpp
+	NewZombie.cpp
+	NewZombiePigman.cpp)
 	
 SET (HDRS
 	AggressiveMonster.h
@@ -73,7 +100,36 @@ SET (HDRS
 	Wither.h
 	Wolf.h
 	Zombie.h
-	ZombiePigman.h)
+	ZombiePigman.h
+	NewBat.h
+	NewBlaze.h
+	NewCaveSpider.h
+	NewChicken.h
+	NewCow.h
+	NewCreeper.h
+	NewEnderDragon.h
+	NewEnderman.h
+	NewGhast.h
+	NewGiant.h
+	NewHorse.h
+	NewIronGolem.h
+	NewMagmaCube.h
+	NewMooshroom.h
+	NewOcelot.h
+	NewPig.h
+	NewSheep.h
+	NewSilverfish.h
+	NewSkeleton.h
+	NewSlime.h
+	NewSnowGolem.h
+	NewSpider.h
+	NewSquid.h
+	NewVillager.h
+	NewWitch.h
+	NewWither.h
+	NewWolf.h
+	NewZombie.h
+	NewZombiePigman.h)
 
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
