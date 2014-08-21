@@ -717,6 +717,35 @@ static int tolua_cRankManager_RemovePermissionFromGroup(lua_State * L)
 
 
 
+/** Binds cRankManager::RemovePlayerRank */
+static int tolua_cRankManager_RemovePlayerRank(lua_State * L)
+{
+	// function signature:
+	// cRankManager:RemovePlayerRank(PlayerUUID)
+	
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString PlayerUUID;
+	S.GetStackValue(2, PlayerUUID);
+	
+	// Remove the player's rank:
+	cRoot::Get()->GetRankManager().RemovePlayerRank(PlayerUUID);
+	return 0;
+}
+
+
+
+
+
 /** Binds cRankManager::RemoveRank */
 static int tolua_cRankManager_RemoveRank(lua_State * L)
 {
@@ -900,6 +929,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "RemoveGroup",               tolua_cRankManager_RemoveGroup);
 		tolua_function(tolua_S, "RemoveGroupFromRank",       tolua_cRankManager_RemoveGroupFromRank);
 		tolua_function(tolua_S, "RemovePermissionFromGroup", tolua_cRankManager_RemovePermissionFromGroup);
+		tolua_function(tolua_S, "RemovePlayerRank",          tolua_cRankManager_RemovePlayerRank);
 		tolua_function(tolua_S, "RemoveRank",                tolua_cRankManager_RemoveRank);
 		tolua_function(tolua_S, "RenameGroup",               tolua_cRankManager_RenameGroup);
 		tolua_function(tolua_S, "RenameRank",                tolua_cRankManager_RenameRank);

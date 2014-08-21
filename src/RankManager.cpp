@@ -1424,6 +1424,29 @@ void cRankManager::SetPlayerRank(const AString & a_PlayerUUID, const AString & a
 
 
 
+void cRankManager::RemovePlayerRank(const AString & a_PlayerUUID)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try
+	{
+		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank WHERE PlayerUUID = ?");
+		stmt.bind(1, a_PlayerUUID);
+		stmt.exec();
+	}
+	catch(const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove rank from player UUID %s: %s",
+			__FUNCTION__, a_PlayerUUID.c_str(), ex.what()
+		);
+	}
+}
+
+
+
+
+
 void cRankManager::SetRankVisuals(
 	const AString & a_RankName,
 	const AString & a_MsgPrefix,

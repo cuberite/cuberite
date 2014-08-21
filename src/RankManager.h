@@ -155,6 +155,12 @@ public:
 	cPlayer instances manually.
 	The PlayerName is provided for reference, so that GetRankPlayerNames() can work. */
 	void SetPlayerRank(const AString & a_PlayerUUID, const AString & a_PlayerName, const AString & a_RankName);
+
+	/** Removes the player's rank assignment. The player is left without a rank.
+	Note that this doesn't change the cPlayer instances for the already connected players, you need to update
+	all the instances manually.
+	No action if the player has no rank assigned to them already. */
+	void RemovePlayerRank(const AString & a_PlayerUUID);
 	
 	/** Sets the message visuals of an existing rank. No action if the rank name is not found. */
 	void SetRankVisuals(
