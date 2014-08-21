@@ -7,7 +7,7 @@ protected:
 	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
 	cEntity * m_Target;
 public:
-	cAIAggressiveComponent(cNewMonster * a_Monster);
+	cAIAggressiveComponent(cMonster * a_Monster);
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	

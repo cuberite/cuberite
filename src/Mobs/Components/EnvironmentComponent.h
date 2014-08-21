@@ -1,15 +1,15 @@
 #pragma once
 
-class cNewMonster;
+class cMonster;
 class cEntity;
 class cChunk;
 
 class cEnvironmentComponent
 {
 protected:
-	cNewMonster * m_Self;
+	cMonster * m_Self;
 public:
-	cEnvironmentComponent(cNewMonster * a_Entity);
+	cEnvironmentComponent(cMonster * a_Entity);
 	virtual ~cEnvironmentComponent(){}
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk){}

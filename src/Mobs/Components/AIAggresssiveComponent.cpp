@@ -3,10 +3,10 @@
 #include "AIAggressiveComponent.h"
 #include <iostream>
 
-#include "../NewMonster.h"
+#include "../Monster.h"
 
 
-cAIAggressiveComponent::cAIAggressiveComponent(cNewMonster * a_Monster) : cAIComponent(a_Monster), m_Target(NULL){}
+cAIAggressiveComponent::cAIAggressiveComponent(cMonster * a_Monster) : cAIComponent(a_Monster), m_Target(NULL){}
 
 void cAIAggressiveComponent::Tick(float a_Dt, cChunk & a_Chunk)
 {

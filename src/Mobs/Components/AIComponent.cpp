@@ -1,5 +1,5 @@
 #include "Globals.h"
 #include "AIComponent.h"
-#include "../NewMonster.h"
+#include "../Monster.h"
 
-cAIComponent::cAIComponent(cNewMonster * a_Entity) : m_Self(a_Entity){}
+cAIComponent::cAIComponent(cMonster * a_Entity) : m_Self(a_Entity){}
