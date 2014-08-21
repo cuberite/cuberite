@@ -106,7 +106,6 @@ public:
 	void SetCanPickUpLoot(bool a_Looting) {}
 
 	// Static Functions
-	// tolua_begin
 	
 	/// Translates MobType enum to a string, empty string if unknown
 	static AString MobTypeToString(eType a_MobType);
@@ -119,8 +118,6 @@ public:
 
 	/// Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family
 	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
-
-	// tolua_end
 	
 	/** Creates a new object of the specified mob.
 	a_MobType is the type of the mob to be created
