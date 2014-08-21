@@ -5,7 +5,6 @@ project (MCServer)
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
-	AggressiveMonster.cpp
 	Bat.cpp
 	Blaze.cpp
 	CaveSpider.cpp
@@ -20,10 +19,7 @@ SET (SRCS
 	IronGolem.cpp
 	MagmaCube.cpp
 	Monster.cpp
-	NewMonster.cpp
 	Mooshroom.cpp
-	PassiveAggressiveMonster.cpp
-	PassiveMonster.cpp
 	Pig.cpp
 	Sheep.cpp
 	Skeleton.cpp
@@ -36,37 +32,9 @@ SET (SRCS
 	Wither.cpp
 	Wolf.cpp
 	Zombie.cpp
-	ZombiePigman.cpp
-	NewBat.cpp
-	NewBlaze.cpp
-	NewCaveSpider.cpp
-	NewChicken.cpp
-	NewCow.cpp
-	NewCreeper.cpp
-	NewEnderDragon.cpp
-	NewEnderman.cpp
-	NewGhast.cpp
-	NewGiant.cpp
-	NewHorse.cpp
-	NewIronGolem.cpp
-	NewMagmaCube.cpp
-	NewMooshroom.cpp
-	NewPig.cpp
-	NewSheep.cpp
-	NewSkeleton.cpp
-	NewSlime.cpp
-	NewSnowGolem.cpp
-	NewSpider.cpp
-	NewSquid.cpp
-	NewVillager.cpp
-	NewWitch.cpp
-	NewWither.cpp
-	NewWolf.cpp
-	NewZombie.cpp
-	NewZombiePigman.cpp)
+	ZombiePigman.cpp)
 	
 SET (HDRS
-	AggressiveMonster.h
 	Bat.h
 	Blaze.h
 	CaveSpider.h
@@ -82,11 +50,8 @@ SET (HDRS
 	IronGolem.h
 	MagmaCube.h
 	Monster.h
-	NewMonster.h
 	Mooshroom.h
 	Ocelot.h
-	PassiveAggressiveMonster.h
-	PassiveMonster.h
 	Pig.h
 	Sheep.h
 	Silverfish.h
@@ -100,36 +65,7 @@ SET (HDRS
 	Wither.h
 	Wolf.h
 	Zombie.h
-	ZombiePigman.h
-	NewBat.h
-	NewBlaze.h
-	NewCaveSpider.h
-	NewChicken.h
-	NewCow.h
-	NewCreeper.h
-	NewEnderDragon.h
-	NewEnderman.h
-	NewGhast.h
-	NewGiant.h
-	NewHorse.h
-	NewIronGolem.h
-	NewMagmaCube.h
-	NewMooshroom.h
-	NewOcelot.h
-	NewPig.h
-	NewSheep.h
-	NewSilverfish.h
-	NewSkeleton.h
-	NewSlime.h
-	NewSnowGolem.h
-	NewSpider.h
-	NewSquid.h
-	NewVillager.h
-	NewWitch.h
-	NewWither.h
-	NewWolf.h
-	NewZombie.h
-	NewZombiePigman.h)
+	ZombiePigman.h)
 
 if(NOT MSVC)
 	add_library(Mobs ${SRCS} ${HDRS})
