@@ -1978,7 +1978,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 		}
 
 		cFastRandom Random;
-		if (Random.NextInt(100) <= chance)
+		if (Random.NextInt(101) <= chance)
 		{
 			return;
 		}
