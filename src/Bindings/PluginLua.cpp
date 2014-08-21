@@ -842,7 +842,7 @@ bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_MOVING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, &a_OldPosition, &a_NewPosition, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, a_OldPosition, a_NewPosition, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
