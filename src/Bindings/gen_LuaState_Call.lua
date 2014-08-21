@@ -54,9 +54,9 @@ local Combinations =
 	{9, 2},
 	
 	-- Special combinations:
+	{5, 5},
 	{7, 3},
 	{8, 3},
-	{5, 5},
 	{9, 5},
 }
 
