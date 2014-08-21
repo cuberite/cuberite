@@ -309,6 +309,7 @@ if (NOT MSVC)
 		OSSupport HTTPServer Bindings Items Blocks
 		Protocol Generating Generating_Prefabs WorldStorage
 		Mobs Entities Simulator UI BlockEntities PolarSSL++
+		Components
 	)
 endif ()
 if (WIN32)
