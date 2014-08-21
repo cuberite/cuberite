@@ -13,7 +13,6 @@
 
 
 
-class cGroup;
 class cWindow;
 class cClientHandle;
 class cTeam;
