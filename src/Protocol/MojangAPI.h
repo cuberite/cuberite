@@ -38,8 +38,6 @@ public:
 	Returns true if all was successful, false on failure. */
 	static bool SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response);
 	
-	// tolua_begin
-	
 	/** Normalizes the given UUID to its short form (32 bytes, no dashes, lowercase).
 	Logs a warning and returns empty string if not a UUID.
 	Note: only checks the string's length, not the actual content. */
@@ -50,8 +48,6 @@ public:
 	Note: only checks the string's length, not the actual content. */
 	static AString MakeUUIDDashed(const AString & a_UUID);
 
-	// tolua_end
-	
 	/** Converts a player name into a UUID.
 	The UUID will be empty on error.
 	If a_UseOnlyCached is true, the function only consults the cached values.

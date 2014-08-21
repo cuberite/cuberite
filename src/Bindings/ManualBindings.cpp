@@ -2414,6 +2414,62 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 
 
 
+static int tolua_cMojangAPI_MakeUUIDDashed(lua_State * L)
+{
+	// Function signature: cMojangAPI:MakeUUIDDashed(UUID) -> string
+
+	// Check params:
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString UUID;
+	S.GetStackValue(2, UUID);
+
+	// Push the result:
+	S.Push(cRoot::Get()->GetMojangAPI().MakeUUIDDashed(UUID));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cMojangAPI_MakeUUIDShort(lua_State * L)
+{
+	// Function signature: cMojangAPI:MakeUUIDShort(UUID) -> string
+
+	// Check params:
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString UUID;
+	S.GetStackValue(2, UUID);
+
+	// Push the result:
+	S.Push(cRoot::Get()->GetMojangAPI().MakeUUIDShort(UUID));
+	return 1;
+}
+
+
+
+
+
 static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 {
 	tolua_Error tolua_err;
@@ -3355,6 +3411,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetPlayerNameFromUUID",      tolua_cMojangAPI_GetPlayerNameFromUUID);
 			tolua_function(tolua_S, "GetUUIDFromPlayerName",      tolua_cMojangAPI_GetUUIDFromPlayerName);
 			tolua_function(tolua_S, "GetUUIDsFromPlayerNames",    tolua_cMojangAPI_GetUUIDsFromPlayerNames);
+			tolua_function(tolua_S, "MakeUUIDDashed",             tolua_cMojangAPI_MakeUUIDDashed);
+			tolua_function(tolua_S, "MakeUUIDShort",              tolua_cMojangAPI_MakeUUIDShort);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cItemGrid");
