@@ -29,7 +29,6 @@
 class cChunkDataSerializer;
 class cInventory;
 class cMonster;
-class cNewMonster;
 class cPawn;
 class cExpOrb;
 class cPainting;
@@ -174,7 +173,6 @@ public:
 	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob            (const cMonster & a_Mob);
-	void SendSpawnMob            (const cNewMonster & a_Mob);
 	void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
 	void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
 	void SendStatistics          (const cStatManager & a_Manager);
