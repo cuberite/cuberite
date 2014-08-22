@@ -460,7 +460,43 @@ void cLuaState::Push(const Vector3d & a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3d");
+	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3<double>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const Vector3d * a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)a_Vector, "Vector3<double>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const Vector3i & a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3<int>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const Vector3i * a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)a_Vector, "Vector3<int>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -708,11 +744,11 @@ void cLuaState::Push(TakeDamageInfo * a_TDI)
 
 
 
-void cLuaState::Push(Vector3i * a_Vector)
+void cLuaState::Push(Vector3d * a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3i");
+	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<double>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -720,11 +756,11 @@ void cLuaState::Push(Vector3i * a_Vector)
 
 
 
-void cLuaState::Push(Vector3d * a_Vector)
+void cLuaState::Push(Vector3i * a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3d");
+	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<int>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
