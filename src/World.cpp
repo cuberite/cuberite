@@ -437,7 +437,7 @@ void cWorld::InitializeSpawn(void)
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
 	
-	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)
