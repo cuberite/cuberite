@@ -357,8 +357,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case cMonster::mtSilverfish:
 					{
 						a_TDI.RawDamage += 2.5 * BaneOfArthropodsLevel;
+						// TODO: Add slowness effect
+						
 						break;
-					}
+					};
+					default: break;
 				}
 			}
 		}
@@ -390,8 +393,27 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					default: StartBurning(BurnTicks * 20);
 				}
 			}
+		}
 
-			
+		int ThornsLevel = 0;
+		cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+		{
+			cItem Item = ArmorItems[i];
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchThorns) > ThornsLevel) ThornsLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchThorns);
+		}
+
+		if (ThornsLevel > 0)
+		{
+			int Chance = ThornsLevel * 15;
+
+			cFastRandom Random;
+			int RandomValue = Random.GenerateRandomInteger(0, 100);
+
+			if (RandomValue <= Chance)
+			{
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.GenerateRandomInteger(1, 4), 0);
+			}
 		}
 	
 		if (!Player->IsOnGround())
@@ -405,6 +427,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
 	}
+
 	if (IsPlayer()){
 		double TotalEPF = 0.0;
 		double EPFProtection = 0.00;
@@ -413,65 +436,39 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		double EPFProjectileProtection = 0.00;
 		double EPFFeatherFalling = 0.00;
 
-		cEnchantments ChestplateEnchantments = GetEquippedChestplate().m_Enchantments;
-		cEnchantments LeggingsEnchantments = GetEquippedLeggings().m_Enchantments;
-		cEnchantments BootsEnchantments = GetEquippedBoots().m_Enchantments;
-		cEnchantments HelmetEnchantments = GetEquippedHelmet().m_Enchantments;
-
-		if ((ChestplateEnchantments.GetLevel(cEnchantments::enchProtection) > 0) || (LeggingsEnchantments.GetLevel(cEnchantments::enchProtection) > 0)
-			|| (BootsEnchantments.GetLevel(cEnchantments::enchProtection) > 0) || (HelmetEnchantments.GetLevel(cEnchantments::enchProtection) > 0))
+		cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
-			EPFProtection += (6 + pow(ChestplateEnchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
-			EPFProtection += (6 + pow(LeggingsEnchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
-			EPFProtection += (6 + pow(BootsEnchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
-			EPFProtection += (6 + pow(HelmetEnchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
+			cItem Item = ArmorItems[i];
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchProtection) > 0)
+			{
+				EPFProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
+			}
 
-			TotalEPF += EPFProtection;
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection) > 0)
+			{
+				EPFFireProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0)
+			{
+				EPFFeatherFalling += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection) > 0)
+			{
+				EPFBlastProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0)
+			{
+				EPFProjectileProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
+			}
+
 		}
 
-		if ((ChestplateEnchantments.GetLevel(cEnchantments::enchFireProtection) > 0) || (LeggingsEnchantments.GetLevel(cEnchantments::enchFireProtection) > 0)
-			|| (BootsEnchantments.GetLevel(cEnchantments::enchFireProtection) > 0) || (HelmetEnchantments.GetLevel(cEnchantments::enchFireProtection) > 0))
-		{
-			EPFFireProtection += (6 + pow(ChestplateEnchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
-			EPFFireProtection += (6 + pow(LeggingsEnchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
-			EPFFireProtection += (6 + pow(BootsEnchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
-			EPFFireProtection += (6 + pow(HelmetEnchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
-			
-			TotalEPF += EPFFireProtection;
-		}
-
-		if ((ChestplateEnchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0) || (LeggingsEnchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0)
-			|| (BootsEnchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0) || (HelmetEnchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0))
-		{
-			EPFFeatherFalling += (6 + pow(ChestplateEnchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
-			EPFFeatherFalling += (6 + pow(LeggingsEnchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
-			EPFFeatherFalling += (6 + pow(BootsEnchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
-			EPFFeatherFalling += (6 + pow(HelmetEnchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
-
-			TotalEPF += EPFFeatherFalling;
-		}
-
-		if ((ChestplateEnchantments.GetLevel(cEnchantments::enchBlastProtection) > 0) || (LeggingsEnchantments.GetLevel(cEnchantments::enchBlastProtection) > 0)
-			|| (BootsEnchantments.GetLevel(cEnchantments::enchBlastProtection) > 0) || (HelmetEnchantments.GetLevel(cEnchantments::enchBlastProtection) > 0))
-		{
-			EPFBlastProtection += (6 + pow(ChestplateEnchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
-			EPFBlastProtection += (6 + pow(LeggingsEnchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
-			EPFBlastProtection += (6 + pow(BootsEnchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
-			EPFBlastProtection += (6 + pow(HelmetEnchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
-
-			TotalEPF += EPFBlastProtection;
-		}
-
-		if ((ChestplateEnchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0) || (LeggingsEnchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0)
-			|| (BootsEnchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0) || (HelmetEnchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0))
-		{
-			EPFProjectileProtection += (6 + pow(ChestplateEnchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
-			EPFProjectileProtection += (6 + pow(LeggingsEnchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
-			EPFProjectileProtection += (6 + pow(BootsEnchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
-			EPFProjectileProtection += (6 + pow(HelmetEnchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
-
-			TotalEPF += EPFProjectileProtection;
-		}
+		TotalEPF = EPFProtection + EPFFireProtection + EPFFeatherFalling + EPFBlastProtection + EPFProjectileProtection;
+		
 
 		EPFProtection = EPFProtection / TotalEPF;
 		EPFFireProtection = EPFFireProtection / TotalEPF;
@@ -482,10 +479,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		if (TotalEPF > 25) TotalEPF = 25;
 
 		cFastRandom Random;
-		float randomvalue;
-		randomvalue = Random.GenerateRandomInteger(50, 100) * 0.01;
+		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01;
 
-		TotalEPF = ceil(TotalEPF * randomvalue);
+		TotalEPF = ceil(TotalEPF * RandomValue);
 
 		if (TotalEPF > 20) TotalEPF = 20;
 
@@ -507,8 +503,12 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (a_TDI.DamageType == dtProjectile) RemovedDamage += ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
 
+		if (a_TDI.FinalDamage < RemovedDamage) RemovedDamage = 0;
+
 		a_TDI.FinalDamage -= RemovedDamage;
 	}
+
+
 
 	m_Health -= (short)a_TDI.FinalDamage;
 	
@@ -533,7 +533,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			case 2: AdditionalSpeed.Set(8, 0.3, 8); break;
 			default: break;
 		}
-		SetSpeed(a_TDI.Knockback + AdditionalSpeed);
+		AddSpeed(a_TDI.Knockback + AdditionalSpeed);
 	}
 
 	m_World->BroadcastEntityStatus(*this, esGenericHurt);
@@ -1435,11 +1435,18 @@ void cEntity::HandleAir(void)
 	// See if the entity is /submerged/ water (block above is water)
 	// Get the type of block the entity is standing in:
 
+	int RespirationLevel = GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration);
+
 	if (IsSubmerged())
 	{
 		if (!IsPlayer())  // Players control themselves
 		{
 			SetSpeedY(1);  // Float in the water
+		}
+
+		if (RespirationLevel > 0)
+		{
+			((cPawn *)this)->AddEntityEffect(cEntityEffect::effNightVision, 200, 5, 0);
 		}
 
 		if (m_AirLevel <= 0)
@@ -1468,6 +1475,12 @@ void cEntity::HandleAir(void)
 		// Set the air back to maximum
 		m_AirLevel = MAX_AIR_LEVEL;
 		m_AirTickTimer = DROWNING_TICKS;
+
+		if (RespirationLevel > 0)
+		{
+			m_AirTickTimer = DROWNING_TICKS + (RespirationLevel * 15 * 20);
+		}
+
 	}
 }
 

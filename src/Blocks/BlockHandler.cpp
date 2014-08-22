@@ -433,7 +433,6 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		else
 		{
 			// TODO: Add a proper overridable function for this
-			// Pickups.Add(m_BlockType, 1, Meta);
 			cEnchantments Enchantments = a_Digger->GetEquippedWeapon().m_Enchantments;
 			if ((Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0) && a_Digger->IsPlayer())
 			{
