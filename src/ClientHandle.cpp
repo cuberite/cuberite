@@ -922,11 +922,16 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		return;
 	}
 
-	// Check for clickthrough-blocks:
-	/* When the user breaks a fire block, the client send the wrong block location.
-	We must find the right block with the face direction. */
-	if (a_BlockFace != BLOCK_FACE_NONE)
+	if ((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED))
 	{
+		if (a_BlockFace == BLOCK_FACE_NONE)
+		{
+			return;
+		}
+
+		/* Check for clickthrough-blocks:
+		When the user breaks a fire block, the client send the wrong block location.
+		We must find the right block with the face direction. */
 		int BlockX = a_BlockX;
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
@@ -937,17 +942,16 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			a_BlockY = BlockY;
 			a_BlockZ = BlockZ;
 		}
-	}
 
-	if (
-		((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED)) &&  // Only do a radius check for block destruction - things like pickup tossing send coordinates that are to be ignored
-		((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
-	)
-	{
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
+		if (
+			((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
+		)
+		{
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			return;
+		}
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
