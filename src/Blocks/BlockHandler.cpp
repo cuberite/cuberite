@@ -45,13 +45,11 @@
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
 #include "BlockLilypad.h"
-#include "BlockNewLeaves.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
-#include "BlockNote.h"
 #include "BlockOre.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
@@ -251,9 +249,9 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
 		case E_BLOCK_NETHER_WART:           return new cBlockNetherWartHandler      (a_BlockType);
 		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_NEW_LEAVES:            return new cBlockNewLeavesHandler       (a_BlockType);
+		case E_BLOCK_NEW_LEAVES:            return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
-		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
+		case E_BLOCK_NOTE_BLOCK:            return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler;
 		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);

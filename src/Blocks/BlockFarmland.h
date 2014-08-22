@@ -54,10 +54,7 @@ public:
 			BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
 			for (size_t i = 0; i < NumBlocks; i++)
 			{
-				if (
-					(BlockTypes[i] == E_BLOCK_WATER) ||
-					(BlockTypes[i] == E_BLOCK_STATIONARY_WATER)
-				)
+				if (IsBlockWater(BlockTypes[i]))
 				{
 					Found = true;
 					break;

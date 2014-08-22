@@ -193,8 +193,6 @@ private:
 	cRankManager       m_RankManager;
 	cHTTPServer        m_HTTPServer;
 
-	cMCLogger *      m_Log;
-
 	bool m_bStop;
 	bool m_bRestart;
 

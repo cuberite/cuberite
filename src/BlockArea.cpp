@@ -1764,7 +1764,9 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 cBlockArea::cChunkReader::cChunkReader(cBlockArea & a_Area) :
 	m_Area(a_Area),
-	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z)
+	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z),
+	m_CurrentChunkX(0),
+	m_CurrentChunkZ(0)
 {
 }
 

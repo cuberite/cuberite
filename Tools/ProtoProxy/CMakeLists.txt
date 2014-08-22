@@ -34,20 +34,18 @@ set_exe_flags()
 set(SHARED_SRC
 	../../src/ByteBuffer.cpp
 	../../src/StringUtils.cpp
-	../../src/Log.cpp
-	../../src/MCLogger.cpp
 	../../src/PolarSSL++/AesCfb128Decryptor.cpp
 	../../src/PolarSSL++/AesCfb128Encryptor.cpp
 	../../src/PolarSSL++/CryptoKey.cpp
 	../../src/PolarSSL++/CtrDrbgContext.cpp
 	../../src/PolarSSL++/EntropyContext.cpp
 	../../src/PolarSSL++/RsaPrivateKey.cpp
+	../../src/LoggerListeners.cpp
+	../../src/Logger.cpp
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h
 	../../src/StringUtils.h
-	../../src/Log.h
-	../../src/MCLogger.h
 	../../src/PolarSSL++/AesCfb128Decryptor.h
 	../../src/PolarSSL++/AesCfb128Encryptor.h
 	../../src/PolarSSL++/CryptoKey.h

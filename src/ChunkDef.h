@@ -419,7 +419,7 @@ public:
 	X   Data;
 	
 	cCoordWithData(int a_X, int a_Y, int a_Z) :
-		x(a_X), y(a_Y), z(a_Z)
+		x(a_X), y(a_Y), z(a_Z), Data()
 	{
 	}
 	

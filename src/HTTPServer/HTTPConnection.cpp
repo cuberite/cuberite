@@ -15,7 +15,8 @@
 cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 	m_HTTPServer(a_HTTPServer),
 	m_State(wcsRecvHeaders),
-	m_CurrentRequest(NULL)
+	m_CurrentRequest(NULL),
+	m_CurrentRequestBodyRemaining(0)
 {
 	// LOGD("HTTP: New connection at %p", this);
 }

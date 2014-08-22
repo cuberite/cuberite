@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -250,8 +251,38 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
 	m_SkyDarkness(0),
+	m_GameMode(gmNotSet),
+	m_bEnabledPVP(false),
+	m_IsDeepSnowEnabled(false),
+	m_ShouldLavaSpawnFire(true),
+	m_VillagersShouldHarvestCrops(true),
+	m_SimulatorManager(NULL),
+	m_SandSimulator(NULL),
+	m_WaterSimulator(NULL),
+	m_LavaSimulator(NULL),
+	m_FireSimulator(NULL),
+	m_RedstoneSimulator(NULL),
+	m_MaxPlayers(10),
+	m_ChunkMap(NULL),
+	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_MaxCactusHeight(3),
+	m_MaxSugarcaneHeight(4),
+	m_IsCactusBonemealable(false),
+	m_IsCarrotsBonemealable(true),
+	m_IsCropsBonemealable(true),
+	m_IsGrassBonemealable(true),
+	m_IsMelonStemBonemealable(true),
+	m_IsMelonBonemealable(true),
+	m_IsPotatoesBonemealable(true),
+	m_IsPumpkinStemBonemealable(true),
+	m_IsPumpkinBonemealable(true),
+	m_IsSaplingBonemealable(true),
+	m_IsSugarcaneBonemealable(false),
+	m_bCommandBlocksEnabled(true),
+	m_bUseChatPrefixes(false),
+	m_TNTShrapnelLevel(slNone),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -406,7 +437,7 @@ void cWorld::InitializeSpawn(void)
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
 	
-	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)

@@ -222,16 +222,24 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
+	bool CanMove = true;
 	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
-		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
+		{
+			CanMove = false;
+			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
+		}
 		m_ClientHandle->StreamChunks();
 	}
 
-	BroadcastMovementUpdate(m_ClientHandle);
+	if (CanMove)
+	{
+		BroadcastMovementUpdate(m_ClientHandle);
+	}
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -881,7 +889,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
 
-	m_Stats.AddValue(statItemsDropped, Pickups.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -1500,7 +1508,7 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
-	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
@@ -1685,6 +1693,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 bool cPlayer::SaveToDisk()
 {
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/"));  // Create the "players" folder, if it doesn't exist yet (#1268)
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
