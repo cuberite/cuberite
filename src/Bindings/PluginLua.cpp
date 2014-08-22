@@ -835,7 +835,7 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
