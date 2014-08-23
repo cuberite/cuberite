@@ -6,7 +6,6 @@ struct lua_State;
 
 
 
-
 /** Provides namespace for the bindings. */
 class ManualBindings
 {
