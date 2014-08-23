@@ -7,6 +7,7 @@
 #include "RankManager.h"
 #include "inifile/iniFile.h"
 #include "Protocol/MojangAPI.h"
+#include "ClientHandle.h"
 
 
 
@@ -54,6 +55,9 @@ public:
 		
 		LOGD("Setting ranks...");
 		SetRanks();
+
+		LOGD("Creating defaults...");
+		CreateDefaults();
 		
 		return true;
 	}
@@ -87,8 +91,11 @@ protected:
 		AString m_Name;
 		AStringVector m_Groups;
 		
-		/** Assigned by ResolveUserUUIDs() */
+		/** Assigned by ResolveUserUUIDs(), contains the online (Mojang) UUID of the player. */
 		AString m_UUID;
+
+		/** Assigned by ResolveUserUUIDs(), contains the offline (generated) UUID of the player. */
+		AString m_OfflineUUID;
 		
 		
 		sUser(void) {}
@@ -275,22 +282,15 @@ protected:
 		m_MojangAPI.GetUUIDsFromPlayerNames(PlayerNames);
 		
 		// Assign the UUIDs back to players, remove those not resolved:
-		for (sUserMap::iterator itr = m_Users.begin(); itr != m_Users.end(); )
+		for (sUserMap::iterator itr = m_Users.begin(); itr != m_Users.end(); ++itr)
 		{
 			AString UUID = m_MojangAPI.GetUUIDFromPlayerName(itr->second.m_Name);
 			if (UUID.empty())
 			{
-				LOGWARNING("RankMigrator: Cannot resolve player %s to UUID, player will be left unranked", itr->second.m_Name.c_str());
-				sUserMap::iterator itr2 = itr;
-				++itr2;
-				m_Users.erase(itr);
-				itr = itr2;
+				LOGWARNING("RankMigrator: Cannot resolve player %s to online UUID, player will be left unranked in online mode", itr->second.m_Name.c_str());
 			}
-			else
-			{
-				itr->second.m_UUID = UUID;
-				++itr;
-			}
+			itr->second.m_UUID = UUID;
+			itr->second.m_OfflineUUID = cClientHandle::GenerateOfflineUUID(itr->second.m_Name);
 		}
 	}
 	
@@ -350,9 +350,27 @@ protected:
 				AddGroupsToRank(Groups, RankName);
 			}
 			
-			// Set the rank to the user:
-			m_RankManager.SetPlayerRank(itr->second.m_UUID, itr->second.m_Name, RankName);
+			// Set the rank to the user, using both the online and offline UUIDs:
+			m_RankManager.SetPlayerRank(itr->second.m_UUID,        itr->second.m_Name, RankName);
+			m_RankManager.SetPlayerRank(itr->second.m_OfflineUUID, itr->second.m_Name, RankName);
 		}  // for itr - m_Users[]
+	}
+
+
+
+	/** Creates the Default rank that contains the Default group, if it exists.
+	Sets the RankManager's default rank. */
+	void CreateDefaults(void)
+	{
+		if (!m_RankManager.RankExists("Default"))
+		{
+			m_RankManager.AddRank("Default", "", "", "");
+			if (!m_RankManager.IsGroupInRank("Default", "Default"))
+			{
+				m_RankManager.AddGroupToRank("Default", "Default");
+			}
+		}
+		m_RankManager.SetDefaultRank("Default");
 	}
 };
 
@@ -396,6 +414,7 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PermGroup (PermGroupID INTEGER PRIMARY KEY, Name)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermGroup (RankID INTEGER, PermGroupID INTEGER)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PermissionItem (PermGroupID INTEGER, Permission)");
+	m_DB.exec("CREATE TABLE IF NOT EXISTS DefaultRank (RankID INTEGER)");
 	
 	m_IsInitialized = true;
 	
@@ -410,12 +429,39 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 		if (Migrator.Migrate())
 		{
 			LOGINFO("Ranks migrated.");
+			// The default rank has been set by the migrator
 			return;
 		}
+
+		// Migration failed. Add some defaults
+		LOGINFO("Rank migration failed, creating default ranks...");
+		CreateDefaults();
+		LOGINFO("Default ranks created.");
 	}
 	
-	// Migration failed.
-	// TODO: Check if tables empty, add some defaults then
+	// Load the default rank:
+	try
+	{
+		SQLite::Statement stmt(m_DB,
+			"SELECT Rank.Name FROM Rank "
+			"LEFT JOIN DefaultRank ON Rank.RankID = DefaultRank.RankID"
+		);
+		if (stmt.executeStep())
+		{
+			m_DefaultRank = stmt.getColumn(0).getText();
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Cannot load default rank: %s", __FUNCTION__, ex.what());
+		return;
+	}
+
+	// If the default rank cannot be loaded, use the first rank:
+	if (m_DefaultRank.empty())
+	{
+		SetDefaultRank(GetAllRanks()[0]);
+	}
 }
 
 
@@ -1085,6 +1131,13 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
+
+	// Check if the default rank is being removed with a proper replacement:
+	if ((a_RankName == m_DefaultRank) && !RankExists(a_ReplacementRankName))
+	{
+		LOGWARNING("%s: Cannot remove rank %s, it is the default rank and the replacement rank doesn't exist.", __FUNCTION__, a_RankName.c_str());
+		return;
+	}
 	
 	AStringVector res;
 	try
@@ -1142,6 +1195,12 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 			SQLite::Statement stmt(m_DB, "DELETE FROM Rank WHERE RankID = ?");
 			stmt.bind(1, RemoveRankID);
 			stmt.exec();
+		}
+
+		// Update the default rank, if it was the one being removed:
+		if (a_RankName == m_DefaultRank)
+		{
+			m_DefaultRank = a_RankName;
 		}
 	}
 	catch (const SQLite::Exception & ex)
@@ -1310,21 +1369,30 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 			stmt.bind(1, a_NewName);
 			if (stmt.executeStep())
 			{
-				LOGD("%s: Rank %s is already present, cannot rename %s", __FUNCTION__, a_NewName.c_str(), a_OldName.c_str());
+				LOGINFO("%s: Rank %s is already present, cannot rename %s", __FUNCTION__, a_NewName.c_str(), a_OldName.c_str());
 				return false;
 			}
 		}
 		
 		// Rename:
-		bool res;
 		{
 			SQLite::Statement stmt(m_DB, "UPDATE Rank SET Name = ? WHERE Name = ?");
 			stmt.bind(1, a_NewName);
 			stmt.bind(2, a_OldName);
-			res = (stmt.exec() > 0);
+			if (stmt.exec() <= 0)
+			{
+				LOGINFO("%s: There is no rank %s, cannot rename to %s.", __FUNCTION__, a_OldName.c_str(), a_NewName.c_str());
+				return false;
+			}
 		}
 		
-		return res;
+		// Update the default rank, if it was the one being renamed:
+		if (a_OldName == m_DefaultRank)
+		{
+			m_DefaultRank = a_NewName;
+		}
+
+		return true;
 	}
 	catch (const SQLite::Exception & ex)
 	{
@@ -1692,6 +1760,57 @@ void cRankManager::NotifyNameUUID(const AString & a_PlayerName, const AString & 
 
 
 
+bool cRankManager::SetDefaultRank(const AString & a_RankName)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try
+	{
+		// Find the rank's ID:
+		int RankID = 0;
+		{
+			SQLite::Statement stmt(m_DB, "SELECT RankID FROM Rank WHERE Name = ?");
+			stmt.bind(1, a_RankName);
+			if (!stmt.executeStep())
+			{
+				LOGINFO("%s: Cannot set rank %s as the default, it does not exist.", __FUNCTION__, a_RankName.c_str());
+				return false;
+			}
+		}
+
+		// Set the rank as the default:
+		{
+			SQLite::Statement stmt(m_DB, "UPDATE DefaultRank SET RankID = ?");
+			stmt.bind(1, RankID);
+			if (stmt.exec() < 1)
+			{
+				// Failed to update, there might be none in the DB, try inserting:
+				SQLite::Statement stmt2(m_DB, "INSERT INTO DefaultRank (RankID) VALUES (?)");
+				stmt2.bind(1, RankID);
+				if (stmt2.exec() < 1)
+				{
+					LOGINFO("%s: Cannot update the default rank in the DB to %s.", __FUNCTION__, a_RankName.c_str());
+					return false;
+				}
+			}
+		}
+
+		// Set the internal cache:
+		m_DefaultRank = a_RankName;
+		return true;
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to update DB: %s", __FUNCTION__, ex.what());
+		return false;
+	}
+}
+
+
+
+
+
 bool cRankManager::AreDBTablesEmpty(void)
 {
 	return (
@@ -1699,7 +1818,8 @@ bool cRankManager::AreDBTablesEmpty(void)
 		IsDBTableEmpty("PlayerRank") &&
 		IsDBTableEmpty("PermGroup") &&
 		IsDBTableEmpty("RankPermGroup") &&
-		IsDBTableEmpty("PermissionItem")
+		IsDBTableEmpty("PermissionItem") &&
+		IsDBTableEmpty("DefaultRank")
 	);
 }
 
@@ -1719,6 +1839,44 @@ bool cRankManager::IsDBTableEmpty(const AString & a_TableName)
 		LOGWARNING("%s: Failed to query DB: %s", __FUNCTION__, ex.what());
 	}
 	return false;
+}
+
+
+
+
+
+void cRankManager::CreateDefaults(void)
+{
+	// Wrap everything in a big transaction to speed things up:
+	cMassChangeLock Lock(*this);
+
+	// Create ranks:
+	AddRank("Default",  "", "", "");
+	AddRank("VIP",      "", "", "");
+	AddRank("Operator", "", "", "");
+	AddRank("Admin",    "", "", "");
+
+	// Create groups:
+	AddGroup("Default");
+	AddGroup("Kick");
+	AddGroup("Teleport");
+	AddGroup("Everything");
+
+	// Add groups to ranks:
+	AddGroupToRank("Default",    "Default");
+	AddGroupToRank("Teleport",   "VIP");
+	AddGroupToRank("Teleport",   "Operator");
+	AddGroupToRank("Kick",       "Operator");
+	AddGroupToRank("Everything", "Admin");
+
+	// Add permissions to groups:
+	AddPermissionToGroup("core.build", "Default");
+	AddPermissionToGroup("core.tp",    "Teleport");
+	AddPermissionToGroup("core.kick",  "Kick");
+	AddPermissionToGroup("*",          "Everything");
+
+	// Set the default rank:
+	SetDefaultRank("Default");
 }
 
 

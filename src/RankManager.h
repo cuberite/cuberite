@@ -127,7 +127,9 @@ public:
 	/** Removes the specified rank.
 	All players assigned to that rank will be re-assigned to a_ReplacementRankName.
 	If a_ReplacementRankName is empty or not a valid rank, the player will be removed from the DB,
-	which means they will receive the default rank the next time they are queried. */
+	which means they will receive the default rank the next time they are queried.
+	If the rank being removed is the default rank, the default will be changed to the replacement
+	rank; the operation fails if there's no replacement. */
 	void RemoveRank(const AString & a_RankName, const AString & a_ReplacementRankName);
 	
 	/** Removes the specified group completely.
@@ -143,6 +145,7 @@ public:
 	
 	/** Renames the specified rank. No action if the rank name is not found.
 	Fails if the new name is already used.
+	Updates the cached m_DefaultRank if the default rank is being renamed.
 	Returns true on success, false on failure. */
 	bool RenameRank(const AString & a_OldName, const AString & a_NewName);
 	
@@ -198,13 +201,23 @@ public:
 	
 	/** Called by cMojangAPI whenever the playername-uuid pairing is discovered. Updates the DB. */
 	void NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID);
-	
+
+	/** Sets the specified rank as the default rank.
+	Returns true on success, false on failure (rank not found). */
+	bool SetDefaultRank(const AString & a_RankName);
+
+	/** Returns the name of the default rank. */
+	const AString & GetDefaultRank(void) const { return m_DefaultRank; }
+
 protected:
 
 	/** The database storage for all the data. Protected by m_CS. */
 	SQLite::Database m_DB;
 	
-	/** The mutex protecting m_DB against multi-threaded access. */
+	/** The name of the default rank. Kept as a cache so that queries for it don't need to go through the DB. */
+	AString m_DefaultRank;
+
+	/** The mutex protecting m_DB and m_DefaultRank against multi-threaded access. */
 	cCriticalSection m_CS;
 	
 	/** Set to true once the manager is initialized. */
@@ -221,6 +234,9 @@ protected:
 	/** Returns true iff the specified DB table is empty.
 	If there's an error while querying, returns false. */
 	bool IsDBTableEmpty(const AString & a_TableName);
+
+	/** Creates a default set of ranks / groups / permissions. */
+	void CreateDefaults(void);
 } ;
 
 
