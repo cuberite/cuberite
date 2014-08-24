@@ -534,34 +534,12 @@ AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 
 AStringVector cRankManager::GetPlayerPermissions(const AString & a_PlayerUUID)
 {
-	ASSERT(m_IsInitialized);
-	cCSLock Lock(m_CS);
-	
-	AStringVector res;
-	try
+	AString Rank = GetPlayerRankName(a_PlayerUUID);
+	if (Rank.empty())
 	{
-		// Prepare the DB statement:
-		SQLite::Statement stmt(m_DB,
-			"SELECT DISTINCT(PermissionItem.Permission) FROM PermissionItem "
-				"LEFT JOIN RankPermGroup "
-					"ON PermissionItem.PermGroupID = RankPermGroup.PermGroupID "
-				"LEFT JOIN PlayerRank "
-					"ON PlayerRank.RankID = RankPermGroup.RankID "
-			"WHERE PlayerRank.PlayerUUID = ?"
-		);
-		stmt.bind(1, a_PlayerUUID);
-		
-		// Execute and get results:
-		while (stmt.executeStep())
-		{
-			res.push_back(stmt.getColumn(0).getText());
-		}
+		Rank = m_DefaultRank;
 	}
-	catch (const SQLite::Exception & ex)
-	{
-		LOGWARNING("%s: Cannot get player permissions: %s", __FUNCTION__, ex.what());
-	}
-	return res;
+	return GetRankPermissions(Rank);
 }
 
 
@@ -742,39 +720,16 @@ bool cRankManager::GetPlayerMsgVisuals(
 	AString & a_MsgNameColorCode
 )
 {
-	ASSERT(m_IsInitialized);
-	cCSLock Lock(m_CS);
-	
-	AStringVector res;
-	try
+	AString Rank = GetPlayerRankName(a_PlayerUUID);
+	if (Rank.empty())
 	{
-		SQLite::Statement stmt(m_DB,
-			"SELECT Rank.MsgPrefix, Rank.MsgSuffix, Rank.MsgNameColorCode FROM Rank "
-				"LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID "
-			"WHERE PlayerRank.PlayerUUID = ?"
-		);
-		stmt.bind(1, a_PlayerUUID);
-		if (!stmt.executeStep())
-		{
-			LOGD("%s: Player UUID %s not found in the DB, returning empty values.", __FUNCTION__, a_PlayerUUID.c_str());
-			a_MsgPrefix.clear();
-			a_MsgSuffix.clear();
-			a_MsgNameColorCode.clear();
-			return false;
-		}
-		a_MsgPrefix = stmt.getColumn(0).getText();
-		a_MsgSuffix = stmt.getColumn(1).getText();
-		a_MsgNameColorCode = stmt.getColumn(2).getText();
-		return true;
+		// Rank not found, return failure:
+		a_MsgPrefix.clear();
+		a_MsgSuffix.clear();
+		a_MsgNameColorCode.clear();
+		return false;
 	}
-	catch (const SQLite::Exception & ex)
-	{
-		LOGWARNING("%s: Failed to get ranks from DB: %s. Returning empty values.", __FUNCTION__, ex.what());
-	}
-	a_MsgPrefix.clear();
-	a_MsgSuffix.clear();
-	a_MsgNameColorCode.clear();
-	return false;
+	return GetRankVisuals(Rank, a_MsgPrefix, a_MsgSuffix, a_MsgNameColorCode);
 }
 
 

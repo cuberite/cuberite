@@ -56,13 +56,15 @@ public:
 	The a_MojangAPI param is used when migrating from old ini files, to look up player UUIDs. */
 	void Initialize(cMojangAPI & a_MojangAPI);
 	
-	/** Returns the name of the rank that the specified player has assigned to them. */
+	/** Returns the name of the rank that the specified player has assigned to them.
+	If the player has no rank assigned, returns an empty string (NOT the default rank). */
 	AString GetPlayerRankName(const AString & a_PlayerUUID);
 	
 	/** Returns the names of Groups that the specified player has assigned to them. */
 	AStringVector GetPlayerGroups(const AString & a_PlayerUUID);
 	
-	/** Returns the permissions that the specified player has assigned to them. */
+	/** Returns the permissions that the specified player has assigned to them.
+	If the player has no rank assigned to them, returns the default rank's permissions. */
 	AStringVector GetPlayerPermissions(const AString & a_PlayerUUID);
 	
 	/** Returns the names of groups that the specified rank has assigned to it.

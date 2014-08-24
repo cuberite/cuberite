@@ -2051,8 +2051,12 @@ void cPlayer::LoadRank(void)
 	// Load the values from cRankManager:
 	cRankManager & RankMgr = cRoot::Get()->GetRankManager();
 	m_Rank = RankMgr.GetPlayerRankName(m_UUID);
+	if (m_Rank.empty())
+	{
+		m_Rank = RankMgr.GetDefaultRank();
+	}
 	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
-	RankMgr.GetPlayerMsgVisuals(m_UUID, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
 
 	// Break up the individual permissions on each dot, into m_SplitPermissions:
 	m_SplitPermissions.clear();
