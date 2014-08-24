@@ -615,14 +615,14 @@ bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const 
 
 
 
-bool cPluginLua::OnPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_WeightedEnchantment, cItem & a_item, int a_levels)
+bool cPluginLua::OnPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_PossibleEnchantments, cItem & a_item)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PRE_ENCHANTING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, &a_WeightedEnchantment, &a_item, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_PossibleEnchantments, &a_item, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -635,14 +635,14 @@ bool cPluginLua::OnPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_We
 
 
 
-bool cPluginLua::OnPostEnchanting(cPlayer & a_Player, cEnchantments & a_Enchantment, cItem & a_item, int a_levels)
+bool cPluginLua::OnPostEnchanting(cPlayer & a_Player, cEnchantments & a_EnchantmentsChosen, cItem & a_item, int a_levels)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_POST_ENCHANTING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, &a_Enchantment, &a_item, a_levels, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_EnchantmentsChosen, &a_item, a_levels, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
