@@ -210,6 +210,30 @@ static int tolua_cRankManager_GetAllRanks(lua_State * L)
 
 
 
+/** Binds cRankManager::GetDefaultRank */
+static int tolua_cRankManager_GetDefaultRank(lua_State * L)
+{
+	// Function signature:
+	// cRankManager:GetDefaultRank() -> string
+	
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	// Return the rank name:
+	S.Push(cRoot::Get()->GetRankManager().GetDefaultRank());
+	return 1;
+}
+
+
+
+
+
 /** Binds cRankManager::GetGroupPermissions */
 static int tolua_cRankManager_GetGroupPermissions(lua_State * L)
 {
@@ -849,6 +873,35 @@ static int tolua_cRankManager_RenameRank(lua_State * L)
 
 
 
+/** Binds cRankManager::SetDefaultRank */
+static int tolua_cRankManager_SetDefaultRank(lua_State * L)
+{
+	// Function signature:
+	// cRankManager:SetDefaultRank(RankName) -> bool
+	
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString RankName;
+	S.GetStackValue(2, RankName);
+	
+	// Set the rank, return the result:
+	S.Push(cRoot::Get()->GetRankManager().SetDefaultRank(RankName));
+	return 0;
+}
+
+
+
+
+
 /** Binds cRankManager::SetPlayerRank */
 static int tolua_cRankManager_SetPlayerRank(lua_State * L)
 {
@@ -922,6 +975,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "GetAllGroups",              tolua_cRankManager_GetAllGroups);
 		tolua_function(tolua_S, "GetAllPermissions",         tolua_cRankManager_GetAllPermissions);
 		tolua_function(tolua_S, "GetAllRanks",               tolua_cRankManager_GetAllRanks);
+		tolua_function(tolua_S, "GetDefaultRank",            tolua_cRankManager_GetDefaultRank);
 		tolua_function(tolua_S, "GetGroupPermissions",       tolua_cRankManager_GetGroupPermissions);
 		tolua_function(tolua_S, "GetPlayerGroups",           tolua_cRankManager_GetPlayerGroups);
 		tolua_function(tolua_S, "GetPlayerMsgVisuals",       tolua_cRankManager_GetPlayerMsgVisuals);
@@ -942,6 +996,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "RemoveRank",                tolua_cRankManager_RemoveRank);
 		tolua_function(tolua_S, "RenameGroup",               tolua_cRankManager_RenameGroup);
 		tolua_function(tolua_S, "RenameRank",                tolua_cRankManager_RenameRank);
+		tolua_function(tolua_S, "SetDefaultRank",            tolua_cRankManager_SetDefaultRank);
 		tolua_function(tolua_S, "SetPlayerRank",             tolua_cRankManager_SetPlayerRank);
 		tolua_function(tolua_S, "SetRankVisuals",            tolua_cRankManager_SetRankVisuals);
 	tolua_endmodule(tolua_S);

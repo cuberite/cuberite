@@ -2003,7 +2003,13 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				<p>
 				Permissions are added to individual groups. Each group can support unlimited permissions. Note that
 				adding a permission to a group will make the permission available to all the ranks that contain that
-				permission group.
+				permission group.</p>
+				<p>
+				One rank is reserved as the Default rank. All players that don't have an explicit rank assigned to them
+				will behave as if assigned to this rank. The default rank can be changed to any other rank at any time.
+				Note that the default rank cannot be removed from the RankManager - RemoveRank() will change the default
+				rank to the replacement rank, if specified, and fail if no replacement rank is specified. Renaming the
+				default rank using RenameRank() will change the default rank to the new name.
 			]],
 			Functions =
 			{
@@ -2014,11 +2020,12 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetAllGroups = { Params = "", Return = "array-table of groups' names", Notes = "Returns an array-table containing the names of all the groups that are known to the manager." },
 				GetAllPermissions = { Params = "", Return = "array-table of permissions", Notes = "Returns an array-table containing all the permissions that are known to the manager." },
 				GetAllRanks = { Params = "", Return = "array-table of ranks' names", Notes = "Returns an array-table containing the names of all the ranks that are known to the manager." },
+				GetDefaultRank = { Params = "", Return = "string", Notes = "Returns the name of the default rank. " },
 				GetGroupPermissions = { Params = "GroupName", Return = "array-table of permissions", Notes = "Returns an array-table containing the permissions that the specified group contains." },
 				GetPlayerGroups = { Params = "PlayerUUID", Return = "array-table of groups' names", Notes = "Returns an array-table of the names of the groups that are assigned to the specified player through their rank. Returns an empty table if the player is not known or has no rank or groups assigned to them." },
-				GetPlayerMsgVisuals = { Params = "PlayerUUID", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals assigned to the player. If the player is not known or has no rank assigned, doesn't return any value." },
-				GetPlayerPermissions = { Params = "PlayerUUID", Return = "array-table of permissions", Notes = "Returns the permissions that the specified player is assigned through their rank. Returns an empty table if the player is not known." },
-				GetPlayerRankName = { Params = "PlayerUUID", Return = "RankName", Notes = "Returns the name of the rank that is assigned to the specified player. An empty string is returned if the player has no rank assigned to them." },
+				GetPlayerMsgVisuals = { Params = "PlayerUUID", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals assigned to the player. If the player is not explicitly assigned a rank, the default rank's visuals are returned. If there is an error, no value is returned at all." },
+				GetPlayerPermissions = { Params = "PlayerUUID", Return = "array-table of permissions", Notes = "Returns the permissions that the specified player is assigned through their rank. Returns the default rank's permissions if the player has no explicit rank assigned to them. Returns an empty array on error." },
+				GetPlayerRankName = { Params = "PlayerUUID", Return = "RankName", Notes = "Returns the name of the rank that is assigned to the specified player. An empty string (NOT the default rank) is returned if the player has no rank assigned to them." },
 				GetRankGroups = { Params = "RankName", Return = "array-table of groups' names", Notes = "Returns an array-table of the names of all the groups that are assigned to the specified rank. Returns an empty table if there is no such rank." },
 				GetRankPermissions = { Params = "RankName", Return = "array-table of permissions", Notes = "Returns an array-table of all the permissions that are assigned to the specified rank through its groups. Returns an empty table if there is no such rank." },
 				GetRankVisuals = { Params = "RankName", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals for the specified rank. Returns no value if the specified rank does not exist." },
@@ -2032,8 +2039,9 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				RemovePermissionFromGroup = { Params = "Permission, GroupName", Return = "", Notes = "Removes the specified permission from the specified group. Logs an info message and does nothing if the group doesn't exist." },
 				RemovePlayerRank = { Params = "PlayerUUID", Return = "", Notes = "Removes the player's rank; the player's left without a rank. Note that this doesn't change the {{cPlayer}} instances for the already connected players, you need to update all the instances manually. No action if the player has no rank assigned to them already." },
 				RemoveRank = { Params = "RankName, [ReplacementRankName]", Return = "", Notes = "Removes the specified rank. If ReplacementRankName is given, the players that have RankName will get their rank set to ReplacementRankName. If it isn't given, or is an invalid rank, the players will be removed from the manager, their ranks will be unset completely. Logs an info message and does nothing if the rank is not found." },
-				RenameGroup = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified group. Logs an info message and does nothing if the group is not found." },
-				RenameRank = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified rank. Logs an info message and does nothing if the rank is not found." },
+				RenameGroup = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified group. Logs an info message and does nothing if the group is not found or the new name is already used." },
+				RenameRank = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified rank. Logs an info message and does nothing if the rank is not found or the new name is already used." },
+				SetDefaultRank = { Params = "RankName", Return = "bool", Notes = "Sets the specified rank as the default rank. Returns true on success, false on failure (rank doesn't exist)." },
 				SetPlayerRank = { Params = "PlayerUUID, PlayerName, RankName", Return = "", Notes = "Updates the rank for the specified player. The player name is provided for reference, the UUID is used for identification. Logs a warning and does nothing if the rank is not found." },
 				SetRankVisuals = { Params = "RankName, MsgPrefix, MsgSuffix, MsgNameColorCode", Return = "", Notes = "Updates the rank's message visuals. Logs an info message and does nothing if rank not found." },
 			},
