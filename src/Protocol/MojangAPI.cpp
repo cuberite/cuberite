@@ -675,7 +675,7 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 		// Also cache the UUIDToName:
 		{
 			cCSLock Lock(m_CSUUIDToName);
-			for (size_t idx = 0; idx < JsonCount; ++idx)
+			for (Json::Value::UInt idx = 0; idx < JsonCount; ++idx)
 			{
 				Json::Value & Val = root[idx];
 				AString JsonName = Val.get("name", "").asString();
