@@ -86,7 +86,7 @@ private:
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 
-	/** cIsThread /*override*/: */
+	/** cIsThread override: */
 	virtual void Execute(void) /*override*/;
 
 	/** Returns true if the user authenticated okay, false on error

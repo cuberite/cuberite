@@ -371,7 +371,7 @@ public:
 	
 	// tolua_end
 
-	/** Descendants /*override*/ this function to send a command to the specified client to spawn the entity on the client.
+	/** Descendants override this function to send a command to the specified client to spawn the entity on the client.
 	To spawn on all eligible clients, use cChunkMap::BroadcastSpawnEntity()
 	*/
 	virtual void SpawnOn(cClientHandle & a_Client) = 0;
@@ -530,7 +530,7 @@ protected:
 	int m_TicksSinceLastVoidDamage;
 	
 	/** Does the actual speed-setting. The default implementation just sets the member variable value;
-	/*override*/s can provide further processing, such as forcing players to move at the given speed. */
+	overrides can provide further processing, such as forcing players to move at the given speed. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed

@@ -101,7 +101,7 @@ public:
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 	
 	/** Called on each tick.
-	By default increases the m_Ticks, descendants may /*override*/ to provide additional processing. */
+	By default increases the m_Ticks, descendants may override to provide additional processing. */
 	virtual void OnTick(cPawn & a_Target);
 	
 	/** Called when the effect is first added to an entity */

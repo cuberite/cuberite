@@ -27,7 +27,7 @@ Each structure thus contains the coords of its grid center (m_GridX, m_GridZ) an
 which it's built (m_OriginX, m_OriginZ).
 
 This class provides a cache for the structures generated for successive chunks and manages that cache. It
-also provides the cFinishGen /*override*/ that uses the cache to actually generate the structure into chunk data.
+also provides the cFinishGen override that uses the cache to actually generate the structure into chunk data.
 
 After generating each chunk the cache is checked for size, each item in the cache has a cost associated with
 it and the cache is trimmed (from its least-recently-used end) so that the sum of the cost in the cache is
@@ -39,7 +39,7 @@ a structure at the specific grid cell.
 
 The descendant must use a specific cStructure descendant to provide the actual structure that gets generated.
 The structure must provide the DrawIntoChunk() function that generates the structure into the chunk data, and
-can /*override*/ the GetCacheCost() function that returns the cost of that structure in the cache.
+can override the GetCacheCost() function that returns the cost of that structure in the cache.
 */
 class cGridStructGen :
 	public cFinishGen

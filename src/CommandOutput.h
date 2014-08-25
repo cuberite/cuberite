@@ -9,7 +9,7 @@
 
 /** Interface for a callback that receives command output
 The Out() function is called for any output the command has produced.
-Descendants /*override*/ that function to provide specific processing of the output.
+Descendants override that function to provide specific processing of the output.
 */
 class cCommandOutputCallback
 {
