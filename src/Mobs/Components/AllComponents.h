@@ -4,3 +4,5 @@
 #include "AttackComponent.h"
 #include "EnvironmentComponent.h"
 #include "MovementComponent.h"
+
+#include "AIAggressiveComponent.h"
