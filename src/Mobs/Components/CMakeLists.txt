@@ -5,12 +5,14 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	AIComponent.cpp
+	AIAggressiveComponent.cpp
 	AttackComponent.cpp
 	EnvironmentComponent.cpp
 	MovementComponent.cpp)
 
 SET (HDRS
 	AIComponent.h
+	AIAggressiveComponent.h
 	AttackComponent.h
 	EnvironmentComponent.h
 	MovementComponent.h)
