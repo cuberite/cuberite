@@ -69,6 +69,11 @@ public:
 
 protected:
 	eType  m_MobType;
+
+	cAIComponent * m_AI;
+	cAttackComponent * m_Attack;
+	cEnvironmentComponent * m_Environment;
+	cMovementComponent * m_Movement;
 public:
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
@@ -77,6 +82,12 @@ public:
 	virtual bool IsBaby    (void) const { return false; }
 	virtual bool IsTame    (void) const { return false; }
 	virtual bool IsUndead  (void) const { return false; }
+
+	// Get Functions
+	cAIComponent & GetAIComponent() { return *m_AI; }
+	cAttackComponent & GetAttackComponent() { return *m_Attack; }
+	cEnvironmentComponent & GetEnvironmentComponent() { return *m_Environment; }
+	cMovementComponent & GetMovementComponent() { return *m_Movement; }
 
 	// Get Functions - Temporary
 
@@ -145,11 +156,6 @@ protected:
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;
-
-	cAIComponent * m_AI;
-	cAttackComponent * m_Attack;
-	cEnvironmentComponent * m_Environment;
-	cMovementComponent * m_Movement;
 
 	// Temporary placement till I figure out where to put it
 	float m_DropChanceWeapon;
