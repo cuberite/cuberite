@@ -87,10 +87,10 @@ public:
 	float   GetDropChanceChestplate() { return m_DropChanceChestplate; }
 	float   GetDropChanceLeggings() { return m_DropChanceLeggings; }
 	float   GetDropChanceWeapon() { return m_DropChanceWeapon; }
-	// tolua_begin
+	
 	eType  GetMobType() const { return m_MobType; }
 	eFamily GetMobFamily() { return mfPassive; }
-	// tolua_end
+	
 
 	// Set Functions - Temporary
 	void    SetDropChanceBoots(float a_Chance) {  m_DropChanceBoots = a_Chance; }

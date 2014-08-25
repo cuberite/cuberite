@@ -3,10 +3,18 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-file(GLOB SOURCE
-    "*.cpp"
-    "*.h"
-)
+SET (SRCS
+	AIComponent.cpp
+	AttackComponent.cpp
+	EnvironmentComponent.cpp
+	MovementComponent.cpp)
+
+SET (HDRS
+	AIComponent.h
+	AttackComponent.h
+	EnvironmentComponent.h
+	MovementComponent.h)
+
 if(NOT MSVC)
-	add_library(Components ${SOURCE})
+	add_library(Components ${SRCS} ${HDRS})
 endif()
