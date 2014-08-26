@@ -34,8 +34,6 @@ SET (SRCS
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
-	Group.cpp
-	GroupManager.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
@@ -53,6 +51,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	Noise.cpp
 	ProbabDistrib.cpp
+	RankManager.cpp
 	RCONServer.cpp
 	Root.cpp
 	Scoreboard.cpp
@@ -98,8 +97,6 @@ SET (HDRS
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
-	Group.h
-	GroupManager.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
@@ -122,6 +119,7 @@ SET (HDRS
 	MonsterConfig.h
 	Noise.h
 	ProbabDistrib.h
+	RankManager.h
 	RCONServer.h
 	Root.h
 	Scoreboard.h
