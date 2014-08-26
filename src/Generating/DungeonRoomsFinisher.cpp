@@ -114,18 +114,10 @@ protected:
 			{
 				for (int x = RelStartX; x < RelEndX; x++)
 				{
-					switch (a_ChunkDesc.GetBlockType(x, y, z))
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
 					{
-						case E_BLOCK_STONE:
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						case E_BLOCK_GRAVEL:
-						case E_BLOCK_SAND:
-						{
-							a_ChunkDesc.SetBlockType(x, y, z, a_DstBlockType);
-							break;
-						}
-					}  // switch (GetBlockType)
+						a_ChunkDesc.SetBlockType(x, y, z, a_DstBlockType);
+					}
 				}  // for x
 			}  // for z
 		}  // for z
