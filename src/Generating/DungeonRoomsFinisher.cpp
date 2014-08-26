@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "DungeonRoomsFinisher.h"
+#include "../FastRandom.h"
 
 
 
@@ -125,6 +126,35 @@ protected:
 
 
 
+	/** Fills the specified area of blocks in the chunk with a random pattern of the specified blocktypes, if they are one of the overwritten block types.
+	The coords are absolute, start coords are inclusive, end coords are exclusive. The first blocktype uses 75% chance, the second 25% chance. */
+	void ReplaceCuboidRandom(cChunkDesc & a_ChunkDesc, int a_StartX, int a_StartY, int a_StartZ, int a_EndX, int a_EndY, int a_EndZ, BLOCKTYPE a_DstBlockType1, BLOCKTYPE a_DstBlockType2)
+	{
+		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+		int RelStartX = Clamp(a_StartX - BlockX, 0, cChunkDef::Width - 1);
+		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width - 1);
+		int RelEndX   = Clamp(a_EndX - BlockX,   0, cChunkDef::Width);
+		int RelEndZ   = Clamp(a_EndZ - BlockZ,   0, cChunkDef::Width);
+		cFastRandom rnd;
+		for (int y = a_StartY; y < a_EndY; y++)
+		{
+			for (int z = RelStartZ; z < RelEndZ; z++)
+			{
+				for (int x = RelStartX; x < RelEndX; x++)
+				{
+					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					{
+						BLOCKTYPE BlockType = (rnd.NextInt(101) < 75) ? a_DstBlockType1 : a_DstBlockType2;
+						a_ChunkDesc.SetBlockType(x, y, z, BlockType);
+					}
+				}  // for x
+			}  // for z
+		}  // for z
+	}
+
+
+
 	/** Tries to place a chest at the specified (absolute) coords.
 	Does nothing if the coords are outside the chunk. */
 	void TryPlaceChest(cChunkDesc & a_ChunkDesc, const Vector3i & a_Chest)
@@ -160,8 +190,9 @@ protected:
 		}
 		int b = m_FloorHeight + 1;  // Bottom
 		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
-		ReplaceCuboid(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE);  // Floor
+		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
 		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, E_BLOCK_AIR);  // Insides
+		// Walls:
 		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_StartX + 1, t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XM wall
 		ReplaceCuboid(a_ChunkDesc, m_EndX,   b, m_StartZ, m_EndX + 1,   t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XP wall
 		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_EndX + 1,   t, m_StartZ + 1, E_BLOCK_COBBLESTONE);  // ZM wall
