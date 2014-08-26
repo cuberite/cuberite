@@ -45,7 +45,7 @@ if %outputdir%n == n (
 
 
 
-::Create the output directory, if it didn't exist
+:: Create the output directory, if it didn't exist
 mkdir %outputdir%
 
 
@@ -60,7 +60,7 @@ if errorlevel 1 goto haderror
 
 :: Launch the application via the profiler
 %pt%\vsperfcmd /launch:%app%
-if errorlevel 1 goto haderror
+if errorlevel 1 goto haderrorshutdown
 
 :: Shut down the profiler (this command waits, until the application is terminated)
 %pt%\vsperfcmd /shutdown
@@ -85,6 +85,10 @@ goto finished
 
 
 
+
+:haderrorshutdown
+echo An error was encountered, shutting down the profiler
+%pt%\vsperfcmd /shutdown
 
 :haderror
 echo An error was encountered
