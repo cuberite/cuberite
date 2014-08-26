@@ -87,10 +87,10 @@ public:
 	virtual bool IsUndead  (void) const { return false; }
 
 	// Get Functions
-	cAIComponent & GetAIComponent() { return *m_AI; }
-	cAttackComponent & GetAttackComponent() { return *m_Attack; }
-	cEnvironmentComponent & GetEnvironmentComponent() { return *m_Environment; }
-	cMovementComponent & GetMovementComponent() { return *m_Movement; }
+	cAIComponent * GetAIComponent() { return m_AI; }
+	cAttackComponent * GetAttackComponent() { return m_Attack; }
+	cEnvironmentComponent * GetEnvironmentComponent() { return m_Environment; }
+	cMovementComponent * GetMovementComponent() { return m_Movement; }
 
 	// Get Functions - Temporary
 

@@ -21,9 +21,9 @@ void cAIComponent::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_bMovingToDestination)
 	{
-		if (m_Self->GetEnvironmentComponent().GetOnGround() && m_Self->GetMovementComponent().DoesPosYRequireJump((int)floor(m_Destination.y)))
+		if (m_Self->GetEnvironmentComponent()->GetOnGround() && m_Self->GetMovementComponent()->DoesPosYRequireJump((int)floor(m_Destination.y)))
 		{
-			m_Self->GetEnvironmentComponent().SetOnGround(false);
+			m_Self->GetEnvironmentComponent()->SetOnGround(false);
 
 			// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
 			m_Self->AddPosY(1.2);  // Jump!!
@@ -35,7 +35,7 @@ void cAIComponent::Tick(float a_Dt, cChunk & a_Chunk)
 			Distance.y = 0;
 			Distance.Normalize();
 
-			if (m_Self->GetEnvironmentComponent().GetOnGround())
+			if (m_Self->GetEnvironmentComponent()->GetOnGround())
 			{
 				Distance *= 2.5f;
 			}
@@ -185,7 +185,7 @@ void cAIComponent::TickPathFinding()
 		BLOCKTYPE BlockAtY = m_Self->GetWorld()->GetBlock(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYP = m_Self->GetWorld()->GetBlock(gCrossCoords[i].x + PosX, PosY + 1, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYPP = m_Self->GetWorld()->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
-		int LowestY = m_Self->GetMovementComponent().FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
+		int LowestY = m_Self->GetMovementComponent()->FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtLowestY = m_Self->GetWorld()->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
 
 		if (
@@ -259,7 +259,7 @@ bool cAIComponent::IsMovingToTargetPosition()
 
 bool cAIComponent::ReachedFinalDestination()
 {
-	if ((m_Self->GetPosition() - m_FinalDestination).Length() <= m_Self->GetAttackComponent().GetAttackRange())
+	if ((m_Self->GetPosition() - m_FinalDestination).Length() <= m_Self->GetAttackComponent()->GetAttackRange())
 	{
 		return true;
 	}
@@ -321,9 +321,9 @@ void cAIComponent::InStateIdle(float a_Dt)
 		{
 			Vector3d Destination(m_Self->GetPosX() + Dist.x, 0, m_Self->GetPosZ() + Dist.z);
 
-			int NextHeight = m_Self->GetMovementComponent().FindFirstNonAirBlockPosition(Destination.x, Destination.z);
+			int NextHeight = m_Self->GetMovementComponent()->FindFirstNonAirBlockPosition(Destination.x, Destination.z);
 
-			if (m_Self->GetMovementComponent().IsNextYPosReachable(NextHeight))
+			if (m_Self->GetMovementComponent()->IsNextYPosReachable(NextHeight))
 			{
 				Destination.y = NextHeight;
 				MoveToPosition(Destination);
@@ -354,7 +354,7 @@ void cAIComponent::InStateEscaping(float a_Dt)
 	
 	if (m_Target != NULL)
 	{
-		int sight_distance = m_Self->GetEnvironmentComponent().GetSightDistance();
+		int sight_distance = m_Self->GetEnvironmentComponent()->GetSightDistance();
 		Vector3d newloc = m_Self->GetPosition();
 		newloc.x = (m_Target->GetPosition().x < newloc.x)? (newloc.x + sight_distance): (newloc.x - sight_distance);
 		newloc.z = (m_Target->GetPosition().z < newloc.z)? (newloc.z + sight_distance): (newloc.z - sight_distance);
