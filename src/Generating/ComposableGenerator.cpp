@@ -19,6 +19,7 @@
 
 #include "Caves.h"
 #include "DistortedHeightmap.h"
+#include "DungeonRoomsFinisher.h"
 #include "EndGen.h"
 #include "MineShafts.h"
 #include "NetherFortGen.h"
@@ -342,6 +343,13 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		{
 			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
 			m_FinishGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
+		}
+		else if (NoCaseCompare(*itr, "DungeonRooms") == 0)
+		{
+			int GridSize = a_IniFile.GetValueSetI("Generator", "DungeonRoomsGridSize", 48);
+			int MaxSize  = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMaxSize", 7);
+			int MinSize  = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
+			m_FinishGens.push_back(new cDungeonRoomsFinisher(*m_HeightGen, Seed, GridSize, MaxSize, MinSize));
 		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
