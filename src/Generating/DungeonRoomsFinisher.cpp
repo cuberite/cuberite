@@ -40,10 +40,22 @@ public:
 		m_EndX(a_OriginX + a_HalfSizeX),
 		m_StartZ(a_OriginZ - a_HalfSizeZ),
 		m_EndZ(a_OriginZ + a_HalfSizeZ),
-		m_FloorHeight(a_FloorHeight),
-		m_Chest1(SelectChestCoords(a_Noise, a_OriginX + 1, a_OriginZ)),
-		m_Chest2(SelectChestCoords(a_Noise, a_OriginX + 2, a_OriginZ))
+		m_FloorHeight(a_FloorHeight)
 	{
+		/*
+		Pick coords next to the wall for the chests.
+		This is done by indexing the possible coords, picking any one for the first chest
+		and then picking another position for the second chest that is not adjacent to the first pos
+		*/
+		int rnd = a_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 7;
+		int SizeX = m_EndX - m_StartX - 1;
+		int SizeZ = m_EndZ - m_StartZ - 1;
+		int NumPositions = 2 * SizeX + 2 * SizeZ;
+		int FirstChestPos = rnd % NumPositions;  // The corner positions are a bit more likely, but we don't mind
+		rnd = rnd / 512;
+		int SecondChestPos = (FirstChestPos + 2 + (rnd % (NumPositions - 3))) % NumPositions;
+		m_Chest1 = DecodeChestCoords(FirstChestPos,  SizeX, SizeZ);
+		m_Chest2 = DecodeChestCoords(SecondChestPos, SizeX, SizeZ);
 	}
 
 protected:
@@ -65,36 +77,29 @@ protected:
 
 
 
-	/** Selects the coords for the chest, using the noise and coords provided.
-	Assumes that the room XZ ranges are already assigned. */
-	Vector3i SelectChestCoords(cNoise & a_Noise, int a_X, int a_Z)
+	/** Decodes the position index along the room walls into a proper 2D position for a chest. */
+	Vector3i DecodeChestCoords(int a_PosIdx, int a_SizeX, int a_SizeZ)
 	{
-		// Pick a coord next to the wall:
-		int rnd = a_Noise.IntNoise2DInt(a_X, a_Z) / 7;
-		int SizeX = m_EndX - m_StartX - 1;
-		int SizeZ = m_EndZ - m_StartZ - 1;
-		rnd = rnd % (2 * SizeX + 2 * SizeZ);
-
-		if (rnd < SizeX)
+		if (a_PosIdx < a_SizeX)
 		{
 			// Return a coord on the ZM side of the room:
-			return Vector3i(m_StartX + rnd + 1, E_META_CHEST_FACING_ZP, m_StartZ + 1);
+			return Vector3i(m_StartX + a_PosIdx + 1, E_META_CHEST_FACING_ZP, m_StartZ + 1);
 		}
-		rnd -= SizeX;
-		if (rnd < SizeZ)
+		a_PosIdx -= a_SizeX;
+		if (a_PosIdx < a_SizeZ)
 		{
 			// Return a coord on the XP side of the room:
-			return Vector3i(m_EndX - 1, E_META_CHEST_FACING_XM, m_StartZ + rnd + 1);
+			return Vector3i(m_EndX - 1, E_META_CHEST_FACING_XM, m_StartZ + a_PosIdx + 1);
 		}
-		rnd -= SizeZ;
-		if (rnd < SizeX)
+		a_PosIdx -= a_SizeZ;
+		if (a_PosIdx < a_SizeX)
 		{
 			// Return a coord on the ZP side of the room:
-			return Vector3i(m_StartX + rnd + 1, E_META_CHEST_FACING_ZM, m_StartZ + 1);
+			return Vector3i(m_StartX + a_PosIdx + 1, E_META_CHEST_FACING_ZM, m_StartZ + 1);
 		}
-		rnd -= SizeX;
+		a_PosIdx -= a_SizeX;
 		// Return a coord on the XM side of the room:
-		return Vector3i(m_StartX + 1, E_META_CHEST_FACING_XP, m_StartZ + rnd + 1);
+		return Vector3i(m_StartX + 1, E_META_CHEST_FACING_XP, m_StartZ + a_PosIdx + 1);
 	}
 
 
