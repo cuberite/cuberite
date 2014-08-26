@@ -58,10 +58,11 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_MobType(a_MobType)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
+	, m_DestroyTimer(0.0f)
 {
-	m_AI = new cAIComponent(this);
+	m_AI = new cAIAggressiveComponent(this);
 	m_Attack = new cAttackComponent(this);
-	m_Environment = new cEnvironmentComponent(this);
+	m_Environment = new cEnvironmentComponent(this, 16);
 	m_Movement = new cMovementComponent(this);
 
 	// Temporary placement till I figure out where to put it
@@ -70,6 +71,27 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	m_DropChanceChestplate = 0.0f;
 	m_DropChanceLeggings = 0.0f;
 	m_DropChanceBoots = 0.0f;
+}
+
+void cMonster::Tick(float a_Dt, cChunk & a_Chunk) {
+	super::Tick(a_Dt, a_Chunk);
+
+	if (m_Health <= 0)
+	{
+		// The mob is dead, but we're still animating the "puff" they leave when they die
+		m_DestroyTimer += a_Dt / 1000;
+		if (m_DestroyTimer > 1)
+		{
+			Destroy(true);
+		}
+		return;
+	}
+
+	LOG("Monster Tick...");
+	m_AI->Tick(a_Dt, a_Chunk);
+	m_Attack->Tick(a_Dt, a_Chunk);
+	m_Environment->Tick(a_Dt, a_Chunk);
+	m_Movement->Tick(a_Dt, a_Chunk);
 }
 
 

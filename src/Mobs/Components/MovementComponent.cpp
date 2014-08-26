@@ -31,3 +31,20 @@ int cMovementComponent::FindFirstNonAirBlockPosition(double a_PosX, double a_Pos
 		return PosY;
 	}
 }
+
+
+
+
+
+bool cMovementComponent::IsNextYPosReachable(int a_PosY)
+{
+	return (
+		(a_PosY <= (int)floor(m_Self->GetPosY())) ||
+		DoesPosYRequireJump(a_PosY)
+		);
+}
+/** Returns if a monster can reach a given height by jumping */
+bool cMovementComponent::DoesPosYRequireJump(int a_PosY)
+{
+	return ((a_PosY > (int)floor(m_Self->GetPosY())) && (a_PosY == (int)floor(m_Self->GetPosY()) + 1));
+}

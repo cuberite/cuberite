@@ -76,7 +76,10 @@ protected:
 	cMovementComponent * m_Movement;
 public:
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	~cMonster() { delete m_AI; delete m_Attack; delete m_Environment; delete m_Movement;}
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
+
+	virtual void Tick(float a_Dt, cChunk & a_Chunk);
 
 	// Type Function
 	virtual bool IsBaby    (void) const { return false; }
@@ -167,4 +170,7 @@ protected:
 
 	AString m_OwnerName;
 	AString m_OwnerUUID;
+
+	
+	float m_DestroyTimer;
 };
