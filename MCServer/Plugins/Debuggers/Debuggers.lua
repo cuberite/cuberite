@@ -33,6 +33,7 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 	PM:AddHook(cPluginManager.HOOK_CHUNK_UNLOADING,              OnChunkUnloading);
 	PM:AddHook(cPluginManager.HOOK_WORLD_STARTED,                OnWorldStarted);
+	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
@@ -1540,6 +1541,18 @@ function OnWorldStarted(a_World)
 			a_World:SetChunkAlwaysTicked(0, 0, true)
 		end
 	)
+end
+
+
+
+
+
+function OnProjectileHitBlock(a_ProjectileEntity, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockHitPos)
+	-- This simple test is for testing issue #1326 - simply declaring this hook would crash the server upon call
+	LOG("Projectile hit block")
+	LOG("  Projectile EntityID: " .. a_ProjectileEntity:GetUniqueID())
+	LOG("  Block: {" .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. "}, face " .. a_BlockFace)
+	LOG("  HitPos: {" .. a_BlockHitPos.x .. ", " .. a_BlockHitPos.y .. ", " .. a_BlockHitPos.z .. "}")
 end
 
 
