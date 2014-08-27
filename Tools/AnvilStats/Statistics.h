@@ -76,6 +76,8 @@ protected:
 	
 	virtual bool OnEmptySection(unsigned char a_Y) override;
 	
+	virtual bool OnSectionsFinished(void) override { return false; }  // continue processing
+
 	virtual bool OnEntity(
 		const AString & a_EntityType,
 		double a_PosX, double a_PosY, double a_PosZ,
@@ -134,6 +136,7 @@ protected:
 	void SaveBiomeBlockTypes(void);
 	void SaveStatistics(void);
 	void SaveSpawners(void);
+	void SavePerHeightSpawners(void);
 } ;
 
 

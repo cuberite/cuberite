@@ -342,6 +342,8 @@ cStatisticsFactory::~cStatisticsFactory()
 	SaveBiomeBlockTypes();
 	LOG("    Spawners.xls");
 	SaveSpawners();
+	LOG("    PerHeightSpawners.xls");
+	SavePerHeightSpawners();
 }
 
 
@@ -429,7 +431,7 @@ void cStatisticsFactory::SavePerHeightBlockTypes(void)
 	}
 	
 	// Write header:
-	f.Printf("Blocks 0 - 127:\nHeight\t");
+	f.Printf("Blocks 0 - 127:\nHeight");
 	for (int i = 0; i < 128; i++)
 	{
 		f.Printf("\t%s(%d)", GetBlockTypeString(i), i);
@@ -442,14 +444,14 @@ void cStatisticsFactory::SavePerHeightBlockTypes(void)
 		f.Printf("%d", y);
 		for (int BlockType = 0; BlockType < 128; BlockType++)
 		{
-			f.Printf("\t%d", m_CombinedStats.m_PerHeightBlockCounts[y][BlockType]);
+			f.Printf("\t%llu", m_CombinedStats.m_PerHeightBlockCounts[y][BlockType]);
 		}  // for BlockType
 		f.Printf("\n");
 	}  // for y - height (0 - 127)
 	f.Printf("\n");
 
 	// Write second header:
-	f.Printf("Blocks 128 - 255:\nHeight\t");
+	f.Printf("Blocks 128 - 255:\nHeight");
 	for (int i = 128; i < 256; i++)
 	{
 		f.Printf("\t%s(%d)", GetBlockTypeString(i), i);
@@ -462,7 +464,7 @@ void cStatisticsFactory::SavePerHeightBlockTypes(void)
 		f.Printf("%d", y);
 		for (int BlockType = 128; BlockType < 256; BlockType++)
 		{
-			f.Printf("\t%d", m_CombinedStats.m_PerHeightBlockCounts[y][BlockType]);
+			f.Printf("\t%llu", m_CombinedStats.m_PerHeightBlockCounts[y][BlockType]);
 		}  // for BlockType
 		f.Printf("\n");
 	}  // for y - height (0 - 127)
@@ -592,6 +594,44 @@ void cStatisticsFactory::SaveSpawners(void)
 	for (int i = 0; i < entMax; i++)
 	{
 		f.Printf("%s\t%llu\t%0.4f\n", GetEntityTypeString((eEntityType)i), m_CombinedStats.m_SpawnerEntity[i], (double)(m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks);
+	}
+}
+
+
+
+
+
+void cStatisticsFactory::SavePerHeightSpawners(void)
+{
+	cFile f;
+	if (!f.Open("PerHeightSpawners.xls", cFile::fmWrite))
+	{
+		LOG("Cannot write to file PerHeightSpawners.xls. Statistics not written.");
+		return;
+	}
+	
+	// Write header:
+	f.Printf("Height\tTotal");
+	for (int i = 0; i < entMax; i++)
+	{
+		f.Printf("\t%s", GetEntityTypeString((eEntityType)i));
+	}
+	f.Printf("\n");
+
+	// Write individual lines:
+	for (int y = 0; y < 256; y++)
+	{
+		UInt64 Total = 0;
+		for (int i = 0; i < entMax; i++)
+		{
+			Total += m_CombinedStats.m_PerHeightSpawners[y][i];
+		}
+		f.Printf("%d\t%llu", y, Total);
+		for (int i = 0; i < entMax; i++)
+		{
+			f.Printf("\t%llu", m_CombinedStats.m_PerHeightSpawners[y][i]);
+		}
+		f.Printf("\n");
 	}
 }
 
