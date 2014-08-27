@@ -108,7 +108,7 @@ local g_ViolationPatterns =
 	
 	-- Check that all commas have spaces after them and not in front of them:
 	{" ,", "Extra space before a \",\""},
-	{",[^%s\"%%]", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
+	{",[^%s\"%%\']", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
 	
 	-- Check that opening braces are not at the end of a code line:
 	{"[^%s].-{\n?$", "Brace should be on a separate line"},
