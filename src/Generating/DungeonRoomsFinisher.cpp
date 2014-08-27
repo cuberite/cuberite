@@ -197,13 +197,28 @@ protected:
 		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
 		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
 		ReplaceCuboid(a_ChunkDesc, m_StartX + 1, b, m_StartZ + 1, m_EndX, t, m_EndZ, E_BLOCK_AIR);  // Insides
+
 		// Walls:
 		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_StartX + 1, t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XM wall
 		ReplaceCuboid(a_ChunkDesc, m_EndX,   b, m_StartZ, m_EndX + 1,   t, m_EndZ,       E_BLOCK_COBBLESTONE);  // XP wall
 		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_StartZ, m_EndX + 1,   t, m_StartZ + 1, E_BLOCK_COBBLESTONE);  // ZM wall
 		ReplaceCuboid(a_ChunkDesc, m_StartX, b, m_EndZ,   m_EndX + 1,   t, m_EndZ + 1,   E_BLOCK_COBBLESTONE);  // ZP wall
+
+		// Place chests:
 		TryPlaceChest(a_ChunkDesc, m_Chest1);
 		TryPlaceChest(a_ChunkDesc, m_Chest2);
+
+		// Place the spawner:
+		int CenterX = (m_StartX + m_EndX) / 2 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		int CenterZ = (m_StartZ + m_EndZ) / 2 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+		if (
+			(CenterX >= 0) && (CenterX < cChunkDef::Width) &&
+			(CenterZ >= 0) && (CenterZ < cChunkDef::Width)
+		)
+		{
+			a_ChunkDesc.SetBlockTypeMeta(CenterX, b, CenterZ, E_BLOCK_MOB_SPAWNER, 0);
+			// TODO: Set the spawned mob
+		}
 	}
 } ;
 
