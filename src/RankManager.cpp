@@ -125,7 +125,7 @@ protected:
 	
 	/** Maps lists of groups to rank names.
 	Each group list is either a simple "<Group>" if there's only one group,
-	or "<PrimaryGroup>,<FirstSecondaryGroup>,<SecondSecondaryGroup>...", where the secondary groups are
+	or "<PrimaryGroup>, <FirstSecondaryGroup>, <SecondSecondaryGroup>...", where the secondary groups are
 	lowercased and  alpha-sorted. This makes the group lists comparable for equivalence, simply by comparing
 	their string names.
 	The ranks are named "<Group>" for single-group players, and "AutoMigratedRank_N" for the composite ranks,
@@ -507,10 +507,8 @@ AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 		// Prepare the DB statement:
 		SQLite::Statement stmt(m_DB,
 			"SELECT PermGroup.Name FROM PermGroup "
-				"LEFT JOIN RankPermGroup "
-					"ON PermGroup.PermGroupID = RankPermGroup.PermGroupID "
-				"LEFT JOIN PlayerRank "
-					"ON PlayerRank.RankID = RankPermGroup.RankID "
+				"LEFT JOIN RankPermGroup ON PermGroup.PermGroupID = RankPermGroup.PermGroupID "
+				"LEFT JOIN PlayerRank ON PlayerRank.RankID = RankPermGroup.RankID "
 			"WHERE PlayerRank.PlayerUUID = ?"
 		);
 		stmt.bind(1, a_PlayerUUID);
@@ -1473,7 +1471,7 @@ void cRankManager::RemovePlayerRank(const AString & a_PlayerUUID)
 		stmt.bind(1, a_PlayerUUID);
 		stmt.exec();
 	}
-	catch(const SQLite::Exception & ex)
+	catch (const SQLite::Exception & ex)
 	{
 		LOGWARNING("%s: Failed to remove rank from player UUID %s: %s",
 			__FUNCTION__, a_PlayerUUID.c_str(), ex.what()
