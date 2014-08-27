@@ -2570,8 +2570,8 @@ World:ForEachEntity(
 						The following code snippet checks if the player holds a shovel.
 <pre class="prettyprint lang-lua">
 -- a_Player is a {{cPlayer}} object, possibly received as a hook param
-local HeldItem = a_Player:GetEquippedItem();
-if (cItemCategory:IsShovel(HeldItem.m_ItemType)) then
+local HeldItem = a_Player:GetEquippedItem()
+if (ItemCategory.IsShovel(HeldItem.m_ItemType)) then
 	-- It's a shovel
 end
 </pre>
