@@ -291,9 +291,6 @@ public:
 	/** Return the Value of a Property */
 	int GetPropertyValue(int a_Property);
 
-	/** Get the Position from the Enchantment Table */
-	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
-
 	cSlotArea * m_SlotArea;
 
 protected:

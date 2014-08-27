@@ -190,31 +190,23 @@ void cItem::FromJson(const Json::Value & a_Value)
 
 
 
-bool cItem::IsEnchantable(short item)
+bool cItem::IsEnchantable(short a_ItemType)
 {
-	if ((item >= 256) && (item <= 259))
+	if (ItemCategory::IsTool(a_ItemType) || ItemCategory::IsArmor(a_ItemType))
 	{
 		return true;
 	}
-	if ((item >= 267) && (item <= 279))
+
+	switch (a_ItemType)
 	{
-		return true;
-	}
-	if ((item >= 283) && (item <= 286))
-	{
-		return true;
-	}
-	if ((item >= 290) && (item <= 294))
-	{
-		return true;
-	}
-	if ((item >= 298) && (item <= 317))
-	{
-		return true;
-	}
-	if ((item == 346) || (item == 359) || (item == 261))
-	{
-		return true;
+		case E_ITEM_BOOK:
+		case E_ITEM_BOW:
+		case E_ITEM_CARROT_ON_STICK:
+		case E_ITEM_FISHING_ROD:
+		case E_ITEM_SHEARS:
+		{
+			return true;
+		}
 	}
 
 	return false;
