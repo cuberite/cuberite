@@ -230,12 +230,16 @@ protected:
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // cDungeonRoomsFinisher:
 
-cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainHeightGen & a_HeightGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize) :
+cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainHeightGen & a_HeightGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib) :
 	super(a_Seed + 100, a_GridSize, a_GridSize, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 1024),
 	m_HeightGen(a_HeightGen),
 	m_MaxHalfSize((a_MaxSize + 1) / 2),
-	m_MinHalfSize((a_MinSize + 1) / 2)
+	m_MinHalfSize((a_MinSize + 1) / 2),
+	m_HeightProbability(cChunkDef::Height)
 {
+	// Initialize the height probability distribution:
+	m_HeightProbability.SetDefString(a_HeightDistrib);
+
 	// Normalize the min and max size:
 	if (m_MinHalfSize > m_MaxHalfSize)
 	{
@@ -264,7 +268,7 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	cChunkDef::HeightMap HeightMap;
 	m_HeightGen.GenHeightMap(ChunkX, ChunkZ, HeightMap);
 	int Height = cChunkDef::GetHeight(HeightMap, RelX, RelZ);  // Max room height at {a_OriginX, a_OriginZ}
-	Height = 10 + (rnd % std::max(1, (Height - 14)));
+	Height = Clamp(m_HeightProbability.MapValue(rnd % m_HeightProbability.GetSum()), 10, Height - 5);
 
 	// Create the dungeon room descriptor:
 	return cStructurePtr(new cDungeonRoom(a_GridX, a_GridZ, a_OriginX, a_OriginZ, HalfSizeX, HalfSizeZ, Height, m_Noise));
