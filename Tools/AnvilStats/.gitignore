@@ -1,3 +1,7 @@
+*.vcproj
+*.vcxproj
+*.sln
+*.user
 .xls
 Statistics.txt
 *.bmp
