@@ -184,9 +184,9 @@ protected:
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
 	{
 		if (
-			(m_EndX <= a_ChunkDesc.GetChunkX() * cChunkDef::Width) ||
+			(m_EndX   <  a_ChunkDesc.GetChunkX() * cChunkDef::Width) ||
 			(m_StartX >= a_ChunkDesc.GetChunkX() * cChunkDef::Width + cChunkDef::Width) ||
-			(m_EndZ <= a_ChunkDesc.GetChunkZ() * cChunkDef::Width) ||
+			(m_EndZ   <  a_ChunkDesc.GetChunkZ() * cChunkDef::Width) ||
 			(m_StartZ >= a_ChunkDesc.GetChunkZ() * cChunkDef::Width + cChunkDef::Width)
 		)
 		{
