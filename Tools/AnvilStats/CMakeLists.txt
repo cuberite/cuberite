@@ -118,5 +118,27 @@ add_executable(AnvilStats
 	${SHARED_OSS_HDR}
 )
 
+
 target_link_libraries(AnvilStats zlib)
+
+
+
+
+
+# Under MSVC we need to enlarge the default stack size for the executable:
+if (MSVC)
+	get_target_property(TEMP AnvilStats LINK_FLAGS)
+	if (TEMP STREQUAL "TEMP-NOTFOUND")
+	  SET(TEMP "") # set to empty string
+		message("LINKER_FLAGS not found")
+	else ()
+	  SET(TEMP "${TEMP} ") # a space to cleanly separate from existing content
+		message("LINKER_FLAGS: ${LINKER_FLAGS}")
+	endif ()
+	# append our values
+	SET(TEMP "${TEMP}/STACK:16777216")
+	set_target_properties(AnvilStats PROPERTIES LINK_FLAGS ${TEMP})
+endif ()
+
+
 
