@@ -119,7 +119,7 @@ bool StringToInteger(const AString& a_str, T& a_Num)
 	{
 		for (size_t size = a_str.size(); i < size; i++)
 		{
-			if ((a_str[i] <= '0') || (a_str[i] >= '9'))
+			if ((a_str[i] < '0') || (a_str[i] > '9'))
 			{
 				return false;
 			}
@@ -140,7 +140,7 @@ bool StringToInteger(const AString& a_str, T& a_Num)
 	{
 		for (size_t size = a_str.size(); i < size; i++)
 		{
-			if ((a_str[i] <= '0') || (a_str[i] >= '9'))
+			if ((a_str[i] < '0') || (a_str[i] > '9'))
 			{
 				return false;
 			}
