@@ -301,11 +301,11 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(const AString &, cItemCallback<Ty2> &)
-	>
+>
 static int tolua_DoWith(lua_State* tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
@@ -395,7 +395,7 @@ static int tolua_DoWith(lua_State* tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(int, cItemCallback<Ty2> &)
@@ -485,7 +485,7 @@ static int tolua_DoWithID(lua_State* tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(int, int, int, cItemCallback<Ty2> &)
@@ -580,7 +580,7 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(int, int, cItemCallback<Ty2> &)
@@ -676,7 +676,7 @@ static int tolua_ForEachInChunk(lua_State * tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(cItemCallback<Ty2> &)
