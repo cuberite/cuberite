@@ -99,7 +99,7 @@ void cChunkGenerator::Stop(void)
 
 
 
-void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	{
 		cCSLock Lock(m_CS);
@@ -107,7 +107,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 		// Check if it is already in the queue:
 		for (cChunkCoordsList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 		{
-			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkY == a_ChunkY) && (itr->m_ChunkZ == a_ChunkZ))
+			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
 			{
 				// Already in the queue, bail out
 				return;
@@ -119,7 +119,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_Chunk
 		{
 			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (" SIZE_T_FMT ")", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
-		m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+		m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
 
 	m_Event.Set();
@@ -246,7 +246,7 @@ void cChunkGenerator::Execute(void)
 		}
 
 		// Hack for regenerating chunks: if Y != 0, the chunk is considered invalid, even if it has its data set
-		if ((coords.m_ChunkY == 0) && m_ChunkSink->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
+		if (m_ChunkSink->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
 			// Already generated, ignore request
@@ -259,8 +259,8 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 
-		LOGD("Generating chunk [%d, %d, %d]", coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
-		DoGenerate(coords.m_ChunkX, coords.m_ChunkY, coords.m_ChunkZ);
+		LOGD("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
+		DoGenerate(coords.m_ChunkX, coords.m_ChunkZ);
 
 		NumChunksGenerated++;
 	}  // while (!bStop)
@@ -269,7 +269,7 @@ void cChunkGenerator::Execute(void)
 
 
 
-void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_PluginInterface != NULL);
 	ASSERT(m_ChunkSink != NULL);

@@ -116,7 +116,7 @@ public:
 	void Stop(void);
 
 	/// Queues the chunk for generation; removes duplicate requests
-	void QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void QueueGenerateChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/// Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading.
 	void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
@@ -154,7 +154,7 @@ private:
 	// cIsThread override:
 	virtual void Execute(void) override;
 
-	void DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void DoGenerate(int a_ChunkX, int a_ChunkZ);
 };
 
 
