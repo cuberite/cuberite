@@ -233,6 +233,47 @@ void cEntityEffect::OnTick(cPawn & a_Target)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cEntityEffectSpeed:
+
+void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
+{
+	// TODO: Add SetMormalMaxSpeed to cMonster
+
+	if (!a_Target.IsPlayer())
+	{
+		return;
+	}
+	cPlayer * Player = (cPlayer*) &a_Target;
+
+	Player->SetNormalMaxSpeed(1.0 + 0.2 * m_Intensity);
+	Player->SetSprintingMaxSpeed(1.3 + 0.26 * m_Intensity);
+	Player->SetFlyingMaxSpeed(1.0 + 0.2 * m_Intensity);
+}
+
+
+
+
+
+void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
+{
+	// TODO: Add SetMormalMaxSpeed to cMonster
+
+	if (!a_Target.IsPlayer())
+	{
+		return;
+	}
+	cPlayer * Player = (cPlayer*) &a_Target;
+
+	Player->SetNormalMaxSpeed(1.0);
+	Player->SetSprintingMaxSpeed(1.3);
+	Player->SetFlyingMaxSpeed(1.0);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cEntityEffectInstantHealth:
 
 void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
