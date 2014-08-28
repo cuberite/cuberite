@@ -1468,6 +1468,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 	if (DraggingItem.IsEmpty())
 	{
+		// DraggingItem is empty -> Switch draggingitem and slot
 		if (!Slot.IsEmpty())
 		{
 			std::swap(DraggingItem, Slot);
@@ -1475,6 +1476,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	}
 	else if (Slot.IsEmpty())
 	{
+		// DraggingItem isn't empty and slot is empty -> Set one dragging item in the slot
 		Slot = DraggingItem.CopyOne();
 		DraggingItem.m_ItemCount -= 1;
 
@@ -1485,7 +1487,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	}
 	else if ((DraggingItem.m_ItemCount == 1) && !DraggingItem.IsEqual(Slot))
 	{
-		// Switch contents
+		// DraggingItem and slot aren't empty -> Switch items
 		std::swap(DraggingItem, Slot);
 	}
 
