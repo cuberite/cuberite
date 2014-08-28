@@ -183,7 +183,7 @@ public:
 	/** Loads the item data from JSON representation */
 	void FromJson(const Json::Value & a_Value);
 	
-	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
+	/** Returns true if the specified item type is enchantable. */
 	static bool IsEnchantable(short a_ItemType, bool a_WithBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */

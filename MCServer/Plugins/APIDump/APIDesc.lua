@@ -1188,7 +1188,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				constructor =
 				{
 					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem object" },
-					{ Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
+					{ Params = "ItemType, Count, Damage, EnchantmentString, CustomName, Lore", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default), enchantments (non-enchanted by default), CustomName (empty by default) and Lore (string, empty by default)" },
 					{ Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
 				} ,
 				AddCount = { Params = "AmountToAdd", Return = "cItem", Notes = "Adds the specified amount to the item count. Returns self (useful for chaining)." },
@@ -1207,6 +1207,9 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsBothNameAndLoreEmpty = { Params = "", Return = "bool", Notes = "Returns if both the custom name and lore are not set." },
 				IsCustomNameEmpty = { Params = "", Return = "bool", Notes = "Returns if the custom name of the cItem is empty." },
 				IsLoreEmpty = { Params = "", Return = "", Notes = "Returns if the lore of the cItem is empty." },
+				GetEnchantability = { Params = "", Return = "number", Notes = "Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0" },
+				EnchantByXPLevels = { Params = "NumXPLevels", Return = "bool", Notes = "Enchants the item using the specified number of XP levels. Returns true if item enchanted, false if not." },
+				IsEnchantable = { Params = "ItemType, WithBook", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is enchantable." },
 			},
 			Variables =
 			{
@@ -1214,8 +1217,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				m_ItemCount    = { Type = "number", Notes = "Number of items in this stack" },
 				m_ItemDamage   = { Type = "number", Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()" },
 				m_ItemType     = { Type = "number", Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants" },
-				m_CustomName = { Type = "string", Notes = "The custom name for an item." },
-				m_Lore = { Type = "string", Notes = "The lore for an item. Line breaks are represented by the ` character." },
+				m_CustomName   = { Type = "string", Notes = "The custom name for an item." },
+				m_Lore         = { Type = "string", Notes = "The lore for an item. Line breaks are represented by the ` character." },
+				m_RepairCost   = { Type = "number", Notes = "The repair cost of the item. The anvil need this value" },
+				m_Enchantments = { Type = "{{cEnchantments|cEnchantments}}}", Notes = "The enchantments of the item." },
 			},
 			AdditionalInfo =
 			{
