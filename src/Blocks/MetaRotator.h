@@ -20,7 +20,7 @@ Usage:
 Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in North, East, South, West. There is also an aptional parameter AssertIfNotMatched. Set this if it is invalid for a block to exist in any other state.
 */
 
-template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched = false>
+template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched = false>
 class cMetaRotator : public Base
 {
 public:
@@ -41,7 +41,7 @@ public:
 
 
 
-template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
+template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaRotateCW(NIBBLETYPE a_Meta)
 {
 	NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
@@ -63,7 +63,7 @@ NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatc
 
 
 
-template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
+template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaRotateCCW(NIBBLETYPE a_Meta)
 {
 	NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
@@ -85,7 +85,7 @@ NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatc
 
 
 
-template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
+template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaMirrorXY(NIBBLETYPE a_Meta)
 {
 	NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
@@ -102,7 +102,7 @@ NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatc
 
 
 
-template<class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
+template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched>
 NIBBLETYPE cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>::MetaMirrorYZ(NIBBLETYPE a_Meta)
 {
 	NIBBLETYPE OtherMeta = a_Meta & (~BitMask);

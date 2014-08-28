@@ -362,7 +362,7 @@ protected:
 		NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 	);
 	
-	template<bool MetasValid>
+	template <bool MetasValid>
 	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
 	// tolua_begin
 } ;
