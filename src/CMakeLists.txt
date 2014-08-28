@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
+
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
@@ -33,16 +34,14 @@ SET (SRCS
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
-	Group.cpp
-	GroupManager.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
-	Log.cpp
-	MCLogger.cpp
+	LoggerListeners.cpp
+	Logger.cpp
 	Map.cpp
 	MapManager.cpp
 	MobCensus.cpp
@@ -52,6 +51,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	Noise.cpp
 	ProbabDistrib.cpp
+	RankManager.cpp
 	RCONServer.cpp
 	Root.cpp
 	Scoreboard.cpp
@@ -97,8 +97,6 @@ SET (HDRS
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
-	Group.h
-	GroupManager.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
@@ -107,8 +105,8 @@ SET (HDRS
 	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
-	Log.h
-	MCLogger.h
+	Logger.h
+	LoggerListeners.h
 	Map.h
 	MapManager.h
 	Matrix4.h
@@ -121,6 +119,7 @@ SET (HDRS
 	MonsterConfig.h
 	Noise.h
 	ProbabDistrib.h
+	RankManager.h
 	RCONServer.h
 	Root.h
 	Scoreboard.h
@@ -234,7 +233,7 @@ endif()
 
 
 # Generate a list of all source files:
-set(ALLFILES "")
+set(ALLFILES "${SRCS}" "${HDRS}")
 foreach(folder ${FOLDERS})
 	get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
 	foreach (src ${FOLDER_SRCS})

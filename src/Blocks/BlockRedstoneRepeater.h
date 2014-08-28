@@ -23,7 +23,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-		) override
+	) override
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = RepeaterRotationToMetaData(a_Player->GetYaw());
@@ -46,7 +46,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to 0
+		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_REPEATER, 1, 0));
 	}
 
@@ -59,7 +59,7 @@ public:
 	
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
+		return ((a_RelY > 0) && cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 
 

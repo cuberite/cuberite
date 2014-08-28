@@ -10,6 +10,7 @@
 #include "inifile/iniFile.h"
 #include "json/json.h"
 #include "PolarSSL++/BlockingSslClientSocket.h"
+#include "../RankManager.h"
 
 
 
@@ -300,6 +301,7 @@ void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const 
 		cCSLock Lock(m_CSUUIDToName);
 		m_UUIDToName[UUID] = sProfile(a_PlayerName, UUID, "", "", Now);
 	}
+	NotifyNameUUID(a_PlayerName, a_UUID);
 }
 
 
@@ -322,6 +324,7 @@ void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const AString & 
 		cCSLock Lock(m_CSUUIDToProfile);
 		m_UUIDToProfile[UUID] = sProfile(a_PlayerName, UUID, a_Properties, Now);
 	}
+	NotifyNameUUID(a_PlayerName, a_UUID);
 }
 
 
@@ -655,11 +658,11 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 		}
 	
 		// Store the returned results into cache:
-		size_t JsonCount = root.size();
+		Json::Value::UInt JsonCount = root.size();
 		Int64 Now = time(NULL);
 		{
 			cCSLock Lock(m_CSNameToUUID);
-			for (size_t idx = 0; idx < JsonCount; ++idx)
+			for (Json::Value::UInt idx = 0; idx < JsonCount; ++idx)
 			{
 				Json::Value & Val = root[idx];
 				AString JsonName = Val.get("name", "").asString();
@@ -669,13 +672,14 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 					continue;
 				}
 				m_NameToUUID[StrToLower(JsonName)] = sProfile(JsonName, JsonUUID, "", "", Now);
+				NotifyNameUUID(JsonName, JsonUUID);
 			}  // for idx - root[]
 		}  // cCSLock (m_CSNameToUUID)
 		
 		// Also cache the UUIDToName:
 		{
 			cCSLock Lock(m_CSUUIDToName);
-			for (size_t idx = 0; idx < JsonCount; ++idx)
+			for (Json::Value::UInt idx = 0; idx < JsonCount; ++idx)
 			{
 				Json::Value & Val = root[idx];
 				AString JsonName = Val.get("name", "").asString();
@@ -791,6 +795,21 @@ void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 	{
 		cCSLock Lock(m_CSNameToUUID);
 		m_NameToUUID[StrToLower(PlayerName)] = sProfile(PlayerName, a_UUID, Properties, Now);
+	}
+	NotifyNameUUID(PlayerName, a_UUID);
+}
+
+
+
+
+
+void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID)
+{
+	// Notify the rank manager:
+	cCSLock Lock(m_CSRankMgr);
+	if (m_RankMgr != NULL)
+	{
+		m_RankMgr->NotifyNameUUID(a_PlayerName, a_UUID);
 	}
 }
 

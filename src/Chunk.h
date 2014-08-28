@@ -241,7 +241,7 @@ public:
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
 	
 	/** Calls the callback for the redstone powered entity at the specified coords; returns false if there's no redstone powered entity at those coords, true if found */
-	bool DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cRedstonePoweredCallback & a_Callback);  
+	bool DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cRedstonePoweredCallback & a_Callback);
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
 

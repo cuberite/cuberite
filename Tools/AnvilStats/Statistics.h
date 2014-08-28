@@ -31,6 +31,8 @@ public:
 		UInt64 m_NumEntities;
 		UInt64 m_NumTileEntities;
 		UInt64 m_NumTileTicks;
+		UInt64 m_PerHeightBlockCounts[256][256];  // First dimension is the height, second dimension is BlockType
+		UInt64 m_PerHeightSpawners[256][entMax + 1];  // First dimension is the height, second dimension is spawned entity type
 		int m_MinChunkX, m_MaxChunkX;  // X coords range
 		int m_MinChunkZ, m_MaxChunkZ;  // Z coords range
 		
@@ -74,6 +76,8 @@ protected:
 	
 	virtual bool OnEmptySection(unsigned char a_Y) override;
 	
+	virtual bool OnSectionsFinished(void) override { return false; }  // continue processing
+
 	virtual bool OnEntity(
 		const AString & a_EntityType,
 		double a_PosX, double a_PosY, double a_PosZ,
@@ -128,9 +132,11 @@ protected:
 	void JoinResults(void);
 	void SaveBiomes(void);
 	void SaveBlockTypes(void);
+	void SavePerHeightBlockTypes(void);
 	void SaveBiomeBlockTypes(void);
 	void SaveStatistics(void);
 	void SaveSpawners(void);
+	void SavePerHeightSpawners(void);
 } ;
 
 

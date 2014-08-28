@@ -26,8 +26,8 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to 0
-		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_DUST, 1));
+		// Reset meta to zero
+		a_Pickups.push_back(cItem(E_ITEM_REDSTONE_DUST, 1, 0));
 	}
 } ;
 

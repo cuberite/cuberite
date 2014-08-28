@@ -208,9 +208,6 @@ protected:
 	/** The HTTP server which provides the underlying HTTP parsing, serialization and events */
 	cHTTPServer m_HTTPServer;
 
-
-	AString GetTemplate(void);
-
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
 	void HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 

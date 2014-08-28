@@ -835,14 +835,14 @@ bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerMoved(cPlayer & a_Player)
+bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_MOVING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, a_OldPosition, a_NewPosition, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1181,6 +1181,26 @@ bool cPluginLua::OnProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
 		m_LuaState.Call((int)(**itr), &a_Projectile, &a_HitEntity, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_SERVER_PING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_ClientHandle, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon, cLuaState::Return, res, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon);
 		if (res)
 		{
 			return true;
@@ -1570,6 +1590,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLUGINS_LOADED:               return "OnPluginsLoaded";
 		case cPluginManager::HOOK_POST_CRAFTING:                return "OnPostCrafting";
 		case cPluginManager::HOOK_PRE_CRAFTING:                 return "OnPreCrafting";
+		case cPluginManager::HOOK_SERVER_PING:                  return "OnServerPing";
 		case cPluginManager::HOOK_SPAWNED_ENTITY:               return "OnSpawnedEntity";
 		case cPluginManager::HOOK_SPAWNED_MONSTER:              return "OnSpawnedMonster";
 		case cPluginManager::HOOK_SPAWNING_ENTITY:              return "OnSpawningEntity";

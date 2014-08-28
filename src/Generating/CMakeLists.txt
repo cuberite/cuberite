@@ -12,6 +12,7 @@ SET (SRCS
 	CompoGen.cpp
 	ComposableGenerator.cpp
 	DistortedHeightmap.cpp
+	DungeonRoomsFinisher.cpp
 	EndGen.cpp
 	FinishGen.cpp
 	GridStructGen.cpp
@@ -40,6 +41,7 @@ SET (HDRS
 	CompoGen.h
 	ComposableGenerator.h
 	DistortedHeightmap.h
+	DungeonRoomsFinisher.h
 	EndGen.h
 	FinishGen.h
 	GridStructGen.h

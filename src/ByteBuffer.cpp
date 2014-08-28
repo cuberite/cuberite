@@ -27,7 +27,7 @@
 )
 	#define IS_LITTLE_ENDIAN
 #elif ( \
-	defined (__ARMEB__) || defined(__sparc) \
+	defined (__ARMEB__) || defined(__sparc) || defined(__powerpc__) || defined(__POWERPC__) \
 )
 	#define IS_BIG_ENDIAN
 #else

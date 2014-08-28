@@ -13,7 +13,6 @@
 
 
 
-class cGroup;
 class cWindow;
 class cClientHandle;
 class cTeam;
@@ -236,24 +235,20 @@ public:
 	
 	// tolua_end
 
-	typedef std::list< cGroup* > GroupList;
-	typedef std::list< std::string > StringList;
+	bool HasPermission(const AString & a_Permission);  // tolua_export
 
-	/** Adds a player to existing group or creates a new group when it doesn't exist */
-	void AddToGroup( const AString & a_GroupName);  // tolua_export
-	
-	/** Removes a player from the group, resolves permissions and group inheritance (case sensitive) */
-	void RemoveFromGroup( const AString & a_GroupName);  // tolua_export
-	
-	bool HasPermission( const AString & a_Permission);  // tolua_export
-	const GroupList & GetGroups() { return m_Groups; }  // >> EXPORTED IN MANUALBINDINGS <<
-	StringList GetResolvedPermissions();  // >> EXPORTED IN MANUALBINDINGS <<
-	bool IsInGroup( const AString & a_Group);  // tolua_export
+	/** Returns true iff a_Permission matches the a_Template.
+	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in a_Template.
+	Ie. {"a", "b", "c"} matches {"a", "b", "*"} but doesn't match {"a", "b"} */
+	static bool PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template);  // Exported in ManualBindings with AString params
+
+	/** Returns all the permissions that the player has assigned to them. */
+	const AStringVector & GetPermissions(void) { return m_Permissions; }  // Exported in ManualBindings.cpp
 
 	// tolua_begin
 	
-	/** Returns the full color code to use for this player, based on their primary group or set in m_Color.
-	The returned value includes the cChatColor::Delimiter. */
+	/** Returns the full color code to use for this player, based on their rank.
+	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
 
 	/** tosses the item in the selected hotbar slot */
@@ -347,8 +342,6 @@ public:
 	*/
 	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 	
-	void LoadPermissionsFromDisk(void);  // tolua_export
-
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
 	void UseEquippedItem(int a_Amount = 1);
@@ -422,6 +415,11 @@ public:
 	/** Returns the UUID (short format) that has been read from the client, or empty string if not available. */
 	const AString & GetUUID(void) const { return m_UUID; }
 
+	/** (Re)loads the rank and permissions from the cRankManager.
+	Expects the m_UUID member to be valid.
+	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
+	void LoadRank(void);
+
 	// tolua_end
 
 	// cEntity overrides:
@@ -432,12 +430,22 @@ public:
 	virtual void Detach(void);
 	
 protected:
-	typedef std::map< std::string, bool > PermissionMap;
-	PermissionMap m_ResolvedPermissions;
-	PermissionMap m_Permissions;
 
-	GroupList m_ResolvedGroups;
-	GroupList m_Groups;
+	typedef std::vector<std::vector<AString> > AStringVectorVector;
+
+	/** The name of the rank assigned to this player. */
+	AString m_Rank;
+
+	/** All the permissions that this player has, based on their rank. */
+	AStringVector m_Permissions;
+
+	/** All the permissions that this player has, based on their rank, split into individual dot-delimited parts.
+	This is used mainly by the HasPermission() function to optimize the lookup. */
+	AStringVectorVector m_SplitPermissions;
+
+	// Message visuals:
+	AString m_MsgPrefix, m_MsgSuffix;
+	AString m_MsgNameColorCode;
 
 	AString m_PlayerName;
 	AString m_LoadedWorldName;
@@ -481,8 +489,6 @@ protected:
 
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
-
-	char m_Color;
 
 	eGameMode m_GameMode;
 	AString m_IP;

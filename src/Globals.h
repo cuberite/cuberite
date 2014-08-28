@@ -249,7 +249,7 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/Event.h"
 	#include "OSSupport/Thread.h"
 	#include "OSSupport/File.h"
-	#include "MCLogger.h"
+	#include "Logger.h"
 #else
 	// Logging functions
 void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);

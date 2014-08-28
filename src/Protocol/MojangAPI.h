@@ -11,6 +11,13 @@
 
 #include <time.h>
 
+
+
+
+
+// fwd: ../RankManager.h"
+class cRankManager;
+
 namespace Json
 {
 	class Value;
@@ -38,8 +45,6 @@ public:
 	Returns true if all was successful, false on failure. */
 	static bool SecureRequest(const AString & a_ServerName, const AString & a_Request, AString & a_Response);
 	
-	// tolua_begin
-	
 	/** Normalizes the given UUID to its short form (32 bytes, no dashes, lowercase).
 	Logs a warning and returns empty string if not a UUID.
 	Note: only checks the string's length, not the actual content. */
@@ -50,8 +55,6 @@ public:
 	Note: only checks the string's length, not the actual content. */
 	static AString MakeUUIDDashed(const AString & a_UUID);
 
-	// tolua_end
-	
 	/** Converts a player name into a UUID.
 	The UUID will be empty on error.
 	If a_UseOnlyCached is true, the function only consults the cached values.
@@ -85,7 +88,10 @@ public:
 	/** Called by the Authenticator to add a profile that it has received from authenticating a user. Adds
 	the profile to the respective mapping caches and updtes their datetime stamp to now. */
 	void AddPlayerProfile(const AString & a_PlayerName, const AString & a_UUID, const Json::Value & a_Properties);
-	
+
+	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts NULL to remove the binding. */
+	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
+
 protected:
 	/** Holds data for a single player profile. */
 	struct sProfile
@@ -165,6 +171,12 @@ protected:
 	
 	/** Protects m_UUIDToProfile against simultaneous multi-threaded access. */
 	cCriticalSection m_CSUUIDToProfile;
+
+	/** The rank manager that is notified of the name-uuid pairings. May be NULL. Protected by m_CSRankMgr. */
+	cRankManager * m_RankMgr;
+
+	/** Protects m_RankMgr agains simultaneous multi-threaded access. */
+	cCriticalSection m_CSRankMgr;
 	
 	
 	/** Loads the caches from a disk storage. */
@@ -182,6 +194,10 @@ protected:
 	UUIDs that are not valid will not be added into the cache.
 	ASSUMEs that a_UUID is a lowercased short UUID. */
 	void CacheUUIDToProfile(const AString & a_UUID);
+
+	/** Called for each name-uuid pairing that is discovered.
+	If assigned, notifies the m_RankManager of the event. */
+	void NotifyNameUUID(const AString & a_PlayerName, const AString & a_PlayerUUID);
 } ;  // tolua_export
 
 

@@ -120,6 +120,7 @@ public:
 		HOOK_PRE_CRAFTING,
 		HOOK_PROJECTILE_HIT_BLOCK,
 		HOOK_PROJECTILE_HIT_ENTITY,
+		HOOK_SERVER_PING,
 		HOOK_SPAWNED_ENTITY,
 		HOOK_SPAWNED_MONSTER,
 		HOOK_SPAWNING_ENTITY,
@@ -206,7 +207,7 @@ public:
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
-	bool CallHookPlayerMoving             (cPlayer & a_Player);
+	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
 	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -225,6 +226,7 @@ public:
 	bool CallHookPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
 	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
+	bool CallHookServerPing               (cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon);
 	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
 	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
 	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);

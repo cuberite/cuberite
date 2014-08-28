@@ -37,7 +37,7 @@ public:
 	{
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 		
-		if ((Meta == 2) || (Meta == 3))
+		if ((Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) || (Meta == E_META_BIG_FLOWER_LARGE_FERN))
 		{
 			return;
 		}
@@ -63,11 +63,11 @@ public:
 				if (r1.randInt(10) == 5)
 				{
 					cItems Pickups;
-					if (FlowerMeta == 2)
+					if (FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 					{
 						Pickups.Add(E_BLOCK_TALL_GRASS, 2, 1);
 					}
-					else if (FlowerMeta == 3)
+					else if (FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
 					{
 						Pickups.Add(E_BLOCK_TALL_GRASS, 2, 2);
 					}

@@ -849,14 +849,14 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
 {
 	FIND_HOOK(HOOK_PLAYER_MOVING);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPlayerMoved(a_Player))
+		if ((*itr)->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition))
 		{
 			return true;
 		}
@@ -1178,6 +1178,25 @@ bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectil
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnProjectileHitEntity(a_Projectile, a_HitEntity))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+{
+	FIND_HOOK(HOOK_SERVER_PING);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnServerPing(a_ClientHandle, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon))
 		{
 			return true;
 		}
