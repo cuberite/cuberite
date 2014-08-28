@@ -1059,7 +1059,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	if (
 		m_Player->IsGameModeCreative() &&
-		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
+		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType) &&
+		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
 	)
 	{
 		// Players can't destroy blocks with a Sword in the hand.
