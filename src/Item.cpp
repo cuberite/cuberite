@@ -190,9 +190,16 @@ void cItem::FromJson(const Json::Value & a_Value)
 
 
 
-bool cItem::IsEnchantable(short a_ItemType)
+bool cItem::IsEnchantable(short a_ItemType, bool a_WithBook)
 {
-	if (ItemCategory::IsTool(a_ItemType) || ItemCategory::IsArmor(a_ItemType))
+	if (
+		ItemCategory::IsAxe(a_ItemType) ||
+		ItemCategory::IsSword(a_ItemType) ||
+		ItemCategory::IsShovel(a_ItemType) ||
+		ItemCategory::IsPickaxe(a_ItemType) ||
+		(a_WithBook && ItemCategory::IsHoe(a_ItemType)) ||
+		ItemCategory::IsArmor(a_ItemType)
+	)
 	{
 		return true;
 	}
@@ -201,11 +208,16 @@ bool cItem::IsEnchantable(short a_ItemType)
 	{
 		case E_ITEM_BOOK:
 		case E_ITEM_BOW:
-		case E_ITEM_CARROT_ON_STICK:
 		case E_ITEM_FISHING_ROD:
-		case E_ITEM_SHEARS:
 		{
 			return true;
+		}
+
+		case E_ITEM_CARROT_ON_STICK:
+		case E_ITEM_SHEARS:
+		case E_ITEM_FLINT_AND_STEEL:
+		{
+			return a_WithBook;
 		}
 	}
 
