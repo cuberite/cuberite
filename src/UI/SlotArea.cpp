@@ -1423,7 +1423,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		}
 		case caDblClick:
 		{
-			// DblClicked(a_Player, a_SlotNum);
+			DblClicked(a_Player, a_SlotNum);
 			return;
 		}
 		case caMiddleClick:
@@ -1470,8 +1470,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	{
 		if (!Slot.IsEmpty())
 		{
-			DraggingItem = Slot;
-			Slot.Empty();
+			std::swap(DraggingItem, Slot);
 		}
 	}
 	else if (Slot.IsEmpty())
@@ -1487,9 +1486,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	else if ((DraggingItem.m_ItemCount == 1) && !DraggingItem.IsEqual(Slot))
 	{
 		// Switch contents
-		cItem tmp(DraggingItem);
-		DraggingItem = Slot;
-		Slot = tmp;
+		std::swap(DraggingItem, Slot);
 	}
 
 	SetSlot(a_SlotNum, a_Player, Slot);
