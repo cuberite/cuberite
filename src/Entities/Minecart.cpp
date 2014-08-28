@@ -906,7 +906,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			}
 			else if ((GetSpeedX() * 0.4 / sqrt(2)) < 0.01)
 			{
-				// Moving +X -T
+				// Moving +X -Z
 				// ~ SpeedX <= 0 Immobile or not moving in the "right" direction
 				AddSpeedX(4 / sqrt(2));
 				AddSpeedZ(-4 / sqrt(2));
