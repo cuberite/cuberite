@@ -101,7 +101,7 @@ extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
 /// Parses any integer type. Checks bounds and returns errors out of band.
 template <class T>
-bool StringToInteger(const AString& a_str, T& a_Num)
+bool StringToInteger(const AString & a_str, T & a_Num)
 {
 	size_t i = 0;
 	bool positive = true;
