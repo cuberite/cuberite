@@ -16,6 +16,7 @@
 #include "../../../lua/src/lauxlib.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 TOLUA_API void tolua_pushvalue (lua_State* L, int lo)
 {
@@ -55,12 +56,14 @@ TOLUA_API void tolua_pushusertype (lua_State* L, void* value, const char* type)
  else
  {
   luaL_getmetatable(L, type);
+  assert(!lua_isnil(L, -1));  /* Failure here means that the usertype is unknown to ToLua. Check what type you're pushing. */
   lua_pushstring(L,"tolua_ubox");
   lua_rawget(L,-2);        /* stack: mt ubox */
-  if (lua_isnil(L, -1)) {
-	  lua_pop(L, 1);
-	  lua_pushstring(L, "tolua_ubox");
-	  lua_rawget(L, LUA_REGISTRYINDEX);
+  if (lua_isnil(L, -1))
+  {
+   lua_pop(L, 1);
+   lua_pushstring(L, "tolua_ubox");
+   lua_rawget(L, LUA_REGISTRYINDEX);
   };
   lua_pushlightuserdata(L,value);
   lua_rawget(L,-2);                       /* stack: mt ubox ubox[u] */

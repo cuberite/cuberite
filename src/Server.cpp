@@ -11,7 +11,6 @@
 #include "World.h"
 #include "ChunkDef.h"
 #include "Bindings/PluginManager.h"
-#include "GroupManager.h"
 #include "ChatColor.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
@@ -117,7 +116,9 @@ cServer::cServer(void) :
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
 	m_TickThread(*this),
-	m_ShouldAuthenticate(false)
+	m_ShouldAuthenticate(false),
+	m_ShouldLoadOfflinePlayerData(false),
+	m_ShouldLoadNamedPlayerData(true)
 {
 }
 
@@ -466,29 +467,20 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
-	if (split[0] == "reload")
+	else if (split[0] == "reload")
 	{
 		cPluginManager::Get()->ReloadPlugins();
-		cRoot::Get()->ReloadGroups();
-		a_Output.Out("Plugins and groups reloaded");
 		a_Output.Finished();
 		return;
 	}
-	if (split[0] == "reloadplugins")
+	else if (split[0] == "reloadplugins")
 	{
 		cPluginManager::Get()->ReloadPlugins();
 		a_Output.Out("Plugins reloaded");
 		a_Output.Finished();
 		return;
 	}
-	if (split[0] == "reloadgroups")
-	{
-		cRoot::Get()->ReloadGroups();
-		a_Output.Out("Groups reloaded");
-		a_Output.Finished();
-		return;
-	}
-	if (split[0] == "load")
+	else if (split[0] == "load")
 	{
 		if (split.size() > 1)
 		{
@@ -501,7 +493,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
-	if (split[0] == "unload")
+	else if (split[0] == "unload")
 	{
 		if (split.size() > 1)
 		{
@@ -543,21 +535,21 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 
 	// There is currently no way a plugin can do these (and probably won't ever be):
-	if (split[0].compare("chunkstats") == 0)
+	else if (split[0].compare("chunkstats") == 0)
 	{
 		cRoot::Get()->LogChunkStats(a_Output);
 		a_Output.Finished();
 		return;
 	}
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	if (split[0].compare("dumpmem") == 0)
+	else if (split[0].compare("dumpmem") == 0)
 	{
 		LeakFinderXmlOutput Output("memdump.xml");
 		DumpUsedMemory(&Output);
 		return;
 	}
 	
-	if (split[0].compare("killmem") == 0)
+	else if (split[0].compare("killmem") == 0)
 	{
 		for (;;)
 		{
@@ -566,7 +558,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	#endif
 
-	if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
+	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
 	{
 		a_Output.Finished();
 		return;

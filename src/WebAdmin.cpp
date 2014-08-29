@@ -159,28 +159,6 @@ void cWebAdmin::Stop(void)
 
 
 
-AString cWebAdmin::GetTemplate()
-{
-	AString retVal = "";
-
-	char SourceFile[] = "webadmin/template.html";
-
-	cFile f;
-	if (!f.Open(SourceFile, cFile::fmRead))
-	{
-		return "";
-	}
-
-	// copy the file into the buffer:
-	f.ReadRestOfFile(retVal);
-
-	return retVal;
-}
-
-
-
-
-
 void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	if (!a_Request.HasAuth())
@@ -198,9 +176,9 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	}
 
 	// Check if the contents should be wrapped in the template:
-	AString URL = a_Request.GetBareURL();
-	ASSERT(URL.length() > 0);
-	bool ShouldWrapInTemplate = ((URL.length() > 1) && (URL[1] != '~'));
+	AString BareURL = a_Request.GetBareURL();
+	ASSERT(BareURL.length() > 0);
+	bool ShouldWrapInTemplate = ((BareURL.length() > 1) && (BareURL[1] != '~'));
 
 	// Retrieve the request data:
 	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
@@ -215,7 +193,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	HTTPTemplateRequest TemplateRequest;
 	TemplateRequest.Request.Username = a_Request.GetAuthUsername();
 	TemplateRequest.Request.Method = a_Request.GetMethod();
-	TemplateRequest.Request.Path = URL.substr(1);
+	TemplateRequest.Request.Path = BareURL.substr(1);
 
 	if (Data->m_Form.Finish())
 	{
@@ -258,7 +236,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		return;
 	}
 
-	AString BaseURL = GetBaseURL(URL);
+	AString BaseURL = GetBaseURL(BareURL);
 	AString Menu;
 	Template = "{CONTENT}";
 	AString FoundPlugin;
@@ -437,6 +415,38 @@ AString cWebAdmin::GetHTMLEscapedString(const AString & a_Input)
 		}  // switch (a_Input[i])
 	}  // for i - a_Input[]
 
+	return dst;
+}
+
+
+
+
+
+AString cWebAdmin::GetURLEncodedString(const AString & a_Input)
+{
+	// Translation table from nibble to hex:
+	static const char Hex[] = "0123456789abcdef";
+	
+	// Preallocate the output to match input:
+	AString dst;
+	size_t len = a_Input.length();
+	dst.reserve(len);
+	
+	// Loop over input and substitute whatever is needed:
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = a_Input[i];
+		if (isalnum(ch) || (ch == '-') || (ch == '_') || (ch == '.') || (ch == '~'))
+		{
+			dst.push_back(ch);
+		}
+		else
+		{
+			dst.push_back('%');
+			dst.push_back(Hex[(ch >> 4) & 0x0f]);
+			dst.push_back(Hex[ch & 0x0f]);
+		}
+	}  // for i - a_Input[]
 	return dst;
 }
 

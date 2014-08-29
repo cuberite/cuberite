@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BlockID.h"
@@ -243,14 +244,45 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #endif
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
+	m_IsDaylightCycleEnabled(true),
 	m_WorldAgeSecs(0),
 	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
 	m_SkyDarkness(0),
+	m_GameMode(gmNotSet),
+	m_bEnabledPVP(false),
+	m_IsDeepSnowEnabled(false),
+	m_ShouldLavaSpawnFire(true),
+	m_VillagersShouldHarvestCrops(true),
+	m_SimulatorManager(NULL),
+	m_SandSimulator(NULL),
+	m_WaterSimulator(NULL),
+	m_LavaSimulator(NULL),
+	m_FireSimulator(NULL),
+	m_RedstoneSimulator(NULL),
+	m_MaxPlayers(10),
+	m_ChunkMap(NULL),
+	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_MaxCactusHeight(3),
+	m_MaxSugarcaneHeight(4),
+	m_IsCactusBonemealable(false),
+	m_IsCarrotsBonemealable(true),
+	m_IsCropsBonemealable(true),
+	m_IsGrassBonemealable(true),
+	m_IsMelonStemBonemealable(true),
+	m_IsMelonBonemealable(true),
+	m_IsPotatoesBonemealable(true),
+	m_IsPumpkinStemBonemealable(true),
+	m_IsPumpkinBonemealable(true),
+	m_IsSaplingBonemealable(true),
+	m_IsSugarcaneBonemealable(false),
+	m_bCommandBlocksEnabled(true),
+	m_bUseChatPrefixes(false),
+	m_TNTShrapnelLevel(slNone),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -405,7 +437,7 @@ void cWorld::InitializeSpawn(void)
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
 	
-	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)
@@ -576,6 +608,7 @@ void cWorld::Start(void)
 	m_bEnabledPVP                 = IniFile.GetValueSetB("Mechanics",     "PVPEnabled",                  true);
 	m_bUseChatPrefixes            = IniFile.GetValueSetB("Mechanics",     "UseChatPrefixes",             true);
 	m_VillagersShouldHarvestCrops = IniFile.GetValueSetB("Monsters",      "VillagersShouldHarvestCrops", true);
+	m_IsDaylightCycleEnabled      = IniFile.GetValueSetB("General",       "IsDaylightCycleEnabled",      true);
 	int GameMode                  = IniFile.GetValueSetI("General",       "Gamemode",                    (int)m_GameMode);
 	int Weather                   = IniFile.GetValueSetI("General",       "Weather",                     (int)m_Weather);
 	
@@ -797,6 +830,7 @@ void cWorld::Stop(void)
 		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
 		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
+		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
 		IniFile.SetValueI("General", "Weather", (int)m_Weather);
 		IniFile.SetValueI("General", "TimeInTicks", m_TimeOfDay);
 	IniFile.WriteFile(m_IniFileName);
@@ -827,28 +861,32 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	{
 		SetChunkData(**itr);
 	}  // for itr - SetChunkDataQueue[]
-	
-	// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
-	m_TimeOfDaySecs += (double)a_Dt / 1000.0;
-
-	// Wrap time of day each 20 minutes (1200 seconds)
-	if (m_TimeOfDaySecs > 1200.0)
-	{
-		m_TimeOfDaySecs -= 1200.0;
-	}
-
 	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
-	m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
 
-	// Updates the sky darkness based on current time of day
-	UpdateSkyDarkness();
-
-	// Broadcast time update every 40 ticks (2 seconds)
-	if (m_LastTimeUpdate < m_WorldAge - 40)
+	if (m_IsDaylightCycleEnabled)
 	{
-		BroadcastTimeUpdate();
-		m_LastTimeUpdate = m_WorldAge;
+		// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+		m_TimeOfDaySecs += (double)a_Dt / 1000.0;
+
+		// Wrap time of day each 20 minutes (1200 seconds)
+		if (m_TimeOfDaySecs > 1200.0)
+		{
+			m_TimeOfDaySecs -= 1200.0;
+		}
+
+		m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
+
+		// Updates the sky darkness based on current time of day
+		UpdateSkyDarkness();
+
+		// Broadcast time update every 40 ticks (2 seconds)
+		if (m_LastTimeUpdate < m_WorldAge - 40)
+		{
+			BroadcastTimeUpdate();
+			m_LastTimeUpdate = m_WorldAge;
+		}
 	}
 
 	// Add entities waiting in the queue to be added:
@@ -2254,7 +2292,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay);
+		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay, m_IsDaylightCycleEnabled);
 	}
 }
 
@@ -3323,7 +3361,7 @@ void cWorld::AddQueuedPlayers(void)
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
-			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?			
+			ASSERT(std::find(m_Players.begin(), m_Players.end(), *itr) == m_Players.end());  // Is it already in the list? HOW?
 			LOGD("Adding player %s to world \"%s\".", (*itr)->GetName().c_str(), m_WorldName.c_str());
 
 			m_Players.push_back(*itr);

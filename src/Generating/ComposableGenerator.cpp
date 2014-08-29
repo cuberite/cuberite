@@ -19,6 +19,7 @@
 
 #include "Caves.h"
 #include "DistortedHeightmap.h"
+#include "DungeonRoomsFinisher.h"
 #include "EndGen.h"
 #include "MineShafts.h"
 #include "NetherFortGen.h"
@@ -343,6 +344,14 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			float Threshold = (float)a_IniFile.GetValueSetF("Generator", "DualRidgeCavesThreshold", 0.3);
 			m_FinishGens.push_back(new cStructGenDualRidgeCaves(Seed, Threshold));
 		}
+		else if (NoCaseCompare(*itr, "DungeonRooms") == 0)
+		{
+			int     GridSize      = a_IniFile.GetValueSetI("Generator", "DungeonRoomsGridSize", 48);
+			int     MaxSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMaxSize", 7);
+			int     MinSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
+			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
+			m_FinishGens.push_back(new cDungeonRoomsFinisher(*m_HeightGen, Seed, GridSize, MaxSize, MinSize, HeightDistrib));
+		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenIce);
@@ -387,6 +396,28 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			m_FinishGens.push_back(new cFinishGenSingleTopBlock(Seed, E_BLOCK_LILY_PAD, AllowedBiomes, 4, AllowedBlocks));
 		}
+		else if (NoCaseCompare(*itr, "NaturalPatches") == 0)
+		{
+			cStructGenOreNests::OreList Ores;
+
+			// Dirt vein
+			cStructGenOreNests::OreInfo DirtVein;
+			DirtVein.BlockType = E_BLOCK_DIRT;
+			DirtVein.MaxHeight = 127;
+			DirtVein.NumNests = 20;
+			DirtVein.NestSize = 32;
+			Ores.push_back(DirtVein);
+
+			// Gravel vein
+			cStructGenOreNests::OreInfo GravelVein;
+			GravelVein.BlockType = E_BLOCK_DIRT;
+			GravelVein.MaxHeight = 127;
+			GravelVein.NumNests = 20;
+			GravelVein.NestSize = 32;
+			Ores.push_back(GravelVein);
+
+			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_STONE));
+		}
 		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)
 		{
 			m_FinishGens.push_back(new cFinishGenNetherClumpFoliage(Seed));
@@ -398,9 +429,74 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "NetherFortsMaxDepth", 12);
 			m_FinishGens.push_back(new cNetherFortGen(Seed, GridSize, MaxOffset, MaxDepth));
 		}
+		else if (NoCaseCompare(*itr, "NetherOreNests") == 0)
+		{
+			cStructGenOreNests::OreList Ores;
+
+			// Quartz vein
+			cStructGenOreNests::OreInfo QuartzVein;
+			QuartzVein.BlockType = E_BLOCK_NETHER_QUARTZ_ORE;
+			QuartzVein.MaxHeight = 255;
+			QuartzVein.NumNests = 80;
+			QuartzVein.NestSize = 8;
+			Ores.push_back(QuartzVein);
+
+			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_NETHERRACK));
+
+		}
 		else if (NoCaseCompare(*itr, "OreNests") == 0)
 		{
-			m_FinishGens.push_back(new cStructGenOreNests(Seed));
+			cStructGenOreNests::OreList Ores;
+
+			// Coal vein
+			cStructGenOreNests::OreInfo CoalVein;
+			CoalVein.BlockType = E_BLOCK_COAL_ORE;
+			CoalVein.MaxHeight = 127;
+			CoalVein.NumNests  = 50;
+			CoalVein.NestSize  = 10;
+			Ores.push_back(CoalVein);
+
+			// Iron vein
+			cStructGenOreNests::OreInfo IronVein;
+			IronVein.BlockType = E_BLOCK_IRON_ORE;
+			IronVein.MaxHeight = 64;
+			IronVein.NumNests  = 14;
+			IronVein.NestSize  = 6;
+			Ores.push_back(IronVein);
+
+			// Gold vein
+			cStructGenOreNests::OreInfo GoldVein;
+			GoldVein.BlockType = E_BLOCK_GOLD_ORE;
+			GoldVein.MaxHeight = 32;
+			GoldVein.NumNests = 2;
+			GoldVein.NestSize = 6;
+			Ores.push_back(GoldVein);
+
+			// Redstone vein
+			cStructGenOreNests::OreInfo RedstoneVein;
+			RedstoneVein.BlockType = E_BLOCK_REDSTONE_ORE;
+			RedstoneVein.MaxHeight = 16;
+			RedstoneVein.NumNests = 4;
+			RedstoneVein.NestSize = 6;
+			Ores.push_back(RedstoneVein);
+
+			// Lapis vein
+			cStructGenOreNests::OreInfo LapisVein;
+			LapisVein.BlockType = E_BLOCK_LAPIS_ORE;
+			LapisVein.MaxHeight = 30;
+			LapisVein.NumNests = 2;
+			LapisVein.NestSize = 5;
+			Ores.push_back(LapisVein);
+
+			// Diamond vein
+			cStructGenOreNests::OreInfo DiamondVein;
+			DiamondVein.BlockType = E_BLOCK_DIAMOND_ORE;
+			DiamondVein.MaxHeight = 15;
+			DiamondVein.NumNests = 1;
+			DiamondVein.NestSize = 4;
+			Ores.push_back(DiamondVein);
+
+			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_STONE));
 		}
 		else if (NoCaseCompare(*itr, "POCPieces") == 0)
 		{

@@ -10,8 +10,6 @@
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
-#include "../GroupManager.h"
-#include "../Group.h"
 #include "../Root.h"
 #include "../OSSupport/Timer.h"
 #include "../Chunk.h"
@@ -33,6 +31,15 @@
 
 
 
+const int cPlayer::MAX_HEALTH = 20;
+
+const int cPlayer::MAX_FOOD_LEVEL = 20;
+
+/** Number of ticks it takes to eat an item */
+const int cPlayer::EATING_TICKS = 30;
+
+
+
 
 
 cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
@@ -50,7 +57,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_EnderChestContents(9, 3),
 	m_CurrentWindow(NULL),
 	m_InventoryWindow(NULL),
-	m_Color('-'),
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
@@ -216,16 +222,24 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
+	bool CanMove = true;
 	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
-		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
+		{
+			CanMove = false;
+			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
+		}
 		m_ClientHandle->StreamChunks();
 	}
 
-	BroadcastMovementUpdate(m_ClientHandle);
+	if (CanMove)
+	{
+		BroadcastMovementUpdate(m_ClientHandle);
+	}
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -509,7 +523,7 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
@@ -601,7 +615,6 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -619,8 +632,8 @@ void cPlayer::FinishEating(void)
 	// if the food is mushroom soup, return a bowl to the inventory
 	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
 	{
-		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
-		GetInventory().AddItem(emptyBowl, true, true);
+		cItem EmptyBowl(E_ITEM_BOWL);
+		GetInventory().AddItem(EmptyBowl, true, true);
 	}
 }
 
@@ -631,7 +644,6 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -877,7 +889,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
 
-	m_Stats.AddValue(statItemsDropped, Pickups.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
@@ -907,6 +919,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			default: DamageText = "died, somehow; we've no idea how though"; break;
 		}
 		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
+	}
+	else if (a_TDI.Attacker == NULL)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
+	{
+		// no-op
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
@@ -1348,48 +1364,6 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
-void cPlayer::AddToGroup( const AString & a_GroupName)
-{
-	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName);
-	m_Groups.push_back( Group);
-	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str());
-	ResolveGroups();
-	ResolvePermissions();
-}
-
-
-
-
-
-void cPlayer::RemoveFromGroup( const AString & a_GroupName)
-{
-	bool bRemoved = false;
-	for (GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr)
-	{
-		if ((*itr)->GetName().compare(a_GroupName) == 0)
-		{
-			m_Groups.erase( itr);
-			bRemoved = true;
-			break;
-		}
-	}
-
-	if (bRemoved)
-	{
-		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str());
-		ResolveGroups();
-		ResolvePermissions();
-	}
-	else
-	{
-		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str());
-	}
-}
-
-
-
-
-
 bool cPlayer::HasPermission(const AString & a_Permission)
 {
 	if (a_Permission.empty())
@@ -1398,47 +1372,18 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 		return true;
 	}
 	
-	AStringVector Split = StringSplit( a_Permission, ".");
-	PermissionMap Possibilities = m_ResolvedPermissions;
-	// Now search the namespaces
-	while (Possibilities.begin() != Possibilities.end())
+	AStringVector Split = StringSplit(a_Permission, ".");
+
+	// Iterate over all granted permissions; if any matches, then return success:
+	for (AStringVectorVector::const_iterator itr = m_SplitPermissions.begin(), end = m_SplitPermissions.end(); itr != end; ++itr)
 	{
-		PermissionMap::iterator itr = Possibilities.begin();
-		if (itr->second)
+		if (PermissionMatches(Split, *itr))
 		{
-			AStringVector OtherSplit = StringSplit( itr->first, ".");
-			if (OtherSplit.size() <= Split.size())
-			{
-				unsigned int i;
-				for (i = 0; i < OtherSplit.size(); ++i)
-				{
-					if (OtherSplit[i].compare( Split[i]) != 0)
-					{
-						if (OtherSplit[i].compare("*") == 0) return true;  // WildCard man!! WildCard!
-						break;
-					}
-				}
-				if (i == Split.size()) return true;
-			}
-		}
-		Possibilities.erase( itr);
-	}
-
-	// Nothing that matched :(
-	return false;
-}
-
-
-
-
-
-bool cPlayer::IsInGroup( const AString & a_Group)
-{
-	for (GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr)
-	{
-		if (a_Group.compare( (*itr)->GetName().c_str()) == 0)
 			return true;
-	}
+		}
+	}  // for itr - m_SplitPermissions[]
+
+	// No granted permission matches
 	return false;
 }
 
@@ -1446,68 +1391,35 @@ bool cPlayer::IsInGroup( const AString & a_Group)
 
 
 
-void cPlayer::ResolvePermissions()
+bool cPlayer::PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template)
 {
-	m_ResolvedPermissions.clear();  // Start with an empty map
-
-	// Copy all player specific permissions into the resolved permissions map
-	for (PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr)
+	// Check the sub-items if they are the same or there's a wildcard:
+	size_t lenP = a_Permission.size();
+	size_t lenT = a_Template.size();
+	size_t minLen = std::min(lenP, lenT);
+	for (size_t i = 0; i < minLen; i++)
 	{
-		m_ResolvedPermissions[ itr->first ] = itr->second;
-	}
-
-	for (GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr)
-	{
-		const cGroup::PermissionMap & Permissions = (*GroupItr)->GetPermissions();
-		for (cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr)
+		if (a_Template[i] == "*")
 		{
-			m_ResolvedPermissions[ itr->first ] = itr->second;
+			// Has matched so far and now there's a wildcard in the template, so the permission matches:
+			return true;
+		}
+		if (a_Permission[i] != a_Template[i])
+		{
+			// Found a mismatch
+			return false;
 		}
 	}
-}
 
-
-
-
-
-void cPlayer::ResolveGroups()
-{
-	// Clear resolved groups first
-	m_ResolvedGroups.clear();
-
-	// Get a complete resolved list of all groups the player is in
-	std::map< cGroup*, bool > AllGroups;  // Use a map, because it's faster than iterating through a list to find duplicates
-	GroupList ToIterate;
-	for (GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr)
+	// So far all the sub-items have matched
+	// If the sub-item count is the same, then the permission matches:
+	if (lenP == lenT)
 	{
-		ToIterate.push_back( *GroupItr);
+		return true;
 	}
-	while (ToIterate.begin() != ToIterate.end())
-	{
-		cGroup* CurrentGroup = *ToIterate.begin();
-		if (AllGroups.find( CurrentGroup) != AllGroups.end())
-		{
-			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
-				GetName().c_str(), CurrentGroup->GetName().c_str()
-			);
-		}
-		else
-		{
-			AllGroups[ CurrentGroup ] = true;
-			m_ResolvedGroups.push_back( CurrentGroup);  // Add group to resolved list
-			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
-			for (cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr)
-			{
-				if (AllGroups.find( *itr) != AllGroups.end())
-				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str());
-					continue;
-				}
-				ToIterate.push_back( *itr);
-			}
-		}
-		ToIterate.erase( ToIterate.begin());
-	}
+
+	// There are more sub-items in either the permission or the template, not a match:
+	return false;
 }
 
 
@@ -1516,17 +1428,14 @@ void cPlayer::ResolveGroups()
 
 AString cPlayer::GetColor(void) const
 {
-	if (m_Color != '-')
+	if (m_MsgNameColorCode.empty() || (m_MsgNameColorCode == "-"))
 	{
-		return cChatColor::Delimiter + m_Color;
+		// Color has not been assigned, return an empty string:
+		return AString();
 	}
 
-	if (m_Groups.size() < 1)
-	{
-		return cChatColor::White;
-	}
-
-	return (*m_Groups.begin())->GetColor();
+	// Return the color, including the delimiter:
+	return cChatColor::Delimiter + m_MsgNameColorCode;
 }
 
 
@@ -1599,7 +1508,7 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
-	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
@@ -1642,48 +1551,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 
 
 
-void cPlayer::LoadPermissionsFromDisk()
-{
-	m_Groups.clear();
-	m_Permissions.clear();
-
-	cIniFile IniFile;
-	if (IniFile.ReadFile("users.ini"))
-	{
-		AString Groups = IniFile.GetValueSet(GetName(), "Groups", "Default");
-		AStringVector Split = StringSplitAndTrim(Groups, ",");
-
-		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
-		{
-			if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
-			{
-				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), GetName().c_str());
-			}
-			AddToGroup(*itr);
-		}
-
-		AString Color = IniFile.GetValue(GetName(), "Color", "-");
-		if (!Color.empty())
-		{
-			m_Color = Color[0];
-		}
-	}
-	else
-	{
-		cGroupManager::GenerateDefaultUsersIni(IniFile);
-		IniFile.AddValue("Groups", GetName(), "Default");
-		AddToGroup("Default");
-	}
-	IniFile.WriteFile("users.ini");
-	ResolvePermissions();
-}
-
-
-
-
 bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
-	LoadPermissionsFromDisk();
+	LoadRank();
 
 	// Load from the UUID file:
 	if (LoadFromFile(GetUUIDFileName(m_UUID), a_World))
@@ -1823,6 +1693,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 bool cPlayer::SaveToDisk()
 {
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/"));  // Create the "players" folder, if it doesn't exist yet (#1268)
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
@@ -1911,26 +1782,6 @@ bool cPlayer::SaveToDisk()
 	}
 
 	return true;
-}
-
-
-
-
-
-cPlayer::StringList cPlayer::GetResolvedPermissions()
-{
-	StringList Permissions;
-
-	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
-	for (PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr)
-	{
-		if (itr->second)
-		{
-			Permissions.push_back( itr->first);
-		}
-	}
-
-	return Permissions;
 }
 
 
@@ -2189,6 +2040,31 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 		BaseExhaustion = BaseExhaustion * 0.01;
 	}
 	m_FoodExhaustionLevel += BaseExhaustion;
+}
+
+
+
+
+
+void cPlayer::LoadRank(void)
+{
+	// Load the values from cRankManager:
+	cRankManager & RankMgr = cRoot::Get()->GetRankManager();
+	m_Rank = RankMgr.GetPlayerRankName(m_UUID);
+	if (m_Rank.empty())
+	{
+		m_Rank = RankMgr.GetDefaultRank();
+	}
+	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
+	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+
+	// Break up the individual permissions on each dot, into m_SplitPermissions:
+	m_SplitPermissions.clear();
+	m_SplitPermissions.reserve(m_Permissions.size());
+	for (AStringVector::const_iterator itr = m_Permissions.begin(), end = m_Permissions.end(); itr != end; ++itr)
+	{
+		m_SplitPermissions.push_back(StringSplit(*itr, "."));
+	}  // for itr - m_Permissions[]
 }
 
 

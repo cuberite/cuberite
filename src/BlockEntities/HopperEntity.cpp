@@ -549,13 +549,13 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Try the chest directly connected to the hopper:
-	cChestEntity * Chest = (cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
-	if (Chest == NULL)
+	cChestEntity * ConnectedChest = (cChestEntity *)a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
+	if (ConnectedChest == NULL)
 	{
 		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, a_BlockX, a_BlockY, a_BlockZ);
 		return false;
 	}
-	if (MoveItemsToGrid(*Chest))
+	if (MoveItemsToGrid(*ConnectedChest))
 	{
 		// Chest block directly connected was not full
 		return true;
@@ -586,13 +586,13 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		}
 
 		BLOCKTYPE Block = Neighbor->GetBlock(x, a_BlockY, z);
-		if (Block != Chest->GetBlockType())
+		if (Block != ConnectedChest->GetBlockType())
 		{
 			// Not the same kind of chest
 			continue;
 		}
 
-		Chest = (cChestEntity *)Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z);
+		cChestEntity * Chest = (cChestEntity *)Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z);
 		if (Chest == NULL)
 		{
 			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d} (%d, %d)", __FUNCTION__, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z, x, z);

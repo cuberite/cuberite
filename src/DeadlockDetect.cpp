@@ -21,7 +21,8 @@ const int CYCLE_MILLISECONDS = 100;
 
 
 cDeadlockDetect::cDeadlockDetect(void) :
-	super("DeadlockDetect")
+	super("DeadlockDetect"),
+	m_IntervalSec(1000)
 {
 }
 
@@ -136,6 +137,7 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 
 void cDeadlockDetect::DeadlockDetected(void)
 {
+	LOGERROR("Deadlock detected, aborting the server");
 	ASSERT(!"Deadlock detected");
 	abort();
 }

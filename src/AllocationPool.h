@@ -3,7 +3,7 @@
 
 #include <memory>
 
-template<class T>
+template <class T>
 class cAllocationPool
 {
 public:
@@ -34,7 +34,7 @@ public:
 
 /** Allocates memory storing unused elements in a linked list. Keeps at least NumElementsInReserve
 elements in the list unless malloc fails so that the program has a reserve to handle OOM.**/
-template<class T, size_t NumElementsInReserve>
+template <class T, size_t NumElementsInReserve>
 class cListAllocationPool : public cAllocationPool<T>
 {
 	public:

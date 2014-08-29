@@ -46,7 +46,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to 0
+		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_BLOCK_VINES, 1, 0));
 	}
 
@@ -80,7 +80,7 @@ public:
 	/// Returns true if the specified block type is good for vines to attach to
 	static bool IsBlockAttachable(BLOCKTYPE a_BlockType)
 	{
-		return (a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES) || cBlockInfo::IsSolid(a_BlockType);
+		return ((a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES) || cBlockInfo::IsSolid(a_BlockType));
 	}
 
 
@@ -182,7 +182,7 @@ public:
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY - 1, a_RelZ, Block);
 		if (Block == E_BLOCK_AIR)
 		{
-			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, a_RelX * cChunkDef::Width, a_RelY - 1, a_RelZ * cChunkDef::Width, ssVineSpread))
+			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY - 1, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, ssVineSpread))
 			{
 				a_Chunk.UnboundedRelSetBlock(a_RelX, a_RelY - 1, a_RelZ, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
 			}
