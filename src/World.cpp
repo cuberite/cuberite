@@ -1188,24 +1188,26 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 		return;
 	}
 	
-	// TODO: Add damage to entities and implement block hardiness
+	// TODO: Implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("random.explode", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.6f);
+
 	{
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 		{
 			cClientHandle * ch = (*itr)->GetClientHandle();
-			if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+			if (ch == NULL)
 			{
 				continue;
 			}
+
 			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
 			if (distance_explosion.SqrLength() < 4096.0)
 			{
-				double real_distance = std::max(0.004, sqrt(distance_explosion.SqrLength()));
+				double real_distance = std::max(0.004, distance_explosion.Length());
 				double power = a_ExplosionSize / real_distance;
 				if (power <= 1)
 				{
@@ -1217,6 +1219,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			}
 		}
 	}
+
 	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
 
