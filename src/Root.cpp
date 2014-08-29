@@ -462,16 +462,6 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 
 void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 {
-	// Some commands are built-in:
-	if (a_Cmd == "stop")
-	{
-		m_bStop = true;
-	}
-	else if (a_Cmd == "restart")
-	{
-		m_bRestart = true;
-	}
-
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.push_back(cCommand(a_Cmd, new cLogCommandDeleteSelfOutputCallback));
@@ -483,14 +473,16 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
-	// Some commands are built-in:
+	// cRoot handles stopping and restarting due to our access to controlling variables
 	if (a_Cmd == "stop")
 	{
 		m_bStop = true;
+		return;
 	}
 	else if (a_Cmd == "restart")
 	{
 		m_bRestart = true;
+		return;
 	}
 
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
