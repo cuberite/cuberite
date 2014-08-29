@@ -55,7 +55,6 @@ void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 {
 	if (m_Item.IsEmpty())
 	{
-		SetHealth(0);
 		super::KilledBy(a_TDI);
 		Destroy();
 		return;
