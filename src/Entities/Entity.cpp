@@ -400,9 +400,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
 			cItem Item = ArmorItems[i];
-			if (Item.m_Enchantments.GetLevel(cEnchantments::enchThorns) > ThornsLevel) ThornsLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchThorns);
+			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
 		}
-
+		
 		if (ThornsLevel > 0)
 		{
 			int Chance = ThornsLevel * 15;
