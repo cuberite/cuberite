@@ -2909,10 +2909,11 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
+	/** Add a chunk to the generation queue, if it's not already present. */
 	if (!(m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkZ)))
 	{
 		LOGD("Chunk [%d, %d] already generated, skipping generation", a_ChunkX, a_ChunkZ);
-		// Already generated, ignore reques
+		/** Already generated, ignore reques */
 	}
 	else
 	{
