@@ -245,14 +245,6 @@ void cChunkGenerator::Execute(void)
 			LastReportTick = clock();
 		}
 
-		// Hack for regenerating chunks: if Y != 0, the chunk is considered invalid, even if it has its data set
-		if (m_ChunkSink->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
-		{
-			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
-			// Already generated, ignore request
-			continue;
-		}
-
 		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);

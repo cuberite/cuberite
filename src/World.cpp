@@ -2909,7 +2909,15 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
+	if (!(m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkZ)))
+	{
+		LOGD("Chunk [%d, %d] already generated, skipping generation", a_ChunkX, a_ChunkZ);
+		// Already generated, ignore reques
+	}
+	else
+	{
 	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ);
+	}
 }
 
 
