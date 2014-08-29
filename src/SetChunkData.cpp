@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "SetChunkData.h"
+#include "BlockEntities/BlockEntity.h"
 
 
 
@@ -112,6 +113,38 @@ void cSetChunkData::CalculateHeightMap(void)
 	m_IsHeightMapValid = true;
 }
 
+
+
+
+
+
+void cSetChunkData::RemoveInvalidBlockEntities(void)
+{
+	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end();)
+	{
+		BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
+		BLOCKTYPE WorldBlockType = cChunkDef::GetBlock(m_BlockTypes, (*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
+		if (EntityBlockType != WorldBlockType)
+		{
+			// Bad blocktype, remove the block entity:
+			LOGD("Block entity blocktype mismatch at {%d, %d, %d}: entity for blocktype %s(%d) in block %s(%d). Deleting the block entity.",
+				(*itr)->GetPosX(), (*itr)->GetPosY(), (*itr)->GetPosZ(),
+				ItemTypeToString(EntityBlockType).c_str(), EntityBlockType,
+				ItemTypeToString(WorldBlockType).c_str(),  WorldBlockType
+			);
+			cBlockEntityList::iterator itr2 = itr;
+			itr2++;
+			m_BlockEntities.erase(itr);
+			delete *itr;
+			itr = itr2;
+		}
+		else
+		{
+			// Good blocktype, keep the block entity:
+			++itr;
+		}
+	}  // for itr - m_BlockEntities[]
+}
 
 
 
