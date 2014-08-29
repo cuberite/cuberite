@@ -16,10 +16,6 @@
 
 
 
-/** This is really only a placeholder to be used in places where we need to "make up" a chunk's Y coord.
-It will help us when the new chunk format comes out and we need to patch everything up for compatibility.
-*/
-
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
 #define AXIS_ORDER_YZX 1  // Original (1.1-)
 #define AXIS_ORDER_XZY 2  // New (1.2+)
