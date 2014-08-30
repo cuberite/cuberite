@@ -632,6 +632,7 @@ bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_Eff
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
+	a_Player->GetInventory().RemoveOneEquippedItem();
 
 	FoodInfo Info = GetFoodInfo();
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
