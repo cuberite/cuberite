@@ -211,13 +211,14 @@ void cCommandBlockEntity::Execute()
 		}
 	} CmdBlockOutCb(this);
 
-	if (  // Administrator commands are not executable by command blocks
+	// Administrator commands are not executable by command blocks:
+	if (
 		(m_Command != "stop") &&
 		(m_Command != "restart") &&
 		(m_Command != "kick") &&
 		(m_Command != "ban") &&
 		(m_Command != "ipban")
-		)
+	)
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());

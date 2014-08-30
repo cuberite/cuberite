@@ -1880,10 +1880,11 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							}
 							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20))  // 20% chance of flinging stuff around
 							{
+								// If the block is shrapnel-able, make a falling block entity out of it:
 								if (
 									((m_World->GetTNTShrapnelLevel() == slAll) && cBlockInfo::FullyOccupiesVoxel(Block)) ||
 									((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block == E_BLOCK_SAND) || (Block == E_BLOCK_GRAVEL)))
-									)
+								)
 								{
 									m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
 								}
@@ -1891,7 +1892,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
 							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
-							break;							
+							break;
 						}
 					}  // switch (BlockType)
 				}  // for z
