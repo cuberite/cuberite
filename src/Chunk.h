@@ -155,7 +155,7 @@ public:
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const;
-	BLOCKTYPE GetBlock(Vector3i a_cords) const { return GetBlock(a_cords.x, a_cords.y, a_cords.z);}
+	BLOCKTYPE GetBlock(const Vector3i & a_RelCoords) const { return GetBlock(a_RelCoords.x, a_RelCoords.y, a_RelCoords.z); }
 	void      GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	void      GetBlockInfo    (int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 	

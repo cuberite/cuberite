@@ -1,4 +1,4 @@
-﻿
+
 // CraftingRecipes.cpp
 
 // Interfaces to the cCraftingRecipes class representing the storage of crafting recipes
@@ -366,7 +366,10 @@ void cCraftingRecipes::ClearRecipes(void)
 
 void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine)
 {
-	AStringVector Sides = StringSplit(a_RecipeLine, "=");
+	AString RecipeLine(a_RecipeLine);
+	RecipeLine.erase(std::remove(RecipeLine.begin(), RecipeLine.end(), ' '), RecipeLine.end());
+
+	AStringVector Sides = StringSplit(RecipeLine, "=");
 	if (Sides.size() != 2)
 	{
 		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);

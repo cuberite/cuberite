@@ -92,6 +92,9 @@ public:
 	/** Calculates the heightmap based on the contained blocktypes and marks it valid. */
 	void CalculateHeightMap(void);
 
+	/** Removes the block entities that don't have a proper blocktype at their corresponding coords. */
+	void RemoveInvalidBlockEntities(void);
+
 protected:
 	int m_ChunkX;
 	int m_ChunkZ;
