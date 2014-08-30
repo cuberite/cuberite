@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <limits>
 
 
 
@@ -97,6 +98,68 @@ extern int GetBEInt(const char * a_Mem);
 
 /// Writes four bytes to the specified memory location so that they interpret as BigEndian int
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
+
+/// Parses any integer type. Checks bounds and returns errors out of band.
+template <class T>
+bool StringToInteger(const AString & a_str, T & a_Num)
+{
+	size_t i = 0;
+	bool positive = true;
+	T result = 0;
+	if (a_str[0] == '+')
+	{
+		i++;
+	}
+	else if (a_str[0] == '-')
+	{
+		i++;
+		positive = false;
+	}
+	if (positive)
+	{
+		for (size_t size = a_str.size(); i < size; i++)
+		{
+			if ((a_str[i] < '0') || (a_str[i] > '9'))
+			{
+				return false;
+			}
+			if (std::numeric_limits<T>::max() / 10 < result)
+			{
+				return false;
+			}
+			result *= 10;
+			T digit = a_str[i] - '0';
+			if (std::numeric_limits<T>::max() - digit < result)
+			{
+				return false;
+			}
+			result += digit;
+		}
+	}
+	else
+	{
+		for (size_t size = a_str.size(); i < size; i++)
+		{
+			if ((a_str[i] < '0') || (a_str[i] > '9'))
+			{
+				return false;
+			}
+			if (std::numeric_limits<T>::min() / 10 > result)
+			{
+				return false;
+			}
+			result *= 10;
+			T digit = a_str[i] - '0';
+			if (std::numeric_limits<T>::min() + digit > result)
+			{
+				return false;
+			}
+			result -= digit;
+		}
+	}
+	a_Num = result;
+	return true;
+}
 
 // If you have any other string helper functions, declare them here
 

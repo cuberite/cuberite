@@ -1,3 +1,7 @@
+*.vcproj
+*.vcxproj
+*.sln
+*.user
 .xls
 Statistics.txt
 *.bmp
@@ -7,3 +11,4 @@ Profiling
 *.png
 world/
 *.html
+*.xls

@@ -272,7 +272,7 @@ extern const char * GetEntityTypeString(eEntityType a_EntityType)
 int GetNumCores(void)
 {
 	// Get number of cores by querying the system process affinity mask (Windows-specific)
-	DWORD Affinity, ProcAffinity;
+	DWORD_PTR Affinity, ProcAffinity;
 	GetProcessAffinityMask(GetCurrentProcess(), &ProcAffinity, &Affinity);
 	int NumCores = 0;
 	while (Affinity > 0)

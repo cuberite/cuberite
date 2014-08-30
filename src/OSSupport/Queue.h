@@ -20,7 +20,7 @@ cQueueFuncs and is used as the default behavior.
 */
 
 /// This empty struct allows for the callback functions to be inlined
-template<class T>
+template <class T>
 struct cQueueFuncs
 {
 public:

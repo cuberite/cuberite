@@ -28,7 +28,17 @@ cProcessor::cThread::cThread(cCallback & a_Callback, cProcessor & a_ParentProces
 	m_Callback(a_Callback),
 	m_ParentProcessor(a_ParentProcessor)
 {
+	LOG("Created a new thread: %p", this);
 	super::Start();
+}
+
+
+
+
+
+void cProcessor::cThread::WaitForStart(void)
+{
+	m_HasStarted.Wait();
 }
 
 
@@ -37,9 +47,9 @@ cProcessor::cThread::cThread(cCallback & a_Callback, cProcessor & a_ParentProces
 
 void cProcessor::cThread::Execute(void)
 {
-	LOG("Started a new thread: %d", cIsThread::GetCurrentID());
+	LOG("Started a new thread: %p, ID %d", this, cIsThread::GetCurrentID());
 	
-	m_ParentProcessor.m_ThreadsHaveStarted.Set();
+	m_HasStarted.Set();
 	
 	for (;;)
 	{
@@ -52,7 +62,7 @@ void cProcessor::cThread::Execute(void)
 		ProcessFile(FileName);
 	}  // for-ever
 	
-	LOG("Thread %d terminated", cIsThread::GetCurrentID());
+	LOG("Thread %p (ID %d) terminated", this, cIsThread::GetCurrentID());
 }
 
 
@@ -522,20 +532,18 @@ void cProcessor::ProcessWorld(const AString & a_WorldFolder, cCallbackFactory & 
 	#endif  // _DEBUG
 	//*/
 	
+	// Start all the threads:
 	for (int i = 0; i < NumThreads; i++)
 	{
 		cCallback * Callback = a_CallbackFactory.GetNewCallback();
 		m_Threads.push_back(new cThread(*Callback, *this));
 	}
 
-	// Wait for the first thread to start processing:
-	m_ThreadsHaveStarted.Wait();
-	
-	// Wait for all threads to finish
-	// simply by calling each thread's destructor sequentially
+	// Wait for all threads to finish:
 	LOG("Waiting for threads to finish");
 	for (cThreads::iterator itr = m_Threads.begin(), end = m_Threads.end(); itr != end; ++itr)
 	{
+		(*itr)->WaitForStart();
 		delete *itr;
 	}  // for itr - m_Threads[]
 	LOG("Processor finished");

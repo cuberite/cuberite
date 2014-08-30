@@ -186,6 +186,9 @@ public:
 	void Push(const HTTPRequest * a_Request);
 	void Push(const HTTPTemplateRequest * a_Request);
 	void Push(const Vector3d & a_Vector);
+	void Push(const Vector3d * a_Vector);
+	void Push(const Vector3i & a_Vector);
+	void Push(const Vector3i * a_Vector);
 
 	// Push a value onto the stack (keep alpha-sorted):
 	void Push(bool a_Value);

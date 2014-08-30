@@ -26,9 +26,11 @@ cStatistics::cStats::cStats(void) :
 	m_MinChunkZ(0x7fffffff),
 	m_MaxChunkZ(0x80000000)
 {
-	memset(m_BiomeCounts, 0, sizeof(m_BiomeCounts));
-	memset(m_BlockCounts, 0, sizeof(m_BlockCounts));
-	memset(m_SpawnerEntity, 0, sizeof(m_SpawnerEntity));
+	memset(m_BiomeCounts,          0, sizeof(m_BiomeCounts));
+	memset(m_BlockCounts,          0, sizeof(m_BlockCounts));
+	memset(m_PerHeightBlockCounts, 0, sizeof(m_PerHeightBlockCounts));
+	memset(m_PerHeightSpawners,    0, sizeof(m_PerHeightSpawners));
+	memset(m_SpawnerEntity,        0, sizeof(m_SpawnerEntity));
 }
 
 
@@ -46,6 +48,11 @@ void cStatistics::cStats::Add(const cStatistics::cStats & a_Stats)
 		for (int j = 0; j <= 255; j++)
 		{
 			m_BlockCounts[i][j] += a_Stats.m_BlockCounts[i][j];
+			m_PerHeightBlockCounts[i][j] += a_Stats.m_PerHeightBlockCounts[i][j];
+		}
+		for (int j = 0; j < ARRAYCOUNT(m_PerHeightSpawners[0]); j++)
+		{
+			m_PerHeightSpawners[i][j] += a_Stats.m_PerHeightSpawners[i][j];
 		}
 	}
 	for (int i = 0; i < ARRAYCOUNT(m_SpawnerEntity); i++)
@@ -149,6 +156,7 @@ bool cStatistics::OnSection
 	
 	for (int y = 0; y < 16; y++)
 	{
+		int Height = (int)a_Y * 16 + y;
 		for (int z = 0; z < 16; z++)
 		{
 			for (int x = 0; x < 16; x++)
@@ -156,6 +164,7 @@ bool cStatistics::OnSection
 				unsigned char Biome = m_BiomeData[x + 16 * z];  // Cannot use cChunkDef, different datatype
 				unsigned char BlockType = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
 				m_Stats.m_BlockCounts[Biome][BlockType] += 1;
+				m_Stats.m_PerHeightBlockCounts[Height][BlockType] += 1;
 			}
 		}
 	}
@@ -259,16 +268,27 @@ bool cStatistics::OnTileTick(
 
 void cStatistics::OnSpawner(cParsedNBT & a_NBT, int a_TileEntityTag)
 {
+	// Get the spawned entity type:
 	int EntityIDTag = a_NBT.FindChildByName(a_TileEntityTag, "EntityId");
 	if ((EntityIDTag < 0) || (a_NBT.GetType(EntityIDTag) != TAG_String))
 	{
 		return;
 	}
 	eEntityType Ent = GetEntityType(a_NBT.GetString(EntityIDTag));
-	if (Ent < ARRAYCOUNT(m_Stats.m_SpawnerEntity))
+	if (Ent >= ARRAYCOUNT(m_Stats.m_SpawnerEntity))
 	{
-		m_Stats.m_SpawnerEntity[Ent] += 1;
+		return;
 	}
+	m_Stats.m_SpawnerEntity[Ent] += 1;
+	
+	// Get the spawner pos:
+	int PosYTag = a_NBT.FindChildByName(a_TileEntityTag, "y");
+	if ((PosYTag < 0) || (a_NBT.GetType(PosYTag) != TAG_Int))
+	{
+		return;
+	}
+	int BlockY = Clamp(a_NBT.GetInt(PosYTag), 0, 255);
+	m_Stats.m_PerHeightSpawners[BlockY][Ent] += 1;
 }
 
 
@@ -316,10 +336,14 @@ cStatisticsFactory::~cStatisticsFactory()
 	SaveBiomes();
 	LOG("    BlockTypes.xls");
 	SaveBlockTypes();
+	LOG("    PerHeightBlockTypes.xls");
+	SavePerHeightBlockTypes();
 	LOG("    BiomeBlockTypes.xls");
 	SaveBiomeBlockTypes();
 	LOG("    Spawners.xls");
 	SaveSpawners();
+	LOG("    PerHeightSpawners.xls");
+	SavePerHeightSpawners();
 }
 
 
@@ -389,6 +413,61 @@ void cStatisticsFactory::SaveBlockTypes(void)
 		Printf(Line, "%s\t%d\t%llu\t%.08f\n", GetBlockTypeString(i), i, Count, ((double)Count) / TotalBlocks);
 		f.Write(Line.c_str(), Line.length());
 	}
+}
+
+
+
+
+
+void cStatisticsFactory::SavePerHeightBlockTypes(void)
+{
+	// Export as two tables: biomes 0-127 and 128-255, because OpenOffice doesn't support more than 256 columns
+
+	cFile f;
+	if (!f.Open("PerHeightBlockTypes.xls", cFile::fmWrite))
+	{
+		LOG("Cannot write to file PerHeightBlockTypes.xls. Statistics not written.");
+		return;
+	}
+	
+	// Write header:
+	f.Printf("Blocks 0 - 127:\nHeight");
+	for (int i = 0; i < 128; i++)
+	{
+		f.Printf("\t%s(%d)", GetBlockTypeString(i), i);
+	}
+	f.Printf("\n");
+	
+	// Write first half:
+	for (int y = 0; y < 256; y++)
+	{
+		f.Printf("%d", y);
+		for (int BlockType = 0; BlockType < 128; BlockType++)
+		{
+			f.Printf("\t%llu", m_CombinedStats.m_PerHeightBlockCounts[y][BlockType]);
+		}  // for BlockType
+		f.Printf("\n");
+	}  // for y - height (0 - 127)
+	f.Printf("\n");
+
+	// Write second header:
+	f.Printf("Blocks 128 - 255:\nHeight");
+	for (int i = 128; i < 256; i++)
+	{
+		f.Printf("\t%s(%d)", GetBlockTypeString(i), i);
+	}
+	f.Printf("\n");
+	
+	// Write second half:
+	for (int y = 0; y < 256; y++)
+	{
+		f.Printf("%d", y);
+		for (int BlockType = 128; BlockType < 256; BlockType++)
+		{
+			f.Printf("\t%llu", m_CombinedStats.m_PerHeightBlockCounts[y][BlockType]);
+		}  // for BlockType
+		f.Printf("\n");
+	}  // for y - height (0 - 127)
 }
 
 
@@ -515,6 +594,44 @@ void cStatisticsFactory::SaveSpawners(void)
 	for (int i = 0; i < entMax; i++)
 	{
 		f.Printf("%s\t%llu\t%0.4f\n", GetEntityTypeString((eEntityType)i), m_CombinedStats.m_SpawnerEntity[i], (double)(m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks);
+	}
+}
+
+
+
+
+
+void cStatisticsFactory::SavePerHeightSpawners(void)
+{
+	cFile f;
+	if (!f.Open("PerHeightSpawners.xls", cFile::fmWrite))
+	{
+		LOG("Cannot write to file PerHeightSpawners.xls. Statistics not written.");
+		return;
+	}
+	
+	// Write header:
+	f.Printf("Height\tTotal");
+	for (int i = 0; i < entMax; i++)
+	{
+		f.Printf("\t%s", GetEntityTypeString((eEntityType)i));
+	}
+	f.Printf("\n");
+
+	// Write individual lines:
+	for (int y = 0; y < 256; y++)
+	{
+		UInt64 Total = 0;
+		for (int i = 0; i < entMax; i++)
+		{
+			Total += m_CombinedStats.m_PerHeightSpawners[y][i];
+		}
+		f.Printf("%d\t%llu", y, Total);
+		for (int i = 0; i < entMax; i++)
+		{
+			f.Printf("\t%llu", m_CombinedStats.m_PerHeightSpawners[y][i]);
+		}
+		f.Printf("\n");
 	}
 }
 

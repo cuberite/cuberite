@@ -75,11 +75,21 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TimeSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
+	m_PingStartTime(0),
+	m_LastPingTime(1000),
 	m_BlockDigAnimStage(-1),
+	m_BlockDigAnimSpeed(0),
+	m_BlockDigAnimX(0),
+	m_BlockDigAnimY(256),  // Invalid Y, so that the coords don't get picked up
+	m_BlockDigAnimZ(0),
 	m_HasStartedDigging(false),
+	m_LastDigBlockX(0),
+	m_LastDigBlockY(256),  // Invalid Y, so that the coords don't get picked up
+	m_LastDigBlockZ(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
+	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB")
@@ -912,11 +922,16 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		return;
 	}
 
-	// Check for clickthrough-blocks:
-	/* When the user breaks a fire block, the client send the wrong block location.
-	We must find the right block with the face direction. */
-	if (a_BlockFace != BLOCK_FACE_NONE)
+	if ((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED))
 	{
+		if (a_BlockFace == BLOCK_FACE_NONE)
+		{
+			return;
+		}
+
+		/* Check for clickthrough-blocks:
+		When the user breaks a fire block, the client send the wrong block location.
+		We must find the right block with the face direction. */
 		int BlockX = a_BlockX;
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
@@ -927,17 +942,16 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			a_BlockY = BlockY;
 			a_BlockZ = BlockZ;
 		}
-	}
 
-	if (
-		((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED)) &&  // Only do a radius check for block destruction - things like pickup tossing send coordinates that are to be ignored
-		((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
-	)
-	{
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
+		if (
+			((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
+		)
+		{
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			return;
+		}
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
@@ -1045,7 +1059,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	if (
 		m_Player->IsGameModeCreative() &&
-		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
+		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType) &&
+		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
 	)
 	{
 		// Players can't destroy blocks with a Sword in the hand.

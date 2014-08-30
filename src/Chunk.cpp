@@ -296,6 +296,16 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	}
 	m_BlockEntities.clear();
 	std::swap(a_SetChunkData.GetBlockEntities(), m_BlockEntities);
+
+	// Check that all block entities have a valid blocktype at their respective coords (DEBUG-mode only):
+	#ifdef _DEBUG
+		for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
+		{
+			BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
+			BLOCKTYPE WorldBlockType = GetBlock((*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
+			ASSERT(EntityBlockType == WorldBlockType);
+		}  // for itr - m_BlockEntities
+	#endif  // _DEBUG
 	
 	// Set all block entities' World variable:
 	for (cBlockEntityList::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)

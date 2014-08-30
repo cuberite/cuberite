@@ -27,6 +27,7 @@ const unsigned int QUEUE_SKIP_LIMIT = 500;
 
 cChunkGenerator::cChunkGenerator(void) :
 	super("cChunkGenerator"),
+	m_Seed(0),  // Will be overwritten by the actual generator
 	m_Generator(NULL),
 	m_PluginInterface(NULL),
 	m_ChunkSink(NULL)

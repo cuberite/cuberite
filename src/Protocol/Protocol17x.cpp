@@ -1824,7 +1824,11 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
 	AString Username;
-	a_ByteBuffer.ReadVarUTF8String(Username);
+	if (!a_ByteBuffer.ReadVarUTF8String(Username))
+	{
+		m_Client->Kick("Bad username");
+		return;
+	}
 	
 	if (!m_Client->HandleHandshake(Username))
 	{

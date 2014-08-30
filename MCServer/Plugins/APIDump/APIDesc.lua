@@ -942,24 +942,6 @@ cFile:Delete("/usr/bin/virus.exe");
 			Inherits = "cEntity",
 		},
 		
-		cGroup =
-		{
-			Desc = [[
-				This class represents a group {{cPlayer|players}} can be in. Groups define the permissions players
-				have, and optionally the color of their name in the chat.
-			]],
-			Functions =
-			{
-				SetName = { Return = "" },
-				GetName = { Return = "string" },
-				SetColor = { Return = "" },
-				GetColor = { Return = "string" },
-				AddCommand = { Return = "" },
-				AddPermission = { Return = "" },
-				InheritFrom = { Return = "" },
-			},
-		},  -- cGroup
-
 		cIniFile =
 		{
 			Desc = [[
@@ -1760,7 +1742,6 @@ a_Player:OpenWindow(Window);
 			Functions =
 			{
 				AddFoodExhaustion = { Params = "Exhaustion", Return = "", Notes = "Adds the specified number to the food exhaustion. Only positive numbers expected." },
-				AddToGroup = { Params = "GroupName", Return = "", Notes = "Temporarily adds the player to the specified group. The assignment is lost when the player disconnects." },
 				CalcLevelFromXp = { Params = "XPAmount", Return = "number", Notes = "(STATIC) Returns the level which is reached with the specified amount of XP. Inverse of XpForLevel()." },
 				CanFly = { Return = "bool", Notes = "Returns if the player is able to fly." },
 				CloseWindow = { Params = "[CanRefuse]", Return = "", Notes = "Closes the currently open UI window. If CanRefuse is true (default), the window may refuse the closing." },
@@ -1770,7 +1751,7 @@ a_Player:OpenWindow(Window);
 				FoodPoison = { Params = "NumTicks", Return = "", Notes = "Starts the food poisoning for the specified amount of ticks; if already foodpoisoned, sets FoodPoisonedTicksRemaining to the larger of the two" },
 				ForceSetSpeed = { Params = "{{Vector3d|Direction}}", Notes = "Forces the player to move to the given direction." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
-				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player (based on the first group). Prefix player messages with this code." },
+				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code." },
 				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
 				GetEffectiveGameMode = { Params = "", Return = "{{Globals#GameMode|GameMode}}", Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead." },
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
@@ -1784,7 +1765,6 @@ a_Player:OpenWindow(Window);
 				GetFoodSaturationLevel = { Params = "", Return = "number", Notes = "Returns the food saturation (overcharge of the food level, is depleted before food level)" },
 				GetFoodTickTimer = { Params = "", Return = "", Notes = "Returns the number of ticks past the last food-based heal or damage action; when this timer reaches 80, a new heal / damage is applied." },
 				GetGameMode = { Return = "{{Globals#GameMode|GameMode}}", Notes = "Returns the player's gamemode. The player may have their gamemode unassigned, in which case they inherit the gamemode from the current {{cWorld|world}}.<br /> <b>NOTE:</b> Instead of comparing the value returned by this function to the gmXXX constants, use the IsGameModeXXX() functions. These functions handle the gamemode inheritance automatically."},
-				GetGroups = { Return = "array-table of {{cGroup}}", Notes = "Returns all the groups that this player is member of, as a table. The groups are stored in the array part of the table, beginning with index 1."},
 				GetIP = { Return = "string", Notes = "Returns the IP address of the player, if available. Returns an empty string if there's no IP to report."},
 				GetInventory = { Return = "{{cInventory|Inventory}}", Notes = "Returns the player's inventory"},
 				GetMaxSpeed = { Params = "", Return = "number", Notes = "Returns the player's current maximum speed, relative to the game default speed. Takes into account the sprinting / flying status." },
@@ -1807,15 +1787,13 @@ a_Player:OpenWindow(Window);
 				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmAdventure gamemode, or has their gamemode unset and the world is a gmAdventure world." },
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmCreative gamemode, or has their gamemode unset and the world is a gmCreative world." },
 				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world." },
-				IsInGroup = { Params = "GroupNameString", Return = "bool", Notes = "Returns true if the player is a member of the specified group." },
 				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the player is on ground (not falling, not jumping, not flying)" },
 				IsSatiated = { Params = "", Return = "bool", Notes = "Returns true if the player is satiated (cannot eat)." },
 				IsVisible = { Params = "", Return = "bool", Notes = "Returns true if the player is visible to other players" },
-				LoadPermissionsFromDisk = { Params = "", Return = "", Notes = "Reloads the player's permissions from the disk. This loses any temporary changes made to the player's groups." },
+				LoadRank = { Params = "", Return = "", Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank." },
 				MoveTo = { Params = "{{Vector3d|NewPosition}}", Return = "Tries to move the player into the specified position." },
 				MoveToWorld = { Params = "WorldName", Return = "bool", Return = "Moves the player to the specified world. Returns true if successful." },
 				OpenWindow = { Params = "{{cWindow|Window}}", Return = "", Notes = "Opens the specified UI window for the player." },
-				RemoveFromGroup = { Params = "GroupName", Return = "", Notes = "Temporarily removes the player from the specified group. This change is lost when the player disconnects." },
 				Respawn = { Params = "", Return = "", Notes = "Restores the health, extinguishes fire, makes visible and sends the Respawn packet." },
 				SendMessage = { Params = "Message", Return = "", Notes = "Sends the specified message to the player." },
 				SendMessageFailure = { Params = "Message", Return = "", Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and sends message to player. For a command that failed to run because of insufficient permissions, etc." },
@@ -2004,6 +1982,71 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 		},  -- cPluginManager
 
+		cRankManager =
+		{
+			Desc = [[
+				Manages the players' permissions. The players are assigned a single rank, which contains groups of
+				permissions. The functions in this class query or modify these.</p>
+				<p>
+				All the functions are static, call them using the <code>cRankManager:Function()</code> convention.</p>
+				<p>
+				The players are identified by their UUID, to support player renaming.</p>
+				<p>
+				The rank also contains specific "mesage visuals" - bits that are used for formatting messages from the
+				players. There's a message prefix, which is put in front of every message the player sends, and the
+				message suffix that is appended to each message. There's also a PlayerNameColorCode, which holds the
+				color that is used for the player's name in the messages.</p>
+				<p>
+				Each rank can contain any number of permission groups. These groups allow for an easier setup of the
+				permissions - you can share groups among ranks, so the usual approach is to group similar permissions
+				together and add that group to any rank that should use those permissions.</p>
+				<p>
+				Permissions are added to individual groups. Each group can support unlimited permissions. Note that
+				adding a permission to a group will make the permission available to all the ranks that contain that
+				permission group.</p>
+				<p>
+				One rank is reserved as the Default rank. All players that don't have an explicit rank assigned to them
+				will behave as if assigned to this rank. The default rank can be changed to any other rank at any time.
+				Note that the default rank cannot be removed from the RankManager - RemoveRank() will change the default
+				rank to the replacement rank, if specified, and fail if no replacement rank is specified. Renaming the
+				default rank using RenameRank() will change the default rank to the new name.
+			]],
+			Functions =
+			{
+				AddGroup = { Params = "GroupName", Return = "", Notes = "Adds the group of the specified name. Logs a warning and does nothing if the group already exists." },
+				AddGroupToRank = { Params = "GroupName, RankName", Return = "bool", Notes = "Adds the specified group to the specified rank. Returns true on success, false on failure - if the group name or the rank name is not found." },
+				AddPermissionToGroup = { Params = "Permission, GroupName", Return = "bool", Notes = "Adds the specified permission to the specified group. Returns true on success, false on failure - if the group name is not found." },
+				AddRank = { Params = "RankName, MsgPrefix, MsgSuffix, MsgNameColorCode", Return = "", Notes = "Adds a new rank of the specified name and with the specified message visuals. Logs an info message and does nothing if the rank already exists." },
+				GetAllGroups = { Params = "", Return = "array-table of groups' names", Notes = "Returns an array-table containing the names of all the groups that are known to the manager." },
+				GetAllPermissions = { Params = "", Return = "array-table of permissions", Notes = "Returns an array-table containing all the permissions that are known to the manager." },
+				GetAllRanks = { Params = "", Return = "array-table of ranks' names", Notes = "Returns an array-table containing the names of all the ranks that are known to the manager." },
+				GetDefaultRank = { Params = "", Return = "string", Notes = "Returns the name of the default rank. " },
+				GetGroupPermissions = { Params = "GroupName", Return = "array-table of permissions", Notes = "Returns an array-table containing the permissions that the specified group contains." },
+				GetPlayerGroups = { Params = "PlayerUUID", Return = "array-table of groups' names", Notes = "Returns an array-table of the names of the groups that are assigned to the specified player through their rank. Returns an empty table if the player is not known or has no rank or groups assigned to them." },
+				GetPlayerMsgVisuals = { Params = "PlayerUUID", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals assigned to the player. If the player is not explicitly assigned a rank, the default rank's visuals are returned. If there is an error, no value is returned at all." },
+				GetPlayerPermissions = { Params = "PlayerUUID", Return = "array-table of permissions", Notes = "Returns the permissions that the specified player is assigned through their rank. Returns the default rank's permissions if the player has no explicit rank assigned to them. Returns an empty array on error." },
+				GetPlayerRankName = { Params = "PlayerUUID", Return = "RankName", Notes = "Returns the name of the rank that is assigned to the specified player. An empty string (NOT the default rank) is returned if the player has no rank assigned to them." },
+				GetRankGroups = { Params = "RankName", Return = "array-table of groups' names", Notes = "Returns an array-table of the names of all the groups that are assigned to the specified rank. Returns an empty table if there is no such rank." },
+				GetRankPermissions = { Params = "RankName", Return = "array-table of permissions", Notes = "Returns an array-table of all the permissions that are assigned to the specified rank through its groups. Returns an empty table if there is no such rank." },
+				GetRankVisuals = { Params = "RankName", Return = "MsgPrefix, MsgSuffix, MsgNameColorCode", Notes = "Returns the message visuals for the specified rank. Returns no value if the specified rank does not exist." },
+				GroupExists = { Params = "GroupName", Return = "bool", Notes = "Returns true iff the specified group exists." },
+				IsGroupInRank = { Params = "GroupName, RankName", Return = "bool", Notes = "Returns true iff the specified group is assigned to the specified rank." },
+				IsPermissionInGroup = { Params = "Permission, GroupName", Return = "bool", Notes = "Returns true iff the specified permission is assigned to the specified group." },
+				IsPlayerRankSet = { Params = "PlayerUUID", Return = "bool", Notes = "Returns true iff the specified player has a rank assigned to them." },
+				RankExists = { Params = "RankName", Return = "bool", Notes = "Returns true iff the specified rank exists." },
+				RemoveGroup = { Params = "GroupName", Return = "", Notes = "Removes the specified group completely. The group will be removed from all the ranks using it and then erased from the manager. Logs an info message and does nothing if the group doesn't exist." },
+				RemoveGroupFromRank = { Params = "GroupName, RankName", Return = "", Notes = "Removes the specified group from the specified rank. The group will still exist, even if it isn't assigned to any rank. Logs an info message and does nothing if the group or rank doesn't exist." },
+				RemovePermissionFromGroup = { Params = "Permission, GroupName", Return = "", Notes = "Removes the specified permission from the specified group. Logs an info message and does nothing if the group doesn't exist." },
+				RemovePlayerRank = { Params = "PlayerUUID", Return = "", Notes = "Removes the player's rank; the player's left without a rank. Note that this doesn't change the {{cPlayer}} instances for the already connected players, you need to update all the instances manually. No action if the player has no rank assigned to them already." },
+				RemoveRank = { Params = "RankName, [ReplacementRankName]", Return = "", Notes = "Removes the specified rank. If ReplacementRankName is given, the players that have RankName will get their rank set to ReplacementRankName. If it isn't given, or is an invalid rank, the players will be removed from the manager, their ranks will be unset completely. Logs an info message and does nothing if the rank is not found." },
+				RenameGroup = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified group. Logs an info message and does nothing if the group is not found or the new name is already used." },
+				RenameRank = { Params = "OldName, NewName", Return = "", Notes = "Renames the specified rank. Logs an info message and does nothing if the rank is not found or the new name is already used." },
+				SetDefaultRank = { Params = "RankName", Return = "bool", Notes = "Sets the specified rank as the default rank. Returns true on success, false on failure (rank doesn't exist)." },
+				SetPlayerRank = { Params = "PlayerUUID, PlayerName, RankName", Return = "", Notes = "Updates the rank for the specified player. The player name is provided for reference, the UUID is used for identification. Logs a warning and does nothing if the rank is not found." },
+				SetRankVisuals = { Params = "RankName, MsgPrefix, MsgSuffix, MsgNameColorCode", Return = "", Notes = "Updates the rank's message visuals. Logs an info message and does nothing if rank not found." },
+			},
+		},  -- cRankManager
+
 		cRoot =
 		{
 			Desc = [[
@@ -2032,7 +2075,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				GetDefaultWorld = { Params = "", Return = "{{cWorld|cWorld}}", Notes = "Returns the world object from the default world." },
 				GetFurnaceFuelBurnTime = { Params = "{{cItem|Fuel}}", Return = "number", Notes = "(STATIC) Returns the number of ticks for how long the item would fuel a furnace. Returns zero if not a fuel." },
 				GetFurnaceRecipe = { Params = "{{cItem|InItem}}", Return = "{{cItem|OutItem}}, NumTicks, {{cItem|InItem}}", Notes = "(STATIC) Returns the furnace recipe for smelting the specified input. If a recipe is found, returns the smelted result, the number of ticks required for the smelting operation, and the input consumed (note that MCServer supports smelting M items into N items and different smelting rates). If no recipe is found, returns no value." },
-				GetGroupManager = { Params = "", Return = "{{cGroupManager|cGroupManager}}", Notes = "Returns the cGroupManager object." },
 				GetPhysicalRAMUsage = { Params = "", Return = "number", Notes = "Returns the amount of physical RAM that the entire MCServer process is using, in KiB. Negative if the OS doesn't support this query." },
 				GetPluginManager = { Params = "", Return = "{{cPluginManager|cPluginManager}}", Notes = "Returns the cPluginManager object." },
 				GetPrimaryServerVersion = { Params = "", Return = "number", Notes = "Returns the servers primary server version." },
@@ -2116,10 +2158,11 @@ end
 			{
 				GetDescription = { Return = "string", Notes = "Returns the server description set in the settings.ini." },
 				GetMaxPlayers = { Return = "number", Notes = "Returns the max amount of players who can join the server." },
-				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
 				GetNumPlayers = { Return = "number", Notes = "Returns the amount of players online." },
 				GetServerID = { Return = "string", Notes = "Returns the ID of the server?" },
 				IsHardcore = { Params = "", Return = "bool", Notes = "Returns true if the server is hardcore (players get banned on death)." },
+				SetMaxPlayers = { Params = "number", Notes = "Sets the max amount of players who can join." },
+				ShouldAuthenticate = { Params = "", Return = "bool", Notes = "Returns true iff the server is set to authenticate players (\"online mode\")." },
 			},
 		},  -- cServer
 
@@ -2527,8 +2570,8 @@ World:ForEachEntity(
 						The following code snippet checks if the player holds a shovel.
 <pre class="prettyprint lang-lua">
 -- a_Player is a {{cPlayer}} object, possibly received as a hook param
-local HeldItem = a_Player:GetEquippedItem();
-if (cItemCategory:IsShovel(HeldItem.m_ItemType)) then
+local HeldItem = a_Player:GetEquippedItem()
+if (ItemCategory.IsShovel(HeldItem.m_ItemType)) then
 	-- It's a shovel
 end
 </pre>

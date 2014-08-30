@@ -251,8 +251,38 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
 	m_SkyDarkness(0),
+	m_GameMode(gmNotSet),
+	m_bEnabledPVP(false),
+	m_IsDeepSnowEnabled(false),
+	m_ShouldLavaSpawnFire(true),
+	m_VillagersShouldHarvestCrops(true),
+	m_SimulatorManager(NULL),
+	m_SandSimulator(NULL),
+	m_WaterSimulator(NULL),
+	m_LavaSimulator(NULL),
+	m_FireSimulator(NULL),
+	m_RedstoneSimulator(NULL),
+	m_MaxPlayers(10),
+	m_ChunkMap(NULL),
+	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_MaxCactusHeight(3),
+	m_MaxSugarcaneHeight(4),
+	m_IsCactusBonemealable(false),
+	m_IsCarrotsBonemealable(true),
+	m_IsCropsBonemealable(true),
+	m_IsGrassBonemealable(true),
+	m_IsMelonStemBonemealable(true),
+	m_IsMelonBonemealable(true),
+	m_IsPotatoesBonemealable(true),
+	m_IsPumpkinStemBonemealable(true),
+	m_IsPumpkinBonemealable(true),
+	m_IsSaplingBonemealable(true),
+	m_IsSugarcaneBonemealable(false),
+	m_bCommandBlocksEnabled(true),
+	m_bUseChatPrefixes(false),
+	m_TNTShrapnelLevel(slNone),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -407,7 +437,7 @@ void cWorld::InitializeSpawn(void)
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
 	
-	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)
@@ -3454,14 +3484,16 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	m_World->QueueSetChunkData(cSetChunkDataPtr(new cSetChunkData(
+	cSetChunkDataPtr SetChunkData(new cSetChunkData(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
 		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
 		true
-	)));
+	));
+	SetChunkData->RemoveInvalidBlockEntities();
+	m_World->QueueSetChunkData(SetChunkData);
 }
 
 

@@ -28,7 +28,7 @@ typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 // This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
 /// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
-template<bool MetasValid, CombinatorFunc Combinator>
+template <bool MetasValid, CombinatorFunc Combinator>
 void InternalMergeBlocks(
 	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
 	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas,
@@ -74,7 +74,7 @@ void InternalMergeBlocks(
 
 
 /// Combinator used for cBlockArea::msOverwrite merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	a_DstType = a_SrcType;
@@ -89,7 +89,7 @@ void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 
 /// Combinator used for cBlockArea::msFillAir merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_DstType == E_BLOCK_AIR)
@@ -108,7 +108,7 @@ void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 /// Combinator used for cBlockArea::msImprint merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_SrcType != E_BLOCK_AIR)
@@ -127,7 +127,7 @@ void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 /// Combinator used for cBlockArea::msLake merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge is the NOP block
@@ -201,7 +201,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 
 
 /** Combinator used for cBlockArea::msSpongePrint merging */
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge overwrites nothing, everything else overwrites anything
@@ -220,7 +220,7 @@ void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 
 
 /** Combinator used for cBlockArea::msDifference merging */
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if ((a_DstType == a_SrcType) && (!MetaValid || (a_DstMeta == a_SrcMeta)))
@@ -246,7 +246,7 @@ void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBL
 
 
 /** Combinator used for cBlockArea::msMask merging */
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// If the blocks are the same, keep the dest; otherwise replace with air
@@ -1764,7 +1764,9 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 cBlockArea::cChunkReader::cChunkReader(cBlockArea & a_Area) :
 	m_Area(a_Area),
-	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z)
+	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z),
+	m_CurrentChunkX(0),
+	m_CurrentChunkZ(0)
 {
 }
 
@@ -2119,7 +2121,7 @@ void cBlockArea::RelSetData(
 
 
 
-template<bool MetasValid>
+template <bool MetasValid>
 void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas)
 {
 	// Block types are compulsory, block metas are voluntary

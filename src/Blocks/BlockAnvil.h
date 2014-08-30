@@ -40,14 +40,15 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE HighBits = a_BlockMeta & 0x0c;  // Only highest two bits are preserved
+		NIBBLETYPE Meta = (NIBBLETYPE)a_Player->GetEquippedItem().m_ItemDamage;
 		int Direction = (int)floor(a_Player->GetYaw() * 4.0 / 360.0 + 1.5) & 0x3;
+
 		switch (Direction)
 		{
-			case 0: a_BlockMeta = 0x2 | HighBits; break;
-			case 1: a_BlockMeta = 0x3 | HighBits; break;
-			case 2: a_BlockMeta = 0x0 | HighBits; break;
-			case 3: a_BlockMeta = 0x1 | HighBits; break;
+			case 0: a_BlockMeta = 0x2 | Meta << 2; break;
+			case 1: a_BlockMeta = 0x3 | Meta << 2; break;
+			case 2: a_BlockMeta = 0x0 | Meta << 2; break;
+			case 3: a_BlockMeta = 0x1 | Meta << 2; break;
 			default:
 			{
 				return false;
