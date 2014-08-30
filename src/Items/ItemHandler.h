@@ -75,7 +75,7 @@ public:
 		int    FoodLevel;
 		double Saturation;
 
-		FoodInfo(int a_FoodLevel, double a_Saturation, int a_PoisonChance = 0) :
+		FoodInfo(int a_FoodLevel, double a_Saturation) :
 			FoodLevel(a_FoodLevel),
 			Saturation(a_Saturation)
 		{
