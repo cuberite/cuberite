@@ -891,31 +891,31 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			)
 			{
 				// Moving -X +Z
-				if ((-GetSpeedX() * 0.4 / sqrt(2)) < 0.01)
+				if ((-GetSpeedX() * 0.4 / sqrt(2.0)) < 0.01)
 				{
 					// ~ SpeedX >= 0 Immobile or not moving in the "right" direction. Give it a bump!
-					AddSpeedX(-4 / sqrt(2));
-					AddSpeedZ(4 / sqrt(2));
+					AddSpeedX(-4 / sqrt(2.0));
+					AddSpeedZ(4 / sqrt(2.0));
 				}
 				else
 				{
 					// ~ SpeedX < 0 Moving in the "right" direction. Only accelerate it a bit.
-					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2));
-					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2));
+					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
 				}
 			}
-			else if ((GetSpeedX() * 0.4 / sqrt(2)) < 0.01)
+			else if ((GetSpeedX() * 0.4 / sqrt(2.0)) < 0.01)
 			{
 				// Moving +X -Z
 				// ~ SpeedX <= 0 Immobile or not moving in the "right" direction
-				AddSpeedX(4 / sqrt(2));
-				AddSpeedZ(-4 / sqrt(2));
+				AddSpeedX(4 / sqrt(2.0));
+				AddSpeedZ(-4 / sqrt(2.0));
 			}
 			else
 			{
 				// ~ SpeedX > 0 Moving in the "right" direction
-				SetSpeedX(GetSpeedX() * 0.4 / sqrt(2));
-				SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2));
+				SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+				SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
 			}
 			break;
 		}
@@ -943,28 +943,28 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 				if ((GetSpeedX() * 0.4) < 0.01)
 				{
 					// ~ SpeedX <= 0 Immobile or not moving in the "right" direction
-					AddSpeedX(4 / sqrt(2));
-					AddSpeedZ(4 / sqrt(2));
+					AddSpeedX(4 / sqrt(2.0));
+					AddSpeedZ(4 / sqrt(2.0));
 				}
 				else
 				{
 					// ~ SpeedX > 0 Moving in the "right" direction
-					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2));
-					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2));
+					SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+					SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
 				}
 			}
 			else if ((-GetSpeedX() * 0.4) < 0.01)
 			{
 				// Moving -X -Z
 				// ~ SpeedX >= 0 Immobile or not moving in the "right" direction
-				AddSpeedX(-4 / sqrt(2));
-				AddSpeedZ(-4 / sqrt(2));
+				AddSpeedX(-4 / sqrt(2.0));
+				AddSpeedZ(-4 / sqrt(2.0));
 			}
 			else
 			{
 				// ~ SpeedX < 0 Moving in the "right" direction
-				SetSpeedX(GetSpeedX() * 0.4 / sqrt(2));
-				SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2));
+				SetSpeedX(GetSpeedX() * 0.4 / sqrt(2.0));
+				SetSpeedZ(GetSpeedZ() * 0.4 / sqrt(2.0));
 			}
 			break;
 		}
