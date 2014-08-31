@@ -43,11 +43,11 @@ private:
 
 	/** Parses the fuel contained in the line, adds it to m_pState's fuels.
 	Logs a warning to the console on input error. */
-	void AddFuelFromLine(const AString & a_Line, int a_LineNum);
+	void AddFuelFromLine(const AString & a_Line, unsigned int a_LineNum);
 
 	/** Parses the recipe contained in the line, adds it to m_pState's recipes.
 	Logs a warning to the console on input error. */
-	void AddRecipeFromLine(const AString & a_Line, int a_LineNum);
+	void AddRecipeFromLine(const AString & a_Line, unsigned int a_LineNum);
 
 	/** Parses an item string in the format "<ItemType>[:<Damage>][,<Amount>]", returns true if successful. */
 	bool ParseItem(const AString & a_String, cItem & a_Item);

@@ -77,7 +77,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 		size_t FirstCommentSymbol = ParsingLine.find('#');
 		if ((FirstCommentSymbol != AString::npos) && (FirstCommentSymbol != 0))
 		{
-			ParsingLine.erase(ParsingLine.begin() + FirstCommentSymbol, ParsingLine.end());
+			ParsingLine.erase(ParsingLine.begin() + (const long)FirstCommentSymbol, ParsingLine.end());
 		}
 
 		switch (ParsingLine[0])
@@ -109,7 +109,7 @@ void cFurnaceRecipe::ReloadRecipes(void)
 
 
 
-void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, int a_LineNum)
+void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_LineNum)
 {
 	AString Line(a_Line);
 	Line.erase(Line.begin());  // Remove the beginning "!"
@@ -151,7 +151,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, int a_LineNum)
 
 
 
-void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, int a_LineNum)
+void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_LineNum)
 {
 	AString Line(a_Line);
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
