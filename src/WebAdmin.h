@@ -116,6 +116,9 @@ public:
 	/** Stops the HTTP server, if it was started. */
 	void Stop(void);
 
+	/** Loads the login template. Returns true if the loading success, false if not. */
+	bool LoadLoginTemplate(void);
+
 	void AddPlugin(cWebPlugin * a_Plugin);
 	void RemovePlugin(cWebPlugin * a_Plugin);
 
@@ -204,6 +207,9 @@ protected:
 
 	/** The Lua template script to provide templates: */
 	cLuaState m_TemplateScript;
+
+	/** The template who provide the login side: */
+	AString m_LoginTemplate;
 
 	/** The HTTP server which provides the underlying HTTP parsing, serialization and events */
 	cHTTPServer m_HTTPServer;

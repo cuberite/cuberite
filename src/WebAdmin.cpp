@@ -135,6 +135,20 @@ bool cWebAdmin::Start(void)
 		m_TemplateScript.Close();
 	}
 
+	if (!LoadLoginTemplate())
+	{
+		LOGWARN("Could not load WebAdmin login template \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
+
+		// Sets the fallback template:
+		m_LoginTemplate = \
+		"<h1>MCServer WebAdmin</h1>" \
+		"<center>" \
+		"<form method='get' action='webadmin/'>" \
+		"<input type='submit' value='Log in'>" \
+		"</form>" \
+		"</center>";
+	}
+
 	m_IsRunning = m_HTTPServer.Start(*this);
 	return m_IsRunning;
 }
@@ -153,6 +167,28 @@ void cWebAdmin::Stop(void)
 	LOGD("Stopping WebAdmin...");
 	m_HTTPServer.Stop();
 	m_IsRunning = false;
+}
+
+
+
+
+
+bool cWebAdmin::LoadLoginTemplate(void)
+{
+	cFile File(FILE_IO_PREFIX "webadmin/login_template.html", cFile::fmRead);
+	if (!File.IsOpen())
+	{
+		return false;
+	}
+
+	AString TemplateContent;
+	if (File.ReadRestOfFile(TemplateContent) == -1)
+	{
+		return false;
+	}
+
+	m_LoginTemplate = TemplateContent;
+	return true;
 }
 
 
@@ -298,17 +334,11 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	UNUSED(a_Request);
-	static const char LoginForm[] = \
-	"<h1>MCServer WebAdmin</h1>" \
-	"<center>" \
-	"<form method='get' action='webadmin/'>" \
-	"<input type='submit' value='Log in'>" \
-	"</form>" \
-	"</center>";
+
 	cHTTPResponse Resp;
 	Resp.SetContentType("text/html");
 	a_Connection.Send(Resp);
-	a_Connection.Send(LoginForm, sizeof(LoginForm) - 1);
+	a_Connection.Send(m_LoginTemplate);
 	a_Connection.FinishResponse();
 }
 
@@ -528,7 +558,64 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	}
 	else
 	{
-		// TODO: Handle other requests
+		AString FileURL = URL;
+		std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
+
+		// Remove all backsplashes on the first place:
+		if (FileURL[0] == '/')
+		{
+			size_t FirstCharToRead = FileURL.find_first_not_of('/');
+			if (FirstCharToRead != AString::npos)
+			{
+				FileURL = FileURL.substr(FirstCharToRead);
+			}
+		}
+
+		// Remove all "../" strings:
+		ReplaceString(FileURL, "../", "");
+
+		bool LoadedSuccessfull = false;
+		AString Content = "<h2>404 Not Found</h2>";
+		AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
+		if (cFile::IsFile(Path))
+		{
+			cFile File(Path, cFile::fmRead);
+			AString FileContent;
+			if (File.IsOpen() && (File.ReadRestOfFile(FileContent) != -1))
+			{
+				LoadedSuccessfull = true;
+				Content = FileContent;
+			}
+		}
+
+		// Find content type (The currently method is very bad. We should change it later)
+		AString ContentType = "text/html";
+		size_t LastPointPosition = Path.find_last_of('.');
+		if (LoadedSuccessfull && (LastPointPosition != AString::npos) && (LastPointPosition < Path.length()))
+		{
+			const AString & FileExtension = StrToLower(Path.substr(LastPointPosition + 1));
+			if (FileExtension == "png")  ContentType = "image/png";
+			if (FileExtension == "fif")  ContentType = "image/fif";
+			if (FileExtension == "gif")  ContentType = "image/gif";
+			if (FileExtension == "jpeg") ContentType = "image/jpeg";
+			if (FileExtension == "jpg")  ContentType = "image/jpeg";
+			if (FileExtension == "jpe")  ContentType = "image/jpeg";
+			if (FileExtension == "tiff") ContentType = "image/tiff";
+			if (FileExtension == "ico")  ContentType = "image/ico";
+			if (FileExtension == "csv")  ContentType = "text/comma-separated-values";
+			if (FileExtension == "css")  ContentType = "text/css";
+			if (FileExtension == "js")   ContentType = "text/javascript";
+			if (FileExtension == "txt")  ContentType = "text/plain";
+			if (FileExtension == "rtx")  ContentType = "text/richtext";
+			if (FileExtension == "xml")  ContentType = "text/xml";
+		}
+
+		// Send the response:
+		cHTTPResponse Resp;
+		Resp.SetContentType(ContentType);
+		a_Connection.Send(Resp);
+		a_Connection.Send(Content);
+		a_Connection.FinishResponse();
 	}
 
 	// Delete any request data assigned to the request:
@@ -548,7 +635,6 @@ void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
 {
 	m_Form.Parse(a_Data, a_Size);
 }
-
 
 
 
