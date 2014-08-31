@@ -49,7 +49,7 @@ private:
 	Logs a warning to the console on input error. */
 	void AddRecipeFromLine(const AString & a_Line, int a_LineNum);
 
-	/** Parses an item string in the format "<ItemType>[^<Damage>][,<Amount>]", returns true if successful. */
+	/** Parses an item string in the format "<ItemType>[:<Damage>][,<Amount>]", returns true if successful. */
 	bool ParseItem(const AString & a_String, cItem & a_Item);
 
 	struct sFurnaceRecipeState;
