@@ -98,6 +98,7 @@ SeaLantern       = PrismarineShard, 1:1, 1:3, 3:1, 3:3, PrismarineCrystal, 1:2, 
 RedSandstone, 4  = RedSand, 1:1, 1:2, 2:1, 2:2
 ChiseledRedSandstone, 4= RedSandstoneSlab, 1:1, 1:2
 SmoothRedSandstone, 4= RedSand, 1:1, 1:2, 2:1, 2:2
+MossyStoneBrick  = Stonebrick, * | Vines, *
 
 # Slabs:
 StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
