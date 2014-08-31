@@ -131,8 +131,10 @@ bool cWebAdmin::Start(void)
 	m_TemplateScript.RegisterAPILibs();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
-		LOGWARN("Could not load WebAdmin template \"%s\", using default template.", FILE_IO_PREFIX "webadmin/template.lua");
+		LOGERROR("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
 		m_TemplateScript.Close();
+		m_HTTPServer.Stop();
+		return false;
 	}
 
 	if (!LoadLoginTemplate())
