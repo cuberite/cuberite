@@ -39,22 +39,25 @@
 #--------------------------
 # Smelting recipes
 
-4:1   @ 200 = 1:1      # 1 Cobblestone  -> 1 Rock
-15:1  @ 200 = 265:1    # 1 Iron Ore     -> 1 Iron Ingot
-14:1  @ 200 = 266:1    # 1 Gold Ore     -> 1 Gold Ingot
-153:1 @ 200 = 406:1    # 1 Quartz Ore   -> 1 Quartz
-12:1  @ 200 = 20:1     # 1 Sand         -> 1 Glass
-319:1 @ 200 = 320:1    # 1 Raw Pork     -> 1 Cooked Pork
-363:1 @ 200 = 364:1    # 1 Raw Beef     -> 1 Cooked Beef (steak)
-365:1 @ 200 = 366:1    # 1 Raw Chicken  -> 1 Cooked Chicken
-337:1 @ 200 = 336:1    # 1 Clay         -> 1 Clay Brick
-82:1  @ 200 = 172:1    # 1 Clay Block   -> 1 Hardened Clay
-87:1  @ 200 = 405:1    # 1 NetherRack   -> 1 NetherBrick
-349:1 @ 200 = 350:1    # 1 Raw Fish     -> 1 Cooked Fish
-17:1  @ 200 = 263:1:1  # 1 Log          -> 1 Charcoal
-81:1  @ 200 = 351:1:2  # 1 Cactus       -> 1 Green Dye
-
-
+4:1     @ 200 = 1:1      # 1 Cobblestone  -> 1 Rock
+15:1    @ 200 = 265:1    # 1 Iron Ore     -> 1 Iron Ingot
+14:1    @ 200 = 266:1    # 1 Gold Ore     -> 1 Gold Ingot
+153:1   @ 200 = 406:1    # 1 Quartz Ore   -> 1 Quartz
+12:1    @ 200 = 20:1     # 1 Sand         -> 1 Glass
+319:1   @ 200 = 320:1    # 1 Raw Pork     -> 1 Cooked Pork
+363:1   @ 200 = 364:1    # 1 Raw Beef     -> 1 Cooked Beef (steak)
+365:1   @ 200 = 366:1    # 1 Raw Chicken  -> 1 Cooked Chicken
+337:1   @ 200 = 336:1    # 1 Clay         -> 1 Clay Brick
+82:1    @ 200 = 172:1    # 1 Clay Block   -> 1 Hardened Clay
+87:1    @ 200 = 405:1    # 1 NetherRack   -> 1 NetherBrick
+349:1   @ 200 = 350:1    # 1 Raw Fish     -> 1 Cooked Fish
+349:1:1 @ 200 = 350:1:1  # 1 Raw Salmon   -> 1 Cooked Salmon
+17:1    @ 200 = 263:1:1  # 1 Log          -> 1 Charcoal
+81:1    @ 200 = 351:1:2  # 1 Cactus       -> 1 Green Dye
+19:1:1  @ 200 = 19:1     # 1 Wet Sponge   -> 1 Sponge
+98:1    @ 200 = 98:1:2   # 1 Stonebrick   -> 1 Cracked Stonebrick
+411:1   @ 200 = 412:1    # 1 Raw Rabbit   -> 1 Cooked Rabbit
+423:1   @ 200 = 424:1    # 1 Raw Mutton   -> 1 Cooked Mutton
 
 
 
@@ -67,6 +70,11 @@
 ! 5:1      = 300    # 1 Planks          -> 15 sec
 ! 280:1    = 100    # 1 Stick           -> 5 sec
 ! 85:1     = 300    # 1 Fence           -> 15 sec
+! 188:1    = 300    # 1 Spruce Fence    -> 15 sec
+! 189:1    = 300    # 1 Birch Fence     -> 15 sec
+! 190:1    = 300    # 1 Jungle Fence    -> 15 sec
+! 191:1    = 300    # 1 Dark Oak Fence  -> 15 sec
+! 192:1    = 300    # 1 Acacia Fence    -> 15 sec
 ! 53:1     = 300    # 1 Wooden Stairs   -> 15 sec
 ! 58:1     = 300    # 1 Crafting Table  -> 15 sec
 ! 47:1     = 300    # 1 Bookshelf       -> 15 sec
@@ -80,6 +88,11 @@
 ! 25:1     = 300    # 1 Note Block      -> 15 sec
 ! 151:1    = 300    # 1 Daylight Sensor -> 15 sec
 ! 107:1    = 300    # 1 Fence Gate      -> 15 sec
+! 183:1    = 300    # 1 Spruce Fence Gate -> 15 sec
+! 184:1    = 300    # 1 Birch Fence Gate -> 15 sec
+! 185:1    = 300    # 1 Jungle Fence Gate -> 15 sec
+! 186:1    = 300    # 1 Dark Oak Fence Gate -> 15 sec
+! 187:1    = 300    # 1 Acacia Fence Gate -> 15 sec
 ! 167:1    = 300    # 1 Trapdoor        -> 15 sec
 ! 146:1    = 300    # 1 Trapped Chest   -> 15 sec
 ! 72:1     = 300    # 1 Pressure Plate  -> 15 sec
