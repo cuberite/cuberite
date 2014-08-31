@@ -94,7 +94,7 @@ protected:
 	*/
 	struct CreatorData
 	{
-		CreatorData(int a_UniqueID, const AString & a_Name, cEnchantments a_Enchantments) :
+		CreatorData(int a_UniqueID, const AString & a_Name, const cEnchantments & a_Enchantments) :
 			m_UniqueID(a_UniqueID),
 			m_Name(a_Name),
 			m_Enchantments(a_Enchantments)

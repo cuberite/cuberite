@@ -396,7 +396,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 
 		int ThornsLevel = 0;
-		cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
 			cItem Item = ArmorItems[i];
@@ -428,7 +428,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
 	}
 
-	if (IsPlayer()){
+	if (IsPlayer())
+	{
 		double TotalEPF = 0.0;
 		double EPFProtection = 0.00;
 		double EPFFireProtection = 0.00;
@@ -436,7 +437,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		double EPFProjectileProtection = 0.00;
 		double EPFFeatherFalling = 0.00;
 
-		cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
 			cItem Item = ArmorItems[i];
@@ -469,7 +470,6 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		TotalEPF = EPFProtection + EPFFireProtection + EPFFeatherFalling + EPFBlastProtection + EPFProjectileProtection;
 		
-
 		EPFProtection = EPFProtection / TotalEPF;
 		EPFFireProtection = EPFFireProtection / TotalEPF;
 		EPFFeatherFalling = EPFFeatherFalling / TotalEPF;
@@ -507,15 +507,13 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		a_TDI.FinalDamage -= RemovedDamage;
 	}
-
-
+	
 
 	m_Health -= (short)a_TDI.FinalDamage;
 	
 	// TODO: Apply damage to armor
 	
 	m_Health = std::max(m_Health, 0);
-
 
 	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
 	{

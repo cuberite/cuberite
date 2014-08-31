@@ -1963,6 +1963,8 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	{
 		return;
 	}
+
+	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
 	cItem Item = GetEquippedItem();
 	int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
 	if (UnbreakingLevel > 0)
@@ -1983,6 +1985,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 			return;
 		}
 	}
+
 	if (GetInventory().DamageEquippedItem(a_Amount))
 	{
 		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
