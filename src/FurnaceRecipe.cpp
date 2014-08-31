@@ -115,7 +115,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_Line
 	Line.erase(Line.begin());  // Remove the beginning "!"
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
-	cItem * Item = new cItem();
+	std::auto_ptr<cItem> Item(new cItem);
 	int BurnTime;
 
 	const AStringVector & Sides = StringSplit(Line, "=");
@@ -142,7 +142,7 @@ void cFurnaceRecipe::AddFuelFromLine(const AString & a_Line, unsigned int a_Line
 
 	// Add to fuel list:
 	cFuel Fuel;
-	Fuel.In = Item;
+	Fuel.In = Item.release();
 	Fuel.BurnTime = BurnTime;
 	m_pState->Fuel.push_back(Fuel);
 }
@@ -157,8 +157,8 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	Line.erase(std::remove_if(Line.begin(), Line.end(), isspace), Line.end());
 
 	int CookTime = 200;
-	cItem * InputItem = new cItem();
-	cItem * OutputItem = new cItem();
+	std::auto_ptr<cItem> InputItem(new cItem());
+	std::auto_ptr<cItem> OutputItem(new cItem());
 
 	const AStringVector & Sides = StringSplit(Line, "=");
 	if (Sides.size() != 2)
@@ -194,8 +194,8 @@ void cFurnaceRecipe::AddRecipeFromLine(const AString & a_Line, unsigned int a_Li
 	}
 
 	cRecipe Recipe;
-	Recipe.In = InputItem;
-	Recipe.Out = OutputItem;
+	Recipe.In = InputItem.release();
+	Recipe.Out = OutputItem.release();
 	Recipe.CookTime = CookTime;
 	m_pState->Recipes.push_back(Recipe);
 }
