@@ -553,6 +553,25 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+void cMonster::OnRightClicked(cPlayer & a_Player)
+{
+	super::OnRightClicked(a_Player);
+
+	const cItem & EquippedItem = a_Player.GetEquippedItem();
+	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	{
+		SetCustomName(EquippedItem.m_CustomName);
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+	}
+}
+
+
+
+
+
 // Checks to see if EventSeePlayer should be fired
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(void)

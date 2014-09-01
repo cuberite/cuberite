@@ -47,6 +47,8 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
 	{
