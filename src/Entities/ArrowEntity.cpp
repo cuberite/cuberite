@@ -114,8 +114,8 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
 	if (PowerLevel > 0)
 	{
-		int ExtraDamage = 0.25 * (PowerLevel + 1);
-		Damage += ceil(ExtraDamage);
+		int ExtraDamage = (int)ceil(0.25 * (PowerLevel + 1));
+		Damage += ExtraDamage;
 	}
 
 	int KnockbackAmount = 1;
