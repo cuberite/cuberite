@@ -396,11 +396,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 
 		int ThornsLevel = 0;
-		const cItem * ArmorItems[] = { &GetEquippedHelmet(), &GetEquippedChestplate(), &GetEquippedLeggings(), &GetEquippedBoots() };
+		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
-			const cItem * Item = ArmorItems[i];
-			ThornsLevel = std::max(ThornsLevel, Item->m_Enchantments.GetLevel(cEnchantments::enchThorns));
+			const cItem & Item = ArmorItems[i];
+			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
 		}
 		
 		if (ThornsLevel > 0)
@@ -437,35 +437,35 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		double EPFProjectileProtection = 0.00;
 		double EPFFeatherFalling = 0.00;
 
-		const cItem * ArmorItems[] = { &GetEquippedHelmet(), &GetEquippedChestplate(), &GetEquippedLeggings(), &GetEquippedBoots() };
+		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
-			const cItem * Item = ArmorItems[i];
-			int Level = Item->m_Enchantments.GetLevel(cEnchantments::enchProtection);
+			const cItem & Item = ArmorItems[i];
+			int Level = Item.m_Enchantments.GetLevel(cEnchantments::enchProtection);
 			if (Level > 0)
 			{
 				EPFProtection += (6 + Level * Level) * 0.75 / 3;
 			}
 
-			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchFireProtection);
+			Level = Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection);
 			if (Level > 0)
 			{
 				EPFFireProtection += (6 + Level * Level) * 1.25 / 3;
 			}
 
-			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling);
+			Level = Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling);
 			if (Level > 0)
 			{
 				EPFFeatherFalling += (6 + Level * Level) * 2.5 / 3;
 			}
 
-			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+			Level = Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
 			if (Level > 0)
 			{
 				EPFBlastProtection += (6 + Level * Level) * 1.5 / 3;
 			}
 
-			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection);
+			Level = Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection);
 			if (Level > 0)
 			{
 				EPFProjectileProtection += (6 + Level * Level) * 1.5 / 3;
