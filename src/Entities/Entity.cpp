@@ -317,7 +317,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
-		cEnchantments Enchantments = Player->GetEquippedItem().m_Enchantments;
+		const cEnchantments & Enchantments = Player->GetEquippedItem().m_Enchantments;
 		
 		int SharpnessLevel = Enchantments.GetLevel(cEnchantments::enchSharpness);
 		int SmiteLevel = Enchantments.GetLevel(cEnchantments::enchSmite);
@@ -325,7 +325,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		if (SharpnessLevel > 0)
 		{
-			a_TDI.FinalDamage += 1.25 * SharpnessLevel;
+			a_TDI.FinalDamage += (int)ceil(1.25 * SharpnessLevel);
 		}
 		else if (SmiteLevel > 0)
 		{
@@ -339,7 +339,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case cMonster::mtWither:
 					case cMonster::mtZombiePigman:
 					{
-						a_TDI.FinalDamage += 2.5 * SmiteLevel;
+						a_TDI.FinalDamage += (int)ceil(2.5 * SmiteLevel);
 						break;
 					}
 				}
@@ -356,7 +356,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case cMonster::mtCaveSpider:
 					case cMonster::mtSilverfish:
 					{
-						a_TDI.RawDamage += 2.5 * BaneOfArthropodsLevel;
+						a_TDI.RawDamage += (int)ceil(2.5 * BaneOfArthropodsLevel);
 						// TODO: Add slowness effect
 						
 						break;
@@ -396,11 +396,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 
 		int ThornsLevel = 0;
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		const cItem * ArmorItems[] = { &GetEquippedHelmet(), &GetEquippedChestplate(), &GetEquippedLeggings(), &GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
-			cItem Item = ArmorItems[i];
-			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
+			const cItem * Item = ArmorItems[i];
+			ThornsLevel = std::max(ThornsLevel, Item->m_Enchantments.GetLevel(cEnchantments::enchThorns));
 		}
 		
 		if (ThornsLevel > 0)
@@ -437,33 +437,38 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		double EPFProjectileProtection = 0.00;
 		double EPFFeatherFalling = 0.00;
 
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		const cItem * ArmorItems[] = { &GetEquippedHelmet(), &GetEquippedChestplate(), &GetEquippedLeggings(), &GetEquippedBoots() };
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
-			cItem Item = ArmorItems[i];
-			if (Item.m_Enchantments.GetLevel(cEnchantments::enchProtection) > 0)
+			const cItem * Item = ArmorItems[i];
+			int Level = Item->m_Enchantments.GetLevel(cEnchantments::enchProtection);
+			if (Level > 0)
 			{
-				EPFProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
+				EPFProtection += (6 + Level * Level) * 0.75 / 3;
 			}
 
-			if (Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection) > 0)
+			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchFireProtection);
+			if (Level > 0)
 			{
-				EPFFireProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
+				EPFFireProtection += (6 + Level * Level) * 1.25 / 3;
 			}
 
-			if (Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0)
+			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling);
+			if (Level > 0)
 			{
-				EPFFeatherFalling += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
+				EPFFeatherFalling += (6 + Level * Level) * 2.5 / 3;
 			}
 
-			if (Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection) > 0)
+			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchBlastProtection);
+			if (Level > 0)
 			{
-				EPFBlastProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
+				EPFBlastProtection += (6 + Level * Level) * 1.5 / 3;
 			}
 
-			if (Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0)
+			Level = Item->m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection);
+			if (Level > 0)
 			{
-				EPFProjectileProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
+				EPFProjectileProtection += (6 + Level * Level) * 1.5 / 3;
 			}
 
 		}
@@ -476,14 +481,20 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		EPFBlastProtection = EPFBlastProtection / TotalEPF;
 		EPFProjectileProtection = EPFProjectileProtection / TotalEPF;
 	
-		if (TotalEPF > 25) TotalEPF = 25;
+		if (TotalEPF > 25)
+		{
+			TotalEPF = 25;
+		}
 
 		cFastRandom Random;
-		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01;
+		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01f;
 
 		TotalEPF = ceil(TotalEPF * RandomValue);
 
-		if (TotalEPF > 20) TotalEPF = 20;
+		if (TotalEPF > 20)
+		{
+			TotalEPF = 20;
+		}
 
 		EPFProtection = TotalEPF * EPFProtection;
 		EPFFireProtection = TotalEPF * EPFFireProtection;
@@ -493,21 +504,38 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		
 		int RemovedDamage = 0;
 
-		if (a_TDI.DamageType != dtInVoid) RemovedDamage += ceil(EPFProtection * 0.04 * a_TDI.FinalDamage);
+		if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtAdmin))
+		{
+			RemovedDamage += (int)ceil(EPFProtection * 0.04 * a_TDI.FinalDamage);
+		}
 
-		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtFall) || (a_TDI.DamageType == dtEnderPearl)) RemovedDamage += ceil(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
+		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtFall) || (a_TDI.DamageType == dtEnderPearl))
+		{
+			RemovedDamage += (int)ceil(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
+		}
 		
-		if (a_TDI.DamageType == dtBurning) RemovedDamage += ceil(EPFFireProtection * 0.04 * a_TDI.FinalDamage);
+		if (a_TDI.DamageType == dtBurning)
+		{
+			RemovedDamage += (int)ceil(EPFFireProtection * 0.04 * a_TDI.FinalDamage);
+		}
 
-		if (a_TDI.DamageType == dtExplosion) RemovedDamage += ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
+		if (a_TDI.DamageType == dtExplosion)
+		{
+			RemovedDamage += (int)ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
+		}
 
-		if (a_TDI.DamageType == dtProjectile) RemovedDamage += ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
+		if (a_TDI.DamageType == dtProjectile)
+		{
+			RemovedDamage += (int)ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
+		}
 
-		if (a_TDI.FinalDamage < RemovedDamage) RemovedDamage = 0;
+		if (a_TDI.FinalDamage < RemovedDamage)
+		{
+			RemovedDamage = 0;
+		}
 
 		a_TDI.FinalDamage -= RemovedDamage;
 	}
-	
 
 	m_Health -= (short)a_TDI.FinalDamage;
 	
@@ -515,7 +543,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	
 	m_Health = std::max(m_Health, 0);
 
-	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))  // Knockback for only players and mobs
+	// Add knockback:
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))
 	{
 		int KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);  // More common enchantment
 		if (KnockbackLevel < 1)
