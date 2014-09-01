@@ -230,7 +230,6 @@ void cChunkGenerator::Execute(void)
 		}
 
 		cChunkCoords coords = m_Queue.front();  // Get next coord from queue
-		m_Queue.erase( m_Queue.begin());  // Remove coordinate from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
 		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
@@ -253,6 +252,8 @@ void cChunkGenerator::Execute(void)
 
 		LOGD("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
 		DoGenerate(coords.m_ChunkX, coords.m_ChunkZ);
+
+		m_Queue.erase(m_Queue.begin());  // Remove coordinate from queue
 
 		NumChunksGenerated++;
 	}  // while (!bStop)
