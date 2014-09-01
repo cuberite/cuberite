@@ -105,7 +105,7 @@ protected:
 	NIBBLETYPE m_BlockMeta;
 
 	/// The recipe for the current input slot
-	const cFurnaceRecipe::Recipe * m_CurrentRecipe;
+	const cFurnaceRecipe::cRecipe * m_CurrentRecipe;
 	
 	/// The item that is being smelted
 	cItem m_LastInput;

@@ -15,6 +15,7 @@
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
+#include "../FastRandom.h"
 
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
@@ -1793,6 +1794,28 @@ void cPlayer::UseEquippedItem(int a_Amount)
 	if (IsGameModeCreative())  // No damage in creative
 	{
 		return;
+	}
+
+	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
+	cItem Item = GetEquippedItem();
+	int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
+	if (UnbreakingLevel > 0)
+	{
+		int chance;
+		if (ItemCategory::IsArmor(Item.m_ItemType))
+		{
+			chance = 60 + (40 / (UnbreakingLevel + 1));
+		}
+		else
+		{
+			chance = 100 / (UnbreakingLevel + 1);
+		}
+
+		cFastRandom Random;
+		if (Random.NextInt(101) <= chance)
+		{
+			return;
+		}
 	}
 
 	if (GetInventory().DamageEquippedItem(a_Amount))

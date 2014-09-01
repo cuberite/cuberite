@@ -10,6 +10,7 @@
 
 
 
+
 // tolua_begin
 
 class cArrowEntity :
@@ -46,7 +47,7 @@ public:
 	
 	/// Returns the damage modifier coeff.
 	double GetDamageCoeff(void) const { return m_DamageCoeff; }
-	
+
 	/// Sets the damage modifier coeff
 	void SetDamageCoeff(double a_DamageCoeff) { m_DamageCoeff = a_DamageCoeff; }
 	
@@ -89,7 +90,7 @@ protected:
 	
 	/// If true, the arrow is in the process of being collected - don't go to anyone else
 	bool m_bIsCollected;
-	
+
 	/// Stores the block position that arrow is lodged into, sets m_IsInGround to false if it becomes air
 	Vector3i m_HitBlockPos;
 	

@@ -2663,7 +2663,7 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	
 	// Get the recipe for the input
 	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
-	const cFurnaceRecipe::Recipe * Recipe = FR->GetRecipeFrom(*Input);
+	const cFurnaceRecipe::cRecipe * Recipe = FR->GetRecipeFrom(*Input);
 	if (Recipe == NULL)
 	{
 		// There is no such furnace recipe for this input, return no value
