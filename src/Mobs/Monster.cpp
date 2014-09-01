@@ -75,6 +75,8 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
+	, m_CustomName("")
+	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
 	, m_AttackRate(3)
@@ -673,6 +675,33 @@ void cMonster::InStateEscaping(float a_Dt)
 	{
 		m_EMState = IDLE;  // This shouldnt be required but just to be safe
 	}
+}
+
+
+
+
+
+void cMonster::SetCustomName(const AString & a_CustomName)
+{
+	m_CustomName = a_CustomName;
+
+	// The maximal length is 64
+	if (a_CustomName.length() > 64)
+	{
+		m_CustomName = a_CustomName.substr(0, 64);
+	}
+
+	m_World->BroadcastEntityMetadata(*this);
+}
+
+
+
+
+
+void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
+{
+	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
+	m_World->BroadcastEntityMetadata(*this);
 }
 
 

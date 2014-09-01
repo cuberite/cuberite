@@ -1,3 +1,4 @@
+
 // Protocol17x.cpp
 
 /*
@@ -3021,6 +3022,15 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 	}  // switch (a_Mob.GetType())
+
+	// Custom name:
+	if (a_Mob.HasCustomName())
+	{
+		WriteByte(0x8a);
+		WriteString(a_Mob.GetCustomName());
+		WriteByte(0x0b);
+		WriteByte(a_Mob.IsCustomNameAlwaysVisible() ? 1 : 0);
+	}
 }
 
 
