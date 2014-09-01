@@ -99,6 +99,7 @@ RedSandstone, 4         = RedSand, 1:1, 1:2, 2:1, 2:2
 ChiseledRedSandstone, 4 = RedSandstoneSlab, 1:1, 1:2
 SmoothRedSandstone, 4   = RedSand, 1:1, 1:2, 2:1, 2:2
 MossyStoneBrick         = Stonebrick, * | Vines, *
+Leather                 = RabbitHide, 1:1, 1:2, 2:1, 2:2
 
 # Slabs:
 StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
