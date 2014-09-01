@@ -13,6 +13,7 @@
 #include "../Tracer.h"
 #include "Player.h"
 #include "Items/ItemHandler.h"
+#include "../FastRandom.h"
 
 
 
@@ -316,8 +317,107 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		// IsOnGround() only is false if the player is moving downwards
 		// TODO: Better damage increase, and check for enchantments (and use magic critical instead of plain)
-		if (!Player->IsOnGround())
+		cEnchantments Enchantments = Player->GetEquippedItem().m_Enchantments;
+		
+		int SharpnessLevel = Enchantments.GetLevel(cEnchantments::enchSharpness);
+		int SmiteLevel = Enchantments.GetLevel(cEnchantments::enchSmite);
+		int BaneOfArthropodsLevel = Enchantments.GetLevel(cEnchantments::enchBaneOfArthropods);
+
+		if (SharpnessLevel > 0)
 		{
+			a_TDI.FinalDamage += 1.25 * SharpnessLevel;
+		}
+		else if (SmiteLevel > 0)
+		{
+			if (IsMob())
+			{
+				cMonster * Monster = (cMonster *)this;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtSkeleton:
+					case cMonster::mtZombie:
+					case cMonster::mtWither:
+					case cMonster::mtZombiePigman:
+					{
+						a_TDI.FinalDamage += 2.5 * SmiteLevel;
+						break;
+					}
+				}
+			}
+		}
+		else if (BaneOfArthropodsLevel > 0)
+		{
+			if (IsMob())
+			{
+				cMonster * Monster = (cMonster *)this;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtSpider:
+					case cMonster::mtCaveSpider:
+					case cMonster::mtSilverfish:
+					{
+						a_TDI.RawDamage += 2.5 * BaneOfArthropodsLevel;
+						// TODO: Add slowness effect
+						
+						break;
+					};
+					default: break;
+				}
+			}
+		}
+
+		int FireAspectLevel = Enchantments.GetLevel(cEnchantments::enchFireAspect);
+		if (FireAspectLevel > 0)
+		{
+			int BurnTicks = 3;
+
+			if (FireAspectLevel > 1)
+			{
+				BurnTicks += 4 * (FireAspectLevel - 1);
+			}
+			if (!IsMob() && !IsSubmerged() && !IsSwimming())
+			{
+				StartBurning(BurnTicks * 20);
+			}
+			else if (IsMob() && !IsSubmerged() && !IsSwimming())
+			{
+				cMonster * Monster = (cMonster *)this;
+				switch (Monster->GetMobType())
+				{
+					case cMonster::mtGhast:
+					case cMonster::mtZombiePigman:
+					case cMonster::mtMagmaCube:
+					{					
+						break;
+					};
+					default: StartBurning(BurnTicks * 20);
+				}
+			}
+		}
+
+		int ThornsLevel = 0;
+		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+		{
+			cItem Item = ArmorItems[i];
+			ThornsLevel = std::max(ThornsLevel, Item.m_Enchantments.GetLevel(cEnchantments::enchThorns));
+		}
+		
+		if (ThornsLevel > 0)
+		{
+			int Chance = ThornsLevel * 15;
+
+			cFastRandom Random;
+			int RandomValue = Random.GenerateRandomInteger(0, 100);
+
+			if (RandomValue <= Chance)
+			{
+				a_TDI.Attacker->TakeDamage(dtAttack, this, 0, Random.GenerateRandomInteger(1, 4), 0);
+			}
+		}
+	
+		if (!Player->IsOnGround())
+		{		
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage += 2;
@@ -327,6 +427,87 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 		Player->GetStatManager().AddValue(statDamageDealt, (StatValue)floor(a_TDI.FinalDamage * 10 + 0.5));
 	}
+
+	if (IsPlayer())
+	{
+		double TotalEPF = 0.0;
+		double EPFProtection = 0.00;
+		double EPFFireProtection = 0.00;
+		double EPFBlastProtection = 0.00;
+		double EPFProjectileProtection = 0.00;
+		double EPFFeatherFalling = 0.00;
+
+		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
+		{
+			cItem Item = ArmorItems[i];
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchProtection) > 0)
+			{
+				EPFProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection), 2)) * 0.75 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection) > 0)
+			{
+				EPFFireProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection), 2)) * 1.25 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling) > 0)
+			{
+				EPFFeatherFalling += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchFeatherFalling), 2)) * 2.5 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection) > 0)
+			{
+				EPFBlastProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchBlastProtection), 2)) * 1.5 / 3;
+			}
+
+			if (Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection) > 0)
+			{
+				EPFProjectileProtection += (6 + pow(Item.m_Enchantments.GetLevel(cEnchantments::enchProjectileProtection), 2)) * 1.5 / 3;
+			}
+
+		}
+
+		TotalEPF = EPFProtection + EPFFireProtection + EPFFeatherFalling + EPFBlastProtection + EPFProjectileProtection;
+		
+		EPFProtection = EPFProtection / TotalEPF;
+		EPFFireProtection = EPFFireProtection / TotalEPF;
+		EPFFeatherFalling = EPFFeatherFalling / TotalEPF;
+		EPFBlastProtection = EPFBlastProtection / TotalEPF;
+		EPFProjectileProtection = EPFProjectileProtection / TotalEPF;
+	
+		if (TotalEPF > 25) TotalEPF = 25;
+
+		cFastRandom Random;
+		float RandomValue = Random.GenerateRandomInteger(50, 100) * 0.01;
+
+		TotalEPF = ceil(TotalEPF * RandomValue);
+
+		if (TotalEPF > 20) TotalEPF = 20;
+
+		EPFProtection = TotalEPF * EPFProtection;
+		EPFFireProtection = TotalEPF * EPFFireProtection;
+		EPFFeatherFalling = TotalEPF * EPFFeatherFalling;
+		EPFBlastProtection = TotalEPF * EPFBlastProtection;
+		EPFProjectileProtection = TotalEPF * EPFProjectileProtection;
+		
+		int RemovedDamage = 0;
+
+		if (a_TDI.DamageType != dtInVoid) RemovedDamage += ceil(EPFProtection * 0.04 * a_TDI.FinalDamage);
+
+		if ((a_TDI.DamageType == dtFalling) || (a_TDI.DamageType == dtFall) || (a_TDI.DamageType == dtEnderPearl)) RemovedDamage += ceil(EPFFeatherFalling * 0.04 * a_TDI.FinalDamage);
+		
+		if (a_TDI.DamageType == dtBurning) RemovedDamage += ceil(EPFFireProtection * 0.04 * a_TDI.FinalDamage);
+
+		if (a_TDI.DamageType == dtExplosion) RemovedDamage += ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
+
+		if (a_TDI.DamageType == dtProjectile) RemovedDamage += ceil(EPFBlastProtection * 0.04 * a_TDI.FinalDamage);
+
+		if (a_TDI.FinalDamage < RemovedDamage) RemovedDamage = 0;
+
+		a_TDI.FinalDamage -= RemovedDamage;
+	}
+	
 
 	m_Health -= (short)a_TDI.FinalDamage;
 	
@@ -1252,11 +1433,18 @@ void cEntity::HandleAir(void)
 	// See if the entity is /submerged/ water (block above is water)
 	// Get the type of block the entity is standing in:
 
+	int RespirationLevel = GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration);
+
 	if (IsSubmerged())
 	{
 		if (!IsPlayer())  // Players control themselves
 		{
 			SetSpeedY(1);  // Float in the water
+		}
+
+		if (RespirationLevel > 0)
+		{
+			((cPawn *)this)->AddEntityEffect(cEntityEffect::effNightVision, 200, 5, 0);
 		}
 
 		if (m_AirLevel <= 0)
@@ -1285,6 +1473,12 @@ void cEntity::HandleAir(void)
 		// Set the air back to maximum
 		m_AirLevel = MAX_AIR_LEVEL;
 		m_AirTickTimer = DROWNING_TICKS;
+
+		if (RespirationLevel > 0)
+		{
+			m_AirTickTimer = DROWNING_TICKS + (RespirationLevel * 15 * 20);
+		}
+
 	}
 }
 
