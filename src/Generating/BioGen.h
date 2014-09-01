@@ -84,7 +84,7 @@ class cBioGenMulticache :
 	typedef cBiomeGen super;
 
 public:
-	cBioGenMulticache(cBiomeGen * a_BioGenToCache, int a_CacheSize, int a_CacheLength);  // Doesn't take ownership of a_BioGenToCache
+	cBioGenMulticache(cBiomeGen * a_BioGenToCache, int a_CacheSize, int a_CachesLength);  // Doesn't take ownership of a_BioGenToCache
 	~cBioGenMulticache();
 
 protected:
@@ -100,9 +100,9 @@ protected:
 
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
 	int          m_CacheSize;
-	int          m_CacheLength;
+	int          m_CachesLength;
 
-	int **m_CachesOrder; // MRU-ized order, indices into the multiple m_CachesData array
+	int ** m_CachesOrder; // MRU-ized order, indices into the multiple m_CachesData array
 	sCacheData ** m_CachesData; 
 
 	// Cache statistics

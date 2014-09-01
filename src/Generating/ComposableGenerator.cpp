@@ -241,7 +241,7 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 		}
 		LOGD("Using a cache for biomegen of size %d.", CacheSize);
 		m_UnderlyingBiomeGen = m_BiomeGen;
-		m_BiomeGen = new cBioGenCache(m_UnderlyingBiomeGen, CacheSize);
+		m_BiomeGen = new cBioGenMulticache(m_UnderlyingBiomeGen, CacheSize, 4);
 	}
 }
 
