@@ -188,7 +188,8 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 
 void cCommandBlockEntity::Execute()
 {
-	ASSERT(m_World != NULL); //Execute should not be called before the command block is attached to a world
+	ASSERT(m_World != NULL);  // Execute should not be called before the command block is attached to a world
+	
 	if (!m_World->AreCommandBlocksEnabled())
 	{
 		return;
