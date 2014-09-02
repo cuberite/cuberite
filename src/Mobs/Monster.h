@@ -150,7 +150,7 @@ public:
 	/** Returns true if the monster has a custom name. */
 	bool HasCustomName(void) const { return !m_CustomName.empty(); }
 
-	/** Gets the custom name of the monster. If no custom name is set, the function returns a empty string. */
+	/** Gets the custom name of the monster. If no custom name is set, the function returns an empty string. */
 	const AString & GetCustomName(void) const { return m_CustomName; }
 
 	/** Sets the custom name of the monster. You see the name over the monster.
@@ -161,7 +161,7 @@ public:
 	bool IsCustomNameAlwaysVisible(void) const { return m_CustomNameAlwaysVisible; }
 
 	/** Sets the custom name visiblity of this monster.
-	If false, you only see the name when you sight the mob. If true, you always see the custom name. */
+	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
 	/// Translates MobType enum to a string, empty string if unknown

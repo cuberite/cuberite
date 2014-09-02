@@ -401,7 +401,7 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
-	/** Is a custom name for this player set? */
+	/** Returns true if the player has a custom name. */
 	bool HasCustomName(void) const { return !m_CustomName.empty(); }
 
 	/** Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string. */
