@@ -1636,8 +1636,8 @@ a_Player:OpenWindow(Window);
 				MobTypeToString = { Params = "{{cMonster#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{cMonster#MobType|mtXXX}} constant), or empty string if unknown type." },
 				MoveToPosition = { Params = "Position", Return = "", Notes = "Moves mob to the specified position" },
 				StringToMobType = { Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{cMonster#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
-				GetWalkSpeed = { Params = "", Return = "number", Notes = "Returns the walk speed of this mob. Standard is 1.0" },
-				SetWalkSpeed = { Params = "number", Return = "", Notes = "Sets the walk speed of this mob. Standard is 1.0" },
+				GetRelativeWalkSpeed = { Params = "", Return = "number", Notes = "Returns the relative walk speed of this mob. Standard is 1.0" },
+				SetRelativeWalkSpeed = { Params = "number", Return = "", Notes = "Sets the relative walk speed of this mob. Standard is 1.0" },
 			},
 			Constants =
 			{

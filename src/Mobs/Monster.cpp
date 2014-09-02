@@ -89,7 +89,7 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
-	, m_WalkSpeed(1.0)
+	, m_RelativeWalkSpeed(1.0)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -304,7 +304,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 
 			// Apply walk speed:
-			Distance *= m_WalkSpeed;
+			Distance *= m_RelativeWalkSpeed;
 
 			AddSpeedX(Distance.x);
 			AddSpeedZ(Distance.z);

@@ -240,7 +240,7 @@ void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
 	if (a_Target.IsMob())
 	{
 		cMonster * Mob = (cMonster*) &a_Target;
-		Mob->SetWalkSpeed(Mob->GetWalkSpeed() + 0.2 * m_Intensity);
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
@@ -260,7 +260,7 @@ void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
 	if (a_Target.IsMob())
 	{
 		cMonster * Mob = (cMonster*) &a_Target;
-		Mob->SetWalkSpeed(Mob->GetWalkSpeed() - 0.2 * m_Intensity);
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
@@ -283,7 +283,7 @@ void cEntityEffectSlowness::OnActivate(cPawn & a_Target)
 	if (a_Target.IsMob())
 	{
 		cMonster * Mob = (cMonster*) &a_Target;
-		Mob->SetWalkSpeed(Mob->GetWalkSpeed() - 0.15 * m_Intensity);
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.15 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
@@ -303,7 +303,7 @@ void cEntityEffectSlowness::OnDeactivate(cPawn & a_Target)
 	if (a_Target.IsMob())
 	{
 		cMonster * Mob = (cMonster*) &a_Target;
-		Mob->SetWalkSpeed(Mob->GetWalkSpeed() + 0.15 * m_Intensity);
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.15 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
