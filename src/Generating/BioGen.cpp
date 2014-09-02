@@ -215,7 +215,6 @@ cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, int a_CacheSiz
 m_CachesLength(a_CachesLength),
 m_InternalCacheLength(a_CachesLength * a_CacheSize)
 {
-	//m_Caches = new std::vector<cBiomeGen*>;
 	m_Caches.reserve(m_InternalCacheLength);
 	for (int i = 0; i < m_InternalCacheLength; i++) {
 		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
@@ -228,7 +227,10 @@ m_InternalCacheLength(a_CachesLength * a_CacheSize)
 
 cBioGenMulticache::~cBioGenMulticache()
 {
-	m_Caches.erase(m_Caches.cbegin(), m_Caches.cend());
+	for (std::vector<cBiomeGen*>::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
+	{
+		delete *it;
+	}
 }
 
 
@@ -249,8 +251,7 @@ void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMa
 
 void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	//super::InitializeBiomeGen(a_IniFile);
-	for (auto it = m_Caches.begin(); it != m_Caches.end(); it++)
+	for (std::vector<cBiomeGen*>::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
 	{
 		cBiomeGen * tmp = *it;
 		tmp->InitializeBiomeGen(a_IniFile);
