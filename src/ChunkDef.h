@@ -389,6 +389,27 @@ typedef std::vector<cChunkCoords> cChunkCoordsVector;
 
 
 
+class cChunkCoordsWithBool
+{
+public:
+	int m_ChunkX;
+	int m_ChunkZ;
+	bool m_ForceGenerate;
+
+	cChunkCoordsWithBool(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_ForceGenerate(a_ForceGenerate){}
+
+	bool operator == (const cChunkCoordsWithBool & a_Other) const
+	{
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ) && (m_ForceGenerate == a_Other.m_ForceGenerate));
+	}
+};
+
+typedef std::list<cChunkCoordsWithBool> cChunkCoordWithBoolList;
+
+
+
+
+
 /// Interface class used as a callback for operations that involve chunk coords
 class cChunkCoordCallback
 {

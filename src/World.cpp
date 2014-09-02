@@ -2900,7 +2900,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
 	
-	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ);
+	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, true);
 }
 
 
@@ -2909,16 +2909,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	/** Add a chunk to the generation queue, if it's not already present. */
-	if (!(m_ChunkMap->IsChunkValid(a_ChunkX, a_ChunkZ)))
-	{
-		LOGD("Chunk [%d, %d] already generated, skipping generation", a_ChunkX, a_ChunkZ);
-		/** Already generated, ignore request */
-	}
-	else
-	{
-	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ);
-	}
+	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, false);
 }
 
 

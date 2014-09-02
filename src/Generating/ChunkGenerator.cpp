@@ -99,13 +99,13 @@ void cChunkGenerator::Stop(void)
 
 
 
-void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ)
+void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate)
 {
 	{
 		cCSLock Lock(m_CS);
 
 		// Check if it is already in the queue:
-		for (cChunkCoordsList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
+		for (cChunkCoordWithBoolList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 		{
 			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
 			{
@@ -119,7 +119,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ)
 		{
 			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (" SIZE_T_FMT ")", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
-		m_Queue.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+		m_Queue.push_back(cChunkCoordsWithBool(a_ChunkX, a_ChunkZ, a_ForceGenerate));
 	}
 
 	m_Event.Set();
@@ -229,8 +229,9 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 
-		cChunkCoords coords = m_Queue.front();  // Get next coord from queue
+		cChunkCoordsWithBool coords = m_Queue.front();  // Get next coord from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
+		m_Queue.erase(m_Queue.begin());  // Remove coordinate from queue
 		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
 
@@ -244,6 +245,13 @@ void cChunkGenerator::Execute(void)
 			LastReportTick = clock();
 		}
 
+		if (!coords.m_ForceGenerate && m_ChunkSink->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
+		{
+			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
+			// Already generated, ignore request
+			continue;
+		}
+
 		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
 		{
 			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
@@ -252,8 +260,6 @@ void cChunkGenerator::Execute(void)
 
 		LOGD("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
 		DoGenerate(coords.m_ChunkX, coords.m_ChunkZ);
-
-		m_Queue.erase(m_Queue.begin());  // Remove coordinate from queue
 
 		NumChunksGenerated++;
 	}  // while (!bStop)
