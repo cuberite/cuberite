@@ -865,14 +865,14 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
-void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocol172::SendPlayerListItem(const AString & a_PlayerName, bool a_IsOnline, short a_Ping)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteString(a_PlayerName);
 	Pkt.WriteBool(a_IsOnline);
-	Pkt.WriteShort(a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
+	Pkt.WriteShort(a_Ping);
 }
 
 
@@ -946,9 +946,16 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
-	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt((UInt32) a_Player.GetUniqueID());
 	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
-	Pkt.WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		Pkt.WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		Pkt.WriteString(a_Player.GetName());
+	}
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY());
 	Pkt.WriteFPInt(a_Player.GetPosZ());
@@ -3075,7 +3082,14 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
 	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
-	Pkt.WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		Pkt.WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		Pkt.WriteString(a_Player.GetName());
+	}
 
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt(Properties.size());

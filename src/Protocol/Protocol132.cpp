@@ -260,7 +260,14 @@ void cProtocol132::SendPlayerSpawn(const cPlayer & a_Player)
 	cCSLock Lock(m_CSPacket);
 	WriteByte	 (PACKET_PLAYER_SPAWN);
 	WriteInt   (a_Player.GetUniqueID());
-	WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		WriteString(a_Player.GetName());
+	}
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));

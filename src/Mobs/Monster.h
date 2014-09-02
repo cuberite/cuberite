@@ -153,7 +153,8 @@ public:
 	/** Gets the custom name of the monster. If no custom name is set, the function returns a empty string. */
 	const AString & GetCustomName(void) const { return m_CustomName; }
 
-	/** Sets the custom name of the monster. You see the name over the monster. */
+	/** Sets the custom name of the monster. You see the name over the monster.
+	If you want to disable the custom name, simply set an empty string. */
 	void SetCustomName(const AString & a_CustomName);
 
 	/** Is the custom name of this monster always visible? If not, you only see the name when you sight the mob. */

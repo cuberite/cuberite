@@ -65,7 +65,7 @@ public:
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override {}  // This protocol doesn't support such message
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
-	virtual void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline) override;
+	virtual void SendPlayerListItem      (const AString & a_PlayerName, bool a_IsOnline, short a_Ping = 0) override;
 	virtual void SendPlayerMaxSpeed      (void) override;
 	virtual void SendPlayerMoveLook      (void) override;
 	virtual void SendPlayerPosition      (void) override;

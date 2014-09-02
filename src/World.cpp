@@ -2147,7 +2147,7 @@ void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, float a_Src
 
 
 
-void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListItem(const AString & a_PlayerName, bool a_IsOnline, short a_Ping, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2157,7 +2157,7 @@ void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline,
 		{
 			continue;
 		}
-		ch->SendPlayerListItem(a_Player, a_IsOnline);
+		ch->SendPlayerListItem(a_PlayerName, a_IsOnline, a_Ping);
 	}
 }
 
@@ -2669,7 +2669,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 		cClientHandle * ch = (*itr)->GetClientHandle();
 		if ((ch != NULL) && !ch->IsDestroyed())
 		{
-			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), true);
+			a_DestPlayer->GetClientHandle()->SendPlayerListItem((*itr)->GetTabListName(), true, (*itr)->GetClientHandle()->GetPing());
 		}
 	}
 }
@@ -3209,13 +3209,17 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
 		AString PlayerName ((*itr)->GetName());
+		if ((*itr)->HasCustomName())
+		{
+			PlayerName = (*itr)->GetCustomName();
+		}
+
 		AString::size_type Found = PlayerName.find(LastWord);  // Try to find last word in playername
-		
 		if (Found == AString::npos)
 		{
 			continue;  // No match
 		}
-		
+
 		UsernamesByWeight.push_back(std::make_pair(Found, PlayerName));  // Match! Store it with the position of the match as a weight
 	}
 	Lock.Unlock();
