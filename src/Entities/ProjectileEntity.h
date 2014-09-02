@@ -94,14 +94,16 @@ protected:
 	*/
 	struct CreatorData
 	{
-		CreatorData(int a_UniqueID, const AString & a_Name) :
+		CreatorData(int a_UniqueID, const AString & a_Name, const cEnchantments & a_Enchantments) :
 			m_UniqueID(a_UniqueID),
-			m_Name(a_Name)
+			m_Name(a_Name),
+			m_Enchantments(a_Enchantments)
 		{
 		}
 
 		const int m_UniqueID;
 		AString m_Name;
+		cEnchantments m_Enchantments;
 	};
 
 	/** The type of projectile I am */

@@ -528,7 +528,7 @@ inline float GetSpecialSignf( float a_Val)
 
 
 
-template<class T> inline T Diff(T a_Val1, T a_Val2)
+template <class T> inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
 }

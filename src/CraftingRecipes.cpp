@@ -1,4 +1,4 @@
-﻿
+
 // CraftingRecipes.cpp
 
 // Interfaces to the cCraftingRecipes class representing the storage of crafting recipes
@@ -83,7 +83,7 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
 	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
@@ -228,7 +228,7 @@ void cCraftingRecipe::Clear(void)
 
 
 
-void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 }
@@ -324,7 +324,11 @@ void cCraftingRecipes::LoadRecipes(void)
 		return;
 	}
 	AString Everything;
-	f.ReadRestOfFile(Everything);
+	if (!f.ReadRestOfFile(Everything))
+	{
+		LOGWARNING("Cannot read file \"crafting.txt\", no crafting recipes will be available!");
+		return;
+	}
 	f.Close();
 	
 	// Split it into lines, then process each line as a single recipe:
@@ -362,7 +366,10 @@ void cCraftingRecipes::ClearRecipes(void)
 
 void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine)
 {
-	AStringVector Sides = StringSplit(a_RecipeLine, "=");
+	AString RecipeLine(a_RecipeLine);
+	RecipeLine.erase(std::remove_if(RecipeLine.begin(), RecipeLine.end(), isspace), RecipeLine.end());
+
+	AStringVector Sides = StringSplit(RecipeLine, "=");
 	if (Sides.size() != 2)
 	{
 		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);
@@ -388,8 +395,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	}
 	if (ResultSplit.size() > 1)
 	{
-		Recipe->m_Result.m_ItemCount = atoi(ResultSplit[1].c_str());
-		if (Recipe->m_Result.m_ItemCount == 0)
+		if (!StringToInteger<char>(ResultSplit[1].c_str(), Recipe->m_Result.m_ItemCount))
 		{
 			LOGWARNING("crafting.txt: line %d: Cannot parse result count, ignoring the recipe.", a_LineNum);
 			LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
@@ -441,8 +447,7 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
-		a_Item.m_ItemDamage = atoi(Damage.c_str());
-		if ((a_Item.m_ItemDamage == 0) && (Damage.compare("0") != 0))
+		if (!StringToInteger<short>(Damage.c_str(), a_Item.m_ItemDamage))
 		{
 			// Parsing the number failed
 			return false;

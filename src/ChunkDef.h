@@ -197,32 +197,32 @@ public:
 	
 	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_HeightMap[a_X + Width * a_Z];
 	}
 	
 	
 	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, unsigned char a_Height)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_HeightMap[a_X + Width * a_Z] = a_Height;
 	}
 	
 	
 	inline static EMCSBiome GetBiome(const BiomeMap & a_BiomeMap, int a_X, int a_Z)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_BiomeMap[a_X + Width * a_Z];
 	}
 	
 	
 	inline static void SetBiome(BiomeMap & a_BiomeMap, int a_X, int a_Z, EMCSBiome a_Biome)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
 	}
 
