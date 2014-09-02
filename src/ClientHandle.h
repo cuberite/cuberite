@@ -269,7 +269,7 @@ public:
 	void RemoveFromWorld(void);
 	
 	/** Called when the player will enchant a Item */
-	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
+	void HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment);
 	
 private:
 

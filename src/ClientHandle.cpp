@@ -2858,11 +2858,27 @@ void cClientHandle::SocketClosed(void)
 
 
 
-void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 {
-	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	if (a_Enchantment > 2)
+	{
+		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
+		Kick("Invalid enchanting!");
+		return;
+	}
+
+	if (
+		(m_Player->GetWindow() == NULL) ||
+		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
+		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
+	)
+	{
+		return;
+	}
+	
+	cEnchantingWindow * Window = (cEnchantingWindow*) m_Player->GetWindow();
 	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
-	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
+	int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
 	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{

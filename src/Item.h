@@ -183,8 +183,10 @@ public:
 	/** Loads the item data from JSON representation */
 	void FromJson(const Json::Value & a_Value);
 	
-	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
-	static bool IsEnchantable(short a_ItemType);  // tolua_export
+	/** Returns true if the specified item type is enchantable.
+	If WithBook is true, the function is used in the anvil inventory with book enchantments.
+	So it checks the "only book enchantments" too. Example: You can only enchant a hoe with a book. */
+	static bool IsEnchantable(short a_ItemType, bool a_WithBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
 	int GetEnchantability();  // tolua_export
