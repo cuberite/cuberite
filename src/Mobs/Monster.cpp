@@ -710,7 +710,10 @@ void cMonster::SetCustomName(const AString & a_CustomName)
 		m_CustomName = a_CustomName.substr(0, 64);
 	}
 
-	m_World->BroadcastEntityMetadata(*this);
+	if (m_World != NULL)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 
@@ -720,7 +723,10 @@ void cMonster::SetCustomName(const AString & a_CustomName)
 void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 {
 	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
-	m_World->BroadcastEntityMetadata(*this);
+	if (m_World != NULL)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 
