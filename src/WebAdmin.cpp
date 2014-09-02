@@ -131,7 +131,7 @@ bool cWebAdmin::Start(void)
 	m_TemplateScript.RegisterAPILibs();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
-		LOGERROR("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
+		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
 		m_TemplateScript.Close();
 		m_HTTPServer.Stop();
 		return false;
@@ -348,6 +348,94 @@ void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest &
 
 
 
+void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+{
+	AString FileURL = a_Request.GetURL();
+	std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
+
+	// Remove all leading backslashes:
+	if (FileURL[0] == '/')
+	{
+		size_t FirstCharToRead = FileURL.find_first_not_of('/');
+		if (FirstCharToRead != AString::npos)
+		{
+			FileURL = FileURL.substr(FirstCharToRead);
+		}
+	}
+
+	// Remove all "../" strings:
+	ReplaceString(FileURL, "../", "");
+
+	bool LoadedSuccessfull = false;
+	AString Content = "<h2>404 Not Found</h2>";
+	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
+	if (cFile::IsFile(Path))
+	{
+		cFile File(Path, cFile::fmRead);
+		AString FileContent;
+		if (File.IsOpen() && (File.ReadRestOfFile(FileContent) != -1))
+		{
+			LoadedSuccessfull = true;
+			Content = FileContent;
+		}
+	}
+
+	// Find content type (The currently method is very bad. We should change it later)
+	AString ContentType = "text/html";
+	size_t LastPointPosition = Path.find_last_of('.');
+	if (LoadedSuccessfull && (LastPointPosition != AString::npos) && (LastPointPosition < Path.length()))
+	{
+		AString FileExtension = Path.substr(LastPointPosition + 1);
+		ContentType = GetContentTypeFromFileExt(FileExtension);
+	}
+
+	// Send the response:
+	cHTTPResponse Resp;
+	Resp.SetContentType(ContentType);
+	a_Connection.Send(Resp);
+	a_Connection.Send(Content);
+	a_Connection.FinishResponse();
+}
+
+
+
+
+
+AString cWebAdmin::GetContentTypeFromFileExt(const AString & a_FileExtension)
+{
+	static bool IsInitialized = false;
+	static std::map<AString, AString> ContentTypeMap;
+	if (!IsInitialized)
+	{
+		// Initialize the ContentTypeMap:
+		ContentTypeMap["png"]  = "image/png";
+		ContentTypeMap["fif"]  = "image/fif";
+		ContentTypeMap["gif"]  = "image/gif";
+		ContentTypeMap["jpeg"] = "image/jpeg";
+		ContentTypeMap["jpg"]  = "image/jpeg";
+		ContentTypeMap["jpe"]  = "image/jpeg";
+		ContentTypeMap["tiff"] = "image/tiff";
+		ContentTypeMap["ico"]  = "image/ico";
+		ContentTypeMap["csv"]  = "image/comma-separated-values";
+		ContentTypeMap["css"]  = "text/css";
+		ContentTypeMap["js"]   = "text/javascript";
+		ContentTypeMap["txt"]  = "text/plain";
+		ContentTypeMap["rtx"]  = "text/richtext";
+		ContentTypeMap["xml"]  = "text/xml";
+	}
+
+	AString FileExtension = StrToLower(a_FileExtension);
+	if (ContentTypeMap.find(a_FileExtension) == ContentTypeMap.end())
+	{
+		return "text/html";
+	}
+	return ContentTypeMap[FileExtension];
+}
+
+
+
+
+
 sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 {
 	sWebAdminPage Page;
@@ -410,6 +498,7 @@ AString cWebAdmin::GetDefaultPage(void)
 	Content += "</ul><br>";
 	return Content;
 }
+
 
 
 
@@ -560,64 +649,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	}
 	else
 	{
-		AString FileURL = URL;
-		std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
-
-		// Remove all backsplashes on the first place:
-		if (FileURL[0] == '/')
-		{
-			size_t FirstCharToRead = FileURL.find_first_not_of('/');
-			if (FirstCharToRead != AString::npos)
-			{
-				FileURL = FileURL.substr(FirstCharToRead);
-			}
-		}
-
-		// Remove all "../" strings:
-		ReplaceString(FileURL, "../", "");
-
-		bool LoadedSuccessfull = false;
-		AString Content = "<h2>404 Not Found</h2>";
-		AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
-		if (cFile::IsFile(Path))
-		{
-			cFile File(Path, cFile::fmRead);
-			AString FileContent;
-			if (File.IsOpen() && (File.ReadRestOfFile(FileContent) != -1))
-			{
-				LoadedSuccessfull = true;
-				Content = FileContent;
-			}
-		}
-
-		// Find content type (The currently method is very bad. We should change it later)
-		AString ContentType = "text/html";
-		size_t LastPointPosition = Path.find_last_of('.');
-		if (LoadedSuccessfull && (LastPointPosition != AString::npos) && (LastPointPosition < Path.length()))
-		{
-			const AString & FileExtension = StrToLower(Path.substr(LastPointPosition + 1));
-			if (FileExtension == "png")  ContentType = "image/png";
-			if (FileExtension == "fif")  ContentType = "image/fif";
-			if (FileExtension == "gif")  ContentType = "image/gif";
-			if (FileExtension == "jpeg") ContentType = "image/jpeg";
-			if (FileExtension == "jpg")  ContentType = "image/jpeg";
-			if (FileExtension == "jpe")  ContentType = "image/jpeg";
-			if (FileExtension == "tiff") ContentType = "image/tiff";
-			if (FileExtension == "ico")  ContentType = "image/ico";
-			if (FileExtension == "csv")  ContentType = "text/comma-separated-values";
-			if (FileExtension == "css")  ContentType = "text/css";
-			if (FileExtension == "js")   ContentType = "text/javascript";
-			if (FileExtension == "txt")  ContentType = "text/plain";
-			if (FileExtension == "rtx")  ContentType = "text/richtext";
-			if (FileExtension == "xml")  ContentType = "text/xml";
-		}
-
-		// Send the response:
-		cHTTPResponse Resp;
-		Resp.SetContentType(ContentType);
-		a_Connection.Send(Resp);
-		a_Connection.Send(Content);
-		a_Connection.FinishResponse();
+		HandleFileRequest(a_Connection, a_Request);
 	}
 
 	// Delete any request data assigned to the request:
