@@ -77,6 +77,9 @@ protected:
 } ;
 
 
+
+
+
 class cBioGenMulticache :
 	public cBiomeGen
 {
@@ -88,31 +91,16 @@ public:
 	~cBioGenMulticache();
 
 protected:
-
-	cBiomeGen * m_BioGenToCache;
-
-	struct sCacheData
-	{
-		int m_ChunkX;
-		int m_ChunkZ;
-		cChunkDef::BiomeMap m_BiomeMap;
-	};
-
-	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
-	int          m_CacheSize;
 	int          m_CachesLength;
-
-	int ** m_CachesOrder; // MRU-ized order, indices into the multiple m_CachesData array
-	sCacheData ** m_CachesData; 
-
-	// Cache statistics
-	int m_NumHits;
-	int m_NumMisses;
-	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
+	int          m_InternalCacheLength;
+	std::vector<cBiomeGen*> m_Caches;
 
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 };
+
+
+
 
 
 /// Base class for generators that use a list of available biomes. This class takes care of the list.

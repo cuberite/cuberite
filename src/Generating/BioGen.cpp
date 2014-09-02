@@ -212,27 +212,14 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 // cBioGenMulticache:
 
 cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, int a_CacheSize, int a_CachesLength) :
-m_BioGenToCache(a_BioGenToCache),
-m_CacheSize(a_CacheSize),
 m_CachesLength(a_CachesLength),
-m_CachesOrder(new int*[a_CachesLength * a_CachesLength]),
-m_CachesData(new sCacheData*[a_CachesLength * a_CachesLength]),
-m_NumHits(0),
-m_NumMisses(0),
-m_TotalChain(0)
+m_InternalCacheLength(a_CachesLength * a_CacheSize)
 {
-	for (int i = 0; i < m_CachesLength * m_CachesLength; i++) {
-		sCacheData * cacheData = m_CachesData[i] = new sCacheData[m_CacheSize];
-		int * cacheOrder = m_CachesOrder[i] = new int[m_CacheSize];
-
-		for (int j = 0; j < m_CacheSize; j++)
-		{
-			cacheOrder[j] = j;
-			cacheData[j].m_ChunkX = 0x7fffffff;
-			cacheData[j].m_ChunkZ = 0x7fffffff;
-		}
+	//m_Caches = new std::vector<cBiomeGen*>;
+	m_Caches.reserve(m_InternalCacheLength);
+	for (int i = 0; i < m_InternalCacheLength; i++) {
+		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
 	}
-
 }
 
 
@@ -241,14 +228,7 @@ m_TotalChain(0)
 
 cBioGenMulticache::~cBioGenMulticache()
 {
-	for (int i = 0; i < m_CachesLength * m_CachesLength; i++) {
-		delete[] m_CachesData[i];
-		delete[] m_CachesOrder[i];
-	}
-	delete[] m_CachesData;
-	m_CachesData = NULL;
-	delete[] m_CachesOrder;
-	m_CachesOrder = NULL;
+	m_Caches.erase(m_Caches.cbegin(), m_Caches.cend());
 }
 
 
@@ -257,57 +237,10 @@ cBioGenMulticache::~cBioGenMulticache()
 
 void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	if (((m_NumHits + m_NumMisses) % 1024) == 10)
-	{
-		LOGD("BioGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
-		LOGD("BioGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
-	}
+	int cacheIdx = ((unsigned int)a_ChunkX % m_CachesLength) * m_CachesLength 
+		+ ((unsigned int)a_ChunkZ % m_CachesLength);
 
-	int cacheIdx = ((unsigned int)a_ChunkX % m_CachesLength) * m_CachesLength + ((unsigned int)a_ChunkZ % m_CachesLength);
-	sCacheData * cacheData = m_CachesData[cacheIdx];
-	int * cacheOrder = m_CachesOrder[cacheIdx];
-
-	for (int i = 0; i < m_CacheSize; i++)
-	{
-		if (
-			(cacheData[cacheOrder[i]].m_ChunkX != a_ChunkX) ||
-			(cacheData[cacheOrder[i]].m_ChunkZ != a_ChunkZ)
-			)
-		{
-			continue;
-		}
-		// Found it in the cache
-		int Idx = cacheOrder[i];
-
-		// Move to front:
-		for (int j = i; j > 0; j--)
-		{
-			cacheOrder[j] = cacheOrder[j - 1];
-		}
-		cacheOrder[0] = Idx;
-
-		// Use the cached data:
-		memcpy(a_BiomeMap, cacheData[Idx].m_BiomeMap, sizeof(a_BiomeMap));
-
-		m_NumHits++;
-		m_TotalChain += i;
-		return;
-	}  // for i - cache
-
-	// Not in the cache:
-	m_NumMisses++;
-	m_BioGenToCache->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
-
-	// Insert it as the first item in the MRU order:
-	int Idx = cacheOrder[m_CacheSize - 1];
-	for (int i = m_CacheSize - 1; i > 0; i--)
-	{
-		cacheOrder[i] = cacheOrder[i - 1];
-	}  // for i - m_CacheOrder[]
-	cacheOrder[0] = Idx;
-	memcpy(cacheData[Idx].m_BiomeMap, a_BiomeMap, sizeof(a_BiomeMap));
-	cacheData[Idx].m_ChunkX = a_ChunkX;
-	cacheData[Idx].m_ChunkZ = a_ChunkZ;
+	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 }
 
 
@@ -316,8 +249,12 @@ void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMa
 
 void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	super::InitializeBiomeGen(a_IniFile);
-	m_BioGenToCache->InitializeBiomeGen(a_IniFile);
+	//super::InitializeBiomeGen(a_IniFile);
+	for (auto it = m_Caches.begin(); it != m_Caches.end(); it++)
+	{
+		cBiomeGen * tmp = *it;
+		tmp->InitializeBiomeGen(a_IniFile);
+	}
 }
 
 
