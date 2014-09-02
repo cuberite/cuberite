@@ -979,9 +979,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
@@ -991,9 +1000,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
