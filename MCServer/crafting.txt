@@ -456,7 +456,7 @@ GreenWool     = Wool, * | GreenDye, *
 RedWool       = Wool, * | RedDye, *
 BlackWool     = Wool, * | BlackDye, *
 
-WhiteCrapet, 3     = WhiteWool, 1:1, 2:1
+WhiteCarpet, 3     = WhiteWool, 1:1, 2:1
 OrangeCarpet, 3    = OrangeWool, 1:1, 2:1
 MagentaCarpet, 3   = MagentaWool, 1:1, 2:1
 LightBlueCarpet, 3 = LightBlueWool, 1:1, 2:1
