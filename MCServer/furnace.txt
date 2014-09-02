@@ -10,25 +10,28 @@
 # An Item is defined by an Item Type, an amount (and damage)
 # The damage is optional, and if not specified it's assumed to be 0
 #
-# -Cactus Green:
-#    351     :   1    ( :   2    )
-#   ItemType : Amount ( : Damage )
+# Cactus Green example:
+#    351     :   2    ( ,   1    )
+#   ItemType : Damage ( , Amount )
+# or simple use the item name (marked in items.ini):
+#   CactusGreen ( , 1 )
 #
 #
 # **** Recipe and result ****
 #
-# 4:1@200=1:1 -> Produces 1 smooth stone from 1 cobblestone in 200 ticks (10 seconds)
+# Cobble @ 200 = Stone -> Produces 1 smooth stone from 1 cobblestone in 200 ticks (10 seconds)
 #
-#   4      :    1   @  200  =   1    :   1
-# ItemType : Amount @ ticks = ItemID : Amount
+# Write in full:
+#    Cobble  :   0    ,   1    @  200  =    1     :   1    ,   1
+#   ItemType : Damage , Amount @ ticks = ItemType : Damage , Amount
 #
 #
 # **** Fuel ****
 #
 # !17:1 = 300 -> 1 Wood burns for 300 ticks (15 s)
 #
-#  !     17   :   1    =  300
-# Fuel ItemType : Amount = ticks
+#  !     Wood   ,   1    =  300
+# Fuel ItemType , Amount = ticks
 #
 #******************************************************#
 
@@ -39,20 +42,24 @@
 #--------------------------
 # Smelting recipes
 
-4:1   @ 200 = 1:1      # 1 Cobblestone  -> 1 Rock
-15:1  @ 200 = 265:1    # 1 Iron Ore     -> 1 Iron Ingot
-14:1  @ 200 = 266:1    # 1 Gold Ore     -> 1 Gold Ingot
-153:1 @ 200 = 406:1    # 1 Quartz Ore   -> 1 Quartz
-12:1  @ 200 = 20:1     # 1 Sand         -> 1 Glass
-319:1 @ 200 = 320:1    # 1 Raw Pork     -> 1 Cooked Pork
-363:1 @ 200 = 364:1    # 1 Raw Beef     -> 1 Cooked Beef (steak)
-365:1 @ 200 = 366:1    # 1 Raw Chicken  -> 1 Cooked Chicken
-337:1 @ 200 = 336:1    # 1 Clay         -> 1 Clay Brick
-82:1  @ 200 = 172:1    # 1 Clay Block   -> 1 Hardened Clay
-87:1  @ 200 = 405:1    # 1 NetherRack   -> 1 NetherBrick
-349:1 @ 200 = 350:1    # 1 Raw Fish     -> 1 Cooked Fish
-17:1  @ 200 = 263:1:1  # 1 Log          -> 1 Charcoal
-81:1  @ 200 = 351:1:2  # 1 Cactus       -> 1 Green Dye
+Cobble           = Stone
+IronOre          = IronIngot
+GoldOre          = GoldIngot
+NetherQuartzOre  = NetherQuartz
+Sand             = Glass
+Pork             = CookedPork
+RawBeef          = Steak
+RawChicken       = CookedChicken
+Clay             = Brick
+ClayBlock        = HardenedClay
+TallGrass        = NetherBrickItem
+RawFish          = CookedFish
+Log              = CharCoal
+Cactus           = GreenDye
+WetSponge        = Sponge
+Stonebrick       = CrackedStonebrick
+RawRabbit        = CookedRabbit
+RawMutton        = CookedMutton
 
 
 
@@ -61,31 +68,41 @@
 #--------------------------
 # Fuels
 
-! 263:1    = 1600   # 1 Coal            -> 80 sec
-! 263:1:1  = 1600   # 1 Charcoal        -> 80 sec
-! 126:1    = 15     # 1 Halfslab        -> 7.5 sec
-! 5:1      = 300    # 1 Planks          -> 15 sec
-! 280:1    = 100    # 1 Stick           -> 5 sec
-! 85:1     = 300    # 1 Fence           -> 15 sec
-! 53:1     = 300    # 1 Wooden Stairs   -> 15 sec
-! 58:1     = 300    # 1 Crafting Table  -> 15 sec
-! 47:1     = 300    # 1 Bookshelf       -> 15 sec
-! 54:1     = 300    # 1 Chest           -> 15 sec
-! 84:1     = 300    # 1 Jukebox         -> 15 sec
-! 327:1    = 20000  # 1 Lava Bucket     -> 1000 sec
-! 17:1     = 300    # 1 Wood            -> 15 sec
-! 6:1      = 100    # 1 Sapling         -> 5 sec
-! 173:1    = 16000  # 1 Coal Block      -> 800 sec
-! 369:1    = 2400   # 1 Blaze Rod       -> 120 sec
-! 25:1     = 300    # 1 Note Block      -> 15 sec
-! 151:1    = 300    # 1 Daylight Sensor -> 15 sec
-! 107:1    = 300    # 1 Fence Gate      -> 15 sec
-! 167:1    = 300    # 1 Trapdoor        -> 15 sec
-! 146:1    = 300    # 1 Trapped Chest   -> 15 sec
-! 72:1     = 300    # 1 Pressure Plate  -> 15 sec
-! 270:1    = 200    # 1 Wooden Pickaxe  -> 10 sec
-! 271:1    = 200    # 1 Wooden Axe      -> 10 sec
-! 269:1    = 200    # 1 Wooden Shovel   -> 10 sec
-! 290:1    = 200    # 1 Wooden Hoe      -> 10 sec
-! 268:1    = 200    # 1 Wooden Sword    -> 10 sec
+! CharCoal        = 1600   # -> 80 sec
+! Coal            = 1600   # -> 80 sec
+! WoodenSlab      = 15     # -> 7.5 sec
+! Planks          = 300    # -> 15 sec
+! Stick           = 100    # -> 5 sec
+! Fence           = 300    # -> 15 sec
+! SpruceFence     = 300    # -> 15 sec
+! BirchFence      = 300    # -> 15 sec
+! JungleFence     = 300    # -> 15 sec
+! DarkOakFence    = 300    # -> 15 sec
+! AcaciaFence     = 300    # -> 15 sec
+! WoodStairs      = 300    # -> 15 sec
+! Workbench       = 300    # -> 15 sec
+! Bookshelf       = 300    # -> 15 sec
+! Chest           = 300    # -> 15 sec
+! Jukebox         = 300    # -> 15 sec
+! Lavabucket      = 20000  # -> 1000 sec
+! Log             = 300    # -> 15 sec
+! Sapling         = 100    # -> 5 sec
+! CoalBlock       = 16000  # -> 800 sec
+! BlazeRod        = 2400   # -> 120 sec
+! NoteBlock       = 300    # -> 15 sec
+! DaylightSensor  = 300    # -> 15 sec
+! FenceGate       = 300    # -> 15 sec
+! SpruceFenceGate = 300    # -> 15 sec
+! BirchFenceGate  = 300    # -> 15 sec
+! JungleFenceGate = 300    # -> 15 sec
+! DarkOakFenceGate = 300   # -> 15 sec
+! Trapdoor        = 300    # -> 15 sec
+! TrappedChest    = 300    # -> 15 sec
+! WoodPlate       = 300    # -> 15 sec
+! WoodPickaxe     = 200    # -> 10 sec
+! WoodAxe         = 200    # -> 10 sec
+! WoodShovel      = 200    # -> 10 sec
+! WoodHoe         = 200    # -> 10 sec
+! WoodSword       = 200    # -> 10 sec
+
 

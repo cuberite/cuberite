@@ -61,30 +61,45 @@ Furnace          = Cobblestone, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3
 #******************************************************#
 # Blocks
 #
-IronBlock        = IronIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-GoldBlock        = GoldIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-DiamondBlock     = Diamond,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-LapisBlock       = LapisLazuli, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-EmeraldBlock     = Emerald,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-RedstoneBlock    = RedstoneDust,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-QuartzBlock      = NetherQuartz, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-NetherBrick      = netherbrickitem, 1:1, 1:2, 2:1, 2:2
-Glowstone        = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
-Wool             = String,    1:1, 1:2, 2:1, 2:2
-TNT              = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3:2, 2:3
-PillarQuartzBlock = QuartzSlab, 1:1, 1:2
-ChiseledQuartzBlock, 2 = QuartzBlock, 1:1, 1:2
-CoalBlock        = Coal, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-HayBale          = Wheat, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
-SnowBlock        = SnowBall,  1:1, 1:2, 2:1, 2:2
-ClayBlock        = Clay,      1:1, 1:2, 2:1, 2:2
-BrickBlock       = Brick,     1:1, 1:2, 2:1, 2:2
-StoneBrick, 4    = Stone,     1:1, 1:2, 2:1, 2:2
-BookShelf        = Planks,    1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
-Sandstone, 4     = Sand,      1:1, 1:2, 2:1, 2:2
-SmoothSandstone, 4 = Sandstone, 1:1, 1:2, 2:1, 2:2
-OrnamentSandstone = SandstoneSlab, 1:1, 1:2
-JackOLantern     = Pumpkin, 1:1 | Torch, 1:2
+IronBlock               = IronIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+GoldBlock               = GoldIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+DiamondBlock            = Diamond,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+LapisBlock              = LapisLazuli, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+EmeraldBlock            = Emerald,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+RedstoneBlock           = RedstoneDust,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+QuartzBlock             = NetherQuartz, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+NetherBrick             = netherbrickitem, 1:1, 1:2, 2:1, 2:2
+Glowstone               = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
+Wool                    = String,    1:1, 1:2, 2:1, 2:2
+TNT                     = Gunpowder, 1:1, 3:1, 2:2, 1:3, 3:3 | Sand, 2:1, 1:2, 3:2, 2:3
+PillarQuartzBlock       = QuartzSlab, 1:1, 1:2
+ChiseledQuartzBlock, 2  = QuartzBlock, 1:1, 1:2
+CoalBlock               = Coal, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+HayBale                 = Wheat, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+SnowBlock               = SnowBall,  1:1, 1:2, 2:1, 2:2
+ClayBlock               = Clay,      1:1, 1:2, 2:1, 2:2
+BrickBlock              = Brick,     1:1, 1:2, 2:1, 2:2
+StoneBrick, 4           = Stone,     1:1, 1:2, 2:1, 2:2
+BookShelf               = Planks,    1:1, 2:1, 3:1, 1:3, 2:3, 3:3 | Book, 1:2, 2:2, 3:2
+Sandstone, 4            = Sand,      1:1, 1:2, 2:1, 2:2
+SmoothSandstone, 4      = Sandstone, 1:1, 1:2, 2:1, 2:2
+OrnamentSandstone       = SandstoneSlab, 1:1, 1:2
+JackOLantern            = Pumpkin, 1:1 | Torch, 1:2
+PolishedGranite, 4      = Granite, 1:1, 1:2, 2:1, 2:2
+PolishedDiorite, 4      = Diorite, 1:1, 1:2, 2:1, 2:2
+PolishedAndesite, 4     = Andesite, 1:1, 1:2, 2:1, 2:2
+CoarsedDirt, 4          = Dirt, 1:1, 2:2 | Gravel, 1:2, 2:1
+CoarsedDirt, 4          = Gravel, 1:1, 2:2 | Dirt, 1:2, 2:1
+SlimeBlock              = Slimeball, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+Prismarine              = PrismarineShard, 1:1, 1:2, 2:1, 2:2
+PrismarineBricks        = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+DarkPrismarine          = PrismarineShard, 1:1, 1:2, 1:3, 2:1, 2:3, 3:1, 3:2, 3:3 | Inksac, 2:2
+SeaLantern              = PrismarineShard, 1:1, 1:3, 3:1, 3:3 | PrismarineCrystals, 1:2, 2:1, 2:2, 2:3, 3:2
+RedSandstone, 4         = RedSand, 1:1, 1:2, 2:1, 2:2
+ChiseledRedSandstone, 4 = RedSandstoneSlab, 1:1, 1:2
+SmoothRedSandstone, 4   = RedSand, 1:1, 1:2, 2:1, 2:2
+MossyStoneBrick         = Stonebrick, * | Vines, *
+Leather                 = RabbitHide, 1:1, 1:2, 2:1, 2:2
 
 # Slabs:
 StoneSlab,       6  = Stone,             1:1, 2:1, 3:1
@@ -101,6 +116,7 @@ StonebrickSlab,  6  = StoneBrick,        1:1, 2:1, 3:1
 NetherbrickSlab, 6  = NetherBrick,       1:1, 2:1, 3:1
 Quartzslab,      6  = QuartzBlock,       1:1, 2:1, 3:1
 snow,            6  = SnowBlock,         1:1, 2:1, 3:1
+RedSandstoneSlab, 6 = RedSandstone,      1:1, 2:1, 3:1
 
 
 # Stairs:
@@ -128,6 +144,8 @@ quartzstairs, 4      = QuartzBlock, 1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 quartzstairs, 4      = QuartzBlock, 3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 StoneBrickStairs, 4  = StoneBrick,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 StoneBrickStairs, 4  = StoneBrick,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+RedSandstoneStairs, 4 = RedSandstone,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
+RedSandstoneStairs, 4 = RedSandstone,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 
 # Other
 Carpet             = Wool, 1:3, 2:3
@@ -262,11 +280,19 @@ ActivatorRail, 6 = IronIngot, 1:1, 1:2, 1:3, 3:1, 3:2, 3:3 | Stick, 2:1, 2:3 | R
 #******************************************************#
 # Mechanisms
 #
-WoodenDoor       = Planks,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3
-IronDoor         = IronIngot, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+WoodenDoor, 3    = OakPlanks,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+SpruceDoor, 3    = SprucePlanks, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+BirchDoor, 3     = BirchPlanks, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+JungleDoor, 3    = JunglePlanks, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+AcaciaDoor, 3    = AcaciaPlanks, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+DarkOakDoor, 3   = DarkOakPlanks, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
+IronDoor, 3      = IronIngot, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3
 TrapDoor, 2      = Planks,    1:1, 2:1, 3:1, 1:2, 2:2, 3:2
+IronTrapDoor     = IronIngot, 1:1, 1:2, 2:1, 2:2
 WoodPlate        = Planks,  1:1, 2:1
 StonePlate       = Stone,   1:1, 2:1
+lightweightedpressureplate = IronIngot, 1:1, 2:1
+heavyweightedpressureplate = GoldIngot, 1:1, 2:1
 StoneButton      = Stone,   1:1
 WoodenButton     = Planks,  1:1
 RedstoneTorchOn  = Stick, 1:2        | RedstoneDust, 1:1
@@ -304,6 +330,8 @@ MelonSeeds           = MelonSlice, *
 PumpkinSeeds, 4      = Pumpkin, *
 PumpkinPie           = Pumpkin, * | Sugar, * | egg, *
 Wheat, 9             = Haybale, *
+RabbitStew           = Cooked Rabbit, 2:1 | Carrot, 1:2 | BakedPotato, 2:2 | BrownMushroom, 3:2 | Bowl, 2:3
+RabbitStew           = Cooked Rabbit, 2:1 | Carrot, 1:2 | BakedPotato, 2:2 | RedMushroom, 3:2 | Bowl, 2:3
 
 
 
@@ -332,17 +360,49 @@ IronBars, 16        = IronIngot, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
 Paper, 3            = Sugarcane, 1:1, 2:1, 3:1
 Book                = Paper, *, *, * | leather, *
 Bookandquill        = Book, * | feather, * | inksac, *
-Fence, 2            = Stick,       1:1, 2:1, 3:1, 1:2, 2:2, 3:2
+Fence, 3            = OakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+SpruceFence, 3      = SprucePlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+BirchFence, 3       = BirchPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+JungleFence, 3      = JunglePlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+DarkOakFence, 3     = DarkOakPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
+AcaciaFence, 3      = AcaciaPlanks, 1:1, 1:2, 3:1, 3:2 | Stick, 2:1, 2:2
 Cobblestonewall, 6  = cobblestone, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 mossycobblestonewall, 6  = mossycobblestone, 1:2, 1:3, 2:2, 2:3, 3:2, 3:3
 NetherBrickFence, 6 = NetherBrick, 1:1, 2:1, 3:1, 1:2, 2:2, 3:2
-FenceGate           = Stick,       1:1, 1:2, 3:1, 3:2  | Planks, 2:1, 2:2
+FenceGate           = Stick,       1:1, 1:2, 3:1, 3:2  | OakPlanks, 2:1, 2:2
+SpruceFenceGate     = Stick,       1:1, 1:2, 3:1, 3:2  | SprucePlanks, 2:1, 2:2
+BirchFenceGate      = Stick,       1:1, 1:2, 3:1, 3:2  | BirchPlanks, 2:1, 2:2
+JungleFenceGate     = Stick,       1:1, 1:2, 3:1, 3:2  | JunglePlanks, 2:1, 2:2
+DarkOakFenceGate    = Stick,       1:1, 1:2, 3:1, 3:2  | DarkOakPlanks, 2:1, 2:2
+AcaciaFenceGate     = Stick,       1:1, 1:2, 3:1, 3:2  | AcaciaPlanks, 2:1, 2:2
 Bed                 = Planks,            1:2, 2:2, 3:2 | Wool,   1:1, 2:1, 3:1
 GoldIngot           = GoldNugget, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 EyeOfEnder          = EnderPearl, *                 | BlazePowder, *
 Beacon              = Glass, 1:1, 1:2, 2:1, 3:1, 3:2 | Obsidian, 1:3, 2:3, 3:3 | NetherStar, 2:2
 Anvil               = IronBlock, 1:1, 2:1, 3:1 | IronIngot, 2:2, 1:3, 2:3, 3:3
 FlowerPot           = Brick, 1:2, 2:3, 3:2
+ArmorStand          = Stick, 1:1, 1:3, 2:1, 2:2, 3:1, 3:3 | StoneSlab, 2:3
+
+# These are just the basic ones, you can add various shapes and stuff to each of them
+# ToDo: Add the various shapes (saved in NBT-Tags, not in meta)
+# Banners:
+
+WhiteBanner         = Stick, 2:3 | WhiteWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+OrangeBanner        = Stick, 2:3 | OrangeWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+MagentaBanner       = Stick, 2:3 | MagentaWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+LightBlueBanner     = Stick, 2:3 | LightBlueWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+YellowBanner        = Stick, 2:3 | YellowWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+LimeBanner          = Stick, 2:3 | LimeWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+PinkBanner          = Stick, 2:3 | PinkWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+GrayBanner          = Stick, 2:3 | GrayWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+LightGrayBanner     = Stick, 2:3 | LightGrayWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+CyanBanner          = Stick, 2:3 | CyanWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+PurpleBanner        = Stick, 2:3 | PurpleWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+BlueBanner          = Stick, 2:3 | BlueWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+BrownBanner         = Stick, 2:3 | BrownWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+GreenBanner         = Stick, 2:3 | GreenWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+RedBanner           = Stick, 2:3 | RedWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
+BlackBanner         = Stick, 2:3 | BlackWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
 
 
 

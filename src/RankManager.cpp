@@ -477,8 +477,8 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 	{
 		SQLite::Statement stmt(m_DB, "SELECT Rank.Name FROM Rank LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID WHERE PlayerRank.PlayerUUID = ?");
 		stmt.bind(1, a_PlayerUUID);
-		stmt.executeStep();
-		if (stmt.isDone())
+		// executeStep returns false on no data
+		if (!stmt.executeStep())
 		{
 			// No data returned from the DB
 			return AString();
