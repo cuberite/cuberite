@@ -1880,21 +1880,19 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 							}
 							else if ((m_World->GetTNTShrapnelLevel() > slNone) && (m_World->GetTickRandomNumber(100) < 20))  // 20% chance of flinging stuff around
 							{
-								if (!cBlockInfo::FullyOccupiesVoxel(Block))
+								// If the block is shrapnel-able, make a falling block entity out of it:
+								if (
+									((m_World->GetTNTShrapnelLevel() == slAll) && cBlockInfo::FullyOccupiesVoxel(Block)) ||
+									((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block == E_BLOCK_SAND) || (Block == E_BLOCK_GRAVEL)))
+								)
 								{
-									break;
+									m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
 								}
-								else if ((m_World->GetTNTShrapnelLevel() == slGravityAffectedOnly) && ((Block != E_BLOCK_SAND) && (Block != E_BLOCK_GRAVEL)))
-								{
-									break;
-								}
-								m_World->SpawnFallingBlock(bx + x, by + y + 5, bz + z, Block, area.GetBlockMeta(bx + x, by + y, bz + z));
 							}
 
 							area.SetBlockTypeMeta(bx + x, by + y, bz + z, E_BLOCK_AIR, 0);
 							a_BlocksAffected.push_back(Vector3i(bx + x, by + y, bz + z));
 							break;
-							
 						}
 					}  // switch (BlockType)
 				}  // for z
@@ -1916,51 +1914,31 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 		virtual bool Item(cEntity * a_Entity) override
 		{
-			if (a_Entity->IsPickup())
+			if (a_Entity->IsPickup() && (a_Entity->GetTicksAlive() < 20))
 			{
-				if (((cPickup *)a_Entity)->GetAge() < 20)  // If pickup age is smaller than one second, it is invincible (so we don't kill pickups that were just spawned)
+				// If pickup age is smaller than one second, it is invincible (so we don't kill pickups that were just spawned)
+				return false;
+			}
+
+			Vector3d DistanceFromExplosion = a_Entity->GetPosition() - m_ExplosionPos;
+			
+			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock())  // Don't apply damage to other TNT entities and falling blocks, they should be invincible
+			{
+				cBoundingBox bbEntity(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());
+
+				if (!m_bbTNT.IsInside(bbEntity))  // If bbEntity is inside bbTNT, not vice versa!
 				{
 					return false;
 				}
-			}
 
-			Vector3d EntityPos = a_Entity->GetPosition();
-			cBoundingBox bbEntity(EntityPos, a_Entity->GetWidth() / 2, a_Entity->GetHeight());
-
-			if (!m_bbTNT.IsInside(bbEntity))  // IsInside actually acts like DoesSurround
-			{
-				return false;
-			}
-			
-			Vector3d AbsoluteEntityPos(abs(EntityPos.x), abs(EntityPos.y), abs(EntityPos.z));
-
-			// Work out how far we are from the edge of the TNT's explosive effect
-			AbsoluteEntityPos -= m_ExplosionPos;
-
-			// All to positive
-			AbsoluteEntityPos.x = abs(AbsoluteEntityPos.x);
-			AbsoluteEntityPos.y = abs(AbsoluteEntityPos.y);
-			AbsoluteEntityPos.z = abs(AbsoluteEntityPos.z);
-
-			double FinalDamage = (((1 / AbsoluteEntityPos.x) + (1 / AbsoluteEntityPos.y) + (1 / AbsoluteEntityPos.z)) * 2) * m_ExplosionSize;
-
-			// Clip damage values
-			FinalDamage = Clamp(FinalDamage, 0.0, (double)a_Entity->GetMaxHealth());
-
-			if (!a_Entity->IsTNT() && !a_Entity->IsFallingBlock())  // Don't apply damage to other TNT entities and falling blocks, they should be invincible
-			{
-				a_Entity->TakeDamage(dtExplosion, NULL, (int)FinalDamage, 0);
+				// Ensure that the damage dealt is inversely proportional to the distance to the TNT centre - the closer a player is, the harder they are hit
+				a_Entity->TakeDamage(dtExplosion, NULL, (int)((1 / DistanceFromExplosion.Length()) * 6 * m_ExplosionSize), 0);
 			}
 
 			// Apply force to entities around the explosion - code modified from World.cpp DoExplosionAt()
-			Vector3d distance_explosion = a_Entity->GetPosition() - m_ExplosionPos;
-			if (distance_explosion.SqrLength() < 4096.0)
-			{
-				distance_explosion.Normalize();
-				distance_explosion *= m_ExplosionSize * m_ExplosionSize;
-
-				a_Entity->AddSpeed(distance_explosion);
-			}
+			DistanceFromExplosion.Normalize();
+			DistanceFromExplosion *= m_ExplosionSize * m_ExplosionSize;
+			a_Entity->AddSpeed(DistanceFromExplosion);
 			
 			return false;
 		}

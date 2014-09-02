@@ -256,6 +256,11 @@ set(EXECUTABLE MCServer)
 if (MSVC)
 	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
+	
+	# The paths in BINDING_DEPENDENCIES are relative to the Bindings folder, convert them relative to this folder:
+	foreach (dep ${BINDING_DEPENDENCIES})
+		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
+	endforeach(dep)
 
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${BINDING_OUTPUTS}
@@ -268,7 +273,7 @@ if (MSVC)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDENCIES}
+		DEPENDS ${BINDINGS_DEPENDENCIES}
 	)
 endif()
 

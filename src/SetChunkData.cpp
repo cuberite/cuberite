@@ -134,8 +134,8 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 			);
 			cBlockEntityList::iterator itr2 = itr;
 			itr2++;
-			m_BlockEntities.erase(itr);
 			delete *itr;
+			m_BlockEntities.erase(itr);
 			itr = itr2;
 		}
 		else

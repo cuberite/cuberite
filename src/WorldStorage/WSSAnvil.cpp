@@ -592,10 +592,6 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		}
 		int RelX = x, RelY = y, RelZ = z, ChunkX, ChunkZ;
 		cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
-		if (RelY == 2)
-		{
-			LOGD("HERE");
-		}
 
 		// Load the proper BlockEntity type based on the block type:
 		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, RelX, RelY, RelZ);

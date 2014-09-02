@@ -75,7 +75,6 @@ public:
 			Arrow = NULL;
 			return;
 		}
-
 		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), 0.5, (float)Force);
 		if (!a_Player->IsGameModeCreative())
 		{
@@ -83,7 +82,18 @@ public:
 			{
 				a_Player->GetInventory().RemoveItem(cItem(E_ITEM_ARROW));
 			}
+			else
+			{
+				Arrow->SetPickupState(cArrowEntity::psNoPickup);
+			}
+			
+
 			a_Player->UseEquippedItem();
+		}
+
+		if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchFlame) > 0)
+		{
+			Arrow->StartBurning(100);
 		}
 	}
 } ;
