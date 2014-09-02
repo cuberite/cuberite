@@ -56,6 +56,10 @@ TallGrass        = NetherBrickItem
 RawFish          = CookedFish
 Log              = CharCoal
 Cactus           = GreenDye
+WetSponge        = Sponge
+Stonebrick       = CrackedStonebrick
+RawRabbit        = CookedRabbit
+RawMutton        = CookedMutton
 
 
 
@@ -64,31 +68,41 @@ Cactus           = GreenDye
 #--------------------------
 # Fuels
 
-! CharCoal       = 1600   # -> 80 sec
-! Coal           = 1600   # -> 80 sec
-! WoodenSlab     = 15     # -> 7.5 sec
-! Planks         = 300    # -> 15 sec
-! Stick          = 100    # -> 5 sec
-! Fence          = 300    # -> 15 sec
-! WoodStairs     = 300    # -> 15 sec
-! Workbench      = 300    # -> 15 sec
-! Bookshelf      = 300    # -> 15 sec
-! Chest          = 300    # -> 15 sec
-! Jukebox        = 300    # -> 15 sec
-! Lavabucket     = 20000  # -> 1000 sec
-! Log            = 300    # -> 15 sec
-! Sapling        = 100    # -> 5 sec
-! CoalBlock      = 16000  # -> 800 sec
-! BlazeRod       = 2400   # -> 120 sec
-! NoteBlock      = 300    # -> 15 sec
-! DaylightSensor = 300    # -> 15 sec
-! FenceGate      = 300    # -> 15 sec
-! Trapdoor       = 300    # -> 15 sec
-! TrappedChest   = 300    # -> 15 sec
-! WoodPlate      = 300    # -> 15 sec
-! WoodPickaxe    = 200    # -> 10 sec
-! WoodAxe        = 200    # -> 10 sec
-! WoodShovel     = 200    # -> 10 sec
-! WoodHoe        = 200    # -> 10 sec
-! WoodSword      = 200    # -> 10 sec
+! CharCoal        = 1600   # -> 80 sec
+! Coal            = 1600   # -> 80 sec
+! WoodenSlab      = 15     # -> 7.5 sec
+! Planks          = 300    # -> 15 sec
+! Stick           = 100    # -> 5 sec
+! Fence           = 300    # -> 15 sec
+! SpruceFence     = 300    # -> 15 sec
+! BirchFence      = 300    # -> 15 sec
+! JungleFence     = 300    # -> 15 sec
+! DarkOakFence    = 300    # -> 15 sec
+! AcaciaFence     = 300    # -> 15 sec
+! WoodStairs      = 300    # -> 15 sec
+! Workbench       = 300    # -> 15 sec
+! Bookshelf       = 300    # -> 15 sec
+! Chest           = 300    # -> 15 sec
+! Jukebox         = 300    # -> 15 sec
+! Lavabucket      = 20000  # -> 1000 sec
+! Log             = 300    # -> 15 sec
+! Sapling         = 100    # -> 5 sec
+! CoalBlock       = 16000  # -> 800 sec
+! BlazeRod        = 2400   # -> 120 sec
+! NoteBlock       = 300    # -> 15 sec
+! DaylightSensor  = 300    # -> 15 sec
+! FenceGate       = 300    # -> 15 sec
+! SpruceFenceGate = 300    # -> 15 sec
+! BirchFenceGate  = 300    # -> 15 sec
+! JungleFenceGate = 300    # -> 15 sec
+! DarkOakFenceGate = 300   # -> 15 sec
+! Trapdoor        = 300    # -> 15 sec
+! TrappedChest    = 300    # -> 15 sec
+! WoodPlate       = 300    # -> 15 sec
+! WoodPickaxe     = 200    # -> 10 sec
+! WoodAxe         = 200    # -> 10 sec
+! WoodShovel      = 200    # -> 10 sec
+! WoodHoe         = 200    # -> 10 sec
+! WoodSword       = 200    # -> 10 sec
+
 
