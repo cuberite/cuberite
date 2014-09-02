@@ -38,6 +38,7 @@ function Initialize(Plugin)
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
+	PM:BindCommand("/cm",      "debuggers", HandleCustomNameCmd,   "- Gives you a custom name");
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -762,6 +763,22 @@ function round(num, idp)
 	local mult = 10^(idp or 0)
 	if num >= 0 then return math.floor(num * mult + 0.5) / mult
 	else return math.ceil(num * mult - 0.5) / mult end
+end
+
+
+
+
+
+function HandleCustomNameCmd(Split, Player)
+	if (Split[2] == nil) then
+		Player:SendMessage("Usage: /cm [CustomName]");
+		return true;
+	end
+
+	local NewName = Split[2]
+	Player:SetCustomName(NewName);
+	Player:SendMessageSuccess("Custom name setted to " .. Player:GetCustomName() .. "!")
+	return true
 end
 
 
