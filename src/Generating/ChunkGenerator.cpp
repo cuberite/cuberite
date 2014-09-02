@@ -105,7 +105,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_Forc
 		cCSLock Lock(m_CS);
 
 		// Check if it is already in the queue:
-		for (cChunkCoordWithBoolList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
+		for (cChunkCoordsWithBoolList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
 		{
 			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
 			{

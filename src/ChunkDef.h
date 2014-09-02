@@ -404,7 +404,7 @@ public:
 	}
 };
 
-typedef std::list<cChunkCoordsWithBool> cChunkCoordWithBoolList;
+typedef std::list<cChunkCoordsWithBool> cChunkCoordsWithBoolList;
 
 
 

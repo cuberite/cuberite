@@ -137,10 +137,10 @@ private:
 
 	int m_Seed;
 
-	cCriticalSection        m_CS;
-	cChunkCoordWithBoolList m_Queue;
-	cEvent                  m_Event;       ///< Set when an item is added to the queue or the thread should terminate
-	cEvent                  m_evtRemoved;  ///< Set when an item is removed from the queue
+	cCriticalSection         m_CS;
+	cChunkCoordsWithBoolList m_Queue;
+	cEvent                   m_Event;       ///< Set when an item is added to the queue or the thread should terminate
+	cEvent                   m_evtRemoved;  ///< Set when an item is removed from the queue
 	
 	cGenerator * m_Generator;  ///< The actual generator engine used to generate chunks
 	
