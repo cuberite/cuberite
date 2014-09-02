@@ -216,7 +216,7 @@ m_CachesLength(a_CachesLength),
 m_InternalCacheLength(a_CachesLength * a_CacheSize)
 {
 	m_Caches.reserve(m_InternalCacheLength);
-	for (int i = 0; i < m_InternalCacheLength; i++) {
+	for (size_t i = 0; i < m_InternalCacheLength; i++) {
 		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
 	}
 }
@@ -239,8 +239,8 @@ cBioGenMulticache::~cBioGenMulticache()
 
 void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	int cacheIdx = ((unsigned int)a_ChunkX % m_CachesLength) * m_CachesLength 
-		+ ((unsigned int)a_ChunkZ % m_CachesLength);
+	size_t cacheIdx = ((size_t)a_ChunkX % m_CachesLength) * m_CachesLength
+		+ ((size_t)a_ChunkZ % m_CachesLength);
 
 	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 }

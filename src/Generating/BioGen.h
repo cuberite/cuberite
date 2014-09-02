@@ -91,8 +91,8 @@ public:
 	~cBioGenMulticache();
 
 protected:
-	int          m_CachesLength;
-	int          m_InternalCacheLength;
+	size_t          m_CachesLength;
+	size_t          m_InternalCacheLength;
 	std::vector<cBiomeGen*> m_Caches;
 
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
