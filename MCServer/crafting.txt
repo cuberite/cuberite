@@ -40,8 +40,8 @@
 
 # Need to list each of the four log types, otherwise all logs would get converted into apple planks (^0)
 
-ApplePlanks, 4   = AppleLog, * 
-ConiferPlanks, 4 = ConiferLog, *
+OakPlanks, 4     = OakLog, * 
+SprucePlanks, 4  = SpruceLog, *
 BirchPlanks, 4   = BirchLog, *
 JunglePlanks, 4  = JungleLog, *
 AcaciaPlanks, 4  = AcaciaLog, *
