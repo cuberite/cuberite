@@ -211,7 +211,7 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenMulticache:
 
-cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, int a_CacheSize, int a_CachesLength) :
+cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength) :
 m_CachesLength(a_CachesLength),
 m_InternalCacheLength(a_CachesLength * a_CacheSize)
 {
