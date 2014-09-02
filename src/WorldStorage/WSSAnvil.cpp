@@ -78,7 +78,7 @@ Since only the header is actually in the memory, this number can be high, but st
 			"Please add the reported file and this message to the issue report.", \
 			__FUNCTION__, __LINE__, CHX, CHZ, RegionX, RegionZ \
 		); \
-		*((int *)0) = 0;  /* Crash intentionally */ \
+		*((volatile int *)0) = 0;  /* Crash intentionally */ \
 	}
 
 
