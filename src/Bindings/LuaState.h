@@ -338,6 +338,14 @@ protected:
 	*/
 	bool PushFunction(int a_FnRef);
 	
+	/** Pushes a function that has been saved as a reference.
+	Returns true if successful. Logs a warning on failure
+	*/
+	bool PushFunction(const cRef & a_FnRef)
+	{
+		return PushFunction((int)a_FnRef);
+	}
+	
 	/** Pushes a function that is stored in a referenced table by name
 	Returns true if successful. Logs a warning on failure
 	*/
