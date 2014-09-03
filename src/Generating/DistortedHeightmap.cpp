@@ -14,7 +14,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPattern:
 
 /// This class is used to store a column pattern initialized at runtime,
@@ -50,7 +50,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // The arrays to use for the top block pattern definitions:
 
 static cDistortedHeightmap::sBlockInfo tbGrass[] =
@@ -119,7 +119,7 @@ static cDistortedHeightmap::sBlockInfo tbStone[] =
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Ocean floor pattern top-block definitions:
 
 static cDistortedHeightmap::sBlockInfo tbOFSand[] =
@@ -151,7 +151,7 @@ static cDistortedHeightmap::sBlockInfo tbOFRedSand[] =
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Individual patterns to use:
 
 static cPattern patGrass    (tbGrass,     ARRAYCOUNT(tbGrass));
@@ -171,7 +171,7 @@ static cPattern patOFRedSand(tbOFRedSand, ARRAYCOUNT(tbOFRedSand));
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cDistortedHeightmap:
 
 /** This table assigns a relative maximum overhang size in each direction to biomes.
@@ -675,6 +675,8 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 		case biForestHills:
 		case biTaigaHills:
 		case biExtremeHillsEdge:
+		case biExtremeHillsPlus:
+		case biExtremeHills:
 		case biJungle:
 		case biJungleHills:
 		case biJungleEdge:
@@ -750,18 +752,6 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			return;
 		}
 
-		case biExtremeHillsPlus:
-		case biExtremeHills:
-		{
-			// Select the pattern to use - stone or grass:
-			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.1) ? patStone.Get() : patGrass.Get();
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
-			return;
-		}
-
 		case biExtremeHillsPlusM:
 		case biExtremeHillsM:
 		{
@@ -769,7 +759,7 @@ void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, in
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
 			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.9) ? patStone.Get() : ((Val > 0) ? patGravel.Get() : patGrass.Get());
+			const sBlockInfo * Pattern = (Val < 0.0) ? patStone.Get() : patGrass.Get();
 			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
 			return;
 		}
@@ -819,7 +809,7 @@ void cDistortedHeightmap::FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX
 		}
 		
 		// Select the ocean-floor pattern to use:
-		a_Pattern = ChooseOceanFloorPattern(a_RelX, a_RelZ);
+		a_Pattern = a_ChunkDesc.GetBiome(a_RelX, a_RelZ) == biDeepOcean ? patGravel.Get() : ChooseOceanFloorPattern(a_RelX, a_RelZ);
 		HasHadWater = true;
 	}  // for y
 	a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);

@@ -11,7 +11,7 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-
+#include "RedstonePoweredEntity.h"
 
 
 
@@ -31,11 +31,15 @@ class cServer;
 // tolua_begin
 class cDropSpenserEntity :
 	public cBlockEntityWithItems
+	// tolua_end
+	, public cRedstonePoweredEntity
+	// tolua_begin
 {
 	typedef cBlockEntityWithItems super;
 
 public:
-	enum {
+	enum
+	{
 		ContentsHeight = 3,
 		ContentsWidth  = 3,
 	} ;
@@ -63,10 +67,10 @@ public:
 	/// Sets the dropspenser to dropspense an item in the next tick
 	void Activate(void);
 	
-	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
-	void SetRedstonePower(bool a_IsPowered);
-	
 	// tolua_end
+	
+	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
+	virtual void SetRedstonePower(bool a_IsPowered) override;
 
 protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick

@@ -16,7 +16,7 @@ class cWolf :
 public:
 	cWolf(void);
 
-	CLASS_PROTODEF(cWolf);
+	CLASS_PROTODEF(cWolf)
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
@@ -29,7 +29,8 @@ public:
 	bool    IsTame        (void) const { return m_IsTame; }
 	bool    IsBegging     (void) const { return m_IsBegging; }
 	bool    IsAngry       (void) const { return m_IsAngry; }
-	AString GetOwner      (void) const { return m_OwnerName; }
+	AString GetOwnerName  (void) const { return m_OwnerName; }
+	AString GetOwnerUUID  (void) const { return m_OwnerUUID; }
 	int     GetCollarColor(void) const { return m_CollarColor; }
 
 	// Set functions
@@ -37,8 +38,12 @@ public:
 	void SetIsTame     (bool a_IsTame)      { m_IsTame = a_IsTame; }
 	void SetIsBegging  (bool a_IsBegging)   { m_IsBegging = a_IsBegging; }
 	void SetIsAngry    (bool a_IsAngry)     { m_IsAngry = a_IsAngry; }
-	void SetOwner      (const AString & a_NewOwner) { m_OwnerName = a_NewOwner; }
 	void SetCollarColor(int a_CollarColor)  { m_CollarColor = a_CollarColor; }
+	void SetOwner      (const AString & a_NewOwnerName, const AString & a_NewOwnerUUID)
+	{
+		m_OwnerName = a_NewOwnerName;
+		m_OwnerUUID = a_NewOwnerUUID;
+	}
 
 protected:
 
@@ -47,6 +52,7 @@ protected:
 	bool    m_IsBegging;
 	bool    m_IsAngry;
 	AString m_OwnerName;
+	AString m_OwnerUUID;
 	int     m_CollarColor;
 } ;
 

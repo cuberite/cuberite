@@ -7,6 +7,9 @@
 
 #include "File.h"
 #include <fstream>
+#ifdef _WIN32
+	#include <share.h>  // for _SH_DENYWRITE
+#endif  // _WIN32
 
 
 
@@ -67,6 +70,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		case fmRead:      Mode = "rb";  break;
 		case fmWrite:     Mode = "wb";  break;
 		case fmReadWrite: Mode = "rb+"; break;
+		case fmAppend:    Mode = "a+";  break;
 	}
 	if (Mode == NULL)
 	{
@@ -78,7 +82,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), Mode, _SH_DENYWR);
 #else
 	m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
-#endif // _WIN32
+#endif  // _WIN32
 
 	if ((m_File == NULL) && (iMode == fmReadWrite))
 	{
@@ -91,7 +95,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		m_File = _fsopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+", _SH_DENYWR);
 #else
 		m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), "wb+");
-#endif // _WIN32
+#endif  // _WIN32
 
 	}
 	return (m_File != NULL);
@@ -252,10 +256,10 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 		return -1;
 	}
 	
-	int DataSize = GetSize() - Tell();
+	size_t DataSize = GetSize() - Tell();
 	
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Contents.assign((size_t)DataSize, '\0');
+	a_Contents.assign(DataSize, '\0');
 	return Read((void *)a_Contents.data(), DataSize);
 }
 
@@ -456,7 +460,7 @@ int cFile::Printf(const char * a_Fmt, ...)
 	va_start(args, a_Fmt);
 	AppendVPrintf(buf, a_Fmt, args);
 	va_end(args);
-	return Write(buf.c_str(), (int)buf.length());
+	return Write(buf.c_str(), buf.length());
 }
 
 

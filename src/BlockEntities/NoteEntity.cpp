@@ -91,7 +91,7 @@ void cNoteEntity::MakeSound(void)
 	
 	// TODO: instead of calculating the power function over and over, make a precalculated table - there's only 24 pitches after all
 	float calcPitch = pow(2.0f, ((float)m_Pitch - 12.0f) / 12.0f);
-	m_World->BroadcastSoundEffect(sampleName, m_PosX * 8, m_PosY * 8, m_PosZ * 8, 3.0f, calcPitch);
+	m_World->BroadcastSoundEffect(sampleName, (double)m_PosX, (double)m_PosY, (double)m_PosZ, 3.0f, calcPitch);
 }
 
 

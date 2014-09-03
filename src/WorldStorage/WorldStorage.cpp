@@ -17,13 +17,6 @@
 
 
 
-/// If a chunk with this Y coord is de-queued, it is a signal to emit the saved-all message (cWorldStorage::QueueSavedMessage())
-#define CHUNK_Y_MESSAGE 2
-
-
-
-
-
 /// Example storage schema - forgets all chunks ;)
 class cWSSForgetful :
 	public cWSSchema
@@ -42,7 +35,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
@@ -68,7 +61,7 @@ cWorldStorage::~cWorldStorage()
 
 
 
-bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor )
+bool cWorldStorage::Start(cWorld * a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor)
 {
 	m_World = a_World;
 	m_StorageSchemaName = a_StorageSchemaName;
@@ -103,7 +96,7 @@ void cWorldStorage::WaitForFinish(void)
 	
 	// Wait for the thread to finish:
 	m_ShouldTerminate = true;
-	m_Event.Set(); // Wake up the thread if waiting
+	m_Event.Set();  // Wake up the thread if waiting
 	super::Wait();
 	LOG("World storage thread finished");
 }
@@ -168,20 +161,9 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cWorldStorage::QueueSavedMessage(void)
-{
-	// Pushes a special coord pair into the queue, signalizing a message instead
-	m_SaveQueue.EnqueueItem(cChunkCoords(0, CHUNK_Y_MESSAGE, 0));
-	m_Event.Set();
-}
-
-
-
-
-
 void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 {
-	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ,true));
+	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, true));
 }
 
 
@@ -200,8 +182,8 @@ void cWorldStorage::UnqueueSave(const cChunkCoords & a_Chunk)
 void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSAnvil    (m_World,a_StorageCompressionFactor));
-	m_Schemas.push_back(new cWSSCompact  (m_World,a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSCompact  (m_World, a_StorageCompressionFactor));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	
@@ -220,7 +202,7 @@ void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 	}  // for itr - m_Schemas[]
 	
 	// Unknown schema selected, let the admin know:
-	LOGWARNING("Unknown storage schema name \"%s\". Using default (\"%s\"). Available schemas:", 
+	LOGWARNING("Unknown storage schema name \"%s\". Using default (\"%s\"). Available schemas:",
 		m_StorageSchemaName.c_str(), m_SaveSchema->GetName().c_str()
 	);
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
@@ -286,19 +268,12 @@ bool cWorldStorage::SaveOneChunk(void)
 {
 	cChunkCoords ToSave(0, 0, 0);
 	bool ShouldSave = m_SaveQueue.TryDequeueItem(ToSave);
-	if(ShouldSave) {
-		if (ToSave.m_ChunkY == CHUNK_Y_MESSAGE)
+	if (ShouldSave && m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
+	{
+		m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
+		if (m_SaveSchema->SaveChunk(ToSave))
 		{
-			LOGINFO("Saved all chunks in world %s", m_World->GetName().c_str());
-			return ShouldSave;
-		}
-		if (ShouldSave && m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
-		{
-			m_World->MarkChunkSaving(ToSave.m_ChunkX, ToSave.m_ChunkZ);
-			if (m_SaveSchema->SaveChunk(ToSave))
-			{
-				m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
-			}
+			m_World->MarkChunkSaved(ToSave.m_ChunkX, ToSave.m_ChunkZ);
 		}
 	}
 	return ShouldSave;

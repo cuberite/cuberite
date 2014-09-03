@@ -1,4 +1,4 @@
-﻿
+
 // CraftingRecipes.cpp
 
 // Interfaces to the cCraftingRecipes class representing the storage of crafting recipes
@@ -12,7 +12,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingGrid:
 
 cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
@@ -59,6 +59,7 @@ cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 cCraftingGrid::~cCraftingGrid()
 {
 	delete[] m_Items;
+	m_Items = NULL;
 }
 
 
@@ -82,7 +83,7 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
 	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
@@ -134,7 +135,7 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 {
 	if ((a_Grid.m_Width != m_Width) || (a_Grid.m_Height != m_Height))
 	{
-		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)", 
+		LOGWARNING("Consuming a grid of different dimensions: (%d, %d) vs (%d, %d)",
 			a_Grid.m_Width, a_Grid.m_Height, m_Width, m_Height
 		);
 	}
@@ -195,7 +196,7 @@ void cCraftingGrid::Dump(void)
 		#ifdef _DEBUG
 		int idx = x + m_Width * y;
 		#endif
-		LOGD("Slot (%d, %d): Type %d, health %d, count %d", 
+		LOGD("Slot (%d, %d): Type %d, health %d, count %d",
 			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
 		);
 	}
@@ -205,7 +206,7 @@ void cCraftingGrid::Dump(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingRecipe:
 
 cCraftingRecipe::cCraftingRecipe(const cCraftingGrid & a_CraftingGrid) :
@@ -227,7 +228,7 @@ void cCraftingRecipe::Clear(void)
 
 
 
-void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, int a_ItemCount, short a_ItemHealth)
+void cCraftingRecipe::SetResult(ENUM_ITEM_ID a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	m_Result = cItem(a_ItemType, a_ItemCount, a_ItemHealth);
 }
@@ -249,7 +250,7 @@ void cCraftingRecipe::Dump(void)
 {
 	LOGD("Recipe ingredients:");
 	m_Ingredients.Dump();
-	LOGD("Result: Type %d, health %d, count %d", 
+	LOGD("Result: Type %d, health %d, count %d",
 		m_Result.m_ItemType, m_Result.m_ItemDamage, m_Result.m_ItemCount
 	);
 }
@@ -258,7 +259,7 @@ void cCraftingRecipe::Dump(void)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCraftingRecipes:
 
 cCraftingRecipes::cCraftingRecipes(void)
@@ -323,7 +324,11 @@ void cCraftingRecipes::LoadRecipes(void)
 		return;
 	}
 	AString Everything;
-	f.ReadRestOfFile(Everything);
+	if (!f.ReadRestOfFile(Everything))
+	{
+		LOGWARNING("Cannot read file \"crafting.txt\", no crafting recipes will be available!");
+		return;
+	}
 	f.Close();
 	
 	// Split it into lines, then process each line as a single recipe:
@@ -361,7 +366,10 @@ void cCraftingRecipes::ClearRecipes(void)
 
 void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine)
 {
-	AStringVector Sides = StringSplit(a_RecipeLine, "=");
+	AString RecipeLine(a_RecipeLine);
+	RecipeLine.erase(std::remove_if(RecipeLine.begin(), RecipeLine.end(), isspace), RecipeLine.end());
+
+	AStringVector Sides = StringSplit(RecipeLine, "=");
 	if (Sides.size() != 2)
 	{
 		LOGWARNING("crafting.txt: line %d: A single '=' was expected, got %d", a_LineNum, (int)Sides.size() - 1);
@@ -387,8 +395,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 	}
 	if (ResultSplit.size() > 1)
 	{
-		Recipe->m_Result.m_ItemCount = atoi(ResultSplit[1].c_str());
-		if (Recipe->m_Result.m_ItemCount == 0)
+		if (!StringToInteger<char>(ResultSplit[1].c_str(), Recipe->m_Result.m_ItemCount))
 		{
 			LOGWARNING("crafting.txt: line %d: Cannot parse result count, ignoring the recipe.", a_LineNum);
 			LOGINFO("Offending line: \"%s\"", a_RecipeLine.c_str());
@@ -440,8 +447,7 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
-		a_Item.m_ItemDamage = atoi(Damage.c_str());
-		if ((a_Item.m_ItemDamage == 0) && (Damage.compare("0") != 0))
+		if (!StringToInteger<short>(Damage.c_str(), a_Item.m_ItemDamage))
 		{
 			// Parsing the number failed
 			return false;
@@ -581,7 +587,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	// Get the real bounds of the crafting grid:
 	int GridLeft = MAX_GRID_WIDTH, GridTop = MAX_GRID_HEIGHT;
 	int GridRight = 0,  GridBottom = 0;
-	for (int y = 0; y < a_GridHeight; y++ ) for(int x = 0; x < a_GridWidth; x++)
+	for (int y = 0; y < a_GridHeight; y++) for (int x = 0; x < a_GridWidth; x++)
 	{
 		if (!a_CraftingGrid[x + y * a_GridWidth].IsEmpty())
 		{
@@ -664,7 +670,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		
 		const cItem & Item = itrS->m_Item;
 		if (
-			(itrS->x >= a_GridWidth) || 
+			(itrS->x >= a_GridWidth) ||
 			(itrS->y >= a_GridHeight) ||
 			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
 			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
@@ -837,7 +843,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case E_ITEM_GOLD_NUGGET: a_Recipe->m_Result.m_FireworkItem.m_Type = 2; break;
 				case E_ITEM_FEATHER: a_Recipe->m_Result.m_FireworkItem.m_Type = 4; break;
 				case E_ITEM_HEAD: a_Recipe->m_Result.m_FireworkItem.m_Type = 3; break;
-				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break; // ermahgerd BARD ardmins
+				default: LOG("Unexpected item in firework star recipe, was the crafting file's fireworks section changed?"); break;  // ermahgerd BARD ardmins
 			}
 		}
 

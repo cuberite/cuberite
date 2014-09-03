@@ -18,20 +18,18 @@
 class cReader :
 	public cChunkDataCallback
 {
-	virtual void BlockTypes(const BLOCKTYPE * a_Type) override
+	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
 	{
-		// ROW is a block of 16 Blocks, one whole row is copied at a time (hopefully the compiler will optimize that)
-		// C++ doesn't permit copying arrays, but arrays as a part of a struct is ok :)
-		typedef struct {BLOCKTYPE m_Row[16]; } ROW;
-		ROW * InputRows = (ROW *)a_Type;
-		ROW * OutputRows = (ROW *)m_BlockTypes;
+		BLOCKTYPE * OutputRows = m_BlockTypes;
 		int InputIdx = 0;
 		int OutputIdx = m_ReadingChunkX + m_ReadingChunkZ * cChunkDef::Width * 3;
-		for (int y = 0; y < cChunkDef::Height; y++)
+		int MaxHeight = std::min(+cChunkDef::Height, m_MaxHeight + 16);  // Need 16 blocks above the highest
+		for (int y = 0; y < MaxHeight; y++)
 		{
 			for (int z = 0; z < cChunkDef::Width; z++)
 			{
-				OutputRows[OutputIdx] = InputRows[InputIdx++];
+				a_ChunkBuffer.CopyBlockTypes(OutputRows + OutputIdx * 16, InputIdx * 16, 16);
+				InputIdx++;
 				OutputIdx += 3;
 			}  // for z
 			// Skip into the next y-level in the 3x3 chunk blob; each level has cChunkDef::Width * 9 rows
@@ -43,6 +41,7 @@ class cReader :
 	
 	virtual void HeightMap(const cChunkDef::HeightMap * a_Heightmap) override
 	{
+		// Copy the entire heightmap, distribute it into the 3x3 chunk blob:
 		typedef struct {HEIGHTTYPE m_Row[16]; } ROW;
 		ROW * InputRows  = (ROW *)a_Heightmap;
 		ROW * OutputRows = (ROW *)m_HeightMap;
@@ -53,25 +52,48 @@ class cReader :
 			OutputRows[OutputIdx] = InputRows[InputIdx++];
 			OutputIdx += 3;
 		}  // for z
+
+		// Find the highest block in the entire chunk, use it as a base for m_MaxHeight:
+		HEIGHTTYPE MaxHeight = m_MaxHeight;
+		for (size_t i = 0; i < ARRAYCOUNT(*a_Heightmap); i++)
+		{
+			if ((*a_Heightmap)[i] > MaxHeight)
+			{
+				MaxHeight = (*a_Heightmap)[i];
+			}
+		}
+		m_MaxHeight = MaxHeight;
 	}
 	
 public:
 	int m_ReadingChunkX;  // 0, 1 or 2; x-offset of the chunk we're reading from the BlockTypes start
 	int m_ReadingChunkZ;  // 0, 1 or 2; z-offset of the chunk we're reading from the BlockTypes start
+	HEIGHTTYPE m_MaxHeight;  // Maximum value in this chunk's heightmap
 	BLOCKTYPE * m_BlockTypes;  // 3x3 chunks of block types, organized as a single XZY blob of data (instead of 3x3 XZY blobs)
 	HEIGHTTYPE * m_HeightMap;  // 3x3 chunks of height map,  organized as a single XZY blob of data (instead of 3x3 XZY blobs)
+	
+	cReader(BLOCKTYPE * a_BlockTypes, HEIGHTTYPE * a_HeightMap) :
+		m_ReadingChunkX(0),
+		m_ReadingChunkZ(0),
+		m_MaxHeight(0),
+		m_BlockTypes(a_BlockTypes),
+		m_HeightMap(a_HeightMap)
+	{
+	}
 } ;
 
 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLightingThread:
 
 cLightingThread::cLightingThread(void) :
 	super("cLightingThread"),
-	m_World(NULL)
+	m_World(NULL),
+	m_MaxHeight(0),
+	m_NumSeeds(0)
 {
 }
 
@@ -227,7 +249,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	// DEBUG: Save chunk data with highlighted seeds for visual inspection:
 	cFile f4;
 	if (
-		f4.Open(Printf("Chunk_%d_%d_seeds.grab", a_Item.x, a_Item.z), cFile::fmWrite)
+		f4.Open(Printf("Chunk_%d_%d_seeds.grab", a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite)
 	)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)
@@ -246,6 +268,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 				f4.Write(Seeds, cChunkDef::Width * 3);
 			}
 		}
+		f4.Close();
 	}
 	//*/
 	
@@ -255,9 +278,9 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	// DEBUG: Save XY slices of the chunk data and lighting for visual inspection:
 	cFile f1, f2, f3;
 	if (
-		f1.Open(Printf("Chunk_%d_%d_data.grab",  a_Item.x, a_Item.z), cFile::fmWrite) &&
-		f2.Open(Printf("Chunk_%d_%d_sky.grab",   a_Item.x, a_Item.z), cFile::fmWrite) &&
-		f3.Open(Printf("Chunk_%d_%d_glow.grab",  a_Item.x, a_Item.z), cFile::fmWrite)
+		f1.Open(Printf("Chunk_%d_%d_data.grab",  a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite) &&
+		f2.Open(Printf("Chunk_%d_%d_sky.grab",   a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite) &&
+		f3.Open(Printf("Chunk_%d_%d_glow.grab",  a_Item.m_ChunkX, a_Item.m_ChunkZ), cFile::fmWrite)
 	)
 	{
 		for (int z = 0; z < cChunkDef::Width * 3; z++)
@@ -276,6 +299,9 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 				f3.Write(BlockLight, cChunkDef::Width * 3);
 			}
 		}
+		f1.Close();
+		f2.Close();
+		f3.Close();
 	}
 	//*/
 	
@@ -296,11 +322,9 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 
 
 
-bool cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
+void cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 {
-	cReader Reader;
-	Reader.m_BlockTypes = m_BlockTypes;
-	Reader.m_HeightMap  = m_HeightMap;
+	cReader Reader(m_BlockTypes, m_HeightMap);
 	
 	for (int z = 0; z < 3; z++)
 	{
@@ -308,16 +332,13 @@ bool cLightingThread::ReadChunks(int a_ChunkX, int a_ChunkZ)
 		for (int x = 0; x < 3; x++)
 		{
 			Reader.m_ReadingChunkX = x;
-			if (!m_World->GetChunkData(a_ChunkX + x - 1, a_ChunkZ + z - 1, Reader))
-			{
-				return false;
-			}
+			VERIFY(m_World->GetChunkData(a_ChunkX + x - 1, a_ChunkZ + z - 1, Reader));
 		}  // for z
 	}  // for x
 	
 	memset(m_BlockLight, 0, sizeof(m_BlockLight));
 	memset(m_SkyLight,   0, sizeof(m_SkyLight));
-	return true;
+	m_MaxHeight = Reader.m_MaxHeight;
 }
 
 
@@ -408,6 +429,50 @@ void cLightingThread::PrepareBlockLight(void)
 
 
 
+void cLightingThread::PrepareBlockLight2(void)
+{
+	// Clear seeds:
+	memset(m_IsSeed1, 0, sizeof(m_IsSeed1));
+	memset(m_IsSeed2, 0, sizeof(m_IsSeed2));
+	m_NumSeeds = 0;
+	
+	// Add each emissive block into the seeds:
+	for (int y = 0; y < m_MaxHeight; y++)
+	{
+		int BaseY = y * BlocksPerYLayer;  // Partial offset into m_BlockTypes for the Y coord
+		for (int z = 1; z < cChunkDef::Width * 3 - 1; z++)
+		{
+			int HBaseZ = z * cChunkDef::Width * 3;  // Partial offset into m_Heightmap for the Z coord
+			int BaseZ = BaseY + HBaseZ;  // Partial offset into m_BlockTypes for the Y and Z coords
+			for (int x = 1; x < cChunkDef::Width * 3 - 1; x++)
+			{
+				int idx = BaseZ + x;
+				if (y > m_HeightMap[HBaseZ + x])
+				{
+					// We're above the heightmap, ignore the block
+					continue;
+				}
+				if (cBlockInfo::GetLightValue(m_BlockTypes[idx]) == 0)
+				{
+					// Not a light-emissive block
+					continue;
+				}
+				
+				// Add current block as a seed:
+				m_IsSeed1[idx] = true;
+				m_SeedIdx1[m_NumSeeds++] = idx;
+
+				// Light it up:
+				m_BlockLight[idx] = cBlockInfo::GetLightValue(m_BlockTypes[idx]);
+			}
+		}
+	}
+}
+
+
+
+
+
 void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 {
 	int NumSeeds2 = 0;
@@ -434,7 +499,7 @@ void cLightingThread::CalcLight(NIBBLETYPE * a_Light)
 
 
 void cLightingThread::CalcLightStep(
-	NIBBLETYPE * a_Light, 
+	NIBBLETYPE * a_Light,
 	int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 	int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 )
@@ -521,7 +586,7 @@ void cLightingThread::QueueChunkStay(cLightingChunkStay & a_ChunkStay)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLightingThread::cLightingChunkStay:
 
 cLightingThread::cLightingChunkStay::cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter) :

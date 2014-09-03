@@ -98,7 +98,7 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 	}
 
 	// Check if block below is passable
-	if (!a_Chunk->UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockType, BlockMeta))
+	if ((a_RelY > 0) && !a_Chunk->UnboundedRelGetBlock(a_RelX, a_RelY - 1, a_RelZ, BlockType, BlockMeta))
 	{
 		return Cost;
 	}

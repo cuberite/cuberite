@@ -1,0 +1,529 @@
+<html>
+<head>
+<title>Generating terrain in MCServer</title>
+</head>
+<body>
+<h1>Generating terrain in MCServer</h1>
+<p>This article explains the principles behind the terrain generator in MCServer. It is not strictly
+specific to MCServer, though, it can be viewed as a generic guide to various terrain-generating algorithms,
+with specific implementation notes regarding MCServer.</p>
+
+<p>Contents:
+<ul>
+<li><a href="#preface">Preface: How it's done in real life</a></li>
+<li><a href="#expectedprops">Expected properties</a></li>
+<li><a href="#reversingflow">Reversing the flow</a></li>
+<li><a href="#composablegen">The ComposableGenerator pipeline</a></li>
+<li><a href="#coherentnoise">Using coherent noise</a></li>
+<li><a href="#biomegen">Generating biomes</a></li>
+<li><a href="#heightgen">Terrain height</a></li>
+<li><a href="#compositiongen">Terrain composition</a></li>
+<li><a href="#finishgen">Finishers</a></li>
+<li><a href="#makefaster">Making it all faster</a></li>
+<li><a href="#GPU">Executing on a GPU</a></li>
+</ul>
+</p>
+
+
+<hr />
+
+<a name="preface"><h2>Preface: How it's done in real life</h2></a>
+<p>The nature has many complicated geological, physical and biological processes working on all scales from
+microscopic to planet-wide scale, that have shaped the terrain into what we see today. The tectonic plates
+collide, push mountain ranges up and ocean trenches down. Erosion dulls the sharp shapes. Plantlife takes
+over to further change the overall look of the world.</p>
+
+<p>Generally speaking, the processes take what's there and change it. Unlike computer generating, which
+usually creates a finished terrain from scratch, or maybe with only a few iterations. It would be unfeasible
+for software to emulate all the natural processes in enough detail to provide world generation for a game,
+mainly because in the nature everything interacts with everything. If a mountain range rises, it changes the
+way that the precipitation is carried by the wind to the lands beyond the mountains, thus changing the
+erosion rate there and the vegetation type. </p>
+
+
+<hr />
+
+<a name="expectedprops"><h2>Expected properties</h2></a>
+<p>For a MineCraft-like game terrain generator we need the generator to have several properties:
+<ul>
+<li>The generator must be able to generate terrain in small chunks. This means it must be possible to
+generate each of the chunks separately, without dependencies on the neighboring chunks. Note that this
+doesn't mean chunks cannot coordinate together, it means that "a tree in one chunk cannot ask if there's
+a building in the neighbor chunk", simply because the neighbor chunk may not be generated yet.</li>
+<li>The generated chunk needs to be the same if re-generated. This property is not exactly required, but it
+makes available several techniques that wouldn't be possible otherwise.</li>
+<li>The generator needs to be reasonably fast. For a server application this means at least some 20 chunks
+per second for chunks close to each other, and 5 chunks per second for distant chunks. The reason for this
+distinction will be discussed later.</li>
+</ul>
+</p>
+
+
+<hr />
+
+<a name="reversingflow"><h2>Reversing the flow</h2></a>
+<p>As already mentioned, the nature works basically by generating raw terrain composition, then "applying"
+erosion, vegetation and finally this leads to biomes being formed. Let's now try a somewhat inverse
+approach: First generate biomes, then fit them with appropriate terrain, and finally cover in vegetation
+and all the other stuff.</p>
+
+<p>Splitting the parts like this suddenly makes it possible to create a generator with the required
+properties. We can generate a reasonable biome map chunk-wise, independently of all the other data. Once we
+have the biomes, we can compose the terrain for the chunk by using the biome data for the chunk, and
+possibly even for neighboring chunks. Note that we're not breaking the first property, the biomes can be
+generated separately so a neighboring chunk's biome map can be generated without the need for the entire
+neighboring chunk to be present. Similarly, once we have the terrain composition for a chunk, we can
+generate all the vegetation and structures in it, and those can again use the terrain composition in
+neighboring chunks.</p>
+
+
+<hr />
+
+<a name="composablegen"><h2>The ComposableGenerator pipeline</h2></a>
+<p>This leads us directly to the main pipeline that is used for generating terrain in MCServer. For
+technical reasons, the terrain composition step is further subdivided into Height generation and Composition
+generation, and the structures are really called Finishers. For each chunk the generator generates, in this
+sequence:
+<ul>
+<li>Biomes</li>
+<li>Terrain height</li>
+<li>Terrain composition</li>
+<li>Finishers</li>
+</ul>
+</p>
+
+<img src="img/biomes.jpg" />
+<img src="img/terrainheight.jpg" />
+<img src="img/terraincomposition.jpg" />
+<img src="img/finishers.jpg" />
+<p>The beautiful thing about this is that the individual components can be changed independently. You can
+have 5 biome generators and 3 height generators and you can let the users mix'n'match.
+</p>
+
+
+<hr />
+
+<a name="coherentnoise"><h2>Using coherent noise for the generation</h2></a>
+<p>For a great tutorial on coherent noise, see the <a href="http://libnoise.sourceforge.net/">LibNoise
+documentation</a>.</p>
+<p>Coherent noise is a type of noise that has three important properties that we can use to our advantage:
+<ul>
+<li>The noise is smooth</li>
+<li>The noise is algorithmically generated, which means that the same data is generated when the same
+parameters are given to the noise functions.</li>
+<li>The noise can be seamlessly extended in any direction</li>
+</ul></p>
+
+<p>We'll be mostly using Perlin noise in this article. It is the easiest one to visualise and use and is one
+of the most useful kinds of coherent noises. Here's an example of a Perlin noise generated in 2 dimensions:</p>
+<img src="img/perlin.jpg" />
+
+<p>It comes only naturally that such a 2D noise can be used as a terrain height map directly:</p>
+<img src="img/perlinheightmap.jpg" />
+
+<p>However, this is not the only use for this noise, and 2 dimensions is not the limit - this noise can be
+generated for any number of dimensions.</p>
+
+
+
+<hr />
+
+<a name="biomegen"><h2>Generating biomes</h2></a>
+<p>The easiest way to generate biomes is to not generate them at all - simply assign a single constant biome
+to everywhere. And indeed there are times when this kind of "generator" is useful - for the MineCraft's Flat
+world type, or for testing purposes, or for tematic maps. In MCServer, this is exactly what the Constant
+biome generator does.</p>
+
+<p>Of course, there are more interesting test scenarios for which multiple biomes must be generated as easy
+as possible. For these special needs, there's a CheckerBoard biome generator. As the name suggests, it
+generates a grid of alternating biomes.</p>
+
+<h3>Voronoi diagram</h3>
+<p>Those two generators were more of a technicality, we need to make something more interesting if we're
+going for a natural look. The Voronoi generator is the first step towards such a change. Recall that a
+<a href="http://en.wikipedia.org/wiki/Voronoi_diagram">Voronoi diagram</a> is a construct that creates a
+set of areas where each point in an area is closer to the appropriate seed of the area than the seeds of any
+other area:</p>
+<img src="img/voronoi.png" />
+
+<p>To generate biomes using this approach, you select random "seeds", assign a biome to each one, and then
+for each "column" of the world you find the seed that is the nearest to that column, and use that seed's
+biome.</p>
+
+<p>The overall shape of a Voronoi diagram is governed by the placement of the seeds. In extreme cases, a
+seed could affect the entire diagram, which is what we don't want - we need our locality, so that we can
+generate a chunk's worth of biome data. We also don't want the too much irregular diagrams that are produced
+when the seeds are in small clusters. We need our seeds to come in random, yet somewhat uniform fashion.</p>
+
+<p>Luckily, we have just the tool: Grid with jitter. Originally used in antialiasing techniques, they can be
+successfully applied as a source of the seeds for a Voronoi diagram. Simply take a regular 2D grid of seeds
+with the grid distance being N, and move each seed along the X and Y axis by a random distance, usually in
+the range [-N / 2, +N / 2]:</p>
+<img src="img/jittergrid.jpg" />
+
+<p>Such a grid is the ideal seed source for a Voronoi biome generator, because not
+only are the Voronoi cells "reasonable", but the seed placement's effect on the diagram is localized - each
+pixel in the diagram depends on at most 4 x 4 seeds around it. In the following picture, the seed for the
+requested point (blue) must be within the indicated circle. Even the second-nearest seed, which we will need
+later, is inside that circle.</p>
+<img src="img/jittergridlocality.jpg" />
+
+<p>Calculating the jitter for each cell can be done easily by using a 2D Perlin noise for each coord. We
+calculate the noise's value at [X, Z], which gives us a number in the range [-1; 1]. We then multiply the
+number by N / 2, this gives us the required range of [-N / 2, +N / 2]. Adding this number to the X coord
+gives us the seed's X position. We use another Perlin noise and the same calculation for the Z coord of the
+seed.</p>
+
+<p>Here's an example of a biome map generated using the Voronoi + jitter grid, as implemented by the Voronoi
+biome generator in MCServer:</p>
+<img src="img/voronoijitterbiomes.png" />
+
+<h3>Distorted Voronoi</h3>
+<p>The biomes are starting to look interesting, but now they have straight-line borders, which looks rather
+weird and the players will most likely notice very soon. We need to somehow distort the borders to make them
+look more natural. By far the easiest way to achieve that is to use a little trick: When the generator is
+asked for the biome at column [X, Z], instead of calculating the Voronoi biome for column [X, Z], we first
+calculate a random offset for each coord, and add it to the coordinates. So the generator actually responds
+with the biome for [X + rndX, Z + rndZ].</p>
+
+<p>In order to keep the property that generating for the second time gives us the same result, we need the
+"random offset" to be replicatable - same output for the same input. This is where we use yet another Perlin
+noise - just like with the jitter for the Voronoi grid, we add a value from a separate noise to each
+coordinate before sending the coordinates down to the Voronoi generator:</p>
+<code>
+DistortedVoronoiBiome(X, Z) := VoronoiBiome(X + PerlinX(X, Z), Z + PerlinZ(X, Z))
+</code>
+
+<p>The following image shows the effects of the change, as generated by MCServer's DistortedVoronoi biome
+generator. It is actually using the very same Voronoi map as the previous image, the only change has been
+the addition of the distortion:</p>
+<img src="img/distortedvoronoibiomes.png" />
+
+<p>As you can see, this already looks reasonable enough, it could be considered natural biomes, if it
+weren't for several drawbacks:
+<ul>
+<li>There's no way to limit the neighbors. A desert biome can neighbor a tundra biome. </li>
+<li>All the biomes are considered equal. There's no way to make oceans larger. A mushroom biome is
+generated right next to other land biomes.</li>
+</ul></p>
+
+<h3>Adding relativity</h3>
+<p>Our next goal is to remove the first defect of the distorted Voronoi generator: unrelated biomes
+generating next to each other. It is highly unlikely to find a jungle biome next to a desert biome, so we
+want to have as few of those borders as possible. We could further improve on the selection of
+biome-to-seed in the Voronoi generator. Or we can try a completely different idea altogether.</p>
+
+<p>Recall how we talked about the nature, where the biomes are formed by the specific conditions of a place.
+What if we could make a similar dependency, but without the terrain? It turns out this is possible rather
+easily - instead of depending on the terrain, we choose two completely artificial measures. Let's call them
+Temperature and Humidity. If we knew the temperature of the place, we know what set of biomes are possible
+for such temperatures - we won't place deserts in the cold and tundra in the hot anymore. Similarly, the
+humidity will help us sort out the desert vs jungle issue. But how do we get a temperature and humidity?
+Once again, the Perlin noise comes to the rescue. We can use a simple 2D Perlin noise as the temperature
+map, and another one as the humidity map.</p>
+
+<p>What we need next is a decision of what biome to generate in certain temperature and humidity
+combinations. The fastest way for a computer is to have a 2D array, where the temperature is one dimension
+and humidity the other, and the values in the array specify the biome to generate:</p>
+<img src="img/temperaturehumiditydecisionsimple.jpg" />
+
+<p>We can even "misuse" the above diagram to include the hill variants of the biomes and have those hills
+neighbor each other properly, simply by declaring some of the decision diagram's parts as hills:</p>
+<img src="img/temperaturehumiditydecisionhills.jpg" />
+
+<p>The problem with this approach is that there are biomes that should not depend on temperature or
+humidity, they generate across all of their values. Biomes like Oceans, Rivers and Mushroom. We could
+either add them somewhere into the decision diagram, or we can make the generator use a multi-step decision:
+<ul>
+<li>Decide whether the point is in the ocean, land or mushroom</li>
+<li>If it's land, decide if it's real land or river.</li>
+<li>If it's real land, use a TemperatureHumidity approach to generate land-biomes</li>
+</ul>
+</p>
+
+<p>This is the approach implemented in MCServer's MultiStepMap biome generator. It generates biome maps like
+this:</p>
+<img src="img/multistepmapbiomes.png" />
+
+<p>To decide whether the point is in the ocean, land or mushroom, the generator first chooses seeds in a grid
+that will be later fed to a DistortedVoronoi algorithm, the seeds get the "ocean" and "land" values. Then it
+considers all the "ocean" seeds that are surrounded by 8 other "ocean" seeds and turns a random few of them
+into "mushroom". This special seed processing makes the mushroom biomes mostly surrounded by ocean. The
+following image shows an example seeds grid that the generator might consider, only the two framed cells are
+allowed to change into mushroom. L = land, O = ocean:</p>
+<img src="img/multistepmapgrid.jpg" />
+
+<p>Next, the generator calculates the DistortedVoronoi for the seeds. For the areas that are calculated as
+mushroom, the distance to the nearest-seed is used to further shrink the mushroom biome and then to
+distinguish between mushroom and mushroom-shore (image depicts a Voronoi cell for illustration purposes, it
+works similarly with DistortedVoronoi). O = ocean, M = mushroom, MS = mushroom shore:</p>
+<img src="img/multistepmapdistance.jpg" />
+
+<a name="perlinrivers">
+<p>The rivers are added only to the areas that have been previously marked as land. A simple 2D Perlin noise
+is used as the base, where its value is between 0 and a configured threshold value, a river is created. This
+creates the rivers in a closed-loop-like shapes, occasionally splitting two branches off:</p>
+<img src="img/perlinrivers1.jpg" />
+<img src="img/perlinrivers2.jpg" />
+<img src="img/perlinrivers3.jpg" />
+</a>
+
+<p>For the leftover land biomes, the two Perlin noises, representing temperature and humidity, are used to
+generate the biomes, as described earlier. Additionally, the temperature map is used to turn the Ocean biome
+into FrozenOcean, and the River biome into FrozenRiver, wherever the temperature drops below a threshold.</p>
+
+<h3>Two-level Voronoi</h3>
+<p>The 1.7 MineCraft update brought a completely new terrain generation, which has sparked renewed interest
+in the biome generation. A new, potentially simpler way of generating biomes was found, the two-level
+DistortedVoronoi generator.</p>
+
+<p>The main idea behind it all is that we create large areas of similar biomes. There are several groups of
+related biomes that can be generated near each other: Desert biomes, Ice biomes, Forest biomes, Mesa biomes.
+Technically, the Ocean biomes were added as yet another group, so that the oceans will generate in
+approximately the size of the larger areas, too.</p>
+
+<p>For each column a DistortedVoronoi is used to select, which large area to use. This in turn results in
+the list of biomes from which to choose. Another DistortedVoronoi, this time with a smaller grid size, is
+used to select one biome out of that list. Additionally, the smaller DistortedVoronoi calculates not only
+the nearest seed's distance, but also the distance to the second-nearest seed; the ratio between these two
+is used as an indicator whether the column is in the "inside" or on the "outskirt" of the smaller Voronoi
+cell. This allows us to give certain biomes an "edge" biome - the Mushroom biome has a MushroomShore edge,
+the ExtremeHills biome have an ExtremeHillsEdge biome on the edge, etc.</p>
+
+<p>The images below illustrate the process with regular Voronoi diagrams, for clarity purposes. The real
+generator uses distortion before querying the small areas.</p>
+<img src="img/twolevellargeareas.jpg" /><br />
+<img src="img/twolevelsmallgrid.jpg" /><br />
+<img src="img/twolevelsmallareas.jpg" /><br />
+
+<p>The following image shows an example output of a TwoLevel biome generator in MCServer:</p>
+<img src="img/twolevelbiomes.png" />
+
+<p>Note that rivers are currently not implemented in this generator in MCServer, but they could be added
+using the same approach as in MultiStepMap - by using a thresholded 2D Perlin noise.</p>
+
+
+<hr />
+
+<a name="heightgen"><h2>Terrain height</h2></a>
+<p>As with biomes, the easiest way to generate terrain height is not generating at all - assigning a constant
+height value to all columns. This is again useful either for internal tests, and for worlds like MineCraft's
+Flat world.</p>
+
+<p>For a somewhat more realistic landscape, we will employ the good old 2D Perlin noise. We can use it
+directly as a heightmap - each value we get from the noise is stretched into the desired range (usually from
+40 to 120 blocks for regular MineCraft worlds) and used as the height value. However, this doesn't play too
+well with the biomes we've just generated. If the biome says "ocean" and the Perlin noise says "mountain",
+the end result will be unpleasant.</p>
+
+<p>So we want a height generator that is biome-aware. The easiest way of doing this is to have a separate
+generator for each biome. Simply use the biome map to select which generator to use, then ask the appropriate
+generator for the height value. Again, this doesn't work too well - imagine an ExtremeHills biome right next
+to an Ocean biome. If no extra care is taken, the border between these two will be a high wall. The following
+image shows a 2D representation (for simplification purposes) of the problem:</p>
+<img src="img/biomeheights.jpg" />
+
+<p>This requires some further processing. What we need is for the terrain height to be dependent not only on
+the immediate biome for that column, but also on the close surroundings of the column. This is exactly the
+kind of task that averaging is designed for. If we take the area of 9x9 biomes centered around the queried
+column, generate height for each of the biomes therein, sum them up and divide by 81 (the number of biomes
+summed), we will be effectively making a 9-long running average over the terrain, and all the borders will
+suddenly become smooth. The following image shows the situation from the previous paragraph after applying
+the averaging process: </p>
+<img src="img/biomeheightsavg.jpg" />
+
+<p>The approach used in MCServer's Biomal generator is based on this idea, with two slight modifications.
+Instead of using a separate generator for each biome, one generator is used with a different set of input
+parameters for each biomes. These input parameters modify the overall amplitude and frequency of the Perlin
+noise that the generator produces, thus modifying the final terrain with regards to biomes. Additionally, the
+averaging process is weighted - columns closer to the queried column get a more powerful weight in the sum
+than the columns further away. The following image shows the output of MCServer's Biomal terrain height
+generator (each block type represents a different biome - ocean in the front (stone), plains and ice plains
+behind it (lapis, whitewool), extreme hills back right (soulsand), desert hills back left (mossy
+cobble)):</p>
+<a name="biomalheights"><img src="img/biomalheights.jpg" /></a>
+
+<p>One key observation about this whole approach is that in order for it to work, the biomes must be
+available for columns outside the currently generated chunk, otherwise the columns at the chunk's edge would
+not be able to properly average their height. This requirement can be fulfilled only by biome generators that
+adhere to the second <a href="#expectedproperties">Expected property</a> - that re-generating will produce
+the same data. If the biome generator returned different data for the same chunk each time it was invoked, it
+would become impossible to apply the averaging.</p>
+
+<p>(TODO: height with variations (N/A in MCS yet)</p>
+
+
+<hr />
+
+<a name="compositiongen"><h2>Terrain composition</h2></a>
+<p>As with the other generators, the composition generator category has its easy and debugging items, too.
+There's the "special" composition of "all the blocks are the same type", which fills the entire column, from
+the bottom to the height, with a single blocktype. This generator is useful when testing the generators in
+the other categories, to speed up the generation by leaving out unnecessary calculations. Another special
+compositor is a similar one, that fills all blocks with the same type, but the type varies for each biome.
+This way it's easy to see the generated biomes and possibly the heights for those biomes, as shown in the
+previous section on the <a href="#biomalheights">height averaging screenshot</a>.</p>
+
+<p>For a natural look, we need to put together a more complicated algorithm. The standard set forth in
+MineCraft is that the top of the world is covered in grass, then there are a few blocks of dirt and finally
+stone. This basic layout is then varied for different biomes - deserts have sand and sandstone instead of the
+grass and dirt layer. Mushroom biomes have mycelium in place of the grass. This per-biome dependency is
+trivial to implement - when compositing, simply use the appropriate layout for the column's biome.</p>
+
+<p>The next change concerns oceans. The generated heightmap doesn't include any waterlevel indication
+whatsoever. So it's up to the terrain compositor to actually decide where to place water. We do this by
+configuration - simply have a value in the config file specifying the sealevel height. The compositor then
+has to add water above any column which has a height lower than that. Additionally, the water needs to
+override per-biome layout selection - we don't want grass blocks to generate under water when the terrain
+height in the plains biome drops below the sealevel accidentally.</p>
+
+<p>The final feature in the compositor is the decision between multiple composition layouts within a single
+biome. A megataiga biome contains patches of non-grass dirt and podzol blocks, and the ocean floor can be
+made of dirt, gravel, sand or clay. A simple 2D Perlin noise can be used to select the layout to use for a
+specific column - simply threshold the noise's value by as many thresholds as there are layout variations,
+and use the layout corresponding to the threshold:</p>
+<img src="img/perlincompositor1.jpg" />
+<img src="img/perlincompositor2.jpg" />
+<img src="img/perlincompositor3.jpg" />
+
+<h3>Nether composition</h3>
+<p>So far we've been discussing only the Overworld generator. But MineCraft contains more than that. The
+Nether has a completely different look and feel, and quite different processes are required to generate that.
+Recall that MineCraft's Nether is 128 blocks high, with bedrock both at the top and the bottom. Between these
+two, the terrain looks more like a cavern than a surface. Not surprisingly, the Nether doesn't need a
+complicated height generator, it can use the flat height. However, the terrain composition must take an
+altogether different approach.</p>
+
+<p>The very first idea is to use the Perlin noise, but generate it in 3D, rather than 2D. Then, for each
+block, evaluate the noise value, if below 0, make it air, if not, make it netherrack.
+
+<p>To make it so that the bedrock at the top and at the bottom is never revealed, we can add a value
+increasing the more the Y coord gets towards the bottom or the top. This way the thresholding then guarantees
+that there will be no air anywhere near the bedrock.</p>
+
+<p>(TODO)</p>
+
+
+<hr />
+
+<a name="finishgen"><h2>Finishers</h2></a>
+<p>Finishers are a vast category of various additions to the terrain generator. They range from very easy
+ones, such as generating snow on top of the terrain in cold biomes, through medium ones, such as growing
+patches of flowers, complicated ones, such as placing trees and generating caves, all the way to very
+complicated ones such as villages and nether fortresses. There is no formal distinction between all these
+"categories", the only thing they have in common is that they take a chunk of blocks and modify it in some
+way.</p>
+
+<h3>Snow</h3>
+<p>Snow is probably the easiest of the finishers. It generates a block of snow on top of each block that is
+on top of the terrain and is not marked as non-snowable. It checks the chunk's heightmap to determine the top
+block, then checks whether the block supports snow on its top. Rails, levers and tall grass don't support
+snow, for example.</p>
+
+<h3>Ice</h3>
+<p>Another example of an easy finisher. This scans through the world and turn each water block on the surface
+into an ice block if the biome is cold. This means that any water block that is under any kind of other
+block, such as under a tree's leaves, will still stay water. Thus an additional improvement could be made by
+scanning down from the surface block through blocks that we deem as non-surface, such as leaves, torches,
+ladders, fences etc. Note that MCServer currently implements only the easy solution.</p>
+
+<h3>Bottom lava</h3>
+<p>Most worlds in MineCraft have lava lakes at their bottom. Generating these is pretty straightforward: Use
+the user-configured depth and replace all the air blocks below this depth with lava blocks. Note however,
+that this makes this generator dependent on the order in which the finishers are applied. If the mineshafts
+generate before bottom lava, the mineshafts that are below the lava level will get filled with lava. On the
+other hand, if bottom lava is generated before the mineshafts, it is possible for a mineshaft to "drill
+through" a lake of lava. MCServer doesn't try to solve this and instead lets the admin choose whichever they
+prefer.</p>
+
+<h3>Specific foliage</h3>
+<p>There are generators for specific kinds of foliage. The dead bushes in the desert biome and lilypads in
+the swamp biome both share the same generating pattern. They are both specific to a single biome and they
+both require a specific block underneath them in order to generate. Their implementation is simple: pick
+several random columns in the chunk. If the column is of the correct biome and has the correct top block,
+add the foliage block on top.</p>
+
+<p>In order to generate the same set of coordinates when the chunk is re-generated, we use the Perlin noise's
+basis functions (the ones providing the random values for Perlin cell vertices). These basically work as a
+hash function for the coorinates - the same input coordinates generate the same output value. We use the
+chunk's coordinates as two of the coords, and the iteration number as the third coordinate, to generate a
+random number. We then check the biome and the top block at those coordinates, if they allow, we generate the
+foliage block on top.</p>
+
+<p>Another example of specific foliage is the tall grass in the plains biome. There are quite a lot of these
+tall grass blocks, it would be inefficient to generate them using the random-coords approach described above.
+Instead, we will use a 2D Perlin noise again, with a threshold defining where to put the grass and where
+not.</p>
+
+<h3>Small foliage</h3>
+<p>For the flowers, grass, mushrooms in caves etc. we want to use a slightly different algorithm. These
+foliage blocks are customarily generated in small "clumps" - there are several blocks of the same type near
+together. To generate these, we first select random coords, using the coord hash functions, for a center of a
+clump. Then we select the type of block to generate. Finally, we loop over adding a random (coord hash)
+number to the clump center coords to get the block where to generate the foliage block:</p>
+<img src="img/smallfoliageclumps.jpg" />
+
+<p>In order to make the clump more "round" and "centered", we want the offsets to be closer to the clump
+center more often. This is done using a thing called Gaussian function distribution. Instead of having each
+random number generate with the same probability, we want higher probability for the numbers around zero,
+like this:</p>
+<img src="img/gaussprobability.jpg" />
+
+<p>Instead of doing complicated calculations to match this shape exactly, we will use a much easier shape.
+By adding together two random numbers in the same range, we get the probability distribution that has a
+"roof" shape, enough for our needs:</p>
+<img src="img/roofprobability.jpg" />
+
+<p>(For the curious, there is a proof that adding together infinitely many uniform-distributed random numbers
+produces random numbers with the Gaussian distribution.)</p>
+
+<p>This scheme can be used to produce clumps of flowers, when we select the 2D coords of the clump center on
+the top surface of the terrain. We simply generate the 2D coords of the foliage blocks and use the terrain
+height to find the third coord. If we want to generate clumps of mushrooms in the caves, however, we need to
+generate the clump center coords in 3D and either use 3 offsets for the mushrooms, or use 2 offsets plus
+searching for the closest opening Y-wise in the terrain.</p>
+
+<p>Note that the clumps generated by this scheme may overlap several chunks. Therefore it's crucial to
+actually check the surrounding chunks if their clumps overlap into the currently generated chunk, and apply
+those as well, otherwise there will be visible cuts in the foliage along the chunks borders.</p>
+
+<h3>Springs</h3>
+<p>Water and lava springs are essential for making the underground quite a lot more interesting. They are
+rather easy to generate, but a bit more difficult to get right. Generating simply means that a few random
+locations (obtained by our familiar coord hashing) are checked and if the block type in there is stone. Then
+we see all the horizontal neighbors of the block, plus the block underneath. If all of them except one are
+stone, and the one left is air, our block is suitable for turning into a spring. If there were more air
+neighbors, the spring would look somewhat unnatural; if there were no air neighbors, the spring won't flow
+anywhere, so it would be rather useless.</p>
+
+<p>The difficult part about springs is the amount of them to generate. There should be a few springs on the
+surface, perhaps a bit more in the mountaineous biomes. There should be quite a few more springs underground,
+but there should definitely be more water springs than lava springs in the upper levels of the terrain, while
+there should be more lava springs and almost no water springs near the bottom. To accomodate this, the
+MCServer team has made a tool that scanned through MineCraft's terrain and counted the amount of both types
+of springs in relation to their height. Two curves have been found for the distribution of each type of the
+spring:</p>
+<img src="http://mc-server.xoft.cz/img/vanilla_springs_huge.png" />
+
+<p>MCServer uses an approximation of the above curves to choose the height at which to generate the
+spring.</p>
+
+<!--
+<h3>Caves</h3>
+<p>Caves are definitely one of the main things people notice about MineCraft terrain. There are quite a lot
+of different algorithms available to generate terrain with caves.
+-->
+
+<hr />
+
+<a name="makefaster"><h2>Making it all faster</h2></a>
+<p>(TODO)</p>
+
+<a name="GPU"><h2>Executing on a GPU</h2></a>
+<p>Much of the terain generation consists of doing the same thing for every single column or block in a chunk. This
+sort of computation is much faster on a GPU as GPUs are massively parallel. High end GPUs can execute up to 30,000
+threads simultaneously, which would allow them to generate every block in half a chunk in parallel or every column
+in over 100 chunks in parallel. A naive comparison suggests that a 800MHz GPU with 15,000 threads can execute parallel
+code 250 times faster than a 3GHz CPU with 128 bit SIMD. Obviously we want to harness that power.</p>
+</body>
+</html>

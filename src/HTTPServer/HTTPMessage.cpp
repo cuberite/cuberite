@@ -20,7 +20,7 @@
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPMessage:
 
 cHTTPMessage::cHTTPMessage(eKind a_Kind) :
@@ -35,8 +35,7 @@ cHTTPMessage::cHTTPMessage(eKind a_Kind) :
 
 void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 {
-	AString Key = a_Key;
-	StrToLower(Key);
+	AString Key = StrToLower(a_Key);
 	cNameValueMap::iterator itr = m_Headers.find(Key);
 	if (itr == m_Headers.end())
 	{
@@ -64,7 +63,7 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPRequest:
 
 cHTTPRequest::cHTTPRequest(void) :
@@ -139,7 +138,7 @@ AString cHTTPRequest::GetBareURL(void) const
 
 
 size_t cHTTPRequest::ParseRequestLine(const char * a_Data, size_t a_Size)
-{	
+{
 	m_IncomingHeaderData.append(a_Data, a_Size);
 	size_t IdxEnd = m_IncomingHeaderData.size();
 
@@ -248,7 +247,7 @@ void cHTTPRequest::OnHeaderLine(const AString & a_Key, const AString & a_Value)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPResponse:
 
 cHTTPResponse::cHTTPResponse(void) :

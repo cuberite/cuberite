@@ -2,8 +2,6 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../MersenneTwister.h"
-#include "../World.h"
 
 
 

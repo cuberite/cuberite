@@ -37,7 +37,7 @@ public:
 	based on the block currently present in the world at the dest specified coords
 	*/
 	static void FinishFalling(
-		cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, 
+		cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,
 		BLOCKTYPE a_FallingBlockType, NIBBLETYPE a_FallingBlockMeta
 	);
 

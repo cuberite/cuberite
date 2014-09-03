@@ -12,7 +12,8 @@
 :: It expects the MS Performance tools installed in C:\Program Files\Microsoft Visual Studio 9.0\Team Tools\Performance Tools
 :: You can override this path by setting the pt environment variable prior to launching this script
 ::
-:: By default it will launch the release version of MCServer; set the app environment variable to another executable to run that instead.
+:: By default it will launch the 32-bit release version of MCServer; set the app environment variable to another executable to run that instead.
+:: Set the IsExecutablex64 env variable to \x64 to profile a 64-bit executable instead (available as the profile_run_x64.cmd script)
 :: Note that the app needs to be compiled with the "/PROFILE" flag in order for the profiling to work
 
 
@@ -45,7 +46,7 @@ if %outputdir%n == n (
 
 
 
-::Create the output directory, if it didn't exist
+:: Create the output directory, if it didn't exist
 mkdir %outputdir%
 
 
@@ -55,15 +56,15 @@ mkdir %outputdir%
 :: Start the profiler
 set outputname=profile.vsp
 set output=%outputdir%\%outputname%
-%pt%\vsperfcmd /start:sample /output:%output%
+%pt%%IsExecutablex64%\vsperfcmd /start:sample /output:%output%
 if errorlevel 1 goto haderror
 
 :: Launch the application via the profiler
-%pt%\vsperfcmd /launch:%app%
-if errorlevel 1 goto haderror
+%pt%%IsExecutablex64%\vsperfcmd /launch:%app%
+if errorlevel 1 goto haderrorshutdown
 
 :: Shut down the profiler (this command waits, until the application is terminated)
-%pt%\vsperfcmd /shutdown
+%pt%%IsExecutablex64%\vsperfcmd /shutdown
 if errorlevel 1 goto haderror
 
 
@@ -85,6 +86,10 @@ goto finished
 
 
 
+
+:haderrorshutdown
+echo An error was encountered, shutting down the profiler
+%pt%%IsExecutablex64%\vsperfcmd /shutdown
 
 :haderror
 echo An error was encountered

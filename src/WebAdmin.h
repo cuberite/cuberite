@@ -60,11 +60,11 @@ struct HTTPRequest
 	StringStringMap Params;     // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method) */
-	StringStringMap PostParams; // >> EXPORTED IN MANUALBINDINGS <<
+	StringStringMap PostParams;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Same as PostParams */
 	FormDataMap FormData;       // >> EXPORTED IN MANUALBINDINGS <<
-} ; // tolua_export
+} ;  // tolua_export
 
 
 
@@ -120,7 +120,7 @@ public:
 	void RemovePlugin(cWebPlugin * a_Plugin);
 
 	// TODO: Convert this to the auto-locking callback mechanism used for looping players in worlds and such
-	PluginList GetPlugins() const { return m_Plugins; } // >> EXPORTED IN MANUALBINDINGS <<
+	PluginList GetPlugins() const { return m_Plugins; }  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin
 
@@ -132,16 +132,19 @@ public:
 	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
 	AString GetBaseURL(const AString & a_URL);
 
-	/** Escapes text passed into it, so it can be embedded into html. */
-	static AString GetHTMLEscapedString(const AString & a_Input);
-
 	AString GetIPv4Ports(void) const { return m_PortsIPv4; }
 	AString GetIPv6Ports(void) const { return m_PortsIPv6; }
 
 	// tolua_end
 
+	/** Escapes text passed into it, so it can be embedded into html. */
+	static AString GetHTMLEscapedString(const AString & a_Input);
+	
+	/** Escapes the string for use in an URL */
+	static AString GetURLEncodedString(const AString & a_Input);
+
 	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
-	AString GetBaseURL(const AStringVector& a_URLSplit);
+	static AString GetBaseURL(const AStringVector & a_URLSplit);
 
 protected:
 	/** Common base class for request body data handlers */
@@ -205,9 +208,6 @@ protected:
 	/** The HTTP server which provides the underlying HTTP parsing, serialization and events */
 	cHTTPServer m_HTTPServer;
 
-
-	AString GetTemplate(void);
-
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
 	void HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 
@@ -218,7 +218,7 @@ protected:
 	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
 	virtual void OnRequestBody    (cHTTPConnection & a_Connection, cHTTPRequest & a_Request, const char * a_Data, size_t a_Size) override;
 	virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;
-} ; // tolua_export
+} ;  // tolua_export
 
 
 

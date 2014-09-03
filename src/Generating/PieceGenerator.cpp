@@ -1,7 +1,7 @@
 
 // PieceGenerator.cpp
 
-// Implements the cBFSPieceGenerator class and cDFSPieceGenerator class 
+// Implements the cBFSPieceGenerator class and cDFSPieceGenerator class
 // representing base classes for generating structures composed of individual "pieces"
 
 #include "Globals.h"
@@ -13,7 +13,7 @@
 
 #ifdef SELF_TEST
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // Self-test:
 
 static class cPieceGeneratorSelfTest :
@@ -140,7 +140,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPiece:
 
 	
@@ -254,7 +254,7 @@ cCuboid cPiece::RotateMoveHitBox(int a_NumCCWRotations, int a_MoveX, int a_MoveY
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPiece::cConnector:
 
 cPiece::cConnector::cConnector(int a_X, int a_Y, int a_Z, int a_Type, eBlockFace a_Direction) :
@@ -279,14 +279,15 @@ cPiece::cConnector::cConnector(const Vector3i & a_Pos, int a_Type, eBlockFace a_
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPlacedPiece:
 
 cPlacedPiece::cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece, const Vector3i & a_Coords, int a_NumCCWRotations) :
 	m_Parent(a_Parent),
 	m_Piece(&a_Piece),
 	m_Coords(a_Coords),
-	m_NumCCWRotations(a_NumCCWRotations)
+	m_NumCCWRotations(a_NumCCWRotations),
+	m_HasBeenMovedToGround(false)
 {
 	m_Depth = (m_Parent == NULL) ? 0 : (m_Parent->GetDepth() + 1);
 	m_HitBox = a_Piece.RotateMoveHitBox(a_NumCCWRotations, a_Coords.x, a_Coords.y, a_Coords.z);
@@ -297,7 +298,37 @@ cPlacedPiece::cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+cPiece::cConnector cPlacedPiece::GetRotatedConnector(size_t a_Index) const
+{
+	cPiece::cConnectors Connectors = m_Piece->GetConnectors();
+	ASSERT(Connectors.size() >= a_Index);
+	return m_Piece->RotateMoveConnector(Connectors[a_Index], m_NumCCWRotations, m_Coords.x, m_Coords.y, m_Coords.z);
+}
+
+
+
+
+
+cPiece::cConnector cPlacedPiece::GetRotatedConnector(const cPiece::cConnector & a_Connector) const
+{
+	return m_Piece->RotateMoveConnector(a_Connector, m_NumCCWRotations, m_Coords.x, m_Coords.y, m_Coords.z);
+}
+
+
+
+
+
+void cPlacedPiece::MoveToGroundBy(int a_OffsetY)
+{
+	m_Coords.y += a_OffsetY;
+	m_HasBeenMovedToGround = true;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cPieceGenerator:
 
 cPieceGenerator::cPieceGenerator(cPiecePool & a_PiecePool, int a_Seed) :
@@ -331,7 +362,31 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 	
 	// Choose a random one of the starting pieces:
 	cPieces StartingPieces = m_PiecePool.GetStartingPieces();
-	cPiece * StartingPiece = StartingPieces[rnd % StartingPieces.size()];
+	int Total = 0;
+	for (cPieces::const_iterator itr = StartingPieces.begin(), end = StartingPieces.end(); itr != end; ++itr)
+	{
+		Total += m_PiecePool.GetStartingPieceWeight(**itr);
+	}
+	cPiece * StartingPiece;
+	if (Total > 0)
+	{
+		int Chosen = rnd % Total;
+		StartingPiece = StartingPieces.front();
+		for (cPieces::const_iterator itr = StartingPieces.begin(), end = StartingPieces.end(); itr != end; ++itr)
+		{
+			Chosen -= m_PiecePool.GetStartingPieceWeight(**itr);
+			if (Chosen <= 0)
+			{
+				StartingPiece = *itr;
+				break;
+			}
+		}
+	}
+	else
+	{
+		// All pieces returned zero weight, but we need one to start. Choose with equal chance:
+		StartingPiece = StartingPieces[rnd % StartingPieces.size()];
+	}
 	rnd = rnd >> 16;
 	
 	// Choose a random supported rotation:
@@ -523,7 +578,7 @@ void cPieceGenerator::DebugConnectorPool(const cPieceGenerator::cFreeConnectors 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPieceGenerator::cConnection:
 
 cPieceGenerator::cConnection::cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations, int a_Weight) :
@@ -538,7 +593,7 @@ cPieceGenerator::cConnection::cConnection(cPiece & a_Piece, cPiece::cConnector &
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cPieceGenerator::cFreeConnector:
 
 cPieceGenerator::cFreeConnector::cFreeConnector(cPlacedPiece * a_Piece, const cPiece::cConnector & a_Connector) :
@@ -551,7 +606,7 @@ cPieceGenerator::cFreeConnector::cFreeConnector(cPlacedPiece * a_Piece, const cP
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cBFSPieceGenerator:
 
 cBFSPieceGenerator::cBFSPieceGenerator(cPiecePool & a_PiecePool, int a_Seed) :

@@ -22,7 +22,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -44,16 +44,16 @@ public:
 		}
 		double yaw = a_Player->GetYaw();
 		if (
-			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
-			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
+			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
+			(Area.GetRelBlockType(2, 0, 1) == m_BlockType)
 		)
 		{
 			a_BlockMeta = ((yaw >= -90) && (yaw < 90)) ? 2 : 3;
 			return true;
 		}
 		if (
-			(Area.GetRelBlockType(0, 0, 1) == E_BLOCK_CHEST) ||
-			(Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
+			(Area.GetRelBlockType(0, 0, 1) == m_BlockType) ||
+			(Area.GetRelBlockType(2, 0, 1) == m_BlockType)
 		)
 		{
 			// FIXME: This is unreachable, as the condition is the same as the above one
@@ -68,7 +68,7 @@ public:
 	
 
 	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, 
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
@@ -130,12 +130,12 @@ public:
 		}
 		
 		int NumChestNeighbors = 0;
-		if (Area.GetRelBlockType(1, 0, 2) == E_BLOCK_CHEST)
+		if (Area.GetRelBlockType(1, 0, 2) == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(0, 0, 2) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(1, 0, 1) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(1, 0, 3) == E_BLOCK_CHEST)
+				(Area.GetRelBlockType(0, 0, 2) == m_BlockType) ||
+				(Area.GetRelBlockType(1, 0, 1) == m_BlockType) ||
+				(Area.GetRelBlockType(1, 0, 3) == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -143,12 +143,12 @@ public:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlockType(3, 0, 2) == E_BLOCK_CHEST)
+		if (Area.GetRelBlockType(3, 0, 2) == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(4, 0, 2) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(3, 0, 1) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(3, 0, 3) == E_BLOCK_CHEST)
+				(Area.GetRelBlockType(4, 0, 2) == m_BlockType) ||
+				(Area.GetRelBlockType(3, 0, 1) == m_BlockType) ||
+				(Area.GetRelBlockType(3, 0, 3) == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -156,12 +156,12 @@ public:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlockType(2, 0, 1) == E_BLOCK_CHEST)
+		if (Area.GetRelBlockType(2, 0, 1) == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(2, 0, 0) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(1, 0, 1) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(3, 0, 1) == E_BLOCK_CHEST)
+				(Area.GetRelBlockType(2, 0, 0) == m_BlockType) ||
+				(Area.GetRelBlockType(1, 0, 1) == m_BlockType) ||
+				(Area.GetRelBlockType(3, 0, 1) == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -169,12 +169,12 @@ public:
 			}
 			NumChestNeighbors += 1;
 		}
-		if (Area.GetRelBlockType(2, 0, 3) == E_BLOCK_CHEST)
+		if (Area.GetRelBlockType(2, 0, 3) == m_BlockType)
 		{
 			if (
-				(Area.GetRelBlockType(2, 0, 4) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(1, 0, 3) == E_BLOCK_CHEST) ||
-				(Area.GetRelBlockType(3, 0, 3) == E_BLOCK_CHEST)
+				(Area.GetRelBlockType(2, 0, 4) == m_BlockType) ||
+				(Area.GetRelBlockType(1, 0, 3) == m_BlockType) ||
+				(Area.GetRelBlockType(3, 0, 3) == m_BlockType)
 			)
 			{
 				// Already a doublechest neighbor, disallow:
@@ -217,7 +217,7 @@ public:
 	/// If there's a chest in the a_Area in the specified coords, modifies its meta to a_NewMeta and returns true.
 	bool CheckAndAdjustNeighbor(cChunkInterface & a_ChunkInterface, const cBlockArea & a_Area, int a_RelX, int a_RelZ, NIBBLETYPE a_NewMeta)
 	{
-		if (a_Area.GetRelBlockType(a_RelX, 0, a_RelZ) != E_BLOCK_CHEST)
+		if (a_Area.GetRelBlockType(a_RelX, 0, a_RelZ) != m_BlockType)
 		{
 			return false;
 		}
@@ -228,7 +228,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_CHEST, 1, 0));
+		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 } ;
 

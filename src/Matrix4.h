@@ -3,7 +3,7 @@
 
 
 
-#define _USE_MATH_DEFINES // Enable non-standard math defines (MSVC)
+#define _USE_MATH_DEFINES  // Enable non-standard math defines (MSVC)
 #include <math.h>
 
 
@@ -34,6 +34,8 @@ public:
 	{
 		*this = a_Rhs;
 	}
+	
+	// tolua_end
 
 	inline Matrix4 & operator = (const Matrix4 & a_Rhs)
 	{
@@ -43,6 +45,8 @@ public:
 		}
 		return *this;
 	}
+	
+	// tolua_begin
 
 	inline T & operator [] (int a_N)
 	{
@@ -104,7 +108,7 @@ public:
 	}
 
 	inline void Translate(const Vector3<T> & a_Pos)
-	{ 
+	{
 		cell[3]  += a_Pos.x;
 		cell[7]  += a_Pos.y;
 		cell[11] += a_Pos.z;

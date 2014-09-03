@@ -9,7 +9,7 @@
 #include "OSSupport/GZipFile.h"
 #include "Blocks/BlockHandler.h"
 #include "Cuboid.h"
-
+#include "ChunkData.h"
 
 
 
@@ -28,10 +28,10 @@ typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 // This wild construct allows us to pass a function argument and still have it inlined by the compiler :)
 /// Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
-template<bool MetasValid, CombinatorFunc Combinator> 
+template <bool MetasValid, CombinatorFunc Combinator>
 void InternalMergeBlocks(
 	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
-	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas, 
+	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas,
 	int a_SizeX, int a_SizeY, int a_SizeZ,
 	int a_SrcOffX, int a_SrcOffY, int a_SrcOffZ,
 	int a_DstOffX, int a_DstOffY, int a_DstOffZ,
@@ -59,7 +59,7 @@ void InternalMergeBlocks(
 				}
 				else
 				{
-					BLOCKTYPE FakeDestMeta = 0;
+					NIBBLETYPE FakeDestMeta = 0;
 					Combinator(a_DstTypes[DstIdx], a_SrcTypes[SrcIdx], FakeDestMeta, (NIBBLETYPE)0);
 				}
 				++DstIdx;
@@ -74,7 +74,7 @@ void InternalMergeBlocks(
 
 
 /// Combinator used for cBlockArea::msOverwrite merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	a_DstType = a_SrcType;
@@ -89,7 +89,7 @@ void MergeCombinatorOverwrite(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLE
 
 
 /// Combinator used for cBlockArea::msFillAir merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_DstType == E_BLOCK_AIR)
@@ -108,7 +108,7 @@ void MergeCombinatorFillAir(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 /// Combinator used for cBlockArea::msImprint merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if (a_SrcType != E_BLOCK_AIR)
@@ -127,7 +127,7 @@ void MergeCombinatorImprint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETY
 
 
 /// Combinator used for cBlockArea::msLake merging
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge is the NOP block
@@ -136,7 +136,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 		return;
 	}
 
-	// Air is always hollowed out	
+	// Air is always hollowed out
 	if (a_SrcType == E_BLOCK_AIR)
 	{
 		a_DstType = E_BLOCK_AIR;
@@ -201,7 +201,7 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 
 
 /** Combinator used for cBlockArea::msSpongePrint merging */
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// Sponge overwrites nothing, everything else overwrites anything
@@ -220,7 +220,7 @@ void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBB
 
 
 /** Combinator used for cBlockArea::msDifference merging */
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	if ((a_DstType == a_SrcType) && (!MetaValid || (a_DstMeta == a_SrcMeta)))
@@ -246,7 +246,7 @@ void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBL
 
 
 /** Combinator used for cBlockArea::msMask merging */
-template<bool MetaValid>
+template <bool MetaValid>
 void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
 {
 	// If the blocks are the same, keep the dest; otherwise replace with air
@@ -269,7 +269,7 @@ void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cBlockArea:
 
 cBlockArea::cBlockArea(void) :
@@ -295,9 +295,9 @@ cBlockArea::~cBlockArea()
 
 void cBlockArea::Clear(void)
 {
-	delete[] m_BlockTypes;    m_BlockTypes = NULL;
-	delete[] m_BlockMetas;    m_BlockMetas = NULL;
-	delete[] m_BlockLight;    m_BlockLight = NULL;
+	delete[] m_BlockTypes;    m_BlockTypes    = NULL;
+	delete[] m_BlockMetas;    m_BlockMetas    = NULL;
+	delete[] m_BlockLight;    m_BlockLight    = NULL;
 	delete[] m_BlockSkyLight; m_BlockSkyLight = NULL;
 	m_Origin.Set(0, 0, 0);
 	m_Size.Set(0, 0, 0);
@@ -309,6 +309,14 @@ void cBlockArea::Clear(void)
 
 void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 {
+	if ((a_SizeX < 0) || (a_SizeY < 0) || (a_SizeZ < 0))
+	{
+		LOGWARNING("Creating a cBlockArea with a negative size! Call to Create ignored. (%d, %d, %d)",
+			a_SizeX, a_SizeY, a_SizeZ
+		);
+		return;
+	}
+	
 	Clear();
 	int BlockCount = a_SizeX * a_SizeY * a_SizeZ;
 	if ((a_DataTypes & baTypes) != 0)
@@ -773,7 +781,7 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
+void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ,
 	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 )
@@ -1005,8 +1013,8 @@ void cBlockArea::RotateCCW(void)
 	}  // for x
 	std::swap(m_BlockTypes, NewTypes);
 	std::swap(m_BlockMetas, NewMetas);
-	delete[] NewTypes;
-	delete[] NewMetas;
+	delete[] NewTypes;   NewTypes = NULL;
+	delete[] NewMetas;   NewMetas = NULL;
 
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1050,8 +1058,8 @@ void cBlockArea::RotateCW(void)
 	}  // for x
 	std::swap(m_BlockTypes, NewTypes);
 	std::swap(m_BlockMetas, NewMetas);
-	delete[] NewTypes;
-	delete[] NewMetas;
+	delete[] NewTypes;   NewTypes = NULL;
+	delete[] NewMetas;   NewMetas = NULL;
 
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1198,7 +1206,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 			}  // for z
 		}  // for x
 		std::swap(m_BlockTypes, NewTypes);
-		delete[] NewTypes;
+		delete[] NewTypes;   NewTypes = NULL;
 	}
 	if (HasBlockMetas())
 	{
@@ -1216,7 +1224,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 			}  // for z
 		}  // for x
 		std::swap(m_BlockMetas, NewMetas);
-		delete[] NewMetas;
+		delete[] NewMetas;   NewMetas = NULL;
 	}
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1243,7 +1251,7 @@ void cBlockArea::RotateCWNoMeta(void)
 			}  // for x
 		}  // for z
 		std::swap(m_BlockTypes, NewTypes);
-		delete[] NewTypes;
+		delete[] NewTypes;   NewTypes = NULL;
 	}
 	if (HasBlockMetas())
 	{
@@ -1261,7 +1269,7 @@ void cBlockArea::RotateCWNoMeta(void)
 			}  // for x
 		}  // for z
 		std::swap(m_BlockMetas, NewMetas);
-		delete[] NewMetas;
+		delete[] NewMetas;   NewMetas = NULL;
 	}
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1650,6 +1658,7 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		if (m_BlockMetas == NULL)
 		{
 			delete[] m_BlockTypes;
+			m_BlockTypes = NULL;
 			return false;
 		}
 	}
@@ -1659,7 +1668,9 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		if (m_BlockLight == NULL)
 		{
 			delete[] m_BlockMetas;
+			m_BlockMetas = NULL;
 			delete[] m_BlockTypes;
+			m_BlockTypes = NULL;
 			return false;
 		}
 	}
@@ -1669,8 +1680,11 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 		if (m_BlockSkyLight == NULL)
 		{
 			delete[] m_BlockLight;
+			m_BlockLight = NULL;
 			delete[] m_BlockMetas;
+			m_BlockMetas = NULL;
 			delete[] m_BlockTypes;
+			m_BlockTypes = NULL;
 			return false;
 		}
 	}
@@ -1745,12 +1759,14 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cBlockArea::cChunkReader:
 
 cBlockArea::cChunkReader::cChunkReader(cBlockArea & a_Area) :
 	m_Area(a_Area),
-	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z)
+	m_Origin(a_Area.m_Origin.x, a_Area.m_Origin.y, a_Area.m_Origin.z),
+	m_CurrentChunkX(0),
+	m_CurrentChunkZ(0)
 {
 }
 
@@ -1835,18 +1851,12 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cBlockArea::cChunkReader::BlockTypes(const BLOCKTYPE * a_BlockTypes)
+void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 {
-	if (m_Area.m_BlockTypes == NULL)
-	{
-		// Don't want BlockTypes
-		return;
-	}
-	
 	int SizeY = m_Area.m_Size.y;
 	int MinY = m_Origin.y;
-	
-	// SizeX, SizeZ are the dmensions of the block data to copy from the current chunk (size of the geometric union)
+
+	// SizeX, SizeZ are the dimensions of the block data to copy from the current chunk (size of the geometric union)
 	// OffX, OffZ are the offsets of the current chunk data from the area origin
 	// BaseX, BaseZ are the offsets of the area data within the current chunk from the chunk borders
 	int SizeX = cChunkDef::Width;
@@ -1884,67 +1894,91 @@ void cBlockArea::cChunkReader::BlockTypes(const BLOCKTYPE * a_BlockTypes)
 	{
 		SizeZ -= (m_CurrentChunkZ + 1) * cChunkDef::Width - (m_Origin.z + m_Area.m_Size.z);
 	}
-
-	for (int y = 0; y < SizeY; y++)
+	
+	// Copy the blocktypes:
+	if (m_Area.m_BlockTypes != NULL)
 	{
-		int ChunkY = MinY + y;
-		int AreaY = y;
-		for (int z = 0; z < SizeZ; z++)
+		for (int y = 0; y < SizeY; y++)
 		{
-			int ChunkZ = BaseZ + z;
-			int AreaZ = OffZ + z;
-			for (int x = 0; x < SizeX; x++)
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
 			{
-				int ChunkX = BaseX + x;
-				int AreaX = OffX + x;
-				m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = cChunkDef::GetBlock(a_BlockTypes, ChunkX, ChunkY, ChunkZ);
-			}  // for x
-		}  // for z
-	}  // for y
-}
-
-
-
-
-
-void cBlockArea::cChunkReader::BlockMeta(const NIBBLETYPE * a_BlockMetas)
-{
-	if (m_Area.m_BlockMetas == NULL)
-	{
-		// Don't want metas
-		return;
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
-	CopyNibbles(m_Area.m_BlockMetas, a_BlockMetas);
-}
 
-
-
-
-
-void cBlockArea::cChunkReader::BlockLight(const NIBBLETYPE * a_BlockLight)
-{
-	if (m_Area.m_BlockLight == NULL)
+	// Copy the block metas:
+	if (m_Area.m_BlockMetas != NULL)
 	{
-		// Don't want light
-		return;
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
+			{
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
-	CopyNibbles(m_Area.m_BlockLight, a_BlockLight);
-}
 
-
-
-
-
-void cBlockArea::cChunkReader::BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight)
-{
-	if (m_Area.m_BlockSkyLight == NULL)
+	// Copy the blocklight:
+	if (m_Area.m_BlockLight != NULL)
 	{
-		// Don't want skylight
-		return;
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
+			{
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
 	}
-	CopyNibbles(m_Area.m_BlockSkyLight, a_BlockSkyLight);
-}
 
+	// Copy the skylight:
+	if (m_Area.m_BlockSkyLight != NULL)
+	{
+		for (int y = 0; y < SizeY; y++)
+		{
+			int InChunkY = MinY + y;
+			int AreaY = y;
+			for (int z = 0; z < SizeZ; z++)
+			{
+				int InChunkZ = BaseZ + z;
+				int AreaZ = OffZ + z;
+				for (int x = 0; x < SizeX; x++)
+				{
+					int InChunkX = BaseX + x;
+					int AreaX = OffX + x;
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight(InChunkX, InChunkY, InChunkZ);
+				}  // for x
+			}  // for z
+		}  // for y
+	}
+}
 
 
 
@@ -2087,7 +2121,7 @@ void cBlockArea::RelSetData(
 
 
 
-template<bool MetasValid>
+template <bool MetasValid>
 void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas)
 {
 	// Block types are compulsory, block metas are voluntary
@@ -2194,7 +2228,7 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 				m_Size.x, m_Size.y, m_Size.z
 			);
 			return;
-		}	// case msDifference
+		}  // case msDifference
 		
 		case cBlockArea::msMask:
 		{

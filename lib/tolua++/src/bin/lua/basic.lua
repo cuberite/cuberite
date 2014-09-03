@@ -383,7 +383,7 @@ end
 
 -- called to output an error message
 function output_error_hook(...)
-	return string.format(...)
+	return string.format(...)  -- Note that this line must not end in the triple-dot-parenthesis due to pre-parsing
 end
 
 -- custom pushers

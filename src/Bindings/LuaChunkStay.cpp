@@ -76,7 +76,7 @@ bool cLuaChunkStay::AddChunks(int a_ChunkCoordTableStackPos)
 
 
 
-void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)		
+void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 {
 	// Check that the element has 2 coords:
 	int NumCoords = luaL_getn(L, -1);

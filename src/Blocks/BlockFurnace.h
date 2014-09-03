@@ -3,7 +3,7 @@
 
 #include "BlockEntity.h"
 #include "../World.h"
-#include "../Piston.h"
+#include "../Blocks/BlockPiston.h"
 #include "MetaRotator.h"
 
 
@@ -13,7 +13,7 @@ class cBlockFurnaceHandler :
 	public cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
 {
 public:
-	cBlockFurnaceHandler(BLOCKTYPE a_BlockType) 
+	cBlockFurnaceHandler(BLOCKTYPE a_BlockType)
 		: cMetaRotator<cBlockEntityHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
 	{
 	}
@@ -27,7 +27,7 @@ public:
 	
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -35,7 +35,7 @@ public:
 		a_BlockType = m_BlockType;
 		
 		// FIXME: Do not use cPiston class for furnace placement!
-		a_BlockMeta = cPiston::RotationPitchToMetaData(a_Player->GetYaw(), 0);
+		a_BlockMeta = cBlockPistonHandler::RotationPitchToMetaData(a_Player->GetYaw(), 0);
 		
 		return true;
 	}

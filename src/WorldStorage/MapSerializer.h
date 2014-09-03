@@ -52,10 +52,9 @@ private:
 
 
 /** Utility class used to serialize item ID counts.
- *
- * In order to perform bounds checking (while loading),
- * the last registered ID of each item is serialized to an NBT file.
- */
+In order to perform bounds checking (while loading),
+the last registered ID of each item is serialized to an NBT file.
+*/
 class cIDCountSerializer
 {
 public:

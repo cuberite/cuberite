@@ -100,7 +100,7 @@ public:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat:
 
 cCompositeChat::cCompositeChat(void) :
@@ -183,6 +183,15 @@ void cCompositeChat::AddRunCommandPart(const AString & a_Text, const AString & a
 void cCompositeChat::AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style)
 {
 	m_Parts.push_back(new cSuggestCommandPart(a_Text, a_SuggestedCommand, a_Style));
+}
+
+
+
+
+
+void cCompositeChat::AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style)
+{
+	m_Parts.push_back(new cShowAchievementPart(a_PlayerName, a_Achievement, a_Style));
 }
 
 
@@ -290,9 +299,10 @@ void cCompositeChat::ParseText(const AString & a_ParseText)
 
 
 
-void cCompositeChat::SetMessageType(eMessageType a_MessageType)
+void cCompositeChat::SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData)
 {
 	m_MessageType = a_MessageType;
+	m_AdditionalMessageTypeData = a_AdditionalMessageTypeData;
 }
 
 
@@ -343,23 +353,23 @@ AString cCompositeChat::ExtractText(void) const
 
 
 
-cMCLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
+cLogger::eLogLevel cCompositeChat::MessageTypeToLogLevel(eMessageType a_MessageType)
 {
 	switch (a_MessageType)
 	{
-		case mtCustom:         return cMCLogger::llRegular;
-		case mtFailure:        return cMCLogger::llWarning;
-		case mtInformation:    return cMCLogger::llInfo;
-		case mtSuccess:        return cMCLogger::llRegular;
-		case mtWarning:        return cMCLogger::llWarning;
-		case mtFatal:          return cMCLogger::llError;
-		case mtDeath:          return cMCLogger::llRegular;
-		case mtPrivateMessage: return cMCLogger::llRegular;
-		case mtJoin:           return cMCLogger::llRegular;
-		case mtLeave:          return cMCLogger::llRegular;
+		case mtCustom:         return cLogger::llRegular;
+		case mtFailure:        return cLogger::llWarning;
+		case mtInformation:    return cLogger::llInfo;
+		case mtSuccess:        return cLogger::llRegular;
+		case mtWarning:        return cLogger::llWarning;
+		case mtFatal:          return cLogger::llError;
+		case mtDeath:          return cLogger::llRegular;
+		case mtPrivateMessage: return cLogger::llRegular;
+		case mtJoin:           return cLogger::llRegular;
+		case mtLeave:          return cLogger::llRegular;
 	}
 	ASSERT(!"Unhandled MessageType");
-	return cMCLogger::llError;
+	return cLogger::llError;
 }
 
 
@@ -389,7 +399,7 @@ void cCompositeChat::AddStyle(AString & a_Style, const AString & a_AddStyle)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cBasePart:
 
 cCompositeChat::cBasePart::cBasePart(cCompositeChat::ePartType a_PartType, const AString & a_Text, const AString & a_Style) :
@@ -403,7 +413,7 @@ cCompositeChat::cBasePart::cBasePart(cCompositeChat::ePartType a_PartType, const
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cTextPart:
 
 cCompositeChat::cTextPart::cTextPart(const AString & a_Text, const AString &a_Style) :
@@ -415,7 +425,7 @@ cCompositeChat::cTextPart::cTextPart(const AString & a_Text, const AString &a_St
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cClientTranslatedPart:
 
 cCompositeChat::cClientTranslatedPart::cClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style) :
@@ -428,7 +438,7 @@ cCompositeChat::cClientTranslatedPart::cClientTranslatedPart(const AString & a_T
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cUrlPart:
 
 cCompositeChat::cUrlPart::cUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style) :
@@ -441,7 +451,7 @@ cCompositeChat::cUrlPart::cUrlPart(const AString & a_Text, const AString & a_Url
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cCommandPart:
 
 cCompositeChat::cCommandPart::cCommandPart(ePartType a_PartType, const AString & a_Text, const AString & a_Command, const AString & a_Style) :
@@ -454,7 +464,7 @@ cCompositeChat::cCommandPart::cCommandPart(ePartType a_PartType, const AString &
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cRunCommandPart:
 
 cCompositeChat::cRunCommandPart::cRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style) :
@@ -465,11 +475,24 @@ cCompositeChat::cRunCommandPart::cRunCommandPart(const AString & a_Text, const A
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat::cSuggestCommandPart:
 
 cCompositeChat::cSuggestCommandPart::cSuggestCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style) :
 	super(ptSuggestCommand, a_Text, a_Command, a_Style)
+{
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cCompositeChat::cShowAchievementPart:
+
+cCompositeChat::cShowAchievementPart::cShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style) :
+	super(ptShowAchievement, a_Achievement, a_Style),
+	m_PlayerName(a_PlayerName)
 {
 }
 

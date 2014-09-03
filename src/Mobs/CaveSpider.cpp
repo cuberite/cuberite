@@ -20,8 +20,22 @@ void cCaveSpider::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	// TODO: Check vanilla if cavespiders really get passive during the day / in daylight
 	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
+}
+
+
+
+
+
+void cCaveSpider::Attack(float a_Dt)
+{
+	super::Attack(a_Dt);
+	
+	if (m_Target->IsPawn())
+	{
+		// TODO: Easy = no poison, Medium = 7 seconds, Hard = 15 seconds
+		((cPawn *) m_Target)->AddEntityEffect(cEntityEffect::effPoison, 7 * 20, 0);
+	}
 }
 
 

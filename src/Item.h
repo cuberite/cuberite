@@ -152,7 +152,7 @@ public:
 
 
 	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
-	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }	
+	bool IsLoreEmpty(void) const { return (m_Lore.empty()); }
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
 	cItem CopyOne(void) const;
@@ -185,15 +185,17 @@ public:
 	/** Loads the item data from JSON representation */
 	void FromJson(const Json::Value & a_Value);
 	
-	/** Returns true if the specified item type is enchantable (as per 1.2.5 protocol requirements) */
-	static bool IsEnchantable(short a_ItemType); // tolua_export
+	/** Returns true if the specified item type is enchantable.
+	If WithBook is true, the function is used in the anvil inventory with book enchantments.
+	So it checks the "only book enchantments" too. Example: You can only enchant a hoe with a book. */
+	static bool IsEnchantable(short a_ItemType, bool a_WithBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
-	int GetEnchantability(); // tolua_export
+	int GetEnchantability();  // tolua_export
 
 	/** Enchants the item using the specified number of XP levels.
 	Returns true if item enchanted, false if not. */
-	bool EnchantByXPLevels(int a_NumXPLevels); // tolua_export
+	bool EnchantByXPLevels(int a_NumXPLevels);  // tolua_export
 
 	// tolua_begin
 	
@@ -230,7 +232,7 @@ public:
 	void    Add   (const cItem & a_Item) {push_back(a_Item); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
-	size_t  Size  (void) {return size(); }
+	size_t  Size  (void) const { return size(); }
 	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
 
 	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)

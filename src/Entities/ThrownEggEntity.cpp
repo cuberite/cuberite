@@ -8,7 +8,8 @@
 
 
 cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkEgg, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
+	super(pkEgg, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+	m_DestroyTimer(-1)
 {
 	SetSpeed(a_Speed);
 }
@@ -21,7 +22,7 @@ void cThrownEggEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_H
 {
 	TrySpawnChicken(a_HitPos);
 	
-	Destroy();
+	m_DestroyTimer = 2;
 }
 
 
@@ -36,7 +37,7 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hit
 	TrySpawnChicken(a_HitPos);
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 	
-	Destroy(true);
+	m_DestroyTimer = 5;
 }
 
 

@@ -40,7 +40,7 @@ const cLuaState::cRet cLuaState::Return = {};
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
@@ -372,11 +372,11 @@ void cLuaState::Push(const AStringVector & a_Vector)
 
 
 
-void cLuaState::PushUserType(void * a_Object, const char * a_Type)
+void cLuaState::Push(const cCraftingGrid * a_Grid)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Object, a_Type);
+	tolua_pushusertype(m_LuaState, (void *)a_Grid, "cCraftingGrid");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -384,23 +384,11 @@ void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 
 
 
-void cLuaState::Push(int a_Value)
+void cLuaState::Push(const cCraftingRecipe * a_Recipe)
 {
 	ASSERT(IsValid());
 
-	tolua_pushnumber(m_LuaState, a_Value);
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(double a_Value)
-{
-	ASSERT(IsValid());
-
-	tolua_pushnumber(m_LuaState, a_Value);
+	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -420,35 +408,11 @@ void cLuaState::Push(const char * a_Value)
 
 
 
-void cLuaState::Push(bool a_Value)
+void cLuaState::Push(const cItems & a_Items)
 {
 	ASSERT(IsValid());
 
-	tolua_pushboolean(m_LuaState, a_Value ? 1 : 0);
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWorld * a_World)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_World, "cWorld");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cPlayer * a_Player)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
+	tolua_pushusertype(m_LuaState, (void *)&a_Items, "cItems");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -468,6 +432,43 @@ void cLuaState::Push(const cPlayer * a_Player)
 
 
 
+void cLuaState::Push(const HTTPRequest * a_Request)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPRequest");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const HTTPTemplateRequest * a_Request)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPTemplateRequest");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const Vector3d & a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3<double>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+<<<<<<< HEAD
 void cLuaState::Push(cEnchantments & a_Enchantment)
 {
 	ASSERT(IsValid());
@@ -493,6 +494,93 @@ void cLuaState::Push(cWeightedEnchantment & a_WeightedEnchantment)
 
 
 void cLuaState::Push(cEntity * a_Entity)
+=======
+void cLuaState::Push(const Vector3d * a_Vector)
+>>>>>>> master
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)a_Vector, "Vector3<double>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const Vector3i & a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)&a_Vector, "Vector3<int>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(const Vector3i * a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, (void *)a_Vector, "Vector3<int>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(bool a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushboolean(m_LuaState, a_Value ? 1 : 0);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cBlockEntity * a_BlockEntity)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cChunkDesc * a_ChunkDesc)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cClientHandle * a_Client)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
@@ -504,23 +592,11 @@ void cLuaState::Push(cEntity * a_Entity)
 
 
 
-void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
+void cLuaState::Push(cHopperEntity * a_Hopper)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cMonster * a_Monster)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Monster, "cMonster");
+	tolua_pushusertype(m_LuaState, a_Hopper, "cHopperEntity");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -552,23 +628,11 @@ void cLuaState::Push(cItems * a_Items)
 
 
 
-void cLuaState::Push(const cItems & a_Items)
+void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)&a_Items, "cItems");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cClientHandle * a_Client)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Client, "cClientHandle");
+	tolua_pushusertype(m_LuaState, a_Monster, "cMonster");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -588,59 +652,11 @@ void cLuaState::Push(cPickup * a_Pickup)
 
 
 
-void cLuaState::Push(cChunkDesc * a_ChunkDesc)
+void cLuaState::Push(cPlayer * a_Player)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_ChunkDesc, "cChunkDesc");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(const cCraftingGrid * a_Grid)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, (void *)a_Grid, "cCraftingGrid");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(const cCraftingRecipe * a_Recipe)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, (void *)a_Recipe, "cCraftingRecipe");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(TakeDamageInfo * a_TDI)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_TDI, "TakeDamageInfo");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWindow * a_Window)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_Window, "cWindow");
+	tolua_pushusertype(m_LuaState, a_Player, "cPlayer");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -660,35 +676,11 @@ void cLuaState::Push(cPluginLua * a_Plugin)
 
 
 
-void cLuaState::Push(const HTTPRequest * a_Request)
+void cLuaState::Push(cProjectileEntity * a_ProjectileEntity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPRequest");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cWebAdmin * a_WebAdmin)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_WebAdmin, "cWebAdmin");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(const HTTPTemplateRequest * a_Request)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, (void *)a_Request, "HTTPTemplateRequest");
+	tolua_pushusertype(m_LuaState, a_ProjectileEntity, "cProjectileEntity");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -708,11 +700,95 @@ void cLuaState::Push(cTNTEntity * a_TNTEntity)
 
 
 
+void cLuaState::Push(cWebAdmin * a_WebAdmin)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_WebAdmin, "cWebAdmin");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cWindow * a_Window)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_Window, "cWindow");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cWorld * a_World)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_World, "cWorld");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(double a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(int a_Value)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, a_Value);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(TakeDamageInfo * a_TDI)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_TDI, "TakeDamageInfo");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(Vector3d * a_Vector)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<double>");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(Vector3i * a_Vector)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Vector, "Vector3i");
+	tolua_pushusertype(m_LuaState, a_Vector, "Vector3<int>");
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -739,23 +815,12 @@ void cLuaState::Push(void * a_Ptr)
 
 
 
-void cLuaState::Push(cHopperEntity * a_Hopper)
+
+void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Hopper, "cHopperEntity");
-	m_NumCurrentFunctionArgs += 1;
-}
-
-
-
-
-
-void cLuaState::Push(cBlockEntity * a_BlockEntity)
-{
-	ASSERT(IsValid());
-
-	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	tolua_pushusertype(m_LuaState, a_Object, a_Type);
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -803,6 +868,18 @@ void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
 		a_ReturnedVal = tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
+	}
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = (eWeather)Clamp((int)tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal), (int)wSunny, (int)wThunderstorm);
 	}
 }
 
@@ -1323,9 +1400,8 @@ void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
 	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
 	
-	
 	// Format string consisting only of %s is used to appease the compiler
-	LOGD("%s",(a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	LOGD("%s", (a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;
@@ -1358,7 +1434,7 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cLuaState::cRef:
 
 cLuaState::cRef::cRef(void) :

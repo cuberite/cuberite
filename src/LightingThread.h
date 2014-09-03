@@ -16,7 +16,7 @@ Lighting is calculated in a flood-fill fashion:
 The seeds need two fast operations:
 	- Check if a block at [x, y, z] is already a seed
 	- Get the next seed in the row
-For that reason it is stored in two arrays, one stores a bool saying a seed is in that position, 
+For that reason it is stored in two arrays, one stores a bool saying a seed is in that position,
 the other is an array of seed coords, encoded as a single int.
 Step 2 needs two separate storages for old seeds and new seeds, so there are two actual storages for that purpose,
 their content is swapped after each full step-2-cycle.
@@ -82,7 +82,7 @@ protected:
 		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter);
 		
 	protected:
-		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override 
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
 		{
 			UNUSED(a_ChunkX);
 			UNUSED(a_ChunkZ);
@@ -107,6 +107,9 @@ protected:
 
 	cEvent m_evtItemAdded;    // Set when queue is appended, or to stop the thread
 	cEvent m_evtQueueEmpty;   // Set when the queue gets empty
+	
+	/** The highest block in the current 3x3 chunk data */
+	HEIGHTTYPE m_MaxHeight;
 	
 	
 	// Buffers for the 3x3 chunk data
@@ -136,8 +139,8 @@ protected:
 	/** Lights the entire chunk. If neighbor chunks don't exist, touches them and re-queues the chunk */
 	void LightChunk(cLightingChunkStay & a_Item);
 	
-	/** Prepares m_BlockTypes and m_HeightMap data; returns false if any of the chunks fail. Zeroes out the light arrays */
-	bool ReadChunks(int a_ChunkX, int a_ChunkZ);
+	/** Prepares m_BlockTypes and m_HeightMap data; zeroes out the light arrays */
+	void ReadChunks(int a_ChunkX, int a_ChunkZ);
 	
 	/** Uses m_HeightMap to initialize the m_SkyLight[] data; fills in seeds for the skylight */
 	void PrepareSkyLight(void);
@@ -145,12 +148,16 @@ protected:
 	/** Uses m_BlockTypes to initialize the m_BlockLight[] data; fills in seeds for the blocklight */
 	void PrepareBlockLight(void);
 	
+	/** Same as PrepareBlockLight(), but uses a different traversal scheme; possibly better perf cache-wise.
+	To be compared in perf benchmarks. */
+	void PrepareBlockLight2(void);
+	
 	/** Calculates light in the light array specified, using stored seeds */
 	void CalcLight(NIBBLETYPE * a_Light);
 	
 	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
-		NIBBLETYPE * a_Light, 
+		NIBBLETYPE * a_Light,
 		int a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
@@ -159,7 +166,7 @@ protected:
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
 	
 	inline void PropagateLight(
-		NIBBLETYPE * a_Light, 
+		NIBBLETYPE * a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	)

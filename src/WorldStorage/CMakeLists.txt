@@ -4,11 +4,34 @@ project (MCServer)
 
 include_directories ("${PROJECT_SOURCE_DIR}/../")
 
-file(GLOB SOURCE
-    "*.cpp"
-    "*.h"
-)
+SET (SRCS
+	EnchantmentSerializer.cpp
+	FastNBT.cpp
+	FireworksSerializer.cpp
+	MapSerializer.cpp
+	NBTChunkSerializer.cpp
+	SchematicFileSerializer.cpp
+	ScoreboardSerializer.cpp
+	StatSerializer.cpp
+	WSSAnvil.cpp
+	WSSCompact.cpp
+	WorldStorage.cpp)
 
-add_library(WorldStorage ${SOURCE})
+SET (HDRS
+	EnchantmentSerializer.h
+	FastNBT.h
+	FireworksSerializer.h
+	MapSerializer.h
+	NBTChunkSerializer.h
+	SchematicFileSerializer.h
+	ScoreboardSerializer.h
+	StatSerializer.h
+	WSSAnvil.h
+	WSSCompact.h
+	WorldStorage.h)
 
-target_link_libraries(WorldStorage OSSupport)
+if(NOT MSVC)
+	add_library(WorldStorage ${SRCS} ${HDRS})
+
+	target_link_libraries(WorldStorage OSSupport)
+endif()

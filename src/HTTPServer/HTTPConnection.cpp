@@ -15,7 +15,8 @@
 cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 	m_HTTPServer(a_HTTPServer),
 	m_State(wcsRecvHeaders),
-	m_CurrentRequest(NULL)
+	m_CurrentRequest(NULL),
+	m_CurrentRequestBodyRemaining(0)
 {
 	// LOGD("HTTP: New connection at %p", this);
 }
@@ -28,6 +29,7 @@ cHTTPConnection::~cHTTPConnection()
 {
 	// LOGD("HTTP: Connection deleting: %p", this);
 	delete m_CurrentRequest;
+	m_CurrentRequest = NULL;
 }
 
 
@@ -99,7 +101,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 	{
 		case wcsRecvHeaders:
 		{
-			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth() )
+			// Nothing has been received yet, or a special response was given (SendStatusAndReason() or SendNeedAuth())
 			break;
 		}
 		

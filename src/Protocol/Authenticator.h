@@ -11,8 +11,6 @@
 
 
 #pragma once
-#ifndef CAUTHENTICATOR_H_INCLUDED
-#define CAUTHENTICATOR_H_INCLUDED
 
 #include "../OSSupport/IsThread.h"
 
@@ -22,6 +20,11 @@
 
 // fwd: "cRoot.h"
 class cRoot;
+
+namespace Json
+{
+	class Value;
+}
 
 
 
@@ -47,7 +50,7 @@ public:
 
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
-
+	
 private:
 
 	class cUser
@@ -71,22 +74,25 @@ private:
 	cUserList        m_Queue;
 	cEvent           m_QueueNonempty;
 
+	/** The server that is to be contacted for auth / UUID conversions */
 	AString m_Server;
+	
+	/** The URL to use for auth, without server part.
+	%USERNAME% will be replaced with actual user name.
+	%SERVERID% will be replaced with server's ID.
+	For example "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%". */
 	AString m_Address;
+	
+	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 
 	/** cIsThread override: */
 	virtual void Execute(void) override;
 
-	/** Returns true if the user authenticated okay, false on error; iLevel is the recursion deptht (bails out if too deep) */
-	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID);
+	/** Returns true if the user authenticated okay, false on error
+	Returns the case-corrected username, UUID, and properties (eg. skin). */
+	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties);
 };
-
-
-
-
-
-#endif  // CAUTHENTICATOR_H_INCLUDED
 
 
 

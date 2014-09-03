@@ -67,9 +67,6 @@ public:
 	void QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate);  // Queues the chunk for loading; if not loaded, the chunk will be generated if a_Generate is true
 	void QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 	
-	/// Signals that a message should be output to the console when all the chunks have been saved
-	void QueueSavedMessage(void);
-	
 	/// Loads the chunk specified; returns true on success, false on failure
 	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
 
@@ -96,23 +93,26 @@ protected:
 		
 		sChunkLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ), m_Generate(a_Generate) {}
 
-		bool operator==(const sChunkLoad other) const
+		bool operator ==(const sChunkLoad other) const
 		{
-			return this->m_ChunkX == other.m_ChunkX && 
-				this->m_ChunkY == other.m_ChunkY &&
-				this->m_ChunkZ == other.m_ChunkZ;
+			return (
+				(this->m_ChunkX == other.m_ChunkX) &&
+				(this->m_ChunkY == other.m_ChunkY) &&
+				(this->m_ChunkZ == other.m_ChunkZ)
+			);
 		}
 	} ;
 
-	struct FuncTable {
-		static void Delete(sChunkLoad) {};
-		static void Combine(sChunkLoad& a_orig, const sChunkLoad a_new) 
+	struct FuncTable
+	{
+		static void Delete(sChunkLoad) {}
+		static void Combine(sChunkLoad & a_orig, const sChunkLoad a_new)
 		{
 			a_orig.m_Generate |= a_new.m_Generate;
-		};
+		}
 	};
 
-	typedef cQueue<sChunkLoad,FuncTable> sChunkLoadQueue;
+	typedef cQueue<sChunkLoad, FuncTable> sChunkLoadQueue;
 	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;

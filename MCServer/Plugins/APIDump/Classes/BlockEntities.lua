@@ -50,6 +50,32 @@ return
 		},
 	},
 
+	cBeaconEntity =
+	{
+		Desc = [[
+			A beacon entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a beacon
+			in the world.
+		]],
+
+		Inherits = "cBlockEntityWithItems",
+
+		Functions =
+		{
+			IsActive = { Params = "", Return = "bool", Notes = "Is the beacon active?" },
+			GetBeaconLevel = { Params = "", Return = "number", Notes = "Returns the beacon level. (0 - 4)" },
+			GetPrimaryEffect = { Params = "", Return = "EffectType", Notes = "Returns the primary effect." },
+			GetSecondaryEffect = { Params = "", Return = "EffectType", Notes = "Returns the secondary effect." },
+			SetPrimaryEffect = { Params = "EffectType", Return = "bool", Notes = "Select the primary effect. Returns false when the effect is invalid." },
+			SetSecondaryEffect = { Params = "EffectType", Return = "bool", Notes = "Select the secondary effect. Returns false when the effect is invalid." },
+			CalculatePyramidLevel = { Params = "", Return = "number", Notes = "Calculate the amount of layers the pyramid below the beacon has." },
+			IsBeaconBlocked = { Params = "", Return = "bool", Notes = "Is the beacon blocked by non-transparent blocks that are higher than the beacon?" },
+			UpdateBeacon = { Params = "", Return = "", Notes = "Update the beacon." },
+			GiveEffects = { Params = "", Return = "", Notes = "Give the near-players the effects." },
+			IsMineralBlock = { Params = "BLOCKTYPE", Return = "bool", Notes = "Returns true if the block is a diamond block, a golden block, an iron block or an emerald block." },
+			IsValidEffect = { Params = "EffectType", Return = "bool", Notes = "Returns true if the effect can be used." },
+		},
+	},
+
 	cChestEntity =
 	{
 		Desc = [[

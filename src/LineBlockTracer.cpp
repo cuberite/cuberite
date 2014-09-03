@@ -203,6 +203,35 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 			m_Callbacks->OnNoChunk();
 			return false;
 		}
+
+		// Move to next block
+		if (!MoveToNextBlock())
+		{
+			// We've reached the end
+			m_Callbacks->OnNoMoreHits();
+			return true;
+		}
+
+		if ((m_CurrentY < 0) || (m_CurrentY >= cChunkDef::Height))
+		{
+			// We've gone out of the world, that's the end of this trace
+			double IntersectX, IntersectZ;
+			CalcXZIntersection(m_CurrentY, IntersectX, IntersectZ);
+			if (m_Callbacks->OnOutOfWorld(IntersectX, m_CurrentY, IntersectZ))
+			{
+				// The callback terminated the trace
+				return false;
+			}
+			m_Callbacks->OnNoMoreHits();
+			return true;
+		}
+
+		// Update the current chunk
+		if (a_Chunk != NULL)
+		{
+			a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
+		}
+
 		if (a_Chunk->IsValid())
 		{
 			BLOCKTYPE BlockType;
@@ -223,34 +252,6 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 				// The callback terminated the trace
 				return false;
 			}
-		}
-		
-		// Move to next block
-		if (!MoveToNextBlock())
-		{
-			// We've reached the end
-			m_Callbacks->OnNoMoreHits();
-			return true;
-		}
-		
-		// Update the current chunk
-		if (a_Chunk != NULL)
-		{
-			a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
-		}
-		
-		if ((m_CurrentY < 0) || (m_CurrentY >= cChunkDef::Height))
-		{
-			// We've gone out of the world, that's the end of this trace
-			double IntersectX, IntersectZ;
-			CalcXZIntersection(m_CurrentY, IntersectX, IntersectZ);
-			if (m_Callbacks->OnOutOfWorld(IntersectX, m_CurrentY, IntersectZ))
-			{
-				// The callback terminated the trace
-				return false;
-			}
-			m_Callbacks->OnNoMoreHits();
-			return true;
 		}
 	}
 }

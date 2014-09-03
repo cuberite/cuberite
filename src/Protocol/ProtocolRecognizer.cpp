@@ -1,7 +1,7 @@
 
 // ProtocolRecognizer.cpp
 
-// Implements the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple 
+// Implements the cProtocolRecognizer class representing the meta-protocol that recognizes possibly multiple
 // protocol versions and redirects everything to them
 
 #include "Globals.h"
@@ -18,6 +18,7 @@
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -37,6 +38,7 @@ cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 cProtocolRecognizer::~cProtocolRecognizer()
 {
 	delete m_Protocol;
+	m_Protocol = NULL;
 }
 
 
@@ -180,10 +182,10 @@ void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSe
 
 
 
-void cProtocolRecognizer::SendCollectPickup(const cPickup & a_Pickup, const cPlayer & a_Player)
+void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendCollectPickup(a_Pickup, a_Player);
+	m_Protocol->SendCollectEntity(a_Entity, a_Player);
 }
 
 
@@ -330,7 +332,7 @@ void cProtocolRecognizer::SendEntityVelocity(const cEntity & a_Entity)
 void cProtocolRecognizer::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendExplosion(a_BlockX,a_BlockY,a_BlockZ,a_Radius, a_BlocksAffected, a_PlayerMotion);
+	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
 
 
@@ -555,10 +557,10 @@ void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a
 
 
 
-void cProtocolRecognizer::SendRespawn(void)
+void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendRespawn();
+	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
 
@@ -615,10 +617,10 @@ void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cSco
 
 
 
-void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, int a_SrcX, int a_SrcY, int a_SrcZ, float a_Volume, float a_Pitch)
+void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendSoundEffect(a_SoundName, a_SrcX, a_SrcY, a_SrcZ, a_Volume, a_Pitch);
+	m_Protocol->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
 }
 
 
@@ -675,6 +677,16 @@ void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Veh
 
 
 
+void cProtocolRecognizer::SendStatistics(const cStatManager & a_Manager)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendStatistics(a_Manager);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Results)
 {
 	ASSERT(m_Protocol != NULL);
@@ -705,10 +717,10 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
 
 
@@ -745,7 +757,7 @@ void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_Block
 
 
 
-void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ )
+void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	ASSERT(m_Protocol != NULL);
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
@@ -817,7 +829,7 @@ void cProtocolRecognizer::SendData(const char * a_Data, size_t a_Size)
 
 bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
-	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and 
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and
 	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
 	
 	// The first packet should be a Handshake, 0x02:
@@ -942,7 +954,6 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
 {
 	UInt32 PacketType;
-	UInt32 NumBytesRead = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -961,7 +972,6 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	{
 		return false;
 	}
-	NumBytesRead -= (UInt32)m_Buffer.GetReadableSpace();
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
@@ -969,9 +979,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
@@ -981,9 +1000,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
@@ -1004,18 +1032,25 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 {
 	AString Reply;
 	cServer * Server = cRoot::Get()->GetServer();
+
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
 	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
 		case PROTO_VERSION_1_2_5:
 		case PROTO_VERSION_1_3_2:
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
-			Printf(Reply, "%s%s%i%s%i", 
-				Server->GetDescription().c_str(),
-				cChatColor::Delimiter.c_str(),
-				Server->GetNumPlayers(),
-				cChatColor::Delimiter.c_str(),
-				Server->GetMaxPlayers()
+			Printf(Reply, "%s%s%i%s%i",
+				ServerDescription.c_str(),
+				cChatColor::Delimiter,
+				NumPlayers,
+				cChatColor::Delimiter,
+				MaxPlayers
 			);
 			break;
 		}
@@ -1042,13 +1077,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 				m_Buffer.ReadByte(val);  // 0x01 magic value
 				ASSERT(val == 0x01);
 			}
-			
-			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
-			AString NumPlayers;
-			Printf(NumPlayers, "%d", Server->GetNumPlayers());
-			AString MaxPlayers;
-			Printf(MaxPlayers, "%d", Server->GetMaxPlayers());
-			
+
 			AString ProtocolVersionNum;
 			Printf(ProtocolVersionNum, "%d", cRoot::Get()->GetPrimaryServerVersion());
 			AString ProtocolVersionTxt(GetVersionTextFromInt(cRoot::Get()->GetPrimaryServerVersion()));
@@ -1061,11 +1090,11 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			Reply.push_back(0);
 			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
-			Reply.append(Server->GetDescription());
+			Reply.append(ServerDescription);
 			Reply.push_back(0);
-			Reply.append(NumPlayers);
+			Reply.append(Printf("%d", NumPlayers));
 			Reply.push_back(0);
-			Reply.append(MaxPlayers);
+			Reply.append(Printf("%d", MaxPlayers));
 			break;
 		}
 	}  // switch (m_PrimaryServerVersion)

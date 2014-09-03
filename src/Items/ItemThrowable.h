@@ -31,7 +31,11 @@ public:
 		Vector3d Pos = a_Player->GetThrowStartPos();
 		Vector3d Speed = a_Player->GetLookVector() * m_SpeedCoeff;
 
-		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, a_Player->GetEquippedItem(), &Speed) < 0)
+		// Play sound
+		cFastRandom Random;
+		a_World->BroadcastSoundEffect("random.bow", a_Player->GetPosX(), a_Player->GetPosY() - a_Player->GetHeight(), a_Player->GetPosZ(), 0.5f, 0.4f / (Random.NextFloat(1.0f) * 0.4f + 0.8f));
+
+		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, m_ProjectileKind, a_Player, &a_Player->GetEquippedItem(), &Speed) < 0)
 		{
 			return false;
 		}
@@ -131,7 +135,7 @@ public:
 			return false;
 		}
 
-		if (a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, a_Player->GetEquippedItem()) < 0)
+		if (a_World->CreateProjectile(a_BlockX + 0.5, a_BlockY + 1, a_BlockZ + 0.5, m_ProjectileKind, a_Player, &a_Player->GetEquippedItem()) < 0)
 		{
 			return false;
 		}

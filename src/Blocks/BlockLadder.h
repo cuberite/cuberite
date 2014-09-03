@@ -3,24 +3,26 @@
 
 #include "BlockHandler.h"
 #include "../World.h"
+#include "ClearMetaOnDrop.h"
 
 
 
 
 
 class cBlockLadderHandler :
-	public cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>
+	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> >
 {
+	typedef cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> > super;
 public:
 	cBlockLadderHandler(BLOCKTYPE a_BlockType)
-		: cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>(a_BlockType)
+		: super(a_BlockType)
 	{
-	}	
+	}
 
 
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
@@ -41,21 +43,27 @@ public:
 	}
 
 
-	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)  // tolua_export
-	{  // tolua_export
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta
+	}
+
+
+	static NIBBLETYPE DirectionToMetaData(eBlockFace a_Direction)
+	{
 		switch (a_Direction)
 		{
 			case BLOCK_FACE_ZM: return 0x2;
 			case BLOCK_FACE_ZP: return 0x3;
 			case BLOCK_FACE_XM: return 0x4;
 			case BLOCK_FACE_XP: return 0x5;
-			default:  return 0x2;
+			default:            return 0x2;
 		}
-	}  // tolua_export
+	}
 
 
-	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)  // tolua_export
-	{														// tolua_export
+	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
+	{
 		switch (a_MetaData)
 		{
 			case 0x2: return BLOCK_FACE_ZM;
@@ -64,10 +72,10 @@ public:
 			case 0x5: return BLOCK_FACE_XP;
 			default:  return BLOCK_FACE_ZM;
 		}
-	}  // tolua_export
+	}
 
 
-	/// Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure
+	/** Finds a suitable Direction for the Ladder. Returns BLOCK_FACE_BOTTOM on failure */
 	static eBlockFace FindSuitableBlockFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int FaceInt = BLOCK_FACE_ZM; FaceInt <= BLOCK_FACE_XP; FaceInt++)
@@ -95,7 +103,7 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface,int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		// TODO: Use AdjustCoordsByMeta(), then cChunk::UnboundedRelGetBlock() and finally some comparison
 		eBlockFace BlockFace = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));

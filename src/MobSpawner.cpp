@@ -8,7 +8,7 @@
 
 
 
-cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily,const std::set<cMonster::eType>& a_AllowedTypes) :
+cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<cMonster::eType>& a_AllowedTypes) :
 	m_MonsterFamily(a_MonsterFamily),
 	m_NewPack(true),
 	m_MobType(cMonster::mtInvalidType)
@@ -91,7 +91,7 @@ cMonster::eType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 			addIfAllowed(cMonster::mtCow, allowedMobs);
 			addIfAllowed(cMonster::mtChicken, allowedMobs);
 			addIfAllowed(cMonster::mtEnderman, allowedMobs);
-			addIfAllowed(cMonster::mtSlime, allowedMobs);	// MG TODO : much more complicated rule
+			addIfAllowed(cMonster::mtSlime, allowedMobs);  // MG TODO : much more complicated rule
 			
 			if (a_Biome == biForest || a_Biome == biForestHills || a_Biome == biTaiga  || a_Biome == biTaigaHills)
 			{
@@ -141,7 +141,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 		SkyLight = a_Chunk->GetTimeAlteredLight(SkyLight);
 
-		switch(a_MobType)
+		switch (a_MobType)
 		{
 			case cMonster::mtSquid:
 			{
@@ -208,7 +208,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 				bool HasFloor = false;
 				for (int x = 0; x < 2; ++x)
 				{
-					for(int z = 0; z < 2; ++z)
+					for (int z = 0; z < 2; ++z)
 					{
 						CanSpawn = a_Chunk->UnboundedRelGetBlockType(a_RelX + x, a_RelY, a_RelZ + z, TargetBlock);
 						CanSpawn = CanSpawn && (TargetBlock == E_BLOCK_AIR);
@@ -241,7 +241,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(m_Random.NextInt(2, a_Biome) == 0)
 				);
 			}
-			
+
+			case cMonster::mtMagmaCube:
 			case cMonster::mtSlime:
 			{
 				return (

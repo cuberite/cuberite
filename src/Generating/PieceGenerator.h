@@ -1,7 +1,7 @@
 
 // PieceGenerator.h
 
-// Declares the cBFSPieceGenerator class and cDFSPieceGenerator class 
+// Declares the cBFSPieceGenerator class and cDFSPieceGenerator class
 // representing base classes for generating structures composed of individual "pieces"
 
 /*
@@ -110,6 +110,7 @@ public:
 	virtual cPieces GetStartingPieces(void) = 0;
 	
 	/** Returns the relative weight with which the a_NewPiece is to be selected for placing under a_PlacedPiece through a_ExistingConnector.
+	a_ExistingConnector is the original connector, before any movement or rotation is applied to it.
 	This allows the pool to tweak the piece's chances, based on the previous pieces in the tree and the connector used.
 	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will never be chosen.
 	*/
@@ -119,6 +120,15 @@ public:
 		const cPiece & a_NewPiece
 	) { return 1; }
 	
+	/** Returns the relative weight with which the a_NewPiece is to be selected for placing as the first piece.
+	This allows the pool to tweak the piece's chances.
+	The higher the number returned, the higher the chance the piece will be chosen. 0 means the piece will not be chosen.
+	If all pieces return 0, a random piece is chosen, with all equal chances.
+	*/
+	virtual int GetStartingPieceWeight(
+		const cPiece & a_NewPiece
+	) { return 1; }
+
 	/** Called after a piece is placed, to notify the pool that it has been used.
 	The pool may adjust the pieces it will return the next time. */
 	virtual void PiecePlaced(const cPiece & a_Piece) = 0;
@@ -138,19 +148,41 @@ class cPlacedPiece
 public:
 	cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece, const Vector3i & a_Coords, int a_NumCCWRotations);
 	
-	const cPiece &   GetPiece          (void) const { return *m_Piece; }
-	const Vector3i & GetCoords         (void) const { return m_Coords; }
-	int              GetNumCCWRotations(void) const { return m_NumCCWRotations; }
-	const cCuboid &  GetHitBox         (void) const { return m_HitBox; }
-	int              GetDepth          (void) const { return m_Depth; }
+	const cPlacedPiece * GetParent           (void) const { return m_Parent; }
+	const cPiece &       GetPiece            (void) const { return *m_Piece; }
+	const Vector3i &     GetCoords           (void) const { return m_Coords; }
+	int                  GetNumCCWRotations  (void) const { return m_NumCCWRotations; }
+	const cCuboid &      GetHitBox           (void) const { return m_HitBox; }
+	int                  GetDepth            (void) const { return m_Depth; }
+	bool                 HasBeenMovedToGround(void) const { return m_HasBeenMovedToGround; }
+	
+	/** Returns the coords as a modifiable object. */
+	Vector3i & GetCoords(void) { return m_Coords; }
+	
+	/** Returns the connector at the specified index, rotated in the actual placement.
+	Undefined behavior if a_Index is out of range. */
+	cPiece::cConnector GetRotatedConnector(size_t a_Index) const;
+	
+	/** Returns a copy of the specified connector, modified to account for the translation and rotation for
+	this placement. */
+	cPiece::cConnector GetRotatedConnector(const cPiece::cConnector & a_Connector) const;
+	
+	/** Moves the placed piece Y-wise by the specified offset.
+	Sets m_HasBeenMovedToGround to true, too.
+	Used eg. by village houses. */
+	void MoveToGroundBy(int a_OffsetY);
 	
 protected:
 	const cPlacedPiece * m_Parent;
 	const cPiece * m_Piece;
 	Vector3i m_Coords;
 	int m_NumCCWRotations;
-	cCuboid m_HitBox;
-	int m_Depth;
+	cCuboid m_HitBox;  // Hitbox of the placed piece, in world coords
+	int m_Depth;       // Depth in the generated piece tree
+	
+	/** Set to true once the piece has been moved Y-wise.
+	Used eg. by village houses. */
+	bool m_HasBeenMovedToGround;
 };
 
 typedef std::vector<cPlacedPiece *> cPlacedPieces;
@@ -219,7 +251,7 @@ protected:
 		const cPiece::cConnector & a_ExistingConnector,  // The existing connector
 		const Vector3i & a_ToPos,                        // The position on which the new connector should be placed
 		const cPiece & a_Piece,                          // The new piece
-		const cPiece::cConnector & a_NewConnector,       // The connector of the new piece 
+		const cPiece::cConnector & a_NewConnector,       // The connector of the new piece
 		int a_NumCCWRotations,                           // Number of rotations for the new piece to align the connector
 		const cPlacedPieces & a_OutPieces                // All the already-placed pieces to check
 	);

@@ -14,6 +14,13 @@
 #include "inifile/iniFile.h"
 #include "../Entities/Player.h"
 
+#define FIND_HOOK(a_HookName) HookMap::iterator Plugins = m_Hooks.find(a_HookName);
+#define VERIFY_HOOK \
+	if (Plugins == m_Hooks.end()) \
+	{ \
+		return false; \
+	}
+
 
 
 
@@ -65,7 +72,7 @@ void cPluginManager::FindPlugins(void)
 		{
 			PluginMap::iterator thiz = itr;
 			++thiz;
-			m_Plugins.erase( itr );
+			m_Plugins.erase( itr);
 			itr = thiz;
 			continue;
 		}
@@ -117,30 +124,44 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	// Check if the Plugins section exists.
 	int KeyNum = a_SettingsIni.FindKey("Plugins");
 
-	// If it does, how many plugins are there?
-	int NumPlugins = ((KeyNum != -1) ? (a_SettingsIni.GetNumValues(KeyNum)) : 0);
-
 	if (KeyNum == -1)
 	{
 		InsertDefaultPlugins(a_SettingsIni);
+		KeyNum = a_SettingsIni.FindKey("Plugins");
 	}
-	else if (NumPlugins > 0)
+
+	// How many plugins are there?
+	int NumPlugins = a_SettingsIni.GetNumValues(KeyNum);
+
+	for (int i = 0; i < NumPlugins; i++)
 	{
-		for (int i = 0; i < NumPlugins; i++)
+		AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
+		if (ValueName.compare("Plugin") == 0)
 		{
-			AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
-			if (ValueName.compare("Plugin") == 0)
+			AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
+			if (!PluginFile.empty())
 			{
-				AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
-				if (!PluginFile.empty())
+				if (m_Plugins.find(PluginFile) != m_Plugins.end())
 				{
-					if (m_Plugins.find(PluginFile) != m_Plugins.end())
-					{
-						LoadPlugin(PluginFile);
-					}
+					LoadPlugin(PluginFile);
 				}
 			}
 		}
+	}
+
+
+	// Remove invalid plugins from the PluginMap.
+	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
+	{
+		if (itr->second == NULL)
+		{
+			PluginMap::iterator thiz = itr;
+			++thiz;
+			m_Plugins.erase(itr);
+			itr = thiz;
+			continue;
+		}
+		++itr;
 	}
 
 	size_t NumLoadedPlugins = GetNumPlugins();
@@ -148,13 +169,13 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	{
 		LOG("-- No Plugins Loaded --");
 	}
-	else if (NumLoadedPlugins > 1)
+	else if (NumLoadedPlugins == 1)
 	{
-		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
+		LOG("-- Loaded 1 Plugin --");
 	}
 	else
 	{
-		LOG("-- Loaded 1 Plugin --");
+		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
 	}
 	CallHookPluginsLoaded();
 }
@@ -192,7 +213,7 @@ void cPluginManager::Tick(float a_Dt)
 		ReloadPluginsNow();
 	}
 
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_TICK);
+	FIND_HOOK(HOOK_TICK);
 	if (Plugins != m_Hooks.end())
 	{
 		for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
@@ -208,11 +229,9 @@ void cPluginManager::Tick(float a_Dt)
 
 bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_SPREAD);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_BLOCK_SPREAD);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source))
@@ -233,11 +252,9 @@ bool cPluginManager::CallHookBlockToPickups(
 	cItems & a_Pickups
 )
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_BLOCK_TO_PICKUPS);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_BLOCK_TO_PICKUPS);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnBlockToPickups(a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups))
@@ -254,18 +271,44 @@ bool cPluginManager::CallHookBlockToPickups(
 
 bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 {
-	bool WasCommandForbidden = false;
-	if (HandleCommand(a_Player, a_Message, true, WasCommandForbidden))  // We use HandleCommand as opposed to ExecuteCommand to accomodate the need to the WasCommandForbidden bool
+	// Check if the message contains a command, execute it:
+	switch (HandleCommand(a_Player, a_Message, true))
 	{
-		return true;  // Chat message was handled as command
-	}
-	else if (WasCommandForbidden) // Couldn't be handled as command, was it because of insufficient permissions?
-	{
-		return true;  // Yes - message was sent in HandleCommand, abort
+		case crExecuted:
+		{
+			// The command has executed successfully
+			return true;
+		}
+		
+		case crBlocked:
+		{
+			// The command was blocked by a plugin using HOOK_EXECUTE_COMMAND
+			// The plugin has most likely sent a message to the player already
+			return true;
+		}
+		
+		case crError:
+		{
+			// An error in the plugin has prevented the command from executing. Report the error to the player:
+			a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			return true;
+		}
+		
+		case crNoPermission:
+		{
+			// The player is not allowed to execute this command
+			a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			return true;
+		}
+
+		case crUnknownCommand:
+		{
+			// This was not a known command, keep processing as a message
+			break;
+		}
 	}
 
-	// Check if it was a standard command (starts with a slash)
-	// If it was, we know that it was completely unrecognised (WasCommandForbidden == false)
+	// Check if the message is a command (starts with a slash). If it is, we know that it wasn't recognised:
 	if (!a_Message.empty() && (a_Message[0] == '/'))
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
@@ -275,11 +318,8 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 		return true;  // Cancel sending
 	}
 
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHAT);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CHAT);
+	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
@@ -298,11 +338,9 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 
 bool cPluginManager::CallHookChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_AVAILABLE);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CHUNK_AVAILABLE);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChunkAvailable(a_World, a_ChunkX, a_ChunkZ))
@@ -319,11 +357,9 @@ bool cPluginManager::CallHookChunkAvailable(cWorld * a_World, int a_ChunkX, int 
 
 bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CHUNK_GENERATED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc))
@@ -340,11 +376,9 @@ bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int 
 
 bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_GENERATING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CHUNK_GENERATING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChunkGenerating(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc))
@@ -361,11 +395,9 @@ bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int
 
 bool cPluginManager::CallHookChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_UNLOADED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CHUNK_UNLOADED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChunkUnloaded(a_World, a_ChunkX, a_ChunkZ))
@@ -382,11 +414,9 @@ bool cPluginManager::CallHookChunkUnloaded(cWorld * a_World, int a_ChunkX, int a
 
 bool cPluginManager::CallHookChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CHUNK_UNLOADING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CHUNK_UNLOADING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnChunkUnloading(a_World, a_ChunkX, a_ChunkZ))
@@ -403,11 +433,9 @@ bool cPluginManager::CallHookChunkUnloading(cWorld * a_World, int a_ChunkX, int 
 
 bool cPluginManager::CallHookCollectingPickup(cPlayer * a_Player, cPickup & a_Pickup)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_COLLECTING_PICKUP);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_COLLECTING_PICKUP);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnCollectingPickup(a_Player, &a_Pickup))
@@ -424,11 +452,9 @@ bool cPluginManager::CallHookCollectingPickup(cPlayer * a_Player, cPickup & a_Pi
 
 bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_CRAFTING_NO_RECIPE);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_CRAFTING_NO_RECIPE);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnCraftingNoRecipe(a_Player, a_Grid, a_Recipe))
@@ -445,11 +471,9 @@ bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cC
 
 bool cPluginManager::CallHookDisconnect(cClientHandle & a_Client, const AString & a_Reason)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_DISCONNECT);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_DISCONNECT);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnDisconnect(a_Client, a_Reason))
@@ -464,13 +488,30 @@ bool cPluginManager::CallHookDisconnect(cClientHandle & a_Client, const AString 
 
 
 
+bool cPluginManager::CallHookEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier)
+{
+	FIND_HOOK(HOOK_ENTITY_ADD_EFFECT);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityAddEffect(a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_DistanceModifier))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_EXECUTE_COMMAND);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_EXECUTE_COMMAND);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnExecuteCommand(a_Player, a_Split))
@@ -487,11 +528,9 @@ bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVec
 
 bool cPluginManager::CallHookExploded(cWorld & a_World, double a_ExplosionSize, bool a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_EXPLODED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_EXPLODED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnExploded(a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData))
@@ -508,11 +547,9 @@ bool cPluginManager::CallHookExploded(cWorld & a_World, double a_ExplosionSize, 
 
 bool cPluginManager::CallHookExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_EXPLODING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_EXPLODING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnExploding(a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData))
@@ -529,11 +566,9 @@ bool cPluginManager::CallHookExploding(cWorld & a_World, double & a_ExplosionSiz
 
 bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const AString & a_Username)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_HANDSHAKE);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_HANDSHAKE);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnHandshake(a_ClientHandle, a_Username))
@@ -550,11 +585,9 @@ bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const ASt
 
 bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_HOPPER_PULLING_ITEM);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_HOPPER_PULLING_ITEM);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnHopperPullingItem(a_World, a_Hopper, a_DstSlotNum, a_SrcEntity, a_SrcSlotNum))
@@ -571,11 +604,9 @@ bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity &
 
 bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_HOPPER_PUSHING_ITEM);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_HOPPER_PUSHING_ITEM);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnHopperPushingItem(a_World, a_Hopper, a_SrcSlotNum, a_DstEntity, a_DstSlotNum))
@@ -590,16 +621,14 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
-bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer)
+bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_KILLING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_KILLING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnKilling(a_Victim, a_Killer))
+		if ((*itr)->OnKilling(a_Victim, a_Killer, a_TDI))
 		{
 			return true;
 		}
@@ -613,11 +642,9 @@ bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer)
 
 bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_LOGIN);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_LOGIN);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnLogin(a_Client, a_ProtocolVersion, a_Username))
@@ -676,11 +703,9 @@ bool cPluginManager::CallHookPostEnchanting(cPlayer & a_Player, cEnchantments & 
 
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_ANIMATION);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_ANIMATION);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerAnimation(a_Player, a_Animation))
@@ -697,11 +722,9 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_BREAKING_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_BREAKING_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta))
@@ -718,11 +741,9 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_Block
 
 bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_BROKEN_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_BROKEN_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta))
@@ -739,11 +760,9 @@ bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX,
 
 bool cPluginManager::CallHookPlayerDestroyed(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_DESTROYED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_DESTROYED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerDestroyed(a_Player))
@@ -760,11 +779,9 @@ bool cPluginManager::CallHookPlayerDestroyed(cPlayer & a_Player)
 
 bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_EATING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_EATING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerEating(a_Player))
@@ -779,13 +796,30 @@ bool cPluginManager::CallHookPlayerEating(cPlayer & a_Player)
 
 
 
+bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
+{
+	FIND_HOOK(HOOK_PLAYER_FOOD_LEVEL_CHANGE);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnPlayerFoodLevelChange(a_Player, a_NewFoodLevel))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems a_Reward)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_FISHED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerFished(a_Player, a_Reward))
@@ -802,11 +836,9 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems a_Rew
 
 bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_FISHING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_FISHING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerFishing(a_Player, a_Reward))
@@ -823,11 +855,9 @@ bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
 
 bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_JOINED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_JOINED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerJoined(a_Player))
@@ -844,11 +874,9 @@ bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 
 bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_LEFT_CLICK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_LEFT_CLICK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
@@ -863,16 +891,14 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_MOVING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_MOVING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPlayerMoved(a_Player))
+		if ((*itr)->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition))
 		{
 			return true;
 		}
@@ -886,11 +912,9 @@ bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player)
 
 bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_PLACED_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_PLACED_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerPlacedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
@@ -907,11 +931,9 @@ bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX,
 
 bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_PLACING_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_PLACING_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
@@ -928,11 +950,9 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX
 
 bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_RIGHT_CLICK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_RIGHT_CLICK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
@@ -949,11 +969,9 @@ bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, 
 
 bool cPluginManager::CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_RIGHT_CLICKING_ENTITY);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerRightClickingEntity(a_Player, a_Entity))
@@ -970,11 +988,9 @@ bool cPluginManager::CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEnti
 
 bool cPluginManager::CallHookPlayerShooting(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_SHOOTING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_SHOOTING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerShooting(a_Player))
@@ -991,11 +1007,9 @@ bool cPluginManager::CallHookPlayerShooting(cPlayer & a_Player)
 
 bool cPluginManager::CallHookPlayerSpawned(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_SPAWNED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_SPAWNED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerSpawned(a_Player))
@@ -1012,11 +1026,9 @@ bool cPluginManager::CallHookPlayerSpawned(cPlayer & a_Player)
 
 bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_TOSSING_ITEM);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_TOSSING_ITEM);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerTossingItem(a_Player))
@@ -1033,11 +1045,9 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USED_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_USED_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerUsedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
@@ -1054,11 +1064,9 @@ bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, i
 
 bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USED_ITEM);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_USED_ITEM);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerUsedItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
@@ -1075,11 +1083,9 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, in
 
 bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USING_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_USING_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerUsingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
@@ -1096,11 +1102,9 @@ bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, 
 
 bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLAYER_USING_ITEM);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLAYER_USING_ITEM);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPlayerUsingItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
@@ -1117,11 +1121,9 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 
 bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGIN_MESSAGE);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLUGIN_MESSAGE);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPluginMessage(a_Client, a_Channel, a_Message))
@@ -1138,11 +1140,9 @@ bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AStri
 
 bool cPluginManager::CallHookPluginsLoaded(void)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PLUGINS_LOADED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PLUGINS_LOADED);
+	VERIFY_HOOK;
+
 	bool res = false;
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
@@ -1157,11 +1157,9 @@ bool cPluginManager::CallHookPluginsLoaded(void)
 
 bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_CRAFTING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_POST_CRAFTING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPostCrafting(a_Player, a_Grid, a_Recipe))
@@ -1178,11 +1176,9 @@ bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraft
 
 bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_CRAFTING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PRE_CRAFTING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnPreCrafting(a_Player, a_Grid, a_Recipe))
@@ -1197,16 +1193,14 @@ bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCrafti
 
 
 
-bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile)
+bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PROJECTILE_HIT_BLOCK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PROJECTILE_HIT_BLOCK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnProjectileHitBlock(a_Projectile))
+		if ((*itr)->OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos))
 		{
 			return true;
 		}
@@ -1220,11 +1214,9 @@ bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile
 
 bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity & a_HitEntity)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_PROJECTILE_HIT_ENTITY);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_PROJECTILE_HIT_ENTITY);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnProjectileHitEntity(a_Projectile, a_HitEntity))
@@ -1239,13 +1231,30 @@ bool cPluginManager::CallHookProjectileHitEntity(cProjectileEntity & a_Projectil
 
 
 
+bool cPluginManager::CallHookServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+{
+	FIND_HOOK(HOOK_SERVER_PING);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnServerPing(a_ClientHandle, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNED_ENTITY);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_SPAWNED_ENTITY);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnSpawnedEntity(a_World, a_Entity))
@@ -1261,11 +1270,9 @@ bool cPluginManager::CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity)
 
 bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monster)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNED_MONSTER);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_SPAWNED_MONSTER);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnSpawnedMonster(a_World, a_Monster))
@@ -1281,11 +1288,9 @@ bool cPluginManager::CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monst
 
 bool cPluginManager::CallHookSpawningEntity(cWorld & a_World, cEntity & a_Entity)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNING_ENTITY);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_SPAWNING_ENTITY);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnSpawningEntity(a_World, a_Entity))
@@ -1302,11 +1307,9 @@ bool cPluginManager::CallHookSpawningEntity(cWorld & a_World, cEntity & a_Entity
 
 bool cPluginManager::CallHookSpawningMonster(cWorld & a_World, cMonster & a_Monster)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_SPAWNING_MONSTER);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_SPAWNING_MONSTER);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnSpawningMonster(a_World, a_Monster))
@@ -1323,11 +1326,9 @@ bool cPluginManager::CallHookSpawningMonster(cWorld & a_World, cMonster & a_Mons
 
 bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_TAKE_DAMAGE);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_TAKE_DAMAGE);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnTakeDamage(a_Receiver, a_TDI))
@@ -1344,11 +1345,9 @@ bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a
 
 bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATING_SIGN);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_UPDATING_SIGN);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player))
@@ -1365,11 +1364,9 @@ bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_
 
 bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_UPDATED_SIGN);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_UPDATED_SIGN);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player))
@@ -1386,11 +1383,9 @@ bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_B
 
 bool cPluginManager::CallHookWeatherChanged(cWorld & a_World)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_WEATHER_CHANGED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnWeatherChanged(a_World))
@@ -1407,11 +1402,9 @@ bool cPluginManager::CallHookWeatherChanged(cWorld & a_World)
 
 bool cPluginManager::CallHookWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_WEATHER_CHANGING);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_WEATHER_CHANGING);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnWeatherChanging(a_World, a_NewWeather))
@@ -1428,11 +1421,9 @@ bool cPluginManager::CallHookWeatherChanging(cWorld & a_World, eWeather & a_NewW
 
 bool cPluginManager::CallHookWorldStarted(cWorld & a_World)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_WORLD_STARTED);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_WORLD_STARTED);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnWorldStarted(a_World))
@@ -1449,11 +1440,9 @@ bool cPluginManager::CallHookWorldStarted(cWorld & a_World)
 
 bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt, int a_LastTickDurationMSec)
 {
-	HookMap::iterator Plugins = m_Hooks.find(HOOK_WORLD_TICK);
-	if (Plugins == m_Hooks.end())
-	{
-		return false;
-	}
+	FIND_HOOK(HOOK_WORLD_TICK);
+	VERIFY_HOOK;
+
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
 		if ((*itr)->OnWorldTick(a_World, a_Dt, a_LastTickDurationMSec))
@@ -1468,28 +1457,28 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt, int a_LastT
 
 
 
-bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions, bool & a_WasCommandForbidden)
+cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
 	ASSERT(a_Player != NULL);
 
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
-		return false;
+		return crUnknownCommand;
 	}
 
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
 	{
 		// Command not found
-		return false;
+		return crUnknownCommand;
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
 	if (CallHookExecuteCommand(a_Player, Split))
 	{
 		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player->GetName().c_str(), Split[0].c_str());
-		return false;
+		return crBlocked;
 	}
 
 	if (
@@ -1498,26 +1487,29 @@ bool cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command
 		!a_Player->HasPermission(cmd->second.m_Permission)
 	)
 	{
-		a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", Split[0].c_str()));
 		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
-		a_WasCommandForbidden = true;
-		return false;
+		return crNoPermission;
 	}
 
 	ASSERT(cmd->second.m_Plugin != NULL);
 
-	return cmd->second.m_Plugin->HandleCommand(Split, a_Player);
+	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player))
+	{
+		return crError;
+	}
+
+	return crExecuted;
 }
 
 
 
 
 
-cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin ) const
+cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin) const
 {
-	for( PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr )
+	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
-		if (itr->second == NULL ) continue;
+		if (itr->second == NULL) continue;
 		if (itr->second->GetName().compare(a_Plugin) == 0)
 		{
 			return itr->second;
@@ -1567,7 +1559,7 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
 	{
 		m_DisablePluginList.push_back(itr->second);
-		itr->second = NULL;	// Get rid of this thing right away
+		itr->second = NULL;  // Get rid of this thing right away
 		return true;
 	}
 	return false;
@@ -1617,6 +1609,7 @@ void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 		a_Plugin->OnDisable();
 	}
 	delete a_Plugin;
+	a_Plugin = NULL;
 }
 
 
@@ -1703,7 +1696,7 @@ AString cPluginManager::GetCommandPermission(const AString & a_Command)
 
 
 
-bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, true);
 }
@@ -1712,7 +1705,7 @@ bool cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Comman
 
 
 
-bool cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, false);
 }

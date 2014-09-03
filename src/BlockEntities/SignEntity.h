@@ -25,7 +25,7 @@ namespace Json
 
 // tolua_begin
 
-class cSignEntity : 
+class cSignEntity :
 	public cBlockEntity
 {
 	typedef cBlockEntity super;
@@ -37,8 +37,8 @@ public:
 	/// Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be NULL
 	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
 
-	bool LoadFromJson( const Json::Value& a_Value );
-	virtual void SaveToJson(Json::Value& a_Value ) override;
+	bool LoadFromJson( const Json::Value& a_Value);
+	virtual void SaveToJson(Json::Value& a_Value) override;
 
 	// tolua_begin
 	

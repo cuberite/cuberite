@@ -447,6 +447,15 @@ bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 
 
+bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists)
+{
+	return SetValue(a_Keyname, a_ValueName, Printf("%lld", a_Value), a_CreateIfNotExists);
+}
+
+
+
+
+
 bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName, double const a_Value, const bool a_CreateIfNotExists)
 {
 	return SetValue(a_KeyName, a_ValueName, Printf("%f", a_Value), a_CreateIfNotExists);
@@ -565,6 +574,24 @@ int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, c
 	AString Data;
 	Printf(Data, "%d", defValue);
 	return atoi(GetValueSet(keyname, valuename, Data).c_str());
+}
+
+
+
+
+
+Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const Int64 defValue)
+{
+	AString Data;
+	Printf(Data, "%lld", defValue);
+	AString resultstring = GetValueSet(keyname, valuename, Data);
+	Int64 result = defValue;
+#ifdef _WIN32
+	sscanf_s(resultstring.c_str(), "%lld", &result);
+#else
+	sscanf(resultstring.c_str(), "%lld", &result);
+#endif
+	return result;
 }
 
 

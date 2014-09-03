@@ -16,18 +16,8 @@ class cBlockHandler;
 class cBlockInfo
 {
 public:
-	// tolua_end
 
-	cBlockInfo();
-
-	~cBlockInfo();
-
-	/** (Re-)Initializes the internal BlockInfo structures. */
-	static void Initialize(void);
-
-	// tolua_begin
-
-	/** Returns the associated BlockInfo structure. */
+	/** Returns the associated BlockInfo structure for the specified block type. */
 	static cBlockInfo & Get(BLOCKTYPE a_Type);
 
 
@@ -49,14 +39,14 @@ public:
 	/** Can this block hold snow atop? */
 	bool m_IsSnowable;
 
-	/** Does this block require a tool to drop? */
-	bool m_RequiresSpecialTool;
-
 	/** Is this block solid (player cannot walk through)? */
 	bool m_IsSolid;
 
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
 	bool m_FullyOccupiesVoxel;
+
+	/** Can a finisher change it? */
+	bool m_CanBeTerraformed;
 
 	// tolua_end
 
@@ -71,22 +61,27 @@ public:
 	inline static bool IsOneHitDig                (BLOCKTYPE a_Type) { return Get(a_Type).m_OneHitDig;           }
 	inline static bool IsPistonBreakable          (BLOCKTYPE a_Type) { return Get(a_Type).m_PistonBreakable;     }
 	inline static bool IsSnowable                 (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSnowable;          }
-	inline static bool RequiresSpecialTool        (BLOCKTYPE a_Type) { return Get(a_Type).m_RequiresSpecialTool; }
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
+	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
 
 	// tolua_end
 
 	inline static cBlockHandler * GetHandler      (BLOCKTYPE a_Type) { return Get(a_Type).m_Handler;             }
 
-
 protected:
+	/** Storage for all the BlockInfo structures. */
+	typedef cBlockInfo cBlockInfoArray[256];
 
-	// TODO xdot: Change to std::vector to support dynamic block IDs
-	static cBlockInfo ms_Info[256];
+	/** Creates a default BlockInfo structure, initializes all values to their defaults */
+	cBlockInfo();
 
+	/** Cleans up the stored values */
+	~cBlockInfo();
 
-}; // tolua_export
+	/** Initializes the specified BlockInfo structures with block-specific values. */
+	static void Initialize(cBlockInfoArray & a_BlockInfos);
+};  // tolua_export
 
 
 

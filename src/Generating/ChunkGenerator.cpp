@@ -22,11 +22,12 @@ const unsigned int QUEUE_SKIP_LIMIT = 500;
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChunkGenerator:
 
 cChunkGenerator::cChunkGenerator(void) :
 	super("cChunkGenerator"),
+	m_Seed(0),  // Will be overwritten by the actual generator
 	m_Generator(NULL),
 	m_PluginInterface(NULL),
 	m_ChunkSink(NULL)
@@ -52,7 +53,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 	m_ChunkSink = &a_ChunkSink;
 
 	MTRand rnd;
-	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", rnd.randInt());
+	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", (int)rnd.randInt());
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
 
 	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
@@ -180,7 +181,7 @@ BLOCKTYPE cChunkGenerator::GetIniBlock(cIniFile & a_IniFile, const AString & a_S
 	BLOCKTYPE Block = BlockStringToType(BlockType);
 	if (Block < 0)
 	{
-		LOGWARN("[%s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(),a_Default.c_str());
+		LOGWARN("[%s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(), a_Default.c_str());
 		return BlockStringToType(a_Default);
 	}
 	return Block;
@@ -228,10 +229,10 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 
-		cChunkCoords coords = m_Queue.front();		// Get next coord from queue
-		m_Queue.erase( m_Queue.begin() );	// Remove coordinate from queue
+		cChunkCoords coords = m_Queue.front();  // Get next coord from queue
+		m_Queue.erase( m_Queue.begin());  // Remove coordinate from queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
-		Lock.Unlock();			// Unlock ASAP
+		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
 
 		// Display perf info once in a while:
@@ -290,7 +291,7 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cChunkGenerator::cGenerator:
 
 cChunkGenerator::cGenerator::cGenerator(cChunkGenerator & a_ChunkGenerator) :

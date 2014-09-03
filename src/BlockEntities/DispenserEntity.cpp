@@ -6,6 +6,10 @@
 #include "../Simulator/FluidSimulator.h"
 #include "../Chunk.h"
 
+#include "../World.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/FireChargeEntity.h"
+#include "../Entities/ProjectileEntity.h"
 
 
 
@@ -33,7 +37,10 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		// Would dispense into / interact with a non-loaded chunk, ignore the tick
 		return;
 	}
+
 	BLOCKTYPE DispBlock = DispChunk->GetBlock(DispX, DispY, DispZ);
+	int BlockX = (DispX + DispChunk->GetPosX() * cChunkDef::Width);
+	int BlockZ = (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
 
 	// Dispense the item:
 	switch (m_Contents.GetSlot(a_SlotNum).m_ItemType)
@@ -69,7 +76,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}  // E_ITEM_BUCKET
-		
+
 		case E_ITEM_WATER_BUCKET:
 		{
 			LOGD("Dispensing water bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
@@ -83,7 +90,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_ITEM_LAVA_BUCKET:
 		{
 			LOGD("Dispensing lava bucket in slot %d; DispBlock is \"%s\" (%d).", a_SlotNum, ItemTypeToString(DispBlock).c_str(), DispBlock);
@@ -97,7 +104,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_ITEM_SPAWN_EGG:
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
@@ -108,7 +115,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_BLOCK_TNT:
 		{
 			// Spawn a primed TNT entity, if space allows:
@@ -128,7 +135,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			if (DispChunk->GetBlock(DispX, DispY, DispZ) == E_BLOCK_AIR)
 			{
 				DispChunk->SetBlock(DispX, DispY, DispZ, E_BLOCK_FIRE, 0);
-				
+
 				bool ItemBroke = m_Contents.DamageItem(a_SlotNum, 1);
 
 				if (ItemBroke)
@@ -138,13 +145,41 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			}
 			break;
 		}
-		
+
 		case E_ITEM_FIRE_CHARGE:
 		{
-			// TODO: Spawn fireball entity
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkFireCharge, GetShootVector(Meta) * 20);
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			break;
 		}
-		
+
+		case E_ITEM_ARROW:
+		{
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkArrow, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0));
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			break;
+		}
+
+		case E_ITEM_SNOWBALL:
+		{
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkSnowball, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0));
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			break;
+		}
+
+		case E_ITEM_EGG:
+		{
+			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkEgg, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0));
+			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			break;
+		}
+
+		case E_ITEM_FIREWORK_ROCKET:
+		{
+			// TODO: Add the fireworks entity
+			break;
+		}
+
 		default:
 		{
 			DropFromSlot(a_Chunk, a_SlotNum);
@@ -153,6 +188,34 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	}  // switch (ItemType)
 }
 
+
+
+
+
+void cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_ShootVector)
+{
+	m_World->CreateProjectile((double)a_BlockX + 0.5, (double)a_BlockY + 0.5, (double)a_BlockZ + 0.5, a_Kind, NULL, NULL, &a_ShootVector);
+}
+
+
+
+
+
+Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
+{
+	switch (a_Meta)
+	{
+		case E_META_DROPSPENSER_FACING_YP: return Vector3d( 0,  1,  0);
+		case E_META_DROPSPENSER_FACING_YM: return Vector3d( 0, -1,  0);
+		case E_META_DROPSPENSER_FACING_XM: return Vector3d(-1,  0,  0);
+		case E_META_DROPSPENSER_FACING_XP: return Vector3d( 1,  0,  0);
+		case E_META_DROPSPENSER_FACING_ZM: return Vector3d( 0,  0, -1);
+		case E_META_DROPSPENSER_FACING_ZP: return Vector3d( 0,  0,  1);
+	}
+	LOGWARNING("Unhandled dispenser meta: %d", a_Meta);
+	ASSERT(!"Unhandled dispenser facing");
+	return Vector3d(0, 1, 0);
+}
 
 
 
@@ -167,14 +230,14 @@ bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_BucketItemType)
 		m_Contents.SetSlot(a_SlotNum, LiquidBucket);
 		return true;
 	}
-	
+
 	// There are stacked buckets at the selected slot, see if a full bucket will fit somewhere else
 	if (m_Contents.HowManyCanFit(LiquidBucket) < 1)
 	{
 		// Cannot fit into m_Contents
 		return false;
 	}
-	
+
 	m_Contents.ChangeSlotCount(a_SlotNum, -1);
 	m_Contents.AddItem(LiquidBucket);
 	return true;
@@ -195,7 +258,7 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 		// Not a suitable block in front
 		return false;
 	}
-	
+
 	cItem EmptyBucket(E_ITEM_BUCKET, 1);
 	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
 	{
@@ -203,20 +266,19 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 		m_Contents.SetSlot(a_SlotNum, EmptyBucket);
 		return true;
 	}
-	
+
 	// There are full buckets stacked at this slot, check if we can fit in the empty bucket
 	if (m_Contents.HowManyCanFit(EmptyBucket) < 1)
 	{
 		// The empty bucket wouldn't fit into m_Contents
 		return false;
 	}
-	
+
 	// The empty bucket fits in, remove one full bucket and add the empty one
 	m_Contents.ChangeSlotCount(a_SlotNum, -1);
 	m_Contents.AddItem(EmptyBucket);
 	return true;
 }
-
 
 
 

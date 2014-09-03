@@ -34,6 +34,12 @@ public:
 		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs
 	);
 	
+	/** Destroys the pool, freeing all pieces. */
+	~cPrefabPiecePool();
+	
+	/** Removes and frees all pieces from this pool. */
+	void Clear(void);
+	
 	/** Adds pieces from the specified definitions into m_AllPieces. Also adds the pieces into
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces. */
@@ -43,7 +49,6 @@ public:
 	the m_PiecesByConnector map.
 	May be called multiple times with different PieceDefs, will add all such pieces. */
 	void AddStartingPieceDefs(const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs);
-	
 	
 protected:
 
@@ -70,6 +75,7 @@ protected:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
 	virtual cPieces GetStartingPieces(void) override;
 	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;
 	virtual void PiecePlaced(const cPiece & a_Piece) override;
 	virtual void Reset(void) override;
 } ;

@@ -27,7 +27,7 @@
 )
 	#define IS_LITTLE_ENDIAN
 #elif ( \
-	defined (__ARMEB__) || defined(__sparc) \
+	defined (__ARMEB__) || defined(__sparc) || defined(__powerpc__) || defined(__POWERPC__) \
 )
 	#define IS_BIG_ENDIAN
 #else
@@ -140,7 +140,7 @@ protected:
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 // cByteBuffer:
 
 cByteBuffer::cByteBuffer(size_t a_BufferSize) :
@@ -165,6 +165,7 @@ cByteBuffer::~cByteBuffer()
 {
 	CheckValid();
 	delete[] m_Buffer;
+	m_Buffer = NULL;
 }
 
 
@@ -762,7 +763,6 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, size_t a_NumChars)
 	// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
 	CHECK_THREAD;
 	CheckValid();
-	ASSERT(a_NumChars >= 0);
 	AString RawData;
 	if (!ReadString(RawData, a_NumChars * 2))
 	{

@@ -21,7 +21,7 @@ class cBoat :
 	typedef cEntity super;
 	
 public:
-	CLASS_PROTODEF(cBoat);
+	CLASS_PROTODEF(cBoat)
 		
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;

@@ -8,6 +8,7 @@
 class cItemPickaxeHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemPickaxeHandler(int a_ItemType)
 	: cItemHandler(a_ItemType)
@@ -17,7 +18,7 @@ public:
 
 	char PickaxeLevel()
 	{
-		switch(m_ItemType)
+		switch (m_ItemType)
 		{
 			case E_ITEM_WOODEN_PICKAXE:  return 1;
 			case E_ITEM_GOLD_PICKAXE:    return 1;
@@ -31,7 +32,7 @@ public:
 	
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
-		switch(a_BlockType)
+		switch (a_BlockType)
 		{
 			case E_BLOCK_OBSIDIAN:
 			{
@@ -84,7 +85,7 @@ public:
 				return PickaxeLevel() >= 1;
 			}
 		}
-		return false;
+		return super::CanHarvestBlock(a_BlockType);
 	}
 
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override

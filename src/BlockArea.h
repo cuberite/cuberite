@@ -14,6 +14,7 @@
 
 #include "ForEachChunkProvider.h"
 #include "Vector3.h"
+#include "ChunkDataCallback.h"
 
 
 
@@ -174,7 +175,7 @@ public:
 	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
 	
 	/** Fills a cuboid inside the block area with the specified data */
-	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ, 
+	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
 		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
@@ -316,11 +317,8 @@ protected:
 		void CopyNibbles(NIBBLETYPE * a_AreaDst, const NIBBLETYPE * a_ChunkSrc);
 		
 		// cChunkDataCallback overrides:
-		virtual bool Coords       (int a_ChunkX, int a_ChunkZ) override;
-		virtual void BlockTypes   (const BLOCKTYPE *  a_BlockTypes)    override;
-		virtual void BlockMeta    (const NIBBLETYPE * a_BlockMetas)    override;
-		virtual void BlockLight   (const NIBBLETYPE * a_BlockLight)    override;
-		virtual void BlockSkyLight(const NIBBLETYPE * a_BlockSkyLight) override;
+		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
+		virtual void ChunkData(const cChunkData &  a_BlockTypes) override;
 	} ;
 	
 	typedef NIBBLETYPE * NIBBLEARRAY;
@@ -359,12 +357,12 @@ protected:
 
 	/** Sets the specified datatypes at the specified location. */
 	void RelSetData(
-		int a_RelX, int a_RelY, int a_RelZ, 
+		int a_RelX, int a_RelY, int a_RelZ,
 		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 		NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
 	);
 	
-	template<bool MetasValid>
+	template <bool MetasValid>
 	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
 	// tolua_begin
 } ;

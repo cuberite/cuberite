@@ -2,7 +2,7 @@ return
 {
 	HOOK_PLAYER_USED_BLOCK =
 	{
-		CalledWhen = "A player has just used a block (chest, furnace…). Notification only.",
+		CalledWhen = "A player has just used a block (chest, furnace...). Notification only.",
 		DefaultFnName = "OnPlayerUsedBlock",  -- also used as pagename
 		Desc = [[
 			This hook is called after a {{cPlayer|player}} has right-clicked a block that can be used, such as a

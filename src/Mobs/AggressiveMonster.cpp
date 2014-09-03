@@ -42,7 +42,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 			MoveToPosition(m_Target->GetPosition());
 		}
 	}
-} 
+}
 
 
 
@@ -95,12 +95,14 @@ void cAggressiveMonster::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
 
-	if ((m_Target != NULL) && (m_AttackInterval > 3.0))
+	if ((m_Target == NULL) || (m_AttackInterval < 3.0))
 	{
-		// Setting this higher gives us more wiggle room for attackrate
-		m_AttackInterval = 0.0;
-		m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
+		return;
 	}
+	
+	// Setting this higher gives us more wiggle room for attackrate
+	m_AttackInterval = 0.0;
+	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);
 }
 
 

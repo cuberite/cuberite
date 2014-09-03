@@ -19,16 +19,16 @@ public:
 	}
 
 
-	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop, bool a_DropVerbatim) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		if (Meta & 0x8)
 		{
-			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY - 1, a_BlockZ);
+			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY - 1, a_BlockZ, a_CanDrop, a_DropVerbatim);
 		}
 		else
 		{
-			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ);
+			super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop, a_DropVerbatim);
 		}
 	}
 
@@ -37,7 +37,7 @@ public:
 	{
 		NIBBLETYPE Meta = a_BlockMeta & 0x7;
 		
-		if ((Meta == 2) || (Meta == 3))
+		if ((Meta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) || (Meta == E_META_BIG_FLOWER_LARGE_FERN))
 		{
 			return;
 		}
@@ -63,11 +63,11 @@ public:
 				if (r1.randInt(10) == 5)
 				{
 					cItems Pickups;
-					if (FlowerMeta == 2)
+					if (FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS)
 					{
 						Pickups.Add(E_BLOCK_TALL_GRASS, 2, 1);
 					}
-					else if (FlowerMeta == 3)
+					else if (FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
 					{
 						Pickups.Add(E_BLOCK_TALL_GRASS, 2, 2);
 					}
@@ -86,8 +86,8 @@ public:
 
 
 	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, 
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, 
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 	) override

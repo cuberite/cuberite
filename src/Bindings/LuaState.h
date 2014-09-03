@@ -9,10 +9,11 @@ Owned lua_State is created by calling Create() and the cLuaState automatically c
 Or, lua_State can be attached by calling Attach(), the cLuaState doesn't close such a state
 Attaching a state will automatically close an owned state.
 
-Calling a Lua function is done by pushing the function, either by PushFunction() or PushFunctionFromRegistry(),
-then pushing the arguments (PushString(), PushNumber(), PushUserData() etc.) and finally
-executing CallFunction(). cLuaState automatically keeps track of the number of arguments and the name of the
-function (for logging purposes), which makes the call less error-prone.
+Calling a Lua function is done internally by pushing the function using PushFunction(), then pushing the
+arguments and finally executing CallFunction(). cLuaState automatically keeps track of the number of
+arguments and the name of the function (for logging purposes). After the call the return values are read from
+the stack using GetStackValue(). All of this is wrapped in a templated function overloads cLuaState::Call(),
+which is generated automatically by gen_LuaState_Call.lua script file into the LuaState_Call.inc file.
 
 Reference management is provided by the cLuaState::cRef class. This is used when you need to hold a reference to
 any Lua object across several function calls; usually this is used for callbacks. The class is RAII-like, with
@@ -30,7 +31,11 @@ extern "C"
 }
 
 #include "../Vector3.h"
+<<<<<<< HEAD
 #include "../Enchantments.h"
+=======
+#include "../Defines.h"
+>>>>>>> master
 
 
 
@@ -127,7 +132,7 @@ public:
 
 
 	/** Creates a new instance. The LuaState is not initialized.
-	a_SubsystemName is used for reporting problems in the console, it is "plugin %s" for plugins, 
+	a_SubsystemName is used for reporting problems in the console, it is "plugin %s" for plugins,
 	or "LuaScript" for the cLuaScript template
 	*/
 	cLuaState(const AString & a_SubsystemName);
@@ -174,41 +179,53 @@ public:
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
 	
-	// Push a value onto the stack
+	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);
-	void Push(int a_Value);
-	void Push(double a_Value);
-	void Push(const char * a_Value);
-	void Push(bool a_Value);
-	void Push(cWorld * a_World);
-	void Push(cPlayer * a_Player);
-	void Push(const cPlayer * a_Player);
-	void Push(cEntity * a_Entity);
-	void Push(cProjectileEntity * a_ProjectileEntity);
-	void Push(cMonster * a_Monster);
-	void Push(cItem * a_Item);
-	void Push(cItems * a_Items);
-	void Push(const cItems & a_Items);
-	void Push(cClientHandle * a_ClientHandle);
-	void Push(cPickup * a_Pickup);
-	void Push(cChunkDesc * a_ChunkDesc);
 	void Push(const cCraftingGrid * a_Grid);
 	void Push(const cCraftingRecipe * a_Recipe);
-	void Push(TakeDamageInfo * a_TDI);
-	void Push(cWindow * a_Window);
-	void Push(cPluginLua * a_Plugin);
+	void Push(const char * a_Value);
+	void Push(const cItems & a_Items);
+	void Push(const cPlayer * a_Player);
 	void Push(const HTTPRequest * a_Request);
-	void Push(cWebAdmin * a_WebAdmin);
 	void Push(const HTTPTemplateRequest * a_Request);
+	void Push(const Vector3d & a_Vector);
+	void Push(const Vector3d * a_Vector);
+	void Push(const Vector3i & a_Vector);
+	void Push(const Vector3i * a_Vector);
+
+	// Push a value onto the stack (keep alpha-sorted):
+	void Push(bool a_Value);
+	void Push(cBlockEntity * a_BlockEntity);
+	void Push(cChunkDesc * a_ChunkDesc);
+	void Push(cClientHandle * a_ClientHandle);
+	void Push(cEntity * a_Entity);
+	void Push(cHopperEntity * a_Hopper);
+	void Push(cItem * a_Item);
+	void Push(cItems * a_Items);
+	void Push(cMonster * a_Monster);
+	void Push(cPickup * a_Pickup);
+	void Push(cPlayer * a_Player);
+	void Push(cPluginLua * a_Plugin);
+	void Push(cProjectileEntity * a_ProjectileEntity);
 	void Push(cTNTEntity * a_TNTEntity);
+	void Push(cWebAdmin * a_WebAdmin);
+	void Push(cWindow * a_Window);
+	void Push(cWorld * a_World);
+	void Push(double a_Value);
+	void Push(int a_Value);
+	void Push(TakeDamageInfo * a_TDI);
+	void Push(Vector3d * a_Vector);
 	void Push(Vector3i * a_Vector);
 	void Push(void * a_Ptr);
+<<<<<<< HEAD
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cBlockEntity * a_BlockEntity);
 	void Push(cEnchantments & a_Enchantment);
 	void Push(cWeightedEnchantment & a_WeightedEnchantment);
 
+=======
+>>>>>>> master
 	
 	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, bool & a_Value);
@@ -222,625 +239,13 @@ public:
 	/** Retrieve value at a_StackPos, if it is a valid number. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, double & a_Value);
 	
-
-	/** Call any 0-param 0-return Lua function in a single line: */
-	template <typename FnT>
-	bool Call(FnT a_FnName)
-	{
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		return CallFunction(0);
-	}
-
-	/** Call any 1-param 0-return Lua function in a single line: */
-	template<
-		typename FnT,
-		typename ArgT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1)
-	{
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		return CallFunction(0);
-	}
-
-	/** Call any 2-param 0-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2)
-	{
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		return CallFunction(0);
-	}
-
-	/** Call any 3-param 0-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3)
-	{
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		return CallFunction(0);
-	}
-
-	/** Call any 0-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename RetT1
-	>
-	bool Call(FnT a_FnName, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-
-	/** Call any 1-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		int InitialTop = lua_gettop(m_LuaState);
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		ASSERT(InitialTop == lua_gettop(m_LuaState));
-		return true;
-	}
-
-	/** Call any 2-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-
-	/** Call any 3-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
+	/** Retrieve value at a_StackPos, if it is a valid number, converting and clamping it to eWeather.
+	If not, a_Value is unchanged. */
+	void GetStackValue(int a_StackPos, eWeather & a_Value);
 	
-	/** Call any 4-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 5-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 6-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
-		typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 7-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
-		typename ArgT7, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 8-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
-		typename ArgT7, typename ArgT8, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		Push(a_Arg8);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 9-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
-		typename ArgT7, typename ArgT8, typename ArgT9, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		Push(a_Arg8);
-		Push(a_Arg9);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 10-param 1-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5, typename ArgT6,
-		typename ArgT7, typename ArgT8, typename ArgT9, typename ArgT10, typename RetT1
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, ArgT10 a_Arg10, const cRet & a_Mark, RetT1 & a_Ret1)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		Push(a_Arg8);
-		Push(a_Arg9);
-		Push(a_Arg10);
-		if (!CallFunction(1))
-		{
-			return false;
-		}
-		GetStackValue(-1, a_Ret1);
-		lua_pop(m_LuaState, 1);
-		return true;
-	}
-	
-	/** Call any 1-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
 
-	/** Call any 2-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
-
-	/** Call any 3-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3,
-		typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
-
-	/** Call any 4-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4,
-		typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
-
-	/** Call any 5-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
-		typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
-
-	/** Call any 6-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
-		typename ArgT6,
-		typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
-
-	/** Call any 7-param 2-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
-		typename ArgT6, typename ArgT7,
-		typename RetT1, typename RetT2
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		if (!CallFunction(2))
-		{
-			return false;
-		}
-		GetStackValue(-2, a_Ret1);
-		GetStackValue(-1, a_Ret2);
-		lua_pop(m_LuaState, 2);
-		return true;
-	}
-
-	/** Call any 7-param 3-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
-		typename ArgT6, typename ArgT7,
-		typename RetT1, typename RetT2, typename RetT3
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		if (!CallFunction(3))
-		{
-			return false;
-		}
-		GetStackValue(-3, a_Ret1);
-		GetStackValue(-2, a_Ret2);
-		GetStackValue(-1, a_Ret3);
-		lua_pop(m_LuaState, 3);
-		return true;
-	}
-
-	/** Call any 8-param 3-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
-		typename ArgT6, typename ArgT7, typename ArgT8,
-		typename RetT1, typename RetT2, typename RetT3
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		Push(a_Arg8);
-		if (!CallFunction(3))
-		{
-			return false;
-		}
-		GetStackValue(-3, a_Ret1);
-		GetStackValue(-2, a_Ret2);
-		GetStackValue(-1, a_Ret3);
-		lua_pop(m_LuaState, 3);
-		return true;
-	}
-
-	/** Call any 9-param 5-return Lua function in a single line: */
-	template<
-		typename FnT, typename ArgT1, typename ArgT2, typename ArgT3, typename ArgT4, typename ArgT5,
-		typename ArgT6, typename ArgT7, typename ArgT8, typename ArgT9, 
-		typename RetT1, typename RetT2, typename RetT3, typename RetT4, typename RetT5
-	>
-	bool Call(FnT a_FnName, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3, ArgT4 a_Arg4, ArgT5 a_Arg5, ArgT6 a_Arg6, ArgT7 a_Arg7, ArgT8 a_Arg8, ArgT9 a_Arg9, const cRet & a_Mark, RetT1 & a_Ret1, RetT2 & a_Ret2, RetT3 & a_Ret3, RetT4 & a_Ret4, RetT5 & a_Ret5)
-	{
-		UNUSED(a_Mark);
-		if (!PushFunction(a_FnName))
-		{
-			return false;
-		}
-		Push(a_Arg1);
-		Push(a_Arg2);
-		Push(a_Arg3);
-		Push(a_Arg4);
-		Push(a_Arg5);
-		Push(a_Arg6);
-		Push(a_Arg7);
-		Push(a_Arg8);
-		Push(a_Arg9);
-		if (!CallFunction(5))
-		{
-			return false;
-		}
-		GetStackValue(-5, a_Ret1);
-		GetStackValue(-4, a_Ret2);
-		GetStackValue(-3, a_Ret3);
-		GetStackValue(-2, a_Ret4);
-		GetStackValue(-1, a_Ret5);
-		lua_pop(m_LuaState, 5);
-		return true;
-	}
+	// Include the cLuaState::Call() overload implementation that is generated by the gen_LuaState_Call.lua script:
+	#include "LuaState_Call.inc"
 
 
 	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions */
