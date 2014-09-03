@@ -52,10 +52,21 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 	m_PluginInterface = &a_PluginInterface;
 	m_ChunkSink = &a_ChunkSink;
 
-	MTRand rnd;
-	m_Seed = a_IniFile.GetValueSetI("Seed", "Seed", (int)rnd.randInt());
+	// Get the seed; create a new one and log it if not found in the INI file:
+	if (a_IniFile.HasValue("Seed", "Seed"))
+	{
+		m_Seed = a_IniFile.GetValueI("Seed", "Seed");
+	}
+	else
+	{
+		MTRand rnd;
+		m_Seed = rnd.randInt();
+		LOGINFO("Chosen a new random seed for world: %d", m_Seed);
+		a_IniFile.SetValueI("Seed", "Seed", m_Seed);
+	}
+	
+	// Get the generator engine based on the INI file settings:
 	AString GeneratorName = a_IniFile.GetValueSet("Generator", "Generator", "Composable");
-
 	if (NoCaseCompare(GeneratorName, "Noise3D") == 0)
 	{
 		m_Generator = new cNoise3DGenerator(*this);
