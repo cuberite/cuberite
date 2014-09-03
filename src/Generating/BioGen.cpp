@@ -212,11 +212,12 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 // cBioGenMulticache:
 
 cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength) :
-m_CachesLength(a_CachesLength),
-m_InternalCacheLength(a_CachesLength * a_CacheSize)
+	m_CachesLength(a_CachesLength),
+	m_InternalCacheLength(a_CachesLength * a_CacheSize)
 {
 	m_Caches.reserve(m_InternalCacheLength);
-	for (size_t i = 0; i < m_InternalCacheLength; i++) {
+	for (size_t i = 0; i < m_InternalCacheLength; i++) 
+	{
 		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
 	}
 }

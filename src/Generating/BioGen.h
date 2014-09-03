@@ -87,12 +87,16 @@ class cBioGenMulticache :
 	typedef cBiomeGen super;
 
 public:
+	/* 
+		a_CacheSize defines the size of each singular cache
+		a_CachesLength defines how many caches are used for the multicache
+	*/
 	cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength);  // Doesn't take ownership of a_BioGenToCache
 	~cBioGenMulticache();
 
 protected:
-	size_t          m_CachesLength;
-	size_t          m_InternalCacheLength;
+	size_t          m_CachesLength; 
+	size_t          m_InternalCacheLength; // used internally only
 	std::vector<cBiomeGen*> m_Caches;
 
 	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
