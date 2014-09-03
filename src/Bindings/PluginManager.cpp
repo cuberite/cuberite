@@ -632,7 +632,7 @@ bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersi
 
 
 
-bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_PossibleEnchantments, cItem & a_Item)
+bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantments & a_PossibleEnchantments, cItem & a_Item)
 {
 	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_ENCHANTING);
 	if (Plugins == m_Hooks.end())

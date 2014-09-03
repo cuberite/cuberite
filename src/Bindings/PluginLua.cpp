@@ -615,7 +615,7 @@ bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const 
 
 
 
-bool cPluginLua::OnPreEnchanting(cPlayer & a_Player, cWeightedEnchantment & a_PossibleEnchantments, cItem & a_item)
+bool cPluginLua::OnPreEnchanting(cPlayer & a_Player, cWeightedEnchantments & a_PossibleEnchantments, cItem & a_item)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
