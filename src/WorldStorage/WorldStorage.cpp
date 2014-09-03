@@ -249,7 +249,7 @@ bool cWorldStorage::LoadOneChunk(void)
 		if (ToLoad.m_Generate)
 		{
 			// The chunk couldn't be loaded, generate it:
-			m_World->GetGenerator().QueueGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, true);
+			m_World->GetGenerator().QueueGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, false);
 		}
 		else
 		{
