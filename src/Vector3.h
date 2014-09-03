@@ -137,9 +137,9 @@ public:
 	inline Vector3<int> Floor(void) const
 	{
 		return Vector3<int>(
-			static_cast<int>(floor(x)),
-			static_cast<int>(floor(y)),
-			static_cast<int>(floor(z))
+			FloorC(x),
+			FloorC(y),
+			FloorC(z)
 		);
 	}
 
