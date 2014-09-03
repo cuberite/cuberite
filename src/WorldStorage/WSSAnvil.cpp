@@ -66,9 +66,6 @@ Since only the header is actually in the memory, this number can be high, but st
 */
 #define MAX_MCA_FILES 32
 
-/// The maximum size of an inflated chunk; raw chunk data is 192 KiB, allow 64 KiB more of entities
-#define CHUNK_INFLATE_MAX 256 KiB
-
 #define LOAD_FAILED(CHX, CHZ) \
 	{ \
 		const int RegionX = FAST_FLOOR_DIV(CHX, 32); \
@@ -260,27 +257,18 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 
 bool cWSSAnvil::LoadChunkFromData(const cChunkCoords & a_Chunk, const AString & a_Data)
 {
-	// Decompress the data:
-	char Uncompressed[CHUNK_INFLATE_MAX];
-	z_stream strm;
-	strm.zalloc = (alloc_func)NULL;
-	strm.zfree = (free_func)NULL;
-	strm.opaque = NULL;
-	inflateInit(&strm);
-	strm.next_out  = (Bytef *)Uncompressed;
-	strm.avail_out = sizeof(Uncompressed);
-	strm.next_in   = (Bytef *)a_Data.data();
-	strm.avail_in  = (uInt)a_Data.size();
-	int res = inflate(&strm, Z_FINISH);
-	inflateEnd(&strm);
-	if (res != Z_STREAM_END)
+	// Uncompress the data:
+	AString Uncompressed;
+	int res = InflateString(a_Data.data(), a_Data.size(), Uncompressed);
+	if (res != Z_OK)
 	{
+		LOGWARNING("Uncompressing chunk [%d, %d] failed: %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, res);
 		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	
 	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed, strm.total_out);
+	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
