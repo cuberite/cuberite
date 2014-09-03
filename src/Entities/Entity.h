@@ -27,9 +27,9 @@
 		return super::GetClass(); \
 	}
 
-#define POSX_TOINT (int)floor(GetPosX())
-#define POSY_TOINT (int)floor(GetPosY())
-#define POSZ_TOINT (int)floor(GetPosZ())
+#define POSX_TOINT FloorD(GetPosX())
+#define POSY_TOINT FloorD(GetPosY())
+#define POSZ_TOINT FloorD(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
