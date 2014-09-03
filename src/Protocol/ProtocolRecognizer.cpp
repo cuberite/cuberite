@@ -13,6 +13,7 @@
 #include "Protocol15x.h"
 #include "Protocol16x.h"
 #include "Protocol17x.h"
+#include "Protocol18x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -51,7 +52,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 	{
 		case PROTO_VERSION_1_2_5: return "1.2.5";
 		case PROTO_VERSION_1_3_2: return "1.3.2";
-		case PROTO_VERSION_1_4_2: return "1.4.2";
+		// case PROTO_VERSION_1_4_2: return "1.4.2";
 		case PROTO_VERSION_1_4_4: return "1.4.4";
 		case PROTO_VERSION_1_4_6: return "1.4.6";
 		case PROTO_VERSION_1_5_0: return "1.5";
@@ -62,6 +63,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_6_4: return "1.6.4";
 		case PROTO_VERSION_1_7_2: return "1.7.2";
 		case PROTO_VERSION_1_7_6: return "1.7.6";
+		case PROTO_VERSION_1_8_0: return "1.8";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -1014,6 +1016,27 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_8_0:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}

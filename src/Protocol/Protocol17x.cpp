@@ -1,10 +1,12 @@
+
 // Protocol17x.cpp
 
 /*
 Implements the 1.7.x protocol classes:
 	- cProtocol172
 		- release 1.7.2 protocol (#4)
-(others may be added later in the future for the 1.7 release series)
+	- cProtocol176
+		- release 1.7.6 protocol (#5)
 */
 
 #include "Globals.h"
@@ -1710,7 +1712,7 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Timestamp);
-	
+
 	cPacketizer Pkt(*this, 0x01);  // Ping packet
 	Pkt.WriteInt64(Timestamp);
 }

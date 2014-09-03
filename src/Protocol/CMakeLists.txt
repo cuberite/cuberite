@@ -14,6 +14,7 @@ SET (SRCS
 	Protocol15x.cpp
 	Protocol16x.cpp
 	Protocol17x.cpp
+	Protocol18x.cpp
 	ProtocolRecognizer.cpp)
 
 SET (HDRS
@@ -27,6 +28,7 @@ SET (HDRS
 	Protocol15x.h
 	Protocol16x.h
 	Protocol17x.h
+	Protocol18x.h
 	ProtocolRecognizer.h)
 
 if(NOT MSVC)

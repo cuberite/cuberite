@@ -5,7 +5,8 @@
 Declares the 1.7.x protocol classes:
 	- cProtocol172
 		- release 1.7.2 protocol (#4)
-(others may be added later in the future for the 1.7 release series)
+	- cProtocol176
+		- release 1.7.6 protocol (#5)
 */
 
 
@@ -198,6 +199,11 @@ protected:
 		{
 			m_Out.WriteVarUTF8String(a_Value);
 		}
+
+		void WritePosition(const Vector3i a_Position)
+		{
+			WriteInt64(((Int64)a_Position.x & 0x3FFFFFF) << 38 | ((Int64)a_Position.y & 0xFFF) << 26 | ((Int64)a_Position.z & 0x3FFFFFF));
+		}
 		
 		void WriteBuf(const char * a_Data, size_t a_Size)
 		{
@@ -258,12 +264,12 @@ protected:
 	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
 	
 	// Packet handlers while in the Status state (m_State == 1):
-	void HandlePacketStatusPing   (cByteBuffer & a_ByteBuffer);
+	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
 	
 	// Packet handlers while in the Login state (m_State == 2):
-	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
-	void HandlePacketLoginStart             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
 	
 	// Packet handlers while in the Game state (m_State == 3):
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
