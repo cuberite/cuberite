@@ -151,7 +151,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 		LOGD("BioGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
 		LOGD("BioGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
 	}
-	
+
 	for (int i = 0; i < m_CacheSize; i++)
 	{
 		if (
@@ -212,11 +212,10 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 // cBioGenMulticache:
 
 cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength) :
-	m_CachesLength(a_CachesLength),
-	m_InternalCacheLength(a_CachesLength * a_CacheSize)
+	m_CachesLength(a_CachesLength)
 {
-	m_Caches.reserve(m_InternalCacheLength);
-	for (size_t i = 0; i < m_InternalCacheLength; i++) 
+	m_Caches.reserve(a_CachesLength);
+	for (size_t i = 0; i < a_CachesLength; i++)
 	{
 		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
 	}
@@ -240,8 +239,8 @@ cBioGenMulticache::~cBioGenMulticache()
 
 void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	size_t cacheIdx = ((size_t)a_ChunkX % m_CachesLength) * m_CachesLength
-		+ ((size_t)a_ChunkZ % m_CachesLength);
+	const size_t coefficient = 3;
+	const size_t cacheIdx = ((size_t)a_ChunkX + coefficient * (size_t)a_ChunkZ) % m_CachesLength;
 
 	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 }
