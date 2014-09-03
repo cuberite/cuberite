@@ -223,10 +223,12 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_RAW_FISH:
 		case E_ITEM_RAW_PORKCHOP:
+        case E_ITEM_RAW_MUTTON:
 		case E_ITEM_RED_APPLE:
 		case E_ITEM_ROTTEN_FLESH:
 		case E_ITEM_SPIDER_EYE:
 		case E_ITEM_STEAK:
+        case E_ITEM_MUTTON:
 		{
 			return new cItemFoodHandler(a_ItemType);
 		}
