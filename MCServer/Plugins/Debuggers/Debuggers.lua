@@ -1566,7 +1566,7 @@ local PossibleItems =
 	cItem(E_ITEM_DIAMOND),
 	cItem(E_ITEM_GOLD),
 	cItem(E_ITEM_IRON),
-	cItem(E_ITEM_DYE, E_META_DYE_BLUE),  -- Lapis lazuli
+	cItem(E_ITEM_DYE, 1, E_META_DYE_BLUE),  -- Lapis lazuli
 	cItem(E_ITEM_COAL),
 }
 
@@ -1579,29 +1579,36 @@ function HandlePickups(a_Split, a_Player)
 	local PlayerY = a_Player:GetPosY()
 	local PlayerZ = a_Player:GetPosZ()
 	local World = a_Player:GetWorld()
-	local Range = 15
+	local Range = 12
 	for x = 0, Range do for z = 0, Range do
-		local x = PlayerX + x - Range / 2
-		local z = PlayerZ + z - Range / 2
+		local px = PlayerX + x - Range / 2
+		local pz = PlayerZ + z - Range / 2
 		local Items = cItems()
 		Items:Add(PossibleItems[math.random(#PossibleItems)])
-		World:SpawnItemPickups(Items, x, PlayerY, z, 0)
+		World:SpawnItemPickups(Items, px, PlayerY, pz, 0)
 	end end  -- for z, for x
+	return true
 end
 
 
 
 
 function HandlePoof(a_Split, a_Player)
-	local PlayerPos = a_Player:GetPos()
-	local Box = cBoundingBox(PlayerPos, a_Player:GetWidth() / 2, a_Player:GetHeight())
+	local PlayerPos = Vector3d(a_Player:GetPosition())  -- Create a copy of the position
+	PlayerPos.y = PlayerPos.y - 1
+	local Box = cBoundingBox(PlayerPos, 4, 2)
+	local NumEntities = 0
 	a_Player:GetWorld():ForEachEntityInBox(Box,
 		function (a_Entity)
-			local AddSpeed = PlayerPos - a_Entity:GetPosition()  -- Speed away from the player
-			a_Entity:AddSpeed(AddSpeed / AddSpeed:SqrLength())  -- The further away, the less speed to add
+			if not(a_Entity:IsPlayer()) then
+				local AddSpeed = a_Entity:GetPosition() - PlayerPos  -- Speed away from the player
+				a_Entity:AddSpeed(AddSpeed * 32 / (AddSpeed:SqrLength() + 1))  -- The further away, the less speed to add
+				NumEntities = NumEntities + 1
+			end
 		end
 	)
-	a_Player:SendMessage("Poof!")
+	a_Player:SendMessage("Poof! (" .. NumEntities .. " entities)")
+	return true
 end
 
 
