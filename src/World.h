@@ -324,6 +324,11 @@ public:
 	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true.
+	If any chunk in the box is missing, ignores the entities in that chunk silently. */
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false. */
 	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 

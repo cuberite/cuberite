@@ -36,6 +36,7 @@ class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
 class cSetChunkData;
+class cBoundingBox;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
@@ -208,6 +209,11 @@ public:
 
 	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
+
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true.
+	If any chunk in the box is missing, ignores the entities in that chunk silently. */
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Lua-accessible
 
 	/** Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates */
 	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);

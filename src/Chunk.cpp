@@ -37,6 +37,7 @@
 #include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
+#include "BoundingBox.h"
 
 #include "json/json.h"
 
@@ -1948,6 +1949,30 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_Entitites[]
+	return true;
+}
+
+
+
+
+
+bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	// The entity list is locked by the parent chunkmap's CS
+	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	{
+		++itr2;
+		cBoundingBox EntBox((*itr)->GetPosition(), (*itr)->GetWidth() / 2, (*itr)->GetHeight());
+		if (!EntBox.DoesIntersect(a_Box))
+		{
+			// The entity is not in the specified box
+			continue;
+		}
 		if (a_Callback.Item(*itr))
 		{
 			return false;

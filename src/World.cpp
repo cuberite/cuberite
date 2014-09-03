@@ -2696,6 +2696,15 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & 
 
 
 
+bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachEntityInBox(a_Box, a_Callback);
+}
+
+
+
+
+
 bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithEntityByID(a_UniqueID, a_Callback);
