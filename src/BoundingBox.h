@@ -80,6 +80,17 @@ public:
 	/// Calculates the intersection of the two bounding boxes; returns true if nonempty
 	bool Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Intersection);
 	
+	double GetMinX(void) const { return m_Min.x; }
+	double GetMinY(void) const { return m_Min.y; }
+	double GetMinZ(void) const { return m_Min.z; }
+
+	double GetMaxX(void) const { return m_Max.x; }
+	double GetMaxY(void) const { return m_Max.y; }
+	double GetMaxZ(void) const { return m_Max.z; }
+	
+	const Vector3d & GetMin(void) const { return m_Min; }
+	const Vector3d & GetMax(void) const { return m_Max; }
+	
 protected:
 	Vector3d m_Min;
 	Vector3d m_Max;
