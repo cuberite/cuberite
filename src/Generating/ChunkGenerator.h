@@ -116,7 +116,7 @@ public:
 	void Stop(void);
 
 	/// Queues the chunk for generation; removes duplicate requests
-	void QueueGenerateChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate);
 	
 	/// Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading.
 	void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
@@ -137,10 +137,10 @@ private:
 
 	int m_Seed;
 
-	cCriticalSection m_CS;
-	cChunkCoordsList m_Queue;
-	cEvent           m_Event;       ///< Set when an item is added to the queue or the thread should terminate
-	cEvent           m_evtRemoved;  ///< Set when an item is removed from the queue
+	cCriticalSection         m_CS;
+	cChunkCoordsWithBoolList m_Queue;
+	cEvent                   m_Event;       ///< Set when an item is added to the queue or the thread should terminate
+	cEvent                   m_evtRemoved;  ///< Set when an item is removed from the queue
 	
 	cGenerator * m_Generator;  ///< The actual generator engine used to generate chunks
 	
@@ -154,7 +154,7 @@ private:
 	// cIsThread override:
 	virtual void Execute(void) override;
 
-	void DoGenerate(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void DoGenerate(int a_ChunkX, int a_ChunkZ);
 };
 
 

@@ -351,16 +351,16 @@ public:
 	void RemoveClientFromChunkSender(cClientHandle * a_Client);
 	
 	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void TouchChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
-	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
 	void LoadChunks(const cChunkCoordsList & a_Chunks);
 	
 	/** Marks the chunk as failed-to-load: */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be NULL. Returns true if sign text changed. Same as UpdateSign() */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = NULL);  // Exported in ManualBindings.cpp
@@ -380,7 +380,7 @@ public:
 	/** Regenerate the given chunk: */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
-	/** Generates the given chunk, if not already generated */
+	/** Generates the given chunk */
 	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */

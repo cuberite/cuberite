@@ -141,9 +141,9 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 
 
-void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, bool a_Generate)
+void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, bool a_Generate)
 {
-	m_LoadQueue.EnqueueItem(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, a_Generate));
+	m_LoadQueue.EnqueueItem(sChunkLoad(a_ChunkX, a_ChunkZ, a_Generate));
 	m_Event.Set();
 }
 
@@ -151,9 +151,9 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, boo
 
 
 
-void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_SaveQueue.EnqueueItemIfNotPresent(cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ));
+	m_SaveQueue.EnqueueItemIfNotPresent(cChunkCoords(a_ChunkX, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -161,9 +161,9 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 
 
 
-void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkZ)
 {
-	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkY, a_ChunkZ, true));
+	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkZ, true));
 }
 
 
@@ -242,19 +242,19 @@ void cWorldStorage::Execute(void)
 
 bool cWorldStorage::LoadOneChunk(void)
 {
-	sChunkLoad ToLoad(0, 0, 0, false);
+	sChunkLoad ToLoad(0, 0, false);
 	bool ShouldLoad = m_LoadQueue.TryDequeueItem(ToLoad);
-	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ))
+	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ))
 	{
 		if (ToLoad.m_Generate)
 		{
 			// The chunk couldn't be loaded, generate it:
-			m_World->GetGenerator().QueueGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+			m_World->GetGenerator().QueueGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, false);
 		}
 		else
 		{
 			// TODO: Notify the world that the load has failed:
-			// m_World->ChunkLoadFailed(ToLoad.m_ChunkX, ToLoad.m_ChunkY, ToLoad.m_ChunkZ);
+			// m_World->ChunkLoadFailed(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
 		}
 	}
 	return ShouldLoad;
@@ -266,7 +266,7 @@ bool cWorldStorage::LoadOneChunk(void)
 
 bool cWorldStorage::SaveOneChunk(void)
 {
-	cChunkCoords ToSave(0, 0, 0);
+	cChunkCoords ToSave(0, 0);
 	bool ShouldSave = m_SaveQueue.TryDequeueItem(ToSave);
 	if (ShouldSave && m_World->IsChunkValid(ToSave.m_ChunkX, ToSave.m_ChunkZ))
 	{
@@ -283,7 +283,7 @@ bool cWorldStorage::SaveOneChunk(void)
 
 
 
-bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	if (m_World->IsChunkValid(a_ChunkX, a_ChunkZ))
 	{
@@ -291,7 +291,7 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 		return true;
 	}
 	
-	cChunkCoords Coords(a_ChunkX, a_ChunkY, a_ChunkZ);
+	cChunkCoords Coords(a_ChunkX, a_ChunkZ);
 
 	// First try the schema that is used for saving
 	if (m_SaveSchema->LoadChunk(Coords))
@@ -309,7 +309,7 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	}
 	
 	// Notify the chunk owner that the chunk failed to load (sets cChunk::m_HasLoadFailed to true):
-	m_World->ChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_World->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
 	
 	return false;
 }
