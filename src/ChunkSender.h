@@ -95,13 +95,11 @@ protected:
 	struct sSendChunk
 	{
 		int m_ChunkX;
-		int m_ChunkY;
 		int m_ChunkZ;
 		cClientHandle * m_Client;
 		
-		sSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client) :
+		sSendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client) :
 			m_ChunkX(a_ChunkX),
-			m_ChunkY(a_ChunkY),
 			m_ChunkZ(a_ChunkZ),
 			m_Client(a_Client)
 		{
@@ -111,7 +109,6 @@ protected:
 		{
 			return (
 				(a_Other.m_ChunkX == m_ChunkX) &&
-				(a_Other.m_ChunkY == m_ChunkY) &&
 				(a_Other.m_ChunkZ == m_ChunkZ) &&
 				(a_Other.m_Client == m_Client)
 			);
@@ -162,7 +159,7 @@ protected:
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
 	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == NULL
-	void SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client);
+	void SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 } ;
 
 

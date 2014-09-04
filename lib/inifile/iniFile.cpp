@@ -668,6 +668,24 @@ void cIniFile::Clear(void)
 
 
 
+bool cIniFile::HasValue(const AString & a_KeyName, const AString & a_ValueName)
+{
+	// Find the key:
+	int keyID = FindKey(a_KeyName);
+	if (keyID == noID)
+	{
+		return false;
+	}
+	
+	// Find the value:
+	int valueID = FindValue(keyID, a_ValueName);
+	return (valueID != noID);
+}
+
+
+
+
+
 void cIniFile::AddHeaderComment(const AString & comment)
 {
 	comments.push_back(comment);

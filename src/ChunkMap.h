@@ -276,16 +276,16 @@ public:
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void TouchChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
-	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
 	void LoadChunks(const cChunkCoordsList & a_Chunks);
 
 	/** Marks the chunk as failed-to-load */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
@@ -369,7 +369,7 @@ private:
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ);
 		
 		/** Returns the specified chunk, or NULL if not created yet */
 		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
@@ -462,9 +462,9 @@ private:
 
 	std::auto_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
-	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Doesn't load, doesn't generate
+	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
+	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
+	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);  // Doesn't load, doesn't generate
 	
 	/** Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
