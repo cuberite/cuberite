@@ -146,6 +146,7 @@ protected:
 			m_Lock(a_Protocol.m_CSPacket)
 		{
 			m_Out.WriteVarInt(a_PacketType);
+			LOG("Send packet %i", a_PacketType);
 		}
 		
 		~cPacketizer();
@@ -211,6 +212,7 @@ protected:
 		}
 		
 		void WriteItem(const cItem & a_Item);
+		void WriteItem180(const cItem & a_Item);
 		void WriteByteAngle(double a_Angle);  // Writes the specified angle using a single byte
 		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
 		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
@@ -277,21 +279,21 @@ protected:
 	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
-	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketClientStatus   (cByteBuffer & a_ByteBuffer);
 	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
-	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
-	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEntityAction   (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketKeepAlive      (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
-	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerPos      (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerPosLook  (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPluginMessage  (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSteerVehicle   (cByteBuffer & a_ByteBuffer);
 	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
-	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketUseEntity      (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);

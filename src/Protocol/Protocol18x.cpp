@@ -11,6 +11,7 @@ Implements the 1.8.x protocol classes:
 #include "Globals.h"
 #include "Bindings/PluginManager.h"
 #include "json/json.h"
+#include "ChunkDataSerializer.h"
 #include "Protocol18x.h"
 
 #include "../ClientHandle.h"
@@ -20,14 +21,25 @@ Implements the 1.8.x protocol classes:
 #include "../World.h"
 
 #include "../Entities/Player.h"
+#include "Entities/Painting.h"
 
-class cProtocol176;
+
+
+
+
+#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	if (!ByteBuf.Proc(Var))\
+	{\
+		return;\
+	}
 
 
 
 
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+class cProtocol176;
 
 
 
@@ -39,6 +51,347 @@ const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should b
 cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
+}
+
+
+
+
+
+void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	/*cPacketizer Pkt(*this, 0x2A);
+	Pkt.WriteString(a_ParticleName);
+	Pkt.WriteFloat(a_SrcX);
+	Pkt.WriteFloat(a_SrcY);
+	Pkt.WriteFloat(a_SrcZ);
+	Pkt.WriteFloat(a_OffsetX);
+	Pkt.WriteFloat(a_OffsetY);
+	Pkt.WriteFloat(a_OffsetZ);
+	Pkt.WriteFloat(a_ParticleData);
+	Pkt.WriteInt(a_ParticleAmmount);*/
+}
+
+
+
+
+
+void cProtocol180::SendPlayerMoveLook(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteDouble(Player->GetPosX());
+	
+	// The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteDouble(Player->GetStance() + 0.001);
+	
+	Pkt.WriteDouble(Player->GetPosZ());
+	Pkt.WriteFloat((float)Player->GetYaw());
+	Pkt.WriteFloat((float)Player->GetPitch());
+	Pkt.WriteByte(0);
+}
+
+
+
+
+
+void cProtocol180::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x0a);
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WritePosition(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+}
+
+
+
+
+
+void cProtocol180::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x0d);  // Collect Item packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteVarInt(a_Player.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol180::SendEntityVelocity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
+	Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
+	Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
+	Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
+}
+
+
+
+
+
+void cProtocol180::SendDestroyEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x13);  // Destroy Entities packet
+	Pkt.WriteVarInt(1);
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+}
+
+
+
+
+
+void cProtocol180::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x15);  // Entity Relative Move packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_RelX);
+	Pkt.WriteByte(a_RelY);
+	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+}
+
+
+
+
+
+void cProtocol180::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x17);  // Entity Look And Relative Move packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_RelX);
+	Pkt.WriteByte(a_RelY);
+	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+}
+
+
+
+
+
+void cProtocol180::SendEntityLook(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x16);  // Entity Look packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+}
+
+
+
+
+
+void cProtocol180::SendTeleportEntity(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x18);
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(a_Entity.GetPosY());
+	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(a_Entity.GetPitch());
+	Pkt.WriteBool(true);  // TODO: IsOnGrond() on entities
+}
+
+
+
+
+
+void cProtocol180::SendEntityHeadLook(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x19);  // Entity Head Look packet
+	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
+	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
+}
+
+
+
+
+
+void cProtocol180::SendEntityMetadata(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteEntityMetadata(a_Entity);
+	Pkt.WriteByte(0x7f);  // The termination byte
+}
+
+
+
+
+
+void cProtocol180::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x1D);  // Entity Effect packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_EffectID);
+	Pkt.WriteByte(a_Amplifier);
+	Pkt.WriteVarInt((UInt32)a_Duration);
+	Pkt.WriteBool(false);  // Hide particles
+}
+
+
+
+
+
+void cProtocol180::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x1e);
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteByte(a_EffectID);
+}
+
+
+
+
+
+void cProtocol180::SendEntityProperties(const cEntity & a_Entity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x20);  // Entity Properties packet
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteEntityProperties(a_Entity);
+}
+
+
+
+
+
+void cProtocol180::SendKeepAlive(int a_PingID)
+{
+	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
+	if (m_State != 3)
+	{
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		return;
+	}
+	
+	cPacketizer Pkt(*this, 0x00);  // Keep Alive packet
+	Pkt.WriteVarInt(a_PingID);
+}
+
+
+
+
+
+void cProtocol180::SendHealth(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x06);  // Update Health packet
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteFloat((float)Player->GetHealth());
+	Pkt.WriteVarInt((UInt32)Player->GetFoodLevel());
+	Pkt.WriteFloat((float)Player->GetFoodSaturationLevel());
+}
+
+
+
+
+
+void cProtocol180::SendExperience(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x1f);  // Experience Packet
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteFloat(Player->GetXpPercentage());
+	Pkt.WriteVarInt((UInt32)Player->GetXpLevel());
+	Pkt.WriteVarInt((UInt32)Player->GetCurrentXp());
+}
+
+
+
+
+
+void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
+	Pkt.WriteVarInt(a_Painting.GetUniqueID());
+	Pkt.WriteString(a_Painting.GetName().c_str());
+	Pkt.WritePosition(Vector3i(a_Painting.GetPosX(), a_Painting.GetPosY(), a_Painting.GetPosZ()));
+	Pkt.WriteChar(a_Painting.GetDirection());
+}
+
+
+
+
+
+void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	/*cPacketizer Pkt(*this, 0x3f);
+	Pkt.WriteString(a_Channel);
+	Pkt.WriteBuf(a_Message.data(), a_Message.size());*/
+}
+
+
+
+
+
+void cProtocol180::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
+	Pkt.WriteInt(a_ChunkX);
+	Pkt.WriteInt(a_ChunkZ);
+	Pkt.WriteBool(true);
+	Pkt.WriteShort(0);  // Primary bitmap
+	Pkt.WriteVarInt(0);  // Data size
+}
+
+
+
+
+
+void cProtocol180::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	/*// Serialize first, before creating the Packetizer (the packetizer locks a CS)
+	// This contains the flags and bitmasks, too
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0);
+
+	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
+	Pkt.WriteInt(a_ChunkX);
+	Pkt.WriteInt(a_ChunkZ);
+	Pkt.WriteBuf(ChunkData.data(), ChunkData.size());*/
 }
 
 
@@ -64,7 +417,7 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x22);  // Multi Block Change packet
+	/*cPacketizer Pkt(*this, 0x22);  // Multi Block Change packet
 	Pkt.WriteInt(a_ChunkX);
 	Pkt.WriteInt(a_ChunkZ);
 	Pkt.WriteVarInt((UInt32)a_Changes.size());
@@ -75,7 +428,7 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 
 		UInt32 Block = ((UInt32)itr->BlockType << 4) | ((UInt32)itr->BlockMeta & 15);
 		Pkt.WriteVarInt(Block);
-	}  // for itr - a_Changes[]
+	}  // for itr - a_Changes[]*/
 }
 
 
@@ -204,10 +557,10 @@ void cProtocol180::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
+	/*cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
 	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
 	Pkt.WriteShort(a_SlotNum);
-	Pkt.WriteItem(a_Item);
+	Pkt.WriteItem(a_Item);*/
 }
 
 
@@ -239,6 +592,50 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	
 	// Send player abilities:
 	SendPlayerAbilities();
+}
+
+
+
+
+
+void cProtocol180::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadChar, char, ActionID);
+	switch (ActionID)
+	{
+		case 0:
+		{
+			// Respawn
+			m_Client->HandleRespawn();
+			break;
+		}
+		case 1:
+		{
+			// Request stats
+			const cStatManager & Manager = m_Client->GetPlayer()->GetStatManager();
+			SendStatistics(Manager);
+
+			break;
+		}
+		case 2:
+		{
+			// Open Inventory achievement
+			m_Client->GetPlayer()->AwardAchievement(achOpenInv);
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
+	AString Data;
+	a_ByteBuffer.ReadAll(Data);
+	m_Client->HandlePluginMessage(Channel, Data);
 }
 
 
@@ -378,6 +775,122 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	
 	StartEncryption(DecryptedKey);
 	m_Client->HandleLogin(4, m_Client->GetUsername());
+}
+
+
+
+
+
+void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Forward);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Sideways);
+	HANDLE_READ(a_ByteBuffer, ReadChar,    char,  Flags);
+
+	if ((Flags & 0x2) != 0)
+	{
+		m_Client->HandleUnmount();
+	}
+	else if ((Flags & 0x1) != 0)
+	{
+		m_Client->HandleSteerVehicle(Forward, Sideways);
+	}
+}
+
+
+
+
+
+void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32,  PlayerID);
+	HANDLE_READ(a_ByteBuffer, ReadChar,   char,    Action);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32,  JumpBoost);
+
+	switch (Action)
+	{
+		case 0: m_Client->HandleEntityCrouch(PlayerID, true);     break;  // Crouch
+		case 1: m_Client->HandleEntityCrouch(PlayerID, false);    break;  // Uncrouch
+		case 2: m_Client->HandleEntityLeaveBed(PlayerID);         break;  // Leave Bed
+		case 3: m_Client->HandleEntitySprinting(PlayerID, true);  break;  // Start sprinting
+		case 4: m_Client->HandleEntitySprinting(PlayerID, false); break;  // Stop sprinting
+	}
+}
+
+
+
+
+
+void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, EntityID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Type);
+
+	switch (Type)
+	{
+		case 0:
+		{
+			m_Client->HandleUseEntity((int)EntityID, false);
+			break;
+		}
+		case 1:
+		{
+			m_Client->HandleUseEntity((int)EntityID, true);
+			break;
+		}
+		case 2:
+		{
+			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetX);
+			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
+			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
+
+			// TODO: Do anything
+			break;
+		}
+		default:
+		{
+			ASSERT(!"Unhandled use entity type!");
+			return;
+		}
+	}
+}
+
+
+
+
+
+void cProtocol180::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, KeepAliveID);
+	m_Client->HandleKeepAlive((int)KeepAliveID);
+}
+
+
+
+
+
+void cProtocol180::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
+	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+	m_Client->HandlePlayerPos(PosX, PosY, PosZ, PosY + 1.62, IsOnGround);
+}
+
+
+
+
+
+void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
+	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
+	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
 }
 
 

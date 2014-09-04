@@ -43,6 +43,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version)
 	{
 		case RELEASE_1_2_5: Serialize29(data); break;
 		case RELEASE_1_3_2: Serialize39(data); break;
+		case RELEASE_1_8_0: Serialize80(data); break;
 		// TODO: Other protocol versions may serialize the data differently; implement here
 		
 		default:
@@ -169,6 +170,69 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	// Unlike 29, 39 doesn't have the "unused" int
 	
 	a_Data.append(CompressedBlockData, CompressedSize);
+}
+
+
+
+
+
+void cChunkDataSerializer::Serialize80(AString & a_Data)
+{
+	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib *can* stream)
+
+	// Blocktypes converter (1.8 included the meta into the blocktype):
+	unsigned short Blocks[ARRAYCOUNT(m_BlockTypes)];
+	for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
+	{
+		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
+		{
+			for (int RelY = 0; RelY < cChunkDef::Height; RelY++)
+			{
+				int Index = cChunkDef::MakeIndexNoCheck(RelX, RelY, RelZ);
+				BLOCKTYPE BlockType = m_BlockTypes[Index];
+				NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
+
+				Blocks[Index] = ((unsigned short)BlockType << 4) | ((unsigned short)BlockMeta & 15);
+			}
+		}
+	}
+
+	const int BiomeDataSize    = cChunkDef::Width * cChunkDef::Width;
+	const int BlockLightOffset = sizeof(Blocks);
+	const int SkyLightOffset   = BlockLightOffset + sizeof(m_BlockLight);
+	const int BiomeOffset      = SkyLightOffset   + sizeof(m_BlockSkyLight);
+	const int DataSize         = BiomeOffset      + BiomeDataSize;
+
+	// Temporary buffer for the composed data:
+	char AllData [DataSize];
+	memcpy(AllData, Blocks, sizeof(Blocks));
+	memcpy(AllData + BlockLightOffset, m_BlockLight,    sizeof(m_BlockLight));
+	memcpy(AllData + SkyLightOffset,   m_BlockSkyLight, sizeof(m_BlockSkyLight));
+	memcpy(AllData + BiomeOffset,      m_BiomeData,     BiomeDataSize);
+
+	// Put all those data into a_Data:
+	a_Data.push_back('\x01');  // "Ground-up continuous", or rather, "biome data present" flag
+
+	// Two bitmaps; we're aways sending the full chunk with no additional data, so the bitmaps are 0xffff and 0, respectively
+	// Also, no endian flipping is needed because of the const values
+	unsigned short BitMap = 0xffff;
+	a_Data.append((const char *)&BitMap, sizeof(short));
+
+	// Write chunk size:
+	UInt32 ChunkSize = htonl((UInt32)DataSize);
+
+	unsigned char b[5];  // // A 32-bit integer can be encoded by at most 5 bytes
+	size_t idx = 0;
+	UInt32 Value = ChunkSize;
+	do
+	{
+		b[idx] = (Value & 0x7f) | ((Value > 0x7f) ? 0x80 : 0x00);
+		Value = Value >> 7;
+		idx++;
+	} while (Value > 0);
+	a_Data.append((const char *)b, idx);
+
+	a_Data.append(AllData, ChunkSize);  // Chunk data
 }
 
 
