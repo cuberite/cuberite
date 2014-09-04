@@ -1789,7 +1789,7 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback &
 	{
 		for (int x = MinChunkX; x <= MaxChunkX; x++)
 		{
-			cChunkPtr Chunk = GetChunkNoGen(x, ZERO_CHUNK_Y, z);
+			cChunkPtr Chunk = GetChunkNoGen(x, z);
 			if ((Chunk == NULL) || !Chunk->IsValid())
 			{
 				continue;
