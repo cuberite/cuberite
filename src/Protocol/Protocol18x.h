@@ -54,6 +54,9 @@ public:
 
 	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
+	virtual void SendLoginSuccess        (void) override;
+	virtual void SendPlayerAbilities     (void) override {}
+	virtual void SendWindowClose         (const cWindow & a_Window) override {}
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override {}
 	virtual void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override {}
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override {}
@@ -105,6 +108,7 @@ protected:
 	virtual void HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketClientSettings(cByteBuffer & a_ByteBuffer) override;
 } ;
 
 

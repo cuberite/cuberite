@@ -182,19 +182,11 @@ void cChunkDataSerializer::Serialize80(AString & a_Data)
 
 	// Blocktypes converter (1.8 included the meta into the blocktype):
 	unsigned short Blocks[ARRAYCOUNT(m_BlockTypes)];
-	for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
+	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
 	{
-		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
-		{
-			for (int RelY = 0; RelY < cChunkDef::Height; RelY++)
-			{
-				int Index = cChunkDef::MakeIndexNoCheck(RelX, RelY, RelZ);
-				BLOCKTYPE BlockType = m_BlockTypes[Index];
-				NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
-
-				Blocks[Index] = ((unsigned short)BlockType << 4) | ((unsigned short)BlockMeta & 15);
-			}
-		}
+		BLOCKTYPE BlockType = m_BlockTypes[Index];
+		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
+		Blocks[Index] = ((unsigned short)BlockType << 4) | ((unsigned short)BlockMeta);
 	}
 
 	const int BiomeDataSize    = cChunkDef::Width * cChunkDef::Width;
@@ -216,23 +208,13 @@ void cChunkDataSerializer::Serialize80(AString & a_Data)
 	// Two bitmaps; we're aways sending the full chunk with no additional data, so the bitmaps are 0xffff and 0, respectively
 	// Also, no endian flipping is needed because of the const values
 	unsigned short BitMap = 0xffff;
-	a_Data.append((const char *)&BitMap, sizeof(short));
+	a_Data.append((const char *)&BitMap, sizeof(unsigned short));
 
 	// Write chunk size:
 	UInt32 ChunkSize = htonl((UInt32)DataSize);
+	a_Data.append((const char *)&ChunkSize, 4);
 
-	unsigned char b[5];  // // A 32-bit integer can be encoded by at most 5 bytes
-	size_t idx = 0;
-	UInt32 Value = ChunkSize;
-	do
-	{
-		b[idx] = (Value & 0x7f) | ((Value > 0x7f) ? 0x80 : 0x00);
-		Value = Value >> 7;
-		idx++;
-	} while (Value > 0);
-	a_Data.append((const char *)b, idx);
-
-	a_Data.append(AllData, ChunkSize);  // Chunk data
+	a_Data.append(AllData, DataSize);  // Chunk data
 }
 
 

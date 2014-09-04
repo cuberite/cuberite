@@ -57,6 +57,29 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 
 
 
+void cProtocol180::SendLoginSuccess(void)
+{
+	ASSERT(m_State == 2);  // State: login?
+
+	// Disable compression:
+	{
+		cPacketizer Pkt(*this, 0x03);  // Set compression packet
+		Pkt.WriteVarInt(-1);
+	}
+
+	{
+		cPacketizer Pkt(*this, 0x02);  // Login success packet
+		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
+		Pkt.WriteString(m_Client->GetUsername());
+	}
+
+	m_State = 3;  // State = Game
+}
+
+
+
+
+
 void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -81,7 +104,7 @@ void cProtocol180::SendPlayerMoveLook(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
+	/*cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteDouble(Player->GetPosX());
 	
@@ -91,7 +114,7 @@ void cProtocol180::SendPlayerMoveLook(void)
 	Pkt.WriteDouble(Player->GetPosZ());
 	Pkt.WriteFloat((float)Player->GetYaw());
 	Pkt.WriteFloat((float)Player->GetPitch());
-	Pkt.WriteByte(0);
+	Pkt.WriteByte(0);*/
 }
 
 
@@ -128,12 +151,12 @@ void cProtocol180::SendEntityVelocity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
+	/*cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
 	Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
-	Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
+	Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));*/
 }
 
 
@@ -144,9 +167,9 @@ void cProtocol180::SendDestroyEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x13);  // Destroy Entities packet
+	/*cPacketizer Pkt(*this, 0x13);  // Destroy Entities packet
 	Pkt.WriteVarInt(1);
-	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());*/
 }
 
 
@@ -157,12 +180,12 @@ void cProtocol180::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x15);  // Entity Relative Move packet
+	/*cPacketizer Pkt(*this, 0x15);  // Entity Relative Move packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByte(a_RelX);
 	Pkt.WriteByte(a_RelY);
 	Pkt.WriteByte(a_RelZ);
-	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities*/
 }
 
 
@@ -173,14 +196,14 @@ void cProtocol180::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x17);  // Entity Look And Relative Move packet
+	/*cPacketizer Pkt(*this, 0x17);  // Entity Look And Relative Move packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByte(a_RelX);
 	Pkt.WriteByte(a_RelY);
 	Pkt.WriteByte(a_RelZ);
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities*/
 }
 
 
@@ -191,11 +214,11 @@ void cProtocol180::SendEntityLook(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x16);  // Entity Look packet
+	/*cPacketizer Pkt(*this, 0x16);  // Entity Look packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities*/
 }
 
 
@@ -206,14 +229,14 @@ void cProtocol180::SendTeleportEntity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x18);
+	/*cPacketizer Pkt(*this, 0x18);
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
 	Pkt.WriteFPInt(a_Entity.GetPosZ());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(true);  // TODO: IsOnGrond() on entities
+	Pkt.WriteBool(true);  // TODO: IsOnGrond() on entities*/
 }
 
 
@@ -224,9 +247,9 @@ void cProtocol180::SendEntityHeadLook(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x19);  // Entity Head Look packet
+	/*cPacketizer Pkt(*this, 0x19);  // Entity Head Look packet
 	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
-	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
+	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());*/
 }
 
 
@@ -237,10 +260,10 @@ void cProtocol180::SendEntityMetadata(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
+	/*cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteEntityMetadata(a_Entity);
-	Pkt.WriteByte(0x7f);  // The termination byte
+	Pkt.WriteByte(0x7f);  // The termination byte*/
 }
 
 
@@ -340,11 +363,11 @@ void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
+	/*cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
 	Pkt.WriteVarInt(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName().c_str());
 	Pkt.WritePosition(Vector3i(a_Painting.GetPosX(), a_Painting.GetPosY(), a_Painting.GetPosZ()));
-	Pkt.WriteChar(a_Painting.GetDirection());
+	Pkt.WriteChar(a_Painting.GetDirection());*/
 }
 
 
@@ -384,14 +407,14 @@ void cProtocol180::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	/*// Serialize first, before creating the Packetizer (the packetizer locks a CS)
+	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
 	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0);
 
 	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
 	Pkt.WriteInt(a_ChunkX);
 	Pkt.WriteInt(a_ChunkZ);
-	Pkt.WriteBuf(ChunkData.data(), ChunkData.size());*/
+	Pkt.WriteBuf(ChunkData.data(), ChunkData.size());
 }
 
 
@@ -451,7 +474,7 @@ void cProtocol180::SendChat(const AString & a_Message)
 void cProtocol180::SendChat(const cCompositeChat & a_Message)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	// Compose the complete Json string to send:
 	Json::Value msg;
 	cWorld * World = m_Client->GetPlayer()->GetWorld();
@@ -634,7 +657,10 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	AString Data;
-	a_ByteBuffer.ReadAll(Data);
+	if (!a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1))
+	{
+		return;
+	}
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -891,6 +917,22 @@ void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
 	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
 	m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, PosY + 1.62, Yaw, Pitch, IsOnGround);
+}
+
+
+
+
+
+void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ViewDistance);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatFlags);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatColors);
+	HANDLE_READ(a_ByteBuffer, ReadChar,          char,    SkinFlags);
+	
+	m_Client->SetLocale(Locale);
+	// TODO: Handle other values
 }
 
 
