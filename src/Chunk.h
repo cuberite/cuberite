@@ -216,6 +216,10 @@ public:
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
 
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true. */
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Lua-accessible
+
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
 

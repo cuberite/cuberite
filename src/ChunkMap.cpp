@@ -1775,6 +1775,38 @@ bool cChunkMap::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback
 
 
 
+bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	// Calculate the chunk range for the box:
+	int MinChunkX = (int)floor(a_Box.GetMinX() / cChunkDef::Width);
+	int MinChunkZ = (int)floor(a_Box.GetMinZ() / cChunkDef::Width);
+	int MaxChunkX = (int)floor((a_Box.GetMaxX() + cChunkDef::Width) / cChunkDef::Width);
+	int MaxChunkZ = (int)floor((a_Box.GetMaxZ() + cChunkDef::Width) / cChunkDef::Width);
+	
+	// Iterate over each chunk in the range:
+	cCSLock Lock(m_CSLayers);
+	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
+	{
+		for (int x = MinChunkX; x <= MaxChunkX; x++)
+		{
+			cChunkPtr Chunk = GetChunkNoGen(x, z);
+			if ((Chunk == NULL) || !Chunk->IsValid())
+			{
+				continue;
+			}
+			if (!Chunk->ForEachEntityInBox(a_Box, a_Callback))
+			{
+				return false;
+			}
+		}  // for x
+	}  // for z
+	return true;
+}
+
+
+
+
+
 void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlocksAffected)
 {
 	// Don't explode if outside of Y range (prevents the following test running into unallocated memory):
