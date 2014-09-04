@@ -2905,7 +2905,13 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	
 	// Store the header:
 	ChunkSize = ((u_long)a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
-	ASSERT(ChunkSize < 256);
+	if (ChunkSize > 255)
+	{
+		LOGWARNING("Cannot save chunk [%d, %d], the data is too large (%u KiB, maximum is 1024 KiB). Remove some entities and retry.",
+			a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, (unsigned)(ChunkSize * 4)
+		);
+		return false;
+	}
 	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
 	if (m_File.Seek(0) < 0)
 	{
