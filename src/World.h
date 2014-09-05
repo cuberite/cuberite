@@ -279,7 +279,12 @@ public:
 	/** Gets the chunk's blocks, only the block types */
 	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 	
-	bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) const;
+	/** Returns true iff the chunk is in the loader / generator queue. */
+	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
+
+	/** Returns true iff the chunk is present and valid. */
+	bool IsChunkValid(int a_ChunkX, int a_ChunkZ) const;
+
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
@@ -357,12 +362,6 @@ public:
 	
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
-	
-	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
-	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
-	
-	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
-	void LoadChunks(const cChunkCoordsList & a_Chunks);
 	
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
@@ -822,6 +821,7 @@ private:
 		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
 		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
 		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
+		virtual bool IsChunkQueued     (int a_ChunkX, int a_ChunkZ) override;
 		
 		// cPluginInterface overrides:
 		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;

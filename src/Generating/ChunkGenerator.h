@@ -106,6 +106,10 @@ public:
 		If this callback returns false, the chunk is not generated.
 		*/
 		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) = 0;
+
+		/** Called to check whether the specified chunk is in the queued state.
+		Currently used only in Debug-mode asserts. */
+		virtual bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) = 0;
 	} ;
 	
 

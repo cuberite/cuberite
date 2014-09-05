@@ -143,6 +143,8 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, bool a_Generate)
 {
+	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
+
 	m_LoadQueue.EnqueueItem(sChunkLoad(a_ChunkX, a_ChunkZ, a_Generate));
 	m_Event.Set();
 }
@@ -153,6 +155,8 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, bool a_Generate)
 
 void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 {
+	ASSERT(m_World->IsChunkValid(a_ChunkX, a_ChunkZ));
+
 	m_SaveQueue.EnqueueItemIfNotPresent(cChunkCoords(a_ChunkX, a_ChunkZ));
 	m_Event.Set();
 }
@@ -244,6 +248,7 @@ bool cWorldStorage::LoadOneChunk(void)
 {
 	sChunkLoad ToLoad(0, 0, false);
 	bool ShouldLoad = m_LoadQueue.TryDequeueItem(ToLoad);
+
 	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ))
 	{
 		if (ToLoad.m_Generate)
@@ -285,11 +290,7 @@ bool cWorldStorage::SaveOneChunk(void)
 
 bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	if (m_World->IsChunkValid(a_ChunkX, a_ChunkZ))
-	{
-		// Already loaded (can happen, since the queue is async)
-		return true;
-	}
+	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
 	
 	cChunkCoords Coords(a_ChunkX, a_ChunkZ);
 

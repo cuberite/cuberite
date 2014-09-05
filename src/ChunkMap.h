@@ -133,6 +133,9 @@ public:
 	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
 	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 	
+	/** Returns true iff the chunk is in the loader / generator queue. */
+	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ);
+
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
 	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
@@ -278,12 +281,6 @@ public:
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
 	
-	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
-	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
-	
-	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
-	void LoadChunks(const cChunkCoordsList & a_Chunks);
-
 	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 	
