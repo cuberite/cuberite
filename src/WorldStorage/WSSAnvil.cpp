@@ -323,7 +323,13 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		return false;
 	}
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
-	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List) || (a_NBT.GetChildrenType(Sections) != TAG_Compound))
+	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
+	{
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		return false;
+	}
+	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
+	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
 		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
