@@ -1,6 +1,7 @@
 body
 {
 	font-family: Calibri, Helvetica;
+	transition: all 300ms;
 }
 
 header
@@ -36,7 +37,6 @@ h2
 #nodownload
 {
 	font-size: 1;
-	transition: 300ms all;
 }
 .downloadosimage
 {
@@ -54,19 +54,22 @@ h2
 	position: relative;
 	margin-left: auto;
 	margin-right: auto;
-	width: 80px;
-	height: 70px;
+	width: 470px;
+	height: 0px;
 	padding-top: 10px;
 	padding-bottom: 5px;
 	transition: 300ms all;
 	text-align: center;
 	overflow: hidden;
+	visibility: hidden;
+	border: 1px solid white;
+	border-radius: 10px;
+	background: white;
+	transition: all 300ms;
 }
+#downloadblockwindows { top: -18px;}
+#downloadblockmacintosh { top: -36px; margin-bottom: -36px; }
 
-.notdisplayed
-{
-	display: none;
-}
 .downloaditem
 {
 	padding: 5px 5px;
