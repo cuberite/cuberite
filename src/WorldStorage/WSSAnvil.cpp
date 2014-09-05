@@ -589,7 +589,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 
 		// Get the BlockEntity's position
 		int x, y, z;
-		if (!GetBlockEntityNBTPos(a_NBT, Child, x, y, z))
+		if (!GetBlockEntityNBTPos(a_NBT, Child, x, y, z) || (y < 0) || (y >= cChunkDef::Height))
 		{
 			LOGWARNING("Bad block entity, missing the coords. Will be ignored.");
 			continue;
