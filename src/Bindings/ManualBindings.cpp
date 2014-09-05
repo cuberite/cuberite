@@ -679,6 +679,75 @@ static int tolua_ForEachInChunk(lua_State * tolua_S)
 template <
 	class Ty1,
 	class Ty2,
+	bool (Ty1::*Func1)(const cBoundingBox &, cItemCallback<Ty2> &)
+>
+static int tolua_ForEachInBox(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamUserType(2, "cBoundingBox") ||
+		!L.CheckParamFunction(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	Ty1 * Self = NULL;
+	cBoundingBox * Box = NULL;
+	L.GetStackValues(1, Self, Box);
+	ASSERT(Self != NULL);  // We have verified the type at the top, so we should get valid objects here
+	ASSERT(Box != NULL);
+	
+	// Create a reference for the function:
+	cLuaState::cRef FnRef(L, 3);
+
+	// Callback wrapper for the Lua function:
+	class cLuaCallback : public cItemCallback<Ty2>
+	{
+	public:
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FuncRef) :
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FuncRef)
+		{}
+
+	private:
+		// cItemCallback<Ty2> overrides:
+		virtual bool Item(Ty2 * a_Item) override
+		{
+			bool res = false;
+			if (!m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+			{
+				LOGWARNING("Failed to call Lua callback");
+				m_LuaState.LogStackTrace();
+				return true;  // Abort enumeration
+			}
+
+			return res;
+		}
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+	} Callback(L, FnRef);
+
+	bool bRetVal = (Self->*Func1)(*Box, Callback);
+	
+	FnRef.UnRef();
+
+	/* Push return value on stack */
+	tolua_pushboolean(tolua_S, bRetVal);
+	return 1;
+}
+
+
+
+
+
+template <
+	class Ty1,
+	class Ty2,
 	bool (Ty1::*Func1)(cItemCallback<Ty2> &)
 >
 static int tolua_ForEach(lua_State * tolua_S)
@@ -3327,6 +3396,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
 			tolua_function(tolua_S, "ForEachChestInChunk",       tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
 			tolua_function(tolua_S, "ForEachEntity",             tolua_ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
+			tolua_function(tolua_S, "ForEachEntityInBox",        tolua_ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);
 			tolua_function(tolua_S, "ForEachEntityInChunk",      tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",     tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",             tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);

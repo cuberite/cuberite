@@ -442,7 +442,7 @@ void cWorld::InitializeSpawn(void)
 	{
 		for (int z = 0; z < ViewDist; z++)
 		{
-			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, ZERO_CHUNK_Y, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
+			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
 		}
 	}
 	
@@ -2424,7 +2424,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
 	if (a_SetChunkData.ShouldMarkDirty())
 	{
-		m_Storage.QueueSaveChunk(ChunkX, 0, ChunkZ);
+		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
 	}
 }
 
@@ -2696,6 +2696,15 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & 
 
 
 
+bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachEntityInBox(a_Box, a_Callback);
+}
+
+
+
+
+
 bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithEntityByID(a_UniqueID, a_Callback);
@@ -2769,18 +2778,18 @@ void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 
 
 
-void cWorld::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+bool cWorld::LoadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	return m_ChunkMap->LoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	return m_ChunkMap->LoadChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2796,9 +2805,9 @@ void cWorld::LoadChunks(const cChunkCoordsList & a_Chunks)
 
 
 
-void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2903,8 +2912,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
 	
-	// Trick: use Y=1 to force the chunk generation even though the chunk data is already present
-	m_Generator.QueueGenerateChunk(a_ChunkX, 1, a_ChunkZ);
+	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, true);
 }
 
 
@@ -2913,7 +2921,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_Generator.QueueGenerateChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, false);
 }
 
 

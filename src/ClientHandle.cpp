@@ -472,13 +472,13 @@ void cClientHandle::StreamChunks(void)
 		// For each distance touch chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
 		{
-			World->TouchChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
-			World->TouchChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			World->TouchChunk(ChunkPosX + d, ChunkPosZ + i);
+			World->TouchChunk(ChunkPosX - d, ChunkPosZ + i);
 		}  // for i
 		for (int i = -d + 1; i < d; ++i)
 		{
-			World->TouchChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
-			World->TouchChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
+			World->TouchChunk(ChunkPosX + i, ChunkPosZ + d);
+			World->TouchChunk(ChunkPosX + i, ChunkPosZ - d);
 		}  // for i
 	}  // for d
 }
@@ -501,8 +501,8 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		{
 			cCSLock Lock(m_CSChunkLists);
-			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
-			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 		}
 		World->SendChunkTo(a_ChunkX, a_ChunkZ, this);
 	}
@@ -2734,7 +2734,7 @@ bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
 
 
 
-bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkZ)
 {
 	if (m_State >= csDestroying)
 	{
@@ -2742,7 +2742,7 @@ bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	}
 	
 	cCSLock Lock(m_CSChunkLists);
-	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)) != m_ChunksToSend.end());
+	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) != m_ChunksToSend.end());
 }
 
 
@@ -2758,9 +2758,9 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 	
 	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, this);
 	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ)) == m_ChunksToSend.end())
+	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) == m_ChunksToSend.end())
 	{
-		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
 }
 
@@ -2858,11 +2858,27 @@ void cClientHandle::SocketClosed(void)
 
 
 
-void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 {
-	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	if (a_Enchantment > 2)
+	{
+		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
+		Kick("Invalid enchanting!");
+		return;
+	}
+
+	if (
+		(m_Player->GetWindow() == NULL) ||
+		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
+		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
+	)
+	{
+		return;
+	}
+	
+	cEnchantingWindow * Window = (cEnchantingWindow*) m_Player->GetWindow();
 	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
-	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
+	int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
 	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{

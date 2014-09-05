@@ -37,6 +37,7 @@
 #include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
+#include "BoundingBox.h"
 
 #include "json/json.h"
 
@@ -65,7 +66,7 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 // cChunk:
 
 cChunk::cChunk(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	int a_ChunkX, int a_ChunkZ,
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
@@ -77,7 +78,6 @@ cChunk::cChunk(
 	m_HasLoadFailed(false),
 	m_StayCount(0),
 	m_PosX(a_ChunkX),
-	m_PosY(a_ChunkY),
 	m_PosZ(a_ChunkZ),
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
@@ -653,7 +653,7 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == NULL)
 	{
-		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
+		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 		if (Neighbor == NULL)
 		{
 			// TODO: What to do with this?
@@ -1960,6 +1960,30 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 
 
 
+bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	// The entity list is locked by the parent chunkmap's CS
+	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	{
+		++itr2;
+		cBoundingBox EntBox((*itr)->GetPosition(), (*itr)->GetWidth() / 2, (*itr)->GetHeight());
+		if (!EntBox.DoesIntersect(a_Box))
+		{
+			// The entity is not in the specified box
+			continue;
+		}
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_Entitites[]
+	return true;
+}
+
+
+
+
+
 bool cChunk::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
 	// The entity list is locked by the parent chunkmap's CS
@@ -2603,7 +2627,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
 		int ChunkX, ChunkZ;
 		BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
-		return m_ChunkMap->GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+		return m_ChunkMap->GetChunkNoLoad(ChunkX, ChunkZ);
 	}
 
 	// Walk the neighbors:

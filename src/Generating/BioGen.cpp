@@ -151,7 +151,7 @@ void cBioGenCache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a
 		LOGD("BioGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
 		LOGD("BioGenCache: Avg cache chain length: %.2f", (float)m_TotalChain / m_NumHits);
 	}
-	
+
 	for (int i = 0; i < m_CacheSize; i++)
 	{
 		if (
@@ -203,6 +203,59 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	super::InitializeBiomeGen(a_IniFile);
 	m_BioGenToCache->InitializeBiomeGen(a_IniFile);
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cBioGenMulticache:
+
+cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength) :
+	m_CachesLength(a_CachesLength)
+{
+	m_Caches.reserve(a_CachesLength);
+	for (size_t i = 0; i < a_CachesLength; i++)
+	{
+		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
+	}
+}
+
+
+
+
+
+cBioGenMulticache::~cBioGenMulticache()
+{
+	for (std::vector<cBiomeGen*>::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
+	{
+		delete *it;
+	}
+}
+
+
+
+
+
+void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
+{
+	const size_t coefficient = 3;
+	const size_t cacheIdx = ((size_t)a_ChunkX + coefficient * (size_t)a_ChunkZ) % m_CachesLength;
+
+	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
+}
+
+
+
+
+
+void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
+{
+	for (std::vector<cBiomeGen*>::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
+	{
+		cBiomeGen * tmp = *it;
+		tmp->InitializeBiomeGen(a_IniFile);
+	}
 }
 
 
