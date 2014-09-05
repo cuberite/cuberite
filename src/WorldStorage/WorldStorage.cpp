@@ -141,11 +141,11 @@ size_t cWorldStorage::GetSaveQueueLength(void)
 
 
 
-void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ, bool a_Generate)
+void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
-	m_LoadQueue.EnqueueItem(sChunkLoad(a_ChunkX, a_ChunkZ, a_Generate));
+	m_LoadQueue.EnqueueItem(cChunkCoords(a_ChunkX, a_ChunkZ));
 	m_Event.Set();
 }
 
@@ -167,7 +167,7 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorldStorage::UnqueueLoad(int a_ChunkX, int a_ChunkZ)
 {
-	m_LoadQueue.Remove(sChunkLoad(a_ChunkX, a_ChunkZ, true));
+	m_LoadQueue.Remove(cChunkCoords(a_ChunkX, a_ChunkZ));
 }
 
 
@@ -246,23 +246,14 @@ void cWorldStorage::Execute(void)
 
 bool cWorldStorage::LoadOneChunk(void)
 {
-	sChunkLoad ToLoad(0, 0, false);
+	cChunkCoords ToLoad(0, 0);
 	bool ShouldLoad = m_LoadQueue.TryDequeueItem(ToLoad);
 
-	if (ShouldLoad && !LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ))
+	if (ShouldLoad)
 	{
-		if (ToLoad.m_Generate)
-		{
-			// The chunk couldn't be loaded, generate it:
-			m_World->GetGenerator().QueueGenerateChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ, false);
-		}
-		else
-		{
-			// TODO: Notify the world that the load has failed:
-			// m_World->ChunkLoadFailed(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
-		}
+		return LoadChunk(ToLoad.m_ChunkX, ToLoad.m_ChunkZ);
 	}
-	return ShouldLoad;
+	return false;
 }
 
 

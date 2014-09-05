@@ -163,7 +163,7 @@ cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		Chunk->SetPresence(cChunk::cpQueued);
 		Chunk->SetShouldGenerateIfLoadFailed(true);
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ, true);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
 	}
 	return Chunk;
 }
@@ -191,7 +191,7 @@ cChunkPtr cChunkMap::GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
 	if (!Chunk->IsValid() && !Chunk->IsQueued())
 	{
 		Chunk->SetPresence(cChunk::cpQueued);
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ, false);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
 	}
 	
 	return Chunk;

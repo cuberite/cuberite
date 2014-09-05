@@ -112,6 +112,8 @@ void cChunkGenerator::Stop(void)
 
 void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate)
 {
+	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
+
 	{
 		cCSLock Lock(m_CS);
 
