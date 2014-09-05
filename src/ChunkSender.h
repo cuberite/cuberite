@@ -51,7 +51,7 @@ class cChunkSender;
 class cNotifyChunkSender :
 	public cChunkCoordCallback
 {
-	virtual void Call(int a_ChunkX, int a_ChunkZ) /*override*/;
+	virtual void Call(int a_ChunkX, int a_ChunkZ) override;
 
 	cChunkSender * m_ChunkSender;
 public:
@@ -154,9 +154,9 @@ protected:
 	
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) /*override*/;
-	virtual void Entity       (cEntity *      a_Entity) /*override*/;
-	virtual void BlockEntity  (cBlockEntity * a_Entity) /*override*/;
+	virtual void BiomeData    (const cChunkDef::BiomeMap * a_BiomeMap) override;
+	virtual void Entity       (cEntity *      a_Entity) override;
+	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
 	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == NULL
 	void SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);

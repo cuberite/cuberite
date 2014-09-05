@@ -17,8 +17,8 @@ public:
 
 	CLASS_PROTODEF(cSkeleton)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;\
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;\
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	
 	bool IsWither(void) const { return m_bIsWither; }
 

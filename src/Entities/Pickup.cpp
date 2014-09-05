@@ -28,7 +28,7 @@ public:
 	{
 	}
 
-	virtual bool Item(cEntity * a_Entity) /*override*/
+	virtual bool Item(cEntity * a_Entity) override
 	{
 		if (!a_Entity->IsPickup() || (a_Entity->GetUniqueID() <= m_Pickup->GetUniqueID()) || a_Entity->IsDestroyed())
 		{

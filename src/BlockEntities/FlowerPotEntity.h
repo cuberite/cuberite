@@ -40,9 +40,9 @@ public:
 	cFlowerPotEntity(int a_BlocX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	bool LoadFromJson( const Json::Value& a_Value);
-	virtual void SaveToJson(Json::Value& a_Value) /*override*/;
+	virtual void SaveToJson(Json::Value& a_Value) override;
 	
-	virtual void Destroy(void) /*override*/;
+	virtual void Destroy(void) override;
 
 	// tolua_begin
 	
@@ -57,8 +57,8 @@ public:
 	
 	// tolua_end
 	
-	virtual void UsedBy(cPlayer * a_Player) /*override*/;
-	virtual void SendTo(cClientHandle & a_Client) /*override*/;
+	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual void SendTo(cClientHandle & a_Client) override;
 
 	static bool IsFlower(short m_ItemType, short m_ItemData);
 

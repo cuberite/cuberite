@@ -17,13 +17,13 @@ public:
 	}
 
 
-	virtual bool DoesIgnoreBuildCollision(void) /*override*/
+	virtual bool DoesIgnoreBuildCollision(void) override
 	{
 		return true;
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Drop seeds, sometimes
 		MTRand r1;
@@ -34,7 +34,7 @@ public:
 	}
 
 
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		
@@ -49,13 +49,13 @@ public:
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
 
 
-	virtual const char * GetStepSound(void) /*override*/
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";
 	}

@@ -2,7 +2,7 @@
 // DropSpenserEntity.cpp
 
 // Declares the cDropSpenserEntity class representing a common ancestor to the cDispenserEntity and cDropperEntity
-// The dropper and dispenser only needs to /*override*/ the DropSpenseFromSlot() function to provide the specific item behavior
+// The dropper and dispenser only needs to override the DropSpenseFromSlot() function to provide the specific item behavior
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"

@@ -94,10 +94,10 @@ protected:
 	/// Stores the block position that arrow is lodged into, sets m_IsInGround to false if it becomes air
 	Vector3i m_HitBlockPos;
 	
-	// cProjectileEntity /*override*/s:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) /*override*/;
-	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) /*override*/;
-	virtual void CollectedBy(cPlayer * a_Player) /*override*/;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void CollectedBy(cPlayer * a_Player) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
 };  // tolua_export

@@ -21,19 +21,19 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SIGN, 1, 0));
 	}
 
 
-	virtual const char * GetStepSound(void) /*override*/
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.wood";
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY <= 0)
 		{
@@ -64,25 +64,25 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) /*override*/
+	) override
 	{
 		a_Player->GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		return (a_Meta + 4) & 0x0f;
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		return (a_Meta + 12) & 0x0f;
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
 		// Mirrors signs over the XY plane (North-South Mirroring)
 
@@ -92,7 +92,7 @@ public:
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// Mirrors signs over the YZ plane (East-West Mirroring)
 

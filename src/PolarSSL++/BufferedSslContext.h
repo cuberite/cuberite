@@ -42,9 +42,9 @@ protected:
 	cByteBuffer m_IncomingData;
 	
 
-	// cSslContext /*override*/s:
-	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) /*override*/;
-	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) /*override*/;
+	// cSslContext overrides:
+	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
+	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
 } ;
 
 

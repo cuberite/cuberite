@@ -44,10 +44,10 @@ public:
 
 	bool LoadFromJson(const Json::Value & a_Value);
 	
-	// cBlockEntity /*override*/s:
-	virtual void SaveToJson(Json::Value & a_Value) /*override*/;
-	virtual void SendTo(cClientHandle & a_Client) /*override*/;
-	virtual void UsedBy(cPlayer * a_Player) /*override*/;
+	// cBlockEntity overrides:
+	virtual void SaveToJson(Json::Value & a_Value) override;
+	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual void UsedBy(cPlayer * a_Player) override;
 	
 	/** Opens a new chest window for this chest.
 	Scans for neighbors to open a double chest window, if appropriate. */

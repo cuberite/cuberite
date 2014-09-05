@@ -269,7 +269,7 @@ public:
 	cBeaconEntity * GetBeaconEntity(void) const { return m_Beacon; }
 
 	// cWindow Overrides:
-	virtual void OpenedByPlayer(cPlayer & a_Player) /*override*/;
+	virtual void OpenedByPlayer(cPlayer & a_Player) override;
 
 protected:
 	cBeaconEntity * m_Beacon;
@@ -285,8 +285,8 @@ class cEnchantingWindow :
 	typedef cWindow super;
 public:
 	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
-	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player) /*override*/;
-	virtual void SetProperty(int a_Property, int a_Value) /*override*/;
+	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player) override;
+	virtual void SetProperty(int a_Property, int a_Value) override;
 
 	/** Return the Value of a Property */
 	int GetPropertyValue(int a_Property);
@@ -346,8 +346,8 @@ public:
 	cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest);
 	~cChestWindow();
 
-	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) /*override*/;
-	virtual void OpenedByPlayer(cPlayer & a_Player) /*override*/;
+	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
+	virtual void OpenedByPlayer(cPlayer & a_Player) override;
 	
 protected:
 	cWorld * m_World;

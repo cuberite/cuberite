@@ -22,8 +22,8 @@ public:
 	cExpOrb(const Vector3d & a_Pos, int a_Reward);
 
 	// Override functions
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
-	virtual void SpawnOn(cClientHandle & a_Client) /*override*/;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 	/** Returns the number of ticks that this entity has existed */
 	int GetAge(void) const { return (int)(m_Timer / 50); }     // tolua_export

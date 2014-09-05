@@ -18,13 +18,13 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// No pickups
 	}
 	
 	
-	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
+	virtual void OnDestroyedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		if (a_Player->IsGameModeCreative() || (a_BlockY <= 0))
 		{

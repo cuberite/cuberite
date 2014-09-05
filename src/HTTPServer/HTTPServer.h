@@ -89,8 +89,8 @@ protected:
 	cCryptoKeyPtr m_CertPrivKey;
 	
 
-	// cListenThread::cCallback /*override*/s:
-	virtual void OnConnectionAccepted(cSocket & a_Socket) /*override*/;
+	// cListenThread::cCallback overrides:
+	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 	
 	/// Called by cHTTPConnection to close the connection (presumably due to an error)
 	void CloseConnection(cHTTPConnection & a_Connection);

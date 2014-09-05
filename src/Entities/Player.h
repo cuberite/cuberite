@@ -44,26 +44,26 @@ public:
 	
 	virtual ~cPlayer();
 
-	virtual void SpawnOn(cClientHandle & a_Client) /*override*/;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float a_Dt, cChunk &) /*override*/ { UNUSED(a_Dt); }
+	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the curently equipped weapon; empty item if none */
-	virtual cItem GetEquippedWeapon(void) const /*override*/ { return m_Inventory.GetEquippedItem(); }
+	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }
 	
 	/** Returns the currently equipped helmet; empty item if none */
-	virtual cItem GetEquippedHelmet(void) const /*override*/ { return m_Inventory.GetEquippedHelmet(); }
+	virtual cItem GetEquippedHelmet(void) const override { return m_Inventory.GetEquippedHelmet(); }
 	
 	/** Returns the currently equipped chestplate; empty item if none */
-	virtual cItem GetEquippedChestplate(void) const /*override*/ { return m_Inventory.GetEquippedChestplate(); }
+	virtual cItem GetEquippedChestplate(void) const override { return m_Inventory.GetEquippedChestplate(); }
 
 	/** Returns the currently equipped leggings; empty item if none */
-	virtual cItem GetEquippedLeggings(void) const /*override*/ { return m_Inventory.GetEquippedLeggings(); }
+	virtual cItem GetEquippedLeggings(void) const override { return m_Inventory.GetEquippedLeggings(); }
 	
 	/** Returns the currently equipped boots; empty item if none */
-	virtual cItem GetEquippedBoots(void) const /*override*/ { return m_Inventory.GetEquippedBoots(); }
+	virtual cItem GetEquippedBoots(void) const override { return m_Inventory.GetEquippedBoots(); }
 
 
 	// tolua_begin
@@ -134,7 +134,7 @@ public:
 	/** Returns whether the player is climbing (ladders, vines etc.) */
 	bool IsClimbing(void) const;
 
-	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) /*override*/;
+	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
 
 	// tolua_begin
 	
@@ -261,7 +261,7 @@ public:
 	void TossPickup(const cItem & a_Item);
 
 	/** Heals the player by the specified amount of HPs (positive only); sends health update */
-	virtual void Heal(int a_Health) /*override*/;
+	virtual void Heal(int a_Health) override;
 	
 	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
 	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
@@ -312,9 +312,9 @@ public:
 	/** Aborts the current eating operation */
 	void AbortEating(void);
 	
-	virtual void KilledBy(TakeDamageInfo & a_TDI) /*override*/;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
-	virtual void Killed(cEntity * a_Victim) /*override*/;
+	virtual void Killed(cEntity * a_Victim) override;
 
 	void Respawn(void);  // tolua_export
 
@@ -323,7 +323,7 @@ public:
 
 	/** Moves the player to the specified world.
 	Returns true if successful, false on failure (world not found). */
-	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn) /*override*/;
+	virtual bool DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn) override;
 
 	/** Saves all player data, such as inventory, to JSON */
 	bool SaveToDisk(void);
@@ -422,7 +422,7 @@ public:
 
 	// tolua_end
 
-	// cEntity /*override*/s:
+	// cEntity overrides:
 	virtual bool IsCrouched (void) const { return m_IsCrouched; }
 	virtual bool IsSprinting(void) const { return m_IsSprinting; }
 	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
@@ -563,7 +563,7 @@ protected:
 	AString m_UUID;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) /*override*/;
+	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
 	void ResolvePermissions(void);
 	void ResolveGroups(void);
@@ -571,10 +571,10 @@ protected:
 	virtual void Destroyed(void);
 
 	/** Filters out damage for creative mode/friendly fire */
-	virtual bool DoTakeDamage(TakeDamageInfo & TDI) /*override*/;
+	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 
 	/** Stops players from burning in creative mode */
-	virtual void TickBurning(cChunk & a_Chunk) /*override*/;
+	virtual void TickBurning(cChunk & a_Chunk) override;
 	
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);

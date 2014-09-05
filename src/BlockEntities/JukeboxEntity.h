@@ -31,7 +31,7 @@ public:
 	virtual ~cJukeboxEntity();
 
 	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) /*override*/;
+	virtual void SaveToJson(Json::Value & a_Value) override;
 
 	// tolua_begin
 	
@@ -57,8 +57,8 @@ public:
 
 	static const char * GetClassStatic(void) { return "cJukeboxEntity"; }
 	
-	virtual void UsedBy(cPlayer * a_Player) /*override*/;
-	virtual void SendTo(cClientHandle &) /*override*/ {}
+	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual void SendTo(cClientHandle &) override {}
 
 private:
 	int m_Record;

@@ -20,13 +20,13 @@ public:
 	}
 	
 	
-	virtual bool IsTool(void) /*override*/
+	virtual bool IsTool(void) override
 	{
 		return true;
 	}
 	
 	
-	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) /*override*/
+	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if ((Block == E_BLOCK_LEAVES) || (Block == E_BLOCK_NEW_LEAVES))
@@ -47,7 +47,7 @@ public:
 	}
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) /*override*/
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
 		switch (a_BlockType)
 		{
@@ -63,13 +63,13 @@ public:
 	}
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) /*override*/
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
 	{
 		return 0;
 	}
 
 
-	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/
+	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
 

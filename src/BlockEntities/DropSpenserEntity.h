@@ -2,7 +2,7 @@
 // DropSpenser.h
 
 // Declares the cDropSpenser class representing a common ancestor to the cDispenserEntity and cDropperEntity
-// The dropper and dispenser only needs to /*override*/ the DropSpenseFromSlot() function to provide the specific item behavior
+// The dropper and dispenser only needs to override the DropSpenseFromSlot() function to provide the specific item behavior
 
 
 
@@ -53,11 +53,11 @@ public:
 
 	bool LoadFromJson(const Json::Value & a_Value);
 	
-	// cBlockEntity /*override*/s:
-	virtual void SaveToJson(Json::Value & a_Value) /*override*/;
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
-	virtual void SendTo(cClientHandle & a_Client) /*override*/;
-	virtual void UsedBy(cPlayer * a_Player) /*override*/;
+	// cBlockEntity overrides:
+	virtual void SaveToJson(Json::Value & a_Value) override;
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual void UsedBy(cPlayer * a_Player) override;
 	
 	// tolua_begin
 	
@@ -70,7 +70,7 @@ public:
 	// tolua_end
 	
 	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
-	virtual void SetRedstonePower(bool a_IsPowered) /*override*/;
+	virtual void SetRedstonePower(bool a_IsPowered) override;
 
 protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick

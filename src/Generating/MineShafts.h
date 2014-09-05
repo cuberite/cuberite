@@ -42,8 +42,8 @@ protected:
 	int    m_ProbLevelCrossing;   ///< Probability level of a branch object being the crossing, minus Corridor
 	int    m_ProbLevelStaircase;  ///< Probability level of a branch object being the staircase, minus Crossing
 	
-	// cGridStructGen /*override*/s:
-	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) /*override*/;
+	// cGridStructGen overrides:
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 

@@ -76,8 +76,8 @@ protected:
 	*/
 	bool CreateSockets(const AString & a_PortsString);
 	
-	// cIsThread /*override*/:
-	virtual void Execute(void) /*override*/;
+	// cIsThread override:
+	virtual void Execute(void) override;
 } ;
 
 

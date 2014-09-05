@@ -84,13 +84,13 @@ public:
 
 	CLASS_PROTODEF(cMonster)
 	
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) /*override*/;
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	
-	virtual void KilledBy(TakeDamageInfo & a_TDI) /*override*/;
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 	virtual bool ReachedDestination(void);

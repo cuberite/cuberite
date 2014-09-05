@@ -31,8 +31,8 @@ protected:
 	int    m_Size;  // Max size, in blocks, of the ravines generated
 	
 
-	// cGridStructGen /*override*/s:
-	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) /*override*/;
+	// cGridStructGen overrides:
+	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 } ;
 
 

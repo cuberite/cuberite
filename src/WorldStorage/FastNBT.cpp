@@ -11,7 +11,7 @@
 
 
 // The number of NBT tags that are reserved when an NBT parsing is started.
-// You can /*override*/ this by using a cmdline define
+// You can override this by using a cmdline define
 #ifndef NBT_RESERVE_SIZE
 	#define NBT_RESERVE_SIZE 200
 #endif  // NBT_RESERVE_SIZE

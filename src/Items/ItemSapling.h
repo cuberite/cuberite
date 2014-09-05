@@ -23,7 +23,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) /*override*/
+	) override
 	{
 		bool res = super::GetPlacementBlockTypeMeta(
 			a_World, a_Player,

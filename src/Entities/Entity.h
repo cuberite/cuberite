@@ -10,11 +10,11 @@
 
 // Place this macro in the public section of each cEntity descendant class and you're done :)
 #define CLASS_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const /*override*/\
+	virtual bool IsA(const char * a_ClassName) const override\
 	{ \
 		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
 	} \
-	virtual const char * GetClass(void) const /*override*/ \
+	virtual const char * GetClass(void) const override \
 	{ \
 		return #classname; \
 	} \
@@ -22,7 +22,7 @@
 	{ \
 		return #classname; \
 	} \
-	virtual const char * GetParentClass(void) const /*override*/ \
+	virtual const char * GetParentClass(void) const override \
 	{ \
 		return super::GetClass(); \
 	}
@@ -420,7 +420,7 @@ public:
 	
 	// tolua_begin
 	
-	// COMMON metadata flags; descendants may /*override*/ the defaults:
+	// COMMON metadata flags; descendants may override the defaults:
 	virtual bool IsOnFire   (void) const {return (m_TicksLeftBurning > 0); }
 	virtual bool IsCrouched (void) const {return false; }
 	virtual bool IsRiding   (void) const {return false; }

@@ -27,7 +27,7 @@ public:
 	
 protected:
 	
-	// cProjectileEntity /*override*/s:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) /*override*/;
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	
 };  // tolua_export

@@ -216,7 +216,7 @@ void cWolf::TickFollowPlayer()
 	class cCallback :
 		public cPlayerListCallback
 	{
-		virtual bool Item(cPlayer * a_Player) /*override*/
+		virtual bool Item(cPlayer * a_Player) override
 		{
 			OwnerPos = a_Player->GetPosition();
 			return false;

@@ -103,11 +103,11 @@ protected:
 	/// Parses m_IncomingData as form-urlencoded data (fpkURL or fpkFormUrlEncoded kinds)
 	void ParseFormUrlEncoded(void);
 	
-	// cMultipartParser::cCallbacks /*override*/s:
-	virtual void OnPartStart (void) /*override*/;
-	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) /*override*/;
-	virtual void OnPartData  (const char * a_Data, size_t a_Size) /*override*/;
-	virtual void OnPartEnd   (void) /*override*/;
+	// cMultipartParser::cCallbacks overrides:
+	virtual void OnPartStart (void) override;
+	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override;
+	virtual void OnPartData  (const char * a_Data, size_t a_Size) override;
+	virtual void OnPartEnd   (void) override;
 } ;
 
 

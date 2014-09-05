@@ -846,7 +846,7 @@ void cIncrementalRedstoneSimulator::HandleDropSpenser(int a_RelBlockX, int a_Rel
 	public:
 		cSetPowerToDropSpenser(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
 
-		virtual bool Item(cRedstonePoweredEntity * a_DropSpenser) /*override*/
+		virtual bool Item(cRedstonePoweredEntity * a_DropSpenser) override
 		{
 			a_DropSpenser->SetRedstonePower(m_IsPowered);
 			return false;
@@ -947,7 +947,7 @@ void cIncrementalRedstoneSimulator::HandleCommandBlock(int a_RelBlockX, int a_Re
 	public:
 		cSetPowerToCommandBlock(bool a_IsPowered) : m_IsPowered(a_IsPowered) {}
 
-		virtual bool Item(cCommandBlockEntity * a_CommandBlock) /*override*/
+		virtual bool Item(cCommandBlockEntity * a_CommandBlock) override
 		{
 			a_CommandBlock->SetRedstonePower(m_IsPowered);
 			return false;
@@ -1037,7 +1037,7 @@ void cIncrementalRedstoneSimulator::HandleNoteBlock(int a_RelBlockX, int a_RelBl
 			public:
 				cSetPowerToNoteBlock() {}
 
-				virtual bool Item(cRedstonePoweredEntity * a_NoteBlock) /*override*/
+				virtual bool Item(cRedstonePoweredEntity * a_NoteBlock) override
 				{
 					a_NoteBlock->SetRedstonePower(true);
 					return false;
@@ -1129,7 +1129,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 				{
 				}
 
-				virtual bool Item(cEntity * a_Entity) /*override*/
+				virtual bool Item(cEntity * a_Entity) override
 				{
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
@@ -1197,7 +1197,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 				{
 				}
 
-				virtual bool Item(cEntity * a_Entity) /*override*/
+				virtual bool Item(cEntity * a_Entity) override
 				{
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
@@ -1265,7 +1265,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 				{
 				}
 
-				virtual bool Item(cEntity * a_Entity) /*override*/
+				virtual bool Item(cEntity * a_Entity) override
 				{
 					Vector3f EntityPos = a_Entity->GetPosition();
 					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
@@ -1405,7 +1405,7 @@ void cIncrementalRedstoneSimulator::HandleTrappedChest(int a_RelBlockX, int a_Re
 		{
 		}
 
-		virtual bool Item(cChestEntity * a_Chest) /*override*/
+		virtual bool Item(cChestEntity * a_Chest) override
 		{
 			ASSERT(a_Chest->GetBlockType() == E_BLOCK_TRAPPED_CHEST);
 			m_NumberOfPlayers = a_Chest->GetNumberOfPlayers();
@@ -1455,7 +1455,7 @@ void cIncrementalRedstoneSimulator::HandleTripwire(int a_RelBlockX, int a_RelBlo
 		{
 		}
 
-		virtual bool Item(cEntity * a_Entity) /*override*/
+		virtual bool Item(cEntity * a_Entity) override
 		{
 			cBoundingBox bbWire(m_X, m_X + 1, m_Y, m_Y + 0.1, m_Z, m_Z + 1);
 			cBoundingBox bbEntity(a_Entity->GetPosition(), a_Entity->GetWidth() / 2, a_Entity->GetHeight());

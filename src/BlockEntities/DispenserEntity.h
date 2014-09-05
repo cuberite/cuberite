@@ -33,8 +33,8 @@ public:
 	// tolua_end
 
 private:
-	// cDropSpenser /*override*/s:
-	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) /*override*/;
+	// cDropSpenser overrides:
+	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
 
 	/** If such a bucket can fit, adds it to m_Contents and returns true */
 	bool ScoopUpLiquid(int a_SlotNum, short a_BucketItemType);

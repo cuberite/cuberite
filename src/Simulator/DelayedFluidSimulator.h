@@ -53,11 +53,11 @@ class cDelayedFluidSimulator :
 public:
 	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
 	
-	// cSimulator /*override*/s:
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) /*override*/;
-	virtual void Simulate(float a_Dt) /*override*/;
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) /*override*/;
-	virtual cFluidSimulatorData * CreateChunkData(void) /*override*/ { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
+	// cSimulator overrides:
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void Simulate(float a_Dt) override;
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
 	
 protected:
 
@@ -73,7 +73,7 @@ protected:
 	|       adding blocks here ^ | ^ simulating here
 	*/
 	
-	/// Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants /*override*/ this method to provide custom simulation.
+	/// Called from SimulateChunk() to simulate each block in one slot of blocks. Descendants override this method to provide custom simulation.
 	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) = 0;
 } ;
 

@@ -669,12 +669,12 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	class cMover :
 		public cClientDiffCallback
 	{
-		virtual void Removed(cClientHandle * a_Client) /*override*/
+		virtual void Removed(cClientHandle * a_Client) override
 		{
 			a_Client->SendDestroyEntity(*m_Entity);
 		}
 
-		virtual void Added(cClientHandle * a_Client) /*override*/
+		virtual void Added(cClientHandle * a_Client) override
 		{
 			m_Entity->SpawnOn(*a_Client);
 		}

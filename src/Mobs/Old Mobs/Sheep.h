@@ -22,11 +22,11 @@ public:
 
 	CLASS_PROTODEF(cSheep)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
-	virtual void OnRightClicked(cPlayer & a_Player) /*override*/;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void OnRightClicked(cPlayer & a_Player) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	virtual const cItem GetFollowedItem(void) const /*override*/ { return cItem(E_ITEM_WHEAT); }
+	virtual const cItem GetFollowedItem(void) const override { return cItem(E_ITEM_WHEAT); }
 
 	/** Generates a random color for the sheep like the vanilla server.
 	The percent's where used are from the wiki: http://minecraft.gamepedia.com/Sheep#Breeding */

@@ -34,8 +34,8 @@ public:
 class cNullCommandOutputCallback :
 	public cCommandOutputCallback
 {
-	// cCommandOutputCallback /*override*/s:
-	virtual void Out(const AString & a_Text) /*override*/
+	// cCommandOutputCallback overrides:
+	virtual void Out(const AString & a_Text) override
 	{
 		// Do nothing
 		UNUSED(a_Text);
@@ -52,9 +52,9 @@ class cLogCommandOutputCallback :
 	public cCommandOutputCallback
 {
 public:
-	// cCommandOutputCallback /*override*/s:
-	virtual void Out(const AString & a_Text) /*override*/;
-	virtual void Finished(void) /*override*/;
+	// cCommandOutputCallback overrides:
+	virtual void Out(const AString & a_Text) override;
+	virtual void Finished(void) override;
 	
 protected:
 	/// Output is stored here until the command finishes processing
@@ -71,7 +71,7 @@ class cLogCommandDeleteSelfOutputCallback :
 {
 	typedef cLogCommandOutputCallback super;
 	
-	virtual void Finished(void) /*override*/
+	virtual void Finished(void) override
 	{
 		super::Finished();
 		delete this;

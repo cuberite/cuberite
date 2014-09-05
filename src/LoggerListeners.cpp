@@ -22,7 +22,7 @@
 		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) = 0;
 		virtual void SetDefaultLogColour() = 0;
 	
-		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) /*override*/
+		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 		{
 			SetLogColour(a_LogLevel);
 			fputs(a_Message.c_str(), stdout);
@@ -48,7 +48,7 @@
 		}
 		
 		#ifdef _DEBUG
-			virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) /*override*/
+			virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 			{
 				super::Log(a_Message, a_LogLevel);
 				// In a Windows Debug build, output the log to debug console as well:
@@ -57,7 +57,7 @@
 		#endif
 
 
-		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) /*override*/
+		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) override
 		{
 			// by default, gray on black
 			WORD Attrib = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
@@ -92,7 +92,7 @@
 		}
 		
 		
-		virtual void SetDefaultLogColour() /*override*/
+		virtual void SetDefaultLogColour() override
 		{
 			SetConsoleTextAttribute(m_Console, m_DefaultConsoleAttrib);
 		}
@@ -113,7 +113,7 @@
 		: public cColouredConsoleListener
 	{
 	public:
-		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) /*override*/
+		virtual void SetLogColour(cLogger::eLogLevel a_LogLevel) override
 		{
 			switch (a_LogLevel)
 			{
@@ -145,7 +145,7 @@
 		}
 		
 		
-		virtual void SetDefaultLogColour() /*override*/
+		virtual void SetDefaultLogColour() override
 		{
 			// Whatever the console default is 
 			printf("\x1b[0m");
@@ -162,7 +162,7 @@
 		: public cLogger::cListener
 	{
 	public:
-		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) /*override*/
+		virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 		{
 			android_LogPriority AndroidLogLevel;
 			switch (a_LogLevel)
@@ -202,7 +202,7 @@ class cVanillaCPPConsoleListener
 	: public cLogger::cListener
 {
 public:
-	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) /*override*/
+	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
 	{
 		AString LogLevelString;
 		switch (a_LogLevel)

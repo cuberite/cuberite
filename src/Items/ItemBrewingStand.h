@@ -17,7 +17,7 @@ public:
 	}
 
 
-	virtual bool IsPlaceable(void) /*override*/
+	virtual bool IsPlaceable(void) override
 	{
 		return true;
 	}
@@ -28,7 +28,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) /*override*/
+	) override
 	{
 		a_BlockType = E_BLOCK_BREWING_STAND;
 		a_BlockMeta = 0;

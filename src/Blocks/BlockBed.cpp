@@ -54,7 +54,7 @@ void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInt
 class cTimeFastForwardTester :
 	public cPlayerListCallback
 {
-	virtual bool Item(cPlayer * a_Player) /*override*/
+	virtual bool Item(cPlayer * a_Player) override
 	{
 		if (!a_Player->IsInBed())
 		{
@@ -78,7 +78,7 @@ public:
 	{
 	}
 
-	virtual bool Item(cPlayer * a_Player) /*override*/
+	virtual bool Item(cPlayer * a_Player) override
 	{
 		a_Player->SetIsInBed(false);
 		m_WorldInterface.GetBroadcastManager().BroadcastEntityAnimation(*a_Player, 2);

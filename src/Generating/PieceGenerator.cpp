@@ -73,7 +73,7 @@ protected:
 		{
 		}
 		
-		virtual cConnectors GetConnectors(void) const /*override*/
+		virtual cConnectors GetConnectors(void) const override
 		{
 			// Each piece has 4 connectors, one of each type, plus one extra, at the center of its walls:
 			cConnectors res;
@@ -84,17 +84,17 @@ protected:
 			return res;
 		}
 		
-		virtual Vector3i GetSize(void) const /*override*/
+		virtual Vector3i GetSize(void) const override
 		{
 			return Vector3i(m_Size, 5, m_Size);
 		}
 		
-		virtual cCuboid GetHitBox(void) const /*override*/
+		virtual cCuboid GetHitBox(void) const override
 		{
 			return cCuboid(0, 0, 0, m_Size - 1, 4, m_Size - 1);
 		}
 		
-		virtual bool CanRotateCCW(int a_NumCCWRotations) const /*override*/
+		virtual bool CanRotateCCW(int a_NumCCWRotations) const override
 		{
 			return true;
 		}
@@ -102,26 +102,26 @@ protected:
 	
 	cPieces m_Pieces;
 	
-	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) /*override*/
+	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override
 	{
 		// Each piece contains each connector
 		return m_Pieces;
 	}
 	
 	
-	virtual cPieces GetStartingPieces(void) /*override*/
+	virtual cPieces GetStartingPieces(void) override
 	{
 		return m_Pieces;
 	}
 	
 	
-	virtual void PiecePlaced(const cPiece & a_Piece) /*override*/
+	virtual void PiecePlaced(const cPiece & a_Piece) override
 	{
 		UNUSED(a_Piece);
 	}
 	
 	
-	virtual void Reset(void) /*override*/
+	virtual void Reset(void) override
 	{
 	}
 	

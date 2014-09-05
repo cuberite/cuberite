@@ -48,7 +48,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 			{
 			}
 
-			virtual bool Item(cEntity * a_Entity) /*override*/
+			virtual bool Item(cEntity * a_Entity) override
 			{
 				if (a_Entity->IsMob() && ((cMonster *)a_Entity)->GetMobType() == mtSkeleton)
 				{

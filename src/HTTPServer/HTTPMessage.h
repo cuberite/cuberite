@@ -149,8 +149,8 @@ protected:
 	*/
 	size_t ParseRequestLine(const char * a_Data, size_t a_Size);
 	
-	// cEnvelopeParser::cCallbacks /*override*/s:
-	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) /*override*/;
+	// cEnvelopeParser::cCallbacks overrides:
+	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;
 } ;
 
 

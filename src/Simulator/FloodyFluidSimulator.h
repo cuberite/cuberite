@@ -35,8 +35,8 @@ protected:
 	NIBBLETYPE m_Falloff;
 	int        m_NumNeighborsForSource;
 	
-	// cDelayedFluidSimulator /*override*/s:
-	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) /*override*/;
+	// cDelayedFluidSimulator overrides:
+	virtual void SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override;
 	
 	/** Checks tributaries, if not fed, decreases the block's level and returns true. */
 	bool CheckTributaries(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_MyMeta);

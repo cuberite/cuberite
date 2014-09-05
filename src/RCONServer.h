@@ -64,10 +64,10 @@ protected:
 		AString m_IPAddress;
 		
 
-		// cSocketThreads::cCallback /*override*/s:
-		virtual bool DataReceived(const char * a_Data, size_t a_Size) /*override*/;
-		virtual void GetOutgoingData(AString & a_Data) /*override*/;
-		virtual void SocketClosed(void) /*override*/;
+		// cSocketThreads::cCallback overrides:
+		virtual bool DataReceived(const char * a_Data, size_t a_Size) override;
+		virtual void GetOutgoingData(AString & a_Data) override;
+		virtual void SocketClosed(void) override;
 		
 		/// Processes the given packet and sends the response; returns true if successful, false if the connection is to be dropped
 		bool ProcessPacket(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload);
@@ -99,8 +99,8 @@ protected:
 	AString m_Password;
 
 
-	// cListenThread::cCallback /*override*/s:
-	virtual void OnConnectionAccepted(cSocket & a_Socket) /*override*/;
+	// cListenThread::cCallback overrides:
+	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 } ;
 
 

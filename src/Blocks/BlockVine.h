@@ -21,7 +21,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) /*override*/
+	) override
 	{
 		UNUSED(a_Player);
 		UNUSED(a_CursorX);
@@ -44,7 +44,7 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_BLOCK_VINES, 1, 0));
@@ -115,7 +115,7 @@ public:
 	}
 	
 	
-	void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) /*override*/
+	void Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk) override
 	{
 		NIBBLETYPE CurMeta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelX, a_RelY, a_RelZ);
@@ -155,19 +155,19 @@ public:
 	}
 
 
-	virtual bool DoesIgnoreBuildCollision(void) /*override*/
+	virtual bool DoesIgnoreBuildCollision(void) override
 	{
 		return true;
 	}
 	
 	
-	virtual const char * GetStepSound(void) /*override*/
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.grass";
 	}
 
 
-	virtual bool DoesDropOnUnsuitable(void) /*override*/
+	virtual bool DoesDropOnUnsuitable(void) override
 	{
 		return false;
 	}
@@ -189,26 +189,26 @@ public:
 		}
 	}
 	
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
 	{
 		return ((a_Meta >> 1) | (a_Meta << 3)) & 0x0f;  // Rotate bits to the right
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
 	{
 		// Bits 2 and 4 stay, bits 1 and 3 swap
 		return (NIBBLETYPE)((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
 	{
 		// Bits 1 and 3 stay, bits 2 and 4 swap
 		return (NIBBLETYPE)((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));

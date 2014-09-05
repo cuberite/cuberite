@@ -19,13 +19,13 @@ public:
 	}
 	
 	
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_ANVIL, 1, a_BlockMeta >> 2));
 	}
 
 
-	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) /*override*/
+	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
 		cWindow * Window = new cAnvilWindow(a_BlockX, a_BlockY, a_BlockZ);
 		a_Player->OpenWindow(Window);
@@ -37,7 +37,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) /*override*/
+	) override
 	{
 		a_BlockType = m_BlockType;
 		NIBBLETYPE Meta = (NIBBLETYPE)a_Player->GetEquippedItem().m_ItemDamage;
@@ -58,7 +58,7 @@ public:
 	}
 
 
-	virtual bool IsUseable() /*override*/
+	virtual bool IsUseable() override
 	{
 		return true;
 	}

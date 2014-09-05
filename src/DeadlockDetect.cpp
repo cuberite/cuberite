@@ -44,7 +44,7 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 		{
 		}
 		
-		virtual bool Item(cWorld * a_World) /*override*/
+		virtual bool Item(cWorld * a_World) override
 		{
 			m_Detect->SetWorldAge(a_World->GetName(), a_World->GetWorldAge());
 			return false;
@@ -79,7 +79,7 @@ void cDeadlockDetect::Execute(void)
 		protected:
 			cDeadlockDetect * m_Detect;
 			
-			virtual bool Item(cWorld * a_World) /*override*/
+			virtual bool Item(cWorld * a_World) override
 			{
 				m_Detect->CheckWorldAge(a_World->GetName(), a_World->GetWorldAge());
 				return false;

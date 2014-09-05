@@ -354,7 +354,7 @@ static int tolua_DoWith(lua_State* tolua_S)
 		{}
 
 	private:
-		virtual bool Item(Ty2 * a_Item) /*override*/
+		virtual bool Item(Ty2 * a_Item) override
 		{
 			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
 			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());
@@ -444,7 +444,7 @@ static int tolua_DoWithID(lua_State* tolua_S)
 		{}
 
 	private:
-		virtual bool Item(Ty2 * a_Item) /*override*/
+		virtual bool Item(Ty2 * a_Item) override
 		{
 			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);            // Push function to call
 			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());  // Push the item
@@ -540,7 +540,7 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 		{}
 
 	private:
-		virtual bool Item(Ty2 * a_Item) /*override*/
+		virtual bool Item(Ty2 * a_Item) override
 		{
 			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
 			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());
@@ -635,7 +635,7 @@ static int tolua_ForEachInChunk(lua_State * tolua_S)
 		{}
 
 	private:
-		virtual bool Item(Ty2 * a_Item) /*override*/
+		virtual bool Item(Ty2 * a_Item) override
 		{
 			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
 			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());
@@ -797,7 +797,7 @@ static int tolua_ForEach(lua_State * tolua_S)
 		{}
 
 	private:
-		virtual bool Item(Ty2 * a_Item) /*override*/
+		virtual bool Item(Ty2 * a_Item) override
 		{
 			lua_rawgeti( LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
 			tolua_pushusertype( LuaState, a_Item, Ty2::GetClassStatic());
@@ -1116,8 +1116,8 @@ protected:
 	cPluginLua & m_Plugin;
 	int m_FnRef;
 	
-	// cWorld::cTask /*override*/s:
-	virtual void Run(cWorld & a_World) /*override*/
+	// cWorld::cTask overrides:
+	virtual void Run(cWorld & a_World) override
 	{
 		m_Plugin.Call(m_FnRef, &a_World);
 	}
@@ -1180,8 +1180,8 @@ protected:
 	cPluginLua & m_Plugin;
 	int m_FnRef;
 	
-	// cWorld::cTask /*override*/s:
-	virtual void Run(cWorld & a_World) /*override*/
+	// cWorld::cTask overrides:
+	virtual void Run(cWorld & a_World) override
 	{
 		m_Plugin.Call(m_FnRef, &a_World);
 	}
@@ -1492,7 +1492,7 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 		{}
 
 	private:
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) /*override*/
+		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
 			UNUSED(a_Plugin);
 			
@@ -1569,7 +1569,7 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 		{}
 
 	private:
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) /*override*/
+		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
 			UNUSED(a_Plugin);
 			UNUSED(a_Permission);
@@ -1801,7 +1801,7 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 		const AString & m_FunctionName;
 		cLuaState & m_SrcLuaState;
 		
-		virtual bool Item(cPlugin * a_Plugin) /*override*/
+		virtual bool Item(cPlugin * a_Plugin) override
 		{
 			m_NumReturns = ((cPluginLua *)a_Plugin)->CallFunctionFromForeignState(
 				m_FunctionName, m_SrcLuaState, 4, lua_gettop(m_SrcLuaState)
@@ -2586,7 +2586,7 @@ public:
 	{
 	}
 	
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) /*override*/
+	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		bool res = false;
 		if (!m_LuaState.Call(
@@ -2601,7 +2601,7 @@ public:
 		return res;
 	}
 	
-	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) /*override*/
+	virtual bool OnNextBlockNoData(int a_BlockX, int a_BlockY, int a_BlockZ, char a_EntryFace) override
 	{
 		bool res = false;
 		if (!m_LuaState.Call(
@@ -2616,7 +2616,7 @@ public:
 		return res;
 	}
 	
-	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) /*override*/
+	virtual bool OnOutOfWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
 		bool res = false;
 		if (!m_LuaState.Call(
@@ -2631,7 +2631,7 @@ public:
 		return res;
 	}
 	
-	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) /*override*/
+	virtual bool OnIntoWorld(double a_BlockX, double a_BlockY, double a_BlockZ) override
 	{
 		bool res = false;
 		if (!m_LuaState.Call(
@@ -2646,12 +2646,12 @@ public:
 		return res;
 	}
 	
-	virtual void OnNoMoreHits(void) /*override*/
+	virtual void OnNoMoreHits(void) override
 	{
 		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoMoreHits"));
 	}
 	
-	virtual void OnNoChunk(void) /*override*/
+	virtual void OnNoChunk(void) override
 	{
 		m_LuaState.Call(cLuaState::cTableRef(m_TableRef, "OnNoChunk"));
 	}

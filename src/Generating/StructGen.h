@@ -64,8 +64,8 @@ protected:
 		const cChunkDef::BiomeMap & a_Biomes
 	);
 	
-	// cFinishGen /*override*/:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 
@@ -100,8 +100,8 @@ protected:
 	OreList   m_OreList;  // A list of possible ores.
 	BLOCKTYPE m_ToReplace;
 	
-	// cFinishGen /*override*/:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	
 	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq);
 } ;
@@ -130,8 +130,8 @@ protected:
 	cTerrainHeightGen & m_HeiGen;
 	int                 m_Probability;  ///< Chance, 0 .. 100, of a chunk having the lake
 	
-	// cFinishGen /*override*/:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	
 	/// Creates a lake image for the specified chunk into a_Lake
 	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a_Lake);
@@ -152,8 +152,8 @@ protected:
 	cNoise    m_Noise1;
 	cNoise    m_Noise2;
 	
-	// cFinishGen /*override*/:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	bool HasWantedBiome(cChunkDesc & a_ChunkDesc) const;
 } ;
@@ -174,8 +174,8 @@ protected:
 	cNoise m_NoiseZ;
 	cNoise m_NoiseH;
 	
-	// cFinishGen /*override*/:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
 
 

@@ -34,26 +34,26 @@ public:
 	
 protected:
 
-	// cProtocol150 /*override*/s:
-	virtual void SendAttachEntity  (const cEntity & a_Entity, const cEntity * a_Vehicle) /*override*/;
-	virtual void SendChat          (const AString & a_Message) /*override*/;
-	virtual void SendChat          (const cCompositeChat & a_Message) /*override*/;
-	virtual void SendEditSign      (int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendGameMode      (eGameMode a_GameMode) /*override*/;
-	virtual void SendHealth        (void) /*override*/;
-	virtual void SendPlayerMaxSpeed(void) /*override*/;
-	virtual void SendRespawn       (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) /*override*/;
-	virtual void SendWindowOpen    (const cWindow & a_Window) /*override*/;
+	// cProtocol150 overrides:
+	virtual void SendAttachEntity  (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
+	virtual void SendChat          (const AString & a_Message) override;
+	virtual void SendChat          (const cCompositeChat & a_Message) override;
+	virtual void SendEditSign      (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
+	virtual void SendGameMode      (eGameMode a_GameMode) override;
+	virtual void SendHealth        (void) override;
+	virtual void SendPlayerMaxSpeed(void) override;
+	virtual void SendRespawn       (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
+	virtual void SendWindowOpen    (const cWindow & a_Window) override;
 	
-	virtual int ParseEntityAction   (void) /*override*/;
-	virtual int ParseLogin          (void) /*override*/;
-	virtual int ParsePlayerAbilities(void) /*override*/;
+	virtual int ParseEntityAction   (void) override;
+	virtual int ParseLogin          (void) override;
+	virtual int ParsePlayerAbilities(void) override;
 	
 	// New packets:
 	virtual int ParseSteerVehicle(void);
 
 	// Enable new packets' handling
-	virtual int ParsePacket(unsigned char a_PacketType) /*override*/;
+	virtual int ParsePacket(unsigned char a_PacketType) override;
 } ;
 
 
@@ -69,8 +69,8 @@ public:
 	cProtocol162(cClientHandle * a_Client);
 
 protected:
-	// cProtocol161 /*override*/s:
-	virtual void SendPlayerMaxSpeed(void) /*override*/;
+	// cProtocol161 overrides:
+	virtual void SendPlayerMaxSpeed(void) override;
 } ;
 
 

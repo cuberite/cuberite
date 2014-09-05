@@ -17,5 +17,5 @@ public:
 
 	CLASS_PROTODEF(cBlaze)
 	
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 } ;

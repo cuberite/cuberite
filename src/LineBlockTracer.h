@@ -77,8 +77,8 @@ protected:
 	/// Moves m_Current to the next block on the line; returns false if no move is possible (reached the end)
 	bool MoveToNextBlock(void);
 	
-	// cChunkCallback /*override*/s:
-	virtual bool Item(cChunk * a_Chunk) /*override*/;
+	// cChunkCallback overrides:
+	virtual bool Item(cChunk * a_Chunk) override;
 } ;
 
 

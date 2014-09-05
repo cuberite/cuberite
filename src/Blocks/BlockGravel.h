@@ -16,7 +16,7 @@ public:
 	{
 	}
 
-	virtual const char * GetStepSound(void) /*override*/
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.gravel";
 	}

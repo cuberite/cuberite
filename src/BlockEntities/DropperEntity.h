@@ -31,8 +31,8 @@ public:
 	static const char * GetClassStatic(void) { return "cDropperEntity"; }
 
 protected:
-	// cDropSpenserEntity /*override*/s:
-	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) /*override*/;
+	// cDropSpenserEntity overrides:
+	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
 	
 	/** Takes an item from slot a_SlotNum and puts it into the container in front of the dropper.
 	Called when there's a container directly in front of the dropper,

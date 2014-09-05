@@ -28,9 +28,9 @@ public:
 	
 protected:
 	
-	// cProjectileEntity /*override*/s:
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) /*override*/;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	// cProjectileEntity overrides:
+	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
 private:
 	

@@ -151,8 +151,8 @@ private:
 	cChunkSink * m_ChunkSink;
 	
 
-	// cIsThread /*override*/:
-	virtual void Execute(void) /*override*/;
+	// cIsThread override:
+	virtual void Execute(void) override;
 
 	void DoGenerate(int a_ChunkX, int a_ChunkZ);
 };

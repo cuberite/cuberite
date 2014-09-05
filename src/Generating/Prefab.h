@@ -183,11 +183,11 @@ protected:
 	bool m_MoveToGround;
 	
 	
-	// cPiece /*override*/s:
-	virtual cConnectors GetConnectors(void) const /*override*/;
-	virtual Vector3i GetSize(void) const /*override*/;
-	virtual cCuboid GetHitBox(void) const /*override*/;
-	virtual bool CanRotateCCW(int a_NumRotations) const /*override*/;
+	// cPiece overrides:
+	virtual cConnectors GetConnectors(void) const override;
+	virtual Vector3i GetSize(void) const override;
+	virtual cCuboid GetHitBox(void) const override;
+	virtual bool CanRotateCCW(int a_NumRotations) const override;
 	
 	/** Based on the m_AllowedRotations, adds rotated cBlockAreas to the m_BlockArea array.
 	To be called only from this class's constructor! */

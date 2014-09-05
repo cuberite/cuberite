@@ -31,7 +31,7 @@ public:
 	}
 	
 	/** Called by cWorld::ForEachEntity(), adds the stored entity effect to the entity, if it is close enough. */
-	virtual bool Item(cEntity * a_Entity) /*override*/
+	virtual bool Item(cEntity * a_Entity) override
 	{
 		if (!a_Entity->IsPawn())
 		{

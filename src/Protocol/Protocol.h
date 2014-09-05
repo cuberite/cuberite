@@ -134,7 +134,7 @@ protected:
 	cClientHandle * m_Client;
 	cCriticalSection m_CSPacket;  // Each SendXYZ() function must acquire this CS in order to send the whole packet at once
 	
-	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may /*override*/ it
+	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
 	
 	/// Called after writing each packet, enables descendants to flush their buffers

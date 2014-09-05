@@ -47,10 +47,10 @@ protected:
 	int m_PotionColor;
 	
 
-	// cProjectileEntity /*override*/s:
-	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) /*override*/;
-	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) /*override*/;
-	virtual void Tick           (float a_Dt, cChunk & a_Chunk) /*override*/
+	// cProjectileEntity overrides:
+	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+	virtual void Tick           (float a_Dt, cChunk & a_Chunk) override
 	{
 		if (m_DestroyTimer > 0)
 		{
@@ -71,7 +71,7 @@ protected:
 	@param a_HitPos     The position where the potion will splash */
 	void Splash(const Vector3d & a_HitPos);
 	
-	virtual void SpawnOn(cClientHandle & a_Client) /*override*/;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
 
 private:
 	/** Time in ticks to wait for the hit animation to begin before destroying */

@@ -55,8 +55,8 @@ protected:
 	cProjectileEntity * m_Projectile;
 	double m_SlowdownCoeff;
 	
-	// cCallbacks /*override*/s:
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) /*override*/
+	// cCallbacks overrides:
+	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
 	{
 		/*
 		// DEBUG:
@@ -140,7 +140,7 @@ public:
 	}
 	
 	
-	virtual bool Item(cEntity * a_Entity) /*override*/
+	virtual bool Item(cEntity * a_Entity) override
 	{
 		if (
 			(a_Entity == m_Projectile) ||          // Do not check collisions with self

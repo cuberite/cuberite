@@ -131,10 +131,10 @@ protected:
 	around their gridpoint intersects the chunk. */
 	void GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructurePtrs & a_Structures);
 
-	// cFinishGen /*override*/s:
-	virtual void GenFinish(cChunkDesc & a_ChunkDesc) /*override*/;
+	// cFinishGen overrides:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	
-	// Functions for the descendants to /*override*/:
+	// Functions for the descendants to override:
 	/** Create a new structure at the specified gridpoint */
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) = 0;
 } ;

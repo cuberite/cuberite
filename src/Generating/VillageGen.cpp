@@ -84,8 +84,8 @@ public:
 	}
 	
 	
-	// cPrefabPiecePool /*override*/s:
-	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) /*override*/
+	// cPrefabPiecePool overrides:
+	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override
 	{
 		// Roads cannot branch T-wise (appending -2 connector to a +2 connector on a 1-high piece):
 		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0) && (a_PlacedPiece.GetPiece().GetSize().y == 1))
@@ -187,8 +187,8 @@ protected:
 	BLOCKTYPE m_WaterRoadBlock;
 	
 	
-	// cGridStructGen::cStructure /*override*/s:
-	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) /*override*/
+	// cGridStructGen::cStructure overrides:
+	virtual void DrawIntoChunk(cChunkDesc & a_Chunk) override
 	{
 		// Iterate over all items
 		// Each intersecting prefab is placed on ground, then drawn
@@ -258,7 +258,7 @@ protected:
 	}
 	
 	
-	// cPiecePool /*override*/s:
+	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType)
 	{
 		return m_Prefabs.GetPiecesWithConnector(a_ConnectorType);
@@ -275,7 +275,7 @@ protected:
 		const cPlacedPiece & a_PlacedPiece,
 		const cPiece::cConnector & a_ExistingConnector,
 		const cPiece & a_NewPiece
-	) /*override*/
+	) override
 	{
 		// Check against the density:
 		if (a_ExistingConnector.m_Type == 1)
@@ -293,19 +293,19 @@ protected:
 	}
 	
 	
-	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) /*override*/
+	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override
 	{
 		return m_Prefabs.GetStartingPieceWeight(a_NewPiece);
 	}
 	
 	
-	virtual void PiecePlaced(const cPiece & a_Piece) /*override*/
+	virtual void PiecePlaced(const cPiece & a_Piece) override
 	{
 		m_Prefabs.PiecePlaced(a_Piece);
 	}
 	
 	
-	virtual void Reset(void) /*override*/
+	virtual void Reset(void) override
 	{
 		m_Prefabs.Reset();
 	}

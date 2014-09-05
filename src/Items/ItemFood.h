@@ -18,13 +18,13 @@ public:
 	}
 
 
-	virtual bool IsFood(void) /*override*/
+	virtual bool IsFood(void) override
 	{
 		return true;
 	}
 
 
-	virtual FoodInfo GetFoodInfo(void) /*override*/
+	virtual FoodInfo GetFoodInfo(void) override
 	{
 		switch (m_ItemType)
 		{
@@ -58,7 +58,7 @@ public:
 		return FoodInfo(0, 0.f);
 	}
 
-	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) /*override*/
+	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance) override
 	{
 		switch (m_ItemType)
 		{

@@ -54,10 +54,10 @@ protected:
 	cLuaState::cRef m_OnAllChunksAvailable;
 	
 	
-	// cChunkStay /*override*/s:
-	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) /*override*/;
-	virtual bool OnAllChunksAvailable(void) /*override*/;
-	virtual void OnDisabled(void) /*override*/;
+	// cChunkStay overrides:
+	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnAllChunksAvailable(void) override;
+	virtual void OnDisabled(void) override;
 	
 	/** Adds a single chunk coord from the table at the top of the Lua stack.
 	Expects the top element to be a table, checks that it contains two numbers.

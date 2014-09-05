@@ -70,8 +70,8 @@ protected:
 	/** Parse one line of incoming data in the headers section of a part. The CRLF has already been stripped from a_Data / a_Size */
 	void ParseHeaderLine(const char * a_Data, size_t a_Size);
 	
-	// cEnvelopeParser /*override*/s:
-	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) /*override*/;
+	// cEnvelopeParser overrides:
+	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;
 } ;
 
 

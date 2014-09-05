@@ -109,8 +109,8 @@ public:
 		public cTask
 	{
 	protected:
-		// cTask /*override*/s:
-		virtual void Run(cWorld & a_World) /*override*/;
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
 	} ;
 	
 
@@ -118,8 +118,8 @@ public:
 		public cTask
 	{
 	protected:
-		// cTask /*override*/s:
-		virtual void Run(cWorld & a_World) /*override*/;
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
 	};
 
 
@@ -130,8 +130,8 @@ public:
 		cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue);
 
 	protected:
-		// cTask /*override*/s:
-		virtual void Run(cWorld & a_World) /*override*/;
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
 
 		std::vector<Vector3i> m_SendQueue;
 	};
@@ -156,15 +156,15 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual Int64 GetWorldAge (void) const /*override*/ { return m_WorldAge; }
-	virtual Int64 GetTimeOfDay(void) const /*override*/ { return m_TimeOfDay; }
+	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
+	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
 
-	virtual void SetTimeOfDay(Int64 a_TimeOfDay) /*override*/
+	virtual void SetTimeOfDay(Int64 a_TimeOfDay) override
 	{
 		m_TimeOfDay = a_TimeOfDay;
 		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
@@ -235,7 +235,7 @@ public:
 	void BroadcastEntityRelMoveLook      (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityStatus           (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) /*override*/;  // tolua_export
+	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;  // tolua_export
 	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);  // tolua_export
 	void BroadcastPlayerListItem         (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect     (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
@@ -248,10 +248,10 @@ public:
 	void BroadcastTeleportEntity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastThunderbolt            (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
 	void BroadcastTimeUpdate             (const cClientHandle * a_Exclude = NULL);
-	virtual void BroadcastUseBed         (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/;
+	virtual void BroadcastUseBed         (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	void BroadcastWeather                (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
 	
-	virtual cBroadcastInterface & GetBroadcastManager(void) /*override*/
+	virtual cBroadcastInterface & GetBroadcastManager(void) override
 	{
 		return *this;
 	}
@@ -299,7 +299,7 @@ public:
 	void RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
-	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) /*override*/;  // >> EXPORTED IN MANUALBINDINGS <<
+	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found. Callback return ignored */
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
@@ -394,7 +394,7 @@ public:
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 	
 	/** Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully */
-	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) /*override*/;
+	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) override;
 
 	// tolua_begin
 	
@@ -453,15 +453,15 @@ public:
 	Prefer cBlockArea::Write() instead, this is the internal implementation; cBlockArea does error checking, too.
 	a_DataTypes is a bitmask of cBlockArea::baXXX constants ORed together.
 	*/
-	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) /*override*/;
+	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
 	
 	// tolua_begin
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
-	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) /*override*/;
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) override;
 	
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
-	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) /*override*/;
+	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) override;
 	
 	/** Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block. */
 	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
@@ -485,14 +485,14 @@ public:
 	
 	// tolua_begin
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) /*override*/;
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) override;
 
 	double GetSpawnX(void) const { return m_SpawnX; }
 	double GetSpawnY(void) const { return m_SpawnY; }
 	double GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
-	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) /*override*/;
+	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
@@ -536,10 +536,10 @@ public:
 	| esWitherBirth      | cMonster *       |
 	| esPlugin           | void *           |
 	*/
-	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) /*override*/;  // tolua_export
+	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;  // tolua_export
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) /*override*/;  // Exported in ManualBindings.cpp
+	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -768,7 +768,7 @@ public:
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) /*override*/;  // tolua_export
+	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) override;  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
@@ -806,8 +806,8 @@ private:
 	protected:
 		cWorld & m_World;
 		
-		// cIsThread /*override*/s:
-		virtual void Execute(void) /*override*/;
+		// cIsThread overrides:
+		virtual void Execute(void) override;
 	} ;
 	
 	
@@ -818,14 +818,14 @@ private:
 	{
 		cWorld * m_World;
 		
-		// cChunkSink /*override*/s:
-		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) /*override*/;
-		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) /*override*/;
-		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) /*override*/;
+		// cChunkSink overrides:
+		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
+		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
+		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
 		
-		// cPluginInterface /*override*/s:
-		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) /*override*/;
-		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) /*override*/;
+		// cPluginInterface overrides:
+		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
+		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) override;
 		
 	public:
 		cChunkGeneratorCallbacks(cWorld & a_World);

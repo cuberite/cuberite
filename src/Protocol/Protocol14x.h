@@ -32,12 +32,12 @@ public:
 	cProtocol142(cClientHandle * a_Client);
 
 	// Sending commands (alphabetically sorted):
-	virtual void SendPickupSpawn        (const cPickup & a_Pickup) /*override*/;
-	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) /*override*/;
-	virtual void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) /*override*/;
+	virtual void SendPickupSpawn        (const cPickup & a_Pickup) override;
+	virtual void SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
+	virtual void SendTimeUpdate         (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
 
 	// Specific packet parsers:
-	virtual int ParseLocaleViewDistance(void) /*override*/;
+	virtual int ParseLocaleViewDistance(void) override;
 } ;
 
 
@@ -52,10 +52,10 @@ class cProtocol146 :
 public:
 	cProtocol146(cClientHandle * a_Client);
 	
-	virtual void SendPickupSpawn      (const cPickup & a_Pickup) /*override*/;
-	virtual void SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock) /*override*/;
-	virtual void SendSpawnObject      (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) /*override*/;
-	virtual void SendSpawnVehicle     (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) /*override*/;
+	virtual void SendPickupSpawn      (const cPickup & a_Pickup) override;
+	virtual void SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock) override;
+	virtual void SendSpawnObject      (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override;
+	virtual void SendSpawnVehicle     (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 } ;
 
 

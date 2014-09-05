@@ -35,11 +35,11 @@ public:
 	cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	bool LoadFromJson(const Json::Value & a_Value);
-	// cBlockEntity /*override*/s:
-	virtual void SaveToJson(Json::Value& a_Value) /*override*/;
-	virtual void SendTo(cClientHandle & a_Client) /*override*/;
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
-	virtual void UsedBy(cPlayer * a_Player) /*override*/;
+	// cBlockEntity overrides:
+	virtual void SaveToJson(Json::Value& a_Value) override;
+	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void UsedBy(cPlayer * a_Player) override;
 
 	/** Modify the beacon level. (It is needed to load the beacon corectly) */
 	void SetBeaconLevel(char a_Level) { m_BeaconLevel = a_Level; }

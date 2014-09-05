@@ -25,10 +25,10 @@ public:
 	cWSSForgetful(cWorld * a_World) : cWSSchema(a_World) {}
 	
 protected:
-	// cWSSchema /*override*/s:
-	virtual bool LoadChunk(const cChunkCoords & a_Chunk) /*override*/ {return false; }
-	virtual bool SaveChunk(const cChunkCoords & a_Chunk) /*override*/ {return true; }
-	virtual const AString GetName(void) const /*override*/ {return "forgetful"; }
+	// cWSSchema overrides:
+	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override {return false; }
+	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override {return true; }
+	virtual const AString GetName(void) const override {return "forgetful"; }
 } ;
 
 

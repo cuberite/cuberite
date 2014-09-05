@@ -213,7 +213,7 @@ public:
 	{
 	}
 	
-	virtual void OnActivate(cPawn & a_Target) /*override*/;
+	virtual void OnActivate(cPawn & a_Target) override;
 };
 
 
@@ -230,7 +230,7 @@ public:
 	{
 	}
 	
-	virtual void OnActivate(cPawn & a_Target) /*override*/;
+	virtual void OnActivate(cPawn & a_Target) override;
 };
 
 
@@ -277,7 +277,7 @@ public:
 	{
 	}
 	
-	virtual void OnTick(cPawn & a_Target) /*override*/;
+	virtual void OnTick(cPawn & a_Target) override;
 };
 
 
@@ -384,8 +384,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect /*override*/s:
-	virtual void OnTick(cPawn & a_Target) /*override*/;
+	// cEntityEffect overrides:
+	virtual void OnTick(cPawn & a_Target) override;
 };
 
 
@@ -402,8 +402,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect /*override*/s:
-	virtual void OnTick(cPawn & a_Target) /*override*/;
+	// cEntityEffect overrides:
+	virtual void OnTick(cPawn & a_Target) override;
 };
 
 
@@ -420,8 +420,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect /*override*/s:
-	virtual void OnTick(cPawn & a_Target) /*override*/;
+	// cEntityEffect overrides:
+	virtual void OnTick(cPawn & a_Target) override;
 };
 
 
@@ -438,8 +438,8 @@ public:
 	{
 	}
 	
-	// cEntityEffect /*override*/s:
-	virtual void OnTick(cPawn & a_Target) /*override*/;
+	// cEntityEffect overrides:
+	virtual void OnTick(cPawn & a_Target) override;
 };
 
 
@@ -486,7 +486,7 @@ public:
 	{
 	}
 	
-	virtual void OnTick(cPawn & a_Target) /*override*/;
+	virtual void OnTick(cPawn & a_Target) override;
 };
 
 

@@ -28,9 +28,9 @@ public:
 	BLOCKTYPE  GetBlockType(void) const { return m_BlockType; }
 	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
 	
-	// cEntity /*override*/s:
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) /*override*/;
+	// cEntity overrides:
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	
 private:
 	BLOCKTYPE  m_BlockType;

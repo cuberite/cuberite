@@ -50,8 +50,8 @@ protected:
 	int m_IntervalSec;
 	
 	
-	// cIsThread /*override*/s:
-	virtual void Execute(void) /*override*/;
+	// cIsThread overrides:
+	virtual void Execute(void) override;
 	
 	/// Sets the initial world age
 	void SetWorldAge(const AString & a_WorldName, Int64 a_Age);

@@ -32,9 +32,9 @@ protected:
 
 	EMCSBiome m_Biome;
 
-	// cBiomeGen /*override*/s:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -72,8 +72,8 @@ protected:
 	int m_NumMisses;
 	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 	
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -134,9 +134,9 @@ class cBioGenCheckerboard :
 protected:
 	int m_BiomeSize;
 	
-	// cBiomeGen /*override*/s:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 } ;
 
 
@@ -157,9 +157,9 @@ public:
 protected:
 	cVoronoiMap m_Voronoi;
 	
-	// cBiomeGen /*override*/s:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	EMCSBiome VoronoiBiome(int a_BlockX, int a_BlockZ);
 } ;
@@ -191,9 +191,9 @@ protected:
 	/// Size of the Voronoi cells, also used for distortion amplitude
 	int m_CellSize;
 	
-	// cBiomeGen /*override*/s:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	/// Distorts the coords using a Perlin-like noise
 	void Distort(int a_BlockX, int a_BlockZ, int & a_DistortedX, int & a_DistortedZ);
@@ -230,9 +230,9 @@ protected:
 	typedef int    IntMap[17 * 17];  // x + 17 * z, expected trimmed into [0..255] range
 	typedef double DblMap[17 * 17];  // x + 17 * z, expected trimmed into [0..1] range
 		
-	// cBiomeGen /*override*/s:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 	
 	/** Step 1: Decides between ocean, land and mushroom, using a DistVoronoi with special conditions and post-processing for mushroom islands
 	Sets biomes to biOcean, -1 (i.e. land), biMushroomIsland or biMushroomShore
@@ -295,9 +295,9 @@ protected:
 	cNoise m_Noise6;
 
 
-	// cBiomeGen /*override*/s:
-	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) /*override*/;
-	virtual void InitializeBiomeGen(cIniFile & a_IniFile) /*override*/;
+	// cBiomeGen overrides:
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
 
 	/// Selects biome from the specified biome group, based on the specified index.
 	/// Note that both params may overflow

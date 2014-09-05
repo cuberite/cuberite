@@ -22,9 +22,9 @@ public:
 	int GetWitherInvulnerableTicks() const { return m_WitherInvulnerableTicks; }
 	void SetWitherInvulnerableTicks(unsigned int a_Ticks) { m_WitherInvulnerableTicks = a_Ticks; }
 	
-	// cEntity /*override*/s
-	virtual bool Initialize(cWorld & a_World) /*override*/;
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) /*override*/;
+	// cEntity overrides
+	virtual bool Initialize(cWorld & a_World) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
 
 private:
 

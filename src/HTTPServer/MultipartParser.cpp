@@ -57,25 +57,25 @@ ThisIsIgnoredEpilogue";
 		printf("Multipart parsing test finished\n");
 	}
 	
-	virtual void OnPartStart(void) /*override*/
+	virtual void OnPartStart(void) override
 	{
 		printf("Starting a new part\n");
 	}
 	
 	
-	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) /*override*/
+	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override
 	{
 		printf("  Hdr: \"%s\"=\"%s\"\n", a_Key.c_str(), a_Value.c_str());
 	}
 	
 	
-	virtual void OnPartData(const char * a_Data, int a_Size) /*override*/
+	virtual void OnPartData(const char * a_Data, int a_Size) override
 	{
 		printf("  Data: %d bytes, \"%.*s\"\n", a_Size, a_Size, a_Data);
 	}
 	
 	
-	virtual void OnPartEnd(void) /*override*/
+	virtual void OnPartEnd(void) override
 	{
 		printf("Part end\n");
 	}

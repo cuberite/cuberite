@@ -82,13 +82,13 @@ protected:
 		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter);
 		
 	protected:
-		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) /*override*/
+		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
 		{
 			UNUSED(a_ChunkX);
 			UNUSED(a_ChunkZ);
 		}
-		virtual bool OnAllChunksAvailable(void) /*override*/;
-		virtual void OnDisabled(void) /*override*/;
+		virtual bool OnAllChunksAvailable(void) override;
+		virtual void OnDisabled(void) override;
 	} ;
 	
 	typedef std::list<cChunkStay *> cChunkStays;
@@ -134,7 +134,7 @@ protected:
 	unsigned int  m_SeedIdx2[BlocksPerYLayer * cChunkDef::Height];
 	int m_NumSeeds;
 
-	virtual void Execute(void) /*override*/;
+	virtual void Execute(void) override;
 
 	/** Lights the entire chunk. If neighbor chunks don't exist, touches them and re-queues the chunk */
 	void LightChunk(cLightingChunkStay & a_Item);

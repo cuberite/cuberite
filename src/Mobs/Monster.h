@@ -77,7 +77,7 @@ protected:
 public:
 	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 	~cMonster() { delete m_AI; delete m_Attack; delete m_Environment; delete m_Movement;}
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) /*override*/;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk);
 
@@ -101,10 +101,10 @@ public:
 	float   GetDropChanceChestplate() { return m_DropChanceChestplate; }
 	float   GetDropChanceLeggings() { return m_DropChanceLeggings; }
 	float   GetDropChanceWeapon() { return m_DropChanceWeapon; }
-	
+
 	eType  GetMobType() const { return m_MobType; }
 	eFamily GetMobFamily() { return mfPassive; }
-	
+
 
 	// Set Functions - Temporary
 	void    SetDropChanceBoots(float a_Chance) {  m_DropChanceBoots = a_Chance; }

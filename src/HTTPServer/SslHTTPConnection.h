@@ -35,9 +35,9 @@ protected:
 	/** The private key used for the certificate */
 	cCryptoKeyPtr m_PrivateKey;
 	
-	// cHTTPConnection /*override*/s:
-	virtual bool DataReceived   (const char * a_Data, size_t a_Size) /*override*/;  // Data is received from the client
-	virtual void GetOutgoingData(AString & a_Data) /*override*/;  // Data can be sent to client
+	// cHTTPConnection overrides:
+	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
+	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
 } ;
 
 

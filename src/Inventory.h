@@ -185,8 +185,8 @@ protected:
 	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum */
 	cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum);
 	
-	// cItemGrid::cListener /*override*/:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) /*override*/;
+	// cItemGrid::cListener override:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 };  // tolua_export
 
 

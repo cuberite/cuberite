@@ -22,7 +22,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) /*override*/
+	) override
 	{
 		a_BlockType = m_BlockType;
 
@@ -43,7 +43,7 @@ public:
 	}
 
 
-	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) /*override*/
+	virtual bool DoesIgnoreBuildCollision(cPlayer * a_Player, NIBBLETYPE a_Meta) override
 	{
 		if ((a_Player->GetEquippedItem().m_ItemType == E_BLOCK_SNOW) && (a_Meta < 7))
 		{
@@ -59,13 +59,13 @@ public:
 	}
 	
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.push_back(cItem(E_ITEM_SNOWBALL, 1, 0));
 	}
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) /*override*/
+	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		if (a_RelY > 0)
 		{
@@ -83,13 +83,13 @@ public:
 	}
 	
 	
-	virtual bool DoesDropOnUnsuitable(void) /*override*/
+	virtual bool DoesDropOnUnsuitable(void) override
 	{
 		return false;
 	}
 	
 
-	virtual const char * GetStepSound(void) /*override*/
+	virtual const char * GetStepSound(void) override
 	{
 		return "step.cloth";
 	}

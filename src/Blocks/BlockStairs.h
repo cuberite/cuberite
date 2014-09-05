@@ -23,7 +23,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) /*override*/
+	) override
 	{
 		UNUSED(a_ChunkInterface);
 		UNUSED(a_BlockX);
@@ -55,7 +55,7 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) /*override*/
+	virtual const char * GetStepSound(void) override
 	{
 		if (
 			(m_BlockType == E_BLOCK_WOODEN_STAIRS) ||
@@ -73,14 +73,14 @@ public:
 	}
 
 
-	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) /*override*/
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		// Reset meta to zero
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
 
-	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) /*override*/
+	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}
@@ -111,7 +111,7 @@ public:
 		}
 	}
 
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) /*override*/
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Toggle bit 3:
 		return (a_Meta & 0x0b) | ((~a_Meta) & 0x04);
