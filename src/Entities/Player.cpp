@@ -1670,7 +1670,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), true);
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), false);
 
 	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
 	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
