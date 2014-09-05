@@ -120,7 +120,7 @@ public:  // tolua_export
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
 	/** Returns true if authentication has been turned on in server settings. */
-	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
+	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
 	
 	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
 	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */

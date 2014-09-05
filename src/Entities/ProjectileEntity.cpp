@@ -222,7 +222,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
 		((a_Creator != NULL) ? a_Creator->GetUniqueID() : -1),
-		((a_Creator != NULL) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : "")
+		((a_Creator != NULL) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : ""),
+		((a_Creator != NULL) ? a_Creator->GetEquippedWeapon().m_Enchantments : cEnchantments())
 	),
 	m_IsInGround(false)
 {
@@ -235,7 +236,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Vector3d & a_Pos, const Vector3d & a_Speed, double a_Width, double a_Height) :
 	super(etProjectile, a_Pos.x, a_Pos.y, a_Pos.z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
-	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : ""),
+	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "", a_Creator->GetEquippedWeapon().m_Enchantments),
 	m_IsInGround(false)
 {
 	SetSpeed(a_Speed);

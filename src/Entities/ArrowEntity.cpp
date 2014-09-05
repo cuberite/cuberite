@@ -90,6 +90,13 @@ void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFa
 	
 	// Broadcast arrow hit sound
 	m_World->BroadcastSoundEffect("random.bowhit", (double)X, (double)Y, (double)Z, 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+
+	if ((m_World->GetBlock(Hit) == E_BLOCK_TNT) && IsOnFire())
+	{
+		m_World->SetBlock(X, Y, Z, E_BLOCK_AIR, 0);
+		m_World->SpawnPrimedTNT(X, Y, Z);
+	}
+
 }
 
 
@@ -103,8 +110,36 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		Damage += m_World->GetTickRandomNumber(Damage / 2 + 2);
 	}
-	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, 1);
+
+	int PowerLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPower);
+	if (PowerLevel > 0)
+	{
+		int ExtraDamage = (int)ceil(0.25 * (PowerLevel + 1));
+		Damage += ExtraDamage;
+	}
+
+	int KnockbackAmount = 1;
+	int PunchLevel = m_CreatorData.m_Enchantments.GetLevel(cEnchantments::enchPunch);
+	if (PunchLevel > 0)
+	{
+		Vector3d LookVector = GetLookVector();
+		Vector3f FinalSpeed = Vector3f(0, 0, 0);
+		switch (PunchLevel)
+		{
+			case 1: FinalSpeed = LookVector * Vector3d(5, 0.3, 5); break;
+			case 2: FinalSpeed = LookVector * Vector3d(8, 0.3, 8); break;
+			default: break;
+		}
+		a_EntityHit.SetSpeed(FinalSpeed);
+	}
+
+	a_EntityHit.TakeDamage(dtRangedAttack, this, Damage, KnockbackAmount);
 	
+	if (IsOnFire() && !a_EntityHit.IsSubmerged() && !a_EntityHit.IsSwimming())
+	{
+		a_EntityHit.StartBurning(100);
+	}
+
 	// Broadcast successful hit sound
 	GetWorld()->BroadcastSoundEffect("random.successful_hit", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 	

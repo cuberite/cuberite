@@ -431,10 +431,45 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		else
 		{
 			// TODO: Add a proper overridable function for this
-			Pickups.Add(m_BlockType, 1, Meta);
+			if (a_Digger != NULL)
+			{
+				cEnchantments Enchantments = a_Digger->GetEquippedWeapon().m_Enchantments;
+				if ((Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0) && a_Digger->IsPlayer())
+				{
+					switch (m_BlockType)
+					{
+						case E_BLOCK_CAKE:
+						case E_BLOCK_CARROTS:
+						case E_BLOCK_COCOA_POD:
+						case E_BLOCK_DOUBLE_STONE_SLAB:
+						case E_BLOCK_DOUBLE_WOODEN_SLAB:
+						case E_BLOCK_FIRE:
+						case E_BLOCK_FARMLAND:
+						case E_BLOCK_MELON_STEM:
+						case E_BLOCK_MOB_SPAWNER:
+						case E_BLOCK_NETHER_WART:
+						case E_BLOCK_POTATOES:
+						case E_BLOCK_PUMPKIN_STEM:
+						case E_BLOCK_SNOW:
+						case E_BLOCK_SUGARCANE:
+						case E_BLOCK_TALL_GRASS:
+						case E_BLOCK_CROPS:
+						{
+							// Silktouch can't be used for this blocks
+							ConvertToPickups(Pickups, Meta);
+							break;
+						};
+						default: Pickups.Add(m_BlockType, 1, Meta);
+					}
+				}
+				else
+				{
+					Pickups.Add(m_BlockType, 1, Meta);
+				}
+			}
 		}
 	}
-	
+
 	// Allow plugins to modify the pickups:
 	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
 	

@@ -65,7 +65,7 @@
 			{
 				case cLogger::llRegular:
 				{
-					// Gray on black 
+					// Gray on black
 					Attrib = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 					break;
 				}
@@ -93,7 +93,7 @@
 		
 		
 		virtual void SetDefaultLogColour() /*override*/
-		{ 
+		{
 			SetConsoleTextAttribute(m_Console, m_DefaultConsoleAttrib);
 		}
 		
@@ -119,9 +119,9 @@
 			{
 				case cLogger::llRegular:
 				{
-					// Whatever the console default is 
+					// Whatever the console default is
 					printf("\x1b[0m");
-					break;  
+					break;
 				}
 				case cLogger::llInfo:
 				{

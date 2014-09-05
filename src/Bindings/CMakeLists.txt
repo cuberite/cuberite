@@ -11,6 +11,7 @@ SET (SRCS
     LuaState.cpp
     LuaWindow.cpp
     ManualBindings.cpp
+    ManualBindings_RankManager.cpp
     Plugin.cpp
     PluginLua.cpp
     PluginManager.cpp
@@ -96,7 +97,6 @@ set(BINDING_DEPENDENCIES
     ../Entities/HangingEntity.h
     ../Entities/ItemFrame.h
     ../Generating/ChunkDesc.h
-    ../Group.h
     ../Inventory.h
     ../Item.h
     ../ItemGrid.h

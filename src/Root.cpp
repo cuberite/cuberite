@@ -6,7 +6,6 @@
 #include "World.h"
 #include "WebAdmin.h"
 #include "FurnaceRecipe.h"
-#include "GroupManager.h"
 #include "CraftingRecipes.h"
 #include "Bindings/PluginManager.h"
 #include "MonsterConfig.h"
@@ -47,7 +46,6 @@ cRoot::cRoot(void) :
 	m_InputThread(NULL),
 	m_Server(NULL),
 	m_MonsterConfig(NULL),
-	m_GroupManager(NULL),
 	m_CraftingRecipes(NULL),
 	m_FurnaceRecipe(NULL),
 	m_WebAdmin(NULL),
@@ -161,7 +159,7 @@ void cRoot::Start(void)
 		m_WebAdmin->Init();
 
 		LOGD("Loading settings...");
-		m_GroupManager    = new cGroupManager();
+		m_RankManager.Initialize(m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
@@ -240,8 +238,6 @@ void cRoot::Start(void)
 		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
-		LOGD("Forgetting groups...");
-		delete m_GroupManager; m_GroupManager = NULL;
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
@@ -472,16 +468,6 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 
 void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 {
-	// Some commands are built-in:
-	if (a_Cmd == "stop")
-	{
-		m_bStop = true;
-	}
-	else if (a_Cmd == "restart")
-	{
-		m_bRestart = true;
-	}
-
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.push_back(cCommand(a_Cmd, new cLogCommandDeleteSelfOutputCallback));
@@ -493,14 +479,16 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
-	// Some commands are built-in:
+	// cRoot handles stopping and restarting due to our access to controlling variables
 	if (a_Cmd == "stop")
 	{
 		m_bStop = true;
+		return;
 	}
 	else if (a_Cmd == "restart")
 	{
 		m_bRestart = true;
+		return;
 	}
 
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
@@ -549,17 +537,6 @@ void cRoot::SaveAllChunks(void)
 	{
 		itr->second->QueueSaveAllChunks();
 	}
-}
-
-
-
-
-
-void cRoot::ReloadGroups(void)
-{
-	LOG("Reload groups ...");
-	m_GroupManager->LoadGroups();
-	m_GroupManager->CheckUsers();
 }
 
 

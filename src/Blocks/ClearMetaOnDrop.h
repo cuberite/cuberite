@@ -7,7 +7,7 @@
 // For example to use in class Foo which should inherit Bar use
 // class Foo : public cClearMetaOnDrop<Bar>;
 
-template<class Base>
+template <class Base>
 class cClearMetaOnDrop : public Base
 {
 public:

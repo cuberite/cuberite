@@ -73,6 +73,8 @@ public:
 	HEIGHTTYPE * m_HeightMap;  // 3x3 chunks of height map,  organized as a single XZY blob of data (instead of 3x3 XZY blobs)
 	
 	cReader(BLOCKTYPE * a_BlockTypes, HEIGHTTYPE * a_HeightMap) :
+		m_ReadingChunkX(0),
+		m_ReadingChunkZ(0),
 		m_MaxHeight(0),
 		m_BlockTypes(a_BlockTypes),
 		m_HeightMap(a_HeightMap)
@@ -89,7 +91,9 @@ public:
 
 cLightingThread::cLightingThread(void) :
 	super("cLightingThread"),
-	m_World(NULL)
+	m_World(NULL),
+	m_MaxHeight(0),
+	m_NumSeeds(0)
 {
 }
 

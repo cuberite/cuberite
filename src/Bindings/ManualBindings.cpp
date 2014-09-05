@@ -301,11 +301,11 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(const AString &, cItemCallback<Ty2> &)
-	>
+>
 static int tolua_DoWith(lua_State* tolua_S)
 {
 	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
@@ -395,7 +395,7 @@ static int tolua_DoWith(lua_State* tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(int, cItemCallback<Ty2> &)
@@ -485,7 +485,7 @@ static int tolua_DoWithID(lua_State* tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(int, int, int, cItemCallback<Ty2> &)
@@ -580,7 +580,7 @@ static int tolua_DoWithXYZ(lua_State* tolua_S)
 
 
 
-template<
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(int, int, cItemCallback<Ty2> &)
@@ -676,7 +676,76 @@ static int tolua_ForEachInChunk(lua_State * tolua_S)
 
 
 
-template<
+template <
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(const cBoundingBox &, cItemCallback<Ty2> &)
+>
+static int tolua_ForEachInBox(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamUserType(2, "cBoundingBox") ||
+		!L.CheckParamFunction(3) ||
+		!L.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	Ty1 * Self = NULL;
+	cBoundingBox * Box = NULL;
+	L.GetStackValues(1, Self, Box);
+	ASSERT(Self != NULL);  // We have verified the type at the top, so we should get valid objects here
+	ASSERT(Box != NULL);
+	
+	// Create a reference for the function:
+	cLuaState::cRef FnRef(L, 3);
+
+	// Callback wrapper for the Lua function:
+	class cLuaCallback : public cItemCallback<Ty2>
+	{
+	public:
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FuncRef) :
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FuncRef)
+		{}
+
+	private:
+		// cItemCallback<Ty2> overrides:
+		virtual bool Item(Ty2 * a_Item) override
+		{
+			bool res = false;
+			if (!m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+			{
+				LOGWARNING("Failed to call Lua callback");
+				m_LuaState.LogStackTrace();
+				return true;  // Abort enumeration
+			}
+
+			return res;
+		}
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+	} Callback(L, FnRef);
+
+	bool bRetVal = (Self->*Func1)(*Box, Callback);
+	
+	FnRef.UnRef();
+
+	/* Push return value on stack */
+	tolua_pushboolean(tolua_S, bRetVal);
+	return 1;
+}
+
+
+
+
+
+template <
 	class Ty1,
 	class Ty2,
 	bool (Ty1::*Func1)(cItemCallback<Ty2> &)
@@ -1803,49 +1872,30 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 
 
-static int tolua_cPlayer_GetGroups(lua_State * tolua_S)
+static int tolua_cPlayer_GetPermissions(lua_State * tolua_S)
 {
+	// Function signature: cPlayer:GetPermissions() -> {permissions-array}
+
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cPlayer") ||
+		!L.CheckParamEnd     (2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
 	cPlayer * self = (cPlayer *)tolua_tousertype(tolua_S, 1, NULL);
-
-	const cPlayer::GroupList & AllGroups = self->GetGroups();
-
-	lua_createtable(tolua_S, (int)AllGroups.size(), 0);
-	int newTable = lua_gettop(tolua_S);
-	int index = 1;
-	cPlayer::GroupList::const_iterator iter = AllGroups.begin();
-	while (iter != AllGroups.end())
+	if (self == NULL)
 	{
-		const cGroup * Group = *iter;
-		tolua_pushusertype(tolua_S, (void *)Group, "const cGroup");
-		lua_rawseti(tolua_S, newTable, index);
-		++iter;
-		++index;
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		return 0;
 	}
-	return 1;
-}
-
-
-
-
-
-static int tolua_cPlayer_GetResolvedPermissions(lua_State * tolua_S)
-{
-	cPlayer * self = (cPlayer*)  tolua_tousertype(tolua_S, 1, NULL);
-
-	cPlayer::StringList AllPermissions = self->GetResolvedPermissions();
-
-	lua_createtable(tolua_S, (int)AllPermissions.size(), 0);
-	int newTable = lua_gettop(tolua_S);
-	int index = 1;
-	cPlayer::StringList::iterator iter = AllPermissions.begin();
-	while (iter != AllPermissions.end())
-	{
-		std::string & Permission = *iter;
-		lua_pushlstring(tolua_S, Permission.c_str(), Permission.length());
-		lua_rawseti(tolua_S, newTable, index);
-		++iter;
-		++index;
-	}
+	
+	// Push the permissions:
+	L.Push(self->GetPermissions());
 	return 1;
 }
 
@@ -1896,6 +1946,40 @@ static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 	// Open the window
 	self->OpenWindow(wnd);
 	return 0;
+}
+
+
+
+
+
+static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
+{
+	// Function signature: cPlayer:PermissionMatches(PermissionStr, TemplateStr) -> bool
+
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cPlayer") ||
+		!L.CheckParamString  (2, 3) ||
+		!L.CheckParamEnd     (4)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * self = (cPlayer *)tolua_tousertype(tolua_S, 1, NULL);
+	if (self == NULL)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		return 0;
+	}
+	AString Permission, Template;
+	L.GetStackValues(2, Permission, Template);
+	
+	// Push the result of the match:
+	L.Push(self->PermissionMatches(StringSplit(Permission, "."), StringSplit(Template, ".")));
+	return 1;
 }
 
 
@@ -2399,6 +2483,62 @@ static int tolua_cMojangAPI_GetUUIDsFromPlayerNames(lua_State * L)
 
 
 
+static int tolua_cMojangAPI_MakeUUIDDashed(lua_State * L)
+{
+	// Function signature: cMojangAPI:MakeUUIDDashed(UUID) -> string
+
+	// Check params:
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString UUID;
+	S.GetStackValue(2, UUID);
+
+	// Push the result:
+	S.Push(cRoot::Get()->GetMojangAPI().MakeUUIDDashed(UUID));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cMojangAPI_MakeUUIDShort(lua_State * L)
+{
+	// Function signature: cMojangAPI:MakeUUIDShort(UUID) -> string
+
+	// Check params:
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cMojangAPI") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the params:
+	AString UUID;
+	S.GetStackValue(2, UUID);
+
+	// Push the result:
+	S.Push(cRoot::Get()->GetMojangAPI().MakeUUIDShort(UUID));
+	return 1;
+}
+
+
+
+
+
 static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 {
 	tolua_Error tolua_err;
@@ -2592,7 +2732,7 @@ static int tolua_cRoot_GetFurnaceRecipe(lua_State * tolua_S)
 	
 	// Get the recipe for the input
 	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
-	const cFurnaceRecipe::Recipe * Recipe = FR->GetRecipeFrom(*Input);
+	const cFurnaceRecipe::cRecipe * Recipe = FR->GetRecipeFrom(*Input);
 	if (Recipe == NULL)
 	{
 		// There is no such furnace recipe for this input, return no value
@@ -3256,6 +3396,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
 			tolua_function(tolua_S, "ForEachChestInChunk",       tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
 			tolua_function(tolua_S, "ForEachEntity",             tolua_ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
+			tolua_function(tolua_S, "ForEachEntityInBox",        tolua_ForEachInBox<  cWorld, cEntity,        &cWorld::ForEachEntityInBox>);
 			tolua_function(tolua_S, "ForEachEntityInChunk",      tolua_ForEachInChunk<cWorld, cEntity,        &cWorld::ForEachEntityInChunk>);
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",     tolua_ForEachInChunk<cWorld, cFurnaceEntity, &cWorld::ForEachFurnaceInChunk>);
 			tolua_function(tolua_S, "ForEachPlayer",             tolua_ForEach<       cWorld, cPlayer,        &cWorld::ForEachPlayer>);
@@ -3295,9 +3436,9 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
-			tolua_function(tolua_S, "GetGroups",              tolua_cPlayer_GetGroups);
-			tolua_function(tolua_S, "GetResolvedPermissions", tolua_cPlayer_GetResolvedPermissions);
-			tolua_function(tolua_S, "OpenWindow",             tolua_cPlayer_OpenWindow);
+			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
+			tolua_function(tolua_S, "OpenWindow",        tolua_cPlayer_OpenWindow);
+			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cLuaWindow");
@@ -3340,6 +3481,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetPlayerNameFromUUID",      tolua_cMojangAPI_GetPlayerNameFromUUID);
 			tolua_function(tolua_S, "GetUUIDFromPlayerName",      tolua_cMojangAPI_GetUUIDFromPlayerName);
 			tolua_function(tolua_S, "GetUUIDsFromPlayerNames",    tolua_cMojangAPI_GetUUIDsFromPlayerNames);
+			tolua_function(tolua_S, "MakeUUIDDashed",             tolua_cMojangAPI_MakeUUIDDashed);
+			tolua_function(tolua_S, "MakeUUIDShort",              tolua_cMojangAPI_MakeUUIDShort);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cItemGrid");
@@ -3347,6 +3490,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 
 		tolua_function(tolua_S, "md5", tolua_md5);
+		
+		BindRankManager(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }

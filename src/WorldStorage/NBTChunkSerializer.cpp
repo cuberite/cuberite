@@ -615,7 +615,6 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
-		Vector3d Pos = a_Projectile->GetPosition();
 		m_Writer.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
 		
 		switch (a_Projectile->GetProjectileKind())

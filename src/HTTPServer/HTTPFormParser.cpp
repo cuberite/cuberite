@@ -15,7 +15,9 @@
 
 cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callbacks) :
 	m_Callbacks(a_Callbacks),
-	m_IsValid(true)
+	m_IsValid(true),
+	m_IsCurrentPartFile(false),
+	m_FileHasBeenAnnounced(false)
 {
 	if (a_Request.GetMethod() == "GET")
 	{
@@ -55,7 +57,9 @@ cHTTPFormParser::cHTTPFormParser(cHTTPRequest & a_Request, cCallbacks & a_Callba
 cHTTPFormParser::cHTTPFormParser(eKind a_Kind, const char * a_Data, size_t a_Size, cCallbacks & a_Callbacks) :
 	m_Callbacks(a_Callbacks),
 	m_Kind(a_Kind),
-	m_IsValid(true)
+	m_IsValid(true),
+	m_IsCurrentPartFile(false),
+	m_FileHasBeenAnnounced(false)
 {
 	Parse(a_Data, a_Size);
 }

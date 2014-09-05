@@ -207,7 +207,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 		
 		// Food (please keep alpha-sorted):
-		// (carrots and potatoes handled in SeedHandler as both seed and food
+		// (carrots and potatoes handled separately in SeedHandler as they're both seed and food)
 		case E_ITEM_BAKED_POTATO:
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKED_CHICKEN:
@@ -217,13 +217,15 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
 		case E_ITEM_MUSHROOM_SOUP:
+		case E_ITEM_MUTTON:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
+		case E_ITEM_RED_APPLE:
 		case E_ITEM_RAW_BEEF:
 		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_RAW_FISH:
+		case E_ITEM_RAW_MUTTON:
 		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_RED_APPLE:
 		case E_ITEM_ROTTEN_FLESH:
 		case E_ITEM_SPIDER_EYE:
 		case E_ITEM_STEAK:

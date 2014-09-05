@@ -30,18 +30,18 @@ public:
 		{
 			return;
 		}
-
-		BLOCKTYPE BlockBelow = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
-		if (!cBlockInfo::FullyOccupiesVoxel(BlockBelow) && !IsBlockLiquid(BlockBelow))
+		
+		cEnchantments Enchantments = a_Player->GetInventory().GetEquippedItem().m_Enchantments;
+		if (Enchantments.GetLevel(cEnchantments::enchSilkTouch) == 0)
 		{
-			return;
-		}
+			BLOCKTYPE BlockBelow = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
+			if (!cBlockInfo::FullyOccupiesVoxel(BlockBelow) && !IsBlockLiquid(BlockBelow))
+			{
+				return;
+			}
 
-		a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WATER, 0);
-		// This is called later than the real destroying of this ice block
+			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WATER, 0);
+			// This is called later than the real destroying of this ice block
+		}
 	}
 } ;
-
-
-
-

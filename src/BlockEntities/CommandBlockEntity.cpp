@@ -13,6 +13,7 @@
 #include "../Root.h"
 #include "../Server.h"  // ExecuteConsoleCommand()
 #include "../Chunk.h"
+#include "../ChatColor.h"
 
 
 
@@ -187,12 +188,11 @@ void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
 
 void cCommandBlockEntity::Execute()
 {
-	if (m_World != NULL)
+	ASSERT(m_World != NULL);  // Execute should not be called before the command block is attached to a world
+	
+	if (!m_World->AreCommandBlocksEnabled())
 	{
-		if (!m_World->AreCommandBlocksEnabled())
-		{
-			return;
-		}
+		return;
 	}
 
 	class CommandBlockOutCb :
@@ -206,15 +206,28 @@ void cCommandBlockEntity::Execute()
 		virtual void Out(const AString & a_Text)
 		{
 			// Overwrite field
-			m_CmdBlock->SetLastOutput(a_Text);
+			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
 		}
 	} CmdBlockOutCb(this);
 
-	LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
-
-	cServer * Server = cRoot::Get()->GetServer();
-
-	Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+	// Administrator commands are not executable by command blocks:
+	if (
+		(m_Command != "stop") &&
+		(m_Command != "restart") &&
+		(m_Command != "kick") &&
+		(m_Command != "ban") &&
+		(m_Command != "ipban")
+	)
+	{
+		cServer * Server = cRoot::Get()->GetServer();
+		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
+		Server->ExecuteConsoleCommand(m_Command, CmdBlockOutCb);
+	}
+	else
+	{
+		SetLastOutput(cClientHandle::FormatChatPrefix(GetWorld()->ShouldUseChatPrefixes(), "FAILURE", cChatColor::Rose, cChatColor::White) + "Adminstration commands can not be executed");
+		LOGD("cCommandBlockEntity: Prevented execution of administration command %s", m_Command.c_str());
+	}
 
 	// TODO 2014-01-18 xdot: Update the signal strength.
 	m_Result = 0;

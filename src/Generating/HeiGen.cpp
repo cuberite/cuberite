@@ -239,7 +239,13 @@ bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_Rel
 
 cHeiGenClassic::cHeiGenClassic(int a_Seed) :
 	m_Seed(a_Seed),
-	m_Noise(a_Seed)
+	m_Noise(a_Seed),
+	m_HeightFreq1(1.0f),
+	m_HeightAmp1(1.0f),
+	m_HeightFreq2(0.5f),
+	m_HeightAmp2(0.5f),
+	m_HeightFreq3(0.1f),
+	m_HeightAmp3(0.1f)
 {
 }
 

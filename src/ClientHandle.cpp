@@ -75,11 +75,21 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TimeSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
+	m_PingStartTime(0),
+	m_LastPingTime(1000),
 	m_BlockDigAnimStage(-1),
+	m_BlockDigAnimSpeed(0),
+	m_BlockDigAnimX(0),
+	m_BlockDigAnimY(256),  // Invalid Y, so that the coords don't get picked up
+	m_BlockDigAnimZ(0),
 	m_HasStartedDigging(false),
+	m_LastDigBlockX(0),
+	m_LastDigBlockY(256),  // Invalid Y, so that the coords don't get picked up
+	m_LastDigBlockZ(0),
 	m_State(csConnected),
 	m_ShouldCheckDownloaded(false),
 	m_NumExplosionsThisTick(0),
+	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB")
@@ -462,13 +472,13 @@ void cClientHandle::StreamChunks(void)
 		// For each distance touch chunks in a hollow square centered around current position:
 		for (int i = -d; i <= d; ++i)
 		{
-			World->TouchChunk(ChunkPosX + d, ZERO_CHUNK_Y, ChunkPosZ + i);
-			World->TouchChunk(ChunkPosX - d, ZERO_CHUNK_Y, ChunkPosZ + i);
+			World->TouchChunk(ChunkPosX + d, ChunkPosZ + i);
+			World->TouchChunk(ChunkPosX - d, ChunkPosZ + i);
 		}  // for i
 		for (int i = -d + 1; i < d; ++i)
 		{
-			World->TouchChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ + d);
-			World->TouchChunk(ChunkPosX + i, ZERO_CHUNK_Y, ChunkPosZ - d);
+			World->TouchChunk(ChunkPosX + i, ChunkPosZ + d);
+			World->TouchChunk(ChunkPosX + i, ChunkPosZ - d);
 		}  // for i
 	}  // for d
 }
@@ -491,8 +501,8 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		{
 			cCSLock Lock(m_CSChunkLists);
-			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
-			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 		}
 		World->SendChunkTo(a_ChunkX, a_ChunkZ, this);
 	}
@@ -912,19 +922,36 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		return;
 	}
 
-	if (
-		((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED)) &&  // Only do a radius check for block destruction - things like pickup tossing send coordinates that are to be ignored
-		((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-		(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-		(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
-	)
+	if ((a_Status == DIG_STATUS_STARTED) || (a_Status == DIG_STATUS_FINISHED))
 	{
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))->IsClickedThrough())
+		if (a_BlockFace == BLOCK_FACE_NONE)
 		{
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);
+			return;
 		}
-		return;
+
+		/* Check for clickthrough-blocks:
+		When the user breaks a fire block, the client send the wrong block location.
+		We must find the right block with the face direction. */
+		int BlockX = a_BlockX;
+		int BlockY = a_BlockY;
+		int BlockZ = a_BlockZ;
+		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
+		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough())
+		{
+			a_BlockX = BlockX;
+			a_BlockY = BlockY;
+			a_BlockZ = BlockZ;
+		}
+
+		if (
+			((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
+			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
+			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
+		)
+		{
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			return;
+		}
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
@@ -932,10 +959,6 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ))->IsClickedThrough())
-		{
-			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);
-		}
 		return;
 	}
 
@@ -1036,7 +1059,8 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 
 	if (
 		m_Player->IsGameModeCreative() &&
-		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType)
+		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType) &&
+		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
 	)
 	{
 		// Players can't destroy blocks with a Sword in the hand.
@@ -1058,26 +1082,6 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 	m_LastDigBlockX = a_BlockX;
 	m_LastDigBlockY = a_BlockY;
 	m_LastDigBlockZ = a_BlockZ;
-
-	// Check for clickthrough-blocks:
-	/* When the user breaks a fire block, the client send the wrong block location.
-	We must find the right block with the face direction. */
-	if (a_BlockFace != BLOCK_FACE_NONE)
-	{
-		int pX = a_BlockX;
-		int pY = a_BlockY;
-		int pZ = a_BlockZ;
-
-		AddFaceDirection(pX, pY, pZ, a_BlockFace);  // Get the block in front of the clicked coordinates (m_bInverse defaulted to false)
-		cBlockHandler * Handler = cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(pX, pY, pZ));
-
-		if (Handler->IsClickedThrough())
-		{
-			cChunkInterface ChunkInterface(m_Player->GetWorld()->GetChunkMap());
-			Handler->OnDigging(ChunkInterface, *m_Player->GetWorld(), m_Player, pX, pY, pZ);
-			return;
-		}
-	}
 
 	if (
 		(m_Player->IsGameModeCreative()) ||  // In creative mode, digging is done immediately
@@ -2730,7 +2734,7 @@ bool cClientHandle::HasPluginChannel(const AString & a_PluginChannel)
 
 
 
-bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkZ)
 {
 	if (m_State >= csDestroying)
 	{
@@ -2738,7 +2742,7 @@ bool cClientHandle::WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
 	}
 	
 	cCSLock Lock(m_CSChunkLists);
-	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkY, a_ChunkZ)) != m_ChunksToSend.end());
+	return (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) != m_ChunksToSend.end());
 }
 
 
@@ -2754,9 +2758,9 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 	
 	LOGD("Adding chunk [%d, %d] to wanted chunks for client %p", a_ChunkX, a_ChunkZ, this);
 	cCSLock Lock(m_CSChunkLists);
-	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ)) == m_ChunksToSend.end())
+	if (std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), cChunkCoords(a_ChunkX, a_ChunkZ)) == m_ChunksToSend.end())
 	{
-		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+		m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
 }
 
@@ -2854,11 +2858,27 @@ void cClientHandle::SocketClosed(void)
 
 
 
-void cClientHandle::HandleEnchantItem(Byte & WindowID, Byte & Enchantment)
+void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 {
-	cEnchantingWindow * Window = (cEnchantingWindow*)m_Player->GetWindow();
+	if (a_Enchantment > 2)
+	{
+		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
+		Kick("Invalid enchanting!");
+		return;
+	}
+
+	if (
+		(m_Player->GetWindow() == NULL) ||
+		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
+		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
+	)
+	{
+		return;
+	}
+	
+	cEnchantingWindow * Window = (cEnchantingWindow*) m_Player->GetWindow();
 	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
-	int BaseEnchantmentLevel = Window->GetPropertyValue(Enchantment);
+	int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
 	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{

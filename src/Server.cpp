@@ -11,7 +11,6 @@
 #include "World.h"
 #include "ChunkDef.h"
 #include "Bindings/PluginManager.h"
-#include "GroupManager.h"
 #include "ChatColor.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
@@ -117,7 +116,9 @@ cServer::cServer(void) :
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
 	m_TickThread(*this),
-	m_ShouldAuthenticate(false)
+	m_ShouldAuthenticate(false),
+	m_ShouldLoadOfflinePlayerData(false),
+	m_ShouldLoadNamedPlayerData(true)
 {
 }
 
@@ -457,83 +458,98 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 
-	// Special handling: "stop" and "restart" are built in
-	if ((split[0].compare("stop") == 0) || (split[0].compare("restart") == 0))
-	{
-		return;
-	}
+	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
 	
 	// "help" and "reload" are to be handled by MCS, so that they work no matter what
 	if (split[0] == "help")
 	{
 		PrintHelp(split, a_Output);
-		return;
-	}
-	if (split[0] == "reload")
-	{
-		cPluginManager::Get()->ReloadPlugins();
-		cRoot::Get()->ReloadGroups();
-		return;
-	}
-	if (split[0] == "reloadplugins")
-	{
-		cPluginManager::Get()->ReloadPlugins();
-		return;
-	}
-	if (split[0] == "reloadgroups")
-	{
-		cRoot::Get()->ReloadGroups();
-		a_Output.Out("Groups reloaded!");
 		a_Output.Finished();
 		return;
 	}
-	if (split[0] == "load")
+	else if (split[0] == "reload")
+	{
+		cPluginManager::Get()->ReloadPlugins();
+		a_Output.Finished();
+		return;
+	}
+	else if (split[0] == "reloadplugins")
+	{
+		cPluginManager::Get()->ReloadPlugins();
+		a_Output.Out("Plugins reloaded");
+		a_Output.Finished();
+		return;
+	}
+	else if (split[0] == "load")
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::Get()->LoadPlugin(split[1]);
-
-			return;
+			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
 		{
-			a_Output.Out("No plugin given! Command: load <pluginname>");
-			a_Output.Finished();
-			return;
+			a_Output.Out("Usage: load <pluginname>");
 		}
+		a_Output.Finished();
+		return;
 	}
-
-	if (split[0] == "unload")
+	else if (split[0] == "unload")
 	{
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->RemovePlugin(cPluginManager::Get()->GetPlugin(split[1]));
-			return;
+			a_Output.Out("Plugin unloaded");
 		}
 		else
 		{
-			a_Output.Out("No plugin given! Command: unload <pluginname>");
-			a_Output.Finished();
-			return;
+			a_Output.Out("Usage: unload <pluginname>");
 		}
+		a_Output.Finished();
+		return;
+	}
+	if (split[0] == "destroyentities")
+	{
+		class WorldCallback : public cWorldListCallback
+		{
+			virtual bool Item(cWorld * a_World) override
+			{
+				class EntityCallback : public cEntityCallback
+				{
+					virtual bool Item(cEntity * a_Entity) override
+					{
+						if (!a_Entity->IsPlayer())
+						{
+							a_Entity->Destroy();
+						}
+						return false;
+					}
+				} EC;
+				a_World->ForEachEntity(EC);
+				return false;
+			}
+		} WC;
+		cRoot::Get()->ForEachWorld(WC);
+		a_Output.Out("Destroyed all entities");
+		a_Output.Finished();
+		return;
 	}
 
 	// There is currently no way a plugin can do these (and probably won't ever be):
-	if (split[0].compare("chunkstats") == 0)
+	else if (split[0].compare("chunkstats") == 0)
 	{
 		cRoot::Get()->LogChunkStats(a_Output);
 		a_Output.Finished();
 		return;
 	}
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	if (split[0].compare("dumpmem") == 0)
+	else if (split[0].compare("dumpmem") == 0)
 	{
 		LeakFinderXmlOutput Output("memdump.xml");
 		DumpUsedMemory(&Output);
 		return;
 	}
 	
-	if (split[0].compare("killmem") == 0)
+	else if (split[0].compare("killmem") == 0)
 	{
 		for (;;)
 		{
@@ -542,7 +558,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	#endif
 
-	if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
+	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
 	{
 		a_Output.Finished();
 		return;
@@ -610,6 +626,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
 	PlgMgr->BindConsoleCommand("load <pluginname>", NULL, " - Adds and enables the specified plugin");
 	PlgMgr->BindConsoleCommand("unload <pluginname>", NULL, " - Disables the specified plugin");
+	PlgMgr->BindConsoleCommand("destroyentities", NULL, " - Destroys all entities in all worlds");
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");

@@ -54,6 +54,7 @@ local Combinations =
 	{9, 2},
 	
 	-- Special combinations:
+	{5, 5},
 	{7, 3},
 	{8, 3},
 	{9, 5},
@@ -108,7 +109,7 @@ local function WriteOverload(f, a_NumParams, a_NumReturns)
 	
 	-- Write the function signature:
 	f:write("bool Call(")
-	f:write("FnT a_Function")
+	f:write("const FnT & a_Function")
 	for i = 1, a_NumParams do
 		f:write(", ParamT", i, " a_Param", i)
 	end
@@ -180,6 +181,33 @@ f:write("\n\n\n\n\n")
 -- Write out a template function for each overload:
 for _, combination in ipairs(Combinations) do
 	WriteOverload(f, combination[1], combination[2])
+end
+
+-- Generate the cLuaState::GetStackValues() multi-param templates:
+for i = 2, 6 do
+	f:write("/** Reads ", i, " consecutive values off the stack */\ntemplate <\n")
+	
+	-- Write the template function header:
+	local txt = {}
+	for idx = 1, i do
+		table.insert(txt, "\ttypename ArgT" .. idx)
+	end
+	f:write(table.concat(txt, ",\n"))
+	
+	-- Write the argument declarations:
+	txt = {}
+	f:write("\n>\nvoid GetStackValues(\n\tint a_BeginPos,\n")
+	for idx = 1, i do
+		table.insert(txt, "\tArgT" .. idx .. " & Arg" .. idx)
+	end
+	f:write(table.concat(txt, ",\n"))
+	
+	-- Write the function body:
+	f:write("\n)\n{\n")
+	for idx = 1, i do
+		f:write("\tGetStackValue(a_BeginPos + ", idx - 1, ", Arg", idx, ");\n")
+	end
+	f:write("}\n\n\n\n\n\n")
 end
 
 -- Close the generated file

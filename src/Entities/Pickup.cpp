@@ -150,10 +150,14 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 				}
 			}
 
-			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine into an already full pickup
+			// Try to combine the pickup with adjacent same-item pickups:
+			if (!IsDestroyed() && (m_Item.m_ItemCount < m_Item.GetMaxStackSize()))  // Don't combine if already full
 			{
+				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
+				// That is a small price to pay for not having to traverse the entire world for each entity.
+				// The speedup in the tick thread is quite considerable.
 				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
-				m_World->ForEachEntity(PickupCombiningCallback);  // Not ForEachEntityInChunk, otherwise pickups don't combine across chunk boundaries
+				a_Chunk.ForEachEntity(PickupCombiningCallback);
 				if (PickupCombiningCallback.FoundMatchingPickup())
 				{
 					m_World->BroadcastEntityMetadata(*this);

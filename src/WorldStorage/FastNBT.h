@@ -76,7 +76,9 @@ public:
 	
 	cFastNBTTag(eTagType a_Type, int a_Parent) :
 		m_Type(a_Type),
+		m_NameStart(0),
 		m_NameLength(0),
+		m_DataStart(0),
 		m_DataLength(0),
 		m_Parent(a_Parent),
 		m_PrevSibling(-1),
@@ -88,7 +90,9 @@ public:
 
 	cFastNBTTag(eTagType a_Type, int a_Parent, int a_PrevSibling) :
 		m_Type(a_Type),
+		m_NameStart(0),
 		m_NameLength(0),
+		m_DataStart(0),
 		m_DataLength(0),
 		m_Parent(a_Parent),
 		m_PrevSibling(a_PrevSibling),

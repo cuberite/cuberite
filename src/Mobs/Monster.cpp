@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 #include "Monster.h"
 #include "IncludeAllMonsters.h"
@@ -73,7 +74,8 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	m_DropChanceBoots = 0.0f;
 }
 
-void cMonster::Tick(float a_Dt, cChunk & a_Chunk) {
+void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
+{
 	super::Tick(a_Dt, a_Chunk);
 
 	if (m_Health <= 0)
@@ -106,7 +108,6 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 
 
-
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
 {
 	MTRand r1;
@@ -130,9 +131,6 @@ void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short
 		a_Drops.push_back(cItem(a_Item, 1, a_ItemHealth));
 	}
 }
-
-
-
 
 
 void cMonster::AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, short a_LootingLevel)
@@ -176,8 +174,6 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
 
 
 
-
-
 void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
 {
 	MTRand r1;
@@ -186,6 +182,7 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
 		if (!GetEquippedWeapon().IsEmpty()) a_Drops.push_back(GetEquippedWeapon());
 	}
 }
+
 
 
 

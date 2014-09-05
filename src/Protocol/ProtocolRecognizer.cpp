@@ -18,6 +18,7 @@
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -978,9 +979,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
@@ -990,9 +1000,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
@@ -1013,6 +1032,13 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 {
 	AString Reply;
 	cServer * Server = cRoot::Get()->GetServer();
+
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
 	switch (cRoot::Get()->GetPrimaryServerVersion())
 	{
 		case PROTO_VERSION_1_2_5:
@@ -1020,11 +1046,11 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 		{
 			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
 			Printf(Reply, "%s%s%i%s%i",
-				Server->GetDescription().c_str(),
+				ServerDescription.c_str(),
 				cChatColor::Delimiter,
-				Server->GetNumPlayers(),
+				NumPlayers,
 				cChatColor::Delimiter,
-				Server->GetMaxPlayers()
+				MaxPlayers
 			);
 			break;
 		}
@@ -1051,13 +1077,7 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 				m_Buffer.ReadByte(val);  // 0x01 magic value
 				ASSERT(val == 0x01);
 			}
-			
-			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
-			AString NumPlayers;
-			Printf(NumPlayers, "%d", Server->GetNumPlayers());
-			AString MaxPlayers;
-			Printf(MaxPlayers, "%d", Server->GetMaxPlayers());
-			
+
 			AString ProtocolVersionNum;
 			Printf(ProtocolVersionNum, "%d", cRoot::Get()->GetPrimaryServerVersion());
 			AString ProtocolVersionTxt(GetVersionTextFromInt(cRoot::Get()->GetPrimaryServerVersion()));
@@ -1070,11 +1090,11 @@ void cProtocolRecognizer::SendLengthlessServerPing(void)
 			Reply.push_back(0);
 			Reply.append(ProtocolVersionTxt);
 			Reply.push_back(0);
-			Reply.append(Server->GetDescription());
+			Reply.append(ServerDescription);
 			Reply.push_back(0);
-			Reply.append(NumPlayers);
+			Reply.append(Printf("%d", NumPlayers));
 			Reply.push_back(0);
-			Reply.append(MaxPlayers);
+			Reply.append(Printf("%d", MaxPlayers));
 			break;
 		}
 	}  // switch (m_PrimaryServerVersion)

@@ -67,7 +67,7 @@ class cChunk :
 {
 public:
 	cChunk(
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ,   // Chunk coords
+		int a_ChunkX, int a_ChunkZ,   // Chunk coords
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
 		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
 		cAllocationPool<cChunkData::sChunkSection> & a_Pool
@@ -155,7 +155,7 @@ public:
 
 	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
 	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const;
-	BLOCKTYPE GetBlock(Vector3i a_cords) const { return GetBlock(a_cords.x, a_cords.y, a_cords.z);}
+	BLOCKTYPE GetBlock(const Vector3i & a_RelCoords) const { return GetBlock(a_RelCoords.x, a_RelCoords.y, a_RelCoords.z); }
 	void      GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	void      GetBlockInfo    (int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 	
@@ -215,6 +215,10 @@ public:
 	
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true. */
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Lua-accessible
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible

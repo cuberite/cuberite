@@ -125,6 +125,10 @@ protected:
 	/// Loads the chunk's BlockEntities from NBT data (a_Tag is the Level\\TileEntities list tag; may be -1)
 	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
 	
+	/** Loads the data for a block entity from the specified NBT tag.
+	Returns the loaded block entity, or NULL upon failure. */
+	cBlockEntity * LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
 	/// Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag
 	bool LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx);
 	
@@ -134,18 +138,21 @@ protected:
 	*/
 	void LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int s_SlotOffset = 0);
 	
-	void LoadBeaconFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadChestFromNBT       (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_ChestType);
-	void LoadDispenserFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadDropperFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadFlowerPotFromNBT   (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadFurnaceFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
-	void LoadHopperFromNBT      (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadJukeboxFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadNoteFromNBT        (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadSignFromNBT        (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadMobHeadFromNBT     (cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
-	void LoadCommandBlockFromNBT(cBlockEntityList & a_BlockEntities, const cParsedNBT & a_NBT, int a_TagIdx);
+	/** Returns true iff the "id" child tag inside the specified tag equals the specified expected type. */
+	bool CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const char * a_ExpectedType);
+
+	cBlockEntity * LoadBeaconFromNBT      (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadChestFromNBT       (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_ChestBlockType);
+	cBlockEntity * LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadDispenserFromNBT   (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadDropperFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadFlowerPotFromNBT   (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadFurnaceFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	cBlockEntity * LoadHopperFromNBT      (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadJukeboxFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadMobHeadFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadNoteBlockFromNBT   (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cBlockEntity * LoadSignFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_SignBlockType);
 	
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, const char * a_IDTag, size_t a_IDTagLength);
 	

@@ -34,8 +34,6 @@ SET (SRCS
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
-	Group.cpp
-	GroupManager.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
@@ -53,6 +51,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	Noise.cpp
 	ProbabDistrib.cpp
+	RankManager.cpp
 	RCONServer.cpp
 	Root.cpp
 	Scoreboard.cpp
@@ -98,8 +97,6 @@ SET (HDRS
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
-	Group.h
-	GroupManager.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
@@ -122,6 +119,7 @@ SET (HDRS
 	MonsterConfig.h
 	Noise.h
 	ProbabDistrib.h
+	RankManager.h
 	RCONServer.h
 	Root.h
 	Scoreboard.h
@@ -258,6 +256,11 @@ set(EXECUTABLE MCServer)
 if (MSVC)
 	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
+	
+	# The paths in BINDING_DEPENDENCIES are relative to the Bindings folder, convert them relative to this folder:
+	foreach (dep ${BINDING_DEPENDENCIES})
+		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
+	endforeach(dep)
 
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${BINDING_OUTPUTS}
@@ -270,7 +273,7 @@ if (MSVC)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDENCIES}
+		DEPENDS ${BINDINGS_DEPENDENCIES}
 	)
 endif()
 

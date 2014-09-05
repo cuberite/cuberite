@@ -37,7 +37,7 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_CARROT: return FoodInfo(4, 4.8);
+			case E_ITEM_CARROT: return FoodInfo(3, 4.8);
 			case E_ITEM_POTATO: return FoodInfo(1, 0.6);
 			default:            return FoodInfo(0, 0);
 		}

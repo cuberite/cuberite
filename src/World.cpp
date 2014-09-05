@@ -251,8 +251,38 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
 	m_SkyDarkness(0),
+	m_GameMode(gmNotSet),
+	m_bEnabledPVP(false),
+	m_IsDeepSnowEnabled(false),
+	m_ShouldLavaSpawnFire(true),
+	m_VillagersShouldHarvestCrops(true),
+	m_SimulatorManager(NULL),
+	m_SandSimulator(NULL),
+	m_WaterSimulator(NULL),
+	m_LavaSimulator(NULL),
+	m_FireSimulator(NULL),
+	m_RedstoneSimulator(NULL),
+	m_MaxPlayers(10),
+	m_ChunkMap(NULL),
+	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
+	m_MaxCactusHeight(3),
+	m_MaxSugarcaneHeight(4),
+	m_IsCactusBonemealable(false),
+	m_IsCarrotsBonemealable(true),
+	m_IsCropsBonemealable(true),
+	m_IsGrassBonemealable(true),
+	m_IsMelonStemBonemealable(true),
+	m_IsMelonBonemealable(true),
+	m_IsPotatoesBonemealable(true),
+	m_IsPumpkinStemBonemealable(true),
+	m_IsPumpkinBonemealable(true),
+	m_IsSaplingBonemealable(true),
+	m_IsSugarcaneBonemealable(false),
+	m_bCommandBlocksEnabled(true),
+	m_bUseChatPrefixes(false),
+	m_TNTShrapnelLevel(slNone),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -407,12 +437,12 @@ void cWorld::InitializeSpawn(void)
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
 	
-	LOG("Preparing spawn area in world \"%s\"...", m_WorldName.c_str());
+	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
 	for (int x = 0; x < ViewDist; x++)
 	{
 		for (int z = 0; z < ViewDist; z++)
 		{
-			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, ZERO_CHUNK_Y, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
+			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
 		}
 	}
 	
@@ -1196,24 +1226,26 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 		return;
 	}
 	
-	// TODO: Add damage to entities and implement block hardiness
+	// TODO: Implement block hardiness
 	Vector3d explosion_pos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
 	cVector3iArray BlocksAffected;
 	m_ChunkMap->DoExplosionAt(a_ExplosionSize, a_BlockX, a_BlockY, a_BlockZ, BlocksAffected);
 	BroadcastSoundEffect("random.explode", (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.6f);
+
 	{
 		cCSLock Lock(m_CSPlayers);
 		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 		{
 			cClientHandle * ch = (*itr)->GetClientHandle();
-			if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+			if (ch == NULL)
 			{
 				continue;
 			}
+
 			Vector3d distance_explosion = (*itr)->GetPosition() - explosion_pos;
 			if (distance_explosion.SqrLength() < 4096.0)
 			{
-				double real_distance = std::max(0.004, sqrt(distance_explosion.SqrLength()));
+				double real_distance = std::max(0.004, distance_explosion.Length());
 				double power = a_ExplosionSize / real_distance;
 				if (power <= 1)
 				{
@@ -1225,6 +1257,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			}
 		}
 	}
+
 	cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 }
 
@@ -2391,7 +2424,7 @@ void cWorld::SetChunkData(cSetChunkData & a_SetChunkData)
 	// Save the chunk right after generating, so that we don't have to generate it again on next run
 	if (a_SetChunkData.ShouldMarkDirty())
 	{
-		m_Storage.QueueSaveChunk(ChunkX, 0, ChunkZ);
+		m_Storage.QueueSaveChunk(ChunkX, ChunkZ);
 	}
 }
 
@@ -2663,6 +2696,15 @@ bool cWorld::ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & 
 
 
 
+bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	return m_ChunkMap->ForEachEntityInBox(a_Box, a_Callback);
+}
+
+
+
+
+
 bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
 	return m_ChunkMap->DoWithEntityByID(a_UniqueID, a_Callback);
@@ -2736,18 +2778,18 @@ void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 
 
 
-void cWorld::TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
 }
 
 
 
 
 
-bool cWorld::LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+bool cWorld::LoadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	return m_ChunkMap->LoadChunk(a_ChunkX, a_ChunkY, a_ChunkZ);
+	return m_ChunkMap->LoadChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2763,9 +2805,9 @@ void cWorld::LoadChunks(const cChunkCoordsList & a_Chunks)
 
 
 
-void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ)
+void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkY, a_ChunkZ);
+	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2870,8 +2912,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->MarkChunkRegenerating(a_ChunkX, a_ChunkZ);
 	
-	// Trick: use Y=1 to force the chunk generation even though the chunk data is already present
-	m_Generator.QueueGenerateChunk(a_ChunkX, 1, a_ChunkZ);
+	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, true);
 }
 
 
@@ -2880,7 +2921,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_Generator.QueueGenerateChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ);
+	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, false);
 }
 
 
@@ -3454,14 +3495,16 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cChunkDef::BlockNibbles BlockMetas;
 	a_ChunkDesc.CompressBlockMetas(BlockMetas);
 
-	m_World->QueueSetChunkData(cSetChunkDataPtr(new cSetChunkData(
+	cSetChunkDataPtr SetChunkData(new cSetChunkData(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
 		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
 		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
 		true
-	)));
+	));
+	SetChunkData->RemoveInvalidBlockEntities();
+	m_World->QueueSetChunkData(SetChunkData);
 }
 
 
