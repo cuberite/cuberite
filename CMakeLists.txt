@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.2)
+cmake_minimum_required (VERSION 2.8.7)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
