@@ -623,6 +623,8 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 
 cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	ASSERT((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height));
+
 	// Load the specific BlockEntity type:
 	switch (a_BlockType)
 	{
