@@ -21,5 +21,7 @@ extern int CompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_
 /// Uncompresses a_Data into a_Uncompressed using GZIP; returns Z_OK for success or Z_XXX error constants same as zlib
 extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & a_Uncompressed);
 
+/** Uncompresses a_Data into a_Uncompressed using Inflate; returns Z_OK for success or Z_XXX error constants same as zlib */
+extern int InflateString(const char * a_Data, size_t a_Length, AString & a_Uncompressed);
 
 

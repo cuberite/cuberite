@@ -16,11 +16,6 @@
 
 
 
-/** This is really only a placeholder to be used in places where we need to "make up" a chunk's Y coord.
-It will help us when the new chunk format comes out and we need to patch everything up for compatibility.
-*/
-#define ZERO_CHUNK_Y 0
-
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
 #define AXIS_ORDER_YZX 1  // Original (1.1-)
 #define AXIS_ORDER_XZY 2  // New (1.2+)
@@ -197,32 +192,32 @@ public:
 	
 	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_HeightMap[a_X + Width * a_Z];
 	}
 	
 	
 	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, unsigned char a_Height)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_HeightMap[a_X + Width * a_Z] = a_Height;
 	}
 	
 	
 	inline static EMCSBiome GetBiome(const BiomeMap & a_BiomeMap, int a_X, int a_Z)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_BiomeMap[a_X + Width * a_Z];
 	}
 	
 	
 	inline static void SetBiome(BiomeMap & a_BiomeMap, int a_X, int a_Z, EMCSBiome a_Biome)
 	{
-		ASSERT((a_X >= 0) && (a_X <= Width));
-		ASSERT((a_Z >= 0) && (a_Z <= Width));
+		ASSERT((a_X >= 0) && (a_X < Width));
+		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
 	}
 
@@ -377,19 +372,39 @@ class cChunkCoords
 {
 public:
 	int m_ChunkX;
-	int m_ChunkY;
 	int m_ChunkZ;
 	
-	cChunkCoords(int a_ChunkX, int a_ChunkY, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkY(a_ChunkY), m_ChunkZ(a_ChunkZ) {}
+	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
 	
 	bool operator == (const cChunkCoords & a_Other) const
 	{
-		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkY == a_Other.m_ChunkY) && (m_ChunkZ == a_Other.m_ChunkZ));
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
 } ;
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;
+
+
+
+
+
+class cChunkCoordsWithBool
+{
+public:
+	int m_ChunkX;
+	int m_ChunkZ;
+	bool m_ForceGenerate;
+
+	cChunkCoordsWithBool(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_ForceGenerate(a_ForceGenerate){}
+
+	bool operator == (const cChunkCoordsWithBool & a_Other) const
+	{
+		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ) && (m_ForceGenerate == a_Other.m_ForceGenerate));
+	}
+};
+
+typedef std::list<cChunkCoordsWithBool> cChunkCoordsWithBoolList;
 
 
 

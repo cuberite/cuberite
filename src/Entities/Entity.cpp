@@ -387,7 +387,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case cMonster::mtGhast:
 					case cMonster::mtZombiePigman:
 					case cMonster::mtMagmaCube:
-					{					
+					{
 						break;
 					};
 					default: StartBurning(BurnTicks * 20);
@@ -417,7 +417,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 	
 		if (!Player->IsOnGround())
-		{		
+		{
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
 			{
 				a_TDI.FinalDamage += 2;

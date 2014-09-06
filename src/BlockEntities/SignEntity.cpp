@@ -15,6 +15,7 @@
 cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World) :
 	super(a_BlockType, a_X, a_Y, a_Z, a_World)
 {
+	ASSERT((a_Y >= 0) && (a_Y < cChunkDef::Height));
 }
 
 
