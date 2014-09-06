@@ -223,8 +223,8 @@ macro(set_exe_flags)
 		add_flags_cxx("-ffast-math")
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			if ("${CLANG_VERSION_STRING}" VERSION_LESS 3.0)
-				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION_STRING}")
+			if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3.0)
+				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CMAKE_CXX_COMPILER_VERSION}")
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
