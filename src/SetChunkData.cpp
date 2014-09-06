@@ -44,7 +44,6 @@ cSetChunkData::cSetChunkData(
 	// Check the params' validity:
 	ASSERT(a_BlockTypes != NULL);
 	ASSERT(a_BlockMetas != NULL);
-	ASSERT(a_Biomes != NULL);
 
 	// Copy block types and metas:
 	memcpy(m_BlockTypes, a_BlockTypes, sizeof(cChunkDef::BlockTypes));

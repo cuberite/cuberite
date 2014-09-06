@@ -1355,6 +1355,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height));
 	
 	cPacketizer Pkt(*this, 0x33);
 	Pkt.WriteInt(a_BlockX);

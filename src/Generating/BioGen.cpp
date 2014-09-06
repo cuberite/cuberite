@@ -227,7 +227,7 @@ cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_Cache
 
 cBioGenMulticache::~cBioGenMulticache()
 {
-	for (std::vector<cBiomeGen*>::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
+	for (cBiomeGens::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
 	{
 		delete *it;
 	}
@@ -251,7 +251,7 @@ void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMa
 
 void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	for (std::vector<cBiomeGen*>::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
+	for (cBiomeGens::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
 	{
 		cBiomeGen * tmp = *it;
 		tmp->InitializeBiomeGen(a_IniFile);

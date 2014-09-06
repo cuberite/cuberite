@@ -112,6 +112,8 @@ void cChunkGenerator::Stop(void)
 
 void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate)
 {
+	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
+
 	{
 		cCSLock Lock(m_CS);
 
@@ -283,7 +285,8 @@ void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_PluginInterface != NULL);
 	ASSERT(m_ChunkSink != NULL);
-	
+	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
+
 	cChunkDesc ChunkDesc(a_ChunkX, a_ChunkZ);
 	m_PluginInterface->CallHookChunkGenerating(ChunkDesc);
 	m_Generator->DoGenerate(a_ChunkX, a_ChunkZ, ChunkDesc);

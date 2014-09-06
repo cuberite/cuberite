@@ -323,7 +323,13 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		return false;
 	}
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
-	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List) || (a_NBT.GetChildrenType(Sections) != TAG_Compound))
+	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
+	{
+		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
+		return false;
+	}
+	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
+	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
 		LOAD_FAILED(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
@@ -589,7 +595,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 
 		// Get the BlockEntity's position
 		int x, y, z;
-		if (!GetBlockEntityNBTPos(a_NBT, Child, x, y, z))
+		if (!GetBlockEntityNBTPos(a_NBT, Child, x, y, z) || (y < 0) || (y >= cChunkDef::Height))
 		{
 			LOGWARNING("Bad block entity, missing the coords. Will be ignored.");
 			continue;
@@ -617,6 +623,8 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 
 cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
+	ASSERT((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height));
+
 	// Load the specific BlockEntity type:
 	switch (a_BlockType)
 	{
@@ -2815,7 +2823,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	}
 	unsigned ChunkLocation = ntohl(m_Header[LocalX + 32 * LocalZ]);
 	unsigned ChunkOffset = ChunkLocation >> 8;
-	if (ChunkOffset <= 2)
+	if (ChunkOffset < 2)
 	{
 		return false;
 	}

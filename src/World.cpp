@@ -2374,6 +2374,8 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 
 void cWorld::QueueSetChunkData(const cSetChunkDataPtr & a_SetChunkData)
 {
+	ASSERT(IsChunkQueued(a_SetChunkData->GetChunkX(), a_SetChunkData->GetChunkZ()));
+
 	// Validate biomes, if needed:
 	if (!a_SetChunkData->AreBiomesValid())
 	{
@@ -2457,6 +2459,15 @@ bool cWorld::GetChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataCallback & a_Cal
 bool cWorld::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes)
 {
 	return m_ChunkMap->GetChunkBlockTypes(a_ChunkX, a_ChunkZ, a_BlockTypes);
+}
+
+
+
+
+
+bool cWorld::IsChunkQueued(int a_ChunkX, int a_ChunkZ) const
+{
+	return m_ChunkMap->IsChunkQueued(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -2781,24 +2792,6 @@ void cWorld::RemoveClientFromChunkSender(cClientHandle * a_Client)
 void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
-bool cWorld::LoadChunk(int a_ChunkX, int a_ChunkZ)
-{
-	return m_ChunkMap->LoadChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-	
-
-void cWorld::LoadChunks(const cChunkCoordsList & a_Chunks)
-{
-	m_ChunkMap->LoadChunks(a_Chunks);
 }
 
 
@@ -3514,6 +3507,15 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 bool cWorld::cChunkGeneratorCallbacks::IsChunkValid(int a_ChunkX, int a_ChunkZ)
 {
 	return m_World->IsChunkValid(a_ChunkX, a_ChunkZ);
+}
+
+
+
+
+
+bool cWorld::cChunkGeneratorCallbacks::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
+{
+	return m_World->IsChunkQueued(a_ChunkX, a_ChunkZ);
 }
 
 

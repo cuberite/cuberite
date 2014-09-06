@@ -230,29 +230,30 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 	
 	// Add a cache, if requested:
 	int CacheSize = a_IniFile.GetValueSetI("Generator", "BiomeGenCacheSize", CacheOffByDefault ? 0 : 64);
-	int MultiCacheLength = a_IniFile.GetValueSetI("Generator", "BiomeGenMultiCacheLength", 4);
 
-	if (CacheSize > 0)
+	if (CacheSize <= 0)
 	{
-		if (CacheSize < 4)
-		{
-			LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
-				CacheSize, 4
-			);
-			CacheSize = 4;
-		}
-		LOGD("Using a cache for biomegen of size %d.", CacheSize);
-		m_UnderlyingBiomeGen = m_BiomeGen;
-		if (MultiCacheLength > 0) 
-		{
-			LOGD("Enabling multicache for biomegen of length %d.", MultiCacheLength);
-			m_BiomeGen = new cBioGenMulticache(m_UnderlyingBiomeGen, CacheSize, MultiCacheLength);
-		}
-		else 
-		{
-			m_BiomeGen = new cBioGenCache(m_UnderlyingBiomeGen, CacheSize);
-		}
-		
+		return;
+	}
+
+	int MultiCacheLength = a_IniFile.GetValueSetI("Generator", "BiomeGenMultiCacheLength", 4);
+	if (CacheSize < 4)
+	{
+		LOGWARNING("Biomegen cache size set too low, would hurt performance instead of helping. Increasing from %d to %d",
+			CacheSize, 4
+		);
+		CacheSize = 4;
+	}
+	LOGD("Using a cache for biomegen of size %d.", CacheSize);
+	m_UnderlyingBiomeGen = m_BiomeGen;
+	if (MultiCacheLength > 0)
+	{
+		LOGD("Enabling multicache for biomegen of length %d.", MultiCacheLength);
+		m_BiomeGen = new cBioGenMulticache(m_UnderlyingBiomeGen, CacheSize, MultiCacheLength);
+	}
+	else
+	{
+		m_BiomeGen = new cBioGenCache(m_UnderlyingBiomeGen, CacheSize);
 	}
 }
 
