@@ -210,7 +210,6 @@ macro(get_clang_version)
 	execute_process(
 		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
 		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
-	message(${CLANG_VERSION_OUTPUT})
 	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
 	set(CLANG_VERSION ${CMAKE_MATCH_1})
 endmacro()
