@@ -160,7 +160,6 @@ public:
 	void TickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
 	int GetPosX(void) const { return m_PosX; }
-	int GetPosY(void) const { return m_PosY; }
 	int GetPosZ(void) const { return m_PosZ; }
 	
 	cWorld * GetWorld(void) const { return m_World; }
@@ -483,7 +482,7 @@ private:
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	int m_StayCount;
 
-	int m_PosX, m_PosY, m_PosZ;
+	int m_PosX, m_PosZ;
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 

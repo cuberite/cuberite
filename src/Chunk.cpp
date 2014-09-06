@@ -1345,11 +1345,11 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_JUKEBOX:
 					case E_BLOCK_FLOWER_POT:
 					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
 						{
 							m_BlockEntities.push_back(cBlockEntity::CreateByBlockType(
 								BlockType, GetMeta(x, y, z),
-								x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World
+								x + m_PosX * Width, y, z + m_PosZ * Width, m_World
 							));
 						}
 						break;
@@ -3178,7 +3178,7 @@ void cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a
 
 Vector3i cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ)
 {
-	return Vector3i(m_PosX * Width + a_RelX, m_PosY * Height + a_RelY, m_PosZ * Width + a_RelZ);
+	return Vector3i(m_PosX * Width + a_RelX, a_RelY, m_PosZ * Width + a_RelZ);
 }
 
 
