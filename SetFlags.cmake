@@ -205,6 +205,16 @@ macro(enable_profile)
 	endif()
 endmacro()
 
+#this is a hack because we can't use cmake 2.8.10 because of travis
+macro(get_clang_version)
+	execute_process(
+		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
+		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
+	message(${CLANG_VERSION_OUTPUT})
+	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
+	set(CLANG_VERSION ${CMAKE_MATCH_1})
+endmacro()
+
 macro(set_exe_flags)
 	# Remove disabling the maximum warning level:
 	# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
@@ -223,8 +233,9 @@ macro(set_exe_flags)
 		add_flags_cxx("-ffast-math")
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3.0)
-				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CMAKE_CXX_COMPILER_VERSION}")
+			get_clang_version()
+			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
+				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
 			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
@@ -236,12 +247,12 @@ macro(set_exe_flags)
 			add_flags_cxx("-Wno-error=shadow -Wno-error=old-style-cast -Wno-error=global-constructors")
 			add_flags_cxx("-Wno-error=exit-time-destructors")
 			add_flags_cxx("-Wno-weak-vtables -Wno-switch-enum")
-			if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER 3.0)
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
 				# flags that are not present in 3.0
 				add_flags_cxx("-Wno-error=covered-switch-default -Wno-error=missing-variable-declarations")
 				add_flags_cxx("-Wno-implicit-fallthrough -Wno-error=extra-semi")
 			endif()
-			if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_GREATER 3.1)
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.1)
 				# flags introduced in 3.2
 				add_flags_cxx("-Wno-documentation")
 			endif()
