@@ -2821,7 +2821,7 @@ bool cWSSAnvil::cMCAFile::GetChunkData(const cChunkCoords & a_Chunk, AString & a
 	}
 	unsigned ChunkLocation = ntohl(m_Header[LocalX + 32 * LocalZ]);
 	unsigned ChunkOffset = ChunkLocation >> 8;
-	if (ChunkOffset <= 2)
+	if (ChunkOffset < 2)
 	{
 		return false;
 	}
