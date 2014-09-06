@@ -150,7 +150,7 @@ public:
 	static AString GetBaseURL(const AStringVector & a_URLSplit);
 
 	/** Returns the content type from the file extension. If the extension isn't in the list, the function returns "text/html" */
-	AString GetContentTypeFromFileExt(const AString & a_FileExtension);
+	static AString GetContentTypeFromFileExt(const AString & a_FileExtension);
 
 protected:
 	/** Common base class for request body data handlers */
