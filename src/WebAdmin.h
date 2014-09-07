@@ -205,8 +205,8 @@ protected:
 
 	PluginList m_Plugins;
 
-	AString m_PortsIPv4;
-	AString m_PortsIPv6;
+	AString m_PortsIPv4 = "8080";
+	AString m_PortsIPv6 = "8080";
 
 	/** The Lua template script to provide templates: */
 	cLuaState m_TemplateScript;
