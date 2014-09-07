@@ -346,7 +346,7 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2, a_ChunkX, a_ChunkZ);
 	
 	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
 	Pkt.WriteInt(a_ChunkX);
@@ -1533,6 +1533,17 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		// Write one NUL extra, so that we can detect over-reads
 		bb.Write("\0", 1);
 		
+		// 1.8 - Compressed packets
+		if (m_State == 3)
+		{
+			UInt32 CompressedSize;
+			if (!bb.ReadVarInt(CompressedSize))
+			{
+				// Not enough data
+				break;
+			}
+		}
+		
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
 		{
@@ -2511,10 +2522,23 @@ cProtocol172::cPacketizer::~cPacketizer()
 
 	// Send the packet length
 	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
+	if (m_Protocol.m_State == 3)
+	{
+		PacketLen += 1;
+	}
+
 	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
 	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
 	m_Protocol.m_OutPacketLenBuffer.CommitRead();
+
+	if (m_Protocol.m_State == 3)
+	{
+		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(0);
+		m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
+		m_Protocol.SendData(DataToSend.data(), DataToSend.size());
+		m_Protocol.m_OutPacketLenBuffer.CommitRead();
+	}
 	
 	// Send the packet data:
 	m_Out.ReadAll(DataToSend);

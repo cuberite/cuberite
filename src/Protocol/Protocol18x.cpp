@@ -13,6 +13,7 @@ Implements the 1.8.x protocol classes:
 #include "json/json.h"
 #include "ChunkDataSerializer.h"
 #include "Protocol18x.h"
+#include "zlib/zlib.h"
 
 #include "../ClientHandle.h"
 #include "../CompositeChat.h"
@@ -21,7 +22,7 @@ Implements the 1.8.x protocol classes:
 #include "../World.h"
 
 #include "../Entities/Player.h"
-#include "Entities/Painting.h"
+#include "../Entities/Painting.h"
 
 
 
@@ -57,23 +58,38 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 
 
 
+void cProtocol180::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x28);  // Effect packet
+	Pkt.WriteInt(a_EffectID);
+	Pkt.WritePosition(Vector3i(a_SrcX, a_SrcY, a_SrcZ));
+	Pkt.WriteInt(a_Data);
+	Pkt.WriteBool(false);
+}
+
+
+
+
+
 void cProtocol180::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
 
-	// Disable compression:
+	// Enable compression:
 	{
 		cPacketizer Pkt(*this, 0x03);  // Set compression packet
-		Pkt.WriteVarInt(-1);
+		Pkt.WriteVarInt(256);
 	}
+
+	m_State = 3;  // State = Game
 
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
 		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
 		Pkt.WriteString(m_Client->GetUsername());
 	}
-
-	m_State = 3;  // State = Game
 }
 
 
@@ -409,12 +425,10 @@ void cProtocol180::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_8_0, a_ChunkX, a_ChunkZ);
 
-	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
-	Pkt.WriteInt(a_ChunkX);
-	Pkt.WriteInt(a_ChunkZ);
-	Pkt.WriteBuf(ChunkData.data(), ChunkData.size());
+	cCSLock Lock(m_CSPacket);
+	SendData(ChunkData.data(), ChunkData.size());
 }
 
 

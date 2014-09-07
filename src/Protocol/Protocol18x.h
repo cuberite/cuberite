@@ -54,6 +54,7 @@ public:
 
 	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
+	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendLoginSuccess        (void) override;
 	virtual void SendPlayerAbilities     (void) override {}
 	virtual void SendWindowClose         (const cWindow & a_Window) override {}

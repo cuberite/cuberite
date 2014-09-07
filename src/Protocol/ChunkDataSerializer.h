@@ -24,7 +24,7 @@ protected:
 	
 	void Serialize29(AString & a_Data);  // Release 1.2.4 and 1.2.5
 	void Serialize39(AString & a_Data);  // Release 1.3.1 to 1.7.10
-	void Serialize80(AString & a_Data);  // Release 1.8
+	void Serialize80(AString & a_Data, int a_ChunkX, int a_ChunkZ);  // Release 1.8
 	
 public:
 	enum
@@ -42,7 +42,7 @@ public:
 		const unsigned char *           a_BiomeData
 	);
 
-	const AString & Serialize(int a_Version);  // Returns one of the internal m_Serializations[]
+	const AString & Serialize(int a_Version, int a_ChunkX, int a_ChunkZ);  // Returns one of the internal m_Serializations[]
 } ;
 
 

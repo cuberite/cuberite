@@ -262,7 +262,7 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	SendPreChunk(a_ChunkX, a_ChunkZ, true);
 	
 	// Send the chunk data:
-	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5);
+	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5, a_ChunkX, a_ChunkZ);
 	WriteByte(PACKET_MAP_CHUNK);
 	WriteInt (a_ChunkX);
 	WriteInt (a_ChunkZ);
