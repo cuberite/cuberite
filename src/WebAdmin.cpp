@@ -43,6 +43,8 @@ public:
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
 	m_IsRunning(false),
+	m_PortsIPv4("8080"),
+	m_PortsIPv6(""),
 	m_TemplateScript("<webadmin_template>")
 {
 }
@@ -89,6 +91,8 @@ bool cWebAdmin::Init(void)
 		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
+		m_IniFile.SetValue("WebAdmin", "Port", m_PortsIPv4);
+		m_IniFile.SetValue("WebAdmin", "PortsIPv6", m_PortsIPv6);
 		m_IniFile.WriteFile("webadmin.ini");
 	}
 
@@ -100,8 +104,8 @@ bool cWebAdmin::Init(void)
 
 	LOGD("Initialising WebAdmin...");
 
-	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
-	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
+	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", m_PortsIPv4);
+	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", m_PortsIPv6);
 
 	if (!m_HTTPServer.Initialize(m_PortsIPv4, m_PortsIPv6))
 	{
