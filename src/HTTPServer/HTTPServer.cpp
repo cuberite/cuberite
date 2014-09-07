@@ -171,6 +171,7 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 	if (m_Cert.get() == NULL)
 	{
 		LOGWARNING("WebServer: The server is running in unsecure HTTP mode.");
+		LOGINFO("Put a valid HTTPS certificate to file 'webadmin/httpscert.crt' and its corresponding private key to 'httpskey.pem' (without any password) to enable HTTPS support");
 	}
 	else
 	{
