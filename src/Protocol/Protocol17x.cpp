@@ -12,6 +12,7 @@ Implements the 1.7.x protocol classes:
 #include "Globals.h"
 #include "json/json.h"
 #include "Protocol17x.h"
+#include "ProtocolRecognizer.h"
 #include "ChunkDataSerializer.h"
 #include "PolarSSL++/Sha1Checksum.h"
 
@@ -92,7 +93,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 // cProtocol172:
 
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client),
+	super(a_Client, cProtocolRecognizer::PROTO_VERSION_1_7_2),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
@@ -1534,7 +1535,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		bb.Write("\0", 1);
 		
 		// 1.8 - Compressed packets
-		if (m_State == 3)
+		if ((m_State == 3) && (GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0))
 		{
 			UInt32 CompressedSize;
 			if (!bb.ReadVarInt(CompressedSize))
@@ -2522,23 +2523,19 @@ cProtocol172::cPacketizer::~cPacketizer()
 
 	// Send the packet length
 	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
-	if (m_Protocol.m_State == 3)
-	{
-		PacketLen += 1;
-	}
 
-	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
+	if ((m_Protocol.m_State == 3) && (m_Protocol.GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0))
+	{
+		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen + 1);
+		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(0);
+	}
+	else
+	{
+		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
+	}
 	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
 	m_Protocol.m_OutPacketLenBuffer.CommitRead();
-
-	if (m_Protocol.m_State == 3)
-	{
-		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(0);
-		m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
-		m_Protocol.SendData(DataToSend.data(), DataToSend.size());
-		m_Protocol.m_OutPacketLenBuffer.CommitRead();
-	}
 	
 	// Send the packet data:
 	m_Out.ReadAll(DataToSend);
@@ -3080,6 +3077,7 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 cProtocol176::cProtocol176(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
+	m_ProtocolVersion = cProtocolRecognizer::PROTO_VERSION_1_7_6;
 }
 
 

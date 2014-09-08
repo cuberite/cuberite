@@ -23,6 +23,7 @@ Implements the 1.4.x protocol classes representing these protocols:
 #include "../UI/Window.h"
 #include "../Entities/Pickup.h"
 #include "../Entities/FallingBlock.h"
+#include "ProtocolRecognizer.h"
 
 #ifdef _MSC_VER
 	#pragma warning(push)
@@ -72,6 +73,7 @@ enum
 cProtocol142::cProtocol142(cClientHandle * a_Client) :
 	super(a_Client)
 {
+	m_ProtocolVersion = cProtocolRecognizer::PROTO_VERSION_1_4_2;
 }
 
 
@@ -132,12 +134,6 @@ void cProtocol142::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_Src
 
 void cProtocol142::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
-	if (!a_DoDaylightCycle)
-	{
-		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
-		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
-	}
-
 	cCSLock Lock(m_CSPacket);
 	WriteByte (PACKET_UPDATE_TIME);
 	WriteInt64(a_WorldAge);
@@ -156,6 +152,7 @@ void cProtocol142::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_Do
 cProtocol146::cProtocol146(cClientHandle * a_Client) :
 	super(a_Client)
 {
+	m_ProtocolVersion = cProtocolRecognizer::PROTO_VERSION_1_4_6;
 }
 
 

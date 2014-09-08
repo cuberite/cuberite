@@ -12,8 +12,8 @@ Implements the 1.8.x protocol classes:
 #include "Bindings/PluginManager.h"
 #include "json/json.h"
 #include "ChunkDataSerializer.h"
+#include "ProtocolRecognizer.h"
 #include "Protocol18x.h"
-#include "zlib/zlib.h"
 
 #include "../ClientHandle.h"
 #include "../CompositeChat.h"
@@ -52,6 +52,7 @@ class cProtocol176;
 cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
+	m_ProtocolVersion = cProtocolRecognizer::PROTO_VERSION_1_8_0;
 }
 
 

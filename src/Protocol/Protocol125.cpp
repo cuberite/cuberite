@@ -16,6 +16,7 @@ Documentation:
 #include "../ClientHandle.h"
 #include "../World.h"
 #include "ChunkDataSerializer.h"
+#include "ProtocolRecognizer.h"
 #include "../Entities/Entity.h"
 #include "../Entities/ExpOrb.h"
 #include "../Mobs/Monster.h"
@@ -132,7 +133,7 @@ typedef unsigned char Byte;
 
 
 cProtocol125::cProtocol125(cClientHandle * a_Client) :
-	super(a_Client),
+	super(a_Client, cProtocolRecognizer::PROTO_VERSION_1_2_5),
 	m_ReceivedData(32 KiB),
 	m_LastSentDimension(dimNotSet)
 {

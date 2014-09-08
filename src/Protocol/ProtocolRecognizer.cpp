@@ -26,7 +26,7 @@
 
 
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
-	super(a_Client),
+	super(a_Client, 0),
 	m_Protocol(NULL),
 	m_Buffer(512)
 {
@@ -915,7 +915,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 			m_Protocol = new cProtocol132(m_Client);
 			return true;
 		}
-		case PROTO_VERSION_1_4_2:
+		//case PROTO_VERSION_1_4_2:
 		case PROTO_VERSION_1_4_4:
 		{
 			m_Protocol = new cProtocol142(m_Client);
