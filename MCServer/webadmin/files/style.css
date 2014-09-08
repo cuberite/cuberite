@@ -1,0 +1,326 @@
+/* reset CSS */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	font-size: 100%;
+	vertical-align: baseline;
+	background: transparent;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+
+/* remember to define focus styles! */
+:focus {
+	outline: 0;
+}
+
+/* remove textarea resize at Safari */
+textarea { 
+	resize: none;
+}
+
+/* remember to highlight inserts somehow! */
+ins {
+	text-decoration: none;
+}
+del {
+	text-decoration: line-through;
+}
+
+/* tables still need 'cellspacing="0"' in the markup */
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+/*
+	Origional from http://www.perspectived.com/
+	Modified by Ben Phelps
+	Made for FakeTruth - MCServer
+*/
+
+/* Basic  ---------------------------------------- */
+
+.clear { clear: both; }
+
+body {
+	background: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #646464;
+	text-align: center;
+}
+
+#wrapper {
+	text-align: left;
+	width: 930px;
+	margin: 0 auto;
+}
+
+/* Logo  ---------------------------------------- */
+
+h1 {
+	margin: 15px 0 10px 5px;
+	width: 180px;
+	height: 36px;
+	background: url(logo.png) no-repeat left top;
+}
+
+h1 a {
+	display: block;
+	width: 225px;
+	height: 28px;
+}
+
+h1 span { display: none; }
+
+a {
+	color: #646464;
+}
+
+/* Container ---------------------------------------- */
+
+#containerHolder {
+	background: #eee;
+	padding: 5px;
+}
+
+
+#container {
+	background: #fff url(background.gif) repeat-y left top;
+	border: 1px solid #ddd;
+	width: 918px;
+
+}
+
+#connectHolder {
+	background: #eee;
+	padding: 5px;
+	margin-bottom:8px;
+}
+
+
+#connect {
+	border: 1px solid #ddd;
+	background-color: #fff;
+	padding:5px;
+	width: 908px;
+}
+
+.pics {  
+	height:  375px;
+	width:   600px;
+} 
+
+.pics img {  
+	padding: 5px;  
+	border:  1px solid #ddd;  
+	background-color: #eee;  
+	width:  600px; 
+	height: 375px;
+	margin-left: 15px;
+}
+
+/* Login -------------------------------------- */
+
+#loginLogo {
+	margin: 0 auto;
+	margin-top:100px;
+	width: 180px;
+	height: 36px;
+	background-image: url(logo.png);
+}
+
+#loginHolder {
+	background: #eee;
+	padding: 5px;
+	width: 310px;
+	margin: 0 auto;
+	height: 90px;
+	margin-top:20px;
+}
+
+#login {
+	padding:10px;
+	width: 288px;
+	height: 68px;
+	border: 1px solid #ddd;
+	background:#fff;
+	text-align: left;
+}
+
+
+/* Sidebar ---------------------------------------- */
+
+#sidebar {
+	width: 179px;
+	float: left;
+}
+
+#sidebar .sideNav { width: 179px; }
+
+#sidebar .sideNav li { border-bottom: 1px solid #ddd; width: 179px; }
+
+#sidebar .sideNav li a {
+	display: block;
+	color: #646464;
+	background: #f6f6f6;
+	text-decoration: none;
+	height: 29px;
+	line-height: 29px;
+	padding: 0 19px;
+	width: 141px;
+}
+
+#sidebar .sideNav li a:hover { background: #fdfcf6; }
+
+#sidebar .sideNav li a.active, #sidebar .sideNav li a.active:hover {
+	background: #f0f7fa;
+	color: #c66653;
+}
+
+/* Breadcrumb ---------------------------------------- */
+
+h2 {
+	width: 718px;
+	float: right;
+	color: #646464;
+	font-size: 16px;
+	line-height: 16px;
+	font-weight: bold;
+	margin: 20px 0 0 0;
+	padding: 0 0 10px 0;
+	border-bottom: 1px solid #ddd;
+}
+
+h2 a {
+	color: #646464;
+	text-decoration: none;
+}
+
+h2 a.active { color: #c66653; }
+
+h2 a:hover { text-decoration: underline; }
+
+/* Content ---------------------------------------- */
+
+#main {
+	width: 700px;
+	float: right;
+	padding: 0 19px 0 0;
+}
+
+#main p {
+
+	padding: 10px;
+
+}
+
+h3 {
+	font-size: 14px;
+	line-height: 14px;
+	font-weight: bold;
+	color: #5494af;
+	padding: 0 0 0 10px;
+	margin: 20px 0 10px;
+}
+
+h4 {
+	padding: 0 0 0 10px;
+	margin: 20px 0 10px;
+}
+
+#main ul {
+	padding: 0 0 0 10px;
+	list-style-type: circle;
+	list-style-position: inside;
+}
+
+#main table {
+	border-top: 1px solid #ddd;
+	width: 700px;
+}
+
+#main table tr th {
+	text-align: left;
+	background: #f6f6f6;
+	padding: 0px 20px;
+	height: 20px;
+	line-height: 20px;
+	border-bottom: 1px solid #ddd;
+}
+
+#main table tr td {
+	background: #f6f6f6;
+	padding: 0px 20px;
+	height: 29px;
+	line-height: 29px;
+	border-bottom: 1px solid #ddd;
+}
+
+#main table tr.odd td {
+	background: #fbfbfb;
+}
+
+#main table tr:hover td { background: #fdfcf6; }
+
+#main table .action {
+	text-align: right;
+	padding: 0 20px 0 10px;
+}
+
+#main table tr .action a { margin: 0 0 0 10px; text-decoration: none; color: #9b9b9b; }
+#main table tr:hover .action .edit { color: #c5a059; }
+#main table tr:hover .action .delete { color: #a02b2b; }
+#main table tr:hover .action .view { color: #55a34a; }
+
+#main table tr:hover .action a:hover { text-decoration: underline; }
+
+fieldset {
+	border: 1px solid #ddd;
+	padding: 19px;
+	margin: 0 0 20px 0;
+	background: #fbfbfb;
+}
+
+form p { margin: 0 0 14px 0; float: left; width: 100%;  }
+
+label {
+	display: block;
+	width: 100%;
+	margin: 0 0 7px 0;
+	line-height: 12px;
+}
+
+/* Footer ---------------------------------------- */
+
+#footer {
+	margin: 10px 0 30px 0;
+	font-size: 11px;
+	line-height: 11px;
+	color: #9B9B9B;
+	padding: 0 0 0 5px;
+}
+
+#footer a { color: #9B9B9B; }
+
+#footer a:hover { text-decoration: none; }
