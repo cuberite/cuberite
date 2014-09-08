@@ -947,11 +947,7 @@ void cProtocol180::SendPlayerSpawn(const cPlayer & a_Player)
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
-
-	// Fake UUID
-	Pkt.WriteInt64(4053239666997989821);
-	Pkt.WriteInt64(-5603022497796657139);
-
+	Pkt.WriteUUID(cMojangAPI::MakeUUIDShort(a_Player.GetUUID()));
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY());
 	Pkt.WriteFPInt(a_Player.GetPosZ());
