@@ -489,6 +489,24 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 
 
+bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+{
+	Int64 Value;
+	if (!ReadBEInt64(Value))
+	{
+		return false;
+	}
+
+	a_BlockX = Value >> 38;
+	a_BlockY = Value << 26 >> 52;
+	a_BlockZ = Value << 38 >> 38;
+	return true;
+}
+
+
+
+
+
 bool cByteBuffer::WriteChar(char a_Value)
 {
 	CHECK_THREAD;
@@ -661,6 +679,15 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 
 
 
+bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
+}
+
+
+
+
+
 bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 {
 	CHECK_THREAD;
@@ -785,6 +812,23 @@ bool cByteBuffer::SkipRead(size_t a_Count)
 		return false;
 	}
 	AdvanceReadPos(a_Count);
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReverseRead(size_t a_Count)
+{
+	CHECK_THREAD;
+	CheckValid();
+	if (m_ReadPos < a_Count)
+	{
+		return false;
+	}
+
+	m_ReadPos -= a_Count;
 	return true;
 }
 

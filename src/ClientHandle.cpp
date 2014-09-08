@@ -1198,6 +1198,12 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	cWorld * World = m_Player->GetWorld();
 
+	// 1.8 protocol fix
+	if ((int)a_BlockFace == 255)
+	{
+		a_BlockFace = BLOCK_FACE_NONE;
+	}
+
 	if (
 		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
 		(
@@ -1268,22 +1274,25 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-	
-	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
+	if ((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() <= 5)
 	{
-		if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+
+		if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 		{
-			// A plugin doesn't agree with using the block, abort
+			if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+			{
+				// A plugin doesn't agree with using the block, abort
+				return;
+			}
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 			return;
 		}
-		cChunkInterface ChunkInterface(World->GetChunkMap());
-		BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-		return;
 	}
 	
 	short EquippedDamage = Equipped.m_ItemDamage;

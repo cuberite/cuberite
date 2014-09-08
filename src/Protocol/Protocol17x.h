@@ -200,9 +200,9 @@ protected:
 			m_Out.WriteVarUTF8String(a_Value);
 		}
 
-		void WritePosition(const Vector3i a_Position)
+		void WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
 		{
-			WriteInt64(((Int64)a_Position.x & 0x3FFFFFF) << 38 | ((Int64)a_Position.y & 0xFFF) << 26 | ((Int64)a_Position.z & 0x3FFFFFF));
+			m_Out.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
 		}
 		
 		void WriteBuf(const char * a_Data, size_t a_Size)
@@ -273,12 +273,12 @@ protected:
 	
 	// Packet handlers while in the Game state (m_State == 3):
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
-	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockDig       (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockPlace     (cByteBuffer & a_ByteBuffer);
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketClientSettings (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketClientStatus   (cByteBuffer & a_ByteBuffer);
-	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketEntityAction   (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketKeepAlive      (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
@@ -306,10 +306,10 @@ protected:
 	void SendCompass(const cWorld & a_World);
 	
 	/** Reads an item out of the received data, sets a_Item to the values read. Returns false if not enough received data */
-	bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item);
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item);
 	
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
+	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata, bool a_IsCompressed = true);
 	
 	void StartEncryption(const Byte * a_Key);
 	

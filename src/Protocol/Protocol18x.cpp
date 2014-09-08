@@ -39,6 +39,21 @@ Implements the 1.8.x protocol classes:
 
 
 
+#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
+	Type Var; \
+	{ \
+		if (!ByteBuf.Proc(Var)) \
+		{ \
+			ByteBuf.CheckValid(); \
+			return false; \
+		} \
+		ByteBuf.CheckValid(); \
+	}
+
+
+
+
+
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 class cProtocol176;
 
@@ -59,13 +74,83 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 
 
 
+void cProtocol180::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
+	Pkt.WriteVarInt(a_Player.GetUniqueID());
+
+	// Send UUID:
+	AString UUID = cMojangAPI::MakeUUIDShort(a_Player.GetClientHandle()->GetUUID());
+
+	Int64 MostSignificantBits = 0;
+	Int64 LeastSignificantBits = 0;
+
+	for (size_t i = 0; i < UUID.length(); i++)
+	{
+		MostSignificantBits += (UUID[i] & 0xff) >> 7;
+		LeastSignificantBits += UUID[i] & 1;
+	}
+	Pkt.WriteInt64(4053239666997989821);
+	Pkt.WriteInt64(-5603022497796657139);
+	LOG("Bits: %i, %i", (int)MostSignificantBits, (int)LeastSignificantBits);
+
+	// Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
+
+	Pkt.WriteFPInt(a_Player.GetPosX());
+	Pkt.WriteFPInt(a_Player.GetPosY());
+	Pkt.WriteFPInt(a_Player.GetPosZ());
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	short ItemType = a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType;
+	Pkt.WriteShort(ItemType);
+	Pkt.WriteByte((3 << 5) | 6);  // Metadata: float + index 6
+	Pkt.WriteFloat((float)a_Player.GetHealth());
+	Pkt.WriteByte((4 << 5 | (2 & 0x1F)) & 0xFF);
+	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteByte(0x7f);  // Metadata: end
+}
+
+
+
+
+
+void cProtocol180::SendPlayerMaxSpeed(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	
+	cPacketizer Pkt(*this, 0x20);  // Entity Properties
+	cPlayer * Player = m_Client->GetPlayer();
+	Pkt.WriteVarInt(Player->GetUniqueID());
+	Pkt.WriteInt(1);  // Count
+	Pkt.WriteString("generic.movementSpeed");
+	// The default game speed is 0.1, multiply that value by the relative speed:
+	Pkt.WriteDouble(0.1 * Player->GetNormalMaxSpeed());
+	if (Player->IsSprinting())
+	{
+		Pkt.WriteVarInt(1);  // Modifier count
+		Pkt.WriteInt64(0x662a6b8dda3e4c1c);
+		Pkt.WriteInt64(0x881396ea6097278d);  // UUID of the modifier
+		Pkt.WriteDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
+		Pkt.WriteByte(2);
+	}
+	else
+	{
+		Pkt.WriteVarInt(0);  // Modifier count
+	}
+}
+
+
+
+
+
 void cProtocol180::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
 	Pkt.WriteInt(a_EffectID);
-	Pkt.WritePosition(Vector3i(a_SrcX, a_SrcY, a_SrcZ));
+	Pkt.WritePosition(a_SrcX, a_SrcY, a_SrcZ);
 	Pkt.WriteInt(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -144,7 +229,7 @@ void cProtocol180::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_Bloc
 	
 	cPacketizer Pkt(*this, 0x0a);
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
-	Pkt.WritePosition(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	Pkt.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
@@ -441,7 +526,7 @@ void cProtocol180::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x23);  // Block Change packet
-	Pkt.WritePosition(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+	Pkt.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
 
 	UInt32 Block = ((UInt32)a_BlockType << 4) | ((UInt32)a_BlockMeta & 15);
 	Pkt.WriteVarInt(Block);
@@ -624,12 +709,66 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, 0x05);  // Spawn Position packet
-		Vector3i Position(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
-		Pkt.WritePosition(Position);
+		Pkt.WritePosition(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
 	
 	// Send player abilities:
 	SendPlayerAbilities();
+}
+
+
+
+
+
+bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
+	if (ItemType == -1)
+	{
+		// The item is empty, no more data follows
+		a_Item.Empty();
+		return true;
+	}
+	a_Item.m_ItemType = ItemType;
+	
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadChar,    char,  ItemCount);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemDamage);
+	a_Item.m_ItemCount  = ItemCount;
+	a_Item.m_ItemDamage = ItemDamage;
+	if (ItemCount <= 0)
+	{
+		a_Item.Empty();
+	}
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadChar, char, FirstChar);
+	if (FirstChar == 0)
+	{
+		// No metadata
+		return true;
+	}
+	a_ByteBuffer.ReverseRead(1);
+
+	// Read the metadata
+	AString Metadata;
+	a_ByteBuffer.ReadAll(Metadata);
+	
+	ParseItemMetadata(a_Item, Metadata, false);
+	return true;
+}
+
+
+
+
+
+void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
+	cItem Item;
+	if (!ReadItem(a_ByteBuffer, Item))
+	{
+		return;
+	}
+	m_Client->HandleCreativeInventory(SlotNum, Item);
 }
 
 
@@ -672,7 +811,10 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	AString Data;
-	a_ByteBuffer.ReadAll(Data);
+	if (!a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1))
+	{
+		return;
+	}
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -940,11 +1082,51 @@ void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ViewDistance);
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatFlags);
-	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatColors);
+	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadChar,          char,    SkinFlags);
 	
 	m_Client->SetLocale(Locale);
 	// TODO: Handle other values
+}
+
+
+
+
+
+void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
+{
+	int BlockX, BlockY, BlockZ;
+	if (!a_ByteBuffer.ReadPosition(BlockX, BlockY, BlockZ))
+	{
+		return;
+	}
+
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
+	cItem Item;
+	ReadItem(a_ByteBuffer, Item);
+
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+}
+
+
+
+
+
+void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Status);
+
+	int BlockX, BlockY, BlockZ;
+	if (!a_ByteBuffer.ReadPosition(BlockX, BlockY, BlockZ))
+	{
+		return;
+	}
+
+	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
+	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), Status);
 }
 
 

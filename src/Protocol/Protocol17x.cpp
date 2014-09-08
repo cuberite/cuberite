@@ -1567,7 +1567,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
 			);
 		}
-		
+
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
@@ -1592,7 +1592,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			
 			return;
 		}
-		
+
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
@@ -1613,7 +1613,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_Client->PacketError(PacketType);
 		}
 	}  // for (ever)
-	
+
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
 	{
@@ -2332,25 +2332,32 @@ bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 
 
 
-void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
+void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata, bool a_IsCompressed)
 {
-	// Uncompress the GZIPped data:
-	AString Uncompressed;
-	if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Uncompressed) != Z_OK)
+	AString Metadata;
+	if (a_IsCompressed)
 	{
-		AString HexDump;
-		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
-		LOGWARNING("Cannot unGZIP item metadata (" SIZE_T_FMT " bytes):\n%s", a_Metadata.size(), HexDump.c_str());
-		return;
+		// Uncompress the GZIPped data:
+		if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Metadata) != Z_OK)
+		{
+			AString HexDump;
+			CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
+			LOGWARNING("Cannot unGZIP item metadata (" SIZE_T_FMT " bytes):\n%s", a_Metadata.size(), HexDump.c_str());
+			return;
+		}
+	}
+	else
+	{
+		Metadata = a_Metadata;
 	}
 	
 	// Parse into NBT:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
+	cParsedNBT NBT(Metadata.data(), Metadata.size());
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
-		CreateHexDump(HexDump, Uncompressed.data(), Uncompressed.size(), 16);
-		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", Uncompressed.size(), HexDump.c_str());
+		CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 16);
+		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", Metadata.size(), HexDump.c_str());
 		return;
 	}
 	
@@ -2580,7 +2587,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	
 	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR))
 	{
-		WriteShort(-1);
+		WriteChar(0);
 		return;
 	}
 
@@ -2626,10 +2633,24 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
 	}
 	Writer.Finish();
-	AString Compressed;
-	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-	WriteShort((short)Compressed.size());
-	WriteBuf(Compressed.data(), Compressed.size());
+
+	AString Result = Writer.GetResult();
+	if (m_Protocol.GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0)
+	{
+		if (Result.size() == 0)
+		{
+			WriteChar(0);
+			return;
+		}
+		WriteBuf(Result.data(), Result.size());
+	}
+	else
+	{
+		AString Compressed;
+		CompressStringGZIP(Result.data(), Result.size(), Compressed);
+		WriteShort((short)Compressed.size());
+		WriteBuf(Compressed.data(), Compressed.size());
+	}
 }
 
 
