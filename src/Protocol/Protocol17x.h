@@ -199,11 +199,6 @@ protected:
 		{
 			m_Out.WriteVarUTF8String(a_Value);
 		}
-
-		void WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
-		{
-			m_Out.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
-		}
 		
 		void WriteBuf(const char * a_Data, size_t a_Size)
 		{
@@ -257,41 +252,41 @@ protected:
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
 	void AddReceivedData(const char * a_Data, size_t a_Size);
-	
+
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
 	*/
 	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
-	
+
 	// Packet handlers while in the Status state (m_State == 1):
 	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer);
-	
+
 	// Packet handlers while in the Login state (m_State == 2):
-	virtual void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
+	void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
+	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
 	
 	// Packet handlers while in the Game state (m_State == 3):
 	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketBlockDig       (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketBlockPlace     (cByteBuffer & a_ByteBuffer);
+	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
+	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketClientSettings (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketClientStatus   (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketEntityAction   (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketKeepAlive      (cByteBuffer & a_ByteBuffer);
+	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
+	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
+	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
+	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
+	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayerPos      (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayerPosLook  (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPluginMessage  (cByteBuffer & a_ByteBuffer);
+	void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
+	void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
+	void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketSteerVehicle   (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketTabComplete    (cByteBuffer & a_ByteBuffer);
+	void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
+	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketUseEntity      (cByteBuffer & a_ByteBuffer);
+	void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
@@ -309,7 +304,7 @@ protected:
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item);
 	
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
-	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata, bool a_IsCompressed = true);
+	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
 	
 	void StartEncryption(const Byte * a_Key);
 	

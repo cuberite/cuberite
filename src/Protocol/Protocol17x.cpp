@@ -1531,17 +1531,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
 
-		// 1.8 - Compressed packets
-		if ((m_State == 3) && (GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0))
-		{
-			UInt32 CompressedSize;
-			if (!bb.ReadVarInt(CompressedSize))
-			{
-				// Not enough data
-				break;
-			}
-		}
-
 		// Write one NUL extra, so that we can detect over-reads
 		bb.Write("\0", 1);
 		
@@ -2290,7 +2279,6 @@ void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 
 
 
-
 bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
@@ -2332,32 +2320,25 @@ bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 
 
 
-void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata, bool a_IsCompressed)
+void cProtocol172::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 {
-	AString Metadata;
-	if (a_IsCompressed)
+	// Uncompress the GZIPped data:
+	AString Uncompressed;
+	if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Uncompressed) != Z_OK)
 	{
-		// Uncompress the GZIPped data:
-		if (UncompressStringGZIP(a_Metadata.data(), a_Metadata.size(), Metadata) != Z_OK)
-		{
-			AString HexDump;
-			CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
-			LOGWARNING("Cannot unGZIP item metadata (" SIZE_T_FMT " bytes):\n%s", a_Metadata.size(), HexDump.c_str());
-			return;
-		}
-	}
-	else
-	{
-		Metadata = a_Metadata;
+		AString HexDump;
+		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
+		LOGWARNING("Cannot unGZIP item metadata (" SIZE_T_FMT " bytes):\n%s", a_Metadata.size(), HexDump.c_str());
+		return;
 	}
 	
 	// Parse into NBT:
-	cParsedNBT NBT(Metadata.data(), Metadata.size());
+	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
-		CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 16);
-		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", Metadata.size(), HexDump.c_str());
+		CreateHexDump(HexDump, Uncompressed.data(), Uncompressed.size(), 16);
+		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", Uncompressed.size(), HexDump.c_str());
 		return;
 	}
 	
@@ -2531,15 +2512,7 @@ cProtocol172::cPacketizer::~cPacketizer()
 	// Send the packet length
 	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
 
-	if ((m_Protocol.m_State == 3) && (m_Protocol.GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0))
-	{
-		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen + 1);
-		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(0);
-	}
-	else
-	{
-		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
-	}
+	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
 	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
 	m_Protocol.m_OutPacketLenBuffer.CommitRead();
@@ -2634,23 +2607,10 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	}
 	Writer.Finish();
 
-	AString Result = Writer.GetResult();
-	if (m_Protocol.GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0)
-	{
-		if (Result.size() == 0)
-		{
-			WriteChar(0);
-			return;
-		}
-		WriteBuf(Result.data(), Result.size());
-	}
-	else
-	{
-		AString Compressed;
-		CompressStringGZIP(Result.data(), Result.size(), Compressed);
-		WriteShort((short)Compressed.size());
-		WriteBuf(Compressed.data(), Compressed.size());
-	}
+	AString Compressed;
+	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
+	WriteShort((short)Compressed.size());
+	WriteBuf(Compressed.data(), Compressed.size());
 }
 
 
