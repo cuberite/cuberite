@@ -59,9 +59,9 @@ class cTNTEntity;
 class cCreeper;
 class cHopperEntity;
 class cBlockEntity;
-class cEnchantments;
-class cWeightedEnchantment;
 class cBoundingBox;
+class cEnchantments;
+struct cWeightedEnchantment;
 typedef cBoundingBox * pBoundingBox;
 typedef cWorld *       pWorld;
 
@@ -153,7 +153,7 @@ public:
 	lite-config as well), use RegisterAPILibs() to do that. */
 	void Create(void);
 	
-	/** Registers all the API libraries that MCS provides into m_LuaState. */
+    /** Registers all the API libraries that MCS provides into m_LuaState. */cBoundingBox
 	void RegisterAPILibs(void);
 	
 	/** Closes the m_LuaState, if not closed already */
