@@ -1192,6 +1192,8 @@ void cClientHandle::FinishDigAnimation()
 
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
 {
+	// TODO: Rewrite this function
+
 	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
@@ -1204,14 +1206,17 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		if (a_BlockY < cChunkDef::Height - 1)
+		if ((a_BlockX >= 0) && (a_BlockY >= 0) && (a_BlockZ >= 0))
 		{
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-		}
-		if (a_BlockY > 0)
-		{
-			World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			if (a_BlockY < cChunkDef::Height - 1)
+			{
+				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+			}
+			if (a_BlockY > 0)
+			{
+				World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+			}
 		}
 		m_Player->GetInventory().SendEquippedSlot();
 		return;
@@ -1221,17 +1226,20 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		cChunkInterface ChunkInterface(World->GetChunkMap());
-		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		if ((a_BlockX >= 0) && (a_BlockY >= 0) && (a_BlockZ >= 0))
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			m_Player->GetInventory().SendEquippedSlot();
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+			BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+
+			if (a_BlockFace != BLOCK_FACE_NONE)
+			{
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+				m_Player->GetInventory().SendEquippedSlot();
+			}
 		}
 		return;
 	}

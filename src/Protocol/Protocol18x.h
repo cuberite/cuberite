@@ -204,6 +204,8 @@ protected:
 			m_Out.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
 		}
 		
+		void WriteUUID(const AString & a_UUID);
+		
 		void WriteBuf(const char * a_Data, size_t a_Size)
 		{
 			m_Out.Write(a_Data, a_Size);

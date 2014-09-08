@@ -2586,6 +2586,23 @@ cProtocol180::cPacketizer::~cPacketizer()
 
 
 
+void cProtocol180::cPacketizer::WriteUUID(const AString & a_UUID)
+{
+	AString UUID_1 = a_UUID.substr(0, a_UUID.length() / 2);
+	AString UUID_2 = a_UUID.substr(a_UUID.length() / 2);
+	
+	UInt64 Value_1, Value_2;
+	sscanf(UUID_1.c_str(), "%llx", &Value_1);
+	sscanf(UUID_2.c_str(), "%llx", &Value_2);
+
+	WriteInt64((Int64)Value_1);
+	WriteInt64((Int64)Value_2);
+}
+
+
+
+
+
 void cProtocol180::cPacketizer::WriteItem(const cItem & a_Item)
 {
 	short ItemType = a_Item.m_ItemType;
