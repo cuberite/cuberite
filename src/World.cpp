@@ -759,7 +759,7 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 		}
 		case dimNotSet:
 		{
-			assert(!"Dimension not set");
+			ASSERT(!"Dimension not set");
 			break;
 		}
 	}
@@ -777,7 +777,7 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = "enderman"; break;
-		case dimNotSet:    assert(!"Dimension not set"); break;
+		case dimNotSet:    ASSERT(!"Dimension not set"); break;
 	}
 	
 	m_bAnimals = a_IniFile.GetValueSetB("Monsters", "AnimalsOn", true);
