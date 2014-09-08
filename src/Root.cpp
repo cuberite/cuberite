@@ -151,7 +151,7 @@ void cRoot::Start(void)
 		m_MojangAPI.Start(IniFile);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
 		if (!m_Server->InitServer(IniFile))
 		{
-			IniFile.WriteFile("Settings.ini")
+			IniFile.WriteFile("Settings.ini");
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
