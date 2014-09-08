@@ -668,7 +668,7 @@ bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantm
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPreEnchanting(a_Player, a_WeightedEnchantment, a_Item, a_levels))
+        if ((*itr)->OnPreEnchanting(a_Player, a_PossibleEnchantments, a_Item))
 		{
 			return true;
 		}
@@ -689,7 +689,7 @@ bool cPluginManager::CallHookPostEnchanting(cPlayer & a_Player, cEnchantments & 
 	}
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPostEnchanting(a_Player, a_Enchantment, a_Item, a_Levels))
+        if ((*itr)->OnPostEnchanting(a_Player, a_EnchantmentsChosen, a_Item, a_Levels))
 		{
 			return true;
 		}

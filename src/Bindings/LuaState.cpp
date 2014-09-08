@@ -468,7 +468,7 @@ void cLuaState::Push(const Vector3d & a_Vector)
 
 
 
-<<<<<<< HEAD
+
 void cLuaState::Push(cEnchantments & a_Enchantment)
 {
 	ASSERT(IsValid());
@@ -493,10 +493,7 @@ void cLuaState::Push(cWeightedEnchantment & a_WeightedEnchantment)
 
 
 
-void cLuaState::Push(cEntity * a_Entity)
-=======
 void cLuaState::Push(const Vector3d * a_Vector)
->>>>>>> master
 {
 	ASSERT(IsValid());
 

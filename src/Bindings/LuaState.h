@@ -31,11 +31,7 @@ extern "C"
 }
 
 #include "../Vector3.h"
-<<<<<<< HEAD
-#include "../Enchantments.h"
-=======
 #include "../Defines.h"
->>>>>>> master
 
 
 
@@ -63,6 +59,8 @@ class cTNTEntity;
 class cCreeper;
 class cHopperEntity;
 class cBlockEntity;
+class cEnchantments;
+class cWeightedEnchantment;
 
 
 
@@ -199,6 +197,7 @@ public:
 	void Push(cBlockEntity * a_BlockEntity);
 	void Push(cChunkDesc * a_ChunkDesc);
 	void Push(cClientHandle * a_ClientHandle);
+    void Push(cEnchantments & a_Enchantment);
 	void Push(cEntity * a_Entity);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cItem * a_Item);
@@ -217,15 +216,8 @@ public:
 	void Push(TakeDamageInfo * a_TDI);
 	void Push(Vector3d * a_Vector);
 	void Push(Vector3i * a_Vector);
-	void Push(void * a_Ptr);
-<<<<<<< HEAD
-	void Push(cHopperEntity * a_Hopper);
-	void Push(cBlockEntity * a_BlockEntity);
-	void Push(cEnchantments & a_Enchantment);
-	void Push(cWeightedEnchantment & a_WeightedEnchantment);
-
-=======
->>>>>>> master
+    void Push(void * a_Ptr);
+    void Push(cWeightedEnchantment & a_WeightedEnchantment);
 	
 	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, bool & a_Value);
