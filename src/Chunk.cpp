@@ -37,6 +37,7 @@
 #include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
+#include "BoundingBox.h"
 
 #include "json/json.h"
 
@@ -65,19 +66,18 @@ sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_Bloc
 // cChunk:
 
 cChunk::cChunk(
-	int a_ChunkX, int a_ChunkY, int a_ChunkZ,
+	int a_ChunkX, int a_ChunkZ,
 	cChunkMap * a_ChunkMap, cWorld * a_World,
 	cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ) :
-	m_IsValid(false),
+	m_Presence(cpInvalid),
 	m_IsLightValid(false),
 	m_IsDirty(false),
 	m_IsSaving(false),
 	m_HasLoadFailed(false),
 	m_StayCount(0),
 	m_PosX(a_ChunkX),
-	m_PosY(a_ChunkY),
 	m_PosZ(a_ChunkZ),
 	m_World(a_World),
 	m_ChunkMap(a_ChunkMap),
@@ -165,11 +165,22 @@ cChunk::~cChunk()
 
 
 
-void cChunk::SetValid(void)
+void cChunk::SetPresence(cChunk::ePresence a_Presence)
 {
-	m_IsValid = true;
-	
-	m_World->GetChunkMap()->ChunkValidated();
+	m_Presence = a_Presence;
+	if (a_Presence == cpPresent)
+	{
+		m_World->GetChunkMap()->ChunkValidated();
+	}
+}
+
+
+
+
+
+void cChunk::SetShouldGenerateIfLoadFailed(bool a_ShouldGenerateIfLoadFailed)
+{
+	m_ShouldGenerateIfLoadFailed = a_ShouldGenerateIfLoadFailed;
 }
 
 
@@ -178,6 +189,9 @@ void cChunk::SetValid(void)
 
 void cChunk::MarkRegenerating(void)
 {
+	// Set as queued again:
+	SetPresence(cpQueued);
+
 	// Tell all clients attached to this chunk that they want this chunk:
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -191,7 +205,11 @@ void cChunk::MarkRegenerating(void)
 
 bool cChunk::CanUnload(void)
 {
-	return m_LoadedByClient.empty() && !m_IsDirty && (m_StayCount == 0);
+	return
+		m_LoadedByClient.empty() &&  // The chunk is not used by any client
+		!m_IsDirty &&                // The chunk has been saved properly or hasn't been touched since the load / gen
+		(m_StayCount == 0) &&        // The chunk is not in a ChunkStay
+		(m_Presence != cpQueued) ;   // The chunk is not queued for loading / generating (otherwise multi-load / multi-gen could occur)
 }
 
 
@@ -223,7 +241,7 @@ void cChunk::MarkSaved(void)
 void cChunk::MarkLoaded(void)
 {
 	m_IsDirty = false;
-	SetValid();
+	SetPresence(cpPresent);
 }
 
 
@@ -232,12 +250,17 @@ void cChunk::MarkLoaded(void)
 
 void cChunk::MarkLoadFailed(void)
 {
-	if (m_IsValid)
+	ASSERT(m_Presence == cpQueued);
+
+	// If the chunk is marked as needed, generate it:
+	if (m_ShouldGenerateIfLoadFailed)
 	{
-		return;
+		m_World->GetGenerator().QueueGenerateChunk(m_PosX, m_PosZ, false);
 	}
-	
-	m_HasLoadFailed = true;
+	else
+	{
+		m_Presence = cpInvalid;
+	}
 }
 
 
@@ -246,6 +269,8 @@ void cChunk::MarkLoadFailed(void)
 
 void cChunk::GetAllData(cChunkDataCallback & a_Callback)
 {
+	ASSERT(m_Presence == cpPresent);
+
 	a_Callback.HeightMap(&m_HeightMap);
 	a_Callback.BiomeData(&m_BiomeMap);
 
@@ -272,6 +297,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 {
 	ASSERT(a_SetChunkData.IsHeightMapValid());
 	ASSERT(a_SetChunkData.AreBiomesValid());
+	ASSERT(IsQueued());
 	
 	memcpy(m_BiomeMap, a_SetChunkData.GetBiomes(), sizeof(m_BiomeMap));
 	memcpy(m_HeightMap, a_SetChunkData.GetHeightMap(), sizeof(m_HeightMap));
@@ -317,7 +343,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 	CreateBlockEntities();
 	
 	// Set the chunk data as valid. This may be needed for some simulators that perform actions upon block adding (Vaporize)
-	SetValid();
+	SetPresence(cpPresent);
 	
 	// Wake up all simulators for their respective blocks:
 	WakeUpSimulators();
@@ -653,7 +679,7 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
 	if (Neighbor == NULL)
 	{
-		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), ZERO_CHUNK_Y, a_Entity->GetChunkZ());
+		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 		if (Neighbor == NULL)
 		{
 			// TODO: What to do with this?
@@ -1319,11 +1345,11 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_JUKEBOX:
 					case E_BLOCK_FLOWER_POT:
 					{
-						if (!HasBlockEntityAt(x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width))
+						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
 						{
 							m_BlockEntities.push_back(cBlockEntity::CreateByBlockType(
 								BlockType, GetMeta(x, y, z),
-								x + m_PosX * Width, y + m_PosY * Height, z + m_PosZ * Width, m_World
+								x + m_PosX * Width, y, z + m_PosZ * Width, m_World
 							));
 						}
 						break;
@@ -1948,6 +1974,30 @@ bool cChunk::ForEachEntity(cEntityCallback & a_Callback)
 	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
 	{
 		++itr2;
+		if (a_Callback.Item(*itr))
+		{
+			return false;
+		}
+	}  // for itr - m_Entitites[]
+	return true;
+}
+
+
+
+
+
+bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback)
+{
+	// The entity list is locked by the parent chunkmap's CS
+	for (cEntityList::iterator itr = m_Entities.begin(), itr2 = itr; itr != m_Entities.end(); itr = itr2)
+	{
+		++itr2;
+		cBoundingBox EntBox((*itr)->GetPosition(), (*itr)->GetWidth() / 2, (*itr)->GetHeight());
+		if (!EntBox.DoesIntersect(a_Box))
+		{
+			// The entity is not in the specified box
+			continue;
+		}
 		if (a_Callback.Item(*itr))
 		{
 			return false;
@@ -2603,7 +2653,7 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 		int BlockZ = m_PosZ * cChunkDef::Width + a_RelZ;
 		int ChunkX, ChunkZ;
 		BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
-		return m_ChunkMap->GetChunkNoLoad(ChunkX, ZERO_CHUNK_Y, ChunkZ);
+		return m_ChunkMap->GetChunkNoLoad(ChunkX, ChunkZ);
 	}
 
 	// Walk the neighbors:
@@ -3128,7 +3178,7 @@ void cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ, int & a
 
 Vector3i cChunk::PositionToWorldPosition(int a_RelX, int a_RelY, int a_RelZ)
 {
-	return Vector3i(m_PosX * Width + a_RelX, m_PosY * Height + a_RelY, m_PosZ * Width + a_RelZ);
+	return Vector3i(m_PosX * Width + a_RelX, a_RelY, m_PosZ * Width + a_RelZ);
 }
 
 

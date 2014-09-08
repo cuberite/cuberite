@@ -283,37 +283,37 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 		bool AllowsFriendlyFire = true, CanSeeFriendlyInvisible = false;
 
 		int CurrLine = a_NBT.FindChildByName(Child, "Name");
-		if (CurrLine >= 0)
+		if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_String))
 		{
-			Name = a_NBT.GetInt(CurrLine);
+			Name = a_NBT.GetString(CurrLine);
 		}
 
 		CurrLine = a_NBT.FindChildByName(Child, "DisplayName");
-		if (CurrLine >= 0)
+		if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_String))
 		{
-			DisplayName = a_NBT.GetInt(CurrLine);
+			DisplayName = a_NBT.GetString(CurrLine);
 		}
 
 		CurrLine = a_NBT.FindChildByName(Child, "Prefix");
-		if (CurrLine >= 0)
+		if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_String))
 		{
-			Prefix = a_NBT.GetInt(CurrLine);
+			Prefix = a_NBT.GetString(CurrLine);
 		}
 
 		CurrLine = a_NBT.FindChildByName(Child, "Suffix");
-		if (CurrLine >= 0)
+		if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_String))
 		{
-			Suffix = a_NBT.GetInt(CurrLine);
+			Suffix = a_NBT.GetString(CurrLine);
 		}
 
 		CurrLine = a_NBT.FindChildByName(Child, "AllowFriendlyFire");
-		if (CurrLine >= 0)
+		if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Int))
 		{
 			AllowsFriendlyFire = (a_NBT.GetInt(CurrLine) != 0);
 		}
 
 		CurrLine = a_NBT.FindChildByName(Child, "SeeFriendlyInvisibles");
-		if (CurrLine >= 0)
+		if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Int))
 		{
 			CanSeeFriendlyInvisible = (a_NBT.GetInt(CurrLine) != 0);
 		}

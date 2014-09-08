@@ -81,7 +81,7 @@ void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkZ)
 	// This is probably never gonna be called twice for the same chunk, and if it is, we don't mind, so we don't check
 	{
 		cCSLock Lock(m_CS);
-		m_ChunksReady.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+		m_ChunksReady.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 	}
 	m_evtQueue.Set();
 }
@@ -95,12 +95,12 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * 
 	ASSERT(a_Client != NULL);
 	{
 		cCSLock Lock(m_CS);
-		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ, a_Client)) != m_SendChunks.end())
+		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, a_ChunkZ, a_Client)) != m_SendChunks.end())
 		{
 			// Already queued, bail out
 			return;
 		}
-		m_SendChunks.push_back(sSendChunk(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ, a_Client));
+		m_SendChunks.push_back(sSendChunk(a_ChunkX, a_ChunkZ, a_Client));
 	}
 	m_evtQueue.Set();
 }
@@ -160,7 +160,7 @@ void cChunkSender::Execute(void)
 			m_ChunksReady.pop_front();
 			Lock.Unlock();
 			
-			SendChunk(Coords.m_ChunkX, Coords.m_ChunkY, Coords.m_ChunkZ, NULL);
+			SendChunk(Coords.m_ChunkX, Coords.m_ChunkZ, NULL);
 		}
 		else
 		{
@@ -169,7 +169,7 @@ void cChunkSender::Execute(void)
 			m_SendChunks.pop_front();
 			Lock.Unlock();
 			
-			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkY, Chunk.m_ChunkZ, Chunk.m_Client);
+			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
 		}
 		Lock.Lock();
 		int RemoveCount = m_RemoveCount;
@@ -186,14 +186,14 @@ void cChunkSender::Execute(void)
 
 
 
-void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ, cClientHandle * a_Client)
+void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
 	ASSERT(m_World != NULL);
 	
 	// Ask the client if it still wants the chunk:
 	if (a_Client != NULL)
 	{
-		if (!a_Client->WantsSendChunk(a_ChunkX, a_ChunkY, a_ChunkZ))
+		if (!a_Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
 		{
 			return;
 		}
