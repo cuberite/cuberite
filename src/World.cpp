@@ -876,7 +876,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 			m_TimeOfDaySecs -= 1200.0;
 		}
 
-		m_TimeOfDay = (Int64)(m_TimeOfDaySecs * 20.0);
+		m_TimeOfDay = static_cast<int>(m_TimeOfDaySecs * 20.0);
 
 		// Updates the sky darkness based on current time of day
 		UpdateSkyDarkness();
