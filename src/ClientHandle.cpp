@@ -1198,19 +1198,9 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	cWorld * World = m_Player->GetWorld();
 
-	// 1.8 protocol fix
-	if ((int)a_BlockFace == 255)
-	{
-		a_BlockFace = BLOCK_FACE_NONE;
-	}
-
 	if (
 		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
-		(
-			(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||  // The block is too far away
-			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
-		)
+		((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() >= 5)
 	)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);

@@ -2560,7 +2560,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	
 	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR))
 	{
-		WriteChar(0);
+		WriteShort(-1);
 		return;
 	}
 

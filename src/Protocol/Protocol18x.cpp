@@ -1908,6 +1908,11 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
+	if (Face == 255)
+	{
+		Face = 0;
+	}
+
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
