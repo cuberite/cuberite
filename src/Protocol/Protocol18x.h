@@ -112,7 +112,8 @@ protected:
 	virtual void HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketClientSettings(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
-	virtual void HandlePacketBlockDig(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)override;
+	virtual void HandlePacketTabComplete(cByteBuffer & a_ByteBuffer) override;
 } ;
 
 

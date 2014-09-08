@@ -1132,3 +1132,20 @@ void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 
 
+
+void cProtocol180::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Text);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasPosition);
+
+	if (HasPosition)
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
+	}
+
+	m_Client->HandleTabCompletion(Text);
+}
+
+
+
+

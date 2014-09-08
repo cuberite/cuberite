@@ -289,7 +289,7 @@ protected:
 	virtual void HandlePacketPluginMessage  (cByteBuffer & a_ByteBuffer);
 	void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSteerVehicle   (cByteBuffer & a_ByteBuffer);
-	void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketTabComplete    (cByteBuffer & a_ByteBuffer);
 	void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketUseEntity      (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
