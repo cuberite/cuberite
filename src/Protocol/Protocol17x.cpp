@@ -1503,14 +1503,14 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		);
 		m_CommLogFile.Flush();
 	}
-	
+
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
 		m_Client->PacketBufferFull();
 		return;
 	}
-	
+
 	// Handle all complete packets:
 	for (;;)
 	{
@@ -1530,10 +1530,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
-		
-		// Write one NUL extra, so that we can detect over-reads
-		bb.Write("\0", 1);
-		
+
 		// 1.8 - Compressed packets
 		if ((m_State == 3) && (GetProtocolVersion() == cProtocolRecognizer::PROTO_VERSION_1_8_0))
 		{
@@ -1544,6 +1541,9 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 				break;
 			}
 		}
+
+		// Write one NUL extra, so that we can detect over-reads
+		bb.Write("\0", 1);
 		
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))

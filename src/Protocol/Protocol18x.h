@@ -56,8 +56,6 @@ public:
 
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendLoginSuccess        (void) override;
-	virtual void SendPlayerAbilities     (void) override {}
-	virtual void SendWindowClose         (const cWindow & a_Window) override {}
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override {}
 	virtual void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override {}
 	virtual void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item) override {}

@@ -121,7 +121,7 @@ void cProtocol180::SendPlayerMoveLook(void)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	/*cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
+	cPacketizer Pkt(*this, 0x08);  // Player Position And Look packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteDouble(Player->GetPosX());
 	
@@ -131,7 +131,7 @@ void cProtocol180::SendPlayerMoveLook(void)
 	Pkt.WriteDouble(Player->GetPosZ());
 	Pkt.WriteFloat((float)Player->GetYaw());
 	Pkt.WriteFloat((float)Player->GetPitch());
-	Pkt.WriteByte(0);*/
+	Pkt.WriteByte(0);
 }
 
 
@@ -168,12 +168,12 @@ void cProtocol180::SendEntityVelocity(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	/*cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
+	cPacketizer Pkt(*this, 0x12);  // Entity Velocity packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	// 400 = 8000 / 20 ... Conversion from our speed in m/s to 8000 m/tick
 	Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
-	Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));*/
+	Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
 }
 
 
@@ -395,9 +395,9 @@ void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & 
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	/*cPacketizer Pkt(*this, 0x3f);
+	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
-	Pkt.WriteBuf(a_Message.data(), a_Message.size());*/
+	Pkt.WriteBuf(a_Message.data(), a_Message.size());
 }
 
 
@@ -672,10 +672,7 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	AString Data;
-	if (!a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1))
-	{
-		return;
-	}
+	a_ByteBuffer.ReadAll(Data);
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 

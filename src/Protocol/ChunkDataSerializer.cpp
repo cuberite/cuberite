@@ -182,25 +182,26 @@ void cChunkDataSerializer::Serialize80(AString & a_Data, int a_ChunkX, int a_Chu
 	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib *can* stream)
 
 	// Blocktypes converter (1.8 included the meta into the blocktype):
-	/*unsigned short Blocks[ARRAYCOUNT(m_BlockTypes)];
+	unsigned char Blocks[cChunkDef::NumBlocks * 2];
+	size_t LastOffset = 0;
 	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
 	{
-		BLOCKTYPE BlockType = m_BlockTypes[Index];
+		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
 		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
-		Blocks[Index] = ((unsigned short)BlockType << 4) | ((unsigned short)BlockMeta);
-	}*/
+		Blocks[LastOffset] = (BlockType << 4) | ((unsigned char)BlockMeta);
+		Blocks[LastOffset + 1] = (unsigned char)BlockType >> 4;
+		LastOffset += 2;
+	}
 
 	const int BiomeDataSize    = cChunkDef::Width * cChunkDef::Width;
-	const int MetadataOffset   = sizeof(m_BlockTypes);
-	const int BlockLightOffset = MetadataOffset   + sizeof(m_BlockMetas);
+	const int BlockLightOffset = sizeof(Blocks);
 	const int SkyLightOffset   = BlockLightOffset + sizeof(m_BlockLight);
 	const int BiomeOffset      = SkyLightOffset   + sizeof(m_BlockSkyLight);
 	const int DataSize         = BiomeOffset      + BiomeDataSize;
 
 	// Temporary buffer for the composed data:
 	char AllData [DataSize];
-	memcpy(AllData, m_BlockTypes, sizeof(m_BlockTypes));
-	memcpy(AllData + MetadataOffset,   m_BlockMetas,    sizeof(m_BlockMetas));
+	memcpy(AllData, Blocks, sizeof(Blocks));
 	memcpy(AllData + BlockLightOffset, m_BlockLight,    sizeof(m_BlockLight));
 	memcpy(AllData + SkyLightOffset,   m_BlockSkyLight, sizeof(m_BlockSkyLight));
 	memcpy(AllData + BiomeOffset,      m_BiomeData,     BiomeDataSize);
