@@ -48,6 +48,9 @@ public:
 	/** Can a finisher change it? */
 	bool m_CanBeTerraformed;
 
+	/** Sound when placing this block */
+	AString m_PlaceSound;
+
 	// tolua_end
 
 	/** Associated block handler. */
@@ -64,6 +67,7 @@ public:
 	inline static bool IsSolid                    (BLOCKTYPE a_Type) { return Get(a_Type).m_IsSolid;             }
 	inline static bool FullyOccupiesVoxel         (BLOCKTYPE a_Type) { return Get(a_Type).m_FullyOccupiesVoxel;  }
 	inline static bool CanBeTerraformed           (BLOCKTYPE a_Type) { return Get(a_Type).m_CanBeTerraformed;    }
+	inline static AString GetPlaceSound           (BLOCKTYPE a_Type) { return Get(a_Type).m_PlaceSound;          }
 
 	// tolua_end
 

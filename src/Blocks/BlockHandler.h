@@ -84,9 +84,6 @@ public:
 	*/
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop = true, bool a_DropVerbatim = false);
 	
-	/// Returns step sound name of block
-	virtual const char * GetStepSound(void);
-	
 	/// Checks if the block can stay at the specified relative coords in the chunk
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);
 

@@ -70,12 +70,6 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
-
-
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)

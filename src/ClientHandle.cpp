@@ -1448,7 +1448,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	// Step sound with 0.8f pitch is used as block placement sound
-	World->BroadcastSoundEffect(NewBlock->GetStepSound(), (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.8f);
+	World->BroadcastSoundEffect(cBlockInfo::GetPlaceSound(BlockType), (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.8f);
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 

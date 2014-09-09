@@ -112,12 +112,6 @@ public:
 		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
 		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
-	}
 } ;
 
 
