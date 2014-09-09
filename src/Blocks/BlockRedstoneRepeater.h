@@ -63,12 +63,6 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
-
-
 	inline static NIBBLETYPE RepeaterRotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis
