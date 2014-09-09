@@ -524,6 +524,7 @@ end
 			Functions =
 			{
 				GenerateOfflineUUID = { Params = "Username", Return = "string", Notes = "(STATIC) Generates an UUID based on the player name provided. This is used for the offline (non-auth) mode, when there's no UUID source. Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. Returns a 32-char UUID (no dashes)." },
+				GetIPString = { Params = "", Return = "string", Notes = "Returns the IP address of the connection, as a string. Only the address part is returned, without the port number." },
 				GetLocale = { Params = "", Return = "Locale", Notes = "Returns the locale string that the client sends as part of the protocol handshake. Can be used to provide localized strings." },
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
 				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },

@@ -40,8 +40,8 @@
 
 # Need to list each of the four log types, otherwise all logs would get converted into apple planks (^0)
 
-ApplePlanks, 4   = AppleLog, * 
-ConiferPlanks, 4 = ConiferLog, *
+OakPlanks, 4     = OakLog, * 
+SprucePlanks, 4  = SpruceLog, *
 BirchPlanks, 4   = BirchLog, *
 JunglePlanks, 4  = JungleLog, *
 AcaciaPlanks, 4  = AcaciaLog, *
@@ -67,6 +67,7 @@ DiamondBlock            = Diamond,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3
 LapisBlock              = LapisLazuli, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 EmeraldBlock            = Emerald,     1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 RedstoneBlock           = RedstoneDust,    1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+CoalBlock               = Coal, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 QuartzBlock             = NetherQuartz, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 NetherBrick             = netherbrickitem, 1:1, 1:2, 2:1, 2:2
 Glowstone               = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
@@ -146,9 +147,6 @@ StoneBrickStairs, 4  = StoneBrick,  1:1, 1:2, 2:2, 1:3, 2:3, 3:3
 StoneBrickStairs, 4  = StoneBrick,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 RedSandstoneStairs, 4 = RedSandstone,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
 RedSandstoneStairs, 4 = RedSandstone,  3:1, 2:2, 3:2, 1:3, 2:3, 3:3
-
-# Other
-Carpet             = Wool, 1:3, 2:3
 
 
 
@@ -451,12 +449,29 @@ PinkWool      = Wool, * | PinkDye, *
 GrayWool      = Wool, * | GrayDye, *
 LightGrayWool = Wool, * | LightGrayDye, *
 CyanWool      = Wool, * | CyanDye, *
-VioletWool    = Wool, * | VioletDye, *
+PurpleWool    = Wool, * | PurpleDye, *
 BlueWool      = Wool, * | BlueDye, *
 BrownWool     = Wool, * | BrownDye, *
 GreenWool     = Wool, * | GreenDye, *
 RedWool       = Wool, * | RedDye, *
 BlackWool     = Wool, * | BlackDye, *
+
+WhiteCarpet, 3     = WhiteWool, 1:1, 2:1
+OrangeCarpet, 3    = OrangeWool, 1:1, 2:1
+MagentaCarpet, 3   = MagentaWool, 1:1, 2:1
+LightBlueCarpet, 3 = LightBlueWool, 1:1, 2:1
+YellowCarpet, 3    = YellowWool, 1:1, 2:1
+LimeCarpet, 3      = LimeWool, 1:1, 2:1
+PinkCarpet, 3      = PinkWool, 1:1, 2:1
+GrayCarpet, 3      = GrayWool, 1:1, 2:1
+LightGrayCarpet, 3 = LightGrayWool, 1:1, 2:1
+CyanCarpet, 3      = CyanWool, 1:1, 2:1
+PurpleCarpet, 3    = PurpleWool, 1:1, 2:1
+BlueCarpet, 3      = BlueWool, 1:1, 2:1
+BrownCarpet, 3     = BrownWool, 1:1, 2:1
+GreenCarpet, 3     = GreenWool, 1:1, 2:1
+RedCarpet, 3       = RedWool, 1:1, 2:2
+BlackCarpet, 3     = BlackWool, 1:1, 2:1
 
 #******************************************************#
 # Stained Glass:

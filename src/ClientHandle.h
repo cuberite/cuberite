@@ -62,7 +62,7 @@ public:
 	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
 	virtual ~cClientHandle();
 
-	const AString & GetIPString(void) const { return m_IPString; }
+	const AString & GetIPString(void) const { return m_IPString; }  // tolua_export
 	
 	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 

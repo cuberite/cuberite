@@ -64,12 +64,9 @@ public:
 	cWorldStorage(void);
 	~cWorldStorage();
 	
-	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ, bool a_Generate);  // Queues the chunk for loading; if not loaded, the chunk will be generated if a_Generate is true
+	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ);
 	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ);
 	
-	/// Loads the chunk specified; returns true on success, false on failure
-	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
-
 	void UnqueueLoad(int a_ChunkX, int a_ChunkZ);
 	void UnqueueSave(const cChunkCoords & a_Chunk);
 	
@@ -84,38 +81,10 @@ public:
 	
 protected:
 
-	struct sChunkLoad
-	{
-		int m_ChunkX;
-		int m_ChunkZ;
-		bool m_Generate;  // If true, the chunk will be generated if it cannot be loaded
-		
-		sChunkLoad(int a_ChunkX, int a_ChunkZ, bool a_Generate) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_Generate(a_Generate) {}
-
-		bool operator ==(const sChunkLoad other) const
-		{
-			return (
-				(this->m_ChunkX == other.m_ChunkX) &&
-				(this->m_ChunkZ == other.m_ChunkZ)
-			);
-		}
-	} ;
-
-	struct FuncTable
-	{
-		static void Delete(sChunkLoad) {}
-		static void Combine(sChunkLoad & a_orig, const sChunkLoad a_new)
-		{
-			a_orig.m_Generate |= a_new.m_Generate;
-		}
-	};
-
-	typedef cQueue<sChunkLoad, FuncTable> sChunkLoadQueue;
-	
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
 
-	sChunkLoadQueue  m_LoadQueue;
+	cChunkCoordsQueue  m_LoadQueue;
 	cChunkCoordsQueue m_SaveQueue;
 	
 	/// All the storage schemas (all used for loading)
@@ -123,7 +92,11 @@ protected:
 	
 	/// The one storage schema used for saving
 	cWSSchema *   m_SaveSchema;
+
 	
+	/// Loads the chunk specified; returns true on success, false on failure
+	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
+
 	void InitSchemas(int a_StorageCompressionFactor);
 	
 	virtual void Execute(void) override;

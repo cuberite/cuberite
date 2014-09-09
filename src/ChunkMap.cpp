@@ -145,10 +145,9 @@ cChunkMap::cChunkLayer * cChunkMap::GetLayerForChunk(int a_ChunkX, int a_ChunkZ)
 
 cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 {
-	// No need to lock m_CSLayers, since it's already locked by the operation that called us
-	ASSERT(m_CSLayers.IsLockedByCurrentThread());
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());  // m_CSLayers should already be locked by the operation that called us
 
-	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ);
+	cChunkLayer * Layer = GetLayerForChunk(a_ChunkX, a_ChunkZ);
 	if (Layer == NULL)
 	{
 		// An error must have occurred, since layers are automatically created if they don't exist
@@ -160,9 +159,11 @@ cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 	{
 		return NULL;
 	}
-	if (!(Chunk->IsValid()))
+	if (!Chunk->IsValid() && !Chunk->IsQueued())
 	{
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ, true);
+		Chunk->SetPresence(cChunk::cpQueued);
+		Chunk->SetShouldGenerateIfLoadFailed(true);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
 	}
 	return Chunk;
 }
@@ -171,10 +172,11 @@ cChunkPtr cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkZ)
+cChunkPtr cChunkMap::GetChunkNoGen(int a_ChunkX, int a_ChunkZ)
 {
-	// No need to lock m_CSLayers, since it's already locked by the operation that called us
-	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ);
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());  // m_CSLayers should already be locked by the operation that called us
+
+	cChunkLayer * Layer = GetLayerForChunk(a_ChunkX, a_ChunkZ);
 	if (Layer == NULL)
 	{
 		// An error must have occurred, since layers are automatically created if they don't exist
@@ -186,9 +188,10 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkZ)
 	{
 		return NULL;
 	}
-	if (!(Chunk->IsValid()))
+	if (!Chunk->IsValid() && !Chunk->IsQueued())
 	{
-		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ, false);
+		Chunk->SetPresence(cChunk::cpQueued);
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ);
 	}
 	
 	return Chunk;
@@ -200,7 +203,8 @@ cChunkPtr cChunkMap::GetChunkNoGen( int a_ChunkX, int a_ChunkZ)
 
 cChunkPtr cChunkMap::GetChunkNoLoad( int a_ChunkX, int a_ChunkZ)
 {
-	// No need to lock m_CSLayers, since it's already locked by the operation that called us
+	ASSERT(m_CSLayers.IsLockedByCurrentThread());  // m_CSLayers should already be locked by the operation that called us
+
 	cChunkLayer * Layer = GetLayerForChunk( a_ChunkX, a_ChunkZ);
 	if (Layer == NULL)
 	{
@@ -1003,6 +1007,17 @@ bool cChunkMap::GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blo
 	}
 	Chunk->GetBlockTypes(a_BlockTypes);
 	return true;
+}
+
+
+
+
+
+bool cChunkMap::IsChunkQueued(int a_ChunkX, int a_ChunkZ)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
+	return (Chunk != NULL) && Chunk->IsQueued();
 }
 
 
@@ -2326,48 +2341,6 @@ void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
 	GetChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
-/// Loads the chunk synchronously, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before)
-bool cChunkMap::LoadChunk(int a_ChunkX, int a_ChunkZ)
-{
-	{
-		cCSLock Lock(m_CSLayers);
-		cChunkPtr Chunk = GetChunkNoGen(a_ChunkX, a_ChunkZ);
-		if (Chunk == NULL)
-		{
-			// Internal error
-			return false;
-		}
-		if (Chunk->IsValid())
-		{
-			// Already loaded
-			return true;
-		}
-		if (Chunk->HasLoadFailed())
-		{
-			// Already tried loading and it failed
-			return false;
-		}
-	}
-	return m_World->GetStorage().LoadChunk(a_ChunkX, a_ChunkZ);
-}
-
-
-
-
-
-/// Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid()
-void cChunkMap::LoadChunks(const cChunkCoordsList & a_Chunks)
-{
-	for (cChunkCoordsList::const_iterator itr = a_Chunks.begin(); itr != a_Chunks.end(); ++itr)
-	{
-		LoadChunk(itr->m_ChunkX, itr->m_ChunkZ);
-	}  // for itr - a_Chunks[]
 }
 
 

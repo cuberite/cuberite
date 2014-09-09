@@ -157,14 +157,14 @@ public:
 	}
 
 	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
-	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
+	virtual int GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
 
-	virtual void SetTimeOfDay(Int64 a_TimeOfDay) override
+	virtual void SetTimeOfDay(int a_TimeOfDay) override
 	{
 		m_TimeOfDay = a_TimeOfDay;
 		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
@@ -279,7 +279,12 @@ public:
 	/** Gets the chunk's blocks, only the block types */
 	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 	
-	bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) const;
+	/** Returns true iff the chunk is in the loader / generator queue. */
+	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
+
+	/** Returns true iff the chunk is present and valid. */
+	bool IsChunkValid(int a_ChunkX, int a_ChunkZ) const;
+
 	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
 	
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
@@ -357,12 +362,6 @@ public:
 	
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
-	
-	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
-	bool LoadChunk(int a_ChunkX, int a_ChunkZ);
-	
-	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
-	void LoadChunks(const cChunkCoordsList & a_Chunks);
 	
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
@@ -822,6 +821,7 @@ private:
 		virtual void OnChunkGenerated  (cChunkDesc & a_ChunkDesc) override;
 		virtual bool IsChunkValid      (int a_ChunkX, int a_ChunkZ) override;
 		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
+		virtual bool IsChunkQueued     (int a_ChunkX, int a_ChunkZ) override;
 		
 		// cPluginInterface overrides:
 		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
@@ -888,7 +888,7 @@ private:
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
 	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
-	Int64  m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
+	int    m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
 	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
