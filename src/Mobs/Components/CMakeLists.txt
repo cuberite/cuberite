@@ -14,6 +14,8 @@ SET (HDRS
 	AIComponent.h
 	AIAggressiveComponent.h
 	AttackComponent.h
+	BurningComponent.inc
+	BurningComponent.h
 	EnvironmentComponent.h
 	MovementComponent.h)
 

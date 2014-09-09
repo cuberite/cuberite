@@ -92,7 +92,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	LOG("Monster Tick...");
 	m_AI->Tick(a_Dt, a_Chunk);
 	m_Attack->Tick(a_Dt, a_Chunk);
-	m_Environment->Tick(a_Dt, a_Chunk);
 	m_Movement->Tick(a_Dt, a_Chunk);
 }
 
