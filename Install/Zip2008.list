@@ -6,6 +6,7 @@
 ..\MCServer\furnace.txt
 ..\MCServer\items.ini
 ..\MCServer\monsters.ini
+..\MCServer\buildinfo.txt
 MCServer*debug.cmd
 *.example.ini
 ThirdPartyLicenses
