@@ -3329,6 +3329,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		if ((Falloff > 15) || (Falloff < 0))
 		{
 			LOGWARNING("Falloff for %s simulator is out of range, assuming default of %d", a_FluidName, IsWater ? 1 : 2);
+			Falloff = IsWater ? 1 : 2;
 		}
 
 		if (NoCaseCompare(SimulatorName, "floody") == 0)
