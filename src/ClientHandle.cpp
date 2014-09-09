@@ -362,13 +362,14 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Send experience
 	m_Player->SendExperience();
-	
-	m_Player->Initialize(*World);
-	m_State = csAuthenticated;
 
 	// Send player list items
 	SendPlayerListItem(*m_Player, 0);
+	World->BroadcastPlayerListItem(*m_Player, 0);
 	World->SendPlayerList(m_Player);
+	
+	m_Player->Initialize(*World);
+	m_State = csAuthenticated;
 
 	// Query player team
 	m_Player->UpdateTeam();

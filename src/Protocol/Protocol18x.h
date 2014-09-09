@@ -133,6 +133,11 @@ public:
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
+	/** Compress the packet. a_Packet must be without packet length.
+	a_Compressed will be set to the compressed packet includes packet length and data length.
+	If compression fails, the function returns false. */
+	static bool CompressPacket(const AString & a_Packet, AString & a_Compressed);
+
 protected:
 
 	/** Composes individual packets in the protocol's m_OutPacketBuffer; sends them upon being destructed */

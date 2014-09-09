@@ -9,6 +9,7 @@
 #include "ChunkDataSerializer.h"
 #include "zlib/zlib.h"
 #include "ByteBuffer.h"
+#include "Protocol18x.h"
 
 
 
@@ -54,7 +55,10 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 			break;
 		}
 	}
-	m_Serializations[a_Version] = data;
+	if (!data.empty())
+	{
+		m_Serializations[a_Version] = data;
+	}
 	return m_Serializations[a_Version];
 }
 
@@ -219,40 +223,23 @@ void cChunkDataSerializer::Serialize80(AString & a_Data, int a_ChunkX, int a_Chu
 	Packet.ReadAll(PacketData);
 	Packet.CommitRead();
 
-	cByteBuffer NumberBuffer(20);
+	cByteBuffer Buffer(20);
 	if (PacketData.size() >= 256)
 	{
-		AString PostData;
-		NumberBuffer.WriteVarInt(PacketData.size());
-		NumberBuffer.ReadAll(PostData);
-		NumberBuffer.CommitRead();
-
-		// Compress the data:
-		const uLongf CompressedMaxSize = 200000;
-		char CompressedData[CompressedMaxSize];
-
-		uLongf CompressedSize = compressBound(PacketData.size());
-		// Run-time check that our compile-time guess about CompressedMaxSize was enough:
-		ASSERT(CompressedSize <= CompressedMaxSize);
-		compress2((Bytef*)CompressedData, &CompressedSize, (const Bytef*)PacketData.data(), PacketData.size(), Z_DEFAULT_COMPRESSION);
-
-		NumberBuffer.WriteVarInt(CompressedSize + PostData.size());
-		NumberBuffer.WriteVarInt(PacketData.size());
-		NumberBuffer.ReadAll(PostData);
-		NumberBuffer.CommitRead();
-
-		a_Data.clear();
-		a_Data.resize(PostData.size() + CompressedSize);
-		a_Data.append(PostData.data(), PostData.size());
-		a_Data.append(CompressedData, CompressedSize);
+		if (!cProtocol180::CompressPacket(PacketData, a_Data))
+		{
+			ASSERT(!"Packet compression failed.");
+			a_Data.clear();
+			return;
+		}
 	}
 	else
 	{
 		AString PostData;
-		NumberBuffer.WriteVarInt(Packet.GetUsedSpace() + 1);
-		NumberBuffer.WriteVarInt(0);
-		NumberBuffer.ReadAll(PostData);
-		NumberBuffer.CommitRead();
+		Buffer.WriteVarInt(Packet.GetUsedSpace() + 1);
+		Buffer.WriteVarInt(0);
+		Buffer.ReadAll(PostData);
+		Buffer.CommitRead();
 
 		a_Data.clear();
 		a_Data.resize(PostData.size() + PacketData.size());
