@@ -659,7 +659,7 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(std::min(Server->GetMaxPlayers(), 60));
+		Pkt.WriteByte(Server->GetMaxPlayers());
 		Pkt.WriteString("default");  // Level type - wtf?
 		Pkt.WriteBool(false);  // Reduced Debug Info - wtf?
 	}
@@ -868,14 +868,74 @@ void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
-void cProtocol180::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocol180::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
-	/*cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteString(a_Player.GetName());
-	Pkt.WriteBool(a_IsOnline);
-	Pkt.WriteShort(a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);*/
+
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteVarInt(a_Action);
+	Pkt.WriteVarInt(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+
+	switch (a_Action)
+	{
+		case 0:
+		{
+			// Add Player
+			Pkt.WriteString(a_Player.GetName());
+
+			const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
+			Pkt.WriteVarInt(Properties.size());
+			for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
+			{
+				Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
+				Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
+				AString Signature = ((Json::Value)*itr).get("signature", "").asString();
+				if (Signature.empty())
+				{
+					Pkt.WriteBool(false);
+				}
+				else
+				{
+					Pkt.WriteBool(true);
+					Pkt.WriteString(Signature);
+				}
+			}
+
+			Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
+			Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+			Pkt.WriteBool(false);
+			break;
+		}
+		case 1:
+		{
+			// Update GameMode
+			Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
+			break;
+		}
+		case 2:
+		{
+			// Update Ping
+			Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+			break;
+		}
+		case 3:
+		{
+			// Update DisplayName
+			Pkt.WriteBool(false);
+			break;
+		}
+		case 4:
+		{
+			// Remove player
+			break;
+		}
+		default:
+		{
+			ASSERT(!"Unhandled player list item action!");
+			return;
+		}
+	}
 }
 
 

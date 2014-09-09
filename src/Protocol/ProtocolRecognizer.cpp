@@ -489,10 +489,10 @@ void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_A
 
 
 
-void cProtocolRecognizer::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocolRecognizer::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
+	m_Protocol->SendPlayerListItem(a_Player, a_Action);
 }
 
 

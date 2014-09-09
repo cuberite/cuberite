@@ -720,9 +720,15 @@ void cProtocol125::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
 {
 	cCSLock Lock(m_CSPacket);
+	if (a_Action == 1)
+	{
+		// Ignore gamemode update
+		return;
+	}
+
 	AString PlayerName(a_Player.GetColor());
 	PlayerName.append(a_Player.GetName());
 	if (PlayerName.length() > 14)
@@ -733,8 +739,8 @@ void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
 
 	WriteByte  ((unsigned char)PACKET_PLAYER_LIST_ITEM);
 	WriteString(PlayerName);
-	WriteBool  (a_IsOnline);
-	WriteShort (a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
+	WriteBool  (a_Action != 4);
+	WriteShort ((a_Action == 4) ? 0 : a_Player.GetClientHandle()->GetPing());
 	Flush();
 }
 

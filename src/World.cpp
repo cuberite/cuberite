@@ -2147,7 +2147,7 @@ void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, float a_Src
 
 
 
-void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListItem(const cPlayer & a_Player, char a_Action, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2157,7 +2157,7 @@ void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline,
 		{
 			continue;
 		}
-		ch->SendPlayerListItem(a_Player, a_IsOnline);
+		ch->SendPlayerListItem(a_Player, a_Action);
 	}
 }
 
@@ -2680,7 +2680,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 		cClientHandle * ch = (*itr)->GetClientHandle();
 		if ((ch != NULL) && !ch->IsDestroyed())
 		{
-			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), true);
+			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), 0);
 		}
 	}
 }

@@ -867,14 +867,19 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
-void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+	if (a_Action == 1)
+	{
+		// Ignore gamemode update
+		return;
+	}
+
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
 	Pkt.WriteString(a_Player.GetName());
-	Pkt.WriteBool(a_IsOnline);
-	Pkt.WriteShort(a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
+	Pkt.WriteBool(a_Action != 4);
+	Pkt.WriteShort((a_Action == 4) ? 0 : a_Player.GetClientHandle()->GetPing());
 }
 
 

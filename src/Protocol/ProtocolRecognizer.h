@@ -101,7 +101,7 @@ public:
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
-	virtual void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline) override;
+	virtual void SendPlayerListItem      (const cPlayer & a_Player, char a_Action) override;
 	virtual void SendPlayerMaxSpeed      (void) override;
 	virtual void SendPlayerMoveLook      (void) override;
 	virtual void SendPlayerPosition      (void) override;

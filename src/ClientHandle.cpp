@@ -127,7 +127,7 @@ cClientHandle::~cClientHandle()
 		if (!m_Username.empty() && (World != NULL))
 		{
 			// Send the Offline PlayerList packet:
-			World->BroadcastPlayerListItem(*m_Player, false, this);
+			World->BroadcastPlayerListItem(*m_Player, 4, this);
 		}
 		if (World != NULL)
 		{
@@ -365,6 +365,10 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	
 	m_Player->Initialize(*World);
 	m_State = csAuthenticated;
+
+	// Send player list items
+	SendPlayerListItem(*m_Player, 0);
+	World->SendPlayerList(m_Player);
 
 	// Query player team
 	m_Player->UpdateTeam();
@@ -2378,9 +2382,9 @@ void cClientHandle::SendPlayerAbilities()
 
 
 
-void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
 {
-	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
+	m_Protocol->SendPlayerListItem(a_Player, a_Action);
 }
 
 
