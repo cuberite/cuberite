@@ -20,11 +20,6 @@ public:
 	{
 		a_Pickups.push_back(cItem(E_BLOCK_AIR, 8, 0));
 	}
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.stone";
-	}
 } ;
 
 

@@ -69,12 +69,6 @@ public:
 	{
 		a_Chunk.GetWorld()->GrowCactus(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.cloth";
-	}
 } ;
 
 
