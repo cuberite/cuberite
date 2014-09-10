@@ -259,7 +259,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_Transparent = true;
 	a_Info[E_BLOCK_JUNGLE_DOOR         ].m_Transparent = true;
 	a_Info[E_BLOCK_JUNGLE_FENCE        ].m_Transparent = true;
-	a_Info[E_BLOCK_JUGNLE_FENCE_GATE   ].m_Transparent = true;
+	a_Info[E_BLOCK_JUNGLE_FENCE_GATE   ].m_Transparent = true;
 	a_Info[E_BLOCK_LADDER              ].m_Transparent = true;
 	a_Info[E_BLOCK_LAVA                ].m_Transparent = true;
 	a_Info[E_BLOCK_LEAVES              ].m_Transparent = true;
