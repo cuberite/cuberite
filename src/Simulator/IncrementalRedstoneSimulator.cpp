@@ -286,8 +286,14 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);  break;
 				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);  break;
 				case E_BLOCK_FENCE_GATE:            HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_SPRUCE_FENCE_GATE:     HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_BIRCH_FENCE_GATE:      HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_JUNGLE_FENCE_GATE:     HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_DARK_OAK_FENCE_GATE:   HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_ACACIA_FENCE_GATE:     HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
 				case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
 				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
+				case E_BLOCK_IRON_TRAPDOOR:         HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
 				case E_BLOCK_TRAPPED_CHEST:         HandleTrappedChest(dataitr->x, dataitr->y, dataitr->z);   break;
 
 				case E_BLOCK_ACTIVATOR_RAIL:
@@ -298,6 +304,11 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 					break;
 				}
 				case E_BLOCK_WOODEN_DOOR:
+				case E_BLOCK_SPRUCE_DOOR:
+				case E_BLOCK_BIRCH_DOOR:
+				case E_BLOCK_JUNGLE_DOOR:
+				case E_BLOCK_DARK_OAK_DOOR:
+				case E_BLOCK_ACACIA_DOOR:
 				case E_BLOCK_IRON_DOOR:
 				{
 					HandleDoor(dataitr->x, dataitr->y, dataitr->z);
