@@ -96,7 +96,7 @@ public:
 	/// Returns true if the specified blocktype is one of the slabs handled by this handler
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
-		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB));
+		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB) || (a_BlockType == E_BLOCK_NEW_STONE_SLAB));
 	}
 
 
@@ -119,6 +119,7 @@ public:
 		{
 			case E_BLOCK_STONE_SLAB:  return E_BLOCK_DOUBLE_STONE_SLAB;
 			case E_BLOCK_WOODEN_SLAB: return E_BLOCK_DOUBLE_WOODEN_SLAB;
+			case E_BLOCK_NEW_STONE_SLAB: return E_BLOCK_DOUBLE_NEW_STONE_SLAB;
 		}
 		ASSERT(!"Unhandled slab type!");
 		return E_BLOCK_AIR;
@@ -158,6 +159,7 @@ public:
 		{
 			case E_BLOCK_DOUBLE_STONE_SLAB:  return E_BLOCK_STONE_SLAB;
 			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
+			case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return E_BLOCK_NEW_STONE_SLAB;
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return a_BlockType;
