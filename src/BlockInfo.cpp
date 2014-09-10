@@ -84,11 +84,15 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_REDSTONE_ORE_GLOWING].m_LightValue = 9;
 	a_Info[E_BLOCK_REDSTONE_REPEATER_ON].m_LightValue = 9;
 	a_Info[E_BLOCK_REDSTONE_TORCH_ON   ].m_LightValue = 7;
+	a_Info[E_BLOCK_SEA_LANTERN         ].m_LightValue = 15;
 	a_Info[E_BLOCK_STATIONARY_LAVA     ].m_LightValue = 15;
 	a_Info[E_BLOCK_TORCH               ].m_LightValue = 14;
 
 
 	// Spread blocks
+	a_Info[E_BLOCK_ACACIA_DOOR         ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_ACACIA_FENCE        ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_ACACIA_FENCE_GATE   ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_ACTIVE_COMPARATOR   ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_AIR                 ].m_SpreadLightFalloff = 1;
@@ -96,6 +100,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_BEACON              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BED                 ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_BIRCH_DOOR          ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_BIRCH_FENCE         ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_BIRCH_FENCE_GATE    ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BROWN_MUSHROOM      ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BREWING_STAND       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_CACTUS              ].m_SpreadLightFalloff = 1;
@@ -109,6 +116,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_COBWEB              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_CROPS               ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_DANDELION           ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_DARK_OAK_DOOR       ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_DARK_OAK_FENCE      ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_DARK_OAK_FENCE_GATE ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_DAYLIGHT_SENSOR     ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_DEAD_BUSH           ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_SpreadLightFalloff = 1;
@@ -132,6 +142,10 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_IRON_BARS           ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_IRON_DOOR           ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_JUNGLE_DOOR         ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_JUNGLE_FENCE        ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_JUNGLE_FENCE_GATE   ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_LADDER              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_LEAVES              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_LEVER               ].m_SpreadLightFalloff = 1;
@@ -142,6 +156,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NETHER_PORTAL       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_NETHER_WART         ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_NEW_LEAVES          ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_NEW_STONE_SLAB      ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_PISTON              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_PISTON_EXTENSION    ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_PISTON_MOVED_BLOCK  ].m_SpreadLightFalloff = 1;
@@ -158,6 +173,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_SAPLING             ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_SIGN_POST           ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_SNOW                ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_SPRUCE_DOOR         ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_SPRUCE_FENCE        ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_SPRUCE_FENCE_GATE   ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STAINED_GLASS       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STAINED_GLASS_PANE  ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STICKY_PISTON       ].m_SpreadLightFalloff = 1;
@@ -186,6 +204,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 
 
 	// Transparent blocks
+	a_Info[E_BLOCK_ACACIA_DOOR         ].m_Transparent = true;
+	a_Info[E_BLOCK_ACACIA_FENCE        ].m_Transparent = true;
+	a_Info[E_BLOCK_ACACIA_FENCE_GATE   ].m_Transparent = true;
 	a_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_Transparent = true;
 	a_Info[E_BLOCK_ACTIVE_COMPARATOR   ].m_Transparent = true;
 	a_Info[E_BLOCK_AIR                 ].m_Transparent = true;
@@ -193,6 +214,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_BEACON              ].m_Transparent = true;
 	a_Info[E_BLOCK_BED                 ].m_Transparent = true;
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_Transparent = true;
+	a_Info[E_BLOCK_BIRCH_DOOR          ].m_Transparent = true;
+	a_Info[E_BLOCK_BIRCH_FENCE         ].m_Transparent = true;
+	a_Info[E_BLOCK_BIRCH_FENCE_GATE    ].m_Transparent = true;
 	a_Info[E_BLOCK_BROWN_MUSHROOM      ].m_Transparent = true;
 	a_Info[E_BLOCK_BREWING_STAND       ].m_Transparent = true;
 	a_Info[E_BLOCK_CACTUS              ].m_Transparent = true;
@@ -206,6 +230,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_COBWEB              ].m_Transparent = true;
 	a_Info[E_BLOCK_CROPS               ].m_Transparent = true;
 	a_Info[E_BLOCK_DANDELION           ].m_Transparent = true;
+	a_Info[E_BLOCK_DARK_OAK_DOOR       ].m_Transparent = true;
+	a_Info[E_BLOCK_DARK_OAK_FENCE      ].m_Transparent = true;
+	a_Info[E_BLOCK_DARK_OAK_FENCE_GATE ].m_Transparent = true;
 	a_Info[E_BLOCK_DAYLIGHT_SENSOR     ].m_Transparent = true;
 	a_Info[E_BLOCK_DEAD_BUSH           ].m_Transparent = true;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_Transparent = true;
@@ -229,6 +256,10 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_Transparent = true;
 	a_Info[E_BLOCK_IRON_BARS           ].m_Transparent = true;
 	a_Info[E_BLOCK_IRON_DOOR           ].m_Transparent = true;
+	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_Transparent = true;
+	a_Info[E_BLOCK_JUNGLE_DOOR         ].m_Transparent = true;
+	a_Info[E_BLOCK_JUNGLE_FENCE        ].m_Transparent = true;
+	a_Info[E_BLOCK_JUGNLE_FENCE_GATE   ].m_Transparent = true;
 	a_Info[E_BLOCK_LADDER              ].m_Transparent = true;
 	a_Info[E_BLOCK_LAVA                ].m_Transparent = true;
 	a_Info[E_BLOCK_LEAVES              ].m_Transparent = true;
@@ -241,6 +272,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NETHER_PORTAL       ].m_Transparent = true;
 	a_Info[E_BLOCK_NETHER_WART         ].m_Transparent = true;
 	a_Info[E_BLOCK_NEW_LEAVES          ].m_Transparent = true;
+	a_Info[E_BLOCK_NEW_STONE_SLAB      ].m_Transparent = true;
 	a_Info[E_BLOCK_PISTON              ].m_Transparent = true;
 	a_Info[E_BLOCK_PISTON_EXTENSION    ].m_Transparent = true;
 	a_Info[E_BLOCK_PISTON_MOVED_BLOCK  ].m_Transparent = true;
@@ -257,6 +289,9 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_SAPLING             ].m_Transparent = true;
 	a_Info[E_BLOCK_SIGN_POST           ].m_Transparent = true;
 	a_Info[E_BLOCK_SNOW                ].m_Transparent = true;
+	a_Info[E_BLOCK_SPRUCE_DOOR         ].m_Transparent = true;
+	a_Info[E_BLOCK_SPRUCE_FENCE        ].m_Transparent = true;
+	a_Info[E_BLOCK_SPRUCE_FENCE_GATE   ].m_Transparent = true;
 	a_Info[E_BLOCK_STAINED_GLASS       ].m_Transparent = true;
 	a_Info[E_BLOCK_STAINED_GLASS_PANE  ].m_Transparent = true;
 	a_Info[E_BLOCK_STATIONARY_LAVA     ].m_Transparent = true;
@@ -388,6 +423,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_DIAMOND_ORE         ].m_IsSnowable = true;
 	a_Info[E_BLOCK_DIRT                ].m_IsSnowable = true;
 	a_Info[E_BLOCK_DISPENSER           ].m_IsSnowable = true;
+	a_Info[E_BLOCK_DOUBLE_NEW_STONE_SLAB].m_IsSnowable = true;
 	a_Info[E_BLOCK_DOUBLE_STONE_SLAB   ].m_IsSnowable = true;
 	a_Info[E_BLOCK_DOUBLE_WOODEN_SLAB  ].m_IsSnowable = true;
 	a_Info[E_BLOCK_DROPPER             ].m_IsSnowable = true;
@@ -424,14 +460,17 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NOTE_BLOCK          ].m_IsSnowable = true;
 	a_Info[E_BLOCK_OBSIDIAN            ].m_IsSnowable = true;
 	a_Info[E_BLOCK_PLANKS              ].m_IsSnowable = true;
+	a_Info[E_BLOCK_PRISMARINE_BLOCK    ].m_IsSnowable = true;
 	a_Info[E_BLOCK_PUMPKIN             ].m_IsSnowable = true;
 	a_Info[E_BLOCK_QUARTZ_BLOCK        ].m_IsSnowable = true;
+	a_Info[E_BLOCK_RED_SANDSTONE       ].m_IsSnowable = true;
 	a_Info[E_BLOCK_REDSTONE_LAMP_OFF   ].m_IsSnowable = true;
 	a_Info[E_BLOCK_REDSTONE_LAMP_ON    ].m_IsSnowable = true;
 	a_Info[E_BLOCK_REDSTONE_ORE        ].m_IsSnowable = true;
 	a_Info[E_BLOCK_REDSTONE_ORE_GLOWING].m_IsSnowable = true;
 	a_Info[E_BLOCK_SAND                ].m_IsSnowable = true;
 	a_Info[E_BLOCK_SANDSTONE           ].m_IsSnowable = true;
+	a_Info[E_BLOCK_SEA_LANTERN         ].m_IsSnowable = true;
 	a_Info[E_BLOCK_SILVERFISH_EGG      ].m_IsSnowable = true;
 	a_Info[E_BLOCK_SNOW_BLOCK          ].m_IsSnowable = true;
 	a_Info[E_BLOCK_SOULSAND            ].m_IsSnowable = true;
@@ -537,8 +576,10 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_OBSIDIAN            ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_PACKED_ICE          ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_PLANKS              ].m_FullyOccupiesVoxel = true;
+	a_Info[E_BLOCK_PRISMARINE_BLOCK    ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_PUMPKIN             ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_QUARTZ_BLOCK        ].m_FullyOccupiesVoxel = true;
+	a_Info[E_BLOCK_RED_SANDSTONE       ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_REDSTONE_LAMP_OFF   ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_REDSTONE_LAMP_ON    ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_REDSTONE_ORE        ].m_FullyOccupiesVoxel = true;
@@ -732,12 +773,34 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NEW_LOG             ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_DARK_OAK_WOOD_STAIRS ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_SLIME_BLOCK         ].m_PlaceSound = "dig.slime"; // I hope it is named slime, it's definetly a new sound type though...
+	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_PlaceSound = "dig.metal";
+	a_Info[E_BLOCK_PRISMARINE_BLOCK    ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_SEA_LANTERN         ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_HAY_BALE            ].m_PlaceSound = "dig.grass";
 	a_Info[E_BLOCK_CARPET              ].m_PlaceSound = "dig.cloth";
 	a_Info[E_BLOCK_HARDENED_CLAY       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_BLOCK_OF_COAL       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_PACKED_ICE          ].m_PlaceSound = "dig.glass";
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_PlaceSound = "dig.grass";
+	a_Info[E_BLOCK_RED_SANDSTONE       ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_RED_SANDSTONE_STAIRS ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_NEW_STONE_SLAB      ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_SPRUCE_FENCE_GATE   ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_BIRCH_FENCE_GATE    ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_JUNGLE_FENCE_GATE   ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_DARK_OAK_FENCE_GATE ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_ACACIA_FENCE_GATE   ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_SPRUCE_FENCE        ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_BIRCH_FENCE         ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_JUNGLE_FENCE        ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_DARK_OAK_FENCE      ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_ACACIA_FENCE        ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_SPRUCE_DOOR         ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_BIRCH_DOOR          ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_JUNGLE_DOOR         ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_ACACIA_DOOR         ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_DARK_OAK_DOOR       ].m_PlaceSound = "dig.wood";
 }
 
 
