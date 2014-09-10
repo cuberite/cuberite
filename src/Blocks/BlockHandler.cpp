@@ -176,12 +176,16 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		// Block handlers, alphabetically sorted:
+		case E_BLOCK_ACACIA_DOOR:           return new cBlockFenceGateHandler       (a_BlockType);
+		case E_BLOCK_ACACIA_FENCE_GATE:     return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
 		case E_BLOCK_BEACON:                return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
 		case E_BLOCK_BIG_FLOWER:            return new cBlockBigFlowerHandler       (a_BlockType);
+		case E_BLOCK_BIRCH_DOOR:            return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_BIRCH_FENCE_GATE:      return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
@@ -199,6 +203,8 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
 		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
+		case E_BLOCK_DARK_OAK_DOOR:         return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_DARK_OAK_FENCE_GATE:   return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_DARK_OAK_WOOD_STAIRS:  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_DEAD_BUSH:             return new cBlockDeadBushHandler        (a_BlockType);
 		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
@@ -230,8 +236,11 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);
 		case E_BLOCK_IRON_DOOR:             return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_IRON_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_IRON_TRAPDOOR:         return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_JACK_O_LANTERN:        return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_JUKEBOX:               return new cBlockEntityHandler          (a_BlockType);
+		case E_BLOCK_JUNGLE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_JUNGLE_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
 		case E_BLOCK_LEVER:                 return new cBlockLeverHandler           (a_BlockType);
@@ -251,6 +260,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_NEW_LEAVES:            return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
+		case E_BLOCK_NEW_STONE_SLAB:        return new cBlockSlabHandler            (a_BlockType);
 		case E_BLOCK_NOTE_BLOCK:            return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler;
@@ -262,6 +272,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_QUARTZ_BLOCK:          return new cBlockQuartzHandler          (a_BlockType);
 		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_RED_SANDSTONE_STAIRS:  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
@@ -277,6 +288,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignPostHandler        (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
+		case E_BLOCK_SPRUCE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STAINED_GLASS:         return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_STAINED_GLASS_PANE:    return new cBlockGlassHandler           (a_BlockType);
