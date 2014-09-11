@@ -26,7 +26,7 @@
 
 
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
-	super(a_Client, 0),
+	super(a_Client),
 	m_Protocol(NULL),
 	m_Buffer(512)
 {

@@ -5,7 +5,6 @@
 
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
-#include "ProtocolRecognizer.h"
 #include "Protocol132.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -79,7 +78,6 @@ cProtocol132::cProtocol132(cClientHandle * a_Client) :
 	super(a_Client),
 	m_IsEncrypted(false)
 {
-	m_ProtocolVersion = cProtocolRecognizer::PROTO_VERSION_1_3_2;
 }
 
 

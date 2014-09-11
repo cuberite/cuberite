@@ -46,11 +46,11 @@ typedef unsigned char Byte;
 class cProtocol
 {
 public:
-	cProtocol(cClientHandle * a_Client, int a_ProtocolVersion) :
-		m_ProtocolVersion(a_ProtocolVersion),
+	cProtocol(cClientHandle * a_Client) :
 		m_Client(a_Client)
 	{
 	}
+
 	virtual ~cProtocol() {}
 	
 	/// Called when client sends some data
@@ -131,11 +131,7 @@ public:
 	/// Returns the ServerID used for authentication through session.minecraft.net
 	virtual AString GetAuthServerID(void) = 0;
 
-	/** Returns the protocol version of this protocol. */
-	int GetProtocolVersion(void) const { return m_ProtocolVersion; }
-
 protected:
-	int m_ProtocolVersion;
 	cClientHandle * m_Client;
 	cCriticalSection m_CSPacket;  // Each SendXYZ() function must acquire this CS in order to send the whole packet at once
 	

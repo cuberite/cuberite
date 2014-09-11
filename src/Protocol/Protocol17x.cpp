@@ -12,7 +12,6 @@ Implements the 1.7.x protocol classes:
 #include "Globals.h"
 #include "json/json.h"
 #include "Protocol17x.h"
-#include "ProtocolRecognizer.h"
 #include "ChunkDataSerializer.h"
 #include "PolarSSL++/Sha1Checksum.h"
 
@@ -93,7 +92,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 // cProtocol172:
 
 cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	super(a_Client, cProtocolRecognizer::PROTO_VERSION_1_7_2),
+	super(a_Client),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
 	m_State(a_State),
@@ -3064,7 +3063,6 @@ void cProtocol172::cPacketizer::WriteEntityProperties(const cEntity & a_Entity)
 cProtocol176::cProtocol176(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
 	super(a_Client, a_ServerAddress, a_ServerPort, a_State)
 {
-	m_ProtocolVersion = cProtocolRecognizer::PROTO_VERSION_1_7_6;
 }
 
 
