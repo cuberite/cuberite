@@ -176,8 +176,8 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		// Block handlers, alphabetically sorted:
-		case E_BLOCK_ACACIA_DOOR:           return new cBlockFenceGateHandler       (a_BlockType);
-		case E_BLOCK_ACACIA_FENCE_GATE:     return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_ACACIA_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_ACACIA_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
@@ -211,7 +211,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_DISPENSER:             return new cBlockDropSpenserHandler     (a_BlockType);
-		case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return new cBlockDropSpenserHandler     (a_BlockType);
+		case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DOUBLE_STONE_SLAB:     return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
