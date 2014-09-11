@@ -1403,9 +1403,7 @@ void cProtocol180::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
-	Pkt.WriteInt(a_BlockEntity.GetPosX());
-	Pkt.WriteShort(a_BlockEntity.GetPosY());
-	Pkt.WriteInt(a_BlockEntity.GetPosZ());
+	Pkt.WritePosition(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 
 	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
@@ -2995,11 +2993,7 @@ void cProtocol180::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 	}
 
 	Writer.Finish();
-
-	AString Compressed;
-	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-	WriteShort((short)Compressed.size());
-	WriteBuf(Compressed.data(), Compressed.size());
+	WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
 }
 
 
