@@ -98,7 +98,7 @@ public:
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
 	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override;
-	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
+	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override;
 	virtual void SendPlayerListItem      (const cPlayer & a_Player, char a_Action) override;

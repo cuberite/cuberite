@@ -93,7 +93,7 @@ public:
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) = 0;
 	virtual void SendPlayerAbilities     (void) = 0;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) = 0;
-	virtual void SendParticleEffect      (const AString & a_SoundName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) = 0;
+	virtual void SendParticleEffect      (const AString & a_SoundName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) = 0;
 	virtual void SendPlayerListItem      (const cPlayer & a_Player, char a_Action) = 0;
 	virtual void SendPlayerMaxSpeed      (void) = 0;  ///< Informs the client of the maximum player speed (1.6.1+)
 	virtual void SendPlayerMoveLook      (void) = 0;

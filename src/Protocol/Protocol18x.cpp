@@ -779,7 +779,7 @@ void cProtocol180::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	/*{
+	{
 		cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
 		Pkt.WriteVarInt(a_Pickup.GetUniqueID());
 		Pkt.WriteByte(2);  // Type = Pickup
@@ -797,7 +797,7 @@ void cProtocol180::SendPickupSpawn(const cPickup & a_Pickup)
 		Pkt.WriteByte((0x05 << 5) | 10);  // Slot type + index 10
 		Pkt.WriteItem(a_Pickup.GetItem());
 		Pkt.WriteByte(0x7f);  // End of metadata
-	}*/
+	}
 }
 
 
@@ -846,12 +846,14 @@ void cProtocol180::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
-void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
-	/*cPacketizer Pkt(*this, 0x2A);
-	Pkt.WriteString(a_ParticleName);
+	int ParticleID = GetParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, 0x2A);
+	Pkt.WriteInt(ParticleID);
+	Pkt.WriteBool(false);
 	Pkt.WriteFloat(a_SrcX);
 	Pkt.WriteFloat(a_SrcY);
 	Pkt.WriteFloat(a_SrcZ);
@@ -859,7 +861,7 @@ void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	Pkt.WriteFloat(a_OffsetY);
 	Pkt.WriteFloat(a_OffsetZ);
 	Pkt.WriteFloat(a_ParticleData);
-	Pkt.WriteInt(a_ParticleAmmount);*/
+	Pkt.WriteInt(a_ParticleAmount);
 }
 
 
@@ -1230,7 +1232,7 @@ void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
-	/*cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
+	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByte(a_ObjectType);
 	Pkt.WriteFPInt(a_Entity.GetPosX());
@@ -1244,7 +1246,7 @@ void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 		Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
 		Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
 		Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
-	}*/
+	}
 }
 
 
@@ -1564,6 +1566,71 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 	a_CompressedData.append(LengthData.data(), LengthData.size());
 	a_CompressedData.append(CompressedData, CompressedSize);
 	return true;
+}
+
+
+
+
+
+int cProtocol180::GetParticleID(const AString & a_ParticleName)
+{
+	static bool IsInitialized = false;
+	static std::map<AString, int> ParticleMap;
+	if (!IsInitialized)
+	{
+		// Initialize the ParticleMap:
+		ParticleMap["explode"]          = 0;
+		ParticleMap["largeexplode"]     = 1;
+		ParticleMap["hugeexplosion"]    = 2;
+		ParticleMap["fireworksspark"]   = 3;
+		ParticleMap["bubble"]           = 4;
+		ParticleMap["splash"]           = 5;
+		ParticleMap["wake"]             = 6;
+		ParticleMap["suspended"]        = 7;
+		ParticleMap["depthsuspend"]     = 8;
+		ParticleMap["crit"]             = 9;
+		ParticleMap["magiccrit"]        = 10;
+		ParticleMap["smoke"]            = 11;
+		ParticleMap["largesmoke"]       = 12;
+		ParticleMap["spell"]            = 13;
+		ParticleMap["instantspell"]     = 14;
+		ParticleMap["mobspell"]         = 15;
+		ParticleMap["mobspellambient"]  = 16;
+		ParticleMap["witchmagic"]       = 17;
+		ParticleMap["dripwater"]        = 18;
+		ParticleMap["driplava"]         = 19;
+		ParticleMap["angryvillager"]    = 20;
+		ParticleMap["happyVillager"]    = 21;
+		ParticleMap["townaura"]         = 22;
+		ParticleMap["note"]             = 23;
+		ParticleMap["portal"]           = 24;
+		ParticleMap["enchantmenttable"] = 25;
+		ParticleMap["flame"]            = 26;
+		ParticleMap["lava"]             = 27;
+		ParticleMap["footstep"]         = 28;
+		ParticleMap["cloud"]            = 29;
+		ParticleMap["reddust"]          = 30;
+		ParticleMap["snowballpoof"]     = 31;
+		ParticleMap["snowshovel"]       = 32;
+		ParticleMap["slime"]            = 33;
+		ParticleMap["heart"]            = 34;
+		ParticleMap["barrier"]          = 35;
+		ParticleMap["iconcrack"]        = 36;
+		ParticleMap["blockcrack"]       = 37;
+		ParticleMap["blockdust"]        = 38;
+		ParticleMap["droplet"]          = 39;
+		ParticleMap["take"]             = 40;
+		ParticleMap["mobappearance"]    = 41;
+	}
+
+	AString ParticleName = StrToLower(a_ParticleName);
+	if (ParticleMap.find(ParticleName) == ParticleMap.end())
+	{
+		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		return 0;
+	}
+
+	return ParticleMap[ParticleName];
 }
 
 
@@ -2685,13 +2752,20 @@ void cProtocol180::cPacketizer::WriteUUID(const AString & a_UUID)
 {
 	AString UUID_1 = a_UUID.substr(0, a_UUID.length() / 2);
 	AString UUID_2 = a_UUID.substr(a_UUID.length() / 2);
-	
-	UInt64 Value_1, Value_2;
+
+	Int64 Value_1, Value_2;
 	sscanf(UUID_1.c_str(), "%llx", &Value_1);
 	sscanf(UUID_2.c_str(), "%llx", &Value_2);
 
-	WriteInt64((Int64)Value_1);
-	WriteInt64((Int64)Value_2);
+	AString SValue_1, SValue_2;
+	Printf(SValue_1, "%lld", Value_1);
+	Printf(SValue_2, "%lld", Value_2);
+
+	StringToInteger<Int64>(SValue_1.c_str(), Value_1);
+	StringToInteger<Int64>(SValue_2.c_str(), Value_2);
+
+	WriteInt64(Value_1);
+	WriteInt64(Value_2);
 }
 
 

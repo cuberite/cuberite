@@ -96,7 +96,7 @@ public:
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override;
 	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
-	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
+	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendPlayerListItem      (const cPlayer & a_Player, char a_Action) override;
 	virtual void SendPlayerMaxSpeed      (void) override;
 	virtual void SendPlayerMoveLook      (void) override;
@@ -137,6 +137,9 @@ public:
 	a_Compressed will be set to the compressed packet includes packet length and data length.
 	If compression fails, the function returns false. */
 	static bool CompressPacket(const AString & a_Packet, AString & a_Compressed);
+
+	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
+	static int GetParticleID(const AString & a_ParticleName);
 
 protected:
 

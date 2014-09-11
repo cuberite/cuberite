@@ -847,7 +847,7 @@ void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
-void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -860,7 +860,7 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	Pkt.WriteFloat(a_OffsetY);
 	Pkt.WriteFloat(a_OffsetZ);
 	Pkt.WriteFloat(a_ParticleData);
-	Pkt.WriteInt(a_ParticleAmmount);
+	Pkt.WriteInt(a_ParticleAmount);
 }
 
 
