@@ -6,23 +6,25 @@
 /// Per-chunk data for the simulator, specified individual chunks to simulate
 typedef cCoordWithBlockAndBoolVector cRedstoneSimulatorChunkData;
 
+class cRedstonePoweredEntity;
+
+typedef cItemCallback<cRedstonePoweredEntity> cRedstonePoweredCallback;
 
 
-
-
+template<class ChunkType, class WorldType, template <BLOCKTYPE block> class GetHandlerCompileTime, class ChestType>
 class cIncrementalRedstoneSimulator :
-	public cRedstoneSimulator
+	public cRedstoneSimulator<ChunkType, WorldType>
 {
-	typedef cRedstoneSimulator super;
+	typedef cRedstoneSimulator<ChunkType, WorldType> super;
 public:
 
-	cIncrementalRedstoneSimulator(cWorld & a_World);
+	cIncrementalRedstoneSimulator(WorldType & a_World);
 	~cIncrementalRedstoneSimulator();
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, ChunkType * a_Chunk) override;
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override { return IsRedstone(a_BlockType); }
-	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, ChunkType * a_Chunk) override;
 
 	enum eRedstoneDirection
 	{
@@ -82,9 +84,9 @@ private:
 	SimulatedPlayerToggleableList * m_SimulatedPlayerToggleableBlocks;
 	RepeatersDelayList * m_RepeatersDelayList;
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override { RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk); }
-	void RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk = NULL);
-	cChunk * m_Chunk;
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, ChunkType * a_Chunk) override { RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk); }
+	void RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, ChunkType * a_Chunk, ChunkType * a_OtherChunk = NULL);
+	ChunkType * m_Chunk;
 
 	// We want a_MyState for devices needing a full FastSetBlock (as opposed to meta) because with our simulation model, we cannot keep setting the block if it is already set correctly
 	// In addition to being non-performant, it would stop the player from actually breaking said device
@@ -159,12 +161,12 @@ private:
 	/** Removes a block from the Powered and LinkedPowered lists
 	Used for variable sources such as tripwire hooks, daylight sensors, and trapped chests
 	*/
-	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
+	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, ChunkType * a_Chunk, bool a_IsFirstCall = true);
 
 	/** Returns if a coordinate is powered or linked powered */
 	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
 	/** Returns if a coordinate is in the directly powered blocks list */
-	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk);
+	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, ChunkType * a_Chunk);
 	/** Returns if a coordinate is in the indirectly powered blocks list */
 	bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
 	/** Returns if a coordinate was marked as simulated (for blocks toggleable by players) */
@@ -312,5 +314,7 @@ private:
 };
 
 
-
+#ifdef SELF_TEST
+#include "IncrementalRedstoneSimulator.inc"
+#endif
 

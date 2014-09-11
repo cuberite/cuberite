@@ -5,13 +5,16 @@
 
 
 
-
+template <class ChunkType, class WorldType>
 class cRedstoneSimulator :
-	public cSimulator
+	public cSimulator<ChunkType, WorldType>
 {
-	typedef cSimulator super;
+	typedef cSimulator<ChunkType, WorldType> super;
 	
 public:
-	cRedstoneSimulator(cWorld & a_World);
+	cRedstoneSimulator(WorldType & a_World) :
+	super(a_World)
+	{
+	}
 
 } ;

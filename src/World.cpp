@@ -3258,7 +3258,7 @@ void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicke
 
 
 
-cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
+cRedstoneSimulator<cChunk, cWorld> * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "Incremental");
 
@@ -3268,11 +3268,11 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 		SimulatorName = "Incremental";
 	}
 	
-	cRedstoneSimulator * res = NULL;
+	cRedstoneSimulator<cChunk, cWorld> * res = NULL;
 
 	if (NoCaseCompare(SimulatorName, "Incremental") == 0)
 	{
-		res = new cIncrementalRedstoneSimulator(*this);
+		res = new cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>(*this);
 	}
 	else if (NoCaseCompare(SimulatorName, "noop") == 0)
 	{
