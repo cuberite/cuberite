@@ -3224,7 +3224,7 @@ void cProtocol180::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case cMonster::mtEnderman:
 		{
 			WriteByte(0x30);
-			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));
+			WriteShort((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));
 			WriteByte(0x11);
 			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta()));
 			WriteByte(0x12);
