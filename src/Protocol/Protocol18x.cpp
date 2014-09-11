@@ -1515,10 +1515,9 @@ void cProtocol180::SendWindowOpen(const cWindow & a_Window)
 	
 	cPacketizer Pkt(*this, 0x2d);
 	Pkt.WriteChar(a_Window.GetWindowID());
-	Pkt.WriteChar(a_Window.GetWindowType());
-	Pkt.WriteString(a_Window.GetWindowTitle());
+	Pkt.WriteString(a_Window.GetWindowTypeName());
+	Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
 	Pkt.WriteChar(a_Window.GetNumNonInventorySlots());
-	Pkt.WriteBool(true);
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{
 		Pkt.WriteInt(0);  // TODO: The animal's EntityID
