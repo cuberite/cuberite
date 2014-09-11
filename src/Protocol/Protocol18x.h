@@ -141,6 +141,9 @@ public:
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	static int GetParticleID(const AString & a_ParticleName);
 
+	/** Minecraft 1.8 use other locations to spawn the item frame. This function converts the 1.7 positions to 1.8 positions. */
+	static void FixItemFramePositions(int a_ObjectData, double & a_PosX, double & a_PosZ, double & a_Yaw);
+
 protected:
 
 	/** Composes individual packets in the protocol's m_OutPacketBuffer; sends them upon being destructed */

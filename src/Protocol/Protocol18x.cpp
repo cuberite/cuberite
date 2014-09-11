@@ -406,9 +406,7 @@ void cProtocol180::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x36);  // Sign Editor Open packet
-	Pkt.WriteInt(a_BlockX);
-	Pkt.WriteInt(a_BlockY);
-	Pkt.WriteInt(a_BlockZ);
+	Pkt.WritePosition(a_BlockX, a_BlockX, a_BlockZ);
 }
 
 
@@ -702,12 +700,23 @@ void cProtocol180::SendLoginSuccess(void)
 void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
-	/*cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
+	double PosX = a_Painting.GetPosX();
+	double PosY = a_Painting.GetPosY();
+	double PosZ = a_Painting.GetPosZ();
+
+	switch (a_Painting.GetDirection())
+	{
+		case 0: PosZ += 1; break;
+		case 1: PosX -= 1; break;
+		case 2: PosZ -= 1; break;
+		case 3: PosX += 1; break;
+	}
+
+	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
 	Pkt.WriteVarInt(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName().c_str());
-	Pkt.WritePosition(Vector3i(a_Painting.GetPosX(), a_Painting.GetPosY(), a_Painting.GetPosZ()));
-	Pkt.WriteChar(a_Painting.GetDirection());*/
+	Pkt.WritePosition(PosX, PosY, PosZ);
+	Pkt.WriteChar(a_Painting.GetDirection());
 }
 
 
@@ -1194,7 +1203,7 @@ void cProtocol180::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 16));  // Or 0x10
+	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 12));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
 	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
@@ -1231,15 +1240,22 @@ void cProtocol180::SendSpawnMob(const cMonster & a_Mob)
 void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+	double PosX = a_Entity.GetPosX();
+	double PosZ = a_Entity.GetPosZ();
+	double Yaw = a_Entity.GetYaw();
+	if (a_ObjectType == 71)
+	{
+		FixItemFramePositions(a_ObjectData, PosX, PosZ, Yaw);
+	}
+
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByte(a_ObjectType);
-	Pkt.WriteFPInt(a_Entity.GetPosX());
+	Pkt.WriteFPInt(PosX);
 	Pkt.WriteFPInt(a_Entity.GetPosY());
-	Pkt.WriteFPInt(a_Entity.GetPosZ());
+	Pkt.WriteFPInt(PosZ);
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
+	Pkt.WriteByteAngle(Yaw);
 	Pkt.WriteInt(a_ObjectData);
 	if (a_ObjectData != 0)
 	{
@@ -1416,14 +1432,11 @@ void cProtocol180::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x33);
-	Pkt.WriteInt(a_BlockX);
-	Pkt.WriteShort((short)a_BlockY);
-	Pkt.WriteInt(a_BlockZ);
-	// Need to send only up to 15 chars, otherwise the client crashes (#598)
-	Pkt.WriteString(a_Line1.substr(0, 15));
-	Pkt.WriteString(a_Line2.substr(0, 15));
-	Pkt.WriteString(a_Line3.substr(0, 15));
-	Pkt.WriteString(a_Line4.substr(0, 15));
+	Pkt.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line1.c_str()));
+	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line2.c_str()));
+	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line3.c_str()));
+	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line4.c_str()));
 }
 
 
@@ -1631,6 +1644,41 @@ int cProtocol180::GetParticleID(const AString & a_ParticleName)
 	}
 
 	return ParticleMap[ParticleName];
+}
+
+
+
+
+
+void cProtocol180::FixItemFramePositions(int a_ObjectData, double & a_PosX, double & a_PosZ, double & a_Yaw)
+{
+	switch (a_ObjectData)
+	{
+		case 0:
+		{
+			a_PosZ += 1;
+			a_Yaw = 0;
+			break;
+		}
+		case 1:
+		{
+			a_PosX -= 1;
+			a_Yaw = 90;
+			break;
+		}
+		case 2:
+		{
+			a_PosZ -= 1;
+			a_Yaw = 180;
+			break;
+		}
+		case 3:
+		{
+			a_PosX += 1;
+			a_Yaw = 270;
+			break;
+		}
+	}
 }
 
 
@@ -2328,14 +2376,20 @@ void cProtocol180::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEInt,         int,     BlockX);
-	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   BlockY);
-	HANDLE_READ(a_ByteBuffer, ReadBEInt,         int,     BlockZ);
-	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line1);
-	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line2);
-	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line3);
-	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line4);
-	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
+	int BlockX, BlockY, BlockZ;
+	if (!a_ByteBuffer.ReadPosition(BlockX, BlockY, BlockZ))
+	{
+		return;
+	}
+
+	AString Lines[4];
+	for (int i = 0; i < 4; i++)
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
+		Lines[i] = Line.substr(1, Line.length() - 2);  // Remove ""
+	}
+
+	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
 }
 
 
@@ -3062,9 +3116,9 @@ void cProtocol180::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 		case cEntity::etItemFrame:
 		{
 			cItemFrame & Frame = (cItemFrame &)a_Entity;
-			WriteByte(0xA2);
+			WriteByte(0xA8);
 			WriteItem(Frame.GetItem());
-			WriteByte(0x3);
+			WriteByte(0x09);
 			WriteByte(Frame.GetRotation());
 			break;
 		}
