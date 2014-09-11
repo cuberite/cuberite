@@ -217,7 +217,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
 		case E_ITEM_MUSHROOM_SOUP:
-		case E_ITEM_MUTTON:
+		case E_ITEM_COOKED_MUTTON:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
 		case E_ITEM_RED_APPLE:
