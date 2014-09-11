@@ -7,6 +7,7 @@ SET (SRCS
 	AIComponent.cpp
 	AIAggressiveComponent.cpp
 	AttackComponent.cpp
+	BurningComponent.cpp
 	EnvironmentComponent.cpp
 	MovementComponent.cpp)
 

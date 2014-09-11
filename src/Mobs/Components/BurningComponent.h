@@ -18,4 +18,6 @@ public:
 	void Tick(float a_Dt, ChunkType & a_Chunk);
 };
 
+#ifdef SELF_TEST
 #include "BurningComponent.inc"
+#endif
