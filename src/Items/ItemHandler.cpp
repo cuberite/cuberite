@@ -191,6 +191,11 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemSeedsHandler(a_ItemType);
 		}
 		
+		case E_ITEM_ACACIA_DOOR:
+		case E_ITEM_BIRCH_DOOR:
+		case E_ITEM_DARK_OAK_DOOR:
+		case E_ITEM_JUNGLE_DOOR:
+		case E_ITEM_SPRUCE_DOOR:
 		case E_ITEM_IRON_DOOR:
 		case E_ITEM_WOODEN_DOOR:
 		{
@@ -212,20 +217,23 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKED_CHICKEN:
 		case E_ITEM_COOKED_FISH:
+		case E_ITEM_COOKED_MUTTON:
 		case E_ITEM_COOKED_PORKCHOP:
+		case E_ITEM_COOKED_RABBIT:
 		case E_ITEM_COOKIE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
 		case E_ITEM_MUSHROOM_SOUP:
-		case E_ITEM_COOKED_MUTTON:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
-		case E_ITEM_RED_APPLE:
+		case E_ITEM_RABBIT_STEW:
 		case E_ITEM_RAW_BEEF:
 		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_RAW_FISH:
 		case E_ITEM_RAW_MUTTON:
 		case E_ITEM_RAW_PORKCHOP:
+		case E_ITEM_RAW_RABBIT:
+		case E_ITEM_RED_APPLE:
 		case E_ITEM_ROTTEN_FLESH:
 		case E_ITEM_SPIDER_EYE:
 		case E_ITEM_STEAK:
