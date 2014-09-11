@@ -313,8 +313,3 @@ private:
 	}
 };
 
-
-#ifdef SELF_TEST
-#include "IncrementalRedstoneSimulator.inc"
-#endif
-
