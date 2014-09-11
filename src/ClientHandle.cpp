@@ -1207,6 +1207,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 	if (
 		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
+		IsValidBlock(a_HeldItem.m_ItemType) &&
 		((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() >= 5)
 	)
 	{
