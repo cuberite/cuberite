@@ -1506,18 +1506,34 @@ void cProtocol180::SendWindowClose(const cWindow & a_Window)
 void cProtocol180::SendWindowOpen(const cWindow & a_Window)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	if (a_Window.GetWindowType() < 0)
 	{
 		// Do not send this packet for player inventory windows
 		return;
 	}
-	
+
 	cPacketizer Pkt(*this, 0x2d);
 	Pkt.WriteChar(a_Window.GetWindowID());
 	Pkt.WriteString(a_Window.GetWindowTypeName());
 	Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
-	Pkt.WriteChar(a_Window.GetNumNonInventorySlots());
+
+	switch (a_Window.GetWindowType())
+	{
+		case cWindow::wtWorkbench:
+		case cWindow::wtEnchantment:
+		case cWindow::wtAnvil:
+		{
+			Pkt.WriteChar(0);
+			break;
+		}
+		default:
+		{
+			Pkt.WriteChar(a_Window.GetNumNonInventorySlots());
+			break;
+		}
+	}
+
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{
 		Pkt.WriteInt(0);  // TODO: The animal's EntityID
