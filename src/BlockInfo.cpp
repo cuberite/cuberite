@@ -97,6 +97,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ACTIVE_COMPARATOR   ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_AIR                 ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_ANVIL               ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_BARRIER             ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BEACON              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BED                 ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_SpreadLightFalloff = 1;
@@ -211,6 +212,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ACTIVE_COMPARATOR   ].m_Transparent = true;
 	a_Info[E_BLOCK_AIR                 ].m_Transparent = true;
 	a_Info[E_BLOCK_ANVIL               ].m_Transparent = true;
+	a_Info[E_BLOCK_BARRIER             ].m_Transparent = true;
 	a_Info[E_BLOCK_BEACON              ].m_Transparent = true;
 	a_Info[E_BLOCK_BED                 ].m_Transparent = true;
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_Transparent = true;
@@ -527,7 +529,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 
 
 	// Blocks that fully occupy their voxel - used as a guide for torch placeable blocks, amongst other things:
-	a_Info[E_BLOCK_NEW_LOG             ].m_FullyOccupiesVoxel = true;
+	a_Info[E_BLOCK_BARRIER             ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_BEDROCK             ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_BLOCK_OF_COAL       ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_BLOCK_OF_REDSTONE   ].m_FullyOccupiesVoxel = true;
@@ -572,6 +574,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NETHERRACK          ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_NETHER_BRICK        ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_NETHER_QUARTZ_ORE   ].m_FullyOccupiesVoxel = true;
+	a_Info[E_BLOCK_NEW_LOG             ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_NOTE_BLOCK          ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_OBSIDIAN            ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_PACKED_ICE          ].m_FullyOccupiesVoxel = true;
@@ -774,6 +777,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_DARK_OAK_WOOD_STAIRS ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_SLIME_BLOCK         ].m_PlaceSound = "dig.slime"; // I hope it is named slime, it's definetly a new sound type though...
+	a_Info[E_BLOCK_BARRIER             ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_PlaceSound = "dig.metal";
 	a_Info[E_BLOCK_PRISMARINE_BLOCK    ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_SEA_LANTERN         ].m_PlaceSound = "dig.stone";
