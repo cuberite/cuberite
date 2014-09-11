@@ -406,7 +406,7 @@ void cProtocol180::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x36);  // Sign Editor Open packet
-	Pkt.WritePosition(a_BlockX, a_BlockX, a_BlockZ);
+	Pkt.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
 }
 
 
