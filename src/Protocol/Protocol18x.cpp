@@ -1822,7 +1822,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
-			LOGWARNING("Protocol 1.7: Wrong number of bytes read for packet 0x%x, state %d. Read " SIZE_T_FMT " bytes, packet contained %u bytes",
+			LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read " SIZE_T_FMT " bytes, packet contained %u bytes",
 				PacketType, m_State, bb.GetUsedSpace() - bb.GetReadableSpace(), PacketLen
 			);
 
@@ -2594,8 +2594,11 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 
 	// Read the metadata
 	AString Metadata;
-	a_ByteBuffer.ReadAll(Metadata);
-	
+	if (a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - 1))
+	{
+		return false;
+	}
+
 	ParseItemMetadata(a_Item, Metadata);
 	return true;
 }
@@ -2781,37 +2784,54 @@ void cProtocol180::AddChatPartStyle(Json::Value & a_Value, const AString & a_Par
 
 cProtocol180::cPacketizer::~cPacketizer()
 {
-	AString DataToSend;
-
-	// Send the packet length
 	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
+	AString PacketData, CompressedPacket;
+	m_Out.ReadAll(PacketData);
+	m_Out.CommitRead();
 
-	if (m_Protocol.m_State == 3)
+	if ((m_Protocol.m_State == 3) && (PacketLen >= 256))
+	{
+		if (!cProtocol180::CompressPacket(PacketData, CompressedPacket))
+		{
+			return;
+		}
+	}
+	else if (m_Protocol.m_State == 3)
 	{
 		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen + 1);
 		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(0);
+
+		AString LengthData;
+		m_Protocol.m_OutPacketLenBuffer.ReadAll(LengthData);
+		m_Protocol.SendData(LengthData.data(), LengthData.size());
 	}
 	else
 	{
 		m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
+
+		AString LengthData;
+		m_Protocol.m_OutPacketLenBuffer.ReadAll(LengthData);
+		m_Protocol.SendData(LengthData.data(), LengthData.size());
 	}
-	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
-	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
-	m_Protocol.m_OutPacketLenBuffer.CommitRead();
-	
-	// Send the packet data:
-	m_Out.ReadAll(DataToSend);
-	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
-	m_Out.CommitRead();
-	
+
+	if (CompressedPacket.empty())
+	{
+		m_Protocol.m_OutPacketLenBuffer.CommitRead();
+		m_Protocol.SendData(PacketData.data(), PacketData.size());
+	}
+	else
+	{
+		m_Protocol.SendData(CompressedPacket.data(), CompressedPacket.size());
+	}
+
 	// Log the comm into logfile:
 	if (g_ShouldLogCommOut)
 	{
 		AString Hex;
-		ASSERT(DataToSend.size() > 0);
-		CreateHexDump(Hex, DataToSend.data() + 1, DataToSend.size() - 1, 16);
+		ASSERT(PacketData.size() > 0);
+		CreateHexDump(Hex, PacketData.data() + 1, PacketData.size() - 1, 16);
 		m_Protocol.m_CommLogFile.Printf("Outgoing packet: type %d (0x%x), length %u (0x%x), state %d. Payload:\n%s\n",
-			DataToSend[0], DataToSend[0], PacketLen, PacketLen, m_Protocol.m_State, Hex.c_str()
+			PacketData[0], PacketData[0], PacketLen, PacketLen, m_Protocol.m_State, Hex.c_str()
 		);
 	}
 }

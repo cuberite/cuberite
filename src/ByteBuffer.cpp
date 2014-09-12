@@ -267,7 +267,7 @@ size_t cByteBuffer::GetReadableSpace(void) const
 	}
 	// Single readable space partition:
 	ASSERT(m_WritePos >= m_ReadPos);
-	return m_WritePos - m_ReadPos ;
+	return m_WritePos - m_ReadPos;
 }
 
 
