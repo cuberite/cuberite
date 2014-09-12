@@ -1753,7 +1753,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_ReceivedData.ResetRead();
 			break;
 		}
-		cByteBuffer bb(PacketLen + 1);
+		cByteBuffer bb(PacketLen);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
 
@@ -1819,7 +1819,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			return;
 		}
 
-		if (bb.GetReadableSpace() != 1)
+		if (bb.GetReadableSpace() != 0)
 		{
 			// Read more or less than packet length, report as error
 			LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read " SIZE_T_FMT " bytes, packet contained %u bytes",
@@ -2334,10 +2334,7 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	AString Data;
-	if (!a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1))
-	{
-		return;
-	}
+	a_ByteBuffer.ReadAll(Data);
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2594,10 +2591,7 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 
 	// Read the metadata
 	AString Metadata;
-	if (a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - 1))
-	{
-		return false;
-	}
+	a_ByteBuffer.ReadAll(Metadata);
 
 	ParseItemMetadata(a_Item, Metadata);
 	return true;
