@@ -62,7 +62,7 @@ public:
 	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
 	virtual ~cClientHandle();
 
-	const AString & GetIPString(void) const { return m_IPString; }
+	const AString & GetIPString(void) const { return m_IPString; }  // tolua_export
 	
 	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 
@@ -209,7 +209,7 @@ public:
 	// tolua_end
 	
 	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
-	bool WantsSendChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	bool WantsSendChunk(int a_ChunkX, int a_ChunkZ);
 	
 	/** Adds the chunk specified to the list of chunks wanted for sending (m_ChunksToSend) */
 	void AddWantedChunk(int a_ChunkX, int a_ChunkZ);
@@ -269,7 +269,7 @@ public:
 	void RemoveFromWorld(void);
 	
 	/** Called when the player will enchant a Item */
-	void HandleEnchantItem(Byte & WindowID, Byte & Enchantment);
+	void HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment);
 	
 private:
 

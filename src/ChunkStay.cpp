@@ -51,7 +51,7 @@ void cChunkStay::Add(int a_ChunkX, int a_ChunkZ)
 			return;
 		}
 	}  // for itr - Chunks[]
-	m_Chunks.push_back(cChunkCoords(a_ChunkX, ZERO_CHUNK_Y, a_ChunkZ));
+	m_Chunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 }
 
 

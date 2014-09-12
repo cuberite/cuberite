@@ -36,7 +36,9 @@ extern "C" {
  #define TEMPLATE_BIND(p)
 #endif
 
-#define TOLUA_TEMPLATE_BIND(p)
+#ifndef TOLUA_TEMPLATE_BIND
+ #define TOLUA_TEMPLATE_BIND(p)
+#endif
 
 #define TOLUA_PROTECTED_DESTRUCTOR
 #define TOLUA_PROPERTY_TYPE(p)

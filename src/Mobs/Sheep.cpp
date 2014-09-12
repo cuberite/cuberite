@@ -39,6 +39,13 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, m_WoolColor));
 	}
+
+	int LootingLevel = 0;
+	if (a_Killer != NULL)
+	{
+		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
+	}
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_MUTTON : E_ITEM_RAW_MUTTON);
 }
 
 

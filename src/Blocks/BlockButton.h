@@ -57,12 +57,6 @@ public:
 	}
 
 
-	virtual const char * GetStepSound(void) override
-	{
-		return m_BlockType == E_BLOCK_WOODEN_BUTTON ? "step.wood" : "step.stone";
-	}
-
-
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)

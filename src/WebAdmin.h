@@ -116,6 +116,9 @@ public:
 	/** Stops the HTTP server, if it was started. */
 	void Stop(void);
 
+	/** Loads the login template. Returns true if the loading succeeds, false if not. */
+	bool LoadLoginTemplate(void);
+
 	void AddPlugin(cWebPlugin * a_Plugin);
 	void RemovePlugin(cWebPlugin * a_Plugin);
 
@@ -145,6 +148,9 @@ public:
 
 	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
 	static AString GetBaseURL(const AStringVector & a_URLSplit);
+
+	/** Returns the content type from the file extension. If the extension isn't in the list, the function returns "text/html" */
+	static AString GetContentTypeFromFileExt(const AString & a_FileExtension);
 
 protected:
 	/** Common base class for request body data handlers */
@@ -205,6 +211,9 @@ protected:
 	/** The Lua template script to provide templates: */
 	cLuaState m_TemplateScript;
 
+	/** The template that provides the login site: */
+	AString m_LoginTemplate;
+
 	/** The HTTP server which provides the underlying HTTP parsing, serialization and events */
 	cHTTPServer m_HTTPServer;
 
@@ -213,6 +222,9 @@ protected:
 
 	/** Handles requests for the root page */
 	void HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
+
+	/** Handles requests for a file */
+	void HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request);
 
 	// cHTTPServer::cCallbacks overrides:
 	virtual void OnRequestBegun   (cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override;

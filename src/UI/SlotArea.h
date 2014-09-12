@@ -349,14 +349,15 @@ class cSlotAreaEnchanting :
 	typedef cSlotAreaTemporary super;
 
 public:
-	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow);
+	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum) override;
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
 	// cSlotAreaTemporary overrides:
+	virtual void OnPlayerAdded  (cPlayer & a_Player) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	/* Get the count of bookshelves who stand in the near of the enchanting table */
@@ -365,6 +366,8 @@ public:
 protected:
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
+
+	int m_BlockX, m_BlockY, m_BlockZ;
 };
 
 

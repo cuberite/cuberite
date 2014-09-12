@@ -362,6 +362,8 @@ enum ENUM_ITEM_ID
 	E_ITEM_LEAD = 420,
 	E_ITEM_NAME_TAG = 421,
 	E_ITEM_MINECART_WITH_COMMAND_BLOCK = 422,
+	E_ITEM_RAW_MUTTON = 423,
+	E_ITEM_MUTTON = 424,
 	
 	// Keep these two as the last values of the consecutive list, without a number - they will get their correct number assigned automagically by C++
 	// IsValidItem() depends on this!

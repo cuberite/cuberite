@@ -75,6 +75,7 @@ SET (HDRS
 	BlockInfo.h
 	BlockTracer.h
 	BoundingBox.h
+	BuildInfo.h.cmake
 	ByteBuffer.h
 	ChatColor.h
 	Chunk.h
@@ -139,6 +140,8 @@ SET (HDRS
 include_directories(".")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
+
+configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
 
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead

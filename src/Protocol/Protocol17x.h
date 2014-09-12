@@ -71,7 +71,9 @@ public:
 	virtual void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player) override;
 	virtual void SendDestroyEntity       (const cEntity & a_Entity) override;
 	virtual void SendDisconnect          (const AString & a_Reason) override;
+	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
+	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
 	virtual void SendEntityEffect        (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration) override;
 	virtual void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendEntityHeadLook      (const cEntity & a_Entity) override;
@@ -82,6 +84,8 @@ public:
 	virtual void SendEntityRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ) override;
 	virtual void SendEntityStatus        (const cEntity & a_Entity, char a_Status) override;
 	virtual void SendEntityVelocity      (const cEntity & a_Entity) override;
+	virtual void SendExperience          (void) override;
+	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
 	virtual void SendExplosion           (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion) override;
 	virtual void SendGameMode            (eGameMode a_GameMode) override;
 	virtual void SendHealth              (void) override;
@@ -93,10 +97,9 @@ public:
 	virtual void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators) override;
 	virtual void SendMapInfo             (int a_ID, unsigned int a_Scale) override;
 	virtual void SendPaintingSpawn       (const cPainting & a_Painting) override;
+	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
 	virtual void SendPickupSpawn         (const cPickup & a_Pickup) override;
 	virtual void SendPlayerAbilities     (void) override;
-	virtual void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation) override;
-	virtual void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount) override;
 	virtual void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline) override;
 	virtual void SendPlayerMaxSpeed      (void) override;
 	virtual void SendPlayerMoveLook      (void) override;
@@ -105,12 +108,9 @@ public:
 	virtual void SendPluginMessage       (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID) override;
 	virtual void SendRespawn             (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks) override;
-	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendExperience          (void) override;
-	virtual void SendExperienceOrb       (const cExpOrb & a_ExpOrb) override;
-	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
-	virtual void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
+	virtual void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob            (const cMonster & a_Mob) override;

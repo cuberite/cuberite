@@ -18,6 +18,7 @@
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
 #include "LoggerListeners.h"
+#include "BuildInfo.h"
 
 #include "inifile/iniFile.h"
 
@@ -111,6 +112,11 @@ void cRoot::Start(void)
 	
 	LOG("--- Started Log ---\n");
 
+	#ifdef BUILD_ID
+	LOG("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID );
+	LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME );
+	#endif
+
 	cDeadlockDetect dd;
 
 	m_bStop = false;
@@ -151,6 +157,7 @@ void cRoot::Start(void)
 		m_MojangAPI.Start(IniFile);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
 		if (!m_Server->InitServer(IniFile))
 		{
+			IniFile.WriteFile("settings.ini");
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}

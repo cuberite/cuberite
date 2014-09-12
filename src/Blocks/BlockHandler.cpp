@@ -495,15 +495,6 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-const char * cBlockHandler::GetStepSound()
-{
-	return "step.stone";
-}
-
-
-
-
-
 bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
 {
 	return true;

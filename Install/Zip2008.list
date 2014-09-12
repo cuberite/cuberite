@@ -6,10 +6,7 @@
 ..\MCServer\furnace.txt
 ..\MCServer\items.ini
 ..\MCServer\monsters.ini
+..\MCServer\buildinfo.txt
 MCServer*debug.cmd
 *.example.ini
-Lua-LICENSE.txt
-LuaExpat-license.html
-LuaSQLite3-LICENSE.txt
-SQLiteCpp-LICENSE.txt
-MersenneTwister-LICENSE.txt
+ThirdPartyLicenses

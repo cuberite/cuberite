@@ -980,7 +980,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	if (!a_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
 	{
 		// Chunk not valid
-		LOG("cWSSCompact: Trying to save chunk [%d, %d, %d] that has no data, ignoring request.", a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);
+		LOG("cWSSCompact: Trying to save chunk [%d, %d] that has no data, ignoring request.", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 
@@ -999,7 +999,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	int errorcode = CompressString(Data.data(), Data.size(), CompressedData, m_CompressionFactor);
 	if (errorcode != Z_OK)
 	{
-		LOGERROR("Error %i compressing data for chunk [%d, %d, %d]", errorcode, a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);
+		LOGERROR("Error %i compressing data for chunk [%d, %d]", errorcode, a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	
@@ -1010,7 +1010,7 @@ bool cWSSCompact::cPAKFile::SaveChunkToData(const cChunkCoords & a_Chunk, cWorld
 	sChunkHeader * Header = new sChunkHeader;
 	if (Header == NULL)
 	{
-		LOGWARNING("Cannot create a new chunk header to save chunk [%d, %d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkY, a_Chunk.m_ChunkZ);
+		LOGWARNING("Cannot create a new chunk header to save chunk [%d, %d]", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		return false;
 	}
 	Header->m_CompressedSize = (int)CompressedData.size();

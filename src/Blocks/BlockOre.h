@@ -51,7 +51,8 @@ public:
 			}
 			default:
 			{
-				ASSERT(!"Unhandled ore!");
+				a_Pickups.push_back(cItem(m_BlockType));
+				break;
 			}
 		}
 	}

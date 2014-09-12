@@ -859,6 +859,32 @@ void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
+{
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cBoundingBox", false, &err))
+	{
+		a_ReturnedVal = *((cBoundingBox **)lua_touserdata(m_LuaState, a_StackPos));
+	}
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
+{
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cWorld", false, &err))
+	{
+		a_ReturnedVal = *((cWorld **)lua_touserdata(m_LuaState, a_StackPos));
+	}
+}
+
+
+
+
+
 bool cLuaState::CallFunction(int a_NumResults)
 {
 	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
