@@ -47,6 +47,7 @@
 #include "BlockLilypad.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
+#include "BlockMobSpawner.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
@@ -244,6 +245,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_MOB_SPAWNER:           return new cBlockMobSpawnerHandler      (a_BlockType);
 		case E_BLOCK_MYCELIUM:              return new cBlockMyceliumHandler        (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
