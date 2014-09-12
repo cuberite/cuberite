@@ -25,6 +25,7 @@ public:
 		if ((Block == E_BLOCK_DIRT) || (Block == E_BLOCK_GRASS))
 		{
 			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FARMLAND, 0);
+			a_World->BroadcastSoundEffect("dig.gravel", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
 			a_Player->UseEquippedItem();
 			return true;
 		}
