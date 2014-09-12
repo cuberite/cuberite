@@ -1134,6 +1134,12 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	FinishDigAnimation();
 
+	if (!m_Player->IsGameModeCreative() && (a_OldBlock == E_BLOCK_BEDROCK))
+	{
+		Kick("You can't break a bedrock!");
+		return;
+	}
+
 	cWorld * World = m_Player->GetWorld();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 
