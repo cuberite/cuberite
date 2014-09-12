@@ -126,11 +126,11 @@ public:
 			{
 				if (Dir == 1)
 				{
-					a_ChunkInterface.SetBlock(a_WorldInterface, Width, Height, Z, E_BLOCK_NETHER_PORTAL, Dir);
+					a_ChunkInterface.SetBlock(Width, Height, Z, E_BLOCK_NETHER_PORTAL, Dir);
 				}
 				else
 				{
-					a_ChunkInterface.SetBlock(a_WorldInterface, X, Height, Width, E_BLOCK_NETHER_PORTAL, Dir);
+					a_ChunkInterface.SetBlock(X, Height, Width, E_BLOCK_NETHER_PORTAL, Dir);
 				}
 			}
 		}

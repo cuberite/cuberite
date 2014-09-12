@@ -590,7 +590,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_LOG                 ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_LEAVES              ].m_PlaceSound = "dig.grass";
 	a_Info[E_BLOCK_SPONGE              ].m_PlaceSound = "dig.grass";
-	a_Info[E_BLOCK_GLASS               ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_GLASS               ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_LAPIS_ORE           ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_LAPIS_BLOCK         ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_DISPENSER           ].m_PlaceSound = "dig.stone";
@@ -647,7 +647,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_REDSTONE_TORCH_ON   ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_STONE_BUTTON        ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_SNOW                ].m_PlaceSound = "dig.snow";
-	a_Info[E_BLOCK_ICE                 ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_ICE                 ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_SNOW_BLOCK          ].m_PlaceSound = "dig.snow";
 	a_Info[E_BLOCK_CACTUS              ].m_PlaceSound = "dig.cloth";
 	a_Info[E_BLOCK_CLAY                ].m_PlaceSound = "dig.gravel";
@@ -657,20 +657,20 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_PUMPKIN             ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_NETHERRACK          ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_SOULSAND            ].m_PlaceSound = "dig.sand";
-	a_Info[E_BLOCK_GLOWSTONE           ].m_PlaceSound = "dig.glass";
-	a_Info[E_BLOCK_NETHER_PORTAL       ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_GLOWSTONE           ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_NETHER_PORTAL       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_JACK_O_LANTERN      ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_CAKE                ].m_PlaceSound = "dig.snow";
 	a_Info[E_BLOCK_REDSTONE_REPEATER_OFF ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_REDSTONE_REPEATER_ON ].m_PlaceSound = "dig.wood";
-	a_Info[E_BLOCK_STAINED_GLASS       ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_STAINED_GLASS       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_TRAPDOOR            ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_SILVERFISH_EGG      ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_STONE_BRICKS        ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_HUGE_BROWN_MUSHROOM ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_HUGE_RED_MUSHROOM   ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_IRON_BARS           ].m_PlaceSound = "dig.metal";
-	a_Info[E_BLOCK_GLASS_PANE          ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_GLASS_PANE          ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_MELON               ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_PUMPKIN_STEM        ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_MELON_STEM          ].m_PlaceSound = "dig.wood";
@@ -687,12 +687,12 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ENCHANTMENT_TABLE   ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_BREWING_STAND       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_CAULDRON            ].m_PlaceSound = "dig.stone";
-	a_Info[E_BLOCK_END_PORTAL          ].m_PlaceSound = "dig.glass";
-	a_Info[E_BLOCK_END_PORTAL_FRAME    ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_END_PORTAL          ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_END_PORTAL_FRAME    ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_END_STONE           ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_DRAGON_EGG          ].m_PlaceSound = "dig.stone";
-	a_Info[E_BLOCK_REDSTONE_LAMP_OFF   ].m_PlaceSound = "dig.glass";
-	a_Info[E_BLOCK_REDSTONE_LAMP_ON    ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_REDSTONE_LAMP_OFF   ].m_PlaceSound = "dig.stone";
+	a_Info[E_BLOCK_REDSTONE_LAMP_ON    ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_DOUBLE_WOODEN_SLAB  ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_WOODEN_SLAB         ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_COCOA_POD           ].m_PlaceSound = "dig.wood";
@@ -712,7 +712,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_CARROTS             ].m_PlaceSound = "dig.grass";
 	a_Info[E_BLOCK_POTATOES            ].m_PlaceSound = "dig.grass";
 	a_Info[E_BLOCK_HEAD                ].m_PlaceSound = "dig.stone";
-	a_Info[E_BLOCK_ANVIL               ].m_PlaceSound = "dig.anvil";
+	a_Info[E_BLOCK_ANVIL               ].m_PlaceSound = "random.anvil_land";
 	a_Info[E_BLOCK_TRAPPED_CHEST       ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE ].m_PlaceSound = "dig.wood";
@@ -727,7 +727,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_ACTIVATOR_RAIL      ].m_PlaceSound = "dig.metal";
 	a_Info[E_BLOCK_DROPPER             ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_STAINED_CLAY        ].m_PlaceSound = "dig.stone";
-	a_Info[E_BLOCK_STAINED_GLASS_PANE  ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_STAINED_GLASS_PANE  ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_NEW_LEAVES          ].m_PlaceSound = "dig.grass";
 	a_Info[E_BLOCK_NEW_LOG             ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_PlaceSound = "dig.wood";
@@ -736,7 +736,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_CARPET              ].m_PlaceSound = "dig.cloth";
 	a_Info[E_BLOCK_HARDENED_CLAY       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_BLOCK_OF_COAL       ].m_PlaceSound = "dig.stone";
-	a_Info[E_BLOCK_PACKED_ICE          ].m_PlaceSound = "dig.glass";
+	a_Info[E_BLOCK_PACKED_ICE          ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_PlaceSound = "dig.grass";
 }
 

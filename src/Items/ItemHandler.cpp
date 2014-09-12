@@ -582,6 +582,7 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SNOW:
 		case E_BLOCK_VINES:
 		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_MOB_SPAWNER:
 		{
 			return false;
 		}

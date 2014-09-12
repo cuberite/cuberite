@@ -15,7 +15,7 @@ void cBlockBedHandler::OnPlacedByPlayer(
 	if (a_BlockMeta < 8)
 	{
 		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
-		a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
+		a_ChunkInterface.SetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
 	}
 }
 
