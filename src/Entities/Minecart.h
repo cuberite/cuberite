@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "../UI/WindowOwner.h"
 
 
 
@@ -108,27 +109,46 @@ protected:
 
 
 class cMinecartWithChest :
-	public cMinecart
+	public cMinecart,
+	public cItemGrid::cListener,
+	public cWindowOwner
 {
 	typedef cMinecart super;
 	
 public:
 	CLASS_PROTODEF(cMinecartWithChest)
 	
-	/// Number of item slots in the chest
-	static const int NumSlots = 9 * 3;
-	
 	cMinecartWithChest(double a_X, double a_Y, double a_Z);
+
+	enum
+	{
+		ContentsHeight = 3,
+		ContentsWidth = 9,
+	};
 	
-	const cItem & GetSlot(int a_Idx) const { return m_Items[a_Idx]; }
-	cItem &       GetSlot(int a_Idx)       { return m_Items[a_Idx]; }
-	
-	void SetSlot(size_t a_Idx, const cItem & a_Item);
+	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }	
+	void SetSlot(size_t a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
 protected:
+	cItemGrid m_Contents;
+	void OpenNewWindow(void);
+	virtual void Destroyed() override;
 
-	/// The chest contents:
-	cItem m_Items[NumSlots];
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+	{
+		UNUSED(a_SlotNum);
+		ASSERT(a_Grid == &m_Contents);
+		if (m_World != NULL)
+		{
+			if (GetWindow() != NULL)
+			{
+				GetWindow()->BroadcastWholeWindow();
+			}
+
+			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+		}
+	}
 	
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;

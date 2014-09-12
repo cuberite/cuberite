@@ -23,7 +23,7 @@ class cBlockEntityWithItems :
 	// tolua_end
 	// tolua doesn't seem to support multiple inheritance?
 	, public cItemGrid::cListener
-	, public cBlockEntityWindowOwner
+	, public cWindowOwner
 	// tolua_begin
 {
 	typedef cBlockEntity super;

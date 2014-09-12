@@ -19,7 +19,6 @@ cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int 
 	m_ShouldDropSpense(false),
 	m_IsPowered(false)
 {
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
 
 
