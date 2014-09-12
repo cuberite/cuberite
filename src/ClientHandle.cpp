@@ -1465,7 +1465,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		Volume = 0.65f;
 	}
 
-	World->BroadcastSoundEffect(PlaceSound, (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, Volume, Pitch);
+	World->BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
