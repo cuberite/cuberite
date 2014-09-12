@@ -17,7 +17,7 @@ class cWorldInterface
 public:
 	virtual ~cWorldInterface() {}
 	
-	virtual Int64 GetTimeOfDay(void) const = 0;
+	virtual int GetTimeOfDay(void) const = 0;
 	virtual Int64 GetWorldAge(void)  const = 0;
 	
 	virtual eDimension GetDimension(void) const = 0;
@@ -44,7 +44,7 @@ public:
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cItemCallback<cPlayer> & a_Callback) = 0;
 
-	virtual void SetTimeOfDay(Int64 a_TimeOfDay) = 0;
+	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
 
 	/** Returns true if it is raining, stormy or snowing at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;

@@ -70,11 +70,6 @@ public:
 
 		return ((a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
 	}
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
 };
 
 

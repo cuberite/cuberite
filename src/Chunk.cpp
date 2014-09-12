@@ -2215,7 +2215,7 @@ bool cChunk::DoWithRedstonePoweredEntityAt(int a_BlockX, int a_BlockY, int a_Blo
 			}
 		}
 		
-		if (a_Callback.Item((cRedstonePoweredEntity *)*itr))
+		if (a_Callback.Item(dynamic_cast<cRedstonePoweredEntity *>(*itr)))  // Needs dynamic_cast due to multiple inheritance
 		{
 			return false;
 		}

@@ -157,14 +157,14 @@ public:
 	}
 
 	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
-	virtual Int64 GetTimeOfDay(void) const override { return m_TimeOfDay; }
+	virtual int GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
 
-	virtual void SetTimeOfDay(Int64 a_TimeOfDay) override
+	virtual void SetTimeOfDay(int a_TimeOfDay) override
 	{
 		m_TimeOfDay = a_TimeOfDay;
 		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
@@ -888,7 +888,7 @@ private:
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
 	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
-	Int64  m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
+	int    m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
 	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
 	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
 	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred

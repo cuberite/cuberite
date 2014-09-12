@@ -50,12 +50,6 @@ public:
 		}
 		return true;
 	}
-	
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
-	}
 } ;
 
 

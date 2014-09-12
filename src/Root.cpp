@@ -18,6 +18,7 @@
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
 #include "LoggerListeners.h"
+#include "BuildInfo.h"
 
 #include "inifile/iniFile.h"
 
@@ -110,6 +111,11 @@ void cRoot::Start(void)
 	cLogger::GetInstance().AttachListener(fileLogListener);
 	
 	LOG("--- Started Log ---\n");
+
+	#ifdef BUILD_ID
+	LOG("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID );
+	LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME );
+	#endif
 
 	cDeadlockDetect dd;
 

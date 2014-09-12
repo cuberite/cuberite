@@ -64,12 +64,6 @@ public:
 		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
 } ;
 
 
