@@ -1727,7 +1727,7 @@ bool cWorld::SetAreaBiome(const cCuboid & a_Area, EMCSBiome a_Biome)
 
 void cWorld::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients)
 {
-	m_ChunkMap->SetBlock(*this, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_SendToClients);
+	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_SendToClients);
 }
 
 
