@@ -665,6 +665,12 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cPacketizer Pkt(*this, 0x05);  // Spawn Position packet
 		Pkt.WritePosition(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
+
+	// Send the server difficulty:
+	{
+		cPacketizer Pkt(*this, 0x41);
+		Pkt.WriteChar(1);
+	}
 	
 	// Send player abilities:
 	SendPlayerAbilities();
