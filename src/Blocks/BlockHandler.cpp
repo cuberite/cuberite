@@ -67,6 +67,7 @@
 #include "BlockTripwireHook.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
+#include "BlockSeaLantern.h"
 #include "BlockSideways.h"
 #include "BlockSignPost.h"
 #include "BlockSlab.h"
@@ -287,6 +288,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
 		case E_BLOCK_SANDSTONE_STAIRS:      return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
+		case E_BLOCK_SEA_LANTERN:           return new cBlockSeaLanternHandler      (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignPostHandler        (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
