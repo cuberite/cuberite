@@ -1204,15 +1204,16 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	);
 	
 	cWorld * World = m_Player->GetWorld();
+	bool AreRealCoords = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() <= 5;
 
 	if (
 		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
 		IsValidBlock(a_HeldItem.m_ItemType) &&
-		((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() >= 5)
+		!AreRealCoords
 	)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		if ((a_BlockX >= 0) && (a_BlockY >= 0) && (a_BlockZ >= 0))
+		if ((a_BlockX != -1) && (a_BlockY >= 0) && (a_BlockZ != -1))
 		{
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 			if (a_BlockY < cChunkDef::Height - 1)
@@ -1228,11 +1229,16 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 
+	if (!AreRealCoords)
+	{
+		a_BlockFace = BLOCK_FACE_NONE;
+	}
+
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		if ((a_BlockX >= 0) && (a_BlockY >= 0) && (a_BlockZ >= 0))
+		if (AreRealCoords)
 		{
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
@@ -1278,7 +1284,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 
-	if ((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() <= 5)
+	if (AreRealCoords)
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
