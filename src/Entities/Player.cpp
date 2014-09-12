@@ -628,8 +628,14 @@ void cPlayer::FinishEating(void)
 	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
 
-	GetInventory().RemoveOneEquippedItem();
+	// Stop potions from being removed in creative mode
+	// TODO: Review item removal locations
+	if (!IsGameModeCreative())
+	{
+		GetInventory().RemoveOneEquippedItem();
+	}
 
+	// TODO: Discuss if this should be moved to its own item like milk
 	// if the food is mushroom soup, return a bowl to the inventory
 	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
 	{

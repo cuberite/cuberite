@@ -68,8 +68,14 @@ public:
 			cEntityEffect::GetPotionEffectDuration(PotionDamage),
 			cEntityEffect::GetPotionEffectIntensity(PotionDamage)
 		);
-		a_Player->GetInventory().RemoveOneEquippedItem();
-		a_Player->GetInventory().AddItem(E_ITEM_GLASS_BOTTLE);
+
+		// Stop potions from being removed in creative mode
+		// TODO: Review item removal locations
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player->GetInventory().AddItem(E_ITEM_GLASS_BOTTLE);
+		}
 		return true;
 	}
 };
