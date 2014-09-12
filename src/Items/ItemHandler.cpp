@@ -399,8 +399,12 @@ char cItemHandler::GetMaxStackSize(void)
 	
 	switch (m_ItemType)
 	{
+		case E_ITEM_ACACIA_DOOR:          return 64;
+		case E_ITEM_ARMOR_STAND:          return 16;
 		case E_ITEM_ARROW:                return 64;
 		case E_ITEM_BAKED_POTATO:         return 64;
+		case E_ITEM_BANNER:               return 16;
+		case E_ITEM_BIRCH_DOOR:           return 64;
 		case E_ITEM_BLAZE_POWDER:         return 64;
 		case E_ITEM_BLAZE_ROD:            return 64;
 		case E_ITEM_BONE:                 return 64;
@@ -411,7 +415,6 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_BREWING_STAND:        return 64;
 		case E_ITEM_BUCKET:               return 16;
 		case E_ITEM_CARROT:               return 64;
-		case E_ITEM_CAKE:                 return 1;
 		case E_ITEM_CAULDRON:             return 64;
 		case E_ITEM_CLAY:                 return 64;
 		case E_ITEM_CLAY_BRICK:           return 64;
@@ -422,7 +425,9 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_COOKED_CHICKEN:       return 64;
 		case E_ITEM_COOKED_FISH:          return 64;
 		case E_ITEM_COOKED_PORKCHOP:      return 64;
+		case E_ITEM_COOKED_MUTTON:        return 64;
 		case E_ITEM_COOKIE:               return 64;
+		case E_ITEM_DARK_OAK_DOOR:        return 64;
 		case E_ITEM_DIAMOND:              return 64;
 		case E_ITEM_DYE:                  return 64;
 		case E_ITEM_EGG:                  return 16;
@@ -446,6 +451,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_GOLD_NUGGET:          return 64;
 		case E_ITEM_GUNPOWDER:            return 64;
 		case E_ITEM_HEAD:                 return 64;
+		case E_ITEM_JUNGLE_DOOR:          return 64;
 		case E_ITEM_IRON:                 return 64;
 		case E_ITEM_ITEM_FRAME:           return 64;
 		case E_ITEM_LEATHER:              return 64;
@@ -459,11 +465,16 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_PAPER:                return 64;
 		case E_ITEM_POISONOUS_POTATO:     return 64;
 		case E_ITEM_POTATO:               return 64;
+		case E_ITEM_PRISMARINE_CRYSTALS:  return 64;
+		case E_ITEM_PRISMARINE_SHARD:     return 64;
 		case E_ITEM_PUMPKIN_PIE:          return 64;
 		case E_ITEM_PUMPKIN_SEEDS:        return 64;
+		case E_ITEM_RABBITS_FOOT:         return 64;
+		case E_ITEM_RABBIT_HIDE:          return 64;
 		case E_ITEM_RAW_BEEF:             return 64;
 		case E_ITEM_RAW_CHICKEN:          return 64;
 		case E_ITEM_RAW_FISH:             return 64;
+		case E_ITEM_RAW_MUTTON:           return 64;
 		case E_ITEM_RAW_PORKCHOP:         return 64;
 		case E_ITEM_RED_APPLE:            return 64;
 		case E_ITEM_REDSTONE_DUST:        return 64;
@@ -475,6 +486,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_SNOWBALL:             return 16;
 		case E_ITEM_SPAWN_EGG:            return 64;
 		case E_ITEM_SPIDER_EYE:           return 64;
+		case E_ITEM_SPRUCE_DOOR:          return 64;
 		case E_ITEM_STEAK:                return 64;
 		case E_ITEM_STICK:                return 64;
 		case E_ITEM_STRING:               return 64;
@@ -553,43 +565,49 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		case E_BLOCK_ANVIL:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_COAL_ORE:
-		case E_BLOCK_STONE:
-		case E_BLOCK_COBBLESTONE:
-		case E_BLOCK_END_STONE:
-		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_SANDSTONE:
-		case E_BLOCK_STONE_BRICKS:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
 		case E_BLOCK_BRICK:
+		case E_BLOCK_CAULDRON:
+		case E_BLOCK_COAL_ORE:
+		case E_BLOCK_COBBLESTONE:
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_CAULDRON:
-		case E_BLOCK_OBSIDIAN:
 		case E_BLOCK_DIAMOND_BLOCK:
 		case E_BLOCK_DIAMOND_ORE:
+		case E_BLOCK_DOUBLE_STONE_SLAB:
+		case E_BLOCK_EMERALD_ORE:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_STONE:
+		case E_BLOCK_FURNACE:
 		case E_BLOCK_GOLD_BLOCK:
 		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_EMERALD_ORE:
 		case E_BLOCK_IRON_BLOCK:
 		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_LAPIS_BLOCK:
-		case E_BLOCK_SNOW:
-		case E_BLOCK_VINES:
+		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_MOSSY_COBBLESTONE:
+		case E_BLOCK_NETHER_BRICK:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_NETHERRACK:
+		case E_BLOCK_NEW_STONE_SLAB:
+		case E_BLOCK_OBSIDIAN:
 		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_PRISMARINE_BLOCK:
+		case E_BLOCK_RED_SANDSTONE:
+		case E_BLOCK_RED_SANDSTONE_STAIRS:
+		case E_BLOCK_REDSTONE_ORE:
+		case E_BLOCK_REDSTONE_ORE_GLOWING:
+		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_SANDSTONE:
+		case E_BLOCK_SNOW:
+		case E_BLOCK_STONE:
+		case E_BLOCK_STONE_BRICKS:
+		case E_BLOCK_STONE_BRICK_STAIRS:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_STONE_SLAB:
+		case E_BLOCK_VINES:
 		{
 			return false;
 		}
