@@ -33,6 +33,7 @@
 #include "ItemLilypad.h"
 #include "ItemMap.h"
 #include "ItemMinecart.h"
+#include "ItemMushroomSoup.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
@@ -125,6 +126,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_MILK:              return new cItemMilkHandler();
+		case E_ITEM_MUSHROOM_SOUP:     return new cItemMushroomSoupHandler(a_ItemType);
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
@@ -216,7 +218,6 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COOKIE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
-		case E_ITEM_MUSHROOM_SOUP:
 		case E_ITEM_MUTTON:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
@@ -634,7 +635,10 @@ bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_Eff
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
-	a_Player->GetInventory().RemoveOneEquippedItem();
+	if (!a_Player->IsGameModeCreative())
+	{
+		a_Player->GetInventory().RemoveOneEquippedItem();
+	}
 
 	FoodInfo Info = GetFoodInfo();
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
