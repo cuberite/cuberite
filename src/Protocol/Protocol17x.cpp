@@ -1040,9 +1040,9 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	
 	cPacketizer Pkt(*this, 0x11);
 	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
 	Pkt.WriteShort(a_ExpOrb.GetReward());
 }
 
