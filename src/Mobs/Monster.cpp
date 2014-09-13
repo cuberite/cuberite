@@ -89,6 +89,7 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
+	, m_RelativeWalkSpeed(1.0)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -301,6 +302,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 				// Don't let the mob move too much if he's falling.
 				Distance *= 0.25f;
 			}
+
+			// Apply walk speed:
+			Distance *= m_RelativeWalkSpeed;
 
 			AddSpeedX(Distance.x);
 			AddSpeedZ(Distance.z);
