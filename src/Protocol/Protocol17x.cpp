@@ -715,7 +715,7 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -737,7 +737,7 @@ void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
-void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -770,7 +770,6 @@ void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
 	Pkt.WriteByte(2);
 	Pkt.WriteByte(a_Scale);
 }
-
 
 
 

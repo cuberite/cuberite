@@ -608,7 +608,7 @@ void cProtocol125::SendLoginSuccess(void)
 
 
 
-void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	cCSLock Lock(m_CSPacket);
 
@@ -630,7 +630,7 @@ void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
-void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	cCSLock Lock(m_CSPacket);
 

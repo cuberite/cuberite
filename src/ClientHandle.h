@@ -148,8 +148,8 @@ public:
 	void SendGameMode            (eGameMode a_GameMode);
 	void SendHealth              (void);
 	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length);
-	void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators);
+	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale);
+	void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale);
 	void SendMapInfo             (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn       (const cPainting & a_Painting);
 	void SendPickupSpawn         (const cPickup & a_Pickup);
