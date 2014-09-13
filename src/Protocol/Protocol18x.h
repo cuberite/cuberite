@@ -324,9 +324,7 @@ protected:
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
 	
 	void StartEncryption(const Byte * a_Key);
-	
-	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
-	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle);
+
 } ;
 
 

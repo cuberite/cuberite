@@ -239,101 +239,13 @@ void cProtocol172::SendChat(const AString & a_Message)
 void cProtocol172::SendChat(const cCompositeChat & a_Message)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
-	// Compose the complete Json string to send:
-	Json::Value msg;
+
 	cWorld * World = m_Client->GetPlayer()->GetWorld();
-	msg["text"] = cClientHandle::FormatMessageType((World == NULL) ? false : World->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
-	const cCompositeChat::cParts & Parts = a_Message.GetParts();
-	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
-	{
-		Json::Value Part;
-		switch ((*itr)->m_PartType)
-		{
-			case cCompositeChat::ptText:
-			{
-				Part["text"] = (*itr)->m_Text;
-				AddChatPartStyle(Part, (*itr)->m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptClientTranslated:
-			{
-				const cCompositeChat::cClientTranslatedPart & p = (const cCompositeChat::cClientTranslatedPart &)**itr;
-				Part["translate"] = p.m_Text;
-				Json::Value With;
-				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
-				{
-					With.append(*itrW);
-				}
-				if (!p.m_Parameters.empty())
-				{
-					Part["with"] = With;
-				}
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptUrl:
-			{
-				const cCompositeChat::cUrlPart & p = (const cCompositeChat::cUrlPart &)**itr;
-				Part["text"] = p.m_Text;
-				Json::Value Url;
-				Url["action"] = "open_url";
-				Url["value"] = p.m_Url;
-				Part["clickEvent"] = Url;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptSuggestCommand:
-			case cCompositeChat::ptRunCommand:
-			{
-				const cCompositeChat::cCommandPart & p = (const cCompositeChat::cCommandPart &)**itr;
-				Part["text"] = p.m_Text;
-				Json::Value Cmd;
-				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
-				Cmd["value"] = p.m_Command;
-				Part["clickEvent"] = Cmd;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
+	bool ShouldUseChatPrefixes = (World == NULL) ? false : World->ShouldUseChatPrefixes();
 
-			case cCompositeChat::ptShowAchievement:
-			{
-				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
-				Part["translate"] = "chat.type.achievement";
-
-				Json::Value Ach;
-				Ach["action"] = "show_achievement";
-				Ach["value"] = p.m_Text;
-				
-				Json::Value AchColourAndName;
-				AchColourAndName["color"] = "green";
-				AchColourAndName["translate"] = p.m_Text;
-				AchColourAndName["hoverEvent"] = Ach;
-
-				Json::Value Extra;
-				Extra.append(AchColourAndName);
-
-				Json::Value Name;
-				Name["text"] = p.m_PlayerName;
-
-				Json::Value With;
-				With.append(Name);
-				With.append(Extra);
-
-				Part["with"] = With;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-		}
-		msg["extra"].append(Part);
-	}  // for itr - Parts[]
-	
 	// Send the message to the client:
 	cPacketizer Pkt(*this, 0x02);
-	Pkt.WriteString(msg.toStyledString());
+	Pkt.WriteString(a_Message.CreateJsonString(ShouldUseChatPrefixes));
 }
 
 
@@ -2421,85 +2333,6 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
-}
-
-
-
-
-
-void cProtocol172::AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle)
-{
-	size_t len = a_PartStyle.length();
-	for (size_t i = 0; i < len; i++)
-	{
-		switch (a_PartStyle[i])
-		{
-			case 'b':
-			{
-				// bold
-				a_Value["bold"] = Json::Value(true);
-				break;
-			}
-			
-			case 'i':
-			{
-				// italic
-				a_Value["italic"] = Json::Value(true);
-				break;
-			}
-			
-			case 'u':
-			{
-				// Underlined
-				a_Value["underlined"] = Json::Value(true);
-				break;
-			}
-			
-			case 's':
-			{
-				// strikethrough
-				a_Value["strikethrough"] = Json::Value(true);
-				break;
-			}
-			
-			case 'o':
-			{
-				// obfuscated
-				a_Value["obfuscated"] = Json::Value(true);
-				break;
-			}
-			
-			case '@':
-			{
-				// Color, specified by the next char:
-				i++;
-				if (i >= len)
-				{
-					// String too short, didn't contain a color
-					break;
-				}
-				switch (a_PartStyle[i])
-				{
-					case '0': a_Value["color"] = Json::Value("black");        break;
-					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
-					case '2': a_Value["color"] = Json::Value("dark_green");   break;
-					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
-					case '4': a_Value["color"] = Json::Value("dark_red");     break;
-					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
-					case '6': a_Value["color"] = Json::Value("gold");         break;
-					case '7': a_Value["color"] = Json::Value("gray");         break;
-					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
-					case '9': a_Value["color"] = Json::Value("blue");         break;
-					case 'a': a_Value["color"] = Json::Value("green");        break;
-					case 'b': a_Value["color"] = Json::Value("aqua");         break;
-					case 'c': a_Value["color"] = Json::Value("red");          break;
-					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
-					case 'e': a_Value["color"] = Json::Value("yellow");       break;
-					case 'f': a_Value["color"] = Json::Value("white");        break;
-				}  // switch (color)
-			}  // case '@'
-		}  // switch (Style[i])
-	}  // for i - a_PartStyle[]
 }
 
 
