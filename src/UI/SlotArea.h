@@ -469,3 +469,7 @@ public:
 protected:
 	cMinecartWithChest * m_Chest;
 };
+
+
+
+
