@@ -1,0 +1,103 @@
+<!doctype html>
+
+<html>
+
+	<script>
+		var CurrentlyOpen = false;
+		var PreviousOS;
+		
+		function ToggleDownloadPane(OS)
+		{
+			if (CurrentlyOpen && (typeof PreviousOS !== "undefined") && (OS !== PreviousOS))
+			{
+				ToggleDownloadPane(PreviousOS);
+			}
+			
+			PreviousOS = OS;
+			var Overlay;
+			
+			switch (OS)
+			{
+				case "Windows": Overlay = document.getElementById("downloadblockwindows"); break;
+				case "Linux": Overlay = document.getElementById("downloadblocklinux"); break;
+				case "Macintosh": Overlay = document.getElementById("downloadblockmacintosh"); break;
+			}
+			
+			if (CurrentlyOpen)
+			{
+				document.body.style.backgroundColor = "white";
+				Overlay.style.visibility = "hidden";
+				Overlay.style.height = "0px";
+			}
+			else
+			{
+				document.body.style.backgroundColor = "grey";
+				Overlay.style.visibility = "visible";
+				Overlay.style.height = "70px";
+			}
+			CurrentlyOpen = CurrentlyOpen ? false : true;
+		}
+	</script>
+
+	<head>
+
+		<meta charset="UTF-8">
+		<meta name="description" content="A high performance custom Minecraft server written entirely in C++.">
+		<meta name="viewport" content="width=device-width" />
+		<link rel="shortcut icon" href="https://raw.githubusercontent.com/mc-server/MCServer/master/src/Resources/icon_256.png" />
+
+		<link type="text/css" href="css.css" rel="stylesheet">
+
+		<title>Cuberite - A Custom Minecraft Server</title>
+
+	</head>
+
+	<body>
+	
+		<header>
+			<img src="https://cloud.githubusercontent.com/assets/1297699/4260278/f1b726f4-3b33-11e4-9d5d-0751f536ea02.png" alt="Cuberite Logo" class="logo">
+			<h1>Cuberite</h1>
+			<h2>A custom Minecraft server written completely in C++. It's a fast, lightweight, and awesome replacement for Vanilla.</h2>
+		</header>
+		
+		<div style="text-align: center;" class="nav">
+			<a href="#" onclick="event.preventDefault(); ToggleDownloadPane('Linux')" title="Download for Linux"><img src="images/linux.svg" alt="Linux" class="downloadosimage"/></a>				
+			<a href="#" onclick="event.preventDefault(); ToggleDownloadPane('Windows')" title="Download for Windows"><img src="images/windows.svg" alt="Windows" class="downloadosimage"/></a>
+			<a href="#" onclick="event.preventDefault(); ToggleDownloadPane('Macintosh')" title="Download for Mac"><img src="images/mac.svg" alt="Macintosh" class="downloadosimage"/></a>
+			<a href="https://github.com/mc-server/MCServer" title="View source code"><img src="images/github.svg" alt="GitHub" class="downloadosimage"/></a>
+		</div>
+		
+		<div id="downloadblocklinux" class="downloadblock" id="downloadblocklinux">
+			<div class="downloaditem">Linux 32 bit&nbsp;&nbsp;&nbsp;<a href="http://builds.mc-server.org/job/MCServer%20Linux%20x86/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Linux 64 bit&nbsp;&nbsp;&nbsp;<a href="http://builds.mc-server.org/job/MCServer%20Linux%20x64/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">RasPi Hardfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20HardFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">RasPi Softfloat<a href="http://ci.bearbin.net/job/MCServer%20Linux-RasPi%20SoftFloat/lastSuccessfulBuild/artifact/MCServer.tar"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+		</div>
+		
+		<div id="downloadblockwindows" class="downloadblock" id="downloadblockwindows">
+			<div class="downloaditem">Windows 32 bit<a href="http://builds.mc-server.org/job/MCServer%20Windows%20x86/lastSuccessfulBuild/artifact/Install/MCServer.zip"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+			<div class="downloaditem">Windows 64 bit<a href="http://builds.mc-server.org/job/MCServer%20Windows%20x64/lastSuccessfulBuild/artifact/Install/MCServer.zip"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+		</div>
+		
+		<div id="downloadblockmacintosh" class="downloadblock" id="downloadblockmacintosh">
+			<div class="downloaditem">Macintosh 64 bit<a href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&amp;id=EAC2A6E3A23C4250%21109"><img src="images/downloadicon.svg" alt="Download Icon" class="downloadicon"/></a></div>
+		</div>
+
+		<nav style="text-align: center;" class="nav">
+			<div id="nodownload" style="font-size: 10px"><br>Is your platform not listed? File an issue to add compatibility on <a href="https://github.com/mc-server/MCServer/issues/new">GitHub</a>.<br><br></div>
+			<a href="http://forum.mc-server.org">Forums</a> &middot;
+			<a href="http://mc-server.xoft.cz/LuaAPI">API&nbsp;Documentation</a> &middot;
+			<a href="http://book.mc-server.org">User's Manual</a> &middot;
+			<a href="http://leekspin.com">Spin ya leeks</a>
+		</nav>
+    
+		<footer>
+			<div style="text-align: center">
+				<a href="https://travis-ci.org/mc-server/MCServer" class="buildstatusanddonatelink"><img src="https://travis-ci.org/mc-server/MCServer.svg?branch=master" alt="Build Status" class="buildstatusanddonatebutton"></a>
+				<a href="http://tip4commit.com/projects/74" class="buildstatusanddonatelink"><img src="http://tip4commit.com/projects/74.svg" alt="Donate Bitcoins!" class="buildstatusanddonatebutton"></a>
+			</div>
+		</footer>
+
+	</body>
+
+</html>
