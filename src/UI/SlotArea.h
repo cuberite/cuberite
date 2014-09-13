@@ -449,7 +449,7 @@ protected:
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
-	/// Called after an item has been smelted to handle statistics e.t.c.
+	/// Called after an item has been smelted to handle statistics etc.
 	void HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
 
