@@ -12,8 +12,8 @@ Installation
 
 Normally, you will want to download a pre-compiled version of MCServer from one of the buildservers:
 
- * [Linux and Raspberry Pi](http://ci.bearbin.net) (Bearbin's CI Server)
- * [Windows](http://mc-server.xoft.cz) (xoft's nightly build service)
+ * [Windows and Linux](http://builds.mc-server.org)
+ * [Raspberry Pi](http://ci.bearbin.net)
 
 You simply need to download and extract these files before you can use the server. 
 
