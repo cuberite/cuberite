@@ -1035,8 +1035,12 @@ void cProtocol180::SendScoreboardObjective(const AString & a_Name, const AString
 	
 	cPacketizer Pkt(*this, 0x3b);
 	Pkt.WriteString(a_Name);
-	Pkt.WriteString(a_DisplayName);
 	Pkt.WriteByte(a_Mode);
+	if ((a_Mode == 0) || (a_Mode == 2))
+	{
+		Pkt.WriteString(a_DisplayName);
+		Pkt.WriteString("integer");
+	}
 }
 
 
@@ -1050,11 +1054,11 @@ void cProtocol180::SendScoreUpdate(const AString & a_Objective, const AString & 
 	cPacketizer Pkt(*this, 0x3c);
 	Pkt.WriteString(a_Player);
 	Pkt.WriteByte(a_Mode);
+	Pkt.WriteString(a_Objective);
 
 	if (a_Mode != 1)
 	{
-		Pkt.WriteString(a_Objective);
-		Pkt.WriteInt((int) a_Score);
+		Pkt.WriteVarInt((UInt32) a_Score);
 	}
 }
 
