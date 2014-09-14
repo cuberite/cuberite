@@ -49,6 +49,9 @@ protected:
 	/** Set to true when the user has a mouse button depressed, and is dragging the view. */
 	bool m_IsMouseDragging;
 
+	/** Accumulator for the mouse wheel's delta. When the accumulator hits a threshold, the view zooms. */
+	int m_MouseWheelDelta;
+
 	/** Data used for rendering a chunk that hasn't been loaded yet */
 	uchar m_EmptyChunkImage[16 * 16 * 4];
 
@@ -79,6 +82,12 @@ protected:
 
 	/** Called when the user presses a key. */
 	virtual void keyPressEvent(QKeyEvent * a_Event) override;
+
+	/** Decreases the zoom level and queues a redraw. */
+	void decreaseZoom();
+
+	/** Increases the zoom level and queues a redraw. */
+	void increaseZoom();
 };
 
 

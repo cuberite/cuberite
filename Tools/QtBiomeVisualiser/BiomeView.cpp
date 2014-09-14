@@ -8,11 +8,19 @@
 
 
 
+static const int DELTA_STEP = 120;  // The normal per-notch wheel delta
+
+
+
+
+
 BiomeView::BiomeView(QWidget * parent) :
 	super(parent),
 	m_X(0),
 	m_Z(0),
-	m_Zoom(1)
+	m_Zoom(1),
+	m_IsMouseDragging(false),
+	m_MouseWheelDelta(0)
 {
 	// Create the image used for undefined chunks:
 	int offset = 0;
@@ -281,9 +289,17 @@ void BiomeView::mouseReleaseEvent(QMouseEvent *)
 
 void BiomeView::wheelEvent(QWheelEvent * a_Event)
 {
-	m_Zoom += floor(a_Event->delta() / 90.0);
-	m_Zoom = Clamp(m_Zoom, 1.0, 20.0);
-	redraw();
+	m_MouseWheelDelta += a_Event->delta();
+	while (m_MouseWheelDelta >= DELTA_STEP)
+	{
+		increaseZoom();
+		m_MouseWheelDelta -= DELTA_STEP;
+	}
+	while (m_MouseWheelDelta <= -DELTA_STEP)
+	{
+		decreaseZoom();
+		m_MouseWheelDelta += DELTA_STEP;
+	}
 }
 
 
@@ -329,27 +345,66 @@ void BiomeView::keyPressEvent(QKeyEvent * a_Event)
 		case Qt::Key_PageUp:
 		case Qt::Key_Q:
 		{
-			m_Zoom++;
-			if (m_Zoom > 20.0)
-			{
-				m_Zoom = 20.0;
-			}
-			redraw();
+			increaseZoom();
 			break;
 		}
 
 		case Qt::Key_PageDown:
 		case Qt::Key_E:
 		{
-			m_Zoom--;
-			if (m_Zoom < 1.0)
-			{
-				m_Zoom = 1.0;
-			}
-			redraw();
+			decreaseZoom();
 			break;
 		}
 	}
+}
+
+
+
+
+
+void BiomeView::decreaseZoom()
+{
+	if (m_Zoom > 1.001)
+	{
+		m_Zoom--;
+		if (m_Zoom < 1.0)
+		{
+			// Just crossed the 100%, fixate the 100% threshold:
+			m_Zoom = 1.0;
+		}
+	}
+	else if (m_Zoom > 0.01)
+	{
+		m_Zoom = m_Zoom / 2;
+	}
+	redraw();
+}
+
+
+
+
+
+void BiomeView::increaseZoom()
+{
+	if (m_Zoom > 0.99)
+	{
+		if (m_Zoom > 20.0)
+		{
+			// Zoom too large
+			return;
+		}
+		m_Zoom++;
+	}
+	else
+	{
+		m_Zoom = m_Zoom * 2;
+		if (m_Zoom > 1.0)
+		{
+			// Just crossed the 100%, fixate the 100% threshold:
+			m_Zoom = 1.0;
+		}
+	}
+	redraw();
 }
 
 
