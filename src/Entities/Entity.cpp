@@ -927,12 +927,13 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		float fallspeed;
 		if (IsBlockWater(BlockIn))
 		{
-			fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
+			fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water
+			ApplyFriction(NextSpeed, 0.7, a_Dt);
 		}
 		else if (BlockIn == E_BLOCK_COBWEB)
 		{
 			NextSpeed.y *= 0.05;  // Reduce overall falling speed
-			fallspeed = 0;  // No falling.
+			fallspeed = 0;  // No falling
 		}
 		else
 		{
@@ -943,20 +944,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		// Friction on ground
-		if (NextSpeed.SqrLength() > 0.0004f)
-		{
-			NextSpeed.x *= 0.7f / (1 + a_Dt);
-			if (fabs(NextSpeed.x) < 0.05)
-			{
-				NextSpeed.x = 0;
-			}
-			NextSpeed.z *= 0.7f / (1 + a_Dt);
-			if (fabs(NextSpeed.z) < 0.05)
-			{
-				NextSpeed.z = 0;
-			}
-		}
+		ApplyFriction(NextSpeed, 0.7, a_Dt);
 	}
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
@@ -1056,6 +1044,27 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 	SetPosition(NextPos);
 	SetSpeed(NextSpeed);
+}
+
+
+
+
+
+void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, float a_Dt)
+{
+	if (a_Speed.SqrLength() > 0.0004f)
+	{
+		a_Speed.x *= a_SlowdownMultiplier / (1 + a_Dt);
+		if (fabs(a_Speed.x) < 0.05)
+		{
+			a_Speed.x = 0;
+		}
+		a_Speed.z *= a_SlowdownMultiplier / (1 + a_Dt);
+		if (fabs(a_Speed.z) < 0.05)
+		{
+			a_Speed.z = 0;
+		}
+	}
 }
 
 

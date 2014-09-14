@@ -12,8 +12,8 @@ Installation
 
 Normally, you will want to download a pre-compiled version of MCServer from one of the buildservers:
 
- * [Linux and Raspberry Pi](http://ci.bearbin.net) (Bearbin's CI Server)
- * [Windows](http://mc-server.xoft.cz) (xoft's nightly build service)
+ * [Windows and Linux](http://builds.mc-server.org)
+ * [Raspberry Pi](http://ci.bearbin.net)
 
 You simply need to download and extract these files before you can use the server. 
 
@@ -33,7 +33,7 @@ For other stuff, including plugins and discussion, check the [forums](http://for
 
 Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 
-Support Us on Gittip: [![Support via Gittip](http://img.shields.io/gittip/mcs_team.svg)](https://www.gittip.com/mcs_team)
+Support Us on Gratipay: [![Support via Gittip](http://img.shields.io/gittip/mcs_team.svg)](https://www.gittip.com/mcs_team)
 
 Travis CI: [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer)
 

@@ -419,56 +419,44 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 
 
 
-void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop, bool a_DropVerbatim)
+void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop)
 {
 	cItems Pickups;
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	if (a_CanDrop)
 	{
-		if (!a_DropVerbatim)
-		{
-			ConvertToPickups(Pickups, Meta);
+		if ((a_Digger != NULL) && (a_Digger->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0))
+		{				
+			switch (m_BlockType)
+			{
+				case E_BLOCK_CAKE:
+				case E_BLOCK_CARROTS:
+				case E_BLOCK_COCOA_POD:
+				case E_BLOCK_DOUBLE_STONE_SLAB:
+				case E_BLOCK_DOUBLE_WOODEN_SLAB:
+				case E_BLOCK_FIRE:
+				case E_BLOCK_FARMLAND:
+				case E_BLOCK_MELON_STEM:
+				case E_BLOCK_MOB_SPAWNER:
+				case E_BLOCK_NETHER_WART:
+				case E_BLOCK_POTATOES:
+				case E_BLOCK_PUMPKIN_STEM:
+				case E_BLOCK_SNOW:
+				case E_BLOCK_SUGARCANE:
+				case E_BLOCK_TALL_GRASS:
+				case E_BLOCK_CROPS:
+				{
+					// Silktouch can't be used for these blocks
+					ConvertToPickups(Pickups, Meta);
+					break;
+				}
+				default: Pickups.Add(m_BlockType, 1, Meta); break;
+			}
 		}
 		else
 		{
-			// TODO: Add a proper overridable function for this
-			if (a_Digger != NULL)
-			{
-				cEnchantments Enchantments = a_Digger->GetEquippedWeapon().m_Enchantments;
-				if ((Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0) && a_Digger->IsPlayer())
-				{
-					switch (m_BlockType)
-					{
-						case E_BLOCK_CAKE:
-						case E_BLOCK_CARROTS:
-						case E_BLOCK_COCOA_POD:
-						case E_BLOCK_DOUBLE_STONE_SLAB:
-						case E_BLOCK_DOUBLE_WOODEN_SLAB:
-						case E_BLOCK_FIRE:
-						case E_BLOCK_FARMLAND:
-						case E_BLOCK_MELON_STEM:
-						case E_BLOCK_MOB_SPAWNER:
-						case E_BLOCK_NETHER_WART:
-						case E_BLOCK_POTATOES:
-						case E_BLOCK_PUMPKIN_STEM:
-						case E_BLOCK_SNOW:
-						case E_BLOCK_SUGARCANE:
-						case E_BLOCK_TALL_GRASS:
-						case E_BLOCK_CROPS:
-						{
-							// Silktouch can't be used for this blocks
-							ConvertToPickups(Pickups, Meta);
-							break;
-						};
-						default: Pickups.Add(m_BlockType, 1, Meta);
-					}
-				}
-				else
-				{
-					Pickups.Add(m_BlockType, 1, Meta);
-				}
-			}
+			ConvertToPickups(Pickups, Meta);
 		}
 	}
 

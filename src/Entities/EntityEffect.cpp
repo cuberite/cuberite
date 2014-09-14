@@ -233,6 +233,92 @@ void cEntityEffect::OnTick(cPawn & a_Target)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cEntityEffectSpeed:
+
+void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.2 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.2 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.26 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.2 * m_Intensity);
+	}
+}
+
+
+
+
+
+void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.2 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.2 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.26 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.2 * m_Intensity);
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cEntityEffectSlowness:
+
+void cEntityEffectSlowness::OnActivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.15 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.15 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.195 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.15 * m_Intensity);
+	}
+}
+
+
+
+
+
+void cEntityEffectSlowness::OnDeactivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.15 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.15 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.195 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.15 * m_Intensity);
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cEntityEffectInstantHealth:
 
 void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)

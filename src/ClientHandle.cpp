@@ -1068,7 +1068,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
 	)
 	{
-		// Players can't destroy blocks with a Sword in the hand.
+		// Players can't destroy blocks with a sword in the hand.
 		return;
 	}
 
