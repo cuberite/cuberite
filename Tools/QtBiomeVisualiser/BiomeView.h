@@ -35,9 +35,19 @@ public slots:
 
 protected:
 	double m_X, m_Z;
-	int m_Zoom;
+	double m_Zoom;
+
+	/** Cache for the loaded chunk data. */
 	ChunkCache m_Cache;
+
+	/** The entire view's contents in an offscreen image. */
 	QImage m_Image;
+
+	/** Coords of the mouse for the previous position, used while dragging. */
+	int m_LastX, m_LastY;
+
+	/** Set to true when the user has a mouse button depressed, and is dragging the view. */
+	bool m_IsMouseDragging;
 
 	/** Data used for rendering a chunk that hasn't been loaded yet */
 	uchar m_EmptyChunkImage[16 * 16 * 4];
@@ -55,8 +65,20 @@ protected:
 	/** Paints the entire widget */
 	virtual void paintEvent(QPaintEvent *) override;
 
-	/** Queues the chunk for rendering. */
-	void queueChunkRender(ChunkPtr a_Chunk);
+	/** Called when the user presses any mouse button. */
+	virtual void mousePressEvent(QMouseEvent * a_Event);
+
+	/** Called when the user moves the mouse. */
+	virtual void mouseMoveEvent(QMouseEvent * a_Event);
+
+	/** Called when the user releases a previously held mouse button. */
+	virtual void mouseReleaseEvent(QMouseEvent * a_Event) override;
+
+	/** Called when the user rotates the mouse wheel. */
+	virtual void wheelEvent(QWheelEvent * a_Event) override;
+
+	/** Called when the user presses a key. */
+	virtual void keyPressEvent(QKeyEvent * a_Event) override;
 };
 
 

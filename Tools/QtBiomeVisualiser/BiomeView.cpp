@@ -33,6 +33,9 @@ BiomeView::BiomeView(QWidget * parent) :
 
 	// Add a chunk-update callback mechanism:
 	connect(&m_Cache, SIGNAL(chunkAvailable(int, int)), this, SLOT(chunkAvailable(int, int)));
+
+	// Allow keyboard interaction:
+	setFocusPolicy(Qt::StrongFocus);
 }
 
 
@@ -236,9 +239,117 @@ void BiomeView::paintEvent(QPaintEvent * a_Event)
 
 
 
-void BiomeView::queueChunkRender(ChunkPtr a_Chunk)
+void BiomeView::mousePressEvent(QMouseEvent * a_Event)
 {
+	m_LastX = a_Event->x();
+	m_LastY = a_Event->y();
+	m_IsMouseDragging = true;
+}
 
+
+
+
+
+void BiomeView::mouseMoveEvent(QMouseEvent * a_Event)
+{
+	if (m_IsMouseDragging)
+	{
+		// The user is dragging the mouse, move the view around:
+		m_X += (m_LastX - a_Event->x()) / m_Zoom;
+		m_Z += (m_LastY - a_Event->y()) / m_Zoom;
+		m_LastX = a_Event->x();
+		m_LastY = a_Event->y();
+		redraw();
+		return;
+	}
+
+	// TODO: Update the status bar info for the biome currently pointed at
+}
+
+
+
+
+
+void BiomeView::mouseReleaseEvent(QMouseEvent *)
+{
+	m_IsMouseDragging = false;
+}
+
+
+
+
+
+void BiomeView::wheelEvent(QWheelEvent * a_Event)
+{
+	m_Zoom += floor(a_Event->delta() / 90.0);
+	m_Zoom = Clamp(m_Zoom, 1.0, 20.0);
+	redraw();
+}
+
+
+
+
+
+void BiomeView::keyPressEvent(QKeyEvent * a_Event)
+{
+	switch (a_Event->key())
+	{
+		case Qt::Key_Up:
+		case Qt::Key_W:
+		{
+			m_Z -= 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_Down:
+		case Qt::Key_S:
+		{
+			m_Z += 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_Left:
+		case Qt::Key_A:
+		{
+			m_X -= 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_Right:
+		case Qt::Key_D:
+		{
+			m_X += 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_PageUp:
+		case Qt::Key_Q:
+		{
+			m_Zoom++;
+			if (m_Zoom > 20.0)
+			{
+				m_Zoom = 20.0;
+			}
+			redraw();
+			break;
+		}
+
+		case Qt::Key_PageDown:
+		case Qt::Key_E:
+		{
+			m_Zoom--;
+			if (m_Zoom < 1.0)
+			{
+				m_Zoom = 1.0;
+			}
+			redraw();
+			break;
+		}
+	}
 }
 
 
