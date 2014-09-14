@@ -1573,6 +1573,7 @@ int cProtocol180::GetParticleID(const AString & a_ParticleName)
 	if (ParticleMap.find(ParticleName) == ParticleMap.end())
 	{
 		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
+		ASSERT(!"Unknown particle");
 		return 0;
 	}
 
@@ -2672,19 +2673,18 @@ cProtocol180::cPacketizer::~cPacketizer()
 
 void cProtocol180::cPacketizer::WriteUUID(const AString & a_UUID)
 {
-	AString UUID_1 = a_UUID.substr(0, a_UUID.length() / 2);
-	AString UUID_2 = a_UUID.substr(a_UUID.length() / 2);
+	if (a_UUID.length() != 32)
+	{
+		LOGWARNING("Attempt to send a bad uuid (length isn't 32): %s", a_UUID.c_str());
+		ASSERT(!"Wrong uuid length!");
+		return;
+	}
+	AString UUID_1 = a_UUID.substr(0, 16);
+	AString UUID_2 = a_UUID.substr(16);
 
 	Int64 Value_1, Value_2;
 	sscanf(UUID_1.c_str(), "%llx", &Value_1);
 	sscanf(UUID_2.c_str(), "%llx", &Value_2);
-
-	AString SValue_1, SValue_2;
-	Printf(SValue_1, "%lld", Value_1);
-	Printf(SValue_2, "%lld", Value_2);
-
-	StringToInteger<Int64>(SValue_1.c_str(), Value_1);
-	StringToInteger<Int64>(SValue_2.c_str(), Value_2);
 
 	WriteInt64(Value_1);
 	WriteInt64(Value_2);
