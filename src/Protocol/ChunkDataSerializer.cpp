@@ -192,8 +192,8 @@ void cChunkDataSerializer::Serialize80(AString & a_Data, int a_ChunkX, int a_Chu
 	{
 		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
 		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
-		Blocks[LastOffset] = (BlockType << 4) | ((unsigned char)BlockMeta);
-		Blocks[LastOffset + 1] = (unsigned char)BlockType >> 4;
+		Blocks[LastOffset] = (unsigned char)(BlockType << 4) | BlockMeta;
+		Blocks[LastOffset + 1] = (unsigned char)(BlockType >> 4);
 		LastOffset += 2;
 	}
 
@@ -215,7 +215,7 @@ void cChunkDataSerializer::Serialize80(AString & a_Data, int a_ChunkX, int a_Chu
 	Packet.WriteBEInt(a_ChunkX);
 	Packet.WriteBEInt(a_ChunkZ);
 	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
-	Packet.WriteBEShort(0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
+	Packet.WriteBEShort((short) 0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
 	Packet.WriteVarInt(DataSize);  // Chunk size
 	Packet.WriteBuf(AllData, DataSize);  // Chunk data
 
