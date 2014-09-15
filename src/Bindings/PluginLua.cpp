@@ -635,6 +635,46 @@ bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const 
 
 
 
+bool cPluginLua::OnPreEnchanting(cPlayer & a_Player, cWeightedEnchantments & a_PossibleEnchantments, cItem & a_item)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PRE_ENCHANTING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, &a_PossibleEnchantments, &a_item, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginLua::OnPostEnchanting(cPlayer & a_Player, cEnchantments & a_EnchantmentsChosen, cItem & a_item, int a_levels)
+{
+	cCSLock Lock(m_CriticalSection);
+	bool res = false;
+	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_POST_ENCHANTING];
+	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
+	{
+		m_LuaState.Call((int)(**itr), &a_Player, &a_EnchantmentsChosen, &a_item, a_levels, cLuaState::Return, res);
+		if (res)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1569,6 +1609,8 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_HANDSHAKE:                    return "OnHandshake";
 		case cPluginManager::HOOK_KILLING:                      return "OnKilling";
 		case cPluginManager::HOOK_LOGIN:                        return "OnLogin";
+		case cPluginManager::HOOK_PRE_ENCHANTING:               return "OnPreEnchanting";
+		case cPluginManager::HOOK_POST_ENCHANTING:              return "OnPostEnchanting";
 		case cPluginManager::HOOK_PLAYER_BREAKING_BLOCK:        return "OnPlayerBreakingBlock";
 		case cPluginManager::HOOK_PLAYER_BROKEN_BLOCK:          return "OnPlayerBrokenBlock";
 		case cPluginManager::HOOK_PLAYER_EATING:                return "OnPlayerEating";

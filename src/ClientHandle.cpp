@@ -2895,9 +2895,10 @@ void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 	}
 	
 	cEnchantingWindow * Window = (cEnchantingWindow*) m_Player->GetWindow();
-	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
-	int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
-
+    cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
+    // cItem & r_Item = Item;
+    int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
+    // cRoot::Get()->GetPluginManager()->CallHookPreEnchanting(*m_Player,
 	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{
 		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)

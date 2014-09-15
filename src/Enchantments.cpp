@@ -10,7 +10,6 @@
 
 
 
-
 cEnchantments::cEnchantments(void)
 {
 	// Nothing needed yet, but the constructor needs to be declared and impemented in order to be usable
@@ -894,6 +893,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 
 void cEnchantments::AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, int a_EnchantmentLevel)
 {
+
 	cWeightedEnchantment weightedenchantment;
 	weightedenchantment.m_Weight = a_Weight;
 	cEnchantments enchantment;

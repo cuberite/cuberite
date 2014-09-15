@@ -659,6 +659,48 @@ bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersi
 
 
 
+bool cPluginManager::CallHookPreEnchanting(cPlayer & a_Player, cWeightedEnchantments & a_PossibleEnchantments, cItem & a_Item)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_PRE_ENCHANTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+        if ((*itr)->OnPreEnchanting(a_Player, a_PossibleEnchantments, a_Item))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
+bool cPluginManager::CallHookPostEnchanting(cPlayer & a_Player, cEnchantments & a_EnchantmentsChosen, cItem & a_Item, int a_Levels)
+{
+	HookMap::iterator Plugins = m_Hooks.find(HOOK_POST_ENCHANTING);
+	if (Plugins == m_Hooks.end())
+	{
+		return false;
+	}
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+        if ((*itr)->OnPostEnchanting(a_Player, a_EnchantmentsChosen, a_Item, a_Levels))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation)
 {
 	FIND_HOOK(HOOK_PLAYER_ANIMATION);

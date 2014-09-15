@@ -468,6 +468,31 @@ void cLuaState::Push(const Vector3d & a_Vector)
 
 
 
+
+void cLuaState::Push(cEnchantments & a_Enchantment)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, &a_Enchantment, "cEnchantments");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cWeightedEnchantment & a_WeightedEnchantment)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, &a_WeightedEnchantment, "cWeightedEnchantment");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(const Vector3d * a_Vector)
 {
 	ASSERT(IsValid());

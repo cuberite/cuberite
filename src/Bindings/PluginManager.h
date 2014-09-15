@@ -117,7 +117,9 @@ public:
 		HOOK_PLUGIN_MESSAGE,
 		HOOK_PLUGINS_LOADED,
 		HOOK_POST_CRAFTING,
+		HOOK_POST_ENCHANTING,
 		HOOK_PRE_CRAFTING,
+		HOOK_PRE_ENCHANTING,
 		HOOK_PROJECTILE_HIT_BLOCK,
 		HOOK_PROJECTILE_HIT_ENTITY,
 		HOOK_SERVER_PING,
@@ -198,6 +200,8 @@ public:
 	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
 	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
 	bool CallHookLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username);
+	bool CallHookPreEnchanting            (cPlayer & a_Player, cWeightedEnchantments & a_PossibleEnchantments, cItem & a_item);
+	bool CallHookPostEnchanting           (cPlayer & a_Player, cEnchantments & a_EnchantmentsChosen, cItem & a_item, int a_levels);
 	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
 	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
@@ -328,7 +332,7 @@ private:
 	/** Reloads all plugins, defaulting to settings.ini for settings location */
 	void ReloadPluginsNow(void);
 
-	/** Reloads all plugins with a cIniFile object expected to be initialised to settings.ini */
+	/** Reloads all plugins with a cIniFile object expected to be initialized to settings.ini */
 	void ReloadPluginsNow(cIniFile & a_SettingsIni);
 
 	/** Unloads all plugins */

@@ -17,8 +17,10 @@
 
 
 
+
 // fwd:
 class cItemHandler;
+class cPlayer;
 
 namespace Json
 {

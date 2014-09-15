@@ -14,9 +14,12 @@
 
 
 
+
 // fwd: WorldStorage/FastNBT.h
 class cFastNBTWriter;
 class cParsedNBT;
+class cPlayer;
+class cItem;
 
 
 // fwd:

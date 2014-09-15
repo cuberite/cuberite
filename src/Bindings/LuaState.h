@@ -60,7 +60,8 @@ class cCreeper;
 class cHopperEntity;
 class cBlockEntity;
 class cBoundingBox;
-
+class cEnchantments;
+struct cWeightedEnchantment;
 typedef cBoundingBox * pBoundingBox;
 typedef cWorld *       pWorld;
 
@@ -149,10 +150,10 @@ public:
 	
 	/** Creates the m_LuaState, if not closed already. This state will be automatically closed in the destructor.
 	The regular Lua libs are registered, but the MCS API is not registered (so that Lua can be used as
-	lite-config as well), use RegisterAPILibs() to do that. */
+    lite-config as well), use RegisterAPILibs() to do that. */
 	void Create(void);
 	
-	/** Registers all the API libraries that MCS provides into m_LuaState. */
+    /** Registers all the API libraries that MCS provides into m_LuaState. */
 	void RegisterAPILibs(void);
 	
 	/** Closes the m_LuaState, if not closed already */
@@ -199,6 +200,7 @@ public:
 	void Push(cBlockEntity * a_BlockEntity);
 	void Push(cChunkDesc * a_ChunkDesc);
 	void Push(cClientHandle * a_ClientHandle);
+    void Push(cEnchantments & a_Enchantment);
 	void Push(cEntity * a_Entity);
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cItem * a_Item);
@@ -217,7 +219,8 @@ public:
 	void Push(TakeDamageInfo * a_TDI);
 	void Push(Vector3d * a_Vector);
 	void Push(Vector3i * a_Vector);
-	void Push(void * a_Ptr);
+    void Push(void * a_Ptr);
+    void Push(cWeightedEnchantment & a_WeightedEnchantment);
 	
 	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, bool & a_Value);
