@@ -142,7 +142,6 @@ static void biomesToImage(cChunkDef::BiomeMap & a_Biomes, Chunk::Image & a_Image
 
 BioGenSource::BioGenSource(QString a_WorldIniPath) :
 	m_WorldIniPath(a_WorldIniPath),
-	m_WorldIni(new cIniFile),
 	m_Mtx(QMutex::Recursive)
 {
 	reload();
@@ -154,14 +153,11 @@ BioGenSource::BioGenSource(QString a_WorldIniPath) :
 
 void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk)
 {
-	cBiomeGenPtr biomeGen;
+	cChunkDef::BiomeMap biomes;
 	{
 		QMutexLocker lock(&m_Mtx);
-		biomeGen = getBiomeGen();
+		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
 	}
-	cChunkDef::BiomeMap biomes;
-	biomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
-	releaseBiomeGen(biomeGen);
 	Chunk::Image img;
 	biomesToImage(biomes, img);
 	a_DestChunk->setImage(img);
@@ -173,52 +169,15 @@ void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChu
 
 void BioGenSource::reload()
 {
+	cIniFile ini;
+	if (!ini.ReadFile(m_WorldIniPath.toStdString()))
 	{
-		QMutexLocker lock(&m_Mtx);
-		if (!m_WorldIni->ReadFile(m_WorldIniPath.toStdString()))
-		{
-			return;
-		}
-		m_AvailableGens.clear();
+		return;
 	}
-}
-
-
-
-
-cBiomeGenPtr BioGenSource::getBiomeGen()
-{
-	QMutexLocker lock(&m_Mtx);
-
-	// Return a generator from the cache, if available:
-	if (!m_AvailableGens.empty())
-	{
-		cBiomeGenPtr res = m_AvailableGens.back();
-		m_AvailableGens.pop_back();
-		return res;
-	}
-
-	// No generator in cache available, create a new one:
-	int seed = m_WorldIni->GetValueSetI("Seed", "Seed", 0);
+	int seed = ini.GetValueSetI("Seed", "Seed", 0);
 	bool unused = false;
-	return cBiomeGenPtr(cBiomeGen::CreateBiomeGen(*m_WorldIni, seed, unused));
-}
-
-
-
-
-
-void BioGenSource::releaseBiomeGen(cBiomeGenPtr a_BiomeGen)
-{
 	QMutexLocker lock(&m_Mtx);
-	m_AvailableGens.push_back(a_BiomeGen);
-
-	// Trim the cache if there are too many gens:
-	int wantedNumGens = QThread::idealThreadCount();
-	if (m_AvailableGens.size() > (size_t)(4 * wantedNumGens))
-	{
-		m_AvailableGens.resize(wantedNumGens);
-	}
+	m_BiomeGen.reset(cBiomeGen::CreateBiomeGen(ini, seed, unused));
 }
 
 
