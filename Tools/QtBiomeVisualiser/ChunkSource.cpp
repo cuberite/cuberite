@@ -103,9 +103,9 @@ public:
 		for (size_t i = 0; i < ARRAYCOUNT(biomeColors); i++)
 		{
 			uchar * color = &biomeToColor[4 * biomeColors[i].m_Biome];
-			color[0] = biomeColors[i].m_Color[0];
+			color[0] = biomeColors[i].m_Color[2];
 			color[1] = biomeColors[i].m_Color[1];
-			color[2] = biomeColors[i].m_Color[2];
+			color[2] = biomeColors[i].m_Color[0];
 			color[3] = 0xff;
 		}
 	}
@@ -170,14 +170,13 @@ void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChu
 void BioGenSource::reload()
 {
 	cIniFile ini;
-	if (!ini.ReadFile(m_WorldIniPath.toStdString()))
-	{
-		return;
-	}
+	ini.ReadFile(m_WorldIniPath.toStdString());
 	int seed = ini.GetValueSetI("Seed", "Seed", 0);
 	bool unused = false;
 	QMutexLocker lock(&m_Mtx);
 	m_BiomeGen.reset(cBiomeGen::CreateBiomeGen(ini, seed, unused));
+	lock.unlock();
+	ini.WriteFile(m_WorldIniPath.toStdString());
 }
 
 
