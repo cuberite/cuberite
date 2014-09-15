@@ -33,6 +33,9 @@ public slots:
 	/** A specified chunk has become available, redraw it. */
 	void chunkAvailable(int a_ChunkX, int a_ChunkZ);
 
+	/** Reloads the current chunk source and redraws the entire workspace. */
+	void reload();
+
 protected:
 	double m_X, m_Z;
 	double m_Zoom;

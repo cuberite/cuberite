@@ -131,6 +131,21 @@ void BiomeView::chunkAvailable(int a_ChunkX, int a_ChunkZ)
 
 
 
+void BiomeView::reload()
+{
+	if (!hasData())
+	{
+		return;
+	}
+	m_Cache.reload();
+
+	redraw();
+}
+
+
+
+
+
 void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 {
 	if (!hasData())

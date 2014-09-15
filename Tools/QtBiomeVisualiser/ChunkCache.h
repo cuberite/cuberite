@@ -36,7 +36,10 @@ public:
 	void setChunkSource(std::shared_ptr<ChunkSource> a_ChunkSource);
 
 	/** Returns true iff the chunk source has been initialized. */
-	bool hasData(void) const { return (m_ChunkSource.get() != nullptr); }
+	bool hasData() const { return (m_ChunkSource.get() != nullptr); }
+
+	/** Reloads the current chunk source. */
+	void reload();
 
 signals:
 	void chunkAvailable(int a_ChunkX, int a_ChunkZ);

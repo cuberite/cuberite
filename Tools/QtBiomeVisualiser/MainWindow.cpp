@@ -16,11 +16,11 @@
 MainWindow::MainWindow(QWidget * parent) :
 	QMainWindow(parent)
 {
-	createActions();
-	createMenus();
-
 	m_BiomeView = new BiomeView(this);
 	setCentralWidget(m_BiomeView);
+
+	createActions();
+	createMenus();
 }
 
 
@@ -68,6 +68,11 @@ void MainWindow::createActions()
 	m_actOpen->setStatusTip(tr("Open an existing world and display its biomes"));
 	connect(m_actOpen, SIGNAL(triggered()), this, SLOT(open()));
 
+	m_actReload = new QAction(tr("&Reload"), this);
+	m_actReload->setShortcut(tr("F5"));
+	m_actReload->setStatusTip(tr("Open an existing world and display its biomes"));
+	connect(m_actReload, SIGNAL(triggered()), m_BiomeView, SLOT(reload()));
+
 	m_actExit = new QAction(tr("E&xit"), this);
 	m_actExit->setShortcut(tr("Alt+X"));
 	m_actExit->setStatusTip(tr("Exit %1").arg(QApplication::instance()->applicationName()));
@@ -83,6 +88,8 @@ void MainWindow::createMenus()
 	QMenu * mFile = menuBar()->addMenu(tr("&World"));
 	mFile->addAction(m_actGen);
 	mFile->addAction(m_actOpen);
+	mFile->addSeparator();
+	mFile->addAction(m_actReload);
 	mFile->addSeparator();
 	mFile->addAction(m_actExit);
 }

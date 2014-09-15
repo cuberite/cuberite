@@ -76,6 +76,22 @@ void ChunkCache::setChunkSource(std::shared_ptr<ChunkSource> a_ChunkSource)
 
 
 
+void ChunkCache::reload()
+{
+	assert(m_ChunkSource.get() != nullptr);
+
+	// Reload the chunk source:
+	m_ChunkSource->reload();
+
+	// Clear the cache:
+	QMutexLocker lock(&m_Mtx);
+	m_Cache.clear();
+}
+
+
+
+
+
 void ChunkCache::gotChunk(int a_ChunkX, int a_ChunkZ)
 {
 	emit chunkAvailable(a_ChunkX, a_ChunkZ);

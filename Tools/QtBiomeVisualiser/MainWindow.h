@@ -29,6 +29,7 @@ protected:
 	// Actions:
 	QAction * m_actGen;
 	QAction * m_actOpen;
+	QAction * m_actReload;
 	QAction * m_actExit;
 
 
