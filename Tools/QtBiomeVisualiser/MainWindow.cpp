@@ -39,19 +39,7 @@ MainWindow::~MainWindow()
 void MainWindow::generate()
 {
 	QString worldIni = QFileDialog::getOpenFileName(this, tr("Open world.ini"), QString(), tr("world.ini (world.ini)"));
-	cIniFile ini;
-	if (!ini.ReadFile(worldIni.toStdString()))
-	{
-		return;
-	}
-	int seed = ini.GetValueSetI("Seed", "Seed", 0);
-	bool unused = false;
-	cBiomeGen * biomeGen = cBiomeGen::CreateBiomeGen(ini, seed, unused);
-	if (biomeGen == nullptr)
-	{
-		return;
-	}
-	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(biomeGen)));
+	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(worldIni)));
 	m_BiomeView->redraw();
 }
 
