@@ -1043,6 +1043,14 @@ bool cPlayer::IsGameModeAdventure(void) const
 
 
 
+bool cPlayer::IsGameModeSpectator(void) const
+{
+	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Adventure
+}
+
+
+
 
 void cPlayer::SetTeam(cTeam * a_Team)
 {
