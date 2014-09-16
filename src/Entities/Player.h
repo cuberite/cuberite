@@ -171,6 +171,9 @@ public:
 	/** Returns true if the player is in Adventure mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeAdventure(void) const;
 	
+	/** Returns true if the player is in Spectator mode, either explicitly, or by inheriting from current world */
+	bool IsGameModeSpectator(void) const;
+	
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, NULL if none */
