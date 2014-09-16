@@ -1166,7 +1166,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
 
-	if (!IsGameModeCreative())
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
 		SetFlying(false);
 		SetCanFly(false);
@@ -1348,6 +1348,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos)
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
+	// Need to Check if this or other players are in gamemode spectator
 	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
