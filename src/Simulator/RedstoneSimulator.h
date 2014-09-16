@@ -4,6 +4,12 @@
 #include "Simulator.h"
 
 
+class cRedstoneSimulatorChunkData
+{
+public:
+	virtual ~cRedstoneSimulatorChunkData() {}
+} ;
+
 
 template <class ChunkType, class WorldType>
 class cRedstoneSimulator :

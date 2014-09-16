@@ -417,11 +417,6 @@ public:
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
-	cRedstoneSimulatorChunkData * GetRedstoneSimulatorQueuedData(void) { return &m_RedstoneSimulatorQueuedData; }
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::PoweredBlocksList * GetRedstoneSimulatorPoweredBlocksList(void) { return &m_RedstoneSimulatorPoweredBlocksList; }
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::LinkedBlocksList * GetRedstoneSimulatorLinkedBlocksList(void) { return &m_RedstoneSimulatorLinkedBlocksList; }
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::SimulatedPlayerToggleableList * GetRedstoneSimulatorSimulatedPlayerToggleableList(void) { return &m_RedstoneSimulatorSimulatedPlayerToggleableList; }
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::RepeatersDelayList * GetRedstoneSimulatorRepeatersDelayList(void) { return &m_RedstoneSimulatorRepeatersDelayList; }
 	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
 	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
@@ -507,11 +502,7 @@ private:
 	cSandSimulatorChunkData m_SandSimulatorData;
 
 	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
-	cRedstoneSimulatorChunkData m_RedstoneSimulatorQueuedData;
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::PoweredBlocksList m_RedstoneSimulatorPoweredBlocksList;
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::LinkedBlocksList m_RedstoneSimulatorLinkedBlocksList;
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::SimulatedPlayerToggleableList m_RedstoneSimulatorSimulatedPlayerToggleableList;
-	cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>::RepeatersDelayList m_RedstoneSimulatorRepeatersDelayList;
+
 
 	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
 	bool m_IsRedstoneDirty;

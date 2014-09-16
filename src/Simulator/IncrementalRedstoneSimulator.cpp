@@ -1,9 +1,6 @@
 
 #include "Globals.h"
 
-#ifndef SELF_TEST
-
-#include "IncrementalRedstoneSimulator.h"
 
 #include "IncrementalRedstoneSimulator.inc"
 
@@ -18,6 +15,8 @@
 #include "Blocks/BlockPiston.h"
 #include "BlockEntities/ChestEntity.h"
 
-#pragma clang diagnostic ignored "-Wweak-template-vtables"
-template class cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>;
-#endif
+cRedstoneSimulator<cChunk, cWorld> * MakeIncrementalRedstoneSimulator(cWorld & a_World)
+{
+	return new cIncrementalRedstoneSimulator<cChunk, cWorld, GetHandlerCompileTime, cChestEntity>(a_World);
+}
+
