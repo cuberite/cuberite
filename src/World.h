@@ -470,7 +470,7 @@ public:
 	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
 
 	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
-	int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward);
+	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
 
 	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided */
 	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);

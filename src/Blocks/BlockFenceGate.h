@@ -17,6 +17,12 @@ public:
 	}
 
 
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.Add(E_BLOCK_FENCE_GATE, 1, 0);  // Reset meta to zero
+	}
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,

@@ -312,8 +312,16 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	ASSERT(m_Player == NULL);
 
 	m_Username = a_Name;
-	m_UUID = a_UUID;
-	m_Properties = a_Properties;
+	
+	// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
+	if (m_UUID.empty())
+	{
+		m_UUID = a_UUID;
+	}
+	if (m_Properties.empty())
+	{
+		m_Properties = a_Properties;
+	}
 	
 	// Send login success (if the protocol supports it):
 	m_Protocol->SendLoginSuccess();
@@ -1063,7 +1071,7 @@ void cClientHandle::HandleBlockDigStarted(int a_BlockX, int a_BlockY, int a_Bloc
 		(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ) != E_BLOCK_FIRE)
 	)
 	{
-		// Players can't destroy blocks with a Sword in the hand.
+		// Players can't destroy blocks with a sword in the hand.
 		return;
 	}
 
@@ -1133,6 +1141,12 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	}
 
 	FinishDigAnimation();
+
+	if (!m_Player->IsGameModeCreative() && (a_OldBlock == E_BLOCK_BEDROCK))
+	{
+		Kick("You can't break a bedrock!");
+		return;
+	}
 
 	cWorld * World = m_Player->GetWorld();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
@@ -1447,8 +1461,20 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
-	// Step sound with 0.8f pitch is used as block placement sound
-	World->BroadcastSoundEffect(cBlockInfo::GetPlaceSound(BlockType), (double)a_BlockX, (double)a_BlockY, (double)a_BlockZ, 1.0f, 0.8f);
+	AString PlaceSound = cBlockInfo::GetPlaceSound(BlockType);
+	float Volume = 1.0f, Pitch = 0.8f;
+	if (PlaceSound == "dig.metal")
+	{
+		Pitch = 1.2f;
+		PlaceSound = "dig.stone";
+	}
+	else if (PlaceSound == "random.anvil_land")
+	{
+		Volume = 0.65f;
+	}
+
+	World->BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
+
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 

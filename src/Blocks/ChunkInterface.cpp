@@ -26,9 +26,9 @@ bool cChunkInterface::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ,
 /** Sets the block at the specified coords to the specified value.
 Full processing, incl. updating neighbors, is performed.
 */
-void cChunkInterface::SetBlock(cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cChunkInterface::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_ChunkMap->SetBlock(a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	m_ChunkMap->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
 void cChunkInterface::SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)

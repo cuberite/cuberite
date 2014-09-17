@@ -10,11 +10,13 @@
 
 
 
-cVoronoiMap::cVoronoiMap(int a_Seed, int a_CellSize) :
+cVoronoiMap::cVoronoiMap(int a_Seed, int a_CellSize, int a_JitterSize) :
 	m_Noise1(a_Seed + 1),
 	m_Noise2(a_Seed + 2),
 	m_Noise3(a_Seed + 3),
-	m_CellSize(a_CellSize),
+	m_CellSize(std::max(a_CellSize, 2)),
+	m_JitterSize(Clamp(a_JitterSize, 1, a_CellSize)),
+	m_OddRowOffset(0),
 	m_CurrentCellX(9999999),  // Cell coords that are definitely out of the range for normal generator, so that the first query will overwrite them
 	m_CurrentCellZ(9999999)
 {
@@ -26,7 +28,29 @@ cVoronoiMap::cVoronoiMap(int a_Seed, int a_CellSize) :
 
 void cVoronoiMap::SetCellSize(int a_CellSize)
 {
+	a_CellSize = std::max(a_CellSize, 2);  // Cell size must be at least 2
 	m_CellSize = a_CellSize;
+
+	// For compatibility with previous version, which didn't have the jitter, we set jitter here as well.
+	m_JitterSize = a_CellSize;
+}
+
+
+
+
+
+void cVoronoiMap::SetJitterSize(int a_JitterSize)
+{
+	m_JitterSize = Clamp(a_JitterSize, 1, m_CellSize);
+}
+
+
+
+
+
+void cVoronoiMap::SetOddRowOffset(int a_OddRowOffset)
+{
+	m_OddRowOffset = Clamp(a_OddRowOffset, -m_CellSize, m_CellSize);
 }
 
 
@@ -111,12 +135,13 @@ void cVoronoiMap::UpdateCell(int a_CellX, int a_CellZ)
 	for (int x = 0; x < 5; x++)
 	{
 		int BaseX = (NoiseBaseX + x) * m_CellSize;
+		int OddRowOffset = ((NoiseBaseX + x) & 0x01) * m_OddRowOffset;
 		for (int z = 0; z < 5; z++)
 		{
-			int OffsetX = (m_Noise1.IntNoise2DInt(NoiseBaseX + x, NoiseBaseZ + z) / 8) % m_CellSize;
-			int OffsetZ = (m_Noise2.IntNoise2DInt(NoiseBaseX + x, NoiseBaseZ + z) / 8) % m_CellSize;
+			int OffsetX = (m_Noise1.IntNoise2DInt(NoiseBaseX + x, NoiseBaseZ + z) / 8) % m_JitterSize;
+			int OffsetZ = (m_Noise2.IntNoise2DInt(NoiseBaseX + x, NoiseBaseZ + z) / 8) % m_JitterSize;
 			m_SeedX[x][z] = BaseX + OffsetX;
-			m_SeedZ[x][z] = (NoiseBaseZ + z) * m_CellSize + OffsetZ;
+			m_SeedZ[x][z] = (NoiseBaseZ + z) * m_CellSize + OddRowOffset + OffsetZ;
 		}  // for z
 	}  // for x
 	m_CurrentCellX = a_CellX;

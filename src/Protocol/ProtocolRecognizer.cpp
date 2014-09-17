@@ -27,7 +27,7 @@
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
 	m_Protocol(NULL),
-	m_Buffer(512)
+	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 {
 }
 

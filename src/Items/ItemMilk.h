@@ -21,8 +21,12 @@ public:
 	{
 		UNUSED(a_Item);
 		a_Player->ClearEntityEffects();
-		a_Player->GetInventory().RemoveOneEquippedItem();
-		a_Player->GetInventory().AddItem(E_ITEM_BUCKET);
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+			a_Player->GetInventory().AddItem(E_ITEM_BUCKET);
+		}
 		return true;
 	}
 };

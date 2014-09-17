@@ -64,14 +64,26 @@ public:
 
 	const AString & GetIPString(void) const { return m_IPString; }  // tolua_export
 	
+	/** Sets the IP string that the client is using. Overrides the IP string that was read from the socket.
+	Used mainly by BungeeCord compatibility code. */
+	void SetIPString(const AString & a_IPString) { m_IPString = a_IPString; }
+	
 	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 
 	/** Returns the player's UUID, as used by the protocol, in the short form (no dashes) */
 	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
 	
-	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+	/** Sets the player's UUID, as used by the protocol. Short UUID form (no dashes) is expected.
+	Used mainly by BungeeCord compatibility code - when authenticating is done on the BungeeCord server
+	and the results are passed to MCS running in offline mode. */
+	void SetUUID(const AString & a_UUID) { ASSERT(a_UUID.size() == 32); m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
+	
+	/** Sets the player's properties, such as skin image and signature.
+	Used mainly by BungeeCord compatibility code - property querying is done on the BungeeCord server
+	and the results are passed to MCS running in offline mode. */
+	void SetProperties(const Json::Value & a_Properties) { m_Properties = a_Properties; }
 	
 	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
 	This is used for the offline (non-auth) mode, when there's no UUID source.

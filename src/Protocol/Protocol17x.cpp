@@ -100,6 +100,19 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_IsEncrypted(false),
 	m_LastSentDimension(dimNotSet)
 {
+	// BungeeCord handling:
+	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+	// hostname\00ip-address\00uuid\00profile-properties-as-json
+	AStringVector Params;
+	if (SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	{
+		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+		m_ServerAddress = Params[0];
+		m_Client->SetIPString(Params[1]);
+		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+		m_Client->SetProperties(Params[3]);
+	}
+	
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
@@ -1033,9 +1046,9 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	
 	cPacketizer Pkt(*this, 0x11);
 	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
 	Pkt.WriteShort(a_ExpOrb.GetReward());
 }
 
