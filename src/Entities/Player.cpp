@@ -451,7 +451,7 @@ void cPlayer::CancelChargingBow(void)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
-	if (IsGameModeSpectator()) // You can fly through the ground in Spectator
+	if (IsGameModeSpectator())  // You can fly through the ground in Spectator
 	{
 		return;
 	}
@@ -1514,7 +1514,7 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
-	if (IsGameModeSpectator()) // Players can't toss items in spectator
+	if (IsGameModeSpectator())  // Players can't toss items in spectator
 	{
 		return;
 	}

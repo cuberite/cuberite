@@ -113,8 +113,8 @@ void cRoot::Start(void)
 	LOG("--- Started Log ---\n");
 
 	#ifdef BUILD_ID
-	LOG("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID );
-	LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME );
+	LOG("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+	LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
 	#endif
 
 	cDeadlockDetect dd;
