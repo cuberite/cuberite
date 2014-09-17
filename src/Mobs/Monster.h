@@ -6,6 +6,7 @@
 #include "../BlockID.h"
 #include "../Item.h"
 #include "../Enchantments.h"
+#include "MonsterTypes.h"
 
 
 
@@ -15,50 +16,13 @@ class cClientHandle;
 class cWorld;
 
 
-
-
 // tolua_begin
 class cMonster :
 	public cPawn
 {
 	typedef cPawn super;
 public:
-	/// This identifies individual monster type, as well as their network type-ID
-	enum eType
-	{
-		mtInvalidType = -1,
-		
-		mtBat          = E_META_SPAWN_EGG_BAT,
-		mtBlaze        = E_META_SPAWN_EGG_BLAZE,
-		mtCaveSpider   = E_META_SPAWN_EGG_CAVE_SPIDER,
-		mtChicken      = E_META_SPAWN_EGG_CHICKEN,
-		mtCow          = E_META_SPAWN_EGG_COW,
-		mtCreeper      = E_META_SPAWN_EGG_CREEPER,
-		mtEnderDragon  = E_META_SPAWN_EGG_ENDER_DRAGON,
-		mtEnderman     = E_META_SPAWN_EGG_ENDERMAN,
-		mtGhast        = E_META_SPAWN_EGG_GHAST,
-		mtGiant        = E_META_SPAWN_EGG_GIANT,
-		mtHorse        = E_META_SPAWN_EGG_HORSE,
-		mtIronGolem    = E_META_SPAWN_EGG_IRON_GOLEM,
-		mtMagmaCube    = E_META_SPAWN_EGG_MAGMA_CUBE,
-		mtMooshroom    = E_META_SPAWN_EGG_MOOSHROOM,
-		mtOcelot       = E_META_SPAWN_EGG_OCELOT,
-		mtPig          = E_META_SPAWN_EGG_PIG,
-		mtSheep        = E_META_SPAWN_EGG_SHEEP,
-		mtSilverfish   = E_META_SPAWN_EGG_SILVERFISH,
-		mtSkeleton     = E_META_SPAWN_EGG_SKELETON,
-		mtSlime        = E_META_SPAWN_EGG_SLIME,
-		mtSnowGolem    = E_META_SPAWN_EGG_SNOW_GOLEM,
-		mtSpider       = E_META_SPAWN_EGG_SPIDER,
-		mtSquid        = E_META_SPAWN_EGG_SQUID,
-		mtVillager     = E_META_SPAWN_EGG_VILLAGER,
-		mtWitch        = E_META_SPAWN_EGG_WITCH,
-		mtWither       = E_META_SPAWN_EGG_WITHER,
-		mtWolf         = E_META_SPAWN_EGG_WOLF,
-		mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
-		mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
-	} ;
-
+	
 	enum eFamily
 	{
 		mfHostile  = 0,  // Spider, Zombies ...
@@ -80,7 +44,7 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
 	CLASS_PROTODEF(cMonster)
 	
@@ -96,7 +60,7 @@ public:
 	virtual bool ReachedDestination(void);
 	
 	// tolua_begin
-	eType GetMobType(void) const {return m_MobType; }
+	eMonsterType GetMobType(void) const {return m_MobType; }
 	eFamily GetMobFamily(void) const;
 	// tolua_end
 	
@@ -146,13 +110,13 @@ public:
 	// tolua_begin
 	
 	/// Translates MobType enum to a string, empty string if unknown
-	static AString MobTypeToString(eType a_MobType);
+	static AString MobTypeToString(eMonsterType a_MobType);
 	
 	/// Translates MobType string to the enum, mtInvalidType if not recognized
-	static eType StringToMobType(const AString & a_MobTypeName);
+	static eMonsterType StringToMobType(const AString & a_MobTypeName);
 	
 	/// Returns the mob family based on the type
-	static eFamily FamilyFromType(eType a_MobType);
+	static eFamily FamilyFromType(eMonsterType a_MobType);
 
 	/// Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family
 	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
@@ -163,7 +127,7 @@ public:
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
 	*/
-	static cMonster * NewMonsterFromType(eType a_MobType);
+	static cMonster * NewMonsterFromType(eMonsterType a_MobType);
 
 protected:
 	
@@ -227,7 +191,7 @@ protected:
 	float m_IdleInterval;
 	float m_DestroyTimer;
 
-	eType m_MobType;
+	eMonsterType m_MobType;
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;

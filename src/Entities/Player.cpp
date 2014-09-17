@@ -2003,8 +2003,8 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 				cMonster * Monster = (cMonster *)m_AttachedTo;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
-					case cMonster::mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
+					case mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
 					default: break;
 				}
 				break;

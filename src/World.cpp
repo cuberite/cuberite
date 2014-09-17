@@ -791,8 +791,8 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
 	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
 	{
-		cMonster::eType ToAdd = cMonster::StringToMobType(*itr);
-		if (ToAdd != cMonster::mtInvalidType)
+		eMonsterType ToAdd = cMonster::StringToMobType(*itr);
+		if (ToAdd != mtInvalidType)
 		{
 			m_AllowedMobs.insert(ToAdd);
 			LOGD("Allowed mob: %s", itr->c_str());
@@ -3126,7 +3126,7 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType)
+int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
 {
 	cMonster * Monster = NULL;
 

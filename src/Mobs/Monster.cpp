@@ -24,38 +24,38 @@ The strings need to be lowercase (for more efficient comparisons in StringToMobT
 */
 static const struct
 {
-	cMonster::eType m_Type;
+	eMonsterType m_Type;
 	const char * m_lcName;
 } g_MobTypeNames[] =
 {
-	{cMonster::mtBat,          "bat"},
-	{cMonster::mtBlaze,        "blaze"},
-	{cMonster::mtCaveSpider,   "cavespider"},
-	{cMonster::mtChicken,      "chicken"},
-	{cMonster::mtCow,          "cow"},
-	{cMonster::mtCreeper,      "creeper"},
-	{cMonster::mtEnderman,     "enderman"},
-	{cMonster::mtEnderDragon,  "enderdragon"},
-	{cMonster::mtGhast,        "ghast"},
-	{cMonster::mtHorse,        "horse"},
-	{cMonster::mtIronGolem,    "irongolem"},
-	{cMonster::mtMagmaCube,    "magmacube"},
-	{cMonster::mtMooshroom,    "mooshroom"},
-	{cMonster::mtOcelot,       "ocelot"},
-	{cMonster::mtPig,          "pig"},
-	{cMonster::mtSheep,        "sheep"},
-	{cMonster::mtSilverfish,   "silverfish"},
-	{cMonster::mtSkeleton,     "skeleton"},
-	{cMonster::mtSlime,        "slime"},
-	{cMonster::mtSnowGolem,    "snowgolem"},
-	{cMonster::mtSpider,       "spider"},
-	{cMonster::mtSquid,        "squid"},
-	{cMonster::mtVillager,     "villager"},
-	{cMonster::mtWitch,        "witch"},
-	{cMonster::mtWither,       "wither"},
-	{cMonster::mtWolf,         "wolf"},
-	{cMonster::mtZombie,       "zombie"},
-	{cMonster::mtZombiePigman, "zombiepigman"},
+	{mtBat,          "bat"},
+	{mtBlaze,        "blaze"},
+	{mtCaveSpider,   "cavespider"},
+	{mtChicken,      "chicken"},
+	{mtCow,          "cow"},
+	{mtCreeper,      "creeper"},
+	{mtEnderman,     "enderman"},
+	{mtEnderDragon,  "enderdragon"},
+	{mtGhast,        "ghast"},
+	{mtHorse,        "horse"},
+	{mtIronGolem,    "irongolem"},
+	{mtMagmaCube,    "magmacube"},
+	{mtMooshroom,    "mooshroom"},
+	{mtOcelot,       "ocelot"},
+	{mtPig,          "pig"},
+	{mtSheep,        "sheep"},
+	{mtSilverfish,   "silverfish"},
+	{mtSkeleton,     "skeleton"},
+	{mtSlime,        "slime"},
+	{mtSnowGolem,    "snowgolem"},
+	{mtSpider,       "spider"},
+	{mtSquid,        "squid"},
+	{mtVillager,     "villager"},
+	{mtWitch,        "witch"},
+	{mtWither,       "wither"},
+	{mtWolf,         "wolf"},
+	{mtZombie,       "zombie"},
+	{mtZombiePigman, "zombiepigman"},
 } ;
 
 
@@ -65,7 +65,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
@@ -485,50 +485,50 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	switch (m_MobType)
 	{
 		// Animals
-		case cMonster::mtChicken:
-		case cMonster::mtCow:
-		case cMonster::mtHorse:
-		case cMonster::mtPig:
-		case cMonster::mtSheep:
-		case cMonster::mtSquid:
-		case cMonster::mtMooshroom:
-		case cMonster::mtOcelot:
-		case cMonster::mtWolf:
+		case mtChicken:
+		case mtCow:
+		case mtHorse:
+		case mtPig:
+		case mtSheep:
+		case mtSquid:
+		case mtMooshroom:
+		case mtOcelot:
+		case mtWolf:
 		{
 			Reward = m_World->GetTickRandomNumber(2) + 1;
 			break;
 		}
 
 		// Monsters
-		case cMonster::mtCaveSpider:
-		case cMonster::mtCreeper:
-		case cMonster::mtEnderman:
-		case cMonster::mtGhast:
-		case cMonster::mtSilverfish:
-		case cMonster::mtSkeleton:
-		case cMonster::mtSpider:
-		case cMonster::mtWitch:
-		case cMonster::mtZombie:
-		case cMonster::mtZombiePigman:
-		case cMonster::mtSlime:
-		case cMonster::mtMagmaCube:
+		case mtCaveSpider:
+		case mtCreeper:
+		case mtEnderman:
+		case mtGhast:
+		case mtSilverfish:
+		case mtSkeleton:
+		case mtSpider:
+		case mtWitch:
+		case mtZombie:
+		case mtZombiePigman:
+		case mtSlime:
+		case mtMagmaCube:
 		{
 			Reward = 6 + (m_World->GetTickRandomNumber(2));
 			break;
 		}
-		case cMonster::mtBlaze:
+		case mtBlaze:
 		{
 			Reward = 10;
 			break;
 		}
 
 		// Bosses
-		case cMonster::mtEnderDragon:
+		case mtEnderDragon:
 		{
 			Reward = 12000;
 			break;
 		}
-		case cMonster::mtWither:
+		case mtWither:
 		{
 			Reward = 50;
 			break;
@@ -697,7 +697,7 @@ bool cMonster::IsUndead(void)
 
 
 
-AString cMonster::MobTypeToString(cMonster::eType a_MobType)
+AString cMonster::MobTypeToString(eMonsterType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
@@ -716,7 +716,7 @@ AString cMonster::MobTypeToString(cMonster::eType a_MobType)
 
 
 
-cMonster::eType cMonster::StringToMobType(const AString & a_Name)
+eMonsterType cMonster::StringToMobType(const AString & a_Name)
 {
 	AString lcName = StrToLower(a_Name);
 	
@@ -757,7 +757,7 @@ cMonster::eType cMonster::StringToMobType(const AString & a_Name)
 
 
 
-cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
+cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 {
 	// Passive-agressive mobs are counted in mob spawning code as passive
 
@@ -822,7 +822,7 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
+cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	cFastRandom Random;
 	cMonster * toReturn = NULL;

@@ -151,7 +151,7 @@ public:
 			a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX - 1, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 
 			// Spawn the wither:
-			a_WorldInterface.SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtWither);
+			a_WorldInterface.SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, mtWither);
 
 			// Award Achievement
 			a_WorldInterface.ForEachPlayer(PlayerCallback);
@@ -181,7 +181,7 @@ public:
 			a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX, a_BlockY, a_BlockZ - 1, E_BLOCK_AIR, 0);
 
 			// Spawn the wither:
-			a_WorldInterface.SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, cMonster::mtWither);
+			a_WorldInterface.SpawnMob(a_BlockX + 0.5, a_BlockY - 2, a_BlockZ + 0.5, mtWither);
 
 			// Award Achievement
 			a_WorldInterface.ForEachPlayer(PlayerCallback);

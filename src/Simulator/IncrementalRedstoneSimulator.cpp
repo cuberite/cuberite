@@ -1,6 +1,9 @@
 
 #include "Globals.h"
 
+#include "BlockEntities/ChestEntity.h"
+
+typedef cItemCallback<cChestEntity> cChestCallback;
 
 #include "IncrementalRedstoneSimulator.inc"
 
@@ -13,7 +16,6 @@
 #include "Blocks/BlockTripwireHook.h"
 #include "Blocks/BlockDoor.h"
 #include "Blocks/BlockPiston.h"
-#include "BlockEntities/ChestEntity.h"
 
 cRedstoneSimulator<cChunk, cWorld> * MakeIncrementalRedstoneSimulator(cWorld & a_World)
 {

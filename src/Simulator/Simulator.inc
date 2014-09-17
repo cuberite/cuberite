@@ -1,10 +1,6 @@
 
 
 #include "Simulator.h"
-#include "../World.h"
-#include "../BlockID.h"
-#include "../Defines.h"
-#include "../Chunk.h"
 
 
 

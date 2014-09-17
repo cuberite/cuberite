@@ -768,7 +768,7 @@ public:
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) override;  // tolua_export
+	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) override;  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
@@ -923,7 +923,7 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	bool m_bAnimals;
-	std::set<cMonster::eType> m_AllowedMobs;
+	std::set<eMonsterType> m_AllowedMobs;
 
 	eWeather m_Weather;
 	int m_WeatherInterval;

@@ -6,6 +6,8 @@
 #include "RedstoneSimulator.h"
 
 
+typedef cItemCallback<cEntity> cEntityCallback;
+
 
 
 
@@ -1630,7 +1632,7 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 		}
 		default:
 		{
-			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(a_MyType).c_str());
+			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(cItem(a_MyType)).c_str());
 			break;
 		}
 	}
@@ -1701,37 +1703,42 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 	}
 }
 
+template <class ChestType>
+class cGetTrappedChestPlayers :
+	public cItemCallback<ChestType>
+{
+public:
+	cGetTrappedChestPlayers(void) :
+		m_NumberOfPlayers(0)
+	{
+	}
 
+	virtual ~cGetTrappedChestPlayers()
+	{
+	}
+
+	virtual bool Item(ChestType * a_Chest) override
+	{
+		ASSERT(a_Chest->GetBlockType() == E_BLOCK_TRAPPED_CHEST);
+		m_NumberOfPlayers = a_Chest->GetNumberOfPlayers();
+		return (m_NumberOfPlayers <= 0);
+	}
+
+	unsigned char GetPowerLevel(void) const
+	{
+		return std::min(m_NumberOfPlayers, MAX_POWER_LEVEL);
+	}
+
+private:
+	int m_NumberOfPlayers;
+
+};
 
 
 template <class ChunkType, class WorldType, template <BLOCKTYPE block> class GetHandlerCompileTime, class ChestType>
 void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::HandleTrappedChest(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	class cGetTrappedChestPlayers :
-		public cChestCallback
-	{
-	public:
-		cGetTrappedChestPlayers(void) :
-			m_NumberOfPlayers(0)
-		{
-		}
-
-		virtual bool Item(ChestType * a_Chest) override
-		{
-			ASSERT(a_Chest->GetBlockType() == E_BLOCK_TRAPPED_CHEST);
-			m_NumberOfPlayers = a_Chest->GetNumberOfPlayers();
-			return (m_NumberOfPlayers <= 0);
-		}
-
-		unsigned char GetPowerLevel(void) const
-		{
-			return std::min(m_NumberOfPlayers, MAX_POWER_LEVEL);
-		}
-
-	private:
-		int m_NumberOfPlayers;
-
-	} GTCP;
+	cGetTrappedChestPlayers<ChestType> GTCP;
 
 	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
 	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
