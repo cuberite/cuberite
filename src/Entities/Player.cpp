@@ -451,7 +451,7 @@ void cPlayer::CancelChargingBow(void)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
-	if (IsGameModeSpectator()) // You can fly through the ground in survival
+	if (IsGameModeSpectator()) // You can fly through the ground in Spectator
 	{
 		return;
 	}
