@@ -189,7 +189,7 @@ public:
 	bool IsGameModeAdventure(void) const { return (m_GameMode == gmAdventure); }
 	
 	/** Returns true if the world is in Spectator mode */
-	bool IsGameModeAdventure(void) const { return (m_GameMode == gmSpectator); }
+	bool IsGameModeSpectator(void) const { return (m_GameMode == gmSpectator); }
 	
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
