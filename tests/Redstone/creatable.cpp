@@ -144,16 +144,17 @@ public:
 	}
 
 };
+class MockChest 
+{
+public:
+	BLOCKTYPE GetBlockType(void) const { return 0; }
+	int GetNumberOfPlayers(void) const { return 0; }
+};
 
 int main(int argc, char** argv)
 {
 	
-	class MockChest 
-	{
-	public:
-		BLOCKTYPE GetBlockType(void) const { return 0; }
-		int GetNumberOfPlayers(void) const { return 0; }
-	};
+	
 
 	MockWorld World;
 
