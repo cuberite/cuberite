@@ -497,9 +497,12 @@ bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 		return false;
 	}
 
-	a_BlockX = Value >> 38;
-	a_BlockY = Value << 26 >> 52;
-	a_BlockZ = Value << 38 >> 38;
+	UInt32 BlockXRaw = (Value >> 38) & 0x3ffffff;
+	UInt32 BlockYRaw = (Value >> 26) & 0xfff;
+	UInt32 BlockZRaw = (Value & 0x3ffffff);
+	a_BlockX = ((BlockXRaw & 0x2000000) == 0) ? BlockXRaw : (~(BlockXRaw & 0x1ffffff)) + 1;
+	a_BlockY = ((BlockYRaw & 0x800) == 0)     ? BlockYRaw : (~(BlockXRaw & 0x7ff))     + 1;
+	a_BlockZ = ((BlockZRaw & 0x2000000) == 0) ? BlockZRaw : (~(BlockZRaw & 0x1ffffff)) + 1;
 	return true;
 }
 
