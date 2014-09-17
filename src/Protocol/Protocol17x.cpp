@@ -104,7 +104,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
 	// hostname\00ip-address\00uuid\00profile-properties-as-json
 	AStringVector Params;
-	if (SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
 	{
 		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 		m_ServerAddress = Params[0];
