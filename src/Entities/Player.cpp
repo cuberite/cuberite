@@ -266,7 +266,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	cTimer t1;
 	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
-		// m_World->BroadcastPlayerListUpdatePing(*this);
+		m_World->BroadcastPlayerListUpdatePing(*this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
