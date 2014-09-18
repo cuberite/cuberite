@@ -107,9 +107,6 @@ public:
 	
 	/** Skips reading by a_Count bytes; returns false if not enough bytes in the ringbuffer */
 	bool SkipRead(size_t a_Count);
-
-	/** Reverse reading by a_Count bytes; returns false if not enough readed bytes in the ringbuffer */
-	bool ReverseRead(size_t a_Count);
 	
 	/** Reads all available data into a_Data */
 	void ReadAll(AString & a_Data);

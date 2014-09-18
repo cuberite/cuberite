@@ -2497,17 +2497,13 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 		a_Item.Empty();
 	}
 
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadChar, char, FirstChar);
-	if (FirstChar == 0)
+	AString Metadata;
+	a_ByteBuffer.ReadAll(Metadata);
+	if ((Metadata.size() == 0) || (Metadata[0] == 0))
 	{
 		// No metadata
 		return true;
 	}
-	a_ByteBuffer.ReverseRead(1);
-
-	// Read the metadata
-	AString Metadata;
-	a_ByteBuffer.ReadAll(Metadata);
 
 	ParseItemMetadata(a_Item, Metadata);
 	return true;

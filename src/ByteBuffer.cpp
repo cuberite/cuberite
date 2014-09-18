@@ -822,23 +822,6 @@ bool cByteBuffer::SkipRead(size_t a_Count)
 
 
 
-bool cByteBuffer::ReverseRead(size_t a_Count)
-{
-	CHECK_THREAD;
-	CheckValid();
-	if (m_ReadPos < a_Count)
-	{
-		return false;
-	}
-
-	m_ReadPos -= a_Count;
-	return true;
-}
-
-
-
-
-
 void cByteBuffer::ReadAll(AString & a_Data)
 {
 	CHECK_THREAD;
