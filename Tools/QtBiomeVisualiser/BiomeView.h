@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <memory>
 #include "ChunkCache.h"
 #include "ChunkSource.h"
 
