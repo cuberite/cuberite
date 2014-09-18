@@ -777,19 +777,71 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
-void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
+void cProtocol172::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	if (a_Action == 1)
-	{
-		// Ignore gamemode update
-		return;
-	}
 
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
 	Pkt.WriteString(a_Player.GetName());
-	Pkt.WriteBool(a_Action != 4);
-	Pkt.WriteShort((a_Action == 4) ? 0 : a_Player.GetClientHandle()->GetPing());
+	Pkt.WriteBool(true);
+	Pkt.WriteShort(a_Player.GetClientHandle()->GetPing());
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);
+	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteBool(false);
+	Pkt.WriteShort(0);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	// It is a simple add player packet in this protocol.
+	SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	if (a_OldListName == a_Player.GetName())
+	{
+		return;
+	}
+
+	// Remove the old name from the tablist:
+	{
+		cPacketizer Pkt(*this, 0x38);
+		Pkt.WriteString(a_OldListName);
+		Pkt.WriteBool(false);
+		Pkt.WriteShort(0);
+	}
+
+	SendPlayerListAddPlayer(a_Player);
 }
 
 

@@ -266,7 +266,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	cTimer t1;
 	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
-		m_World->BroadcastPlayerListItem(*this, 2);
+		// m_World->BroadcastPlayerListUpdatePing(*this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
@@ -1164,7 +1164,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 		SetCanFly(false);
 	}
 
-	m_World->BroadcastPlayerListItem(*this, 1);
+	m_World->BroadcastPlayerListUpdateGameMode(*this);
 }
 
 

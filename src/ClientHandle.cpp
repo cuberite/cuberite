@@ -127,7 +127,7 @@ cClientHandle::~cClientHandle()
 		if (!m_Username.empty() && (World != NULL))
 		{
 			// Send the Offline PlayerList packet:
-			World->BroadcastPlayerListItem(*m_Player, 4, this);
+			World->BroadcastPlayerListRemovePlayer(*m_Player, this);
 		}
 		if (World != NULL)
 		{
@@ -364,10 +364,10 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Player->SendExperience();
 
 	// Send player list items
-	SendPlayerListItem(*m_Player, 0);
-	World->BroadcastPlayerListItem(*m_Player, 0);
+	SendPlayerListAddPlayer(*m_Player);
+	World->BroadcastPlayerListAddPlayer(*m_Player);
 	World->SendPlayerList(m_Player);
-	
+
 	m_Player->Initialize(*World);
 	m_State = csAuthenticated;
 
@@ -2408,9 +2408,45 @@ void cClientHandle::SendPlayerAbilities()
 
 
 
-void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
+void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
-	m_Protocol->SendPlayerListItem(a_Player, a_Action);
+	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListRemovePlayer(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListUpdatePing(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
 }
 
 

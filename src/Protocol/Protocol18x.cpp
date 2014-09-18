@@ -793,73 +793,106 @@ void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
-void cProtocol180::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
+void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteVarInt(a_Action);
+	Pkt.WriteVarInt(0);
+	Pkt.WriteVarInt(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteString(a_Player.GetName());
+
+	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
+	Pkt.WriteVarInt(Properties.size());
+	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
+	{
+		Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
+		Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
+		AString Signature = ((Json::Value)*itr).get("signature", "").asString();
+		if (Signature.empty())
+		{
+			Pkt.WriteBool(false);
+		}
+		else
+		{
+			Pkt.WriteBool(true);
+			Pkt.WriteString(Signature);
+		}
+	}
+
+	Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
+	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+	Pkt.WriteBool(false);
+}
+
+
+
+
+
+void cProtocol180::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteVarInt(4);
+	Pkt.WriteVarInt(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+}
+
+
+
+
+
+void cProtocol180::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteVarInt(1);
+	Pkt.WriteVarInt(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
+}
+
+
+
+
+
+void cProtocol180::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteVarInt(2);
+	Pkt.WriteVarInt(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+}
+
+
+
+
+
+void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	UNUSED(a_OldListName);
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+	Pkt.WriteVarInt(3);
 	Pkt.WriteVarInt(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 
-	switch (a_Action)
+	// TODO: Replace this with GetPlayerListName() (It's already done in other pull request)
+	if (a_Player.GetName().empty())
 	{
-		case 0:
-		{
-			// Add Player
-			Pkt.WriteString(a_Player.GetName());
-
-			const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
-			Pkt.WriteVarInt(Properties.size());
-			for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
-			{
-				Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
-				Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
-				AString Signature = ((Json::Value)*itr).get("signature", "").asString();
-				if (Signature.empty())
-				{
-					Pkt.WriteBool(false);
-				}
-				else
-				{
-					Pkt.WriteBool(true);
-					Pkt.WriteString(Signature);
-				}
-			}
-
-			Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
-			Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
-			Pkt.WriteBool(false);
-			break;
-		}
-		case 1:
-		{
-			// Update GameMode
-			Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
-			break;
-		}
-		case 2:
-		{
-			// Update Ping
-			Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
-			break;
-		}
-		case 3:
-		{
-			// Update DisplayName
-			Pkt.WriteBool(false);
-			break;
-		}
-		case 4:
-		{
-			// Remove player
-			break;
-		}
-		default:
-		{
-			ASSERT(!"Unhandled player list item action!");
-			return;
-		}
+		Pkt.WriteBool(false);
+	}
+	else
+	{
+		Pkt.WriteBool(true);
+		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Player.GetName().c_str()));
 	}
 }
 

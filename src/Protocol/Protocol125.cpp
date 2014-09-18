@@ -719,28 +719,73 @@ void cProtocol125::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
+void cProtocol125::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
-	if (a_Action == 1)
+	WriteByte  (PACKET_PLAYER_LIST_ITEM);
+	WriteString(a_Player.GetName());
+	WriteBool  (true);
+	WriteShort (a_Player.GetClientHandle()->GetPing());
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_PLAYER_LIST_ITEM);
+	WriteString(a_Player.GetName());
+	WriteBool  (false);
+	WriteShort (0);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	// It is a simple add player packet in this protocol.
+	SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	if (a_OldListName == a_Player.GetName())
 	{
-		// Ignore gamemode update
 		return;
 	}
 
-	AString PlayerName(a_Player.GetColor());
-	PlayerName.append(a_Player.GetName());
-	if (PlayerName.length() > 14)
-	{
-		PlayerName.erase(14);
-	}
-	PlayerName += cChatColor::White;
+	cCSLock Lock(m_CSPacket);
 
-	WriteByte  ((unsigned char)PACKET_PLAYER_LIST_ITEM);
-	WriteString(PlayerName);
-	WriteBool  (a_Action != 4);
-	WriteShort ((a_Action == 4) ? 0 : a_Player.GetClientHandle()->GetPing());
-	Flush();
+	// Remove the old name from the tablist:
+	{
+		WriteByte  (PACKET_PLAYER_LIST_ITEM);
+		WriteString(a_OldListName);
+		WriteBool  (false);
+		WriteShort (0);
+		Flush();
+	}
+
+	SendPlayerListAddPlayer(a_Player);
 }
 
 

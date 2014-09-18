@@ -223,33 +223,37 @@ public:
 	void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = NULL);
 	// tolua_end
 
-	void BroadcastChunkData              (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
-	void BroadcastCollectEntity          (const cEntity & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
-	void BroadcastDestroyEntity          (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityEffect           (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityEquipment        (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityHeadLook         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityLook             (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityMetadata         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityRelMove          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityRelMoveLook      (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityStatus           (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
-	void BroadcastEntityVelocity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	virtual void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;  // tolua_export
-	void BroadcastParticleEffect         (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = NULL);  // tolua_export
-	void BroadcastPlayerListItem         (const cPlayer & a_Player, char a_Action, const cClientHandle * a_Exclude = NULL);
-	void BroadcastRemoveEntityEffect     (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
-	void BroadcastScoreboardObjective    (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
-	void BroadcastScoreUpdate            (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void BroadcastDisplayObjective       (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void BroadcastSoundEffect            (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export
-	void BroadcastSoundParticleEffect    (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);  // tolua_export
-	void BroadcastSpawnEntity            (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastTeleportEntity         (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
-	void BroadcastThunderbolt            (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
-	void BroadcastTimeUpdate             (const cClientHandle * a_Exclude = NULL);
-	virtual void BroadcastUseBed         (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	void BroadcastWeather                (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
+	void BroadcastChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = NULL);
+	void BroadcastCollectEntity              (const cEntity & a_Pickup, const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastDestroyEntity              (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityHeadLook             (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityLook                 (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityMetadata             (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityStatus               (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
+	void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	virtual void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL) override;  // tolua_export
+	void BroadcastParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = NULL);  // tolua_export
+	void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = NULL);
+	void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName, const cClientHandle * a_Exclude = NULL);
+	void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
+	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
+	void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
+	void BroadcastSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);   // tolua_export
+	void BroadcastSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);  // tolua_export
+	void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastTeleportEntity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
+	void BroadcastThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = NULL);
+	void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = NULL);
+	virtual void BroadcastUseBed             (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ) override;
+	void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = NULL);
 	
 	virtual cBroadcastInterface & GetBroadcastManager(void) override
 	{

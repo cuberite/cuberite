@@ -2153,7 +2153,7 @@ void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, float a_Src
 
 
 
-void cWorld::BroadcastPlayerListItem(const cPlayer & a_Player, char a_Action, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2163,7 +2163,79 @@ void cWorld::BroadcastPlayerListItem(const cPlayer & a_Player, char a_Action, co
 		{
 			continue;
 		}
-		ch->SendPlayerListItem(a_Player, a_Action);
+		ch->SendPlayerListAddPlayer(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListRemovePlayer(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListUpdateGameMode(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListUpdatePing(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
 	}
 }
 
@@ -2686,7 +2758,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 		cClientHandle * ch = (*itr)->GetClientHandle();
 		if ((ch != NULL) && !ch->IsDestroyed())
 		{
-			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), 0);
+			a_DestPlayer->GetClientHandle()->SendPlayerListAddPlayer(*(*itr));
 		}
 	}
 }

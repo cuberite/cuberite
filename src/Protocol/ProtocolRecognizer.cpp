@@ -489,10 +489,50 @@ void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_A
 
 
 
-void cProtocolRecognizer::SendPlayerListItem(const cPlayer & a_Player, char a_Action)
+void cProtocolRecognizer::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendPlayerListItem(a_Player, a_Action);
+	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListRemovePlayer(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdatePing(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
 }
 
 
