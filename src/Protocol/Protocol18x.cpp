@@ -75,6 +75,7 @@ Implements the 1.8.x protocol classes:
 
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
+const uLongf MAX_COMPRESSED_PACKET_LEN = 200 KiB;  // Maximum size of compressed packets.
 
 
 
@@ -1513,11 +1514,10 @@ void cProtocol180::SendWindowProperty(const cWindow & a_Window, int a_Property, 
 bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_CompressedData)
 {
 	// Compress the data:
-	const uLongf CompressedMaxSize = 200000;
-	char CompressedData[CompressedMaxSize];
+	char CompressedData[MAX_COMPRESSED_PACKET_LEN];
 
 	uLongf CompressedSize = compressBound(a_Packet.size());
-	if (CompressedSize >= CompressedMaxSize)
+	if (CompressedSize >= MAX_COMPRESSED_PACKET_LEN)
 	{
 		ASSERT(!"Too high packet size.");
 		return false;
@@ -1541,7 +1541,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 	Buffer.CommitRead();
 
 	a_CompressedData.clear();
-	a_CompressedData.resize(LengthData.size() + CompressedSize);
+	a_CompressedData.reserve(LengthData.size() + CompressedSize);
 	a_CompressedData.append(LengthData.data(), LengthData.size());
 	a_CompressedData.append(CompressedData, CompressedSize);
 	return true;

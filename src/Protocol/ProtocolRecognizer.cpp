@@ -955,7 +955,7 @@ bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
 			m_Protocol = new cProtocol132(m_Client);
 			return true;
 		}
-		//case PROTO_VERSION_1_4_2:
+		case PROTO_VERSION_1_4_2:
 		case PROTO_VERSION_1_4_4:
 		{
 			m_Protocol = new cProtocol142(m_Client);

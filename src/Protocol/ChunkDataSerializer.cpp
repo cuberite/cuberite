@@ -45,7 +45,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int
 	{
 		case RELEASE_1_2_5: Serialize29(data); break;
 		case RELEASE_1_3_2: Serialize39(data); break;
-		case RELEASE_1_8_0: Serialize80(data, a_ChunkX, a_ChunkZ); break;
+		case RELEASE_1_8_0: Serialize47(data, a_ChunkX, a_ChunkZ); break;
 		// TODO: Other protocol versions may serialize the data differently; implement here
 		
 		default:
@@ -181,43 +181,41 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 
 
 
-void cChunkDataSerializer::Serialize80(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ)
 {
-	// TODO: Do not copy data and then compress it; rather, compress partial blocks of data (zlib *can* stream)
+	// This function returns the fully compressed packet (including packet size), not the raw packet!
 
-	// Blocktypes converter (1.8 included the meta into the blocktype):
-	unsigned char Blocks[cChunkDef::NumBlocks * 2];
-	size_t LastOffset = 0;
-	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
-	{
-		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
-		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
-		Blocks[LastOffset] = (unsigned char)(BlockType << 4) | BlockMeta;
-		Blocks[LastOffset + 1] = (unsigned char)(BlockType >> 4);
-		LastOffset += 2;
-	}
-
-	const int BiomeDataSize    = cChunkDef::Width * cChunkDef::Width;
-	const int BlockLightOffset = sizeof(Blocks);
-	const int SkyLightOffset   = BlockLightOffset + sizeof(m_BlockLight);
-	const int BiomeOffset      = SkyLightOffset   + sizeof(m_BlockSkyLight);
-	const int DataSize         = BiomeOffset      + BiomeDataSize;
-
-	// Temporary buffer for the composed data:
-	char AllData [DataSize];
-	memcpy(AllData, Blocks, sizeof(Blocks));
-	memcpy(AllData + BlockLightOffset, m_BlockLight,    sizeof(m_BlockLight));
-	memcpy(AllData + SkyLightOffset,   m_BlockSkyLight, sizeof(m_BlockSkyLight));
-	memcpy(AllData + BiomeOffset,      m_BiomeData,     BiomeDataSize);
-
+	// Create the packet:
 	cByteBuffer Packet(512 KiB);
 	Packet.WriteVarInt(0x21);  // Packet id (Chunk Data packet)
 	Packet.WriteBEInt(a_ChunkX);
 	Packet.WriteBEInt(a_ChunkZ);
 	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
 	Packet.WriteBEShort((short) 0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
-	Packet.WriteVarInt(DataSize);  // Chunk size
-	Packet.WriteBuf(AllData, DataSize);  // Chunk data
+
+	// Write the chunk size:
+	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
+	UInt32 ChunkSize = (
+		(cChunkDef::NumBlocks * 2) +  // Block meta + type
+		sizeof(m_BlockLight) +        // Block light
+		sizeof(m_BlockSkyLight) +     // Block sky light
+		BiomeDataSize                 // Biome data
+	);
+	Packet.WriteVarInt(ChunkSize);
+
+	// Write the block types to the packet:
+	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
+	{
+		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
+		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
+		Packet.WriteByte((unsigned char)(BlockType << 4) | BlockMeta);
+		Packet.WriteByte((unsigned char)(BlockType >> 4));
+	}
+
+	// Write the rest:
+	Packet.WriteBuf(m_BlockLight,    sizeof(m_BlockLight));
+	Packet.WriteBuf(m_BlockSkyLight, sizeof(m_BlockSkyLight));
+	Packet.WriteBuf(m_BiomeData,     BiomeDataSize);
 
 	AString PacketData;
 	Packet.ReadAll(PacketData);
@@ -236,13 +234,13 @@ void cChunkDataSerializer::Serialize80(AString & a_Data, int a_ChunkX, int a_Chu
 	else
 	{
 		AString PostData;
-		Buffer.WriteVarInt(Packet.GetUsedSpace() + 1);
+		Buffer.WriteVarInt((UInt32)Packet.GetUsedSpace() + 1);
 		Buffer.WriteVarInt(0);
 		Buffer.ReadAll(PostData);
 		Buffer.CommitRead();
 
 		a_Data.clear();
-		a_Data.resize(PostData.size() + PacketData.size());
+		a_Data.reserve(PostData.size() + PacketData.size());
 		a_Data.append(PostData.data(), PostData.size());
 		a_Data.append(PacketData.data(), PacketData.size());
 	}
