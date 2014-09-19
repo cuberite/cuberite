@@ -427,7 +427,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 	if (a_CanDrop)
 	{
 		if ((a_Digger != NULL) && (a_Digger->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0))
-		{				
+		{
 			switch (m_BlockType)
 			{
 				case E_BLOCK_CAKE:

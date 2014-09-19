@@ -451,6 +451,11 @@ void cPlayer::CancelChargingBow(void)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
+	if (IsGameModeSpectator())  // You can fly through the ground in Spectator
+	{
+		return;
+	}
+	
 	m_bTouchGround = a_bTouchGround;
 
 	if (!m_bTouchGround)
@@ -585,7 +590,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 {
-	if (!IsGameModeCreative())
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
 		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion, 40.0);
 	}
@@ -823,9 +828,9 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
-		if (IsGameModeCreative())
+		if (IsGameModeCreative() || IsGameModeSpectator())
 		{
-			// No damage / health in creative mode if not void or plugin damage
+			// No damage / health in creative or spectator mode if not void or plugin damage
 			return false;
 		}
 	}
@@ -1043,6 +1048,14 @@ bool cPlayer::IsGameModeAdventure(void) const
 
 
 
+bool cPlayer::IsGameModeSpectator(void) const
+{
+	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Adventure
+}
+
+
+
 
 void cPlayer::SetTeam(cTeam * a_Team)
 {
@@ -1158,7 +1171,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
 
-	if (!IsGameModeCreative())
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
 		SetFlying(false);
 		SetCanFly(false);
@@ -1340,6 +1353,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos)
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
+	// Need to Check if the player or other players are in gamemode spectator, but will break compatibility
 	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
@@ -1500,6 +1514,11 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
+	if (IsGameModeSpectator())  // Players can't toss items in spectator
+	{
+		return;
+	}
+	
 	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
@@ -1786,7 +1805,7 @@ bool cPlayer::SaveToDisk()
 
 void cPlayer::UseEquippedItem(int a_Amount)
 {
-	if (IsGameModeCreative())  // No damage in creative
+	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
 	{
 		return;
 	}

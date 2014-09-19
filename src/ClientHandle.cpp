@@ -312,8 +312,16 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	ASSERT(m_Player == NULL);
 
 	m_Username = a_Name;
-	m_UUID = a_UUID;
-	m_Properties = a_Properties;
+	
+	// Only assign UUID and properties if not already pre-assigned (BungeeCord sends those in the Handshake packet):
+	if (m_UUID.empty())
+	{
+		m_UUID = a_UUID;
+	}
+	if (m_Properties.empty())
+	{
+		m_Properties = a_Properties;
+	}
 	
 	// Send login success (if the protocol supports it):
 	m_Protocol->SendLoginSuccess();

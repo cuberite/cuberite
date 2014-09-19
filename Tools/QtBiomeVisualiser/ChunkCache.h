@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QCache>
 #include <QMutex>
+#include <memory>
 
 
 
