@@ -1,6 +1,8 @@
 #include "Globals.h"
 #include "ChunkSource.h"
+#include <QThread>
 #include "Generating/BioGen.h"
+#include "inifile/iniFile.h"
 
 
 
@@ -101,9 +103,9 @@ public:
 		for (size_t i = 0; i < ARRAYCOUNT(biomeColors); i++)
 		{
 			uchar * color = &biomeToColor[4 * biomeColors[i].m_Biome];
-			color[0] = biomeColors[i].m_Color[0];
+			color[0] = biomeColors[i].m_Color[2];
 			color[1] = biomeColors[i].m_Color[1];
-			color[2] = biomeColors[i].m_Color[2];
+			color[2] = biomeColors[i].m_Color[0];
 			color[3] = 0xff;
 		}
 	}
@@ -118,8 +120,8 @@ static void biomesToImage(cChunkDef::BiomeMap & a_Biomes, Chunk::Image & a_Image
 {
 	// Make sure the two arrays are of the same size, compile-time.
 	// Note that a_Image is actually 4 items per pixel, so the array is 4 times bigger:
-	static const char Check1[4 * ARRAYCOUNT(a_Biomes) - ARRAYCOUNT(a_Image)      + 1];
-	static const char Check2[ARRAYCOUNT(a_Image)      - 4 * ARRAYCOUNT(a_Biomes) + 1];
+	static const char Check1[4 * ARRAYCOUNT(a_Biomes) - ARRAYCOUNT(a_Image)      + 1] = {};
+	static const char Check2[ARRAYCOUNT(a_Image)      - 4 * ARRAYCOUNT(a_Biomes) + 1] = {};
 
 	// Convert the biomes into color:
 	for (size_t i = 0; i < ARRAYCOUNT(a_Biomes); i++)
@@ -138,9 +140,11 @@ static void biomesToImage(cChunkDef::BiomeMap & a_Biomes, Chunk::Image & a_Image
 ////////////////////////////////////////////////////////////////////////////////
 // BioGenSource:
 
-BioGenSource::BioGenSource(cBiomeGen * a_BiomeGen) :
-	m_BiomeGen(a_BiomeGen)
+BioGenSource::BioGenSource(QString a_WorldIniPath) :
+	m_WorldIniPath(a_WorldIniPath),
+	m_Mtx(QMutex::Recursive)
 {
+	reload();
 }
 
 
@@ -149,14 +153,30 @@ BioGenSource::BioGenSource(cBiomeGen * a_BiomeGen) :
 
 void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk)
 {
-	// TODO: To make use of multicore machines, we need multiple copies of the biomegen
-	// Right now we have only one, so we can let only one thread use it (hence the mutex)
-	QMutexLocker lock(&m_Mtx);
 	cChunkDef::BiomeMap biomes;
-	m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
+	{
+		QMutexLocker lock(&m_Mtx);
+		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
+	}
 	Chunk::Image img;
 	biomesToImage(biomes, img);
 	a_DestChunk->setImage(img);
+}
+
+
+
+
+
+void BioGenSource::reload()
+{
+	cIniFile ini;
+	ini.ReadFile(m_WorldIniPath.toStdString());
+	int seed = ini.GetValueSetI("Seed", "Seed", 0);
+	bool unused = false;
+	QMutexLocker lock(&m_Mtx);
+	m_BiomeGen.reset(cBiomeGen::CreateBiomeGen(ini, seed, unused));
+	lock.unlock();
+	ini.WriteFile(m_WorldIniPath.toStdString());
 }
 
 

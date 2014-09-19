@@ -99,6 +99,11 @@ extern int GetBEInt(const char * a_Mem);
 /// Writes four bytes to the specified memory location so that they interpret as BigEndian int
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
+/** Splits a string that has embedded \0 characters, on those characters.
+a_Output is first cleared and then each separate string is pushed back into a_Output.
+Returns true if there are at least two strings in a_Output (there was at least one \0 separator). */
+extern bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Output);
+
 /// Parses any integer type. Checks bounds and returns errors out of band.
 template <class T>
 bool StringToInteger(const AString & a_str, T & a_Num)

@@ -8,11 +8,19 @@
 
 
 
+static const int DELTA_STEP = 120;  // The normal per-notch wheel delta
+
+
+
+
+
 BiomeView::BiomeView(QWidget * parent) :
 	super(parent),
 	m_X(0),
 	m_Z(0),
-	m_Zoom(1)
+	m_Zoom(1),
+	m_IsMouseDragging(false),
+	m_MouseWheelDelta(0)
 {
 	// Create the image used for undefined chunks:
 	int offset = 0;
@@ -33,6 +41,9 @@ BiomeView::BiomeView(QWidget * parent) :
 
 	// Add a chunk-update callback mechanism:
 	connect(&m_Cache, SIGNAL(chunkAvailable(int, int)), this, SLOT(chunkAvailable(int, int)));
+
+	// Allow keyboard interaction:
+	setFocusPolicy(Qt::StrongFocus);
 }
 
 
@@ -114,6 +125,21 @@ void BiomeView::chunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
 	drawChunk(a_ChunkX, a_ChunkZ);
 	update();
+}
+
+
+
+
+
+void BiomeView::reload()
+{
+	if (!hasData())
+	{
+		return;
+	}
+	m_Cache.reload();
+
+	redraw();
 }
 
 
@@ -236,9 +262,164 @@ void BiomeView::paintEvent(QPaintEvent * a_Event)
 
 
 
-void BiomeView::queueChunkRender(ChunkPtr a_Chunk)
+void BiomeView::mousePressEvent(QMouseEvent * a_Event)
 {
+	m_LastX = a_Event->x();
+	m_LastY = a_Event->y();
+	m_IsMouseDragging = true;
+}
 
+
+
+
+
+void BiomeView::mouseMoveEvent(QMouseEvent * a_Event)
+{
+	if (m_IsMouseDragging)
+	{
+		// The user is dragging the mouse, move the view around:
+		m_X += (m_LastX - a_Event->x()) / m_Zoom;
+		m_Z += (m_LastY - a_Event->y()) / m_Zoom;
+		m_LastX = a_Event->x();
+		m_LastY = a_Event->y();
+		redraw();
+		return;
+	}
+
+	// TODO: Update the status bar info for the biome currently pointed at
+}
+
+
+
+
+
+void BiomeView::mouseReleaseEvent(QMouseEvent *)
+{
+	m_IsMouseDragging = false;
+}
+
+
+
+
+
+void BiomeView::wheelEvent(QWheelEvent * a_Event)
+{
+	m_MouseWheelDelta += a_Event->delta();
+	while (m_MouseWheelDelta >= DELTA_STEP)
+	{
+		increaseZoom();
+		m_MouseWheelDelta -= DELTA_STEP;
+	}
+	while (m_MouseWheelDelta <= -DELTA_STEP)
+	{
+		decreaseZoom();
+		m_MouseWheelDelta += DELTA_STEP;
+	}
+}
+
+
+
+
+
+void BiomeView::keyPressEvent(QKeyEvent * a_Event)
+{
+	switch (a_Event->key())
+	{
+		case Qt::Key_Up:
+		case Qt::Key_W:
+		{
+			m_Z -= 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_Down:
+		case Qt::Key_S:
+		{
+			m_Z += 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_Left:
+		case Qt::Key_A:
+		{
+			m_X -= 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_Right:
+		case Qt::Key_D:
+		{
+			m_X += 10.0 / m_Zoom;
+			redraw();
+			break;
+		}
+
+		case Qt::Key_PageUp:
+		case Qt::Key_Q:
+		{
+			increaseZoom();
+			break;
+		}
+
+		case Qt::Key_PageDown:
+		case Qt::Key_E:
+		{
+			decreaseZoom();
+			break;
+		}
+	}
+}
+
+
+
+
+
+void BiomeView::decreaseZoom()
+{
+	if (m_Zoom > 1.001)
+	{
+		m_Zoom--;
+		if (m_Zoom < 1.0)
+		{
+			// Just crossed the 100%, fixate the 100% threshold:
+			m_Zoom = 1.0;
+		}
+	}
+	else if (m_Zoom > 0.01)
+	{
+		m_Zoom = m_Zoom / 2;
+	}
+	redraw();
+}
+
+
+
+
+
+void BiomeView::increaseZoom()
+{
+	if (m_Zoom > 0.99)
+	{
+		if (m_Zoom > 20.0)
+		{
+			// Zoom too large
+			return;
+		}
+		m_Zoom++;
+	}
+	else
+	{
+		m_Zoom = m_Zoom * 2;
+		if (m_Zoom > 1.0)
+		{
+			// Just crossed the 100%, fixate the 100% threshold:
+			m_Zoom = 1.0;
+		}
+	}
+	redraw();
 }
 
 

@@ -1,6 +1,8 @@
 #pragma once
+
 #include <QObject>
 #include <QRunnable>
+#include <memory>
 
 
 

@@ -55,8 +55,6 @@ INCLUDEPATH += $$_PRO_FILE_PWD_ \
 	$$_PRO_FILE_PWD_/../../lib
 
 
-CONFIG += STATIC
-
-
+CONFIG += C++11
 
 
