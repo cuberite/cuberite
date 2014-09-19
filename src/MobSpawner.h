@@ -51,9 +51,10 @@ public :
 	typedef const std::set<cMonster *> tSpawnedContainer;
 	tSpawnedContainer & getSpawned(void);
 
+	/** Returns true if specified type of mob can spawn on specified block */
+	static bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
+
 protected :
-	// return true if specified type of mob can spawn on specified block
-	bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
 
 	// return a random type that can spawn on specified biome.
 	// returns E_ENTITY_TYPE_DONOTUSE if none is possible

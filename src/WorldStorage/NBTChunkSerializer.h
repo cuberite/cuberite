@@ -32,6 +32,7 @@ class cJukeboxEntity;
 class cNoteEntity;
 class cSignEntity;
 class cMobHeadEntity;
+class cMobSpawnerEntity;
 class cFlowerPotEntity;
 class cFallingBlock;
 class cMinecart;
@@ -93,19 +94,20 @@ protected:
 	void AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum = 0);
 	
 	// Block entities:
-	void AddBasicTileEntity(cBlockEntity *     a_Entity, const char * a_EntityTypeID);
-	void AddBeaconEntity   (cBeaconEntity *    a_Entity);
-	void AddChestEntity    (cChestEntity *     a_Entity, BLOCKTYPE a_ChestType);
-	void AddDispenserEntity(cDispenserEntity * a_Entity);
-	void AddDropperEntity  (cDropperEntity *   a_Entity);
-	void AddFurnaceEntity  (cFurnaceEntity *   a_Furnace);
-	void AddHopperEntity   (cHopperEntity *    a_Entity);
-	void AddJukeboxEntity  (cJukeboxEntity *   a_Jukebox);
-	void AddNoteEntity     (cNoteEntity *      a_Note);
-	void AddSignEntity     (cSignEntity *      a_Sign);
-	void AddMobHeadEntity  (cMobHeadEntity *     a_MobHead);
+	void AddBasicTileEntity   (cBlockEntity *        a_Entity, const char * a_EntityTypeID);
+	void AddBeaconEntity      (cBeaconEntity *       a_Entity);
+	void AddChestEntity       (cChestEntity *        a_Entity, BLOCKTYPE a_ChestType);
+	void AddDispenserEntity   (cDispenserEntity *    a_Entity);
+	void AddDropperEntity     (cDropperEntity *      a_Entity);
+	void AddFurnaceEntity     (cFurnaceEntity *      a_Furnace);
+	void AddHopperEntity      (cHopperEntity *       a_Entity);
+	void AddJukeboxEntity     (cJukeboxEntity *      a_Jukebox);
+	void AddMobSpawnerEntity  (cMobSpawnerEntity *   a_MobSpawner);
+	void AddNoteEntity        (cNoteEntity *         a_Note);
+	void AddSignEntity        (cSignEntity *         a_Sign);
+	void AddMobHeadEntity     (cMobHeadEntity *      a_MobHead);
 	void AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock);
-	void AddFlowerPotEntity(cFlowerPotEntity * a_FlowerPot);
+	void AddFlowerPotEntity   (cFlowerPotEntity *    a_FlowerPot);
 	
 	// Entities:
 	void AddBasicEntity       (cEntity * a_Entity, const AString & a_ClassName);

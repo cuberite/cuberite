@@ -96,7 +96,7 @@ public:
 	virtual bool ReachedDestination(void);
 	
 	// tolua_begin
-	eType GetMobType(void) const {return m_MobType; }
+	eType GetMobType(void) const { return m_MobType; }
 	eFamily GetMobFamily(void) const;
 	// tolua_end
 	

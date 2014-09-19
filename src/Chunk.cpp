@@ -16,13 +16,14 @@
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/DispenserEntity.h"
 #include "BlockEntities/DropperEntity.h"
+#include "BlockEntities/FlowerPotEntity.h"
 #include "BlockEntities/FurnaceEntity.h"
 #include "BlockEntities/HopperEntity.h"
 #include "BlockEntities/JukeboxEntity.h"
+#include "BlockEntities/MobHeadEntity.h"
+#include "BlockEntities/MobSpawnerEntity.h"
 #include "BlockEntities/NoteEntity.h"
 #include "BlockEntities/SignEntity.h"
-#include "BlockEntities/MobHeadEntity.h"
-#include "BlockEntities/FlowerPotEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
 #include "Noise.h"
@@ -1344,6 +1345,7 @@ void cChunk::CreateBlockEntities(void)
 					case E_BLOCK_NOTE_BLOCK:
 					case E_BLOCK_JUKEBOX:
 					case E_BLOCK_FLOWER_POT:
+					case E_BLOCK_MOB_SPAWNER:
 					{
 						if (!HasBlockEntityAt(x + m_PosX * Width, y, z + m_PosZ * Width))
 						{
@@ -1475,6 +1477,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 		case E_BLOCK_NOTE_BLOCK:
 		case E_BLOCK_JUKEBOX:
 		case E_BLOCK_FLOWER_POT:
+		case E_BLOCK_MOB_SPAWNER:
 		{
 			AddBlockEntity(cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, WorldPos.x, WorldPos.y, WorldPos.z, m_World));
 			break;
