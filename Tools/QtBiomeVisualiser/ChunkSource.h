@@ -1,4 +1,5 @@
 #pragma once
+#include "Globals.h"
 #include <QString>
 #include <QMutex>
 #include "Chunk.h"
@@ -64,11 +65,40 @@ class AnvilSource :
 	public ChunkSource
 {
 public:
-	// TODO
+	/** Constructs a new AnvilSource based on the world path. */
+	AnvilSource(QString a_WorldRegionFolder);
 
 	// ChunkSource overrides:
 	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) override;
-	virtual void reload() override {}
+	virtual void reload() override;
+
+protected:
+	class AnvilFile;
+	typedef std::shared_ptr<AnvilFile> AnvilFilePtr;
+
+
+	/** Folder where the individual Anvil Region files are located. */
+	QString m_WorldRegionFolder;
+
+	/** List of currently loaded files. Acts as a cache so that a file is not opened and closed over and over again.
+	Protected against multithreaded access by m_Mtx. */
+	std::list<AnvilFilePtr> m_Files;
+
+	/** Guards m_Files agains multithreaded access. */
+	QMutex m_Mtx;
+
+
+	/** Converts chunk coords to region coords. */
+	void chunkToRegion(int a_ChunkX, int a_ChunkZ, int & a_RegionX, int & a_RegionZ);
+
+	/** Returns the compressed data of the specified chunk.
+	Returns an empty string if the chunk is not available. */
+	AString getCompressedChunkData(int a_ChunkX, int a_ChunkZ);
+
+	/** Returns the file object that contains the specified chunk.
+	The file is taken from the cache if available there, otherwise it is created anew. */
+	AnvilFilePtr getAnvilFile(int a_ChunkX, int a_ChunkZ);
+
 };
 
 

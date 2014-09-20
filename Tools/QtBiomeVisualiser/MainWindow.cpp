@@ -39,6 +39,10 @@ MainWindow::~MainWindow()
 void MainWindow::generate()
 {
 	QString worldIni = QFileDialog::getOpenFileName(this, tr("Open world.ini"), QString(), tr("world.ini (world.ini)"));
+	if (worldIni.isEmpty())
+	{
+		return;
+	}
 	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(worldIni)));
 	m_BiomeView->redraw();
 }
@@ -49,7 +53,13 @@ void MainWindow::generate()
 
 void MainWindow::open()
 {
-	// TODO
+	QString regionFolder = QFileDialog::getExistingDirectory(this, tr("Select the region folder"), QString());
+	if (regionFolder.isEmpty())
+	{
+		return;
+	}
+	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(regionFolder)));
+	m_BiomeView->redraw();
 }
 
 

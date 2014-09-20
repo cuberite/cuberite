@@ -29,7 +29,24 @@ SOURCES += main.cpp\
     ChunkCache.cpp \
     Chunk.cpp \
     ChunkSource.cpp \
-    ChunkLoader.cpp
+    ChunkLoader.cpp \
+    ../../src/StringCompression.cpp \
+    ../../src/WorldStorage/FastNBT.cpp \
+    ../../lib/zlib/adler32.c \
+    ../../lib/zlib/compress.c \
+    ../../lib/zlib/crc32.c \
+    ../../lib/zlib/deflate.c \
+    ../../lib/zlib/gzclose.c \
+    ../../lib/zlib/gzlib.c \
+    ../../lib/zlib/gzread.c \
+    ../../lib/zlib/gzwrite.c \
+    ../../lib/zlib/infback.c \
+    ../../lib/zlib/inffast.c \
+    ../../lib/zlib/inflate.c \
+    ../../lib/zlib/inftrees.c \
+    ../../lib/zlib/trees.c \
+    ../../lib/zlib/uncompr.c \
+    ../../lib/zlib/zutil.c
 
 HEADERS  += MainWindow.h \
 		Globals.h \
@@ -48,7 +65,20 @@ HEADERS  += MainWindow.h \
     ChunkCache.h \
     Chunk.h \
     ChunkSource.h \
-    ChunkLoader.h
+    ChunkLoader.h \
+    ../../src/StringCompression.h \
+    ../../src/WorldStorage/FastNBT.h \
+    ../../lib/zlib/crc32.h \
+    ../../lib/zlib/deflate.h \
+    ../../lib/zlib/gzguts.h \
+    ../../lib/zlib/inffast.h \
+    ../../lib/zlib/inffixed.h \
+    ../../lib/zlib/inflate.h \
+    ../../lib/zlib/inftrees.h \
+    ../../lib/zlib/trees.h \
+    ../../lib/zlib/zconf.h \
+    ../../lib/zlib/zlib.h \
+    ../../lib/zlib/zutil.h
 
 INCLUDEPATH += $$_PRO_FILE_PWD_ \
 	$$_PRO_FILE_PWD_/../../src \
@@ -56,5 +86,9 @@ INCLUDEPATH += $$_PRO_FILE_PWD_ \
 
 
 CONFIG += C++11
+
+OTHER_FILES += \
+    ../../lib/zlib/example.c.txt \
+    ../../lib/zlib/minigzip.c.txt
 
 
