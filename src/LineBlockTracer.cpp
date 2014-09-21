@@ -227,9 +227,11 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 		}
 
 		// Update the current chunk
-		if (a_Chunk != NULL)
+		a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
+		if (a_Chunk == NULL)
 		{
-			a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
+			m_Callbacks->OnNoChunk();
+			return false;
 		}
 
 		if (a_Chunk->IsValid())
@@ -245,13 +247,10 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 				return false;
 			}
 		}
-		else
+		else if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ, m_CurrentFace))
 		{
-			if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ, m_CurrentFace))
-			{
-				// The callback terminated the trace
-				return false;
-			}
+			// The callback terminated the trace
+			return false;
 		}
 	}
 }
