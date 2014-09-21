@@ -12,6 +12,7 @@
 #include "Generating/BioGen.h"
 #include "StringCompression.h"
 #include "WorldStorage/FastNBT.h"
+#include "GeneratorSetupDlg.h"
 
 
 
@@ -42,13 +43,37 @@ MainWindow::~MainWindow()
 
 
 
-void MainWindow::generate()
+void MainWindow::newGenerator()
 {
+	// TODO
+
+	// (Re-)open the generator setup dialog:
+	m_GeneratorSetupDlg.reset(new GeneratorSetupDlg(""));
+	m_GeneratorSetupDlg->show();
+	m_GeneratorSetupDlg->raise();
+
+	// TODO
+}
+
+
+
+
+
+void MainWindow::openGenerator()
+{
+	// Let the user specify the world.ini file:
 	QString worldIni = QFileDialog::getOpenFileName(this, tr("Open world.ini"), QString(), tr("world.ini (world.ini)"));
 	if (worldIni.isEmpty())
 	{
 		return;
 	}
+
+	// (Re-)open the generator setup dialog:
+	m_GeneratorSetupDlg.reset(new GeneratorSetupDlg(worldIni.toStdString()));
+	m_GeneratorSetupDlg->show();
+	m_GeneratorSetupDlg->raise();
+
+	// Set the chunk source:
 	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(worldIni)));
 	m_BiomeView->redraw();
 }
@@ -57,13 +82,23 @@ void MainWindow::generate()
 
 
 
-void MainWindow::open()
+void MainWindow::openWorld()
 {
+	// Let the user specify the world:
 	QString regionFolder = QFileDialog::getExistingDirectory(this, tr("Select the region folder"), QString());
 	if (regionFolder.isEmpty())
 	{
 		return;
 	}
+
+	// Remove the generator setup dialog, if open:
+	if (m_GeneratorSetupDlg.get() != nullptr)
+	{
+		m_GeneratorSetupDlg->hide();
+		m_GeneratorSetupDlg.reset(nullptr);
+	}
+
+	// Set the chunk source:
 	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(regionFolder)));
 	m_BiomeView->redraw();
 }
@@ -74,11 +109,21 @@ void MainWindow::open()
 
 void MainWindow::openVanillaWorld()
 {
+	// The world is stored in the sender action's data, retrieve it:
 	QAction * action = qobject_cast<QAction *>(sender());
 	if (action == nullptr)
 	{
 		return;
 	}
+
+	// Remove the generator setup dialog, if open:
+	if (m_GeneratorSetupDlg.get() != nullptr)
+	{
+		m_GeneratorSetupDlg->hide();
+		m_GeneratorSetupDlg.reset(nullptr);
+	}
+
+	// Set the chunk source:
 	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(action->data().toString())));
 	m_BiomeView->redraw();
 }
@@ -107,19 +152,24 @@ void MainWindow::createActions()
 {
 	createWorldActions();
 
-	m_actGen = new QAction(tr("&Generate..."), this);
-	m_actGen->setShortcut(tr("Ctrl+N"));
-	m_actGen->setStatusTip(tr("Open a generator INI file and display the generated biomes"));
-	connect(m_actGen, SIGNAL(triggered()), this, SLOT(generate()));
+	m_actNewGen = new QAction(tr("&New generator"), this);
+	m_actNewGen->setShortcut(tr("Ctrl+N"));
+	m_actNewGen->setStatusTip(tr("Open a generator INI file and display the generated biomes"));
+	connect(m_actNewGen, SIGNAL(triggered()), this, SLOT(newGenerator()));
 
-	m_actOpen = new QAction(tr("&Open world..."), this);
-	m_actOpen->setShortcut(tr("Ctrl+O"));
-	m_actOpen->setStatusTip(tr("Open an existing world and display its biomes"));
-	connect(m_actOpen, SIGNAL(triggered()), this, SLOT(open()));
+	m_actOpenGen = new QAction(tr("&Open generator..."), this);
+	m_actOpenGen->setShortcut(tr("Ctrl+G"));
+	m_actOpenGen->setStatusTip(tr("Open a generator INI file and display the generated biomes"));
+	connect(m_actOpenGen, SIGNAL(triggered()), this, SLOT(openGenerator()));
+
+	m_actOpenWorld = new QAction(tr("&Open world..."), this);
+	m_actOpenWorld->setShortcut(tr("Ctrl+O"));
+	m_actOpenWorld->setStatusTip(tr("Open an existing world and display its biomes"));
+	connect(m_actOpenWorld, SIGNAL(triggered()), this, SLOT(openWorld()));
 
 	m_actReload = new QAction(tr("&Reload"), this);
 	m_actReload->setShortcut(tr("F5"));
-	m_actReload->setStatusTip(tr("Open an existing world and display its biomes"));
+	m_actReload->setStatusTip(tr("Clear the view cache and force a reload of all the data"));
 	connect(m_actReload, SIGNAL(triggered()), m_BiomeView, SLOT(reload()));
 
 	m_actExit = new QAction(tr("E&xit"), this);
@@ -174,7 +224,8 @@ void MainWindow::createWorldActions()
 void MainWindow::createMenus()
 {
 	QMenu * file = menuBar()->addMenu(tr("&Map"));
-	file->addAction(m_actGen);
+	file->addAction(m_actNewGen);
+	file->addAction(m_actOpenGen);
 	file->addSeparator();
 	QMenu * worlds = file->addMenu(tr("Open existing"));
 	worlds->addActions(m_WorldActions);
@@ -182,7 +233,7 @@ void MainWindow::createMenus()
 	{
 		worlds->setEnabled(false);
 	}
-	file->addAction(m_actOpen);
+	file->addAction(m_actOpenWorld);
 	file->addSeparator();
 	file->addAction(m_actReload);
 	file->addSeparator();

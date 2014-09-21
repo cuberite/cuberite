@@ -46,7 +46,8 @@ SOURCES += main.cpp\
     ../../lib/zlib/inftrees.c \
     ../../lib/zlib/trees.c \
     ../../lib/zlib/uncompr.c \
-    ../../lib/zlib/zutil.c
+    ../../lib/zlib/zutil.c \
+    GeneratorSetupDlg.cpp
 
 HEADERS  += MainWindow.h \
 		Globals.h \
@@ -78,7 +79,8 @@ HEADERS  += MainWindow.h \
     ../../lib/zlib/trees.h \
     ../../lib/zlib/zconf.h \
     ../../lib/zlib/zlib.h \
-    ../../lib/zlib/zutil.h
+    ../../lib/zlib/zutil.h \
+    GeneratorSetupDlg.h
 
 INCLUDEPATH += $$_PRO_FILE_PWD_ \
 	$$_PRO_FILE_PWD_/../../src \
