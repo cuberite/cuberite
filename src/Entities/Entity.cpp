@@ -342,6 +342,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 						a_TDI.FinalDamage += (int)ceil(2.5 * SmiteLevel);
 						break;
 					}
+					default: break;
 				}
 			}
 		}
@@ -1015,7 +1016,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-				if (Tracer.HitNormal.y == 1)  // Hit BLOCK_FACE_YP, we are on the ground
+				if (Tracer.HitNormal.y == 1.f)  // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
@@ -1960,7 +1961,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 	{
 		return;
 	}
-	if ((a_Forward != 0) || (a_Sideways != 0))
+	if ((a_Forward != 0.f) || (a_Sideways != 0.f))
 	{
 		m_AttachedTo->HandleSpeedFromAttachee(a_Forward, a_Sideways);
 	}
