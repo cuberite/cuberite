@@ -1652,169 +1652,6 @@ void cProtocol180::FixItemFramePositions(int a_ObjectData, double & a_PosX, doub
 
 
 
-AString cProtocol180::ReadNBTDataFromBuffer(cByteBuffer & a_ByteBuffer, int a_ListTag)
-{
-	cByteBuffer BufferCache(64 KiB);
-	AString Data;
-
-	while (a_ByteBuffer.GetReadableSpace() != 0)
-	{
-		unsigned char TypeID;
-		if (a_ListTag != 0)
-		{
-			TypeID = (unsigned char)a_ListTag;
-		}
-		else
-		{
-			if (!a_ByteBuffer.ReadByte(TypeID))
-			{
-				// Can't read the next byte
-				break;
-			}
-			BufferCache.WriteByte(TypeID);
-		}
-
-		if ((TypeID <= eTagType::TAG_Min) || (TypeID > eTagType::TAG_Max))
-		{
-			// Bad type id (or TAG_End)
-			break;
-		}
-		eTagType TagType = static_cast<eTagType>(TypeID);
-
-		// Read the following string length:
-		if (a_ListTag == 0)
-		{
-			short StrLength = 0;
-			if (!a_ByteBuffer.ReadBEShort(StrLength))
-			{
-				// Can't read string length
-				return Data;
-			}
-			BufferCache.WriteBEShort(StrLength);
-
-			// Read string and write to BufferCache:
-			AString TagTitle;
-			if (!a_ByteBuffer.ReadString(TagTitle, (size_t)StrLength))
-			{
-				// Can't read string
-				return Data;
-			}
-			BufferCache.WriteBuf(TagTitle.data(), TagTitle.size());
-		}
-
-		size_t TagLength = 0;
-		switch (TagType)
-		{
-			case eTagType::TAG_Byte:   TagLength = sizeof(Byte);   break;
-			case eTagType::TAG_Short:  TagLength = sizeof(short);  break;
-			case eTagType::TAG_Int:    TagLength = sizeof(int);    break;
-			case eTagType::TAG_Long:   TagLength = sizeof(long);   break;
-			case eTagType::TAG_Float:  TagLength = sizeof(float);  break;
-			case eTagType::TAG_Double: TagLength = sizeof(double); break;
-			case eTagType::TAG_End:                                break;
-			case eTagType::TAG_Compound:
-			{
-				AString CompoundData = ReadNBTDataFromBuffer(a_ByteBuffer);
-				Data.append(CompoundData.data(), CompoundData.size());
-				break;
-			}
-			case eTagType::TAG_List:
-			{
-				Byte ListType;
-				int ListLength;
-				if (!a_ByteBuffer.ReadByte(ListType) || !a_ByteBuffer.ReadBEInt(ListLength) || (ListLength < 0))
-				{
-					// Bad list type or list length
-					return Data;
-				}
-				LOGWARNING("LIST, Type: %i", (int)ListType);
-
-				BufferCache.WriteByte(ListType);
-				BufferCache.WriteBEInt(ListLength);
-
-				if ((ListType <= eTagType::TAG_Min) || (ListType > eTagType::TAG_Max))
-				{
-					// Bad tag type
-					return Data;
-				}
-
-				for (int i = 0; i < ListLength; i++)
-				{
-					AString EntryData = ReadNBTDataFromBuffer(a_ByteBuffer, ListType);
-					BufferCache.WriteBuf(EntryData.data(), EntryData.size());
-				}
-				break;
-			}
-			case eTagType::TAG_String:
-			{
-				// Read the following string length:
-				short StrLength;
-				if (!a_ByteBuffer.ReadBEShort(StrLength))
-				{
-					// Can't read string length
-					return Data;
-				}
-				BufferCache.WriteBEShort(StrLength);
-				TagLength += (size_t)StrLength;
-				break;
-			}
-			case eTagType::TAG_ByteArray:
-			{
-				int ArrayLength;
-				if (!a_ByteBuffer.ReadBEInt(ArrayLength) || (ArrayLength < 0) || (ArrayLength >= 16777216))
-				{
-					// Bad array length
-					return Data;
-				}
-				BufferCache.WriteBEInt(ArrayLength);
-				TagLength += (size_t) ArrayLength;
-				break;
-			}
-			case eTagType::TAG_IntArray:
-			{
-				int ArrayLength;
-				if (!a_ByteBuffer.ReadBEInt(ArrayLength) || (ArrayLength < 0) || (ArrayLength >= 16777216))
-				{
-					// Bad array length
-					return Data;
-				}
-				BufferCache.WriteBEInt(ArrayLength);
-				TagLength += (size_t)ArrayLength * sizeof(int);
-				break;
-			}
-		}
-
-		// Copy tag bytes to the cache:
-		AString TagBytes;
-		if (!a_ByteBuffer.ReadString(TagBytes, TagLength))
-		{
-			break;
-		}
-		BufferCache.WriteBuf(TagBytes.data(), TagBytes.size());
-
-		// Write cache to Data and clean:
-		AString Bytes;
-		BufferCache.ReadAll(Bytes);
-		BufferCache.CommitRead();
-		Data.append(Bytes.data(), Bytes.size());
-	}
-
-	// Read the rest from cache
-	if (BufferCache.GetUsedSpace() != 0)
-	{
-		AString Bytes;
-		BufferCache.ReadAll(Bytes);
-		BufferCache.CommitRead();
-		Data.append(Bytes.data(), Bytes.size());
-	}
-
-	return Data;
-}
-
-
-
-
-
 void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
@@ -2254,7 +2091,7 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	}
 
 	cItem Item;
-	ReadItem(a_ByteBuffer, Item);
+	ReadItem(a_ByteBuffer, Item, a_ByteBuffer.GetReadableSpace() - 3);
 
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
@@ -2328,7 +2165,7 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
 	cItem Item;
-	if (!ReadItem(a_ByteBuffer, Item))
+	if (!ReadItem(a_ByteBuffer, Item, a_ByteBuffer.GetReadableSpace()))
 	{
 		return;
 	}
@@ -2581,7 +2418,7 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, TransactionID);
 	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Mode);
 	cItem Item;
-	ReadItem(a_ByteBuffer, Item);
+	ReadItem(a_ByteBuffer, Item, a_ByteBuffer.GetReadableSpace());
 
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
 	eClickAction Action;
@@ -2673,7 +2510,7 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 
 
 
-bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
+bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_MetadataSize)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
 	if (ItemType == -1)
@@ -2693,8 +2530,8 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 		a_Item.Empty();
 	}
 
-	AString Metadata = ReadNBTDataFromBuffer(a_ByteBuffer);
-	if (Metadata.size() == 0 || (Metadata[0] == 0))
+	AString Metadata;
+	if (!a_ByteBuffer.ReadString(Metadata, a_MetadataSize) || (Metadata.size() == 0) || (Metadata[0] == 0))
 	{
 		// No metadata
 		return true;

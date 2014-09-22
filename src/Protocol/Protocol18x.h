@@ -269,9 +269,6 @@ protected:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
-
-	/** Read a nbt data from the buffer. (It's needed because the 1.8 protocol doesn't send the nbt length) */
-	AString ReadNBTDataFromBuffer(cByteBuffer & a_ByteBuffer, int a_ListTag = 0);
 	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
@@ -325,7 +322,7 @@ protected:
 	void SendCompass(const cWorld & a_World);
 	
 	/** Reads an item out of the received data, sets a_Item to the values read. Returns false if not enough received data */
-	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item);
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_MetadataSize = 1);
 	
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
