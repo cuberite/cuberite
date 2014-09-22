@@ -8,6 +8,8 @@
 #include "Globals.h"
 #include "ChunkDataSerializer.h"
 #include "zlib/zlib.h"
+#include "ByteBuffer.h"
+#include "Protocol18x.h"
 
 
 
@@ -30,7 +32,7 @@ cChunkDataSerializer::cChunkDataSerializer(
 
 
 
-const AString & cChunkDataSerializer::Serialize(int a_Version)
+const AString & cChunkDataSerializer::Serialize(int a_Version, int a_ChunkX, int a_ChunkZ)
 {
 	Serializations::const_iterator itr = m_Serializations.find(a_Version);
 	if (itr != m_Serializations.end())
@@ -43,6 +45,7 @@ const AString & cChunkDataSerializer::Serialize(int a_Version)
 	{
 		case RELEASE_1_2_5: Serialize29(data); break;
 		case RELEASE_1_3_2: Serialize39(data); break;
+		case RELEASE_1_8_0: Serialize47(data, a_ChunkX, a_ChunkZ); break;
 		// TODO: Other protocol versions may serialize the data differently; implement here
 		
 		default:
@@ -52,7 +55,10 @@ const AString & cChunkDataSerializer::Serialize(int a_Version)
 			break;
 		}
 	}
-	m_Serializations[a_Version] = data;
+	if (!data.empty())
+	{
+		m_Serializations[a_Version] = data;
+	}
 	return m_Serializations[a_Version];
 }
 
@@ -169,6 +175,75 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	// Unlike 29, 39 doesn't have the "unused" int
 	
 	a_Data.append(CompressedBlockData, CompressedSize);
+}
+
+
+
+
+
+void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ)
+{
+	// This function returns the fully compressed packet (including packet size), not the raw packet!
+
+	// Create the packet:
+	cByteBuffer Packet(512 KiB);
+	Packet.WriteVarInt(0x21);  // Packet id (Chunk Data packet)
+	Packet.WriteBEInt(a_ChunkX);
+	Packet.WriteBEInt(a_ChunkZ);
+	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
+	Packet.WriteBEShort((short) 0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
+
+	// Write the chunk size:
+	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
+	UInt32 ChunkSize = (
+		(cChunkDef::NumBlocks * 2) +  // Block meta + type
+		sizeof(m_BlockLight) +        // Block light
+		sizeof(m_BlockSkyLight) +     // Block sky light
+		BiomeDataSize                 // Biome data
+	);
+	Packet.WriteVarInt(ChunkSize);
+
+	// Write the block types to the packet:
+	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
+	{
+		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
+		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
+		Packet.WriteByte((unsigned char)(BlockType << 4) | BlockMeta);
+		Packet.WriteByte((unsigned char)(BlockType >> 4));
+	}
+
+	// Write the rest:
+	Packet.WriteBuf(m_BlockLight,    sizeof(m_BlockLight));
+	Packet.WriteBuf(m_BlockSkyLight, sizeof(m_BlockSkyLight));
+	Packet.WriteBuf(m_BiomeData,     BiomeDataSize);
+
+	AString PacketData;
+	Packet.ReadAll(PacketData);
+	Packet.CommitRead();
+
+	cByteBuffer Buffer(20);
+	if (PacketData.size() >= 256)
+	{
+		if (!cProtocol180::CompressPacket(PacketData, a_Data))
+		{
+			ASSERT(!"Packet compression failed.");
+			a_Data.clear();
+			return;
+		}
+	}
+	else
+	{
+		AString PostData;
+		Buffer.WriteVarInt((UInt32)Packet.GetUsedSpace() + 1);
+		Buffer.WriteVarInt(0);
+		Buffer.ReadAll(PostData);
+		Buffer.CommitRead();
+
+		a_Data.clear();
+		a_Data.reserve(PostData.size() + PacketData.size());
+		a_Data.append(PostData.data(), PostData.size());
+		a_Data.append(PacketData.data(), PacketData.size());
+	}
 }
 
 
