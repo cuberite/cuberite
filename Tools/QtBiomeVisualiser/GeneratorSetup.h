@@ -11,21 +11,25 @@
 
 
 class cIniFile;
+typedef std::shared_ptr<cIniFile> cIniFilePtr;
 
 
 
 
 
-class GeneratorSetupDlg :
-	public QDialog
+class GeneratorSetup :
+	public QWidget
 {
-	typedef QDialog super;
+	typedef QWidget super;
 
 	Q_OBJECT
 
 public:
-	/** Creates the dialog and loads the contents of the INI file, if not empty. */
-	explicit GeneratorSetupDlg(const std::string & a_IniFileName, QWidget * parent = nullptr);
+	/** Creates the widget and loads the contents of the INI file, if not empty. */
+	explicit GeneratorSetup(const std::string & a_IniFileName, QWidget * parent = nullptr);
+
+	/** Returns the cIniFile instance that is being edited by this widget. */
+	cIniFilePtr getIniFile() { return m_IniFile; }
 
 signals:
 
@@ -39,7 +43,7 @@ protected:
 	QVBoxLayout * m_MainLayout;
 	QFormLayout * m_FormLayout;
 
-	std::unique_ptr<cIniFile> m_IniFile;
+	cIniFilePtr m_IniFile;
 
 	int m_Seed;
 

@@ -12,19 +12,27 @@
 #include "Generating/BioGen.h"
 #include "StringCompression.h"
 #include "WorldStorage/FastNBT.h"
-#include "GeneratorSetupDlg.h"
+#include "GeneratorSetup.h"
 
 
 
 
 
 MainWindow::MainWindow(QWidget * parent) :
-	QMainWindow(parent)
+	QMainWindow(parent),
+	m_GeneratorSetup(nullptr),
+	m_LineSeparator(nullptr)
 {
 	initMinecraftPath();
 
-	m_BiomeView = new BiomeView(this);
-	setCentralWidget(m_BiomeView);
+	m_BiomeView = new BiomeView();
+	m_MainLayout = new QHBoxLayout();
+	m_MainLayout->addWidget(m_BiomeView);
+	m_MainLayout->setMenuBar(menuBar());
+	m_MainLayout->setMargin(0);
+	QWidget * central = new QWidget();
+	central->setLayout(m_MainLayout);
+	setCentralWidget(central);
 
 	createActions();
 	createMenus();
@@ -48,9 +56,7 @@ void MainWindow::newGenerator()
 	// TODO
 
 	// (Re-)open the generator setup dialog:
-	m_GeneratorSetupDlg.reset(new GeneratorSetupDlg(""));
-	m_GeneratorSetupDlg->show();
-	m_GeneratorSetupDlg->raise();
+	openGeneratorSetup("");
 
 	// TODO
 }
@@ -69,9 +75,7 @@ void MainWindow::openGenerator()
 	}
 
 	// (Re-)open the generator setup dialog:
-	m_GeneratorSetupDlg.reset(new GeneratorSetupDlg(worldIni.toStdString()));
-	m_GeneratorSetupDlg->show();
-	m_GeneratorSetupDlg->raise();
+	openGeneratorSetup(worldIni.toStdString());
 
 	// Set the chunk source:
 	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(worldIni)));
@@ -92,11 +96,7 @@ void MainWindow::openWorld()
 	}
 
 	// Remove the generator setup dialog, if open:
-	if (m_GeneratorSetupDlg.get() != nullptr)
-	{
-		m_GeneratorSetupDlg->hide();
-		m_GeneratorSetupDlg.reset(nullptr);
-	}
+	closeGeneratorSetup();
 
 	// Set the chunk source:
 	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(regionFolder)));
@@ -117,11 +117,7 @@ void MainWindow::openVanillaWorld()
 	}
 
 	// Remove the generator setup dialog, if open:
-	if (m_GeneratorSetupDlg.get() != nullptr)
-	{
-		m_GeneratorSetupDlg->hide();
-		m_GeneratorSetupDlg.reset(nullptr);
-	}
+	closeGeneratorSetup();
 
 	// Set the chunk source:
 	m_BiomeView->setChunkSource(std::shared_ptr<AnvilSource>(new AnvilSource(action->data().toString())));
@@ -271,6 +267,39 @@ QString MainWindow::getWorldName(const AString & a_Path)
 		return QString();
 	}
 	return QString::fromStdString(nbt.GetString(levelNameTag));
+}
+
+
+
+
+
+void MainWindow::openGeneratorSetup(const AString & a_IniFileName)
+{
+	// Close any previous editor:
+	closeGeneratorSetup();
+
+	// Open up a new editor:
+	m_GeneratorSetup = new GeneratorSetup(a_IniFileName);
+	m_LineSeparator = new QWidget();
+	m_LineSeparator->setFixedWidth(2);
+	m_LineSeparator->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+	m_LineSeparator->setStyleSheet(QString("background-color: #c0c0c0;"));
+	m_MainLayout->addWidget(m_LineSeparator);
+	m_MainLayout->addWidget(m_GeneratorSetup);
+}
+
+
+
+
+
+void MainWindow::closeGeneratorSetup()
+{
+	delete m_MainLayout->takeAt(2);
+	delete m_MainLayout->takeAt(1);
+	delete m_GeneratorSetup;
+	delete m_LineSeparator;
+	m_GeneratorSetup = nullptr;
+	m_LineSeparator = nullptr;
 }
 
 

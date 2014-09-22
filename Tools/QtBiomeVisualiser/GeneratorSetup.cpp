@@ -1,5 +1,5 @@
 #include "Globals.h"
-#include "GeneratorSetupDlg.h"
+#include "GeneratorSetup.h"
 #include <QLabel>
 #include <QLineEdit>
 #include "Generating/BioGen.h"
@@ -23,13 +23,13 @@ static const QString s_GeneratorNames[] =
 
 
 
-GeneratorSetupDlg::GeneratorSetupDlg(const AString & a_IniFileName, QWidget * a_Parent) :
+GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent) :
 	super(a_Parent),
 	m_IniFile(new cIniFile())
 {
 	// The generator name is in a separate form layout at the top, always present:
 	m_cbGenerator = new QComboBox();
-	m_cbGenerator->setMinimumWidth(300);
+	m_cbGenerator->setMinimumWidth(120);
 	for (size_t i = 0; i < ARRAYCOUNT(s_GeneratorNames); i++)
 	{
 		m_cbGenerator->addItem(s_GeneratorNames[i]);
@@ -44,6 +44,7 @@ GeneratorSetupDlg::GeneratorSetupDlg(const AString & a_IniFileName, QWidget * a_
 	m_MainLayout = new QVBoxLayout();
 	m_MainLayout->addLayout(nameLayout);
 	m_MainLayout->addLayout(m_FormLayout);
+	m_MainLayout->addStretch();
 	setLayout(m_MainLayout);
 
 	// Load the INI file, if specified, otherwise set defaults:
@@ -68,7 +69,7 @@ GeneratorSetupDlg::GeneratorSetupDlg(const AString & a_IniFileName, QWidget * a_
 
 
 
-void GeneratorSetupDlg::generatorChanged(const QString & a_NewName)
+void GeneratorSetup::generatorChanged(const QString & a_NewName)
 {
 	// Clear the current contents of the form layout by assigning it to a stack temporary:
 	{
@@ -78,7 +79,7 @@ void GeneratorSetupDlg::generatorChanged(const QString & a_NewName)
 
 	// Re-create the layout:
 	m_FormLayout = new QFormLayout();
-	m_MainLayout->addLayout(m_FormLayout);
+	m_MainLayout->insertLayout(1, m_FormLayout);
 
 	// Recreate the INI file:
 	m_IniFile->Clear();
@@ -97,7 +98,7 @@ void GeneratorSetupDlg::generatorChanged(const QString & a_NewName)
 
 
 
-void GeneratorSetupDlg::updateFromIni()
+void GeneratorSetup::updateFromIni()
 {
 	int keyID = m_IniFile->FindKey("Generator");
 	if (keyID <= -1)
@@ -105,6 +106,8 @@ void GeneratorSetupDlg::updateFromIni()
 		return;
 	}
 	int numItems = m_IniFile->GetNumValues(keyID);
+	AString generatorName = m_IniFile->GetValue("Generator", "BiomeGen");
+	size_t generatorNameLen = generatorName.length();
 	for (int i = 0; i < numItems; i++)
 	{
 		AString itemName  = m_IniFile->GetValueName(keyID, i);
@@ -114,6 +117,13 @@ void GeneratorSetupDlg::updateFromIni()
 			// These special cases are not to be added
 			continue;
 		}
+
+		// Remove the generator name prefix from the item name, for clarity purposes:
+		if (NoCaseCompare(itemName.substr(0, generatorNameLen), generatorName) == 0)
+		{
+			itemName.erase(0, generatorNameLen);
+		}
+
 		QLineEdit * edit = new QLineEdit();
 		edit->setText(QString::fromStdString(itemValue));
 		m_FormLayout->addRow(new QLabel(QString::fromStdString(itemName)), edit);

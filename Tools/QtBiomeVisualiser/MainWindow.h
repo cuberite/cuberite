@@ -3,6 +3,7 @@
 #include <memory>
 #include <QList>
 #include <QMainWindow>
+#include <QHBoxLayout>
 #include "BiomeView.h"
 
 
@@ -10,7 +11,7 @@
 
 
 // fwd:
-class GeneratorSetupDlg;
+class GeneratorSetup;
 
 
 
@@ -20,8 +21,6 @@ class MainWindow :
 	public QMainWindow
 {
 	Q_OBJECT
-
-	BiomeView * m_BiomeView;
 
 public:
 	MainWindow(QWidget * parent = nullptr);
@@ -54,8 +53,17 @@ protected:
 	/** Path to the vanilla folder. */
 	QString m_MinecraftPath;
 
-	/** The dialog for setting up the generator. */
-	std::unique_ptr<GeneratorSetupDlg> m_GeneratorSetupDlg;
+	/** The pane for setting up the generator, available when visualising a generator. */
+	GeneratorSetup * m_GeneratorSetup;
+
+	/** The main biome display widget. */
+	BiomeView * m_BiomeView;
+
+	/** The layout for the window. */
+	QHBoxLayout * m_MainLayout;
+
+	/** The separator line between biome view and generator setup. */
+	QWidget * m_LineSeparator;
 
 
 	/** Initializes the m_MinecraftPath based on the proper MC path */
@@ -73,6 +81,12 @@ protected:
 	/** Returns the name of the vanilla world in the specified path.
 	Reads the level.dat file for the name. Returns an empty string on failure. */
 	QString getWorldName(const AString & a_Path);
+
+	/** Opens the generator setup pane, if not already open, and loads the specified INI file to it. */
+	void openGeneratorSetup(const AString & a_IniFileName);
+
+	/** Closes and destroys the generator setup pane, if there is one. */
+	void closeGeneratorSetup();
 };
 
 
