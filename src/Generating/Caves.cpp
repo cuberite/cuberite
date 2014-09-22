@@ -755,7 +755,7 @@ void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 				float n2 = m_Noise2.CubicNoise3D(xx, yy, zz);
 				float n3 = m_Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
 				float n4 = m_Noise2.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
-				if ((abs(n1 + n3) * abs(n2 + n4)) > m_Threshold)
+				if ((std::abs(n1 + n3) * std::abs(n2 + n4)) > m_Threshold)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
 				}

@@ -236,7 +236,7 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
 	for (size_t i = 0; i < ARRAYCOUNT(Height); i++)
 	{
-		Height[i] = abs(Height[i]) * m_HeightAmplification + 1;
+		Height[i] = std::abs(Height[i]) * m_HeightAmplification + 1;
 	}
 
 	// Modify the noise by height data:
@@ -395,7 +395,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 		for (int x = 0; x < 17; x += UPSCALE_X)
 		{
 			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-			NOISE_DATATYPE val = abs(m_Noise1.CubicNoise2D(NoiseX / 5, NoiseZ / 5)) * m_HeightAmplification + 1;
+			NOISE_DATATYPE val = std::abs(m_Noise1.CubicNoise2D(NoiseX / 5, NoiseZ / 5)) * m_HeightAmplification + 1;
 			Height[x + 17 * z] = val * val * val;
 		}
 	}
