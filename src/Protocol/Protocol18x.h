@@ -269,6 +269,9 @@ protected:
 	/** The dimension that was last sent to a player in a Respawn or Login packet.
 	Used to avoid Respawning into the same dimension, which confuses the client. */
 	eDimension m_LastSentDimension;
+
+	/** Read a nbt data from the buffer. (It's needed because the 1.8 protocol doesn't send the nbt length) */
+	AString ReadNBTDataFromBuffer(cByteBuffer & a_ByteBuffer, int a_ListTag = 0);
 	
 	
 	/** Adds the received (unencrypted) data to m_ReceivedData, parses complete packets */
