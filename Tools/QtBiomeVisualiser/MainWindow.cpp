@@ -53,12 +53,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::newGenerator()
 {
-	// TODO
-
-	// (Re-)open the generator setup dialog:
+	// (Re-)open the generator setup dialog with empty settings:
 	openGeneratorSetup("");
 
-	// TODO
+	// Set the chunk source:
+	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(m_GeneratorSetup->getIniFile())));
+	m_BiomeView->redraw();
 }
 
 
@@ -78,7 +78,7 @@ void MainWindow::openGenerator()
 	openGeneratorSetup(worldIni.toStdString());
 
 	// Set the chunk source:
-	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(worldIni)));
+	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(m_GeneratorSetup->getIniFile())));
 	m_BiomeView->redraw();
 }
 

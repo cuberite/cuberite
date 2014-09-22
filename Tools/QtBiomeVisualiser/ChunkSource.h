@@ -12,6 +12,7 @@
 class cBiomeGen;
 typedef std::shared_ptr<cBiomeGen> cBiomeGenPtr;
 class cIniFile;
+typedef std::shared_ptr<cIniFile> cIniFilePtr;
 
 
 
@@ -41,15 +42,15 @@ class BioGenSource :
 {
 public:
 	/** Constructs a new BioGenSource based on the biome generator that is defined in the specified world.ini file. */
-	BioGenSource(QString a_WorldIniPath);
+	BioGenSource(cIniFilePtr a_IniFile);
 
 	// ChunkSource overrides:
 	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) override;
 	virtual void reload(void) override;
 
 protected:
-	/** Path to the world.ini file from which the m_WorldIni is regenerated on reload requests. */
-	QString m_WorldIniPath;
+	/** The world.ini contents from which the generator is created and re-created on reload(). */
+	cIniFilePtr m_IniFile;
 
 	/** The generator used for generating biomes. */
 	std::unique_ptr<cBiomeGen> m_BiomeGen;
