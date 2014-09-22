@@ -260,7 +260,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 void cEntity::SetYawFromSpeed(void)
 {
 	const double EPS = 0.0000001;
-	if ((abs(m_Speed.x) < EPS) && (abs(m_Speed.z) < EPS))
+	if ((std::abs(m_Speed.x) < EPS) && (std::abs(m_Speed.z) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetYaw(0);
@@ -277,7 +277,7 @@ void cEntity::SetPitchFromSpeed(void)
 {
 	const double EPS = 0.0000001;
 	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
-	if ((abs(xz) < EPS) && (abs(m_Speed.y) < EPS))
+	if ((std::abs(xz) < EPS) && (std::abs(m_Speed.y) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetPitch(0);

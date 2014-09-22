@@ -876,7 +876,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
 			// Prevent division by small numbers
-			if (abs(Distance.z) < 0.001)
+			if (std::abs(Distance.z) < 0.001)
 			{
 				Distance.z = 0.001;
 			}
@@ -925,7 +925,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
 			// Prevent division by small numbers
-			if (abs(Distance.z) < 0.001)
+			if (std::abs(Distance.z) < 0.001)
 			{
 				Distance.z = 0.001;
 			}
