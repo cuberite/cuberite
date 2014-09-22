@@ -2091,7 +2091,7 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	}
 
 	cItem Item;
-	ReadItem(a_ByteBuffer, Item, a_ByteBuffer.GetReadableSpace() - 3);
+	ReadItem(a_ByteBuffer, Item, 3);
 
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
@@ -2165,7 +2165,7 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
 	cItem Item;
-	if (!ReadItem(a_ByteBuffer, Item, a_ByteBuffer.GetReadableSpace()))
+	if (!ReadItem(a_ByteBuffer, Item))
 	{
 		return;
 	}
@@ -2418,7 +2418,7 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, TransactionID);
 	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Mode);
 	cItem Item;
-	ReadItem(a_ByteBuffer, Item, a_ByteBuffer.GetReadableSpace());
+	ReadItem(a_ByteBuffer, Item);
 
 	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
 	eClickAction Action;
@@ -2510,7 +2510,7 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 
 
 
-bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_MetadataSize)
+bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_RemainingBytes)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
 	if (ItemType == -1)
@@ -2531,7 +2531,7 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a
 	}
 
 	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, a_MetadataSize) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_RemainingBytes) || (Metadata.size() == 0) || (Metadata[0] == 0))
 	{
 		// No metadata
 		return true;

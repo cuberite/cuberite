@@ -322,7 +322,7 @@ protected:
 	void SendCompass(const cWorld & a_World);
 	
 	/** Reads an item out of the received data, sets a_Item to the values read. Returns false if not enough received data */
-	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_MetadataSize = 1);
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_RemainingBytes = 0);
 	
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
