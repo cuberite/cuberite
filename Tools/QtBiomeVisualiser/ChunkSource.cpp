@@ -171,7 +171,7 @@ void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChu
 
 void BioGenSource::reload()
 {
-	int seed = m_IniFile->GetValueSetI("Seed", "Seed", 0);
+	int seed = m_IniFile->GetValueSetI("Generator", "Seed", 0);
 	bool unused = false;
 	QMutexLocker lock(&m_Mtx);
 	m_BiomeGen.reset(cBiomeGen::CreateBiomeGen(*m_IniFile, seed, unused));

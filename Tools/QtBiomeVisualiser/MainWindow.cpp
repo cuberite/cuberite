@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget * parent) :
 
 	m_BiomeView = new BiomeView();
 	m_MainLayout = new QHBoxLayout();
-	m_MainLayout->addWidget(m_BiomeView);
+	m_MainLayout->addWidget(m_BiomeView, 1);
 	m_MainLayout->setMenuBar(menuBar());
 	m_MainLayout->setMargin(0);
 	QWidget * central = new QWidget();
@@ -57,7 +57,8 @@ void MainWindow::newGenerator()
 	openGeneratorSetup("");
 
 	// Set the chunk source:
-	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(m_GeneratorSetup->getIniFile())));
+	cIniFilePtr iniFile = m_GeneratorSetup->getIniFile();
+	m_BiomeView->setChunkSource(std::shared_ptr<BioGenSource>(new BioGenSource(iniFile)));
 	m_BiomeView->redraw();
 }
 
@@ -260,7 +261,6 @@ QString MainWindow::getWorldName(const AString & a_Path)
 		return QString();
 	}
 	AString name = nbt.GetName(1);
-	OutputDebugStringA(name.c_str());
 	int levelNameTag = nbt.FindTagByPath(nbt.GetRoot(), "Data\\LevelName");
 	if ((levelNameTag <= 0) || (nbt.GetType(levelNameTag) != TAG_String))
 	{
@@ -286,6 +286,9 @@ void MainWindow::openGeneratorSetup(const AString & a_IniFileName)
 	m_LineSeparator->setStyleSheet(QString("background-color: #c0c0c0;"));
 	m_MainLayout->addWidget(m_LineSeparator);
 	m_MainLayout->addWidget(m_GeneratorSetup);
+
+	// Connect the signals from the setup pane:
+	connect(m_GeneratorSetup, SIGNAL(generatorUpdated()), m_BiomeView, SLOT(reload()));
 }
 
 

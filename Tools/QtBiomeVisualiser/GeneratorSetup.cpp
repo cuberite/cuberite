@@ -27,22 +27,27 @@ GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent
 	super(a_Parent),
 	m_IniFile(new cIniFile())
 {
-	// The generator name is in a separate form layout at the top, always present:
+	// The seed and generator name is in a separate form layout at the top, always present:
+	m_eSeed = new QLineEdit();
+	m_eSeed->setValidator(new QIntValidator());
+	m_eSeed->setText("0");
+	m_eSeed->setProperty("INI.ItemName", QVariant("Seed"));
 	m_cbGenerator = new QComboBox();
 	m_cbGenerator->setMinimumWidth(120);
 	for (size_t i = 0; i < ARRAYCOUNT(s_GeneratorNames); i++)
 	{
 		m_cbGenerator->addItem(s_GeneratorNames[i]);
 	}
-	QFormLayout * nameLayout = new QFormLayout();
-	nameLayout->addRow(new QLabel(tr("Generator")), m_cbGenerator);
+	QFormLayout * baseLayout = new QFormLayout();
+	baseLayout->addRow(new QLabel(tr("Seed")), m_eSeed);
+	baseLayout->addRow(new QLabel(tr("Generator")), m_cbGenerator);
 
 	// The rest of the controls are in a dynamically created form layout:
 	m_FormLayout = new QFormLayout();
 
 	// The main layout joins these two vertically:
 	m_MainLayout = new QVBoxLayout();
-	m_MainLayout->addLayout(nameLayout);
+	m_MainLayout->addLayout(baseLayout);
 	m_MainLayout->addLayout(m_FormLayout);
 	m_MainLayout->addStretch();
 	setLayout(m_MainLayout);
@@ -51,18 +56,20 @@ GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent
 	if (!a_IniFileName.empty() && m_IniFile->ReadFile(a_IniFileName))
 	{
 		m_cbGenerator->setCurrentText(QString::fromStdString(m_IniFile->GetValue("Generator", "BiomeGen")));
+		m_eSeed->setText(QString::number(m_IniFile->GetValueI("Generator", "Seed")));
 	}
 	else
 	{
 		m_IniFile->SetValue("Generator", "Generator", "Composable");
 		m_IniFile->SetValue("Generator", "BiomeGen", m_cbGenerator->currentText().toStdString());
 		bool dummy;
-		delete cBiomeGen::CreateBiomeGen(*m_IniFile, m_Seed, dummy);
+		delete cBiomeGen::CreateBiomeGen(*m_IniFile, 0, dummy);
 	}
 	updateFromIni();
 
-	// Connect the combo change even only after the data has been loaded:
-	connect(m_cbGenerator, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(generatorChanged(QString)));
+	// Connect the change events only after the data has been loaded:
+	connect(m_cbGenerator, SIGNAL(currentIndexChanged(QString)), this, SLOT(generatorChanged(QString)));
+	connect(m_eSeed,       SIGNAL(textChanged(QString)),         this, SLOT(editChanged(QString)));
 }
 
 
@@ -92,6 +99,20 @@ void GeneratorSetup::generatorChanged(const QString & a_NewName)
 
 	// Read all values from the INI file and put them into the form layout:
 	updateFromIni();
+
+	// Notify of the changes:
+	emit generatorUpdated();
+}
+
+
+
+
+
+void GeneratorSetup::editChanged(const QString & a_NewValue)
+{
+	QString itemName = sender()->property("INI.ItemName").toString();
+	m_IniFile->SetValue("Generator", itemName.toStdString(), a_NewValue.toStdString());
+	emit generatorUpdated();
 }
 
 
@@ -111,12 +132,16 @@ void GeneratorSetup::updateFromIni()
 	for (int i = 0; i < numItems; i++)
 	{
 		AString itemName  = m_IniFile->GetValueName(keyID, i);
-		AString itemValue = m_IniFile->GetValue(keyID, i);
 		if ((itemName == "Generator") || (itemName == "BiomeGen"))
 		{
 			// These special cases are not to be added
 			continue;
 		}
+		AString itemValue = m_IniFile->GetValue(keyID, i);
+
+		QLineEdit * edit = new QLineEdit();
+		edit->setText(QString::fromStdString(itemValue));
+		edit->setProperty("INI.ItemName", QVariant(QString::fromStdString(itemName)));
 
 		// Remove the generator name prefix from the item name, for clarity purposes:
 		if (NoCaseCompare(itemName.substr(0, generatorNameLen), generatorName) == 0)
@@ -124,8 +149,7 @@ void GeneratorSetup::updateFromIni()
 			itemName.erase(0, generatorNameLen);
 		}
 
-		QLineEdit * edit = new QLineEdit();
-		edit->setText(QString::fromStdString(itemValue));
+		connect(edit, SIGNAL(textChanged(QString)), this, SLOT(editChanged(QString)));
 		m_FormLayout->addRow(new QLabel(QString::fromStdString(itemName)), edit);
 	}  // for i - INI values[]
 }

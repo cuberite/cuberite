@@ -89,8 +89,6 @@ INCLUDEPATH += $$_PRO_FILE_PWD_ \
 
 CONFIG += C++11
 
-OTHER_FILES += \
-    ../../lib/zlib/example.c.txt \
-    ../../lib/zlib/minigzip.c.txt
+OTHER_FILES +=
 
 

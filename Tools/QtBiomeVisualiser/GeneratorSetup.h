@@ -32,14 +32,21 @@ public:
 	cIniFilePtr getIniFile() { return m_IniFile; }
 
 signals:
+	/** Emitted when the generator parameters have changed. */
+	void generatorUpdated();
 
 public slots:
 	/** Called when the user selects a different generator from the top combobox.
 	Re-creates m_IniFile and updates the form layout. */
 	void generatorChanged(const QString & a_NewName);
 
+protected slots:
+	/** Called when any of the edit widgets are changed. */
+	void editChanged(const QString & a_NewValue);
+
 protected:
 	QComboBox * m_cbGenerator;
+	QLineEdit * m_eSeed;
 	QVBoxLayout * m_MainLayout;
 	QFormLayout * m_FormLayout;
 
