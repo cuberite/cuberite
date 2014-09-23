@@ -2476,10 +2476,24 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 		Monster->SetIsAngry(Angry);
 	}
 	int CollarColorIdx = a_NBT.FindChildByName(a_TagIdx, "CollarColor");
-	if ((CollarColorIdx > 0) && (a_NBT.GetType(CollarColorIdx) == TAG_Int))
+	if (CollarColorIdx > 0)
 	{
-		int CollarColor = a_NBT.GetInt(CollarColorIdx);
-		Monster->SetCollarColor(CollarColor);
+		switch (a_NBT.GetType(CollarColorIdx))
+		{
+			case TAG_Byte:
+			{
+				// Vanilla uses this
+				unsigned char CollarColor = a_NBT.GetByte(CollarColorIdx);
+				Monster->SetCollarColor(CollarColor);
+				break;
+			}
+			case TAG_Int:
+			{
+				// Old MCS code used this, keep reading it for compatibility reasons:
+				Monster->SetCollarColor(a_NBT.GetInt(CollarColorIdx));
+				break;
+			}
+		}
 	}
 	a_Entities.push_back(Monster.release());
 }
