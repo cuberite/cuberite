@@ -283,7 +283,7 @@ int cTracer::intersect3D_SegmentPlane( const Vector3f & a_Origin, const Vector3f
 	if (fabs(D) < EPSILON)
 	{
 		// segment is parallel to plane
-		if (N == 0)
+		if (N == 0.0)
 		{
 			// segment lies in plane
 			return 2;
