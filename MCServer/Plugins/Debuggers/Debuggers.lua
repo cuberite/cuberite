@@ -38,7 +38,7 @@ function Initialize(Plugin)
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
-	PM:BindCommand("/cm",      "debuggers", HandleCustomNameCmd,   "- Gives you a custom name");
+	PM:BindCommand("/nick",    "debuggers", HandleNickCmd,         "- Gives you a custom name");
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -66,6 +66,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
 	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z");
 	PM:BindCommand("/rmitem",  "debuggers", HandleRMItem,          "- Remove the specified item from the inventory.");
+	PM:BindCommand("/pickups", "debuggers", HandlePickups,         "- Spawns random pickups around you");
+	PM:BindCommand("/poof",    "debuggers", HandlePoof,            "- Nudges pickups close to you away from you");
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -769,14 +771,13 @@ end
 
 
 
-function HandleCustomNameCmd(Split, Player)
+function HandleNickCmd(Split, Player)
 	if (Split[2] == nil) then
-		Player:SendMessage("Usage: /cm [CustomName]");
+		Player:SendMessage("Usage: /nick [CustomName]");
 		return true;
 	end
 
-	local NewName = Split[2]
-	Player:SetCustomName(NewName);
+	Player:SetCustomName(Split[2]);
 	Player:SendMessageSuccess("Custom name setted to " .. Player:GetCustomName() .. "!")
 	return true
 end
@@ -1517,7 +1518,7 @@ function OnPlayerJoined(a_Player)
 	-- Test composite chat chaining:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")
 		:AddRunCommandPart(" SetDay", "/time set 0")
 	)
@@ -1570,6 +1571,60 @@ function OnProjectileHitBlock(a_ProjectileEntity, a_BlockX, a_BlockY, a_BlockZ, 
 	LOG("  Projectile EntityID: " .. a_ProjectileEntity:GetUniqueID())
 	LOG("  Block: {" .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. "}, face " .. a_BlockFace)
 	LOG("  HitPos: {" .. a_BlockHitPos.x .. ", " .. a_BlockHitPos.y .. ", " .. a_BlockHitPos.z .. "}")
+end
+
+
+
+
+
+local PossibleItems =
+{
+	cItem(E_ITEM_DIAMOND),
+	cItem(E_ITEM_GOLD),
+	cItem(E_ITEM_IRON),
+	cItem(E_ITEM_DYE, 1, E_META_DYE_BLUE),  -- Lapis lazuli
+	cItem(E_ITEM_COAL),
+}
+
+
+
+
+
+function HandlePickups(a_Split, a_Player)
+	local PlayerX = a_Player:GetPosX()
+	local PlayerY = a_Player:GetPosY()
+	local PlayerZ = a_Player:GetPosZ()
+	local World = a_Player:GetWorld()
+	local Range = 12
+	for x = 0, Range do for z = 0, Range do
+		local px = PlayerX + x - Range / 2
+		local pz = PlayerZ + z - Range / 2
+		local Items = cItems()
+		Items:Add(PossibleItems[math.random(#PossibleItems)])
+		World:SpawnItemPickups(Items, px, PlayerY, pz, 0)
+	end end  -- for z, for x
+	return true
+end
+
+
+
+
+function HandlePoof(a_Split, a_Player)
+	local PlayerPos = Vector3d(a_Player:GetPosition())  -- Create a copy of the position
+	PlayerPos.y = PlayerPos.y - 1
+	local Box = cBoundingBox(PlayerPos, 4, 2)
+	local NumEntities = 0
+	a_Player:GetWorld():ForEachEntityInBox(Box,
+		function (a_Entity)
+			if not(a_Entity:IsPlayer()) then
+				local AddSpeed = a_Entity:GetPosition() - PlayerPos  -- Speed away from the player
+				a_Entity:AddSpeed(AddSpeed * 32 / (AddSpeed:SqrLength() + 1))  -- The further away, the less speed to add
+				NumEntities = NumEntities + 1
+			end
+		end
+	)
+	a_Player:SendMessage("Poof! (" .. NumEntities .. " entities)")
+	return true
 end
 
 

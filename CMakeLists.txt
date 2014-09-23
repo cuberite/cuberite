@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.2)
+cmake_minimum_required (VERSION 2.8.7)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
@@ -16,6 +16,25 @@ endif()
 
 if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})
 	set(BUILD_WITH_COVERAGE $ENV{TRAVIS_BUILD_WITH_COVERAGE})
+endif()
+
+if(DEFINED ENV{MCSERVER_BUILD_ID})
+	set(BUILD_ID $ENV{MCSERVER_BUILD_ID})
+	set(BUILD_SERIES_NAME $ENV{MCSERVER_BUILD_SERIES_NAME})
+	set(BUILD_DATETIME $ENV{MCSERVER_BUILD_DATETIME})
+	if(DEFINED ENV{MCSERVER_BUILD_COMMIT_ID})
+		set(BUILD_COMMIT_ID $ENV{MCSERVER_BUILD_COMMIT_ID})
+	else()
+		message("Commit id not set, attempting to determine id from git")
+		execute_process(
+			COMMAND git rev-parse HEAD
+			RESULT_VARIABLE GIT_EXECUTED
+			OUTPUT_VARIABLE BUILD_COMMIT_ID)
+			string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
+		if (NOT (GIT_EXECUTED EQUAL 0))
+			message(FATAL_ERROR "Could not identifiy git commit id")
+		endif()
+	endif()
 endif()
 
 # This has to be done before any flags have been set up.

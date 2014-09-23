@@ -131,6 +131,11 @@ public:  // tolua_export
 	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
 	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
 	
+	/** Returns true if BungeeCord logins (that specify the player's UUID) are allowed.
+	Read from settings, admins should set this to true only when they chain to BungeeCord,
+	it makes the server vulnerable to identity theft through direct connections. */
+	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
+	
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
@@ -230,6 +235,9 @@ private:
 	This allows a seamless transition from name-based to UUID-based player storage.
 	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
 	bool m_ShouldLoadNamedPlayerData;
+	
+	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
+	bool m_ShouldAllowBungeeCord;
 
 
 	cServer(void);

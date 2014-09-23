@@ -250,7 +250,7 @@ int LinesCross(float x0, float y0, float x1, float y1, float x2, float y2, float
 	// float linx, liny;
 
 	float d=(x1-x0)*(y3-y2)-(y1-y0)*(x3-x2);
-	if (abs(d)<0.001) {return 0;}
+	if (std::abs(d)<0.001) {return 0;}
 	float AB=((y0-y2)*(x3-x2)-(x0-x2)*(y3-y2))/d;
 	if (AB>=0.0 && AB<=1.0)
 	{
@@ -283,7 +283,7 @@ int cTracer::intersect3D_SegmentPlane( const Vector3f & a_Origin, const Vector3f
 	if (fabs(D) < EPSILON)
 	{
 		// segment is parallel to plane
-		if (N == 0)
+		if (N == 0.0)
 		{
 			// segment lies in plane
 			return 2;

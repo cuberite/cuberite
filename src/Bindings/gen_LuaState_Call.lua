@@ -109,7 +109,7 @@ local function WriteOverload(f, a_NumParams, a_NumReturns)
 	
 	-- Write the function signature:
 	f:write("bool Call(")
-	f:write("FnT a_Function")
+	f:write("const FnT & a_Function")
 	for i = 1, a_NumParams do
 		f:write(", ParamT", i, " a_Param", i)
 	end

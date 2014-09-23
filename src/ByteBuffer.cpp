@@ -267,7 +267,7 @@ size_t cByteBuffer::GetReadableSpace(void) const
 	}
 	// Single readable space partition:
 	ASSERT(m_WritePos >= m_ReadPos);
-	return m_WritePos - m_ReadPos ;
+	return m_WritePos - m_ReadPos;
 }
 
 
@@ -489,6 +489,27 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 
 
+bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+{
+	Int64 Value;
+	if (!ReadBEInt64(Value))
+	{
+		return false;
+	}
+
+	UInt32 BlockXRaw = (Value >> 38) & 0x3ffffff;
+	UInt32 BlockYRaw = (Value >> 26) & 0xfff;
+	UInt32 BlockZRaw = (Value & 0x3ffffff);
+	a_BlockX = ((BlockXRaw & 0x2000000) == 0) ? BlockXRaw : (~(BlockXRaw & 0x1ffffff)) + 1;
+	a_BlockY = ((BlockYRaw & 0x800) == 0)     ? BlockYRaw : (~(BlockXRaw & 0x7ff))     + 1;
+	a_BlockZ = ((BlockZRaw & 0x2000000) == 0) ? BlockZRaw : (~(BlockZRaw & 0x1ffffff)) + 1;
+	return true;
+}
+
+
+
+
+
 bool cByteBuffer::WriteChar(char a_Value)
 {
 	CHECK_THREAD;
@@ -655,6 +676,15 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 		int Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
 		return WriteBuf((const char *)&Value, 4);
 	#endif
+}
+
+
+
+
+
+bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
 }
 
 

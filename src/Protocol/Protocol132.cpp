@@ -176,7 +176,7 @@ void cProtocol132::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	// Pre-chunk not used in 1.3.2. Finally.
 
 	// Send the chunk data:
-	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
+	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2, a_ChunkX, a_ChunkZ);
 	WriteByte(PACKET_CHUNK_DATA);
 	WriteInt (a_ChunkX);
 	WriteInt (a_ChunkZ);

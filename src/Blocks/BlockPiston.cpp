@@ -52,7 +52,7 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 
 	if (a_ChunkInterface.GetBlock(newX, newY, newZ) == E_BLOCK_PISTON_EXTENSION)
 	{
-		a_ChunkInterface.SetBlock(a_WorldInterface, newX, newY, newZ, E_BLOCK_AIR, 0);
+		a_ChunkInterface.SetBlock(newX, newY, newZ, E_BLOCK_AIR, 0);
 	}
 }
 

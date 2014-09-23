@@ -262,7 +262,7 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	SendPreChunk(a_ChunkX, a_ChunkZ, true);
 	
 	// Send the chunk data:
-	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5);
+	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5, a_ChunkX, a_ChunkZ);
 	WriteByte(PACKET_MAP_CHUNK);
 	WriteInt (a_ChunkX);
 	WriteInt (a_ChunkZ);
@@ -608,7 +608,7 @@ void cProtocol125::SendLoginSuccess(void)
 
 
 
-void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	cCSLock Lock(m_CSPacket);
 
@@ -630,7 +630,7 @@ void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
-void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	cCSLock Lock(m_CSPacket);
 
@@ -700,7 +700,7 @@ void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
-void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	// Not supported by this protocol version
 }
@@ -719,14 +719,73 @@ void cProtocol125::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol125::SendPlayerListItem(const AString & a_PlayerName, bool a_IsOnline, short a_Ping)
+void cProtocol125::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
-	WriteByte  ((unsigned char)PACKET_PLAYER_LIST_ITEM);
-	WriteString(a_PlayerName);
-	WriteBool  (a_IsOnline);
-	WriteShort (a_Ping);
+	WriteByte  (PACKET_PLAYER_LIST_ITEM);
+	WriteString(a_Player.GetPlayerListName());
+	WriteBool  (true);
+	WriteShort (a_Player.GetClientHandle()->GetPing());
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_PLAYER_LIST_ITEM);
+	WriteString(a_Player.GetPlayerListName());
+	WriteBool  (false);
+	WriteShort (0);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	// It is a simple add player packet in this protocol.
+	SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	if (a_OldListName == a_Player.GetPlayerListName())
+	{
+		return;
+	}
+
+	cCSLock Lock(m_CSPacket);
+
+	// Remove the old name from the tablist:
+	{
+		WriteByte  (PACKET_PLAYER_LIST_ITEM);
+		WriteString(a_OldListName);
+		WriteBool  (false);
+		WriteShort (0);
+		Flush();
+	}
+
+	SendPlayerListAddPlayer(a_Player);
 }
 
 

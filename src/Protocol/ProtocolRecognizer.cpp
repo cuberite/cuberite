@@ -13,6 +13,7 @@
 #include "Protocol15x.h"
 #include "Protocol16x.h"
 #include "Protocol17x.h"
+#include "Protocol18x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -27,7 +28,7 @@
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
 	m_Protocol(NULL),
-	m_Buffer(512)
+	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 {
 }
 
@@ -51,7 +52,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 	{
 		case PROTO_VERSION_1_2_5: return "1.2.5";
 		case PROTO_VERSION_1_3_2: return "1.3.2";
-		case PROTO_VERSION_1_4_2: return "1.4.2";
+		// case PROTO_VERSION_1_4_2: return "1.4.2";
 		case PROTO_VERSION_1_4_4: return "1.4.4";
 		case PROTO_VERSION_1_4_6: return "1.4.6";
 		case PROTO_VERSION_1_5_0: return "1.5";
@@ -62,6 +63,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 		case PROTO_VERSION_1_6_4: return "1.6.4";
 		case PROTO_VERSION_1_7_2: return "1.7.2";
 		case PROTO_VERSION_1_7_6: return "1.7.6";
+		case PROTO_VERSION_1_8_0: return "1.8";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -409,20 +411,20 @@ void cProtocolRecognizer::SendLoginSuccess(void)
 
 
 
-void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators, m_Scale);
 }
 
 
@@ -439,10 +441,10 @@ void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
 
 
 
-void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
 }
 
 
@@ -487,10 +489,50 @@ void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_A
 
 
 
-void cProtocolRecognizer::SendPlayerListItem(const AString & a_PlayerName, bool a_IsOnline, short a_Ping)
+void cProtocolRecognizer::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendPlayerListItem(a_PlayerName, a_IsOnline, a_Ping);
+	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListRemovePlayer(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdatePing(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
 }
 
 
@@ -1014,6 +1056,27 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_8_0:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}

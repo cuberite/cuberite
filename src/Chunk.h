@@ -66,8 +66,16 @@ class cChunk :
 	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
 {
 public:
+	/** Represents the presence state of the chunk */
+	enum ePresence
+	{
+		cpInvalid,  /**< The chunk is not present at all and is not queued in the loader / generator */
+		cpQueued,   /**< The chunk is not present, but is queued for loading / generation */
+		cpPresent,  /**< The chunk is present */
+	};
+
 	cChunk(
-		int a_ChunkX, int a_ChunkY, int a_ChunkZ,   // Chunk coords
+		int a_ChunkX, int a_ChunkZ,   // Chunk coords
 		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
 		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
 		cAllocationPool<cChunkData::sChunkSection> & a_Pool
@@ -75,11 +83,25 @@ public:
 	cChunk(cChunk & other);
 	~cChunk();
 
-	bool IsValid(void) const {return m_IsValid; }  // Returns true if the chunk block data is valid (loaded / generated)
-	void SetValid(void);                           // Also wakes up any calls to cChunkMap::GetHeight()
-	void MarkRegenerating(void);                   // Marks all clients attached to this chunk as wanting this chunk
-	bool IsDirty(void) const {return m_IsDirty; }  // Returns true if the chunk has changed since it was last saved
-	bool HasLoadFailed(void) const {return m_HasLoadFailed; }  // Returns true if the chunk failed to load and hasn't been generated since then
+	/** Returns true iff the chunk block data is valid (loaded / generated) */
+	bool IsValid(void) const {return (m_Presence == cpPresent); }
+
+	/** Returns true iff the chunk is in the queue for loading / generating */
+	bool IsQueued(void) const {return (m_Presence == cpQueued); }
+
+	/** Sets the chunk's presence.
+	Wakes up any calls to cChunkMap::GetHeight() when setting to cpPresent. */
+	void SetPresence(ePresence a_Presence);
+
+	/** Called to indicate whether the chunk should be queued in the generator if it fails to load. Set by cChunkMap::GetChunk(). */
+	void SetShouldGenerateIfLoadFailed(bool a_ShouldGenerateIfLoadFailed);
+
+	/** Marks all clients attached to this chunk as wanting this chunk. Also sets presence to cpQueued. */
+	void MarkRegenerating(void);
+
+	/** Returns true iff the chunk has changed since it was last saved. */
+	bool IsDirty(void) const {return m_IsDirty; }
+
 	bool CanUnload(void);
 	
 	bool IsLightValid(void) const {return m_IsLightValid; }
@@ -94,7 +116,10 @@ public:
 	void MarkSaving(void);  // Marks the chunk as being saved.
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
-	void MarkLoadFailed(void);  // Marks the chunk as failed to load. Ignored is the chunk is already valid
+
+	/** Marks the chunk as failed to load.
+	If m_ShouldGenerateIfLoadFailed is set, queues the chunk for generating. */
+	void MarkLoadFailed(void);
 	
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
 	void GetAllData(cChunkDataCallback & a_Callback);
@@ -135,7 +160,6 @@ public:
 	void TickBlock(int a_RelX, int a_RelY, int a_RelZ);
 
 	int GetPosX(void) const { return m_PosX; }
-	int GetPosY(void) const { return m_PosY; }
 	int GetPosZ(void) const { return m_PosZ; }
 	
 	cWorld * GetWorld(void) const { return m_World; }
@@ -215,6 +239,10 @@ public:
 	
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
+
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true. */
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Lua-accessible
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
 	bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult);  // Lua-accessible
@@ -298,7 +326,7 @@ public:
 	void BroadcastEntityStatus       (const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity     (const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityAnimation    (const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL);
-	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);
+	void BroadcastParticleEffect     (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundEffect        (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
@@ -430,7 +458,12 @@ private:
 	typedef std::vector<sSetBlockQueueItem> sSetBlockQueueVector;
 	
 
-	bool m_IsValid;        // True if the chunk is loaded / generated
+	/** Holds the presence status of the chunk - if it is present, or in the loader / generator queue, or unloaded */
+	ePresence m_Presence;
+
+	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
+	bool m_ShouldGenerateIfLoadFailed;
+
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
@@ -449,7 +482,7 @@ private:
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
 	int m_StayCount;
 
-	int m_PosX, m_PosY, m_PosZ;
+	int m_PosX, m_PosZ;
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 

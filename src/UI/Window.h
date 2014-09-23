@@ -63,7 +63,7 @@ public:
 		wtBeacon      = 7,
 		wtAnvil       = 8,
 		wtHopper      = 9,
-		// Unknown: 10
+		wtDropper     = 10,
 		wtAnimalChest = 11,
 	};
 	
@@ -76,6 +76,7 @@ public:
 
 	char GetWindowID(void) const { return m_WindowID; }  // tolua_export
 	int GetWindowType(void) const { return m_WindowType; }  // tolua_export
+	const AString GetWindowTypeName(void) const;  // tolua_export
 
 	cWindowOwner * GetOwner(void) { return m_Owner; }
 	void SetOwner( cWindowOwner * a_Owner) { m_Owner = a_Owner; }
@@ -290,9 +291,6 @@ public:
 
 	/** Return the Value of a Property */
 	int GetPropertyValue(int a_Property);
-
-	/** Get the Position from the Enchantment Table */
-	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
 
 	cSlotArea * m_SlotArea;
 

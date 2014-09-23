@@ -869,3 +869,31 @@ void SetBEInt(char * a_Mem, Int32 a_Value)
 
 
 
+
+bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Output)
+{
+	a_Output.clear();
+	size_t size = a_Strings.size();
+	size_t start = 0;
+	bool res = false;
+	for (size_t i = 0; i < size; i++)
+	{
+		if (a_Strings[i] == 0)
+		{
+			a_Output.push_back(a_Strings.substr(start, i - start));
+			start = i + 1;
+			res = true;
+		}
+	}
+	if (start < size)
+	{
+		a_Output.push_back(a_Strings.substr(start, size - start));
+		res = true;
+	}
+	
+	return res;
+}
+
+
+
+

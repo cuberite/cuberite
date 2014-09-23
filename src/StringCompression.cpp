@@ -180,3 +180,65 @@ extern int UncompressStringGZIP(const char * a_Data, size_t a_Length, AString & 
 
 
 
+
+extern int InflateString(const char * a_Data, size_t a_Length, AString & a_Uncompressed)
+{
+	a_Uncompressed.reserve(a_Length);
+
+	char Buffer[64 KiB];
+	z_stream strm;
+	memset(&strm, 0, sizeof(strm));
+	strm.next_in = (Bytef *)a_Data;
+	strm.avail_in = (uInt)a_Length;
+	strm.next_out = (Bytef *)Buffer;
+	strm.avail_out = sizeof(Buffer);
+	
+	int res = inflateInit(&strm);  // Force GZIP decoding
+	if (res != Z_OK)
+	{
+		LOG("%s: inflation initialization failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
+		return res;
+	}
+	
+	for (;;)
+	{
+		res = inflate(&strm, Z_NO_FLUSH);
+		switch (res)
+		{
+			case Z_OK:
+			{
+				// Some data has been uncompressed. Consume the buffer and continue uncompressing
+				a_Uncompressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				strm.next_out = (Bytef *)Buffer;
+				strm.avail_out = sizeof(Buffer);
+				if (strm.avail_in == 0)
+				{
+					// All data has been uncompressed
+					inflateEnd(&strm);
+					return Z_OK;
+				}
+				break;
+			}
+			
+			case Z_STREAM_END:
+			{
+				// Finished uncompressing. Consume the rest of the buffer and return
+				a_Uncompressed.append(Buffer, sizeof(Buffer) - strm.avail_out);
+				inflateEnd(&strm);
+				return Z_OK;
+			}
+			
+			default:
+			{
+				// An error has occurred, log it and return the error value
+				LOG("%s: inflation failed: %d (\"%s\").", __FUNCTION__, res, strm.msg);
+				inflateEnd(&strm);
+				return res;
+			}
+		}  // switch (res)
+	}  // while (true)
+}
+
+
+
+

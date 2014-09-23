@@ -137,6 +137,10 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
+
+	virtual void OnActivate(cPawn & a_Target) override;
+
+	virtual void OnDeactivate(cPawn & a_Target) override;
 };
 
 
@@ -152,6 +156,10 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
+
+	virtual void OnActivate(cPawn & a_Target) override;
+
+	virtual void OnDeactivate(cPawn & a_Target) override;
 };
 
 

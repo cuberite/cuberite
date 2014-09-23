@@ -267,7 +267,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	cTimer t1;
 	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
-		m_World->SendPlayerList(this);
+		m_World->BroadcastPlayerListUpdatePing(*this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
@@ -452,6 +452,11 @@ void cPlayer::CancelChargingBow(void)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
+	if (IsGameModeSpectator())  // You can fly through the ground in Spectator
+	{
+		return;
+	}
+	
 	m_bTouchGround = a_bTouchGround;
 
 	if (!m_bTouchGround)
@@ -586,7 +591,7 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 {
-	if (!IsGameModeCreative())
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
 		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion, 40.0);
 	}
@@ -628,15 +633,6 @@ void cPlayer::FinishEating(void)
 		return;
 	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
-
-	GetInventory().RemoveOneEquippedItem();
-
-	// if the food is mushroom soup, return a bowl to the inventory
-	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
-	{
-		cItem EmptyBowl(E_ITEM_BOWL);
-		GetInventory().AddItem(EmptyBowl, true, true);
-	}
 }
 
 
@@ -820,7 +816,7 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 	{
 		return;
 	}
-	m_World->BroadcastPlayerListItem(GetTabListName(), false, 0);  // Remove old tab-list entry
+	AString OldCustomName = m_CustomName;
 
 	m_CustomName = a_CustomName;
 	if (m_CustomName.length() > 16)
@@ -828,8 +824,8 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 		m_CustomName = m_CustomName.substr(0, 16);
 	}
 
+	m_World->BroadcastPlayerListUpdateDisplayName(*this, m_CustomName);
 	m_World->BroadcastSpawnEntity(*this, m_ClientHandle);
-	m_World->BroadcastPlayerListItem(GetTabListName(), true, GetClientHandle()->GetPing());
 }
 
 
@@ -855,9 +851,9 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
-		if (IsGameModeCreative())
+		if (IsGameModeCreative() || IsGameModeSpectator())
 		{
-			// No damage / health in creative mode if not void or plugin damage
+			// No damage / health in creative or spectator mode if not void or plugin damage
 			return false;
 		}
 	}
@@ -1075,6 +1071,14 @@ bool cPlayer::IsGameModeAdventure(void) const
 
 
 
+bool cPlayer::IsGameModeSpectator(void) const
+{
+	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Adventure
+}
+
+
+
 
 void cPlayer::SetTeam(cTeam * a_Team)
 {
@@ -1190,11 +1194,13 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
 
-	if (!IsGameModeCreative())
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
 		SetFlying(false);
 		SetCanFly(false);
 	}
+
+	m_World->BroadcastPlayerListUpdateGameMode(*this);
 }
 
 
@@ -1372,6 +1378,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos)
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
+	// Need to Check if the player or other players are in gamemode spectator, but will break compatibility
 	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
@@ -1466,7 +1473,7 @@ AString cPlayer::GetColor(void) const
 
 
 
-AString cPlayer::GetTabListName(void) const
+AString cPlayer::GetPlayerListName(void) const
 {
 	const AString & Color = GetColor();
 
@@ -1554,6 +1561,11 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
+	if (IsGameModeSpectator())  // Players can't toss items in spectator
+	{
+		return;
+	}
+	
 	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
@@ -1715,7 +1727,11 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), true);
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), false);
+	if (a_World == NULL)
+	{
+		a_World = cRoot::Get()->GetDefaultWorld();
+	}
 
 	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
 	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
@@ -1836,7 +1852,7 @@ bool cPlayer::SaveToDisk()
 
 void cPlayer::UseEquippedItem(int a_Amount)
 {
-	if (IsGameModeCreative())  // No damage in creative
+	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
 	{
 		return;
 	}

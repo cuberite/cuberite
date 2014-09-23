@@ -57,6 +57,34 @@ cWindow::~cWindow()
 
 
 
+const AString cWindow::GetWindowTypeName(void) const
+{
+	switch (m_WindowType)
+	{
+		case wtChest:       return "minecraft:chest";
+		case wtWorkbench:   return "minecraft:crafting_table";
+		case wtFurnace:     return "minecraft:furnace";
+		case wtDropSpenser: return "minecraft:dispenser";
+		case wtEnchantment: return "minecraft:enchanting_table";
+		case wtBrewery:     return "minecraft:brewing_stand";
+		case wtNPCTrade:    return "minecraft:villager";
+		case wtBeacon:      return "minecraft:beacon";
+		case wtAnvil:       return "minecraft:anvil";
+		case wtHopper:      return "minecraft:hopper";
+		case wtDropper:     return "minecraft:dropper";
+		case wtAnimalChest: return "EntityHorse";
+		default:
+		{
+			ASSERT(!"Unknown inventory type!");
+			return "";
+		}
+	}
+}
+
+
+
+
+
 int cWindow::GetNumSlots(void) const
 {
 	int res = 0;
@@ -881,7 +909,7 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
 {
-	m_SlotAreas.push_back(new cSlotAreaEnchanting(*this));
+	m_SlotAreas.push_back(new cSlotAreaEnchanting(*this, m_BlockX, m_BlockY, m_BlockZ));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
@@ -892,8 +920,13 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 {
-	m_PropertyValue[a_Property] = a_Value;
+	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
+	{
+		ASSERT(!"a_Property is invalid");
+		return;
+	}
 
+	m_PropertyValue[a_Property] = a_Value;
 	super::SetProperty(a_Property, a_Value);
 }
 
@@ -903,8 +936,13 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 
 void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
 {
-	m_PropertyValue[a_Property] = a_Value;
+	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
+	{
+		ASSERT(!"a_Property is invalid");
+		return;
+	}
 
+	m_PropertyValue[a_Property] = a_Value;
 	super::SetProperty(a_Property, a_Value, a_Player);
 }
 
@@ -914,18 +952,13 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Pla
 
 int cEnchantingWindow::GetPropertyValue(int a_Property)
 {
+	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
+	{
+		ASSERT(!"a_Property is invalid");
+		return 0;
+	}
+
 	return m_PropertyValue[a_Property];
-}
-
-
-
-
-
-void cEnchantingWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
-{
-	a_PosX = m_BlockX;
-	a_PosY = m_BlockY;
-	a_PosZ = m_BlockZ;
 }
 
 

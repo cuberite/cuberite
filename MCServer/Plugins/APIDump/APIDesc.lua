@@ -524,6 +524,7 @@ end
 			Functions =
 			{
 				GenerateOfflineUUID = { Params = "Username", Return = "string", Notes = "(STATIC) Generates an UUID based on the player name provided. This is used for the offline (non-auth) mode, when there's no UUID source. Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. Returns a 32-char UUID (no dashes)." },
+				GetIPString = { Params = "", Return = "string", Notes = "Returns the IP address of the connection, as a string. Only the address part is returned, without the port number." },
 				GetLocale = { Params = "", Return = "Locale", Notes = "Returns the locale string that the client sends as part of the protocol handshake. Can be used to provide localized strings." },
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
 				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },
@@ -1188,7 +1189,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				constructor =
 				{
 					{ Params = "", Return = "cItem", Notes = "Creates a new empty cItem object" },
-					{ Params = "ItemType, Count, Damage, EnchantmentString", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default) and enchantments (non-enchanted by default)" },
+					{ Params = "ItemType, Count, Damage, EnchantmentString, CustomName, Lore", Return = "cItem", Notes = "Creates a new cItem object of the specified type, count (1 by default), damage (0 by default), enchantments (non-enchanted by default), CustomName (empty by default) and Lore (string, empty by default)" },
 					{ Params = "cItem", Return = "cItem", Notes = "Creates an exact copy of the cItem object in the parameter" },
 				} ,
 				AddCount = { Params = "AmountToAdd", Return = "cItem", Notes = "Adds the specified amount to the item count. Returns self (useful for chaining)." },
@@ -1201,12 +1202,14 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				IsDamageable = { Params = "", Return = "bool", Notes = "Returns true if this item does account for its damage" },
 				IsEmpty = { Params = "", Return = "bool", Notes = "Returns true if this object represents an empty item (zero count or invalid ID)" },
 				IsEqual = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is the same as the one stored in the object (type, damage, lore, name and enchantments)" },
-				IsEnchantable = { Params = "", Return = "bool", Notes = "Returns true if the item is enchantable" },
 				IsFullStack = { Params = "", Return = "bool", Notes = "Returns true if the item is stacked up to its maximum stacking" },
 				IsSameType = { Params = "cItem", Return = "bool", Notes = "Returns true if the item in the parameter is of the same ItemType as the one stored in the object. This is true even if the two items have different enchantments" },
 				IsBothNameAndLoreEmpty = { Params = "", Return = "bool", Notes = "Returns if both the custom name and lore are not set." },
 				IsCustomNameEmpty = { Params = "", Return = "bool", Notes = "Returns if the custom name of the cItem is empty." },
 				IsLoreEmpty = { Params = "", Return = "", Notes = "Returns if the lore of the cItem is empty." },
+				GetEnchantability = { Params = "", Return = "number", Notes = "Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0" },
+				EnchantByXPLevels = { Params = "NumXPLevels", Return = "bool", Notes = "Enchants the item using the specified number of XP levels. Returns true if item enchanted, false if not." },
+				IsEnchantable = { Params = "ItemType, WithBook", Return = "bool", Notes = "(STATIC) Returns true if the specified item type is enchantable. If WithBook is true, the function is used in the anvil inventory with book enchantments. So it checks the \"only book enchantments\" too. Example: You can only enchant a hoe with a book." },
 			},
 			Variables =
 			{
@@ -1214,8 +1217,10 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				m_ItemCount    = { Type = "number", Notes = "Number of items in this stack" },
 				m_ItemDamage   = { Type = "number", Notes = "The damage of the item. Zero means no damage. Maximum damage can be queried with GetMaxDamage()" },
 				m_ItemType     = { Type = "number", Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants" },
-				m_CustomName = { Type = "string", Notes = "The custom name for an item." },
-				m_Lore = { Type = "string", Notes = "The lore for an item. Line breaks are represented by the ` character." },
+				m_CustomName   = { Type = "string", Notes = "The custom name for an item." },
+				m_Lore         = { Type = "string", Notes = "The lore for an item. Line breaks are represented by the ` character." },
+				m_RepairCost   = { Type = "number", Notes = "The repair cost of the item. The anvil need this value" },
+				m_Enchantments = { Type = "{{cEnchantments|cEnchantments}}}", Notes = "The enchantments of the item." },
 			},
 			AdditionalInfo =
 			{
@@ -1641,6 +1646,8 @@ a_Player:OpenWindow(Window);
 				MobTypeToString = { Params = "{{cMonster#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{cMonster#MobType|mtXXX}} constant), or empty string if unknown type." },
 				MoveToPosition = { Params = "Position", Return = "", Notes = "Moves mob to the specified position" },
 				StringToMobType = { Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{cMonster#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
+				GetRelativeWalkSpeed = { Params = "", Return = "number", Notes = "Returns the relative walk speed of this mob. Standard is 1.0" },
+				SetRelativeWalkSpeed = { Params = "number", Return = "", Notes = "Sets the relative walk speed of this mob. Standard is 1.0" },
 			},
 			Constants =
 			{
@@ -1757,7 +1764,7 @@ a_Player:OpenWindow(Window);
 				ForceSetSpeed = { Params = "{{Vector3d|Direction}}", Notes = "Forces the player to move to the given direction." },
 				GetClientHandle = { Params = "", Return = "{{cClientHandle}}", Notes = "Returns the client handle representing the player's connection. May be nil (AI players)." },
 				GetColor = { Return = "string", Notes = "Returns the full color code to be used for this player's messages (based on their rank). Prefix player messages with this code." },
-				GetTabListName = { Return = "string", Notes = "Returns the name that is used in the tablist." },
+				GetPlayerListName = { Return = "string", Notes = "Returns the name that is used in the playerlist." },
 				GetCurrentXp = { Params = "", Return = "number", Notes = "Returns the current amount of XP" },
 				GetEffectiveGameMode = { Params = "", Return = "{{Globals#GameMode|GameMode}}", Notes = "(OBSOLETE) Returns the current resolved game mode of the player. If the player is set to inherit the world's gamemode, returns that instead. See also GetGameMode() and IsGameModeXXX() functions. Note that this function is the same as GetGameMode(), use that function instead." },
 				GetEquippedItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that the player is currently holding; empty item if holding nothing." },
@@ -1889,13 +1896,13 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				BindCommand =
 				{
-					{ Params = "Command, Permission, Callback, HelpString", Return = "[bool]", Notes = "(STATIC) Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error." },
-					{ Params = "Command, Permission, Callback, HelpString", Return = "[bool]", Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error." },
+					{ Params = "Command, Permission, Callback, HelpString", Return = "[bool]", Notes = "(STATIC) Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split, {{cPlayer|Player}})</pre> The Split parameter contains an array-table of the words that the player has sent, Player is the {{cPlayer}} object representing the player who sent the command. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server sends a warning to the player that the command is unknown (this is so that subcommands can be implemented)." },
+					{ Params = "Command, Permission, Callback, HelpString", Return = "[bool]", Notes = "Binds an in-game command with the specified callback function, permission and help string. By common convention, providing an empty string for HelpString will hide the command from the /help display. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split, {{cPlayer|Player}})</pre> The Split parameter contains an array-table of the words that the player has sent, Player is the {{cPlayer}} object representing the player who sent the command. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server sends a warning to the player that the command is unknown (this is so that subcommands can be implemented)." },
 				},
 				BindConsoleCommand =
 				{
-					{ Params = "Command, Callback, HelpString", Return = "[bool]", Notes = "(STATIC) Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error." },
-					{ Params = "Command, Callback, HelpString", Return = "[bool]", Notes = "Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error." },
+					{ Params = "Command, Callback, HelpString", Return = "[bool]", Notes = "(STATIC) Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split)</pre> The Split parameter contains an array-table of the words that the admin has typed. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server issues a warning to the console that the command is unknown (this is so that subcommands can be implemented)." },
+					{ Params = "Command, Callback, HelpString", Return = "[bool]", Notes = "Binds a console command with the specified callback function and help string. By common convention, providing an empty string for HelpString will hide the command from the \"help\" console command. Returns true if successful, logs to console and returns no value on error. The callback uses the following signature: <pre class=\"prettyprint lang-lua\">function(Split)</pre> The Split parameter contains an array-table of the words that the admin has typed. If the callback returns true, the command is assumed to have executed successfully; in all other cases the server issues a warning to the console that the command is unknown (this is so that subcommands can be implemented)." },
 				},
 				CallPlugin = { Params = "PluginName, FunctionName, [FunctionArgs...]", Return = "[FunctionRets]", Notes = "(STATIC) Calls the specified function in the specified plugin, passing all the given arguments to it. If it succeeds, it returns all the values returned by that function. If it fails, returns no value at all. Note that only strings, numbers, bools, nils and classes can be used for parameters and return values; tables and functions cannot be copied across plugins." },
 				DisablePlugin = { Params = "PluginName", Return = "bool", Notes = "Disables a plugin specified by its name. Returns true if the plugin was disabled, false if it wasn't found or wasn't active." },
@@ -2349,6 +2356,7 @@ end
 				ForEachBlockEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each block entity in the chunk. Returns true if all block entities in the chunk have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration. Use {{tolua}}.cast() to cast the Callback's BlockEntity parameter to the correct {{cBlockEntity}} descendant." },
 				ForEachChestInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each chest in the chunk. Returns true if all chests in the chunk have been processed (including when there are zero chests), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cChestEntity|ChestEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next chest, or true to abort the enumeration." },
 				ForEachEntity = { Params = "CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each entity in the loaded world. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
+				ForEachEntityInBox = { Params = "{{cBoundingBox|Box}}, CallbackFunction", Return = "bool", Notes = "Calls the specified callback for each entity in the specified bounding box. Returns true if all the entities have been processed (including when there are zero entities), or false if the callback function has aborted the enumeration by returning true. If any chunk within the bounding box is not valid, it is silently skipped without any notification. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}})</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
 				ForEachEntityInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each entity in the specified chunk. Returns true if all the entities have been processed (including when there are zero entities), or false if the chunk is not loaded or the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cEntity|Entity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next entity, or true to abort the enumeration." },
 				ForEachFurnaceInChunk = { Params = "ChunkX, ChunkZ, CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each furnace in the chunk. Returns true if all furnaces in the chunk have been processed (including when there are zero furnaces), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cFurnaceEntity|FurnaceEntity}}, [CallbackData])</pre> The callback should return false or no value to continue with the next furnace, or true to abort the enumeration." },
 				ForEachPlayer = { Params = "CallbackFunction, [CallbackData]", Return = "bool", Notes = "Calls the specified callback for each player in the loaded world. Returns true if all the players have been processed (including when there are zero players), or false if the callback function has aborted the enumeration by returning true. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}}, [CallbackData])</pre> The callback should return false or no value to continue with the next player, or true to abort the enumeration." },

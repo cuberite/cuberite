@@ -36,6 +36,7 @@ class cBlockArea;
 class cMobCensus;
 class cMobSpawner;
 class cSetChunkData;
+class cBoundingBox;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cChunk *                           cChunkPtr;
@@ -86,7 +87,7 @@ public:
 	void BroadcastEntityStatus(const cEntity & a_Entity, char a_Status, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHandle * a_Exclude = NULL);
 	void BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation, const cClientHandle * a_Exclude = NULL);
-	void BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude = NULL);
+	void BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude = NULL);
 	void BroadcastRemoveEntityEffect (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = NULL);
 	void BroadcastSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = NULL);
@@ -132,6 +133,9 @@ public:
 	/** Copies the chunk's blocktypes into a_Blocks; returns true if successful */
 	bool GetChunkBlockTypes (int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_Blocks);
 	
+	/** Returns true iff the chunk is in the loader / generator queue. */
+	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ);
+
 	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ);
 	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ);
 	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
@@ -147,8 +151,8 @@ public:
 	NIBBLETYPE GetBlockSkyLight  (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 	void       SetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta);
-	void       SetBlock          (cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
-	void       QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
+	void       SetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_SendToClients = true);
+	void       QueueSetBlock     (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType = E_BLOCK_AIR);
 	bool       GetBlockTypeMeta  (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
 	bool       GetBlockInfo      (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
 
@@ -208,6 +212,11 @@ public:
 
 	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback & a_Callback);  // Lua-accessible
+
+	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
+	Returns true if all entities processed, false if the callback aborted by returning true.
+	If any chunk in the box is missing, ignores the entities in that chunk silently. */
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Lua-accessible
 
 	/** Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates */
 	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
@@ -270,16 +279,10 @@ public:
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void TouchChunk(int a_ChunkX, int a_ChunkZ);
 	
-	/** Loads the chunk, if not already loaded. Doesn't generate. Returns true if chunk valid (even if already loaded before) */
-	bool LoadChunk(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
-	
-	/** Loads the chunks specified. Doesn't report failure, other than chunks being !IsValid() */
-	void LoadChunks(const cChunkCoordsList & a_Chunks);
-
 	/** Marks the chunk as failed-to-load */
-	void ChunkLoadFailed(int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 	
 	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
@@ -363,7 +366,7 @@ private:
 		~cChunkLayer();
 
 		/** Always returns an assigned chunkptr, but the chunk needn't be valid (loaded / generated) - callers must check */
-		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkY, int a_ChunkZ);
+		cChunkPtr GetChunk( int a_ChunkX, int a_ChunkZ);
 		
 		/** Returns the specified chunk, or NULL if not created yet */
 		cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
@@ -456,9 +459,9 @@ private:
 
 	std::auto_ptr<cAllocationPool<cChunkData::sChunkSection> > m_Pool;
 
-	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
-	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
-	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkY, int a_ChunkZ);  // Doesn't load, doesn't generate
+	cChunkPtr GetChunk      (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading / generating if not valid
+	cChunkPtr GetChunkNoGen (int a_ChunkX, int a_ChunkZ);  // Also queues the chunk for loading if not valid; doesn't generate
+	cChunkPtr GetChunkNoLoad(int a_ChunkX, int a_ChunkZ);  // Doesn't load, doesn't generate
 	
 	/** Gets a block in any chunk while in the cChunk's Tick() method; returns true if successful, false if chunk not loaded (doesn't queue load) */
 	bool LockedGetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);

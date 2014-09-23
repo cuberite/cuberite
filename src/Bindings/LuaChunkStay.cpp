@@ -107,7 +107,7 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 		}
 	}  // for itr - m_Chunks[]
 	
-	m_Chunks.push_back(cChunkCoords(ChunkX, ZERO_CHUNK_Y, ChunkZ));
+	m_Chunks.push_back(cChunkCoords(ChunkX, ChunkZ));
 }
 
 

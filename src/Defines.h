@@ -115,12 +115,14 @@ enum eGameMode
 	eGameMode_Survival  = 0,
 	eGameMode_Creative  = 1,
 	eGameMode_Adventure = 2,
+	eGameMode_Spectator = 3,
 	
 	// Easier-to-use synonyms:
 	gmNotSet    = eGameMode_NotSet,
 	gmSurvival  = eGameMode_Survival,
 	gmCreative  = eGameMode_Creative,
 	gmAdventure = eGameMode_Adventure,
+	gmSpectator = eGameMode_Spectator,
 	
 	// These two are used to check GameMode for validity when converting from integers.
 	gmMax,  // Gets automatically assigned

@@ -80,6 +80,36 @@ protected:
 
 
 
+class cBioGenMulticache :
+	public cBiomeGen
+{
+
+	typedef cBiomeGen super;
+
+public:
+	/*
+	a_CacheSize defines the size of each singular cache
+	a_CachesLength defines how many caches are used for the multicache
+	*/
+	cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength);  // Doesn't take ownership of a_BioGenToCache
+	~cBioGenMulticache();
+
+protected:
+	typedef std::vector<cBiomeGen *> cBiomeGens;
+
+
+	size_t     m_CachesLength;
+	cBiomeGens m_Caches;
+
+
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override;
+};
+
+
+
+
+
 /// Base class for generators that use a list of available biomes. This class takes care of the list.
 class cBiomeGenList :
 	public cBiomeGen

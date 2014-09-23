@@ -81,6 +81,7 @@ public:
 			case E_BLOCK_STONE_BRICK_STAIRS:
 			case E_BLOCK_NETHER_BRICK_STAIRS:
 			case E_BLOCK_CAULDRON:
+			case E_BLOCK_MOB_SPAWNER:
 			{
 				return PickaxeLevel() >= 1;
 			}

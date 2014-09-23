@@ -82,10 +82,7 @@ public:
 	@param a_CanDrop Informs the handler whether the block should be dropped at all. One example when this is false is when stone is destroyed by hand
 	@param a_DropVerbatim Calls ConvertToVerbatimPickups() instead of its counterpart, meaning the block itself is dropped by default (due to a speical tool or enchantment)
 	*/
-	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop = true, bool a_DropVerbatim = false);
-	
-	/// Returns step sound name of block
-	virtual const char * GetStepSound(void);
+	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop = true);
 	
 	/// Checks if the block can stay at the specified relative coords in the chunk
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk);

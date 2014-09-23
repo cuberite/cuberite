@@ -33,6 +33,7 @@
 #include "ItemLilypad.h"
 #include "ItemMap.h"
 #include "ItemMinecart.h"
+#include "ItemMushroomSoup.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
@@ -125,6 +126,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_MILK:              return new cItemMilkHandler();
+		case E_ITEM_MUSHROOM_SOUP:     return new cItemMushroomSoupHandler(a_ItemType);
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
@@ -207,7 +209,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 		
 		// Food (please keep alpha-sorted):
-		// (carrots and potatoes handled in SeedHandler as both seed and food
+		// (carrots and potatoes handled separately in SeedHandler as they're both seed and food)
 		case E_ITEM_BAKED_POTATO:
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKED_CHICKEN:
@@ -216,14 +218,15 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COOKIE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
-		case E_ITEM_MUSHROOM_SOUP:
+		case E_ITEM_MUTTON:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
+		case E_ITEM_RED_APPLE:
 		case E_ITEM_RAW_BEEF:
 		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_RAW_FISH:
+		case E_ITEM_RAW_MUTTON:
 		case E_ITEM_RAW_PORKCHOP:
-		case E_ITEM_RED_APPLE:
 		case E_ITEM_ROTTEN_FLESH:
 		case E_ITEM_SPIDER_EYE:
 		case E_ITEM_STEAK:
@@ -331,7 +334,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 	{
 		cChunkInterface ChunkInterface(a_World->GetChunkMap());
 		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block), a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0);
+		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
 	}
 
 	if (!cBlockInfo::IsOneHitDig(Block))
@@ -580,6 +583,7 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SNOW:
 		case E_BLOCK_VINES:
 		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_MOB_SPAWNER:
 		{
 			return false;
 		}
@@ -632,6 +636,10 @@ bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_Eff
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
+	if (!a_Player->IsGameModeCreative())
+	{
+		a_Player->GetInventory().RemoveOneEquippedItem();
+	}
 
 	FoodInfo Info = GetFoodInfo();
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))

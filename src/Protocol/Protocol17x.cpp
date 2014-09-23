@@ -5,7 +5,8 @@
 Implements the 1.7.x protocol classes:
 	- cProtocol172
 		- release 1.7.2 protocol (#4)
-(others may be added later in the future for the 1.7 release series)
+	- cProtocol176
+		- release 1.7.6 protocol (#5)
 */
 
 #include "Globals.h"
@@ -101,6 +102,19 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_IsEncrypted(false),
 	m_LastSentDimension(dimNotSet)
 {
+	// BungeeCord handling:
+	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+	// hostname\00ip-address\00uuid\00profile-properties-as-json
+	AStringVector Params;
+	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	{
+		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+		m_ServerAddress = Params[0];
+		m_Client->SetIPString(Params[1]);
+		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+		m_Client->SetProperties(Params[3]);
+	}
+	
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
@@ -238,101 +252,13 @@ void cProtocol172::SendChat(const AString & a_Message)
 void cProtocol172::SendChat(const cCompositeChat & a_Message)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
-	// Compose the complete Json string to send:
-	Json::Value msg;
+
 	cWorld * World = m_Client->GetPlayer()->GetWorld();
-	msg["text"] = cClientHandle::FormatMessageType((World == NULL) ? false : World->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
-	const cCompositeChat::cParts & Parts = a_Message.GetParts();
-	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
-	{
-		Json::Value Part;
-		switch ((*itr)->m_PartType)
-		{
-			case cCompositeChat::ptText:
-			{
-				Part["text"] = (*itr)->m_Text;
-				AddChatPartStyle(Part, (*itr)->m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptClientTranslated:
-			{
-				const cCompositeChat::cClientTranslatedPart & p = (const cCompositeChat::cClientTranslatedPart &)**itr;
-				Part["translate"] = p.m_Text;
-				Json::Value With;
-				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
-				{
-					With.append(*itrW);
-				}
-				if (!p.m_Parameters.empty())
-				{
-					Part["with"] = With;
-				}
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptUrl:
-			{
-				const cCompositeChat::cUrlPart & p = (const cCompositeChat::cUrlPart &)**itr;
-				Part["text"] = p.m_Text;
-				Json::Value Url;
-				Url["action"] = "open_url";
-				Url["value"] = p.m_Url;
-				Part["clickEvent"] = Url;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptSuggestCommand:
-			case cCompositeChat::ptRunCommand:
-			{
-				const cCompositeChat::cCommandPart & p = (const cCompositeChat::cCommandPart &)**itr;
-				Part["text"] = p.m_Text;
-				Json::Value Cmd;
-				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
-				Cmd["value"] = p.m_Command;
-				Part["clickEvent"] = Cmd;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
+	bool ShouldUseChatPrefixes = (World == NULL) ? false : World->ShouldUseChatPrefixes();
 
-			case cCompositeChat::ptShowAchievement:
-			{
-				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
-				Part["translate"] = "chat.type.achievement";
-
-				Json::Value Ach;
-				Ach["action"] = "show_achievement";
-				Ach["value"] = p.m_Text;
-				
-				Json::Value AchColourAndName;
-				AchColourAndName["color"] = "green";
-				AchColourAndName["translate"] = p.m_Text;
-				AchColourAndName["hoverEvent"] = Ach;
-
-				Json::Value Extra;
-				Extra.append(AchColourAndName);
-
-				Json::Value Name;
-				Name["text"] = p.m_PlayerName;
-
-				Json::Value With;
-				With.append(Name);
-				With.append(Extra);
-
-				Part["with"] = With;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-		}
-		msg["extra"].append(Part);
-	}  // for itr - Parts[]
-	
 	// Send the message to the client:
 	cPacketizer Pkt(*this, 0x02);
-	Pkt.WriteString(msg.toStyledString());
+	Pkt.WriteString(a_Message.CreateJsonString(ShouldUseChatPrefixes));
 }
 
 
@@ -345,7 +271,7 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2, a_ChunkX, a_ChunkZ);
 	
 	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
 	Pkt.WriteInt(a_ChunkX);
@@ -714,7 +640,7 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -736,7 +662,7 @@ void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
-void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -769,7 +695,6 @@ void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
 	Pkt.WriteByte(2);
 	Pkt.WriteByte(a_Scale);
 }
-
 
 
 
@@ -845,7 +770,7 @@ void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
-void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -858,21 +783,78 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	Pkt.WriteFloat(a_OffsetY);
 	Pkt.WriteFloat(a_OffsetZ);
 	Pkt.WriteFloat(a_ParticleData);
-	Pkt.WriteInt(a_ParticleAmmount);
+	Pkt.WriteInt(a_ParticleAmount);
 }
 
 
 
 
 
-void cProtocol172::SendPlayerListItem(const AString & a_PlayerName, bool a_IsOnline, short a_Ping)
+void cProtocol172::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteString(a_PlayerName);
-	Pkt.WriteBool(a_IsOnline);
-	Pkt.WriteShort(a_Ping);
+	Pkt.WriteString(a_Player.GetPlayerListName());
+	Pkt.WriteBool(true);
+	Pkt.WriteShort(a_Player.GetClientHandle()->GetPing());
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);
+	Pkt.WriteString(a_Player.GetPlayerListName());
+	Pkt.WriteBool(false);
+	Pkt.WriteShort(0);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	// It is a simple add player packet in this protocol.
+	SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	if (a_OldListName == a_Player.GetPlayerListName())
+	{
+		return;
+	}
+
+	// Remove the old name from the tablist:
+	{
+		cPacketizer Pkt(*this, 0x38);
+		Pkt.WriteString(a_OldListName);
+		Pkt.WriteBool(false);
+		Pkt.WriteShort(0);
+	}
+
+	SendPlayerListAddPlayer(a_Player);
 }
 
 
@@ -1041,9 +1023,9 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	
 	cPacketizer Pkt(*this, 0x11);
 	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
 	Pkt.WriteShort(a_ExpOrb.GetReward());
 }
 
@@ -1363,6 +1345,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height));
 	
 	cPacketizer Pkt(*this, 0x33);
 	Pkt.WriteInt(a_BlockX);
@@ -1508,14 +1491,14 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		);
 		m_CommLogFile.Flush();
 	}
-	
+
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
 		m_Client->PacketBufferFull();
 		return;
 	}
-	
+
 	// Handle all complete packets:
 	for (;;)
 	{
@@ -1535,7 +1518,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
-		
+
 		// Write one NUL extra, so that we can detect over-reads
 		bb.Write("\0", 1);
 		
@@ -1561,7 +1544,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
 			);
 		}
-		
+
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
@@ -1586,7 +1569,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			
 			return;
 		}
-		
+
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
@@ -1607,7 +1590,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_Client->PacketError(PacketType);
 		}
 	}  // for (ever)
-	
+
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
 	{
@@ -1718,7 +1701,7 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Timestamp);
-	
+
 	cPacketizer Pkt(*this, 0x01);  // Ping packet
 	Pkt.WriteInt64(Timestamp);
 }
@@ -1930,7 +1913,7 @@ void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
 	
 	m_Client->SetLocale(Locale);
-	// TODO: handle in m_Client
+	// TODO: Do anything with the other values.
 }
 
 
@@ -2284,7 +2267,6 @@ void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 
 
 
-
 bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
@@ -2429,85 +2411,6 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 
 
 
-void cProtocol172::AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle)
-{
-	size_t len = a_PartStyle.length();
-	for (size_t i = 0; i < len; i++)
-	{
-		switch (a_PartStyle[i])
-		{
-			case 'b':
-			{
-				// bold
-				a_Value["bold"] = Json::Value(true);
-				break;
-			}
-			
-			case 'i':
-			{
-				// italic
-				a_Value["italic"] = Json::Value(true);
-				break;
-			}
-			
-			case 'u':
-			{
-				// Underlined
-				a_Value["underlined"] = Json::Value(true);
-				break;
-			}
-			
-			case 's':
-			{
-				// strikethrough
-				a_Value["strikethrough"] = Json::Value(true);
-				break;
-			}
-			
-			case 'o':
-			{
-				// obfuscated
-				a_Value["obfuscated"] = Json::Value(true);
-				break;
-			}
-			
-			case '@':
-			{
-				// Color, specified by the next char:
-				i++;
-				if (i >= len)
-				{
-					// String too short, didn't contain a color
-					break;
-				}
-				switch (a_PartStyle[i])
-				{
-					case '0': a_Value["color"] = Json::Value("black");        break;
-					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
-					case '2': a_Value["color"] = Json::Value("dark_green");   break;
-					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
-					case '4': a_Value["color"] = Json::Value("dark_red");     break;
-					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
-					case '6': a_Value["color"] = Json::Value("gold");         break;
-					case '7': a_Value["color"] = Json::Value("gray");         break;
-					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
-					case '9': a_Value["color"] = Json::Value("blue");         break;
-					case 'a': a_Value["color"] = Json::Value("green");        break;
-					case 'b': a_Value["color"] = Json::Value("aqua");         break;
-					case 'c': a_Value["color"] = Json::Value("red");          break;
-					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
-					case 'e': a_Value["color"] = Json::Value("yellow");       break;
-					case 'f': a_Value["color"] = Json::Value("white");        break;
-				}  // switch (color)
-			}  // case '@'
-		}  // switch (Style[i])
-	}  // for i - a_PartStyle[]
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol172::cPacketizer:
 
@@ -2517,6 +2420,7 @@ cProtocol172::cPacketizer::~cPacketizer()
 
 	// Send the packet length
 	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
+
 	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
 	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
@@ -2611,11 +2515,13 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
 	}
 	Writer.Finish();
+
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	WriteShort((short)Compressed.size());
 	WriteBuf(Compressed.data(), Compressed.size());
 }
+
 
 
 
@@ -2831,7 +2737,7 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(0xA2);
 			WriteItem(Frame.GetItem());
 			WriteByte(0x3);
-			WriteByte(Frame.GetRotation());
+			WriteByte(Frame.GetRotation() / 2);
 			break;
 		}
 		default: break;

@@ -535,6 +535,12 @@ protected:
 	
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 
+	/** Applies friction to an entity
+	@param a_Speed The speed vector to apply changes to
+	@param a_SlowdownMultiplier The factor to reduce the speed by
+	*/
+	static void ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, float a_Dt);
+
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);
 	

@@ -50,11 +50,6 @@ public:
 		return true;
 	}
 
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
-
 	/** Traces along YP until it finds an obsidian block, returns Y difference or 0 if no portal, and -1 for border
 	Takes the X, Y, and Z of the base block; with an optional MaxY for portal border finding */
 	int FindObsidianCeiling(int X, int Y, int Z, cChunkInterface & a_ChunkInterface, int MaxY = 0)
@@ -131,11 +126,11 @@ public:
 			{
 				if (Dir == 1)
 				{
-					a_ChunkInterface.SetBlock(a_WorldInterface, Width, Height, Z, E_BLOCK_NETHER_PORTAL, Dir);
+					a_ChunkInterface.SetBlock(Width, Height, Z, E_BLOCK_NETHER_PORTAL, Dir);
 				}
 				else
 				{
-					a_ChunkInterface.SetBlock(a_WorldInterface, X, Height, Width, E_BLOCK_NETHER_PORTAL, Dir);
+					a_ChunkInterface.SetBlock(X, Height, Width, E_BLOCK_NETHER_PORTAL, Dir);
 				}
 			}
 		}

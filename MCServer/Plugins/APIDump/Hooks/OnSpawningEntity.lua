@@ -6,8 +6,9 @@ return
 		DefaultFnName = "OnSpawningEntity",  -- also used as pagename
 		Desc = [[
 			This hook is called before the server spawns an {{cEntity|entity}}. The plugin can either modify the
-			entity before it is spawned, or disable the spawning altogether. If the entity spawning is a
-			monster, the {{OnSpawningMonster|HOOK_SPAWNING_MONSTER}} hook is called before this hook.</p>
+			entity before it is spawned, or disable the spawning altogether. You can't disable the spawning if the
+			entity is a player. If the entity spawning is a monster, the {{OnSpawningMonster|HOOK_SPAWNING_MONSTER}}
+			hook is called before this hook.</p>
 			<p>
 			See also the {{OnSpawnedEntity|HOOK_SPAWNED_ENTITY}} hook for a similar hook called after the
 			entity is spawned.
