@@ -9,9 +9,9 @@
 #include <QDirIterator>
 #include "inifile/iniFile.h"
 #include "ChunkSource.h"
-#include "Generating/BioGen.h"
-#include "StringCompression.h"
-#include "WorldStorage/FastNBT.h"
+#include "src/Generating/BioGen.h"
+#include "src/StringCompression.h"
+#include "src/WorldStorage/FastNBT.h"
 #include "GeneratorSetup.h"
 
 

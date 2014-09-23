@@ -83,8 +83,8 @@ HEADERS  += MainWindow.h \
     GeneratorSetup.h
 
 INCLUDEPATH += $$_PRO_FILE_PWD_ \
-	$$_PRO_FILE_PWD_/../../src \
-	$$_PRO_FILE_PWD_/../../lib
+	$$_PRO_FILE_PWD_/../../lib \
+	$$_PRO_FILE_PWD_/../../
 
 
 CONFIG += C++11

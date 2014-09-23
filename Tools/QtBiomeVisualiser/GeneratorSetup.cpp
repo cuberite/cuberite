@@ -2,7 +2,7 @@
 #include "GeneratorSetup.h"
 #include <QLabel>
 #include <QLineEdit>
-#include "Generating/BioGen.h"
+#include "src/Generating/BioGen.h"
 #include "inifile/iniFile.h"
 
 

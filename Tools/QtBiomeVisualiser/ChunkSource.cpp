@@ -1,10 +1,10 @@
 #include "Globals.h"
 #include "ChunkSource.h"
 #include <QThread>
-#include "Generating/BioGen.h"
+#include "src/Generating/BioGen.h"
 #include "inifile/iniFile.h"
-#include "StringCompression.h"
-#include "WorldStorage/FastNBT.h"
+#include "src/StringCompression.h"
+#include "src/WorldStorage/FastNBT.h"
 
 
 
