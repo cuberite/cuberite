@@ -576,7 +576,7 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, 0x05);  // Spawn Position packet
-		Pkt.WritePosition(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
+		Pkt.WritePosition((int)a_World.GetSpawnX(), (int)a_World.GetSpawnY(), (int)a_World.GetSpawnZ());
 	}
 
 	// Send the server difficulty:
@@ -633,7 +633,7 @@ void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
 	Pkt.WriteVarInt(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName().c_str());
-	Pkt.WritePosition(PosX, PosY, PosZ);
+	Pkt.WritePosition((int)PosX, (int)PosY, (int)PosZ);
 	Pkt.WriteChar(a_Painting.GetDirection());
 }
 
