@@ -795,7 +795,7 @@ void cProtocol172::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteString(a_Player.GetPlayerListName());
 	Pkt.WriteBool(true);
 	Pkt.WriteShort(a_Player.GetClientHandle()->GetPing());
 }
@@ -809,7 +809,7 @@ void cProtocol172::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x38);
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteString(a_Player.GetPlayerListName());
 	Pkt.WriteBool(false);
 	Pkt.WriteShort(0);
 }
@@ -841,7 +841,7 @@ void cProtocol172::SendPlayerListUpdatePing(const cPlayer & a_Player)
 void cProtocol172::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	if (a_OldListName == a_Player.GetName())
+	if (a_OldListName == a_Player.GetPlayerListName())
 	{
 		return;
 	}
@@ -928,9 +928,16 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
-	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt((UInt32) a_Player.GetUniqueID());
 	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
-	Pkt.WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		Pkt.WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		Pkt.WriteString(a_Player.GetName());
+	}
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY());
 	Pkt.WriteFPInt(a_Player.GetPosZ());
@@ -2928,6 +2935,15 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 	}  // switch (a_Mob.GetType())
+
+	// Custom name:
+	if (a_Mob.HasCustomName())
+	{
+		WriteByte(0x8a);
+		WriteString(a_Mob.GetCustomName());
+		WriteByte(0x0b);
+		WriteByte(a_Mob.IsCustomNameAlwaysVisible() ? 1 : 0);
+	}
 }
 
 
@@ -2972,7 +2988,14 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
 	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
-	Pkt.WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		Pkt.WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		Pkt.WriteString(a_Player.GetName());
+	}
 
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt(Properties.size());

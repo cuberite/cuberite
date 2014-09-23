@@ -1073,6 +1073,8 @@ cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const c
 
 void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (m_Attachee != NULL)
 	{
 		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
@@ -1125,8 +1127,7 @@ void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
 
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
-	// Show the chest UI window to the player
-	// TODO
+	// TODO: Show the chest UI window to the player
 }
 
 

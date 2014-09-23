@@ -824,7 +824,17 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 	Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
 	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
-	Pkt.WriteBool(false);
+
+	AString CustomName = a_Player.GetPlayerListName();
+	if (CustomName != a_Player.GetName())
+	{
+		Pkt.WriteBool(true);
+		Pkt.WriteString(Printf("{\"text\":\"%s\"}", CustomName.c_str()));
+	}
+	else
+	{
+		Pkt.WriteBool(false);
+	}
 }
 
 
@@ -877,7 +887,6 @@ void cProtocol180::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
 {
-	UNUSED(a_OldListName);
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
@@ -885,15 +894,15 @@ void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, con
 	Pkt.WriteVarInt(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 
-	// TODO: Replace this with GetPlayerListName() (It's already done in other pull request)
-	if (a_Player.GetName().empty())
+	AString CustomName = a_Player.GetPlayerListName();
+	if (CustomName == a_Player.GetName())
 	{
 		Pkt.WriteBool(false);
 	}
 	else
 	{
 		Pkt.WriteBool(true);
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Player.GetName().c_str()));
+		Pkt.WriteString(Printf("{\"text\":\"%s\"}", CustomName.c_str()));
 	}
 }
 

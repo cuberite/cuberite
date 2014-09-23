@@ -124,13 +124,14 @@ cClientHandle::~cClientHandle()
 	if (m_Player != NULL)
 	{
 		cWorld * World = m_Player->GetWorld();
-		if (!m_Username.empty() && (World != NULL))
-		{
-			// Send the Offline PlayerList packet:
-			World->BroadcastPlayerListRemovePlayer(*m_Player, this);
-		}
 		if (World != NULL)
 		{
+			if (!m_Username.empty())
+			{
+				// Send the Offline PlayerList packet:
+				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
+			}
+	
 			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
 			m_Player->Destroy();
 		}

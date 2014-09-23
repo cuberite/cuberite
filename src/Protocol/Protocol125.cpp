@@ -723,7 +723,7 @@ void cProtocol125::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_PLAYER_LIST_ITEM);
-	WriteString(a_Player.GetName());
+	WriteString(a_Player.GetPlayerListName());
 	WriteBool  (true);
 	WriteShort (a_Player.GetClientHandle()->GetPing());
 	Flush();
@@ -737,7 +737,7 @@ void cProtocol125::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte  (PACKET_PLAYER_LIST_ITEM);
-	WriteString(a_Player.GetName());
+	WriteString(a_Player.GetPlayerListName());
 	WriteBool  (false);
 	WriteShort (0);
 	Flush();
@@ -769,7 +769,7 @@ void cProtocol125::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 void cProtocol125::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
 {
-	if (a_OldListName == a_Player.GetName())
+	if (a_OldListName == a_Player.GetPlayerListName())
 	{
 		return;
 	}
@@ -843,7 +843,14 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 	cCSLock Lock(m_CSPacket);
 	WriteByte	 (PACKET_PLAYER_SPAWN);
 	WriteInt   (a_Player.GetUniqueID());
-	WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		WriteString(a_Player.GetName());
+	}
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));

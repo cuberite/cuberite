@@ -81,7 +81,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_Team(NULL),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
-	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : "")
+	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : ""),
+	m_CustomName("")
 {
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -809,6 +810,28 @@ void cPlayer::SetCanFly(bool a_CanFly)
 
 
 
+void cPlayer::SetCustomName(const AString & a_CustomName)
+{
+	if (m_CustomName == a_CustomName)
+	{
+		return;
+	}
+	AString OldCustomName = m_CustomName;
+
+	m_CustomName = a_CustomName;
+	if (m_CustomName.length() > 16)
+	{
+		m_CustomName = m_CustomName.substr(0, 16);
+	}
+
+	m_World->BroadcastPlayerListUpdateDisplayName(*this, m_CustomName);
+	m_World->BroadcastSpawnEntity(*this, m_ClientHandle);
+}
+
+
+
+
+
 void cPlayer::SetFlying(bool a_IsFlying)
 {
 	if (a_IsFlying == m_IsFlying)
@@ -1444,6 +1467,28 @@ AString cPlayer::GetColor(void) const
 
 	// Return the color, including the delimiter:
 	return cChatColor::Delimiter + m_MsgNameColorCode;
+}
+
+
+
+
+
+AString cPlayer::GetPlayerListName(void) const
+{
+	const AString & Color = GetColor();
+
+	if (HasCustomName())
+	{
+		return m_CustomName;
+	}
+	else if ((GetName().length() <= 14) && !Color.empty())
+	{
+		return Printf("%s%s", Color.c_str(), GetName().c_str());
+	}
+	else
+	{
+		return GetName();
+	}
 }
 
 

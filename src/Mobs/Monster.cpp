@@ -75,6 +75,8 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
+	, m_CustomName("")
+	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
 	, m_AttackRate(3)
@@ -555,6 +557,25 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+void cMonster::OnRightClicked(cPlayer & a_Player)
+{
+	super::OnRightClicked(a_Player);
+
+	const cItem & EquippedItem = a_Player.GetEquippedItem();
+	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	{
+		SetCustomName(EquippedItem.m_CustomName);
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+	}
+}
+
+
+
+
+
 // Checks to see if EventSeePlayer should be fired
 // monster sez: Do I see the player
 void cMonster::CheckEventSeePlayer(void)
@@ -676,6 +697,39 @@ void cMonster::InStateEscaping(float a_Dt)
 	else
 	{
 		m_EMState = IDLE;  // This shouldnt be required but just to be safe
+	}
+}
+
+
+
+
+
+void cMonster::SetCustomName(const AString & a_CustomName)
+{
+	m_CustomName = a_CustomName;
+
+	// The maximal length is 64
+	if (a_CustomName.length() > 64)
+	{
+		m_CustomName = a_CustomName.substr(0, 64);
+	}
+
+	if (m_World != NULL)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
+{
+	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
+	if (m_World != NULL)
+	{
+		m_World->BroadcastEntityMetadata(*this);
 	}
 }
 

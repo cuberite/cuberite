@@ -3288,13 +3288,17 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
 		AString PlayerName ((*itr)->GetName());
+		if ((*itr)->HasCustomName())
+		{
+			PlayerName = (*itr)->GetCustomName();
+		}
+
 		AString::size_type Found = PlayerName.find(LastWord);  // Try to find last word in playername
-		
 		if (Found == AString::npos)
 		{
 			continue;  // No match
 		}
-		
+
 		UsernamesByWeight.push_back(std::make_pair(Found, PlayerName));  // Match! Store it with the position of the match as a weight
 	}
 	Lock.Unlock();

@@ -504,6 +504,8 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			m_Writer.AddFloat("", a_Monster->GetDropChanceBoots());
 		m_Writer.EndList();
 		m_Writer.AddByte("CanPickUpLoot", (char)a_Monster->CanPickUpLoot());
+		m_Writer.AddString("CustomName", a_Monster->GetCustomName());
+		m_Writer.AddByte("CustomNameVisible", (char)a_Monster->IsCustomNameAlwaysVisible());
 		switch (a_Monster->GetMobType())
 		{
 			case cMonster::mtBat:
