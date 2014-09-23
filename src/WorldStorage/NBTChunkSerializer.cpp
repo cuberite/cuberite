@@ -765,6 +765,22 @@ void cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
 
 
 
+void cNBTChunkSerializer::HeightMap(const cChunkDef::HeightMap * a_HeightMap)
+{
+	for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
+	{
+		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
+		{
+			int Height = cChunkDef::GetHeight(*a_HeightMap, RelX, RelZ);
+			m_VanillaHeightMap[(RelZ << 4) | RelX] = Height;
+		}
+	}
+}
+
+
+
+
+
 void cNBTChunkSerializer::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 {
 	memcpy(m_Biomes, a_BiomeMap, sizeof(m_Biomes));
