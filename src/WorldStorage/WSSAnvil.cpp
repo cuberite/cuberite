@@ -2464,19 +2464,19 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	LoadWolfOwner(*Monster.get(), a_NBT, a_TagIdx);
 
 	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
-	if (SittingIdx > 0)
+	if ((SittingIdx > 0) && (a_NBT.GetType(SittingIdx) == TAG_Byte))
 	{
 		bool Sitting = ((a_NBT.GetByte(SittingIdx) == 1) ? true : false);
 		Monster->SetIsSitting(Sitting);
 	}
 	int AngryIdx = a_NBT.FindChildByName(a_TagIdx, "Angry");
-	if (AngryIdx > 0)
+	if ((AngryIdx > 0) && (a_NBT.GetType(AngryIdx) == TAG_Byte))
 	{
 		bool Angry = ((a_NBT.GetByte(AngryIdx) == 1) ? true : false);
 		Monster->SetIsAngry(Angry);
 	}
 	int CollarColorIdx = a_NBT.FindChildByName(a_TagIdx, "CollarColor");
-	if (CollarColorIdx > 0)
+	if ((CollarColorIdx > 0) && (a_NBT.GetType(CollarColorIdx) == TAG_Int))
 	{
 		int CollarColor = a_NBT.GetInt(CollarColorIdx);
 		Monster->SetCollarColor(CollarColor);
