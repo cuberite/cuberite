@@ -51,6 +51,7 @@
 #include "../Entities/ItemFrame.h"
 
 #include "../Protocol/MojangAPI.h"
+#include "Server.h"
 
 
 
@@ -96,10 +97,26 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
-		Writer.BeginCompound("");
-		Writer.AddInt("SpawnX", (int)(a_World->GetSpawnX()));
-		Writer.AddInt("SpawnY", (int)(a_World->GetSpawnY()));
-		Writer.AddInt("SpawnZ", (int)(a_World->GetSpawnZ()));
+		Writer.BeginCompound("Data");
+		Writer.AddByte("allowCommands", 1);
+		Writer.AddByte("Difficulty", 2);
+		Writer.AddByte("hardcore", cRoot::Get()->GetServer()->IsHardcore() ? 1 : 0);
+		Writer.AddByte("initialized", 1);
+		Writer.AddByte("MapFeatures", 1);
+		Writer.AddByte("raining", a_World->IsWeatherRain() ? 1 : 0);
+		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
+		Writer.AddInt("GameType", (int)a_World->GetGameMode());
+		Writer.AddInt("generatorVersion", 1);
+		Writer.AddInt("SpawnX", (int)a_World->GetSpawnX());
+		Writer.AddInt("SpawnY", (int)a_World->GetSpawnY());
+		Writer.AddInt("SpawnZ", (int)a_World->GetSpawnZ());
+		Writer.AddInt("version", 19133);
+		Writer.AddLong("DayTime", (Int64)a_World->GetTimeOfDay());
+		Writer.AddLong("Time", a_World->GetWorldAge());
+		Writer.AddLong("SizeOnDisk", 0);
+		Writer.AddString("generatorName", "default");
+		Writer.AddString("generatorOptions", "");
+		Writer.AddString("LevelName", a_World->GetName());
 		Writer.EndCompound();
 		Writer.Finish();
 		
@@ -440,6 +457,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	a_Writer.BeginCompound("Level");
 	a_Writer.AddInt("xPos", a_Chunk.m_ChunkX);
 	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
+
 	cNBTChunkSerializer Serializer(a_Writer);
 	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
 	{
@@ -454,7 +472,10 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		a_Writer.AddByteArray("Biomes",    (const char *)(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
 		a_Writer.AddIntArray ("MCSBiomes", (const int *)(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
 	}
-	
+
+	// Save heightmap (Vanilla require this):
+	a_Writer.AddIntArray("HeightMap", (const int *)Serializer.m_VanillaHeightMap, ARRAYCOUNT(Serializer.m_VanillaHeightMap));
+
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
 	size_t SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
@@ -485,6 +506,9 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	{
 		a_Writer.AddByte("MCSIsLightValid", 1);
 	}
+
+	// Save the world age to the chunk data. Required by vanilla and mcedit.
+	a_Writer.AddLong("LastUpdate", m_World->GetWorldAge());
 	
 	// Store the flag that the chunk has all the ores, trees, dungeons etc. MCS chunks are always complete.
 	a_Writer.AddByte("TerrainPopulated", 1);

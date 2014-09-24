@@ -81,6 +81,18 @@ void cNBTChunkSerializer::Finish(void)
 		memset(m_BlockLight,    0, sizeof(m_BlockLight));
 		memset(m_BlockSkyLight, 0, sizeof(m_BlockSkyLight));
 	}
+
+	// Check if "Entity" and "TileEntities" lists exists. MCEdit requires this.
+	if (!m_HasHadEntity)
+	{
+		m_Writer.BeginList("Entities", TAG_Compound);
+		m_Writer.EndList();
+	}
+	if (!m_HasHadBlockEntity)
+	{
+		m_Writer.BeginList("TileEntities", TAG_Compound);
+		m_Writer.EndList();
+	}
 }
 
 
@@ -759,6 +771,22 @@ void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Mineca
 void cNBTChunkSerializer::LightIsValid(bool a_IsLightValid)
 {
 	m_IsLightValid = a_IsLightValid;
+}
+
+
+
+
+
+void cNBTChunkSerializer::HeightMap(const cChunkDef::HeightMap * a_HeightMap)
+{
+	for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
+	{
+		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
+		{
+			int Height = cChunkDef::GetHeight(*a_HeightMap, RelX, RelZ);
+			m_VanillaHeightMap[(RelZ << 4) | RelX] = Height;
+		}
+	}
 }
 
 
