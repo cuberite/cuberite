@@ -85,13 +85,13 @@ void cNBTChunkSerializer::Finish(void)
 	// Check if "Entity" and "TileEntities" lists exists. MCEdit requires this.
 	if (!m_HasHadEntity)
 	{
-		a_Writer.BeginList("Entities", TAG_Compound);
-		a_Writer.EndList();
+		m_Writer.BeginList("Entities", TAG_Compound);
+		m_Writer.EndList();
 	}
 	if (!m_HasHadBlockEntity)
 	{
-		a_Writer.BeginList("TileEntities", TAG_Compound);
-		a_Writer.EndList();
+		m_Writer.BeginList("TileEntities", TAG_Compound);
+		m_Writer.EndList();
 	}
 }
 
