@@ -2,7 +2,7 @@
 #include "Globals.h"
 #include <QString>
 #include <QMutex>
-#include "Chunk.h"
+#include "QtChunk.h"
 
 
 
