@@ -81,6 +81,18 @@ void cNBTChunkSerializer::Finish(void)
 		memset(m_BlockLight,    0, sizeof(m_BlockLight));
 		memset(m_BlockSkyLight, 0, sizeof(m_BlockSkyLight));
 	}
+
+	// Check if "Entity" and "TileEntities" lists exists. MCEdit requires this.
+	if (!m_HasHadEntity)
+	{
+		a_Writer.BeginList("Entities", TAG_Compound);
+		a_Writer.EndList();
+	}
+	if (!m_HasHadBlockEntity)
+	{
+		a_Writer.BeginList("TileEntities", TAG_Compound);
+		a_Writer.EndList();
+	}
 }
 
 

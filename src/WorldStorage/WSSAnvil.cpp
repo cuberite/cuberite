@@ -51,6 +51,7 @@
 #include "../Entities/ItemFrame.h"
 
 #include "../Protocol/MojangAPI.h"
+#include "Server.h"
 
 
 
@@ -99,7 +100,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.BeginCompound("Data");
 		Writer.AddByte("allowCommands", 1);
 		Writer.AddByte("Difficulty", 2);
-		Writer.AddByte("hardcore", 0);
+		Writer.AddByte("hardcore", cRoot::Get()->GetServer()->IsHardcore() ? 1 : 0);
 		Writer.AddByte("initialized", 1);
 		Writer.AddByte("MapFeatures", 1);
 		Writer.AddByte("raining", a_World->IsWeatherRain() ? 1 : 0);
@@ -456,12 +457,6 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	a_Writer.BeginCompound("Level");
 	a_Writer.AddInt("xPos", a_Chunk.m_ChunkX);
 	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
-
-	// Add "Entities" and "TileEntities". MCEdit can't load the chunk if one of these lists doesn't exists.
-	a_Writer.BeginList("Entities", TAG_Compound);
-	a_Writer.EndList();
-	a_Writer.BeginList("TileEntities", TAG_Compound);
-	a_Writer.EndList();
 
 	cNBTChunkSerializer Serializer(a_Writer);
 	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
