@@ -2,9 +2,9 @@
 #include "ChunkSource.h"
 #include <QThread>
 #include "src/Generating/BioGen.h"
-#include "inifile/iniFile.h"
 #include "src/StringCompression.h"
 #include "src/WorldStorage/FastNBT.h"
+#include "inifile/iniFile.h"
 
 
 

@@ -12,7 +12,7 @@ TARGET = QtBiomeVisualiser
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES +=\
 		MainWindow.cpp \
     BiomeView.cpp \
     ../../src/Generating/BioGen.cpp \
@@ -27,7 +27,6 @@ SOURCES += main.cpp\
     ../../src/OSSupport/IsThread.cpp \
     ../../src/BiomeDef.cpp \
     ChunkCache.cpp \
-    Chunk.cpp \
     ChunkSource.cpp \
     ChunkLoader.cpp \
     ../../src/StringCompression.cpp \
@@ -47,7 +46,9 @@ SOURCES += main.cpp\
     ../../lib/zlib/trees.c \
     ../../lib/zlib/uncompr.c \
     ../../lib/zlib/zutil.c \
-    GeneratorSetup.cpp
+    GeneratorSetup.cpp \
+    QtBiomeVisualiser.cpp \
+    QtChunk.cpp
 
 HEADERS  += MainWindow.h \
 		Globals.h \
@@ -64,7 +65,6 @@ HEADERS  += MainWindow.h \
     ../../src/OSSupport/IsThread.h \
     ../../src/BiomeDef.h \
     ChunkCache.h \
-    Chunk.h \
     ChunkSource.h \
     ChunkLoader.h \
     ../../src/StringCompression.h \
@@ -80,11 +80,17 @@ HEADERS  += MainWindow.h \
     ../../lib/zlib/zconf.h \
     ../../lib/zlib/zlib.h \
     ../../lib/zlib/zutil.h \
-    GeneratorSetup.h
+    GeneratorSetup.h \
+    QtChunk.h
 
 INCLUDEPATH += $$_PRO_FILE_PWD_ \
 	$$_PRO_FILE_PWD_/../../lib \
+	$$_PRO_FILE_PWD_/../../lib/jsoncpp/include \
+	$$_PRO_FILE_PWD_/../../lib/polarssl/include \
+	$$_PRO_FILE_PWD_/../../lib/sqlite \
+	$$_PRO_FILE_PWD_/../../lib/SQLiteCpp/include \
 	$$_PRO_FILE_PWD_/../../
+
 
 
 CONFIG += C++11

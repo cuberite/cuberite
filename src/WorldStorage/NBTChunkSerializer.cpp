@@ -582,7 +582,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				}
 				m_Writer.AddByte("Sitting",     Wolf.IsSitting() ? 1 : 0);
 				m_Writer.AddByte("Angry",       Wolf.IsAngry() ? 1 : 0);
-				m_Writer.AddInt("CollarColor",  Wolf.GetCollarColor());
+				m_Writer.AddByte("CollarColor", (unsigned char)Wolf.GetCollarColor());
 				break;
 			}
 			case cMonster::mtZombie:
