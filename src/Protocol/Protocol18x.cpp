@@ -1966,13 +1966,19 @@ void cProtocol180::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
 	UInt32 EncKeyLength, EncNonceLength;
-	a_ByteBuffer.ReadVarInt(EncKeyLength);
+	if (!a_ByteBuffer.ReadVarInt(EncKeyLength))
+	{
+		return;
+	}
 	AString EncKey;
 	if (!a_ByteBuffer.ReadString(EncKey, EncKeyLength))
 	{
 		return;
 	}
-	a_ByteBuffer.ReadVarInt(EncNonceLength);
+	if (!a_ByteBuffer.ReadVarInt(EncNonceLength))
+	{
+		return;
+	}
 	AString EncNonce;
 	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
 	{
