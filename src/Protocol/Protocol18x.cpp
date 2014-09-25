@@ -1711,20 +1711,43 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_ReceivedData.ResetRead();
 			break;
 		}
-		cByteBuffer bb(PacketLen + 1);
-		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
-		m_ReceivedData.CommitRead();
-
-		// Compressed packets
+		
+		// Check packet for compression:
+		UInt32 CompressedSize = 0;
+		AString UncompressedData;
 		if (m_State == 3)
 		{
-			UInt32 CompressedSize;
-			if (!bb.ReadVarInt(CompressedSize))
+			UInt32 NumBytesRead = m_ReceivedData.GetReadableSpace();
+			m_ReceivedData.ReadVarInt(CompressedSize);
+			if (CompressedSize > 0)
 			{
-				// Not enough data
-				break;
+				// Decompress the data:
+				AString CompressedData;
+				m_ReceivedData.ReadString(CompressedData, CompressedSize);
+				InflateString(CompressedData.data(), CompressedSize, UncompressedData);
+				PacketLen = UncompressedData.size();
+			}
+			else
+			{
+				NumBytesRead -= m_ReceivedData.GetReadableSpace();  // How many bytes has the CompressedSize taken up?
+				ASSERT(PacketLen > NumBytesRead);
+				PacketLen -= NumBytesRead;
 			}
 		}
+		
+		// Move the packet payload to a separate cByteBuffer, bb:
+		cByteBuffer bb(PacketLen + 1);
+		if (CompressedSize == 0)
+		{
+			// No compression was used, move directly
+			VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
+		}
+		else
+		{
+			// Compression was used, move the uncompressed data:
+			VERIFY(bb.Write(UncompressedData.data(), UncompressedData.size()));
+		}
+		m_ReceivedData.CommitRead();
 
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
@@ -2299,7 +2322,7 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	AString Data;
-	a_ByteBuffer.ReadAll(Data);
+	a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1);
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2526,7 +2549,7 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 
 
 
-bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_RemainingBytes)
+bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes)
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
 	if (ItemType == -1)
@@ -2547,7 +2570,7 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a
 	}
 
 	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_RemainingBytes) || (Metadata.size() == 0) || (Metadata[0] == 0))
+	if (!a_ByteBuffer.ReadString(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes - 1) || (Metadata.size() == 0) || (Metadata[0] == 0))
 	{
 		// No metadata
 		return true;
