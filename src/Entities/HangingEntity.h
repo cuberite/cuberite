@@ -24,7 +24,7 @@ public:
 	eBlockFace GetDirection() const { return m_BlockFace; }  // tolua_export
 	
 	/** Set the orientation from the hanging entity */
-	void SetDirection(eBlockFace a_BlockFace) { m_BlockFace = a_BlockFace; }  // tolua_export
+	void SetDirection(eBlockFace a_BlockFace); // tolua_export
 	
 	/** Returns the X coord. */
 	int GetTileX() const { return POSX_TOINT; }  // tolua_export

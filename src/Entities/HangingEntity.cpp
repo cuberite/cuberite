@@ -21,6 +21,21 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace,
 
 
 
+void cHangingEntity::SetDirection(eBlockFace a_BlockFace)
+{
+	if ((a_BlockFace < 2) || (a_BlockFace > 5))
+	{
+		ASSERT(!"Tried to set a bad direction!");
+		return;
+	}
+
+	m_BlockFace = a_BlockFace;
+}
+
+
+
+
+
 void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	int Dir = 0;

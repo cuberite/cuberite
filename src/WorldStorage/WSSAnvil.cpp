@@ -1664,7 +1664,7 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 	if (Direction > 0)
 	{
 		Direction = (int)a_NBT.GetByte(Direction);
-		if ((Direction < 0) || (Direction > 5))
+		if ((Direction < 2) || (Direction > 5))
 		{
 			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
 		}
