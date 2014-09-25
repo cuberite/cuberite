@@ -1000,6 +1000,7 @@ void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & 
 	
 	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
+	Pkt.WriteVarInt((UInt32)a_Message.size());
 	Pkt.WriteBuf(a_Message.data(), a_Message.size());
 }
 
@@ -2326,8 +2327,9 @@ void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, DataLen);
 	AString Data;
-	a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1);
+	a_ByteBuffer.ReadString(Data, DataLen);
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
