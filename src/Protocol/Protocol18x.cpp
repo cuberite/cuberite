@@ -1711,7 +1711,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_ReceivedData.ResetRead();
 			break;
 		}
-		cByteBuffer bb(PacketLen);
+		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
 
@@ -1726,9 +1726,6 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			}
 		}
 
-		// Write one NUL extra, so that we can detect over-reads
-		bb.Write("\0", 1);
-		
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
 		{
@@ -1736,6 +1733,9 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			break;
 		}
 
+		// Write one NUL extra, so that we can detect over-reads
+		bb.Write("\0", 1);
+		
 		// Log the packet info into the comm log file:
 		if (g_ShouldLogCommIn)
 		{
@@ -1743,7 +1743,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
 			bb.ReadVarInt(PacketType);
-			ASSERT(PacketData.size() > 0);
+			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
 			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
@@ -1777,7 +1777,8 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			return;
 		}
 
-		if (bb.GetReadableSpace() != 0)
+		// The packet should have 1 byte left in the buffer - the NUL we had added
+		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
 			LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read " SIZE_T_FMT " bytes, packet contained %u bytes",

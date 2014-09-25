@@ -1519,9 +1519,6 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
 
-		// Write one NUL extra, so that we can detect over-reads
-		bb.Write("\0", 1);
-		
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
 		{
@@ -1529,6 +1526,9 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			break;
 		}
 
+		// Write one NUL extra, so that we can detect over-reads
+		bb.Write("\0", 1);
+		
 		// Log the packet info into the comm log file:
 		if (g_ShouldLogCommIn)
 		{
@@ -1536,7 +1536,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
 			bb.ReadVarInt(PacketType);
-			ASSERT(PacketData.size() > 0);
+			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
 			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);

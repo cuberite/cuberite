@@ -1937,17 +1937,23 @@ bool cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 		{
 			// Check if eastern(right) neighbor is a powered on repeater who is facing us
 			BLOCKTYPE Block = 0;
-			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))  // Is right neighbor a powered repeater?
+			NIBBLETYPE OtherRepeaterDir = 0;
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON)) // Is right neighbor a powered repeater?
 			{
-				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ) & 0x3;
-				if (OtherRepeaterDir == 0x3) { return true; }  // If so, I am latched/locked
+				if ((OtherRepeaterDir & 0x03) == 0x3) 
+				{
+					return true;
+				}  // If so, I am latched/locked
 			}
 
 			// Check if western(left) neighbor is a powered on repeater who is facing us
-			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
 				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX -1, a_RelBlockY, a_RelBlockZ) & 0x3;
-				if (OtherRepeaterDir == 0x1) { return true; }  // If so, I am latched/locked
+				if ((OtherRepeaterDir & 0x03) == 0x1) 
+				{ 
+					return true; 
+				}  // If so, I am latched/locked
 			}
 
 			break;
@@ -1959,17 +1965,23 @@ bool cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 		{
 			// Check if southern(down) neighbor is a powered on repeater who is facing us
 			BLOCKTYPE Block = 0;
-			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			NIBBLETYPE OtherRepeaterDir = 0;
+			
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
-				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1) & 0x3;
-				if (OtherRepeaterDir == 0x0) { return true; }  // If so,  am latched/locked
+				if ((OtherRepeaterDir & 0x30 ) == 0x00) 
+				{ 
+					return true; 
+				}  // If so,  am latched/locked
 			}
 			
 			// Check if northern(up) neighbor is a powered on repeater who is facing us
-			if (m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
-				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1) & 0x3;
-				if (OtherRepeaterDir == 0x2) { return true; }  // If so, I am latched/locked
+				if ((OtherRepeaterDir & 0x03) == 0x02)
+				{ 
+					return true;
+				}  // If so, I am latched/locked
 			}
 
 			break;
