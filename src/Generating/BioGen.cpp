@@ -913,15 +913,32 @@ EMCSBiome cBioGenTwoLevel::SelectBiome(int a_BiomeGroup, int a_BiomeIdx, int a_D
 
 void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	// TODO: Read these from a file
-	m_VoronoiLarge.SetCellSize(1024);
-	m_VoronoiSmall.SetCellSize(128);
-	m_DistortX.AddOctave(0.01f,   16);
-	m_DistortX.AddOctave(0.005f,   8);
-	m_DistortX.AddOctave(0.0025f,  4);
-	m_DistortZ.AddOctave(0.01f,   16);
-	m_DistortZ.AddOctave(0.005f,   8);
-	m_DistortZ.AddOctave(0.0025f,  4);
+	m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "TwoLevelLargeCellSize", 1024));
+	m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "TwoLevelSmallCellSize", 128));
+	m_DistortX.AddOctave(
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Freq", 0.01),
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Amp",  16)
+	);
+	m_DistortX.AddOctave(
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Freq", 0.005),
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Amp",  8)
+	);
+	m_DistortX.AddOctave(
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.0025),
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Amp",  4)
+	);
+	m_DistortZ.AddOctave(
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Freq", 0.01),
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Amp",  16)
+	);
+	m_DistortZ.AddOctave(
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Freq", 0.005),
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Amp",  8)
+	);
+	m_DistortZ.AddOctave(
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Freq", 0.0025),
+		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Amp",  4)
+	);
 }
 
 
