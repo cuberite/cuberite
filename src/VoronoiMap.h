@@ -40,7 +40,18 @@ public:
 	
 	/** Returns the value in the cell into which the specified point lies,
 	and the distances to the 2 nearest Voronoi seeds. Uses a cache. */
-	int GetValueAt(int a_X, int a_Y, int & a_MinDistance1, int & a_MinDistance2);
+	int GetValueAt(
+		int a_X, int a_Y,                            // Coords to query
+		int & a_NearestSeedX, int & a_NearestSeedY,  // Coords of the closest cell's seed
+		int & a_MinDist2                             // Distance to the second closest cell's seed
+	);
+
+	/** Finds the nearest and second nearest seeds, returns their coords. */
+	void FindNearestSeeds(
+		int a_X, int a_Y,
+		int & a_NearestSeedX, int & a_NearestSeedY,
+		int & a_SecondNearestSeedX, int & a_SecondNearestSeedY
+	);
 
 protected:
 	/// The noise used for generating Voronoi seeds

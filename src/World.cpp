@@ -2144,16 +2144,16 @@ void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animation
 
 
 
-void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude)
+void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude)
 {
-	m_ChunkMap->BroadcastParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount, a_Exclude);
+	m_ChunkMap->BroadcastParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount, a_Exclude);
 }
 
 
 
 
 
-void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2163,7 +2163,79 @@ void cWorld::BroadcastPlayerListItem (const cPlayer & a_Player, bool a_IsOnline,
 		{
 			continue;
 		}
-		ch->SendPlayerListItem(a_Player, a_IsOnline);
+		ch->SendPlayerListAddPlayer(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListRemovePlayer(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListUpdateGameMode(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListUpdatePing(a_Player);
+	}
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName, const cClientHandle * a_Exclude)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		cClientHandle * ch = (*itr)->GetClientHandle();
+		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		{
+			continue;
+		}
+		ch->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
 	}
 }
 
@@ -2686,7 +2758,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 		cClientHandle * ch = (*itr)->GetClientHandle();
 		if ((ch != NULL) && !ch->IsDestroyed())
 		{
-			a_DestPlayer->GetClientHandle()->SendPlayerListItem(*(*itr), true);
+			a_DestPlayer->GetClientHandle()->SendPlayerListAddPlayer(*(*itr));
 		}
 	}
 }
@@ -3216,13 +3288,17 @@ void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Resul
 	for (cPlayerList::iterator itr = m_Players.begin(), end = m_Players.end(); itr != end; ++itr)
 	{
 		AString PlayerName ((*itr)->GetName());
+		if ((*itr)->HasCustomName())
+		{
+			PlayerName = (*itr)->GetCustomName();
+		}
+
 		AString::size_type Found = PlayerName.find(LastWord);  // Try to find last word in playername
-		
 		if (Found == AString::npos)
 		{
 			continue;  // No match
 		}
-		
+
 		UsernamesByWeight.push_back(std::make_pair(Found, PlayerName));  // Match! Store it with the position of the match as a weight
 	}
 	Lock.Unlock();

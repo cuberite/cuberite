@@ -238,14 +238,14 @@ template class SizeChecker<UInt16, 2>;
 
 #ifndef TEST_GLOBALS
 	// Common headers (part 1, without macros):
-	#include "StringUtils.h"
-	#include "OSSupport/Sleep.h"
-	#include "OSSupport/CriticalSection.h"
-	#include "OSSupport/Semaphore.h"
-	#include "OSSupport/Event.h"
-	#include "OSSupport/Thread.h"
-	#include "OSSupport/File.h"
-	#include "Logger.h"
+	#include "src/StringUtils.h"
+	#include "src/OSSupport/Sleep.h"
+	#include "src/OSSupport/CriticalSection.h"
+	#include "src/OSSupport/Semaphore.h"
+	#include "src/OSSupport/Event.h"
+	#include "src/OSSupport/Thread.h"
+	#include "src/OSSupport/File.h"
+	#include "src/Logger.h"
 #else
 	// Logging functions
 void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
@@ -375,10 +375,10 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 // Common headers (part 2, with macros):
-#include "ChunkDef.h"
-#include "BiomeDef.h"
-#include "BlockID.h"
-#include "BlockInfo.h"
+#include "src/ChunkDef.h"
+#include "src/BiomeDef.h"
+#include "src/BlockID.h"
+#include "src/BlockInfo.h"
 
 
 

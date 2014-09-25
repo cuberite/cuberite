@@ -96,6 +96,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 			base = 1800;
 			break;
 		}
+		default: break;
 	}
 	
 	// If potion is level II, half the duration. If not, stays the same

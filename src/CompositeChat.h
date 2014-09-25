@@ -4,6 +4,7 @@
 // Declares the cCompositeChat class used to wrap a chat message with multiple parts (text, url, cmd)
 
 #include "Defines.h"
+#include "json/json.h"
 
 
 
@@ -189,6 +190,8 @@ public:
 	Used for older protocols that don't support composite chat
 	and for console-logging. */
 	AString ExtractText(void) const;
+
+	AString CreateJsonString(bool a_ShouldUseChatPrefixes = true) const;
 	
 	// tolua_end
 	
@@ -197,6 +200,9 @@ public:
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
 	static cLogger::eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+
+	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
+	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
 	
 protected:
 	/** All the parts that */

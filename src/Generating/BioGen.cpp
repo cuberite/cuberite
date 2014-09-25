@@ -13,72 +13,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cBiomeGen:
-
-cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
-{
-	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
-	if (BiomeGenName.empty())
-	{
-		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
-		BiomeGenName = "MultiStepMap";
-	}
-	
-	cBiomeGen * res = NULL;
-	a_CacheOffByDefault = false;
-	if (NoCaseCompare(BiomeGenName, "constant") == 0)
-	{
-		res = new cBioGenConstant;
-		a_CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
-	}
-	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
-	{
-		res = new cBioGenCheckerboard;
-		a_CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
-	}
-	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
-	{
-		res = new cBioGenVoronoi(a_Seed);
-	}
-	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
-	{
-		res = new cBioGenDistortedVoronoi(a_Seed);
-	}
-	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
-	{
-		res = new cBioGenTwoLevel(a_Seed);
-	}
-	else
-	{
-		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
-		{
-			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
-		}
-		res = new cBioGenMultiStepMap(a_Seed);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 5000; x++)
-		{
-			cChunkDef::BiomeMap Biomes;
-			res->GenBiomes(x * 5, x * 5, Biomes);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
-	}
-	res->InitializeBiomeGen(a_IniFile);
-	
-	return res;
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cBioGenConstant:
 
 void cBioGenConstant::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
@@ -402,8 +336,13 @@ void cBioGenVoronoi::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap &
 void cBioGenVoronoi::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	super::InitializeBiomeGen(a_IniFile);
-	m_Voronoi.SetCellSize(a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 64));
-	InitializeBiomes     (a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   ""));
+	int CellSize     = a_IniFile.GetValueSetI("Generator", "VoronoiCellSize", 128);
+	int JitterSize   = a_IniFile.GetValueSetI("Generator", "VoronoiJitterSize", CellSize);
+	int OddRowOffset = a_IniFile.GetValueSetI("Generator", "VoronoiOddRowOffset", 0);
+	m_Voronoi.SetCellSize(CellSize);
+	m_Voronoi.SetJitterSize(JitterSize);
+	m_Voronoi.SetOddRowOffset(OddRowOffset);
+	InitializeBiomes(a_IniFile.GetValueSet ("Generator", "VoronoiBiomes",   ""));
 }
 
 
@@ -846,9 +785,10 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int MinDist1, MinDist2;
-			int BiomeGroup = m_VoronoiLarge.GetValueAt(DistortX[x][z], DistortZ[x][z], MinDist1, MinDist2) / 7;
-			int BiomeIdx   = m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], MinDist1, MinDist2) / 11;
+			int SeedX, SeedZ, MinDist2;
+			int BiomeGroup = m_VoronoiLarge.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 7;
+			int BiomeIdx   = m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 11;
+			int MinDist1 = (DistortX[x][z] - SeedX) * (DistortX[x][z] - SeedX) + (DistortZ[x][z] - SeedZ) * (DistortZ[x][z] - SeedZ);
 			cChunkDef::SetBiome(a_BiomeMap, x, z, SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 0 : 1));
 		}
 	}
@@ -982,6 +922,72 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 	m_DistortZ.AddOctave(0.01f,   16);
 	m_DistortZ.AddOctave(0.005f,   8);
 	m_DistortZ.AddOctave(0.0025f,  4);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cBiomeGen:
+
+cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
+{
+	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
+	if (BiomeGenName.empty())
+	{
+		LOGWARN("[Generator] BiomeGen value not set in world.ini, using \"MultiStepMap\".");
+		BiomeGenName = "MultiStepMap";
+	}
+
+	cBiomeGen * res = NULL;
+	a_CacheOffByDefault = false;
+	if (NoCaseCompare(BiomeGenName, "constant") == 0)
+	{
+		res = new cBioGenConstant;
+		a_CacheOffByDefault = true;  // we're generating faster than a cache would retrieve data :)
+	}
+	else if (NoCaseCompare(BiomeGenName, "checkerboard") == 0)
+	{
+		res = new cBioGenCheckerboard;
+		a_CacheOffByDefault = true;  // we're (probably) generating faster than a cache would retrieve data
+	}
+	else if (NoCaseCompare(BiomeGenName, "voronoi") == 0)
+	{
+		res = new cBioGenVoronoi(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
+	{
+		res = new cBioGenDistortedVoronoi(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
+	{
+		res = new cBioGenTwoLevel(a_Seed);
+	}
+	else
+	{
+		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
+		{
+			LOGWARNING("Unknown BiomeGen \"%s\", using \"MultiStepMap\" instead.", BiomeGenName.c_str());
+		}
+		res = new cBioGenMultiStepMap(a_Seed);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cBioGenMultiStepMap...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 5000; x++)
+		{
+			cChunkDef::BiomeMap Biomes;
+			res->GenBiomes(x * 5, x * 5, Biomes);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("cBioGenMultiStepMap for 5000 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
+	}
+	res->InitializeBiomeGen(a_IniFile);
+
+	return res;
 }
 
 

@@ -1,6 +1,6 @@
 #include "Globals.h"
 #include "BiomeView.h"
-#include "Chunk.h"
+#include "QtChunk.h"
 #include <QPainter>
 #include <QResizeEvent>
 

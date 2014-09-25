@@ -38,6 +38,7 @@ function Initialize(Plugin)
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
+	PM:BindCommand("/nick",    "debuggers", HandleNickCmd,         "- Gives you a custom name");
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -764,6 +765,21 @@ function round(num, idp)
 	local mult = 10^(idp or 0)
 	if num >= 0 then return math.floor(num * mult + 0.5) / mult
 	else return math.ceil(num * mult - 0.5) / mult end
+end
+
+
+
+
+
+function HandleNickCmd(Split, Player)
+	if (Split[2] == nil) then
+		Player:SendMessage("Usage: /nick [CustomName]");
+		return true;
+	end
+
+	Player:SetCustomName(Split[2]);
+	Player:SendMessageSuccess("Custom name setted to " .. Player:GetCustomName() .. "!")
+	return true
 end
 
 
@@ -1502,7 +1518,7 @@ function OnPlayerJoined(a_Player)
 	-- Test composite chat chaining:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")
 		:AddRunCommandPart(" SetDay", "/time set 0")
 	)
