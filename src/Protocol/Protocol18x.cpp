@@ -1391,13 +1391,18 @@ void cProtocol180::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 void cProtocol180::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	cPacketizer Pkt(*this, 0x33);
 	Pkt.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line1.c_str()));
-	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line2.c_str()));
-	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line3.c_str()));
-	Pkt.WriteString(Printf("{\"text\": \"%s\"}", a_Line4.c_str()));
+
+	Json::StyledWriter JsonWriter;
+	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
+	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
+	{
+		Json::Value RootValue;
+		RootValue["text"] = Lines[i];
+		Pkt.WriteString(JsonWriter.write(RootValue).c_str());
+	}
 }
 
 
