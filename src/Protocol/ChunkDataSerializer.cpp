@@ -191,7 +191,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	Packet.WriteBEInt(a_ChunkX);
 	Packet.WriteBEInt(a_ChunkZ);
 	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
-	Packet.WriteBEShort((short) 0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
+	Packet.WriteBEUShort(0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
 
 	// Write the chunk size:
 	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;

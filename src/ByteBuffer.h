@@ -82,6 +82,7 @@ public:
 	bool WriteChar           (char a_Value);
 	bool WriteByte           (unsigned char a_Value);
 	bool WriteBEShort        (short  a_Value);
+	bool WriteBEUShort       (unsigned short a_Value);
 	bool WriteBEInt          (int    a_Value);
 	bool WriteBEInt64        (Int64  a_Value);
 	bool WriteBEFloat        (float  a_Value);

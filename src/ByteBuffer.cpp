@@ -547,6 +547,19 @@ bool cByteBuffer::WriteBEShort(short a_Value)
 
 
 
+bool cByteBuffer::WriteBEUShort(unsigned short a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	PUTBYTES(2);
+	u_short Converted = htons((u_short)a_Value);
+	return WriteBuf(&Converted, 2);
+}
+
+
+
+
+
 bool cByteBuffer::WriteBEInt(int a_Value)
 {
 	CHECK_THREAD;
