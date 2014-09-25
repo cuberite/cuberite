@@ -19,8 +19,8 @@ public:
 	/** Returns the associated BlockInfo structure for the specified block type. */
 	
 	/** This accessor makes sure that the cBlockInfo structures are properly initialized exactly once.
-It does so by using the C++ singleton approximation - storing the actual singleton as the function's static variable.
-It works only if it is called for the first time before the app spawns other threads. */
+	It does so by using the C++ singleton approximation - storing the actual singleton as the function's static variable.
+	It works only if it is called for the first time before the app spawns other threads. */
 	static cBlockInfo & Get(BLOCKTYPE a_Type)
 	{
 		static cBlockInfo ms_Info[256];
