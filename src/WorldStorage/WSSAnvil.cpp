@@ -1664,7 +1664,7 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 	if (Direction > 0)
 	{
 		Direction = (int)a_NBT.GetByte(Direction);
-		if ((Direction < 0) || (Direction > 5))
+		if ((Direction < 2) || (Direction > 5))
 		{
 			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
 		}
@@ -1752,7 +1752,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	
 	// Load pickup state:
 	int PickupIdx = a_NBT.FindChildByName(a_TagIdx, "pickup");
-	if (PickupIdx > 0)
+	if ((PickupIdx > 0) && (a_NBT.GetType(PickupIdx) == TAG_Byte))
 	{
 		Arrow->SetPickupState((cArrowEntity::ePickupState)a_NBT.GetByte(PickupIdx));
 	}
@@ -1760,7 +1760,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	{
 		// Try the older "player" tag:
 		int PlayerIdx = a_NBT.FindChildByName(a_TagIdx, "player");
-		if (PlayerIdx > 0)
+		if ((PlayerIdx > 0) && (a_NBT.GetType(PlayerIdx) == TAG_Byte))
 		{
 			Arrow->SetPickupState((a_NBT.GetByte(PlayerIdx) == 0) ? cArrowEntity::psNoPickup : cArrowEntity::psInSurvivalOrCreative);
 		}
@@ -1768,7 +1768,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	
 	// Load damage:
 	int DamageIdx = a_NBT.FindChildByName(a_TagIdx, "damage");
-	if (DamageIdx > 0)
+	if ((DamageIdx > 0) && (a_NBT.GetType(DamageIdx) == TAG_Double))
 	{
 		Arrow->SetDamageCoeff(a_NBT.GetDouble(DamageIdx));
 	}
@@ -1779,7 +1779,24 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int InBlockZIdx = a_NBT.FindChildByName(a_TagIdx, "zTile");
 	if ((InBlockXIdx > 0) && (InBlockYIdx > 0) && (InBlockZIdx > 0))
 	{
-		Arrow->SetBlockHit(Vector3i(a_NBT.GetInt(InBlockXIdx), a_NBT.GetInt(InBlockYIdx), a_NBT.GetInt(InBlockZIdx)));
+		if (a_NBT.GetType(InBlockXIdx) == a_NBT.GetType(InBlockYIdx) == a_NBT.GetType(InBlockZIdx))
+		{
+			switch (a_NBT.GetType(InBlockXIdx))
+			{
+				case TAG_Int:
+				{
+					// Old MCS code used this, keep reading it for compatibility reasons:
+					Arrow->SetBlockHit(Vector3i(a_NBT.GetInt(InBlockXIdx), a_NBT.GetInt(InBlockYIdx), a_NBT.GetInt(InBlockZIdx)));
+					break;
+				}
+				case TAG_Short:
+				{
+					// Vanilla uses this
+					Arrow->SetBlockHit(Vector3i((int)a_NBT.GetShort(InBlockXIdx), (int)a_NBT.GetShort(InBlockYIdx), (int)a_NBT.GetShort(InBlockZIdx)));
+					break;
+				}
+			}
+		}
 	}
 	
 	// Store the new arrow in the entities list:

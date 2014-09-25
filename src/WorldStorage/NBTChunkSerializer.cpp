@@ -637,9 +637,9 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			{
 				cArrowEntity * Arrow = (cArrowEntity *)a_Projectile;
 
-				m_Writer.AddInt("xTile", (Int16)Arrow->GetBlockHit().x);
-				m_Writer.AddInt("yTile", (Int16)Arrow->GetBlockHit().y);
-				m_Writer.AddInt("zTile", (Int16)Arrow->GetBlockHit().z);
+				m_Writer.AddShort("xTile", (Int16)Arrow->GetBlockHit().x);
+				m_Writer.AddShort("yTile", (Int16)Arrow->GetBlockHit().y);
+				m_Writer.AddShort("zTile", (Int16)Arrow->GetBlockHit().z);
 				m_Writer.AddByte("pickup",   Arrow->GetPickupState());
 				m_Writer.AddDouble("damage", Arrow->GetDamageCoeff());
 				break;
