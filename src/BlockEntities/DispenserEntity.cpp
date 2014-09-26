@@ -109,7 +109,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-			if (m_World->SpawnMob(MobX, DispY, MobZ, (cMonster::eType)m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
+			if (m_World->SpawnMob(MobX, DispY, MobZ, (eMonsterType)m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -203,7 +203,7 @@ void cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, 
 
 Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
 {
-	switch (a_Meta)
+	switch (a_Meta & 0x7)
 	{
 		case E_META_DROPSPENSER_FACING_YP: return Vector3d( 0,  1,  0);
 		case E_META_DROPSPENSER_FACING_YM: return Vector3d( 0, -1,  0);

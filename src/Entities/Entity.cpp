@@ -135,7 +135,7 @@ const char * cEntity::GetParentClass(void) const
 
 bool cEntity::Initialize(cWorld & a_World)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this))
+	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this) && !IsPlayer())
 	{
 		return false;
 	}
@@ -260,7 +260,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 void cEntity::SetYawFromSpeed(void)
 {
 	const double EPS = 0.0000001;
-	if ((abs(m_Speed.x) < EPS) && (abs(m_Speed.z) < EPS))
+	if ((std::abs(m_Speed.x) < EPS) && (std::abs(m_Speed.z) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetYaw(0);
@@ -277,7 +277,7 @@ void cEntity::SetPitchFromSpeed(void)
 {
 	const double EPS = 0.0000001;
 	double xz = sqrt(m_Speed.x * m_Speed.x + m_Speed.z * m_Speed.z);  // Speed XZ-plane component
-	if ((abs(xz) < EPS) && (abs(m_Speed.y) < EPS))
+	if ((std::abs(xz) < EPS) && (std::abs(m_Speed.y) < EPS))
 	{
 		// atan2() may overflow or is undefined, pick any number
 		SetPitch(0);
@@ -334,14 +334,15 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				cMonster * Monster = (cMonster *)this;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtSkeleton:
-					case cMonster::mtZombie:
-					case cMonster::mtWither:
-					case cMonster::mtZombiePigman:
+					case mtSkeleton:
+					case mtZombie:
+					case mtWither:
+					case mtZombiePigman:
 					{
 						a_TDI.FinalDamage += (int)ceil(2.5 * SmiteLevel);
 						break;
 					}
+					default: break;
 				}
 			}
 		}
@@ -352,9 +353,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				cMonster * Monster = (cMonster *)this;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtSpider:
-					case cMonster::mtCaveSpider:
-					case cMonster::mtSilverfish:
+					case mtSpider:
+					case mtCaveSpider:
+					case mtSilverfish:
 					{
 						a_TDI.RawDamage += (int)ceil(2.5 * BaneOfArthropodsLevel);
 						// TODO: Add slowness effect
@@ -384,9 +385,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				cMonster * Monster = (cMonster *)this;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtGhast:
-					case cMonster::mtZombiePigman:
-					case cMonster::mtMagmaCube:
+					case mtGhast:
+					case mtZombiePigman:
+					case mtMagmaCube:
 					{
 						break;
 					};
@@ -927,12 +928,13 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		float fallspeed;
 		if (IsBlockWater(BlockIn))
 		{
-			fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water.
+			fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water
+			ApplyFriction(NextSpeed, 0.7, a_Dt);
 		}
 		else if (BlockIn == E_BLOCK_COBWEB)
 		{
 			NextSpeed.y *= 0.05;  // Reduce overall falling speed
-			fallspeed = 0;  // No falling.
+			fallspeed = 0;  // No falling
 		}
 		else
 		{
@@ -941,20 +943,9 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 		NextSpeed.y += fallspeed;
 	}
-
-	// Friction
-	if (NextSpeed.SqrLength() > 0.0004f)
+	else
 	{
-		NextSpeed.x *= 0.7f / (1 + a_Dt);
-		if (fabs(NextSpeed.x) < 0.05)
-		{
-			NextSpeed.x = 0;
-		}
-		NextSpeed.z *= 0.7f / (1 + a_Dt);
-		if (fabs(NextSpeed.z) < 0.05)
-		{
-			NextSpeed.z = 0;
-		}
+		ApplyFriction(NextSpeed, 0.7, a_Dt);
 	}
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
@@ -1025,7 +1016,7 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
 				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
 
-				if (Tracer.HitNormal.y == 1)  // Hit BLOCK_FACE_YP, we are on the ground
+				if (Tracer.HitNormal.y == 1.f)  // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
@@ -1054,6 +1045,27 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 	SetPosition(NextPos);
 	SetSpeed(NextSpeed);
+}
+
+
+
+
+
+void cEntity::ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, float a_Dt)
+{
+	if (a_Speed.SqrLength() > 0.0004f)
+	{
+		a_Speed.x *= a_SlowdownMultiplier / (1 + a_Dt);
+		if (fabs(a_Speed.x) < 0.05)
+		{
+			a_Speed.x = 0;
+		}
+		a_Speed.z *= a_SlowdownMultiplier / (1 + a_Dt);
+		if (fabs(a_Speed.z) < 0.05)
+		{
+			a_Speed.z = 0;
+		}
+	}
 }
 
 
@@ -1949,7 +1961,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 	{
 		return;
 	}
-	if ((a_Forward != 0) || (a_Sideways != 0))
+	if ((a_Forward != 0.f) || (a_Sideways != 0.f))
 	{
 		m_AttachedTo->HandleSpeedFromAttachee(a_Forward, a_Sideways);
 	}

@@ -447,7 +447,7 @@ public:
 	// tolua_end
 	
 	/// Called when the specified player right-clicks this entity
-	virtual void OnRightClicked(cPlayer &) {}
+	virtual void OnRightClicked(cPlayer & a_Player) {}
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL)
@@ -534,6 +534,12 @@ protected:
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
+
+	/** Applies friction to an entity
+	@param a_Speed The speed vector to apply changes to
+	@param a_SlowdownMultiplier The factor to reduce the speed by
+	*/
+	static void ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, float a_Dt);
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);

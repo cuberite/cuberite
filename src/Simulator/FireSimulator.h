@@ -16,7 +16,7 @@ it progresses to the next step (blockmeta++). This value is updated if a neighbo
 The simulator reads its parameters from the ini file given to the constructor.
 */
 class cFireSimulator :
-	public cSimulator
+	public cSimulator<cChunk, cWorld>
 {
 public:
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);

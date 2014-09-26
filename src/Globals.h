@@ -261,6 +261,27 @@ void inline LOGERROR(const char* a_Format, ...)
 	vprintf(a_Format, argList);
 	va_end(argList);
 }
+
+void inline LOGWARNING(const char* a_Format, ...) FORMATSTRING(1, 2);
+
+void inline LOGWARNING(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	va_end(argList);
+}
+
+void inline LOGD(const char* a_Format, ...) FORMATSTRING(1, 2);
+
+void inline LOGD(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	va_end(argList);
+}
+
 #endif
 
 

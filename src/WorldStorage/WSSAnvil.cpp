@@ -51,6 +51,7 @@
 #include "../Entities/ItemFrame.h"
 
 #include "../Protocol/MojangAPI.h"
+#include "Server.h"
 
 
 
@@ -96,10 +97,26 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 	if (!cFile::Exists(fnam))
 	{
 		cFastNBTWriter Writer;
-		Writer.BeginCompound("");
-		Writer.AddInt("SpawnX", (int)(a_World->GetSpawnX()));
-		Writer.AddInt("SpawnY", (int)(a_World->GetSpawnY()));
-		Writer.AddInt("SpawnZ", (int)(a_World->GetSpawnZ()));
+		Writer.BeginCompound("Data");
+		Writer.AddByte("allowCommands", 1);
+		Writer.AddByte("Difficulty", 2);
+		Writer.AddByte("hardcore", cRoot::Get()->GetServer()->IsHardcore() ? 1 : 0);
+		Writer.AddByte("initialized", 1);
+		Writer.AddByte("MapFeatures", 1);
+		Writer.AddByte("raining", a_World->IsWeatherRain() ? 1 : 0);
+		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
+		Writer.AddInt("GameType", (int)a_World->GetGameMode());
+		Writer.AddInt("generatorVersion", 1);
+		Writer.AddInt("SpawnX", (int)a_World->GetSpawnX());
+		Writer.AddInt("SpawnY", (int)a_World->GetSpawnY());
+		Writer.AddInt("SpawnZ", (int)a_World->GetSpawnZ());
+		Writer.AddInt("version", 19133);
+		Writer.AddLong("DayTime", (Int64)a_World->GetTimeOfDay());
+		Writer.AddLong("Time", a_World->GetWorldAge());
+		Writer.AddLong("SizeOnDisk", 0);
+		Writer.AddString("generatorName", "default");
+		Writer.AddString("generatorOptions", "");
+		Writer.AddString("LevelName", a_World->GetName());
 		Writer.EndCompound();
 		Writer.Finish();
 		
@@ -440,6 +457,7 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	a_Writer.BeginCompound("Level");
 	a_Writer.AddInt("xPos", a_Chunk.m_ChunkX);
 	a_Writer.AddInt("zPos", a_Chunk.m_ChunkZ);
+
 	cNBTChunkSerializer Serializer(a_Writer);
 	if (!m_World->GetChunkData(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Serializer))
 	{
@@ -454,7 +472,10 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 		a_Writer.AddByteArray("Biomes",    (const char *)(Serializer.m_VanillaBiomes), ARRAYCOUNT(Serializer.m_VanillaBiomes));
 		a_Writer.AddIntArray ("MCSBiomes", (const int *)(Serializer.m_Biomes),         ARRAYCOUNT(Serializer.m_Biomes));
 	}
-	
+
+	// Save heightmap (Vanilla require this):
+	a_Writer.AddIntArray("HeightMap", (const int *)Serializer.m_VanillaHeightMap, ARRAYCOUNT(Serializer.m_VanillaHeightMap));
+
 	// Save blockdata:
 	a_Writer.BeginList("Sections", TAG_Compound);
 	size_t SliceSizeBlock  = cChunkDef::Width * cChunkDef::Width * 16;
@@ -485,6 +506,9 @@ bool cWSSAnvil::SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_
 	{
 		a_Writer.AddByte("MCSIsLightValid", 1);
 	}
+
+	// Save the world age to the chunk data. Required by vanilla and mcedit.
+	a_Writer.AddLong("LastUpdate", m_World->GetWorldAge());
 	
 	// Store the flag that the chunk has all the ores, trees, dungeons etc. MCS chunks are always complete.
 	a_Writer.AddByte("TerrainPopulated", 1);
@@ -1640,7 +1664,7 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 	if (Direction > 0)
 	{
 		Direction = (int)a_NBT.GetByte(Direction);
-		if ((Direction < 0) || (Direction > 5))
+		if ((Direction < 2) || (Direction > 5))
 		{
 			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
 		}
@@ -1728,7 +1752,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	
 	// Load pickup state:
 	int PickupIdx = a_NBT.FindChildByName(a_TagIdx, "pickup");
-	if (PickupIdx > 0)
+	if ((PickupIdx > 0) && (a_NBT.GetType(PickupIdx) == TAG_Byte))
 	{
 		Arrow->SetPickupState((cArrowEntity::ePickupState)a_NBT.GetByte(PickupIdx));
 	}
@@ -1736,7 +1760,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	{
 		// Try the older "player" tag:
 		int PlayerIdx = a_NBT.FindChildByName(a_TagIdx, "player");
-		if (PlayerIdx > 0)
+		if ((PlayerIdx > 0) && (a_NBT.GetType(PlayerIdx) == TAG_Byte))
 		{
 			Arrow->SetPickupState((a_NBT.GetByte(PlayerIdx) == 0) ? cArrowEntity::psNoPickup : cArrowEntity::psInSurvivalOrCreative);
 		}
@@ -1744,7 +1768,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	
 	// Load damage:
 	int DamageIdx = a_NBT.FindChildByName(a_TagIdx, "damage");
-	if (DamageIdx > 0)
+	if ((DamageIdx > 0) && (a_NBT.GetType(DamageIdx) == TAG_Double))
 	{
 		Arrow->SetDamageCoeff(a_NBT.GetDouble(DamageIdx));
 	}
@@ -1755,7 +1779,24 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int InBlockZIdx = a_NBT.FindChildByName(a_TagIdx, "zTile");
 	if ((InBlockXIdx > 0) && (InBlockYIdx > 0) && (InBlockZIdx > 0))
 	{
-		Arrow->SetBlockHit(Vector3i(a_NBT.GetInt(InBlockXIdx), a_NBT.GetInt(InBlockYIdx), a_NBT.GetInt(InBlockZIdx)));
+		if (a_NBT.GetType(InBlockXIdx) == a_NBT.GetType(InBlockYIdx) == a_NBT.GetType(InBlockZIdx))
+		{
+			switch (a_NBT.GetType(InBlockXIdx))
+			{
+				case TAG_Int:
+				{
+					// Old MCS code used this, keep reading it for compatibility reasons:
+					Arrow->SetBlockHit(Vector3i(a_NBT.GetInt(InBlockXIdx), a_NBT.GetInt(InBlockYIdx), a_NBT.GetInt(InBlockZIdx)));
+					break;
+				}
+				case TAG_Short:
+				{
+					// Vanilla uses this
+					Arrow->SetBlockHit(Vector3i((int)a_NBT.GetShort(InBlockXIdx), (int)a_NBT.GetShort(InBlockYIdx), (int)a_NBT.GetShort(InBlockZIdx)));
+					break;
+				}
+			}
+		}
 	}
 	
 	// Store the new arrow in the entities list:
@@ -2464,13 +2505,13 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	LoadWolfOwner(*Monster.get(), a_NBT, a_TagIdx);
 
 	int SittingIdx = a_NBT.FindChildByName(a_TagIdx, "Sitting");
-	if (SittingIdx > 0)
+	if ((SittingIdx > 0) && (a_NBT.GetType(SittingIdx) == TAG_Byte))
 	{
 		bool Sitting = ((a_NBT.GetByte(SittingIdx) == 1) ? true : false);
 		Monster->SetIsSitting(Sitting);
 	}
 	int AngryIdx = a_NBT.FindChildByName(a_TagIdx, "Angry");
-	if (AngryIdx > 0)
+	if ((AngryIdx > 0) && (a_NBT.GetType(AngryIdx) == TAG_Byte))
 	{
 		bool Angry = ((a_NBT.GetByte(AngryIdx) == 1) ? true : false);
 		Monster->SetIsAngry(Angry);
@@ -2478,8 +2519,22 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 	int CollarColorIdx = a_NBT.FindChildByName(a_TagIdx, "CollarColor");
 	if (CollarColorIdx > 0)
 	{
-		int CollarColor = a_NBT.GetInt(CollarColorIdx);
-		Monster->SetCollarColor(CollarColor);
+		switch (a_NBT.GetType(CollarColorIdx))
+		{
+			case TAG_Byte:
+			{
+				// Vanilla uses this
+				unsigned char CollarColor = a_NBT.GetByte(CollarColorIdx);
+				Monster->SetCollarColor(CollarColor);
+				break;
+			}
+			case TAG_Int:
+			{
+				// Old MCS code used this, keep reading it for compatibility reasons:
+				Monster->SetCollarColor(a_NBT.GetInt(CollarColorIdx));
+				break;
+			}
+		}
 	}
 	a_Entities.push_back(Monster.release());
 }
@@ -2650,6 +2705,19 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 	{
 		bool CanPickUpLoot = (a_NBT.GetByte(LootTag) == 1);
 		a_Monster.SetCanPickUpLoot(CanPickUpLoot);
+	}
+
+	int CustomNameTag = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	if ((CustomNameTag > 0) && (a_NBT.GetType(CustomNameTag) == TAG_String))
+	{
+		a_Monster.SetCustomName(a_NBT.GetString(CustomNameTag));
+	}
+
+	int CustomNameVisibleTag = a_NBT.FindChildByName(a_TagIdx, "CustomNameVisible");
+	if ((CustomNameVisibleTag > 0) && (a_NBT.GetType(CustomNameVisibleTag) == TAG_Byte))
+	{
+		bool CustomNameVisible = (a_NBT.GetByte(CustomNameVisibleTag) == 1);
+		a_Monster.SetCustomNameAlwaysVisible(CustomNameVisible);
 	}
 
 	return true;

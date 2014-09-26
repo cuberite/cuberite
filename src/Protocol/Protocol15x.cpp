@@ -80,7 +80,7 @@ void cProtocol150::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol150::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol150::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	cCSLock Lock(m_CSPacket);
 	WriteByte(PACKET_PARTICLE_EFFECT);
@@ -92,7 +92,7 @@ void cProtocol150::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	WriteFloat(a_OffsetY);
 	WriteFloat(a_OffsetZ);
 	WriteFloat(a_ParticleData);
-	WriteInt(a_ParticleAmmount);
+	WriteInt(a_ParticleAmount);
 	Flush();
 }
 

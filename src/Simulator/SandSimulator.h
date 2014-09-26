@@ -3,13 +3,15 @@
 
 #include "Simulator.h"
 
+/// Per-chunk data for the simulator, specified individual chunks to simulate; Data is not used
+typedef cCoordWithIntList cSandSimulatorChunkData;
 
-
+#include "Chunk.h"
 
 
 /// Despite the class name, this simulator takes care of all blocks that fall when suspended in the air.
 class cSandSimulator :
-	public cSimulator
+	public cSimulator<cChunk, cWorld>
 {
 public:
 	cSandSimulator(cWorld & a_World, cIniFile & a_IniFile);
@@ -55,8 +57,7 @@ protected:
 
 
 
-/// Per-chunk data for the simulator, specified individual chunks to simulate; Data is not used
-typedef cCoordWithIntList cSandSimulatorChunkData;
+
 
 
 

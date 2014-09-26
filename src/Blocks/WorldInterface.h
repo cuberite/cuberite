@@ -2,14 +2,15 @@
 #pragma once
 
 #include "BroadcastInterface.h"
-#include "../Mobs/Monster.h"
+#include "../Mobs/MonsterTypes.h"
 
 class cItems;
 
 typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
 
 
-
+class cMonster;
+class cPlayer;
 
 
 class cWorldInterface
@@ -33,7 +34,10 @@ public:
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) = 0;
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) = 0;
+	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) = 0;
+
+	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
+	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) = 0;

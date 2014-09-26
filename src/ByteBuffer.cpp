@@ -267,7 +267,7 @@ size_t cByteBuffer::GetReadableSpace(void) const
 	}
 	// Single readable space partition:
 	ASSERT(m_WritePos >= m_ReadPos);
-	return m_WritePos - m_ReadPos ;
+	return m_WritePos - m_ReadPos;
 }
 
 
@@ -489,6 +489,30 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 
 
+bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+{
+	Int64 Value;
+	if (!ReadBEInt64(Value))
+	{
+		return false;
+	}
+
+	// Convert the 64 received bits into 3 coords:
+	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
+	UInt32 BlockYRaw = (Value >> 26) & 0x0fff;      // Middle 12 bits
+	UInt32 BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
+	
+	// If the highest bit in the number's range is set, convert the number into negative:
+	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? BlockXRaw : -(0x04000000 - (int)BlockXRaw);
+	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? BlockYRaw : -(0x0800     - (int)BlockYRaw);
+	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? BlockZRaw : -(0x04000000 - (int)BlockZRaw);
+	return true;
+}
+
+
+
+
+
 bool cByteBuffer::WriteChar(char a_Value)
 {
 	CHECK_THREAD;
@@ -514,6 +538,19 @@ bool cByteBuffer::WriteByte(unsigned char a_Value)
 
 
 bool cByteBuffer::WriteBEShort(short a_Value)
+{
+	CHECK_THREAD;
+	CheckValid();
+	PUTBYTES(2);
+	u_short Converted = htons((u_short)a_Value);
+	return WriteBuf(&Converted, 2);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEUShort(unsigned short a_Value)
 {
 	CHECK_THREAD;
 	CheckValid();
@@ -655,6 +692,15 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 		int Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
 		return WriteBuf((const char *)&Value, 4);
 	#endif
+}
+
+
+
+
+
+bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
 }
 
 

@@ -262,7 +262,7 @@ void cProtocol125::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	SendPreChunk(a_ChunkX, a_ChunkZ, true);
 	
 	// Send the chunk data:
-	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5);
+	AString Serialized = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_2_5, a_ChunkX, a_ChunkZ);
 	WriteByte(PACKET_MAP_CHUNK);
 	WriteInt (a_ChunkX);
 	WriteInt (a_ChunkZ);
@@ -608,7 +608,7 @@ void cProtocol125::SendLoginSuccess(void)
 
 
 
-void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	cCSLock Lock(m_CSPacket);
 
@@ -630,7 +630,7 @@ void cProtocol125::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
-void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocol125::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	cCSLock Lock(m_CSPacket);
 
@@ -700,7 +700,7 @@ void cProtocol125::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
-void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol125::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	// Not supported by this protocol version
 }
@@ -719,22 +719,73 @@ void cProtocol125::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol125::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocol125::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	cCSLock Lock(m_CSPacket);
-	AString PlayerName(a_Player.GetColor());
-	PlayerName.append(a_Player.GetName());
-	if (PlayerName.length() > 14)
-	{
-		PlayerName.erase(14);
-	}
-	PlayerName += cChatColor::White;
-
-	WriteByte  ((unsigned char)PACKET_PLAYER_LIST_ITEM);
-	WriteString(PlayerName);
-	WriteBool  (a_IsOnline);
-	WriteShort (a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
+	WriteByte  (PACKET_PLAYER_LIST_ITEM);
+	WriteString(a_Player.GetPlayerListName());
+	WriteBool  (true);
+	WriteShort (a_Player.GetClientHandle()->GetPing());
 	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	cCSLock Lock(m_CSPacket);
+	WriteByte  (PACKET_PLAYER_LIST_ITEM);
+	WriteString(a_Player.GetPlayerListName());
+	WriteBool  (false);
+	WriteShort (0);
+	Flush();
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	// It is a simple add player packet in this protocol.
+	SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocol125::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+{
+	if (a_OldListName == a_Player.GetPlayerListName())
+	{
+		return;
+	}
+
+	cCSLock Lock(m_CSPacket);
+
+	// Remove the old name from the tablist:
+	{
+		WriteByte  (PACKET_PLAYER_LIST_ITEM);
+		WriteString(a_OldListName);
+		WriteBool  (false);
+		WriteShort (0);
+		Flush();
+	}
+
+	SendPlayerListAddPlayer(a_Player);
 }
 
 
@@ -792,7 +843,14 @@ void cProtocol125::SendPlayerSpawn(const cPlayer & a_Player)
 	cCSLock Lock(m_CSPacket);
 	WriteByte	 (PACKET_PLAYER_SPAWN);
 	WriteInt   (a_Player.GetUniqueID());
-	WriteString(a_Player.GetName());
+	if (a_Player.HasCustomName())
+	{
+		WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		WriteString(a_Player.GetName());
+	}
 	WriteInt   ((int)(a_Player.GetPosX() * 32));
 	WriteInt   ((int)(a_Player.GetPosY() * 32));
 	WriteInt   ((int)(a_Player.GetPosZ() * 32));
@@ -1946,7 +2004,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 {
 	switch (a_Mob.GetMobType())
 	{
-		case cMonster::mtCreeper:
+		case mtCreeper:
 		{
 			WriteByte(0x10);
 			WriteChar(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);  // Blowing up?
@@ -1954,25 +2012,25 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0);  // Lightning-charged?
 			break;
 		}
-		case cMonster::mtBat:
+		case mtBat:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);  // Upside down?
 			break;
 		}
-		case cMonster::mtPig:
+		case mtPig:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);  // Saddled?
 			break;
 		}
-		case cMonster::mtVillager:
+		case mtVillager:
 		{
 			WriteByte(0x50);
 			WriteInt(((const cVillager &)a_Mob).GetVilType());  // What sort of TESTIFICATE?
 			break;
 		}
-		case cMonster::mtZombie:
+		case mtZombie:
 		{
 			WriteByte(0xC);
 			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);  // Baby zombie?
@@ -1982,13 +2040,13 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0);  // Converted-but-converting-back zombllager?
 			break;
 		}
-		case cMonster::mtGhast:
+		case mtGhast:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cGhast &)a_Mob).IsCharging());  // About to spit a flameball?
 			break;
 		}
-		case cMonster::mtWolf:
+		case mtWolf:
 		{
 			Byte WolfStatus = 0;
 			if (((const cWolf &)a_Mob).IsSitting())
@@ -2012,7 +2070,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0);  // Ultra cute mode?
 			break;
 		}
-		case cMonster::mtSheep:
+		case mtSheep:
 		{
 			// [1](1111)
 			// [] = Is sheared? () = Color, from 0 to 15
@@ -2028,7 +2086,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(SheepMetadata);
 			break;
 		}
-		case cMonster::mtEnderman:
+		case mtEnderman:
 		{
 			WriteByte(0x10);
 			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));  // Block that he stole from your house
@@ -2038,19 +2096,19 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0);  // Screaming at your face?
 			break;
 		}
-		case cMonster::mtSkeleton:
+		case mtSkeleton:
 		{
 			WriteByte(0xD);
 			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);  // It's a skeleton, but it's not
 			break;
 		}
-		case cMonster::mtWitch:
+		case mtWitch:
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);  // Aggravated? Doesn't seem to do anything
 			break;
 		}
-		case cMonster::mtWither:
+		case mtWither:
 		{
 			WriteByte(0x54);  // Int at index 20
 			WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
@@ -2058,11 +2116,11 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
-		case cMonster::mtSlime:
-		case cMonster::mtMagmaCube:
+		case mtSlime:
+		case mtMagmaCube:
 		{
 			WriteByte(0x10);
-			if (a_Mob.GetMobType() == cMonster::mtSlime)
+			if (a_Mob.GetMobType() == mtSlime)
 			{
 				WriteByte((Byte)((const cSlime &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
@@ -2072,7 +2130,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			}
 			break;
 		}
-		case cMonster::mtHorse:
+		case mtHorse:
 		{
 			int Flags = 0;
 			if (((const cHorse &)a_Mob).IsTame())

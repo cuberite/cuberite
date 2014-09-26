@@ -10,7 +10,6 @@ SET (SRCS
 	FloodyFluidSimulator.cpp
 	FluidSimulator.cpp
 	IncrementalRedstoneSimulator.cpp
-	RedstoneSimulator.cpp
 	SandSimulator.cpp
 	Simulator.cpp
 	SimulatorManager.cpp

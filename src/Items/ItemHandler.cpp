@@ -33,6 +33,7 @@
 #include "ItemLilypad.h"
 #include "ItemMap.h"
 #include "ItemMinecart.h"
+#include "ItemMushroomSoup.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
@@ -125,6 +126,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_MILK:              return new cItemMilkHandler();
+		case E_ITEM_MUSHROOM_SOUP:     return new cItemMushroomSoupHandler(a_ItemType);
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
@@ -223,7 +225,6 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_COOKIE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
-		case E_ITEM_MUSHROOM_SOUP:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
 		case E_ITEM_RABBIT_STEW:
@@ -341,7 +342,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 	{
 		cChunkInterface ChunkInterface(a_World->GetChunkMap());
 		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block), a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0);
+		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
 	}
 
 	if (!cBlockInfo::IsOneHitDig(Block))
@@ -593,7 +594,6 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHERRACK:
 		case E_BLOCK_NEW_STONE_SLAB:
 		case E_BLOCK_OBSIDIAN:
-		case E_BLOCK_PACKED_ICE:
 		case E_BLOCK_PRISMARINE_BLOCK:
 		case E_BLOCK_RED_SANDSTONE:
 		case E_BLOCK_RED_SANDSTONE_STAIRS:
@@ -608,6 +608,8 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		case E_BLOCK_STONE_SLAB:
 		case E_BLOCK_VINES:
+		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_MOB_SPAWNER:
 		{
 			return false;
 		}
@@ -660,6 +662,10 @@ bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_Eff
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
+	if (!a_Player->IsGameModeCreative())
+	{
+		a_Player->GetInventory().RemoveOneEquippedItem();
+	}
 
 	FoodInfo Info = GetFoodInfo();
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))

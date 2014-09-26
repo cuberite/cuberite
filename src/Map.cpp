@@ -432,7 +432,7 @@ void cMap::StreamNext(cMapClient & a_Client)
 		// This is dangerous as the player object may have been destroyed before the decorator is erased from the list
 		UpdateDecorators();
 
-		Handle->SendMapDecorators(m_ID, m_Decorators);
+		Handle->SendMapDecorators(m_ID, m_Decorators, m_Scale);
 
 		a_Client.m_NextDecoratorUpdate = 0;
 	}
@@ -444,7 +444,7 @@ void cMap::StreamNext(cMapClient & a_Client)
 
 		const Byte * Colors = &m_Data[Y * m_Height];
 
-		Handle->SendMapColumn(m_ID, Y, 0, Colors, m_Height);
+		Handle->SendMapColumn(m_ID, Y, 0, Colors, m_Height, m_Scale);
 	}
 }
 
@@ -595,10 +595,10 @@ void cMap::SendTo(cClientHandle & a_Client)
 	{
 		const Byte* Colors = &m_Data[i * m_Height];
 
-		a_Client.SendMapColumn(m_ID, i, 0, Colors, m_Height);
+		a_Client.SendMapColumn(m_ID, i, 0, Colors, m_Height, m_Scale);
 	}
 
-	a_Client.SendMapDecorators(m_ID, m_Decorators);
+	a_Client.SendMapDecorators(m_ID, m_Decorators, m_Scale);
 }
 
 

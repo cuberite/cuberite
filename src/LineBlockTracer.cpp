@@ -146,7 +146,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 		dirY,
 		dirZ,
 	} Direction = dirNONE;
-	if (abs(m_DiffX) > EPS)
+	if (std::abs(m_DiffX) > EPS)
 	{
 		double DestX = (m_DirX > 0) ? (m_CurrentX + 1) : m_CurrentX;
 		Coeff = (DestX - m_StartX) / m_DiffX;
@@ -155,7 +155,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 			Direction = dirX;
 		}
 	}
-	if (abs(m_DiffY) > EPS)
+	if (std::abs(m_DiffY) > EPS)
 	{
 		double DestY = (m_DirY > 0) ? (m_CurrentY + 1) : m_CurrentY;
 		double CoeffY = (DestY - m_StartY) / m_DiffY;
@@ -165,7 +165,7 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 			Direction = dirY;
 		}
 	}
-	if (abs(m_DiffZ) > EPS)
+	if (std::abs(m_DiffZ) > EPS)
 	{
 		double DestZ = (m_DirZ > 0) ? (m_CurrentZ + 1) : m_CurrentZ;
 		double CoeffZ = (DestZ - m_StartZ) / m_DiffZ;
@@ -227,9 +227,11 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 		}
 
 		// Update the current chunk
-		if (a_Chunk != NULL)
+		a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
+		if (a_Chunk == NULL)
 		{
-			a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
+			m_Callbacks->OnNoChunk();
+			return false;
 		}
 
 		if (a_Chunk->IsValid())
@@ -245,13 +247,10 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 				return false;
 			}
 		}
-		else
+		else if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ, m_CurrentFace))
 		{
-			if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ, m_CurrentFace))
-			{
-				// The callback terminated the trace
-				return false;
-			}
+			// The callback terminated the trace
+			return false;
 		}
 	}
 }

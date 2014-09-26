@@ -29,5 +29,10 @@ protected:
 	
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
+	virtual void OnHitEntity    (cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
+
+	/** Breaks the bottle, fires its particle effects and sounds
+	@param a_HitPos     The position where the bottle will break */
+	void Break(const Vector3d &a_HitPos);
 	
 };  // tolua_export
