@@ -208,8 +208,10 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	{
 		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
 		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
-		Packet.WriteByte((unsigned char)(BlockType << 4) | BlockMeta);
-		Packet.WriteByte((unsigned char)(BlockType >> 4));
+
+		unsigned char BlockValue = (unsigned char)(BlockType << 4) | BlockMeta;
+		Packet.WriteByte(BlockValue & 0xFF);
+		Packet.WriteByte(BlockValue >> '\b' & 0xFF);
 	}
 
 	// Write the rest:
