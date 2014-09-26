@@ -7,9 +7,11 @@
 class cRedstoneSimulatorChunkData
 {
 public:
-	virtual ~cRedstoneSimulatorChunkData() {}
+	virtual ~cRedstoneSimulatorChunkData() = 0;
 } ;
 
+
+inline cRedstoneSimulatorChunkData::~cRedstoneSimulatorChunkData() {}
 
 template <class ChunkType, class WorldType>
 class cRedstoneSimulator :

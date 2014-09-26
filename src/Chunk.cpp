@@ -91,6 +91,7 @@ cChunk::cChunk(
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
+	m_RedstoneSimulatorData(NULL),
 	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != NULL)
@@ -159,6 +160,8 @@ cChunk::~cChunk()
 	m_WaterSimulatorData = NULL;
 	delete m_LavaSimulatorData;
 	m_LavaSimulatorData = NULL;
+	delete m_RedstoneSimulatorData;
+	m_RedstoneSimulatorData = NULL;
 }
 
 

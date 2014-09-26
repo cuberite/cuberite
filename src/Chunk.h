@@ -416,7 +416,7 @@ public:
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
-	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_RedstoneSimulatorData; }
+	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
 	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
 	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
@@ -501,7 +501,7 @@ private:
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
 
-	cRedstoneSimulatorChunkData m_RedstoneSimulatorData;
+	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
 
 
 	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
