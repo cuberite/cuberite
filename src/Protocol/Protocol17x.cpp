@@ -2752,7 +2752,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 {
 	switch (a_Mob.GetMobType())
 	{
-		case cMonster::mtCreeper:
+		case mtCreeper:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);
@@ -2761,28 +2761,28 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtBat:
+		case mtBat:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);
 			break;
 		}
 		
-		case cMonster::mtPig:
+		case mtPig:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);
 			break;
 		}
 		
-		case cMonster::mtVillager:
+		case mtVillager:
 		{
 			WriteByte(0x50);
 			WriteInt(((const cVillager &)a_Mob).GetVilType());
 			break;
 		}
 		
-		case cMonster::mtZombie:
+		case mtZombie:
 		{
 			WriteByte(0x0c);
 			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);
@@ -2793,14 +2793,14 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtGhast:
+		case mtGhast:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cGhast &)a_Mob).IsCharging());
 			break;
 		}
 		
-		case cMonster::mtWolf:
+		case mtWolf:
 		{
 			const cWolf & Wolf = (const cWolf &)a_Mob;
 			Byte WolfStatus = 0;
@@ -2828,7 +2828,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtSheep:
+		case mtSheep:
 		{
 			WriteByte(0x10);
 			Byte SheepMetadata = 0;
@@ -2841,7 +2841,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtEnderman:
+		case mtEnderman:
 		{
 			WriteByte(0x10);
 			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));
@@ -2852,21 +2852,21 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtSkeleton:
+		case mtSkeleton:
 		{
 			WriteByte(0x0d);
 			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);
 			break;
 		}
 		
-		case cMonster::mtWitch:
+		case mtWitch:
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);
 			break;
 		}
 
-		case cMonster::mtWither:
+		case mtWither:
 		{
 			WriteByte(0x54);  // Int at index 20
 			WriteInt(((const cWither &)a_Mob).GetWitherInvulnerableTicks());
@@ -2875,21 +2875,21 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtSlime:
+		case mtSlime:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cSlime &)a_Mob).GetSize());
 			break;
 		}
 		
-		case cMonster::mtMagmaCube:
+		case mtMagmaCube:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cMagmaCube &)a_Mob).GetSize());
 			break;
 		}
 		
-		case cMonster::mtHorse:
+		case mtHorse:
 		{
 			const cHorse & Horse = (const cHorse &)a_Mob;
 			int Flags = 0;

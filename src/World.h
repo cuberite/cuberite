@@ -33,6 +33,7 @@
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
+template <class ChunkType, class WorldType>
 class cRedstoneSimulator;
 class cItem;
 class cPlayer;
@@ -509,7 +510,7 @@ public:
 	
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
-	inline cRedstoneSimulator * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
+	inline cRedstoneSimulator<cChunk, cWorld> * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
 	
 	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -774,7 +775,7 @@ public:
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
 	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, cMonster::eType a_MonsterType) override;  // tolua_export
+	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) override;  // tolua_export
 	int SpawnMobFinalize(cMonster* a_Monster);
 	
 	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
@@ -917,7 +918,7 @@ private:
 	cFluidSimulator *    m_WaterSimulator;
 	cFluidSimulator *    m_LavaSimulator;
 	cFireSimulator *     m_FireSimulator;
-	cRedstoneSimulator * m_RedstoneSimulator;
+	cRedstoneSimulator<cChunk, cWorld> * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSPlayers;
 	cPlayerList      m_Players;
@@ -929,7 +930,7 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	bool m_bAnimals;
-	std::set<cMonster::eType> m_AllowedMobs;
+	std::set<eMonsterType> m_AllowedMobs;
 
 	eWeather m_Weather;
 	int m_WeatherInterval;
@@ -1058,7 +1059,7 @@ private:
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
 
 	/** Creates a new redstone simulator.*/
-	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
+	cRedstoneSimulator<cChunk, cWorld> * InitializeRedstoneSimulator(cIniFile & a_IniFile);
 
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */

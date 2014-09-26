@@ -2004,7 +2004,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 {
 	switch (a_Mob.GetMobType())
 	{
-		case cMonster::mtCreeper:
+		case mtCreeper:
 		{
 			WriteByte(0x10);
 			WriteChar(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);  // Blowing up?
@@ -2012,25 +2012,25 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0);  // Lightning-charged?
 			break;
 		}
-		case cMonster::mtBat:
+		case mtBat:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);  // Upside down?
 			break;
 		}
-		case cMonster::mtPig:
+		case mtPig:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);  // Saddled?
 			break;
 		}
-		case cMonster::mtVillager:
+		case mtVillager:
 		{
 			WriteByte(0x50);
 			WriteInt(((const cVillager &)a_Mob).GetVilType());  // What sort of TESTIFICATE?
 			break;
 		}
-		case cMonster::mtZombie:
+		case mtZombie:
 		{
 			WriteByte(0xC);
 			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);  // Baby zombie?
@@ -2040,13 +2040,13 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cZombie &)a_Mob).IsConverting() ? 1 : 0);  // Converted-but-converting-back zombllager?
 			break;
 		}
-		case cMonster::mtGhast:
+		case mtGhast:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cGhast &)a_Mob).IsCharging());  // About to spit a flameball?
 			break;
 		}
-		case cMonster::mtWolf:
+		case mtWolf:
 		{
 			Byte WolfStatus = 0;
 			if (((const cWolf &)a_Mob).IsSitting())
@@ -2070,7 +2070,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cWolf &)a_Mob).IsBegging() ? 1 : 0);  // Ultra cute mode?
 			break;
 		}
-		case cMonster::mtSheep:
+		case mtSheep:
 		{
 			// [1](1111)
 			// [] = Is sheared? () = Color, from 0 to 15
@@ -2086,7 +2086,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(SheepMetadata);
 			break;
 		}
-		case cMonster::mtEnderman:
+		case mtEnderman:
 		{
 			WriteByte(0x10);
 			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));  // Block that he stole from your house
@@ -2096,19 +2096,19 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0);  // Screaming at your face?
 			break;
 		}
-		case cMonster::mtSkeleton:
+		case mtSkeleton:
 		{
 			WriteByte(0xD);
 			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);  // It's a skeleton, but it's not
 			break;
 		}
-		case cMonster::mtWitch:
+		case mtWitch:
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);  // Aggravated? Doesn't seem to do anything
 			break;
 		}
-		case cMonster::mtWither:
+		case mtWither:
 		{
 			WriteByte(0x54);  // Int at index 20
 			WriteInt((Int32)((const cWither &)a_Mob).GetWitherInvulnerableTicks());
@@ -2116,11 +2116,11 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
 		}
-		case cMonster::mtSlime:
-		case cMonster::mtMagmaCube:
+		case mtSlime:
+		case mtMagmaCube:
 		{
 			WriteByte(0x10);
-			if (a_Mob.GetMobType() == cMonster::mtSlime)
+			if (a_Mob.GetMobType() == mtSlime)
 			{
 				WriteByte((Byte)((const cSlime &)a_Mob).GetSize());  // Size of slime - HEWGE, meh, cute BABBY SLIME
 			}
@@ -2130,7 +2130,7 @@ void cProtocol125::WriteMobMetadata(const cMonster & a_Mob)
 			}
 			break;
 		}
-		case cMonster::mtHorse:
+		case mtHorse:
 		{
 			int Flags = 0;
 			if (((const cHorse &)a_Mob).IsTame())

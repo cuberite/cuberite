@@ -33,9 +33,9 @@ public:
 			a_BlockY--;
 		}
 
-		cMonster::eType MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
+		eMonsterType MonsterType = ItemDamageToMonsterType(a_Item.m_ItemDamage);
 		if (
-			(MonsterType != cMonster::mtInvalidType) &&  // Valid monster type
+			(MonsterType != mtInvalidType) &&  // Valid monster type
 			(a_World->SpawnMob(a_BlockX + 0.5, a_BlockY, a_BlockZ + 0.5, MonsterType) >= 0))  // Spawning succeeded
 		{
 			if (!a_Player->IsGameModeCreative())
@@ -52,36 +52,36 @@ public:
 	
 	/** Converts the Spawn egg item damage to the monster type to spawn.
 	Returns mtInvalidType for invalid damage values. */
-	static cMonster::eType ItemDamageToMonsterType(short a_ItemDamage)
+	static eMonsterType ItemDamageToMonsterType(short a_ItemDamage)
 	{
 		switch (a_ItemDamage)
 		{
-			case E_META_SPAWN_EGG_BAT:           return cMonster::mtBat;
-			case E_META_SPAWN_EGG_BLAZE:         return cMonster::mtBlaze;
-			case E_META_SPAWN_EGG_CAVE_SPIDER:   return cMonster::mtCaveSpider;
-			case E_META_SPAWN_EGG_CHICKEN:       return cMonster::mtChicken;
-			case E_META_SPAWN_EGG_COW:           return cMonster::mtCow;
-			case E_META_SPAWN_EGG_CREEPER:       return cMonster::mtCreeper;
-			case E_META_SPAWN_EGG_ENDERMAN:      return cMonster::mtEnderman;
-			case E_META_SPAWN_EGG_GHAST:         return cMonster::mtGhast;
-			case E_META_SPAWN_EGG_HORSE:         return cMonster::mtHorse;
-			case E_META_SPAWN_EGG_MAGMA_CUBE:    return cMonster::mtMagmaCube;
-			case E_META_SPAWN_EGG_MOOSHROOM:     return cMonster::mtMooshroom;
-			case E_META_SPAWN_EGG_OCELOT:        return cMonster::mtOcelot;
-			case E_META_SPAWN_EGG_PIG:           return cMonster::mtPig;
-			case E_META_SPAWN_EGG_SHEEP:         return cMonster::mtSheep;
-			case E_META_SPAWN_EGG_SILVERFISH:    return cMonster::mtSilverfish;
-			case E_META_SPAWN_EGG_SKELETON:      return cMonster::mtSkeleton;
-			case E_META_SPAWN_EGG_SLIME:         return cMonster::mtSlime;
-			case E_META_SPAWN_EGG_SPIDER:        return cMonster::mtSpider;
-			case E_META_SPAWN_EGG_SQUID:         return cMonster::mtSquid;
-			case E_META_SPAWN_EGG_VILLAGER:      return cMonster::mtVillager;
-			case E_META_SPAWN_EGG_WITCH:         return cMonster::mtWitch;
-			case E_META_SPAWN_EGG_WOLF:          return cMonster::mtWolf;
-			case E_META_SPAWN_EGG_ZOMBIE:        return cMonster::mtZombie;
-			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN: return cMonster::mtZombiePigman;
+			case E_META_SPAWN_EGG_BAT:           return mtBat;
+			case E_META_SPAWN_EGG_BLAZE:         return mtBlaze;
+			case E_META_SPAWN_EGG_CAVE_SPIDER:   return mtCaveSpider;
+			case E_META_SPAWN_EGG_CHICKEN:       return mtChicken;
+			case E_META_SPAWN_EGG_COW:           return mtCow;
+			case E_META_SPAWN_EGG_CREEPER:       return mtCreeper;
+			case E_META_SPAWN_EGG_ENDERMAN:      return mtEnderman;
+			case E_META_SPAWN_EGG_GHAST:         return mtGhast;
+			case E_META_SPAWN_EGG_HORSE:         return mtHorse;
+			case E_META_SPAWN_EGG_MAGMA_CUBE:    return mtMagmaCube;
+			case E_META_SPAWN_EGG_MOOSHROOM:     return mtMooshroom;
+			case E_META_SPAWN_EGG_OCELOT:        return mtOcelot;
+			case E_META_SPAWN_EGG_PIG:           return mtPig;
+			case E_META_SPAWN_EGG_SHEEP:         return mtSheep;
+			case E_META_SPAWN_EGG_SILVERFISH:    return mtSilverfish;
+			case E_META_SPAWN_EGG_SKELETON:      return mtSkeleton;
+			case E_META_SPAWN_EGG_SLIME:         return mtSlime;
+			case E_META_SPAWN_EGG_SPIDER:        return mtSpider;
+			case E_META_SPAWN_EGG_SQUID:         return mtSquid;
+			case E_META_SPAWN_EGG_VILLAGER:      return mtVillager;
+			case E_META_SPAWN_EGG_WITCH:         return mtWitch;
+			case E_META_SPAWN_EGG_WOLF:          return mtWolf;
+			case E_META_SPAWN_EGG_ZOMBIE:        return mtZombie;
+			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN: return mtZombiePigman;
 		}
-		return cMonster::mtInvalidType;
+		return mtInvalidType;
 	}
 } ;
 

@@ -334,10 +334,10 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				cMonster * Monster = (cMonster *)this;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtSkeleton:
-					case cMonster::mtZombie:
-					case cMonster::mtWither:
-					case cMonster::mtZombiePigman:
+					case mtSkeleton:
+					case mtZombie:
+					case mtWither:
+					case mtZombiePigman:
 					{
 						a_TDI.FinalDamage += (int)ceil(2.5 * SmiteLevel);
 						break;
@@ -353,9 +353,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				cMonster * Monster = (cMonster *)this;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtSpider:
-					case cMonster::mtCaveSpider:
-					case cMonster::mtSilverfish:
+					case mtSpider:
+					case mtCaveSpider:
+					case mtSilverfish:
 					{
 						a_TDI.RawDamage += (int)ceil(2.5 * BaneOfArthropodsLevel);
 						// TODO: Add slowness effect
@@ -385,9 +385,9 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 				cMonster * Monster = (cMonster *)this;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtGhast:
-					case cMonster::mtZombiePigman:
-					case cMonster::mtMagmaCube:
+					case mtGhast:
+					case mtZombiePigman:
+					case mtMagmaCube:
 					{
 						break;
 					};
