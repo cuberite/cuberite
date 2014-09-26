@@ -5,11 +5,6 @@
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
-#include "Plugin.h"
-#include "PluginLua.h"
-#include "PluginManager.h"
-#include "LuaWindow.h"
-#include "LuaChunkStay.h"
 
 #include "../BlockInfo.h"
 
