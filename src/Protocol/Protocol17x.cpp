@@ -838,23 +838,11 @@ void cProtocol172::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 
 
-void cProtocol172::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+void cProtocol172::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
-	ASSERT(m_State == 3);  // In game mode?
-	if (a_OldListName == a_Player.GetPlayerListName())
-	{
-		return;
-	}
-
-	// Remove the old name from the tablist:
-	{
-		cPacketizer Pkt(*this, 0x38);
-		Pkt.WriteString(a_OldListName);
-		Pkt.WriteBool(false);
-		Pkt.WriteShort(0);
-	}
-
-	SendPlayerListAddPlayer(a_Player);
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+	UNUSED(a_CustomName);
 }
 
 

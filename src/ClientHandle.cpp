@@ -2453,9 +2453,9 @@ void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 
 
-void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
-	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 

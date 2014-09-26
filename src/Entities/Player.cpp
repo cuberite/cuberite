@@ -816,7 +816,8 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 	{
 		return;
 	}
-	AString OldCustomName = m_CustomName;
+
+	m_World->BroadcastPlayerListRemovePlayer(*this);
 
 	m_CustomName = a_CustomName;
 	if (m_CustomName.length() > 16)
@@ -824,8 +825,8 @@ void cPlayer::SetCustomName(const AString & a_CustomName)
 		m_CustomName = m_CustomName.substr(0, 16);
 	}
 
-	m_World->BroadcastPlayerListUpdateDisplayName(*this, m_CustomName);
-	m_World->BroadcastSpawnEntity(*this, m_ClientHandle);
+	m_World->BroadcastPlayerListAddPlayer(*this);
+	m_World->BroadcastSpawnEntity(*this, GetClientHandle());
 }
 
 

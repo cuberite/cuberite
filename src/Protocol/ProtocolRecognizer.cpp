@@ -529,10 +529,10 @@ void cProtocolRecognizer::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 
 
-void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 
