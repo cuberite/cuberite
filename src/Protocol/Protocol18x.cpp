@@ -802,7 +802,7 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	Pkt.WriteVarInt(0);
 	Pkt.WriteVarInt(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteString(a_Player.GetPlayerListName());
 
 	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt(Properties.size());
@@ -824,17 +824,7 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 	Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
 	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
-
-	AString CustomName = a_Player.GetPlayerListName();
-	if (CustomName != a_Player.GetName())
-	{
-		Pkt.WriteBool(true);
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", CustomName.c_str()));
-	}
-	else
-	{
-		Pkt.WriteBool(false);
-	}
+	Pkt.WriteBool(false);
 }
 
 
@@ -885,7 +875,7 @@ void cProtocol180::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 
 
-void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -894,15 +884,14 @@ void cProtocol180::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, con
 	Pkt.WriteVarInt(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
 
-	AString CustomName = a_Player.GetPlayerListName();
-	if (CustomName == a_Player.GetName())
+	if (a_CustomName.empty())
 	{
 		Pkt.WriteBool(false);
 	}
 	else
 	{
 		Pkt.WriteBool(true);
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", CustomName.c_str()));
+		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_CustomName.c_str()));
 	}
 }
 

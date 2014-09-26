@@ -2236,7 +2236,7 @@ void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClie
 
 
 
-void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2246,7 +2246,7 @@ void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, cons
 		{
 			continue;
 		}
-		ch->SendPlayerListUpdateDisplayName(a_Player, a_OldListName);
+		ch->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 	}
 }
 

@@ -767,25 +767,11 @@ void cProtocol125::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 
 
-void cProtocol125::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName)
+void cProtocol125::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
-	if (a_OldListName == a_Player.GetPlayerListName())
-	{
-		return;
-	}
-
-	cCSLock Lock(m_CSPacket);
-
-	// Remove the old name from the tablist:
-	{
-		WriteByte  (PACKET_PLAYER_LIST_ITEM);
-		WriteString(a_OldListName);
-		WriteBool  (false);
-		WriteShort (0);
-		Flush();
-	}
-
-	SendPlayerListAddPlayer(a_Player);
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+	UNUSED(a_CustomName);
 }
 
 

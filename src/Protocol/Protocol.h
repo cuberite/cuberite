@@ -98,7 +98,7 @@ public:
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdatePing       (const cPlayer & a_Player) = 0;
-	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_OldListName) = 0;
+	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) = 0;
 	virtual void SendPlayerMaxSpeed             (void) = 0;  ///< Informs the client of the maximum player speed (1.6.1+)
 	virtual void SendPlayerMoveLook             (void) = 0;
 	virtual void SendPlayerPosition             (void) = 0;
