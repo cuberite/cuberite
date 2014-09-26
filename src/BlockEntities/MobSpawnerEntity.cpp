@@ -15,7 +15,7 @@
 
 cMobSpawnerEntity::cMobSpawnerEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World)
 	: super(E_BLOCK_MOB_SPAWNER, a_BlockX, a_BlockY, a_BlockZ, a_World)
-	, m_Entity(cMonster::mtPig)
+	, m_Entity(mtPig)
 	, m_SpawnDelay(100)
 	, m_IsActive(false)
 {
@@ -39,7 +39,7 @@ void cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 	if (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SPAWN_EGG)
 	{
 		cMonster::eType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
-		if (MonsterType == cMonster::mtInvalidType)
+		if (MonsterType == mtInvalidType)
 		{
 			return;
 		}
@@ -115,7 +115,7 @@ void cMobSpawnerEntity::ResetTimer(void)
 
 void cMobSpawnerEntity::SpawnEntity(void)
 {
-	int NearbyEntities = GetNearbyEntityNum(m_Entity);
+	int NearbyEntities = GetNearbyMonsterNum(m_Entity);
 	if (NearbyEntities >= 6)
 	{
 		ResetTimer();
@@ -125,7 +125,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 	class cCallback : public cChunkCallback
 	{
 	public:
-		cCallback(int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, int a_NearbyEntitiesNum) :
+		cCallback(int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, int a_NearbyEntitiesNum) :
 			m_RelX(a_RelX),
 			m_RelY(a_RelY),
 			m_RelZ(a_RelZ),
@@ -170,7 +170,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 					Monster->SetPosition(PosX, RelY, PosZ);
 					Monster->SetYaw(Random.NextFloat() * 360.0f);
-					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != cMonster::mtInvalidType)
+					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != mtInvalidType)
 					{
 						EntitiesSpawned = true;
 						Chunk->BroadcastSoundParticleEffect(2004, (int)(PosX * 8.0), (int)(RelY * 8.0), (int)(PosZ * 8.0), 0);
@@ -182,7 +182,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 		}
 	protected:
 		int m_RelX, m_RelY, m_RelZ;
-		cMonster::eType m_MobType;
+		eMonsterType m_MobType;
 		int m_NearbyEntitiesNum;
 	} Callback(m_RelX, m_PosY, m_RelZ, m_Entity, NearbyEntities);
 
@@ -224,35 +224,35 @@ AString cMobSpawnerEntity::GetEntityName() const
 {
 	switch (m_Entity)
 	{
-		case cMonster::mtBat:          return "Bat";
-		case cMonster::mtBlaze:        return "Blaze";
-		case cMonster::mtCaveSpider:   return "CaveSpider";
-		case cMonster::mtChicken:      return "Chicken";
-		case cMonster::mtCow:          return "Cow";
-		case cMonster::mtCreeper:      return "Creeper";
-		case cMonster::mtEnderDragon:  return "EnderDragon";
-		case cMonster::mtEnderman:     return "Enderman";
-		case cMonster::mtGhast:        return "Ghast";
-		case cMonster::mtGiant:        return "Giant";
-		case cMonster::mtHorse:        return "EntityHorse";
-		case cMonster::mtIronGolem:    return "VillagerGolem";
-		case cMonster::mtMagmaCube:    return "LavaSlime";
-		case cMonster::mtMooshroom:    return "MushroomCow";
-		case cMonster::mtOcelot:       return "Ozelot";
-		case cMonster::mtPig:          return "Pig";
-		case cMonster::mtSheep:        return "Sheep";
-		case cMonster::mtSilverfish:   return "Silverfish";
-		case cMonster::mtSkeleton:     return "Skeleton";
-		case cMonster::mtSlime:        return "Slime";
-		case cMonster::mtSnowGolem:    return "SnowMan";
-		case cMonster::mtSpider:       return "Spider";
-		case cMonster::mtSquid:        return "Squid";
-		case cMonster::mtVillager:     return "Villager";
-		case cMonster::mtWitch:        return "Witch";
-		case cMonster::mtWither:       return "WitherBoss";
-		case cMonster::mtWolf:         return "Wolf";
-		case cMonster::mtZombie:       return "Zombie";
-		case cMonster::mtZombiePigman: return "PigZombie";
+		case mtBat:          return "Bat";
+		case mtBlaze:        return "Blaze";
+		case mtCaveSpider:   return "CaveSpider";
+		case mtChicken:      return "Chicken";
+		case mtCow:          return "Cow";
+		case mtCreeper:      return "Creeper";
+		case mtEnderDragon:  return "EnderDragon";
+		case mtEnderman:     return "Enderman";
+		case mtGhast:        return "Ghast";
+		case mtGiant:        return "Giant";
+		case mtHorse:        return "EntityHorse";
+		case mtIronGolem:    return "VillagerGolem";
+		case mtMagmaCube:    return "LavaSlime";
+		case mtMooshroom:    return "MushroomCow";
+		case mtOcelot:       return "Ozelot";
+		case mtPig:          return "Pig";
+		case mtSheep:        return "Sheep";
+		case mtSilverfish:   return "Silverfish";
+		case mtSkeleton:     return "Skeleton";
+		case mtSlime:        return "Slime";
+		case mtSnowGolem:    return "SnowMan";
+		case mtSpider:       return "Spider";
+		case mtSquid:        return "Squid";
+		case mtVillager:     return "Villager";
+		case mtWitch:        return "Witch";
+		case mtWither:       return "WitherBoss";
+		case mtWolf:         return "Wolf";
+		case mtZombie:       return "Zombie";
+		case mtZombiePigman: return "PigZombie";
 		default:
 		{
 			ASSERT(!"Unknown monster type!");
@@ -308,7 +308,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 
 
 
-int cMobSpawnerEntity::GetNearbyEntityNum(cMonster::eType a_EntityType)
+int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 {
 	Vector3d SpawnerPos(m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);
 	int NumEntities = 0;
@@ -316,7 +316,7 @@ int cMobSpawnerEntity::GetNearbyEntityNum(cMonster::eType a_EntityType)
 	class cCallback : public cChunkDataCallback
 	{
 	public:
-		cCallback(Vector3d a_SpawnerPos, cMonster::eType a_EntityType, int & a_NumEntities) :
+		cCallback(Vector3d a_SpawnerPos, eMonsterType a_EntityType, int & a_NumEntities) :
 			m_SpawnerPos(a_SpawnerPos),
 			m_EntityType(a_EntityType),
 			m_NumEntities(a_NumEntities)
@@ -344,7 +344,7 @@ int cMobSpawnerEntity::GetNearbyEntityNum(cMonster::eType a_EntityType)
 
 	protected:
 		Vector3d m_SpawnerPos;
-		cMonster::eType m_EntityType;
+		eMonsterType m_EntityType;
 		int & m_NumEntities;
 	} Callback(SpawnerPos, a_EntityType, NumEntities);
 

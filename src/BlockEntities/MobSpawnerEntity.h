@@ -45,10 +45,10 @@ public:
 	void SpawnEntity(void);
 
 	/** Returns the entity type who will be spawn by this mob spawner. */
-	cMonster::eType GetEntity(void) const { return m_Entity; }
+	eMonsterType GetEntity(void) const { return m_Entity; }
 
 	/** Sets the entity type who will be spawn by this mob spawner. */
-	void SetEntity(cMonster::eType a_EntityType) { m_Entity = a_EntityType; }
+	void SetEntity(eMonsterType a_EntityType) { m_Entity = a_EntityType; }
 
 	/** Returns the entity name. (Required by the protocol) */
 	AString GetEntityName(void) const;
@@ -57,7 +57,7 @@ public:
 	int GetSpawnDelay(void) const { return m_SpawnDelay; }
 
 	int GetNearbyPlayersNum(void);
-	int GetNearbyEntityNum(cMonster::eType a_EntityType);
+	int GetNearbyMonsterNum(eMonsterType a_EntityType);
 
 	// tolua_end
 
@@ -68,7 +68,7 @@ public:
 
 private:
 	/** The entity to spawn. */
-	cMonster::eType m_Entity;
+	eMonsterType m_Entity;
 
 	int m_SpawnDelay;
 
