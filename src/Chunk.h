@@ -368,16 +368,17 @@ public:
 	{
 		return m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
 	}
-	inline void       SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+
+	inline void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
-			bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
-			if (hasChanged)
-			{
-				MarkDirty();
-				m_IsRedstoneDirty = true;
-				
-				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
-			}
+		bool hasChanged = m_ChunkData.SetMeta(a_RelX, a_RelY, a_RelZ, a_Meta);
+		if (hasChanged)
+		{
+			MarkDirty();
+			m_IsRedstoneDirty = true;
+
+			m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), a_Meta));
+		}
 	}
 
 	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const {return m_ChunkData.GetBlockLight(a_RelX, a_RelY, a_RelZ); }
