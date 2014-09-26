@@ -1,8 +1,6 @@
 
 #pragma once
 
-//#include "PluginManager.h"
-
 #include "Defines.h"
 
 class cCommandOutputCallback;
