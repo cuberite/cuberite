@@ -30,7 +30,8 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		switch (m_ItemType) {
+		switch (m_ItemType)
+		{
 			case E_ITEM_WOODEN_DOOR:   a_BlockType = E_BLOCK_WOODEN_DOOR; break;
 			case E_ITEM_IRON_DOOR:     a_BlockType = E_BLOCK_IRON_DOOR; break;
 			case E_ITEM_SPRUCE_DOOR:   a_BlockType = E_BLOCK_SPRUCE_DOOR; break;
