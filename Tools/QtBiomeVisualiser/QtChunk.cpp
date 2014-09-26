@@ -1,6 +1,5 @@
 #include "Globals.h"
-#include "Globals.h"
-#include "Chunk.h"
+#include "QtChunk.h"
 
 
 

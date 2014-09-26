@@ -3,8 +3,8 @@
 
 #include "EnderCrystal.h"
 #include "ClientHandle.h"
-#include "Player.h"
 #include "../Chunk.h"
+#include "../World.h"
 
 
 

@@ -14,7 +14,6 @@ namespace Json
 }
 
 class cClientHandle;
-class cServer;
 
 
 

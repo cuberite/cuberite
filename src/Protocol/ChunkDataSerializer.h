@@ -23,13 +23,15 @@ protected:
 	Serializations m_Serializations;
 	
 	void Serialize29(AString & a_Data);  // Release 1.2.4 and 1.2.5
-	void Serialize39(AString & a_Data);  // Release 1.3.1 and 1.3.2
+	void Serialize39(AString & a_Data);  // Release 1.3.1 to 1.7.10
+	void Serialize47(AString & a_Data, int a_ChunkX, int a_ChunkZ);  // Release 1.8
 	
 public:
 	enum
 	{
 		RELEASE_1_2_5 = 29,
 		RELEASE_1_3_2 = 39,
+		RELEASE_1_8_0 = 47,
 	} ;
 	
 	cChunkDataSerializer(
@@ -40,7 +42,7 @@ public:
 		const unsigned char *           a_BiomeData
 	);
 
-	const AString & Serialize(int a_Version);  // Returns one of the internal m_Serializations[]
+	const AString & Serialize(int a_Version, int a_ChunkX, int a_ChunkZ);  // Returns one of the internal m_Serializations[]
 } ;
 
 

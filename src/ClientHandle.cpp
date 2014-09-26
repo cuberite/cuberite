@@ -124,13 +124,14 @@ cClientHandle::~cClientHandle()
 	if (m_Player != NULL)
 	{
 		cWorld * World = m_Player->GetWorld();
-		if (!m_Username.empty() && (World != NULL))
-		{
-			// Send the Offline PlayerList packet:
-			World->BroadcastPlayerListItem(*m_Player, false, this);
-		}
 		if (World != NULL)
 		{
+			if (!m_Username.empty())
+			{
+				// Send the Offline PlayerList packet:
+				World->BroadcastPlayerListRemovePlayer(*m_Player, this);
+			}
+	
 			World->RemovePlayer(m_Player, true);  // Must be called before cPlayer::Destroy() as otherwise cChunk tries to delete the player, and then we do it again
 			m_Player->Destroy();
 		}
@@ -370,7 +371,12 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Send experience
 	m_Player->SendExperience();
-	
+
+	// Send player list items
+	SendPlayerListAddPlayer(*m_Player);
+	World->BroadcastPlayerListAddPlayer(*m_Player);
+	World->SendPlayerList(m_Player);
+
 	m_Player->Initialize(*World);
 	m_State = csAuthenticated;
 
@@ -1206,50 +1212,61 @@ void cClientHandle::FinishDigAnimation()
 
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
 {
+	// TODO: Rewrite this function
+
 	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
 	
 	cWorld * World = m_Player->GetWorld();
+	bool AreRealCoords = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() <= 5;
 
 	if (
 		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
-		(
-			(Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||  // The block is too far away
-			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6)
-		)
+		IsValidBlock(a_HeldItem.m_ItemType) &&
+		!AreRealCoords
 	)
 	{
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		if (a_BlockY < cChunkDef::Height - 1)
+		if ((a_BlockX != -1) && (a_BlockY >= 0) && (a_BlockZ != -1))
 		{
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-		}
-		if (a_BlockY > 0)
-		{
-			World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+			if (a_BlockY < cChunkDef::Height - 1)
+			{
+				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+			}
+			if (a_BlockY > 0)
+			{
+				World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+			}
 		}
 		m_Player->GetInventory().SendEquippedSlot();
 		return;
+	}
+
+	if (!AreRealCoords)
+	{
+		a_BlockFace = BLOCK_FACE_NONE;
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		cChunkInterface ChunkInterface(World->GetChunkMap());
-		BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-		BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		if (AreRealCoords)
 		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			m_Player->GetInventory().SendEquippedSlot();
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+			BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+
+			if (a_BlockFace != BLOCK_FACE_NONE)
+			{
+				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+				m_Player->GetInventory().SendEquippedSlot();
+			}
 		}
 		return;
 	}
@@ -1282,22 +1299,25 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		return;
 	}
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-	
-	if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
+	if (AreRealCoords)
 	{
-		if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+
+		if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 		{
-			// A plugin doesn't agree with using the block, abort
+			if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+			{
+				// A plugin doesn't agree with using the block, abort
+				return;
+			}
+			cChunkInterface ChunkInterface(World->GetChunkMap());
+			BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 			return;
 		}
-		cChunkInterface ChunkInterface(World->GetChunkMap());
-		BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-		PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-		return;
 	}
 	
 	short EquippedDamage = Equipped.m_ItemDamage;
@@ -2326,18 +2346,18 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 
 
 
-void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
-	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
 }
 
 
 
 
 
-void cClientHandle::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cClientHandle::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
-	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators, m_Scale);
 }
 
 
@@ -2353,9 +2373,9 @@ void cClientHandle::SendMapInfo(int a_ID, unsigned int a_Scale)
 
 
 
-void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
-	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
 }
 
 
@@ -2397,9 +2417,45 @@ void cClientHandle::SendPlayerAbilities()
 
 
 
-void cClientHandle::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
-	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
+	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListRemovePlayer(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListUpdatePing(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 

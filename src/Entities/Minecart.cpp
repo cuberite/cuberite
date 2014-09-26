@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "../BoundingBox.h"
 
+#define NO_SPEED 0.0
 #define MAX_SPEED 8
 #define MAX_SPEED_NEGATIVE -MAX_SPEED
 
@@ -220,7 +221,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
 			if (EntCol || BlckCol) return;
 			
-			if (GetSpeedZ() != 0)  // Don't do anything if cart is stationary
+			if (GetSpeedZ() != NO_SPEED)  // Don't do anything if cart is stationary
 			{
 				if (GetSpeedZ() > 0)
 				{
@@ -239,13 +240,13 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		{
 			SetYaw(180);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
-			SetSpeedZ(0);
+			SetSpeedY(NO_SPEED);
+			SetSpeedZ(NO_SPEED);
 
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
 			if (EntCol || BlckCol) return;
 
-			if (GetSpeedX() != 0)
+			if (GetSpeedX() != NO_SPEED)
 			{
 				if (GetSpeedX() > 0)
 				{
@@ -305,9 +306,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 		case E_META_RAIL_ASCEND_XM:  // ASCEND EAST
 		{
 			SetYaw(180);
-			SetSpeedZ(0);
+			SetSpeedZ(NO_SPEED);
 
-			if (GetSpeedX() >= 0)
+			if (GetSpeedX() >= NO_SPEED)
 			{
 				if (GetSpeedX() <= MAX_SPEED)
 				{
@@ -424,9 +425,9 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
 			if (EntCol || BlckCol) return;
 			
-			if (GetSpeedZ() != 0)
+			if (GetSpeedZ() != NO_SPEED)
 			{
-				if (GetSpeedZ() > 0)
+				if (GetSpeedZ() > NO_SPEED)
 				{
 					AddSpeedZ(AccelDecelSpeed);
 				}
@@ -441,15 +442,15 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		{
 			SetYaw(180);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
-			SetSpeedZ(0);
+			SetSpeedY(NO_SPEED);
+			SetSpeedZ(NO_SPEED);
 
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
 			if (EntCol || BlckCol) return;
 
-			if (GetSpeedX() != 0)
+			if (GetSpeedX() != NO_SPEED)
 			{
-				if (GetSpeedX() > 0)
+				if (GetSpeedX() > NO_SPEED)
 				{
 					AddSpeedX(AccelDecelSpeed);
 				}
@@ -463,9 +464,9 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_ASCEND_XM:  // ASCEND EAST
 		{
 			SetYaw(180);
-			SetSpeedZ(0);
+			SetSpeedZ(NO_SPEED);
 
-			if (GetSpeedX() >= 0)
+			if (GetSpeedX() >= NO_SPEED)
 			{
 				if (GetSpeedX() <= MAX_SPEED)
 				{
@@ -483,9 +484,9 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_ASCEND_XP:  // ASCEND WEST
 		{
 			SetYaw(180);
-			SetSpeedZ(0);
+			SetSpeedZ(NO_SPEED);
 
-			if (GetSpeedX() > 0)
+			if (GetSpeedX() > NO_SPEED)
 			{
 				AddSpeedX(AccelDecelSpeed);
 				SetSpeedY(GetSpeedX());
@@ -503,9 +504,9 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_ASCEND_ZM:  // ASCEND NORTH
 		{
 			SetYaw(270);
-			SetSpeedX(0);
+			SetSpeedX(NO_SPEED);
 
-			if (GetSpeedZ() >= 0)
+			if (GetSpeedZ() >= NO_SPEED)
 			{
 				if (GetSpeedZ() <= MAX_SPEED)
 				{
@@ -523,9 +524,9 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_ASCEND_ZP:  // ASCEND SOUTH
 		{
 			SetYaw(270);
-			SetSpeedX(0);
+			SetSpeedX(NO_SPEED);
 
-			if (GetSpeedZ() > 0)
+			if (GetSpeedZ() > NO_SPEED)
 			{
 				AddSpeedZ(AccelDecelSpeed);
 				SetSpeedY(GetSpeedZ());
@@ -576,7 +577,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_ASCEND_XP:
 		case E_META_RAIL_XM_XP:
 		{
-			SetSpeedZ(0);
+			SetSpeedZ(NO_SPEED);
 			SetPosZ(floor(GetPosZ()) + 0.5);
 			break;
 		}
@@ -584,7 +585,7 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 		case E_META_RAIL_ASCEND_ZP:
 		case E_META_RAIL_ZM_ZP:
 		{
-			SetSpeedX(0);
+			SetSpeedX(NO_SPEED);
 			SetPosX(floor(GetPosX()) + 0.5);
 			break;
 		}
@@ -593,12 +594,12 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 		{
 			if (GetPosZ() > floor(GetPosZ()) + 0.5)
 			{
-				if (GetSpeedZ() > 0)
+				if (GetSpeedZ() > NO_SPEED)
 				{
 					SetSpeedX(-GetSpeedZ() * 0.7);
 				}
 
-				SetSpeedZ(0);
+				SetSpeedZ(NO_SPEED);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
 			else if (GetPosX() > floor(GetPosX()) + 0.5)
@@ -608,82 +609,82 @@ void cMinecart::SnapToRail(NIBBLETYPE a_RailMeta)
 					SetSpeedZ(-GetSpeedX() * 0.7);
 				}
 
-				SetSpeedX(0);
+				SetSpeedX(NO_SPEED);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 			break;
 		}
 		case E_META_RAIL_CURVED_ZM_XP:
 		{
 			if (GetPosZ() > floor(GetPosZ()) + 0.5)
 			{
-				if (GetSpeedZ() > 0)
+				if (GetSpeedZ() > NO_SPEED)
 				{
 					SetSpeedX(GetSpeedZ() * 0.7);
 				}
 
-				SetSpeedZ(0);
+				SetSpeedZ(NO_SPEED);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
 			else if (GetPosX() < floor(GetPosX()) + 0.5)
 			{
-				if (GetSpeedX() < 0)
+				if (GetSpeedX() < NO_SPEED)
 				{
 					SetSpeedZ(GetSpeedX() * 0.7);
 				}
 
-				SetSpeedX(0);
+				SetSpeedX(NO_SPEED);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 			break;
 		}
 		case E_META_RAIL_CURVED_ZP_XM:
 		{
 			if (GetPosZ() < floor(GetPosZ()) + 0.5)
 			{
-				if (GetSpeedZ() < 0)
+				if (GetSpeedZ() < NO_SPEED)
 				{
 					SetSpeedX(GetSpeedZ() * 0.7);
 				}
 
-				SetSpeedZ(0);
+				SetSpeedZ(NO_SPEED);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
 			else if (GetPosX() > floor(GetPosX()) + 0.5)
 			{
-				if (GetSpeedX() > 0)
+				if (GetSpeedX() > NO_SPEED)
 				{
 					SetSpeedZ(GetSpeedX() * 0.7);
 				}
 
-				SetSpeedX(0);
+				SetSpeedX(NO_SPEED);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 			break;
 		}
 		case E_META_RAIL_CURVED_ZP_XP:
 		{
 			if (GetPosZ() < floor(GetPosZ()) + 0.5)
 			{
-				if (GetSpeedZ() < 0)
+				if (GetSpeedZ() < NO_SPEED)
 				{
 					SetSpeedX(-GetSpeedZ() * 0.7);
 				}
 
-				SetSpeedZ(0);
+				SetSpeedZ(NO_SPEED);
 				SetPosZ(floor(GetPosZ()) + 0.5);
 			}
 			else if (GetPosX() < floor(GetPosX()) + 0.5)
 			{
-				if (GetSpeedX() < 0)
+				if (GetSpeedX() < NO_SPEED)
 				{
 					SetSpeedZ(-GetSpeedX() * 0.7);
 				}
 
-				SetSpeedX(0);
+				SetSpeedX(NO_SPEED);
 				SetPosX(floor(GetPosX()) + 0.5);
 			}
 			SetSpeedY(0);
@@ -876,7 +877,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
 			// Prevent division by small numbers
-			if (abs(Distance.z) < 0.001)
+			if (std::abs(Distance.z) < 0.001)
 			{
 				Distance.z = 0.001;
 			}
@@ -925,7 +926,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 			Vector3d Distance = MinecartCollisionCallback.GetCollidedEntityPosition() - Vector3d(GetPosX(), 0, GetPosZ());
 
 			// Prevent division by small numbers
-			if (abs(Distance.z) < 0.001)
+			if (std::abs(Distance.z) < 0.001)
 			{
 				Distance.z = 0.001;
 			}
@@ -1072,6 +1073,8 @@ cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const c
 
 void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (m_Attachee != NULL)
 	{
 		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
@@ -1124,8 +1127,7 @@ void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
 
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
-	// Show the chest UI window to the player
-	// TODO
+	// TODO: Show the chest UI window to the player
 }
 
 

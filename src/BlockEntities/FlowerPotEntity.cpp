@@ -4,7 +4,6 @@
 // Implements the cFlowerPotEntity class representing a single flower pot in the world
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "json/json.h"
 #include "FlowerPotEntity.h"
 #include "../Entities/Player.h"
 #include "../Item.h"

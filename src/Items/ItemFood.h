@@ -35,7 +35,9 @@ public:
 			// Carrots handled in ItemSeeds
 			case E_ITEM_COOKED_CHICKEN:   return FoodInfo(6, 7.2);
 			case E_ITEM_COOKED_FISH:      return FoodInfo(5, 6);  // TODO: Add other fish types
+			case E_ITEM_COOKED_MUTTON:    return FoodInfo(6, 9.6);
 			case E_ITEM_COOKED_PORKCHOP:  return FoodInfo(8, 12.8);
+			case E_ITEM_COOKED_RABBIT:    return FoodInfo(5, 6);
 			case E_ITEM_COOKIE:           return FoodInfo(2, 0.4);
 			// Golden apple handled in ItemGoldenApple
 			case E_ITEM_GOLDEN_CARROT:    return FoodInfo(6, 14.4);
@@ -43,16 +45,17 @@ public:
 			case E_ITEM_POISONOUS_POTATO: return FoodInfo(2, 1.2);
 			// Potatoes handled in ItemSeeds
 			case E_ITEM_PUMPKIN_PIE:      return FoodInfo(8, 4.8);
+			case E_ITEM_RABBIT_STEW:      return FoodInfo(10, 12);
 			case E_ITEM_RED_APPLE:        return FoodInfo(4, 2.4);
 			case E_ITEM_RAW_BEEF:         return FoodInfo(3, 1.8);
 			case E_ITEM_RAW_CHICKEN:      return FoodInfo(2, 1.2);
 			case E_ITEM_RAW_FISH:         return FoodInfo(2, 1.2);
 			case E_ITEM_RAW_MUTTON:       return FoodInfo(2, 1.2);
 			case E_ITEM_RAW_PORKCHOP:     return FoodInfo(3, 1.8);
+			case E_ITEM_RAW_RABBIT:       return FoodInfo(3, 1.8);
 			case E_ITEM_ROTTEN_FLESH:     return FoodInfo(4, 0.8);
 			case E_ITEM_SPIDER_EYE:       return FoodInfo(2, 3.2);
 			case E_ITEM_STEAK:            return FoodInfo(8, 12.8);
-			case E_ITEM_MUTTON:           return FoodInfo(6, 9.6);
 		}
 		LOGWARNING("%s: Unknown food item (%d), returning zero nutrition", __FUNCTION__, m_ItemType);
 		return FoodInfo(0, 0.f);

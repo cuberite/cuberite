@@ -4,7 +4,7 @@
 #include "BlockHandler.h"
 
 
-
+class cWorld;
 
 
 class cBlockPistonHandler :
@@ -94,6 +94,7 @@ private:
 		switch (a_BlockType)
 		{
 			case E_BLOCK_ANVIL:
+			case E_BLOCK_BARRIER:
 			case E_BLOCK_BEACON:
 			case E_BLOCK_BEDROCK:
 			case E_BLOCK_BREWING_STAND:

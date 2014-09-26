@@ -81,7 +81,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_Team(NULL),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
-	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : "")
+	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : ""),
+	m_CustomName("")
 {
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -266,7 +267,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	cTimer t1;
 	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
-		m_World->SendPlayerList(this);
+		m_World->BroadcastPlayerListUpdatePing(*this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
@@ -809,6 +810,29 @@ void cPlayer::SetCanFly(bool a_CanFly)
 
 
 
+void cPlayer::SetCustomName(const AString & a_CustomName)
+{
+	if (m_CustomName == a_CustomName)
+	{
+		return;
+	}
+
+	m_World->BroadcastPlayerListRemovePlayer(*this);
+
+	m_CustomName = a_CustomName;
+	if (m_CustomName.length() > 16)
+	{
+		m_CustomName = m_CustomName.substr(0, 16);
+	}
+
+	m_World->BroadcastPlayerListAddPlayer(*this);
+	m_World->BroadcastSpawnEntity(*this, GetClientHandle());
+}
+
+
+
+
+
 void cPlayer::SetFlying(bool a_IsFlying)
 {
 	if (a_IsFlying == m_IsFlying)
@@ -1176,6 +1200,8 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 		SetFlying(false);
 		SetCanFly(false);
 	}
+
+	m_World->BroadcastPlayerListUpdateGameMode(*this);
 }
 
 
@@ -1442,6 +1468,28 @@ AString cPlayer::GetColor(void) const
 
 	// Return the color, including the delimiter:
 	return cChatColor::Delimiter + m_MsgNameColorCode;
+}
+
+
+
+
+
+AString cPlayer::GetPlayerListName(void) const
+{
+	const AString & Color = GetColor();
+
+	if (HasCustomName())
+	{
+		return m_CustomName;
+	}
+	else if ((GetName().length() <= 14) && !Color.empty())
+	{
+		return Printf("%s%s", Color.c_str(), GetName().c_str());
+	}
+	else
+	{
+		return GetName();
+	}
 }
 
 
@@ -2013,8 +2061,8 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 				cMonster * Monster = (cMonster *)m_AttachedTo;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
-					case cMonster::mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
+					case mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
 					default: break;
 				}
 				break;

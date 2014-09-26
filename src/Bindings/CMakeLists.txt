@@ -129,6 +129,8 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPER
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.h PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/LuaState_Call.inc PROPERTIES GENERATED TRUE)
 
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
+
 if(NOT MSVC)
     add_library(Bindings ${SRCS} ${HDRS})
 

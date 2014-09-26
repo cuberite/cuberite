@@ -4,7 +4,8 @@
 #include "Simulator.h"
 
 
-
+class cChunk;
+class cWorld;
 
 
 enum Direction
@@ -36,9 +37,9 @@ public:
 
 
 class cFluidSimulator :
-	public cSimulator
+	public cSimulator<cChunk, cWorld>
 {
-	typedef cSimulator super;
+	typedef cSimulator<cChunk, cWorld> super;
 	
 public:
 	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);

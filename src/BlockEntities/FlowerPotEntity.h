@@ -9,8 +9,8 @@
 #pragma once
 
 #include "BlockEntity.h"
+#include "Item.h"
 
-class cItem;
 
 
 

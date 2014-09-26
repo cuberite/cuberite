@@ -254,6 +254,9 @@ public:
 	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
 
+	/** Returns the name that is used in the playerlist. */
+	AString GetPlayerListName(void) const;
+
 	/** tosses the item in the selected hotbar slot */
 	void TossEquippedItem(char a_Amount = 1);
 
@@ -400,6 +403,16 @@ public:
 
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
+
+	/** Returns true if the player has a custom name. */
+	bool HasCustomName(void) const { return !m_CustomName.empty(); }
+
+	/** Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string. */
+	const AString & GetCustomName(void) const { return m_CustomName; }
+
+	/** Sets the custom name of this player. If you want to disable the custom name, simply set an empty string.
+	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
+	void SetCustomName(const AString & a_CustomName);
 
 	/** Gets the last position that the player slept in
 	This is initialised to the world spawn point if the player has not slept in a bed as of yet
@@ -564,6 +577,8 @@ protected:
 	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
 	If no ClientHandle is given, the UUID is initialized to empty. */
 	AString m_UUID;
+
+	AString m_CustomName;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;

@@ -28,10 +28,10 @@ public:
 
 	cMapSerializer(const AString& a_WorldName, cMap * a_Map);
 
-	/** Try to load the scoreboard */
+	/** Try to load the map */
 	bool Load(void);
 
-	/** Try to save the scoreboard */
+	/** Try to save the map */
 	bool Save(void);
 
 

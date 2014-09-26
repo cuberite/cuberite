@@ -7,6 +7,7 @@
 #include "../Blocks/BlockHandler.h"
 #include "../LineBlockTracer.h"
 #include "../BlockInServerPluginInterface.h"
+#include "../Blocks/ChunkInterface.h"
 
 
 

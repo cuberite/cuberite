@@ -30,7 +30,7 @@ public :
 	// a_AllowedTypes is the set of types allowed for mobs it will spawn. Empty set
 	// would result in no spawn at all
 	// Allowed mobs thah are not of the right Family will not be include (no warning)
-	cMobSpawner(cMonster::eFamily MobFamily, const std::set<cMonster::eType> & a_AllowedTypes);
+	cMobSpawner(cMonster::eFamily MobFamily, const std::set<eMonsterType> & a_AllowedTypes);
 
 	/// Check if specified block can be a Pack center for this spawner
 	bool CheckPackCenter(BLOCKTYPE a_BlockType);
@@ -55,19 +55,17 @@ public :
 	static bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
 
 protected :
-
 	// return a random type that can spawn on specified biome.
 	// returns E_ENTITY_TYPE_DONOTUSE if none is possible
-	cMonster::eType ChooseMobType(EMCSBiome a_Biome);
+	eMonsterType ChooseMobType(EMCSBiome a_Biome);
 
 	// add toAdd inside toAddIn, if toAdd is in m_AllowedTypes
-	void addIfAllowed(cMonster::eType toAdd, std::set<cMonster::eType> & toAddIn);
+	void addIfAllowed(eMonsterType toAdd, std::set<eMonsterType> & toAddIn);
 
-protected :
 	cMonster::eFamily m_MonsterFamily;
-	std::set<cMonster::eType> m_AllowedTypes;
+	std::set<eMonsterType> m_AllowedTypes;
 	bool m_NewPack;
-	cMonster::eType m_MobType;
+	eMonsterType m_MobType;
 	std::set<cMonster*> m_Spawned;
 	cFastRandom m_Random;
 } ;

@@ -109,11 +109,11 @@ void cVillager::HandleFarmerPrepareFarmCrops()
 	Surrounding.Read(
 		m_World,
 		(int) GetPosX() - 5,
-		(int) GetPosX() + 5,
+		(int) GetPosX() + 6,
 		(int) GetPosY() - 3,
-		(int) GetPosY() + 3,
+		(int) GetPosY() + 4,
 		(int) GetPosZ() - 5,
-		(int) GetPosZ() + 5
+		(int) GetPosZ() + 6
 	);
 
 	for (int I = 0; I < 5; I++)
