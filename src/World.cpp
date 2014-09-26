@@ -681,8 +681,19 @@ void cWorld::GenerateRandomSpawn(void)
 {
 	LOGD("Generating random spawnpoint...");
 
-	while (IsBlockWaterOrIce(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ)))
+	// Look for a spawn point at most 100 chunks away from map center:
+	for (int i = 0; i < 100; i++)
 	{
+		EMCSBiome biome = GetBiomeAt((int)m_SpawnX, (int)m_SpawnZ);
+		if (
+			(biome != biOcean) && (biome != biFrozenOcean) &&  // The biome is acceptable (don't want a small ocean island)
+			!IsBlockWaterOrIce(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ))  // The terrain is acceptable (don't want to spawn inside a lake / river)
+		)
+		{
+			// A good spawnpoint was found
+			break;
+		}
+		// Try a neighboring chunk:
 		if ((GetTickRandomNumber(4) % 2) == 0)  // Randomise whether to increment X or Z coords
 		{
 			m_SpawnX += cChunkDef::Width;
@@ -691,11 +702,11 @@ void cWorld::GenerateRandomSpawn(void)
 		{
 			m_SpawnZ += cChunkDef::Width;
 		}
-	}
+	}  // for i - 100*
 
 	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f;  // 1.6f to accomodate player height
 
-	LOGD("Generated random spawnpoint %i %i %i", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
+	LOGINFO("Generated random spawnpoint position {%i, %i, %i}", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
 }
 
 
