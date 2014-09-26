@@ -12,10 +12,12 @@
 #endif
 #include "PluginLua.h"
 #include "../CommandOutput.h"
+#include "PluginManager.h"
+#include "../Item.h"
 
 extern "C"
 {
-	#include "lua/src/lualib.h"
+	#include "lua/src/lauxlib.h"
 }
 
 #undef TOLUA_TEMPLATE_BIND

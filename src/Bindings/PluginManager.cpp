@@ -4,12 +4,10 @@
 #include "PluginManager.h"
 #include "Plugin.h"
 #include "PluginLua.h"
-#include "../WebAdmin.h"
 #include "../Item.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../CommandOutput.h"
-#include "../ChatColor.h"
 
 #include "inifile/iniFile.h"
 #include "../Entities/Player.h"

@@ -1,9 +1,8 @@
 
 #pragma once
 
-#include "../Item.h"
 
-
+#include "Defines.h"
 
 
 
@@ -36,7 +35,6 @@ class cPickup;
 
 // fwd: Pawn.h
 struct TakeDamageInfo;
-class cPawn;
 
 // fwd: CommandOutput.h
 class cCommandOutputCallback;
@@ -48,6 +46,8 @@ class cHopperEntity;
 class cBlockEntityWithItems;
 
 
+
+class cItems;
 
 
 
