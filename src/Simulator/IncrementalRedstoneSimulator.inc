@@ -220,25 +220,36 @@ private:
 	{
 		switch (Block)
 		{
+			case E_BLOCK_ACACIA_DOOR:
+			case E_BLOCK_ACACIA_FENCE_GATE:
 			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_BIRCH_DOOR:
+			case E_BLOCK_BIRCH_FENCE_GATE:
 			case E_BLOCK_COMMAND_BLOCK:
-			case E_BLOCK_PISTON:
-			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_DARK_OAK_DOOR:
+			case E_BLOCK_DARK_OAK_FENCE_GATE:
 			case E_BLOCK_DISPENSER:
 			case E_BLOCK_DROPPER:
 			case E_BLOCK_FENCE_GATE:
 			case E_BLOCK_HOPPER:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_IRON_TRAPDOOR:
+			case E_BLOCK_JUNGLE_DOOR:
+			case E_BLOCK_JUNGLE_FENCE_GATE:
 			case E_BLOCK_NOTE_BLOCK:
-			case E_BLOCK_TNT:
-			case E_BLOCK_TRAPDOOR:
+			case E_BLOCK_PISTON:
+			case E_BLOCK_POWERED_RAIL:
 			case E_BLOCK_REDSTONE_LAMP_OFF:
 			case E_BLOCK_REDSTONE_LAMP_ON:
-			case E_BLOCK_WOODEN_DOOR:
-			case E_BLOCK_IRON_DOOR:
 			case E_BLOCK_REDSTONE_REPEATER_OFF:
 			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_POWERED_RAIL:
 			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_SPRUCE_DOOR:
+			case E_BLOCK_SPRUCE_FENCE_GATE:
+			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_TNT:
+			case E_BLOCK_TRAPDOOR:
+			case E_BLOCK_WOODEN_DOOR:
 			{
 				return true;
 			}
@@ -279,19 +290,28 @@ private:
 		switch (Block)
 		{
 			// All redstone devices, please alpha sort
+			case E_BLOCK_ACACIA_DOOR:
+			case E_BLOCK_ACACIA_FENCE_GATE:
 			case E_BLOCK_ACTIVATOR_RAIL:
 			case E_BLOCK_ACTIVE_COMPARATOR:
+			case E_BLOCK_BIRCH_DOOR:
+			case E_BLOCK_BIRCH_FENCE_GATE:
 			case E_BLOCK_BLOCK_OF_REDSTONE:
 			case E_BLOCK_COMMAND_BLOCK:
+			case E_BLOCK_DARK_OAK_DOOR:
+			case E_BLOCK_DARK_OAK_FENCE_GATE:
+			case E_BLOCK_DAYLIGHT_SENSOR:
 			case E_BLOCK_DETECTOR_RAIL:
 			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DAYLIGHT_SENSOR:
 			case E_BLOCK_DROPPER:
 			case E_BLOCK_FENCE_GATE:
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 			case E_BLOCK_HOPPER:
 			case E_BLOCK_INACTIVE_COMPARATOR:
 			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_IRON_TRAPDOOR:
+			case E_BLOCK_JUNGLE_DOOR:
+			case E_BLOCK_JUNGLE_FENCE_GATE:
 			case E_BLOCK_LEVER:
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 			case E_BLOCK_NOTE_BLOCK:
@@ -303,6 +323,8 @@ private:
 			case E_BLOCK_REDSTONE_TORCH_OFF:
 			case E_BLOCK_REDSTONE_TORCH_ON:
 			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_SPRUCE_DOOR:
+			case E_BLOCK_SPRUCE_FENCE_GATE:
 			case E_BLOCK_STICKY_PISTON:
 			case E_BLOCK_STONE_BUTTON:
 			case E_BLOCK_STONE_PRESSURE_PLATE:
@@ -595,8 +617,8 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
 				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);  break;
 				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);  break;
-				case E_BLOCK_FENCE_GATE:            HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);      break;
 				case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
+				case E_BLOCK_IRON_TRAPDOOR:         HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
 				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
 				case E_BLOCK_TRAPPED_CHEST:         HandleTrappedChest(dataitr->x, dataitr->y, dataitr->z);   break;
 
@@ -607,10 +629,25 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 					HandleRail(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
 					break;
 				}
+				case E_BLOCK_ACACIA_DOOR:
+				case E_BLOCK_BIRCH_DOOR:
+				case E_BLOCK_DARK_OAK_DOOR:
+				case E_BLOCK_JUNGLE_DOOR:
+				case E_BLOCK_SPRUCE_DOOR:
 				case E_BLOCK_WOODEN_DOOR:
 				case E_BLOCK_IRON_DOOR:
 				{
 					HandleDoor(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_ACACIA_FENCE_GATE:
+				case E_BLOCK_BIRCH_FENCE_GATE:
+				case E_BLOCK_DARK_OAK_FENCE_GATE:
+				case E_BLOCK_FENCE_GATE:
+				case E_BLOCK_JUNGLE_FENCE_GATE:
+				case E_BLOCK_SPRUCE_FENCE_GATE:
+				{
+					HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);
 					break;
 				}
 				case E_BLOCK_REDSTONE_LAMP_OFF:
