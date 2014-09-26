@@ -56,7 +56,6 @@ struct HTTPRequest;
 class cWebAdmin;
 struct HTTPTemplateRequest;
 class cTNTEntity;
-class cCreeper;
 class cHopperEntity;
 class cBlockEntity;
 class cBoundingBox;

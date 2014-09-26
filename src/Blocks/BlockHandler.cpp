@@ -3,8 +3,6 @@
 #include "BlockHandler.h"
 #include "../Item.h"
 #include "../World.h"
-#include "../Root.h"
-#include "../Bindings/PluginManager.h"
 #include "../Chunk.h"
 #include "BlockAnvil.h"
 #include "BlockBed.h"
@@ -83,6 +81,8 @@
 #include "BlockWallSign.h"
 #include "BlockWorkbench.h"
 
+
+#include "BlockPluginInterface.h"
 
 
 

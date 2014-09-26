@@ -470,35 +470,35 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 	const char * EntityClass = NULL;
 	switch (a_Monster->GetMobType())
 	{
-		case cMonster::mtBat:           EntityClass = "Bat";            break;
-		case cMonster::mtBlaze:         EntityClass = "Blaze";          break;
-		case cMonster::mtCaveSpider:    EntityClass = "CaveSpider";     break;
-		case cMonster::mtChicken:       EntityClass = "Chicken";        break;
-		case cMonster::mtCow:           EntityClass = "Cow";            break;
-		case cMonster::mtCreeper:       EntityClass = "Creeper";        break;
-		case cMonster::mtEnderDragon:   EntityClass = "EnderDragon";    break;
-		case cMonster::mtEnderman:      EntityClass = "Enderman";       break;
-		case cMonster::mtGhast:         EntityClass = "Ghast";          break;
-		case cMonster::mtGiant:         EntityClass = "Giant";          break;
-		case cMonster::mtHorse:         EntityClass = "Horse";          break;
-		case cMonster::mtIronGolem:     EntityClass = "VillagerGolem";  break;
-		case cMonster::mtMagmaCube:     EntityClass = "LavaSlime";      break;
-		case cMonster::mtMooshroom:     EntityClass = "MushroomCow";    break;
-		case cMonster::mtOcelot:        EntityClass = "Ozelot";         break;
-		case cMonster::mtPig:           EntityClass = "Pig";            break;
-		case cMonster::mtSheep:         EntityClass = "Sheep";          break;
-		case cMonster::mtSilverfish:    EntityClass = "Silverfish";     break;
-		case cMonster::mtSkeleton:      EntityClass = "Skeleton";       break;
-		case cMonster::mtSlime:         EntityClass = "Slime";          break;
-		case cMonster::mtSnowGolem:     EntityClass = "SnowMan";        break;
-		case cMonster::mtSpider:        EntityClass = "Spider";         break;
-		case cMonster::mtSquid:         EntityClass = "Squid";          break;
-		case cMonster::mtVillager:      EntityClass = "Villager";       break;
-		case cMonster::mtWitch:         EntityClass = "Witch";          break;
-		case cMonster::mtWither:        EntityClass = "WitherBoss";     break;
-		case cMonster::mtWolf:          EntityClass = "Wolf";           break;
-		case cMonster::mtZombie:        EntityClass = "Zombie";         break;
-		case cMonster::mtZombiePigman:  EntityClass = "PigZombie";      break;
+		case mtBat:           EntityClass = "Bat";            break;
+		case mtBlaze:         EntityClass = "Blaze";          break;
+		case mtCaveSpider:    EntityClass = "CaveSpider";     break;
+		case mtChicken:       EntityClass = "Chicken";        break;
+		case mtCow:           EntityClass = "Cow";            break;
+		case mtCreeper:       EntityClass = "Creeper";        break;
+		case mtEnderDragon:   EntityClass = "EnderDragon";    break;
+		case mtEnderman:      EntityClass = "Enderman";       break;
+		case mtGhast:         EntityClass = "Ghast";          break;
+		case mtGiant:         EntityClass = "Giant";          break;
+		case mtHorse:         EntityClass = "Horse";          break;
+		case mtIronGolem:     EntityClass = "VillagerGolem";  break;
+		case mtMagmaCube:     EntityClass = "LavaSlime";      break;
+		case mtMooshroom:     EntityClass = "MushroomCow";    break;
+		case mtOcelot:        EntityClass = "Ozelot";         break;
+		case mtPig:           EntityClass = "Pig";            break;
+		case mtSheep:         EntityClass = "Sheep";          break;
+		case mtSilverfish:    EntityClass = "Silverfish";     break;
+		case mtSkeleton:      EntityClass = "Skeleton";       break;
+		case mtSlime:         EntityClass = "Slime";          break;
+		case mtSnowGolem:     EntityClass = "SnowMan";        break;
+		case mtSpider:        EntityClass = "Spider";         break;
+		case mtSquid:         EntityClass = "Squid";          break;
+		case mtVillager:      EntityClass = "Villager";       break;
+		case mtWitch:         EntityClass = "Witch";          break;
+		case mtWither:        EntityClass = "WitherBoss";     break;
+		case mtWolf:          EntityClass = "Wolf";           break;
+		case mtZombie:        EntityClass = "Zombie";         break;
+		case mtZombiePigman:  EntityClass = "PigZombie";      break;
 		default:
 		{
 			ASSERT(!"Unhandled monster type");
@@ -520,24 +520,24 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		m_Writer.AddByte("CustomNameVisible", (char)a_Monster->IsCustomNameAlwaysVisible());
 		switch (a_Monster->GetMobType())
 		{
-			case cMonster::mtBat:
+			case mtBat:
 			{
 				m_Writer.AddByte("BatFlags", ((const cBat *)a_Monster)->IsHanging());
 				break;
 			}
-			case cMonster::mtCreeper:
+			case mtCreeper:
 			{
 				m_Writer.AddByte("powered", ((const cCreeper *)a_Monster)->IsCharged());
 				m_Writer.AddByte("ignited", ((const cCreeper *)a_Monster)->IsBlowing());
 				break;
 			}
-			case cMonster::mtEnderman:
+			case mtEnderman:
 			{
 				m_Writer.AddShort("carried",     (Int16)((const cEnderman *)a_Monster)->GetCarriedBlock());
 				m_Writer.AddShort("carriedData", (Int16)((const cEnderman *)a_Monster)->GetCarriedMeta());
 				break;
 			}
-			case cMonster::mtHorse:
+			case mtHorse:
 			{
 				const cHorse & Horse = *((const cHorse *)a_Monster);
 				m_Writer.AddByte("ChestedHorse",   Horse.IsChested());
@@ -550,38 +550,38 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddByte("Saddle",         Horse.IsSaddled());
 				break;
 			}
-			case cMonster::mtMagmaCube:
+			case mtMagmaCube:
 			{
 				m_Writer.AddInt("Size", ((const cMagmaCube *)a_Monster)->GetSize());
 				break;
 			}
-			case cMonster::mtSheep:
+			case mtSheep:
 			{
 				m_Writer.AddByte("Sheared", ((const cSheep *)a_Monster)->IsSheared());
 				m_Writer.AddByte("Color",   ((const cSheep *)a_Monster)->GetFurColor());
 				break;
 			}
-			case cMonster::mtSlime:
+			case mtSlime:
 			{
 				m_Writer.AddInt("Size", ((const cSlime *)a_Monster)->GetSize());
 				break;
 			}
-			case cMonster::mtSkeleton:
+			case mtSkeleton:
 			{
 				m_Writer.AddByte("SkeletonType", (((const cSkeleton *)a_Monster)->IsWither() ? 1 : 0));
 				break;
 			}
-			case cMonster::mtVillager:
+			case mtVillager:
 			{
 				m_Writer.AddInt("Profession", ((const cVillager *)a_Monster)->GetVilType());
 				break;
 			}
-			case cMonster::mtWither:
+			case mtWither:
 			{
 				m_Writer.AddInt("Invul", ((const cWither *)a_Monster)->GetWitherInvulnerableTicks());
 				break;
 			}
-			case cMonster::mtWolf:
+			case mtWolf:
 			{
 				const cWolf & Wolf = *((cWolf *)a_Monster);
 				if (!Wolf.GetOwnerName().empty())
@@ -597,7 +597,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddByte("CollarColor", (unsigned char)Wolf.GetCollarColor());
 				break;
 			}
-			case cMonster::mtZombie:
+			case mtZombie:
 			{
 				m_Writer.AddByte("IsVillager",   (((const cZombie *)a_Monster)->IsVillagerZombie() ? 1 : 0));
 				m_Writer.AddByte("IsBaby",       (((const cZombie *)a_Monster)->IsBaby() ? 1 : 0));

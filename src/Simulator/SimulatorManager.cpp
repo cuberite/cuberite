@@ -70,7 +70,7 @@ void cSimulatorManager::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk 
 
 
 
-void cSimulatorManager::RegisterSimulator(cSimulator * a_Simulator, int a_Rate)
+void cSimulatorManager::RegisterSimulator(cSimulator<cChunk, cWorld> * a_Simulator, int a_Rate)
 {
 	m_Simulators.push_back(std::make_pair(a_Simulator, a_Rate));
 }

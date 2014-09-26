@@ -2,13 +2,10 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "DispenserEntity.h"
-#include "../Entities/Player.h"
 #include "../Simulator/FluidSimulator.h"
 #include "../Chunk.h"
 
 #include "../World.h"
-#include "../Entities/ArrowEntity.h"
-#include "../Entities/FireChargeEntity.h"
 #include "../Entities/ProjectileEntity.h"
 
 
@@ -109,7 +106,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-			if (m_World->SpawnMob(MobX, DispY, MobZ, (cMonster::eType)m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
+			if (m_World->SpawnMob(MobX, DispY, MobZ, (eMonsterType)m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}

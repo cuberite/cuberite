@@ -1,23 +1,25 @@
 
 #pragma once
 
-#include "PluginManager.h"
+#include "Defines.h"
+
+class cCommandOutputCallback;
+class cItems;
+class cHopperEntity;
 
 
 
-
-
+class cBlockEntityWithItems;
 class cClientHandle;
-class cPlayer;
 class cPickup;
-class cItem;
+class cPlayer;
+class cProjectileEntity;
 class cEntity;
+class cMonster;
 class cWorld;
 class cChunkDesc;
 struct TakeDamageInfo;
 
-// fwd: cPlayer.h
-class cPlayer;
 
 // fwd: CraftingRecipes.h
 class cCraftingGrid;

@@ -4,7 +4,7 @@
 #include "BlockHandler.h"
 
 
-
+class cWorld;
 
 
 class cBlockPistonHandler :

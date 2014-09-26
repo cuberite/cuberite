@@ -4,6 +4,15 @@
 
 
 
+#include "BroadcastInterface.h"
+#include "ChunkInterface.h"
+#include "Entities/../World.h"
+#include "Entities/Player.h"
+#include "WorldInterface.h"
+
+
+
+
 
 void cBlockBedHandler::OnPlacedByPlayer(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,

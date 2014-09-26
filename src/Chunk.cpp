@@ -38,6 +38,7 @@
 #include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
 #include "BoundingBox.h"
+#include "Blocks/ChunkInterface.h"
 
 #include "json/json.h"
 
@@ -91,6 +92,7 @@ cChunk::cChunk(
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
+	m_RedstoneSimulatorData(NULL),
 	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != NULL)
@@ -159,6 +161,8 @@ cChunk::~cChunk()
 	m_WaterSimulatorData = NULL;
 	delete m_LavaSimulatorData;
 	m_LavaSimulatorData = NULL;
+	delete m_RedstoneSimulatorData;
+	m_RedstoneSimulatorData = NULL;
 }
 
 
@@ -1366,9 +1370,9 @@ void cChunk::CreateBlockEntities(void)
 
 void cChunk::WakeUpSimulators(void)
 {
-	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
-	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
-	cSimulator * RedstoneSimulator = m_World->GetRedstoneSimulator();
+	cSimulator<cChunk, cWorld> * WaterSimulator = m_World->GetWaterSimulator();
+	cSimulator<cChunk, cWorld> * LavaSimulator  = m_World->GetLavaSimulator();
+	cSimulator<cChunk, cWorld> * RedstoneSimulator = m_World->GetRedstoneSimulator();
 	int BaseX = m_PosX * cChunkDef::Width;
 	int BaseZ = m_PosZ * cChunkDef::Width;
 	for (int x = 0; x < Width; x++)

@@ -10,10 +10,7 @@
 #include "../Entities/Pickup.h"
 #include "../Bindings/PluginManager.h"
 #include "ChestEntity.h"
-#include "DropSpenserEntity.h"
 #include "FurnaceEntity.h"
-#include "../BoundingBox.h"
-#include "json/json.h"
 
 
 

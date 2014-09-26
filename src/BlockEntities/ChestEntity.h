@@ -13,8 +13,6 @@ namespace Json
 };
 
 class cClientHandle;
-class cServer;
-class cNBTData;
 
 
 

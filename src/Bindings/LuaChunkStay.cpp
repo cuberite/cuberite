@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "LuaChunkStay.h"
 #include "PluginLua.h"
-#include "../World.h"
 
 
 

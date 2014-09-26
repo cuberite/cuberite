@@ -1,7 +1,6 @@
 
 #include "Globals.h"
 #include "BlockDoor.h"
-#include "../Item.h"
 #include "../Entities/Player.h"
 
 
