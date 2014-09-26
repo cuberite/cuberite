@@ -17,7 +17,7 @@
 #include "MobSpawner.h"
 #include "BoundingBox.h"
 #include "SetChunkData.h"
-
+#include "Blocks/ChunkInterface.h"
 #include "Entities/Pickup.h"
 
 #ifndef _WIN32

@@ -2,11 +2,12 @@
 #pragma once
 
 #include "../ForEachChunkProvider.h"
-#include "WorldInterface.h"
 
 
 
 class cChunkMap;
+class cWorldInterface;
+class cPlayer;
 
 class cChunkInterface:
 	public cForEachChunkProvider

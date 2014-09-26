@@ -4,7 +4,6 @@
 // Implements the cMobHeadEntity class representing a single skull/head in the world
 
 #include "Globals.h"
-#include "json/json.h"
 #include "MobHeadEntity.h"
 #include "../Entities/Player.h"
 

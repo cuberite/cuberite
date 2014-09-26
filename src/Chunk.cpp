@@ -38,6 +38,7 @@
 #include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
 #include "BoundingBox.h"
+#include "Blocks/ChunkInterface.h"
 
 #include "json/json.h"
 

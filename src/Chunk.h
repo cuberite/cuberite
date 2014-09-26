@@ -11,7 +11,7 @@
 
 #include "Blocks/GetHandlerCompileTimeTemplate.h"
 
-
+#include "ChunkMap.h"
 
 
 
@@ -31,7 +31,10 @@ class MTRand;
 class cPlayer;
 class cChunkMap;
 class cBeaconEntity;
+class cBoundingBox;
 class cChestEntity;
+class cCHunkDataCallback;
+class cCommandBlockEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
 class cNoteEntity;
@@ -46,6 +49,7 @@ class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
 class cRedstonePoweredEntity;
+class cSetChunkData;
 
 typedef std::list<cClientHandle *>         cClientHandleList;
 typedef cItemCallback<cEntity>             cEntityCallback;

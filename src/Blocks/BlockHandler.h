@@ -2,10 +2,6 @@
 #pragma once
 
 #include "../Defines.h"
-#include "../Item.h"
-#include "WorldInterface.h"
-#include "ChunkInterface.h"
-#include "BlockPluginInterface.h"
 
 
 
@@ -14,6 +10,10 @@
 // fwd:
 class cPlayer;
 class cChunk;
+class cBlockPluginInterface;
+class cChunkInterface;
+class cWorldInterface;
+class cItems;
 
 
 

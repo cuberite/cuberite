@@ -4,16 +4,14 @@
 // Implements the cCommandBlockEntity class representing a single command block in the world
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "json/json.h"
 #include "CommandBlockEntity.h"
-#include "../Entities/Player.h"
-#include "../WorldStorage/FastNBT.h"
 
 #include "../CommandOutput.h"
 #include "../Root.h"
 #include "../Server.h"  // ExecuteConsoleCommand()
-#include "../Chunk.h"
 #include "../ChatColor.h"
+#include "../World.h"
+#include "../ClientHandle.h"
 
 
 

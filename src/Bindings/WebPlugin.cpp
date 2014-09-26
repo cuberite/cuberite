@@ -3,7 +3,6 @@
 
 #include "WebPlugin.h"
 #include "../WebAdmin.h"
-#include "../Server.h"
 #include "../Root.h"
 
 

@@ -3,7 +3,6 @@
 
 #include "Entity.h"
 #include "../World.h"
-#include "../Server.h"
 #include "../Root.h"
 #include "../Matrix4.h"
 #include "../ClientHandle.h"

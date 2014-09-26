@@ -9,7 +9,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-
+#include "Defines.h"
 
 
 

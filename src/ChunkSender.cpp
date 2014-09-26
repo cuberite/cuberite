@@ -12,6 +12,7 @@
 #include "World.h"
 #include "BlockEntities/BlockEntity.h"
 #include "Protocol/ChunkDataSerializer.h"
+#include "ClientHandle.h"
 
 
 
