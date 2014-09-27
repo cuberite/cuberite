@@ -5,7 +5,6 @@
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 #include "polarssl/md5.h"
-#include "Plugin.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
@@ -27,7 +26,6 @@
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "../LineBlockTracer.h"
-#include "../Protocol/Authenticator.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
 

@@ -30,7 +30,22 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		a_BlockType = (m_ItemType == E_ITEM_WOODEN_DOOR) ? E_BLOCK_WOODEN_DOOR : E_BLOCK_IRON_DOOR;
+		switch (m_ItemType)
+		{
+			case E_ITEM_WOODEN_DOOR:   a_BlockType = E_BLOCK_WOODEN_DOOR; break;
+			case E_ITEM_IRON_DOOR:     a_BlockType = E_BLOCK_IRON_DOOR; break;
+			case E_ITEM_SPRUCE_DOOR:   a_BlockType = E_BLOCK_SPRUCE_DOOR; break;
+			case E_ITEM_BIRCH_DOOR:    a_BlockType = E_BLOCK_BIRCH_DOOR; break;
+			case E_ITEM_JUNGLE_DOOR:   a_BlockType = E_BLOCK_JUNGLE_DOOR; break;
+			case E_ITEM_DARK_OAK_DOOR: a_BlockType = E_BLOCK_DARK_OAK_DOOR; break;
+			case E_ITEM_ACACIA_DOOR:   a_BlockType = E_BLOCK_ACACIA_DOOR; break;
+			default:
+			{
+				ASSERT(!"Unhandled door type");
+				return false;
+			}
+		}
+		
 		cChunkInterface ChunkInterface(a_World->GetChunkMap());
 		bool Meta = BlockHandler(a_BlockType)->GetPlacementBlockTypeMeta(
 			ChunkInterface, a_Player,

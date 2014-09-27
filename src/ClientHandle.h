@@ -64,14 +64,26 @@ public:
 
 	const AString & GetIPString(void) const { return m_IPString; }  // tolua_export
 	
+	/** Sets the IP string that the client is using. Overrides the IP string that was read from the socket.
+	Used mainly by BungeeCord compatibility code. */
+	void SetIPString(const AString & a_IPString) { m_IPString = a_IPString; }
+	
 	cPlayer * GetPlayer(void) { return m_Player; }  // tolua_export
 
 	/** Returns the player's UUID, as used by the protocol, in the short form (no dashes) */
 	const AString & GetUUID(void) const { return m_UUID; }  // tolua_export
 	
-	void SetUUID(const AString & a_UUID) { m_UUID = a_UUID; }
+	/** Sets the player's UUID, as used by the protocol. Short UUID form (no dashes) is expected.
+	Used mainly by BungeeCord compatibility code - when authenticating is done on the BungeeCord server
+	and the results are passed to MCS running in offline mode. */
+	void SetUUID(const AString & a_UUID) { ASSERT(a_UUID.size() == 32); m_UUID = a_UUID; }
 
 	const Json::Value & GetProperties(void) const { return m_Properties; }
+	
+	/** Sets the player's properties, such as skin image and signature.
+	Used mainly by BungeeCord compatibility code - property querying is done on the BungeeCord server
+	and the results are passed to MCS running in offline mode. */
+	void SetProperties(const Json::Value & a_Properties) { m_Properties = a_Properties; }
 	
 	/** Generates an UUID based on the username stored for this client, and stores it in the m_UUID member.
 	This is used for the offline (non-auth) mode, when there's no UUID source.
@@ -122,73 +134,77 @@ public:
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
-	void SendAttachEntity        (const cEntity & a_Entity, const cEntity * a_Vehicle);
-	void SendBlockAction         (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
-	void SendBlockBreakAnim      (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
-	void SendBlockChange         (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
-	void SendBlockChanges        (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
-	void SendChat                (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
-	void SendChat                (const cCompositeChat & a_Message);
-	void SendChunkData           (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
-	void SendCollectEntity       (const cEntity & a_Entity, const cPlayer & a_Player);
-	void SendDestroyEntity       (const cEntity & a_Entity);
-	void SendDisconnect          (const AString & a_Reason);
-	void SendEditSign            (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendEntityEffect        (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
-	void SendEntityEquipment     (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
-	void SendEntityHeadLook      (const cEntity & a_Entity);
-	void SendEntityLook          (const cEntity & a_Entity);
-	void SendEntityMetadata      (const cEntity & a_Entity);
-	void SendEntityProperties    (const cEntity & a_Entity);
-	void SendEntityRelMove       (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntityRelMoveLook   (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
-	void SendEntityStatus        (const cEntity & a_Entity, char a_Status);
-	void SendEntityVelocity      (const cEntity & a_Entity);
-	void SendExplosion           (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
-	void SendGameMode            (eGameMode a_GameMode);
-	void SendHealth              (void);
-	void SendInventorySlot       (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendMapColumn           (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length);
-	void SendMapDecorators       (int a_ID, const cMapDecoratorList & a_Decorators);
-	void SendMapInfo             (int a_ID, unsigned int a_Scale);
-	void SendPaintingSpawn       (const cPainting & a_Painting);
-	void SendPickupSpawn         (const cPickup & a_Pickup);
-	void SendEntityAnimation     (const cEntity & a_Entity, char a_Animation);  // tolua_export
-	void SendParticleEffect      (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount);
-	void SendPlayerAbilities     (void);
-	void SendPlayerListItem      (const cPlayer & a_Player, bool a_IsOnline);
-	void SendPlayerMaxSpeed      (void);  ///< Informs the client of the maximum player speed (1.6.1+)
-	void SendPlayerMoveLook      (void);
-	void SendPlayerPosition      (void);
-	void SendPlayerSpawn         (const cPlayer & a_Player);
-	void SendPluginMessage       (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
-	void SendRemoveEntityEffect  (const cEntity & a_Entity, int a_EffectID);
-	void SendRespawn             (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	void SendExperience          (void);
-	void SendExperienceOrb       (const cExpOrb & a_ExpOrb);
-	void SendScoreboardObjective (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
-	void SendScoreUpdate         (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void SendDisplayObjective    (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
-	void SendSoundEffect         (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
-	void SendSoundParticleEffect (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
-	void SendSpawnFallingBlock   (const cFallingBlock & a_FallingBlock);
-	void SendSpawnMob            (const cMonster & a_Mob);
-	void SendSpawnObject         (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
-	void SendSpawnVehicle        (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
-	void SendStatistics          (const cStatManager & a_Manager);
-	void SendTabCompletionResults(const AStringVector & a_Results);
-	void SendTeleportEntity      (const cEntity & a_Entity);
-	void SendThunderbolt         (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendTimeUpdate          (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
-	void SendUnloadChunk         (int a_ChunkX, int a_ChunkZ);
-	void SendUpdateBlockEntity   (cBlockEntity & a_BlockEntity);
-	void SendUpdateSign          (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
-	void SendUseBed              (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendWeather             (eWeather a_Weather);
-	void SendWholeInventory      (const cWindow & a_Window);
-	void SendWindowClose         (const cWindow & a_Window);
-	void SendWindowOpen          (const cWindow & a_Window);
-	void SendWindowProperty      (const cWindow & a_Window, int a_Property, int a_Value);
+	void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle);
+	void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
+	void SendBlockBreakAnim             (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
+	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
+	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
+	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
+	void SendChat                       (const cCompositeChat & a_Message);
+	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer);
+	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
+	void SendDestroyEntity              (const cEntity & a_Entity);
+	void SendDisconnect                 (const AString & a_Reason);
+	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
+	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
+	void SendEntityHeadLook             (const cEntity & a_Entity);
+	void SendEntityLook                 (const cEntity & a_Entity);
+	void SendEntityMetadata             (const cEntity & a_Entity);
+	void SendEntityProperties           (const cEntity & a_Entity);
+	void SendEntityRelMove              (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
+	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
+	void SendEntityVelocity             (const cEntity & a_Entity);
+	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
+	void SendGameMode                   (eGameMode a_GameMode);
+	void SendHealth                     (void);
+	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
+	void SendMapColumn                  (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale);
+	void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale);
+	void SendMapInfo                    (int a_ID, unsigned int a_Scale);
+	void SendPaintingSpawn              (const cPainting & a_Painting);
+	void SendPickupSpawn                (const cPickup & a_Pickup);
+	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
+	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
+	void SendPlayerAbilities            (void);
+	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
+	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
+	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
+	void SendPlayerListUpdatePing       (const cPlayer & a_Player);
+	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
+	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
+	void SendPlayerMoveLook             (void);
+	void SendPlayerPosition             (void);
+	void SendPlayerSpawn                (const cPlayer & a_Player);
+	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
+	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
+	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
+	void SendExperience                 (void);
+	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
+	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
+	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
+	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
+	void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
+	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
+	void SendSpawnMob                   (const cMonster & a_Mob);
+	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
+	void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
+	void SendStatistics                 (const cStatManager & a_Manager);
+	void SendTabCompletionResults       (const AStringVector & a_Results);
+	void SendTeleportEntity             (const cEntity & a_Entity);
+	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
+	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
+	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
+	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	void SendUseBed                     (const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendWeather                    (eWeather a_Weather);
+	void SendWholeInventory             (const cWindow & a_Window);
+	void SendWindowClose                (const cWindow & a_Window);
+	void SendWindowOpen                 (const cWindow & a_Window);
+	void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value);
 
 	// tolua_begin
 	const AString & GetUsername(void) const;

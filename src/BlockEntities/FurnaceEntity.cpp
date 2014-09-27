@@ -5,8 +5,6 @@
 #include "../UI/Window.h"
 #include "../Entities/Player.h"
 #include "../Root.h"
-#include "../Chunk.h"
-#include "json/json.h"
 
 
 

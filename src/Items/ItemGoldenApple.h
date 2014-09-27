@@ -36,6 +36,7 @@ public:
 			a_Player->AddEntityEffect(cEntityEffect::effFireResistance, 6000, 0);
 		}
 
+		a_Player->GetInventory().RemoveOneEquippedItem();
 		return true;
 	}
 

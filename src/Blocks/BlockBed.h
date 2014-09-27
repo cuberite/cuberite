@@ -2,11 +2,13 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "ChunkInterface.h"
-#include "WorldInterface.h"
 #include "MetaRotator.h"
-#include "../Entities/Player.h"
+#include "Item.h"
 
+
+class cChunkInterface;
+class cPlayer;
+class cWorldInterface;
 
 
 

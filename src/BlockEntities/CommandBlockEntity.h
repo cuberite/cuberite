@@ -10,7 +10,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-
+#include "RedstonePoweredEntity.h"
 
 
 
@@ -27,7 +27,8 @@ namespace Json
 // tolua_begin
 
 class cCommandBlockEntity :
-	public cBlockEntity
+	public cBlockEntity,
+	public cRedstonePoweredEntity
 {
 	typedef cBlockEntity super;
 	
@@ -52,7 +53,7 @@ public:
 	// tolua_begin
 
 	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
-	void SetRedstonePower(bool a_IsPowered);
+	virtual void SetRedstonePower(bool a_IsPowered) override;
 
 	/// Sets the command block to execute a command in the next tick
 	void Activate(void);

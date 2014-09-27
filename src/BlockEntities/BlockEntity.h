@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "../ClientHandle.h"
-#include "../World.h"
 
 
 
@@ -13,8 +11,9 @@ namespace Json
 	class Value;
 };
 
+class cChunk;
 class cPlayer;
-class cPacket;
+class cWorld;
 
 
 

@@ -17,7 +17,7 @@
 #include "MobSpawner.h"
 #include "BoundingBox.h"
 #include "SetChunkData.h"
-
+#include "Blocks/ChunkInterface.h"
 #include "Entities/Pickup.h"
 
 #ifndef _WIN32
@@ -617,7 +617,7 @@ void cChunkMap::BroadcastEntityAnimation(const cEntity & a_Entity, char a_Animat
 
 
 
-void cChunkMap::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount, cClientHandle * a_Exclude)
+void cChunkMap::BroadcastParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount, cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
@@ -629,7 +629,7 @@ void cChunkMap::BroadcastParticleEffect(const AString & a_ParticleName, float a_
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount, a_Exclude);
+	Chunk->BroadcastParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount, a_Exclude);
 }
 
 
