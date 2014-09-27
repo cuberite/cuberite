@@ -92,6 +92,11 @@ public:
 				a_Pickups.Add(E_ITEM_IRON_DOOR);
 				break;
 			}
+			default:
+			{
+				ASSERT(!"Unhandled door type!");
+				break;
+			}
 		}
 	}
 
