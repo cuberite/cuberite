@@ -1148,10 +1148,18 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	FinishDigAnimation();
 
-	if (!m_Player->IsGameModeCreative() && (a_OldBlock == E_BLOCK_BEDROCK))
+	if (!m_Player->IsGameModeCreative())
 	{
-		Kick("You can't break a bedrock!");
-		return;
+		if (a_OldBlock == E_BLOCK_BEDROCK)
+		{
+			Kick("You can't break a bedrock!");
+			return;	
+		}
+		if (a_OldBlock == E_BLOCK_BARRIER)
+		{
+			Kick("You can't break a barrier!");
+			return;
+		}
 	}
 
 	cWorld * World = m_Player->GetWorld();
