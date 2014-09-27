@@ -1741,20 +1741,6 @@ void cClientHandle::HandleRespawn(void)
 
 
 
-void cClientHandle::HandleDisconnect(const AString & a_Reason)
-{
-	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
-
-	cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, a_Reason);
-
-	m_HasSentDC = true;
-	Destroy();
-}
-
-
-
-
-
 void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 {
 	if (a_KeepAliveID == m_PingID)
