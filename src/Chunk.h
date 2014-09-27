@@ -4,14 +4,11 @@
 #include "Entities/Entity.h"
 #include "ChunkDef.h"
 #include "ChunkData.h"
+#include "ChunkMap.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
 #include "Simulator/IncrementalRedstoneSimulator.h"
-
-#include "Blocks/GetHandlerCompileTimeTemplate.h"
-
-#include "ChunkMap.h"
 
 
 
@@ -33,7 +30,7 @@ class cChunkMap;
 class cBeaconEntity;
 class cBoundingBox;
 class cChestEntity;
-class cCHunkDataCallback;
+class cChunkDataCallback;
 class cCommandBlockEntity;
 class cDispenserEntity;
 class cFurnaceEntity;
@@ -71,6 +68,7 @@ typedef cItemCallback<cRedstonePoweredEntity> cRedstonePoweredCallback;
 class cChunk :
 	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
 {
+
 public:
 	/** Represents the presence state of the chunk */
 	enum ePresence
@@ -420,7 +418,7 @@ public:
 	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
-	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
+	cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return &m_IncrementalRedstoneSimulatorChunkData; }
 	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
 	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 
@@ -504,9 +502,7 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
-
-	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
-
+	cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData m_IncrementalRedstoneSimulatorChunkData;
 
 	/** Indicates if simulate-once blocks should be updated by the redstone simulator */
 	bool m_IsRedstoneDirty;

@@ -37,9 +37,9 @@ public:
 
 
 class cFluidSimulator :
-	public cSimulator<cChunk, cWorld>
+	public cSimulator
 {
-	typedef cSimulator<cChunk, cWorld> super;
+	typedef cSimulator super;
 	
 public:
 	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);

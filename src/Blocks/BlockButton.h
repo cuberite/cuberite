@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Chunk.h"
+#include "ChunkInterface.h"
 #include "MetaRotator.h"
 
 
