@@ -8,6 +8,11 @@
 
 #include "Simulator.inc"
 
-#pragma clang diagnostic ignored "-Wweak-template-vtables"
+#ifdef __clang__
+	#pragma clang diagnostic ignored "-Wweak-template-vtables"
+#endif  // __clang__
+
 template class cSimulator<cChunk, cWorld>;
+
+
 
