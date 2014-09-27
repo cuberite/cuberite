@@ -421,6 +421,7 @@ public:
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
 
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
+	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) { m_RedstoneSimulatorData = a_Data; }
 	bool IsRedstoneDirty(void) const { return m_IsRedstoneDirty; }
 	void SetIsRedstoneDirty(bool a_Flag) { m_IsRedstoneDirty = a_Flag; }
 

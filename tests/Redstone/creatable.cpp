@@ -99,6 +99,7 @@ class MockChunk
 {
 public:
 	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData() { return NULL; }
+	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) {}
 	bool IsRedstoneDirty() { return true; }
 	void SetIsRedstoneDirty(bool a_Param) {}
 	

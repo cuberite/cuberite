@@ -9,7 +9,7 @@
 	url = https://github.com/bearbin/transapi.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl
-	url = https://github.com/mc-server/polarssl
+	url = https://github.com/mc-server/polarssl.git
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
 	url = https://github.com/mc-server/SQLiteCpp.git
