@@ -294,6 +294,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SIGN_POST:             return new cBlockSignPostHandler        (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
 		case E_BLOCK_SPRUCE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_SPRUCE_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STAINED_GLASS:         return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_STAINED_GLASS_PANE:    return new cBlockGlassHandler           (a_BlockType);

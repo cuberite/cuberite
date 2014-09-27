@@ -55,7 +55,49 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem((m_BlockType == E_BLOCK_WOODEN_DOOR) ? E_ITEM_WOODEN_DOOR : E_ITEM_IRON_DOOR, 1, 0));
+		switch (m_BlockType)
+		{
+			case E_BLOCK_WOODEN_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_WOODEN_DOOR);
+				break;
+			}
+			case E_BLOCK_ACACIA_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_ACACIA_DOOR);
+				break;
+			}
+			case E_BLOCK_BIRCH_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_BIRCH_DOOR);
+				break;
+			}
+			case E_BLOCK_DARK_OAK_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_DARK_OAK_DOOR);
+				break;
+			}
+			case E_BLOCK_JUNGLE_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_JUNGLE_DOOR);
+				break;
+			}
+			case E_BLOCK_SPRUCE_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_SPRUCE_DOOR);
+				break;
+			}
+			case E_BLOCK_IRON_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_IRON_DOOR);
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unhandled door type!");
+				break;
+			}
+		}
 	}
 
 
