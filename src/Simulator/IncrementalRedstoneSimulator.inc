@@ -77,7 +77,7 @@ private:
 	};
 	
 	class cIncrementalRedstoneSimulatorChunkData :
-	cRedstoneSimulatorChunkData
+	public cRedstoneSimulatorChunkData
 	{
 	public:
 		/// Per-chunk data for the simulator, specified individual chunks to simulate
