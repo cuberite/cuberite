@@ -2815,7 +2815,7 @@ end
 		Globals =
 		{
 			Desc = [[
-				These functions are available directly, without a class instance. Any plugin cal call them at any
+				These functions are available directly, without a class instance. Any plugin can call them at any
 				time.
 			]],
 			Functions =
