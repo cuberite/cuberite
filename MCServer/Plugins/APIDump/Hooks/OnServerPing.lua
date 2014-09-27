@@ -17,7 +17,9 @@ return
 			{ Name = "Favicon", Type = "string", Notes = "The base64 encoded favicon to be displayed in the server list for compatible clients" },
 		},
 		Returns = [[
-			The plugin may return a boolean.
+			The plugin returns <code>res, ServerDescription, OnlinePlayersCount, MaxPlayersCount, Favicon</code>.
+			res is a boolean which stops other plugins being notified of the ping if it's set to true, and the others
+			are the same as the arguments, and if emitted change the values transmitted to the client. 
 		]],
 	},  -- HOOK_SERVER_PING
 }
