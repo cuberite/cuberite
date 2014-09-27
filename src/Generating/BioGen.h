@@ -285,18 +285,21 @@ protected:
 	/// The Voronoi map that decides biomes inside individual biome groups
 	cVoronoiMap m_VoronoiSmall;
 	
-	/// The noise used to distort the input X coord
-	cPerlinNoise m_DistortX;
-	
-	/// The noise used to distort the inupt Z coord
-	cPerlinNoise m_DistortZ;
-	
+	// The noises used for the distortion:
 	cNoise m_Noise1;
 	cNoise m_Noise2;
 	cNoise m_Noise3;
 	cNoise m_Noise4;
 	cNoise m_Noise5;
 	cNoise m_Noise6;
+
+	// Frequencies and amplitudes for the distortion noises:
+	float m_FreqX1, m_AmpX1;
+	float m_FreqX2, m_AmpX2;
+	float m_FreqX3, m_AmpX3;
+	float m_FreqZ1, m_AmpZ1;
+	float m_FreqZ2, m_AmpZ2;
+	float m_FreqZ3, m_AmpZ3;
 
 
 	// cBiomeGen overrides:

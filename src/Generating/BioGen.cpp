@@ -737,8 +737,6 @@ void cBioGenMultiStepMap::FreezeWaterBiomes(cChunkDef::BiomeMap & a_BiomeMap, co
 cBioGenTwoLevel::cBioGenTwoLevel(int a_Seed) :
 	m_VoronoiLarge(a_Seed + 1000),
 	m_VoronoiSmall(a_Seed + 2000),
-	m_DistortX(a_Seed + 3000),
-	m_DistortZ(a_Seed + 4000),
 	m_Noise1(a_Seed + 5001),
 	m_Noise2(a_Seed + 5002),
 	m_Noise3(a_Seed + 5003),
@@ -762,19 +760,17 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
 	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
 	{
-		int BlockX = BaseX + x * 4;
-		int BlockZ = BaseZ + z * 4;
-		float BlockXF = (float)(16 * BlockX) / 128;
-		float BlockZF = (float)(16 * BlockZ) / 128;
-		double NoiseX =  m_Noise1.CubicNoise2D(BlockXF / 16, BlockZF / 16);
-		NoiseX += 0.5  * m_Noise2.CubicNoise2D(BlockXF / 8,  BlockZF / 8);
-		NoiseX += 0.08 * m_Noise3.CubicNoise2D(BlockXF,      BlockZF);
-		double NoiseZ  = m_Noise4.CubicNoise2D(BlockXF / 16, BlockZF / 16);
-		NoiseZ += 0.5  * m_Noise5.CubicNoise2D(BlockXF / 8,  BlockZF / 8);
-		NoiseZ += 0.08 * m_Noise6.CubicNoise2D(BlockXF,      BlockZF);
+		float BlockX = BaseX + x * 4;
+		float BlockZ = BaseZ + z * 4;
+		double NoiseX = m_AmpX1 * m_Noise1.CubicNoise2D(BlockX * m_FreqX1, BlockZ * m_FreqX1);
+		NoiseX       += m_AmpX2 * m_Noise2.CubicNoise2D(BlockX * m_FreqX2, BlockZ * m_FreqX2);
+		NoiseX       += m_AmpX3 * m_Noise3.CubicNoise2D(BlockX * m_FreqX3, BlockZ * m_FreqX3);
+		double NoiseZ = m_AmpZ1 * m_Noise4.CubicNoise2D(BlockX * m_FreqZ1, BlockZ * m_FreqZ1);
+		NoiseZ       += m_AmpZ2 * m_Noise5.CubicNoise2D(BlockX * m_FreqZ2, BlockZ * m_FreqZ2);
+		NoiseZ       += m_AmpZ3 * m_Noise6.CubicNoise2D(BlockX * m_FreqZ3, BlockZ * m_FreqZ3);
 		
-		DistortX[4 * x][4 * z] = BlockX + (int)(64 * NoiseX);
-		DistortZ[4 * x][4 * z] = BlockZ + (int)(64 * NoiseZ);
+		DistortX[4 * x][4 * z] = (int)(BlockX + NoiseX);
+		DistortZ[4 * x][4 * z] = (int)(BlockZ + NoiseZ);
 	}
 	
 	LinearUpscale2DArrayInPlace<cChunkDef::Width + 1, cChunkDef::Width + 1, 4, 4>(&DistortX[0][0]);
@@ -915,30 +911,18 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 {
 	m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "TwoLevelLargeCellSize", 1024));
 	m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "TwoLevelSmallCellSize", 128));
-	m_DistortX.AddOctave(
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Freq", 0.01),
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Amp",  16)
-	);
-	m_DistortX.AddOctave(
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Freq", 0.005),
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Amp",  8)
-	);
-	m_DistortX.AddOctave(
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.0025),
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Amp",  4)
-	);
-	m_DistortZ.AddOctave(
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Freq", 0.01),
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Amp",  16)
-	);
-	m_DistortZ.AddOctave(
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Freq", 0.005),
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Amp",  8)
-	);
-	m_DistortZ.AddOctave(
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Freq", 0.0025),
-		(float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Amp",  4)
-	);
+	m_FreqX1 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Freq", 0.01);
+	m_AmpX1  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave1Amp",  80);
+	m_FreqX2 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Freq", 0.05);
+	m_AmpX2  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave2Amp",  20);
+	m_FreqX3 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Freq", 0.1),
+	m_AmpX3  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortXOctave3Amp",  8);
+	m_FreqZ1 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Freq", 0.01);
+	m_AmpZ1  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave1Amp",  80);
+	m_FreqZ2 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Freq", 0.05);
+	m_AmpZ2  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave2Amp",  20);
+	m_FreqZ3 = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Freq", 0.1);
+	m_AmpZ3  = (float)a_IniFile.GetValueSetF("Generator", "TwoLevelDistortZOctave3Amp",  8);
 }
 
 
