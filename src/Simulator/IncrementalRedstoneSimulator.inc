@@ -554,6 +554,11 @@ template <class ChunkType, class WorldType, template <BLOCKTYPE block> class Get
 void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, ChunkType * a_Chunk)
 {
 	m_RedstoneSimulatorChunkData = (cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
+	if (m_RedstoneSimulatorChunkData == NULL)
+	{
+		m_RedstoneSimulatorChunkData = new cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData();
+		a_Chunk->SetRedstoneChunkData(m_RedstoneSimulatorChunkData);
+	}
 	if (m_RedstoneSimulatorChunkData->m_ChunkData.empty() && ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_QueuedChunkData.empty())
 	{
 		return;
