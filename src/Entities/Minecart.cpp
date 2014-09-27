@@ -7,7 +7,6 @@
 
 #include "Globals.h"
 #include "Minecart.h"
-#include "../World.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "Player.h"
@@ -1107,7 +1106,8 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 
 cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
 	super(mpChest, a_X, a_Y, a_Z),
-	m_Contents(ContentsWidth, ContentsHeight)
+	m_Contents(ContentsWidth, ContentsHeight),
+	cEntityWindowOwner(this)
 {
 	m_Contents.AddListener(*this);
 }

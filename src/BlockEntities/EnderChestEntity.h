@@ -11,7 +11,7 @@
 // tolua_begin
 class cEnderChestEntity :
 	public cBlockEntity,
-	public cWindowOwner
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntity super;
 	

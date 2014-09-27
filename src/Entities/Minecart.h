@@ -10,6 +10,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "World.h"
 #include "../UI/WindowOwner.h"
 
 
@@ -111,7 +112,7 @@ protected:
 class cMinecartWithChest :
 	public cMinecart,
 	public cItemGrid::cListener,
-	public cWindowOwner
+	public cEntityWindowOwner
 {
 	typedef cMinecart super;
 	
