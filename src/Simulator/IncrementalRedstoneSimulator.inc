@@ -408,7 +408,12 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
 	// Checking only when a block is changed, as opposed to every tick, also improves performance
 
-	PoweredBlocksList & PoweredBlocks = ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks;
+	cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData * SimulatorChunkData = ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData());
+	if (SimulatorChunkData == NULL)
+	{
+		return;
+	}
+	PoweredBlocksList & PoweredBlocks = SimulatorChunkData->m_PoweredBlocks;
 	for (typename PoweredBlocksList::iterator itr = PoweredBlocks.begin(); itr != PoweredBlocks.end();)
 	{
 		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
