@@ -557,7 +557,7 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 	if (m_RedstoneSimulatorChunkData == NULL)
 	{
 		m_RedstoneSimulatorChunkData = new cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData();
-		a_Chunk->SetRedstoneData(m_RedstoneSimulatorChunkData);
+		a_Chunk->SetRedstoneSimulatorData(m_RedstoneSimulatorChunkData);
 	}
 	if (m_RedstoneSimulatorChunkData->m_ChunkData.empty() && ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_QueuedChunkData.empty())
 	{
