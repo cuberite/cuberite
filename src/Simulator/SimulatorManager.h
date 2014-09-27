@@ -37,10 +37,10 @@ public:
 	
 	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
 
-	void RegisterSimulator(cSimulator<cChunk, cWorld> * a_Simulator, int a_Rate);  // Takes ownership of the simulator object!
+	void RegisterSimulator(cSimulator * a_Simulator, int a_Rate);  // Takes ownership of the simulator object!
 
 protected:
-	typedef std::vector <std::pair<cSimulator<cChunk, cWorld> *, int> > cSimulators;
+	typedef std::vector <std::pair<cSimulator *, int> > cSimulators;
 	
 	cWorld & m_World;
 	cSimulators m_Simulators;

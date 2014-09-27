@@ -8,9 +8,9 @@
 
 
 class cRedstoneNoopSimulator :
-	public cRedstoneSimulator<cChunk, cWorld>
+	public cRedstoneSimulator
 {
-	typedef cRedstoneSimulator<cChunk, cWorld> super;
+	typedef cRedstoneSimulator super;
 public:
 
 	cRedstoneNoopSimulator(cWorld & a_World) :

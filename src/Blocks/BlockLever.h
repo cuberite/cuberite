@@ -2,6 +2,7 @@
 
 #include "BlockHandler.h"
 #include "MetaRotator.h"
+#include "WorldInterface.h"
 
 
 
