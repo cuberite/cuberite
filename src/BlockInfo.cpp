@@ -734,7 +734,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NEW_LOG             ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_DARK_OAK_WOOD_STAIRS ].m_PlaceSound = "dig.wood";
-	a_Info[E_BLOCK_SLIME_BLOCK         ].m_PlaceSound = "dig.slime"; // I hope it is named slime, it's definetly a new sound type though...
+	a_Info[E_BLOCK_SLIME_BLOCK         ].m_PlaceSound = "dig.slime";  // TODO: Check that this is the correct name
 	a_Info[E_BLOCK_BARRIER             ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_PlaceSound = "dig.metal";
 	a_Info[E_BLOCK_PRISMARINE_BLOCK    ].m_PlaceSound = "dig.stone";

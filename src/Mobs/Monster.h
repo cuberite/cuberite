@@ -25,7 +25,7 @@ class cMonster :
 	typedef cPawn super;
 public:
 
-	//Depreciated
+	// Deprecated
 	typedef eMonsterType eType;
 
 	enum eFamily
