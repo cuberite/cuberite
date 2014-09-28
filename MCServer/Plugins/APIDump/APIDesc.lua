@@ -2033,6 +2033,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				AddGroupToRank = { Params = "GroupName, RankName", Return = "bool", Notes = "Adds the specified group to the specified rank. Returns true on success, false on failure - if the group name or the rank name is not found." },
 				AddPermissionToGroup = { Params = "Permission, GroupName", Return = "bool", Notes = "Adds the specified permission to the specified group. Returns true on success, false on failure - if the group name is not found." },
 				AddRank = { Params = "RankName, MsgPrefix, MsgSuffix, MsgNameColorCode", Return = "", Notes = "Adds a new rank of the specified name and with the specified message visuals. Logs an info message and does nothing if the rank already exists." },
+				ClearPlayerRanks = { Params = "", Return = "", Notes = "Removes all player ranks from the database. Note that this doesn't change the cPlayer instances for the already connected players, you need to update all the instances manually." },
 				GetAllGroups = { Params = "", Return = "array-table of groups' names", Notes = "Returns an array-table containing the names of all the groups that are known to the manager." },
 				GetAllPermissions = { Params = "", Return = "array-table of permissions", Notes = "Returns an array-table containing all the permissions that are known to the manager." },
 				GetAllPlayers = { Params = "", Return = "array-table of playernames", Notes = "Returns the short uuids of all defined players." },

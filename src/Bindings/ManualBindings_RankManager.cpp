@@ -129,6 +129,27 @@ static int tolua_cRankManager_AddRank(lua_State * L)
 
 
 
+/** Binds cRankManager::ClearPlayerRanks */
+static int tolua_cRankManager_ClearPlayerRanks(lua_State * L)
+{
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Remove all players:
+	cRoot::Get()->GetRankManager().ClearPlayerRanks();
+	return 1;
+}
+
+
+
+
+
 /** Binds cRankManager::GetAllGroups */
 static int tolua_cRankManager_GetAllGroups(lua_State * L)
 {
@@ -1031,6 +1052,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "AddGroupToRank",            tolua_cRankManager_AddGroupToRank);
 		tolua_function(tolua_S, "AddPermissionToGroup",      tolua_cRankManager_AddPermissionToGroup);
 		tolua_function(tolua_S, "AddRank",                   tolua_cRankManager_AddRank);
+		tolua_function(tolua_S, "ClearPlayerRanks",          tolua_cRankManager_ClearPlayerRanks);
 		tolua_function(tolua_S, "GetAllGroups",              tolua_cRankManager_GetAllGroups);
 		tolua_function(tolua_S, "GetAllPermissions",         tolua_cRankManager_GetAllPermissions);
 		tolua_function(tolua_S, "GetAllPlayers",             tolua_cRankManager_GetAllPlayers);

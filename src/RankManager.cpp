@@ -1817,6 +1817,25 @@ bool cRankManager::SetDefaultRank(const AString & a_RankName)
 
 
 
+void cRankManager::ClearPlayerRanks(void)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try {
+		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank");
+		stmt.exec();
+	}
+	catch (SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove/clear all players: %s", __FUNCTION__, ex.what());
+	}
+}
+
+
+
+
+
 bool cRankManager::UpdatePlayerName(const AString & a_PlayerUUID, const AString & a_NewPlayerName)
 {
 	ASSERT(m_IsInitialized);
