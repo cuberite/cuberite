@@ -296,9 +296,6 @@ protected:
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	
 	
-	/** Writes an entire packet into the output stream. a_Packet is expected to start with the packet type; data length is prepended here. */
-	void WritePacket(cByteBuffer & a_Packet);
-
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 

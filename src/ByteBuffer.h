@@ -88,7 +88,6 @@ public:
 	bool WriteBEFloat        (float  a_Value);
 	bool WriteBEDouble       (double a_Value);
 	bool WriteBool           (bool   a_Value);
-	bool WriteBEUTF16String16(const AString & a_Value);  // string length as BE short, then string as UTF-16BE
 	bool WriteVarInt         (UInt32 a_Value);
 	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool WriteLEInt          (int a_Value);

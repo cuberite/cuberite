@@ -2217,20 +2217,6 @@ void cProtocol172::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol172::WritePacket(cByteBuffer & a_Packet)
-{
-	cCSLock Lock(m_CSPacket);
-	AString Pkt;
-	a_Packet.ReadAll(Pkt);
-	WriteVarInt((UInt32)Pkt.size());
-	SendData(Pkt.data(), Pkt.size());
-	Flush();
-}
-
-
-
-
-
 void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)

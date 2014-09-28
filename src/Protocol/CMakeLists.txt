@@ -8,11 +8,6 @@ SET (SRCS
 	Authenticator.cpp
 	ChunkDataSerializer.cpp
 	MojangAPI.cpp
-	Protocol125.cpp
-	Protocol132.cpp
-	Protocol14x.cpp
-	Protocol15x.cpp
-	Protocol16x.cpp
 	Protocol17x.cpp
 	Protocol18x.cpp
 	ProtocolRecognizer.cpp)
@@ -22,11 +17,6 @@ SET (HDRS
 	ChunkDataSerializer.h
 	MojangAPI.h
 	Protocol.h
-	Protocol125.h
-	Protocol132.h
-	Protocol14x.h
-	Protocol15x.h
-	Protocol16x.h
 	Protocol17x.h
 	Protocol18x.h
 	ProtocolRecognizer.h)

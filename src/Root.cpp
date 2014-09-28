@@ -42,7 +42,6 @@ cRoot* cRoot::s_Root = NULL;
 
 
 cRoot::cRoot(void) :
-	m_PrimaryServerVersion(cProtocolRecognizer::PROTO_VERSION_LATEST),
 	m_pDefaultWorld(NULL),
 	m_InputThread(NULL),
 	m_Server(NULL),
@@ -140,17 +139,6 @@ void cRoot::Start(void)
 			IniFile.AddHeaderComment(" This is the main server configuration");
 			IniFile.AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
 			IniFile.AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
-		}
-
-		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
-		if (m_PrimaryServerVersion == 0)
-		{
-			m_PrimaryServerVersion = cProtocolRecognizer::PROTO_VERSION_LATEST;
-		}
-		else
-		{
-			// Make a note in the log that the primary server version is explicitly set in the ini file
-			LOGINFO("Primary server version set explicitly to %d.", m_PrimaryServerVersion);
 		}
 
 		LOG("Starting server...");
