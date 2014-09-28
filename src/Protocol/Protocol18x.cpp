@@ -1713,6 +1713,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		{
 			UInt32 NumBytesRead = m_ReceivedData.GetReadableSpace();
 			m_ReceivedData.ReadVarInt(CompressedSize);
+			if (CompressedSize > PacketLen)
+			{
+				m_Client->Kick("Bad compression");
+				return;
+			}
 			if (CompressedSize > 0)
 			{
 				// Decompress the data:
