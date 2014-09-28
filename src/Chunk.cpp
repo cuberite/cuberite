@@ -92,7 +92,7 @@ cChunk::cChunk(
 	m_NeighborZP(a_NeighborZP),
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
-	m_RedstoneSimulatorData(NULL),
+	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
 	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != NULL)
