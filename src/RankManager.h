@@ -61,7 +61,7 @@ public:
 	AString GetPlayerRankName(const AString & a_PlayerUUID);
 	
 	/** Returns the last name that the specified player has.
-	If the player isn't in the database, this returns an empty string. */
+	An empty string is returned if the player isn't in the database. */
 	AString GetPlayerName(const AString & a_PlayerUUID);
 	
 	/** Returns the names of Groups that the specified player has assigned to them. */
