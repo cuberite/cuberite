@@ -79,10 +79,19 @@ public:
 	struct OreInfo
 	{
 		BLOCKTYPE  BlockType;  // The type of the nest.
-		NIBBLETYPE BlockMeta = 0;  // The block meta
+		NIBBLETYPE BlockMeta;  // The block meta
 		int        MaxHeight;  // The highest possible a nest can occur
 		int        NumNests;   // How many nests per chunk
 		int        NestSize;   // The amount of blocks a nest can have.
+
+		OreInfo() :
+			BlockType(0),
+			BlockMeta(0),
+			MaxHeight(0),
+			NumNests(0),
+			NestSize(0)
+		{
+		}
 	};
 
 	typedef std::vector<OreInfo> OreList;
