@@ -200,7 +200,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 		static const int Packet = 0xff;  // PACKET_DISCONNECT
 		SendData((const char *)&Packet, 1);  // WriteByte()
 
-		AString & UTF16 = UTF8ToRawBEUTF16(a_Reason.c_str(), a_Reason.length());
+		AString UTF16 = UTF8ToRawBEUTF16(a_Reason.c_str(), a_Reason.length());
 		static const short Size = htons((short)(UTF16.size() / 2));
 		SendData((const char *)&Size, 2);  // WriteShort()
 		SendData(UTF16.data(), UTF16.size()); // WriteString()
