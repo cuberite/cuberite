@@ -27,6 +27,11 @@ public:
 	{
 	}
 	~cIncrementalRedstoneSimulator();
+	
+	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
+	{
+		return new cIncrementalRedstoneSimulatorChunkData;
+	}
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, ChunkType * a_Chunk) override;
