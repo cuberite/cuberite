@@ -181,3 +181,23 @@ bool cEnderman::CheckLight()
 
 	return true;
 }
+
+
+
+
+
+void cEnderman::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	super::Tick(a_Dt, a_Chunk);
+
+	//TODO take damage in rain
+
+	//Take damage when touching water, drowning damage seems to be most appropriate
+	if (IsSwimming())
+	{
+		EventLosePlayer();
+		TakeDamage(dtDrowning, NULL, 1, 0);
+		//TODO teleport to a safe location
+	}
+
+}
