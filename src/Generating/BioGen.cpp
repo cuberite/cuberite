@@ -760,8 +760,8 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
 	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
 	{
-		float BlockX = BaseX + x * 4;
-		float BlockZ = BaseZ + z * 4;
+		float BlockX = (float)BaseX + x * 4;
+		float BlockZ = (float)BaseZ + z * 4;
 		double NoiseX = m_AmpX1 * m_Noise1.CubicNoise2D(BlockX * m_FreqX1, BlockZ * m_FreqX1);
 		NoiseX       += m_AmpX2 * m_Noise2.CubicNoise2D(BlockX * m_FreqX2, BlockZ * m_FreqX2);
 		NoiseX       += m_AmpX3 * m_Noise3.CubicNoise2D(BlockX * m_FreqX3, BlockZ * m_FreqX3);
@@ -930,6 +930,348 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cBioGenPerlinoi:
+
+class cBioGenPerlinoi :
+	public cBiomeGen
+{
+	typedef cBiomeGen super;
+
+public:
+	typedef NOISE_DATATYPE CoordMap[17][17];
+
+	cBioGenPerlinoi(int a_Seed) :
+		m_VoronoiSmall(a_Seed + 100),
+		m_VoronoiLarge(a_Seed + 110),
+		m_OceanNoise(a_Seed + 120),
+		m_RiverNoise(a_Seed + 130),
+		m_DistortNoiseX(a_Seed + 300),
+		m_DistortNoiseZ(a_Seed + 400)
+	{
+	}
+
+
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override
+	{
+		// Calculate the distorted coords:
+		CoordMap DistortedX;
+		CoordMap DistortedZ;
+		CalcDistortion(a_ChunkX, a_ChunkZ, DistortedX, DistortedZ);
+
+		// Calculate the ocean noisemap:
+		NOISE_DATATYPE OceanMap[5 * 5];
+		NOISE_DATATYPE Workspace[5 * 5];
+		m_OceanNoise.Generate2D(OceanMap, 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		NOISE_DATATYPE OceanMapFull[17 * 17];
+		LinearUpscale2DArray(OceanMap, 5, 5, OceanMapFull, 4, 4);
+
+		// Calculate the river noisemap (using ocean's workspace):
+		m_RiverNoise.Generate2D(OceanMap, 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		NOISE_DATATYPE RiverMapFull[17 * 17];
+		LinearUpscale2DArray(OceanMap, 5, 5, RiverMapFull, 4, 4);
+
+		// Apply distortion to each block coord, then query the voronoi maps for biome group and biome index and choose biome based on that:
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int BaseX = a_ChunkX * cChunkDef::Width + x;
+			for (int z = 0; z < cChunkDef::Width; z++)
+			{
+				// Test the ocean:
+				NOISE_DATATYPE OceanVal = OceanMapFull[x + 17 * z];
+				if (OceanVal < m_OceanThreshold)
+				{
+					// Below the ocean threshold, this is an ocean, deep ocean or mushroom
+					cChunkDef::SetBiome(a_BiomeMap, x, z, GetOceanBiome(OceanVal));
+					continue;
+				}
+
+				// Query the biomes for the current small voronoi cell:
+				int BaseZ = a_ChunkZ * cChunkDef::Width + z;
+				int QueryX = BaseX + DistortedX[z][x], QueryZ = BaseZ + DistortedZ[z][x];
+				int SeedX, SeedZ, SeedX2, SeedZ2;
+				m_VoronoiSmall.FindNearestSeeds(QueryX, QueryZ, SeedX, SeedZ, SeedX2, SeedZ2);
+				EMCSBiome InnerBiome, OuterBiome;
+				GetSmallCellBiomes(SeedX, SeedZ, InnerBiome, OuterBiome);
+
+				// Apply river and beach:
+				NOISE_DATATYPE RiverVal = RiverMapFull[x + 17 * z];
+				if (std::abs(RiverVal) < m_RiverThreshold)
+				{
+					cChunkDef::SetBiome(a_BiomeMap, x, z, IsBiomeVeryCold(OuterBiome) ? biFrozenRiver : biRiver);
+					continue;
+				}
+				if (OceanVal < m_BeachThreshold)
+				{
+					// This is too close to the ocean, make it a beach corresponding to the biome:
+					cChunkDef::SetBiome(a_BiomeMap, x, z, GetBeachBiome(OuterBiome));
+					continue;
+				}
+
+				// Set the voronoi cell biome:
+				int Dist  = DistanceSq(QueryX, QueryZ, SeedX, SeedZ);
+				int Dist2 = DistanceSq(QueryX, QueryZ, SeedX2, SeedZ2);
+				if (Dist < Dist2 / 4)
+				{
+					cChunkDef::SetBiome(a_BiomeMap, x, z, InnerBiome);
+				}
+				else
+				{
+					cChunkDef::SetBiome(a_BiomeMap, x, z, OuterBiome);
+				}
+			}  // for x
+		}  // for z
+	}
+
+
+	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override
+	{
+		m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiSmallCellSize", 128));
+		m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiLargeCellSize", 1024));
+		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq1", 0.005f), 1);
+		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq2", 0.1f), 0.1);
+		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq3", 0.5f), 0.01);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq1", 0.015f), 1);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq2", 0.05f), 0.1);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq3", 0.25f), 0.01);
+		m_RiverThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverThreshold",           0.02);
+		m_BeachThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiBeachThreshold",          -0.08);
+		m_OceanThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanThreshold",          -0.1);
+		m_DeepOceanThreshold      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDeepOceanThreshold",      -0.5);
+		m_MushroomShoreThreshold  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiMushroomShoreThreshold",  -1.2);
+		m_MushroomIslandThreshold = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiMushroomIslandThreshold", -1.25);
+
+		NOISE_DATATYPE DistortFreq1 = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortFreq1", 0.01);
+		NOISE_DATATYPE DistortAmp1  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortAmp1",  80);
+		NOISE_DATATYPE DistortFreq2 = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortFreq2", 0.05);
+		NOISE_DATATYPE DistortAmp2  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortAmp2",  20);
+		NOISE_DATATYPE DistortFreq3 = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortFreq3", 0.1);
+		NOISE_DATATYPE DistortAmp3  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortAmp3",  8);
+		m_DistortNoiseX.AddOctave(DistortFreq1, DistortAmp1);
+		m_DistortNoiseX.AddOctave(DistortFreq2, DistortAmp2);
+		m_DistortNoiseX.AddOctave(DistortFreq3, DistortAmp3);
+		m_DistortNoiseZ.AddOctave(DistortFreq1, DistortAmp1);
+		m_DistortNoiseZ.AddOctave(DistortFreq2, DistortAmp2);
+		m_DistortNoiseZ.AddOctave(DistortFreq3, DistortAmp3);
+	}
+
+protected:
+
+	/** The Voronoi map producing individual biome cells. */
+	cVoronoiMap m_VoronoiSmall;
+
+	/** The Voronoi map producing the groups of related biomes. */
+	cVoronoiMap m_VoronoiLarge;
+
+	/** The Perlin noise determining the locations of oceans, landmasses and mushroom islands. */
+	cPerlinNoise m_OceanNoise;
+
+	/** The Perlin noise determining the locations of rivers within landmasses. */
+	cPerlinNoise m_RiverNoise;
+
+	/** Cached values of the small seed biomes (for GetSmallCellBiomes()).*/
+	int m_LastSmallSeedX, m_LastSmallSeedZ;
+	EMCSBiome m_LastSmallInnerBiome, m_LastSmallOuterBiome;
+
+	/** The threshold for m_OceanNoise at which the biomes turn into beaches. */
+	NOISE_DATATYPE m_BeachThreshold;
+
+	/** The threshold for m_OceanNoise at which the biomes turn into ocean. */
+	NOISE_DATATYPE m_OceanThreshold;
+
+	/** The threshold for m_OceanNoise at which the biomes turn into deep ocean. */
+	NOISE_DATATYPE m_DeepOceanThreshold;
+
+	/** The threshold for m_OceanNoise at which the biomes turn into mushroom shore. */
+	NOISE_DATATYPE m_MushroomShoreThreshold;
+
+	/** The threshold for m_OceanNoise at which the biomes turn into mushroom island. */
+	NOISE_DATATYPE m_MushroomIslandThreshold;
+
+	/** The threshold around zero for m_RiverNoise at which the biomes turn into river / frozen river. */
+	NOISE_DATATYPE m_RiverThreshold;
+
+	/** Noises for the distortion. */
+	cPerlinNoise m_DistortNoiseX, m_DistortNoiseZ;
+
+
+	EMCSBiome GetOceanBiome(NOISE_DATATYPE a_OceanNoiseVal)
+	{
+		if (a_OceanNoiseVal < m_MushroomIslandThreshold)
+		{
+			return biMushroomIsland;
+		}
+		if (a_OceanNoiseVal < m_MushroomShoreThreshold)
+		{
+			return biMushroomShore;
+		}
+		if (a_OceanNoiseVal < m_DeepOceanThreshold)
+		{
+			return biDeepOcean;
+		}
+		return biOcean;
+	}
+
+
+	/** Calculates each item in a_DistortedX and a_DistortedZ as the block coords for the appropriate block, plus distortion. */
+	void CalcDistortion(int a_ChunkX, int a_ChunkZ, CoordMap & a_DistortedX, CoordMap & a_DistortedZ)
+	{
+		NOISE_DATATYPE DistX[5][5];
+		NOISE_DATATYPE DistZ[5][5];
+		NOISE_DATATYPE Workspace[5 * 5];
+		m_DistortNoiseX.Generate2D(&(DistX[0][0]), 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		m_DistortNoiseZ.Generate2D(&(DistZ[0][0]), 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		for (int z = 0; z <= 4; z++)
+		{
+			NOISE_DATATYPE BlockZ = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z * 4);
+			for (int x = 0; x <= 4; x++)
+			{
+				NOISE_DATATYPE BlockX = (NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x * 4);
+				DistX[z][x] += BlockX;
+				DistZ[z][x] += BlockZ;
+			}  // for z
+		}  // for x
+
+		LinearUpscale2DArray(&(DistX[0][0]), 5, 5, &(a_DistortedX[0][0]), 4, 4);
+		LinearUpscale2DArray(&(DistZ[0][0]), 5, 5, &(a_DistortedZ[0][0]), 4, 4);
+	}
+
+
+	/** Calculates the biomes for the specified small voronoi cell. Caches the last results to speed up re-query. */
+	void GetSmallCellBiomes(int a_SeedX, int a_SeedZ, EMCSBiome & a_InnerBiome, EMCSBiome & a_OuterBiome)
+	{
+		// If the seed is the same as the last time, return the precalculated values:
+		if ((m_LastSmallSeedX == a_SeedX) && (m_LastSmallSeedZ == a_SeedZ))
+		{
+			a_InnerBiome = m_LastSmallInnerBiome;
+			a_OuterBiome = m_LastSmallOuterBiome;
+			return;
+		}
+
+		// TODO: Move this into settings
+		struct BiomeLevels
+		{
+			EMCSBiome InnerBiome;
+			EMCSBiome OuterBiome;
+		} ;
+
+		static BiomeLevels bgFrozen[] =
+		{
+			{ biIcePlains,         biIcePlains, },
+			{ biIceMountains,      biIceMountains, },
+			{ biFrozenOcean,       biFrozenRiver, },
+			{ biColdTaiga,         biColdTaiga, },
+			{ biColdTaigaHills,    biColdTaigaHills, },
+			{ biColdTaigaM,        biColdTaigaM, },
+			{ biIcePlainsSpikes,   biIcePlainsSpikes, },
+			{ biExtremeHills,      biExtremeHillsEdge, },
+			{ biExtremeHillsPlus,  biExtremeHillsEdge, },
+			{ biExtremeHillsPlusM, biExtremeHillsPlusM, },
+		} ;
+		static BiomeLevels bgTemperate[] =
+		{
+			{ biBirchForestHills,  biBirchForest, },
+			{ biBirchForest,       biBirchForest, },
+			{ biBirchForestHillsM, biBirchForestM, },
+			{ biBirchForestM,      biBirchForestM, },
+			{ biForest,            biForestHills, },
+			{ biFlowerForest,      biFlowerForest, },
+			{ biRoofedForest,      biForest, },
+			{ biRoofedForest,      biRoofedForest, },
+			{ biRoofedForestM,     biForest, },
+			{ biPlains,            biPlains, },
+			{ biSunflowerPlains,   biSunflowerPlains, },
+			{ biSwampland,         biSwampland, },
+			{ biSwamplandM,        biSwamplandM, },
+		} ;
+		static BiomeLevels bgWarm[] =
+		{
+			{ biDesertHills,    biDesert, },
+			{ biDesert,         biDesert, },
+			{ biDesertM,        biDesertM, },
+			{ biSavannaPlateau, biSavanna, },
+			{ biSavanna,        biSavanna, },
+			{ biSavannaM,       biSavannaM, },
+		} ;
+		static BiomeLevels bgMesa[] =
+		{
+			{ biMesaPlateau,    biMesa, },
+			{ biMesaPlateauF,   biMesa, },
+			{ biMesaPlateauFM,  biMesa, },
+			{ biMesaPlateauM,   biMesa, },
+			{ biMesaBryce,      biMesaBryce, },
+			{ biSavanna,        biSavanna, },
+			{ biSavannaPlateau, biSavanna, },
+		} ;
+		static BiomeLevels bgConifers[] =
+		{
+			{ biTaiga,                biTaiga, },
+			{ biTaigaM,               biTaigaM, },
+			{ biMegaTaiga,            biMegaTaiga, },
+			{ biMegaSpruceTaiga,      biMegaSpruceTaiga, },
+			{ biMegaSpruceTaigaHills, biMegaSpruceTaiga, }
+		} ;
+		static BiomeLevels bgDenseTrees[] =
+		{
+			{ biJungleHills, biJungle, },
+			{ biJungle, biJungleEdge, },
+			{ biJungleM, biJungleEdgeM, },
+		} ;
+		static struct
+		{
+			BiomeLevels * Biomes;
+			size_t        Count;
+		} BiomeGroups[] =
+		{
+			{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
+			{ bgFrozen,     ARRAYCOUNT(bgFrozen), },
+			{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
+			{ bgTemperate,  ARRAYCOUNT(bgTemperate), },
+			{ bgConifers,   ARRAYCOUNT(bgConifers), },
+			{ bgConifers,   ARRAYCOUNT(bgConifers), },
+			{ bgWarm,       ARRAYCOUNT(bgWarm), },
+			{ bgWarm,       ARRAYCOUNT(bgWarm), },
+			{ bgMesa,       ARRAYCOUNT(bgMesa), },
+			{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
+		} ;
+		size_t Group = (m_VoronoiLarge.GetValueAt(a_SeedX, a_SeedZ) / 7) % ARRAYCOUNT(BiomeGroups);
+		size_t Index = (m_VoronoiSmall.GetValueAt(a_SeedX, a_SeedZ) / 7) % BiomeGroups[Group].Count;
+
+		a_InnerBiome = BiomeGroups[Group].Biomes[Index].InnerBiome;
+		a_OuterBiome = BiomeGroups[Group].Biomes[Index].OuterBiome;
+		m_LastSmallSeedX = a_SeedX;
+		m_LastSmallSeedZ = a_SeedZ;
+		m_LastSmallInnerBiome = a_InnerBiome;
+		m_LastSmallOuterBiome = a_OuterBiome;
+	}
+
+
+	/** Returns the square of the 2D distance between the two points */
+	int DistanceSq(int a_X1, int a_Y1, int a_X2, int a_Y2)
+	{
+		return (a_X1 - a_X2) * (a_X1 - a_X2) + (a_Y1 - a_Y2) * (a_Y1 - a_Y2);
+	}
+
+
+	/** Returns the biome to use for a beach based on the specified parent biome. */
+	EMCSBiome GetBeachBiome(EMCSBiome a_BaseBiome)
+	{
+		if (IsBiomeVeryCold(a_BaseBiome))
+		{
+			return biColdBeach;
+		}
+		else if (IsBiomeCold(a_BaseBiome))
+		{
+			return biStoneBeach;
+		}
+		return biBeach;
+	}
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cBiomeGen:
 
 cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
@@ -960,6 +1302,10 @@ cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a
 	else if (NoCaseCompare(BiomeGenName, "distortedvoronoi") == 0)
 	{
 		res = new cBioGenDistortedVoronoi(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "perlinoi") == 0)
+	{
+		res = new cBioGenPerlinoi(a_Seed);
 	}
 	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
 	{
