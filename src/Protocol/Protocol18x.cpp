@@ -989,7 +989,10 @@ void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & 
 	
 	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
-	Pkt.WriteVarInt((UInt32)a_Message.size());
+	if (a_Channel.substr(0, 3) == "MC|")
+	{
+		Pkt.WriteVarInt((UInt32)a_Message.size());
+	}
 	Pkt.WriteBuf(a_Message.data(), a_Message.size());
 }
 
@@ -2321,12 +2324,18 @@ void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, DataLen);
 	AString Data;
-	if (!a_ByteBuffer.ReadString(Data, DataLen))
+	if (Channel.substr(0, 3) == "MC|")
 	{
-		return;
+		// Vanilla sends the payload length within the payload itself, so skip it:
+		HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, DataLen);
+		if (DataLen != a_ByteBuffer.GetReadableSpace() - 1)
+		{
+			ASSERT(!"Bad plugin message payload length");
+			return;
+		}
 	}
+	a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1);  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
