@@ -975,7 +975,7 @@ static int tolua_cRankManager_SetDefaultRank(lua_State * L)
 	
 	// Set the rank, return the result:
 	S.Push(cRoot::Get()->GetRankManager().SetDefaultRank(RankName));
-	return 0;
+	return 1;
 }
 
 
