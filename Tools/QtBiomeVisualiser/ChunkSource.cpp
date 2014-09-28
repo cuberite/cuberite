@@ -121,7 +121,7 @@ public:
 static void biomesToImage(cChunkDef::BiomeMap & a_Biomes, Chunk::Image & a_Image)
 {
 	// Make sure the two arrays are of the same size, compile-time.
-	// Note that a_Image is actually 4 items per pixel, so the array is 4 times bigger:
+	// Note that a_Image is actually 4 items per pixel, so the array count is 4 times bigger:
 	static const char Check1[4 * ARRAYCOUNT(a_Biomes) - ARRAYCOUNT(a_Image)      + 1] = {};
 	static const char Check2[ARRAYCOUNT(a_Image)      - 4 * ARRAYCOUNT(a_Biomes) + 1] = {};
 
