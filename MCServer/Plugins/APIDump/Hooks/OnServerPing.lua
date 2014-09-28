@@ -20,5 +20,31 @@ return
 			The plugin can return whether to continue processing of the hook with other plugins, the server description to
 			be displayed to the client, the currently online players, the player cap and the base64/png favicon data, in that order.
 		]],
+		CodeExamples = {
+			{
+				Title = "Change information returned to the player",
+				Desc = "Tells the client that the server description is 'test', there are one more players online than there actually are, and that the player cap is zero. It also changes the favicon data.",
+				Code = [[
+function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers, Favicon)
+	-- Change Server Description
+	ServerDescription = "Test"
+
+	-- Change online / max players
+	OnlinePlayers = OnlinePlayers + 1
+	MaxPlayers = 0
+
+	-- Change favicon
+	if (cFile:IsFile("my-favicon.png")) then
+		local FaviconData = cFile:ReadWholeFile("my-favicon.png")
+		if (FaviconData != "") then
+			Favicon = Base64Encode(FaviconData)
+		end
+	end
+
+	return false, ServerDescription, OnlinePlayers, MaxPlayers, Favicon
+end				
+				]],
+			},
+		},
 	},  -- HOOK_SERVER_PING
 }
