@@ -1106,8 +1106,8 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 
 cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
 	super(mpChest, a_X, a_Y, a_Z),
-	m_Contents(ContentsWidth, ContentsHeight),
-	cEntityWindowOwner(this)
+	cEntityWindowOwner(this),
+	m_Contents(ContentsWidth, ContentsHeight)
 {
 	m_Contents.AddListener(*this);
 }

@@ -36,8 +36,8 @@ public:
 		cWorld * a_World                            // Optional world to assign to the entity
 	) :
 		super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, a_World),
-		m_Contents(a_ItemGridWidth, a_ItemGridHeight),
-		cBlockEntityWindowOwner(this)
+		cBlockEntityWindowOwner(this),
+		m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 	{
 		m_Contents.AddListener(*this);
 	}
