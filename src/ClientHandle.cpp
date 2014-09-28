@@ -1153,7 +1153,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		if (a_OldBlock == E_BLOCK_BEDROCK)
 		{
 			Kick("You can't break a bedrock!");
-			return;	
+			return;
 		}
 		if (a_OldBlock == E_BLOCK_BARRIER)
 		{
