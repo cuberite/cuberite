@@ -78,10 +78,11 @@ class cStructGenOreNests :
 public:
 	struct OreInfo
 	{
-		BLOCKTYPE BlockType;  // The type of the nest.
-		int       MaxHeight;  // The highest possible a nest can occur
-		int       NumNests;   // How many nests per chunk
-		int       NestSize;   // The amount of blocks a nest can have.
+		BLOCKTYPE  BlockType;  // The type of the nest.
+		NIBBLETYPE BlockMeta = 0;  // The block meta
+		int        MaxHeight;  // The highest possible a nest can occur
+		int        NumNests;   // How many nests per chunk
+		int        NestSize;   // The amount of blocks a nest can have.
 	};
 
 	typedef std::vector<OreInfo> OreList;
@@ -103,7 +104,7 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	
-	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq);
+	void GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, NIBBLETYPE a_BlockMeta, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, cChunkDesc::BlockNibbleBytes & a_BlockMetas, int a_Seq);
 } ;
 
 
