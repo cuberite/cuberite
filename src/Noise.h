@@ -104,6 +104,10 @@ public:
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
 		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Z direction
 	) const;
+
+
+	/** Calculates the noise's value at the specified coords. */
+	NOISE_DATATYPE GetValueAt(NOISE_DATATYPE a_PosX, NOISE_DATATYPE a_PosY) const;
 	
 protected:
 	typedef NOISE_DATATYPE Workspace1D[4];
@@ -176,6 +180,10 @@ public:
 		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
 		NOISE_DATATYPE * a_Workspace = NULL              ///< Workspace that this function can use and trash
 	) const;
+
+
+	/** Retrieves a single value from the noise, at the specified coords. */
+	NOISE_DATATYPE GetValueAt(NOISE_DATATYPE a_PosX, NOISE_DATATYPE a_PosY) const;
 	
 protected:
 	class cOctave
