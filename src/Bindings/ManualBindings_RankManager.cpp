@@ -183,6 +183,33 @@ static int tolua_cRankManager_GetAllPermissions(lua_State * L)
 
 
 
+/** Binds cRankManager::GetAllPlayers */
+static int tolua_cRankManager_GetAllPlayers(lua_State * L)
+{
+	// Function signature:
+	// cRankManager:GetAllPlayers() -> arraytable of Player UUID's
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the player uuid's:
+	AStringVector Players = cRoot::Get()->GetRankManager().GetAllPlayers();
+
+	// Push the results:
+	S.Push(Players);
+	return 1;
+}
+
+
+
+
+
 /** Binds cRankManager::GetAllRanks */
 static int tolua_cRankManager_GetAllRanks(lua_State * L)
 {
@@ -393,6 +420,38 @@ static int tolua_cRankManager_GetPlayerRankName(lua_State * L)
 	
 	// Push the result:
 	S.Push(RankName);
+	return 1;
+}
+
+
+
+
+
+/** Binds cRankManager::GetPlayerName */
+static int tolua_cRankManager_GetPlayerName(lua_State * L)
+{
+	// Function signature:
+	// cRankManager:GetPlayerName(PlayerUUID) -> string
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cRankManager") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	AString PlayerUUID;
+	S.GetStackValue(2, PlayerUUID);
+
+	// Get the player name:
+	AString PlayerName = cRoot::Get()->GetRankManager().GetPlayerName(PlayerUUID);
+
+	// Push the result:
+	S.Push(PlayerName);
 	return 1;
 }
 
@@ -974,6 +1033,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "AddRank",                   tolua_cRankManager_AddRank);
 		tolua_function(tolua_S, "GetAllGroups",              tolua_cRankManager_GetAllGroups);
 		tolua_function(tolua_S, "GetAllPermissions",         tolua_cRankManager_GetAllPermissions);
+		tolua_function(tolua_S, "GetAllPlayers",             tolua_cRankManager_GetAllPlayers);
 		tolua_function(tolua_S, "GetAllRanks",               tolua_cRankManager_GetAllRanks);
 		tolua_function(tolua_S, "GetDefaultRank",            tolua_cRankManager_GetDefaultRank);
 		tolua_function(tolua_S, "GetGroupPermissions",       tolua_cRankManager_GetGroupPermissions);
@@ -981,6 +1041,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 		tolua_function(tolua_S, "GetPlayerMsgVisuals",       tolua_cRankManager_GetPlayerMsgVisuals);
 		tolua_function(tolua_S, "GetPlayerPermissions",      tolua_cRankManager_GetPlayerPermissions);
 		tolua_function(tolua_S, "GetPlayerRankName",         tolua_cRankManager_GetPlayerRankName);
+		tolua_function(tolua_S, "GetPlayerName",             tolua_cRankManager_GetPlayerName);
 		tolua_function(tolua_S, "GetRankGroups",             tolua_cRankManager_GetRankGroups);
 		tolua_function(tolua_S, "GetRankPermissions",        tolua_cRankManager_GetRankPermissions);
 		tolua_function(tolua_S, "GetRankVisuals",            tolua_cRankManager_GetRankVisuals);

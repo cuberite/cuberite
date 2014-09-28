@@ -2140,6 +2140,11 @@ void cPlayer::LoadRank(void)
 	{
 		m_Rank = RankMgr.GetDefaultRank();
 	}
+	else
+	{
+		// Update the name:
+		RankMgr.UpdatePlayerName(m_UUID, m_PlayerName);
+	}
 	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
 	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
 
