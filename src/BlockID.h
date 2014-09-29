@@ -652,6 +652,12 @@ enum
 	E_META_STAINED_GLASS_PANE_RED        = 14,
 	E_META_STAINED_GLASS_PANE_BLACK      = 15,
 
+	// E_BLOCK_STONE metas:
+	E_META_STONE                   = 0,
+	E_META_STONE_GRANITE           = 1,
+	E_META_STONE_DIORITE           = 3,
+	E_META_STONE_ANDESITE          = 5,
+
 	// E_BLOCK_STONE_SLAB metas:
 	E_META_STONE_SLAB_STONE        = 0,
 	E_META_STONE_SLAB_SANDSTONE    = 1,

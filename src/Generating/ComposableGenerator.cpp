@@ -428,6 +428,33 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			GravelVein.NestSize = 32;
 			Ores.push_back(GravelVein);
 
+			// Granite vein
+			cStructGenOreNests::OreInfo GraniteVein;
+			GraniteVein.BlockType = E_BLOCK_STONE;
+			GraniteVein.BlockMeta = 1;
+			GraniteVein.MaxHeight = 127;
+			GraniteVein.NumNests = 20;
+			GraniteVein.NestSize = 32;
+			Ores.push_back(GraniteVein);
+
+			// Diorite vein
+			cStructGenOreNests::OreInfo DioriteVein;
+			DioriteVein.BlockType = E_BLOCK_STONE;
+			DioriteVein.BlockMeta = 3;
+			DioriteVein.MaxHeight = 127;
+			DioriteVein.NumNests = 20;
+			DioriteVein.NestSize = 32;
+			Ores.push_back(DioriteVein);
+
+			// Andesite vein
+			cStructGenOreNests::OreInfo AndesiteVein;
+			AndesiteVein.BlockType = E_BLOCK_STONE;
+			AndesiteVein.BlockMeta = 5;
+			AndesiteVein.MaxHeight = 127;
+			AndesiteVein.NumNests = 20;
+			AndesiteVein.NestSize = 32;
+			Ores.push_back(AndesiteVein);
+
 			m_FinishGens.push_back(new cStructGenOreNests(Seed, Ores, E_BLOCK_STONE));
 		}
 		else if (NoCaseCompare(*itr, "NetherClumpFoliage") == 0)

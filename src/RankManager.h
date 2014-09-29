@@ -60,6 +60,10 @@ public:
 	If the player has no rank assigned, returns an empty string (NOT the default rank). */
 	AString GetPlayerRankName(const AString & a_PlayerUUID);
 	
+	/** Returns the last name that the specified player has.
+	An empty string is returned if the player isn't in the database. */
+	AString GetPlayerName(const AString & a_PlayerUUID);
+	
 	/** Returns the names of Groups that the specified player has assigned to them. */
 	AStringVector GetPlayerGroups(const AString & a_PlayerUUID);
 	
@@ -78,6 +82,9 @@ public:
 	/** Returns all permissions that the specified rank has assigned to it, through all its groups.
 	Returns an empty vector if the rank doesn't exist. Any non-existent groups are ignored. */
 	AStringVector GetRankPermissions(const AString & a_RankName);
+	
+	/** Returns the short uuids of all defined players. */
+	AStringVector GetAllPlayerUUIDs(void);
 	
 	/** Returns the names of all defined ranks. */
 	AStringVector GetAllRanks(void);
@@ -210,6 +217,13 @@ public:
 
 	/** Returns the name of the default rank. */
 	const AString & GetDefaultRank(void) const { return m_DefaultRank; }
+
+	/** Removes all player ranks from the database. Note that this doesn't change the cPlayer instances
+	for the already connected players, you need to update all the instances manually. */
+	void ClearPlayerRanks(void);
+	
+	/** Updates the playername that is saved with this uuid. Returns false if a error occurred */
+	bool UpdatePlayerName(const AString & a_PlayerUUID, const AString & a_NewPlayerName);
 
 protected:
 
