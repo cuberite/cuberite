@@ -671,7 +671,7 @@ AStringVector cRankManager::GetAllPlayerUUIDs(void)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB, "SELECT PlayerUUID FROM PlayerRank");
+		SQLite::Statement stmt(m_DB, "SELECT PlayerUUID FROM PlayerRank ORDER BY PlayerName COLLATE NOCASE");
 		while (stmt.executeStep())
 		{
 			res.push_back(stmt.getColumn(0).getText());

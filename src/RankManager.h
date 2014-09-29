@@ -83,7 +83,7 @@ public:
 	Returns an empty vector if the rank doesn't exist. Any non-existent groups are ignored. */
 	AStringVector GetRankPermissions(const AString & a_RankName);
 	
-	/** Returns the short uuids of all defined players. */
+	/** Returns the short uuids of all defined players. The returned players are ordered by their name (NOT their UUIDs). */
 	AStringVector GetAllPlayerUUIDs(void);
 	
 	/** Returns the names of all defined ranks. */
