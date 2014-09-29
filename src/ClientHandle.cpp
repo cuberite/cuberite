@@ -539,6 +539,7 @@ void cClientHandle::RemoveFromAllChunks()
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
+		m_SentChunks.clear();
 		
 		// Also reset the LastStreamedChunk coords to bogus coords,
 		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
@@ -2076,7 +2077,14 @@ void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_Block
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	cChunkCoords chunkCoords = cChunkCoords(a_BlockX >> 4, a_BlockZ >> 4);
+	cCSLock Lock(m_CSChunkLists);
+	cChunkCoordsList::iterator itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), chunkCoords);
+
+	if(itr != m_SentChunks.end())
+	{
+		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	}
 }
 
 
@@ -2086,8 +2094,15 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
-	
-	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+
+	cChunkCoords chunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
+	cCSLock Lock(m_CSChunkLists);
+	cChunkCoordsList::iterator itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), chunkCoords);
+
+	if(itr != m_SentChunks.end())
+	{
+		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+	}
 }
 
 
@@ -2150,6 +2165,8 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	}
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+
+	m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 
 	// If it is the chunk the player's in, make them spawn (in the tick thread):
 	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
@@ -2681,6 +2698,7 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_D
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+	m_SentChunks.remove(cChunkCoords(a_ChunkX, a_ChunkZ));
 }
 
 
