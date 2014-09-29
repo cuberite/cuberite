@@ -190,9 +190,9 @@ void cEnderman::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
-	//TODO take damage in rain
+	// TODO take damage in rain
 
-	//Take damage when touching water, drowning damage seems to be most appropriate
+	// Take damage when touching water, drowning damage seems to be most appropriate
 	if (IsSwimming())
 	{
 		EventLosePlayer();
