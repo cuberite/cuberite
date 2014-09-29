@@ -496,6 +496,33 @@ AString cRankManager::GetPlayerRankName(const AString & a_PlayerUUID)
 
 
 
+AString cRankManager::GetPlayerName(const AString & a_PlayerUUID)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try
+	{
+		// Prepare the DB statement:
+		SQLite::Statement stmt(m_DB, "SELECT PlayerName FROM PlayerRank WHERE PlayerUUID = ?");
+		stmt.bind(1, a_PlayerUUID);
+
+		if (stmt.executeStep())
+		{
+			return stmt.getColumn(0).getText();
+		}
+	}
+	catch (SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Cannot get player name: %s", __FUNCTION__, ex.what());
+	}
+	return AString();
+}
+
+
+
+
+
 AStringVector cRankManager::GetPlayerGroups(const AString & a_PlayerUUID)
 {
 	ASSERT(m_IsInitialized);
@@ -631,6 +658,32 @@ AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 	}
 	return res;
 }
+
+
+
+
+
+AStringVector cRankManager::GetAllPlayerUUIDs(void)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	AStringVector res;
+	try
+	{
+		SQLite::Statement stmt(m_DB, "SELECT PlayerUUID FROM PlayerRank");
+		while (stmt.executeStep())
+		{
+			res.push_back(stmt.getColumn(0).getText());
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to get players from DB: %s", __FUNCTION__, ex.what());
+	}
+	return res;
+}
+
 
 
 
@@ -1759,6 +1812,53 @@ bool cRankManager::SetDefaultRank(const AString & a_RankName)
 		return false;
 	}
 }
+
+
+
+
+
+void cRankManager::ClearPlayerRanks(void)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try {
+		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank");
+		stmt.exec();
+	}
+	catch (SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to remove/clear all players: %s", __FUNCTION__, ex.what());
+	}
+}
+
+
+
+
+
+bool cRankManager::UpdatePlayerName(const AString & a_PlayerUUID, const AString & a_NewPlayerName)
+{
+	ASSERT(m_IsInitialized);
+	cCSLock Lock(m_CS);
+
+	try
+	{
+		SQLite::Statement stmt(m_DB, "UPDATE PlayerRank SET PlayerName = ? WHERE PlayerUUID = ?");
+		stmt.bind(1, a_NewPlayerName);
+		stmt.bind(2, a_PlayerUUID);
+		if (stmt.exec() > 0)
+		{
+			// The player name was changed, returns true
+			return true;
+		}
+	}
+	catch (const SQLite::Exception & ex)
+	{
+		LOGWARNING("%s: Failed to update player name from UUID %s: %s", __FUNCTION__, a_PlayerUUID.c_str(), ex.what());
+	}
+	return false;
+}
+
 
 
 
