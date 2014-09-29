@@ -21,6 +21,7 @@ public:
 	virtual void CheckEventSeePlayer(void) override;
 	virtual void CheckEventLostPlayer(void) override;
 	virtual void EventLosePlayer(void) override;
+	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 	bool IsScreaming(void) const {return m_bIsScreaming; }
 	BLOCKTYPE GetCarriedBlock(void) const {return CarriedBlock; }

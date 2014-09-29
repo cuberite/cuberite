@@ -239,7 +239,6 @@ public:
 	void HandleAnimation        (char a_Animation);
 	void HandleChat             (const AString & a_Message);
 	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
-	void HandleDisconnect       (const AString & a_Reason);
 	void HandleEntityCrouch     (int a_EntityID, bool a_IsCrouching);
 	void HandleEntityLeaveBed   (int a_EntityID);
 	void HandleEntitySprinting  (int a_EntityID, bool a_IsSprinting);

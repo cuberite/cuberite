@@ -24,5 +24,7 @@ public:
 	super(a_World)
 	{
 	}
+	
+	virtual cRedstoneSimulatorChunkData * CreateChunkData() = 0;
 
 } ;

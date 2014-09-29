@@ -989,7 +989,10 @@ void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & 
 	
 	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
-	Pkt.WriteVarInt((UInt32)a_Message.size());
+	if (a_Channel.substr(0, 3) == "MC|")
+	{
+		Pkt.WriteVarInt((UInt32)a_Message.size());
+	}
 	Pkt.WriteBuf(a_Message.data(), a_Message.size());
 }
 
@@ -1714,6 +1717,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		{
 			UInt32 NumBytesRead = m_ReceivedData.GetReadableSpace();
 			m_ReceivedData.ReadVarInt(CompressedSize);
+			if (CompressedSize > PacketLen)
+			{
+				m_Client->Kick("Bad compression");
+				return;
+			}
 			if (CompressedSize > 0)
 			{
 				// Decompress the data:
@@ -2316,9 +2324,18 @@ void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, DataLen);
 	AString Data;
-	a_ByteBuffer.ReadString(Data, DataLen);
+	if (Channel.substr(0, 3) == "MC|")
+	{
+		// Vanilla sends the payload length within the payload itself, so skip it:
+		HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, DataLen);
+		if (DataLen != a_ByteBuffer.GetReadableSpace() - 1)
+		{
+			ASSERT(!"Bad plugin message payload length");
+			return;
+		}
+	}
+	a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1);  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2501,20 +2518,6 @@ void cProtocol180::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadChar, char, WindowID);
 	m_Client->HandleWindowClose(WindowID);
-}
-
-
-
-
-
-void cProtocol180::WritePacket(cByteBuffer & a_Packet)
-{
-	cCSLock Lock(m_CSPacket);
-	AString Pkt;
-	a_Packet.ReadAll(Pkt);
-	WriteVarInt((UInt32)Pkt.size());
-	SendData(Pkt.data(), Pkt.size());
-	Flush();
 }
 
 

@@ -1819,8 +1819,7 @@ bool cConnection::HandleServerKick(void)
 			Reason.append(Split[4]);
 			Reason.push_back(0);
 			Reason.append(Split[5]);
-			AString ReasonBE16;
-			UTF8ToRawBEUTF16(Reason.data(), Reason.size(), ReasonBE16);
+			AString ReasonBE16 = UTF8ToRawBEUTF16(Reason.data(), Reason.size());
 			AString PacketStart("\xff");
 			PacketStart.push_back((ReasonBE16.size() / 2) / 256);
 			PacketStart.push_back((ReasonBE16.size() / 2) % 256);
