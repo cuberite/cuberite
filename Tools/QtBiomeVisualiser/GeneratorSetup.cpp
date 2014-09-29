@@ -32,6 +32,7 @@ GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent
 	m_eSeed = new QLineEdit();
 	m_eSeed->setValidator(new QIntValidator());
 	m_eSeed->setText("0");
+	m_eSeed->setProperty("INI.SectionName", QVariant("Seed"));
 	m_eSeed->setProperty("INI.ItemName", QVariant("Seed"));
 	m_cbGenerator = new QComboBox();
 	m_cbGenerator->setMinimumWidth(120);
@@ -54,12 +55,7 @@ GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent
 	setLayout(m_MainLayout);
 
 	// Load the INI file, if specified, otherwise set defaults:
-	if (!a_IniFileName.empty() && m_IniFile->ReadFile(a_IniFileName))
-	{
-		m_cbGenerator->setCurrentText(QString::fromStdString(m_IniFile->GetValue("Generator", "BiomeGen")));
-		m_eSeed->setText(QString::number(m_IniFile->GetValueI("Generator", "Seed")));
-	}
-	else
+	if (a_IniFileName.empty() || !m_IniFile->ReadFile(a_IniFileName))
 	{
 		m_IniFile->SetValue("Generator", "Generator", "Composable");
 		m_IniFile->SetValue("Generator", "BiomeGen", m_cbGenerator->currentText().toStdString());
@@ -111,8 +107,9 @@ void GeneratorSetup::generatorChanged(const QString & a_NewName)
 
 void GeneratorSetup::editChanged(const QString & a_NewValue)
 {
-	QString itemName = sender()->property("INI.ItemName").toString();
-	m_IniFile->SetValue("Generator", itemName.toStdString(), a_NewValue.toStdString());
+	QString sectionName = sender()->property("INI.SectionName").toString();
+	QString itemName    = sender()->property("INI.ItemName").toString();
+	m_IniFile->SetValue(sectionName.toStdString(), itemName.toStdString(), a_NewValue.toStdString());
 	emit generatorUpdated();
 }
 
@@ -122,6 +119,7 @@ void GeneratorSetup::editChanged(const QString & a_NewValue)
 
 void GeneratorSetup::updateFromIni()
 {
+	m_eSeed->setText(QString::number(m_IniFile->GetValueI("Seed", "Seed", 0)));
 	int keyID = m_IniFile->FindKey("Generator");
 	if (keyID <= -1)
 	{
@@ -142,6 +140,7 @@ void GeneratorSetup::updateFromIni()
 
 		QLineEdit * edit = new QLineEdit();
 		edit->setText(QString::fromStdString(itemValue));
+		edit->setProperty("INI.SectionName", QVariant("Generator"));
 		edit->setProperty("INI.ItemName", QVariant(QString::fromStdString(itemName)));
 
 		// Remove the generator name prefix from the item name, for clarity purposes:
