@@ -2081,7 +2081,7 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 	cCSLock Lock(m_CSChunkLists);
 	cChunkCoordsList::iterator itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), chunkCoords);
 
-	if(itr != m_SentChunks.end())
+	if (itr != m_SentChunks.end())
 	{
 		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	}
@@ -2099,7 +2099,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 	cCSLock Lock(m_CSChunkLists);
 	cChunkCoordsList::iterator itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), chunkCoords);
 
-	if(itr != m_SentChunks.end())
+	if (itr != m_SentChunks.end())
 	{
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
