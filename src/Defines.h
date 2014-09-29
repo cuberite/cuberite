@@ -186,6 +186,17 @@ enum eMobHeadRotation
 
 
 
+/* Metadata indicating the stone type. */
+enum eStoneType
+{
+	NORMAL_STONE = 0,
+	GRANITE = 1,
+	DIORITE = 3,
+	ANDESITE = 5,
+} ;
+
+
+
 
 inline const char * ClickActionToString(eClickAction a_ClickAction)
 {
