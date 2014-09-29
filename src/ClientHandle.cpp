@@ -2077,11 +2077,10 @@ void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_Block
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cChunkCoords chunkCoords = cChunkCoords(a_BlockX >> 4, a_BlockZ >> 4);
+	cChunkCoords ChunkCoords = cChunkCoords(a_BlockX >> 4, a_BlockZ >> 4);
 	cCSLock Lock(m_CSChunkLists);
-	cChunkCoordsList::iterator itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), chunkCoords);
 
-	if (itr != m_SentChunks.end())
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
 		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	}
@@ -2095,11 +2094,10 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
 
-	cChunkCoords chunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
+	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
 	cCSLock Lock(m_CSChunkLists);
-	cChunkCoordsList::iterator itr = std::find(m_SentChunks.begin(), m_SentChunks.end(), chunkCoords);
 
-	if (itr != m_SentChunks.end())
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
