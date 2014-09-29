@@ -1822,7 +1822,8 @@ void cRankManager::ClearPlayerRanks(void)
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
 
-	try {
+	try
+	{
 		SQLite::Statement stmt(m_DB, "DELETE FROM PlayerRank");
 		stmt.exec();
 	}
