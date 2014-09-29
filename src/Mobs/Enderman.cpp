@@ -197,7 +197,7 @@ void cEnderman::Tick(float a_Dt, cChunk & a_Chunk)
 	{
 		EventLosePlayer();
 		TakeDamage(dtDrowning, NULL, 1, 0);
-		//TODO teleport to a safe location
+		// TODO teleport to a safe location
 	}
 
 }
