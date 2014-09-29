@@ -124,7 +124,9 @@ public:
 				((BlockInQuestion == E_BLOCK_GLASS) ||
 				(BlockInQuestion == E_BLOCK_FENCE) ||
 				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
-				(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)) &&
+                		(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL) ||
+                		(BlockInQuestion == E_BLOCK_STONE_SLAB) ||
+                		(BlockInQuestion == E_BLOCK_WOODEN_SLAB)) &&
 				(Face == BLOCK_FACE_TOP)
 			)
 			{

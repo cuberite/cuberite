@@ -1984,6 +1984,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				HOOK_PLAYER_USING_ITEM = { Notes = "Called when the player is about to right-click with a usable item in their hand." },
 				HOOK_POST_CRAFTING = { Notes = "Called after a valid recipe has been chosen for the current contents of the crafting grid. Plugins may modify the recipe." },
 				HOOK_PRE_CRAFTING = { Notes = "Called before a recipe is searched for the current contents of the crafting grid. Plugins may provide a recipe and cancel the built-in search." },
+				HOOK_SERVER_PING = { Notes = "Called when a client pings the server from the server list. Plugins may change the favicon, server description, players online and maximum players values." },
 				HOOK_SPAWNED_ENTITY = { Notes = "Called after an entity is spawned in a {{cWorld|world}}. The entity is already part of the world." },
 				HOOK_SPAWNED_MONSTER = { Notes = "Called after a mob is spawned in a {{cWorld|world}}. The mob is already part of the world." },
 				HOOK_SPAWNING_ENTITY = { Notes = "Called just before an entity is spawned in a {{cWorld|world}}." },
@@ -2817,7 +2818,7 @@ end
 		Globals =
 		{
 			Desc = [[
-				These functions are available directly, without a class instance. Any plugin cal call them at any
+				These functions are available directly, without a class instance. Any plugin can call them at any
 				time.
 			]],
 			Functions =

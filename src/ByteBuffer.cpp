@@ -627,23 +627,6 @@ bool cByteBuffer::WriteBool(bool a_Value)
 
 
 
-bool cByteBuffer::WriteBEUTF16String16(const AString & a_Value)
-{
-	CHECK_THREAD;
-	CheckValid();
-	PUTBYTES(2);
-	AString UTF16BE;
-	UTF8ToRawBEUTF16(a_Value.data(), a_Value.size(), UTF16BE);
-	WriteBEShort((short)(UTF16BE.size() / 2));
-	PUTBYTES(UTF16BE.size());
-	WriteBuf(UTF16BE.data(), UTF16BE.size());
-	return true;
-}
-
-
-
-
-
 bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 {
 	CHECK_THREAD;

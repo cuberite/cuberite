@@ -73,9 +73,6 @@ public:
 	/// Writes chunkstats, for each world and totals, to the output callback
 	void LogChunkStats(cCommandOutputCallback & a_Output);
 	
-	int GetPrimaryServerVersion(void) const { return m_PrimaryServerVersion; }  // tolua_export
-	void SetPrimaryServerVersion(int a_Version) { m_PrimaryServerVersion = a_Version; }  // tolua_export
-	
 	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
 
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
@@ -169,9 +166,6 @@ private:
 	
 	typedef std::map<AString, cWorld *> WorldMap;
 	typedef std::vector<cCommand> cCommandQueue;
-	
-	/// The version of the protocol that is primary for the server (reported in the server list). All versions are still supported.
-	int m_PrimaryServerVersion;
 
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;

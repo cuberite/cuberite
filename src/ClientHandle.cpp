@@ -1153,7 +1153,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 		if (a_OldBlock == E_BLOCK_BEDROCK)
 		{
 			Kick("You can't break a bedrock!");
-			return;	
+			return;
 		}
 		if (a_OldBlock == E_BLOCK_BARRIER)
 		{
@@ -1743,20 +1743,6 @@ void cClientHandle::HandleRespawn(void)
 	}
 	m_Player->Respawn();
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
-}
-
-
-
-
-
-void cClientHandle::HandleDisconnect(const AString & a_Reason)
-{
-	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
-
-	cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, a_Reason);
-
-	m_HasSentDC = true;
-	Destroy();
 }
 
 
