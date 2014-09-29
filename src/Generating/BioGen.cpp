@@ -961,12 +961,12 @@ public:
 		// Calculate the ocean noisemap:
 		NOISE_DATATYPE OceanMap[5 * 5];
 		NOISE_DATATYPE Workspace[5 * 5];
-		m_OceanNoise.Generate2D(OceanMap, 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		m_OceanNoise.Generate2D(OceanMap, 5, 5, (NOISE_DATATYPE)a_ChunkX * 16, (NOISE_DATATYPE)a_ChunkX * 16 + 16, (NOISE_DATATYPE)a_ChunkZ * 16, (NOISE_DATATYPE)a_ChunkZ * 16 + 16, Workspace);
 		NOISE_DATATYPE OceanMapFull[17 * 17];
 		LinearUpscale2DArray(OceanMap, 5, 5, OceanMapFull, 4, 4);
 
 		// Calculate the river noisemap (using ocean's workspace):
-		m_RiverNoise.Generate2D(OceanMap, 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		m_RiverNoise.Generate2D(OceanMap, 5, 5, (NOISE_DATATYPE)a_ChunkX * 16, (NOISE_DATATYPE)a_ChunkX * 16 + 16, (NOISE_DATATYPE)a_ChunkZ * 16, (NOISE_DATATYPE)a_ChunkZ * 16 + 16, Workspace);
 		NOISE_DATATYPE RiverMapFull[17 * 17];
 		LinearUpscale2DArray(OceanMap, 5, 5, RiverMapFull, 4, 4);
 
@@ -987,7 +987,7 @@ public:
 
 				// Query the biomes for the current small voronoi cell:
 				int BaseZ = a_ChunkZ * cChunkDef::Width + z;
-				int QueryX = BaseX + DistortedX[z][x], QueryZ = BaseZ + DistortedZ[z][x];
+				int QueryX = BaseX + (int)DistortedX[z][x], QueryZ = BaseZ + (int)DistortedZ[z][x];
 				int SeedX, SeedZ, SeedX2, SeedZ2;
 				m_VoronoiSmall.FindNearestSeeds(QueryX, QueryZ, SeedX, SeedZ, SeedX2, SeedZ2);
 				EMCSBiome InnerBiome, OuterBiome;
@@ -1027,18 +1027,18 @@ public:
 	{
 		m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiSmallCellSize", 128));
 		m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiLargeCellSize", 1024));
-		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq1", 0.005f), 1);
-		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq2", 0.1f), 0.1);
-		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq3", 0.5f), 0.01);
-		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq1", 0.015f), 1);
-		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq2", 0.05f), 0.1);
-		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq3", 0.25f), 0.01);
-		m_RiverThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverThreshold",           0.02);
-		m_BeachThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiBeachThreshold",          -0.08);
-		m_OceanThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanThreshold",          -0.1);
-		m_DeepOceanThreshold      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDeepOceanThreshold",      -0.5);
-		m_MushroomShoreThreshold  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiMushroomShoreThreshold",  -1.2);
-		m_MushroomIslandThreshold = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiMushroomIslandThreshold", -1.25);
+		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq1", 0.005f), 1.0f);
+		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq2", 0.1f),   0.1f);
+		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq3", 0.5f),   0.01f);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq1", 0.015f), 1.0f);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq2", 0.05f),  0.1f);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq3", 0.25f),  0.01f);
+		m_RiverThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverThreshold",           0.02f);
+		m_BeachThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiBeachThreshold",          -0.08f);
+		m_OceanThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanThreshold",          -0.1f);
+		m_DeepOceanThreshold      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDeepOceanThreshold",      -0.5f);
+		m_MushroomShoreThreshold  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiMushroomShoreThreshold",  -1.2f);
+		m_MushroomIslandThreshold = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiMushroomIslandThreshold", -1.25f);
 
 		NOISE_DATATYPE DistortFreq1 = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortFreq1", 0.01);
 		NOISE_DATATYPE DistortAmp1  = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDistortAmp1",  80);
@@ -1118,8 +1118,8 @@ protected:
 		NOISE_DATATYPE DistX[5][5];
 		NOISE_DATATYPE DistZ[5][5];
 		NOISE_DATATYPE Workspace[5 * 5];
-		m_DistortNoiseX.Generate2D(&(DistX[0][0]), 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
-		m_DistortNoiseZ.Generate2D(&(DistZ[0][0]), 5, 5, a_ChunkX * 16, a_ChunkX * 16 + 16, a_ChunkZ * 16, a_ChunkZ * 16 + 16, Workspace);
+		m_DistortNoiseX.Generate2D(&(DistX[0][0]), 5, 5, (NOISE_DATATYPE)a_ChunkX * 16, (NOISE_DATATYPE)a_ChunkX * 16 + 16, (NOISE_DATATYPE)a_ChunkZ * 16, (NOISE_DATATYPE)a_ChunkZ * 16 + 16, Workspace);
+		m_DistortNoiseZ.Generate2D(&(DistZ[0][0]), 5, 5, (NOISE_DATATYPE)a_ChunkX * 16, (NOISE_DATATYPE)a_ChunkX * 16 + 16, (NOISE_DATATYPE)a_ChunkZ * 16, (NOISE_DATATYPE)a_ChunkZ * 16 + 16, Workspace);
 		for (int z = 0; z <= 4; z++)
 		{
 			NOISE_DATATYPE BlockZ = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z * 4);
@@ -1233,8 +1233,8 @@ protected:
 			{ bgMesa,       ARRAYCOUNT(bgMesa), },
 			{ bgDenseTrees, ARRAYCOUNT(bgDenseTrees), },
 		} ;
-		size_t Group = (m_VoronoiLarge.GetValueAt(a_SeedX, a_SeedZ) / 7) % ARRAYCOUNT(BiomeGroups);
-		size_t Index = (m_VoronoiSmall.GetValueAt(a_SeedX, a_SeedZ) / 7) % BiomeGroups[Group].Count;
+		size_t Group = (size_t)(m_VoronoiLarge.GetValueAt(a_SeedX, a_SeedZ) / 7) % ARRAYCOUNT(BiomeGroups);
+		size_t Index = (size_t)(m_VoronoiSmall.GetValueAt(a_SeedX, a_SeedZ) / 7) % BiomeGroups[Group].Count;
 
 		a_InnerBiome = BiomeGroups[Group].Biomes[Index].InnerBiome;
 		a_OuterBiome = BiomeGroups[Group].Biomes[Index].OuterBiome;
