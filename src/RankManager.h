@@ -84,7 +84,7 @@ public:
 	AStringVector GetRankPermissions(const AString & a_RankName);
 	
 	/** Returns the short uuids of all defined players. */
-	AStringVector GetAllPlayers(void);
+	AStringVector GetAllPlayerUUIDs(void);
 	
 	/** Returns the names of all defined ranks. */
 	AStringVector GetAllRanks(void);

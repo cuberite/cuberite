@@ -663,7 +663,7 @@ AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 
 
 
-AStringVector cRankManager::GetAllPlayers(void)
+AStringVector cRankManager::GetAllPlayerUUIDs(void)
 {
 	ASSERT(m_IsInitialized);
 	cCSLock Lock(m_CS);
