@@ -24,12 +24,35 @@ public:
 		{
 			return false;
 		}
-		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		BLOCKTYPE UpperBlock = a_World->GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
+
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
 
 		if (((Block == E_BLOCK_DIRT) || (Block == E_BLOCK_GRASS)) && (UpperBlock == E_BLOCK_AIR))
 		{
-			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FARMLAND, 0);
+			BLOCKTYPE NewBlock = E_BLOCK_FARMLAND;
+			if (Block == E_BLOCK_DIRT)
+			{
+				switch (BlockMeta)
+				{
+					case E_META_DIRT_COARSE:
+					{
+						// Transform to normal dirt
+						NewBlock = E_BLOCK_DIRT;
+						break;
+					}
+					case E_META_DIRT_PODZOL:
+					{
+						// You can't transform this block with a hoe in vanilla
+						return false;
+					}
+					default: break;
+				}
+			}
+
+			a_World->FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, NewBlock, 0);
 			a_World->BroadcastSoundEffect("dig.gravel", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
 			a_Player->UseEquippedItem();
 			return true;
