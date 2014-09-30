@@ -74,8 +74,6 @@ public:
 	int GetRelZ(void) const { return m_RelZ; }
 	
 	// tolua_end
-
-	virtual void SaveToJson  (Json::Value & a_Value) = 0;
 	
 	/// Called when a player uses this entity; should open the UI window
 	virtual void UsedBy( cPlayer * a_Player) = 0;

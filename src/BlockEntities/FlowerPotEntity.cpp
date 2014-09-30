@@ -72,37 +72,6 @@ void cFlowerPotEntity::Destroy(void)
 
 
 
-bool cFlowerPotEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	m_Item = cItem();
-	m_Item.FromJson(a_Value.get("Item", 0));
-
-	return true;
-}
-
-
-
-
-
-void cFlowerPotEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-	
-	Json::Value Item;
-	m_Item.GetJson(Item);
-	a_Value["Item"] = Item;
-}
-
-
-
-
-
 bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
 {
 	switch (m_ItemType)

@@ -49,11 +49,8 @@ public:
 	virtual ~cDropSpenserEntity();
 	
 	static const char * GetClassStatic(void) { return "cDropSpenserEntity"; }
-
-	bool LoadFromJson(const Json::Value & a_Value);
 	
 	// cBlockEntity overrides:
-	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;

@@ -44,9 +44,6 @@ public:
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cNoteEntity() {}
 
-	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
-
 	// tolua_begin
 	
 	char GetPitch(void);

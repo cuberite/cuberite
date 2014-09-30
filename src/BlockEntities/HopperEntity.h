@@ -49,7 +49,6 @@ protected:
 
 	// cBlockEntity overrides:
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 	

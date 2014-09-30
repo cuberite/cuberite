@@ -124,32 +124,3 @@ void cNoteEntity::IncrementPitch(void)
 
 
 
-
-bool cNoteEntity::LoadFromJson(const Json::Value & a_Value)
-{
-
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	m_Pitch = (char)a_Value.get("p", 0).asInt();
-
-	return true;
-}
-
-
-
-
-
-void cNoteEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	a_Value["p"] = m_Pitch;
-}
-
-
-
-

@@ -7,7 +7,6 @@
 
 #include "Globals.h"
 #include "WorldStorage.h"
-#include "WSSCompact.h"
 #include "WSSAnvil.h"
 #include "../World.h"
 #include "../Generating/ChunkGenerator.h"
@@ -187,7 +186,6 @@ void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
 	m_Schemas.push_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
-	m_Schemas.push_back(new cWSSCompact  (m_World, a_StorageCompressionFactor));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 	

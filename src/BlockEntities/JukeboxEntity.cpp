@@ -117,31 +117,3 @@ void cJukeboxEntity::SetRecord(int a_Record)
 
 
 
-
-bool cJukeboxEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	m_Record = a_Value.get("Record", 0).asInt();
-
-	return true;
-}
-
-
-
-
-
-void cJukeboxEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	a_Value["Record"] = m_Record;
-}
-
-
-
-
