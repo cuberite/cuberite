@@ -173,7 +173,23 @@ public:
 	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoor(BLOCKTYPE a_Block)
 	{
-		return (a_Block == E_BLOCK_WOODEN_DOOR) || (a_Block == E_BLOCK_IRON_DOOR);
+		switch (a_Block)
+		{
+			case E_BLOCK_ACACIA_DOOR:
+			case E_BLOCK_BIRCH_DOOR:
+			case E_BLOCK_DARK_OAK_DOOR:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_JUNGLE_DOOR:
+			case E_BLOCK_SPRUCE_DOOR:
+			case E_BLOCK_WOODEN_DOOR:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 
