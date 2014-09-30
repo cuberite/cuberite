@@ -20,12 +20,9 @@
 
 // tolua_begin
 class cBlockEntityWithItems :
-	public cBlockEntity
-	// tolua_end
-	// tolua doesn't seem to support multiple inheritance?
-	, public cItemGrid::cListener
-	, public cBlockEntityWindowOwner
-	// tolua_begin
+	public cBlockEntity,
+	public cItemGrid::cListener,
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntity super;
 	
@@ -39,6 +36,7 @@ public:
 		cWorld * a_World                            // Optional world to assign to the entity
 	) :
 		super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, a_World),
+		cBlockEntityWindowOwner(this),
 		m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 	{
 		m_Contents.AddListener(*this);

@@ -752,7 +752,7 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 {
 	m_Writer.BeginList("Items", TAG_Compound);
-		for (int i = 0; i < cMinecartWithChest::NumSlots; i++)
+		for (int i = 0; i < cMinecartWithChest::ContentsHeight * cMinecartWithChest::ContentsWidth; i++)
 		{
 			const cItem & Item = a_Minecart->GetSlot(i);
 			if (Item.IsEmpty())

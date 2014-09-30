@@ -23,6 +23,7 @@ class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
+class cMinecartWithChest;
 class cBeaconEntity;
 class cSlotArea;
 class cSlotAreaAnvil;
@@ -356,6 +357,20 @@ protected:
 	cChestEntity * m_PrimaryChest;
 	cChestEntity * m_SecondaryChest;
 } ;
+
+
+
+
+
+class cMinecartWithChestWindow :
+	public cWindow
+{
+public:
+	cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart);
+	~cMinecartWithChestWindow();
+private:
+	cMinecartWithChest * m_ChestCart;
+};
 
 
 

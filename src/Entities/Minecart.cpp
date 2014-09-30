@@ -7,7 +7,6 @@
 
 #include "Globals.h"
 #include "Minecart.h"
-#include "../World.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "Player.h"
@@ -1106,19 +1105,11 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 // cMinecartWithChest:
 
 cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
-	super(mpChest, a_X, a_Y, a_Z)
+	super(mpChest, a_X, a_Y, a_Z),
+	cEntityWindowOwner(this),
+	m_Contents(ContentsWidth, ContentsHeight)
 {
-}
-
-
-
-
-
-void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
-{
-	ASSERT(a_Idx < ARRAYCOUNT(m_Items));
-	
-	m_Items[a_Idx] = a_Item;
+	m_Contents.AddListener(*this);
 }
 
 
@@ -1127,7 +1118,42 @@ void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
 
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
-	// TODO: Show the chest UI window to the player
+	// If the window is not created, open it anew:
+	cWindow * Window = GetWindow();
+	if (Window == NULL)
+	{
+		OpenNewWindow();
+		Window = GetWindow();
+	}
+
+	// Open the window for the player:
+	if (Window != NULL)
+	{
+		if (a_Player.GetWindow() != Window)
+		{
+			a_Player.OpenWindow(Window);
+		}
+	}
+}
+
+
+
+
+
+void cMinecartWithChest::OpenNewWindow()
+{
+	OpenWindow(new cMinecartWithChestWindow(this));
+}
+
+
+
+
+
+void cMinecartWithChest::Destroyed()
+{
+	cItems Pickups;
+	m_Contents.CopyToItems(Pickups);
+	GetWorld()->SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);
 }
 
 

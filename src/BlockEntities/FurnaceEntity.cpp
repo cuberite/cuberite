@@ -34,7 +34,6 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	m_LastProgressFuel(0),
 	m_LastProgressCook(0)
 {
-	cBlockEntityWindowOwner::SetBlockEntity(this);
 	m_Contents.AddListener(*this);
 }
 

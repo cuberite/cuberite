@@ -10,6 +10,7 @@
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
+#include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
 #include "Window.h"
 #include "../CraftingRecipes.h"
@@ -1913,6 +1914,40 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(achCookFish);    break;
 		default: break;
 	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaMinecartWithChest:
+
+cSlotAreaMinecartWithChest::cSlotAreaMinecartWithChest(cMinecartWithChest * a_Chest, cWindow & a_ParentWindow) :
+	cSlotArea(27, a_ParentWindow),
+	m_Chest(a_Chest)
+{
+}
+
+
+
+
+
+const cItem * cSlotAreaMinecartWithChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	// a_SlotNum ranges from 0 to 26, use that to index the minecart chest entity's inventory directly:
+	UNUSED(a_Player);
+	return &(m_Chest->GetSlot(a_SlotNum));
+}
+
+
+
+
+
+void cSlotAreaMinecartWithChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	UNUSED(a_Player);
+	m_Chest->SetSlot(a_SlotNum, a_Item);
 }
 
 
