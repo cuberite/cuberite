@@ -2237,7 +2237,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 {
 	if (a_Channel == "MC|AdvCdm")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode)
+		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode);
 		switch (Mode)
 		{
 			case 0x00:
