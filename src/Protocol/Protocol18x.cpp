@@ -989,10 +989,6 @@ void cProtocol180::SendPluginMessage(const AString & a_Channel, const AString & 
 	
 	cPacketizer Pkt(*this, 0x3f);
 	Pkt.WriteString(a_Channel);
-	if (a_Channel.substr(0, 3) == "MC|")
-	{
-		Pkt.WriteVarInt((UInt32)a_Message.size());
-	}
 	Pkt.WriteBuf(a_Message.data(), a_Message.size());
 }
 
@@ -2324,18 +2320,17 @@ void cProtocol180::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
-	AString Data;
+	
+	// If the plugin channel is recognized vanilla, handle it directly:
 	if (Channel.substr(0, 3) == "MC|")
 	{
-		// Vanilla sends the payload length within the payload itself, so skip it:
-		HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, DataLen);
-		if (DataLen != a_ByteBuffer.GetReadableSpace() - 1)
-		{
-			ASSERT(!"Bad plugin message payload length");
-			return;
-		}
+		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
+		return;
 	}
-	a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1);  // Always succeeds
+
+	// Read the plugin message and relay to clienthandle:
+	AString Data;
+	VERIFY(a_ByteBuffer.ReadString(Data, a_ByteBuffer.GetReadableSpace() - 1));  // Always succeeds
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2518,6 +2513,71 @@ void cProtocol180::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadChar, char, WindowID);
 	m_Client->HandleWindowClose(WindowID);
+}
+
+
+
+
+
+void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel)
+{
+	if (a_Channel == "MC|AdvCdm")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode)
+		switch (Mode)
+		{
+			case 0x00:
+			{
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockX);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockY);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockZ);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				break;
+			}
+
+			default:
+			{
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %d", Mode), mtFailure);
+				LOG("Unhandled MC|AdvCdm packet mode.");
+				return;
+			}
+		}  // switch (Mode)
+		return;
+	}
+	else if (a_Channel == "MC|Brand")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
+		m_Client->SetClientBrand(Brand);
+		// Send back our brand, including the length:
+		SendPluginMessage("MC|Brand", "\x08MCServer");
+		return;
+	}
+	else if (a_Channel == "MC|Beacon")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect2);
+		m_Client->HandleBeaconSelection(Effect1, Effect2);
+		return;
+	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, ItemName);
+		m_Client->HandleAnvilItemName(ItemName);
+		return;
+	}
+	else if (a_Channel == "MC|TrSel")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, SlotNum);
+		m_Client->HandleNPCTrade(SlotNum);
+		return;
+	}
+	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
+	
+	// Read the payload and send it through to the clienthandle:
+	AString Message;
+	VERIFY(a_ByteBuffer.ReadString(Message, a_ByteBuffer.GetReadableSpace() - 1));
+	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
 
