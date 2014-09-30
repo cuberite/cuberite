@@ -31,6 +31,7 @@ public:
 	{
 		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
 		{
+			// Iron doors can only be toggled by redstone, not by right-clicking
 			return;
 		}
 

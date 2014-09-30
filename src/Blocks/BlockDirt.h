@@ -24,11 +24,11 @@ public:
 		if (a_BlockMeta == E_META_DIRT_COARSE)
 		{
 			// Drop the coarse block (dirt, meta 1)
-			a_Pickups.Add(E_BLOCK_DIRT, 1, 1);
+			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
 		}
 		else
 		{
-			a_Pickups.Add(E_BLOCK_DIRT, 1, 0);
+			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
 		}
 	}
 	
