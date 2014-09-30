@@ -2954,7 +2954,7 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
-	if (Block != E_BLOCK_TRAPDOOR)
+	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
 	}
@@ -2971,7 +2971,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
-	if (Block != E_BLOCK_TRAPDOOR)
+	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
 	}

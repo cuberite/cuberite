@@ -329,6 +329,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_PistonBreakable = true;
 	a_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_IRON_DOOR           ].m_PistonBreakable = true;
+	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_JACK_O_LANTERN      ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_PistonBreakable = true;
 	a_Info[E_BLOCK_LILY_PAD            ].m_PistonBreakable = true;

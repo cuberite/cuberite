@@ -160,6 +160,7 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_FIRE:
 		case E_BLOCK_FLOWER_POT:
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_LAVA:
 		case E_BLOCK_LEVER:
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
