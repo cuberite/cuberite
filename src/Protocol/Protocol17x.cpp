@@ -2064,6 +2064,22 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
+	if (Length + 1 != (int)a_ByteBuffer.GetReadableSpace())
+	{
+		LOGD("Invalid plugin message packet, payload length doesn't match packet length (exp %d, got %d)",
+			(int)a_ByteBuffer.GetReadableSpace() - 1, Length
+		);
+		return;
+	}
+	
+	// If the plugin channel is recognized vanilla, handle it directly:
+	if (Channel.substr(0, 3) == "MC|")
+	{
+		HandleVanillaPluginMessage(a_ByteBuffer, Channel, Length);
+		return;
+	}
+	
+	// Read the plugin message and relay to clienthandle:
 	AString Data;
 	if (!a_ByteBuffer.ReadString(Data, Length))
 	{
@@ -2211,6 +2227,82 @@ void cProtocol172::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadChar, char, WindowID);
 	m_Client->HandleWindowClose(WindowID);
+}
+
+
+
+
+
+void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, short a_PayloadLength)
+{
+	if (a_Channel == "MC|AdvCdm")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode)
+		switch (Mode)
+		{
+			case 0x00:
+			{
+				// Block-based commandblock update:
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockX);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockY);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockZ);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				break;
+			}
+
+			// TODO: Entity-based commandblock update
+			
+			default:
+			{
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %d", Mode), mtFailure);
+				LOG("Unhandled MC|AdvCdm packet mode.");
+				return;
+			}
+		}  // switch (Mode)
+		return;
+	}
+	else if (a_Channel == "MC|Brand")
+	{
+		// Read the client's brand:
+		AString Brand;
+		if (a_ByteBuffer.ReadString(Brand, a_PayloadLength))
+		{
+			m_Client->SetClientBrand(Brand);
+		}
+		
+		// Send back our brand:
+		SendPluginMessage("MC|Brand", "MCServer");
+		return;
+	}
+	else if (a_Channel == "MC|Beacon")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect2);
+		m_Client->HandleBeaconSelection(Effect1, Effect2);
+		return;
+	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		AString ItemName;
+		if (a_ByteBuffer.ReadString(ItemName, a_PayloadLength))
+		{
+			m_Client->HandleAnvilItemName(ItemName);
+		}
+		return;
+	}
+	else if (a_Channel == "MC|TrSel")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, SlotNum);
+		m_Client->HandleNPCTrade(SlotNum);
+		return;
+	}
+	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
+	
+	// Read the payload and send it through to the clienthandle:
+	AString Message;
+	VERIFY(a_ByteBuffer.ReadString(Message, a_PayloadLength));
+	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
 

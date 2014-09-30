@@ -312,6 +312,10 @@ protected:
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	
+	/** Parses Vanilla plugin messages into specific ClientHandle calls.
+	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel */
+	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel);
+	
 	
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
