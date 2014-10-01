@@ -2086,13 +2086,20 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			]],
 			Functions =
 			{
-				BroadcastChat = { Params = "Message", Return = "", Notes = "Broadcasts a message to every player in the server. No formatting is done by the server." },
-				BroadcastChatFailure = { Params = "Message", Return = "", Notes = "Prepends Rose [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a command that failed to run because of insufficient permissions, etc." },
-				BroadcastChatFatal = { Params = "Message", Return = "", Notes = "Prepends Red [FATAL] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For a plugin that crashed, or similar." },
-				BroadcastChatInfo = { Params = "Message", Return = "", Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For informational messages, such as command usage." },
-				BroadcastChatSuccess = { Params = "Message", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For success messages." },
-				BroadcastChatWarning = { Params = "Message", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For concerning events, such as plugin reload etc." },
-				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil." },
+				BroadcastChat =
+				{
+					{ Params = "MessageText, MessageType", Return = "", Notes = "Broadcasts a message to all players, with its message type set to MessageType (default: mtCustom)." },
+					{ Params = "{{cCompositeChat|CompositeChat}}", Return = "", Notes = "Broadcasts a {{cCompositeChat|composite chat message} to all players." },
+				},
+				BroadcastChatDeath = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtDeath. Use for when a player has died." },
+				BroadcastChatFailure = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtFailure. Use for a command that failed to run because of insufficient permissions, etc." },
+				BroadcastChatFatal = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtFatal. Use for a plugin that crashed, or similar." },
+				BroadcastChatInfo = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtInfo. Use for informational messages, such as command usage." },
+				BroadcastChatJoin = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtJoin. Use for players joining the server." },
+				BroadcastChatLeave = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtLeave. Use for players leaving the server." },
+				BroadcastChatSuccess = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtSuccess. Use for success messages." },
+				BroadcastChatWarning = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc." },
+				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil.<br/><br/><b>NOTE</b>This function is currently unsafe, do not use!" },
 				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for all players with names partially (or fully) matching the name string provided." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },

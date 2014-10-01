@@ -129,15 +129,15 @@ public:
 	
 	/// Sends a chat message to all connected clients (in all worlds)
 	void BroadcastChat       (const AString & a_Message, eMessageType a_ChatPrefix = mtCustom);
-	void BroadcastChatInfo   (const AString & a_Message) { BroadcastChat(a_Message, mtInformation); }
+	void BroadcastChat       (const cCompositeChat & a_Message);
+	void BroadcastChatDeath  (const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
 	void BroadcastChatFailure(const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
-	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(a_Message, mtSuccess); }
-	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(a_Message, mtWarning); }
 	void BroadcastChatFatal  (const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
+	void BroadcastChatInfo   (const AString & a_Message) { BroadcastChat(a_Message, mtInformation); }
 	void BroadcastChatJoin   (const AString & a_Message) { BroadcastChat(a_Message, mtJoin); }
 	void BroadcastChatLeave  (const AString & a_Message) { BroadcastChat(a_Message, mtLeave); }
-	void BroadcastChatDeath  (const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
-	void BroadcastChat       (const cCompositeChat & a_Message);
+	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(a_Message, mtSuccess); }
+	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(a_Message, mtWarning); }
 	
 	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);
