@@ -540,6 +540,9 @@ end
 				SetUsername = { Params = "Name", Return = "", Notes = "Sets the username" },
 				SetViewDistance = { Params = "ViewDistance", Return = "", Notes = "Sets the viewdistance (number of chunks loaded for the player in each direction)" },
 				SendBlockChange = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta", Return = "", Notes = "Sends a BlockChange packet to the client. This can be used to create fake blocks only for that player." },
+				SendEntityAnimation = { Params = "{{cEntity|Entity}}, AnimationNumber", Return = "", Notes = "Sends the specified animation of the specified entity to the client. The AnimationNumber is protocol-specific." },
+				SendSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch", Return = "", Notes = "Sends a sound effect request to the client. The sound is played at the specified coords, with the specified volume (a float, 1.0 is full volume, can be more) and pitch (0-255, 63 is 100%)" },
+				SendTimeUpdate = { Params = "WorldAge, TimeOfDay, DoDaylightCycle", Return = "", Notes = "Sends the specified time update to the client. WorldAge is the total age of the world, in ticks. TimeOfDay is the current day's time, in ticks (0 - 24000). DoDaylightCycle is a bool that specifies whether the client should automatically move the sun (true) or keep it in the same place (false)." },
 			},
 			Constants =
 			{
