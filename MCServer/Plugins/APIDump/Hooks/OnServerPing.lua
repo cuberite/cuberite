@@ -34,9 +34,9 @@ function OnServerPing(ClientHandle, ServerDescription, OnlinePlayers, MaxPlayers
 	MaxPlayers = 0
 
 	-- Change favicon
-	if (cFile:IsFile("my-favicon.png")) then
+	if cFile:IsFile("my-favicon.png") then
 		local FaviconData = cFile:ReadWholeFile("my-favicon.png")
-		if (FaviconData != "") then
+		if FaviconData ~= "" and FaviconData ~= nil then
 			Favicon = Base64Encode(FaviconData)
 		end
 	end
