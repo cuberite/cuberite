@@ -1048,6 +1048,7 @@ ValueName0=SomeOtherValue
 				GetValueSetB = { Params = "KeyName, ValueName, Default", Return = "bool", Notes = "Returns the value of the specified name under the specified key, as a bool. If the value doesn't exist, creates it with the specified default." },
 				GetValueSetF = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as a floating-point number. If the value doesn't exist, creates it with the specified default." },
 				GetValueSetI = { Params = "KeyName, ValueName, Default", Return = "number", Notes = "Returns the value of the specified name under the specified key, as an integer. If the value doesn't exist, creates it with the specified default." },
+				HasValue = { Params = "KeyName, ValueName", Return = "bool", Notes = "Returns true if the specified value is present." },
 				ReadFile = { Params = "FileName, [AllowExampleFallback]", Return = "bool", Notes = "Reads the values from the specified file. Previous in-memory contents are lost. If the file cannot be opened, and AllowExample is true, another file, \"filename.example.ini\", is loaded and then saved as \"filename.ini\". Returns true if successful, false if not." },
 				SetValue = 
 				{
