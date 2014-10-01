@@ -2077,11 +2077,14 @@ void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_Block
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	cChunkCoords ChunkCoords = cChunkCoords(a_BlockX >> 4, a_BlockZ >> 4);
+	int ChunkX, ChunkZ = 0;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
+	cChunkCoords ChunkCoords = cChunkCoords(ChunkX, ChunkZ);
 	cCSLock Lock(m_CSChunkLists);
 
 	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
+		Lock.Unlock();
 		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 	}
 }
@@ -2099,6 +2102,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
+		Lock.Unlock();
 		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 	}
 }
