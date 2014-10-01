@@ -306,7 +306,7 @@ private:
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
 	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
-	cChunkCoordsList m_SentChunks;
+	cChunkCoordsList m_SentChunks; // Store the coordinates of the chunks that the client has loaded
 
 	cProtocol * m_Protocol;
 	
