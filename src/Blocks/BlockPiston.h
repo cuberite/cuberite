@@ -115,7 +115,9 @@ private:
 			case E_BLOCK_NOTE_BLOCK:
 			case E_BLOCK_OBSIDIAN:
 			case E_BLOCK_PISTON_EXTENSION:
+			case E_BLOCK_STANDING_BANNER:
 			case E_BLOCK_TRAPPED_CHEST:
+			case E_BLOCK_WALL_BANNER:
 			{
 				return false;
 			}
