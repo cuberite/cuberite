@@ -39,9 +39,6 @@ public:
 	/// Creates a new empty command block entity
 	cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 
-	bool LoadFromJson( const Json::Value& a_Value);
-	virtual void SaveToJson(Json::Value& a_Value) override;
-
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;

@@ -77,35 +77,3 @@ void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 
 
 
-
-bool cMobHeadEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	m_Type      = static_cast<eMobHeadType>(a_Value.get("Type", 0).asInt());
-	m_Rotation  = static_cast<eMobHeadRotation>(a_Value.get("Rotation", 0).asInt());
-	m_Owner     = a_Value.get("Owner", "").asString();
-
-	return true;
-}
-
-
-
-
-
-void cMobHeadEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	a_Value["Type"] = m_Type;
-	a_Value["Rotation"]  = m_Rotation;
-	a_Value["Owner"]     = m_Owner;
-}
-
-
-
-
