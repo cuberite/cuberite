@@ -2086,7 +2086,7 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 
 	/* This is needed to fix the chunk rendering issue in Minecraft 1.8
 	 * If block updates get send to the client, while the client hasn't loaded the chunks corresponding to the blocks,
-	 * the client will render those blocks as dirt or leaves. This code checks if the chunk is loaded, before sending the block update.
+	 * the client will render those blocks, without the blocks that it is surrounded by. This code checks if the chunk is loaded, before sending the block update.
 	 */
 	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
@@ -2108,7 +2108,7 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 
 	/* This is needed to fix the chunk rendering issue in Minecraft 1.8
 	 * If block updates get send to the client, while the client hasn't loaded the chunks corresponding to the blocks,
-	 * the client will render those blocks as dirt or leaves. This code checks if the chunk is loaded, before sending the block update.
+	 * the client will render those blocks, without the blocks that it is surrounded by. This code checks if the chunk is loaded, before sending the block update.
 	 */
 	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
 	{
