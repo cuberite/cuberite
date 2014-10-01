@@ -41,10 +41,11 @@ namespace Json
 class cRoot
 {
 public:
-	static bool m_TerminateEventRaised;
-	
 	static cRoot * Get() { return s_Root; }
 	// tolua_end
+
+	static bool m_TerminateEventRaised;
+
 
 	cRoot(void);
 	~cRoot();
