@@ -222,6 +222,13 @@ public:
 	
 	bool HasPluginChannel(const AString & a_PluginChannel);
 	
+	/** Called by the protocol when it receives the MC|Brand plugin message. Also callable by plugins.
+	Simply stores the string value. */
+	void SetClientBrand(const AString & a_ClientBrand) { m_ClientBrand = a_ClientBrand; }
+	
+	/** Returns the client brand received in the MC|Brand plugin message or set by a plugin. */
+	const AString & GetClientBrand(void) const { return m_ClientBrand; }
+	
 	// tolua_end
 	
 	/** Returns true if the client wants the chunk specified to be sent (in m_ChunksToSend) */
@@ -236,12 +243,31 @@ public:
 	void PacketError(unsigned char a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation        (char a_Animation);
-	void HandleChat             (const AString & a_Message);
-	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
-	void HandleEntityCrouch     (int a_EntityID, bool a_IsCrouching);
-	void HandleEntityLeaveBed   (int a_EntityID);
-	void HandleEntitySprinting  (int a_EntityID, bool a_IsSprinting);
+	void HandleAnimation(char a_Animation);
+	
+	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
+	an item in the anvil UI. */
+	void HandleAnvilItemName(const AString & a_ItemName);
+	
+	/** Called when the protocol receives a MC|Beacon plugin message, indicating that the player set an effect
+	in the beacon UI. */
+	void HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect);
+	
+	/** Called when the protocol detects a chat packet. */
+	void HandleChat(const AString & a_Message);
+	
+	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	command in the command block UI, for a block-based commandblock. */
+	void HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand);
+	
+	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	command in the command block UI, for an entity-based commandblock (minecart?). */
+	void HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand);
+	
+	void HandleCreativeInventory      (short a_SlotNum, const cItem & a_HeldItem);
+	void HandleEntityCrouch           (int a_EntityID, bool a_IsCrouching);
+	void HandleEntityLeaveBed         (int a_EntityID);
+	void HandleEntitySprinting        (int a_EntityID, bool a_IsSprinting);
 	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).
@@ -251,6 +277,11 @@ public:
 	
 	void HandleKeepAlive        (int a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status);
+	
+	/** Called when the protocol receives a MC|TrSel packet, indicating that the player used a trade in
+	the NPC UI. */
+	void HandleNPCTrade(int a_SlotNum);
+	
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
@@ -392,6 +423,9 @@ private:
 	
 	/** The plugin channels that the client has registered. */
 	cChannels m_PluginChannels;
+	
+	/** The brand identification of the client, as received in the MC|Brand plugin message or set from a plugin. */
+	AString m_ClientBrand;
 
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
@@ -421,15 +455,6 @@ private:
 	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 
-	/** Handles the "MC|Beacon" plugin message */
-	void HandleBeaconSelection(const char * a_Data, size_t a_Length);
-
-	/** Handles the "MC|AdvCdm" plugin message */
-	void HandleCommandBlockMessage(const char * a_Data, size_t a_Length);
-
-	/** Handles the "MC|ItemName" plugin message */
-	void HandleAnvilItemName(const char * a_Data, size_t a_Length);
-	
 	// cSocketThreads::cCallback overrides:
 	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client

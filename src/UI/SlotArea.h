@@ -20,6 +20,7 @@ class cChestEntity;
 class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
+class cMinecartWithChest;
 class cCraftingRecipe;
 class cEnchantingWindow;
 class cWorld;
@@ -448,9 +449,26 @@ protected:
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
-	/// Called after an item has been smelted to handle statistics e.t.c.
+	/// Called after an item has been smelted to handle statistics etc.
 	void HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
+
+
+
+
+
+class cSlotAreaMinecartWithChest :
+	public cSlotArea
+{
+public:
+	cSlotAreaMinecartWithChest(cMinecartWithChest * a_ChestCart, cWindow & a_ParentWindow);
+
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+protected:
+	cMinecartWithChest * m_Chest;
+};
 
 
 

@@ -70,17 +70,6 @@ bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cHopperEntity::SaveToJson(Json::Value & a_Value)
-{
-	UNUSED(a_Value);
-	// TODO
-	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
-}
-
-
-
-
-
 void cHopperEntity::SendTo(cClientHandle & a_Client)
 {
 	// The hopper entity doesn't need anything sent to the client when it's created / gets in the viewdistance

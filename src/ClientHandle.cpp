@@ -551,6 +551,16 @@ void cClientHandle::RemoveFromAllChunks()
 
 
 
+void cClientHandle::HandleNPCTrade(int a_SlotNum)
+{
+	// TODO
+	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+}
+
+
+
+
+
 void cClientHandle::HandlePing(void)
 {
 	// Somebody tries to retrieve information about the server
@@ -573,7 +583,6 @@ void cClientHandle::HandlePing(void)
 
 bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
 {
-	LOGD("LOGIN %s", a_Username.c_str());
 	m_Username = a_Username;
 
 	if (cRoot::Get()->GetPluginManager()->CallHookLogin(this, a_ProtocolVersion, a_Username))
@@ -676,25 +685,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm")
-	{
-		// Command block, set text, Client -> Server
-		HandleCommandBlockMessage(a_Message.c_str(), a_Message.size());
-	}
-	else if (a_Channel == "MC|Brand")
-	{
-		// Client <-> Server branding exchange
-		SendPluginMessage("MC|Brand", "MCServer");
-	}
-	else if (a_Channel == "MC|Beacon")
-	{
-		HandleBeaconSelection(a_Message.c_str(), a_Message.size());
-	}
-	else if (a_Channel == "MC|ItemName")
-	{
-		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
-	}
-	else if (a_Channel == "REGISTER")
+	if (a_Channel == "REGISTER")
 	{
 		if (HasPluginChannel(a_Channel))
 		{
@@ -777,15 +768,8 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
+void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect)
 {
-	if (a_Length < 14)
-	{
-		SendChat("Failure setting beacon selection; bad request", mtFailure);
-		LOGD("Malformed MC|Beacon packet.");
-		return;
-	}
-
 	cWindow * Window = m_Player->GetWindow();
 	if ((Window == NULL) || (Window->GetWindowType() != cWindow::wtBeacon))
 	{
@@ -798,23 +782,15 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 		return;
 	}
 
-	cByteBuffer Buffer(a_Length);
-	Buffer.Write(a_Data, a_Length);
-
-	int PrimaryEffectID, SecondaryEffectID;
-	Buffer.ReadBEInt(PrimaryEffectID);
-	Buffer.ReadBEInt(SecondaryEffectID);
-
 	cEntityEffect::eType PrimaryEffect = cEntityEffect::effNoEffect;
-	if ((PrimaryEffectID >= 0) && (PrimaryEffectID <= (int)cEntityEffect::effSaturation))
+	if ((a_PrimaryEffect >= 0) && (a_PrimaryEffect <= (int)cEntityEffect::effSaturation))
 	{
-		PrimaryEffect = (cEntityEffect::eType)PrimaryEffectID;
+		PrimaryEffect = (cEntityEffect::eType)a_PrimaryEffect;
 	}
-
 	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
-	if ((SecondaryEffectID >= 0) && (SecondaryEffectID <= (int)cEntityEffect::effSaturation))
+	if ((a_SecondaryEffect >= 0) && (a_SecondaryEffect <= (int)cEntityEffect::effSaturation))
 	{
-		SecondaryEffect = (cEntityEffect::eType)SecondaryEffectID;
+		SecondaryEffect = (cEntityEffect::eType)a_SecondaryEffect;
 	}
 
 	Window->SetSlot(*m_Player, 0, cItem());
@@ -841,52 +817,12 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Length)
+void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand)
 {
-	if (a_Length < 14)
-	{
-		SendChat("Failure setting command block command; bad request", mtFailure);
-		LOGD("Malformed MC|AdvCdm packet.");
-		return;
-	}
-
-	cByteBuffer Buffer(a_Length);
-	Buffer.Write(a_Data, a_Length);
-
-	int BlockX, BlockY, BlockZ;
-
-	AString Command;
-
-	char Mode;
-
-	Buffer.ReadChar(Mode);
-
-	switch (Mode)
-	{
-		case 0x00:
-		{
-			Buffer.ReadBEInt(BlockX);
-			Buffer.ReadBEInt(BlockY);
-			Buffer.ReadBEInt(BlockZ);
-
-			Buffer.ReadVarUTF8String(Command);
-			break;
-		}
-
-		default:
-		{
-			SendChat("Failure setting command block command; unhandled mode", mtFailure);
-			LOGD("Unhandled MC|AdvCdm packet mode.");
-			return;
-		}
-	}
-
 	cWorld * World = m_Player->GetWorld();
-
 	if (World->AreCommandBlocksEnabled())
 	{
-		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
-		
+		World->SetCommandBlockCommand(a_BlockX, a_BlockY, a_BlockZ, a_NewCommand);
 		SendChat("Successfully set command block command", mtSuccess);
 	}
 	else
@@ -899,22 +835,26 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Leng
 
 
 
-void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
+void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand)
 {
-	if (a_Length < 1)
-	{
-		return;
-	}
+	// TODO
+	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+}
 
+
+
+
+
+void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
+{
 	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
 	{
 		return;
 	}
 
-	AString Name(a_Data, a_Length);
-	if (Name.length() <= 30)
+	if (a_ItemName.length() <= 30)
 	{
-		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(Name, m_Player);
+		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(a_ItemName, m_Player);
 	}
 }
 

@@ -121,12 +121,14 @@ public:
 
 			// If on a block that can only hold a torch if torch is standing on it, return that face
 			if (
-				((BlockInQuestion == E_BLOCK_GLASS) ||
-				(BlockInQuestion == E_BLOCK_FENCE) ||
-				(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
-                		(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL) ||
-                		(BlockInQuestion == E_BLOCK_STONE_SLAB) ||
-                		(BlockInQuestion == E_BLOCK_WOODEN_SLAB)) &&
+				(
+					(BlockInQuestion == E_BLOCK_GLASS) ||
+					(BlockInQuestion == E_BLOCK_FENCE) ||
+					(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
+					(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL) ||
+					(BlockInQuestion == E_BLOCK_STONE_SLAB) ||
+					(BlockInQuestion == E_BLOCK_WOODEN_SLAB)
+				) &&
 				(Face == BLOCK_FACE_TOP)
 			)
 			{
@@ -163,7 +165,9 @@ public:
 			(BlockInQuestion == E_BLOCK_MOB_SPAWNER) ||
 			(BlockInQuestion == E_BLOCK_END_PORTAL_FRAME) ||  // Actual vanilla behaviour
 			(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
-			(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL)
+			(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL) ||
+			(BlockInQuestion == E_BLOCK_STONE_SLAB) ||
+			(BlockInQuestion == E_BLOCK_WOODEN_SLAB)
 		)
 		{
 			// Torches can be placed on tops of glass and fences, despite them being 'untorcheable'

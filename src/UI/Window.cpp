@@ -14,6 +14,7 @@
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/HopperEntity.h"
+#include "../Entities/Minecart.h"
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
 
@@ -1076,6 +1077,34 @@ cChestWindow::~cChestWindow()
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cMinecartWithChestWindow:
+
+cMinecartWithChestWindow::cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart) :
+	cWindow(wtChest, "Minecart with Chest"),
+	m_ChestCart(a_ChestCart)
+{
+	m_ShouldDistributeToHotbarFirst = false;
+	m_SlotAreas.push_back(new cSlotAreaMinecartWithChest(a_ChestCart, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+
+	a_ChestCart->GetWorld()->BroadcastSoundEffect("random.chestopen", a_ChestCart->GetPosX(), a_ChestCart->GetPosY(), a_ChestCart->GetPosZ(), 1, 1);
+}
+
+
+
+
+
+cMinecartWithChestWindow::~cMinecartWithChestWindow()
+{
+	m_ChestCart->GetWorld()->BroadcastSoundEffect("random.chestclosed", m_ChestCart->GetPosX(), m_ChestCart->GetPosY(), m_ChestCart->GetPosZ(), 1, 1);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cDropSpenserWindow:
 
 cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
@@ -1101,6 +1130,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	m_BlockY(a_EnderChest->GetPosY()),
 	m_BlockZ(a_EnderChest->GetPosZ())
 {
+	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaEnderChest(a_EnderChest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));

@@ -34,7 +34,6 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	m_LastProgressFuel(0),
 	m_LastProgressCook(0)
 {
-	cBlockEntityWindowOwner::SetBlockEntity(this);
 	m_Contents.AddListener(*this);
 }
 
@@ -124,60 +123,6 @@ bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 	UpdateProgressBars();
 	
 	return true;
-}
-
-
-
-
-
-bool cFurnaceEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	Json::Value AllSlots = a_Value.get("Slots", 0);
-	int SlotIdx = 0;
-	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
-	{
-		cItem Item;
-		Item.FromJson(*itr);
-		SetSlot(SlotIdx, Item);
-		SlotIdx++;
-	}
-
-	m_NeedCookTime = (int)(a_Value.get("CookTime",   0).asDouble() / 50);
-	m_TimeCooked   = (int)(a_Value.get("TimeCooked", 0).asDouble() / 50);
-	m_FuelBurnTime = (int)(a_Value.get("BurnTime",   0).asDouble() / 50);
-	m_TimeBurned   = (int)(a_Value.get("TimeBurned", 0).asDouble() / 50);
-
-	return true;
-}
-
-
-
-
-
-void cFurnaceEntity::SaveToJson( Json::Value& a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	Json::Value AllSlots;
-	int NumSlots = m_Contents.GetNumSlots();
-	for (int i = 0; i < NumSlots; i++)
-	{
-		Json::Value Slot;
-		m_Contents.GetSlot(i).GetJson(Slot);
-		AllSlots.append(Slot);
-	}
-	a_Value["Slots"] = AllSlots;
-
-	a_Value["CookTime"]   = m_NeedCookTime * 50;
-	a_Value["TimeCooked"] = m_TimeCooked   * 50;
-	a_Value["BurnTime"]   = m_FuelBurnTime * 50;
-	a_Value["TimeBurned"] = m_TimeBurned   * 50;
 }
 
 
