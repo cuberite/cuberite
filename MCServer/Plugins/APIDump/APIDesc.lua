@@ -558,9 +558,9 @@ end
 				and commands suggested on click. The chat message can be sent by the regular chat-sending functions,
 				{{cPlayer}}:SendMessage(), {{cWorld}}:BroadcastChat() and {{cRoot}}:BroadcastChat().</p>
 				<p>
-				Note that most of the functions in this class are so-called modifiers - they modify the object and
-				then return the object itself, so that they can be chained one after another. See the Chaining
-				example below for details.</p>
+				Note that most of the functions in this class are so-called chaining modifiers - they modify the
+				object and then return the object itself, so that they can be chained one after another. See the
+				Chaining example below for details.</p>
 				<p>
 				Each part of the composite chat message takes a "Style" parameter, this is a string that describes
 				the formatting. It uses the following strings, concatenated together:
@@ -584,14 +584,16 @@ end
 					{ Params = "Text", Return = "", Notes = "Creates a chat message containing the specified text, parsed by the ParseText() function. This allows easy migration from old chat messages." },
 				},
 				AddRunCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, runs the specified command. Chaining." },
+				AddShowAchievementPart = { Params = "PlayerName, AchievementName, [Style]", Return = "", Notes = "Adds a text that represents the 'Achievement get' message." },
 				AddSuggestCommandPart = { Params = "Text, Command, [Style]", Return = "self", Notes = "Adds a text which, when clicked, puts the specified command into the player's chat input area. Chaining." },
 				AddTextPart = { Params = "Text, [Style]", Return = "self", Notes = "Adds a regular text. Chaining." },
 				AddUrlPart = { Params = "Text, Url, [Style]", Return = "self", Notes = "Adds a text which, when clicked, opens up a browser at the specified URL. Chaining." },
 				Clear = { Params = "", Return = "", Notes = "Removes all parts from this object" },
 				ExtractText = { Params = "", Return = "string", Notes = "Returns the text from the parts that comprises the human-readable data. Used for older protocols that don't support composite chat and for console-logging." },
+				GetAdditionalMessageTypeData = { Params = "", Return = "string", Notes = "Returns the AdditionalData associated with the message, such as the sender's name for mtPrivateMessage" },
 				GetMessageType = { Params = "", Return = "MessageType", Notes = "Returns the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.)" },
 				ParseText = { Params = "Text", Return = "self", Notes = "Adds text, while recognizing http and https URLs and old-style formatting codes (\"@2\"). Chaining." },
-				SetMessageType = { Params = "MessageType", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.) Chaining." },
+				SetMessageType = { Params = "MessageType, AdditionalData", Return = "self", Notes = "Sets the MessageType (mtXXX constant) that is associated with this message. Also sets the additional data (string) associated with the message, which is specific for the message type - such as the sender's name for mtPrivateMessage. When sent to a player, the message will be formatted according to this message type and the player's settings (adding \"[INFO]\" prefix etc.). Chaining." },
 				UnderlineUrls = { Params = "", Return = "self", Notes = "Makes all URL parts contained in the message underlined. Doesn't affect parts added in the future. Chaining." },
 			},
 
