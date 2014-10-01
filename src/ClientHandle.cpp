@@ -2168,7 +2168,9 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
 
+	cCSLock Lock(m_CSChunkLists);
 	m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	Lock.Unlock();
 
 	// If it is the chunk the player's in, make them spawn (in the tick thread):
 	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
@@ -2699,8 +2701,10 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_D
 
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
+	cCSLock Lock(m_CSChunkLists);
 	m_SentChunks.remove(cChunkCoords(a_ChunkX, a_ChunkZ));
+	Lock.Unlock();
+	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
 }
 
 
