@@ -1957,26 +1957,20 @@ static int tolua_cPlayer_PermissionMatches(lua_State * tolua_S)
 	// Check the params:
 	cLuaState L(tolua_S);
 	if (
-		!L.CheckParamUserType(1, "cPlayer") ||
-		!L.CheckParamString  (2, 3) ||
-		!L.CheckParamEnd     (4)
+		!L.CheckParamUserTable(1, "cPlayer") ||
+		!L.CheckParamString   (2, 3) ||
+		!L.CheckParamEnd      (4)
 	)
 	{
 		return 0;
 	}
 
 	// Get the params:
-	cPlayer * self = (cPlayer *)tolua_tousertype(tolua_S, 1, NULL);
-	if (self == NULL)
-	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
-		return 0;
-	}
 	AString Permission, Template;
 	L.GetStackValues(2, Permission, Template);
 	
 	// Push the result of the match:
-	L.Push(self->PermissionMatches(StringSplit(Permission, "."), StringSplit(Template, ".")));
+	L.Push(cPlayer::PermissionMatches(StringSplit(Permission, "."), StringSplit(Template, ".")));
 	return 1;
 }
 
