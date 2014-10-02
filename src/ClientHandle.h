@@ -145,7 +145,9 @@ public:
 	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDisconnect                 (const AString & a_Reason);
+	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
 	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
@@ -156,6 +158,8 @@ public:
 	void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
 	void SendEntityVelocity             (const cEntity & a_Entity);
+	void SendExperience                 (void);
+	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
 	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
@@ -164,15 +168,14 @@ public:
 	void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale);
 	void SendMapInfo                    (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
-	void SendPickupSpawn                (const cPickup & a_Pickup);
-	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
+	void SendPickupSpawn                (const cPickup & a_Pickup);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
+	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
 	void SendPlayerListUpdatePing       (const cPlayer & a_Player);
-	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
@@ -180,11 +183,8 @@ public:
 	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	void SendExperience                 (void);
-	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
-	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
+	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
