@@ -96,10 +96,29 @@ public:
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn);
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
+		BLOCKTYPE BlockIsOn;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+
+		if (
+			(
+				(BlockIsOn == E_BLOCK_WOODEN_SLAP) ||
+				(BlockIsOn == E_BLOCK_STONE_SLAP)
+			) &&
+			(a_RelY > 0)
+		)
+		{
+			return true;
+		}
+		else if (!cBlockInfo::FullyOccupiesVoxel(BlockIsOn) && !(a_RelY > 0))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 
