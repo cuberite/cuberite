@@ -1025,15 +1025,15 @@ public:
 
 	virtual void InitializeBiomeGen(cIniFile & a_IniFile) override
 	{
-		m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiSmallCellSize", 128));
-		m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiLargeCellSize", 1024));
+		m_VoronoiSmall.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiSmallCellSize", 256));
+		m_VoronoiLarge.SetCellSize(a_IniFile.GetValueSetI("Generator", "PerlinoiLargeCellSize", 2048));
 		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq1", 0.005f), 1.0f);
 		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq2", 0.1f),   0.1f);
 		m_OceanNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanNoiseFreq3", 0.5f),   0.01f);
-		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq1", 0.015f), 1.0f);
-		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq2", 0.05f),  0.1f);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq1", 0.005f), 1.0f);
+		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq2", 0.04f),  0.1f);
 		m_RiverNoise.AddOctave((NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverNoiseFreq3", 0.25f),  0.01f);
-		m_RiverThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverThreshold",           0.02f);
+		m_RiverThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiRiverThreshold",           0.05f);
 		m_BeachThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiBeachThreshold",          -0.08f);
 		m_OceanThreshold          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiOceanThreshold",          -0.1f);
 		m_DeepOceanThreshold      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "PerlinoiDeepOceanThreshold",      -0.5f);
