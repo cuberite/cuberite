@@ -104,8 +104,8 @@ public:
 
 		if (
 			(
-                ((BlockIsOn == E_BLOCK_WOODEN_SLAB) && ((Meta & 0x08) == 0x08)) ||
-                ((BlockIsOn == E_BLOCK_STONE_SLAB) && ((Meta & 0x08) == 0x08))
+				((BlockIsOn == E_BLOCK_WOODEN_SLAB) && ((Meta & 0x08) == 0x08)) ||
+				((BlockIsOn == E_BLOCK_STONE_SLAB) && ((Meta & 0x08) == 0x08))
 			) &&
 			(a_RelY > 0)
 		)
