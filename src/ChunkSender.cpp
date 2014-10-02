@@ -192,40 +192,37 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	ASSERT(m_World != NULL);
 	
 	// Ask the client if it still wants the chunk:
-	if (a_Client != NULL)
+	if ((a_Client != NULL) && !a_Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
 	{
-		if (!a_Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
-		{
-			return;
-		}
+		return;
 	}
-	
+
 	// If the chunk has no clients, no need to packetize it:
 	if (!m_World->HasChunkAnyClients(a_ChunkX, a_ChunkZ))
 	{
 		return;
 	}
-	
+
 	// If the chunk is not valid, do nothing - whoever needs it has queued it for loading / generating
 	if (!m_World->IsChunkValid(a_ChunkX, a_ChunkZ))
 	{
 		return;
 	}
-	
+
 	// If the chunk is not lighted, queue it for relighting and get notified when it's ready:
 	if (!m_World->IsChunkLighted(a_ChunkX, a_ChunkZ))
 	{
 		m_World->QueueLightChunk(a_ChunkX, a_ChunkZ, &m_Notify);
 		return;
 	}
-	
+
 	// Query and prepare chunk data:
 	if (!m_World->GetChunkData(a_ChunkX, a_ChunkZ, *this))
 	{
 		return;
 	}
 	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap);
-	
+
 	// Send:
 	if (a_Client == NULL)
 	{
@@ -235,7 +232,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	{
 		a_Client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
 	}
-	
+
 	// Send block-entity packets:
 	for (sBlockCoords::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
@@ -249,7 +246,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 		}
 	}  // for itr - m_Packets[]
 	m_BlockEntities.clear();
-	
+
 	// TODO: Send entity spawn packets
 }
 

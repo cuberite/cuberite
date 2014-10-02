@@ -70,8 +70,6 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_OutgoingData(64 KiB),
 	m_Player(NULL),
 	m_HasSentDC(false),
-	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
-	m_LastStreamedChunkZ(0x7fffffff),
 	m_TimeSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
@@ -401,53 +399,84 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 
 
-void cClientHandle::StreamChunks(void)
+void cClientHandle::StreamNextChunk(void)
 {
 	if ((m_State < csAuthenticated) || (m_State >= csDestroying))
 	{
 		return;
 	}
 
-	ASSERT(m_Player != NULL);
+	Vector3d LookVector = m_Player->GetLookVector();
+	LookVector.Normalize();
 
+	Vector3d Position = m_Player->GetEyePosition();
+	for (size_t Range = 0; Range < (size_t)m_ViewDistance; Range++)
+	{
+		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
+
+		int RangeX, RangeZ = 0;
+		cChunkDef::BlockToChunk((int)std::floor(Vector.x), (int)std::floor(Vector.z), RangeX, RangeZ);
+
+		for (size_t X = 0; X < 6; X++)
+		{
+			for (size_t Z = 0; Z < 6; Z++)
+			{
+				int ChunkX = RangeX + ((X >= 3) ? (2 - X) : X);
+				int ChunkZ = RangeZ + ((Z >= 3) ? (2 - Z) : Z);
+				cChunkCoords Coords(ChunkX, ChunkZ);
+
+				// If the chunk already loading/loaded -> skip
+				{
+					cCSLock Lock(m_CSChunkLists);
+					if (
+						(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+						(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+					)
+					{
+						continue;
+					}
+				}
+
+				// Unloaded chunk found -> Send it to the client.
+				StreamChunk(ChunkX, ChunkZ);
+				return;
+			}
+		}
+	}
+}
+
+
+
+
+
+void cClientHandle::UnloadOutOfRangeChunks(void)
+{
 	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
 	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
-	if ((ChunkPosX == m_LastStreamedChunkX) && (ChunkPosZ == m_LastStreamedChunkZ))
-	{
-		// Already streamed for this position
-		return;
-	}
-	m_LastStreamedChunkX = ChunkPosX;
-	m_LastStreamedChunkZ = ChunkPosZ;
-	
-	LOGD("Streaming chunks centered on [%d, %d], view distance %d", ChunkPosX, ChunkPosZ, m_ViewDistance);
-	
-	cWorld * World = m_Player->GetWorld();
-	ASSERT(World != NULL);
 
-	// Remove all loaded chunks that are no longer in range; deferred to out-of-CS:
-	cChunkCoordsList RemoveChunks;
+	cChunkCoordsList ChunksToRemove;
 	{
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
 		{
-			int RelX = (*itr).m_ChunkX - ChunkPosX;
-			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
-			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
+			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
+			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
+			if ((DiffX > m_ViewDistance) || (DiffZ > m_ViewDistance))
 			{
-				RemoveChunks.push_back(*itr);
+				ChunksToRemove.push_back(*itr);
 				itr = m_LoadedChunks.erase(itr);
 			}
 			else
 			{
 				++itr;
 			}
-		}  // for itr - m_LoadedChunks[]
+		}
+
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
 		{
-			int RelX = (*itr).m_ChunkX - ChunkPosX;
-			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
-			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
+			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
+			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
+			if ((DiffX > m_ViewDistance) || (DiffZ > m_ViewDistance))
 			{
 				itr = m_ChunksToSend.erase(itr);
 			}
@@ -455,47 +484,16 @@ void cClientHandle::StreamChunks(void)
 			{
 				++itr;
 			}
-		}  // for itr - m_ChunksToSend[]
+		}
 	}
-	for (cChunkCoordsList::iterator itr = RemoveChunks.begin(); itr != RemoveChunks.end(); ++itr)
+
+	for (cChunkCoordsList::iterator itr = ChunksToRemove.begin(); itr != ChunksToRemove.end(); ++itr)
 	{
-		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
+		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
-	}  // for itr - RemoveChunks[]
-	
-	// Add all chunks that are in range and not yet in m_LoadedChunks:
-	// Queue these smartly - from the center out to the edge
-	for (int d = 0; d <= m_ViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
-	{
-		// For each distance add chunks in a hollow square centered around current position:
-		for (int i = -d; i <= d; ++i)
-		{
-			StreamChunk(ChunkPosX + d, ChunkPosZ + i);
-			StreamChunk(ChunkPosX - d, ChunkPosZ + i);
-		}  // for i
-		for (int i = -d + 1; i < d; ++i)
-		{
-			StreamChunk(ChunkPosX + i, ChunkPosZ + d);
-			StreamChunk(ChunkPosX + i, ChunkPosZ - d);
-		}  // for i
-	}  // for d
-	
-	// Touch chunks GENERATEDISTANCE ahead to let them generate:
-	for (int d = m_ViewDistance + 1; d <= m_ViewDistance + GENERATEDISTANCE; ++d)  // cycle through (square) distance, from nearest to furthest
-	{
-		// For each distance touch chunks in a hollow square centered around current position:
-		for (int i = -d; i <= d; ++i)
-		{
-			World->TouchChunk(ChunkPosX + d, ChunkPosZ + i);
-			World->TouchChunk(ChunkPosX - d, ChunkPosZ + i);
-		}  // for i
-		for (int i = -d + 1; i < d; ++i)
-		{
-			World->TouchChunk(ChunkPosX + i, ChunkPosZ + d);
-			World->TouchChunk(ChunkPosX + i, ChunkPosZ - d);
-		}  // for i
-	}  // for d
+	}
 }
+
 
 
 
@@ -539,11 +537,6 @@ void cClientHandle::RemoveFromAllChunks()
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
-		
-		// Also reset the LastStreamedChunk coords to bogus coords,
-		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
-		m_LastStreamedChunkX = 0x7fffffff;
-		m_LastStreamedChunkZ = 0x7fffffff;
 	}
 }
 
@@ -1858,10 +1851,7 @@ void cClientHandle::RemoveFromWorld(void)
 	{
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
-	
-	// Here, we set last streamed values to bogus ones so everything is resent
-	m_LastStreamedChunkX = 0x7fffffff;
-	m_LastStreamedChunkZ = 0x7fffffff;
+
 	m_HasSentPlayerChunk = false;
 }
 
@@ -1907,7 +1897,7 @@ void cClientHandle::Tick(float a_Dt)
 	{
 		return;
 	}
-	
+
 	// If the chunk the player's in was just sent, spawn the player:
 	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
@@ -1925,6 +1915,17 @@ void cClientHandle::Tick(float a_Dt)
 			m_PingStartTime = t1.GetNowTime();
 			m_Protocol->SendKeepAlive(m_PingID);
 			m_LastPingTime = m_PingStartTime;
+		}
+	}
+
+	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
+	{
+		StreamNextChunk();  // Streams the next chunk
+
+		// Unload all chunks that are out of the view distance (all 2 seconds)
+		if ((m_Player->GetWorld()->GetWorldAge() % 40) == 0)
+		{
+			UnloadOutOfRangeChunks();
 		}
 	}
 
@@ -1964,7 +1965,7 @@ void cClientHandle::ServerTick(float a_Dt)
 	
 	if (m_State == csAuthenticated)
 	{
-		StreamChunks();
+		StreamNextChunk();
 
 		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
 		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
@@ -2723,18 +2724,8 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
-	if (a_ViewDistance < MIN_VIEW_DISTANCE)
-	{
-		a_ViewDistance = MIN_VIEW_DISTANCE;
-	}
-	if (a_ViewDistance > MAX_VIEW_DISTANCE)
-	{
-		a_ViewDistance = MAX_VIEW_DISTANCE;
-	}
-	m_ViewDistance = a_ViewDistance;
-	
-	// Need to re-stream chunks for the change to become apparent:
-	StreamChunks();
+	m_ViewDistance = Clamp(a_ViewDistance, MIN_VIEW_DISTANCE, MAX_VIEW_DISTANCE);
+	LOGD("Setted %s's view distance to %i", GetUsername().c_str(), m_ViewDistance);
 }
 
 

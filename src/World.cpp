@@ -3491,7 +3491,6 @@ void cWorld::AddQueuedPlayers(void)
 		cClientHandle * Client = (*itr)->GetClientHandle();
 		if (Client != NULL)
 		{
-			Client->StreamChunks();
 			Client->SendPlayerMoveLook();
 			Client->SendHealth();
 			Client->SendWholeInventory(*(*itr)->GetWindow());

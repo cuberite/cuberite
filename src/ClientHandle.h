@@ -113,7 +113,11 @@ public:
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
-	void StreamChunks(void);
+	/** This function sends a new unloaded chunk to the player. */
+	void StreamNextChunk(void);
+
+	/** Remove all loaded chunks that are no longer in range */
+	void UnloadOutOfRangeChunks(void);
 	
 	// Removes the client from all chunks. Used when switching worlds or destroying the player
 	void RemoveFromAllChunks(void);
@@ -352,10 +356,6 @@ private:
 	cPlayer * m_Player;
 	
 	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
-	
-	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
-	int m_LastStreamedChunkX;
-	int m_LastStreamedChunkZ;
 
 	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
 	float m_TimeSinceLastPacket;
