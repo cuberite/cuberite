@@ -80,6 +80,27 @@ void BiomeView::setChunkSource(std::shared_ptr<ChunkSource> a_ChunkSource)
 
 
 
+void BiomeView::setPosition(int a_BlockX, int a_BlockZ)
+{
+	m_X = a_BlockX;
+	m_Z = a_BlockZ;
+	redraw();
+}
+
+
+
+
+
+void BiomeView::setZoomLevel(double a_ZoomLevel)
+{
+	m_Zoom = a_ZoomLevel;
+	redraw();
+}
+
+
+
+
+
 void BiomeView::redraw()
 {
 	if (!hasData())
@@ -307,12 +328,12 @@ void BiomeView::wheelEvent(QWheelEvent * a_Event)
 	m_MouseWheelDelta += a_Event->delta();
 	while (m_MouseWheelDelta >= DELTA_STEP)
 	{
-		increaseZoom();
+		emit wheelUp();
 		m_MouseWheelDelta -= DELTA_STEP;
 	}
 	while (m_MouseWheelDelta <= -DELTA_STEP)
 	{
-		decreaseZoom();
+		emit wheelDown();
 		m_MouseWheelDelta += DELTA_STEP;
 	}
 }
@@ -360,66 +381,17 @@ void BiomeView::keyPressEvent(QKeyEvent * a_Event)
 		case Qt::Key_PageUp:
 		case Qt::Key_Q:
 		{
-			increaseZoom();
+			emit increaseZoom();
 			break;
 		}
 
 		case Qt::Key_PageDown:
 		case Qt::Key_E:
 		{
-			decreaseZoom();
+			emit decreaseZoom();
 			break;
 		}
 	}
-}
-
-
-
-
-
-void BiomeView::decreaseZoom()
-{
-	if (m_Zoom > 1.001)
-	{
-		m_Zoom--;
-		if (m_Zoom < 1.0)
-		{
-			// Just crossed the 100%, fixate the 100% threshold:
-			m_Zoom = 1.0;
-		}
-	}
-	else if (m_Zoom > 0.01)
-	{
-		m_Zoom = m_Zoom / 2;
-	}
-	redraw();
-}
-
-
-
-
-
-void BiomeView::increaseZoom()
-{
-	if (m_Zoom > 0.99)
-	{
-		if (m_Zoom > 20.0)
-		{
-			// Zoom too large
-			return;
-		}
-		m_Zoom++;
-	}
-	else
-	{
-		m_Zoom = m_Zoom * 2;
-		if (m_Zoom > 1.0)
-		{
-			// Just crossed the 100%, fixate the 100% threshold:
-			m_Zoom = 1.0;
-		}
-	}
-	redraw();
 }
 
 
