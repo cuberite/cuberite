@@ -4,6 +4,7 @@
 #include <QList>
 #include <QMainWindow>
 #include <QHBoxLayout>
+#include <QLabel>
 #include "BiomeView.h"
 
 
@@ -51,6 +52,9 @@ private slots:
 	/** Sets a zoom level one step smaller than current, if allowed. */
 	void decreaseZoom();
 
+	/** Updates the statusbar for the specified info about the current block under the cursor. */
+	void hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome);
+
 protected:
 	/** The zoom levels */
 	static const double m_ViewZooms[10];
@@ -78,6 +82,13 @@ protected:
 
 	/** The layout for the window. */
 	QHBoxLayout * m_MainLayout;
+
+	/** The status bar that displays the current hover information. */
+	QStatusBar * m_StatusBar;
+
+	QLabel * m_StatusBlockX;
+	QLabel * m_StatusBlockZ;
+	QLabel * m_StatusBiome;
 
 	/** The separator line between biome view and generator setup. */
 	QWidget * m_LineSeparator;

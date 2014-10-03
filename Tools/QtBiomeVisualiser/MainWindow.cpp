@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QSettings>
 #include <QDirIterator>
+#include <QStatusBar>
 #include "inifile/iniFile.h"
 #include "ChunkSource.h"
 #include "src/Generating/BioGen.h"
@@ -40,6 +41,15 @@ MainWindow::MainWindow(QWidget * parent) :
 	connect(m_BiomeView, SIGNAL(wheelUp()),      this, SLOT(increaseZoom()));
 	connect(m_BiomeView, SIGNAL(wheelDown()),    this, SLOT(decreaseZoom()));
 
+	m_StatusBar = new QStatusBar();
+	this->setStatusBar(m_StatusBar);
+	m_StatusBlockX = new QLabel(tr("X"));
+	m_StatusBlockZ = new QLabel(tr("Z"));
+	m_StatusBiome = new QLabel(tr("B"));
+	m_StatusBar->addPermanentWidget(m_StatusBlockX);
+	m_StatusBar->addPermanentWidget(m_StatusBlockZ);
+	m_StatusBar->addPermanentWidget(m_StatusBiome);
+
 	m_MainLayout = new QHBoxLayout();
 	m_MainLayout->addWidget(m_BiomeView, 1);
 	m_MainLayout->setMenuBar(menuBar());
@@ -50,6 +60,8 @@ MainWindow::MainWindow(QWidget * parent) :
 
 	createActions();
 	createMenus();
+
+	connect(m_BiomeView, SIGNAL(hoverChanged(int, int, int)), this, SLOT(hoverChanged(int, int, int)));
 }
 
 
@@ -205,6 +217,17 @@ void MainWindow::decreaseZoom()
 
 
 
+void MainWindow::hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome)
+{
+	m_StatusBlockX->setText(tr("X: %1").arg(a_BlockX));
+	m_StatusBlockZ->setText(tr("Z: %1").arg(a_BlockZ));
+	m_StatusBiome->setText (tr("B: %1 (%2)").arg(BiomeToString(a_Biome).c_str()).arg(a_Biome));
+}
+
+
+
+
+
 void MainWindow::initMinecraftPath()
 {
 	#ifdef Q_OS_MAC
@@ -322,7 +345,7 @@ void MainWindow::createMenus()
 	file->addAction(m_actNewGen);
 	file->addAction(m_actOpenGen);
 	file->addSeparator();
-	QMenu * worlds = file->addMenu(tr("Open existing"));
+	QMenu * worlds = file->addMenu(tr("Open &existing"));
 	worlds->addActions(m_WorldActions);
 	if (m_WorldActions.empty())
 	{

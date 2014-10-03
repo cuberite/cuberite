@@ -42,8 +42,9 @@ BiomeView::BiomeView(QWidget * parent) :
 	// Add a chunk-update callback mechanism:
 	connect(&m_Cache, SIGNAL(chunkAvailable(int, int)), this, SLOT(chunkAvailable(int, int)));
 
-	// Allow keyboard interaction:
+	// Allow mouse and keyboard interaction:
 	setFocusPolicy(Qt::StrongFocus);
+	setMouseTracking(true);
 }
 
 
@@ -296,6 +297,12 @@ void BiomeView::mousePressEvent(QMouseEvent * a_Event)
 
 void BiomeView::mouseMoveEvent(QMouseEvent * a_Event)
 {
+	// If there's no data displayed, bail out:
+	if (!hasData())
+	{
+		return;
+	}
+
 	if (m_IsMouseDragging)
 	{
 		// The user is dragging the mouse, move the view around:
@@ -307,7 +314,15 @@ void BiomeView::mouseMoveEvent(QMouseEvent * a_Event)
 		return;
 	}
 
-	// TODO: Update the status bar info for the biome currently pointed at
+	// Update the status bar info text:
+	int blockX = floor((a_Event->x() - width()  / 2) / m_Zoom + m_X);
+	int blockZ = floor((a_Event->y() - height() / 2) / m_Zoom + m_Z);
+	int chunkX, chunkZ;
+	int relX = blockX, relY, relZ = blockZ;
+	cChunkDef::AbsoluteToRelative(relX, relY, relZ, chunkX, chunkZ);
+	auto chunk = m_Cache.fetch(chunkX, chunkZ);
+	int biome = (chunk.get() != nullptr) ? chunk->getBiome(relX, relZ) : biInvalidBiome;
+	emit hoverChanged(blockX, blockZ, biome);
 }
 
 

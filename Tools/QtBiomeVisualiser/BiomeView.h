@@ -44,6 +44,9 @@ signals:
 	/** Signalled when the user presses a key to decrease zoom. */
 	void decreaseZoom();
 
+	/** Emitted when the user moves the mouse, to reflect the current block under the cursor. */
+	void hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome);
+
 public slots:
 	/** Redraw the entire widget area. */
 	void redraw();
