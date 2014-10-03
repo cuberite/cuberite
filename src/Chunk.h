@@ -33,7 +33,7 @@ class cChunkMap;
 class cBeaconEntity;
 class cBoundingBox;
 class cChestEntity;
-class cCHunkDataCallback;
+class cChunkDataCallback;
 class cCommandBlockEntity;
 class cDispenserEntity;
 class cFurnaceEntity;

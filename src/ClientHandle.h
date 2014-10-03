@@ -204,7 +204,7 @@ public:
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
-	void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value);
+	void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value);
 
 	// tolua_begin
 	const AString & GetUsername(void) const;

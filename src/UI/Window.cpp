@@ -758,20 +758,7 @@ void cWindow::BroadcastWholeWindow(void)
 
 
 
-void cWindow::BroadcastProgress(int a_Progressbar, int a_Value)
-{
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
-	{
-		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Progressbar, a_Value);
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SetProperty(int a_Property, int a_Value)
+void cWindow::SetProperty(short a_Property, short a_Value)
 {
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
@@ -784,7 +771,7 @@ void cWindow::SetProperty(int a_Property, int a_Value)
 
 
 
-void cWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
+void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
 	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
 }
@@ -919,7 +906,7 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 
-void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
+void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
 {
 	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
 	{
@@ -935,7 +922,7 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 
 
 
-void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
+void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
 {
 	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
 	{
@@ -951,7 +938,7 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Pla
 
 
 
-int cEnchantingWindow::GetPropertyValue(int a_Property)
+short cEnchantingWindow::GetPropertyValue(short a_Property)
 {
 	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
 	{
