@@ -18,6 +18,15 @@
 
 
 
+const double MainWindow::m_ViewZooms[] =
+{
+	0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 24,
+};
+
+
+
+
+
 MainWindow::MainWindow(QWidget * parent) :
 	QMainWindow(parent),
 	m_GeneratorSetup(nullptr),
@@ -26,6 +35,11 @@ MainWindow::MainWindow(QWidget * parent) :
 	initMinecraftPath();
 
 	m_BiomeView = new BiomeView();
+	connect(m_BiomeView, SIGNAL(increaseZoom()), this, SLOT(increaseZoom()));
+	connect(m_BiomeView, SIGNAL(decreaseZoom()), this, SLOT(decreaseZoom()));
+	connect(m_BiomeView, SIGNAL(wheelUp()),      this, SLOT(increaseZoom()));
+	connect(m_BiomeView, SIGNAL(wheelDown()),    this, SLOT(decreaseZoom()));
+
 	m_MainLayout = new QHBoxLayout();
 	m_MainLayout->addWidget(m_BiomeView, 1);
 	m_MainLayout->setMenuBar(menuBar());
@@ -129,6 +143,68 @@ void MainWindow::openVanillaWorld()
 
 
 
+void MainWindow::centerView()
+{
+	m_BiomeView->setPosition(0, 0);
+}
+
+
+
+
+
+void MainWindow::setViewZoom()
+{
+	// The zoom level is stored in the sender action's data, retrieve it:
+	QAction * action = qobject_cast<QAction *>(sender());
+	if (action == nullptr)
+	{
+		return;
+	}
+	double newZoom = m_ViewZooms[action->data().toInt()];
+	m_BiomeView->setZoomLevel(newZoom);
+	action->setChecked(true);
+}
+
+
+
+
+
+void MainWindow::increaseZoom()
+{
+	// If already at max zoom, bail out:
+	if (m_CurrentZoomLevel >= ARRAYCOUNT(m_ViewZooms) - 1)
+	{
+		return;
+	}
+
+	// Increase the zoom level:
+	m_CurrentZoomLevel += 1;
+	m_actViewZoom[m_CurrentZoomLevel]->setChecked(true);
+	m_BiomeView->setZoomLevel(m_ViewZooms[m_CurrentZoomLevel]);
+}
+
+
+
+
+
+void MainWindow::decreaseZoom()
+{
+	// If already at min zoom, bail out:
+	if (m_CurrentZoomLevel == 0)
+	{
+		return;
+	}
+
+	// Decrease the zoom level:
+	m_CurrentZoomLevel -= 1;
+	m_actViewZoom[m_CurrentZoomLevel]->setChecked(true);
+	m_BiomeView->setZoomLevel(m_ViewZooms[m_CurrentZoomLevel]);
+}
+
+
+
+
+
 void MainWindow::initMinecraftPath()
 {
 	#ifdef Q_OS_MAC
@@ -147,6 +223,7 @@ void MainWindow::initMinecraftPath()
 
 void MainWindow::createActions()
 {
+	// Map menu:
 	createWorldActions();
 
 	m_actNewGen = new QAction(tr("&New generator"), this);
@@ -173,6 +250,26 @@ void MainWindow::createActions()
 	m_actExit->setShortcut(tr("Alt+X"));
 	m_actExit->setStatusTip(tr("Exit %1").arg(QApplication::instance()->applicationName()));
 	connect(m_actExit, SIGNAL(triggered()), this, SLOT(close()));
+
+	// View menu:
+	m_actViewCenter = new QAction(tr("&Reset to center"), this);
+	m_actViewCenter->setStatusTip(tr("Scrolls the view back to the map center"));
+	connect(m_actViewCenter, SIGNAL(triggered()), this, SLOT(centerView()));
+
+	QActionGroup * zoomGroup = new QActionGroup(this);
+	for (int i = 0; i < ARRAYCOUNT(m_ViewZooms); i++)
+	{
+		m_actViewZoom[i] = new QAction(tr("&Zoom %1%").arg(std::floor(m_ViewZooms[i] * 100)), this);
+		m_actViewZoom[i]->setCheckable(true);
+		if ((int)(m_ViewZooms[i] * 16) == 16)
+		{
+			m_actViewZoom[i]->setChecked(true);
+			m_CurrentZoomLevel = i;
+		}
+		m_actViewZoom[i]->setData(QVariant(i));
+		zoomGroup->addAction(m_actViewZoom[i]);
+		connect(m_actViewZoom[i], SIGNAL(triggered()), this, SLOT(setViewZoom()));
+	}
 }
 
 
@@ -220,6 +317,7 @@ void MainWindow::createWorldActions()
 
 void MainWindow::createMenus()
 {
+	// Map menu:
 	QMenu * file = menuBar()->addMenu(tr("&Map"));
 	file->addAction(m_actNewGen);
 	file->addAction(m_actOpenGen);
@@ -235,6 +333,15 @@ void MainWindow::createMenus()
 	file->addAction(m_actReload);
 	file->addSeparator();
 	file->addAction(m_actExit);
+
+	// View menu:
+	QMenu * view = menuBar()->addMenu(tr("&View"));
+	view->addAction(m_actViewCenter);
+	view->addSeparator();
+	for (size_t i = 0; i < ARRAYCOUNT(m_actViewZoom); i++)
+	{
+		view->addAction(m_actViewZoom[i]);
+	}
 }
 
 
