@@ -205,45 +205,88 @@ public:
 	int GetChunkZ(void) const {return (int)floor(m_Pos.z / cChunkDef::Width); }
 
 	void SetHeadYaw (double a_HeadYaw);
-	void SetHeight  (double a_Height);
+	void SetHeight  (double a_Height) { m_Height = a_Height; }
+	void SetWidth   (double a_Width) { m_Width = a_Width; }
 	void SetMass    (double a_Mass);
-	void SetPosX    (double a_PosX);
-	void SetPosY    (double a_PosY);
-	void SetPosZ    (double a_PosZ);
-	void SetPosition(double a_PosX, double a_PosY, double a_PosZ);
-	void SetPosition(const Vector3d & a_Pos) { SetPosition(a_Pos.x, a_Pos.y, a_Pos.z); }
 	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
 
-	/** Sets the speed of the entity, measured in m / sec */
-	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
+	/** Sets the speed of the entity, measured in m / sec
+	The default implementation just sets the member variable value;
+	overrides can provide further processing, such as forcing players to move at the given speed
+	*/
+	virtual void SetSpeed(const Vector3d & a_Speed);
 	
 	/** Sets the speed of the entity, measured in m / sec */
-	void SetSpeed(const Vector3d & a_Speed) { SetSpeed(a_Speed.x, a_Speed.y, a_Speed.z); }
+	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) { SetSpeed(Vector3d(a_SpeedX, a_SpeedY, a_SpeedZ)); }
 	
-	/** Sets the speed in the X axis, leaving the other speed components intact. Measured in m / sec. */
-	void SetSpeedX(double a_SpeedX);
+	/** Sets the speed in the X axis, leaving the other speed components intact. Measured in m / sec */
+	void SetSpeedX(double a_SpeedX) { SetSpeed(a_SpeedX, m_Speed.y, m_Speed.z); }
 	
-	/** Sets the speed in the Y axis, leaving the other speed components intact. Measured in m / sec. */
-	void SetSpeedY(double a_SpeedY);
+	/** Sets the speed in the Y axis, leaving the other speed components intact. Measured in m / sec */
+	void SetSpeedY(double a_SpeedY) { SetSpeed(m_Speed.x, a_SpeedY, m_Speed.z); }
 	
-	/** Sets the speed in the Z axis, leaving the other speed components intact. Measured in m / sec. */
-	void SetSpeedZ(double a_SpeedZ);
-	
-	void SetWidth   (double a_Width);
-	
-	void AddPosX    (double a_AddPosX);
-	void AddPosY    (double a_AddPosY);
-	void AddPosZ    (double a_AddPosZ);
-	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ);
-	void AddPosition(const Vector3d & a_AddPos) { AddPosition(a_AddPos.x, a_AddPos.y, a_AddPos.z); }
-	void AddSpeed   (double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ);
-	void AddSpeed   (const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x, a_AddSpeed.y, a_AddSpeed.z); }
-	void AddSpeedX  (double a_AddSpeedX);
-	void AddSpeedY  (double a_AddSpeedY);
-	void AddSpeedZ  (double a_AddSpeedZ);
+	/** Sets the speed in the Z axis, leaving the other speed components intact. Measured in m / sec */
+	void SetSpeedZ(double a_SpeedZ) { SetSpeed(m_Speed.x, m_Speed.y, a_SpeedZ); }
+
+
+	/** Adds to the speed of the entity, measured in m / sec
+	The default implementation just increases the member variable value;
+	overrides can provide further processing, such as forcing players to move at the given speed
+	*/
+	virtual void AddSpeed(const Vector3d & a_AddSpeed);
+
+	/** Adds to the speed of the entity, measured in m / sec */
+	void AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ) { AddSpeed(Vector3d(a_AddSpeedX, a_AddSpeedY, a_AddSpeedZ)); }
+
+	/** Adds to the X speed of the entity, measured in m / sec */
+	void AddSpeedX(double a_AddSpeedX) { AddSpeed(a_AddSpeedX, m_Speed.y, m_Speed.z); }
+
+	/** Adds to the Y speed of the entity, measured in m / sec */
+	void AddSpeedY(double a_AddSpeedY) { AddSpeed(m_Speed.x, a_AddSpeedY, m_Speed.z); }
+
+	/** Adds to the Z speed of the entity, measured in m / sec */
+	void AddSpeedZ(double a_AddSpeedZ) { AddSpeed(m_Speed.x, m_Speed.y, a_AddSpeedZ); }
+
+
+	/** Sets the absolute position of an entity
+	The default implementation just sets the member variable value;
+	overrides can provide further processing, such as teleporting players to the specified location
+	*/
+	virtual void SetPosition(const Vector3d & a_Pos);
+
+	/** Sets the absolute position of an entity */
+	void SetPosition(double a_PosX, double a_PosY, double a_PosZ) { SetPosition(Vector3d(a_PosX, a_PosY, a_PosZ)); }
+
+	/** Sets the absolute X position of an entity */
+	void SetPosX(double a_PosX) { SetPosition(a_PosX, m_Pos.y, m_Pos.z); }
+
+	/** Sets the absolute Y position of an entity */
+	void SetPosY(double a_PosY) { SetPosition(m_Pos.x, a_PosY, m_Pos.z); }
+
+	/** Sets the absolute Z position of an entity */
+	void SetPosZ(double a_PosZ) { SetPosition(m_Pos.x, m_Pos.y, a_PosZ); }
+
+
+	/** Adds to the absolute position of an entity	
+	The default implementation just adds to the member variable value;
+	overrides can provide further processing, such as teleporting players to the specified location
+	*/
+	virtual void AddPosition(const Vector3d & a_AddPos);
+
+	/** Adds to the absolute position of an entity */
+	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ) { AddPosition(Vector3d(a_AddPosX, a_AddPosY, a_AddPosZ)); }
+
+	/** Adds to the absolute X position of an entity */
+	void AddPosX(double a_AddPosX) { AddPosition(a_AddPosX, m_Pos.y, m_Pos.z); }
+
+	/** Adds to the absolute Y position of an entity */
+	void AddPosY(double a_AddPosY) { AddPosition(m_Pos.x, a_AddPosY, m_Pos.z); }
+
+	/** Adds to the absolute Z position of an entity */
+	void AddPosZ(double a_AddPosZ) { AddPosition(m_Pos.x, m_Pos.y, a_AddPosZ); }
 	
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways);
 	void SteerVehicle(float a_Forward, float a_Sideways);
@@ -528,10 +571,6 @@ protected:
 	
 	/// Time, in ticks, since the last damage dealt by the void. Reset to zero when moving out of the void.
 	int m_TicksSinceLastVoidDamage;
-	
-	/** Does the actual speed-setting. The default implementation just sets the member variable value;
-	overrides can provide further processing, such as forcing players to move at the given speed. */
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
 

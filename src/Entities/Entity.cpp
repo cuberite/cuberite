@@ -1456,17 +1456,6 @@ void cEntity::SetSwimState(cChunk & a_Chunk)
 
 
 
-void cEntity::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
-{
-	m_Speed.Set(a_SpeedX, a_SpeedY, a_SpeedZ);
-	
-	WrapSpeed();
-}
-
-
-
-
-
 void cEntity::HandleAir(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Chunk_format
@@ -1770,15 +1759,6 @@ void cEntity::SetHeadYaw(double a_HeadYaw)
 
 
 
-void cEntity::SetHeight(double a_Height)
-{
-	m_Height = a_Height;
-}
-
-
-
-
-
 void cEntity::SetMass(double a_Mass)
 {
 	// Make sure that mass is not zero. 1g is the default because we
@@ -1823,87 +1803,18 @@ void cEntity::SetRoll(double a_Roll)
 
 
 
-void cEntity::SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+void cEntity::SetSpeed(const Vector3d & a_Speed)
 {
-	DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	m_Speed = a_Speed;
+	WrapSpeed();
 }
 
 
 
 
-void cEntity::SetSpeedX(double a_SpeedX)
+void cEntity::AddSpeed(const Vector3d & a_AddSpeed)
 {
-	SetSpeed(a_SpeedX, m_Speed.y, m_Speed.z);
-}
-
-
-
-
-void cEntity::SetSpeedY(double a_SpeedY)
-{
-	SetSpeed(m_Speed.x, a_SpeedY, m_Speed.z);
-}
-
-
-
-
-void cEntity::SetSpeedZ(double a_SpeedZ)
-{
-	SetSpeed(m_Speed.x, m_Speed.y, a_SpeedZ);
-}
-
-
-
-
-
-void cEntity::SetWidth(double a_Width)
-{
-	m_Width = a_Width;
-}
-
-
-
-
-
-void cEntity::AddPosX(double a_AddPosX)
-{
-	m_Pos.x += a_AddPosX;
-}
-
-
-
-
-void cEntity::AddPosY(double a_AddPosY)
-{
-	m_Pos.y += a_AddPosY;
-}
-
-
-
-
-void cEntity::AddPosZ(double a_AddPosZ)
-{
-	m_Pos.z += a_AddPosZ;
-}
-
-
-
-
-void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
-{
-	m_Pos.x += a_AddPosX;
-	m_Pos.y += a_AddPosY;
-	m_Pos.z += a_AddPosZ;
-}
-
-
-
-
-void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ)
-{
-	m_Speed.x += a_AddSpeedX;
-	m_Speed.y += a_AddSpeedY;
-	m_Speed.z += a_AddSpeedZ;
+	m_Speed += a_AddSpeed;
 	WrapSpeed();
 }
 
@@ -1911,30 +1822,17 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 
 
 
-void cEntity::AddSpeedX(double a_AddSpeedX)
+void cEntity::SetPosition(const Vector3d & a_Pos)
 {
-	m_Speed.x += a_AddSpeedX;
-	WrapSpeed();
+	m_Pos = a_Pos;
 }
 
 
 
 
-
-void cEntity::AddSpeedY(double a_AddSpeedY)
+void cEntity::AddPosition(const Vector3d & a_AddPos)
 {
-	m_Speed.y += a_AddSpeedY;
-	WrapSpeed();
-}
-
-
-
-
-
-void cEntity::AddSpeedZ(double a_AddSpeedZ)
-{
-	m_Speed.z += a_AddSpeedZ;
-	WrapSpeed();
+	m_Pos += a_AddPos;
 }
 
 
@@ -1978,44 +1876,6 @@ Vector3d cEntity::GetLookVector(void) const
 	m.Init(Vector3d(), 0, m_Rot.x, -m_Rot.y);
 	Vector3d Look = m.Transform(Vector3d(0, 0, 1));
 	return Look;
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Set position
-void cEntity::SetPosition(double a_PosX, double a_PosY, double a_PosZ)
-{
-	m_Pos.Set(a_PosX, a_PosY, a_PosZ);
-}
-
-
-
-
-
-void cEntity::SetPosX(double a_PosX)
-{
-	m_Pos.x = a_PosX;
-}
-
-
-
-
-
-void cEntity::SetPosY(double a_PosY)
-{
-	m_Pos.y = a_PosY;
-}
-
-
-
-
-
-void cEntity::SetPosZ(double a_PosZ)
-{
-	m_Pos.z = a_PosZ;
 }
 
 

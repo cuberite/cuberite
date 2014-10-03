@@ -1271,7 +1271,7 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	SetPosition(a_PosX, a_PosY, a_PosZ);
+	cEntity::SetPosition(a_PosX, a_PosY, a_PosZ);
 	m_LastGroundHeight = (float)a_PosY;
 	m_LastJumpHeight = (float)a_PosY;
 	m_bIsTeleporting = true;
@@ -1325,21 +1325,48 @@ Vector3d cPlayer::GetThrowSpeed(double a_SpeedCoeff) const
 
 
 
-void cPlayer::ForceSetSpeed(const Vector3d & a_Speed)
+void cPlayer::SetSpeed(const Vector3d & a_Speed)
 {
-	SetSpeed(a_Speed);
+	super::SetSpeed(a_Speed);
+
+	// Send the speed to the client
+	m_ClientHandle->SendEntityVelocity(*this);
 }
 
 
 
 
 
-void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
+void cPlayer::AddSpeed(const Vector3d & a_Speed)
 {
-	super::DoSetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
+	super::AddSpeed(a_Speed);
 
-	// Send the speed to the client so he actualy moves
+	// Send the speed to the client
 	m_ClientHandle->SendEntityVelocity(*this);
+}
+
+
+
+
+
+void cPlayer::SetPosition(const Vector3d & a_Position)
+{
+	super::SetPosition(a_Position);
+
+	// Teleport the client
+	TeleportToCoords(a_Position.x, a_Position.y, a_Position.z);
+}
+
+
+
+
+
+void cPlayer::AddPosition(const Vector3d & a_Position)
+{
+	super::AddPosition(a_Position);
+
+	// Teleport the client
+	TeleportToCoords(GetPosX(), GetPosY(), GetPosZ());
 }
 
 
