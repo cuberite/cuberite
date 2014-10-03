@@ -15,6 +15,7 @@ static const QString s_GeneratorNames[] =
 	QString("Constant"),
 	QString("DistortedVoronoi"),
 	QString("MultiStepMap"),
+	QString("Perlinoi"),
 	QString("TwoLevel"),
 	QString("Voronoi"),
 };

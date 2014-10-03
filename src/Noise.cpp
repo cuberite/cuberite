@@ -748,6 +748,15 @@ void cCubicNoise::Generate3D(
 
 
 
+NOISE_DATATYPE cCubicNoise::GetValueAt(NOISE_DATATYPE a_PosX, NOISE_DATATYPE a_PosY) const
+{
+	return m_Noise.CubicNoise2D(a_PosX, a_PosY);
+}
+
+
+
+
+
 void cCubicNoise::CalcFloorFrac(
 	int a_Size,
 	NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
@@ -955,6 +964,29 @@ void cPerlinNoise::Generate3D(
 		delete[] a_Workspace;
 		a_Workspace = NULL;
 	}
+}
+
+
+
+
+
+NOISE_DATATYPE cPerlinNoise::GetValueAt(NOISE_DATATYPE a_PosX, NOISE_DATATYPE a_PosY) const
+{
+	if (m_Octaves.empty())
+	{
+		// No work to be done
+		ASSERT(!"Perlin: No octaves to generate!");
+		return 0;
+	}
+
+	// Add up all the octaves' values:
+	NOISE_DATATYPE res = 0;
+	for (cOctaves::const_iterator itr = m_Octaves.begin(), end = m_Octaves.end(); itr != end; ++itr)
+	{
+		// Generate the noise value for the octave:
+		res += itr->m_Amplitude * itr->m_Noise.GetValueAt(a_PosX * itr->m_Frequency, a_PosY * itr->m_Frequency);
+	}
+	return res;
 }
 
 
