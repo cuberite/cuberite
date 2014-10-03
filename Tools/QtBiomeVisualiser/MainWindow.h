@@ -4,6 +4,7 @@
 #include <QList>
 #include <QMainWindow>
 #include <QHBoxLayout>
+#include <QLabel>
 #include "BiomeView.h"
 
 
@@ -39,13 +40,33 @@ private slots:
 	/** Opens a vanilla world that is specified by the calling action. */
 	void openVanillaWorld();
 
+	/** Moves the view to the map's center. */
+	void centerView();
+
+	/** Sets the zoom level specified in the triggering action. */
+	void setViewZoom();
+
+	/** Sets a zoom level one step larger than current, if allowed. */
+	void increaseZoom();
+
+	/** Sets a zoom level one step smaller than current, if allowed. */
+	void decreaseZoom();
+
+	/** Updates the statusbar for the specified info about the current block under the cursor. */
+	void hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome);
+
 protected:
+	/** The zoom levels */
+	static const double m_ViewZooms[10];
+
 	// Actions:
 	QAction * m_actNewGen;
 	QAction * m_actOpenGen;
 	QAction * m_actOpenWorld;
 	QAction * m_actReload;
 	QAction * m_actExit;
+	QAction * m_actViewCenter;
+	QAction * m_actViewZoom[ARRAYCOUNT(m_ViewZooms)];
 
 	/** List of actions that open the specific vanilla world. */
 	QList<QAction *> m_WorldActions;
@@ -62,8 +83,18 @@ protected:
 	/** The layout for the window. */
 	QHBoxLayout * m_MainLayout;
 
+	/** The status bar that displays the current hover information. */
+	QStatusBar * m_StatusBar;
+
+	QLabel * m_StatusBlockX;
+	QLabel * m_StatusBlockZ;
+	QLabel * m_StatusBiome;
+
 	/** The separator line between biome view and generator setup. */
 	QWidget * m_LineSeparator;
+
+	/** Index into m_ViewZooms[] for the current zoom level. */
+	size_t m_CurrentZoomLevel;
 
 
 	/** Initializes the m_MinecraftPath based on the proper MC path */
