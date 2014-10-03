@@ -91,6 +91,14 @@ public:
 
 		if (Callbacks.m_HasHitFluid)
 		{
+			if (cRoot::Get()->GetPluginManager()->CallHookPlayerPlacingBlock(*a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 0, 0, 0, E_BLOCK_LILY_PAD, 0))
+			{
+				// A plugin doesn't agree with placing the block, revert the block on the client:
+				a_World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+				a_Player->GetInventory().SendEquippedSlot();
+				return;
+			}
+
 			a_World->SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);
 			if (!a_Player->IsGameModeCreative())
 			{
