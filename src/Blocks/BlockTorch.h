@@ -37,6 +37,7 @@ public:
 			a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);  // Set a_BlockFace to a valid direction which will be converted later to a metadata
 			if (a_BlockFace == BLOCK_FACE_NONE)
 			{
+				// No attachable face found - don't place the torch
 				return false;
 			}
 		}
@@ -116,7 +117,7 @@ public:
 			{
 				if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
 				{
-					// Torches can be placed on full blocks unless their bottom side is clicked
+					// Torches can be placed on all sides of full blocks except the bottom
 					return (a_BlockFace != BLOCK_FACE_YM);
 				}
 				return false;
@@ -125,7 +126,7 @@ public:
 	}
 	
 	
-	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
+	/** Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure */
 	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++)  // Loop through all directions
