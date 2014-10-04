@@ -422,7 +422,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 
 			// Gravel vein
 			cStructGenOreNests::OreInfo GravelVein;
-			GravelVein.BlockType = E_BLOCK_DIRT;
+			GravelVein.BlockType = E_BLOCK_GRAVEL;
 			GravelVein.MaxHeight = 127;
 			GravelVein.NumNests = 20;
 			GravelVein.NestSize = 32;
