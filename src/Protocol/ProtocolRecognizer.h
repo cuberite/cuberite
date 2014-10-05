@@ -134,7 +134,7 @@ protected:
 	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
 	bool TryRecognizeProtocol(void);
 	
-	/** Tries to recognize a protocol in the leghted family (1.7+), based on m_Buffer; returns true if recognized.
+	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
 	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining
 	**/

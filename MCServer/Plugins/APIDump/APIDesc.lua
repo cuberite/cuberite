@@ -529,6 +529,7 @@ end
 				GetLocale = { Params = "", Return = "Locale", Notes = "Returns the locale string that the client sends as part of the protocol handshake. Can be used to provide localized strings." },
 				GetPing = { Params = "", Return = "number", Notes = "Returns the ping time, in ms" },
 				GetPlayer = { Params = "", Return = "{{cPlayer|cPlayer}}", Notes = "Returns the player object connected to this client. Note that this may be nil, for example if the player object is not yet spawned." },
+				GetProtocolVersion = { Params = "", Return = "number", Notes = "Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known." },
 				GetUniqueID = { Params = "", Return = "number", Notes = "Returns the UniqueID of the client used to identify the client in the server" },
 				GetUUID = { Params = "", Return = "string", Notes = "Returns the authentication-based UUID of the client. This UUID should be used to identify the player when persisting any player-related data. Returns a 32-char UUID (no dashes)" },
 				GetUsername = { Params = "", Return = "string", Notes = "Returns the username that the client has provided" },
