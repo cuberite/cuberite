@@ -24,30 +24,21 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		// Find proper placement of torch
+		BLOCKTYPE Block;
+		NIBBLETYPE Meta;
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
+		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
 
-		if ((a_BlockFace == BLOCK_FACE_TOP) || (a_BlockFace == BLOCK_FACE_BOTTOM))
+		if (!CanBePlacedOn(Block, Meta, a_BlockFace))  // Try to preserve original direction
 		{
-			a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);  // Top or bottom faces clicked, find a suitable face
+			// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
+
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);  // Reset to torch block
+			a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);  // Set a_BlockFace to a valid direction which will be converted later to a metadata
 			if (a_BlockFace == BLOCK_FACE_NONE)
 			{
-				// Client wouldn't have sent anything anyway, but whatever
+				// No attachable face found - don't place the torch
 				return false;
-			}
-		}
-		else
-		{
-			// Not top or bottom faces, try to preserve whatever face was clicked
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // Set to clicked block
-			if (!CanBePlacedOn(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ), a_BlockFace))
-			{
-				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);  // Reset to torch block
-				// Torch couldn't be placed on whatever face was clicked, last ditch resort - find another face
-				a_BlockFace = FindSuitableFace(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-				if (a_BlockFace == BLOCK_FACE_NONE)
-				{
-					return false;
-				}
 			}
 		}
 
@@ -97,46 +88,57 @@ public:
 	}
 
 
-	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, eBlockFace a_BlockFace)
+	static bool CanBePlacedOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_BlockFace)
 	{
-		if (!cBlockInfo::FullyOccupiesVoxel(a_BlockType))
+		switch (a_BlockType)
 		{
-			return (a_BlockFace == BLOCK_FACE_TOP);  // Allow placement only when torch upright (for glass, etc.); exceptions won't even be sent by client, no need to handle
-		}
-		else
-		{
-			return true;
+			case E_BLOCK_END_PORTAL_FRAME:
+			case E_BLOCK_SOULSAND:
+			{
+				// Exceptional vanilla behaviour
+				return true;
+			}
+			case E_BLOCK_GLASS:
+			case E_BLOCK_STAINED_GLASS:
+			case E_BLOCK_FENCE:
+			case E_BLOCK_NETHER_BRICK_FENCE:
+			case E_BLOCK_COBBLESTONE_WALL:
+			{
+				// Torches can only be placed on top of these blocks
+				return (a_BlockFace == BLOCK_FACE_YP);
+			}
+			case E_BLOCK_STONE_SLAB:
+			case E_BLOCK_WOODEN_SLAB:
+			{
+				// Toches can be placed on the top of these slabs only if the occupy the top half of the voxel
+				return ((a_BlockFace == BLOCK_FACE_YP) && ((a_BlockMeta & 0x08) == 0x08));
+			}
+			default:
+			{
+				if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
+				{
+					// Torches can be placed on all sides of full blocks except the bottom
+					return (a_BlockFace != BLOCK_FACE_YM);
+				}
+				return false;
+			}
 		}
 	}
 	
 	
-	/// Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure
+	/** Finds a suitable face to place the torch, returning BLOCK_FACE_NONE on failure */
 	static eBlockFace FindSuitableFace(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		for (int i = BLOCK_FACE_YM; i <= BLOCK_FACE_XP; i++)  // Loop through all directions
 		{
 			eBlockFace Face = static_cast<eBlockFace>(i);
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, Face, true);
-			BLOCKTYPE BlockInQuestion = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+			BLOCKTYPE BlockInQuestion;
+			NIBBLETYPE BlockInQuestionMeta;
+			a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockInQuestion, BlockInQuestionMeta);
 
-			// If on a block that can only hold a torch if torch is standing on it, return that face
-			if (
-				(
-					(BlockInQuestion == E_BLOCK_GLASS) ||
-					(BlockInQuestion == E_BLOCK_FENCE) ||
-					(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
-					(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL) ||
-					(BlockInQuestion == E_BLOCK_STONE_SLAB) ||
-					(BlockInQuestion == E_BLOCK_WOODEN_SLAB)
-				) &&
-				(Face == BLOCK_FACE_TOP)
-			)
+			if (CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face))
 			{
-				return Face;
-			}
-			else if (cBlockInfo::FullyOccupiesVoxel(BlockInQuestion) && (i != BLOCK_FACE_BOTTOM))
-			{
-				// Otherwise, if block in that direction is torch placeable and we haven't gotten to it via the bottom face, return that face
 				return Face;
 			}
 			else
@@ -152,36 +154,16 @@ public:
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		eBlockFace Face = MetaDataToDirection(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ));
-
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
-		BLOCKTYPE BlockInQuestion;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockInQuestion);
 
-		if (
-			(BlockInQuestion == E_BLOCK_GLASS) ||
-			(BlockInQuestion == E_BLOCK_STAINED_GLASS) ||
-			(BlockInQuestion == E_BLOCK_FENCE) ||
-			(BlockInQuestion == E_BLOCK_SOULSAND) ||
-			(BlockInQuestion == E_BLOCK_MOB_SPAWNER) ||
-			(BlockInQuestion == E_BLOCK_END_PORTAL_FRAME) ||  // Actual vanilla behaviour
-			(BlockInQuestion == E_BLOCK_NETHER_BRICK_FENCE) ||
-			(BlockInQuestion == E_BLOCK_COBBLESTONE_WALL) ||
-			(BlockInQuestion == E_BLOCK_STONE_SLAB) ||
-			(BlockInQuestion == E_BLOCK_WOODEN_SLAB)
-		)
-		{
-			// Torches can be placed on tops of glass and fences, despite them being 'untorcheable'
-			// No need to check for upright orientation, it was done when the torch was placed
-			return true;
-		}
-		else if (!cBlockInfo::FullyOccupiesVoxel(BlockInQuestion))
+		BLOCKTYPE BlockInQuestion;
+		NIBBLETYPE BlockInQuestionMeta;
+		if (!a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockInQuestion, BlockInQuestionMeta))
 		{
 			return false;
 		}
-		else
-		{
-			return true;
-		}
+
+		return CanBePlacedOn(BlockInQuestion, BlockInQuestionMeta, Face);
 	}
 
 
