@@ -70,33 +70,25 @@ function ShowPage(WebAdmin, TemplateRequest)
 		PageContent, SubTitle = GetDefaultPage()
 	end
 	
-	local reqParamsClass = ""
-	
-	for key,value in pairs(TemplateRequest.Request.Params) do
-		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
-	end
-	
-	if (string.gsub(reqParamsClass, "%s", "") == "") then
-		reqParamsClass = " no-param"
-	end
-	
 	Output([[
 <!DOCTYPE html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="icon" href="/favicon.ico">
 <title>]] .. Title .. [[</title>
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,300' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="/style.css">
+<link rel="stylesheet" type="text/css" media="screen" href="/style.css">
 </head>
+
 <body>
-<div id="wrapper">
-	<div id="containerHolder">
-		<a href="./" class="title light">MCServer</a>
-		<div id="container">
-			<div id="sidebar">
-				<ul class="sideNav">
-					<li class='link'><a href=']] .. BaseURL .. [['>Home</a></li>
+	<div id="wrapper">
+		<!-- h1 tag stays for the logo, you can use the a tag for linking the index page -->
+		<h1>
+			<a href="]] .. BaseURL .. [["><span>MCServer</span></a>
+		</h1>
+		<div id="containerHolder">
+			<div id="container">
+				<div id="sidebar">
+					<ul class="sideNav">
 	]])
 
 
@@ -108,7 +100,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 			Output("<li>"..PluginWebTitle.."</li>\n");
 			
 			for webname,prettyname in pairs(TabNames) do
-				Output("<li class='link'><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "'>" .. prettyname .. "</a></li>\n")
+				Output("<li><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "'>" .. prettyname .. "</a></li>\n")
 			end
 		end
 	end
@@ -116,23 +108,30 @@ function ShowPage(WebAdmin, TemplateRequest)
 	
 	Output([[
 					</ul>
+					<!-- // .sideNav -->
+				</div>    
+				<!-- // #sidebar -->
+				<!-- h2 stays for breadcrumbs -->
+				<h2>Welcome ]] .. TemplateRequest.Request.Username .. [[</h2>
+				<div id="main">
+					<h3>]] .. SubTitle .. [[</h3>
+					]] .. PageContent .. [[
+				</div>
+				<!-- // #main -->
+				
+				<div class="clear"></div>
+				
 			</div>
-			
-			<div id="main" class="page-]] .. string.lower(PluginPage.PluginName .. "-" .. string.gsub(PluginPage.TabName, "[^a-zA-Z0-9]+", "-")) .. reqParamsClass .. [[">
-				<h2 class="welcome-msg">Welcome <span class="username">]] .. TemplateRequest.Request.Username .. [[</span></h2>
-				
-				<hr/>
-				
-				<h3>]] .. SubTitle .. [[</h3>
-					]] .. PageContent .. [[</div>
-			<div class="clear"></div>
-		</div>
+			<!-- // #container -->
+		</div>	
+		<!-- // #containerHolder -->
+	    
+		<p id="footer">MCServer is using: ]] .. MemoryUsageKiB / 1024 .. [[ MiB of memory; Current chunk count: ]] .. NumChunks .. [[ </p>
 	</div>
-	<div id="footer"><div class="fleft">running MCServer using <span class="bold">]] .. MemoryUsageKiB / 1024 .. [[MB</span> of memory; <span class="bold">]] .. NumChunks .. [[</span> chunks</div><div class="fright">design by <a href="//www.github.com/WebFreak001">WebFreak001</a></div><div class="clear"></div></div>
-</div>
+	<!-- // #wrapper -->
 </body>
 </html>
-]])
+	]])
 	
 	return table.concat(SiteContent)
 end
