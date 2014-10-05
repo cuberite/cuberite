@@ -253,57 +253,6 @@ AString ItemToFullString(const cItem & a_Item)
 
 
 
-int StringToMobType(const AString & a_MobString)
-{
-	static struct
-	{
-		int m_MobType;
-		const char * m_String;
-	} MobMap [] =
-	{
-		{mtCreeper,      "Creeper"},
-		{mtSkeleton,     "Skeleton"},
-		{mtSpider,       "Spider"},
-		{mtGiant,        "Giant"},
-		{mtZombie,       "Zombie"},
-		{mtSlime,        "Slime"},
-		{mtGhast,        "Ghast"},
-		{mtZombiePigman, "ZombiePigman"},
-		{mtEnderman,     "Enderman"},
-		{mtCaveSpider,   "CaveSpider"},
-		{mtSilverfish,   "SilverFish"},
-		{mtBlaze,        "Blaze"},
-		{mtMagmaCube,    "MagmaCube"},
-		{mtEnderDragon,  "EnderDragon"},
-		{mtWither,       "Wither"},
-		{mtBat,          "Bat"},
-		{mtWitch,        "Witch"},
-		{mtPig,          "Pig"},
-		{mtSheep,        "Sheep"},
-		{mtCow,          "Cow"},
-		{mtChicken,      "Chicken"},
-		{mtSquid,        "Squid"},
-		{mtWolf,         "Wolf"},
-		{mtMooshroom,    "Mooshroom"},
-		{mtSnowGolem,    "SnowGolem"},
-		{mtOcelot,       "Ocelot"},
-		{mtIronGolem,    "IronGolem"},
-		{mtVillager,     "Villager"},
-	};
-	for (size_t i = 0; i < ARRAYCOUNT(MobMap); i++)
-	{
-		if (NoCaseCompare(MobMap[i].m_String, a_MobString) == 0)
-		{
-			return MobMap[i].m_MobType;
-		}
-	}  // for i - MobMap[]
-	return -1;
-}
-
-
-
-
-
 eDimension StringToDimension(const AString & a_DimensionString)
 {
 	// First try decoding as a number
