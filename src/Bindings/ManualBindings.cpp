@@ -697,8 +697,12 @@ static int tolua_ForEachInBox(lua_State * tolua_S)
 	Ty1 * Self = NULL;
 	cBoundingBox * Box = NULL;
 	L.GetStackValues(1, Self, Box);
-	ASSERT(Self != NULL);  // We have verified the type at the top, so we should get valid objects here
-	ASSERT(Box != NULL);
+	if ((Self == NULL) || (Box == NULL))
+	{
+		LOGWARNING("Invalid world (%p) or boundingbox (%p)", Self, Box);
+		L.LogStackTrace();
+		return 0;
+	}
 	
 	// Create a reference for the function:
 	cLuaState::cRef FnRef(L, 3);

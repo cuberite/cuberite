@@ -861,6 +861,11 @@ void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 
 void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 {
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = NULL;
+		return;
+	}
 	tolua_Error err;
 	if (tolua_isusertype(m_LuaState, a_StackPos, "cBoundingBox", false, &err))
 	{
@@ -874,6 +879,11 @@ void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 
 void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
 {
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = NULL;
+		return;
+	}
 	tolua_Error err;
 	if (tolua_isusertype(m_LuaState, a_StackPos, "cWorld", false, &err))
 	{
@@ -1396,10 +1406,8 @@ void cLuaState::LogStack(const char * a_Header)
 
 void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
-	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
-	
 	// Format string consisting only of %s is used to appease the compiler
-	LOGD("%s", (a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	LOG("%s", (a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;

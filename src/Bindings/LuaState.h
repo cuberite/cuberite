@@ -304,7 +304,7 @@ public:
 	void ToString(int a_StackPos, AString & a_String);
 
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	void LogStack(const char * a_Header);
+	void LogStack(const char * a_Header = NULL);
 	
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
 	static void LogStack(lua_State * a_LuaState, const char * a_Header = NULL);
