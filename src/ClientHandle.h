@@ -357,6 +357,10 @@ private:
 	
 	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
 
+	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
+	int m_LastStreamedChunkX;
+	int m_LastStreamedChunkZ;
+
 	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
 	float m_TimeSinceLastPacket;
 	

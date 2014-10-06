@@ -70,6 +70,8 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_OutgoingData(64 KiB),
 	m_Player(NULL),
 	m_HasSentDC(false),
+	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
+	m_LastStreamedChunkZ(0x7fffffff),
 	m_TimeSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
@@ -405,44 +407,133 @@ void cClientHandle::StreamNextChunk(void)
 	{
 		return;
 	}
+	ASSERT(m_Player != NULL);
 
+	int ChunkPosX = m_Player->GetChunkX();
+	int ChunkPosZ = m_Player->GetChunkZ();
+	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
+	{
+		// All chunks are already loaded. Abort loading.
+		return;
+	}
+
+	// Get the look vector and normalize it.
+	Vector3d Position = m_Player->GetEyePosition();
 	Vector3d LookVector = m_Player->GetLookVector();
 	LookVector.Normalize();
 
-	Vector3d Position = m_Player->GetEyePosition();
+	// Lock the list
+	cCSLock Lock(m_CSChunkLists);
+
+	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
 	for (size_t Range = 0; Range < (size_t)m_ViewDistance; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
+		// Get the chunk from the x/z coords.
 		int RangeX, RangeZ = 0;
 		cChunkDef::BlockToChunk((int)std::floor(Vector.x), (int)std::floor(Vector.z), RangeX, RangeZ);
 
-		for (size_t X = 0; X < 6; X++)
+		for (size_t X = 0; X < 7; X++)
 		{
-			for (size_t Z = 0; Z < 6; Z++)
+			for (size_t Z = 0; Z < 7; Z++)
 			{
-				int ChunkX = RangeX + ((X >= 3) ? (2 - X) : X);
-				int ChunkZ = RangeZ + ((Z >= 3) ? (2 - Z) : Z);
+				int ChunkX = RangeX + ((X >= 4) ? (3 - X) : X);
+				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
 				cChunkCoords Coords(ChunkX, ChunkZ);
 
 				// If the chunk already loading/loaded -> skip
+				if (
+					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+				)
 				{
-					cCSLock Lock(m_CSChunkLists);
-					if (
-						(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
-						(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
-					)
-					{
-						continue;
-					}
+					continue;
 				}
 
 				// Unloaded chunk found -> Send it to the client.
+				Lock.Unlock();
 				StreamChunk(ChunkX, ChunkZ);
 				return;
 			}
 		}
 	}
+
+	// Medium priority: Load the chunks that are behind the player
+	LookVector = m_Player->GetLookVector() * -1;
+	for (size_t Range = 0; Range < 3; Range++)
+	{
+		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
+
+		// Get the chunk from the x/z coords.
+		int RangeX, RangeZ = 0;
+		cChunkDef::BlockToChunk((int)std::floor(Vector.x), (int)std::floor(Vector.z), RangeX, RangeZ);
+
+		for (size_t X = 0; X < 7; X++)
+		{
+			for (size_t Z = 0; Z < 7; Z++)
+			{
+				int ChunkX = RangeX + ((X >= 4) ? (3 - X) : X);
+				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
+				cChunkCoords Coords(ChunkX, ChunkZ);
+
+				// If the chunk already loading/loaded -> skip
+				if (
+					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+				)
+				{
+					continue;
+				}
+
+				// Unloaded chunk found -> Send it to the client.
+				Lock.Unlock();
+				StreamChunk(ChunkX, ChunkZ);
+				return;
+			}
+		}
+	}
+
+	// Low priority: Add all chunks that are in range. (From the center out to the edge)
+	for (int d = 0; d <= m_ViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
+	{
+		// For each distance add chunks in a hollow square centered around current position:
+		cChunkCoordsList CurcleChunks;
+		for (int i = -d; i <= d; ++i)
+		{
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX + d, ChunkPosZ + i));
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX - d, ChunkPosZ + i));
+		}
+		for (int i = -d + 1; i < d; ++i)
+		{
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ + d));
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ - d));
+		}
+
+		// For each the CurcleChunks list and send the first unloaded chunk:
+		for (cChunkCoordsList::iterator itr = CurcleChunks.begin(), end = CurcleChunks.end(); itr != end; ++itr)
+		{
+			cChunkCoords Coords = *itr;
+
+			// If the chunk already loading/loaded -> skip
+			if (
+				(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+				(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+			)
+			{
+				continue;
+			}
+
+			// Unloaded chunk found -> Send it to the client.
+			Lock.Unlock();
+			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ);
+			return;
+		}
+	}
+
+	// All chunks are loaded -> Sets the last loaded chunk coordinates to current coordinates
+	m_LastStreamedChunkX = ChunkPosX;
+	m_LastStreamedChunkZ = ChunkPosZ;
 }
 
 
@@ -537,6 +628,11 @@ void cClientHandle::RemoveFromAllChunks()
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
+
+		// Also reset the LastStreamedChunk coords to bogus coords,
+		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
+		m_LastStreamedChunkX = 0x7fffffff;
+		m_LastStreamedChunkZ = 0x7fffffff;
 	}
 }
 
@@ -1852,6 +1948,10 @@ void cClientHandle::RemoveFromWorld(void)
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
 
+	// Here, we set last streamed values to bogus ones so everything is resent
+	m_LastStreamedChunkX = 0x7fffffff;
+	m_LastStreamedChunkZ = 0x7fffffff;
+
 	m_HasSentPlayerChunk = false;
 }
 
@@ -1920,10 +2020,11 @@ void cClientHandle::Tick(float a_Dt)
 
 	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
 	{
+		
 		StreamNextChunk();  // Streams the next chunk
 
-		// Unload all chunks that are out of the view distance (all 2 seconds)
-		if ((m_Player->GetWorld()->GetWorldAge() % 40) == 0)
+		// Unload all chunks that are out of the view distance (all 5 seconds)
+		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
 		{
 			UnloadOutOfRangeChunks();
 		}
