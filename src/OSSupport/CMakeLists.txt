@@ -39,6 +39,6 @@ if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
 
 	if(UNIX)
-		target_link_libraries(OSSupport pthread)
+		target_link_libraries(OSSupport pthread rt)
 	endif()
 endif()
