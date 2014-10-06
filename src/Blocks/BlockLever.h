@@ -96,9 +96,9 @@ public:
 	{
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
 
-
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 		BLOCKTYPE BlockIsOn;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
@@ -107,7 +107,7 @@ public:
 				((BlockIsOn == E_BLOCK_WOODEN_SLAB) && ((Meta & 0x08) == 0x08)) ||
 				((BlockIsOn == E_BLOCK_STONE_SLAB) && ((Meta & 0x08) == 0x08))
 			) &&
-			(a_RelY > 0)
+			(a_RelY > 0) && Face ==	BLOCK_FACE_TOP
 		)
 		{
 			return true;
