@@ -1742,7 +1742,7 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 	// Re-send the chunk to all clients:
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
-		m_World->ForceSendChunkTo(m_PosX, m_PosZ, (*itr));
+		m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM,  (*itr));
 	}  // for itr - m_LoadedByClient[]
 }
 

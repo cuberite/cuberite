@@ -2850,19 +2850,19 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
 {
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
 
 
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
 
 

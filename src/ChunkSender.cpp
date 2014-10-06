@@ -91,17 +91,22 @@ void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client)
 {
 	ASSERT(a_Client != NULL);
 	{
+		sSendChunk Chunk(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
+
 		cCSLock Lock(m_CS);
-		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, a_ChunkZ, a_Client)) != m_SendChunks.end())
+		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), Chunk) != m_SendChunks.end())
 		{
 			// Already queued, bail out
 			return;
 		}
-		m_SendChunks.push_back(sSendChunk(a_ChunkX, a_ChunkZ, a_Client));
+		m_SendChunks.push_back(Chunk);
+
+		// Sort the list:
+		m_SendChunks.sort();
 	}
 	m_evtQueue.Set();
 }
@@ -169,7 +174,7 @@ void cChunkSender::Execute(void)
 			sSendChunk Chunk(m_SendChunks.front());
 			m_SendChunks.pop_front();
 			Lock.Unlock();
-			
+
 			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
 		}
 		Lock.Lock();

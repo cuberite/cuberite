@@ -402,11 +402,11 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 
 
-void cClientHandle::StreamNextChunk(void)
+bool cClientHandle::StreamNextChunk(void)
 {
 	if ((m_State < csAuthenticated) || (m_State >= csDestroying))
 	{
-		return;
+		return true;
 	}
 	ASSERT(m_Player != NULL);
 
@@ -415,7 +415,7 @@ void cClientHandle::StreamNextChunk(void)
 	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
 	{
 		// All chunks are already loaded. Abort loading.
-		return;
+		return true;
 	}
 
 	// Get the look vector and normalize it.
@@ -454,8 +454,8 @@ void cClientHandle::StreamNextChunk(void)
 
 				// Unloaded chunk found -> Send it to the client.
 				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ);
-				return;
+				StreamChunk(ChunkX, ChunkZ, cChunkSender::E_CHUNK_PRIORITY_HIGH);
+				return false;
 			}
 		}
 	}
@@ -489,8 +489,8 @@ void cClientHandle::StreamNextChunk(void)
 
 				// Unloaded chunk found -> Send it to the client.
 				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ);
-				return;
+				StreamChunk(ChunkX, ChunkZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM);
+				return false;
 			}
 		}
 	}
@@ -527,14 +527,15 @@ void cClientHandle::StreamNextChunk(void)
 
 			// Unloaded chunk found -> Send it to the client.
 			Lock.Unlock();
-			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ);
-			return;
+			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::E_CHUNK_PRIORITY_LOW);
+			return false;
 		}
 	}
 
 	// All chunks are loaded -> Sets the last loaded chunk coordinates to current coordinates
 	m_LastStreamedChunkX = ChunkPosX;
 	m_LastStreamedChunkZ = ChunkPosZ;
+	return true;
 }
 
 
@@ -590,7 +591,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 
 
 
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
+void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority)
 {
 	if (m_State >= csDestroying)
 	{
@@ -608,7 +609,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 		}
-		World->SendChunkTo(a_ChunkX, a_ChunkZ, this);
+		World->SendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, this);
 	}
 }
 
@@ -2028,8 +2029,16 @@ void cClientHandle::Tick(float a_Dt)
 
 	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
 	{
-		
-		StreamNextChunk();  // Streams the next chunk
+		// Stream 4 chunks per tick
+		for (int i = 0; i < 4; i++)
+		{
+			// Stream the next chunk
+			if (StreamNextChunk())
+			{
+				// Streaming finished. All chunks are loaded.
+				break;
+			}
+		}
 
 		// Unload all chunks that are out of the view distance (all 5 seconds)
 		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
