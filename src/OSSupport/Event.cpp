@@ -102,6 +102,53 @@ void cEvent::Wait(void)
 
 
 
+bool cEvent::Wait(int a_TimeoutMSec)
+{
+	#ifdef _WIN32
+		DWORD res = WaitForSingleObject(m_Event, (DWORD)a_TimeoutMSec);
+		switch (res)
+		{
+			case WAIT_OBJECT_0: return true;   // Regular event signalled
+			case WAIT_TIMEOUT:  return false;  // Regular event timeout
+			default:
+			{
+				LOGWARN("cEvent: waiting for the event failed: %u, GLE = %u. Continuing, but server may be unstable.", (unsigned)res, (unsigned)GetLastError());
+				return false;
+			}
+		}
+	#else
+		// Get the current time:
+		timespec timeout;
+		if (clock_gettime(CLOCK_REALTIME, &timeout) == -1)
+		{
+			LOGWARN("cEvent: Getting current time failed: %i, err = %s. Continuing, but the server may be unstable.", errno, GetOSErrorString(errno).c_str());
+			return false;
+		}
+
+		// Add the specified timeout:
+		timeout.tv_sec += a_TimeoutMSec / 1000;
+		timeout.tv_nsec += (a_TimeoutMSec % 1000) * 1000000;  // 1 msec = 1000000 usec
+
+		// Wait with timeout:
+		int res = sem_timedwait(m_Event, &timeout);
+		switch (res)
+		{
+			case 0:         return true;   // Regular event signalled
+			case ETIMEDOUT: return false;  // Regular even timeout
+			default:
+			{
+				AString error = GetOSErrorString(errno);
+				LOGWARN("cEvent: waiting for the event failed: %i, err = %s. Continuing, but server may be unstable.", res, error.c_str());
+				return false;
+			}
+		}
+	#endif
+}
+
+
+
+
+
 void cEvent::Set(void)
 {
 	#ifdef _WIN32

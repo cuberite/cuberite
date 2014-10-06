@@ -535,6 +535,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_LAPIS_ORE           ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_LOG                 ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_MELON               ].m_FullyOccupiesVoxel = true;
+	a_Info[E_BLOCK_MOB_SPAWNER         ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_MOSSY_COBBLESTONE   ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_MYCELIUM            ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_NETHERRACK          ].m_FullyOccupiesVoxel = true;

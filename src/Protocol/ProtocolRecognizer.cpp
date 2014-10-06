@@ -905,6 +905,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	{
 		return false;
 	}
+	m_Client->SetProtocolVersion(ProtocolVersion);
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:

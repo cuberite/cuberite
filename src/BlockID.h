@@ -555,10 +555,10 @@ enum
 	E_META_PRESSURE_PLATE_RAISED = 0,
 	E_META_PRESSURE_PLATE_DEPRESSED = 1,
 	
-	// E_BLOCK_PRISMARINE:
-	E_META_PRISMRAINE_ROUGH  = 0,
-	E_META_PRISMARINE_BRICKS = 1,
-	E_META_PRISMARINE_DARK   = 2,
+	// E_BLOCK_PRISMARINE_BLOCK metas:
+	E_META_PRISMARINE_BLOCK_ROUGH  = 0,
+	E_META_PRISMARINE_BLOCK_BRICKS = 1,
+	E_META_PRISMARINE_BLOCK_DARK   = 2,
 	
 	// E_BLOCK_QUARTZ_BLOCK metas:
 	E_META_QUARTZ_NORMAL = 0,
@@ -577,7 +577,7 @@ enum
 	E_META_RAIL_CURVED_ZM_XM       = 8,
 	E_META_RAIL_CURVED_ZM_XP       = 9,
 	
-	// E_BLOCK_RED_SANDSTONE:
+	// E_BLOCK_RED_SANDSTONE metas:
 	E_META_RED_SANDSTONE_NORMAL   = 0,
 	E_META_RED_SANDSTONE_ORNAMENT = 1,
 	E_META_RED_SANDSTONE_SMOOTH   = 2,
@@ -746,7 +746,7 @@ enum
 	////////////////////////////////////////////////////////////////////////////////
 	// Item metas:
 	
-	// E_ITEM_BANNER:
+	// E_ITEM_BANNER metas:
 	E_META_BANNER_BLACK      = 0,
 	E_META_BANNER_RED        = 1,
 	E_META_BANNER_GREEN      = 2,
@@ -790,7 +790,7 @@ enum
 	E_META_GOLDEN_APPLE_NORMAL = 0,
 	E_META_GOLDEN_APPLE_ENCHANTED = 1,
 	
-	// E_ITEM_HEAD:
+	// E_ITEM_HEAD metas:
 	E_META_HEAD_SKELETON = 0,
 	E_META_HEAD_WITHER   = 1,
 	E_META_HEAD_ZOMBIE   = 2,
@@ -1004,9 +1004,6 @@ extern AString ItemTypeToString(short a_ItemType);
 
 /// Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string.
 extern AString ItemToFullString(const cItem & a_Item);
-
-/// Translates a mob string ("ocelot") to mobtype (E_ENTITY_TYPE_OCELOT)
-extern int StringToMobType(const AString & a_MobString);
 
 /// Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure
 extern eDimension StringToDimension(const AString & a_DimensionString);

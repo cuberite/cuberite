@@ -92,7 +92,8 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
-	m_Locale("en_GB")
+	m_Locale("en_GB"),
+	m_ProtocolVersion(0)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -672,15 +673,22 @@ void cClientHandle::HandlePing(void)
 
 bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
 {
+	// If the protocol version hasn't been set yet, set it now:
+	if (m_ProtocolVersion == 0)
+	{
+		m_ProtocolVersion = a_ProtocolVersion;
+	}
+
 	m_Username = a_Username;
 
+	// Let the plugins know about this event, they may refuse the player:
 	if (cRoot::Get()->GetPluginManager()->CallHookLogin(this, a_ProtocolVersion, a_Username))
 	{
 		Destroy();
 		return false;
 	}
 
-	// Schedule for authentication; until then, let them wait (but do not block)
+	// Schedule for authentication; until then, let the player wait (but do not block)
 	m_State = csAuthenticating;
 	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
 	return true;

@@ -25,9 +25,6 @@ class cMonster :
 	typedef cPawn super;
 public:
 
-	// Deprecated
-	typedef eMonsterType eType;
-
 	enum eFamily
 	{
 		mfHostile  = 0,  // Spider, Zombies ...

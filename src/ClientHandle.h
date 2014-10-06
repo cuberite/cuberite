@@ -320,6 +320,12 @@ public:
 	
 	/** Called when the player will enchant a Item */
 	void HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment);
+
+	/** Called by the protocol recognizer when the protocol version is known. */
+	void SetProtocolVersion(UInt32 a_ProtocolVersion) { m_ProtocolVersion = a_ProtocolVersion; }
+
+	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
+	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 	
 private:
 
@@ -430,6 +436,9 @@ private:
 	
 	/** The brand identification of the client, as received in the MC|Brand plugin message or set from a plugin. */
 	AString m_ClientBrand;
+
+	/** The version of the protocol that the client is talking, or 0 if unknown. */
+	UInt32 m_ProtocolVersion;
 
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
