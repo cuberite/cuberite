@@ -28,21 +28,25 @@ public:
 	
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
+
 		if ((Block == E_BLOCK_LEAVES) || (Block == E_BLOCK_NEW_LEAVES))
 		{
-			NIBBLETYPE Meta = a_World->GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
+			cItems Drops;
 			cBlockHandler * Handler = cBlockInfo::GetHandler(Block);
 
-			cItems Drops;
-			Handler->ConvertToPickups(Drops, Meta);
-			Drops.push_back(cItem(Block, 1, Meta & 3));
+			Handler->ConvertToPickups(Drops, BlockMeta);
+			Drops.Add(Block, 1, BlockMeta & 3);
 			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
+			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 			a_Player->UseEquippedItem();
 			return true;
 		}
+
 		return false;
 	}
 
@@ -53,12 +57,10 @@ public:
 		{
 			case E_BLOCK_COBWEB:
 			case E_BLOCK_VINES:
-			case E_BLOCK_LEAVES:
-			case E_BLOCK_NEW_LEAVES:
 			{
 				return true;
 			}
-		}  // switch (a_BlockType)
+		}
 		return super::CanHarvestBlock(a_BlockType);
 	}
 
@@ -71,12 +73,30 @@ public:
 
 	virtual void OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
 
-		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		if ((Block == E_BLOCK_TRIPWIRE) || (Block == E_BLOCK_VINES))
+		if ((Block == E_BLOCK_TALL_GRASS) && !a_Player->IsGameModeCreative())
 		{
+			cItems Drops;
+			Drops.Add(Block, 1, BlockMeta);
+			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 			a_Player->UseEquippedItem();
+			return;
+		}
+
+		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
+		switch (Block)
+		{
+			case E_BLOCK_COBWEB:
+			case E_BLOCK_DEAD_BUSH:
+			case E_BLOCK_TRIPWIRE:
+			case E_BLOCK_VINES:
+			case E_BLOCK_WOOL:
+			{
+				a_Player->UseEquippedItem();
+			}
 		}
 	}
 } ;
