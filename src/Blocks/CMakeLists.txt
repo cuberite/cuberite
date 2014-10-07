@@ -45,7 +45,6 @@ SET (HDRS
 	BlockGlowstone.h
 	BlockGravel.h
 	BlockHandler.h
-	BlockHayBale.h
 	BlockHopper.h
 	BlockIce.h
 	BlockLadder.h
