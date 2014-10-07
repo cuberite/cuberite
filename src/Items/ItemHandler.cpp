@@ -589,7 +589,6 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_LAPIS_BLOCK:
 		case E_BLOCK_LAPIS_ORE:
-		case E_BLOCK_LEAVES:
 		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_MOB_SPAWNER:
 		case E_BLOCK_MOSSY_COBBLESTONE:
@@ -597,7 +596,6 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_NETHER_BRICK_STAIRS:
 		case E_BLOCK_NETHER_BRICK_FENCE:
 		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_NEW_LEAVES:
 		case E_BLOCK_NEW_STONE_SLAB:
 		case E_BLOCK_OBSIDIAN:
 		case E_BLOCK_PACKED_ICE:
