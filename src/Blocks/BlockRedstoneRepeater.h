@@ -77,12 +77,7 @@ public:
 	
 	
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{	
-		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
-		{
-			return false;
-		}
-
+	{
 		NIBBLETYPE Meta;
 		if (!a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta))
 		{
@@ -91,6 +86,12 @@ public:
 		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
+
+		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
+		{
+			return false;
+		}
+
 		BLOCKTYPE BlockIsOn;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
