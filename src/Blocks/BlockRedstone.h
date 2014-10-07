@@ -41,7 +41,7 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if ((a_RelY <= 0) && (a_RelY >= cChunkDef::Height))
+		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
 		{
 			return false;
 		}
