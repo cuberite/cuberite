@@ -443,6 +443,12 @@ bool cClientHandle::StreamNextChunk(void)
 				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
 				cChunkCoords Coords(ChunkX, ChunkZ);
 
+				// Checks if the chunk is in distance
+				if ((Diff(ChunkX, ChunkPosX) > m_ViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_ViewDistance))
+				{
+					continue;
+				}
+
 				// If the chunk already loading/loaded -> skip
 				if (
 					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
@@ -477,6 +483,12 @@ bool cClientHandle::StreamNextChunk(void)
 				int ChunkX = RangeX + ((X >= 4) ? (3 - X) : X);
 				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
 				cChunkCoords Coords(ChunkX, ChunkZ);
+
+				// Checks if the chunk is in distance
+				if ((Diff(ChunkX, ChunkPosX) > m_ViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_ViewDistance))
+				{
+					continue;
+				}
 
 				// If the chunk already loading/loaded -> skip
 				if (
