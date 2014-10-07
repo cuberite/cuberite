@@ -2614,7 +2614,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 
 
 
-void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	a_BlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
 	a_BlockMeta = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
