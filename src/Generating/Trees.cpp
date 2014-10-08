@@ -416,15 +416,16 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
 	}
 
-	Vector3i BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
-	Vector3i BranchDirection = Vector3i(a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY, a_BlockZ) % 3 - 1, 0, a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ * a_Seq) % 3 - 1);
-	int Attempts = 0;
-	while (BranchDirection.Length() == 0.0)
+	const Vector3i AvailableDirections[] =
 	{
-		Attempts++;
-		BranchDirection = Vector3i(a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * Attempts, a_BlockZ) % 3 - 1, 0, a_Noise.IntNoise3DInt(a_BlockX, a_BlockY * Attempts, a_BlockZ * a_Seq) % 3 - 1);
-	}
-	BranchDirection.y = 1;
+		{ -1, 1, 0 }, { 0, 1, -1 },
+		{ -1, 1, 1 }, { -1, 1, -1 },
+		{ 1, 1, 1 }, { 1, 1, -1 },
+		{ 1, 1, 0 }, { 0, 1, 1 },
+	};
+
+	Vector3i BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
+	Vector3i BranchDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 8];
 
 	int BranchHeight = a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 3 + 1;
 	for (int i = 0; i < BranchHeight; i++)
