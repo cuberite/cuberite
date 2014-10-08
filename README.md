@@ -12,8 +12,8 @@ Installation
 
 Normally, you will want to download a pre-compiled version of MCServer from one of the buildservers:
 
- * [Windows and Linux](http://builds.mc-server.org)
- * [Raspberry Pi](http://ci.bearbin.net)
+ * [Windows and Linux](http://builds.cuberite.org)
+ * [Raspberry Pi](http://builds.cuberite.org)
 
 You simply need to download and extract these files before you can use the server. 
 
