@@ -224,8 +224,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biMegaTaiga:
 		case biMegaTaigaHills:
 		case biExtremeHillsPlus:
-		case biSavanna:
-		case biSavannaPlateau:
 		case biMesa:
 		case biMesaPlateauF:
 		case biMesaPlateau:
@@ -241,14 +239,21 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
 		case biExtremeHillsPlusM:
-		case biSavannaM:
-		case biSavannaPlateauM:
 		case biMesaBryce:
 		case biMesaPlateauFM:
 		case biMesaPlateauM:
 		{
 			// TODO: These need their special trees
 			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+			return;
+		}
+
+		case biSavanna:
+		case biSavannaPlateau:
+		case biSavannaM:
+		case biSavannaPlateauM:
+		{
+			GetAcaciaTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
 			return;
 		}
 
@@ -403,7 +408,53 @@ void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 
 void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	// TODO
+	int Height = 2 + (a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) / 11 % 3);
+	
+	// Create the trunk
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
+	}
+
+	Vector3i BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
+	Vector3i BranchDirection = Vector3i(a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY, a_BlockZ) % 3 - 1, 0, a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ * a_Seq) % 3 - 1);
+	int Attempts = 0;
+	while (BranchDirection.Length() == 0.0)
+	{
+		Attempts++;
+		BranchDirection = Vector3i(a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * Attempts, a_BlockZ) % 3 - 1, 0, a_Noise.IntNoise3DInt(a_BlockX, a_BlockY * Attempts, a_BlockZ * a_Seq) % 3 - 1);
+	}
+	BranchDirection.y = 1;
+
+	int BranchHeight = a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 3 + 1;
+	for (int i = 0; i < BranchHeight; i++)
+	{
+		BranchPos = BranchPos + BranchDirection;
+		a_LogBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y, BranchPos.z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
+	}
+
+	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
+	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
+	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD));
+
+	bool TwoTop = (a_Noise.IntNoise3D(a_BlockX, a_BlockY, a_BlockZ) < 0 ? true : false);
+	if (!TwoTop)
+	{
+		return;
+	}
+
+	BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
+	BranchDirection = Vector3d(-BranchDirection.x, 1, -BranchDirection.z);
+	BranchHeight = a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq * 10, a_BlockZ * a_Seq) % 3 + 1;
+	for (int i = 0; i < BranchHeight; i++)
+	{
+		BranchPos = BranchPos + BranchDirection;
+		a_LogBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y, BranchPos.z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
+	}
+
+	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
+	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
+	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD));
 }
 
 
