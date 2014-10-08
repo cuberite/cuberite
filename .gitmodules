@@ -13,3 +13,6 @@
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
 	url = https://github.com/mc-server/SQLiteCpp.git
+[submodule "MCServer/Plugins/ChunkWorx"]
+	path = MCServer/Plugins/ChunkWorx
+	url = https://github.com/mc-server/ChunkWorx.git
