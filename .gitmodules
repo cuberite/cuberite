@@ -19,3 +19,6 @@
 [submodule "MCServer/Plugins/ChatLog"]
 	path = MCServer/Plugins/ChatLog
 	url = https://github.com/mc-server/ChatLog.git
+[submodule "MCServer/Plugins/Handy"]
+	path = MCServer/Plugins/Handy
+	url = https://github.com/mc-server/Handy.git
