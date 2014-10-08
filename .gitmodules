@@ -22,3 +22,6 @@
 [submodule "MCServer/Plugins/Handy"]
 	path = MCServer/Plugins/Handy
 	url = https://github.com/mc-server/Handy.git
+[submodule "MCServer/Plugins/MagicCarpet"]
+	path = MCServer/Plugins/MagicCarpet
+	url = https://github.com/mc-server/MagicCarpet.git
