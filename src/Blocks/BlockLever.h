@@ -117,7 +117,10 @@ public:
 				((BlockIsOn == E_BLOCK_WOODEN_SLAB) && ((Meta & 0x08) == 0x08)) ||
 				((BlockIsOn == E_BLOCK_STONE_SLAB) && ((Meta & 0x08) == 0x08))
 			) &&
-			((a_RelY < cChunkDef::Height) && (Face == BLOCK_FACE_TOP))
+			(
+				(a_RelY < (cChunkDef::Height -1)) &&
+				(Face == BLOCK_FACE_TOP)
+			)
 		)
 		{
 			return true;

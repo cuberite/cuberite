@@ -43,6 +43,12 @@ public:
 		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 
+
+	/**
+	 * @brief BlockMetaDataToBlockFace
+	 * @param a_Meta
+	 * @return eBlockFace
+	 */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
