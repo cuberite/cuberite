@@ -408,6 +408,7 @@ void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Nois
 
 void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
+	// Calculate a base height
 	int Height = 2 + (a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) / 11 % 3);
 	
 	// Create the trunk
@@ -416,6 +417,7 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
 	}
 
+	// Array with possible directions for a branch to go to.
 	const Vector3i AvailableDirections[] =
 	{
 		{ -1, 1, 0 }, { 0, 1, -1 },
@@ -424,35 +426,51 @@ void GetAcaciaTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noi
 		{ 1, 1, 0 }, { 0, 1, 1 },
 	};
 
+	// Set the starting point of the branch
 	Vector3i BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
+
+	// Get a direction for the trunk to go to.
 	Vector3i BranchDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 8];
 
+	// Calculate a height for the branch between 1 and 3
 	int BranchHeight = a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 3 + 1;
+
+	// Place the logs of the branch.
 	for (int i = 0; i < BranchHeight; i++)
 	{
 		BranchPos = BranchPos + BranchDirection;
 		a_LogBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y, BranchPos.z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
 	}
 
+	// Add the leaves to the top of the branch
 	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
 	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
 	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD));
 
+	// Choose if we have to add another branch
 	bool TwoTop = (a_Noise.IntNoise3D(a_BlockX, a_BlockY, a_BlockZ) < 0 ? true : false);
 	if (!TwoTop)
 	{
 		return;
 	}
 
+	// Reset the starting point of the branch
 	BranchPos = Vector3i(a_BlockX, a_BlockY + Height - 1, a_BlockZ);
+
+	// Invert the direction of the previous branch.
 	BranchDirection = Vector3d(-BranchDirection.x, 1, -BranchDirection.z);
+
+	// Calculate a new height for the second branch
 	BranchHeight = a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq * 10, a_BlockZ * a_Seq) % 3 + 1;
+
+	// Place the logs in the same way as the first branch
 	for (int i = 0; i < BranchHeight; i++)
 	{
 		BranchPos = BranchPos + BranchDirection;
 		a_LogBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y, BranchPos.z, E_BLOCK_NEW_LOG, E_META_NEW_LOG_ACACIA_WOOD));
 	}
 
+	// And add the leaves ontop of the second branch
 	PushCoordBlocks(BranchPos.x, BranchPos.y, BranchPos.z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
 	PushCoordBlocks(BranchPos.x, BranchPos.y + 1, BranchPos.z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD);
 	a_OtherBlocks.push_back(sSetBlock(BranchPos.x, BranchPos.y + 1, BranchPos.z, E_BLOCK_NEW_LEAVES, E_META_NEW_LEAVES_ACACIA_WOOD));
