@@ -7,12 +7,15 @@
 [submodule "MCServer/Plugins/TransAPI"]
 	path = MCServer/Plugins/TransAPI
 	url = https://github.com/bearbin/transapi.git
+[submodule "MCServer/Plugins/ChunkWorx"]
+	path = MCServer/Plugins/ChunkWorx
+	url = https://github.com/mc-server/ChunkWorx.git
 [submodule "lib/polarssl"]
 	path = lib/polarssl
 	url = https://github.com/mc-server/polarssl.git
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
 	url = https://github.com/mc-server/SQLiteCpp.git
-[submodule "MCServer/Plugins/ChunkWorx"]
-	path = MCServer/Plugins/ChunkWorx
-	url = https://github.com/mc-server/ChunkWorx.git
+[submodule "MCServer/Plugins/ChatLog"]
+	path = MCServer/Plugins/ChatLog
+	url = https://github.com/mc-server/ChatLog.git
