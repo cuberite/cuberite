@@ -5,8 +5,6 @@
 #include "MetaRotator.h"
 
 
-
-
 class cBlockLeverHandler :
 	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
@@ -106,8 +104,7 @@ public:
 		}
 
 		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
 
 
 		if (!(cBlockInfo::FullyOccupiesVoxel(BlockIsOn)))
