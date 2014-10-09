@@ -98,7 +98,7 @@ public:
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 
-		if ((a_RelY < 0) && (a_RelY >= cChunkDef::Height -1))
+		if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height -1))
 		{
 			return false;
 		}
