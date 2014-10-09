@@ -114,7 +114,11 @@ public:
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
 
-		if (
+		if (!(cBlockInfo::FullyOccupiesVoxel(BlockIsOn)))
+		{
+			return false;
+		}
+		else if (
 				(BlockIsOn == E_BLOCK_STONE_SLAB) ||
 				(BlockIsOn == E_BLOCK_WOODEN_SLAB)
 		)
@@ -124,15 +128,13 @@ public:
 			{
 				return true;
 			}
+			else
+			{
+				return false;
+			}
 		}
-		else if (!(cBlockInfo::FullyOccupiesVoxel(BlockIsOn)))
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+
+		return true;
 	}
 
 
