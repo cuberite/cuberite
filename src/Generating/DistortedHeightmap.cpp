@@ -540,10 +540,11 @@ void cDistortedHeightmap::InitializeCompoGen(cIniFile & a_IniFile)
 
 int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 {
-	int ChunkX = (int)floor(a_X / (NOISE_DATATYPE)16);
-	int ChunkZ = (int)floor(a_Z / (NOISE_DATATYPE)16);
-	int RelX = (int)(a_X - (NOISE_DATATYPE)ChunkX * cChunkDef::Width);
-	int RelZ = (int)(a_Z - (NOISE_DATATYPE)ChunkZ * cChunkDef::Width);
+	int RelX = (int)std::floor(a_X);
+	int RelY = 0;
+	int RelZ = (int)std::floor(a_Z);
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
 
 	// If we're withing the same chunk, return the pre-cached heightmap:
 	if ((ChunkX == m_CurChunkX) && (ChunkZ == m_CurChunkZ))
