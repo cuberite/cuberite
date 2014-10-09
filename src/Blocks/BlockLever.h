@@ -3,6 +3,7 @@
 #include "BlockHandler.h"
 #include "../Chunk.h"
 #include "MetaRotator.h"
+#include "BlockSlab.h"
 
 
 class cBlockLeverHandler :
@@ -111,10 +112,7 @@ public:
 		{
 			return false;
 		}
-		else if (
-				(BlockIsOn == E_BLOCK_STONE_SLAB) ||
-				(BlockIsOn == E_BLOCK_WOODEN_SLAB)
-		)
+		else if (cBlockSlabHandler::IsAnySlabType(BlockIsOn))
 		{
 			// Check if the slab is turned up side down
 			if (((Meta & 0x08) == 0x08) && (Face == BLOCK_FACE_TOP))
