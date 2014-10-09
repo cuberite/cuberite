@@ -226,10 +226,10 @@ template class SizeChecker<UInt16, 2>;
 
 // CRT stuff:
 #include <sys/stat.h>
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+#include <cstdarg>
 
 
 
@@ -394,6 +394,24 @@ template <typename T>
 T Clamp(T a_Value, T a_Min, T a_Max)
 {
 	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
+}
+
+
+
+
+
+/** Floors a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type FloorC(T a_Value)
+{
+	return static_cast<C>(std::floor(a_Value));
+}
+
+/** Ceils a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
+{
+	return static_cast<C>(std::ceil(a_Value));
 }
 
 
