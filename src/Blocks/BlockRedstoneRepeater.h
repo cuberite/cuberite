@@ -5,6 +5,7 @@
 #include "Chunk.h"
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
+#include "BlockSlab.h"
 
 
 
@@ -44,10 +45,8 @@ public:
 	}
 
 
-	/**
-	 * @brief BlockMetaDataToBlockFace
-	 * @param a_Meta
-	 * @return eBlockFace
+	/** BlockMetaToBlockFace
+	 *	Takes the meta of a specific block and returns the corresponding face
 	 */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -84,37 +83,28 @@ public:
 	
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta;
-		if (!a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta))
-		{
-			return false;
-		}
-		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
-
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
-
-		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
+		if (a_RelY <= 0)
 		{
 			return false;
 		}
 
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+		BLOCKTYPE BelowBlock;
+		NIBBLETYPE BelowBlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
 
-		if (
-			(
-				((BlockIsOn == E_BLOCK_WOODEN_SLAB) && ((Meta & 0x08) == 0x08)) ||
-				((BlockIsOn == E_BLOCK_STONE_SLAB) && ((Meta & 0x08) == 0x08))
-			) &&
-			((a_RelY < cChunkDef::Height) && (Face == BLOCK_FACE_TOP))
-		)
+		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
 			return true;
 		}
-		else
+		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
-			return ((a_RelY > 0) && cBlockInfo::IsSolid(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
+			// Check if the slab is turned up side down
+			if ((BelowBlockMeta & 0x08) == 0x08)
+			{
+				return true;
+			}
 		}
+		return false;
 	}
 
 

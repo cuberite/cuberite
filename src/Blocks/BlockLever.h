@@ -104,28 +104,28 @@ public:
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 
-		if ((a_RelY < 0) && (a_RelY >= cChunkDef::Height))
+		if ((a_RelY < 0) && (a_RelY >= cChunkDef::Height -1))
 		{
 			return false;
 		}
 
 		BLOCKTYPE BlockIsOn;
 		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+
 
 		if (
-			(
-				((BlockIsOn == E_BLOCK_WOODEN_SLAB) && ((Meta & 0x08) == 0x08)) ||
-				((BlockIsOn == E_BLOCK_STONE_SLAB) && ((Meta & 0x08) == 0x08))
-			) &&
-			(
-				(a_RelY < (cChunkDef::Height -1)) &&
-				(Face == BLOCK_FACE_TOP)
-			)
+				(BlockIsOn == E_BLOCK_STONE_SLAB) ||
+				(BlockIsOn == E_BLOCK_WOODEN_SLAB)
 		)
 		{
-			return true;
+			// Check if the slab is turned up side down
+			if (((Meta & 0x08) == 0x08) && (Face == BLOCK_FACE_TOP))
+			{
+				return true;
+			}
 		}
-		else if (!(cBlockInfo::FullyOccupiesVoxel(BlockIsOn) && (a_RelY > 0)))
+		else if (!(cBlockInfo::FullyOccupiesVoxel(BlockIsOn)))
 		{
 			return false;
 		}
