@@ -51,6 +51,9 @@
 	
 	#define NORETURN      __declspec(noreturn)
 
+	// Use non-standard defines in <cmath>
+	#define _USE_MATH_DEFINES
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
