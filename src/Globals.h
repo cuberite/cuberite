@@ -419,6 +419,12 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 
 
 
+//temporary replacement for std::make_unique until we get c++14
+template< class T, class... Args >
+std::unique_ptr<T> make_unique( Args&&... args )
+{
+	return std::unique_ptr<T>(new T(args...));
+}
 
 
 #ifndef TOLUA_TEMPLATE_BIND
@@ -434,5 +440,6 @@ typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
+
 
 

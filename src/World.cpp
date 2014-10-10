@@ -256,14 +256,14 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_IsDeepSnowEnabled(false),
 	m_ShouldLavaSpawnFire(true),
 	m_VillagersShouldHarvestCrops(true),
-	m_SimulatorManager(NULL),
-	m_SandSimulator(NULL),
+	m_SimulatorManager(),
+	m_SandSimulator(),
 	m_WaterSimulator(NULL),
-	m_LavaSimulator(NULL),
-	m_FireSimulator(NULL),
+	m_LavaSimulator(nullptr),
+	m_FireSimulator(),
 	m_RedstoneSimulator(NULL),
 	m_MaxPlayers(10),
-	m_ChunkMap(NULL),
+	m_ChunkMap(),
 	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
@@ -303,11 +303,8 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 
 cWorld::~cWorld()
 {
-	delete m_SimulatorManager;   m_SimulatorManager  = NULL;
-	delete m_SandSimulator;      m_SandSimulator     = NULL;
 	delete m_WaterSimulator;     m_WaterSimulator    = NULL;
 	delete m_LavaSimulator;      m_LavaSimulator     = NULL;
-	delete m_FireSimulator;      m_FireSimulator     = NULL;
 	delete m_RedstoneSimulator;  m_RedstoneSimulator = NULL;
 
 	UnloadUnusedChunks();
@@ -319,8 +316,6 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
-
-	delete m_ChunkMap;
 }
 
 
@@ -631,7 +626,7 @@ void cWorld::Start(void)
 	InitialiseAndLoadMobSpawningValues(IniFile);
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", m_TimeOfDay));
 
-	m_ChunkMap = new cChunkMap(this);
+	m_ChunkMap = make_unique<cChunkMap>(this);
 	
 	m_LastSave = 0;
 	m_LastUnload = 0;
@@ -641,16 +636,16 @@ void cWorld::Start(void)
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = new cSimulatorManager(*this);
+	m_SimulatorManager  = make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = new cSandSimulator(*this, IniFile);
-	m_FireSimulator     = new cFireSimulator(*this, IniFile);
+	m_SandSimulator     = make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
-	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_SandSimulator.get(), 1);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator.get(), 1);
 
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
@@ -1059,7 +1054,6 @@ void cWorld::TickQueuedTasks(void)
 	for (cTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
 	{
 		(*itr)->Run(*this);
-		delete *itr;
 	}  // for itr - m_Tasks[]
 }
 
@@ -1073,18 +1067,19 @@ void cWorld::TickScheduledTasks(void)
 	cScheduledTasks Tasks;
 	{
 		cCSLock Lock(m_CSScheduledTasks);
-		while (!m_ScheduledTasks.empty() && (m_ScheduledTasks.front()->m_TargetTick < m_WorldAge))
-		{
-			Tasks.push_back(m_ScheduledTasks.front());
-			m_ScheduledTasks.pop_front();
-		}
+		std::move(
+			m_ScheduledTasks.begin(),
+			std::find_if(
+				m_ScheduledTasks.begin(),
+				m_ScheduledTasks.end(),
+				[m_WorldAge] (std::unique_ptr<cScheduledTask>& Task) { return Task->m_TargetTick < m_WorldAge;}),
+		 	std::back_inserter(Tasks));
 	}
 
 	// Execute and delete each task:
 	for (cScheduledTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
 	{
 		(*itr)->m_Task->Run(*this);
-		delete *itr;
 	}  // for itr - m_Tasks[]
 }
 
@@ -2593,7 +2588,7 @@ void cWorld::UnloadUnusedChunks(void)
 
 void cWorld::QueueUnloadUnusedChunks(void)
 {
-	QueueTask(new cWorld::cTaskUnloadUnusedChunks);
+	QueueTask(make_unique<cWorld::cTaskUnloadUnusedChunks>());
 }
 
 
@@ -3049,17 +3044,17 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::QueueSaveAllChunks(void)
 {
-	QueueTask(new cWorld::cTaskSaveAllChunks);
+	QueueTask(make_unique<cWorld::cTaskSaveAllChunks>());
 }
 
 
 
 
 
-void cWorld::QueueTask(cTask * a_Task)
+void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.push_back(a_Task);
+	m_Tasks.push_back(std::move(a_Task));
 }
 
 
@@ -3076,11 +3071,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 	{
 		if ((*itr)->m_TargetTick >= TargetTick)
 		{
-			m_ScheduledTasks.insert(itr, new cScheduledTask(TargetTick, a_Task));
+			m_ScheduledTasks.insert(itr, make_unique<cScheduledTask>(TargetTick, a_Task));
 			return;
 		}
 	}
-	m_ScheduledTasks.push_back(new cScheduledTask(TargetTick, a_Task));
+	m_ScheduledTasks.push_back(make_unique<cScheduledTask>(TargetTick, a_Task));
 }
 
 
