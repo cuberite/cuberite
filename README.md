@@ -10,7 +10,7 @@ We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 Installation
 ------------
 
-For Linux there is an easy installation method:
+For Linux there is an easy installation method, just run this in your terminal:
 
     curl -s https://raw.githubusercontent.com/mc-server/MCServer/master/easyinstall.sh | sh
 
