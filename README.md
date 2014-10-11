@@ -12,7 +12,7 @@ Installation
 
 For Linux there is an easy installation method:
 
-    curl -s http://git.io/KXfyxQ | sh
+    curl -s https://raw.githubusercontent.com/mc-server/MCServer/master/easyinstall.sh | sh
 
 For Windows, you just need to download a file and extract it:
 
