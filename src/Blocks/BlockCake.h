@@ -19,7 +19,7 @@ public:
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-		if (!a_Player->Feed(2, 0.1))
+		if (!a_Player->Feed(2, 0.4))
 		{
 			return;
 		}
@@ -42,11 +42,6 @@ public:
 	virtual bool IsUseable(void) override
 	{
 		return true;
-	}
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.cloth";
 	}
 } ;
 

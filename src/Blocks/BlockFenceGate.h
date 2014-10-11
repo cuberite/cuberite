@@ -17,6 +17,12 @@ public:
 	}
 
 
+	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
+	{
+		a_Pickups.Add(m_BlockType, 1, 0);  // Reset meta to zero
+	}
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -35,6 +41,7 @@ public:
 		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 		NIBBLETYPE NewMetaData = PlayerYawToMetaData(a_Player->GetYaw());
 		OldMetaData ^= 4;  // Toggle the gate
+
 		if ((OldMetaData & 1) == (NewMetaData & 1))
 		{
 			// Standing in front of the gate - apply new direction

@@ -46,12 +46,6 @@ public:
 			a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x08);
 		}
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
-	}
 } ;
 
 

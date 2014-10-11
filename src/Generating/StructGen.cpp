@@ -13,45 +13,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cStructGenOreNests configuration:
-
-const int MAX_HEIGHT_COAL = 127;
-const int NUM_NESTS_COAL = 50;
-const int NEST_SIZE_COAL = 10;
-
-const int MAX_HEIGHT_IRON = 64;
-const int NUM_NESTS_IRON = 14;
-const int NEST_SIZE_IRON = 6;
-
-const int MAX_HEIGHT_REDSTONE = 16;
-const int NUM_NESTS_REDSTONE = 4;
-const int NEST_SIZE_REDSTONE = 6;
-
-const int MAX_HEIGHT_GOLD = 32;
-const int NUM_NESTS_GOLD = 2;
-const int NEST_SIZE_GOLD = 6;
-
-const int MAX_HEIGHT_DIAMOND = 15;
-const int NUM_NESTS_DIAMOND = 1;
-const int NEST_SIZE_DIAMOND = 4;
-
-const int MAX_HEIGHT_LAPIS = 30;
-const int NUM_NESTS_LAPIS = 2;
-const int NEST_SIZE_LAPIS = 5;
-
-const int MAX_HEIGHT_DIRT = 127;
-const int NUM_NESTS_DIRT = 20;
-const int NEST_SIZE_DIRT = 32;
-
-const int MAX_HEIGHT_GRAVEL = 70;
-const int NUM_NESTS_GRAVEL = 15;
-const int NEST_SIZE_GRAVEL = 32;
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cStructGenTrees:
 
 void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
@@ -311,21 +272,23 @@ void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_COAL_ORE,     MAX_HEIGHT_COAL,     NUM_NESTS_COAL,     NEST_SIZE_COAL,     BlockTypes, 1);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_IRON_ORE,     MAX_HEIGHT_IRON,     NUM_NESTS_IRON,     NEST_SIZE_IRON,     BlockTypes, 2);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_REDSTONE_ORE, MAX_HEIGHT_REDSTONE, NUM_NESTS_REDSTONE, NEST_SIZE_REDSTONE, BlockTypes, 3);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_GOLD_ORE,     MAX_HEIGHT_GOLD,     NUM_NESTS_GOLD,     NEST_SIZE_GOLD,     BlockTypes, 4);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_DIAMOND_ORE,  MAX_HEIGHT_DIAMOND,  NUM_NESTS_DIAMOND,  NEST_SIZE_DIAMOND,  BlockTypes, 5);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_LAPIS_ORE,    MAX_HEIGHT_LAPIS,    NUM_NESTS_LAPIS,    NEST_SIZE_LAPIS,    BlockTypes, 6);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_DIRT,         MAX_HEIGHT_DIRT,     NUM_NESTS_DIRT,     NEST_SIZE_DIRT,     BlockTypes, 10);
-	GenerateOre(ChunkX, ChunkZ, E_BLOCK_GRAVEL,       MAX_HEIGHT_GRAVEL,   NUM_NESTS_GRAVEL,   NEST_SIZE_GRAVEL,   BlockTypes, 11);
+	cChunkDesc::BlockNibbleBytes & BlockMetas = a_ChunkDesc.GetBlockMetasUncompressed();
+
+	int seq = 1;
+	
+	// Generate the ores from the ore list.
+	for (OreList::const_iterator itr = m_OreList.begin(); itr != m_OreList.end(); ++itr)
+	{
+		GenerateOre(ChunkX, ChunkZ, itr->BlockType, itr->BlockMeta, itr->MaxHeight, itr->NumNests, itr->NestSize, BlockTypes, BlockMetas, seq);
+		seq++;
+	}
 }
 
 
 
 
 
-void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq)
+void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, NIBBLETYPE a_BlockMeta, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, cChunkDesc::BlockNibbleBytes & a_BlockMetas, int a_Seq)
 {
 	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent to each other.
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
@@ -376,9 +339,10 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 						}
 
 						int Index = cChunkDef::MakeIndexNoCheck(BlockX, BlockY, BlockZ);
-						if (a_BlockTypes[Index] == E_BLOCK_STONE)
+						if (a_BlockTypes[Index] == m_ToReplace)
 						{
 							a_BlockTypes[Index] = a_OreType;
+							a_BlockMetas[Index] = a_BlockMeta;
 						}
 						Num++;
 					}  // for z
@@ -585,10 +549,10 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 		// First update the high floor:
 		for (int z = 0; z <= 16 / INTERPOL_Z; z++) for (int x = 0; x <= 16 / INTERPOL_X; x++)
 		{
-			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] =
+			FloorHi[INTERPOL_X * x + 17 * INTERPOL_Z * z] = (
 				m_Noise1.IntNoise3DInt(BaseX + INTERPOL_X * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) *
-				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) /
-				256;
+				m_Noise2.IntNoise3DInt(BaseX + INTERPOL_Z * x, Segment + SEGMENT_HEIGHT, BaseZ + INTERPOL_Z * z) / 256
+			);
 		}  // for x, z - FloorLo[]
 		LinearUpscale2DArrayInPlace<17, 17, INTERPOL_X, INTERPOL_Z>(FloorHi);
 		

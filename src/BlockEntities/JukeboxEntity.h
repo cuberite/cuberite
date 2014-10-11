@@ -2,7 +2,6 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "../Entities/Player.h"
 
 
 
@@ -29,9 +28,6 @@ public:
 	
 	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cJukeboxEntity();
-
-	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
 
 	// tolua_begin
 	

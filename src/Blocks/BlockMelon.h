@@ -19,14 +19,8 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		MTRand r1;
-		a_Pickups.push_back(cItem(E_ITEM_MELON_SLICE, (char)(3 + r1.randInt(4)), 0));
-	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
+		cFastRandom Random;
+		a_Pickups.push_back(cItem(E_ITEM_MELON_SLICE, (char)(3 + Random.NextInt(5)), 0));
 	}
 } ;
 

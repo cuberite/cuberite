@@ -53,7 +53,9 @@ private:
 
 	/// Removes the UTF-8 BOMs (Byte order makers), if present.
 	void RemoveBom(AString & a_line) const;
+	
 public:
+
 	enum errors
 	{
 		noID = -1,
@@ -79,6 +81,9 @@ public:
 
 	/// Deletes all stored ini data (but doesn't touch the file)
 	void Clear(void);
+	
+	/** Returns true iff the specified value exists. */
+	bool HasValue(const AString & a_KeyName, const AString & a_ValueName);
 
 	/// Returns index of specified key, or noID if not found
 	int FindKey(const AString & keyname) const;

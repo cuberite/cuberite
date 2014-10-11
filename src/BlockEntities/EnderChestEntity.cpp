@@ -5,14 +5,14 @@
 #include "../Item.h"
 #include "../Entities/Player.h"
 #include "../UI/Window.h"
-#include "json/json.h"
 
 
 
 
 
 cEnderChestEntity::cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_ENDER_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World)
+	super(E_BLOCK_ENDER_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	cBlockEntityWindowOwner(this)
 {
 }
 

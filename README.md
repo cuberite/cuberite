@@ -5,15 +5,15 @@ MCServer is a Minecraft server that is written in C++ and designed to be efficie
 
 MCServer can run on PCs, Macs, and *nix. This includes android phones and tablets as well as Raspberry Pis. 
 
-We currently support the protocol from Minecraft 1.2 all the way up to Minecraft 1.7.10.
+We currently support the protocol from Minecraft 1.2 all the way up to Minecraft 1.8.
 
 Installation
 ------------
 
 Normally, you will want to download a pre-compiled version of MCServer from one of the buildservers:
 
- * [Linux and Raspberry Pi](http://ci.bearbin.net) (Bearbin's CI Server)
- * [Windows](http://mc-server.xoft.cz) (xoft's nightly build service)
+ * [Windows and Linux](http://builds.cuberite.org)
+ * [Raspberry Pi](http://builds.cuberite.org)
 
 You simply need to download and extract these files before you can use the server. 
 
@@ -33,7 +33,7 @@ For other stuff, including plugins and discussion, check the [forums](http://for
 
 Earn bitcoins for commits or donate to reward the MCServer developers: [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 
-Support Us on Gittip: [![Support via Gittip](http://img.shields.io/gittip/mcs_team.svg)](https://www.gittip.com/mcs_team)
+Support Us on Gratipay: [![Support via Gratipay](http://img.shields.io/gittip/cuberite_team.svg)](https://www.gratipay.com/cuberite_team)
 
 Travis CI: [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer)
 

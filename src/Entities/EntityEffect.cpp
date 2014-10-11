@@ -34,14 +34,14 @@ cEntityEffect::eType cEntityEffect::GetPotionEffectType(short a_ItemDamage)
 		case 0x08: return cEntityEffect::effWeakness;
 		case 0x09: return cEntityEffect::effStrength;
 		case 0x0a: return cEntityEffect::effSlowness;
+		case 0x0b: return cEntityEffect::effJumpBoost;
 		case 0x0c: return cEntityEffect::effInstantDamage;
 		case 0x0d: return cEntityEffect::effWaterBreathing;
 		case 0x0e: return cEntityEffect::effInvisibility;
-			
+
 		// No effect potions
 		case 0x00:
 		case 0x07:
-		case 0x0b:  // Will be potion of leaping in 1.8
 		case 0x0f:
 		{
 			break;
@@ -96,6 +96,7 @@ int cEntityEffect::GetPotionEffectDuration(short a_ItemDamage)
 			base = 1800;
 			break;
 		}
+		default: break;
 	}
 	
 	// If potion is level II, half the duration. If not, stays the same
@@ -170,7 +171,7 @@ cEntityEffect::cEntityEffect(const cEntityEffect & a_OtherEffect):
 
 
 
-cEntityEffect & cEntityEffect::operator=(cEntityEffect a_OtherEffect)
+cEntityEffect & cEntityEffect::operator =(cEntityEffect a_OtherEffect)
 {
 	std::swap(m_Ticks, a_OtherEffect.m_Ticks);
 	std::swap(m_Duration, a_OtherEffect.m_Duration);
@@ -226,6 +227,92 @@ void cEntityEffect::OnTick(cPawn & a_Target)
 {
 	// Reduce the effect's duration
 	++m_Ticks;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cEntityEffectSpeed:
+
+void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.2 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.2 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.26 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.2 * m_Intensity);
+	}
+}
+
+
+
+
+
+void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.2 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.2 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.26 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.2 * m_Intensity);
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cEntityEffectSlowness:
+
+void cEntityEffectSlowness::OnActivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.15 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.15 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.195 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.15 * m_Intensity);
+	}
+}
+
+
+
+
+
+void cEntityEffectSlowness::OnDeactivate(cPawn & a_Target)
+{
+	if (a_Target.IsMob())
+	{
+		cMonster * Mob = (cMonster*) &a_Target;
+		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.15 * m_Intensity);
+	}
+	else if (a_Target.IsPlayer())
+	{
+		cPlayer * Player = (cPlayer*) &a_Target;
+		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.15 * m_Intensity);
+		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.195 * m_Intensity);
+		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.15 * m_Intensity);
+	}
 }
 
 
@@ -309,7 +396,7 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = (cPlayer &) a_Target;
-		Target.SetFoodExhaustionLevel(Target.GetFoodExhaustionLevel() + 0.025);  // 0.5 per second = 0.025 per tick
+		Target.AddFoodExhaustion(0.025 * ((double)GetIntensity() + 1.0));  // 0.5 per second = 0.025 per tick
 	}
 }
 
@@ -349,8 +436,8 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		// Doesn't effect undead mobs, spiders
 		if (
 			Target.IsUndead() ||
-			(Target.GetMobType() == cMonster::mtSpider) ||
-			(Target.GetMobType() == cMonster::mtCaveSpider)
+			(Target.GetMobType() == mtSpider) ||
+			(Target.GetMobType() == mtCaveSpider)
 		)
 		{
 			return;

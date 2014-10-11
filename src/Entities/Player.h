@@ -13,7 +13,6 @@
 
 
 
-class cGroup;
 class cWindow;
 class cClientHandle;
 class cTeam;
@@ -29,12 +28,13 @@ class cPlayer :
 	typedef cPawn super;
 	
 public:
-	enum
-	{
-		MAX_HEALTH = 20,
-		MAX_FOOD_LEVEL = 20,
-		EATING_TICKS = 30,  ///< Number of ticks it takes to eat an item
-	} ;
+	static const int MAX_HEALTH;
+	
+	static const int MAX_FOOD_LEVEL;
+	
+	/** Number of ticks it takes to eat an item */
+	static const int EATING_TICKS;
+	
 	// tolua_end
 	
 	CLASS_PROTODEF(cPlayer)
@@ -171,6 +171,9 @@ public:
 	/** Returns true if the player is in Adventure mode, either explicitly, or by inheriting from current world */
 	bool IsGameModeAdventure(void) const;
 	
+	/** Returns true if the player is in Spectator mode, either explicitly, or by inheriting from current world */
+	bool IsGameModeSpectator(void) const;
+	
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
 	/** Returns the associated team, NULL if none */
@@ -179,10 +182,10 @@ public:
 	/** Sets the player team, NULL if none */
 	void SetTeam(cTeam * a_Team);
 
+	// tolua_end
+
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
-
-	// tolua_end
 
 	/** Return the associated statistic and achievement manager. */
 	cStatManager & GetStatManager() { return m_Stats; }
@@ -235,25 +238,24 @@ public:
 	
 	// tolua_end
 
-	typedef std::list< cGroup* > GroupList;
-	typedef std::list< std::string > StringList;
+	bool HasPermission(const AString & a_Permission);  // tolua_export
 
-	/** Adds a player to existing group or creates a new group when it doesn't exist */
-	void AddToGroup( const AString & a_GroupName);  // tolua_export
-	
-	/** Removes a player from the group, resolves permissions and group inheritance (case sensitive) */
-	void RemoveFromGroup( const AString & a_GroupName);  // tolua_export
-	
-	bool HasPermission( const AString & a_Permission);  // tolua_export
-	const GroupList & GetGroups() { return m_Groups; }  // >> EXPORTED IN MANUALBINDINGS <<
-	StringList GetResolvedPermissions();  // >> EXPORTED IN MANUALBINDINGS <<
-	bool IsInGroup( const AString & a_Group);  // tolua_export
+	/** Returns true iff a_Permission matches the a_Template.
+	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in a_Template.
+	Ie. {"a", "b", "c"} matches {"a", "b", "*"} but doesn't match {"a", "b"} */
+	static bool PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template);  // Exported in ManualBindings with AString params
+
+	/** Returns all the permissions that the player has assigned to them. */
+	const AStringVector & GetPermissions(void) { return m_Permissions; }  // Exported in ManualBindings.cpp
 
 	// tolua_begin
 	
-	/** Returns the full color code to use for this player, based on their primary group or set in m_Color.
-	The returned value includes the cChatColor::Delimiter. */
+	/** Returns the full color code to use for this player, based on their rank.
+	The returned value either is empty, or includes the cChatColor::Delimiter. */
 	AString GetColor(void) const;
+
+	/** Returns the name that is used in the playerlist. */
+	AString GetPlayerListName(void) const;
 
 	/** tosses the item in the selected hotbar slot */
 	void TossEquippedItem(char a_Amount = 1);
@@ -284,13 +286,7 @@ public:
 	bool Feed(int a_Food, double a_Saturation);
 
 	/** Adds the specified exhaustion to m_FoodExhaustion. Expects only positive values. */
-	void AddFoodExhaustion(double a_Exhaustion)
-	{
-		m_FoodExhaustionLevel += a_Exhaustion;
-	}
-	
-	/** Starts the food poisoning for the specified amount of ticks */
-	void FoodPoison(int a_NumTicks);
+	void AddFoodExhaustion(double a_Exhaustion);
 	
 	/** Returns true if the player is currently in the process of eating the currently equipped item */
 	bool IsEating(void) const { return (m_EatingFinishTick >= 0); }
@@ -352,8 +348,6 @@ public:
 	*/
 	bool LoadFromFile(const AString & a_FileName, cWorldPtr & a_World);
 	
-	void LoadPermissionsFromDisk(void);  // tolua_export
-
 	const AString & GetLoadedWorldName() { return m_LoadedWorldName; }
 
 	void UseEquippedItem(int a_Amount = 1);
@@ -410,6 +404,16 @@ public:
 	/** If true the player can fly even when he's not in creative. */
 	void SetCanFly(bool a_CanFly);
 
+	/** Returns true if the player has a custom name. */
+	bool HasCustomName(void) const { return !m_CustomName.empty(); }
+
+	/** Returns the custom name of this player. If the player hasn't a custom name, it will return an empty string. */
+	const AString & GetCustomName(void) const { return m_CustomName; }
+
+	/** Sets the custom name of this player. If you want to disable the custom name, simply set an empty string.
+	The custom name will be used in the tab-list, in the player nametag and in the tab-completion. */
+	void SetCustomName(const AString & a_CustomName);
+
 	/** Gets the last position that the player slept in
 	This is initialised to the world spawn point if the player has not slept in a bed as of yet
 	*/
@@ -417,12 +421,24 @@ public:
 
 	/** Sets the player's bed (home) position */
 	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+	
+	// tolua_end
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos);
+	
+	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }
+	
+	/** Returns the UUID (short format) that has been read from the client, or empty string if not available. */
+	const AString & GetUUID(void) const { return m_UUID; }
+
+	/** (Re)loads the rank and permissions from the cRankManager.
+	Expects the m_UUID member to be valid.
+	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
+	void LoadRank(void);
 
 	// tolua_end
 
@@ -434,12 +450,22 @@ public:
 	virtual void Detach(void);
 	
 protected:
-	typedef std::map< std::string, bool > PermissionMap;
-	PermissionMap m_ResolvedPermissions;
-	PermissionMap m_Permissions;
 
-	GroupList m_ResolvedGroups;
-	GroupList m_Groups;
+	typedef std::vector<std::vector<AString> > AStringVectorVector;
+
+	/** The name of the rank assigned to this player. */
+	AString m_Rank;
+
+	/** All the permissions that this player has, based on their rank. */
+	AStringVector m_Permissions;
+
+	/** All the permissions that this player has, based on their rank, split into individual dot-delimited parts.
+	This is used mainly by the HasPermission() function to optimize the lookup. */
+	AStringVectorVector m_SplitPermissions;
+
+	// Message visuals:
+	AString m_MsgPrefix, m_MsgSuffix;
+	AString m_MsgNameColorCode;
 
 	AString m_PlayerName;
 	AString m_LoadedWorldName;
@@ -483,8 +509,6 @@ protected:
 
 	/** The player's last saved bed position */
 	Vector3i m_LastBedPos;
-
-	char m_Color;
 
 	eGameMode m_GameMode;
 	AString m_IP;
@@ -554,9 +578,11 @@ protected:
 	*/
 	bool m_bIsTeleporting;
 	
-	/** The UUID of the player, as read from the ClientHandle.
+	/** The short UUID (no dashes) of the player, as read from the ClientHandle.
 	If no ClientHandle is given, the UUID is initialized to empty. */
 	AString m_UUID;
+
+	AString m_CustomName;
 
 	/** Sets the speed and sends it to the client, so that they are forced to move so. */
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;

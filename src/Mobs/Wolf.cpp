@@ -68,6 +68,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 {
 	if (!IsTame() && !IsAngry())
 	{
+		// If the player is holding a bone, try to tame the wolf:
 		if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_BONE)
 		{
 			if (!a_Player.IsGameModeCreative())
@@ -77,14 +78,16 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 
 			if (m_World->GetTickRandomNumber(7) == 0)
 			{
+				// Taming succeeded
 				SetMaxHealth(20);
 				SetIsTame(true);
-				SetOwner(a_Player.GetName());
+				SetOwner(a_Player.GetName(), a_Player.GetUUID());
 				m_World->BroadcastEntityStatus(*this, esWolfTamed);
 				m_World->BroadcastParticleEffect("heart", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
 			else
 			{
+				// Taming failed
 				m_World->BroadcastEntityStatus(*this, esWolfTaming);
 				m_World->BroadcastParticleEffect("smoke", (float) GetPosX(), (float) GetPosY(), (float) GetPosZ(), 0, 0, 0, 0, 5);
 			}
@@ -92,6 +95,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsTame())
 	{
+		// Feed the wolf, restoring its health, or dye its collar:
 		switch (a_Player.GetEquippedItem().m_ItemType)
 		{
 			case E_ITEM_RAW_BEEF:

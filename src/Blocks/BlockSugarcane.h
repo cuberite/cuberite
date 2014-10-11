@@ -29,6 +29,7 @@ public:
 		{
 			return false;
 		}
+
 		switch (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ))
 		{
 			case E_BLOCK_DIRT:
@@ -76,12 +77,6 @@ public:
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
 		a_Chunk.GetWorld()->GrowSugarcane(a_RelX + a_Chunk.GetPosX() * cChunkDef::Width, a_RelY, a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width, 1);
-	}
-	
-	
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
 	}
 } ;
 

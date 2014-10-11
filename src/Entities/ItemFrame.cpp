@@ -22,11 +22,13 @@ cItemFrame::cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_
 
 void cItemFrame::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (!m_Item.IsEmpty())
 	{
 		// Item not empty, rotate, clipping values to zero to three inclusive
 		m_Rotation++;
-		if (m_Rotation >= 4)
+		if (m_Rotation >= 8)
 		{
 			m_Rotation = 0;
 		}
@@ -55,7 +57,6 @@ void cItemFrame::KilledBy(TakeDamageInfo & a_TDI)
 {
 	if (m_Item.IsEmpty())
 	{
-		SetHealth(0);
 		super::KilledBy(a_TDI);
 		Destroy();
 		return;

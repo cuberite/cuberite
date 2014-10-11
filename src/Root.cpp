@@ -6,7 +6,6 @@
 #include "World.h"
 #include "WebAdmin.h"
 #include "FurnaceRecipe.h"
-#include "GroupManager.h"
 #include "CraftingRecipes.h"
 #include "Bindings/PluginManager.h"
 #include "MonsterConfig.h"
@@ -18,6 +17,8 @@
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
 #include "OSSupport/Timer.h"
+#include "LoggerListeners.h"
+#include "BuildInfo.h"
 
 #include "inifile/iniFile.h"
 
@@ -41,17 +42,14 @@ cRoot* cRoot::s_Root = NULL;
 
 
 cRoot::cRoot(void) :
-	m_PrimaryServerVersion(cProtocolRecognizer::PROTO_VERSION_LATEST),
 	m_pDefaultWorld(NULL),
 	m_InputThread(NULL),
 	m_Server(NULL),
 	m_MonsterConfig(NULL),
-	m_GroupManager(NULL),
 	m_CraftingRecipes(NULL),
 	m_FurnaceRecipe(NULL),
 	m_WebAdmin(NULL),
 	m_PluginManager(NULL),
-	m_Log(NULL),
 	m_bStop(false),
 	m_bRestart(false)
 {
@@ -105,10 +103,20 @@ void cRoot::Start(void)
 	HMENU hmenu = GetSystemMenu(hwnd, FALSE);
 	EnableMenuItem(hmenu, SC_CLOSE, MF_GRAYED);  // Disable close button when starting up; it causes problems with our CTRL-CLOSE handling
 	#endif
+	
+	cLogger::cListener * consoleLogListener = MakeConsoleListener();
+	cLogger::cListener * fileLogListener = new cFileListener();
+	cLogger::GetInstance().AttachListener(consoleLogListener);
+	cLogger::GetInstance().AttachListener(fileLogListener);
+	
+	LOG("--- Started Log ---\n");
+
+	#ifdef BUILD_ID
+	LOG("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+	LOG("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
+	#endif
 
 	cDeadlockDetect dd;
-	delete m_Log;
-	m_Log = new cMCLogger();
 
 	m_bStop = false;
 	while (!m_bStop)
@@ -133,20 +141,11 @@ void cRoot::Start(void)
 			IniFile.AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 		}
 
-		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
-		if (m_PrimaryServerVersion == 0)
-		{
-			m_PrimaryServerVersion = cProtocolRecognizer::PROTO_VERSION_LATEST;
-		}
-		else
-		{
-			// Make a note in the log that the primary server version is explicitly set in the ini file
-			LOGINFO("Primary server version set explicitly to %d.", m_PrimaryServerVersion);
-		}
-
 		LOG("Starting server...");
+		m_MojangAPI.Start(IniFile);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
 		if (!m_Server->InitServer(IniFile))
 		{
+			IniFile.WriteFile("settings.ini");
 			LOGERROR("Failure starting server, aborting...");
 			return;
 		}
@@ -155,7 +154,7 @@ void cRoot::Start(void)
 		m_WebAdmin->Init();
 
 		LOGD("Loading settings...");
-		m_GroupManager    = new cGroupManager();
+		m_RankManager.Initialize(m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
@@ -234,8 +233,6 @@ void cRoot::Start(void)
 		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
 		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
-		LOGD("Forgetting groups...");
-		delete m_GroupManager; m_GroupManager = NULL;
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
@@ -248,8 +245,13 @@ void cRoot::Start(void)
 		delete m_Server; m_Server = NULL;
 		LOG("Shutdown successful!");
 	}
-
-	delete m_Log; m_Log = NULL;
+	
+	LOG("--- Stopped Log ---");
+	
+	cLogger::GetInstance().DetachListener(consoleLogListener);
+	delete consoleLogListener;
+	cLogger::GetInstance().DetachListener(fileLogListener);
+	delete fileLogListener;
 }
 
 
@@ -269,19 +271,19 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 {
 	// First get the default world
 	AString DefaultWorldName = IniFile.GetValueSet("Worlds", "DefaultWorld", "world");
-	m_pDefaultWorld = new cWorld( DefaultWorldName.c_str());
+	m_pDefaultWorld = new cWorld(DefaultWorldName.c_str());
 	m_WorldsByName[ DefaultWorldName ] = m_pDefaultWorld;
 
 	// Then load the other worlds
-	unsigned int KeyNum = IniFile.FindKey("Worlds");
-	unsigned int NumWorlds = IniFile.GetNumValues( KeyNum);
+	int KeyNum = IniFile.FindKey("Worlds");
+	int NumWorlds = IniFile.GetNumValues(KeyNum);
 	if (NumWorlds <= 0)
 	{
 		return;
 	}
 	
 	bool FoundAdditionalWorlds = false;
-	for (unsigned int i = 0; i < NumWorlds; i++)
+	for (int i = 0; i < NumWorlds; i++)
 	{
 		AString ValueName = IniFile.GetValueName(KeyNum, i);
 		if (ValueName.compare("World") != 0)
@@ -461,16 +463,6 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 
 void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 {
-	// Some commands are built-in:
-	if (a_Cmd == "stop")
-	{
-		m_bStop = true;
-	}
-	else if (a_Cmd == "restart")
-	{
-		m_bRestart = true;
-	}
-
 	// Put the command into a queue (Alleviates FS #363):
 	cCSLock Lock(m_CSPendingCommands);
 	m_PendingCommands.push_back(cCommand(a_Cmd, new cLogCommandDeleteSelfOutputCallback));
@@ -482,14 +474,16 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd)
 
 void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
-	// Some commands are built-in:
+	// cRoot handles stopping and restarting due to our access to controlling variables
 	if (a_Cmd == "stop")
 	{
 		m_bStop = true;
+		return;
 	}
 	else if (a_Cmd == "restart")
 	{
 		m_bRestart = true;
+		return;
 	}
 
 	LOG("Executing console command: \"%s\"", a_Cmd.c_str());
@@ -538,17 +532,6 @@ void cRoot::SaveAllChunks(void)
 	{
 		itr->second->QueueSaveAllChunks();
 	}
-}
-
-
-
-
-
-void cRoot::ReloadGroups(void)
-{
-	LOG("Reload groups ...");
-	m_GroupManager->LoadGroups();
-	m_GroupManager->CheckUsers();
 }
 
 

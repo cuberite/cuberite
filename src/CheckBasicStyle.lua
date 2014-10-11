@@ -10,10 +10,11 @@ Checks that all source files (*.cpp, *.h) use the basic style requirements of th
 	- Spaces after comma, not before
 	- Opening braces not at the end of a code line
 	- Spaces after if, for, while
+	- Line dividers (////...) exactly 80 slashes
+	- Multi-level indent change
 	- (TODO) Spaces before *, /, &
 	- (TODO) Hex numbers with even digit length
 	- (TODO) Hex numbers in lowercase
-	- (TODO) Line dividers (////...) exactly 80 slashes
 	- (TODO) Not using "* "-style doxy comment continuation lines
 	
 Violations that cannot be checked easily:
@@ -107,7 +108,7 @@ local g_ViolationPatterns =
 	
 	-- Check that all commas have spaces after them and not in front of them:
 	{" ,", "Extra space before a \",\""},
-	{",[^%s\"%%]", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
+	{",[^%s\"%%\']", "Needs a space after a \",\""},  -- Report all except >> "," << needed for splitting and >>,%s<< needed for formatting
 	
 	-- Check that opening braces are not at the end of a code line:
 	{"[^%s].-{\n?$", "Brace should be on a separate line"},
@@ -118,6 +119,7 @@ local g_ViolationPatterns =
 	{"while%(", "Needs a space after \"while\""},
 	{"switch%(", "Needs a space after \"switch\""},
 	{"catch%(", "Needs a space after \"catch\""},
+	{"template<", "Needs a space after \"template\""},
 	
 	-- No space after keyword's parenthesis:
 	{"[^%a#]if %( ", "Remove the space after \"(\""},
@@ -158,12 +160,42 @@ local function ProcessFile(a_FileName)
 	-- Process each line separately:
 	-- Ref.: http://stackoverflow.com/questions/10416869/iterate-over-possibly-empty-lines-in-a-way-that-matches-the-expectations-of-exis
 	local lineCounter = 1
+	local lastIndentLevel = 0
 	all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
 	string.gsub(all .. "\n", "[^\n]*\n",  -- Iterate over each line, while preserving empty lines
 		function(a_Line)
 			-- Check against each violation pattern:
 			for _, pat in ipairs(g_ViolationPatterns) do
 				ReportViolationIfFound(a_Line, a_FileName, lineCounter, pat[1], pat[2])
+			end
+			
+			-- Check that divider comments are well formed - 80 slashes plus optional indent:
+			local dividerStart, dividerEnd = a_Line:find("/////*")
+			if (dividerStart) then
+				if (dividerEnd ~= dividerStart + 79) then
+					ReportViolation(a_FileName, lineCounter, 1, 80, "Divider comment should have exactly 80 slashes")
+				end
+				if (dividerStart > 1) then
+					if (
+						(a_Line:sub(1, dividerStart - 1) ~= string.rep("\t", dividerStart - 1)) or  -- The divider should have only indent in front of it
+						(a_Line:len() > dividerEnd + 1)                                             -- The divider should have no other text following it
+					) then
+						ReportViolation(a_FileName, lineCounter, 1, 80, "Divider comment shouldn't have any extra text around it")
+					end
+				end
+			end
+			
+			-- Check the indent level change from the last line, if it's too much, report:
+			local indentStart, indentEnd = a_Line:find("\t+")
+			local indentLevel = 0
+			if (indentStart) then
+				indentLevel = indentEnd - indentStart
+			end
+			if (indentLevel > 0) then
+				if ((lastIndentLevel - indentLevel >= 2) or (lastIndentLevel - indentLevel <= -2)) then
+					ReportViolation(a_FileName, lineCounter, 1, indentStart or 1, "Indent changed more than a single level between the previous line and this one: from " .. lastIndentLevel .. " to " .. indentLevel)
+				end
+				lastIndentLevel = indentLevel
 			end
 
 			lineCounter = lineCounter + 1

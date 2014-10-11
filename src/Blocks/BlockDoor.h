@@ -5,6 +5,7 @@
 #include "../Entities/Player.h"
 #include "Chunk.h"
 #include "MetaRotator.h"
+#include "ChunkInterface.h"
 
 
 
@@ -19,7 +20,6 @@ public:
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override;
-	virtual const char * GetStepSound(void) override;
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override;
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  override;
@@ -55,7 +55,49 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem((m_BlockType == E_BLOCK_WOODEN_DOOR) ? E_ITEM_WOODEN_DOOR : E_ITEM_IRON_DOOR, 1, 0));
+		switch (m_BlockType)
+		{
+			case E_BLOCK_WOODEN_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_WOODEN_DOOR);
+				break;
+			}
+			case E_BLOCK_ACACIA_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_ACACIA_DOOR);
+				break;
+			}
+			case E_BLOCK_BIRCH_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_BIRCH_DOOR);
+				break;
+			}
+			case E_BLOCK_DARK_OAK_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_DARK_OAK_DOOR);
+				break;
+			}
+			case E_BLOCK_JUNGLE_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_JUNGLE_DOOR);
+				break;
+			}
+			case E_BLOCK_SPRUCE_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_SPRUCE_DOOR);
+				break;
+			}
+			case E_BLOCK_IRON_DOOR:
+			{
+				a_Pickups.Add(E_ITEM_IRON_DOOR);
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unhandled door type!");
+				break;
+			}
+		}
 	}
 
 
@@ -131,7 +173,23 @@ public:
 	/** Returns true if the specified blocktype is any kind of door */
 	inline static bool IsDoor(BLOCKTYPE a_Block)
 	{
-		return (a_Block == E_BLOCK_WOODEN_DOOR) || (a_Block == E_BLOCK_IRON_DOOR);
+		switch (a_Block)
+		{
+			case E_BLOCK_ACACIA_DOOR:
+			case E_BLOCK_BIRCH_DOOR:
+			case E_BLOCK_DARK_OAK_DOOR:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_JUNGLE_DOOR:
+			case E_BLOCK_SPRUCE_DOOR:
+			case E_BLOCK_WOODEN_DOOR:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+		}
 	}
 
 

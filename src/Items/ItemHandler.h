@@ -3,6 +3,7 @@
 
 #include "../Defines.h"
 #include "../Item.h"
+#include "../Entities/EntityEffect.h"
 
 
 
@@ -71,23 +72,24 @@ public:
 
 	struct FoodInfo
 	{
-		double Saturation;
 		int    FoodLevel;
-		int    PoisonChance;	  // 0 - 100, in percent. 0 = no chance of poisoning, 100 = sure poisoning
+		double Saturation;
 
-		FoodInfo(int a_FoodLevel, double a_Saturation, int a_PoisonChance = 0) :
-			Saturation(a_Saturation),
+		FoodInfo(int a_FoodLevel, double a_Saturation) :
 			FoodLevel(a_FoodLevel),
-			PoisonChance(a_PoisonChance)
+			Saturation(a_Saturation)
 		{
 		}
 	} ;
 
-	/** Returns the FoodInfo for this item. (FoodRecovery, Saturation and PoisionChance) */
+	/** Returns the FoodInfo for this item. (FoodRecovery and Saturation) */
 	virtual FoodInfo GetFoodInfo();
-	
+
+	/** If this function returns true, it sets the arguments to a effect who will be activated when you eat the item. */
+	virtual bool GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance);
+
 	/** Lets the player eat a selected item. Returns true if the player ate the item */
-	virtual bool EatItem(cPlayer *a_Player, cItem *a_Item);
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item);
 
 	/** Indicates if this item is a tool */
 	virtual bool IsTool(void);

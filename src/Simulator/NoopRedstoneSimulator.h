@@ -8,9 +8,9 @@
 
 
 class cRedstoneNoopSimulator :
-	public cRedstoneSimulator
+	public cRedstoneSimulator<cChunk, cWorld>
 {
-	typedef cRedstoneSimulator super;
+	typedef cRedstoneSimulator<cChunk, cWorld> super;
 public:
 
 	cRedstoneNoopSimulator(cWorld & a_World) :
@@ -35,6 +35,11 @@ public:
 		UNUSED(a_BlockY);
 		UNUSED(a_BlockZ);
 		UNUSED(a_Chunk);
+	}
+	
+	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
+	{
+		return NULL;
 	}
 
 } ;

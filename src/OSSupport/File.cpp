@@ -70,6 +70,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		case fmRead:      Mode = "rb";  break;
 		case fmWrite:     Mode = "wb";  break;
 		case fmReadWrite: Mode = "rb+"; break;
+		case fmAppend:    Mode = "a+";  break;
 	}
 	if (Mode == NULL)
 	{
@@ -255,10 +256,10 @@ int cFile::ReadRestOfFile(AString & a_Contents)
 		return -1;
 	}
 	
-	int DataSize = GetSize() - Tell();
+	size_t DataSize = GetSize() - Tell();
 	
 	// HACK: This depends on the internal knowledge that AString's data() function returns the internal buffer directly
-	a_Contents.assign((size_t)DataSize, '\0');
+	a_Contents.assign(DataSize, '\0');
 	return Read((void *)a_Contents.data(), DataSize);
 }
 
@@ -297,7 +298,7 @@ bool cFile::Rename(const AString & a_OrigFileName, const AString & a_NewFileName
 bool cFile::Copy(const AString & a_SrcFileName, const AString & a_DstFileName)
 {
 	#ifdef _WIN32
-		return (CopyFile(a_SrcFileName.c_str(), a_DstFileName.c_str(), true) != 0);
+		return (CopyFileA(a_SrcFileName.c_str(), a_DstFileName.c_str(), true) != 0);
 	#else
 		// Other OSs don't have a direct CopyFile equivalent, do it the harder way:
 		std::ifstream src(a_SrcFileName.c_str(), std::ios::binary);
@@ -321,7 +322,7 @@ bool cFile::Copy(const AString & a_SrcFileName, const AString & a_DstFileName)
 bool cFile::IsFolder(const AString & a_Path)
 {
 	#ifdef _WIN32
-		DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
+		DWORD FileAttrib = GetFileAttributesA(a_Path.c_str());
 		return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & FILE_ATTRIBUTE_DIRECTORY) != 0));
 	#else
 		struct stat st;
@@ -336,7 +337,7 @@ bool cFile::IsFolder(const AString & a_Path)
 bool cFile::IsFile(const AString & a_Path)
 {
 	#ifdef _WIN32
-		DWORD FileAttrib = GetFileAttributes(a_Path.c_str());
+		DWORD FileAttrib = GetFileAttributesA(a_Path.c_str());
 		return ((FileAttrib != INVALID_FILE_ATTRIBUTES) && ((FileAttrib & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_DEVICE)) == 0));
 	#else
 		struct stat st;
@@ -365,7 +366,7 @@ int cFile::GetSize(const AString & a_FileName)
 bool cFile::CreateFolder(const AString & a_FolderPath)
 {
 	#ifdef _WIN32
-		return (CreateDirectory(a_FolderPath.c_str(), NULL) != 0);
+		return (CreateDirectoryA(a_FolderPath.c_str(), NULL) != 0);
 	#else
 		return (mkdir(a_FolderPath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0);
 	#endif
@@ -395,13 +396,13 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 	// Find all files / folders:
 	FileFilter.append("*.*");
 	HANDLE hFind;
-	WIN32_FIND_DATA FindFileData;
-	if ((hFind = FindFirstFile(FileFilter.c_str(), &FindFileData)) != INVALID_HANDLE_VALUE)
+	WIN32_FIND_DATAA FindFileData;
+	if ((hFind = FindFirstFileA(FileFilter.c_str(), &FindFileData)) != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
 			AllFiles.push_back(FindFileData.cFileName);
-		} while (FindNextFile(hFind, &FindFileData));
+		} while (FindNextFileA(hFind, &FindFileData));
 		FindClose(hFind);
 	}
 	
@@ -459,7 +460,7 @@ int cFile::Printf(const char * a_Fmt, ...)
 	va_start(args, a_Fmt);
 	AppendVPrintf(buf, a_Fmt, args);
 	va_end(args);
-	return Write(buf.c_str(), (int)buf.length());
+	return Write(buf.c_str(), buf.length());
 }
 
 

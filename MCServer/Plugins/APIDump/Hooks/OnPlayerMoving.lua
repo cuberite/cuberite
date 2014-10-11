@@ -11,9 +11,11 @@ return
 		Params =
 		{
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has moved. The object already has the new position stored in it." },
+			{ Name = "OldPosition", Type = "{{Vector3d}}", Notes = "The old position." },
+			{ Name = "NewPosition", Type = "{{Vector3d}}", Notes = "The new position." },
 		},
 		Returns = [[
-			If the function returns true, movement is prohibited. FIXME: The player's client is not informed.</p>
+			If the function returns true, movement is prohibited.</p>
 			<p>
 			If the function returns false or no value, other plugins' callbacks are called and finally the new
 			position is permanently stored in the cPlayer object.</p>

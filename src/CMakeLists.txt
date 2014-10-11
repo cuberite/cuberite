@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 2.8.2)
 project (MCServer)
 
+
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
@@ -33,16 +34,14 @@ SET (SRCS
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
-	Group.cpp
-	GroupManager.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
-	Log.cpp
-	MCLogger.cpp
+	LoggerListeners.cpp
+	Logger.cpp
 	Map.cpp
 	MapManager.cpp
 	MobCensus.cpp
@@ -52,6 +51,7 @@ SET (SRCS
 	MonsterConfig.cpp
 	Noise.cpp
 	ProbabDistrib.cpp
+	RankManager.cpp
 	RCONServer.cpp
 	Root.cpp
 	Scoreboard.cpp
@@ -75,6 +75,7 @@ SET (HDRS
 	BlockInfo.h
 	BlockTracer.h
 	BoundingBox.h
+	BuildInfo.h.cmake
 	ByteBuffer.h
 	ChatColor.h
 	Chunk.h
@@ -97,8 +98,6 @@ SET (HDRS
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
-	Group.h
-	GroupManager.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
@@ -107,8 +106,8 @@ SET (HDRS
 	LineBlockTracer.h
 	LinearInterpolation.h
 	LinearUpscale.h
-	Log.h
-	MCLogger.h
+	Logger.h
+	LoggerListeners.h
 	Map.h
 	MapManager.h
 	Matrix4.h
@@ -121,6 +120,7 @@ SET (HDRS
 	MonsterConfig.h
 	Noise.h
 	ProbabDistrib.h
+	RankManager.h
 	RCONServer.h
 	Root.h
 	Scoreboard.h
@@ -138,6 +138,10 @@ SET (HDRS
 	XMLParser.h)
 
 include_directories(".")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
+include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/SQLiteCpp/include")
+
+configure_file("BuildInfo.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/BuildInfo.h")
 
 if (NOT MSVC)
 	# Bindings need to reference other folders, so they are done here instead
@@ -151,10 +155,10 @@ if (NOT MSVC)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
 
 	#clear file
-	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt)
-	foreach(dependecy ${BINDING_DEPENDECIES})
-		#write each dependecy on a seperate line
-		file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependecies.txt "${dependecy}\n")
+	file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependencies.txt)
+	foreach(dependency ${BINDING_DEPENDENCIES})
+		#write each dependency on a seperate line
+		file(APPEND ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/BindingDependencies.txt "${dependency}\n")
 	endforeach()
 
 	set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "Bindings.cpp Bindings.h")
@@ -232,7 +236,7 @@ endif()
 
 
 # Generate a list of all source files:
-set(ALLFILES "")
+set(ALLFILES "${SRCS}" "${HDRS}")
 foreach(folder ${FOLDERS})
 	get_directory_property(FOLDER_SRCS DIRECTORY ${folder} DEFINITION SRCS)
 	foreach (src ${FOLDER_SRCS})
@@ -255,6 +259,11 @@ set(EXECUTABLE MCServer)
 if (MSVC)
 	get_directory_property(BINDING_OUTPUTS DIRECTORY "Bindings" DEFINITION BINDING_OUTPUTS)
 	get_directory_property(BINDING_DEPENDENCIES DIRECTORY "Bindings" DEFINITION BINDING_DEPENDENCIES)
+	
+	# The paths in BINDING_DEPENDENCIES are relative to the Bindings folder, convert them relative to this folder:
+	foreach (dep ${BINDING_DEPENDENCIES})
+		list (APPEND BINDINGS_DEPENDENCIES "Bindings/${dep}")
+	endforeach(dep)
 
 	ADD_CUSTOM_COMMAND(
 		OUTPUT ${BINDING_OUTPUTS}
@@ -267,7 +276,7 @@ if (MSVC)
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bindings/
 
 		# add any new generation dependencies here
-		DEPENDS ${BINDING_DEPENDENCIES}
+		DEPENDS ${BINDINGS_DEPENDENCIES}
 	)
 endif()
 
@@ -311,4 +320,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib sqlite lua)
+target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib sqlite lua SQLiteCpp)

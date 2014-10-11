@@ -16,8 +16,8 @@ public:
 	{
 
 	}
-	
-	
+
+
 	virtual bool GetPlacementBlockTypeMeta(
 		cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -53,36 +53,21 @@ public:
 		}
 		return true;
 	}
-	
-	
-	virtual const char * GetStepSound(void) override
-	{
-		if (
-			(m_BlockType == E_BLOCK_WOODEN_STAIRS) ||
-			(m_BlockType == E_BLOCK_SPRUCE_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_JUNGLE_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_ACACIA_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_BIRCH_WOOD_STAIRS) ||
-			(m_BlockType == E_BLOCK_DARK_OAK_WOOD_STAIRS)
-			)
-		{
-			return "step.wood";
-		}
 
-		return "step.stone";
-	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to 0
+		// Reset meta to zero
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
+
 
 	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}
-	
+
+
 	static NIBBLETYPE RotationToMetaData(double a_Rotation)
 	{
 		a_Rotation += 90 + 45;  // So its not aligned with axis
@@ -108,14 +93,11 @@ public:
 		}
 	}
 
-
 	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
 	{
 		// Toggle bit 3:
 		return (a_Meta & 0x0b) | ((~a_Meta) & 0x04);
 	}
-
-
 } ;
 
 

@@ -16,14 +16,9 @@ public:
 	{
 	}
 
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
-	}
-
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to 0
+		// Reset meta to zero
 		a_Pickups.push_back(cItem(m_BlockType, 1, 0));
 	}
 
@@ -34,6 +29,12 @@ public:
 
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
 	{
+		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
+		{
+			// Iron doors can only be toggled by redstone, not by right-clicking
+			return;
+		}
+
 		// Flip the ON bit on/off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) ^ 0x04);
 		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
@@ -53,7 +54,7 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-		) override
+	) override
 	{
 		a_BlockType = m_BlockType;
 		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
@@ -103,9 +104,10 @@ public:
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+		BLOCKTYPE BlockIsOn;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn);
+		return ((a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn));
 	}
 };
 

@@ -10,13 +10,12 @@
 #include "../Bindings/PluginManager.h"
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
-#include "../GroupManager.h"
-#include "../Group.h"
 #include "../Root.h"
 #include "../OSSupport/Timer.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
+#include "../FastRandom.h"
 
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
@@ -30,6 +29,15 @@
 // 1000 = once per second
 #define PLAYER_LIST_TIME_MS 1000
 
+
+
+
+const int cPlayer::MAX_HEALTH = 20;
+
+const int cPlayer::MAX_FOOD_LEVEL = 20;
+
+/** Number of ticks it takes to eat an item */
+const int cPlayer::EATING_TICKS = 30;
 
 
 
@@ -50,7 +58,6 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_EnderChestContents(9, 3),
 	m_CurrentWindow(NULL),
 	m_InventoryWindow(NULL),
-	m_Color('-'),
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
@@ -74,7 +81,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_Team(NULL),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
-	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : "")
+	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : ""),
+	m_CustomName("")
 {
 	m_InventoryWindow = new cInventoryWindow(*this);
 	m_CurrentWindow = m_InventoryWindow;
@@ -216,16 +224,24 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 		SendExperience();
 	}
 
+	bool CanMove = true;
 	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
-		cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this);
+		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
+		{
+			CanMove = false;
+			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
+		}
 		m_ClientHandle->StreamChunks();
 	}
 
-	BroadcastMovementUpdate(m_ClientHandle);
+	if (CanMove)
+	{
+		BroadcastMovementUpdate(m_ClientHandle);
+	}
 
 	if (m_Health > 0)  // make sure player is alive
 	{
@@ -251,7 +267,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	cTimer t1;
 	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
 	{
-		m_World->SendPlayerList(this);
+		m_World->BroadcastPlayerListUpdatePing(*this);
 		m_LastPlayerListTime = t1.GetNowTime();
 	}
 
@@ -436,6 +452,11 @@ void cPlayer::CancelChargingBow(void)
 
 void cPlayer::SetTouchGround(bool a_bTouchGround)
 {
+	if (IsGameModeSpectator())  // You can fly through the ground in Spectator
+	{
+		return;
+	}
+	
 	m_bTouchGround = a_bTouchGround;
 
 	if (!m_bTouchGround)
@@ -509,7 +530,7 @@ void cPlayer::Heal(int a_Health)
 
 void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
-	int FoodLevel = std::max(0, std::min(a_FoodLevel, (int)MAX_FOOD_LEVEL));
+	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
 	{
@@ -527,7 +548,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 
 void cPlayer::SetFoodSaturationLevel(double a_FoodSaturationLevel)
 {
-	m_FoodSaturationLevel = std::max(0.0, std::min(a_FoodSaturationLevel, (double)m_FoodLevel));
+	m_FoodSaturationLevel = Clamp(a_FoodSaturationLevel, 0.0, (double) m_FoodLevel);
 }
 
 
@@ -545,7 +566,7 @@ void cPlayer::SetFoodTickTimer(int a_FoodTickTimer)
 
 void cPlayer::SetFoodExhaustionLevel(double a_FoodExhaustionLevel)
 {
-	m_FoodExhaustionLevel = std::max(0.0, std::min(a_FoodExhaustionLevel, 4.0));
+	m_FoodExhaustionLevel = Clamp(a_FoodExhaustionLevel, 0.0, 40.0);
 }
 
 
@@ -568,9 +589,12 @@ bool cPlayer::Feed(int a_Food, double a_Saturation)
 
 
 
-void cPlayer::FoodPoison(int a_NumTicks)
+void cPlayer::AddFoodExhaustion(double a_Exhaustion)
 {
-	AddEntityEffect(cEntityEffect::effHunger, a_NumTicks, 0, 1);
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
+	{
+		m_FoodExhaustionLevel = std::min(m_FoodExhaustionLevel + a_Exhaustion, 40.0);
+	}
 }
 
 
@@ -598,7 +622,6 @@ void cPlayer::FinishEating(void)
 	
 	// Send the packets:
 	m_ClientHandle->SendEntityStatus(*this, esPlayerEatingAccepted);
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 
 	// consume the item:
@@ -610,15 +633,6 @@ void cPlayer::FinishEating(void)
 		return;
 	}
 	ItemHandler->OnFoodEaten(m_World, this, &Item);
-
-	GetInventory().RemoveOneEquippedItem();
-
-	// if the food is mushroom soup, return a bowl to the inventory
-	if (Item.m_ItemType == E_ITEM_MUSHROOM_SOUP)
-	{
-		cItem emptyBowl(E_ITEM_BOWL, 1, 0, "");
-		GetInventory().AddItem(emptyBowl, true, true);
-	}
 }
 
 
@@ -628,7 +642,6 @@ void cPlayer::FinishEating(void)
 void cPlayer::AbortEating(void)
 {
 	m_EatingFinishTick = -1;
-	m_World->BroadcastEntityAnimation(*this, 0);
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -697,16 +710,13 @@ double cPlayer::GetMaxSpeed(void) const
 	{
 		return m_FlyingMaxSpeed;
 	}
+	else if (m_IsSprinting)
+	{
+		return m_SprintingMaxSpeed;
+	}
 	else
 	{
-		if (m_IsSprinting)
-		{
-			return m_SprintingMaxSpeed;
-		}
-		else
-		{
-			return m_NormalMaxSpeed;
-		}
+		return m_NormalMaxSpeed;
 	}
 }
 
@@ -800,6 +810,29 @@ void cPlayer::SetCanFly(bool a_CanFly)
 
 
 
+void cPlayer::SetCustomName(const AString & a_CustomName)
+{
+	if (m_CustomName == a_CustomName)
+	{
+		return;
+	}
+
+	m_World->BroadcastPlayerListRemovePlayer(*this);
+
+	m_CustomName = a_CustomName;
+	if (m_CustomName.length() > 16)
+	{
+		m_CustomName = m_CustomName.substr(0, 16);
+	}
+
+	m_World->BroadcastPlayerListAddPlayer(*this);
+	m_World->BroadcastSpawnEntity(*this, GetClientHandle());
+}
+
+
+
+
+
 void cPlayer::SetFlying(bool a_IsFlying)
 {
 	if (a_IsFlying == m_IsFlying)
@@ -819,9 +852,9 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if ((a_TDI.DamageType != dtInVoid) && (a_TDI.DamageType != dtPlugin))
 	{
-		if (IsGameModeCreative())
+		if (IsGameModeCreative() || IsGameModeSpectator())
 		{
-			// No damage / health in creative mode if not void or plugin damage
+			// No damage / health in creative or spectator mode if not void or plugin damage
 			return false;
 		}
 	}
@@ -877,12 +910,12 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		Pickups.Add(cItem(E_ITEM_RED_APPLE));
 	}
 
-	m_Stats.AddValue(statItemsDropped, Pickups.Size());
+	m_Stats.AddValue(statItemsDropped, (StatValue)Pickups.Size());
 
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
-	if (a_TDI.Attacker == NULL)
+	if ((a_TDI.Attacker == NULL) && m_World->ShouldBroadcastDeathMessages())
 	{
 		AString DamageText;
 		switch (a_TDI.DamageType)
@@ -907,6 +940,10 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 			default: DamageText = "died, somehow; we've no idea how though"; break;
 		}
 		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
+	}
+	else if (a_TDI.Attacker == NULL)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
+	{
+		// no-op
 	}
 	else if (a_TDI.Attacker->IsPlayer())
 	{
@@ -1035,6 +1072,14 @@ bool cPlayer::IsGameModeAdventure(void) const
 
 
 
+bool cPlayer::IsGameModeSpectator(void) const
+{
+	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Adventure
+}
+
+
+
 
 void cPlayer::SetTeam(cTeam * a_Team)
 {
@@ -1150,11 +1195,13 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	m_GameMode = a_GameMode;
 	m_ClientHandle->SendGameMode(a_GameMode);
 
-	if (!IsGameModeCreative())
+	if (!(IsGameModeCreative() || IsGameModeSpectator()))
 	{
 		SetFlying(false);
 		SetCanFly(false);
 	}
+
+	m_World->BroadcastPlayerListUpdateGameMode(*this);
 }
 
 
@@ -1200,11 +1247,13 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 	}
 	else
 	{
-		// First time, announce it
-		cCompositeChat Msg;
-		Msg.SetMessageType(mtSuccess);
-		Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
-		m_World->BroadcastChat(Msg);
+		if (m_World->ShouldBroadcastAchievementMessages())
+		{
+			cCompositeChat Msg;
+			Msg.SetMessageType(mtSuccess);
+			Msg.AddShowAchievementPart(GetName(), cStatInfo::GetName(a_Ach));
+			m_World->BroadcastChat(Msg);
+		}
 
 		// Increment the statistic
 		StatValue New = m_Stats.AddValue(a_Ach);
@@ -1330,6 +1379,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos)
 
 void cPlayer::SetVisible(bool a_bVisible)
 {
+	// Need to Check if the player or other players are in gamemode spectator, but will break compatibility
 	if (a_bVisible && !m_bVisible)  // Make visible
 	{
 		m_bVisible = true;
@@ -1346,48 +1396,6 @@ void cPlayer::SetVisible(bool a_bVisible)
 
 
 
-void cPlayer::AddToGroup( const AString & a_GroupName)
-{
-	cGroup* Group = cRoot::Get()->GetGroupManager()->GetGroup( a_GroupName);
-	m_Groups.push_back( Group);
-	LOGD("Added %s to group %s", GetName().c_str(), a_GroupName.c_str());
-	ResolveGroups();
-	ResolvePermissions();
-}
-
-
-
-
-
-void cPlayer::RemoveFromGroup( const AString & a_GroupName)
-{
-	bool bRemoved = false;
-	for (GroupList::iterator itr = m_Groups.begin(); itr != m_Groups.end(); ++itr)
-	{
-		if ((*itr)->GetName().compare(a_GroupName) == 0)
-		{
-			m_Groups.erase( itr);
-			bRemoved = true;
-			break;
-		}
-	}
-
-	if (bRemoved)
-	{
-		LOGD("Removed %s from group %s", GetName().c_str(), a_GroupName.c_str());
-		ResolveGroups();
-		ResolvePermissions();
-	}
-	else
-	{
-		LOGWARN("Tried to remove %s from group %s but was not in that group", GetName().c_str(), a_GroupName.c_str());
-	}
-}
-
-
-
-
-
 bool cPlayer::HasPermission(const AString & a_Permission)
 {
 	if (a_Permission.empty())
@@ -1396,47 +1404,18 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 		return true;
 	}
 	
-	AStringVector Split = StringSplit( a_Permission, ".");
-	PermissionMap Possibilities = m_ResolvedPermissions;
-	// Now search the namespaces
-	while (Possibilities.begin() != Possibilities.end())
+	AStringVector Split = StringSplit(a_Permission, ".");
+
+	// Iterate over all granted permissions; if any matches, then return success:
+	for (AStringVectorVector::const_iterator itr = m_SplitPermissions.begin(), end = m_SplitPermissions.end(); itr != end; ++itr)
 	{
-		PermissionMap::iterator itr = Possibilities.begin();
-		if (itr->second)
+		if (PermissionMatches(Split, *itr))
 		{
-			AStringVector OtherSplit = StringSplit( itr->first, ".");
-			if (OtherSplit.size() <= Split.size())
-			{
-				unsigned int i;
-				for (i = 0; i < OtherSplit.size(); ++i)
-				{
-					if (OtherSplit[i].compare( Split[i]) != 0)
-					{
-						if (OtherSplit[i].compare("*") == 0) return true;  // WildCard man!! WildCard!
-						break;
-					}
-				}
-				if (i == Split.size()) return true;
-			}
-		}
-		Possibilities.erase( itr);
-	}
-
-	// Nothing that matched :(
-	return false;
-}
-
-
-
-
-
-bool cPlayer::IsInGroup( const AString & a_Group)
-{
-	for (GroupList::iterator itr = m_ResolvedGroups.begin(); itr != m_ResolvedGroups.end(); ++itr)
-	{
-		if (a_Group.compare( (*itr)->GetName().c_str()) == 0)
 			return true;
-	}
+		}
+	}  // for itr - m_SplitPermissions[]
+
+	// No granted permission matches
 	return false;
 }
 
@@ -1444,68 +1423,35 @@ bool cPlayer::IsInGroup( const AString & a_Group)
 
 
 
-void cPlayer::ResolvePermissions()
+bool cPlayer::PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template)
 {
-	m_ResolvedPermissions.clear();  // Start with an empty map
-
-	// Copy all player specific permissions into the resolved permissions map
-	for (PermissionMap::iterator itr = m_Permissions.begin(); itr != m_Permissions.end(); ++itr)
+	// Check the sub-items if they are the same or there's a wildcard:
+	size_t lenP = a_Permission.size();
+	size_t lenT = a_Template.size();
+	size_t minLen = std::min(lenP, lenT);
+	for (size_t i = 0; i < minLen; i++)
 	{
-		m_ResolvedPermissions[ itr->first ] = itr->second;
-	}
-
-	for (GroupList::iterator GroupItr = m_ResolvedGroups.begin(); GroupItr != m_ResolvedGroups.end(); ++GroupItr)
-	{
-		const cGroup::PermissionMap & Permissions = (*GroupItr)->GetPermissions();
-		for (cGroup::PermissionMap::const_iterator itr = Permissions.begin(); itr != Permissions.end(); ++itr)
+		if (a_Template[i] == "*")
 		{
-			m_ResolvedPermissions[ itr->first ] = itr->second;
+			// Has matched so far and now there's a wildcard in the template, so the permission matches:
+			return true;
+		}
+		if (a_Permission[i] != a_Template[i])
+		{
+			// Found a mismatch
+			return false;
 		}
 	}
-}
 
-
-
-
-
-void cPlayer::ResolveGroups()
-{
-	// Clear resolved groups first
-	m_ResolvedGroups.clear();
-
-	// Get a complete resolved list of all groups the player is in
-	std::map< cGroup*, bool > AllGroups;  // Use a map, because it's faster than iterating through a list to find duplicates
-	GroupList ToIterate;
-	for (GroupList::iterator GroupItr = m_Groups.begin(); GroupItr != m_Groups.end(); ++GroupItr)
+	// So far all the sub-items have matched
+	// If the sub-item count is the same, then the permission matches:
+	if (lenP == lenT)
 	{
-		ToIterate.push_back( *GroupItr);
+		return true;
 	}
-	while (ToIterate.begin() != ToIterate.end())
-	{
-		cGroup* CurrentGroup = *ToIterate.begin();
-		if (AllGroups.find( CurrentGroup) != AllGroups.end())
-		{
-			LOGWARNING("ERROR: Player \"%s\" is in the group multiple times (\"%s\"). Please fix your settings in users.ini!",
-				GetName().c_str(), CurrentGroup->GetName().c_str()
-			);
-		}
-		else
-		{
-			AllGroups[ CurrentGroup ] = true;
-			m_ResolvedGroups.push_back( CurrentGroup);  // Add group to resolved list
-			const cGroup::GroupList & Inherits = CurrentGroup->GetInherits();
-			for (cGroup::GroupList::const_iterator itr = Inherits.begin(); itr != Inherits.end(); ++itr)
-			{
-				if (AllGroups.find( *itr) != AllGroups.end())
-				{
-					LOGERROR("ERROR: Player %s is in the same group multiple times due to inheritance (%s). FIX IT!", GetName().c_str(), (*itr)->GetName().c_str());
-					continue;
-				}
-				ToIterate.push_back( *itr);
-			}
-		}
-		ToIterate.erase( ToIterate.begin());
-	}
+
+	// There are more sub-items in either the permission or the template, not a match:
+	return false;
 }
 
 
@@ -1514,17 +1460,36 @@ void cPlayer::ResolveGroups()
 
 AString cPlayer::GetColor(void) const
 {
-	if (m_Color != '-')
+	if (m_MsgNameColorCode.empty() || (m_MsgNameColorCode == "-"))
 	{
-		return cChatColor::Delimiter + m_Color;
+		// Color has not been assigned, return an empty string:
+		return AString();
 	}
 
-	if (m_Groups.size() < 1)
-	{
-		return cChatColor::White;
-	}
+	// Return the color, including the delimiter:
+	return cChatColor::Delimiter + m_MsgNameColorCode;
+}
 
-	return (*m_Groups.begin())->GetColor();
+
+
+
+
+AString cPlayer::GetPlayerListName(void) const
+{
+	const AString & Color = GetColor();
+
+	if (HasCustomName())
+	{
+		return m_CustomName;
+	}
+	else if ((GetName().length() <= 14) && !Color.empty())
+	{
+		return Printf("%s%s", Color.c_str(), GetName().c_str());
+	}
+	else
+	{
+		return GetName();
+	}
 }
 
 
@@ -1597,7 +1562,12 @@ void cPlayer::TossPickup(const cItem & a_Item)
 
 void cPlayer::TossItems(const cItems & a_Items)
 {
-	m_Stats.AddValue(statItemsDropped, a_Items.Size());
+	if (IsGameModeSpectator())  // Players can't toss items in spectator
+	{
+		return;
+	}
+	
+	m_Stats.AddValue(statItemsDropped, (StatValue)a_Items.Size());
 
 	double vX = 0, vY = 0, vZ = 0;
 	EulerToVector(-GetYaw(), GetPitch(), vZ, vX, vY);
@@ -1640,48 +1610,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 
 
 
-void cPlayer::LoadPermissionsFromDisk()
-{
-	m_Groups.clear();
-	m_Permissions.clear();
-
-	cIniFile IniFile;
-	if (IniFile.ReadFile("users.ini"))
-	{
-		AString Groups = IniFile.GetValueSet(GetName(), "Groups", "Default");
-		AStringVector Split = StringSplitAndTrim(Groups, ",");
-
-		for (AStringVector::const_iterator itr = Split.begin(), end = Split.end(); itr != end; ++itr)
-		{
-			if (!cRoot::Get()->GetGroupManager()->ExistsGroup(*itr))
-			{
-				LOGWARNING("The group %s for player %s was not found!", itr->c_str(), GetName().c_str());
-			}
-			AddToGroup(*itr);
-		}
-
-		AString Color = IniFile.GetValue(GetName(), "Color", "-");
-		if (!Color.empty())
-		{
-			m_Color = Color[0];
-		}
-	}
-	else
-	{
-		cGroupManager::GenerateDefaultUsersIni(IniFile);
-		IniFile.AddValue("Groups", GetName(), "Default");
-		AddToGroup("Default");
-	}
-	IniFile.WriteFile("users.ini");
-	ResolvePermissions();
-}
-
-
-
-
 bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 {
-	LoadPermissionsFromDisk();
+	LoadRank();
 
 	// Load from the UUID file:
 	if (LoadFromFile(GetUUIDFileName(m_UUID), a_World))
@@ -1691,8 +1622,10 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 	
 	// Load from the offline UUID file, if allowed:
 	AString OfflineUUID = cClientHandle::GenerateOfflineUUID(GetName());
+	const char * OfflineUsage = " (unused)";
 	if (cRoot::Get()->GetServer()->ShouldLoadOfflinePlayerData())
 	{
+		OfflineUsage = "";
 		if (LoadFromFile(GetUUIDFileName(OfflineUUID), a_World))
 		{
 			return true;
@@ -1715,8 +1648,8 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 	}
 	
 	// None of the files loaded successfully
-	LOG("Player data file not found for %s (%s, offline %s), will be reset to defaults.",
-		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str()
+	LOG("Player data file not found for %s (%s, offline %s%s), will be reset to defaults.",
+		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str(), OfflineUsage
 	);
 
 	if (a_World == NULL)
@@ -1795,7 +1728,11 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	cEnderChestEntity::LoadFromJson(root["enderchestinventory"], m_EnderChestContents);
 
 	m_LoadedWorldName = root.get("world", "world").asString();
-	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), true);
+	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), false);
+	if (a_World == NULL)
+	{
+		a_World = cRoot::Get()->GetDefaultWorld();
+	}
 
 	m_LastBedPos.x = root.get("SpawnX", a_World->GetSpawnX()).asInt();
 	m_LastBedPos.y = root.get("SpawnY", a_World->GetSpawnY()).asInt();
@@ -1819,6 +1756,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 bool cPlayer::SaveToDisk()
 {
+	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/"));  // Create the "players" folder, if it doesn't exist yet (#1268)
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("players/") + m_UUID.substr(0, 2));
 
 	// create the JSON data
@@ -1913,31 +1851,33 @@ bool cPlayer::SaveToDisk()
 
 
 
-cPlayer::StringList cPlayer::GetResolvedPermissions()
-{
-	StringList Permissions;
-
-	const PermissionMap& ResolvedPermissions = m_ResolvedPermissions;
-	for (PermissionMap::const_iterator itr = ResolvedPermissions.begin(); itr != ResolvedPermissions.end(); ++itr)
-	{
-		if (itr->second)
-		{
-			Permissions.push_back( itr->first);
-		}
-	}
-
-	return Permissions;
-}
-
-
-
-
-
 void cPlayer::UseEquippedItem(int a_Amount)
 {
-	if (IsGameModeCreative())  // No damage in creative
+	if (IsGameModeCreative() || IsGameModeSpectator())  // No damage in creative or spectator
 	{
 		return;
+	}
+
+	// If the item has an unbreaking enchantment, give it a random chance of not breaking:
+	cItem Item = GetEquippedItem();
+	int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
+	if (UnbreakingLevel > 0)
+	{
+		int chance;
+		if (ItemCategory::IsArmor(Item.m_ItemType))
+		{
+			chance = 60 + (40 / (UnbreakingLevel + 1));
+		}
+		else
+		{
+			chance = 100 / (UnbreakingLevel + 1);
+		}
+
+		cFastRandom Random;
+		if (Random.NextInt(101) <= chance)
+		{
+			return;
+		}
 	}
 
 	if (GetInventory().DamageEquippedItem(a_Amount))
@@ -1977,19 +1917,34 @@ void cPlayer::HandleFood(void)
 		return;
 	}
 
+	// Apply food exhaustion that has accumulated:
+	if (m_FoodExhaustionLevel > 4.0)
+	{
+		m_FoodExhaustionLevel -= 4.0;
+
+		if (m_FoodSaturationLevel > 0.0)
+		{
+			m_FoodSaturationLevel = std::max(m_FoodSaturationLevel - 1.0, 0.0);
+		}
+		else
+		{
+			SetFoodLevel(m_FoodLevel - 1);
+		}
+	}
+
 	// Heal or damage, based on the food level, using the m_FoodTickTimer:
-	if ((m_FoodLevel > 17) || (m_FoodLevel <= 0))
+	if ((m_FoodLevel >= 18) || (m_FoodLevel <= 0))
 	{
 		m_FoodTickTimer++;
 		if (m_FoodTickTimer >= 80)
 		{
 			m_FoodTickTimer = 0;
 
-			if ((m_FoodLevel > 17) && (GetHealth() < GetMaxHealth()))
+			if ((m_FoodLevel >= 18) && (GetHealth() < GetMaxHealth()))
 			{
 				// Regenerate health from food, incur 3 pts of food exhaustion:
 				Heal(1);
-				m_FoodExhaustionLevel += 3.0;
+				AddFoodExhaustion(3.0);
 			}
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
@@ -1998,20 +1953,9 @@ void cPlayer::HandleFood(void)
 			}
 		}
 	}
-
-	// Apply food exhaustion that has accumulated:
-	if (m_FoodExhaustionLevel >= 4.0)
+	else
 	{
-		m_FoodExhaustionLevel -= 4.0;
-
-		if (m_FoodSaturationLevel >= 1.0)
-		{
-			m_FoodSaturationLevel -= 1.0;
-		}
-		else
-		{
-			SetFoodLevel(m_FoodLevel - 1);
-		}
+		m_FoodTickTimer = 0;
 	}
 }
 
@@ -2086,14 +2030,17 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		else if (IsSubmerged())
 		{
 			m_Stats.AddValue(statDistDove, Value);
+			AddFoodExhaustion(0.00015 * (double)Value);
 		}
 		else if (IsSwimming())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
+			AddFoodExhaustion(0.00015 * (double)Value);
 		}
 		else if (IsOnGround())
 		{
 			m_Stats.AddValue(statDistWalked, Value);
+			AddFoodExhaustion((m_IsSprinting ? 0.001 : 0.0001) * (double)Value);
 		}
 		else
 		{
@@ -2114,8 +2061,8 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 				cMonster * Monster = (cMonster *)m_AttachedTo;
 				switch (Monster->GetMobType())
 				{
-					case cMonster::mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
-					case cMonster::mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
+					case mtPig:   m_Stats.AddValue(statDistPig,   Value); break;
+					case mtHorse: m_Stats.AddValue(statDistHorse, Value); break;
 					default: break;
 				}
 				break;
@@ -2184,6 +2131,36 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 
 
 
+void cPlayer::LoadRank(void)
+{
+	// Load the values from cRankManager:
+	cRankManager & RankMgr = cRoot::Get()->GetRankManager();
+	m_Rank = RankMgr.GetPlayerRankName(m_UUID);
+	if (m_Rank.empty())
+	{
+		m_Rank = RankMgr.GetDefaultRank();
+	}
+	else
+	{
+		// Update the name:
+		RankMgr.UpdatePlayerName(m_UUID, m_PlayerName);
+	}
+	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
+	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+
+	// Break up the individual permissions on each dot, into m_SplitPermissions:
+	m_SplitPermissions.clear();
+	m_SplitPermissions.reserve(m_Permissions.size());
+	for (AStringVector::const_iterator itr = m_Permissions.begin(), end = m_Permissions.end(); itr != end; ++itr)
+	{
+		m_SplitPermissions.push_back(StringSplit(*itr, "."));
+	}  // for itr - m_Permissions[]
+}
+
+
+
+
+
 void cPlayer::Detach()
 {
 	super::Detach();
@@ -2216,12 +2193,13 @@ void cPlayer::Detach()
 
 AString cPlayer::GetUUIDFileName(const AString & a_UUID)
 {
-	ASSERT(a_UUID.size() == 36);
+	AString UUID = cMojangAPI::MakeUUIDDashed(a_UUID);
+	ASSERT(UUID.length() == 36);
 	
 	AString res("players/");
-	res.append(a_UUID, 0, 2);
+	res.append(UUID, 0, 2);
 	res.push_back('/');
-	res.append(a_UUID, 2, AString::npos);
+	res.append(UUID, 2, AString::npos);
 	res.append(".json");
 	return res;
 }

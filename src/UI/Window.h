@@ -23,6 +23,8 @@ class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
+class cMinecartWithChest;
+class cBeaconEntity;
 class cSlotArea;
 class cSlotAreaAnvil;
 class cWorld;
@@ -62,7 +64,7 @@ public:
 		wtBeacon      = 7,
 		wtAnvil       = 8,
 		wtHopper      = 9,
-		// Unknown: 10
+		wtDropper     = 10,
 		wtAnimalChest = 11,
 	};
 	
@@ -75,6 +77,7 @@ public:
 
 	char GetWindowID(void) const { return m_WindowID; }  // tolua_export
 	int GetWindowType(void) const { return m_WindowType; }  // tolua_export
+	const AString GetWindowTypeName(void) const;  // tolua_export
 
 	cWindowOwner * GetOwner(void) { return m_Owner; }
 	void SetOwner( cWindowOwner * a_Owner) { m_Owner = a_Owner; }
@@ -258,6 +261,26 @@ protected:
 
 
 
+class cBeaconWindow :
+	public cWindow
+{
+	typedef cWindow super;
+public:
+	cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon);
+
+	cBeaconEntity * GetBeaconEntity(void) const { return m_Beacon; }
+
+	// cWindow Overrides:
+	virtual void OpenedByPlayer(cPlayer & a_Player) override;
+
+protected:
+	cBeaconEntity * m_Beacon;
+} ;
+
+
+
+
+
 class cEnchantingWindow :
 	public cWindow
 {
@@ -269,9 +292,6 @@ public:
 
 	/** Return the Value of a Property */
 	int GetPropertyValue(int a_Property);
-
-	/** Get the Position from the Enchantment Table */
-	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
 
 	cSlotArea * m_SlotArea;
 
@@ -337,6 +357,20 @@ protected:
 	cChestEntity * m_PrimaryChest;
 	cChestEntity * m_SecondaryChest;
 } ;
+
+
+
+
+
+class cMinecartWithChestWindow :
+	public cWindow
+{
+public:
+	cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart);
+	~cMinecartWithChestWindow();
+private:
+	cMinecartWithChest * m_ChestCart;
+};
 
 
 

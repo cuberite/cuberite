@@ -16,6 +16,7 @@ cSslContext::cSslContext(void) :
 	m_IsValid(false),
 	m_HasHandshaken(false)
 {
+	memset(&m_Ssl, 0, sizeof(m_Ssl));
 }
 
 

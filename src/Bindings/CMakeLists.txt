@@ -11,6 +11,7 @@ SET (SRCS
     LuaState.cpp
     LuaWindow.cpp
     ManualBindings.cpp
+    ManualBindings_RankManager.cpp
     Plugin.cpp
     PluginLua.cpp
     PluginManager.cpp
@@ -45,7 +46,6 @@ set(BINDING_DEPENDENCIES
     ../Bindings/AllToLua.pkg
     ../Bindings/gen_LuaState_Call.lua
     ../Bindings/LuaFunctions.h
-    ../Bindings/LuaState_Call.inc
     ../Bindings/LuaWindow.h
     ../Bindings/Plugin.h
     ../Bindings/PluginLua.h
@@ -53,6 +53,7 @@ set(BINDING_DEPENDENCIES
     ../Bindings/WebPlugin.h
     ../BiomeDef.h
     ../BlockArea.h
+	../BlockEntities/BeaconEntity.h
     ../BlockEntities/BlockEntity.h
     ../BlockEntities/BlockEntityWithItems.h
     ../BlockEntities/ChestEntity.h
@@ -96,7 +97,6 @@ set(BINDING_DEPENDENCIES
     ../Entities/HangingEntity.h
     ../Entities/ItemFrame.h
     ../Generating/ChunkDesc.h
-    ../Group.h
     ../Inventory.h
     ../Item.h
     ../ItemGrid.h
@@ -125,8 +125,11 @@ if (NOT MSVC)
         DEPENDS ${BINDING_DEPENDENCIES}
     )
 endif ()
-set_source_files_properties(Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
-set_source_files_properties(Bindings/Bindings.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/LuaState_Call.inc PROPERTIES GENERATED TRUE)
+
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
 
 if(NOT MSVC)
     add_library(Bindings ${SRCS} ${HDRS})

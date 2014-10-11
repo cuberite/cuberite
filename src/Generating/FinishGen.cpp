@@ -15,6 +15,7 @@
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
 #include "../World.h"
+#include "inifile/iniFile.h"
 
 
 
@@ -484,8 +485,6 @@ int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap
 
 void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	// Add Lilypads on top of water surface in Swampland
-
 	int NumToGen = GetNumToGen(a_ChunkDesc.GetBiomeMap());
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
@@ -555,7 +554,10 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenPreSimulator:
 
-cFinishGenPreSimulator::cFinishGenPreSimulator(void)
+cFinishGenPreSimulator::cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava) :
+	m_PreSimulateFallingBlocks(a_PreSimulateFallingBlocks),
+	m_PreSimulateWater(a_PreSimulateWater),
+	m_PreSimulateLava(a_PreSimulateLava)
 {
 	// Nothing needed yet
 }
@@ -566,9 +568,20 @@ cFinishGenPreSimulator::cFinishGenPreSimulator(void)
 
 void cFinishGenPreSimulator::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	CollapseSandGravel(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
-	StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
-	StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
+	if (m_PreSimulateFallingBlocks)
+	{
+		CollapseSandGravel(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap());
+	}
+
+	if (m_PreSimulateWater)
+	{
+		StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+	}
+
+	if (m_PreSimulateLava)
+	{
+		StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_LAVA, E_BLOCK_STATIONARY_LAVA);
+	}
 	// TODO: other operations
 }
 

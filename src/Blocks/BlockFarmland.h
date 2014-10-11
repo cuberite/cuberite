@@ -28,52 +28,12 @@ public:
 
 	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
 	{
-		bool Found = false;
-		
-		EMCSBiome Biome = a_Chunk.GetBiomeAt(a_RelX, a_RelZ);
-		if (a_Chunk.GetWorld()->IsWeatherWet() && !IsBiomeNoDownfall(Biome))
-		{
-			// Rain hydrates farmland, too, except in Desert biomes.
-			Found = true;
-		}
-		else
-		{
-			// Search for water in a close proximity:
-			// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
-			// TODO: Rewrite this to use the chunk and its neighbors directly
-			cBlockArea Area;
-			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			if (!Area.Read(a_Chunk.GetWorld(), BlockX - 4, BlockX + 4, a_RelY, a_RelY + 1, BlockZ - 4, BlockZ + 4))
-			{
-				// Too close to the world edge, cannot check surroundings; don't tick at all
-				return;
-			}
-
-			size_t NumBlocks = Area.GetBlockCount();
-			BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
-			for (size_t i = 0; i < NumBlocks; i++)
-			{
-				if (
-					(BlockTypes[i] == E_BLOCK_WATER) ||
-					(BlockTypes[i] == E_BLOCK_STATIONARY_WATER)
-				)
-				{
-					Found = true;
-					break;
-				}
-			}  // for i - BlockTypes[]
-		}
-		
 		NIBBLETYPE BlockMeta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		
-		if (Found)
+
+		if (IsWaterInNear(a_Chunk, a_RelX, a_RelY, a_RelZ))
 		{
-			// Water was found, hydrate the block until hydration reaches 7:
-			if (BlockMeta < 7)
-			{
-				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, ++BlockMeta);
-			}
+			// Water was found, set block meta to 7
+			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, m_BlockType, 7);
 			return;
 		}
 
@@ -83,9 +43,10 @@ public:
 			a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_FARMLAND, --BlockMeta);
 			return;
 		}
-		
+
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		switch (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ))
+		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height) ? E_BLOCK_AIR : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
+		switch (UpperBlock)
 		{
 			case E_BLOCK_CROPS:
 			case E_BLOCK_POTATOES:
@@ -98,15 +59,62 @@ public:
 			}
 			default:
 			{
-				a_Chunk.FastSetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
+				a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_DIRT, 0);
 				break;
 			}
+		}
+	}
+
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
+	{
+		if (a_BlockY >= cChunkDef::Height)
+		{
+			return;
+		}
+
+		BLOCKTYPE UpperBlock = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
+		if (cBlockInfo::FullyOccupiesVoxel(UpperBlock))
+		{
+			a_ChunkInterface.SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_DIRT, 0);
 		}
 	}
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
 		a_Pickups.Add(E_BLOCK_DIRT, 1, 0);  // Reset meta
+	}
+
+	bool IsWaterInNear(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+	{
+		if (a_Chunk.GetWorld()->IsWeatherWetAt(a_RelX, a_RelZ))
+		{
+			// Rain hydrates farmland, too, except in Desert biomes.
+			return true;
+		}
+
+		// Search for water in a close proximity:
+		// Ref.: http://www.minecraftwiki.net/wiki/Farmland#Hydrated_Farmland_Tiles
+		// TODO: Rewrite this to use the chunk and its neighbors directly
+		cBlockArea Area;
+		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
+		int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
+		if (!Area.Read(a_Chunk.GetWorld(), BlockX - 4, BlockX + 4, a_RelY, a_RelY + 1, BlockZ - 4, BlockZ + 4))
+		{
+			// Too close to the world edge, cannot check surroundings
+			return false;
+		}
+
+		size_t NumBlocks = Area.GetBlockCount();
+		BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
+		for (size_t i = 0; i < NumBlocks; i++)
+		{
+			if (IsBlockWater(BlockTypes[i]))
+			{
+				return true;
+			}
+		}  // for i - BlockTypes[]
+
+		return false;
 	}
 } ;
 

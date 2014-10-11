@@ -56,6 +56,7 @@ Makefile
 *.a
 *.d
 *.so
+BuildInfo.h
 CMakeCache.txt
 CMakeFiles
 Makefile
@@ -64,7 +65,7 @@ install_mainfest.txt
 src/MCServer
 lib/tolua++/tolua
 src/Bindings/Bindings.*
-src/Bindings/BindingDependecies.txt
+src/Bindings/BindingDependencies.txt
 MCServer.dir/
 src/AllFiles.lst
 

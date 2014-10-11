@@ -25,6 +25,7 @@
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
+#include "ItemGoldenApple.h"
 #include "ItemItemFrame.h"
 #include "ItemHoe.h"
 #include "ItemLeaves.h"
@@ -32,6 +33,7 @@
 #include "ItemLilypad.h"
 #include "ItemMap.h"
 #include "ItemMinecart.h"
+#include "ItemMushroomSoup.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
@@ -65,7 +67,7 @@ cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
-	if ((a_ItemType < 0) || ((unsigned long)a_ItemType >= ARRAYCOUNT(m_ItemHandler)))
+	if ((a_ItemType < 0) || ((size_t)a_ItemType >= ARRAYCOUNT(m_ItemHandler)))
 	{
 		// Either nothing (-1), or bad value, both cases should return the air handler
 		if (a_ItemType < -1)
@@ -106,7 +108,7 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
 		case E_ITEM_BOAT:              return new cItemBoatHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
-		case E_ITEM_BOW:               return new cItemBowHandler;
+		case E_ITEM_BOW:               return new cItemBowHandler();
 		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
 		case E_ITEM_CAKE:              return new cItemCakeHandler(a_ItemType);
 		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
@@ -120,9 +122,11 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
 		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_GOLDEN_APPLE:      return new cItemGoldenAppleHandler();
 		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:               return new cItemMapHandler();
 		case E_ITEM_MILK:              return new cItemMilkHandler();
+		case E_ITEM_MUSHROOM_SOUP:     return new cItemMushroomSoupHandler(a_ItemType);
 		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
 		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
 		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
@@ -189,6 +193,11 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 			return new cItemSeedsHandler(a_ItemType);
 		}
 		
+		case E_ITEM_ACACIA_DOOR:
+		case E_ITEM_BIRCH_DOOR:
+		case E_ITEM_DARK_OAK_DOOR:
+		case E_ITEM_JUNGLE_DOOR:
+		case E_ITEM_SPRUCE_DOOR:
 		case E_ITEM_IRON_DOOR:
 		case E_ITEM_WOODEN_DOOR:
 		{
@@ -205,23 +214,26 @@ cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
 		}
 		
 		// Food (please keep alpha-sorted):
-		// (carrots and potatoes handled in SeedHandler as both seed and food
+		// (carrots and potatoes handled separately in SeedHandler as they're both seed and food)
 		case E_ITEM_BAKED_POTATO:
 		case E_ITEM_BREAD:
 		case E_ITEM_COOKED_CHICKEN:
 		case E_ITEM_COOKED_FISH:
+		case E_ITEM_COOKED_MUTTON:
 		case E_ITEM_COOKED_PORKCHOP:
+		case E_ITEM_COOKED_RABBIT:
 		case E_ITEM_COOKIE:
-		case E_ITEM_GOLDEN_APPLE:
 		case E_ITEM_GOLDEN_CARROT:
 		case E_ITEM_MELON_SLICE:
-		case E_ITEM_MUSHROOM_SOUP:
 		case E_ITEM_POISONOUS_POTATO:
 		case E_ITEM_PUMPKIN_PIE:
+		case E_ITEM_RABBIT_STEW:
 		case E_ITEM_RAW_BEEF:
 		case E_ITEM_RAW_CHICKEN:
 		case E_ITEM_RAW_FISH:
+		case E_ITEM_RAW_MUTTON:
 		case E_ITEM_RAW_PORKCHOP:
+		case E_ITEM_RAW_RABBIT:
 		case E_ITEM_RED_APPLE:
 		case E_ITEM_ROTTEN_FLESH:
 		case E_ITEM_SPIDER_EYE:
@@ -330,7 +342,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 	{
 		cChunkInterface ChunkInterface(a_World->GetChunkMap());
 		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block), a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0);
+		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
 	}
 
 	if (!cBlockInfo::IsOneHitDig(Block))
@@ -388,8 +400,12 @@ char cItemHandler::GetMaxStackSize(void)
 	
 	switch (m_ItemType)
 	{
+		case E_ITEM_ACACIA_DOOR:          return 64;
+		case E_ITEM_ARMOR_STAND:          return 16;
 		case E_ITEM_ARROW:                return 64;
 		case E_ITEM_BAKED_POTATO:         return 64;
+		case E_ITEM_BANNER:               return 16;
+		case E_ITEM_BIRCH_DOOR:           return 64;
 		case E_ITEM_BLAZE_POWDER:         return 64;
 		case E_ITEM_BLAZE_ROD:            return 64;
 		case E_ITEM_BONE:                 return 64;
@@ -400,7 +416,6 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_BREWING_STAND:        return 64;
 		case E_ITEM_BUCKET:               return 16;
 		case E_ITEM_CARROT:               return 64;
-		case E_ITEM_CAKE:                 return 1;
 		case E_ITEM_CAULDRON:             return 64;
 		case E_ITEM_CLAY:                 return 64;
 		case E_ITEM_CLAY_BRICK:           return 64;
@@ -411,7 +426,9 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_COOKED_CHICKEN:       return 64;
 		case E_ITEM_COOKED_FISH:          return 64;
 		case E_ITEM_COOKED_PORKCHOP:      return 64;
+		case E_ITEM_COOKED_MUTTON:        return 64;
 		case E_ITEM_COOKIE:               return 64;
+		case E_ITEM_DARK_OAK_DOOR:        return 64;
 		case E_ITEM_DIAMOND:              return 64;
 		case E_ITEM_DYE:                  return 64;
 		case E_ITEM_EGG:                  return 16;
@@ -435,6 +452,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_GOLD_NUGGET:          return 64;
 		case E_ITEM_GUNPOWDER:            return 64;
 		case E_ITEM_HEAD:                 return 64;
+		case E_ITEM_JUNGLE_DOOR:          return 64;
 		case E_ITEM_IRON:                 return 64;
 		case E_ITEM_ITEM_FRAME:           return 64;
 		case E_ITEM_LEATHER:              return 64;
@@ -448,11 +466,16 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_PAPER:                return 64;
 		case E_ITEM_POISONOUS_POTATO:     return 64;
 		case E_ITEM_POTATO:               return 64;
+		case E_ITEM_PRISMARINE_CRYSTALS:  return 64;
+		case E_ITEM_PRISMARINE_SHARD:     return 64;
 		case E_ITEM_PUMPKIN_PIE:          return 64;
 		case E_ITEM_PUMPKIN_SEEDS:        return 64;
+		case E_ITEM_RABBITS_FOOT:         return 64;
+		case E_ITEM_RABBIT_HIDE:          return 64;
 		case E_ITEM_RAW_BEEF:             return 64;
 		case E_ITEM_RAW_CHICKEN:          return 64;
 		case E_ITEM_RAW_FISH:             return 64;
+		case E_ITEM_RAW_MUTTON:           return 64;
 		case E_ITEM_RAW_PORKCHOP:         return 64;
 		case E_ITEM_RED_APPLE:            return 64;
 		case E_ITEM_REDSTONE_DUST:        return 64;
@@ -464,6 +487,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_SNOWBALL:             return 16;
 		case E_ITEM_SPAWN_EGG:            return 64;
 		case E_ITEM_SPIDER_EYE:           return 64;
+		case E_ITEM_SPRUCE_DOOR:          return 64;
 		case E_ITEM_STEAK:                return 64;
 		case E_ITEM_STICK:                return 64;
 		case E_ITEM_STRING:               return 64;
@@ -542,41 +566,50 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		case E_BLOCK_ANVIL:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_COAL_ORE:
-		case E_BLOCK_STONE:
-		case E_BLOCK_COBBLESTONE:
-		case E_BLOCK_END_STONE:
-		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_SANDSTONE:
-		case E_BLOCK_STONE_BRICKS:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
 		case E_BLOCK_BRICK:
+		case E_BLOCK_CAULDRON:
+		case E_BLOCK_COAL_ORE:
+		case E_BLOCK_COBBLESTONE:
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_CAULDRON:
-		case E_BLOCK_OBSIDIAN:
 		case E_BLOCK_DIAMOND_BLOCK:
 		case E_BLOCK_DIAMOND_ORE:
+		case E_BLOCK_DOUBLE_NEW_STONE_SLAB:
+		case E_BLOCK_DOUBLE_STONE_SLAB:
+		case E_BLOCK_EMERALD_ORE:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_STONE:
+		case E_BLOCK_FURNACE:
 		case E_BLOCK_GOLD_BLOCK:
 		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_EMERALD_ORE:
 		case E_BLOCK_IRON_BLOCK:
 		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_LAPIS_BLOCK:
+		case E_BLOCK_LAPIS_ORE:
+		case E_BLOCK_LIT_FURNACE:
+		case E_BLOCK_MOB_SPAWNER:
+		case E_BLOCK_MOSSY_COBBLESTONE:
+		case E_BLOCK_NETHER_BRICK:
+		case E_BLOCK_NETHER_BRICK_STAIRS:
+		case E_BLOCK_NETHER_BRICK_FENCE:
+		case E_BLOCK_NETHERRACK:
+		case E_BLOCK_NEW_STONE_SLAB:
+		case E_BLOCK_OBSIDIAN:
+		case E_BLOCK_PACKED_ICE:
+		case E_BLOCK_PRISMARINE_BLOCK:
+		case E_BLOCK_RED_SANDSTONE:
+		case E_BLOCK_RED_SANDSTONE_STAIRS:
+		case E_BLOCK_REDSTONE_ORE:
+		case E_BLOCK_REDSTONE_ORE_GLOWING:
+		case E_BLOCK_SANDSTONE_STAIRS:
+		case E_BLOCK_SANDSTONE:
 		case E_BLOCK_SNOW:
+		case E_BLOCK_STONE:
+		case E_BLOCK_STONE_BRICKS:
+		case E_BLOCK_STONE_BRICK_STAIRS:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_STONE_SLAB:
 		case E_BLOCK_VINES:
 		{
 			return false;
@@ -618,29 +651,43 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 
 
 
+bool cItemHandler::GetEatEffect(cEntityEffect::eType & a_EffectType, int & a_EffectDurationTicks, short & a_EffectIntensity, float & a_Chance)
+{
+	return false;
+}
+
+
+
+
+
 bool cItemHandler::EatItem(cPlayer * a_Player, cItem * a_Item)
 {
 	UNUSED(a_Item);
-	
-	FoodInfo Info = GetFoodInfo();
+	if (!a_Player->IsGameModeCreative())
+	{
+		a_Player->GetInventory().RemoveOneEquippedItem();
+	}
 
+	FoodInfo Info = GetFoodInfo();
 	if ((Info.FoodLevel > 0) || (Info.Saturation > 0.f))
 	{
 		bool Success = a_Player->Feed(Info.FoodLevel, Info.Saturation);
-		
-		// If consumed and there's chance of foodpoisoning, do it:
-		if (Success && (Info.PoisonChance > 0))
+
+		// Give effects
+		cEntityEffect::eType EffectType;
+		int EffectDurationTicks;
+		short EffectIntensity;
+		float Chance;
+		if (Success && GetEatEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance))
 		{
 			cFastRandom r1;
-			if ((r1.NextInt(100, a_Player->GetUniqueID()) - Info.PoisonChance) <= 0)
+			if (r1.NextFloat() < Chance)
 			{
-				a_Player->FoodPoison(600);  // Give the player food poisoning for 30 seconds.
+				a_Player->AddEntityEffect(EffectType, EffectDurationTicks, EffectIntensity, Chance);
 			}
 		}
-
 		return Success;
 	}
-
 	return false;
 }
 

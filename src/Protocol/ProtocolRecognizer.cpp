@@ -7,17 +7,14 @@
 #include "Globals.h"
 
 #include "ProtocolRecognizer.h"
-#include "Protocol125.h"
-#include "Protocol132.h"
-#include "Protocol14x.h"
-#include "Protocol15x.h"
-#include "Protocol16x.h"
 #include "Protocol17x.h"
+#include "Protocol18x.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
 #include "../ChatColor.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -26,7 +23,7 @@
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
 	m_Protocol(NULL),
-	m_Buffer(512)
+	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 {
 }
 
@@ -48,19 +45,9 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 {
 	switch (a_ProtocolVersion)
 	{
-		case PROTO_VERSION_1_2_5: return "1.2.5";
-		case PROTO_VERSION_1_3_2: return "1.3.2";
-		case PROTO_VERSION_1_4_2: return "1.4.2";
-		case PROTO_VERSION_1_4_4: return "1.4.4";
-		case PROTO_VERSION_1_4_6: return "1.4.6";
-		case PROTO_VERSION_1_5_0: return "1.5";
-		case PROTO_VERSION_1_5_2: return "1.5.2";
-		case PROTO_VERSION_1_6_1: return "1.6.1";
-		case PROTO_VERSION_1_6_2: return "1.6.2";
-		case PROTO_VERSION_1_6_3: return "1.6.3";
-		case PROTO_VERSION_1_6_4: return "1.6.4";
 		case PROTO_VERSION_1_7_2: return "1.7.2";
 		case PROTO_VERSION_1_7_6: return "1.7.6";
+		case PROTO_VERSION_1_8_0: return "1.8";
 	}
 	ASSERT(!"Unknown protocol version");
 	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
@@ -210,8 +197,13 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 	else
 	{
 		// This is used when the client sends a server-ping, respond with the default packet:
-		WriteByte  (0xff);  // PACKET_DISCONNECT
-		WriteString(a_Reason);
+		static const int Packet = 0xff;  // PACKET_DISCONNECT
+		SendData((const char *)&Packet, 1);  // WriteByte()
+
+		AString UTF16 = UTF8ToRawBEUTF16(a_Reason.c_str(), a_Reason.length());
+		static const u_short Size = htons((u_short)(UTF16.size() / 2));
+		SendData((const char *)&Size, 2);      // WriteShort()
+		SendData(UTF16.data(), UTF16.size());  // WriteString()
 	}
 }
 
@@ -408,20 +400,20 @@ void cProtocolRecognizer::SendLoginSuccess(void)
 
 
 
-void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length);
+	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
 }
 
 
 
 
 
-void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendMapDecorators(a_ID, a_Decorators);
+	m_Protocol->SendMapDecorators(a_ID, a_Decorators, m_Scale);
 }
 
 
@@ -438,10 +430,10 @@ void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
 
 
 
-void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmmount);
+	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
 }
 
 
@@ -486,10 +478,50 @@ void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_A
 
 
 
-void cProtocolRecognizer::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocolRecognizer::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendPlayerListItem(a_Player, a_IsOnline);
+	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListRemovePlayer(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdatePing(a_Player);
+}
+
+
+
+
+
+void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	ASSERT(m_Protocol != NULL);
+	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
 
@@ -716,10 +748,10 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_Protocol != NULL);
-	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay);
+	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
 
 
@@ -830,51 +862,8 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and
 	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
-	
-	// The first packet should be a Handshake, 0x02:
-	unsigned char PacketType;
-	if (!m_Buffer.ReadByte(PacketType))
-	{
-		return false;
-	}
-	switch (PacketType)
-	{
-		case 0x02: return TryRecognizeLengthlessProtocol();  // Handshake, continue recognizing
-		case 0xfe:
-		{
-			// This may be either a packet length or the length-less Ping packet
-			Byte NextByte;
-			if (!m_Buffer.ReadByte(NextByte))
-			{
-				// Not enough data for either protocol
-				// This could actually happen with the 1.2 / 1.3 client, but their support is fading out anyway
-				return false;
-			}
-			if (NextByte != 0x01)
-			{
-				// This is definitely NOT a length-less Ping packet, handle as lengthed protocol:
-				break;
-			}
-			if (!m_Buffer.ReadByte(NextByte))
-			{
-				// There is no more data. Although this *could* mean TCP fragmentation, it is highly unlikely
-				// and rather this is a 1.4 client sending a regular Ping packet (without the following Plugin message)
-				SendLengthlessServerPing();
-				return false;
-			}
-			if (NextByte == 0xfa)
-			{
-				// Definitely a length-less Ping followed by a Plugin message
-				SendLengthlessServerPing();
-				return false;
-			}
-			// Definitely a lengthed Initial handshake, handle below:
-			break;
-		}
-	}  // switch (PacketType)
 
-	// This must be a lengthed protocol, try if it has the entire initial handshake packet:
-	m_Buffer.ResetRead();
+	// Lengthed protocol, try if it has the entire initial handshake packet:
 	UInt32 PacketLen;
 	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketLen))
@@ -889,61 +878,6 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 		return false;
 	}
 	return TryRecognizeLengthedProtocol(PacketLen - ReadSoFar);
-}
-
-
-
-
-
-bool cProtocolRecognizer::TryRecognizeLengthlessProtocol(void)
-{
-	// The comm started with 0x02, which is a Handshake packet in the length-less protocol family
-	// 1.3.2 starts with 0x02 0x39 <name-length-short>
-	// 1.2.5 starts with 0x02 <name-length-short> and name is expected to less than 0x3900 long :)
-	char ch;
-	if (!m_Buffer.ReadChar(ch))
-	{
-		return false;
-	}
-	switch (ch)
-	{
-		case PROTO_VERSION_1_3_2:
-		{
-			m_Protocol = new cProtocol132(m_Client);
-			return true;
-		}
-		case PROTO_VERSION_1_4_2:
-		case PROTO_VERSION_1_4_4:
-		{
-			m_Protocol = new cProtocol142(m_Client);
-			return true;
-		}
-		case PROTO_VERSION_1_4_6:
-		{
-			m_Protocol = new cProtocol146(m_Client);
-			return true;
-		}
-		case PROTO_VERSION_1_5_0:
-		case PROTO_VERSION_1_5_2:
-		{
-			m_Protocol = new cProtocol150(m_Client);
-			return true;
-		}
-		case PROTO_VERSION_1_6_1:
-		{
-			m_Protocol = new cProtocol161(m_Client);
-			return true;
-		}
-		case PROTO_VERSION_1_6_2:
-		case PROTO_VERSION_1_6_3:
-		case PROTO_VERSION_1_6_4:
-		{
-			m_Protocol = new cProtocol162(m_Client);
-			return true;
-		}
-	}
-	m_Protocol = new cProtocol125(m_Client);
-	return true;
 }
 
 
@@ -971,6 +905,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	{
 		return false;
 	}
+	m_Client->SetProtocolVersion(ProtocolVersion);
 	switch (ProtocolVersion)
 	{
 		case PROTO_VERSION_1_7_2:
@@ -978,9 +913,18 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
@@ -990,11 +934,41 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			AString ServerAddress;
 			short ServerPort;
 			UInt32 NextState;
-			m_Buffer.ReadVarUTF8String(ServerAddress);
-			m_Buffer.ReadBEShort(ServerPort);
-			m_Buffer.ReadVarInt(NextState);
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			return true;
+		}
+		case PROTO_VERSION_1_8_0:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
 			return true;
 		}
 	}
@@ -1003,82 +977,6 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 	);
 	m_Client->Kick("Unsupported protocol version");
 	return false;
-}
-
-
-
-
-
-void cProtocolRecognizer::SendLengthlessServerPing(void)
-{
-	AString Reply;
-	cServer * Server = cRoot::Get()->GetServer();
-	switch (cRoot::Get()->GetPrimaryServerVersion())
-	{
-		case PROTO_VERSION_1_2_5:
-		case PROTO_VERSION_1_3_2:
-		{
-			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3099#Server_List_Ping_.280xFE.29
-			Printf(Reply, "%s%s%i%s%i",
-				Server->GetDescription().c_str(),
-				cChatColor::Delimiter,
-				Server->GetNumPlayers(),
-				cChatColor::Delimiter,
-				Server->GetMaxPlayers()
-			);
-			break;
-		}
-		
-		case PROTO_VERSION_1_4_2:
-		case PROTO_VERSION_1_4_4:
-		case PROTO_VERSION_1_4_6:
-		case PROTO_VERSION_1_5_0:
-		case PROTO_VERSION_1_5_2:
-		case PROTO_VERSION_1_6_1:
-		case PROTO_VERSION_1_6_2:
-		case PROTO_VERSION_1_6_3:
-		case PROTO_VERSION_1_6_4:
-		{
-			// The server list ping now has 1 more byte of "magic". Mojang just loves to complicate stuff.
-			// http://wiki.vg/wiki/index.php?title=Protocol&oldid=3101#Server_List_Ping_.280xFE.29
-			// _X 2012_10_31: I know that this needn't eat the byte, since it still may be in transit.
-			//    Who cares? We're disconnecting anyway.
-			m_Buffer.ResetRead();
-			if (m_Buffer.CanReadBytes(2))
-			{
-				Byte val;
-				m_Buffer.ReadByte(val);  // Packet type - Serverlist ping
-				m_Buffer.ReadByte(val);  // 0x01 magic value
-				ASSERT(val == 0x01);
-			}
-			
-			// http://wiki.vg/wiki/index.php?title=Server_List_Ping&oldid=3100
-			AString NumPlayers;
-			Printf(NumPlayers, "%d", Server->GetNumPlayers());
-			AString MaxPlayers;
-			Printf(MaxPlayers, "%d", Server->GetMaxPlayers());
-			
-			AString ProtocolVersionNum;
-			Printf(ProtocolVersionNum, "%d", cRoot::Get()->GetPrimaryServerVersion());
-			AString ProtocolVersionTxt(GetVersionTextFromInt(cRoot::Get()->GetPrimaryServerVersion()));
-
-			// Cannot use Printf() because of in-string NUL bytes.
-			Reply = cChatColor::Delimiter;
-			Reply.append("1");
-			Reply.push_back(0);
-			Reply.append(ProtocolVersionNum);
-			Reply.push_back(0);
-			Reply.append(ProtocolVersionTxt);
-			Reply.push_back(0);
-			Reply.append(Server->GetDescription());
-			Reply.push_back(0);
-			Reply.append(NumPlayers);
-			Reply.push_back(0);
-			Reply.append(MaxPlayers);
-			break;
-		}
-	}  // switch (m_PrimaryServerVersion)
-	m_Client->Kick(Reply);
 }
 
 

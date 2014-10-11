@@ -3,6 +3,9 @@
 local mobdebugfound, mobdebug = pcall(require, "mobdebug")
 if mobdebugfound then mobdebug.start() end
 
+-- Disable buffering for stdout, so that the results appear immediately:
+io.output():setvbuf("no")
+
 -- The list of valid arguments that the ToLua scripts can process:
 local KnownArgs = {
 	['v'] = true,

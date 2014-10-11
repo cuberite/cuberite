@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 	BLOCKTYPE * WritePosition = &TestBuffer[WritePosIdx];
 	memset(TestBuffer, 0x03, sizeof(TestBuffer));
 	size_t LastReportedStep = 1;
-	for (size_t idx = 0; idx < 5000; idx += 7)
+	for (size_t idx = 0; idx < 5000; idx += 73)
 	{
 		if (idx / 500 != LastReportedStep)
 		{
@@ -53,7 +53,7 @@ int main(int argc, char ** argv)
 			LastReportedStep = idx / 500;
 		}
 
-		for (size_t len = 3; len < 1000; len += 13)
+		for (size_t len = 3; len < 700; len += 13)
 		{
 			Data.CopyBlockTypes(WritePosition, idx, len);
 

@@ -19,7 +19,6 @@ public:
 	cItemShovelHandler(int a_ItemType)
 		: cItemHandler(a_ItemType)
 	{
-
 	}
 
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override

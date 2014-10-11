@@ -1,3 +1,5 @@
+
+
 macro (add_flags_lnk FLAGS)
 	set(CMAKE_EXE_LINKER_FLAGS             "${CMAKE_EXE_LINKER_FLAGS}             ${FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS_DEBUG       "${CMAKE_EXE_LINKER_FLAGS_DEBUG}       ${FLAGS}")
@@ -57,12 +59,25 @@ macro(set_flags)
 		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
 		set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
 	elseif(APPLE)
-		#on os x clang adds pthread for us but we need to add it for gcc
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                		OUTPUT_VARIABLE GCC_VERSION)
+                endif()
+                
+                if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND (NOT GCC_VERSION VERSION_GREATER 4.6))
+	                set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++0x")
+			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++0x")
+			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++0x")
+			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++0x")
+		else()
 			set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
 			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
 			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
+		endif()
+		#on os x clang adds pthread for us but we need to add it for gcc
+		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			add_flags_cxx("-stdlib=libc++")
 			add_flags_lnk("-stdlib=libc++")
 		else()
@@ -75,8 +90,17 @@ macro(set_flags)
 			add_flags_cxx("-pthread")
 		endif()
 
-		# Make CLang use C++11, otherwise MSVC2008-supported extensions don't work ("override" keyword etc.):
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                		OUTPUT_VARIABLE GCC_VERSION)
+                endif()
+                
+                if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND (NOT GCC_VERSION VERSION_GREATER 4.6))
+	                set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++0x")
+			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++0x")
+			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++0x")
+			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++0x")
+		else()
 			set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
 			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
@@ -203,6 +227,15 @@ macro(enable_profile)
 	endif()
 endmacro()
 
+#this is a hack because we can't use cmake 2.8.10 because of travis
+macro(get_clang_version)
+	execute_process(
+		COMMAND "${CMAKE_CXX_COMPILER}" "--version"
+		OUTPUT_VARIABLE CLANG_VERSION_OUTPUT)
+	string(REGEX MATCH "version ([0-9]\\.[0-9])" x ${CLANG_VERSION_OUTPUT})
+	set(CLANG_VERSION ${CMAKE_MATCH_1})
+endmacro()
+
 macro(set_exe_flags)
 	# Remove disabling the maximum warning level:
 	# clang does not like a command line that reads -Wall -Wextra -w -Wall -Wextra and does not output any warnings
@@ -221,17 +254,28 @@ macro(set_exe_flags)
 		add_flags_cxx("-ffast-math")
 
 		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			get_clang_version()
+			if ("${CLANG_VERSION}" VERSION_LESS 3.0)
+				message(FATAL_ERROR "MCServer requires clang version 3.0 or higher, version is ${CLANG_VERSION}")
+			endif()
 			# clang does not provide the __extern_always_inline macro and a part of libm depends on this when using fast-math
 			add_flags_cxx("-D__extern_always_inline=inline")
 			add_flags_cxx("-Werror -Weverything -Wno-c++98-compat-pedantic -Wno-string-conversion")
-			add_flags_cxx("-Wno-error=switch-enum -Wno-documentation -Wno-exit-time-destructors")
-			add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-padded")
-			add_flags_cxx("-Wno-error=deprecated -Wno-error=weak-vtables -Wno-error=float-equal")
-			add_flags_cxx("-Wno-error=missing-prototypes -Wno-error=non-virtual-dtor")
-			add_flags_cxx("-Wno-error=covered-switch-default -Wno-error=shadow -Wno-error=old-style-cast")
-			add_flags_cxx("-Wno-error=exit-time-destructors -Wno-error=missing-variable-declarations")
-			add_flags_cxx("-Wno-error=global-constructors -Wno-implicit-fallthrough")
-			add_flags_cxx("-Wno-error=extra-semi -Wno-weak-vtables -Wno-switch-enum")
+			add_flags_cxx("-Wno-exit-time-destructors -Wno-padded")
+			add_flags_cxx("-Wno-error=sign-conversion -Wno-error=conversion -Wno-error=deprecated")
+			add_flags_cxx("-Wno-error=missing-prototypes")
+			add_flags_cxx("-Wno-error=shadow -Wno-error=old-style-cast -Wno-error=global-constructors")
+			add_flags_cxx("-Wno-error=float-equal")
+			add_flags_cxx("-Wno-weak-vtables -Wno-switch-enum")
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.0)
+				# flags that are not present in 3.0
+				add_flags_cxx("-Wno-error=covered-switch-default -Wno-error=missing-variable-declarations")
+				add_flags_cxx("-Wno-implicit-fallthrough -Wno-error=extra-semi")
+			endif()
+			if ("${CLANG_VERSION}" VERSION_GREATER 3.1)
+				# flags introduced in 3.2
+				add_flags_cxx("-Wno-documentation")
+			endif()
 		endif()
 	endif()
 

@@ -71,7 +71,7 @@ public:
 	
 	/** Creates an entity effect by copying another
 	@param a_OtherEffect      The other effect to copy */
-	cEntityEffect & operator=(cEntityEffect a_OtherEffect);
+	cEntityEffect & operator =(cEntityEffect a_OtherEffect);
 	
 	virtual ~cEntityEffect(void) {}
 	
@@ -137,6 +137,10 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
+
+	virtual void OnActivate(cPawn & a_Target) override;
+
+	virtual void OnDeactivate(cPawn & a_Target) override;
 };
 
 
@@ -152,6 +156,10 @@ public:
 		super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
+
+	virtual void OnActivate(cPawn & a_Target) override;
+
+	virtual void OnDeactivate(cPawn & a_Target) override;
 };
 
 

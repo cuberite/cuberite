@@ -11,7 +11,7 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-
+#include "RedstonePoweredEntity.h"
 
 
 
@@ -22,7 +22,6 @@ namespace Json
 }
 
 class cClientHandle;
-class cServer;
 
 
 
@@ -31,6 +30,9 @@ class cServer;
 // tolua_begin
 class cDropSpenserEntity :
 	public cBlockEntityWithItems
+	// tolua_end
+	, public cRedstonePoweredEntity
+	// tolua_begin
 {
 	typedef cBlockEntityWithItems super;
 
@@ -47,11 +49,8 @@ public:
 	virtual ~cDropSpenserEntity();
 	
 	static const char * GetClassStatic(void) { return "cDropSpenserEntity"; }
-
-	bool LoadFromJson(const Json::Value & a_Value);
 	
 	// cBlockEntity overrides:
-	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
@@ -64,10 +63,10 @@ public:
 	/// Sets the dropspenser to dropspense an item in the next tick
 	void Activate(void);
 	
-	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
-	void SetRedstonePower(bool a_IsPowered);
-	
 	// tolua_end
+	
+	/// Sets the internal redstone power flag to "on" or "off", depending on the parameter. Calls Activate() if appropriate
+	virtual void SetRedstonePower(bool a_IsPowered) override;
 
 protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick

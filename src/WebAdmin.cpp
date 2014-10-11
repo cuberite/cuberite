@@ -43,6 +43,8 @@ public:
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
 	m_IsRunning(false),
+	m_PortsIPv4("8080"),
+	m_PortsIPv6(""),
 	m_TemplateScript("<webadmin_template>")
 {
 }
@@ -89,6 +91,8 @@ bool cWebAdmin::Init(void)
 		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
+		m_IniFile.SetValue("WebAdmin", "Port", m_PortsIPv4);
+		m_IniFile.SetValue("WebAdmin", "PortsIPv6", m_PortsIPv6);
 		m_IniFile.WriteFile("webadmin.ini");
 	}
 
@@ -100,8 +104,8 @@ bool cWebAdmin::Init(void)
 
 	LOGD("Initialising WebAdmin...");
 
-	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", "8080");
-	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", "");
+	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", m_PortsIPv4);
+	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", m_PortsIPv6);
 
 	if (!m_HTTPServer.Initialize(m_PortsIPv4, m_PortsIPv6))
 	{
@@ -131,8 +135,24 @@ bool cWebAdmin::Start(void)
 	m_TemplateScript.RegisterAPILibs();
 	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
 	{
-		LOGWARN("Could not load WebAdmin template \"%s\", using default template.", FILE_IO_PREFIX "webadmin/template.lua");
+		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
 		m_TemplateScript.Close();
+		m_HTTPServer.Stop();
+		return false;
+	}
+
+	if (!LoadLoginTemplate())
+	{
+		LOGWARN("Could not load WebAdmin login template \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
+
+		// Sets the fallback template:
+		m_LoginTemplate = \
+		"<h1>MCServer WebAdmin</h1>" \
+		"<center>" \
+		"<form method='get' action='webadmin/'>" \
+		"<input type='submit' value='Log in'>" \
+		"</form>" \
+		"</center>";
 	}
 
 	m_IsRunning = m_HTTPServer.Start(*this);
@@ -159,22 +179,22 @@ void cWebAdmin::Stop(void)
 
 
 
-AString cWebAdmin::GetTemplate()
+bool cWebAdmin::LoadLoginTemplate(void)
 {
-	AString retVal = "";
-
-	char SourceFile[] = "webadmin/template.html";
-
-	cFile f;
-	if (!f.Open(SourceFile, cFile::fmRead))
+	cFile File(FILE_IO_PREFIX "webadmin/login_template.html", cFile::fmRead);
+	if (!File.IsOpen())
 	{
-		return "";
+		return false;
 	}
 
-	// copy the file into the buffer:
-	f.ReadRestOfFile(retVal);
+	AString TemplateContent;
+	if (File.ReadRestOfFile(TemplateContent) == -1)
+	{
+		return false;
+	}
 
-	return retVal;
+	m_LoginTemplate = TemplateContent;
+	return true;
 }
 
 
@@ -198,9 +218,9 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	}
 
 	// Check if the contents should be wrapped in the template:
-	AString URL = a_Request.GetBareURL();
-	ASSERT(URL.length() > 0);
-	bool ShouldWrapInTemplate = ((URL.length() > 1) && (URL[1] != '~'));
+	AString BareURL = a_Request.GetBareURL();
+	ASSERT(BareURL.length() > 0);
+	bool ShouldWrapInTemplate = ((BareURL.length() > 1) && (BareURL[1] != '~'));
 
 	// Retrieve the request data:
 	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
@@ -215,7 +235,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	HTTPTemplateRequest TemplateRequest;
 	TemplateRequest.Request.Username = a_Request.GetAuthUsername();
 	TemplateRequest.Request.Method = a_Request.GetMethod();
-	TemplateRequest.Request.Path = URL.substr(1);
+	TemplateRequest.Request.Path = BareURL.substr(1);
 
 	if (Data->m_Form.Finish())
 	{
@@ -258,7 +278,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 		return;
 	}
 
-	AString BaseURL = GetBaseURL(URL);
+	AString BaseURL = GetBaseURL(BareURL);
 	AString Menu;
 	Template = "{CONTENT}";
 	AString FoundPlugin;
@@ -320,18 +340,100 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 void cWebAdmin::HandleRootRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
 {
 	UNUSED(a_Request);
-	static const char LoginForm[] = \
-	"<h1>MCServer WebAdmin</h1>" \
-	"<center>" \
-	"<form method='get' action='webadmin/'>" \
-	"<input type='submit' value='Log in'>" \
-	"</form>" \
-	"</center>";
+
 	cHTTPResponse Resp;
 	Resp.SetContentType("text/html");
 	a_Connection.Send(Resp);
-	a_Connection.Send(LoginForm, sizeof(LoginForm) - 1);
+	a_Connection.Send(m_LoginTemplate);
 	a_Connection.FinishResponse();
+}
+
+
+
+
+
+void cWebAdmin::HandleFileRequest(cHTTPConnection & a_Connection, cHTTPRequest & a_Request)
+{
+	AString FileURL = a_Request.GetURL();
+	std::replace(FileURL.begin(), FileURL.end(), '\\', '/');
+
+	// Remove all leading backslashes:
+	if (FileURL[0] == '/')
+	{
+		size_t FirstCharToRead = FileURL.find_first_not_of('/');
+		if (FirstCharToRead != AString::npos)
+		{
+			FileURL = FileURL.substr(FirstCharToRead);
+		}
+	}
+
+	// Remove all "../" strings:
+	ReplaceString(FileURL, "../", "");
+
+	bool LoadedSuccessfull = false;
+	AString Content = "<h2>404 Not Found</h2>";
+	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
+	if (cFile::IsFile(Path))
+	{
+		cFile File(Path, cFile::fmRead);
+		AString FileContent;
+		if (File.IsOpen() && (File.ReadRestOfFile(FileContent) != -1))
+		{
+			LoadedSuccessfull = true;
+			Content = FileContent;
+		}
+	}
+
+	// Find content type (The currently method is very bad. We should change it later)
+	AString ContentType = "text/html";
+	size_t LastPointPosition = Path.find_last_of('.');
+	if (LoadedSuccessfull && (LastPointPosition != AString::npos) && (LastPointPosition < Path.length()))
+	{
+		AString FileExtension = Path.substr(LastPointPosition + 1);
+		ContentType = GetContentTypeFromFileExt(FileExtension);
+	}
+
+	// Send the response:
+	cHTTPResponse Resp;
+	Resp.SetContentType(ContentType);
+	a_Connection.Send(Resp);
+	a_Connection.Send(Content);
+	a_Connection.FinishResponse();
+}
+
+
+
+
+
+AString cWebAdmin::GetContentTypeFromFileExt(const AString & a_FileExtension)
+{
+	static bool IsInitialized = false;
+	static std::map<AString, AString> ContentTypeMap;
+	if (!IsInitialized)
+	{
+		// Initialize the ContentTypeMap:
+		ContentTypeMap["png"]  = "image/png";
+		ContentTypeMap["fif"]  = "image/fif";
+		ContentTypeMap["gif"]  = "image/gif";
+		ContentTypeMap["jpeg"] = "image/jpeg";
+		ContentTypeMap["jpg"]  = "image/jpeg";
+		ContentTypeMap["jpe"]  = "image/jpeg";
+		ContentTypeMap["tiff"] = "image/tiff";
+		ContentTypeMap["ico"]  = "image/ico";
+		ContentTypeMap["csv"]  = "image/comma-separated-values";
+		ContentTypeMap["css"]  = "text/css";
+		ContentTypeMap["js"]   = "text/javascript";
+		ContentTypeMap["txt"]  = "text/plain";
+		ContentTypeMap["rtx"]  = "text/richtext";
+		ContentTypeMap["xml"]  = "text/xml";
+	}
+
+	AString FileExtension = StrToLower(a_FileExtension);
+	if (ContentTypeMap.find(a_FileExtension) == ContentTypeMap.end())
+	{
+		return "text/html";
+	}
+	return ContentTypeMap[FileExtension];
 }
 
 
@@ -404,6 +506,7 @@ AString cWebAdmin::GetDefaultPage(void)
 
 
 
+
 AString cWebAdmin::GetBaseURL( const AString& a_URL)
 {
 	return GetBaseURL(StringSplit(a_URL, "/"));
@@ -437,6 +540,38 @@ AString cWebAdmin::GetHTMLEscapedString(const AString & a_Input)
 		}  // switch (a_Input[i])
 	}  // for i - a_Input[]
 
+	return dst;
+}
+
+
+
+
+
+AString cWebAdmin::GetURLEncodedString(const AString & a_Input)
+{
+	// Translation table from nibble to hex:
+	static const char Hex[] = "0123456789abcdef";
+	
+	// Preallocate the output to match input:
+	AString dst;
+	size_t len = a_Input.length();
+	dst.reserve(len);
+	
+	// Loop over input and substitute whatever is needed:
+	for (size_t i = 0; i < len; i++)
+	{
+		char ch = a_Input[i];
+		if (isalnum(ch) || (ch == '-') || (ch == '_') || (ch == '.') || (ch == '~'))
+		{
+			dst.push_back(ch);
+		}
+		else
+		{
+			dst.push_back('%');
+			dst.push_back(Hex[(ch >> 4) & 0x0f]);
+			dst.push_back(Hex[ch & 0x0f]);
+		}
+	}  // for i - a_Input[]
 	return dst;
 }
 
@@ -518,7 +653,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	}
 	else
 	{
-		// TODO: Handle other requests
+		HandleFileRequest(a_Connection, a_Request);
 	}
 
 	// Delete any request data assigned to the request:
@@ -538,7 +673,6 @@ void cWebAdmin::cWebadminRequestData::OnBody(const char * a_Data, size_t a_Size)
 {
 	m_Form.Parse(a_Data, a_Size);
 }
-
 
 
 

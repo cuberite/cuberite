@@ -14,7 +14,6 @@ namespace Json
 }
 
 class cClientHandle;
-class cServer;
 
 
 
@@ -45,11 +44,8 @@ public:
 	virtual ~cFurnaceEntity();
 
 	static const char * GetClassStatic() { return "cFurnaceEntity"; }
-
-	bool LoadFromJson(const Json::Value & a_Value);
 	
 	// cBlockEntity overrides:
-	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
@@ -105,7 +101,7 @@ protected:
 	NIBBLETYPE m_BlockMeta;
 
 	/// The recipe for the current input slot
-	const cFurnaceRecipe::Recipe * m_CurrentRecipe;
+	const cFurnaceRecipe::cRecipe * m_CurrentRecipe;
 	
 	/// The item that is being smelted
 	cItem m_LastInput;

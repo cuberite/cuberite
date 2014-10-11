@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 2.8.2)
+cmake_minimum_required (VERSION 2.8.7)
 
 # Without this, the MSVC variable isn't defined for MSVC builds ( http://www.cmake.org/pipermail/cmake/2011-November/047130.html )
 enable_language(CXX C)
@@ -16,6 +16,25 @@ endif()
 
 if(DEFINED ENV{TRAVIS_BUILD_WITH_COVERAGE})
 	set(BUILD_WITH_COVERAGE $ENV{TRAVIS_BUILD_WITH_COVERAGE})
+endif()
+
+if(DEFINED ENV{MCSERVER_BUILD_ID})
+	set(BUILD_ID $ENV{MCSERVER_BUILD_ID})
+	set(BUILD_SERIES_NAME $ENV{MCSERVER_BUILD_SERIES_NAME})
+	set(BUILD_DATETIME $ENV{MCSERVER_BUILD_DATETIME})
+	if(DEFINED ENV{MCSERVER_BUILD_COMMIT_ID})
+		set(BUILD_COMMIT_ID $ENV{MCSERVER_BUILD_COMMIT_ID})
+	else()
+		message("Commit id not set, attempting to determine id from git")
+		execute_process(
+			COMMAND git rev-parse HEAD
+			RESULT_VARIABLE GIT_EXECUTED
+			OUTPUT_VARIABLE BUILD_COMMIT_ID)
+			string(STRIP ${BUILD_COMMIT_ID} BUILD_COMMIT_ID)
+		if (NOT (GIT_EXECUTED EQUAL 0))
+			message(FATAL_ERROR "Could not identifiy git commit id")
+		endif()
+	endif()
 endif()
 
 # This has to be done before any flags have been set up.
@@ -53,6 +72,14 @@ endif()
 
 project (MCServer)
 
+# Set options for SQLiteCpp, disable all their tests and lints:
+set(SQLITECPP_RUN_CPPLINT     OFF CACHE BOOL "Run cpplint.py tool for Google C++ StyleGuide."  FORCE)
+set(SQLITECPP_RUN_CPPCHECK    OFF CACHE BOOL "Run cppcheck C++ static analysis tool."          FORCE)
+set(SQLITECPP_RUN_DOXYGEN     OFF CACHE BOOL "Run Doxygen C++ documentation tool."             FORCE)
+set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                                 FORCE)
+set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
+set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
+
 # Include all the libraries:
 add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
@@ -60,8 +87,15 @@ add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)
 add_subdirectory(lib/tolua++/)
 add_subdirectory(lib/sqlite/)
+add_subdirectory(lib/SQLiteCpp/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
+
+# Add proper include directories so that SQLiteCpp can find SQLite3:
+get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
+set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
+set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
+set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
 
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)

@@ -9,7 +9,7 @@
 #pragma once
 
 #include <string>
-
+#include <limits>
 
 
 
@@ -43,10 +43,16 @@ extern AStringVector StringSplitAndTrim(const AString & str, const AString & del
 extern AString TrimString(const AString & str);  // tolua_export
 
 /// In-place string conversion to uppercase; returns the same string
-extern AString & StrToUpper(AString & s);
+extern AString & InPlaceUppercase(AString & s);
 
 /// In-place string conversion to lowercase; returns the same string
-extern AString & StrToLower(AString & s);
+extern AString & InPlaceLowercase(AString & s);
+
+/** Returns an upper-cased copy of the string */
+extern AString StrToUpper(const AString & s);
+
+/** Returns a lower-cased copy of the string */
+extern AString StrToLower(const AString & s);
 
 /// Case-insensitive string comparison; returns 0 if the strings are the same
 extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
@@ -60,8 +66,8 @@ extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AS
 /// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 
-/// Converts a UTF-8 string into a UTF-16 BE string, packing that back into AString; return a ref to a_UTF16
-extern AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16);
+/// Converts a UTF-8 string into a UTF-16 BE string; returns a ref to a_UTF16
+extern AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length);
 
 /// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
 extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
@@ -92,6 +98,73 @@ extern int GetBEInt(const char * a_Mem);
 
 /// Writes four bytes to the specified memory location so that they interpret as BigEndian int
 extern void SetBEInt(char * a_Mem, Int32 a_Value);
+
+/** Splits a string that has embedded \0 characters, on those characters.
+a_Output is first cleared and then each separate string is pushed back into a_Output.
+Returns true if there are at least two strings in a_Output (there was at least one \0 separator). */
+extern bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Output);
+
+/// Parses any integer type. Checks bounds and returns errors out of band.
+template <class T>
+bool StringToInteger(const AString & a_str, T & a_Num)
+{
+	size_t i = 0;
+	bool positive = true;
+	T result = 0;
+	if (a_str[0] == '+')
+	{
+		i++;
+	}
+	else if (a_str[0] == '-')
+	{
+		i++;
+		positive = false;
+	}
+	if (positive)
+	{
+		for (size_t size = a_str.size(); i < size; i++)
+		{
+			if ((a_str[i] < '0') || (a_str[i] > '9'))
+			{
+				return false;
+			}
+			if (std::numeric_limits<T>::max() / 10 < result)
+			{
+				return false;
+			}
+			result *= 10;
+			T digit = a_str[i] - '0';
+			if (std::numeric_limits<T>::max() - digit < result)
+			{
+				return false;
+			}
+			result += digit;
+		}
+	}
+	else
+	{
+		for (size_t size = a_str.size(); i < size; i++)
+		{
+			if ((a_str[i] < '0') || (a_str[i] > '9'))
+			{
+				return false;
+			}
+			if (std::numeric_limits<T>::min() / 10 > result)
+			{
+				return false;
+			}
+			result *= 10;
+			T digit = a_str[i] - '0';
+			if (std::numeric_limits<T>::min() + digit > result)
+			{
+				return false;
+			}
+			result -= digit;
+		}
+	}
+	a_Num = result;
+	return true;
+}
 
 // If you have any other string helper functions, declare them here
 

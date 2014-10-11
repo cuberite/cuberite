@@ -310,7 +310,7 @@ int cParsedNBT::FindTagByPath(int a_Tag, const AString & a_Path) const
 		{
 			continue;
 		}
-		Tag = FindChildByName(Tag, a_Path.c_str() + Begin, i - Begin - 1);
+		Tag = FindChildByName(Tag, a_Path.c_str() + Begin, i - Begin);
 		if (Tag < 0)
 		{
 			return -1;

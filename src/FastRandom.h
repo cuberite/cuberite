@@ -45,7 +45,7 @@ public:
 	float NextFloat(float a_Range, int a_Salt);
 
 	/** Returns a random float between 0 and 1. */
-	float NextFloat(void) { return NextFloat(1); };
+	float NextFloat(void) { return NextFloat(1); }
 
 	/** Returns a random int in the range [a_Begin .. a_End] */
 	int GenerateRandomInteger(int a_Begin, int a_End);

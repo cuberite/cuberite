@@ -33,10 +33,12 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 	PM:AddHook(cPluginManager.HOOK_CHUNK_UNLOADING,              OnChunkUnloading);
 	PM:AddHook(cPluginManager.HOOK_WORLD_STARTED,                OnWorldStarted);
+	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
+	PM:BindCommand("/nick",    "debuggers", HandleNickCmd,         "- Gives you a custom name");
 	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
 	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
 	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
@@ -64,6 +66,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
 	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z");
 	PM:BindCommand("/rmitem",  "debuggers", HandleRMItem,          "- Remove the specified item from the inventory.");
+	PM:BindCommand("/pickups", "debuggers", HandlePickups,         "- Spawns random pickups around you");
+	PM:BindCommand("/poof",    "debuggers", HandlePoof,            "- Nudges pickups close to you away from you");
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -80,6 +84,8 @@ function Initialize(Plugin)
 	
 	TestBlockAreasString()
 	TestStringBase64()
+	-- TestUUIDFromName()
+	-- TestRankMgr()
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -269,6 +275,94 @@ function TestStringBase64()
 	local UnBase64 = Base64Decode(Base64)
 	
 	assert(UnBase64 == s)
+end
+
+
+
+
+
+function TestUUIDFromName()
+	LOG("Testing UUID-from-Name resolution...")
+	
+	-- Test by querying a few existing names, along with a non-existent one:
+	local PlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+		"nonexistent_player",
+	}
+	-- WARNING: Blocking operation! DO NOT USE IN TICK THREAD!
+	local UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames)
+	
+	-- Log the results:
+	for _, name in ipairs(PlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+	
+	-- Test once more with the same players, valid-only. This should go directly from cache, so fast.
+	LOG("Testing again with the same valid players...")
+	local ValidPlayerNames =
+	{
+		"xoft",
+		"aloe_vera",
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(ValidPlayerNames);
+
+	-- Log the results:
+	for _, name in ipairs(ValidPlayerNames) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	-- Test yet again, cache-only:
+	LOG("Testing once more, cache only...")
+	local PlayerNames3 =
+	{
+		"xoft",
+		"aloe_vera",
+		"notch",  -- Valid player name, but not cached (most likely :)
+	}
+	UUIDs = cMojangAPI:GetUUIDsFromPlayerNames(PlayerNames3, true)
+	
+	-- Log the results:
+	for _, name in ipairs(PlayerNames3) do
+		local UUID = UUIDs[name]
+		if (UUID == nil) then
+			LOG("  UUID(" .. name .. ") not found.")
+		else
+			LOG("  UUID(" .. name .. ") = \"" .. UUID .. "\"")
+		end
+	end
+
+	LOG("UUID-from-Name resolution tests finished.")
+	
+	LOG("Performing a Name-from-UUID test...")
+	-- local NameToTest = "aloe_vera"
+	local NameToTest = "xoft"
+	local Name = cMojangAPI:GetPlayerNameFromUUID(UUIDs[NameToTest])
+	LOG("Name(" .. UUIDs[NameToTest] .. ") = '" .. Name .. "', expected '" .. NameToTest .. "'.")
+	LOG("Name-from-UUID test finished.")
+end
+
+
+
+
+
+function TestRankMgr()
+	LOG("Testing the rank manager")
+	cRankManager:AddRank("LuaRank")
+	cRankManager:AddGroup("LuaTestGroup")
+	cRankManager:AddGroupToRank("LuaTestGroup", "LuaRank")
+	cRankManager:AddPermissionToGroup("luaperm", "LuaTestGroup")
 end
 
 
@@ -671,6 +765,21 @@ function round(num, idp)
 	local mult = 10^(idp or 0)
 	if num >= 0 then return math.floor(num * mult + 0.5) / mult
 	else return math.ceil(num * mult - 0.5) / mult end
+end
+
+
+
+
+
+function HandleNickCmd(Split, Player)
+	if (Split[2] == nil) then
+		Player:SendMessage("Usage: /nick [CustomName]");
+		return true;
+	end
+
+	Player:SetCustomName(Split[2]);
+	Player:SendMessageSuccess("Custom name setted to " .. Player:GetCustomName() .. "!")
+	return true
 end
 
 
@@ -1409,7 +1518,7 @@ function OnPlayerJoined(a_Player)
 	-- Test composite chat chaining:
 	a_Player:SendMessage(cCompositeChat()
 		:AddTextPart("Hello, ")
-		:AddUrlPart(a_Player:GetName(), "www.mc-server.org", "u@2")
+		:AddUrlPart(a_Player:GetName(), "http://www.mc-server.org", "u@2")
 		:AddSuggestCommandPart(", and welcome.", "/help", "u")
 		:AddRunCommandPart(" SetDay", "/time set 0")
 	)
@@ -1450,6 +1559,72 @@ function OnWorldStarted(a_World)
 			a_World:SetChunkAlwaysTicked(0, 0, true)
 		end
 	)
+end
+
+
+
+
+
+function OnProjectileHitBlock(a_ProjectileEntity, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockHitPos)
+	-- This simple test is for testing issue #1326 - simply declaring this hook would crash the server upon call
+	LOG("Projectile hit block")
+	LOG("  Projectile EntityID: " .. a_ProjectileEntity:GetUniqueID())
+	LOG("  Block: {" .. a_BlockX .. ", " .. a_BlockY .. ", " .. a_BlockZ .. "}, face " .. a_BlockFace)
+	LOG("  HitPos: {" .. a_BlockHitPos.x .. ", " .. a_BlockHitPos.y .. ", " .. a_BlockHitPos.z .. "}")
+end
+
+
+
+
+
+local PossibleItems =
+{
+	cItem(E_ITEM_DIAMOND),
+	cItem(E_ITEM_GOLD),
+	cItem(E_ITEM_IRON),
+	cItem(E_ITEM_DYE, 1, E_META_DYE_BLUE),  -- Lapis lazuli
+	cItem(E_ITEM_COAL),
+}
+
+
+
+
+
+function HandlePickups(a_Split, a_Player)
+	local PlayerX = a_Player:GetPosX()
+	local PlayerY = a_Player:GetPosY()
+	local PlayerZ = a_Player:GetPosZ()
+	local World = a_Player:GetWorld()
+	local Range = 12
+	for x = 0, Range do for z = 0, Range do
+		local px = PlayerX + x - Range / 2
+		local pz = PlayerZ + z - Range / 2
+		local Items = cItems()
+		Items:Add(PossibleItems[math.random(#PossibleItems)])
+		World:SpawnItemPickups(Items, px, PlayerY, pz, 0)
+	end end  -- for z, for x
+	return true
+end
+
+
+
+
+function HandlePoof(a_Split, a_Player)
+	local PlayerPos = Vector3d(a_Player:GetPosition())  -- Create a copy of the position
+	PlayerPos.y = PlayerPos.y - 1
+	local Box = cBoundingBox(PlayerPos, 4, 2)
+	local NumEntities = 0
+	a_Player:GetWorld():ForEachEntityInBox(Box,
+		function (a_Entity)
+			if not(a_Entity:IsPlayer()) then
+				local AddSpeed = a_Entity:GetPosition() - PlayerPos  -- Speed away from the player
+				a_Entity:AddSpeed(AddSpeed * 32 / (AddSpeed:SqrLength() + 1))  -- The further away, the less speed to add
+				NumEntities = NumEntities + 1
+			end
+		end
+	)
+	a_Player:SendMessage("Poof! (" .. NumEntities .. " entities)")
+	return true
 end
 
 

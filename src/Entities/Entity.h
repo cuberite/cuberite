@@ -27,9 +27,9 @@
 		return super::GetClass(); \
 	}
 
-#define POSX_TOINT (int)floor(GetPosX())
-#define POSY_TOINT (int)floor(GetPosY())
-#define POSZ_TOINT (int)floor(GetPosZ())
+#define POSX_TOINT FloorC(GetPosX())
+#define POSY_TOINT FloorC(GetPosY())
+#define POSZ_TOINT FloorC(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
@@ -128,20 +128,20 @@ public:
 		esFireworkExploding      = 17,
 	} ;
 	
-	enum
-	{
-		FIRE_TICKS_PER_DAMAGE = 10,  ///< How many ticks to wait between damaging an entity when it stands in fire
-		FIRE_DAMAGE = 1,             ///< How much damage to deal when standing in fire
-		LAVA_TICKS_PER_DAMAGE = 10,  ///< How many ticks to wait between damaging an entity when it stands in lava
-		LAVA_DAMAGE = 5,             ///< How much damage to deal when standing in lava
-		BURN_TICKS_PER_DAMAGE = 20,  ///< How many ticks to wait between damaging an entity when it is burning
-		BURN_DAMAGE = 1,             ///< How much damage to deal when the entity is burning
-		BURN_TICKS = 200,            ///< How long to keep an entity burning after it has stood in lava / fire
-		MAX_AIR_LEVEL = 300,         ///< Maximum air an entity can have
-		DROWNING_TICKS = 20,         ///< Number of ticks per heart of damage
-		VOID_BOUNDARY = -46,         ///< At what position Y to begin applying void damage
-		FALL_DAMAGE_HEIGHT = 4       ///< At what position Y fall damage is applied
-	} ;
+	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
+	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
+	static const int LAVA_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in lava
+	static const int LAVA_DAMAGE           = 5;    ///< Damage to deal when standing in lava
+	static const int BURN_TICKS_PER_DAMAGE = 20;   ///< Ticks to wait between damaging an entity when it is burning
+	static const int BURN_DAMAGE           = 1;    ///< Damage to deal when the entity is burning
+	
+	static const int BURN_TICKS            = 200;  ///< Ticks to keep an entity burning after it has stood in lava / fire
+	
+	static const int MAX_AIR_LEVEL         = 300;  ///< Maximum air an entity can have
+	static const int DROWNING_TICKS        = 20;   ///< Number of ticks per heart of damage
+	
+	static const int VOID_BOUNDARY         = -46;  ///< Y position to begin applying void damage
+	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
@@ -447,7 +447,7 @@ public:
 	// tolua_end
 	
 	/// Called when the specified player right-clicks this entity
-	virtual void OnRightClicked(cPlayer &) {}
+	virtual void OnRightClicked(cPlayer & a_Player) {}
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL)
@@ -534,6 +534,12 @@ protected:
 	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
 	
 	virtual void Destroyed(void) {}  // Called after the entity has been destroyed
+
+	/** Applies friction to an entity
+	@param a_Speed The speed vector to apply changes to
+	@param a_SlowdownMultiplier The factor to reduce the speed by
+	*/
+	static void ApplyFriction(Vector3d & a_Speed, double a_SlowdownMultiplier, float a_Dt);
 
 	/** Called in each tick to handle air-related processing i.e. drowning */
 	virtual void HandleAir(void);

@@ -76,7 +76,9 @@ public:
 	
 	cFastNBTTag(eTagType a_Type, int a_Parent) :
 		m_Type(a_Type),
+		m_NameStart(0),
 		m_NameLength(0),
+		m_DataStart(0),
 		m_DataLength(0),
 		m_Parent(a_Parent),
 		m_PrevSibling(-1),
@@ -88,7 +90,9 @@ public:
 
 	cFastNBTTag(eTagType a_Type, int a_Parent, int a_PrevSibling) :
 		m_Type(a_Type),
+		m_NameStart(0),
 		m_NameLength(0),
+		m_DataStart(0),
 		m_DataLength(0),
 		m_Parent(a_Parent),
 		m_PrevSibling(a_PrevSibling),
@@ -209,8 +213,8 @@ public:
 		// If your platform produces a compiler error here, you'll need to add code that manually decodes 32-bit floats
 		char Check1[5 - sizeof(float)];  // Fails if sizeof(float) > 4
 		char Check2[sizeof(float) - 3];  // Fails if sizeof(float) < 4
-		UNUSED(Check1);
-		UNUSED(Check2);
+		UNUSED_VAR(Check1);
+		UNUSED_VAR(Check2);
 		
 		Int32 i = GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 		float f;
@@ -225,8 +229,8 @@ public:
 		// If your platform produces a compiler error here, you'll need to add code that manually decodes 64-bit doubles
 		char Check1[9 - sizeof(double)];  // Fails if sizeof(double) > 8
 		char Check2[sizeof(double) - 7];  // Fails if sizeof(double) < 8
-		UNUSED(Check1);
-		UNUSED(Check2);
+		UNUSED_VAR(Check1);
+		UNUSED_VAR(Check2);
 
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Double);
 		return NetworkToHostDouble8(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);

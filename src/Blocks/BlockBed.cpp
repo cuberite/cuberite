@@ -4,6 +4,15 @@
 
 
 
+#include "BroadcastInterface.h"
+#include "ChunkInterface.h"
+#include "Entities/../World.h"
+#include "Entities/Player.h"
+#include "WorldInterface.h"
+
+
+
+
 
 void cBlockBedHandler::OnPlacedByPlayer(
 	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
@@ -15,7 +24,7 @@ void cBlockBedHandler::OnPlacedByPlayer(
 	if (a_BlockMeta < 8)
 	{
 		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
-		a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
+		a_ChunkInterface.SetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
 	}
 }
 

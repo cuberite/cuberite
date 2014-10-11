@@ -24,39 +24,49 @@ The strings need to be lowercase (for more efficient comparisons in StringToMobT
 */
 static const struct
 {
-	cMonster::eType m_Type;
+	eMonsterType m_Type;
 	const char * m_lcName;
 } g_MobTypeNames[] =
 {
-	{cMonster::mtBat,          "bat"},
-	{cMonster::mtBlaze,        "blaze"},
-	{cMonster::mtCaveSpider,   "cavespider"},
-	{cMonster::mtChicken,      "chicken"},
-	{cMonster::mtCow,          "cow"},
-	{cMonster::mtCreeper,      "creeper"},
-	{cMonster::mtEnderman,     "enderman"},
-	{cMonster::mtEnderDragon,  "enderdragon"},
-	{cMonster::mtGhast,        "ghast"},
-	{cMonster::mtHorse,        "horse"},
-	{cMonster::mtIronGolem,    "irongolem"},
-	{cMonster::mtMagmaCube,    "magmacube"},
-	{cMonster::mtMooshroom,    "mooshroom"},
-	{cMonster::mtOcelot,       "ocelot"},
-	{cMonster::mtPig,          "pig"},
-	{cMonster::mtSheep,        "sheep"},
-	{cMonster::mtSilverfish,   "silverfish"},
-	{cMonster::mtSkeleton,     "skeleton"},
-	{cMonster::mtSlime,        "slime"},
-	{cMonster::mtSnowGolem,    "snowgolem"},
-	{cMonster::mtSpider,       "spider"},
-	{cMonster::mtSquid,        "squid"},
-	{cMonster::mtVillager,     "villager"},
-	{cMonster::mtWitch,        "witch"},
-	{cMonster::mtWither,       "wither"},
-	{cMonster::mtWolf,         "wolf"},
-	{cMonster::mtZombie,       "zombie"},
-	{cMonster::mtZombiePigman, "zombiepigman"},
+	{mtBat,          "bat"},
+	{mtBlaze,        "blaze"},
+	{mtCaveSpider,   "cavespider"},
+	{mtChicken,      "chicken"},
+	{mtCow,          "cow"},
+	{mtCreeper,      "creeper"},
+	{mtEnderman,     "enderman"},
+	{mtEnderDragon,  "enderdragon"},
+	{mtGhast,        "ghast"},
+	{mtHorse,        "horse"},
+	{mtIronGolem,    "irongolem"},
+	{mtMagmaCube,    "magmacube"},
+	{mtMooshroom,    "mooshroom"},
+	{mtOcelot,       "ocelot"},
+	{mtPig,          "pig"},
+	{mtSheep,        "sheep"},
+	{mtSilverfish,   "silverfish"},
+	{mtSkeleton,     "skeleton"},
+	{mtSlime,        "slime"},
+	{mtSnowGolem,    "snowgolem"},
+	{mtSpider,       "spider"},
+	{mtSquid,        "squid"},
+	{mtVillager,     "villager"},
+	{mtWitch,        "witch"},
+	{mtWither,       "wither"},
+	{mtWolf,         "wolf"},
+	{mtZombie,       "zombie"},
+	{mtZombiePigman, "zombiepigman"},
 } ;
+
+
+
+
+
+eMonsterType StringToMobType(const AString & a_MobString)
+{
+	LOGWARNING("%s: Function is obsolete, use cMonster::StringToMobType() instead", __FUNCTION__);
+	return cMonster::StringToMobType(a_MobString);
+}
 
 
 
@@ -65,7 +75,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
 	: super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
@@ -75,6 +85,8 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
+	, m_CustomName("")
+	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
 	, m_AttackRate(3)
@@ -89,6 +101,7 @@ cMonster::cMonster(const AString & a_ConfigName, eType a_MobType, const AString 
 	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
+	, m_RelativeWalkSpeed(1.0)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -276,11 +289,13 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
 			{
 				m_bOnGround = false;
-				AddSpeedY(5.2);  // Jump!!
+
+				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
+				AddPosY(1.2);  // Jump!!
 			}
 		}
 
-		Vector3f Distance = m_Destination - GetPosition();
+		Vector3d Distance = m_Destination - GetPosition();
 		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
 			Distance.y = 0;
@@ -288,22 +303,33 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 			if (m_bOnGround)
 			{
-				Distance *= 2.5;
+				Distance *= 2.5f;
+			}
+			else if (IsSwimming())
+			{
+				Distance *= 1.3f;
 			}
 			else
 			{
 				// Don't let the mob move too much if he's falling.
-				Distance *= 0.25;
+				Distance *= 0.25f;
 			}
+
+			// Apply walk speed:
+			Distance *= m_RelativeWalkSpeed;
 
 			AddSpeedX(Distance.x);
 			AddSpeedZ(Distance.z);
 
+			// It's too buggy!
+			/*
 			if (m_EMState == ESCAPING)
-			{  // Runs Faster when escaping :D otherwise they just walk away
+			{
+				// Runs Faster when escaping :D otherwise they just walk away
 				SetSpeedX (GetSpeedX() * 2.f);
 				SetSpeedZ (GetSpeedZ() * 2.f);
 			}
+			*/
 		}
 		else
 		{
@@ -475,50 +501,50 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	switch (m_MobType)
 	{
 		// Animals
-		case cMonster::mtChicken:
-		case cMonster::mtCow:
-		case cMonster::mtHorse:
-		case cMonster::mtPig:
-		case cMonster::mtSheep:
-		case cMonster::mtSquid:
-		case cMonster::mtMooshroom:
-		case cMonster::mtOcelot:
-		case cMonster::mtWolf:
+		case mtChicken:
+		case mtCow:
+		case mtHorse:
+		case mtPig:
+		case mtSheep:
+		case mtSquid:
+		case mtMooshroom:
+		case mtOcelot:
+		case mtWolf:
 		{
 			Reward = m_World->GetTickRandomNumber(2) + 1;
 			break;
 		}
 
 		// Monsters
-		case cMonster::mtCaveSpider:
-		case cMonster::mtCreeper:
-		case cMonster::mtEnderman:
-		case cMonster::mtGhast:
-		case cMonster::mtSilverfish:
-		case cMonster::mtSkeleton:
-		case cMonster::mtSpider:
-		case cMonster::mtWitch:
-		case cMonster::mtZombie:
-		case cMonster::mtZombiePigman:
-		case cMonster::mtSlime:
-		case cMonster::mtMagmaCube:
+		case mtCaveSpider:
+		case mtCreeper:
+		case mtEnderman:
+		case mtGhast:
+		case mtSilverfish:
+		case mtSkeleton:
+		case mtSpider:
+		case mtWitch:
+		case mtZombie:
+		case mtZombiePigman:
+		case mtSlime:
+		case mtMagmaCube:
 		{
 			Reward = 6 + (m_World->GetTickRandomNumber(2));
 			break;
 		}
-		case cMonster::mtBlaze:
+		case mtBlaze:
 		{
 			Reward = 10;
 			break;
 		}
 
 		// Bosses
-		case cMonster::mtEnderDragon:
+		case mtEnderDragon:
 		{
 			Reward = 12000;
 			break;
 		}
-		case cMonster::mtWither:
+		case mtWither:
 		{
 			Reward = 50;
 			break;
@@ -535,6 +561,25 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
 	m_DestroyTimer = 0;
+}
+
+
+
+
+
+void cMonster::OnRightClicked(cPlayer & a_Player)
+{
+	super::OnRightClicked(a_Player);
+
+	const cItem & EquippedItem = a_Player.GetEquippedItem();
+	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	{
+		SetCustomName(EquippedItem.m_CustomName);
+		if (!a_Player.IsGameModeCreative())
+		{
+			a_Player.GetInventory().RemoveOneEquippedItem();
+		}
+	}
 }
 
 
@@ -669,6 +714,39 @@ void cMonster::InStateEscaping(float a_Dt)
 
 
 
+void cMonster::SetCustomName(const AString & a_CustomName)
+{
+	m_CustomName = a_CustomName;
+
+	// The maximal length is 64
+	if (a_CustomName.length() > 64)
+	{
+		m_CustomName = a_CustomName.substr(0, 64);
+	}
+
+	if (m_World != NULL)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
+void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
+{
+	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
+	if (m_World != NULL)
+	{
+		m_World->BroadcastEntityMetadata(*this);
+	}
+}
+
+
+
+
+
 void cMonster::GetMonsterConfig(const AString & a_Name)
 {
 	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
@@ -687,7 +765,7 @@ bool cMonster::IsUndead(void)
 
 
 
-AString cMonster::MobTypeToString(cMonster::eType a_MobType)
+AString cMonster::MobTypeToString(eMonsterType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
@@ -706,10 +784,9 @@ AString cMonster::MobTypeToString(cMonster::eType a_MobType)
 
 
 
-cMonster::eType cMonster::StringToMobType(const AString & a_Name)
+eMonsterType cMonster::StringToMobType(const AString & a_Name)
 {
-	AString lcName(a_Name);
-	StrToLower(lcName);
+	AString lcName = StrToLower(a_Name);
 	
 	// Binary-search for the lowercase name:
 	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames) - 1;
@@ -748,7 +825,7 @@ cMonster::eType cMonster::StringToMobType(const AString & a_Name)
 
 
 
-cMonster::eFamily cMonster::FamilyFromType(eType a_Type)
+cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 {
 	// Passive-agressive mobs are counted in mob spawning code as passive
 
@@ -813,7 +890,7 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 
-cMonster * cMonster::NewMonsterFromType(cMonster::eType a_MobType)
+cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	cFastRandom Random;
 	cMonster * toReturn = NULL;
@@ -1015,7 +1092,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
 		!IsOnFire() &&                                               // Not already burning
-		GetWorld()->IsWeatherWetAt(POSX_TOINT, POSZ_TOINT)           // Not raining
+		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)         // Not raining
 	)
 	{
 		// Burn for 100 ticks, then decide again

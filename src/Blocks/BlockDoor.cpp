@@ -1,7 +1,6 @@
 
 #include "Globals.h"
 #include "BlockDoor.h"
-#include "../Item.h"
 #include "../Entities/Player.h"
 
 
@@ -102,16 +101,7 @@ void cBlockDoorHandler::OnPlacedByPlayer(
 	{
 		a_TopBlockMeta = 9;
 	}
-	a_ChunkInterface.SetBlock(a_WorldInterface, a_BlockX, a_BlockY + 1, a_BlockZ, m_BlockType, a_TopBlockMeta);
-}
-
-
-
-
-
-const char * cBlockDoorHandler::GetStepSound(void)
-{
-	return (m_BlockType == E_BLOCK_WOODEN_DOOR) ? "step.wood" : "step.stone";
+	a_ChunkInterface.SetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, m_BlockType, a_TopBlockMeta);
 }
 
 

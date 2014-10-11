@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
+#include "RedstonePoweredEntity.h"
 
 
 namespace Json
@@ -30,6 +31,9 @@ enum ENUM_NOTE_INSTRUMENTS
 
 class cNoteEntity :
 	public cBlockEntity
+	// tolua_end
+	, public cRedstonePoweredEntity
+	// tolua_begin
 {
 	typedef cBlockEntity super;
 public:
@@ -38,9 +42,7 @@ public:
 
 	/// Creates a new note entity. a_World may be NULL
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
-
-	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
+	virtual ~cNoteEntity() {}
 
 	// tolua_begin
 	
@@ -53,6 +55,14 @@ public:
 	
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
+	
+	virtual void SetRedstonePower(bool a_Value)
+	{
+		if (a_Value)
+		{
+			MakeSound();
+		}
+	}
 
 	static const char * GetClassStatic(void) { return "cNoteEntity"; }
 

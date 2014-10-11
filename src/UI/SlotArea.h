@@ -15,10 +15,12 @@
 
 class cWindow;
 class cPlayer;
+class cBeaconEntity;
 class cChestEntity;
 class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
+class cMinecartWithChest;
 class cCraftingRecipe;
 class cEnchantingWindow;
 class cWorld;
@@ -314,20 +316,49 @@ protected:
 
 
 
+class cSlotAreaBeacon :
+	public cSlotArea,
+	public cItemGrid::cListener
+{
+	typedef cSlotArea super;
+	
+public:
+	cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow);
+	virtual ~cSlotAreaBeacon();
+
+	bool IsPlaceableItem(short a_ItemType);
+	
+	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+protected:
+	cBeaconEntity * m_Beacon;
+
+	// cItemGrid::cListener overrides:
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+} ;
+
+
+
+
+
 class cSlotAreaEnchanting :
 	public cSlotAreaTemporary
 {
 	typedef cSlotAreaTemporary super;
 
 public:
-	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow);
+	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum) override;
 	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
 	// cSlotAreaTemporary overrides:
+	virtual void OnPlayerAdded  (cPlayer & a_Player) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	/* Get the count of bookshelves who stand in the near of the enchanting table */
@@ -336,6 +367,8 @@ public:
 protected:
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
+
+	int m_BlockX, m_BlockY, m_BlockZ;
 };
 
 
@@ -416,9 +449,26 @@ protected:
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
-	/// Called after an item has been smelted to handle statistics e.t.c.
+	/// Called after an item has been smelted to handle statistics etc.
 	void HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
+
+
+
+
+
+class cSlotAreaMinecartWithChest :
+	public cSlotArea
+{
+public:
+	cSlotAreaMinecartWithChest(cMinecartWithChest * a_ChestCart, cWindow & a_ParentWindow);
+
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+protected:
+	cMinecartWithChest * m_Chest;
+};
 
 
 

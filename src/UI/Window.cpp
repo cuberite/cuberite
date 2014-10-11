@@ -9,10 +9,12 @@
 #include "../Entities/Pickup.h"
 #include "../Inventory.h"
 #include "../Items/ItemHandler.h"
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/ChestEntity.h"
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/HopperEntity.h"
+#include "../Entities/Minecart.h"
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
 
@@ -50,6 +52,34 @@ cWindow::~cWindow()
 		delete *itr;
 	}
 	m_SlotAreas.clear();
+}
+
+
+
+
+
+const AString cWindow::GetWindowTypeName(void) const
+{
+	switch (m_WindowType)
+	{
+		case wtChest:       return "minecraft:chest";
+		case wtWorkbench:   return "minecraft:crafting_table";
+		case wtFurnace:     return "minecraft:furnace";
+		case wtDropSpenser: return "minecraft:dispenser";
+		case wtEnchantment: return "minecraft:enchanting_table";
+		case wtBrewery:     return "minecraft:brewing_stand";
+		case wtNPCTrade:    return "minecraft:villager";
+		case wtBeacon:      return "minecraft:beacon";
+		case wtAnvil:       return "minecraft:anvil";
+		case wtHopper:      return "minecraft:hopper";
+		case wtDropper:     return "minecraft:dropper";
+		case wtAnimalChest: return "EntityHorse";
+		default:
+		{
+			ASSERT(!"Unknown inventory type!");
+			return "";
+		}
+	}
 }
 
 
@@ -841,6 +871,36 @@ void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cBeaconWindow:
+
+cBeaconWindow::cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon) :
+	cWindow(wtBeacon, "Beacon"),
+	m_Beacon(a_Beacon)
+{
+	m_ShouldDistributeToHotbarFirst = true;
+	m_SlotAreas.push_back(new cSlotAreaBeacon(m_Beacon, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+}
+
+
+
+
+
+void cBeaconWindow::OpenedByPlayer(cPlayer & a_Player)
+{
+	super::OpenedByPlayer(a_Player);
+
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 0, m_Beacon->GetBeaconLevel());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, m_Beacon->GetPrimaryEffect());
+	a_Player.GetClientHandle()->SendWindowProperty(*this, 2, m_Beacon->GetSecondaryEffect());
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cEnchantingWindow:
 
 cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
@@ -850,7 +910,7 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
 {
-	m_SlotAreas.push_back(new cSlotAreaEnchanting(*this));
+	m_SlotAreas.push_back(new cSlotAreaEnchanting(*this, m_BlockX, m_BlockY, m_BlockZ));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 }
@@ -861,8 +921,13 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 {
-	m_PropertyValue[a_Property] = a_Value;
+	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
+	{
+		ASSERT(!"a_Property is invalid");
+		return;
+	}
 
+	m_PropertyValue[a_Property] = a_Value;
 	super::SetProperty(a_Property, a_Value);
 }
 
@@ -872,8 +937,13 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value)
 
 void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Player)
 {
-	m_PropertyValue[a_Property] = a_Value;
+	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
+	{
+		ASSERT(!"a_Property is invalid");
+		return;
+	}
 
+	m_PropertyValue[a_Property] = a_Value;
 	super::SetProperty(a_Property, a_Value, a_Player);
 }
 
@@ -883,18 +953,13 @@ void cEnchantingWindow::SetProperty(int a_Property, int a_Value, cPlayer & a_Pla
 
 int cEnchantingWindow::GetPropertyValue(int a_Property)
 {
+	if ((a_Property < 0) || ((size_t)a_Property >= ARRAYCOUNT(m_PropertyValue)))
+	{
+		ASSERT(!"a_Property is invalid");
+		return 0;
+	}
+
 	return m_PropertyValue[a_Property];
-}
-
-
-
-
-
-void cEnchantingWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
-{
-	a_PosX = m_BlockX;
-	a_PosY = m_BlockY;
-	a_PosZ = m_BlockZ;
 }
 
 
@@ -1012,6 +1077,34 @@ cChestWindow::~cChestWindow()
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cMinecartWithChestWindow:
+
+cMinecartWithChestWindow::cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart) :
+	cWindow(wtChest, "Minecart with Chest"),
+	m_ChestCart(a_ChestCart)
+{
+	m_ShouldDistributeToHotbarFirst = false;
+	m_SlotAreas.push_back(new cSlotAreaMinecartWithChest(a_ChestCart, *this));
+	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
+	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+
+	a_ChestCart->GetWorld()->BroadcastSoundEffect("random.chestopen", a_ChestCart->GetPosX(), a_ChestCart->GetPosY(), a_ChestCart->GetPosZ(), 1, 1);
+}
+
+
+
+
+
+cMinecartWithChestWindow::~cMinecartWithChestWindow()
+{
+	m_ChestCart->GetWorld()->BroadcastSoundEffect("random.chestclosed", m_ChestCart->GetPosX(), m_ChestCart->GetPosY(), m_ChestCart->GetPosZ(), 1, 1);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cDropSpenserWindow:
 
 cDropSpenserWindow::cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_DropSpenser) :
@@ -1037,6 +1130,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
 	m_BlockY(a_EnderChest->GetPosY()),
 	m_BlockZ(a_EnderChest->GetPosZ())
 {
+	m_ShouldDistributeToHotbarFirst = false;
 	m_SlotAreas.push_back(new cSlotAreaEnderChest(a_EnderChest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));

@@ -166,6 +166,9 @@ cCaveTunnel::cCaveTunnel(
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
 		// Don't bother detailing this cave, it's under the world anyway
+		m_MinBlockX = m_MaxBlockX = 0;
+		m_MinBlockY = m_MaxBlockY = -1;
+		m_MinBlockZ = m_MaxBlockZ = 0;
 		return;
 	}
 
@@ -497,29 +500,9 @@ void cCaveTunnel::ProcessChunk(
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
 				if (4 * SqDist <= SqRad)
 				{
-					switch (cChunkDef::GetBlock(a_BlockTypes, x, y, z))
+					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes, x, y, z)))
 					{
-						// Only carve out these specific block types
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						case E_BLOCK_STONE:
-						case E_BLOCK_COBBLESTONE:
-						case E_BLOCK_GRAVEL:
-						case E_BLOCK_SAND:
-						case E_BLOCK_SANDSTONE:
-						case E_BLOCK_SOULSAND:
-						case E_BLOCK_NETHERRACK:
-						case E_BLOCK_COAL_ORE:
-						case E_BLOCK_IRON_ORE:
-						case E_BLOCK_GOLD_ORE:
-						case E_BLOCK_DIAMOND_ORE:
-						case E_BLOCK_REDSTONE_ORE:
-						case E_BLOCK_REDSTONE_ORE_GLOWING:
-						{
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
-							break;
-						}
-						default: break;
+						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 					}
 				}
 			}  // for y
@@ -772,7 +755,7 @@ void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 				float n2 = m_Noise2.CubicNoise3D(xx, yy, zz);
 				float n3 = m_Noise1.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
 				float n4 = m_Noise2.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
-				if ((abs(n1 + n3) * abs(n2 + n4)) > m_Threshold)
+				if ((std::abs(n1 + n3) * std::abs(n2 + n4)) > m_Threshold)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
 				}

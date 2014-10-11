@@ -3,8 +3,6 @@
 #include "BlockHandler.h"
 #include "../Item.h"
 #include "../World.h"
-#include "../Root.h"
-#include "../Bindings/PluginManager.h"
 #include "../Chunk.h"
 #include "BlockAnvil.h"
 #include "BlockBed.h"
@@ -38,20 +36,18 @@
 #include "BlockGlass.h"
 #include "BlockGlowstone.h"
 #include "BlockGravel.h"
-#include "BlockHayBale.h"
 #include "BlockMobHead.h"
 #include "BlockHopper.h"
 #include "BlockIce.h"
 #include "BlockLadder.h"
 #include "BlockLeaves.h"
 #include "BlockLilypad.h"
-#include "BlockNewLeaves.h"
 #include "BlockLever.h"
 #include "BlockMelon.h"
+#include "BlockMobSpawner.h"
 #include "BlockMushroom.h"
 #include "BlockMycelium.h"
 #include "BlockNetherWart.h"
-#include "BlockNote.h"
 #include "BlockOre.h"
 #include "BlockPiston.h"
 #include "BlockPlanks.h"
@@ -69,6 +65,7 @@
 #include "BlockTripwireHook.h"
 #include "BlockSand.h"
 #include "BlockSapling.h"
+#include "BlockSeaLantern.h"
 #include "BlockSideways.h"
 #include "BlockSignPost.h"
 #include "BlockSlab.h"
@@ -84,6 +81,8 @@
 #include "BlockWallSign.h"
 #include "BlockWorkbench.h"
 
+
+#include "BlockPluginInterface.h"
 
 
 
@@ -178,11 +177,16 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 	switch (a_BlockType)
 	{
 		// Block handlers, alphabetically sorted:
+		case E_BLOCK_ACACIA_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_ACACIA_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_ACACIA_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_ACTIVATOR_RAIL:        return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_ANVIL:                 return new cBlockAnvilHandler           (a_BlockType);
+		case E_BLOCK_BEACON:                return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_BED:                   return new cBlockBedHandler             (a_BlockType);
 		case E_BLOCK_BIG_FLOWER:            return new cBlockBigFlowerHandler       (a_BlockType);
+		case E_BLOCK_BIRCH_DOOR:            return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_BIRCH_FENCE_GATE:      return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_BIRCH_WOOD_STAIRS:     return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_BREWING_STAND:         return new cBlockBrewingStandHandler    (a_BlockType);
 		case E_BLOCK_BRICK_STAIRS:          return new cBlockStairsHandler          (a_BlockType);
@@ -200,12 +204,15 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBBLESTONE_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_COBWEB:                return new cBlockCobWebHandler          (a_BlockType);
 		case E_BLOCK_CROPS:                 return new cBlockCropsHandler           (a_BlockType);
+		case E_BLOCK_DARK_OAK_DOOR:         return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_DARK_OAK_FENCE_GATE:   return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_DARK_OAK_WOOD_STAIRS:  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_DEAD_BUSH:             return new cBlockDeadBushHandler        (a_BlockType);
 		case E_BLOCK_DETECTOR_RAIL:         return new cBlockRailHandler            (a_BlockType);
 		case E_BLOCK_DIAMOND_ORE:           return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_DIRT:                  return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_DISPENSER:             return new cBlockDropSpenserHandler     (a_BlockType);
+		case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DOUBLE_STONE_SLAB:     return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DOUBLE_WOODEN_SLAB:    return new cBlockDoubleSlabHandler      (a_BlockType);
 		case E_BLOCK_DROPPER:               return new cBlockDropSpenserHandler     (a_BlockType);
@@ -223,7 +230,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLASS_PANE:            return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
-		case E_BLOCK_HAY_BALE:              return new cBlockHayBaleHandler         (a_BlockType);
+		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HEAD:                  return new cBlockMobHeadHandler         (a_BlockType);
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);
@@ -231,8 +238,11 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_INACTIVE_COMPARATOR:   return new cBlockComparatorHandler      (a_BlockType);
 		case E_BLOCK_IRON_DOOR:             return new cBlockDoorHandler            (a_BlockType);
 		case E_BLOCK_IRON_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_IRON_TRAPDOOR:         return new cBlockTrapdoorHandler        (a_BlockType);
 		case E_BLOCK_JACK_O_LANTERN:        return new cBlockPumpkinHandler         (a_BlockType);
 		case E_BLOCK_JUKEBOX:               return new cBlockEntityHandler          (a_BlockType);
+		case E_BLOCK_JUNGLE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_JUNGLE_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_JUNGLE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_LADDER:                return new cBlockLadderHandler          (a_BlockType);
 		case E_BLOCK_LEVER:                 return new cBlockLeverHandler           (a_BlockType);
@@ -245,14 +255,16 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LOG:                   return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_MELON:                 return new cBlockMelonHandler           (a_BlockType);
 		case E_BLOCK_MELON_STEM:            return new cBlockStemsHandler           (a_BlockType);
+		case E_BLOCK_MOB_SPAWNER:           return new cBlockMobSpawnerHandler      (a_BlockType);
 		case E_BLOCK_MYCELIUM:              return new cBlockMyceliumHandler        (a_BlockType);
 		case E_BLOCK_NETHER_BRICK_STAIRS:   return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_NETHER_PORTAL:         return new cBlockPortalHandler          (a_BlockType);
 		case E_BLOCK_NETHER_WART:           return new cBlockNetherWartHandler      (a_BlockType);
 		case E_BLOCK_NETHER_QUARTZ_ORE:     return new cBlockOreHandler             (a_BlockType);
-		case E_BLOCK_NEW_LEAVES:            return new cBlockNewLeavesHandler       (a_BlockType);
+		case E_BLOCK_NEW_LEAVES:            return new cBlockLeavesHandler          (a_BlockType);
 		case E_BLOCK_NEW_LOG:               return new cBlockSidewaysHandler        (a_BlockType);
-		case E_BLOCK_NOTE_BLOCK:            return new cBlockNoteHandler            (a_BlockType);
+		case E_BLOCK_NEW_STONE_SLAB:        return new cBlockSlabHandler            (a_BlockType);
+		case E_BLOCK_NOTE_BLOCK:            return new cBlockEntityHandler          (a_BlockType);
 		case E_BLOCK_PISTON:                return new cBlockPistonHandler          (a_BlockType);
 		case E_BLOCK_PISTON_EXTENSION:      return new cBlockPistonHeadHandler;
 		case E_BLOCK_PLANKS:                return new cBlockPlanksHandler          (a_BlockType);
@@ -263,6 +275,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_QUARTZ_BLOCK:          return new cBlockQuartzHandler          (a_BlockType);
 		case E_BLOCK_QUARTZ_STAIRS:         return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_RAIL:                  return new cBlockRailHandler            (a_BlockType);
+		case E_BLOCK_RED_SANDSTONE_STAIRS:  return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_REDSTONE_LAMP_ON:      return new cBlockRedstoneLampHandler    (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE:          return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_REDSTONE_ORE_GLOWING:  return new cBlockOreHandler             (a_BlockType);
@@ -276,8 +289,11 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_SAND:                  return new cBlockSandHandler            (a_BlockType);
 		case E_BLOCK_SANDSTONE_STAIRS:      return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_SAPLING:               return new cBlockSaplingHandler         (a_BlockType);
+		case E_BLOCK_SEA_LANTERN:           return new cBlockSeaLanternHandler      (a_BlockType);
 		case E_BLOCK_SIGN_POST:             return new cBlockSignPostHandler        (a_BlockType);
 		case E_BLOCK_SNOW:                  return new cBlockSnowHandler            (a_BlockType);
+		case E_BLOCK_SPRUCE_DOOR:           return new cBlockDoorHandler            (a_BlockType);
+		case E_BLOCK_SPRUCE_FENCE_GATE:     return new cBlockFenceGateHandler       (a_BlockType);
 		case E_BLOCK_SPRUCE_WOOD_STAIRS:    return new cBlockStairsHandler          (a_BlockType);
 		case E_BLOCK_STAINED_GLASS:         return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_STAINED_GLASS_PANE:    return new cBlockGlassHandler           (a_BlockType);
@@ -418,24 +434,47 @@ void cBlockHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
 
 
 
-void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop, bool a_DropVerbatim)
+void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop)
 {
 	cItems Pickups;
 	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
 	if (a_CanDrop)
 	{
-		if (!a_DropVerbatim)
+		if ((a_Digger != NULL) && (a_Digger->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0))
 		{
-			ConvertToPickups(Pickups, Meta);
+			switch (m_BlockType)
+			{
+				case E_BLOCK_CAKE:
+				case E_BLOCK_CARROTS:
+				case E_BLOCK_COCOA_POD:
+				case E_BLOCK_DOUBLE_STONE_SLAB:
+				case E_BLOCK_DOUBLE_WOODEN_SLAB:
+				case E_BLOCK_FIRE:
+				case E_BLOCK_FARMLAND:
+				case E_BLOCK_MELON_STEM:
+				case E_BLOCK_MOB_SPAWNER:
+				case E_BLOCK_NETHER_WART:
+				case E_BLOCK_POTATOES:
+				case E_BLOCK_PUMPKIN_STEM:
+				case E_BLOCK_SNOW:
+				case E_BLOCK_SUGARCANE:
+				case E_BLOCK_TALL_GRASS:
+				case E_BLOCK_CROPS:
+				{
+					// Silktouch can't be used for these blocks
+					ConvertToPickups(Pickups, Meta);
+					break;
+				}
+				default: Pickups.Add(m_BlockType, 1, Meta); break;
+			}
 		}
 		else
 		{
-			// TODO: Add a proper overridable function for this
-			Pickups.Add(m_BlockType, 1, Meta);
+			ConvertToPickups(Pickups, Meta);
 		}
 	}
-	
+
 	// Allow plugins to modify the pickups:
 	a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Pickups);
 	
@@ -455,15 +494,6 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 		a_WorldInterface.SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ);
 	}
-}
-
-
-
-
-
-const char * cBlockHandler::GetStepSound()
-{
-	return "step.stone";
 }
 
 

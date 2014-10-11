@@ -62,6 +62,8 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 void cBoat::OnRightClicked(cPlayer & a_Player)
 {
+	super::OnRightClicked(a_Player);
+
 	if (m_Attachee != NULL)
 	{
 		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())

@@ -53,12 +53,6 @@ public:
 	{
 		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
-	}
 } ;
 
 

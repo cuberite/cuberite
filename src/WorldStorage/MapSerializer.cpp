@@ -130,14 +130,14 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	}
 
 	int CurrLine = a_NBT.FindChildByName(Data, "scale");
-	if (CurrLine >= 0)
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
 	{
-		unsigned int Scale = a_NBT.GetByte(CurrLine);
+		unsigned int Scale = (unsigned int)a_NBT.GetByte(CurrLine);
 		m_Map->SetScale(Scale);
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "dimension");
-	if (CurrLine >= 0)
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Byte))
 	{
 		eDimension Dimension = (eDimension) a_NBT.GetByte(CurrLine);
 		
@@ -149,9 +149,9 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "width");
-	if (CurrLine >= 0)
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
 	{
-		unsigned int Width = a_NBT.GetShort(CurrLine);
+		unsigned int Width = (unsigned int)a_NBT.GetShort(CurrLine);
 		if (Width != 128)
 		{
 			return false;
@@ -160,9 +160,9 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "height");
-	if (CurrLine >= 0)
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Short))
 	{
-		unsigned int Height = a_NBT.GetShort(CurrLine);
+		unsigned int Height = (unsigned int)a_NBT.GetShort(CurrLine);
 		if (Height >= 256)
 		{
 			return false;
@@ -171,14 +171,14 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "xCenter");
-	if (CurrLine >= 0)
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Int))
 	{
 		int CenterX = a_NBT.GetInt(CurrLine);
 		m_Map->m_CenterX = CenterX;
 	}
 
 	CurrLine = a_NBT.FindChildByName(Data, "zCenter");
-	if (CurrLine >= 0)
+	if ((CurrLine >= 0) && (a_NBT.GetType(CurrLine) == TAG_Int))
 	{
 		int CenterZ = a_NBT.GetInt(CurrLine);
 		m_Map->m_CenterZ = CenterZ;

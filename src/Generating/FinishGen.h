@@ -163,7 +163,7 @@ public:
 		m_Amount(a_Amount)
 	{
 		// Initialize all the block types.
-		for (int idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
+		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
 		{
 			m_IsAllowedBelow[idx] = false;
 		}
@@ -175,7 +175,7 @@ public:
 		}
 		
 		// Initialize all the biome types.
-		for (int idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
+		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
 		{
 			m_IsBiomeAllowed[idx] = false;
 		}
@@ -240,9 +240,14 @@ class cFinishGenPreSimulator :
 	public cFinishGen
 {
 public:
-	cFinishGenPreSimulator(void);
+	cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava);
 	
 protected:
+
+	bool m_PreSimulateFallingBlocks;
+	bool m_PreSimulateWater;
+	bool m_PreSimulateLava;
+
 	// Drops hanging sand and gravel down to the ground, recalculates heightmap
 	void CollapseSandGravel(
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change

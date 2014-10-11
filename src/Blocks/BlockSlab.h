@@ -12,6 +12,7 @@
 #include "BlockHandler.h"
 #include "../Items/ItemHandler.h"
 #include "Root.h"
+#include "ChunkInterface.h"
 
 
 
@@ -85,18 +86,6 @@ public:
 
 		return true;
 	}
-	
-	
-	virtual const char * GetStepSound(void) override
-	{
-		switch (m_BlockType)
-		{
-			case E_BLOCK_WOODEN_SLAB: return "step.wood";
-			case E_BLOCK_STONE_SLAB:  return "step.stone";
-		}
-		ASSERT(!"Unhandled slab type!");
-		return "";
-	}
 
 
 	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
@@ -108,7 +97,19 @@ public:
 	/// Returns true if the specified blocktype is one of the slabs handled by this handler
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
 	{
-		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB));
+		return ((a_BlockType == E_BLOCK_WOODEN_SLAB) || (a_BlockType == E_BLOCK_STONE_SLAB) || (a_BlockType == E_BLOCK_NEW_STONE_SLAB));
+	}
+
+
+	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+	{
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player->GetEquippedItem().m_ItemType != (short)m_BlockType))
+		{
+			return;
+		}
+
+		// Sends the slab back to the client. It's to refuse a doubleslab placement.
+		a_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 	}
 	
 	
@@ -119,6 +120,7 @@ public:
 		{
 			case E_BLOCK_STONE_SLAB:  return E_BLOCK_DOUBLE_STONE_SLAB;
 			case E_BLOCK_WOODEN_SLAB: return E_BLOCK_DOUBLE_WOODEN_SLAB;
+			case E_BLOCK_NEW_STONE_SLAB: return E_BLOCK_DOUBLE_NEW_STONE_SLAB;
 		}
 		ASSERT(!"Unhandled slab type!");
 		return E_BLOCK_AIR;
@@ -158,20 +160,10 @@ public:
 		{
 			case E_BLOCK_DOUBLE_STONE_SLAB:  return E_BLOCK_STONE_SLAB;
 			case E_BLOCK_DOUBLE_WOODEN_SLAB: return E_BLOCK_WOODEN_SLAB;
+			case E_BLOCK_DOUBLE_NEW_STONE_SLAB: return E_BLOCK_NEW_STONE_SLAB;
 		}
 		ASSERT(!"Unhandled double slab type!");
 		return a_BlockType;
-	}
-	
-	virtual const char * GetStepSound(void) override
-	{
-		switch (m_BlockType)
-		{
-			case E_BLOCK_DOUBLE_STONE_SLAB:  return "step.stone";
-			case E_BLOCK_DOUBLE_WOODEN_SLAB: return "step.wood";
-		}
-		ASSERT(!"Unhandled double slab type!");
-		return "";
 	}
 } ;
 

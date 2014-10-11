@@ -3,8 +3,8 @@
 
 #include "BlockHandler.h"
 #include "../FastRandom.h"
-
-
+#include "Root.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -21,7 +21,15 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
+		if (a_BlockMeta == E_META_DIRT_COARSE)
+		{
+			// Drop the coarse block (dirt, meta 1)
+			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
+		}
+		else
+		{
+			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
+		}
 	}
 	
 	
@@ -81,18 +89,12 @@ public:
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
 			if (cBlockInfo::GetHandler(AboveDest)->CanDirtGrowGrass(AboveMeta))
 			{
-				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread((cWorld*) &a_WorldInterface, BlockX * cChunkDef::Width, BlockY, BlockZ * cChunkDef::Width, ssGrassSpread))
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{
 					Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
 				}
 			}
 		}  // for i - repeat twice
-	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.gravel";
 	}
 } ;
 

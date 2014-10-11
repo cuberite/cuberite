@@ -63,12 +63,12 @@ public:  // tolua_export
 	const AString & GetDescription(void) const {return m_Description; }
 
 	// Player counts:
-	int  GetMaxPlayers(void) const {return m_MaxPlayers; }
+	int  GetMaxPlayers(void) const { return m_MaxPlayers; }
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	// Hardcore mode or not:
-	bool IsHardcore(void) const {return m_bIsHardcore; }
+	bool IsHardcore(void) const { return m_bIsHardcore; }
 
 	// tolua_end
 
@@ -120,7 +120,7 @@ public:  // tolua_export
 	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 	
 	/** Returns true if authentication has been turned on in server settings. */
-	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }
+	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
 	
 	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
 	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
@@ -130,6 +130,11 @@ public:  // tolua_export
 	This allows a seamless transition from name-based to UUID-based player storage.
 	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
 	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
+	
+	/** Returns true if BungeeCord logins (that specify the player's UUID) are allowed.
+	Read from settings, admins should set this to true only when they chain to BungeeCord,
+	it makes the server vulnerable to identity theft through direct connections. */
+	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
 	
 private:
 
@@ -230,6 +235,9 @@ private:
 	This allows a seamless transition from name-based to UUID-based player storage.
 	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
 	bool m_ShouldLoadNamedPlayerData;
+	
+	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
+	bool m_ShouldAllowBungeeCord;
 
 
 	cServer(void);

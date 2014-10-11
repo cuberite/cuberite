@@ -3,7 +3,6 @@
 
 #include "BlockEntity.h"
 #include "UI/WindowOwner.h"
-#include "json/json.h"
 
 
 
@@ -26,7 +25,6 @@ public:
 	
 	// cBlockEntity overrides:
 	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual void SaveToJson(Json::Value & a_Value) override { UNUSED(a_Value); }
 	virtual void SendTo(cClientHandle & a_Client) override { UNUSED(a_Client); }
 
 	static void LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid);

@@ -12,6 +12,7 @@
 #include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
 #include "../BlockInServerPluginInterface.h"
+#include "../Blocks/ChunkInterface.h"
 
 
 

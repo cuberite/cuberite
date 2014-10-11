@@ -51,6 +51,9 @@
 	
 	#define NORETURN      __declspec(noreturn)
 
+	// Use non-standard defines in <cmath>
+	#define _USE_MATH_DEFINES
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -156,14 +159,23 @@ template class SizeChecker<UInt64, 8>;
 template class SizeChecker<UInt32, 4>;
 template class SizeChecker<UInt16, 2>;
 
-// A macro to disallow the copy constructor and operator= functions
+// A macro to disallow the copy constructor and operator = functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself
 #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
 	TypeName(const TypeName &); \
-	void operator=(const TypeName &)
+	void operator =(const TypeName &)
+
+// A macro that is used to mark unused local variables, to avoid pedantic warnings in gcc / clang / MSVC
+// Note that in MSVC it requires the full type of X to be known
+#define UNUSED_VAR(X) (void)(X)
 
 // A macro that is used to mark unused function parameters, to avoid pedantic warnings in gcc
-#define UNUSED(X) (void)(X)
+// Written so that the full type of param needn't be known
+#ifdef _MSC_VER
+	#define UNUSED(X)
+#else
+	#define UNUSED UNUSED_VAR
+#endif
 
 
 
@@ -217,10 +229,10 @@ template class SizeChecker<UInt16, 2>;
 
 // CRT stuff:
 #include <sys/stat.h>
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+#include <cstdarg>
 
 
 
@@ -249,7 +261,7 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/Event.h"
 	#include "OSSupport/Thread.h"
 	#include "OSSupport/File.h"
-	#include "MCLogger.h"
+	#include "Logger.h"
 #else
 	// Logging functions
 void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
@@ -261,6 +273,27 @@ void inline LOGERROR(const char* a_Format, ...)
 	vprintf(a_Format, argList);
 	va_end(argList);
 }
+
+void inline LOGWARNING(const char* a_Format, ...) FORMATSTRING(1, 2);
+
+void inline LOGWARNING(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	va_end(argList);
+}
+
+void inline LOGD(const char* a_Format, ...) FORMATSTRING(1, 2);
+
+void inline LOGD(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	va_end(argList);
+}
+
 #endif
 
 
@@ -364,6 +397,24 @@ template <typename T>
 T Clamp(T a_Value, T a_Min, T a_Max)
 {
 	return (a_Value < a_Min) ? a_Min : ((a_Value > a_Max) ? a_Max : a_Value);
+}
+
+
+
+
+
+/** Floors a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type FloorC(T a_Value)
+{
+	return static_cast<C>(std::floor(a_Value));
+}
+
+/** Ceils a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
+{
+	return static_cast<C>(std::ceil(a_Value));
 }
 
 

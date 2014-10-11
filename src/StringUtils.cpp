@@ -196,16 +196,9 @@ AString TrimString(const AString & str)
 
 
 
-AString & StrToUpper(AString & s)
+AString & InPlaceLowercase(AString & s)
 {
-	AString::iterator i = s.begin();
-	AString::iterator end = s.end();
-
-	while (i != end)
-	{
-		*i = (char)toupper(*i);
-		++i;
-	}
+	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 	return s;
 }
 
@@ -213,17 +206,32 @@ AString & StrToUpper(AString & s)
 
 
 
-AString & StrToLower(AString & s)
+AString & InPlaceUppercase(AString & s)
 {
-	AString::iterator i = s.begin();
-	AString::iterator end = s.end();
-
-	while (i != end)
-	{
-		*i = (char)tolower(*i);
-		++i;
-	}
+	std::transform(s.begin(), s.end(), s.begin(), ::toupper);
 	return s;
+}
+
+
+
+
+
+AString StrToLower(const AString & s)
+{
+	AString res(s);
+	std::transform(res.begin(), res.end(), res.begin(), ::tolower);
+	return res;
+}
+
+
+
+
+
+AString StrToUpper(const AString & s)
+{
+	AString res(s);
+	std::transform(res.begin(), res.end(), res.begin(), ::toupper);
+	return res;
 }
 
 
@@ -236,10 +244,8 @@ int NoCaseCompare(const AString & s1, const AString & s2)
 		// MSVC has stricmp that compares case-insensitive:
 		return _stricmp(s1.c_str(), s2.c_str());
 	#else
-		// Do it the hard way:
-		AString s1Copy(s1);
-		AString s2Copy(s2);
-		return StrToUpper(s1Copy).compare(StrToUpper(s2Copy));
+		// Do it the hard way - convert both strings to lowercase:
+		return StrToLower(s1).compare(StrToLower(s2));
 	#endif  // else _MSC_VER
 }
 
@@ -435,10 +441,10 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 
 
 
-AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16)
+AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 {
-	a_UTF16.clear();
-	a_UTF16.reserve(a_UTF8Length * 3);
+	AString UTF16;
+	UTF16.reserve(a_UTF8Length * 3);
 
 	const unsigned char * source    = (const unsigned char*)a_UTF8;
 	const unsigned char * sourceEnd = source + a_UTF8Length;
@@ -452,12 +458,12 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 		unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
 		if (source + extraBytesToRead >= sourceEnd)
 		{
-			return a_UTF16;
+			return UTF16;
 		}
 		// Do this check whether lenient or strict
 		if (!isLegalUTF8(source, extraBytesToRead + 1))
 		{
-			return a_UTF16;
+			return UTF16;
 		}
 		
 		// The cases all fall through. See "Note A" below.
@@ -481,13 +487,13 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 				ch = ' ';
 			}
 			unsigned short v = htons((unsigned short)ch);
-			a_UTF16.append((const char *)&v, 2);
+			UTF16.append((const char *)&v, 2);
 		}
 		else if (ch > UNI_MAX_UTF16)
 		{
 			// Invalid value, replace with a space
 			unsigned short v = htons(' ');
-			a_UTF16.append((const char *)&v, 2);
+			UTF16.append((const char *)&v, 2);
 		}
 		else
 		{
@@ -495,11 +501,11 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 			ch -= halfBase;
 			unsigned short v1 = htons((ch >> halfShift) + UNI_SUR_HIGH_START);
 			unsigned short v2 = htons((ch & halfMask) + UNI_SUR_LOW_START);
-			a_UTF16.append((const char *)&v1, 2);
-			a_UTF16.append((const char *)&v2, 2);
+			UTF16.append((const char *)&v1, 2);
+			UTF16.append((const char *)&v2, 2);
 		}
 	}
-	return a_UTF16;
+	return UTF16;
 }
 
 /*
@@ -858,6 +864,34 @@ void SetBEInt(char * a_Mem, Int32 a_Value)
 	a_Mem[1] = (a_Value >> 16) & 0xff;
 	a_Mem[2] = (a_Value >> 8) & 0xff;
 	a_Mem[3] = a_Value & 0xff;
+}
+
+
+
+
+
+bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Output)
+{
+	a_Output.clear();
+	size_t size = a_Strings.size();
+	size_t start = 0;
+	bool res = false;
+	for (size_t i = 0; i < size; i++)
+	{
+		if (a_Strings[i] == 0)
+		{
+			a_Output.push_back(a_Strings.substr(start, i - start));
+			start = i + 1;
+			res = true;
+		}
+	}
+	if (start < size)
+	{
+		a_Output.push_back(a_Strings.substr(start, size - start));
+		res = true;
+	}
+	
+	return res;
 }
 
 

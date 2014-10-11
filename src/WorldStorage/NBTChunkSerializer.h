@@ -20,6 +20,7 @@ class cFastNBTWriter;
 class cEntity;
 class cBlockEntity;
 class cBoat;
+class cBeaconEntity;
 class cChestEntity;
 class cCommandBlockEntity;
 class cDispenserEntity;
@@ -58,6 +59,7 @@ class cNBTChunkSerializer :
 public:
 	cChunkDef::BiomeMap m_Biomes;
 	unsigned char m_VanillaBiomes[cChunkDef::Width * cChunkDef::Width];
+	int m_VanillaHeightMap[cChunkDef::Width * cChunkDef::Width];
 	bool m_BiomesAreValid;
 
 
@@ -93,6 +95,7 @@ protected:
 	
 	// Block entities:
 	void AddBasicTileEntity(cBlockEntity *     a_Entity, const char * a_EntityTypeID);
+	void AddBeaconEntity   (cBeaconEntity *    a_Entity);
 	void AddChestEntity    (cChestEntity *     a_Entity, BLOCKTYPE a_ChestType);
 	void AddDispenserEntity(cDispenserEntity * a_Entity);
 	void AddDropperEntity  (cDropperEntity *   a_Entity);
@@ -123,6 +126,7 @@ protected:
 	
 	// cChunkDataSeparateCollector overrides:
 	virtual void LightIsValid(bool a_IsLightValid) override;
+	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) override;
 	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override;
 	virtual void Entity(cEntity * a_Entity) override;
 	virtual void BlockEntity(cBlockEntity * a_Entity) override;

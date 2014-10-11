@@ -112,12 +112,6 @@ public:
 		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
 		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
 	}
-
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.grass";
-	}
 } ;
 
 
@@ -152,7 +146,7 @@ bool HasNearLog(cBlockArea & a_Area, int a_BlockX, int a_BlockY, int a_BlockZ)
 	a_Area.SetBlockType(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_SPONGE);
 	for (int i = 0; i < LEAVES_CHECK_DISTANCE; i++)
 	{
-		for (int y = a_BlockY - i; y <= a_BlockY + i; y++)
+		for (int y = std::max(a_BlockY - i, 0); y <= std::min(a_BlockY + i, 255); y++)
 		{
 			for (int z = a_BlockZ - i; z <= a_BlockZ + i; z++)
 			{

@@ -54,6 +54,7 @@ SET (HDRS
 	IronGolem.h
 	MagmaCube.h
 	Monster.h
+	MonsterTypes.h
 	Mooshroom.h
 	Ocelot.h
 	PassiveAggressiveMonster.h

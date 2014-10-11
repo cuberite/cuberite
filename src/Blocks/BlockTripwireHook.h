@@ -21,10 +21,9 @@ public:
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
 		int a_CursorX, int a_CursorY, int a_CursorZ,
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-		) override
+	) override
 	{
 		a_BlockType = m_BlockType;
-
 		a_BlockMeta = DirectionToMetadata(a_BlockFace);
 
 		return true;
@@ -56,7 +55,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		// Reset meta to 0
+		// Reset meta to zero
 		a_Pickups.push_back(cItem(E_BLOCK_TRIPWIRE_HOOK, 1, 0));
 	}
 
@@ -66,14 +65,10 @@ public:
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, MetadataToDirection(Meta), true);
-		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+		BLOCKTYPE BlockIsOn;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return (a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn);
-	}
-
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
+		return ((a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn));
 	}
 };
 

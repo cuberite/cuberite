@@ -11,8 +11,6 @@
 
 
 #pragma once
-#ifndef CAUTHENTICATOR_H_INCLUDED
-#define CAUTHENTICATOR_H_INCLUDED
 
 #include "../OSSupport/IsThread.h"
 
@@ -52,7 +50,7 @@ public:
 
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
-
+	
 private:
 
 	class cUser
@@ -76,28 +74,25 @@ private:
 	cUserList        m_Queue;
 	cEvent           m_QueueNonempty;
 
+	/** The server that is to be contacted for auth / UUID conversions */
 	AString m_Server;
+	
+	/** The URL to use for auth, without server part.
+	%USERNAME% will be replaced with actual user name.
+	%SERVERID% will be replaced with server's ID.
+	For example "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%". */
 	AString m_Address;
+	
 	AString m_PropertiesAddress;
 	bool    m_ShouldAuthenticate;
 
 	/** cIsThread override: */
 	virtual void Execute(void) override;
 
-	/** Connects to a hostname using SSL, sends given data, and sets the response, returning whether all was successful or not */
-	bool SecureGetFromAddress(const AString & a_CACerts, const AString & a_ExpectedPeerName, const AString & a_Request, AString & a_Response);
-
 	/** Returns true if the user authenticated okay, false on error
-	Sets the username, UUID, and properties (i.e. skin) fields
-	*/
+	Returns the case-corrected username, UUID, and properties (eg. skin). */
 	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, AString & a_UUID, Json::Value & a_Properties);
 };
-
-
-
-
-
-#endif  // CAUTHENTICATOR_H_INCLUDED
 
 
 

@@ -30,6 +30,7 @@ class cProcessor
 		
 		cCallback &  m_Callback;
 		cProcessor & m_ParentProcessor;
+		cEvent m_HasStarted;
 		
 		// cIsThread override:
 		virtual void Execute(void) override;
@@ -48,6 +49,9 @@ class cProcessor
 
 	public:
 		cThread(cCallback & a_Callback, cProcessor & a_ParentProcessor);
+
+		/** Waits until the thread starts processing the callback code. */
+		void WaitForStart(void);
 	} ;
 	
 	typedef std::vector<cThread *> cThreads;
@@ -65,10 +69,12 @@ protected:
 	AStringList      m_FileQueue;
 	
 	cThreads m_Threads;
-	cEvent   m_ThreadsHaveStarted;  // This is signalled by each thread to notify the parent thread that it can start waiting for those threads
-	
+
+
+	/** Populates m_FileQueue with Anvil files from the specified folder. */
 	void PopulateFileQueue(const AString & a_WorldFolder);
 	
+	/** Returns one filename from m_FileQueue, and removes the name from the queue. */
 	AString GetOneFileName(void);
 } ;
 

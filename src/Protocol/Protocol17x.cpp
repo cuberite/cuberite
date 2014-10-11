@@ -1,10 +1,12 @@
+
 // Protocol17x.cpp
 
 /*
 Implements the 1.7.x protocol classes:
 	- cProtocol172
 		- release 1.7.2 protocol (#4)
-(others may be added later in the future for the 1.7 release series)
+	- cProtocol176
+		- release 1.7.6 protocol (#5)
 */
 
 #include "Globals.h"
@@ -37,9 +39,11 @@ Implements the 1.7.x protocol classes:
 #include "../Mobs/IncludeAllMonsters.h"
 #include "../UI/Window.h"
 
+#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
+#include "Bindings/PluginManager.h"
 
 
 
@@ -47,7 +51,10 @@ Implements the 1.7.x protocol classes:
 
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
-	ByteBuf.Proc(Var);
+	if (!ByteBuf.Proc(Var))\
+	{\
+		return;\
+	}
 
 
 
@@ -95,6 +102,19 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	m_IsEncrypted(false),
 	m_LastSentDimension(dimNotSet)
 {
+	// BungeeCord handling:
+	// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
+	// hostname\00ip-address\00uuid\00profile-properties-as-json
+	AStringVector Params;
+	if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord() && SplitZeroTerminatedStrings(a_ServerAddress, Params) && (Params.size() == 4))
+	{
+		LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
+		m_ServerAddress = Params[0];
+		m_Client->SetIPString(Params[1]);
+		m_Client->SetUUID(cMojangAPI::MakeUUIDShort(Params[2]));
+		m_Client->SetProperties(Params[3]);
+	}
+	
 	// Create the comm log file, if so requested:
 	if (g_ShouldLogCommIn || g_ShouldLogCommOut)
 	{
@@ -232,101 +252,13 @@ void cProtocol172::SendChat(const AString & a_Message)
 void cProtocol172::SendChat(const cCompositeChat & a_Message)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
-	// Compose the complete Json string to send:
-	Json::Value msg;
+
 	cWorld * World = m_Client->GetPlayer()->GetWorld();
-	msg["text"] = cClientHandle::FormatMessageType((World == NULL) ? false : World->ShouldUseChatPrefixes(), a_Message.GetMessageType(), a_Message.GetAdditionalMessageTypeData());  // The client crashes without this field being present
-	const cCompositeChat::cParts & Parts = a_Message.GetParts();
-	for (cCompositeChat::cParts::const_iterator itr = Parts.begin(), end = Parts.end(); itr != end; ++itr)
-	{
-		Json::Value Part;
-		switch ((*itr)->m_PartType)
-		{
-			case cCompositeChat::ptText:
-			{
-				Part["text"] = (*itr)->m_Text;
-				AddChatPartStyle(Part, (*itr)->m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptClientTranslated:
-			{
-				const cCompositeChat::cClientTranslatedPart & p = (const cCompositeChat::cClientTranslatedPart &)**itr;
-				Part["translate"] = p.m_Text;
-				Json::Value With;
-				for (AStringVector::const_iterator itrW = p.m_Parameters.begin(), endW = p.m_Parameters.end(); itrW != endW; ++itr)
-				{
-					With.append(*itrW);
-				}
-				if (!p.m_Parameters.empty())
-				{
-					Part["with"] = With;
-				}
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptUrl:
-			{
-				const cCompositeChat::cUrlPart & p = (const cCompositeChat::cUrlPart &)**itr;
-				Part["text"] = p.m_Text;
-				Json::Value Url;
-				Url["action"] = "open_url";
-				Url["value"] = p.m_Url;
-				Part["clickEvent"] = Url;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-			
-			case cCompositeChat::ptSuggestCommand:
-			case cCompositeChat::ptRunCommand:
-			{
-				const cCompositeChat::cCommandPart & p = (const cCompositeChat::cCommandPart &)**itr;
-				Part["text"] = p.m_Text;
-				Json::Value Cmd;
-				Cmd["action"] = (p.m_PartType == cCompositeChat::ptRunCommand) ? "run_command" : "suggest_command";
-				Cmd["value"] = p.m_Command;
-				Part["clickEvent"] = Cmd;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
+	bool ShouldUseChatPrefixes = (World == NULL) ? false : World->ShouldUseChatPrefixes();
 
-			case cCompositeChat::ptShowAchievement:
-			{
-				const cCompositeChat::cShowAchievementPart & p = (const cCompositeChat::cShowAchievementPart &)**itr;
-				Part["translate"] = "chat.type.achievement";
-
-				Json::Value Ach;
-				Ach["action"] = "show_achievement";
-				Ach["value"] = p.m_Text;
-				
-				Json::Value AchColourAndName;
-				AchColourAndName["color"] = "green";
-				AchColourAndName["translate"] = p.m_Text;
-				AchColourAndName["hoverEvent"] = Ach;
-
-				Json::Value Extra;
-				Extra.append(AchColourAndName);
-
-				Json::Value Name;
-				Name["text"] = p.m_PlayerName;
-
-				Json::Value With;
-				With.append(Name);
-				With.append(Extra);
-
-				Part["with"] = With;
-				AddChatPartStyle(Part, p.m_Style);
-				break;
-			}
-		}
-		msg["extra"].append(Part);
-	}  // for itr - Parts[]
-	
 	// Send the message to the client:
 	cPacketizer Pkt(*this, 0x02);
-	Pkt.WriteString(msg.toStyledString());
+	Pkt.WriteString(a_Message.CreateJsonString(ShouldUseChatPrefixes));
 }
 
 
@@ -339,7 +271,7 @@ void cProtocol172::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerialize
 	
 	// Serialize first, before creating the Packetizer (the packetizer locks a CS)
 	// This contains the flags and bitmasks, too
-	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2);
+	const AString & ChunkData = a_Serializer.Serialize(cChunkDataSerializer::RELEASE_1_3_2, a_ChunkX, a_ChunkZ);
 	
 	cPacketizer Pkt(*this, 0x21);  // Chunk Data packet
 	Pkt.WriteInt(a_ChunkX);
@@ -680,7 +612,7 @@ void cProtocol172::SendLoginSuccess(void)
 	
 	{
 		cPacketizer Pkt(*this, 0x02);  // Login success packet
-		Pkt.WriteString(m_Client->GetUUID());
+		Pkt.WriteString(cMojangAPI::MakeUUIDDashed(m_Client->GetUUID()));
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 
@@ -708,7 +640,7 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length)
+void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -730,7 +662,7 @@ void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 
 
 
-void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators)
+void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -763,7 +695,6 @@ void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
 	Pkt.WriteByte(2);
 	Pkt.WriteByte(a_Scale);
 }
-
 
 
 
@@ -819,7 +750,7 @@ void cProtocol172::SendPlayerAbilities(void)
 	}
 	Pkt.WriteByte(Flags);
 	Pkt.WriteFloat((float)(0.05 * Player->GetFlyingMaxSpeed()));
-	Pkt.WriteFloat((float)(0.1 * Player->GetMaxSpeed()));
+	Pkt.WriteFloat((float)(0.1 * Player->GetNormalMaxSpeed()));
 }
 
 
@@ -839,7 +770,7 @@ void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 
 
 
-void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmmount)
+void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -852,21 +783,66 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 	Pkt.WriteFloat(a_OffsetY);
 	Pkt.WriteFloat(a_OffsetZ);
 	Pkt.WriteFloat(a_ParticleData);
-	Pkt.WriteInt(a_ParticleAmmount);
+	Pkt.WriteInt(a_ParticleAmount);
 }
 
 
 
 
 
-void cProtocol172::SendPlayerListItem(const cPlayer & a_Player, bool a_IsOnline)
+void cProtocol172::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteString(a_Player.GetName());
-	Pkt.WriteBool(a_IsOnline);
-	Pkt.WriteShort(a_IsOnline ? a_Player.GetClientHandle()->GetPing() : 0);
+	Pkt.WriteString(a_Player.GetPlayerListName());
+	Pkt.WriteBool(true);
+	Pkt.WriteShort(a_Player.GetClientHandle()->GetPing());
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListRemovePlayer(const cPlayer & a_Player)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x38);
+	Pkt.WriteString(a_Player.GetPlayerListName());
+	Pkt.WriteBool(false);
+	Pkt.WriteShort(0);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdatePing(const cPlayer & a_Player)
+{
+	// It is a simple add player packet in this protocol.
+	SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cProtocol172::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
+{
+	// Not implemented in this protocol version
+	UNUSED(a_Player);
+	UNUSED(a_CustomName);
 }
 
 
@@ -940,9 +916,16 @@ void cProtocol172::SendPlayerSpawn(const cPlayer & a_Player)
 	
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
-	Pkt.WriteVarInt(a_Player.GetUniqueID());
-	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteVarInt((UInt32) a_Player.GetUniqueID());
+	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
+	if (a_Player.HasCustomName())
+	{
+		Pkt.WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		Pkt.WriteString(a_Player.GetName());
+	}
 	Pkt.WriteFPInt(a_Player.GetPosX());
 	Pkt.WriteFPInt(a_Player.GetPosY());
 	Pkt.WriteFPInt(a_Player.GetPosZ());
@@ -1028,9 +1011,9 @@ void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 	
 	cPacketizer Pkt(*this, 0x11);
 	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosX());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosY());
-	Pkt.WriteInt((int) a_ExpOrb.GetPosZ());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
+	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
 	Pkt.WriteShort(a_ExpOrb.GetReward());
 }
 
@@ -1285,9 +1268,14 @@ void cProtocol172::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay)
+void cProtocol172::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	if (!a_DoDaylightCycle)
+	{
+		// When writing a "-" before the number the client ignores it but it will stop the client-side time expiration.
+		a_TimeOfDay = std::min(-a_TimeOfDay, -1LL);
+	}
 	
 	cPacketizer Pkt(*this, 0x03);
 	Pkt.WriteInt64(a_WorldAge);
@@ -1328,6 +1316,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
 		case E_BLOCK_COMMAND_BLOCK: Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
 		case E_BLOCK_HEAD:          Action = 4; break;  // Update Mobhead entity
 		case E_BLOCK_FLOWER_POT:    Action = 5; break;  // Update flower pot
 		default: ASSERT(!"Unhandled or unimplemented BlockEntity update request!"); break;
@@ -1344,6 +1333,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 void cProtocol172::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height));
 	
 	cPacketizer Pkt(*this, 0x33);
 	Pkt.WriteInt(a_BlockX);
@@ -1489,14 +1479,14 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		);
 		m_CommLogFile.Flush();
 	}
-	
+
 	if (!m_ReceivedData.Write(a_Data, a_Size))
 	{
 		// Too much data in the incoming queue, report to caller:
 		m_Client->PacketBufferFull();
 		return;
 	}
-	
+
 	// Handle all complete packets:
 	for (;;)
 	{
@@ -1516,10 +1506,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 		cByteBuffer bb(PacketLen + 1);
 		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
 		m_ReceivedData.CommitRead();
-		
-		// Write one NUL extra, so that we can detect over-reads
-		bb.Write("\0", 1);
-		
+
 		UInt32 PacketType;
 		if (!bb.ReadVarInt(PacketType))
 		{
@@ -1527,6 +1514,9 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			break;
 		}
 
+		// Write one NUL extra, so that we can detect over-reads
+		bb.Write("\0", 1);
+		
 		// Log the packet info into the comm log file:
 		if (g_ShouldLogCommIn)
 		{
@@ -1534,7 +1524,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
 			bb.ReadVarInt(PacketType);
-			ASSERT(PacketData.size() > 0);
+			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
 			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
@@ -1542,7 +1532,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 				PacketType, PacketType, PacketLen, PacketLen, m_State, PacketDataHex.c_str()
 			);
 		}
-		
+
 		if (!HandlePacket(bb, PacketType))
 		{
 			// Unknown packet, already been reported, but without the length. Log the length here:
@@ -1567,7 +1557,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			
 			return;
 		}
-		
+
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
@@ -1588,7 +1578,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			m_Client->PacketError(PacketType);
 		}
 	}  // for (ever)
-	
+
 	// Log any leftover bytes into the logfile:
 	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
 	{
@@ -1698,9 +1688,8 @@ bool cProtocol172::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 
 void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
-	Int64 Timestamp;
-	a_ByteBuffer.ReadBEInt64(Timestamp);
-	
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Timestamp);
+
 	cPacketizer Pkt(*this, 0x01);  // Ping packet
 	Pkt.WriteInt64(Timestamp);
 }
@@ -1711,21 +1700,41 @@ void cProtocol172::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
-	// Send the response:
-	AString Response = "{\"version\":{\"name\":\"1.7.2\", \"protocol\":4}, \"players\":{";
 	cServer * Server = cRoot::Get()->GetServer();
-	AppendPrintf(Response, "\"max\":%u, \"online\":%u, \"sample\":[]},",
-		Server->GetMaxPlayers(),
-		Server->GetNumPlayers()
-	);
-	AppendPrintf(Response, "\"description\":{\"text\":\"%s\"},",
-		Server->GetDescription().c_str()
-	);
-	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
-		Server->GetFaviconData().c_str()
-	);
-	Response.append("}");
-	
+	AString ServerDescription = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "1.7.2";
+	Version["protocol"] = 4;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = ServerDescription.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
 }
@@ -1794,7 +1803,11 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 void cProtocol172::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
 	AString Username;
-	a_ByteBuffer.ReadVarUTF8String(Username);
+	if (!a_ByteBuffer.ReadVarUTF8String(Username))
+	{
+		m_Client->Kick("Bad username");
+		return;
+	}
 	
 	if (!m_Client->HandleHandshake(Username))
 	{
@@ -1888,7 +1901,7 @@ void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
 	
 	m_Client->SetLocale(Locale);
-	// TODO: handle in m_Client
+	// TODO: Do anything with the other values.
 }
 
 
@@ -2051,8 +2064,27 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
+	if (Length + 1 != (int)a_ByteBuffer.GetReadableSpace())
+	{
+		LOGD("Invalid plugin message packet, payload length doesn't match packet length (exp %d, got %d)",
+			(int)a_ByteBuffer.GetReadableSpace() - 1, Length
+		);
+		return;
+	}
+	
+	// If the plugin channel is recognized vanilla, handle it directly:
+	if (Channel.substr(0, 3) == "MC|")
+	{
+		HandleVanillaPluginMessage(a_ByteBuffer, Channel, Length);
+		return;
+	}
+	
+	// Read the plugin message and relay to clienthandle:
 	AString Data;
-	a_ByteBuffer.ReadString(Data, Length);
+	if (!a_ByteBuffer.ReadString(Data, Length))
+	{
+		return;
+	}
 	m_Client->HandlePluginMessage(Channel, Data);
 }
 
@@ -2201,14 +2233,76 @@ void cProtocol172::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol172::WritePacket(cByteBuffer & a_Packet)
+void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, short a_PayloadLength)
 {
-	cCSLock Lock(m_CSPacket);
-	AString Pkt;
-	a_Packet.ReadAll(Pkt);
-	WriteVarInt((UInt32)Pkt.size());
-	SendData(Pkt.data(), Pkt.size());
-	Flush();
+	if (a_Channel == "MC|AdvCdm")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode);
+		switch (Mode)
+		{
+			case 0x00:
+			{
+				// Block-based commandblock update:
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockX);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockY);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockZ);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				break;
+			}
+
+			// TODO: Entity-based commandblock update
+			
+			default:
+			{
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %d", Mode), mtFailure);
+				LOG("Unhandled MC|AdvCdm packet mode.");
+				return;
+			}
+		}  // switch (Mode)
+		return;
+	}
+	else if (a_Channel == "MC|Brand")
+	{
+		// Read the client's brand:
+		AString Brand;
+		if (a_ByteBuffer.ReadString(Brand, a_PayloadLength))
+		{
+			m_Client->SetClientBrand(Brand);
+		}
+		
+		// Send back our brand:
+		SendPluginMessage("MC|Brand", "MCServer");
+		return;
+	}
+	else if (a_Channel == "MC|Beacon")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect2);
+		m_Client->HandleBeaconSelection(Effect1, Effect2);
+		return;
+	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		AString ItemName;
+		if (a_ByteBuffer.ReadString(ItemName, a_PayloadLength))
+		{
+			m_Client->HandleAnvilItemName(ItemName);
+		}
+		return;
+	}
+	else if (a_Channel == "MC|TrSel")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, SlotNum);
+		m_Client->HandleNPCTrade(SlotNum);
+		return;
+	}
+	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
+	
+	// Read the payload and send it through to the clienthandle:
+	AString Message;
+	VERIFY(a_ByteBuffer.ReadString(Message, a_PayloadLength));
+	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
 
@@ -2234,7 +2328,6 @@ void cProtocol172::SendData(const char * a_Data, size_t a_Size)
 		m_Client->SendData(a_Data, a_Size);
 	}
 }
-
 
 
 
@@ -2384,85 +2477,6 @@ void cProtocol172::StartEncryption(const Byte * a_Key)
 
 
 
-void cProtocol172::AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle)
-{
-	size_t len = a_PartStyle.length();
-	for (size_t i = 0; i < len; i++)
-	{
-		switch (a_PartStyle[i])
-		{
-			case 'b':
-			{
-				// bold
-				a_Value["bold"] = Json::Value(true);
-				break;
-			}
-			
-			case 'i':
-			{
-				// italic
-				a_Value["italic"] = Json::Value(true);
-				break;
-			}
-			
-			case 'u':
-			{
-				// Underlined
-				a_Value["underlined"] = Json::Value(true);
-				break;
-			}
-			
-			case 's':
-			{
-				// strikethrough
-				a_Value["strikethrough"] = Json::Value(true);
-				break;
-			}
-			
-			case 'o':
-			{
-				// obfuscated
-				a_Value["obfuscated"] = Json::Value(true);
-				break;
-			}
-			
-			case '@':
-			{
-				// Color, specified by the next char:
-				i++;
-				if (i >= len)
-				{
-					// String too short, didn't contain a color
-					break;
-				}
-				switch (a_PartStyle[i])
-				{
-					case '0': a_Value["color"] = Json::Value("black");        break;
-					case '1': a_Value["color"] = Json::Value("dark_blue");    break;
-					case '2': a_Value["color"] = Json::Value("dark_green");   break;
-					case '3': a_Value["color"] = Json::Value("dark_aqua");    break;
-					case '4': a_Value["color"] = Json::Value("dark_red");     break;
-					case '5': a_Value["color"] = Json::Value("dark_purple");  break;
-					case '6': a_Value["color"] = Json::Value("gold");         break;
-					case '7': a_Value["color"] = Json::Value("gray");         break;
-					case '8': a_Value["color"] = Json::Value("dark_gray");    break;
-					case '9': a_Value["color"] = Json::Value("blue");         break;
-					case 'a': a_Value["color"] = Json::Value("green");        break;
-					case 'b': a_Value["color"] = Json::Value("aqua");         break;
-					case 'c': a_Value["color"] = Json::Value("red");          break;
-					case 'd': a_Value["color"] = Json::Value("light_purple"); break;
-					case 'e': a_Value["color"] = Json::Value("yellow");       break;
-					case 'f': a_Value["color"] = Json::Value("white");        break;
-				}  // switch (color)
-			}  // case '@'
-		}  // switch (Style[i])
-	}  // for i - a_PartStyle[]
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol172::cPacketizer:
 
@@ -2472,6 +2486,7 @@ cProtocol172::cPacketizer::~cPacketizer()
 
 	// Send the packet length
 	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
+
 	m_Protocol.m_OutPacketLenBuffer.WriteVarInt(PacketLen);
 	m_Protocol.m_OutPacketLenBuffer.ReadAll(DataToSend);
 	m_Protocol.SendData(DataToSend.data(), DataToSend.size());
@@ -2566,11 +2581,13 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, (ENUM_ITEM_ID)a_Item.m_ItemType);
 	}
 	Writer.Finish();
+
 	AString Compressed;
 	CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
 	WriteShort((short)Compressed.size());
 	WriteBuf(Compressed.data(), Compressed.size());
 }
+
 
 
 
@@ -2581,6 +2598,19 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 
 	switch (a_BlockEntity.GetBlockType())
 	{
+		case E_BLOCK_BEACON:
+		{
+			cBeaconEntity & BeaconEntity = (cBeaconEntity &)a_BlockEntity;
+
+			Writer.AddInt("x", BeaconEntity.GetPosX());
+			Writer.AddInt("y", BeaconEntity.GetPosY());
+			Writer.AddInt("z", BeaconEntity.GetPosZ());
+			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
+			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
+			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
+			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
+			break;
+		}
 		case E_BLOCK_COMMAND_BLOCK:
 		{
 			cCommandBlockEntity & CommandBlockEntity = (cCommandBlockEntity &)a_BlockEntity;
@@ -2773,7 +2803,7 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(0xA2);
 			WriteItem(Frame.GetItem());
 			WriteByte(0x3);
-			WriteByte(Frame.GetRotation());
+			WriteByte(Frame.GetRotation() / 2);
 			break;
 		}
 		default: break;
@@ -2788,7 +2818,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 {
 	switch (a_Mob.GetMobType())
 	{
-		case cMonster::mtCreeper:
+		case mtCreeper:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);
@@ -2797,28 +2827,28 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtBat:
+		case mtBat:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cBat &)a_Mob).IsHanging() ? 1 : 0);
 			break;
 		}
 		
-		case cMonster::mtPig:
+		case mtPig:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cPig &)a_Mob).IsSaddled() ? 1 : 0);
 			break;
 		}
 		
-		case cMonster::mtVillager:
+		case mtVillager:
 		{
 			WriteByte(0x50);
 			WriteInt(((const cVillager &)a_Mob).GetVilType());
 			break;
 		}
 		
-		case cMonster::mtZombie:
+		case mtZombie:
 		{
 			WriteByte(0x0c);
 			WriteByte(((const cZombie &)a_Mob).IsBaby() ? 1 : 0);
@@ -2829,14 +2859,14 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtGhast:
+		case mtGhast:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cGhast &)a_Mob).IsCharging());
 			break;
 		}
 		
-		case cMonster::mtWolf:
+		case mtWolf:
 		{
 			const cWolf & Wolf = (const cWolf &)a_Mob;
 			Byte WolfStatus = 0;
@@ -2864,7 +2894,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtSheep:
+		case mtSheep:
 		{
 			WriteByte(0x10);
 			Byte SheepMetadata = 0;
@@ -2877,7 +2907,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtEnderman:
+		case mtEnderman:
 		{
 			WriteByte(0x10);
 			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));
@@ -2888,21 +2918,21 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtSkeleton:
+		case mtSkeleton:
 		{
 			WriteByte(0x0d);
 			WriteByte(((const cSkeleton &)a_Mob).IsWither() ? 1 : 0);
 			break;
 		}
 		
-		case cMonster::mtWitch:
+		case mtWitch:
 		{
 			WriteByte(0x15);
 			WriteByte(((const cWitch &)a_Mob).IsAngry() ? 1 : 0);
 			break;
 		}
 
-		case cMonster::mtWither:
+		case mtWither:
 		{
 			WriteByte(0x54);  // Int at index 20
 			WriteInt(((const cWither &)a_Mob).GetWitherInvulnerableTicks());
@@ -2911,21 +2941,21 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 		
-		case cMonster::mtSlime:
+		case mtSlime:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cSlime &)a_Mob).GetSize());
 			break;
 		}
 		
-		case cMonster::mtMagmaCube:
+		case mtMagmaCube:
 		{
 			WriteByte(0x10);
 			WriteByte(((const cMagmaCube &)a_Mob).GetSize());
 			break;
 		}
 		
-		case cMonster::mtHorse:
+		case mtHorse:
 		{
 			const cHorse & Horse = (const cHorse &)a_Mob;
 			int Flags = 0;
@@ -2971,6 +3001,15 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			break;
 		}
 	}  // switch (a_Mob.GetType())
+
+	// Custom name:
+	if (a_Mob.HasCustomName())
+	{
+		WriteByte(0x8a);
+		WriteString(a_Mob.GetCustomName());
+		WriteByte(0x0b);
+		WriteByte(a_Mob.IsCustomNameAlwaysVisible() ? 1 : 0);
+	}
 }
 
 
@@ -3014,18 +3053,24 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
-	Pkt.WriteString(a_Player.GetClientHandle()->GetUUID());
-	Pkt.WriteString(a_Player.GetName());
+	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
+	if (a_Player.HasCustomName())
+	{
+		Pkt.WriteString(a_Player.GetCustomName());
+	}
+	else
+	{
+		Pkt.WriteString(a_Player.GetName());
+	}
 
-	const Json::Value & Properties = m_Client->GetProperties();
-	const Json::Value::const_iterator End = Properties.end();
+	const Json::Value & Properties = a_Player.GetClientHandle()->GetProperties();
 	Pkt.WriteVarInt(Properties.size());
 
-	for (Json::Value::iterator itr = Properties.begin(); itr != End; ++itr)
+	for (Json::Value::iterator itr = Properties.begin(), end = Properties.end(); itr != end; ++itr)
 	{
-		Pkt.WriteString(((Json::Value)*itr).get("name", "").toStyledString());
-		Pkt.WriteString(((Json::Value)*itr).get("value", "").toStyledString());
-		Pkt.WriteString(((Json::Value)*itr).get("signature", "").toStyledString());
+		Pkt.WriteString(((Json::Value)*itr).get("name", "").asString());
+		Pkt.WriteString(((Json::Value)*itr).get("value", "").asString());
+		Pkt.WriteString(((Json::Value)*itr).get("signature", "").asString());
 	}
 
 	Pkt.WriteFPInt(a_Player.GetPosX());
@@ -3046,20 +3091,41 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 {
-	// Send the response:
-	AString Response = "{\"version\": {\"name\": \"1.7.6\", \"protocol\":5}, \"players\": {";
-	AppendPrintf(Response, "\"max\": %u, \"online\": %u, \"sample\": []},",
-		cRoot::Get()->GetServer()->GetMaxPlayers(),
-		cRoot::Get()->GetServer()->GetNumPlayers()
-	);
-	AppendPrintf(Response, "\"description\": {\"text\": \"%s\"},",
-		cRoot::Get()->GetServer()->GetDescription().c_str()
-	);
-	AppendPrintf(Response, "\"favicon\": \"data:image/png;base64,%s\"",
-		cRoot::Get()->GetServer()->GetFaviconData().c_str()
-	);
-	Response.append("}");
-	
+	cServer * Server = cRoot::Get()->GetServer();
+	AString Motd = Server->GetDescription();
+	int NumPlayers = Server->GetNumPlayers();
+	int MaxPlayers = Server->GetMaxPlayers();
+	AString Favicon = Server->GetFaviconData();
+	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, Motd, NumPlayers, MaxPlayers, Favicon);
+
+	// Version:
+	Json::Value Version;
+	Version["name"] = "1.7.6";
+	Version["protocol"] = 5;
+
+	// Players:
+	Json::Value Players;
+	Players["online"] = NumPlayers;
+	Players["max"] = MaxPlayers;
+	// TODO: Add "sample"
+
+	// Description:
+	Json::Value Description;
+	Description["text"] = Motd.c_str();
+
+	// Create the response:
+	Json::Value ResponseValue;
+	ResponseValue["version"] = Version;
+	ResponseValue["players"] = Players;
+	ResponseValue["description"] = Description;
+	if (!Favicon.empty())
+	{
+		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+	}
+
+	Json::StyledWriter Writer;
+	AString Response = Writer.write(ResponseValue);
+
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
 }

@@ -17,7 +17,7 @@ class cBlockIDMap
 	// Making the map case-insensitive:
 	struct Comparator
 	{
-		bool operator()(const AString & a_Item1, const AString & a_Item2) const
+		bool operator ()(const AString & a_Item1, const AString & a_Item2) const
 		{
 			return (NoCaseCompare(a_Item1, a_Item2) > 0);
 		}
@@ -247,57 +247,6 @@ AString ItemToFullString(const cItem & a_Item)
 	AString res;
 	Printf(res, "%s:%d * %d", ItemToString(a_Item).c_str(), a_Item.m_ItemDamage, a_Item.m_ItemCount);
 	return res;
-}
-
-
-
-
-
-int StringToMobType(const AString & a_MobString)
-{
-	static struct
-	{
-		int m_MobType;
-		const char * m_String;
-	} MobMap [] =
-	{
-		{cMonster::mtCreeper,      "Creeper"},
-		{cMonster::mtSkeleton,     "Skeleton"},
-		{cMonster::mtSpider,       "Spider"},
-		{cMonster::mtGiant,        "Giant"},
-		{cMonster::mtZombie,       "Zombie"},
-		{cMonster::mtSlime,        "Slime"},
-		{cMonster::mtGhast,        "Ghast"},
-		{cMonster::mtZombiePigman, "ZombiePigman"},
-		{cMonster::mtEnderman,     "Enderman"},
-		{cMonster::mtCaveSpider,   "CaveSpider"},
-		{cMonster::mtSilverfish,   "SilverFish"},
-		{cMonster::mtBlaze,        "Blaze"},
-		{cMonster::mtMagmaCube,    "MagmaCube"},
-		{cMonster::mtEnderDragon,  "EnderDragon"},
-		{cMonster::mtWither,       "Wither"},
-		{cMonster::mtBat,          "Bat"},
-		{cMonster::mtWitch,        "Witch"},
-		{cMonster::mtPig,          "Pig"},
-		{cMonster::mtSheep,        "Sheep"},
-		{cMonster::mtCow,          "Cow"},
-		{cMonster::mtChicken,      "Chicken"},
-		{cMonster::mtSquid,        "Squid"},
-		{cMonster::mtWolf,         "Wolf"},
-		{cMonster::mtMooshroom,    "Mooshroom"},
-		{cMonster::mtSnowGolem,    "SnowGolem"},
-		{cMonster::mtOcelot,       "Ocelot"},
-		{cMonster::mtIronGolem,    "IronGolem"},
-		{cMonster::mtVillager,     "Villager"},
-	};
-	for (size_t i = 0; i < ARRAYCOUNT(MobMap); i++)
-	{
-		if (NoCaseCompare(MobMap[i].m_String, a_MobString) == 0)
-		{
-			return MobMap[i].m_MobType;
-		}
-	}  // for i - MobMap[]
-	return -1;
 }
 
 

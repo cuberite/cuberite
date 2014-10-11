@@ -24,15 +24,8 @@ public:
 	) override
 	{
 		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
-		a_BlockMeta = Meta;
+		a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage);
 		return true;
-	}
-
-	
-	virtual const char * GetStepSound(void) override
-	{
-		return "step.wood";
 	}
 } ;
 

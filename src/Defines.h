@@ -115,12 +115,14 @@ enum eGameMode
 	eGameMode_Survival  = 0,
 	eGameMode_Creative  = 1,
 	eGameMode_Adventure = 2,
+	eGameMode_Spectator = 3,
 	
 	// Easier-to-use synonyms:
 	gmNotSet    = eGameMode_NotSet,
 	gmSurvival  = eGameMode_Survival,
 	gmCreative  = eGameMode_Creative,
 	gmAdventure = eGameMode_Adventure,
+	gmSpectator = eGameMode_Spectator,
 	
 	// These two are used to check GameMode for validity when converting from integers.
 	gmMax,  // Gets automatically assigned
@@ -528,7 +530,7 @@ inline float GetSpecialSignf( float a_Val)
 
 
 
-template<class T> inline T Diff(T a_Val1, T a_Val2)
+template <class T> inline T Diff(T a_Val1, T a_Val2)
 {
 	return std::abs(a_Val1 - a_Val2);
 }
