@@ -10,11 +10,18 @@ We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 Installation
 ------------
 
-Normally, you will want to download a pre-compiled version of MCServer from the official buildserver: http://builds.cuberite.org
+For Linux there is an easy installation method:
 
-You simply need to download and extract these files before you can use the server. 
+    curl -s http://git.io/KXfyxQ | sh
 
-If you're a more advanced user, you may want to compile the server yourself for more performance. See the [COMPILING.md](https://github.com/mc-server/MCServer/blob/master/COMPILING.md) file for more details.
+For Windows, you just need to download a file and extract it:
+
+ - [Windows 32 bit](http://builds.cuberite.org/job/MCServer%20Windows%20x86/lastSuccessfulBuild/artifact/Install/MCServer.zip)
+ - [Windows 64 bit](http://builds.cuberite.org/job/MCServer%20Windows%20x64/lastSuccessfulBuild/artifact/Install/MCServer.zip)
+
+For other operating systems you need to download and compile yourself. There is also an archive of binary builds on the buildserver: http://builds.cuberite.org
+
+Compiling the server yourself has other benefits: you may get better performance performance (1.5-3x as fast) and it supports more operating systems. See the [COMPILING.md](https://github.com/mc-server/MCServer/blob/master/COMPILING.md) file for more details.
 
 Contributing
 ------------
