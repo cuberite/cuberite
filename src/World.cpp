@@ -1067,12 +1067,13 @@ void cWorld::TickScheduledTasks(void)
 	cScheduledTasks Tasks;
 	{
 		cCSLock Lock(m_CSScheduledTasks);
+		auto WorldAge = m_WorldAge;
 		std::move(
 			m_ScheduledTasks.begin(),
 			std::find_if(
 				m_ScheduledTasks.begin(),
 				m_ScheduledTasks.end(),
-				[m_WorldAge] (std::unique_ptr<cScheduledTask>& Task) { return Task->m_TargetTick < m_WorldAge;}),
+				[WorldAge] (std::unique_ptr<cScheduledTask>& Task) { return Task->m_TargetTick < m_WorldAge;}),
 		 	std::back_inserter(Tasks));
 	}
 
