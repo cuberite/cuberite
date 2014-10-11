@@ -10,10 +10,7 @@ We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 Installation
 ------------
 
-Normally, you will want to download a pre-compiled version of MCServer from one of the buildservers:
-
- * [Windows and Linux](http://builds.cuberite.org)
- * [Raspberry Pi](http://builds.cuberite.org)
+Normally, you will want to download a pre-compiled version of MCServer from the official buildserver: http://builds.cuberite.org
 
 You simply need to download and extract these files before you can use the server. 
 
@@ -22,7 +19,7 @@ If you're a more advanced user, you may want to compile the server yourself for 
 Contributing
 ------------
 
-MCServer is licensed under the Apache license V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
+MCServer is licensed under the Apache License V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
 
 Check out the [CONTRIBUTING.md](https://github.com/mc-server/MCServer/blob/master/CONTRIBUTING.md) file for more details.
 
