@@ -1073,7 +1073,7 @@ void cWorld::TickScheduledTasks(void)
 			std::find_if(
 				m_ScheduledTasks.begin(),
 				m_ScheduledTasks.end(),
-				[WorldAge] (std::unique_ptr<cScheduledTask>& Task) { return Task->m_TargetTick < m_WorldAge;}),
+				[WorldAge] (std::unique_ptr<cScheduledTask>& Task) { return Task->m_TargetTick < WorldAge;}),
 		 	std::back_inserter(Tasks));
 	}
 
