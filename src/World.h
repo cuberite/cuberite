@@ -103,7 +103,7 @@ public:
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
-	typedef std::vector<cTask *> cTasks;
+	typedef std::vector<std::unique_ptr<cTask>> cTasks;
 
 	
 	class cTaskSaveAllChunks :
@@ -506,7 +506,7 @@ public:
 
 	// tolua_end
 
-	inline cSimulatorManager * GetSimulatorManager(void) { return m_SimulatorManager; }
+	inline cSimulatorManager * GetSimulatorManager(void) { return m_SimulatorManager.get(); }
 	
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
@@ -671,7 +671,7 @@ public:
 	void QueueSaveAllChunks(void);  // tolua_export
 	
 	/** Queues a task onto the tick thread. The task object will be deleted once the task is finished */
-	void QueueTask(cTask * a_Task);  // Exported in ManualBindings.cpp
+	void QueueTask(std::unique_ptr<cTask> a_Task);  // Exported in ManualBindings.cpp
 	
 	/** Queues a task onto the tick thread, with the specified delay.
 	The task object will be deleted once the task is finished */
@@ -764,7 +764,7 @@ public:
 
 	cChunkGenerator & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
-	cChunkMap *       GetChunkMap (void) { return m_ChunkMap; }
+	cChunkMap *       GetChunkMap (void) { return m_ChunkMap.get(); }
 		
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
@@ -861,7 +861,7 @@ private:
 		}
 	};
 
-	typedef std::list<cScheduledTask *> cScheduledTasks;
+	typedef std::list<std::unique_ptr<cScheduledTask>> cScheduledTasks;
 
 
 	AString m_WorldName;
@@ -913,11 +913,11 @@ private:
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
 	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;  // Second is for safely removing the objects from the queue
 
-	cSimulatorManager *  m_SimulatorManager;
-	cSandSimulator *     m_SandSimulator;
-	cFluidSimulator *    m_WaterSimulator;
-	cFluidSimulator *    m_LavaSimulator;
-	cFireSimulator *     m_FireSimulator;
+	std::unique_ptr<cSimulatorManager>   m_SimulatorManager;
+	std::unique_ptr<cSandSimulator>      m_SandSimulator;
+	cFluidSimulator *                    m_WaterSimulator;
+	cFluidSimulator *                    m_LavaSimulator;
+	std::unique_ptr<cFireSimulator>      m_FireSimulator;
 	cRedstoneSimulator<cChunk, cWorld> * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSPlayers;
@@ -927,7 +927,7 @@ private:
 	
 	unsigned int m_MaxPlayers;
 
-	cChunkMap * m_ChunkMap;
+	std::unique_ptr<cChunkMap> m_ChunkMap;
 
 	bool m_bAnimals;
 	std::set<eMonsterType> m_AllowedMobs;
