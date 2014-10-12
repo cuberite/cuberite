@@ -1063,7 +1063,7 @@ void cWorld::TickQueuedTasks(void)
 
 void cWorld::TickScheduledTasks(void)
 {
-	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	// Move the tasks to be executed to a seperate vector to avoid deadlocks on accessing m_Tasks
 	cScheduledTasks Tasks;
 	{
 		cCSLock Lock(m_CSScheduledTasks);
@@ -1073,7 +1073,7 @@ void cWorld::TickScheduledTasks(void)
 			std::find_if(
 				m_ScheduledTasks.begin(),
 				m_ScheduledTasks.end(),
-				[WorldAge] (std::unique_ptr<cScheduledTask>& Task) { return Task->m_TargetTick < WorldAge;}),
+				[WorldAge] (std::unique_ptr<cScheduledTask> & Task) { return Task->m_TargetTick < WorldAge;}),
 		 	std::back_inserter(Tasks));
 	}
 
