@@ -913,11 +913,11 @@ private:
 	std::vector<BlockTickQueueItem *> m_BlockTickQueue;
 	std::vector<BlockTickQueueItem *> m_BlockTickQueueCopy;  // Second is for safely removing the objects from the queue
 
-	std::unique_ptr<cSimulatorManager>  m_SimulatorManager;
-	std::unique_ptr<cSandSimulator>    m_SandSimulator;
-	cFluidSimulator *    m_WaterSimulator;
-	cFluidSimulator *    m_LavaSimulator;
-	std::unique_ptr<cFireSimulator>     m_FireSimulator;
+	std::unique_ptr<cSimulatorManager>   m_SimulatorManager;
+	std::unique_ptr<cSandSimulator>      m_SandSimulator;
+	cFluidSimulator *                    m_WaterSimulator;
+	cFluidSimulator *                    m_LavaSimulator;
+	std::unique_ptr<cFireSimulator>      m_FireSimulator;
 	cRedstoneSimulator<cChunk, cWorld> * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSPlayers;
