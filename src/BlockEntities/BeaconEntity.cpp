@@ -5,7 +5,7 @@
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 
-
+#include <algorithm>
 
 
 
@@ -227,7 +227,7 @@ void cBeaconEntity::GiveEffects(void)
 		virtual bool Item(cPlayer * a_Player)
 		{
 			Vector3d PlayerPosition = Vector3d(a_Player->GetPosition());
-			PlayerPosition.y = std::min(m_PosY, static_cast<double>(PlayerPosition.y))
+			PlayerPosition.y = std::min(static_cast<double>(m_PosY), static_cast<double>(PlayerPosition.y));
 
 			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
 			Vector3d BeaconPosition = Vector3d(m_PosX, m_PosY, m_PosZ);
