@@ -66,7 +66,7 @@ public:
 
 	/// The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column
 	typedef HEIGHTTYPE HeightMap[Width * Width];
-	
+
 	/** The type used for any biomemap operations and storage inside MCServer,
 	using MCServer biomes (need not correspond to client representation!)
 	idx = x + Width * z  // Need to verify this with the protocol spec, currently unknown!
@@ -95,8 +95,8 @@ public:
 		a_X = a_X - a_ChunkX * Width;
 		a_Z = a_Z - a_ChunkZ * Width;
 	}
-	
-	
+
+
 	/// Converts absolute block coords to chunk coords:
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{
@@ -165,15 +165,15 @@ public:
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
 	}
-	
-	
+
+
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_Index, BLOCKTYPE a_Type)
 	{
 		ASSERT((a_Index >= 0) && (a_Index <= NumBlocks));
 		a_BlockTypes[a_Index] = a_Type;
 	}
-	
-	
+
+
 	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
@@ -181,39 +181,39 @@ public:
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)];
 	}
-	
-	
+
+
 	inline static BLOCKTYPE GetBlock(const BLOCKTYPE * a_BlockTypes, int a_Idx)
 	{
 		ASSERT((a_Idx >= 0) && (a_Idx < NumBlocks));
 		return a_BlockTypes[a_Idx];
 	}
-	
-	
+
+
 	inline static int GetHeight(const HeightMap & a_HeightMap, int a_X, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_HeightMap[a_X + Width * a_Z];
 	}
-	
-	
+
+
 	inline static void SetHeight(HeightMap & a_HeightMap, int a_X, int a_Z, unsigned char a_Height)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		a_HeightMap[a_X + Width * a_Z] = a_Height;
 	}
-	
-	
+
+
 	inline static EMCSBiome GetBiome(const BiomeMap & a_BiomeMap, int a_X, int a_Z)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
 		return a_BiomeMap[a_X + Width * a_Z];
 	}
-	
-	
+
+
 	inline static void SetBiome(BiomeMap & a_BiomeMap, int a_X, int a_Z, EMCSBiome a_Biome)
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
@@ -226,11 +226,11 @@ public:
 	{
 		if ((a_BlockIdx > -1) && (a_BlockIdx < NumBlocks))
 		{
-			if ((size_t)(a_BlockIdx / 2) >= a_Buffer.size())
+			if (static_cast<size_t>((a_BlockIdx / 2)) >= a_Buffer.size())
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
 			}
-			return (a_Buffer[(size_t)(a_BlockIdx / 2)] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
+			return (a_Buffer[static_cast<size_t>(a_BlockIdx / 2)] >> ((a_BlockIdx & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): index out of chunk range!");
 		return 0;
@@ -241,7 +241,7 @@ public:
 	{
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
-			size_t Index = (size_t)MakeIndexNoCheck(x, y, z);
+			size_t Index = static_cast<size_t>(MakeIndexNoCheck(x, y, z));
 			if ((Index / 2) >= a_Buffer.size())
 			{
 				return (a_IsSkyLightNibble ? 0xff : 0);
@@ -258,7 +258,7 @@ public:
 		if ((x < Width) && (x > -1) && (y < Height) && (y > -1) && (z < Width) && (z > -1))
 		{
 			int Index = MakeIndexNoCheck(x, y, z);
-			return (a_Buffer[(size_t)(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
+			return (a_Buffer[static_cast<size_t>(Index / 2)] >> ((Index & 1) * 4)) & 0x0f;
 		}
 		ASSERT(!"cChunkDef::GetNibble(): coords out of chunk range!");
 		return 0;
@@ -272,11 +272,11 @@ public:
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
 		}
-		if ((size_t)(a_BlockIdx / 2) >= a_Buffer.size())
+		if (static_cast<size_t>(a_BlockIdx / 2) >= a_Buffer.size())
 		{
-			a_Buffer.resize((size_t)((a_BlockIdx / 2) + 1));
+			a_Buffer.resize(static_cast<size_t>((a_BlockIdx / 2) + 1));
 		}
-		a_Buffer[(size_t)(a_BlockIdx / 2)] = PackNibble(a_Buffer, (size_t)a_BlockIdx, a_Nibble);
+		a_Buffer[static_cast<size_t>(a_BlockIdx / 2)] = PackNibble(a_Buffer, static_cast<size_t>(a_BlockIdx), a_Nibble);
 	}
 
 
@@ -292,7 +292,7 @@ public:
 			return;
 		}
 
-		size_t Index = (size_t)MakeIndexNoCheck(x, y, z);
+		size_t Index = static_cast<size_t>(MakeIndexNoCheck(x, y, z));
 		if ((Index / 2) >= a_Buffer.size())
 		{
 			a_Buffer.resize(((Index / 2) + 1));
@@ -336,7 +336,7 @@ public:
 
 	/// Called for clients that are in Chunk1 and not in Chunk2,
 	virtual void Removed(cClientHandle * a_Client) = 0;
-	
+
 	/// Called for clients that are in Chunk2 and not in Chunk1.
 	virtual void Added(cClientHandle * a_Client) = 0;
 } ;
@@ -373,9 +373,9 @@ class cChunkCoords
 public:
 	int m_ChunkX;
 	int m_ChunkZ;
-	
+
 	cChunkCoords(int a_ChunkX, int a_ChunkZ) : m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ) {}
-	
+
 	bool operator == (const cChunkCoords & a_Other) const
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
@@ -432,12 +432,12 @@ public:
 	int y;
 	int z;
 	X   Data;
-	
+
 	cCoordWithData(int a_X, int a_Y, int a_Z) :
 		x(a_X), y(a_Y), z(a_Z), Data()
 	{
 	}
-	
+
 	cCoordWithData(int a_X, int a_Y, int a_Z, const X & a_Data) :
 		x(a_X), y(a_Y), z(a_Z), Data(a_Data)
 	{
@@ -478,7 +478,3 @@ public:
 typedef cCoordWithDoubleData <BLOCKTYPE, bool> cCoordWithBlockAndBool;
 
 typedef std::vector<cCoordWithBlockAndBool> cCoordWithBlockAndBoolVector;
-
-
-
-

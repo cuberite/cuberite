@@ -67,8 +67,8 @@ void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 		if (a_Player->GetWindow() != Window)
 		{
 			a_Player->OpenWindow(Window);
-			BroadcastProgress(PROGRESSBAR_FUEL,     (short)m_LastProgressFuel);
-			BroadcastProgress(PROGRESSBAR_SMELTING, (short)m_LastProgressCook);
+			BroadcastProgress(PROGRESSBAR_FUEL,     static_cast<short>(m_LastProgressFuel));
+			BroadcastProgress(PROGRESSBAR_SMELTING, static_cast<short>(m_LastProgressCook));
 		}
 	}
 }
@@ -112,16 +112,16 @@ bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			FinishOne();
 		}
 	}
-	
+
 	m_TimeBurned++;
 	if (m_TimeBurned >= m_FuelBurnTime)
 	{
 		// The current fuel has been exhausted, use another one, if possible
 		BurnNewFuel();
 	}
-	
+
 	UpdateProgressBars();
-	
+
 	return true;
 }
 
@@ -166,7 +166,7 @@ void cFurnaceEntity::FinishOne()
 		m_Contents.ChangeSlotCount(fsOutput, m_CurrentRecipe->Out->m_ItemCount);
 	}
 	m_Contents.ChangeSlotCount(fsInput, -m_CurrentRecipe->In->m_ItemCount);
-	
+
 	UpdateIsCooking();
 }
 
@@ -186,7 +186,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 		SetIsCooking(false);
 		return;
 	}
-	
+
 	// Is the input and output ready for cooking?
 	if (!CanCookInputToOutput())
 	{
@@ -214,13 +214,13 @@ void cFurnaceEntity::BurnNewFuel(void)
 void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
-	
+
 	if (m_World == NULL)
 	{
 		// The furnace isn't initialized yet, do no processing
 		return;
 	}
-	
+
 	ASSERT(a_ItemGrid == &m_Contents);
 	switch (a_SlotNum)
 	{
@@ -229,13 +229,13 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 			UpdateInput();
 			break;
 		}
-		
+
 		case fsFuel:
 		{
 			UpdateFuel();
 			break;
 		}
-		
+
 		case fsOutput:
 		{
 			UpdateOutput();
@@ -258,7 +258,7 @@ void cFurnaceEntity::UpdateInput(void)
 		m_TimeCooked = 0;
 	}
 	m_LastInput = m_Contents.GetSlot(fsInput);
-	
+
 	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
 	m_CurrentRecipe = FR->GetRecipeFrom(m_Contents.GetSlot(fsInput));
 	if (!CanCookInputToOutput())
@@ -271,7 +271,7 @@ void cFurnaceEntity::UpdateInput(void)
 	{
 		m_NeedCookTime = m_CurrentRecipe->CookTime;
 		SetIsCooking(true);
-		
+
 		// Start burning new fuel if there's no flame now:
 		if (GetFuelBurnTimeLeft() <= 0)
 		{
@@ -292,7 +292,7 @@ void cFurnaceEntity::UpdateFuel(void)
 		// The current fuel is still burning, don't modify anything:
 		return;
 	}
-	
+
 	// The current fuel is spent, try to burn some more:
 	BurnNewFuel();
 }
@@ -312,7 +312,7 @@ void cFurnaceEntity::UpdateOutput(void)
 		SetIsCooking(false);
 		return;
 	}
-	
+
 	// No need to burn new fuel, the Tick() function will take care of that
 
 	// Can cook, start cooking if not already underway:
@@ -339,7 +339,7 @@ void cFurnaceEntity::UpdateIsCooking(void)
 		m_NeedCookTime = 0;
 		return;
 	}
-	
+
 	SetIsCooking(true);
 }
 
@@ -355,7 +355,7 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		// This input cannot be cooked
 		return false;
 	}
-	
+
 	const cItem & Slot = m_Contents.GetSlot(fsOutput);
 	if (Slot.IsEmpty())
 	{
@@ -368,13 +368,13 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		// The output slot is blocked with something that cannot be stacked with the recipe's output
 		return false;
 	}
-	
+
 	if (Slot.IsFullStack())
 	{
 		// Cannot add any more items to the output slot
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -387,18 +387,18 @@ void cFurnaceEntity::UpdateProgressBars(void)
 {
 	// In order to preserve bandwidth, an update is sent only every 10th tick
 	// That's why the comparisons use the division by eight
-	
+
 	int CurFuel = (m_FuelBurnTime > 0) ? (200 - 200 * m_TimeBurned / m_FuelBurnTime) : 0;
 	if ((CurFuel / 8) != (m_LastProgressFuel / 8))
 	{
-		BroadcastProgress(PROGRESSBAR_FUEL, (short)CurFuel);
+		BroadcastProgress(PROGRESSBAR_FUEL, static_cast<short>(CurFuel));
 		m_LastProgressFuel = CurFuel;
 	}
-	
+
 	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;
 	if ((CurCook / 8) != (m_LastProgressCook / 8))
 	{
-		BroadcastProgress(PROGRESSBAR_SMELTING, (short)CurCook);
+		BroadcastProgress(PROGRESSBAR_SMELTING, static_cast<short>(CurCook));
 		m_LastProgressCook = CurCook;
 	}
 }
@@ -415,11 +415,7 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	}
 
 	m_IsCooking = a_IsCooking;
-		
+
 	// Light or extinguish the furnace:
 	m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, m_IsCooking ? E_BLOCK_LIT_FURNACE : E_BLOCK_FURNACE, m_BlockMeta);
 }
-
-
-
-	
