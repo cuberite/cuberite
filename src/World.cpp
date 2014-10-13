@@ -1068,15 +1068,24 @@ void cWorld::TickScheduledTasks(void)
 	{
 		cCSLock Lock(m_CSScheduledTasks);
 		auto WorldAge = m_WorldAge;
-		std::move(
-			m_ScheduledTasks.begin(),
-			std::find_if(
-				m_ScheduledTasks.begin(),
-				m_ScheduledTasks.end(),
-				[WorldAge] (cScheduledTaskPtr & Task) { return (Task->m_TargetTick < WorldAge);}
-			),
-			std::back_inserter(Tasks)
-		);
+
+		// Move all the due tasks from m_ScheduledTasks into Tasks:
+		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-basd for, we're modifying the container
+		{
+			if ((*itr)->m_TargetTick < WorldAge)
+			{
+				auto next = itr;
+				++next;
+				Tasks.push_back(std::move(*itr));
+				m_ScheduledTasks.erase(itr);
+				itr = next;
+			}
+			else
+			{
+				// All the eligible tasks have been moved, bail out now
+				break;
+			}
+		}
 	}
 
 	// Execute and delete each task:
