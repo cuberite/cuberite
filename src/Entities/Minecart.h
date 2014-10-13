@@ -127,7 +127,7 @@ public:
 		ContentsWidth = 9,
 	};
 	
-	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }	
+	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
 	void SetSlot(size_t a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
 protected:

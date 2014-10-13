@@ -861,7 +861,8 @@ private:
 		}
 	};
 
-	typedef std::list<std::unique_ptr<cScheduledTask>> cScheduledTasks;
+	typedef std::unique_ptr<cScheduledTask> cScheduledTaskPtr;
+	typedef std::list<cScheduledTaskPtr> cScheduledTasks;
 
 
 	AString m_WorldName;
