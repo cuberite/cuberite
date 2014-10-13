@@ -1160,7 +1160,7 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 
-	self->QueueTask(new cLuaWorldTask(*Plugin, FnRef));
+	self->QueueTask(make_unique<cLuaWorldTask>(*Plugin, FnRef));
 	return 0;
 }
 

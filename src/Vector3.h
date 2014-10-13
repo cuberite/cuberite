@@ -3,8 +3,6 @@
 
 
 
-#define _USE_MATH_DEFINES  // Enable non-standard math defines (MSVC)
-#include <math.h>
 #include <list>
 #include <vector>
 
@@ -29,9 +27,9 @@ public:
 
 
 	// Hardcoded copy constructors (tolua++ does not support function templates .. yet)
-	Vector3(const Vector3<float>  & a_Rhs) : x((T) a_Rhs.x), y((T) a_Rhs.y), z((T) a_Rhs.z) {}
-	Vector3(const Vector3<double> & a_Rhs) : x((T) a_Rhs.x), y((T) a_Rhs.y), z((T) a_Rhs.z) {}
-	Vector3(const Vector3<int>    & a_Rhs) : x((T) a_Rhs.x), y((T) a_Rhs.y), z((T) a_Rhs.z) {}
+	Vector3(const Vector3<float>  & a_Rhs) : x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
+	Vector3(const Vector3<double> & a_Rhs) : x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
+	Vector3(const Vector3<int>    & a_Rhs) : x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
 
 
 	// tolua_end
@@ -53,9 +51,9 @@ public:
 	{
 		double Len = 1.0 / Length();
 
-		x = (T)(x * Len);
-		y = (T)(y * Len);
-		z = (T)(z * Len);
+		x = static_cast<T>(x * Len);
+		y = static_cast<T>(y * Len);
+		z = static_cast<T>(z * Len);
 	}
 
 	inline Vector3<T> NormalizeCopy(void) const
@@ -63,9 +61,9 @@ public:
 		double Len = 1.0 / Length();
 
 		return Vector3<T>(
-			(T)(x * Len),
-			(T)(y * Len),
-			(T)(z * Len)
+			static_cast<T>(x * Len),
+			static_cast<T>(y * Len),
+			static_cast<T>(z * Len)
 		);
 	}
 
@@ -74,15 +72,15 @@ public:
 		double Len = 1.0 / Length();
 
 		a_Rhs.Set(
-			(T)(x * Len),
-			(T)(y * Len),
-			(T)(z * Len)
+			static_cast<T>(x * Len),
+			static_cast<T>(y * Len),
+			static_cast<T>(z * Len)
 		);
 	}
 
 	inline double Length(void) const
 	{
-		return sqrt((double)(x * x + y * y + z * z));
+		return sqrt(static_cast<double>(x * x + y * y + z * z));
 	}
 
 	inline double SqrLength(void) const
@@ -138,9 +136,9 @@ public:
 	inline Vector3<int> Floor(void) const
 	{
 		return Vector3<int>(
-			(int)floor(x),
-			(int)floor(y),
-			(int)floor(z)
+			FloorC(x),
+			FloorC(y),
+			FloorC(z)
 		);
 	}
 

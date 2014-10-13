@@ -51,6 +51,9 @@
 	
 	#define NORETURN      __declspec(noreturn)
 
+	// Use non-standard defines in <cmath>
+	#define _USE_MATH_DEFINES
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -226,10 +229,10 @@ template class SizeChecker<UInt16, 2>;
 
 // CRT stuff:
 #include <sys/stat.h>
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+#include <cstdarg>
 
 
 
@@ -400,6 +403,30 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
+/** Floors a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type FloorC(T a_Value)
+{
+	return static_cast<C>(std::floor(a_Value));
+}
+
+/** Ceils a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
+{
+	return static_cast<C>(std::ceil(a_Value));
+}
+
+
+
+//temporary replacement for std::make_unique until we get c++14
+template <class T, class... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+	return std::unique_ptr<T>(new T(args...));
+}
+
+
 #ifndef TOLUA_TEMPLATE_BIND
 	#define TOLUA_TEMPLATE_BIND(x)
 #endif
@@ -413,5 +440,6 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
+
 
 

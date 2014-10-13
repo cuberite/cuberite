@@ -3,26 +3,30 @@ MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](
 
 MCServer is a Minecraft server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API.
 
-MCServer can run on PCs, Macs, and *nix. This includes android phones and tablets as well as Raspberry Pis. 
+MCServer can run on Windows, *nix and Android operating systems. This includes Android phones and tablets as well as Raspberry Pis. 
 
-We currently support the protocol from Minecraft 1.2 all the way up to Minecraft 1.8.
+We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 
 Installation
 ------------
 
-Normally, you will want to download a pre-compiled version of MCServer from one of the buildservers:
+For Linux there is an easy installation method, just run this in your terminal:
 
- * [Windows and Linux](http://builds.cuberite.org)
- * [Raspberry Pi](http://builds.cuberite.org)
+    curl -s https://raw.githubusercontent.com/mc-server/MCServer/master/easyinstall.sh | sh
 
-You simply need to download and extract these files before you can use the server. 
+For Windows, you just need to download a file and extract it:
 
-If you're a more advanced user, you may want to compile the server yourself for more performance. See the [COMPILING.md](https://github.com/mc-server/MCServer/blob/master/COMPILING.md) file for more details.
+ - [Windows 32 bit](http://builds.cuberite.org/job/MCServer%20Windows%20x86/lastSuccessfulBuild/artifact/Install/MCServer.zip)
+ - [Windows 64 bit](http://builds.cuberite.org/job/MCServer%20Windows%20x64/lastSuccessfulBuild/artifact/Install/MCServer.zip)
+
+For other operating systems you need to download and compile yourself. There is also an archive of binary builds on the buildserver: http://builds.cuberite.org
+
+Compiling the server yourself has other benefits: you may get better performance performance (1.5-3x as fast) and it supports more operating systems. See the [COMPILING.md](https://github.com/mc-server/MCServer/blob/master/COMPILING.md) file for more details.
 
 Contributing
 ------------
 
-MCServer is licensed under the Apache license V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
+MCServer is licensed under the Apache License V2, and we welcome anybody to fork and submit a Pull Request back with their changes, and if you want to join as a permanent member we can add you to the team.
 
 Check out the [CONTRIBUTING.md](https://github.com/mc-server/MCServer/blob/master/CONTRIBUTING.md) file for more details.
 

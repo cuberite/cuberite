@@ -10,9 +10,6 @@ g_ShowFoodStats = false;  -- When true, each player's food stats are sent to the
 
 
 function Initialize(Plugin)
-	Plugin:SetName("Debuggers")
-	Plugin:SetVersion(1)
-	
 	--[[
 	-- Test multiple hook handlers:
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick1);
@@ -68,6 +65,8 @@ function Initialize(Plugin)
 	PM:BindCommand("/rmitem",  "debuggers", HandleRMItem,          "- Remove the specified item from the inventory.");
 	PM:BindCommand("/pickups", "debuggers", HandlePickups,         "- Spawns random pickups around you");
 	PM:BindCommand("/poof",    "debuggers", HandlePoof,            "- Nudges pickups close to you away from you");
+	
+	PM:BindConsoleCommand("sched", HandleConsoleSchedule, "Tests the world scheduling");
 
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
@@ -1625,6 +1624,20 @@ function HandlePoof(a_Split, a_Player)
 	)
 	a_Player:SendMessage("Poof! (" .. NumEntities .. " entities)")
 	return true
+end
+
+
+
+
+
+function HandleConsoleSchedule(a_Split)
+	LOG("Scheduling a task for 2 seconds in the future")
+	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
+		function ()
+			LOG("Scheduled function is called.")
+		end
+	)
+	return true, "Task scheduled"
 end
 
 
