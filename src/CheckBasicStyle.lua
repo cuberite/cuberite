@@ -41,6 +41,7 @@ local g_ShouldProcessExt =
 --- The list of files not to be processed:
 local g_IgnoredFiles =
 {
+	"Bindings/Bindings.h",
 	"Bindings/Bindings.cpp",
 	"LeakFinder.cpp",
 	"LeakFinder.h",
