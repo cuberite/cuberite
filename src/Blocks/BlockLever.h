@@ -108,9 +108,9 @@ public:
 		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
 
 
-		if (!(cBlockInfo::FullyOccupiesVoxel(BlockIsOn)))
+		if (cBlockInfo::FullyOccupiesVoxel(BlockIsOn))
 		{
-			return false;
+			return true;
 		}
 		else if (cBlockSlabHandler::IsAnySlabType(BlockIsOn))
 		{
@@ -119,13 +119,9 @@ public:
 			{
 				return true;
 			}
-			else
-			{
-				return false;
-			}
 		}
 
-		return true;
+		return false;
 	}
 
 
