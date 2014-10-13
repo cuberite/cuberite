@@ -2,7 +2,6 @@
 #pragma once
 
 
-#include "../Entities/Player.h"
 
 
 
@@ -13,8 +12,7 @@ namespace Json
 
 class cChunk;
 class cWorld;
-
-
+class cPlayer;
 
 
 
