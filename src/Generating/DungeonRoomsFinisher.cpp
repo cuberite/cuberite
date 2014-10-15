@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "DungeonRoomsFinisher.h"
 #include "../FastRandom.h"
+#include "../BlockEntities/ChestEntity.h"
 
 
 
@@ -175,7 +176,32 @@ protected:
 		}
 		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, (NIBBLETYPE)a_Chest.y);
 
-		// TODO: Fill the chest with random loot
+		// Fill the chest with random loot
+		static const cLootProbab LootProbab[] =
+		{
+			// Item,                          MinAmount, MaxAmount, Weight
+			{ cItem(E_ITEM_IRON),                1,         4,        10 },
+			{ cItem(E_ITEM_WHEAT),               1,         4,        10 },
+			{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
+			{ cItem(E_ITEM_STRING),              1,         4,        10 },
+			{ cItem(E_ITEM_REDSTONE_DUST),       1,         4,        10 },
+			{ cItem(E_ITEM_SADDLE),              1,         1,        10 },
+			{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
+			{ cItem(E_ITEM_BREAD),               1,         1,        10 },
+			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
+			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
+			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
+			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
+			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
+			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
+		} ;
+
+		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ);
+		ASSERT((ChestEntity != NULL) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
+		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
+		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
 	}
 
 
