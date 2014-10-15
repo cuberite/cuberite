@@ -1030,7 +1030,7 @@ cEnchantments cEnchantments::GenerateEnchantmentFromVector(cWeightedEnchantments
 	}
 
 	cNoise Noise(a_Seed);
-	int RandomNumber = Noise.IntNoise1DInt(AllWeights) % AllWeights;
+	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
 
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
