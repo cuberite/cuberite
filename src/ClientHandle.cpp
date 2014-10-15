@@ -248,9 +248,12 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	// Note that we generate a short UUID (without the dashes)
 	
+	// First make the username lowercase:
+	AString lcUsername = StrToLower(a_Username);
+
 	// Generate an md5 checksum, and use it as base for the ID:
 	unsigned char MD5[16];
-	md5((const unsigned char *)a_Username.c_str(), a_Username.length(), MD5);
+	md5((const unsigned char *)lcUsername.c_str(), lcUsername.length(), MD5);
 	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
 	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
 	return Printf("%02x%02x%02x%02x%02x%02x3%01x%02x8%01x%02x%02x%02x%02x%02x%02x%02x",
