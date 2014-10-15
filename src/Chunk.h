@@ -218,7 +218,7 @@ public:
 	Sends the chunk to all relevant clients. */
 	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
 	
-	void CollectPickupsByPlayer(cPlayer * a_Player);
+	void CollectPickupsByPlayer(cPlayer & a_Player);
 	
 	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
 	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);

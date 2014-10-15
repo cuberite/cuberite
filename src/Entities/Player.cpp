@@ -245,7 +245,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_Health > 0)  // make sure player is alive
 	{
-		m_World->CollectPickupsByPlayer(this);
+		m_World->CollectPickupsByPlayer(*this);
 
 		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
 		{

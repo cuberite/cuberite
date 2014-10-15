@@ -69,26 +69,26 @@ public:
 
 	virtual void Tick(float a_Dt) override;
 
-	virtual bool OnBlockSpread              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
-	virtual bool OnBlockToPickups           (cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
-	virtual bool OnChat                     (cPlayer * a_Player, AString & a_Message) override;
-	virtual bool OnChunkAvailable           (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
-	virtual bool OnChunkGenerated           (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
-	virtual bool OnChunkGenerating          (cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
-	virtual bool OnChunkUnloaded            (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
-	virtual bool OnChunkUnloading           (cWorld * a_World, int a_ChunkX, int a_ChunkZ) override;
-	virtual bool OnCollectingPickup         (cPlayer * a_Player, cPickup * a_Pickup) override;
-	virtual bool OnCraftingNoRecipe         (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
+	virtual bool OnBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
+	virtual bool OnBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
+	virtual bool OnChat                     (cPlayer & a_Player, AString & a_Message) override;
+	virtual bool OnChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
+	virtual bool OnChunkGenerating          (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
+	virtual bool OnChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool OnCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup) override;
+	virtual bool OnCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe) override;
 	virtual bool OnDisconnect               (cClientHandle & a_Client, const AString & a_Reason) override;
 	virtual bool OnEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) override;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split) override;
 	virtual bool OnExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
 	virtual bool OnExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
-	virtual bool OnHandshake                (cClientHandle * a_Client, const AString & a_Username) override;
+	virtual bool OnHandshake                (cClientHandle & a_Client, const AString & a_Username) override;
 	virtual bool OnHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum) override;
 	virtual bool OnHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) override;
 	virtual bool OnKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) override;
-	virtual bool OnLogin                    (cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username) override;
+	virtual bool OnLogin                    (cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username) override;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
 	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
@@ -113,8 +113,8 @@ public:
 	virtual bool OnPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual bool OnPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message) override;
 	virtual bool OnPluginsLoaded            (void) override;
-	virtual bool OnPostCrafting             (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
-	virtual bool OnPreCrafting              (const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe) override;
+	virtual bool OnPostCrafting             (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
+	virtual bool OnPreCrafting              (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
 	virtual bool OnProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos) override;
 	virtual bool OnProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) override;
 	virtual bool OnServerPing               (cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon) override;
@@ -123,14 +123,14 @@ public:
 	virtual bool OnSpawningEntity           (cWorld & a_World, cEntity & a_Entity) override;
 	virtual bool OnSpawningMonster          (cWorld & a_World, cMonster & a_Monster) override;
 	virtual bool OnTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TakeDamageInfo) override;
-	virtual bool OnUpdatedSign              (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player) override;
-	virtual bool OnUpdatingSign             (cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
+	virtual bool OnUpdatedSign              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player) override;
+	virtual bool OnUpdatingSign             (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
 	virtual bool OnWeatherChanged           (cWorld & a_World) override;
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) override;
 	virtual bool OnWorldStarted             (cWorld & a_World) override;
 	virtual bool OnWorldTick                (cWorld & a_World, float a_Dt, int a_LastTickDurationMSec) override;
 	
-	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer * a_Player) override;
+	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player) override;
 	
 	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) override;
 

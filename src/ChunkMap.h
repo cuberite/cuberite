@@ -144,7 +144,7 @@ public:
 	
 	void FastSetQueuedBlocks();
 	void      FastSetBlocks      (sSetBlockList & a_BlockList);
-	void      CollectPickupsByPlayer(cPlayer * a_Player);
+	void      CollectPickupsByPlayer(cPlayer & a_Player);
 	
 	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
 	NIBBLETYPE GetBlockMeta      (int a_BlockX, int a_BlockY, int a_BlockZ);

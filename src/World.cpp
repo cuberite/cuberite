@@ -2607,7 +2607,7 @@ void cWorld::QueueUnloadUnusedChunks(void)
 
 
 
-void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
+void cWorld::CollectPickupsByPlayer(cPlayer & a_Player)
 {
 	m_ChunkMap->CollectPickupsByPlayer(a_Player);
 }
@@ -2909,13 +2909,13 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	AString Line2(a_Line2);
 	AString Line3(a_Line3);
 	AString Line4(a_Line4);
-	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
+	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
 	{
 		return false;
 	}
 	if (m_ChunkMap->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4))
 	{
-		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
+		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
 		return true;
 	}
 	return false;
@@ -3640,7 +3640,7 @@ bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_Ch
 void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc)
 {
 	cPluginManager::Get()->CallHookChunkGenerating(
-		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
 
@@ -3651,7 +3651,7 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_Ch
 void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc)
 {
 	cPluginManager::Get()->CallHookChunkGenerated(
-		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
 

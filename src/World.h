@@ -298,7 +298,7 @@ public:
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading*/
 	void QueueUnloadUnusedChunks(void);  // tolua_export
 	
-	void CollectPickupsByPlayer(cPlayer * a_Player);
+	void CollectPickupsByPlayer(cPlayer & a_Player);
 
 	/** Adds the player to the world.
 	Uses a queue to store the player object until the Tick thread processes the addition event.

@@ -149,14 +149,14 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 
 
 
-void cArrowEntity::CollectedBy(cPlayer * a_Dest)
+void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 {
-	if (m_IsInGround && !m_bIsCollected && CanPickup(*a_Dest))
+	if (m_IsInGround && !m_bIsCollected && CanPickup(a_Dest))
 	{
 		// Do not add the arrow to the inventory when the player is in creative:
-		if (!a_Dest->IsGameModeCreative())
+		if (!a_Dest.IsGameModeCreative())
 		{
-			int NumAdded = a_Dest->GetInventory().AddItem(E_ITEM_ARROW);
+			int NumAdded = a_Dest.GetInventory().AddItem(E_ITEM_ARROW);
 			if (NumAdded == 0)
 			{
 				// No space in the inventory
@@ -164,7 +164,7 @@ void cArrowEntity::CollectedBy(cPlayer * a_Dest)
 			}
 		}
 
-		GetWorld()->BroadcastCollectEntity(*this, *a_Dest);
+		GetWorld()->BroadcastCollectEntity(*this, a_Dest);
 		GetWorld()->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
@@ -229,3 +229,7 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 }
+
+
+
+

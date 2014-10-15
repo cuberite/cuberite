@@ -450,7 +450,7 @@ bool cServer::Start(void)
 
 bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 {
-	return cRoot::Get()->GetPluginManager()->CallHookChat(a_Client.GetPlayer(), a_Cmd);
+	return cRoot::Get()->GetPluginManager()->CallHookChat(*(a_Client.GetPlayer()), a_Cmd);
 }
 
 

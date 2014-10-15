@@ -596,7 +596,7 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 	m_Username = a_Username;
 
 	// Let the plugins know about this event, they may refuse the player:
-	if (cRoot::Get()->GetPluginManager()->CallHookLogin(this, a_ProtocolVersion, a_Username))
+	if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, a_ProtocolVersion, a_Username))
 	{
 		Destroy();
 		return false;
@@ -1715,7 +1715,7 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(this, a_Username))
+	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
 		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
 		{
