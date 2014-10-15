@@ -637,7 +637,20 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 		int Rnd = (Noise.IntNoise1DInt(i) / 7);
 		int LootRnd = Rnd % TotalProbab;
 		Rnd >>= 8;
-		cItem CurrentLoot = cItem(E_ITEM_BOOK, 1, 0);  // TODO: enchantment
+		cItem CurrentLoot = cItem(E_ITEM_ENCHANTED_BOOK, 1, 0);
+
+		// Choose the enchantments
+		cWeightedEnchantments Enchantments;
+		cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7);
+		int NumEnchantments = Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5; // The number of enchantments this book wil get.
+		
+		for (int I = 0; I <= NumEnchantments; I++)
+		{
+			cEnchantments Enchantment = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Seed);
+			CurrentLoot.m_Enchantments.AddFromString(Enchantment.ToString());
+			cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment);
+		}
+
 		for (size_t j = 0; j < a_CountLootProbabs; j++)
 		{
 			LootRnd -= a_LootProbabs[i].m_Weight;

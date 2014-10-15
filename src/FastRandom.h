@@ -30,7 +30,7 @@ salts, the values they get will be different.
 class cFastRandom
 {
 public:
-	cFastRandom(void);
+	cFastRandom(int a_Seed = -1);
 	
 	/// Returns a random int in the range [0 .. a_Range - 1]; a_Range must be less than 1M
 	int NextInt(int a_Range);

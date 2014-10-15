@@ -994,9 +994,13 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & 
 
 
 
-cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments)
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
 {
 	cFastRandom Random;
+	if (a_Seed != -1)
+	{
+		Random = cFastRandom(a_Seed);
+	}
 
 	int AllWeights = 0;
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)

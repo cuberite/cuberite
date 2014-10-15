@@ -126,7 +126,7 @@ public:
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
 
 	/** Gets random enchantment from Vector and returns it */
-	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
+	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed = -1);
 
 	/** Returns true if a_Other doesn't contain exactly the same enchantments and levels */
 	bool operator !=(const cEnchantments & a_Other) const;
