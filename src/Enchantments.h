@@ -126,7 +126,10 @@ public:
 	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, cEnchantments a_FirstEnchantment);
 
 	/** Gets random enchantment from Vector and returns it */
-	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed = -1);
+	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
+
+	/** Returns an enchantment from a Vector using cNoise. Mostly used for generators.*/
+	static cEnchantments GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed);
 
 	/** Returns true if a_Other doesn't contain exactly the same enchantments and levels */
 	bool operator !=(const cEnchantments & a_Other) const;

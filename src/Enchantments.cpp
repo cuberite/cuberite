@@ -6,6 +6,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
+#include "Noise.h"
 
 
 
@@ -994,13 +995,9 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(cWeightedEnchantments & 
 
 
 
-cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments)
 {
 	cFastRandom Random;
-	if (a_Seed != -1)
-	{
-		Random = cFastRandom(a_Seed);
-	}
 
 	int AllWeights = 0;
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
@@ -1008,6 +1005,33 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 		AllWeights += (*it).m_Weight;
 	}
 	int RandomNumber = Random.GenerateRandomInteger(0, AllWeights - 1);
+	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	{
+		RandomNumber -= (*it).m_Weight;
+		if (RandomNumber < 0)
+		{
+			return (*it).m_Enchantments;
+		}
+	}
+
+	return cEnchantments();
+}
+
+
+
+
+
+cEnchantments cEnchantments::GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
+{
+	int AllWeights = 0;
+	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	{
+		AllWeights += (*it).m_Weight;
+	}
+
+	cNoise Noise(a_Seed);
+	int RandomNumber = Noise.IntNoise1DInt(AllWeights) % AllWeights;
+
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
 		RandomNumber -= (*it).m_Weight;

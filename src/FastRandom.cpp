@@ -90,17 +90,10 @@ int cFastRandom::m_SeedCounter = 0;
 
 
 
-cFastRandom::cFastRandom(int a_Seed) :
+cFastRandom::cFastRandom(void) :
+	m_Seed(m_SeedCounter++),
 	m_Counter(0)
 {
-	if (a_Seed == -1)
-	{
-		m_Seed = m_SeedCounter++;
-	}
-	else
-	{
-		m_Seed = a_Seed;
-	}
 }
 
 

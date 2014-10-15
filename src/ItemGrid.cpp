@@ -646,7 +646,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 		
 		for (int I = 0; I <= NumEnchantments; I++)
 		{
-			cEnchantments Enchantment = cEnchantments::GetRandomEnchantmentFromVector(Enchantments, a_Seed);
+			cEnchantments Enchantment = cEnchantments::GenerateEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));
 			CurrentLoot.m_Enchantments.AddFromString(Enchantment.ToString());
 			cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment);
 		}
