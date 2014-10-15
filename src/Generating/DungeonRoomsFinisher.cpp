@@ -180,6 +180,12 @@ protected:
 		static const cLootProbab LootProbab[] =
 		{
 			// Item,                          MinAmount, MaxAmount, Weight
+			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
+			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
+			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
+			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
+			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
+			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
 			{ cItem(E_ITEM_IRON),                1,         4,        10 },
 			{ cItem(E_ITEM_WHEAT),               1,         4,        10 },
 			{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
@@ -189,11 +195,6 @@ protected:
 			{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
 			{ cItem(E_ITEM_BREAD),               1,         1,        10 },
 			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
-			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
-			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
-			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
-			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
-			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
 		} ;
 
 		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ);
@@ -209,6 +210,9 @@ protected:
 	// cGridStructGen::cStructure override:
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
 	{
+		int CenterX = (m_StartX + m_EndX) / 2 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		int CenterZ = (m_StartZ + m_EndZ) / 2 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+
 		if (
 			(m_EndX   <  a_ChunkDesc.GetChunkX() * cChunkDef::Width) ||
 			(m_StartX >= a_ChunkDesc.GetChunkX() * cChunkDef::Width + cChunkDef::Width) ||
@@ -219,6 +223,12 @@ protected:
 			// The chunk is not intersecting the room at all, bail out
 			return;
 		}
+
+		if (!cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(CenterX, m_FloorHeight + 1, CenterZ)))
+		{
+			return;
+		}
+
 		int b = m_FloorHeight + 1;  // Bottom
 		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
 		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
@@ -235,8 +245,6 @@ protected:
 		TryPlaceChest(a_ChunkDesc, m_Chest2);
 
 		// Place the spawner:
-		int CenterX = (m_StartX + m_EndX) / 2 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
-		int CenterZ = (m_StartZ + m_EndZ) / 2 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 		if (
 			(CenterX >= 0) && (CenterX < cChunkDef::Width) &&
 			(CenterZ >= 0) && (CenterZ < cChunkDef::Width)
