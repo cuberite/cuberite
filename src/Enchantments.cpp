@@ -1024,20 +1024,20 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 cEnchantments cEnchantments::GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
 {
 	int AllWeights = 0;
-	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	for (const auto Enchantment : a_Enchantments)
 	{
-		AllWeights += (*it).m_Weight;
+		AllWeights += Enchantment.m_Weight;
 	}
 
 	cNoise Noise(a_Seed);
 	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
 
-	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
+	for (const auto Enchantment : a_Enchantments)
 	{
-		RandomNumber -= (*it).m_Weight;
+		RandomNumber -= Enchantment.m_Weight;
 		if (RandomNumber < 0)
 		{
-			return (*it).m_Enchantments;
+			return Enchantment.m_Enchantments;
 		}
 	}
 
