@@ -58,13 +58,13 @@ cFurnaceEntity::~cFurnaceEntity()
 void cFurnaceEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenWindow(new cFurnaceWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
 
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
