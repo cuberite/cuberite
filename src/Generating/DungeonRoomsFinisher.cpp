@@ -210,9 +210,6 @@ protected:
 	// cGridStructGen::cStructure override:
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override
 	{
-		int CenterX = (m_StartX + m_EndX) / 2 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
-		int CenterZ = (m_StartZ + m_EndZ) / 2 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
-
 		if (
 			(m_EndX   <  a_ChunkDesc.GetChunkX() * cChunkDef::Width) ||
 			(m_StartX >= a_ChunkDesc.GetChunkX() * cChunkDef::Width + cChunkDef::Width) ||
@@ -221,11 +218,6 @@ protected:
 		)
 		{
 			// The chunk is not intersecting the room at all, bail out
-			return;
-		}
-
-		if (!cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(CenterX, m_FloorHeight + 1, CenterZ)))
-		{
 			return;
 		}
 
@@ -245,6 +237,8 @@ protected:
 		TryPlaceChest(a_ChunkDesc, m_Chest2);
 
 		// Place the spawner:
+		int CenterX = (m_StartX + m_EndX) / 2 - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		int CenterZ = (m_StartZ + m_EndZ) / 2 - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 		if (
 			(CenterX >= 0) && (CenterX < cChunkDef::Width) &&
 			(CenterZ >= 0) && (CenterZ < cChunkDef::Width)
