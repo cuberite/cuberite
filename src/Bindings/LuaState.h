@@ -245,7 +245,7 @@ public:
 	A special param of cRet & signifies the end of param list and the start of return values.
 	Example call: Call(Fn, Param1, Param2, Param3, cLuaState::Return, Ret1, Ret2) */
 	template <typename FnT, typename... Args>
-	bool Call(const FnT & a_Function, Args &... args)
+	bool Call(const FnT & a_Function, Args &&... args)
 	{
 		PushFunction(a_Function);
 		return PushCallPop(args...);
@@ -253,7 +253,7 @@ public:
 
 	/** Retrieves a list of values from the Lua stack, starting at the specified index. */
 	template <typename T, typename... Args>
-	inline void GetStackValues(int a_StartStackPos, T & a_Ret, Args &... args)
+	inline void GetStackValues(int a_StartStackPos, T & a_Ret, Args &&... args)
 	{
 		GetStackValue(a_StartStackPos, a_Ret);
 		GetStackValues(a_StartStackPos + 1, args...);
@@ -364,7 +364,7 @@ protected:
 
 	/** Variadic template recursor: More params to push. Push them and recurse. */
 	template<typename T, typename... Args>
-	inline bool PushCallPop(T a_Param, Args &... args)
+	inline bool PushCallPop(T a_Param, Args &&... args)
 	{
 		Push(a_Param);
 		return PushCallPop(args...);
@@ -372,7 +372,7 @@ protected:
 
 	/** Variadic template terminator: If there's nothing more to push, but return values to collect, call the function and collect the returns. */
 	template <typename... Args>
-	bool PushCallPop(cLuaState::cRet, Args &... args)
+	bool PushCallPop(cLuaState::cRet, Args &&... args)
 	{
 		// Calculate the number of return values (number of args left):
 		int NumReturns = CountArgs(args...);
