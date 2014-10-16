@@ -540,9 +540,11 @@ void cClientHandle::RemoveFromAllChunks()
 	}
 	
 	{
+		// Reset all chunk lists:
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
+		m_SentChunks.clear();
 		
 		// Also reset the LastStreamedChunk coords to bogus coords,
 		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
@@ -2027,7 +2029,17 @@ void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_Block
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	int ChunkX, ChunkZ = 0;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
+	cChunkCoords ChunkCoords = cChunkCoords(ChunkX, ChunkZ);
+
+	// Do not send block changes in chunks that weren't sent to the client yet:
+	cCSLock Lock(m_CSChunkLists);
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	}
 }
 
 
@@ -2037,8 +2049,15 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
-	
-	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+
+	// Do not send block changes in chunks that weren't sent to the client yet:
+	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
+	cCSLock Lock(m_CSChunkLists);
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+	}
 }
 
 
@@ -2101,6 +2120,12 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	}
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+
+	// Add the chunk to the list of chunks sent to the player:
+	{
+		cCSLock Lock(m_CSChunkLists);
+		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
 
 	// If it is the chunk the player's in, make them spawn (in the tick thread):
 	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
@@ -2631,6 +2656,12 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_D
 
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
+	// Remove the chunk from the list of chunks sent to the client:
+	{
+		cCSLock Lock(m_CSChunkLists);
+		m_SentChunks.remove(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
+
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
 }
 
