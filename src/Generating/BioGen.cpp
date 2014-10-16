@@ -760,8 +760,8 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 	int DistortZ[cChunkDef::Width + 1][cChunkDef::Width + 1];
 	for (int x = 0; x <= 4; x++) for (int z = 0; z <= 4; z++)
 	{
-		float BlockX = BaseX + x * 4;
-		float BlockZ = BaseZ + z * 4;
+		float BlockX = static_cast<float>(BaseX + x * 4);
+		float BlockZ = static_cast<float>(BaseZ + z * 4);
 		double NoiseX = m_AmpX1 * m_Noise1.CubicNoise2D(BlockX * m_FreqX1, BlockZ * m_FreqX1);
 		NoiseX       += m_AmpX2 * m_Noise2.CubicNoise2D(BlockX * m_FreqX2, BlockZ * m_FreqX2);
 		NoiseX       += m_AmpX3 * m_Noise3.CubicNoise2D(BlockX * m_FreqX3, BlockZ * m_FreqX3);
