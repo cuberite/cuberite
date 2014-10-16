@@ -654,17 +654,17 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 
 		for (size_t j = 0; j < a_CountLootProbabs; j++)
 		{
-			LootRnd -= a_LootProbabs[i].m_Weight;
+			LootRnd -= a_LootProbabs[j].m_Weight;
 			if (LootRnd < 0)
 			{
-				CurrentLoot = a_LootProbabs[i].m_Item;
-				if ((a_LootProbabs[i].m_MaxAmount - a_LootProbabs[i].m_MinAmount) > 0)
+				CurrentLoot = a_LootProbabs[j].m_Item;
+				if ((a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount) > 0)
 				{
-					CurrentLoot.m_ItemCount = a_LootProbabs[i].m_MinAmount + (Rnd % (a_LootProbabs[i].m_MaxAmount - a_LootProbabs[i].m_MinAmount));
+					CurrentLoot.m_ItemCount = a_LootProbabs[j].m_MinAmount + (Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount));
 				}
 				else
 				{
-					CurrentLoot.m_ItemCount = a_LootProbabs[i].m_MinAmount;
+					CurrentLoot.m_ItemCount = a_LootProbabs[j].m_MinAmount;
 				}
 				Rnd >>= 8;
 				break;
