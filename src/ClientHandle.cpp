@@ -543,6 +543,9 @@ void cClientHandle::RemoveFromAllChunks()
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
+		// Reset the list that stores the coordinates of the chunks that the client has loaded.
+		// This is needed to fix the chunk rendering issue in Minecraft 1.8
+		m_SentChunks.clear();
 		
 		// Also reset the LastStreamedChunk coords to bogus coords,
 		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
@@ -2027,7 +2030,20 @@ void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_Block
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	int ChunkX, ChunkZ = 0;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
+	cChunkCoords ChunkCoords = cChunkCoords(ChunkX, ChunkZ);
+	cCSLock Lock(m_CSChunkLists);
+
+	/* This is needed to fix the chunk rendering issue in Minecraft 1.8
+	 * If block updates get send to the client, while the client hasn't loaded the chunks corresponding to the blocks,
+	 * the client will render those blocks, without the blocks that it is surrounded by. This code checks if the chunk is loaded, before sending the block update.
+	 */
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	}
 }
 
 
@@ -2037,8 +2053,19 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
-	
-	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+
+	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
+	cCSLock Lock(m_CSChunkLists);
+
+	/* This is needed to fix the chunk rendering issue in Minecraft 1.8
+	 * If block updates get send to the client, while the client hasn't loaded the chunks corresponding to the blocks,
+	 * the client will render those blocks, without the blocks that it is surrounded by. This code checks if the chunk is loaded, before sending the block update.
+	 */
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+	}
 }
 
 
@@ -2101,6 +2128,12 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	}
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+
+	// Add the chunks to the list that stores the the coordinates of the chunks that are loaded by the client.
+	// This is needed to fix the chunk rendering issue in Minecraft 1.8
+	cCSLock Lock(m_CSChunkLists);
+	m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	Lock.Unlock();
 
 	// If it is the chunk the player's in, make them spawn (in the tick thread):
 	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
@@ -2631,6 +2664,11 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_D
 
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
+	// This is needed to fix the chunk rendering issue in Minecraft 1.8
+	// This removes the coordinates of the chunk that the client has loaded from the list, when the client unloads those chunks.
+	cCSLock Lock(m_CSChunkLists);
+	m_SentChunks.remove(cChunkCoords(a_ChunkX, a_ChunkZ));
+	Lock.Unlock();
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
 }
 
