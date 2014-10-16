@@ -5,7 +5,7 @@
 #include "../UI/Window.h"
 #include "../Entities/Player.h"
 #include "../Root.h"
-#include "Chunk.h"
+#include "../Chunk.h"
 
 
 
@@ -27,12 +27,12 @@ cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTY
 	super(E_BLOCK_FURNACE, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_BlockMeta(a_BlockMeta),
 	m_CurrentRecipe(NULL),
+	m_IsDestroyed(false),
 	m_IsCooking((a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_LIT_FURNACE)),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
-	m_TimeBurned(0),
-	m_IsDestroyed(false)
+	m_TimeBurned(0)
 {
 	m_Contents.AddListener(*this);
 }
@@ -221,8 +221,8 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	ASSERT(a_ItemGrid == &m_Contents);
 	switch (a_SlotNum)
 	{
-		case fsInput: UpdateInput(); break;		
-		case fsFuel: UpdateFuel(); break;		
+		case fsInput:  UpdateInput();  break;		
+		case fsFuel:   UpdateFuel();   break;		
 		case fsOutput: UpdateOutput(); break;
 		default: ASSERT(!"Invalid furnace slot update!"); break;
 	}
@@ -347,11 +347,11 @@ void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 	}
 	
 	int CurFuel = (m_FuelBurnTime > 0) ? 200 - (200 * m_TimeBurned / m_FuelBurnTime) : 0;
-	BroadcastProgress(PROGRESSBAR_FUEL, (short)CurFuel);
+	BroadcastProgress(PROGRESSBAR_FUEL, static_cast<short>(CurFuel));
 	
 	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;	
 	BroadcastProgress(PROGRESSBAR_SMELTING_CONFIRM, 200);  // Post 1.8, Mojang requires a random packet with an ID of three and value of 200. Wat. Wat. Wat.
-	BroadcastProgress(PROGRESSBAR_SMELTING, (short)CurCook);
+	BroadcastProgress(PROGRESSBAR_SMELTING, static_cast<short>(CurCook));
 }
 
 
