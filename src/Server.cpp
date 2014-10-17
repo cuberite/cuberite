@@ -196,7 +196,7 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 
 
-bool cServer::InitServer(cIniFile & a_SettingsIni)
+bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 {
 	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!");
 	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
@@ -247,7 +247,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsConnected = true;
 
 	m_ServerID = "-";
-	m_ShouldAuthenticate = a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true);
+	m_ShouldAuthenticate = a_ShouldAuth;
 	if (m_ShouldAuthenticate)
 	{
 		MTRand mtrand1;
