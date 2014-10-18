@@ -324,12 +324,12 @@ local function WriteCommandsCategoryGithub(a_Category, f)
 		f:write(GithubizeString(a_Category.Description), "\n\n")
 	end
 	
-	f:write("| Command | Permission | Description | \n")
-	f:write("| ------- | ---------- | ----------- | \n")
+	f:write("| Command | Permission | Description |\n")
+	f:write("| ------- | ---------- | ----------- |\n")
 	
 	-- Write commands:
 	for idx2, cmd in ipairs(a_Category.Commands) do
-		f:write("|", cmd.CommandString, " | ", cmd.Info.Permission or "", " | ", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "| \n")
+		f:write("|", cmd.CommandString, " | ", cmd.Info.Permission or "", " | ", GithubizeString(cmd.Info.HelpString or "UNDOCUMENTED"), "|\n")
 	end
 	f:write("\n\n")
 end
