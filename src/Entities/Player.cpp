@@ -2134,19 +2134,19 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 void cPlayer::LoadRank(void)
 {
 	// Load the values from cRankManager:
-	cRankManager & RankMgr = cRoot::Get()->GetRankManager();
-	m_Rank = RankMgr.GetPlayerRankName(m_UUID);
+	cRankManager * RankMgr = cRoot::Get()->GetRankManager();
+	m_Rank = RankMgr->GetPlayerRankName(m_UUID);
 	if (m_Rank.empty())
 	{
-		m_Rank = RankMgr.GetDefaultRank();
+		m_Rank = RankMgr->GetDefaultRank();
 	}
 	else
 	{
 		// Update the name:
-		RankMgr.UpdatePlayerName(m_UUID, m_PlayerName);
+		RankMgr->UpdatePlayerName(m_UUID, m_PlayerName);
 	}
-	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
-	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+	m_Permissions = RankMgr->GetPlayerPermissions(m_UUID);
+	RankMgr->GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
 
 	// Break up the individual permissions on each dot, into m_SplitPermissions:
 	m_SplitPermissions.clear();
