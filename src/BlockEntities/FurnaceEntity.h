@@ -38,7 +38,7 @@ public:
 	
 	// tolua_end
 	
-	/// Constructor used for normal operation
+	/** Constructor used for normal operation */
 	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
 	
 	virtual ~cFurnaceEntity();
@@ -49,103 +49,117 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
+	virtual void Destroy() override
+	{
+		m_IsDestroyed = true;
+		super::Destroy();
+	}
 
-	/// Restarts cooking. Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active. Returns true if cooking.
+	/** Restarts cooking
+	Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active
+	Returns true if cooking */
 	bool ContinueCooking(void);
-
-	void ResetCookTimer();
 	
 	// tolua_begin
 	
-	/// Returns the item in the input slot
+	/** Returns the item in the input slot */
 	const cItem & GetInputSlot(void) const { return GetSlot(fsInput); }
 	
-	/// Returns the item in the fuel slot
+	/** Returns the item in the fuel slot */
 	const cItem & GetFuelSlot(void) const { return GetSlot(fsFuel); }
 	
-	/// Returns the item in the output slot
+	/** Returns the item in the output slot */
 	const cItem & GetOutputSlot(void) const { return GetSlot(fsOutput); }
 	
-	/// Sets the item in the input slot
+	/** Sets the item in the input slot */
 	void SetInputSlot(const cItem & a_Item) { SetSlot(fsInput, a_Item); }
 	
-	/// Sets the item in the fuel slot
+	/** Sets the item in the fuel slot */
 	void SetFuelSlot(const cItem & a_Item) { SetSlot(fsFuel, a_Item); }
 	
-	/// Sets the item in the output slot
+	/** Sets the item in the output slot */
 	void SetOutputSlot(const cItem & a_Item) { SetSlot(fsOutput, a_Item); }
 	
-	/// Returns the time that the current item has been cooking, in ticks
-	int GetTimeCooked(void) const {return m_TimeCooked; }
+	/** Returns the time that the current item has been cooking, in ticks */
+	int GetTimeCooked(void) const { return m_TimeCooked; }
 	
-	/// Returns the time until the current item finishes cooking, in ticks
+	/** Returns the time until the current item finishes cooking, in ticks */
 	int GetCookTimeLeft(void) const { return m_NeedCookTime - m_TimeCooked; }
 	
-	/// Returns the time until the current fuel is depleted, in ticks
-	int GetFuelBurnTimeLeft(void) const {return m_FuelBurnTime - m_TimeBurned; }
+	/** Returns the time until the current fuel is depleted, in ticks */
+	int GetFuelBurnTimeLeft(void) const { return m_FuelBurnTime - m_TimeBurned; }
 	
-	/// Returns true if there's time left before the current fuel is depleted
+	/** Returns true if there's time left before the current fuel is depleted */
 	bool HasFuelTimeLeft(void) const { return (GetFuelBurnTimeLeft() > 0); }
 	
 	// tolua_end
 	
-	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned) {m_FuelBurnTime = a_FuelBurnTime; m_TimeBurned = a_TimeBurned; }
-	void SetCookTimes(int a_NeedCookTime, int a_TimeCooked) {m_NeedCookTime = a_NeedCookTime; m_TimeCooked = a_TimeCooked; }
+	void SetBurnTimes(int a_FuelBurnTime, int a_TimeBurned)
+	{
+		m_FuelBurnTime = a_FuelBurnTime;
+		m_TimeBurned = a_TimeBurned;
+	}
+
+	void SetCookTimes(int a_NeedCookTime, int a_TimeCooked)
+	{
+		m_NeedCookTime = a_NeedCookTime;
+		m_TimeCooked = a_TimeCooked;
+	}
 	
 protected:
-
-	/// Block type of the block currently represented by this entity (changes when furnace lights up)
-	BLOCKTYPE m_BlockType;
 	
-	/// Block meta of the block currently represented by this entity
+	/** Block meta of the block currently represented by this entity */
 	NIBBLETYPE m_BlockMeta;
 
-	/// The recipe for the current input slot
+	/** The recipe for the current input slot */
 	const cFurnaceRecipe::cRecipe * m_CurrentRecipe;
 	
-	/// The item that is being smelted
+	/** The item that is being smelted */
 	cItem m_LastInput;
+
+	/** Set to true when the furnace entity has been destroyed to prevent the block being set again */
+	bool m_IsDestroyed;
 	
-	bool m_IsCooking;  ///< Set to true if the furnace is cooking an item
+	/** Set to true if the furnace is cooking an item */
+	bool m_IsCooking;
 	
-	// All timers are in ticks
-	int m_NeedCookTime;  ///< Amount of time needed to fully cook current item
-	int m_TimeCooked;    ///< Amount of time that the current item has been cooking
-	int m_FuelBurnTime;  ///< Amount of time that the current fuel can burn (in total); zero if no fuel burning
-	int m_TimeBurned;    ///< Amount of time that the current fuel has been burning
+	/** Amount of ticks needed to fully cook current item */
+	int m_NeedCookTime;
+
+	/** Amount of ticks that the current item has been cooking */
+	int m_TimeCooked;
+
+	/** Amount of ticks that the current fuel can burn (in total); zero if no fuel burning */
+	int m_FuelBurnTime;
+
+	/** Amount of ticks that the current fuel has been burning */
+	int m_TimeBurned;	
 	
-	int m_LastProgressFuel;  ///< Last value sent as the progress for the fuel
-	int m_LastProgressCook;  ///< Last value sent as the progress for the cooking
+	/** Sends the specified progressbar value to all clients of the window */
+	void BroadcastProgress(short a_ProgressbarID, short a_Value);
 	
-	
-	/// Sends the specified progressbar value to all clients of the window
-	void BroadcastProgress(int a_ProgressbarID, short a_Value);
-	
-	/// One item finished cooking
+	/** One item finished cooking */
 	void FinishOne();
 	
-	/// Starts burning a new fuel, if possible
+	/** Starts burning a new fuel, if possible */
 	void BurnNewFuel(void);
 	
-	/// Updates the recipe, based on the current input
+	/** Updates the recipe, based on the current input */
 	void UpdateInput(void);
 	
-	/// Called when the fuel slot changes or when the fuel is spent, burns another piece of fuel if appropriate
+	/** Called when the fuel slot changes or when the fuel is spent, burns another piece of fuel if appropriate */
 	void UpdateFuel(void);
 	
-	/// Called when the output slot changes
+	/** Called when the output slot changes */
 	void UpdateOutput(void);
 	
-	/// Updates the m_IsCooking, based on the input slot, output slot and m_FuelBurnTime / m_TimeBurned
-	void UpdateIsCooking(void);
-	
-	/// Returns true if the input can be cooked into output and the item counts allow for another cooking operation
+	/** Returns true if the input can be cooked into output and the item counts allow for another cooking operation */
 	bool CanCookInputToOutput(void) const;
 	
-	/// Broadcasts progressbar updates, if needed
-	void UpdateProgressBars(void);
+	/** Broadcasts progressbar updates, if needed */
+	void UpdateProgressBars(bool a_ForceUpdate = false);
 	
-	/// Sets the m_IsCooking variable, updates the furnace block type based on the value
+	/** Sets the m_IsCooking variable, updates the furnace block type based on the value */
 	void SetIsCooking(bool a_IsCooking);
 	
 	// cItemGrid::cListener overrides:

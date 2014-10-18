@@ -333,7 +333,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 		{
 			BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
 			BLOCKTYPE WorldBlockType = GetBlock((*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
-			ASSERT(EntityBlockType == WorldBlockType);
+			ASSERT(WorldBlockType == EntityBlockType);
 		}  // for itr - m_BlockEntities
 	#endif  // _DEBUG
 	

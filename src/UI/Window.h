@@ -130,9 +130,6 @@ public:
 	
 	/// Sends the contents of the whole window to all clients of this window.
 	void BroadcastWholeWindow(void);
-	
-	/// Sends the progressbar to all clients of this window (same as SetProperty)
-	void BroadcastProgress(int a_Progressbar, int a_Value);
 
 	// tolua_begin
 	
@@ -140,10 +137,10 @@ public:
 	void SetWindowTitle(const AString & a_WindowTitle) { m_WindowTitle = a_WindowTitle; }
 	
 	/// Sends the UpdateWindowProperty (0x69) packet to all clients of the window
-	virtual void SetProperty(int a_Property, int a_Value);
+	virtual void SetProperty(short a_Property, short a_Value);
 	
 	/// Sends the UpdateWindowPropert(0x69) packet to the specified player
-	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player);
+	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player);
 
 	// tolua_end
 
@@ -287,16 +284,16 @@ class cEnchantingWindow :
 	typedef cWindow super;
 public:
 	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
-	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player) override;
-	virtual void SetProperty(int a_Property, int a_Value) override;
+	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player) override;
+	virtual void SetProperty(short a_Property, short a_Value) override;
 
 	/** Return the Value of a Property */
-	int GetPropertyValue(int a_Property);
+	short GetPropertyValue(short a_Property);
 
 	cSlotArea * m_SlotArea;
 
 protected:
-	int m_PropertyValue[3];
+	short m_PropertyValue[3];
 	int m_BlockX, m_BlockY, m_BlockZ;
 };
 
