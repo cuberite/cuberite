@@ -59,7 +59,7 @@ void cCriticalSection::Lock()
 	
 	#ifdef _DEBUG
 		m_IsLocked += 1;
-		m_OwningThreadID = cIsThread::GetCurrentID();
+		m_OwningThreadID = std::this_thread::get_id();
 	#endif  // _DEBUG
 }
 
@@ -97,7 +97,7 @@ bool cCriticalSection::IsLocked(void)
 
 bool cCriticalSection::IsLockedByCurrentThread(void)
 {
-	return ((m_IsLocked > 0) && (m_OwningThreadID == cIsThread::GetCurrentID()));
+	return ((m_IsLocked > 0) && (m_OwningThreadID == std::this_thread::get_id()));
 }
 #endif  // _DEBUG
 

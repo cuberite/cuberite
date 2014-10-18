@@ -27,7 +27,7 @@ public:
 private:
 	#ifdef _DEBUG
 	int           m_IsLocked;  // Number of times this CS is locked
-	unsigned long m_OwningThreadID;
+	std::thread::id m_OwningThreadID;
 	#endif  // _DEBUG
 	
 	#ifdef _WIN32

@@ -43,7 +43,6 @@ cRoot* cRoot::s_Root = NULL;
 
 cRoot::cRoot(void) :
 	m_pDefaultWorld(NULL),
-	m_InputThread(NULL),
 	m_Server(NULL),
 	m_MonsterConfig(NULL),
 	m_CraftingRecipes(NULL),
@@ -69,26 +68,24 @@ cRoot::~cRoot()
 
 
 
-void cRoot::InputThread(void * a_Params)
+void cRoot::InputThread(cRoot * a_Params)
 {
-	cRoot & self = *(cRoot*)a_Params;
-
 	cLogCommandOutputCallback Output;
 	
-	while (!self.m_bStop && !self.m_bRestart && !m_TerminateEventRaised && std::cin.good())
+	while (!a_Params->m_bStop && !a_Params->m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
 		std::getline(std::cin, Command);
 		if (!Command.empty())
 		{
-			self.ExecuteConsoleCommand(TrimString(Command), Output);
+			a_Params->ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
 
 	if (m_TerminateEventRaised || !std::cin.good())
 	{
 		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
-		self.m_bStop = true;
+		a_Params->m_bStop = true;
 	}
 }
 
@@ -191,8 +188,14 @@ void cRoot::Start(void)
 
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
-		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread");
-		m_InputThread->Start( false);  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
+		try
+		{
+			m_InputThread = std::thread(InputThread, this);
+		}
+		catch (std::system_error & a_Exception)
+		{
+			LOGERROR("ERROR: Could not create input thread, error = %s!", a_Exception.code(), a_Exception.what());
+		}
 		#endif
 
 		long long finishmseconds = Time.GetNowTime();
@@ -214,7 +217,14 @@ void cRoot::Start(void)
 		}
 
 		#if !defined(ANDROID_NDK)
-		delete m_InputThread; m_InputThread = NULL;
+		try
+		{
+			m_InputThread.join();
+		}
+		catch (std::system_error & a_Exception)
+		{
+			LOGERROR("ERROR: Could not wait for input thread to finish, error = %s!", a_Exception.code(), a_Exception.what());
+		}
 		#endif
 
 		// Stop the server:

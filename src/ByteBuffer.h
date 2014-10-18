@@ -130,10 +130,6 @@ protected:
 	char * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
 	
-	#ifdef _DEBUG
-	volatile unsigned long m_ThreadID;  // Thread that is currently accessing the object, checked via cSingleThreadAccessChecker
-	#endif  // _DEBUG
-	
 	size_t m_DataStart;  // Where the data starts in the ringbuffer
 	size_t m_WritePos;   // Where the data ends in the ringbuffer
 	size_t m_ReadPos;    // Where the next read will start in the ringbuffer

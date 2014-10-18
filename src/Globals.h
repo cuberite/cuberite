@@ -239,6 +239,7 @@ template class SizeChecker<UInt16, 2>;
 
 
 // STL stuff:
+#include <thread>
 #include <vector>
 #include <list>
 #include <deque>
@@ -259,7 +260,6 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/CriticalSection.h"
 	#include "OSSupport/Semaphore.h"
 	#include "OSSupport/Event.h"
-	#include "OSSupport/Thread.h"
 	#include "OSSupport/File.h"
 	#include "Logger.h"
 #else

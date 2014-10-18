@@ -16,7 +16,6 @@ SET (SRCS
 	Sleep.cpp
 	Socket.cpp
 	SocketThreads.cpp
-	Thread.cpp
 	Timer.cpp)
 
 SET (HDRS
@@ -32,7 +31,6 @@ SET (HDRS
 	Sleep.h
 	Socket.h
 	SocketThreads.h
-	Thread.h
 	Timer.h)
 
 if(NOT MSVC)
