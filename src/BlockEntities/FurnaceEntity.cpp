@@ -96,9 +96,8 @@ bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_FuelBurnTime <= 0)
 	{
-		// Cooked time decreases twice as fast when ran out of fuel
-		m_TimeCooked -= 2;
-		m_TimeCooked = std::max(m_TimeCooked, 0);
+		// If a furnace is out of fuel, the progress bar reverses at twice the speed of cooking.
+		m_TimeCooked = std::max((m_TimeCooked - 2), 0);
 
 		// Reset progressbars, block type, and bail out
 		a_Chunk.FastSetBlock(GetRelX(), m_PosY, GetRelZ(), E_BLOCK_FURNACE, m_BlockMeta);
