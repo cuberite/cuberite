@@ -24,6 +24,16 @@ See http://forum.mc-server.org/showthread.php?tid=409 for details.
 
 
 
+// Forward-declare the shared pointers to subgenerator classes:
+class cBiomeGen;
+class cTerrainHeightGen;
+class cTerrainCompositionGen;
+class cFinishGen;
+typedef SharedPtr<cBiomeGen>              cBiomeGenPtr;
+typedef SharedPtr<cTerrainHeightGen>      cTerrainHeightGenPtr;
+typedef SharedPtr<cTerrainCompositionGen> cTerrainCompositionGenPtr;
+typedef SharedPtr<cFinishGen>             cFinishGenPtr;
+
 // fwd: Noise3DGenerator.h
 class cNoise3DComposable;
 
@@ -53,8 +63,7 @@ public:
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default.
 	Used in BiomeVisualiser, too.
 	Implemented in BioGen.cpp! */
-	static cBiomeGen * CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
-
+	static cBiomeGenPtr CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
 } ;
 
 
@@ -83,7 +92,7 @@ public:
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default
 	Implemented in HeiGen.cpp!
 	*/
-	static cTerrainHeightGen * CreateHeightGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault);
+	static cTerrainHeightGenPtr CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault);
 } ;
 
 
@@ -109,7 +118,7 @@ public:
 	a_BiomeGen is the underlying biome generator, some composition generators may depend on it to generate more biomes
 	a_HeightGen is the underlying height generator, some composition generators may depend on it providing additional values
 	*/
-	static cTerrainCompositionGen * CreateCompositionGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed);
+	static cTerrainCompositionGenPtr CreateCompositionGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed);
 } ;
 
 
@@ -131,7 +140,7 @@ public:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
-typedef std::list<cFinishGen *> cFinishGenList;
+typedef std::list<cFinishGenPtr> cFinishGenList;
 
 
 
@@ -144,7 +153,6 @@ class cComposableGenerator :
 	
 public:
 	cComposableGenerator(cChunkGenerator & a_ChunkGenerator);
-	virtual ~cComposableGenerator();
 	
 	virtual void Initialize(cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap) override;
@@ -152,15 +160,10 @@ public:
 
 protected:
 	// The generation composition:
-	cBiomeGen *              m_BiomeGen;
-	cTerrainHeightGen *      m_HeightGen;
-	cTerrainCompositionGen * m_CompositionGen;
-	cFinishGenList           m_FinishGens;
-	
-	// Generators underlying the caches:
-	cBiomeGen *              m_UnderlyingBiomeGen;
-	cTerrainHeightGen *      m_UnderlyingHeightGen;
-	cTerrainCompositionGen * m_UnderlyingCompositionGen;
+	cBiomeGenPtr              m_BiomeGen;
+	cTerrainHeightGenPtr      m_HeightGen;
+	cTerrainCompositionGenPtr m_CompositionGen;
+	cFinishGenList            m_FinishGens;
 	
 	
 	/** Reads the biome gen settings from the ini and initializes m_BiomeGen accordingly */

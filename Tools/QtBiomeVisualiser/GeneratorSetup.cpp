@@ -59,7 +59,7 @@ GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent
 		m_IniFile->SetValue("Generator", "Generator", "Composable");
 		m_IniFile->SetValue("Generator", "BiomeGen", m_cbGenerator->currentText().toStdString());
 		bool dummy;
-		delete cBiomeGen::CreateBiomeGen(*m_IniFile, 0, dummy);
+		cBiomeGen::CreateBiomeGen(*m_IniFile, 0, dummy);
 	}
 	updateFromIni();
 
@@ -91,7 +91,7 @@ void GeneratorSetup::generatorChanged(const QString & a_NewName)
 
 	// Create a dummy biome gen from the INI file, this will create the defaults in the INI file:
 	bool dummy;
-	delete cBiomeGen::CreateBiomeGen(*m_IniFile, m_Seed, dummy);
+	cBiomeGen::CreateBiomeGen(*m_IniFile, m_Seed, dummy);
 
 	// Read all values from the INI file and put them into the form layout:
 	updateFromIni();

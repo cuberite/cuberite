@@ -45,7 +45,7 @@ class cHeiGenCache :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize);  // Doesn't take ownership of a_HeiGenToCache
+	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, int a_CacheSize);
 	~cHeiGenCache();
 	
 	// cTerrainHeightGen overrides:
@@ -57,7 +57,7 @@ public:
 	
 protected:
 
-	cTerrainHeightGen & m_HeiGenToCache;
+	cTerrainHeightGenPtr m_HeiGenToCache;
 	
 	struct sCacheData
 	{
@@ -131,7 +131,7 @@ class cHeiGenBiomal :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenBiomal(int a_Seed, cBiomeGen & a_BiomeGen) :
+	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 		m_Noise(a_Seed),
 		m_BiomeGen(a_BiomeGen)
 	{
@@ -141,8 +141,8 @@ protected:
 
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
 
-	cNoise      m_Noise;
-	cBiomeGen & m_BiomeGen;
+	cNoise       m_Noise;
+	cBiomeGenPtr m_BiomeGen;
 	
 	// Per-biome terrain generator parameters:
 	struct sGenParam

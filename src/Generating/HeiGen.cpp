@@ -19,7 +19,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainHeightGen:
 
-cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBiomeGen & a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
+cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
 {
 	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
 	if (HeightGenName.empty())
@@ -84,7 +84,7 @@ cTerrainHeightGen * cTerrainHeightGen::CreateHeightGen(cIniFile &a_IniFile, cBio
 	// Read the settings:
 	res->InitializeHeightGen(a_IniFile);
 	
-	return res;
+	return cTerrainHeightGenPtr(res);
 }
 
 
@@ -118,7 +118,7 @@ void cHeiGenFlat::InitializeHeightGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenCache:
 
-cHeiGenCache::cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, int a_CacheSize) :
+cHeiGenCache::cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, int a_CacheSize) :
 	m_HeiGenToCache(a_HeiGenToCache),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[a_CacheSize]),
@@ -190,7 +190,7 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 	
 	// Not in the cache:
 	m_NumMisses++;
-	m_HeiGenToCache.GenHeightMap(a_ChunkX, a_ChunkZ, a_HeightMap);
+	m_HeiGenToCache->GenHeightMap(a_ChunkX, a_ChunkZ, a_HeightMap);
 	
 	// Insert it as the first item in the MRU order:
 	int Idx = m_CacheOrder[m_CacheSize - 1];
@@ -210,7 +210,7 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 
 void cHeiGenCache::InitializeHeightGen(cIniFile & a_IniFile)
 {
-	m_HeiGenToCache.InitializeHeightGen(a_IniFile);
+	m_HeiGenToCache->InitializeHeightGen(a_IniFile);
 }
 
 
@@ -479,7 +479,7 @@ void cHeiGenBiomal::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMa
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen.GenBiomes(a_ChunkX + x, a_ChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes(a_ChunkX + x, a_ChunkZ + z, Biomes[x + 1][z + 1]);
 		}  // for x
 	}  // for z
 	

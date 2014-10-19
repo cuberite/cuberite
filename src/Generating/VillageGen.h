@@ -21,7 +21,7 @@ class cVillageGen :
 {
 	typedef cGridStructGen super;
 public:
-	cVillageGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, int a_MinDensity, int a_MaxDensity, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
+	cVillageGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, int a_MinDensity, int a_MaxDensity, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen);
 
 protected:
 	class cVillage;  // fwd: VillageGen.cpp
@@ -42,10 +42,10 @@ protected:
 	int m_MaxDensity;
 
 	/** The underlying biome generator that defines whether the village is created or not */
-	cBiomeGen & m_BiomeGen;
+	cBiomeGenPtr m_BiomeGen;
 	
 	/** The underlying height generator, used to position the prefabs crossing chunk borders */
-	cTerrainHeightGen & m_HeightGen;
+	cTerrainHeightGenPtr m_HeightGen;
 
 
 	// cGridStructGen overrides:

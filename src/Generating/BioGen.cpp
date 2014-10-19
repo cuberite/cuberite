@@ -45,7 +45,7 @@ void cBioGenConstant::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenCache:
 
-cBioGenCache::cBioGenCache(cBiomeGen * a_BioGenToCache, int a_CacheSize) :
+cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, int a_CacheSize) :
 	m_BioGenToCache(a_BioGenToCache),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[a_CacheSize]),
@@ -145,25 +145,13 @@ void cBioGenCache::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBioGenMulticache:
 
-cBioGenMulticache::cBioGenMulticache(cBiomeGen * a_BioGenToCache, size_t a_CacheSize, size_t a_CachesLength) :
-	m_CachesLength(a_CachesLength)
+cBioGenMulticache::cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches) :
+	m_NumSubCaches(a_NumSubCaches)
 {
-	m_Caches.reserve(a_CachesLength);
-	for (size_t i = 0; i < a_CachesLength; i++)
+	m_Caches.reserve(a_NumSubCaches);
+	for (size_t i = 0; i < a_NumSubCaches; i++)
 	{
-		m_Caches.push_back(new cBioGenCache(a_BioGenToCache, a_CacheSize));
-	}
-}
-
-
-
-
-
-cBioGenMulticache::~cBioGenMulticache()
-{
-	for (cBiomeGens::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
-	{
-		delete *it;
+		m_Caches.push_back(cBiomeGenPtr(new cBioGenCache(a_BioGenToCache, a_SubCacheSize)));
 	}
 }
 
@@ -174,7 +162,7 @@ cBioGenMulticache::~cBioGenMulticache()
 void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
 	const size_t coefficient = 3;
-	const size_t cacheIdx = ((size_t)a_ChunkX + coefficient * (size_t)a_ChunkZ) % m_CachesLength;
+	const size_t cacheIdx = ((size_t)a_ChunkX + coefficient * (size_t)a_ChunkZ) % m_NumSubCaches;
 
 	m_Caches[cacheIdx]->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 }
@@ -185,10 +173,9 @@ void cBioGenMulticache::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMa
 
 void cBioGenMulticache::InitializeBiomeGen(cIniFile & a_IniFile)
 {
-	for (cBiomeGens::iterator it = m_Caches.begin(); it != m_Caches.end(); it++)
+	for (auto itr : m_Caches)
 	{
-		cBiomeGen * tmp = *it;
-		tmp->InitializeBiomeGen(a_IniFile);
+		itr->InitializeBiomeGen(a_IniFile);
 	}
 }
 
@@ -932,7 +919,7 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cBiomeGen:
 
-cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
+cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
 {
 	AString BiomeGenName = a_IniFile.GetValueSet("Generator", "BiomeGen", "");
 	if (BiomeGenName.empty())
@@ -988,7 +975,7 @@ cBiomeGen * cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a
 	}
 	res->InitializeBiomeGen(a_IniFile);
 
-	return res;
+	return cBiomeGenPtr(res);
 }
 
 
