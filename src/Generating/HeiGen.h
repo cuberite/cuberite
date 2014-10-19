@@ -115,7 +115,8 @@ public:
 protected:
 
 	int m_Seed;
-	cRidgedMultiNoise m_Noise;
+	cRidgedMultiNoise m_MountainNoise;
+	cRidgedMultiNoise m_DitchNoise;
 	cPerlinNoise m_Perlin;
 	
 	// cTerrainHeightGen overrides:

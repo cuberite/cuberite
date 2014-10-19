@@ -317,7 +317,9 @@ void cHeiGenClassic::InitializeHeightGen(cIniFile & a_IniFile)
 
 cHeiGenMountains::cHeiGenMountains(int a_Seed) :
 	m_Seed(a_Seed),
-	m_Noise(a_Seed)
+	m_MountainNoise(a_Seed + 100),
+	m_DitchNoise(a_Seed + 200),
+	m_Perlin(a_Seed + 300)
 {
 }
 
@@ -332,9 +334,11 @@ void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heigh
 	NOISE_DATATYPE StartZ = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width);
 	NOISE_DATATYPE EndZ   = (NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + cChunkDef::Width - 1);
 	NOISE_DATATYPE Workspace[16 * 16];
-	NOISE_DATATYPE Noise[16 * 16];
+	NOISE_DATATYPE MountainNoise[16 * 16];
+	NOISE_DATATYPE DitchNoise[16 * 16];
 	NOISE_DATATYPE PerlinNoise[16 * 16];
-	m_Noise.Generate2D(Noise, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
+	m_MountainNoise.Generate2D(MountainNoise, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
+	m_DitchNoise.Generate2D(DitchNoise, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
 	m_Perlin.Generate2D(PerlinNoise, 16, 16, StartX, EndX, StartZ, EndZ, Workspace);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -342,7 +346,7 @@ void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heigh
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int idx = IdxZ + x;
-			int hei = 100 - (int)((Noise[idx] + PerlinNoise[idx]) * 15);
+			int hei = 100 - (int)((MountainNoise[idx] - DitchNoise[idx] + PerlinNoise[idx]) * 15);
 			if (hei < 10)
 			{
 				hei = 10;
@@ -363,9 +367,12 @@ void cHeiGenMountains::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Heigh
 void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
 {
 	// TODO: Read the params from an INI file
-	m_Noise.AddOctave(0.1f,  0.1f);
-	m_Noise.AddOctave(0.05f, 0.5f);
-	m_Noise.AddOctave(0.02f, 1.5f);
+	m_MountainNoise.AddOctave(0.1f,  0.2f);
+	m_MountainNoise.AddOctave(0.05f, 0.4f);
+	m_MountainNoise.AddOctave(0.02f, 1.0f);
+	m_DitchNoise.AddOctave(0.1f,  0.2f);
+	m_DitchNoise.AddOctave(0.05f, 0.4f);
+	m_DitchNoise.AddOctave(0.02f, 1.0f);
 
 	m_Perlin.AddOctave(0.01f, 1.5f);
 }
