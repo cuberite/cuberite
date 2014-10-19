@@ -363,7 +363,7 @@ protected:
 	}
 
 	/** Variadic template recursor: More params to push. Push them and recurse. */
-	template<typename T, typename... Args>
+	template <typename T, typename... Args>
 	inline bool PushCallPop(T a_Param, Args &&... args)
 	{
 		Push(a_Param);
