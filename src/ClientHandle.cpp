@@ -25,8 +25,6 @@
 #include "Root.h"
 
 #include "Protocol/Authenticator.h"
-#include "MersenneTwister.h"
-
 #include "Protocol/ProtocolRecognizer.h"
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
@@ -40,16 +38,6 @@
 
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
-
-
-
-
-
-#define RECI_RAND_MAX (1.f/RAND_MAX)
-inline int fRadRand(MTRand & r1, int a_BlockCoord)
-{
-	return a_BlockCoord * 32 + (int)(16 * ((float)r1.rand() * RECI_RAND_MAX) * 16 - 8);
-}
 
 
 

@@ -210,7 +210,7 @@ private:
 	
 	static cRoot* s_Root;
 
-	static void InputThread(cRoot * a_Params);
+	static void InputThread(cRoot & a_Params);
 };  // tolua_export
 
 
