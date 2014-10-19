@@ -5,39 +5,14 @@
 
 
 
-/** Place this macro in the declaration of each cBlockEntity descendant. */
-#define BLOCKENTITY_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const override \
-	{ \
-		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
-	} \
-	virtual const char * GetClass(void) const override \
-	{ \
-		return #classname; \
-	} \
-	static const char * GetClassStatic(void) \
-	{ \
-		return #classname; \
-	} \
-	virtual const char * GetParentClass(void) const override \
-	{ \
-		return super::GetClass(); \
-	}
-
-
-
-
-
 namespace Json
 {
 	class Value;
 };
 
 class cChunk;
-class cPlayer;
 class cWorld;
-
-
+class cPlayer;
 
 
 
@@ -77,15 +52,6 @@ public:
 	{
 		return "cBlockEntity";
 	}
-
-	/** Returns true if the object is the specified class, or its descendant. */
-	virtual bool IsA(const char * a_ClassName) const { return (strcmp(a_ClassName, "cBlockEntity") == 0); }
-
-	/** Returns the name of the tompost class (the most descendant). Used for Lua bindings to push the correct object type. */
-	virtual const char * GetClass(void) const { return GetClassStatic(); }
-
-	/** Returns the name of the parent class, or empty string if no parent class. */
-	virtual const char * GetParentClass(void) const { return ""; }
 	
 	// tolua_begin
 	

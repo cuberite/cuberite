@@ -3,6 +3,7 @@
 
 #include "BlockHandler.h"
 #include "../World.h"
+#include "BlockSlab.h"
 
 
 
@@ -16,11 +17,33 @@ public:
 		: cBlockHandler(a_BlockType)
 	{
 	}
-	
+
+
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
+		if (a_RelY <= 0)
+		{
+			return false;
+		}
+
+		BLOCKTYPE BelowBlock;
+		NIBBLETYPE BelowBlockMeta;
+		a_Chunk.GetBlockTypeMeta(a_RelX, a_RelY - 1, a_RelZ, BelowBlock, BelowBlockMeta);
+
+		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
+		{
+			return true;
+		}
+		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
+		{
+			// Check if the slab is turned up side down
+			if ((BelowBlockMeta & 0x08) == 0x08)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	
