@@ -772,7 +772,7 @@ void cBioGenTwoLevel::GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap 
 			int BiomeGroup = m_VoronoiLarge.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 7;
 			int BiomeIdx   = m_VoronoiSmall.GetValueAt(DistortX[x][z], DistortZ[x][z], SeedX, SeedZ, MinDist2) / 11;
 			int MinDist1 = (DistortX[x][z] - SeedX) * (DistortX[x][z] - SeedX) + (DistortZ[x][z] - SeedZ) * (DistortZ[x][z] - SeedZ);
-			cChunkDef::SetBiome(a_BiomeMap, x, z, SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 0 : 1));
+			cChunkDef::SetBiome(a_BiomeMap, x, z, SelectBiome(BiomeGroup, BiomeIdx, (MinDist1 < MinDist2 / 4) ? 1 : 0));
 		}
 	}
 }
