@@ -522,7 +522,7 @@ void cLuaState::Push(cBlockEntity * a_BlockEntity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	tolua_pushusertype(m_LuaState, a_BlockEntity, (a_BlockEntity == nullptr) ? "cBlockEntity" : a_BlockEntity->GetClass());
 	m_NumCurrentFunctionArgs += 1;
 }
 

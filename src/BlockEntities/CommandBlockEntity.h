@@ -36,6 +36,8 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cCommandBlockEntity);
+	
 	/// Creates a new empty command block entity
 	cCommandBlockEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 

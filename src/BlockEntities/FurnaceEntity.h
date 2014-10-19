@@ -38,13 +38,13 @@ public:
 	
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cFurnaceEntity);
+	
 	/** Constructor used for normal operation */
 	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
 	
 	virtual ~cFurnaceEntity();
 
-	static const char * GetClassStatic() { return "cFurnaceEntity"; }
-	
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
