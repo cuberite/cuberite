@@ -119,7 +119,7 @@ cChunk::cChunk(
 
 cChunk::~cChunk()
 {
-	cPluginManager::Get()->CallHookChunkUnloaded(*m_World, m_PosX, m_PosZ);
+	cPluginManager::Get()->CallHookChunkUnloaded(m_World, m_PosX, m_PosZ);
 	
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 	
@@ -333,7 +333,7 @@ void cChunk::SetAllData(cSetChunkData & a_SetChunkData)
 		{
 			BLOCKTYPE EntityBlockType = (*itr)->GetBlockType();
 			BLOCKTYPE WorldBlockType = GetBlock((*itr)->GetRelX(), (*itr)->GetPosY(), (*itr)->GetRelZ());
-			ASSERT(WorldBlockType == EntityBlockType);
+			ASSERT(EntityBlockType == WorldBlockType);
 		}  // for itr - m_BlockEntities
 	#endif  // _DEBUG
 	
@@ -1750,11 +1750,11 @@ void cChunk::SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_Max
 
 
 
-void cChunk::CollectPickupsByPlayer(cPlayer & a_Player)
+void cChunk::CollectPickupsByPlayer(cPlayer * a_Player)
 {
-	double PosX = a_Player.GetPosX();
-	double PosY = a_Player.GetPosY();
-	double PosZ = a_Player.GetPosZ();
+	double PosX = a_Player->GetPosX();
+	double PosY = a_Player->GetPosY();
+	double PosZ = a_Player->GetPosZ();
 	
 	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
@@ -2614,7 +2614,7 @@ BLOCKTYPE cChunk::GetBlock(int a_RelX, int a_RelY, int a_RelZ) const
 
 
 
-void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+void cChunk::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	a_BlockType = GetBlock(a_RelX, a_RelY, a_RelZ);
 	a_BlockMeta = m_ChunkData.GetMeta(a_RelX, a_RelY, a_RelZ);
