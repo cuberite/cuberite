@@ -2736,7 +2736,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }

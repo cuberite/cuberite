@@ -36,6 +36,8 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cFlowerPotEntity);
+	
 	/** Creates a new flowerpot entity at the specified block coords. a_World may be NULL */
 	cFlowerPotEntity(int a_BlocX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	
@@ -59,8 +61,6 @@ public:
 
 	static bool IsFlower(short m_ItemType, short m_ItemData);
 
-	static const char * GetClassStatic(void) { return "cFlowerPotEntity"; }
-	
 private:
 
 	cItem m_Item;

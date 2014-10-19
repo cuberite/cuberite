@@ -1500,7 +1500,7 @@ void cProtocol180::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol180::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
+void cProtocol180::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	

@@ -18,11 +18,11 @@ class cEnderChestEntity :
 public:
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cEnderChestEntity);
+	
 	cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cEnderChestEntity();
 
-	static const char * GetClassStatic(void) { return "cEnderChestEntity"; }
-	
 	// cBlockEntity overrides:
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override { UNUSED(a_Client); }

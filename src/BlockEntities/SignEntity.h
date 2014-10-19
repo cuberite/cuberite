@@ -34,6 +34,8 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cSignEntity);
+	
 	/// Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be NULL
 	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);
 
@@ -53,8 +55,6 @@ public:
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	static const char * GetClassStatic(void) { return "cSignEntity"; }
-	
 private:
 
 	AString  m_Line[4];

@@ -16,6 +16,8 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 #include "DeprecatedBindings.h"
+#include "../Entities/Entity.h"
+#include "../BlockEntities/BlockEntity.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -520,7 +522,7 @@ void cLuaState::Push(cBlockEntity * a_BlockEntity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	tolua_pushusertype(m_LuaState, a_BlockEntity, (a_BlockEntity == nullptr) ? "cBlockEntity" : a_BlockEntity->GetClass());
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -556,7 +558,16 @@ void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	if (a_Entity->IsMob())
+	{
+		// Don't push specific mob types, as those are not exported in the API:
+		tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
+	}
+	else
+	{
+		// Push the specific class type:
+		tolua_pushusertype(m_LuaState, a_Entity, (a_Entity == nullptr) ? "cEntity" : a_Entity->GetClass());
+	}
 	m_NumCurrentFunctionArgs += 1;
 }
 
