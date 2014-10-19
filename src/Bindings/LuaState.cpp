@@ -16,6 +16,8 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 #include "DeprecatedBindings.h"
+#include "../Entities/Entity.h"
+#include "../BlockEntities/BlockEntity.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -556,7 +558,7 @@ void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	tolua_pushusertype(m_LuaState, a_Entity, (a_Entity == nullptr) ? "cEntity" : a_Entity->GetClass());
 	m_NumCurrentFunctionArgs += 1;
 }
 

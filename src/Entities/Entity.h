@@ -172,13 +172,13 @@ public:
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;
 	
-	/// Returns the topmost class name for the object
-	virtual const char * GetClass(void) const;
-	
-	// Returns the class name of this class
+	/** Returns the class name of this class */
 	static const char * GetClassStatic(void);
 	
-	/// Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent).
+	/** Returns the topmost class name for the object */
+	virtual const char * GetClass(void) const;
+	
+	/** Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent). */
 	virtual const char * GetParentClass(void) const;
 
 	cWorld * GetWorld(void) const { return m_World; }
