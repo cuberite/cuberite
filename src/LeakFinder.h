@@ -68,7 +68,7 @@ public:
     LeakFinderShowCompleteCallstack = 0x1000
   } LeakFinderOptions;
 
-  LeakFinderOutput(int options = OptionsAll,  LPCSTR szSymPath = NULL);
+  LeakFinderOutput(int options = OptionsAll,  LPCSTR szSymPath = nullptr);
   virtual void OnLeakSearchStart(LPCSTR sszLeakFinderName);
   virtual void OnLeakStartEntry(LPCSTR szKeyName, SIZE_T nDataSize);
 protected:
@@ -110,7 +110,7 @@ class ZZZ_LeakFinder
 public:
   ZZZ_LeakFinder()
   {
-    m_pXml = NULL;
+    m_pXml = nullptr;
 #ifdef XML_LEAK_FINDER
     m_pXml = new LeakFinderXmlOutput();
 #endif
@@ -119,7 +119,7 @@ public:
   ~ZZZ_LeakFinder()
   {
     DeinitLeakFinder(m_pXml);
-    if (m_pXml != NULL) delete m_pXml;
+    if (m_pXml != nullptr) delete m_pXml;
   }
 protected:
   LeakFinderXmlOutput *m_pXml;
@@ -148,7 +148,7 @@ ZZZ_LeakFinder zzz_LeakFinder;
 
 
 
-extern void DumpUsedMemory(LeakFinderOutput * output = NULL);
+extern void DumpUsedMemory(LeakFinderOutput * output = nullptr);
 
 
 

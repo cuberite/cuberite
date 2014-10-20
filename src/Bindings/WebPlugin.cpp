@@ -12,7 +12,7 @@
 cWebPlugin::cWebPlugin()
 {
 	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
-	if (WebAdmin != NULL)
+	if (WebAdmin != nullptr)
 	{
 		WebAdmin->AddPlugin(this);
 	}
@@ -25,7 +25,7 @@ cWebPlugin::cWebPlugin()
 cWebPlugin::~cWebPlugin()
 {
 	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
-	if (WebAdmin != NULL)
+	if (WebAdmin != nullptr)
 	{
 		WebAdmin->RemovePlugin(this);
 	}
@@ -65,7 +65,7 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 
 	if (Split.size() > 1)
 	{
-		sWebPluginTab * Tab = NULL;
+		sWebPluginTab * Tab = nullptr;
 		if (Split.size() > 2)  // If we got the tab name, show that page
 		{
 			for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
@@ -85,7 +85,7 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 			}
 		}
 
-		if (Tab != NULL)
+		if (Tab != nullptr)
 		{
 			Names.first = Tab->Title;
 			Names.second = Tab->SafeTitle;

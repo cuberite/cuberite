@@ -19,7 +19,7 @@ cZombiePigman::cZombiePigman(void) :
 void cZombiePigman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
-	if (a_Killer != NULL)
+	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
@@ -41,7 +41,7 @@ void cZombiePigman::KilledBy(TakeDamageInfo & a_TDI)
 {
 	super::KilledBy(a_TDI);
 
-	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
+	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		// TODO: Anger all nearby zombie pigmen
 		// TODO: In vanilla, if one player angers ZPs, do they attack any nearby player, or only that one attacker?

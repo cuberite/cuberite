@@ -19,7 +19,7 @@ cBlaze::cBlaze(void) :
 
 void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	if ((a_Killer != NULL) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
+	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
 	{
 		int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
@@ -34,20 +34,20 @@ void cBlaze::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
 
-	if (m_Target != NULL && m_AttackInterval > 3.0)
+	if (m_Target != nullptr && m_AttackInterval > 3.0)
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;
 		Speed.y = Speed.y + 1;
 		cFireChargeEntity * FireCharge = new cFireChargeEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		if (FireCharge == NULL)
+		if (FireCharge == nullptr)
 		{
 			return;
 		}
 		if (!FireCharge->Initialize(*m_World))
 		{
 			delete FireCharge;
-			FireCharge = NULL;
+			FireCharge = nullptr;
 			return;
 		}
 		m_World->BroadcastSpawnEntity(*FireCharge);

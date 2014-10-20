@@ -88,7 +88,7 @@ public:
 
   StackWalker(
     int options = OptionsAll, // 'int' is by design, to combine the enum-flags
-    LPCSTR szSymPath = NULL, 
+    LPCSTR szSymPath = nullptr, 
     DWORD dwProcessId = GetCurrentProcessId(), 
     HANDLE hProcess = GetCurrentProcess()
     );
@@ -108,9 +108,9 @@ public:
 
   BOOL ShowCallstack(
     HANDLE hThread = GetCurrentThread(), 
-    const CONTEXT *context = NULL, 
-    PReadProcessMemoryRoutine readMemoryFunction = NULL,
-    LPVOID pUserData = NULL  // optional to identify some data in the 'readMemoryFunction'-callback
+    const CONTEXT *context = nullptr, 
+    PReadProcessMemoryRoutine readMemoryFunction = nullptr,
+    LPVOID pUserData = nullptr  // optional to identify some data in the 'readMemoryFunction'-callback
     );
 
 #if _MSC_VER >= 1300
@@ -180,11 +180,11 @@ protected:
 #define GET_CURRENT_CONTEXT(c, contextFlags) \
   do { \
     memset(&c, 0, sizeof(CONTEXT)); \
-    EXCEPTION_POINTERS *pExp = NULL; \
+    EXCEPTION_POINTERS *pExp = nullptr; \
     __try { \
       throw 0; \
     } __except( ( (pExp = GetExceptionInformation()) ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_EXECUTE_HANDLER)) {} \
-    if (pExp != NULL) \
+    if (pExp != nullptr) \
       memcpy(&c, pExp->ContextRecord, sizeof(CONTEXT)); \
       c.ContextFlags = contextFlags; \
   } while(0);

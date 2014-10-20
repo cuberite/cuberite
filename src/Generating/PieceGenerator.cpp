@@ -289,7 +289,7 @@ cPlacedPiece::cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece
 	m_NumCCWRotations(a_NumCCWRotations),
 	m_HasBeenMovedToGround(false)
 {
-	m_Depth = (m_Parent == NULL) ? 0 : (m_Parent->GetDepth() + 1);
+	m_Depth = (m_Parent == nullptr) ? 0 : (m_Parent->GetDepth() + 1);
 	m_HitBox = a_Piece.RotateMoveHitBox(a_NumCCWRotations, a_Coords.x, a_Coords.y, a_Coords.z);
 	m_HitBox.Sort();
 }
@@ -402,7 +402,7 @@ cPlacedPiece * cPieceGenerator::PlaceStartingPiece(int a_BlockX, int a_BlockY, i
 	}
 	int Rotation = Rotations[rnd % NumRotations];
 	
-	cPlacedPiece * res = new cPlacedPiece(NULL, *StartingPiece, Vector3i(a_BlockX, a_BlockY, a_BlockZ), Rotation);
+	cPlacedPiece * res = new cPlacedPiece(nullptr, *StartingPiece, Vector3i(a_BlockX, a_BlockY, a_BlockZ), Rotation);
 
 	// Place the piece's connectors into a_OutConnectors:
 	const cPiece::cConnectors & Conn = StartingPiece->GetConnectors();

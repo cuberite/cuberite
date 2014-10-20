@@ -29,7 +29,7 @@ public:
 	
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
-		ASSERT(a_Player != NULL);
+		ASSERT(a_Player != nullptr);
 		
 		// Check if the player has an arrow in the inventory, or is in Creative:
 		if (!(a_Player->IsGameModeCreative() || a_Player->GetInventory().HasItems(cItem(E_ITEM_ARROW))))
@@ -45,7 +45,7 @@ public:
 	virtual void OnItemShoot(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
 	{
 		// Actual shot - produce the arrow with speed based on the ticks that the bow was charged
-		ASSERT(a_Player != NULL);
+		ASSERT(a_Player != nullptr);
 
 		int BowCharge = a_Player->FinishChargingBow();
 		double Force = (double)BowCharge / 20.0;
@@ -65,14 +65,14 @@ public:
 
 		// Create the arrow entity:
 		cArrowEntity * Arrow = new cArrowEntity(*a_Player, Force * 2);
-		if (Arrow == NULL)
+		if (Arrow == nullptr)
 		{
 			return;
 		}
 		if (!Arrow->Initialize(*a_Player->GetWorld()))
 		{
 			delete Arrow;
-			Arrow = NULL;
+			Arrow = nullptr;
 			return;
 		}
 		a_Player->GetWorld()->BroadcastSoundEffect("random.bow", a_Player->GetPosX(), a_Player->GetPosY(), a_Player->GetPosZ(), 0.5, (float)Force);

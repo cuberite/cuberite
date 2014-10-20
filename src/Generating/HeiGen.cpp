@@ -29,7 +29,7 @@ cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cB
 	}
 	
 	a_CacheOffByDefault = false;
-	cTerrainHeightGen * res = NULL;
+	cTerrainHeightGen * res = nullptr;
 	if (NoCaseCompare(HeightGenName, "flat") == 0)
 	{
 		res = new cHeiGenFlat;
@@ -142,9 +142,9 @@ cHeiGenCache::cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, int a_CacheSize
 cHeiGenCache::~cHeiGenCache()
 {
 	delete[] m_CacheData;
-	m_CacheData = NULL;
+	m_CacheData = nullptr;
 	delete[] m_CacheOrder;
-	m_CacheOrder = NULL;
+	m_CacheOrder = nullptr;
 }
 
 

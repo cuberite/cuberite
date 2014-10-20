@@ -70,8 +70,8 @@ public:
 	
 	/// Creates a new block entity for the specified block type
 	/// If a_World is valid, then the entity is created bound to that world
-	/// Returns NULL for unknown block types
-	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = NULL);
+	/// Returns nullptr for unknown block types
+	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = nullptr);
 	
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{

@@ -113,10 +113,10 @@ protected:
 	/// Saves the chunk into NBT data using a_Writer; returns true on success
 	bool SaveChunkToNBT(const cChunkCoords & a_Chunk, cFastNBTWriter & a_Writer);
 	
-	/// Loads the chunk's biome map from vanilla-format; returns a_BiomeMap if biomes present and valid, NULL otherwise
+	/// Loads the chunk's biome map from vanilla-format; returns a_BiomeMap if biomes present and valid, nullptr otherwise
 	cChunkDef::BiomeMap * LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 	
-	/// Loads the chunk's biome map from MCS format; returns a_BiomeMap if biomes present and valid, NULL otherwise
+	/// Loads the chunk's biome map from MCS format; returns a_BiomeMap if biomes present and valid, nullptr otherwise
 	cChunkDef::BiomeMap * LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads the chunk's entities from NBT data (a_Tag is the Level\\Entities list tag; may be -1)
@@ -126,7 +126,7 @@ protected:
 	void LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntitites, const cParsedNBT & a_NBT, int a_Tag, BLOCKTYPE * a_BlockTypes, NIBBLETYPE * a_BlockMetas);
 	
 	/** Loads the data for a block entity from the specified NBT tag.
-	Returns the loaded block entity, or NULL upon failure. */
+	Returns the loaded block entity, or nullptr upon failure. */
 	cBlockEntity * LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/// Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag

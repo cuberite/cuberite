@@ -687,9 +687,9 @@ cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_Cac
 cCompoGenCache::~cCompoGenCache()
 {
 	delete[] m_CacheData;
-	m_CacheData = NULL;
+	m_CacheData = nullptr;
 	delete[] m_CacheOrder;
-	m_CacheOrder = NULL;
+	m_CacheOrder = nullptr;
 }
 
 

@@ -477,16 +477,16 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 
 
 
-#define PI 3.14159265358979323846264338327950288419716939937510582097494459072381640628620899862803482534211706798f
+
 
 inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a_Y, double & a_Z)
 {
 	// 	a_X = sinf ( a_Pan / 180 * PI) * cosf ( a_Pitch / 180 * PI);
 	// 	a_Y = -sinf ( a_Pitch / 180 * PI);
 	// 	a_Z = -cosf ( a_Pan / 180 * PI) * cosf ( a_Pitch / 180 * PI);
-	a_X = cos(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
-	a_Y = sin(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
-	a_Z = sin(a_Pitch / 180 * PI);
+	a_X = cos(a_Pan / 180 * M_PI) * cos(a_Pitch / 180 * M_PI);
+	a_Y = sin(a_Pan / 180 * M_PI) * cos(a_Pitch / 180 * M_PI);
+	a_Z = sin(a_Pitch / 180 * M_PI);
 }
 
 
@@ -502,10 +502,10 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 	}
 	else
 	{
-		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
+		a_Pan = atan2(a_Z, a_X) * 180 / M_PI - 90;
 	}
 
-	a_Pitch = atan2(a_Y, r) * 180 / PI;
+	a_Pitch = atan2(a_Y, r) * 180 / M_PI;
 }
 
 

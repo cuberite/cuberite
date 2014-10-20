@@ -220,7 +220,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	ASSERT(a_NewMeta > 0);  // Source blocks aren't spread
 
 	a_NearChunk = a_NearChunk->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((a_NearChunk == NULL) || (!a_NearChunk->IsValid()))
+	if ((a_NearChunk == nullptr) || (!a_NearChunk->IsValid()))
 	{
 		// Chunk not available
 		return;
@@ -297,7 +297,7 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 				ChunkInterface,
 				m_World,
 				PluginInterface,
-				NULL,
+				nullptr,
 				BlockX,
 				a_RelY,
 				BlockZ

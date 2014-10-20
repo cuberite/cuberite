@@ -148,7 +148,7 @@ public:
 				{
 					int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 					int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-					DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
+					DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
 				}
 				a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 				return;

@@ -39,7 +39,7 @@ public:
 	
 	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
 	{
-		return NULL;
+		return nullptr;
 	}
 
 } ;

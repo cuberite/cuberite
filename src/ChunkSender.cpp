@@ -35,9 +35,9 @@ void cNotifyChunkSender::Call(int a_ChunkX, int a_ChunkZ)
 
 cChunkSender::cChunkSender(void) :
 	super("ChunkSender"),
-	m_World(NULL),
+	m_World(nullptr),
 	m_RemoveCount(0),
-	m_Notify(NULL)
+	m_Notify(nullptr)
 {
 	m_Notify.SetChunkSender(this);
 }
@@ -93,7 +93,7 @@ void cChunkSender::ChunkReady(int a_ChunkX, int a_ChunkZ)
 
 void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
-	ASSERT(a_Client != NULL);
+	ASSERT(a_Client != nullptr);
 	{
 		cCSLock Lock(m_CS);
 		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), sSendChunk(a_ChunkX, a_ChunkZ, a_Client)) != m_SendChunks.end())
@@ -161,7 +161,7 @@ void cChunkSender::Execute(void)
 			m_ChunksReady.pop_front();
 			Lock.Unlock();
 			
-			SendChunk(Coords.m_ChunkX, Coords.m_ChunkZ, NULL);
+			SendChunk(Coords.m_ChunkX, Coords.m_ChunkZ, nullptr);
 		}
 		else
 		{
@@ -189,10 +189,10 @@ void cChunkSender::Execute(void)
 
 void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
 {
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 	
 	// Ask the client if it still wants the chunk:
-	if (a_Client != NULL)
+	if (a_Client != nullptr)
 	{
 		if (!a_Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
 		{
@@ -227,7 +227,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	cChunkDataSerializer Data(m_BlockTypes, m_BlockMetas, m_BlockLight, m_BlockSkyLight, m_BiomeMap);
 	
 	// Send:
-	if (a_Client == NULL)
+	if (a_Client == nullptr)
 	{
 		m_World->BroadcastChunkData(a_ChunkX, a_ChunkZ, Data);
 	}
@@ -239,7 +239,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Clien
 	// Send block-entity packets:
 	for (sBlockCoords::iterator itr = m_BlockEntities.begin(); itr != m_BlockEntities.end(); ++itr)
 	{
-		if (a_Client == NULL)
+		if (a_Client == nullptr)
 		{
 			m_World->BroadcastBlockEntity(itr->m_BlockX, itr->m_BlockY, itr->m_BlockZ);
 		}

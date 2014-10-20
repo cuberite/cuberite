@@ -56,7 +56,7 @@ public:
 		double x = (double)a_BlockX + 0.5;
 		double y = (double)a_BlockY + 0.5;
 		double z = (double)a_BlockZ + 0.5;
-		cMinecart * Minecart = NULL;
+		cMinecart * Minecart = nullptr;
 		switch (m_ItemType)
 		{
 			case E_ITEM_MINECART:             Minecart = new cRideableMinecart     (x, y, z, cItem(), 1); break;

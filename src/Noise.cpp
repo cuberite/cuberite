@@ -845,7 +845,7 @@ void cPerlinNoise::Generate2D(
 		return;
 	}
 	
-	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
 	int ArrayCount = a_SizeX * a_SizeY;
 	if (ShouldFreeWorkspace)
 	{
@@ -886,7 +886,7 @@ void cPerlinNoise::Generate2D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
-		a_Workspace = NULL;
+		a_Workspace = nullptr;
 	}
 }
 
@@ -910,7 +910,7 @@ void cPerlinNoise::Generate3D(
 		return;
 	}
 	
-	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
 	int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
 	if (ShouldFreeWorkspace)
 	{
@@ -953,7 +953,7 @@ void cPerlinNoise::Generate3D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
-		a_Workspace = NULL;
+		a_Workspace = nullptr;
 	}
 }
 
@@ -1015,7 +1015,7 @@ void cRidgedMultiNoise::Generate2D(
 		return;
 	}
 	
-	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
 	int ArrayCount = a_SizeX * a_SizeY;
 	if (ShouldFreeWorkspace)
 	{
@@ -1056,7 +1056,7 @@ void cRidgedMultiNoise::Generate2D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
-		a_Workspace = NULL;
+		a_Workspace = nullptr;
 	}
 }
 
@@ -1080,7 +1080,7 @@ void cRidgedMultiNoise::Generate3D(
 		return;
 	}
 	
-	bool ShouldFreeWorkspace = (a_Workspace == NULL);
+	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
 	int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
 	if (ShouldFreeWorkspace)
 	{
@@ -1123,7 +1123,7 @@ void cRidgedMultiNoise::Generate3D(
 	if (ShouldFreeWorkspace)
 	{
 		delete[] a_Workspace;
-		a_Workspace = NULL;
+		a_Workspace = nullptr;
 	}
 }
 

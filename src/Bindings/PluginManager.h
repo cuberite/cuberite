@@ -190,7 +190,7 @@ public:
 	bool CallHookCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe);
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
-	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == NULL, it is a console cmd
+	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == nullptr, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);
@@ -285,7 +285,7 @@ public:
 	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
 	
 	/** Appends all commands beginning with a_Text (case-insensitive) into a_Results.
-	If a_Player is not NULL, only commands for which the player has permissions are added.
+	If a_Player is not nullptr, only commands for which the player has permissions are added.
 	*/
 	void TabCompleteCommand(const AString & a_Text, AStringVector & a_Results, cPlayer * a_Player);
 	

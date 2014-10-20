@@ -45,12 +45,12 @@ void cCaveSpider::Attack(float a_Dt)
 void cCaveSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
-	if (a_Killer != NULL)
+	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_STRING);
-	if ((a_Killer != NULL) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
+	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
 	{
 		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_SPIDER_EYE);
 	}

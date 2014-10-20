@@ -44,7 +44,7 @@ class cDebugCallbacks :
 			UNUSED(a_Connection);
 			
 			cHTTPFormParser * FormParser = (cHTTPFormParser *)(a_Request.GetUserData());
-			if (FormParser != NULL)
+			if (FormParser != nullptr)
 			{
 				FormParser->Parse(a_Data, a_Size);
 			}
@@ -54,7 +54,7 @@ class cDebugCallbacks :
 		virtual void OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest & a_Request) override
 		{
 			cHTTPFormParser * FormParser = (cHTTPFormParser *)(a_Request.GetUserData());
-			if (FormParser != NULL)
+			if (FormParser != nullptr)
 			{
 				if (FormParser->Finish())
 				{
@@ -124,7 +124,7 @@ class cDebugCallbacks :
 cHTTPServer::cHTTPServer(void) :
 	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer"),
 	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer"),
-	m_Callbacks(NULL)
+	m_Callbacks(nullptr)
 {
 }
 
@@ -168,7 +168,7 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 	}
 
 	// Notify the admin about the HTTPS / HTTP status
-	if (m_Cert.get() == NULL)
+	if (m_Cert.get() == nullptr)
 	{
 		LOGWARNING("WebServer: The server is running in unsecured HTTP mode.");
 		LOGINFO("Put a valid HTTPS certificate in file 'webadmin/httpscert.crt' and its corresponding private key to 'webadmin/httpskey.pem' (without any password) to enable HTTPS support");
@@ -235,7 +235,7 @@ void cHTTPServer::Stop(void)
 void cHTTPServer::OnConnectionAccepted(cSocket & a_Socket)
 {
 	cHTTPConnection * Connection;
-	if (m_Cert.get() != NULL)
+	if (m_Cert.get() != nullptr)
 	{
 		Connection = new cSslHTTPConnection(*this, m_Cert, m_CertPrivKey);
 	}

@@ -135,7 +135,7 @@ public:
 		m_Pos(a_Pos),
 		m_NextPos(a_NextPos),
 		m_MinCoeff(1),
-		m_HitEntity(NULL)
+		m_HitEntity(nullptr)
 	{
 	}
 	
@@ -221,9 +221,9 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
-		((a_Creator != NULL) ? a_Creator->GetUniqueID() : -1),
-		((a_Creator != NULL) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : ""),
-		((a_Creator != NULL) ? a_Creator->GetEquippedWeapon().m_Enchantments : cEnchantments())
+		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : -1),
+		((a_Creator != nullptr) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : ""),
+		((a_Creator != nullptr) ? a_Creator->GetEquippedWeapon().m_Enchantments : cEnchantments())
 	),
 	m_IsInGround(false)
 {
@@ -251,7 +251,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	Vector3d Speed;
-	if (a_Speed != NULL)
+	if (a_Speed != nullptr)
 	{
 		Speed = *a_Speed;
 	}
@@ -269,10 +269,10 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 		case pkWitherSkull:   return new cWitherSkullEntity     (a_Creator, a_X, a_Y, a_Z, Speed);
 		case pkFirework:
 		{
-			ASSERT(a_Item != NULL);
+			ASSERT(a_Item != nullptr);
 			if (a_Item->m_FireworkItem.m_Colours.empty())
 			{
-				return NULL;
+				return nullptr;
 			}
 
 			return new cFireworkEntity(a_Creator, a_X, a_Y, a_Z, *a_Item);
@@ -280,7 +280,7 @@ cProjectileEntity * cProjectileEntity::Create(eKind a_Kind, cEntity * a_Creator,
 	}
 	
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
-	return NULL;
+	return nullptr;
 }
 
 

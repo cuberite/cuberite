@@ -17,7 +17,7 @@ public:
 
 	CLASS_PROTODEF(cEnderman)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void CheckEventSeePlayer(void) override;
 	virtual void CheckEventLostPlayer(void) override;
 	virtual void EventLosePlayer(void) override;

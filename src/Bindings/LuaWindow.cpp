@@ -18,7 +18,7 @@
 cLuaWindow::cLuaWindow(cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title) :
 	super(a_WindowType, a_Title),
 	m_Contents(a_SlotsX, a_SlotsY),
-	m_Plugin(NULL),
+	m_Plugin(nullptr),
 	m_LuaRef(LUA_REFNIL),
 	m_OnClosingFnRef(LUA_REFNIL),
 	m_OnSlotChangedFnRef(LUA_REFNIL)
@@ -70,7 +70,7 @@ cLuaWindow::~cLuaWindow()
 void cLuaWindow::SetLuaRef(cPluginLua * a_Plugin, int a_LuaRef)
 {
 	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
-	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
+	ASSERT((m_Plugin == nullptr) || (m_Plugin == a_Plugin));
 	ASSERT(m_LuaRef == LUA_REFNIL);
 	m_Plugin = a_Plugin;
 	m_LuaRef = a_LuaRef;
@@ -82,7 +82,7 @@ void cLuaWindow::SetLuaRef(cPluginLua * a_Plugin, int a_LuaRef)
 
 bool cLuaWindow::IsLuaReferenced(void) const
 {
-	return ((m_Plugin != NULL) && (m_LuaRef != LUA_REFNIL));
+	return ((m_Plugin != nullptr) && (m_LuaRef != LUA_REFNIL));
 }
 
 
@@ -92,7 +92,7 @@ bool cLuaWindow::IsLuaReferenced(void) const
 void cLuaWindow::SetOnClosing(cPluginLua * a_Plugin, int a_FnRef)
 {
 	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
-	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
+	ASSERT((m_Plugin == nullptr) || (m_Plugin == a_Plugin));
 	
 	// If there already was a function, unreference it first
 	if (m_OnClosingFnRef != LUA_REFNIL)
@@ -112,7 +112,7 @@ void cLuaWindow::SetOnClosing(cPluginLua * a_Plugin, int a_FnRef)
 void cLuaWindow::SetOnSlotChanged(cPluginLua * a_Plugin, int a_FnRef)
 {
 	// Either m_Plugin is not set or equal to the passed plugin; only one plugin can use one cLuaWindow object
-	ASSERT((m_Plugin == NULL) || (m_Plugin == a_Plugin));
+	ASSERT((m_Plugin == nullptr) || (m_Plugin == a_Plugin));
 	
 	// If there already was a function, unreference it first
 	if (m_OnSlotChangedFnRef != LUA_REFNIL)
@@ -134,7 +134,7 @@ bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	// First notify the plugin through the registered callback:
 	if (m_OnClosingFnRef != LUA_REFNIL)
 	{
-		ASSERT(m_Plugin != NULL);
+		ASSERT(m_Plugin != nullptr);
 		if (m_Plugin->CallbackWindowClosing(m_OnClosingFnRef, *this, a_Player, a_CanRefuse))
 		{
 			// The callback disagrees (the higher levels check the CanRefuse flag compliance)
@@ -153,7 +153,7 @@ void cLuaWindow::Destroy(void)
 {
 	super::Destroy();
 	
-	if ((m_LuaRef != LUA_REFNIL) && (m_Plugin != NULL))
+	if ((m_LuaRef != LUA_REFNIL) && (m_Plugin != nullptr))
 	{
 		// The object is referenced by Lua, un-reference it
 		m_Plugin->Unreference(m_LuaRef);

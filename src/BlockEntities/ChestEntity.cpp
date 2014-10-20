@@ -23,7 +23,7 @@ cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_
 cChestEntity::~cChestEntity()
 {
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
 	}
@@ -49,14 +49,14 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenNewWindow();
 		Window = GetWindow();
 	}
 	
 	// Open the window for the player:
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{

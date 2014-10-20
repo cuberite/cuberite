@@ -220,7 +220,7 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
@@ -359,7 +359,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		int Z = a_RelZ + gNeighborCoords[i].z;
 
 		cChunkPtr Neighbour = a_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
-		if (Neighbour == NULL)
+		if (Neighbour == nullptr)
 		{
 			continue;
 		}

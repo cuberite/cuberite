@@ -30,7 +30,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if ((a_TDI.Attacker != NULL) && a_TDI.Attacker->IsPlayer())
+	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPlayer())
 	{
 		if (m_World->GetTickRandomNumber(5) == 3)
 		{
