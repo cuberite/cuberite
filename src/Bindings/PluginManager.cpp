@@ -1525,15 +1525,6 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 
 bool cPluginManager::LoadPlugin(const AString & a_PluginName)
 {
-	PluginMap map = GetAllPlugins();
-
-	for(auto plugin_entry : map)
-	{
-		if(plugin_entry.first == a_PluginName)
-		{
-			return false;
-		}
-	}
 	return AddPlugin(new cPluginLua(a_PluginName.c_str()));
 }
 
