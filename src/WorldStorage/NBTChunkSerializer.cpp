@@ -467,7 +467,7 @@ void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 
 void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 {
-	const char * EntityClass = NULL;
+	const char * EntityClass = nullptr;
 	switch (a_Monster->GetMobType())
 	{
 		case mtBat:           EntityClass = "Bat";            break;

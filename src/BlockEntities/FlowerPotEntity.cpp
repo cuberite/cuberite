@@ -59,7 +59,7 @@ void cFlowerPotEntity::Destroy(void)
 	// Drop the contents as pickups:
 	if (!m_Item.IsEmpty())
 	{
-		ASSERT(m_World != NULL);
+		ASSERT(m_World != nullptr);
 		cItems Pickups;
 		Pickups.Add(m_Item);
 		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);

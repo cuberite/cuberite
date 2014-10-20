@@ -31,7 +31,7 @@ public:
 	{
 		cMap * Map = a_World->GetMapManager().GetMapData((unsigned)a_Item.m_ItemDamage);
 
-		if (Map == NULL)
+		if (Map == nullptr)
 		{
 			return;
 		}

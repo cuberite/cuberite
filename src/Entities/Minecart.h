@@ -140,9 +140,9 @@ protected:
 	{
 		UNUSED(a_SlotNum);
 		ASSERT(a_Grid == &m_Contents);
-		if (m_World != NULL)
+		if (m_World != nullptr)
 		{
-			if (GetWindow() != NULL)
+			if (GetWindow() != nullptr)
 			{
 				GetWindow()->BroadcastWholeWindow();
 			}

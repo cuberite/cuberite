@@ -69,9 +69,9 @@ cBioGenCache::cBioGenCache(cBiomeGenPtr a_BioGenToCache, int a_CacheSize) :
 cBioGenCache::~cBioGenCache()
 {
 	delete[] m_CacheData;
-	m_CacheData = NULL;
+	m_CacheData = nullptr;
 	delete[] m_CacheOrder;
-	m_CacheOrder = NULL;
+	m_CacheOrder = nullptr;
 }
 
 
@@ -928,7 +928,7 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 		BiomeGenName = "MultiStepMap";
 	}
 
-	cBiomeGen * res = NULL;
+	cBiomeGen * res = nullptr;
 	a_CacheOffByDefault = false;
 	if (NoCaseCompare(BiomeGenName, "constant") == 0)
 	{

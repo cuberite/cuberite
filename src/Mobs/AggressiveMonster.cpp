@@ -26,7 +26,7 @@ void cAggressiveMonster::InStateChasing(float a_Dt)
 {
 	super::InStateChasing(a_Dt);
 
-	if (m_Target != NULL)
+	if (m_Target != nullptr)
 	{
 		if (m_Target->IsPlayer())
 		{
@@ -74,7 +74,7 @@ void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		CheckEventSeePlayer();
 	}
 
-	if (m_Target == NULL)
+	if (m_Target == nullptr)
 		return;
 
 	cTracer LineOfSight(GetWorld());
@@ -95,7 +95,7 @@ void cAggressiveMonster::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
 
-	if ((m_Target == NULL) || (m_AttackInterval < 3.0))
+	if ((m_Target == nullptr) || (m_AttackInterval < 3.0))
 	{
 		return;
 	}

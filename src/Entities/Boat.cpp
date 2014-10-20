@@ -42,7 +42,7 @@ bool cBoat::DoTakeDamage(TakeDamageInfo & TDI)
 
 	if (GetHealth() == 0)
 	{
-		if (TDI.Attacker != NULL)
+		if (TDI.Attacker != nullptr)
 		{
 			if (TDI.Attacker->IsPlayer())
 			{
@@ -64,7 +64,7 @@ void cBoat::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
-	if (m_Attachee != NULL)
+	if (m_Attachee != nullptr)
 	{
 		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
 		{

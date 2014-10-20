@@ -133,8 +133,8 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 	ExcInformation.ClientPointers = 0;
 
 	// Write the dump file:
-	HANDLE dumpFile = CreateFile(g_DumpFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, g_DumpFlags, (a_ExceptionInfo) ? &ExcInformation : NULL, NULL, NULL);
+	HANDLE dumpFile = CreateFile(g_DumpFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, g_DumpFlags, (a_ExceptionInfo) ? &ExcInformation : nullptr, nullptr, nullptr);
 	CloseHandle(dumpFile);
 
 	// Revert to old stack:
@@ -190,7 +190,7 @@ int main( int argc, char **argv)
 	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)
 	HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");
 	g_WriteMiniDump = (pMiniDumpWriteDump)GetProcAddress(hDbgHelp, "MiniDumpWriteDump");
-	if (g_WriteMiniDump != NULL)
+	if (g_WriteMiniDump != nullptr)
 	{
 		_snprintf_s(g_DumpFileName, ARRAYCOUNT(g_DumpFileName), _TRUNCATE, "crash_mcs_%x.dmp", GetCurrentProcessId());
 		SetUnhandledExceptionFilter(LastChanceExceptionFilter);
@@ -272,7 +272,7 @@ int main( int argc, char **argv)
 		}
 		else if (NoCaseCompare(Arg, "nooutbuf") == 0)
 		{
-			setvbuf(stdout, NULL, _IONBF, 0);
+			setvbuf(stdout, nullptr, _IONBF, 0);
 		}
 	}  // for i - argv[]
 	

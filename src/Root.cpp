@@ -34,20 +34,20 @@
 
 
 
-cRoot* cRoot::s_Root = NULL;
+cRoot* cRoot::s_Root = nullptr;
 
 
 
 
 
 cRoot::cRoot(void) :
-	m_pDefaultWorld(NULL),
-	m_Server(NULL),
-	m_MonsterConfig(NULL),
-	m_CraftingRecipes(NULL),
-	m_FurnaceRecipe(NULL),
-	m_WebAdmin(NULL),
-	m_PluginManager(NULL),
+	m_pDefaultWorld(nullptr),
+	m_Server(nullptr),
+	m_MonsterConfig(nullptr),
+	m_CraftingRecipes(nullptr),
+	m_FurnaceRecipe(nullptr),
+	m_WebAdmin(nullptr),
+	m_PluginManager(nullptr),
 	m_bStop(false),
 	m_bRestart(false)
 {
@@ -224,21 +224,21 @@ void cRoot::Start(void)
 		m_Authenticator.Stop();
 
 		LOGD("Freeing MonsterConfig...");
-		delete m_MonsterConfig; m_MonsterConfig = NULL;
-		delete m_WebAdmin; m_WebAdmin = NULL;
+		delete m_MonsterConfig; m_MonsterConfig = nullptr;
+		delete m_WebAdmin; m_WebAdmin = nullptr;
 		LOGD("Unloading recipes...");
-		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
-		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
+		delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
+		delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
 		LOGD("Stopping plugin manager...");
-		delete m_PluginManager; m_PluginManager = NULL;
+		delete m_PluginManager; m_PluginManager = nullptr;
 
 		cItemHandler::Deinit();
 
 		LOG("Cleaning up...");
-		delete m_Server; m_Server = NULL;
+		delete m_Server; m_Server = nullptr;
 		LOG("Shutdown successful!");
 	}
 	
@@ -313,7 +313,7 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
 {
 	cWorld * World = m_WorldsByName[a_WorldName];
-	if (World != NULL)
+	if (World != nullptr)
 	{
 		return World;
 	}
@@ -358,7 +358,7 @@ void cRoot::StopWorlds(void)
 
 void cRoot::UnloadWorlds(void)
 {
-	m_pDefaultWorld = NULL;
+	m_pDefaultWorld = nullptr;
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		delete itr->second;
@@ -391,7 +391,7 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
 	{
 		return CreateAndInitializeWorld(a_WorldName);
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -403,7 +403,7 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
-		if (itr->second != NULL)
+		if (itr->second != nullptr)
 		{
 			if (a_Callback.Item(itr->second))
 			{
@@ -538,7 +538,7 @@ void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
 	{
-		itr->second->BroadcastChat(a_Message, NULL, a_ChatPrefix);
+		itr->second->BroadcastChat(a_Message, nullptr, a_ChatPrefix);
 	}  // for itr - m_WorldsByName[]
 }
 
@@ -608,7 +608,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
-			m_BestMatch(NULL),
+			m_BestMatch(nullptr),
 			m_NumMatches(0)
 		{}
 

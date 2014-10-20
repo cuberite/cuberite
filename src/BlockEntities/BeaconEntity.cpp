@@ -97,7 +97,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 	m_PrimaryEffect = a_Effect;
 
 	// Send window update:
-	if (GetWindow() != NULL)
+	if (GetWindow() != nullptr)
 	{
 		GetWindow()->SetProperty(1, m_PrimaryEffect);
 	}
@@ -119,7 +119,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 	m_SecondaryEffect = a_Effect;
 
 	// Send window update:
-	if (GetWindow() != NULL)
+	if (GetWindow() != nullptr)
 	{
 		GetWindow()->SetProperty(2, m_SecondaryEffect);
 	}
@@ -184,7 +184,7 @@ void cBeaconEntity::UpdateBeacon(void)
 	if (m_BeaconLevel != OldBeaconLevel)
 	{
 		// Send window update:
-		if (GetWindow() != NULL)
+		if (GetWindow() != nullptr)
 		{
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
@@ -283,13 +283,13 @@ bool cBeaconEntity::Tick(float a_Dt, cChunk & a_Chunk)
 void cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
 	
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		// if (a_Player->GetWindow() != Window)
 		// -> Because mojang doesn't send a 'close window' packet when you click the cancel button in the beacon inventory ...

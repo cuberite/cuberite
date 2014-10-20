@@ -78,7 +78,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	: super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
-	, m_Target(NULL)
+	, m_Target(nullptr)
 	, m_bMovingToDestination(false)
 	, m_LastGroundHeight(POSY_TOINT)
 	, m_IdleInterval(0)
@@ -273,8 +273,8 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	if ((m_Target != NULL) && m_Target->IsDestroyed())
-		m_Target = NULL;
+	if ((m_Target != nullptr) && m_Target->IsDestroyed())
+		m_Target = nullptr;
 
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
@@ -378,7 +378,7 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 void cMonster::SetPitchAndYawFromDestination()
 {
 	Vector3d FinalDestination = m_FinalDestination;
-	if (m_Target != NULL)
+	if (m_Target != nullptr)
 	{
 		if (m_Target->IsPlayer())
 		{
@@ -422,7 +422,7 @@ void cMonster::HandleFalling()
 
 		if (Damage > 0)
 		{
-			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
+			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 
 			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, POSY_TOINT - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
@@ -478,7 +478,7 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosX(), GetPosY(), GetPosZ(), 1.0f, 0.8f);
 	}
 
-	if (a_TDI.Attacker != NULL)
+	if (a_TDI.Attacker != nullptr)
 	{
 		m_Target = a_TDI.Attacker;
 	}
@@ -555,7 +555,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 			break;
 		}
 	}
-	if ((a_TDI.Attacker != NULL) && (!IsBaby()))
+	if ((a_TDI.Attacker != nullptr) && (!IsBaby()))
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
@@ -592,7 +592,7 @@ void cMonster::CheckEventSeePlayer(void)
 	// TODO: Rewrite this to use cWorld's DoWithPlayers()
 	cPlayer * Closest = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance, false);
 
-	if (Closest != NULL)
+	if (Closest != nullptr)
 	{
 		EventSeePlayer(Closest);
 	}
@@ -604,7 +604,7 @@ void cMonster::CheckEventSeePlayer(void)
 
 void cMonster::CheckEventLostPlayer(void)
 {
-	if (m_Target != NULL)
+	if (m_Target != nullptr)
 	{
 		if ((m_Target->GetPosition() - GetPosition()).Length() > m_SightDistance)
 		{
@@ -634,7 +634,7 @@ void cMonster::EventSeePlayer(cEntity * a_SeenPlayer)
 
 void cMonster::EventLosePlayer(void)
 {
-	m_Target = NULL;
+	m_Target = nullptr;
 	m_EMState = IDLE;
 }
 
@@ -696,7 +696,7 @@ void cMonster::InStateEscaping(float a_Dt)
 {
 	UNUSED(a_Dt);
 	
-	if (m_Target != NULL)
+	if (m_Target != nullptr)
 	{
 		Vector3d newloc = GetPosition();
 		newloc.x = (m_Target->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
@@ -723,7 +723,7 @@ void cMonster::SetCustomName(const AString & a_CustomName)
 		m_CustomName = a_CustomName.substr(0, 64);
 	}
 
-	if (m_World != NULL)
+	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);
 	}
@@ -736,7 +736,7 @@ void cMonster::SetCustomName(const AString & a_CustomName)
 void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 {
 	m_CustomNameAlwaysVisible = a_CustomNameAlwaysVisible;
-	if (m_World != NULL)
+	if (m_World != nullptr)
 	{
 		m_World->BroadcastEntityMetadata(*this);
 	}
@@ -892,7 +892,7 @@ int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 {
 	cFastRandom Random;
-	cMonster * toReturn = NULL;
+	cMonster * toReturn = nullptr;
 
 	// Create the mob entity
 	switch (a_MobType)

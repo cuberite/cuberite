@@ -61,7 +61,7 @@ public:
 	void Stop(void);
 	
 	/** Queues the entire chunk for lighting */
-	void QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter = NULL);
+	void QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter = nullptr);
 	
 	/** Blocks until the queue is empty or the thread is terminated */
 	void WaitForQueueEmpty(void);

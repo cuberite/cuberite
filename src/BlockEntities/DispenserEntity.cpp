@@ -28,7 +28,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
 	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
-	if (DispChunk == NULL)
+	if (DispChunk == nullptr)
 	{
 		// Would dispense into / interact with a non-loaded chunk, ignore the tick
 		return;
@@ -190,7 +190,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 void cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_ShootVector)
 {
-	m_World->CreateProjectile((double)a_BlockX + 0.5, (double)a_BlockY + 0.5, (double)a_BlockZ + 0.5, a_Kind, NULL, NULL, &a_ShootVector);
+	m_World->CreateProjectile((double)a_BlockX + 0.5, (double)a_BlockY + 0.5, (double)a_BlockZ + 0.5, a_Kind, nullptr, nullptr, &a_ShootVector);
 }
 
 

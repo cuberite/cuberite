@@ -1044,7 +1044,7 @@ void ManualBindings::BindRankManager(lua_State * tolua_S)
 {
 	// Create the cRankManager class in the API:
 	tolua_usertype(tolua_S, "cRankManager");
-	tolua_cclass(tolua_S, "cRankManager", "cRankManager", "", NULL);
+	tolua_cclass(tolua_S, "cRankManager", "cRankManager", "", nullptr);
 	
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cRankManager");

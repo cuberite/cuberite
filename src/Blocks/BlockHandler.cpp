@@ -99,9 +99,9 @@ public:
 		for (BLOCKTYPE Type = 0; Type < E_BLOCK_MAX_TYPE_ID; Type++)
 		{
 			cBlockHandler * Handler = cBlockInfo::GetHandler(Type);
-			if (Handler == NULL)
+			if (Handler == nullptr)
 			{
-				printf("NULL handler for block type %d!\n", Type);
+				printf("nullptr handler for block type %d!\n", Type);
 				continue;
 			}
 			AString BlockName = ItemTypeToString(Type);
@@ -441,7 +441,7 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 	if (a_CanDrop)
 	{
-		if ((a_Digger != NULL) && (a_Digger->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0))
+		if ((a_Digger != nullptr) && (a_Digger->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) > 0))
 		{
 			switch (m_BlockType)
 			{
@@ -562,7 +562,7 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 		{
 			int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 			int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-			DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
+			DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
 		}
 		
 		a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);

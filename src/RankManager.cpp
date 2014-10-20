@@ -384,7 +384,7 @@ protected:
 cRankManager::cRankManager(void) :
 	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
 	m_IsInitialized(false),
-	m_MojangAPI(NULL)
+	m_MojangAPI(nullptr)
 {
 }
 
@@ -394,9 +394,9 @@ cRankManager::cRankManager(void) :
 
 cRankManager::~cRankManager()
 {
-	if (m_MojangAPI != NULL)
+	if (m_MojangAPI != nullptr)
 	{
-		m_MojangAPI->SetRankManager(NULL);
+		m_MojangAPI->SetRankManager(nullptr);
 	}
 }
 

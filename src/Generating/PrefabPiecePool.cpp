@@ -16,7 +16,7 @@ cPrefabPiecePool::cPrefabPiecePool(
 )
 {
 	AddPieceDefs(a_PieceDefs, a_NumPieceDefs);
-	if (a_StartingPieceDefs != NULL)
+	if (a_StartingPieceDefs != nullptr)
 	{
 		AddStartingPieceDefs(a_StartingPieceDefs, a_NumStartingPieceDefs);
 	}
@@ -56,7 +56,7 @@ void cPrefabPiecePool::Clear(void)
 
 void cPrefabPiecePool::AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_NumPieceDefs)
 {
-	ASSERT(a_PieceDefs != NULL);
+	ASSERT(a_PieceDefs != nullptr);
 	for (size_t i = 0; i < a_NumPieceDefs; i++)
 	{
 		cPrefab * Prefab = new cPrefab(a_PieceDefs[i]);
@@ -71,7 +71,7 @@ void cPrefabPiecePool::AddPieceDefs(const cPrefab::sDef * a_PieceDefs, size_t a_
 
 void cPrefabPiecePool::AddStartingPieceDefs(const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs)
 {
-	ASSERT(a_StartingPieceDefs != NULL);
+	ASSERT(a_StartingPieceDefs != nullptr);
 	for (size_t i = 0; i < a_NumStartingPieceDefs; i++)
 	{
 		cPrefab * Prefab = new cPrefab(a_StartingPieceDefs[i]);

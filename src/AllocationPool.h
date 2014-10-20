@@ -45,7 +45,7 @@ class cListAllocationPool : public cAllocationPool<T>
 			for (size_t i = 0; i < NumElementsInReserve; i++)
 			{
 				void * space = malloc(sizeof(T));
-				if (space == NULL)
+				if (space == nullptr)
 				{
 					m_Callbacks->OnStartUsingReserve();
 					break;
@@ -68,7 +68,7 @@ class cListAllocationPool : public cAllocationPool<T>
 			if (m_FreeList.size() <= NumElementsInReserve)
 			{
 				void * space = malloc(sizeof(T));
-				if (space != NULL)
+				if (space != nullptr)
 				{
 					return new(space) T;
 				}
@@ -90,7 +90,7 @@ class cListAllocationPool : public cAllocationPool<T>
 		}
 		virtual void Free(T * a_ptr) override
 		{
-			if (a_ptr == NULL)
+			if (a_ptr == nullptr)
 			{
 				return;
 			}

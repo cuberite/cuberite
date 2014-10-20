@@ -68,7 +68,7 @@ protected:
 3, Create an instance of your class:
 	CMyParser Parser;
 4, Call Create():
-	Parser.Create(NULL, NULL);
+	Parser.Create(nullptr, nullptr);
 4, Call Parse(), repeatedly:
 	Parser.Parse(Buffer, Length);
 */
@@ -84,7 +84,7 @@ public:
 
 	CExpatImpl ()
 	{
-		m_p = NULL;
+		m_p = nullptr;
 	}
 
 	// @cmember Destructor
@@ -99,24 +99,24 @@ public:
 
 	// @cmember Create a parser
 
-	bool Create (const XML_Char * pszEncoding = NULL, const XML_Char * pszSep = NULL)
+	bool Create (const XML_Char * pszEncoding = nullptr, const XML_Char * pszSep = nullptr)
 	{
 		// Destroy the old parser
 		Destroy ();
 
-		// If the encoding or seperator are empty, then NULL
-		if (pszEncoding != NULL && pszEncoding [0] == 0)
+		// If the encoding or seperator are empty, then nullptr
+		if (pszEncoding != nullptr && pszEncoding [0] == 0)
 		{
-			pszEncoding = NULL;
+			pszEncoding = nullptr;
 		}
-		if (pszSep != NULL && pszSep [0] == 0)
+		if (pszSep != nullptr && pszSep [0] == 0)
 		{
-			pszSep = NULL;
+			pszSep = nullptr;
 		}
 
 		// Create the new parser
-		m_p = XML_ParserCreate_MM (pszEncoding, NULL, pszSep);
-		if (m_p == NULL)
+		m_p = XML_ParserCreate_MM (pszEncoding, nullptr, pszSep);
+		if (m_p == nullptr)
 		{
 			return false;
 		}
@@ -134,11 +134,11 @@ public:
 
 	void Destroy (void)
 	{
-		if (m_p != NULL)
+		if (m_p != nullptr)
 		{
 			XML_ParserFree (m_p);
 		}
-		m_p = NULL;
+		m_p = nullptr;
 	}
 
 
@@ -146,7 +146,7 @@ public:
 
 	bool Parse (const char *pszBuffer, int nLength, bool fIsFinal = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_Parse (m_p, pszBuffer, nLength, fIsFinal) != 0;
 	}
 
@@ -154,7 +154,7 @@ public:
 
 	bool ParseBuffer (int nLength, bool fIsFinal = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_ParseBuffer (m_p, nLength, fIsFinal) != 0;
 	}
 
@@ -162,7 +162,7 @@ public:
 
 	void *GetBuffer (int nLength)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetBuffer (m_p, nLength);
 	}
 
@@ -174,23 +174,23 @@ protected:
 
 	void EnableStartElementHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetStartElementHandler (m_p, fEnable ? StartElementHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetStartElementHandler (m_p, fEnable ? StartElementHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the end element handler
 
 	void EnableEndElementHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetEndElementHandler (m_p, fEnable ? EndElementHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetEndElementHandler (m_p, fEnable ? EndElementHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the element handlers
 
 	void EnableElementHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		EnableStartElementHandler (fEnable);
 		EnableEndElementHandler (fEnable);
 	}
@@ -199,47 +199,47 @@ protected:
 
 	void EnableCharacterDataHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetCharacterDataHandler (m_p, fEnable ? CharacterDataHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetCharacterDataHandler (m_p, fEnable ? CharacterDataHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the processing instruction handler
 
 	void EnableProcessingInstructionHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetProcessingInstructionHandler (m_p, fEnable ? ProcessingInstructionHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetProcessingInstructionHandler (m_p, fEnable ? ProcessingInstructionHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the comment handler
 
 	void EnableCommentHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetCommentHandler (m_p, fEnable ? CommentHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetCommentHandler (m_p, fEnable ? CommentHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the start CDATA section handler
 
 	void EnableStartCdataSectionHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetStartCdataSectionHandler (m_p, fEnable ? StartCdataSectionHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetStartCdataSectionHandler (m_p, fEnable ? StartCdataSectionHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the end CDATA section handler
 
 	void EnableEndCdataSectionHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetEndCdataSectionHandler (m_p, fEnable ? EndCdataSectionHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetEndCdataSectionHandler (m_p, fEnable ? EndCdataSectionHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the CDATA section handlers
 
 	void EnableCdataSectionHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		EnableStartCdataSectionHandler (fEnable);
 		EnableEndCdataSectionHandler (fEnable);
 	}
@@ -248,45 +248,45 @@ protected:
 	
 	void EnableDefaultHandler (bool fEnable = true, bool fExpand = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		if (fExpand)
 		{
-			XML_SetDefaultHandlerExpand (m_p, fEnable ? DefaultHandler : NULL);
+			XML_SetDefaultHandlerExpand (m_p, fEnable ? DefaultHandler : nullptr);
 		}
 		else
-			XML_SetDefaultHandler (m_p, fEnable ? DefaultHandler : NULL);
+			XML_SetDefaultHandler (m_p, fEnable ? DefaultHandler : nullptr);
 	}
 	
 	// @cmember Enable/Disable external entity ref handler
 	
 	void EnableExternalEntityRefHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetExternalEntityRefHandler (m_p, fEnable ? ExternalEntityRefHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetExternalEntityRefHandler (m_p, fEnable ? ExternalEntityRefHandler : nullptr);
 	}
 	
 	// @cmember Enable/Disable unknown encoding handler
 	
 	void EnableUnknownEncodingHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetUnknownEncodingHandler (m_p, fEnable ? UnknownEncodingHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetUnknownEncodingHandler (m_p, fEnable ? UnknownEncodingHandler : nullptr);
 	}
 	
 	// @cmember Enable/Disable start namespace handler
 	
 	void EnableStartNamespaceDeclHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetStartNamespaceDeclHandler (m_p, fEnable ? StartNamespaceDeclHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetStartNamespaceDeclHandler (m_p, fEnable ? StartNamespaceDeclHandler : nullptr);
 	}
 	
 	// @cmember Enable/Disable end namespace handler
 	
 	void EnableEndNamespaceDeclHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetEndNamespaceDeclHandler (m_p, fEnable ? EndNamespaceDeclHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetEndNamespaceDeclHandler (m_p, fEnable ? EndNamespaceDeclHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable namespace handlers
@@ -301,32 +301,32 @@ protected:
 
 	void EnableXmlDeclHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetXmlDeclHandler (m_p, fEnable ? XmlDeclHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetXmlDeclHandler (m_p, fEnable ? XmlDeclHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the start DOCTYPE declaration handler
 
 	void EnableStartDoctypeDeclHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
-		XML_SetStartDoctypeDeclHandler (m_p, fEnable ? StartDoctypeDeclHandler : NULL);
+		assert (m_p != nullptr);
+		XML_SetStartDoctypeDeclHandler (m_p, fEnable ? StartDoctypeDeclHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the end DOCTYPE declaration handler
 
 	void EnableEndDoctypeDeclHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		XML_SetEndDoctypeDeclHandler (m_p,
-			fEnable ? EndDoctypeDeclHandler : NULL);
+			fEnable ? EndDoctypeDeclHandler : nullptr);
 	}
 
 	// @cmember Enable/Disable the DOCTYPE declaration handler
 
 	void EnableDoctypeDeclHandler (bool fEnable = true)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		EnableStartDoctypeDeclHandler (fEnable);
 		EnableEndDoctypeDeclHandler (fEnable);
 	}
@@ -338,7 +338,7 @@ public:
 
 	enum XML_Error GetErrorCode ()
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetErrorCode (m_p);
 	}
 
@@ -346,7 +346,7 @@ public:
 
 	long GetCurrentByteIndex ()
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetCurrentByteIndex (m_p);
 	}
 
@@ -354,7 +354,7 @@ public:
 
 	int GetCurrentLineNumber ()
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetCurrentLineNumber (m_p);
 	}
 
@@ -362,7 +362,7 @@ public:
 
 	int GetCurrentColumnNumber ()
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetCurrentColumnNumber (m_p);
 	}
 
@@ -370,7 +370,7 @@ public:
 
 	int GetCurrentByteCount ()
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetCurrentByteCount (m_p);
 	}
 
@@ -378,7 +378,7 @@ public:
 
 	const char *GetInputContext (int *pnOffset, int *pnSize)
 	{
-		assert (m_p != NULL);
+		assert (m_p != nullptr);
 		return XML_GetInputContext (m_p, pnOffset, pnSize);
 	}
 
@@ -682,17 +682,17 @@ protected:
 
 	XML_Parser m_p;
 	
-	/// Returns the value of the specified attribute, if found; NULL otherwise
+	/// Returns the value of the specified attribute, if found; nullptr otherwise
 	static const XML_Char * FindAttr(const XML_Char ** iAttrs, const XML_Char * iAttrToFind)
 	{
-		for (const XML_Char ** Attr = iAttrs; *Attr != NULL; Attr += 2)
+		for (const XML_Char ** Attr = iAttrs; *Attr != nullptr; Attr += 2)
 		{
 			if (strcmp(*Attr, iAttrToFind) == 0)
 			{
 				return *(Attr + 1);
 			}
 		}  // for Attr - iAttrs[]
-		return NULL;
+		return nullptr;
 	}
 } ;
 

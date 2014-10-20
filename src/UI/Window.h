@@ -90,7 +90,7 @@ public:
 	
 	// tolua_begin
 	
-	/// Returns the item at the specified slot for the specified player. Returns NULL if invalid SlotNum requested
+	/// Returns the item at the specified slot for the specified player. Returns nullptr if invalid SlotNum requested
 	const cItem * GetSlot(cPlayer & a_Player, int a_SlotNum) const;
 	
 	/// Sets the item to the specified slot for the specified player
@@ -189,13 +189,13 @@ protected:
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
-	If the global SlotNum is out of range, returns NULL
+	If the global SlotNum is out of range, returns nullptr
 	*/
 	cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum);
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
-	If the global SlotNum is out of range, returns NULL.
+	If the global SlotNum is out of range, returns nullptr.
 	Const version.
 	*/
 	const cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum) const;

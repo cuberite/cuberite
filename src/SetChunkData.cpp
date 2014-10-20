@@ -42,15 +42,15 @@ cSetChunkData::cSetChunkData(
 	m_ShouldMarkDirty(a_ShouldMarkDirty)
 {
 	// Check the params' validity:
-	ASSERT(a_BlockTypes != NULL);
-	ASSERT(a_BlockMetas != NULL);
+	ASSERT(a_BlockTypes != nullptr);
+	ASSERT(a_BlockMetas != nullptr);
 
 	// Copy block types and metas:
 	memcpy(m_BlockTypes, a_BlockTypes, sizeof(cChunkDef::BlockTypes));
 	memcpy(m_BlockMetas, a_BlockMetas, sizeof(cChunkDef::BlockNibbles));
 	
 	// Copy lights, if both given:
-	if ((a_BlockLight != NULL) && (a_SkyLight != NULL))
+	if ((a_BlockLight != nullptr) && (a_SkyLight != nullptr))
 	{
 		memcpy(m_BlockLight, a_BlockLight, sizeof(m_BlockLight));
 		memcpy(m_SkyLight,   a_SkyLight,   sizeof(m_SkyLight));
@@ -62,7 +62,7 @@ cSetChunkData::cSetChunkData(
 	}
 	
 	// Copy the heightmap, if available:
-	if (a_HeightMap != NULL)
+	if (a_HeightMap != nullptr)
 	{
 		memcpy(m_HeightMap, a_HeightMap, sizeof(m_HeightMap));
 		m_IsHeightMapValid = true;
@@ -73,7 +73,7 @@ cSetChunkData::cSetChunkData(
 	}
 	
 	// Copy biomes, if available:
-	if (a_Biomes != NULL)
+	if (a_Biomes != nullptr)
 	{
 		memcpy(m_Biomes, a_Biomes, sizeof(m_Biomes));
 		m_AreBiomesValid = true;

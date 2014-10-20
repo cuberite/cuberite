@@ -20,7 +20,7 @@ cWitch::cWitch(void) :
 void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
-	if (a_Killer != NULL)
+	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}

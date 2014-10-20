@@ -530,10 +530,10 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	
 	// The block entity is not created yet, try to create it and add to list:
 	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), AbsX, a_RelY, AbsZ);
-	if (be == NULL)
+	if (be == nullptr)
 	{
 		// No block entity for this block type
-		return NULL;
+		return nullptr;
 	}
 	m_BlockEntities.push_back(be);
 	return be;

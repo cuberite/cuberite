@@ -176,10 +176,10 @@ public:
 	
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
-	/** Returns the associated team, NULL if none */
+	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
-	/** Sets the player team, NULL if none */
+	/** Sets the player team, nullptr if none */
 	void SetTeam(cTeam * a_Team);
 
 	// tolua_end

@@ -252,10 +252,10 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_VillagersShouldHarvestCrops(true),
 	m_SimulatorManager(),
 	m_SandSimulator(),
-	m_WaterSimulator(NULL),
+	m_WaterSimulator(nullptr),
 	m_LavaSimulator(nullptr),
 	m_FireSimulator(),
-	m_RedstoneSimulator(NULL),
+	m_RedstoneSimulator(nullptr),
 	m_MaxPlayers(10),
 	m_ChunkMap(),
 	m_bAnimals(true),
@@ -297,9 +297,9 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 
 cWorld::~cWorld()
 {
-	delete m_WaterSimulator;     m_WaterSimulator    = NULL;
-	delete m_LavaSimulator;      m_LavaSimulator     = NULL;
-	delete m_RedstoneSimulator;  m_RedstoneSimulator = NULL;
+	delete m_WaterSimulator;     m_WaterSimulator    = nullptr;
+	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
+	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
 
 	UnloadUnusedChunks();
 	
@@ -1255,7 +1255,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 		{
 			cClientHandle * ch = (*itr)->GetClientHandle();
-			if (ch == NULL)
+			if (ch == nullptr)
 			{
 				continue;
 			}
@@ -2010,7 +2010,7 @@ void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Ex
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2028,7 +2028,7 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2171,7 +2171,7 @@ void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClien
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2189,7 +2189,7 @@ void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cCl
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2207,7 +2207,7 @@ void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const c
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2225,7 +2225,7 @@ void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClie
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2243,7 +2243,7 @@ void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, cons
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2270,7 +2270,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2288,7 +2288,7 @@ void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2306,7 +2306,7 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2351,7 +2351,7 @@ void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHand
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2378,7 +2378,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2405,7 +2405,7 @@ void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclud
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2640,7 +2640,7 @@ void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 	
 	// Remove the player's client from the list of clients to be ticked:
 	cClientHandle * Client = a_Player->GetClientHandle();
-	if (Client != NULL)
+	if (Client != nullptr)
 	{
 		Client->RemoveFromWorld();
 		m_ChunkMap->RemoveClientFromChunks(Client);
@@ -2693,7 +2693,7 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 
 bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback)
 {
-	cPlayer * BestMatch = NULL;
+	cPlayer * BestMatch = nullptr;
 	size_t BestRating = 0;
 	size_t NameLength = a_PlayerNameHint.length();
 
@@ -2712,7 +2712,7 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 		}
 	}  // for itr - m_Players[]
 
-	if (BestMatch != NULL)
+	if (BestMatch != nullptr)
 	{
 		return a_Callback.Item (BestMatch);
 	}
@@ -2729,7 +2729,7 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 	cTracer LineOfSight(this);
 
 	double ClosestDistance = a_SightLimit;
-	cPlayer * ClosestPlayer = NULL;
+	cPlayer * ClosestPlayer = nullptr;
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2768,7 +2768,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch != NULL) && !ch->IsDestroyed())
+		if ((ch != nullptr) && !ch->IsDestroyed())
 		{
 			a_DestPlayer->GetClientHandle()->SendPlayerListAddPlayer(*(*itr));
 		}
@@ -3212,10 +3212,10 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
 {
-	cMonster * Monster = NULL;
+	cMonster * Monster = nullptr;
 
 	Monster = cMonster::NewMonsterFromType(a_MonsterType);
-	if (Monster != NULL)
+	if (Monster != nullptr)
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
@@ -3241,7 +3241,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
 		delete a_Monster;
-		a_Monster = NULL;
+		a_Monster = nullptr;
 		return -1;
 	}
 
@@ -3249,7 +3249,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	if (!a_Monster->Initialize(*this))
 	{
 		delete a_Monster;
-		a_Monster = NULL;
+		a_Monster = nullptr;
 		return -1;
 	}
 
@@ -3266,14 +3266,14 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
-	if (Projectile == NULL)
+	if (Projectile == nullptr)
 	{
 		return -1;
 	}
 	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
-		Projectile = NULL;
+		Projectile = nullptr;
 		return -1;
 	}
 	return Projectile->GetUniqueID();
@@ -3356,7 +3356,7 @@ cRedstoneSimulator<cChunk, cWorld> * cWorld::InitializeRedstoneSimulator(cIniFil
 		SimulatorName = "Incremental";
 	}
 	
-	cRedstoneSimulator<cChunk, cWorld> * res = NULL;
+	cRedstoneSimulator<cChunk, cWorld> * res = nullptr;
 
 	if (NoCaseCompare(SimulatorName, "Incremental") == 0)
 	{
@@ -3389,7 +3389,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		SimulatorName = "Vanilla";
 	}
 	
-	cFluidSimulator * res = NULL;
+	cFluidSimulator * res = nullptr;
 	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	int Rate = 1;
 	if (
@@ -3479,7 +3479,7 @@ void cWorld::AddQueuedPlayers(void)
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
 			cClientHandle * Client = (*itr)->GetClientHandle();
-			if (Client != NULL)
+			if (Client != nullptr)
 			{
 				m_Clients.push_back(Client);
 			}
@@ -3490,7 +3490,7 @@ void cWorld::AddQueuedPlayers(void)
 	for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 	{
 		cClientHandle * Client = (*itr)->GetClientHandle();
-		if (Client != NULL)
+		if (Client != nullptr)
 		{
 			Client->StreamChunks();
 			Client->SendPlayerMoveLook();
@@ -3591,7 +3591,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cSetChunkDataPtr SetChunkData(new cSetChunkData(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
-		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
+		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed
 		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
 		true

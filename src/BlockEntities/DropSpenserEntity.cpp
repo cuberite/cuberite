@@ -28,7 +28,7 @@ cDropSpenserEntity::~cDropSpenserEntity()
 {
 	// Tell window its owner is destroyed
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
 	}
@@ -155,13 +155,13 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
 	
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{

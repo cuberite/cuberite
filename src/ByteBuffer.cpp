@@ -131,7 +131,7 @@ cByteBuffer::~cByteBuffer()
 {
 	CheckValid();
 	delete[] m_Buffer;
-	m_Buffer = NULL;
+	m_Buffer = nullptr;
 }
 
 

@@ -72,7 +72,7 @@ public:
 			int BlockY = a_RelY + OfsY;
 			int BlockZ = a_RelZ + OfsZ;
 			cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(BlockX, BlockZ);
-			if (Chunk == NULL)
+			if (Chunk == nullptr)
 			{
 				// Unloaded chunk
 				continue;

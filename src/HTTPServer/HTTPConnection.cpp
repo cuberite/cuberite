@@ -15,7 +15,7 @@
 cHTTPConnection::cHTTPConnection(cHTTPServer & a_HTTPServer) :
 	m_HTTPServer(a_HTTPServer),
 	m_State(wcsRecvHeaders),
-	m_CurrentRequest(NULL),
+	m_CurrentRequest(nullptr),
 	m_CurrentRequestBodyRemaining(0)
 {
 	// LOGD("HTTP: New connection at %p", this);
@@ -29,7 +29,7 @@ cHTTPConnection::~cHTTPConnection()
 {
 	// LOGD("HTTP: Connection deleting: %p", this);
 	delete m_CurrentRequest;
-	m_CurrentRequest = NULL;
+	m_CurrentRequest = nullptr;
 }
 
 
@@ -136,7 +136,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 
 void cHTTPConnection::Terminate(void)
 {
-	if (m_CurrentRequest != NULL)
+	if (m_CurrentRequest != nullptr)
 	{
 		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 	}
@@ -153,7 +153,7 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 	{
 		case wcsRecvHeaders:
 		{
-			if (m_CurrentRequest == NULL)
+			if (m_CurrentRequest == nullptr)
 			{
 				m_CurrentRequest = new cHTTPRequest;
 			}
@@ -162,7 +162,7 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 			if (BytesConsumed == AString::npos)
 			{
 				delete m_CurrentRequest;
-				m_CurrentRequest = NULL;
+				m_CurrentRequest = nullptr;
 				m_State = wcsInvalid;
 				m_HTTPServer.CloseConnection(*this);
 				return true;
@@ -196,7 +196,7 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 
 		case wcsRecvBody:
 		{
-			ASSERT(m_CurrentRequest != NULL);
+			ASSERT(m_CurrentRequest != nullptr);
 			if (m_CurrentRequestBodyRemaining > 0)
 			{
 				size_t BytesToConsume = std::min(m_CurrentRequestBodyRemaining, (size_t)a_Size);
@@ -214,7 +214,7 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 					return true;
 				}
 				delete m_CurrentRequest;
-				m_CurrentRequest = NULL;
+				m_CurrentRequest = nullptr;
 			}
 			break;
 		}
@@ -243,7 +243,7 @@ void cHTTPConnection::GetOutgoingData(AString & a_Data)
 
 void cHTTPConnection::SocketClosed(void)
 {
-	if (m_CurrentRequest != NULL)
+	if (m_CurrentRequest != nullptr)
 	{
 		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 	}

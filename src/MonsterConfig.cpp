@@ -47,7 +47,7 @@ cMonsterConfig::cMonsterConfig(void)
 cMonsterConfig::~cMonsterConfig()
 {
 	delete m_pState;
-	m_pState = NULL;
+	m_pState = nullptr;
 }
 
 

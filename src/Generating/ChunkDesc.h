@@ -172,7 +172,7 @@ public:
 	
 	/** Returns the block entity at the specified coords.
 	If there is no block entity at those coords, tries to create one, based on the block type
-	If the blocktype doesn't support a block entity, returns NULL. */
+	If the blocktype doesn't support a block entity, returns nullptr. */
 	cBlockEntity * GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ);
 	
 	/** Updates the heightmap to match the current contents.

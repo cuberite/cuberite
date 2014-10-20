@@ -32,7 +32,7 @@
 #define POSZ_TOINT FloorC(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
-#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
+#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) { return; }
 
 
 
@@ -309,7 +309,7 @@ public:
 	/// Returns the currently equipped boots; empty item if none
 	virtual cItem GetEquippedBoots(void) const { return cItem(); }
 
-	/// Called when the health drops below zero. a_Killer may be NULL (environmental damage)
+	/// Called when the health drops below zero. a_Killer may be nullptr (environmental damage)
 	virtual void KilledBy(TakeDamageInfo & a_TDI);
 
 	/// Called when the entity kills another entity
@@ -401,7 +401,7 @@ public:
 	void SetWorldTravellingFrom(cWorld * a_World) { m_WorldTravellingFrom = a_World; }
 	
 	/// Updates clients of changes in the entity.
-	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = NULL);
+	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
 	
 	/// Attaches to the specified entity; detaches from any previous one first
 	void AttachTo(cEntity * a_AttachTo);
@@ -450,7 +450,7 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) {}
 
 	/// Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy().
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL)
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr)
 	{
 		UNUSED(a_Drops);
 		UNUSED(a_Killer);
@@ -471,10 +471,10 @@ protected:
 	int m_Health;
 	int m_MaxHealth;
 	
-	/// The entity to which this entity is attached (vehicle), NULL if none
+	/// The entity to which this entity is attached (vehicle), nullptr if none
 	cEntity * m_AttachedTo;
 	
-	/// The entity which is attached to this entity (rider), NULL if none
+	/// The entity which is attached to this entity (rider), nullptr if none
 	cEntity * m_Attachee;
 
 	/** Stores whether head yaw has been set manually */
@@ -502,7 +502,7 @@ protected:
 	bool m_IsInitialized;
 
 	/** World entity is travelling from
-	Set to a valid world pointer by MoveToWorld; reset to NULL when the entity is removed from the old world
+	Set to a valid world pointer by MoveToWorld; reset to nullptr when the entity is removed from the old world
 	Can't be a simple boolean as context switches between worlds may leave the new chunk processing (and therefore immediately removing) the entity before the old chunk could remove it
 	*/
 	cWorld * m_WorldTravellingFrom;

@@ -70,7 +70,7 @@ cHTTPRequest::cHTTPRequest(void) :
 	super(mkRequest),
 	m_EnvelopeParser(*this),
 	m_IsValid(true),
-	m_UserData(NULL),
+	m_UserData(nullptr),
 	m_HasAuth(false),
 	m_AllowKeepAlive(false)
 {
