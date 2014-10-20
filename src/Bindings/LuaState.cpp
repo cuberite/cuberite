@@ -558,7 +558,11 @@ void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
-	if (a_Entity->IsMob())
+	if (a_Entity == nullptr)
+	{
+		lua_pushnil(m_LuaState);
+	}
+	else if (a_Entity->IsMob())
 	{
 		// Don't push specific mob types, as those are not exported in the API:
 		tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
@@ -566,7 +570,7 @@ void cLuaState::Push(cEntity * a_Entity)
 	else
 	{
 		// Push the specific class type:
-		tolua_pushusertype(m_LuaState, a_Entity, (a_Entity == nullptr) ? "cEntity" : a_Entity->GetClass());
+		tolua_pushusertype(m_LuaState, a_Entity, a_Entity->GetClass());
 	}
 	m_NumCurrentFunctionArgs += 1;
 }

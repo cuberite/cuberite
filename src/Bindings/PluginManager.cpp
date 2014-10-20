@@ -1828,6 +1828,7 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
 	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
+
 	if (a_Plugin->Initialize())
 	{
 		// Initialization OK

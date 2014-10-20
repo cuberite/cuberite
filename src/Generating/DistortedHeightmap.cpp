@@ -276,13 +276,13 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 
 
 
-cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
+cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 	m_NoiseDistortX(a_Seed + 1000),
 	m_NoiseDistortZ(a_Seed + 2000),
 	m_OceanFloorSelect(a_Seed + 3000),
 	m_MesaFloor(a_Seed + 4000),
 	m_BiomeGen(a_BiomeGen),
-	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
+	m_UnderlyingHeiGen(new cHeiGenBiomal(a_Seed, a_BiomeGen)),
 	m_HeightGen(m_UnderlyingHeiGen, 64),
 	m_IsInitialized(false)
 {
@@ -577,7 +577,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen.GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
 		}  // for x
 	}  // for z
 

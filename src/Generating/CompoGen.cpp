@@ -663,7 +663,7 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cCompoGenCache:
 
-cCompoGenCache::cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_CacheSize) :
+cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize) :
 	m_Underlying(a_Underlying),
 	m_CacheSize(a_CacheSize),
 	m_CacheOrder(new int[a_CacheSize]),
@@ -739,7 +739,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	
 	// Not in the cache:
 	m_NumMisses++;
-	m_Underlying.ComposeTerrain(a_ChunkDesc);
+	m_Underlying->ComposeTerrain(a_ChunkDesc);
 	
 	// Insert it as the first item in the MRU order:
 	int Idx = m_CacheOrder[m_CacheSize - 1];
@@ -760,7 +760,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 void cCompoGenCache::InitializeCompoGen(cIniFile & a_IniFile)
 {
-	m_Underlying.InitializeCompoGen(a_IniFile);
+	m_Underlying->InitializeCompoGen(a_IniFile);
 }
 
 

@@ -411,7 +411,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 	
 	// Find the minimum height in this chunk:
 	cChunkDef::HeightMap HeightMap;
-	m_HeiGen.GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
+	m_HeiGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
 	HEIGHTTYPE MinHeight = HeightMap[0];
 	for (size_t i = 1; i < ARRAYCOUNT(HeightMap); i++)
 	{
