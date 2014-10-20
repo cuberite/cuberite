@@ -1,6 +1,5 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
-#include "IsThread.h"
 
 
 
@@ -9,41 +8,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCriticalSection:
 
+#ifdef _DEBUG
 cCriticalSection::cCriticalSection()
 {
-	#ifdef _WIN32
-		InitializeCriticalSection(&m_CriticalSection);
-	#else
-		pthread_mutexattr_init(&m_Attributes);
-		pthread_mutexattr_settype(&m_Attributes, PTHREAD_MUTEX_RECURSIVE);
-
-		if (pthread_mutex_init(&m_CriticalSection, &m_Attributes) != 0)
-		{
-			LOGERROR("Could not initialize Critical Section!");
-		}
-	#endif
-	
-	#ifdef _DEBUG
-		m_IsLocked = 0;
-	#endif  // _DEBUG
+	m_IsLocked = 0;
 }
-
-
-
-
-
-cCriticalSection::~cCriticalSection()
-{
-	#ifdef _WIN32
-		DeleteCriticalSection(&m_CriticalSection);
-	#else
-		if (pthread_mutex_destroy(&m_CriticalSection) != 0)
-		{
-			LOGWARNING("Could not destroy Critical Section!");
-		}
-		pthread_mutexattr_destroy(&m_Attributes);
-	#endif
-}
+#endif  // _DEBUG
 
 
 
@@ -51,11 +21,7 @@ cCriticalSection::~cCriticalSection()
 
 void cCriticalSection::Lock()
 {
-	#ifdef _WIN32
-		EnterCriticalSection(&m_CriticalSection);
-	#else
-		pthread_mutex_lock(&m_CriticalSection);
-	#endif
+	m_Mutex.lock();
 	
 	#ifdef _DEBUG
 		m_IsLocked += 1;
@@ -74,11 +40,7 @@ void cCriticalSection::Unlock()
 		m_IsLocked -= 1;
 	#endif  // _DEBUG
 	
-	#ifdef _WIN32
-		LeaveCriticalSection(&m_CriticalSection);
-	#else
-		pthread_mutex_unlock(&m_CriticalSection);
-	#endif
+	m_Mutex.unlock();
 }
 
 

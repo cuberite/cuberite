@@ -63,7 +63,7 @@ void cIsThread::Stop(void)
 
 
 bool cIsThread::Wait(void)
-{	
+{
 	#ifdef LOGD  // ProtoProxy doesn't have LOGD
 		LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
 	#endif  // LOGD
