@@ -625,7 +625,11 @@ local function LoadPluginInfo(a_FolderName)
 	-- This is Lua-5.1-specific and won't work in Lua 5.2!
 	local Sandbox = {}
 	setfenv(cfg, Sandbox)
-	cfg()
+	local isSuccess, errMsg = pcall(cfg)
+	if not(isSuccess) then
+		return nil, "Cannot load Info.lua: " .. (errMsg or "<unknown error>")
+	end
+	
 	if (Sandbox.g_PluginInfo == nil) then
 		return nil, "Info.lua doesn't contain the g_PluginInfo declaration"
 	end
