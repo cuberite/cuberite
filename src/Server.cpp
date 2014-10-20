@@ -493,9 +493,9 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		{
 			cPluginManager::PluginMap map = cPluginManager::Get()->GetAllPlugins();
 
-			for(auto plugin_entry : map)
+			for (auto plugin_entry : map)
 			{
-				if(plugin_entry.first == split[1])
+				if (plugin_entry.first == split[1])
 				{
 					a_Output.Out("Error! Plugin is already loaded!");
 					a_Output.Finished();
