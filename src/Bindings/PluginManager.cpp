@@ -1525,6 +1525,15 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 
 bool cPluginManager::LoadPlugin(const AString & a_PluginName)
 {
+	PluginMap map = GetAllPlugins();
+
+	for(auto plugin_entry : map)
+	{
+		if(plugin_entry.first == a_PluginName)
+		{
+			return false;
+		}
+	}
 	return AddPlugin(new cPluginLua(a_PluginName.c_str()));
 }
 
@@ -1827,7 +1836,8 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
-	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
+	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;	
+
 	if (a_Plugin->Initialize())
 	{
 		// Initialization OK
