@@ -491,6 +491,17 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
+			cPluginManager::PluginMap map = cPluginManager::Get()->GetAllPlugins();
+
+			for(auto plugin_entry : map)
+			{
+				if(plugin_entry.first == split[1])
+				{
+					a_Output.Out("Error! Plugin is already loaded!");
+					a_Output.Finished();
+					return;
+				}
+			}
 			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
