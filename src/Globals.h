@@ -257,7 +257,6 @@ template class SizeChecker<UInt16, 2>;
 #ifndef TEST_GLOBALS
 	// Common headers (part 1, without macros):
 	#include "StringUtils.h"
-	#include "OSSupport/Sleep.h"
 	#include "OSSupport/CriticalSection.h"
 	#include "OSSupport/Semaphore.h"
 	#include "OSSupport/Event.h"

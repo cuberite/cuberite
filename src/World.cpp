@@ -11,7 +11,6 @@
 #include "inifile/iniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
-#include "OSSupport/Timer.h"
 #include "SetChunkData.h"
 
 // Serializers
@@ -109,7 +108,7 @@ protected:
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
 			for (int i = 0; i < 20; i++)
 			{
-				cSleep::MilliSleep(100);
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				if (m_ShouldTerminate)
 				{
 					return;
@@ -159,7 +158,7 @@ protected:
 			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
 			for (int i = 0; i < 20; i++)
 			{
-				cSleep::MilliSleep(100);
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				if (m_ShouldTerminate)
 				{
 					return;
@@ -167,8 +166,7 @@ protected:
 			}
 		}  // for (-ever)
 	}
-	
-} ;
+};
 
 
 
@@ -201,23 +199,20 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 void cWorld::cTickThread::Execute(void)
 {
-	cTimer Timer;
+	auto LastTime = std::chrono::steady_clock::now();
+	static const auto msPerTick = std::chrono::milliseconds(50);
+	auto TickTime = std::chrono::steady_clock::duration(50);
 
-	const Int64 msPerTick = 50;
-	Int64 LastTime = Timer.GetNowTime();
-
-	Int64 TickDuration = 50;
 	while (!m_ShouldTerminate)
 	{
-		Int64 NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime - LastTime);
-		m_World.Tick(DeltaTime, (int)TickDuration);
-		TickDuration = Timer.GetNowTime() - NowTime;
+		auto NowTime = std::chrono::steady_clock::now();
+		m_World.Tick(std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count(), std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count());
+		TickTime = std::chrono::steady_clock::now() - NowTime;
 		
-		if (TickDuration < msPerTick)
+		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			cSleep::MilliSleep((unsigned int)(msPerTick - TickDuration));
+			std::this_thread::sleep_for(msPerTick -TickTime);
 		}
 
 		LastTime = NowTime;

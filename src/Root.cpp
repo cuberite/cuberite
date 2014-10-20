@@ -16,7 +16,6 @@
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
-#include "OSSupport/Timer.h"
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
 
@@ -118,9 +117,7 @@ void cRoot::Start(void)
 	m_bStop = false;
 	while (!m_bStop)
 	{
-		cTimer Time;
-		long long mseconds = Time.GetNowTime();
-		
+		auto BeginTime = std::chrono::steady_clock::now();		
 		m_bRestart = false;
 
 		LoadGlobalSettings();
@@ -200,17 +197,14 @@ void cRoot::Start(void)
 		}
 		#endif
 
-		long long finishmseconds = Time.GetNowTime();
-		finishmseconds -= mseconds;
-
-		LOG("Startup complete, took %lld ms!", finishmseconds);
+		LOG("Startup complete, took %lld ms!", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count());
 		#ifdef _WIN32
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
 		while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
 		{
-			cSleep::MilliSleep(1000);
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 
 		if (m_TerminateEventRaised)

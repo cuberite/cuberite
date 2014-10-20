@@ -16,7 +16,6 @@
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
 #include "OSSupport/Socket.h"
-#include "OSSupport/Timer.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
@@ -63,8 +62,6 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TimeSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
-	m_PingStartTime(0),
-	m_LastPingTime(1000),
 	m_BlockDigAnimStage(-1),
 	m_BlockDigAnimSpeed(0),
 	m_BlockDigAnimX(0),
@@ -87,9 +84,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
-
-	cTimer t1;
-	m_LastPingTime = t1.GetNowTime();
+	m_LastPingTime = std::chrono::steady_clock::now();
 
 	LOGD("New ClientHandle created at %p", this);
 }
@@ -383,8 +378,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
-	cTimer t1;
-	m_LastPingTime = t1.GetNowTime() + 3000;  // Send the first KeepAlive packet in 3 seconds
+	m_LastPingTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -1694,8 +1688,7 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 {
 	if (a_KeepAliveID == m_PingID)
 	{
-		cTimer t1;
-		m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
+		m_Ping = std::chrono::steady_clock::now() - m_PingStartTime;
 	}
 }
 
@@ -1919,11 +1912,10 @@ void cClientHandle::Tick(float a_Dt)
 	// Send a ping packet:
 	if (m_State == csPlaying)
 	{
-		cTimer t1;
-		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= std::chrono::steady_clock::now()))
 		{
 			m_PingID++;
-			m_PingStartTime = t1.GetNowTime();
+			m_PingStartTime = std::chrono::steady_clock::now();
 			m_Protocol->SendKeepAlive(m_PingID);
 			m_LastPingTime = m_PingStartTime;
 		}

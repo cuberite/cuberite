@@ -11,7 +11,6 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../Root.h"
-#include "../OSSupport/Timer.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
@@ -27,7 +26,7 @@
 #define PLAYER_INVENTORY_SAVE_INTERVAL 6000
 
 // 1000 = once per second
-#define PLAYER_LIST_TIME_MS 1000
+#define PLAYER_LIST_TIME_MS std::chrono::milliseconds(1000)
 
 
 
@@ -91,9 +90,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	SetMaxHealth(MAX_HEALTH);
 	m_Health = MAX_HEALTH;
 	
-	cTimer t1;
-	m_LastPlayerListTime = t1.GetNowTime();
-	
+	m_LastPlayerListTime = std::chrono::steady_clock::now();
 	m_PlayerName = a_PlayerName;
 
 	cWorld * World = NULL;
@@ -264,11 +261,10 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	m_Inventory.UpdateItems();
 
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
-	cTimer t1;
-	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
+	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= std::chrono::steady_clock::now())
 	{
 		m_World->BroadcastPlayerListUpdatePing(*this);
-		m_LastPlayerListTime = t1.GetNowTime();
+		m_LastPlayerListTime = std::chrono::steady_clock::now();
 	}
 
 	if (IsFlying())
