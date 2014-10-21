@@ -115,16 +115,16 @@ bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			FinishOne();
 		}
 	}
-	
+
 	m_TimeBurned++;
 	if (m_TimeBurned >= m_FuelBurnTime)
 	{
 		// The current fuel has been exhausted, use another one, if possible
 		BurnNewFuel();
 	}
-	
+
 	UpdateProgressBars();
-	
+
 	return true;
 }
 
@@ -185,7 +185,7 @@ void cFurnaceEntity::BurnNewFuel(void)
 		SetIsCooking(false);
 		return;
 	}
-	
+
 	// Is the input and output ready for cooking?
 	if (!CanCookInputToOutput())
 	{
@@ -217,12 +217,12 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	{
 		return;
 	}
-	
+
 	ASSERT(a_ItemGrid == &m_Contents);
 	switch (a_SlotNum)
 	{
-		case fsInput:  UpdateInput();  break;		
-		case fsFuel:   UpdateFuel();   break;		
+		case fsInput:  UpdateInput();  break;
+		case fsFuel:   UpdateFuel();   break;
 		case fsOutput: UpdateOutput(); break;
 		default: ASSERT(!"Invalid furnace slot update!"); break;
 	}
@@ -241,7 +241,7 @@ void cFurnaceEntity::UpdateInput(void)
 		m_TimeCooked = 0;
 	}
 	m_LastInput = m_Contents.GetSlot(fsInput);
-	
+
 	cFurnaceRecipe * FR = cRoot::Get()->GetFurnaceRecipe();
 	m_CurrentRecipe = FR->GetRecipeFrom(m_Contents.GetSlot(fsInput));
 	if (!CanCookInputToOutput())
@@ -254,7 +254,7 @@ void cFurnaceEntity::UpdateInput(void)
 	{
 		m_NeedCookTime = m_CurrentRecipe->CookTime;
 		SetIsCooking(true);
-		
+
 		// Start burning new fuel if there's no flame now:
 		if (GetFuelBurnTimeLeft() <= 0)
 		{
@@ -274,7 +274,7 @@ void cFurnaceEntity::UpdateFuel(void)
 		// The current fuel is still burning, don't modify anything:
 		return;
 	}
-	
+
 	// The current fuel is spent, try to burn some more:
 	BurnNewFuel();
 }
@@ -292,7 +292,7 @@ void cFurnaceEntity::UpdateOutput(void)
 		SetIsCooking(false);
 		return;
 	}
-	
+
 	// No need to burn new fuel, the Tick() function will take care of that
 
 	// Can cook, start cooking if not already underway:
@@ -311,7 +311,7 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		// This input cannot be cooked
 		return false;
 	}
-	
+
 	const cItem & Slot = m_Contents.GetSlot(fsOutput);
 	if (Slot.IsEmpty())
 	{
@@ -324,13 +324,13 @@ bool cFurnaceEntity::CanCookInputToOutput(void) const
 		// The output slot is blocked with something that cannot be stacked with the recipe's output
 		return false;
 	}
-	
+
 	if (Slot.IsFullStack())
 	{
 		// Cannot add any more items to the output slot
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -345,7 +345,7 @@ void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 	{
 		return;
 	}
-	
+
 	int CurFuel = (m_FuelBurnTime > 0) ? 200 - (200 * m_TimeBurned / m_FuelBurnTime) : 0;
 	BroadcastProgress(PROGRESSBAR_FUEL, static_cast<short>(CurFuel));
 	
@@ -373,7 +373,3 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 		m_World->FastSetBlock(m_PosX, m_PosY, m_PosZ, E_BLOCK_LIT_FURNACE, m_BlockMeta);
 	}
 }
-
-
-
-	

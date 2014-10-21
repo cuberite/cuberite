@@ -28,7 +28,7 @@ void cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 	{
 		return;
 	}
-	
+
 	cItem SelectedItem = a_Player->GetInventory().GetEquippedItem();
 	if (IsFlower(SelectedItem.m_ItemType, SelectedItem.m_ItemDamage))
 	{
@@ -63,7 +63,7 @@ void cFlowerPotEntity::Destroy(void)
 		cItems Pickups;
 		Pickups.Add(m_Item);
 		m_World->SpawnItemPickups(Pickups, m_PosX + 0.5, m_PosY + 0.5, m_PosZ + 0.5);
-		
+
 		m_Item.Empty();
 	}
 }
@@ -88,7 +88,7 @@ bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
 		}
 		case E_BLOCK_TALL_GRASS:
 		{
-			return (m_ItemData == (short) 2);
+			return (m_ItemData == static_cast<short>(2));
 		}
 		default:
 		{
@@ -96,7 +96,3 @@ bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
 		}
 	}
 }
-
-
-
-
