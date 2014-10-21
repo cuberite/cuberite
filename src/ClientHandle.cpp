@@ -430,13 +430,13 @@ bool cClientHandle::StreamNextChunk(void)
 	cCSLock Lock(m_CSChunkLists);
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
-	for (size_t Range = 0; Range < (size_t)m_ViewDistance; Range++)
+	for (int Range = 0; Range < m_ViewDistance; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
 		// Get the chunk from the x/z coords.
 		int RangeX, RangeZ = 0;
-		cChunkDef::BlockToChunk((int)std::floor(Vector.x), (int)std::floor(Vector.z), RangeX, RangeZ);
+		cChunkDef::BlockToChunk(FloorC(Vector.x), FloorC(Vector.z), RangeX, RangeZ);
 
 		for (size_t X = 0; X < 7; X++)
 		{
@@ -471,13 +471,13 @@ bool cClientHandle::StreamNextChunk(void)
 
 	// Medium priority: Load the chunks that are behind the player
 	LookVector = m_Player->GetLookVector() * -1;
-	for (size_t Range = 0; Range < 3; Range++)
+	for (int Range = 0; Range < 3; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
 		// Get the chunk from the x/z coords.
 		int RangeX, RangeZ = 0;
-		cChunkDef::BlockToChunk((int)std::floor(Vector.x), (int)std::floor(Vector.z), RangeX, RangeZ);
+		cChunkDef::BlockToChunk(FloorC(Vector.x), FloorC(Vector.z), RangeX, RangeZ);
 
 		for (size_t X = 0; X < 7; X++)
 		{
