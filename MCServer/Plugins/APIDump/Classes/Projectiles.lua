@@ -35,12 +35,33 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cArrowEntity
 
+	cExpBottleEntity =
+	{
+		Desc = "",
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cExpBottleEntity
+
 	cFireChargeEntity =
 	{
 		Desc = "",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cFireChargeEntity
+	
+	cFireworkEntity =
+	{
+		Desc = "",
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cFireworkEntity
+
+	cFloater =
+	{
+		Desc = "",
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cFloater
 
 	cGhastFireballEntity =
 	{
@@ -64,14 +85,14 @@ return
 			pkArrow = { Notes = "The projectile is an {{cArrowEntity|arrow}}" },
 			pkEgg = { Notes = "The projectile is a {{cThrownEggEntity|thrown egg}}" },
 			pkEnderPearl = { Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}" },
-			pkExpBottle = { Notes = "The projectile is a thrown exp bottle (NYI)" },
+			pkExpBottle = { Notes = "The projectile is a {{cExpBottleEntity|thrown exp bottle}}" },
 			pkFireCharge = { Notes = "The projectile is a {{cFireChargeEntity|fire charge}}" },
-			pkFirework = { Notes = "The projectile is a (flying) firework (NYI)" },
-			pkFishingFloat = { Notes = "The projectile is a fishing float (NYI)" },
+			pkFirework = { Notes = "The projectile is a (flying) {{cFireworkEntity|firework}}" },
+			pkFishingFloat = { Notes = "The projectile is a {{cFloater|fishing float}}" },
 			pkGhastFireball = { Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}" },
 			pkSnowball = { Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}" },
-			pkSplashPotion = { Notes = "The projectile is a thrown splash potion (NYI)" },
-			pkWitherSkull = { Notes = "The projectile is a wither skull (NYI)" },
+			pkSplashPotion = { Notes = "The projectile is a {{cSplashPotionEntity|thrown splash potion}}" },
+			pkWitherSkull = { Notes = "The projectile is a {{cWitherSkullEntity|wither skull}}" },
 		},
 		ConstantGroups =
 		{
@@ -83,6 +104,13 @@ return
 		},
 		Inherits = "cEntity",
 	},  -- cProjectileEntity
+
+	cSplashPotionEntity =
+	{
+		Desc = "",
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cSplashPotionEntity
 
 	cThrownEggEntity =
 	{
@@ -97,13 +125,20 @@ return
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEnderPearlEntity
-
+	
 	cThrownSnowballEntity =
 	{
 		Desc = "",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownSnowballEntity
+
+	cWitherSkullEntity =
+	{
+		Desc = "",
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cWitherSkullEntity
 }
 
 
