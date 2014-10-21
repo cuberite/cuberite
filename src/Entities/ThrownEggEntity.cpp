@@ -44,6 +44,27 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hit
 
 
 
+void cThrownEggEntity::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	if (m_DestroyTimer > 0)
+	{
+		m_DestroyTimer--;
+		if (m_DestroyTimer == 0)
+		{
+			Destroy();
+			return;
+		}
+	}
+	else
+	{
+		super::Tick(a_Dt, a_Chunk);
+	}
+}
+
+
+
+
+
 void cThrownEggEntity::TrySpawnChicken(const Vector3d & a_HitPos)
 {
 	if (m_World->GetTickRandomNumber(7) == 1)

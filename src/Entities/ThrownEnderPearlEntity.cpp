@@ -1,3 +1,4 @@
+
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "ThrownEnderPearlEntity.h"
@@ -39,6 +40,27 @@ void cThrownEnderPearlEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d 
 	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
 	
 	m_DestroyTimer = 5;
+}
+
+
+
+
+
+void cThrownEnderPearlEntity::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	if (m_DestroyTimer > 0)
+	{
+		m_DestroyTimer--;
+		if (m_DestroyTimer == 0)
+		{
+			Destroy();
+			return;
+		}
+	}
+	else
+	{
+		super::Tick(a_Dt, a_Chunk);
+	}
 }
 
 

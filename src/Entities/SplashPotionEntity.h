@@ -1,6 +1,11 @@
-//
-//  SplashPotionEntity.h
-//
+
+// SplashPotionEntity.h
+
+// Declares the cSplashPotionEntity class representing a splash potion that has been thrown
+
+
+
+
 
 #pragma once
 
@@ -32,6 +37,7 @@ public:
 		const cItem & a_Item
 	);
 	
+	// tolua_begin
 	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
 	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
 	int                  GetPotionColor(void)      const { return m_PotionColor; }
@@ -39,6 +45,8 @@ public:
 	void SetEntityEffectType(cEntityEffect::eType a_EntityEffectType) { m_EntityEffectType = a_EntityEffectType; }
 	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
 	void SetPotionColor(int a_PotionColor) { m_PotionColor = a_PotionColor; }
+
+	// tolua_end
 	
 protected:
 	
@@ -77,3 +85,7 @@ private:
 	/** Time in ticks to wait for the hit animation to begin before destroying */
 	int m_DestroyTimer;
 } ;  // tolua_export
+
+
+
+
