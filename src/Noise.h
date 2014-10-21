@@ -155,7 +155,7 @@ public:
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
 		int a_SizeX,                                     ///< Count of the array
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
-		NOISE_DATATYPE * a_Workspace = nullptr              ///< Workspace that this function can use and trash
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
 	) const;
 	
 	
@@ -164,7 +164,7 @@ public:
 		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE * a_Workspace = nullptr              ///< Workspace that this function can use and trash
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
 	) const;
 	
 	
@@ -174,7 +174,7 @@ public:
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
 		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-		NOISE_DATATYPE * a_Workspace = nullptr              ///< Workspace that this function can use and trash
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
 	) const;
 	
 protected:
@@ -219,7 +219,7 @@ public:
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
 		int a_SizeX,                                     ///< Count of the array
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
-		NOISE_DATATYPE * a_Workspace = nullptr              ///< Workspace that this function can use and trash
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
 	) const;
 	
 	
@@ -228,7 +228,7 @@ public:
 		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE * a_Workspace = nullptr              ///< Workspace that this function can use and trash
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
 	) const;
 	
 	
@@ -238,7 +238,7 @@ public:
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
 		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-		NOISE_DATATYPE * a_Workspace = nullptr              ///< Workspace that this function can use and trash
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
 	) const;
 	
 protected:
