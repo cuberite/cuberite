@@ -212,7 +212,7 @@ void cWorld::cTickThread::Execute(void)
 		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			std::this_thread::sleep_for(msPerTick -TickTime);
+			std::this_thread::sleep_for(msPerTick - TickTime);
 		}
 
 		LastTime = NowTime;
