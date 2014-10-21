@@ -43,7 +43,7 @@ void BioGenSource::reload()
 	int seed = m_IniFile->GetValueSetI("Seed", "Seed", 0);
 	bool unused = false;
 	QMutexLocker lock(&m_Mtx);
-	m_BiomeGen.reset(cBiomeGen::CreateBiomeGen(*m_IniFile, seed, unused));
+	m_BiomeGen = cBiomeGen::CreateBiomeGen(*m_IniFile, seed, unused);
 }
 
 

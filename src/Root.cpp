@@ -142,8 +142,9 @@ void cRoot::Start(void)
 		}
 
 		LOG("Starting server...");
-		m_MojangAPI.Start(IniFile);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
-		if (!m_Server->InitServer(IniFile))
+		bool ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
+		m_MojangAPI.Start(IniFile, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
+		if (!m_Server->InitServer(IniFile, ShouldAuthenticate))
 		{
 			IniFile.WriteFile("settings.ini");
 			LOGERROR("Failure starting server, aborting...");
@@ -154,7 +155,8 @@ void cRoot::Start(void)
 		m_WebAdmin->Init();
 
 		LOGD("Loading settings...");
-		m_RankManager.Initialize(m_MojangAPI);
+		m_RankManager = new cRankManager();
+		m_RankManager->Initialize(m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		

@@ -24,7 +24,7 @@ class cStructGenTrees :
 	public cFinishGen
 {
 public:
-	cStructGenTrees(int a_Seed, cBiomeGen * a_BiomeGen, cTerrainHeightGen * a_HeightGen, cTerrainCompositionGen * a_CompositionGen) :
+	cStructGenTrees(int a_Seed, cBiomeGenPtr a_BiomeGen, cTerrainHeightGenPtr a_HeightGen, cTerrainCompositionGenPtr a_CompositionGen) :
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
 		m_BiomeGen(a_BiomeGen),
@@ -36,9 +36,9 @@ protected:
 
 	int m_Seed;
 	cNoise m_Noise;
-	cBiomeGen *              m_BiomeGen;
-	cTerrainHeightGen *      m_HeightGen;
-	cTerrainCompositionGen * m_CompositionGen;
+	cBiomeGenPtr              m_BiomeGen;
+	cTerrainHeightGenPtr      m_HeightGen;
+	cTerrainCompositionGenPtr m_CompositionGen;
 	
 	/** Generates and applies an image of a single tree.
 	Parts of the tree inside the chunk are applied to a_BlockX.
@@ -124,7 +124,7 @@ class cStructGenLakes :
 	public cFinishGen
 {
 public:
-	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainHeightGen & a_HeiGen, int a_Probability) :
+	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainHeightGenPtr a_HeiGen, int a_Probability) :
 		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_Fluid(a_Fluid),
@@ -134,11 +134,11 @@ public:
 	}
 	
 protected:
-	cNoise              m_Noise;
-	int                 m_Seed;
-	BLOCKTYPE           m_Fluid;
-	cTerrainHeightGen & m_HeiGen;
-	int                 m_Probability;  ///< Chance, 0 .. 100, of a chunk having the lake
+	cNoise               m_Noise;
+	int                  m_Seed;
+	BLOCKTYPE            m_Fluid;
+	cTerrainHeightGenPtr m_HeiGen;
+	int                  m_Probability;  ///< Chance, 0 .. 100, of a chunk having the lake
 	
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;

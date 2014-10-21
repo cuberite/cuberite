@@ -32,6 +32,8 @@ class cBeaconEntity :
 public:
 	// tolua_end
 
+	BLOCKENTITY_PROTODEF(cBeaconEntity);
+
 	cBeaconEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	// cBlockEntity overrides:

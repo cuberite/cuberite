@@ -31,6 +31,8 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cHopperEntity);
+	
 	/// Constructor used for normal operation
 	cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	
@@ -39,8 +41,6 @@ public:
 	Exported in ManualBindings.cpp
 	*/
 	bool GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, int & a_OutputY, int & a_OutputZ);
-	
-	static const char * GetClassStatic(void) { return "cHopperEntity"; }
 	
 protected:
 

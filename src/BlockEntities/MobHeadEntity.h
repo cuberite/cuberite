@@ -34,6 +34,8 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cMobHeadEntity);
+	
 	/** Creates a new mob head entity at the specified block coords. a_World may be NULL */
 	cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
@@ -62,8 +64,6 @@ public:
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	static const char * GetClassStatic(void) { return "cMobHeadEntity"; }
-	
 private:
 
 	eMobHeadType m_Type;

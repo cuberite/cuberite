@@ -17,10 +17,10 @@ public:
 
 	// tolua_end
 
+	BLOCKENTITY_PROTODEF(cDispenserEntity);
+	
 	/** Constructor used for normal operation */
 	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-
-	static const char * GetClassStatic(void) { return "cDispenserEntity"; }
 
 	// tolua_begin
 	

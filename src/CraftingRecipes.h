@@ -115,7 +115,7 @@ public:
 	~cCraftingRecipes();
 	
 	/// Returns the recipe for current crafting grid. Doesn't modify the grid. Clears a_Recipe if no recipe found.
-	void GetRecipe(const cPlayer * a_Player, const cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
+	void GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingGrid, cCraftingRecipe & a_Recipe);
 	
 protected:
 

@@ -4,6 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Chunk.h"
+#include "BlockPluginInterface.h"
 #include "BlockAnvil.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
@@ -82,7 +83,6 @@
 #include "BlockWorkbench.h"
 
 
-#include "BlockPluginInterface.h"
 
 
 

@@ -191,10 +191,8 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-bool cPickup::CollectedBy(cPlayer * a_Dest)
+bool cPickup::CollectedBy(cPlayer & a_Dest)
 {
-	ASSERT(a_Dest != NULL);
-	
 	if (m_bCollected)
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", m_UniqueID, a_Dest->GetName().c_str());
@@ -214,21 +212,21 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 		return false;
 	}
 
-	int NumAdded = a_Dest->GetInventory().AddItem(m_Item);
+	int NumAdded = a_Dest.GetInventory().AddItem(m_Item);
 	if (NumAdded > 0)
 	{
 		// Check achievements
 		switch (m_Item.m_ItemType)
 		{
-			case E_BLOCK_LOG:      a_Dest->AwardAchievement(achMineWood); break;
-			case E_ITEM_LEATHER:   a_Dest->AwardAchievement(achKillCow);  break;
-			case E_ITEM_DIAMOND:   a_Dest->AwardAchievement(achDiamonds); break;
-			case E_ITEM_BLAZE_ROD: a_Dest->AwardAchievement(achBlazeRod); break;
+			case E_BLOCK_LOG:      a_Dest.AwardAchievement(achMineWood); break;
+			case E_ITEM_LEATHER:   a_Dest.AwardAchievement(achKillCow);  break;
+			case E_ITEM_DIAMOND:   a_Dest.AwardAchievement(achDiamonds); break;
+			case E_ITEM_BLAZE_ROD: a_Dest.AwardAchievement(achBlazeRod); break;
 			default: break;
 		}
 
 		m_Item.m_ItemCount -= NumAdded;
-		m_World->BroadcastCollectEntity(*this, *a_Dest);
+		m_World->BroadcastCollectEntity(*this, a_Dest);
 		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
 		m_World->BroadcastSoundEffect("random.pop", GetPosX(), GetPosY(), GetPosZ(), 0.5, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
 		if (m_Item.m_ItemCount <= 0)

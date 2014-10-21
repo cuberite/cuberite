@@ -59,7 +59,7 @@ public:
 	}
 	
 	/// Called by Chunk when the projectile is eligible for player collection
-	virtual void CollectedBy(cPlayer * a_Dest);
+	virtual void CollectedBy(cPlayer & a_Dest);
 
 	// tolua_begin
 

@@ -27,9 +27,9 @@
 		return super::GetClass(); \
 	}
 
-#define POSX_TOINT (int)floor(GetPosX())
-#define POSY_TOINT (int)floor(GetPosY())
-#define POSZ_TOINT (int)floor(GetPosZ())
+#define POSX_TOINT FloorC(GetPosX())
+#define POSY_TOINT FloorC(GetPosY())
+#define POSZ_TOINT FloorC(GetPosZ())
 #define POS_TOINT  Vector3i(POSXTOINT, POSYTOINT, POSZTOINT)
 
 #define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); if ((ChunkVarName == NULL) || !ChunkVarName->IsValid()) { return; }
@@ -172,13 +172,13 @@ public:
 	/// Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true)
 	virtual bool IsA(const char * a_ClassName) const;
 	
-	/// Returns the topmost class name for the object
-	virtual const char * GetClass(void) const;
-	
-	// Returns the class name of this class
+	/** Returns the class name of this class */
 	static const char * GetClassStatic(void);
 	
-	/// Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent).
+	/** Returns the topmost class name for the object */
+	virtual const char * GetClass(void) const;
+	
+	/** Returns the topmost class's parent class name for the object. cEntity returns an empty string (no parent). */
 	virtual const char * GetParentClass(void) const;
 
 	cWorld * GetWorld(void) const { return m_World; }

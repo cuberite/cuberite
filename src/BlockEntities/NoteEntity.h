@@ -40,6 +40,8 @@ public:
 
 	// tolua_end
 
+	BLOCKENTITY_PROTODEF(cNoteEntity);
+	
 	/// Creates a new note entity. a_World may be NULL
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cNoteEntity() {}
@@ -63,8 +65,6 @@ public:
 			MakeSound();
 		}
 	}
-
-	static const char * GetClassStatic(void) { return "cNoteEntity"; }
 
 private:
 	char m_Pitch;

@@ -4,9 +4,8 @@ To compile MCServer from source, you need CMake and make, as well as a C compile
 
 ## Windows ##
 
-We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but it isn't tested nor supported. Visual Studio versions 2008 Express and 2013 Express are being actively used for development, so either should work.
-You can find download links for VS2008 Express here: http://stackoverflow.com/questions/15318560/visual-c-2008-express-download-link-dead
-And VS2013 Express here: http://www.microsoft.com/en-us/download/details.aspx?id=40787
+We use Microsoft Visual Studio for Windows compilation. It is possible to use other toolchains, but it isn't tested nor supported. Visual Studio versions 2013 Express is being actively used for development.
+You can find download links for VS2013 Express here: http://www.microsoft.com/en-us/download/details.aspx?id=40787
 
 Next, you need to download and install CMake. Download from here: http://cmake.org/cmake/resources/software.html . You should download a full installation package, so that the installer will set everything up for you (especially the paths).
 
