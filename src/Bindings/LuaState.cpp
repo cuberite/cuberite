@@ -562,16 +562,57 @@ void cLuaState::Push(cEntity * a_Entity)
 	{
 		lua_pushnil(m_LuaState);
 	}
-	else if (a_Entity->IsMob())
-	{
-		// Don't push specific mob types, as those are not exported in the API:
-		tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
-	}
 	else
 	{
-		// Push the specific class type:
-		tolua_pushusertype(m_LuaState, a_Entity, a_Entity->GetClass());
+		switch (a_Entity->GetEntityType())
+		{
+			case cEntity::etMonster:
+			{
+				// Don't push specific mob types, as those are not exported in the API:
+				tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
+				break;
+			}
+			case cEntity::etPlayer:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cPlayer");
+				break;
+			}
+			case cEntity::etPickup:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cPickup");
+				break;
+			}
+			case cEntity::etTNT:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cTNTEntity");
+				break;
+			}
+			case cEntity::etProjectile:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cProjectileEntity");
+				break;
+			}
+			case cEntity::etFloater:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cFloater");
+				break;
+			}
+
+			case cEntity::etEntity:
+			case cEntity::etEnderCrystal:
+			case cEntity::etFallingBlock:
+			case cEntity::etMinecart:
+			case cEntity::etBoat:
+			case cEntity::etExpOrb:
+			case cEntity::etItemFrame:
+			case cEntity::etPainting:
+			{
+				// Push the generic entity class type:
+				tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+			}
+		}  // switch (EntityType)
 	}
+
 	m_NumCurrentFunctionArgs += 1;
 }
 
