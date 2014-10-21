@@ -469,47 +469,6 @@ bool cClientHandle::StreamNextChunk(void)
 		}
 	}
 
-	// Medium priority: Load the chunks that are behind the player
-	LookVector = m_Player->GetLookVector() * -1;
-	for (int Range = 0; Range < 3; Range++)
-	{
-		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
-
-		// Get the chunk from the x/z coords.
-		int RangeX, RangeZ = 0;
-		cChunkDef::BlockToChunk(FloorC(Vector.x), FloorC(Vector.z), RangeX, RangeZ);
-
-		for (size_t X = 0; X < 7; X++)
-		{
-			for (size_t Z = 0; Z < 7; Z++)
-			{
-				int ChunkX = RangeX + ((X >= 4) ? (3 - X) : X);
-				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
-				cChunkCoords Coords(ChunkX, ChunkZ);
-
-				// Checks if the chunk is in distance
-				if ((Diff(ChunkX, ChunkPosX) > m_ViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_ViewDistance))
-				{
-					continue;
-				}
-
-				// If the chunk already loading/loaded -> skip
-				if (
-					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
-					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
-				)
-				{
-					continue;
-				}
-
-				// Unloaded chunk found -> Send it to the client.
-				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM);
-				return false;
-			}
-		}
-	}
-
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
 	for (int d = 0; d <= m_ViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{

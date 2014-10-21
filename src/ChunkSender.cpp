@@ -95,18 +95,23 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 {
 	ASSERT(a_Client != NULL);
 	{
-		sSendChunk Chunk(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
+		sSendChunk Chunk(a_ChunkX, a_ChunkZ, a_Client);
 
 		cCSLock Lock(m_CS);
-		if (std::find(m_SendChunks.begin(), m_SendChunks.end(), Chunk) != m_SendChunks.end())
+		if (
+			std::find(m_SendChunksLowPriority.begin(), m_SendChunksLowPriority.end(), Chunk) != m_SendChunksLowPriority.end() ||
+			std::find(m_SendChunksHighPriority.begin(), m_SendChunksHighPriority.end(), Chunk) != m_SendChunksHighPriority.end()
+		)
 		{
 			// Already queued, bail out
 			return;
 		}
-		m_SendChunks.push_back(Chunk);
 
-		// Sort the list:
-		m_SendChunks.sort();
+		if (a_Priority == E_CHUNK_PRIORITY_LOW) {
+			m_SendChunksLowPriority.push_back(Chunk);
+		} else if (a_Priority == E_CHUNK_PRIORITY_HIGH) {
+			m_SendChunksHighPriority.push_back(Chunk);
+		}
 	}
 	m_evtQueue.Set();
 }
@@ -119,15 +124,23 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 {
 	{
 		cCSLock Lock(m_CS);
-		for (sSendChunkList::iterator itr = m_SendChunks.begin(); itr != m_SendChunks.end();)
+		for (sSendChunkList::iterator itr = m_SendChunksLowPriority.begin(); itr != m_SendChunksLowPriority.end();)
 		{
 			if (itr->m_Client == a_Client)
 			{
-				itr = m_SendChunks.erase(itr);
+				itr = m_SendChunksLowPriority.erase(itr);
 				continue;
 			}
 			++itr;
-		}  // for itr - m_SendChunks[]
+		}  // for itr - m_SendChunksLowPriority[]
+		for (sSendChunkList::iterator itr = m_SendChunksHighPriority.begin(); itr != m_SendChunksHighPriority.end();)
+		{
+			if (itr->m_Client == a_Client) {
+				itr = m_SendChunksHighPriority.erase(itr);
+				continue;
+			}
+			++itr;
+		}  // for itr - m_SendChunksHighPriority[]
 		m_RemoveCount++;
 	}
 	m_evtQueue.Set();
@@ -143,7 +156,7 @@ void cChunkSender::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
-		while (m_ChunksReady.empty() && m_SendChunks.empty())
+		while (m_ChunksReady.empty() && m_SendChunksLowPriority.empty() && m_SendChunksHighPriority.empty())
 		{
 			int RemoveCount = m_RemoveCount;
 			m_RemoveCount = 0;
@@ -158,8 +171,17 @@ void cChunkSender::Execute(void)
 				return;
 			}
 		}  // while (empty)
-		
-		if (!m_ChunksReady.empty())
+
+		if (!m_SendChunksHighPriority.empty())
+		{
+			// Take one from the queue:
+			sSendChunk Chunk(m_SendChunksHighPriority.front());
+			m_SendChunksHighPriority.pop_front();
+			Lock.Unlock();
+
+			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
+		}
+		else if (!m_ChunksReady.empty())
 		{
 			// Take one from the queue:
 			cChunkCoords Coords(m_ChunksReady.front());
@@ -171,8 +193,8 @@ void cChunkSender::Execute(void)
 		else
 		{
 			// Take one from the queue:
-			sSendChunk Chunk(m_SendChunks.front());
-			m_SendChunks.pop_front();
+			sSendChunk Chunk(m_SendChunksLowPriority.front());
+			m_SendChunksLowPriority.pop_front();
 			Lock.Unlock();
 
 			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);

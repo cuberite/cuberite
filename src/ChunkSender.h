@@ -79,8 +79,7 @@ public:
 	enum eChunkPriority
 	{
 		E_CHUNK_PRIORITY_HIGH   = 0,
-		E_CHUNK_PRIORITY_MEDIUM = 1,
-		E_CHUNK_PRIORITY_LOW    = 2,
+		E_CHUNK_PRIORITY_LOW    = 1,
 	};
 	
 	bool Start(cWorld * a_World);
@@ -103,13 +102,11 @@ protected:
 	{
 		int m_ChunkX;
 		int m_ChunkZ;
-		eChunkPriority m_Priority;
 		cClientHandle * m_Client;
 		
-		sSendChunk(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client) :
+		sSendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client) :
 			m_ChunkX(a_ChunkX),
 			m_ChunkZ(a_ChunkZ),
-			m_Priority(a_Priority),
 			m_Client(a_Client)
 		{
 		}
@@ -121,11 +118,6 @@ protected:
 				(a_Other.m_ChunkZ == m_ChunkZ) &&
 				(a_Other.m_Client == m_Client)
 			);
-		}
-
-		bool operator < (const sSendChunk & a_Other)
-		{
-			return (m_Priority < a_Other.m_Priority);
 		}
 	} ;
 	typedef std::list<sSendChunk> sSendChunkList;
@@ -150,7 +142,8 @@ protected:
 	
 	cCriticalSection  m_CS;
 	cChunkCoordsList  m_ChunksReady;
-	sSendChunkList    m_SendChunks;
+	sSendChunkList    m_SendChunksLowPriority;
+	sSendChunkList    m_SendChunksHighPriority;
 	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)
