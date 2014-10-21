@@ -1118,16 +1118,16 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	cWorld * World = m_Player->GetWorld();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 
-	if (a_OldBlock == E_BLOCK_AIR)
-	{
-		LOGD("Dug air - what the function?");
-		return;
-	}
-
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		return;
+	}
+
+	if (a_OldBlock == E_BLOCK_AIR)
+	{
+		LOGD("Dug air - what the function?");
 		return;
 	}
 
