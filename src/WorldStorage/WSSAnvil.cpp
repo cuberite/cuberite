@@ -1743,7 +1743,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	int Rotation = a_NBT.FindChildByName(a_TagIdx, "ItemRotation");
 	if (Rotation > 0)
 	{
-		ItemFrame->SetRotation((Byte)a_NBT.GetByte(Rotation));
+		ItemFrame->SetItemRotation((Byte)a_NBT.GetByte(Rotation));
 	}
 	
 	a_Entities.push_back(ItemFrame.release());

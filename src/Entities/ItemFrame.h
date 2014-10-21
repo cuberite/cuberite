@@ -33,7 +33,7 @@ public:
 	Byte GetItemRotation(void) const { return m_ItemRotation; }
 
 	/** Set the rotation from the item in the frame */
-	void SetRotation(Byte a_ItemRotation) { m_ItemRotation = a_ItemRotation; }
+	void SetItemRotation(Byte a_ItemRotation) { m_ItemRotation = a_ItemRotation; }
 
 	// tolua_end
 
