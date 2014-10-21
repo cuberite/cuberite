@@ -16,6 +16,8 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 #include "DeprecatedBindings.h"
+#include "../Entities/Entity.h"
+#include "../BlockEntities/BlockEntity.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -520,7 +522,7 @@ void cLuaState::Push(cBlockEntity * a_BlockEntity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	tolua_pushusertype(m_LuaState, a_BlockEntity, (a_BlockEntity == nullptr) ? "cBlockEntity" : a_BlockEntity->GetClass());
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -556,7 +558,61 @@ void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	if (a_Entity == nullptr)
+	{
+		lua_pushnil(m_LuaState);
+	}
+	else
+	{
+		switch (a_Entity->GetEntityType())
+		{
+			case cEntity::etMonster:
+			{
+				// Don't push specific mob types, as those are not exported in the API:
+				tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
+				break;
+			}
+			case cEntity::etPlayer:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cPlayer");
+				break;
+			}
+			case cEntity::etPickup:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cPickup");
+				break;
+			}
+			case cEntity::etTNT:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cTNTEntity");
+				break;
+			}
+			case cEntity::etProjectile:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cProjectileEntity");
+				break;
+			}
+			case cEntity::etFloater:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cFloater");
+				break;
+			}
+
+			case cEntity::etEntity:
+			case cEntity::etEnderCrystal:
+			case cEntity::etFallingBlock:
+			case cEntity::etMinecart:
+			case cEntity::etBoat:
+			case cEntity::etExpOrb:
+			case cEntity::etItemFrame:
+			case cEntity::etPainting:
+			{
+				// Push the generic entity class type:
+				tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+			}
+		}  // switch (EntityType)
+	}
+
 	m_NumCurrentFunctionArgs += 1;
 }
 

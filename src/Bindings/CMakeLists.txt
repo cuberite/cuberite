@@ -37,14 +37,12 @@ SET (HDRS
 set (BINDING_OUTPUTS
     ${CMAKE_CURRENT_SOURCE_DIR}/Bindings.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Bindings.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/LuaState_Call.inc
 )
 
 set(BINDING_DEPENDENCIES
     tolua
     ../Bindings/virtual_method_hooks.lua
     ../Bindings/AllToLua.pkg
-    ../Bindings/gen_LuaState_Call.lua
     ../Bindings/LuaFunctions.h
     ../Bindings/LuaWindow.h
     ../Bindings/Plugin.h
@@ -127,7 +125,6 @@ if (NOT MSVC)
 endif ()
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.h PROPERTIES GENERATED TRUE)
-set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/LuaState_Call.inc PROPERTIES GENERATED TRUE)
 
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS -Wno-error)
 

@@ -25,9 +25,11 @@ class cBlockEntityWithItems :
 	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntity super;
-	
+
 public:
 	// tolua_end
+	
+	BLOCKENTITY_PROTODEF(cBlockEntityWithItems);
 	
 	cBlockEntityWithItems(
 		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents

@@ -11,6 +11,8 @@
 #include "json/json.h"
 #include "PolarSSL++/BlockingSslClientSocket.h"
 #include "../RankManager.h"
+#include "../OSSupport/IsThread.h"
+#include "../Root.h"
 
 
 
@@ -152,6 +154,41 @@ cMojangAPI::sProfile::sProfile(
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cMojangAPI::cUpdateThread:
+
+class cMojangAPI::cUpdateThread :
+	public cIsThread
+{
+	typedef cIsThread super;
+public:
+	cUpdateThread() :
+		super("cMojangAPI::cUpdateThread")
+	{
+	}
+
+	~cUpdateThread()
+	{
+		m_evtNotify.Set();
+		Stop();
+	}
+
+protected:
+	cEvent m_evtNotify;
+
+	virtual void Execute(void) override
+	{
+		do
+		{
+			cRoot::Get()->GetMojangAPI().Update();
+		} while (!m_evtNotify.Wait(60 * 60 * 1000));  // Repeat every 60 minutes
+	}
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cMojangAPI:
 
 cMojangAPI::cMojangAPI(void) :
@@ -159,7 +196,8 @@ cMojangAPI::cMojangAPI(void) :
 	m_NameToUUIDAddress(DEFAULT_NAME_TO_UUID_ADDRESS),
 	m_UUIDToProfileServer(DEFAULT_UUID_TO_PROFILE_SERVER),
 	m_UUIDToProfileAddress(DEFAULT_UUID_TO_PROFILE_ADDRESS),
-	m_RankMgr(NULL)
+	m_RankMgr(NULL),
+	m_UpdateThread(new cUpdateThread())
 {
 }
 
@@ -176,13 +214,17 @@ cMojangAPI::~cMojangAPI()
 
 
 
-void cMojangAPI::Start(cIniFile & a_SettingsIni)
+void cMojangAPI::Start(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 {
 	m_NameToUUIDServer     = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDServer",     DEFAULT_NAME_TO_UUID_SERVER);
 	m_NameToUUIDAddress    = a_SettingsIni.GetValueSet("MojangAPI", "NameToUUIDAddress",    DEFAULT_NAME_TO_UUID_ADDRESS);
 	m_UUIDToProfileServer  = a_SettingsIni.GetValueSet("MojangAPI", "UUIDToProfileServer",  DEFAULT_UUID_TO_PROFILE_SERVER);
 	m_UUIDToProfileAddress = a_SettingsIni.GetValueSet("MojangAPI", "UUIDToProfileAddress", DEFAULT_UUID_TO_PROFILE_ADDRESS);
 	LoadCachesFromDisk();
+	if (a_ShouldAuth)
+	{
+		m_UpdateThread->Start();
+	}
 }
 
 
@@ -465,21 +507,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
 		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
 		
-		// Clean up old entries:
-		{
-			SQLite::Statement stmt(db, "DELETE FROM PlayerNameToUUID WHERE DateTime < ?");
-			Int64 LimitDateTime = time(NULL) - MAX_AGE;
-			stmt.bind(1, LimitDateTime);
-			stmt.exec();
-		}
-		{
-			SQLite::Statement stmt(db, "DELETE FROM UUIDToProfile WHERE DateTime < ?");
-			Int64 LimitDateTime = time(NULL) - MAX_AGE;
-			stmt.bind(1, LimitDateTime);
-			stmt.exec();
-		}
-		
-		// Retrieve all remaining entries:
+		// Retrieve all entries:
 		{
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
 			while (stmt.executeStep())
@@ -596,18 +624,27 @@ void cMojangAPI::CacheNamesToUUIDs(const AStringVector & a_PlayerNames)
 		}  // for itr - a_PlayerNames[]
 	}  // Lock(m_CSNameToUUID)
 	
-	while (!NamesToQuery.empty())
+	QueryNamesToUUIDs(NamesToQuery);
+}
+
+
+
+
+
+void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
+{
+	while (!a_NamesToQuery.empty())
 	{
 		// Create the request body - a JSON containing up to MAX_PER_QUERY playernames:
 		Json::Value root;
 		int Count = 0;
-		AStringVector::iterator itr = NamesToQuery.begin(), end = NamesToQuery.end();
+		AStringVector::iterator itr = a_NamesToQuery.begin(), end = a_NamesToQuery.end();
 		for (; (itr != end) && (Count < MAX_PER_QUERY); ++itr, ++Count)
 		{
 			Json::Value req(*itr);
 			root.append(req);
 		}  // for itr - a_PlayerNames[]
-		NamesToQuery.erase(NamesToQuery.begin(), itr);
+		a_NamesToQuery.erase(a_NamesToQuery.begin(), itr);
 		Json::FastWriter Writer;
 		AString RequestBody = Writer.write(root);
 	
@@ -705,12 +742,22 @@ void cMojangAPI::CacheUUIDToProfile(const AString & a_UUID)
 	
 	// Check if already present:
 	{
+		cCSLock Lock(m_CSUUIDToProfile);
 		if (m_UUIDToProfile.find(a_UUID) != m_UUIDToProfile.end())
 		{
 			return;
 		}
 	}
 	
+	QueryUUIDToProfile(a_UUID);
+}
+
+
+
+
+
+void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
+{
 	// Create the request address:
 	AString Address = m_UUIDToProfileAddress;
 	ReplaceString(Address, "%UUID%", a_UUID);
@@ -811,6 +858,54 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const AString & a_
 	if (m_RankMgr != NULL)
 	{
 		m_RankMgr->NotifyNameUUID(a_PlayerName, a_UUID);
+	}
+}
+
+
+
+
+
+void cMojangAPI::Update(void)
+{
+	Int64 LimitDateTime = time(NULL) - MAX_AGE;
+
+	// Re-query all playernames that are stale:
+	AStringVector PlayerNames;
+	{
+		cCSLock Lock(m_CSNameToUUID);
+		for (cProfileMap::const_iterator itr = m_NameToUUID.begin(), end = m_NameToUUID.end(); itr != end; ++itr)
+		{
+			if (itr->second.m_DateTime < LimitDateTime)
+			{
+				PlayerNames.push_back(itr->first);
+			}
+		}  // for itr - m_NameToUUID[]
+	}
+	if (!PlayerNames.empty())
+	{
+		LOG("cMojangAPI: Updating name-to-uuid cache for %u names", (unsigned)PlayerNames.size());
+		QueryNamesToUUIDs(PlayerNames);
+	}
+
+	// Re-query all profiles that are stale:
+	AStringVector ProfileUUIDs;
+	{
+		cCSLock Lock(m_CSUUIDToProfile);
+		for (cProfileMap::const_iterator itr = m_UUIDToProfile.begin(), end = m_UUIDToProfile.end(); itr != end; ++itr)
+		{
+			if (itr->second.m_DateTime < LimitDateTime)
+			{
+				ProfileUUIDs.push_back(itr->first);
+			}
+		}  // for itr - m_UUIDToProfile[]
+	}
+	if (!ProfileUUIDs.empty())
+	{
+		LOG("cMojangAPI: Updating uuid-to-profile cache for %u uuids", (unsigned)ProfileUUIDs.size());
+		for (AStringVector::const_iterator itr = ProfileUUIDs.begin(), end = ProfileUUIDs.end(); itr != end; ++itr)
+		{
+			QueryUUIDToProfile(*itr);
+		}
 	}
 }
 

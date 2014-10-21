@@ -637,14 +637,35 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 		int Rnd = (Noise.IntNoise1DInt(i) / 7);
 		int LootRnd = Rnd % TotalProbab;
 		Rnd >>= 8;
-		cItem CurrentLoot = cItem(E_ITEM_BOOK, 1, 0);  // TODO: enchantment
+		cItem CurrentLoot = cItem(E_ITEM_ENCHANTED_BOOK, 1, 0);
+
+		// Choose the enchantments
+		cWeightedEnchantments Enchantments;
+		cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, 24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7);
+		int NumEnchantments = Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5;  // The number of enchantments this book wil get.
+		
+		for (int j = 0; j <= NumEnchantments; j++)
+		{
+			cEnchantments Enchantment = cEnchantments::GenerateEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));
+			CurrentLoot.m_Enchantments.Add(Enchantment);
+			cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment);
+			cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment);
+		}
+
 		for (size_t j = 0; j < a_CountLootProbabs; j++)
 		{
-			LootRnd -= a_LootProbabs[i].m_Weight;
+			LootRnd -= a_LootProbabs[j].m_Weight;
 			if (LootRnd < 0)
 			{
-				CurrentLoot = a_LootProbabs[i].m_Item;
-				CurrentLoot.m_ItemCount = a_LootProbabs[i].m_MinAmount + (Rnd % (a_LootProbabs[i].m_MaxAmount - a_LootProbabs[i].m_MinAmount));
+				CurrentLoot = a_LootProbabs[j].m_Item;
+				if ((a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount) > 0)
+				{
+					CurrentLoot.m_ItemCount = a_LootProbabs[j].m_MinAmount + (Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount));
+				}
+				else
+				{
+					CurrentLoot.m_ItemCount = a_LootProbabs[j].m_MinAmount;
+				}
 				Rnd >>= 8;
 				break;
 			}

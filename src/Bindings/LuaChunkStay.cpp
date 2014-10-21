@@ -130,8 +130,11 @@ void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, int a_OnChunkAvailableStackPo
 
 void cLuaChunkStay::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
-	cPluginLua::cOperation Op(m_Plugin);
-	Op().Call((int)m_OnChunkAvailable, a_ChunkX, a_ChunkZ);
+	if (m_OnChunkAvailable.IsValid())
+	{
+		cPluginLua::cOperation Op(m_Plugin);
+		Op().Call((int)m_OnChunkAvailable, a_ChunkX, a_ChunkZ);
+	}
 }
 
 
@@ -140,6 +143,7 @@ void cLuaChunkStay::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 
 bool cLuaChunkStay::OnAllChunksAvailable(void)
 {
+	if (m_OnAllChunksAvailable.IsValid())
 	{
 		// Call the callback:
 		cPluginLua::cOperation Op(m_Plugin);

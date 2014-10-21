@@ -209,7 +209,7 @@ public:
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
-	void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value);
+	void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value);
 
 	// tolua_begin
 	const AString & GetUsername(void) const;
@@ -348,6 +348,7 @@ private:
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
 	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
+	cChunkCoordsList m_SentChunks;    // Chunks that are currently sent to the client
 
 	cProtocol * m_Protocol;
 	

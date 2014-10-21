@@ -4,6 +4,7 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Chunk.h"
+#include "BlockPluginInterface.h"
 #include "BlockAnvil.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
@@ -36,7 +37,6 @@
 #include "BlockGlass.h"
 #include "BlockGlowstone.h"
 #include "BlockGravel.h"
-#include "BlockHayBale.h"
 #include "BlockMobHead.h"
 #include "BlockHopper.h"
 #include "BlockIce.h"
@@ -83,7 +83,6 @@
 #include "BlockWorkbench.h"
 
 
-#include "BlockPluginInterface.h"
 
 
 
@@ -231,7 +230,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_GLASS_PANE:            return new cBlockGlassHandler           (a_BlockType);
 		case E_BLOCK_GRASS:                 return new cBlockDirtHandler            (a_BlockType);
 		case E_BLOCK_GRAVEL:                return new cBlockGravelHandler          (a_BlockType);
-		case E_BLOCK_HAY_BALE:              return new cBlockHayBaleHandler         (a_BlockType);
+		case E_BLOCK_HAY_BALE:              return new cBlockSidewaysHandler        (a_BlockType);
 		case E_BLOCK_HEAD:                  return new cBlockMobHeadHandler         (a_BlockType);
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return new cBlockPressurePlateHandler(a_BlockType);
 		case E_BLOCK_HOPPER:                return new cBlockHopperHandler          (a_BlockType);

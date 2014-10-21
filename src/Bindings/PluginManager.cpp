@@ -225,7 +225,7 @@ void cPluginManager::Tick(float a_Dt)
 
 
 
-bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+bool cPluginManager::CallHookBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
 {
 	FIND_HOOK(HOOK_BLOCK_SPREAD);
 	VERIFY_HOOK;
@@ -245,7 +245,7 @@ bool cPluginManager::CallHookBlockSpread(cWorld * a_World, int a_BlockX, int a_B
 
 
 bool cPluginManager::CallHookBlockToPickups(
-	cWorld * a_World, cEntity * a_Digger,
+	cWorld & a_World, cEntity * a_Digger,
 	int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
 	cItems & a_Pickups
 )
@@ -267,7 +267,7 @@ bool cPluginManager::CallHookBlockToPickups(
 
 
 
-bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
+bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 {
 	// Check if the message contains a command, execute it:
 	switch (HandleCommand(a_Player, a_Message, true))
@@ -288,14 +288,14 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 		case crError:
 		{
 			// An error in the plugin has prevented the command from executing. Report the error to the player:
-			a_Player->SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
 			return true;
 		}
 		
 		case crNoPermission:
 		{
 			// The player is not allowed to execute this command
-			a_Player->SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
 			return true;
 		}
 
@@ -311,8 +311,8 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player->SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
-		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player->GetName().c_str(), a_Message.c_str());
+		a_Player.SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
+		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName().c_str(), a_Message.c_str());
 		return true;  // Cancel sending
 	}
 
@@ -334,7 +334,7 @@ bool cPluginManager::CallHookChat(cPlayer * a_Player, AString & a_Message)
 
 
 
-bool cPluginManager::CallHookChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginManager::CallHookChunkAvailable(cWorld & a_World, int a_ChunkX, int a_ChunkZ)
 {
 	FIND_HOOK(HOOK_CHUNK_AVAILABLE);
 	VERIFY_HOOK;
@@ -353,7 +353,7 @@ bool cPluginManager::CallHookChunkAvailable(cWorld * a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginManager::CallHookChunkGenerated(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	FIND_HOOK(HOOK_CHUNK_GENERATED);
 	VERIFY_HOOK;
@@ -372,7 +372,7 @@ bool cPluginManager::CallHookChunkGenerated(cWorld * a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginManager::CallHookChunkGenerating(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	FIND_HOOK(HOOK_CHUNK_GENERATING);
 	VERIFY_HOOK;
@@ -391,7 +391,7 @@ bool cPluginManager::CallHookChunkGenerating(cWorld * a_World, int a_ChunkX, int
 
 
 
-bool cPluginManager::CallHookChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginManager::CallHookChunkUnloaded(cWorld & a_World, int a_ChunkX, int a_ChunkZ)
 {
 	FIND_HOOK(HOOK_CHUNK_UNLOADED);
 	VERIFY_HOOK;
@@ -410,7 +410,7 @@ bool cPluginManager::CallHookChunkUnloaded(cWorld * a_World, int a_ChunkX, int a
 
 
 
-bool cPluginManager::CallHookChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginManager::CallHookChunkUnloading(cWorld & a_World, int a_ChunkX, int a_ChunkZ)
 {
 	FIND_HOOK(HOOK_CHUNK_UNLOADING);
 	VERIFY_HOOK;
@@ -429,14 +429,14 @@ bool cPluginManager::CallHookChunkUnloading(cWorld * a_World, int a_ChunkX, int 
 
 
 
-bool cPluginManager::CallHookCollectingPickup(cPlayer * a_Player, cPickup & a_Pickup)
+bool cPluginManager::CallHookCollectingPickup(cPlayer & a_Player, cPickup & a_Pickup)
 {
 	FIND_HOOK(HOOK_COLLECTING_PICKUP);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnCollectingPickup(a_Player, &a_Pickup))
+		if ((*itr)->OnCollectingPickup(a_Player, a_Pickup))
 		{
 			return true;
 		}
@@ -448,7 +448,7 @@ bool cPluginManager::CallHookCollectingPickup(cPlayer * a_Player, cPickup & a_Pi
 
 
 
-bool cPluginManager::CallHookCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginManager::CallHookCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe)
 {
 	FIND_HOOK(HOOK_CRAFTING_NO_RECIPE);
 	VERIFY_HOOK;
@@ -562,7 +562,7 @@ bool cPluginManager::CallHookExploding(cWorld & a_World, double & a_ExplosionSiz
 
 
 
-bool cPluginManager::CallHookHandshake(cClientHandle * a_ClientHandle, const AString & a_Username)
+bool cPluginManager::CallHookHandshake(cClientHandle & a_ClientHandle, const AString & a_Username)
 {
 	FIND_HOOK(HOOK_HANDSHAKE);
 	VERIFY_HOOK;
@@ -638,7 +638,7 @@ bool cPluginManager::CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, Tak
 
 
 
-bool cPluginManager::CallHookLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
+bool cPluginManager::CallHookLogin(cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
 	FIND_HOOK(HOOK_LOGIN);
 	VERIFY_HOOK;
@@ -1111,7 +1111,7 @@ bool cPluginManager::CallHookPluginsLoaded(void)
 
 
 
-bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginManager::CallHookPostCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	FIND_HOOK(HOOK_POST_CRAFTING);
 	VERIFY_HOOK;
@@ -1130,7 +1130,7 @@ bool cPluginManager::CallHookPostCrafting(const cPlayer * a_Player, const cCraft
 
 
 
-bool cPluginManager::CallHookPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginManager::CallHookPreCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	FIND_HOOK(HOOK_PRE_CRAFTING);
 	VERIFY_HOOK;
@@ -1299,7 +1299,7 @@ bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a
 
 
 
-bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	FIND_HOOK(HOOK_UPDATING_SIGN);
 	VERIFY_HOOK;
@@ -1318,7 +1318,7 @@ bool cPluginManager::CallHookUpdatingSign(cWorld * a_World, int a_BlockX, int a_
 
 
 
-bool cPluginManager::CallHookUpdatedSign(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	FIND_HOOK(HOOK_UPDATED_SIGN);
 	VERIFY_HOOK;
@@ -1413,10 +1413,8 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt, int a_LastT
 
 
 
-cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
+cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
-	ASSERT(a_Player != NULL);
-
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
@@ -1431,19 +1429,19 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer * a_Player, 
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
-	if (CallHookExecuteCommand(a_Player, Split))
+	if (CallHookExecuteCommand(&a_Player, Split))
 	{
-		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player->GetName().c_str(), Split[0].c_str());
+		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
 		return crBlocked;
 	}
 
 	if (
 		a_ShouldCheckPermissions &&
 		!cmd->second.m_Permission.empty() &&
-		!a_Player->HasPermission(cmd->second.m_Permission)
+		!a_Player.HasPermission(cmd->second.m_Permission)
 	)
 	{
-		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player->GetName().c_str(), Split[0].c_str());
+		LOGINFO("Player %s tried to execute forbidden command: \"%s\"", a_Player.GetName().c_str(), Split[0].c_str());
 		return crNoPermission;
 	}
 
@@ -1652,7 +1650,7 @@ AString cPluginManager::GetCommandPermission(const AString & a_Command)
 
 
 
-cPluginManager::CommandResult cPluginManager::ExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ExecuteCommand(cPlayer & a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, true);
 }
@@ -1661,7 +1659,7 @@ cPluginManager::CommandResult cPluginManager::ExecuteCommand(cPlayer * a_Player,
 
 
 
-cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer * a_Player, const AString & a_Command)
+cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer & a_Player, const AString & a_Command)
 {
 	return HandleCommand(a_Player, a_Command, false);
 }
@@ -1830,6 +1828,7 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 {
 	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
+
 	if (a_Plugin->Initialize())
 	{
 		// Initialization OK

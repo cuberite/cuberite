@@ -25,10 +25,10 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cDropperEntity);
+	
 	/// Constructor used for normal operation
 	cDropperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-
-	static const char * GetClassStatic(void) { return "cDropperEntity"; }
 
 protected:
 	// cDropSpenserEntity overrides:

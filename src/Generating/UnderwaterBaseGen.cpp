@@ -93,7 +93,7 @@ protected:
 
 
 
-cUnderwaterBaseGen::cUnderwaterBaseGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, cBiomeGen & a_BiomeGen) :
+cUnderwaterBaseGen::cUnderwaterBaseGen(int a_Seed, int a_GridSize, int a_MaxOffset, int a_MaxDepth, int a_MaxSize, cBiomeGenPtr a_BiomeGen) :
 	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
 	m_Noise(a_Seed + 1000),
 	m_MaxDepth(a_MaxDepth),
@@ -112,7 +112,7 @@ cGridStructGen::cStructurePtr cUnderwaterBaseGen::CreateStructure(int a_GridX, i
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_OriginX, a_OriginZ, ChunkX, ChunkZ);
 	cChunkDef::BiomeMap Biomes;
-	m_BiomeGen.GenBiomes(ChunkX, ChunkZ, Biomes);
+	m_BiomeGen->GenBiomes(ChunkX, ChunkZ, Biomes);
 
 	// Check if all the biomes are ocean:
 	// If just one is not, no base is created, because it's likely that an unfriendly biome is too close

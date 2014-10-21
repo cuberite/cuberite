@@ -714,7 +714,7 @@ void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 {
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
-	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
 	SetSlot(0, a_Player, Recipe.GetResult());
 	m_ParentWindow.SendSlot(a_Player, this, 0);
 }
@@ -736,7 +736,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	// Not found. Add a new one:
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe Recipe(Grid);
-	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }

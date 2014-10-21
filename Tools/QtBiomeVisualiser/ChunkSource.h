@@ -53,7 +53,7 @@ protected:
 	cIniFilePtr m_IniFile;
 
 	/** The generator used for generating biomes. */
-	std::unique_ptr<cBiomeGen> m_BiomeGen;
+	cBiomeGenPtr m_BiomeGen;
 
 	/** Guards m_BiomeGen against multithreaded access. */
 	QMutex m_Mtx;

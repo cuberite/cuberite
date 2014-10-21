@@ -59,12 +59,25 @@ macro(set_flags)
 		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
 		set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "${CMAKE_MODULE_LINKER_FLAGS_RELEASE} /LTCG")
 	elseif(APPLE)
-		#on os x clang adds pthread for us but we need to add it for gcc
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                		OUTPUT_VARIABLE GCC_VERSION)
+                endif()
+                
+                if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND (NOT GCC_VERSION VERSION_GREATER 4.6))
+	                set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++0x")
+			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++0x")
+			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++0x")
+			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++0x")
+		else()
 			set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
 			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")
 			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++11")
+		endif()
+		#on os x clang adds pthread for us but we need to add it for gcc
+		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			add_flags_cxx("-stdlib=libc++")
 			add_flags_lnk("-stdlib=libc++")
 		else()
@@ -77,8 +90,17 @@ macro(set_flags)
 			add_flags_cxx("-pthread")
 		endif()
 
-		# Make CLang use C++11, otherwise MSVC2008-supported extensions don't work ("override" keyword etc.):
-		if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+			execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                		OUTPUT_VARIABLE GCC_VERSION)
+                endif()
+                
+                if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND (NOT GCC_VERSION VERSION_GREATER 4.6))
+	                set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++0x")
+			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++0x")
+			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++0x")
+			set(CMAKE_CXX_FLAGS_RELEASE  "${CMAKE_CXX_FLAGS_RELEASE}  -std=c++0x")
+		else()
 			set(CMAKE_CXX_FLAGS          "${CMAKE_CXX_FLAGS}          -std=c++11")
 			set(CMAKE_CXX_FLAGS_DEBUG    "${CMAKE_CXX_FLAGS_DEBUG}    -std=c++11")
 			set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++11")

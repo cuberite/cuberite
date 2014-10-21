@@ -6,6 +6,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
+#include "Noise.h"
 
 
 
@@ -1010,6 +1011,33 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 		if (RandomNumber < 0)
 		{
 			return (*it).m_Enchantments;
+		}
+	}
+
+	return cEnchantments();
+}
+
+
+
+
+
+cEnchantments cEnchantments::GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
+{
+	int AllWeights = 0;
+	for (const auto Enchantment : a_Enchantments)
+	{
+		AllWeights += Enchantment.m_Weight;
+	}
+
+	cNoise Noise(a_Seed);
+	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
+
+	for (const auto Enchantment : a_Enchantments)
+	{
+		RandomNumber -= Enchantment.m_Weight;
+		if (RandomNumber < 0)
+		{
+			return Enchantment.m_Enchantments;
 		}
 	}
 

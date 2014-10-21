@@ -954,7 +954,7 @@ void cChunkMap::SetChunkData(cSetChunkData & a_SetChunkData)
 	}
 
 	// Notify plugins of the chunk becoming available
-	cPluginManager::Get()->CallHookChunkAvailable(m_World, ChunkX, ChunkZ);
+	cPluginManager::Get()->CallHookChunkAvailable(*m_World, ChunkX, ChunkZ);
 }
 
 
@@ -1145,11 +1145,11 @@ void cChunkMap::FastSetBlocks(sSetBlockList & a_BlockList)
 
 
 
-void cChunkMap::CollectPickupsByPlayer(cPlayer * a_Player)
+void cChunkMap::CollectPickupsByPlayer(cPlayer & a_Player)
 {
-	int BlockX = (int)(a_Player->GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
-	int BlockY = (int)(a_Player->GetPosY());
-	int BlockZ = (int)(a_Player->GetPosZ());
+	int BlockX = (int)(a_Player.GetPosX());  // Truncating doesn't matter much; we're scanning entire chunks anyway
+	int BlockY = (int)(a_Player.GetPosY());
+	int BlockZ = (int)(a_Player.GetPosZ());
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	int OtherChunkX = ChunkX + ((BlockX > 8) ? 1 : -1);
@@ -2973,7 +2973,7 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 		if (
 			(m_Chunks[i] != NULL) &&   // Is valid
 			(m_Chunks[i]->CanUnload()) &&  // Can unload
-			!cPluginManager::Get()->CallHookChunkUnloading(m_Parent->GetWorld(), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
+			!cPluginManager::Get()->CallHookChunkUnloading(*(m_Parent->GetWorld()), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
 		)
 		{
 			// The cChunk destructor calls our GetChunk() while removing its entities
@@ -2984,6 +2984,8 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 		}
 	}  // for i - m_Chunks[]
 }
+
+
 
 
 

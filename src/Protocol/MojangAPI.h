@@ -38,7 +38,7 @@ public:
 	
 	/** Initializes the API; reads the settings from the specified ini file.
 	Loads cached results from disk. */
-	void Start(cIniFile & a_SettingsIni);
+	void Start(cIniFile & a_SettingsIni, bool a_ShouldAuth);
 	
 	/** Connects to the specified server using SSL, sends the given request and receives the response.
 	Checks Mojang certificates using the hard-coded Starfield root CA certificate.
@@ -93,6 +93,10 @@ public:
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
 
 protected:
+	/** The thread that periodically checks for stale data and re-queries it from the server. */
+	class cUpdateThread;
+
+
 	/** Holds data for a single player profile. */
 	struct sProfile
 	{
@@ -177,6 +181,9 @@ protected:
 
 	/** Protects m_RankMgr agains simultaneous multi-threaded access. */
 	cCriticalSection m_CSRankMgr;
+
+	/** The thread that periodically updates the stale data in the DB from the Mojang servers. */
+	SharedPtr<cUpdateThread> m_UpdateThread;
 	
 	
 	/** Loads the caches from a disk storage. */
@@ -189,15 +196,29 @@ protected:
 	Names that are not valid are not added into the cache.
 	ASSUMEs that a_PlayerNames contains lowercased player names. */
 	void CacheNamesToUUIDs(const AStringVector & a_PlayerNames);
+
+	/** Queries all the specified names and stores them into the m_PlayerNameToUUID cache.
+	Names that are not valid are not added into the cache.
+	ASSUMEs that a_PlayerNames contans lowercased player names.
+	For performance reasons takes a non-const reference and modifies the list given to it, until empty. */
+	void QueryNamesToUUIDs(AStringVector & a_PlayerNames);
 	
 	/** Makes sure the specified UUID is in the m_UUIDToProfile cache. If missing, downloads it from Mojang API servers.
 	UUIDs that are not valid will not be added into the cache.
 	ASSUMEs that a_UUID is a lowercased short UUID. */
 	void CacheUUIDToProfile(const AString & a_UUID);
 
+	/** Queries the specified UUID's profile and stores it in the m_UUIDToProfile cache. If already present, updates the cache entry.
+	UUIDs that are not valid will not be added into the cache.
+	ASSUMEs that a_UUID is a lowercased short UUID. */
+	void QueryUUIDToProfile(const AString & a_UUID);
+
 	/** Called for each name-uuid pairing that is discovered.
 	If assigned, notifies the m_RankManager of the event. */
 	void NotifyNameUUID(const AString & a_PlayerName, const AString & a_PlayerUUID);
+
+	/** Updates the stale values in the DB from the Mojang servers. Called from the cUpdateThread, blocks on the HTTPS API calls. */
+	void Update(void);
 } ;  // tolua_export
 
 

@@ -424,8 +424,12 @@ void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cProjectileEntity::CollectedBy(cPlayer * a_Dest)
+void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 {
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
+
+
+
+

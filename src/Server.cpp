@@ -196,7 +196,7 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 
 
-bool cServer::InitServer(cIniFile & a_SettingsIni)
+bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 {
 	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!");
 	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
@@ -247,7 +247,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsConnected = true;
 
 	m_ServerID = "-";
-	m_ShouldAuthenticate = a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true);
+	m_ShouldAuthenticate = a_ShouldAuth;
 	if (m_ShouldAuthenticate)
 	{
 		MTRand mtrand1;
@@ -450,7 +450,7 @@ bool cServer::Start(void)
 
 bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 {
-	return cRoot::Get()->GetPluginManager()->CallHookChat(a_Client.GetPlayer(), a_Cmd);
+	return cRoot::Get()->GetPluginManager()->CallHookChat(*(a_Client.GetPlayer()), a_Cmd);
 }
 
 
@@ -491,6 +491,17 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
+			cPluginManager::PluginMap map = cPluginManager::Get()->GetAllPlugins();
+
+			for (auto plugin_entry : map)
+			{
+				if (plugin_entry.first == split[1])
+				{
+					a_Output.Out("Error! Plugin is already loaded!");
+					a_Output.Finished();
+					return;
+				}
+			}
 			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else

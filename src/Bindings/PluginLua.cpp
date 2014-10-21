@@ -202,14 +202,14 @@ void cPluginLua::Tick(float a_Dt)
 
 
 
-bool cPluginLua::OnBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BLOCK_SPREAD];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -222,14 +222,14 @@ bool cPluginLua::OnBlockSpread(cWorld * a_World, int a_BlockX, int a_BlockY, int
 
 
 
-bool cPluginLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
+bool cPluginLua::OnBlockToPickups(cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_BLOCK_TO_PICKUPS];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, &a_Pickups, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -242,14 +242,14 @@ bool cPluginLua::OnBlockToPickups(cWorld * a_World, cEntity * a_Digger, int a_Bl
 
 
 
-bool cPluginLua::OnChat(cPlayer * a_Player, AString & a_Message)
+bool cPluginLua::OnChat(cPlayer & a_Player, AString & a_Message)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHAT];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Message, cLuaState::Return, res, a_Message);
+		m_LuaState.Call((int)(**itr), &a_Player, a_Message, cLuaState::Return, res, a_Message);
 		if (res)
 		{
 			return true;
@@ -262,14 +262,14 @@ bool cPluginLua::OnChat(cPlayer * a_Player, AString & a_Message)
 
 
 
-bool cPluginLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginLua::OnChunkAvailable(cWorld & a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_AVAILABLE];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -282,14 +282,14 @@ bool cPluginLua::OnChunkAvailable(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cPluginLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginLua::OnChunkGenerated(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_GENERATED];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -302,14 +302,14 @@ bool cPluginLua::OnChunkGenerated(cWorld * a_World, int a_ChunkX, int a_ChunkZ, 
 
 
 
-bool cPluginLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
+bool cPluginLua::OnChunkGenerating(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_GENERATING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -322,14 +322,14 @@ bool cPluginLua::OnChunkGenerating(cWorld * a_World, int a_ChunkX, int a_ChunkZ,
 
 
 
-bool cPluginLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginLua::OnChunkUnloaded(cWorld & a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_UNLOADED];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -342,14 +342,14 @@ bool cPluginLua::OnChunkUnloaded(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cPluginLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
+bool cPluginLua::OnChunkUnloading(cWorld & a_World, int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CHUNK_UNLOADING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -362,14 +362,14 @@ bool cPluginLua::OnChunkUnloading(cWorld * a_World, int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cPluginLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
+bool cPluginLua::OnCollectingPickup(cPlayer & a_Player, cPickup & a_Pickup)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_COLLECTING_PICKUP];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Pickup, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_Pickup, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -382,14 +382,14 @@ bool cPluginLua::OnCollectingPickup(cPlayer * a_Player, cPickup * a_Pickup)
 
 
 
-bool cPluginLua::OnCraftingNoRecipe(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_CRAFTING_NO_RECIPE];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), (cPlayer *)a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_Grid, &a_Recipe, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -471,12 +471,12 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 	{
 		switch (a_Source)
 		{
-			case esOther:            m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res); break;
-			case esPrimedTNT:        m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData, cLuaState::Return, res); break;
-			case esMonster:          m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cMonster *)a_SourceData,   cLuaState::Return, res); break;
-			case esBed:              m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res); break;
-			case esEnderCrystal:     m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,   cLuaState::Return, res); break;
-			case esGhastFireball:    m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,               cLuaState::Return, res); break;
+			case esOther:            m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,                cLuaState::Return, res); break;
+			case esPrimedTNT:        m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cTNTEntity *)a_SourceData,  cLuaState::Return, res); break;
+			case esMonster:          m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (cMonster *)a_SourceData,    cLuaState::Return, res); break;
+			case esBed:              m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,    cLuaState::Return, res); break;
+			case esEnderCrystal:     m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, (Vector3i *)a_SourceData,    cLuaState::Return, res); break;
+			case esGhastFireball:    m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData,                cLuaState::Return, res); break;
 			case esWitherSkullBlack:
 			case esWitherSkullBlue:  m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
 			case esWitherBirth:      m_LuaState.Call((int)(**itr), &a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, a_SourceData, cLuaState::Return, res); break;
@@ -536,14 +536,14 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 
 
 
-bool cPluginLua::OnHandshake(cClientHandle * a_Client, const AString & a_Username)
+bool cPluginLua::OnHandshake(cClientHandle & a_Client, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_HANDSHAKE];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Client, a_Username, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Client, a_Username, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -617,14 +617,14 @@ bool cPluginLua::OnKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInf
 
 
 
-bool cPluginLua::OnLogin(cClientHandle * a_Client, int a_ProtocolVersion, const AString & a_Username)
+bool cPluginLua::OnLogin(cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_LOGIN];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Client, a_ProtocolVersion, a_Username, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Client, a_ProtocolVersion, a_Username, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -784,7 +784,7 @@ bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_FISHING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_Reward, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_Reward, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1115,14 +1115,14 @@ bool cPluginLua::OnPluginsLoaded(void)
 
 
 
-bool cPluginLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnPostCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_POST_CRAFTING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_Grid, &a_Recipe, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1135,14 +1135,14 @@ bool cPluginLua::OnPostCrafting(const cPlayer * a_Player, const cCraftingGrid * 
 
 
 
-bool cPluginLua::OnPreCrafting(const cPlayer * a_Player, const cCraftingGrid * a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnPreCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PRE_CRAFTING];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Grid, a_Recipe, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, &a_Grid, &a_Recipe, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1316,7 +1316,7 @@ bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 
 
 bool cPluginLua::OnUpdatedSign(
-	cWorld * a_World,
+	cWorld & a_World,
 	int a_BlockX, int a_BlockY, int a_BlockZ,
 	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
 	cPlayer * a_Player
@@ -1327,7 +1327,7 @@ bool cPluginLua::OnUpdatedSign(
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_UPDATED_SIGN];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1341,7 +1341,7 @@ bool cPluginLua::OnUpdatedSign(
 
 
 bool cPluginLua::OnUpdatingSign(
-	cWorld * a_World,
+	cWorld & a_World,
 	int a_BlockX, int a_BlockY, int a_BlockZ,
 	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
 	cPlayer * a_Player
@@ -1352,7 +1352,7 @@ bool cPluginLua::OnUpdatingSign(
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_UPDATING_SIGN];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res, a_Line1, a_Line2, a_Line3, a_Line4);
+		m_LuaState.Call((int)(**itr), &a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res, a_Line1, a_Line2, a_Line3, a_Line4);
 		if (res)
 		{
 			return true;
@@ -1435,7 +1435,7 @@ bool cPluginLua::OnWorldTick(cWorld & a_World, float a_Dt, int a_LastTickDuratio
 
 
 
-bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player)
+bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
@@ -1447,7 +1447,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer * a_Player
 	
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(cmd->second, a_Split, a_Player, cLuaState::Return, res);
+	m_LuaState.Call(cmd->second, a_Split, &a_Player, cLuaState::Return, res);
 	return res;
 }
 

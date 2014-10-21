@@ -86,7 +86,7 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
-	cRankManager &     GetRankManager    (void) { return m_RankManager; }
+	cRankManager *     GetRankManager    (void) { return m_RankManager; }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -185,7 +185,7 @@ private:
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
 	cMojangAPI         m_MojangAPI;
-	cRankManager       m_RankManager;
+	cRankManager *     m_RankManager;
 	cHTTPServer        m_HTTPServer;
 
 	bool m_bStop;

@@ -33,13 +33,13 @@ public:
 	
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cChestEntity);
+	
 	/** Constructor used for normal operation */
 	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);
 	
 	virtual ~cChestEntity();
 
-	static const char * GetClassStatic(void) { return "cChestEntity"; }
-	
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
