@@ -15,7 +15,7 @@ SET (SRCS
 	Semaphore.cpp
 	Socket.cpp
 	SocketThreads.cpp
-	Timer.cpp)
+)
 
 SET (HDRS
 	CriticalSection.h
@@ -29,7 +29,7 @@ SET (HDRS
 	Semaphore.h
 	Socket.h
 	SocketThreads.h
-	Timer.h)
+)
 
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
