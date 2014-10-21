@@ -45,7 +45,7 @@ void cSignEntity::SetLines(const AString & a_Line1, const AString & a_Line2, con
 
 void cSignEntity::SetLine(int a_Index, const AString & a_Line)
 {
-	if ((a_Index < 0) || (a_Index >= (int)ARRAYCOUNT(m_Line)))
+	if ((a_Index < 0) || (a_Index >= static_cast<int>(ARRAYCOUNT(m_Line))))
 	{
 		LOGWARNING("%s: setting a non-existent line %d (value \"%s\"", __FUNCTION__, a_Index, a_Line.c_str());
 		return;
@@ -59,7 +59,7 @@ void cSignEntity::SetLine(int a_Index, const AString & a_Line)
 
 AString cSignEntity::GetLine(int a_Index) const
 {
-	if ((a_Index < 0) || (a_Index >= (int)ARRAYCOUNT(m_Line)))
+	if ((a_Index < 0) || (a_Index >= static_cast<int>(ARRAYCOUNT(m_Line))))
 	{
 		LOGWARNING("%s: requesting a non-existent line %d", __FUNCTION__, a_Index);
 		return "";
@@ -75,7 +75,3 @@ void cSignEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateSign(m_PosX, m_PosY, m_PosZ, m_Line[0], m_Line[1], m_Line[2], m_Line[3]);
 }
-
-
-
-

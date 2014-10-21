@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
+#include <algorithm>
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 
@@ -227,10 +228,7 @@ void cBeaconEntity::GiveEffects(void)
 		virtual bool Item(cPlayer * a_Player)
 		{
 			Vector3d PlayerPosition = Vector3d(a_Player->GetPosition());
-			if (PlayerPosition.y > (double)m_PosY)
-			{
-				PlayerPosition.y = (double)m_PosY;
-			}
+			PlayerPosition.y = std::min(static_cast<double>(m_PosY), PlayerPosition.y);
 
 			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
 			Vector3d BeaconPosition = Vector3d(m_PosX, m_PosY, m_PosZ);
@@ -255,7 +253,7 @@ void cBeaconEntity::GiveEffects(void)
 			, m_PrimaryEffect(a_PrimaryEffect)
 			, m_SecondaryEffect(a_SecondaryEffect)
 			, m_EffectLevel(a_EffectLevel)
-		{};
+		{}
 
 	} PlayerCallback(Radius, m_PosX, m_PosY, m_PosZ, m_PrimaryEffect, SecondaryEffect, EffectLevel);
 	GetWorld()->ForEachPlayer(PlayerCallback);
@@ -288,7 +286,7 @@ void cBeaconEntity::UsedBy(cPlayer * a_Player)
 		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
-	
+
 	if (Window != NULL)
 	{
 		// if (a_Player->GetWindow() != Window)
@@ -307,7 +305,3 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateBlockEntity(*this);
 }
-
-
-
-

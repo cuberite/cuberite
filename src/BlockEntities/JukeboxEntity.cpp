@@ -79,7 +79,7 @@ bool cJukeboxEntity::EjectRecord(void)
 	}
 
 	cItems Drops;
-	Drops.push_back(cItem(m_Record, 1, 0));
+	Drops.push_back(cItem(static_cast<short>(m_Record), 1, 0));
 	m_Record = 0;
 	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 8);
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX, m_PosY, m_PosZ, 0);
@@ -113,7 +113,3 @@ void cJukeboxEntity::SetRecord(int a_Record)
 {
 	m_Record = a_Record;
 }
-
-
-
-
