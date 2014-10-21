@@ -77,15 +77,6 @@ public:
 		NIBBLETYPE BlockMeta;
 		a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, BlockMeta);
 
-		if ((Block == E_BLOCK_TALL_GRASS) && !a_Player->IsGameModeCreative())
-		{
-			cItems Drops;
-			Drops.Add(Block, 1, BlockMeta);
-			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
-			a_Player->UseEquippedItem();
-			return;
-		}
-
 		super::OnBlockDestroyed(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ);
 		switch (Block)
 		{
