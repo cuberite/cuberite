@@ -135,7 +135,8 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 		}  // for itr - m_SendChunksLowPriority[]
 		for (sSendChunkList::iterator itr = m_SendChunksHighPriority.begin(); itr != m_SendChunksHighPriority.end();)
 		{
-			if (itr->m_Client == a_Client) {
+			if (itr->m_Client == a_Client)
+			{
 				itr = m_SendChunksHighPriority.erase(itr);
 				continue;
 			}
