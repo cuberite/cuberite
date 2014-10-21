@@ -82,6 +82,8 @@ set(BINDING_DEPENDENCIES
 	../Entities/FireworkEntity.h
 	../Entities/Floater.h
 	../Entities/GhastFireballEntity.h
+	../Entities/HangingEntity.h
+	../Entities/ItemFrame.h
 	../Entities/Pawn.h
 	../Entities/Player.h
 	../Entities/Painting.h

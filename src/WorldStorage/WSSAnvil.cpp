@@ -1660,30 +1660,41 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int Direction = a_NBT.FindChildByName(a_TagIdx, "Direction");
-	if (Direction > 0)
+	// "Facing" tag is the prime source of the Facing; if not available, translate from older "Direction" or "Dir"
+	int Facing = a_NBT.FindChildByName(a_TagIdx, "Facing");
+	if (Facing > 0)
 	{
-		Direction = (int)a_NBT.GetByte(Direction);
-		if ((Direction < 2) || (Direction > 5))
+		Facing = (int)a_NBT.GetByte(Facing);
+		if ((Facing >= 2) && (Facing <= 5))
 		{
-			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
-		}
-		else
-		{
-			a_Hanging.SetDirection(static_cast<eBlockFace>(Direction));
+			a_Hanging.SetFacing(static_cast<eBlockFace>(Facing));
 		}
 	}
 	else
 	{
-		Direction = a_NBT.FindChildByName(a_TagIdx, "Dir");
-		if (Direction > 0)
+		Facing = a_NBT.FindChildByName(a_TagIdx, "Direction");
+		if (Facing > 0)
 		{
-			switch ((int)a_NBT.GetByte(Direction))
+			switch ((int)a_NBT.GetByte(Facing))
 			{
-				case 0:   a_Hanging.SetDirection(BLOCK_FACE_NORTH);  break;
-				case 1:   a_Hanging.SetDirection(BLOCK_FACE_TOP);    break;
-				case 2:   a_Hanging.SetDirection(BLOCK_FACE_BOTTOM); break;
-				case 3:   a_Hanging.SetDirection(BLOCK_FACE_SOUTH);  break;
+				case 0: a_Hanging.SetFacing(BLOCK_FACE_ZM); break;
+				case 1: a_Hanging.SetFacing(BLOCK_FACE_XM); break;
+				case 2: a_Hanging.SetFacing(BLOCK_FACE_ZP); break;
+				case 3: a_Hanging.SetFacing(BLOCK_FACE_XP); break;
+			}
+		}
+		else
+		{
+			Facing = a_NBT.FindChildByName(a_TagIdx, "Dir");  // Has values 0 and 2 swapped
+			if (Facing > 0)
+			{
+				switch ((int)a_NBT.GetByte(Facing))
+				{
+					case 0: a_Hanging.SetFacing(BLOCK_FACE_ZP); break;
+					case 1: a_Hanging.SetFacing(BLOCK_FACE_XM); break;
+					case 2: a_Hanging.SetFacing(BLOCK_FACE_ZM); break;
+					case 3: a_Hanging.SetFacing(BLOCK_FACE_XP); break;
+				}
 			}
 		}
 	}
