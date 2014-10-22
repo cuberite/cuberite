@@ -119,9 +119,9 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 
 cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 	super(a_ChunkGenerator),
-	m_BiomeGen(nullptr),
-	m_HeightGen(nullptr),
-	m_CompositionGen(nullptr)
+	m_BiomeGen(),
+	m_HeightGen(),
+	m_CompositionGen()
 {
 }
 
