@@ -37,22 +37,38 @@ return
 
 	cExpBottleEntity =
 	{
-		Desc = "",
-		Functions = {},
+		Desc = [[
+			Represents a thrown ExpBottle. A subclass of the {{cProjectileEntity}}.
+		]],
+		Functions =
+		{
+		},
 		Inherits = "cProjectileEntity",
 	},  -- cExpBottleEntity
 
 	cFireChargeEntity =
 	{
-		Desc = "",
+		Desc = [[
+			Represents a fire charge that has been shot by a Blaze or a {{cDispenserEntity|Dispenser}}. A subclass
+			of the {{cProjectileEntity}}.
+		]],
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cFireChargeEntity
 	
 	cFireworkEntity =
 	{
-		Desc = "",
-		Functions = {},
+		Desc = [[
+			Represents a firework rocket.
+		]],
+			Functions =
+			{
+				GetItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that has been used to create the firework rocket. The item's m_FireworkItem member contains all the firework-related data." },
+				GetTicksToExplosion = { Params = "", Return = "number", Notes = "Returns the number of ticks left until the firework explodes." },
+				SetItem = { Params = "{{cItem}}", Return = "", Notes = "Sets a new item to be used for the firework." },
+				SetTicksToExplosion = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks left until the firework explodes." },
+			},
+
 		Inherits = "cProjectileEntity",
 	},  -- cFireworkEntity
 
