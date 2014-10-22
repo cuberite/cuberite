@@ -589,7 +589,7 @@ void cLuaState::Push(cEntity * a_Entity)
 			}
 			case cEntity::etProjectile:
 			{
-				tolua_pushusertype(m_LuaState, a_Entity, "cProjectileEntity");
+				tolua_pushusertype(m_LuaState, a_Entity, a_Entity->GetClass());
 				break;
 			}
 			case cEntity::etFloater:
