@@ -31,6 +31,7 @@ SET (SRCS
 	Cuboid.cpp
 	DeadlockDetect.cpp
 	Enchantments.cpp
+	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
 	Inventory.cpp
@@ -93,6 +94,7 @@ SET (HDRS
 	Defines.h
 	Enchantments.h
 	Endianness.h
+	FastRandom.h
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
