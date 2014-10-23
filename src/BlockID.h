@@ -64,13 +64,11 @@ static const BLOCKTYPE E_BLOCK_WORKBENCH = 58;
 static const BLOCKTYPE E_BLOCK_CROPS = 59;
 static const BLOCKTYPE E_BLOCK_FARMLAND = 60;
 static const BLOCKTYPE E_BLOCK_FURNACE = 61;
-static const BLOCKTYPE E_BLOCK_LIT_FURNACE = 62;
 static const BLOCKTYPE E_BLOCK_BURNING_FURNACE = 62;
 static const BLOCKTYPE E_BLOCK_SIGN_POST = 63;
 static const BLOCKTYPE E_BLOCK_WOODEN_DOOR = 64;
 static const BLOCKTYPE E_BLOCK_LADDER = 65;
 static const BLOCKTYPE E_BLOCK_RAIL = 66;
-static const BLOCKTYPE E_BLOCK_MINECART_TRACKS = 66;
 static const BLOCKTYPE E_BLOCK_COBBLESTONE_STAIRS = 67;
 static const BLOCKTYPE E_BLOCK_WALLSIGN = 68;
 static const BLOCKTYPE E_BLOCK_LEVER = 69;
@@ -209,12 +207,14 @@ static const BLOCKTYPE E_BLOCK_DARK_OAK_DOOR = 197;
 	
 // Keep these two as the last values, without a number - they will get their correct number assigned automagically by C++
 // IsValidBlock() depends on this
-//E_BLOCK_NUMBER_OF_TYPES,  ///< Number of individual (different) blocktypes
-//E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
+static const unsigned char E_BLOCK_NUMBER_OF_TYPES = 197;  ///< Number of individual (different) blocktypes
+static const unsigned char E_BLOCK_MAX_TYPE_ID = 197;  ///< Maximum BlockType number used
 	
 // Synonyms or ID compatibility
 static const BLOCKTYPE E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION;
 static const BLOCKTYPE E_BLOCK_RED_ROSE = E_BLOCK_FLOWER;
+static const BLOCKTYPE E_BLOCK_LIT_FURNACE = E_BLOCK_BURNING_FURNACE;
+static const BLOCKTYPE E_BLOCK_MINECART_TRACKS = E_BLOCK_RAIL;
 static const BLOCKTYPE E_BLOCK_LOCKED_CHEST = E_BLOCK_STAINED_GLASS;
 
 // tolua_end
