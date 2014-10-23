@@ -156,7 +156,7 @@ public:
 	
 	// tolua_end
 	
-	bool SetValueV( const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...);
+	bool SetValueV( const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...) FORMATSTRING(3,4);
 	
 	// tolua_begin
 
