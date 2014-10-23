@@ -38,11 +38,11 @@ SET (HDRS
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
 
-	if(NOT APPLE)
-		target_link_libraries(OSSupport rt)
-	endif()
-
     if(UNIX)
+		if(NOT APPLE)
+			target_link_libraries(OSSupport rt)
+		endif()
+
         target_link_libraries(OSSupport pthread)
     endif()
 endif()
