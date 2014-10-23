@@ -36,7 +36,7 @@ public:
 	
 	BLOCKENTITY_PROTODEF(cMobHeadEntity);
 	
-	/** Creates a new mob head entity at the specified block coords. a_World may be NULL */
+	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
 	cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 
 	// tolua_begin

@@ -59,7 +59,7 @@ cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 cCraftingGrid::~cCraftingGrid()
 {
 	delete[] m_Items;
-	m_Items = NULL;
+	m_Items = nullptr;
 }
 
 
@@ -291,7 +291,7 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 	// Built-in recipes:
 	std::auto_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid.GetItems(), a_CraftingGrid.GetWidth(), a_CraftingGrid.GetHeight()));
 	a_Recipe.Clear();
-	if (Recipe.get() == NULL)
+	if (Recipe.get() == nullptr)
 	{
 		// Allow plugins to intercept a no-recipe-found situation:
 		cRoot::Get()->GetPluginManager()->CallHookCraftingNoRecipe(a_Player, a_CraftingGrid, &a_Recipe);
@@ -603,9 +603,9 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 	// Search in the possibly minimized grid, but keep the stride:
 	const cItem * Grid = a_CraftingGrid + GridLeft + (a_GridWidth * GridTop);
 	cRecipe * Recipe = FindRecipeCropped(Grid, GridWidth, GridHeight, a_GridWidth);
-	if (Recipe == NULL)
+	if (Recipe == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 	
 	// A recipe has been found, move it to correspond to the original crafting grid:
@@ -637,7 +637,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_
 		for (int x = 0; x <= MaxOfsX; x++) for (int y = 0; y <= MaxOfsY; y++)
 		{
 			cRecipe * Recipe = MatchRecipe(a_CraftingGrid, a_GridWidth, a_GridHeight, a_GridStride, *itr, x, y);
-			if (Recipe != NULL)
+			if (Recipe != nullptr)
 			{
 				return Recipe;
 			}
@@ -645,7 +645,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_
 	}  // for itr - m_Recipes[]
 	
 	// No matching recipe found
-	return NULL;
+	return nullptr;
 }
 
 
@@ -681,7 +681,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		)
 		{
 			// Doesn't match
-			return NULL;
+			return nullptr;
 		}
 		HasMatched[itrS->x + a_OffsetX][itrS->y + a_OffsetY] = true;
 	}  // for itrS - Recipe->m_Ingredients[]
@@ -743,7 +743,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		}  // for x
 		if (!Found)
 		{
-			return NULL;
+			return nullptr;
 		}
 	}  // for itrS - a_Recipe->m_Ingredients[]
 	
@@ -753,7 +753,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		if (!HasMatched[x][y] && !a_CraftingGrid[x + a_GridStride * y].IsEmpty())
 		{
 			// There's an unmatched item in the grid
-			return NULL;
+			return nullptr;
 		}
 	}  // for y, for x
 	

@@ -68,7 +68,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_ViewDistance(a_ViewDistance),
 	m_IPString(a_Socket->GetIPString()),
 	m_OutgoingData(64 KiB),
-	m_Player(NULL),
+	m_Player(nullptr),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(0x7fffffff),
@@ -122,10 +122,10 @@ cClientHandle::~cClientHandle()
 		m_ChunksToSend.clear();
 	}
 
-	if (m_Player != NULL)
+	if (m_Player != nullptr)
 	{
 		cWorld * World = m_Player->GetWorld();
-		if (World != NULL)
+		if (World != nullptr)
 		{
 			if (!m_Username.empty())
 			{
@@ -137,7 +137,7 @@ cClientHandle::~cClientHandle()
 			m_Player->Destroy();
 		}
 		delete m_Player;
-		m_Player = NULL;
+		m_Player = nullptr;
 	}
 
 	if (!m_HasSentDC)
@@ -149,7 +149,7 @@ cClientHandle::~cClientHandle()
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
 	delete m_Protocol;
-	m_Protocol = NULL;
+	m_Protocol = nullptr;
 	
 	LOGD("ClientHandle at %p deleted", this);
 }
@@ -173,7 +173,7 @@ void cClientHandle::Destroy(void)
 	// DEBUG:
 	LOGD("%s: client %p, \"%s\"", __FUNCTION__, this, m_Username.c_str());
 	
-	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
+	if ((m_Player != nullptr) && (m_Player->GetWorld() != nullptr))
 	{
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
@@ -314,7 +314,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		return;
 	}
 	
-	ASSERT(m_Player == NULL);
+	ASSERT(m_Player == nullptr);
 
 	m_Username = a_Name;
 	
@@ -335,7 +335,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Player = new cPlayer(this, GetUsername());
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
-	if (World == NULL)
+	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetDefaultWorld();
 	}
@@ -412,7 +412,7 @@ void cClientHandle::StreamChunks(void)
 		return;
 	}
 
-	ASSERT(m_Player != NULL);
+	ASSERT(m_Player != nullptr);
 
 	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
 	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
@@ -427,7 +427,7 @@ void cClientHandle::StreamChunks(void)
 	LOGD("Streaming chunks centered on [%d, %d], view distance %d", ChunkPosX, ChunkPosZ, m_ViewDistance);
 	
 	cWorld * World = m_Player->GetWorld();
-	ASSERT(World != NULL);
+	ASSERT(World != nullptr);
 
 	// Remove all loaded chunks that are no longer in range; deferred to out-of-CS:
 	cChunkCoordsList RemoveChunks;
@@ -513,7 +513,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	ASSERT(World != NULL);
+	ASSERT(World != nullptr);
 
 	if (World->AddChunkClient(a_ChunkX, a_ChunkZ, this))
 	{
@@ -534,7 +534,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 void cClientHandle::RemoveFromAllChunks()
 {
 	cWorld * World = m_Player->GetWorld();
-	if (World != NULL)
+	if (World != nullptr)
 	{
 		World->RemoveClientFromChunks(this);
 	}
@@ -650,7 +650,7 @@ void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float 
 
 void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
-	if ((m_Player == NULL) || (m_State != csPlaying))
+	if ((m_Player == nullptr) || (m_State != csPlaying))
 	{
 		// The client hasn't been spawned yet and sends nonsense, we know better
 		return;
@@ -784,7 +784,7 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect)
 {
 	cWindow * Window = m_Player->GetWindow();
-	if ((Window == NULL) || (Window->GetWindowType() != cWindow::wtBeacon))
+	if ((Window == nullptr) || (Window->GetWindowType() != cWindow::wtBeacon))
 	{
 		return;
 	}
@@ -860,7 +860,7 @@ void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString
 
 void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 {
-	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
+	if ((m_Player->GetWindow() == nullptr) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
 	{
 		return;
 	}
@@ -1497,7 +1497,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 
 void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	if ((m_Player == NULL) || (m_State != csPlaying))
+	if ((m_Player == nullptr) || (m_State != csPlaying))
 	{
 		return;
 	}
@@ -1597,7 +1597,7 @@ void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAc
 	);
 	
 	cWindow * Window = m_Player->GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		LOGWARNING("Player \"%s\" clicked in a non-existent window. Ignoring", m_Username.c_str());
 		return;
@@ -1689,7 +1689,7 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 
 void cClientHandle::HandleRespawn(void)
 {
-	if (m_Player == NULL)
+	if (m_Player == nullptr)
 	{
 		Destroy();
 		return;
@@ -1779,7 +1779,7 @@ void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
 
 void cClientHandle::HandleUnmount(void)
 {
-	if (m_Player == NULL)
+	if (m_Player == nullptr)
 	{
 		return;
 	}
@@ -1884,8 +1884,8 @@ void cClientHandle::RemoveFromWorld(void)
 
 bool cClientHandle::CheckBlockInteractionsRate(void)
 {
-	ASSERT(m_Player != NULL);
-	ASSERT(m_Player->GetWorld() != NULL);
+	ASSERT(m_Player != nullptr);
+	ASSERT(m_Player->GetWorld() != nullptr);
 
 	if (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
 	{
@@ -1916,7 +1916,7 @@ void cClientHandle::Tick(float a_Dt)
 		Destroy();
 	}
 	
-	if (m_Player == NULL)
+	if (m_Player == nullptr)
 	{
 		return;
 	}
@@ -2067,10 +2067,10 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	cWorld * World = GetPlayer()->GetWorld();
-	if (World == NULL)
+	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
-		if (World == NULL)
+		if (World == nullptr)
 		{
 			World = cRoot::Get()->GetDefaultWorld();
 		}
@@ -2095,7 +2095,7 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	ASSERT(m_Player != NULL);
+	ASSERT(m_Player != nullptr);
 	
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
@@ -2926,7 +2926,7 @@ void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 	}
 
 	if (
-		(m_Player->GetWindow() == NULL) ||
+		(m_Player->GetWindow() == nullptr) ||
 		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)

@@ -47,7 +47,7 @@ public:
 	virtual void Destroy(void) override
 	{
 		// Drop the contents as pickups:
-		ASSERT(m_World != NULL);
+		ASSERT(m_World != nullptr);
 		cItems Pickups;
 		m_Contents.CopyToItems(Pickups);
 		m_Contents.Clear();
@@ -78,9 +78,9 @@ protected:
 	{
 		UNUSED(a_SlotNum);
 		ASSERT(a_Grid == &m_Contents);
-		if (m_World != NULL)
+		if (m_World != nullptr)
 		{
-			if (GetWindow() != NULL)
+			if (GetWindow() != nullptr)
 			{
 				GetWindow()->BroadcastWholeWindow();
 			}

@@ -48,7 +48,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 	}
 	
 	// If we have been assigned a trusted CA root cert store, push it into the SSL context:
-	if (m_CACerts.get() != NULL)
+	if (m_CACerts.get() != nullptr)
 	{
 		m_Ssl.SetCACerts(m_CACerts, m_ExpectedPeerName);
 	}
@@ -72,7 +72,7 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 bool cBlockingSslClientSocket::SetTrustedRootCertsFromString(const AString & a_CACerts, const AString & a_ExpectedPeerName)
 {
 	// Warn if used multiple times, but don't signal an error:
-	if (m_CACerts.get() != NULL)
+	if (m_CACerts.get() != nullptr)
 	{
 		LOGWARNING(
 			"SSL: Trying to set multiple trusted CA root cert stores, only the last one will be used. Name: %s",

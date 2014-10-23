@@ -51,7 +51,7 @@ public:
 	virtual Direction GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a_Over = true);
 	
 	/// Creates a ChunkData object for the simulator to use. The simulator returns the correct object type.
-	virtual cFluidSimulatorData * CreateChunkData(void) { return NULL; }
+	virtual cFluidSimulatorData * CreateChunkData(void) { return nullptr; }
 	
 	bool IsFluidBlock          (BLOCKTYPE a_BlockType) const { return (a_BlockType == m_FluidBlock); }
 	bool IsStationaryFluidBlock(BLOCKTYPE a_BlockType) const { return (a_BlockType == m_StationaryFluidBlock); }

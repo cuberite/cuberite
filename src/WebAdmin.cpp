@@ -224,7 +224,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 
 	// Retrieve the request data:
 	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
-	if (Data == NULL)
+	if (Data == nullptr)
 	{
 		a_Connection.SendStatusAndReason(500, "Bad UserData");
 		return;
@@ -483,7 +483,7 @@ AString cWebAdmin::GetDefaultPage(void)
 	const cPluginManager::PluginMap & List = PM->GetAllPlugins();
 	for (cPluginManager::PluginMap::const_iterator itr = List.begin(); itr != List.end(); ++itr)
 	{
-		if (itr->second == NULL)
+		if (itr->second == nullptr)
 		{
 			continue;
 		}
@@ -494,7 +494,7 @@ AString cWebAdmin::GetDefaultPage(void)
 
 	cPlayerAccum PlayerAccum;
 	cWorld * World = cRoot::Get()->GetDefaultWorld();  // TODO - Create a list of worlds and players
-	if (World != NULL)
+	if (World != nullptr)
 	{
 		World->ForEachPlayer(PlayerAccum);
 		Content.append(PlayerAccum.m_Contents);
@@ -625,7 +625,7 @@ void cWebAdmin::OnRequestBody(cHTTPConnection & a_Connection, cHTTPRequest & a_R
 {
 	UNUSED(a_Connection);
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
-	if (Data == NULL)
+	if (Data == nullptr)
 	{
 		return;
 	}
@@ -659,7 +659,7 @@ void cWebAdmin::OnRequestFinished(cHTTPConnection & a_Connection, cHTTPRequest &
 	// Delete any request data assigned to the request:
 	cRequestData * Data = (cRequestData *)(a_Request.GetUserData());
 	delete Data;
-	Data = NULL;
+	Data = nullptr;
 }
 
 

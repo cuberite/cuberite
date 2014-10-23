@@ -273,10 +273,10 @@ void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 // cBlockArea:
 
 cBlockArea::cBlockArea(void) :
-	m_BlockTypes(NULL),
-	m_BlockMetas(NULL),
-	m_BlockLight(NULL),
-	m_BlockSkyLight(NULL)
+	m_BlockTypes(nullptr),
+	m_BlockMetas(nullptr),
+	m_BlockLight(nullptr),
+	m_BlockSkyLight(nullptr)
 {
 }
 
@@ -295,10 +295,10 @@ cBlockArea::~cBlockArea()
 
 void cBlockArea::Clear(void)
 {
-	delete[] m_BlockTypes;    m_BlockTypes    = NULL;
-	delete[] m_BlockMetas;    m_BlockMetas    = NULL;
-	delete[] m_BlockLight;    m_BlockLight    = NULL;
-	delete[] m_BlockSkyLight; m_BlockSkyLight = NULL;
+	delete[] m_BlockTypes;    m_BlockTypes    = nullptr;
+	delete[] m_BlockMetas;    m_BlockMetas    = nullptr;
+	delete[] m_BlockLight;    m_BlockLight    = nullptr;
+	delete[] m_BlockSkyLight; m_BlockSkyLight = nullptr;
 	m_Origin.Set(0, 0, 0);
 	m_Size.Set(0, 0, 0);
 }
@@ -711,7 +711,7 @@ void cBlockArea::Merge(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_R
 	const NIBBLETYPE * SrcMetas = a_Src.GetBlockMetas();
 	NIBBLETYPE * DstMetas = m_BlockMetas;
 	
-	bool IsDummyMetas = ((SrcMetas == NULL) || (DstMetas == NULL));
+	bool IsDummyMetas = ((SrcMetas == nullptr) || (DstMetas == nullptr));
 	
 	if (IsDummyMetas)
 	{
@@ -1013,8 +1013,8 @@ void cBlockArea::RotateCCW(void)
 	}  // for x
 	std::swap(m_BlockTypes, NewTypes);
 	std::swap(m_BlockMetas, NewMetas);
-	delete[] NewTypes;   NewTypes = NULL;
-	delete[] NewMetas;   NewMetas = NULL;
+	delete[] NewTypes;   NewTypes = nullptr;
+	delete[] NewMetas;   NewMetas = nullptr;
 
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1058,8 +1058,8 @@ void cBlockArea::RotateCW(void)
 	}  // for x
 	std::swap(m_BlockTypes, NewTypes);
 	std::swap(m_BlockMetas, NewMetas);
-	delete[] NewTypes;   NewTypes = NULL;
-	delete[] NewMetas;   NewMetas = NULL;
+	delete[] NewTypes;   NewTypes = nullptr;
+	delete[] NewMetas;   NewMetas = nullptr;
 
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1206,7 +1206,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 			}  // for z
 		}  // for x
 		std::swap(m_BlockTypes, NewTypes);
-		delete[] NewTypes;   NewTypes = NULL;
+		delete[] NewTypes;   NewTypes = nullptr;
 	}
 	if (HasBlockMetas())
 	{
@@ -1224,7 +1224,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 			}  // for z
 		}  // for x
 		std::swap(m_BlockMetas, NewMetas);
-		delete[] NewMetas;   NewMetas = NULL;
+		delete[] NewMetas;   NewMetas = nullptr;
 	}
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1251,7 +1251,7 @@ void cBlockArea::RotateCWNoMeta(void)
 			}  // for x
 		}  // for z
 		std::swap(m_BlockTypes, NewTypes);
-		delete[] NewTypes;   NewTypes = NULL;
+		delete[] NewTypes;   NewTypes = nullptr;
 	}
 	if (HasBlockMetas())
 	{
@@ -1269,7 +1269,7 @@ void cBlockArea::RotateCWNoMeta(void)
 			}  // for x
 		}  // for z
 		std::swap(m_BlockMetas, NewMetas);
-		delete[] NewMetas;   NewMetas = NULL;
+		delete[] NewMetas;   NewMetas = nullptr;
 	}
 	std::swap(m_Size.x, m_Size.z);
 }
@@ -1391,7 +1391,7 @@ void cBlockArea::MirrorYZNoMeta(void)
 
 void cBlockArea::SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType)
 {
-	if (m_BlockTypes == NULL)
+	if (m_BlockTypes == nullptr)
 	{
 		LOGWARNING("cBlockArea: BlockTypes have not been read!");
 		return;
@@ -1468,7 +1468,7 @@ void cBlockArea::SetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBB
 
 BLOCKTYPE cBlockArea::GetRelBlockType(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if (m_BlockTypes == NULL)
+	if (m_BlockTypes == nullptr)
 	{
 		LOGWARNING("cBlockArea: BlockTypes have not been read!");
 		return E_BLOCK_AIR;
@@ -1555,7 +1555,7 @@ void cBlockArea::SetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOC
 void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	int idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	if (m_BlockTypes == NULL)
+	if (m_BlockTypes == nullptr)
 	{
 		LOGWARNING("%s: BlockTypes not available but requested to be written to.", __FUNCTION__);
 	}
@@ -1563,7 +1563,7 @@ void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   B
 	{
 		m_BlockTypes[idx] = a_BlockType;
 	}
-	if (m_BlockMetas == NULL)
+	if (m_BlockMetas == nullptr)
 	{
 		LOGWARNING("%s: BlockMetas not available but requested to be written to.", __FUNCTION__);
 	}
@@ -1589,7 +1589,7 @@ void cBlockArea::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOC
 void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
 	int idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
-	if (m_BlockTypes == NULL)
+	if (m_BlockTypes == nullptr)
 	{
 		LOGWARNING("cBlockArea: BlockTypes have not been read!");
 		a_BlockType = E_BLOCK_AIR;
@@ -1599,7 +1599,7 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 		a_BlockType = m_BlockTypes[idx];
 	}
 	
-	if (m_BlockMetas == NULL)
+	if (m_BlockMetas == nullptr)
 	{
 		LOGWARNING("cBlockArea: BlockMetas have not been read!");
 		a_BlockMeta = 0;
@@ -1617,19 +1617,19 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 int cBlockArea::GetDataTypes(void) const
 {
 	int res = 0;
-	if (m_BlockTypes != NULL)
+	if (m_BlockTypes != nullptr)
 	{
 		res |= baTypes;
 	}
-	if (m_BlockMetas != NULL)
+	if (m_BlockMetas != nullptr)
 	{
 		res |= baMetas;
 	}
-	if (m_BlockLight != NULL)
+	if (m_BlockLight != nullptr)
 	{
 		res |= baLight;
 	}
-	if (m_BlockSkyLight != NULL)
+	if (m_BlockSkyLight != nullptr)
 	{
 		res |= baSkyLight;
 	}
@@ -1642,12 +1642,12 @@ int cBlockArea::GetDataTypes(void) const
 
 bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 {
-	ASSERT(m_BlockTypes == NULL);  // Has been cleared
+	ASSERT(m_BlockTypes == nullptr);  // Has been cleared
 	
 	if (a_DataTypes & baTypes)
 	{
 		m_BlockTypes = new BLOCKTYPE[a_SizeX * a_SizeY * a_SizeZ];
-		if (m_BlockTypes == NULL)
+		if (m_BlockTypes == nullptr)
 		{
 			return false;
 		}
@@ -1655,36 +1655,36 @@ bool cBlockArea::SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	if (a_DataTypes & baMetas)
 	{
 		m_BlockMetas = new NIBBLETYPE[a_SizeX * a_SizeY * a_SizeZ];
-		if (m_BlockMetas == NULL)
+		if (m_BlockMetas == nullptr)
 		{
 			delete[] m_BlockTypes;
-			m_BlockTypes = NULL;
+			m_BlockTypes = nullptr;
 			return false;
 		}
 	}
 	if (a_DataTypes & baLight)
 	{
 		m_BlockLight = new NIBBLETYPE[a_SizeX * a_SizeY * a_SizeZ];
-		if (m_BlockLight == NULL)
+		if (m_BlockLight == nullptr)
 		{
 			delete[] m_BlockMetas;
-			m_BlockMetas = NULL;
+			m_BlockMetas = nullptr;
 			delete[] m_BlockTypes;
-			m_BlockTypes = NULL;
+			m_BlockTypes = nullptr;
 			return false;
 		}
 	}
 	if (a_DataTypes & baSkyLight)
 	{
 		m_BlockSkyLight = new NIBBLETYPE[a_SizeX * a_SizeY * a_SizeZ];
-		if (m_BlockSkyLight == NULL)
+		if (m_BlockSkyLight == nullptr)
 		{
 			delete[] m_BlockLight;
-			m_BlockLight = NULL;
+			m_BlockLight = nullptr;
 			delete[] m_BlockMetas;
-			m_BlockMetas = NULL;
+			m_BlockMetas = nullptr;
 			delete[] m_BlockTypes;
-			m_BlockTypes = NULL;
+			m_BlockTypes = nullptr;
 			return false;
 		}
 	}
@@ -1714,7 +1714,7 @@ int cBlockArea::MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 
 void cBlockArea::SetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array)
 {
-	if (a_Array == NULL)
+	if (a_Array == nullptr)
 	{
 		LOGWARNING("cBlockArea: datatype has not been read!");
 		return;
@@ -1737,7 +1737,7 @@ void cBlockArea::SetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE 
 
 NIBBLETYPE cBlockArea::GetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE * a_Array) const
 {
-	if (a_Array == NULL)
+	if (a_Array == nullptr)
 	{
 		LOGWARNING("cBlockArea: datatype has not been read!");
 		return 16;
@@ -1896,7 +1896,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 	}
 	
 	// Copy the blocktypes:
-	if (m_Area.m_BlockTypes != NULL)
+	if (m_Area.m_BlockTypes != nullptr)
 	{
 		for (int y = 0; y < SizeY; y++)
 		{
@@ -1917,7 +1917,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 	}
 
 	// Copy the block metas:
-	if (m_Area.m_BlockMetas != NULL)
+	if (m_Area.m_BlockMetas != nullptr)
 	{
 		for (int y = 0; y < SizeY; y++)
 		{
@@ -1938,7 +1938,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 	}
 
 	// Copy the blocklight:
-	if (m_Area.m_BlockLight != NULL)
+	if (m_Area.m_BlockLight != nullptr)
 	{
 		for (int y = 0; y < SizeY; y++)
 		{
@@ -1959,7 +1959,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 	}
 
 	// Copy the skylight:
-	if (m_Area.m_BlockSkyLight != NULL)
+	if (m_Area.m_BlockSkyLight != nullptr)
 	{
 		for (int y = 0; y < SizeY; y++)
 		{

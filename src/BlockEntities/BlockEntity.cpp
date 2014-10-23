@@ -48,7 +48,7 @@ cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE
 		__FUNCTION__, a_BlockType, ItemTypeToString(a_BlockType).c_str()
 	);
 	ASSERT(!"Requesting creation of an unknown block entity");
-	return NULL;
+	return nullptr;
 }
 
 

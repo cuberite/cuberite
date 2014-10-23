@@ -88,12 +88,12 @@ public:
 
 	/** Copies the blocklight data from the specified flat array into the internal representation.
 	Allocates sectios that are needed for the operation.
-	Allows a_Src to be NULL, in which case it doesn't do anything. */
+	Allows a_Src to be nullptr, in which case it doesn't do anything. */
 	void SetBlockLight(const NIBBLETYPE * a_Src);
 
 	/** Copies the skylight data from the specified flat array into the internal representation.
 	Allocates sectios that are needed for the operation.
-	Allows a_Src to be NULL, in which case it doesn't do anything. */
+	Allows a_Src to be nullptr, in which case it doesn't do anything. */
 	void SetSkyLight(const NIBBLETYPE * a_Src);
 
 	struct sChunkSection
@@ -118,7 +118,7 @@ private:
 	sChunkSection * Allocate(void);
 
 	/** Frees the specified section, previously allocated using Allocate().
-	Note that a_Section may be NULL. */
+	Note that a_Section may be nullptr. */
 	void Free(sChunkSection * a_Section);
 	
 	/** Sets the data in the specified section to their default values. */

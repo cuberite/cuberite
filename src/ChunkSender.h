@@ -158,7 +158,7 @@ protected:
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
 
-	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == NULL
+	/// Sends the specified chunk to a_Client, or to all chunk clients if a_Client == nullptr
 	void SendChunk(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
 } ;
 

@@ -1487,7 +1487,7 @@ void cPluginLua::ClearCommands(void)
 	cCSLock Lock(m_CriticalSection);
 
 	// Unreference the bound functions so that Lua can GC them
-	if (m_LuaState != NULL)
+	if (m_LuaState != nullptr)
 	{
 		for (CommandMap::iterator itr = m_Commands.begin(), end = m_Commands.end(); itr != end; ++itr)
 		{
@@ -1506,7 +1506,7 @@ void cPluginLua::ClearConsoleCommands(void)
 	cCSLock Lock(m_CriticalSection);
 
 	// Unreference the bound functions so that Lua can GC them
-	if (m_LuaState != NULL)
+	if (m_LuaState != nullptr)
 	{
 		for (CommandMap::iterator itr = m_ConsoleCommands.begin(), end = m_ConsoleCommands.end(); itr != end; ++itr)
 		{
@@ -1523,7 +1523,7 @@ void cPluginLua::ClearConsoleCommands(void)
 bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 {
 	const char * FnName = GetHookFnName(a_HookType);
-	if (FnName == NULL)
+	if (FnName == nullptr)
 	{
 		// Unknown hook ID
 		LOGWARNING("Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.",
@@ -1614,7 +1614,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 	}  // switch (a_Hook)
 	LOGWARNING("Requested name of an unknown hook type function: %d (max is %d)", a_HookType, cPluginManager::HOOK_MAX);
 	ASSERT(!"Unknown hook requested!");
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1627,12 +1627,12 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 	
 	// Check if the function reference is valid:
 	cLuaState::cRef * Ref = new cLuaState::cRef(m_LuaState, a_FnRefIdx);
-	if ((Ref == NULL) || !Ref->IsValid())
+	if ((Ref == nullptr) || !Ref->IsValid())
 	{
 		LOGWARNING("Plugin %s tried to add a hook %d with bad handler function.", GetName().c_str(), a_HookType);
 		m_LuaState.LogStackTrace();
 		delete Ref;
-		Ref = NULL;
+		Ref = nullptr;
 		return false;
 	}
 	
@@ -1700,7 +1700,7 @@ AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request)
 		}
 	}
 
-	if (Tab != NULL)
+	if (Tab != nullptr)
 	{
 		AString Contents = Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
 		if (!m_LuaState.Call(Tab->UserData, a_Request, cLuaState::Return, Contents))

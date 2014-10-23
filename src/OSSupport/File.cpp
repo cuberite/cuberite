@@ -17,7 +17,7 @@
 
 cFile::cFile(void) :
 	#ifdef USE_STDIO_FILE
-	m_File(NULL)
+	m_File(nullptr)
 	#else
 	m_File(INVALID_HANDLE_VALUE)
 	#endif  // USE_STDIO_FILE
@@ -31,7 +31,7 @@ cFile::cFile(void) :
 
 cFile::cFile(const AString & iFileName, eMode iMode) :
 	#ifdef USE_STDIO_FILE
-	m_File(NULL)
+	m_File(nullptr)
 	#else
 	m_File(INVALID_HANDLE_VALUE)
 	#endif  // USE_STDIO_FILE
@@ -64,7 +64,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		Close();
 	}
 	
-	const char * Mode = NULL;
+	const char * Mode = nullptr;
 	switch (iMode)
 	{
 		case fmRead:      Mode = "rb";  break;
@@ -72,7 +72,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 		case fmReadWrite: Mode = "rb+"; break;
 		case fmAppend:    Mode = "a+";  break;
 	}
-	if (Mode == NULL)
+	if (Mode == nullptr)
 	{
 		ASSERT(!"Unhandled file mode");
 		return false;
@@ -84,7 +84,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 	m_File = fopen((FILE_IO_PREFIX + iFileName).c_str(), Mode);
 #endif  // _WIN32
 
-	if ((m_File == NULL) && (iMode == fmReadWrite))
+	if ((m_File == nullptr) && (iMode == fmReadWrite))
 	{
 		// Fix for MS not following C spec, opening "a" mode files for writing at the end only
 		// The file open operation has been tried with "read update", fails if file not found
@@ -98,7 +98,7 @@ bool cFile::Open(const AString & iFileName, eMode iMode)
 #endif  // _WIN32
 
 	}
-	return (m_File != NULL);
+	return (m_File != nullptr);
 }
 
 
@@ -114,7 +114,7 @@ void cFile::Close(void)
 	}
 
 	fclose(m_File);
-	m_File = NULL;
+	m_File = nullptr;
 }
 
 
@@ -123,7 +123,7 @@ void cFile::Close(void)
 
 bool cFile::IsOpen(void) const
 {
-	return (m_File != NULL);
+	return (m_File != nullptr);
 }
 
 
@@ -366,7 +366,7 @@ int cFile::GetSize(const AString & a_FileName)
 bool cFile::CreateFolder(const AString & a_FolderPath)
 {
 	#ifdef _WIN32
-		return (CreateDirectoryA(a_FolderPath.c_str(), NULL) != 0);
+		return (CreateDirectoryA(a_FolderPath.c_str(), nullptr) != 0);
 	#else
 		return (mkdir(a_FolderPath.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0);
 	#endif
@@ -415,13 +415,13 @@ AStringVector cFile::GetFolderContents(const AString & a_Folder)
 	{
 		Folder = ".";
 	}
-	if ((dp = opendir(Folder.c_str())) == NULL)
+	if ((dp = opendir(Folder.c_str())) == nullptr)
 	{
 		LOGERROR("Error (%i) opening directory \"%s\"\n", errno, Folder.c_str());
 	}
 	else
 	{
-		while ((dirp = readdir(dp)) != NULL)
+		while ((dirp = readdir(dp)) != nullptr)
 		{
 			AllFiles.push_back(dirp->d_name);
 		}

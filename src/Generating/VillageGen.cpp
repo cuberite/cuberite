@@ -385,7 +385,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 
 	// Check if all the biomes are village-friendly:
 	// If just one is not, no village is created, because it's likely that an unfriendly biome is too close
-	cVillagePiecePool * VillagePrefabs = NULL;
+	cVillagePiecePool * VillagePrefabs = nullptr;
 	BLOCKTYPE RoadBlock = E_BLOCK_GRAVEL;
 	BLOCKTYPE WaterRoadBlock = E_BLOCK_PLANKS;
 	int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 11;
@@ -432,7 +432,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	}
 	
 	// Create a village based on the chosen prefabs:
-	if (VillagePrefabs == NULL)
+	if (VillagePrefabs == nullptr)
 	{
 		return cStructurePtr();
 	}

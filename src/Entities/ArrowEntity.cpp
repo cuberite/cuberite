@@ -217,7 +217,7 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		int RelPosZ = m_HitBlockPos.z - a_Chunk.GetPosZ() * cChunkDef::Width;
 		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
 		
-		if (Chunk == NULL)
+		if (Chunk == nullptr)
 		{
 			// Inside an unloaded chunk, abort
 			return;

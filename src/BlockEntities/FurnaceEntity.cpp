@@ -26,7 +26,7 @@ enum
 cFurnaceEntity::cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World) :
 	super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_BlockMeta(a_BlockMeta),
-	m_CurrentRecipe(NULL),
+	m_CurrentRecipe(nullptr),
 	m_IsDestroyed(false),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
 	m_NeedCookTime(0),
@@ -45,7 +45,7 @@ cFurnaceEntity::~cFurnaceEntity()
 {
 	// Tell window its owner is destroyed
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
 	}
@@ -145,7 +145,7 @@ void cFurnaceEntity::SendTo(cClientHandle & a_Client)
 void cFurnaceEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->SetProperty(a_ProgressbarID, a_Value);
 	}
@@ -306,7 +306,7 @@ void cFurnaceEntity::UpdateOutput(void)
 
 bool cFurnaceEntity::CanCookInputToOutput(void) const
 {
-	if (m_CurrentRecipe == NULL)
+	if (m_CurrentRecipe == nullptr)
 	{
 		// This input cannot be cooked
 		return false;

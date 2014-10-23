@@ -86,14 +86,14 @@ void cHopperEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenNewWindow();
 		Window = GetWindow();
 	}
 
 	// Open the window for the player:
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{
@@ -197,7 +197,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 		virtual bool Item(cEntity * a_Entity) override
 		{
-			ASSERT(a_Entity != NULL);
+			ASSERT(a_Entity != nullptr);
 
 			if (!a_Entity->IsPickup() || a_Entity->IsDestroyed())
 			{
@@ -299,7 +299,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 	int OutRelX = OutX - a_Chunk.GetPosX() * cChunkDef::Width;
 	int OutRelZ = OutZ - a_Chunk.GetPosZ() * cChunkDef::Width;
 	cChunk * DestChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(OutRelX, OutRelZ);
-	if (DestChunk == NULL)
+	if (DestChunk == nullptr)
 	{
 		// The destination chunk has been unloaded, don't tick
 		return false;
@@ -328,7 +328,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 		case E_BLOCK_HOPPER:
 		{
 			cBlockEntityWithItems * BlockEntity = static_cast<cBlockEntityWithItems *>(DestChunk->GetBlockEntity(OutX, OutY, OutZ));
-			if (BlockEntity == NULL)
+			if (BlockEntity == nullptr)
 			{
 				LOGWARNING("%s: A block entity was not found where expected at {%d, %d, %d}", __FUNCTION__, OutX, OutY, OutZ);
 				return false;
@@ -355,7 +355,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
 	cChestEntity * MainChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
-	if (MainChest == NULL)
+	if (MainChest == nullptr)
 	{
 		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
 		return false;
@@ -383,7 +383,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		int x = m_RelX + Coords[i].x;
 		int z = m_RelZ + Coords[i].z;
 		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
-		if (Neighbor == NULL)
+		if (Neighbor == nullptr)
 		{
 			continue;
 		}
@@ -396,7 +396,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 		}
 
 		cChestEntity * SideChest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z));
-		if (SideChest == NULL)
+		if (SideChest == nullptr)
 		{
 			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX + Coords[i].x, m_PosY + 1, m_PosZ + Coords[i].z);
 		}
@@ -422,7 +422,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 {
 	cFurnaceEntity * Furnace = static_cast<cFurnaceEntity *>(a_Chunk.GetBlockEntity(m_PosX, m_PosY + 1, m_PosZ));
-	if (Furnace == NULL)
+	if (Furnace == nullptr)
 	{
 		LOGWARNING("%s: A furnace entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, m_PosX, m_PosY + 1, m_PosZ);
 		return false;
@@ -536,7 +536,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 {
 	// Try the chest directly connected to the hopper:
 	cChestEntity * ConnectedChest = static_cast<cChestEntity *>(a_Chunk.GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ));
-	if (ConnectedChest == NULL)
+	if (ConnectedChest == nullptr)
 	{
 		LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d}", __FUNCTION__, a_BlockX, a_BlockY, a_BlockZ);
 		return false;
@@ -566,7 +566,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		int x = RelX + Coords[i].x;
 		int z = RelZ + Coords[i].z;
 		cChunk * Neighbor = a_Chunk.GetRelNeighborChunkAdjustCoords(x, z);
-		if (Neighbor == NULL)
+		if (Neighbor == nullptr)
 		{
 			continue;
 		}
@@ -579,7 +579,7 @@ bool cHopperEntity::MoveItemsToChest(cChunk & a_Chunk, int a_BlockX, int a_Block
 		}
 
 		cChestEntity * Chest = static_cast<cChestEntity *>(Neighbor->GetBlockEntity(a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z));
-		if (Chest == NULL)
+		if (Chest == nullptr)
 		{
 			LOGWARNING("%s: A chest entity was not found where expected, at {%d, %d, %d} (%d, %d)", __FUNCTION__, a_BlockX + Coords[i].x, a_BlockY, a_BlockZ + Coords[i].z, x, z);
 			continue;

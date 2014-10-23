@@ -39,8 +39,8 @@ protected:
 
 cWorldStorage::cWorldStorage(void) :
 	super("cWorldStorage"),
-	m_World(NULL),
-	m_SaveSchema(NULL)
+	m_World(nullptr),
+	m_SaveSchema(nullptr)
 {
 }
 

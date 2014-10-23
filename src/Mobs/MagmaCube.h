@@ -17,7 +17,7 @@ public:
 
 	CLASS_PROTODEF(cMagmaCube)
 
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	int GetSize(void) const { return m_Size; }
 	
 protected:

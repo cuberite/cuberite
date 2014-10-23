@@ -157,13 +157,13 @@ protected:
 	/// Moves the recipe to top-left corner, sets its MinWidth / MinHeight
 	void NormalizeIngredients(cRecipe * a_Recipe);
 	
-	/// Finds a recipe matching the crafting grid. Returns a newly allocated recipe (with all its coords set) or NULL if not found. Caller must delete return value!
+	/// Finds a recipe matching the crafting grid. Returns a newly allocated recipe (with all its coords set) or nullptr if not found. Caller must delete return value!
 	cRecipe * FindRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight);
 	
 	/// Same as FindRecipe, but the grid is guaranteed to be of minimal dimensions needed
 	cRecipe * FindRecipeCropped(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride);
 	
-	/// Checks if the grid matches the specified recipe, offset by the specified offsets. Returns a matched cRecipe * if so, or NULL if not matching. Caller must delete the return value!
+	/// Checks if the grid matches the specified recipe, offset by the specified offsets. Returns a matched cRecipe * if so, or nullptr if not matching. Caller must delete the return value!
 	cRecipe * MatchRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride, const cRecipe * a_Recipe, int a_OffsetX, int a_OffsetY);
 
 	/** Searches for anything firework related, and does the data setting if appropriate */

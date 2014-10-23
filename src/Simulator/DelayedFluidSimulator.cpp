@@ -55,7 +55,7 @@ cDelayedFluidSimulatorChunkData::cDelayedFluidSimulatorChunkData(int a_TickDelay
 cDelayedFluidSimulatorChunkData::~cDelayedFluidSimulatorChunkData()
 {
 	delete[] m_Slots;
-	m_Slots = NULL;
+	m_Slots = nullptr;
 }
 
 
@@ -86,7 +86,7 @@ void cDelayedFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, 
 		return;
 	}
 	
-	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}

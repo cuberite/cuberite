@@ -164,7 +164,7 @@ public:
 	void Detach(void);
 	
 	/** Returns true if the m_LuaState is valid */
-	bool IsValid(void) const { return (m_LuaState != NULL); }
+	bool IsValid(void) const { return (m_LuaState != nullptr); }
 	
 	/** Adds the specified path to package.<a_PathVariable> */
 	void AddPackagePath(const AString & a_PathVariable, const AString & a_Path);
@@ -318,10 +318,10 @@ public:
 	void ToString(int a_StackPos, AString & a_String);
 
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	void LogStack(const char * a_Header = NULL);
+	void LogStack(const char * a_Header = nullptr);
 	
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
-	static void LogStack(lua_State * a_LuaState, const char * a_Header = NULL);
+	static void LogStack(lua_State * a_LuaState, const char * a_Header = nullptr);
 	
 protected:
 

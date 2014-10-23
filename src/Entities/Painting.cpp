@@ -43,7 +43,7 @@ void cPainting::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
-	if ((a_Killer != NULL) && a_Killer->IsPlayer() && !((cPlayer *)a_Killer)->IsGameModeCreative())
+	if ((a_Killer != nullptr) && a_Killer->IsPlayer() && !((cPlayer *)a_Killer)->IsGameModeCreative())
 	{
 		a_Items.push_back(cItem(E_ITEM_PAINTING));
 	}

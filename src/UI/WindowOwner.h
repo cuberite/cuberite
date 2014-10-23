@@ -22,7 +22,7 @@ class cWindowOwner
 {
 public:
 	cWindowOwner() :
-		m_Window(NULL)
+		m_Window(nullptr)
 	{
 	}
 
@@ -32,7 +32,7 @@ public:
 
 	void CloseWindow(void)
 	{
-		m_Window = NULL;
+		m_Window = nullptr;
 	}
 
 	void OpenWindow(cWindow * a_Window)

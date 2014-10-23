@@ -15,7 +15,7 @@
 cMapManager::cMapManager(cWorld * a_World)
 	: m_World(a_World)
 {
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 }
 
 
@@ -27,7 +27,7 @@ bool cMapManager::DoWithMap(int a_ID, cMapCallback & a_Callback)
 	cCSLock Lock(m_CS);
 	cMap * Map = GetMapData(a_ID);
 
-	if (Map == NULL)
+	if (Map == nullptr)
 	{
 		return false;
 	}
@@ -68,7 +68,7 @@ cMap * cMapManager::GetMapData(unsigned int a_ID)
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -83,7 +83,7 @@ cMap * cMapManager::CreateMap(int a_CenterX, int a_CenterY, int a_Scale)
 	if (m_MapData.size() >= 65536)
 	{
 		LOGWARN("Could not craft map - Too many maps in use");
-		return NULL;
+		return nullptr;
 	}
 
 	cMap Map((unsigned)m_MapData.size(), a_CenterX, a_CenterY, m_World, a_Scale);

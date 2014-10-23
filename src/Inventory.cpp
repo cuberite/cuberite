@@ -220,7 +220,7 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
-	if (Grid == NULL)
+	if (Grid == nullptr)
 	{
 		LOGWARNING("%s(%d): requesting an invalid itemgrid. Ignoring.", __FUNCTION__, a_SlotNum);
 		return;
@@ -278,7 +278,7 @@ const cItem & cInventory::GetSlot(int a_SlotNum) const
 	}
 	int GridSlotNum = 0;
 	const cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
-	if (Grid == NULL)
+	if (Grid == nullptr)
 	{
 		// Something went wrong, but we don't know what. We must return a value, so return the first inventory slot
 		LOGWARNING("%s(%d): requesting an invalid ItemGrid, returning the first inventory slot instead.", __FUNCTION__, a_SlotNum);
@@ -372,7 +372,7 @@ int cInventory::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
 {
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
-	if (Grid == NULL)
+	if (Grid == nullptr)
 	{
 		LOGWARNING("%s: invalid slot number, expected 0 .. %d, got %d; ignoring", __FUNCTION__, invNumSlots, a_SlotNum);
 		return -1;
@@ -398,7 +398,7 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 	
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
-	if (Grid == NULL)
+	if (Grid == nullptr)
 	{
 		LOGWARNING("%s(%d, %d): requesting an invalid grid, ignoring.", __FUNCTION__, a_SlotNum, a_Amount);
 		return false;
@@ -640,7 +640,7 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 		
 		int GridSlotNum = 0;
 		cItemGrid * Grid = GetGridForSlotNum(SlotIdx - 5, GridSlotNum);
-		ASSERT(Grid != NULL);
+		ASSERT(Grid != nullptr);
 		Grid->SetSlot(GridSlotNum, Item);
 	}  // for itr - a_Value[]
 	return true;
@@ -708,7 +708,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	
 	// Armor update needs broadcast to other players:
 	cWorld * World = m_Owner.GetWorld();
-	if ((a_ItemGrid == &m_ArmorSlots) && (World != NULL))
+	if ((a_ItemGrid == &m_ArmorSlots) && (World != nullptr))
 	{
 		World->BroadcastEntityEquipment(
 			m_Owner, ArmorSlotNumToEntityEquipmentID(a_SlotNum),

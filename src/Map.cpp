@@ -21,7 +21,7 @@ cMapDecorator::cMapDecorator(cMap * a_Map, eType a_Type, int a_X, int a_Z, int a
 	, m_PixelX(a_X)
 	, m_PixelZ(a_Z)
 	, m_Rot(a_Rot)
-	, m_Player(NULL)
+	, m_Player(nullptr)
 {
 }
 
@@ -43,9 +43,9 @@ cMapDecorator::cMapDecorator(cMap * a_Map, cPlayer * a_Player)
 
 void cMapDecorator::Update(void)
 {
-	if (m_Player != NULL)
+	if (m_Player != nullptr)
 	{
-		ASSERT(m_Map != NULL);
+		ASSERT(m_Map != nullptr);
 		unsigned int PixelWidth = m_Map->GetPixelWidth();
 
 		int InsideWidth  = (m_Map->GetWidth()  / 2) - 1;
@@ -221,7 +221,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 
 		virtual bool Item(cChunk * a_Chunk) override
 		{
-			if (a_Chunk == NULL)
+			if (a_Chunk == nullptr)
 			{
 				return false;
 			}
@@ -322,7 +322,7 @@ bool cMap::UpdatePixel(unsigned int a_X, unsigned int a_Z)
 		}
 	} CalculatePixelCb(this, RelX, RelZ);
 
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 	m_World->DoWithChunk(ChunkX, ChunkZ, CalculatePixelCb);
 
 	SetPixel(a_X, a_Z, CalculatePixelCb.GetPixelData());
@@ -349,7 +349,7 @@ void cMap::UpdateDecorators(void)
 void cMap::AddPlayer(cPlayer * a_Player, Int64 a_WorldAge)
 {
 	cClientHandle * Handle = a_Player->GetClientHandle();
-	if (Handle == NULL)
+	if (Handle == nullptr)
 	{
 		return;
 	}
@@ -454,10 +454,10 @@ void cMap::StreamNext(cMapClient & a_Client)
 
 void cMap::UpdateClient(cPlayer * a_Player)
 {
-	ASSERT(a_Player != NULL);
+	ASSERT(a_Player != nullptr);
 	cClientHandle * Handle = a_Player->GetClientHandle();
 
-	if (Handle == NULL)
+	if (Handle == nullptr)
 	{
 		return;
 	}
@@ -498,7 +498,7 @@ void cMap::EraseData(void)
 
 eDimension cMap::GetDimension(void) const
 {
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 	return m_World->GetDimension();
 }
 

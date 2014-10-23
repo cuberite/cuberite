@@ -66,7 +66,7 @@ void cPluginManager::FindPlugins(void)
 	// First get a clean list of only the currently running plugins, we don't want to mess those up
 	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
 	{
-		if (itr->second == NULL)
+		if (itr->second == nullptr)
 		{
 			PluginMap::iterator thiz = itr;
 			++thiz;
@@ -89,7 +89,7 @@ void cPluginManager::FindPlugins(void)
 		// Add plugin name/directory to the list
 		if (m_Plugins.find(*itr) == m_Plugins.end())
 		{
-			m_Plugins[*itr] = NULL;
+			m_Plugins[*itr] = nullptr;
 		}
 	}
 }
@@ -151,7 +151,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	// Remove invalid plugins from the PluginMap.
 	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
 	{
-		if (itr->second == NULL)
+		if (itr->second == nullptr)
 		{
 			PluginMap::iterator thiz = itr;
 			++thiz;
@@ -1445,7 +1445,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 		return crNoPermission;
 	}
 
-	ASSERT(cmd->second.m_Plugin != NULL);
+	ASSERT(cmd->second.m_Plugin != nullptr);
 
 	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player))
 	{
@@ -1463,7 +1463,7 @@ cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin) const
 {
 	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
-		if (itr->second == NULL) continue;
+		if (itr->second == nullptr) continue;
 		if (itr->second->GetName().compare(a_Plugin) == 0)
 		{
 			return itr->second;
@@ -1513,7 +1513,7 @@ bool cPluginManager::DisablePlugin(const AString & a_PluginName)
 	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
 	{
 		m_DisablePluginList.push_back(itr->second);
-		itr->second = NULL;  // Get rid of this thing right away
+		itr->second = nullptr;  // Get rid of this thing right away
 		return true;
 	}
 	return false;
@@ -1558,12 +1558,12 @@ void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 	RemovePluginCommands(a_Plugin);
 	RemovePluginConsoleCommands(a_Plugin);
 	RemoveHooks(a_Plugin);
-	if (a_Plugin != NULL)
+	if (a_Plugin != nullptr)
 	{
 		a_Plugin->OnDisable();
 	}
 	delete a_Plugin;
-	a_Plugin = NULL;
+	a_Plugin = nullptr;
 }
 
 
@@ -1572,7 +1572,7 @@ void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
 
 void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 {
-	if (a_Plugin != NULL)
+	if (a_Plugin != nullptr)
 	{
 		a_Plugin->ClearCommands();
 	}
@@ -1670,7 +1670,7 @@ cPluginManager::CommandResult cPluginManager::ForceExecuteCommand(cPlayer & a_Pl
 
 void cPluginManager::RemovePluginConsoleCommands(cPlugin * a_Plugin)
 {
-	if (a_Plugin != NULL)
+	if (a_Plugin != nullptr)
 	{
 		a_Plugin->ClearConsoleCommands();
 	}
@@ -1699,7 +1699,7 @@ bool cPluginManager::BindConsoleCommand(const AString & a_Command, cPlugin * a_P
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Command);
 	if (cmd != m_ConsoleCommands.end())
 	{
-		if (cmd->second.m_Plugin == NULL)
+		if (cmd->second.m_Plugin == nullptr)
 		{
 			LOGWARNING("Console command \"%s\" is already bound internally by MCServer, cannot bind in plugin \"%s\".", a_Command.c_str(), a_Plugin->GetName().c_str());
 		}
@@ -1759,14 +1759,14 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 		return false;
 	}
 
-	if (cmd->second.m_Plugin == NULL)
+	if (cmd->second.m_Plugin == nullptr)
 	{
 		// This is a built-in command
 		return false;
 	}
 
 	// Ask plugins first if a command is okay to execute the console command:
-	if (CallHookExecuteCommand(NULL, a_Split))
+	if (CallHookExecuteCommand(nullptr, a_Split))
 	{
 		a_Output.Out("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
 		return false;
@@ -1788,7 +1788,7 @@ void cPluginManager::TabCompleteCommand(const AString & a_Text, AStringVector & 
 			// Command name doesn't match
 			continue;
 		}
-		if ((a_Player != NULL) && !a_Player->HasPermission(itr->second.m_Permission))
+		if ((a_Player != nullptr) && !a_Player->HasPermission(itr->second.m_Permission))
 		{
 			// Player doesn't have permission for the command
 			continue;
@@ -1814,7 +1814,7 @@ bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback 
 {
 	// TODO: Implement locking for plugins
 	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
-	if ((itr == m_Plugins.end()) || (itr->second == NULL))
+	if ((itr == m_Plugins.end()) || (itr->second == nullptr))
 	{
 		return false;
 	}
@@ -1848,7 +1848,7 @@ void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 {
 	if (!a_Plugin)
 	{
-		LOGWARN("Called cPluginManager::AddHook() with a_Plugin == NULL");
+		LOGWARN("Called cPluginManager::AddHook() with a_Plugin == nullptr");
 		return;
 	}
 	PluginList & Plugins = m_Hooks[a_Hook];

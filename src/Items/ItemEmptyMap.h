@@ -50,7 +50,7 @@ public:
 			return true;
 		}
 
-		if (NewMap == NULL)
+		if (NewMap == nullptr)
 		{
 			return true;
 		}

@@ -61,7 +61,7 @@ bool cSocketThreads::AddClient(const cSocket & a_Socket, cCallback * a_Client)
 		// There was an error launching the thread (but it was already logged along with the reason)
 		LOGERROR("A new cSocketThread failed to start");
 		delete Thread;
-		Thread = NULL;
+		Thread = nullptr;
 		return false;
 	}
 	Thread->AddClient(a_Socket, a_Client);
@@ -233,7 +233,7 @@ bool cSocketThreads::cSocketThread::RemoveClient(const cCallback * a_Client)
 				// More data to send, shut down reading and wait for the rest to get sent:
 				m_Slots[i].m_State = sSlot::ssWritingRestOut;
 			}
-			m_Slots[i].m_Client = NULL;
+			m_Slots[i].m_Client = nullptr;
 		}
 		
 		// Notify the thread of the change:
@@ -407,7 +407,7 @@ void cSocketThreads::cSocketThread::Execute(void)
 		timeval Timeout;
 		Timeout.tv_sec = 5;
 		Timeout.tv_usec = 0;
-		if (select((int)Highest + 1, &fdRead, &fdWrite, NULL, &Timeout) == -1)
+		if (select((int)Highest + 1, &fdRead, &fdWrite, nullptr, &Timeout) == -1)
 		{
 			LOG("select() call failed in cSocketThread: \"%s\"", cSocket::GetLastErrorString().c_str());
 			continue;
@@ -519,7 +519,7 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 		}
 		else
 		{
-			if (m_Slots[i].m_Client != NULL)
+			if (m_Slots[i].m_Client != nullptr)
 			{
 				m_Slots[i].m_Client->DataReceived(Buffer, Received);
 			}
@@ -545,7 +545,7 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 		if (m_Slots[i].m_Outgoing.empty())
 		{
 			// Request another chunk of outgoing data:
-			if (m_Slots[i].m_Client != NULL)
+			if (m_Slots[i].m_Client != nullptr)
 			{
 				AString Data;
 				m_Slots[i].m_Client->GetOutgoingData(Data);
@@ -573,7 +573,7 @@ void cSocketThreads::cSocketThread::WriteToSockets(fd_set * a_Write)
 			int Err = cSocket::GetLastError();
 			LOGWARNING("Error %d while writing to client \"%s\", disconnecting. \"%s\"", Err, m_Slots[i].m_Socket.GetIPString().c_str(), GetOSErrorString(Err).c_str());
 			m_Slots[i].m_Socket.CloseSocket();
-			if (m_Slots[i].m_Client != NULL)
+			if (m_Slots[i].m_Client != nullptr)
 			{
 				m_Slots[i].m_Client->SocketClosed();
 			}
@@ -668,7 +668,7 @@ void cSocketThreads::cSocketThread::QueueOutgoingData(void)
 	cCSLock Lock(m_Parent->m_CS);
 	for (int i = 0; i < m_NumSlots; i++)
 	{
-		if (m_Slots[i].m_Client != NULL)
+		if (m_Slots[i].m_Client != nullptr)
 		{
 			AString Data;
 			m_Slots[i].m_Client->GetOutgoingData(Data);
