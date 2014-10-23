@@ -79,7 +79,8 @@ public:
 	enum eChunkPriority
 	{
 		E_CHUNK_PRIORITY_HIGH   = 0,
-		E_CHUNK_PRIORITY_LOW    = 1,
+		E_CHUNK_PRIORITY_MEDIUM = 1,
+		E_CHUNK_PRIORITY_LOW    = 2,
 	};
 	
 	bool Start(cWorld * a_World);
@@ -143,6 +144,7 @@ protected:
 	cCriticalSection  m_CS;
 	cChunkCoordsList  m_ChunksReady;
 	sSendChunkList    m_SendChunksLowPriority;
+	sSendChunkList    m_SendChunksMediumPriority;
 	sSendChunkList    m_SendChunksHighPriority;
 	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted

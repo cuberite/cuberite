@@ -463,7 +463,7 @@ bool cClientHandle::StreamNextChunk(void)
 
 				// Unloaded chunk found -> Send it to the client.
 				Lock.Unlock();
-				StreamChunk(ChunkX, ChunkZ, cChunkSender::E_CHUNK_PRIORITY_HIGH);
+				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM));
 				return false;
 			}
 		}

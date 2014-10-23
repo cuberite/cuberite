@@ -100,6 +100,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		cCSLock Lock(m_CS);
 		if (
 			std::find(m_SendChunksLowPriority.begin(), m_SendChunksLowPriority.end(), Chunk) != m_SendChunksLowPriority.end() ||
+			std::find(m_SendChunksMediumPriority.begin(), m_SendChunksMediumPriority.end(), Chunk) != m_SendChunksMediumPriority.end() ||
 			std::find(m_SendChunksHighPriority.begin(), m_SendChunksHighPriority.end(), Chunk) != m_SendChunksHighPriority.end()
 		)
 		{
@@ -107,10 +108,27 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 			return;
 		}
 
-		if (a_Priority == E_CHUNK_PRIORITY_LOW) {
-			m_SendChunksLowPriority.push_back(Chunk);
-		} else if (a_Priority == E_CHUNK_PRIORITY_HIGH) {
-			m_SendChunksHighPriority.push_back(Chunk);
+		switch (a_Priority)
+		{
+			case E_CHUNK_PRIORITY_LOW:
+			{
+				m_SendChunksLowPriority.push_back(Chunk);
+				break;
+			}
+			case E_CHUNK_PRIORITY_MEDIUM:
+			{
+				m_SendChunksMediumPriority.push_back(Chunk);
+				break;
+			}
+			case E_CHUNK_PRIORITY_HIGH:
+			{
+				m_SendChunksHighPriority.push_back(Chunk);
+				break;
+			}
+			default:
+			{
+				ASSERT(!"Unknown chunk priority!");
+			}
 		}
 	}
 	m_evtQueue.Set();
@@ -133,6 +151,15 @@ void cChunkSender::RemoveClient(cClientHandle * a_Client)
 			}
 			++itr;
 		}  // for itr - m_SendChunksLowPriority[]
+		for (sSendChunkList::iterator itr = m_SendChunksMediumPriority.begin(); itr != m_SendChunksMediumPriority.end();)
+		{
+			if (itr->m_Client == a_Client)
+			{
+				itr = m_SendChunksMediumPriority.erase(itr);
+				continue;
+			}
+			++itr;
+		}  // for itr - m_SendChunksMediumPriority[]
 		for (sSendChunkList::iterator itr = m_SendChunksHighPriority.begin(); itr != m_SendChunksHighPriority.end();)
 		{
 			if (itr->m_Client == a_Client)
@@ -190,6 +217,15 @@ void cChunkSender::Execute(void)
 			Lock.Unlock();
 			
 			SendChunk(Coords.m_ChunkX, Coords.m_ChunkZ, nullptr);
+		}
+		else if (!m_SendChunksMediumPriority.empty())
+		{
+			// Take one from the queue:
+			sSendChunk Chunk(m_SendChunksMediumPriority.front());
+			m_SendChunksMediumPriority.pop_front();
+			Lock.Unlock();
+
+			SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, Chunk.m_Client);
 		}
 		else
 		{
