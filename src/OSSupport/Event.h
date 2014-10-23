@@ -1,16 +1,17 @@
 
 // Event.h
 
-// Interfaces to the cEvent object representing an OS-specific synchronization primitive that can be waited-for
-// Implemented as an Event on Win and as a 1-semaphore on *nix
+// Interfaces to the cEvent object representing a synchronization primitive that can be waited-for
+// Implemented using C++11 condition variable and mutex
 
 
 
 
 
 #pragma once
-#ifndef CEVENT_H_INCLUDED
-#define CEVENT_H_INCLUDED
+
+#include <mutex>
+#include <condition_variable>
 
 
 
@@ -20,9 +21,13 @@ class cEvent
 {
 public:
 	cEvent(void);
-	~cEvent();
 
+	/** Waits until the event has been set.
+	If the event has been set before it has been waited for, Wait() returns immediately. */
 	void Wait(void);
+
+	/** Sets the event - releases one thread that has been waiting in Wait().
+	If there was no thread waiting, the next call to Wait() will not block. */
 	void Set (void);
 
 	/** Waits for the event until either it is signalled, or the (relative) timeout is passed.
@@ -31,20 +36,16 @@ public:
 	
 private:
 
-	#ifdef _WIN32
-	HANDLE m_Event;
-	#else
-	sem_t * m_Event;
-	bool    m_bIsNamed;
-	#endif
+	/** Used for checking for spurious wakeups. */
+	bool m_ShouldWait;
+
+	/** Mutex protecting m_ShouldWait from multithreaded access. */
+	std::mutex m_Mutex;
+
+	/** The condition variable used as the Event. */
+	std::condition_variable m_CondVar;
 } ;
 
-
-
-
-
-
-#endif  // CEVENT_H_INCLUDED
 
 
 
