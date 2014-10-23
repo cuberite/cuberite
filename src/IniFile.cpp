@@ -32,10 +32,6 @@
 	#define iniEOL '\r' << endl
 #endif
 
-#ifndef _WIN32
-	#define sscanf_s(buffer, stringbuffer, ...) (sscanf(buffer, stringbuffer, __VA_ARGS__))
-#endif
-
 using namespace std;
 
 
