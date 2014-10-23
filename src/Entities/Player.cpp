@@ -235,7 +235,6 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 			CanMove = false;
 			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
 		}
-		m_ClientHandle->StreamChunks();
 	}
 
 	if (CanMove)
