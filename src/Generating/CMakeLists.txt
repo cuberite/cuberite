@@ -65,5 +65,5 @@ SET (HDRS
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})
 
-	target_link_libraries(Generating OSSupport iniFile Blocks)
+	target_link_libraries(Generating OSSupport Blocks)
 endif()
