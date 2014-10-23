@@ -193,7 +193,7 @@ void cRoot::Start(void)
 		}
 		catch (std::system_error & a_Exception)
 		{
-			LOGERROR("ERROR: Could not create input thread, error = %s!", a_Exception.code(), a_Exception.what());
+			LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
 		}
 		#endif
 

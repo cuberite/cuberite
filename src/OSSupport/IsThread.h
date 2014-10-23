@@ -16,8 +16,7 @@ In the descending class' constructor call the Start() method to start the thread
 
 
 #pragma once
-#ifndef CISTHREAD_H_INCLUDED
-#define CISTHREAD_H_INCLUDED
+#include <thread>
 
 
 
@@ -56,5 +55,3 @@ protected:
 
 
 
-
-#endif  // CISTHREAD_H_INCLUDED

@@ -14,7 +14,7 @@
 
 
 /** Number of milliseconds per cycle */
-#define CYCLE_MILLISECONDS 100
+const int CYCLE_MILLISECONDS = 100;
 
 
 
