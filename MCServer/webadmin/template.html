@@ -1,140 +1,129 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>{TITLE} | {PLUGIN_NAME}</title>
-		<style type="text/css">
-			body {
-				line-height: 1;
-				background: #B8B8B8;
-			}
-	
-			#maincontent {
-				padding: 0px 25px 10px 25px;
-			}
-	
-			#wrapper {
-				min-width: 850px;
-				width: 75%;
-				margin: 10px auto;
-				background-color: white;
-				border: 4px #888888 solid;
-				border-radius: 10px;
-				font-family: Calibri, Trebuchet MS;
-			}
-	
-			header {
-				text-align:center;
-				padding: 10px; 0px;
-			}
-	
-			span {
-				text-align: right;
-				float: right;
-				border-left: 2px #C8C8C8 solid;
-				border-bottom: 2px #C8C8C8 solid;
-				padding: 2px 10px;
-			}
-	
-			footer {
-				font-family: helvetica;
-				font-size: 10px;
-				text-align: center;
-				border-top: 1px #000 dotted;
-				padding: 1px 0px 1px 0px;
-			}
-	
-			table {
-				border-collapse: collapse;
-				border-spacing: 10;
-			}
-	
-			table {
-				border-top: 1px solid #ddd;
-				width: 700px;
-			}
-	
-			table tr th {
-				text-align: left;
-				background: #f6f6f6;
-				padding: 0px 20px;
-				height: 25px;
-				line-height: 25px;
-				border: 1px solid #ddd;
-				border-radius: 3px;
-			}
-	
-			table tr td {
-				background: #f6f6f6;
-				padding: 0px 20px;
-				height: 29px;
-				line-height: 29px;
-				border: 1px solid #ddd;
-				border-radius: 3px;
-			}
-	
-			#main table tr.odd td {
-				background: #fbfbfb;
-			}
-	
-			table tr:hover td {
-				background: #fdfcf6;
-			}
-	
-			table .action {
-				text-align: right;
-				padding: 0 20px 0 10px;
-			}
-	
-			table tr .action a {
-				color: #9b9b9b;
-			}
-	
-			#cssmenu{ height:10px; display:table; padding:0; margin: 0 auto;  border:1px #707070 solid; border-radius:5px; }
-			#cssmenu > ul {list-style:inside none; padding:0; margin:0;}
-			#cssmenu > ul > li {list-style:inside none; padding:0; margin:0; float:left; display:block; position:relative;} 
-			#cssmenu > ul > li > a{ outline:none; display:block; position:relative; color:#E8E8E8; padding:10px 10px; font:bold 13px/100% Arial, Helvetica, sans-serif; text-align:center; text-decoration:none; text-shadow:1px 1px 0 rgba(0,0,0, 0.4); }
-			#cssmenu > ul > li:first-child > a{border-radius:5px 0 0 5px;}
-			/* #cssmenu > ul > li > a:after{ content:''; position:absolute; border-right:1px solid #FFFFFF; top:-1px; bottom:-1px; right:-2px; z-index:99; } */
-			#cssmenu ul li.has-sub:hover > a:after{top:0; bottom:0;}
-			#cssmenu > ul > li.has-sub > a:before{ content:''; position:absolute; top:18px; right:6px; border:5px solid transparent; border-top:5px solid #707070; }
-			#cssmenu > ul > li.has-sub:hover > a:before{top:19px;}
-			#cssmenu ul li.has-sub:hover > a{ background:#3f3f3f; border-color:#707070; padding-bottom:13px; padding-top:13px; top:-1px; z-index:999; } 
-			#cssmenu ul li.has-sub:hover > ul, #cssmenu ul li.has-sub:hover > div{display:block;}
-			#cssmenu ul li.has-sub > a:hover{background:#3f3f3f; border-color:#3f3f3f;}
-			#cssmenu ul li > ul, #cssmenu ul li > div{ display:none; width:auto; position:absolute; top:38px; padding:10px 0; background:#3f3f3f; border-radius:0 0 5px 5px; z-index:999; } 
-			#cssmenu ul li > ul{width:200px;}
-			#cssmenu ul li > ul li{display:block; list-style:inside none; padding:0; margin:0; position:relative;}
-			#cssmenu ul li > ul li a{ outline:none; display:block; position:relative; margin:0; padding:8px 20px; font:10pt Arial, Helvetica, sans-serif; color:#fff; text-decoration:none; text-shadow:1px 1px 0 rgba(0,0,0, 0.5); }
-			#cssmenu, #cssmenu > ul > li > ul > li a:hover{ background:#C8C8C8;}
-			#cssmenu > ul > li > a { border-right:1px solid #707070; color:#FFFFFF; }
-			#cssmenu > ul > li > a:after { border-color:#707070; }
-			#cssmenu > ul > li > a:hover { background:#B8B8B8; }
-		</style>
-		<meta name="msapplication-tooltip" content="MCServer WebAdministrator"/>
-		<meta name="msapplication-navbutton-color" content="#B8B8B8" />
-		<link rel="shortcut icon" href="http://mc-server.org/favicon.ico" />
-	</head>
-	<body>
-		<div id="wrapper">
-			<span>
-				<b>Login: {USERNAME}</b>
-			</span>
-			<br />
-			<header>
-				<img alt="" src="files/logo.png" />
-			</header>
-			<nav id="cssmenu">
-				<ul>
-					{MENU}
-				</ul>
-			</nav>
-			<div id="maincontent">
-				{CONTENT}
-			</div>
-			<footer>
-				<p>MCServer is using {MEM}MB of memory, with {NUMCHUNKS} chunks loaded.</p>
-				<p>Web Design by <a href="https://github.com/WebFreak001"@WebFreak001</a></p>
-			</footer>
+<head>
+	<title>{TITLE} | {PLUGIN_NAME}</title>
+	<style type="text/css">
+	    body {
+	        line-height: 1;
+    		background: #B8B8B8;
+	    }
+	    
+	    #maincontent {
+	    	padding: 0px 25px 10px 25px;
+	    }
+	    
+	    #wrapper {
+	    	min-width: 850px;
+	    	width: 75%;
+	    	margin: 10px auto;
+	    	background-color: white;
+	    	border: 4px #888888 solid;
+	    	border-radius: 10px;
+		font-family: Calibri, Trebuchet MS;
+	    }
+	    
+	    header {
+	    	text-align:center;
+	    	padding: 10px; 0px;
+	    }
+	    
+	    span {
+	    	text-align: right;
+		float: right;
+		border-left: 2px #C8C8C8 solid;
+		border-bottom: 2px #C8C8C8 solid;
+		padding: 2px 10px;
+	    }
+
+	    footer {
+		font-family: helvetica;
+		font-size: 10px;
+		text-align: center;
+		border-top: 1px #000 dotted;
+		padding: 1px 0px 1px 0px;
+	    }
+	    
+	    table {
+	    	border-collapse: collapse;
+	    	border-spacing: 10;
+	    }
+	    
+	    table {
+	        border-top: 1px solid #ddd;
+	        width: 700px;
+		    }
+	    
+	    table tr th {
+	    	text-align: left;
+	    	background: #f6f6f6;
+	    	padding: 0px 20px;
+	    	height: 25px;
+	    	line-height: 25px;
+	    	border: 1px solid #ddd;
+	    	border-radius: 3px;
+	    }
+	    
+	    table tr td {
+	    	background: #f6f6f6;
+	    	padding: 0px 20px;
+	    	height: 29px;
+	    	line-height: 29px;
+	    	border: 1px solid #ddd;
+	    	border-radius: 3px;
+	    }
+	    	#main table tr.odd td {
+	    	background: #fbfbfb;
+	    }
+	    
+	    table tr:hover td { background: #fdfcf6; }
+	    table .action {
+	    	text-align: right;
+	    	padding: 0 20px 0 10px;
+	    }
+	    
+	    table tr .action a { color: #9b9b9b; }
+	    
+	    #cssmenu{ height:10px; display:table; padding:0; margin: 0 auto;  border:1px #707070 solid; border-radius:5px; } 
+	    #cssmenu > ul {list-style:inside none; padding:0; margin:0;} 
+	    #cssmenu > ul > li {list-style:inside none; padding:0; margin:0; float:left; display:block; position:relative;} 
+	    #cssmenu > ul > li > a{ outline:none; display:block; position:relative; color:#E8E8E8; padding:10px 10px; font:bold 13px/100% Arial, Helvetica, sans-serif; text-align:center; text-decoration:none; text-shadow:1px 1px 0 rgba(0,0,0, 0.4); }
+	    #cssmenu > ul > li:first-child > a{border-radius:5px 0 0 5px;} 
+	    /* #cssmenu > ul > li > a:after{ content:''; position:absolute; border-right:1px solid #FFFFFF; top:-1px; bottom:-1px; right:-2px; z-index:99; } */
+	    #cssmenu ul li.has-sub:hover > a:after{top:0; bottom:0;} 
+	    #cssmenu > ul > li.has-sub > a:before{ content:''; position:absolute; top:18px; right:6px; border:5px solid transparent; border-top:5px solid #707070; }
+	    #cssmenu > ul > li.has-sub:hover > a:before{top:19px;} 
+	    #cssmenu ul li.has-sub:hover > a{ background:#3f3f3f; border-color:#707070; padding-bottom:13px; padding-top:13px; top:-1px; z-index:999; } 
+	    #cssmenu ul li.has-sub:hover > ul, #cssmenu ul li.has-sub:hover > div{display:block;} 
+	    #cssmenu ul li.has-sub > a:hover{background:#3f3f3f; border-color:#3f3f3f;} 
+	    #cssmenu ul li > ul, #cssmenu ul li > div{ display:none; width:auto; position:absolute; top:38px; padding:10px 0; background:#3f3f3f; border-radius:0 0 5px 5px; z-index:999; } 
+	    #cssmenu ul li > ul{width:200px;} 
+	    #cssmenu ul li > ul li{display:block; list-style:inside none; padding:0; margin:0; position:relative;} 
+	    #cssmenu ul li > ul li a{ outline:none; display:block; position:relative; margin:0; padding:8px 20px; font:10pt Arial, Helvetica, sans-serif; color:#fff; text-decoration:none; text-shadow:1px 1px 0 rgba(0,0,0, 0.5); } 
+	    #cssmenu, #cssmenu > ul > li > ul > li a:hover{ background:#C8C8C8;}  
+	    #cssmenu > ul > li > a{border-right:1px solid #707070; color:#FFFFFF;}
+	    #cssmenu > ul > li > a:after{border-color:#707070;} 
+	    #cssmenu > ul > li > a:hover{background:#B8B8B8;}    
+    </style>
+    <meta name="msapplication-tooltip" content="MCServer WebAdministrator"/>
+    <meta name="msapplication-navbutton-color" content="#B8B8B8" />
+    <link rel="shortcut icon" href="http://mc-server.org/favicon.ico" />
+</head>
+
+<body>
+	<div id="wrapper">
+		<span><b>Login: {USERNAME}</b></span><br />
+		<header>
+			<img alt="" src="data:image/png;base64,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" />
+		</header>
+		<nav id="cssmenu">
+			<ul>
+				{MENU}
+			</ul>
+		</nav>
+		<div id="maincontent">
+			{CONTENT}
 		</div>
-	</body>
+		<footer><p>MCServer is using {MEM}MB of memory, with {NUMCHUNKS} chunks loaded.</p><p>Web Design by Tiger</p></footer>
+	</div>
+</head>
 </html>

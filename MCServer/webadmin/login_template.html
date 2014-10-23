@@ -1,25 +1,69 @@
-<html>
+<!DOCTYPE html>
 <head>
 	<title>MCServer WebAdmin - Login</title>
-	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,300' rel='stylesheet' type='text/css'>
+	<link href='login.css' rel='stylesheet' type='text/css'>
 	<link rel="icon" href="favicon.ico">
-	<style type="text/css">
-		header {
-			margin: 0 auto;
-			text-align: center;
-			vertical-align: middle;
-		}
-	</style>
 </head>
 
 <body>
-	<header>
-		<img src="mc-logo.png" alt="MCServer Logo" class="logo">
-		<h1>MCServer - WebAdmin</h1>
-		<form method="get" action="webadmin/">
-			<input type="submit" value="Log in">
-		</form>
-	</header>
+	<div class="contention">
+		<div class="row1">
+			<div class="wrapper">
+				<img src="logo_login.png" alt="MCServer Logo" class="logo">
+			</div>
+		</div>
+		<div id="panel">
+			<div class="upper">
+				<div class="wrapper">
+					<div><form method="get" action="webadmin/"><button type="submit" value="Log in" style="width:150px;height:25px;font-family: 'Source Sans Pro', sans-serif;background:transparent;border:none!important;vertical-align: middle;"><strong><img src="login.gif" style="vertical-align: bottom;"/> WebAdmin Log in</strong></button></form></div>
+				</div>
+			</div>
+		</div>
+		<div class="row2 push10">
+			<div class="wrapper padtopp">
+				<table border="0" cellspacing="0" cellpadding="5" class="tborder" style="margin-bottom: 5px; " id="post_16419">
+					<tbody>
+						<tr>
+							<td class="thead rounded_top">
+								<div style="float:left!important;">
+									<strong>Welcome Guest</strong>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td class="trow2 post_content ">
+								<div class="post_body" id="pid_16419">
+									<iframe width="100%" height="100%" style="border:none;min-height:350px;max-height:450%;" src="/guest.html"></iframe>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<div class="upper">
+			<div class="wrapper">
+				<ul class="menu bottom_links">
+					<li><a href="http://www.mc-server.org" target="_blank">MCServer</a></li>
+				</ul>
+			</div>
+		</div>
+		<div class="lower">
+			<div class="wrapper">
+				<span id="current_time"><strong>FusionCare</strong> Web Developement</span>
+				<span id="copyright">
+					Powered By <a href="http://www.mc-server.org" target="_blank">MC Server</a>.
+				</span>
+				<span id="theme">
+					Theme created by Justin S.
+				</span>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>
