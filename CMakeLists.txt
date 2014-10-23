@@ -81,7 +81,6 @@ set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."             
 set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
 
 # Include all the libraries:
-add_subdirectory(lib/inifile/)
 add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/zlib/)
 add_subdirectory(lib/lua/)

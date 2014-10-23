@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "EndGen.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "../LinearUpscale.h"
 
 

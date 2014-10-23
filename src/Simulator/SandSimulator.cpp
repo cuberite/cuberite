@@ -7,7 +7,7 @@
 #include "../Defines.h"
 #include "../Entities/FallingBlock.h"
 #include "../Chunk.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 
 
 

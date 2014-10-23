@@ -9,7 +9,7 @@
 #include "../Server.h"
 #include "../CommandOutput.h"
 
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "../Entities/Player.h"
 
 #define FIND_HOOK(a_HookName) HookMap::iterator Plugins = m_Hooks.find(a_HookName);

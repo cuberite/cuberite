@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "HeiGen.h"
 #include "../LinearUpscale.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "DistortedHeightmap.h"
 #include "EndGen.h"
 #include "Noise3DGenerator.h"

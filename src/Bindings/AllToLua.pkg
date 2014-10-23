@@ -15,7 +15,7 @@ $cfile "../Vector3.h"
 $cfile "../ChunkDef.h"
 $cfile "../BiomeDef.h"
 
-$cfile "../../lib/inifile/iniFile.h"
+$cfile "../IniFile.h"
 
 $cfile "../OSSupport/File.h"
 

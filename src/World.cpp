@@ -8,7 +8,7 @@
 #include "Server.h"
 #include "Item.h"
 #include "Root.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"

@@ -7,7 +7,7 @@
 #include "MojangAPI.h"
 #include "SQLiteCpp/Database.h"
 #include "SQLiteCpp/Statement.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "json/json.h"
 #include "PolarSSL++/BlockingSslClientSocket.h"
 #include "../RankManager.h"

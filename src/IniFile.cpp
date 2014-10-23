@@ -24,7 +24,7 @@
 #include <ctype.h>
 
 // Local Includes
-#include "iniFile.h"
+#include "IniFile.h"
 
 #if defined(WIN32)
 	#define iniEOL endl

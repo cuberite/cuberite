@@ -20,7 +20,7 @@
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
 
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "json/json.h"
 
 // 6000 ticks or 5 minutes
