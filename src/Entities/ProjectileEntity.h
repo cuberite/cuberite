@@ -1,7 +1,7 @@
 
 // ProjectileEntity.h
 
-// Declares the cProjectileEntity class representing the common base class for projectiles, as well as individual projectile types
+// Declares the cProjectileEntity class representing the common base class for projectiles
 
 
 
@@ -23,7 +23,7 @@ class cProjectileEntity :
 	typedef cEntity super;
 	
 public:
-	/// The kind of the projectile. The numbers correspond to the network type ID used for spawning via the 0x17 packet.
+	/** The kind of the projectile. The numbers correspond to the network type ID used for spawning them in the protocol. */
 	enum eKind
 	{
 		pkArrow         = 60,
@@ -48,22 +48,22 @@ public:
 	
 	static cProjectileEntity * Create(eKind a_Kind, cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem * a_Item, const Vector3d * a_Speed = nullptr);
 	
-	/// Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given
+	/** Called by the physics blocktracer when the entity hits a solid block, the hit position and the face hit (BLOCK_FACE_) is given */
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace);
 	
-	/// Called by the physics blocktracer when the entity hits another entity
+	/** Called by the physics blocktracer when the entity hits another entity */
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos)
 	{
 		UNUSED(a_EntityHit);
 		UNUSED(a_HitPos);
 	}
 	
-	/// Called by Chunk when the projectile is eligible for player collection
+	/** Called by Chunk when the projectile is eligible for player collection */
 	virtual void CollectedBy(cPlayer & a_Dest);
 
 	// tolua_begin
 
-	/// Returns the kind of the projectile (fast class identification)
+	/** Returns the kind of the projectile (fast class identification) */
 	eKind GetProjectileKind(void) const { return m_ProjectileKind; }
 	
 	/** Returns the unique ID of the entity who created this projectile
@@ -76,15 +76,15 @@ public:
 	*/
 	AString GetCreatorName(void) const { return m_CreatorData.m_Name; }
 	
-	/// Returns the string that is used as the entity type (class name) in MCA files
+	/** Returns the string that is used as the entity type (class name) in MCA files */
 	AString GetMCAClassName(void) const;
 	
-	/// Returns true if the projectile has hit the ground and is stuck there
+	/** Returns true if the projectile has hit the ground and is stuck there */
 	bool IsInGround(void) const { return m_IsInGround; }
 	
 	// tolua_end
 	
-	/// Sets the internal InGround flag. To be used by MCA loader only!
+	/** Sets the internal InGround flag. To be used by MCA loader only! */
 	void SetIsInGround(bool a_IsInGround) { m_IsInGround = a_IsInGround; }
 	
 protected:
@@ -114,7 +114,7 @@ protected:
 	*/
 	CreatorData m_CreatorData;
 	
-	/// True if the projectile has hit the ground and is stuck there
+	/** True if the projectile has hit the ground and is stuck there */
 	bool m_IsInGround;
 		
 	// cEntity overrides:

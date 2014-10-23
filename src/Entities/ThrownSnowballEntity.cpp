@@ -43,3 +43,28 @@ void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & 
 	
 	m_DestroyTimer = 5;
 }
+
+
+
+
+
+void cThrownSnowballEntity::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	if (m_DestroyTimer > 0)
+	{
+		m_DestroyTimer--;
+		if (m_DestroyTimer == 0)
+		{
+			Destroy();
+			return;
+		}
+	}
+	else
+	{
+		super::Tick(a_Dt, a_Chunk);
+	}
+}
+
+
+
+

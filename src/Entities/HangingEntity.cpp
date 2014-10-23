@@ -9,9 +9,9 @@
 
 
 
-cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z)
-	: cEntity(a_EntityType, a_X, a_Y, a_Z, 0.8, 0.8)
-	, m_BlockFace(a_BlockFace)
+cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_Facing, double a_X, double a_Y, double a_Z) :
+	cEntity(a_EntityType, a_X, a_Y, a_Z, 0.8, 0.8),
+	m_Facing(a_Facing)
 {
 	SetMaxHealth(1);
 	SetHealth(1);
@@ -21,15 +21,23 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace,
 
 
 
-void cHangingEntity::SetDirection(eBlockFace a_BlockFace)
+void cHangingEntity::SetFacing(eBlockFace a_Facing)
 {
-	if ((a_BlockFace < 2) || (a_BlockFace > 5))
+	// Y-based faces are not allowed:
+	switch (a_Facing)
 	{
-		ASSERT(!"Tried to set a bad direction!");
-		return;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			LOGWARNING("%s: Invalid facing: %d. Ignoring.", __FUNCTION__, a_Facing);
+			ASSERT(!"Tried to set a bad facing!");
+			return;
+		}
+		default: break;
 	}
 
-	m_BlockFace = a_BlockFace;
+	m_Facing = a_Facing;
 }
 
 
@@ -41,7 +49,7 @@ void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 	int Dir = 0;
 
 	// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
-	switch (m_BlockFace)
+	switch (m_Facing)
 	{
 		case BLOCK_FACE_ZP: Dir = 0; break;
 		case BLOCK_FACE_ZM: Dir = 2; break;
@@ -49,8 +57,8 @@ void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 		case BLOCK_FACE_XP: Dir = 3; break;
 		default:
 		{
-			LOGINFO("Invalid face (%d) in a cHangingEntity at {%d, %d, %d}, adjusting to BLOCK_FACE_XP.",
-				m_BlockFace, (int)GetPosX(), (int)GetPosY(), (int)GetPosZ()
+			LOGINFO("Invalid facing (%d) in a cHangingEntity at {%d, %d, %d}, adjusting to BLOCK_FACE_XP.",
+				m_Facing, (int)GetPosX(), (int)GetPosY(), (int)GetPosZ()
 			);
 			Dir = 3;
 		}

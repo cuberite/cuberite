@@ -31,17 +31,17 @@ protected:
 
 	/// The overriden Execute() method should check this value periodically and terminate if this is true
 	volatile bool m_ShouldTerminate;
-	
+
 public:
 	cIsThread(const AString & a_ThreadName);
 	virtual ~cIsThread();
-	
+
 	/// Starts the thread; returns without waiting for the actual start
 	bool Start(void);
-	
+
 	/// Signals the thread to terminate and waits until it's finished
 	void Stop(void);
-	
+
 	/// Waits for the thread to finish. Doesn't signalize the ShouldTerminate flag
 	bool Wait(void);
 
@@ -58,7 +58,3 @@ protected:
 
 
 #endif  // CISTHREAD_H_INCLUDED
-
-
-
-

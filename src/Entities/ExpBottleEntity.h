@@ -1,6 +1,11 @@
-//
-//  ExpBottleEntity.h
-//
+
+// ExpBottleEntity.h
+
+// Declares the cExpBottleEntity class representing the thrown exp bottle
+
+
+
+
 
 #pragma once
 
@@ -33,6 +38,10 @@ protected:
 
 	/** Breaks the bottle, fires its particle effects and sounds
 	@param a_HitPos     The position where the bottle will break */
-	void Break(const Vector3d &a_HitPos);
+	void Break(const Vector3d & a_HitPos);
 	
 };  // tolua_export
+
+
+
+

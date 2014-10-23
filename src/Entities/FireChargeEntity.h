@@ -1,6 +1,11 @@
-//
-//  FireChargeEntity.h
-//
+
+// FireChargeEntity.h
+
+// Declares the cFireChargeEntity representing the fire charge shot by the blaze
+
+
+
+
 
 #pragma once
 
@@ -34,3 +39,7 @@ protected:
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 	
 } ;  // tolua_export
+
+
+
+

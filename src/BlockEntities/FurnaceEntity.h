@@ -133,7 +133,7 @@ protected:
 	int m_FuelBurnTime;
 
 	/** Amount of ticks that the current fuel has been burning */
-	int m_TimeBurned;	
+	int m_TimeBurned;
 	
 	/** Sends the specified progressbar value to all clients of the window */
 	void BroadcastProgress(short a_ProgressbarID, short a_Value);

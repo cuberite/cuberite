@@ -2803,7 +2803,7 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(0xA2);
 			WriteItem(Frame.GetItem());
 			WriteByte(0x3);
-			WriteByte(Frame.GetRotation() / 2);
+			WriteByte(Frame.GetItemRotation() / 2);
 			break;
 		}
 		default: break;

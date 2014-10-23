@@ -33,7 +33,7 @@ function GetDefaultPage()
 	local AllPlugins = PM:GetAllPlugins()
 	for key,value in pairs(AllPlugins) do
 		if( value ~= nil and value ~= false ) then
-			Content = Content ..  "<li>" .. key .. " V." .. value:GetVersion() .. "</li>"
+			Content = Content ..  "<li>" .. key .. " (version " .. value:GetVersion() .. ")</li>"
 		end
 	end
 	
