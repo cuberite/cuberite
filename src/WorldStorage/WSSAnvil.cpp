@@ -126,7 +126,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		#endif  // _DEBUG
 		
 		gzFile gz = gzopen((FILE_IO_PREFIX + fnam).c_str(), "wb");
-		if (gz != NULL)
+		if (gz != nullptr)
 		{
 			gzwrite(gz, Writer.GetResult().data(), (unsigned)Writer.GetResult().size());
 		}
@@ -193,7 +193,7 @@ bool cWSSAnvil::GetChunkData(const cChunkCoords & a_Chunk, AString & a_Data)
 {
 	cCSLock Lock(m_CS);
 	cMCAFile * File = LoadMCAFile(a_Chunk);
-	if (File == NULL)
+	if (File == nullptr)
 	{
 		return false;
 	}
@@ -208,7 +208,7 @@ bool cWSSAnvil::SetChunkData(const cChunkCoords & a_Chunk, const AString & a_Dat
 {
 	cCSLock Lock(m_CS);
 	cMCAFile * File = LoadMCAFile(a_Chunk);
-	if (File == NULL)
+	if (File == nullptr)
 	{
 		return false;
 	}
@@ -234,7 +234,7 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	// Is it already cached?
 	for (cMCAFiles::iterator itr = m_Files.begin(); itr != m_Files.end(); ++itr)
 	{
-		if (((*itr) != NULL) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
+		if (((*itr) != nullptr) && ((*itr)->GetRegionX() == RegionX) && ((*itr)->GetRegionZ() == RegionZ))
 		{
 			// Move the file to front and return it:
 			cMCAFile * f = *itr;
@@ -253,9 +253,9 @@ cWSSAnvil::cMCAFile * cWSSAnvil::LoadMCAFile(const cChunkCoords & a_Chunk)
 	cFile::CreateFolder(FILE_IO_PREFIX + FileName);
 	AppendPrintf(FileName, "/r.%d.%d.mca", RegionX, RegionZ);
 	cMCAFile * f = new cMCAFile(FileName, RegionX, RegionZ);
-	if (f == NULL)
+	if (f == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 	m_Files.push_front(f);
 	
@@ -373,7 +373,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	// Load the biomes from NBT, if present and valid. First try MCS-style, then Vanilla-style:
 	cChunkDef::BiomeMap BiomeMap;
 	cChunkDef::BiomeMap * Biomes = LoadBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "MCSBiomes"));
-	if (Biomes == NULL)
+	if (Biomes == nullptr)
 	{
 		// MCS-style biomes not available, load vanilla-style:
 		Biomes = LoadVanillaBiomeMapFromNBT(&BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes"));
@@ -426,9 +426,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	cSetChunkDataPtr SetChunkData(new cSetChunkData(
 		a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ,
 		BlockTypes, MetaData,
-		IsLightValid ? BlockLight : NULL,
-		IsLightValid ? SkyLight : NULL,
-		NULL, Biomes,
+		IsLightValid ? BlockLight : nullptr,
+		IsLightValid ? SkyLight : nullptr,
+		nullptr, Biomes,
 		Entities, BlockEntities,
 		false
 	));
@@ -525,12 +525,12 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_ByteArray))
 	{
-		return NULL;
+		return nullptr;
 	}
 	if (a_NBT.GetDataLength(a_TagIdx) != 16 * 16)
 	{
 		// The biomes stored don't match in size
-		return NULL;
+		return nullptr;
 	}
 	const unsigned char * VanillaBiomeData = (const unsigned char *)(a_NBT.GetData(a_TagIdx));
 	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
@@ -538,7 +538,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadVanillaBiomeMapFromNBT(cChunkDef::BiomeMap 
 		if ((VanillaBiomeData)[i] == 0xff)
 		{
 			// Unassigned biomes
-			return NULL;
+			return nullptr;
 		}
 		(*a_BiomeMap)[i] = (EMCSBiome)(VanillaBiomeData[i]);
 	}
@@ -553,12 +553,12 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 {
 	if ((a_TagIdx < 0) || (a_NBT.GetType(a_TagIdx) != TAG_IntArray))
 	{
-		return NULL;
+		return nullptr;
 	}
 	if (a_NBT.GetDataLength(a_TagIdx) != sizeof(*a_BiomeMap))
 	{
 		// The biomes stored don't match in size
-		return NULL;
+		return nullptr;
 	}
 	const char * BiomeData = (a_NBT.GetData(a_TagIdx));
 	for (size_t i = 0; i < ARRAYCOUNT(*a_BiomeMap); i++)
@@ -567,7 +567,7 @@ cChunkDef::BiomeMap * cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap * a_Bio
 		if ((*a_BiomeMap)[i] == 0xff)
 		{
 			// Unassigned biomes
-			return NULL;
+			return nullptr;
 		}
 	}
 	return a_BiomeMap;
@@ -631,7 +631,7 @@ void cWSSAnvil::LoadBlockEntitiesFromNBT(cBlockEntityList & a_BlockEntities, con
 		BLOCKTYPE BlockType = cChunkDef::GetBlock(a_BlockTypes, RelX, RelY, RelZ);
 		NIBBLETYPE BlockMeta = cChunkDef::GetNibble(a_BlockMetas, RelX, RelY, RelZ);
 		std::auto_ptr<cBlockEntity> be(LoadBlockEntityFromNBT(a_NBT, Child, x, y, z, BlockType, BlockMeta));
-		if (be.get() == NULL)
+		if (be.get() == nullptr)
 		{
 			continue;
 		}
@@ -670,7 +670,7 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 		case E_BLOCK_WALLSIGN:      return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_WALLSIGN);
 
 		// Blocktypes that have block entities but don't load their contents from disk:
-		case E_BLOCK_ENDER_CHEST:   return NULL;
+		case E_BLOCK_ENDER_CHEST:   return nullptr;
 	}
 
 	// All the other blocktypes should have no entities assigned to them. Report an error:
@@ -686,7 +686,7 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 		ItemTypeToString(a_BlockType).c_str(), a_BlockType, TypeName.c_str(),
 		a_BlockX, a_BlockY, a_BlockZ
 	);
-	return NULL;
+	return nullptr;
 }
 
 
@@ -836,7 +836,7 @@ cBlockEntity * cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_TagI
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Beacon"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cBeaconEntity> Beacon(new cBeaconEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -881,13 +881,13 @@ cBlockEntity * cWSSAnvil::LoadChestFromNBT(const cParsedNBT & a_NBT, int a_TagId
 	//       https://github.com/mc-server/MCServer/blob/d0551e2e0a98a28f31a88d489d17b408e4a7d38d/src/WorldStorage/WSSAnvil.cpp#L637
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Chest") && !CheckBlockEntityType(a_NBT, a_TagIdx, "TrappedChest"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return NULL;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
+		return nullptr;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
 	std::auto_ptr<cChestEntity> Chest(new cChestEntity(a_BlockX, a_BlockY, a_BlockZ, m_World, a_ChestBlockType));
 	LoadItemGridFromNBT(Chest->GetContents(), a_NBT, Items);
@@ -903,7 +903,7 @@ cBlockEntity * cWSSAnvil::LoadCommandBlockFromNBT(const cParsedNBT & a_NBT, int 
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Control"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cCommandBlockEntity> CmdBlock(new cCommandBlockEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -940,13 +940,13 @@ cBlockEntity * cWSSAnvil::LoadDispenserFromNBT(const cParsedNBT & a_NBT, int a_T
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Trap"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return NULL;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
+		return nullptr;  // Make it an empty dispenser - the chunk loader will provide an empty cDispenserEntity for this
 	}
 	std::auto_ptr<cDispenserEntity> Dispenser(new cDispenserEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
 	LoadItemGridFromNBT(Dispenser->GetContents(), a_NBT, Items);
@@ -962,13 +962,13 @@ cBlockEntity * cWSSAnvil::LoadDropperFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Dropper"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return NULL;  // Make it an empty dropper - the chunk loader will provide an empty cDropperEntity for this
+		return nullptr;  // Make it an empty dropper - the chunk loader will provide an empty cDropperEntity for this
 	}
 	std::auto_ptr<cDropperEntity> Dropper(new cDropperEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
 	LoadItemGridFromNBT(Dropper->GetContents(), a_NBT, Items);
@@ -984,7 +984,7 @@ cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_T
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "FlowerPot"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cFlowerPotEntity> FlowerPot(new cFlowerPotEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -1015,13 +1015,13 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Furnace"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return NULL;  // Make it an empty furnace - the chunk loader will provide an empty cFurnaceEntity for this
+		return nullptr;  // Make it an empty furnace - the chunk loader will provide an empty cFurnaceEntity for this
 	}
 	
 	std::auto_ptr<cFurnaceEntity> Furnace(new cFurnaceEntity(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, m_World));
@@ -1073,13 +1073,13 @@ cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagI
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Hopper"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int Items = a_NBT.FindChildByName(a_TagIdx, "Items");
 	if ((Items < 0) || (a_NBT.GetType(Items) != TAG_List))
 	{
-		return NULL;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
+		return nullptr;  // Make it an empty hopper - the chunk loader will provide an empty cHopperEntity for this
 	}
 	std::auto_ptr<cHopperEntity> Hopper(new cHopperEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
 	LoadItemGridFromNBT(Hopper->GetContents(), a_NBT, Items);
@@ -1095,7 +1095,7 @@ cBlockEntity * cWSSAnvil::LoadJukeboxFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "RecordPlayer"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cJukeboxEntity> Jukebox(new cJukeboxEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -1116,7 +1116,7 @@ cBlockEntity * cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Skull"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cMobHeadEntity> MobHead(new cMobHeadEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -1151,7 +1151,7 @@ cBlockEntity * cWSSAnvil::LoadNoteBlockFromNBT(const cParsedNBT & a_NBT, int a_T
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Music"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cNoteEntity> NoteBlock(new cNoteEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -1172,7 +1172,7 @@ cBlockEntity * cWSSAnvil::LoadSignFromNBT(const cParsedNBT & a_NBT, int a_TagIdx
 	// Check if the data has a proper type:
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "Sign"))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	std::auto_ptr<cSignEntity> Sign(new cSignEntity(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, m_World));
@@ -1660,30 +1660,41 @@ void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int Direction = a_NBT.FindChildByName(a_TagIdx, "Direction");
-	if (Direction > 0)
+	// "Facing" tag is the prime source of the Facing; if not available, translate from older "Direction" or "Dir"
+	int Facing = a_NBT.FindChildByName(a_TagIdx, "Facing");
+	if (Facing > 0)
 	{
-		Direction = (int)a_NBT.GetByte(Direction);
-		if ((Direction < 2) || (Direction > 5))
+		Facing = (int)a_NBT.GetByte(Facing);
+		if ((Facing >= 2) && (Facing <= 5))
 		{
-			a_Hanging.SetDirection(BLOCK_FACE_NORTH);
-		}
-		else
-		{
-			a_Hanging.SetDirection(static_cast<eBlockFace>(Direction));
+			a_Hanging.SetFacing(static_cast<eBlockFace>(Facing));
 		}
 	}
 	else
 	{
-		Direction = a_NBT.FindChildByName(a_TagIdx, "Dir");
-		if (Direction > 0)
+		Facing = a_NBT.FindChildByName(a_TagIdx, "Direction");
+		if (Facing > 0)
 		{
-			switch ((int)a_NBT.GetByte(Direction))
+			switch ((int)a_NBT.GetByte(Facing))
 			{
-				case 0:   a_Hanging.SetDirection(BLOCK_FACE_NORTH);  break;
-				case 1:   a_Hanging.SetDirection(BLOCK_FACE_TOP);    break;
-				case 2:   a_Hanging.SetDirection(BLOCK_FACE_BOTTOM); break;
-				case 3:   a_Hanging.SetDirection(BLOCK_FACE_SOUTH);  break;
+				case 0: a_Hanging.SetFacing(BLOCK_FACE_ZM); break;
+				case 1: a_Hanging.SetFacing(BLOCK_FACE_XM); break;
+				case 2: a_Hanging.SetFacing(BLOCK_FACE_ZP); break;
+				case 3: a_Hanging.SetFacing(BLOCK_FACE_XP); break;
+			}
+		}
+		else
+		{
+			Facing = a_NBT.FindChildByName(a_TagIdx, "Dir");  // Has values 0 and 2 swapped
+			if (Facing > 0)
+			{
+				switch ((int)a_NBT.GetByte(Facing))
+				{
+					case 0: a_Hanging.SetFacing(BLOCK_FACE_ZP); break;
+					case 1: a_Hanging.SetFacing(BLOCK_FACE_XM); break;
+					case 2: a_Hanging.SetFacing(BLOCK_FACE_ZM); break;
+					case 3: a_Hanging.SetFacing(BLOCK_FACE_XP); break;
+				}
 			}
 		}
 	}
@@ -1732,7 +1743,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	int Rotation = a_NBT.FindChildByName(a_TagIdx, "ItemRotation");
 	if (Rotation > 0)
 	{
-		ItemFrame->SetRotation((Byte)a_NBT.GetByte(Rotation));
+		ItemFrame->SetItemRotation((Byte)a_NBT.GetByte(Rotation));
 	}
 	
 	a_Entities.push_back(ItemFrame.release());
@@ -1744,7 +1755,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cArrowEntity> Arrow(new cArrowEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	std::auto_ptr<cArrowEntity> Arrow(new cArrowEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0)));
 	if (!LoadProjectileBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1808,7 +1819,7 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cItem()));
+	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0), cItem()));
 	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1832,7 +1843,7 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cThrownSnowballEntity> Snowball(new cThrownSnowballEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	std::auto_ptr<cThrownSnowballEntity> Snowball(new cThrownSnowballEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0)));
 	if (!LoadProjectileBaseFromNBT(*Snowball.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1848,7 +1859,7 @@ void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cThrownEggEntity> Egg(new cThrownEggEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	std::auto_ptr<cThrownEggEntity> Egg(new cThrownEggEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0)));
 	if (!LoadProjectileBaseFromNBT(*Egg.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1864,7 +1875,7 @@ void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cGhastFireballEntity> Fireball(new cGhastFireballEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	std::auto_ptr<cGhastFireballEntity> Fireball(new cGhastFireballEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0)));
 	if (!LoadProjectileBaseFromNBT(*Fireball.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1880,7 +1891,7 @@ void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cFireChargeEntity> FireCharge(new cFireChargeEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	std::auto_ptr<cFireChargeEntity> FireCharge(new cFireChargeEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0)));
 	if (!LoadProjectileBaseFromNBT(*FireCharge.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -1896,7 +1907,7 @@ void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cThrownEnderPearlEntity> Enderpearl(new cThrownEnderPearlEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
+	std::auto_ptr<cThrownEnderPearlEntity> Enderpearl(new cThrownEnderPearlEntity(nullptr, 0, 0, 0, Vector3d(0, 0, 0)));
 	if (!LoadProjectileBaseFromNBT(*Enderpearl.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2853,7 +2864,7 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 	if (m_File.Read(m_Header, sizeof(m_Header)) != sizeof(m_Header))
 	{
 		// Cannot read the header - perhaps the file has just been created?
-		// Try writing a NULL header (both chunk offsets and timestamps):
+		// Try writing a nullptr header (both chunk offsets and timestamps):
 		memset(m_Header, 0, sizeof(m_Header));
 		if (
 			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Real header - chunk offsets

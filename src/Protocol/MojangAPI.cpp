@@ -196,7 +196,7 @@ cMojangAPI::cMojangAPI(void) :
 	m_NameToUUIDAddress(DEFAULT_NAME_TO_UUID_ADDRESS),
 	m_UUIDToProfileServer(DEFAULT_UUID_TO_PROFILE_SERVER),
 	m_UUIDToProfileAddress(DEFAULT_UUID_TO_PROFILE_ADDRESS),
-	m_RankMgr(NULL),
+	m_RankMgr(nullptr),
 	m_UpdateThread(new cUpdateThread())
 {
 }
@@ -335,7 +335,7 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
 	AString UUID = MakeUUIDShort(a_UUID);
-	Int64 Now = time(NULL);
+	Int64 Now = time(nullptr);
 	{
 		cCSLock Lock(m_CSNameToUUID);
 		m_NameToUUID[StrToLower(a_PlayerName)] = sProfile(a_PlayerName, UUID, "", "", Now);
@@ -354,7 +354,7 @@ void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const 
 void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	AString UUID = MakeUUIDShort(a_UUID);
-	Int64 Now = time(NULL);
+	Int64 Now = time(nullptr);
 	{
 		cCSLock Lock(m_CSNameToUUID);
 		m_NameToUUID[StrToLower(a_PlayerName)] = sProfile(a_PlayerName, UUID, "", "", Now);
@@ -558,7 +558,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 		db.exec("DELETE FROM UUIDToProfile");
 		
 		// Save all cache entries - m_PlayerNameToUUID:
-		Int64 LimitDateTime = time(NULL) - MAX_AGE;
+		Int64 LimitDateTime = time(nullptr) - MAX_AGE;
 		{
 			SQLite::Statement stmt(db, "INSERT INTO PlayerNameToUUID(PlayerName, UUID, DateTime) VALUES (?, ?, ?)");
 			cCSLock Lock(m_CSNameToUUID);
@@ -697,7 +697,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 	
 		// Store the returned results into cache:
 		Json::Value::UInt JsonCount = root.size();
-		Int64 Now = time(NULL);
+		Int64 Now = time(nullptr);
 		{
 			cCSLock Lock(m_CSNameToUUID);
 			for (Json::Value::UInt idx = 0; idx < JsonCount; ++idx)
@@ -831,7 +831,7 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 		return;
 	}
 	Json::Value Properties = root.get("properties", "");
-	Int64 Now = time(NULL);
+	Int64 Now = time(nullptr);
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
 		m_UUIDToProfile[a_UUID] = sProfile(PlayerName, a_UUID, Properties, Now);
@@ -855,7 +855,7 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const AString & a_
 {
 	// Notify the rank manager:
 	cCSLock Lock(m_CSRankMgr);
-	if (m_RankMgr != NULL)
+	if (m_RankMgr != nullptr)
 	{
 		m_RankMgr->NotifyNameUUID(a_PlayerName, a_UUID);
 	}
@@ -867,7 +867,7 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const AString & a_
 
 void cMojangAPI::Update(void)
 {
-	Int64 LimitDateTime = time(NULL) - MAX_AGE;
+	Int64 LimitDateTime = time(nullptr) - MAX_AGE;
 
 	// Re-query all playernames that are stale:
 	AStringVector PlayerNames;

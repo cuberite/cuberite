@@ -10,7 +10,7 @@
 
 cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const cItem & a_Item) :
 	super(pkFirework, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
-	m_ExplodeTimer(0),
+	m_TicksToExplosion(a_Item.m_FireworkItem.m_FlightTimeInTicks),
 	m_FireworkItem(a_Item)
 {
 }
@@ -27,7 +27,9 @@ void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	
 	if ((PosY < 0) || (PosY >= cChunkDef::Height))
 	{
-		goto setspeed;
+		AddSpeedY(1);
+		AddPosition(GetSpeed() * (a_Dt / 1000));
+		return;
 	}
 	
 	if (m_IsInGround)
@@ -50,7 +52,6 @@ void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		}
 	}
 	
-setspeed:
 	AddSpeedY(1);
 	AddPosition(GetSpeed() * (a_Dt / 1000));
 }
@@ -63,11 +64,13 @@ void cFireworkEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	
-	if (m_ExplodeTimer == m_FireworkItem.m_FireworkItem.m_FlightTimeInTicks)
+	if (m_TicksToExplosion <= 0)
 	{
+		// TODO: Notify the plugins
 		m_World->BroadcastEntityStatus(*this, esFireworkExploding);
 		Destroy();
+		return;
 	}
 	
-	m_ExplodeTimer++;
+	m_TicksToExplosion -= 1;
 }

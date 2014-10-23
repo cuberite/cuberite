@@ -89,7 +89,7 @@ public:
 	the profile to the respective mapping caches and updtes their datetime stamp to now. */
 	void AddPlayerProfile(const AString & a_PlayerName, const AString & a_UUID, const Json::Value & a_Properties);
 
-	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts NULL to remove the binding. */
+	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
 
 protected:
@@ -112,7 +112,7 @@ protected:
 			m_UUID(),
 			m_Textures(),
 			m_TexturesSignature(),
-			m_DateTime(time(NULL))
+			m_DateTime(time(nullptr))
 		{
 		}
 		
@@ -176,7 +176,7 @@ protected:
 	/** Protects m_UUIDToProfile against simultaneous multi-threaded access. */
 	cCriticalSection m_CSUUIDToProfile;
 
-	/** The rank manager that is notified of the name-uuid pairings. May be NULL. Protected by m_CSRankMgr. */
+	/** The rank manager that is notified of the name-uuid pairings. May be nullptr. Protected by m_CSRankMgr. */
 	cRankManager * m_RankMgr;
 
 	/** Protects m_RankMgr agains simultaneous multi-threaded access. */

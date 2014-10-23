@@ -216,7 +216,7 @@ cEntityEffect * cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectT
 	}
 	
 	ASSERT(!"Unhandled entity effect type!");
-	return NULL;
+	return nullptr;
 }
 
 
@@ -329,7 +329,7 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 	
 	if (a_Target.IsMob() && ((cMonster &) a_Target).IsUndead())
 	{
-		a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+		a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 		return;
 	}
 	a_Target.Heal(amount);
@@ -352,7 +352,7 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 		a_Target.Heal(amount);
 		return;
 	}
-	a_Target.TakeDamage(dtPotionOfHarming, NULL, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+	a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 }
 
 
@@ -452,7 +452,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		// Cannot take poison damage when health is at 1
 		if (a_Target.GetHealth() > 1)
 		{
-			a_Target.TakeDamage(dtPoisoning, NULL, 1, 0);
+			a_Target.TakeDamage(dtPoisoning, nullptr, 1, 0);
 		}
 	}
 }
@@ -473,7 +473,7 @@ void cEntityEffectWither::OnTick(cPawn & a_Target)
 
 	if ((m_Ticks % frequency) == 0)
 	{
-		a_Target.TakeDamage(dtWither, NULL, 1, 0);
+		a_Target.TakeDamage(dtWither, nullptr, 1, 0);
 	}
 }
 

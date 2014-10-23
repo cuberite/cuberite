@@ -31,10 +31,10 @@ public:
 	
 	enum eState
 	{
-		wcsRecvHeaders,  ///< Receiving request headers (m_CurrentRequest is created if NULL)
+		wcsRecvHeaders,  ///< Receiving request headers (m_CurrentRequest is created if nullptr)
 		wcsRecvBody,     ///< Receiving request body    (m_CurrentRequest is valid)
-		wcsRecvIdle,     ///< Has received the entire body, waiting to send the response (m_CurrentRequest == NULL)
-		wcsSendingResp,  ///< Sending response body     (m_CurrentRequest == NULL)
+		wcsRecvIdle,     ///< Has received the entire body, waiting to send the response (m_CurrentRequest == nullptr)
+		wcsSendingResp,  ///< Sending response body     (m_CurrentRequest == nullptr)
 		wcsInvalid,      ///< The request was malformed, the connection is closing
 	} ;
 	

@@ -95,19 +95,19 @@ cChunk::cChunk(
 	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
 	m_AlwaysTicked(0)
 {
-	if (a_NeighborXM != NULL)
+	if (a_NeighborXM != nullptr)
 	{
 		a_NeighborXM->m_NeighborXP = this;
 	}
-	if (a_NeighborXP != NULL)
+	if (a_NeighborXP != nullptr)
 	{
 		a_NeighborXP->m_NeighborXM = this;
 	}
-	if (a_NeighborZM != NULL)
+	if (a_NeighborZM != nullptr)
 	{
 		a_NeighborZM->m_NeighborZP = this;
 	}
-	if (a_NeighborZP != NULL)
+	if (a_NeighborZP != nullptr)
 	{
 		a_NeighborZP->m_NeighborZM = this;
 	}
@@ -141,28 +141,28 @@ cChunk::~cChunk()
 		}
 	}
 	
-	if (m_NeighborXM != NULL)
+	if (m_NeighborXM != nullptr)
 	{
-		m_NeighborXM->m_NeighborXP = NULL;
+		m_NeighborXM->m_NeighborXP = nullptr;
 	}
-	if (m_NeighborXP != NULL)
+	if (m_NeighborXP != nullptr)
 	{
-		m_NeighborXP->m_NeighborXM = NULL;
+		m_NeighborXP->m_NeighborXM = nullptr;
 	}
-	if (m_NeighborZM != NULL)
+	if (m_NeighborZM != nullptr)
 	{
-		m_NeighborZM->m_NeighborZP = NULL;
+		m_NeighborZM->m_NeighborZP = nullptr;
 	}
-	if (m_NeighborZP != NULL)
+	if (m_NeighborZP != nullptr)
 	{
-		m_NeighborZP->m_NeighborZM = NULL;
+		m_NeighborZP->m_NeighborZM = nullptr;
 	}
 	delete m_WaterSimulatorData;
-	m_WaterSimulatorData = NULL;
+	m_WaterSimulatorData = nullptr;
 	delete m_LavaSimulatorData;
-	m_LavaSimulatorData = NULL;
+	m_LavaSimulatorData = nullptr;
 	delete m_RedstoneSimulatorData;
-	m_RedstoneSimulatorData = NULL;
+	m_RedstoneSimulatorData = nullptr;
 }
 
 
@@ -581,7 +581,7 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 		}
 		
 		cEntity * newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
-		if (newMob == NULL)
+		if (newMob == nullptr)
 		{
 			continue;
 		}
@@ -639,7 +639,7 @@ void cChunk::Tick(float a_Dt)
 		{
 			// Remove all entities that are travelling to another world
 			MarkDirty();
-			(*itr)->SetWorldTravellingFrom(NULL);
+			(*itr)->SetWorldTravellingFrom(nullptr);
 			itr = m_Entities.erase(itr);
 		}
 		else if (
@@ -668,7 +668,7 @@ void cChunk::Tick(float a_Dt)
 void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 {
 	cBlockHandler * Handler = BlockHandler(GetBlock(a_RelX, a_RelY, a_RelZ));
-	ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
+	ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
 	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
 	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelX, a_RelY, a_RelZ);
@@ -681,10 +681,10 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 {
 	cChunk * Neighbor = GetNeighborChunk(a_Entity->GetChunkX() * cChunkDef::Width, a_Entity->GetChunkZ() * cChunkDef::Width);
-	if (Neighbor == NULL)
+	if (Neighbor == nullptr)
 	{
 		Neighbor = m_ChunkMap->GetChunkNoLoad(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
-		if (Neighbor == NULL)
+		if (Neighbor == nullptr)
 		{
 			// TODO: What to do with this?
 			LOGWARNING("%s: Failed to move entity, destination chunk unreachable. Entity lost", __FUNCTION__);
@@ -847,7 +847,7 @@ void cChunk::TickBlocks(void)
 		}
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
-		ASSERT(Handler != NULL);  // Happenned on server restart, FS #243
+		ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
 		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
 }
@@ -1127,7 +1127,7 @@ bool cChunk::UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1148,7 +1148,7 @@ bool cChunk::UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1169,7 +1169,7 @@ bool cChunk::UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLE
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1190,7 +1190,7 @@ bool cChunk::UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, 
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1211,7 +1211,7 @@ bool cChunk::UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NI
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1232,7 +1232,7 @@ bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBB
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1254,7 +1254,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1275,7 +1275,7 @@ bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKT
 		return false;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk == NULL) || !Chunk->IsValid())
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		// The chunk is not available, bail out
 		return false;
@@ -1296,7 +1296,7 @@ void cChunk::UnboundedQueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
 		return;
 	}
 	cChunk * Chunk = GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	if ((Chunk != NULL) && Chunk->IsValid())
+	if ((Chunk != nullptr) && Chunk->IsValid())
 	{
 		Chunk->QueueTickBlock(a_RelX, a_RelY, a_RelZ);
 	}
@@ -1452,12 +1452,12 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 	// If there was a block entity, remove it:
 	Vector3i WorldPos = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
 	cBlockEntity * BlockEntity = GetBlockEntity(WorldPos);
-	if (BlockEntity != NULL)
+	if (BlockEntity != nullptr)
 	{
 		BlockEntity->Destroy();
 		RemoveBlockEntity(BlockEntity);
 		delete BlockEntity;
-		BlockEntity = NULL;
+		BlockEntity = nullptr;
 	}
 	
 	// If the new block is a block entity, create the entity object:
@@ -1619,7 +1619,7 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client)
 {
 
-	if (a_Client == NULL)
+	if (a_Client == nullptr)
 	{
 		// Queue the block for all clients in the chunk (will be sent in Tick())
 		m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelX, a_RelY, a_RelZ, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ)));
@@ -1673,7 +1673,7 @@ cBlockEntity * cChunk::GetBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ)
 		}
 	}  // for itr - m_BlockEntities[]
 	
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1708,7 +1708,7 @@ void cChunk::SetAlwaysTicked(bool a_AlwaysTicked)
 void cChunk::UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z)
 {
 	cBlockEntity * be = GetBlockEntity(a_X, a_Y, a_Z);
-	if (be != NULL)
+	if (be != nullptr)
 	{
 		be->UsedBy(a_Player);
 	}
@@ -2664,10 +2664,10 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 	bool ReturnThis = true;
 	if (a_RelX < 0)
 	{
-		if (m_NeighborXM != NULL)
+		if (m_NeighborXM != nullptr)
 		{
 			cChunk * Candidate = m_NeighborXM->GetRelNeighborChunk(a_RelX + cChunkDef::Width, a_RelZ);
-			if (Candidate != NULL)
+			if (Candidate != nullptr)
 			{
 				return Candidate;
 			}
@@ -2677,10 +2677,10 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 	}
 	else if (a_RelX >= cChunkDef::Width)
 	{
-		if (m_NeighborXP != NULL)
+		if (m_NeighborXP != nullptr)
 		{
 			cChunk * Candidate = m_NeighborXP->GetRelNeighborChunk(a_RelX - cChunkDef::Width, a_RelZ);
-			if (Candidate != NULL)
+			if (Candidate != nullptr)
 			{
 				return Candidate;
 			}
@@ -2691,24 +2691,24 @@ cChunk * cChunk::GetRelNeighborChunk(int a_RelX, int a_RelZ)
 	
 	if (a_RelZ < 0)
 	{
-		if (m_NeighborZM != NULL)
+		if (m_NeighborZM != nullptr)
 		{
 			return m_NeighborZM->GetRelNeighborChunk(a_RelX, a_RelZ + cChunkDef::Width);
 			// For requests crossing both X and Z, the X-first way has been already tried
 		}
-		return NULL;
+		return nullptr;
 	}
 	else if (a_RelZ >= cChunkDef::Width)
 	{
-		if (m_NeighborZP != NULL)
+		if (m_NeighborZP != nullptr)
 		{
 			return m_NeighborZP->GetRelNeighborChunk(a_RelX, a_RelZ - cChunkDef::Width);
 			// For requests crossing both X and Z, the X-first way has been already tried
 		}
-		return NULL;
+		return nullptr;
 	}
 	
-	return (ReturnThis ? this : NULL);
+	return (ReturnThis ? this : nullptr);
 }
 
 
@@ -2731,27 +2731,27 @@ cChunk * cChunk::GetRelNeighborChunkAdjustCoords(int & a_RelX, int & a_RelZ) con
 	// Request for a different chunk, calculate chunk offset:
 	int RelX = a_RelX;  // Make a local copy of the coords (faster access)
 	int RelZ = a_RelZ;
-	while ((RelX >= Width) && (ToReturn != NULL))
+	while ((RelX >= Width) && (ToReturn != nullptr))
 	{
 		RelX -= Width;
 		ToReturn = ToReturn->m_NeighborXP;
 	}
-	while ((RelX < 0) && (ToReturn != NULL))
+	while ((RelX < 0) && (ToReturn != nullptr))
 	{
 		RelX += Width;
 		ToReturn = ToReturn->m_NeighborXM;
 	}
-	while ((RelZ >= Width) && (ToReturn != NULL))
+	while ((RelZ >= Width) && (ToReturn != nullptr))
 	{
 		RelZ -= Width;
 		ToReturn = ToReturn->m_NeighborZP;
 	}
-	while ((RelZ < 0) && (ToReturn != NULL))
+	while ((RelZ < 0) && (ToReturn != nullptr))
 	{
 		RelZ += Width;
 		ToReturn = ToReturn->m_NeighborZM;
 	}
-	if (ToReturn != NULL)
+	if (ToReturn != nullptr)
 	{
 		a_RelX = RelX;
 		a_RelZ = RelZ;
@@ -2821,7 +2821,7 @@ void cChunk::BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cons
 {
 	// We can operate on entity pointers, we're inside the ChunkMap's CS lock which guards the list
 	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
-	if (Entity == NULL)
+	if (Entity == nullptr)
 	{
 		return;
 	}
@@ -3158,7 +3158,7 @@ void cChunk::BroadcastUseBed(const cEntity & a_Entity, int a_BlockX, int a_Block
 void cChunk::SendBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client)
 {
 	cBlockEntity * Entity = GetBlockEntity(a_BlockX, a_BlockY, a_BlockZ);
-	if (Entity == NULL)
+	if (Entity == nullptr)
 	{
 		return;
 	}

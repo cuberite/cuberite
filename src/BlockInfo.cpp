@@ -9,7 +9,7 @@
 cBlockInfo::~cBlockInfo()
 {
 	delete m_Handler;
-	m_Handler = NULL;
+	m_Handler = nullptr;
 }
 
 
@@ -17,7 +17,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 {
 	for (unsigned int i = 0; i < 256; ++i)
 	{
-		if (a_Info[i].m_Handler == NULL)
+		if (a_Info[i].m_Handler == nullptr)
 		{
 			a_Info[i].m_Handler = cBlockHandler::CreateBlockHandler((BLOCKTYPE) i);
 		}

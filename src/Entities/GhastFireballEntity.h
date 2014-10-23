@@ -1,6 +1,11 @@
-//
-//  GhastFireballEntity.h
-//
+
+// GhastFireballEntity.h
+
+// Declares the cGhastFireballEntity class representing the ghast fireball in flight.
+
+
+
+
 
 #pragma once
 
@@ -36,3 +41,7 @@ protected:
 	// TODO: Deflecting the fireballs by arrow- or sword- hits
 	
 } ;  // tolua_export
+
+
+
+

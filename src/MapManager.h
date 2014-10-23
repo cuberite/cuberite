@@ -31,12 +31,12 @@ public:
 
 	cMapManager(cWorld * a_World);
 
-	/** Returns the map with the specified ID, NULL if out of range.
+	/** Returns the map with the specified ID, nullptr if out of range.
 	WARNING: The returned map object is not thread safe.
 	*/
 	cMap * GetMapData(unsigned int a_ID);
 
-	/** Creates a new map. Returns NULL on error */
+	/** Creates a new map. Returns nullptr on error */
 	cMap * CreateMap(int a_CenterX, int a_CenterY, int a_Scale = 3);
 
 	/** Calls the callback for the map with the specified ID.

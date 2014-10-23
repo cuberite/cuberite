@@ -46,7 +46,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 	
 	// Set the CtrDrbg context, create a new one if needed:
 	m_CtrDrbg = a_CtrDrbg;
-	if (m_CtrDrbg.get() == NULL)
+	if (m_CtrDrbg.get() == nullptr)
 	{
 		m_CtrDrbg.reset(new cCtrDrbgContext);
 		m_CtrDrbg->Initialize("MCServer", 8);
@@ -98,7 +98,7 @@ void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cRsaPrivateKe
 	ASSERT(m_IsValid);  // Call Initialize() first
 	
 	// Check that both the cert and the key is valid:
-	if ((a_OwnCert.get() == NULL) || (a_OwnCertPrivKey.get() == NULL))
+	if ((a_OwnCert.get() == nullptr) || (a_OwnCertPrivKey.get() == nullptr))
 	{
 		LOGWARNING("SSL: Own certificate is not valid, skipping the set.");
 		return;
@@ -121,7 +121,7 @@ void cSslContext::SetOwnCert(const cX509CertPtr & a_OwnCert, const cCryptoKeyPtr
 	ASSERT(m_IsValid);  // Call Initialize() first
 	
 	// Check that both the cert and the key is valid:
-	if ((a_OwnCert.get() == NULL) || (a_OwnCertPrivKey.get() == NULL))
+	if ((a_OwnCert.get() == nullptr) || (a_OwnCertPrivKey.get() == nullptr))
 	{
 		LOGWARNING("SSL: Own certificate is not valid, skipping the set.");
 		return;
@@ -150,7 +150,7 @@ void cSslContext::SetCACerts(const cX509CertPtr & a_CACert, const AString & a_Ex
 	
 	// Set the trusted CA root cert store:
 	ssl_set_authmode(&m_Ssl, SSL_VERIFY_REQUIRED);
-	ssl_set_ca_chain(&m_Ssl, m_CACerts->GetInternal(), NULL, m_ExpectedPeerName.empty() ? NULL : m_ExpectedPeerName.c_str());
+	ssl_set_ca_chain(&m_Ssl, m_CACerts->GetInternal(), nullptr, m_ExpectedPeerName.empty() ? nullptr : m_ExpectedPeerName.c_str());
 }
 
 

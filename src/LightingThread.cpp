@@ -91,7 +91,7 @@ public:
 
 cLightingThread::cLightingThread(void) :
 	super("cLightingThread"),
-	m_World(NULL),
+	m_World(nullptr),
 	m_MaxHeight(0),
 	m_NumSeeds(0)
 {
@@ -112,7 +112,7 @@ cLightingThread::~cLightingThread()
 
 bool cLightingThread::Start(cWorld * a_World)
 {
-	ASSERT(m_World == NULL);  // Not started yet
+	ASSERT(m_World == nullptr);  // Not started yet
 	m_World = a_World;
 	
 	return super::Start();
@@ -151,7 +151,7 @@ void cLightingThread::Stop(void)
 
 void cLightingThread::QueueChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallbackAfter)
 {
-	ASSERT(m_World != NULL);  // Did you call Start() properly?
+	ASSERT(m_World != nullptr);  // Did you call Start() properly?
 	
 	cChunkStay * ChunkStay = new cLightingChunkStay(*this, a_ChunkX, a_ChunkZ, a_CallbackAfter);
 	{
@@ -310,7 +310,7 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	
 	m_World->ChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ, BlockLight, SkyLight);
 
-	if (a_Item.m_CallbackAfter != NULL)
+	if (a_Item.m_CallbackAfter != nullptr)
 	{
 		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 	}

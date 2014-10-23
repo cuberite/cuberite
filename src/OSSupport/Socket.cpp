@@ -292,7 +292,7 @@ bool cSocket::ConnectIPv4(const AString & a_HostNameOrAddr, unsigned short a_Por
 	{
 		// It is not an IP Address string, but rather a regular hostname, resolve:
 		hostent * hp = gethostbyname(a_HostNameOrAddr.c_str());
-		if (hp == NULL)
+		if (hp == nullptr)
 		{
 			LOGWARNING("%s: Could not resolve hostname \"%s\"", __FUNCTION__, a_HostNameOrAddr.c_str());
 			CloseSocket();

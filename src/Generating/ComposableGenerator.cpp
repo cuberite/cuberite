@@ -48,7 +48,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 		CompoGenName = "Biomal";
 	}
 	
-	cTerrainCompositionGen * res = NULL;
+	cTerrainCompositionGen * res = nullptr;
 	if (NoCaseCompare(CompoGenName, "sameblock") == 0)
 	{
 		res = new cCompoGenSameBlock;
@@ -102,7 +102,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 		a_IniFile.SetValue("Generator", "CompositionGen", "Biomal");
 		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_HeightGen, a_Seed);
 	}
-	ASSERT(res != NULL);
+	ASSERT(res != nullptr);
 	
 	// Read the settings from the ini file:
 	res->InitializeCompoGen(a_IniFile);
@@ -119,9 +119,9 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 
 cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 	super(a_ChunkGenerator),
-	m_BiomeGen(nullptr),
-	m_HeightGen(nullptr),
-	m_CompositionGen(nullptr)
+	m_BiomeGen(),
+	m_HeightGen(),
+	m_CompositionGen()
 {
 }
 
@@ -145,7 +145,7 @@ void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 
 void cComposableGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	if (m_BiomeGen != NULL)  // Quick fix for generator deinitializing before the world storage finishes loading
+	if (m_BiomeGen != nullptr)  // Quick fix for generator deinitializing before the world storage finishes loading
 	{
 		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 	}

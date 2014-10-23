@@ -83,7 +83,7 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 		memset(m_ItemHandler, 0, sizeof(m_ItemHandler));
 		m_HandlerInitialized = true;
 	}
-	if (m_ItemHandler[a_ItemType] == NULL)
+	if (m_ItemHandler[a_ItemType] == nullptr)
 	{
 		m_ItemHandler[a_ItemType] = CreateItemHandler(a_ItemType);
 	}
@@ -278,7 +278,7 @@ void cItemHandler::Deinit()
 	for (int i = 0; i < 2267; i++)
 	{
 		delete m_ItemHandler[i];
-		m_ItemHandler[i] = NULL;
+		m_ItemHandler[i] = nullptr;
 	}
 	memset(m_ItemHandler, 0, sizeof(m_ItemHandler));  // Don't leave any dangling pointers around, just in case
 	m_HandlerInitialized = false;
@@ -572,6 +572,8 @@ bool cItemHandler::CanHarvestBlock(BLOCKTYPE a_BlockType)
 		case E_BLOCK_COBBLESTONE:
 		case E_BLOCK_COBBLESTONE_STAIRS:
 		case E_BLOCK_COBBLESTONE_WALL:
+		case E_BLOCK_COBWEB:
+		case E_BLOCK_DEAD_BUSH:
 		case E_BLOCK_DIAMOND_BLOCK:
 		case E_BLOCK_DIAMOND_ORE:
 		case E_BLOCK_DOUBLE_NEW_STONE_SLAB:

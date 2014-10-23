@@ -33,7 +33,7 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_WindowTitle(a_WindowTitle),
 	m_IsDestroyed(false),
 	m_ShouldDistributeToHotbarFirst(true),
-	m_Owner(NULL)
+	m_Owner(nullptr)
 {
 	if (a_WindowType == wtInventory)
 	{
@@ -105,10 +105,10 @@ const cItem * cWindow::GetSlot(cPlayer & a_Player, int a_SlotNum) const
 	// Return the item at the specified slot for the specified player
 	int LocalSlotNum = 0;
 	const cSlotArea * Area = GetSlotArea(a_SlotNum, LocalSlotNum);
-	if (Area == NULL)
+	if (Area == nullptr)
 	{
-		LOGWARNING("%s: requesting item from an invalid SlotArea (SlotNum %d), returning NULL.", __FUNCTION__, a_SlotNum);
-		return NULL;
+		LOGWARNING("%s: requesting item from an invalid SlotArea (SlotNum %d), returning nullptr.", __FUNCTION__, a_SlotNum);
+		return nullptr;
 	}
 	return Area->GetSlot(LocalSlotNum, a_Player);
 }
@@ -122,7 +122,7 @@ void cWindow::SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item)
 	// Set the item to the specified slot for the specified player
 	int LocalSlotNum = 0;
 	cSlotArea * Area = GetSlotArea(a_SlotNum, LocalSlotNum);
-	if (Area == NULL)
+	if (Area == nullptr)
 	{
 		LOGWARNING("%s: requesting write to an invalid SlotArea (SlotNum %d), ignoring.", __FUNCTION__, a_SlotNum);
 		return;
@@ -177,7 +177,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 		for (int i = 0; i < NumSlots; i++)
 		{
 			const cItem * Item = (*itr)->GetSlot(i, a_Player);
-			if (Item == NULL)
+			if (Item == nullptr)
 			{
 				a_Slots.push_back(cItem());
 			}
@@ -311,7 +311,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	}
 
 	cClientHandle * ClientHandle = a_Player.GetClientHandle();
-	if (ClientHandle != NULL)
+	if (ClientHandle != nullptr)
 	{
 		ClientHandle->SendWindowClose(*this);
 	}
@@ -345,7 +345,7 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 void cWindow::OwnerDestroyed()
 {
-	m_Owner = NULL;
+	m_Owner = nullptr;
 	// Close window for each player. Note that the last one needs special handling
 	while (m_OpenedBy.size() > 1)
 	{
@@ -511,10 +511,10 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 
 void cWindow::Destroy(void)
 {
-	if (m_Owner != NULL)
+	if (m_Owner != nullptr)
 	{
 		m_Owner->CloseWindow();
-		m_Owner = NULL;
+		m_Owner = nullptr;
 	}
 	m_IsDestroyed = true;
 }
@@ -529,7 +529,7 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 	{
 		LOGWARNING("%s: requesting an invalid SlotNum: %d out of %d slots", __FUNCTION__, a_GlobalSlotNum, GetNumSlots() - 1);
 		ASSERT(!"Invalid SlotNum");
-		return NULL;
+		return nullptr;
 	}
 	
 	// Iterate through all the SlotAreas, find the correct one
@@ -547,7 +547,7 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
 	LOGWARNING("%s: GetNumSlots() is out of sync: %d; LocalSlotNum = %d", __FUNCTION__, GetNumSlots(), LocalSlotNum);
 	ASSERT(!"Invalid GetNumSlots");
-	return NULL;
+	return nullptr;
 }
 
 
@@ -560,7 +560,7 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 	{
 		LOGWARNING("%s: requesting an invalid SlotNum: %d out of %d slots", __FUNCTION__, a_GlobalSlotNum, GetNumSlots() - 1);
 		ASSERT(!"Invalid SlotNum");
-		return NULL;
+		return nullptr;
 	}
 	
 	// Iterate through all the SlotAreas, find the correct one
@@ -578,7 +578,7 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
 	LOGWARNING("%s: GetNumSlots() is out of sync: %d; LocalSlotNum = %d", __FUNCTION__, GetNumSlots(), LocalSlotNum);
 	ASSERT(!"Invalid GetNumSlots");
-	return NULL;
+	return nullptr;
 }
 
 
@@ -669,7 +669,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 	{
 		int LocalSlotNum = 0;
 		cSlotArea * Area = GetSlotArea(*itr, LocalSlotNum);
-		if (Area == NULL)
+		if (Area == nullptr)
 		{
 			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, *itr);
 			continue;
@@ -836,7 +836,7 @@ void cAnvilWindow::SetRepairedItemName(const AString & a_Name, cPlayer * a_Playe
 {
 	m_RepairedItemName = a_Name;
 
-	if (a_Player != NULL)
+	if (a_Player != nullptr)
 	{
 		m_AnvilSlotArea->UpdateResult(*a_Player);
 	}
@@ -963,7 +963,7 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest) :
 	m_BlockY(a_Chest->GetPosY()),
 	m_BlockZ(a_Chest->GetPosZ()),
 	m_PrimaryChest(a_Chest),
-	m_SecondaryChest(NULL)
+	m_SecondaryChest(nullptr)
 {
 	m_SlotAreas.push_back(new cSlotAreaChest(a_Chest, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -1014,7 +1014,7 @@ void cChestWindow::OpenedByPlayer(cPlayer & a_Player)
 	cChunkDef::BlockToChunk(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosZ(), ChunkX, ChunkZ);
 	m_PrimaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
 
-	if (m_SecondaryChest != NULL)
+	if (m_SecondaryChest != nullptr)
 	{
 		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() + 1);
 		cChunkDef::BlockToChunk(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosZ(), ChunkX, ChunkZ);
@@ -1036,7 +1036,7 @@ bool cChestWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	cChunkDef::BlockToChunk(m_PrimaryChest->GetPosX(), m_PrimaryChest->GetPosZ(), ChunkX, ChunkZ);
 	m_PrimaryChest->GetWorld()->MarkRedstoneDirty(ChunkX, ChunkZ);
 
-	if (m_SecondaryChest != NULL)
+	if (m_SecondaryChest != nullptr)
 	{
 		m_SecondaryChest->SetNumberOfPlayers(m_SecondaryChest->GetNumberOfPlayers() - 1);
 		cChunkDef::BlockToChunk(m_SecondaryChest->GetPosX(), m_SecondaryChest->GetPosZ(), ChunkX, ChunkZ);

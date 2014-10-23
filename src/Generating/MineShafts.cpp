@@ -112,7 +112,7 @@ class cMineShaftCorridor :
 public:
 	/** Creates a new Corridor attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
-	May return NULL if cannot fit.
+	May return nullptr if cannot fit.
 	*/
 	static cMineShaft * CreateAndFit(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
@@ -165,7 +165,7 @@ class cMineShaftCrossing :
 public:
 	/** Creates a new Crossing attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
-	May return NULL if cannot fit.
+	May return nullptr if cannot fit.
 	*/
 	static cMineShaft * CreateAndFit(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
@@ -199,7 +199,7 @@ public:
 
 	/** Creates a new Staircase attached to the specified pivot point and direction.
 	Checks all ParentSystem's objects and disallows intersecting. Initializes the new object to fit.
-	May return NULL if cannot fit.
+	May return nullptr if cannot fit.
 	*/
 	static cMineShaft * CreateAndFit(
 		cStructGenMineShafts::cMineShaftSystem & a_ParentSystem,
@@ -351,7 +351,7 @@ void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
 		return;
 	}
 
-	cMineShaft * Next = NULL;
+	cMineShaft * Next = nullptr;
 	int rnd = (a_Noise.IntNoise3DInt(a_PivotX, a_PivotY + a_RecursionLevel * 16, a_PivotZ) / 13) % m_ProbLevelStaircase;
 	if (rnd < m_ProbLevelCorridor)
 	{
@@ -365,7 +365,7 @@ void cStructGenMineShafts::cMineShaftSystem::AppendBranch(
 	{
 		Next = cMineShaftStaircase::CreateAndFit(*this, a_PivotX, a_PivotY, a_PivotZ, a_Direction, a_Noise);
 	}
-	if (Next == NULL)
+	if (Next == nullptr)
 	{
 		return;
 	}
@@ -552,7 +552,7 @@ cMineShaft * cMineShaftCorridor::CreateAndFit(
 	}
 	if (!a_ParentSystem.CanAppend(BoundingBox))
 	{
-		return NULL;
+		return nullptr;
 	}
 	return new cMineShaftCorridor(a_ParentSystem, BoundingBox, NumSegments, a_Direction, a_Noise);
 }
@@ -796,7 +796,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 	{
 		a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, Meta);
 		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z);
-		ASSERT((ChestEntity != NULL) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(x, z);
@@ -1006,7 +1006,7 @@ cMineShaft * cMineShaftCrossing::CreateAndFit(
 	}
 	if (!a_ParentSystem.CanAppend(BoundingBox))
 	{
-		return NULL;
+		return nullptr;
 	}
 	return new cMineShaftCrossing(a_ParentSystem, BoundingBox);
 }
@@ -1157,7 +1157,7 @@ cMineShaft * cMineShaftStaircase::CreateAndFit(
 	}
 	if (!a_ParentSystem.CanAppend(Box))
 	{
-		return NULL;
+		return nullptr;
 	}
 	return new cMineShaftStaircase(a_ParentSystem, Box, a_Direction, Slope);
 }

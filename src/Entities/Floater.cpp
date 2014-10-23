@@ -22,7 +22,7 @@ public:
 		m_Pos(a_Pos),
 		m_NextPos(a_NextPos),
 		m_MinCoeff(1),
-		m_HitEntity(NULL)
+		m_HitEntity(nullptr)
 	{
 	}
 	virtual bool Item(cEntity * a_Entity) override

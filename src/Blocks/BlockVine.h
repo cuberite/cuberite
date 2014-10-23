@@ -23,10 +23,6 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	) override
 	{
-		UNUSED(a_Player);
-		UNUSED(a_CursorX);
-		UNUSED(a_CursorY);
-		UNUSED(a_CursorZ);
 		// TODO: Disallow placement where the vine doesn't attach to something properly
 		BLOCKTYPE BlockType = 0;
 		NIBBLETYPE BlockMeta;
@@ -80,7 +76,21 @@ public:
 	/// Returns true if the specified block type is good for vines to attach to
 	static bool IsBlockAttachable(BLOCKTYPE a_BlockType)
 	{
-		return ((a_BlockType == E_BLOCK_LEAVES) || (a_BlockType == E_BLOCK_NEW_LEAVES) || cBlockInfo::IsSolid(a_BlockType));
+		switch (a_BlockType)
+		{
+			case E_BLOCK_GLASS:
+			case E_BLOCK_STAINED_GLASS:
+			case E_BLOCK_CHEST:
+			case E_BLOCK_TRAPPED_CHEST:
+			{
+				// You can't attach a vine to this solid blocks.
+				return false;
+			}
+			default:
+			{
+				return cBlockInfo::IsSolid(a_BlockType);
+			}
+		}
 	}
 
 
@@ -138,7 +148,7 @@ public:
 				{
 					int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
 					int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-					DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
+					DropBlock(a_ChunkInterface, *a_Chunk.GetWorld(), a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
 				}
 				a_Chunk.SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
 				return;

@@ -24,7 +24,7 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		return false;
 	}
-	if ((a_TDI.Attacker != this) && (a_TDI.Attacker != NULL))
+	if ((a_TDI.Attacker != this) && (a_TDI.Attacker != nullptr))
 	{
 		m_EMState = ESCAPING;
 	}
@@ -49,7 +49,7 @@ void cPassiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
-	if (a_Closest_Player != NULL)
+	if (a_Closest_Player != nullptr)
 	{
 		if (a_Closest_Player->GetEquippedItem().IsEqual(FollowedItem))
 		{

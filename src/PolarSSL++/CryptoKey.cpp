@@ -123,7 +123,7 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 	
 	if (a_Password.empty())
 	{
-		return pk_parse_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes, NULL, 0);
+		return pk_parse_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes, nullptr, 0);
 	}
 	else
 	{

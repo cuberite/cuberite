@@ -20,7 +20,7 @@
 
 AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
-	ASSERT(format != NULL);
+	ASSERT(format != nullptr);
 	
 	char buffer[2048];
 	size_t len;
@@ -562,7 +562,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		#else
 		int Count = sprintf(line, "%08x:", (unsigned)i);
 		#endif
-		// Remove the terminating NULL / leftover garbage in line, after the sprintf-ed value
+		// Remove the terminating nullptr / leftover garbage in line, after the sprintf-ed value
 		memset(line + Count, 32, sizeof(line) - Count);
 		p = line + 10;
 		q = p + 2 + a_BytesPerLine * 3 + 1;

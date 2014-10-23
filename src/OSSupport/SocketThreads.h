@@ -137,7 +137,7 @@ private:
 			/** The socket is primarily owned by this object */
 			cSocket m_Socket;
 			
-			/** The callback to call for events. May be NULL */
+			/** The callback to call for events. May be nullptr */
 			cCallback * m_Client;
 			
 			/** If sending writes only partial data, the rest is stored here for another send.

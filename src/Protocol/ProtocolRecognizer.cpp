@@ -22,7 +22,7 @@
 
 cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 	super(a_Client),
-	m_Protocol(NULL),
+	m_Protocol(nullptr),
 	m_Buffer(8192)     // We need a larger buffer to support BungeeCord - it sends one huge packet at the start
 {
 }
@@ -34,7 +34,7 @@ cProtocolRecognizer::cProtocolRecognizer(cClientHandle * a_Client) :
 cProtocolRecognizer::~cProtocolRecognizer()
 {
 	delete m_Protocol;
-	m_Protocol = NULL;
+	m_Protocol = nullptr;
 }
 
 
@@ -59,7 +59,7 @@ AString cProtocolRecognizer::GetVersionTextFromInt(int a_ProtocolVersion)
 
 void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 {
-	if (m_Protocol == NULL)
+	if (m_Protocol == nullptr)
 	{
 		if (!m_Buffer.Write(a_Data, a_Size))
 		{
@@ -90,7 +90,7 @@ void cProtocolRecognizer::DataReceived(const char * a_Data, size_t a_Size)
 
 void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
 }
 
@@ -100,7 +100,7 @@ void cProtocolRecognizer::SendAttachEntity(const cEntity & a_Entity, const cEnti
 
 void cProtocolRecognizer::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendBlockAction(a_BlockX, a_BlockY, a_BlockZ, a_Byte1, a_Byte2, a_BlockType);
 }
 
@@ -110,7 +110,7 @@ void cProtocolRecognizer::SendBlockAction(int a_BlockX, int a_BlockY, int a_Bloc
 
 void cProtocolRecognizer::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendBlockBreakAnim(a_entityID, a_BlockX, a_BlockY, a_BlockZ, stage);
 }
 
@@ -120,7 +120,7 @@ void cProtocolRecognizer::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a
 
 void cProtocolRecognizer::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
 }
 
@@ -130,7 +130,7 @@ void cProtocolRecognizer::SendBlockChange(int a_BlockX, int a_BlockY, int a_Bloc
 
 void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
 }
 
@@ -140,7 +140,7 @@ void cProtocolRecognizer::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSe
 
 void cProtocolRecognizer::SendChat(const AString & a_Message)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendChat(a_Message);
 }
 
@@ -150,7 +150,7 @@ void cProtocolRecognizer::SendChat(const AString & a_Message)
 
 void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendChat(a_Message);
 }
 
@@ -160,7 +160,7 @@ void cProtocolRecognizer::SendChat(const cCompositeChat & a_Message)
 
 void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
 }
 
@@ -170,7 +170,7 @@ void cProtocolRecognizer::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSe
 
 void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendCollectEntity(a_Entity, a_Player);
 }
 
@@ -180,7 +180,7 @@ void cProtocolRecognizer::SendCollectEntity(const cEntity & a_Entity, const cPla
 
 void cProtocolRecognizer::SendDestroyEntity(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendDestroyEntity(a_Entity);
 }
 
@@ -190,7 +190,7 @@ void cProtocolRecognizer::SendDestroyEntity(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 {
-	if (m_Protocol != NULL)
+	if (m_Protocol != nullptr)
 	{
 		m_Protocol->SendDisconnect(a_Reason);
 	}
@@ -212,7 +212,7 @@ void cProtocolRecognizer::SendDisconnect(const AString & a_Reason)
 
 void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -222,7 +222,7 @@ void cProtocolRecognizer::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 void cProtocolRecognizer::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityEffect(a_Entity, a_EffectID, a_Amplifier, a_Duration);
 }
 
@@ -232,7 +232,7 @@ void cProtocolRecognizer::SendEntityEffect(const cEntity & a_Entity, int a_Effec
 
 void cProtocolRecognizer::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityEquipment(a_Entity, a_SlotNum, a_Item);
 }
 
@@ -242,7 +242,7 @@ void cProtocolRecognizer::SendEntityEquipment(const cEntity & a_Entity, short a_
 
 void cProtocolRecognizer::SendEntityHeadLook(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityHeadLook(a_Entity);
 }
 
@@ -252,7 +252,7 @@ void cProtocolRecognizer::SendEntityHeadLook(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendEntityLook(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityLook(a_Entity);
 }
 
@@ -262,7 +262,7 @@ void cProtocolRecognizer::SendEntityLook(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendEntityMetadata(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityMetadata(a_Entity);
 }
 
@@ -272,7 +272,7 @@ void cProtocolRecognizer::SendEntityMetadata(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendEntityProperties(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityProperties(a_Entity);
 }
 
@@ -282,7 +282,7 @@ void cProtocolRecognizer::SendEntityProperties(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityRelMove(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
@@ -292,7 +292,7 @@ void cProtocolRecognizer::SendEntityRelMove(const cEntity & a_Entity, char a_Rel
 
 void cProtocolRecognizer::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityRelMoveLook(a_Entity, a_RelX, a_RelY, a_RelZ);
 }
 
@@ -302,7 +302,7 @@ void cProtocolRecognizer::SendEntityRelMoveLook(const cEntity & a_Entity, char a
 
 void cProtocolRecognizer::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityStatus(a_Entity, a_Status);
 }
 
@@ -312,7 +312,7 @@ void cProtocolRecognizer::SendEntityStatus(const cEntity & a_Entity, char a_Stat
 
 void cProtocolRecognizer::SendEntityVelocity(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityVelocity(a_Entity);
 }
 
@@ -322,7 +322,7 @@ void cProtocolRecognizer::SendEntityVelocity(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendExplosion(double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendExplosion(a_BlockX, a_BlockY, a_BlockZ, a_Radius, a_BlocksAffected, a_PlayerMotion);
 }
 
@@ -332,7 +332,7 @@ void cProtocolRecognizer::SendExplosion(double a_BlockX, double a_BlockY, double
 
 void cProtocolRecognizer::SendGameMode(eGameMode a_GameMode)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendGameMode(a_GameMode);
 }
 
@@ -342,7 +342,7 @@ void cProtocolRecognizer::SendGameMode(eGameMode a_GameMode)
 
 void cProtocolRecognizer::SendHealth(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendHealth();
 }
 
@@ -352,7 +352,7 @@ void cProtocolRecognizer::SendHealth(void)
 
 void cProtocolRecognizer::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }
 
@@ -362,7 +362,7 @@ void cProtocolRecognizer::SendWindowProperty(const cWindow & a_Window, short a_P
 
 void cProtocolRecognizer::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
 }
 
@@ -372,7 +372,7 @@ void cProtocolRecognizer::SendInventorySlot(char a_WindowID, short a_SlotNum, co
 
 void cProtocolRecognizer::SendKeepAlive(int a_PingID)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendKeepAlive(a_PingID);
 }
 
@@ -382,7 +382,7 @@ void cProtocolRecognizer::SendKeepAlive(int a_PingID)
 
 void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendLogin(a_Player, a_World);
 }
 
@@ -392,7 +392,7 @@ void cProtocolRecognizer::SendLogin(const cPlayer & a_Player, const cWorld & a_W
 
 void cProtocolRecognizer::SendLoginSuccess(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendLoginSuccess();
 }
 
@@ -402,7 +402,7 @@ void cProtocolRecognizer::SendLoginSuccess(void)
 
 void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
 }
 
@@ -412,7 +412,7 @@ void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte *
 
 void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendMapDecorators(a_ID, a_Decorators, m_Scale);
 }
 
@@ -422,7 +422,7 @@ void cProtocolRecognizer::SendMapDecorators(int a_ID, const cMapDecoratorList & 
 
 void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendMapInfo(a_ID, a_Scale);
 }
 
@@ -432,7 +432,7 @@ void cProtocolRecognizer::SendMapInfo(int a_ID, unsigned int a_Scale)
 
 void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendParticleEffect(a_ParticleName, a_SrcX, a_SrcY, a_SrcZ, a_OffsetX, a_OffsetY, a_OffsetZ, a_ParticleData, a_ParticleAmount);
 }
 
@@ -450,7 +450,7 @@ void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
 
 void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPickupSpawn(a_Pickup);
 }
 
@@ -460,7 +460,7 @@ void cProtocolRecognizer::SendPickupSpawn(const cPickup & a_Pickup)
 
 void cProtocolRecognizer::SendPlayerAbilities(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerAbilities();
 }
 
@@ -470,7 +470,7 @@ void cProtocolRecognizer::SendPlayerAbilities(void)
 
 void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_Animation)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendEntityAnimation(a_Entity, a_Animation);
 }
 
@@ -480,7 +480,7 @@ void cProtocolRecognizer::SendEntityAnimation(const cEntity & a_Entity, char a_A
 
 void cProtocolRecognizer::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerListAddPlayer(a_Player);
 }
 
@@ -490,7 +490,7 @@ void cProtocolRecognizer::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 void cProtocolRecognizer::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerListRemovePlayer(a_Player);
 }
 
@@ -500,7 +500,7 @@ void cProtocolRecognizer::SendPlayerListRemovePlayer(const cPlayer & a_Player)
 
 void cProtocolRecognizer::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerListUpdateGameMode(a_Player);
 }
 
@@ -510,7 +510,7 @@ void cProtocolRecognizer::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 
 void cProtocolRecognizer::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerListUpdatePing(a_Player);
 }
 
@@ -520,7 +520,7 @@ void cProtocolRecognizer::SendPlayerListUpdatePing(const cPlayer & a_Player)
 
 void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 }
 
@@ -530,7 +530,7 @@ void cProtocolRecognizer::SendPlayerListUpdateDisplayName(const cPlayer & a_Play
 
 void cProtocolRecognizer::SendPlayerMaxSpeed(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerMaxSpeed();
 }
 
@@ -540,7 +540,7 @@ void cProtocolRecognizer::SendPlayerMaxSpeed(void)
 
 void cProtocolRecognizer::SendPlayerMoveLook(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerMoveLook();
 }
 
@@ -550,7 +550,7 @@ void cProtocolRecognizer::SendPlayerMoveLook(void)
 
 void cProtocolRecognizer::SendPlayerPosition(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerPosition();
 }
 
@@ -560,7 +560,7 @@ void cProtocolRecognizer::SendPlayerPosition(void)
 
 void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPlayerSpawn(a_Player);
 }
 
@@ -570,7 +570,7 @@ void cProtocolRecognizer::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocolRecognizer::SendPluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendPluginMessage(a_Channel, a_Message);
 }
 
@@ -580,7 +580,7 @@ void cProtocolRecognizer::SendPluginMessage(const AString & a_Channel, const ASt
 
 void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendRemoveEntityEffect(a_Entity, a_EffectID);
 }
 
@@ -590,7 +590,7 @@ void cProtocolRecognizer::SendRemoveEntityEffect(const cEntity & a_Entity, int a
 
 void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
 }
 
@@ -600,7 +600,7 @@ void cProtocolRecognizer::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnor
 
 void cProtocolRecognizer::SendExperience(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendExperience();
 }
 
@@ -610,7 +610,7 @@ void cProtocolRecognizer::SendExperience(void)
 
 void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendExperienceOrb(a_ExpOrb);
 }
 
@@ -620,7 +620,7 @@ void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
 }
 
@@ -630,7 +630,7 @@ void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const 
 
 void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
 }
 
@@ -640,7 +640,7 @@ void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const ASt
 
 void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
 }
 
@@ -650,7 +650,7 @@ void cProtocolRecognizer::SendDisplayObjective(const AString & a_Objective, cSco
 
 void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSoundEffect(a_SoundName, a_X, a_Y, a_Z, a_Volume, a_Pitch);
 }
 
@@ -660,7 +660,7 @@ void cProtocolRecognizer::SendSoundEffect(const AString & a_SoundName, double a_
 
 void cProtocolRecognizer::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSoundParticleEffect(a_EffectID, a_SrcX, a_SrcY, a_SrcZ, a_Data);
 }
 
@@ -670,7 +670,7 @@ void cProtocolRecognizer::SendSoundParticleEffect(int a_EffectID, int a_SrcX, in
 
 void cProtocolRecognizer::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSpawnFallingBlock(a_FallingBlock);
 }
 
@@ -680,7 +680,7 @@ void cProtocolRecognizer::SendSpawnFallingBlock(const cFallingBlock & a_FallingB
 
 void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSpawnMob(a_Mob);
 }
 
@@ -690,7 +690,7 @@ void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 
 void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
 }
 
@@ -700,7 +700,7 @@ void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_Objec
 
 void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSpawnVehicle(a_Vehicle, a_VehicleType, a_VehicleSubType);
 }
 
@@ -710,7 +710,7 @@ void cProtocolRecognizer::SendSpawnVehicle(const cEntity & a_Vehicle, char a_Veh
 
 void cProtocolRecognizer::SendStatistics(const cStatManager & a_Manager)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendStatistics(a_Manager);
 }
 
@@ -720,7 +720,7 @@ void cProtocolRecognizer::SendStatistics(const cStatManager & a_Manager)
 
 void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Results)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendTabCompletionResults(a_Results);
 }
 
@@ -730,7 +730,7 @@ void cProtocolRecognizer::SendTabCompletionResults(const AStringVector & a_Resul
 
 void cProtocolRecognizer::SendTeleportEntity(const cEntity & a_Entity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendTeleportEntity(a_Entity);
 }
 
@@ -740,7 +740,7 @@ void cProtocolRecognizer::SendTeleportEntity(const cEntity & a_Entity)
 
 void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -750,7 +750,7 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 
 void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
 
@@ -760,7 +760,7 @@ void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bo
 
 void cProtocolRecognizer::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
 }
 
@@ -770,7 +770,7 @@ void cProtocolRecognizer::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 
 void cProtocolRecognizer::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendUpdateBlockEntity(a_BlockEntity);
 }
 
@@ -780,7 +780,7 @@ void cProtocolRecognizer::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendUpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4);
 }
 
@@ -790,7 +790,7 @@ void cProtocolRecognizer::SendUpdateSign(int a_BlockX, int a_BlockY, int a_Block
 
 void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendUseBed(a_Entity, a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -800,7 +800,7 @@ void cProtocolRecognizer::SendUseBed(const cEntity & a_Entity, int a_BlockX, int
 
 void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendWeather(a_Weather);
 }
 
@@ -810,7 +810,7 @@ void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 
 void cProtocolRecognizer::SendWholeInventory(const cWindow & a_Window)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendWholeInventory(a_Window);
 }
 
@@ -820,7 +820,7 @@ void cProtocolRecognizer::SendWholeInventory(const cWindow & a_Window)
 
 void cProtocolRecognizer::SendWindowClose(const cWindow & a_Window)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendWindowClose(a_Window);
 }
 
@@ -830,7 +830,7 @@ void cProtocolRecognizer::SendWindowClose(const cWindow & a_Window)
 
 void cProtocolRecognizer::SendWindowOpen(const cWindow & a_Window)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendWindowOpen(a_Window);
 }
 
@@ -840,7 +840,7 @@ void cProtocolRecognizer::SendWindowOpen(const cWindow & a_Window)
 
 AString cProtocolRecognizer::GetAuthServerID(void)
 {
-	ASSERT(m_Protocol != NULL);
+	ASSERT(m_Protocol != nullptr);
 	return m_Protocol->GetAuthServerID();
 }
 

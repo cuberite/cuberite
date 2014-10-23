@@ -23,7 +23,7 @@ cSkeleton::cSkeleton(bool IsWither) :
 void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
-	if (a_Killer != NULL)
+	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
@@ -71,20 +71,20 @@ void cSkeleton::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
 
-	if (m_Target != NULL && m_AttackInterval > 3.0)
+	if (m_Target != nullptr && m_AttackInterval > 3.0)
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;
 		Speed.y = Speed.y + 1;
 		cArrowEntity * Arrow = new cArrowEntity(this, GetPosX(), GetPosY() + 1, GetPosZ(), Speed);
-		if (Arrow == NULL)
+		if (Arrow == nullptr)
 		{
 			return;
 		}
 		if (!Arrow->Initialize(*m_World))
 		{
 			delete Arrow;
-			Arrow = NULL;
+			Arrow = nullptr;
 			return;
 		}
 		m_World->BroadcastSpawnEntity(*Arrow);

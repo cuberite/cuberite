@@ -12,7 +12,7 @@
 
 
 cCallbackSslContext::cCallbackSslContext(void) :
-	m_Callbacks(NULL)
+	m_Callbacks(nullptr)
 {
 	// Nothing needed, but the constructor needs to exist so
 }
@@ -32,7 +32,7 @@ cCallbackSslContext::cCallbackSslContext(cCallbackSslContext::cDataCallbacks & a
 
 int cCallbackSslContext::ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes)
 {
-	if (m_Callbacks == NULL)
+	if (m_Callbacks == nullptr)
 	{
 		LOGWARNING("SSL: Trying to receive data with no callbacks, aborting.");
 		return POLARSSL_ERR_NET_RECV_FAILED;
@@ -46,7 +46,7 @@ int cCallbackSslContext::ReceiveEncrypted(unsigned char * a_Buffer, size_t a_Num
 
 int cCallbackSslContext::SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes)
 {
-	if (m_Callbacks == NULL)
+	if (m_Callbacks == nullptr)
 	{
 		LOGWARNING("SSL: Trying to send data with no callbacks, aborting.");
 		return POLARSSL_ERR_NET_SEND_FAILED;

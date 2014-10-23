@@ -120,7 +120,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	{
 		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(NULL), sCounter++, a_Client->GetIPString().c_str());
+		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(nullptr), sCounter++, a_Client->GetIPString().c_str());
 		m_CommLogFile.Open(FileName, cFile::fmWrite);
 	}
 }
@@ -159,7 +159,7 @@ void cProtocol172::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_
 	
 	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteInt((a_Vehicle != NULL) ? a_Vehicle->GetUniqueID() : 0);
+	Pkt.WriteInt((a_Vehicle != nullptr) ? a_Vehicle->GetUniqueID() : 0);
 	Pkt.WriteBool(false);
 }
 
@@ -254,7 +254,7 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cWorld * World = m_Client->GetPlayer()->GetWorld();
-	bool ShouldUseChatPrefixes = (World == NULL) ? false : World->ShouldUseChatPrefixes();
+	bool ShouldUseChatPrefixes = (World == nullptr) ? false : World->ShouldUseChatPrefixes();
 
 	// Send the message to the client:
 	cPacketizer Pkt(*this, 0x02);
@@ -2804,7 +2804,7 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(0xA2);
 			WriteItem(Frame.GetItem());
 			WriteByte(0x3);
-			WriteByte(Frame.GetRotation() / 2);
+			WriteByte(Frame.GetItemRotation() / 2);
 			break;
 		}
 		default: break;

@@ -47,7 +47,7 @@ void cWolf::Attack(float a_Dt)
 {
 	UNUSED(a_Dt);
 
-	if ((m_Target != NULL) && (m_Target->IsPlayer()))
+	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
 	{
 		if (((cPlayer *)m_Target)->GetName() != m_OwnerName)
 		{
@@ -157,7 +157,7 @@ void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 
 	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
-	if (a_Closest_Player != NULL)
+	if (a_Closest_Player != nullptr)
 	{
 		switch (a_Closest_Player->GetEquippedItem().m_ItemType)
 		{

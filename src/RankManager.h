@@ -240,7 +240,7 @@ protected:
 	bool m_IsInitialized;
 
 	/** The MojangAPI instance that is used for translating playernames to UUIDs.
-	Set in Initialize(), may be NULL. */
+	Set in Initialize(), may be nullptr. */
 	cMojangAPI * m_MojangAPI;
 	
 	

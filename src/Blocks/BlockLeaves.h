@@ -109,7 +109,7 @@ public:
 		}
 
 		// Decay the leaves:
-		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, NULL, BlockX, a_RelY, BlockZ);
+		DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, nullptr, BlockX, a_RelY, BlockZ);
 		a_ChunkInterface.DigBlock(a_WorldInterface, BlockX, a_RelY, BlockZ);
 	}
 } ;

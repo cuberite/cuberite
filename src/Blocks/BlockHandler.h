@@ -78,7 +78,7 @@ public:
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta);
 	
 	/** Handles the dropping, but not destruction, of a block based on what ConvertTo(Verbatim)Pickups() returns, including the spawning of pickups and alertion of plugins
-	@param a_Digger The entity causing the drop; it may be NULL
+	@param a_Digger The entity causing the drop; it may be nullptr
 	@param a_CanDrop Informs the handler whether the block should be dropped at all. One example when this is false is when stone is destroyed by hand
 	@param a_DropVerbatim Calls ConvertToVerbatimPickups() instead of its counterpart, meaning the block itself is dropped by default (due to a speical tool or enchantment)
 	*/

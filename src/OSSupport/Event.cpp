@@ -15,8 +15,8 @@
 cEvent::cEvent(void)
 {
 #ifdef _WIN32
-	m_Event = CreateEvent(NULL, FALSE, FALSE, NULL);
-	if (m_Event == NULL)
+	m_Event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	if (m_Event == nullptr)
 	{
 		LOGERROR("cEvent: cannot create event, GLE = %u. Aborting server.", (unsigned)GetLastError());
 		abort();
@@ -71,7 +71,7 @@ cEvent::~cEvent()
 	{
 		sem_destroy(m_Event);
 		delete m_Event;
-		m_Event = NULL;
+		m_Event = nullptr;
 	}
 #endif
 }

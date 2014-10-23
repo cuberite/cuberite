@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
-#include <algorithm>
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 
@@ -98,7 +97,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 	m_PrimaryEffect = a_Effect;
 
 	// Send window update:
-	if (GetWindow() != NULL)
+	if (GetWindow() != nullptr)
 	{
 		GetWindow()->SetProperty(1, m_PrimaryEffect);
 	}
@@ -120,7 +119,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 	m_SecondaryEffect = a_Effect;
 
 	// Send window update:
-	if (GetWindow() != NULL)
+	if (GetWindow() != nullptr)
 	{
 		GetWindow()->SetProperty(2, m_SecondaryEffect);
 	}
@@ -185,7 +184,7 @@ void cBeaconEntity::UpdateBeacon(void)
 	if (m_BeaconLevel != OldBeaconLevel)
 	{
 		// Send window update:
-		if (GetWindow() != NULL)
+		if (GetWindow() != nullptr)
 		{
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
@@ -228,7 +227,10 @@ void cBeaconEntity::GiveEffects(void)
 		virtual bool Item(cPlayer * a_Player)
 		{
 			Vector3d PlayerPosition = Vector3d(a_Player->GetPosition());
-			PlayerPosition.y = std::min(static_cast<double>(m_PosY), PlayerPosition.y);
+			if (PlayerPosition.y > (double)m_PosY)
+			{
+				PlayerPosition.y = (double)m_PosY;
+			}
 
 			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
 			Vector3d BeaconPosition = Vector3d(m_PosX, m_PosY, m_PosZ);
@@ -253,7 +255,7 @@ void cBeaconEntity::GiveEffects(void)
 			, m_PrimaryEffect(a_PrimaryEffect)
 			, m_SecondaryEffect(a_SecondaryEffect)
 			, m_EffectLevel(a_EffectLevel)
-		{}
+		{};
 
 	} PlayerCallback(Radius, m_PosX, m_PosY, m_PosZ, m_PrimaryEffect, SecondaryEffect, EffectLevel);
 	GetWorld()->ForEachPlayer(PlayerCallback);
@@ -281,13 +283,13 @@ bool cBeaconEntity::Tick(float a_Dt, cChunk & a_Chunk)
 void cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
-
-	if (Window != NULL)
+	
+	if (Window != nullptr)
 	{
 		// if (a_Player->GetWindow() != Window)
 		// -> Because mojang doesn't send a 'close window' packet when you click the cancel button in the beacon inventory ...
@@ -305,3 +307,7 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 {
 	a_Client.SendUpdateBlockEntity(*this);
 }
+
+
+
+

@@ -135,7 +135,7 @@ void cGridStructGen::GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructur
 				int OriginX = GridX + ((m_Noise.IntNoise2DInt(GridX + 3, GridZ + 5) / 7) % (m_MaxOffsetX * 2)) - m_MaxOffsetX;
 				int OriginZ = GridZ + ((m_Noise.IntNoise2DInt(GridX + 5, GridZ + 3) / 7) % (m_MaxOffsetZ * 2)) - m_MaxOffsetZ;
 				cStructurePtr Structure = CreateStructure(GridX, GridZ, OriginX, OriginZ);
-				if (Structure.get() == NULL)
+				if (Structure.get() == nullptr)
 				{
 					Structure.reset(new cEmptyStructure(GridX, GridZ, OriginX, OriginZ));
 				}

@@ -13,7 +13,7 @@
 
 cLuaChunkStay::cLuaChunkStay(cPluginLua & a_Plugin) :
 	m_Plugin(a_Plugin),
-	m_LuaState(NULL)
+	m_LuaState(nullptr)
 {
 }
 
