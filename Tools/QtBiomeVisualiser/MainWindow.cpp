@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QDirIterator>
 #include <QStatusBar>
-#include "inifile/iniFile.h"
+#include "src/IniFile.h"
 #include "ChunkSource.h"
 #include "src/Generating/BioGen.h"
 #include "src/StringCompression.h"
