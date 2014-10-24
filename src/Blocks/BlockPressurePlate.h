@@ -28,8 +28,7 @@ public:
 			return false;
 		}
 
-		BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-		return (cBlockInfo::IsSolid(BlockBelow));
+		return (cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 } ;
 
