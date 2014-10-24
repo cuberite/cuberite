@@ -75,6 +75,13 @@ class cChunkSender:
 public:
 	cChunkSender(void);
 	~cChunkSender();
+
+	enum eChunkPriority
+	{
+		E_CHUNK_PRIORITY_HIGH   = 0,
+		E_CHUNK_PRIORITY_MEDIUM = 1,
+		E_CHUNK_PRIORITY_LOW    = 2,
+	};
 	
 	bool Start(cWorld * a_World);
 	
@@ -84,7 +91,7 @@ public:
 	void ChunkReady(int a_ChunkX, int a_ChunkZ);
 	
 	/// Queues a chunk to be sent to a specific client
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client);
+	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client);
 	
 	/// Removes the a_Client from all waiting chunk send operations
 	void RemoveClient(cClientHandle * a_Client);
@@ -136,7 +143,9 @@ protected:
 	
 	cCriticalSection  m_CS;
 	cChunkCoordsList  m_ChunksReady;
-	sSendChunkList    m_SendChunks;
+	sSendChunkList    m_SendChunksLowPriority;
+	sSendChunkList    m_SendChunksMediumPriority;
+	sSendChunkList    m_SendChunksHighPriority;
 	cEvent            m_evtQueue;  // Set when anything is added to m_ChunksReady
 	cEvent            m_evtRemoved;  // Set when removed clients are safe to be deleted
 	int               m_RemoveCount;  // Number of threads waiting for a client removal (m_evtRemoved needs to be set this many times)

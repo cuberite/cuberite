@@ -8,7 +8,7 @@
 #include "Server.h"
 #include "Item.h"
 #include "Root.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
@@ -2857,19 +2857,19 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
 {
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
 
 
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
 
 
@@ -3498,7 +3498,6 @@ void cWorld::AddQueuedPlayers(void)
 		cClientHandle * Client = (*itr)->GetClientHandle();
 		if (Client != nullptr)
 		{
-			Client->StreamChunks();
 			Client->SendPlayerMoveLook();
 			Client->SendHealth();
 			Client->SendWholeInventory(*(*itr)->GetWindow());

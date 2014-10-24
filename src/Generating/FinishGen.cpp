@@ -15,7 +15,7 @@
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
 #include "../World.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 
 
 

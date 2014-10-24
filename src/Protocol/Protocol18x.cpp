@@ -2160,6 +2160,7 @@ void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadChar,          char,    SkinFlags);
 	
 	m_Client->SetLocale(Locale);
+	m_Client->SetViewDistance(ViewDistance);
 	// TODO: Handle other values
 }
 

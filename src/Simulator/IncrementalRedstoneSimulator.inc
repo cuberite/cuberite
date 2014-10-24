@@ -2001,7 +2001,6 @@ bool cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 			// Check if western(left) neighbor is a powered on repeater who is facing us
 			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
-				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX -1, a_RelBlockY, a_RelBlockZ) & 0x3;
 				if ((OtherRepeaterDir & 0x03) == 0x1) 
 				{ 
 					return true; 

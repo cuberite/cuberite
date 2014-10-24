@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "RankManager.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "Protocol/MojangAPI.h"
 #include "ClientHandle.h"
 
