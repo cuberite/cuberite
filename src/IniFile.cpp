@@ -24,16 +24,12 @@
 #include <ctype.h>
 
 // Local Includes
-#include "iniFile.h"
+#include "IniFile.h"
 
 #if defined(WIN32)
 	#define iniEOL endl
 #else
 	#define iniEOL '\r' << endl
-#endif
-
-#ifndef _WIN32
-	#define sscanf_s(buffer, stringbuffer, ...) (sscanf(buffer, stringbuffer, __VA_ARGS__))
 #endif
 
 using namespace std;
@@ -459,20 +455,6 @@ bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName,
 bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName, double const a_Value, const bool a_CreateIfNotExists)
 {
 	return SetValue(a_KeyName, a_ValueName, Printf("%f", a_Value), a_CreateIfNotExists);
-}
-
-
-
-
-
-bool cIniFile::SetValueV(const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...)
-{
-	va_list args;
-	va_start(args, a_Format);
-	AString Data;
-	AppendVPrintf(Data, a_Format, args);
-	va_end(args);
-	return SetValue(a_KeyName, a_ValueName, Data);
 }
 
 

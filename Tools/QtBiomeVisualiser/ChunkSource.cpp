@@ -4,7 +4,7 @@
 #include "src/Generating/BioGen.h"
 #include "src/StringCompression.h"
 #include "src/WorldStorage/FastNBT.h"
-#include "inifile/iniFile.h"
+#include "src/IniFile.h"
 
 
 

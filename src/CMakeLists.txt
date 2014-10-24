@@ -34,6 +34,7 @@ SET (SRCS
 	FastRandom.cpp
 	FurnaceRecipe.cpp
 	Globals.cpp
+	IniFile.cpp
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
@@ -98,6 +99,7 @@ SET (HDRS
 	ForEachChunkProvider.h
 	FurnaceRecipe.h
 	Globals.h
+	IniFile.h
 	Inventory.h
 	Item.h
 	ItemGrid.h
@@ -319,4 +321,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} luaexpat iniFile jsoncpp polarssl zlib sqlite lua SQLiteCpp)
+target_link_libraries(${EXECUTABLE} luaexpat jsoncpp polarssl zlib sqlite lua SQLiteCpp)

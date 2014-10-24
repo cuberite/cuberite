@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "src/Generating/BioGen.h"
-#include "inifile/iniFile.h"
+#include "src/IniFile.h"
 
 
 

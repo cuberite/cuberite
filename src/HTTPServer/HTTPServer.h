@@ -11,7 +11,7 @@
 
 #include "../OSSupport/ListenThread.h"
 #include "../OSSupport/SocketThreads.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "PolarSSL++/RsaPrivateKey.h"
 #include "PolarSSL++/CryptoKey.h"
 #include "PolarSSL++/X509Cert.h"

@@ -154,12 +154,6 @@ public:
 	}
 	bool SetValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value, const bool a_CreateIfNotExists = true);
 	
-	// tolua_end
-	
-	bool SetValueV( const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...);
-	
-	// tolua_begin
-
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
 	bool DeleteValueByID(const int keyID, const int valueID);

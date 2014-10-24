@@ -2,7 +2,7 @@
 #include "Globals.h"
 
 #include "ChunkGenerator.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"

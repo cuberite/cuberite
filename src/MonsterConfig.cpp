@@ -3,7 +3,7 @@
 
 #include "MonsterConfig.h"
 #include "Mobs/Monster.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 
 
 

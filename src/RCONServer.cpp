@@ -4,7 +4,7 @@
 // Implements the cRCONServer class representing the RCON server
 
 #include "Globals.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "RCONServer.h"
 #include "Server.h"
 #include "Root.h"

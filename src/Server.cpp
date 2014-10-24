@@ -19,7 +19,7 @@
 #include "Protocol/ProtocolRecognizer.h"
 #include "CommandOutput.h"
 
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "Vector3.h"
 
 #include <fstream>

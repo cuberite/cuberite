@@ -18,11 +18,10 @@
 #include "DeadlockDetect.h"
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
-
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 
 #ifdef _WIN32
-	#include "conio.h"
+	#include <conio.h>
 	#include <psapi.h>
 #elif defined(__linux__)
 	#include <fstream>

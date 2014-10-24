@@ -35,7 +35,7 @@ public:
 		}
 		BLOCKTYPE Type = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 
-		return ((Type == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(Type));
+		return ((Type == E_BLOCK_SIGN_POST) || (Type == E_BLOCK_WALLSIGN) || cBlockInfo::IsSolid(Type));
 	}
 
 

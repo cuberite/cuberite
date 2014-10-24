@@ -7,7 +7,7 @@
 
 #include "ComposableGenerator.h"
 #include "../World.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "../Root.h"
 
 // Individual composed algorithms:

@@ -21,6 +21,7 @@
 #include "Enchantments.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
+#include "ChunkSender.h"
 
 
 
@@ -113,7 +114,11 @@ public:
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
-	void StreamChunks(void);
+	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
+	bool StreamNextChunk();
+
+	/** Remove all loaded chunks that are no longer in range */
+	void UnloadOutOfRangeChunks(void);
 	
 	// Removes the client from all chunks. Used when switching worlds or destroying the player
 	void RemoveFromAllChunks(void);
@@ -359,7 +364,7 @@ private:
 	cPlayer * m_Player;
 	
 	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
-	
+
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
@@ -445,7 +450,7 @@ private:
 	bool CheckBlockInteractionsRate(void);
 	
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
-	void StreamChunk(int a_ChunkX, int a_ChunkZ);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
 	
 	/** Handles the DIG_STARTED dig packet: */
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
