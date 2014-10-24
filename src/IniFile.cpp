@@ -461,20 +461,6 @@ bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName,
 
 
 
-bool cIniFile::SetValueV(const AString & a_KeyName, const AString & a_ValueName, const char * a_Format, ...)
-{
-	va_list args;
-	va_start(args, a_Format);
-	AString Data;
-	AppendVPrintf(Data, a_Format, args);
-	va_end(args);
-	return SetValue(a_KeyName, a_ValueName, Data);
-}
-
-
-
-
-
 AString cIniFile::GetValue(const int keyID, const int valueID, const AString & defValue) const
 {
 	if ((keyID < (int)keys.size()) && (valueID < (int)keys[keyID].names.size()))
