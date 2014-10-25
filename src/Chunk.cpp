@@ -1370,9 +1370,9 @@ void cChunk::CreateBlockEntities(void)
 
 void cChunk::WakeUpSimulators(void)
 {
-	cSimulator<cChunk, cWorld> * WaterSimulator = m_World->GetWaterSimulator();
-	cSimulator<cChunk, cWorld> * LavaSimulator  = m_World->GetLavaSimulator();
-	cSimulator<cChunk, cWorld> * RedstoneSimulator = m_World->GetRedstoneSimulator();
+	cSimulator * WaterSimulator = m_World->GetWaterSimulator();
+	cSimulator * LavaSimulator  = m_World->GetLavaSimulator();
+	cSimulator * RedstoneSimulator = m_World->GetRedstoneSimulator();
 	int BaseX = m_PosX * cChunkDef::Width;
 	int BaseZ = m_PosZ * cChunkDef::Width;
 	for (int x = 0; x < Width; x++)
