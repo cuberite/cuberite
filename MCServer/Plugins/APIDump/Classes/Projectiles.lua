@@ -123,35 +123,47 @@ return
 
 	cSplashPotionEntity =
 	{
-		Desc = "",
-		Functions = {},
+		Desc = [[
+			Represents a thrown splash potion.
+		]],
+			Functions =
+			{
+				GetEntityEffect = { Params = "", Return = "{{cEntityEffect}}", Notes = "Returns the entity effect in this potion" },
+				GetEntityEffectType = { Params = "", Return = "{{cEntityEffect|Entity effect type}}", Notes = "Returns the effect type of this potion" },
+				GetPotionColor = { Params = "", Return = "number", Notes = "Returns the color index of the particles emitted by this potion" },
+				SetEntityEffect = { Params = "{{cEntityEffect}}", Return = "", Notes = "Sets the entity effect for this potion" },
+				SetEntityEffectType = { Params = "{{cEntityEffect|Entity effect type}}", Return = "", Notes = "Sets the effect type of this potion" },
+				SetPotionColor = { Params = "number", Return = "", Notes = "Sets the color index of the particles for this potion" },
+			},
 		Inherits = "cProjectileEntity",
 	},  -- cSplashPotionEntity
 
 	cThrownEggEntity =
 	{
-		Desc = "",
+		Desc = [[
+			Represents a thrown egg.
+		]],
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEggEntity
 
 	cThrownEnderPearlEntity =
 	{
-		Desc = "",
+		Desc = "Represents a thrown ender pearl.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEnderPearlEntity
 	
 	cThrownSnowballEntity =
 	{
-		Desc = "",
+		Desc = "Represents a thrown snowball.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownSnowballEntity
 
 	cWitherSkullEntity =
 	{
-		Desc = "",
+		Desc = "Represents a wither skull being shot.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cWitherSkullEntity
