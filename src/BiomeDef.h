@@ -113,6 +113,12 @@ extern AString BiomeToString(int a_Biome);
 /** Returns true if the biome has no downfall - deserts and savannas */
 extern bool IsBiomeNoDownfall(EMCSBiome a_Biome);
 
+/** Returns true if the biome is an ocean biome. */
+inline bool IsBiomeOcean(int a_Biome)
+{
+	return ((a_Biome == biOcean) || (a_Biome == biDeepOcean));
+}
+
 /** Returns true if the biome is very cold
 (has snow on ground everywhere, turns top water to ice, has snowfall instead of rain everywhere).
 Doesn't report mildly cold biomes (where it snows above certain elevation), use IsBiomeCold() for those. */

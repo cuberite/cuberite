@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "BioGen.h"
+#include "IntGen.h"
 #include "../IniFile.h"
 #include "../LinearUpscale.h"
 
@@ -917,6 +918,94 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cBioGenGrown:
+
+class cBioGenGrown:
+	public cBiomeGen
+{
+public:
+	cBioGenGrown(int a_Seed)
+	{
+		auto FinalRivers =
+			std::make_shared<cIntGenSmooth<8>>   (a_Seed + 1,
+			std::make_shared<cIntGenRiver <10>>  (a_Seed + 2,
+			std::make_shared<cIntGenZoom  <12>>  (a_Seed + 3,
+			std::make_shared<cIntGenSmooth<8>>   (a_Seed + 4,
+			std::make_shared<cIntGenZoom  <10>>  (a_Seed + 5,
+			std::make_shared<cIntGenZoom  <7>>   (a_Seed + 6,
+			std::make_shared<cIntGenZoom  <5>>   (a_Seed + 7,
+			std::make_shared<cIntGenZoom  <4>>   (a_Seed + 8,
+			std::make_shared<cIntGenZoom  <4>>   (a_Seed + 9,
+			std::make_shared<cIntGenZoom  <4>>   (a_Seed + 10,
+			std::make_shared<cIntGenZoom  <4>>   (a_Seed + 11,
+			std::make_shared<cIntGenChoice<2, 4>>(a_Seed + 12
+		))))))))))));
+
+		auto FinalBiomes =
+			std::make_shared<cIntGenSmooth         <8>> (a_Seed + 1008,
+			std::make_shared<cIntGenZoom           <10>>(a_Seed + 15,
+			std::make_shared<cIntGenSmooth         <7>> (a_Seed + 1000,
+			std::make_shared<cIntGenZoom           <9>> (a_Seed + 16,
+			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1001,
+			std::make_shared<cIntGenZoom           <8>> (a_Seed,
+			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1002,
+			std::make_shared<cIntGenZoom           <8>> (a_Seed + 1,
+			std::make_shared<cIntGenBeaches        <6>> (
+			std::make_shared<cIntGenSmooth         <8>> (a_Seed + 1002,
+			std::make_shared<cIntGenZoom           <10>>(a_Seed + 2,
+			std::make_shared<cIntGenZoom           <7>> (a_Seed + 3,
+			std::make_shared<cIntGenAddIslands     <5>> (a_Seed + 2004, 10,
+			std::make_shared<cIntGenZoom           <5>> (a_Seed + 4,
+			std::make_shared<cIntGenAddToOcean     <4>> (a_Seed + 9, 50, biMushroomIsland,
+			std::make_shared<cIntGenZoom           <6>> (a_Seed + 8,
+			std::make_shared<cIntGenAddToOcean     <5>> (a_Seed + 10, 500, biDeepOcean,
+			std::make_shared<cIntGenBiomes         <7>> (a_Seed + 3000,
+			std::make_shared<cIntGenZoom           <7>> (a_Seed + 5,
+			std::make_shared<cIntGenBiomeGroupEdges<5>> (
+			std::make_shared<cIntGenSmooth         <7>> (a_Seed + 1003,
+			std::make_shared<cIntGenZoom           <9>> (a_Seed + 7,
+			std::make_shared<cIntGenReplaceRandomly<6>> (bgJungle, bgTemperate, 50, a_Seed + 100,
+			std::make_shared<cIntGenReplaceRandomly<6>> (bgIce,    bgTemperate, 50, a_Seed + 101,
+			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2000, 70,
+			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1004,
+			std::make_shared<cIntGenZoom           <8>> (a_Seed + 10,
+			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2003, 50,
+			std::make_shared<cIntGenZoom           <6>> (a_Seed + 11,
+			std::make_shared<cIntLandOcean         <5>> (a_Seed + 100, 65
+		))))))))))))))))))))))))))))));
+
+		m_Gen =
+			std::make_shared<cIntGenSmooth   <16>>(a_Seed,
+			std::make_shared<cIntGenZoom     <18>>(a_Seed,
+			std::make_shared<cIntGenSmooth   <11>>(a_Seed,
+			std::make_shared<cIntGenZoom     <13>>(a_Seed,
+			std::make_shared<cIntGenMixRivers<8>> (
+			FinalBiomes, FinalRivers
+		)))));
+	}
+
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
+	{
+		cIntGen<16, 16>::Values vals;
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, vals);
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				cChunkDef::SetBiome(a_Biomes, x, z, (EMCSBiome)vals[x + cChunkDef::Width * z]);
+			}
+		}
+	}
+
+protected:
+	cIntGenPtr<16, 16> m_Gen;
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cBiomeGen:
 
 cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
@@ -951,6 +1040,10 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 	else if (NoCaseCompare(BiomeGenName, "twolevel") == 0)
 	{
 		res = new cBioGenTwoLevel(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "grown") == 0)
+	{
+		res = new cBioGenGrown(a_Seed);
 	}
 	else
 	{
