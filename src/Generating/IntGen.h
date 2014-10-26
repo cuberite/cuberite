@@ -124,7 +124,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename Values & a_Values) override
 	{
 		for (int z = 0; z < SizeZ; z++)
 		{
@@ -913,15 +913,15 @@ public:
 				{
 					NumOceanNeighbors += 1;
 				}
-				if (IsBiomeOcean(Above))
+				if (IsBiomeOcean(Below))
 				{
 					NumOceanNeighbors += 1;
 				}
-				if (IsBiomeOcean(Above))
+				if (IsBiomeOcean(Left))
 				{
 					NumOceanNeighbors += 1;
 				}
-				if (IsBiomeOcean(Above))
+				if (IsBiomeOcean(Right))
 				{
 					NumOceanNeighbors += 1;
 				}
