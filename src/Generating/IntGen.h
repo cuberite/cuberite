@@ -131,7 +131,7 @@ public:
 			int BaseZ = a_MinZ + z;
 			for (int x = 0; x < SizeX; x++)
 			{
-				a_Values[x + SizeX * z] = (m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7) % Range;
+				a_Values[x + SizeX * z] = (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7) % Range;
 			}
 		}  // for z
 	}
@@ -159,7 +159,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		for (int z = 0; z < SizeZ; z++)
 		{
@@ -207,7 +207,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying data with half the resolution:
 		int lowerMinX = a_MinX >> 1;
@@ -276,7 +276,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying values:
 		int Cache[(SizeX + 2) * (SizeZ + 2)];
@@ -350,7 +350,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Map for biome -> its beach:
 		static const int ToBeach[] =
@@ -450,7 +450,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_Values);
 		for (int z = 0; z < SizeZ; z++)
@@ -499,7 +499,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values)
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values)
 	{
 		// Generate the underlying biome groups:
 		int Cache[m_UnderlyingSizeX * m_UnderlyingSizeZ];
@@ -602,7 +602,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Define the per-biome-group biomes:
 		static const int OceanBiomes[] =
@@ -699,7 +699,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying values:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_Values);
@@ -754,11 +754,11 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying data:
 		m_Biomes->GetInts(a_MinX, a_MinZ, a_Values);
-		Values Rivers;
+		typename super::Values Rivers;
 		m_Rivers->GetInts(a_MinX, a_MinZ, Rivers);
 
 		// Mix the values:
@@ -823,7 +823,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying data:
 		int Cache[UnderlyingSizeX * UnderlyingSizeZ];
@@ -884,7 +884,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying data:
 		int Cache[UnderlyingSizeX * UnderlyingSizeZ];
