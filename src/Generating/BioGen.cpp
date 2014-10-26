@@ -969,10 +969,8 @@ public:
 			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2000, 70,
 			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1004,
 			std::make_shared<cIntGenZoom           <8>> (a_Seed + 10,
-			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2003, 50,
-			std::make_shared<cIntGenZoom           <6>> (a_Seed + 11,
-			std::make_shared<cIntLandOcean         <5>> (a_Seed + 100, 65
-		))))))))))))))))))))))))))))));
+			std::make_shared<cIntGenLandOcean      <6>> (a_Seed + 100, 65
+		))))))))))))))))))))))))))));
 
 		m_Gen =
 			std::make_shared<cIntGenSmooth   <16>>(a_Seed,

@@ -124,7 +124,7 @@ public:
 	}
 
 
-	virtual void GetInts(int a_MinX, int a_MinZ, typename Values & a_Values) override
+	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		for (int z = 0; z < SizeZ; z++)
 		{
@@ -146,13 +146,13 @@ public:
 Has a threshold (in percent) of how much land, the larger the threshold, the more land.
 Generates 0 for ocean, biome group ID for landmass. */
 template <int SizeX, int SizeZ = SizeX>
-class cIntLandOcean :
+class cIntGenLandOcean :
 	public cIntGenWithNoise<SizeX, SizeZ>
 {
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
 
 public:
-	cIntLandOcean(int a_Seed, int a_Threshold) :
+	cIntGenLandOcean(int a_Seed, int a_Threshold) :
 		super(a_Seed),
 		m_Threshold(a_Threshold)
 	{
@@ -169,6 +169,12 @@ public:
 				int rnd = (m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7);
 				a_Values[x + SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 128) % bgMax + 1) : 0;
 			}
+		}
+
+		// If the centerpoint of the world is within the area, set it to bgTemperate, always:
+		if ((a_MinX <= 0) && (a_MinZ <= 0) && (a_MinX + SizeX > 0) && (a_MinZ + SizeZ > 0))
+		{
+			a_Values[-a_MinX - a_MinZ * SizeX] = bgTemperate;
 		}
 	}
 
@@ -451,12 +457,12 @@ public:
 		{
 			for (int x = 0; x < SizeX; x++)
 			{
-				if (a_Values[x + z * SizeX] == 0)
+				if (a_Values[x + z * SizeX] == bgOcean)
 				{
 					int rnd = m_Noise.IntNoise2DInt(a_MinX + x, a_MinZ + z) / 7;
 					if (rnd % 100 < m_Threshold)
 					{
-						a_Values[x + z * SizeX] = (rnd / 100) % 4;
+						a_Values[x + z * SizeX] = (rnd / 100) % bgMax;
 					}
 				}
 			}
@@ -511,13 +517,6 @@ public:
 				int Right = Cache[x + 2 + (z + 1) * m_UnderlyingSizeX];
 				switch (v)
 				{
-					// Oceans don't need any edges:
-					case bgOcean:
-					{
-						v = bgOcean;
-						break;
-					}
-
 					// Desert should neighbor only oceans, desert and temperates; change to temperate when another:
 					case bgDesert:
 					{
