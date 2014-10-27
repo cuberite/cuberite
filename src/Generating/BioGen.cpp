@@ -996,7 +996,7 @@ public:
 	}
 
 protected:
-	cIntGenPtr<16, 16> m_Gen;
+	std::shared_ptr<cIntGen<16, 16>> m_Gen;
 };
 
 

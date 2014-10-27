@@ -60,10 +60,6 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) = 0;
 };
 
-template <int SizeX, int SizeZ = SizeX>
-using cIntGenPtr = std::shared_ptr<cIntGen<SizeX, SizeZ>>;
-
-
 
 
 
@@ -166,7 +162,7 @@ public:
 			int BaseZ = a_MinZ + z;
 			for (int x = 0; x < SizeX; x++)
 			{
-				int rnd = (m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7);
+				int rnd = (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7);
 				a_Values[x + SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 128) % bgMax + 1) : 0;
 			}
 		}
@@ -197,7 +193,7 @@ protected:
 	static const int m_LowerSizeZ = (SizeZ / 2) + 2;
 
 public:
-	typedef cIntGenPtr<m_LowerSizeX, m_LowerSizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<m_LowerSizeX, m_LowerSizeZ>> Underlying;
 
 
 	cIntGenZoom(int a_Seed, Underlying a_UnderlyingGen) :
@@ -232,10 +228,10 @@ public:
 				int RndX = (x + lowerMinX) * 2;
 				int RndZ = (z + lowerMinZ) * 2;
 				Cache[idx] = PrevZ0;
-				Cache[idx + lowStepX] = ChooseRandomOne(RndX, RndZ, PrevZ0, PrevZ1);
+				Cache[idx + lowStepX] = super::ChooseRandomOne(RndX, RndZ, PrevZ0, PrevZ1);
 				idx++;
-				Cache[idx] = ChooseRandomOne(RndX, RndZ, PrevZ0, ValX1Z0);
-				Cache[idx + lowStepX] = ChooseRandomOne(RndX, RndZ, PrevZ0, ValX1Z0, PrevZ1, ValX1Z1);
+				Cache[idx] = super::ChooseRandomOne(RndX, RndZ, PrevZ0, ValX1Z0);
+				Cache[idx + lowStepX] = super::ChooseRandomOne(RndX, RndZ, PrevZ0, ValX1Z0, PrevZ1, ValX1Z1);
 				idx++;
 				PrevZ0 = ValX1Z0;
 				PrevZ1 = ValX1Z1;
@@ -262,11 +258,11 @@ class cIntGenSmooth :
 	public cIntGenWithNoise<SizeX, SizeZ>
 {
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
-	static const int m_UnderlyingSizeX = SizeX + 2;
-	static const int m_UnderlyingSizeZ = SizeZ + 2;
+	static const int UnderlyingSizeX = SizeX + 2;
+	static const int UnderlyingSizeZ = SizeZ + 2;
 
 public:
-	typedef cIntGenPtr<m_UnderlyingSizeX, m_UnderlyingSizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<UnderlyingSizeX, UnderlyingSizeZ>> Underlying;
 
 
 	cIntGenSmooth(int a_Seed, Underlying a_Underlying) :
@@ -279,7 +275,7 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying values:
-		int Cache[(SizeX + 2) * (SizeZ + 2)];
+		int Cache[UnderlyingSizeX * UnderlyingSizeZ];
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, Cache);
 
 		// Smooth - for each square check if the surroundings are the same, if so, expand them diagonally.
@@ -289,15 +285,15 @@ public:
 			int NoiseZ = a_MinZ + z;
 			for (int x = 0; x < SizeX; x++)
 			{
-				int val   = Cache[x + 1 + (z + 1) * m_UnderlyingSizeX];
-				int Above = Cache[x + 1 +  z      * m_UnderlyingSizeX];
-				int Below = Cache[x + 1 + (z + 2) * m_UnderlyingSizeX];
-				int Left  = Cache[x     + (z + 1) * m_UnderlyingSizeX];
-				int Right = Cache[x + 2 + (z + 1) * m_UnderlyingSizeX];
+				int val   = Cache[x + 1 + (z + 1) * UnderlyingSizeX];
+				int Above = Cache[x + 1 +  z      * UnderlyingSizeX];
+				int Below = Cache[x + 1 + (z + 2) * UnderlyingSizeX];
+				int Left  = Cache[x     + (z + 1) * UnderlyingSizeX];
+				int Right = Cache[x + 2 + (z + 1) * UnderlyingSizeX];
 
 				if ((Left == Right) && (Above == Below))
 				{
-					if (((m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 2) == 0)
+					if (((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 2) == 0)
 					{
 						val = Left;
 					}
@@ -341,7 +337,7 @@ class cIntGenBeaches :
 	static const int m_UnderlyingSizeZ = SizeZ + 2;
 
 public:
-	typedef cIntGenPtr<m_UnderlyingSizeX, m_UnderlyingSizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<m_UnderlyingSizeX, m_UnderlyingSizeZ>> Underlying;
 
 
 	cIntGenBeaches(Underlying a_Underlying) :
@@ -439,7 +435,7 @@ class cIntGenAddIslands :
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
 
 public:
-	typedef cIntGenPtr<SizeX, SizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<SizeX, SizeZ>> Underlying;
 
 
 	cIntGenAddIslands(int a_Seed, int a_Threshold, Underlying a_Underlying) :
@@ -459,7 +455,7 @@ public:
 			{
 				if (a_Values[x + z * SizeX] == bgOcean)
 				{
-					int rnd = m_Noise.IntNoise2DInt(a_MinX + x, a_MinZ + z) / 7;
+					int rnd = super::m_Noise.IntNoise2DInt(a_MinX + x, a_MinZ + z) / 7;
 					if (rnd % 100 < m_Threshold)
 					{
 						a_Values[x + z * SizeX] = (rnd / 100) % bgMax;
@@ -491,7 +487,7 @@ class cIntGenBiomeGroupEdges :
 
 public:
 
-	typedef cIntGenPtr<m_UnderlyingSizeX, m_UnderlyingSizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<m_UnderlyingSizeX, m_UnderlyingSizeZ>> Underlying;
 
 	cIntGenBiomeGroupEdges(Underlying a_Underlying) :
 		m_Underlying(a_Underlying)
@@ -592,7 +588,7 @@ class cIntGenBiomes :
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
 
 public:
-	typedef cIntGenPtr<SizeX, SizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<SizeX, SizeZ>> Underlying;
 
 
 	cIntGenBiomes(int a_Seed, Underlying a_Underlying) :
@@ -656,7 +652,7 @@ public:
 			{
 				int val = a_Values[x + IdxZ];
 				const cBiomesInGroups & Biomes = BiomesInGroups[val % ARRAYCOUNT(BiomesInGroups)];
-				int rnd = (m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7);
+				int rnd = (super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7);
 				a_Values[x + IdxZ] = Biomes.Biomes[rnd % Biomes.Count];
 			}
 		}
@@ -686,7 +682,7 @@ class cIntGenReplaceRandomly :
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
 
 public:
-	typedef cIntGenPtr<SizeX, SizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<SizeX, SizeZ>> Underlying;
 
 
 	cIntGenReplaceRandomly(int a_From, int a_To, int a_Chance, int a_Seed, Underlying a_Underlying) :
@@ -713,7 +709,7 @@ public:
 				int idx = x + idxZ;
 				if (a_Values[idx] == m_From)
 				{
-					int rnd = m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
+					int rnd = super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
 					if (rnd % 100 < m_Chance)
 					{
 						a_Values[idx] = m_To;
@@ -744,7 +740,7 @@ class cIntGenMixRivers:
 	typedef cIntGen<SizeX, SizeZ> super;
 
 public:
-	typedef cIntGenPtr<SizeX, SizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<SizeX, SizeZ>> Underlying;
 
 
 	cIntGenMixRivers(Underlying a_Biomes, Underlying a_Rivers):
@@ -813,7 +809,7 @@ class cIntGenRiver:
 	static const int UnderlyingSizeZ = SizeZ + 2;
 
 public:
-	typedef cIntGenPtr<UnderlyingSizeX, UnderlyingSizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<UnderlyingSizeX, UnderlyingSizeZ>> Underlying;
 
 
 	cIntGenRiver(int a_Seed, Underlying a_Underlying):
@@ -872,7 +868,7 @@ class cIntGenAddToOcean:
 	static const int UnderlyingSizeZ = SizeZ + 2;
 
 public:
-	typedef cIntGenPtr<UnderlyingSizeX, UnderlyingSizeZ> Underlying;
+	typedef std::shared_ptr<cIntGen<UnderlyingSizeX, UnderlyingSizeZ>> Underlying;
 
 
 	cIntGenAddToOcean(int a_Seed, int a_Chance, int a_ToValue, Underlying a_Underlying):
@@ -926,7 +922,7 @@ public:
 				}
 
 				// If at least 3 ocean neighbors and the chance is right, change:
-				if ((NumOceanNeighbors >= 3) && ((m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7) % 1000 < m_Chance))
+				if ((NumOceanNeighbors >= 3) && ((super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7) % 1000 < m_Chance))
 				{
 					a_Values[x + z * SizeX] = m_ToValue;
 				}
