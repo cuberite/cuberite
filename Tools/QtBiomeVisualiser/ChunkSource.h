@@ -26,7 +26,7 @@ public:
 
 	/** Fills the a_DestChunk with the biomes for the specified coords.
 	It is expected to be thread-safe and re-entrant. Usually QThread::idealThreadCount() threads are used. */
-	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) = 0;
+	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) = 0;
 
 	/** Forces a fresh reload of the source. Useful mainly for the generator, whose underlying definition file may have been changed. */
 	virtual void reload() = 0;
@@ -45,7 +45,7 @@ public:
 	BioGenSource(cIniFilePtr a_IniFile);
 
 	// ChunkSource overrides:
-	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) override;
+	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) override;
 	virtual void reload(void) override;
 
 protected:
@@ -70,7 +70,7 @@ public:
 	AnvilSource(QString a_WorldRegionFolder);
 
 	// ChunkSource overrides:
-	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) override;
+	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) override;
 	virtual void reload() override;
 
 protected:

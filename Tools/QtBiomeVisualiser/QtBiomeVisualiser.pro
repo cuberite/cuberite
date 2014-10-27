@@ -26,9 +26,6 @@ SOURCES +=\
     ../../src/OSSupport/CriticalSection.cpp \
     ../../src/OSSupport/IsThread.cpp \
     ../../src/BiomeDef.cpp \
-    ChunkCache.cpp \
-    ChunkSource.cpp \
-    ChunkLoader.cpp \
     ../../src/StringCompression.cpp \
     ../../src/WorldStorage/FastNBT.cpp \
     ../../lib/zlib/adler32.c \
@@ -48,7 +45,11 @@ SOURCES +=\
     ../../lib/zlib/zutil.c \
     GeneratorSetup.cpp \
     QtBiomeVisualiser.cpp \
-    QtChunk.cpp
+    QtChunk.cpp \
+    RegionCache.cpp \
+    Region.cpp \
+    ChunkSource.cpp \
+    RegionLoader.cpp
 
 HEADERS  += MainWindow.h \
 		Globals.h \
@@ -64,9 +65,6 @@ HEADERS  += MainWindow.h \
     ../../src/OSSupport/CriticalSection.h \
     ../../src/OSSupport/IsThread.h \
     ../../src/BiomeDef.h \
-    ChunkCache.h \
-    ChunkSource.h \
-    ChunkLoader.h \
     ../../src/StringCompression.h \
     ../../src/WorldStorage/FastNBT.h \
     ../../lib/zlib/crc32.h \
@@ -81,7 +79,11 @@ HEADERS  += MainWindow.h \
     ../../lib/zlib/zlib.h \
     ../../lib/zlib/zutil.h \
     GeneratorSetup.h \
-    QtChunk.h
+    QtChunk.h \
+    RegionCache.h \
+    Region.h \
+    ChunkSource.h \
+    RegionLoader.h
 
 INCLUDEPATH += $$_PRO_FILE_PWD_ \
 	$$_PRO_FILE_PWD_/../../lib \

@@ -1,8 +1,8 @@
 #include "Globals.h"
 #include "BiomeView.h"
-#include "QtChunk.h"
 #include <QPainter>
 #include <QResizeEvent>
+#include "Region.h"
 
 
 
@@ -40,7 +40,7 @@ BiomeView::BiomeView(QWidget * parent) :
 	redraw();
 
 	// Add a chunk-update callback mechanism:
-	connect(&m_Cache, SIGNAL(chunkAvailable(int, int)), this, SLOT(chunkAvailable(int, int)));
+	connect(&m_Cache, SIGNAL(regionAvailable(int, int)), this, SLOT(regionAvailable(int, int)));
 
 	// Allow mouse and keyboard interaction:
 	setFocusPolicy(Qt::StrongFocus);
@@ -143,9 +143,15 @@ void BiomeView::redraw()
 
 
 
-void BiomeView::chunkAvailable(int a_ChunkX, int a_ChunkZ)
+void BiomeView::regionAvailable(int a_RegionX, int a_RegionZ)
 {
-	drawChunk(a_ChunkX, a_ChunkZ);
+	for (int z = 0; z < 32; z++)
+	{
+		for (int x = 0; x < 32; x++)
+		{
+			drawChunk(a_RegionX * 32 + x, a_RegionZ * 32 + z);
+		}
+	}
 	update();
 }
 
@@ -175,8 +181,11 @@ void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 		return;
 	}
 
-	//fetch the chunk:
-	ChunkPtr chunk = m_Cache.fetch(a_ChunkX, a_ChunkZ);
+	// Fetch the region:
+	int regionX;
+	int regionZ;
+	Region::chunkToRegion(a_ChunkX, a_ChunkZ, regionX, regionZ);
+	RegionPtr region = m_Cache.fetch(regionX, regionZ);
 
 	// Figure out where on the screen this chunk should be drawn:
 	// first find the center chunk
@@ -228,9 +237,15 @@ void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 
 	// If the chunk is valid, use its data; otherwise use the empty placeholder:
 	const uchar * src = m_EmptyChunkImage;
-	if (chunk.get() != nullptr)
+	if (region.get() != nullptr)
 	{
-		src = chunk->getImage();
+		int relChunkX = a_ChunkX - regionX * 32;
+		int relChunkZ = a_ChunkZ - regionZ * 32;
+		Chunk & chunk = region->getRelChunk(relChunkX, relChunkZ);
+		if (chunk.isValid())
+		{
+			src = chunk.getImage();
+		}
 	}
 
 	// Blit or scale-blit the image:
@@ -317,11 +332,12 @@ void BiomeView::mouseMoveEvent(QMouseEvent * a_Event)
 	// Update the status bar info text:
 	int blockX = floor((a_Event->x() - width()  / 2) / m_Zoom + m_X);
 	int blockZ = floor((a_Event->y() - height() / 2) / m_Zoom + m_Z);
-	int chunkX, chunkZ;
-	int relX = blockX, relY, relZ = blockZ;
-	cChunkDef::AbsoluteToRelative(relX, relY, relZ, chunkX, chunkZ);
-	auto chunk = m_Cache.fetch(chunkX, chunkZ);
-	int biome = (chunk.get() != nullptr) ? chunk->getBiome(relX, relZ) : biInvalidBiome;
+	int regionX, regionZ;
+	Region::blockToRegion(blockX, blockZ, regionX, regionZ);
+	int relX = blockX - regionX * 512;
+	int relZ = blockZ - regionZ * 512;
+	auto region = m_Cache.fetch(regionX, regionZ);
+	int biome = (region.get() != nullptr) ? region->getRelBiome(relX, relZ) : biInvalidBiome;
 	emit hoverChanged(blockX, blockZ, biome);
 }
 
