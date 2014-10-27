@@ -235,7 +235,7 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 90 .. 99
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 100 .. 109
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 110 .. 119
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},               // 120 .. 128
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},                // 120 .. 128
 	
 	// Release 1.7 /* biome variants:
 	/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
@@ -254,14 +254,14 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 141 .. 148
 
 	/* biJungleM              */ { 4.0f,  4.0f},  // 149
-	{0.0f, 0.0f},                                  // 150
+	{0.0f, 0.0f},                                 // 150
 	/* biJungleEdgeM          */ { 3.0f,  3.0f},  // 151
-	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},        // 152 .. 154
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},     // 152 .. 154
 	/* biBirchForestM         */ { 3.0f,  3.0f},  // 155
 	/* biBirchForestHillsM    */ { 5.0f,  5.0f},  // 156
 	/* biRoofedForestM        */ { 2.0f,  2.0f},  // 157
 	/* biColdTaigaM           */ { 1.0f,  1.0f},  // 158
-	{0.0f, 0.0f},                                  // 159
+	{0.0f, 0.0f},                                 // 159
 	/* biMegaSpruceTaiga      */ { 3.0f,  3.0f},  // 160
 	/* biMegaSpruceTaigaHills */ { 3.0f,  3.0f},  // 161
 	/* biExtremeHillsPlusM    */ {32.0f, 32.0f},  // 162
