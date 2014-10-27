@@ -23,11 +23,30 @@ end
 function GetDefaultPage()
 	local PM = cRoot:Get():GetPluginManager()
 
-	local SubTitle = "Home"
+	local SubTitle = "Current Game"
 	local Content = ""
 	
-	Content = Content .. "<h4>Home Home Home</h4><ul>I have no idea what this content should do.</ul>"
+	Content = Content .. "<h4>Server Name:</h4>"
+	Content = Content .. "<p>" .. cRoot:Get():GetServer():GetServerID() .. "</p>"
 	
+	Content = Content .. "<h4>Plugins:</h4><ul>"
+	local AllPlugins = PM:GetAllPlugins()
+	for key,value in pairs(AllPlugins) do
+		if( value ~= nil and value ~= false ) then
+			Content = Content ..  "<li>" .. key .. " (version " .. value:GetVersion() .. ")</li>"
+		end
+	end
+	
+	Content = Content .. "</ul>"
+	Content = Content .. "<h4>Players:</h4><ul>"
+	
+	local AddPlayerToTable = function( Player )
+		Content = Content .. "<li>" .. Player:GetName() .. "</li>"
+	end
+	cRoot:Get():ForEachPlayer( AddPlayerToTable )
+	
+	Content = Content .. "</ul><br>";
+
 	return Content, SubTitle
 end
 
