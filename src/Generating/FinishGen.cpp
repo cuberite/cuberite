@@ -414,6 +414,11 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					break;
 				}
+				default:
+				{
+					// There's no snow in the other biomes.
+					break;
+				}
 			}
 		}
 	}  // for z
