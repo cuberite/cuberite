@@ -612,13 +612,13 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case mtEnderDragon:
 			case mtGhast:
 			case mtGiant:
-			case mtIronGolem
+			case mtIronGolem:
 			case mtMooshroom:
 			case mtOcelot:
 			case mtPig:
 			case mtSilverfish:
 			case mtSnowGolem:
-			case meSpider:
+			case mtSpider:
 			case mtSquid:
 			case mtWitch:
 			case mtZombiePigman:
