@@ -246,22 +246,22 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biSwamplandM           */ { 0.0f,  0.0f},  // 134
 	
 	// Biomes 135 .. 139 unused, 5 empty placeholders here:
-	{}, {}, {}, {}, {},                           // 135 .. 139
+	{0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, // 135 .. 139
 
 	/* biIcePlainsSpikes      */ { 1.0f,  1.0f},  // 140
 	
 	// Biomes 141 .. 148 unused, 8 empty placeholders here:
-	{}, {}, {}, {}, {}, {}, {}, {},               // 141 .. 148
+	{0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f}, // 141 .. 148
 
 	/* biJungleM              */ { 4.0f,  4.0f},  // 149
-	{},                                           // 150
+	{0.0f,0.0f},                                  // 150
 	/* biJungleEdgeM          */ { 3.0f,  3.0f},  // 151
-	{}, {}, {},                                   // 152 .. 154
+	{0.0f,0.0f}, {0.0f,0.0f}, {0.0f,0.0f},        // 152 .. 154
 	/* biBirchForestM         */ { 3.0f,  3.0f},  // 155
 	/* biBirchForestHillsM    */ { 5.0f,  5.0f},  // 156
 	/* biRoofedForestM        */ { 2.0f,  2.0f},  // 157
 	/* biColdTaigaM           */ { 1.0f,  1.0f},  // 158
-	{},                                           // 159
+	{0.0f,0.0f},                                  // 159
 	/* biMegaSpruceTaiga      */ { 3.0f,  3.0f},  // 160
 	/* biMegaSpruceTaigaHills */ { 3.0f,  3.0f},  // 161
 	/* biExtremeHillsPlusM    */ {32.0f, 32.0f},  // 162
