@@ -459,6 +459,11 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					break;
 				}
+				default:
+				{
+					// No icy water in other biomes.
+					break;
+				}
 			}
 		}
 	}  // for z
