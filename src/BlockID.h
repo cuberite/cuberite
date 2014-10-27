@@ -1,7 +1,7 @@
 #pragma once
 
-// The following hackery is to allow typed C++ enum for C++ code, yet have ToLua pocess the values.
-// ToLua doesn't understand typed enums, so we use preprocessor to hide it from ToLua
+// The following hackery is to allow typed C++ enum for C++ code, yet have ToLua peocess the values.
+// ToLua doesn't understand typed enums, so we use preprocessor to hide it from ToLua.
 
 enum ENUM_BLOCK_ID : BLOCKTYPE
 #if 0
