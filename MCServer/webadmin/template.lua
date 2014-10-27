@@ -62,6 +62,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	end
 	
 	Output([[
+/* Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 */
 <!DOCTYPE html>
 <head>
 <title>]] .. Title .. [[</title>
