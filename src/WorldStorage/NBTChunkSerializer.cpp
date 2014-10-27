@@ -604,6 +604,28 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddByte("IsConverting", (((const cZombie *)a_Monster)->IsConverting() ? 1 : 0));
 				break;
 			}
+			case mtInvalidType:
+			case mtBlaze:
+			case mtCaveSpider:
+			case mtChicken:
+			case mtCow:
+			case mtEnderDragon:
+			case mtGhast:
+			case mtGiant:
+			case mtIronGolem:
+			case mtMooshroom:
+			case mtOcelot:
+			case mtPig:
+			case mtSilverfish:
+			case mtSnowGolem:
+			case mtSpider:
+			case mtSquid:
+			case mtWitch:
+			case mtZombiePigman:
+			{
+				// Other mobs have no special tags.
+				break;
+			}
 		}
 	m_Writer.EndCompound();
 }

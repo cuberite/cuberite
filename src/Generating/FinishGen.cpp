@@ -414,6 +414,11 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					break;
 				}
+				default:
+				{
+					// There's no snow in the other biomes.
+					break;
+				}
 			}
 		}
 	}  // for z
@@ -452,6 +457,11 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 							break;
 						}
 					}
+					break;
+				}
+				default:
+				{
+					// No icy water in other biomes.
 					break;
 				}
 			}
