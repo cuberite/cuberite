@@ -8,12 +8,13 @@
 #include <QSettings>
 #include <QDirIterator>
 #include <QStatusBar>
-#include "src/IniFile.h"
 #include "ChunkSource.h"
+#include "src/IniFile.h"
 #include "src/Generating/BioGen.h"
 #include "src/StringCompression.h"
 #include "src/WorldStorage/FastNBT.h"
 #include "GeneratorSetup.h"
+#include "RegionLoader.h"
 
 
 
@@ -70,7 +71,7 @@ MainWindow::MainWindow(QWidget * parent) :
 
 MainWindow::~MainWindow()
 {
-
+	RegionLoader::shutdown();
 }
 
 
@@ -172,7 +173,8 @@ void MainWindow::setViewZoom()
 	{
 		return;
 	}
-	double newZoom = m_ViewZooms[action->data().toInt()];
+	m_CurrentZoomLevel = action->data().toInt();
+	double newZoom = m_ViewZooms[m_CurrentZoomLevel];
 	m_BiomeView->setZoomLevel(newZoom);
 	action->setChecked(true);
 }

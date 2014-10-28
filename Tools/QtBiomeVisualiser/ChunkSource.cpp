@@ -24,14 +24,14 @@ BioGenSource::BioGenSource(cIniFilePtr a_IniFile) :
 
 
 
-void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk)
+void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk)
 {
 	cChunkDef::BiomeMap biomes;
 	{
 		QMutexLocker lock(&m_Mtx);
 		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
 	}
-	a_DestChunk->setBiomes(biomes);
+	a_DestChunk.setBiomes(biomes);
 }
 
 
@@ -160,7 +160,7 @@ AnvilSource::AnvilSource(QString a_WorldRegionFolder) :
 
 
 
-void AnvilSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk)
+void AnvilSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk)
 {
 	// Load the compressed data:
 	AString compressedChunkData = getCompressedChunkData(a_ChunkX, a_ChunkZ);
@@ -200,7 +200,7 @@ void AnvilSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChun
 		{
 			biomeMap[i] = (EMCSBiome)GetBEInt(beBiomes + 4 * i);
 		}
-		a_DestChunk->setBiomes(biomeMap);
+		a_DestChunk.setBiomes(biomeMap);
 		return;
 	}
 
@@ -216,7 +216,7 @@ void AnvilSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChun
 	{
 		biomeMap[i] = EMCSBiome(vanillaBiomes[i]);
 	}
-	a_DestChunk->setBiomes(biomeMap);
+	a_DestChunk.setBiomes(biomeMap);
 }
 
 
@@ -260,7 +260,7 @@ AnvilSource::AnvilFilePtr AnvilSource::getAnvilFile(int a_ChunkX, int a_ChunkZ)
 
 	// Search the cache for the file:
 	QMutexLocker lock(&m_Mtx);
-	for (auto itr = m_Files.cbegin(), end = m_Files.cend(); itr != end; ++itr)
+	for (auto itr = m_Files.begin(), end = m_Files.end(); itr != end; ++itr)
 	{
 		if (((*itr)->m_RegionX == RegionX) && ((*itr)->m_RegionZ == RegionZ))
 		{
