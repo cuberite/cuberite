@@ -260,7 +260,7 @@ AnvilSource::AnvilFilePtr AnvilSource::getAnvilFile(int a_ChunkX, int a_ChunkZ)
 
 	// Search the cache for the file:
 	QMutexLocker lock(&m_Mtx);
-	for (auto itr = m_Files.cbegin(), end = m_Files.cend(); itr != end; ++itr)
+	for (auto itr = m_Files.begin(), end = m_Files.end(); itr != end; ++itr)
 	{
 		if (((*itr)->m_RegionX == RegionX) && ((*itr)->m_RegionZ == RegionZ))
 		{

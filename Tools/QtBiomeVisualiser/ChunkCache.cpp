@@ -37,14 +37,14 @@ ChunkPtr ChunkCache::fetch(int a_ChunkX, int a_ChunkZ)
 	// If the chunk is in cache but not valid, it means it has been already queued for rendering, do nothing now:
 	if (res != nullptr)
 	{
-		return ChunkPtr(nullptr);
+		return ChunkPtr();
 	}
 
 	// There's no such item in the cache, create it now:
 	res = new ChunkPtr(new Chunk);
 	if (res == nullptr)
 	{
-		return ChunkPtr(nullptr);
+		return ChunkPtr();
 	}
 	{
 		QMutexLocker lock(&m_Mtx);
@@ -55,7 +55,7 @@ ChunkPtr ChunkCache::fetch(int a_ChunkX, int a_ChunkZ)
 	queueChunkRender(a_ChunkX, a_ChunkZ, *res);
 
 	// Return failure, the chunk is not yet rendered:
-	return ChunkPtr(nullptr);
+	return ChunkPtr();
 }
 
 

@@ -7,6 +7,15 @@
 
 
 
+#if (!defined(_MSC_VER) && (__cplusplus < 201103L))
+	// GCC in non-c++11 mode doesn't have the "override" keyword
+	#define override
+#endif
+
+
+
+
+
 // fwd:
 class Chunk;
 typedef std::shared_ptr<Chunk> ChunkPtr;

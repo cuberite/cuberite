@@ -10,7 +10,7 @@
 
 // fwd:
 class cBiomeGen;
-typedef std::shared_ptr<cBiomeGen> cBiomeGenPtr;
+typedef SharedPtr<cBiomeGen> cBiomeGenPtr;
 class cIniFile;
 typedef std::shared_ptr<cIniFile> cIniFilePtr;
 
