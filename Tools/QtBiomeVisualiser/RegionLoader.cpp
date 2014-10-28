@@ -7,6 +7,12 @@
 
 
 
+volatile bool RegionLoader::m_IsShuttingDown = false;
+
+
+
+
+
 RegionLoader::RegionLoader(int a_RegionX, int a_RegionZ, RegionPtr a_Region, ChunkSourcePtr a_ChunkSource) :
 	m_RegionX(a_RegionX),
 	m_RegionZ(a_RegionZ),
@@ -27,6 +33,10 @@ void RegionLoader::run()
 		for (int x = 0; x < 32; x++)
 		{
 			m_ChunkSource->getChunkBiomes(m_RegionX * 32 + x, m_RegionZ * 32 + z, m_Region->getRelChunk(x, z));
+			if (m_IsShuttingDown)
+			{
+				return;
+			}
 		}
 	}
 	m_Region->m_IsValid = true;

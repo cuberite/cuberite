@@ -28,6 +28,9 @@ public:
 	RegionLoader(int a_RegionX, int a_RegionZ, RegionPtr a_Region, ChunkSourcePtr a_ChunkSource);
 	virtual ~RegionLoader() {}
 
+	/** Signals to all loaders that the app is shutting down and the loading should be aborted. */
+	static void shutdown() { m_IsShuttingDown = true; }
+
 signals:
 	void loaded(int a_RegionX, int a_RegionZ);
 
@@ -43,6 +46,9 @@ private:
 
 	/** The chunk source to be used for individual chunks within the region. */
 	ChunkSourcePtr m_ChunkSource;
+
+	/** Flag that is set upon app exit to terminate the queued loaders faster. */
+	static volatile bool m_IsShuttingDown;
 };
 
 

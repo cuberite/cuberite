@@ -14,6 +14,7 @@
 #include "src/StringCompression.h"
 #include "src/WorldStorage/FastNBT.h"
 #include "GeneratorSetup.h"
+#include "RegionLoader.h"
 
 
 
@@ -70,7 +71,7 @@ MainWindow::MainWindow(QWidget * parent) :
 
 MainWindow::~MainWindow()
 {
-
+	RegionLoader::shutdown();
 }
 
 
