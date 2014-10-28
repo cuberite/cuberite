@@ -2,7 +2,7 @@
 
 #include <QWidget>
 #include <memory>
-#include "ChunkCache.h"
+#include "RegionCache.h"
 #include "ChunkSource.h"
 
 
@@ -51,8 +51,8 @@ public slots:
 	/** Redraw the entire widget area. */
 	void redraw();
 
-	/** A specified chunk has become available, redraw it. */
-	void chunkAvailable(int a_ChunkX, int a_ChunkZ);
+	/** A specified region has become available, redraw it. */
+	void regionAvailable(int a_RegionX, int a_RegionZ);
 
 	/** Reloads the current chunk source and redraws the entire workspace. */
 	void reload();
@@ -62,7 +62,7 @@ protected:
 	double m_Zoom;
 
 	/** Cache for the loaded chunk data. */
-	ChunkCache m_Cache;
+	RegionCache m_Cache;
 
 	/** The entire view's contents in an offscreen image. */
 	QImage m_Image;
@@ -78,6 +78,9 @@ protected:
 
 	/** Data used for rendering a chunk that hasn't been loaded yet */
 	uchar m_EmptyChunkImage[16 * 16 * 4];
+
+	/** Data placeholder for chunks that aren't valid. */
+	short m_EmptyChunkBiomes[16 * 16];
 
 
 	/** Draws the specified chunk into m_Image */
