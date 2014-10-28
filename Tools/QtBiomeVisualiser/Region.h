@@ -30,6 +30,8 @@ public:
 	static void chunkToRegion(int a_ChunkX, int a_ChunkZ, int & a_RegionX, int & a_RegionZ);
 
 protected:
+	friend class RegionLoader;
+
 
 	Chunk m_Chunks[32 * 32];
 

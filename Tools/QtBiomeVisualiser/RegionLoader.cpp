@@ -29,6 +29,8 @@ void RegionLoader::run()
 			m_ChunkSource->getChunkBiomes(m_RegionX * 32 + x, m_RegionZ * 32 + z, m_Region->getRelChunk(x, z));
 		}
 	}
+	m_Region->m_IsValid = true;
+
 	emit loaded(m_RegionX, m_RegionZ);
 }
 
