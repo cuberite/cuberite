@@ -82,13 +82,12 @@ function ShowPage(WebAdmin, TemplateRequest)
 	
 	Output([[
 /* Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 */
-<!DOCTYPE html>
+<html>
 <head>
-<title>]] .. Title .. [[</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,300" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="/style.css">
-<link rel="icon" href="/favicon.ico">
+	<title>]] .. Title .. [[</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="/style.css">
+	<link rel="icon" href="/favicon.ico">
 </head>
 <body>
 <div class="contention">
