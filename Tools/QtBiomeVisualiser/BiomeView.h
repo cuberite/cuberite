@@ -79,6 +79,9 @@ protected:
 	/** Data used for rendering a chunk that hasn't been loaded yet */
 	uchar m_EmptyChunkImage[16 * 16 * 4];
 
+	/** Data placeholder for chunks that aren't valid. */
+	short m_EmptyChunkBiomes[16 * 16];
+
 
 	/** Draws the specified chunk into m_Image */
 	void drawChunk(int a_ChunkX, int a_ChunkZ);
