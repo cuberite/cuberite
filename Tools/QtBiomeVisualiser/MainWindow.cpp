@@ -172,7 +172,8 @@ void MainWindow::setViewZoom()
 	{
 		return;
 	}
-	double newZoom = m_ViewZooms[action->data().toInt()];
+	m_CurrentZoomLevel = action->data().toInt();
+	double newZoom = m_ViewZooms[m_CurrentZoomLevel];
 	m_BiomeView->setZoomLevel(newZoom);
 	action->setChecked(true);
 }
