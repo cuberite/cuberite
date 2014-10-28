@@ -4,7 +4,7 @@
 }
 
 body {
-    font-family: "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     -webkit-font-smoothing: antialiased;
     background: #fff;
     width: 100%;
@@ -23,7 +23,7 @@ a:visited {
     text-decoration: none;
 }
 
-a:hover,a:active {
+a:hover, a:active {
     color: #000;
     text-decoration: underline;
 }
@@ -168,11 +168,11 @@ h1 {
     top: expression((0-(footer.offsetHeight)+(document.documentElement.clientHeight ? document.documentElement.clientHeight : document.body.clientHeight)+(ignoreMe = document.documentElement.scrollTop ? document.documentElement.scrollTop : document.body.scrollTop))+'px');
 }
 
-tr td.trow1:first-child,tr td.trow2:first-child {
+tr td.trow1:first-child, tr td.trow2:first-child {
     border-left: 0;
 }
 
-tr td.trow1:last-child,tr td.trow2:last-child {
+tr td.trow1:last-child, tr td.trow2:last-child {
     border-right: 0;
 }
 
