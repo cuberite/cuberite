@@ -22,7 +22,7 @@ a:visited {
     text-decoration: none;
 }
 
-a:hover,a:active {
+a:hover, a:active {
     color: #000;
     text-decoration: underline;
 }
@@ -128,12 +128,12 @@ button:active {
     font-size: 11px;
 }
 
-#footer .lower a:link,#footer .lower a:visited {
+#footer .lower a:link, #footer .lower a:visited {
     color: #fff;
     font-weight: 700;
 }
 
-#footer .lower a:hover,#footer .lower a:active {
+#footer .lower a:hover, #footer .lower a:active {
     color: #fff;
     font-weight: 700;
 }
@@ -179,7 +179,7 @@ tr td.trow2:last-child {
     border-radius: 7px;
 }
 
-.thead,.rounded_top {
+.thead, .rounded_top {
     -moz-border-radius-topleft: 6px;
     -moz-border-radius-topright: 6px;
     -webkit-border-top-left-radius: 6px;
