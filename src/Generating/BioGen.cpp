@@ -946,18 +946,15 @@ public:
 			std::make_shared<cIntGenZoom           <10>>(a_Seed + 15,
 			std::make_shared<cIntGenSmooth         <7>> (a_Seed + 1000,
 			std::make_shared<cIntGenZoom           <9>> (a_Seed + 16,
-			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1001,
-			std::make_shared<cIntGenZoom           <8>> (a_Seed,
-			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1002,
-			std::make_shared<cIntGenZoom           <8>> (a_Seed + 1,
 			std::make_shared<cIntGenBeaches        <6>> (
 			std::make_shared<cIntGenSmooth         <8>> (a_Seed + 1002,
-			std::make_shared<cIntGenZoom           <10>>(a_Seed + 2,
-			std::make_shared<cIntGenZoom           <7>> (a_Seed + 3,
-			std::make_shared<cIntGenAddIslands     <5>> (a_Seed + 2004, 10,
-			std::make_shared<cIntGenZoom           <5>> (a_Seed + 4,
-			std::make_shared<cIntGenAddToOcean     <4>> (a_Seed + 9, 50, biMushroomIsland,
-			std::make_shared<cIntGenZoom           <6>> (a_Seed + 8,
+			std::make_shared<cIntGenZoom           <10>>(a_Seed + 1,
+			std::make_shared<cIntGenSmooth         <7>> (a_Seed + 1002,
+			std::make_shared<cIntGenZoom           <9>> (a_Seed + 2,
+			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2004, 10,
+			std::make_shared<cIntGenZoom           <6>> (a_Seed + 4,
+			std::make_shared<cIntGenAddToOcean     <5>> (a_Seed + 9, 50, biMushroomIsland,
+			std::make_shared<cIntGenZoom           <7>> (a_Seed + 8,
 			std::make_shared<cIntGenAddToOcean     <5>> (a_Seed + 10, 500, biDeepOcean,
 			std::make_shared<cIntGenBiomes         <7>> (a_Seed + 3000,
 			std::make_shared<cIntGenZoom           <7>> (a_Seed + 5,
@@ -970,7 +967,7 @@ public:
 			std::make_shared<cIntGenSmooth         <6>> (a_Seed + 1004,
 			std::make_shared<cIntGenZoom           <8>> (a_Seed + 10,
 			std::make_shared<cIntGenLandOcean      <6>> (a_Seed + 100, 65
-		))))))))))))))))))))))))))));
+		)))))))))))))))))))))))));
 
 		m_Gen =
 			std::make_shared<cIntGenSmooth   <16>>(a_Seed,
