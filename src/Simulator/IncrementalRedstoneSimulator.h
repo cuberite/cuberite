@@ -25,7 +25,6 @@ public:
 		: cRedstoneSimulator(a_World)
 	{
 	}
-	~cIncrementalRedstoneSimulator() {};
 
 	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
 	{
@@ -186,6 +185,7 @@ private:
 	Used for variable sources such as tripwire hooks, daylight sensors, and trapped chests
 	*/
 	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
+	void SetInvalidMiddleBlock(int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
 
 	/** Returns if a coordinate is powered or linked powered */
 	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
@@ -224,40 +224,40 @@ private:
 	{
 		switch (Block)
 		{
-		case E_BLOCK_ACACIA_DOOR:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_BIRCH_DOOR:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DARK_OAK_DOOR:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_FENCE_GATE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_IRON_DOOR:
-		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_JUNGLE_DOOR:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_PISTON:
-		case E_BLOCK_POWERED_RAIL:
-		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_SPRUCE_DOOR:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_STICKY_PISTON:
-		case E_BLOCK_TNT:
-		case E_BLOCK_TRAPDOOR:
-		case E_BLOCK_WOODEN_DOOR:
-		{
-			return true;
-		}
-		default: return false;
+			case E_BLOCK_ACACIA_DOOR:
+			case E_BLOCK_ACACIA_FENCE_GATE:
+			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_BIRCH_DOOR:
+			case E_BLOCK_BIRCH_FENCE_GATE:
+			case E_BLOCK_COMMAND_BLOCK:
+			case E_BLOCK_DARK_OAK_DOOR:
+			case E_BLOCK_DARK_OAK_FENCE_GATE:
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_DROPPER:
+			case E_BLOCK_FENCE_GATE:
+			case E_BLOCK_HOPPER:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_IRON_TRAPDOOR:
+			case E_BLOCK_JUNGLE_DOOR:
+			case E_BLOCK_JUNGLE_FENCE_GATE:
+			case E_BLOCK_NOTE_BLOCK:
+			case E_BLOCK_PISTON:
+			case E_BLOCK_POWERED_RAIL:
+			case E_BLOCK_REDSTONE_LAMP_OFF:
+			case E_BLOCK_REDSTONE_LAMP_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_SPRUCE_DOOR:
+			case E_BLOCK_SPRUCE_FENCE_GATE:
+			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_TNT:
+			case E_BLOCK_TRAPDOOR:
+			case E_BLOCK_WOODEN_DOOR:
+			{
+				return true;
+			}
+			default: return false;
 		}
 	}
 
@@ -266,25 +266,25 @@ private:
 	{
 		switch (Block)
 		{
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_WOODEN_BUTTON:
-		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_LEVER:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_TRAPPED_CHEST:
-		{
-			return true;
-		}
-		default: return false;
+			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_DAYLIGHT_SENSOR:
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_LEVER:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_ACTIVE_COMPARATOR:
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_TRAPPED_CHEST:
+			{
+				return true;
+			}
+			default: return false;
 		}
 	}
 
@@ -294,57 +294,57 @@ private:
 		switch (Block)
 		{
 			// All redstone devices, please alpha sort
-		case E_BLOCK_ACACIA_DOOR:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_BIRCH_DOOR:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DARK_OAK_DOOR:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_FENCE_GATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_INACTIVE_COMPARATOR:
-		case E_BLOCK_IRON_DOOR:
-		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_JUNGLE_DOOR:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_LEVER:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_POWERED_RAIL:
-		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_SPRUCE_DOOR:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_STICKY_PISTON:
-		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_TNT:
-		case E_BLOCK_TRAPDOOR:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_TRIPWIRE_HOOK:
-		case E_BLOCK_TRIPWIRE:
-		case E_BLOCK_WOODEN_BUTTON:
-		case E_BLOCK_WOODEN_DOOR:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_PISTON:
-		{
-			return true;
-		}
-		default: return false;
+			case E_BLOCK_ACACIA_DOOR:
+			case E_BLOCK_ACACIA_FENCE_GATE:
+			case E_BLOCK_ACTIVATOR_RAIL:
+			case E_BLOCK_ACTIVE_COMPARATOR:
+			case E_BLOCK_BIRCH_DOOR:
+			case E_BLOCK_BIRCH_FENCE_GATE:
+			case E_BLOCK_BLOCK_OF_REDSTONE:
+			case E_BLOCK_COMMAND_BLOCK:
+			case E_BLOCK_DARK_OAK_DOOR:
+			case E_BLOCK_DARK_OAK_FENCE_GATE:
+			case E_BLOCK_DAYLIGHT_SENSOR:
+			case E_BLOCK_DETECTOR_RAIL:
+			case E_BLOCK_DISPENSER:
+			case E_BLOCK_DROPPER:
+			case E_BLOCK_FENCE_GATE:
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_HOPPER:
+			case E_BLOCK_INACTIVE_COMPARATOR:
+			case E_BLOCK_IRON_DOOR:
+			case E_BLOCK_IRON_TRAPDOOR:
+			case E_BLOCK_JUNGLE_DOOR:
+			case E_BLOCK_JUNGLE_FENCE_GATE:
+			case E_BLOCK_LEVER:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_NOTE_BLOCK:
+			case E_BLOCK_POWERED_RAIL:
+			case E_BLOCK_REDSTONE_LAMP_OFF:
+			case E_BLOCK_REDSTONE_LAMP_ON:
+			case E_BLOCK_REDSTONE_REPEATER_OFF:
+			case E_BLOCK_REDSTONE_REPEATER_ON:
+			case E_BLOCK_REDSTONE_TORCH_OFF:
+			case E_BLOCK_REDSTONE_TORCH_ON:
+			case E_BLOCK_REDSTONE_WIRE:
+			case E_BLOCK_SPRUCE_DOOR:
+			case E_BLOCK_SPRUCE_FENCE_GATE:
+			case E_BLOCK_STICKY_PISTON:
+			case E_BLOCK_STONE_BUTTON:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_TNT:
+			case E_BLOCK_TRAPDOOR:
+			case E_BLOCK_TRAPPED_CHEST:
+			case E_BLOCK_TRIPWIRE_HOOK:
+			case E_BLOCK_TRIPWIRE:
+			case E_BLOCK_WOODEN_BUTTON:
+			case E_BLOCK_WOODEN_DOOR:
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_PISTON:
+			{
+				return true;
+			}
+			default: return false;
 		}
 	}
 
@@ -356,5 +356,38 @@ private:
 			((a_BlockZ % cChunkDef::Width) <= 1) ||
 			((a_BlockZ % cChunkDef::Width) >= 14)
 			);
+	}
+
+	inline static Vector3i AdjustRelativeCoords(const Vector3i & a_RelPosition)
+	{
+		if (
+			(a_RelPosition.x >= 0) && (a_RelPosition.x < cChunkDef::Width) &&
+			(a_RelPosition.z >= 0) && (a_RelPosition.z < cChunkDef::Width)
+			)
+		{
+			return a_RelPosition;
+		}
+
+		Vector3i RelPos = a_RelPosition;
+
+		// Request for a different chunk, calculate chunk offset:
+		while (RelPos.x >= cChunkDef::Width)
+		{
+			RelPos.x -= cChunkDef::Width;
+		}
+		while (RelPos.x < 0)
+		{
+			RelPos.x += cChunkDef::Width;
+		}
+		while (RelPos.z >= cChunkDef::Width)
+		{
+			RelPos.z -= cChunkDef::Width;
+		}
+		while (RelPos.z < 0)
+		{
+			RelPos.z += cChunkDef::Width;
+		}
+
+		return RelPos;
 	}
 };

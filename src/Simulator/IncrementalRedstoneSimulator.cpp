@@ -22,9 +22,6 @@ typedef cItemCallback<cChestEntity> cChestCallback;
 #include "RedstoneSimulator.h"
 
 
-typedef cItemCallback<cEntity> cEntityCallback;
-
-
 
 
 
@@ -68,108 +65,40 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
 	// Checking only when a block is changed, as opposed to every tick, also improves performance
 
-	cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData * SimulatorChunkData = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData());
-	if (SimulatorChunkData == NULL)
-	{
-		return;
-	}
-	PoweredBlocksList & PoweredBlocks = SimulatorChunkData->m_PoweredBlocks;
-	for (PoweredBlocksList::iterator itr = PoweredBlocks.begin(); itr != PoweredBlocks.end();)
-	{
-		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
-		{
-			++itr;
-			continue;
-		}
-
-		if (!IsPotentialSource(Block))
-		{
-			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list as it no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			itr = PoweredBlocks.erase(itr);
-			continue;
-		}
-		else if (
+	if (
+		!IsPotentialSource(Block) ||
+		(
 			// Changeable sources
 			((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
 			((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
 			((Block == E_BLOCK_DETECTOR_RAIL) && ((Meta & 0x08) == 0)) ||
 			(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta))) ||
 			((Block == E_BLOCK_TRIPWIRE_HOOK) && ((Meta & 0x08) == 0))
-			)
-		{
-			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-			itr = PoweredBlocks.erase(itr);
-			continue;
-		}
-		++itr;
-	}
-
-	LinkedBlocksList & LinkedPoweredBlocks = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_LinkedBlocks;
-	// We loop through all values (insteading of breaking out at the first) to make sure everything is gone, as there can be multiple SourceBlock entries for one AddBlock coordinate
-	for (LinkedBlocksList::iterator itr = LinkedPoweredBlocks.begin(); itr != LinkedPoweredBlocks.end();)
+		)
+	)
 	{
-		if (itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
-		{
-			if (!IsPotentialSource(Block))
-			{
-				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer connected to a source", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				itr = LinkedPoweredBlocks.erase(itr);
-				continue;
-			}
-			else if (
-				// Things that can send power through a block but which depends on meta
-				((Block == E_BLOCK_REDSTONE_WIRE) && (Meta == 0)) ||
-				((Block == E_BLOCK_LEVER) && !IsLeverOn(Meta)) ||
-				(((Block == E_BLOCK_STONE_BUTTON) || (Block == E_BLOCK_WOODEN_BUTTON)) && (!IsButtonOn(Meta)))
-				)
-			{
-				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list due to present/past metadata mismatch", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				itr = LinkedPoweredBlocks.erase(itr);
-				continue;
-			}
-		}
-		else if (itr->a_MiddlePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
-		{
-			if (!IsViableMiddleBlock(Block))
-			{
-				LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from linked powered blocks list as it is no longer powered through a valid middle block", itr->a_BlockPos.x, itr->a_BlockPos.y, itr->a_BlockPos.z);
-				itr = LinkedPoweredBlocks.erase(itr);
-				continue;
-			}
-		}
-		++itr;
+		SetSourceUnpowered(RelX, a_BlockY, RelZ, a_OtherChunk != nullptr ? a_OtherChunk : a_Chunk);
 	}
 
-	SimulatedPlayerToggleableList & SimulatedPlayerToggleableBlocks = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_SimulatedPlayerToggleableBlocks;
-	for (SimulatedPlayerToggleableList::iterator itr = SimulatedPlayerToggleableBlocks.begin(); itr != SimulatedPlayerToggleableBlocks.end(); ++itr)
+	if (!IsViableMiddleBlock(Block))
 	{
-		if (!itr->a_RelBlockPos.Equals(Vector3i(RelX, a_BlockY, RelZ)))
-		{
-			continue;
-		}
-
-		if (!IsAllowedBlock(Block))
-		{
-			LOGD("cIncrementalRedstoneSimulator: Erased block @ {%i, %i, %i} from toggleable simulated list as it is no longer redstone", itr->a_RelBlockPos.x, itr->a_RelBlockPos.y, itr->a_RelBlockPos.z);
-			SimulatedPlayerToggleableBlocks.erase(itr);
-			break;
-		}
+		SetInvalidMiddleBlock(RelX, a_BlockY, RelZ, a_OtherChunk != nullptr ? a_OtherChunk : a_Chunk);
 	}
 
-	RepeatersDelayList & RepeatersDelayList = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_RepeatersDelayList;
-	for (RepeatersDelayList::iterator itr = RepeatersDelayList.begin(); itr != RepeatersDelayList.end(); ++itr)
-	{
-		if (!itr->a_RelBlockPos.Equals(Vector3i(RelX, a_BlockY, RelZ)))
+	auto & SimulatedPlayerToggleableBlocks = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_SimulatedPlayerToggleableBlocks;
+	SimulatedPlayerToggleableBlocks.erase(std::remove_if(SimulatedPlayerToggleableBlocks.begin(), SimulatedPlayerToggleableBlocks.end(), [RelX, a_BlockY, RelZ, Block, this](const sSimulatedPlayerToggleableList & itr)
 		{
-			continue;
+			return itr.a_RelBlockPos.Equals(Vector3i(RelX, a_BlockY, RelZ)) && !IsAllowedBlock(Block);
 		}
+	), SimulatedPlayerToggleableBlocks.end());
 
-		if ((Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF))
+	
+	auto & RepeatersDelayList = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_RepeatersDelayList;	
+	RepeatersDelayList.erase(std::remove_if(RepeatersDelayList.begin(), RepeatersDelayList.end(), [RelX, a_BlockY, RelZ, Block](const sRepeatersDelayList & itr)
 		{
-			RepeatersDelayList.erase(itr);
-			break;
+			return itr.a_RelBlockPos.Equals(Vector3i(RelX, a_BlockY, RelZ)) && (Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF);
 		}
-	}
+	), RepeatersDelayList.end());
 
 	if (a_OtherChunk != NULL)
 	{
@@ -178,18 +107,18 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	}
 
 	cCoordWithBlockAndBoolVector & RedstoneSimulatorChunkData = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_ChunkData;
-	for (cCoordWithBlockAndBoolVector::iterator itr = RedstoneSimulatorChunkData.begin(); itr != RedstoneSimulatorChunkData.end(); ++itr)
+	for (auto & itr : RedstoneSimulatorChunkData)
 	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))  // We are at an entry matching the current (changed) block
+		if ((itr.x == RelX) && (itr.y == a_BlockY) && (itr.z == RelZ))  // We are at an entry matching the current (changed) block
 		{
 			if (!IsAllowedBlock(Block))
 			{
-				itr->DataTwo = true;  // The new blocktype is not redstone; it must be queued to be removed from this list
+				itr.DataTwo = true;  // The new blocktype is not redstone; it must be queued to be removed from this list
 			}
 			else
 			{
-				itr->DataTwo = false;
-				itr->Data = Block;  // Update block information
+				itr.DataTwo = false;
+				itr.Data = Block;  // Update block information
 			}
 			return;
 		}
@@ -201,15 +130,15 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	}
 
 	cCoordWithBlockAndBoolVector & QueuedData = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_QueuedChunkData;
-	for (cCoordWithBlockAndBoolVector::iterator itr = QueuedData.begin(); itr != QueuedData.end(); ++itr)
+	for (const auto & itr : QueuedData)
 	{
-		if ((itr->x == RelX) && (itr->y == a_BlockY) && (itr->z == RelZ))
+		if ((itr.x == RelX) && (itr.y == a_BlockY) && (itr.z == RelZ))
 		{
 			// Can't have duplicates in here either, in case something adds the block again before the structure can written to the main chunk data
 			return;
 		}
 	}
-	QueuedData.push_back(cCoordWithBlockAndBool(RelX, a_BlockY, RelZ, Block, false));
+	QueuedData.emplace_back(cCoordWithBlockAndBool(RelX, a_BlockY, RelZ, Block, false));
 }
 
 
@@ -232,7 +161,8 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 	m_RedstoneSimulatorChunkData->m_ChunkData.insert(
 		m_RedstoneSimulatorChunkData->m_ChunkData.end(),
 		m_RedstoneSimulatorChunkData->m_QueuedChunkData.begin(),
-		m_RedstoneSimulatorChunkData->m_QueuedChunkData.end());
+		m_RedstoneSimulatorChunkData->m_QueuedChunkData.end()
+	);
 
 	m_RedstoneSimulatorChunkData->m_QueuedChunkData.clear();
 
@@ -253,7 +183,7 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 
 	HandleRedstoneRepeaterDelays();
 
-	for (cCoordWithBlockAndBoolVector::iterator dataitr = m_RedstoneSimulatorChunkData->m_ChunkData.begin(); dataitr != m_RedstoneSimulatorChunkData->m_ChunkData.end();)
+	for (auto dataitr = m_RedstoneSimulatorChunkData->m_ChunkData.begin(); dataitr != m_RedstoneSimulatorChunkData->m_ChunkData.end();)
 	{
 		if (dataitr->DataTwo)
 		{
@@ -263,100 +193,100 @@ void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int 
 
 		switch (dataitr->Data)
 		{
-		case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
-		case E_BLOCK_TRIPWIRE:        HandleTripwire(dataitr->x, dataitr->y, dataitr->z);       break;
-		case E_BLOCK_TRIPWIRE_HOOK:   HandleTripwireHook(dataitr->x, dataitr->y, dataitr->z);   break;
+			case E_BLOCK_DAYLIGHT_SENSOR: HandleDaylightSensor(dataitr->x, dataitr->y, dataitr->z); break;
+			case E_BLOCK_TRIPWIRE:        HandleTripwire(dataitr->x, dataitr->y, dataitr->z);       break;
+			case E_BLOCK_TRIPWIRE_HOOK:   HandleTripwireHook(dataitr->x, dataitr->y, dataitr->z);   break;
 
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		{
-			HandlePressurePlate(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-			break;
-		}
-		default: break;
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:
+			case E_BLOCK_STONE_PRESSURE_PLATE:
+			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+			{
+				HandlePressurePlate(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+				break;
+			}
+			default: break;
 		}
 
 		if (ShouldUpdateSimulateOnceBlocks)
 		{
 			switch (dataitr->Data)
 			{
-			case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	  break;
-			case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
-			case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
-			case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);  break;
-			case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);  break;
-			case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
-			case E_BLOCK_IRON_TRAPDOOR:         HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
-			case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
-			case E_BLOCK_TRAPPED_CHEST:         HandleTrappedChest(dataitr->x, dataitr->y, dataitr->z);   break;
+				case E_BLOCK_REDSTONE_WIRE:         HandleRedstoneWire(dataitr->x, dataitr->y, dataitr->z);	  break;
+				case E_BLOCK_COMMAND_BLOCK:         HandleCommandBlock(dataitr->x, dataitr->y, dataitr->z);   break;
+				case E_BLOCK_NOTE_BLOCK:            HandleNoteBlock(dataitr->x, dataitr->y, dataitr->z);      break;
+				case E_BLOCK_BLOCK_OF_REDSTONE:     HandleRedstoneBlock(dataitr->x, dataitr->y, dataitr->z);  break;
+				case E_BLOCK_LEVER:                 HandleRedstoneLever(dataitr->x, dataitr->y, dataitr->z);  break;
+				case E_BLOCK_TNT:                   HandleTNT(dataitr->x, dataitr->y, dataitr->z);            break;
+				case E_BLOCK_IRON_TRAPDOOR:         HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
+				case E_BLOCK_TRAPDOOR:              HandleTrapdoor(dataitr->x, dataitr->y, dataitr->z);       break;
+				case E_BLOCK_TRAPPED_CHEST:         HandleTrappedChest(dataitr->x, dataitr->y, dataitr->z);   break;
 
-			case E_BLOCK_ACTIVATOR_RAIL:
-			case E_BLOCK_DETECTOR_RAIL:
-			case E_BLOCK_POWERED_RAIL:
-			{
-				HandleRail(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_ACACIA_DOOR:
-			case E_BLOCK_BIRCH_DOOR:
-			case E_BLOCK_DARK_OAK_DOOR:
-			case E_BLOCK_JUNGLE_DOOR:
-			case E_BLOCK_SPRUCE_DOOR:
-			case E_BLOCK_WOODEN_DOOR:
-			case E_BLOCK_IRON_DOOR:
-			{
-				HandleDoor(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_ACACIA_FENCE_GATE:
-			case E_BLOCK_BIRCH_FENCE_GATE:
-			case E_BLOCK_DARK_OAK_FENCE_GATE:
-			case E_BLOCK_FENCE_GATE:
-			case E_BLOCK_JUNGLE_FENCE_GATE:
-			case E_BLOCK_SPRUCE_FENCE_GATE:
-			{
-				HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_REDSTONE_LAMP_OFF:
-			case E_BLOCK_REDSTONE_LAMP_ON:
-			{
-				HandleRedstoneLamp(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			{
-				HandleDropSpenser(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_PISTON:
-			case E_BLOCK_STICKY_PISTON:
-			{
-				HandlePiston(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			{
-				HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_REDSTONE_TORCH_OFF:
-			case E_BLOCK_REDSTONE_TORCH_ON:
-			{
-				HandleRedstoneTorch(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
-				break;
-			}
-			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_WOODEN_BUTTON:
-			{
-				HandleRedstoneButton(dataitr->x, dataitr->y, dataitr->z);
-				break;
-			}
-			default: break;
+				case E_BLOCK_ACTIVATOR_RAIL:
+				case E_BLOCK_DETECTOR_RAIL:
+				case E_BLOCK_POWERED_RAIL:
+				{
+					HandleRail(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_ACACIA_DOOR:
+				case E_BLOCK_BIRCH_DOOR:
+				case E_BLOCK_DARK_OAK_DOOR:
+				case E_BLOCK_JUNGLE_DOOR:
+				case E_BLOCK_SPRUCE_DOOR:
+				case E_BLOCK_WOODEN_DOOR:
+				case E_BLOCK_IRON_DOOR:
+				{
+					HandleDoor(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_ACACIA_FENCE_GATE:
+				case E_BLOCK_BIRCH_FENCE_GATE:
+				case E_BLOCK_DARK_OAK_FENCE_GATE:
+				case E_BLOCK_FENCE_GATE:
+				case E_BLOCK_JUNGLE_FENCE_GATE:
+				case E_BLOCK_SPRUCE_FENCE_GATE:
+				{
+					HandleFenceGate(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_REDSTONE_LAMP_OFF:
+				case E_BLOCK_REDSTONE_LAMP_ON:
+				{
+					HandleRedstoneLamp(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_DISPENSER:
+				case E_BLOCK_DROPPER:
+				{
+					HandleDropSpenser(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_PISTON:
+				case E_BLOCK_STICKY_PISTON:
+				{
+					HandlePiston(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				case E_BLOCK_REDSTONE_REPEATER_OFF:
+				case E_BLOCK_REDSTONE_REPEATER_ON:
+				{
+					HandleRedstoneRepeater(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_REDSTONE_TORCH_OFF:
+				case E_BLOCK_REDSTONE_TORCH_ON:
+				{
+					HandleRedstoneTorch(dataitr->x, dataitr->y, dataitr->z, dataitr->Data);
+					break;
+				}
+				case E_BLOCK_STONE_BUTTON:
+				case E_BLOCK_WOODEN_BUTTON:
+				{
+					HandleRedstoneButton(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
+				default: break;
 			}
 		}
 		++dataitr;
@@ -412,7 +342,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
 		AddFaceDirection(X, Y, Z, GetHandlerCompileTime<E_BLOCK_TORCH>::type::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 
-		cChunk * Neighbour = m_Chunk->GetRelNeighborChunk(X, Z);
+		cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
 		if ((Neighbour == NULL) || !Neighbour->IsValid())
 		{
 			return;
@@ -468,7 +398,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		int X = a_RelBlockX; int Y = a_RelBlockY; int Z = a_RelBlockZ;
 		AddFaceDirection(X, Y, Z, GetHandlerCompileTime<E_BLOCK_TORCH>::type::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 
-		cChunk * Neighbour = m_Chunk->GetRelNeighborChunk(X, Z);
+		cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
 		if ((Neighbour == NULL) || !Neighbour->IsValid())
 		{
 			return;
@@ -608,10 +538,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 	unsigned char MyPower;
 	if (!IsWirePowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower))
 	{
-		int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-		int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0);
-		this->m_World.WakeUpSimulators(BlockX, a_RelBlockY, BlockZ);
 		return;
 	}
 
@@ -685,43 +612,43 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 
 	switch (GetWireDirection(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
 	{
-	case REDSTONE_NONE:
-	{
-		SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+		case REDSTONE_NONE:
+		{
+			SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
 
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP, MyPower);
-		break;
-	}
-	case REDSTONE_X_POS:
-	{
-		SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP, MyPower);
-		break;
-	}
-	case REDSTONE_X_NEG:
-	{
-		SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM, MyPower);
-		break;
-	}
-	case REDSTONE_Z_POS:
-	{
-		SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP, MyPower);
-		break;
-	}
-	case REDSTONE_Z_NEG:
-	{
-		SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-		SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM, MyPower);
-		break;
-	}
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP, MyPower);
+			break;
+		}
+		case REDSTONE_X_POS:
+		{
+			SetBlockPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XP, MyPower);
+			break;
+		}
+		case REDSTONE_X_NEG:
+		{
+			SetBlockPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_XM, MyPower);
+			break;
+		}
+		case REDSTONE_Z_POS:
+		{
+			SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZP, MyPower);
+			break;
+		}
+		case REDSTONE_Z_NEG:
+		{
+			SetBlockPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
+			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM, MyPower);
+			break;
+		}
 	}
 }
 
@@ -773,7 +700,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeater(int a_RelBlockX, int 
 
 void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 {
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end();)
+	for (auto itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end();)
 	{
 		if (itr->a_ElapsedTicks >= itr->a_DelayTicks)  // Has the elapsed ticks reached the target ticks?
 		{
@@ -792,30 +719,30 @@ void cIncrementalRedstoneSimulator::HandleRedstoneRepeaterDelays()
 
 				switch (Meta & 0x3)  // We only want the direction (bottom) bits
 				{
-				case 0x0:
-				{
-					SetBlockPowered(RelBlockX, RelBlockY, RelBlockZ - 1, RelBlockX, RelBlockY, RelBlockZ);
-					SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_ZM);
-					break;
-				}
-				case 0x1:
-				{
-					SetBlockPowered(RelBlockX + 1, RelBlockY, RelBlockZ, RelBlockX, RelBlockY, RelBlockZ);
-					SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_XP);
-					break;
-				}
-				case 0x2:
-				{
-					SetBlockPowered(RelBlockX, RelBlockY, RelBlockZ + 1, RelBlockX, RelBlockY, RelBlockZ);
-					SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_ZP);
-					break;
-				}
-				case 0x3:
-				{
-					SetBlockPowered(RelBlockX - 1, RelBlockY, RelBlockZ, RelBlockX, RelBlockY, RelBlockZ);
-					SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_XM);
-					break;
-				}
+					case 0x0:
+					{
+						SetBlockPowered(RelBlockX, RelBlockY, RelBlockZ - 1, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_ZM);
+						break;
+					}
+					case 0x1:
+					{
+						SetBlockPowered(RelBlockX + 1, RelBlockY, RelBlockZ, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_XP);
+						break;
+					}
+					case 0x2:
+					{
+						SetBlockPowered(RelBlockX, RelBlockY, RelBlockZ + 1, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_ZP);
+						break;
+					}
+					case 0x3:
+					{
+						SetBlockPowered(RelBlockX - 1, RelBlockY, RelBlockZ, RelBlockX, RelBlockY, RelBlockZ);
+						SetDirectionLinkedPowered(RelBlockX, RelBlockY, RelBlockZ, BLOCK_FACE_XM);
+						break;
+					}
 				}
 			}
 			else if (Block != E_BLOCK_REDSTONE_REPEATER_OFF)
@@ -988,28 +915,28 @@ void cIncrementalRedstoneSimulator::HandleRail(int a_RelBlockX, int a_RelBlockY,
 {
 	switch (a_MyType)
 	{
-	case E_BLOCK_DETECTOR_RAIL:
-	{
-		if ((m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x08) == 0x08)
+		case E_BLOCK_DETECTOR_RAIL:
 		{
-			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_MyType);
+			if ((m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x08) == 0x08)
+			{
+				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_MyType);
+			}
+			break;
 		}
-		break;
-	}
-	case E_BLOCK_ACTIVATOR_RAIL:
-	case E_BLOCK_POWERED_RAIL:
-	{
-		if (AreCoordsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_POWERED_RAIL:
 		{
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) | 0x08);
+			if (AreCoordsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ))
+			{
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) | 0x08);
+			}
+			else
+			{
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x07);
+			}
+			break;
 		}
-		else
-		{
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x07);
-		}
-		break;
-	}
-	default: LOGD("Unhandled type of rail in %s", __FUNCTION__);
+		default: LOGD("Unhandled type of rail in %s", __FUNCTION__);
 	}
 }
 
@@ -1118,231 +1045,231 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 
 	switch (a_MyType)
 	{
-	case E_BLOCK_STONE_PRESSURE_PLATE:
-	{
-		// MCS feature - stone pressure plates can only be triggered by players :D
-		cPlayer * a_Player = this->m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, (float)a_RelBlockY, BlockZ + 0.5f), 0.5f, false);
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		{
+			// MCS feature - stone pressure plates can only be triggered by players :D
+			cPlayer * a_Player = this->m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, (float)a_RelBlockY, BlockZ + 0.5f), 0.5f, false);
 
-		if (a_Player != NULL)
-		{
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x1);
-			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
-		}
-		else
-		{
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
-			SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
-		}
-		break;
-	}
-	case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-	{
-		class cPressurePlateCallback :
-			public cEntityCallback
-		{
-		public:
-			cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
-				m_NumberOfEntities(0),
-				m_X(a_BlockX),
-				m_Y(a_BlockY),
-				m_Z(a_BlockZ)
+			if (a_Player != NULL)
 			{
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x1);
+				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+				SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
 			}
-
-			virtual bool Item(cEntity * a_Entity) override
+			else
 			{
-				Vector3f EntityPos = a_Entity->GetPosition();
-				Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
-				double Distance = (EntityPos - BlockPos).Length();
-
-				if (Distance <= 0.5)
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x0);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+			}
+			break;
+		}
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		{
+			class cPressurePlateCallback :
+				public cEntityCallback
+			{
+			public:
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_NumberOfEntities(0),
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ)
 				{
-					m_NumberOfEntities++;
 				}
-				return false;
-			}
 
-			bool GetPowerLevel(unsigned char & a_PowerLevel) const
-			{
-				a_PowerLevel = std::min(m_NumberOfEntities, MAX_POWER_LEVEL);
-				return (a_PowerLevel > 0);
-			}
-
-		protected:
-			int m_NumberOfEntities;
-
-			int m_X;
-			int m_Y;
-			int m_Z;
-		};
-
-		cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
-		this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
-
-		unsigned char Power;
-		NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-		if (PressurePlateCallback.GetPowerLevel(Power))
-		{
-			if (Meta == E_META_PRESSURE_PLATE_RAISED)
-			{
-				m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
-			}
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
-			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Power);
-			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
-		}
-		else
-		{
-			if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
-			{
-				m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
-			}
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-			SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
-		}
-
-		break;
-	}
-	case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-	{
-		class cPressurePlateCallback :
-			public cEntityCallback
-		{
-		public:
-			cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
-				m_NumberOfEntities(0),
-				m_X(a_BlockX),
-				m_Y(a_BlockY),
-				m_Z(a_BlockZ)
-			{
-			}
-
-			virtual bool Item(cEntity * a_Entity) override
-			{
-				Vector3f EntityPos = a_Entity->GetPosition();
-				Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
-				double Distance = (EntityPos - BlockPos).Length();
-
-				if (Distance <= 0.5)
+				virtual bool Item(cEntity * a_Entity) override
 				{
-					m_NumberOfEntities++;
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					double Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance <= 0.5)
+					{
+						m_NumberOfEntities++;
+					}
+					return false;
 				}
-				return false;
-			}
 
-			bool GetPowerLevel(unsigned char & a_PowerLevel) const
-			{
-				a_PowerLevel = std::min((int)ceil(m_NumberOfEntities / 10.f), MAX_POWER_LEVEL);
-				return (a_PowerLevel > 0);
-			}
-
-		protected:
-			int m_NumberOfEntities;
-
-			int m_X;
-			int m_Y;
-			int m_Z;
-		};
-
-		cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
-		this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
-
-		unsigned char Power;
-		NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-		if (PressurePlateCallback.GetPowerLevel(Power))
-		{
-			if (Meta == E_META_PRESSURE_PLATE_RAISED)
-			{
-				m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
-			}
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
-			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Power);
-			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
-		}
-		else
-		{
-			if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
-			{
-				m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
-			}
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-			SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
-		}
-
-		break;
-	}
-	case E_BLOCK_WOODEN_PRESSURE_PLATE:
-	{
-		class cPressurePlateCallback :
-			public cEntityCallback
-		{
-		public:
-			cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
-				m_FoundEntity(false),
-				m_X(a_BlockX),
-				m_Y(a_BlockY),
-				m_Z(a_BlockZ)
-			{
-			}
-
-			virtual bool Item(cEntity * a_Entity) override
-			{
-				Vector3f EntityPos = a_Entity->GetPosition();
-				Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
-				double Distance = (EntityPos - BlockPos).Length();
-
-				if (Distance <= 0.5)
+				bool GetPowerLevel(unsigned char & a_PowerLevel) const
 				{
-					m_FoundEntity = true;
-					return true;  // Break out, we only need to know for plates that at least one entity is on top
+					a_PowerLevel = std::min(m_NumberOfEntities, MAX_POWER_LEVEL);
+					return (a_PowerLevel > 0);
 				}
-				return false;
-			}
 
-			bool FoundEntity(void) const
+			protected:
+				int m_NumberOfEntities;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			};
+
+			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
+			this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
+
+			unsigned char Power;
+			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+			if (PressurePlateCallback.GetPowerLevel(Power))
 			{
-				return m_FoundEntity;
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
+				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Power);
+				SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
 			}
-
-		protected:
-			bool m_FoundEntity;
-
-			int m_X;
-			int m_Y;
-			int m_Z;
-		};
-
-		cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
-		this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
-
-		NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-		if (PressurePlateCallback.FoundEntity())
-		{
-			if (Meta == E_META_PRESSURE_PLATE_RAISED)
+			else
 			{
-				m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
+				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			}
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
-			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
+
+			break;
 		}
-		else
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
 		{
-			if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+			class cPressurePlateCallback :
+				public cEntityCallback
 			{
-				m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
+			public:
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_NumberOfEntities(0),
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					double Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance <= 0.5)
+					{
+						m_NumberOfEntities++;
+					}
+					return false;
+				}
+
+				bool GetPowerLevel(unsigned char & a_PowerLevel) const
+				{
+					a_PowerLevel = std::min((int)ceil(m_NumberOfEntities / 10.f), MAX_POWER_LEVEL);
+					return (a_PowerLevel > 0);
+				}
+
+			protected:
+				int m_NumberOfEntities;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			};
+
+			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
+			this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
+
+			unsigned char Power;
+			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+			if (PressurePlateCallback.GetPowerLevel(Power))
+			{
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
+				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Power);
+				SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
 			}
-			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
-			SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
+			else
+			{
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
+				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+			}
+
+			break;
 		}
-		break;
-	}
-	default:
-	{
-		LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(cItem(a_MyType)).c_str());
-		break;
-	}
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		{
+			class cPressurePlateCallback :
+				public cEntityCallback
+			{
+			public:
+				cPressurePlateCallback(int a_BlockX, int a_BlockY, int a_BlockZ) :
+					m_FoundEntity(false),
+					m_X(a_BlockX),
+					m_Y(a_BlockY),
+					m_Z(a_BlockZ)
+				{
+				}
+
+				virtual bool Item(cEntity * a_Entity) override
+				{
+					Vector3f EntityPos = a_Entity->GetPosition();
+					Vector3f BlockPos(m_X + 0.5f, (float)m_Y, m_Z + 0.5f);
+					double Distance = (EntityPos - BlockPos).Length();
+
+					if (Distance <= 0.5)
+					{
+						m_FoundEntity = true;
+						return true;  // Break out, we only need to know for plates that at least one entity is on top
+					}
+					return false;
+				}
+
+				bool FoundEntity(void) const
+				{
+					return m_FoundEntity;
+				}
+
+			protected:
+				bool m_FoundEntity;
+
+				int m_X;
+				int m_Y;
+				int m_Z;
+			};
+
+			cPressurePlateCallback PressurePlateCallback(BlockX, a_RelBlockY, BlockZ);
+			this->m_World.ForEachEntityInChunk(m_Chunk->GetPosX(), m_Chunk->GetPosZ(), PressurePlateCallback);
+
+			NIBBLETYPE Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+			if (PressurePlateCallback.FoundEntity())
+			{
+				if (Meta == E_META_PRESSURE_PLATE_RAISED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.5F);
+				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_DEPRESSED);
+				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+				SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_YM, a_MyType);
+			}
+			else
+			{
+				if (Meta == E_META_PRESSURE_PLATE_DEPRESSED)
+				{
+					m_Chunk->BroadcastSoundEffect("random.click", (double)BlockX + 0.5, (double)a_RelBlockY + 0.1, (double)BlockZ + 0.5, 0.3F, 0.6F);
+				}
+				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, E_META_PRESSURE_PLATE_RAISED);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
+			}
+			break;
+		}
+		default:
+		{
+			LOGD("Unimplemented pressure plate type %s in cRedstoneSimulator", ItemToFullString(cItem(a_MyType)).c_str());
+			break;
+		}
 	}
 }
 
@@ -1352,8 +1279,6 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 
 void cIncrementalRedstoneSimulator::HandleTripwireHook(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
-	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
 	int RelX = a_RelBlockX, RelZ = a_RelBlockZ;
 	bool FoundActivated = false;
 	eBlockFace FaceToGoTowards = GetHandlerCompileTime<E_BLOCK_TRIPWIRE_HOOK>::type::MetadataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ));
@@ -1384,7 +1309,7 @@ void cIncrementalRedstoneSimulator::HandleTripwireHook(int a_RelBlockX, int a_Re
 			{
 				// Tripwire hook not connected at all, AND away all the power state bits
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x3);
-				SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
+				SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 				return;
 			}
 		}
@@ -1392,7 +1317,7 @@ void cIncrementalRedstoneSimulator::HandleTripwireHook(int a_RelBlockX, int a_Re
 		{
 			// Tripwire hook not connected at all, AND away all the power state bits
 			m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x3);
-			SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
+			SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 			return;
 		}
 	}
@@ -1407,7 +1332,7 @@ void cIncrementalRedstoneSimulator::HandleTripwireHook(int a_RelBlockX, int a_Re
 	{
 		// Connected but not activated, AND away the highest bit
 		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, (m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7) | 0x4);
-		SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
+		SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 	}
 }
 
@@ -1455,7 +1380,7 @@ void cIncrementalRedstoneSimulator::HandleTrappedChest(int a_RelBlockX, int a_Re
 	}
 	else
 	{
-		SetSourceUnpowered(BlockX, a_RelBlockY, BlockZ, m_Chunk);
+		SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 	}
 }
 
@@ -1527,12 +1452,9 @@ bool cIncrementalRedstoneSimulator::AreCoordsDirectlyPowered(int a_RelBlockX, in
 {
 	// Torches want to access neighbour's data when on a wall, hence the extra chunk parameter
 
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-
-	for (PoweredBlocksList::const_iterator itr = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks.begin(); itr != ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks.end(); ++itr)  // Check powered list
+	for (const auto & itr : ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks)  // Check powered list
 	{
-		if (itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		if (itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
 			return true;
 		}
@@ -1546,12 +1468,9 @@ bool cIncrementalRedstoneSimulator::AreCoordsDirectlyPowered(int a_RelBlockX, in
 
 bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
 {
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)  // Check linked powered list
+	for (const auto & itr : *m_LinkedPoweredBlocks)  // Check linked powered list
 	{
-		if (itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		if (itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
 			return true;
 		}
@@ -1566,65 +1485,63 @@ bool cIncrementalRedstoneSimulator::AreCoordsLinkedPowered(int a_RelBlockX, int 
 bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta)
 {
 	// Repeaters cannot be powered by any face except their back; verify that this is true for a source
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
 
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
+	for (const auto & itr : *m_PoweredBlocks)
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
 
 		switch (a_Meta & 0x3)
 		{
-		case 0x0:
-		{
-			// Flip the coords to check the back of the repeater
-			if (itr->a_SourcePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ + 1))) { return true; }
-			break;
-		}
-		case 0x1:
-		{
-			if (itr->a_SourcePos.Equals(Vector3i(BlockX - 1, a_RelBlockY, BlockZ))) { return true; }
-			break;
-		}
-		case 0x2:
-		{
-			if (itr->a_SourcePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ - 1))) { return true; }
-			break;
-		}
-		case 0x3:
-		{
-			if (itr->a_SourcePos.Equals(Vector3i(BlockX + 1, a_RelBlockY, BlockZ))) { return true; }
-			break;
-		}
+			case 0x0:
+			{
+				// Flip the coords to check the back of the repeater
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1)))) { return true; }
+				break;
+			}
+			case 0x1:
+			{
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				break;
+			}
+			case 0x2:
+			{
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1)))) { return true; }
+				break;
+			}
+			case 0x3:
+			{
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				break;
+			}
 		}
 	}
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
+	for (const auto & itr : *m_LinkedPoweredBlocks)
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
 
 		switch (a_Meta & 0x3)
 		{
-		case 0x0:
-		{
-			if (itr->a_MiddlePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ + 1))) { return true; }
-			break;
-		}
-		case 0x1:
-		{
-			if (itr->a_MiddlePos.Equals(Vector3i(BlockX - 1, a_RelBlockY, BlockZ))) { return true; }
-			break;
-		}
-		case 0x2:
-		{
-			if (itr->a_MiddlePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ - 1))) { return true; }
-			break;
-		}
-		case 0x3:
-		{
-			if (itr->a_MiddlePos.Equals(Vector3i(BlockX + 1, a_RelBlockY, BlockZ))) { return true; }
-			break;
-		}
+			case 0x0:
+			{
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1)))) { return true; }
+				break;
+			}
+			case 0x1:
+			{
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				break;
+			}
+			case 0x2:
+			{
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1)))) { return true; }
+				break;
+			}
+			case 0x3:
+			{
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				break;
+			}
 		}
 	}
 	return false;  // Couldn't find power source behind repeater
@@ -1639,59 +1556,59 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 	switch (a_Meta & 0x3)  // We only want the 'direction' part of our metadata
 	{
 		// If the repeater is looking up or down (If parallel to the Z axis)
-	case 0x0:
-	case 0x2:
-	{
-		// Check if eastern(right) neighbor is a powered on repeater who is facing us
-		BLOCKTYPE Block = 0;
-		NIBBLETYPE OtherRepeaterDir = 0;
-		if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON)) // Is right neighbor a powered repeater?
+		case 0x0:
+		case 0x2:
 		{
-			if ((OtherRepeaterDir & 0x03) == 0x3)
+			// Check if eastern(right) neighbor is a powered on repeater who is facing us
+			BLOCKTYPE Block = 0;
+			NIBBLETYPE OtherRepeaterDir = 0;
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON)) // Is right neighbor a powered repeater?
 			{
-				return true;
-			}  // If so, I am latched/locked
-		}
+				if ((OtherRepeaterDir & 0x03) == 0x3)
+				{
+					return true;
+				}  // If so, I am latched/locked
+			}
 
-		// Check if western(left) neighbor is a powered on repeater who is facing us
-		if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
-		{
-			if ((OtherRepeaterDir & 0x03) == 0x1)
+			// Check if western(left) neighbor is a powered on repeater who is facing us
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
-				return true;
-			}  // If so, I am latched/locked
-		}
+				if ((OtherRepeaterDir & 0x03) == 0x1)
+				{
+					return true;
+				}  // If so, I am latched/locked
+			}
 
-		break;
-	}
+			break;
+		}
 
 		// If the repeater is looking left or right (If parallel to the x axis)
-	case 0x1:
-	case 0x3:
-	{
-		// Check if southern(down) neighbor is a powered on repeater who is facing us
-		BLOCKTYPE Block = 0;
-		NIBBLETYPE OtherRepeaterDir = 0;
-
-		if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+		case 0x1:
+		case 0x3:
 		{
-			if ((OtherRepeaterDir & 0x30) == 0x00)
-			{
-				return true;
-			}  // If so,  am latched/locked
-		}
+			// Check if southern(down) neighbor is a powered on repeater who is facing us
+			BLOCKTYPE Block = 0;
+			NIBBLETYPE OtherRepeaterDir = 0;
 
-		// Check if northern(up) neighbor is a powered on repeater who is facing us
-		if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
-		{
-			if ((OtherRepeaterDir & 0x03) == 0x02)
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
-				return true;
-			}  // If so, I am latched/locked
-		}
+				if ((OtherRepeaterDir & 0x30) == 0x00)
+				{
+					return true;
+				}  // If so,  am latched/locked
+			}
 
-		break;
-	}
+			// Check if northern(up) neighbor is a powered on repeater who is facing us
+			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			{
+				if ((OtherRepeaterDir & 0x03) == 0x02)
+				{
+					return true;
+				}  // If so, I am latched/locked
+			}
+
+			break;
+		}
 	}
 
 	return false;  // None of the checks succeeded, I am not a locked repeater
@@ -1705,35 +1622,31 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 	// Pistons cannot be powered through their front face; this function verifies that a source meets this requirement
 
 	eBlockFace Face = GetHandlerCompileTime<E_BLOCK_PISTON>::type::MetaDataToDirection(a_Meta);
-	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
-	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
 
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
+	for (const auto & itr : *m_PoweredBlocks)
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
 
-		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face);
+		int X = a_RelBlockX, Z = a_RelBlockZ;
+		AddFaceDirection(X, a_RelBlockY, Z, Face);
 
-		if (!itr->a_SourcePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		if (!itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(X, a_RelBlockY, Z))))
 		{
 			return true;
 		}
-
-		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face, true);
 	}
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)
+	for (const auto & itr : *m_LinkedPoweredBlocks)
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
 
-		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face);
+		int X = a_RelBlockX, Z = a_RelBlockZ;
+		AddFaceDirection(X, a_RelBlockY, Z, Face);
 
-		if (!itr->a_MiddlePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		if (!itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(X, a_RelBlockY, Z))))
 		{
 			return true;
 		}
-
-		AddFaceDirection(BlockX, a_RelBlockY, BlockZ, Face, true);
 	}
 	return false;  // Source was in front of the piston's front face
 }
@@ -1744,33 +1657,29 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char & a_PowerLevel)
 {
 	a_PowerLevel = 0;
-	int BlockX = m_Chunk->GetPosX() * cChunkDef::Width + a_RelBlockX;
-	int BlockZ = m_Chunk->GetPosZ() * cChunkDef::Width + a_RelBlockZ;
 
-	for (PoweredBlocksList::const_iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)  // Check powered list
+	for (const auto & itr : *m_PoweredBlocks)  // Check powered list
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
 			continue;
 		}
-		a_PowerLevel = std::max(itr->a_PowerLevel, a_PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
+		a_PowerLevel = std::max(itr.a_PowerLevel, a_PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
 	}
 
-	for (LinkedBlocksList::const_iterator itr = m_LinkedPoweredBlocks->begin(); itr != m_LinkedPoweredBlocks->end(); ++itr)  // Check linked powered list
+	for (const auto & itr : *m_LinkedPoweredBlocks)  // Check linked powered list
 	{
-		if (!itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)))
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
 			continue;
 		}
 
 		BLOCKTYPE Type = E_BLOCK_AIR;
-		int RelSourceX = itr->a_SourcePos.x - m_Chunk->GetPosX() * cChunkDef::Width;
-		int RelSourceZ = itr->a_SourcePos.z - m_Chunk->GetPosZ() * cChunkDef::Width;
-		if (!m_Chunk->UnboundedRelGetBlockType(RelSourceX, itr->a_SourcePos.y, RelSourceZ, Type) || (Type == E_BLOCK_REDSTONE_WIRE))
+		if (!m_Chunk->UnboundedRelGetBlockType(itr.a_SourcePos.x, itr.a_SourcePos.y, itr.a_SourcePos.z, Type) || (Type == E_BLOCK_REDSTONE_WIRE))
 		{
 			continue;
 		}
-		a_PowerLevel = std::max(itr->a_PowerLevel, a_PowerLevel);
+		a_PowerLevel = std::max(itr.a_PowerLevel, a_PowerLevel);
 	}
 
 	return (a_PowerLevel != 0);  // Answer the inital question: is the wire powered?
@@ -1782,11 +1691,11 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 
 bool cIncrementalRedstoneSimulator::AreCoordsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool IsCurrentStatePowered)
 {
-	for (SimulatedPlayerToggleableList::const_iterator itr = m_SimulatedPlayerToggleableBlocks->begin(); itr != m_SimulatedPlayerToggleableBlocks->end(); ++itr)
+	for (const auto & itr : *m_SimulatedPlayerToggleableBlocks)
 	{
-		if (itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		if (itr.a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
-			if (itr->WasLastStatePowered != IsCurrentStatePowered)  // Was the last power state different to the current?
+			if (itr.WasLastStatePowered != IsCurrentStatePowered)  // Was the last power state different to the current?
 			{
 				return false;  // It was, coordinates are no longer simulated
 			}
@@ -1808,101 +1717,101 @@ void cIncrementalRedstoneSimulator::SetDirectionLinkedPowered(int a_RelBlockX, i
 	BLOCKTYPE MiddleBlock = 0;
 	switch (a_Direction)
 	{
-	case BLOCK_FACE_XM:
-	{
-		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, MiddleBlock))
+		case BLOCK_FACE_XM:
 		{
-			return;
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, MiddleBlock))
+			{
+				return;
+			}
+
+			SetBlockLinkedPowered(a_RelBlockX - 2, a_RelBlockY, a_RelBlockZ, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+
+			break;
 		}
-
-		SetBlockLinkedPowered(a_RelBlockX - 2, a_RelBlockY, a_RelBlockZ, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-
-		break;
-	}
-	case BLOCK_FACE_XP:
-	{
-		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, MiddleBlock))
+		case BLOCK_FACE_XP:
 		{
-			return;
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, MiddleBlock))
+			{
+				return;
+			}
+
+			SetBlockLinkedPowered(a_RelBlockX + 2, a_RelBlockY, a_RelBlockZ, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+
+			break;
 		}
-
-		SetBlockLinkedPowered(a_RelBlockX + 2, a_RelBlockY, a_RelBlockZ, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-
-		break;
-	}
-	case BLOCK_FACE_YM:
-	{
-		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, MiddleBlock))
+		case BLOCK_FACE_YM:
 		{
-			return;
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, MiddleBlock))
+			{
+				return;
+			}
+
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 2, a_RelBlockZ, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+
+			break;
 		}
-
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 2, a_RelBlockZ, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-
-		break;
-	}
-	case BLOCK_FACE_YP:
-	{
-		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, MiddleBlock))
+		case BLOCK_FACE_YP:
 		{
-			return;
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, MiddleBlock))
+			{
+				return;
+			}
+
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 2, a_RelBlockZ, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+
+			break;
 		}
-
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 2, a_RelBlockZ, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-
-		break;
-	}
-	case BLOCK_FACE_ZM:
-	{
-		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, MiddleBlock))
+		case BLOCK_FACE_ZM:
 		{
-			return;
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, MiddleBlock))
+			{
+				return;
+			}
+
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 2, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+
+			break;
 		}
-
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 2, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-
-		break;
-	}
-	case BLOCK_FACE_ZP:
-	{
-		if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, MiddleBlock))
+		case BLOCK_FACE_ZP:
 		{
-			return;
+			if (!m_Chunk->UnboundedRelGetBlockType(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, MiddleBlock))
+			{
+				return;
+			}
+
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 2, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+			SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
+
+			break;
 		}
-
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 2, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-		SetBlockLinkedPowered(a_RelBlockX, a_RelBlockY - 1, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, a_RelBlockX, a_RelBlockY, a_RelBlockZ, MiddleBlock, a_PowerLevel);
-
-		break;
-	}
-	default:
-	{
-		ASSERT(!"Unhandled face direction when attempting to set blocks as linked powered!");  // Zombies, that wasn't supposed to happen...
-		break;
-	}
+		default:
+		{
+			ASSERT(!"Unhandled face direction when attempting to set blocks as linked powered!");  // Zombies, that wasn't supposed to happen...
+			break;
+		}
 	}
 }
 
@@ -1937,23 +1846,18 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_RelBlockX, int a_R
 
 void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, unsigned char a_PowerLevel)
 {
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-	int SourceX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelSourceX;
-	int SourceZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelSourceZ;
-
 	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ);  // Adjust coordinates for the later call using these values
 	if ((Neighbour == NULL) || !Neighbour->IsValid())
 	{
 		return;
 	}
 
-	PoweredBlocksList & Powered = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_PoweredBlocks;  // We need to insert the value into the chunk who owns the block position
-	for (PoweredBlocksList::iterator itr = Powered.begin(); itr != Powered.end(); ++itr)
+	auto & Powered = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_PoweredBlocks;  // We need to insert the value into the chunk who owns the block position
+	for (auto itr = Powered.begin(); itr != Powered.end(); ++itr)
 	{
 		if (
-			itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)) &&
-			itr->a_SourcePos.Equals(Vector3i(SourceX, a_RelSourceY, SourceZ))
+			itr->a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)) &&
+			itr->a_SourcePos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ))
 			)
 		{
 			// Check for duplicates, update power level, don't add a new listing
@@ -1963,12 +1867,11 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	}
 
 	// No need to get neighbouring chunk as we can guarantee that when something is powering us, the entry will be in our chunk
-	// TODO: on C++11 support, change this to a llama function pased to a std::remove_if
-	for (PoweredBlocksList::iterator itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
+	for (auto itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
 	{
 		if (
-			itr->a_BlockPos.Equals(Vector3i(SourceX, a_RelSourceY, SourceZ)) &&
-			itr->a_SourcePos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)) &&
+			itr->a_BlockPos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ)) &&
+			itr->a_SourcePos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)) &&
 			(m_Chunk->GetBlock(a_RelSourceX, a_RelSourceY, a_RelSourceZ) == E_BLOCK_REDSTONE_WIRE)
 			)
 		{
@@ -1993,10 +1896,10 @@ void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBl
 	}
 
 	sPoweredBlocks RC;
-	RC.a_BlockPos = Vector3i(BlockX, a_RelBlockY, BlockZ);
-	RC.a_SourcePos = Vector3i(SourceX, a_RelSourceY, SourceZ);
+	RC.a_BlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	RC.a_SourcePos = Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ);
 	RC.a_PowerLevel = a_PowerLevel;
-	Powered.push_back(RC);
+	Powered.emplace_back(RC);
 	Neighbour->SetIsRedstoneDirty(true);
 	m_Chunk->SetIsRedstoneDirty(true);
 }
@@ -2012,45 +1915,39 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 	BLOCKTYPE a_MiddleBlock, unsigned char a_PowerLevel
 	)
 {
-	int BlockX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelBlockX;
-	int BlockZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelBlockZ;
-	int MiddleX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelMiddleX;
-	int MiddleZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelMiddleZ;
-	int SourceX = (m_Chunk->GetPosX() * cChunkDef::Width) + a_RelSourceX;
-	int SourceZ = (m_Chunk->GetPosZ() * cChunkDef::Width) + a_RelSourceZ;
-
 	if (!IsViableMiddleBlock(a_MiddleBlock))
 	{
 		return;
 	}
 
-	cChunk * Neighbour = m_Chunk->GetNeighborChunk(BlockX, BlockZ);
+	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ);
+	m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelMiddleX, a_RelMiddleZ);
 	if ((Neighbour == NULL) || !Neighbour->IsValid())
 	{
 		return;
 	}
 
-	LinkedBlocksList & Linked = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_LinkedBlocks;
-	for (LinkedBlocksList::iterator itr = Linked.begin(); itr != Linked.end(); ++itr)  // Check linked powered list
+	auto & Linked = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_LinkedBlocks;
+	for (auto & itr : Linked)  // Check linked powered list
 	{
 		if (
-			itr->a_BlockPos.Equals(Vector3i(BlockX, a_RelBlockY, BlockZ)) &&
-			itr->a_MiddlePos.Equals(Vector3i(MiddleX, a_RelMiddleY, MiddleZ)) &&
-			itr->a_SourcePos.Equals(Vector3i(SourceX, a_RelSourceY, SourceZ))
+			itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)) &&
+			itr.a_MiddlePos.Equals(Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ)) &&
+			itr.a_SourcePos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ))
 			)
 		{
 			// Check for duplicates, update power level, don't add a new listing
-			itr->a_PowerLevel = a_PowerLevel;
+			itr.a_PowerLevel = a_PowerLevel;
 			return;
 		}
 	}
 
 	sLinkedPoweredBlocks RC;
-	RC.a_BlockPos = Vector3i(BlockX, a_RelBlockY, BlockZ);
-	RC.a_MiddlePos = Vector3i(MiddleX, a_RelMiddleY, MiddleZ);
-	RC.a_SourcePos = Vector3i(SourceX, a_RelSourceY, SourceZ);
+	RC.a_BlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	RC.a_MiddlePos = Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ);
+	RC.a_SourcePos = Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ);
 	RC.a_PowerLevel = a_PowerLevel;
-	Linked.push_back(RC);
+	Linked.emplace_back(RC);
 	Neighbour->SetIsRedstoneDirty(true);
 	m_Chunk->SetIsRedstoneDirty(true);
 }
@@ -2061,7 +1958,7 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 
 void cIncrementalRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool WasLastStatePowered)
 {
-	for (SimulatedPlayerToggleableList::iterator itr = m_SimulatedPlayerToggleableBlocks->begin(); itr != m_SimulatedPlayerToggleableBlocks->end(); ++itr)
+	for (auto itr = m_SimulatedPlayerToggleableBlocks->begin(); itr != m_SimulatedPlayerToggleableBlocks->end(); ++itr)
 	{
 		if (!itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
@@ -2085,7 +1982,7 @@ void cIncrementalRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_Re
 	sSimulatedPlayerToggleableList RC;
 	RC.a_RelBlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 	RC.WasLastStatePowered = WasLastStatePowered;
-	m_SimulatedPlayerToggleableBlocks->push_back(RC);
+	m_SimulatedPlayerToggleableBlocks->emplace_back(RC);
 }
 
 
@@ -2094,7 +1991,7 @@ void cIncrementalRedstoneSimulator::SetPlayerToggleableBlockAsSimulated(int a_Re
 
 bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, NIBBLETYPE a_Meta, bool ShouldPowerOn)
 {
-	for (RepeatersDelayList::iterator itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
+	for (auto itr = m_RepeatersDelayList->begin(); itr != m_RepeatersDelayList->end(); ++itr)
 	{
 		if (itr->a_RelBlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
 		{
@@ -2121,7 +2018,7 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 
 	RC.a_ElapsedTicks = 0;
 	RC.ShouldPowerOn = ShouldPowerOn;
-	m_RepeatersDelayList->push_back(RC);
+	m_RepeatersDelayList->emplace_back(RC);
 	return true;
 }
 
@@ -2129,7 +2026,7 @@ bool cIncrementalRedstoneSimulator::QueueRepeaterPowerChange(int a_RelBlockX, in
 
 
 
-void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_SourceX, int a_SourceY, int a_SourceZ, cChunk * a_Chunk, bool a_IsFirstCall)
+void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk, bool a_IsFirstCall)
 {
 	if (!a_IsFirstCall)  // The neighbouring chunks passed when this parameter is false may be invalid
 	{
@@ -2138,36 +2035,96 @@ void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_SourceX, int a_Sour
 			return;
 		}
 	}
-	// TODO: on C++11 support, change both of these to llama functions pased to a std::remove_if
 
-	for (PoweredBlocksList::iterator itr = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks.begin(); itr != ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks.end();)
-	{
-		if (itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ)))
-		{
-			itr = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks.erase(itr);
-			a_Chunk->SetIsRedstoneDirty(true);
-			continue;
-		}
-		++itr;
-	}
-	for (LinkedBlocksList::iterator itr = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_LinkedBlocks.begin(); itr != ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_LinkedBlocks.end();)
-	{
-		if (itr->a_SourcePos.Equals(Vector3i(a_SourceX, a_SourceY, a_SourceZ)))
-		{
-			itr = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_LinkedBlocks.erase(itr);
-			a_Chunk->SetIsRedstoneDirty(true);
-			continue;
-		}
-		++itr;
-	}
+	std::vector<Vector3i> BlocksPotentiallyUnpowered;
 
-	if (a_IsFirstCall && AreCoordsOnChunkBoundary(a_SourceX, a_SourceY, a_SourceZ))
+	auto Data = (cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
+	Data->m_PoweredBlocks.erase(std::remove_if(Data->m_PoweredBlocks.begin(), Data->m_PoweredBlocks.end(), [&BlocksPotentiallyUnpowered, a_Chunk, a_RelSourceX, a_RelSourceY, a_RelSourceZ](const sPoweredBlocks & itr)
+		{
+			if (itr.a_SourcePos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ)))
+			{
+				BlocksPotentiallyUnpowered.emplace_back(itr.a_BlockPos);
+				a_Chunk->SetIsRedstoneDirty(true);
+				return true;
+			}
+			return false;
+		}
+	), Data->m_PoweredBlocks.end());
+
+	Data->m_LinkedBlocks.erase(std::remove_if(Data->m_LinkedBlocks.begin(), Data->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, a_Chunk, a_RelSourceX, a_RelSourceY, a_RelSourceZ](const sLinkedPoweredBlocks & itr)
+		{
+			if (itr.a_SourcePos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ)))
+			{
+				BlocksPotentiallyUnpowered.emplace_back(itr.a_BlockPos);
+				a_Chunk->SetIsRedstoneDirty(true);
+				return true;
+			}
+			return false;
+		}
+	), Data->m_LinkedBlocks.end());
+
+	if (a_IsFirstCall && AreCoordsOnChunkBoundary(a_RelSourceX, a_RelSourceY, a_RelSourceZ))
 	{
 		// +- 2 to accomodate linked powered blocks
-		SetSourceUnpowered(a_SourceX, a_SourceY, a_SourceZ, a_Chunk->GetNeighborChunk(a_SourceX - 2, a_SourceZ), false);
-		SetSourceUnpowered(a_SourceX, a_SourceY, a_SourceZ, a_Chunk->GetNeighborChunk(a_SourceX + 2, a_SourceZ), false);
-		SetSourceUnpowered(a_SourceX, a_SourceY, a_SourceZ, a_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ - 2), false);
-		SetSourceUnpowered(a_SourceX, a_SourceY, a_SourceZ, a_Chunk->GetNeighborChunk(a_SourceX, a_SourceZ + 2), false);
+		SetSourceUnpowered(a_RelSourceX, a_RelSourceY, a_RelSourceZ, a_Chunk->GetRelNeighborChunk(a_RelSourceX - 2, a_RelSourceZ), false);
+		SetSourceUnpowered(a_RelSourceX, a_RelSourceY, a_RelSourceZ, a_Chunk->GetRelNeighborChunk(a_RelSourceX + 2, a_RelSourceZ), false);
+		SetSourceUnpowered(a_RelSourceX, a_RelSourceY, a_RelSourceZ, a_Chunk->GetRelNeighborChunk(a_RelSourceX, a_RelSourceZ - 2), false);
+		SetSourceUnpowered(a_RelSourceX, a_RelSourceY, a_RelSourceZ, a_Chunk->GetRelNeighborChunk(a_RelSourceX, a_RelSourceZ + 2), false);
+	}
+
+	for (const auto & itr : BlocksPotentiallyUnpowered)
+	{
+		if (!AreCoordsPowered(itr.x, itr.y, itr.z))
+		{
+			SetSourceUnpowered(itr.x, itr.y, itr.z, a_Chunk->GetRelNeighborChunk(itr.x, itr.z));
+		}
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::SetInvalidMiddleBlock(int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, cChunk * a_Chunk, bool a_IsFirstCall)
+{
+	if (!a_IsFirstCall)  // The neighbouring chunks passed when this parameter is false may be invalid
+	{
+		if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+		{
+			return;
+		}
+	}
+
+	std::vector<Vector3i> BlocksPotentiallyUnpowered;
+	auto Data = (cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
+
+	Data->m_LinkedBlocks.erase(std::remove_if(Data->m_LinkedBlocks.begin(), Data->m_LinkedBlocks.end(), [&BlocksPotentiallyUnpowered, a_Chunk, a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ](const sLinkedPoweredBlocks & itr)
+		{
+			if (itr.a_MiddlePos.Equals(Vector3i(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ)))
+			{
+				BlocksPotentiallyUnpowered.emplace_back(itr.a_BlockPos);
+				a_Chunk->SetIsRedstoneDirty(true);
+				return true;
+			}
+			return false;
+		}
+	), Data->m_LinkedBlocks.end());
+
+	if (a_IsFirstCall && AreCoordsOnChunkBoundary(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ))
+	{
+		// +- 2 to accomodate linked powered blocks
+		SetInvalidMiddleBlock(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ, a_Chunk->GetRelNeighborChunk(a_RelMiddleX - 2, a_RelMiddleZ), false);
+		SetInvalidMiddleBlock(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ, a_Chunk->GetRelNeighborChunk(a_RelMiddleX + 2, a_RelMiddleZ), false);
+		SetInvalidMiddleBlock(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ, a_Chunk->GetRelNeighborChunk(a_RelMiddleX, a_RelMiddleZ - 2), false);
+		SetInvalidMiddleBlock(a_RelMiddleX, a_RelMiddleY, a_RelMiddleZ, a_Chunk->GetRelNeighborChunk(a_RelMiddleX, a_RelMiddleZ + 2), false);
+	}
+
+	for (const auto & itr : BlocksPotentiallyUnpowered)
+	{
+		if (!AreCoordsPowered(itr.x, itr.y, itr.z))
+		{
+			SetSourceUnpowered(itr.x, itr.y, itr.z, a_Chunk->GetRelNeighborChunk(itr.x, itr.z));
+		}
 	}
 }
 
