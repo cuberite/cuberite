@@ -27,10 +27,10 @@ BioGenSource::BioGenSource(cIniFilePtr a_IniFile) :
 void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk)
 {
 	cChunkDef::BiomeMap biomes;
-	{
-		QMutexLocker lock(&m_Mtx);
-		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
-	}
+	int tag;
+	cBiomeGenPtr biomeGen = getBiomeGen(tag);
+	biomeGen->GenBiomes(a_ChunkX, a_ChunkZ, biomes);
+	releaseBiomeGen(std::move(biomeGen), tag);
 	a_DestChunk.setBiomes(biomes);
 }
 
@@ -40,10 +40,53 @@ void BioGenSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChun
 
 void BioGenSource::reload()
 {
-	int seed = m_IniFile->GetValueSetI("Seed", "Seed", 0);
-	bool unused = false;
 	QMutexLocker lock(&m_Mtx);
-	m_BiomeGen = cBiomeGen::CreateBiomeGen(*m_IniFile, seed, unused);
+	m_CurrentTag += 1;
+	m_BiomeGens.clear();
+}
+
+
+
+
+
+cBiomeGenPtr BioGenSource::getBiomeGen(int & a_Tag)
+{
+	QMutexLocker lock(&m_Mtx);
+	a_Tag = m_CurrentTag;
+	if (m_BiomeGens.empty())
+	{
+		// Create a new biogen:
+		lock.unlock();
+		int seed = m_IniFile->GetValueSetI("Seed", "Seed", 0);
+		bool unused;
+		cBiomeGenPtr res = cBiomeGen::CreateBiomeGen(*m_IniFile, seed, unused);
+		return res;
+	}
+	else
+	{
+		// Return an existing biogen:
+		cBiomeGenPtr res = m_BiomeGens.back();
+		m_BiomeGens.pop_back();
+		return res;
+	}
+}
+
+
+
+
+
+void BioGenSource::releaseBiomeGen(cBiomeGenPtr && a_BiomeGen, int a_Tag)
+{
+	QMutexLocker lock(&m_Mtx);
+
+	// If the tag differs, the source has been reloaded and this biogen is old, dispose:
+	if (a_Tag != m_CurrentTag)
+	{
+		return;
+	}
+
+	// The tag is the same, put the biogen back to list:
+	m_BiomeGens.push_back(std::move(a_BiomeGen));
 }
 
 
