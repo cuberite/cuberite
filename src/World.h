@@ -968,7 +968,7 @@ private:
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
 
-	/** The maximum view distance that a player can have. */
+	/** The maximum view distance that a player can have in this world. */
 	int m_MaxViewDistance;
 
 	/** Name of the nether world */
