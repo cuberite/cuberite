@@ -2847,7 +2847,9 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
-	m_ViewDistance = Clamp(a_ViewDistance, MIN_VIEW_DISTANCE, MAX_VIEW_DISTANCE);
+	ASSERT(m_Player->GetWorld() == NULL);
+
+	m_ViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, m_Player->GetWorld()->GetMaxViewDistance());
 	LOGD("Setted %s's view distance to %i", GetUsername().c_str(), m_ViewDistance);
 }
 

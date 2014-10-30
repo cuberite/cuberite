@@ -26,6 +26,7 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
+#include "ClientHandle.h"
 
 
 
@@ -646,6 +647,12 @@ public:
 	eShrapnelLevel GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
 	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
 
+	int GetMaxViewDistance(void) const { return m_MaxViewDistance; }
+	void SetMaxViewDistance(int a_MaxViewDistance)
+	{
+		m_MaxViewDistance = Clamp(a_MaxViewDistance, cClientHandle::MIN_VIEW_DISTANCE, cClientHandle::MAX_VIEW_DISTANCE);
+	}
+
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 
@@ -960,6 +967,9 @@ private:
 	See the eShrapnelLevel enumeration for details
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
+
+	/** The maximum view distance that a player can have. */
+	int m_MaxViewDistance;
 
 	/** Name of the nether world */
 	AString m_NetherWorldName;
