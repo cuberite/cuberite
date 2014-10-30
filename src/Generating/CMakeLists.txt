@@ -54,6 +54,7 @@ SET (HDRS
 	PieceGenerator.h
 	Prefab.h
 	PrefabPiecePool.h
+	ProtIntGen.h
 	RainbowRoadsGen.h
 	Ravines.h
 	RoughRavines.h

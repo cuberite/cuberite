@@ -59,6 +59,8 @@ HEADERS += \
 	Globals.h \
 	BiomeView.h \
 	../../src/Generating/BioGen.h \
+	../../src/Generating/IntGen.h \
+	../../src/Generating/ProtIntGen.h \
 	../../src/VoronoiMap.h \
 	../../src/Noise.h \
 	../../src/StringUtils.h \
