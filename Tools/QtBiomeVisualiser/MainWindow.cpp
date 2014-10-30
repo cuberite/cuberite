@@ -32,7 +32,8 @@ const double MainWindow::m_ViewZooms[] =
 MainWindow::MainWindow(QWidget * parent) :
 	QMainWindow(parent),
 	m_GeneratorSetup(nullptr),
-	m_LineSeparator(nullptr)
+	m_LineSeparator(nullptr),
+	m_CurrentZoomLevel(2)
 {
 	initMinecraftPath();
 
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QWidget * parent) :
 	connect(m_BiomeView, SIGNAL(decreaseZoom()), this, SLOT(decreaseZoom()));
 	connect(m_BiomeView, SIGNAL(wheelUp()),      this, SLOT(increaseZoom()));
 	connect(m_BiomeView, SIGNAL(wheelDown()),    this, SLOT(decreaseZoom()));
+	m_BiomeView->setZoomLevel(m_ViewZooms[m_CurrentZoomLevel]);
 
 	m_StatusBar = new QStatusBar();
 	this->setStatusBar(m_StatusBar);
