@@ -288,15 +288,11 @@ void MainWindow::createActions()
 	{
 		m_actViewZoom[i] = new QAction(tr("&Zoom %1%").arg(std::floor(m_ViewZooms[i] * 100)), this);
 		m_actViewZoom[i]->setCheckable(true);
-		if ((int)(m_ViewZooms[i] * 16) == 16)
-		{
-			m_actViewZoom[i]->setChecked(true);
-			m_CurrentZoomLevel = i;
-		}
 		m_actViewZoom[i]->setData(QVariant(i));
 		zoomGroup->addAction(m_actViewZoom[i]);
 		connect(m_actViewZoom[i], SIGNAL(triggered()), this, SLOT(setViewZoom()));
 	}
+	m_actViewZoom[m_CurrentZoomLevel]->setChecked(true);
 }
 
 
