@@ -8,13 +8,13 @@ The integers generated may be interpreted in several ways:
 - land/see designators
 	- 0 = ocean
 	- >0 = land
-- biome group designators
+- biome group
 	- 0 = ocean
 	- 1 = desert biomes
 	- 2 = temperate biomes
 	- 3 = mountains (hills and forests)
-	- 4 = jungle
-	- 5 = ice biomes
+	- 4 = ice biomes
+- biome group with "bgfRare" flag (for generating rare biomes for the group)
 - biome IDs
 The interpretation depends on the generator used and on the position in the chain.
 
@@ -40,10 +40,9 @@ const int bgOcean        = 0;
 const int bgDesert       = 1;
 const int bgTemperate    = 2;
 const int bgMountains    = 3;
-const int bgJungle       = 4;
-const int bgIce          = 5;
-const int bgLandOceanMax = 5;  // Maximum biome group value generated in the landOcean generator
-const int bgMesa         = 6;
+const int bgIce          = 4;
+const int bgLandOceanMax = 4;  // Maximum biome group value generated in the landOcean generator
+const int bgfRare        = 1024;  // Flag added to values to generate rare biomes for the group
 
 
 
@@ -547,35 +546,6 @@ public:
 						}
 						break;
 					}  // case bgIce
-
-					// Jungle should not neighbor Desert or Ice; change to temperate:
-					case bgJungle:
-					{
-						if (
-							!isJungleCompatible(Above) ||
-							!isJungleCompatible(Below) ||
-							!isJungleCompatible(Left) ||
-							!isJungleCompatible(Right)
-						)
-						{
-							v = bgTemperate;
-						}
-					}  // case bgJungle
-
-					// Mesa should neighbor only oceans and deserts; change to desert when another:
-					case bgMesa:
-					{
-						if (
-							!isMesaCompatible(Above) ||
-							!isMesaCompatible(Below) ||
-							!isMesaCompatible(Left) ||
-							!isMesaCompatible(Right)
-						)
-						{
-							v = bgDesert;
-						}
-						break;
-					}  // case bgDesert
 				}
 				a_Values[x + z * SizeX] = v;
 			}  // for x
@@ -593,7 +563,6 @@ protected:
 			case bgOcean:
 			case bgDesert:
 			case bgTemperate:
-			case bgMesa:
 			{
 				return true;
 			}
@@ -602,16 +571,6 @@ protected:
 				return false;
 			}
 		}
-	}
-
-	inline bool isJungleCompatible(int a_BiomeGroup)
-	{
-		return ((a_BiomeGroup != bgDesert) && (a_BiomeGroup != bgMesa) && (a_BiomeGroup != bgIce));
-	}
-
-	inline bool isMesaCompatible(int a_BiomeGroup)
-	{
-		return ((a_BiomeGroup == bgOcean) || (a_BiomeGroup == bgDesert));
 	}
 };
 

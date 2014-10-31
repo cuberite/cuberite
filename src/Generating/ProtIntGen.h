@@ -154,7 +154,7 @@ public:
 			for (int x = 0; x < a_SizeX; x++)
 			{
 				int rnd = (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7);
-				a_Values[x + a_SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 128) % bgLandOceanMax + 1) : 0;
+				a_Values[x + a_SizeX * z] = ((rnd % 100) < m_Threshold) ? ((rnd / 101) % bgLandOceanMax + 1) : 0;
 			}
 		}
 
@@ -410,7 +410,8 @@ protected:
 
 
 
-/** Generates the underlying numbers and then randomly changes some zeroes into nonzeroes. */
+/** Generates the underlying numbers and then randomly changes some ocean group pixels into random land
+group pixels, based on the predefined chance. */
 class cProtIntGenAddIslands :
 	public cProtIntGenWithNoise
 {
@@ -420,9 +421,9 @@ public:
 	typedef std::shared_ptr<cProtIntGen> Underlying;
 
 
-	cProtIntGenAddIslands(int a_Seed, int a_Threshold, Underlying a_Underlying) :
+	cProtIntGenAddIslands(int a_Seed, int a_Chance, Underlying a_Underlying) :
 		super(a_Seed),
-		m_Threshold(a_Threshold),
+		m_Chance(a_Chance),
 		m_Underlying(a_Underlying)
 	{
 	}
@@ -438,9 +439,9 @@ public:
 				if (a_Values[x + z * a_SizeX] == bgOcean)
 				{
 					int rnd = super::m_Noise.IntNoise2DInt(a_MinX + x, a_MinZ + z) / 7;
-					if (rnd % 100 < m_Threshold)
+					if (rnd % 1000 < m_Chance)
 					{
-						a_Values[x + z * a_SizeX] = (rnd / 100) % bgLandOceanMax;
+						a_Values[x + z * a_SizeX] = (rnd / 101) % bgLandOceanMax;
 					}
 				}
 			}
@@ -448,7 +449,8 @@ public:
 	}
 
 protected:
-	int m_Threshold;
+	/** Chance of each ocean pixel being converted, in permille. */
+	int m_Chance;
 
 	Underlying m_Underlying;
 };
@@ -520,35 +522,6 @@ public:
 						}
 						break;
 					}  // case bgIce
-
-					// Jungle should not neighbor Desert or Ice; change to temperate:
-					case bgJungle:
-					{
-						if (
-							!isJungleCompatible(Above) ||
-							!isJungleCompatible(Below) ||
-							!isJungleCompatible(Left) ||
-							!isJungleCompatible(Right)
-						)
-						{
-							val = bgTemperate;
-						}
-					}  // case bgJungle
-
-					// Mesa should neighbor only oceans and deserts; change to desert when another:
-					case bgMesa:
-					{
-						if (
-							!isMesaCompatible(Above) ||
-							!isMesaCompatible(Below) ||
-							!isMesaCompatible(Left) ||
-							!isMesaCompatible(Right)
-						)
-						{
-							val = bgDesert;
-						}
-						break;
-					}  // case bgDesert
 				}
 				a_Values[x + z * a_SizeX] = val;
 			}  // for x
@@ -566,7 +539,6 @@ protected:
 			case bgOcean:
 			case bgDesert:
 			case bgTemperate:
-			case bgMesa:
 			{
 				return true;
 			}
@@ -575,16 +547,6 @@ protected:
 				return false;
 			}
 		}
-	}
-
-	inline bool isJungleCompatible(int a_BiomeGroup)
-	{
-		return ((a_BiomeGroup != bgDesert) && (a_BiomeGroup != bgMesa) && (a_BiomeGroup != bgIce));
-	}
-
-	inline bool isMesaCompatible(int a_BiomeGroup)
-	{
-		return ((a_BiomeGroup == bgOcean) || (a_BiomeGroup == bgDesert));
 	}
 };
 
@@ -616,9 +578,20 @@ public:
 			biOcean, // biDeepOcean,
 		};
 
+		// Same as oceanBiomes, there are no rare oceanic biomes (mushroom islands are handled separately)
+		static const int rareOceanBiomes[] =
+		{
+			biOcean,
+		};
+
 		static const int desertBiomes[] =
 		{
 			biDesert, biDesert, biDesert, biDesert, biDesert, biDesert, biSavanna, biSavanna, biPlains,
+		};
+
+		static const int rareDesertBiomes[] =
+		{
+			biMesaPlateau, biMesaPlateauF,
 		};
 
 		static const int temperateBiomes[] =
@@ -626,14 +599,19 @@ public:
 			biForest, biForest, biRoofedForest, biExtremeHills, biPlains, biBirchForest, biSwampland,
 		};
 
+		static const int rareTemperateBiomes[] =
+		{
+			biJungle,  // Jungle is not strictly temperate, but let's piggyback it here
+		};
+
 		static const int mountainBiomes[] =
 		{
 			biExtremeHills, biForest, biTaiga, biPlains,
 		};
 
-		static const int jungleBiomes[] =
+		static const int rareMountainBiomes[] =
 		{
-			biJungle, biJungle, biJungle, biForest,
+			biMegaTaiga,
 		};
 
 		static const int iceBiomes[] =
@@ -641,33 +619,44 @@ public:
 			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
 		};
 
-		static const int mesaBiomes[] =
+		// Same as iceBiomes, there's no rare ice biome
+		static const int rareIceBiomes[] =
 		{
-			biMesa, biMesaPlateau,
+			biIcePlains, biIcePlains, biIcePlains, biIcePlains, biColdTaiga,
 		};
 
-		static const cBiomesInGroups BiomesInGroups[] =
+		static const cBiomesInGroups biomesInGroups[] =
 		{
 			/* bgOcean */     { static_cast<int>(ARRAYCOUNT(oceanBiomes)),     oceanBiomes},
 			/* bgDesert */    { static_cast<int>(ARRAYCOUNT(desertBiomes)),    desertBiomes},
 			/* bgTemperate */ { static_cast<int>(ARRAYCOUNT(temperateBiomes)), temperateBiomes},
 			/* bgMountains */ { static_cast<int>(ARRAYCOUNT(mountainBiomes)),  mountainBiomes},
-			/* bgJungle */    { static_cast<int>(ARRAYCOUNT(jungleBiomes)),    jungleBiomes},
 			/* bgIce */       { static_cast<int>(ARRAYCOUNT(iceBiomes)),       iceBiomes},
-			/* bgMesa */      { static_cast<int>(ARRAYCOUNT(mesaBiomes)),      mesaBiomes},
+		};
+
+		static const cBiomesInGroups rareBiomesInGroups[] =
+		{
+			/* bgOcean */     { static_cast<int>(ARRAYCOUNT(rareOceanBiomes)),     rareOceanBiomes},
+			/* bgDesert */    { static_cast<int>(ARRAYCOUNT(rareDesertBiomes)),    rareDesertBiomes},
+			/* bgTemperate */ { static_cast<int>(ARRAYCOUNT(rareTemperateBiomes)), rareTemperateBiomes},
+			/* bgMountains */ { static_cast<int>(ARRAYCOUNT(rareMountainBiomes)),  rareMountainBiomes},
+			/* bgIce */       { static_cast<int>(ARRAYCOUNT(rareIceBiomes)),       rareIceBiomes},
 		};
 
 		// Generate the underlying values, representing biome groups:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
 
 		// Overwrite each biome group with a random biome from that group:
+		// Take care of the bgfRare flag
 		for (int z = 0; z < a_SizeZ; z++)
 		{
 			int IdxZ = z * a_SizeX;
 			for (int x = 0; x < a_SizeX; x++)
 			{
 				int val = a_Values[x + IdxZ];
-				const cBiomesInGroups & Biomes = BiomesInGroups[val % ARRAYCOUNT(BiomesInGroups)];
+				const cBiomesInGroups & Biomes = (val > bgfRare) ?
+					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
+					biomesInGroups[val % ARRAYCOUNT(biomesInGroups)];
 				int rnd = (super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7);
 				a_Values[x + IdxZ] = Biomes.Biomes[rnd % Biomes.Count];
 			}
@@ -700,7 +689,7 @@ public:
 	typedef std::shared_ptr<cProtIntGen> Underlying;
 
 
-	cProtIntGenReplaceRandomly(int a_From, int a_To, int a_Chance, int a_Seed, Underlying a_Underlying) :
+	cProtIntGenReplaceRandomly(int a_Seed, int a_From, int a_To, int a_Chance, Underlying a_Underlying) :
 		super(a_Seed),
 		m_From(a_From),
 		m_To(a_To),
@@ -725,7 +714,7 @@ public:
 				if (a_Values[idx] == m_From)
 				{
 					int rnd = super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
-					if (rnd % 100 < m_Chance)
+					if (rnd % 1000 < m_Chance)
 					{
 						a_Values[idx] = m_To;
 					}
@@ -1002,6 +991,116 @@ protected:
 	Underlying m_Underlying;
 };
 
+
+
+
+
+
+/** Adds a "rare" flag to random biome groups, based on the given chance. */
+class cProtIntGenRareBiomeGroups:
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenRareBiomeGroups(int a_Seed, int a_Chance, Underlying a_Underlying):
+		super(a_Seed),
+		m_Chance(a_Chance),
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying data:
+		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
+
+		// Change some of the biome groups into rare biome groups:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int rnd = super::m_Noise.IntNoise2DInt(x + a_MinX, z + a_MinZ) / 7;
+				if (rnd % 1000 < m_Chance)
+				{
+					int idx = x + a_SizeX * z;
+					a_Values[idx] = a_Values[idx] | bgfRare;
+				}
+			}
+		}
+	}
+
+protected:
+	/** Chance, in permille, of changing each pixel into the rare biome group. */
+	int m_Chance;
+
+	/** The underlying generator. */
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Changes biomes in the parent data into their alternate verions ("M" variants), in such places that
+have their alterations set. */
+class cProtIntGenAlternateBiomes:
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenAlternateBiomes(int a_Seed, Underlying a_Alterations, Underlying a_BaseBiomes):
+		super(a_Seed),
+		m_Alterations(a_Alterations),
+		m_BaseBiomes(a_BaseBiomes)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the base biomes and the alterations:
+		m_BaseBiomes->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
+		int alterations[m_BufferSize];
+		m_Alterations->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
+
+		// Change the biomes into their alternate versions:
+		int len = a_SizeX * a_SizeZ;
+		for (int idx = 0; idx < len; ++idx)
+		{
+			if (alterations[idx] == 0)
+			{
+				// No change
+				continue;
+			}
+
+			// Change to alternate biomes:
+			int val = a_Values[idx];
+			switch (val)
+			{
+				case biBirchForest:  val = biBirchForest;      break;
+				case biDesert:       val = biDesertHills;      break;
+				case biExtremeHills: val = biExtremeHillsPlus; break;
+				case biForest:       val = biForestHills;      break;
+				case biIcePlains:    val = biIceMountains;     break;
+				case biJungle:       val = biJungleHills;      break;
+				case biMegaTaiga:    val = biMegaTaigaHills;   break;
+				case biMesaPlateau:  val = biMesa;             break;
+				case biPlains:       val = biForest;           break;
+				case biRoofedForest: val = biPlains;           break;
+				case biSavanna:      val = biSavannaPlateau;   break;
+				case biTaiga:        val = biTaigaHills;       break;
+			}
+			a_Values[idx] = val;
+		}  // for idx - a_Values[]
+	}
+
+protected:
+	Underlying m_Alterations;
+	Underlying m_BaseBiomes;
+};
 
 
 
