@@ -557,7 +557,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 	for (cChunkCoordsList::iterator itr = ChunksToRemove.begin(); itr != ChunksToRemove.end(); ++itr)
 	{
 		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
-		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
+		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}
 }
 

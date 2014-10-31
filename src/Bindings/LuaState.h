@@ -247,7 +247,11 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
-		PushFunction(a_Function);
+		if (!PushFunction(a_Function))
+		{
+			// Pushing the function failed
+			return false;
+		}
 		return PushCallPop(args...);
 	}
 

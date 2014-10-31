@@ -822,6 +822,7 @@ void cChunkMap::WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_M
 	int MinChunkX, MinChunkZ, MaxChunkX, MaxChunkZ;
 	cChunkDef::BlockToChunk(a_MinBlockX, a_MinBlockZ, MinChunkX, MinChunkZ);
 	cChunkDef::BlockToChunk(a_MaxBlockX, a_MaxBlockZ, MaxChunkX, MaxChunkZ);
+	cCSLock Lock(m_CSLayers);
 	for (int z = MinChunkZ; z <= MaxChunkZ; z++)
 	{
 		int MinZ = std::max(a_MinBlockZ, z * cChunkDef::Width);
