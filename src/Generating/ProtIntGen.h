@@ -1080,19 +1080,21 @@ public:
 			int val = a_Values[idx];
 			switch (val)
 			{
-				case biBirchForest:  val = biBirchForest;      break;
-				case biDesert:       val = biDesertHills;      break;
-				case biExtremeHills: val = biExtremeHillsPlus; break;
-				case biForest:       val = biForestHills;      break;
-				case biIcePlains:    val = biIceMountains;     break;
-				case biJungle:       val = biJungleHills;      break;
-				case biMegaTaiga:    val = biMegaTaigaHills;   break;
-				case biMesaPlateau:  val = biMesa;             break;
-				case biMesaPlateauF: val = biMesa;             break;
-				case biPlains:       val = biForest;           break;
-				case biRoofedForest: val = biPlains;           break;
-				case biSavanna:      val = biSavannaPlateau;   break;
-				case biTaiga:        val = biTaigaHills;       break;
+				case biBirchForest:   val = biBirchForest;      break;
+				case biDesert:        val = biDesertHills;      break;
+				case biExtremeHills:  val = biExtremeHillsPlus; break;
+				case biForest:        val = biForestHills;      break;
+				case biIcePlains:     val = biIceMountains;     break;
+				case biJungle:        val = biJungleHills;      break;
+				case biMegaTaiga:     val = biMegaTaigaHills;   break;
+				case biMesaPlateau:   val = biMesa;             break;
+				case biMesaPlateauF:  val = biMesa;             break;
+				case biMesaPlateauM:  val = biMesa;             break;
+				case biMesaPlateauFM: val = biMesa;             break;
+				case biPlains:        val = biForest;           break;
+				case biRoofedForest:  val = biPlains;           break;
+				case biSavanna:       val = biSavannaPlateau;   break;
+				case biTaiga:         val = biTaigaHills;       break;
 			}
 			a_Values[idx] = val;
 		}  // for idx - a_Values[]
@@ -1259,6 +1261,72 @@ protected:
 			}
 		}
 	}
+};
+
+
+
+
+
+class cProtIntGenMBiomes:
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenMBiomes(int a_Seed, Underlying a_Alteration, Underlying a_Underlying):
+		super(a_Seed),
+		m_Underlying(a_Underlying),
+		m_Alteration(a_Alteration)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying biomes and the alterations:
+		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
+		int alterations[m_BufferSize];
+		m_Alteration->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, alterations);
+
+		// Wherever alterations are nonzero, change into alternate biome, if available:
+		int len = a_SizeX * a_SizeZ;
+		for (int idx = 0; idx < len; ++idx)
+		{
+			if (alterations[idx] == 0)
+			{
+				continue;
+			}
+
+			// Ice spikes biome was removed from here, because it was generated way too often
+			switch (a_Values[idx])
+			{
+				case biPlains:               a_Values[idx] = biSunflowerPlains;      break;
+				case biDesert:               a_Values[idx] = biDesertM;              break;
+				case biExtremeHills:         a_Values[idx] = biExtremeHillsM;        break;
+				case biForest:               a_Values[idx] = biFlowerForest;         break;
+				case biTaiga:                a_Values[idx] = biTaigaM;               break;
+				case biSwampland:            a_Values[idx] = biSwamplandM;           break;
+				case biJungle:               a_Values[idx] = biJungleM;              break;
+				case biJungleEdge:           a_Values[idx] = biJungleEdgeM;          break;
+				case biBirchForest:          a_Values[idx] = biBirchForestM;         break;
+				case biBirchForestHills:     a_Values[idx] = biBirchForestHillsM;    break;
+				case biRoofedForest:         a_Values[idx] = biRoofedForestM;        break;
+				case biColdTaiga:            a_Values[idx] = biColdTaigaM;           break;
+				case biMegaSpruceTaiga:      a_Values[idx] = biMegaSpruceTaiga;      break;
+				case biMegaSpruceTaigaHills: a_Values[idx] = biMegaSpruceTaigaHills; break;
+				case biExtremeHillsPlus:     a_Values[idx] = biExtremeHillsPlusM;    break;
+				case biSavanna:              a_Values[idx] = biSavannaM;             break;
+				case biSavannaPlateau:       a_Values[idx] = biSavannaPlateauM;      break;
+				case biMesa:                 a_Values[idx] = biMesaBryce;            break;
+				case biMesaPlateauF:         a_Values[idx] = biMesaPlateauFM;        break;
+				case biMesaPlateau:          a_Values[idx] = biMesaBryce;            break;
+			}
+		}  // for idx - a_Values[] / alterations[]
+	}
+
+protected:
+	Underlying m_Underlying;
+	Underlying m_Alteration;
 };
 
 
