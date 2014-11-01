@@ -41,9 +41,9 @@ bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a
 	return false;
 }
 
-#include "Simulator/Simulator.inc"
+#include "Simulator/Simulator.h"
 
-#include "Simulator/IncrementalRedstoneSimulator.inc"
+#include "Simulator/IncrementalRedstoneSimulator.h"
 
 class MockWorld;
 
@@ -159,6 +159,7 @@ int main(int argc, char** argv)
 
 	MockWorld World;
 
-	cIncrementalRedstoneSimulator<MockChunk, MockWorld, MockHandlerFetcher, MockChest> Simulator(World);
+	// TODO: Implement a user-friendly method of testing
+	// cIncrementalRedstoneSimulator<MockChunk, MockWorld, MockHandlerFetcher, MockChest> Simulator(World);
 	return 0;
 }
