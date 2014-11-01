@@ -10,7 +10,7 @@ We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 Installation
 ------------
 
-[![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/churchio/onebody)
+[![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/mc-server/MCServer)
 
 For Linux there is an easy installation method, just run this in your terminal:
 
