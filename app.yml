@@ -1,0 +1,10 @@
+name: MCServer
+image: ubuntu-14-04-x64
+config:
+  #cloud-config
+  packages:
+    - curl
+  runcmd:
+    - mkdir /minecraft
+    - cd /minecraft && curl -s https://raw.githubusercontent.com/mc-server/MCServer/master/easyinstall.sh | sh
+    - nohup /minecraft/MCServer/MCServer &
