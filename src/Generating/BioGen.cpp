@@ -1042,11 +1042,12 @@ public:
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 16,
 			std::make_shared<cProtIntGenBeaches        >(
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 1,
-			std::make_shared<cProtIntGenZoom           >(a_Seed + 2,
 			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2004, 10,
 			std::make_shared<cProtIntGenAddToOcean     >(a_Seed + 10, 500, biDeepOcean,
 			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 1, biPlains, biSunflowerPlains, 20,
 			std::make_shared<cProtIntGenAlternateBiomes>(a_Seed + 1, alteration,
+			std::make_shared<cProtIntGenBiomeEdges     >(a_Seed + 3,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 2,
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 4,
 			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 99, biIcePlains, biIcePlainsSpikes, 50,
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 8,
@@ -1065,7 +1066,7 @@ public:
 			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 9, 50, bgOcean,
 			std::make_shared<cProtIntGenZoom           >(a_Seed + 10,
 			std::make_shared<cProtIntGenLandOcean      >(a_Seed + 100, 30
-		)))))))))))))))))))))))))))));
+		))))))))))))))))))))))))))))));
 
 		m_Gen =
 			std::make_shared<cProtIntGenSmooth   >(a_Seed,

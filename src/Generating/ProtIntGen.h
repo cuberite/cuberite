@@ -1088,6 +1088,7 @@ public:
 				case biJungle:       val = biJungleHills;      break;
 				case biMegaTaiga:    val = biMegaTaigaHills;   break;
 				case biMesaPlateau:  val = biMesa;             break;
+				case biMesaPlateauF: val = biMesa;             break;
 				case biPlains:       val = biForest;           break;
 				case biRoofedForest: val = biPlains;           break;
 				case biSavanna:      val = biSavannaPlateau;   break;
@@ -1100,6 +1101,164 @@ public:
 protected:
 	Underlying m_Alterations;
 	Underlying m_BaseBiomes;
+};
+
+
+
+
+
+/** Adds an edge between two specifically incompatible biomes, such as mesa and forest. */
+class cProtIntGenBiomeEdges:
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenBiomeEdges(int a_Seed, Underlying a_Underlying):
+		super(a_Seed),
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying biomes:
+		int lowerSizeX = a_SizeX + 2;
+		int lowerSizeZ = a_SizeZ + 2;
+		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
+		int lowerValues[m_BufferSize];
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerValues);
+
+		// Convert incompatible edges into neutral biomes:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int biome = lowerValues[x + 1 + (z + 1) * lowerSizeX];
+				int above = lowerValues[x + 1 + z *       lowerSizeX];
+				int below = lowerValues[x + 1 + (z + 2) * lowerSizeX];
+				int left  = lowerValues[x +     (z + 1) * lowerSizeX];
+				int right = lowerValues[x + 2 + (z + 1) * lowerSizeX];
+
+				switch (biome)
+				{
+					case biDesert:
+					case biDesertM:
+					case biDesertHills:
+					{
+						if (
+							IsBiomeVeryCold(static_cast<EMCSBiome>(above)) ||
+							IsBiomeVeryCold(static_cast<EMCSBiome>(below)) ||
+							IsBiomeVeryCold(static_cast<EMCSBiome>(left))  ||
+							IsBiomeVeryCold(static_cast<EMCSBiome>(right))
+						)
+						{
+							biome = biPlains;
+						}
+						break;
+					}  // case biDesert
+
+					case biMesaPlateau:
+					case biMesaPlateauF:
+					case biMesaPlateauFM:
+					case biMesaPlateauM:
+					{
+						if (
+							!isMesaCompatible(above) ||
+							!isMesaCompatible(below) ||
+							!isMesaCompatible(left)  ||
+							!isMesaCompatible(right)
+						)
+						{
+							biome = biDesert;
+						}
+						break;
+					}  // Mesa biomes
+
+					case biJungle:
+					case biJungleM:
+					{
+						if (
+							!isJungleCompatible(above) ||
+							!isJungleCompatible(below) ||
+							!isJungleCompatible(left)  ||
+							!isJungleCompatible(right)
+						)
+						{
+							biome = (biome == biJungle) ? biJungleEdge : biJungleEdgeM;
+						}
+						break;
+					}  // Jungle biomes
+
+					case biSwampland:
+					case biSwamplandM:
+					{
+						if (
+							IsBiomeNoDownfall(static_cast<EMCSBiome>(above)) ||
+							IsBiomeNoDownfall(static_cast<EMCSBiome>(below)) ||
+							IsBiomeNoDownfall(static_cast<EMCSBiome>(left))  ||
+							IsBiomeNoDownfall(static_cast<EMCSBiome>(right))
+						)
+						{
+							biome = biPlains;
+						}
+						break;
+					}  // Swampland biomes
+				}  // switch (biome)
+
+				a_Values[x + z * a_SizeX] = biome;
+			}  // for x
+		}  // for z
+	}
+
+
+protected:
+	Underlying m_Underlying;
+
+
+	bool isMesaCompatible(int a_Biome)
+	{
+		switch (a_Biome)
+		{
+			case biDesert:
+			case biMesa:
+			case biMesaBryce:
+			case biMesaPlateau:
+			case biMesaPlateauF:
+			case biMesaPlateauFM:
+			case biMesaPlateauM:
+			case biOcean:
+			case biDeepOcean:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+		}
+	}
+
+
+	bool isJungleCompatible(int a_Biome)
+	{
+		switch (a_Biome)
+		{
+			case biJungle:
+			case biJungleM:
+			case biJungleEdge:
+			case biJungleEdgeM:
+			case biJungleHills:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+		}
+	}
 };
 
 
