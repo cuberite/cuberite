@@ -1128,7 +1128,7 @@ public:
 	{
 		// Generate the base biomes and the alterations:
 		m_BaseBiomes->GetInts(a_MinX, a_MinZ, a_Values);
-		super::Values alterations;
+		typename super::Values alterations;
 		m_Alterations->GetInts(a_MinX, a_MinZ, alterations);
 
 		// Change the biomes into their alternate versions:
@@ -1196,7 +1196,7 @@ public:
 	virtual void GetInts(int a_MinX, int a_MinZ, typename super::Values & a_Values) override
 	{
 		// Generate the underlying biomes:
-		Underlying::element_type::Values lowerValues;
+		typename Underlying::element_type::Values lowerValues;
 		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerValues);
 
 		// Convert incompatible edges into neutral biomes:
@@ -1358,7 +1358,7 @@ public:
 	{
 		// Generate the underlying biomes and the alterations:
 		m_Underlying->GetInts(a_MinX, a_MinZ, a_Values);
-		super::Values alterations;
+		typename super::Values alterations;
 		m_Alteration->GetInts(a_MinX, a_MinZ, alterations);
 
 		// Wherever alterations are nonzero, change into alternate biome, if available:
