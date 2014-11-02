@@ -4,6 +4,7 @@ config:
   #cloud-config
   packages:
     - curl
+    - nohup
   runcmd:
     - mkdir /minecraft
     - cd /minecraft && curl -s https://raw.githubusercontent.com/mc-server/MCServer/master/easyinstall.sh | sh
