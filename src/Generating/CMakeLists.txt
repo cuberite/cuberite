@@ -46,6 +46,7 @@ SET (HDRS
 	FinishGen.h
 	GridStructGen.h
 	HeiGen.h
+	IntGen.h
 	MineShafts.h
 	NetherFortGen.h
 	Noise3DGenerator.h
@@ -53,6 +54,7 @@ SET (HDRS
 	PieceGenerator.h
 	Prefab.h
 	PrefabPiecePool.h
+	ProtIntGen.h
 	RainbowRoadsGen.h
 	Ravines.h
 	RoughRavines.h
