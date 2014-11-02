@@ -8,4 +8,4 @@ config:
   runcmd:
     - mkdir /minecraft
     - cd /minecraft && curl -s https://raw.githubusercontent.com/mc-server/MCServer/master/easyinstall.sh | sh
-    - screen -S mcserver -d -m /minecraft/MCServer/MCServer
+    - screen -S mcserver -d -m 'cd /minecraft/MCServer && ./MCServer'
