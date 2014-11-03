@@ -17,81 +17,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cTerrainHeightGen:
-
-cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
-{
-	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
-	if (HeightGenName.empty())
-	{
-		LOGWARN("[Generator] HeightGen value not set in world.ini, using \"Biomal\".");
-		HeightGenName = "Biomal";
-	}
-	
-	a_CacheOffByDefault = false;
-	cTerrainHeightGen * res = nullptr;
-	if (NoCaseCompare(HeightGenName, "flat") == 0)
-	{
-		res = new cHeiGenFlat;
-		a_CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
-	}
-	else if (NoCaseCompare(HeightGenName, "classic") == 0)
-	{
-		res = new cHeiGenClassic(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
-	{
-		res = new cDistortedHeightmap(a_Seed, a_BiomeGen);
-	}
-	else if (NoCaseCompare(HeightGenName, "End") == 0)
-	{
-		res = new cEndGen(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
-	{
-		res = new cHeiGenMountains(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
-	{
-		res = new cNoise3DComposable(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "biomal") == 0)
-	{
-		res = new cHeiGenBiomal(a_Seed, a_BiomeGen);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cHeiGenBiomal...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 500; x++)
-		{
-			cChunkDef::HeightMap Heights;
-			res->GenHeightMap(x * 5, x * 5, Heights);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("HeightGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
-	}
-	else
-	{
-		// No match found, force-set the default and retry
-		LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
-		a_IniFile.DeleteValue("Generator", "HeightGen");
-		a_IniFile.SetValue("Generator", "HeightGen", "Biomal");
-		return CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
-	}
-	
-	// Read the settings:
-	res->InitializeHeightGen(a_IniFile);
-	
-	return cTerrainHeightGenPtr(res);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cHeiGenFlat:
 
 void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
@@ -605,6 +530,81 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 	// No known biome around? Weird. Return a bogus value:
 	ASSERT(!"cHeiGenBiomal: Biome sum failed, no known biome around");
 	return 5;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cTerrainHeightGen:
+
+cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
+{
+	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
+	if (HeightGenName.empty())
+	{
+		LOGWARN("[Generator] HeightGen value not set in world.ini, using \"Biomal\".");
+		HeightGenName = "Biomal";
+	}
+	
+	a_CacheOffByDefault = false;
+	cTerrainHeightGen * res = nullptr;
+	if (NoCaseCompare(HeightGenName, "flat") == 0)
+	{
+		res = new cHeiGenFlat;
+		a_CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
+	}
+	else if (NoCaseCompare(HeightGenName, "classic") == 0)
+	{
+		res = new cHeiGenClassic(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
+	{
+		res = new cDistortedHeightmap(a_Seed, a_BiomeGen);
+	}
+	else if (NoCaseCompare(HeightGenName, "End") == 0)
+	{
+		res = new cEndGen(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
+	{
+		res = new cHeiGenMountains(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
+	{
+		res = new cNoise3DComposable(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "biomal") == 0)
+	{
+		res = new cHeiGenBiomal(a_Seed, a_BiomeGen);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cHeiGenBiomal...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 500; x++)
+		{
+			cChunkDef::HeightMap Heights;
+			res->GenHeightMap(x * 5, x * 5, Heights);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("HeightGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
+	}
+	else
+	{
+		// No match found, force-set the default and retry
+		LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
+		a_IniFile.DeleteValue("Generator", "HeightGen");
+		a_IniFile.SetValue("Generator", "HeightGen", "Biomal");
+		return CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
+	}
+	
+	// Read the settings:
+	res->InitializeHeightGen(a_IniFile);
+	
+	return cTerrainHeightGenPtr(res);
 }
 
 
