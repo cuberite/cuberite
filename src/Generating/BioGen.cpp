@@ -5,6 +5,8 @@
 
 #include "Globals.h"
 #include "BioGen.h"
+#include <chrono>
+#include <iostream>
 #include "IntGen.h"
 #include "ProtIntGen.h"
 #include "../IniFile.h"
@@ -1199,3 +1201,47 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 
 
 
+
+////////////////////////////////////////////////////////////////////////////////
+// Performance tests:
+
+// Change to 1 to enable the perf test:
+#if 0
+
+class cBioGenPerfTest
+{
+public:
+	cBioGenPerfTest()
+	{
+		std::cout << "BioGen performance tests commencing, please wait..." << std::endl;
+		TestGen("MultiStepMap", std::make_unique<cBioGenMultiStepMap>(1).get());
+		TestGen("Grown",        std::make_unique<cBioGenGrown>(1).get());
+		TestGen("GrownProt",    std::make_unique<cBioGenProtGrown>(1).get());
+		std::cout << "BioGen performance tests complete." << std::endl;
+	}
+
+protected:
+	void TestGen(const AString && a_GenName, cBiomeGen * a_BioGen)
+	{
+		// Initialize the default settings for the generator:
+		cIniFile iniFile;
+		a_BioGen->InitializeBiomeGen(iniFile);
+
+		// Generate the biomes:
+		auto start = std::chrono::system_clock::now();
+		for (int z = 0; z < 100; z++)
+		{
+			for (int x = 0; x < 100; x++)
+			{
+				cChunkDef::BiomeMap biomes;
+				a_BioGen->GenBiomes(x, z, biomes);
+			}  // for x
+		}  // for z
+		auto dur = std::chrono::system_clock::now() - start;
+		double milliseconds = static_cast<double>((std::chrono::duration_cast<std::chrono::milliseconds>(dur)).count());
+
+		std::cout << a_GenName << ": " << 1000.0 * 100.0 * 100.0 / milliseconds << " chunks per second" << std::endl;
+	}
+} g_BioGenPerfTest;
+
+#endif
