@@ -37,7 +37,7 @@ void cEvent::Wait(void)
 
 bool cEvent::Wait(int a_TimeoutMSec)
 {
-	std::chrono::system_clock::time_point dst = std::chrono::system_clock::now() + std::chrono::milliseconds(a_TimeoutMSec);
+	std::chrono::system_clock::time_point dst = std::chrono::system_clock::now() + std::chrono::microseconds(a_TimeoutMSec * 1000);
 	std::unique_lock<std::mutex> Lock(m_Mutex);  // We assume that this lock is acquired without much delay - we are the only user of the mutex
 	while (m_ShouldWait && (std::chrono::system_clock::now() < dst))
 	{
