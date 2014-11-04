@@ -567,8 +567,6 @@ public:
 		m_Perlin.AddOctave(0.04f,   0.2f);
 		m_Perlin.AddOctave(0.02f,   0.1f);
 		m_Perlin.AddOctave(0.01f,   0.05f);
-		m_Perlin.AddOctave(0.005f,  0.025f);
-		m_Perlin.AddOctave(0.0025f, 0.0125f);
 	}
 
 
