@@ -160,3 +160,65 @@ bool IsBiomeNoDownfall(EMCSBiome a_Biome)
 		}
 	}
 }
+
+
+
+
+
+bool IsBiomeVeryCold(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biFrozenOcean:
+		case biFrozenRiver:
+		case biIcePlains:
+		case biIceMountains:
+		case biColdBeach:
+		case biColdTaiga:
+		case biColdTaigaHills:
+		case biIcePlainsSpikes:
+		case biColdTaigaM:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+bool IsBiomeCold(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biExtremeHills:
+		case biTaiga:
+		case biTaigaHills:
+		case biExtremeHillsEdge:
+		case biStoneBeach:
+		case biMegaTaiga:
+		case biMegaTaigaHills:
+		case biExtremeHillsPlus:
+		case biExtremeHillsM:
+		case biTaigaM:
+		case biColdTaigaM:
+		case biMegaSpruceTaiga:
+		case biMegaSpruceTaigaHills:
+		case biExtremeHillsPlusM:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+

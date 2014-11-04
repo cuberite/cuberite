@@ -10,7 +10,7 @@
 
 // fwd:
 class cBiomeGen;
-typedef std::shared_ptr<cBiomeGen> cBiomeGenPtr;
+typedef SharedPtr<cBiomeGen> cBiomeGenPtr;
 class cIniFile;
 typedef std::shared_ptr<cIniFile> cIniFilePtr;
 
@@ -26,7 +26,7 @@ public:
 
 	/** Fills the a_DestChunk with the biomes for the specified coords.
 	It is expected to be thread-safe and re-entrant. Usually QThread::idealThreadCount() threads are used. */
-	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) = 0;
+	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) = 0;
 
 	/** Forces a fresh reload of the source. Useful mainly for the generator, whose underlying definition file may have been changed. */
 	virtual void reload() = 0;
@@ -45,7 +45,7 @@ public:
 	BioGenSource(cIniFilePtr a_IniFile);
 
 	// ChunkSource overrides:
-	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) override;
+	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) override;
 	virtual void reload(void) override;
 
 protected:
@@ -53,10 +53,30 @@ protected:
 	cIniFilePtr m_IniFile;
 
 	/** The generator used for generating biomes. */
-	cBiomeGenPtr m_BiomeGen;
+	std::vector<cBiomeGenPtr> m_BiomeGens;
 
-	/** Guards m_BiomeGen against multithreaded access. */
+	/** Guards m_BiomeGens against multithreaded access. */
 	QMutex m_Mtx;
+
+	/** Keeps track of the current settings of the biomegens.
+	Incremented by one each time reload() is called. Provides the means of releasing old biomegens that were
+	in use while reload() was being processed and thus couldn't be changed back then. releaseBiomeGen() does
+	the job of filtering the biogens before reusing them. */
+	int m_CurrentTag;
+
+
+	/** Retrieves one cBiomeGenPtr from m_BiomeGens.
+	If there's no biogen available there, creates a new one based on the ini file.
+	When done with it, the caller should call releaseBiomeGen() to put the biogen back to m_BiomeGens.
+	a_Tag receives the value of m_CurrentTag from when the lock was held; it should be passed to
+	releaseBiomeGen() together with the biogen. */
+	cBiomeGenPtr getBiomeGen(int & a_Tag);
+
+	/** Marks the specified biogen as available for reuse (puts it back into m_BiomeGens).
+	a_Tag is the value of m_CurrentTag from the time when the biogen was retrieved; if it is different from
+	current m_CurrentTagValue, the biogen will be disposed of (because reload() has been called in the
+	meantime). */
+	void releaseBiomeGen(cBiomeGenPtr && a_BiomeGen, int a_Tag);
 };
 
 
@@ -70,7 +90,7 @@ public:
 	AnvilSource(QString a_WorldRegionFolder);
 
 	// ChunkSource overrides:
-	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, ChunkPtr a_DestChunk) override;
+	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) override;
 	virtual void reload() override;
 
 protected:

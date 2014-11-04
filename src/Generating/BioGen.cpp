@@ -5,6 +5,10 @@
 
 #include "Globals.h"
 #include "BioGen.h"
+#include <chrono>
+#include <iostream>
+#include "IntGen.h"
+#include "ProtIntGen.h"
 #include "../IniFile.h"
 #include "../LinearUpscale.h"
 
@@ -917,6 +921,214 @@ void cBioGenTwoLevel::InitializeBiomeGen(cIniFile & a_IniFile)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cBioGenGrown:
+
+class cBioGenGrown:
+	public cBiomeGen
+{
+public:
+	cBioGenGrown(int a_Seed)
+	{
+		auto FinalRivers =
+			std::make_shared<cIntGenSmooth<8>>   (a_Seed + 1,
+			std::make_shared<cIntGenZoom  <10>>  (a_Seed + 2,
+			std::make_shared<cIntGenRiver <7>>   (a_Seed + 3,
+			std::make_shared<cIntGenZoom  <9>>   (a_Seed + 4,
+			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
+			std::make_shared<cIntGenZoom  <8>>   (a_Seed + 8,
+			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
+			std::make_shared<cIntGenZoom  <8>>   (a_Seed + 9,
+			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
+			std::make_shared<cIntGenZoom  <8>>   (a_Seed + 10,
+			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
+			std::make_shared<cIntGenSmooth<8>>   (a_Seed + 6,
+			std::make_shared<cIntGenZoom  <10>>  (a_Seed + 11,
+			std::make_shared<cIntGenChoice<2, 7>>(a_Seed + 12
+		))))))))))))));
+
+		auto alteration =
+			std::make_shared<cIntGenZoom     <8>>(a_Seed,
+			std::make_shared<cIntGenLandOcean<6>>(a_Seed, 20
+		));
+
+		auto alteration2 =
+			std::make_shared<cIntGenZoom     <8>>(a_Seed + 1,
+			std::make_shared<cIntGenZoom     <6>>(a_Seed + 2,
+			std::make_shared<cIntGenZoom     <5>>(a_Seed + 1,
+			std::make_shared<cIntGenZoom     <4>>(a_Seed + 2,
+			std::make_shared<cIntGenLandOcean<4>>(a_Seed + 1, 10
+		)))));
+
+		auto FinalBiomes =
+			std::make_shared<cIntGenSmooth         <8>> (a_Seed + 1,
+			std::make_shared<cIntGenZoom           <10>>(a_Seed + 15,
+			std::make_shared<cIntGenSmooth         <7>> (a_Seed + 1,
+			std::make_shared<cIntGenZoom           <9>> (a_Seed + 16,
+			std::make_shared<cIntGenBeaches        <6>> (
+			std::make_shared<cIntGenZoom           <8>> (a_Seed + 1,
+			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2004, 10,
+			std::make_shared<cIntGenAddToOcean     <6>> (a_Seed + 10, 500, biDeepOcean,
+			std::make_shared<cIntGenReplaceRandomly<8>> (a_Seed + 1, biPlains, biSunflowerPlains, 20,
+			std::make_shared<cIntGenMBiomes        <8>> (a_Seed + 5, alteration2,
+			std::make_shared<cIntGenAlternateBiomes<8>> (a_Seed + 1, alteration,
+			std::make_shared<cIntGenBiomeEdges     <8>> (a_Seed + 3,
+			std::make_shared<cIntGenZoom           <10>>(a_Seed + 2,
+			std::make_shared<cIntGenZoom           <7>> (a_Seed + 4,
+			std::make_shared<cIntGenReplaceRandomly<5>> (a_Seed + 99, biIcePlains, biIcePlainsSpikes, 50,
+			std::make_shared<cIntGenZoom           <5>> (a_Seed + 8,
+			std::make_shared<cIntGenAddToOcean     <4>> (a_Seed + 10, 300, biDeepOcean,
+			std::make_shared<cIntGenAddToOcean     <6>> (a_Seed + 9, 8, biMushroomIsland,
+			std::make_shared<cIntGenBiomes         <8>> (a_Seed + 3000,
+			std::make_shared<cIntGenAddIslands     <8>> (a_Seed + 2000, 200,
+			std::make_shared<cIntGenZoom           <8>> (a_Seed + 5,
+			std::make_shared<cIntGenRareBiomeGroups<6>> (a_Seed + 5, 50,
+			std::make_shared<cIntGenBiomeGroupEdges<6>> (
+			std::make_shared<cIntGenAddIslands     <8>> (a_Seed + 2000, 200,
+			std::make_shared<cIntGenZoom           <8>> (a_Seed + 7,
+			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 8, 50, bgOcean,
+			std::make_shared<cIntGenReplaceRandomly<6>> (a_Seed + 101, bgIce, bgTemperate, 150,
+			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2000, 200,
+			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 9, 50, bgOcean,
+			std::make_shared<cIntGenZoom           <6>> (a_Seed + 10,
+			std::make_shared<cIntGenLandOcean      <5>> (a_Seed + 100, 30
+		)))))))))))))))))))))))))))))));
+
+		m_Gen =
+			std::make_shared<cIntGenSmooth   <16>>(a_Seed,
+			std::make_shared<cIntGenZoom     <18>>(a_Seed,
+			std::make_shared<cIntGenSmooth   <11>>(a_Seed,
+			std::make_shared<cIntGenZoom     <13>>(a_Seed,
+			std::make_shared<cIntGenMixRivers<8>> (
+			FinalBiomes, FinalRivers
+		)))));
+	}
+
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
+	{
+		cIntGen<16, 16>::Values vals;
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, vals);
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				cChunkDef::SetBiome(a_Biomes, x, z, (EMCSBiome)vals[x + cChunkDef::Width * z]);
+			}
+		}
+	}
+
+protected:
+	std::shared_ptr<cIntGen<16, 16>> m_Gen;
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cBioGenGrown:
+
+class cBioGenProtGrown:
+	public cBiomeGen
+{
+public:
+	cBioGenProtGrown(int a_Seed)
+	{
+		auto FinalRivers =
+			std::make_shared<cProtIntGenSmooth>(a_Seed + 1,
+			std::make_shared<cProtIntGenZoom  >(a_Seed + 2,
+			std::make_shared<cProtIntGenRiver >(a_Seed + 3,
+			std::make_shared<cProtIntGenZoom  >(a_Seed + 4,
+			std::make_shared<cProtIntGenSmooth>(a_Seed + 5,
+			std::make_shared<cProtIntGenZoom  >(a_Seed + 8,
+			std::make_shared<cProtIntGenSmooth>(a_Seed + 5,
+			std::make_shared<cProtIntGenZoom  >(a_Seed + 9,
+			std::make_shared<cProtIntGenSmooth>(a_Seed + 5,
+			std::make_shared<cProtIntGenZoom  >(a_Seed + 10,
+			std::make_shared<cProtIntGenSmooth>(a_Seed + 5,
+			std::make_shared<cProtIntGenSmooth>(a_Seed + 6,
+			std::make_shared<cProtIntGenZoom  >(a_Seed + 11,
+			std::make_shared<cProtIntGenChoice>(a_Seed + 12, 2
+		))))))))))))));
+
+		auto alteration =
+			std::make_shared<cProtIntGenZoom     >(a_Seed,
+			std::make_shared<cProtIntGenLandOcean>(a_Seed, 20
+		));
+
+		auto alteration2 =
+			std::make_shared<cProtIntGenZoom     >(a_Seed + 1,
+			std::make_shared<cProtIntGenZoom     >(a_Seed + 2,
+			std::make_shared<cProtIntGenZoom     >(a_Seed + 1,
+			std::make_shared<cProtIntGenZoom     >(a_Seed + 2,
+			std::make_shared<cProtIntGenLandOcean>(a_Seed + 1, 10
+		)))));
+
+		auto FinalBiomes =
+			std::make_shared<cProtIntGenSmooth         >(a_Seed + 1,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 15,
+			std::make_shared<cProtIntGenSmooth         >(a_Seed + 1,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 16,
+			std::make_shared<cProtIntGenBeaches        >(
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 1,
+			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2004, 10,
+			std::make_shared<cProtIntGenAddToOcean     >(a_Seed + 10, 500, biDeepOcean,
+			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 1, biPlains, biSunflowerPlains, 20,
+			std::make_shared<cProtIntGenMBiomes        >(a_Seed + 5, alteration2,
+			std::make_shared<cProtIntGenAlternateBiomes>(a_Seed + 1, alteration,
+			std::make_shared<cProtIntGenBiomeEdges     >(a_Seed + 3,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 2,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 4,
+			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 99, biIcePlains, biIcePlainsSpikes, 50,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 8,
+			std::make_shared<cProtIntGenAddToOcean     >(a_Seed + 10, 300, biDeepOcean,
+			std::make_shared<cProtIntGenAddToOcean     >(a_Seed + 9, 8, biMushroomIsland,
+			std::make_shared<cProtIntGenBiomes         >(a_Seed + 3000,
+			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2000, 200,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 5,
+			std::make_shared<cProtIntGenRareBiomeGroups>(a_Seed + 5, 50,
+			std::make_shared<cProtIntGenBiomeGroupEdges>(
+			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2000, 200,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 7,
+			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 8, 50, bgOcean,
+			std::make_shared<cProtIntGenReplaceRandomly>(a_Seed + 101, bgIce, bgTemperate, 150,
+			std::make_shared<cProtIntGenAddIslands     >(a_Seed + 2000, 200,
+			std::make_shared<cProtIntGenSetRandomly    >(a_Seed + 9, 50, bgOcean,
+			std::make_shared<cProtIntGenZoom           >(a_Seed + 10,
+			std::make_shared<cProtIntGenLandOcean      >(a_Seed + 100, 30
+		)))))))))))))))))))))))))))))));
+
+		m_Gen =
+			std::make_shared<cProtIntGenSmooth   >(a_Seed,
+			std::make_shared<cProtIntGenZoom     >(a_Seed,
+			std::make_shared<cProtIntGenSmooth   >(a_Seed,
+			std::make_shared<cProtIntGenZoom     >(a_Seed,
+			std::make_shared<cProtIntGenMixRivers>(
+			FinalBiomes, FinalRivers
+		)))));
+	}
+
+	virtual void GenBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_Biomes) override
+	{
+		int vals[16 * 16];
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, 16, 16, vals);
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				cChunkDef::SetBiome(a_Biomes, x, z, (EMCSBiome)vals[x + cChunkDef::Width * z]);
+			}
+		}
+	}
+
+protected:
+	std::shared_ptr<cProtIntGen> m_Gen;
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cBiomeGen:
 
 cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault)
@@ -952,6 +1164,14 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 	{
 		res = new cBioGenTwoLevel(a_Seed);
 	}
+	else if (NoCaseCompare(BiomeGenName, "grown") == 0)
+	{
+		res = new cBioGenGrown(a_Seed);
+	}
+	else if (NoCaseCompare(BiomeGenName, "grownprot") == 0)
+	{
+		res = new cBioGenProtGrown(a_Seed);
+	}
 	else
 	{
 		if (NoCaseCompare(BiomeGenName, "multistepmap") != 0)
@@ -977,6 +1197,54 @@ cBiomeGenPtr cBiomeGen::CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & 
 
 	return cBiomeGenPtr(res);
 }
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Performance tests:
+
+// Change to 1 to enable the perf test:
+#if 0
+
+class cBioGenPerfTest
+{
+public:
+	cBioGenPerfTest()
+	{
+		std::cout << "BioGen performance tests commencing, please wait..." << std::endl;
+		TestGen("MultiStepMap", std::make_unique<cBioGenMultiStepMap>(1).get());
+		TestGen("Grown",        std::make_unique<cBioGenGrown>(1).get());
+		TestGen("GrownProt",    std::make_unique<cBioGenProtGrown>(1).get());
+		std::cout << "BioGen performance tests complete." << std::endl;
+	}
+
+protected:
+	void TestGen(const AString && a_GenName, cBiomeGen * a_BioGen)
+	{
+		// Initialize the default settings for the generator:
+		cIniFile iniFile;
+		a_BioGen->InitializeBiomeGen(iniFile);
+
+		// Generate the biomes:
+		auto start = std::chrono::system_clock::now();
+		for (int z = 0; z < 100; z++)
+		{
+			for (int x = 0; x < 100; x++)
+			{
+				cChunkDef::BiomeMap biomes;
+				a_BioGen->GenBiomes(x, z, biomes);
+			}  // for x
+		}  // for z
+		auto dur = std::chrono::system_clock::now() - start;
+		double milliseconds = static_cast<double>((std::chrono::duration_cast<std::chrono::milliseconds>(dur)).count());
+
+		std::cout << a_GenName << ": " << 1000.0 * 100.0 * 100.0 / milliseconds << " chunks per second" << std::endl;
+	}
+} g_BioGenPerfTest;
+
+#endif
 
 
 

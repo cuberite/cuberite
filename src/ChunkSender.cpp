@@ -184,7 +184,7 @@ void cChunkSender::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
-		while (m_ChunksReady.empty() && m_SendChunksLowPriority.empty() && m_SendChunksHighPriority.empty())
+		while (m_ChunksReady.empty() && m_SendChunksLowPriority.empty() && m_SendChunksMediumPriority.empty() && m_SendChunksHighPriority.empty())
 		{
 			int RemoveCount = m_RemoveCount;
 			m_RemoveCount = 0;
