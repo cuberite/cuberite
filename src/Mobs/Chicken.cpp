@@ -9,8 +9,8 @@
 
 
 
-cChicken::cChicken(void) :
-	super("Chicken", mtChicken, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4),
+cChicken::cChicken(CreateMonsterInfo a_Info) :
+	super(a_Info, "Chicken", mtChicken, "mob.chicken.hurt", "mob.chicken.hurt", 0.3, 0.4),
 	m_EggDropTimer(0)
 {
 }

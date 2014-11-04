@@ -7,8 +7,8 @@
 
 
 
-cCaveSpider::cCaveSpider(void) :
-	super("CaveSpider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
+cCaveSpider::cCaveSpider(CreateMonsterInfo a_Info) :
+	super(a_Info, "CaveSpider", mtCaveSpider, "mob.spider.say", "mob.spider.death", 0.7, 0.5)
 {
 }
 

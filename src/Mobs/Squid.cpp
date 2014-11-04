@@ -9,8 +9,8 @@
 
 
 
-cSquid::cSquid(void) :
-	super("Squid", mtSquid, "", "", 0.95, 0.95)
+cSquid::cSquid(CreateMonsterInfo a_Info) :
+	super(a_Info, "Squid", mtSquid, "", "", 0.95, 0.95)
 {
 }
 

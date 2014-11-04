@@ -13,7 +13,7 @@ class cOcelot :
 	typedef cPassiveMonster super;
 	
 public:
-	cOcelot(void) :
+	cOcelot(CreateMonsterInfo a_Info) :
 		super("Ocelot", mtOcelot, "mob.cat.hitt", "mob.cat.hitt", 0.6, 0.8)
 	{
 	}

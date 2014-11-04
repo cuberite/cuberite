@@ -63,6 +63,19 @@ struct TakeDamageInfo
 
 
 
+struct CreateEntityInfo
+{
+	Vector3d Position;
+	Vector3d Speed;
+	Vector3d Rotation;
+	int Health;
+	int MaxHealth;
+} ;
+
+
+
+
+
 // tolua_begin
 class cEntity
 {
@@ -83,10 +96,7 @@ public:
 		etExpOrb,
 		etFloater,
 		etItemFrame,
-		etPainting,
-		
-		// Common variations
-		etMob = etMonster,  // DEPRECATED, use etMonster instead!
+		etPainting
 	} ;
 	
 	// tolua_end
@@ -143,7 +153,7 @@ public:
 	static const int VOID_BOUNDARY         = -46;  ///< Y position to begin applying void damage
 	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
 	
-	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
+	cEntity(CreateEntityInfo a_Info, eEntityType a_EntityType, double a_Width, double a_Height, int a_MaxHealth);
 	virtual ~cEntity();
 
 	/** Spawns the entity in the world; returns true if spawned, false if not (plugin disallowed).
@@ -190,7 +200,6 @@ public:
 	double           GetPosX      (void) const { return m_Pos.x;   }
 	double           GetPosY      (void) const { return m_Pos.y;   }
 	double           GetPosZ      (void) const { return m_Pos.z;   }
-	const Vector3d & GetRot       (void) const { return m_Rot;     }  // OBSOLETE, use individual GetYaw(), GetPitch, GetRoll() components
 	double           GetYaw       (void) const { return m_Rot.x;   }  // In degrees, [-180, +180)
 	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
 	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
@@ -208,7 +217,6 @@ public:
 	void SetHeight  (double a_Height) { m_Height = a_Height; }
 	void SetWidth   (double a_Width) { m_Width = a_Width; }
 	void SetMass    (double a_Mass);
-	void SetRot     (const Vector3f & a_Rot);  // OBSOLETE, use individual SetYaw(), SetPitch(), SetRoll() components
 	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
 	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
 	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
@@ -420,12 +428,6 @@ public:
 	virtual void SpawnOn(cClientHandle & a_Client) = 0;
 
 	// tolua_begin
-	
-	/// Teleports to the entity specified
-	virtual void TeleportToEntity(cEntity & a_Entity);
-	
-	/// Teleports to the coordinates specified
-	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
 	/** Moves entity to specified world, taking a world pointer */
 	bool MoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn = true) { return DoMoveToWorld(a_World, a_ShouldSendRespawn); }
@@ -479,7 +481,10 @@ public:
 	int GetAirLevel(void) const { return m_AirLevel; }
 
 	/** Gets number of ticks this entity has existed for */
-	long int GetTicksAlive(void) const { return m_TicksAlive; }
+	long GetTicksAlive(void) const { return m_TicksAlive; }
+
+	/** Sets number of ticks this entity has existed for */
+	void SetTicksAlive(long a_TicksAlive) { m_TicksAlive = a_TicksAlive; }
 	
 	/** Gets the invulnerable ticks from the entity */
 	int GetInvulnerableTicks(void) const { return m_InvulnerableTicks; }

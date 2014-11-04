@@ -24,7 +24,7 @@ public:
 	
 	CLASS_PROTODEF(cWitherSkullEntity)
 	
-	cWitherSkullEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	cWitherSkullEntity(CreateEntityInfo a_Info, cEntity * a_Creator);
 	
 protected:
 	

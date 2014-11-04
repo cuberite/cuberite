@@ -1222,23 +1222,6 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadFallingBlockFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
-	else if (strncmp(a_IDTag, "Minecart", a_IDTagLength) == 0)
-	{
-		// It is a minecart, old style, find out the type:
-		int TypeTag = a_NBT.FindChildByName(a_EntityTagIdx, "Type");
-		if ((TypeTag < 0) || (a_NBT.GetType(TypeTag) != TAG_Int))
-		{
-			return;
-		}
-		switch (a_NBT.GetInt(TypeTag))
-		{
-			case 0: LoadMinecartRFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Rideable minecart
-			case 1: LoadMinecartCFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with chest
-			case 2: LoadMinecartFFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with furnace
-			case 3: LoadMinecartTFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with TNT
-			case 4: LoadMinecartHFromNBT(a_Entities, a_NBT, a_EntityTagIdx); break;  // Minecart with Hopper
-		}
-	}
 	else if (strncmp(a_IDTag, "MinecartRideable", a_IDTagLength) == 0)
 	{
 		LoadMinecartRFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1428,11 +1411,13 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cBoat> Boat(new cBoat(0, 0, 0));
-	if (!LoadEntityBaseFromNBT(*Boat.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cBoat> Boat(new cBoat(Info));
 	a_Entities.push_back(Boat.release());
 }
 
@@ -1442,11 +1427,13 @@ void cWSSAnvil::LoadBoatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 
 void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cEnderCrystal> EnderCrystal(new cEnderCrystal(0, 0, 0));
-	if (!LoadEntityBaseFromNBT(*EnderCrystal.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cEnderCrystal> EnderCrystal(new cEnderCrystal(Info));
 	a_Entities.push_back(EnderCrystal.release());
 }
 
@@ -1464,11 +1451,13 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 	int Type = a_NBT.GetInt(TypeIdx);
 	NIBBLETYPE Meta = (NIBBLETYPE)a_NBT.GetByte(MetaIdx);
 
-	std::auto_ptr<cFallingBlock> FallingBlock(new cFallingBlock(Vector3i(0, 0, 0), Type, Meta));
-	if (!LoadEntityBaseFromNBT(*FallingBlock.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cFallingBlock> FallingBlock(new cFallingBlock(Info, Type, Meta));
 	a_Entities.push_back(FallingBlock.release());
 }
 
@@ -1478,11 +1467,13 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadMinecartRFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cRideableMinecart> Minecart(new cRideableMinecart(0, 0, 0, cItem(), 1));  // TODO: Load the block and the height
-	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cRideableMinecart> Minecart(new cRideableMinecart(Info, cItem(), 1));  // TODO: Load the block and the height
 	a_Entities.push_back(Minecart.release());
 }
 
@@ -1497,11 +1488,14 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	{
 		return;  // Make it an empty chest - the chunk loader will provide an empty cChestEntity for this
 	}
-	std::auto_ptr<cMinecartWithChest> Minecart(new cMinecartWithChest(0, 0, 0));
-	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cMinecartWithChest> Minecart(new cMinecartWithChest(Info));
+
 	for (int Child = a_NBT.GetFirstChild(Items); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
 		int Slot = a_NBT.FindChildByName(Child, "Slot");
@@ -1524,11 +1518,13 @@ void cWSSAnvil::LoadMinecartCFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cMinecartWithFurnace> Minecart(new cMinecartWithFurnace(0, 0, 0));
-	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cMinecartWithFurnace> Minecart(new cMinecartWithFurnace(Info));
 	
 	// TODO: Load the Push and Fuel tags
 	
@@ -1541,11 +1537,13 @@ void cWSSAnvil::LoadMinecartFFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cMinecartWithTNT> Minecart(new cMinecartWithTNT(0, 0, 0));
-	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cMinecartWithTNT> Minecart(new cMinecartWithTNT(Info));
 	
 	// TODO: Everything to do with TNT carts
 
@@ -1558,11 +1556,13 @@ void cWSSAnvil::LoadMinecartTFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMinecartHFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cMinecartWithHopper> Minecart(new cMinecartWithHopper(0, 0, 0));
-	if (!LoadEntityBaseFromNBT(*Minecart.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	std::auto_ptr<cMinecartWithHopper> Minecart(new cMinecartWithHopper(Info));
 	
 	// TODO: Everything to do with hopper carts
 
@@ -1587,17 +1587,18 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 	
-	std::auto_ptr<cPickup> Pickup(new cPickup(0, 0, 0, Item, false));  // Pickup delay doesn't matter, just say false
-	if (!LoadEntityBaseFromNBT(*Pickup.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cPickup> Pickup(new cPickup(Info, Item, false));  // Pickup delay doesn't matter, just say false
 	
 	// Load age:
 	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
 	if (Age > 0)
 	{
-		Pickup->SetAge(a_NBT.GetShort(Age));
+		Pickup->SetTicksAlive(a_NBT.GetShort(Age));
 	}
 
 	a_Entities.push_back(Pickup.release());
@@ -1609,11 +1610,12 @@ void cWSSAnvil::LoadPickupFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 
 void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(0.0, 0.0, 0.0, 0));
-	if (!LoadEntityBaseFromNBT(*TNT.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cTNTEntity> TNT(new cTNTEntity(Info));
 	
 	// Load Fuse Ticks:
 	int FuseTicks = a_NBT.FindChildByName(a_TagIdx, "Fuse");
@@ -1631,24 +1633,26 @@ void cWSSAnvil::LoadTNTFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadExpOrbFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cExpOrb> ExpOrb(new cExpOrb(0.0, 0.0, 0.0, 0));
-	if (!LoadEntityBaseFromNBT(*ExpOrb.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+
+	// Load Reward (Value):
+	int Reward = a_NBT.FindChildByName(a_TagIdx, "Value");
+	if (Reward <= 0)
+	{
+		return;
+	}
+
+	std::auto_ptr<cExpOrb> ExpOrb(new cExpOrb(Info, a_NBT.GetShort(Reward)));
 
 	// Load Age:
 	int Age = a_NBT.FindChildByName(a_TagIdx, "Age");
 	if (Age > 0)
 	{
-		ExpOrb->SetAge(a_NBT.GetShort(Age));
-	}
-
-	// Load Reward (Value):
-	int Reward = a_NBT.FindChildByName(a_TagIdx, "Value");
-	if (Reward > 0)
-	{
-		ExpOrb->SetReward(a_NBT.GetShort(Reward));
+		ExpOrb->SetTicksAlive(a_NBT.GetShort(Age));
 	}
 
 	a_Entities.push_back(ExpOrb.release());
@@ -1719,11 +1723,12 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 		return;
 	}
 	
-	std::auto_ptr<cItemFrame> ItemFrame(new cItemFrame(BLOCK_FACE_NONE, 0.0, 0.0, 0.0));
-	if (!LoadEntityBaseFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cItemFrame> ItemFrame(new cItemFrame(BLOCK_FACE_NONE, Info));
 	ItemFrame->SetItem(Item);
 
 	LoadHangingFromNBT(*ItemFrame.get(), a_NBT, a_TagIdx);
@@ -1744,11 +1749,14 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cArrowEntity> Arrow(new cArrowEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadProjectileBaseFromNBT(*Arrow.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	bool InGround;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx, InGround))
 	{
 		return;
 	}
+	std::auto_ptr<cArrowEntity> Arrow(new cArrowEntity(Info, NULL));
+	Arrow->SetIsInGround(InGround);
 	
 	// Load pickup state:
 	int PickupIdx = a_NBT.FindChildByName(a_TagIdx, "pickup");
@@ -1808,11 +1816,14 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0), cItem()));
-	if (!LoadProjectileBaseFromNBT(*SplashPotion.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	bool InGround;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx, InGround))
 	{
 		return;
 	}
+	std::auto_ptr<cSplashPotionEntity> SplashPotion(new cSplashPotionEntity(Info, NULL, cItem()));
+	SplashPotion->SetIsInGround(InGround);
 	
 	int EffectDuration         = a_NBT.FindChildByName(a_TagIdx, "EffectDuration");
 	int EffectIntensity        = a_NBT.FindChildByName(a_TagIdx, "EffectIntensity");
@@ -1832,11 +1843,12 @@ void cWSSAnvil::LoadSplashPotionFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cThrownSnowballEntity> Snowball(new cThrownSnowballEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadProjectileBaseFromNBT(*Snowball.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cThrownSnowballEntity> Snowball(new cThrownSnowballEntity(Info, NULL));
 	
 	// Store the new snowball in the entities list:
 	a_Entities.push_back(Snowball.release());
@@ -1848,11 +1860,12 @@ void cWSSAnvil::LoadSnowballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cThrownEggEntity> Egg(new cThrownEggEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadProjectileBaseFromNBT(*Egg.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cThrownEggEntity> Egg(new cThrownEggEntity(Info, NULL));
 	
 	// Store the new egg in the entities list:
 	a_Entities.push_back(Egg.release());
@@ -1864,11 +1877,12 @@ void cWSSAnvil::LoadEggFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cGhastFireballEntity> Fireball(new cGhastFireballEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadProjectileBaseFromNBT(*Fireball.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cGhastFireballEntity> Fireball(new cGhastFireballEntity(Info, NULL));
 	
 	// Store the new fireball in the entities list:
 	a_Entities.push_back(Fireball.release());
@@ -1880,11 +1894,12 @@ void cWSSAnvil::LoadFireballFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cFireChargeEntity> FireCharge(new cFireChargeEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadProjectileBaseFromNBT(*FireCharge.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cFireChargeEntity> FireCharge(new cFireChargeEntity(Info, NULL));
 	
 	// Store the new FireCharge in the entities list:
 	a_Entities.push_back(FireCharge.release());
@@ -1896,11 +1911,12 @@ void cWSSAnvil::LoadFireChargeFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cThrownEnderPearlEntity> Enderpearl(new cThrownEnderPearlEntity(NULL, 0, 0, 0, Vector3d(0, 0, 0)));
-	if (!LoadProjectileBaseFromNBT(*Enderpearl.get(), a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadProjectileBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
+	std::auto_ptr<cThrownEnderPearlEntity> Enderpearl(new cThrownEnderPearlEntity(Info, NULL));
 	
 	// Store the new enderpearl in the entities list:
 	a_Entities.push_back(Enderpearl.release());
@@ -1912,17 +1928,18 @@ void cWSSAnvil::LoadThrownEnderpearlFromNBT(cEntityList & a_Entities, const cPar
 
 void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cBat> Monster(new cBat());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cBat::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	std::auto_ptr<cBat> Monster(new cBat(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -1932,17 +1949,18 @@ void cWSSAnvil::LoadBatFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cBlaze> Monster(new cBlaze());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cBlaze::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cBlaze> Monster(new cBlaze(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -1952,17 +1970,18 @@ void cWSSAnvil::LoadBlazeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cCaveSpider> Monster(new cCaveSpider());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cCaveSpider::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cCaveSpider> Monster(new cCaveSpider(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -1972,17 +1991,18 @@ void cWSSAnvil::LoadCaveSpiderFromNBT(cEntityList & a_Entities, const cParsedNBT
 
 void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cChicken> Monster(new cChicken());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cChicken::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cChicken> Monster(new cChicken(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -1992,17 +2012,18 @@ void cWSSAnvil::LoadChickenFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 
 void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cCow> Monster(new cCow());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cCow::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cCow> Monster(new cCow(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2012,17 +2033,18 @@ void cWSSAnvil::LoadCowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NB
 
 void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cCreeper> Monster(new cCreeper());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cCreeper::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cCreeper> Monster(new cCreeper(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2032,17 +2054,18 @@ void cWSSAnvil::LoadCreeperFromNBT(cEntityList & a_Entities, const cParsedNBT & 
 
 void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cEnderDragon> Monster(new cEnderDragon());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cEnderDragon::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cEnderDragon> Monster(new cEnderDragon(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2052,17 +2075,18 @@ void cWSSAnvil::LoadEnderDragonFromNBT(cEntityList & a_Entities, const cParsedNB
 
 void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cEnderman> Monster(new cEnderman());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cEnderman::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	std::auto_ptr<cEnderman> Monster(new cEnderman(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2072,17 +2096,18 @@ void cWSSAnvil::LoadEndermanFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cGhast> Monster(new cGhast());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cGhast::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	std::auto_ptr<cGhast> Monster(new cGhast(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2092,17 +2117,18 @@ void cWSSAnvil::LoadGhastFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cGiant> Monster(new cGiant());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cGiant::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cGiant> Monster(new cGiant(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2122,18 +2148,18 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int Color = a_NBT.GetInt(ColorIdx);
 	int Style = a_NBT.GetInt(StyleIdx);
 
-	std::auto_ptr<cHorse> Monster(new cHorse(Type, Color, Style, 1));
-
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cHorse::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cHorse> Monster(new cHorse(Info, Type, Color, Style, 1));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2143,17 +2169,18 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cIronGolem> Monster(new cIronGolem());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cIronGolem::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cIronGolem> Monster(new cIronGolem(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2164,25 +2191,24 @@ void cWSSAnvil::LoadIronGolemFromNBT(cEntityList & a_Entities, const cParsedNBT 
 void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int SizeIdx = a_NBT.FindChildByName(a_TagIdx, "Size");
-
 	if (SizeIdx < 0)
 	{
 		return;
 	}
-
 	int Size = a_NBT.GetInt(SizeIdx);
 
-	std::auto_ptr<cMagmaCube> Monster(new cMagmaCube(Size));
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cMagmaCube::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cMagmaCube> Monster(new cMagmaCube(Size));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2192,17 +2218,18 @@ void cWSSAnvil::LoadMagmaCubeFromNBT(cEntityList & a_Entities, const cParsedNBT 
 
 void cWSSAnvil::LoadMooshroomFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	std::auto_ptr<cMooshroom> Monster(new cMooshroom());
-	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
-	{
-		return;
-	}
-	
-	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	CreateMonsterInfo Info(cMooshroom::GetClassStatic());
+	if (!LoadEntityBaseFromNBT(Info.EntityInfo, a_NBT, a_TagIdx))
 	{
 		return;
 	}
 
+	if (!LoadMonsterBaseFromNBT(Info, a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	std::auto_ptr<cMooshroom> Monster(new cMooshroom(Info));
 	a_Entities.push_back(Monster.release());
 }
 
@@ -2647,14 +2674,14 @@ void cWSSAnvil::LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_Ta
 
 
 
-bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx)
+bool cWSSAnvil::LoadEntityBaseFromNBT(CreateEntityInfo & a_EntityInfo, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	double Pos[3];
 	if (!LoadDoublesListFromNBT(Pos, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "Pos")))
 	{
 		return false;
 	}
-	a_Entity.SetPosition(Pos[0], Pos[1], Pos[2]);
+	a_EntityInfo.Position = Vector3d(Pos[0], Pos[1], Pos[2]);
 	
 	double Speed[3];
 	if (!LoadDoublesListFromNBT(Speed, 3, a_NBT, a_NBT.FindChildByName(a_TagIdx, "Motion")))
@@ -2664,7 +2691,7 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		Speed[1] = 0;
 		Speed[2] = 0;
 	}
-	a_Entity.SetSpeed(Speed[0], Speed[1], Speed[2]);
+	a_EntityInfo.Speed = Vector3d(Speed[0], Speed[1], Speed[2]);
 	
 	double Rotation[3];
 	if (!LoadDoublesListFromNBT(Rotation, 2, a_NBT, a_NBT.FindChildByName(a_TagIdx, "Rotation")))
@@ -2673,12 +2700,12 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 		Rotation[0] = 0;
 		Rotation[1] = 0;
 	}
-	a_Entity.SetYaw(Rotation[0]);
-	a_Entity.SetRoll(Rotation[1]);
+	a_EntityInfo.Rotation.x = Rotation[0];
+	a_EntityInfo.Rotation.y = Rotation[1];
 
 	// Load health:
 	int Health = a_NBT.FindChildByName(a_TagIdx, "Health");
-	a_Entity.SetHealth(Health > 0 ? a_NBT.GetShort(Health) : a_Entity.GetMaxHealth());
+	a_EntityInfo.Health= (Health > 0 ? a_NBT.GetShort(Health) : -1);
 	
 	return true;
 }
@@ -2687,37 +2714,37 @@ bool cWSSAnvil::LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_N
 
 
 
-bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx)
+bool cWSSAnvil::LoadMonsterBaseFromNBT(CreateMonsterInfo a_MonsterInfo, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	float DropChance[5];
 	if (!LoadFloatsListFromNBT(DropChance, 5, a_NBT, a_NBT.FindChildByName(a_TagIdx, "DropChances")))
 	{
 		return false;
 	}
-	a_Monster.SetDropChanceWeapon(DropChance[0]);
-	a_Monster.SetDropChanceHelmet(DropChance[1]);
-	a_Monster.SetDropChanceChestplate(DropChance[2]);
-	a_Monster.SetDropChanceLeggings(DropChance[3]);
-	a_Monster.SetDropChanceBoots(DropChance[4]);
+	a_MonsterInfo.DropChanceWeapon = DropChance[0];
+	a_MonsterInfo.DropChanceHelmet = DropChance[1];
+	a_MonsterInfo.DropChanceChestplate = DropChance[2];
+	a_MonsterInfo.DropChanceLeggings = DropChance[3;;
+	a_MonsterInfo.DropChanceBoots = DropChance[4];
 
 	int LootTag = a_NBT.FindChildByName(a_TagIdx, "CanPickUpLoot");
 	if (LootTag > 0)
 	{
 		bool CanPickUpLoot = (a_NBT.GetByte(LootTag) == 1);
-		a_Monster.SetCanPickUpLoot(CanPickUpLoot);
+		a_MonsterInfo.CanPickUpLoot = CanPickUpLoot;
 	}
 
 	int CustomNameTag = a_NBT.FindChildByName(a_TagIdx, "CustomName");
 	if ((CustomNameTag > 0) && (a_NBT.GetType(CustomNameTag) == TAG_String))
 	{
-		a_Monster.SetCustomName(a_NBT.GetString(CustomNameTag));
+		a_MonsterInfo.CustomName = a_NBT.GetString(CustomNameTag);
 	}
 
 	int CustomNameVisibleTag = a_NBT.FindChildByName(a_TagIdx, "CustomNameVisible");
 	if ((CustomNameVisibleTag > 0) && (a_NBT.GetType(CustomNameVisibleTag) == TAG_Byte))
 	{
 		bool CustomNameVisible = (a_NBT.GetByte(CustomNameVisibleTag) == 1);
-		a_Monster.SetCustomNameAlwaysVisible(CustomNameVisible);
+		a_MonsterInfo.CustomNameAlwaysVisible = CustomNameVisible;
 	}
 
 	return true;
@@ -2727,9 +2754,10 @@ bool cWSSAnvil::LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & 
 
 
 
-bool cWSSAnvil::LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx)
+bool cWSSAnvil::LoadProjectileBaseFromNBT(CreateEntityInfo & a_EntityInfo, cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	if (!LoadEntityBaseFromNBT(a_Entity, a_NBT, a_TagIdx))
+	CreateEntityInfo Info;
+	if (!LoadEntityBaseFromNBT(Info, a_NBT, a_TagIdx))
 	{
 		return false;
 	}

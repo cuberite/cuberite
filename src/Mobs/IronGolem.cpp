@@ -7,8 +7,8 @@
 
 
 
-cIronGolem::cIronGolem(void) :
-	super("IronGolem", mtIronGolem, "mob.IronGolem.hit", "mob.IronGolem.death", 1.4, 2.9)
+cIronGolem::cIronGolem(CreateMonsterInfo a_Info) :
+	super(a_Info, "IronGolem", mtIronGolem, "mob.IronGolem.hit", "mob.IronGolem.death", 1.4, 2.9)
 {
 }
 

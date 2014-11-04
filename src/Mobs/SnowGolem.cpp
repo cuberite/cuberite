@@ -8,8 +8,8 @@
 
 
 
-cSnowGolem::cSnowGolem(void) :
-	super("SnowGolem", mtSnowGolem, "", "", 0.4, 1.8)
+cSnowGolem::cSnowGolem(CreateMonsterInfo a_Info) :
+	super(a_Info, "SnowGolem", mtSnowGolem, "", "", 0.4, 1.8)
 {
 }
 

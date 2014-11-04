@@ -134,8 +134,6 @@ public:
 	/** Returns whether the player is climbing (ladders, vines etc.) */
 	bool IsClimbing(void) const;
 
-	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ) override;
-
 	// tolua_begin
 	
 	/** Sends the "look" packet to the player, forcing them to set their rotation to the specified values.
@@ -436,6 +434,12 @@ public:
 	Loads the m_Rank, m_Permissions, m_MsgPrefix, m_MsgSuffix and m_MsgNameColorCode members. */
 	void LoadRank(void);
 
+	/** Sets the speed and sends it to the client, so that they are forced to move so. */
+	void SetPosition(const Vector3d & a_Position, bool a_Teleport);
+
+	/** Adds to the speed and sends it to the client, so that they are forced to move so. */
+	void AddPosition(const Vector3d & a_Position, bool a_Teleport);
+
 	// tolua_end
 
 	// cEntity overrides:
@@ -585,12 +589,6 @@ protected:
 
 	/** Adds to the speed and sends it to the client, so that they are forced to move so. */
 	virtual void AddSpeed(const Vector3d & a_Speed) override;
-
-	/** Sets the speed and sends it to the client, so that they are forced to move so. */
-	virtual void SetPosition(const Vector3d & a_Position) override;
-
-	/** Adds to the speed and sends it to the client, so that they are forced to move so. */
-	virtual void AddPosition(const Vector3d & a_Position) override;
 
 	void ResolvePermissions(void);
 	void ResolveGroups(void);

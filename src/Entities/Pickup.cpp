@@ -84,17 +84,14 @@ protected:
 
 
 
-cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
-	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
-	, m_Timer(0.f)
-	, m_Item(a_Item)
-	, m_bCollected(false)
-	, m_bIsPlayerCreated(IsPlayerCreated)
+cPickup::cPickup(CreateEntityInfo a_Info, const cItem & a_Item, bool IsPlayerCreated)
+	: cEntity(etPickup, a_Info, 0.2, 0.2, 5),
+	m_DestroyTimer(0),
+	m_Item(a_Item),
+	m_bCollected(false),
+	m_bIsPlayerCreated(IsPlayerCreated)
 {
 	SetGravity(-10.5f);
-	SetMaxHealth(5);
-	SetHealth(5);
-	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);
 }
 
 
@@ -112,10 +109,10 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 {
+	UNUSED(a_Dt);
+
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();  // Notify clients of position
-
-	m_Timer += a_Dt;
 	
 	if (!m_bCollected)
 	{
@@ -141,13 +138,8 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 			)
 			{
 				m_bCollected = true;
-				m_Timer = 0;  // We have to reset the timer.
-				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
-				if (m_Timer > 500.f)
-				{
-					Destroy(true);
-					return;
-				}
+				Destroy();
+				return;
 			}
 
 			// Try to combine the pickup with adjacent same-item pickups:
@@ -167,22 +159,25 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		if (m_Timer > 500.f)  // 0.5 second
+		// Playing collect animation, wait until it's complete
+		m_DestroyTimer++;
+
+		if (m_DestroyTimer == 10)  // Animation lasts around 0.5 seconds
 		{
-			Destroy(true);
+			Destroy();
 			return;
 		}
 	}
 
-	if (m_Timer > 1000 * 60 * 5)  // 5 minutes
+	if (GetTicksAlive() >= 20 * 60 * 5)  // 5 minutes
 	{
-		Destroy(true);
+		Destroy();
 		return;
 	}
 
 	if (GetPosY() < VOID_BOUNDARY)  // Out of this world and no more visible!
 	{
-		Destroy(true);
+		Destroy();
 		return;
 	}
 }
@@ -202,7 +197,7 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 	}
 	
 	// Two seconds if player created the pickup (vomiting), half a second if anything else
-	if (m_Timer < (m_bIsPlayerCreated ? 2000.f : 500.f))
+	if (GetTicksAlive() < (m_bIsPlayerCreated ? 40 : 10))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", m_UniqueID, a_Dest->GetName().c_str());
 		return false;  // Not old enough
@@ -236,7 +231,6 @@ bool cPickup::CollectedBy(cPlayer * a_Dest)
 			// All of the pickup has been collected, schedule the pickup for destroying
 			m_bCollected = true;
 		}
-		m_Timer = 0;
 		return true;
 	}
 

@@ -77,8 +77,8 @@ protected:
 
 
 
-cEnderman::cEnderman(void) :
-	super("Enderman", mtEnderman, "mob.endermen.hit", "mob.endermen.death", 0.5, 2.9),
+cEnderman::cEnderman(CreateMonsterInfo a_Info) :
+	super(a_Info, "Enderman", mtEnderman, "mob.endermen.hit", "mob.endermen.death", 0.5, 2.9),
 	m_bIsScreaming(false),
 	CarriedBlock(E_BLOCK_AIR),
 	CarriedMeta(0)

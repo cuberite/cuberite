@@ -7,9 +7,9 @@
 
 
 
-cEnderDragon::cEnderDragon(void) :
+cEnderDragon::cEnderDragon(CreateMonsterInfo a_Info) :
 	// TODO: Vanilla source says this, but is it right? Dragons fly, they don't stand
-	super("EnderDragon", mtEnderDragon, "mob.enderdragon.hit", "mob.enderdragon.end", 16.0, 8.0)
+	super(a_Info, "EnderDragon", mtEnderDragon, "mob.enderdragon.hit", "mob.enderdragon.end", 16.0, 8.0)
 {
 }
 

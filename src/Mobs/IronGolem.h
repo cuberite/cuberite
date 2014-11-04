@@ -13,7 +13,7 @@ class cIronGolem :
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cIronGolem(void);
+	cIronGolem(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cIronGolem)
 	

@@ -7,8 +7,8 @@
 
 
 
-cZombiePigman::cZombiePigman(void) :
-	super("ZombiePigman", mtZombiePigman, "mob.zombiepig.zpighurt", "mob.zombiepig.zpigdeath", 0.6, 1.8)
+cZombiePigman::cZombiePigman(CreateMonsterInfo a_Info) :
+	super(a_Info, "ZombiePigman", mtZombiePigman, "mob.zombiepig.zpighurt", "mob.zombiepig.zpigdeath", 0.6, 1.8)
 {
 }
 

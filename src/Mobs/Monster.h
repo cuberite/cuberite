@@ -6,6 +6,8 @@
 #include "../BlockID.h"
 #include "../Item.h"
 #include "../Enchantments.h"
+#include "../Root.h"
+#include "../MonsterConfig.h"
 #include "MonsterTypes.h"
 
 
@@ -14,6 +16,31 @@
 
 class cClientHandle;
 class cWorld;
+
+
+
+
+
+struct CreateMonsterInfo
+{
+	CreateMonsterInfo(const AString & a_ClassName) :
+		MonsterInfo(cRoot::Get()->GetMonsterConfig()->ReturnAttributes(a_ClassName))
+	{
+	}
+
+	CreateEntityInfo EntityInfo;
+	cMonsterConfig::sReturnAttributes MonsterInfo;
+
+	float DropChanceWeapon;
+	float DropChanceHelmet;
+	float DropChanceChestplate;
+	float DropChanceLeggings;
+	float DropChanceBoots;
+
+	AString CustomName;
+	bool CustomNameAlwaysVisible;
+	bool CanPickUpLoot;
+};
 
 
 
@@ -49,7 +76,7 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cMonster(CreateMonsterInfo a_Info, const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
 	CLASS_PROTODEF(cMonster)
 	
@@ -73,9 +100,6 @@ public:
 	
 	virtual void CheckEventSeePlayer(void);
 	virtual void EventSeePlayer(cEntity * a_Player);
-	
-	/// Reads the monster configuration for the specified monster name and assigns it to this object.
-	void GetMonsterConfig(const AString & a_Name);
 	
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);

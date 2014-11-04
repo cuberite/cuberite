@@ -17,7 +17,7 @@ class cEnderCrystal :
 public:
 	CLASS_PROTODEF(cEnderCrystal)
 
-	cEnderCrystal(double a_X, double a_Y, double a_Z);
+	cEnderCrystal(CreateEntityInfo a_Info);
 
 private:
 

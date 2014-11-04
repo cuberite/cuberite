@@ -9,33 +9,8 @@
 
 
 
-struct cMonsterConfig::sAttributesStruct
-{
-	AString m_Name;
-	int     m_SightDistance;
-	int     m_AttackDamage;
-	int     m_AttackRange;
-	double  m_AttackRate;
-	int     m_MaxHealth;
-	bool    m_IsFireproof;
-};
-
-
-
-
-
-struct cMonsterConfig::sMonsterConfigState
-{
-	AString MonsterTypes;
-	std::list< sAttributesStruct > AttributesList;
-};
-
-
-
-
-
 cMonsterConfig::cMonsterConfig(void)
-	: m_pState( new sMonsterConfigState)
+	: m_pState(new sMonsterConfigState)
 {
 	Initialize();
 }
@@ -83,20 +58,22 @@ void cMonsterConfig::Initialize()
 
 
 
-void cMonsterConfig::AssignAttributes(cMonster * a_Monster, const AString & a_Name)
+cMonsterConfig::sReturnAttributes cMonsterConfig::ReturnAttributes(const AString & a_Name)
 {
 	std::list<sAttributesStruct>::const_iterator itr;
 	for (itr = m_pState->AttributesList.begin(); itr != m_pState->AttributesList.end(); ++itr)
 	{
-		if (itr->m_Name.compare(a_Name) == 0)
+		if (itr->m_Name == a_Name)
 		{
-			a_Monster->SetAttackDamage (itr->m_AttackDamage);
-			a_Monster->SetAttackRange  (itr->m_AttackRange);
-			a_Monster->SetSightDistance(itr->m_SightDistance);
-			a_Monster->SetAttackRate   ((float)itr->m_AttackRate);
-			a_Monster->SetMaxHealth    (itr->m_MaxHealth);
-			a_Monster->SetIsFireproof  (itr->m_IsFireproof);
-			return;
+			cMonsterConfig::sReturnAttributes Attr {
+				itr->m_SightDistance,
+				itr->m_AttackDamage,
+				itr->m_AttackRange,
+				itr->m_AttackRate,
+				itr->m_MaxHealth,
+				itr->m_IsFireproof
+			};
+			return Attr;
 		}
 	}  // for itr - m_pState->AttributesList[]
 }

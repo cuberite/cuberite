@@ -2,13 +2,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "IncludeAllMonsters.h"
-#include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
-#include "../MonsterConfig.h"
 #include "../MersenneTwister.h"
 
 #include "../Chunk.h"
@@ -65,38 +63,34 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height)
-	: super(etMonster, a_Width, a_Height)
-	, m_EMState(IDLE)
-	, m_EMPersonality(AGGRESSIVE)
-	, m_Target(NULL)
-	, m_bMovingToDestination(false)
-	, m_LastGroundHeight(POSY_TOINT)
-	, m_IdleInterval(0)
-	, m_DestroyTimer(0)
-	, m_MobType(a_MobType)
-	, m_CustomName("")
-	, m_CustomNameAlwaysVisible(false)
-	, m_SoundHurt(a_SoundHurt)
-	, m_SoundDeath(a_SoundDeath)
-	, m_AttackRate(3)
-	, m_AttackDamage(1)
-	, m_AttackRange(2)
-	, m_AttackInterval(0)
-	, m_SightDistance(25)
-	, m_DropChanceWeapon(0.085f)
-	, m_DropChanceHelmet(0.085f)
-	, m_DropChanceChestplate(0.085f)
-	, m_DropChanceLeggings(0.085f)
-	, m_DropChanceBoots(0.085f)
-	, m_CanPickUpLoot(true)
-	, m_BurnsInDaylight(false)
-	, m_RelativeWalkSpeed(1.0)
+cMonster::cMonster(CreateMonsterInfo a_Info, const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height) :
+	super(a_Info, etMonster, a_Width, a_Height),
+	m_EMState(IDLE),
+	m_EMPersonality(AGGRESSIVE),
+	m_Target(NULL),
+	m_bMovingToDestination(false),
+	m_LastGroundHeight(POSY_TOINT),
+	m_IdleInterval(0),
+	m_DestroyTimer(0),
+	m_MobType(a_MobType),
+	m_CustomName(a_Info.CustomName),
+	m_CustomNameAlwaysVisible(a_Info.CustomNameAlwaysVisible),
+	m_SoundHurt(a_SoundHurt),
+	m_SoundDeath(a_SoundDeath),
+	m_AttackRate(a_Info.MonsterInfo.m_AttackRate),
+	m_AttackDamage(a_Info.MonsterInfo.m_AttackDamage),
+	m_AttackRange(a_Info.MonsterInfo.m_AttackRange),
+	m_AttackInterval(a_Info.MonsterInfo.m_AttackRate),
+	m_SightDistance(a_Info.MonsterInfo.m_SightDistance),
+	m_DropChanceWeapon(a_Info.DropChanceWeapon),
+	m_DropChanceHelmet(a_Info.DropChanceHelmet),
+	m_DropChanceChestplate(a_Info.DropChanceChestplate),
+	m_DropChanceLeggings(a_Info.DropChanceLeggings),
+	m_DropChanceBoots(a_Info.DropChanceBoots),
+	m_CanPickUpLoot(a_Info.CanPickUpLoot),
+	m_BurnsInDaylight(false),
+	m_RelativeWalkSpeed(1.0)
 {
-	if (!a_ConfigName.empty())
-	{
-		GetMonsterConfig(a_ConfigName);
-	}
 }
 
 
@@ -731,15 +725,6 @@ void cMonster::SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible)
 	{
 		m_World->BroadcastEntityMetadata(*this);
 	}
-}
-
-
-
-
-
-void cMonster::GetMonsterConfig(const AString & a_Name)
-{
-	cRoot::Get()->GetMonsterConfig()->AssignAttributes(this, a_Name);
 }
 
 

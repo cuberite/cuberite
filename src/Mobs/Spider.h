@@ -13,7 +13,7 @@ class cSpider :
 	typedef cAggressiveMonster super;
 	
 public:
-	cSpider(void);
+	cSpider(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cSpider)
 

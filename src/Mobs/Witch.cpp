@@ -7,8 +7,8 @@
 
 
 
-cWitch::cWitch(void) :
-	super("Witch", mtWitch, "", "", 0.6, 1.8)
+cWitch::cWitch(CreateMonsterInfo a_Info) :
+	super(a_Info, "Witch", mtWitch, "", "", 0.6, 1.8)
 {
 }
 

@@ -7,8 +7,8 @@
 
 
 
-cSpider::cSpider(void) :
-	super("Spider", mtSpider, "mob.spider.say", "mob.spider.death", 1.4, 0.9)
+cSpider::cSpider(CreateMonsterInfo a_Info) :
+	super(a_Info, "Spider", mtSpider, "mob.spider.say", "mob.spider.death", 1.4, 0.9)
 {
 }
 

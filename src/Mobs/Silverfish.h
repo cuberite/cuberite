@@ -13,7 +13,7 @@ class cSilverfish :
 	typedef cAggressiveMonster super;
 	
 public:
-	cSilverfish(void) :
+	cSilverfish(CreateMonsterInfo a_Info) :
 		super("Silverfish", mtSilverfish, "mob.silverfish.hit", "mob.silverfish.kill", 0.3, 0.7)
 	{
 	}

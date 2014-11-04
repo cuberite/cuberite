@@ -8,8 +8,8 @@
 
 
 
-cBlaze::cBlaze(void) :
-	super("Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.6, 1.8)
+cBlaze::cBlaze(CreateMonsterInfo a_Info) :
+	super(a_Info, "Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.6, 1.8)
 {
 }
 

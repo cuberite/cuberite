@@ -13,7 +13,7 @@ class cEnderDragon :
 	typedef cAggressiveMonster super;
 	
 public:
-	cEnderDragon(void);
+	cEnderDragon(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cEnderDragon)
 	

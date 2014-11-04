@@ -18,7 +18,7 @@ class cPawn :
 public:
 	CLASS_PROTODEF(cPawn)
 
-	cPawn(eEntityType a_EntityType, double a_Width, double a_Height);
+	cPawn(CreateMonsterInfo a_Info, eEntityType a_EntityType, double a_Width, double a_Height);
 	
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;

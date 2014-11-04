@@ -18,7 +18,7 @@ public:
 
 	CLASS_PROTODEF(cHangingEntity)
 
-	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
+	cHangingEntity(eEntityType a_EntityType, eBlockFace a_BlockFace, CreateEntityInfo a_Info);
 	
 	/** Returns the orientation from the hanging entity */
 	eBlockFace GetDirection() const { return m_BlockFace; }  // tolua_export

@@ -14,7 +14,7 @@ class cWolf :
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cWolf(void);
+	cWolf(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cWolf)
 

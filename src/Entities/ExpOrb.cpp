@@ -5,26 +5,10 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
-	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
-	, m_Reward(a_Reward)
-	, m_Timer(0.f)
+cExpOrb::cExpOrb(CreateEntityInfo a_Info, int a_Reward)
+	: cEntity(a_Info, etExpOrb, 0.98, 0.98, 5),
+	m_Reward(a_Reward)
 {
-	SetMaxHealth(5);
-	SetHealth(5);
-}
-
-
-
-
-
-cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
-	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
-	, m_Reward(a_Reward)
-	, m_Timer(0.f)
-{
-	SetMaxHealth(5);
-	SetHealth(5);
 }
 
 
@@ -69,9 +53,8 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	HandlePhysics(a_Dt, a_Chunk);
 	
-	m_Timer += a_Dt;
-	if (m_Timer >= 1000 * 60 * 5)  // 5 minutes
+	if (GetTicksAlive() >= 20 * 60 * 5)  // 5 minutes
 	{
-		Destroy(true);
+		Destroy();
 	}
 }

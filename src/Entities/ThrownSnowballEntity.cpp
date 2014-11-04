@@ -7,11 +7,10 @@
 
 
 
-cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkSnowball, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+cThrownSnowballEntity::cThrownSnowballEntity(CreateEntityInfo a_Info, cEntity * a_Creator) :
+	super(a_Info, pkSnowball, a_Creator, 0.25, 0.25),
 	m_DestroyTimer(-1)
 {
-	SetSpeed(a_Speed);
 }
 
 

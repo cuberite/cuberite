@@ -13,7 +13,7 @@ class cMooshroom :
 	typedef cPassiveMonster super;
 	
 public:
-	cMooshroom(void);
+	cMooshroom(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cMooshroom)
 

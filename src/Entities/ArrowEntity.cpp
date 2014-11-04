@@ -8,8 +8,8 @@
 
 
 
-cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkArrow, a_Creator, a_X, a_Y, a_Z, 0.5, 0.5),
+cArrowEntity::cArrowEntity(CreateEntityInfo Info, cEntity * a_Creator) :
+	super(Info, pkArrow, a_Creator, 0.5, 0.5),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),
@@ -17,10 +17,8 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 	m_HitGroundTimer(0),
 	m_HasTeleported(false),
 	m_bIsCollected(false),
-	m_HitBlockPos(Vector3i(0, 0, 0))
+	m_HitBlockPos(0, 0, 0)
 {
-	SetSpeed(a_Speed);
-	SetMass(0.1);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
@@ -34,7 +32,7 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 
 
 cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
-	super(pkArrow, &a_Player, a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), 0.5, 0.5),
+	super(CreateEntityInfo{ a_Player.GetThrowStartPos(), a_Player.GetThrowSpeed(a_Force * 1.5 * 20), Vector3d(0, 0, 0) }, pkArrow, &a_Player, 0.5, 0.5),
 	m_PickupState(psInSurvivalOrCreative),
 	m_DamageCoeff(2),
 	m_IsCritical((a_Force >= 1)),

@@ -213,13 +213,13 @@ protected:
 	void LoadWolfOwner(cWolf & a_Wolf, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads entity common data from the NBT compound; returns true if successful
-	bool LoadEntityBaseFromNBT(cEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIdx);
+	bool LoadEntityBaseFromNBT(CreateEntityInfo & a_EntityInfo, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads monster common data from the NBT compound; returns true if successful
-	bool LoadMonsterBaseFromNBT(cMonster & a_Monster, const cParsedNBT & a_NBT, int a_TagIdx);
+	bool LoadMonsterBaseFromNBT(CreateMonsterInfo a_MonsterInfo, const cParsedNBT & a_NBT, int a_TagIdx);
 	
 	/// Loads projectile common data from the NBT compound; returns true if successful
-	bool LoadProjectileBaseFromNBT(cProjectileEntity & a_Entity, const cParsedNBT & a_NBT, int a_TagIx);
+	bool LoadProjectileBaseFromNBT(CreateEntityInfo & a_EntityInfo, const cParsedNBT & a_NBT, int a_TagIx, bool & a_IsInGround);
 	
 	/// Loads an array of doubles of the specified length from the specified NBT list tag a_TagIdx; returns true if successful
 	bool LoadDoublesListFromNBT(double * a_Doubles, int a_NumDoubles, const cParsedNBT & a_NBT, int a_TagIdx);

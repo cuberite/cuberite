@@ -30,7 +30,7 @@ public:
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	
-	cBoat(double a_X, double a_Y, double a_Z);
+	cBoat(CreateEntityInfo a_Info);
 } ;
 
 

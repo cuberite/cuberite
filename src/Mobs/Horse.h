@@ -13,7 +13,7 @@ class cHorse :
 	typedef cPassiveMonster super;
 	
 public:
-	cHorse(int Type, int Color, int Style, int TameTimes);
+	cHorse(CreateMonsterInfo a_Info, int Type, int Color, int Style, int TameTimes);
 
 	CLASS_PROTODEF(cHorse)
 	

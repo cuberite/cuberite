@@ -14,7 +14,7 @@ class cSlime :
 	
 public:
 	/** Creates a slime of the specified size; size can be 1, 2 or 4, with 1 is the smallest and 4 is the tallest. */
-	cSlime(int a_Size);
+	cSlime(CreateMonsterInfo a_Info, int a_Size);
 
 	CLASS_PROTODEF(cSlime)
 

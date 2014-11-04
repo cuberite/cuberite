@@ -14,7 +14,7 @@ class cWitch :
 	typedef cAggressiveMonster super;
 	
 public:
-	cWitch();
+	cWitch(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cWitch)
 

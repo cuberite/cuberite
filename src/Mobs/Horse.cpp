@@ -8,8 +8,8 @@
 
 
 
-cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
-	super("Horse", mtHorse, "mob.horse.hit", "mob.horse.death", 1.4, 1.6),
+cHorse::cHorse(CreateMonsterInfo a_Info, int Type, int Color, int Style, int TameTimes) :
+	super(a_Info, "Horse", mtHorse, "mob.horse.hit", "mob.horse.death", 1.4, 1.6),
 	m_bHasChest(false),
 	m_bIsEating(false),
 	m_bIsRearing(false),

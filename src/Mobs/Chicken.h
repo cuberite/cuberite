@@ -12,7 +12,7 @@ class cChicken :
 	typedef cPassiveMonster super;
 	
 public:
-	cChicken(void);
+	cChicken(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cChicken)
 

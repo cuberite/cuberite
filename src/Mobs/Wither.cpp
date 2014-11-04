@@ -10,8 +10,8 @@
 
 
 
-cWither::cWither(void) :
-	super("Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0),
+cWither::cWither(CreateMonsterInfo a_Info) :
+	super(a_Info, "Wither", mtWither, "mob.wither.hurt", "mob.wither.death", 0.9, 4.0),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);

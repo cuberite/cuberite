@@ -13,7 +13,7 @@ class cGiant :
 	typedef cAggressiveMonster super;
 	
 public:
-	cGiant(void);
+	cGiant(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cGiant)
 	

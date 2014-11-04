@@ -23,7 +23,7 @@ public:
 	
 	CLASS_PROTODEF(cFireChargeEntity)
 	
-	cFireChargeEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed);
+	cFireChargeEntity(CreateEntityInfo a_Info, cEntity * a_Creator);
 	
 protected:
 	

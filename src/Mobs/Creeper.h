@@ -13,7 +13,7 @@ class cCreeper :
 	typedef cAggressiveMonster super;
 	
 public:
-	cCreeper(void);
+	cCreeper(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cCreeper)
 

@@ -7,8 +7,8 @@
 
 
 
-cGiant::cGiant(void) :
-	super("Giant", mtGiant, "mob.zombie.hurt", "mob.zombie.death", 3.6, 10.8)
+cGiant::cGiant(CreateMonsterInfo a_Info) :
+	super(a_Info, "Giant", mtGiant, "mob.zombie.hurt", "mob.zombie.death", 3.6, 10.8)
 {
 
 }

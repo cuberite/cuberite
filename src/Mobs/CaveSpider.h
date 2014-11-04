@@ -12,7 +12,7 @@ class cCaveSpider :
 	typedef cAggressiveMonster super;
 	
 public:
-	cCaveSpider(void);
+	cCaveSpider(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cCaveSpider)
 

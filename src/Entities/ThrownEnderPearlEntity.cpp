@@ -7,11 +7,10 @@
 
 
 
-cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkEnderPearl, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25),
+cThrownEnderPearlEntity::cThrownEnderPearlEntity(CreateEntityInfo a_Info, cEntity * a_Creator) :
+	super(a_Info, pkEnderPearl, a_Creator, 0.25, 0.25),
 	m_DestroyTimer(-1)
 {
-	SetSpeed(a_Speed);
 }
 
 
@@ -64,7 +63,7 @@ void cThrownEnderPearlEntity::TeleportCreator(const Vector3d & a_HitPos)
 		virtual bool Item(cPlayer * a_Entity) override
 		{
 			// Teleport the creator here, make them take 5 damage:
-			a_Entity->TeleportToCoords(m_HitPos.x, m_HitPos.y + 0.2, m_HitPos.z);
+			a_Entity->SetPosition(m_HitPos, true);
 			a_Entity->TakeDamage(dtEnderPearl, m_Attacker, 5, 0);
 			return true;
 		}

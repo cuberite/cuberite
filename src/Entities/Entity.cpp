@@ -25,41 +25,41 @@ cCriticalSection cEntity::m_CSCount;
 
 
 
-cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height)
-	: m_UniqueID(0)
-	, m_Health(1)
-	, m_MaxHealth(1)
-	, m_AttachedTo(NULL)
-	, m_Attachee(NULL)
-	, m_bDirtyHead(true)
-	, m_bDirtyOrientation(true)
-	, m_bHasSentNoSpeed(true)
-	, m_bOnGround(false)
-	, m_Gravity(-9.81f)
-	, m_LastPos(a_X, a_Y, a_Z)
-	, m_IsInitialized(false)
-	, m_WorldTravellingFrom(NULL)
-	, m_EntityType(a_EntityType)
-	, m_World(NULL)
-	, m_IsFireproof(false)
-	, m_TicksSinceLastBurnDamage(0)
-	, m_TicksSinceLastLavaDamage(0)
-	, m_TicksSinceLastFireDamage(0)
-	, m_TicksLeftBurning(0)
-	, m_TicksSinceLastVoidDamage(0)
-	, m_IsSwimming(false)
-	, m_IsSubmerged(false)
-	, m_AirLevel(0)
-	, m_AirTickTimer(0)
-	, m_TicksAlive(0)
-	, m_HeadYaw(0.0)
-	, m_Rot(0.0, 0.0, 0.0)
-	, m_Pos(a_X, a_Y, a_Z)
-	, m_WaterSpeed(0, 0, 0)
-	, m_Mass (0.001)  // Default 1g
-	, m_Width(a_Width)
-	, m_Height(a_Height)
-	, m_InvulnerableTicks(0)
+cEntity::cEntity(CreateEntityInfo a_Info, eEntityType a_EntityType, double a_Width, double a_Height, int a_MaxHealth) :
+	m_UniqueID(0),
+	m_Health(a_Info.Health),
+	m_MaxHealth(a_MaxHealth),
+	m_AttachedTo(NULL),
+	m_Attachee(NULL),
+	m_bDirtyHead(true),
+	m_bDirtyOrientation(true),
+	m_bHasSentNoSpeed(true),
+	m_bOnGround(false),
+	m_Gravity(-9.81f),
+	m_LastPos(a_Info.Position),
+	m_IsInitialized(false),
+	m_WorldTravellingFrom(NULL),
+	m_EntityType(a_EntityType),
+	m_World(NULL),
+	m_IsFireproof(false),
+	m_TicksSinceLastBurnDamage(0),
+	m_TicksSinceLastLavaDamage(0),
+	m_TicksSinceLastFireDamage(0),
+	m_TicksLeftBurning(0),
+	m_TicksSinceLastVoidDamage(0),
+	m_IsSwimming(false),
+	m_IsSubmerged(false),
+	m_AirLevel(0),
+	m_AirTickTimer(0),
+	m_TicksAlive(0),
+	m_HeadYaw(0.0),
+	m_Rot(a_Info.Rotation),
+	m_Pos(a_Info.Position),
+	m_WaterSpeed(0, 0, 0),
+	m_Mass (0.001),  // Default 1g
+	m_Width(a_Width),
+	m_Height(a_Height),
+	m_InvulnerableTicks(0)
 {
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
@@ -1338,7 +1338,7 @@ bool cEntity::DetectPortal()
 					if (IsPlayer())
 					{
 						cPlayer * Player = (cPlayer *)this;
-						Player->TeleportToCoords(Player->GetLastBedPos().x, Player->GetLastBedPos().y, Player->GetLastBedPos().z);
+						SetPosition(Player->GetLastBedPos());
 						Player->GetClientHandle()->SendRespawn(dimOverworld);
 					}
 
@@ -1598,25 +1598,6 @@ void cEntity::StopBurning(void)
 
 
 
-void cEntity::TeleportToEntity(cEntity & a_Entity)
-{
-	TeleportToCoords(a_Entity.GetPosX(), a_Entity.GetPosY(), a_Entity.GetPosZ());
-}
-
-
-
-
-
-void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
-{
-	SetPosition(a_PosX, a_PosY, a_PosZ);
-	m_World->BroadcastTeleportEntity(*this);
-}
-
-
-
-
-
 void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 {
 	// Process packet sending every two ticks
@@ -1738,16 +1719,6 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 
 
-void cEntity::SetRot(const Vector3f & a_Rot)
-{
-	m_Rot = a_Rot;
-	m_bDirtyOrientation = true;
-}
-
-
-
-
-
 void cEntity::SetHeadYaw(double a_HeadYaw)
 {
 	m_HeadYaw = a_HeadYaw;
@@ -1826,6 +1797,7 @@ void cEntity::SetPosition(const Vector3d & a_Pos)
 {
 	m_Pos = a_Pos;
 }
+
 
 
 

@@ -13,7 +13,7 @@ class cMagmaCube :
 	
 public:
 	/// Creates a MagmaCube of the specified size; size is 1 .. 3, with 1 being the smallest
-	cMagmaCube(int a_Size);
+	cMagmaCube(CreateMonsterInfo a_Info, int a_Size);
 
 	CLASS_PROTODEF(cMagmaCube)
 

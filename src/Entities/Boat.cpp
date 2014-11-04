@@ -13,12 +13,10 @@
 
 
 
-cBoat::cBoat(double a_X, double a_Y, double a_Z) :
-	super(etBoat, a_X, a_Y, a_Z, 0.98, 0.7)
+cBoat::cBoat(CreateEntityInfo a_Info) :
+	super(etBoat, a_Info, 0.98, 0.7, 6)
 {
 	SetMass(20.f);
-	SetMaxHealth(6);
-	SetHealth(6);
 }
 
 

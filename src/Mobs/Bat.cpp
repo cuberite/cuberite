@@ -6,8 +6,8 @@
 #include "../Chunk.h"
 
 
-cBat::cBat(void) :
-	super("Bat", mtBat,  "mob.bat.hurt", "mob.bat.death", 0.5, 0.9)
+cBat::cBat(CreateMonsterInfo a_Info) :
+	super(a_Info, "Bat", mtBat,  "mob.bat.hurt", "mob.bat.death", 0.5, 0.9)
 {
 }
 

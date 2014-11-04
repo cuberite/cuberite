@@ -10,8 +10,8 @@
 
 
 
-cCow::cCow(void) :
-	super("Cow", mtCow, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
+cCow::cCow(CreateMonsterInfo a_Info) :
+	super(a_Info, "Cow", mtCow, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
 {
 }
 

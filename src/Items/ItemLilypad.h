@@ -96,7 +96,7 @@ public:
 				// A plugin doesn't agree with placing the block, revert the block on the client:
 				a_World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
 				a_Player->GetInventory().SendEquippedSlot();
-				return;
+				return false;
 			}
 
 			a_World->SetBlock(Callbacks.m_Pos.x, Callbacks.m_Pos.y, Callbacks.m_Pos.z, E_BLOCK_LILY_PAD, 0);

@@ -13,7 +13,7 @@ class cEnderman :
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cEnderman(void);
+	cEnderman(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cEnderman)
 

@@ -13,7 +13,7 @@ class cCow :
 	typedef cPassiveMonster super;
 	
 public:
-	cCow();
+	cCow(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cCow)
 

@@ -25,7 +25,7 @@ public:
 
 	CLASS_PROTODEF(cPickup)
 
-	cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX = 0.f, float a_SpeedY = 0.f, float a_SpeedZ = 0.f);
+	cPickup(CreateEntityInfo a_Info, const cItem & a_Item, bool IsPlayerCreated);
 
 	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
@@ -36,12 +36,6 @@ public:
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
-	/** Returns the number of ticks that this entity has existed */
-	int GetAge(void) const { return (int)(m_Timer / 50); }     // tolua_export
-
-	/** Set the number of ticks that this entity has existed */
-	void SetAge(int a_Age) { m_Timer = (float)(a_Age * 50); }  // tolua_export
-
 	/** Returns true if the pickup has already been collected */
 	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
 
@@ -50,8 +44,7 @@ public:
 
 private:
 
-	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
-	float m_Timer;
+	int m_DestroyTimer;
 
 	cItem m_Item;
 

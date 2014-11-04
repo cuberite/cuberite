@@ -18,7 +18,7 @@ public:
 
 	CLASS_PROTODEF(cItemFrame)
 
-	cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z);
+	cItemFrame(eBlockFace a_BlockFace, CreateEntityInfo a_Info);
 
 	/** Returns the item in the frame */
 	const cItem & GetItem(void) { return m_Item; }                  // tolua_export

@@ -8,8 +8,8 @@
 
 
 
-cGhast::cGhast(void) :
-	super("Ghast", mtGhast, "mob.ghast.scream", "mob.ghast.death", 4, 4)
+cGhast::cGhast(CreateMonsterInfo a_Info) :
+	super(a_Info, "Ghast", mtGhast, "mob.ghast.scream", "mob.ghast.death", 4, 4)
 {
 }
 

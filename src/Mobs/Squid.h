@@ -13,7 +13,7 @@ class cSquid :
 	typedef cPassiveMonster super;
 	
 public:
-	cSquid();
+	cSquid(CreateMonsterInfo a_Info);
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 

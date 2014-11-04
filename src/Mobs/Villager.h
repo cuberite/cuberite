@@ -25,7 +25,7 @@ public:
 		vtMax
 	} ;
 
-	cVillager(eVillagerType VillagerType);
+	cVillager(CreateMonsterInfo a_Info, eVillagerType VillagerType);
 
 	CLASS_PROTODEF(cVillager)
 

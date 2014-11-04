@@ -10,8 +10,8 @@
 
 
 
-cCreeper::cCreeper(void) :
-	super("Creeper", mtCreeper, "mob.creeper.say", "mob.creeper.say", 0.6, 1.8),
+cCreeper::cCreeper(CreateMonsterInfo a_Info) :
+	super(a_Info, "Creeper", mtCreeper, "mob.creeper.say", "mob.creeper.say", 0.6, 1.8),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),

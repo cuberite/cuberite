@@ -13,7 +13,7 @@ class cBlaze :
 	typedef cAggressiveMonster super;
 	
 public:
-	cBlaze(void);
+	cBlaze(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cBlaze)
 	

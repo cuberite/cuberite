@@ -84,18 +84,14 @@ protected:
 
 
 
-cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
-	super(etMinecart, a_X, a_Y, a_Z, 0.98, 0.7),
+cMinecart::cMinecart(ePayload a_Payload, CreateEntityInfo a_Info) :
+	super(a_Info, etMinecart, 0.98, 0.7, 6),
 	m_Payload(a_Payload),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
 	m_bIsOnDetectorRail(false)
 {
 	SetMass(20.f);
-	SetMaxHealth(6);
-	SetHealth(6);
-	SetWidth(1);
-	SetHeight(0.9);
 }
 
 
@@ -1059,8 +1055,8 @@ void cMinecart::Destroyed()
 ////////////////////////////////////////////////////////////////////////////////
 // cRideableMinecart:
 
-cRideableMinecart::cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height) :
-	super(mpNone, a_X, a_Y, a_Z),
+cRideableMinecart::cRideableMinecart(CreateEntityInfo a_Info, const cItem & a_Content, int a_Height) :
+	super(mpNone, a_Info),
 	m_Content(a_Content),
 	m_Height(a_Height)
 {
@@ -1104,8 +1100,8 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithChest:
 
-cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
-	super(mpChest, a_X, a_Y, a_Z),
+cMinecartWithChest::cMinecartWithChest(CreateEntityInfo a_Info) :
+	super(mpChest, a_Info),
 	cEntityWindowOwner(this),
 	m_Contents(ContentsWidth, ContentsHeight)
 {
@@ -1163,8 +1159,8 @@ void cMinecartWithChest::Destroyed()
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithFurnace:
 
-cMinecartWithFurnace::cMinecartWithFurnace(double a_X, double a_Y, double a_Z) :
-	super(mpFurnace, a_X, a_Y, a_Z),
+cMinecartWithFurnace::cMinecartWithFurnace(CreateEntityInfo a_Info) :
+	super(mpFurnace, a_Info),
 	m_FueledTimeLeft(-1),
 	m_IsFueled(false)
 {
@@ -1225,8 +1221,8 @@ void cMinecartWithFurnace::Tick(float a_Dt, cChunk & a_Chunk)
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithTNT:
 
-cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
-	super(mpTNT, a_X, a_Y, a_Z)
+cMinecartWithTNT::cMinecartWithTNT(CreateEntityInfo a_Info) :
+	super(mpTNT, a_Info)
 {
 }
 
@@ -1239,8 +1235,8 @@ cMinecartWithTNT::cMinecartWithTNT(double a_X, double a_Y, double a_Z) :
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecartWithHopper:
 
-cMinecartWithHopper::cMinecartWithHopper(double a_X, double a_Y, double a_Z) :
-	super(mpHopper, a_X, a_Y, a_Z)
+cMinecartWithHopper::cMinecartWithHopper(CreateEntityInfo a_Info) :
+	super(mpHopper, a_Info)
 {
 }
 

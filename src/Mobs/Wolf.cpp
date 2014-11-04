@@ -10,8 +10,8 @@
 
 
 
-cWolf::cWolf(void) :
-	super("Wolf", mtWolf, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
+cWolf::cWolf(CreateMonsterInfo a_Info) :
+	super(a_Info, "Wolf", mtWolf, "mob.wolf.hurt", "mob.wolf.death", 0.6, 0.8),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
@@ -232,7 +232,7 @@ void cWolf::TickFollowPlayer()
 		if (Distance > 30)
 		{
 			Callback.OwnerPos.y = FindFirstNonAirBlockPosition(Callback.OwnerPos.x, Callback.OwnerPos.z);
-			TeleportToCoords(Callback.OwnerPos.x, Callback.OwnerPos.y, Callback.OwnerPos.z);
+			SetPosition(Callback.OwnerPos);
 		}
 		else
 		{

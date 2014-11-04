@@ -13,8 +13,8 @@
 
 
 
-cMooshroom::cMooshroom(void) :
-	super("Mooshroom", mtMooshroom, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
+cMooshroom::cMooshroom(CreateMonsterInfo a_Info) :
+	super(a_Info, "Mooshroom", mtMooshroom, "mob.cow.hurt", "mob.cow.hurt", 0.9, 1.3)
 {
 }
 

@@ -12,7 +12,7 @@ class cZombiePigman :
 	typedef cPassiveAggressiveMonster super;
 	
 public:
-	cZombiePigman(void);
+	cZombiePigman(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cZombiePigman)
 

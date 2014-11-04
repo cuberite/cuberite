@@ -71,7 +71,7 @@ cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 {
 	// Read params from the ini file:
 	m_BurnStepTimeFuel    = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500);
-	m_BurnStepTimeNonfuel = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100);
+	m_BurnStepTimeNonFuel = a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100);
 	m_Flammability        = a_IniFile.GetValueSetI("FireSimulator", "Flammability",          50);
 	m_ReplaceFuelChance   = a_IniFile.GetValueSetI("FireSimulator", "ReplaceFuelChance",  50000);
 }
@@ -98,7 +98,9 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 		int x = itr->x;
 		int y = itr->y;
 		int z = itr->z;
-		BLOCKTYPE BlockType = a_Chunk->GetBlock(x, y, z);
+		BLOCKTYPE BlockType;
+		NIBBLETYPE BlockMeta;
+		a_Chunk->GetBlockTypeMeta(x, y, z, BlockType, BlockMeta);
 
 		if (!IsAllowedBlock(BlockType))
 		{
@@ -112,6 +114,16 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 
 		// Try to spread the fire:
 		TrySpreadFire(a_Chunk, itr->x, itr->y, itr->z);
+
+		BLOCKTYPE BlockBelow = E_BLOCK_AIR;
+		if (y > 0)
+		{
+			BlockBelow = a_Chunk->GetBlock(x, y - 1, z);
+			if (DoesBurnForever(BlockBelow))
+			{
+				continue;
+			}
+		}
 
 		itr->Data -= NumMSecs;
 		if (itr->Data >= 0)
@@ -127,7 +139,6 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
 		);
 		*/
-		NIBBLETYPE BlockMeta = a_Chunk->GetMeta(x, y, z);
 		if (BlockMeta == 0x0f)
 		{
 			// The fire burnt out completely
@@ -140,11 +151,26 @@ void cFireSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChun
 			continue;
 		}
 
-		if ((itr->y > 0) && (!DoesBurnForever(a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z))))
+		int NextCheck = GetBurnStepTime(a_Chunk, BlockBelow, x, y, z);
+		if (NextCheck == 0)
 		{
-			a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
+			/*
+			A return value of zero means the fire block can't exist here
+			The fire block's CanBeAt() doesn't check for this because fire can exist depending on its surroundings,
+			and since we're checking that here, we might as well amalgamate all checks
+			*/
+			FLOG("FS: Removing block {%d, %d, %d}",
+				itr->x + a_ChunkX * cChunkDef::Width, itr->y, itr->z + a_ChunkZ * cChunkDef::Width
+				);
+			a_Chunk->SetBlock(itr->x, itr->y, itr->z, E_BLOCK_AIR, 0);
+			itr = Data.erase(itr);
+			continue;
 		}
-		itr->Data = GetBurnStepTime(a_Chunk, itr->x, itr->y, itr->z);  // TODO: Add some randomness into this
+
+		a_Chunk->SetMeta(x, y, z, BlockMeta + 1);
+		x = x + a_Chunk->GetPosX() * cChunkDef::Width;
+		z = z + a_Chunk->GetPosZ() * cChunkDef::Width;
+		itr->Data = (NextCheck / ((m_World.IsWeatherWetAt(x, z) && (a_Chunk->GetHeight(x, z) == y)) ? 10 : 1)) + (m_World.GetTickRandomNumber(40) - 20);
 	}  // for itr - Data[]
 }
 
@@ -252,22 +278,11 @@ void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk *
 
 
 
-int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
+int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, BLOCKTYPE a_BlockBelow, int a_RelX, int a_RelY, int a_RelZ)
 {
-	bool IsBlockBelowSolid = false;
-	if (a_RelY > 0)
+	if (IsFuel(a_BlockBelow))
 	{
-		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-		if (DoesBurnForever(BlockBelow))
-		{
-			// Is burning atop of netherrack, burn forever (re-check in 10 sec)
-			return 10000;
-		}
-		if (IsFuel(BlockBelow))
-		{
-			return m_BurnStepTimeFuel;
-		}
-		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
+		return m_BurnStepTimeFuel;
 	}
 	
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
@@ -283,15 +298,14 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, in
 		}
 	}  // for i - gCrossCoords[]
 
-	if (!IsBlockBelowSolid && (a_RelY >= 0))
+	if (!cBlockInfo::IsSolid(a_BlockBelow))
 	{
 		// Checked through everything, nothing was flammable
 		// If block below isn't solid, we can't have fire, it would be a non-fueled fire
-		// SetBlock just to make sure fire doesn't spawn
-		a_Chunk->SetBlock(a_RelX, a_RelY, a_RelZ, E_BLOCK_AIR, 0);
+		// Return zero to tell our caller to kill us
 		return 0;
 	}
-	return m_BurnStepTimeNonfuel;
+	return m_BurnStepTimeNonFuel;
 }
 
 

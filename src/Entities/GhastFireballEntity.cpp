@@ -7,10 +7,9 @@
 
 
 
-cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, double a_X, double a_Y, double a_Z, const Vector3d & a_Speed) :
-	super(pkGhastFireball, a_Creator, a_X, a_Y, a_Z, 1, 1)
+cGhastFireballEntity::cGhastFireballEntity(CreateEntityInfo a_Info, cEntity * a_Creator) :
+	super(a_Info, pkGhastFireball, a_Creator, 1, 1)
 {
-	SetSpeed(a_Speed);
 	SetGravity(0);
 }
 

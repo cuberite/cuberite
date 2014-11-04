@@ -18,7 +18,7 @@ public:
 	Use E_META_WOOL_* constants for the wool color.
 	If you type -1, the server will generate a random color
 	with the GenerateNaturalRandomColor() function. */
-	cSheep(int a_Color = -1);
+	cSheep(CreateMonsterInfo a_Info, int a_Color = -1);
 
 	CLASS_PROTODEF(cSheep)
 

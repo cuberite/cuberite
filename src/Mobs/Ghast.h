@@ -13,7 +13,7 @@ class cGhast :
 	typedef cAggressiveMonster super;
 	
 public:
-	cGhast(void);
+	cGhast(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cGhast)
 

@@ -51,7 +51,7 @@ protected:
 	Vector3i m_DetectorRailPosition;
 	bool m_bIsOnDetectorRail;
 	
-	cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z);
+	cMinecart(ePayload a_Payload, CreateEntityInfo a_Info);
 
 	/** Handles physics on normal rails
 		For each tick, slow down on flat rails, speed up or slow down on ascending/descending rails (depending on direction), and turn on curved rails
@@ -93,7 +93,7 @@ class cRideableMinecart :
 public:
 	CLASS_PROTODEF(cRideableMinecart)
 	
-	cRideableMinecart(double a_X, double a_Y, double a_Z, const cItem & a_Content, int a_Height);
+	cRideableMinecart(CreateEntityInfo a_Info, const cItem & a_Content, int a_Height);
 
 	const cItem & GetContent(void) const {return m_Content;}
 	int GetBlockHeight(void) const {return m_Height;}
@@ -119,7 +119,7 @@ class cMinecartWithChest :
 public:
 	CLASS_PROTODEF(cMinecartWithChest)
 	
-	cMinecartWithChest(double a_X, double a_Y, double a_Z);
+	cMinecartWithChest(CreateEntityInfo a_Info);
 
 	enum
 	{
@@ -167,7 +167,7 @@ class cMinecartWithFurnace :
 public:
 	CLASS_PROTODEF(cMinecartWithFurnace)
 	
-	cMinecartWithFurnace(double a_X, double a_Y, double a_Z);
+	cMinecartWithFurnace(CreateEntityInfo a_Info);
 	
 	// cEntity overrides:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
@@ -199,7 +199,7 @@ class cMinecartWithTNT :
 public:
 	CLASS_PROTODEF(cMinecartWithTNT)
 	
-	cMinecartWithTNT(double a_X, double a_Y, double a_Z);
+	cMinecartWithTNT(CreateEntityInfo a_Info);
 } ;
 
 
@@ -214,5 +214,5 @@ class cMinecartWithHopper :
 public:
 	CLASS_PROTODEF(cMinecartWithHopper)
 	
-	cMinecartWithHopper(double a_X, double a_Y, double a_Z);
+	cMinecartWithHopper(CreateEntityInfo a_Info);
 } ;

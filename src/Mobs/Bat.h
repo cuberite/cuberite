@@ -13,7 +13,7 @@ class cBat :
 	typedef cPassiveMonster super;
 	
 public:
-	cBat(void);
+	cBat(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cBat)
 	

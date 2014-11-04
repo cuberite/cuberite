@@ -35,7 +35,7 @@ protected:
 	unsigned m_BurnStepTimeFuel;
 
 	/// Time (in msec) that a fire block takes to burn without a fuel block into the next step
-	unsigned m_BurnStepTimeNonfuel;
+	unsigned m_BurnStepTimeNonFuel;
 
 	/// Chance [0..100000] of an adjacent fuel to catch fire on each tick
 	int m_Flammability;
@@ -47,7 +47,7 @@ protected:
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 	
 	/// Returns the time [msec] after which the specified fire block is stepped again; based on surrounding fuels
-	int GetBurnStepTime(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);
+	int GetBurnStepTime(cChunk * a_Chunk, BLOCKTYPE BlockBelow, int a_RelX, int a_RelY, int a_RelZ);
 	
 	/// Tries to spread fire to a neighborhood of the specified block
 	void TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ);

@@ -14,7 +14,7 @@ class cAggressiveMonster :
 	
 public:
 
-	cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
+	cAggressiveMonster(CreateMonsterInfo a_Info, const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
 
 	virtual void Tick          (float a_Dt, cChunk & a_Chunk) override;
 	virtual void InStateChasing(float a_Dt) override;

@@ -9,8 +9,9 @@
 
 
 
-cSlime::cSlime(int a_Size) :
-	super("Slime",
+cSlime::cSlime(CreateMonsterInfo a_Info, int a_Size) :
+	super(a_Info,
+		"Slime",
 		mtSlime,
 		Printf("mob.slime.%s", GetSizeName(a_Size).c_str()),
 		Printf("mob.slime.%s", GetSizeName(a_Size).c_str()),

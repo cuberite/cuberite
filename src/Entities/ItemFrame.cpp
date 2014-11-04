@@ -9,8 +9,8 @@
 
 
 
-cItemFrame::cItemFrame(eBlockFace a_BlockFace, double a_X, double a_Y, double a_Z)
-	: cHangingEntity(etItemFrame, a_BlockFace, a_X, a_Y, a_Z)
+cItemFrame::cItemFrame(eBlockFace a_BlockFace, CreateEntityInfo a_Info)
+	: cHangingEntity(etItemFrame, a_BlockFace, a_Info)
 	, m_Item(E_BLOCK_AIR)
 	, m_Rotation(0)
 {

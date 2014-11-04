@@ -12,7 +12,7 @@ class cZombie :
 	typedef cAggressiveMonster super;
 	
 public:
-	cZombie(bool a_IsVillagerZombie);
+	cZombie(CreateMonsterInfo a_Info, bool a_IsVillagerZombie);
 
 	CLASS_PROTODEF(cZombie)
 	

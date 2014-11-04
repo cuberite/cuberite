@@ -10,10 +10,9 @@
 
 
 
-cEnderCrystal::cEnderCrystal(double a_X, double a_Y, double a_Z)
-	: cEntity(etEnderCrystal, a_X, a_Y, a_Z, 1.0, 1.0)
+cEnderCrystal::cEnderCrystal(CreateEntityInfo a_Info)
+	: cEntity(etEnderCrystal, a_Info, 1.0, 1.0, 5)
 {
-	SetMaxHealth(5);
 }
 
 

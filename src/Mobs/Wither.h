@@ -13,7 +13,7 @@ class cWither :
 	typedef cAggressiveMonster super;
 	
 public:
-	cWither(void);
+	cWither(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cWither)
 

@@ -8,18 +8,8 @@
 
 
 
-cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks) :
-	super(etTNT, a_X, a_Y, a_Z, 0.98, 0.98),
-	m_FuseTicks(a_FuseTicks)
-{
-}
-
-
-
-
-
-cTNTEntity::cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks) :
-	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
+cTNTEntity::cTNTEntity(CreateEntityInfo a_Info, int a_FuseTicks) :
+	super(etTNT, a_Info, 0.98, 0.98, 1),
 	m_FuseTicks(a_FuseTicks)
 {
 }

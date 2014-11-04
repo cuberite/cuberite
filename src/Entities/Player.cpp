@@ -226,14 +226,16 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 	bool CanMove = true;
 	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
-	{
-		// Apply food exhaustion from movement:
-		ApplyFoodExhaustionFromMovement();
-		
+	{		
 		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
 		{
 			CanMove = false;
-			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
+			SetPosition(m_LastPos, true);
+		}
+		else
+		{
+			// Apply food exhaustion from movement:
+			ApplyFoodExhaustionFromMovement();
 		}
 		m_ClientHandle->StreamChunks();
 	}
@@ -1007,17 +1009,16 @@ void cPlayer::Respawn(void)
 	m_FoodSaturationLevel = 5.0;
 	m_FoodExhaustionLevel = 0.0;
 
-	// Reset Experience
+	// Reset experience
 	m_CurrentXp = 0;
 	m_LifetimeTotalXp = 0;
-	// ToDo: send score to client? How?
 
 	m_ClientHandle->SendRespawn(GetWorld()->GetDimension(), true);
 	
 	// Extinguish the fire:
 	StopBurning();
 
-	TeleportToCoords(GetLastBedPos().x, GetLastBedPos().y, GetLastBedPos().z);
+	SetPosition(GetLastBedPos(), true);
 
 	SetVisible(true);
 }
@@ -1269,21 +1270,6 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 
 
-void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
-{
-	cEntity::SetPosition(a_PosX, a_PosY, a_PosZ);
-	m_LastGroundHeight = (float)a_PosY;
-	m_LastJumpHeight = (float)a_PosY;
-	m_bIsTeleporting = true;
-
-	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
-	m_ClientHandle->SendPlayerMoveLook();
-}
-
-
-
-
-
 void cPlayer::SendRotation(double a_YawDegrees, double a_PitchDegrees)
 {
 	SetYaw(a_YawDegrees);
@@ -1349,31 +1335,47 @@ void cPlayer::AddSpeed(const Vector3d & a_Speed)
 
 
 
-void cPlayer::SetPosition(const Vector3d & a_Position)
+void cPlayer::SetPosition(const Vector3d & a_Position, bool a_Teleport)
 {
 	super::SetPosition(a_Position);
 
-	// Teleport the client
-	TeleportToCoords(a_Position.x, a_Position.y, a_Position.z);
+	if (a_Teleport)
+	{
+		// Teleport the client
+		m_LastGroundHeight = (float)a_Position.y;
+		m_LastJumpHeight = (float)a_Position.y;
+		m_bIsTeleporting = true;
+
+		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
+		m_ClientHandle->SendPlayerMoveLook();
+	}
 }
 
 
 
 
 
-void cPlayer::AddPosition(const Vector3d & a_Position)
+void cPlayer::AddPosition(const Vector3d & a_Position, bool a_Teleport)
 {
 	super::AddPosition(a_Position);
 
-	// Teleport the client
-	TeleportToCoords(GetPosX(), GetPosY(), GetPosZ());
+	if (a_Teleport)
+	{
+		// Teleport the client
+		m_LastGroundHeight = (float)a_Position.y;
+		m_LastJumpHeight = (float)a_Position.y;
+		m_bIsTeleporting = true;
+
+		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
+		m_ClientHandle->SendPlayerMoveLook();
+	}
 }
 
 
 
 
 
-void cPlayer::MoveTo( const Vector3d & a_NewPos)
+void cPlayer::MoveTo(const Vector3d & a_NewPos)
 {
 	if ((a_NewPos.y < -990) && (GetPosY() > -100))
 	{
@@ -1396,7 +1398,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos)
 	Vector3d DeltaPos = a_NewPos - GetPosition();
 	UpdateMovementStats(DeltaPos);
 	
-	SetPosition( a_NewPos);
+	SetPosition(a_NewPos, false);
 	SetStance(a_NewPos.y + 1.62);
 }
 
@@ -2206,7 +2208,7 @@ void cPlayer::Detach()
 			{
 				if (!cBlockInfo::IsSolid(m_World->GetBlock(x, y, z)) && cBlockInfo::IsSolid(m_World->GetBlock(x, y - 1, z)))
 				{
-					TeleportToCoords(x, y, z);
+					cEntity::SetPosition(x, y, z);
 					return;
 				}
 			}

@@ -13,7 +13,7 @@ class cSnowGolem :
 	typedef cAggressiveMonster super;
 	
 public:
-	cSnowGolem(void);
+	cSnowGolem(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cSnowGolem)
 	

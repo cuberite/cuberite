@@ -13,7 +13,7 @@ class cPig :
 	typedef cPassiveMonster super;
 	
 public:
-	cPig(void);
+	cPig(CreateMonsterInfo a_Info);
 
 	CLASS_PROTODEF(cPig)
 

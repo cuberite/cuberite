@@ -11,8 +11,8 @@
 
 
 
-cVillager::cVillager(eVillagerType VillagerType) :
-	super("Villager", mtVillager, "", "", 0.6, 1.8),
+cVillager::cVillager(CreateMonsterInfo a_Info, eVillagerType VillagerType) :
+	super(a_Info, "Villager", mtVillager, "", "", 0.6, 1.8),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_VillagerAction(false)

@@ -25,12 +25,7 @@ public:
 	
 	CLASS_PROTODEF(cSplashPotionEntity)
 	
-	cSplashPotionEntity(
-		cEntity * a_Creator,
-		double a_X, double a_Y, double a_Z,
-		const Vector3d & a_Speed,
-		const cItem & a_Item
-	);
+	cSplashPotionEntity(CreateEntityInfo a_Info, cEntity * a_Creator, const cItem & a_Item);
 	
 	cEntityEffect::eType GetEntityEffectType(void) const { return m_EntityEffectType; }
 	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }

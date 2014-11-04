@@ -23,7 +23,7 @@ public:
 	CLASS_PROTODEF(cFallingBlock)
 
 	/// Creates a new falling block. a_BlockPosition is expected in world coords
-	cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	cFallingBlock(CreateEntityInfo a_Info, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	BLOCKTYPE  GetBlockType(void) const { return m_BlockType; }
 	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
@@ -35,7 +35,6 @@ public:
 private:
 	BLOCKTYPE  m_BlockType;
 	NIBBLETYPE m_BlockMeta;
-	Vector3i   m_OriginalPosition;  // Position where the falling block has started, in world coords
 } ;
 
 
