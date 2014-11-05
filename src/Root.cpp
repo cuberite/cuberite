@@ -633,11 +633,11 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 
 
 
-bool cRoot::FindAndDoWithUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
 {    
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end();itr++)
 	{
-		if (itr->second->FindAndDoWithUUID(a_PlayerUUID, a_Callback))
+		if (itr->second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
 		{
 			return true;
 		}
