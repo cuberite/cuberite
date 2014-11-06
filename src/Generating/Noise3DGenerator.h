@@ -96,9 +96,11 @@ protected:
 	
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
 
