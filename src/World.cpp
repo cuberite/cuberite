@@ -2736,7 +2736,7 @@ bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallbac
 	{
 		if ((*itr)->GetUUID() == a_PlayerUUID)
 		{
-			return a_Callback.Item (*itr);
+			return a_Callback.Item(*itr);
 		}
 	}
 	return false;
