@@ -83,7 +83,7 @@ inline static NOISE_DATATYPE ClampedLerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a
 	{
 		return a_Val2;
 	}
-	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
+	return Lerp(a_Val1, a_Val2, a_Ratio);
 }
 
 
