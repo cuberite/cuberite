@@ -61,6 +61,35 @@ public:
 
 
 
+/** Linearly interpolates between two values.
+Assumes that a_Ratio is in range [0, 1]. */
+inline static NOISE_DATATYPE Lerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
+{
+	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
+}
+
+
+
+
+
+/** Linearly interpolates between two values, clamping the ratio to [0, 1] first. */
+inline static NOISE_DATATYPE ClampedLerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
+{
+	if (a_Ratio < 0)
+	{
+		return a_Val1;
+	}
+	if (a_Ratio > 1)
+	{
+		return a_Val2;
+	}
+	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cNoise3DGenerator:
 
@@ -346,9 +375,10 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 // cNoise3DComposable:
 
 cNoise3DComposable::cNoise3DComposable(int a_Seed) :
-	m_Noise1(a_Seed + 1000),
-	m_Noise2(a_Seed + 2000),
-	m_Noise3(a_Seed + 3000)
+	m_ChoiceNoise(a_Seed),
+	m_DensityNoiseA(a_Seed + 1),
+	m_DensityNoiseB(a_Seed + 2),
+	m_BaseNoise(a_Seed + 3)
 {
 }
 
@@ -359,13 +389,51 @@ cNoise3DComposable::cNoise3DComposable(int a_Seed) :
 void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
+	// The defaults generate extreme hills terrain
 	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
-	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);
+	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0.045);
 	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 75);
-	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 10);
-	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 10);
-	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 10);
-	m_AirThreshold        = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DAirThreshold", 0.5);
+	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 40);
+	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 40);
+	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 40);
+	m_BaseFrequencyX      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DBaseFrequencyX", 40);
+	m_BaseFrequencyZ      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DBaseFrequencyZ", 40);
+	m_ChoiceFrequencyX    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DChoiceFrequencyX", 40);
+	m_ChoiceFrequencyY    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DChoiceFrequencyY", 80);
+	m_ChoiceFrequencyZ    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DChoiceFrequencyZ", 40);
+	m_AirThreshold        = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DAirThreshold", 0);
+	int NumChoiceOctaves  = a_IniFile.GetValueSetI("Generator", "Noise3DNumChoiceOctaves",  4);
+	int NumDensityOctaves = a_IniFile.GetValueSetI("Generator", "Noise3DNumDensityOctaves", 6);
+	int NumBaseOctaves    = a_IniFile.GetValueSetI("Generator", "Noise3DNumBaseOctaves",    6);
+	NOISE_DATATYPE BaseNoiseAmplitude = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DBaseAmplitude", 1);
+
+	// Add octaves for the choice noise:
+	NOISE_DATATYPE wavlen = 1, ampl = 0.5;
+	for (int i = 0; i < NumChoiceOctaves; i++)
+	{
+		m_ChoiceNoise.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+
+	// Add octaves for the density noises:
+	wavlen = 1, ampl = 1;
+	for (int i = 0; i < NumDensityOctaves; i++)
+	{
+		m_DensityNoiseA.AddOctave(wavlen, ampl);
+		m_DensityNoiseB.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+
+	// Add octaves for the base noise:
+	wavlen = 1, ampl = BaseNoiseAmplitude;
+	for (int i = 0; i < NumBaseOctaves; i++)
+	{
+		m_BaseNoise.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
 }
 
 
@@ -382,77 +450,44 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	m_LastChunkX = a_ChunkX;
 	m_LastChunkZ = a_ChunkZ;
 
-	// Upscaling parameters:
-	const int UPSCALE_X = 8;
-	const int UPSCALE_Y = 4;
-	const int UPSCALE_Z = 8;
+	// Generate all the noises:
+	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
+	NOISE_DATATYPE Workspace[5 * 5 * 33];
+	NOISE_DATATYPE DensityNoiseA[5 * 5 * 33];
+	NOISE_DATATYPE DensityNoiseB[5 * 5 * 33];
+	NOISE_DATATYPE BaseNoise[5 * 5];
+	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
+	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
+	// Note that we have to swap the coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "z":
+	m_ChoiceNoise.Generate3D  (ChoiceNoise,   5, 5, 33, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, 0, 257 / m_ChoiceFrequencyY, Workspace);
+	m_DensityNoiseA.Generate3D(DensityNoiseA, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	m_DensityNoiseB.Generate3D(DensityNoiseB, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
 
-	// Precalculate a "height" array:
-	NOISE_DATATYPE Height[17 * 17];  // x + 17 * z
-	for (int z = 0; z < 17; z += UPSCALE_Z)
+	// Calculate the final noise based on the partial noises:
+	for (int y = 0; y < 33; y++)
 	{
-		NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
-		for (int x = 0; x < 17; x += UPSCALE_X)
+		NOISE_DATATYPE AddHeight = (static_cast<NOISE_DATATYPE>(y * 8) - m_MidPoint) * m_HeightAmplification;
+
+		// If "underground", make the terrain smoother by forcing the vertical linear gradient into steeper slope:
+		if (AddHeight < 0)
 		{
-			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-			NOISE_DATATYPE val = std::abs(m_Noise1.CubicNoise2D(NoiseX / 5, NoiseZ / 5)) * m_HeightAmplification + 1;
-			Height[x + 17 * z] = val * val * val;
+			AddHeight *= 4;
 		}
-	}
 
-	for (int y = 0; y < 257; y += UPSCALE_Y)
-	{
-		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / m_FrequencyY;
-		NOISE_DATATYPE AddHeight = (y - m_MidPoint) / 20;
-		AddHeight *= AddHeight * AddHeight;
-		NOISE_DATATYPE * CurFloor = &(m_NoiseArray[y * 17 * 17]);
-		for (int z = 0; z < 17; z += UPSCALE_Z)
+		for (int z = 0; z < 5; z++)
 		{
-			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
-			for (int x = 0; x < 17; x += UPSCALE_X)
+			for (int x = 0; x < 5; x++)
 			{
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-				CurFloor[x + 17 * z] = (
-					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
-					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
-					m_Noise3.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2 +
-					AddHeight / Height[x + 17 * z]
-				);
+				int idx = x + 5 * z + 5 * 5 * y;
+				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + BaseNoise[x + 5 * z];
 			}
 		}
-		// Linear-interpolate this XZ floor:
-		LinearUpscale2DArrayInPlace<17, 17, UPSCALE_X, UPSCALE_Z>(CurFloor);
 	}
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 5, 5, 33, m_NoiseArray, 4, 4, 8);
 
-	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
-	for (int y = 1; y < cChunkDef::Height; y++)
-	{
-		if ((y % UPSCALE_Y) == 0)
-		{
-			// This is the interpolation source floor, already calculated
-			continue;
-		}
-		int LoFloorY = (y / UPSCALE_Y) * UPSCALE_Y;
-		int HiFloorY = LoFloorY + UPSCALE_Y;
-		NOISE_DATATYPE * LoFloor  = &(m_NoiseArray[LoFloorY * 17 * 17]);
-		NOISE_DATATYPE * HiFloor  = &(m_NoiseArray[HiFloorY * 17 * 17]);
-		NOISE_DATATYPE * CurFloor = &(m_NoiseArray[y * 17 * 17]);
-		NOISE_DATATYPE Ratio = ((NOISE_DATATYPE)(y % UPSCALE_Y)) / UPSCALE_Y;
-		int idx = 0;
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (int x = 0; x < cChunkDef::Width; x++)
-			{
-				CurFloor[idx] = LoFloor[idx] + (HiFloor[idx] - LoFloor[idx]) * Ratio;
-				idx += 1;
-			}
-			idx += 1;  // Skipping one X column
-		}
-	}
-
-	// The noise array is now fully interpolated
-	/*
-	// DEBUG: Output two images of the array, sliced by XY and XZ:
+	#if 0
+	// DEBUG: Output two images of m_NoiseArray, sliced by XY and XZ, into grayscale files, to be inspected by Grabber:
 	cFile f1;
 	if (f1.Open(Printf("Chunk_%d_%d_XY.raw", a_ChunkX, a_ChunkZ), cFile::fmWrite))
 	{
@@ -464,7 +499,7 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 				unsigned char buf[16];
 				for (int x = 0; x < cChunkDef::Width; x++)
 				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * m_Noise[idx++]))));
+					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 32 * m_NoiseArray[idx++]))));
 				}
 				f1.Write(buf, 16);
 			}  // for y
@@ -482,13 +517,13 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 				unsigned char buf[16];
 				for (int x = 0; x < cChunkDef::Width; x++)
 				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * m_Noise[idx++]))));
+					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 32 * m_NoiseArray[idx++]))));
 				}
 				f2.Write(buf, 16);
 			}  // for z
 		}  // for y
 	}  // if (XZ file open)
-	*/
+	#endif
 }
 
 

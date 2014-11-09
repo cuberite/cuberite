@@ -1,7 +1,11 @@
 
 // Noise3DGenerator.h
 
-// Generates terrain using 3D noise, rather than composing. Is a test.
+// Declares cNoise3DGenerator and cNoise3DComposable classes, representing 3D-noise-based generators.
+// They generate terrain shape by combining a lerp of two 3D noises with a vertical linear gradient
+// cNoise3DGenerator is obsolete and unmaintained.
+// cNoise3DComposable is used to test parameter combinations for single-biome worlds.
+
 
 
 
@@ -74,24 +78,52 @@ public:
 	void Initialize(cIniFile & a_IniFile);
 
 protected:
-	cNoise m_Noise1;
-	cNoise m_Noise2;
-	cNoise m_Noise3;
+	/** The noise that is used to choose between density noise A and B. */
+	cPerlinNoise m_ChoiceNoise;
+
+	/** Density 3D noise, variant A. */
+	cPerlinNoise m_DensityNoiseA;
+
+	/** Density 3D noise, variant B. */
+	cPerlinNoise m_DensityNoiseB;
+
+	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
+	cPerlinNoise m_BaseNoise;
 	
-	int            m_SeaLevel;
+	/** Block height of the sealevel, used for composing the terrain. */
+	int m_SeaLevel;
+
+	/** The main parameter of the generator, specifies the slope of the vertical linear gradient.
+	A higher value means a steeper slope and a smaller total amplitude of the generated terrain. */
 	NOISE_DATATYPE m_HeightAmplification;
-	NOISE_DATATYPE m_MidPoint;  // Where the vertical "center" of the noise should be
+
+	/** Where the vertical "center" of the noise should be, as block height. */
+	NOISE_DATATYPE m_MidPoint;
+
+	// Frequency of the 3D noise's first octave:
 	NOISE_DATATYPE m_FrequencyX;
 	NOISE_DATATYPE m_FrequencyY;
 	NOISE_DATATYPE m_FrequencyZ;
+
+	// Frequency of the base terrain noise:
+	NOISE_DATATYPE m_BaseFrequencyX;
+	NOISE_DATATYPE m_BaseFrequencyZ;
+
+	// Frequency of the choice noise:
+	NOISE_DATATYPE m_ChoiceFrequencyX;
+	NOISE_DATATYPE m_ChoiceFrequencyY;
+	NOISE_DATATYPE m_ChoiceFrequencyZ;
+
+	// Threshold for when the values are considered air:
 	NOISE_DATATYPE m_AirThreshold;
 	
+	// Cache for the last calculated chunk (reused between heightmap and composition queries):
 	int m_LastChunkX;
 	int m_LastChunkZ;
 	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
 	
 	
-	/// Generates the 3D noise array used for terrain generation, unless the LastChunk coords are equal to coords given
+	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
 	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
 	
 	// cTerrainHeightGen overrides:
