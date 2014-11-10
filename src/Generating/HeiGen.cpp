@@ -776,6 +776,10 @@ cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cB
 	{
 		res = new cHeiGenMountains(a_Seed);
 	}
+	else if (NoCaseCompare(HeightGenName, "BiomalNoise3D") == 0)
+	{
+		res = new cBiomalNoise3DComposable(a_Seed, a_BiomeGen);
+	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
 		res = new cNoise3DComposable(a_Seed);

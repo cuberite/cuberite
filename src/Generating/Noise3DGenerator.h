@@ -138,3 +138,89 @@ protected:
 
 
 
+
+class cBiomalNoise3DComposable :
+	public cTerrainHeightGen,
+	public cTerrainCompositionGen
+{
+public:
+	cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_BiomeGen);
+
+	void Initialize(cIniFile & a_IniFile);
+
+protected:
+	/** Number of columns around the pixel to query for biomes for averaging. */
+	static const int AVERAGING_SIZE = 5;
+
+	/** Type used for a single parameter across the entire (downscaled) chunk. */
+	typedef NOISE_DATATYPE ChunkParam[5 * 5];
+
+
+	/** The noise that is used to choose between density noise A and B. */
+	cPerlinNoise m_ChoiceNoise;
+
+	/** Density 3D noise, variant A. */
+	cPerlinNoise m_DensityNoiseA;
+
+	/** Density 3D noise, variant B. */
+	cPerlinNoise m_DensityNoiseB;
+
+	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
+	cPerlinNoise m_BaseNoise;
+
+	/** The underlying biome generator. */
+	cBiomeGenPtr m_BiomeGen;
+	
+	/** Block height of the sealevel, used for composing the terrain. */
+	int m_SeaLevel;
+
+	// Frequency of the 3D noise's first octave:
+	NOISE_DATATYPE m_FrequencyX;
+	NOISE_DATATYPE m_FrequencyY;
+	NOISE_DATATYPE m_FrequencyZ;
+
+	// Frequency of the base terrain noise:
+	NOISE_DATATYPE m_BaseFrequencyX;
+	NOISE_DATATYPE m_BaseFrequencyZ;
+
+	// Frequency of the choice noise:
+	NOISE_DATATYPE m_ChoiceFrequencyX;
+	NOISE_DATATYPE m_ChoiceFrequencyY;
+	NOISE_DATATYPE m_ChoiceFrequencyZ;
+
+	// Threshold for when the values are considered air:
+	NOISE_DATATYPE m_AirThreshold;
+	
+	// Cache for the last calculated chunk (reused between heightmap and composition queries):
+	int m_LastChunkX;
+	int m_LastChunkZ;
+	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
+
+	/** Weights for summing up neighboring biomes. */
+	NOISE_DATATYPE m_Weight[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];
+
+	/** The sum of m_Weight[]. */
+	NOISE_DATATYPE m_WeightSum;
+	
+	
+	/** Generates the 3D noise array used for terrain generation (m_NoiseArray), unless the LastChunk coords are equal to coords given */
+	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
+
+	/** Calculates the biome-related parameters for the chunk. */
+	void CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint);
+
+	/** Returns the parameters for the specified biome. */
+	void GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE & a_HeightAmp, NOISE_DATATYPE & a_MidPoint);
+	
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
+
+	// cTerrainCompositionGen overrides:
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void InitializeCompoGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
+} ;
+
+
+
+
