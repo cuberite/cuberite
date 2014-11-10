@@ -199,6 +199,11 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			
 			// Get the top block + 1. This is the place where the grass would finaly be placed:
 			int y = a_ChunkDesc.GetHeight(x, z) + 1;
+			
+			if (y >= 255)
+			{
+				continue;
+			}
 
 			// Check if long grass can be placed:
 			if (
