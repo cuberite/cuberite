@@ -10,6 +10,7 @@ SET (SRCS
 	ChunkDesc.cpp
 	ChunkGenerator.cpp
 	CompoGen.cpp
+	CompoGenBiomal.cpp
 	ComposableGenerator.cpp
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
@@ -39,6 +40,7 @@ SET (HDRS
 	ChunkDesc.h
 	ChunkGenerator.h
 	CompoGen.h
+	CompoGenBiomal.h
 	ComposableGenerator.h
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
@@ -58,6 +60,7 @@ SET (HDRS
 	RainbowRoadsGen.h
 	Ravines.h
 	RoughRavines.h
+	ShapeGen.cpp
 	StructGen.h
 	TestRailsGen.h
 	Trees.h

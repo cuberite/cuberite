@@ -15,7 +15,6 @@
 
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenFlat:
 
@@ -127,15 +126,6 @@ void cHeiGenCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap
 	memcpy(m_CacheData[Idx].m_HeightMap, a_HeightMap, sizeof(a_HeightMap));
 	m_CacheData[Idx].m_ChunkX = a_ChunkX;
 	m_CacheData[Idx].m_ChunkZ = a_ChunkZ;
-}
-
-
-
-
-
-void cHeiGenCache::InitializeHeightGen(cIniFile & a_IniFile)
-{
-	m_HeiGenToCache->InitializeHeightGen(a_IniFile);
 }
 
 
@@ -750,43 +740,51 @@ cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cB
 	}
 	
 	a_CacheOffByDefault = false;
-	cTerrainHeightGen * res = nullptr;
-	if (NoCaseCompare(HeightGenName, "flat") == 0)
+	cTerrainHeightGenPtr res;
+	if (NoCaseCompare(HeightGenName, "Flat") == 0)
 	{
-		res = new cHeiGenFlat;
+		res = std::make_shared<cHeiGenFlat>();
 		a_CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
 	}
 	else if (NoCaseCompare(HeightGenName, "classic") == 0)
 	{
-		res = new cHeiGenClassic(a_Seed);
+		res = std::make_shared<cHeiGenClassic>(a_Seed);
 	}
 	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
 	{
-		res = new cDistortedHeightmap(a_Seed, a_BiomeGen);
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
+		// Return an empty pointer, the caller will create the proper generator:
+		return cTerrainHeightGenPtr();
 	}
 	else if (NoCaseCompare(HeightGenName, "End") == 0)
 	{
-		res = new cEndGen(a_Seed);
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
+		// Return an empty pointer, the caller will create the proper generator:
+		return cTerrainHeightGenPtr();
 	}
 	else if (NoCaseCompare(HeightGenName, "MinMax") == 0)
 	{
-		res = new cHeiGenMinMax(a_Seed, a_BiomeGen);
+		res = std::make_shared<cHeiGenMinMax>(a_Seed, a_BiomeGen);
 	}
 	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
 	{
-		res = new cHeiGenMountains(a_Seed);
+		res = std::make_shared<cHeiGenMountains>(a_Seed);
 	}
 	else if (NoCaseCompare(HeightGenName, "BiomalNoise3D") == 0)
 	{
-		res = new cBiomalNoise3DComposable(a_Seed, a_BiomeGen);
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
+		// Return an empty pointer, the caller will create the proper generator:
+		return cTerrainHeightGenPtr();
 	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
-		res = new cNoise3DComposable(a_Seed);
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
+		// Return an empty pointer, the caller will create the proper generator:
+		return cTerrainHeightGenPtr();
 	}
-	else if (NoCaseCompare(HeightGenName, "biomal") == 0)
+	else if (NoCaseCompare(HeightGenName, "Biomal") == 0)
 	{
-		res = new cHeiGenBiomal(a_Seed, a_BiomeGen);
+		res = std::make_shared<cHeiGenBiomal>(a_Seed, a_BiomeGen);
 
 		/*
 		// Performance-testing:
@@ -805,15 +803,14 @@ cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cB
 	{
 		// No match found, force-set the default and retry
 		LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
-		a_IniFile.DeleteValue("Generator", "HeightGen");
 		a_IniFile.SetValue("Generator", "HeightGen", "Biomal");
 		return CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
 	}
 	
 	// Read the settings:
 	res->InitializeHeightGen(a_IniFile);
-	
-	return cTerrainHeightGenPtr(res);
+
+	return res;
 }
 
 

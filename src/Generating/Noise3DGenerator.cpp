@@ -458,110 +458,53 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 	NOISE_DATATYPE BaseNoise[5 * 5];
 	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
 	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
-	// Note that we have to swap the coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "z":
-	m_ChoiceNoise.Generate3D  (ChoiceNoise,   5, 5, 33, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, 0, 257 / m_ChoiceFrequencyY, Workspace);
-	m_DensityNoiseA.Generate3D(DensityNoiseA, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
-	m_DensityNoiseB.Generate3D(DensityNoiseB, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	// Note that we have to swap the X and Y coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "x":
+	m_ChoiceNoise.Generate3D  (ChoiceNoise,   33, 5, 5, 0, 257 / m_ChoiceFrequencyY, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, Workspace);
+	m_DensityNoiseA.Generate3D(DensityNoiseA, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
+	m_DensityNoiseB.Generate3D(DensityNoiseB, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
 	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
 
 	// Calculate the final noise based on the partial noises:
-	for (int y = 0; y < 33; y++)
+	for (int z = 0; z < 5; z++)
 	{
-		NOISE_DATATYPE AddHeight = (static_cast<NOISE_DATATYPE>(y * 8) - m_MidPoint) * m_HeightAmplification;
-
-		// If "underground", make the terrain smoother by forcing the vertical linear gradient into steeper slope:
-		if (AddHeight < 0)
+		for (int x = 0; x < 5; x++)
 		{
-			AddHeight *= 4;
-		}
-
-		for (int z = 0; z < 5; z++)
-		{
-			for (int x = 0; x < 5; x++)
+			NOISE_DATATYPE curBaseNoise = BaseNoise[x + 5 * z];
+			for (int y = 0; y < 33; y++)
 			{
-				int idx = x + 5 * z + 5 * 5 * y;
-				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + BaseNoise[x + 5 * z];
+				NOISE_DATATYPE AddHeight = (static_cast<NOISE_DATATYPE>(y * 8) - m_MidPoint) * m_HeightAmplification;
+
+				// If "underground", make the terrain smoother by forcing the vertical linear gradient into steeper slope:
+				if (AddHeight < 0)
+				{
+					AddHeight *= 4;
+				}
+
+				int idx = 33 * x + 33 * 5 * z + y;
+				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + curBaseNoise;
 			}
 		}
 	}
-	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 5, 5, 33, m_NoiseArray, 4, 4, 8);
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, m_NoiseArray, 8, 4, 4);
 }
 
 
 
 
 
-void cNoise3DComposable::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+void cNoise3DComposable::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkX, a_ChunkZ);
 
+	// Translate the noise array into Shape:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			cChunkDef::SetHeight(a_HeightMap, x, z, m_SeaLevel);
-			for (int y = cChunkDef::Height - 1; y > m_SeaLevel; y--)
+			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				if (m_NoiseArray[y * 17 * 17 + z * 17 + x] <= m_AirThreshold)
-				{
-					cChunkDef::SetHeight(a_HeightMap, x, z, y);
-					break;
-				}
-			}  // for y
-		}  // for x
-	}  // for z
-}
-
-
-
-
-
-void cNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
-{
-	GenerateNoiseArrayIfNeeded(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
-
-	// Make basic terrain composition:
-	for (int z = 0; z < cChunkDef::Width; z++)
-	{
-		for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
-			bool HasHadWater = false;
-			for (int y = LastAir; y < m_SeaLevel; y++)
-			{
-				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
+				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
 			}
-			for (int y = LastAir - 1; y > 0; y--)
-			{
-				if (m_NoiseArray[x + 17 * z + 17 * 17 * y] > m_AirThreshold)
-				{
-					// "air" part
-					LastAir = y;
-					if (y < m_SeaLevel)
-					{
-						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
-						HasHadWater = true;
-					}
-					continue;
-				}
-				// "ground" part:
-				if (LastAir - y > 4)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STONE);
-					continue;
-				}
-				if (HasHadWater)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
-				}
-				else
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, (LastAir == y + 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
-				}
-			}  // for y
-			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
 }
@@ -671,21 +614,23 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 	NOISE_DATATYPE BaseNoise[5 * 5];
 	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
 	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
-	// Note that we have to swap the coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "z":
-	m_ChoiceNoise.Generate3D  (ChoiceNoise,   5, 5, 33, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, 0, 257 / m_ChoiceFrequencyY, Workspace);
-	m_DensityNoiseA.Generate3D(DensityNoiseA, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
-	m_DensityNoiseB.Generate3D(DensityNoiseB, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	// Note that we have to swap the X and Y coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "x":
+	m_ChoiceNoise.Generate3D  (ChoiceNoise,   33, 5, 5, 0, 257 / m_ChoiceFrequencyY, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, Workspace);
+	m_DensityNoiseA.Generate3D(DensityNoiseA, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
+	m_DensityNoiseB.Generate3D(DensityNoiseB, 33, 5, 5, 0, 257 / m_FrequencyY,       BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       Workspace);
 	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
 
 	// Calculate the final noise based on the partial noises:
-	for (int y = 0; y < 33; y++)
+	for (int z = 0; z < 5; z++)
 	{
-		NOISE_DATATYPE BlockHeight = static_cast<NOISE_DATATYPE>(y * 8);
-		for (int z = 0; z < 5; z++)
+		for (int x = 0; x < 5; x++)
 		{
-			for (int x = 0; x < 5; x++)
+			NOISE_DATATYPE curMidPoint = MidPoint[x + 5 * z];
+			NOISE_DATATYPE curHeightAmp = HeightAmp[x + 5 * z];
+			NOISE_DATATYPE curBaseNoise = BaseNoise[x + 5 * z];
+			for (int y = 0; y < 33; y++)
 			{
-				NOISE_DATATYPE AddHeight = (BlockHeight - MidPoint[x + 5 * z]) * HeightAmp[x + 5 * z];
+				NOISE_DATATYPE AddHeight = (static_cast<NOISE_DATATYPE>(y * 8) - curMidPoint) * curHeightAmp;
 
 				// If "underground", make the terrain smoother by forcing the vertical linear gradient into steeper slope:
 				if (AddHeight < 0)
@@ -693,12 +638,12 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 					AddHeight *= 4;
 				}
 
-				int idx = x + 5 * z + 5 * 5 * y;
-				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + BaseNoise[x + 5 * z];
+				int idx = 33 * x + y + 33 * 5 * z;
+				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + curBaseNoise;
 			}
 		}
 	}
-	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 5, 5, 33, m_NoiseArray, 4, 4, 8);
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 33, 5, 5, m_NoiseArray, 8, 4, 4);
 }
 
 
@@ -778,81 +723,23 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 
 
 
-
-void cBiomalNoise3DComposable::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+void cBiomalNoise3DComposable::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkX, a_ChunkZ);
 
+	// Translate the noise array into Shape:
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			cChunkDef::SetHeight(a_HeightMap, x, z, m_SeaLevel);
-			for (int y = cChunkDef::Height - 1; y > m_SeaLevel; y--)
+			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				if (m_NoiseArray[y * 17 * 17 + z * 17 + x] <= m_AirThreshold)
-				{
-					cChunkDef::SetHeight(a_HeightMap, x, z, y);
-					break;
-				}
-			}  // for y
-		}  // for x
-	}  // for z
-}
-
-
-
-
-
-void cBiomalNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
-{
-	GenerateNoiseArrayIfNeeded(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
-
-	// Make basic terrain composition:
-	for (int z = 0; z < cChunkDef::Width; z++)
-	{
-		for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
-			bool HasHadWater = false;
-			for (int y = LastAir; y < m_SeaLevel; y++)
-			{
-				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
+				a_Shape[y + x * 256 + z * 256 * 16] = (m_NoiseArray[y + 257 * x + 257 * 17 * z] > m_AirThreshold) ? 0 : 1;
 			}
-			for (int y = LastAir - 1; y > 0; y--)
-			{
-				if (m_NoiseArray[x + 17 * z + 17 * 17 * y] > m_AirThreshold)
-				{
-					// "air" part
-					LastAir = y;
-					if (y < m_SeaLevel)
-					{
-						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
-						HasHadWater = true;
-					}
-					continue;
-				}
-				// "ground" part:
-				if (LastAir - y > 4)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STONE);
-					continue;
-				}
-				if (HasHadWater)
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
-				}
-				else
-				{
-					a_ChunkDesc.SetBlockType(x, y, z, (LastAir == y + 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
-				}
-			}  // for y
-			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 		}  // for x
 	}  // for z
 }
+
 
 
 

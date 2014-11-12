@@ -69,8 +69,7 @@ protected:
 
 
 class cNoise3DComposable :
-	public cTerrainHeightGen,
-	public cTerrainCompositionGen
+	public cTerrainShapeGen
 {
 public:
 	cNoise3DComposable(int a_Seed);
@@ -127,12 +126,8 @@ protected:
 	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
 	
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
-
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
+	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
 
@@ -140,8 +135,7 @@ protected:
 
 
 class cBiomalNoise3DComposable :
-	public cTerrainHeightGen,
-	public cTerrainCompositionGen
+	public cTerrainShapeGen
 {
 public:
 	cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_BiomeGen);
@@ -194,7 +188,7 @@ protected:
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
 	int m_LastChunkX;
 	int m_LastChunkZ;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
+	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // 257 * x + y + 257 * 17 * z
 
 	/** Weights for summing up neighboring biomes. */
 	NOISE_DATATYPE m_Weight[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];
@@ -212,13 +206,9 @@ protected:
 	/** Returns the parameters for the specified biome. */
 	void GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE & a_HeightAmp, NOISE_DATATYPE & a_MidPoint);
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
-
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
+	// cTerrainShapeGen overrides:
+	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
 
