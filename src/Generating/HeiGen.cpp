@@ -150,6 +150,51 @@ bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_Rel
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cHeiGenMultiCache:
+
+cHeiGenMultiCache::cHeiGenMultiCache(cTerrainHeightGenPtr a_HeiGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches):
+	m_NumSubCaches(a_NumSubCaches)
+{
+	// Create the individual sub-caches:
+	m_SubCaches.reserve(a_NumSubCaches);
+	for (size_t i = 0; i < a_NumSubCaches; i++)
+	{
+		m_SubCaches.push_back(std::make_shared<cHeiGenCache>(a_HeiGenToCache, a_SubCacheSize));
+	}
+}
+
+
+
+
+
+void cHeiGenMultiCache::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+{
+	// Get the subcache responsible for this chunk:
+	const size_t cacheIdx = ((size_t)a_ChunkX + m_CoeffZ * (size_t)a_ChunkZ) % m_NumSubCaches;
+
+	// Ask the subcache:
+	m_SubCaches[cacheIdx]->GenHeightMap(a_ChunkX, a_ChunkZ, a_HeightMap);
+}
+
+
+
+
+
+bool cHeiGenMultiCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height)
+{
+	// Get the subcache responsible for this chunk:
+	const size_t cacheIdx = ((size_t)a_ChunkX + m_CoeffZ * (size_t)a_ChunkZ) % m_NumSubCaches;
+
+	// Ask the subcache:
+	return m_SubCaches[cacheIdx]->GetHeightAt(a_ChunkX, a_ChunkZ, a_RelX, a_RelZ, a_Height);
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cHeiGenClassic:
 
 cHeiGenClassic::cHeiGenClassic(int a_Seed) :

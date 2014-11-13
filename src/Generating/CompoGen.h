@@ -132,6 +132,7 @@ protected:
 		int m_ChunkZ;
 		cChunkDef::BlockTypes        m_BlockTypes;
 		cChunkDesc::BlockNibbleBytes m_BlockMetas;  // The metas are uncompressed, 1 meta per byte
+		cChunkDef::HeightMap         m_HeightMap;
 	} ;
 	
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data

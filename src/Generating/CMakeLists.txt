@@ -42,6 +42,7 @@ SET (HDRS
 	CompoGen.h
 	CompoGenBiomal.h
 	ComposableGenerator.h
+	CompositedHeiGen.h
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
 	EndGen.h

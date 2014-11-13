@@ -19,6 +19,8 @@
 
 #include "CompoGenBiomal.h"
 
+#include "CompositedHeiGen.h"
+
 #include "Caves.h"
 #include "DistortedHeightmap.h"
 #include "DungeonRoomsFinisher.h"
@@ -173,7 +175,6 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
 		m_CompositionGen->ComposeTerrain(a_ChunkDesc, shape);
-		ShouldUpdateHeightmap = true;
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultFinish())
@@ -264,11 +265,17 @@ void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
 	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(a_IniFile, m_BiomeGen, m_ShapeGen, m_ChunkGenerator.GetSeed());
 	
+	// Add a cache over the composition generator:
+	// Even a cache of size 1 is useful due to the CompositedHeiGen cache after us doing re-composition on its misses
 	int CompoGenCacheSize = a_IniFile.GetValueSetI("Generator", "CompositionGenCacheSize", 64);
-	if (CompoGenCacheSize > 1)
+	if (CompoGenCacheSize > 0)
 	{
-		m_CompositionGen = cTerrainCompositionGenPtr(new cCompoGenCache(m_CompositionGen, 32));
+		m_CompositionGen = std::make_shared<cCompoGenCache>(m_CompositionGen, CompoGenCacheSize);
 	}
+
+	// Create a cache of the composited heightmaps, so that finishers may use it:
+	m_CompositedHeightCache = std::make_shared<cHeiGenMultiCache>(std::make_shared<cCompositedHeiGen>(m_ShapeGen, m_CompositionGen), 16, 24);
+	// 24 subcaches of depth 16 each = 96 KiB of RAM. Acceptable, for the amount of work this saves.
 }
 
 
