@@ -62,6 +62,12 @@ void GetSmallAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 /// Generates an image of a large (branching) apple tree
 void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
+/// Generates a branch for a large apple tree
+void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, int a_TreeHeight, cNoise & a_Noise, sSetBlockVector & a_LogBlocks);
+
+/// Returns the meta for a log from the given direction
+NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction);
+
 /// Generates an image of a random birch tree
 void GetBirchTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 

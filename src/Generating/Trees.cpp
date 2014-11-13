@@ -61,7 +61,7 @@ static const sCoords BigO3[] =
 
 static const sCoords BigO4[] =  // Part of Big Jungle tree
 {
-	/* -4 */                    {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4},
+	/* -4 */                     {-2, -4}, {-1, -4}, {0, -4}, {1, -4}, {2, -4},
 	/* -3 */           {-3, -3}, {-2, -3}, {-1, -3}, {0, -3}, {1, -3}, {2, -3}, {3, -3},
 	/* -2 */ {-4, -2}, {-3, -2}, {-2, -2}, {-1, -2}, {0, -2}, {1, -2}, {2, -2}, {3, -2}, {4, -2},
 	/* -1 */ {-4, -1}, {-3, -1}, {-2, -1}, {-1, -1}, {0, -1}, {1, -1}, {2, -1}, {3, -1}, {4, -1},
@@ -361,7 +361,109 @@ void GetSmallAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 
 void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks)
 {
-	// TODO
+	int Height = 7 + a_Noise.IntNoise3DInt(a_BlockX, a_BlockY, a_BlockZ) % 4;
+
+	// Array with possible directions for a branch to go to.
+	const Vector3d AvailableDirections[] =
+	{
+		{ -1, 0, 0 }, { 0, 0, -1  },
+		{ -1, 0, 1 }, { -1, 0, -1 },
+		{ 1, 0, 1  }, { 1, 0, -1  },
+		{ 1, 0, 0  }, { 0, 0, 1   },
+
+		{ -0.5, 0, 0   }, { 0, 0, -0.5    },
+		{ -0.5, 0, 0.5 }, { -0.5, 0, -0.5 },
+		{ 0.5, 0, 0.5  }, { 0.5, 0, -0.5  },
+		{ 0.5, 0, 0    }, { 0, 0, 0.5     },
+
+		{ -1, 0.5, 0 }, { 0, 0.5, -1  },
+		{ -1, 0.5, 1 }, { -1, 0.5, -1 },
+		{ 1, 0.5, 1  }, { 1, 0.5, -1  },
+		{ 1, 0.5, 0  }, { 0, 0.5, 1   },
+
+		{ -0.5, 0.5, 0   },  { 0, 0.5, -0.5    },
+		{ -0.5, 0.5, 0.5 },  { -0.5, 0.5, -0.5 },
+		{ 0.5, 0.5, 0.5  },  { 0.5, 0.5, -0.5  },
+		{ 0.5, 0.5, 0    },  { 0, 0.5, 0.5     },
+
+	};
+
+	// Create branches
+	for (int i = 4; i < Height; i++)
+	{
+		// Get a direction for the trunk to go to.
+		Vector3d BranchStartDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY + i, a_BlockZ) % ARRAYCOUNT(AvailableDirections)];
+		Vector3d BranchDirection = AvailableDirections[a_Noise.IntNoise3DInt(a_BlockX, a_BlockY / i, a_BlockZ) % ARRAYCOUNT(AvailableDirections)] / 3;
+
+		int BranchLength = 2 + a_Noise.IntNoise3DInt(a_BlockX * a_Seq, a_BlockY * a_Seq, a_BlockZ * a_Seq) % 3;
+		GetLargeAppleTreeBranch(a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_Noise, a_LogBlocks);
+	}
+
+	// Place leaves
+	for (auto itr : a_LogBlocks)
+	{
+		// Get the log's X and Z coordinates
+		int X = itr.ChunkX * 16 + itr.x;
+		int Z = itr.ChunkZ * 16 + itr.z;
+
+		a_OtherBlocks.push_back(sSetBlock(X, itr.y - 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+		PushCoordBlocks(X, itr.y - 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		for (int y = -1; y <= 1; y++)
+		{
+			PushCoordBlocks (X, itr.y + y, Z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		}
+		PushCoordBlocks(X, itr.y + 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		a_OtherBlocks.push_back(sSetBlock(X, itr.y + 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+	}
+
+	// Trunk:
+	for (int i = 0; i < Height; i++)
+	{
+		a_LogBlocks.push_back(sSetBlock(a_BlockX, a_BlockY + i, a_BlockZ, E_BLOCK_LOG, E_META_LOG_APPLE));
+	}
+}
+
+
+
+
+
+void GetLargeAppleTreeBranch(int a_BlockX, int a_BlockY, int a_BlockZ, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, int a_TreeHeight, cNoise & a_Noise, sSetBlockVector & a_LogBlocks)
+{
+	Vector3d CurrentPos = Vector3d(a_BlockX, a_BlockY, a_BlockZ);
+	Vector3d Direction  = a_StartDirection;
+	for (int i = 0; i < a_BranchLength; i++)
+	{
+		CurrentPos += Direction;
+		if (CurrentPos.y >= a_TreeHeight)
+		{
+			return;
+		}
+		Direction -= a_Direction;
+		Direction.clamp(-1.0, 1.0);
+		a_LogBlocks.push_back(sSetBlock(FloorC(CurrentPos.x), FloorC(CurrentPos.y), FloorC(CurrentPos.z), E_BLOCK_LOG, GetLogMetaFromDirection(E_META_LOG_APPLE, Direction)));
+	}
+}
+
+
+
+
+
+NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction)
+{
+	a_Direction.abs();
+
+	if ((a_Direction.y > a_Direction.x) && (a_Direction.y > a_Direction.z))
+	{
+		return a_BlockMeta;
+	}
+	else if (a_Direction.x > a_Direction.z)
+	{
+		return a_BlockMeta + 4;
+	}
+	else
+	{
+		return a_BlockMeta + 8;
+	}
 }
 
 
