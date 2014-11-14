@@ -762,6 +762,8 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 		case biExtremeHillsPlus: a_HeightAmp = 0.04f;  a_MidPoint = 80; break;
 		case biFrozenRiver:      a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
 		case biFrozenOcean:      a_HeightAmp = 0.17f;  a_MidPoint = 47; break;
+		case biJungle:           a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
+		case biJungleM:          a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
 		case biOcean:            a_HeightAmp = 0.17f;  a_MidPoint = 47; break;
 		case biPlains:           a_HeightAmp = 0.3f;   a_MidPoint = 62; break;  // Needs verification
 		case biRiver:            a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
