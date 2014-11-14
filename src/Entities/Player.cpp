@@ -1602,6 +1602,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	a_World->AddPlayer(this);
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
 
+	// Update the view distance.
+	m_ClientHandle->SetViewDistance(m_ClientHandle->GetSettedViewDistance());
+
 	return true;
 }
 

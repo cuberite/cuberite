@@ -217,9 +217,15 @@ public:
 	
 	inline short GetPing(void) const { return m_Ping; }
 	
+	/** Sets the maximal view distance. */
 	void SetViewDistance(int a_ViewDistance);
-	int  GetViewDistance(void) const { return m_ViewDistance; }
-	
+
+	/** Returns the view distance that the player currently have. */
+	int GetViewDistance(void) const { return m_UsedViewDistance; }
+
+	/** Returns the view distance that the player set, not the used view distance. */
+	int GetSettedViewDistance(void) const { return m_SetViewDistance; }
+
 	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
 
@@ -334,11 +340,11 @@ private:
 	typedef std::set<AString> cChannels;
 
 	/** Number of chunks the player can see in each direction */
-	int m_ViewDistance;
-	
-	/** Server generates this many chunks AHEAD of player sight. */
-	static const int GENERATEDISTANCE = 2;
-	
+	int m_UsedViewDistance;
+
+	/** The original view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
+	int m_SetViewDistance;
+
 	AString m_IPString;
 
 	AString m_Username;
