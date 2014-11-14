@@ -2732,6 +2732,23 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 
 
 
+bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		if ((*itr)->GetUUID() == a_PlayerUUID)
+		{
+			return a_Callback.Item(*itr);
+		}
+	}
+	return false;
+}
+
+
+
+
+
 // TODO: This interface is dangerous!
 cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight)
 {

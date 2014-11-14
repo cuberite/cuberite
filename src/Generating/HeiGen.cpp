@@ -17,81 +17,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cTerrainHeightGen:
-
-cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
-{
-	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
-	if (HeightGenName.empty())
-	{
-		LOGWARN("[Generator] HeightGen value not set in world.ini, using \"Biomal\".");
-		HeightGenName = "Biomal";
-	}
-	
-	a_CacheOffByDefault = false;
-	cTerrainHeightGen * res = nullptr;
-	if (NoCaseCompare(HeightGenName, "flat") == 0)
-	{
-		res = new cHeiGenFlat;
-		a_CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
-	}
-	else if (NoCaseCompare(HeightGenName, "classic") == 0)
-	{
-		res = new cHeiGenClassic(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
-	{
-		res = new cDistortedHeightmap(a_Seed, a_BiomeGen);
-	}
-	else if (NoCaseCompare(HeightGenName, "End") == 0)
-	{
-		res = new cEndGen(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
-	{
-		res = new cHeiGenMountains(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
-	{
-		res = new cNoise3DComposable(a_Seed);
-	}
-	else if (NoCaseCompare(HeightGenName, "biomal") == 0)
-	{
-		res = new cHeiGenBiomal(a_Seed, a_BiomeGen);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cHeiGenBiomal...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 500; x++)
-		{
-			cChunkDef::HeightMap Heights;
-			res->GenHeightMap(x * 5, x * 5, Heights);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("HeightGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
-	}
-	else
-	{
-		// No match found, force-set the default and retry
-		LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
-		a_IniFile.DeleteValue("Generator", "HeightGen");
-		a_IniFile.SetValue("Generator", "HeightGen", "Biomal");
-		return CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
-	}
-	
-	// Read the settings:
-	res->InitializeHeightGen(a_IniFile);
-	
-	return cTerrainHeightGenPtr(res);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cHeiGenFlat:
 
 void cHeiGenFlat::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
@@ -605,6 +530,290 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 	// No known biome around? Weird. Return a bogus value:
 	ASSERT(!"cHeiGenBiomal: Biome sum failed, no known biome around");
 	return 5;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cHeiGenMinMax:
+
+class cHeiGenMinMax:
+	public cTerrainHeightGen
+{
+	typedef cTerrainHeightGen super;
+
+	/** Size of the averaging process, in columns (for each direction). Must be less than 16. */
+	static const int AVERAGING_SIZE = 4;
+
+public:
+	cHeiGenMinMax(int a_Seed, cBiomeGenPtr a_BiomeGen):
+		m_Noise(a_Seed),
+		m_BiomeGen(a_BiomeGen),
+		m_TotalWeight(0)
+	{
+		// Initialize the weights:
+		for (int z = 0; z <= AVERAGING_SIZE * 2; z++)
+		{
+			for (int x = 0; x <= AVERAGING_SIZE * 2; x++)
+			{
+				m_Weights[z][x] = 1 + 2 * AVERAGING_SIZE - std::abs(x - AVERAGING_SIZE) - std::abs(z - AVERAGING_SIZE);
+				m_TotalWeight += m_Weights[z][x];
+			}
+		}
+
+		// Initialize the Perlin generator:
+		m_Perlin.AddOctave(0.04f,   0.2f);
+		m_Perlin.AddOctave(0.02f,   0.1f);
+		m_Perlin.AddOctave(0.01f,   0.05f);
+	}
+
+
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+	{
+		// Generate the biomes for the 3*3 neighbors:
+		cChunkDef::BiomeMap neighborBiomes[3][3];
+		for (int z = 0; z < 3; z++) for (int x = 0; x < 3; x++)
+		{
+			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[z][x]);
+		}
+
+		// Get the min and max heights based on the biomes:
+		double minHeight[cChunkDef::Width * cChunkDef::Width];
+		double maxHeight[cChunkDef::Width * cChunkDef::Width];
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				// For each column, sum the min and max values of the neighborhood around it:
+				double min = 0, max = 0;
+				for (int relz = 0; relz <= AVERAGING_SIZE * 2; relz++)
+				{
+					int bz = z + 16 + relz - AVERAGING_SIZE;  // Biome Z coord relative to the neighborBiomes start
+					int cz = bz / 16;                         // Chunk Z coord relative to the neighborBiomes start
+					bz = bz % 16;                             // Biome Z coord relative to cz in neighborBiomes
+					for (int relx = 0; relx <= AVERAGING_SIZE * 2; relx++)
+					{
+						int bx = x + 16 + relx - AVERAGING_SIZE;  // Biome X coord relative to the neighborBiomes start
+						int cx = bx / 16;                         // Chunk X coord relative to the neighborBiomes start
+						bx = bx % 16;                             // Biome X coord relative to cz in neighborBiomes
+
+						// Get the biome's min and max heights:
+						double bmin, bmax;
+						getBiomeMinMax(cChunkDef::GetBiome(neighborBiomes[cz][cx], bx, bz), bmin, bmax);
+
+						// Add them to the total, with the weight depending on their relative position to the column:
+						min += bmin * m_Weights[relz][relx];
+						max += bmax * m_Weights[relz][relx];
+					}  // for relx
+				}  // for relz
+				minHeight[x + z * cChunkDef::Width] = min / m_TotalWeight;
+				maxHeight[x + z * cChunkDef::Width] = max / m_TotalWeight;
+			}  // for x
+		}  // for z
+
+		// Generate the base noise:
+		NOISE_DATATYPE noise[cChunkDef::Width * cChunkDef::Width];
+		NOISE_DATATYPE workspace[cChunkDef::Width * cChunkDef::Width];
+		NOISE_DATATYPE startX = static_cast<float>(a_ChunkX * cChunkDef::Width);
+		NOISE_DATATYPE endX = startX + cChunkDef::Width - 1;
+		NOISE_DATATYPE startZ = static_cast<float>(a_ChunkZ * cChunkDef::Width);
+		NOISE_DATATYPE endZ = startZ + cChunkDef::Width - 1;
+		m_Perlin.Generate2D(noise, 16, 16, startX, endX, startZ, endZ, workspace);
+
+		// Make the height by ranging the noise between min and max:
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			for (int x = 0; x < cChunkDef::Width; x++)
+			{
+				double min = minHeight[x + z * cChunkDef::Width];
+				double max = maxHeight[x + z * cChunkDef::Width];
+				double h = (max + min) / 2 + noise[x + z * cChunkDef::Width] * (max - min);
+				cChunkDef::SetHeight(a_HeightMap, x, z, static_cast<HEIGHTTYPE>(h));
+			}
+		}
+	}
+
+	
+	virtual void InitializeHeightGen(cIniFile & a_IniFile)
+	{
+		// No settings available
+	}
+
+protected:
+	cNoise m_Noise;
+
+	cPerlinNoise m_Perlin;
+
+	/** The biome generator to query for the underlying biomes. */
+	cBiomeGenPtr m_BiomeGen;
+
+	/** Weights applied to each of the min / max values in the neighborhood of the currently evaluated column. */
+	double m_Weights[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];
+
+	/** Sum of all the m_Weights items. */
+	double m_TotalWeight;
+
+
+	/** Returns the minimum and maximum heights for the given biome. */
+	void getBiomeMinMax(EMCSBiome a_Biome, double & a_Min, double & a_Max)
+	{
+		switch (a_Biome)
+		{
+			case biBeach:                a_Min = 61; a_Max = 64; break;
+			case biBirchForest:          a_Min = 63; a_Max = 75; break;
+			case biBirchForestHills:     a_Min = 63; a_Max = 90; break;
+			case biBirchForestHillsM:    a_Min = 63; a_Max = 90; break;
+			case biBirchForestM:         a_Min = 63; a_Max = 75; break;
+			case biColdBeach:            a_Min = 61; a_Max = 64; break;
+			case biColdTaiga:            a_Min = 63; a_Max = 75; break;
+			case biColdTaigaHills:       a_Min = 63; a_Max = 90; break;
+			case biColdTaigaM:           a_Min = 63; a_Max = 75; break;
+			case biDeepOcean:            a_Min = 30; a_Max = 60; break;
+			case biDesert:               a_Min = 63; a_Max = 70; break;
+			case biDesertHills:          a_Min = 63; a_Max = 85; break;
+			case biDesertM:              a_Min = 63; a_Max = 70; break;
+			case biEnd:                  a_Min = 10; a_Max = 100; break;
+			case biExtremeHills:         a_Min = 60; a_Max = 120; break;
+			case biExtremeHillsEdge:     a_Min = 63; a_Max = 100; break;
+			case biExtremeHillsM:        a_Min = 60; a_Max = 120; break;
+			case biExtremeHillsPlus:     a_Min = 60; a_Max = 140; break;
+			case biExtremeHillsPlusM:    a_Min = 60; a_Max = 140; break;
+			case biFlowerForest:         a_Min = 63; a_Max = 75; break;
+			case biForest:               a_Min = 63; a_Max = 75; break;
+			case biForestHills:          a_Min = 63; a_Max = 90; break;
+			case biFrozenOcean:          a_Min = 45; a_Max = 64; break;
+			case biFrozenRiver:          a_Min = 60; a_Max = 62; break;
+			case biIceMountains:         a_Min = 63; a_Max = 90; break;
+			case biIcePlains:            a_Min = 63; a_Max = 70; break;
+			case biIcePlainsSpikes:      a_Min = 60; a_Max = 70; break;
+			case biJungle:               a_Min = 60; a_Max = 80; break;
+			case biJungleEdge:           a_Min = 62; a_Max = 75; break;
+			case biJungleEdgeM:          a_Min = 62; a_Max = 75; break;
+			case biJungleHills:          a_Min = 60; a_Max = 90; break;
+			case biJungleM:              a_Min = 60; a_Max = 75; break;
+			case biMegaSpruceTaiga:      a_Min = 63; a_Max = 75; break;
+			case biMegaSpruceTaigaHills: a_Min = 63; a_Max = 90; break;
+			case biMegaTaiga:            a_Min = 63; a_Max = 75; break;
+			case biMegaTaigaHills:       a_Min = 63; a_Max = 90; break;
+			case biMesa:                 a_Min = 63; a_Max = 90; break;
+			case biMesaBryce:            a_Min = 60; a_Max = 67; break;
+			case biMesaPlateau:          a_Min = 75; a_Max = 85; break;
+			case biMesaPlateauF:         a_Min = 80; a_Max = 90; break;
+			case biMesaPlateauFM:        a_Min = 80; a_Max = 90; break;
+			case biMesaPlateauM:         a_Min = 75; a_Max = 85; break;
+			case biMushroomIsland:       a_Min = 63; a_Max = 90; break;
+			case biMushroomShore:        a_Min = 60; a_Max = 75; break;
+			case biNether:               a_Min = 10; a_Max = 100; break;
+			case biOcean:                a_Min = 45; a_Max = 64; break;
+			case biPlains:               a_Min = 63; a_Max = 70; break;
+			case biRiver:                a_Min = 60; a_Max = 62; break;
+			case biRoofedForest:         a_Min = 63; a_Max = 75; break;
+			case biRoofedForestM:        a_Min = 63; a_Max = 75; break;
+			case biSavanna:              a_Min = 63; a_Max = 75; break;
+			case biSavannaM:             a_Min = 63; a_Max = 80; break;
+			case biSavannaPlateau:       a_Min = 75; a_Max = 100; break;
+			case biSavannaPlateauM:      a_Min = 80; a_Max = 160; break;
+			case biStoneBeach:           a_Min = 60; a_Max = 64; break;
+			case biSunflowerPlains:      a_Min = 63; a_Max = 70; break;
+			case biSwampland:            a_Min = 60; a_Max = 67; break;
+			case biSwamplandM:           a_Min = 61; a_Max = 67; break;
+			case biTaiga:                a_Min = 63; a_Max = 75; break;
+			case biTaigaHills:           a_Min = 63; a_Max = 90; break;
+			case biTaigaM:               a_Min = 63; a_Max = 80; break;
+			default:
+			{
+				ASSERT(!"Unknown biome");
+				a_Min = 10;
+				a_Max = 10;
+				break;
+			}
+		}
+	}
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cTerrainHeightGen:
+
+cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
+{
+	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
+	if (HeightGenName.empty())
+	{
+		LOGWARN("[Generator] HeightGen value not set in world.ini, using \"Biomal\".");
+		HeightGenName = "Biomal";
+	}
+	
+	a_CacheOffByDefault = false;
+	cTerrainHeightGen * res = nullptr;
+	if (NoCaseCompare(HeightGenName, "flat") == 0)
+	{
+		res = new cHeiGenFlat;
+		a_CacheOffByDefault = true;  // We're generating faster than a cache would retrieve data
+	}
+	else if (NoCaseCompare(HeightGenName, "classic") == 0)
+	{
+		res = new cHeiGenClassic(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
+	{
+		res = new cDistortedHeightmap(a_Seed, a_BiomeGen);
+	}
+	else if (NoCaseCompare(HeightGenName, "End") == 0)
+	{
+		res = new cEndGen(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "MinMax") == 0)
+	{
+		res = new cHeiGenMinMax(a_Seed, a_BiomeGen);
+	}
+	else if (NoCaseCompare(HeightGenName, "Mountains") == 0)
+	{
+		res = new cHeiGenMountains(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "BiomalNoise3D") == 0)
+	{
+		res = new cBiomalNoise3DComposable(a_Seed, a_BiomeGen);
+	}
+	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
+	{
+		res = new cNoise3DComposable(a_Seed);
+	}
+	else if (NoCaseCompare(HeightGenName, "biomal") == 0)
+	{
+		res = new cHeiGenBiomal(a_Seed, a_BiomeGen);
+
+		/*
+		// Performance-testing:
+		LOGINFO("Measuring performance of cHeiGenBiomal...");
+		clock_t BeginTick = clock();
+		for (int x = 0; x < 500; x++)
+		{
+			cChunkDef::HeightMap Heights;
+			res->GenHeightMap(x * 5, x * 5, Heights);
+		}
+		clock_t Duration = clock() - BeginTick;
+		LOGINFO("HeightGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
+		//*/
+	}
+	else
+	{
+		// No match found, force-set the default and retry
+		LOGWARN("Unknown HeightGen \"%s\", using \"Biomal\" instead.", HeightGenName.c_str());
+		a_IniFile.DeleteValue("Generator", "HeightGen");
+		a_IniFile.SetValue("Generator", "HeightGen", "Biomal");
+		return CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
+	}
+	
+	// Read the settings:
+	res->InitializeHeightGen(a_IniFile);
+	
+	return cTerrainHeightGenPtr(res);
 }
 
 

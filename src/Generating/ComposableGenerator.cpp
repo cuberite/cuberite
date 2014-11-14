@@ -73,6 +73,10 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 	{
 		res = new cCompoGenNether(a_Seed);
 	}
+	else if (NoCaseCompare(CompoGenName, "BiomalNoise3D") == 0)
+	{
+		res = new cBiomalNoise3DComposable(a_Seed, a_BiomeGen);
+	}
 	else if (NoCaseCompare(CompoGenName, "Noise3D") == 0)
 	{
 		res = new cNoise3DComposable(a_Seed);

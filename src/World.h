@@ -324,6 +324,9 @@ public:
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 	
+	/** Finds the player over his uuid and calls the callback */
+	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.

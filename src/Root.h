@@ -126,6 +126,9 @@ public:
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
+	/** Finds the player over his uuid and calls the callback */
+	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+
 	// tolua_begin
 	
 	/// Sends a chat message to all connected clients (in all worlds)
