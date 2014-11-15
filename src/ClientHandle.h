@@ -224,7 +224,7 @@ public:
 	int GetViewDistance(void) const { return m_UsedViewDistance; }
 
 	/** Returns the view distance that the player request, not the used view distance. */
-	int GetRequestedViewDistance(void) const { return m_SetViewDistance; }
+	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
 
 	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
@@ -342,8 +342,8 @@ private:
 	/** Number of chunks the player can see in each direction */
 	int m_UsedViewDistance;
 
-	/** The original view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
-	int m_SetViewDistance;
+	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
+	int m_RequestedViewDistance;
 
 	AString m_IPString;
 

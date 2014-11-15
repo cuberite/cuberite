@@ -66,7 +66,7 @@ int cClientHandle::s_ClientCount = 0;
 
 cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_UsedViewDistance(a_ViewDistance),
-	m_SetViewDistance(a_ViewDistance),
+	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_Socket->GetIPString()),
 	m_OutgoingData(64 KiB),
 	m_Player(nullptr),
@@ -2850,9 +2850,9 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
 	ASSERT(m_Player->GetWorld() == NULL);
 
-	m_SetViewDistance = a_ViewDistance;
-	m_UsedViewDistance = Clamp(m_SetViewDistance, cClientHandle::MIN_VIEW_DISTANCE, m_Player->GetWorld()->GetMaxViewDistance());
-	LOGD("Setted view distance from %s to %i!", GetUsername().c_str(), m_UsedViewDistance);
+	m_RequestedViewDistance = a_ViewDistance;
+	m_UsedViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, m_Player->GetWorld()->GetMaxViewDistance());
+	LOGD("Setted view distance from %s to %d!", GetUsername().c_str(), m_UsedViewDistance);
 }
 
 
