@@ -948,7 +948,7 @@ void cClientHandle::HandleSwingArm()
 	if (Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
 	{
 		// Air click.
-		LOGD("%s do a left click to the air!", m_Player->GetName());
+		LOGD("%s do a left click to the air!", m_Player->GetName().c_str());
 
 		// Call the left click hook with BLOCK_FACE_NONE
 		cRoot::Get()->GetPluginManager()->CallHookPlayerLeftClick(*m_Player, 0, 0, 0, BLOCK_FACE_NONE);
