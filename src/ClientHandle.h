@@ -223,8 +223,8 @@ public:
 	/** Returns the view distance that the player currently have. */
 	int GetViewDistance(void) const { return m_UsedViewDistance; }
 
-	/** Returns the view distance that the player set, not the used view distance. */
-	int GetSettedViewDistance(void) const { return m_SetViewDistance; }
+	/** Returns the view distance that the player request, not the used view distance. */
+	int GetRequestedViewDistance(void) const { return m_SetViewDistance; }
 
 	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
