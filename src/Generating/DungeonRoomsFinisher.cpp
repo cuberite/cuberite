@@ -78,7 +78,8 @@ protected:
 
 
 
-	/** Decodes the position index along the room walls into a proper 2D position for a chest. */
+	/** Decodes the position index along the room walls into a proper 2D position for a chest.
+	The Y coord of the returned vector specifies the chest's meta value*/
 	Vector3i DecodeChestCoords(int a_PosIdx, int a_SizeX, int a_SizeZ)
 	{
 		if (a_PosIdx < a_SizeX)
@@ -293,17 +294,21 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	int ChunkX, ChunkZ;
 	int RelX = a_OriginX, RelY = 0, RelZ = a_OriginZ;
 	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
-	/*
-	// TODO
-	cChunkDef::HeightMap HeightMap;
-	m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
-	int Height = cChunkDef::GetHeight(HeightMap, RelX, RelZ);  // Max room height at {a_OriginX, a_OriginZ}
-	Height = Clamp(m_HeightProbability.MapValue(rnd % m_HeightProbability.GetSum()), 10, Height - 5);
-	*/
-	int Height = 62;
+	cChunkDesc::Shape shape;
+	m_ShapeGen->GenShape(ChunkX, ChunkZ, shape);
+	int height = 0;
+	int idx = RelX * 256 + RelZ * 16 * 256;
+	for (int y = 6; y < cChunkDef::Height; y++)
+	{
+		if (shape[idx + y] != 0)
+		{
+			continue;
+		}
+		height = Clamp(m_HeightProbability.MapValue(rnd % m_HeightProbability.GetSum()), 10, y - 5);
+	}
 
 	// Create the dungeon room descriptor:
-	return cStructurePtr(new cDungeonRoom(a_GridX, a_GridZ, a_OriginX, a_OriginZ, HalfSizeX, HalfSizeZ, Height, m_Noise));
+	return cStructurePtr(new cDungeonRoom(a_GridX, a_GridZ, a_OriginX, a_OriginZ, HalfSizeX, HalfSizeZ, height, m_Noise));
 }
 
 
