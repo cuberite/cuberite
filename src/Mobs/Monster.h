@@ -169,10 +169,12 @@ protected:
 	/** Stores if mobile is currently moving towards the ultimate, final destination */
 	bool m_bMovingToDestination;
 
-	/** Finds the first non-air block position (not the highest, as cWorld::GetHeight does)
-		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
-		If current Y is solid, goes up to find first nonsolid block, and returns that */
+	/** Finds the lowest non-air block position (not the highest, as cWorld::GetHeight does)
+	If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
+	If current Y is solid, goes up to find first nonsolid block, and returns that.
+	If no suitable position is found, returns cChunkDef::Height. */
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
+
 	/** Returns if a monster can actually reach a given height by jumping or walking */
 	inline bool IsNextYPosReachable(int a_PosY)
 	{
