@@ -9,6 +9,7 @@
 #include "ProtocolRecognizer.h"
 #include "Protocol17x.h"
 #include "Protocol18x.h"
+#include "ProtocolUnknown.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -969,6 +970,27 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 			}
 			m_Buffer.CommitRead();
 			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			return true;
+		}
+		default:
+		{
+			AString ServerAddress;
+			short ServerPort;
+			UInt32 NextState;
+			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadBEShort(ServerPort))
+			{
+				break;
+			}
+			if (!m_Buffer.ReadVarInt(NextState))
+			{
+				break;
+			}
+			m_Buffer.CommitRead();
+			m_Protocol = new cProtocolUnknown(m_Client, NextState);
 			return true;
 		}
 	}

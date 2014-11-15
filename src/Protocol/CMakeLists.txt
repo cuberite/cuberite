@@ -10,6 +10,7 @@ SET (SRCS
 	MojangAPI.cpp
 	Protocol17x.cpp
 	Protocol18x.cpp
+	ProtocolUnknown.cpp
 	ProtocolRecognizer.cpp)
 
 SET (HDRS
@@ -19,6 +20,7 @@ SET (HDRS
 	Protocol.h
 	Protocol17x.h
 	Protocol18x.h
+	ProtocolUnknown.h
 	ProtocolRecognizer.h)
 
 if(NOT MSVC)
