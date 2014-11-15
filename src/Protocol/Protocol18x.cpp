@@ -2426,7 +2426,7 @@ void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetY);
 			HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, TargetZ);
 
-			m_Client->GetPlayer()->GetWorld()->BroadcastEntityAnimation(*m_Client->GetPlayer(), 0, m_Client);
+			// TODO: Do anything
 			break;
 		}
 		default:
