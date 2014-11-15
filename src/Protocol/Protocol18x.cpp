@@ -1883,7 +1883,7 @@ bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return true;
 				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return true;
 				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return true;
-				case 0x0a:  HandlePacketAnimation              (a_ByteBuffer); return true;
+				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return true;
 				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return true;
 				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
 				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return true;
