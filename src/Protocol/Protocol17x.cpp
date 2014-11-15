@@ -1844,7 +1844,7 @@ void cProtocol172::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 
 	if (Animation == 1)
 	{
-		m_Client->GetPlayer()->GetWorld()->BroadcastEntityAnimation(*m_Client->GetPlayer(), 0, m_Client);
+		m_Client->HandleSwingArm();
 	}
 }
 
