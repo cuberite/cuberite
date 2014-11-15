@@ -7,6 +7,7 @@
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
+#include "LineBlockTracer.h"
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
@@ -919,6 +920,45 @@ void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString
 
 
 
+void cClientHandle::HandleSwingArm()
+{
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 0, this);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerAnimation(*m_Player, 1);
+
+	// Test air left click
+	class cCallback :
+		public cBlockTracer::cCallbacks
+	{
+	public:
+
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+		{
+			if (a_BlockType != E_BLOCK_AIR)
+			{
+				return true;
+			}
+			return false;
+		}
+	} Callback;
+
+	cLineBlockTracer Tracer(*m_Player->GetWorld(), Callback);
+	Vector3d Start(m_Player->GetEyePosition() + m_Player->GetLookVector());
+	Vector3d End(m_Player->GetEyePosition() + m_Player->GetLookVector() * 5);
+
+	if (Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
+	{
+		// Air click.
+		LOGD("%s do a left click to the air!", m_Player->GetName());
+
+		// Call the left click hook with BLOCK_FACE_NONE
+		cRoot::Get()->GetPluginManager()->CallHookPlayerLeftClick(*m_Player, 0, 0, 0, BLOCK_FACE_NONE);
+	}
+}
+
+
+
+
+
 void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 {
 	if ((m_Player->GetWindow() == nullptr) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
@@ -975,12 +1015,6 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
-	{
-		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
 
 	switch (a_Status)
 	{
@@ -1018,6 +1052,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		
 		case DIG_STATUS_STARTED:
 		{
+			if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+			{
+				// A plugin doesn't agree with the action, replace the block on the client and quit:
+				m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+				return;
+			}
+
 			BLOCKTYPE  OldBlock;
 			NIBBLETYPE OldMeta;
 			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
@@ -1149,6 +1190,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
 			(m_HasStartedDigging ? "True" : "False")
 		);
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
 

@@ -2,17 +2,19 @@ return
 {
 	HOOK_PLAYER_RIGHT_CLICK =
 	{
-		CalledWhen = "A right-click packet is received from the client. Plugin may override / refuse.",
+		CalledWhen = "The client do a right click. Plugin may override / refuse.",
 		DefaultFnName = "OnPlayerRightClick",  -- also used as pagename
 		Desc = [[
 			This hook is called when MCServer receives a right-click packet from the {{cClientHandle|client}}. It
 			is called before any processing whatsoever is performed on the packet, meaning that hacked /
-			malicious clients may be trigerring this event very often and with unchecked parameters. Therefore
+			malicious clients may be trigerring this even very often and with unchecked parameters. Therefore
 			plugin authors are advised to use extreme caution with this callback.</p>
 			<p>
 			Plugins may refuse the default processing for the packet, causing MCServer to behave as if the
 			packet has never arrived. This may, however, create inconsistencies in the client - the client may
-			think that they placed a block, while the server didn't process the placing, etc.
+			think that they placed a block, while the server didn't process the placing, etc.</p>
+			<p>
+			If BlockFace is BLOCK_FACE_NONE, the player interacts with the air and not with a specific block. 
 		]],
 		Params =
 		{
@@ -37,4 +39,4 @@ return
 
 
 
-
+t

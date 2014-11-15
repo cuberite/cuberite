@@ -2,7 +2,7 @@ return
 {
 	HOOK_PLAYER_ANIMATION =
 	{
-		CalledWhen = "A client has sent an Animation packet (0x12)",
+		CalledWhen = "<b>DEPRECATED!</b> A client has sent an Animation packet (0x12)",
 		DefaultFnName = "OnPlayerAnimation",  -- also used as pagename
 		Desc = [[
 			This hook is called when the server receives an Animation packet (0x12) from the client.</p>

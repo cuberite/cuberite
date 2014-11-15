@@ -2203,7 +2203,7 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 
 void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
-	m_Client->GetPlayer()->GetWorld()->BroadcastEntityAnimation(*m_Client->GetPlayer(), 0, m_Client);
+	m_Client->HandleSwingArm();
 }
 
 

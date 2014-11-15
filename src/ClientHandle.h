@@ -246,7 +246,10 @@ public:
 	void PacketBufferFull(void);
 	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(unsigned char a_PacketType);
-	
+
+	/** Called when the protocol receives a animation packet with id 1. */
+	void HandleSwingArm();
+
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
 	an item in the anvil UI. */
 	void HandleAnvilItemName(const AString & a_ItemName);
