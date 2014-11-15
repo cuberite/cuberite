@@ -125,9 +125,6 @@ public:
 	
 	inline bool IsLoggedIn(void) const { return (m_State >= csAuthenticating); }
 
-	/** Returns the positions from the last block that the player placed. */
-	const Vector3i & GetLastPlacedBlock(void) const { return m_LastPlacedBlock; }  // tolua_export
-
 	/** Called while the client is being ticked from the world via its cPlayer object */
 	void Tick(float a_Dt);
 	
@@ -436,8 +433,8 @@ private:
 	/** Client Settings */
 	AString m_Locale;
 
-	/** The positions from the last block that the player placed. It's needed to verify the sign text change. */
-	Vector3i m_LastPlacedBlock;
+	/** The positions from the last sign that the player placed. It's needed to verify the sign text change. */
+	Vector3i m_LastPlacedSign;
 	
 	/** The plugin channels that the client has registered. */
 	cChannels m_PluginChannels;
