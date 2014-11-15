@@ -33,7 +33,7 @@ public:
 	/** The datatype used to represent the entire chunk worth of shape.
 	0 = air
 	1 = solid
-	Indexed as [y + 256 * z + 256 * 16 * x]. */
+	Indexed as [y + 256 * x + 256 * 16 * z]. */
 	typedef Byte Shape[256 * 16 * 16];
 	
 	/** Uncompressed block metas, 1 meta per byte */
