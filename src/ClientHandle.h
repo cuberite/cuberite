@@ -221,7 +221,7 @@ public:
 	void SetViewDistance(int a_ViewDistance);
 
 	/** Returns the view distance that the player currently have. */
-	int GetViewDistance(void) const { return m_UsedViewDistance; }
+	int GetViewDistance(void) const { return m_CurrentViewDistance; }
 
 	/** Returns the view distance that the player request, not the used view distance. */
 	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
@@ -339,8 +339,8 @@ private:
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
-	/** Number of chunks the player can see in each direction */
-	int m_UsedViewDistance;
+	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
+	int m_CurrentViewDistance;
 
 	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
 	int m_RequestedViewDistance;

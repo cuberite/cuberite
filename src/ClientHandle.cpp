@@ -65,7 +65,7 @@ int cClientHandle::s_ClientCount = 0;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
-	m_UsedViewDistance(a_ViewDistance),
+	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_Socket->GetIPString()),
 	m_OutgoingData(64 KiB),
@@ -431,7 +431,7 @@ bool cClientHandle::StreamNextChunk(void)
 	cCSLock Lock(m_CSChunkLists);
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
-	for (int Range = 0; Range < m_UsedViewDistance; Range++)
+	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
@@ -448,7 +448,7 @@ bool cClientHandle::StreamNextChunk(void)
 				cChunkCoords Coords(ChunkX, ChunkZ);
 
 				// Checks if the chunk is in distance
-				if ((Diff(ChunkX, ChunkPosX) > m_UsedViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_UsedViewDistance))
+				if ((Diff(ChunkX, ChunkPosX) > m_CurrentViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_CurrentViewDistance))
 				{
 					continue;
 				}
@@ -471,7 +471,7 @@ bool cClientHandle::StreamNextChunk(void)
 	}
 
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
-	for (int d = 0; d <= m_UsedViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
+	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
 		// For each distance add chunks in a hollow square centered around current position:
 		cChunkCoordsList CurcleChunks;
@@ -529,7 +529,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		{
 			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
 			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
-			if ((DiffX > m_UsedViewDistance) || (DiffZ > m_UsedViewDistance))
+			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				ChunksToRemove.push_back(*itr);
 				itr = m_LoadedChunks.erase(itr);
@@ -544,7 +544,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		{
 			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
 			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
-			if ((DiffX > m_UsedViewDistance) || (DiffZ > m_UsedViewDistance))
+			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				itr = m_ChunksToSend.erase(itr);
 			}
@@ -2851,8 +2851,8 @@ void cClientHandle::SetViewDistance(int a_ViewDistance)
 	ASSERT(m_Player->GetWorld() == NULL);
 
 	m_RequestedViewDistance = a_ViewDistance;
-	m_UsedViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, m_Player->GetWorld()->GetMaxViewDistance());
-	LOGD("Setted view distance from %s to %d!", GetUsername().c_str(), m_UsedViewDistance);
+	m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, m_Player->GetWorld()->GetMaxViewDistance());
+	LOGD("Setted view distance from %s to %d!", GetUsername().c_str(), m_CurrentViewDistance);
 }
 
 
