@@ -399,7 +399,7 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 		GetLargeAppleTreeBranch(a_BlockX, a_BlockY + i, a_BlockZ, BranchLength, BranchStartDirection, BranchDirection, a_BlockY + Height, a_Noise, a_LogBlocks);
 	}
 
-	// Place leaves
+	// Place leaves around each log block
 	for (auto itr : a_LogBlocks)
 	{
 		// Get the log's X and Z coordinates
