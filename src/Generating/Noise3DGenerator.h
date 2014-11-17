@@ -34,9 +34,9 @@ public:
 	
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
-	static const int UPSCALE_X = 8;
-	static const int UPSCALE_Y = 4;
-	static const int UPSCALE_Z = 8;
+	static const int UPSCALE_X = 4;
+	static const int UPSCALE_Y = 8;
+	static const int UPSCALE_Z = 4;
 	
 	// Linear interpolation buffer dimensions, calculated from the step sizes:
 	static const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;

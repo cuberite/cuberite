@@ -61,35 +61,6 @@ public:
 
 
 
-/** Linearly interpolates between two values.
-Assumes that a_Ratio is in range [0, 1]. */
-inline static NOISE_DATATYPE Lerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
-{
-	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
-}
-
-
-
-
-
-/** Linearly interpolates between two values, clamping the ratio to [0, 1] first. */
-inline static NOISE_DATATYPE ClampedLerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
-{
-	if (a_Ratio < 0)
-	{
-		return a_Val1;
-	}
-	if (a_Ratio > 1)
-	{
-		return a_Val2;
-	}
-	return Lerp(a_Val1, a_Val2, a_Ratio);
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cNoise3DGenerator:
 
@@ -249,10 +220,10 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	NOISE_DATATYPE NoiseW[DIM_X * DIM_Y * DIM_Z];  // Workspace that the noise calculation can use and trash
 
 	// Our noise array has different layout, XZY, instead of regular chunk's XYZ, that's why the coords are "renamed"
-	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(a_ChunkX       * cChunkDef::Width))     / m_FrequencyX;
-	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((a_ChunkX + 1) * cChunkDef::Width) - 1) / m_FrequencyX;
-	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(a_ChunkZ       * cChunkDef::Width))     / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((a_ChunkZ + 1) * cChunkDef::Width) - 1) / m_FrequencyZ;
+	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(a_ChunkX       * cChunkDef::Width)) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((a_ChunkX + 1) * cChunkDef::Width)) / m_FrequencyX;
+	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(a_ChunkZ       * cChunkDef::Width)) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((a_ChunkZ + 1) * cChunkDef::Width)) / m_FrequencyZ;
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)256) / m_FrequencyY;
 

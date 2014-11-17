@@ -2,8 +2,109 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Noise.h"
+#include "OSSupport\Timer.h"
 
 #define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
+
+
+
+
+
+#if 0
+/** cImprovedPerlin noise test suite:
+- Generate a rather large 2D and 3D noise array and output it to a file
+- Compare performance of cCubicNoise and cImprovedNoise, both in single-value and 3D-array usages */
+static class cImprovedPerlinNoiseTest
+{
+public:
+	cImprovedPerlinNoiseTest(void)
+	{
+		printf("Performing Improved Perlin Noise tests...\n");
+		TestImage();
+		TestSpeed();
+		TestSpeedArr();
+		printf("Improved Perlin Noise tests complete.\n");
+	}
+
+
+	/** Tests the noise by generating 2D and 3D images and dumping them to files. */
+	void TestImage(void)
+	{
+		static const int SIZE_X = 256;
+		static const int SIZE_Y = 256;
+		static const int SIZE_Z = 16;
+
+		cImprovedNoise noise(1);
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
+		noise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
+		Debug3DNoise(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, "ImprovedPerlinNoiseTest3D", 128);
+		noise.Generate2D(arr.get(), SIZE_X, SIZE_Y, 0, 14, 15, 28);
+		Debug2DNoise(arr.get(), SIZE_X, SIZE_Y, "ImprovedPerlinNoiseTest2D", 128);
+	}
+
+
+	/** Tests the speeds of cImprovedPerlin and cCubicNoise when generating individual values. */
+	void TestSpeed(void)
+	{
+		cImprovedNoise improvedNoise(1);
+		cNoise         noise(1);
+		cTimer timer;
+
+		// Measure the improvedNoise:
+		NOISE_DATATYPE sum = 0;
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 100000000; i++)
+		{
+			sum += improvedNoise.GetValueAt(i, 0, -i);
+		}
+		long long finish = timer.GetNowTime();
+		printf("cImprovedNoise took %.2f seconds; total is %f.\n", static_cast<float>(finish - start) / 1000.0f, sum);
+
+		// Measure the cubicNoise:
+		sum = 0;
+		start = timer.GetNowTime();
+		for (int i = 0; i < 100000000; i++)
+		{
+			sum += noise.IntNoise3D(i, 0, -i);
+		}
+		finish = timer.GetNowTime();
+		printf("cCubicNoise took %.2f seconds; total is %f.\n", static_cast<float>(finish - start) / 1000.0f, sum);
+	}
+
+
+	/** Tests the speeds of cImprovedPerlin and cCubicNoise when generating arrays. */
+	void TestSpeedArr(void)
+	{
+		static const int SIZE_X = 256;
+		static const int SIZE_Y = 256;
+		static const int SIZE_Z = 16;
+
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
+		cTimer timer;
+		cImprovedNoise improvedNoise(1);
+		cCubicNoise    cubicNoise(1);
+
+		// Measure the improvedNoise:
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 40; i++)
+		{
+			improvedNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
+		}
+		long long finish = timer.GetNowTime();
+		printf("cImprovedNoise(arr) took %.2f seconds.\n", static_cast<float>(finish - start) / 1000.0f);
+
+		// Measure the cubicNoise:
+		start = timer.GetNowTime();
+		for (int i = 0; i < 40; i++)
+		{
+			cubicNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
+		}
+		finish = timer.GetNowTime();
+		printf("cCubicNoise(arr) took %.2f seconds.\n", static_cast<float>(finish - start) / 1000.0f);
+	}
+} g_Test;
+
+#endif
 
 
 
@@ -12,7 +113,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_SizeZ, const AString & a_FileNameBase)
+void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
@@ -29,7 +130,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 				unsigned char buf[BUF_SIZE];
 				for (int x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f1.Write(buf, a_SizeX);
 			}  // for y
@@ -50,7 +151,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 				unsigned char buf[BUF_SIZE];
 				for (int x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f2.Write(buf, a_SizeX);
 			}  // for z
@@ -65,7 +166,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 
 
 
-void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase)
+void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
@@ -79,7 +180,7 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, cons
 			unsigned char buf[BUF_SIZE];
 			for (int x = 0; x < a_SizeX; x++)
 			{
-				buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+				buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 			}
 			f1.Write(buf, a_SizeX);
 		}  // for y
@@ -785,6 +886,169 @@ void cCubicNoise::CalcFloorFrac(
 		a_Same[a_NumSame] = a_Size - LastSame;
 		a_NumSame += 1;
 	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cImprovedNoise:
+
+cImprovedNoise::cImprovedNoise(int a_Seed)
+{
+	// Initialize the permutations with identity:
+	for (int i = 0; i < 256; i++)
+	{
+		m_Perm[i] = i;
+	}
+
+	// Randomize the permutation table - swap each element with a random other element:
+	cNoise noise(a_Seed);
+	for (int i = 0; i < 256; i++)
+	{
+		int rnd = (noise.IntNoise1DInt(i) / 7) % 256;
+		std::swap(m_Perm[i], m_Perm[rnd]);
+	}
+
+	// Copy the lower 256 entries into upper 256 entries:
+	for (int i = 0; i < 256; i++)
+	{
+		m_Perm[i + 256] = m_Perm[i];
+	}
+}
+
+
+
+
+
+void cImprovedNoise::Generate2D(
+	NOISE_DATATYPE * a_Array,
+	int a_SizeX, int a_SizeY,
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY
+) const
+{
+	size_t idx = 0;
+	for (int y = 0; y < a_SizeY; y++)
+	{
+		NOISE_DATATYPE ratioY = static_cast<NOISE_DATATYPE>(y) / (a_SizeY - 1);
+		NOISE_DATATYPE noiseY = Lerp(a_StartY, a_EndY, ratioY);
+		int noiseYInt = FAST_FLOOR(noiseY);
+		int yCoord = noiseYInt & 255;
+		NOISE_DATATYPE noiseYFrac = noiseY - noiseYInt;
+		NOISE_DATATYPE fadeY = Fade(noiseYFrac);
+		for (int x = 0; x < a_SizeX; x++)
+		{
+			NOISE_DATATYPE ratioX = static_cast<NOISE_DATATYPE>(x) / (a_SizeX - 1);
+			NOISE_DATATYPE noiseX = Lerp(a_StartX, a_EndX, ratioX);
+			int noiseXInt = FAST_FLOOR(noiseX);
+			int xCoord = noiseXInt & 255;
+			NOISE_DATATYPE noiseXFrac = noiseX - noiseXInt;
+			NOISE_DATATYPE fadeX = Fade(noiseXFrac);
+
+			// Hash the coordinates:
+			int A  = m_Perm[xCoord] + yCoord;
+			int AA = m_Perm[A];
+			int AB = m_Perm[A + 1];
+			int B  = m_Perm[xCoord + 1] + yCoord;
+			int BA = m_Perm[B];
+			int BB = m_Perm[B + 1];
+
+			// Lerp the gradients:
+			a_Array[idx++] = Lerp(
+				Lerp(Grad(m_Perm[AA], noiseXFrac, noiseYFrac,     0), Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac,     0), fadeX),
+				Lerp(Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, 0), Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, 0), fadeX),
+				fadeY
+			);
+		}  // for x
+	}  // for y
+}
+
+
+
+
+
+void cImprovedNoise::Generate3D(
+	NOISE_DATATYPE * a_Array,
+	int a_SizeX, int a_SizeY, int a_SizeZ,
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,
+	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ
+) const
+{
+	size_t idx = 0;
+	for (int z = 0; z < a_SizeZ; z++)
+	{
+		NOISE_DATATYPE ratioZ = static_cast<NOISE_DATATYPE>(z) / (a_SizeZ - 1);
+		NOISE_DATATYPE noiseZ = Lerp(a_StartZ, a_EndZ, ratioZ);
+		int noiseZInt = FAST_FLOOR(noiseZ);
+		int zCoord = noiseZInt & 255;
+		NOISE_DATATYPE noiseZFrac = noiseZ - noiseZInt;
+		NOISE_DATATYPE fadeZ = Fade(noiseZFrac);
+		for (int y = 0; y < a_SizeY; y++)
+		{
+			NOISE_DATATYPE ratioY = static_cast<NOISE_DATATYPE>(y) / (a_SizeY - 1);
+			NOISE_DATATYPE noiseY = Lerp(a_StartY, a_EndY, ratioY);
+			int noiseYInt = FAST_FLOOR(noiseY);
+			int yCoord = noiseYInt & 255;
+			NOISE_DATATYPE noiseYFrac = noiseY - noiseYInt;
+			NOISE_DATATYPE fadeY = Fade(noiseYFrac);
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				NOISE_DATATYPE ratioX = static_cast<NOISE_DATATYPE>(x) / (a_SizeX - 1);
+				NOISE_DATATYPE noiseX = Lerp(a_StartX, a_EndX, ratioX);
+				int noiseXInt = FAST_FLOOR(noiseX);
+				int xCoord = noiseXInt & 255;
+				NOISE_DATATYPE noiseXFrac = noiseX - noiseXInt;
+				NOISE_DATATYPE fadeX = Fade(noiseXFrac);
+
+				// Hash the coordinates:
+				int A  = m_Perm[xCoord] + yCoord;
+				int AA = m_Perm[A] + zCoord;
+				int AB = m_Perm[A + 1] + zCoord;
+				int B  = m_Perm[xCoord + 1] + yCoord;
+				int BA = m_Perm[B] + zCoord;
+				int BB = m_Perm[B + 1] + zCoord;
+
+				// Lerp the gradients:
+				// TODO: This may be optimized by swapping the coords and recalculating most lerps only "once every x"
+				a_Array[idx++] = Lerp(
+					Lerp(
+						Lerp(Grad(m_Perm[AA], noiseXFrac, noiseYFrac,     noiseZFrac), Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac,     noiseZFrac), fadeX),
+						Lerp(Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, noiseZFrac), Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac), fadeX),
+						fadeY
+					),
+					Lerp(
+						Lerp(Grad(m_Perm[AA + 1], noiseXFrac, noiseYFrac,     noiseZFrac - 1), Grad(m_Perm[BA + 1], noiseXFrac - 1, noiseYFrac,     noiseZFrac - 1), fadeX),
+						Lerp(Grad(m_Perm[AB + 1], noiseXFrac, noiseYFrac - 1, noiseZFrac - 1), Grad(m_Perm[BB + 1], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac - 1), fadeX),
+						fadeY
+					),
+					fadeZ
+				);
+			}  // for x
+		}  // for y
+	}  // for z
+}
+
+
+
+
+
+NOISE_DATATYPE cImprovedNoise::GetValueAt(int a_X, int a_Y, int a_Z)
+{
+	// Hash the coordinates:
+	a_X = a_X & 255;
+	a_Y = a_Y & 255;
+	a_Z = a_Z & 255;
+	int A  = m_Perm[a_X] + a_Y;
+	int AA = m_Perm[A] + a_Z;
+	int AB = m_Perm[A + 1] + a_Z;
+	int B  = m_Perm[a_X + 1] + a_Y;
+	int BA = m_Perm[B] + a_Z;
+	int BB = m_Perm[B + 1] + a_Z;
+
+	return Grad(m_Perm[AA], 0, 0, 0);
 }
 
 
