@@ -9,31 +9,7 @@
 #include "../BlockInfo.h"
 #include "../World.h"
 #include "../Entities/Player.h"
-
-
-
-
-
-static void lua_do_warning(lua_State* L, const char * a_pFormat, ...)
-{
-	// Retrieve current function name
-	lua_Debug entry;
-	VERIFY(lua_getstack(L, 0, &entry));
-	VERIFY(lua_getinfo(L, "n", &entry));
-
-	// Insert function name into error msg
-	AString msg(a_pFormat);
-	ReplaceString(msg, "#funcname#", entry.name?entry.name:"?");
-
-	// Copied from luaL_error and modified
-	va_list argp;
-	va_start(argp, a_pFormat);
-	luaL_where(L, 1);
-	lua_pushvfstring(L, msg.c_str(), argp);
-	va_end(argp);
-	lua_concat(L, 2);
-	lua_error(L);
-}
+#include "LuaState.h"
 
 
 
@@ -252,50 +228,53 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 /** function: cWorld:SetSignLines */
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 {
+	cLuaState LuaState(tolua_S);
+
 	#ifndef TOLUA_RELEASE
 	tolua_Error tolua_err;
 	if (
-		!tolua_isusertype (tolua_S, 1, "cWorld", 0, &tolua_err) ||
-		!tolua_isnumber   (tolua_S, 2, 0, &tolua_err) ||
-		!tolua_isnumber   (tolua_S, 3, 0, &tolua_err) ||
-		!tolua_isnumber   (tolua_S, 4, 0, &tolua_err) ||
-		!tolua_iscppstring(tolua_S, 5, 0, &tolua_err) ||
-		!tolua_iscppstring(tolua_S, 6, 0, &tolua_err) ||
-		!tolua_iscppstring(tolua_S, 7, 0, &tolua_err) ||
-		!tolua_iscppstring(tolua_S, 8, 0, &tolua_err) ||
-		!tolua_isusertype (tolua_S, 9, "cPlayer", 1, &tolua_err) ||
-		!tolua_isnoobj    (tolua_S, 10, &tolua_err)
+		!tolua_isusertype (LuaState, 1, "cWorld", 0, &tolua_err) ||
+		!tolua_isnumber   (LuaState, 2, 0, &tolua_err) ||
+		!tolua_isnumber   (LuaState, 3, 0, &tolua_err) ||
+		!tolua_isnumber   (LuaState, 4, 0, &tolua_err) ||
+		!tolua_iscppstring(LuaState, 5, 0, &tolua_err) ||
+		!tolua_iscppstring(LuaState, 6, 0, &tolua_err) ||
+		!tolua_iscppstring(LuaState, 7, 0, &tolua_err) ||
+		!tolua_iscppstring(LuaState, 8, 0, &tolua_err) ||
+		!tolua_isusertype (LuaState, 9, "cPlayer", 1, &tolua_err) ||
+		!tolua_isnoobj    (LuaState, 10, &tolua_err)
 		)
 		goto tolua_lerror;
 	else
 	#endif
 	{
-		cWorld * self       = (cWorld *) tolua_tousertype (tolua_S, 1, nullptr);
-		int BlockX          = (int)      tolua_tonumber   (tolua_S, 2, 0);
-		int BlockY          = (int)      tolua_tonumber   (tolua_S, 3, 0);
-		int BlockZ          = (int)      tolua_tonumber   (tolua_S, 4, 0);
-		const AString Line1 =            tolua_tocppstring(tolua_S, 5, 0);
-		const AString Line2 =            tolua_tocppstring(tolua_S, 6, 0);
-		const AString Line3 =            tolua_tocppstring(tolua_S, 7, 0);
-		const AString Line4 =            tolua_tocppstring(tolua_S, 8, 0);
-		cPlayer * Player    = (cPlayer *)tolua_tousertype (tolua_S, 9, nullptr);
+		cWorld * self       = (cWorld *) tolua_tousertype (LuaState, 1, nullptr);
+		int BlockX          = (int)      tolua_tonumber   (LuaState, 2, 0);
+		int BlockY          = (int)      tolua_tonumber   (LuaState, 3, 0);
+		int BlockZ          = (int)      tolua_tonumber   (LuaState, 4, 0);
+		const AString Line1 =            tolua_tocppstring(LuaState, 5, 0);
+		const AString Line2 =            tolua_tocppstring(LuaState, 6, 0);
+		const AString Line3 =            tolua_tocppstring(LuaState, 7, 0);
+		const AString Line4 =            tolua_tocppstring(LuaState, 8, 0);
+		cPlayer * Player    = (cPlayer *)tolua_tousertype (LuaState, 9, nullptr);
 		#ifndef TOLUA_RELEASE
 		if (self == nullptr)
 		{
-			tolua_error(tolua_S, "invalid 'self' in function 'UpdateSign'", nullptr);
+			tolua_error(LuaState, "invalid 'self' in function 'UpdateSign'", nullptr);
 		}
 		#endif
 		{
 			bool res = self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
-			tolua_pushboolean(tolua_S, res ? 1 : 0);
+			tolua_pushboolean(LuaState, res ? 1 : 0);
 		}
 	}
-	lua_do_warning(tolua_S, "Warning in function call '#funcname#': UpdateSign() is deprecated. Please use SetSignLines()");
+	LOGWARNING("Warning in function call 'UpdateSign': UpdateSign() is deprecated. Please use SetSignLines()");
+	LuaState.LogStackTrace(0);
 	return 1;
 	
 	#ifndef TOLUA_RELEASE
 tolua_lerror:
-	tolua_error(tolua_S, "#ferror in function 'UpdateSign'.", &tolua_err);
+	tolua_error(LuaState, "#ferror in function 'UpdateSign'.", &tolua_err);
 	return 0;
 	#endif
 }
