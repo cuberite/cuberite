@@ -2848,11 +2848,15 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
-	ASSERT(m_Player->GetWorld() == NULL);
-
 	m_RequestedViewDistance = a_ViewDistance;
-	m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, m_Player->GetWorld()->GetMaxViewDistance());
-	LOGD("Setted view distance from %s to %d!", GetUsername().c_str(), m_CurrentViewDistance);
+	LOGD("%s is requesting ViewDistance of %d!", GetUsername().c_str(), m_RequestedViewDistance);
+
+	// Set the current view distance based on the requested VD and world max VD:
+	cWorld * world = m_Player->GetWorld();
+	if (world != nullptr)
+	{
+		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
+	}
 }
 
 
