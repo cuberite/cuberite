@@ -7,22 +7,10 @@
 
 #include <cmath>
 
+/** The datatype used by all the noise generators. */
+typedef float NOISE_DATATYPE;
 
-
-
-
-// Some settings
-#define NOISE_DATATYPE float
-
-
-
-
-
-#ifdef _MSC_VER
-	#define INLINE __forceinline
-#else
-	#define INLINE inline
-#endif
+#include "OctavedNoise.h"
 
 
 
@@ -35,20 +23,20 @@ public:
 	cNoise(const cNoise & a_Noise);
 
 	// The following functions, if not marked INLINE, are about 20 % slower
-	INLINE NOISE_DATATYPE IntNoise1D(int a_X) const;
-	INLINE NOISE_DATATYPE IntNoise2D(int a_X, int a_Y) const;
-	INLINE NOISE_DATATYPE IntNoise3D(int a_X, int a_Y, int a_Z) const;
+	inline NOISE_DATATYPE IntNoise1D(int a_X) const;
+	inline NOISE_DATATYPE IntNoise2D(int a_X, int a_Y) const;
+	inline NOISE_DATATYPE IntNoise3D(int a_X, int a_Y, int a_Z) const;
 
 	// Return a float number in the specified range:
-	INLINE NOISE_DATATYPE IntNoise2DInRange(int a_X, int a_Y, float a_Min, float a_Max) const
+	inline NOISE_DATATYPE IntNoise2DInRange(int a_X, int a_Y, float a_Min, float a_Max) const
 	{
 		return a_Min + std::abs(IntNoise2D(a_X, a_Y)) * (a_Max - a_Min);
 	}
 
 	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of occurrence. Divide by 8 to rectify.
-	INLINE int IntNoise1DInt(int a_X) const;
-	INLINE int IntNoise2DInt(int a_X, int a_Y) const;
-	INLINE int IntNoise3DInt(int a_X, int a_Y, int a_Z) const;
+	inline int IntNoise1DInt(int a_X) const;
+	inline int IntNoise2DInt(int a_X, int a_Y) const;
+	inline int IntNoise3DInt(int a_X, int a_Y, int a_Z) const;
 
 	NOISE_DATATYPE LinearNoise1D(NOISE_DATATYPE a_X) const;
 	NOISE_DATATYPE CosineNoise1D(NOISE_DATATYPE a_X) const;
@@ -61,9 +49,9 @@ public:
 
 	void SetSeed(int a_Seed) { m_Seed = a_Seed; }
 
-	INLINE static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
-	INLINE static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
-	INLINE static NOISE_DATATYPE LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
+	inline static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
+	inline static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
+	inline static NOISE_DATATYPE LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
 
 private:
 	int m_Seed;
@@ -197,65 +185,7 @@ protected:
 
 
 
-class cPerlinNoise
-{
-public:
-	cPerlinNoise(void);
-	cPerlinNoise(int a_Seed);
-	
-	
-	void SetSeed(int a_Seed);
-	
-	void AddOctave(NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude);
-	
-	void Generate1D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
-		int a_SizeX,                                     ///< Count of the array
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array
-		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
-	) const;
-	
-	
-	void Generate2D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
-	) const;
-	
-	
-	void Generate3D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash
-	) const;
-	
-protected:
-	class cOctave
-	{
-	public:
-		cCubicNoise m_Noise;
-		
-		NOISE_DATATYPE m_Frequency;  // Coord multiplier
-		NOISE_DATATYPE m_Amplitude;  // Value multiplier
-		
-		cOctave(int a_Seed, NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude) :
-			m_Noise(a_Seed),
-			m_Frequency(a_Frequency),
-			m_Amplitude(a_Amplitude)
-		{
-		}
-	} ;
-	
-	typedef std::vector<cOctave> cOctaves;
-	
-	int      m_Seed;
-	cOctaves m_Octaves;
-} ;
+typedef cOctavedNoise<cCubicNoise> cPerlinNoise;
 
 
 
