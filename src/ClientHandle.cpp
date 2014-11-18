@@ -94,6 +94,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
+	m_LastPlacedSign(0, -1, 0),
 	m_ProtocolVersion(0)
 {
 	m_Protocol = new cProtocolRecognizer(this);
@@ -1501,6 +1502,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
@@ -1678,8 +1680,11 @@ void cClientHandle::HandleUpdateSign(
 	const AString & a_Line3, const AString & a_Line4
 )
 {
-	cWorld * World = m_Player->GetWorld();
-	World->UpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+	if (m_LastPlacedSign.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+	{
+		m_LastPlacedSign.Set(0, -1, 0);
+		m_Player->GetWorld()->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+	}
 }
 
 
@@ -2258,6 +2263,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 
 void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	m_LastPlacedSign.Set(a_BlockX, a_BlockY, a_BlockZ);
 	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 }
 

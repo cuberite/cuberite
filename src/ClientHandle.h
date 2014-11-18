@@ -438,6 +438,9 @@ private:
 
 	/** Client Settings */
 	AString m_Locale;
+
+	/** The positions from the last sign that the player placed. It's needed to verify the sign text change. */
+	Vector3i m_LastPlacedSign;
 	
 	/** The plugin channels that the client has registered. */
 	cChannels m_PluginChannels;
