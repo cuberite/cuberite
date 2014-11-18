@@ -695,13 +695,6 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 ////////////////////////////////////////////////////////////////////////////////
 // cCubicNoise:
 
-#ifdef _DEBUG
-	int cCubicNoise::m_NumSingleX = 0;
-	int cCubicNoise::m_NumSingleXY = 0;
-	int cCubicNoise::m_NumSingleY = 0;
-	int cCubicNoise::m_NumCalls = 0;
-#endif  // _DEBUG
-
 cCubicNoise::cCubicNoise(int a_Seed) :
 	m_Noise(a_Seed)
 {
@@ -739,23 +732,6 @@ void cCubicNoise::Generate2D(
 	cCubicCell2D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
 	
 	Cell.InitWorkRnds(FloorX[0], FloorY[0]);
-	
-	#ifdef _DEBUG
-		// Statistics on the noise-space coords:
-		if (NumSameX == 1)
-		{
-			m_NumSingleX++;
-			if (NumSameY == 1)
-			{
-				m_NumSingleXY++;
-			}
-		}
-		if (NumSameY == 1)
-		{
-			m_NumSingleY++;
-		}
-		m_NumCalls++;
-	#endif  // _DEBUG
 	
 	// Calculate query values using Cell:
 	int FromY = 0;

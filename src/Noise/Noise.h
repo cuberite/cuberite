@@ -65,19 +65,15 @@ private:
 class cCubicNoise
 {
 public:
-	static const int MAX_SIZE = 512;  ///< Maximum size of each dimension of the query arrays.
+	/** Maximum size of each dimension of the query arrays. */
+	static const int MAX_SIZE = 512;
 	
 	
+	/** Creates a new instance with the specified seed. */
 	cCubicNoise(int a_Seed);
 	
 	
-	void Generate1D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into
-		int a_SizeX,                                     ///< Count of the array
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX   ///< Noise-space coords of the array
-	) const;
-	
-	
+	/** Fills a 2D array with the values of the noise. */
 	void Generate2D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
 		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
@@ -86,6 +82,7 @@ public:
 	) const;
 	
 	
+	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
 		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
@@ -95,33 +92,21 @@ public:
 	) const;
 	
 protected:
-	typedef NOISE_DATATYPE Workspace1D[4];
-	typedef NOISE_DATATYPE Workspace2D[4][4];
 	
-	cNoise m_Noise;  // Used for integral rnd values
+	/** Noise used for integral random values. */
+	cNoise m_Noise;
 
-	#ifdef _DEBUG
-		// Statistics on the noise-space coords:
-		static int m_NumSingleX;
-		static int m_NumSingleXY;
-		static int m_NumSingleY;
-		static int m_NumCalls;
-	#endif  // _DEBUG
-	
-	/// Calculates the integral and fractional parts along one axis.
+
+	/** Calculates the integral and fractional parts along one axis.
+	a_Floor will receive the integral parts (array of a_Size ints).
+	a_Frac will receive the fractional parts (array of a_Size floats).
+	a_Same will receive the counts of items that have the same integral parts (array of up to a_Size ints).
+	a_NumSame will receive the count of a_Same elements (total count of different integral parts). */
 	void CalcFloorFrac(
 		int a_Size,
 		NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
 		int * a_Floor, NOISE_DATATYPE * a_Frac,
 		int * a_Same, int & a_NumSame
-	) const;
-	
-	void UpdateWorkRnds2DX(
-		Workspace2D & a_WorkRnds,
-		Workspace1D & a_Interps,
-		int a_LastFloorX, int a_NewFloorX,
-		int a_FloorY,
-		NOISE_DATATYPE a_FractionY
 	) const;
 } ;
 

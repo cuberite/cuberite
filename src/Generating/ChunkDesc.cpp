@@ -7,7 +7,7 @@
 #include "ChunkDesc.h"
 #include "../BlockArea.h"
 #include "../Cuboid.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 #include "../BlockEntities/BlockEntity.h"
 
 

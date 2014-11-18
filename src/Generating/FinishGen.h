@@ -16,7 +16,7 @@
 
 
 #include "ComposableGenerator.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"
 
 

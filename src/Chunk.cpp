@@ -25,7 +25,7 @@
 #include "BlockEntities/FlowerPotEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
-#include "Noise.h"
+#include "Noise/Noise.h"
 #include "Root.h"
 #include "MersenneTwister.h"
 #include "Entities/Player.h"
