@@ -294,9 +294,10 @@ void cNBTChunkSerializer::AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
 void cNBTChunkSerializer::AddMobSpawnerEntity(cMobSpawnerEntity * a_MobSpawner)
 {
 	m_Writer.BeginCompound("");
-	AddBasicTileEntity(a_MobSpawner, "MobSpawner");
+		AddBasicTileEntity(a_MobSpawner, "MobSpawner");
+		m_Writer.AddShort("Entity", static_cast<short>(a_MobSpawner->GetEntity()));
 		m_Writer.AddString("EntityId", a_MobSpawner->GetEntityName());
-		m_Writer.AddShort("Delay", (Int16)a_MobSpawner->GetSpawnDelay());
+		m_Writer.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
 	m_Writer.EndCompound();
 }
 

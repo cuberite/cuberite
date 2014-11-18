@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "MobSpawnerEntity.h"
-#include "json/json.h"
 
 #include "../World.h"
 #include "../FastRandom.h"
@@ -38,8 +37,8 @@ void cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 {
 	if (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SPAWN_EGG)
 	{
-		cMonster::eType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
-		if (MonsterType == mtInvalidType)
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
+		if (MonsterType == eMonsterType::mtInvalidType)
 		{
 			return;
 		}
@@ -50,7 +49,7 @@ void cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
-		LOGD("Changed monster spawner entity to %s!", GetEntityName().c_str());
+		LOGD("Changed monster spawner at {%d, %d, %d} to type %s.", GetPosX(), GetPosY(), GetPosZ(), GetEntityName().c_str());
 	}
 }
 
@@ -105,7 +104,7 @@ bool cMobSpawnerEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cMobSpawnerEntity::ResetTimer(void)
 {
-	m_SpawnDelay = 200 + m_World->GetTickRandomNumber(600);
+	m_SpawnDelay = (short) (200 + m_World->GetTickRandomNumber(600));
 	m_World->BroadcastBlockEntity(m_PosX, m_PosY, m_PosZ);
 }
 
@@ -190,30 +189,6 @@ void cMobSpawnerEntity::SpawnEntity(void)
 	{
 		ResetTimer();
 	}
-}
-
-
-
-
-
-bool cMobSpawnerEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	return true;
-}
-
-
-
-
-
-void cMobSpawnerEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
 }
 
 

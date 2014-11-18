@@ -28,11 +28,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-};
-
 class cChunk;
 class cPlayer;
 class cWorld;

@@ -28,6 +28,7 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Mobs/Monster.h"
@@ -664,6 +665,7 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 		case E_BLOCK_HOPPER:        return LoadHopperFromNBT      (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_JUKEBOX:       return LoadJukeboxFromNBT     (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_LIT_FURNACE:   return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LIT_FURNACE, a_BlockMeta);
+		case E_BLOCK_MOB_SPAWNER:   return LoadMobSpawnerFromNBT  (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_NOTE_BLOCK:    return LoadNoteBlockFromNBT   (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_SIGN_POST:     return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_SIGN_POST);
 		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_TRAPPED_CHEST);
@@ -1079,6 +1081,54 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	// Restart cooking:
 	Furnace->ContinueCooking();
 	return Furnace.release();
+}
+
+
+
+
+
+cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	// Check if the data has a proper type:
+	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "MobSpawner"))
+	{
+		return nullptr;
+	}
+
+	std::auto_ptr<cMobSpawnerEntity> MobSpawner(new cMobSpawnerEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
+
+	// Load entity (MCServer worlds):
+	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
+	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
+	{
+		short MonsterType = a_NBT.GetShort(Type);
+		if ((MonsterType >= 50) && (MonsterType <= 120))
+		{
+			MobSpawner->SetEntity(static_cast<eMonsterType>(MonsterType));
+		}
+	}
+	else
+	{
+		// Load entity (vanilla worlds):
+		Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
+		if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
+		{
+			eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
+			if (MonsterType != eMonsterType::mtInvalidType)
+			{
+				MobSpawner->SetEntity(MonsterType);
+			}
+		}
+	}
+
+	// Load delay:
+	int Delay = a_NBT.FindChildByName(a_TagIdx, "Delay");
+	if ((Delay >= 0) && (a_NBT.GetType(Delay) == TAG_Short))
+	{
+		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
+	}
+
+	return MobSpawner.release();
 }
 
 

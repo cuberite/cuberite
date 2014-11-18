@@ -15,16 +15,6 @@
 
 
 
-
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 // tolua_begin
 
 class cFlowerPotEntity :

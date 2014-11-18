@@ -1,3 +1,4 @@
+
 // BeaconEntity.h
 
 // Declares the cBeaconEntity class representing a single beacon in the world
@@ -9,15 +10,6 @@
 #pragma once
 
 #include "BlockEntityWithItems.h"
-
-
-
-
-
-namespace Json
-{
-	class Value;
-}
 
 
 

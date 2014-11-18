@@ -8,15 +8,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 // tolua_begin
 
 class cMobSpawnerEntity :
@@ -54,15 +45,15 @@ public:
 	AString GetEntityName(void) const;
 
 	/** Returns the spawn delay. */
-	int GetSpawnDelay(void) const { return m_SpawnDelay; }
+	short GetSpawnDelay(void) const { return m_SpawnDelay; }
+
+	/** Sets the spawn delay. */
+	void SetSpawnDelay(short a_Delay) { m_SpawnDelay = a_Delay; }
 
 	int GetNearbyPlayersNum(void);
 	int GetNearbyMonsterNum(eMonsterType a_EntityType);
 
 	// tolua_end
-
-	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
 
 	static const char * GetClassStatic(void) { return "cMobSpawnerEntity"; }
 
@@ -70,7 +61,7 @@ private:
 	/** The entity to spawn. */
 	eMonsterType m_Entity;
 
-	int m_SpawnDelay;
+	short m_SpawnDelay;
 
 	bool m_IsActive;
 } ;  // tolua_end

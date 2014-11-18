@@ -52,7 +52,7 @@ public :
 	tSpawnedContainer & getSpawned(void);
 
 	/** Returns true if specified type of mob can spawn on specified block */
-	static bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, cMonster::eType a_MobType, EMCSBiome a_Biome);
+	static bool CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, EMCSBiome a_Biome);
 
 protected :
 	// return a random type that can spawn on specified biome.
