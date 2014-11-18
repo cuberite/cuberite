@@ -14,6 +14,7 @@
 
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
+#include "../Noise/InterpolNoise.h"
 
 
 
@@ -43,7 +44,9 @@ protected:
 	static const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
 	static const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
 
-	cPerlinNoise m_Perlin;   // The base 3D noise source for the actual composition
+	/** The base 3D noise source for the actual composition */
+	cOctavedNoise<cInterp5DegNoise> m_Perlin;
+
 	cCubicNoise  m_Cubic;    // The noise used for heightmap directing
 	
 	int            m_SeaLevel;

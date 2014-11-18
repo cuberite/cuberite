@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Noise3DGenerator.h"
 #include "../OSSupport/File.h"
+#include "../OSSupport/Timer.h"
 #include "../IniFile.h"
 #include "../LinearInterpolation.h"
 #include "../LinearUpscale.h"
@@ -61,6 +62,50 @@ public:
 
 
 
+#if 0
+// Perform speed test of the cInterpolNoise class
+static class cInterpolNoiseSpeedTest
+{
+public:
+	cInterpolNoiseSpeedTest(void)
+	{
+		printf("Evaluating 3D noise performance...\n");
+		static const int SIZE_X = 128;
+		static const int SIZE_Y = 128;
+		static const int SIZE_Z = 128;
+		static const NOISE_DATATYPE MUL = 80;
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
+		cTimer timer;
+
+		// Test the cInterpolNoise:
+		cInterpolNoise<Interp5Deg> interpNoise(1);
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 30; i++)
+		{
+			interpNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, MUL * i, MUL * i + MUL, 0, MUL, 0, MUL);
+		}
+		long long end = timer.GetNowTime();
+		printf("InterpolNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+
+		// Test the cCubicNoise:
+		cCubicNoise cubicNoise(1);
+		start = timer.GetNowTime();
+		for (int i = 0; i < 30; i++)
+		{
+			cubicNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, MUL * i, MUL * i + MUL, 0, MUL, 0, MUL);
+		}
+		end = timer.GetNowTime();
+		printf("CubicNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+		printf("3D noise performance comparison finished.\n");
+	}
+
+} g_InterpolNoiseSpeedTest;
+#endif
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cNoise3DGenerator:
 
@@ -69,9 +114,11 @@ cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_Perlin(1000),
 	m_Cubic(1000)
 {
-	m_Perlin.AddOctave(1, (NOISE_DATATYPE)0.5);
-	m_Perlin.AddOctave((NOISE_DATATYPE)0.5, 1);
-	m_Perlin.AddOctave((NOISE_DATATYPE)0.5, 2);
+	m_Perlin.AddOctave(1,  1);
+	m_Perlin.AddOctave(2,  0.5);
+	m_Perlin.AddOctave(4,  0.25);
+	m_Perlin.AddOctave(8,  0.125);
+	m_Perlin.AddOctave(16, 0.0625);
 
 	#if 0
 	// DEBUG: Test the noise generation:
