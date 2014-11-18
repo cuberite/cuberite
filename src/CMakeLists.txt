@@ -121,6 +121,7 @@ SET (HDRS
 	MobSpawner.h
 	MonsterConfig.h
 	Noise.h
+	OctavedNoise.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h

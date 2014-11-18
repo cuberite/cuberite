@@ -80,7 +80,7 @@ public:
 		}
 	
 		// Add each octave:
-		for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
+		for (auto itr = m_Octaves.cbegin() + 1, end = m_Octaves.cend(); itr != end; ++itr)
 		{
 			// Generate the noise for the octave:
 			itr->m_Noise.Generate2D(
@@ -139,7 +139,7 @@ public:
 		}
 	
 		// Add each octave:
-		for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
+		for (auto itr = m_Octaves.cbegin() + 1, end = m_Octaves.cend(); itr != end; ++itr)
 		{
 			// Generate the noise for the octave:
 			itr->m_Noise.Generate3D(
