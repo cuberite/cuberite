@@ -14,7 +14,6 @@ SET (SRCS
 	ScoreboardSerializer.cpp
 	StatSerializer.cpp
 	WSSAnvil.cpp
-	WSSCompact.cpp
 	WorldStorage.cpp)
 
 SET (HDRS
@@ -27,7 +26,6 @@ SET (HDRS
 	ScoreboardSerializer.h
 	StatSerializer.h
 	WSSAnvil.h
-	WSSCompact.h
 	WorldStorage.h)
 
 if(NOT MSVC)

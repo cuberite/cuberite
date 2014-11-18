@@ -43,7 +43,7 @@ cFurnaceRecipe::~cFurnaceRecipe()
 {
 	ClearRecipes();
 	delete m_pState;
-	m_pState = NULL;
+	m_pState = nullptr;
 }
 
 
@@ -247,9 +247,9 @@ void cFurnaceRecipe::ClearRecipes(void)
 	{
 		cRecipe Recipe = *itr;
 		delete Recipe.In;
-		Recipe.In = NULL;
+		Recipe.In = nullptr;
 		delete Recipe.Out;
-		Recipe.Out = NULL;
+		Recipe.Out = nullptr;
 	}
 	m_pState->Recipes.clear();
 
@@ -257,7 +257,7 @@ void cFurnaceRecipe::ClearRecipes(void)
 	{
 		cFuel Fuel = *itr;
 		delete Fuel.In;
-		Fuel.In = NULL;
+		Fuel.In = nullptr;
 	}
 	m_pState->Fuel.clear();
 }

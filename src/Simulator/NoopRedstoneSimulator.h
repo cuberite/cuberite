@@ -36,5 +36,10 @@ public:
 		UNUSED(a_BlockZ);
 		UNUSED(a_Chunk);
 	}
+	
+	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
+	{
+		return nullptr;
+	}
 
 } ;

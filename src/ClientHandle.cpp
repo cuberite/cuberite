@@ -65,10 +65,11 @@ int cClientHandle::s_ClientCount = 0;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
-	m_ViewDistance(a_ViewDistance),
+	m_CurrentViewDistance(a_ViewDistance),
+	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_Socket->GetIPString()),
 	m_OutgoingData(64 KiB),
-	m_Player(NULL),
+	m_Player(nullptr),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(0x7fffffff),
@@ -92,7 +93,9 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_NumBlockChangeInteractionsThisTick(0),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
-	m_Locale("en_GB")
+	m_Locale("en_GB"),
+	m_LastPlacedSign(0, -1, 0),
+	m_ProtocolVersion(0)
 {
 	m_Protocol = new cProtocolRecognizer(this);
 	
@@ -121,10 +124,10 @@ cClientHandle::~cClientHandle()
 		m_ChunksToSend.clear();
 	}
 
-	if (m_Player != NULL)
+	if (m_Player != nullptr)
 	{
 		cWorld * World = m_Player->GetWorld();
-		if (World != NULL)
+		if (World != nullptr)
 		{
 			if (!m_Username.empty())
 			{
@@ -136,7 +139,7 @@ cClientHandle::~cClientHandle()
 			m_Player->Destroy();
 		}
 		delete m_Player;
-		m_Player = NULL;
+		m_Player = nullptr;
 	}
 
 	if (!m_HasSentDC)
@@ -148,7 +151,7 @@ cClientHandle::~cClientHandle()
 	cRoot::Get()->GetServer()->RemoveClient(this);
 	
 	delete m_Protocol;
-	m_Protocol = NULL;
+	m_Protocol = nullptr;
 	
 	LOGD("ClientHandle at %p deleted", this);
 }
@@ -172,7 +175,7 @@ void cClientHandle::Destroy(void)
 	// DEBUG:
 	LOGD("%s: client %p, \"%s\"", __FUNCTION__, this, m_Username.c_str());
 	
-	if ((m_Player != NULL) && (m_Player->GetWorld() != NULL))
+	if ((m_Player != nullptr) && (m_Player->GetWorld() != nullptr))
 	{
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
@@ -247,9 +250,12 @@ AString cClientHandle::GenerateOfflineUUID(const AString & a_Username)
 	// xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx where x is any hexadecimal digit and y is one of 8, 9, A, or B
 	// Note that we generate a short UUID (without the dashes)
 	
+	// First make the username lowercase:
+	AString lcUsername = StrToLower(a_Username);
+
 	// Generate an md5 checksum, and use it as base for the ID:
 	unsigned char MD5[16];
-	md5((const unsigned char *)a_Username.c_str(), a_Username.length(), MD5);
+	md5((const unsigned char *)lcUsername.c_str(), lcUsername.length(), MD5);
 	MD5[6] &= 0x0f;  // Need to trim to 4 bits only...
 	MD5[8] &= 0x0f;  // ... otherwise %01x overflows into two chars
 	return Printf("%02x%02x%02x%02x%02x%02x3%01x%02x8%01x%02x%02x%02x%02x%02x%02x%02x",
@@ -310,7 +316,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		return;
 	}
 	
-	ASSERT(m_Player == NULL);
+	ASSERT(m_Player == nullptr);
 
 	m_Username = a_Name;
 	
@@ -331,7 +337,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Player = new cPlayer(this, GetUsername());
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
-	if (World == NULL)
+	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetDefaultWorld();
 	}
@@ -401,53 +407,145 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 
 
-void cClientHandle::StreamChunks(void)
+bool cClientHandle::StreamNextChunk(void)
 {
 	if ((m_State < csAuthenticated) || (m_State >= csDestroying))
 	{
-		return;
+		return true;
 	}
+	ASSERT(m_Player != nullptr);
 
-	ASSERT(m_Player != NULL);
-
-	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
-	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
-	if ((ChunkPosX == m_LastStreamedChunkX) && (ChunkPosZ == m_LastStreamedChunkZ))
+	int ChunkPosX = m_Player->GetChunkX();
+	int ChunkPosZ = m_Player->GetChunkZ();
+	if ((m_LastStreamedChunkX == ChunkPosX) && (m_LastStreamedChunkZ == ChunkPosZ))
 	{
-		// Already streamed for this position
-		return;
+		// All chunks are already loaded. Abort loading.
+		return true;
 	}
+
+	// Get the look vector and normalize it.
+	Vector3d Position = m_Player->GetEyePosition();
+	Vector3d LookVector = m_Player->GetLookVector();
+	LookVector.Normalize();
+
+	// Lock the list
+	cCSLock Lock(m_CSChunkLists);
+
+	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
+	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
+	{
+		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
+
+		// Get the chunk from the x/z coords.
+		int RangeX, RangeZ = 0;
+		cChunkDef::BlockToChunk(FloorC(Vector.x), FloorC(Vector.z), RangeX, RangeZ);
+
+		for (size_t X = 0; X < 7; X++)
+		{
+			for (size_t Z = 0; Z < 7; Z++)
+			{
+				int ChunkX = RangeX + ((X >= 4) ? (3 - X) : X);
+				int ChunkZ = RangeZ + ((Z >= 4) ? (3 - Z) : Z);
+				cChunkCoords Coords(ChunkX, ChunkZ);
+
+				// Checks if the chunk is in distance
+				if ((Diff(ChunkX, ChunkPosX) > m_CurrentViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_CurrentViewDistance))
+				{
+					continue;
+				}
+
+				// If the chunk already loading/loaded -> skip
+				if (
+					(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+					(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+				)
+				{
+					continue;
+				}
+
+				// Unloaded chunk found -> Send it to the client.
+				Lock.Unlock();
+				StreamChunk(ChunkX, ChunkZ, ((Range <= 2) ? cChunkSender::E_CHUNK_PRIORITY_HIGH : cChunkSender::E_CHUNK_PRIORITY_MEDIUM));
+				return false;
+			}
+		}
+	}
+
+	// Low priority: Add all chunks that are in range. (From the center out to the edge)
+	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
+	{
+		// For each distance add chunks in a hollow square centered around current position:
+		cChunkCoordsList CurcleChunks;
+		for (int i = -d; i <= d; ++i)
+		{
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX + d, ChunkPosZ + i));
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX - d, ChunkPosZ + i));
+		}
+		for (int i = -d + 1; i < d; ++i)
+		{
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ + d));
+			CurcleChunks.push_back(cChunkCoords(ChunkPosX + i, ChunkPosZ - d));
+		}
+
+		// For each the CurcleChunks list and send the first unloaded chunk:
+		for (cChunkCoordsList::iterator itr = CurcleChunks.begin(), end = CurcleChunks.end(); itr != end; ++itr)
+		{
+			cChunkCoords Coords = *itr;
+
+			// If the chunk already loading/loaded -> skip
+			if (
+				(std::find(m_ChunksToSend.begin(), m_ChunksToSend.end(), Coords) != m_ChunksToSend.end()) ||
+				(std::find(m_LoadedChunks.begin(), m_LoadedChunks.end(), Coords) != m_LoadedChunks.end())
+			)
+			{
+				continue;
+			}
+
+			// Unloaded chunk found -> Send it to the client.
+			Lock.Unlock();
+			StreamChunk(Coords.m_ChunkX, Coords.m_ChunkZ, cChunkSender::E_CHUNK_PRIORITY_LOW);
+			return false;
+		}
+	}
+
+	// All chunks are loaded -> Sets the last loaded chunk coordinates to current coordinates
 	m_LastStreamedChunkX = ChunkPosX;
 	m_LastStreamedChunkZ = ChunkPosZ;
-	
-	LOGD("Streaming chunks centered on [%d, %d], view distance %d", ChunkPosX, ChunkPosZ, m_ViewDistance);
-	
-	cWorld * World = m_Player->GetWorld();
-	ASSERT(World != NULL);
+	return true;
+}
 
-	// Remove all loaded chunks that are no longer in range; deferred to out-of-CS:
-	cChunkCoordsList RemoveChunks;
+
+
+
+
+void cClientHandle::UnloadOutOfRangeChunks(void)
+{
+	int ChunkPosX = FAST_FLOOR_DIV((int)m_Player->GetPosX(), cChunkDef::Width);
+	int ChunkPosZ = FAST_FLOOR_DIV((int)m_Player->GetPosZ(), cChunkDef::Width);
+
+	cChunkCoordsList ChunksToRemove;
 	{
 		cCSLock Lock(m_CSChunkLists);
 		for (cChunkCoordsList::iterator itr = m_LoadedChunks.begin(); itr != m_LoadedChunks.end();)
 		{
-			int RelX = (*itr).m_ChunkX - ChunkPosX;
-			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
-			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
+			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
+			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
+			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
-				RemoveChunks.push_back(*itr);
+				ChunksToRemove.push_back(*itr);
 				itr = m_LoadedChunks.erase(itr);
 			}
 			else
 			{
 				++itr;
 			}
-		}  // for itr - m_LoadedChunks[]
+		}
+
 		for (cChunkCoordsList::iterator itr = m_ChunksToSend.begin(); itr != m_ChunksToSend.end();)
 		{
-			int RelX = (*itr).m_ChunkX - ChunkPosX;
-			int RelZ = (*itr).m_ChunkZ - ChunkPosZ;
-			if ((RelX > m_ViewDistance) || (RelX < -m_ViewDistance) || (RelZ > m_ViewDistance) || (RelZ < -m_ViewDistance))
+			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
+			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
+			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				itr = m_ChunksToSend.erase(itr);
 			}
@@ -455,52 +553,21 @@ void cClientHandle::StreamChunks(void)
 			{
 				++itr;
 			}
-		}  // for itr - m_ChunksToSend[]
+		}
 	}
-	for (cChunkCoordsList::iterator itr = RemoveChunks.begin(); itr != RemoveChunks.end(); ++itr)
+
+	for (cChunkCoordsList::iterator itr = ChunksToRemove.begin(); itr != ChunksToRemove.end(); ++itr)
 	{
-		World->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
-		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
-	}  // for itr - RemoveChunks[]
-	
-	// Add all chunks that are in range and not yet in m_LoadedChunks:
-	// Queue these smartly - from the center out to the edge
-	for (int d = 0; d <= m_ViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
-	{
-		// For each distance add chunks in a hollow square centered around current position:
-		for (int i = -d; i <= d; ++i)
-		{
-			StreamChunk(ChunkPosX + d, ChunkPosZ + i);
-			StreamChunk(ChunkPosX - d, ChunkPosZ + i);
-		}  // for i
-		for (int i = -d + 1; i < d; ++i)
-		{
-			StreamChunk(ChunkPosX + i, ChunkPosZ + d);
-			StreamChunk(ChunkPosX + i, ChunkPosZ - d);
-		}  // for i
-	}  // for d
-	
-	// Touch chunks GENERATEDISTANCE ahead to let them generate:
-	for (int d = m_ViewDistance + 1; d <= m_ViewDistance + GENERATEDISTANCE; ++d)  // cycle through (square) distance, from nearest to furthest
-	{
-		// For each distance touch chunks in a hollow square centered around current position:
-		for (int i = -d; i <= d; ++i)
-		{
-			World->TouchChunk(ChunkPosX + d, ChunkPosZ + i);
-			World->TouchChunk(ChunkPosX - d, ChunkPosZ + i);
-		}  // for i
-		for (int i = -d + 1; i < d; ++i)
-		{
-			World->TouchChunk(ChunkPosX + i, ChunkPosZ + d);
-			World->TouchChunk(ChunkPosX + i, ChunkPosZ - d);
-		}  // for i
-	}  // for d
+		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
+		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
+	}
 }
 
 
 
 
-void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
+
+void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority)
 {
 	if (m_State >= csDestroying)
 	{
@@ -509,7 +576,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 	}
 	
 	cWorld * World = m_Player->GetWorld();
-	ASSERT(World != NULL);
+	ASSERT(World != nullptr);
 
 	if (World->AddChunkClient(a_ChunkX, a_ChunkZ, this))
 	{
@@ -518,7 +585,7 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 			m_LoadedChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 			m_ChunksToSend.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
 		}
-		World->SendChunkTo(a_ChunkX, a_ChunkZ, this);
+		World->SendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, this);
 	}
 }
 
@@ -530,21 +597,33 @@ void cClientHandle::StreamChunk(int a_ChunkX, int a_ChunkZ)
 void cClientHandle::RemoveFromAllChunks()
 {
 	cWorld * World = m_Player->GetWorld();
-	if (World != NULL)
+	if (World != nullptr)
 	{
 		World->RemoveClientFromChunks(this);
 	}
 	
 	{
+		// Reset all chunk lists:
 		cCSLock Lock(m_CSChunkLists);
 		m_LoadedChunks.clear();
 		m_ChunksToSend.clear();
-		
+		m_SentChunks.clear();
+
 		// Also reset the LastStreamedChunk coords to bogus coords,
 		// so that all chunks are streamed in subsequent StreamChunks() call (FS #407)
 		m_LastStreamedChunkX = 0x7fffffff;
 		m_LastStreamedChunkZ = 0x7fffffff;
 	}
+}
+
+
+
+
+
+void cClientHandle::HandleNPCTrade(int a_SlotNum)
+{
+	// TODO
+	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
 }
 
 
@@ -573,16 +652,22 @@ void cClientHandle::HandlePing(void)
 
 bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Username)
 {
-	LOGD("LOGIN %s", a_Username.c_str());
+	// If the protocol version hasn't been set yet, set it now:
+	if (m_ProtocolVersion == 0)
+	{
+		m_ProtocolVersion = a_ProtocolVersion;
+	}
+
 	m_Username = a_Username;
 
-	if (cRoot::Get()->GetPluginManager()->CallHookLogin(this, a_ProtocolVersion, a_Username))
+	// Let the plugins know about this event, they may refuse the player:
+	if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, a_ProtocolVersion, a_Username))
 	{
 		Destroy();
 		return false;
 	}
 
-	// Schedule for authentication; until then, let them wait (but do not block)
+	// Schedule for authentication; until then, let the player wait (but do not block)
 	m_State = csAuthenticating;
 	cRoot::Get()->GetAuthenticator().Authenticate(GetUniqueID(), GetUsername(), m_Protocol->GetAuthServerID());
 	return true;
@@ -628,7 +713,7 @@ void cClientHandle::HandlePlayerAbilities(bool a_CanFly, bool a_IsFlying, float 
 
 void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ, double a_Stance, bool a_IsOnGround)
 {
-	if ((m_Player == NULL) || (m_State != csPlaying))
+	if ((m_Player == nullptr) || (m_State != csPlaying))
 	{
 		// The client hasn't been spawned yet and sends nonsense, we know better
 		return;
@@ -676,25 +761,7 @@ void cClientHandle::HandlePlayerPos(double a_PosX, double a_PosY, double a_PosZ,
 
 void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString & a_Message)
 {
-	if (a_Channel == "MC|AdvCdm")
-	{
-		// Command block, set text, Client -> Server
-		HandleCommandBlockMessage(a_Message.c_str(), a_Message.size());
-	}
-	else if (a_Channel == "MC|Brand")
-	{
-		// Client <-> Server branding exchange
-		SendPluginMessage("MC|Brand", "MCServer");
-	}
-	else if (a_Channel == "MC|Beacon")
-	{
-		HandleBeaconSelection(a_Message.c_str(), a_Message.size());
-	}
-	else if (a_Channel == "MC|ItemName")
-	{
-		HandleAnvilItemName(a_Message.c_str(), a_Message.size());
-	}
-	else if (a_Channel == "REGISTER")
+	if (a_Channel == "REGISTER")
 	{
 		if (HasPluginChannel(a_Channel))
 		{
@@ -777,17 +844,10 @@ void cClientHandle::UnregisterPluginChannels(const AStringVector & a_ChannelList
 
 
 
-void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
+void cClientHandle::HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect)
 {
-	if (a_Length < 14)
-	{
-		SendChat("Failure setting beacon selection; bad request", mtFailure);
-		LOGD("Malformed MC|Beacon packet.");
-		return;
-	}
-
 	cWindow * Window = m_Player->GetWindow();
-	if ((Window == NULL) || (Window->GetWindowType() != cWindow::wtBeacon))
+	if ((Window == nullptr) || (Window->GetWindowType() != cWindow::wtBeacon))
 	{
 		return;
 	}
@@ -798,23 +858,15 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 		return;
 	}
 
-	cByteBuffer Buffer(a_Length);
-	Buffer.Write(a_Data, a_Length);
-
-	int PrimaryEffectID, SecondaryEffectID;
-	Buffer.ReadBEInt(PrimaryEffectID);
-	Buffer.ReadBEInt(SecondaryEffectID);
-
 	cEntityEffect::eType PrimaryEffect = cEntityEffect::effNoEffect;
-	if ((PrimaryEffectID >= 0) && (PrimaryEffectID <= (int)cEntityEffect::effSaturation))
+	if ((a_PrimaryEffect >= 0) && (a_PrimaryEffect <= (int)cEntityEffect::effSaturation))
 	{
-		PrimaryEffect = (cEntityEffect::eType)PrimaryEffectID;
+		PrimaryEffect = (cEntityEffect::eType)a_PrimaryEffect;
 	}
-
 	cEntityEffect::eType SecondaryEffect = cEntityEffect::effNoEffect;
-	if ((SecondaryEffectID >= 0) && (SecondaryEffectID <= (int)cEntityEffect::effSaturation))
+	if ((a_SecondaryEffect >= 0) && (a_SecondaryEffect <= (int)cEntityEffect::effSaturation))
 	{
-		SecondaryEffect = (cEntityEffect::eType)SecondaryEffectID;
+		SecondaryEffect = (cEntityEffect::eType)a_SecondaryEffect;
 	}
 
 	Window->SetSlot(*m_Player, 0, cItem());
@@ -841,52 +893,12 @@ void cClientHandle::HandleBeaconSelection(const char * a_Data, size_t a_Length)
 
 
 
-void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Length)
+void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand)
 {
-	if (a_Length < 14)
-	{
-		SendChat("Failure setting command block command; bad request", mtFailure);
-		LOGD("Malformed MC|AdvCdm packet.");
-		return;
-	}
-
-	cByteBuffer Buffer(a_Length);
-	Buffer.Write(a_Data, a_Length);
-
-	int BlockX, BlockY, BlockZ;
-
-	AString Command;
-
-	char Mode;
-
-	Buffer.ReadChar(Mode);
-
-	switch (Mode)
-	{
-		case 0x00:
-		{
-			Buffer.ReadBEInt(BlockX);
-			Buffer.ReadBEInt(BlockY);
-			Buffer.ReadBEInt(BlockZ);
-
-			Buffer.ReadVarUTF8String(Command);
-			break;
-		}
-
-		default:
-		{
-			SendChat("Failure setting command block command; unhandled mode", mtFailure);
-			LOGD("Unhandled MC|AdvCdm packet mode.");
-			return;
-		}
-	}
-
 	cWorld * World = m_Player->GetWorld();
-
 	if (World->AreCommandBlocksEnabled())
 	{
-		World->SetCommandBlockCommand(BlockX, BlockY, BlockZ, Command);
-		
+		World->SetCommandBlockCommand(a_BlockX, a_BlockY, a_BlockZ, a_NewCommand);
 		SendChat("Successfully set command block command", mtSuccess);
 	}
 	else
@@ -899,22 +911,26 @@ void cClientHandle::HandleCommandBlockMessage(const char * a_Data, size_t a_Leng
 
 
 
-void cClientHandle::HandleAnvilItemName(const char * a_Data, size_t a_Length)
+void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand)
 {
-	if (a_Length < 1)
+	// TODO
+	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
+}
+
+
+
+
+
+void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
+{
+	if ((m_Player->GetWindow() == nullptr) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
 	{
 		return;
 	}
 
-	if ((m_Player->GetWindow() == NULL) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
+	if (a_ItemName.length() <= 30)
 	{
-		return;
-	}
-
-	AString Name(a_Data, a_Length);
-	if (Name.length() <= 30)
-	{
-		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(Name, m_Player);
+		((cAnvilWindow *)m_Player->GetWindow())->SetRepairedItemName(a_ItemName, m_Player);
 	}
 }
 
@@ -1148,10 +1164,18 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 
 	FinishDigAnimation();
 
-	if (!m_Player->IsGameModeCreative() && (a_OldBlock == E_BLOCK_BEDROCK))
+	if (!m_Player->IsGameModeCreative())
 	{
-		Kick("You can't break a bedrock!");
-		return;
+		if (a_OldBlock == E_BLOCK_BEDROCK)
+		{
+			Kick("You can't break a bedrock!");
+			return;
+		}
+		if (a_OldBlock == E_BLOCK_BARRIER)
+		{
+			Kick("You can't break a barrier!");
+			return;
+		}
 	}
 
 	cWorld * World = m_Player->GetWorld();
@@ -1478,6 +1502,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
@@ -1536,7 +1561,7 @@ void cClientHandle::HandleChat(const AString & a_Message)
 
 void cClientHandle::HandlePlayerLook(float a_Rotation, float a_Pitch, bool a_IsOnGround)
 {
-	if ((m_Player == NULL) || (m_State != csPlaying))
+	if ((m_Player == nullptr) || (m_State != csPlaying))
 	{
 		return;
 	}
@@ -1636,7 +1661,7 @@ void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAc
 	);
 	
 	cWindow * Window = m_Player->GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		LOGWARNING("Player \"%s\" clicked in a non-existent window. Ignoring", m_Username.c_str());
 		return;
@@ -1655,8 +1680,11 @@ void cClientHandle::HandleUpdateSign(
 	const AString & a_Line3, const AString & a_Line4
 )
 {
-	cWorld * World = m_Player->GetWorld();
-	World->UpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+	if (m_LastPlacedSign.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+	{
+		m_LastPlacedSign.Set(0, -1, 0);
+		m_Player->GetWorld()->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+	}
 }
 
 
@@ -1728,27 +1756,13 @@ void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
 
 void cClientHandle::HandleRespawn(void)
 {
-	if (m_Player == NULL)
+	if (m_Player == nullptr)
 	{
 		Destroy();
 		return;
 	}
 	m_Player->Respawn();
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
-}
-
-
-
-
-
-void cClientHandle::HandleDisconnect(const AString & a_Reason)
-{
-	LOGD("Received d/c packet from %s with reason \"%s\"", m_Username.c_str(), a_Reason.c_str());
-
-	cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, a_Reason);
-
-	m_HasSentDC = true;
-	Destroy();
 }
 
 
@@ -1770,7 +1784,7 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(this, a_Username))
+	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
 		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
 		{
@@ -1832,7 +1846,7 @@ void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
 
 void cClientHandle::HandleUnmount(void)
 {
-	if (m_Player == NULL)
+	if (m_Player == nullptr)
 	{
 		return;
 	}
@@ -1924,10 +1938,11 @@ void cClientHandle::RemoveFromWorld(void)
 	{
 		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}  // for itr - Chunks[]
-	
+
 	// Here, we set last streamed values to bogus ones so everything is resent
 	m_LastStreamedChunkX = 0x7fffffff;
 	m_LastStreamedChunkZ = 0x7fffffff;
+
 	m_HasSentPlayerChunk = false;
 }
 
@@ -1937,8 +1952,8 @@ void cClientHandle::RemoveFromWorld(void)
 
 bool cClientHandle::CheckBlockInteractionsRate(void)
 {
-	ASSERT(m_Player != NULL);
-	ASSERT(m_Player->GetWorld() != NULL);
+	ASSERT(m_Player != nullptr);
+	ASSERT(m_Player->GetWorld() != nullptr);
 
 	if (m_NumBlockChangeInteractionsThisTick > MAX_BLOCK_CHANGE_INTERACTIONS)
 	{
@@ -1969,11 +1984,11 @@ void cClientHandle::Tick(float a_Dt)
 		Destroy();
 	}
 	
-	if (m_Player == NULL)
+	if (m_Player == nullptr)
 	{
 		return;
 	}
-	
+
 	// If the chunk the player's in was just sent, spawn the player:
 	if (m_HasSentPlayerChunk && (m_State == csDownloadingWorld))
 	{
@@ -1991,6 +2006,26 @@ void cClientHandle::Tick(float a_Dt)
 			m_PingStartTime = t1.GetNowTime();
 			m_Protocol->SendKeepAlive(m_PingID);
 			m_LastPingTime = m_PingStartTime;
+		}
+	}
+
+	if ((m_State >= csAuthenticated) && (m_State < csDestroying))
+	{
+		// Stream 4 chunks per tick
+		for (int i = 0; i < 4; i++)
+		{
+			// Stream the next chunk
+			if (StreamNextChunk())
+			{
+				// Streaming finished. All chunks are loaded.
+				break;
+			}
+		}
+
+		// Unload all chunks that are out of the view distance (all 5 seconds)
+		if ((m_Player->GetWorld()->GetWorldAge() % 100) == 0)
+		{
+			UnloadOutOfRangeChunks();
 		}
 	}
 
@@ -2030,7 +2065,7 @@ void cClientHandle::ServerTick(float a_Dt)
 	
 	if (m_State == csAuthenticated)
 	{
-		StreamChunks();
+		StreamNextChunk();
 
 		// Remove the client handle from the server, it will be ticked from its cPlayer object from now on
 		cRoot::Get()->GetServer()->ClientMovedToWorld(this);
@@ -2082,7 +2117,17 @@ void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_Block
 
 void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	int ChunkX, ChunkZ = 0;
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
+	cChunkCoords ChunkCoords = cChunkCoords(ChunkX, ChunkZ);
+
+	// Do not send block changes in chunks that weren't sent to the client yet:
+	cCSLock Lock(m_CSChunkLists);
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->SendBlockChange(a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta);
+	}
 }
 
 
@@ -2092,8 +2137,15 @@ void cClientHandle::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BL
 void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(!a_Changes.empty());  // We don't want to be sending empty change packets!
-	
-	m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+
+	// Do not send block changes in chunks that weren't sent to the client yet:
+	cChunkCoords ChunkCoords = cChunkCoords(a_ChunkX, a_ChunkZ);
+	cCSLock Lock(m_CSChunkLists);
+	if (std::find(m_SentChunks.begin(), m_SentChunks.end(), ChunkCoords) != m_SentChunks.end())
+	{
+		Lock.Unlock();
+		m_Protocol->SendBlockChanges(a_ChunkX, a_ChunkZ, a_Changes);
+	}
 }
 
 
@@ -2103,10 +2155,10 @@ void cClientHandle::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlock
 void cClientHandle::SendChat(const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData)
 {
 	cWorld * World = GetPlayer()->GetWorld();
-	if (World == NULL)
+	if (World == nullptr)
 	{
 		World = cRoot::Get()->GetWorld(GetPlayer()->GetLoadedWorldName());
-		if (World == NULL)
+		if (World == nullptr)
 		{
 			World = cRoot::Get()->GetDefaultWorld();
 		}
@@ -2131,7 +2183,7 @@ void cClientHandle::SendChat(const cCompositeChat & a_Message)
 
 void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer)
 {
-	ASSERT(m_Player != NULL);
+	ASSERT(m_Player != nullptr);
 	
 	// Check chunks being sent, erase them from m_ChunksToSend:
 	bool Found = false;
@@ -2156,6 +2208,12 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializ
 	}
 	
 	m_Protocol->SendChunkData(a_ChunkX, a_ChunkZ, a_Serializer);
+
+	// Add the chunk to the list of chunks sent to the player:
+	{
+		cCSLock Lock(m_CSChunkLists);
+		m_SentChunks.push_back(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
 
 	// If it is the chunk the player's in, make them spawn (in the tick thread):
 	if ((m_State == csAuthenticated) || (m_State == csDownloadingWorld))
@@ -2205,6 +2263,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 
 void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	m_LastPlacedSign.Set(a_BlockX, a_BlockY, a_BlockZ);
 	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -2686,6 +2745,12 @@ void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_D
 
 void cClientHandle::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
+	// Remove the chunk from the list of chunks sent to the client:
+	{
+		cCSLock Lock(m_CSChunkLists);
+		m_SentChunks.remove(cChunkCoords(a_ChunkX, a_ChunkZ));
+	}
+
 	m_Protocol->SendUnloadChunk(a_ChunkX, a_ChunkZ);
 }
 
@@ -2760,7 +2825,7 @@ void cClientHandle::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cClientHandle::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
+void cClientHandle::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	m_Protocol->SendWindowProperty(a_Window, a_Property, a_Value);
 }
@@ -2789,18 +2854,15 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
-	if (a_ViewDistance < MIN_VIEW_DISTANCE)
+	m_RequestedViewDistance = a_ViewDistance;
+	LOGD("%s is requesting ViewDistance of %d!", GetUsername().c_str(), m_RequestedViewDistance);
+
+	// Set the current view distance based on the requested VD and world max VD:
+	cWorld * world = m_Player->GetWorld();
+	if (world != nullptr)
 	{
-		a_ViewDistance = MIN_VIEW_DISTANCE;
+		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
 	}
-	if (a_ViewDistance > MAX_VIEW_DISTANCE)
-	{
-		a_ViewDistance = MAX_VIEW_DISTANCE;
-	}
-	m_ViewDistance = a_ViewDistance;
-	
-	// Need to re-stream chunks for the change to become apparent:
-	StreamChunks();
 }
 
 
@@ -2950,7 +3012,7 @@ void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 	}
 
 	if (
-		(m_Player->GetWindow() == NULL) ||
+		(m_Player->GetWindow() == nullptr) ||
 		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
 		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
 	)

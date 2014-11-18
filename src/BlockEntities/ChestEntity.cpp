@@ -14,7 +14,6 @@ cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_
 	super(a_Type, a_BlockX, a_BlockY, a_BlockZ, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0)
 {
-	cBlockEntityWindowOwner::SetBlockEntity(this);
 }
 
 
@@ -24,52 +23,10 @@ cChestEntity::cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_
 cChestEntity::~cChestEntity()
 {
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
 	}
-}
-
-
-
-
-
-bool cChestEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	Json::Value AllSlots = a_Value.get("Slots", 0);
-	int SlotIdx = 0;
-	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
-	{
-		cItem Item;
-		Item.FromJson(*itr);
-		SetSlot(SlotIdx, Item);
-		SlotIdx++;
-	}
-	return true;
-}
-
-
-
-
-
-void cChestEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	Json::Value AllSlots;
-	for (int i = m_Contents.GetNumSlots() - 1; i >= 0; i--)
-	{
-		Json::Value Slot;
-		m_Contents.GetSlot(i).GetJson(Slot);
-		AllSlots.append(Slot);
-	}
-	a_Value["Slots"] = AllSlots;
 }
 
 
@@ -92,14 +49,14 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenNewWindow();
 		Window = GetWindow();
 	}
 	
 	// Open the window for the player:
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{

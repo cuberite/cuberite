@@ -7,7 +7,6 @@
 
 #include "Globals.h"
 #include "Minecart.h"
-#include "../World.h"
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "Player.h"
@@ -37,7 +36,7 @@ public:
 
 	virtual bool Item(cEntity * a_Entity) override
 	{
-		ASSERT(a_Entity != NULL);
+		ASSERT(a_Entity != nullptr);
 
 		if (!a_Entity->IsPlayer() && !a_Entity->IsMob() && !a_Entity->IsMinecart() && !a_Entity->IsBoat())
 		{
@@ -131,7 +130,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	int RelPosX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelPosZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
 	cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(RelPosX, RelPosZ);
-	if (Chunk == NULL)
+	if (Chunk == nullptr)
 	{
 		// Inside an unloaded chunk, bail out all processing
 		return;
@@ -807,7 +806,7 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 
 bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 {
-	cMinecartCollisionCallback MinecartCollisionCallback(GetPosition(), GetHeight(), GetWidth(), GetUniqueID(), ((m_Attachee == NULL) ? -1 : m_Attachee->GetUniqueID()));
+	cMinecartCollisionCallback MinecartCollisionCallback(GetPosition(), GetHeight(), GetWidth(), GetUniqueID(), ((m_Attachee == nullptr) ? -1 : m_Attachee->GetUniqueID()));
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
 	m_World->ForEachEntityInChunk(ChunkX, ChunkZ, MinecartCollisionCallback);
@@ -981,7 +980,7 @@ bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 
 bool cMinecart::DoTakeDamage(TakeDamageInfo & TDI)
 {
-	if ((TDI.Attacker != NULL) && TDI.Attacker->IsPlayer() && ((cPlayer *)TDI.Attacker)->IsGameModeCreative())
+	if ((TDI.Attacker != nullptr) && TDI.Attacker->IsPlayer() && ((cPlayer *)TDI.Attacker)->IsGameModeCreative())
 	{
 		Destroy();
 		TDI.FinalDamage = GetMaxHealth();  // Instant hit for creative
@@ -1075,7 +1074,7 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 {
 	super::OnRightClicked(a_Player);
 
-	if (m_Attachee != NULL)
+	if (m_Attachee != nullptr)
 	{
 		if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
 		{
@@ -1106,19 +1105,11 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 // cMinecartWithChest:
 
 cMinecartWithChest::cMinecartWithChest(double a_X, double a_Y, double a_Z) :
-	super(mpChest, a_X, a_Y, a_Z)
+	super(mpChest, a_X, a_Y, a_Z),
+	cEntityWindowOwner(this),
+	m_Contents(ContentsWidth, ContentsHeight)
 {
-}
-
-
-
-
-
-void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
-{
-	ASSERT(a_Idx < ARRAYCOUNT(m_Items));
-	
-	m_Items[a_Idx] = a_Item;
+	m_Contents.AddListener(*this);
 }
 
 
@@ -1127,7 +1118,42 @@ void cMinecartWithChest::SetSlot(size_t a_Idx, const cItem & a_Item)
 
 void cMinecartWithChest::OnRightClicked(cPlayer & a_Player)
 {
-	// TODO: Show the chest UI window to the player
+	// If the window is not created, open it anew:
+	cWindow * Window = GetWindow();
+	if (Window == nullptr)
+	{
+		OpenNewWindow();
+		Window = GetWindow();
+	}
+
+	// Open the window for the player:
+	if (Window != nullptr)
+	{
+		if (a_Player.GetWindow() != Window)
+		{
+			a_Player.OpenWindow(Window);
+		}
+	}
+}
+
+
+
+
+
+void cMinecartWithChest::OpenNewWindow()
+{
+	OpenWindow(new cMinecartWithChestWindow(this));
+}
+
+
+
+
+
+void cMinecartWithChest::Destroyed()
+{
+	cItems Pickups;
+	m_Contents.CopyToItems(Pickups);
+	GetWorld()->SpawnItemPickups(Pickups, GetPosX(), GetPosY() + 1, GetPosZ(), 4);
 }
 
 

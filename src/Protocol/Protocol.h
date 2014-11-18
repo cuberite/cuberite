@@ -130,7 +130,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
-	virtual void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value) = 0;
+	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) = 0;
 
 	/// Returns the ServerID used for authentication through session.minecraft.net
 	virtual AString GetAuthServerID(void) = 0;
@@ -138,108 +138,9 @@ public:
 protected:
 	cClientHandle * m_Client;
 	cCriticalSection m_CSPacket;  // Each SendXYZ() function must acquire this CS in order to send the whole packet at once
-	
+
 	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
-	
-	/// Called after writing each packet, enables descendants to flush their buffers
-	virtual void Flush(void) {}
-	
-	// Helpers for writing partial packet data, write using SendData()
-	void WriteByte(Byte a_Value)
-	{
-		SendData((const char *)&a_Value, 1);
-	}
-	
-	void WriteChar(char a_Value)
-	{
-		SendData(&a_Value, 1);
-	}
-	
-	void WriteShort(short a_Value)
-	{
-		u_short Value = htons((u_short)a_Value);
-		SendData((const char *)&Value, 2);
-	}
-	
-	/*
-	void WriteShort(unsigned short a_Value)
-	{
-		a_Value = htons(a_Value);
-		SendData((const char *)&a_Value, 2);
-	}
-	*/
-	
-	void WriteInt(int a_Value)
-	{
-		u_long Value = htonl((u_long)a_Value);
-		SendData((const char *)&Value, 4);
-	}
-	
-	void WriteUInt(unsigned int a_Value)
-	{
-		a_Value = htonl(a_Value);
-		SendData((const char *)&a_Value, 4);
-	}
-	
-	void WriteInt64 (Int64 a_Value)
-	{
-		UInt64 Value = HostToNetwork8(&a_Value);
-		SendData((const char *)&Value, 8);
-	}
-	
-	void WriteFloat (float a_Value)
-	{
-		UInt32 val = HostToNetwork4(&a_Value);
-		SendData((const char *)&val, 4);
-	}
-	
-	void WriteDouble(double a_Value)
-	{
-		UInt64 val = HostToNetwork8(&a_Value);
-		SendData((const char *)&val, 8);
-	}
-	
-	void WriteString(const AString & a_Value)
-	{
-		AString UTF16;
-		UTF8ToRawBEUTF16(a_Value.c_str(), a_Value.length(), UTF16);
-		WriteShort((short)(UTF16.size() / 2));
-		SendData(UTF16.data(), UTF16.size());
-	}
-	
-	void WriteBool(bool a_Value)
-	{
-		WriteByte(a_Value ? 1 : 0);
-	}
-	
-	void WriteVectorI(const Vector3i & a_Vector)
-	{
-		WriteInt(a_Vector.x);
-		WriteInt(a_Vector.y);
-		WriteInt(a_Vector.z);
-	}
-	
-	void WriteVarInt(UInt32 a_Value)
-	{
-		// A 32-bit integer can be encoded by at most 5 bytes:
-		unsigned char b[5];
-		size_t idx = 0;
-		do
-		{
-			b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
-			a_Value = a_Value >> 7;
-			idx++;
-		} while (a_Value > 0);
-
-		SendData((const char *)b, idx);
-	}
-	
-	void WriteVarUTF8String(const AString & a_String)
-	{
-		WriteVarInt((UInt32)a_String.size());
-		SendData(a_String.data(), a_String.size());
-	}
 } ;
 
 

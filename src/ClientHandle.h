@@ -21,6 +21,7 @@
 #include "Enchantments.h"
 #include "UI/SlotArea.h"
 #include "json/json.h"
+#include "ChunkSender.h"
 
 
 
@@ -113,7 +114,11 @@ public:
 	/** Authenticates the specified user, called by cAuthenticator */
 	void Authenticate(const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties);
 
-	void StreamChunks(void);
+	/** This function sends a new unloaded chunk to the player. Returns true if all chunks are loaded. */
+	bool StreamNextChunk();
+
+	/** Remove all loaded chunks that are no longer in range */
+	void UnloadOutOfRangeChunks(void);
 	
 	// Removes the client from all chunks. Used when switching worlds or destroying the player
 	void RemoveFromAllChunks(void);
@@ -145,7 +150,9 @@ public:
 	void SendCollectEntity              (const cEntity & a_Entity, const cPlayer & a_Player);
 	void SendDestroyEntity              (const cEntity & a_Entity);
 	void SendDisconnect                 (const AString & a_Reason);
+	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void SendEditSign                   (int a_BlockX, int a_BlockY, int a_BlockZ);
+	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
 	void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration);
 	void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item);
 	void SendEntityHeadLook             (const cEntity & a_Entity);
@@ -156,6 +163,8 @@ public:
 	void SendEntityRelMoveLook          (const cEntity & a_Entity, char a_RelX, char a_RelY, char a_RelZ);
 	void SendEntityStatus               (const cEntity & a_Entity, char a_Status);
 	void SendEntityVelocity             (const cEntity & a_Entity);
+	void SendExperience                 (void);
+	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
 	void SendExplosion                  (double a_BlockX, double a_BlockY, double a_BlockZ, float a_Radius, const cVector3iArray & a_BlocksAffected, const Vector3d & a_PlayerMotion);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
@@ -164,15 +173,14 @@ public:
 	void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale);
 	void SendMapInfo                    (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
-	void SendPickupSpawn                (const cPickup & a_Pickup);
-	void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation);  // tolua_export
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
+	void SendPickupSpawn                (const cPickup & a_Pickup);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
+	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerListUpdateGameMode   (const cPlayer & a_Player);
 	void SendPlayerListUpdatePing       (const cPlayer & a_Player);
-	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
 	void SendPlayerMaxSpeed             (void);  ///< Informs the client of the maximum player speed (1.6.1+)
 	void SendPlayerMoveLook             (void);
 	void SendPlayerPosition             (void);
@@ -180,11 +188,8 @@ public:
 	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	void SendExperience                 (void);
-	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
-	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
+	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
@@ -204,7 +209,7 @@ public:
 	void SendWholeInventory             (const cWindow & a_Window);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
-	void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value);
+	void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value);
 
 	// tolua_begin
 	const AString & GetUsername(void) const;
@@ -212,15 +217,28 @@ public:
 	
 	inline short GetPing(void) const { return m_Ping; }
 	
+	/** Sets the maximal view distance. */
 	void SetViewDistance(int a_ViewDistance);
-	int  GetViewDistance(void) const { return m_ViewDistance; }
-	
+
+	/** Returns the view distance that the player currently have. */
+	int GetViewDistance(void) const { return m_CurrentViewDistance; }
+
+	/** Returns the view distance that the player request, not the used view distance. */
+	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
+
 	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
 	
 	bool HasPluginChannel(const AString & a_PluginChannel);
+	
+	/** Called by the protocol when it receives the MC|Brand plugin message. Also callable by plugins.
+	Simply stores the string value. */
+	void SetClientBrand(const AString & a_ClientBrand) { m_ClientBrand = a_ClientBrand; }
+	
+	/** Returns the client brand received in the MC|Brand plugin message or set by a plugin. */
+	const AString & GetClientBrand(void) const { return m_ClientBrand; }
 	
 	// tolua_end
 	
@@ -236,13 +254,31 @@ public:
 	void PacketError(unsigned char a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation        (char a_Animation);
-	void HandleChat             (const AString & a_Message);
-	void HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem);
-	void HandleDisconnect       (const AString & a_Reason);
-	void HandleEntityCrouch     (int a_EntityID, bool a_IsCrouching);
-	void HandleEntityLeaveBed   (int a_EntityID);
-	void HandleEntitySprinting  (int a_EntityID, bool a_IsSprinting);
+	void HandleAnimation(char a_Animation);
+	
+	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
+	an item in the anvil UI. */
+	void HandleAnvilItemName(const AString & a_ItemName);
+	
+	/** Called when the protocol receives a MC|Beacon plugin message, indicating that the player set an effect
+	in the beacon UI. */
+	void HandleBeaconSelection(int a_PrimaryEffect, int a_SecondaryEffect);
+	
+	/** Called when the protocol detects a chat packet. */
+	void HandleChat(const AString & a_Message);
+	
+	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	command in the command block UI, for a block-based commandblock. */
+	void HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_NewCommand);
+	
+	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
+	command in the command block UI, for an entity-based commandblock (minecart?). */
+	void HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand);
+	
+	void HandleCreativeInventory      (short a_SlotNum, const cItem & a_HeldItem);
+	void HandleEntityCrouch           (int a_EntityID, bool a_IsCrouching);
+	void HandleEntityLeaveBed         (int a_EntityID);
+	void HandleEntitySprinting        (int a_EntityID, bool a_IsSprinting);
 	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).
@@ -252,6 +288,11 @@ public:
 	
 	void HandleKeepAlive        (int a_KeepAliveID);
 	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status);
+	
+	/** Called when the protocol receives a MC|TrSel packet, indicating that the player used a trade in
+	the NPC UI. */
+	void HandleNPCTrade(int a_SlotNum);
+	
 	void HandlePing             (void);
 	void HandlePlayerAbilities  (bool a_CanFly, bool a_IsFlying, float FlyingSpeed, float WalkingSpeed);
 	void HandlePlayerLook       (float a_Rotation, float a_Pitch, bool a_IsOnGround);
@@ -286,18 +327,24 @@ public:
 	
 	/** Called when the player will enchant a Item */
 	void HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment);
+
+	/** Called by the protocol recognizer when the protocol version is known. */
+	void SetProtocolVersion(UInt32 a_ProtocolVersion) { m_ProtocolVersion = a_ProtocolVersion; }
+
+	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
+	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 	
 private:
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
-	/** Number of chunks the player can see in each direction */
-	int m_ViewDistance;
-	
-	/** Server generates this many chunks AHEAD of player sight. */
-	static const int GENERATEDISTANCE = 2;
-	
+	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
+	int m_CurrentViewDistance;
+
+	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
+	int m_RequestedViewDistance;
+
 	AString m_IPString;
 
 	AString m_Username;
@@ -307,6 +354,7 @@ private:
 	cCriticalSection m_CSChunkLists;
 	cChunkCoordsList m_LoadedChunks;  // Chunks that the player belongs to
 	cChunkCoordsList m_ChunksToSend;  // Chunks that need to be sent to the player (queued because they weren't generated yet or there's not enough time to send them)
+	cChunkCoordsList m_SentChunks;    // Chunks that are currently sent to the client
 
 	cProtocol * m_Protocol;
 	
@@ -322,7 +370,7 @@ private:
 	cPlayer * m_Player;
 	
 	bool m_HasSentDC;  ///< True if a D/C packet has been sent in either direction
-	
+
 	// Chunk position when the last StreamChunks() was called; used to avoid re-streaming while in the same chunk
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
@@ -390,9 +438,18 @@ private:
 
 	/** Client Settings */
 	AString m_Locale;
+
+	/** The positions from the last sign that the player placed. It's needed to verify the sign text change. */
+	Vector3i m_LastPlacedSign;
 	
 	/** The plugin channels that the client has registered. */
 	cChannels m_PluginChannels;
+	
+	/** The brand identification of the client, as received in the MC|Brand plugin message or set from a plugin. */
+	AString m_ClientBrand;
+
+	/** The version of the protocol that the client is talking, or 0 if unknown. */
+	UInt32 m_ProtocolVersion;
 
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
@@ -402,7 +459,7 @@ private:
 	bool CheckBlockInteractionsRate(void);
 	
 	/** Adds a single chunk to be streamed to the client; used by StreamChunks() */
-	void StreamChunk(int a_ChunkX, int a_ChunkZ);
+	void StreamChunk(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority);
 	
 	/** Handles the DIG_STARTED dig packet: */
 	void HandleBlockDigStarted (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_OldBlock, NIBBLETYPE a_OldMeta);
@@ -422,15 +479,6 @@ private:
 	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 
-	/** Handles the "MC|Beacon" plugin message */
-	void HandleBeaconSelection(const char * a_Data, size_t a_Length);
-
-	/** Handles the "MC|AdvCdm" plugin message */
-	void HandleCommandBlockMessage(const char * a_Data, size_t a_Length);
-
-	/** Handles the "MC|ItemName" plugin message */
-	void HandleAnvilItemName(const char * a_Data, size_t a_Length);
-	
 	// cSocketThreads::cCallback overrides:
 	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
 	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client

@@ -41,10 +41,11 @@ namespace Json
 class cRoot
 {
 public:
-	static bool m_TerminateEventRaised;
-	
 	static cRoot * Get() { return s_Root; }
 	// tolua_end
+
+	static bool m_TerminateEventRaised;
+
 
 	cRoot(void);
 	~cRoot();
@@ -73,9 +74,6 @@ public:
 	/// Writes chunkstats, for each world and totals, to the output callback
 	void LogChunkStats(cCommandOutputCallback & a_Output);
 	
-	int GetPrimaryServerVersion(void) const { return m_PrimaryServerVersion; }  // tolua_export
-	void SetPrimaryServerVersion(int a_Version) { m_PrimaryServerVersion = a_Version; }  // tolua_export
-	
 	cMonsterConfig * GetMonsterConfig(void) { return m_MonsterConfig; }
 
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
@@ -88,7 +86,7 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
-	cRankManager &     GetRankManager    (void) { return m_RankManager; }
+	cRankManager *     GetRankManager    (void) { return m_RankManager; }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -128,19 +126,22 @@ public:
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
+	/** Finds the player over his uuid and calls the callback */
+	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+
 	// tolua_begin
 	
 	/// Sends a chat message to all connected clients (in all worlds)
 	void BroadcastChat       (const AString & a_Message, eMessageType a_ChatPrefix = mtCustom);
-	void BroadcastChatInfo   (const AString & a_Message) { BroadcastChat(a_Message, mtInformation); }
+	void BroadcastChat       (const cCompositeChat & a_Message);
+	void BroadcastChatDeath  (const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
 	void BroadcastChatFailure(const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
-	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(a_Message, mtSuccess); }
-	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(a_Message, mtWarning); }
 	void BroadcastChatFatal  (const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
+	void BroadcastChatInfo   (const AString & a_Message) { BroadcastChat(a_Message, mtInformation); }
 	void BroadcastChatJoin   (const AString & a_Message) { BroadcastChat(a_Message, mtJoin); }
 	void BroadcastChatLeave  (const AString & a_Message) { BroadcastChat(a_Message, mtLeave); }
-	void BroadcastChatDeath  (const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
-	void BroadcastChat       (const cCompositeChat & a_Message);
+	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(a_Message, mtSuccess); }
+	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(a_Message, mtWarning); }
 	
 	/// Returns the textual description of the protocol version: 49 -> "1.4.4". Provided specifically for Lua API
 	static AString GetProtocolVersionTextFromInt(int a_ProtocolVersionNum);
@@ -169,9 +170,6 @@ private:
 	
 	typedef std::map<AString, cWorld *> WorldMap;
 	typedef std::vector<cCommand> cCommandQueue;
-	
-	/// The version of the protocol that is primary for the server (reported in the server list). All versions are still supported.
-	int m_PrimaryServerVersion;
 
 	cWorld * m_pDefaultWorld;
 	WorldMap m_WorldsByName;
@@ -190,7 +188,7 @@ private:
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
 	cMojangAPI         m_MojangAPI;
-	cRankManager       m_RankManager;
+	cRankManager *     m_RankManager;
 	cHTTPServer        m_HTTPServer;
 
 	bool m_bStop;

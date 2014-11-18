@@ -26,7 +26,7 @@ bool cPassiveAggressiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 	
-	if ((m_Target != NULL) && (m_Target->IsPlayer()))
+	if ((m_Target != nullptr) && (m_Target->IsPlayer()))
 	{
 		if (!((cPlayer *)m_Target)->IsGameModeCreative())
 		{

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "../Chunk.h"
 #include "MetaRotator.h"
-
-
+#include "BlockSlab.h"
 
 
 class cBlockLeverHandler :
@@ -93,13 +93,35 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		
+		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn; a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
+		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 
-		return (a_RelY > 0) && cBlockInfo::FullyOccupiesVoxel(BlockIsOn);
+		if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height -1))
+		{
+			return false;
+		}
+
+		BLOCKTYPE BlockIsOn;
+		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
+
+
+		if (cBlockInfo::FullyOccupiesVoxel(BlockIsOn))
+		{
+			return true;
+		}
+		else if (cBlockSlabHandler::IsAnySlabType(BlockIsOn))
+		{
+			// Check if the slab is turned up side down
+			if (((Meta & 0x08) == 0x08) && (Face == BLOCK_FACE_TOP))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 

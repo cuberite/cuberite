@@ -97,7 +97,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 	m_PrimaryEffect = a_Effect;
 
 	// Send window update:
-	if (GetWindow() != NULL)
+	if (GetWindow() != nullptr)
 	{
 		GetWindow()->SetProperty(1, m_PrimaryEffect);
 	}
@@ -119,7 +119,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 	m_SecondaryEffect = a_Effect;
 
 	// Send window update:
-	if (GetWindow() != NULL)
+	if (GetWindow() != nullptr)
 	{
 		GetWindow()->SetProperty(2, m_SecondaryEffect);
 	}
@@ -184,7 +184,7 @@ void cBeaconEntity::UpdateBeacon(void)
 	if (m_BeaconLevel != OldBeaconLevel)
 	{
 		// Send window update:
-		if (GetWindow() != NULL)
+		if (GetWindow() != nullptr)
 		{
 			GetWindow()->SetProperty(0, m_BeaconLevel);
 		}
@@ -283,13 +283,13 @@ bool cBeaconEntity::Tick(float a_Dt, cChunk & a_Chunk)
 void cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
 	
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		// if (a_Player->GetWindow() != Window)
 		// -> Because mojang doesn't send a 'close window' packet when you click the cancel button in the beacon inventory ...
@@ -297,68 +297,6 @@ void cBeaconEntity::UsedBy(cPlayer * a_Player)
 			a_Player->OpenWindow(Window);
 		}
 	}
-}
-
-
-
-
-
-bool cBeaconEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	Json::Value AllSlots = a_Value.get("Slots", 0);
-	int SlotIdx = 0;
-	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
-	{
-		cItem Item;
-		Item.FromJson(*itr);
-		SetSlot(SlotIdx, Item);
-		SlotIdx++;
-	}
-
-	m_BeaconLevel = (char)a_Value.get("Level", 0).asInt();
-	int PrimaryEffect = a_Value.get("PrimaryEffect", 0).asInt();
-	int SecondaryEffect = a_Value.get("SecondaryEffect", 0).asInt();
-
-	if ((PrimaryEffect >= 0) && (PrimaryEffect <= (int)cEntityEffect::effSaturation))
-	{
-		m_PrimaryEffect = (cEntityEffect::eType)PrimaryEffect;
-	}
-
-	if ((SecondaryEffect >= 0) && (SecondaryEffect <= (int)cEntityEffect::effSaturation))
-	{
-		m_SecondaryEffect = (cEntityEffect::eType)SecondaryEffect;
-	}
-
-	return true;
-}
-
-
-
-
-
-void cBeaconEntity::SaveToJson(Json::Value& a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	Json::Value AllSlots;
-	int NumSlots = m_Contents.GetNumSlots();
-	for (int i = 0; i < NumSlots; i++)
-	{
-		Json::Value Slot;
-		m_Contents.GetSlot(i).GetJson(Slot);
-		AllSlots.append(Slot);
-	}
-	a_Value["Slots"] = AllSlots;
-
-	a_Value["Level"] = m_BeaconLevel;
-	a_Value["PrimaryEffect"] = (int)m_PrimaryEffect;
-	a_Value["SecondaryEffect"] = (int)m_SecondaryEffect;
 }
 
 

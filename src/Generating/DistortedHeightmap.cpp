@@ -7,7 +7,7 @@
 
 #include "DistortedHeightmap.h"
 #include "../OSSupport/File.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "../LinearUpscale.h"
 
 
@@ -227,15 +227,15 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biMesaPlateau      */ { 2.0f,  2.0f},  // 39
 	
 	// biomes 40 .. 128 are unused, 89 empty placeholders here:
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 40 .. 49
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 50 .. 59
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 60 .. 69
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 70 .. 79
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 80 .. 89
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 90 .. 99
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 100 .. 109
-	{}, {}, {}, {}, {}, {}, {}, {}, {}, {},  // 110 .. 119
-	{}, {}, {}, {}, {}, {}, {}, {}, {},      // 120 .. 128
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 40 .. 49
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 50 .. 59
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 60 .. 69
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 70 .. 79
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 80 .. 89
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 90 .. 99
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 100 .. 109
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 110 .. 119
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},                // 120 .. 128
 	
 	// Release 1.7 /* biome variants:
 	/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
@@ -246,22 +246,22 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	/* biSwamplandM           */ { 0.0f,  0.0f},  // 134
 	
 	// Biomes 135 .. 139 unused, 5 empty placeholders here:
-	{}, {}, {}, {}, {},                           // 135 .. 139
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 135 .. 139
 
 	/* biIcePlainsSpikes      */ { 1.0f,  1.0f},  // 140
 	
 	// Biomes 141 .. 148 unused, 8 empty placeholders here:
-	{}, {}, {}, {}, {}, {}, {}, {},               // 141 .. 148
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 141 .. 148
 
 	/* biJungleM              */ { 4.0f,  4.0f},  // 149
-	{},                                           // 150
+	{0.0f, 0.0f},                                 // 150
 	/* biJungleEdgeM          */ { 3.0f,  3.0f},  // 151
-	{}, {}, {},                                   // 152 .. 154
+	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},     // 152 .. 154
 	/* biBirchForestM         */ { 3.0f,  3.0f},  // 155
 	/* biBirchForestHillsM    */ { 5.0f,  5.0f},  // 156
 	/* biRoofedForestM        */ { 2.0f,  2.0f},  // 157
 	/* biColdTaigaM           */ { 1.0f,  1.0f},  // 158
-	{},                                           // 159
+	{0.0f, 0.0f},                                 // 159
 	/* biMegaSpruceTaiga      */ { 3.0f,  3.0f},  // 160
 	/* biMegaSpruceTaigaHills */ { 3.0f,  3.0f},  // 161
 	/* biExtremeHillsPlusM    */ {32.0f, 32.0f},  // 162
@@ -276,13 +276,13 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 
 
 
-cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen) :
+cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 	m_NoiseDistortX(a_Seed + 1000),
 	m_NoiseDistortZ(a_Seed + 2000),
 	m_OceanFloorSelect(a_Seed + 3000),
 	m_MesaFloor(a_Seed + 4000),
 	m_BiomeGen(a_BiomeGen),
-	m_UnderlyingHeiGen(a_Seed, a_BiomeGen),
+	m_UnderlyingHeiGen(new cHeiGenBiomal(a_Seed, a_BiomeGen)),
 	m_HeightGen(m_UnderlyingHeiGen, 64),
 	m_IsInitialized(false)
 {
@@ -540,10 +540,11 @@ void cDistortedHeightmap::InitializeCompoGen(cIniFile & a_IniFile)
 
 int cDistortedHeightmap::GetHeightmapAt(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Z)
 {
-	int ChunkX = (int)floor(a_X / (NOISE_DATATYPE)16);
-	int ChunkZ = (int)floor(a_Z / (NOISE_DATATYPE)16);
-	int RelX = (int)(a_X - (NOISE_DATATYPE)ChunkX * cChunkDef::Width);
-	int RelZ = (int)(a_Z - (NOISE_DATATYPE)ChunkZ * cChunkDef::Width);
+	int RelX = (int)std::floor(a_X);
+	int RelY = 0;
+	int RelZ = (int)std::floor(a_Z);
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
 
 	// If we're withing the same chunk, return the pre-cached heightmap:
 	if ((ChunkX == m_CurChunkX) && (ChunkZ == m_CurChunkZ))
@@ -576,7 +577,7 @@ void cDistortedHeightmap::UpdateDistortAmps(void)
 	{
 		for (int x = -1; x <= 1; x++)
 		{
-			m_BiomeGen.GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
+			m_BiomeGen->GenBiomes(m_CurChunkX + x, m_CurChunkZ + z, Biomes[x + 1][z + 1]);
 		}  // for x
 	}  // for z
 

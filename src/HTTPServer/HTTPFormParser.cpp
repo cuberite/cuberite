@@ -86,7 +86,7 @@ void cHTTPFormParser::Parse(const char * a_Data, size_t a_Size)
 		}
 		case fpkMultipart:
 		{
-			ASSERT(m_MultipartParser.get() != NULL);
+			ASSERT(m_MultipartParser.get() != nullptr);
 			m_MultipartParser->Parse(a_Data, a_Size);
 			break;
 		}
@@ -145,7 +145,7 @@ bool cHTTPFormParser::HasFormData(const cHTTPRequest & a_Request)
 
 void cHTTPFormParser::BeginMultipart(const cHTTPRequest & a_Request)
 {
-	ASSERT(m_MultipartParser.get() == NULL);
+	ASSERT(m_MultipartParser.get() == nullptr);
 	m_MultipartParser.reset(new cMultipartParser(a_Request.GetContentType(), *this));
 }
 

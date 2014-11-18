@@ -2,7 +2,7 @@
 #include "Globals.h"
 
 #include "ChunkGenerator.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"
@@ -28,9 +28,9 @@ const unsigned int QUEUE_SKIP_LIMIT = 500;
 cChunkGenerator::cChunkGenerator(void) :
 	super("cChunkGenerator"),
 	m_Seed(0),  // Will be overwritten by the actual generator
-	m_Generator(NULL),
-	m_PluginInterface(NULL),
-	m_ChunkSink(NULL)
+	m_Generator(nullptr),
+	m_PluginInterface(nullptr),
+	m_ChunkSink(nullptr)
 {
 }
 
@@ -80,7 +80,7 @@ bool cChunkGenerator::Start(cPluginInterface & a_PluginInterface, cChunkSink & a
 		m_Generator = new cComposableGenerator(*this);
 	}
 
-	if (m_Generator == NULL)
+	if (m_Generator == nullptr)
 	{
 		LOGERROR("Generator could not start, aborting the server");
 		return false;
@@ -103,7 +103,7 @@ void cChunkGenerator::Stop(void)
 	Wait();
 
 	delete m_Generator;
-	m_Generator = NULL;
+	m_Generator = nullptr;
 }
 
 
@@ -144,7 +144,7 @@ void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_Forc
 
 void cChunkGenerator::GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap)
 {
-	if (m_Generator != NULL)
+	if (m_Generator != nullptr)
 	{
 		m_Generator->GenerateBiomes(a_ChunkX, a_ChunkZ, a_BiomeMap);
 	}
@@ -180,7 +180,7 @@ int cChunkGenerator::GetQueueLength(void)
 
 EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 {
-	ASSERT(m_Generator != NULL);
+	ASSERT(m_Generator != nullptr);
 	return m_Generator->GetBiomeAt(a_BlockX, a_BlockZ);
 }
 
@@ -283,8 +283,8 @@ void cChunkGenerator::Execute(void)
 
 void cChunkGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT(m_PluginInterface != NULL);
-	ASSERT(m_ChunkSink != NULL);
+	ASSERT(m_PluginInterface != nullptr);
+	ASSERT(m_ChunkSink != nullptr);
 	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
 	cChunkDesc ChunkDesc(a_ChunkX, a_ChunkZ);

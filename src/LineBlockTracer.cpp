@@ -198,7 +198,7 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 	for (;;)
 	{
 		// Report the current block through the callbacks:
-		if (a_Chunk == NULL)
+		if (a_Chunk == nullptr)
 		{
 			m_Callbacks->OnNoChunk();
 			return false;
@@ -228,7 +228,7 @@ bool cLineBlockTracer::Item(cChunk * a_Chunk)
 
 		// Update the current chunk
 		a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
-		if (a_Chunk == NULL)
+		if (a_Chunk == nullptr)
 		{
 			m_Callbacks->OnNoChunk();
 			return false;

@@ -12,7 +12,7 @@
 
 
 cChunkStay::cChunkStay(void) :
-	m_ChunkMap(NULL)
+	m_ChunkMap(nullptr)
 {
 }
 
@@ -31,7 +31,7 @@ cChunkStay::~cChunkStay()
 
 void cChunkStay::Clear(void)
 {
-	ASSERT(m_ChunkMap == NULL);
+	ASSERT(m_ChunkMap == nullptr);
 	m_Chunks.clear();
 }
 
@@ -41,7 +41,7 @@ void cChunkStay::Clear(void)
 
 void cChunkStay::Add(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT(m_ChunkMap == NULL);
+	ASSERT(m_ChunkMap == nullptr);
 
 	for (cChunkCoordsVector::const_iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
 	{
@@ -60,7 +60,7 @@ void cChunkStay::Add(int a_ChunkX, int a_ChunkZ)
 
 void cChunkStay::Remove(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT(m_ChunkMap == NULL);
+	ASSERT(m_ChunkMap == nullptr);
 
 	for (cChunkCoordsVector::iterator itr = m_Chunks.begin(); itr != m_Chunks.end(); ++itr)
 	{
@@ -79,7 +79,7 @@ void cChunkStay::Remove(int a_ChunkX, int a_ChunkZ)
 
 void cChunkStay::Enable(cChunkMap & a_ChunkMap)
 {
-	ASSERT(m_ChunkMap == NULL);
+	ASSERT(m_ChunkMap == nullptr);
 	
 	m_OutstandingChunks = m_Chunks;
 	m_ChunkMap = &a_ChunkMap;
@@ -92,10 +92,10 @@ void cChunkStay::Enable(cChunkMap & a_ChunkMap)
 
 void cChunkStay::Disable(void)
 {
-	ASSERT(m_ChunkMap != NULL);
+	ASSERT(m_ChunkMap != nullptr);
 	
 	cChunkMap * ChunkMap = m_ChunkMap;
-	m_ChunkMap = NULL;
+	m_ChunkMap = nullptr;
 	ChunkMap->DelChunkStay(*this);
 }
 

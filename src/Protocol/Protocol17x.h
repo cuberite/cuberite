@@ -134,7 +134,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
-	virtual void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value) override;
+	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
@@ -295,10 +295,10 @@ protected:
 	void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
 	
+	/** Parses Vanilla plugin messages into specific ClientHandle calls.
+	The message payload is still in the bytebuffer, to be read by this function. */
+	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, short a_PayloadLength);
 	
-	/** Writes an entire packet into the output stream. a_Packet is expected to start with the packet type; data length is prepended here. */
-	void WritePacket(cByteBuffer & a_Packet);
-
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 

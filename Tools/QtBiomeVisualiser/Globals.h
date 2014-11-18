@@ -158,8 +158,17 @@ template class SizeChecker<UInt16, 2>;
 	TypeName(const TypeName &); \
 	void operator =(const TypeName &)
 
+// A macro that is used to mark unused local variables, to avoid pedantic warnings in gcc / clang / MSVC
+// Note that in MSVC it requires the full type of X to be known
+#define UNUSED_VAR(X) (void)(X)
+
 // A macro that is used to mark unused function parameters, to avoid pedantic warnings in gcc
-#define UNUSED(X) (void)(X)
+// Written so that the full type of param needn't be known
+#ifdef _MSC_VER
+	#define UNUSED(X)
+#else
+	#define UNUSED UNUSED_VAR
+#endif
 
 
 

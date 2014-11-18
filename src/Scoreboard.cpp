@@ -278,7 +278,7 @@ cScoreboard::cScoreboard(cWorld * a_World) : m_World(a_World)
 {
 	for (int i = 0; i < (int) dsCount; ++i)
 	{
-		m_Display[i] = NULL;
+		m_Display[i] = nullptr;
 	}
 }
 
@@ -294,14 +294,14 @@ cObjective* cScoreboard::RegisterObjective(const AString & a_Name, const AString
 
 	if (Status.second)
 	{
-		ASSERT(m_World != NULL);
+		ASSERT(m_World != nullptr);
 		m_World->BroadcastScoreboardObjective(a_Name, a_DisplayName, 0);
 
 		return &Status.first->second;
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -320,14 +320,14 @@ bool cScoreboard::RemoveObjective(const AString & a_Name)
 		return false;
 	}
 
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 	m_World->BroadcastScoreboardObjective(it->second.GetName(), it->second.GetDisplayName(), 1);
 
 	for (unsigned int i = 0; i < (unsigned int) dsCount; ++i)
 	{
 		if (m_Display[i] == &it->second)
 		{
-			SetDisplay(NULL, (eDisplaySlot) i);
+			SetDisplay(nullptr, (eDisplaySlot) i);
 		}
 	}
 
@@ -348,7 +348,7 @@ cObjective * cScoreboard::GetObjective(const AString & a_Name)
 
 	if (it == m_Objectives.end())
 	{
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
@@ -369,7 +369,7 @@ cTeam * cScoreboard::RegisterTeam(
 
 	std::pair<cTeamMap::iterator, bool> Status = m_Teams.insert(cNamedTeam(a_Name, Team));
 
-	return Status.second ? &Status.first->second : NULL;
+	return Status.second ? &Status.first->second : nullptr;
 }
 
 
@@ -404,7 +404,7 @@ cTeam * cScoreboard::GetTeam(const AString & a_Name)
 
 	if (it == m_Teams.end())
 	{
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
@@ -428,7 +428,7 @@ cTeam * cScoreboard::QueryPlayerTeam(const AString & a_Name)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -452,7 +452,7 @@ void cScoreboard::SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot)
 {
 	m_Display[a_Slot] = a_Objective;
 
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 	m_World->BroadcastDisplayObjective(a_Objective ? a_Objective->GetName() : "", a_Slot);
 }
 

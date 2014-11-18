@@ -272,13 +272,14 @@ void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
+	cChunkDesc::BlockNibbleBytes & BlockMetas = a_ChunkDesc.GetBlockMetasUncompressed();
 
 	int seq = 1;
 	
 	// Generate the ores from the ore list.
 	for (OreList::const_iterator itr = m_OreList.begin(); itr != m_OreList.end(); ++itr)
 	{
-		GenerateOre(ChunkX, ChunkZ, itr->BlockType, itr->MaxHeight, itr->NumNests, itr->NestSize, BlockTypes, seq);
+		GenerateOre(ChunkX, ChunkZ, itr->BlockType, itr->BlockMeta, itr->MaxHeight, itr->NumNests, itr->NestSize, BlockTypes, BlockMetas, seq);
 		seq++;
 	}
 }
@@ -287,7 +288,7 @@ void cStructGenOreNests::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, int a_Seq)
+void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_OreType, NIBBLETYPE a_BlockMeta, int a_MaxHeight, int a_NumNests, int a_NestSize, cChunkDef::BlockTypes & a_BlockTypes, cChunkDesc::BlockNibbleBytes & a_BlockMetas, int a_Seq)
 {
 	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent to each other.
 	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
@@ -341,6 +342,7 @@ void cStructGenOreNests::GenerateOre(int a_ChunkX, int a_ChunkZ, BLOCKTYPE a_Ore
 						if (a_BlockTypes[Index] == m_ToReplace)
 						{
 							a_BlockTypes[Index] = a_OreType;
+							a_BlockMetas[Index] = a_BlockMeta;
 						}
 						Num++;
 					}  // for z
@@ -409,7 +411,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a
 	
 	// Find the minimum height in this chunk:
 	cChunkDef::HeightMap HeightMap;
-	m_HeiGen.GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
+	m_HeiGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
 	HEIGHTTYPE MinHeight = HeightMap[0];
 	for (size_t i = 1; i < ARRAYCOUNT(HeightMap); i++)
 	{

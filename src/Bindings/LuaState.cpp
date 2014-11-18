@@ -16,6 +16,8 @@ extern "C"
 #include "Bindings.h"
 #include "ManualBindings.h"
 #include "DeprecatedBindings.h"
+#include "../Entities/Entity.h"
+#include "../BlockEntities/BlockEntity.h"
 
 // fwd: SQLite/lsqlite3.c
 extern "C"
@@ -44,7 +46,7 @@ const cLuaState::cRet cLuaState::Return = {};
 // cLuaState:
 
 cLuaState::cLuaState(const AString & a_SubsystemName) :
-	m_LuaState(NULL),
+	m_LuaState(nullptr),
 	m_IsOwned(false),
 	m_SubsystemName(a_SubsystemName),
 	m_NumCurrentFunctionArgs(-1)
@@ -88,7 +90,7 @@ cLuaState::~cLuaState()
 
 void cLuaState::Create(void)
 {
-	if (m_LuaState != NULL)
+	if (m_LuaState != nullptr)
 	{
 		LOGWARNING("%s: Trying to create an already-existing LuaState, ignoring.", __FUNCTION__);
 		return;
@@ -117,7 +119,7 @@ void cLuaState::RegisterAPILibs(void)
 
 void cLuaState::Close(void)
 {
-	if (m_LuaState == NULL)
+	if (m_LuaState == nullptr)
 	{
 		LOGWARNING("%s: Trying to close an invalid LuaState, ignoring.", __FUNCTION__);
 		return;
@@ -132,7 +134,7 @@ void cLuaState::Close(void)
 		return;
 	}
 	lua_close(m_LuaState);
-	m_LuaState = NULL;
+	m_LuaState = nullptr;
 	m_IsOwned = false;
 }
 
@@ -142,7 +144,7 @@ void cLuaState::Close(void)
 
 void cLuaState::Attach(lua_State * a_State)
 {
-	if (m_LuaState != NULL)
+	if (m_LuaState != nullptr)
 	{
 		LOGINFO("%s: Already contains a LuaState (0x%p), will be closed / detached.", __FUNCTION__, m_LuaState);
 		if (m_IsOwned)
@@ -164,7 +166,7 @@ void cLuaState::Attach(lua_State * a_State)
 
 void cLuaState::Detach(void)
 {
-	if (m_LuaState == NULL)
+	if (m_LuaState == nullptr)
 	{
 		return;
 	}
@@ -177,7 +179,7 @@ void cLuaState::Detach(void)
 		Close();
 		return;
 	}
-	m_LuaState = NULL;
+	m_LuaState = nullptr;
 }
 
 
@@ -520,7 +522,7 @@ void cLuaState::Push(cBlockEntity * a_BlockEntity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_BlockEntity, "cBlockEntity");
+	tolua_pushusertype(m_LuaState, a_BlockEntity, (a_BlockEntity == nullptr) ? "cBlockEntity" : a_BlockEntity->GetClass());
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -556,7 +558,61 @@ void cLuaState::Push(cEntity * a_Entity)
 {
 	ASSERT(IsValid());
 
-	tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+	if (a_Entity == nullptr)
+	{
+		lua_pushnil(m_LuaState);
+	}
+	else
+	{
+		switch (a_Entity->GetEntityType())
+		{
+			case cEntity::etMonster:
+			{
+				// Don't push specific mob types, as those are not exported in the API:
+				tolua_pushusertype(m_LuaState, a_Entity, "cMonster");
+				break;
+			}
+			case cEntity::etPlayer:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cPlayer");
+				break;
+			}
+			case cEntity::etPickup:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cPickup");
+				break;
+			}
+			case cEntity::etTNT:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cTNTEntity");
+				break;
+			}
+			case cEntity::etProjectile:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, a_Entity->GetClass());
+				break;
+			}
+			case cEntity::etFloater:
+			{
+				tolua_pushusertype(m_LuaState, a_Entity, "cFloater");
+				break;
+			}
+
+			case cEntity::etEntity:
+			case cEntity::etEnderCrystal:
+			case cEntity::etFallingBlock:
+			case cEntity::etMinecart:
+			case cEntity::etBoat:
+			case cEntity::etExpOrb:
+			case cEntity::etItemFrame:
+			case cEntity::etPainting:
+			{
+				// Push the generic entity class type:
+				tolua_pushusertype(m_LuaState, a_Entity, "cEntity");
+			}
+		}  // switch (EntityType)
+	}
+
 	m_NumCurrentFunctionArgs += 1;
 }
 
@@ -813,7 +869,7 @@ void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 {
 	size_t len = 0;
 	const char * data = lua_tolstring(m_LuaState, a_StackPos, &len);
-	if (data != NULL)
+	if (data != nullptr)
 	{
 		a_Value.assign(data, len);
 	}
@@ -861,6 +917,11 @@ void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 
 void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 {
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
 	tolua_Error err;
 	if (tolua_isusertype(m_LuaState, a_StackPos, "cBoundingBox", false, &err))
 	{
@@ -874,6 +935,11 @@ void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 
 void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
 {
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
 	tolua_Error err;
 	if (tolua_isusertype(m_LuaState, a_StackPos, "cWorld", false, &err))
 	{
@@ -936,7 +1002,7 @@ bool cLuaState::CheckParamUserTable(int a_StartParam, const char * a_UserTable, 
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -969,7 +1035,7 @@ bool cLuaState::CheckParamUserType(int a_StartParam, const char * a_UserType, in
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1002,7 +1068,7 @@ bool cLuaState::CheckParamTable(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1035,7 +1101,7 @@ bool cLuaState::CheckParamNumber(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1068,7 +1134,7 @@ bool cLuaState::CheckParamString(int a_StartParam, int a_EndParam)
 		lua_Debug entry;
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != NULL) ? entry.name : "?");
+		AString ErrMsg = Printf("#ferror in function '%s'.", (entry.name != nullptr) ? entry.name : "?");
 		tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 		return false;
 	}  // for i - Param
@@ -1101,7 +1167,7 @@ bool cLuaState::CheckParamFunction(int a_StartParam, int a_EndParam)
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
 		luaL_error(m_LuaState, "Error in function '%s' parameter #%d. Function expected, got %s",
-			(entry.name != NULL) ? entry.name : "?", i, GetTypeText(i).c_str()
+			(entry.name != nullptr) ? entry.name : "?", i, GetTypeText(i).c_str()
 		);
 		return false;
 	}  // for i - Param
@@ -1134,7 +1200,7 @@ bool cLuaState::CheckParamFunctionOrNil(int a_StartParam, int a_EndParam)
 		VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 		VERIFY(lua_getinfo (m_LuaState, "n", &entry));
 		luaL_error(m_LuaState, "Error in function '%s' parameter #%d. Function expected, got %s",
-			(entry.name != NULL) ? entry.name : "?", i, GetTypeText(i).c_str()
+			(entry.name != nullptr) ? entry.name : "?", i, GetTypeText(i).c_str()
 		);
 		return false;
 	}  // for i - Param
@@ -1158,7 +1224,7 @@ bool cLuaState::CheckParamEnd(int a_Param)
 	lua_Debug entry;
 	VERIFY(lua_getstack(m_LuaState, 0,   &entry));
 	VERIFY(lua_getinfo (m_LuaState, "n", &entry));
-	AString ErrMsg = Printf("#ferror in function '%s': Too many arguments.", (entry.name != NULL) ? entry.name : "?");
+	AString ErrMsg = Printf("#ferror in function '%s': Too many arguments.", (entry.name != nullptr) ? entry.name : "?");
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 	return false;
 }
@@ -1337,7 +1403,7 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 			case LUA_TUSERDATA:
 			{
 				// Get the class name:
-				const char * type = NULL;
+				const char * type = nullptr;
 				if (lua_getmetatable(a_SrcLuaState, i) == 0)
 				{
 					LOGWARNING("%s: Unknown class in pos %d, cannot copy.", __FUNCTION__, i);
@@ -1349,7 +1415,7 @@ int cLuaState::CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_Sr
 				lua_pop(a_SrcLuaState, 1);                     // Stack -1
 				
 				// Copy the value:
-				void * ud = tolua_touserdata(a_SrcLuaState, i, NULL);
+				void * ud = tolua_touserdata(a_SrcLuaState, i, nullptr);
 				tolua_pushusertype(m_LuaState, ud, type);
 				break;
 			}
@@ -1375,7 +1441,7 @@ void cLuaState::ToString(int a_StackPos, AString & a_String)
 {
 	size_t len;
 	const char * s = lua_tolstring(m_LuaState, a_StackPos, &len);
-	if (s != NULL)
+	if (s != nullptr)
 	{
 		a_String.assign(s, len);
 	}
@@ -1396,10 +1462,8 @@ void cLuaState::LogStack(const char * a_Header)
 
 void cLuaState::LogStack(lua_State * a_LuaState, const char * a_Header)
 {
-	UNUSED(a_Header);  // The param seems unused when compiling for release, so the compiler warns
-	
 	// Format string consisting only of %s is used to appease the compiler
-	LOGD("%s", (a_Header != NULL) ? a_Header : "Lua C API Stack contents:");
+	LOG("%s", (a_Header != nullptr) ? a_Header : "Lua C API Stack contents:");
 	for (int i = lua_gettop(a_LuaState); i > 0; i--)
 	{
 		AString Value;
@@ -1436,7 +1500,7 @@ int cLuaState::ReportFnCallErrors(lua_State * a_LuaState)
 // cLuaState::cRef:
 
 cLuaState::cRef::cRef(void) :
-	m_LuaState(NULL),
+	m_LuaState(nullptr),
 	m_Ref(LUA_REFNIL)
 {
 }
@@ -1446,7 +1510,7 @@ cLuaState::cRef::cRef(void) :
 
 
 cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
-	m_LuaState(NULL),
+	m_LuaState(nullptr),
 	m_Ref(LUA_REFNIL)
 {
 	RefStack(a_LuaState, a_StackPos);
@@ -1458,7 +1522,7 @@ cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
 
 cLuaState::cRef::~cRef()
 {
-	if (m_LuaState != NULL)
+	if (m_LuaState != nullptr)
 	{
 		UnRef();
 	}
@@ -1471,7 +1535,7 @@ cLuaState::cRef::~cRef()
 void cLuaState::cRef::RefStack(cLuaState & a_LuaState, int a_StackPos)
 {
 	ASSERT(a_LuaState.IsValid());
-	if (m_LuaState != NULL)
+	if (m_LuaState != nullptr)
 	{
 		UnRef();
 	}
@@ -1492,7 +1556,7 @@ void cLuaState::cRef::UnRef(void)
 	{
 		luaL_unref(*m_LuaState, LUA_REGISTRYINDEX, m_Ref);
 	}
-	m_LuaState = NULL;
+	m_LuaState = nullptr;
 	m_Ref = LUA_REFNIL;
 }
 

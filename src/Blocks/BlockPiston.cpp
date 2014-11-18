@@ -139,7 +139,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		{
 			cChunkInterface ChunkInterface(a_World->GetChunkMap());
 			cBlockInServerPluginInterface PluginInterface(*a_World);
-			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, NULL, a_BlockX, a_BlockY, a_BlockZ);
+			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 

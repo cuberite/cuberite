@@ -18,18 +18,23 @@ public:
 	/** Returns true iff the chunk data is valid - loaded or generated. */
 	bool isValid(void) const { return m_IsValid; }
 
-	/** Returns the image of the chunk's biomes. Assumes that the chunk is valid. */
-	const uchar * getImage(void) const;
+	/** Sets the biomes to m_Biomes and renders them into m_Image. */
+	void setBiomes(const cChunkDef::BiomeMap & a_Biomes);
 
-	/** Sets the image data for this chunk. */
-	void setImage(const Image & a_Image);
+	/** Returns the biome at the specified relative coords, or biInvalidBiome if not valid.
+	Coords must be valid inside this chunk. */
+	EMCSBiome getBiome(int a_RelX, int a_RelZ);
+
+	/** Returns the raw biome data for this chunk. */
+	const short * getBiomes(void) const { return m_Biomes; }
 
 protected:
 	/** Flag that specifies if the chunk data is valid - loaded or generated. */
 	bool m_IsValid;
 
-	/** Cached rendered image of this chunk's biomes. Updated in render(). */
-	Image m_Image;
+	/** Biomes comprising the chunk, in the X + 16 * Z ordering.
+	Typed as short to save on memory, converted automatically when needed. */
+	short m_Biomes[16 * 16];
 };
 
 typedef std::shared_ptr<Chunk> ChunkPtr;

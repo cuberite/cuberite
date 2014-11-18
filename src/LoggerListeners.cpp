@@ -280,7 +280,7 @@ cFileListener::cFileListener(void)
 {
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 	AString FileName;
-	FileName = Printf("%s%sLOG_%d.txt", FILE_IO_PREFIX, "logs/", (int)time(NULL));
+	FileName = Printf("%s%sLOG_%d.txt", FILE_IO_PREFIX, "logs/", (int)time(nullptr));
 	m_File.Open(FileName, cFile::fmAppend);
 }
 

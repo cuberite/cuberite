@@ -5,6 +5,28 @@
 
 
 
+/** Place this macro in the declaration of each cBlockEntity descendant. */
+#define BLOCKENTITY_PROTODEF(classname) \
+	virtual bool IsA(const char * a_ClassName) const override \
+	{ \
+		return ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName)); \
+	} \
+	virtual const char * GetClass(void) const override \
+	{ \
+		return #classname; \
+	} \
+	static const char * GetClassStatic(void) \
+	{ \
+		return #classname; \
+	} \
+	virtual const char * GetParentClass(void) const override \
+	{ \
+		return super::GetClass(); \
+	}
+
+
+
+
 
 namespace Json
 {
@@ -48,13 +70,22 @@ public:
 	
 	/// Creates a new block entity for the specified block type
 	/// If a_World is valid, then the entity is created bound to that world
-	/// Returns NULL for unknown block types
-	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = NULL);
+	/// Returns nullptr for unknown block types
+	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World = nullptr);
 	
 	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
 	{
 		return "cBlockEntity";
 	}
+
+	/** Returns true if the object is the specified class, or its descendant. */
+	virtual bool IsA(const char * a_ClassName) const { return (strcmp(a_ClassName, "cBlockEntity") == 0); }
+
+	/** Returns the name of the tompost class (the most descendant). Used for Lua bindings to push the correct object type. */
+	virtual const char * GetClass(void) const { return GetClassStatic(); }
+
+	/** Returns the name of the parent class, or empty string if no parent class. */
+	virtual const char * GetParentClass(void) const { return ""; }
 	
 	// tolua_begin
 	
@@ -74,8 +105,6 @@ public:
 	int GetRelZ(void) const { return m_RelZ; }
 	
 	// tolua_end
-
-	virtual void SaveToJson  (Json::Value & a_Value) = 0;
 	
 	/// Called when a player uses this entity; should open the UI window
 	virtual void UsedBy( cPlayer * a_Player) = 0;

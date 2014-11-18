@@ -33,7 +33,7 @@ function GetDefaultPage()
 	local AllPlugins = PM:GetAllPlugins()
 	for key,value in pairs(AllPlugins) do
 		if( value ~= nil and value ~= false ) then
-			Content = Content ..  "<li>" .. key .. " V." .. value:GetVersion() .. "</li>"
+			Content = Content ..  "<li>" .. key .. " (version " .. value:GetVersion() .. ")</li>"
 		end
 	end
 	
@@ -70,25 +70,67 @@ function ShowPage(WebAdmin, TemplateRequest)
 		PageContent, SubTitle = GetDefaultPage()
 	end
 	
+	local reqParamsClass = ""
+	
+	for key,value in pairs(TemplateRequest.Request.Params) do
+		reqParamsClass = reqParamsClass .. " param-" .. string.lower(string.gsub(key, "[^a-zA-Z0-9]+", "-") .. "-" .. string.gsub(value, "[^a-zA-Z0-9]+", "-"))
+	end
+	
+	if (string.gsub(reqParamsClass, "%s", "") == "") then
+		reqParamsClass = " no-param"
+	end
+	
 	Output([[
-<!DOCTYPE html>
+<!-- Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 -->
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link rel="icon" href="/favicon.ico">
-<title>]] .. Title .. [[</title>
-<link rel="stylesheet" type="text/css" media="screen" href="/style.css">
+	<title>]] .. Title .. [[</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="/style.css">
+	<link rel="icon" href="/favicon.ico">
 </head>
-
 <body>
-	<div id="wrapper">
-		<!-- h1 tag stays for the logo, you can use the a tag for linking the index page -->
-		<h1>
-			<a href="]] .. BaseURL .. [["><span>MCServer</span></a>
-		</h1>
-		<div id="containerHolder">
-			<div id="container">
-				<div id="sidebar">
-					<ul class="sideNav">
+<div class="contention push25">
+	<div class="pagehead">
+		<div class="row1">
+			<div class="wrapper">
+				<img src="/logo_login.png" alt="MCServer Logo" class="logo">
+			</div>
+		</div>
+		<div id="panel">
+			<div class="upper">
+				<div class="wrapper">
+					<ul class="menu top_links">
+						<li><a>Server Name: <strong>]] .. cRoot:Get():GetServer():GetServerID() .. [[</strong></a></li>
+						<li><a>Memory: <strong>]] .. MemoryUsageKiB / 1024 .. [[MB</strong></a></li>
+						<li><a>Chunks: <strong>]] .. NumChunks .. [[</strong></a></li>
+					</ul>
+					<div class="welcome"><strong>Welcome back, ]] .. TemplateRequest.Request.Username .. [[</strong>&nbsp;&nbsp;&nbsp;<a href=".././"><img src="/log_out.png" style="vertical-align:bottom;"> Log Out</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row2">
+		<div class="wrapper">
+			<table width="100%" border="0" align="center">
+				<tbody>
+					<tr>
+						<td width="180" valign="top">
+							<table border="0" cellspacing="0" cellpadding="5" class="tborder">
+							<tbody>
+								<tr>
+									<td class="thead"><strong>Menu</strong></td>
+								</tr>
+								<tr>
+									<td class="trow1 smalltext"><a href=']] .. BaseURL .. [[' class='usercp_nav_item usercp_nav_home'>Home</a></td>
+								</tr>
+								<tr>
+									<td class="tcat"><div><span class="smalltext"><strong><font color="#000">Server Management</font></strong></span></div></td>
+								</tr>
+							</tbody>
+							<tbody style="" id="usercppms_e">
+								<tr>
+									<td class="trow1 smalltext">
 	]])
 
 
@@ -97,41 +139,62 @@ function ShowPage(WebAdmin, TemplateRequest)
 		local PluginWebTitle = value:GetWebTitle()
 		local TabNames = value:GetTabNames()
 		if (GetTableSize(TabNames) > 0) then
-			Output("<li>"..PluginWebTitle.."</li>\n");
+			Output("<div><a class='usercp_nav_item usercp_nav_pmfolder' style='text-decoration:none;'><b>"..PluginWebTitle.."</b></a></div>\n");
 			
 			for webname,prettyname in pairs(TabNames) do
-				Output("<li><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "'>" .. prettyname .. "</a></li>\n")
+				Output("<div><a href='" .. BaseURL .. PluginWebTitle .. "/" .. webname .. "' class='usercp_nav_item usercp_nav_sub_pmfolder'>" .. prettyname .. "</a></div>\n")
 			end
+
+			Output("<br>\n");
 		end
 	end
 
 	
 	Output([[
-					</ul>
-					<!-- // .sideNav -->
-				</div>    
-				<!-- // #sidebar -->
-				<!-- h2 stays for breadcrumbs -->
-				<h2>Welcome ]] .. TemplateRequest.Request.Username .. [[</h2>
-				<div id="main">
-					<h3>]] .. SubTitle .. [[</h3>
-					]] .. PageContent .. [[
-				</div>
-				<!-- // #main -->
-				
-				<div class="clear"></div>
-				
-			</div>
-			<!-- // #container -->
-		</div>	
-		<!-- // #containerHolder -->
-	    
-		<p id="footer">MCServer is using: ]] .. MemoryUsageKiB / 1024 .. [[ MiB of memory; Current chunk count: ]] .. NumChunks .. [[ </p>
+								</td>
+							</tr>
+						</tbody>
+						</table>
+					</td>
+					<td valign="top" style='padding-left:25px;'>
+						<table border="0" cellspacing="0" cellpadding="5" class="tborder">
+						<tbody>
+							<tr>
+								<td class="thead" colspan="2"><strong>]] .. SubTitle .. [[</strong></td>
+							</tr>
+							<tr>
+								<td class="trow2">]] .. PageContent .. [[</td>
+							</tr>
+						</tbody>
+						</table>
+					</td>
+				</tr>
+			</tbody>
+			</table>
+		</div>
 	</div>
-	<!-- // #wrapper -->
+<div id="footer">
+	<div class="upper">
+		<div class="wrapper">
+			<ul class="menu bottom_links">
+				<li><a href="http://www.mc-server.org" target="_blank">MCServer</a></li>
+				<li><a href="http://forum.mc-server.org" target="_blank">Forums</a></li>
+				<li><a href="http://builds.cuberite.org" target="_blank">Buildserver</a></li>
+				<li><a href="http://mc-server.xoft.cz/LuaAPI" target="_blank">API Documentation</a></li>
+				<li><a href="http://book.mc-server.org/" target="_blank">User's Manual</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="lower">
+		<div class="wrapper">
+			<span id="copyright">Copyright © <a href="http://www.mc-server.org" target="_blank">MCServer Team</a> 2014.</span>
+		</div>
+	</div>
+</div>
+</div>
 </body>
 </html>
-	]])
+]])
 	
 	return table.concat(SiteContent)
 end

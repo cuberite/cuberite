@@ -8,7 +8,7 @@
 #include "Server.h"
 #include "Item.h"
 #include "Root.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
 #include "OSSupport/Timer.h"
@@ -256,14 +256,14 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_IsDeepSnowEnabled(false),
 	m_ShouldLavaSpawnFire(true),
 	m_VillagersShouldHarvestCrops(true),
-	m_SimulatorManager(NULL),
-	m_SandSimulator(NULL),
-	m_WaterSimulator(NULL),
-	m_LavaSimulator(NULL),
-	m_FireSimulator(NULL),
-	m_RedstoneSimulator(NULL),
+	m_SimulatorManager(),
+	m_SandSimulator(),
+	m_WaterSimulator(nullptr),
+	m_LavaSimulator(nullptr),
+	m_FireSimulator(),
+	m_RedstoneSimulator(nullptr),
 	m_MaxPlayers(10),
-	m_ChunkMap(NULL),
+	m_ChunkMap(),
 	m_bAnimals(true),
 	m_Weather(eWeather_Sunny),
 	m_WeatherInterval(24000),  // Guaranteed 1 day of sunshine at server start :)
@@ -283,6 +283,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_bCommandBlocksEnabled(true),
 	m_bUseChatPrefixes(false),
 	m_TNTShrapnelLevel(slNone),
+	m_MaxViewDistance(12),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -303,12 +304,9 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 
 cWorld::~cWorld()
 {
-	delete m_SimulatorManager;   m_SimulatorManager  = NULL;
-	delete m_SandSimulator;      m_SandSimulator     = NULL;
-	delete m_WaterSimulator;     m_WaterSimulator    = NULL;
-	delete m_LavaSimulator;      m_LavaSimulator     = NULL;
-	delete m_FireSimulator;      m_FireSimulator     = NULL;
-	delete m_RedstoneSimulator;  m_RedstoneSimulator = NULL;
+	delete m_WaterSimulator;     m_WaterSimulator    = nullptr;
+	delete m_LavaSimulator;      m_LavaSimulator     = nullptr;
+	delete m_RedstoneSimulator;  m_RedstoneSimulator = nullptr;
 
 	UnloadUnusedChunks();
 	
@@ -319,8 +317,6 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
-
-	delete m_ChunkMap;
 }
 
 
@@ -566,6 +562,8 @@ void cWorld::Start(void)
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
 
+	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", 12));
+
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
 	m_IsSpawnExplicitlySet =
@@ -631,7 +629,7 @@ void cWorld::Start(void)
 	InitialiseAndLoadMobSpawningValues(IniFile);
 	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", m_TimeOfDay));
 
-	m_ChunkMap = new cChunkMap(this);
+	m_ChunkMap = make_unique<cChunkMap>(this);
 	
 	m_LastSave = 0;
 	m_LastUnload = 0;
@@ -641,16 +639,16 @@ void cWorld::Start(void)
 	m_BlockTickQueueCopy.reserve(1000);
 
 	// Simulators:
-	m_SimulatorManager  = new cSimulatorManager(*this);
+	m_SimulatorManager  = make_unique<cSimulatorManager>(*this);
 	m_WaterSimulator    = InitializeFluidSimulator(IniFile, "Water", E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
 	m_LavaSimulator     = InitializeFluidSimulator(IniFile, "Lava",  E_BLOCK_LAVA,  E_BLOCK_STATIONARY_LAVA);
-	m_SandSimulator     = new cSandSimulator(*this, IniFile);
-	m_FireSimulator     = new cFireSimulator(*this, IniFile);
+	m_SandSimulator     = make_unique<cSandSimulator>(*this, IniFile);
+	m_FireSimulator     = make_unique<cFireSimulator>(*this, IniFile);
 	m_RedstoneSimulator = InitializeRedstoneSimulator(IniFile);
 
 	// Water, Lava and Redstone simulators get registered in their initialize function.
-	m_SimulatorManager->RegisterSimulator(m_SandSimulator, 1);
-	m_SimulatorManager->RegisterSimulator(m_FireSimulator, 1);
+	m_SimulatorManager->RegisterSimulator(m_SandSimulator.get(), 1);
+	m_SimulatorManager->RegisterSimulator(m_FireSimulator.get(), 1);
 
 	m_Lighting.Start(this);
 	m_Storage.Start(this, m_StorageSchema, m_StorageCompressionFactor);
@@ -1059,7 +1057,6 @@ void cWorld::TickQueuedTasks(void)
 	for (cTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
 	{
 		(*itr)->Run(*this);
-		delete *itr;
 	}  // for itr - m_Tasks[]
 }
 
@@ -1069,14 +1066,28 @@ void cWorld::TickQueuedTasks(void)
 
 void cWorld::TickScheduledTasks(void)
 {
-	// Make a copy of the tasks to avoid deadlocks on accessing m_Tasks
+	// Move the tasks to be executed to a seperate vector to avoid deadlocks on accessing m_Tasks
 	cScheduledTasks Tasks;
 	{
 		cCSLock Lock(m_CSScheduledTasks);
-		while (!m_ScheduledTasks.empty() && (m_ScheduledTasks.front()->m_TargetTick < m_WorldAge))
+		auto WorldAge = m_WorldAge;
+
+		// Move all the due tasks from m_ScheduledTasks into Tasks:
+		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-basd for, we're modifying the container
 		{
-			Tasks.push_back(m_ScheduledTasks.front());
-			m_ScheduledTasks.pop_front();
+			if ((*itr)->m_TargetTick < WorldAge)
+			{
+				auto next = itr;
+				++next;
+				Tasks.push_back(std::move(*itr));
+				m_ScheduledTasks.erase(itr);
+				itr = next;
+			}
+			else
+			{
+				// All the eligible tasks have been moved, bail out now
+				break;
+			}
 		}
 	}
 
@@ -1084,7 +1095,6 @@ void cWorld::TickScheduledTasks(void)
 	for (cScheduledTasks::iterator itr = Tasks.begin(), end = Tasks.end(); itr != end; ++itr)
 	{
 		(*itr)->m_Task->Run(*this);
-		delete *itr;
 	}  // for itr - m_Tasks[]
 }
 
@@ -1254,7 +1264,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 		for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 		{
 			cClientHandle * ch = (*itr)->GetClientHandle();
-			if (ch == NULL)
+			if (ch == nullptr)
 			{
 				continue;
 			}
@@ -2009,7 +2019,7 @@ void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Ex
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2027,7 +2037,7 @@ void cWorld::BroadcastChat(const cCompositeChat & a_Message, const cClientHandle
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2170,7 +2180,7 @@ void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClien
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2188,7 +2198,7 @@ void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cCl
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2206,7 +2216,7 @@ void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const c
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2224,7 +2234,7 @@ void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClie
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2242,7 +2252,7 @@ void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, cons
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2269,7 +2279,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2287,7 +2297,7 @@ void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2305,7 +2315,7 @@ void cWorld::BroadcastDisplayObjective(const AString & a_Objective, cScoreboard:
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2350,7 +2360,7 @@ void cWorld::BroadcastTeleportEntity(const cEntity & a_Entity, const cClientHand
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2377,7 +2387,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2404,7 +2414,7 @@ void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclud
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == NULL) || !ch->IsLoggedIn() || ch->IsDestroyed())
+		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
 		{
 			continue;
 		}
@@ -2593,14 +2603,14 @@ void cWorld::UnloadUnusedChunks(void)
 
 void cWorld::QueueUnloadUnusedChunks(void)
 {
-	QueueTask(new cWorld::cTaskUnloadUnusedChunks);
+	QueueTask(make_unique<cWorld::cTaskUnloadUnusedChunks>());
 }
 
 
 
 
 
-void cWorld::CollectPickupsByPlayer(cPlayer * a_Player)
+void cWorld::CollectPickupsByPlayer(cPlayer & a_Player)
 {
 	m_ChunkMap->CollectPickupsByPlayer(a_Player);
 }
@@ -2639,7 +2649,7 @@ void cWorld::RemovePlayer(cPlayer * a_Player, bool a_RemoveFromChunk)
 	
 	// Remove the player's client from the list of clients to be ticked:
 	cClientHandle * Client = a_Player->GetClientHandle();
-	if (Client != NULL)
+	if (Client != nullptr)
 	{
 		Client->RemoveFromWorld();
 		m_ChunkMap->RemoveClientFromChunks(Client);
@@ -2692,7 +2702,7 @@ bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_
 
 bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCallback & a_Callback)
 {
-	cPlayer * BestMatch = NULL;
+	cPlayer * BestMatch = nullptr;
 	size_t BestRating = 0;
 	size_t NameLength = a_PlayerNameHint.length();
 
@@ -2711,9 +2721,26 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 		}
 	}  // for itr - m_Players[]
 
-	if (BestMatch != NULL)
+	if (BestMatch != nullptr)
 	{
 		return a_Callback.Item (BestMatch);
+	}
+	return false;
+}
+
+
+
+
+
+bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		if ((*itr)->GetUUID() == a_PlayerUUID)
+		{
+			return a_Callback.Item(*itr);
+		}
 	}
 	return false;
 }
@@ -2728,7 +2755,7 @@ cPlayer * cWorld::FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, 
 	cTracer LineOfSight(this);
 
 	double ClosestDistance = a_SightLimit;
-	cPlayer * ClosestPlayer = NULL;
+	cPlayer * ClosestPlayer = nullptr;
 
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2767,7 +2794,7 @@ void cWorld::SendPlayerList(cPlayer * a_DestPlayer)
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
 		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch != NULL) && !ch->IsDestroyed())
+		if ((ch != nullptr) && !ch->IsDestroyed())
 		{
 			a_DestPlayer->GetClientHandle()->SendPlayerListAddPlayer(*(*itr));
 		}
@@ -2850,19 +2877,19 @@ void cWorld::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
-void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
 {
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
 
 
 
 
 
-void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cClientHandle * a_Client)
+void cWorld::ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client)
 {
 	a_Client->AddWantedChunk(a_ChunkX, a_ChunkZ);
-	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Client);
+	m_ChunkSender.QueueSendChunkTo(a_ChunkX, a_ChunkZ, a_Priority, a_Client);
 }
 
 
@@ -2902,25 +2929,19 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	AString Line2(a_Line2);
 	AString Line3(a_Line3);
 	AString Line4(a_Line4);
-	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
+
+	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
 	{
 		return false;
 	}
+
 	if (m_ChunkMap->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4))
 	{
-		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
+		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
 		return true;
 	}
+
 	return false;
-}
-
-
-
-
-
-bool cWorld::UpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
-{
-	return SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 }
 
 
@@ -2954,7 +2975,7 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
-	if (Block != E_BLOCK_TRAPDOOR)
+	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
 	}
@@ -2971,7 +2992,7 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
 	GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, Block, Meta);
-	if (Block != E_BLOCK_TRAPDOOR)
+	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
 	}
@@ -3003,7 +3024,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_Generator.QueueGenerateChunk(a_ChunkX, a_ChunkZ, false);
+	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -3049,17 +3070,17 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::QueueSaveAllChunks(void)
 {
-	QueueTask(new cWorld::cTaskSaveAllChunks);
+	QueueTask(make_unique<cWorld::cTaskSaveAllChunks>());
 }
 
 
 
 
 
-void cWorld::QueueTask(cTask * a_Task)
+void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
 {
 	cCSLock Lock(m_CSTasks);
-	m_Tasks.push_back(a_Task);
+	m_Tasks.push_back(std::move(a_Task));
 }
 
 
@@ -3076,11 +3097,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 	{
 		if ((*itr)->m_TargetTick >= TargetTick)
 		{
-			m_ScheduledTasks.insert(itr, new cScheduledTask(TargetTick, a_Task));
+			m_ScheduledTasks.insert(itr, make_unique<cScheduledTask>(TargetTick, a_Task));
 			return;
 		}
 	}
-	m_ScheduledTasks.push_back(new cScheduledTask(TargetTick, a_Task));
+	m_ScheduledTasks.push_back(make_unique<cScheduledTask>(TargetTick, a_Task));
 }
 
 
@@ -3211,10 +3232,10 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
 {
-	cMonster * Monster = NULL;
+	cMonster * Monster = nullptr;
 
 	Monster = cMonster::NewMonsterFromType(a_MonsterType);
-	if (Monster != NULL)
+	if (Monster != nullptr)
 	{
 		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	}
@@ -3240,7 +3261,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
 	{
 		delete a_Monster;
-		a_Monster = NULL;
+		a_Monster = nullptr;
 		return -1;
 	}
 
@@ -3248,7 +3269,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	if (!a_Monster->Initialize(*this))
 	{
 		delete a_Monster;
-		a_Monster = NULL;
+		a_Monster = nullptr;
 		return -1;
 	}
 
@@ -3265,14 +3286,14 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
-	if (Projectile == NULL)
+	if (Projectile == nullptr)
 	{
 		return -1;
 	}
 	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
-		Projectile = NULL;
+		Projectile = nullptr;
 		return -1;
 	}
 	return Projectile->GetUniqueID();
@@ -3355,7 +3376,7 @@ cRedstoneSimulator<cChunk, cWorld> * cWorld::InitializeRedstoneSimulator(cIniFil
 		SimulatorName = "Incremental";
 	}
 	
-	cRedstoneSimulator<cChunk, cWorld> * res = NULL;
+	cRedstoneSimulator<cChunk, cWorld> * res = nullptr;
 
 	if (NoCaseCompare(SimulatorName, "Incremental") == 0)
 	{
@@ -3388,7 +3409,7 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 		SimulatorName = "Vanilla";
 	}
 	
-	cFluidSimulator * res = NULL;
+	cFluidSimulator * res = nullptr;
 	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	int Rate = 1;
 	if (
@@ -3478,7 +3499,7 @@ void cWorld::AddQueuedPlayers(void)
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
 			cClientHandle * Client = (*itr)->GetClientHandle();
-			if (Client != NULL)
+			if (Client != nullptr)
 			{
 				m_Clients.push_back(Client);
 			}
@@ -3489,9 +3510,8 @@ void cWorld::AddQueuedPlayers(void)
 	for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 	{
 		cClientHandle * Client = (*itr)->GetClientHandle();
-		if (Client != NULL)
+		if (Client != nullptr)
 		{
-			Client->StreamChunks();
 			Client->SendPlayerMoveLook();
 			Client->SendHealth();
 			Client->SendWholeInventory(*(*itr)->GetWindow());
@@ -3590,7 +3610,7 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	cSetChunkDataPtr SetChunkData(new cSetChunkData(
 		a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(),
 		a_ChunkDesc.GetBlockTypes(), BlockMetas,
-		NULL, NULL,  // We don't have lighting, chunk will be lighted when needed
+		nullptr, nullptr,  // We don't have lighting, chunk will be lighted when needed
 		&a_ChunkDesc.GetHeightMap(), &a_ChunkDesc.GetBiomeMap(),
 		a_ChunkDesc.GetEntities(), a_ChunkDesc.GetBlockEntities(),
 		true
@@ -3633,7 +3653,7 @@ bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_Ch
 void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc)
 {
 	cPluginManager::Get()->CallHookChunkGenerating(
-		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
 
@@ -3644,7 +3664,7 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_Ch
 void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc)
 {
 	cPluginManager::Get()->CallHookChunkGenerated(
-		m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
+		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
 

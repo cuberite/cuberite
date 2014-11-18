@@ -179,10 +179,10 @@ protected:
 
 	cPlayer & m_Owner;
 	
-	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum */
+	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid SlotNum */
 	const cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const;
 	
-	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return NULL for invalid SlotNum */
+	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid SlotNum */
 	cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum);
 	
 	// cItemGrid::cListener override:

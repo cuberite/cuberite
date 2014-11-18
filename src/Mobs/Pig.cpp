@@ -22,7 +22,7 @@ cPig::cPig(void) :
 void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
-	if (a_Killer != NULL)
+	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
@@ -41,7 +41,7 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 {
 	if (m_bIsSaddled)
 	{
-		if (m_Attachee != NULL)
+		if (m_Attachee != nullptr)
 		{
 			if (m_Attachee->GetUniqueID() == a_Player.GetUniqueID())
 			{
@@ -85,7 +85,7 @@ void cPig::Tick(float a_Dt, cChunk & a_Chunk)
 	super::Tick(a_Dt, a_Chunk);
 
 	// If the attachee player is holding a carrot-on-stick, let them drive this pig:
-	if (m_bIsSaddled && (m_Attachee != NULL))
+	if (m_bIsSaddled && (m_Attachee != nullptr))
 	{
 		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == E_ITEM_CARROT_ON_STICK))
 		{

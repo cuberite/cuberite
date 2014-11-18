@@ -27,7 +27,7 @@ public:
 	Will move the entity and blockentity lists into the internal storage, and empty the a_Entities and
 	a_BlockEntities lists.
 	a_BlockTypes and a_BlockMetas must always be valid.
-	If either of the light arrays are NULL, the chunk data will be marked as not having any light at all and
+	If either of the light arrays are nullptr, the chunk data will be marked as not having any light at all and
 	will be scheduled for re-lighting once it is set into the chunkmap.
 	If a_Biomes is not valid, the internal flag is set and the world will calculate the biomes using the chunk
 	generator when setting the chunk data.

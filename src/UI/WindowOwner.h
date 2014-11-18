@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "../BlockEntities/BlockEntity.h"
@@ -16,12 +15,6 @@ for entities / players in motion to close their windows when they get too far aw
 
 
 
-// class cWindow;
-
-
-
-
-
 /**
 Base class for the window owning
 */
@@ -29,19 +22,19 @@ class cWindowOwner
 {
 public:
 	cWindowOwner() :
-		m_Window(NULL)
+		m_Window(nullptr)
 	{
 	}
-	
+
 	virtual ~cWindowOwner()
 	{
 	}
-	
+
 	void CloseWindow(void)
 	{
-		m_Window = NULL;
+		m_Window = nullptr;
 	}
-	
+
 	void OpenWindow(cWindow * a_Window)
 	{
 		m_Window = a_Window;
@@ -54,11 +47,11 @@ public:
 	}
 
 	/// Returns the block position at which the element owning the window is
-	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) = 0;
-	
+	virtual Vector3i GetBlockPos(void) = 0;
+
 private:
 	cWindow * m_Window;
-} ;
+};
 
 
 
@@ -71,26 +64,19 @@ class cBlockEntityWindowOwner :
 	public cWindowOwner
 {
 public:
-	cBlockEntityWindowOwner(void) :
-		m_BlockEntity(NULL)
+	cBlockEntityWindowOwner(cBlockEntity * a_BlockEntity) :
+		m_BlockEntity(a_BlockEntity)
 	{
 	}
-	
-	void SetBlockEntity(cBlockEntity * a_BlockEntity)
+
+	virtual Vector3i GetBlockPos(void) override
 	{
-		m_BlockEntity = a_BlockEntity;
+		return Vector3i(m_BlockEntity->GetPosX(), m_BlockEntity->GetPosY(), m_BlockEntity->GetPosZ());
 	}
-	
-	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override
-	{
-		a_BlockX = m_BlockEntity->GetPosX();
-		a_BlockY = m_BlockEntity->GetPosY();
-		a_BlockZ = m_BlockEntity->GetPosZ();
-	}
-	
+
 private:
 	cBlockEntity * m_BlockEntity;
-} ;
+};
 
 
 
@@ -103,26 +89,19 @@ class cEntityWindowOwner :
 	public cWindowOwner
 {
 public:
-	cEntityWindowOwner(void) :
-		m_Entity(NULL)
+	cEntityWindowOwner(cEntity * a_Entity) :
+		m_Entity(a_Entity)
 	{
-	}
-	
-	void SetEntity(cEntity * a_Entity)
-	{
-		m_Entity = a_Entity;
 	}
 
-	virtual void GetBlockPos(int & a_BlockX, int & a_BlockY, int & a_BlockZ) override
+	virtual Vector3i GetBlockPos(void) override
 	{
-		a_BlockX = (int)floor(m_Entity->GetPosX() + 0.5);
-		a_BlockY = (int)floor(m_Entity->GetPosY() + 0.5);
-		a_BlockZ = (int)floor(m_Entity->GetPosZ() + 0.5);
+		return m_Entity->GetPosition().Floor();
 	}
-	
+
 private:
 	cEntity * m_Entity;
-} ;
+};
 
 
 

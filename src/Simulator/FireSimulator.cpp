@@ -220,7 +220,7 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 void cFireSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
@@ -333,7 +333,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 					int a_PosX = x + a_Chunk->GetPosX() * cChunkDef::Width;
 					int a_PosZ = z + a_Chunk->GetPosZ() * cChunkDef::Width;
 					
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(&m_World, a_PosX, y, a_PosZ, ssFireSpread))
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, a_PosX, y, a_PosZ, ssFireSpread))
 					{
 						return;
 					}
@@ -359,7 +359,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		int Z = a_RelZ + gNeighborCoords[i].z;
 
 		cChunkPtr Neighbour = a_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
-		if (Neighbour == NULL)
+		if (Neighbour == nullptr)
 		{
 			continue;
 		}
@@ -382,7 +382,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, int a_RelX, int a_Rel
 		}
 
 		bool ShouldReplaceFuel = (m_World.GetTickRandomNumber(MAX_CHANCE_REPLACE_FUEL) < m_ReplaceFuelChance);
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(&m_World, AbsX, Y, AbsZ, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsX, Y, AbsZ, ssFireSpread))
 		{
 			Neighbour->SetBlock(X, Y, Z, E_BLOCK_FIRE, 0);
 		}

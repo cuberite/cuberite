@@ -328,7 +328,7 @@ void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, eBlockFace a_Dire
 
 void cPrefab::ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef)
 {
-	ASSERT(a_CharMapDef != NULL);
+	ASSERT(a_CharMapDef != nullptr);
 	
 	// Initialize the charmap to all-invalid values:
 	for (size_t i = 0; i < ARRAYCOUNT(a_CharMapOut); i++)
@@ -389,7 +389,7 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 
 void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 {
-	ASSERT(a_ConnectorsDef != NULL);
+	ASSERT(a_ConnectorsDef != nullptr);
 	
 	AStringVector Lines = StringSplitAndTrim(a_ConnectorsDef, "\n");
 	for (AStringVector::const_iterator itr = Lines.begin(), end = Lines.end(); itr != end; ++itr)
@@ -436,7 +436,7 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 void cPrefab::ParseDepthWeight(const char * a_DepthWeightDef)
 {
 	// The member needn't be defined at all, if so, skip:
-	if (a_DepthWeightDef == NULL)
+	if (a_DepthWeightDef == nullptr)
 	{
 		return;
 	}

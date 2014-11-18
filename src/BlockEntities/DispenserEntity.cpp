@@ -14,7 +14,6 @@
 cDispenserEntity::cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
 	super(E_BLOCK_DISPENSER, a_BlockX, a_BlockY, a_BlockZ, a_World)
 {
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
 
 
@@ -29,7 +28,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	NIBBLETYPE Meta = a_Chunk.GetMeta(m_RelX, m_PosY, m_RelZ);
 	AddDropSpenserDir(DispX, DispY, DispZ, Meta);
 	cChunk * DispChunk = a_Chunk.GetRelNeighborChunkAdjustCoords(DispX, DispZ);
-	if (DispChunk == NULL)
+	if (DispChunk == nullptr)
 	{
 		// Would dispense into / interact with a non-loaded chunk, ignore the tick
 		return;
@@ -106,7 +105,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-			if (m_World->SpawnMob(MobX, DispY, MobZ, (eMonsterType)m_Contents.GetSlot(a_SlotNum).m_ItemDamage) >= 0)
+			if (m_World->SpawnMob(MobX, DispY, MobZ, static_cast<eMonsterType>(m_Contents.GetSlot(a_SlotNum).m_ItemDamage)) >= 0)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -191,7 +190,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 void cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_ShootVector)
 {
-	m_World->CreateProjectile((double)a_BlockX + 0.5, (double)a_BlockY + 0.5, (double)a_BlockZ + 0.5, a_Kind, NULL, NULL, &a_ShootVector);
+	m_World->CreateProjectile(static_cast<double>(a_BlockX + 0.5), static_cast<double>(a_BlockY + 0.5), static_cast<double>(a_BlockZ + 0.5), a_Kind, nullptr, nullptr, &a_ShootVector);
 }
 
 
@@ -276,6 +275,3 @@ bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum
 	m_Contents.AddItem(EmptyBucket);
 	return true;
 }
-
-
-

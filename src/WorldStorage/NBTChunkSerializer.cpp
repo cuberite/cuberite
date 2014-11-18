@@ -481,7 +481,7 @@ void cNBTChunkSerializer::AddMinecartEntity(cMinecart * a_Minecart)
 
 void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 {
-	const char * EntityClass = NULL;
+	const char * EntityClass = nullptr;
 	switch (a_Monster->GetMobType())
 	{
 		case mtBat:           EntityClass = "Bat";            break;
@@ -618,6 +618,28 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 				m_Writer.AddByte("IsConverting", (((const cZombie *)a_Monster)->IsConverting() ? 1 : 0));
 				break;
 			}
+			case mtInvalidType:
+			case mtBlaze:
+			case mtCaveSpider:
+			case mtChicken:
+			case mtCow:
+			case mtEnderDragon:
+			case mtGhast:
+			case mtGiant:
+			case mtIronGolem:
+			case mtMooshroom:
+			case mtOcelot:
+			case mtPig:
+			case mtSilverfish:
+			case mtSnowGolem:
+			case mtSpider:
+			case mtSquid:
+			case mtWitch:
+			case mtZombiePigman:
+			{
+				// Other mobs have no special tags.
+				break;
+			}
 		}
 	m_Writer.EndCompound();
 }
@@ -699,21 +721,21 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 
 void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 {
-	m_Writer.AddByte("Direction", (unsigned char)a_Hanging->GetDirection());
-	m_Writer.AddInt("TileX", a_Hanging->GetTileX());
-	m_Writer.AddInt("TileY", a_Hanging->GetTileY());
-	m_Writer.AddInt("TileZ", a_Hanging->GetTileZ());
-	switch (a_Hanging->GetDirection())
+	m_Writer.AddInt("TileX", a_Hanging->GetBlockX());
+	m_Writer.AddInt("TileY", a_Hanging->GetBlockY());
+	m_Writer.AddInt("TileZ", a_Hanging->GetBlockZ());
+	switch (a_Hanging->GetFacing())
 	{
-		case BLOCK_FACE_YM: m_Writer.AddByte("Dir", (unsigned char)2); break;
-		case BLOCK_FACE_YP: m_Writer.AddByte("Dir", (unsigned char)1); break;
-		case BLOCK_FACE_ZM: m_Writer.AddByte("Dir", (unsigned char)0); break;
-		case BLOCK_FACE_ZP: m_Writer.AddByte("Dir", (unsigned char)3); break;
+		case BLOCK_FACE_XM: m_Writer.AddByte("Facing", 1); break;
+		case BLOCK_FACE_XP: m_Writer.AddByte("Facing", 3); break;
+		case BLOCK_FACE_ZM: m_Writer.AddByte("Facing", 2); break;
+		case BLOCK_FACE_ZP: m_Writer.AddByte("Facing", 0); break;
 		
-		case BLOCK_FACE_XM:
-		case BLOCK_FACE_XP:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
 		case BLOCK_FACE_NONE:
 		{
+			// These directions are invalid, but they may have been previously loaded, so keep them.
 			break;
 		}
 	}
@@ -754,7 +776,7 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 		AddBasicEntity(a_ItemFrame, "ItemFrame");
 		AddHangingEntity(a_ItemFrame);
 		AddItem(a_ItemFrame->GetItem(), -1, "Item");
-		m_Writer.AddByte("ItemRotation", (unsigned char)a_ItemFrame->GetRotation());
+		m_Writer.AddByte("ItemRotation", (unsigned char)a_ItemFrame->GetItemRotation());
 		m_Writer.AddFloat("ItemDropChance", 1.0F);
 	m_Writer.EndCompound();
 }
@@ -766,7 +788,7 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 {
 	m_Writer.BeginList("Items", TAG_Compound);
-		for (int i = 0; i < cMinecartWithChest::NumSlots; i++)
+		for (int i = 0; i < cMinecartWithChest::ContentsHeight * cMinecartWithChest::ContentsWidth; i++)
 		{
 			const cItem & Item = a_Minecart->GetSlot(i);
 			if (Item.IsEmpty())

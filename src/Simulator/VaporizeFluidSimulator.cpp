@@ -22,7 +22,7 @@ cVaporizeFluidSimulator::cVaporizeFluidSimulator(cWorld & a_World, BLOCKTYPE a_F
 
 void cVaporizeFluidSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	if (a_Chunk == NULL)
+	if (a_Chunk == nullptr)
 	{
 		return;
 	}

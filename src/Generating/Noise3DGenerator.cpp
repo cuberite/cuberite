@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "Noise3DGenerator.h"
 #include "../OSSupport/File.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "../LinearInterpolation.h"
 #include "../LinearUpscale.h"
 
@@ -56,6 +56,35 @@ public:
 
 } gTest;
 //*/
+
+
+
+
+
+/** Linearly interpolates between two values.
+Assumes that a_Ratio is in range [0, 1]. */
+inline static NOISE_DATATYPE Lerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
+{
+	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
+}
+
+
+
+
+
+/** Linearly interpolates between two values, clamping the ratio to [0, 1] first. */
+inline static NOISE_DATATYPE ClampedLerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
+{
+	if (a_Ratio < 0)
+	{
+		return a_Val1;
+	}
+	if (a_Ratio > 1)
+	{
+		return a_Val2;
+	}
+	return Lerp(a_Val1, a_Val2, a_Ratio);
+}
 
 
 
@@ -346,9 +375,10 @@ void cNoise3DGenerator::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 // cNoise3DComposable:
 
 cNoise3DComposable::cNoise3DComposable(int a_Seed) :
-	m_Noise1(a_Seed + 1000),
-	m_Noise2(a_Seed + 2000),
-	m_Noise3(a_Seed + 3000)
+	m_ChoiceNoise(a_Seed),
+	m_DensityNoiseA(a_Seed + 1),
+	m_DensityNoiseB(a_Seed + 2),
+	m_BaseNoise(a_Seed + 3)
 {
 }
 
@@ -359,13 +389,51 @@ cNoise3DComposable::cNoise3DComposable(int a_Seed) :
 void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
+	// The defaults generate extreme hills terrain
 	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
-	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);
+	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0.045);
 	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 75);
-	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 10);
-	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 10);
-	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 10);
-	m_AirThreshold        = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DAirThreshold", 0.5);
+	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 40);
+	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 40);
+	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 40);
+	m_BaseFrequencyX      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DBaseFrequencyX", 40);
+	m_BaseFrequencyZ      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DBaseFrequencyZ", 40);
+	m_ChoiceFrequencyX    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DChoiceFrequencyX", 40);
+	m_ChoiceFrequencyY    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DChoiceFrequencyY", 80);
+	m_ChoiceFrequencyZ    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DChoiceFrequencyZ", 40);
+	m_AirThreshold        = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DAirThreshold", 0);
+	int NumChoiceOctaves  = a_IniFile.GetValueSetI("Generator", "Noise3DNumChoiceOctaves",  4);
+	int NumDensityOctaves = a_IniFile.GetValueSetI("Generator", "Noise3DNumDensityOctaves", 6);
+	int NumBaseOctaves    = a_IniFile.GetValueSetI("Generator", "Noise3DNumBaseOctaves",    6);
+	NOISE_DATATYPE BaseNoiseAmplitude = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DBaseAmplitude", 1);
+
+	// Add octaves for the choice noise:
+	NOISE_DATATYPE wavlen = 1, ampl = 0.5;
+	for (int i = 0; i < NumChoiceOctaves; i++)
+	{
+		m_ChoiceNoise.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+
+	// Add octaves for the density noises:
+	wavlen = 1, ampl = 1;
+	for (int i = 0; i < NumDensityOctaves; i++)
+	{
+		m_DensityNoiseA.AddOctave(wavlen, ampl);
+		m_DensityNoiseB.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+
+	// Add octaves for the base noise:
+	wavlen = 1, ampl = BaseNoiseAmplitude;
+	for (int i = 0; i < NumBaseOctaves; i++)
+	{
+		m_BaseNoise.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
 }
 
 
@@ -376,119 +444,47 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 {
 	if ((a_ChunkX == m_LastChunkX) && (a_ChunkZ == m_LastChunkZ))
 	{
-		// The noise for this chunk is already generated in m_Noise
+		// The noise for this chunk is already generated in m_NoiseArray
 		return;
 	}
 	m_LastChunkX = a_ChunkX;
 	m_LastChunkZ = a_ChunkZ;
 
-	// Upscaling parameters:
-	const int UPSCALE_X = 8;
-	const int UPSCALE_Y = 4;
-	const int UPSCALE_Z = 8;
+	// Generate all the noises:
+	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
+	NOISE_DATATYPE Workspace[5 * 5 * 33];
+	NOISE_DATATYPE DensityNoiseA[5 * 5 * 33];
+	NOISE_DATATYPE DensityNoiseB[5 * 5 * 33];
+	NOISE_DATATYPE BaseNoise[5 * 5];
+	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
+	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
+	// Note that we have to swap the coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "z":
+	m_ChoiceNoise.Generate3D  (ChoiceNoise,   5, 5, 33, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, 0, 257 / m_ChoiceFrequencyY, Workspace);
+	m_DensityNoiseA.Generate3D(DensityNoiseA, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	m_DensityNoiseB.Generate3D(DensityNoiseB, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
 
-	// Precalculate a "height" array:
-	NOISE_DATATYPE Height[17 * 17];  // x + 17 * z
-	for (int z = 0; z < 17; z += UPSCALE_Z)
+	// Calculate the final noise based on the partial noises:
+	for (int y = 0; y < 33; y++)
 	{
-		NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
-		for (int x = 0; x < 17; x += UPSCALE_X)
+		NOISE_DATATYPE AddHeight = (static_cast<NOISE_DATATYPE>(y * 8) - m_MidPoint) * m_HeightAmplification;
+
+		// If "underground", make the terrain smoother by forcing the vertical linear gradient into steeper slope:
+		if (AddHeight < 0)
 		{
-			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-			NOISE_DATATYPE val = std::abs(m_Noise1.CubicNoise2D(NoiseX / 5, NoiseZ / 5)) * m_HeightAmplification + 1;
-			Height[x + 17 * z] = val * val * val;
+			AddHeight *= 4;
 		}
-	}
 
-	for (int y = 0; y < 257; y += UPSCALE_Y)
-	{
-		NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)y) / m_FrequencyY;
-		NOISE_DATATYPE AddHeight = (y - m_MidPoint) / 20;
-		AddHeight *= AddHeight * AddHeight;
-		NOISE_DATATYPE * CurFloor = &(m_NoiseArray[y * 17 * 17]);
-		for (int z = 0; z < 17; z += UPSCALE_Z)
+		for (int z = 0; z < 5; z++)
 		{
-			NOISE_DATATYPE NoiseZ = ((NOISE_DATATYPE)(a_ChunkZ * cChunkDef::Width + z)) / m_FrequencyZ;
-			for (int x = 0; x < 17; x += UPSCALE_X)
+			for (int x = 0; x < 5; x++)
 			{
-				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(a_ChunkX * cChunkDef::Width + x)) / m_FrequencyX;
-				CurFloor[x + 17 * z] = (
-					m_Noise1.CubicNoise3D(NoiseX, NoiseY, NoiseZ) * (NOISE_DATATYPE)0.5 +
-					m_Noise2.CubicNoise3D(NoiseX / 2, NoiseY / 2, NoiseZ / 2) +
-					m_Noise3.CubicNoise3D(NoiseX / 4, NoiseY / 4, NoiseZ / 4) * 2 +
-					AddHeight / Height[x + 17 * z]
-				);
+				int idx = x + 5 * z + 5 * 5 * y;
+				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + BaseNoise[x + 5 * z];
 			}
 		}
-		// Linear-interpolate this XZ floor:
-		LinearUpscale2DArrayInPlace<17, 17, UPSCALE_X, UPSCALE_Z>(CurFloor);
 	}
-
-	// Finish the 3D linear interpolation by interpolating between each XZ-floors on the Y axis
-	for (int y = 1; y < cChunkDef::Height; y++)
-	{
-		if ((y % UPSCALE_Y) == 0)
-		{
-			// This is the interpolation source floor, already calculated
-			continue;
-		}
-		int LoFloorY = (y / UPSCALE_Y) * UPSCALE_Y;
-		int HiFloorY = LoFloorY + UPSCALE_Y;
-		NOISE_DATATYPE * LoFloor  = &(m_NoiseArray[LoFloorY * 17 * 17]);
-		NOISE_DATATYPE * HiFloor  = &(m_NoiseArray[HiFloorY * 17 * 17]);
-		NOISE_DATATYPE * CurFloor = &(m_NoiseArray[y * 17 * 17]);
-		NOISE_DATATYPE Ratio = ((NOISE_DATATYPE)(y % UPSCALE_Y)) / UPSCALE_Y;
-		int idx = 0;
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (int x = 0; x < cChunkDef::Width; x++)
-			{
-				CurFloor[idx] = LoFloor[idx] + (HiFloor[idx] - LoFloor[idx]) * Ratio;
-				idx += 1;
-			}
-			idx += 1;  // Skipping one X column
-		}
-	}
-
-	// The noise array is now fully interpolated
-	/*
-	// DEBUG: Output two images of the array, sliced by XY and XZ:
-	cFile f1;
-	if (f1.Open(Printf("Chunk_%d_%d_XY.raw", a_ChunkX, a_ChunkZ), cFile::fmWrite))
-	{
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (int y = 0; y < cChunkDef::Height; y++)
-			{
-				int idx = y * 17 * 17 + z * 17;
-				unsigned char buf[16];
-				for (int x = 0; x < cChunkDef::Width; x++)
-				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * m_Noise[idx++]))));
-				}
-				f1.Write(buf, 16);
-			}  // for y
-		}  // for z
-	}  // if (XY file open)
-
-	cFile f2;
-	if (f2.Open(Printf("Chunk_%d_%d_XZ.raw", a_ChunkX, a_ChunkZ), cFile::fmWrite))
-	{
-		for (int y = 0; y < cChunkDef::Height; y++)
-		{
-			for (int z = 0; z < cChunkDef::Width; z++)
-			{
-				int idx = y * 17 * 17 + z * 17;
-				unsigned char buf[16];
-				for (int x = 0; x < cChunkDef::Width; x++)
-				{
-					buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 128 * m_Noise[idx++]))));
-				}
-				f2.Write(buf, 16);
-			}  // for z
-		}  // for y
-	}  // if (XZ file open)
-	*/
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 5, 5, 33, m_NoiseArray, 4, 4, 8);
 }
 
 
@@ -521,6 +517,351 @@ void cNoise3DComposable::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::Hei
 
 
 void cNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+{
+	GenerateNoiseArrayIfNeeded(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
+
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+
+	// Make basic terrain composition:
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int LastAir = a_ChunkDesc.GetHeight(x, z) + 1;
+			bool HasHadWater = false;
+			for (int y = LastAir; y < m_SeaLevel; y++)
+			{
+				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
+			}
+			for (int y = LastAir - 1; y > 0; y--)
+			{
+				if (m_NoiseArray[x + 17 * z + 17 * 17 * y] > m_AirThreshold)
+				{
+					// "air" part
+					LastAir = y;
+					if (y < m_SeaLevel)
+					{
+						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STATIONARY_WATER);
+						HasHadWater = true;
+					}
+					continue;
+				}
+				// "ground" part:
+				if (LastAir - y > 4)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_STONE);
+					continue;
+				}
+				if (HasHadWater)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SAND);
+				}
+				else
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, (LastAir == y + 1) ? E_BLOCK_GRASS : E_BLOCK_DIRT);
+				}
+			}  // for y
+			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cBiomalNoise3DComposable:
+
+cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_BiomeGen) :
+	m_ChoiceNoise(a_Seed),
+	m_DensityNoiseA(a_Seed + 1),
+	m_DensityNoiseB(a_Seed + 2),
+	m_BaseNoise(a_Seed + 3),
+	m_BiomeGen(a_BiomeGen)
+{
+	// Generate the weight distribution for summing up neighboring biomes:
+	m_WeightSum = 0;
+	for (int z = 0; z <= AVERAGING_SIZE * 2; z++)
+	{
+		for (int x = 0; x <= AVERAGING_SIZE * 2; x++)
+		{
+			m_Weight[z][x] = static_cast<NOISE_DATATYPE>((5 - std::abs(5 - x)) + (5 - std::abs(5 - z)));
+			m_WeightSum += m_Weight[z][x];
+		}
+	}
+}
+
+
+
+
+
+void cBiomalNoise3DComposable::Initialize(cIniFile & a_IniFile)
+{
+	// Params:
+	// The defaults generate extreme hills terrain
+	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "BiomalNoise3DSeaLevel", 62);
+	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DFrequencyX", 40);
+	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DFrequencyY", 40);
+	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DFrequencyZ", 40);
+	m_BaseFrequencyX      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DBaseFrequencyX", 40);
+	m_BaseFrequencyZ      = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DBaseFrequencyZ", 40);
+	m_ChoiceFrequencyX    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DChoiceFrequencyX", 40);
+	m_ChoiceFrequencyY    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DChoiceFrequencyY", 80);
+	m_ChoiceFrequencyZ    = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DChoiceFrequencyZ", 40);
+	m_AirThreshold        = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DAirThreshold", 0);
+	int NumChoiceOctaves  = a_IniFile.GetValueSetI("Generator", "BiomalNoise3DNumChoiceOctaves",  4);
+	int NumDensityOctaves = a_IniFile.GetValueSetI("Generator", "BiomalNoise3DNumDensityOctaves", 6);
+	int NumBaseOctaves    = a_IniFile.GetValueSetI("Generator", "BiomalNoise3DNumBaseOctaves",    6);
+	NOISE_DATATYPE BaseNoiseAmplitude = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DBaseAmplitude", 1);
+
+	// Add octaves for the choice noise:
+	NOISE_DATATYPE wavlen = 1, ampl = 0.5;
+	for (int i = 0; i < NumChoiceOctaves; i++)
+	{
+		m_ChoiceNoise.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+
+	// Add octaves for the density noises:
+	wavlen = 1, ampl = 1;
+	for (int i = 0; i < NumDensityOctaves; i++)
+	{
+		m_DensityNoiseA.AddOctave(wavlen, ampl);
+		m_DensityNoiseB.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+
+	// Add octaves for the base noise:
+	wavlen = 1, ampl = BaseNoiseAmplitude;
+	for (int i = 0; i < NumBaseOctaves; i++)
+	{
+		m_BaseNoise.AddOctave(wavlen, ampl);
+		wavlen = wavlen * 2;
+		ampl = ampl / 2;
+	}
+}
+
+
+
+
+
+void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
+{
+	if ((a_ChunkX == m_LastChunkX) && (a_ChunkZ == m_LastChunkZ))
+	{
+		// The noise for this chunk is already generated in m_NoiseArray
+		return;
+	}
+	m_LastChunkX = a_ChunkX;
+	m_LastChunkZ = a_ChunkZ;
+
+	// Calculate the parameters for the biomes:
+	ChunkParam MidPoint;
+	ChunkParam HeightAmp;
+	CalcBiomeParamArrays(a_ChunkX, a_ChunkZ, HeightAmp, MidPoint);
+
+	// Generate all the noises:
+	NOISE_DATATYPE ChoiceNoise[5 * 5 * 33];
+	NOISE_DATATYPE Workspace[5 * 5 * 33];
+	NOISE_DATATYPE DensityNoiseA[5 * 5 * 33];
+	NOISE_DATATYPE DensityNoiseB[5 * 5 * 33];
+	NOISE_DATATYPE BaseNoise[5 * 5];
+	NOISE_DATATYPE BlockX = static_cast<NOISE_DATATYPE>(a_ChunkX * cChunkDef::Width);
+	NOISE_DATATYPE BlockZ = static_cast<NOISE_DATATYPE>(a_ChunkZ * cChunkDef::Width);
+	// Note that we have to swap the coords, because noise generator uses [x + SizeX * y + SizeX * SizeY * z] ordering and we want "BlockY" to be "z":
+	m_ChoiceNoise.Generate3D  (ChoiceNoise,   5, 5, 33, BlockX / m_ChoiceFrequencyX, (BlockX + 17) / m_ChoiceFrequencyX, BlockZ / m_ChoiceFrequencyZ, (BlockZ + 17) / m_ChoiceFrequencyZ, 0, 257 / m_ChoiceFrequencyY, Workspace);
+	m_DensityNoiseA.Generate3D(DensityNoiseA, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	m_DensityNoiseB.Generate3D(DensityNoiseB, 5, 5, 33, BlockX / m_FrequencyX,       (BlockX + 17) / m_FrequencyX,       BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ,       0, 257 / m_FrequencyY,       Workspace);
+	m_BaseNoise.Generate2D    (BaseNoise,     5, 5,     BlockX / m_BaseFrequencyX,   (BlockX + 17) / m_BaseFrequencyX,   BlockZ / m_FrequencyZ,       (BlockZ + 17) / m_FrequencyZ, Workspace);
+
+	// Calculate the final noise based on the partial noises:
+	for (int y = 0; y < 33; y++)
+	{
+		NOISE_DATATYPE BlockHeight = static_cast<NOISE_DATATYPE>(y * 8);
+		for (int z = 0; z < 5; z++)
+		{
+			for (int x = 0; x < 5; x++)
+			{
+				NOISE_DATATYPE AddHeight = (BlockHeight - MidPoint[x + 5 * z]) * HeightAmp[x + 5 * z];
+
+				// If "underground", make the terrain smoother by forcing the vertical linear gradient into steeper slope:
+				if (AddHeight < 0)
+				{
+					AddHeight *= 4;
+				}
+
+				int idx = x + 5 * z + 5 * 5 * y;
+				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + BaseNoise[x + 5 * z];
+			}
+		}
+	}
+	LinearUpscale3DArray<NOISE_DATATYPE>(Workspace, 5, 5, 33, m_NoiseArray, 4, 4, 8);
+}
+
+
+
+
+
+void cBiomalNoise3DComposable::CalcBiomeParamArrays(int a_ChunkX, int a_ChunkZ, ChunkParam & a_HeightAmp, ChunkParam & a_MidPoint)
+{
+	// Generate the 3*3 chunks of biomes around this chunk:
+	cChunkDef::BiomeMap neighborBiomes[3 * 3];
+	for (int z = 0; z < 3; z++)
+	{
+		for (int x = 0; x < 3; x++)
+		{
+			m_BiomeGen->GenBiomes(a_ChunkX + x - 1, a_ChunkZ + z - 1, neighborBiomes[x + 3 * z]);
+		}
+	}
+
+	// Sum up the biome values:
+	for (int z = 0; z < 5; z++)
+	{
+		for (int x = 0; x < 5; x++)
+		{
+			NOISE_DATATYPE totalHeightAmp = 0;
+			NOISE_DATATYPE totalMidPoint = 0;
+			// Add up the biomes around this point:
+			for (int relz = 0; relz <= AVERAGING_SIZE * 2; ++relz)
+			{
+				int colz = 16 + z * 4 + relz - AVERAGING_SIZE;   // Biome Z coord relative to the neighborBiomes start
+				int neicellz = colz / 16;	                       // Chunk Z coord relative to the neighborBiomes start
+				int neirelz  = colz % 16;	                       // Biome Z coord relative to cz in neighborBiomes
+				for (int relx = 0; relx <= AVERAGING_SIZE * 2; ++relx)
+				{
+					int colx = 16 + x * 4 + relx - AVERAGING_SIZE;   // Biome X coord relative to the neighborBiomes start
+					int neicellx = colx / 16;	                       // Chunk X coord relative to the neighborBiomes start
+					int neirelx  = colx % 16;	                       // Biome X coord relative to cz in neighborBiomes
+					EMCSBiome biome = cChunkDef::GetBiome(neighborBiomes[neicellx + neicellz * 3], neirelx, neirelz);
+					NOISE_DATATYPE heightAmp, midPoint;
+					GetBiomeParams(biome, heightAmp, midPoint);
+					totalHeightAmp += heightAmp * m_Weight[relz][relx];
+					totalMidPoint += midPoint * m_Weight[relz][relx];
+				}  // for relx
+			}  // for relz
+			a_HeightAmp[x + 5 * z] = totalHeightAmp / m_WeightSum;
+			a_MidPoint[x + 5 * z] = totalMidPoint / m_WeightSum;
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE & a_HeightAmp, NOISE_DATATYPE & a_MidPoint)
+{
+	switch (a_Biome)
+	{
+		case biBeach:                a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biBirchForest:          a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biBirchForestHills:     a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biBirchForestHillsM:    a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biBirchForestM:         a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biColdBeach:            a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biDesertHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biDeepOcean:            a_HeightAmp = 0.17f;  a_MidPoint = 35; break;
+		case biDesert:               a_HeightAmp = 0.29f;  a_MidPoint = 62; break;
+		case biEnd:                  a_HeightAmp = 0.15f;  a_MidPoint = 64; break;
+		case biExtremeHills:         a_HeightAmp = 0.045f; a_MidPoint = 75; break;
+		case biExtremeHillsPlus:     a_HeightAmp = 0.04f;  a_MidPoint = 80; break;
+		case biFlowerForest:         a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biForest:               a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biForestHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biFrozenRiver:          a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
+		case biFrozenOcean:          a_HeightAmp = 0.17f;  a_MidPoint = 47; break;
+		case biIceMountains:         a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biIcePlains:            a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biIcePlainsSpikes:      a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biJungle:               a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
+		case biJungleHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biJungleM:              a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
+		case biMegaSpruceTaigaHills: a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biMegaTaigaHills:       a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biMushroomShore:        a_HeightAmp = 0.15f;  a_MidPoint = 15; break;
+		case biOcean:                a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biPlains:               a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biRiver:                a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
+		case biSwampland:            a_HeightAmp = 0.25f;  a_MidPoint = 59; break;
+		case biSwamplandM:           a_HeightAmp = 0.11f;  a_MidPoint = 59; break;
+		case biTaigaHills:           a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+
+		/*
+		// Still missing:
+		case biColdTaiga:            a_HeightAmp = 0.15f;  a_MidPoint = 30; break;
+		case biColdTaigaHills:       a_HeightAmp = 0.15f;  a_MidPoint = 31; break;
+		case biColdTaigaM:           a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biDesertM:              a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biExtremeHillsEdge:     a_HeightAmp = 0.15f;  a_MidPoint = 20; break;
+		case biExtremeHillsM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biExtremeHillsPlusM:    a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biJungleEdge:           a_HeightAmp = 0.15f;  a_MidPoint = 23; break;
+		case biJungleEdgeM:          a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMegaSpruceTaiga:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMegaTaiga:            a_HeightAmp = 0.15f;  a_MidPoint = 32; break;
+		case biMesa:                 a_HeightAmp = 0.15f;  a_MidPoint = 37; break;
+		case biMesaBryce:            a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMesaPlateau:          a_HeightAmp = 0.15f;  a_MidPoint = 39; break;
+		case biMesaPlateauF:         a_HeightAmp = 0.15f;  a_MidPoint = 38; break;
+		case biMesaPlateauFM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMesaPlateauM:         a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMushroomIsland:       a_HeightAmp = 0.15f;  a_MidPoint = 14; break;
+		case biNether:               a_HeightAmp = 0.15f;  a_MidPoint = 68; break;
+		case biRoofedForest:         a_HeightAmp = 0.15f;  a_MidPoint = 29; break;
+		case biRoofedForestM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biSavanna:              a_HeightAmp = 0.15f;  a_MidPoint = 35; break;
+		case biSavannaM:             a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biSavannaPlateau:       a_HeightAmp = 0.15f;  a_MidPoint = 36; break;
+		case biSavannaPlateauM:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biStoneBeach:           a_HeightAmp = 0.15f;  a_MidPoint = 25; break;
+		case biSunflowerPlains:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biTaiga:                a_HeightAmp = 0.15f;  a_MidPoint = 65; break;
+		case biTaigaM:               a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		*/
+
+		default:
+		{
+			// Make a crazy terrain so that it stands out
+			a_HeightAmp = 0.001f;
+			a_MidPoint = 90;
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cBiomalNoise3DComposable::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+{
+	GenerateNoiseArrayIfNeeded(a_ChunkX, a_ChunkZ);
+
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			cChunkDef::SetHeight(a_HeightMap, x, z, m_SeaLevel);
+			for (int y = cChunkDef::Height - 1; y > m_SeaLevel; y--)
+			{
+				if (m_NoiseArray[y * 17 * 17 + z * 17 + x] <= m_AirThreshold)
+				{
+					cChunkDef::SetHeight(a_HeightMap, x, z, y);
+					break;
+				}
+			}  // for y
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cBiomalNoise3DComposable::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 {
 	GenerateNoiseArrayIfNeeded(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
 

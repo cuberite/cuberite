@@ -34,11 +34,10 @@ public:
 
 	// tolua_end
 	
-	/** Creates a new mob head entity at the specified block coords. a_World may be NULL */
+	BLOCKENTITY_PROTODEF(cMobHeadEntity);
+	
+	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
 	cMobHeadEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
-
-	bool LoadFromJson( const Json::Value& a_Value);
-	virtual void SaveToJson(Json::Value& a_Value) override;
 
 	// tolua_begin
 	
@@ -65,8 +64,6 @@ public:
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-	static const char * GetClassStatic(void) { return "cMobHeadEntity"; }
-	
 private:
 
 	eMobHeadType m_Type;

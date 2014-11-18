@@ -391,7 +391,7 @@ cItem * cItems::Get(int a_Idx)
 	if ((a_Idx < 0) || (a_Idx >= (int)size()))
 	{
 		LOGWARNING("cItems: Attempt to get an out-of-bounds item at index %d; there are currently " SIZE_T_FMT " items. Returning a nil.", a_Idx, size());
-		return NULL;
+		return nullptr;
 	}
 	return &at(a_Idx);
 }

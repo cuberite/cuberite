@@ -29,8 +29,8 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	: m_UniqueID(0)
 	, m_Health(1)
 	, m_MaxHealth(1)
-	, m_AttachedTo(NULL)
-	, m_Attachee(NULL)
+	, m_AttachedTo(nullptr)
+	, m_Attachee(nullptr)
 	, m_bDirtyHead(true)
 	, m_bDirtyOrientation(true)
 	, m_bHasSentNoSpeed(true)
@@ -38,9 +38,9 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	, m_Gravity(-9.81f)
 	, m_LastPos(a_X, a_Y, a_Z)
 	, m_IsInitialized(false)
-	, m_WorldTravellingFrom(NULL)
+	, m_WorldTravellingFrom(nullptr)
 	, m_EntityType(a_EntityType)
-	, m_World(NULL)
+	, m_World(nullptr)
 	, m_IsFireproof(false)
 	, m_TicksSinceLastBurnDamage(0)
 	, m_TicksSinceLastLavaDamage(0)
@@ -73,7 +73,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 cEntity::~cEntity()
 {
 	// Before deleting, the entity needs to have been removed from the world, if ever added
-	ASSERT((m_World == NULL) || !m_World->HasEntity(m_UniqueID));
+	ASSERT((m_World == nullptr) || !m_World->HasEntity(m_UniqueID));
 	
 	/*
 	// DEBUG:
@@ -85,11 +85,11 @@ cEntity::~cEntity()
 		);
 	*/
 	
-	if (m_AttachedTo != NULL)
+	if (m_AttachedTo != nullptr)
 	{
 		Detach();
 	}
-	if (m_Attachee != NULL)
+	if (m_Attachee != nullptr)
 	{
 		m_Attachee->Detach();
 	}
@@ -242,7 +242,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	TDI.FinalDamage = a_FinalDamage;
 	
 	Vector3d Heading(0, 0, 0);
-	if (a_Attacker != NULL)
+	if (a_Attacker != nullptr)
 	{
 		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
 		Heading.y = 1.6;
@@ -265,7 +265,7 @@ void cEntity::SetYawFromSpeed(void)
 		SetYaw(0);
 		return;
 	}
-	SetYaw(atan2(m_Speed.x, m_Speed.z) * 180 / PI);
+	SetYaw(atan2(m_Speed.x, m_Speed.z) * 180 / M_PI);
 }
 
 
@@ -282,7 +282,7 @@ void cEntity::SetPitchFromSpeed(void)
 		SetPitch(0);
 		return;
 	}
-	SetPitch(atan2(m_Speed.y, xz) * 180 / PI);
+	SetPitch(atan2(m_Speed.y, xz) * 180 / M_PI);
 }
 
 
@@ -308,7 +308,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
+	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Player = (cPlayer *)a_TDI.Attacker;
 
@@ -544,7 +544,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	m_Health = std::max(m_Health, 0);
 
 	// Add knockback:
-	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != NULL))
+	if ((IsMob() || IsPlayer()) && (a_TDI.Attacker != nullptr))
 	{
 		int KnockbackLevel = a_TDI.Attacker->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchKnockback);  // More common enchantment
 		if (KnockbackLevel < 1)
@@ -571,7 +571,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 	{
 		KilledBy(a_TDI);
 
-		if (a_TDI.Attacker != NULL)
+		if (a_TDI.Attacker != nullptr)
 		{
 			a_TDI.Attacker->Killed(this);
 		}
@@ -778,7 +778,7 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		m_InvulnerableTicks--;
 	}
 
-	if (m_AttachedTo != NULL)
+	if (m_AttachedTo != nullptr)
 	{
 		Vector3d DeltaPos = m_Pos - m_AttachedTo->GetPosition();
 		if (DeltaPos.Length() > 0.5)
@@ -1092,7 +1092,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		{
 			if (!m_IsFireproof)
 			{
-				TakeDamage(dtOnFire, NULL, BURN_DAMAGE, 0);
+				TakeDamage(dtOnFire, nullptr, BURN_DAMAGE, 0);
 			}
 			m_TicksSinceLastBurnDamage = 0;
 		}
@@ -1163,7 +1163,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		{
 			if (!m_IsFireproof)
 			{
-				TakeDamage(dtLavaContact, NULL, LAVA_DAMAGE, 0);
+				TakeDamage(dtLavaContact, nullptr, LAVA_DAMAGE, 0);
 			}
 			m_TicksSinceLastLavaDamage = 0;
 		}
@@ -1184,7 +1184,7 @@ void cEntity::TickBurning(cChunk & a_Chunk)
 		{
 			if (!m_IsFireproof)
 			{
-				TakeDamage(dtFireContact, NULL, FIRE_DAMAGE, 0);
+				TakeDamage(dtFireContact, nullptr, FIRE_DAMAGE, 0);
 			}
 			m_TicksSinceLastFireDamage = 0;
 		}
@@ -1213,7 +1213,7 @@ void cEntity::TickInVoid(cChunk & a_Chunk)
 {
 	if (m_TicksSinceLastVoidDamage == 20)
 	{
-		TakeDamage(dtInVoid, NULL, 2, 0);
+		TakeDamage(dtInVoid, nullptr, 2, 0);
 		m_TicksSinceLastVoidDamage = 0;
 	}
 	else
@@ -1239,7 +1239,7 @@ void cEntity::DetectCacti(void)
 		(((GetPosY() - Y < 1) && (GetWorld()->GetBlock(X, Y, Z) == E_BLOCK_CACTUS))))
 		)
 	{
-		TakeDamage(dtCactusContact, NULL, 1, 0);
+		TakeDamage(dtCactusContact, nullptr, 1, 0);
 	}
 }
 
@@ -1380,7 +1380,7 @@ bool cEntity::DetectPortal()
 bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
 	UNUSED(a_ShouldSendRespawn);
-	ASSERT(a_World != NULL);
+	ASSERT(a_World != nullptr);
 
 	if (GetWorld() == a_World)
 	{
@@ -1406,7 +1406,7 @@ bool cEntity::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 {
 	cWorld * World = cRoot::Get()->GetWorld(a_WorldName);
-	if (World == NULL)
+	if (World == nullptr)
 	{
 		LOG("%s: Couldn't find world \"%s\".", __FUNCTION__, a_WorldName.c_str());
 		return false;
@@ -1493,7 +1493,7 @@ void cEntity::HandleAir(void)
 			if (m_AirTickTimer <= 0)
 			{
 				// Damage player
-				TakeDamage(dtDrowning, NULL, 1, 1, 0);
+				TakeDamage(dtDrowning, nullptr, 1, 1, 0);
 				// Reset timer
 				m_AirTickTimer = DROWNING_TICKS;
 			}
@@ -1708,7 +1708,7 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 		// Already attached to that entity, nothing to do here
 		return;
 	}
-	if (m_AttachedTo != NULL)
+	if (m_AttachedTo != nullptr)
 	{
 		// Detach from any previous entity:
 		Detach();
@@ -1726,14 +1726,14 @@ void cEntity::AttachTo(cEntity * a_AttachTo)
 
 void cEntity::Detach(void)
 {
-	if (m_AttachedTo == NULL)
+	if (m_AttachedTo == nullptr)
 	{
 		// Attached to no entity, our work is done
 		return;
 	}
-	m_AttachedTo->m_Attachee = NULL;
-	m_AttachedTo = NULL;
-	m_World->BroadcastAttachEntity(*this, NULL);
+	m_AttachedTo->m_Attachee = nullptr;
+	m_AttachedTo = nullptr;
+	m_World->BroadcastAttachEntity(*this, nullptr);
 }
 
 
@@ -1956,7 +1956,7 @@ void cEntity::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 
 void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 {
-	if (m_AttachedTo == NULL)
+	if (m_AttachedTo == nullptr)
 	{
 		return;
 	}

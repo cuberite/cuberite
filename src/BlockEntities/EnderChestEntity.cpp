@@ -11,7 +11,8 @@
 
 
 cEnderChestEntity::cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World) :
-	super(E_BLOCK_ENDER_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World)
+	super(E_BLOCK_ENDER_CHEST, a_BlockX, a_BlockY, a_BlockZ, a_World),
+	cBlockEntityWindowOwner(this)
 {
 }
 
@@ -22,7 +23,7 @@ cEnderChestEntity::cEnderChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, c
 cEnderChestEntity::~cEnderChestEntity()
 {
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
 	}
@@ -36,14 +37,14 @@ void cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenNewWindow();
 		Window = GetWindow();
 	}
 	
 	// Open the window for the player:
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{

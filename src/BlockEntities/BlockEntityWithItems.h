@@ -20,17 +20,16 @@
 
 // tolua_begin
 class cBlockEntityWithItems :
-	public cBlockEntity
-	// tolua_end
-	// tolua doesn't seem to support multiple inheritance?
-	, public cItemGrid::cListener
-	, public cBlockEntityWindowOwner
-	// tolua_begin
+	public cBlockEntity,
+	public cItemGrid::cListener,
+	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntity super;
-	
+
 public:
 	// tolua_end
+	
+	BLOCKENTITY_PROTODEF(cBlockEntityWithItems);
 	
 	cBlockEntityWithItems(
 		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents
@@ -39,6 +38,7 @@ public:
 		cWorld * a_World                            // Optional world to assign to the entity
 	) :
 		super(a_BlockType, a_BlockX, a_BlockY, a_BlockZ, a_World),
+		cBlockEntityWindowOwner(this),
 		m_Contents(a_ItemGridWidth, a_ItemGridHeight)
 	{
 		m_Contents.AddListener(*this);
@@ -47,7 +47,7 @@ public:
 	virtual void Destroy(void) override
 	{
 		// Drop the contents as pickups:
-		ASSERT(m_World != NULL);
+		ASSERT(m_World != nullptr);
 		cItems Pickups;
 		m_Contents.CopyToItems(Pickups);
 		m_Contents.Clear();
@@ -78,9 +78,9 @@ protected:
 	{
 		UNUSED(a_SlotNum);
 		ASSERT(a_Grid == &m_Contents);
-		if (m_World != NULL)
+		if (m_World != nullptr)
 		{
-			if (GetWindow() != NULL)
+			if (GetWindow() != nullptr)
 			{
 				GetWindow()->BroadcastWholeWindow();
 			}

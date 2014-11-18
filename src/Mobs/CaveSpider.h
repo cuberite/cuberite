@@ -18,7 +18,7 @@ public:
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 	virtual void Attack(float a_Dt) override;
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = NULL) override;
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;
 
 

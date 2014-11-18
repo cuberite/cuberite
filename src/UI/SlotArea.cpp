@@ -10,6 +10,7 @@
 #include "../BlockEntities/DropSpenserEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
+#include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
 #include "Window.h"
 #include "../CraftingRecipes.h"
@@ -47,9 +48,9 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
 	bool bAsync = false;
-	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	if (GetSlot(a_SlotNum, a_Player) == nullptr)
 	{
-		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 		return;
 	}
 	
@@ -713,7 +714,7 @@ void cSlotAreaCrafting::UpdateRecipe(cPlayer & a_Player)
 {
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
-	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
 	SetSlot(0, a_Player, Recipe.GetResult());
 	m_ParentWindow.SendSlot(a_Player, this, 0);
 }
@@ -735,7 +736,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 	// Not found. Add a new one:
 	cCraftingGrid   Grid(GetPlayerSlots(a_Player) + 1, m_GridSize, m_GridSize);
 	cCraftingRecipe Recipe(Grid);
-	cRoot::Get()->GetCraftingRecipes()->GetRecipe(&a_Player, Grid, Recipe);
+	cRoot::Get()->GetCraftingRecipes()->GetRecipe(a_Player, Grid, Recipe);
 	m_Recipes.push_back(std::make_pair(a_Player.GetUniqueID(), Recipe));
 	return m_Recipes.back().second;
 }
@@ -790,9 +791,9 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 
 	bool bAsync = false;
-	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	if (GetSlot(a_SlotNum, a_Player) == nullptr)
 	{
-		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 		return;
 	}
 
@@ -979,7 +980,7 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 	m_ParentWindow.SetProperty(0, m_MaximumCost, a_Player);
 
 	m_MaximumCost = 0;
-	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", NULL);
+	((cAnvilWindow*)&m_ParentWindow)->SetRepairedItemName("", nullptr);
 
 	int PosX, PosY, PosZ;
 	((cAnvilWindow*)&m_ParentWindow)->GetBlockPos(PosX, PosY, PosZ);
@@ -1237,9 +1238,9 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
 	bool bAsync = false;
-	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	if (GetSlot(a_SlotNum, a_Player) == nullptr)
 	{
-		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 		return;
 	}
 
@@ -1407,9 +1408,9 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
 	bool bAsync = false;
-	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	if (GetSlot(a_SlotNum, a_Player) == nullptr)
 	{
-		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 		return;
 	}
 
@@ -1708,19 +1709,19 @@ cSlotAreaFurnace::~cSlotAreaFurnace()
 
 void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
-	if (m_Furnace == NULL)
+	if (m_Furnace == nullptr)
 	{
-		LOGERROR("cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
-		ASSERT(!"cSlotAreaFurnace::Clicked(): m_Furnace == NULL");
+		LOGERROR("cSlotAreaFurnace::Clicked(): m_Furnace == nullptr");
+		ASSERT(!"cSlotAreaFurnace::Clicked(): m_Furnace == nullptr");
 		return;
 	}
 
 	if (a_SlotNum == 2)
 	{
 		bool bAsync = false;
-		if (GetSlot(a_SlotNum, a_Player) == NULL)
+		if (GetSlot(a_SlotNum, a_Player) == nullptr)
 		{
-			LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+			LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 			return;
 		}
 
@@ -1920,6 +1921,40 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cSlotAreaMinecartWithChest:
+
+cSlotAreaMinecartWithChest::cSlotAreaMinecartWithChest(cMinecartWithChest * a_Chest, cWindow & a_ParentWindow) :
+	cSlotArea(27, a_ParentWindow),
+	m_Chest(a_Chest)
+{
+}
+
+
+
+
+
+const cItem * cSlotAreaMinecartWithChest::GetSlot(int a_SlotNum, cPlayer & a_Player) const
+{
+	// a_SlotNum ranges from 0 to 26, use that to index the minecart chest entity's inventory directly:
+	UNUSED(a_Player);
+	return &(m_Chest->GetSlot(a_SlotNum));
+}
+
+
+
+
+
+void cSlotAreaMinecartWithChest::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item)
+{
+	UNUSED(a_Player);
+	m_Chest->SetSlot(a_SlotNum, a_Item);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaInventoryBase:
 
 cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow) :
@@ -2036,9 +2071,9 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 
 	bool bAsync = false;
-	if (GetSlot(a_SlotNum, a_Player) == NULL)
+	if (GetSlot(a_SlotNum, a_Player) == nullptr)
 	{
-		LOGWARNING("GetSlot(%d) returned NULL! Ignoring click", a_SlotNum);
+		LOGWARNING("GetSlot(%d) returned nullptr! Ignoring click", a_SlotNum);
 		return;
 	}
 
@@ -2188,15 +2223,15 @@ const cItem * cSlotAreaTemporary::GetSlot(int a_SlotNum, cPlayer & a_Player) con
 		LOGERROR("cSlotAreaTemporary: player \"%s\" not found for slot %d!", a_Player.GetName().c_str(), a_SlotNum);
 		ASSERT(!"cSlotAreaTemporary: player not found!");
 		
-		// Player not found, this should not happen, ever! Return NULL, but things may break by this.
-		return NULL;
+		// Player not found, this should not happen, ever! Return nullptr, but things may break by this.
+		return nullptr;
 	}
 	
 	if (a_SlotNum >= (int)(itr->second.size()))
 	{
 		LOGERROR("cSlotAreaTemporary: asking for more slots than actually stored!");
 		ASSERT(!"cSlotAreaTemporary: asking for more slots than actually stored!");
-		return NULL;
+		return nullptr;
 	}
 	
 	return &(itr->second[a_SlotNum]);
@@ -2285,7 +2320,7 @@ cItem * cSlotAreaTemporary::GetPlayerSlots(cPlayer & a_Player)
 	cItemMap::iterator itr = m_Items.find(a_Player.GetUniqueID());
 	if (itr == m_Items.end())
 	{
-		return NULL;
+		return nullptr;
 	}
 	return &(itr->second[0]);
 }

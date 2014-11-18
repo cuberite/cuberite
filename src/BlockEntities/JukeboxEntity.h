@@ -26,11 +26,10 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cJukeboxEntity);
+	
 	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cJukeboxEntity();
-
-	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
 
 	// tolua_begin
 	
@@ -54,8 +53,6 @@ public:
 	
 	// tolua_end
 
-	static const char * GetClassStatic(void) { return "cJukeboxEntity"; }
-	
 	virtual void UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle &) override {}
 

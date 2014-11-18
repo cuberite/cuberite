@@ -22,7 +22,7 @@
 
 #include "MersenneTwister.h"
 
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "Vector3.h"
 
 #include <fstream>
@@ -196,7 +196,7 @@ void cServer::PlayerDestroying(const cPlayer * a_Player)
 
 
 
-bool cServer::InitServer(cIniFile & a_SettingsIni)
+bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 {
 	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!");
 	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
@@ -247,7 +247,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni)
 	m_bIsConnected = true;
 
 	m_ServerID = "-";
-	m_ShouldAuthenticate = a_SettingsIni.GetValueSetB("Authentication", "Authenticate", true);
+	m_ShouldAuthenticate = a_ShouldAuth;
 	if (m_ShouldAuthenticate)
 	{
 		MTRand mtrand1;
@@ -338,7 +338,7 @@ void cServer::OnConnectionAccepted(cSocket & a_Socket)
 		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", ClientIP.c_str());
 		a_Socket.CloseSocket();
 		delete NewHandle;
-		NewHandle = NULL;
+		NewHandle = nullptr;
 		return;
 	}
 	
@@ -450,7 +450,7 @@ bool cServer::Start(void)
 
 bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 {
-	return cRoot::Get()->GetPluginManager()->CallHookChat(a_Client.GetPlayer(), a_Cmd);
+	return cRoot::Get()->GetPluginManager()->CallHookChat(*(a_Client.GetPlayer()), a_Cmd);
 }
 
 
@@ -491,6 +491,17 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
+			cPluginManager::PluginMap map = cPluginManager::Get()->GetAllPlugins();
+
+			for (auto plugin_entry : map)
+			{
+				if (plugin_entry.first == split[1])
+				{
+					a_Output.Out("Error! Plugin is already loaded!");
+					a_Output.Finished();
+					return;
+				}
+			}
 			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
@@ -626,17 +637,17 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 void cServer::BindBuiltInConsoleCommands(void)
 {
 	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("help", NULL, " - Shows the available commands");
-	PlgMgr->BindConsoleCommand("reload", NULL, " - Reloads all plugins");
-	PlgMgr->BindConsoleCommand("restart", NULL, " - Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop", NULL, " - Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats", NULL, " - Displays detailed chunk memory statistics");
-	PlgMgr->BindConsoleCommand("load <pluginname>", NULL, " - Adds and enables the specified plugin");
-	PlgMgr->BindConsoleCommand("unload <pluginname>", NULL, " - Disables the specified plugin");
-	PlgMgr->BindConsoleCommand("destroyentities", NULL, " - Destroys all entities in all worlds");
+	PlgMgr->BindConsoleCommand("help", nullptr, " - Shows the available commands");
+	PlgMgr->BindConsoleCommand("reload", nullptr, " - Reloads all plugins");
+	PlgMgr->BindConsoleCommand("restart", nullptr, " - Restarts the server cleanly");
+	PlgMgr->BindConsoleCommand("stop", nullptr, " - Stops the server cleanly");
+	PlgMgr->BindConsoleCommand("chunkstats", nullptr, " - Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("load <pluginname>", nullptr, " - Adds and enables the specified plugin");
+	PlgMgr->BindConsoleCommand("unload <pluginname>", nullptr, " - Disables the specified plugin");
+	PlgMgr->BindConsoleCommand("destroyentities", nullptr, " - Destroys all entities in all worlds");
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
-	PlgMgr->BindConsoleCommand("dumpmem", NULL, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
+	PlgMgr->BindConsoleCommand("dumpmem", nullptr, " - Dumps all used memory blocks together with their callstacks into memdump.xml");
 	#endif
 }
 
@@ -705,7 +716,7 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 
 cServer::cNotifyWriteThread::cNotifyWriteThread(void) :
 	super("ClientPacketThread"),
-	m_Server(NULL)
+	m_Server(nullptr)
 {
 }
 

@@ -14,20 +14,26 @@ Chunk::Chunk() :
 
 
 
-const uchar * Chunk::getImage(void) const
+void Chunk::setBiomes(const cChunkDef::BiomeMap & a_Biomes)
 {
-	ASSERT(m_IsValid);
-	return m_Image;
+	for (size_t idx = 0; idx < ARRAYCOUNT(a_Biomes); ++idx)
+	{
+		m_Biomes[idx] = static_cast<short>(a_Biomes[idx]);
+	}
+	m_IsValid = true;
 }
 
 
 
 
 
-void Chunk::setImage(const Image & a_Image)
+EMCSBiome Chunk::getBiome(int a_RelX, int a_RelZ)
 {
-	memcpy(m_Image, a_Image, sizeof(a_Image));
-	m_IsValid = true;
+	if (!m_IsValid)
+	{
+		return biInvalidBiome;
+	}
+	return static_cast<EMCSBiome>(m_Biomes[a_RelX + 16 * a_RelZ]);
 }
 
 

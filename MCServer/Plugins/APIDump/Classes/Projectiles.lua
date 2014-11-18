@@ -35,12 +35,49 @@ return
 		Inherits = "cProjectileEntity",
 	},  -- cArrowEntity
 
+	cExpBottleEntity =
+	{
+		Desc = [[
+			Represents a thrown ExpBottle. A subclass of the {{cProjectileEntity}}.
+		]],
+		Functions =
+		{
+		},
+		Inherits = "cProjectileEntity",
+	},  -- cExpBottleEntity
+
 	cFireChargeEntity =
+	{
+		Desc = [[
+			Represents a fire charge that has been shot by a Blaze or a {{cDispenserEntity|Dispenser}}. A subclass
+			of the {{cProjectileEntity}}.
+		]],
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cFireChargeEntity
+	
+	cFireworkEntity =
+	{
+		Desc = [[
+			Represents a firework rocket.
+		]],
+			Functions =
+			{
+				GetItem = { Params = "", Return = "{{cItem}}", Notes = "Returns the item that has been used to create the firework rocket. The item's m_FireworkItem member contains all the firework-related data." },
+				GetTicksToExplosion = { Params = "", Return = "number", Notes = "Returns the number of ticks left until the firework explodes." },
+				SetItem = { Params = "{{cItem}}", Return = "", Notes = "Sets a new item to be used for the firework." },
+				SetTicksToExplosion = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks left until the firework explodes." },
+			},
+
+		Inherits = "cProjectileEntity",
+	},  -- cFireworkEntity
+
+	cFloater =
 	{
 		Desc = "",
 		Functions = {},
 		Inherits = "cProjectileEntity",
-	},  -- cFireChargeEntity
+	},  -- cFloater
 
 	cGhastFireballEntity =
 	{
@@ -64,14 +101,14 @@ return
 			pkArrow = { Notes = "The projectile is an {{cArrowEntity|arrow}}" },
 			pkEgg = { Notes = "The projectile is a {{cThrownEggEntity|thrown egg}}" },
 			pkEnderPearl = { Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}" },
-			pkExpBottle = { Notes = "The projectile is a thrown exp bottle (NYI)" },
+			pkExpBottle = { Notes = "The projectile is a {{cExpBottleEntity|thrown exp bottle}}" },
 			pkFireCharge = { Notes = "The projectile is a {{cFireChargeEntity|fire charge}}" },
-			pkFirework = { Notes = "The projectile is a (flying) firework (NYI)" },
-			pkFishingFloat = { Notes = "The projectile is a fishing float (NYI)" },
+			pkFirework = { Notes = "The projectile is a (flying) {{cFireworkEntity|firework}}" },
+			pkFishingFloat = { Notes = "The projectile is a {{cFloater|fishing float}}" },
 			pkGhastFireball = { Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}" },
 			pkSnowball = { Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}" },
-			pkSplashPotion = { Notes = "The projectile is a thrown splash potion (NYI)" },
-			pkWitherSkull = { Notes = "The projectile is a wither skull (NYI)" },
+			pkSplashPotion = { Notes = "The projectile is a {{cSplashPotionEntity|thrown splash potion}}" },
+			pkWitherSkull = { Notes = "The projectile is a {{cWitherSkullEntity|wither skull}}" },
 		},
 		ConstantGroups =
 		{
@@ -84,26 +121,52 @@ return
 		Inherits = "cEntity",
 	},  -- cProjectileEntity
 
+	cSplashPotionEntity =
+	{
+		Desc = [[
+			Represents a thrown splash potion.
+		]],
+			Functions =
+			{
+				GetEntityEffect = { Params = "", Return = "{{cEntityEffect}}", Notes = "Returns the entity effect in this potion" },
+				GetEntityEffectType = { Params = "", Return = "{{cEntityEffect|Entity effect type}}", Notes = "Returns the effect type of this potion" },
+				GetPotionColor = { Params = "", Return = "number", Notes = "Returns the color index of the particles emitted by this potion" },
+				SetEntityEffect = { Params = "{{cEntityEffect}}", Return = "", Notes = "Sets the entity effect for this potion" },
+				SetEntityEffectType = { Params = "{{cEntityEffect|Entity effect type}}", Return = "", Notes = "Sets the effect type of this potion" },
+				SetPotionColor = { Params = "number", Return = "", Notes = "Sets the color index of the particles for this potion" },
+			},
+		Inherits = "cProjectileEntity",
+	},  -- cSplashPotionEntity
+
 	cThrownEggEntity =
 	{
-		Desc = "",
+		Desc = [[
+			Represents a thrown egg.
+		]],
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEggEntity
 
 	cThrownEnderPearlEntity =
 	{
-		Desc = "",
+		Desc = "Represents a thrown ender pearl.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownEnderPearlEntity
-
+	
 	cThrownSnowballEntity =
 	{
-		Desc = "",
+		Desc = "Represents a thrown snowball.",
 		Functions = {},
 		Inherits = "cProjectileEntity",
 	},  -- cThrownSnowballEntity
+
+	cWitherSkullEntity =
+	{
+		Desc = "Represents a wither skull being shot.",
+		Functions = {},
+		Inherits = "cProjectileEntity",
+	},  -- cWitherSkullEntity
 }
 
 

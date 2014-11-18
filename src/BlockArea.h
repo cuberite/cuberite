@@ -282,10 +282,10 @@ public:
 	/** Returns the datatypes that are stored in the object (bitmask of baXXX values) */
 	int GetDataTypes(void) const;
 	
-	bool HasBlockTypes    (void) const { return (m_BlockTypes    != NULL); }
-	bool HasBlockMetas    (void) const { return (m_BlockMetas    != NULL); }
-	bool HasBlockLights   (void) const { return (m_BlockLight    != NULL); }
-	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != NULL); }
+	bool HasBlockTypes    (void) const { return (m_BlockTypes    != nullptr); }
+	bool HasBlockMetas    (void) const { return (m_BlockMetas    != nullptr); }
+	bool HasBlockLights   (void) const { return (m_BlockLight    != nullptr); }
+	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != nullptr); }
 	
 	// tolua_end
 	

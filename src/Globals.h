@@ -17,7 +17,6 @@
 	#pragma warning(disable:4100)  // Unreferenced formal parameter
 
 	// Useful warnings from warning level 4:
-	#pragma warning(3 : 4127)  // Conditional expression is constant
 	#pragma warning(3 : 4189)  // Local variable is initialized but not referenced
 	#pragma warning(3 : 4245)  // Conversion from 'type1' to 'type2', signed/unsigned mismatch
 	#pragma warning(3 : 4310)  // Cast truncates constant value
@@ -26,7 +25,10 @@
 	#pragma warning(3 : 4701)  // Potentially unitialized local variable used
 	#pragma warning(3 : 4702)  // Unreachable code
 	#pragma warning(3 : 4706)  // Assignment within conditional expression
-	
+
+	// 2014-10-23 xoft: Disabled this because the new C++11 headers in MSVC produce tons of these warnings uselessly
+	// #pragma warning(3 : 4127)  // Conditional expression is constant
+
 	// Disabling this warning, because we know what we're doing when we're doing this:
 	#pragma warning(disable: 4355)  // 'this' used in initializer list
 
@@ -50,6 +52,9 @@
 	#define SIZE_T_FMT_HEX "%Ix"
 	
 	#define NORETURN      __declspec(noreturn)
+
+	// Use non-standard defines in <cmath>
+	#define _USE_MATH_DEFINES
 
 #elif defined(__GNUC__)
 
@@ -226,10 +231,10 @@ template class SizeChecker<UInt16, 2>;
 
 // CRT stuff:
 #include <sys/stat.h>
-#include <assert.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdarg.h>
+#include <cassert>
+#include <cstdio>
+#include <cmath>
+#include <cstdarg>
 
 
 
@@ -358,19 +363,8 @@ void inline LOGD(const char* a_Format, ...)
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
-// Allow both Older versions of MSVC and newer versions of everything use a shared_ptr:
-// Note that we cannot typedef, because C++ doesn't allow (partial) templates to be typedeffed.
-#if (defined(_MSC_VER) && (_MSC_VER < 1600))
-	// MSVC before 2010 doesn't have std::shared_ptr, but has std::tr1::shared_ptr, defined in <memory> included earlier
-	#define SharedPtr std::tr1::shared_ptr
-#elif (defined(_MSC_VER) || (__cplusplus >= 201103L))
-	// C++11 has std::shared_ptr in <memory>, included earlier
-	#define SharedPtr std::shared_ptr
-#else
-	// C++03 has std::tr1::shared_ptr in <tr1/memory>
-	#include <tr1/memory>
-	#define SharedPtr std::tr1::shared_ptr
-#endif
+// Unified shared ptr from before C++11. Also no silly undercores.
+#define SharedPtr std::shared_ptr
 
 
 
@@ -400,6 +394,30 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 
 
 
+/** Floors a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type FloorC(T a_Value)
+{
+	return static_cast<C>(std::floor(a_Value));
+}
+
+/** Ceils a value, then casts it to C (an int by default) */
+template <typename C = int, typename T>
+typename std::enable_if<std::is_arithmetic<T>::value, C>::type CeilC(T a_Value)
+{
+	return static_cast<C>(std::ceil(a_Value));
+}
+
+
+
+//temporary replacement for std::make_unique until we get c++14
+template <class T, class... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+	return std::unique_ptr<T>(new T(args...));
+}
+
+
 #ifndef TOLUA_TEMPLATE_BIND
 	#define TOLUA_TEMPLATE_BIND(x)
 #endif
@@ -413,5 +431,6 @@ T Clamp(T a_Value, T a_Min, T a_Max)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
+
 
 

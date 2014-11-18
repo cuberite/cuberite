@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "DungeonRoomsFinisher.h"
 #include "../FastRandom.h"
+#include "../BlockEntities/ChestEntity.h"
 
 
 
@@ -175,7 +176,33 @@ protected:
 		}
 		a_ChunkDesc.SetBlockTypeMeta(RelX, m_FloorHeight + 1, RelZ, E_BLOCK_CHEST, (NIBBLETYPE)a_Chest.y);
 
-		// TODO: Fill the chest with random loot
+		// Fill the chest with random loot
+		static const cLootProbab LootProbab[] =
+		{
+			// Item,                          MinAmount, MaxAmount, Weight
+			{ cItem(E_ITEM_GOLDEN_APPLE),        1,         1,         1 },
+			{ cItem(E_ITEM_DIAMOND_HORSE_ARMOR), 1,         1,         1 },
+			{ cItem(E_ITEM_GOLD_HORSE_ARMOR),    1,         1,         2 },
+			{ cItem(E_ITEM_13_DISC),             1,         1,         4 },
+			{ cItem(E_ITEM_CAT_DISC),            1,         1,         4 },
+			{ cItem(E_ITEM_IRON_HORSE_ARMOR),    1,         1,         5 },
+			{ cItem(E_ITEM_IRON),                1,         4,        10 },
+			{ cItem(E_ITEM_WHEAT),               1,         4,        10 },
+			{ cItem(E_ITEM_GUNPOWDER),           1,         4,        10 },
+			{ cItem(E_ITEM_STRING),              1,         4,        10 },
+			{ cItem(E_ITEM_REDSTONE_DUST),       1,         4,        10 },
+			{ cItem(E_ITEM_SADDLE),              1,         1,        10 },
+			{ cItem(E_ITEM_BUCKET),              1,         1,        10 },
+			{ cItem(E_ITEM_BREAD),               1,         1,        10 },
+			{ cItem(E_ITEM_NAME_TAG),            1,         1,        10 },
+		} ;
+
+		cChestEntity * ChestEntity = (cChestEntity *)a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ);
+		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
+		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
+		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
+		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
 	}
 
 
@@ -193,6 +220,7 @@ protected:
 			// The chunk is not intersecting the room at all, bail out
 			return;
 		}
+
 		int b = m_FloorHeight + 1;  // Bottom
 		int t = m_FloorHeight + 1 + ROOM_HEIGHT;  // Top
 		ReplaceCuboidRandom(a_ChunkDesc, m_StartX, m_FloorHeight, m_StartZ, m_EndX + 1, b, m_EndZ + 1, E_BLOCK_MOSSY_COBBLESTONE, E_BLOCK_COBBLESTONE);  // Floor
@@ -230,7 +258,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cDungeonRoomsFinisher:
 
-cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainHeightGen & a_HeightGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib) :
+cDungeonRoomsFinisher::cDungeonRoomsFinisher(cTerrainHeightGenPtr a_HeightGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib) :
 	super(a_Seed + 100, a_GridSize, a_GridSize, a_GridSize, a_GridSize, a_MaxSize, a_MaxSize, 1024),
 	m_HeightGen(a_HeightGen),
 	m_MaxHalfSize((a_MaxSize + 1) / 2),
@@ -266,7 +294,7 @@ cDungeonRoomsFinisher::cStructurePtr cDungeonRoomsFinisher::CreateStructure(int 
 	int RelX = a_OriginX, RelY = 0, RelZ = a_OriginZ;
 	cChunkDef::AbsoluteToRelative(RelX, RelY, RelZ, ChunkX, ChunkZ);
 	cChunkDef::HeightMap HeightMap;
-	m_HeightGen.GenHeightMap(ChunkX, ChunkZ, HeightMap);
+	m_HeightGen->GenHeightMap(ChunkX, ChunkZ, HeightMap);
 	int Height = cChunkDef::GetHeight(HeightMap, RelX, RelZ);  // Max room height at {a_OriginX, a_OriginZ}
 	Height = Clamp(m_HeightProbability.MapValue(rnd % m_HeightProbability.GetSum()), 10, Height - 5);
 

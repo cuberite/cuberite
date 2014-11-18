@@ -79,7 +79,7 @@ bool cJukeboxEntity::EjectRecord(void)
 	}
 
 	cItems Drops;
-	Drops.push_back(cItem(m_Record, 1, 0));
+	Drops.push_back(cItem(static_cast<short>(m_Record), 1, 0));
 	m_Record = 0;
 	m_World->SpawnItemPickups(Drops, m_PosX + 0.5, m_PosY + 1, m_PosZ + 0.5, 8);
 	m_World->BroadcastSoundParticleEffect(1005, m_PosX, m_PosY, m_PosZ, 0);
@@ -113,35 +113,3 @@ void cJukeboxEntity::SetRecord(int a_Record)
 {
 	m_Record = a_Record;
 }
-
-
-
-
-
-bool cJukeboxEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	m_Record = a_Value.get("Record", 0).asInt();
-
-	return true;
-}
-
-
-
-
-
-void cJukeboxEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	a_Value["Record"] = m_Record;
-}
-
-
-
-

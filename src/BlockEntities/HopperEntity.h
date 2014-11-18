@@ -31,6 +31,8 @@ public:
 
 	// tolua_end
 	
+	BLOCKENTITY_PROTODEF(cHopperEntity);
+	
 	/// Constructor used for normal operation
 	cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	
@@ -40,8 +42,6 @@ public:
 	*/
 	bool GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, int & a_OutputY, int & a_OutputZ);
 	
-	static const char * GetClassStatic(void) { return "cHopperEntity"; }
-	
 protected:
 
 	Int64 m_LastMoveItemsInTick;
@@ -49,7 +49,6 @@ protected:
 
 	// cBlockEntity overrides:
 	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
-	virtual void SaveToJson(Json::Value & a_Value) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 	

@@ -4,7 +4,7 @@
 // Implements the cRCONServer class representing the RCON server
 
 #include "Globals.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 #include "RCONServer.h"
 #include "Server.h"
 #include "Root.h"
@@ -242,7 +242,7 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 			if (strncmp(a_Payload, m_RCONServer.m_Password.c_str(), a_PayloadLength) != 0)
 			{
 				LOGINFO("RCON: Invalid password from client %s, dropping connection.", m_IPAddress.c_str());
-				SendResponse(-1, RCON_PACKET_RESPONSE, 0, NULL);
+				SendResponse(-1, RCON_PACKET_RESPONSE, 0, nullptr);
 				return false;
 			}
 			m_IsAuthenticated = true;
@@ -250,7 +250,7 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 			LOGD("RCON: Client at %s has successfully authenticated", m_IPAddress.c_str());
 			
 			// Send OK response:
-			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, NULL);
+			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, nullptr);
 			return true;
 		}
 		
@@ -268,7 +268,7 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 			cRoot::Get()->ExecuteConsoleCommand(cmd, *(new cRCONCommandOutput(*this, a_RequestID)));
 			
 			// Send an empty response:
-			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, NULL);
+			SendResponse(a_RequestID, RCON_PACKET_RESPONSE, 0, nullptr);
 			return true;
 		}
 	}
@@ -310,7 +310,7 @@ void cRCONServer::cConnection::IntToBuffer(int a_Value, char * a_Buffer)
 /// Sends a RCON packet back to the client
 void cRCONServer::cConnection::SendResponse(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload)
 {
-	ASSERT((a_PayloadLength == 0) || (a_Payload != NULL));  // Either zero data to send, or a valid payload ptr
+	ASSERT((a_PayloadLength == 0) || (a_Payload != nullptr));  // Either zero data to send, or a valid payload ptr
 	
 	char Buffer[4];
 	int Length = a_PayloadLength + 10;

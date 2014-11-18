@@ -176,16 +176,16 @@ public:
 	
 	AString GetIP(void) const { return m_IP; }  // tolua_export
 
-	/** Returns the associated team, NULL if none */
+	/** Returns the associated team, nullptr if none */
 	cTeam * GetTeam(void) { return m_Team; }  // tolua_export
 
-	/** Sets the player team, NULL if none */
+	/** Sets the player team, nullptr if none */
 	void SetTeam(cTeam * a_Team);
+
+	// tolua_end
 
 	/** Forces the player to query the scoreboard for his team */
 	cTeam * UpdateTeam(void);
-
-	// tolua_end
 
 	/** Return the associated statistic and achievement manager. */
 	cStatManager & GetStatManager() { return m_Stats; }
@@ -421,9 +421,13 @@ public:
 
 	/** Sets the player's bed (home) position */
 	void SetBedPos(const Vector3i & a_Pos) { m_LastBedPos = a_Pos; }
+	
+	// tolua_end
 
 	/** Update movement-related statistics. */
 	void UpdateMovementStats(const Vector3d & a_DeltaPos);
+	
+	// tolua_begin
 
 	/** Returns wheter the player can fly or not. */
 	virtual bool CanFly(void) const { return m_CanFly; }

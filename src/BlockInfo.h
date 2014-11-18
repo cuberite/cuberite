@@ -102,7 +102,7 @@ protected:
 		, m_FullyOccupiesVoxel(false)
 		, m_CanBeTerraformed(false)
 		, m_PlaceSound("")
-		, m_Handler(NULL)
+		, m_Handler(nullptr)
 	{}
 
 	/** Cleans up the stored values */

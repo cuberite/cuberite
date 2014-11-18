@@ -39,7 +39,7 @@ enum eBlockFace
 	BLOCK_FACE_YP   = 1,   // Interacting with the Y+ face of the block
 	BLOCK_FACE_ZM   = 2,   // Interacting with the Z- face of the block
 	BLOCK_FACE_ZP   = 3,   // Interacting with the Z+ face of the block
-	
+
 	// Synonyms using the (deprecated) world directions:
 	BLOCK_FACE_BOTTOM = BLOCK_FACE_YM,  // Interacting with the bottom   face of the block
 	BLOCK_FACE_TOP    = BLOCK_FACE_YP,  // Interacting with the top      face of the block
@@ -101,7 +101,7 @@ enum eClickAction
 	caDblClick,
 	// Add new actions here
 	caUnknown = 255,
-	
+
 	// Keep this list in sync with ClickActionToString() function below!
 } ;
 
@@ -116,14 +116,14 @@ enum eGameMode
 	eGameMode_Creative  = 1,
 	eGameMode_Adventure = 2,
 	eGameMode_Spectator = 3,
-	
+
 	// Easier-to-use synonyms:
 	gmNotSet    = eGameMode_NotSet,
 	gmSurvival  = eGameMode_Survival,
 	gmCreative  = eGameMode_Creative,
 	gmAdventure = eGameMode_Adventure,
 	gmSpectator = eGameMode_Spectator,
-	
+
 	// These two are used to check GameMode for validity when converting from integers.
 	gmMax,  // Gets automatically assigned
 	gmMin = 0,
@@ -138,7 +138,7 @@ enum eWeather
 	eWeather_Sunny        = 0,
 	eWeather_Rain         = 1,
 	eWeather_ThunderStorm = 2,
-	
+
 	// Easier-to-use synonyms:
 	wSunny        = eWeather_Sunny,
 	wRain         = eWeather_Rain,
@@ -218,7 +218,7 @@ inline const char * ClickActionToString(eClickAction a_ClickAction)
 		case caLeftPaintEnd:                 return "caLeftPaintEnd";
 		case caRightPaintEnd:                return "caRightPaintEnd";
 		case caDblClick:                     return "caDblClick";
-		
+
 		case caUnknown:                      return "caUnknown";
 	}
 	ASSERT(!"Unknown click action");
@@ -472,21 +472,21 @@ inline void AddFaceDirection(int & a_BlockX, unsigned char & a_BlockY, int & a_B
 {
 	int Y = a_BlockY;
 	AddFaceDirection(a_BlockX, Y, a_BlockZ, a_BlockFace, a_bInverse);
-	a_BlockY = Clamp<unsigned char>((unsigned char)Y, 0, 255);
+	a_BlockY = Clamp<unsigned char>(static_cast<unsigned char>(Y), 0, 255);
 }
 
 
 
-#define PI 3.14159265358979323846264338327950288419716939937510582097494459072381640628620899862803482534211706798f
+
 
 inline void EulerToVector(double a_Pan, double a_Pitch, double & a_X, double & a_Y, double & a_Z)
 {
 	// 	a_X = sinf ( a_Pan / 180 * PI) * cosf ( a_Pitch / 180 * PI);
 	// 	a_Y = -sinf ( a_Pitch / 180 * PI);
 	// 	a_Z = -cosf ( a_Pan / 180 * PI) * cosf ( a_Pitch / 180 * PI);
-	a_X = cos(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
-	a_Y = sin(a_Pan / 180 * PI) * cos(a_Pitch / 180 * PI);
-	a_Z = sin(a_Pitch / 180 * PI);
+	a_X = cos(a_Pan / 180 * M_PI) * cos(a_Pitch / 180 * M_PI);
+	a_Y = sin(a_Pan / 180 * M_PI) * cos(a_Pitch / 180 * M_PI);
+	a_Z = sin(a_Pitch / 180 * M_PI);
 }
 
 
@@ -502,10 +502,10 @@ inline void VectorToEuler(double a_X, double a_Y, double a_Z, double & a_Pan, do
 	}
 	else
 	{
-		a_Pan = atan2(a_Z, a_X) * 180 / PI - 90;
+		a_Pan = atan2(a_Z, a_X) * 180 / M_PI - 90;
 	}
 
-	a_Pitch = atan2(a_Y, r) * 180 / PI;
+	a_Pitch = atan2(a_Y, r) * 180 / M_PI;
 }
 
 
@@ -556,7 +556,7 @@ enum eMessageType
 	mtPrivateMessage,  // Player to player messaging identifier
 	mtJoin,            // A player has joined the server
 	mtLeave,           // A player has left the server
-	
+
 	// Common aliases:
 	mtFail  = mtFailure,
 	mtError = mtFailure,
@@ -626,9 +626,9 @@ namespace ItemCategory
 			|| (a_ItemID == E_ITEM_GOLD_HOE)
 			|| (a_ItemID == E_ITEM_DIAMOND_HOE);
 	}
-	
-	
-	
+
+
+
 	inline bool IsShovel(short a_ItemID)
 	{
 		return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
@@ -648,9 +648,9 @@ namespace ItemCategory
 			|| IsHoe    ( a_ItemID)
 			|| IsShovel ( a_ItemID);
 	}
-	
-	
-	
+
+
+
 	inline bool IsHelmet(short a_ItemType)
 	{
 		return (
@@ -700,9 +700,9 @@ namespace ItemCategory
 			(a_ItemType == E_ITEM_DIAMOND_BOOTS)
 		);
 	}
-	
-	
-	
+
+
+
 	inline bool IsArmor(short a_ItemType)
 	{
 		return (
@@ -715,7 +715,3 @@ namespace ItemCategory
 }
 
 // tolua_end
-
-
-
-

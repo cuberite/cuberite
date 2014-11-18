@@ -95,8 +95,8 @@ template <typename TYPE> void LinearUpscale2DArray(
 	const int MAX_UPSCALE_X = 128;
 	const int MAX_UPSCALE_Y = 128;
 
-	ASSERT(a_Src != NULL);
-	ASSERT(a_Dst != NULL);
+	ASSERT(a_Src != nullptr);
+	ASSERT(a_Dst != nullptr);
 	ASSERT(a_SrcSizeX > 0);
 	ASSERT(a_SrcSizeY > 0);
 	ASSERT(a_UpscaleX > 0);
@@ -166,8 +166,8 @@ template <typename TYPE> void LinearUpscale3DArray(
 	const int MAX_UPSCALE_Y = 128;
 	const int MAX_UPSCALE_Z = 128;
 
-	ASSERT(a_Src != NULL);
-	ASSERT(a_Dst != NULL);
+	ASSERT(a_Src != nullptr);
+	ASSERT(a_Dst != nullptr);
 	ASSERT(a_SrcSizeX > 0);
 	ASSERT(a_SrcSizeY > 0);
 	ASSERT(a_SrcSizeZ > 0);

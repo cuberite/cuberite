@@ -226,22 +226,22 @@ public:
 
 	// tolua_begin
 
-	/** Registers a new scoreboard objective, returns the cObjective instance, NULL on name collision */
+	/** Registers a new scoreboard objective, returns the cObjective instance, nullptr on name collision */
 	cObjective * RegisterObjective(const AString & a_Name, const AString & a_DisplayName, cObjective::eType a_Type);
 
 	/** Removes a registered objective, returns true if operation was successful */
 	bool RemoveObjective(const AString & a_Name);
 
-	/** Retrieves the objective with the specified name, NULL if not found */
+	/** Retrieves the objective with the specified name, nullptr if not found */
 	cObjective * GetObjective(const AString & a_Name);
 
-	/** Registers a new team, returns the cTeam instance, NULL on name collision */
+	/** Registers a new team, returns the cTeam instance, nullptr on name collision */
 	cTeam * RegisterTeam(const AString & a_Name, const AString & a_DisplayName, const AString & a_Prefix, const AString & a_Suffix);
 
 	/** Removes a registered team, returns true if operation was successful */
 	bool RemoveTeam(const AString & a_Name);
 
-	/** Retrieves the team with the specified name, NULL if not found */
+	/** Retrieves the team with the specified name, nullptr if not found */
 	cTeam * GetTeam(const AString & a_Name);
 
 	void SetDisplay(const AString & a_Objective, eDisplaySlot a_Slot);

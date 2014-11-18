@@ -40,12 +40,11 @@ public:
 
 	// tolua_end
 
-	/// Creates a new note entity. a_World may be NULL
+	BLOCKENTITY_PROTODEF(cNoteEntity);
+	
+	/// Creates a new note entity. a_World may be nullptr
 	cNoteEntity(int a_X, int a_Y, int a_Z, cWorld * a_World);
 	virtual ~cNoteEntity() {}
-
-	bool LoadFromJson(const Json::Value & a_Value);
-	virtual void SaveToJson(Json::Value & a_Value) override;
 
 	// tolua_begin
 	
@@ -66,8 +65,6 @@ public:
 			MakeSound();
 		}
 	}
-
-	static const char * GetClassStatic(void) { return "cNoteEntity"; }
 
 private:
 	char m_Pitch;

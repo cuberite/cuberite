@@ -269,10 +269,10 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelX less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelX = 0;
 	}
-	else if (a_MaxRelX >= cChunkDef::Width)
+	else if (a_MaxRelX > cChunkDef::Width)
 	{
 		LOGWARNING("%s: MaxRelX more than chunk width, adjusting to chunk width", __FUNCTION__);
-		a_MaxRelX = cChunkDef::Width - 1;
+		a_MaxRelX = cChunkDef::Width;
 	}
 
 	if (a_MinRelY < 0)
@@ -290,10 +290,10 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelY = 0;
 	}
-	else if (a_MaxRelY >= cChunkDef::Height)
+	else if (a_MaxRelY > cChunkDef::Height)
 	{
 		LOGWARNING("%s: MaxRelY more than chunk height, adjusting to chunk height", __FUNCTION__);
-		a_MaxRelY = cChunkDef::Height - 1;
+		a_MaxRelY = cChunkDef::Height;
 	}
 
 	if (a_MinRelZ < 0)
@@ -311,10 +311,10 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 		LOGWARNING("%s: MaxRelZ less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelZ = 0;
 	}
-	else if (a_MaxRelZ >= cChunkDef::Width)
+	else if (a_MaxRelZ > cChunkDef::Width)
 	{
 		LOGWARNING("%s: MaxRelZ more than chunk width, adjusting to chunk width", __FUNCTION__);
-		a_MaxRelZ = cChunkDef::Width - 1;
+		a_MaxRelZ = cChunkDef::Width;
 	}
 
 	// Prepare the block area:
@@ -530,10 +530,10 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	
 	// The block entity is not created yet, try to create it and add to list:
 	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), AbsX, a_RelY, AbsZ);
-	if (be == NULL)
+	if (be == nullptr)
 	{
 		// No block entity for this block type
-		return NULL;
+		return nullptr;
 	}
 	m_BlockEntities.push_back(be);
 	return be;

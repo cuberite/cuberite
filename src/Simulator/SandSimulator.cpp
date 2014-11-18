@@ -7,7 +7,7 @@
 #include "../Defines.h"
 #include "../Entities/FallingBlock.h"
 #include "../Chunk.h"
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 
 
 
@@ -94,7 +94,7 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 
 void cSandSimulator::AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk)
 {
-	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
@@ -160,6 +160,7 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_FIRE:
 		case E_BLOCK_FLOWER_POT:
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_IRON_TRAPDOOR:
 		case E_BLOCK_LAVA:
 		case E_BLOCK_LEVER:
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:

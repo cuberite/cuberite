@@ -20,7 +20,7 @@
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
 
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "json/json.h"
 
 // 6000 ticks or 5 minutes
@@ -56,8 +56,8 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_Stance(0.0),
 	m_Inventory(*this),
 	m_EnderChestContents(9, 3),
-	m_CurrentWindow(NULL),
-	m_InventoryWindow(NULL),
+	m_CurrentWindow(nullptr),
+	m_InventoryWindow(nullptr),
 	m_GameMode(eGameMode_NotSet),
 	m_IP(""),
 	m_ClientHandle(a_Client),
@@ -78,10 +78,10 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	m_IsChargingBow(false),
 	m_BowCharge(0),
 	m_FloaterID(-1),
-	m_Team(NULL),
+	m_Team(nullptr),
 	m_TicksUntilNextSave(PLAYER_INVENTORY_SAVE_INTERVAL),
 	m_bIsTeleporting(false),
-	m_UUID((a_Client != NULL) ? a_Client->GetUUID() : ""),
+	m_UUID((a_Client != nullptr) ? a_Client->GetUUID() : ""),
 	m_CustomName("")
 {
 	m_InventoryWindow = new cInventoryWindow(*this);
@@ -96,7 +96,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	
 	m_PlayerName = a_PlayerName;
 
-	cWorld * World = NULL;
+	cWorld * World = nullptr;
 	if (!LoadFromDisk(World))
 	{
 		m_Inventory.Clear();
@@ -144,10 +144,10 @@ cPlayer::~cPlayer(void)
 
 	SaveToDisk();
 
-	m_ClientHandle = NULL;
+	m_ClientHandle = nullptr;
 	
 	delete m_InventoryWindow;
-	m_InventoryWindow = NULL;
+	m_InventoryWindow = nullptr;
 	
 	LOGD("Player %p deleted", this);
 }
@@ -186,12 +186,12 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 {
-	if (m_ClientHandle != NULL)
+	if (m_ClientHandle != nullptr)
 	{
 		if (m_ClientHandle->IsDestroyed())
 		{
 			// This should not happen, because destroying a client will remove it from the world, but just in case
-			m_ClientHandle = NULL;
+			m_ClientHandle = nullptr;
 			return;
 		}
 		
@@ -235,7 +235,6 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 			CanMove = false;
 			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
 		}
-		m_ClientHandle->StreamChunks();
 	}
 
 	if (CanMove)
@@ -245,7 +244,7 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 
 	if (m_Health > 0)  // make sure player is alive
 	{
-		m_World->CollectPickupsByPlayer(this);
+		m_World->CollectPickupsByPlayer(*this);
 
 		if ((m_EatingFinishTick >= 0) && (m_EatingFinishTick <= m_World->GetWorldAge()))
 		{
@@ -504,7 +503,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 		if (Damage > 0)
 		{
 			// cPlayer makes sure damage isn't applied in creative, no need to check here
-			TakeDamage(dtFalling, NULL, Damage, Damage, 0);
+			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 			
 			// Fall particles
 			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
@@ -651,7 +650,7 @@ void cPlayer::AbortEating(void)
 
 void cPlayer::SendHealth(void)
 {
-	if (m_ClientHandle != NULL)
+	if (m_ClientHandle != nullptr)
 	{
 		m_ClientHandle->SendHealth();
 	}
@@ -663,7 +662,7 @@ void cPlayer::SendHealth(void)
 
 void cPlayer::SendExperience(void)
 {
-	if (m_ClientHandle != NULL)
+	if (m_ClientHandle != nullptr)
 	{
 		m_ClientHandle->SendExperience();
 		m_bDirtyExperience = false;
@@ -859,11 +858,11 @@ bool cPlayer::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 	}
 
-	if ((a_TDI.Attacker != NULL) && (a_TDI.Attacker->IsPlayer()))
+	if ((a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsPlayer()))
 	{
 		cPlayer * Attacker = (cPlayer *)a_TDI.Attacker;
 
-		if ((m_Team != NULL) && (m_Team == Attacker->m_Team))
+		if ((m_Team != nullptr) && (m_Team == Attacker->m_Team))
 		{
 			if (!m_Team->AllowsFriendlyFire())
 			{
@@ -915,7 +914,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 	m_World->SpawnItemPickups(Pickups, GetPosX(), GetPosY(), GetPosZ(), 10);
 	SaveToDisk();  // Save it, yeah the world is a tough place !
 
-	if ((a_TDI.Attacker == NULL) && m_World->ShouldBroadcastDeathMessages())
+	if ((a_TDI.Attacker == nullptr) && m_World->ShouldBroadcastDeathMessages())
 	{
 		AString DamageText;
 		switch (a_TDI.DamageType)
@@ -941,7 +940,7 @@ void cPlayer::KilledBy(TakeDamageInfo & a_TDI)
 		}
 		GetWorld()->BroadcastChatDeath(Printf("%s %s", GetName().c_str(), DamageText.c_str()));
 	}
-	else if (a_TDI.Attacker == NULL)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
+	else if (a_TDI.Attacker == nullptr)  // && !m_World->ShouldBroadcastDeathMessages() by fallthrough
 	{
 		// no-op
 	}
@@ -997,7 +996,7 @@ void cPlayer::Killed(cEntity * a_Victim)
 
 void cPlayer::Respawn(void)
 {
-	ASSERT(m_World != NULL);
+	ASSERT(m_World != nullptr);
 
 	m_Health = GetMaxHealth();
 	SetInvulnerableTicks(20);
@@ -1107,9 +1106,9 @@ void cPlayer::SetTeam(cTeam * a_Team)
 
 cTeam * cPlayer::UpdateTeam(void)
 {
-	if (m_World == NULL)
+	if (m_World == nullptr)
 	{
-		SetTeam(NULL);
+		SetTeam(nullptr);
 	}
 	else
 	{
@@ -1142,7 +1141,7 @@ void cPlayer::OpenWindow(cWindow * a_Window)
 
 void cPlayer::CloseWindow(bool a_CanRefuse)
 {
-	if (m_CurrentWindow == NULL)
+	if (m_CurrentWindow == nullptr)
 	{
 		m_CurrentWindow = m_InventoryWindow;
 		return;
@@ -1167,7 +1166,7 @@ void cPlayer::CloseWindow(bool a_CanRefuse)
 
 void cPlayer::CloseWindowIfID(char a_WindowID, bool a_CanRefuse)
 {
-	if ((m_CurrentWindow == NULL) || (m_CurrentWindow->GetWindowID() != a_WindowID))
+	if ((m_CurrentWindow == nullptr) || (m_CurrentWindow->GetWindowID() != a_WindowID))
 	{
 		return;
 	}
@@ -1354,7 +1353,7 @@ void cPlayer::MoveTo( const Vector3d & a_NewPos)
 		// Y = -999 and X, Z = attempting to create speed, usually up to 0.03
 		// We cannot test m_AttachedTo, because when deattaching, the server thinks the client is already deattached while
 		// the client may still send more of these nonsensical packets.
-		if (m_AttachedTo != NULL)
+		if (m_AttachedTo != nullptr)
 		{
 			Vector3d AddSpeed(a_NewPos);
 			AddSpeed.y = 0;
@@ -1581,7 +1580,7 @@ void cPlayer::TossItems(const cItems & a_Items)
 
 bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 {
-	ASSERT(a_World != NULL);
+	ASSERT(a_World != nullptr);
 
 	if (GetWorld() == a_World)
 	{
@@ -1590,7 +1589,7 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	}
 	
 	// Send the respawn packet:
-	if (a_ShouldSendRespawn && (m_ClientHandle != NULL))
+	if (a_ShouldSendRespawn && (m_ClientHandle != nullptr))
 	{
 		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
@@ -1602,6 +1601,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	// Queue adding player to the new world, including all the necessary adjustments to the object
 	a_World->AddPlayer(this);
 	SetWorld(a_World);  // Chunks may be streamed before cWorld::AddPlayer() sets the world to the new value
+
+	// Update the view distance.
+	m_ClientHandle->SetViewDistance(m_ClientHandle->GetRequestedViewDistance());
 
 	return true;
 }
@@ -1652,7 +1654,7 @@ bool cPlayer::LoadFromDisk(cWorldPtr & a_World)
 		GetName().c_str(), m_UUID.c_str(), OfflineUUID.c_str(), OfflineUsage
 	);
 
-	if (a_World == NULL)
+	if (a_World == nullptr)
 	{
 		a_World = cRoot::Get()->GetDefaultWorld();
 	}
@@ -1729,7 +1731,7 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 
 	m_LoadedWorldName = root.get("world", "world").asString();
 	a_World = cRoot::Get()->GetWorld(GetLoadedWorldName(), false);
-	if (a_World == NULL)
+	if (a_World == nullptr)
 	{
 		a_World = cRoot::Get()->GetDefaultWorld();
 	}
@@ -1795,7 +1797,7 @@ bool cPlayer::SaveToDisk()
 	root["SpawnY"]              = GetLastBedPos().y;
 	root["SpawnZ"]              = GetLastBedPos().z;
 
-	if (m_World != NULL)
+	if (m_World != nullptr)
 	{
 		root["world"] = m_World->GetName();
 		if (m_GameMode == m_World->GetGameMode())
@@ -1949,7 +1951,7 @@ void cPlayer::HandleFood(void)
 			else if ((m_FoodLevel <= 0) && (m_Health > 1))
 			{
 				// Damage from starving
-				TakeDamage(dtStarving, NULL, 1, 1, 0);
+				TakeDamage(dtStarving, nullptr, 1, 1, 0);
 			}
 		}
 	}
@@ -2018,7 +2020,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 {
 	StatValue Value = (StatValue)floor(a_DeltaPos.Length() * 100 + 0.5);
 
-	if (m_AttachedTo == NULL)
+	if (m_AttachedTo == nullptr)
 	{
 		if (IsClimbing())
 		{
@@ -2091,7 +2093,7 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 	}
 
 	// If riding anything, apply no food exhaustion
-	if (m_AttachedTo != NULL)
+	if (m_AttachedTo != nullptr)
 	{
 		return;
 	}
@@ -2134,14 +2136,19 @@ void cPlayer::ApplyFoodExhaustionFromMovement()
 void cPlayer::LoadRank(void)
 {
 	// Load the values from cRankManager:
-	cRankManager & RankMgr = cRoot::Get()->GetRankManager();
-	m_Rank = RankMgr.GetPlayerRankName(m_UUID);
+	cRankManager * RankMgr = cRoot::Get()->GetRankManager();
+	m_Rank = RankMgr->GetPlayerRankName(m_UUID);
 	if (m_Rank.empty())
 	{
-		m_Rank = RankMgr.GetDefaultRank();
+		m_Rank = RankMgr->GetDefaultRank();
 	}
-	m_Permissions = RankMgr.GetPlayerPermissions(m_UUID);
-	RankMgr.GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
+	else
+	{
+		// Update the name:
+		RankMgr->UpdatePlayerName(m_UUID, m_PlayerName);
+	}
+	m_Permissions = RankMgr->GetPlayerPermissions(m_UUID);
+	RankMgr->GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
 
 	// Break up the individual permissions on each dot, into m_SplitPermissions:
 	m_SplitPermissions.clear();

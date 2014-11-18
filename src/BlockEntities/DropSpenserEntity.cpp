@@ -18,7 +18,6 @@ cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int 
 	m_ShouldDropSpense(false),
 	m_IsPowered(false)
 {
-	SetBlockEntity(this);  // cBlockEntityWindowOwner
 }
 
 
@@ -29,7 +28,7 @@ cDropSpenserEntity::~cDropSpenserEntity()
 {
 	// Tell window its owner is destroyed
 	cWindow * Window = GetWindow();
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		Window->OwnerDestroyed();
 	}
@@ -143,54 +142,6 @@ bool cDropSpenserEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-bool cDropSpenserEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	Json::Value AllSlots = a_Value.get("Slots", 0);
-	int SlotIdx = 0;
-	for (Json::Value::iterator itr = AllSlots.begin(); itr != AllSlots.end(); ++itr)
-	{
-		cItem Contents;
-		Contents.FromJson(*itr);
-		m_Contents.SetSlot(SlotIdx, Contents);
-		SlotIdx++;
-		if (SlotIdx >= m_Contents.GetNumSlots())
-		{
-			return true;
-		}
-	}
-
-	return true;
-}
-
-
-
-
-
-void cDropSpenserEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	Json::Value AllSlots;
-	int NumSlots = m_Contents.GetNumSlots();
-	for (int i = 0; i < NumSlots; i++)
-	{
-		Json::Value Slot;
-		m_Contents.GetSlot(i).GetJson(Slot);
-		AllSlots.append(Slot);
-	}
-	a_Value["Slots"] = AllSlots;
-}
-
-
-
-
-
 void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 {
 	// Nothing needs to be sent
@@ -204,13 +155,13 @@ void cDropSpenserEntity::SendTo(cClientHandle & a_Client)
 void cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 {
 	cWindow * Window = GetWindow();
-	if (Window == NULL)
+	if (Window == nullptr)
 	{
 		OpenWindow(new cDropSpenserWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
 	
-	if (Window != NULL)
+	if (Window != nullptr)
 	{
 		if (a_Player->GetWindow() != Window)
 		{

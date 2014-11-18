@@ -7,7 +7,7 @@
 #include "../Server.h"
 #include "../ClientHandle.h"
 
-#include "inifile/iniFile.h"
+#include "../IniFile.h"
 #include "json/json.h"
 
 #include "PolarSSL++/BlockingSslClientSocket.h"

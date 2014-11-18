@@ -19,11 +19,10 @@
 #include "OSSupport/Timer.h"
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
-
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 
 #ifdef _WIN32
-	#include "conio.h"
+	#include <conio.h>
 	#include <psapi.h>
 #elif defined(__linux__)
 	#include <fstream>
@@ -35,22 +34,21 @@
 
 
 
-cRoot* cRoot::s_Root = NULL;
+cRoot* cRoot::s_Root = nullptr;
 
 
 
 
 
 cRoot::cRoot(void) :
-	m_PrimaryServerVersion(cProtocolRecognizer::PROTO_VERSION_LATEST),
-	m_pDefaultWorld(NULL),
-	m_InputThread(NULL),
-	m_Server(NULL),
-	m_MonsterConfig(NULL),
-	m_CraftingRecipes(NULL),
-	m_FurnaceRecipe(NULL),
-	m_WebAdmin(NULL),
-	m_PluginManager(NULL),
+	m_pDefaultWorld(nullptr),
+	m_InputThread(nullptr),
+	m_Server(nullptr),
+	m_MonsterConfig(nullptr),
+	m_CraftingRecipes(nullptr),
+	m_FurnaceRecipe(nullptr),
+	m_WebAdmin(nullptr),
+	m_PluginManager(nullptr),
 	m_bStop(false),
 	m_bRestart(false)
 {
@@ -142,20 +140,10 @@ void cRoot::Start(void)
 			IniFile.AddHeaderComment(" See: http://wiki.mc-server.org/doku.php?id=configure:settings.ini for further configuration help");
 		}
 
-		m_PrimaryServerVersion = IniFile.GetValueI("Server", "PrimaryServerVersion", 0);
-		if (m_PrimaryServerVersion == 0)
-		{
-			m_PrimaryServerVersion = cProtocolRecognizer::PROTO_VERSION_LATEST;
-		}
-		else
-		{
-			// Make a note in the log that the primary server version is explicitly set in the ini file
-			LOGINFO("Primary server version set explicitly to %d.", m_PrimaryServerVersion);
-		}
-
 		LOG("Starting server...");
-		m_MojangAPI.Start(IniFile);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
-		if (!m_Server->InitServer(IniFile))
+		bool ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
+		m_MojangAPI.Start(IniFile, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
+		if (!m_Server->InitServer(IniFile, ShouldAuthenticate))
 		{
 			IniFile.WriteFile("settings.ini");
 			LOGERROR("Failure starting server, aborting...");
@@ -166,7 +154,8 @@ void cRoot::Start(void)
 		m_WebAdmin->Init();
 
 		LOGD("Loading settings...");
-		m_RankManager.Initialize(m_MojangAPI);
+		m_RankManager = new cRankManager();
+		m_RankManager->Initialize(m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
@@ -225,7 +214,7 @@ void cRoot::Start(void)
 		}
 
 		#if !defined(ANDROID_NDK)
-		delete m_InputThread; m_InputThread = NULL;
+		delete m_InputThread; m_InputThread = nullptr;
 		#endif
 
 		// Stop the server:
@@ -240,21 +229,21 @@ void cRoot::Start(void)
 		m_Authenticator.Stop();
 
 		LOGD("Freeing MonsterConfig...");
-		delete m_MonsterConfig; m_MonsterConfig = NULL;
-		delete m_WebAdmin; m_WebAdmin = NULL;
+		delete m_MonsterConfig; m_MonsterConfig = nullptr;
+		delete m_WebAdmin; m_WebAdmin = nullptr;
 		LOGD("Unloading recipes...");
-		delete m_FurnaceRecipe;   m_FurnaceRecipe = NULL;
-		delete m_CraftingRecipes; m_CraftingRecipes = NULL;
+		delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
+		delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
 		LOGD("Stopping plugin manager...");
-		delete m_PluginManager; m_PluginManager = NULL;
+		delete m_PluginManager; m_PluginManager = nullptr;
 
 		cItemHandler::Deinit();
 
 		LOG("Cleaning up...");
-		delete m_Server; m_Server = NULL;
+		delete m_Server; m_Server = nullptr;
 		LOG("Shutdown successful!");
 	}
 	
@@ -329,7 +318,7 @@ void cRoot::LoadWorlds(cIniFile & IniFile)
 cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName)
 {
 	cWorld * World = m_WorldsByName[a_WorldName];
-	if (World != NULL)
+	if (World != nullptr)
 	{
 		return World;
 	}
@@ -374,7 +363,7 @@ void cRoot::StopWorlds(void)
 
 void cRoot::UnloadWorlds(void)
 {
-	m_pDefaultWorld = NULL;
+	m_pDefaultWorld = nullptr;
 	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); ++itr)
 	{
 		delete itr->second;
@@ -407,7 +396,7 @@ cWorld * cRoot::GetWorld(const AString & a_WorldName, bool a_SearchForFolder)
 	{
 		return CreateAndInitializeWorld(a_WorldName);
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -419,7 +408,7 @@ bool cRoot::ForEachWorld(cWorldListCallback & a_Callback)
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), itr2 = itr; itr != m_WorldsByName.end(); itr = itr2)
 	{
 		++itr2;
-		if (itr->second != NULL)
+		if (itr->second != nullptr)
 		{
 			if (a_Callback.Item(itr->second))
 			{
@@ -554,7 +543,7 @@ void cRoot::BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix)
 {
 	for (WorldMap::iterator itr = m_WorldsByName.begin(), end = m_WorldsByName.end(); itr != end; ++itr)
 	{
-		itr->second->BroadcastChat(a_Message, NULL, a_ChatPrefix);
+		itr->second->BroadcastChat(a_Message, nullptr, a_ChatPrefix);
 	}  // for itr - m_WorldsByName[]
 }
 
@@ -624,7 +613,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
-			m_BestMatch(NULL),
+			m_BestMatch(nullptr),
 			m_NumMatches(0)
 		{}
 
@@ -636,6 +625,22 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 	if (Callback.m_NumMatches == 1)
 	{
 		return a_Callback.Item(Callback.m_BestMatch);
+	}
+	return false;
+}
+
+
+
+
+
+bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+{
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end();itr++)
+	{
+		if (itr->second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
+		{
+			return true;
+		}
 	}
 	return false;
 }

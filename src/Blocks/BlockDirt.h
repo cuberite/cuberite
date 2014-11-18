@@ -21,7 +21,15 @@ public:
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		a_Pickups.push_back(cItem(E_BLOCK_DIRT, 1, 0));
+		if (a_BlockMeta == E_META_DIRT_COARSE)
+		{
+			// Drop the coarse block (dirt, meta 1)
+			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_COARSE);
+		}
+		else
+		{
+			a_Pickups.Add(E_BLOCK_DIRT, 1, E_META_DIRT_NORMAL);
+		}
 	}
 	
 	
@@ -64,7 +72,7 @@ public:
 			int BlockY = a_RelY + OfsY;
 			int BlockZ = a_RelZ + OfsZ;
 			cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(BlockX, BlockZ);
-			if (Chunk == NULL)
+			if (Chunk == nullptr)
 			{
 				// Unloaded chunk
 				continue;
@@ -81,7 +89,7 @@ public:
 			Chunk->GetBlockTypeMeta(BlockX, BlockY + 1, BlockZ, AboveDest, AboveMeta);
 			if (cBlockInfo::GetHandler(AboveDest)->CanDirtGrowGrass(AboveMeta))
 			{
-				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
+				if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), Chunk->GetPosX() * cChunkDef::Width + BlockX, BlockY, Chunk->GetPosZ() * cChunkDef::Width + BlockZ, ssGrassSpread))
 				{
 					Chunk->FastSetBlock(BlockX, BlockY, BlockZ, E_BLOCK_GRASS, 0);
 				}

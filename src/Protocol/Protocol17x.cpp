@@ -121,7 +121,7 @@ cProtocol172::cProtocol172(cClientHandle * a_Client, const AString & a_ServerAdd
 	{
 		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(NULL), sCounter++, a_Client->GetIPString().c_str());
+		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(nullptr), sCounter++, a_Client->GetIPString().c_str());
 		m_CommLogFile.Open(FileName, cFile::fmWrite);
 	}
 }
@@ -160,7 +160,7 @@ void cProtocol172::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_
 	
 	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteInt((a_Vehicle != NULL) ? a_Vehicle->GetUniqueID() : 0);
+	Pkt.WriteInt((a_Vehicle != nullptr) ? a_Vehicle->GetUniqueID() : 0);
 	Pkt.WriteBool(false);
 }
 
@@ -255,7 +255,7 @@ void cProtocol172::SendChat(const cCompositeChat & a_Message)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cWorld * World = m_Client->GetPlayer()->GetWorld();
-	bool ShouldUseChatPrefixes = (World == NULL) ? false : World->ShouldUseChatPrefixes();
+	bool ShouldUseChatPrefixes = (World == nullptr) ? false : World->ShouldUseChatPrefixes();
 
 	// Send the message to the client:
 	cPacketizer Pkt(*this, 0x02);
@@ -1440,7 +1440,7 @@ void cProtocol172::SendWindowOpen(const cWindow & a_Window)
 
 
 
-void cProtocol172::SendWindowProperty(const cWindow & a_Window, int a_Property, int a_Value)
+void cProtocol172::SendWindowProperty(const cWindow & a_Window, short a_Property, short a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -1902,6 +1902,7 @@ void cProtocol172::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ShowCape);
 	
 	m_Client->SetLocale(Locale);
+	m_Client->SetViewDistance(ViewDistance);
 	// TODO: Do anything with the other values.
 }
 
@@ -2065,6 +2066,22 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 	HANDLE_READ(a_ByteBuffer, ReadBEShort,       short,   Length);
+	if (Length + 1 != (int)a_ByteBuffer.GetReadableSpace())
+	{
+		LOGD("Invalid plugin message packet, payload length doesn't match packet length (exp %d, got %d)",
+			(int)a_ByteBuffer.GetReadableSpace() - 1, Length
+		);
+		return;
+	}
+	
+	// If the plugin channel is recognized vanilla, handle it directly:
+	if (Channel.substr(0, 3) == "MC|")
+	{
+		HandleVanillaPluginMessage(a_ByteBuffer, Channel, Length);
+		return;
+	}
+	
+	// Read the plugin message and relay to clienthandle:
 	AString Data;
 	if (!a_ByteBuffer.ReadString(Data, Length))
 	{
@@ -2218,14 +2235,76 @@ void cProtocol172::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol172::WritePacket(cByteBuffer & a_Packet)
+void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, short a_PayloadLength)
 {
-	cCSLock Lock(m_CSPacket);
-	AString Pkt;
-	a_Packet.ReadAll(Pkt);
-	WriteVarInt((UInt32)Pkt.size());
-	SendData(Pkt.data(), Pkt.size());
-	Flush();
+	if (a_Channel == "MC|AdvCdm")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode);
+		switch (Mode)
+		{
+			case 0x00:
+			{
+				// Block-based commandblock update:
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockX);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockY);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockZ);
+				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
+				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+				break;
+			}
+
+			// TODO: Entity-based commandblock update
+			
+			default:
+			{
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %d", Mode), mtFailure);
+				LOG("Unhandled MC|AdvCdm packet mode.");
+				return;
+			}
+		}  // switch (Mode)
+		return;
+	}
+	else if (a_Channel == "MC|Brand")
+	{
+		// Read the client's brand:
+		AString Brand;
+		if (a_ByteBuffer.ReadString(Brand, a_PayloadLength))
+		{
+			m_Client->SetClientBrand(Brand);
+		}
+		
+		// Send back our brand:
+		SendPluginMessage("MC|Brand", "MCServer");
+		return;
+	}
+	else if (a_Channel == "MC|Beacon")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect2);
+		m_Client->HandleBeaconSelection(Effect1, Effect2);
+		return;
+	}
+	else if (a_Channel == "MC|ItemName")
+	{
+		AString ItemName;
+		if (a_ByteBuffer.ReadString(ItemName, a_PayloadLength))
+		{
+			m_Client->HandleAnvilItemName(ItemName);
+		}
+		return;
+	}
+	else if (a_Channel == "MC|TrSel")
+	{
+		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, SlotNum);
+		m_Client->HandleNPCTrade(SlotNum);
+		return;
+	}
+	LOG("Unhandled vanilla plugin channel: \"%s\".", a_Channel.c_str());
+	
+	// Read the payload and send it through to the clienthandle:
+	AString Message;
+	VERIFY(a_ByteBuffer.ReadString(Message, a_PayloadLength));
+	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
 
@@ -2738,7 +2817,7 @@ void cProtocol172::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 			WriteByte(0xA2);
 			WriteItem(Frame.GetItem());
 			WriteByte(0x3);
-			WriteByte(Frame.GetRotation() / 2);
+			WriteByte(Frame.GetItemRotation() / 2);
 			break;
 		}
 		default: break;

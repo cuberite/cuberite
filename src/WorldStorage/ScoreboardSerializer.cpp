@@ -174,13 +174,13 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.BeginCompound("DisplaySlots");
 
 	cObjective * Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsList);
-	a_Writer.AddString("slot_0", (Objective == NULL) ? "" : Objective->GetName());
+	a_Writer.AddString("slot_0", (Objective == nullptr) ? "" : Objective->GetName());
 
 	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsSidebar);
-	a_Writer.AddString("slot_1", (Objective == NULL) ? "" : Objective->GetName());
+	a_Writer.AddString("slot_1", (Objective == nullptr) ? "" : Objective->GetName());
 
 	Objective = m_ScoreBoard->GetObjectiveIn(cScoreboard::dsName);
-	a_Writer.AddString("slot_2", (Objective == NULL) ? "" : Objective->GetName());
+	a_Writer.AddString("slot_2", (Objective == nullptr) ? "" : Objective->GetName());
 
 	a_Writer.EndCompound();  // DisplaySlots
 

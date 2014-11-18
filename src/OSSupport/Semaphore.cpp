@@ -36,7 +36,7 @@ cSemaphore::cSemaphore( unsigned int a_MaxCount, unsigned int a_InitialCount /* 
 	}
 #else
 	m_Handle = CreateSemaphore(
-		NULL,  // security attribute
+		nullptr,  // security attribute
 		a_InitialCount,  // initial count
 		a_MaxCount,  // maximum count
 		0  // name (optional)
@@ -98,7 +98,7 @@ void cSemaphore::Signal()
 		LOG("ERROR: Could not signal cSemaphore. (%i)", errno);
 	}
 #else
-	ReleaseSemaphore( m_Handle, 1, NULL);
+	ReleaseSemaphore( m_Handle, 1, nullptr);
 #endif
 }
 

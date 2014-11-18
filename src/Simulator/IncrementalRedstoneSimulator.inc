@@ -27,6 +27,11 @@ public:
 	{
 	}
 	~cIncrementalRedstoneSimulator();
+	
+	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
+	{
+		return new cIncrementalRedstoneSimulatorChunkData;
+	}
 
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
 	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, ChunkType * a_Chunk) override;
@@ -77,7 +82,7 @@ private:
 	};
 	
 	class cIncrementalRedstoneSimulatorChunkData :
-	cRedstoneSimulatorChunkData
+	public cRedstoneSimulatorChunkData
 	{
 	public:
 		/// Per-chunk data for the simulator, specified individual chunks to simulate
@@ -408,7 +413,12 @@ void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 	// Every time a block is changed (AddBlock called), we want to go through all lists and check to see if the coordiantes stored within are still valid
 	// Checking only when a block is changed, as opposed to every tick, also improves performance
 
-	PoweredBlocksList & PoweredBlocks = ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_PoweredBlocks;
+	cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData * SimulatorChunkData = ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData());
+	if (SimulatorChunkData == NULL)
+	{
+		return;
+	}
+	PoweredBlocksList & PoweredBlocks = SimulatorChunkData->m_PoweredBlocks;
 	for (typename PoweredBlocksList::iterator itr = PoweredBlocks.begin(); itr != PoweredBlocks.end();)
 	{
 		if (!itr->a_SourcePos.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
@@ -554,6 +564,11 @@ template <class ChunkType, class WorldType, template <BLOCKTYPE block> class Get
 void cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, ChunkType * a_Chunk)
 {
 	m_RedstoneSimulatorChunkData = (cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
+	if (m_RedstoneSimulatorChunkData == NULL)
+	{
+		m_RedstoneSimulatorChunkData = new cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData();
+		a_Chunk->SetRedstoneSimulatorData(m_RedstoneSimulatorChunkData);
+	}
 	if (m_RedstoneSimulatorChunkData->m_ChunkData.empty() && ((cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, ChestType>::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_QueuedChunkData.empty())
 	{
 		return;
@@ -1986,7 +2001,6 @@ bool cIncrementalRedstoneSimulator<ChunkType, WorldType, GetHandlerCompileTime, 
 			// Check if western(left) neighbor is a powered on repeater who is facing us
 			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
 			{
-				NIBBLETYPE OtherRepeaterDir = m_Chunk->GetMeta(a_RelBlockX -1, a_RelBlockY, a_RelBlockZ) & 0x3;
 				if ((OtherRepeaterDir & 0x03) == 0x1) 
 				{ 
 					return true; 

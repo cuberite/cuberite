@@ -144,12 +144,12 @@ protected:
 
 
 
-/// Caches most-recently-used chunk composition of another composition generator. Caches only the types and metas
+/** Caches most-recently-used chunk composition of another composition generator. Caches only the types and metas */
 class cCompoGenCache :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenCache(cTerrainCompositionGen & a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
+	cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
 	~cCompoGenCache();
 	
 	// cTerrainCompositionGen override:
@@ -158,7 +158,7 @@ public:
 	
 protected:
 
-	cTerrainCompositionGen & m_Underlying;
+	cTerrainCompositionGenPtr m_Underlying;
 	
 	struct sCacheData
 	{

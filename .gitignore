@@ -24,6 +24,8 @@ AllFiles.lst
 *.*~
 *~
 *.orig
+## CLion
+.idea
 ## Eclipse
 .cproject
 .project

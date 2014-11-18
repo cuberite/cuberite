@@ -19,7 +19,7 @@ class cPickup :
 	public cEntity
 {
 	typedef cEntity super;
-	
+
 public:
 	// tolua_end
 
@@ -32,15 +32,15 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	bool CollectedBy(cPlayer * a_Dest);  // tolua_export
+	bool CollectedBy(cPlayer & a_Dest);  // tolua_export
 
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
 
 	/** Returns the number of ticks that this entity has existed */
-	int GetAge(void) const { return (int)(m_Timer / 50); }     // tolua_export
+	int GetAge(void) const { return static_cast<int>(m_Timer / 50); }     // tolua_export
 
 	/** Set the number of ticks that this entity has existed */
-	void SetAge(int a_Age) { m_Timer = (float)(a_Age * 50); }  // tolua_export
+	void SetAge(int a_Age) { m_Timer = static_cast<float>(a_Age * 50); }  // tolua_export
 
 	/** Returns true if the pickup has already been collected */
 	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
@@ -59,7 +59,3 @@ private:
 
 	bool m_bIsPlayerCreated;
 };  // tolua_export
-
-
-
-

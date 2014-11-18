@@ -15,7 +15,7 @@ class cPlayerLookCheck :
 {
 public:
 	cPlayerLookCheck(Vector3d a_EndermanPos, int a_SightDistance) :
-		m_Player(NULL),
+		m_Player(nullptr),
 		m_EndermanPos(a_EndermanPos),
 		m_SightDistance(a_SightDistance)
 	{
@@ -92,7 +92,7 @@ cEnderman::cEnderman(void) :
 void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	int LootingLevel = 0;
-	if (a_Killer != NULL)
+	if (a_Killer != nullptr)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
@@ -104,7 +104,7 @@ void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cEnderman::CheckEventSeePlayer()
 {
-	if (m_Target != NULL)
+	if (m_Target != nullptr)
 	{
 		return;
 	}
@@ -115,7 +115,7 @@ void cEnderman::CheckEventSeePlayer()
 		return;
 	}
 	
-	ASSERT(Callback.GetPlayer() != NULL);
+	ASSERT(Callback.GetPlayer() != nullptr);
 
 	if (!CheckLight())
 	{
@@ -180,4 +180,24 @@ bool cEnderman::CheckLight()
 	}
 
 	return true;
+}
+
+
+
+
+
+void cEnderman::Tick(float a_Dt, cChunk & a_Chunk)
+{
+	super::Tick(a_Dt, a_Chunk);
+
+	// TODO take damage in rain
+
+	// Take damage when touching water, drowning damage seems to be most appropriate
+	if (IsSwimming())
+	{
+		EventLosePlayer();
+		TakeDamage(dtDrowning, nullptr, 1, 0);
+		// TODO teleport to a safe location
+	}
+
 }

@@ -9,7 +9,7 @@
 cBlockInfo::~cBlockInfo()
 {
 	delete m_Handler;
-	m_Handler = NULL;
+	m_Handler = nullptr;
 }
 
 
@@ -17,7 +17,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 {
 	for (unsigned int i = 0; i < 256; ++i)
 	{
-		if (a_Info[i].m_Handler == NULL)
+		if (a_Info[i].m_Handler == nullptr)
 		{
 			a_Info[i].m_Handler = cBlockHandler::CreateBlockHandler((BLOCKTYPE) i);
 		}
@@ -99,6 +99,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_HOPPER              ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_ICE                 ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_INVERTED_DAYLIGHT_SENSOR ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_IRON_BARS           ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_IRON_DOOR           ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_SpreadLightFalloff = 1;
@@ -137,6 +138,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_SPRUCE_FENCE_GATE   ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STAINED_GLASS       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STAINED_GLASS_PANE  ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_STANDING_BANNER     ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STICKY_PISTON       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STONE_BUTTON        ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_SpreadLightFalloff = 1;
@@ -149,6 +151,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_TRIPWIRE            ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_VINES               ].m_SpreadLightFalloff = 1;
+	a_Info[E_BLOCK_WALL_BANNER         ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_WALLSIGN            ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_WOODEN_BUTTON       ].m_SpreadLightFalloff = 1;
 	a_Info[E_BLOCK_WOODEN_DOOR         ].m_SpreadLightFalloff = 1;
@@ -256,6 +259,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_STAINED_GLASS_PANE  ].m_Transparent = true;
 	a_Info[E_BLOCK_STATIONARY_LAVA     ].m_Transparent = true;
 	a_Info[E_BLOCK_STATIONARY_WATER    ].m_Transparent = true;
+	a_Info[E_BLOCK_STANDING_BANNER     ].m_Transparent = true;
 	a_Info[E_BLOCK_STICKY_PISTON       ].m_Transparent = true;
 	a_Info[E_BLOCK_STONE_BUTTON        ].m_Transparent = true;
 	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_Transparent = true;
@@ -268,6 +272,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_TRIPWIRE            ].m_Transparent = true;
 	a_Info[E_BLOCK_TRIPWIRE_HOOK       ].m_Transparent = true;
 	a_Info[E_BLOCK_VINES               ].m_Transparent = true;
+	a_Info[E_BLOCK_WALL_BANNER         ].m_Transparent = true;
 	a_Info[E_BLOCK_WALLSIGN            ].m_Transparent = true;
 	a_Info[E_BLOCK_WATER               ].m_Transparent = true;
 	a_Info[E_BLOCK_WOODEN_BUTTON       ].m_Transparent = true;
@@ -329,6 +334,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE].m_PistonBreakable = true;
 	a_Info[E_BLOCK_INACTIVE_COMPARATOR ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_IRON_DOOR           ].m_PistonBreakable = true;
+	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_JACK_O_LANTERN      ].m_PistonBreakable = true;
 	a_Info[E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE].m_PistonBreakable = true;
 	a_Info[E_BLOCK_LILY_PAD            ].m_PistonBreakable = true;
@@ -474,12 +480,14 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_SNOW                ].m_IsSolid = false;
 	a_Info[E_BLOCK_STATIONARY_LAVA     ].m_IsSolid = false;
 	a_Info[E_BLOCK_STATIONARY_WATER    ].m_IsSolid = false;
+	a_Info[E_BLOCK_STANDING_BANNER     ].m_IsSolid = false;
 	a_Info[E_BLOCK_STONE_BUTTON        ].m_IsSolid = false;
 	a_Info[E_BLOCK_STONE_PRESSURE_PLATE].m_IsSolid = false;
 	a_Info[E_BLOCK_TALL_GRASS          ].m_IsSolid = false;
 	a_Info[E_BLOCK_TORCH               ].m_IsSolid = false;
 	a_Info[E_BLOCK_TRIPWIRE            ].m_IsSolid = false;
 	a_Info[E_BLOCK_VINES               ].m_IsSolid = false;
+	a_Info[E_BLOCK_WALL_BANNER         ].m_IsSolid = false;
 	a_Info[E_BLOCK_WALLSIGN            ].m_IsSolid = false;
 	a_Info[E_BLOCK_WATER               ].m_IsSolid = false;
 	a_Info[E_BLOCK_WOODEN_BUTTON       ].m_IsSolid = false;
@@ -527,6 +535,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_LAPIS_ORE           ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_LOG                 ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_MELON               ].m_FullyOccupiesVoxel = true;
+	a_Info[E_BLOCK_MOB_SPAWNER         ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_MOSSY_COBBLESTONE   ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_MYCELIUM            ].m_FullyOccupiesVoxel = true;
 	a_Info[E_BLOCK_NETHERRACK          ].m_FullyOccupiesVoxel = true;
@@ -734,7 +743,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_NEW_LOG             ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_ACACIA_WOOD_STAIRS  ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_DARK_OAK_WOOD_STAIRS ].m_PlaceSound = "dig.wood";
-	a_Info[E_BLOCK_SLIME_BLOCK         ].m_PlaceSound = "dig.slime"; // I hope it is named slime, it's definetly a new sound type though...
+	a_Info[E_BLOCK_SLIME_BLOCK         ].m_PlaceSound = "mob.slime.big";
 	a_Info[E_BLOCK_BARRIER             ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_IRON_TRAPDOOR       ].m_PlaceSound = "dig.metal";
 	a_Info[E_BLOCK_PRISMARINE_BLOCK    ].m_PlaceSound = "dig.stone";
@@ -745,6 +754,8 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_BLOCK_OF_COAL       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_PACKED_ICE          ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_BIG_FLOWER          ].m_PlaceSound = "dig.grass";
+	a_Info[E_BLOCK_STANDING_BANNER     ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_WALL_BANNER         ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_RED_SANDSTONE       ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_RED_SANDSTONE_STAIRS ].m_PlaceSound = "dig.stone";
 	a_Info[E_BLOCK_NEW_STONE_SLAB      ].m_PlaceSound = "dig.stone";

@@ -152,41 +152,9 @@ void cCommandBlockEntity::SendTo(cClientHandle & a_Client)
 
 
 
-bool cCommandBlockEntity::LoadFromJson(const Json::Value & a_Value)
-{
-	m_PosX = a_Value.get("x", 0).asInt();
-	m_PosY = a_Value.get("y", 0).asInt();
-	m_PosZ = a_Value.get("z", 0).asInt();
-
-	m_Command    = a_Value.get("Command",     "").asString();
-	m_LastOutput = a_Value.get("LastOutput",  "").asString();
-	m_Result     = (NIBBLETYPE)a_Value.get("SuccessCount", 0).asInt();
-
-	return true;
-}
-
-
-
-
-
-void cCommandBlockEntity::SaveToJson(Json::Value & a_Value)
-{
-	a_Value["x"] = m_PosX;
-	a_Value["y"] = m_PosY;
-	a_Value["z"] = m_PosZ;
-
-	a_Value["Command"]      = m_Command;
-	a_Value["LastOutput"]   = m_LastOutput;
-	a_Value["SuccessCount"] = m_Result;
-}
-
-
-
-
-
 void cCommandBlockEntity::Execute()
 {
-	ASSERT(m_World != NULL);  // Execute should not be called before the command block is attached to a world
+	ASSERT(m_World != nullptr);  // Execute should not be called before the command block is attached to a world
 	
 	if (!m_World->AreCommandBlocksEnabled())
 	{

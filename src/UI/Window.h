@@ -23,6 +23,7 @@ class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
+class cMinecartWithChest;
 class cBeaconEntity;
 class cSlotArea;
 class cSlotAreaAnvil;
@@ -89,7 +90,7 @@ public:
 	
 	// tolua_begin
 	
-	/// Returns the item at the specified slot for the specified player. Returns NULL if invalid SlotNum requested
+	/// Returns the item at the specified slot for the specified player. Returns nullptr if invalid SlotNum requested
 	const cItem * GetSlot(cPlayer & a_Player, int a_SlotNum) const;
 	
 	/// Sets the item to the specified slot for the specified player
@@ -129,9 +130,6 @@ public:
 	
 	/// Sends the contents of the whole window to all clients of this window.
 	void BroadcastWholeWindow(void);
-	
-	/// Sends the progressbar to all clients of this window (same as SetProperty)
-	void BroadcastProgress(int a_Progressbar, int a_Value);
 
 	// tolua_begin
 	
@@ -139,10 +137,10 @@ public:
 	void SetWindowTitle(const AString & a_WindowTitle) { m_WindowTitle = a_WindowTitle; }
 	
 	/// Sends the UpdateWindowProperty (0x69) packet to all clients of the window
-	virtual void SetProperty(int a_Property, int a_Value);
+	virtual void SetProperty(short a_Property, short a_Value);
 	
 	/// Sends the UpdateWindowPropert(0x69) packet to the specified player
-	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player);
+	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player);
 
 	// tolua_end
 
@@ -191,13 +189,13 @@ protected:
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
-	If the global SlotNum is out of range, returns NULL
+	If the global SlotNum is out of range, returns nullptr
 	*/
 	cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum);
 	
 	/** Returns the correct slot area for the specified window-global SlotNum
 	Also returns the area-local SlotNum corresponding to the GlobalSlotNum
-	If the global SlotNum is out of range, returns NULL.
+	If the global SlotNum is out of range, returns nullptr.
 	Const version.
 	*/
 	const cSlotArea * GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum) const;
@@ -286,16 +284,16 @@ class cEnchantingWindow :
 	typedef cWindow super;
 public:
 	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
-	virtual void SetProperty(int a_Property, int a_Value, cPlayer & a_Player) override;
-	virtual void SetProperty(int a_Property, int a_Value) override;
+	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player) override;
+	virtual void SetProperty(short a_Property, short a_Value) override;
 
 	/** Return the Value of a Property */
-	int GetPropertyValue(int a_Property);
+	short GetPropertyValue(short a_Property);
 
 	cSlotArea * m_SlotArea;
 
 protected:
-	int m_PropertyValue[3];
+	short m_PropertyValue[3];
 	int m_BlockX, m_BlockY, m_BlockZ;
 };
 
@@ -356,6 +354,20 @@ protected:
 	cChestEntity * m_PrimaryChest;
 	cChestEntity * m_SecondaryChest;
 } ;
+
+
+
+
+
+class cMinecartWithChestWindow :
+	public cWindow
+{
+public:
+	cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart);
+	~cMinecartWithChestWindow();
+private:
+	cMinecartWithChest * m_ChestCart;
+};
 
 
 

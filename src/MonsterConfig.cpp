@@ -3,7 +3,7 @@
 
 #include "MonsterConfig.h"
 #include "Mobs/Monster.h"
-#include "inifile/iniFile.h"
+#include "IniFile.h"
 
 
 
@@ -47,7 +47,7 @@ cMonsterConfig::cMonsterConfig(void)
 cMonsterConfig::~cMonsterConfig()
 {
 	delete m_pState;
-	m_pState = NULL;
+	m_pState = nullptr;
 }
 
 

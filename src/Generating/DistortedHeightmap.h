@@ -35,7 +35,7 @@ public:
 		NIBBLETYPE BlockMeta;
 	} ;
 
-	cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen);
+	cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen);
 	
 protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
@@ -64,9 +64,14 @@ protected:
 	int m_CurChunkZ;
 	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
 
-	cBiomeGen &   m_BiomeGen;
-	cHeiGenBiomal m_UnderlyingHeiGen;  // This generator provides us with base heightmap (before distortion)
-	cHeiGenCache  m_HeightGen;         // Cache above m_UnderlyingHeiGen
+	/** The bime generator to query for biomes. */
+	cBiomeGenPtr m_BiomeGen;
+
+	/** The generator that provides the base heightmap (before distortion). */
+	cTerrainHeightGenPtr m_UnderlyingHeiGen;
+
+	/** Cache for m_UnderlyingHeiGen. */
+	cHeiGenCache  m_HeightGen;
 	
 	/// Heightmap for the current chunk, before distortion (from m_HeightGen). Used for optimization.
 	cChunkDef::HeightMap m_CurChunkHeights;

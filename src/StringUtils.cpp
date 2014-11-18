@@ -20,7 +20,7 @@
 
 AString & AppendVPrintf(AString & str, const char * format, va_list args)
 {
-	ASSERT(format != NULL);
+	ASSERT(format != nullptr);
 	
 	char buffer[2048];
 	size_t len;
@@ -441,10 +441,10 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 
 
 
-AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a_UTF16)
+AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 {
-	a_UTF16.clear();
-	a_UTF16.reserve(a_UTF8Length * 3);
+	AString UTF16;
+	UTF16.reserve(a_UTF8Length * 3);
 
 	const unsigned char * source    = (const unsigned char*)a_UTF8;
 	const unsigned char * sourceEnd = source + a_UTF8Length;
@@ -458,12 +458,12 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 		unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
 		if (source + extraBytesToRead >= sourceEnd)
 		{
-			return a_UTF16;
+			return UTF16;
 		}
 		// Do this check whether lenient or strict
 		if (!isLegalUTF8(source, extraBytesToRead + 1))
 		{
-			return a_UTF16;
+			return UTF16;
 		}
 		
 		// The cases all fall through. See "Note A" below.
@@ -487,13 +487,13 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 				ch = ' ';
 			}
 			unsigned short v = htons((unsigned short)ch);
-			a_UTF16.append((const char *)&v, 2);
+			UTF16.append((const char *)&v, 2);
 		}
 		else if (ch > UNI_MAX_UTF16)
 		{
 			// Invalid value, replace with a space
 			unsigned short v = htons(' ');
-			a_UTF16.append((const char *)&v, 2);
+			UTF16.append((const char *)&v, 2);
 		}
 		else
 		{
@@ -501,11 +501,11 @@ AString & UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length, AString & a
 			ch -= halfBase;
 			unsigned short v1 = htons((ch >> halfShift) + UNI_SUR_HIGH_START);
 			unsigned short v2 = htons((ch & halfMask) + UNI_SUR_LOW_START);
-			a_UTF16.append((const char *)&v1, 2);
-			a_UTF16.append((const char *)&v2, 2);
+			UTF16.append((const char *)&v1, 2);
+			UTF16.append((const char *)&v2, 2);
 		}
 	}
-	return a_UTF16;
+	return UTF16;
 }
 
 /*
@@ -562,7 +562,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		#else
 		int Count = sprintf(line, "%08x:", (unsigned)i);
 		#endif
-		// Remove the terminating NULL / leftover garbage in line, after the sprintf-ed value
+		// Remove the terminating nullptr / leftover garbage in line, after the sprintf-ed value
 		memset(line + Count, 32, sizeof(line) - Count);
 		p = line + 10;
 		q = p + 2 + a_BytesPerLine * 3 + 1;

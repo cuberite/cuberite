@@ -18,8 +18,8 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4, 1.7.2, 1.7.4, 1.7.5, 1.7.6, 1.7.7, 1.7.8, 1.7.9, 1.7.10, 1.8"
-#define MCS_PROTOCOL_VERSIONS "29, 39, 47, 49, 51, 60, 61, 73, 74, 77, 78, 4, 5"
+#define MCS_CLIENT_VERSIONS "1.7.x, 1.8"
+#define MCS_PROTOCOL_VERSIONS "4, 5, 47"
 
 
 
@@ -33,22 +33,6 @@ class cProtocolRecognizer :
 public:
 	enum
 	{
-		PROTO_VERSION_1_2_5 = 29,
-		PROTO_VERSION_1_3_2 = 39,
-		PROTO_VERSION_1_4_2 = 47,
-		PROTO_VERSION_1_4_4 = 49,
-		PROTO_VERSION_1_4_6 = 51,
-		PROTO_VERSION_1_5_0 = 60,
-		PROTO_VERSION_1_5_2 = 61,
-		PROTO_VERSION_1_6_1 = 73,
-		PROTO_VERSION_1_6_2 = 74,
-		PROTO_VERSION_1_6_3 = 77,
-		PROTO_VERSION_1_6_4 = 78,
-		
-		PROTO_VERSION_NEXT,
-		PROTO_VERSION_LATEST = PROTO_VERSION_NEXT - 1,  ///< Automatically assigned to the last protocol version, this serves as the default for PrimaryServerVersion
-
-		// These will be kept "under" the next / latest, because the next and latest are only needed for previous protocols
 		PROTO_VERSION_1_7_2 = 4,
 		PROTO_VERSION_1_7_6 = 5,
 		PROTO_VERSION_1_8_0 = 47,
@@ -137,7 +121,7 @@ public:
 	virtual void SendWholeInventory             (const cWindow & a_Window) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
-	virtual void SendWindowProperty             (const cWindow & a_Window, int a_Property, int a_Value) override;
+	virtual void SendWindowProperty             (const cWindow & a_Window, short a_Property, short a_Value) override;
 	
 	virtual AString GetAuthServerID(void) override;
 
@@ -150,23 +134,11 @@ protected:
 	/// Tries to recognize protocol based on m_Buffer contents; returns true if recognized
 	bool TryRecognizeProtocol(void);
 	
-	/** Tries to recognize a protocol in the length-less family, based on m_Buffer; returns true if recognized.
-	Handles protocols before release 1.7, that didn't include packet lengths, and started with a 0x02 handshake packet
-	Note that length-less server ping is handled directly in TryRecognizeProtocol(), this function is called only
-	when the 0x02 Handshake packet has been received
-	*/
-	bool TryRecognizeLengthlessProtocol(void);
-	
-	/** Tries to recognize a protocol in the leghted family (1.7+), based on m_Buffer; returns true if recognized.
+	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
 	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining
 	**/
 	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
-	
-	/** Called when the recognizer gets a length-less protocol's server ping packet
-	Responds with server stats and destroys the client.
-	*/
-	void SendLengthlessServerPing(void);
 } ;
 
 

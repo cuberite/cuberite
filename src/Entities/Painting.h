@@ -11,15 +11,22 @@
 class cPainting :
 	public cEntity
 {
-	// tolua_end
 	typedef cEntity super;
 
 public:
+
+	// tolua_end
+
 	CLASS_PROTODEF(cPainting)
 
 	cPainting(const AString & a_Name, int a_Direction, double a_X, double a_Y, double a_Z);
-	const AString & GetName(void) const { return m_Name; }  // tolua_export
-	int GetDirection(void) const { return m_Direction; }  // tolua_export
+
+	// tolua_begin
+
+	const AString & GetName(void) const { return m_Name; }
+	int GetDirection(void) const { return m_Direction; }
+
+	// tolua_end
 
 private:
 

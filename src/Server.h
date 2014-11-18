@@ -56,7 +56,7 @@ class cServer  // tolua_export
 public:  // tolua_export
 
 	virtual ~cServer() {}
-	bool InitServer(cIniFile & a_SettingsIni);
+	bool InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth);
 
 	// tolua_begin
 	
