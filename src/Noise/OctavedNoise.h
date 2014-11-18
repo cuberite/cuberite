@@ -34,7 +34,7 @@ public:
 	}
 
 
-	/** */
+	/** Adds a new octave to the list of octaves that compose this noise. */
 	void AddOctave(NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude)
 	{
 		m_Octaves.emplace_back(m_Seed, a_Frequency, a_Amplitude);
