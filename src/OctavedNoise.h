@@ -32,7 +32,7 @@ public:
 			oct->SetSeed(a_Seed);
 		}
 	}
-	
+
 
 	/** */
 	void AddOctave(NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude)
@@ -56,7 +56,7 @@ public:
 			ASSERT(!"Perlin: No octaves to generate!");
 			return;
 		}
-	
+
 		// Allocate the workspace on the heap, if it wasn't given:
 		std::unique_ptr<NOISE_DATATYPE[]> workspaceHeap;
 		if (a_Workspace == nullptr)
@@ -78,7 +78,7 @@ public:
 		{
 			a_Array[i] = a_Workspace[i] * Amplitude;
 		}
-	
+
 		// Add each octave:
 		for (auto itr = m_Octaves.cbegin() + 1, end = m_Octaves.cend(); itr != end; ++itr)
 		{
@@ -96,8 +96,8 @@ public:
 			}
 		}  // for itr - m_Octaves[]
 	}
-	
-	
+
+
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
 		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
@@ -114,7 +114,7 @@ public:
 			ASSERT(!"Perlin: No octaves to generate!");
 			return;
 		}
-	
+
 		// Allocate the workspace on the heap, if it wasn't given:
 		std::unique_ptr<NOISE_DATATYPE[]> workspaceHeap;
 		if (a_Workspace == nullptr)
@@ -137,7 +137,7 @@ public:
 		{
 			a_Array[i] = a_Workspace[i] * Amplitude;
 		}
-	
+
 		// Add each octave:
 		for (auto itr = m_Octaves.cbegin() + 1, end = m_Octaves.cend(); itr != end; ++itr)
 		{
@@ -169,7 +169,7 @@ protected:
 
 		/** Value multiplier. */
 		NOISE_DATATYPE m_Amplitude;
-		
+
 		cOctave(int a_Seed, NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude) :
 			m_Noise(a_Seed),
 			m_Frequency(a_Frequency),
@@ -181,7 +181,7 @@ protected:
 
 
 	/** The seed used by the underlying generators. */
-	int m_Seed; 
+	int m_Seed;
 
 	/** The octaves that compose this noise. */
 	cOctaves m_Octaves;

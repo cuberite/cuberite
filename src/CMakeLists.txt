@@ -124,6 +124,7 @@ SET (HDRS
 	OctavedNoise.h
 	ProbabDistrib.h
 	RankManager.h
+	RidgedNoise.h
 	RCONServer.h
 	Root.h
 	Scoreboard.h
