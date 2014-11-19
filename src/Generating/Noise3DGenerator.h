@@ -47,7 +47,8 @@ protected:
 	/** The base 3D noise source for the actual composition */
 	cOctavedNoise<cInterp5DegNoise> m_Perlin;
 
-	cCubicNoise  m_Cubic;    // The noise used for heightmap directing
+	/** The noise used for heightmap directing. */
+	cOctavedNoise<cInterp5DegNoise> m_Cubic;
 	
 	int            m_SeaLevel;
 	NOISE_DATATYPE m_HeightAmplification;

@@ -18,6 +18,134 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cInterpolCell2D:
+
+template <typename T>
+class cInterpolCell2D
+{
+public:
+	cInterpolCell2D(
+		const cNoise & a_Noise,    ///< Noise to use for generating the random values
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
+		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
+		const NOISE_DATATYPE * a_FracY   ///< Pointer to the attay that stores the Y fractional values
+	):
+		m_Noise(a_Noise),
+		m_WorkRnds(&m_Workspace1),
+		m_CurFloorX(0),
+		m_CurFloorY(0),
+		m_Array(a_Array),
+		m_SizeX(a_SizeX),
+		m_SizeY(a_SizeY),
+		m_FracX(a_FracX),
+		m_FracY(a_FracY)
+	{
+	}
+	
+
+	/** Generates part of the output noise array using the current m_WorkRnds[] values */
+	void Generate(
+		int a_FromX, int a_ToX,
+		int a_FromY, int a_ToY
+	)
+	{
+		for (int y = a_FromY; y < a_ToY; y++)
+		{
+			NOISE_DATATYPE Interp[2];
+			NOISE_DATATYPE FracY = T::coeff(m_FracY[y]);
+			Interp[0] = Lerp((*m_WorkRnds)[0][0], (*m_WorkRnds)[0][1], FracY);
+			Interp[1] = Lerp((*m_WorkRnds)[1][0], (*m_WorkRnds)[1][1], FracY);
+			int idx = y * m_SizeX + a_FromX;
+			for (int x = a_FromX; x < a_ToX; x++)
+			{
+				m_Array[idx++] = Lerp(Interp[0], Interp[1], T::coeff(m_FracX[x]));
+			}  // for x
+		}  // for y
+	}
+	
+
+	/** Initializes m_WorkRnds[] with the specified values of the noise at the specified integral coords. */
+	void InitWorkRnds(int a_FloorX, int a_FloorY)
+	{
+		m_CurFloorX = a_FloorX;
+		m_CurFloorY = a_FloorY;
+		(*m_WorkRnds)[0][0] = m_Noise.IntNoise2D(m_CurFloorX,     m_CurFloorY);
+		(*m_WorkRnds)[0][1] = m_Noise.IntNoise2D(m_CurFloorX,     m_CurFloorY + 1);
+		(*m_WorkRnds)[1][0] = m_Noise.IntNoise2D(m_CurFloorX + 1, m_CurFloorY);
+		(*m_WorkRnds)[1][1] = m_Noise.IntNoise2D(m_CurFloorX + 1, m_CurFloorY + 1);
+	}
+	
+
+	/** Updates m_WorkRnds[] for the new integral coords */
+	void Move(int a_NewFloorX, int a_NewFloorY)
+	{
+		// Swap the doublebuffer:
+		int OldFloorX = m_CurFloorX;
+		int OldFloorY = m_CurFloorY;
+		Workspace * OldWorkRnds = m_WorkRnds;
+		m_WorkRnds = (m_WorkRnds == &m_Workspace1) ? &m_Workspace2 : &m_Workspace1;
+	
+		// Reuse as much of the old workspace as possible:
+		// TODO: Try out if simply calculating all 4 elements each time is faster than this monster loop
+		int DiffX = OldFloorX - a_NewFloorX;
+		int DiffY = OldFloorY - a_NewFloorY;
+		for (int x = 0; x < 2; x++)
+		{
+			int cx = a_NewFloorX + x;
+			int OldX = x - DiffX;  // Where would this X be in the old grid?
+			for (int y = 0; y < 2; y++)
+			{
+				int cy = a_NewFloorY + y;
+				int OldY = y - DiffY;  // Where would this Y be in the old grid?
+				if ((OldX >= 0) && (OldX < 2) && (OldY >= 0) && (OldY < 2))
+				{
+					(*m_WorkRnds)[x][y] = (*OldWorkRnds)[OldX][OldY];
+				}
+				else
+				{
+					(*m_WorkRnds)[x][y] = (NOISE_DATATYPE)m_Noise.IntNoise2D(cx, cy);
+				}
+			}
+		}
+		m_CurFloorX = a_NewFloorX;
+		m_CurFloorY = a_NewFloorY;
+	}
+
+protected:
+	typedef NOISE_DATATYPE Workspace[2][2];
+	
+	/** The noise used for generating the values at integral coords. */
+	const cNoise & m_Noise;
+	
+	/** The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering) */
+	Workspace * m_WorkRnds;
+
+	/** Buffer 1 for workspace doublebuffering, used in Move() */
+	Workspace m_Workspace1;
+
+	/** Buffer 2 for workspace doublebuffering, used in Move() */
+	Workspace m_Workspace2;
+
+	/** Coords of the currently calculated m_WorkRnds[]. */
+	int m_CurFloorX, m_CurFloorY;
+	
+	/** The output array to generate into. */
+	NOISE_DATATYPE * m_Array;
+
+	/** Dimensions of the output array. */
+	int m_SizeX, m_SizeY;
+
+	/** Arrays holding the fractional values of the coords in each direction. */
+	const NOISE_DATATYPE * m_FracX;
+	const NOISE_DATATYPE * m_FracY;
+} ;
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cInterpolCell3D:
 
 /** Holds a cache of the last calculated integral noise values and interpolates between them en masse.
@@ -212,33 +340,44 @@ public:
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
 	) const
 	{
-		// Check params:
-		ASSERT(a_SizeX > 1);
-		ASSERT(a_SizeY > 1);
-
-		// Generate the noise:
-		size_t idx = 0;
-		for (int y = 0; y < a_SizeY; y++)
+		ASSERT(a_SizeX > 0);
+		ASSERT(a_SizeY > 0);
+		ASSERT(a_SizeX < MAX_SIZE);
+		ASSERT(a_SizeY < MAX_SIZE);
+		ASSERT(a_StartX < a_EndX);
+		ASSERT(a_StartY < a_EndY);
+	
+		// Calculate the integral and fractional parts of each coord:
+		int FloorX[MAX_SIZE];
+		int FloorY[MAX_SIZE];
+		NOISE_DATATYPE FracX[MAX_SIZE];
+		NOISE_DATATYPE FracY[MAX_SIZE];
+		int SameX[MAX_SIZE];
+		int SameY[MAX_SIZE];
+		int NumSameX, NumSameY;
+		CalcFloorFrac(a_SizeX, a_StartX, a_EndX, FloorX, FracX, SameX, NumSameX);
+		CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
+	
+		cInterpolCell2D<T> Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
+	
+		Cell.InitWorkRnds(FloorX[0], FloorY[0]);
+	
+		// Calculate query values using Cell:
+		int FromY = 0;
+		for (int y = 0; y < NumSameY; y++)
 		{
-			NOISE_DATATYPE ratioY = static_cast<NOISE_DATATYPE>(y) / (a_SizeY - 1);
-			NOISE_DATATYPE noiseY = Lerp(a_StartY, a_EndY, ratioY);
-			int noiseYInt = FAST_FLOOR(noiseY);
-			NOISE_DATATYPE ratioY = typename T(noiseY - static_cast<NOISE_DATATYPE>(noiseYInt));
-			for (int x = 0; x < a_SizeX; x++)
+			int ToY = FromY + SameY[y];
+			int FromX = 0;
+			int CurFloorY = FloorY[FromY];
+			for (int x = 0; x < NumSameX; x++)
 			{
-				NOISE_DATATYPE ratioX = static_cast<NOISE_DATATYPE>(x) / (a_SizeX - 1);
-				NOISE_DATATYPE noiseX = Lerp(a_StartX, a_EndX, ratioX);
-				int noiseXInt = FAST_FLOOR(noiseX);
-				NOISE_DATATYPE ratioX = typename T(noiseX - static_cast<NOISE_DATATYPE>(noiseXInt));
-
-				NOISE_DATATYPE valx0y0 = m_Noise.IntNoise2D(noiseXInt, noiseYInt);
-				NOISE_DATATYPE valx1y0 = m_Noise.IntNoise2D(noiseXInt + 1, noiseYInt);
-				NOISE_DATATYPE valx0y1 = m_Noise.IntNoise2D(noiseXInt, noiseYInt + 1);
-				NOISE_DATATYPE valx1y1 = m_Noise.IntNoise2D(noiseXInt + 1, noiseYInt + 1);
-				NOISE_DATATYPE valx0 = Lerp(valx0y0, valx0y1, ratioY);
-				NOISE_DATATYPE valx1 = Lerp(valx1y1, valx1y1, ratioY);
-				a_Array[idx++] = Lerp(valx0, valx1, ratioX);
+				int ToX = FromX + SameX[x];
+				Cell.Generate(FromX, ToX, FromY, ToY);
+				Cell.Move(FloorX[ToX], CurFloorY);
+				FromX = ToX;
 			}  // for x
+			Cell.Move(FloorX[0], FloorY[ToY]);
+			FromY = ToY;
 		}  // for y
 	}
 

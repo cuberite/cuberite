@@ -69,6 +69,15 @@ static class cInterpolNoiseSpeedTest
 public:
 	cInterpolNoiseSpeedTest(void)
 	{
+		TestSpeed2D();
+		TestSpeed3D();
+		printf("InterpolNoise speed comparison finished.\n");
+	}
+
+
+	/** Compare the speed of the 3D InterpolNoise vs 3D CubicNoise. */
+	void TestSpeed3D(void)
+	{
 		printf("Evaluating 3D noise performance...\n");
 		static const int SIZE_X = 128;
 		static const int SIZE_Y = 128;
@@ -99,6 +108,38 @@ public:
 		printf("3D noise performance comparison finished.\n");
 	}
 
+
+	/** Compare the speed of the 2D InterpolNoise vs 2D CubicNoise. */
+	void TestSpeed2D(void)
+	{
+		printf("Evaluating 2D noise performance...\n");
+		static const int SIZE_X = 128;
+		static const int SIZE_Y = 128;
+		static const NOISE_DATATYPE MUL = 80;
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y]);
+		cTimer timer;
+
+		// Test the cInterpolNoise:
+		cInterpolNoise<Interp5Deg> interpNoise(1);
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 500; i++)
+		{
+			interpNoise.Generate2D(arr.get(), SIZE_X, SIZE_Y, MUL * i, MUL * i + MUL, 0, MUL);
+		}
+		long long end = timer.GetNowTime();
+		printf("InterpolNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+
+		// Test the cCubicNoise:
+		cCubicNoise cubicNoise(1);
+		start = timer.GetNowTime();
+		for (int i = 0; i < 500; i++)
+		{
+			cubicNoise.Generate2D(arr.get(), SIZE_X, SIZE_Y, MUL * i, MUL * i + MUL, 0, MUL);
+		}
+		end = timer.GetNowTime();
+		printf("CubicNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+		printf("2D noise performance comparison finished.\n");
+	}
 } g_InterpolNoiseSpeedTest;
 #endif
 
@@ -119,6 +160,12 @@ cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_Perlin.AddOctave(4,  0.25);
 	m_Perlin.AddOctave(8,  0.125);
 	m_Perlin.AddOctave(16, 0.0625);
+
+	m_Cubic.AddOctave(1,  1);
+	m_Cubic.AddOctave(2,  0.5);
+	m_Cubic.AddOctave(4,  0.25);
+	m_Cubic.AddOctave(8,  0.125);
+	m_Cubic.AddOctave(16, 0.0625);
 
 	#if 0
 	// DEBUG: Test the noise generation:
@@ -201,8 +248,8 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
 	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
-	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);
-	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 75);
+	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0.1);
+	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 68);
 	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 8);
 	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 8);
 	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 8);
@@ -280,23 +327,23 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
-	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
+	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 5, EndX / 5, StartZ / 5, EndZ / 5);
 	for (size_t i = 0; i < ARRAYCOUNT(Height); i++)
 	{
-		Height[i] = std::abs(Height[i]) * m_HeightAmplification + 1;
+		Height[i] = Height[i] * m_HeightAmplification;
 	}
 
 	// Modify the noise by height data:
 	for (int y = 0; y < DIM_Y; y++)
 	{
-		NOISE_DATATYPE AddHeight = (y * UPSCALE_Y - m_MidPoint) / 20;
-		AddHeight *= AddHeight * AddHeight;
+		NOISE_DATATYPE AddHeight = (y * UPSCALE_Y - m_MidPoint) / 30;
+		// AddHeight *= AddHeight * AddHeight;
 		for (int z = 0; z < DIM_Z; z++)
 		{
 			NOISE_DATATYPE * CurRow = &(NoiseO[y * DIM_X + z * DIM_X * DIM_Y]);
 			for (int x = 0; x < DIM_X; x++)
 			{
-				CurRow[x] += AddHeight / Height[x + DIM_X * z];
+				CurRow[x] += AddHeight + Height[x + DIM_X * z];
 			}
 		}
 	}
