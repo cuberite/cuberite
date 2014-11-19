@@ -47,13 +47,13 @@ public:
 		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
 		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
 		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash. Must be valid.
+		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash.
 	) const
 	{
 		// Check that state is alright:
 		if (m_Octaves.empty())
 		{
-			ASSERT(!"Perlin: No octaves to generate!");
+			ASSERT(!"cOctavedNoise: No octaves to generate!");
 			return;
 		}
 
@@ -111,7 +111,7 @@ public:
 		// Check that state is alright:
 		if (m_Octaves.empty())
 		{
-			ASSERT(!"Perlin: No octaves to generate!");
+			ASSERT(!"cOctavedNoise: No octaves to generate!");
 			return;
 		}
 
