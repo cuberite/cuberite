@@ -741,28 +741,32 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 	{
 		case dimEnd:
 		{
-			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome", "End");
-			a_IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
 			break;
 		}
 		case dimOverworld:
 		{
-			a_IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
-			a_IniFile.GetValueSet("Generator", "HeightGen", "DistortedHeightmap");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "DistortedHeightmap");
-			a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
 			break;
 		}
 		case dimNether:
 		{
-			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome", "Nether");
-			a_IniFile.GetValueSet("Generator", "HeightGen", "Flat");
-			a_IniFile.GetValueSet("Generator", "FlatHeight", "128");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "Nether");
-			a_IniFile.GetValueSet("Generator", "Finishers", "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Generator",        "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",         "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome",    "Nether");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",         "HeightMap");
+			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
+			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
+			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
+			a_IniFile.GetValueSet("Generator", "Finishers",        "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
 			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
 			break;
 		}
