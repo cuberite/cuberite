@@ -197,7 +197,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 
 void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 {
-	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "ClassicSeaLevel",    m_SeaLevel);
+	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "SeaLevel",           m_SeaLevel);
 	m_BeachHeight      = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", m_BeachHeight);
 	m_BeachDepth       = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth",  m_BeachDepth);
 	m_BlockTop         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass").m_ItemType);

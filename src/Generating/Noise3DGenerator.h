@@ -93,9 +93,6 @@ protected:
 	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
 	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_BaseNoise;
 	
-	/** Block height of the sealevel, used for composing the terrain. */
-	int m_SeaLevel;
-
 	/** The main parameter of the generator, specifies the slope of the vertical linear gradient.
 	A higher value means a steeper slope and a smaller total amplitude of the generated terrain. */
 	NOISE_DATATYPE m_HeightAmplification;

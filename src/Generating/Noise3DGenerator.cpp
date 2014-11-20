@@ -166,69 +166,6 @@ cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_Cubic.AddOctave(4,  0.25);
 	m_Cubic.AddOctave(8,  0.125);
 	m_Cubic.AddOctave(16, 0.0625);
-
-	#if 0
-	// DEBUG: Test the noise generation:
-	// NOTE: In order to be able to run MCS with this code, you need to increase the default thread stack size
-	// In MSVC, it is done in Project Settings -> Configuration Properties -> Linker -> System, set Stack reserve size to at least 64M
-	m_SeaLevel            = 62;
-	m_HeightAmplification = 0;
-	m_MidPoint            = 75;
-	m_FrequencyX          = 4;
-	m_FrequencyY          = 4;
-	m_FrequencyZ          = 4;
-	m_AirThreshold        = 0.5;
-
-	const int NumChunks = 4;
-	NOISE_DATATYPE Noise[NumChunks][cChunkDef::Width * cChunkDef::Width * cChunkDef::Height];
-	for (int x = 0; x < NumChunks; x++)
-	{
-		GenerateNoiseArray(x, 5, Noise[x]);
-	}
-
-	// Save in XY cuts:
-	cFile f1;
-	if (f1.Open("Test_XY.grab", cFile::fmWrite))
-	{
-		for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			for (int y = 0; y < cChunkDef::Height; y++)
-			{
-				for (int i = 0; i < NumChunks; i++)
-				{
-					int idx = y * cChunkDef::Width + z * cChunkDef::Width * cChunkDef::Height;
-					unsigned char buf[cChunkDef::Width];
-					for (int x = 0; x < cChunkDef::Width; x++)
-					{
-						buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 32 * Noise[i][idx++]))));
-					}
-					f1.Write(buf, cChunkDef::Width);
-				}
-			}  // for y
-		}  // for z
-	}  // if (XY file open)
-
-	cFile f2;
-	if (f2.Open("Test_XZ.grab", cFile::fmWrite))
-	{
-		for (int y = 0; y < cChunkDef::Height; y++)
-		{
-			for (int z = 0; z < cChunkDef::Width; z++)
-			{
-				for (int i = 0; i < NumChunks; i++)
-				{
-					int idx = y * cChunkDef::Width + z * cChunkDef::Width * cChunkDef::Height;
-					unsigned char buf[cChunkDef::Width];
-					for (int x = 0; x < cChunkDef::Width; x++)
-					{
-						buf[x] = (unsigned char)(std::min(256, std::max(0, (int)(128 + 32 * Noise[i][idx++]))));
-					}
-					f2.Write(buf, cChunkDef::Width);
-				}
-			}  // for z
-		}  // for y
-	}  // if (XZ file open)
-	#endif  // 0
 }
 
 
@@ -247,7 +184,7 @@ cNoise3DGenerator::~cNoise3DGenerator()
 void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
-	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
+	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "SeaLevel", 62);
 	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0.1);
 	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 68);
 	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 8);
@@ -455,7 +392,6 @@ void cNoise3DComposable::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
 	// The defaults generate extreme hills terrain
-	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
 	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0.045);
 	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 75);
 	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 40);
@@ -608,7 +544,7 @@ void cBiomalNoise3DComposable::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
 	// The defaults generate extreme hills terrain
-	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "BiomalNoise3DSeaLevel", 62);
+	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "SeaLevel", 62);
 	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DFrequencyX", 40);
 	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DFrequencyY", 40);
 	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "BiomalNoise3DFrequencyZ", 40);
