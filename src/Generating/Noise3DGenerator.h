@@ -81,17 +81,17 @@ public:
 	void Initialize(cIniFile & a_IniFile);
 
 protected:
-	/** The noise that is used to choose between density noise A and B. */
-	cPerlinNoise m_ChoiceNoise;
+	/** The 3D noise that is used to choose between density noise A and B. */
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_ChoiceNoise;
 
 	/** Density 3D noise, variant A. */
-	cPerlinNoise m_DensityNoiseA;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseA;
 
 	/** Density 3D noise, variant B. */
-	cPerlinNoise m_DensityNoiseB;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseB;
 
 	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
-	cPerlinNoise m_BaseNoise;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_BaseNoise;
 	
 	/** Block height of the sealevel, used for composing the terrain. */
 	int m_SeaLevel;
@@ -155,16 +155,16 @@ protected:
 
 
 	/** The noise that is used to choose between density noise A and B. */
-	cPerlinNoise m_ChoiceNoise;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_ChoiceNoise;
 
 	/** Density 3D noise, variant A. */
-	cPerlinNoise m_DensityNoiseA;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseA;
 
 	/** Density 3D noise, variant B. */
-	cPerlinNoise m_DensityNoiseB;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseB;
 
 	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
-	cPerlinNoise m_BaseNoise;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_BaseNoise;
 
 	/** The underlying biome generator. */
 	cBiomeGenPtr m_BiomeGen;
