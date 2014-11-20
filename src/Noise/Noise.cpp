@@ -2,8 +2,109 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Noise.h"
+#include "OSSupport/Timer.h"
 
 #define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
+
+
+
+
+
+#if 0
+/** cImprovedPerlin noise test suite:
+- Generate a rather large 2D and 3D noise array and output it to a file
+- Compare performance of cCubicNoise and cImprovedNoise, both in single-value and 3D-array usages */
+static class cImprovedPerlinNoiseTest
+{
+public:
+	cImprovedPerlinNoiseTest(void)
+	{
+		printf("Performing Improved Perlin Noise tests...\n");
+		TestImage();
+		TestSpeed();
+		TestSpeedArr();
+		printf("Improved Perlin Noise tests complete.\n");
+	}
+
+
+	/** Tests the noise by generating 2D and 3D images and dumping them to files. */
+	void TestImage(void)
+	{
+		static const int SIZE_X = 256;
+		static const int SIZE_Y = 256;
+		static const int SIZE_Z = 16;
+
+		cImprovedNoise noise(1);
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
+		noise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
+		Debug3DNoise(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, "ImprovedPerlinNoiseTest3D", 128);
+		noise.Generate2D(arr.get(), SIZE_X, SIZE_Y, 0, 14, 15, 28);
+		Debug2DNoise(arr.get(), SIZE_X, SIZE_Y, "ImprovedPerlinNoiseTest2D", 128);
+	}
+
+
+	/** Tests the speeds of cImprovedPerlin and cCubicNoise when generating individual values. */
+	void TestSpeed(void)
+	{
+		cImprovedNoise improvedNoise(1);
+		cNoise         noise(1);
+		cTimer timer;
+
+		// Measure the improvedNoise:
+		NOISE_DATATYPE sum = 0;
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 100000000; i++)
+		{
+			sum += improvedNoise.GetValueAt(i, 0, -i);
+		}
+		long long finish = timer.GetNowTime();
+		printf("cImprovedNoise took %.2f seconds; total is %f.\n", static_cast<float>(finish - start) / 1000.0f, sum);
+
+		// Measure the cubicNoise:
+		sum = 0;
+		start = timer.GetNowTime();
+		for (int i = 0; i < 100000000; i++)
+		{
+			sum += noise.IntNoise3D(i, 0, -i);
+		}
+		finish = timer.GetNowTime();
+		printf("cCubicNoise took %.2f seconds; total is %f.\n", static_cast<float>(finish - start) / 1000.0f, sum);
+	}
+
+
+	/** Tests the speeds of cImprovedPerlin and cCubicNoise when generating arrays. */
+	void TestSpeedArr(void)
+	{
+		static const int SIZE_X = 256;
+		static const int SIZE_Y = 256;
+		static const int SIZE_Z = 16;
+
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
+		cTimer timer;
+		cImprovedNoise improvedNoise(1);
+		cCubicNoise    cubicNoise(1);
+
+		// Measure the improvedNoise:
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 40; i++)
+		{
+			improvedNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
+		}
+		long long finish = timer.GetNowTime();
+		printf("cImprovedNoise(arr) took %.2f seconds.\n", static_cast<float>(finish - start) / 1000.0f);
+
+		// Measure the cubicNoise:
+		start = timer.GetNowTime();
+		for (int i = 0; i < 40; i++)
+		{
+			cubicNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, 0, 14, 0, 14, 0, 14);
+		}
+		finish = timer.GetNowTime();
+		printf("cCubicNoise(arr) took %.2f seconds.\n", static_cast<float>(finish - start) / 1000.0f);
+	}
+} g_Test;
+
+#endif
 
 
 
@@ -12,7 +113,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_SizeZ, const AString & a_FileNameBase)
+void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
@@ -29,7 +130,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 				unsigned char buf[BUF_SIZE];
 				for (int x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f1.Write(buf, a_SizeX);
 			}  // for y
@@ -50,7 +151,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 				unsigned char buf[BUF_SIZE];
 				for (int x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+					buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f2.Write(buf, a_SizeX);
 			}  // for z
@@ -65,7 +166,7 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, int 
 
 
 
-void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase)
+void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
@@ -79,7 +180,7 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, int a_SizeX, int a_SizeY, cons
 			unsigned char buf[BUF_SIZE];
 			for (int x = 0; x < a_SizeX; x++)
 			{
-				buf[x] = (unsigned char)(std::min(255, std::max(0, (int)(128 + 32 * a_Noise[idx++]))));
+				buf[x] = static_cast<unsigned char>(Clamp((int)(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 			}
 			f1.Write(buf, a_SizeX);
 		}  // for y
@@ -594,13 +695,6 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 ////////////////////////////////////////////////////////////////////////////////
 // cCubicNoise:
 
-#ifdef _DEBUG
-	int cCubicNoise::m_NumSingleX = 0;
-	int cCubicNoise::m_NumSingleXY = 0;
-	int cCubicNoise::m_NumSingleY = 0;
-	int cCubicNoise::m_NumCalls = 0;
-#endif  // _DEBUG
-
 cCubicNoise::cCubicNoise(int a_Seed) :
 	m_Noise(a_Seed)
 {
@@ -638,23 +732,6 @@ void cCubicNoise::Generate2D(
 	cCubicCell2D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, FracX, FracY);
 	
 	Cell.InitWorkRnds(FloorX[0], FloorY[0]);
-	
-	#ifdef _DEBUG
-		// Statistics on the noise-space coords:
-		if (NumSameX == 1)
-		{
-			m_NumSingleX++;
-			if (NumSameY == 1)
-			{
-				m_NumSingleXY++;
-			}
-		}
-		if (NumSameY == 1)
-		{
-			m_NumSingleY++;
-		}
-		m_NumCalls++;
-	#endif  // _DEBUG
 	
 	// Calculate query values using Cell:
 	int FromY = 0;
@@ -792,340 +869,160 @@ void cCubicNoise::CalcFloorFrac(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cPerlinNoise:
+// cImprovedNoise:
 
-cPerlinNoise::cPerlinNoise(void) :
-	m_Seed(0)
+cImprovedNoise::cImprovedNoise(int a_Seed)
 {
+	// Initialize the permutations with identity:
+	for (int i = 0; i < 256; i++)
+	{
+		m_Perm[i] = i;
+	}
+
+	// Randomize the permutation table - swap each element with a random other element:
+	cNoise noise(a_Seed);
+	for (int i = 0; i < 256; i++)
+	{
+		int rnd = (noise.IntNoise1DInt(i) / 7) % 256;
+		std::swap(m_Perm[i], m_Perm[rnd]);
+	}
+
+	// Copy the lower 256 entries into upper 256 entries:
+	for (int i = 0; i < 256; i++)
+	{
+		m_Perm[i + 256] = m_Perm[i];
+	}
 }
 
 
 
 
 
-cPerlinNoise::cPerlinNoise(int a_Seed) :
-	m_Seed(a_Seed)
-{
-}
-
-
-
-
-
-void cPerlinNoise::SetSeed(int a_Seed)
-{
-	m_Seed = a_Seed;
-}
-
-
-
-
-
-void cPerlinNoise::AddOctave(float a_Frequency, float a_Amplitude)
-{
-	m_Octaves.push_back(cOctave(m_Seed * ((int)m_Octaves.size() + 4) * 4 + 1024, a_Frequency, a_Amplitude));
-}
-
-
-
-
-
-void cPerlinNoise::Generate2D(
-	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-	int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
+void cImprovedNoise::Generate2D(
+	NOISE_DATATYPE * a_Array,
+	int a_SizeX, int a_SizeY,
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY
 ) const
 {
-	if (m_Octaves.empty())
+	size_t idx = 0;
+	for (int y = 0; y < a_SizeY; y++)
 	{
-		// No work to be done
-		ASSERT(!"Perlin: No octaves to generate!");
-		return;
-	}
-	
-	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
-	int ArrayCount = a_SizeX * a_SizeY;
-	if (ShouldFreeWorkspace)
-	{
-		a_Workspace = new NOISE_DATATYPE[ArrayCount];
-	}
-	
-	// Generate the first octave directly into array:
-	const cOctave & FirstOctave = m_Octaves.front();
-	
-	FirstOctave.m_Noise.Generate2D(
-		a_Workspace, a_SizeX, a_SizeY,
-		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
-	);
-	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
-	for (int i = 0; i < ArrayCount; i++)
-	{
-		a_Array[i] = a_Workspace[i] * Amplitude;
-	}
-	
-	// Add each octave:
-	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
-	{
-		// Generate cubic noise for the octave:
-		itr->m_Noise.Generate2D(
-			a_Workspace, a_SizeX, a_SizeY,
-			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
-			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency
-		);
-		// Add the cubic noise into the output:
-		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
-		for (int i = 0; i < ArrayCount; i++)
+		NOISE_DATATYPE ratioY = static_cast<NOISE_DATATYPE>(y) / (a_SizeY - 1);
+		NOISE_DATATYPE noiseY = Lerp(a_StartY, a_EndY, ratioY);
+		int noiseYInt = FAST_FLOOR(noiseY);
+		int yCoord = noiseYInt & 255;
+		NOISE_DATATYPE noiseYFrac = noiseY - noiseYInt;
+		NOISE_DATATYPE fadeY = Fade(noiseYFrac);
+		for (int x = 0; x < a_SizeX; x++)
 		{
-			a_Array[i] += a_Workspace[i] * Amplitude;
-		}
-	}
-	
-	if (ShouldFreeWorkspace)
-	{
-		delete[] a_Workspace;
-		a_Workspace = nullptr;
-	}
+			NOISE_DATATYPE ratioX = static_cast<NOISE_DATATYPE>(x) / (a_SizeX - 1);
+			NOISE_DATATYPE noiseX = Lerp(a_StartX, a_EndX, ratioX);
+			int noiseXInt = FAST_FLOOR(noiseX);
+			int xCoord = noiseXInt & 255;
+			NOISE_DATATYPE noiseXFrac = noiseX - noiseXInt;
+			NOISE_DATATYPE fadeX = Fade(noiseXFrac);
+
+			// Hash the coordinates:
+			int A  = m_Perm[xCoord] + yCoord;
+			int AA = m_Perm[A];
+			int AB = m_Perm[A + 1];
+			int B  = m_Perm[xCoord + 1] + yCoord;
+			int BA = m_Perm[B];
+			int BB = m_Perm[B + 1];
+
+			// Lerp the gradients:
+			a_Array[idx++] = Lerp(
+				Lerp(Grad(m_Perm[AA], noiseXFrac, noiseYFrac,     0), Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac,     0), fadeX),
+				Lerp(Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, 0), Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, 0), fadeX),
+				fadeY
+			);
+		}  // for x
+	}  // for y
 }
 
 
 
 
 
-void cPerlinNoise::Generate3D(
-	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
+void cImprovedNoise::Generate3D(
+	NOISE_DATATYPE * a_Array,
+	int a_SizeX, int a_SizeY, int a_SizeZ,
+	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
+	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,
+	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ
 ) const
 {
-	if (m_Octaves.empty())
+	size_t idx = 0;
+	for (int z = 0; z < a_SizeZ; z++)
 	{
-		// No work to be done
-		ASSERT(!"Perlin: No octaves to generate!");
-		return;
-	}
-	
-	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
-	int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
-	if (ShouldFreeWorkspace)
-	{
-		a_Workspace = new NOISE_DATATYPE[ArrayCount];
-	}
-	
-	// Generate the first octave directly into array:
-	const cOctave & FirstOctave = m_Octaves.front();
-
-	FirstOctave.m_Noise.Generate3D(
-		a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
-		a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
-	);
-	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
-	for (int i = 0; i < ArrayCount; i++)
-	{
-		a_Array[i] = a_Workspace[i] * Amplitude;
-	}
-	
-	// Add each octave:
-	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
-	{
-		// Generate cubic noise for the octave:
-		itr->m_Noise.Generate3D(
-			a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
-			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency,
-			a_StartZ * itr->m_Frequency, a_EndZ * itr->m_Frequency
-		);
-		// Add the cubic noise into the output:
-		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
-		for (int i = 0; i < ArrayCount; i++)
+		NOISE_DATATYPE ratioZ = static_cast<NOISE_DATATYPE>(z) / (a_SizeZ - 1);
+		NOISE_DATATYPE noiseZ = Lerp(a_StartZ, a_EndZ, ratioZ);
+		int noiseZInt = FAST_FLOOR(noiseZ);
+		int zCoord = noiseZInt & 255;
+		NOISE_DATATYPE noiseZFrac = noiseZ - noiseZInt;
+		NOISE_DATATYPE fadeZ = Fade(noiseZFrac);
+		for (int y = 0; y < a_SizeY; y++)
 		{
-			a_Array[i] += a_Workspace[i] * Amplitude;
-		}
-	}
-	
-	if (ShouldFreeWorkspace)
-	{
-		delete[] a_Workspace;
-		a_Workspace = nullptr;
-	}
+			NOISE_DATATYPE ratioY = static_cast<NOISE_DATATYPE>(y) / (a_SizeY - 1);
+			NOISE_DATATYPE noiseY = Lerp(a_StartY, a_EndY, ratioY);
+			int noiseYInt = FAST_FLOOR(noiseY);
+			int yCoord = noiseYInt & 255;
+			NOISE_DATATYPE noiseYFrac = noiseY - noiseYInt;
+			NOISE_DATATYPE fadeY = Fade(noiseYFrac);
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				NOISE_DATATYPE ratioX = static_cast<NOISE_DATATYPE>(x) / (a_SizeX - 1);
+				NOISE_DATATYPE noiseX = Lerp(a_StartX, a_EndX, ratioX);
+				int noiseXInt = FAST_FLOOR(noiseX);
+				int xCoord = noiseXInt & 255;
+				NOISE_DATATYPE noiseXFrac = noiseX - noiseXInt;
+				NOISE_DATATYPE fadeX = Fade(noiseXFrac);
+
+				// Hash the coordinates:
+				int A  = m_Perm[xCoord] + yCoord;
+				int AA = m_Perm[A] + zCoord;
+				int AB = m_Perm[A + 1] + zCoord;
+				int B  = m_Perm[xCoord + 1] + yCoord;
+				int BA = m_Perm[B] + zCoord;
+				int BB = m_Perm[B + 1] + zCoord;
+
+				// Lerp the gradients:
+				// TODO: This may be optimized by swapping the coords and recalculating most lerps only "once every x"
+				a_Array[idx++] = Lerp(
+					Lerp(
+						Lerp(Grad(m_Perm[AA], noiseXFrac, noiseYFrac,     noiseZFrac), Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac,     noiseZFrac), fadeX),
+						Lerp(Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, noiseZFrac), Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac), fadeX),
+						fadeY
+					),
+					Lerp(
+						Lerp(Grad(m_Perm[AA + 1], noiseXFrac, noiseYFrac,     noiseZFrac - 1), Grad(m_Perm[BA + 1], noiseXFrac - 1, noiseYFrac,     noiseZFrac - 1), fadeX),
+						Lerp(Grad(m_Perm[AB + 1], noiseXFrac, noiseYFrac - 1, noiseZFrac - 1), Grad(m_Perm[BB + 1], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac - 1), fadeX),
+						fadeY
+					),
+					fadeZ
+				);
+			}  // for x
+		}  // for y
+	}  // for z
 }
 
 
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// cRidgedMultiNoise:
-
-cRidgedMultiNoise::cRidgedMultiNoise(void) :
-	m_Seed(0)
+NOISE_DATATYPE cImprovedNoise::GetValueAt(int a_X, int a_Y, int a_Z)
 {
+	// Hash the coordinates:
+	a_X = a_X & 255;
+	a_Y = a_Y & 255;
+	a_Z = a_Z & 255;
+	int A  = m_Perm[a_X] + a_Y;
+	int AA = m_Perm[A] + a_Z;
+
+	return Grad(m_Perm[AA], 1, 1, 1);
 }
 
-
-
-
-
-cRidgedMultiNoise::cRidgedMultiNoise(int a_Seed) :
-	m_Seed(a_Seed)
-{
-}
-
-
-
-
-
-void cRidgedMultiNoise::SetSeed(int a_Seed)
-{
-	m_Seed = a_Seed;
-}
-
-
-
-
-
-void cRidgedMultiNoise::AddOctave(float a_Frequency, float a_Amplitude)
-{
-	m_Octaves.push_back(cOctave(m_Seed * ((int)m_Octaves.size() + 4) * 4 + 1024, a_Frequency, a_Amplitude));
-}
-
-
-
-
-
-void cRidgedMultiNoise::Generate2D(
-	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-	int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
-) const
-{
-	if (m_Octaves.empty())
-	{
-		// No work to be done
-		ASSERT(!"RidgedMulti: No octaves to generate!");
-		return;
-	}
-	
-	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
-	int ArrayCount = a_SizeX * a_SizeY;
-	if (ShouldFreeWorkspace)
-	{
-		a_Workspace = new NOISE_DATATYPE[ArrayCount];
-	}
-	
-	// Generate the first octave directly into array:
-	const cOctave & FirstOctave = m_Octaves.front();
-	
-	FirstOctave.m_Noise.Generate2D(
-		a_Workspace, a_SizeX, a_SizeY,
-		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
-	);
-	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
-	for (int i = 0; i < ArrayCount; i++)
-	{
-		a_Array[i] = fabs(a_Workspace[i] * Amplitude);
-	}
-	
-	// Add each octave:
-	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
-	{
-		// Generate cubic noise for the octave:
-		itr->m_Noise.Generate2D(
-			a_Workspace, a_SizeX, a_SizeY,
-			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
-			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency
-		);
-		// Add the cubic noise into the output:
-		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
-		for (int i = 0; i < ArrayCount; i++)
-		{
-			a_Array[i] += fabs(a_Workspace[i] * Amplitude);
-		}
-	}
-	
-	if (ShouldFreeWorkspace)
-	{
-		delete[] a_Workspace;
-		a_Workspace = nullptr;
-	}
-}
-
-
-
-
-
-void cRidgedMultiNoise::Generate3D(
-	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-	NOISE_DATATYPE * a_Workspace                     ///< Workspace that this function can use and trash
-) const
-{
-	if (m_Octaves.empty())
-	{
-		// No work to be done
-		ASSERT(!"RidgedMulti: No octaves to generate!");
-		return;
-	}
-	
-	bool ShouldFreeWorkspace = (a_Workspace == nullptr);
-	int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
-	if (ShouldFreeWorkspace)
-	{
-		a_Workspace = new NOISE_DATATYPE[ArrayCount];
-	}
-	
-	// Generate the first octave directly into array:
-	const cOctave & FirstOctave = m_Octaves.front();
-
-	FirstOctave.m_Noise.Generate3D(
-		a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-		a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-		a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
-		a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
-	);
-	NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
-	for (int i = 0; i < ArrayCount; i++)
-	{
-		a_Array[i] = a_Workspace[i] * Amplitude;
-	}
-	
-	// Add each octave:
-	for (cOctaves::const_iterator itr = m_Octaves.begin() + 1, end = m_Octaves.end(); itr != end; ++itr)
-	{
-		// Generate cubic noise for the octave:
-		itr->m_Noise.Generate3D(
-			a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-			a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
-			a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency,
-			a_StartZ * itr->m_Frequency, a_EndZ * itr->m_Frequency
-		);
-		// Add the cubic noise into the output:
-		NOISE_DATATYPE Amplitude = itr->m_Amplitude;
-		for (int i = 0; i < ArrayCount; i++)
-		{
-			a_Array[i] += a_Workspace[i] * Amplitude;
-		}
-	}
-	
-	if (ShouldFreeWorkspace)
-	{
-		delete[] a_Workspace;
-		a_Workspace = nullptr;
-	}
-}
 
 
 

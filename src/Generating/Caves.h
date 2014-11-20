@@ -13,7 +13,6 @@
 #pragma once
 
 #include "GridStructGen.h"
-#include "../Noise.h"
 
 
 

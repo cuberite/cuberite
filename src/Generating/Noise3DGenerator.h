@@ -13,7 +13,8 @@
 #pragma once
 
 #include "ComposableGenerator.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
+#include "../Noise/InterpolNoise.h"
 
 
 
@@ -34,17 +35,20 @@ public:
 	
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
-	static const int UPSCALE_X = 8;
-	static const int UPSCALE_Y = 4;
-	static const int UPSCALE_Z = 8;
+	static const int UPSCALE_X = 4;
+	static const int UPSCALE_Y = 8;
+	static const int UPSCALE_Z = 4;
 	
 	// Linear interpolation buffer dimensions, calculated from the step sizes:
 	static const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;
 	static const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
 	static const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
 
-	cPerlinNoise m_Perlin;   // The base 3D noise source for the actual composition
-	cCubicNoise  m_Cubic;    // The noise used for heightmap directing
+	/** The base 3D noise source for the actual composition */
+	cOctavedNoise<cInterp5DegNoise> m_Perlin;
+
+	/** The noise used for heightmap directing. */
+	cOctavedNoise<cInterp5DegNoise> m_Cubic;
 	
 	int            m_SeaLevel;
 	NOISE_DATATYPE m_HeightAmplification;
