@@ -481,6 +481,13 @@ void cNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ)
 					AddHeight *= 4;
 				}
 
+				// If too high, cut off any terrain:
+				if (y > 28)
+				{
+					AddHeight = AddHeight + static_cast<NOISE_DATATYPE>(y - 28) / 4;
+				}
+
+				// Decide between the two density noises:
 				int idx = 33 * x + 33 * 5 * z + y;
 				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + curBaseNoise;
 			}
@@ -638,7 +645,13 @@ void cBiomalNoise3DComposable::GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_Ch
 				{
 					AddHeight *= 4;
 				}
+				// If too high, cut off any terrain:
+				if (y > 28)
+				{
+					AddHeight = AddHeight + static_cast<NOISE_DATATYPE>(y - 28) / 4;
+				}
 
+				// Decide between the two density noises:
 				int idx = 33 * x + y + 33 * 5 * z;
 				Workspace[idx] = ClampedLerp(DensityNoiseA[idx], DensityNoiseB[idx], 8 * (ChoiceNoise[idx] + 0.5f)) + AddHeight + curBaseNoise;
 			}
@@ -702,72 +715,67 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 {
 	switch (a_Biome)
 	{
-		case biBeach:                a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
-		case biBirchForest:          a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
-		case biBirchForestHills:     a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biBirchForestHillsM:    a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biBirchForestM:         a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
-		case biColdBeach:            a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
-		case biDesertHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biDeepOcean:            a_HeightAmp = 0.17f;  a_MidPoint = 35; break;
-		case biDesert:               a_HeightAmp = 0.29f;  a_MidPoint = 62; break;
-		case biEnd:                  a_HeightAmp = 0.15f;  a_MidPoint = 64; break;
-		case biExtremeHills:         a_HeightAmp = 0.045f; a_MidPoint = 75; break;
-		case biExtremeHillsPlus:     a_HeightAmp = 0.04f;  a_MidPoint = 80; break;
-		case biFlowerForest:         a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
-		case biForest:               a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
-		case biForestHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biFrozenRiver:          a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
-		case biFrozenOcean:          a_HeightAmp = 0.17f;  a_MidPoint = 47; break;
-		case biIceMountains:         a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biIcePlains:            a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
-		case biIcePlainsSpikes:      a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
-		case biJungle:               a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
-		case biJungleHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biJungleM:              a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
-		case biMegaSpruceTaigaHills: a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biMegaTaigaHills:       a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-		case biMushroomShore:        a_HeightAmp = 0.15f;  a_MidPoint = 15; break;
-		case biOcean:                a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
-		case biPlains:               a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
-		case biRiver:                a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
-		case biSwampland:            a_HeightAmp = 0.25f;  a_MidPoint = 59; break;
-		case biSwamplandM:           a_HeightAmp = 0.11f;  a_MidPoint = 59; break;
-		case biTaigaHills:           a_HeightAmp = 0.075f; a_MidPoint = 68; break;
-
-		/*
-		// Still missing:
-		case biColdTaiga:            a_HeightAmp = 0.15f;  a_MidPoint = 30; break;
-		case biColdTaigaHills:       a_HeightAmp = 0.15f;  a_MidPoint = 31; break;
-		case biColdTaigaM:           a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biDesertM:              a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biExtremeHillsEdge:     a_HeightAmp = 0.15f;  a_MidPoint = 20; break;
-		case biExtremeHillsM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biExtremeHillsPlusM:    a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biJungleEdge:           a_HeightAmp = 0.15f;  a_MidPoint = 23; break;
-		case biJungleEdgeM:          a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biMegaSpruceTaiga:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biMegaTaiga:            a_HeightAmp = 0.15f;  a_MidPoint = 32; break;
-		case biMesa:                 a_HeightAmp = 0.15f;  a_MidPoint = 37; break;
-		case biMesaBryce:            a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biMesaPlateau:          a_HeightAmp = 0.15f;  a_MidPoint = 39; break;
-		case biMesaPlateauF:         a_HeightAmp = 0.15f;  a_MidPoint = 38; break;
-		case biMesaPlateauFM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biMesaPlateauM:         a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biMushroomIsland:       a_HeightAmp = 0.15f;  a_MidPoint = 14; break;
-		case biNether:               a_HeightAmp = 0.15f;  a_MidPoint = 68; break;
-		case biRoofedForest:         a_HeightAmp = 0.15f;  a_MidPoint = 29; break;
-		case biRoofedForestM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biSavanna:              a_HeightAmp = 0.15f;  a_MidPoint = 35; break;
-		case biSavannaM:             a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biSavannaPlateau:       a_HeightAmp = 0.15f;  a_MidPoint = 36; break;
-		case biSavannaPlateauM:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biStoneBeach:           a_HeightAmp = 0.15f;  a_MidPoint = 25; break;
-		case biSunflowerPlains:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		case biTaiga:                a_HeightAmp = 0.15f;  a_MidPoint = 65; break;
-		case biTaigaM:               a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
-		*/
-
+		case biBeach:                a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biBirchForest:          a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biBirchForestHills:     a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biBirchForestHillsM:    a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biBirchForestM:         a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biColdBeach:            a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biColdTaiga:            a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biColdTaigaM:           a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biColdTaigaHills:       a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biDesertHills:          a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biDeepOcean:            a_HeightAmp = 0.17f;  a_MidPoint =  35; break;
+		case biDesert:               a_HeightAmp = 0.29f;  a_MidPoint =  62; break;
+		case biDesertM:              a_HeightAmp = 0.29f;  a_MidPoint =  62; break;
+		case biEnd:                  a_HeightAmp = 0.15f;  a_MidPoint =  64; break;
+		case biExtremeHills:         a_HeightAmp = 0.045f; a_MidPoint =  75; break;
+		case biExtremeHillsEdge:     a_HeightAmp = 0.1f;   a_MidPoint =  70; break;
+		case biExtremeHillsM:        a_HeightAmp = 0.045f; a_MidPoint =  75; break;
+		case biExtremeHillsPlus:     a_HeightAmp = 0.04f;  a_MidPoint =  80; break;
+		case biExtremeHillsPlusM:    a_HeightAmp = 0.04f;  a_MidPoint =  80; break;
+		case biFlowerForest:         a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biForest:               a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biForestHills:          a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biFrozenRiver:          a_HeightAmp = 0.4f;   a_MidPoint =  57; break;
+		case biFrozenOcean:          a_HeightAmp = 0.12f;  a_MidPoint =  45; break;
+		case biIceMountains:         a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biIcePlains:            a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biIcePlainsSpikes:      a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biJungle:               a_HeightAmp = 0.1f;   a_MidPoint =  63; break;
+		case biJungleEdge:           a_HeightAmp = 0.15f;  a_MidPoint =  62; break;
+		case biJungleEdgeM:          a_HeightAmp = 0.15f;  a_MidPoint =  62; break;
+		case biJungleHills:          a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biJungleM:              a_HeightAmp = 0.1f;   a_MidPoint =  63; break;
+		case biMegaSpruceTaiga:      a_HeightAmp = 0.09f;  a_MidPoint =  64; break;
+		case biMegaSpruceTaigaHills: a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biMegaTaiga:            a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biMegaTaigaHills:       a_HeightAmp = 0.075f; a_MidPoint =  68; break;
+		case biMesa:                 a_HeightAmp = 0.09f;  a_MidPoint =  61; break;
+		case biMesaBryce:            a_HeightAmp = 0.15f;  a_MidPoint =  61; break;
+		case biMesaPlateau:          a_HeightAmp = 0.25f;  a_MidPoint =  86; break;
+		case biMesaPlateauF:         a_HeightAmp = 0.25f;  a_MidPoint =  96; break;
+		case biMesaPlateauFM:        a_HeightAmp = 0.25f;  a_MidPoint =  96; break;
+		case biMesaPlateauM:         a_HeightAmp = 0.25f;  a_MidPoint =  86; break;
+		case biMushroomShore:        a_HeightAmp = 0.075f; a_MidPoint =  60; break;
+		case biMushroomIsland:       a_HeightAmp = 0.06f;  a_MidPoint =  80; break;
+		case biNether:               a_HeightAmp = 0.01f;  a_MidPoint =  64; break;
+		case biOcean:                a_HeightAmp = 0.12f;  a_MidPoint =  45; break;
+		case biPlains:               a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biRiver:                a_HeightAmp = 0.4f;   a_MidPoint =  57; break;
+		case biRoofedForest:         a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biRoofedForestM:        a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biSavanna:              a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biSavannaM:             a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biSavannaPlateau:       a_HeightAmp = 0.3f;   a_MidPoint =  85; break;
+		case biSavannaPlateauM:      a_HeightAmp = 0.012f; a_MidPoint = 105; break;
+		case biStoneBeach:           a_HeightAmp = 0.075f; a_MidPoint =  60; break;
+		case biSunflowerPlains:      a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biSwampland:            a_HeightAmp = 0.25f;  a_MidPoint =  59; break;
+		case biSwamplandM:           a_HeightAmp = 0.11f;  a_MidPoint =  59; break;
+		case biTaiga:                a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
+		case biTaigaM:               a_HeightAmp = 0.1f;   a_MidPoint =  70; break;
+		case biTaigaHills:           a_HeightAmp = 0.075f; a_MidPoint =  68; break;
 		default:
 		{
 			// Make a crazy terrain so that it stands out
