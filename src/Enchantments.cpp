@@ -6,7 +6,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FastNBT.h"
 #include "FastRandom.h"
-#include "Noise.h"
+#include "Noise/Noise.h"
 
 
 

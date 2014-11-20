@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Noise3DGenerator.h"
 #include "../OSSupport/File.h"
+#include "../OSSupport/Timer.h"
 #include "../IniFile.h"
 #include "../LinearInterpolation.h"
 #include "../LinearUpscale.h"
@@ -61,30 +62,86 @@ public:
 
 
 
-/** Linearly interpolates between two values.
-Assumes that a_Ratio is in range [0, 1]. */
-inline static NOISE_DATATYPE Lerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
+#if 0
+// Perform speed test of the cInterpolNoise class
+static class cInterpolNoiseSpeedTest
 {
-	return a_Val1 + (a_Val2 - a_Val1) * a_Ratio;
-}
-
-
-
-
-
-/** Linearly interpolates between two values, clamping the ratio to [0, 1] first. */
-inline static NOISE_DATATYPE ClampedLerp(NOISE_DATATYPE a_Val1, NOISE_DATATYPE a_Val2, NOISE_DATATYPE a_Ratio)
-{
-	if (a_Ratio < 0)
+public:
+	cInterpolNoiseSpeedTest(void)
 	{
-		return a_Val1;
+		TestSpeed2D();
+		TestSpeed3D();
+		printf("InterpolNoise speed comparison finished.\n");
 	}
-	if (a_Ratio > 1)
+
+
+	/** Compare the speed of the 3D InterpolNoise vs 3D CubicNoise. */
+	void TestSpeed3D(void)
 	{
-		return a_Val2;
+		printf("Evaluating 3D noise performance...\n");
+		static const int SIZE_X = 128;
+		static const int SIZE_Y = 128;
+		static const int SIZE_Z = 128;
+		static const NOISE_DATATYPE MUL = 80;
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y * SIZE_Z]);
+		cTimer timer;
+
+		// Test the cInterpolNoise:
+		cInterpolNoise<Interp5Deg> interpNoise(1);
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 30; i++)
+		{
+			interpNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, MUL * i, MUL * i + MUL, 0, MUL, 0, MUL);
+		}
+		long long end = timer.GetNowTime();
+		printf("InterpolNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+
+		// Test the cCubicNoise:
+		cCubicNoise cubicNoise(1);
+		start = timer.GetNowTime();
+		for (int i = 0; i < 30; i++)
+		{
+			cubicNoise.Generate3D(arr.get(), SIZE_X, SIZE_Y, SIZE_Z, MUL * i, MUL * i + MUL, 0, MUL, 0, MUL);
+		}
+		end = timer.GetNowTime();
+		printf("CubicNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+		printf("3D noise performance comparison finished.\n");
 	}
-	return Lerp(a_Val1, a_Val2, a_Ratio);
-}
+
+
+	/** Compare the speed of the 2D InterpolNoise vs 2D CubicNoise. */
+	void TestSpeed2D(void)
+	{
+		printf("Evaluating 2D noise performance...\n");
+		static const int SIZE_X = 128;
+		static const int SIZE_Y = 128;
+		static const NOISE_DATATYPE MUL = 80;
+		std::unique_ptr<NOISE_DATATYPE[]> arr(new NOISE_DATATYPE[SIZE_X * SIZE_Y]);
+		cTimer timer;
+
+		// Test the cInterpolNoise:
+		cInterpolNoise<Interp5Deg> interpNoise(1);
+		long long start = timer.GetNowTime();
+		for (int i = 0; i < 500; i++)
+		{
+			interpNoise.Generate2D(arr.get(), SIZE_X, SIZE_Y, MUL * i, MUL * i + MUL, 0, MUL);
+		}
+		long long end = timer.GetNowTime();
+		printf("InterpolNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+
+		// Test the cCubicNoise:
+		cCubicNoise cubicNoise(1);
+		start = timer.GetNowTime();
+		for (int i = 0; i < 500; i++)
+		{
+			cubicNoise.Generate2D(arr.get(), SIZE_X, SIZE_Y, MUL * i, MUL * i + MUL, 0, MUL);
+		}
+		end = timer.GetNowTime();
+		printf("CubicNoise took %.02f sec\n", static_cast<float>(end - start) / 1000);
+		printf("2D noise performance comparison finished.\n");
+	}
+} g_InterpolNoiseSpeedTest;
+#endif
 
 
 
@@ -98,9 +155,17 @@ cNoise3DGenerator::cNoise3DGenerator(cChunkGenerator & a_ChunkGenerator) :
 	m_Perlin(1000),
 	m_Cubic(1000)
 {
-	m_Perlin.AddOctave(1, (NOISE_DATATYPE)0.5);
-	m_Perlin.AddOctave((NOISE_DATATYPE)0.5, 1);
-	m_Perlin.AddOctave((NOISE_DATATYPE)0.5, 2);
+	m_Perlin.AddOctave(1,  1);
+	m_Perlin.AddOctave(2,  0.5);
+	m_Perlin.AddOctave(4,  0.25);
+	m_Perlin.AddOctave(8,  0.125);
+	m_Perlin.AddOctave(16, 0.0625);
+
+	m_Cubic.AddOctave(1,  1);
+	m_Cubic.AddOctave(2,  0.5);
+	m_Cubic.AddOctave(4,  0.25);
+	m_Cubic.AddOctave(8,  0.125);
+	m_Cubic.AddOctave(16, 0.0625);
 
 	#if 0
 	// DEBUG: Test the noise generation:
@@ -183,8 +248,8 @@ void cNoise3DGenerator::Initialize(cIniFile & a_IniFile)
 {
 	// Params:
 	m_SeaLevel            =                 a_IniFile.GetValueSetI("Generator", "Noise3DSeaLevel", 62);
-	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0);
-	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 75);
+	m_HeightAmplification = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DHeightAmplification", 0.1);
+	m_MidPoint            = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DMidPoint", 68);
 	m_FrequencyX          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyX", 8);
 	m_FrequencyY          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyY", 8);
 	m_FrequencyZ          = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "Noise3DFrequencyZ", 8);
@@ -249,10 +314,10 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 	NOISE_DATATYPE NoiseW[DIM_X * DIM_Y * DIM_Z];  // Workspace that the noise calculation can use and trash
 
 	// Our noise array has different layout, XZY, instead of regular chunk's XYZ, that's why the coords are "renamed"
-	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(a_ChunkX       * cChunkDef::Width))     / m_FrequencyX;
-	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((a_ChunkX + 1) * cChunkDef::Width) - 1) / m_FrequencyX;
-	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(a_ChunkZ       * cChunkDef::Width))     / m_FrequencyZ;
-	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((a_ChunkZ + 1) * cChunkDef::Width) - 1) / m_FrequencyZ;
+	NOISE_DATATYPE StartX = ((NOISE_DATATYPE)(a_ChunkX       * cChunkDef::Width)) / m_FrequencyX;
+	NOISE_DATATYPE EndX   = ((NOISE_DATATYPE)((a_ChunkX + 1) * cChunkDef::Width)) / m_FrequencyX;
+	NOISE_DATATYPE StartZ = ((NOISE_DATATYPE)(a_ChunkZ       * cChunkDef::Width)) / m_FrequencyZ;
+	NOISE_DATATYPE EndZ   = ((NOISE_DATATYPE)((a_ChunkZ + 1) * cChunkDef::Width)) / m_FrequencyZ;
 	NOISE_DATATYPE StartY = 0;
 	NOISE_DATATYPE EndY   = ((NOISE_DATATYPE)256) / m_FrequencyY;
 
@@ -262,23 +327,23 @@ void cNoise3DGenerator::GenerateNoiseArray(int a_ChunkX, int a_ChunkZ, NOISE_DAT
 
 	// Precalculate a "height" array:
 	NOISE_DATATYPE Height[DIM_X * DIM_Z];  // Output for the cubic noise heightmap ("source")
-	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 25, EndX / 25, StartZ / 25, EndZ / 25);
+	m_Cubic.Generate2D(Height, DIM_X, DIM_Z, StartX / 5, EndX / 5, StartZ / 5, EndZ / 5);
 	for (size_t i = 0; i < ARRAYCOUNT(Height); i++)
 	{
-		Height[i] = std::abs(Height[i]) * m_HeightAmplification + 1;
+		Height[i] = Height[i] * m_HeightAmplification;
 	}
 
 	// Modify the noise by height data:
 	for (int y = 0; y < DIM_Y; y++)
 	{
-		NOISE_DATATYPE AddHeight = (y * UPSCALE_Y - m_MidPoint) / 20;
-		AddHeight *= AddHeight * AddHeight;
+		NOISE_DATATYPE AddHeight = (y * UPSCALE_Y - m_MidPoint) / 30;
+		// AddHeight *= AddHeight * AddHeight;
 		for (int z = 0; z < DIM_Z; z++)
 		{
 			NOISE_DATATYPE * CurRow = &(NoiseO[y * DIM_X + z * DIM_X * DIM_Y]);
 			for (int x = 0; x < DIM_X; x++)
 			{
-				CurRow[x] += AddHeight / Height[x + DIM_X * z];
+				CurRow[x] += AddHeight + Height[x + DIM_X * z];
 			}
 		}
 	}
@@ -701,14 +766,71 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 {
 	switch (a_Biome)
 	{
-		case biDesert:           a_HeightAmp = 0.29f;  a_MidPoint = 62; break;  // Needs verification
-		case biExtremeHills:     a_HeightAmp = 0.045f; a_MidPoint = 75; break;
-		case biExtremeHillsPlus: a_HeightAmp = 0.04f;  a_MidPoint = 80; break;
-		case biFrozenRiver:      a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
-		case biPlains:           a_HeightAmp = 0.3f;   a_MidPoint = 62; break;  // Needs verification
-		case biRiver:            a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
-		case biSwampland:        a_HeightAmp = 0.25f;  a_MidPoint = 59; break;
-		case biSwamplandM:       a_HeightAmp = 0.11f;  a_MidPoint = 59; break;
+		case biBeach:                a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biBirchForest:          a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biBirchForestHills:     a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biBirchForestHillsM:    a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biBirchForestM:         a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biColdBeach:            a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biDesertHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biDeepOcean:            a_HeightAmp = 0.17f;  a_MidPoint = 35; break;
+		case biDesert:               a_HeightAmp = 0.29f;  a_MidPoint = 62; break;
+		case biEnd:                  a_HeightAmp = 0.15f;  a_MidPoint = 64; break;
+		case biExtremeHills:         a_HeightAmp = 0.045f; a_MidPoint = 75; break;
+		case biExtremeHillsPlus:     a_HeightAmp = 0.04f;  a_MidPoint = 80; break;
+		case biFlowerForest:         a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biForest:               a_HeightAmp = 0.1f;   a_MidPoint = 64; break;
+		case biForestHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biFrozenRiver:          a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
+		case biFrozenOcean:          a_HeightAmp = 0.17f;  a_MidPoint = 47; break;
+		case biIceMountains:         a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biIcePlains:            a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biIcePlainsSpikes:      a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biJungle:               a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
+		case biJungleHills:          a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biJungleM:              a_HeightAmp = 0.1f;   a_MidPoint = 63; break;
+		case biMegaSpruceTaigaHills: a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biMegaTaigaHills:       a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+		case biMushroomShore:        a_HeightAmp = 0.15f;  a_MidPoint = 15; break;
+		case biOcean:                a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biPlains:               a_HeightAmp = 0.3f;   a_MidPoint = 62; break;
+		case biRiver:                a_HeightAmp = 0.4f;   a_MidPoint = 53; break;
+		case biSwampland:            a_HeightAmp = 0.25f;  a_MidPoint = 59; break;
+		case biSwamplandM:           a_HeightAmp = 0.11f;  a_MidPoint = 59; break;
+		case biTaigaHills:           a_HeightAmp = 0.075f; a_MidPoint = 68; break;
+
+		/*
+		// Still missing:
+		case biColdTaiga:            a_HeightAmp = 0.15f;  a_MidPoint = 30; break;
+		case biColdTaigaHills:       a_HeightAmp = 0.15f;  a_MidPoint = 31; break;
+		case biColdTaigaM:           a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biDesertM:              a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biExtremeHillsEdge:     a_HeightAmp = 0.15f;  a_MidPoint = 20; break;
+		case biExtremeHillsM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biExtremeHillsPlusM:    a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biJungleEdge:           a_HeightAmp = 0.15f;  a_MidPoint = 23; break;
+		case biJungleEdgeM:          a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMegaSpruceTaiga:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMegaTaiga:            a_HeightAmp = 0.15f;  a_MidPoint = 32; break;
+		case biMesa:                 a_HeightAmp = 0.15f;  a_MidPoint = 37; break;
+		case biMesaBryce:            a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMesaPlateau:          a_HeightAmp = 0.15f;  a_MidPoint = 39; break;
+		case biMesaPlateauF:         a_HeightAmp = 0.15f;  a_MidPoint = 38; break;
+		case biMesaPlateauFM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMesaPlateauM:         a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biMushroomIsland:       a_HeightAmp = 0.15f;  a_MidPoint = 14; break;
+		case biNether:               a_HeightAmp = 0.15f;  a_MidPoint = 68; break;
+		case biRoofedForest:         a_HeightAmp = 0.15f;  a_MidPoint = 29; break;
+		case biRoofedForestM:        a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biSavanna:              a_HeightAmp = 0.15f;  a_MidPoint = 35; break;
+		case biSavannaM:             a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biSavannaPlateau:       a_HeightAmp = 0.15f;  a_MidPoint = 36; break;
+		case biSavannaPlateauM:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biStoneBeach:           a_HeightAmp = 0.15f;  a_MidPoint = 25; break;
+		case biSunflowerPlains:      a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		case biTaiga:                a_HeightAmp = 0.15f;  a_MidPoint = 65; break;
+		case biTaigaM:               a_HeightAmp = 0.15f;  a_MidPoint = 70; break;
+		*/
 
 		default:
 		{

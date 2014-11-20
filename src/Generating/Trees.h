@@ -18,7 +18,7 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 #pragma once
 
 #include "../ChunkDef.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 
 
 

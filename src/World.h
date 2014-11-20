@@ -26,6 +26,7 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
+#include "ClientHandle.h"
 
 
 
@@ -325,7 +326,7 @@ public:
 	
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
-    
+
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
@@ -377,11 +378,8 @@ public:
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 	
-	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. Same as UpdateSign() */
+	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
-	
-	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. Same as SetSignLines() */
-	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
@@ -648,6 +646,12 @@ public:
 
 	eShrapnelLevel GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
 	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
+
+	int GetMaxViewDistance(void) const { return m_MaxViewDistance; }
+	void SetMaxViewDistance(int a_MaxViewDistance)
+	{
+		m_MaxViewDistance = Clamp(a_MaxViewDistance, cClientHandle::MIN_VIEW_DISTANCE, cClientHandle::MAX_VIEW_DISTANCE);
+	}
 
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
@@ -963,6 +967,9 @@ private:
 	See the eShrapnelLevel enumeration for details
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
+
+	/** The maximum view distance that a player can have in this world. */
+	int m_MaxViewDistance;
 
 	/** Name of the nether world */
 	AString m_NetherWorldName;

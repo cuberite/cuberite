@@ -14,7 +14,7 @@
 #pragma once
 
 #include "ComposableGenerator.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 
 
 

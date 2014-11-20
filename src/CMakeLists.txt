@@ -9,6 +9,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include
 set(FOLDERS
 	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
 	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs
+	Noise
 )
 
 SET (SRCS
@@ -50,7 +51,6 @@ SET (SRCS
 	MobProximityCounter.cpp
 	MobSpawner.cpp
 	MonsterConfig.cpp
-	Noise.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
 	RCONServer.cpp
@@ -65,7 +65,8 @@ SET (SRCS
 	VoronoiMap.cpp
 	WebAdmin.cpp
 	World.cpp
-	main.cpp)
+	main.cpp
+)
 
 SET (HDRS
 	AllocationPool.h
@@ -120,7 +121,6 @@ SET (HDRS
 	MobProximityCounter.h
 	MobSpawner.h
 	MonsterConfig.h
-	Noise.h
 	ProbabDistrib.h
 	RankManager.h
 	RCONServer.h
@@ -137,7 +137,8 @@ SET (HDRS
 	VoronoiMap.h
 	WebAdmin.h
 	World.h
-	XMLParser.h)
+	XMLParser.h
+)
 
 include_directories(".")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/../lib/sqlite")
@@ -314,7 +315,7 @@ endif ()
 
 if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE}
-		OSSupport HTTPServer Bindings Items Blocks
+		OSSupport HTTPServer Bindings Items Blocks Noise
 		Protocol Generating Generating_Prefabs WorldStorage
 		Mobs Entities Simulator UI BlockEntities PolarSSL++
 	)

@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Noise.h"
+#include "Noise/Noise.h"
 
 
 

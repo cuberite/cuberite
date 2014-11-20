@@ -1034,11 +1034,11 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 		#ifndef TOLUA_RELEASE
 		if (self == nullptr)
 		{
-			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", nullptr);
+			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines'", nullptr);
 		}
 		#endif
 		{
-			bool res = self->UpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			bool res = self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
 			tolua_pushboolean(tolua_S, res ? 1 : 0);
 		}
 	}
@@ -1046,7 +1046,7 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	
 	#ifndef TOLUA_RELEASE
 tolua_lerror:
-	tolua_error(tolua_S, "#ferror in function 'SetSignLines' / 'UpdateSign'.", &tolua_err);
+	tolua_error(tolua_S, "#ferror in function 'SetSignLines'.", &tolua_err);
 	return 0;
 	#endif
 }
@@ -3405,7 +3405,6 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ScheduleTask",              tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",              tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "TryGetHeight",              tolua_cWorld_TryGetHeight);
-			tolua_function(tolua_S, "UpdateSign",                tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cMapManager");
