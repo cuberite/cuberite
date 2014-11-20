@@ -221,7 +221,7 @@ protected:
 
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override
 	{
-		m_SeaLevel = a_IniFile.GetValueSetI("Generator", "SeaLevel", m_SeaLevel) - 1;
+		m_SeaLevel = a_IniFile.GetValueSetI("Generator", "SeaLevel", m_SeaLevel);
 	}
 	
 
