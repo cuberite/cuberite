@@ -37,10 +37,12 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 			m_World->BroadcastEntityStatus(*this, esVillagerAngry);
 		}
 	}
+	
 	if (a_TDI.DamageType == dtLightning)
 	{
-		m_World->SpawnMob((int) GetPosX(), (int) GetPosY(), (int) GetPosZ(), mtWitch);
-		super::Destroy(this);
+		Destroy();
+	    m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtWitch);
+	    return true;
 	}
 	return true;
 }
