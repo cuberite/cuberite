@@ -74,102 +74,137 @@ const int TIME_SPAWN_DIVISOR =   148;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cWorldLoadProgress:
+// cSpawnPrepare:
 
-/// A simple thread that displays the progress of world loading / saving in cWorld::InitializeSpawn()
-class cWorldLoadProgress :
-	public cIsThread
+/** Generates and lights the spawn area of the world. Runs as a separate thread. */
+class cSpawnPrepare:
+	public cIsThread,
+	public cChunkCoordCallback
 {
-public:
-	cWorldLoadProgress(cWorld * a_World) :
-		cIsThread("cWorldLoadProgress"),
-		m_World(a_World)
-	{
-		Start();
-	}
-	
-	void Stop(void)
-	{
-		m_ShouldTerminate = true;
-		Wait();
-	}
-	
-protected:
+	typedef cIsThread super;
 
-	cWorld * m_World;
-	
+public:
+	cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance):
+		super("SpawnPrepare"),
+		m_World(a_World),
+		m_SpawnChunkX(a_SpawnChunkX),
+		m_SpawnChunkZ(a_SpawnChunkZ),
+		m_PrepareDistance(a_PrepareDistance),
+		m_MaxIdx(a_PrepareDistance * a_PrepareDistance),
+		m_NumPrepared(0),
+		m_LastReportTime(0),
+		m_LastReportChunkCount(0)
+	{
+		// Start the thread:
+		Start();
+
+		// Wait for start confirmation, so that the thread can be waited-upon after the constructor returns:
+		m_EvtStarted.Wait();
+	}
+
+
+	// cIsThread override:
 	virtual void Execute(void) override
 	{
-		for (;;)
+		// Confirm thread start:
+		m_EvtStarted.Set();
+
+		// Queue the initial chunks:
+		m_MaxIdx = m_PrepareDistance * m_PrepareDistance;
+		int maxQueue = std::min(m_MaxIdx - 1, 100);  // Number of chunks to queue at once
+		m_NextIdx = maxQueue;
+		m_LastReportTime = m_Timer.GetNowTime();
+		for (int i = 0; i < maxQueue; i++)
 		{
-			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate",
-				m_World->GetStorage().GetLoadQueueLength(),
-				m_World->GetGenerator().GetQueueLength()
-			);
-			
-			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
-			for (int i = 0; i < 20; i++)
-			{
-				cSleep::MilliSleep(100);
-				if (m_ShouldTerminate)
-				{
-					return;
-				}
-			}
-		}  // for (-ever)
+			int chunkX, chunkZ;
+			decodeChunkCoords(i, chunkX, chunkZ);
+			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
+		}  // for i
+
+		// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
+		m_EvtFinished.Wait();
 	}
-	
-} ;
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWorldLightingProgress:
-
-/// A simple thread that displays the progress of world lighting in cWorld::InitializeSpawn()
-class cWorldLightingProgress :
-	public cIsThread
-{
-public:
-	cWorldLightingProgress(cLightingThread * a_Lighting) :
-		cIsThread("cWorldLightingProgress"),
-		m_Lighting(a_Lighting)
-	{
-		Start();
-	}
-	
-	void Stop(void)
-	{
-		m_ShouldTerminate = true;
-		Wait();
-	}
-	
 protected:
+	cWorld & m_World;
+	int m_SpawnChunkX;
+	int m_SpawnChunkZ;
+	int m_PrepareDistance;
 
-	cLightingThread * m_Lighting;
-	
-	virtual void Execute(void) override
+	/** The index of the next chunk to be queued in the lighting thread. */
+	int m_NextIdx;
+
+	/** The maximum index of the prepared chunks. Queueing stops when m_NextIdx reaches this number. */
+	int m_MaxIdx;
+
+	/** Total number of chunks already finished preparing. Preparation finishes when this number reaches m_MaxIdx. */
+	int m_NumPrepared;
+
+	/** Event used to signal that the thread has started. */
+	cEvent m_EvtStarted;
+
+	/** Event used to signal that the preparation is finished. */
+	cEvent m_EvtFinished;
+
+	/** The timer used to report progress every second. */
+	cTimer m_Timer;
+
+	/** The timestamp of the last progress report emitted. */
+	long long m_LastReportTime;
+
+	/** Number of chunks prepared when the last progress report was emitted. */
+	int m_LastReportChunkCount;
+
+
+	// cChunkCoordCallback override:
+	virtual void Call(int a_ChunkX, int a_ChunkZ)
 	{
-		for (;;)
+		// Check if this was the last chunk:
+		m_NumPrepared += 1;
+		if (m_NumPrepared >= m_MaxIdx)
 		{
-			LOG("" SIZE_T_FMT  " chunks remaining to light", m_Lighting->GetQueueLength()
+			m_EvtFinished.Set();
+		}
+
+		// Queue another chunk, if appropriate:
+		if (m_NextIdx < m_MaxIdx)
+		{
+			int chunkX, chunkZ;
+			decodeChunkCoords(m_NextIdx, chunkX, chunkZ);
+			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
+			m_NextIdx += 1;
+		}
+
+		// Report progress every 1 second:
+		long long now = m_Timer.GetNowTime();
+		if (now - m_LastReportTime > 1000)
+		{
+			float percentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
+			float chunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / (now - m_LastReportTime);
+			LOG("Preparing spawn (%s): %.02f%% done (%d chunks out of %d; %.02f chunks / sec)",
+				m_World.GetName().c_str(), percentDone, m_NumPrepared, m_MaxIdx, chunkSpeed
 			);
-			
-			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
-			for (int i = 0; i < 20; i++)
-			{
-				cSleep::MilliSleep(100);
-				if (m_ShouldTerminate)
-				{
-					return;
-				}
-			}
-		}  // for (-ever)
+			m_LastReportTime = now;
+			m_LastReportChunkCount = m_NumPrepared;
+		}
 	}
-	
-} ;
+
+
+	/** Decodes the index into chunk coords. Provides the specific chunk ordering. */
+	void decodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ)
+	{
+		// A zigzag pattern from the top to bottom, each row alternating between forward-x and backward-x:
+		int z = a_Idx / m_PrepareDistance;
+		int x = a_Idx % m_PrepareDistance;
+		if ((z & 1) == 0)
+		{
+			// Reverse every second row:
+			x = m_PrepareDistance - 1 - x;
+		}
+		a_ChunkZ = m_SpawnChunkZ + z - m_PrepareDistance / 2;
+		a_ChunkX = m_SpawnChunkX + x - m_PrepareDistance / 2;
+	}
+};
 
 
 
@@ -432,53 +467,9 @@ void cWorld::InitializeSpawn(void)
 	IniFile.ReadFile(m_IniFileName);
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
-	
-	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
-	for (int x = 0; x < ViewDist; x++)
-	{
-		for (int z = 0; z < ViewDist; z++)
-		{
-			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
-		}
-	}
-	
-	{
-		// Display progress during this process:
-		cWorldLoadProgress Progress(this);
-		
-		// Wait for the loader to finish loading
-		m_Storage.WaitForLoadQueueEmpty();
-		
-		// Wait for the generator to finish generating
-		m_Generator.WaitForQueueEmpty();
 
-		// Wait for the loader to finish saving
-		m_Storage.WaitForSaveQueueEmpty();
-		
-		Progress.Stop();
-	}
-	
-	// Light all chunks that have been newly generated:
-	LOG("Lighting spawn area in world \"%s\"...", m_WorldName.c_str());
-	
-	for (int x = 0; x < ViewDist; x++)
-	{
-		int ChX = x + ChunkX-(ViewDist - 1) / 2;
-		for (int z = 0; z < ViewDist; z++)
-		{
-			int ChZ = z + ChunkZ-(ViewDist - 1) / 2;
-			if (!m_ChunkMap->IsChunkLighted(ChX, ChZ))
-			{
-				m_Lighting.QueueChunk(ChX, ChZ);  // Queue the chunk in the lighting thread
-			}
-		}  // for z
-	}  // for x
-	
-	{
-		cWorldLightingProgress Progress(&m_Lighting);
-		m_Lighting.WaitForQueueEmpty();
-		Progress.Stop();
-	}
+	cSpawnPrepare prep(*this, ChunkX, ChunkZ, ViewDist);
+	prep.Wait();
 	
 	#ifdef TEST_LINEBLOCKTRACER
 	// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
