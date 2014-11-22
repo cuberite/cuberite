@@ -114,3 +114,7 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 	return true;
 }
+
+
+
+
