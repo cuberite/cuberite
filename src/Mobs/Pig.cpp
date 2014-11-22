@@ -98,3 +98,19 @@ void cPig::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
+
+bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
+{	
+	if (!super::DoTakeDamage(a_TDI))
+	{
+		return false;
+	}
+
+	if (a_TDI.DamageType == dtLightning)
+	{
+		Destroy();
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombiePigman);
+		return true;
+	}
+	return true;
+}
