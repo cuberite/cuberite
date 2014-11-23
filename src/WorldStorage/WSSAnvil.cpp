@@ -696,11 +696,28 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int Type = a_NBT.FindChildByName(a_TagIdx, "id");
-	if ((Type < 0) || (a_NBT.GetType(Type) != TAG_Short))
+	if (Type <= 0)
 	{
 		return false;
 	}
-	a_Item.m_ItemType = a_NBT.GetShort(Type);
+
+	if (a_NBT.GetType(Type) == TAG_String)
+	{
+		if (!StringToItem(a_NBT.GetString(Type), a_Item))
+		{
+			// Can't resolve item type
+			return false;
+		}
+	}
+	else if (a_NBT.GetType(Type) == TAG_Short)
+	{
+		a_Item.m_ItemType = a_NBT.GetShort(Type);
+	}
+	else
+	{
+		return false;
+	}
+
 	if (a_Item.m_ItemType < 0)
 	{
 		a_Item.Empty();

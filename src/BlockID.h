@@ -1,7 +1,13 @@
 #pragma once
 
+// The following hackery is to allow typed C++ enum for C++ code, yet have ToLua process the values.
+// ToLua doesn't understand typed enums, so we use preprocessor to hide it from ToLua.
+
+enum ENUM_BLOCK_ID : BLOCKTYPE
+#if 0
+enum ENUM_BLOCK_ID  // tolua_export
+#endif
 // tolua_begin
-enum ENUM_BLOCK_ID
 {
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
@@ -220,6 +226,10 @@ enum ENUM_BLOCK_ID
 	E_BLOCK_LOCKED_CHEST = E_BLOCK_STAINED_GLASS,
 };
 // tolua_end
+
+
+
+
 
 // tolua_begin
 enum ENUM_ITEM_ID

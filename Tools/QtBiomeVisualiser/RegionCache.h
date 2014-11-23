@@ -9,8 +9,9 @@
 
 
 
-class Chunk;
-typedef std::shared_ptr<Chunk> ChunkPtr;
+// fwd:
+class Region;
+typedef std::shared_ptr<Region> RegionPtr;
 
 class ChunkSource;
 
@@ -18,19 +19,19 @@ class ChunkSource;
 
 
 
-/** Caches chunk data for reuse */
-class ChunkCache :
+/** Caches regions' chunk data for reuse */
+class RegionCache :
 	public QObject
 {
 	typedef QObject super;
 	Q_OBJECT
 
 public:
-	explicit ChunkCache(QObject * parent = NULL);
+	explicit RegionCache(QObject * parent = NULL);
 
-	/** Retrieves the specified chunk from the cache.
-	Only returns valid chunks; if the chunk is invalid, queues it for rendering and returns an empty ptr. */
-	ChunkPtr fetch(int a_ChunkX, int a_ChunkZ);
+	/** Retrieves the specified region from the cache.
+	Only returns valid regions; if the region is invalid, queues it for rendering and returns an empty ptr. */
+	RegionPtr fetch(int a_RegionX, int a_RegionZ);
 
 	/** Replaces the chunk source used by the biome view to get the chunk biome data.
 	The cache is then invalidated. */
@@ -43,16 +44,16 @@ public:
 	void reload();
 
 signals:
-	void chunkAvailable(int a_ChunkX, int a_ChunkZ);
+	void regionAvailable(int a_RegionX, int a_RegionZ);
 
 protected slots:
-	void gotChunk(int a_ChunkX, int a_ChunkZ);
+	void gotRegion(int a_RegionX, int a_RegionZ);
 
 protected:
 	/** The cache of the chunks */
-	QCache<quint32, ChunkPtr> m_Cache;
+	QCache<quint32, RegionPtr> m_Cache;
 
-	/** Locks te cache against multithreaded access */
+	/** Locks the cache against multithreaded access */
 	QMutex m_Mtx;
 
 	/** The source used to get the biome data. */
@@ -60,10 +61,10 @@ protected:
 
 
 	/** Returns the hash used by the chunk in the cache */
-	quint32 getChunkHash(int a_ChunkX, int a_ChunkZ);
+	quint32 getRegionHash(int a_RegionX, int a_RegionZ);
 
-	/** Queues the specified chunk for rendering by m_ChunkSource. */
-	void queueChunkRender(int a_ChunkX, int a_ChunkZ, ChunkPtr & a_Chunk);
+	/** Queues the specified region for rendering by m_RegionSource. */
+	void queueRegionRender(int a_RegionX, int a_RegionZ, RegionPtr & a_Region);
 };
 
 

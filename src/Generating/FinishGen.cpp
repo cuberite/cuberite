@@ -10,7 +10,6 @@
 #include "Globals.h"
 
 #include "FinishGen.h"
-#include "../Noise.h"
 #include "../BlockID.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
@@ -199,6 +198,11 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			
 			// Get the top block + 1. This is the place where the grass would finaly be placed:
 			int y = a_ChunkDesc.GetHeight(x, z) + 1;
+			
+			if (y >= 255)
+			{
+				continue;
+			}
 
 			// Check if long grass can be placed:
 			if (
@@ -414,6 +418,11 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					break;
 				}
+				default:
+				{
+					// There's no snow in the other biomes.
+					break;
+				}
 			}
 		}
 	}  // for z
@@ -452,6 +461,11 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 							break;
 						}
 					}
+					break;
+				}
+				default:
+				{
+					// No icy water in other biomes.
 					break;
 				}
 			}

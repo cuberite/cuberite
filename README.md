@@ -1,4 +1,4 @@
-MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer.svg)](https://travis-ci.org/mc-server/MCServer) [![Coverity Scan Build Status](https://scan.coverity.com/projects/1930/badge.svg)](https://scan.coverity.com/projects/1930) [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
+MCServer [![Build Status](http://img.shields.io/travis/mc-server/MCServer/master.svg?style=flat)](https://travis-ci.org/mc-server/MCServer) [![Coverity Scan Build Status](https://scan.coverity.com/projects/1930/badge.svg)](https://scan.coverity.com/projects/1930) [![weekly tips](http://img.shields.io/gratipay/cuberite_team.svg?style=flat)](http://gratipay.com/cuberite_team)  [![tip for next commit](http://tip4commit.com/projects/74.svg)](http://tip4commit.com/projects/74)
 ========
 
 MCServer is a Minecraft server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API.
@@ -9,6 +9,8 @@ We currently support Release 1.7 and 1.8 (not beta) Minecraft protocol versions.
 
 Installation
 ------------
+
+[![Install on DigitalOcean](http://doinstall.bearbin.net/button.svg)](http://doinstall.bearbin.net/install?url=https://github.com/mc-server/MCServer)
 
 For Linux there is an easy installation method, just run this in your terminal:
 

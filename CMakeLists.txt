@@ -37,6 +37,21 @@ if(DEFINED ENV{MCSERVER_BUILD_ID})
 	endif()
 endif()
 
+# We need C++11 features, Visual Studio has those from VS2012, but it needs a new platform toolset for those; VS2013 supports them natively:
+# Adapted from http://binglongx.wordpress.com/2013/06/28/set-non-default-platform-toolset-in-cmake/
+if(MSVC OR MSVC_IDE)
+  if( MSVC_VERSION LESS 1700 )       # VC10- / VS2010-
+    message(FATAL_ERROR "The project requires C++11 features. "
+      "You need at least Visual Studio 11 (Microsoft Visual Studio 2012), "
+      "with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012).")
+  elseif( MSVC_VERSION EQUAL 1700 )  # VC11 / VS2012
+    message( "VC11: using Microsoft Visual Studio 2012 "
+      "with Microsoft Visual C++ Compiler Nov 2012 CTP (v120_CTP_Nov2012)" )
+    set(CMAKE_GENERATOR_TOOLSET "v120_CTP_Nov2012" CACHE STRING "Platform Toolset" FORCE)
+  else() # VC12+, assuming C++11 supported.
+  endif()
+endif()
+
 # This has to be done before any flags have been set up.
 if(${BUILD_TOOLS})
 	add_subdirectory(Tools/MCADefrag/)

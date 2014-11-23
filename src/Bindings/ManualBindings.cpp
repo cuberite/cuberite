@@ -1034,11 +1034,11 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 		#ifndef TOLUA_RELEASE
 		if (self == nullptr)
 		{
-			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines' / 'UpdateSign'", nullptr);
+			tolua_error(tolua_S, "invalid 'self' in function 'SetSignLines'", nullptr);
 		}
 		#endif
 		{
-			bool res = self->UpdateSign(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			bool res = self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
 			tolua_pushboolean(tolua_S, res ? 1 : 0);
 		}
 	}
@@ -1046,7 +1046,7 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	
 	#ifndef TOLUA_RELEASE
 tolua_lerror:
-	tolua_error(tolua_S, "#ferror in function 'SetSignLines' / 'UpdateSign'.", &tolua_err);
+	tolua_error(tolua_S, "#ferror in function 'SetSignLines'.", &tolua_err);
 	return 0;
 	#endif
 }
@@ -3368,6 +3368,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cRoot");
 			tolua_function(tolua_S, "FindAndDoWithPlayer", tolua_DoWith <cRoot, cPlayer, &cRoot::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "DoWithPlayerByUUID",  tolua_DoWith <cRoot, cPlayer, &cRoot::DoWithPlayerByUUID>);
 			tolua_function(tolua_S, "ForEachPlayer",       tolua_ForEach<cRoot, cPlayer, &cRoot::ForEachPlayer>);
 			tolua_function(tolua_S, "ForEachWorld",        tolua_ForEach<cRoot, cWorld,  &cRoot::ForEachWorld>);
 			tolua_function(tolua_S, "GetFurnaceRecipe",    tolua_cRoot_GetFurnaceRecipe);
@@ -3389,6 +3390,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithFlowerPotAt",         tolua_DoWithXYZ<cWorld, cFlowerPotEntity,    &cWorld::DoWithFlowerPotAt>);
 			tolua_function(tolua_S, "DoWithPlayer",              tolua_DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",       tolua_DoWith<   cWorld, cPlayer,             &cWorld::FindAndDoWithPlayer>);
+			tolua_function(tolua_S, "DoWithPlayerByUUID",        tolua_DoWith<   cWorld, cPlayer,             &cWorld::DoWithPlayerByUUID>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk", tolua_ForEachInChunk<cWorld, cBlockEntity,   &cWorld::ForEachBlockEntityInChunk>);
 			tolua_function(tolua_S, "ForEachChestInChunk",       tolua_ForEachInChunk<cWorld, cChestEntity,   &cWorld::ForEachChestInChunk>);
 			tolua_function(tolua_S, "ForEachEntity",             tolua_ForEach<       cWorld, cEntity,        &cWorld::ForEachEntity>);
@@ -3403,7 +3405,6 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "ScheduleTask",              tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",              tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "TryGetHeight",              tolua_cWorld_TryGetHeight);
-			tolua_function(tolua_S, "UpdateSign",                tolua_cWorld_SetSignLines);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cMapManager");

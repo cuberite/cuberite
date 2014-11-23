@@ -52,7 +52,8 @@ int cClientHandle::s_ClientCount = 0;
 // cClientHandle:
 
 cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
-	m_ViewDistance(a_ViewDistance),
+	m_CurrentViewDistance(a_ViewDistance),
+	m_RequestedViewDistance(a_ViewDistance),
 	m_IPString(a_Socket->GetIPString()),
 	m_OutgoingData(64 KiB),
 	m_Player(nullptr),
@@ -78,6 +79,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
+	m_LastPlacedSign(0, -1, 0),
 	m_ProtocolVersion(0)
 {
 	m_Protocol = new cProtocolRecognizer(this);
@@ -412,7 +414,7 @@ bool cClientHandle::StreamNextChunk(void)
 	cCSLock Lock(m_CSChunkLists);
 
 	// High priority: Load the chunks that are in the view-direction of the player (with a radius of 3)
-	for (int Range = 0; Range < m_ViewDistance; Range++)
+	for (int Range = 0; Range < m_CurrentViewDistance; Range++)
 	{
 		Vector3d Vector = Position + LookVector * cChunkDef::Width * Range;
 
@@ -429,7 +431,7 @@ bool cClientHandle::StreamNextChunk(void)
 				cChunkCoords Coords(ChunkX, ChunkZ);
 
 				// Checks if the chunk is in distance
-				if ((Diff(ChunkX, ChunkPosX) > m_ViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_ViewDistance))
+				if ((Diff(ChunkX, ChunkPosX) > m_CurrentViewDistance) || (Diff(ChunkZ, ChunkPosZ) > m_CurrentViewDistance))
 				{
 					continue;
 				}
@@ -452,7 +454,7 @@ bool cClientHandle::StreamNextChunk(void)
 	}
 
 	// Low priority: Add all chunks that are in range. (From the center out to the edge)
-	for (int d = 0; d <= m_ViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
+	for (int d = 0; d <= m_CurrentViewDistance; ++d)  // cycle through (square) distance, from nearest to furthest
 	{
 		// For each distance add chunks in a hollow square centered around current position:
 		cChunkCoordsList CurcleChunks;
@@ -510,7 +512,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		{
 			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
 			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
-			if ((DiffX > m_ViewDistance) || (DiffZ > m_ViewDistance))
+			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				ChunksToRemove.push_back(*itr);
 				itr = m_LoadedChunks.erase(itr);
@@ -525,7 +527,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 		{
 			int DiffX = Diff((*itr).m_ChunkX, ChunkPosX);
 			int DiffZ = Diff((*itr).m_ChunkZ, ChunkPosZ);
-			if ((DiffX > m_ViewDistance) || (DiffZ > m_ViewDistance))
+			if ((DiffX > m_CurrentViewDistance) || (DiffZ > m_CurrentViewDistance))
 			{
 				itr = m_ChunksToSend.erase(itr);
 			}
@@ -539,7 +541,7 @@ void cClientHandle::UnloadOutOfRangeChunks(void)
 	for (cChunkCoordsList::iterator itr = ChunksToRemove.begin(); itr != ChunksToRemove.end(); ++itr)
 	{
 		m_Player->GetWorld()->RemoveChunkClient(itr->m_ChunkX, itr->m_ChunkZ, this);
-		m_Protocol->SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
+		SendUnloadChunk(itr->m_ChunkX, itr->m_ChunkZ);
 	}
 }
 
@@ -1482,6 +1484,7 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	{
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
+
 	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
@@ -1659,8 +1662,11 @@ void cClientHandle::HandleUpdateSign(
 	const AString & a_Line3, const AString & a_Line4
 )
 {
-	cWorld * World = m_Player->GetWorld();
-	World->UpdateSign(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+	if (m_LastPlacedSign.Equals(Vector3i(a_BlockX, a_BlockY, a_BlockZ)))
+	{
+		m_LastPlacedSign.Set(0, -1, 0);
+		m_Player->GetWorld()->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, m_Player);
+	}
 }
 
 
@@ -2237,6 +2243,7 @@ void cClientHandle::SendDisconnect(const AString & a_Reason)
 
 void cClientHandle::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	m_LastPlacedSign.Set(a_BlockX, a_BlockY, a_BlockZ);
 	m_Protocol->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
 }
 
@@ -2827,8 +2834,15 @@ void cClientHandle::SetUsername( const AString & a_Username)
 
 void cClientHandle::SetViewDistance(int a_ViewDistance)
 {
-	m_ViewDistance = Clamp(a_ViewDistance, MIN_VIEW_DISTANCE, MAX_VIEW_DISTANCE);
-	LOGD("Setted %s's view distance to %i", GetUsername().c_str(), m_ViewDistance);
+	m_RequestedViewDistance = a_ViewDistance;
+	LOGD("%s is requesting ViewDistance of %d!", GetUsername().c_str(), m_RequestedViewDistance);
+
+	// Set the current view distance based on the requested VD and world max VD:
+	cWorld * world = m_Player->GetWorld();
+	if (world != nullptr)
+	{
+		m_CurrentViewDistance = Clamp(a_ViewDistance, cClientHandle::MIN_VIEW_DISTANCE, world->GetMaxViewDistance());
+	}
 }
 
 

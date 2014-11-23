@@ -51,6 +51,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 			return a_CmdInfo.Handler(a_Split, a_Player);
 		end
 		-- Let the player know they need to give a subcommand:
+		assert(type(a_CmdInfo.Subcommands) == "table", "Info.lua error: There is no handler for command \"" .. a_CmdString .. "\" and there are no subcommands defined at level " .. a_Level)
 		ListSubcommands(a_Player, a_CmdInfo.Subcommands, a_CmdString);
 		return true;
 	end

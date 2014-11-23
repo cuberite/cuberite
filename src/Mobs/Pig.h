@@ -17,6 +17,9 @@ public:
 
 	CLASS_PROTODEF(cPig)
 
+	// cEntity overrides
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
