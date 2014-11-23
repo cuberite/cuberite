@@ -85,7 +85,7 @@ bool cIsThread::Start(void)
 	}
 	catch (std::system_error & a_Exception)
 	{
-		LOGERROR("cIsThread::Wait (std::thread) error %i: could not construct thread %s; %s", m_ThreadName.c_str(), a_Exception.code().value(), a_Exception.what());
+		LOGERROR("cIsThread::Wait (std::thread) error %i: could not construct thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.what());
 		return false;
 	}
 }
@@ -119,7 +119,7 @@ bool cIsThread::Wait(void)
 		}
 		catch (std::system_error & a_Exception)
 		{
-			LOGERROR("cIsThread::Wait (std::thread) error %i: could not join thread %s; %s", m_ThreadName.c_str(), a_Exception.code().value(), a_Exception.what());
+			LOGERROR("cIsThread::Wait (std::thread) error %i: could not join thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.what());
 			return false;
 		}
 	}

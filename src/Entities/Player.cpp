@@ -354,7 +354,7 @@ float cPlayer::GetXpPercentage()
 
 bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 {
-	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<short>().max() - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false;  // oops, they gave us a dodgey number
@@ -374,18 +374,17 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 
 short cPlayer::DeltaExperience(short a_Xp_delta)
 {
-	if (a_Xp_delta > (SHRT_MAX - m_CurrentXp))
+	if (a_Xp_delta > (std::numeric_limits<short>().max() - m_CurrentXp))
 	{
 		// Value was bad, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.",
-			a_Xp_delta);
+		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.", a_Xp_delta);
 		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	m_CurrentXp = std::max<short int>(m_CurrentXp, 0);
+	m_CurrentXp = std::max<short>(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -393,8 +392,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d",
-		GetName().c_str(), a_Xp_delta, m_CurrentXp);
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
