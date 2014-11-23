@@ -537,7 +537,7 @@ cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_Bi
 	{
 		for (int x = 0; x <= AVERAGING_SIZE * 2; x++)
 		{
-			m_Weight[z][x] = static_cast<NOISE_DATATYPE>((5 - std::abs(5 - x)) + (5 - std::abs(5 - z)));
+			m_Weight[z][x] = static_cast<NOISE_DATATYPE>((AVERAGING_SIZE - std::abs(AVERAGING_SIZE - x)) + (AVERAGING_SIZE - std::abs(AVERAGING_SIZE - z)));
 			m_WeightSum += m_Weight[z][x];
 		}
 	}
@@ -715,7 +715,7 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 {
 	switch (a_Biome)
 	{
-		case biBeach:                a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
+		case biBeach:                a_HeightAmp = 0.2f;   a_MidPoint =  60; break;
 		case biBirchForest:          a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
 		case biBirchForestHills:     a_HeightAmp = 0.075f; a_MidPoint =  68; break;
 		case biBirchForestHillsM:    a_HeightAmp = 0.075f; a_MidPoint =  68; break;

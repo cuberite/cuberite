@@ -144,8 +144,8 @@ public:
 	void Initialize(cIniFile & a_IniFile);
 
 protected:
-	/** Number of columns around the pixel to query for biomes for averaging. */
-	static const int AVERAGING_SIZE = 5;
+	/** Number of columns around the pixel to query for biomes for averaging. Must be less than or equal to 16. */
+	static const int AVERAGING_SIZE = 9;
 
 	/** Type used for a single parameter across the entire (downscaled) chunk. */
 	typedef NOISE_DATATYPE ChunkParam[5 * 5];
