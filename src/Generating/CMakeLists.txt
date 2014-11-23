@@ -31,8 +31,10 @@ SET (SRCS
 	StructGen.cpp
 	TestRailsGen.cpp
 	Trees.cpp
+	TwoHeights.cpp
 	UnderwaterBaseGen.cpp
-	VillageGen.cpp)
+	VillageGen.cpp
+)
 
 SET (HDRS
 	BioGen.h
@@ -65,8 +67,10 @@ SET (HDRS
 	StructGen.h
 	TestRailsGen.h
 	Trees.h
+	TwoHeights.h
 	UnderwaterBaseGen.h
-	VillageGen.h)
+	VillageGen.h
+)
 
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})

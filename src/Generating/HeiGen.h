@@ -170,7 +170,11 @@ public:
 		m_BiomeGen(a_BiomeGen)
 	{
 	}
-	
+
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+
 protected:
 
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
@@ -187,11 +191,8 @@ protected:
 		float m_BaseHeight;
 	} ;
 	static const sGenParam m_GenParam[256];
-	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
-	
+
+
 	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
 } ;
 

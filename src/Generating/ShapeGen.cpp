@@ -9,6 +9,7 @@
 #include "DistortedHeightmap.h"
 #include "EndGen.h"
 #include "Noise3DGenerator.h"
+#include "TwoHeights.h"
 
 
 
@@ -120,6 +121,10 @@ cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(cIniFile & a_IniFile, cBiom
 	else if (NoCaseCompare(shapeGenName, "Noise3D") == 0)
 	{
 		res = std::make_shared<cNoise3DComposable>(a_Seed);
+	}
+	else if (NoCaseCompare(shapeGenName, "TwoHeights") == 0)
+	{
+		res = CreateShapeGenTwoHeights(a_Seed, a_BiomeGen);
 	}
 	else
 	{
