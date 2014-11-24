@@ -117,7 +117,7 @@ public:
 		for (int i = 0; i < maxQueue; i++)
 		{
 			int chunkX, chunkZ;
-			decodeChunkCoords(i, chunkX, chunkZ);
+			DecodeChunkCoords(i, chunkX, chunkZ);
 			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
 		}  // for i
 
@@ -170,7 +170,7 @@ protected:
 		if (m_NextIdx < m_MaxIdx)
 		{
 			int chunkX, chunkZ;
-			decodeChunkCoords(m_NextIdx, chunkX, chunkZ);
+			DecodeChunkCoords(m_NextIdx, chunkX, chunkZ);
 			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
 			m_NextIdx += 1;
 		}
@@ -191,7 +191,7 @@ protected:
 
 
 	/** Decodes the index into chunk coords. Provides the specific chunk ordering. */
-	void decodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ)
+	void DecodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ)
 	{
 		// A zigzag pattern from the top to bottom, each row alternating between forward-x and backward-x:
 		int z = a_Idx / m_PrepareDistance;
