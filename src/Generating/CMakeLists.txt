@@ -10,6 +10,7 @@ SET (SRCS
 	ChunkDesc.cpp
 	ChunkGenerator.cpp
 	CompoGen.cpp
+	CompoGenBiomal.cpp
 	ComposableGenerator.cpp
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
@@ -30,8 +31,10 @@ SET (SRCS
 	StructGen.cpp
 	TestRailsGen.cpp
 	Trees.cpp
+	TwoHeights.cpp
 	UnderwaterBaseGen.cpp
-	VillageGen.cpp)
+	VillageGen.cpp
+)
 
 SET (HDRS
 	BioGen.h
@@ -39,7 +42,9 @@ SET (HDRS
 	ChunkDesc.h
 	ChunkGenerator.h
 	CompoGen.h
+	CompoGenBiomal.h
 	ComposableGenerator.h
+	CompositedHeiGen.h
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
 	EndGen.h
@@ -58,11 +63,14 @@ SET (HDRS
 	RainbowRoadsGen.h
 	Ravines.h
 	RoughRavines.h
+	ShapeGen.cpp
 	StructGen.h
 	TestRailsGen.h
 	Trees.h
+	TwoHeights.h
 	UnderwaterBaseGen.h
-	VillageGen.h)
+	VillageGen.h
+)
 
 if(NOT MSVC)
 	add_library(Generating ${SRCS} ${HDRS})

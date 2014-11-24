@@ -152,6 +152,52 @@ int cChunkDesc::GetHeight(int a_RelX, int a_RelZ)
 
 
 
+void cChunkDesc::SetHeightFromShape(const Shape & a_Shape)
+{
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			for (int y = cChunkDef::Height - 1; y > 0; y--)
+			{
+				if (a_Shape[y + x * 256 + z * 16 * 256] != 0)
+				{
+					cChunkDef::SetHeight(m_HeightMap, x, z, y);
+					break;
+				}
+			}  // for y
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
+void cChunkDesc::GetShapeFromHeight(Shape & a_Shape) const
+{
+	for (int z = 0; z < cChunkDef::Width; z++)
+	{
+		for (int x = 0; x < cChunkDef::Width; x++)
+		{
+			int height = cChunkDef::GetHeight(m_HeightMap, x, z);
+			for (int y = 0; y <= height; y++)
+			{
+				a_Shape[y + x * 256 + z * 16 * 256] = 1;
+			}
+			
+			for (int y = height + 1; y < cChunkDef::Height; y++)
+			{
+				a_Shape[y + x * 256 + z * 16 * 256] = 0;
+			}  // for y
+		}  // for x
+	}  // for z
+}
+
+
+
+
+
 void cChunkDesc::SetUseDefaultBiomes(bool a_bUseDefaultBiomes)
 {
 	m_bUseDefaultBiomes = a_bUseDefaultBiomes;
@@ -360,6 +406,23 @@ HEIGHTTYPE cChunkDesc::GetMaxHeight(void) const
 		}
 	}
 	return MaxHeight;
+}
+
+
+
+
+
+HEIGHTTYPE cChunkDesc::GetMinHeight(void) const
+{
+	HEIGHTTYPE MinHeight = m_HeightMap[0];
+	for (size_t i = 1; i < ARRAYCOUNT(m_HeightMap); i++)
+	{
+		if (m_HeightMap[i] < MinHeight)
+		{
+			MinHeight = m_HeightMap[i];
+		}
+	}
+	return MinHeight;
 }
 
 

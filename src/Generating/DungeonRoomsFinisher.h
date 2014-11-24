@@ -23,15 +23,15 @@ class cDungeonRoomsFinisher :
 
 public:
 	/** Creates a new dungeon room finisher.
-	a_HeightGen is the underlying height generator, so that the rooms can always be placed under the terrain.
+	a_ShapeGen is the underlying terrain shape generator, so that the rooms can always be placed under the terrain.
 	a_MaxSize and a_MinSize are the maximum and minimum sizes of the room's internal (air) area, in blocks across.
 	a_HeightDistrib is the string defining the height distribution for the rooms (cProbabDistrib format). */
-	cDungeonRoomsFinisher(cTerrainHeightGenPtr a_HeightGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib);
+	cDungeonRoomsFinisher(cTerrainShapeGenPtr a_ShapeGen, int a_Seed, int a_GridSize, int a_MaxSize, int a_MinSize, const AString & a_HeightDistrib);
 
 protected:
 
-	/** The height gen that is used for limiting the rooms' Y coords */
-	cTerrainHeightGenPtr m_HeightGen;
+	/** The shape gen that is used for limiting the rooms' Y coords */
+	cTerrainShapeGenPtr m_ShapeGen;
 
 	/** Maximum half-size (from center to wall) of the dungeon room's inner (air) area. Default is 3 (vanilla). */
 	int m_MaxHalfSize;

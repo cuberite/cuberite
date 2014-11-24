@@ -18,8 +18,8 @@
 
 /*
 How village generating works:
-By descending from a cGridStructGen, a semi-random grid is generated. A village may be generated for each of
-the grid's cells. Each cell checks the biomes in an entire chunk around it, only generating a village if all
+By descending from a cGridStructGen, a semi-random (jitter) grid is generated. A village may be generated for each
+of the grid's cells. Each cell checks the biomes in an entire chunk around it, only generating a village if all
 biomes are village-friendly. If yes, the entire village structure is built for that cell. If not, the cell
 is left village-less.
 
@@ -125,7 +125,7 @@ public:
 		m_Noise(a_Seed),
 		m_MaxSize(a_MaxSize),
 		m_Density(a_Density),
-		m_Borders(a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize, a_OriginX + a_MaxSize, 255, a_OriginZ + a_MaxSize),
+		m_Borders(a_OriginX - a_MaxSize, 0, a_OriginZ - a_MaxSize, a_OriginX + a_MaxSize, cChunkDef::Height - 1, a_OriginZ + a_MaxSize),
 		m_Prefabs(a_Prefabs),
 		m_HeightGen(a_HeightGen),
 		m_RoadBlock(a_RoadBlock),

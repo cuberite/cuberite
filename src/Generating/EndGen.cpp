@@ -147,13 +147,14 @@ bool cEndGen::IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cEndGen::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+void cEndGen::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 {
+	// If the chunk is outside out range, fill the shape with zeroes:
 	if (IsChunkOutsideRange(a_ChunkX, a_ChunkZ))
 	{
-		for (size_t i = 0; i < ARRAYCOUNT(a_HeightMap); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(a_Shape); i++)
 		{
-			a_HeightMap[i] = 0;
+			a_Shape[i] = 0;
 		}
 		return;
 	}
@@ -165,15 +166,14 @@ void cEndGen::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			cChunkDef::SetHeight(a_HeightMap, x, z, MaxY);
-			for (int y = MaxY; y > 0; y--)
+			for (int y = 0; y < MaxY; y++)
 			{
-				if (m_NoiseArray[y * 17 * 17 + z * 17 + x] <= 0)
-				{
-					cChunkDef::SetHeight(a_HeightMap, x, z, y);
-					break;
-				}
-			}  // for y
+				a_Shape[(x + 16 * z) * 256 + y] = (m_NoiseArray[y * 17 * 17 + z * 17 + z] > 0) ? 1 : 0;
+			}
+			for (int y = MaxY; y < cChunkDef::Height; y++)
+			{
+				a_Shape[(x + 16 * z) * 256 + y] = 0;
+			}
 		}  // for x
 	}  // for z
 }
@@ -182,30 +182,18 @@ void cEndGen::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_
 
 
 
-void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
-	if (IsChunkOutsideRange(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()))
-	{
-		a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
-		return;
-	}
-
-	PrepareState(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-
-	int MaxY = std::min((int)(1.75 * m_IslandSizeY + 1), cChunkDef::Height - 1);
+	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			for (int y = MaxY; y > 0; y--)
+			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				if (m_NoiseArray[y * 17 * 17 + z * 17 + x] <= 0)
+				if (a_Shape[(x + 16 * z) * 256 + y] != 0)
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_END_STONE, 0);
-				}
-				else
-				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_AIR, 0);
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_END_STONE);
 				}
 			}  // for y
 		}  // for x

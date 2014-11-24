@@ -2,10 +2,12 @@
 // HeiGen.h
 
 /*
-Interfaces to the various height generators:
+Interfaces to the various height-based terrain shape generators:
 	- cHeiGenFlat
 	- cHeiGenClassic
 	- cHeiGenBiomal
+
+Also implements the heightmap cache
 */
 
 
@@ -16,6 +18,78 @@ Interfaces to the various height generators:
 
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
+
+
+
+
+
+/** A simple cache that stores N most recently generated chunks' heightmaps; N being settable upon creation */
+class cHeiGenCache :
+	public cTerrainHeightGen
+{
+public:
+	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, int a_CacheSize);
+	~cHeiGenCache();
+	
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	
+	/** Retrieves height at the specified point in the cache, returns true if found, false if not found */
+	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
+	
+protected:
+	struct sCacheData
+	{
+		int m_ChunkX;
+		int m_ChunkZ;
+		cChunkDef::HeightMap m_HeightMap;
+	} ;
+	
+	/** The terrain height generator that is being cached. */
+	cTerrainHeightGenPtr m_HeiGenToCache;
+	
+	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
+	int          m_CacheSize;
+	int *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
+	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
+	
+	// Cache statistics
+	int m_NumHits;
+	int m_NumMisses;
+	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
+} ;
+
+
+
+
+
+/** Caches heightmaps in multiple underlying caches to improve the distribution and lower the chain length. */
+class cHeiGenMultiCache:
+	public cTerrainHeightGen
+{
+public:
+	cHeiGenMultiCache(cTerrainHeightGenPtr a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	
+	/** Retrieves height at the specified point in the cache, returns true if found, false if not found */
+	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
+
+protected:
+	typedef SharedPtr<cHeiGenCache> cHeiGenCachePtr;
+	typedef std::vector<cHeiGenCachePtr> cHeiGenCachePtrs;
+
+
+	/** The coefficient used to turn Z coords into index (x + Coeff * z). */
+	static const size_t m_CoeffZ = 5;
+
+	/** Number of sub-caches, pulled out of m_SubCaches.size() for performance reasons. */
+	size_t m_NumSubCaches;
+
+	/** The individual sub-caches. */
+	cHeiGenCachePtrs m_SubCaches;
+};
 
 
 
@@ -34,47 +108,6 @@ protected:
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
 	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
-} ;
-
-
-
-
-
-/// A simple cache that stores N most recently generated chunks' heightmaps; N being settable upon creation
-class cHeiGenCache :
-	public cTerrainHeightGen
-{
-public:
-	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, int a_CacheSize);
-	~cHeiGenCache();
-	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
-	
-	/// Retrieves height at the specified point in the cache, returns true if found, false if not found
-	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
-	
-protected:
-
-	cTerrainHeightGenPtr m_HeiGenToCache;
-	
-	struct sCacheData
-	{
-		int m_ChunkX;
-		int m_ChunkZ;
-		cChunkDef::HeightMap m_HeightMap;
-	} ;
-	
-	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
-	int          m_CacheSize;
-	int *        m_CacheOrder;  // MRU-ized order, indices into m_CacheData array
-	sCacheData * m_CacheData;   // m_CacheData[m_CacheOrder[0]] is the most recently used
-	
-	// Cache statistics
-	int m_NumHits;
-	int m_NumMisses;
-	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 } ;
 
 
@@ -137,7 +170,11 @@ public:
 		m_BiomeGen(a_BiomeGen)
 	{
 	}
-	
+
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
+
 protected:
 
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
@@ -154,11 +191,8 @@ protected:
 		float m_BaseHeight;
 	} ;
 	static const sGenParam m_GenParam[256];
-	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override;
-	
+
+
 	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
 } ;
 

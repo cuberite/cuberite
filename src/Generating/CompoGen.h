@@ -38,7 +38,7 @@ protected:
 	bool      m_IsBedrocked;
 	
 	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -55,7 +55,7 @@ public:
 protected:
 	
 	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 } ;
 
 
@@ -81,42 +81,8 @@ protected:
 	BLOCKTYPE m_BlockSea;
 	
 	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
-} ;
-
-
-
-
-
-class cCompoGenBiomal :
-	public cTerrainCompositionGen
-{
-public:
-	cCompoGenBiomal(int a_Seed) :
-		m_Noise(a_Seed + 1000),
-		m_SeaLevel(62)
-	{
-	}
-	
-protected:
-
-	cNoise m_Noise;
-	int    m_SeaLevel;
-	
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
-	
-	void FillColumnGrass    (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	void FillColumnClay     (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	void FillColumnDirt     (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	void FillColumnSand     (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	void FillColumnMycelium (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	void FillColumnWaterSand(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	void FillColumnWaterDirt(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes);
-	
-	void FillColumnPattern  (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes, const BLOCKTYPE * a_Pattern, int a_PatternSize);
 } ;
 
 
@@ -136,7 +102,7 @@ protected:
 	int m_Threshold;
 	
 	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;
 
@@ -153,7 +119,7 @@ public:
 	~cCompoGenCache();
 	
 	// cTerrainCompositionGen override:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 	
 protected:
@@ -166,6 +132,7 @@ protected:
 		int m_ChunkZ;
 		cChunkDef::BlockTypes        m_BlockTypes;
 		cChunkDesc::BlockNibbleBytes m_BlockMetas;  // The metas are uncompressed, 1 meta per byte
+		cChunkDef::HeightMap         m_HeightMap;
 	} ;
 	
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
