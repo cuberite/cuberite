@@ -29,10 +29,17 @@ class cChunkDesc
 {
 public:
 	// tolua_end
+
+	/** The datatype used to represent the entire chunk worth of shape.
+	0 = air
+	1 = solid
+	Indexed as [y + 256 * x + 256 * 16 * z]. */
+	typedef Byte Shape[256 * 16 * 16];
 	
 	/** Uncompressed block metas, 1 meta per byte */
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
 	
+
 	cChunkDesc(int a_ChunkX, int a_ChunkZ);
 	~cChunkDesc();
 
@@ -57,9 +64,20 @@ public:
 	EMCSBiome  GetBiome(int a_RelX, int a_RelZ);
 
 	// These operate on the heightmap, so they could get out of sync with the data
-	// Use UpdateHeightmap() to re-sync
+	// Use UpdateHeightmap() to re-calculate heightmap from the block data
 	void       SetHeight(int a_RelX, int a_RelZ, int a_Height);
 	int        GetHeight(int a_RelX, int a_RelZ);
+
+	// tolua_end
+
+	/** Sets the heightmap to match the given shape data.
+	Note that this ignores overhangs; the method is mostly used by old composition generators. */
+	void SetHeightFromShape(const Shape & a_Shape);
+
+	/** Sets the shape in a_Shape to match the heightmap stored currently in m_HeightMap. */
+	void GetShapeFromHeight(Shape & a_Shape) const;
+
+	// tolua_begin
 
 	// Default generation:
 	void SetUseDefaultBiomes(bool a_bUseDefaultBiomes);
@@ -77,8 +95,11 @@ public:
 	/** Reads an area from the chunk into a cBlockArea, blocktypes and blockmetas */
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
 
-	/** Returns the maximum height value in the heightmap */
+	/** Returns the maximum height value in the heightmap. */
 	HEIGHTTYPE GetMaxHeight(void) const;
+
+	/** Returns the minimum height value in the heightmap. */
+	HEIGHTTYPE GetMinHeight(void) const;
 	
 	/** Fills the relative cuboid with specified block; allows cuboid out of range of this chunk */
 	void FillRelCuboid(

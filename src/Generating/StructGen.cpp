@@ -37,10 +37,13 @@ void cStructGenTrees::GenFinish(cChunkDesc & a_ChunkDesc)
 				Dest = &WorkerDesc;
 				WorkerDesc.SetChunkCoords(BaseX, BaseZ);
 				
+				// TODO: This may cause a lot of wasted calculations, instead of pulling data out of a single (cChunkDesc) cache
+
+				cChunkDesc::Shape workerShape;
 				m_BiomeGen->GenBiomes           (BaseX, BaseZ, WorkerDesc.GetBiomeMap());
-				m_HeightGen->GenHeightMap       (BaseX, BaseZ, WorkerDesc.GetHeightMap());
-				m_CompositionGen->ComposeTerrain(WorkerDesc);
-				// TODO: Free the entity lists
+				m_ShapeGen->GenShape            (BaseX, BaseZ, workerShape);
+				WorkerDesc.SetHeightFromShape   (workerShape);
+				m_CompositionGen->ComposeTerrain(WorkerDesc, workerShape);
 			}
 			else
 			{
@@ -97,7 +100,7 @@ void cStructGenTrees::GenerateSingleTree(
 	
 	int Height = a_ChunkDesc.GetHeight(x, z);
 	
-	if ((Height <= 0) || (Height > 240))
+	if ((Height <= 0) || (Height >= 230))
 	{
 		return;
 	}
@@ -123,6 +126,11 @@ void cStructGenTrees::GenerateSingleTree(
 		if ((itr->ChunkX != a_ChunkX) || (itr->ChunkZ != a_ChunkZ))
 		{
 			// Outside the chunk
+			continue;
+		}
+		if (itr->y >= cChunkDef::Height)
+		{
+			// Above the chunk, cut off (this shouldn't happen too often, we're limiting trees to y < 230)
 			continue;
 		}
 
@@ -159,7 +167,7 @@ void cStructGenTrees::ApplyTreeImage(
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
 	for (sSetBlockVector::const_iterator itr = a_Image.begin(), end = a_Image.end(); itr != end; ++itr)
 	{
-		if ((itr->ChunkX == a_ChunkX) && (itr->ChunkZ == a_ChunkZ))
+		if ((itr->ChunkX == a_ChunkX) && (itr->ChunkZ == a_ChunkZ) && (itr->y < cChunkDef::Height))
 		{
 			// Inside this chunk, integrate into a_ChunkDesc:
 			switch (a_ChunkDesc.GetBlockType(itr->x, itr->y, itr->z))
@@ -390,7 +398,7 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 		
 		cBlockArea Lake;
-		CreateLakeImage(ChunkX + x, ChunkZ + z, Lake);
+		CreateLakeImage(ChunkX + x, ChunkZ + z, a_ChunkDesc.GetMinHeight(), Lake);
 		
 		int OfsX = Lake.GetOriginX() + x * cChunkDef::Width;
 		int OfsZ = Lake.GetOriginZ() + z * cChunkDef::Width;
@@ -404,25 +412,13 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, cBlockArea & a_Lake)
+void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake)
 {
 	a_Lake.Create(16, 8, 16);
 	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
 	
-	// Find the minimum height in this chunk:
-	cChunkDef::HeightMap HeightMap;
-	m_HeiGen->GenHeightMap(a_ChunkX, a_ChunkZ, HeightMap);
-	HEIGHTTYPE MinHeight = HeightMap[0];
-	for (size_t i = 1; i < ARRAYCOUNT(HeightMap); i++)
-	{
-		if (HeightMap[i] < MinHeight)
-		{
-			MinHeight = HeightMap[i];
-		}
-	}
-	
 	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height minus 6
-	MinHeight = std::max(MinHeight - 6, 2);
+	int MinHeight = std::max(a_MaxLakeHeight - 6, 2);
 	int Rnd = m_Noise.IntNoise3DInt(a_ChunkX, 128, a_ChunkZ) / 11;
 	// Random offset [-8 .. 8], with higher probability around 0; add up four three-bit-wide randoms [0 .. 28], divide and subtract to get range
 	int OffsetX = 4 * ((Rnd & 0x07) + ((Rnd & 0x38) >> 3) + ((Rnd & 0x1c0) >> 6) + ((Rnd & 0xe00) >> 9)) / 7 - 8;
