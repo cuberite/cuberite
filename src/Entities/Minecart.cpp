@@ -432,10 +432,10 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 				}
 				else
 				{
-                    if(GetSpeedZ() > MAX_SPEED_NEGATIVE)
-                    {
-                        AddSpeedZ(AccelDecelNegSpeed);
-                    }
+                    			if(GetSpeedZ() > MAX_SPEED_NEGATIVE)
+                    			{
+                        			AddSpeedZ(AccelDecelNegSpeed);
+                    			}
 				}
 			}
 			break;
@@ -458,9 +458,9 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 				}
 				else
 				{
-				    if(GetSpeedX() > MAX_SPEED_NEGATIVE
-                    {
-                        AddSpeedX(AccelDecelNegSpeed);
+				    if(GetSpeedX() > MAX_SPEED_NEGATIVE)
+        			    {
+                        		AddSpeedX(AccelDecelNegSpeed);
 				    }
 				}
 			}
@@ -483,8 +483,8 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			{
 			    if(AddSpeedX > MAX_SPEED_NEGATIVE)
 			    {
-                    AddSpeedX(AccelDecelNegSpeed);
-                    SetSpeedY(-GetSpeedX());
+                    		AddSpeedX(AccelDecelNegSpeed);
+                    		SetSpeedY(-GetSpeedX());
 			    }
 			}
 			break;
