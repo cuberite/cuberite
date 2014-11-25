@@ -7,6 +7,7 @@
 #include "Bindings/PluginManager.h"
 #include "Entities/Player.h"
 #include "Inventory.h"
+#include "LineBlockTracer.h"
 #include "BlockEntities/BeaconEntity.h"
 #include "BlockEntities/ChestEntity.h"
 #include "BlockEntities/CommandBlockEntity.h"
@@ -921,6 +922,45 @@ void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString
 
 
 
+void cClientHandle::HandleSwingArm()
+{
+	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 0, this);
+	cRoot::Get()->GetPluginManager()->CallHookPlayerAnimation(*m_Player, 1);
+
+	// Test air left click
+	class cCallback :
+		public cBlockTracer::cCallbacks
+	{
+	public:
+
+		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, char a_EntryFace) override
+		{
+			if (a_BlockType != E_BLOCK_AIR)
+			{
+				return true;
+			}
+			return false;
+		}
+	} Callback;
+
+	cLineBlockTracer Tracer(*m_Player->GetWorld(), Callback);
+	Vector3d Start(m_Player->GetEyePosition() + m_Player->GetLookVector());
+	Vector3d End(m_Player->GetEyePosition() + m_Player->GetLookVector() * 5);
+
+	if (Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
+	{
+		// Air click.
+		LOGD("%s do a left click to the air!", m_Player->GetName().c_str());
+
+		// Call the left click hook with BLOCK_FACE_NONE
+		cRoot::Get()->GetPluginManager()->CallHookPlayerLeftClick(*m_Player, 0, 0, 0, BLOCK_FACE_NONE);
+	}
+}
+
+
+
+
+
 void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 {
 	if ((m_Player->GetWindow() == nullptr) || (m_Player->GetWindow()->GetWindowType() != cWindow::wtAnvil))
@@ -962,22 +1002,14 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		/* Check for clickthrough-blocks:
 		When the user breaks a fire block, the client send the wrong block location.
 		We must find the right block with the face direction. */
-		int BlockX = a_BlockX;
-		int BlockY = a_BlockY;
-		int BlockZ = a_BlockZ;
-		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
-		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough())
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
+		BLOCKTYPE Block = m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		if (!cBlockInfo::GetHandler(Block)->IsClickedThrough())
 		{
-			a_BlockX = BlockX;
-			a_BlockY = BlockY;
-			a_BlockZ = BlockZ;
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 		}
 
-		if (
-			((Diff(m_Player->GetPosX(), (double)a_BlockX) > 6) ||
-			(Diff(m_Player->GetPosY(), (double)a_BlockY) > 6) ||
-			(Diff(m_Player->GetPosZ(), (double)a_BlockZ) > 6))
-		)
+		if ((Vector3i(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() > 6)
 		{
 			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 			return;
@@ -985,12 +1017,6 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
-	{
-		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		return;
-	}
 
 	switch (a_Status)
 	{
@@ -1014,7 +1040,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 				m_Player->AbortEating();
 				return;
 			}
-			else
+			else if (m_Player->GetEquippedItem().m_ItemType == E_ITEM_BOW)
 			{
 				if (PlgMgr->CallHookPlayerShooting(*m_Player))
 				{
@@ -1028,6 +1054,13 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		
 		case DIG_STATUS_STARTED:
 		{
+			if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace))
+			{
+				// A plugin doesn't agree with the action, replace the block on the client and quit:
+				m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+				return;
+			}
+
 			BLOCKTYPE  OldBlock;
 			NIBBLETYPE OldMeta;
 			m_Player->GetWorld()->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, OldBlock, OldMeta);
@@ -1159,6 +1192,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 			m_LastDigBlockX, m_LastDigBlockY, m_LastDigBlockZ,
 			(m_HasStartedDigging ? "True" : "False")
 		);
+		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
 		return;
 	}
 
@@ -1236,75 +1270,12 @@ void cClientHandle::FinishDigAnimation()
 
 void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem)
 {
-	// TODO: Rewrite this function
-
 	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
 	);
-	
-	cWorld * World = m_Player->GetWorld();
-	bool AreRealCoords = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() <= 5;
 
-	if (
-		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block
-		IsValidBlock(a_HeldItem.m_ItemType) &&
-		!AreRealCoords
-	)
-	{
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		if ((a_BlockX != -1) && (a_BlockY >= 0) && (a_BlockZ != -1))
-		{
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			if (a_BlockY < cChunkDef::Height - 1)
-			{
-				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-			}
-			if (a_BlockY > 0)
-			{
-				World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
-			}
-		}
-		m_Player->GetInventory().SendEquippedSlot();
-		return;
-	}
-
-	if (!AreRealCoords)
-	{
-		a_BlockFace = BLOCK_FACE_NONE;
-	}
-
-	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
-	{
-		// A plugin doesn't agree with the action, replace the block on the client and quit:
-		if (AreRealCoords)
-		{
-			cChunkInterface ChunkInterface(World->GetChunkMap());
-			BLOCKTYPE BlockType = World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-			cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
-			BlockHandler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-
-			if (a_BlockFace != BLOCK_FACE_NONE)
-			{
-				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
-				m_Player->GetInventory().SendEquippedSlot();
-			}
-		}
-		return;
-	}
-
-	m_NumBlockChangeInteractionsThisTick++;
-	
-	if (!CheckBlockInteractionsRate())
-	{
-		Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
-		return;
-	}
-	
+	// Check equipped item.
 	const cItem & Equipped = m_Player->GetInventory().GetEquippedItem();
-
 	if ((Equipped.m_ItemType != a_HeldItem.m_ItemType) && (a_HeldItem.m_ItemType != -1))
 	{
 		// Only compare ItemType, not meta (torches have different metas)
@@ -1313,68 +1284,135 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		LOGWARN("Player %s tried to place a block that was not equipped (exp %d, got %d)",
 			m_Username.c_str(), Equipped.m_ItemType, a_HeldItem.m_ItemType
 		);
-		
-		// Let's send the current world block to the client, so that it can immediately "let the user know" that they haven't placed the block
-		if (a_BlockFace != BLOCK_FACE_NONE)
-		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		}
+
+		AbortRightClick(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		return;
 	}
 
-	if (AreRealCoords)
-	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-		cBlockHandler * BlockHandler = cBlockInfo::GetHandler(BlockType);
+	cPluginManager * PlgManager = cRoot::Get()->GetPluginManager();
 
-		if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
+	if (PlgManager->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+	{
+		AbortRightClick(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		return;
+	}
+
+	// Check block interactions ticks:
+	{
+		m_NumBlockChangeInteractionsThisTick++;
+		if (!CheckBlockInteractionsRate())
 		{
-			if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
-			{
-				// A plugin doesn't agree with using the block, abort
-				return;
-			}
-			cChunkInterface ChunkInterface(World->GetChunkMap());
-			BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-			PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+			Kick("Too many blocks were placed/interacted with per unit time - hacked client?");
 			return;
 		}
 	}
-	
-	short EquippedDamage = Equipped.m_ItemDamage;
+
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(Equipped.m_ItemType);
-	
-	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
+	cWorld * World = m_Player->GetWorld();
+	cChunkInterface ChunkInterface(World->GetChunkMap());
+
+	if (a_BlockFace != BLOCK_FACE_NONE)
 	{
-		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
+		// The client is interacting with a block.
+
+		// First test if the interacted block is a clickable block (like buttons)
+		if (!m_Player->IsCrouched())
+		{
+			BLOCKTYPE BlockType;
+			NIBBLETYPE BlockMeta;
+			World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
+			cBlockHandler * Handler = cBlockInfo::GetHandler(BlockType);
+
+			if (Handler->IsUseable())
+			{
+				// Test the coordinates:
+				if ((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() > 6)
+				{
+					Handler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+					return;
+				}
+
+				if (PlgManager->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+				{
+					// A plugin doesn't agree with using the block, abort.
+					Handler->OnCancelRightClick(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+					return;
+				}
+
+				Handler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+				PlgManager->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+				return;
+			}
+		}
+
+		// Then test if the block is placeable
+		if (ItemHandler->IsPlaceable())
+		{
+			// Test the coordinates:
+			if ((Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() > 6)
+			{
+				AbortRightClick(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+				return;
+			}
+
+			HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
+			return;
+		}
 	}
-	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
+
+	if (ItemHandler->IsFood() || ItemHandler->IsDrinkable(Equipped.m_ItemDamage))
 	{
-		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&
-			ItemHandler->IsFood() && (Equipped.m_ItemType != E_ITEM_GOLDEN_APPLE))
+		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) && ItemHandler->IsFood() && (Equipped.m_ItemType != E_ITEM_GOLDEN_APPLE))
 		{
 			// The player is satiated or in creative, and trying to eat
 			return;
 		}
+
 		m_Player->StartEating();
-		if (PlgMgr->CallHookPlayerEating(*m_Player))
+		if (PlgManager->CallHookPlayerEating(*m_Player))
 		{
 			// A plugin won't let us eat, abort (send the proper packets to the client, too):
 			m_Player->AbortEating();
 		}
+		return;
 	}
-	else
+
+	// -> No special right click.
+	if (PlgManager->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
-		if (PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		// A plugin doesn't agree with using the item, abort
+		return;
+	}
+
+	ItemHandler->OnItemUse(World, m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+	PlgManager->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+}
+
+
+
+
+
+void cClientHandle::AbortRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+{
+	m_Player->GetInventory().SendEquippedSlot();
+
+	if ((a_BlockFace != BLOCK_FACE_NONE) && (a_BlockY >= 0) && (a_BlockY < cChunkDef::Height))
+	{
+		cBlockHandler * Handler = cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(a_BlockX, a_BlockY, a_BlockZ));
+		if (!m_Player->IsCrouched() && Handler->IsUseable())
 		{
-			// A plugin doesn't agree with using the item, abort
-			return;
+			cChunkInterface ChunkInterface(m_Player->GetWorld()->GetChunkMap());
+			Handler->OnCancelRightClick(ChunkInterface, *m_Player->GetWorld(), m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		}
-		ItemHandler->OnItemUse(World, m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		else if (Handler->DoesIgnoreBuildCollision())
+		{
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		}
+		else
+		{
+			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		}
 	}
 }
 
@@ -1519,7 +1557,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 
 	World->BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-
 	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 
@@ -1580,45 +1617,6 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 {
 	HandlePlayerLook(a_Rotation, a_Pitch, a_IsOnGround);
 	HandlePlayerPos(a_PosX, a_PosY, a_PosZ, a_Stance, a_IsOnGround);
-}
-
-
-
-
-
-void cClientHandle::HandleAnimation(char a_Animation)
-{
-	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
-	{
-		// Plugin disagrees, bail out
-		return;
-	}
-
-	// Because the animation ID sent to servers by clients are different to those sent back, we need this
-	switch (a_Animation)
-	{
-		case 0:  // No animation - wiki.vg doesn't say that client has something specific for it, so I suppose it will just become -1
-		case 1:
-		case 2:
-		case 3:
-		{
-			a_Animation--;  // Offset by -1
-			break;
-		}
-		case 5:
-		case 6:
-		case 7:
-		{
-			a_Animation -= 2;  // Offset by -2
-			break;
-		}
-		default:  // Anything else is the same
-		{
-			break;
-		}
-	}
-
-	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
 }
 
 

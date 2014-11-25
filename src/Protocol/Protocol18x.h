@@ -288,13 +288,13 @@ protected:
 	void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
 	
 	// Packet handlers while in the Game state (m_State == 3):
-	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
 	void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
 	void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
 	void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
 	void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
+	void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
 	void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
 	void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);

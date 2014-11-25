@@ -2085,17 +2085,6 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
-{
-	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  EntityID);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Animation);
-	m_Client->HandleAnimation(Animation);
-}
-
-
-
-
-
 void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Status);
@@ -2122,11 +2111,8 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
-	if (Face == 255)
-	{
-		Face = 0;
-	}
+	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, FaceByte);
+	eBlockFace Face = (FaceByte == 255) ? BLOCK_FACE_NONE : static_cast<eBlockFace>(FaceByte);
 
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item, 3);
@@ -2134,7 +2120,7 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, Face, CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
 
@@ -2209,6 +2195,15 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 		return;
 	}
 	m_Client->HandleCreativeInventory(SlotNum, Item);
+}
+
+
+
+
+
+void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
+{
+	m_Client->HandleSwingArm();
 }
 
 

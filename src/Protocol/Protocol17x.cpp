@@ -1841,7 +1841,11 @@ void cProtocol172::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  EntityID);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Animation);
-	m_Client->HandleAnimation(Animation);
+
+	if (Animation == 1)
+	{
+		m_Client->HandleSwingArm();
+	}
 }
 
 

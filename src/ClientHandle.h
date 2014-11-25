@@ -253,9 +253,9 @@ public:
 	void PacketUnknown(UInt32 a_PacketType);
 	void PacketError(unsigned char a_PacketType);
 
-	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation(char a_Animation);
-	
+	/** Called when the protocol receives a animation packet with id 1. */
+	void HandleSwingArm();
+
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
 	an item in the anvil UI. */
 	void HandleAnvilItemName(const AString & a_ItemName);
@@ -451,6 +451,9 @@ private:
 	/** The version of the protocol that the client is talking, or 0 if unknown. */
 	UInt32 m_ProtocolVersion;
 
+
+	/** Handles the block resending part if the right click failed. */
+	void AbortRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace);
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
 	void HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler);

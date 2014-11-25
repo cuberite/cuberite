@@ -35,6 +35,7 @@ SET (HDRS
 	BlockEnderchest.h
 	BlockEntity.h
 	BlockFarmland.h
+	BlockFence.h
 	BlockFenceGate.h
 	BlockFire.h
 	BlockFlower.h

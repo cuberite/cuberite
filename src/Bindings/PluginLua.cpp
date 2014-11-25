@@ -817,14 +817,14 @@ bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_LEFT_CLICK];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, DIG_STATUS_STARTED, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -1635,7 +1635,11 @@ bool cPluginLua::AddHookRef(int a_HookType, int a_FnRefIdx)
 		Ref = nullptr;
 		return false;
 	}
-	
+
+	if (a_HookType == cPluginManager::HOOK_PLAYER_ANIMATION)
+	{
+		LOGWARNING("Plugin %s uses the deprecated HOOK_PLAYER_ANIMATION hook!", GetName().c_str());
+	}
 	m_HookMap[a_HookType].push_back(Ref);
 	return true;
 }
