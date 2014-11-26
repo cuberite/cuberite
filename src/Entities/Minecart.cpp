@@ -481,7 +481,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			}
 			else
 			{
-			    if(AddSpeedX > MAX_SPEED_NEGATIVE)
+			    if(GetSpeedX() > MAX_SPEED_NEGATIVE)
 			    {
                     		AddSpeedX(AccelDecelNegSpeed);
                     		SetSpeedY(-GetSpeedX());
