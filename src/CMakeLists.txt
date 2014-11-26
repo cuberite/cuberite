@@ -39,6 +39,7 @@ SET (SRCS
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
+	LeakFinder.cpp
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
@@ -58,6 +59,7 @@ SET (SRCS
 	Scoreboard.cpp
 	Server.cpp
 	SetChunkData.cpp
+	StackWalker.cpp
 	Statistics.cpp
 	StringCompression.cpp
 	StringUtils.cpp
@@ -225,7 +227,7 @@ else ()
 		Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS "/Yc\"string.h\" /Fp\"$(IntDir)/Bindings.pch\""
 	)
 	SET_SOURCE_FILES_PROPERTIES(
-		"StackWalker.cpp LeakFinder.h" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
+		"StackWalker.cpp LeakFinder.cpp" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
 	list(APPEND SOURCE "Resources/MCServer.rc")
 
