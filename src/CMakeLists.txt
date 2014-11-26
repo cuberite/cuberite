@@ -39,7 +39,6 @@ SET (SRCS
 	Inventory.cpp
 	Item.cpp
 	ItemGrid.cpp
-	LeakFinder.cpp
 	LightingThread.cpp
 	LineBlockTracer.cpp
 	LinearInterpolation.cpp
@@ -59,7 +58,6 @@ SET (SRCS
 	Scoreboard.cpp
 	Server.cpp
 	SetChunkData.cpp
-	StackWalker.cpp
 	Statistics.cpp
 	StringCompression.cpp
 	StringUtils.cpp
@@ -106,7 +104,6 @@ SET (HDRS
 	Inventory.h
 	Item.h
 	ItemGrid.h
-	LeakFinder.h
 	LightingThread.h
 	LineBlockTracer.h
 	LinearInterpolation.h
@@ -116,7 +113,6 @@ SET (HDRS
 	Map.h
 	MapManager.h
 	Matrix4.h
-	MemoryLeak.h
 	MersenneTwister.h
 	MobCensus.h
 	MobFamilyCollecter.h
@@ -130,7 +126,6 @@ SET (HDRS
 	Scoreboard.h
 	Server.h
 	SetChunkData.h
-	StackWalker.h
 	Statistics.h
 	StringCompression.h
 	StringUtils.h
@@ -177,6 +172,10 @@ if (NOT MSVC)
 	endif()
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
+
+	# Add the MSVC-specific LeakFinder sources:
+	list (APPEND SRCS LeakFinder.cpp StackWalker.cpp)
+	list (APPEND HDRS LeakFinder.h StackWalker.h MemoryLeak.h)
 
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
