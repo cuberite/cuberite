@@ -33,7 +33,7 @@ public:
 	
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cChestEntity);
+	BLOCKENTITY_PROTODEF(cChestEntity)
 	
 	/** Constructor used for normal operation */
 	cChestEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World, BLOCKTYPE a_Type);

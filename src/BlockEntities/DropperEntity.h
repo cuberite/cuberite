@@ -25,7 +25,7 @@ public:
 
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cDropperEntity);
+	BLOCKENTITY_PROTODEF(cDropperEntity)
 	
 	/// Constructor used for normal operation
 	cDropperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
