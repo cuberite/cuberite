@@ -200,7 +200,7 @@ public:
 
 
 
-BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString)
+int BlockStringToType(const AString & a_BlockTypeString)
 {
 	int res = atoi(a_BlockTypeString.c_str());
 	if ((res != 0) || (a_BlockTypeString.compare("0") == 0))

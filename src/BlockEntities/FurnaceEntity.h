@@ -38,7 +38,7 @@ public:
 	
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cFurnaceEntity);
+	BLOCKENTITY_PROTODEF(cFurnaceEntity)
 	
 	/** Constructor used for normal operation */
 	cFurnaceEntity(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cWorld * a_World);
