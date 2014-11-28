@@ -67,7 +67,7 @@ public:  // tolua_export
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-        // get the usernames
+  // get the usernames
 	std::list<std::string> getUsernames(void);
 	
 	bool AllowMultiLogin(void)

@@ -3523,6 +3523,7 @@ std::list<std::string> cWorld::getUsernames() {
 
 	std::list<std::string> usernames;
 	cCSLock Lock(m_CSPlayers);
+	
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
   	std::string username = (*itr)->GetName();

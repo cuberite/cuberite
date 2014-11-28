@@ -202,7 +202,6 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
 	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_SettingsIni.GetValueSetI("Server", "AllowMultiLogin", false);
-	std::cout<<"AllowMultiLogin setting = "<<m_bAllowMultiLogin<<std::endl;
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 

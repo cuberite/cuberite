@@ -1792,7 +1792,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 	// search through the server for it's usernames and if it matches, return false saying its already on the server.
 	bool work = cRoot::Get()->GetServer()->AllowMultiLogin();
 	std::cout<<"AllowMultiLogin setting = "<< work <<std::endl;
-	if ( !( cRoot::Get()->GetServer()->AllowMultiLogin() ) ) {
+	if ( !(cRoot::Get()->GetServer()->AllowMultiLogin()) ) {
 	
      // get the usernames
      std::list<std::string> usernamesServer = cRoot::Get()->GetServer()->getUsernames();
