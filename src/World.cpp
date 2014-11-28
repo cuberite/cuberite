@@ -3518,6 +3518,25 @@ void cWorld::AddQueuedPlayers(void)
 
 
 
+	// get the usernames
+std::list<std::string> cWorld::getUsernames() {
+
+	std::list<std::string> usernames;
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+  	std::string username = (*itr)->GetName();
+		usernames.insert(usernames.begin(), username ); 
+		
+	}
+	return usernames;
+}
+
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTaskSaveAllChunks:
 
@@ -3662,6 +3681,8 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
+
+
 
 
 

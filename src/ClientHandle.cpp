@@ -41,10 +41,6 @@
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
-
-
-
-
 #define RECI_RAND_MAX (1.f/RAND_MAX)
 inline int fRadRand(MTRand & r1, int a_BlockCoord)
 {
@@ -1792,6 +1788,31 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 			return false;
 		}
 	}
+
+	// search through the server for it's usernames and if it matches, return false saying its already on the server.
+	bool work = cRoot::Get()->GetServer()->AllowMultiLogin();
+	std::cout<<"AllowMultiLogin setting = "<< work <<std::endl;
+	if ( !( cRoot::Get()->GetServer()->AllowMultiLogin() ) ) {
+	
+     // get the usernames
+     std::list<std::string> usernamesServer = cRoot::Get()->GetServer()->getUsernames();
+     std::list<std::string> usernamesWorld = cRoot::Get()->GetDefaultWorld()->getUsernames();
+     usernamesServer.sort();
+     usernamesWorld.sort();
+     usernamesServer.merge(usernamesWorld);
+ 
+		 for (std::list<std::string>::iterator itr = usernamesServer.begin(); itr != usernamesServer.end(); ++itr)
+		 {
+			 if ( (*itr).compare( a_Username ) == 0 )
+			 {
+			   Kick("User already logged in.");
+				 return false;
+			 }
+	 	 }  		
+	}
+
+
+
 	return true;
 }
 
@@ -3038,6 +3059,7 @@ void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
 		}
 	}
 }
+
 
 
 

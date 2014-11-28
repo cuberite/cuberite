@@ -67,6 +67,14 @@ public:  // tolua_export
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
+        // get the usernames
+	std::list<std::string> getUsernames(void);
+	
+	bool AllowMultiLogin(void)
+	{
+    return m_bAllowMultiLogin; 
+	}
+        
 	// Hardcore mode or not:
 	bool IsHardcore(void) const { return m_bIsHardcore; }
 
@@ -203,6 +211,7 @@ private:
 
 	bool m_bRestarting;
 	
+
 	/** The private key used for the assymetric encryption start in the protocols */
 	cRsaPrivateKey m_PrivateKey;
 	
@@ -215,6 +224,9 @@ private:
 	AString m_FaviconData;
 	int m_MaxPlayers;
 	bool m_bIsHardcore;
+	
+	/** True - allow same username to login more than once False - only once */
+	bool m_bAllowMultiLogin; 
 	
 	cTickThread m_TickThread;
 	cEvent m_RestartEvent;
