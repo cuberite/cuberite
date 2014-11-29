@@ -696,6 +696,8 @@ public:
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
 
+	cLightingThread & GetLightingThread(void) { return m_Lighting; }
+
 	void InitializeSpawn(void);
 	
 	/** Starts threads that belong to this world */

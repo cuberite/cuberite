@@ -182,7 +182,7 @@ int main( int argc, char **argv)
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	InitLeakFinder();
 	#endif
-	
+
 	// Magic code to produce dump-files on Windows if the server crashes:
 	#if defined(_WIN32) && !defined(_WIN64) && defined(_MSC_VER)
 	HINSTANCE hDbgHelp = LoadLibrary("DBGHELP.DLL");

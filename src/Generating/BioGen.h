@@ -15,7 +15,7 @@ Interfaces to the various biome generators:
 #pragma once
 
 #include "ComposableGenerator.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 #include "../VoronoiMap.h"
 
 

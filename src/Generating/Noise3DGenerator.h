@@ -13,7 +13,8 @@
 #pragma once
 
 #include "ComposableGenerator.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
+#include "../Noise/InterpolNoise.h"
 
 
 
@@ -34,17 +35,20 @@ public:
 	
 protected:
 	// Linear interpolation step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
-	static const int UPSCALE_X = 8;
-	static const int UPSCALE_Y = 4;
-	static const int UPSCALE_Z = 8;
+	static const int UPSCALE_X = 4;
+	static const int UPSCALE_Y = 8;
+	static const int UPSCALE_Z = 4;
 	
 	// Linear interpolation buffer dimensions, calculated from the step sizes:
 	static const int DIM_X = 1 + cChunkDef::Width  / UPSCALE_X;
 	static const int DIM_Y = 1 + cChunkDef::Height / UPSCALE_Y;
 	static const int DIM_Z = 1 + cChunkDef::Width  / UPSCALE_Z;
 
-	cPerlinNoise m_Perlin;   // The base 3D noise source for the actual composition
-	cCubicNoise  m_Cubic;    // The noise used for heightmap directing
+	/** The base 3D noise source for the actual composition */
+	cOctavedNoise<cInterp5DegNoise> m_Perlin;
+
+	/** The noise used for heightmap directing. */
+	cOctavedNoise<cInterp5DegNoise> m_Cubic;
 	
 	int            m_SeaLevel;
 	NOISE_DATATYPE m_HeightAmplification;
@@ -69,8 +73,7 @@ protected:
 
 
 class cNoise3DComposable :
-	public cTerrainHeightGen,
-	public cTerrainCompositionGen
+	public cTerrainShapeGen
 {
 public:
 	cNoise3DComposable(int a_Seed);
@@ -78,21 +81,18 @@ public:
 	void Initialize(cIniFile & a_IniFile);
 
 protected:
-	/** The noise that is used to choose between density noise A and B. */
-	cPerlinNoise m_ChoiceNoise;
+	/** The 3D noise that is used to choose between density noise A and B. */
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_ChoiceNoise;
 
 	/** Density 3D noise, variant A. */
-	cPerlinNoise m_DensityNoiseA;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseA;
 
 	/** Density 3D noise, variant B. */
-	cPerlinNoise m_DensityNoiseB;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseB;
 
 	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
-	cPerlinNoise m_BaseNoise;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_BaseNoise;
 	
-	/** Block height of the sealevel, used for composing the terrain. */
-	int m_SeaLevel;
-
 	/** The main parameter of the generator, specifies the slope of the vertical linear gradient.
 	A higher value means a steeper slope and a smaller total amplitude of the generated terrain. */
 	NOISE_DATATYPE m_HeightAmplification;
@@ -127,12 +127,8 @@ protected:
 	void GenerateNoiseArrayIfNeeded(int a_ChunkX, int a_ChunkZ);
 	
 	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
-
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
+	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
 
@@ -140,8 +136,7 @@ protected:
 
 
 class cBiomalNoise3DComposable :
-	public cTerrainHeightGen,
-	public cTerrainCompositionGen
+	public cTerrainShapeGen
 {
 public:
 	cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_BiomeGen);
@@ -149,24 +144,24 @@ public:
 	void Initialize(cIniFile & a_IniFile);
 
 protected:
-	/** Number of columns around the pixel to query for biomes for averaging. */
-	static const int AVERAGING_SIZE = 5;
+	/** Number of columns around the pixel to query for biomes for averaging. Must be less than or equal to 16. */
+	static const int AVERAGING_SIZE = 9;
 
 	/** Type used for a single parameter across the entire (downscaled) chunk. */
 	typedef NOISE_DATATYPE ChunkParam[5 * 5];
 
 
 	/** The noise that is used to choose between density noise A and B. */
-	cPerlinNoise m_ChoiceNoise;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_ChoiceNoise;
 
 	/** Density 3D noise, variant A. */
-	cPerlinNoise m_DensityNoiseA;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseA;
 
 	/** Density 3D noise, variant B. */
-	cPerlinNoise m_DensityNoiseB;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_DensityNoiseB;
 
 	/** Heightmap-like noise used to provide variance for low-amplitude biomes. */
-	cPerlinNoise m_BaseNoise;
+	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_BaseNoise;
 
 	/** The underlying biome generator. */
 	cBiomeGenPtr m_BiomeGen;
@@ -194,7 +189,7 @@ protected:
 	// Cache for the last calculated chunk (reused between heightmap and composition queries):
 	int m_LastChunkX;
 	int m_LastChunkZ;
-	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // x + 17 * z + 17 * 17 * y
+	NOISE_DATATYPE m_NoiseArray[17 * 17 * 257];  // 257 * x + y + 257 * 17 * z
 
 	/** Weights for summing up neighboring biomes. */
 	NOISE_DATATYPE m_Weight[AVERAGING_SIZE * 2 + 1][AVERAGING_SIZE * 2 + 1];
@@ -212,13 +207,9 @@ protected:
 	/** Returns the parameters for the specified biome. */
 	void GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE & a_HeightAmp, NOISE_DATATYPE & a_MidPoint);
 	
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
-	virtual void InitializeHeightGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
-
-	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
+	// cTerrainShapeGen overrides:
+	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
 
 

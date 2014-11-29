@@ -6,7 +6,7 @@
 #include "Globals.h"
 #include "ItemGrid.h"
 #include "Items/ItemHandler.h"
-#include "Noise.h"
+#include "Noise/Noise.h"
 
 
 

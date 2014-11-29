@@ -26,7 +26,7 @@
 #include "BlockEntities/SignEntity.h"
 #include "Entities/Pickup.h"
 #include "Item.h"
-#include "Noise.h"
+#include "Noise/Noise.h"
 #include "Root.h"
 #include "MersenneTwister.h"
 #include "Entities/Player.h"
@@ -1872,18 +1872,18 @@ bool cChunk::AddClient(cClientHandle * a_Client)
 
 void cChunk::RemoveClient(cClientHandle * a_Client)
 {
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
+	for (cClientHandleList::iterator itrC = m_LoadedByClient.begin(); itrC != m_LoadedByClient.end(); ++itrC)
 	{
-		if (*itr != a_Client)
+		if (*itrC != a_Client)
 		{
 			continue;
 		}
 
-		m_LoadedByClient.erase(itr);
+		m_LoadedByClient.erase(itrC);
 
 		if (!a_Client->IsDestroyed())
 		{
-			for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+			for (cEntityList::iterator itrE = m_Entities.begin(); itrE != m_Entities.end(); ++itrE)
 			{
 				/*
 				// DEBUG:
@@ -1892,7 +1892,7 @@ void cChunk::RemoveClient(cClientHandle * a_Client)
 					(*itr)->GetUniqueID(), a_Client->GetUsername().c_str()
 				);
 				*/
-				a_Client->SendDestroyEntity(*(*itr));
+				a_Client->SendDestroyEntity(*(*itrE));
 			}
 		}
 		return;

@@ -1857,9 +1857,10 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int InBlockZIdx = a_NBT.FindChildByName(a_TagIdx, "zTile");
 	if ((InBlockXIdx > 0) && (InBlockYIdx > 0) && (InBlockZIdx > 0))
 	{
-		if (a_NBT.GetType(InBlockXIdx) == a_NBT.GetType(InBlockYIdx) == a_NBT.GetType(InBlockZIdx))
+		eTagType typeX = a_NBT.GetType(InBlockXIdx);
+		if ((typeX == a_NBT.GetType(InBlockYIdx)) &&  (typeX == a_NBT.GetType(InBlockZIdx)))
 		{
-			switch (a_NBT.GetType(InBlockXIdx))
+			switch (typeX)
 			{
 				case TAG_Int:
 				{
@@ -1871,6 +1872,11 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 				{
 					// Vanilla uses this
 					Arrow->SetBlockHit(Vector3i((int)a_NBT.GetShort(InBlockXIdx), (int)a_NBT.GetShort(InBlockYIdx), (int)a_NBT.GetShort(InBlockZIdx)));
+					break;
+				}
+				default:
+				{
+					// No hit block, the arrow is still flying?
 					break;
 				}
 			}

@@ -154,7 +154,7 @@ void cRoot::Start(void)
 		m_WebAdmin->Init();
 
 		LOGD("Loading settings...");
-		m_RankManager = new cRankManager();
+		m_RankManager.reset(new cRankManager());
 		m_RankManager->Initialize(m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();

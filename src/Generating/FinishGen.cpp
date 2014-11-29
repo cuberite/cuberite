@@ -10,7 +10,6 @@
 #include "Globals.h"
 
 #include "FinishGen.h"
-#include "../Noise.h"
 #include "../BlockID.h"
 #include "../Simulator/FluidSimulator.h"  // for cFluidSimulator::CanWashAway()
 #include "../Simulator/FireSimulator.h"
@@ -412,7 +411,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 				case biFrozenOcean:
 				{
 					int Height = a_ChunkDesc.GetHeight(x, z);
-					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)))
+					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
 					{
 						a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
 						a_ChunkDesc.SetHeight(x, z, Height + 1);
