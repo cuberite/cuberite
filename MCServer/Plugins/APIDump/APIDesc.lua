@@ -2928,7 +2928,7 @@ end
 				StringToDamageType = {Params = "string", Return = "{{Globals#DamageType|DamageType}}", Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value."},
 				StringToDimension = {Params = "string", Return = "{{Globals#WorldDimension|Dimension}}", Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value"},
 				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
-				StringToMobType = {Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "Converts a string representation to a {{cMonster#MobType|MobType}} enumerated value"},
+				StringToMobType = {Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "<b>DEPRECATED!</b> Please use cMonster:StringToMobType(). Converts a string representation to a {{cMonster#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
 				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
