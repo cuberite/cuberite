@@ -32,7 +32,6 @@ Declares the 1.8.x protocol classes:
 
 #include "PolarSSL++/AesCfb128Decryptor.h"
 #include "PolarSSL++/AesCfb128Encryptor.h"
-#include "../Mobs/MonsterTypes.h"
 
 
 
