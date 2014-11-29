@@ -1790,6 +1790,7 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
+
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
 		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
@@ -1801,11 +1802,6 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 	if (!(cRoot::Get()->GetServer()->IsAllowMultiLogin()))
 	{
 		std::list<AString> usernamesServer = cRoot::Get()->GetServer()->GetUsernames();
-		std::list<AString> usernamesWorld = cRoot::Get()->GetDefaultWorld()-> GetUsernames();
-		
-		usernamesServer.sort();
-		usernamesWorld.sort();
-		usernamesServer.merge(usernamesWorld);
 		
 		for (std::list<AString>::iterator itr = usernamesServer.begin(); itr != usernamesServer.end(); ++itr)
 		{
@@ -1814,6 +1810,17 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 				Kick("User already logged in.");
 				return false;
 			}
+		}
+		class cCallback : public cPlayerListCallback
+		{
+			virtual bool Item(cPlayer * a_Player) override
+			{
+				return false;
+			}
+		} Callback;	
+		if (cRoot::Get()->GetDefaultWorld()->DoWithPlayer(a_Username, Callback))
+		{
+			Kick("User already logged in.");
 		}
 	}
 	return true;
