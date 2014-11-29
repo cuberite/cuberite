@@ -133,16 +133,19 @@ public:
 	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
-	/// Translates MobType enum to a string, empty string if unknown
+	/** Translates MobType enum to a string, empty string if unknown */
 	static AString MobTypeToString(eMonsterType a_MobType);
 
-	/// Translates MobType string to the enum, mtInvalidType if not recognized
+	/** Translates MobType enum to the correct vanilla name of the mob, empty string if unknown. */
+	static AString MobTypeToVanillaName(eMonsterType a_MobType);
+
+	/** Translates MobType string to the enum, mtInvalidType if not recognized */
 	static eMonsterType StringToMobType(const AString & a_MobTypeName);
 
-	/// Returns the mob family based on the type
+	/** Returns the mob family based on the type */
 	static eFamily FamilyFromType(eMonsterType a_MobType);
 
-	/// Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family
+	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
 	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	// tolua_end

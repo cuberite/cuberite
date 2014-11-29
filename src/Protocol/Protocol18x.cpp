@@ -2980,7 +2980,7 @@ void cProtocol180::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
 			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
 			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.AddString("EntityId", MobSpawnerEntity.GetEntityName());
+			Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
 			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			Writer.AddString("id", "MobSpawner");
 			break;

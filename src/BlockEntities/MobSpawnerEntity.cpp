@@ -49,7 +49,7 @@ void cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
-		LOGD("Changed monster spawner at {%d, %d, %d} to type %s.", GetPosX(), GetPosY(), GetPosZ(), GetEntityName().c_str());
+		LOGD("Changed monster spawner at {%d, %d, %d} to type %s.", GetPosX(), GetPosY(), GetPosZ(), cMonster::MobTypeToString(MonsterType).c_str());
 	}
 }
 
@@ -188,51 +188,6 @@ void cMobSpawnerEntity::SpawnEntity(void)
 	if (m_World->DoWithChunk(GetChunkX(), GetChunkZ(), Callback))
 	{
 		ResetTimer();
-	}
-}
-
-
-
-
-
-AString cMobSpawnerEntity::GetEntityName() const
-{
-	switch (m_Entity)
-	{
-		case mtBat:          return "Bat";
-		case mtBlaze:        return "Blaze";
-		case mtCaveSpider:   return "CaveSpider";
-		case mtChicken:      return "Chicken";
-		case mtCow:          return "Cow";
-		case mtCreeper:      return "Creeper";
-		case mtEnderDragon:  return "EnderDragon";
-		case mtEnderman:     return "Enderman";
-		case mtGhast:        return "Ghast";
-		case mtGiant:        return "Giant";
-		case mtHorse:        return "EntityHorse";
-		case mtIronGolem:    return "VillagerGolem";
-		case mtMagmaCube:    return "LavaSlime";
-		case mtMooshroom:    return "MushroomCow";
-		case mtOcelot:       return "Ozelot";
-		case mtPig:          return "Pig";
-		case mtSheep:        return "Sheep";
-		case mtSilverfish:   return "Silverfish";
-		case mtSkeleton:     return "Skeleton";
-		case mtSlime:        return "Slime";
-		case mtSnowGolem:    return "SnowMan";
-		case mtSpider:       return "Spider";
-		case mtSquid:        return "Squid";
-		case mtVillager:     return "Villager";
-		case mtWitch:        return "Witch";
-		case mtWither:       return "WitherBoss";
-		case mtWolf:         return "Wolf";
-		case mtZombie:       return "Zombie";
-		case mtZombiePigman: return "PigZombie";
-		default:
-		{
-			ASSERT(!"Unknown monster type!");
-			return "Pig";
-		}
 	}
 }
 
