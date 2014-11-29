@@ -68,10 +68,10 @@ public:  // tolua_export
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	// Get the users waiting to be put into the World.
-	std::list<std::string> GetUsernames(void);
+	std::list<AString> GetUsernames(void);
 	
 	// Can login more than once with same username.
-	bool isAllowMultiLogin(void) { return m_bAllowMultiLogin; }
+	bool IsAllowMultiLogin(void) { return m_bAllowMultiLogin; }
 	
 	// Hardcore mode or not:
 	bool IsHardcore(void) const { return m_bIsHardcore; }

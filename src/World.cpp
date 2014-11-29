@@ -3667,14 +3667,18 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 
 
 
-std::list<std::string> cWorld::GetUsernames()
+std::list<AString> cWorld::GetUsernames()
 {
-	std::list<std::string> usernames;
+	std::list<AString> usernames;
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
-		std::string username = (*itr)->GetName();
+		AString username = (*itr)->GetName();
 		usernames.insert(usernames.begin(),username);
 	}
 	return usernames;
 }
+
+
+
+

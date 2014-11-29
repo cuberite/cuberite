@@ -304,13 +304,13 @@ int cServer::GetNumPlayers(void) const
 
 
 
-std::list<std::string> cServer::GetUsernames()
+std::list<AString> cServer::GetUsernames()
 {
-	std::list<std::string> usernames;
+	std::list<AString> usernames;
 	cCSLock Lock(m_CSClients);
 	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
-		std::string username = (*itr)->GetUsername();
+		AString username = (*itr)->GetUsername();
 		usernames.insert(usernames.begin(),username);
 	}
 	return usernames;

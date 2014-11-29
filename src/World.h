@@ -809,7 +809,8 @@ public:
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
 	/** Get the usernames from the World. */
-	std::list<std::string> GetUsernames(void);
+	std::list<AString> GetUsernames(void);
+	
 private:
 
 	friend class cRoot;
