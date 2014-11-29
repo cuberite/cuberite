@@ -264,6 +264,7 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/Thread.h"
 	#include "OSSupport/File.h"
 	#include "Logger.h"
+	#include "OSSupport/StackTrace.h"
 #else
 	// Logging functions
 void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
@@ -349,14 +350,14 @@ void inline LOGD(const char* a_Format, ...)
 
 #else
 	#ifdef  _DEBUG
-		#define ASSERT( x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), assert(0), 0))
+		#define ASSERT( x) ( !!(x) || ( LOGERROR("Assertion failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), assert(0), 0))
 	#else
 		#define ASSERT(x) ((void)(x))
 	#endif
 #endif
 
 // Pretty much the same as ASSERT() but stays in Release builds
-#define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), exit(1), 0))
+#define VERIFY( x) ( !!(x) || ( LOGERROR("Verification failed: %s, file %s, line %i", #x, __FILE__, __LINE__), PrintStackTrace(), exit(1), 0))
 
 // Same as assert but in all Self test builds
 #ifdef SELF_TEST

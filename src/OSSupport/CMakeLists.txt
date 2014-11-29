@@ -16,8 +16,10 @@ SET (SRCS
 	Sleep.cpp
 	Socket.cpp
 	SocketThreads.cpp
+	StackTrace.cpp
 	Thread.cpp
-	Timer.cpp)
+	Timer.cpp
+)
 
 SET (HDRS
 	CriticalSection.h
@@ -32,8 +34,10 @@ SET (HDRS
 	Sleep.h
 	Socket.h
 	SocketThreads.h
+	StackTrace.h
 	Thread.h
-	Timer.h)
+	Timer.h
+)
 
 if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
