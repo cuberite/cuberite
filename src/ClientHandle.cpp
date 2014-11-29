@@ -1798,6 +1798,24 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 			return false;
 		}
 	}
+	if (!(cRoot::Get()->GetServer()->isAllowMultiLogin()))
+	{
+		std::list<std::string> usernamesServer = cRoot::Get()->GetServer()->GetUsernames();
+		std::list<std::string> usernamesWorld = cRoot::Get()->GetDefaultWorld()-> GetUsernames();
+		
+		usernamesServer.sort();
+		usernamesWorld.sort();
+		usernamesServer.merge(usernamesWorld);
+		
+		for (std::list<std::string>::iterator itr = usernamesServer.begin(); itr != usernamesServer.end(); ++itr)
+		{
+			if ((*itr).compare(a_Username) == 0)
+			{
+				Kick("User already logged in.");
+				return false;
+			}
+		}
+	}
 	return true;
 }
 

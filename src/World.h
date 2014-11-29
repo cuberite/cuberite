@@ -808,6 +808,8 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
+	/** Get the usernames from the World. */
+	std::list<std::string> GetUsernames(void);
 private:
 
 	friend class cRoot;

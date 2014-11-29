@@ -201,6 +201,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	m_Description = a_SettingsIni.GetValueSet("Server", "Description", "MCServer - in C++!");
 	m_MaxPlayers  = a_SettingsIni.GetValueSetI("Server", "MaxPlayers", 100);
 	m_bIsHardcore = a_SettingsIni.GetValueSetB("Server", "HardcoreEnabled", false);
+	m_bAllowMultiLogin = a_SettingsIni.GetValueSetB("Server", "AllowMultiLogin", false);
 	m_PlayerCount = 0;
 	m_PlayerCountDiff = 0;
 
@@ -297,6 +298,22 @@ int cServer::GetNumPlayers(void) const
 {
 	cCSLock Lock(m_CSPlayerCount);
 	return m_PlayerCount;
+}
+
+
+
+
+
+std::list<std::string> cServer::GetUsernames()
+{
+	std::list<std::string> usernames;
+	cCSLock Lock(m_CSClients);
+	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	{
+		std::string username = (*itr)->GetUsername();
+		usernames.insert(usernames.begin(),username);
+	}
+	return usernames;
 }
 
 
