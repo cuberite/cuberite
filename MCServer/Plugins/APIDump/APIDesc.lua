@@ -1726,13 +1726,6 @@ a_Player:OpenWindow(Window);
 						Mobs are divided into families. The following constants are used for individual family types:
 					]],
 				},
-				MobType =
-				{
-					Include = "mt.*",
-					TextBefore = [[
-						The following constants are used for distinguishing between the individual mob types:
-					]],
-				},
 			},
 			Inherits = "cPawn",
 		},  -- cMonster
@@ -3019,7 +3012,7 @@ end
 				{
 					Include = { "^mt.*" },
 					TextBefore = [[
-						The following constants are used for the mob types.
+						The following constants are used for distinguishing between the individual mob types:
 					]],
 				},
 				Weather =
