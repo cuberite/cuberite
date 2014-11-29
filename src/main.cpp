@@ -10,7 +10,6 @@
 #ifdef _MSC_VER
 	#include <dbghelp.h>
 #endif  // _MSC_VER
-#include "OSSupport/StackTrace.h"
 
 
 bool cRoot::m_TerminateEventRaised = false;  // If something has told the server to stop; checked periodically in cRoot
