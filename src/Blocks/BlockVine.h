@@ -24,19 +24,25 @@ public:
 	) override
 	{
 		// TODO: Disallow placement where the vine doesn't attach to something properly
-		BLOCKTYPE BlockType = 0;
+		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		a_ChunkInterface.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-		if (BlockType == m_BlockType)
+
+		NIBBLETYPE DirectionMeta = DirectionToMetaData(a_BlockFace);
+
+		if ((BlockType == E_BLOCK_AIR) || IsBlockLiquid(BlockType))
 		{
-			a_BlockMeta = BlockMeta | DirectionToMetaData(a_BlockFace);
+			a_BlockType = m_BlockType;
+			a_BlockMeta = DirectionMeta;
+			return true;
 		}
-		else
+		else if ((BlockType == m_BlockType) && ((BlockMeta & DirectionMeta) == 0))
 		{
-			a_BlockMeta = DirectionToMetaData(a_BlockFace);
+			a_BlockType = m_BlockType;
+			a_BlockMeta = BlockMeta | DirectionMeta;
+			return true;
 		}
-		a_BlockType = m_BlockType;
-		return true;
+		return false;
 	}
 
 
