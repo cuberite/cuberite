@@ -40,12 +40,18 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		int BlockX = (a_Chunk.GetPosX() * cChunkDef::Width) + a_RelX;
-		int BlockZ = (a_Chunk.GetPosZ() * cChunkDef::Width) + a_RelZ;
-		GetBlockCoordsBehindTheSign(a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ), BlockX, BlockZ);
-		BLOCKTYPE Type = a_ChunkInterface.GetBlock(BlockX, a_RelY, BlockZ);
+		if (a_Chunk.GetBlock(a_RelX, a_RelY, a_RelZ) != m_BlockType)
+		{
+			return true;
+		}
 
-		return ((Type == E_BLOCK_WALLSIGN) || (Type == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(Type));
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		GetBlockCoordsBehindTheSign(Meta, a_RelX, a_RelZ);
+
+		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
+		BLOCKTYPE BehindBlock = Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
+
+		return ((BehindBlock == E_BLOCK_WALLSIGN) || (BehindBlock == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(BehindBlock));
 	}
 
 

@@ -153,6 +153,7 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 	{
 		case E_BLOCK_AIR:
 		case E_BLOCK_BROWN_MUSHROOM:
+		case E_BLOCK_CARROTS:
 		case E_BLOCK_COBWEB:
 		case E_BLOCK_CROPS:
 		case E_BLOCK_DEAD_BUSH:
@@ -166,6 +167,7 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_MINECART_TRACKS:
 		case E_BLOCK_MELON_STEM:
+		case E_BLOCK_POTATOES:
 		case E_BLOCK_POWERED_RAIL:
 		case E_BLOCK_PUMPKIN_STEM:
 		case E_BLOCK_REDSTONE_REPEATER_OFF:
@@ -181,11 +183,13 @@ bool cSandSimulator::CanContinueFallThrough(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_STONE_BUTTON:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_SUGARCANE:
 		case E_BLOCK_TALL_GRASS:
 		case E_BLOCK_TORCH:
 		case E_BLOCK_TRAPDOOR:
 		case E_BLOCK_TRIPWIRE:
 		case E_BLOCK_TRIPWIRE_HOOK:
+		case E_BLOCK_VINES:
 		case E_BLOCK_WALLSIGN:
 		case E_BLOCK_WATER:
 		case E_BLOCK_WOODEN_BUTTON:
@@ -215,6 +219,7 @@ bool cSandSimulator::IsReplacedOnRematerialization(BLOCKTYPE a_BlockType)
 		case E_BLOCK_STATIONARY_LAVA:
 		case E_BLOCK_STATIONARY_WATER:
 		case E_BLOCK_TALL_GRASS:
+		case E_BLOCK_VINES:
 		case E_BLOCK_WATER:
 		{
 			return true;
