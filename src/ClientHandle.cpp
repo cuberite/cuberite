@@ -1493,6 +1493,15 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 	
 	cBlockHandler * NewBlock = BlockHandler(BlockType);
+	cChunkInterface ChunkInterface(World->GetChunkMap());
+
+	if (!NewBlock->CanBeAt(World, a_BlockX, a_BlockY, a_BlockZ))
+	{
+		// Handler refused the placement, send that information back to the client:
+		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
+		m_Player->GetInventory().SendEquippedSlot();
+		return;
+	}
 
 	if (cRoot::Get()->GetPluginManager()->CallHookPlayerPlacingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 	{
@@ -1509,7 +1518,6 @@ void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		m_Player->GetInventory().RemoveOneEquippedItem();
 	}
 
-	cChunkInterface ChunkInterface(World->GetChunkMap());
 	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 	
 	AString PlaceSound = cBlockInfo::GetPlaceSound(BlockType);

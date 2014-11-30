@@ -500,6 +500,43 @@ void cBlockHandler::DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
+bool cBlockHandler::CanBeAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ)
+{
+	class cCallback : public cChunkCallback
+	{
+	public:
+		cCallback(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, cBlockHandler * a_BlockHandler) :
+			m_ChunkInterface(a_ChunkInterface),
+			m_RelX(a_RelX),
+			m_RelY(a_RelY),
+			m_RelZ(a_RelZ),
+			m_Handler(a_BlockHandler)
+		{
+		}
+
+		virtual bool Item(cChunk * a_Chunk)
+		{
+			return m_Handler->CanBeAt(m_ChunkInterface, m_RelX, m_RelY, m_RelZ, *a_Chunk);
+		}
+
+	protected:
+		cChunkInterface & m_ChunkInterface;
+		int m_RelX, m_RelY, m_RelZ;
+		cBlockHandler * m_Handler;
+	};
+
+	int ChunkX, ChunkZ;
+	cChunkDef::AbsoluteToRelative(a_BlockX, a_BlockY, a_BlockZ, ChunkX, ChunkZ);
+	cChunkInterface ChunkInterface(a_World->GetChunkMap());
+
+	cCallback Callback(ChunkInterface, a_BlockX, a_BlockY, a_BlockZ, this);
+	return a_World->GetChunkMap()->DoWithChunk(ChunkX, ChunkZ, Callback);
+}
+
+
+
+
+
 bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
 {
 	return true;
