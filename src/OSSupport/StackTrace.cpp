@@ -9,6 +9,7 @@
 	#include "../StackWalker.h"
 #else
 	#include <execinfo.h>
+	#include <unistd.h>
 #endif
 
 
