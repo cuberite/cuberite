@@ -26,8 +26,6 @@
 #define DEF_OVERWORLD_LAVA_SPRINGS  "0, 0; 10, 5; 11, 45; 48, 2; 64, 1; 255, 0"
 #define DEF_END_WATER_SPRINGS       "0, 1; 255, 1"
 #define DEF_END_LAVA_SPRINGS        "0, 1; 255, 1"
-#define DEF_ANIMAL_SPAWN_PERCENT    10
-#define DEF_NO_ANIMALS              0
 
 
 
