@@ -18,6 +18,7 @@
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"
+#include "../Mobs/Monster.h"
 
 
 
@@ -296,3 +297,26 @@ protected:
 
 
 
+
+/**  This class spawns biome-dependant packs of animals in a configurable percentage of chunks
+*/
+class cFinishGenPassiveMobs :
+	public cFinishGen
+{
+public:
+	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
+	
+protected:
+
+	cNoise         m_Noise;
+	int            m_AnimalProbability;  // Chance, [0..100], that an animal pack will be generated in a chunk
+
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+	// Tries to spawn a mob in the center of the pack. If successful, spawns 0-5 more.
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
+
+	// Gets a random mob from biome-dependant list
+	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc, int x, int z);
+} ;
