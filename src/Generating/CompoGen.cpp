@@ -324,7 +324,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 			CeilingDisguise = -CeilingDisguise;
 		}
 
-		int CeilingDisguiseHeight = Height - 2 - (int)CeilingDisguise * 3;
+		int CeilingDisguiseHeight = Height - 2 - FloorC(CeilingDisguise * 3);
 
 		for (int y = Height - 1; y > CeilingDisguiseHeight; y--)
 		{
