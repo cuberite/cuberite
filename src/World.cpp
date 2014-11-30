@@ -164,6 +164,8 @@ protected:
 		if (m_NumPrepared >= m_MaxIdx)
 		{
 			m_EvtFinished.Set();
+			// Must return here, because "this" may have gotten deleted by the previous line
+			return;
 		}
 
 		// Queue another chunk, if appropriate:
@@ -2678,7 +2680,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 
 bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	// Calls the callback for each player in the list
+	// Calls the callback for the specified player in the list
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{

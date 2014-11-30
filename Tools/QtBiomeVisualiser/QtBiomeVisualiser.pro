@@ -17,7 +17,7 @@ SOURCES += \
 	BiomeView.cpp \
 	../../src/Generating/BioGen.cpp \
 	../../src/VoronoiMap.cpp \
-	../../src/Noise.cpp \
+	../../src/Noise/Noise.cpp \
 	../../src/StringUtils.cpp \
 	../../src/LoggerListeners.cpp \
 	../../src/Logger.cpp \
@@ -25,7 +25,9 @@ SOURCES += \
 	../../src/OSSupport/File.cpp \
 	../../src/OSSupport/CriticalSection.cpp \
 	../../src/OSSupport/IsThread.cpp \
+	../../src/OSSupport/StackTrace.cpp \
 	../../src/BiomeDef.cpp \
+	../../src/StackWalker.cpp \
 	../../src/StringCompression.cpp \
 	../../src/WorldStorage/FastNBT.cpp \
 	../../lib/zlib/adler32.c \
@@ -62,7 +64,7 @@ HEADERS += \
 	../../src/Generating/IntGen.h \
 	../../src/Generating/ProtIntGen.h \
 	../../src/VoronoiMap.h \
-	../../src/Noise.h \
+	../../src/Noise/Noise.h \
 	../../src/StringUtils.h \
 	../../src/LoggerListeners.h \
 	../../src/Logger.h \
@@ -70,7 +72,9 @@ HEADERS += \
 	../../src/OSSupport/File.h \
 	../../src/OSSupport/CriticalSection.h \
 	../../src/OSSupport/IsThread.h \
+	../../src/OSSupport/StackTrace.h \
 	../../src/BiomeDef.h \
+	../../src/StackWalker.h \
 	../../src/StringCompression.h \
 	../../src/WorldStorage/FastNBT.h \
 	../../lib/zlib/crc32.h \
@@ -106,5 +110,16 @@ INCLUDEPATH += $$_PRO_FILE_PWD_ \
 CONFIG += C++11
 
 OTHER_FILES +=
+
+win* {
+	# Add the advapi32 library for windows compiles; needed for the StackWalker:
+	LIBS += advapi32.lib
+
+	#	StackWalker doesn't like how Qt inconsistently defines only UNICODE, but not _UNICODE:
+	DEFINES -= UNICODE
+}
+
+
+
 
 

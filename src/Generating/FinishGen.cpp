@@ -516,7 +516,7 @@ void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 
 		int Height = a_ChunkDesc.GetHeight(x, z);
-		if (Height >= cChunkDef::Height)
+		if (Height >= cChunkDef::Height - 1)
 		{
 			// Too high up
 			continue;

@@ -61,6 +61,7 @@ void NonCtrlHandler(int a_Signal)
 			std::signal(SIGSEGV, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGSEGV: Segmentation fault");
+			PrintStackTrace();
 			abort();
 		}
 		case SIGABRT:
@@ -71,6 +72,7 @@ void NonCtrlHandler(int a_Signal)
 			std::signal(a_Signal, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
+			PrintStackTrace();
 			abort();
 		}
 		case SIGINT:
@@ -136,6 +138,9 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 	HANDLE dumpFile = CreateFile(g_DumpFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	g_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, g_DumpFlags, (a_ExceptionInfo) ? &ExcInformation : nullptr, nullptr, nullptr);
 	CloseHandle(dumpFile);
+
+	// Print the stack trace for the basic debugging:
+	PrintStackTrace();
 
 	// Revert to old stack:
 	_asm

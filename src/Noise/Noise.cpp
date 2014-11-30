@@ -2,7 +2,6 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Noise.h"
-#include "OSSupport/Timer.h"
 
 #define FAST_FLOOR(x) (((x) < 0) ? (((int)x) - 1) : ((int)x))
 
