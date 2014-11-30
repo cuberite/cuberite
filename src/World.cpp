@@ -164,6 +164,8 @@ protected:
 		if (m_NumPrepared >= m_MaxIdx)
 		{
 			m_EvtFinished.Set();
+			// Must return here, because "this" may have gotten deleted by the previous line
+			return;
 		}
 
 		// Queue another chunk, if appropriate:
