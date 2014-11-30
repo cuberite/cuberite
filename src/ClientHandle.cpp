@@ -1806,7 +1806,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 		{
 			if ((*itr).compare(a_Username) == 0)
 			{
-				Kick("User already logged in.");
+				Kick("A player of the username is already logged in");
 				return false;
 			}
 		}
@@ -1820,7 +1820,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 		} Callback;	
 		if (cRoot::Get()->GetDefaultWorld()->DoWithPlayer(a_Username, Callback))
 		{
-			Kick("User already logged in.");
+			Kick("A player of the username is already logged in");
 		}
 	}
 	return true;
