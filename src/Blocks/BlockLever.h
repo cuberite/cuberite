@@ -93,20 +93,23 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		
-		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
+		if (a_Chunk.GetBlock(a_RelX, a_RelY, a_RelZ) != m_BlockType)
+		{
+			// In placing
+			return true;
+		}
 
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
 		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
 
-		if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height -1))
+		if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 		{
 			return false;
 		}
 
 		BLOCKTYPE BlockIsOn;
 		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
-
 
 		if (cBlockInfo::FullyOccupiesVoxel(BlockIsOn))
 		{

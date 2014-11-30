@@ -42,14 +42,15 @@ public:
 	{
 		if (a_Chunk.GetBlock(a_RelX, a_RelY, a_RelZ) != m_BlockType)
 		{
+			// In placing
 			return true;
 		}
 
 		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 		GetBlockCoordsBehindTheSign(Meta, a_RelX, a_RelZ);
 
-		cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-		BLOCKTYPE BehindBlock = Chunk->GetBlock(a_RelX, a_RelY, a_RelZ);
+		BLOCKTYPE BehindBlock;
+		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BehindBlock);
 
 		return ((BehindBlock == E_BLOCK_WALLSIGN) || (BehindBlock == E_BLOCK_SIGN_POST) || cBlockInfo::IsSolid(BehindBlock));
 	}

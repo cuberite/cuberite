@@ -91,6 +91,12 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
+		if (a_Chunk.GetBlock(a_RelX, a_RelY, a_RelZ) != m_BlockType)
+		{
+			// In placing
+			return true;
+		}
+
 		NIBBLETYPE Meta;
 		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 

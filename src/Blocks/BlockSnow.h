@@ -67,19 +67,16 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if (a_RelY > 0)
+		if (a_RelY <= 0)
 		{
-			BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
-			NIBBLETYPE MetaBelow = a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ);
-			
-			if (cBlockInfo::IsSnowable(BlockBelow) || ((BlockBelow == E_BLOCK_SNOW) && (MetaBelow == 7)))
-			{
-				// If block below is snowable, or it is a thin slow block and has a meta of 7 (full thin snow block), say yay
-				return true;
-			}
+			return false;
 		}
-		
-		return false;
+
+		BLOCKTYPE BlockBelow = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
+		NIBBLETYPE MetaBelow = a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ);
+
+		// If block below is snowable, or it is a thin slow block and has a meta of 7 (full thin snow block), say yay
+		return (cBlockInfo::IsSnowable(BlockBelow) || ((BlockBelow == E_BLOCK_SNOW) && (MetaBelow == 7)));
 	}
 	
 	
