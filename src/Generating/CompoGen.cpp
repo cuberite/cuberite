@@ -288,24 +288,14 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
 				BLOCKTYPE Block = E_BLOCK_AIR;
-				if (Val < m_Threshold)  // Don't calculate if the block should be Netherrack or Soulsand when it's already decided that it's air.
+				if (Val < m_Threshold)  // It's a solid block
 				{
-					NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(BaseX + x)) / 8;
-					NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(BaseZ + z)) / 8;
-					NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) (y + Segment) / 2, NoiseY);
-					if (CompBlock < -0.5)
-					{
-						Block = E_BLOCK_SOULSAND;
-					}
-					else
-					{
-						Block = E_BLOCK_NETHERRACK;
-					}
+					Block = E_BLOCK_NETHERRACK;
 				}
 				a_ChunkDesc.SetBlockType(x, y + Segment, z, Block);
 			}
 		}
-		
+
 		// Swap the floors:
 		std::swap(FloorLo, FloorHi);
 	}
@@ -313,11 +303,73 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 	// Bedrock at the bottom and at the top:
 	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 	{
+		// Place soulsand rims when netherrack gets thin
+		for (int y = 0; y < MaxHeight; y++)
+		{
+			// The current block is air. Lets bail ut.
+			BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
+			if (Block == E_BLOCK_AIR)
+			{
+				continue;
+			}
+
+			// Check how many blocks there are above the current block. Don't go higher than 2 blocks, because we already bail out if that's the case.
+			int NumBlocksAbove = 0;
+			for (int I = y + 1; I <= y + 2; I++)
+			{
+				if (a_ChunkDesc.GetBlockType(x, Clamp(I, 0, cChunkDef::Height), z) != E_BLOCK_AIR)
+				{
+					NumBlocksAbove++;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			// There are too many blocks above the current block.
+			if (NumBlocksAbove == 2)
+			{
+				continue;
+			}
+
+			// Check how many blocks there below the current block. Don't go lower than 2 blocks, because we already bail out if that's the case.
+			int NumBlocksBelow = 0;
+			for (int I = y - 1; I >= y - 2; I--)
+			{
+				if (a_ChunkDesc.GetBlockType(x, Clamp(I, 0, cChunkDef::Height), z) != E_BLOCK_AIR)
+				{
+					NumBlocksBelow++;
+				}
+				else
+				{
+					break;
+				}
+			}
+
+			// There are too many blocks below the current block
+			if (NumBlocksBelow == 2)
+			{
+				continue;
+			}
+
+			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(BaseX + x)) / 32;
+			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(BaseZ + z)) / 32;
+			NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) (y) / 4, NoiseY);
+			if (CompBlock < 0)
+			{
+				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SOULSAND);
+			}
+		}
+
+		// Place bedrock at the bottom
 		a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
 
+		// Place bedrock at the top
 		int Height = a_ChunkDesc.GetHeight(x, z);
 		a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_BEDROCK);
 
+		// Place netherrack to disguise the top bedrock.
 		NOISE_DATATYPE CeilingDisguise = (m_Noise1.CubicNoise2D((float)(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10, (float)(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10));
 		if (CeilingDisguise < 0)
 		{
