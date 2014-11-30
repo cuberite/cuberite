@@ -306,7 +306,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 		// Place soulsand rims when netherrack gets thin
 		for (int y = 0; y < MaxHeight; y++)
 		{
-			// The current block is air. Lets bail ut.
+			// The current block is air. Let's bail out.
 			BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
 			if (Block == E_BLOCK_AIR)
 			{
