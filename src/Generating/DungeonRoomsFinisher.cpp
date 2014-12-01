@@ -265,7 +265,7 @@ protected:
 		)
 		{
 			a_ChunkDesc.SetBlockTypeMeta(CenterX, b, CenterZ, E_BLOCK_MOB_SPAWNER, 0);
-			cMobSpawnerEntity * MobSpawner = (cMobSpawnerEntity *)a_ChunkDesc.GetBlockEntity(CenterX, b, CenterZ);
+			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(CenterX, b, CenterZ));
 			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
 			MobSpawner->SetEntity(m_MonsterType);
 		}
