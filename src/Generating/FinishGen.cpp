@@ -417,42 +417,12 @@ void cFinishGenSoulsandRims::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				// Check how many blocks there are above the current block. Don't go higher than 2 blocks, because we already bail out if that's the case.
-				int NumBlocksAbove = 0;
-				for (int I = y + 1; I <= y + 2; I++)
-				{
-					if (a_ChunkDesc.GetBlockType(x, I, z) != E_BLOCK_AIR)
-					{
-						NumBlocksAbove++;
-					}
-					else
-					{
-						break;
-					}
-				}
-
-				// There are too many blocks above the current block.
-				if (NumBlocksAbove == 2)
-				{
-					continue;
-				}
-
-				// Check how many blocks there below the current block. Don't go lower than 2 blocks, because we already bail out if that's the case.
-				int NumBlocksBelow = 0;
-				for (int I = y - 1; I >= y - 2; I--)
-				{
-					if (a_ChunkDesc.GetBlockType(x, I, z) != E_BLOCK_AIR)
-					{
-						NumBlocksBelow++;
-					}
-					else
-					{
-						break;
-					}
-				}
-				
-				// There are too many blocks below the current block
-				if (NumBlocksBelow == 2)
+				if (
+					((a_ChunkDesc.GetBlockType(x, y + 1, z) != E_BLOCK_AIR) &&
+					( a_ChunkDesc.GetBlockType(x, y + 2, z) != E_BLOCK_AIR)) ||
+					((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_AIR) &&
+					( a_ChunkDesc.GetBlockType(x, y - 2, z) != E_BLOCK_AIR))
+				)
 				{
 					continue;
 				}
