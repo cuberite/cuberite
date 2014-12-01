@@ -876,7 +876,7 @@ void cMineShaftCorridor::PlaceSpawner(cChunkDesc & a_ChunkDesc)
 	)
 	{
 		a_ChunkDesc.SetBlockTypeMeta(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ, E_BLOCK_MOB_SPAWNER, 0);
-		cMobSpawnerEntity * MobSpawner = (cMobSpawnerEntity *)a_ChunkDesc.GetBlockEntity(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ);
+		cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ));
 		ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
 		MobSpawner->SetEntity(mtCaveSpider);
 	}
