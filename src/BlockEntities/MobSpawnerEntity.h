@@ -1,3 +1,10 @@
+// MobSpawnerEntity.h
+
+// Declares the cMobSpawnerEntity class representing a single mob spawner in the world
+
+
+
+
 
 #pragma once
 

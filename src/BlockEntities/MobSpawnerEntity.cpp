@@ -104,7 +104,7 @@ bool cMobSpawnerEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 void cMobSpawnerEntity::ResetTimer(void)
 {
-	m_SpawnDelay = (short) (200 + m_World->GetTickRandomNumber(600));
+	m_SpawnDelay = static_cast<short>(200 + m_World->GetTickRandomNumber(600));
 	m_World->BroadcastBlockEntity(m_PosX, m_PosY, m_PosZ);
 }
 
@@ -266,7 +266,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 				return;
 			}
 
-			if (((m_SpawnerPos - a_Entity->GetPosition()).Length() <= 8) && (Diff(m_SpawnerPos.y, a_Entity->GetPosY()) <= 4.0))
+			if ((Diff(m_SpawnerPos.x, a_Entity->GetPosX()) <= 8.0) && (Diff(m_SpawnerPos.y, a_Entity->GetPosY()) <= 4.0) && (Diff(m_SpawnerPos.z, a_Entity->GetPosZ()) <= 8.0))
 			{
 				m_NumEntities++;
 			}

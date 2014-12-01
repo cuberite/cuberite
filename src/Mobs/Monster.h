@@ -136,7 +136,7 @@ public:
 	/** Translates MobType enum to a string, empty string if unknown */
 	static AString MobTypeToString(eMonsterType a_MobType);
 
-	/** Translates MobType enum to the correct vanilla name of the mob, empty string if unknown. */
+	/** Translates MobType enum to the vanilla name of the mob, empty string if unknown. */
 	static AString MobTypeToVanillaName(eMonsterType a_MobType);
 
 	/** Translates MobType string to the enum, mtInvalidType if not recognized */

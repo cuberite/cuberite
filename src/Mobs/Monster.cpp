@@ -21,6 +21,7 @@
 /** Map for eType <-> string
 Needs to be alpha-sorted by the strings, because binary search is used in StringToMobType()
 The strings need to be lowercase (for more efficient comparisons in StringToMobType())
+m_VanillaName is the name that vanilla use for this mob.
 */
 static const struct
 {

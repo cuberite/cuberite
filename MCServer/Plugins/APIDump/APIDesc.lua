@@ -1673,7 +1673,7 @@ a_Player:OpenWindow(Window);
 				GetMobType = { Params = "", Return = "{{Globals#MobType|MobType}}", Notes = "Returns the type of this mob ({{Globals#MobType|mtXXX}} constant)" },
 				GetSpawnDelay = { Params = "{{cMonster#MobFamily|MobFamily}}", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
 				MobTypeToString = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{Globals#MobType|mtXXX}} constant), or empty string if unknown type." },
-				MobTypeToVanillaName = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the correct vanilla name of the given mob type, or empty string if unknown type." },
+				MobTypeToVanillaName = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the vanilla name of the given mob type, or empty string if unknown type." },
 				MoveToPosition = { Params = "Position", Return = "", Notes = "Moves mob to the specified position" },
 				StringToMobType = { Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{Globals#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
 				GetRelativeWalkSpeed = { Params = "", Return = "number", Notes = "Returns the relative walk speed of this mob. Standard is 1.0" },
