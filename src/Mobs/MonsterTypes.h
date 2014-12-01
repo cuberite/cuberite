@@ -2,6 +2,7 @@
 #pragma once
 
 /// This identifies individual monster type, as well as their network type-ID
+
 // tolua_begin
 enum eMonsterType
 {
@@ -37,15 +38,6 @@ enum eMonsterType
 	mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
 	mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
 } ;
-
-
-
-
-
-/** Translates a mob string ("ocelot") to mobtype (mtOcelot).
-OBSOLETE, use cMonster::StringToMobType() instead.
-Implemented in Monster.cpp. */
-extern eMonsterType StringToMobType(const AString & a_MobString);
 
 // tolua_end
 
