@@ -455,6 +455,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_CAKE                ].m_IsSolid = false;
 	a_Info[E_BLOCK_CARROTS             ].m_IsSolid = false;
 	a_Info[E_BLOCK_COBWEB              ].m_IsSolid = false;
+	a_Info[E_BLOCK_COCOA_POD           ].m_IsSolid = false;
 	a_Info[E_BLOCK_CROPS               ].m_IsSolid = false;
 	a_Info[E_BLOCK_DANDELION           ].m_IsSolid = false;
 	a_Info[E_BLOCK_DETECTOR_RAIL       ].m_IsSolid = false;
