@@ -126,8 +126,9 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, EMCSBiome a_Biome)
 {
+	cFastRandom Random;
 	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
-	if (m_AllowedTypes.find(a_MobType) != m_AllowedTypes.end() && a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
+	if (a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
 		if ((a_RelY + 1 > cChunkDef::Height) || (a_RelY - 1 < 0))
 		{
@@ -177,7 +178,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES) || (BlockBelow == E_BLOCK_NEW_LEAVES)
 					) &&
 					(a_RelY >= 62) &&
-					(m_Random.NextInt(3, a_Biome) != 0)
+					(Random.NextInt(3, a_Biome) != 0)
 				);
 			}
 			
@@ -238,7 +239,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(SkyLight <= 7) &&
 					(BlockLight <= 7) &&
-					(m_Random.NextInt(2, a_Biome) == 0)
+					(Random.NextInt(2, a_Biome) == 0)
 				);
 			}
 
@@ -262,7 +263,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
 					(!cBlockInfo::IsTransparent(BlockBelow)) &&
-					(m_Random.NextInt(20, a_Biome) == 0)
+					(Random.NextInt(20, a_Biome) == 0)
 				);
 			}
 			
@@ -322,8 +323,8 @@ cMonster* cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 
 	// Make sure we are looking at the right chunk to spawn in
 	a_Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(a_RelX, a_RelZ);
-	
-	if (CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
+
+	if ((m_AllowedTypes.find(m_MobType) != m_AllowedTypes.end()) && CanSpawnHere(a_Chunk, a_RelX, a_RelY, a_RelZ, m_MobType, a_Biome))
 	{
 		cMonster * newMob = cMonster::NewMonsterFromType(m_MobType);
 		if (newMob)

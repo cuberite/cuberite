@@ -5,12 +5,6 @@
 #include "RedstonePoweredEntity.h"
 
 
-namespace Json
-{
-	class Value;
-}
-
-
 
 
 

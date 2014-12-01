@@ -42,6 +42,7 @@ Implements the 1.7.x protocol classes:
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
+#include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 #include "Bindings/PluginManager.h"
 
@@ -2662,6 +2663,18 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
+		case E_BLOCK_MOB_SPAWNER:
+		{
+			cMobSpawnerEntity & MobSpawnerEntity = (cMobSpawnerEntity &)a_BlockEntity;
+
+			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
+			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
+			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
+			Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
+			Writer.AddString("id", "MobSpawner");
+			break;
+		}
 		default: break;
 	}
 
@@ -3130,7 +3143,6 @@ void cProtocol176::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	cPacketizer Pkt(*this, 0x00);  // Response packet
 	Pkt.WriteString(Response);
 }
-
 
 
 

@@ -8,11 +8,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-}
-
 class cClientHandle;
 
 

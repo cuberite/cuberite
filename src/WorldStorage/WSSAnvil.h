@@ -148,6 +148,7 @@ protected:
 	cBlockEntity * LoadDropperFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadFlowerPotFromNBT   (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadFurnaceFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	cBlockEntity * LoadMobSpawnerFromNBT  (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadHopperFromNBT      (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadJukeboxFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadMobHeadFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
