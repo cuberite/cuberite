@@ -14,14 +14,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-}
-
-
-
-
 
 // tolua_begin
 
@@ -41,22 +33,22 @@ public:
 
 	// tolua_begin
 	
-	/** Set the Type */
+	/** Set the type of the mob head */
 	void SetType(const eMobHeadType & a_SkullType);
 	
-	/** Set the Rotation */
+	/** Set the rotation of the mob head */
 	void SetRotation(eMobHeadRotation a_Rotation);
 	
-	/** Set the Player Name for Mobheads with Player type */
+	/** Set the player name for mob heads with player type */
 	void SetOwner(const AString & a_Owner);
 	
-	/** Get the Type */
+	/** Returns the type of the mob head */
 	eMobHeadType GetType(void) const { return m_Type; }
 	
-	/** Get the Rotation */
+	/** Returns the rotation of the mob head */
 	eMobHeadRotation GetRotation(void) const { return m_Rotation; }
 	
-	/** Get the setted Player Name */
+	/** Returns the player name of the mob head */
 	AString GetOwner(void) const { return m_Owner; }
 	
 	// tolua_end
