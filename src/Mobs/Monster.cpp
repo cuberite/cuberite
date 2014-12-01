@@ -63,16 +63,6 @@ static const struct
 
 
 
-eMonsterType StringToMobType(const AString & a_MobString)
-{
-	LOGWARNING("%s: Function is obsolete, use cMonster::StringToMobType() instead", __FUNCTION__);
-	return cMonster::StringToMobType(a_MobString);
-}
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
