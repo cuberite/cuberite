@@ -392,6 +392,88 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cFinishGenSoulsandRims
+
+void cFinishGenSoulsandRims::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	int ChunkX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int ChunkZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
+
+	for (int x = 0; x < 16; x++) 
+	{
+		int xx = ChunkX + x;
+		for (int z = 0; z < 16; z++)
+		{
+			int zz = ChunkZ + z;
+
+			// Place soulsand rims when netherrack gets thin
+			for (int y = 2; y < MaxHeight - 2; y++)
+			{
+				// The current block is air. Let's bail ut.
+				BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
+				if (Block == E_BLOCK_AIR)
+				{
+					continue;
+				}
+
+				// Check how many blocks there are above the current block. Don't go higher than 2 blocks, because we already bail out if that's the case.
+				int NumBlocksAbove = 0;
+				for (int I = y + 1; I <= y + 2; I++)
+				{
+					if (a_ChunkDesc.GetBlockType(x, I, z) != E_BLOCK_AIR)
+					{
+						NumBlocksAbove++;
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				// There are too many blocks above the current block.
+				if (NumBlocksAbove == 2)
+				{
+					continue;
+				}
+
+				// Check how many blocks there below the current block. Don't go lower than 2 blocks, because we already bail out if that's the case.
+				int NumBlocksBelow = 0;
+				for (int I = y - 1; I >= y - 2; I--)
+				{
+					if (a_ChunkDesc.GetBlockType(x, I, z) != E_BLOCK_AIR)
+					{
+						NumBlocksBelow++;
+					}
+					else
+					{
+						break;
+					}
+				}
+				
+				// There are too many blocks below the current block
+				if (NumBlocksBelow == 2)
+				{
+					continue;
+				}
+
+				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(xx)) / 32;
+				NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(zz)) / 32;
+				NOISE_DATATYPE CompBlock = m_Noise.CubicNoise3D(NoiseX, (float) (y) / 4, NoiseY);
+				if (CompBlock < 0)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SOULSAND);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSnow:
 
 void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)

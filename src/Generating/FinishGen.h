@@ -117,6 +117,25 @@ protected:
 
 
 
+class cFinishGenSoulsandRims :
+	public cFinishGen
+{
+public:
+	cFinishGenSoulsandRims(int a_Seed) : 
+		m_Noise(a_Seed)
+	{
+	}
+
+protected:
+	cNoise m_Noise;
+
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+} ;
+
+
+
+
+
 class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {

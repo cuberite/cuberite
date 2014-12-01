@@ -570,6 +570,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				GridSize, MaxOffset
 			)));
 		}
+		else if (NoCaseCompare(*itr, "SoulsandRims") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSoulsandRims(Seed)));
+		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSnow));
