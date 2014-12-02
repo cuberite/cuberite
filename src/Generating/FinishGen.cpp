@@ -392,11 +392,11 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_biome)
+bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_Biome)
 {
-	return a_biome == biDesertHills ||
-	       a_biome == biDesert ||
-	       a_biome == biDesertM;
+	return (a_Biome == biDesertHills) ||
+	       (a_Biome == biDesert     ) ||
+	       (a_Biome == biDesertM    );
 }
 
 
