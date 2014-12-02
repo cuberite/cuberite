@@ -293,8 +293,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(BlockAbove == E_BLOCK_AIR) &&
 					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(
-						a_Biome == biMushroomShore ||
-						a_Biome == biMushroomIsland
+						(a_Biome == biMushroomShore) ||
+						(a_Biome == biMushroomIsland)
 					)
 				);
 			}
