@@ -61,12 +61,12 @@ public:
 
 		// Choose what the mobspawner will spawn.
 		// 25% chance for a spider, 25% for a skeleton and 50% chance to get a zombie spawer.
-		NOISE_DATATYPE MobType = a_Noise.IntNoise3D(a_OriginX, m_FloorHeight, a_OriginZ);
-		if (MobType <= -0.5)
+		int MobType = (a_Noise.IntNoise3D(a_OriginX, m_FloorHeight, a_OriginZ) / 7) % 100
+		if (MobType <= 25)
 		{
 			m_MonsterType = mtSkeleton;
 		}
-		else if (MobType <= 0)
+		else if (MobType <= 50)
 		{
 			m_MonsterType = mtSpider;
 		}
