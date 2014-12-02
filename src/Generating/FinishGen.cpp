@@ -986,6 +986,8 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 
 void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 {
+	int chunkX = a_ChunkDesc.GetChunkX();
+	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int ChanceRnd = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % 100;
 	if (ChanceRnd > m_AnimalProbability)
 	{
@@ -1074,6 +1076,8 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 
 	std::set<eMonsterType> ListOfSpawnables;
 	std::set<eMonsterType>::iterator MobIter = ListOfSpawnables.begin();
+	int chunkX = a_ChunkDesc.GetChunkX();
+	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
 
@@ -1137,7 +1141,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		return mtInvalidType;
 	}
 
-	int RandMob = m_Random.NextInt(ListOfSpawnables.size());
+	int RandMob = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % ListOfSpawnables.size();
 	MobIter=ListOfSpawnables.begin();
 	for (int i = 0; i < RandMob; i++)
 	{
