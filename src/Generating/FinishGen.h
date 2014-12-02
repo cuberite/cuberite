@@ -121,7 +121,7 @@ class cFinishGenSoulsandRims :
 	public cFinishGen
 {
 public:
-	cFinishGenSoulsandRims(int a_Seed) : 
+	cFinishGenSoulsandRims(int a_Seed) :
 		m_Noise(a_Seed)
 	{
 	}

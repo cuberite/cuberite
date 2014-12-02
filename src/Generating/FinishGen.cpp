@@ -371,7 +371,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR) &&
-						IsDesertVariant(a_ChunkDesc.GetBiome(x, z)
+						IsDesertVariant(a_ChunkDesc.GetBiome(x, z))
 					)
 					{
 						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
@@ -394,9 +394,12 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_Biome)
 {
-	return (a_Biome == biDesertHills) ||
-	       (a_Biome == biDesert     ) ||
-	       (a_Biome == biDesertM    );
+	return
+	(
+		(a_Biome == biDesertHills) ||
+		(a_Biome == biDesert) ||
+		(a_Biome == biDesertM)
+	);
 }
 
 
@@ -412,7 +415,7 @@ void cFinishGenSoulsandRims::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
 
-	for (int x = 0; x < 16; x++) 
+	for (int x = 0; x < 16; x++)
 	{
 		int xx = ChunkX + x;
 		for (int z = 0; z < 16; z++)
