@@ -962,7 +962,7 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 				break;
 			}
 			case dimNether:
-			case dimEnd:// No nether or end animals (currently)
+			case dimEnd:  // No nether or end animals (currently)
 			{
 				DefaultAnimalSpawnChunkPercentage = DEF_NO_ANIMALS;
 				break;
@@ -972,7 +972,7 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 				ASSERT(!"Unhandled world dimension");
 				break;
 			}
-	}// switch (dimension)
+	}  // switch (dimension)
 	m_AnimalProbability = a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
 	if (m_AnimalProbability < 0 || m_AnimalProbability > 100)
 	{
@@ -1015,8 +1015,8 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 			return;
 
-		}// if pack center spawn successful
-	}// for tries
+		}  // if pack center spawn successful
+	}  // for tries
 }
 
 
