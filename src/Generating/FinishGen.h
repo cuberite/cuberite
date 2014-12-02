@@ -123,7 +123,7 @@ class cFinishGenSoulsandRims :
 	public cFinishGen
 {
 public:
-	cFinishGenSoulsandRims(int a_Seed) : 
+	cFinishGenSoulsandRims(int a_Seed) :
 		m_Noise(a_Seed)
 	{
 	}
@@ -319,26 +319,26 @@ protected:
 
 
 class cFinishGenPassiveMobs :
-      public cFinishGen
+	public cFinishGen
 {
 public:
 
-      cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
+	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
 
 protected:
 
-      cNoise                 m_Noise;
-      int                    m_AnimalProbability;  // Chance, [0..100], that an animal pack will be generated in a chunk
-      cFastRandom            m_Random;
+	cNoise      m_Noise;
+	int         m_AnimalProbability;  // Chance, [0..100], that an animal pack will be generated in a chunk
+	cFastRandom m_Random;
 
-      // cFinishGen override:
-      virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-      // Tries to spawn a mob in the center of the pack. If successful, spawns 0-5 more.
-      bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
+	// Tries to spawn a mob in the center of the pack. If successful, spawns 0-5 more.
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
 
-      // Gets a random mob from biome-dependant list
-      eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
+	// Gets a random mob from biome-dependant list
+	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
 } ;
 
 
