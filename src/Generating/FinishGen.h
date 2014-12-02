@@ -329,7 +329,6 @@ protected:
 
 	cNoise      m_Noise;
 	int         m_AnimalProbability;  // Chance, [0..100], that an animal pack will be generated in a chunk
-	cFastRandom m_Random;
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
