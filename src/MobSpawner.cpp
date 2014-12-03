@@ -285,6 +285,19 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					)
 				);
 			}
+
+			case mtMooshroom:
+			{
+				return (
+					(TargetBlock == E_BLOCK_AIR) &&
+					(BlockAbove == E_BLOCK_AIR) &&
+					(BlockBelow == E_BLOCK_MYCELIUM) &&
+					(
+						(a_Biome == biMushroomShore) ||
+						(a_Biome == biMushroomIsland)
+					)
+				);
+			}
 			
 			default:
 			{
