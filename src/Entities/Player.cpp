@@ -120,11 +120,11 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 		{
 			m_CanFly = true;
 		}
-        if (World->IsGameModeSpectator()) //Otherwise Player will fall out of the world on join
-        {
-            m_CanFly = true;
-            m_IsFlying = true;
-        }
+		if (World->IsGameModeSpectator()) //Otherwise Player will fall out of the world on join
+		{
+			m_CanFly = true;
+			m_IsFlying = true;
+		}
 	}
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
