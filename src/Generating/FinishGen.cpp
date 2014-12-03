@@ -1001,7 +1001,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 		return;
 	}
 
-	// Try spawning a pack center 10 times, should get roughly the same probability
+	/** Try spawning a pack center 10 times, should get roughly the same probability */
 	for (int Tries = 0; Tries < 10; Tries++)
 	{
 		int PackCenterX = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
@@ -1030,7 +1030,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	BLOCKTYPE BlockAtFeet    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ);
 	BLOCKTYPE BlockUnderFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY - 1, a_RelZ);
 
-	// Check block below (opaque, grass, water), and above (air)
+	/** Check block below (opaque, grass, water), and above (air) */
 	if (AnimalToSpawn == mtSquid && BlockAtFeet != E_BLOCK_WATER)
 	{
 		return false;
@@ -1081,7 +1081,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
 
-	// Check biomes first to get a list of animals
+	/** Check biomes first to get a list of animals */
 	switch (a_ChunkDesc.GetBiome(x, z))
 	{
 		// No animals

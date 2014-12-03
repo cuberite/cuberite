@@ -318,6 +318,9 @@ protected:
 
 
 
+/** This class populates generated chunks with packs of biome-dependant animals
+Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots
+*/
 class cFinishGenPassiveMobs :
 	public cFinishGen
 {
@@ -328,9 +331,9 @@ public:
 protected:
 
 	cNoise      m_Noise;
-	int         m_AnimalProbability;  // Chance, [0..100], that an animal pack will be generated in a chunk
+	int         m_AnimalProbability;  /** Chance, [0..100], that an animal pack will be generated in a chunk */
 
-	// cFinishGen override:
+	/** cFinishGen override: */
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Tries to spawn a mob in the center of the pack. If successful, spawns 0-5 more. */
