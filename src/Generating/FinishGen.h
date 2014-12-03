@@ -310,7 +310,7 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	/// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
+	// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
 	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
 } ;
 
@@ -333,10 +333,10 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	// Tries to spawn a mob in the center of the pack. If successful, spawns 0-5 more.
+	/** Tries to spawn a mob in the center of the pack. If successful, spawns 0-5 more. */
 	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
 
-	// Gets a random mob from biome-dependant list
+	/** Gets a random mob from biome-dependant list */
 	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
 } ;
 
