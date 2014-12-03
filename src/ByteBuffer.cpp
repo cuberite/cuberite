@@ -140,10 +140,10 @@ public:
 		std::thread::id * m_ThreadID;
 	};
 
-#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
+	#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
 
 #else
- #define CHECK_THREAD
+	#define CHECK_THREAD
 #endif
 
 
