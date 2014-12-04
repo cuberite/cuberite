@@ -974,7 +974,7 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 		}
 	}  // switch (dimension)
 	m_AnimalProbability = a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
-	if (m_AnimalProbability < 0 || m_AnimalProbability > 100)
+	if ((m_AnimalProbability < 0) || (m_AnimalProbability > 100))
 	{
 		LOGWARNING("[Animals]: AnimalSpawnChunkPercentage is invalid, using the default of \"%d\".", DefaultAnimalSpawnChunkPercentage);
 	}
@@ -1001,7 +1001,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 		return;
 	}
 
-	/** Try spawning a pack center 10 times, should get roughly the same probability */
+	// Try spawning a pack center 10 times, should get roughly the same probability
 	for (int Tries = 0; Tries < 10; Tries++)
 	{
 		int PackCenterX = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
@@ -1010,8 +1010,8 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			for (int i = 0; i < 5; i++)
 			{
-				int OffsetX = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
-				int OffsetZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
+				int OffsetX = (m_Noise.IntNoise2DInt(chunkX + chunkZ, Tries) / 7) % cChunkDef::Width;
+				int OffsetZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries) / 7) % cChunkDef::Width;
 				TrySpawnAnimals(a_ChunkDesc, OffsetX, a_ChunkDesc.GetHeight(OffsetX, OffsetZ), OffsetZ, RandomMob);
 			}
 			return;
@@ -1026,11 +1026,16 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
 {
+	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
+	{
+		return false;
+	}
+
 	BLOCKTYPE BlockAtHead    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY + 1, a_RelZ);
 	BLOCKTYPE BlockAtFeet    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ);
 	BLOCKTYPE BlockUnderFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY - 1, a_RelZ);
 
-	/** Check block below (opaque, grass, water), and above (air) */
+	// Check block below (opaque, grass, water), and above (air)
 	if (AnimalToSpawn == mtSquid && BlockAtFeet != E_BLOCK_WATER)
 	{
 		return false;
@@ -1087,53 +1092,61 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		// No animals
 		case biNether:
 		case biEnd:
+		{
 			return mtInvalidType;
-
+		}
 		// Squid only
 		case biOcean:
 		case biFrozenOcean:
 		case biFrozenRiver:
 		case biRiver:
 		case biDeepOcean:
+		{
 			ListOfSpawnables.insert(MobIter, mtSquid);
 			break;
-
+		}
 		// Mooshroom only
 		case biMushroomIsland:
 		case biMushroomShore:
+		{
 			ListOfSpawnables.insert(MobIter, mtMooshroom);
 			break;
-
+		}
 		case biJungle:
 		case biJungleHills:
 		case biJungleEdge:
 		case biJungleM:
 		case biJungleEdgeM:
+		{
 			ListOfSpawnables.insert(MobIter, mtOcelot);
-
+		}
 		case biPlains:
 		case biSunflowerPlains:
 		case biSavanna:
 		case biSavannaPlateau:
 		case biSavannaM:
 		case biSavannaPlateauM:
+		{
 			ListOfSpawnables.insert(MobIter, mtHorse);
 			// ListOfSpawnables.insert(mtDonkey);
-
+		}
 		// Wolves only
 		case biForest:
 		case biTaiga:
 		case biMegaTaiga:
 		case biColdTaiga:
 		case biColdTaigaM:
+		{
 			ListOfSpawnables.insert(MobIter, mtWolf);
-
+		}
 		// All other mobs
 		default:
+		{
 			ListOfSpawnables.insert(MobIter, mtChicken);
 			ListOfSpawnables.insert(MobIter, mtCow);
 			ListOfSpawnables.insert(MobIter, mtPig);
 			ListOfSpawnables.insert(MobIter, mtSheep);
+		}
 	}
 
 	if (ListOfSpawnables.empty())
