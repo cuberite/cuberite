@@ -116,11 +116,11 @@ local g_ViolationPatterns =
 	
 	-- Space after keywords:
 	{"[^_]if%(", "Needs a space after \"if\""},
-	{"for%(", "Needs a space after \"for\""},
-	{"while%(", "Needs a space after \"while\""},
-	{"switch%(", "Needs a space after \"switch\""},
-	{"catch%(", "Needs a space after \"catch\""},
-	{"template<", "Needs a space after \"template\""},
+	{"%sfor%(", "Needs a space after \"for\""},
+	{"%swhile%(", "Needs a space after \"while\""},
+	{"%sswitch%(", "Needs a space after \"switch\""},
+	{"%scatch%(", "Needs a space after \"catch\""},
+	{"%stemplate<", "Needs a space after \"template\""},
 	
 	-- No space after keyword's parenthesis:
 	{"[^%a#]if %( ", "Remove the space after \"(\""},
