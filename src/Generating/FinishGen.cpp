@@ -370,7 +370,8 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR)
+						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR) &&
+						IsDesertVariant(a_ChunkDesc.GetBiome(x, z))
 					)
 					{
 						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
@@ -385,6 +386,20 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.SetHeight(x, z, Top);
 		}  // for y
 	}  // for z
+}
+
+
+
+
+
+bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_Biome)
+{
+	return
+	(
+		(a_Biome == biDesertHills) ||
+		(a_Biome == biDesert) ||
+		(a_Biome == biDesertM)
+	);
 }
 
 

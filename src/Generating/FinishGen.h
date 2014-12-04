@@ -149,6 +149,9 @@ protected:
 	/// Tries to place sugarcane at the coords specified, returns true if successful
 	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);
 
+	// Returns true is the specified biome is a desert or its variant
+	static bool IsDesertVariant(EMCSBiome a_biome);
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
