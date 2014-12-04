@@ -1004,14 +1004,14 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 	// Try spawning a pack center 10 times, should get roughly the same probability
 	for (int Tries = 0; Tries < 10; Tries++)
 	{
-		int PackCenterX = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
-		int PackCenterZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
+		int PackCenterX = (m_Noise.IntNoise2DInt(chunkX + chunkZ, Tries) / 7) % cChunkDef::Width;
+		int PackCenterZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries) / 7) % cChunkDef::Width;
 		if (TrySpawnAnimals(a_ChunkDesc, PackCenterX, a_ChunkDesc.GetHeight(PackCenterX, PackCenterZ), PackCenterZ, RandomMob))
 		{
 			for (int i = 0; i < 5; i++)
 			{
-				int OffsetX = (m_Noise.IntNoise2DInt(chunkX + chunkZ, Tries) / 7) % cChunkDef::Width;
-				int OffsetZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries) / 7) % cChunkDef::Width;
+				int OffsetX = (m_Noise.IntNoise2DInt(chunkX + chunkZ + i, Tries) / 7) % cChunkDef::Width;
+				int OffsetZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries + i) / 7) % cChunkDef::Width;
 				TrySpawnAnimals(a_ChunkDesc, OffsetX, a_ChunkDesc.GetHeight(OffsetX, OffsetZ), OffsetZ, RandomMob);
 			}
 			return;
@@ -1040,7 +1040,8 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	{
 		return false;
 	}
-	if ((AnimalToSpawn != mtSquid) &&
+	if (
+		(AnimalToSpawn != mtSquid) &&
 		(BlockAtHead != E_BLOCK_AIR) &&
 		(BlockAtFeet != E_BLOCK_AIR) &&
 		(!cBlockInfo::IsTransparent(BlockUnderFeet))
@@ -1083,8 +1084,8 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 	std::set<eMonsterType>::iterator MobIter = ListOfSpawnables.begin();
 	int chunkX = a_ChunkDesc.GetChunkX();
 	int chunkZ = a_ChunkDesc.GetChunkZ();
-	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
-	int z = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % cChunkDef::Width;
+	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ + 10) / 7) % cChunkDef::Width;
+	int z = (m_Noise.IntNoise2DInt(chunkX + chunkZ, chunkZ) / 7) % cChunkDef::Width;
 
 	/** Check biomes first to get a list of animals */
 	switch (a_ChunkDesc.GetBiome(x, z))
@@ -1154,7 +1155,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		return mtInvalidType;
 	}
 
-	int RandMob = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % ListOfSpawnables.size();
+	int RandMob = (m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size();
 	MobIter=ListOfSpawnables.begin();
 	for (int i = 0; i < RandMob; i++)
 	{
