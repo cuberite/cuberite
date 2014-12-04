@@ -318,14 +318,14 @@ protected:
 
 
 
+/** This class populates generated chunks with packs of biome-dependant animals
+	Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots
+	*/
 class cFinishGenPassiveMobs :
 	public cFinishGen
 {
 public:
 	
-	/** This class populates generated chunks with packs of biome-dependant animals
-	Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots
-	*/
 	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
 
 protected:
