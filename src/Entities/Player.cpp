@@ -120,7 +120,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 		{
 			m_CanFly = true;
 		}
-		if (World->IsGameModeSpectator()) //Otherwise Player will fall out of the world on join
+		if (World->IsGameModeSpectator())  // Otherwise Player will fall out of the world on join
 		{
 			m_CanFly = true;
 			m_IsFlying = true;
@@ -1899,7 +1899,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 void cPlayer::TickBurning(cChunk & a_Chunk)
 {
 	// Don't burn in creative or spectator and stop burning in creative if necessary
-	if (!(IsGameModeCreative() || IsGameModeSpectator()))
+	if (!IsGameModeCreative() && !IsGameModeSpectator())
 	{
 		super::TickBurning(a_Chunk);
 	}
