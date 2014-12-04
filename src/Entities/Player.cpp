@@ -120,6 +120,11 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 		{
 			m_CanFly = true;
 		}
+		if (World->IsGameModeSpectator())  // Otherwise Player will fall out of the world on join
+		{
+			m_CanFly = true;
+			m_IsFlying = true;
+		}
 	}
 	
 	cRoot::Get()->GetServer()->PlayerCreated(this);
@@ -1074,7 +1079,7 @@ bool cPlayer::IsGameModeAdventure(void) const
 bool cPlayer::IsGameModeSpectator(void) const
 {
 	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Adventure
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Spectator
 }
 
 
@@ -1893,8 +1898,8 @@ void cPlayer::UseEquippedItem(int a_Amount)
 
 void cPlayer::TickBurning(cChunk & a_Chunk)
 {
-	// Don't burn in creative and stop burning in creative if necessary
-	if (!IsGameModeCreative())
+	// Don't burn in creative or spectator and stop burning in creative if necessary
+	if (!IsGameModeCreative() && !IsGameModeSpectator())
 	{
 		super::TickBurning(a_Chunk);
 	}
@@ -1913,9 +1918,9 @@ void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
 
-	if (IsGameModeCreative())
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
-		// Hunger is disabled for Creative
+		// Hunger is disabled for Creative and Spectator
 		return;
 	}
 
@@ -2080,7 +2085,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 
 void cPlayer::ApplyFoodExhaustionFromMovement()
 {
-	if (IsGameModeCreative())
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
 		return;
 	}
