@@ -18,6 +18,7 @@
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
+#include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
@@ -283,6 +284,20 @@ void cNBTChunkSerializer::AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
 	m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_Jukebox, "RecordPlayer");
 		m_Writer.AddInt("Record", a_Jukebox->GetRecord());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddMobSpawnerEntity(cMobSpawnerEntity * a_MobSpawner)
+{
+	m_Writer.BeginCompound("");
+		AddBasicTileEntity(a_MobSpawner, "MobSpawner");
+		m_Writer.AddShort("Entity", static_cast<short>(a_MobSpawner->GetEntity()));
+		m_Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(a_MobSpawner->GetEntity()));
+		m_Writer.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
 	m_Writer.EndCompound();
 }
 
@@ -914,6 +929,7 @@ void cNBTChunkSerializer::BlockEntity(cBlockEntity * a_Entity)
 		case E_BLOCK_HOPPER:        AddHopperEntity      ((cHopperEntity *)      a_Entity); break;
 		case E_BLOCK_JUKEBOX:       AddJukeboxEntity     ((cJukeboxEntity *)     a_Entity); break;
 		case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity     ((cFurnaceEntity *)     a_Entity); break;
+		case E_BLOCK_MOB_SPAWNER:   AddMobSpawnerEntity  ((cMobSpawnerEntity *)  a_Entity); break;
 		case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        ((cNoteEntity *)        a_Entity); break;
 		case E_BLOCK_SIGN_POST:     AddSignEntity        ((cSignEntity *)        a_Entity); break;
 		case E_BLOCK_TRAPPED_CHEST: AddChestEntity       ((cChestEntity *)       a_Entity, a_Entity->GetBlockType()); break;

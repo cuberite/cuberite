@@ -15,6 +15,7 @@ SET (SRCS
 	Semaphore.cpp
 	Socket.cpp
 	SocketThreads.cpp
+	StackTrace.cpp
 )
 
 SET (HDRS
@@ -29,6 +30,7 @@ SET (HDRS
 	Semaphore.h
 	Socket.h
 	SocketThreads.h
+	StackTrace.h
 )
 
 if(NOT MSVC)

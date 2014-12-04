@@ -31,7 +31,7 @@ public:
 
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cHopperEntity);
+	BLOCKENTITY_PROTODEF(cHopperEntity)
 	
 	/// Constructor used for normal operation
 	cHopperEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);

@@ -1220,12 +1220,18 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 {
 	// TODO: Rewrite this function
 
-	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s",
-		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str()
+	// Distance from the block's center to the player's eye height
+	double dist = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) + Vector3d(0.5, 0.5, 0.5) - m_Player->GetEyePosition()).Length();
+	LOGD("HandleRightClick: {%d, %d, %d}, face %d, HeldItem: %s; dist: %.02f",
+		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, ItemToFullString(a_HeldItem).c_str(), dist
 	);
-	
+
+	// Check the reach distance:
+	// _X 2014-11-25: I've maxed at 5.26 with a Survival client and 5.78 with a Creative client in my tests
+	double maxDist = m_Player->IsGameModeCreative() ? 5.78 : 5.26;
+	bool AreRealCoords = (dist <= maxDist);
+
 	cWorld * World = m_Player->GetWorld();
-	bool AreRealCoords = (Vector3d(a_BlockX, a_BlockY, a_BlockZ) - m_Player->GetPosition()).Length() <= 5;
 
 	if (
 		(a_BlockFace != BLOCK_FACE_NONE) &&  // The client is interacting with a specific block

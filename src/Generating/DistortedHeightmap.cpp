@@ -122,6 +122,8 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 	m_NoiseDistortX(a_Seed + 1000),
 	m_NoiseDistortZ(a_Seed + 2000),
+	m_CurChunkX(0x7fffffff),  // Set impossible coords for the chunk so that it's always considered stale
+	m_CurChunkZ(0x7fffffff),
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(new cHeiGenBiomal(a_Seed, a_BiomeGen)),
 	m_HeightGen(m_UnderlyingHeiGen, 64),

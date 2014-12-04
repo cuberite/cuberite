@@ -247,15 +247,16 @@ void cBeaconEntity::GiveEffects(void)
 		}
 
 	public:
-		cPlayerCallback(int a_Radius, int a_PosX, int a_PosY, int a_PosZ, cEntityEffect::eType a_PrimaryEffect, cEntityEffect::eType a_SecondaryEffect, short a_EffectLevel)
-			: m_Radius(a_Radius)
-			, m_PosX(a_PosX)
-			, m_PosY(a_PosY)
-			, m_PosZ(a_PosZ)
-			, m_PrimaryEffect(a_PrimaryEffect)
-			, m_SecondaryEffect(a_SecondaryEffect)
-			, m_EffectLevel(a_EffectLevel)
-		{};
+		cPlayerCallback(int a_Radius, int a_PosX, int a_PosY, int a_PosZ, cEntityEffect::eType a_PrimaryEffect, cEntityEffect::eType a_SecondaryEffect, short a_EffectLevel):
+			m_Radius(a_Radius),
+			m_PosX(a_PosX),
+			m_PosY(a_PosY),
+			m_PosZ(a_PosZ),
+			m_PrimaryEffect(a_PrimaryEffect),
+			m_SecondaryEffect(a_SecondaryEffect),
+			m_EffectLevel(a_EffectLevel)
+		{
+		}
 
 	} PlayerCallback(Radius, m_PosX, m_PosY, m_PosZ, m_PrimaryEffect, SecondaryEffect, EffectLevel);
 	GetWorld()->ForEachPlayer(PlayerCallback);

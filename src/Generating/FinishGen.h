@@ -117,19 +117,38 @@ protected:
 
 
 
+class cFinishGenSoulsandRims :
+	public cFinishGen
+{
+public:
+	cFinishGenSoulsandRims(int a_Seed) :
+		m_Noise(a_Seed)
+	{
+	}
+
+protected:
+	cNoise m_Noise;
+
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+} ;
+
+
+
+
+
 class cFinishGenSprinkleFoliage :
 	public cFinishGen
 {
 public:
 	cFinishGenSprinkleFoliage(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
-	
+
 protected:
 	cNoise m_Noise;
 	int    m_Seed;
-	
+
 	/// Tries to place sugarcane at the coords specified, returns true if successful
 	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ);
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
@@ -167,31 +186,31 @@ public:
 		{
 			m_IsAllowedBelow[idx] = false;
 		}
-		
+
 		// Load the allowed blocks into m_IsAllowedBelow
 		for (BlockList::iterator itr = a_AllowedBelow.begin(); itr != a_AllowedBelow.end(); ++itr)
 		{
 			m_IsAllowedBelow[*itr] = true;
 		}
-		
+
 		// Initialize all the biome types.
 		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsBiomeAllowed); ++idx)
 		{
 			m_IsBiomeAllowed[idx] = false;
 		}
-		
+
 		// Load the allowed biomes into m_IsBiomeAllowed
 		for (BiomeList::iterator itr = a_Biomes.begin(); itr != a_Biomes.end(); ++itr)
 		{
 			m_IsBiomeAllowed[*itr] = true;
 		}
 	}
-	
+
 protected:
 	cNoise m_Noise;
 	BLOCKTYPE m_BlockType;
 	int       m_Amount;         ///< Relative amount of blocks to try adding. 1 = one block per 256 biome columns.
-	
+
 	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
 
 	// Returns true if the given biome is a biome that is allowed.
@@ -206,7 +225,7 @@ protected:
 		return m_IsAllowedBelow[a_BlockBelow];
 	}
 
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
@@ -223,11 +242,11 @@ public:
 		m_Level(a_Level)
 	{
 	}
-	
+
 	int GetLevel(void) const { return m_Level; }
 protected:
 	int m_Level;
-	
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 } ;
@@ -241,7 +260,7 @@ class cFinishGenPreSimulator :
 {
 public:
 	cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava);
-	
+
 protected:
 
 	bool m_PreSimulateFallingBlocks;
@@ -253,7 +272,7 @@ protected:
 		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
 		cChunkDef::HeightMap & a_HeightMap       // Height map to update by the current data
 	);
-	
+
 	/** For each fluid block:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
 	- all fluid on the chunk's edge is made flowing
@@ -278,7 +297,7 @@ class cFinishGenFluidSprings :
 {
 public:
 	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension);
-	
+
 protected:
 
 	cNoise         m_Noise;

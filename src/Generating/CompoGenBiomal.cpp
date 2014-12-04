@@ -39,7 +39,7 @@ public:
 		
 		// Fill the rest with stone:
 		static BlockInfo Stone = {E_BLOCK_STONE, 0};
-		for (size_t i = a_Count; i < cChunkDef::Height; i++)
+		for (int i = static_cast<int>(a_Count); i < cChunkDef::Height; i++)
 		{
 			m_Pattern[i] = Stone;
 		}

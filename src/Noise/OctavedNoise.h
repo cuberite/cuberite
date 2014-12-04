@@ -66,17 +66,19 @@ public:
 		}
 
 		// Generate the first octave directly into array:
-		const cOctave & FirstOctave = m_Octaves.front();
 		int ArrayCount = a_SizeX * a_SizeY;
-		FirstOctave.m_Noise.Generate2D(
-			a_Workspace, a_SizeX, a_SizeY,
-			a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-			a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
-		);
-		NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
-		for (int i = 0; i < ArrayCount; i++)
 		{
-			a_Array[i] = a_Workspace[i] * Amplitude;
+			const cOctave & FirstOctave = m_Octaves.front();
+			FirstOctave.m_Noise.Generate2D(
+				a_Workspace, a_SizeX, a_SizeY,
+				a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
+				a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
+			);
+			NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
+			for (int i = 0; i < ArrayCount; i++)
+			{
+				a_Array[i] = a_Workspace[i] * Amplitude;
+			}
 		}
 
 		// Add each octave:
@@ -124,18 +126,20 @@ public:
 		}
 
 		// Generate the first octave directly into array:
-		const cOctave & FirstOctave = m_Octaves.front();
 		int ArrayCount = a_SizeX * a_SizeY * a_SizeZ;
-		FirstOctave.m_Noise.Generate3D(
-			a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-			a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-			a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
-			a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
-		);
-		NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
-		for (int i = 0; i < ArrayCount; i++)
 		{
-			a_Array[i] = a_Workspace[i] * Amplitude;
+			const cOctave & FirstOctave = m_Octaves.front();
+			FirstOctave.m_Noise.Generate3D(
+				a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
+				a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
+				a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
+				a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
+			);
+			NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
+			for (int i = 0; i < ArrayCount; i++)
+			{
+				a_Array[i] = a_Workspace[i] * Amplitude;
+			}
 		}
 
 		// Add each octave:

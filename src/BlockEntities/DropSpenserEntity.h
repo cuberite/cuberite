@@ -16,10 +16,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-}
 
 class cClientHandle;
 
@@ -45,7 +41,7 @@ public:
 	
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cDropSpenserEntity);
+	BLOCKENTITY_PROTODEF(cDropSpenserEntity)
 	
 	cDropSpenserEntity(BLOCKTYPE a_BlockType, int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cDropSpenserEntity();

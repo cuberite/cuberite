@@ -1096,7 +1096,7 @@ class cIniFile;
 // tolua_begin
 
 /// Translates a blocktype string into blocktype. Takes either a number or an items.ini alias as input. Returns -1 on failure.
-extern BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString);
+extern int BlockStringToType(const AString & a_BlockTypeString);
 
 /// Translates an itemtype string into an item. Takes either a number, number^number, number:number or an items.ini alias as input. Returns true if successful.
 extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);

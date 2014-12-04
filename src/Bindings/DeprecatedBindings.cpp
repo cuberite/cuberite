@@ -225,6 +225,42 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 
 
 
+/* function: StringToMobType */
+static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+
+	#ifndef TOLUA_RELEASE
+	tolua_Error tolua_err;
+	if (
+		!tolua_iscppstring(tolua_S, 1, 0, &tolua_err) ||
+		!tolua_isnoobj(tolua_S, 2, &tolua_err)
+		)
+		goto tolua_lerror;
+	else
+	#endif
+	{
+		const AString a_MobString = tolua_tocppstring(LuaState, 1, 0);
+		eMonsterType MobType = cMonster::StringToMobType(a_MobString);
+		tolua_pushnumber(LuaState, (lua_Number) MobType);
+		tolua_pushcppstring(LuaState, (const char *) a_MobString);
+	}
+
+	LOGWARNING("Warning in function call 'StringToMobType': StringToMobType() is deprecated. Please use cMonster:StringToMobType()");
+	LuaState.LogStackTrace(0);
+	return 2;
+
+	#ifndef TOLUA_RELEASE
+tolua_lerror:
+	tolua_error(LuaState, "#ferror in function 'StringToMobType'.", &tolua_err);
+	return 0;
+	#endif
+}
+
+
+
+
+
 /** function: cWorld:SetSignLines */
 static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 {
@@ -295,6 +331,8 @@ void DeprecatedBindings::Bind(lua_State * tolua_S)
 	tolua_array(tolua_S, "g_BlockIsSnowable",          tolua_get_AllToLua_g_BlockIsSnowable,          nullptr);
 	tolua_array(tolua_S, "g_BlockIsSolid",             tolua_get_AllToLua_g_BlockIsSolid,             nullptr);
 	tolua_array(tolua_S, "g_BlockFullyOccupiesVoxel",  tolua_get_AllToLua_g_BlockFullyOccupiesVoxel,  nullptr);
+
+	tolua_function(tolua_S, "StringToMobType", tolua_AllToLua_StringToMobType00);
 
 	tolua_beginmodule(tolua_S, "cWorld");
 		tolua_function(tolua_S, "UpdateSign", tolua_cWorld_SetSignLines);

@@ -1668,13 +1668,14 @@ a_Player:OpenWindow(Window);
 				SetCustomName = { Params = "string", Return = "", Notes = "Sets the custom name of the monster. You see the name over the monster. If you want to disable the custom name, simply set an empty string." },
 				IsCustomNameAlwaysVisible = { Params = "", Return = "bool", Notes = "Is the custom name of this monster always visible? If not, you only see the name when you sight the mob." },
 				SetCustomNameAlwaysVisible = { Params = "bool", Return = "", Notes = "Sets the custom name visiblity of this monster. If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name." },
-				FamilyFromType = { Params = "{{cMonster#MobType|MobType}}", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "(STATIC) Returns the mob family ({{cMonster#MobFamily|mfXXX}} constants) based on the mob type ({{cMonster#MobType|mtXXX}} constants)" },
+				FamilyFromType = { Params = "{{Globals#MobType|MobType}}", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "(STATIC) Returns the mob family ({{cMonster#MobFamily|mfXXX}} constants) based on the mob type ({{Globals#MobType|mtXXX}} constants)" },
 				GetMobFamily = { Params = "", Return = "{{cMonster#MobFamily|MobFamily}}", Notes = "Returns this mob's family ({{cMonster#MobFamily|mfXXX}} constant)" },
-				GetMobType = { Params = "", Return = "{{cMonster#MobType|MobType}}", Notes = "Returns the type of this mob ({{cMonster#MobType|mtXXX}} constant)" },
+				GetMobType = { Params = "", Return = "{{Globals#MobType|MobType}}", Notes = "Returns the type of this mob ({{Globals#MobType|mtXXX}} constant)" },
 				GetSpawnDelay = { Params = "{{cMonster#MobFamily|MobFamily}}", Return = "number", Notes = "(STATIC) Returns the spawn delay  - the number of game ticks between spawn attempts - for the specified mob family." },
-				MobTypeToString = { Params = "{{cMonster#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{cMonster#MobType|mtXXX}} constant), or empty string if unknown type." },
+				MobTypeToString = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the string representing the given mob type ({{Globals#MobType|mtXXX}} constant), or empty string if unknown type." },
+				MobTypeToVanillaName = { Params = "{{Globals#MobType|MobType}}", Return = "string", Notes = "(STATIC) Returns the vanilla name of the given mob type, or empty string if unknown type." },
 				MoveToPosition = { Params = "Position", Return = "", Notes = "Moves mob to the specified position" },
-				StringToMobType = { Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{cMonster#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
+				StringToMobType = { Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "(STATIC) Returns the mob type ({{Globals#MobType|mtXXX}} constant) parsed from the string type (\"creeper\"), or mtInvalidType if unrecognized." },
 				GetRelativeWalkSpeed = { Params = "", Return = "number", Notes = "Returns the relative walk speed of this mob. Standard is 1.0" },
 				SetRelativeWalkSpeed = { Params = "number", Return = "", Notes = "Sets the relative walk speed of this mob. Standard is 1.0" },
 			},
@@ -1723,13 +1724,6 @@ a_Player:OpenWindow(Window);
 					Include = "mf.*",
 					TextBefore = [[
 						Mobs are divided into families. The following constants are used for individual family types:
-					]],
-				},
-				MobType =
-				{
-					Include = "mt.*",
-					TextBefore = [[
-						The following constants are used for distinguishing between the individual mob types:
 					]],
 				},
 			},
@@ -2571,7 +2565,7 @@ World:ForEachEntity(
 			return;
 		end
 		local Monster = tolua.cast(a_Entity, "cMonster");  -- Get the cMonster out of cEntity, now that we know the entity represents one.
-		if (Monster:GetMobType() == cMonster.mtSpider) then
+		if (Monster:GetMobType() == mtSpider) then
 			Monster:TeleportToCoords(Monster:GetPosX(), Monster:GetPosY() + 100, Monster:GetPosZ());
 		end
 	end
@@ -2928,7 +2922,7 @@ end
 				StringToDamageType = {Params = "string", Return = "{{Globals#DamageType|DamageType}}", Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value."},
 				StringToDimension = {Params = "string", Return = "{{Globals#WorldDimension|Dimension}}", Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value"},
 				StringToItem = {Params = "string, {{cItem|cItem}}", Return = "bool", Notes = "Parses the given string and sets the item; returns true if successful"},
-				StringToMobType = {Params = "string", Return = "{{cMonster#MobType|MobType}}", Notes = "Converts a string representation to a {{cMonster#MobType|MobType}} enumerated value"},
+				StringToMobType = {Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "<b>DEPRECATED!</b> Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
 				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
 				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
@@ -3012,6 +3006,13 @@ end
 					TextBefore = [[
 						The following constants are used for the gamemode - survival, creative or adventure. Use the
 						gmXXX constants, the eGameMode_ constants are deprecated and will be removed from the API.
+					]],
+				},
+				MobType =
+				{
+					Include = { "^mt.*" },
+					TextBefore = [[
+						The following constants are used for distinguishing between the individual mob types:
 					]],
 				},
 				Weather =

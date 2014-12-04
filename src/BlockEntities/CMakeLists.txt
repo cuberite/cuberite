@@ -18,6 +18,7 @@ SET (SRCS
 	HopperEntity.cpp
 	JukeboxEntity.cpp
 	MobHeadEntity.cpp
+	MobSpawnerEntity.cpp
 	NoteEntity.cpp
 	SignEntity.cpp)
 
@@ -36,6 +37,7 @@ SET (HDRS
 	HopperEntity.h
 	JukeboxEntity.h
 	MobHeadEntity.h
+	MobSpawnerEntity.h
 	NoteEntity.h
 	SignEntity.h)
 

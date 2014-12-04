@@ -104,7 +104,6 @@ SET (HDRS
 	Inventory.h
 	Item.h
 	ItemGrid.h
-	LeakFinder.h
 	LightingThread.h
 	LineBlockTracer.h
 	LinearInterpolation.h
@@ -114,7 +113,6 @@ SET (HDRS
 	Map.h
 	MapManager.h
 	Matrix4.h
-	MemoryLeak.h
 	MobCensus.h
 	MobFamilyCollecter.h
 	MobProximityCounter.h
@@ -127,7 +125,6 @@ SET (HDRS
 	Scoreboard.h
 	Server.h
 	SetChunkData.h
-	StackWalker.h
 	Statistics.h
 	StringCompression.h
 	StringUtils.h
@@ -174,6 +171,10 @@ if (NOT MSVC)
 	endif()
 else ()
 	# MSVC-specific handling: Put all files into one project, separate by the folders:
+
+	# Add the MSVC-specific LeakFinder sources:
+	list (APPEND SRCS LeakFinder.cpp StackWalker.cpp)
+	list (APPEND HDRS LeakFinder.h StackWalker.h MemoryLeak.h)
 
 	source_group(Bindings FILES "Bindings/Bindings.cpp" "Bindings/Bindings.h")
 
@@ -224,7 +225,7 @@ else ()
 		Bindings/Bindings.cpp PROPERTIES COMPILE_FLAGS "/Yc\"string.h\" /Fp\"$(IntDir)/Bindings.pch\""
 	)
 	SET_SOURCE_FILES_PROPERTIES(
-		"StackWalker.cpp LeakFinder.h" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
+		"StackWalker.cpp LeakFinder.cpp" PROPERTIES COMPILE_FLAGS "/Yc\"Globals.h\""
 	)
 	list(APPEND SOURCE "Resources/MCServer.rc")
 

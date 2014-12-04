@@ -54,7 +54,7 @@ public:
 		);
 		for (int i = 0; i < ArrayCount; i++)
 		{
-			a_Array[i] = fabs(a_Array[i]);
+			a_Array[i] = std::abs(a_Array[i]);
 		}
 	}
 
@@ -77,7 +77,7 @@ public:
 		);
 		for (int i = 0; i < ArrayCount; i++)
 		{
-			a_Array[i] = fabs(a_Array[i]);
+			a_Array[i] = std::abs(a_Array[i]);
 		}
 	}
 

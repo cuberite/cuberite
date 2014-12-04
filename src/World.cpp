@@ -157,6 +157,8 @@ protected:
 		if (m_NumPrepared >= m_MaxIdx)
 		{
 			m_EvtFinished.Set();
+			// Must return here, because "this" may have gotten deleted by the previous line
+			return;
 		}
 
 		// Queue another chunk, if appropriate:
@@ -602,7 +604,7 @@ void cWorld::Start(void)
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
-	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
+	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmSpectator);
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 	m_Weather          = (eWeather)      Clamp(Weather,          (int)wSunny,     (int)wStorm);
 
@@ -747,7 +749,7 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
 			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
 			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
-			a_IniFile.GetValueSet("Generator", "Finishers",        "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Finishers",        "SoulsandRims, WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
 			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
 			break;
 		}
@@ -2668,7 +2670,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 
 bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	// Calls the callback for each player in the list
+	// Calls the callback for the specified player in the list
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
