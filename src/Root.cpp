@@ -116,7 +116,7 @@ void cRoot::Start(void)
 	m_bStop = false;
 	while (!m_bStop)
 	{
-		auto BeginTime = std::chrono::steady_clock::now();		
+		auto BeginTime = std::chrono::steady_clock::now();
 		m_bRestart = false;
 
 		LoadGlobalSettings();

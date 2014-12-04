@@ -18,10 +18,10 @@
 	#pragma pack(push, 8)
 		struct THREADNAME_INFO
 		{
-			DWORD  dwType;      // Must be 0x1000. 
-			LPCSTR szName;      // Pointer to name (in user addr space). 
-			DWORD  dwThreadID;  // Thread ID (-1 = caller thread). 
-			DWORD  dwFlags;     // Reserved for future use, must be zero. 
+			DWORD  dwType;      // Must be 0x1000.
+			LPCSTR szName;      // Pointer to name (in user addr space).
+			DWORD  dwThreadID;  // Thread ID (-1 = caller thread).
+			DWORD  dwFlags;     // Reserved for future use, must be zero.
 		};
 	#pragma pack(pop)
 
@@ -39,7 +39,7 @@
 		{
 		}
 	}
-#endif  // _MSC_VER && _DEBUG 
+#endif  // _MSC_VER && _DEBUG
 
 
 
