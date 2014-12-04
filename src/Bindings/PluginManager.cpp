@@ -448,7 +448,7 @@ bool cPluginManager::CallHookCollectingPickup(cPlayer & a_Player, cPickup & a_Pi
 
 
 
-bool cPluginManager::CallHookCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginManager::CallHookCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	FIND_HOOK(HOOK_CRAFTING_NO_RECIPE);
 	VERIFY_HOOK;
