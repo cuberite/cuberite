@@ -233,8 +233,8 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 	#ifndef TOLUA_RELEASE
 	tolua_Error tolua_err;
 	if (
-		!tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-		!tolua_isnoobj(tolua_S,2,&tolua_err)
+		!tolua_iscppstring(tolua_S, 1, 0, &tolua_err) ||
+		!tolua_isnoobj(tolua_S, 2, &tolua_err)
 		)
 		goto tolua_lerror;
 	else
