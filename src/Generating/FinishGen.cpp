@@ -835,7 +835,6 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 		default:
 		{
 			ASSERT(!"Unhandled world dimension");
-			DefaultChance = 0;
 			break;
 		}
 	}  // switch (dimension)
@@ -971,7 +970,8 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 		default:
 		{
 			ASSERT(!"Unhandled world dimension");
-			return;
+			DefaultChance = 0;
+			break;
 		}
 	}  // switch (dimension)
 	m_AnimalProbability = a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
