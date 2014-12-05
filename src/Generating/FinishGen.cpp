@@ -1106,8 +1106,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biMushroomIsland:
 		case biMushroomShore:
 		{
-			ListOfSpawnables.insert(MobIter, mtMooshroom);
-			break;
+			return mtMooshroom;
 		}
 		// Add squid in ocean biomes
 		case biOcean:
@@ -1156,13 +1155,10 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 			break;
 		}
 	}
-	if ((a_ChunkDesc.GetBiome(x, z) != biMushroomIsland) && (a_ChunkDesc.GetBiome(x, z) != biMushroomShore))
-	{
-		ListOfSpawnables.insert(MobIter, mtChicken);
-		ListOfSpawnables.insert(MobIter, mtCow);
-		ListOfSpawnables.insert(MobIter, mtPig);
-		ListOfSpawnables.insert(MobIter, mtSheep);
-	}
+	ListOfSpawnables.insert(MobIter, mtChicken);
+	ListOfSpawnables.insert(MobIter, mtCow);
+	ListOfSpawnables.insert(MobIter, mtPig);
+	ListOfSpawnables.insert(MobIter, mtSheep);
 
 	if (ListOfSpawnables.empty())
 	{
