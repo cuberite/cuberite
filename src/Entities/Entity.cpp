@@ -1276,7 +1276,7 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
-				if (IsPlayer() && !((cPlayer *)this)->IsGameModeCreative() && m_PortalCooldownData.m_TicksDelayed != 80)
+				if (IsPlayer() && !((cPlayer *)this)->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
 				{
 					// Delay teleportation for four seconds if the entity is a non-creative player
 					m_PortalCooldownData.m_TicksDelayed++;

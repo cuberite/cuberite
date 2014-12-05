@@ -105,11 +105,11 @@ public:
 		Destroy ();
 
 		// If the encoding or seperator are empty, then nullptr
-		if (pszEncoding != nullptr && pszEncoding [0] == 0)
+		if ((pszEncoding != nullptr) && (pszEncoding[0] == 0))
 		{
 			pszEncoding = nullptr;
 		}
-		if (pszSep != nullptr && pszSep [0] == 0)
+		if ((pszSep != nullptr) && (pszSep[0] == 0))
 		{
 			pszSep = nullptr;
 		}
@@ -147,7 +147,7 @@ public:
 	bool Parse (const char *pszBuffer, int nLength, bool fIsFinal = true)
 	{
 		assert (m_p != nullptr);
-		return XML_Parse (m_p, pszBuffer, nLength, fIsFinal) != 0;
+		return (XML_Parse (m_p, pszBuffer, nLength, fIsFinal) != 0);
 	}
 
 	// @cmember Parse internal buffer
