@@ -835,6 +835,7 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 		default:
 		{
 			ASSERT(!"Unhandled world dimension");
+			DefaultChance = 0;
 			break;
 		}
 	}  // switch (dimension)
@@ -970,7 +971,7 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 		default:
 		{
 			ASSERT(!"Unhandled world dimension");
-			break;
+			return;
 		}
 	}  // switch (dimension)
 	m_AnimalProbability = a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
@@ -1156,7 +1157,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 	ListOfSpawnables.insert(MobIter, mtCow);
 	ListOfSpawnables.insert(MobIter, mtPig);
 	ListOfSpawnables.insert(MobIter, mtSheep);
-	
+
 	if (ListOfSpawnables.empty())
 	{
 		return mtInvalidType;
