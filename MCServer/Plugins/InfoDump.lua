@@ -444,7 +444,18 @@ local function BuildPermissions(a_PluginInfo)
 				Permissions[info.Permission] = Permission
 				-- Add the command to the list of commands using this permission:
 				Permission.CommandsAffected = Permission.CommandsAffected or {}
-				table.insert(Permission.CommandsAffected, CommandString)
+				-- First, make sure that we don't already have this command in the list,
+				-- it may have already been present in a_PluginInfo
+				local NewCommand = true
+				for _, existCmd in ipairs(Permission.CommandsAffected) do
+					if CommandString == existCmd then
+						NewCommand = false
+						break
+					end
+				end
+				if NewCommand then
+					table.insert(Permission.CommandsAffected, CommandString)
+				end
 			end
 			
 			-- Process the command param combinations for permissions:
