@@ -970,7 +970,7 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 		default:
 		{
 			ASSERT(!"Unhandled world dimension");
-			DefaultChance = 0;
+			DefaultAnimalSpawnChunkPercentage = DEF_NO_ANIMALS;
 			break;
 		}
 	}  // switch (dimension)
@@ -1009,7 +1009,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 		int PackCenterZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries) / 7) % cChunkDef::Width;
 		if (TrySpawnAnimals(a_ChunkDesc, PackCenterX, a_ChunkDesc.GetHeight(PackCenterX, PackCenterZ), PackCenterZ, RandomMob))
 		{
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 3; i++)
 			{
 				int OffsetX = (m_Noise.IntNoise2DInt(chunkX + chunkZ + i, Tries) / 7) % cChunkDef::Width;
 				int OffsetZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries + i) / 7) % cChunkDef::Width;
@@ -1093,13 +1093,23 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 	/** Check biomes first to get a list of animals */
 	switch (a_ChunkDesc.GetBiome(x, z))
 	{
-		// No animals
+		// No animals in deserts or non-overworld dimensions
 		case biNether:
 		case biEnd:
+		case biDesertHills:
+		case biDesert:
+		case biDesertM:
 		{
 			return mtInvalidType;
 		}
-		// Squid only
+		// Mooshroom only - no other mobs on mushroom islands
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			ListOfSpawnables.insert(MobIter, mtMooshroom);
+			break;
+		}
+		// Add squid in ocean biomes
 		case biOcean:
 		case biFrozenOcean:
 		case biFrozenRiver:
@@ -1107,15 +1117,8 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biDeepOcean:
 		{
 			ListOfSpawnables.insert(MobIter, mtSquid);
-			break;
 		}
-		// Mooshroom only
-		case biMushroomIsland:
-		case biMushroomShore:
-		{
-			ListOfSpawnables.insert(MobIter, mtMooshroom);
-			break;
-		}
+		// Add ocelots in jungle biomes
 		case biJungle:
 		case biJungleHills:
 		case biJungleEdge:
@@ -1134,7 +1137,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 			ListOfSpawnables.insert(MobIter, mtHorse);
 			// ListOfSpawnables.insert(mtDonkey);
 		}
-		// Wolves only
+		// Add wolves in forest and spruce forests
 		case biForest:
 		case biTaiga:
 		case biMegaTaiga:
@@ -1143,7 +1146,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		{
 			ListOfSpawnables.insert(MobIter, mtWolf);
 		}
-		// All other mobs
+		// All other animals can be added to the list
 		default:
 		{
 			ListOfSpawnables.insert(MobIter, mtChicken);
@@ -1152,11 +1155,6 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 			ListOfSpawnables.insert(MobIter, mtSheep);
 		}
 	}
-
-	ListOfSpawnables.insert(MobIter, mtChicken);
-	ListOfSpawnables.insert(MobIter, mtCow);
-	ListOfSpawnables.insert(MobIter, mtPig);
-	ListOfSpawnables.insert(MobIter, mtSheep);
 
 	if (ListOfSpawnables.empty())
 	{
