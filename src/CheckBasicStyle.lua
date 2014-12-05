@@ -181,6 +181,7 @@ local function ProcessFile(a_FileName)
 	-- Ref.: http://stackoverflow.com/questions/10416869/iterate-over-possibly-empty-lines-in-a-way-that-matches-the-expectations-of-exis
 	local lineCounter = 1
 	local lastIndentLevel = 0
+	local isLastLineControl = false
 	all:gsub("\r\n", "\n")  -- normalize CRLF into LF-only
 	string.gsub(all .. "\n", "[^\n]*\n",  -- Iterate over each line, while preserving empty lines
 		function(a_Line)
@@ -217,6 +218,24 @@ local function ProcessFile(a_FileName)
 				end
 				lastIndentLevel = indentLevel
 			end
+			
+			-- Check that control statements have braces on separate lines after them:
+			-- Note that if statements can be broken into multiple lines, in which case this test is not taken
+			if (isLastLineControl) then
+				if not(a_Line:find("^%s*{") or a_Line:find("^%s*#")) then
+					-- Not followed by a brace, not followed by a preprocessor
+					ReportViolation(a_FileName, lineCounter - 1, 1, 1, "Control statement needs a brace on separate line")
+				end
+			end
+			local lineWithSpace = " " .. a_Line
+			isLastLineControl =
+				lineWithSpace:find("^%s+if %b()") or
+				lineWithSpace:find("^%s+else if %b()") or
+				lineWithSpace:find("^%s+for %b()") or
+				lineWithSpace:find("^%s+switch %b()") or
+				lineWithSpace:find("^%s+else\n") or
+				lineWithSpace:find("^%s+else  //") or
+				lineWithSpace:find("^%s+do %b()")
 
 			lineCounter = lineCounter + 1
 		end
