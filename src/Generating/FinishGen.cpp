@@ -1049,12 +1049,14 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	{
 		return false;
 	}
-	if ((BlockUnderFeet != E_BLOCK_GRASS) &&
-		((AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig)))
+	if (
+		(BlockUnderFeet != E_BLOCK_GRASS) &&
+		((AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
+	)
 	{
 		return false;
 	}
-	if (AnimalToSpawn == mtMooshroom && BlockUnderFeet != E_BLOCK_MYCELIUM)
+	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet != E_BLOCK_MYCELIUM))
 	{
 		return false;
 	}
@@ -1150,13 +1152,18 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		}
 	}
 
+	ListOfSpawnables.insert(MobIter, mtChicken);
+	ListOfSpawnables.insert(MobIter, mtCow);
+	ListOfSpawnables.insert(MobIter, mtPig);
+	ListOfSpawnables.insert(MobIter, mtSheep);
+	
 	if (ListOfSpawnables.empty())
 	{
 		return mtInvalidType;
 	}
 
 	int RandMob = (m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size();
-	MobIter=ListOfSpawnables.begin();
+	MobIter = ListOfSpawnables.begin();
 	for (int i = 0; i < RandMob; i++)
 	{
 		++MobIter;
