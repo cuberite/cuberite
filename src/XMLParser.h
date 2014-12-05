@@ -254,7 +254,9 @@ protected:
 			XML_SetDefaultHandlerExpand (m_p, fEnable ? DefaultHandler : nullptr);
 		}
 		else
+		{
 			XML_SetDefaultHandler (m_p, fEnable ? DefaultHandler : nullptr);
+		}
 	}
 	
 	// @cmember Enable/Disable external entity ref handler
@@ -402,11 +404,17 @@ public:
 	{
 		XML_expat_version v = XML_ExpatVersionInfo ();
 		if (pnMajor)
+		{
 			*pnMajor = v .major;
+		}
 		if (pnMinor)
+		{
 			*pnMinor = v .minor;
+		}
 		if (pnMicro)
+		{
 			*pnMicro = v .micro;
+		}
 	}
 
 	// @cmember Get last error string

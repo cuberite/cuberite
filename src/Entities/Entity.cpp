@@ -665,7 +665,10 @@ int cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Dama
 	// Returns the hitpoints out of a_RawDamage that the currently equipped armor would cover
 	
 	// Filter out damage types that are not protected by armor:
-	if (!ArmorCoversAgainst(a_DamageType)) return 0;
+	if (!ArmorCoversAgainst(a_DamageType))
+	{
+		return 0;
+	}
 	
 	// Add up all armor points:
 	// Ref.: http://www.minecraftwiki.net/wiki/Armor#Defense_points as of 2012_12_20
@@ -1011,9 +1014,18 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				// Block hit was within our projected path
 				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
 				// For example: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
-				if (Tracer.HitNormal.x != 0.f) NextSpeed.x = 0.f;
-				if (Tracer.HitNormal.y != 0.f) NextSpeed.y = 0.f;
-				if (Tracer.HitNormal.z != 0.f) NextSpeed.z = 0.f;
+				if (Tracer.HitNormal.x != 0.f)
+				{
+					NextSpeed.x = 0.f;
+				}
+				if (Tracer.HitNormal.y != 0.f)
+				{
+					NextSpeed.y = 0.f;
+				}
+				if (Tracer.HitNormal.z != 0.f)
+				{
+					NextSpeed.z = 0.f;
+				}
 
 				if (Tracer.HitNormal.y == 1.f)  // Hit BLOCK_FACE_YP, we are on the ground
 				{

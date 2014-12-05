@@ -184,7 +184,9 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	}
 
 	if (LowestPoint == m_World.GetBlockMeta(a_X, a_Y, a_Z))
+	{
 		return NONE;
+	}
 
 	if (a_X - X > 0)
 	{

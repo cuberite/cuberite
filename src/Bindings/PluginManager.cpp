@@ -1459,11 +1459,16 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 
 
 
-cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin) const
+cPlugin * cPluginManager::GetPlugin(const AString & a_Plugin) const
 {
 	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
-		if (itr->second == nullptr) continue;
+		if (itr->second == nullptr)
+		{
+			// The plugin is currently unloaded
+			continue;
+		}
+
 		if (itr->second->GetName().compare(a_Plugin) == 0)
 		{
 			return itr->second;

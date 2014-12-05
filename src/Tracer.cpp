@@ -39,8 +39,14 @@ cTracer::~cTracer()
 
 float cTracer::SigNum(float a_Num)
 {
-	if (a_Num < 0.f) return -1.f;
-	if (a_Num > 0.f) return 1.f;
+	if (a_Num < 0.f)
+	{
+		return -1.f;
+	}
+	if (a_Num > 0.f)
+	{
+		return 1.f;
+	}
 	return 0.f;
 }
 
@@ -59,7 +65,10 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	step.z = (int) SigNum(dir.z);
 
 	// normalize the direction vector
-	if (dir.SqrLength() > 0.f) dir.Normalize();
+	if (dir.SqrLength() > 0.f)
+	{
+		dir.Normalize();
+	}
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction

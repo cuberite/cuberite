@@ -420,7 +420,10 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 		case 3: if (((a = (*--srcptr)) < 0x80) || (a > 0xbf)) return false;
 		case 2:
 		{
-			if ((a = (*--srcptr)) > 0xbf) return false;
+			if ((a = (*--srcptr)) > 0xbf)
+			{
+				return false;
+			}
 			switch (*source)
 			{
 				// no fall-through in this inner switch
@@ -523,7 +526,10 @@ are equivalent to the following loop:
 	{
 		ch += *source++;
 		--tmpBytesToRead;
-		if (tmpBytesToRead) ch <<= 6;
+		if (tmpBytesToRead)
+		{
+			ch <<= 6;
+		}
 	} while (tmpBytesToRead > 0);
 }
 ---------------------------------------------------------------------

@@ -83,12 +83,16 @@ cThread::~cThread()
 void cThread::Start( bool a_bWaitOnDelete /* = true */)
 {
 	if (a_bWaitOnDelete)
+	{
 		m_StopEvent = new cEvent();
+	}
 
 #ifndef _WIN32
 	pthread_t SndThread;
 	if (pthread_create( &SndThread, NULL, MyThread, this))
+	{
 		LOGERROR("ERROR: Could not create thread!");
+	}
 #else
 	DWORD ThreadID = 0;
 	HANDLE hThread = CreateThread(NULL  // security
@@ -132,6 +136,11 @@ void *cThread::MyThread( void *a_Param)
 
 	ThreadFunction( ThreadParam);
 
-	if (StopEvent) StopEvent->Set();
+	// If the thread was marked as wait-on-delete, signal the event being waited on:
+	if (StopEvent != nullptr)
+	{
+		StopEvent->Set();
+	}
+
 	return 0;
 }

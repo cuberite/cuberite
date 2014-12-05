@@ -151,13 +151,21 @@ public:
 		Neighbors[6] = (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ - 1) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_NORTH, E_PURE_NONE));
 		Neighbors[7] = (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ + 1) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY + 1, a_BlockZ, BLOCK_FACE_SOUTH, E_PURE_NONE));
 		if (IsUnstable(a_ChunkInterface, a_BlockX + 1, a_BlockY - 1, a_BlockZ) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ, BLOCK_FACE_EAST))
+		{
 			Neighbors[0] = true;
+		}
 		if (IsUnstable(a_ChunkInterface, a_BlockX - 1, a_BlockY - 1, a_BlockZ) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ, BLOCK_FACE_WEST))
+		{
 			Neighbors[1] = true;
+		}
 		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ - 1) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ, BLOCK_FACE_NORTH))
+		{
 			Neighbors[2] = true;
+		}
 		if (IsUnstable(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ + 1) || !IsNotConnected(a_ChunkInterface, a_BlockX, a_BlockY - 1, a_BlockZ, BLOCK_FACE_SOUTH))
+		{
 			Neighbors[3] = true;
+		}
 		for (int i = 0; i < 8; i++)
 		{
 			if (Neighbors[i])
@@ -167,12 +175,30 @@ public:
 		}
 		if (RailsCnt == 1)
 		{
-			if (Neighbors[7]) return E_META_RAIL_ASCEND_ZP;
-			else if (Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
-			else if (Neighbors[5]) return E_META_RAIL_ASCEND_XM;
-			else if (Neighbors[4]) return E_META_RAIL_ASCEND_XP;
-			else if (Neighbors[0] || Neighbors[1]) return E_META_RAIL_XM_XP;
-			else if (Neighbors[2] || Neighbors[3]) return E_META_RAIL_ZM_ZP;
+			if (Neighbors[7])
+			{
+				return E_META_RAIL_ASCEND_ZP;
+			}
+			else if (Neighbors[6])
+			{
+				return E_META_RAIL_ASCEND_ZM;
+			}
+			else if (Neighbors[5])
+			{
+				return E_META_RAIL_ASCEND_XM;
+			}
+			else if (Neighbors[4])
+			{
+				return E_META_RAIL_ASCEND_XP;
+			}
+			else if (Neighbors[0] || Neighbors[1])
+			{
+				return E_META_RAIL_XM_XP;
+			}
+			else if (Neighbors[2] || Neighbors[3])
+			{
+				return E_META_RAIL_ZM_ZP;
+			}
 			ASSERT(!"Weird neighbor count");
 			return Meta;
 		}
@@ -185,16 +211,46 @@ public:
 		}
 		if (RailsCnt > 1)
 		{
-			if      (Neighbors[3] && Neighbors[0] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZP_XP;
-			else if (Neighbors[3] && Neighbors[1] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZP_XM;
-			else if (Neighbors[2] && Neighbors[0] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZM_XP;
-			else if (Neighbors[2] && Neighbors[1] && CanThisRailCurve()) return E_META_RAIL_CURVED_ZM_XM;
-			else if (Neighbors[7] && Neighbors[2]) return E_META_RAIL_ASCEND_ZP;
-			else if (Neighbors[3] && Neighbors[6]) return E_META_RAIL_ASCEND_ZM;
-			else if (Neighbors[5] && Neighbors[0]) return E_META_RAIL_ASCEND_XM;
-			else if (Neighbors[4] && Neighbors[1]) return E_META_RAIL_ASCEND_XP;
-			else if (Neighbors[0] && Neighbors[1]) return E_META_RAIL_XM_XP;
-			else if (Neighbors[2] && Neighbors[3]) return E_META_RAIL_ZM_ZP;
+			if (Neighbors[3] && Neighbors[0] && CanThisRailCurve())
+			{
+				return E_META_RAIL_CURVED_ZP_XP;
+			}
+			else if (Neighbors[3] && Neighbors[1] && CanThisRailCurve())
+			{
+				return E_META_RAIL_CURVED_ZP_XM;
+			}
+			else if (Neighbors[2] && Neighbors[0] && CanThisRailCurve())
+			{
+				return E_META_RAIL_CURVED_ZM_XP;
+			}
+			else if (Neighbors[2] && Neighbors[1] && CanThisRailCurve())
+			{
+				return E_META_RAIL_CURVED_ZM_XM;
+			}
+			else if (Neighbors[7] && Neighbors[2])
+			{
+				return E_META_RAIL_ASCEND_ZP;
+			}
+			else if (Neighbors[3] && Neighbors[6])
+			{
+				return E_META_RAIL_ASCEND_ZM;
+			}
+			else if (Neighbors[5] && Neighbors[0])
+			{
+				return E_META_RAIL_ASCEND_XM;
+			}
+			else if (Neighbors[4] && Neighbors[1])
+			{
+				return E_META_RAIL_ASCEND_XP;
+			}
+			else if (Neighbors[0] && Neighbors[1])
+			{
+				return E_META_RAIL_XM_XP;
+			}
+			else if (Neighbors[2] && Neighbors[3])
+			{
+				return E_META_RAIL_ZM_ZP;
+			}
 
 			if (CanThisRailCurve())
 			{
