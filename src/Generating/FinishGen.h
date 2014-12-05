@@ -18,6 +18,7 @@
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"
+#include "../Mobs/Monster.h"
 
 
 
@@ -311,8 +312,37 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	/// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
+	// Tries to place a spring at the specified coords, checks neighbors. Returns true if successful
 	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
+} ;
+
+
+
+
+
+/** This class populates generated chunks with packs of biome-dependant animals
+	Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots
+	*/
+class cFinishGenPassiveMobs :
+	public cFinishGen
+{
+public:
+	
+	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
+
+protected:
+
+	cNoise      m_Noise;
+	int         m_AnimalProbability;  // Chance, [0..100], that an animal pack will be generated in a chunk
+
+	// cFinishGen override:
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+	// Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns true
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
+
+	// Gets a random animal from biome-dependant list
+	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
 } ;
 
 
