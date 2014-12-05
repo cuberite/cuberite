@@ -1078,16 +1078,14 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 		return false;
 	}
 
-	int AnimalX, AnimalY, AnimalZ;
-	AnimalX = (double)(a_ChunkDesc.GetChunkX()*cChunkDef::Width + a_RelX + 0.5);
-	AnimalY = a_RelY;
-	AnimalZ = (double)(a_ChunkDesc.GetChunkZ()*cChunkDef::Width + a_RelZ + 0.5);
+	double AnimalX = static_cast<double>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX + 0.5);
+	double AnimalY = a_RelY;
+	double AnimalZ = static_cast<double>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ + 0.5);
 
-	cEntityList ChunkEntities = a_ChunkDesc.GetEntities();
 	cMonster * NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
 	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
-	ChunkEntities.push_back(NewMob);
-	LOGD("Spawning %s #%i at {%d, %d, %d}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
+	a_ChunkDesc.GetEntities().push_back(NewMob);
+	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
 
 	return true;
 }
@@ -1100,13 +1098,12 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 {
 
 	std::set<eMonsterType> ListOfSpawnables;
-	std::set<eMonsterType>::iterator MobIter = ListOfSpawnables.begin();
 	int chunkX = a_ChunkDesc.GetChunkX();
 	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ + 10) / 7) % cChunkDef::Width;
 	int z = (m_Noise.IntNoise2DInt(chunkX + chunkZ, chunkZ) / 7) % cChunkDef::Width;
 
-	/** Check biomes first to get a list of animals */
+	// Check biomes first to get a list of animals
 	switch (a_ChunkDesc.GetBiome(x, z))
 	{
 		// No animals in deserts or non-overworld dimensions
@@ -1118,12 +1115,14 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		{
 			return mtInvalidType;
 		}
+
 		// Mooshroom only - no other mobs on mushroom islands
 		case biMushroomIsland:
 		case biMushroomShore:
 		{
 			return mtMooshroom;
 		}
+
 		// Add squid in ocean biomes
 		case biOcean:
 		case biFrozenOcean:
@@ -1131,9 +1130,10 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biRiver:
 		case biDeepOcean:
 		{
-			ListOfSpawnables.insert(MobIter, mtSquid);
+			ListOfSpawnables.insert(mtSquid);
 			break;
 		}
+
 		// Add ocelots in jungle biomes
 		case biJungle:
 		case biJungleHills:
@@ -1141,9 +1141,11 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biJungleM:
 		case biJungleEdgeM:
 		{
-			ListOfSpawnables.insert(MobIter, mtOcelot);
+			ListOfSpawnables.insert(mtOcelot);
 			break;
 		}
+
+		// Add horses in plains-like biomes
 		case biPlains:
 		case biSunflowerPlains:
 		case biSavanna:
@@ -1151,10 +1153,10 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biSavannaM:
 		case biSavannaPlateauM:
 		{
-			ListOfSpawnables.insert(MobIter, mtHorse);
-			// ListOfSpawnables.insert(mtDonkey);
+			ListOfSpawnables.insert(mtHorse);
 			break;
 		}
+
 		// Add wolves in forest and spruce forests
 		case biForest:
 		case biTaiga:
@@ -1162,7 +1164,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biColdTaiga:
 		case biColdTaigaM:
 		{
-			ListOfSpawnables.insert(MobIter, mtWolf);
+			ListOfSpawnables.insert(mtWolf);
 			break;
 		}
 		// Nothing special about this biome
@@ -1171,10 +1173,10 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 			break;
 		}
 	}
-	ListOfSpawnables.insert(MobIter, mtChicken);
-	ListOfSpawnables.insert(MobIter, mtCow);
-	ListOfSpawnables.insert(MobIter, mtPig);
-	ListOfSpawnables.insert(MobIter, mtSheep);
+	ListOfSpawnables.insert(mtChicken);
+	ListOfSpawnables.insert(mtCow);
+	ListOfSpawnables.insert(mtPig);
+	ListOfSpawnables.insert(mtSheep);
 
 	if (ListOfSpawnables.empty())
 	{
@@ -1182,11 +1184,8 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 	}
 
 	int RandMob = (m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size();
-	MobIter = ListOfSpawnables.begin();
-	for (int i = 0; i < RandMob; i++)
-	{
-		++MobIter;
-	}
+	auto MobIter = ListOfSpawnables.begin();
+	std::advance(MobIter, RandMob);
 
 	return *MobIter;
 }
