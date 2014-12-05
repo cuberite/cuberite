@@ -1117,6 +1117,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biDeepOcean:
 		{
 			ListOfSpawnables.insert(MobIter, mtSquid);
+			break;
 		}
 		// Add ocelots in jungle biomes
 		case biJungle:
@@ -1126,6 +1127,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biJungleEdgeM:
 		{
 			ListOfSpawnables.insert(MobIter, mtOcelot);
+			break;
 		}
 		case biPlains:
 		case biSunflowerPlains:
@@ -1136,6 +1138,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		{
 			ListOfSpawnables.insert(MobIter, mtHorse);
 			// ListOfSpawnables.insert(mtDonkey);
+			break;
 		}
 		// Add wolves in forest and spruce forests
 		case biForest:
@@ -1145,15 +1148,20 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		case biColdTaigaM:
 		{
 			ListOfSpawnables.insert(MobIter, mtWolf);
+			break;
 		}
-		// All other animals can be added to the list
+		// Nothing special about this biome
 		default:
 		{
-			ListOfSpawnables.insert(MobIter, mtChicken);
-			ListOfSpawnables.insert(MobIter, mtCow);
-			ListOfSpawnables.insert(MobIter, mtPig);
-			ListOfSpawnables.insert(MobIter, mtSheep);
+			break;
 		}
+	}
+	if ((a_ChunkDesc.GetBiome(x, z) != biMushroomIsland) && (a_ChunkDesc.GetBiome(x, z) != biMushroomShore))
+	{
+		ListOfSpawnables.insert(MobIter, mtChicken);
+		ListOfSpawnables.insert(MobIter, mtCow);
+		ListOfSpawnables.insert(MobIter, mtPig);
+		ListOfSpawnables.insert(MobIter, mtSheep);
 	}
 
 	if (ListOfSpawnables.empty())
