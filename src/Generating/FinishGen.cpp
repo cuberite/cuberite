@@ -67,7 +67,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			continue;
 		}
-		
+
 		// Choose what block to use.
 		NOISE_DATATYPE BlockType = m_Noise.IntNoise3D((int) ChunkX, y, (int) ChunkZ);
 		if (BlockType < -0.7)
@@ -197,10 +197,10 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			{
 				continue;
 			}
-			
+
 			// Get the top block + 1. This is the place where the grass would finaly be placed:
 			int y = a_ChunkDesc.GetHeight(x, z) + 1;
-			
+
 			if (y >= 255)
 			{
 				continue;
@@ -283,7 +283,7 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 	{
 		return false;
 	}
-	
+
 	// All conditions met, place a sugarcane here:
 	a_ChunkDesc.SetBlockType(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
 	return true;
@@ -296,7 +296,7 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Generate small foliage (1-block):
-	
+
 	// TODO: Update heightmap with 1-block-tall foliage
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -321,7 +321,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 				// WEIRD, since we're using heightmap, so there should NOT be anything above it
 				continue;
 			}
-			
+
 			const float xx = (float)BlockX;
 			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f);
 			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f);
@@ -361,7 +361,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					break;
 				}  // case E_BLOCK_GRASS
-				
+
 				case E_BLOCK_SAND:
 				{
 					int y = Top + 1;
@@ -372,7 +372,8 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR)
+						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR) &&
+						IsDesertVariant(a_ChunkDesc.GetBiome(x, z))
 					)
 					{
 						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
@@ -387,6 +388,20 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.SetHeight(x, z, Top);
 		}  // for y
 	}  // for z
+}
+
+
+
+
+
+bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_Biome)
+{
+	return
+	(
+		(a_Biome == biDesertHills) ||
+		(a_Biome == biDesert) ||
+		(a_Biome == biDesertM)
+	);
 }
 
 
@@ -770,7 +785,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 			}  // for y
 		}  // for x
 	}  // for z
-	
+
 	// Turn fluid at the chunk edges into non-stationary fluid:
 	for (int y = 0; y < cChunkDef::Height; y++)
 	{
@@ -862,12 +877,12 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 		// Not in this chunk
 		return;
 	}
-	
+
 	// Get the height at which to try:
 	int Height = m_Noise.IntNoise3DInt(128 * a_ChunkDesc.GetChunkX(), 1024, 256 * a_ChunkDesc.GetChunkZ()) / 11;
 	Height %= m_HeightDistribution.GetSum();
 	Height = m_HeightDistribution.MapValue(Height);
-	
+
 	// Try adding the spring at the height, if unsuccessful, move lower:
 	for (int y = Height; y > 1; y--)
 	{
@@ -905,7 +920,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	{
 		return false;
 	}
-	
+
 	static const struct
 	{
 		int x, y, z;
@@ -936,7 +951,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	{
 		return false;
 	}
-	
+
 	// Has exactly one air neighbor, place a spring:
 	a_ChunkDesc.SetBlockTypeMeta(x, y, z, m_Fluid, 0);
 	return true;

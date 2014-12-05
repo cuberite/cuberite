@@ -71,7 +71,7 @@ void cSkeleton::Attack(float a_Dt)
 {
 	m_AttackInterval += a_Dt * m_AttackRate;
 
-	if (m_Target != nullptr && m_AttackInterval > 3.0)
+	if ((m_Target != nullptr) && (m_AttackInterval > 3.0))
 	{
 		// Setting this higher gives us more wiggle room for attackrate
 		Vector3d Speed = GetLookVector() * 20;

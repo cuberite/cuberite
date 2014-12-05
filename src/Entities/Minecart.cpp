@@ -142,8 +142,13 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 	if (!IsBlockRail(InsideType))
 	{
-		Chunk->GetBlockTypeMeta(RelPosX, PosY + 1, RelPosZ, InsideType, InsideMeta);  // When an descending minecart hits a flat rail, it goes through the ground; check for this
-		if (IsBlockRail(InsideType)) AddPosY(1);  // Push cart upwards
+		// When a descending minecart hits a flat rail, it goes through the ground; check for this
+		Chunk->GetBlockTypeMeta(RelPosX, PosY + 1, RelPosZ, InsideType, InsideMeta);
+		if (IsBlockRail(InsideType))
+		{
+			// Push cart upwards
+			AddPosY(1);
+		}
 	}
 
 	bool WasDetectorRail = false;
@@ -218,7 +223,10 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 
 			// Execute both the entity and block collision checks
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
-			if (EntCol || BlckCol) return;
+			if (EntCol || BlckCol)
+			{
+				return;
+			}
 			
 			if (GetSpeedZ() != NO_SPEED)  // Don't do anything if cart is stationary
 			{
@@ -243,7 +251,10 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 			SetSpeedZ(NO_SPEED);
 
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
-			if (EntCol || BlckCol) return;
+			if (EntCol || BlckCol)
+			{
+				return;
+			}
 
 			if (GetSpeedX() != NO_SPEED)
 			{
@@ -422,7 +433,10 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			SetSpeedX(0);
 
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
-			if (EntCol || BlckCol) return;
+			if (EntCol || BlckCol)
+			{
+				return;
+			}
 			
 			if (GetSpeedZ() != NO_SPEED)
 			{
@@ -445,7 +459,10 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 			SetSpeedZ(NO_SPEED);
 
 			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
-			if (EntCol || BlckCol) return;
+			if (EntCol || BlckCol)
+			{
+				return;
+			}
 
 			if (GetSpeedX() != NO_SPEED)
 			{
