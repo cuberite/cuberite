@@ -993,6 +993,7 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 	if ((m_AnimalProbability < 0) || (m_AnimalProbability > 100))
 	{
 		LOGWARNING("[Animals]: AnimalSpawnChunkPercentage is invalid, using the default of \"%d\".", DefaultAnimalSpawnChunkPercentage);
+		m_AnimalProbability = DefaultAnimalSpawnChunkPercentage;
 	}
 }
 
@@ -1052,7 +1053,7 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	BLOCKTYPE BlockUnderFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY - 1, a_RelZ);
 
 	// Check block below (opaque, grass, water), and above (air)
-	if (AnimalToSpawn == mtSquid && BlockAtFeet != E_BLOCK_WATER)
+	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet != E_BLOCK_WATER))
 	{
 		return false;
 	}
