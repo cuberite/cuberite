@@ -105,11 +105,11 @@ public:
 		Destroy ();
 
 		// If the encoding or seperator are empty, then nullptr
-		if (pszEncoding != nullptr && pszEncoding [0] == 0)
+		if ((pszEncoding != nullptr) && (pszEncoding[0] == 0))
 		{
 			pszEncoding = nullptr;
 		}
-		if (pszSep != nullptr && pszSep [0] == 0)
+		if ((pszSep != nullptr) && (pszSep[0] == 0))
 		{
 			pszSep = nullptr;
 		}
@@ -147,7 +147,7 @@ public:
 	bool Parse (const char *pszBuffer, int nLength, bool fIsFinal = true)
 	{
 		assert (m_p != nullptr);
-		return XML_Parse (m_p, pszBuffer, nLength, fIsFinal) != 0;
+		return (XML_Parse (m_p, pszBuffer, nLength, fIsFinal) != 0);
 	}
 
 	// @cmember Parse internal buffer
@@ -254,7 +254,9 @@ protected:
 			XML_SetDefaultHandlerExpand (m_p, fEnable ? DefaultHandler : nullptr);
 		}
 		else
+		{
 			XML_SetDefaultHandler (m_p, fEnable ? DefaultHandler : nullptr);
+		}
 	}
 	
 	// @cmember Enable/Disable external entity ref handler
@@ -402,11 +404,17 @@ public:
 	{
 		XML_expat_version v = XML_ExpatVersionInfo ();
 		if (pnMajor)
+		{
 			*pnMajor = v .major;
+		}
 		if (pnMinor)
+		{
 			*pnMinor = v .minor;
+		}
 		if (pnMicro)
+		{
 			*pnMicro = v .micro;
+		}
 	}
 
 	// @cmember Get last error string

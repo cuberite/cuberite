@@ -182,9 +182,13 @@ void cClientHandle::GenerateOfflineUUID(void)
 AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
 {
 	if (ShouldAppendChatPrefixes)
+	{
 		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+	}
 	else
+	{
 		return Printf("%s", m_Color1.c_str());
+	}
 }
 
 

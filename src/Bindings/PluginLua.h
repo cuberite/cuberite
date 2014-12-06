@@ -78,7 +78,7 @@ public:
 	virtual bool OnChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup) override;
-	virtual bool OnCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe) override;
+	virtual bool OnCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
 	virtual bool OnDisconnect               (cClientHandle & a_Client, const AString & a_Reason) override;
 	virtual bool OnEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) override;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split) override;

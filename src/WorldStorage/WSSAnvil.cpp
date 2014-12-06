@@ -1526,7 +1526,10 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "TileID");
 	int MetaIdx = a_NBT.FindChildByName(a_TagIdx, "Data");
 
-	if ((TypeIdx < 0) || (MetaIdx < 0)) { return; }
+	if ((TypeIdx < 0) || (MetaIdx < 0))
+	{
+		return;
+	}
 
 	int Type = a_NBT.GetInt(TypeIdx);
 	NIBBLETYPE Meta = (NIBBLETYPE)a_NBT.GetByte(MetaIdx);
@@ -2196,11 +2199,13 @@ void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Type");
+	int TypeIdx  = a_NBT.FindChildByName(a_TagIdx, "Type");
 	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
 	int StyleIdx = a_NBT.FindChildByName(a_TagIdx, "Style");
-
-	if ((TypeIdx < 0) || (ColorIdx < 0) || (StyleIdx < 0)) { return; }
+	if ((TypeIdx < 0) || (ColorIdx < 0) || (StyleIdx < 0))
+	{
+		return;
+	}
 
 	int Type = a_NBT.GetInt(TypeIdx);
 	int Color = a_NBT.GetInt(ColorIdx);
@@ -2390,8 +2395,10 @@ void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT
 void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "SkeletonType");
-
-	if (TypeIdx < 0) { return; }
+	if (TypeIdx < 0)
+	{
+		return;
+	}
 
 	bool Type = ((a_NBT.GetByte(TypeIdx) == 1) ? true : false);
 
@@ -2505,8 +2512,10 @@ void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
-
-	if (TypeIdx < 0) { return; }
+	if (TypeIdx < 0)
+	{
+		return;
+	}
 
 	int Type = a_NBT.GetInt(TypeIdx);
 
@@ -2630,8 +2639,10 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int IsVillagerIdx = a_NBT.FindChildByName(a_TagIdx, "IsVillager");
-
-	if (IsVillagerIdx < 0) { return; }
+	if (IsVillagerIdx < 0)
+	{
+		return;
+	}
 
 	bool IsVillagerZombie = ((a_NBT.GetByte(IsVillagerIdx) == 1) ? true : false);
 
