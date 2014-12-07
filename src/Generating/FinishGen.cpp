@@ -1014,7 +1014,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 	eMonsterType RandomMob = GetRandomMob(a_ChunkDesc);
 	if (RandomMob == mtInvalidType)
 	{
-		LOGWARNING("Attempted to spawn invalid mob type.");
+		// No mobs here. Don't send an error, because if the biome was a desert it would return mtInvalidType as well.
 		return;
 	}
 
