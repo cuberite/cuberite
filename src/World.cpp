@@ -346,6 +346,10 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
+
+	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
+	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
+	m_ChunkMap.reset();
 }
 
 
@@ -3122,6 +3126,11 @@ bool cWorld::HasEntity(int a_UniqueID)
 	}
 
 	// Check if the entity is in the chunkmap:
+	if (m_ChunkMap.get() == nullptr)
+	{
+		// Chunkmap has already been destroyed, there are no entities anymore.
+		return false;
+	}
 	return m_ChunkMap->HasEntity(a_UniqueID);
 }
 
