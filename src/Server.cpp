@@ -4,7 +4,6 @@
 
 #include "Server.h"
 #include "ClientHandle.h"
-#include "OSSupport/Timer.h"
 #include "Mobs/Monster.h"
 #include "OSSupport/Socket.h"
 #include "Root.h"
@@ -19,8 +18,6 @@
 #include "WebAdmin.h"
 #include "Protocol/ProtocolRecognizer.h"
 #include "CommandOutput.h"
-
-#include "MersenneTwister.h"
 
 #include "IniFile.h"
 #include "Vector3.h"
@@ -75,22 +72,20 @@ cServer::cTickThread::cTickThread(cServer & a_Server) :
 
 void cServer::cTickThread::Execute(void)
 {
-	cTimer Timer;
-
-	long long msPerTick = 50;
-	long long LastTime = Timer.GetNowTime();
+	auto LastTime = std::chrono::steady_clock::now();
+	static const auto msPerTick = std::chrono::milliseconds(50);
 
 	while (!m_ShouldTerminate)
 	{
-		long long NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime-LastTime);
-		m_ShouldTerminate = !m_Server.Tick(DeltaTime);
-		long long TickTime = Timer.GetNowTime() - NowTime;
+		auto NowTime = std::chrono::steady_clock::now();
+		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
+		m_ShouldTerminate = !m_Server.Tick(static_cast<float>(msec));
+		auto TickTime = std::chrono::steady_clock::now() - NowTime;
 		
 		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			cSleep::MilliSleep((unsigned int)(msPerTick - TickTime));
+			std::this_thread::sleep_for(msPerTick - TickTime);
 		}
 
 		LastTime = NowTime;

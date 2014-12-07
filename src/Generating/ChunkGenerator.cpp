@@ -6,7 +6,7 @@
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"
-#include "../MersenneTwister.h"
+#include "FastRandom.h"
 
 
 
@@ -191,13 +191,13 @@ EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 BLOCKTYPE cChunkGenerator::GetIniBlock(cIniFile & a_IniFile, const AString & a_SectionName, const AString & a_ValueName, const AString & a_Default)
 {
 	AString BlockType = a_IniFile.GetValueSet(a_SectionName, a_ValueName, a_Default);
-	BLOCKTYPE Block = BlockStringToType(BlockType);
+	int Block = BlockStringToType(BlockType);
 	if (Block < 0)
 	{
 		LOGWARN("[%s].%s Could not parse block value \"%s\". Using default: \"%s\".", a_SectionName.c_str(), a_ValueName.c_str(), BlockType.c_str(), a_Default.c_str());
-		return BlockStringToType(a_Default);
+		return static_cast<BLOCKTYPE>(BlockStringToType(a_Default));
 	}
-	return Block;
+	return static_cast<BLOCKTYPE>(Block);
 }
 
 

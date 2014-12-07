@@ -17,7 +17,7 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cDispenserEntity);
+	BLOCKENTITY_PROTODEF(cDispenserEntity)
 	
 	/** Constructor used for normal operation */
 	cDispenserEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);

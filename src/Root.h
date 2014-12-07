@@ -6,6 +6,7 @@
 #include "HTTPServer/HTTPServer.h"
 #include "Defines.h"
 #include "RankManager.h"
+#include <thread>
 
 
 
@@ -86,7 +87,7 @@ public:
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
 	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
-	cRankManager *     GetRankManager    (void) { return m_RankManager; }
+	cRankManager *     GetRankManager    (void) { return m_RankManager.get(); }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -125,6 +126,9 @@ public:
 
 	/// Finds a player from a partial or complete player name and calls the callback - case-insensitive
 	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+
+	/** Finds the player over his uuid and calls the callback */
+	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	// tolua_begin
 	
@@ -174,7 +178,7 @@ private:
 	cCriticalSection m_CSPendingCommands;
 	cCommandQueue    m_PendingCommands;
 
-	cThread * m_InputThread;
+	std::thread m_InputThread;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -185,7 +189,9 @@ private:
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
 	cMojangAPI         m_MojangAPI;
-	cRankManager *     m_RankManager;
+
+	std::unique_ptr<cRankManager> m_RankManager;
+
 	cHTTPServer        m_HTTPServer;
 
 	bool m_bStop;
@@ -207,10 +213,10 @@ private:
 	
 	/// Does the actual work of executing a command
 	void DoExecuteConsoleCommand(const AString & a_Cmd);
-
-	static void InputThread(void* a_Params);
 	
 	static cRoot* s_Root;
+
+	static void InputThread(cRoot & a_Params);
 };  // tolua_export
 
 

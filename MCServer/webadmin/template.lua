@@ -81,7 +81,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	end
 	
 	Output([[
-/* Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 */
+<!-- Copyright Justin S and MCServer Team, licensed under CC-BY-SA 3.0 -->
 <html>
 <head>
 	<title>]] .. Title .. [[</title>
@@ -90,7 +90,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 	<link rel="icon" href="/favicon.ico">
 </head>
 <body>
-<div class="contention">
+<div class="contention push25">
 	<div class="pagehead">
 		<div class="row1">
 			<div class="wrapper">
@@ -110,27 +110,27 @@ function ShowPage(WebAdmin, TemplateRequest)
 			</div>
 		</div>
 	</div>
-<div class="row2 push10">
-	<div class="wrapper padtopp">
-		<table width="100%" border="0" align="center">
-			<tbody>
-				<tr>
-					<td width="180" valign="top">
-						<table border="0" cellspacing="0" cellpadding="5" class="tborder">
-						<tbody>
-							<tr>
-								<td class="thead"><strong>Menu</strong></td>
-							</tr>
-							<tr>
-								<td class="trow1 smalltext"><a href=']] .. BaseURL .. [[' class='usercp_nav_item usercp_nav_home'>Home</a></td>
-							</tr>
-							<tr>
-								<td class="tcat"><div><span class="smalltext"><strong><font color="#000">Server Management</font></strong></span></div></td>
-							</tr>
-						</tbody>
-						<tbody style="" id="usercppms_e">
-							<tr>
-								<td class="trow1 smalltext">
+	<div class="row2">
+		<div class="wrapper">
+			<table width="100%" border="0" align="center">
+				<tbody>
+					<tr>
+						<td width="180" valign="top">
+							<table border="0" cellspacing="0" cellpadding="5" class="tborder">
+							<tbody>
+								<tr>
+									<td class="thead"><strong>Menu</strong></td>
+								</tr>
+								<tr>
+									<td class="trow1 smalltext"><a href=']] .. BaseURL .. [[' class='usercp_nav_item usercp_nav_home'>Home</a></td>
+								</tr>
+								<tr>
+									<td class="tcat"><div><span class="smalltext"><strong><font color="#000">Server Management</font></strong></span></div></td>
+								</tr>
+							</tbody>
+							<tbody style="" id="usercppms_e">
+								<tr>
+									<td class="trow1 smalltext">
 	]])
 
 
@@ -173,7 +173,6 @@ function ShowPage(WebAdmin, TemplateRequest)
 			</table>
 		</div>
 	</div>
-</div>
 <div id="footer">
 	<div class="upper">
 		<div class="wrapper">
@@ -188,10 +187,10 @@ function ShowPage(WebAdmin, TemplateRequest)
 	</div>
 	<div class="lower">
 		<div class="wrapper">
-			<span id="current_time"><strong>Current time:</strong> <script type="text/javascript">document.write('Time: <strong><span id="date-time">',new Date().toLocaleString(),"</span></strong>");if(document.getElementById){onload=function(){setInterval("document.getElementById ('date-time').firstChild.data = new Date().toLocaleString()",50)}};</script></span>
 			<span id="copyright">Copyright © <a href="http://www.mc-server.org" target="_blank">MCServer Team</a> 2014.</span>
 		</div>
 	</div>
+</div>
 </div>
 </body>
 </html>

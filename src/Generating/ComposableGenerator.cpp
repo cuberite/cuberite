@@ -17,6 +17,10 @@
 #include "StructGen.h"
 #include "FinishGen.h"
 
+#include "CompoGenBiomal.h"
+
+#include "CompositedHeiGen.h"
+
 #include "Caves.h"
 #include "DistortedHeightmap.h"
 #include "DungeonRoomsFinisher.h"
@@ -39,7 +43,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainCompositionGen:
 
-cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_Seed)
+cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile & a_IniFile, cBiomeGenPtr a_BiomeGen, cTerrainShapeGenPtr a_ShapeGen, int a_Seed)
 {
 	AString CompoGenName = a_IniFile.GetValueSet("Generator", "CompositionGen", "");
 	if (CompoGenName.empty())
@@ -48,59 +52,52 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 		CompoGenName = "Biomal";
 	}
 	
-	cTerrainCompositionGen * res = nullptr;
-	if (NoCaseCompare(CompoGenName, "sameblock") == 0)
+	// Compositor list is alpha-sorted
+	cTerrainCompositionGenPtr res;
+	if (NoCaseCompare(CompoGenName, "Biomal") == 0)
 	{
-		res = new cCompoGenSameBlock;
+		res = CreateCompoGenBiomal(a_Seed);
 	}
-	else if (NoCaseCompare(CompoGenName, "debugbiomes") == 0)
+	else if (NoCaseCompare(CompoGenName, "BiomalNoise3D") == 0)
 	{
-		res = new cCompoGenDebugBiomes;
+		// The composition that used to be provided with BiomalNoise3D is now provided by the Biomal compositor:
+		res = CreateCompoGenBiomal(a_Seed);
 	}
-	else if (NoCaseCompare(CompoGenName, "classic") == 0)
+	else if (NoCaseCompare(CompoGenName, "Classic") == 0)
 	{
-		res = new cCompoGenClassic;
+		res = std::make_shared<cCompoGenClassic>();
+	}
+	else if (NoCaseCompare(CompoGenName, "DebugBiomes") == 0)
+	{
+		res = std::make_shared<cCompoGenDebugBiomes>();
 	}
 	else if (NoCaseCompare(CompoGenName, "DistortedHeightmap") == 0)
 	{
-		res = new cDistortedHeightmap(a_Seed, a_BiomeGen);
+		// The composition that used to be provided with DistortedHeightmap is now provided by the Biomal compositor:
+		res = CreateCompoGenBiomal(a_Seed);
 	}
-	else if (NoCaseCompare(CompoGenName, "end") == 0)
+	else if (NoCaseCompare(CompoGenName, "End") == 0)
 	{
-		res = new cEndGen(a_Seed);
+		res = std::make_shared<cEndGen>(a_Seed);
 	}
-	else if (NoCaseCompare(CompoGenName, "nether") == 0)
+	else if (NoCaseCompare(CompoGenName, "Nether") == 0)
 	{
-		res = new cCompoGenNether(a_Seed);
+		res = std::make_shared<cCompoGenNether>(a_Seed);
 	}
 	else if (NoCaseCompare(CompoGenName, "Noise3D") == 0)
 	{
-		res = new cNoise3DComposable(a_Seed);
+		// The composition that used to be provided with Noise3D is now provided by the Biomal compositor:
+		res = CreateCompoGenBiomal(a_Seed);
 	}
-	else if (NoCaseCompare(CompoGenName, "biomal") == 0)
+	else if (NoCaseCompare(CompoGenName, "SameBlock") == 0)
 	{
-		res = new cCompoGenBiomal(a_Seed);
-
-		/*
-		// Performance-testing:
-		LOGINFO("Measuring performance of cCompoGenBiomal...");
-		clock_t BeginTick = clock();
-		for (int x = 0; x < 500; x++)
-		{
-			cChunkDesc Desc(200 + x * 8, 200 + x * 8);
-			a_BiomeGen->GenBiomes(Desc.GetChunkX(), Desc.GetChunkZ(), Desc.GetBiomeMap());
-			a_HeightGen->GenHeightMap(Desc.GetChunkX(), Desc.GetChunkZ(), Desc.GetHeightMap());
-			res->ComposeTerrain(Desc);
-		}
-		clock_t Duration = clock() - BeginTick;
-		LOGINFO("CompositionGen for 500 chunks took %d ticks (%.02f sec)", Duration, (double)Duration / CLOCKS_PER_SEC);
-		//*/
+		res = std::make_shared<cCompoGenSameBlock>();
 	}
 	else
 	{
 		LOGWARN("Unknown CompositionGen \"%s\", using \"Biomal\" instead.", CompoGenName.c_str());
 		a_IniFile.SetValue("Generator", "CompositionGen", "Biomal");
-		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_HeightGen, a_Seed);
+		return CreateCompositionGen(a_IniFile, a_BiomeGen, a_ShapeGen, a_Seed);
 	}
 	ASSERT(res != nullptr);
 	
@@ -120,7 +117,7 @@ cTerrainCompositionGenPtr cTerrainCompositionGen::CreateCompositionGen(cIniFile 
 cComposableGenerator::cComposableGenerator(cChunkGenerator & a_ChunkGenerator) :
 	super(a_ChunkGenerator),
 	m_BiomeGen(),
-	m_HeightGen(),
+	m_ShapeGen(),
 	m_CompositionGen()
 {
 }
@@ -134,7 +131,7 @@ void cComposableGenerator::Initialize(cIniFile & a_IniFile)
 	super::Initialize(a_IniFile);
 	
 	InitBiomeGen(a_IniFile);
-	InitHeightGen(a_IniFile);
+	InitShapeGen(a_IniFile);
 	InitCompositionGen(a_IniFile);
 	InitFinishGens(a_IniFile);
 }
@@ -162,16 +159,22 @@ void cComposableGenerator::DoGenerate(int a_ChunkX, int a_ChunkZ, cChunkDesc & a
 		m_BiomeGen->GenBiomes(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetBiomeMap());
 	}
 	
+	cChunkDesc::Shape shape;
 	if (a_ChunkDesc.IsUsingDefaultHeight())
 	{
-		m_HeightGen->GenHeightMap(a_ChunkX, a_ChunkZ, a_ChunkDesc.GetHeightMap());
+		m_ShapeGen->GenShape(a_ChunkX, a_ChunkZ, shape);
+		a_ChunkDesc.SetHeightFromShape(shape);
+	}
+	else
+	{
+		// Convert the heightmap in a_ChunkDesc into shape:
+		a_ChunkDesc.GetShapeFromHeight(shape);
 	}
 	
 	bool ShouldUpdateHeightmap = false;
 	if (a_ChunkDesc.IsUsingDefaultComposition())
 	{
-		m_CompositionGen->ComposeTerrain(a_ChunkDesc);
-		ShouldUpdateHeightmap = true;
+		m_CompositionGen->ComposeTerrain(a_ChunkDesc, shape);
 	}
 
 	if (a_ChunkDesc.IsUsingDefaultFinish())
@@ -230,13 +233,15 @@ void cComposableGenerator::InitBiomeGen(cIniFile & a_IniFile)
 
 
 
-void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
+void cComposableGenerator::InitShapeGen(cIniFile & a_IniFile)
 {
 	bool CacheOffByDefault = false;
-	m_HeightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
+	m_ShapeGen = cTerrainShapeGen::CreateShapeGen(a_IniFile, m_BiomeGen, m_ChunkGenerator.GetSeed(), CacheOffByDefault);
 	
+	/*
+	// TODO
 	// Add a cache, if requested:
-	int CacheSize = a_IniFile.GetValueSetI("Generator", "HeightGenCacheSize", CacheOffByDefault ? 0 : 64);
+	int CacheSize = a_IniFile.GetValueSetI("Generator", "ShapeGenCacheSize", CacheOffByDefault ? 0 : 64);
 	if (CacheSize > 0)
 	{
 		if (CacheSize < 4)
@@ -249,6 +254,7 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 		LOGD("Using a cache for Heightgen of size %d.", CacheSize);
 		m_HeightGen = cTerrainHeightGenPtr(new cHeiGenCache(m_HeightGen, CacheSize));
 	}
+	*/
 }
 
 
@@ -257,13 +263,19 @@ void cComposableGenerator::InitHeightGen(cIniFile & a_IniFile)
 
 void cComposableGenerator::InitCompositionGen(cIniFile & a_IniFile)
 {
-	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(a_IniFile, m_BiomeGen, *m_HeightGen, m_ChunkGenerator.GetSeed());
+	m_CompositionGen = cTerrainCompositionGen::CreateCompositionGen(a_IniFile, m_BiomeGen, m_ShapeGen, m_ChunkGenerator.GetSeed());
 	
+	// Add a cache over the composition generator:
+	// Even a cache of size 1 is useful due to the CompositedHeiGen cache after us doing re-composition on its misses
 	int CompoGenCacheSize = a_IniFile.GetValueSetI("Generator", "CompositionGenCacheSize", 64);
-	if (CompoGenCacheSize > 1)
+	if (CompoGenCacheSize > 0)
 	{
-		m_CompositionGen = cTerrainCompositionGenPtr(new cCompoGenCache(m_CompositionGen, 32));
+		m_CompositionGen = std::make_shared<cCompoGenCache>(m_CompositionGen, CompoGenCacheSize);
 	}
+
+	// Create a cache of the composited heightmaps, so that finishers may use it:
+	m_CompositedHeightCache = std::make_shared<cHeiGenMultiCache>(std::make_shared<cCompositedHeiGen>(m_ShapeGen, m_CompositionGen), 16, 24);
+	// 24 subcaches of depth 16 each = 96 KiB of RAM. Acceptable, for the amount of work this saves.
 }
 
 
@@ -282,7 +294,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		// Finishers, alpha-sorted:
-		if (NoCaseCompare(*itr, "BottomLava") == 0)
+		if (NoCaseCompare(*itr, "Animals") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenPassiveMobs(Seed, a_IniFile, Dimension)));
+		}
+		else if (NoCaseCompare(*itr, "BottomLava") == 0)
 		{
 			int DefaultBottomLavaLevel = (Dimension == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
@@ -329,7 +345,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int     MaxSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMaxSize", 7);
 			int     MinSize       = a_IniFile.GetValueSetI("Generator", "DungeonRoomsMinSize", 5);
 			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
-			m_FinishGens.push_back(cFinishGenPtr(new cDungeonRoomsFinisher(m_HeightGen, Seed, GridSize, MaxSize, MinSize, HeightDistrib)));
+			m_FinishGens.push_back(cFinishGenPtr(new cDungeonRoomsFinisher(m_ShapeGen, Seed, GridSize, MaxSize, MinSize, HeightDistrib)));
 		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
@@ -338,7 +354,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "LavaLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "LavaLakesProbability", 10);
-			m_FinishGens.push_back(cFinishGenPtr(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, m_HeightGen, Probability)));
+			m_FinishGens.push_back(cFinishGenPtr(new cStructGenLakes(Seed * 5 + 16873, E_BLOCK_STATIONARY_LAVA, m_ShapeGen, Probability)));
 		}
 		else if (NoCaseCompare(*itr, "LavaSprings") == 0)
 		{
@@ -558,6 +574,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				GridSize, MaxOffset
 			)));
 		}
+		else if (NoCaseCompare(*itr, "SoulsandRims") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSoulsandRims(Seed)));
+		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSnow));
@@ -576,7 +596,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		}
 		else if (NoCaseCompare(*itr, "Trees") == 0)
 		{
-			m_FinishGens.push_back(cFinishGenPtr(new cStructGenTrees(Seed, m_BiomeGen, m_HeightGen, m_CompositionGen)));
+			m_FinishGens.push_back(cFinishGenPtr(new cStructGenTrees(Seed, m_BiomeGen, m_ShapeGen, m_CompositionGen)));
 		}
 		else if (NoCaseCompare(*itr, "UnderwaterBases") == 0)
 		{
@@ -584,7 +604,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxOffset = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxOffset", 128);
 			int MaxDepth  = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxDepth",    7);
 			int MaxSize   = a_IniFile.GetValueSetI("Generator", "UnderwaterBaseMaxSize",   128);
-			m_FinishGens.push_back(cFinishGenPtr(new cUnderwaterBaseGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, m_BiomeGen)));
+			m_FinishGens.push_back(std::make_shared<cUnderwaterBaseGen>(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, m_BiomeGen));
 		}
 		else if (NoCaseCompare(*itr, "Villages") == 0)
 		{
@@ -594,12 +614,12 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxSize    = a_IniFile.GetValueSetI("Generator", "VillageMaxSize",   128);
 			int MinDensity = a_IniFile.GetValueSetI("Generator", "VillageMinDensity", 50);
 			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
-			m_FinishGens.push_back(cFinishGenPtr(new cVillageGen(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, m_BiomeGen, m_HeightGen)));
+			m_FinishGens.push_back(std::make_shared<cVillageGen>(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, m_BiomeGen, m_CompositedHeightCache));
 		}
 		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);
-			m_FinishGens.push_back(cFinishGenPtr(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, m_HeightGen, Probability)));
+			m_FinishGens.push_back(cFinishGenPtr(new cStructGenLakes(Seed * 3 + 652, E_BLOCK_STATIONARY_WATER, m_ShapeGen, Probability)));
 		}
 		else if (NoCaseCompare(*itr, "WaterSprings") == 0)
 		{

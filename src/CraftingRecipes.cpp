@@ -289,12 +289,12 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 	}
 	
 	// Built-in recipes:
-	std::auto_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid.GetItems(), a_CraftingGrid.GetWidth(), a_CraftingGrid.GetHeight()));
+	std::unique_ptr<cRecipe> Recipe(FindRecipe(a_CraftingGrid.GetItems(), a_CraftingGrid.GetWidth(), a_CraftingGrid.GetHeight()));
 	a_Recipe.Clear();
 	if (Recipe.get() == nullptr)
 	{
 		// Allow plugins to intercept a no-recipe-found situation:
-		cRoot::Get()->GetPluginManager()->CallHookCraftingNoRecipe(a_Player, a_CraftingGrid, &a_Recipe);
+		cRoot::Get()->GetPluginManager()->CallHookCraftingNoRecipe(a_Player, a_CraftingGrid, a_Recipe);
 		return;
 	}
 	for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
@@ -377,7 +377,7 @@ void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine
 		return;
 	}
 	
-	std::auto_ptr<cCraftingRecipes::cRecipe> Recipe(new cCraftingRecipes::cRecipe);
+	std::unique_ptr<cCraftingRecipes::cRecipe> Recipe(new cCraftingRecipes::cRecipe);
 	
 	// Parse the result:
 	AStringVector ResultSplit = StringSplit(Sides[0], ",");
@@ -758,7 +758,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	}  // for y, for x
 	
 	// The recipe has matched. Create a copy of the recipe and set its coords to match the crafting grid:
-	std::auto_ptr<cRecipe> Recipe(new cRecipe);
+	std::unique_ptr<cRecipe> Recipe(new cRecipe);
 	Recipe->m_Result = a_Recipe->m_Result;
 	Recipe->m_Width  = a_Recipe->m_Width;
 	Recipe->m_Height = a_Recipe->m_Height;

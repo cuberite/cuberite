@@ -54,7 +54,7 @@ public:
 	virtual bool OnChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ) = 0;
 	virtual bool OnChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) = 0;
 	virtual bool OnCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup) = 0;
-	virtual bool OnCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe) = 0;
+	virtual bool OnCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) = 0;
 	virtual bool OnDisconnect               (cClientHandle & a_Client, const AString & a_Reason) = 0;
 	virtual bool OnEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) = 0;
 	virtual bool OnExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split) = 0;

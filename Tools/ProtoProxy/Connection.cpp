@@ -189,7 +189,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_Server(a_Server),
 	m_ClientSocket(a_ClientSocket),
 	m_ServerSocket(-1),
-	m_BeginTick(m_Timer.GetNowTime()),
+	m_BeginTick(std::chrono::steady_clock::now()),
 	m_ClientState(csUnencrypted),
 	m_ServerState(csUnencrypted),
 	m_Nonce(0),
@@ -436,7 +436,8 @@ bool cConnection::RelayFromClient(void)
 
 double cConnection::GetRelativeTime(void)
 {
-	return (double)(m_Timer.GetNowTime() - m_BeginTick) / 1000;
+	Int64 msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_BeginTick).count();
+	return static_cast<double>(msec) / 1000;
 }
 
 

@@ -20,7 +20,7 @@ Each uses a slightly different approach to generating:
 
 #include "../Defines.h"
 #include "../Cuboid.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 
 
 

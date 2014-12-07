@@ -111,26 +111,36 @@ public:
 
 #ifdef _DEBUG
 
-/// Simple RAII class that uses one internal unsigned long for checking if two threads are using an object simultanously
-class cSingleThreadAccessChecker
-{
-public:
-	cSingleThreadAccessChecker(unsigned long * a_ThreadID) :
-		m_ThreadID(a_ThreadID)
+	/** Simple RAII class that is used for checking that no two threads are using an object simultanously.
+	It requires the monitored object to provide the storage for a thread ID.
+	It uses that storage to check if the thread ID of consecutive calls is the same all the time. */
+	class cSingleThreadAccessChecker
 	{
-		ASSERT((*a_ThreadID == 0) || (*a_ThreadID == cIsThread::GetCurrentID()));
-	}
-	
-	~cSingleThreadAccessChecker()
-	{
-		*m_ThreadID = 0;
-	}
-	
-protected:
-	unsigned long * m_ThreadID;
-} ;
+	public:
+		cSingleThreadAccessChecker(std::thread::id * a_ThreadID) :
+			m_ThreadID(a_ThreadID)
+		{
+			ASSERT(
+				(*a_ThreadID == std::this_thread::get_id()) ||  // Either the object is used by current thread...
+				(*a_ThreadID == std::thread::id())              // ... or by no thread at all
+			);
 
-#define CHECK_THREAD cSingleThreadAccessChecker Checker(const_cast<unsigned long *>(&m_ThreadID))
+			// Mark as being used by this thread:
+			*m_ThreadID = std::this_thread::get_id();
+		}
+
+		~cSingleThreadAccessChecker()
+		{
+			// Mark as not being used by any thread:
+			*m_ThreadID = std::thread::id();
+		}
+
+	protected:
+		/** Points to the storage used for ID of the thread using the object. */
+		std::thread::id * m_ThreadID;
+	};
+
+	#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
 
 #else
 	#define CHECK_THREAD
@@ -146,9 +156,6 @@ protected:
 cByteBuffer::cByteBuffer(size_t a_BufferSize) :
 	m_Buffer(new char[a_BufferSize + 1]),
 	m_BufferSize(a_BufferSize + 1),
-	#ifdef _DEBUG
-	m_ThreadID(0),
-	#endif  // _DEBUG
 	m_DataStart(0),
 	m_WritePos(0),
 	m_ReadPos(0)
@@ -174,7 +181,7 @@ cByteBuffer::~cByteBuffer()
 
 bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 
 	// Store the current free space for a check after writing:
@@ -221,7 +228,7 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 
 size_t cByteBuffer::GetFreeSpace(void) const
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	if (m_WritePos >= m_DataStart)
 	{
@@ -243,7 +250,7 @@ size_t cByteBuffer::GetFreeSpace(void) const
 /// Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes()
 size_t cByteBuffer::GetUsedSpace(void) const
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	ASSERT(m_BufferSize >= GetFreeSpace());
 	ASSERT((m_BufferSize - GetFreeSpace()) >= 1);
@@ -257,7 +264,7 @@ size_t cByteBuffer::GetUsedSpace(void) const
 /// Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already)
 size_t cByteBuffer::GetReadableSpace(void) const
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	if (m_ReadPos > m_WritePos)
 	{
@@ -276,7 +283,7 @@ size_t cByteBuffer::GetReadableSpace(void) const
 
 bool cByteBuffer::CanReadBytes(size_t a_Count) const
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	return (a_Count <= GetReadableSpace());
 }
@@ -287,7 +294,7 @@ bool cByteBuffer::CanReadBytes(size_t a_Count) const
 
 bool cByteBuffer::CanWriteBytes(size_t a_Count) const
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	return (a_Count <= GetFreeSpace());
 }
@@ -298,7 +305,7 @@ bool cByteBuffer::CanWriteBytes(size_t a_Count) const
 
 bool cByteBuffer::ReadChar(char & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(1);
 	ReadBuf(&a_Value, 1);
@@ -311,7 +318,7 @@ bool cByteBuffer::ReadChar(char & a_Value)
 
 bool cByteBuffer::ReadByte(unsigned char & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(1);
 	ReadBuf(&a_Value, 1);
@@ -324,7 +331,7 @@ bool cByteBuffer::ReadByte(unsigned char & a_Value)
 
 bool cByteBuffer::ReadBEShort(short & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(2);
 	ReadBuf(&a_Value, 2);
@@ -338,7 +345,7 @@ bool cByteBuffer::ReadBEShort(short & a_Value)
 
 bool cByteBuffer::ReadBEInt(int & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
@@ -352,7 +359,7 @@ bool cByteBuffer::ReadBEInt(int & a_Value)
 
 bool cByteBuffer::ReadBEInt64(Int64 & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(8);
 	ReadBuf(&a_Value, 8);
@@ -366,7 +373,7 @@ bool cByteBuffer::ReadBEInt64(Int64 & a_Value)
 
 bool cByteBuffer::ReadBEFloat(float & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
@@ -380,7 +387,7 @@ bool cByteBuffer::ReadBEFloat(float & a_Value)
 
 bool cByteBuffer::ReadBEDouble(double & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(8);
 	ReadBuf(&a_Value, 8);
@@ -394,7 +401,7 @@ bool cByteBuffer::ReadBEDouble(double & a_Value)
 
 bool cByteBuffer::ReadBool(bool & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(1);
 	char Value = 0;
@@ -409,7 +416,7 @@ bool cByteBuffer::ReadBool(bool & a_Value)
 
 bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	short Length;
 	if (!ReadBEShort(Length))
@@ -430,7 +437,7 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 
 bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	UInt32 Value = 0;
 	int Shift = 0;
@@ -452,7 +459,7 @@ bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
 
 bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	UInt32 Size = 0;
 	if (!ReadVarInt(Size))
@@ -472,7 +479,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 
 bool cByteBuffer::ReadLEInt(int & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
@@ -491,6 +498,7 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
+	CHECK_THREAD
 	Int64 Value;
 	if (!ReadBEInt64(Value))
 	{
@@ -515,7 +523,7 @@ bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 
 bool cByteBuffer::WriteChar(char a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(1);
 	return WriteBuf(&a_Value, 1);
@@ -527,7 +535,7 @@ bool cByteBuffer::WriteChar(char a_Value)
 
 bool cByteBuffer::WriteByte(unsigned char a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(1);
 	return WriteBuf(&a_Value, 1);
@@ -539,7 +547,7 @@ bool cByteBuffer::WriteByte(unsigned char a_Value)
 
 bool cByteBuffer::WriteBEShort(short a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(2);
 	u_short Converted = htons((u_short)a_Value);
@@ -552,7 +560,7 @@ bool cByteBuffer::WriteBEShort(short a_Value)
 
 bool cByteBuffer::WriteBEUShort(unsigned short a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(2);
 	u_short Converted = htons((u_short)a_Value);
@@ -565,7 +573,7 @@ bool cByteBuffer::WriteBEUShort(unsigned short a_Value)
 
 bool cByteBuffer::WriteBEInt(int a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
 	UInt32 Converted = HostToNetwork4(&a_Value);
@@ -578,7 +586,7 @@ bool cByteBuffer::WriteBEInt(int a_Value)
 
 bool cByteBuffer::WriteBEInt64(Int64 a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
 	UInt64 Converted = HostToNetwork8(&a_Value);
@@ -591,7 +599,7 @@ bool cByteBuffer::WriteBEInt64(Int64 a_Value)
 
 bool cByteBuffer::WriteBEFloat(float a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
 	UInt32 Converted = HostToNetwork4(&a_Value);
@@ -604,7 +612,7 @@ bool cByteBuffer::WriteBEFloat(float a_Value)
 
 bool cByteBuffer::WriteBEDouble(double a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
 	UInt64 Converted = HostToNetwork8(&a_Value);
@@ -618,7 +626,7 @@ bool cByteBuffer::WriteBEDouble(double a_Value)
 
 bool cByteBuffer::WriteBool(bool a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	return WriteChar(a_Value ? 1 : 0);
 }
@@ -629,7 +637,7 @@ bool cByteBuffer::WriteBool(bool a_Value)
 
 bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	
 	// A 32-bit integer can be encoded by at most 5 bytes:
@@ -650,7 +658,7 @@ bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 
 bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
 	bool res = WriteVarInt((UInt32)(a_Value.size()));
@@ -667,7 +675,7 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 
 bool cByteBuffer::WriteLEInt(int a_Value)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	#ifdef IS_LITTLE_ENDIAN
 		return WriteBuf((const char *)&a_Value, 4);
@@ -683,6 +691,7 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 
 bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	CHECK_THREAD
 	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
 }
 
@@ -692,7 +701,7 @@ bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(a_Count);
 	char * Dst = (char *)a_Buffer;  // So that we can do byte math
@@ -725,7 +734,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 
 bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Count);
 	char * Src = (char *)a_Buffer;  // So that we can do byte math
@@ -755,7 +764,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 
 bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(a_Count);
 	a_String.clear();
@@ -790,7 +799,7 @@ bool cByteBuffer::ReadString(AString & a_String, size_t a_Count)
 bool cByteBuffer::ReadUTF16String(AString & a_String, size_t a_NumChars)
 {
 	// Reads 2 * a_NumChars bytes and interprets it as a UTF16 string, converting it into UTF8 string a_String
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	AString RawData;
 	if (!ReadString(RawData, a_NumChars * 2))
@@ -807,7 +816,7 @@ bool cByteBuffer::ReadUTF16String(AString & a_String, size_t a_NumChars)
 
 bool cByteBuffer::SkipRead(size_t a_Count)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	if (!CanReadBytes(a_Count))
 	{
@@ -823,7 +832,7 @@ bool cByteBuffer::SkipRead(size_t a_Count)
 
 void cByteBuffer::ReadAll(AString & a_Data)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	ReadString(a_Data, GetReadableSpace());
 }
@@ -834,6 +843,7 @@ void cByteBuffer::ReadAll(AString & a_Data)
 
 bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes)
 {
+	CHECK_THREAD
 	if (!a_Dst.CanWriteBytes(a_NumBytes) || !CanReadBytes(a_NumBytes))
 	{
 		// There's not enough source bytes or space in the dest BB
@@ -858,7 +868,7 @@ bool cByteBuffer::ReadToByteBuffer(cByteBuffer & a_Dst, size_t a_NumBytes)
 
 void cByteBuffer::CommitRead(void)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	m_DataStart = m_ReadPos;
 }
@@ -869,7 +879,7 @@ void cByteBuffer::CommitRead(void)
 
 void cByteBuffer::ResetRead(void)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	m_ReadPos = m_DataStart;
 }
@@ -882,7 +892,7 @@ void cByteBuffer::ReadAgain(AString & a_Out)
 {
 	// Return the data between m_DataStart and m_ReadPos (the data that has been read but not committed)
 	// Used by ProtoProxy to repeat communication twice, once for parsing and the other time for the remote party
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	size_t DataStart = m_DataStart;
 	if (m_ReadPos < m_DataStart)
@@ -902,7 +912,7 @@ void cByteBuffer::ReadAgain(AString & a_Out)
 
 void cByteBuffer::AdvanceReadPos(size_t a_Count)
 {
-	CHECK_THREAD;
+	CHECK_THREAD
 	CheckValid();
 	m_ReadPos += a_Count;
 	if (m_ReadPos >= m_BufferSize)

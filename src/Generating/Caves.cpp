@@ -692,8 +692,14 @@ static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise)
 	float oct1 = (a_Noise.CubicNoise3D(x * 0.1f, y * 0.1f, z * 0.1f)) * 4;
 
 	oct1 = oct1 * oct1 * oct1;
-	if (oct1 < 0.f)  oct1 = PI_2;
-	if (oct1 > PI_2) oct1 = PI_2;
+	if (oct1 < 0.f)
+	{
+		oct1 = PI_2;
+	}
+	if (oct1 > PI_2)
+	{
+		oct1 = PI_2;
+	}
 
 	return oct1;
 }

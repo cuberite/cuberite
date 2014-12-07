@@ -15,163 +15,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cPattern:
-
-/// This class is used to store a column pattern initialized at runtime,
-/// so that the program doesn't need to explicitly set 256 values for each pattern
-/// Each pattern has 256 blocks so that there's no need to check pattern bounds when assigning the
-/// pattern - there will always be enough pattern left, even for the whole chunk height
-class cPattern
-{
-public:
-	cPattern(cDistortedHeightmap::sBlockInfo * a_TopBlocks, size_t a_Count)
-	{
-		// Copy the pattern into the top:
-		for (size_t i = 0; i < a_Count; i++)
-		{
-			m_Pattern[i] = a_TopBlocks[i];
-		}
-		
-		// Fill the rest with stone:
-		static cDistortedHeightmap::sBlockInfo Stone = {E_BLOCK_STONE, 0};
-		for (size_t i = a_Count; i < cChunkDef::Height; i++)
-		{
-			m_Pattern[i] = Stone;
-		}
-	}
-	
-	const cDistortedHeightmap::sBlockInfo * Get(void) const { return m_Pattern; }
-	
-protected:
-	cDistortedHeightmap::sBlockInfo m_Pattern[cChunkDef::Height];
-} ;
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// The arrays to use for the top block pattern definitions:
-
-static cDistortedHeightmap::sBlockInfo tbGrass[] =
-{
-	{E_BLOCK_GRASS, 0},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbSand[] =
-{
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SANDSTONE, 0},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbDirt[] =
-{
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbPodzol[] =
-{
-	{E_BLOCK_DIRT, E_META_DIRT_PODZOL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbGrassLess[] =
-{
-	{E_BLOCK_DIRT, E_META_DIRT_GRASSLESS},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbMycelium[] =
-{
-	{E_BLOCK_MYCELIUM, 0},
-	{E_BLOCK_DIRT,     0},
-	{E_BLOCK_DIRT,     0},
-	{E_BLOCK_DIRT,     0},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbGravel[] =
-{
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_STONE,  0},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbStone[] =
-{
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-} ;
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Ocean floor pattern top-block definitions:
-
-static cDistortedHeightmap::sBlockInfo tbOFSand[] =
-{
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SANDSTONE, 0}
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbOFClay[] =
-{
-	{ E_BLOCK_CLAY, 0},
-	{ E_BLOCK_CLAY, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-} ;
-
-static cDistortedHeightmap::sBlockInfo tbOFRedSand[] =
-{
-	{ E_BLOCK_SAND,      E_META_SAND_RED},
-	{ E_BLOCK_SAND,      E_META_SAND_RED},
-	{ E_BLOCK_SAND,      E_META_SAND_RED},
-	{ E_BLOCK_SANDSTONE, 0},
-} ;
-
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Individual patterns to use:
-
-static cPattern patGrass    (tbGrass,     ARRAYCOUNT(tbGrass));
-static cPattern patSand     (tbSand,      ARRAYCOUNT(tbSand));
-static cPattern patDirt     (tbDirt,      ARRAYCOUNT(tbDirt));
-static cPattern patPodzol   (tbPodzol,    ARRAYCOUNT(tbPodzol));
-static cPattern patGrassLess(tbGrassLess, ARRAYCOUNT(tbGrassLess));
-static cPattern patMycelium (tbMycelium,  ARRAYCOUNT(tbMycelium));
-static cPattern patGravel   (tbGravel,    ARRAYCOUNT(tbGravel));
-static cPattern patStone    (tbStone,     ARRAYCOUNT(tbStone));
-
-static cPattern patOFSand   (tbOFSand,    ARRAYCOUNT(tbOFSand));
-static cPattern patOFClay   (tbOFClay,    ARRAYCOUNT(tbOFClay));
-static cPattern patOFRedSand(tbOFRedSand, ARRAYCOUNT(tbOFRedSand));
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // cDistortedHeightmap:
 
 /** This table assigns a relative maximum overhang size in each direction to biomes.
@@ -237,7 +80,7 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},  // 110 .. 119
 	{0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f},                // 120 .. 128
 	
-	// Release 1.7 /* biome variants:
+	// Release 1.7 biome variants:
 	/* biSunflowerPlains      */ { 1.0f,  1.0f},  // 129
 	/* biDesertM              */ { 1.0f,  1.0f},  // 130
 	/* biExtremeHillsM        */ {16.0f, 16.0f},  // 131
@@ -279,8 +122,8 @@ const cDistortedHeightmap::sGenParam cDistortedHeightmap::m_GenParam[256] =
 cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 	m_NoiseDistortX(a_Seed + 1000),
 	m_NoiseDistortZ(a_Seed + 2000),
-	m_OceanFloorSelect(a_Seed + 3000),
-	m_MesaFloor(a_Seed + 4000),
+	m_CurChunkX(0x7fffffff),  // Set impossible coords for the chunk so that it's always considered stale
+	m_CurChunkZ(0x7fffffff),
 	m_BiomeGen(a_BiomeGen),
 	m_UnderlyingHeiGen(new cHeiGenBiomal(a_Seed, a_BiomeGen)),
 	m_HeightGen(m_UnderlyingHeiGen, 64),
@@ -293,8 +136,6 @@ cDistortedHeightmap::cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen) :
 	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)1,    (NOISE_DATATYPE)0.5);
 	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.5,  (NOISE_DATATYPE)1);
 	m_NoiseDistortZ.AddOctave((NOISE_DATATYPE)0.25, (NOISE_DATATYPE)2);
-	
-	InitMesaPattern(a_Seed);
 }
 
 
@@ -309,95 +150,12 @@ void cDistortedHeightmap::Initialize(cIniFile & a_IniFile)
 	}
 
 	// Read the params from the INI file:
-	m_SeaLevel   =                 a_IniFile.GetValueSetI("Generator", "DistortedHeightmapSeaLevel",   62);
+	m_SeaLevel   =                 a_IniFile.GetValueSetI("Generator", "SeaLevel",                     62);
 	m_FrequencyX = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyX", 10);
 	m_FrequencyY = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyY", 10);
 	m_FrequencyZ = (NOISE_DATATYPE)a_IniFile.GetValueSetF("Generator", "DistortedHeightmapFrequencyZ", 10);
 
 	m_IsInitialized = true;
-}
-
-
-
-
-
-void cDistortedHeightmap::InitMesaPattern(int a_Seed)
-{
-	// Stone in the bottom half of the pattern:
-	for (int i = cChunkDef::Height; i < 2 * cChunkDef::Height; i++)
-	{
-		m_MesaPattern[i].BlockMeta = 0;
-		m_MesaPattern[i].BlockType = E_BLOCK_STONE;
-	}
-
-	// Stained and hardened clay in the top half of the pattern
-	// In a loop, choose whether to use one or two layers of stained clay, then choose a color and width for each layer
-	// Separate each group with another layer of hardened clay
-	cNoise PatternNoise((unsigned)a_Seed);
-	static NIBBLETYPE AllowedColors[] =
-	{
-		E_META_STAINED_CLAY_YELLOW,
-		E_META_STAINED_CLAY_YELLOW,
-		E_META_STAINED_CLAY_RED,
-		E_META_STAINED_CLAY_RED,
-		E_META_STAINED_CLAY_WHITE,
-		E_META_STAINED_CLAY_BROWN,
-		E_META_STAINED_CLAY_BROWN,
-		E_META_STAINED_CLAY_BROWN,
-		E_META_STAINED_CLAY_ORANGE,
-		E_META_STAINED_CLAY_ORANGE,
-		E_META_STAINED_CLAY_ORANGE,
-		E_META_STAINED_CLAY_ORANGE,
-		E_META_STAINED_CLAY_ORANGE,
-		E_META_STAINED_CLAY_ORANGE,
-		E_META_STAINED_CLAY_LIGHTGRAY,
-	} ;
-	static int LayerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
-	{
-		1, 1, 1, 1, 1, 1,
-		2, 2, 2, 2,
-		3, 3,
-	} ;
-	int Idx = cChunkDef::Height - 1;
-	while (Idx >= 0)
-	{
-		// A layer group of 1 - 2 color stained clay:
-		int Random = PatternNoise.IntNoise1DInt(Idx) / 7;
-		int NumLayers = (Random % 2) + 1;
-		Random /= 2;
-		for (int Lay = 0; Lay < NumLayers; Lay++)
-		{
-			int NumBlocks = LayerSizes[(Random % ARRAYCOUNT(LayerSizes))];
-			NIBBLETYPE Color = AllowedColors[(Random / 4) % ARRAYCOUNT(AllowedColors)];
-			if (
-				((NumBlocks == 3) && (NumLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
-				(Color == E_META_STAINED_CLAY_WHITE))      // White stained clay can ever be only 1 block high
-			{
-				NumBlocks = 1;
-			}
-			NumBlocks = std::min(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
-			Random /= 32;
-			for (int Block = 0; Block < NumBlocks; Block++, Idx--)
-			{
-				m_MesaPattern[Idx].BlockMeta = Color;
-				m_MesaPattern[Idx].BlockType = E_BLOCK_STAINED_CLAY;
-			}  // for Block
-		}  // for Lay
-
-		// A layer of hardened clay in between the layer group:
-		int NumBlocks = (Random % 4) + 1;  // All heights the same probability
-		if ((NumLayers == 2) && (NumBlocks < 4))
-		{
-			// For two layers of stained clay, add an extra block of hardened clay:
-			NumBlocks++;
-		}
-		NumBlocks = std::min(Idx + 1, NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
-		for (int Block = 0; Block < NumBlocks; Block++, Idx--)
-		{
-			m_MesaPattern[Idx].BlockMeta = 0;
-			m_MesaPattern[Idx].BlockType = E_BLOCK_HARDENED_CLAY;
-		}  // for Block
-	}  // while (Idx >= 0)
 }
 
 
@@ -474,23 +232,17 @@ void cDistortedHeightmap::GenerateHeightArray(void)
 
 
 
-void cDistortedHeightmap::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap)
+void cDistortedHeightmap::GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape)
 {
 	PrepareState(a_ChunkX, a_ChunkZ);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int NoiseArrayIdx = x + 17 * 257 * z;
-			cChunkDef::SetHeight(a_HeightMap, x, z, m_SeaLevel - 1);
-			for (int y = cChunkDef::Height - 1; y > m_SeaLevel - 1; y--)
+			int idx = x + 17 * 257 * z;
+			for (int y = 0; y < cChunkDef::Height; y++)
 			{
-				int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * y];
-				if (y < HeightMapHeight)
-				{
-					cChunkDef::SetHeight(a_HeightMap, x, z, y);
-					break;
-				}
+				a_Shape[y + x * 256 + z * 16 * 256] = (y < m_DistortedHeightmap[idx + y * 17]) ? 1 : 0;
 			}  // for y
 		}  // for x
 	}  // for z
@@ -500,36 +252,7 @@ void cDistortedHeightmap::GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::He
 
 
 
-void cDistortedHeightmap::InitializeHeightGen(cIniFile & a_IniFile)
-{
-	Initialize(a_IniFile);
-}
-
-
-
-
-
-void cDistortedHeightmap::ComposeTerrain(cChunkDesc & a_ChunkDesc)
-{
-	// Prepare the internal state for generating this chunk:
-	PrepareState(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ());
-
-	// Compose:
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
-	for (int z = 0; z < cChunkDef::Width; z++)
-	{
-		for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			ComposeColumn(a_ChunkDesc, x, z);
-		}  // for x
-	}  // for z
-}
-
-
-
-
-
-void cDistortedHeightmap::InitializeCompoGen(cIniFile & a_IniFile)
+void cDistortedHeightmap::InitializeShapeGen(cIniFile & a_IniFile)
 {
 	Initialize(a_IniFile);
 }
@@ -649,278 +372,6 @@ void cDistortedHeightmap::GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_R
 	}
 	a_DistortAmpX = AmpX / Sum;
 	a_DistortAmpZ = AmpZ / Sum;
-}
-
-
-
-
-void cDistortedHeightmap::ComposeColumn(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ)
-{
-	// Frequencies for the podzol floor selecting noise:
-	const NOISE_DATATYPE FrequencyX = 8;
-	const NOISE_DATATYPE FrequencyZ = 8;
-	
-	EMCSBiome Biome = a_ChunkDesc.GetBiome(a_RelX, a_RelZ);
-	switch (Biome)
-	{
-		case biOcean:
-		case biPlains:
-		case biForest:
-		case biTaiga:
-		case biSwampland:
-		case biRiver:
-		case biFrozenOcean:
-		case biFrozenRiver:
-		case biIcePlains:
-		case biIceMountains:
-		case biForestHills:
-		case biTaigaHills:
-		case biExtremeHillsEdge:
-		case biExtremeHillsPlus:
-		case biExtremeHills:
-		case biJungle:
-		case biJungleHills:
-		case biJungleEdge:
-		case biDeepOcean:
-		case biStoneBeach:
-		case biColdBeach:
-		case biBirchForest:
-		case biBirchForestHills:
-		case biRoofedForest:
-		case biColdTaiga:
-		case biColdTaigaHills:
-		case biSavanna:
-		case biSavannaPlateau:
-		case biSunflowerPlains:
-		case biFlowerForest:
-		case biTaigaM:
-		case biSwamplandM:
-		case biIcePlainsSpikes:
-		case biJungleM:
-		case biJungleEdgeM:
-		case biBirchForestM:
-		case biBirchForestHillsM:
-		case biRoofedForestM:
-		case biColdTaigaM:
-		case biSavannaM:
-		case biSavannaPlateauM:
-		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patGrass.Get());
-			return;
-		}
-
-		case biMegaTaiga:
-		case biMegaTaigaHills:
-		case biMegaSpruceTaiga:
-		case biMegaSpruceTaigaHills:
-		{
-			// Select the pattern to use - podzol, grass or grassless dirt:
-			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
-			return;
-		}
-
-		case biDesertHills:
-		case biDesert:
-		case biDesertM:
-		case biBeach:
-		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patSand.Get());
-			return;
-		}
-		
-		case biMushroomIsland:
-		case biMushroomShore:
-		{
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patMycelium.Get());
-			return;
-		}
-
-		case biMesa:
-		case biMesaPlateauF:
-		case biMesaPlateau:
-		case biMesaBryce:
-		case biMesaPlateauFM:
-		case biMesaPlateauM:
-		{
-			// Mesa biomes need special handling, because they don't follow the usual "4 blocks from top pattern",
-			// instead, they provide a "from bottom" pattern with varying base height,
-			// usually 4 blocks below the ocean level
-			FillColumnMesa(a_ChunkDesc, a_RelX, a_RelZ);
-			return;
-		}
-
-		case biExtremeHillsPlusM:
-		case biExtremeHillsM:
-		{
-			// Select the pattern to use - gravel, stone or grass:
-			NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-			NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-			NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-			const sBlockInfo * Pattern = (Val < 0.0) ? patStone.Get() : patGrass.Get();
-			FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern);
-			return;
-		}
-		default:
-		{
-			ASSERT(!"Unhandled biome");
-			return;
-		}
-	}  // switch (Biome)
-}
-
-
-
-
-
-void cDistortedHeightmap::FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const sBlockInfo * a_Pattern)
-{
-	int NoiseArrayIdx = a_RelX + 17 * 257 * a_RelZ;
-	bool HasHadWater = false;
-	int PatternIdx = 0;
-	for (int y = a_ChunkDesc.GetHeight(a_RelX, a_RelZ); y > 0; y--)
-	{
-		int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * y];
-
-		if (y < HeightMapHeight)
-		{
-			// "ground" part, use the pattern:
-			a_ChunkDesc.SetBlockTypeMeta(a_RelX, y, a_RelZ, a_Pattern[PatternIdx].BlockType, a_Pattern[PatternIdx].BlockMeta);
-			PatternIdx++;
-			continue;
-		}
-		
-		// "air" or "water" part:
-		// Reset the pattern index to zero, so that the pattern is repeated from the top again:
-		PatternIdx = 0;
-		
-		if (y >= m_SeaLevel)
-		{
-			// "air" part, do nothing
-			continue;
-		}
-		
-		a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
-		if (HasHadWater)
-		{
-			continue;
-		}
-		
-		// Select the ocean-floor pattern to use:
-		a_Pattern = a_ChunkDesc.GetBiome(a_RelX, a_RelZ) == biDeepOcean ? patGravel.Get() : ChooseOceanFloorPattern(a_RelX, a_RelZ);
-		HasHadWater = true;
-	}  // for y
-	a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
-}
-
-
-
-
-
-void cDistortedHeightmap::FillColumnMesa(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ)
-{
-	// Frequencies for the clay floor noise:
-	const NOISE_DATATYPE FrequencyX = 50;
-	const NOISE_DATATYPE FrequencyZ = 50;
-
-	int Top = a_ChunkDesc.GetHeight(a_RelX, a_RelZ);
-	if (Top < m_SeaLevel)
-	{
-		// The terrain is below sealevel, handle as regular ocean:
-		FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, patOFRedSand.Get());
-		return;
-	}
-
-	NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-	NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-	int ClayFloor = m_SeaLevel - 6 + (int)(4.f * m_MesaFloor.CubicNoise2D(NoiseX, NoiseY));
-	if (ClayFloor >= Top)
-	{
-		ClayFloor = Top - 1;
-	}
-	
-	if (Top - m_SeaLevel < 5)
-	{
-		// Simple case: top is red sand, then hardened clay down to ClayFloor, then stone:
-		a_ChunkDesc.SetBlockTypeMeta(a_RelX, Top, a_RelZ, E_BLOCK_SAND, E_META_SAND_RED);
-		for (int y = Top - 1; y >= ClayFloor; y--)
-		{
-			a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_HARDENED_CLAY);
-		}
-		for (int y = ClayFloor - 1; y > 0; y--)
-		{
-			a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STONE);
-		}
-		a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
-		return;
-	}
-	
-	// Difficult case: use the mesa pattern and watch for overhangs:
-	int NoiseArrayIdx = a_RelX + 17 * 257 * a_RelZ;
-	int PatternIdx = cChunkDef::Height - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
-	const sBlockInfo * Pattern = m_MesaPattern;
-	bool HasHadWater = false;
-	for (int y = Top; y > 0; y--)
-	{
-		int HeightMapHeight = (int)m_DistortedHeightmap[NoiseArrayIdx + 17 * y];
-		if (y < HeightMapHeight)
-		{
-			// "ground" part, use the pattern:
-			a_ChunkDesc.SetBlockTypeMeta(a_RelX, y, a_RelZ, Pattern[PatternIdx].BlockType, Pattern[PatternIdx].BlockMeta);
-			PatternIdx++;
-			continue;
-		}
-
-		if (y >= m_SeaLevel)
-		{
-			// "air" part, do nothing
-			continue;
-		}
-		
-		// "water" part, fill with water and choose new pattern for ocean floor, if not chosen already:
-		PatternIdx = 0;
-		a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
-		if (HasHadWater)
-		{
-			continue;
-		}
-		
-		// Select the ocean-floor pattern to use:
-		Pattern = ChooseOceanFloorPattern(a_RelX, a_RelZ);
-		HasHadWater = true;
-	}  // for y
-	a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
-}
-
-
-
-
-
-const cDistortedHeightmap::sBlockInfo * cDistortedHeightmap::ChooseOceanFloorPattern(int a_RelX, int a_RelZ)
-{
-	// Frequencies for the ocean floor selecting noise:
-	const NOISE_DATATYPE FrequencyX = 3;
-	const NOISE_DATATYPE FrequencyZ = 3;
-
-	// Select the ocean-floor pattern to use:
-	NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(m_CurChunkX * cChunkDef::Width + a_RelX)) / FrequencyX;
-	NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(m_CurChunkZ * cChunkDef::Width + a_RelZ)) / FrequencyZ;
-	NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-	if (Val < -0.95)
-	{
-		return patOFClay.Get();
-	}
-	else if (Val < 0)
-	{
-		return patOFSand.Get();
-	}
-	else
-	{
-		return patDirt.Get();
-	}
 }
 
 

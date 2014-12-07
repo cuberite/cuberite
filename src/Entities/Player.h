@@ -516,7 +516,7 @@ protected:
 	/** The item being dragged by the cursor while in a UI window */
 	cItem m_DraggingItem;
 
-	long long m_LastPlayerListTime;
+	std::chrono::steady_clock::time_point m_LastPlayerListTime;
 
 	cClientHandle * m_ClientHandle;
 	

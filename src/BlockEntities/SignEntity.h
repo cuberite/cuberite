@@ -14,15 +14,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 // tolua_begin
 
 class cSignEntity :
@@ -34,7 +25,7 @@ public:
 
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cSignEntity);
+	BLOCKENTITY_PROTODEF(cSignEntity)
 	
 	/// Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be nullptr
 	cSignEntity(BLOCKTYPE a_BlockType, int a_X, int a_Y, int a_Z, cWorld * a_World);

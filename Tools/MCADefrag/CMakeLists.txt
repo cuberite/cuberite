@@ -46,6 +46,7 @@ set(SHARED_HDR
 	../../src/ByteBuffer.h
 	../../src/StringUtils.h
 )
+
 flatten_files(SHARED_SRC)
 flatten_files(SHARED_HDR)
 source_group("Shared" FILES ${SHARED_SRC} ${SHARED_HDR})
@@ -54,14 +55,20 @@ set(SHARED_OSS_SRC
 	../../src/OSSupport/CriticalSection.cpp
 	../../src/OSSupport/File.cpp
 	../../src/OSSupport/IsThread.cpp
-	../../src/OSSupport/Timer.cpp
+	../../src/OSSupport/StackTrace.cpp
 )
+
 set(SHARED_OSS_HDR
 	../../src/OSSupport/CriticalSection.h
 	../../src/OSSupport/File.h
 	../../src/OSSupport/IsThread.h
-	../../src/OSSupport/Timer.h
+	../../src/OSSupport/StackTrace.h
 )
+
+if(WIN32)
+	list (APPEND SHARED_OSS_SRC ../../src/StackWalker.cpp)
+	list (APPEND SHARED_OSS_HDR ../../src/StackWalker.h)
+endif()
 
 flatten_files(SHARED_OSS_SRC)
 flatten_files(SHARED_OSS_HDR)

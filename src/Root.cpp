@@ -16,7 +16,6 @@
 #include "Protocol/ProtocolRecognizer.h"  // for protocol version constants
 #include "CommandOutput.h"
 #include "DeadlockDetect.h"
-#include "OSSupport/Timer.h"
 #include "LoggerListeners.h"
 #include "BuildInfo.h"
 #include "IniFile.h"
@@ -42,7 +41,6 @@ cRoot* cRoot::s_Root = nullptr;
 
 cRoot::cRoot(void) :
 	m_pDefaultWorld(nullptr),
-	m_InputThread(nullptr),
 	m_Server(nullptr),
 	m_MonsterConfig(nullptr),
 	m_CraftingRecipes(nullptr),
@@ -68,26 +66,24 @@ cRoot::~cRoot()
 
 
 
-void cRoot::InputThread(void * a_Params)
+void cRoot::InputThread(cRoot & a_Params)
 {
-	cRoot & self = *(cRoot*)a_Params;
-
 	cLogCommandOutputCallback Output;
 	
-	while (!self.m_bStop && !self.m_bRestart && !m_TerminateEventRaised && std::cin.good())
+	while (!a_Params.m_bStop && !a_Params.m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
 		std::getline(std::cin, Command);
 		if (!Command.empty())
 		{
-			self.ExecuteConsoleCommand(TrimString(Command), Output);
+			a_Params.ExecuteConsoleCommand(TrimString(Command), Output);
 		}
 	}
 
 	if (m_TerminateEventRaised || !std::cin.good())
 	{
 		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
-		self.m_bStop = true;
+		a_Params.m_bStop = true;
 	}
 }
 
@@ -120,9 +116,7 @@ void cRoot::Start(void)
 	m_bStop = false;
 	while (!m_bStop)
 	{
-		cTimer Time;
-		long long mseconds = Time.GetNowTime();
-		
+		auto BeginTime = std::chrono::steady_clock::now();
 		m_bRestart = false;
 
 		LoadGlobalSettings();
@@ -154,7 +148,7 @@ void cRoot::Start(void)
 		m_WebAdmin->Init();
 
 		LOGD("Loading settings...");
-		m_RankManager = new cRankManager();
+		m_RankManager.reset(new cRankManager());
 		m_RankManager->Initialize(m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
@@ -191,31 +185,31 @@ void cRoot::Start(void)
 
 		#if !defined(ANDROID_NDK)
 		LOGD("Starting InputThread...");
-		m_InputThread = new cThread( InputThread, this, "cRoot::InputThread");
-		m_InputThread->Start( false);  // We should NOT wait? Otherwise we can't stop the server from other threads than the input thread
+		try
+		{
+			m_InputThread = std::thread(InputThread, std::ref(*this));
+			m_InputThread.detach();
+		}
+		catch (std::system_error & a_Exception)
+		{
+			LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
+		}
 		#endif
 
-		long long finishmseconds = Time.GetNowTime();
-		finishmseconds -= mseconds;
-
-		LOG("Startup complete, took %lld ms!", finishmseconds);
+		LOG("Startup complete, took %lld ms!", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count());
 		#ifdef _WIN32
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
 
 		while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
 		{
-			cSleep::MilliSleep(1000);
+			std::this_thread::sleep_for(std::chrono::seconds(1));
 		}
 
 		if (m_TerminateEventRaised)
 		{
 			m_bStop = true;
 		}
-
-		#if !defined(ANDROID_NDK)
-		delete m_InputThread; m_InputThread = nullptr;
-		#endif
 
 		// Stop the server:
 		m_WebAdmin->Stop();
@@ -625,6 +619,22 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 	if (Callback.m_NumMatches == 1)
 	{
 		return a_Callback.Item(Callback.m_BestMatch);
+	}
+	return false;
+}
+
+
+
+
+
+bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+{
+	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr !=  m_WorldsByName.end();itr++)
+	{
+		if (itr->second->DoWithPlayerByUUID(a_PlayerUUID, a_Callback))
+		{
+			return true;
+		}
 	}
 	return false;
 }

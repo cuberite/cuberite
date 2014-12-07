@@ -10,7 +10,6 @@
 #pragma once
 
 #include "ByteBuffer.h"
-#include "OSSupport/Timer.h"
 #include "PolarSSL++/AesCfb128Decryptor.h"
 #include "PolarSSL++/AesCfb128Encryptor.h"
 
@@ -37,8 +36,7 @@ class cConnection
 	SOCKET m_ClientSocket;
 	SOCKET m_ServerSocket;
 	
-	cTimer m_Timer;
-	long long m_BeginTick;  // Tick when the relative time was first retrieved (used for GetRelativeTime())
+	std::chrono::steady_clock::time_point m_BeginTick;  // Tick when the relative time was first retrieved (used for GetRelativeTime())
 	
 	enum eConnectionState
 	{

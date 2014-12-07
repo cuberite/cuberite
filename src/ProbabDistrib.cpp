@@ -5,7 +5,7 @@
 
 #include "Globals.h"
 #include "ProbabDistrib.h"
-#include "MersenneTwister.h"
+#include "FastRandom.h"
 
 
 

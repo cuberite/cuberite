@@ -28,7 +28,7 @@ class cDeadlockDetect :
 public:
 	cDeadlockDetect(void);
 	
-	/// Starts the detection. Hides cIsThread's Start, because we need some initialization
+	/** Starts the detection. Hides cIsThread's Start, because we need some initialization */
 	bool Start(int a_IntervalSec);
 	
 protected:

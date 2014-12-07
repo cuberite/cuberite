@@ -64,7 +64,7 @@ public:
 	virtual bool ReachedDestination(void);
 
 	// tolua_begin
-	eMonsterType GetMobType(void) const {return m_MobType; }
+	eMonsterType GetMobType(void) const { return m_MobType; }
 	eFamily GetMobFamily(void) const;
 	// tolua_end
 
@@ -133,16 +133,19 @@ public:
 	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
-	/// Translates MobType enum to a string, empty string if unknown
+	/** Translates MobType enum to a string, empty string if unknown */
 	static AString MobTypeToString(eMonsterType a_MobType);
 
-	/// Translates MobType string to the enum, mtInvalidType if not recognized
+	/** Translates MobType enum to the vanilla name of the mob, empty string if unknown. */
+	static AString MobTypeToVanillaName(eMonsterType a_MobType);
+
+	/** Translates MobType string to the enum, mtInvalidType if not recognized */
 	static eMonsterType StringToMobType(const AString & a_MobTypeName);
 
-	/// Returns the mob family based on the type
+	/** Returns the mob family based on the type */
 	static eFamily FamilyFromType(eMonsterType a_MobType);
 
-	/// Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family
+	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
 	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	// tolua_end
@@ -169,10 +172,12 @@ protected:
 	/** Stores if mobile is currently moving towards the ultimate, final destination */
 	bool m_bMovingToDestination;
 
-	/** Finds the first non-air block position (not the highest, as cWorld::GetHeight does)
-		If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
-		If current Y is solid, goes up to find first nonsolid block, and returns that */
+	/** Finds the lowest non-air block position (not the highest, as cWorld::GetHeight does)
+	If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
+	If current Y is solid, goes up to find first nonsolid block, and returns that.
+	If no suitable position is found, returns cChunkDef::Height. */
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
+
 	/** Returns if a monster can actually reach a given height by jumping or walking */
 	inline bool IsNextYPosReachable(int a_PosY)
 	{
