@@ -28,7 +28,6 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
-#include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Mobs/Monster.h"
@@ -665,7 +664,6 @@ cBlockEntity * cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a
 		case E_BLOCK_HOPPER:        return LoadHopperFromNBT      (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_JUKEBOX:       return LoadJukeboxFromNBT     (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_LIT_FURNACE:   return LoadFurnaceFromNBT     (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_LIT_FURNACE, a_BlockMeta);
-		case E_BLOCK_MOB_SPAWNER:   return LoadMobSpawnerFromNBT  (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_NOTE_BLOCK:    return LoadNoteBlockFromNBT   (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ);
 		case E_BLOCK_SIGN_POST:     return LoadSignFromNBT        (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_SIGN_POST);
 		case E_BLOCK_TRAPPED_CHEST: return LoadChestFromNBT       (a_NBT, a_Tag, a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_TRAPPED_CHEST);
@@ -1087,54 +1085,6 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 
 
 
-cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ)
-{
-	// Check if the data has a proper type:
-	if (!CheckBlockEntityType(a_NBT, a_TagIdx, "MobSpawner"))
-	{
-		return nullptr;
-	}
-
-	std::unique_ptr<cMobSpawnerEntity> MobSpawner(new cMobSpawnerEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
-
-	// Load entity (MCServer worlds):
-	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
-	if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_Short))
-	{
-		short MonsterType = a_NBT.GetShort(Type);
-		if ((MonsterType >= 50) && (MonsterType <= 120))
-		{
-			MobSpawner->SetEntity(static_cast<eMonsterType>(MonsterType));
-		}
-	}
-	else
-	{
-		// Load entity (vanilla worlds):
-		Type = a_NBT.FindChildByName(a_TagIdx, "EntityId");
-		if ((Type >= 0) && (a_NBT.GetType(Type) == TAG_String))
-		{
-			eMonsterType MonsterType = cMonster::StringToMobType(a_NBT.GetString(Type));
-			if (MonsterType != eMonsterType::mtInvalidType)
-			{
-				MobSpawner->SetEntity(MonsterType);
-			}
-		}
-	}
-
-	// Load delay:
-	int Delay = a_NBT.FindChildByName(a_TagIdx, "Delay");
-	if ((Delay >= 0) && (a_NBT.GetType(Delay) == TAG_Short))
-	{
-		MobSpawner->SetSpawnDelay(a_NBT.GetShort(Delay));
-	}
-
-	return MobSpawner.release();
-}
-
-
-
-
-
 cBlockEntity * cWSSAnvil::LoadHopperFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	// Check if the data has a proper type:
@@ -1526,10 +1476,7 @@ void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedN
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "TileID");
 	int MetaIdx = a_NBT.FindChildByName(a_TagIdx, "Data");
 
-	if ((TypeIdx < 0) || (MetaIdx < 0))
-	{
-		return;
-	}
+	if ((TypeIdx < 0) || (MetaIdx < 0)) { return; }
 
 	int Type = a_NBT.GetInt(TypeIdx);
 	NIBBLETYPE Meta = (NIBBLETYPE)a_NBT.GetByte(MetaIdx);
@@ -1860,10 +1807,9 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 	int InBlockZIdx = a_NBT.FindChildByName(a_TagIdx, "zTile");
 	if ((InBlockXIdx > 0) && (InBlockYIdx > 0) && (InBlockZIdx > 0))
 	{
-		eTagType typeX = a_NBT.GetType(InBlockXIdx);
-		if ((typeX == a_NBT.GetType(InBlockYIdx)) &&  (typeX == a_NBT.GetType(InBlockZIdx)))
+		if (a_NBT.GetType(InBlockXIdx) == a_NBT.GetType(InBlockYIdx) == a_NBT.GetType(InBlockZIdx))
 		{
-			switch (typeX)
+			switch (a_NBT.GetType(InBlockXIdx))
 			{
 				case TAG_Int:
 				{
@@ -1875,11 +1821,6 @@ void cWSSAnvil::LoadArrowFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 				{
 					// Vanilla uses this
 					Arrow->SetBlockHit(Vector3i((int)a_NBT.GetShort(InBlockXIdx), (int)a_NBT.GetShort(InBlockYIdx), (int)a_NBT.GetShort(InBlockZIdx)));
-					break;
-				}
-				default:
-				{
-					// No hit block, the arrow is still flying?
 					break;
 				}
 			}
@@ -2199,13 +2140,11 @@ void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int TypeIdx  = a_NBT.FindChildByName(a_TagIdx, "Type");
+	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Type");
 	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
 	int StyleIdx = a_NBT.FindChildByName(a_TagIdx, "Style");
-	if ((TypeIdx < 0) || (ColorIdx < 0) || (StyleIdx < 0))
-	{
-		return;
-	}
+
+	if ((TypeIdx < 0) || (ColorIdx < 0) || (StyleIdx < 0)) { return; }
 
 	int Type = a_NBT.GetInt(TypeIdx);
 	int Color = a_NBT.GetInt(ColorIdx);
@@ -2395,10 +2334,8 @@ void cWSSAnvil::LoadSilverfishFromNBT(cEntityList & a_Entities, const cParsedNBT
 void cWSSAnvil::LoadSkeletonFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "SkeletonType");
-	if (TypeIdx < 0)
-	{
-		return;
-	}
+
+	if (TypeIdx < 0) { return; }
 
 	bool Type = ((a_NBT.GetByte(TypeIdx) == 1) ? true : false);
 
@@ -2512,10 +2449,8 @@ void cWSSAnvil::LoadSquidFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
-	if (TypeIdx < 0)
-	{
-		return;
-	}
+
+	if (TypeIdx < 0) { return; }
 
 	int Type = a_NBT.GetInt(TypeIdx);
 
@@ -2639,10 +2574,8 @@ void cWSSAnvil::LoadWolfFromNBT(cEntityList & a_Entities, const cParsedNBT & a_N
 void cWSSAnvil::LoadZombieFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int IsVillagerIdx = a_NBT.FindChildByName(a_TagIdx, "IsVillager");
-	if (IsVillagerIdx < 0)
-	{
-		return;
-	}
+
+	if (IsVillagerIdx < 0) { return; }
 
 	bool IsVillagerZombie = ((a_NBT.GetByte(IsVillagerIdx) == 1) ? true : false);
 
@@ -2951,7 +2884,7 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 		// Try writing a nullptr header (both chunk offsets and timestamps):
 		memset(m_Header, 0, sizeof(m_Header));
 		if (
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Real header - chunk offsets
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Null header - chunk offsets
 			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))     // Bogus data for the chunk timestamps
 		)
 		{
@@ -2960,6 +2893,26 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 			return false;
 		}
 	}
+
+	// Load the TimeStamps:
+	if (m_File.Read(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
+	{
+		// Cannot read the time stamps - perhaps the file has just been created?
+		// Try writing a nullptr header (both chunk offsets and timestamps):
+		memset(m_TimeStamps, 0, sizeof(m_TimeStamps));
+		if (
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Real header - chunk offsets
+			(m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))     // Bogus data for the chunk timestamps
+			)
+		{
+			LOGWARNING("Cannot process MCA header in file \"%s\", chunks in that file will be lost", m_FileName.c_str());
+			m_File.Close();
+			return false;
+		}
+	}
+
+
+
 	return true;
 }
 
@@ -3083,7 +3036,13 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 		);
 		return false;
 	}
+
+	// Store the header info in the table
 	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
+
+	// Set the modification time
+	m_TimeStamps[LocalX + 32 * LocalZ] = time(nullptr);
+
 	if (m_File.Seek(0) < 0)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], seeking in file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
@@ -3094,13 +3053,13 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 		LOGWARNING("Cannot save chunk [%d, %d], writing header to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
 		return false;
 	}
-	
+	if (m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
+	{
+		LOGWARNING("Cannot save chunk [%d, %d], writing timestamps to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
+		return false;
+	}
 	return true;
 }
-
-
-
-
 
 unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const AString & a_Data)
 {
