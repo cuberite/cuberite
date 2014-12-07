@@ -96,8 +96,8 @@ cFastRandom::cFastRandom(void) :
 
 int cFastRandom::NextInt(int a_Range)
 {
-	m_IntDistribution = std::uniform_int_distribution<>(0, a_Range - 1);
-	return m_IntDistribution(m_LinearRand);
+	std::uniform_int_distribution<> distribution(0, a_Range - 1);
+	return distribution(m_LinearRand);
 }
 
 
@@ -108,8 +108,8 @@ int cFastRandom::NextInt(int a_Range)
 int cFastRandom::NextInt(int a_Range, int a_Salt)
 {
 	m_LinearRand.seed(a_Salt);
-	m_IntDistribution = std::uniform_int_distribution<>(0, a_Range - 1);
-	return m_IntDistribution(m_LinearRand);
+	std::uniform_int_distribution<> distribution(0, a_Range - 1);
+	return distribution(m_LinearRand);
 }
 
 
@@ -119,8 +119,8 @@ int cFastRandom::NextInt(int a_Range, int a_Salt)
 
 float cFastRandom::NextFloat(float a_Range)
 {
-	m_FloatDistribution = std::uniform_real_distribution<float>(0, a_Range - 1);
-	return m_FloatDistribution(m_LinearRand);
+	std::uniform_real_distribution<float> distribution(0, a_Range);
+	return distribution(m_LinearRand);
 }
 
 
@@ -131,8 +131,8 @@ float cFastRandom::NextFloat(float a_Range)
 float cFastRandom::NextFloat(float a_Range, int a_Salt)
 {
 	m_LinearRand.seed(a_Salt);
-	m_FloatDistribution = std::uniform_real_distribution<float>(0, a_Range - 1);
-	return m_FloatDistribution(m_LinearRand);
+	std::uniform_real_distribution<float> distribution(0, a_Range);
+	return distribution(m_LinearRand);
 }
 
 
@@ -142,8 +142,8 @@ float cFastRandom::NextFloat(float a_Range, int a_Salt)
 
 int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
 {
-	m_IntDistribution = std::uniform_int_distribution<>(a_Begin, a_End - 1);
-	return m_IntDistribution(m_LinearRand);
+	std::uniform_int_distribution<> distribution(a_Begin, a_End);
+	return distribution(m_LinearRand);
 }
 
 
@@ -164,8 +164,8 @@ MTRand::MTRand() :
 
 int MTRand::randInt(int a_Range)
 {
-	m_IntDistribution = std::uniform_int_distribution<>(0, a_Range);
-	return m_IntDistribution(m_MersenneRand);
+	std::uniform_int_distribution<> distribution(0, a_Range);
+	return distribution(m_MersenneRand);
 }
 
 
@@ -174,8 +174,8 @@ int MTRand::randInt(int a_Range)
 
 int MTRand::randInt()
 {
-	m_IntDistribution = std::uniform_int_distribution<>(0, std::numeric_limits<int>::max());
-	return m_IntDistribution(m_MersenneRand);
+	std::uniform_int_distribution<> distribution(0, std::numeric_limits<int>::max());
+	return distribution(m_MersenneRand);
 }
 
 
@@ -184,8 +184,8 @@ int MTRand::randInt()
 
 double MTRand::rand(double a_Range)
 {
-	m_DoubleDistribution = std::uniform_real_distribution<>(0, a_Range);
-	return m_DoubleDistribution(m_MersenneRand);
+	std::uniform_real_distribution<> distribution(0, a_Range);
+	return distribution(m_MersenneRand);
 }
 
 

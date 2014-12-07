@@ -38,6 +38,11 @@
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
+/** The interval for sending pings to clients.
+Vanilla sends one ping every 1 second. */
+static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
+
+
 
 
 
@@ -86,7 +91,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
-	m_LastPingTime = std::chrono::steady_clock::now();
+	m_PingStartTime = std::chrono::steady_clock::now();
 
 	LOGD("New ClientHandle created at %p", this);
 }
@@ -384,7 +389,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
-	m_LastPingTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
+	m_PingStartTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -1990,12 +1995,11 @@ void cClientHandle::Tick(float a_Dt)
 	// Send a ping packet:
 	if (m_State == csPlaying)
 	{
-		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= std::chrono::steady_clock::now()))
+		if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
 		{
 			m_PingID++;
 			m_PingStartTime = std::chrono::steady_clock::now();
 			m_Protocol->SendKeepAlive(m_PingID);
-			m_LastPingTime = m_PingStartTime;
 		}
 	}
 

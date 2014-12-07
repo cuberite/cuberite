@@ -85,7 +85,7 @@ bool cIsThread::Start(void)
 	}
 	catch (std::system_error & a_Exception)
 	{
-		LOGERROR("cIsThread::Wait (std::thread) error %i: could not construct thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.what());
+		LOGERROR("cIsThread::Start error %i: could not construct thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.code().message().c_str());
 		return false;
 	}
 }
@@ -96,6 +96,12 @@ bool cIsThread::Start(void)
 
 void cIsThread::Stop(void)
 {
+	if (!m_Thread.joinable())
+	{
+		// The thread hasn't been started or has already been joined
+		return;
+	}
+
 	m_ShouldTerminate = true;
 	Wait();
 }
@@ -106,10 +112,7 @@ void cIsThread::Stop(void)
 
 bool cIsThread::Wait(void)
 {
-	#ifdef LOGD  // ProtoProxy doesn't have LOGD
-		LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
-	#endif  // LOGD
-
+	LOGD("Waiting for thread %s to finish", m_ThreadName.c_str());
 	if (m_Thread.joinable())
 	{
 		try
@@ -119,15 +122,12 @@ bool cIsThread::Wait(void)
 		}
 		catch (std::system_error & a_Exception)
 		{
-			LOGERROR("cIsThread::Wait (std::thread) error %i: could not join thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.what());
+			LOGERROR("cIsThread::Wait error %i: could not join thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.code().message().c_str());
 			return false;
 		}
 	}
 
-	#ifdef LOGD  // ProtoProxy doesn't have LOGD
-		LOGD("Thread %s finished", m_ThreadName.c_str());
-	#endif
-
+	LOGD("Thread %s finished", m_ThreadName.c_str());
 	return true;
 }
 

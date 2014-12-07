@@ -436,7 +436,8 @@ bool cConnection::RelayFromClient(void)
 
 double cConnection::GetRelativeTime(void)
 {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_BeginTick).count() / 1000;
+	Int64 msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_BeginTick).count();
+	return static_cast<double>(msec) / 1000;
 }
 
 

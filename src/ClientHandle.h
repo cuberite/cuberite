@@ -378,12 +378,15 @@ private:
 	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
 	float m_TimeSinceLastPacket;
 	
+	/** Duration of the last completed client ping. */
 	std::chrono::steady_clock::duration m_Ping;
-	int   m_PingID;
+
+	/** ID of the last ping request sent to the client. */
+	int m_PingID;
+
+	/** Time of the last ping request sent to the client. */
 	std::chrono::steady_clock::time_point m_PingStartTime;
-	std::chrono::steady_clock::time_point m_LastPingTime;
-	std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);  // Vanilla sends 1 per 20 ticks (1 second or every 1000 ms)
-	
+
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
 	int m_BlockDigAnimSpeed;  // Current speed of the animation (units ???)

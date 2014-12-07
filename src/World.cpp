@@ -239,7 +239,9 @@ void cWorld::cTickThread::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		auto NowTime = std::chrono::steady_clock::now();
-		m_World.Tick(static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count()), std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count());
+		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
+		auto LastTickMsec = std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count();
+		m_World.Tick(static_cast<float>(msec), LastTickMsec);
 		TickTime = std::chrono::steady_clock::now() - NowTime;
 		
 		if (TickTime < msPerTick)

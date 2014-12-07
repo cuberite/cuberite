@@ -78,7 +78,8 @@ void cServer::cTickThread::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		auto NowTime = std::chrono::steady_clock::now();
-		m_ShouldTerminate = !m_Server.Tick(static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count()));
+		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
+		m_ShouldTerminate = !m_Server.Tick(static_cast<float>(msec));
 		auto TickTime = std::chrono::steady_clock::now() - NowTime;
 		
 		if (TickTime < msPerTick)
