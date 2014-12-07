@@ -32,7 +32,7 @@ public:
 
 	/** Waits for the event until either it is signalled, or the (relative) timeout is passed.
 	Returns true if the event was signalled, false if the timeout was hit or there was an error. */
-	bool Wait(int a_TimeoutMSec);
+	bool Wait(unsigned a_TimeoutMSec);
 	
 private:
 
