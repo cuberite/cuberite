@@ -1790,7 +1790,6 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
-
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
 	{
 		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
@@ -1807,20 +1806,21 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 		{
 			if ((item).compare(a_Username) == 0)
 			{
-				Kick("User already logged in.");
+				Kick("A player of the username is already logged in");
 				return false;
 			}
 		}
-		class cCallback : public cPlayerListCallback
+		class cCallback :
+		public cPlayerListCallback
 		{
 			virtual bool Item(cPlayer * a_Player) override
 			{
-				return false;
+				return true;
 			}
 		} Callback;	
 		if (cRoot::Get()->GetDefaultWorld()->DoWithPlayer(a_Username, Callback))
 		{
-			Kick("User already logged in.");
+			Kick("A player of the username is already logged in");
 		}
 	}
 	return true;
