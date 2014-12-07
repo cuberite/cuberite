@@ -1803,9 +1803,9 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 	{
 		std::list<AString> usernamesServer = cRoot::Get()->GetServer()->GetUsernames();
 		
-		for (std::list<AString>::iterator itr = usernamesServer.begin(); itr != usernamesServer.end(); ++itr)
+		for (auto item : usernamesServer)
 		{
-			if ((*itr).compare(a_Username) == 0)
+			if ((item).compare(a_Username) == 0)
 			{
 				Kick("User already logged in.");
 				return false;

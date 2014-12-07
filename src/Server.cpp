@@ -308,9 +308,9 @@ std::list<AString> cServer::GetUsernames()
 {
 	std::list<AString> usernames;
 	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (auto client : m_Clients)
 	{
-		AString username = (*itr)->GetUsername();
+		AString username = (client)->GetUsername();
 		usernames.insert(usernames.begin(),username);
 	}
 	return usernames;
