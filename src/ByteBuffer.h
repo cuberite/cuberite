@@ -130,13 +130,15 @@ protected:
 	char * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
 	
-	#ifdef _DEBUG
-	volatile unsigned long m_ThreadID;  // Thread that is currently accessing the object, checked via cSingleThreadAccessChecker
-	#endif  // _DEBUG
-	
 	size_t m_DataStart;  // Where the data starts in the ringbuffer
 	size_t m_WritePos;   // Where the data ends in the ringbuffer
 	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
+
+	#ifdef _DEBUG
+		/** The ID of the thread currently accessing the object.
+		Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
+		mutable std::thread::id m_ThreadID;
+	#endif
 	
 	/** Advances the m_ReadPos by a_Count bytes */
 	void AdvanceReadPos(size_t a_Count);

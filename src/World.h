@@ -10,7 +10,6 @@
 #define MAX_PLAYERS 65535
 
 #include "Simulator/SimulatorManager.h"
-#include "MersenneTwister.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
@@ -26,6 +25,7 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
+#include "FastRandom.h"
 #include "ClientHandle.h"
 
 

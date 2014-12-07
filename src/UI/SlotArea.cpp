@@ -2322,7 +2322,7 @@ cItem * cSlotAreaTemporary::GetPlayerSlots(cPlayer & a_Player)
 	{
 		return nullptr;
 	}
-	return &(itr->second[0]);
+	return itr->second.data();
 }
 
 

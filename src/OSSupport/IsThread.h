@@ -16,8 +16,7 @@ In the descending class' constructor call the Start() method to start the thread
 
 
 #pragma once
-#ifndef CISTHREAD_H_INCLUDED
-#define CISTHREAD_H_INCLUDED
+#include <thread>
 
 
 
@@ -33,7 +32,7 @@ protected:
 	volatile bool m_ShouldTerminate;
 
 public:
-	cIsThread(const AString & iThreadName);
+	cIsThread(const AString & a_ThreadName);
 	virtual ~cIsThread();
 
 	/// Starts the thread; returns without waiting for the actual start
@@ -45,56 +44,14 @@ public:
 	/// Waits for the thread to finish. Doesn't signalize the ShouldTerminate flag
 	bool Wait(void);
 
-	/// Returns the OS-dependent thread ID for the caller's thread
-	static unsigned long GetCurrentID(void);
-
 	/** Returns true if the thread calling this function is the thread contained within this object. */
-	bool IsCurrentThread(void) const;
+	bool IsCurrentThread(void) const { return std::this_thread::get_id() == m_Thread.get_id(); }
 
 protected:
 	AString m_ThreadName;
-
-	// Value used for "no handle":
-	#ifdef _WIN32
-		#define NULL_HANDLE NULL
-	#else
-		#define NULL_HANDLE 0
-	#endif
-
-	#ifdef _WIN32
-
-		DWORD m_ThreadID;
-		HANDLE m_Handle;
-
-		static DWORD __stdcall thrExecute(LPVOID a_Param)
-		{
-			// Create a window so that the thread can be identified by 3rd party tools:
-			HWND IdentificationWnd = CreateWindowA("STATIC", ((cIsThread *)a_Param)->m_ThreadName.c_str(), 0, 0, 0, 0, WS_OVERLAPPED, NULL, NULL, NULL, NULL);
-
-			// Run the thread:
-			((cIsThread *)a_Param)->Execute();
-
-			// Destroy the identification window:
-			DestroyWindow(IdentificationWnd);
-
-			return 0;
-		}
-
-	#else  // _WIN32
-
-		pthread_t m_Handle;
-
-		static void * thrExecute(void * a_Param)
-		{
-			(static_cast<cIsThread *>(a_Param))->Execute();
-			return NULL;
-		}
-
-	#endif  // else _WIN32
+	std::thread m_Thread;
 } ;
 
 
 
 
-
-#endif  // CISTHREAD_H_INCLUDED

@@ -11,7 +11,6 @@
 #include "IniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
-#include "OSSupport/Timer.h"
 #include "SetChunkData.h"
 
 // Serializers
@@ -45,7 +44,6 @@
 #include "MobCensus.h"
 #include "MobSpawner.h"
 
-#include "MersenneTwister.h"
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
@@ -92,7 +90,6 @@ public:
 		m_PrepareDistance(a_PrepareDistance),
 		m_MaxIdx(a_PrepareDistance * a_PrepareDistance),
 		m_NumPrepared(0),
-		m_LastReportTime(0),
 		m_LastReportChunkCount(0)
 	{
 		// Start the thread:
@@ -113,7 +110,7 @@ public:
 		m_MaxIdx = m_PrepareDistance * m_PrepareDistance;
 		int maxQueue = std::min(m_MaxIdx - 1, 100);  // Number of chunks to queue at once
 		m_NextIdx = maxQueue;
-		m_LastReportTime = m_Timer.GetNowTime();
+		m_LastReportTime = std::chrono::steady_clock::now();
 		for (int i = 0; i < maxQueue; i++)
 		{
 			int chunkX, chunkZ;
@@ -146,15 +143,11 @@ protected:
 	/** Event used to signal that the preparation is finished. */
 	cEvent m_EvtFinished;
 
-	/** The timer used to report progress every second. */
-	cTimer m_Timer;
-
 	/** The timestamp of the last progress report emitted. */
-	long long m_LastReportTime;
+	std::chrono::steady_clock::time_point m_LastReportTime;
 
 	/** Number of chunks prepared when the last progress report was emitted. */
 	int m_LastReportChunkCount;
-
 
 	// cChunkCoordCallback override:
 	virtual void Call(int a_ChunkX, int a_ChunkZ)
@@ -178,15 +171,15 @@ protected:
 		}
 
 		// Report progress every 1 second:
-		long long now = m_Timer.GetNowTime();
-		if (now - m_LastReportTime > 1000)
+		auto Now = std::chrono::steady_clock::now();
+		if (Now - m_LastReportTime > std::chrono::seconds(1))
 		{
-			float percentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
-			float chunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / (now - m_LastReportTime);
-			LOG("Preparing spawn (%s): %.02f%% done (%d chunks out of %d; %.02f chunks / sec)",
-				m_World.GetName().c_str(), percentDone, m_NumPrepared, m_MaxIdx, chunkSpeed
+			float PercentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
+			float ChunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(Now - m_LastReportTime).count();
+			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks/s)",
+				m_World.GetName().c_str(), PercentDone, m_NumPrepared, m_MaxIdx, ChunkSpeed
 			);
-			m_LastReportTime = now;
+			m_LastReportTime = Now;
 			m_LastReportChunkCount = m_NumPrepared;
 		}
 	}
@@ -239,23 +232,20 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 void cWorld::cTickThread::Execute(void)
 {
-	cTimer Timer;
+	auto LastTime = std::chrono::steady_clock::now();
+	static const auto msPerTick = std::chrono::milliseconds(50);
+	auto TickTime = std::chrono::steady_clock::duration(50);
 
-	const Int64 msPerTick = 50;
-	Int64 LastTime = Timer.GetNowTime();
-
-	Int64 TickDuration = 50;
 	while (!m_ShouldTerminate)
 	{
-		Int64 NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime - LastTime);
-		m_World.Tick(DeltaTime, (int)TickDuration);
-		TickDuration = Timer.GetNowTime() - NowTime;
+		auto NowTime = std::chrono::steady_clock::now();
+		m_World.Tick(static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count()), std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count());
+		TickTime = std::chrono::steady_clock::now() - NowTime;
 		
-		if (TickDuration < msPerTick)
+		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			cSleep::MilliSleep((unsigned int)(msPerTick - TickDuration));
+			std::this_thread::sleep_for(msPerTick - TickTime);
 		}
 
 		LastTime = NowTime;

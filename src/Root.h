@@ -6,6 +6,7 @@
 #include "HTTPServer/HTTPServer.h"
 #include "Defines.h"
 #include "RankManager.h"
+#include <thread>
 
 
 
@@ -177,7 +178,7 @@ private:
 	cCriticalSection m_CSPendingCommands;
 	cCommandQueue    m_PendingCommands;
 
-	cThread * m_InputThread;
+	std::thread m_InputThread;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -212,10 +213,10 @@ private:
 	
 	/// Does the actual work of executing a command
 	void DoExecuteConsoleCommand(const AString & a_Cmd);
-
-	static void InputThread(void* a_Params);
 	
 	static cRoot* s_Root;
+
+	static void InputThread(cRoot & a_Params);
 };  // tolua_export
 
 

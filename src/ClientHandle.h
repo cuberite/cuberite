@@ -215,7 +215,7 @@ public:
 	const AString & GetUsername(void) const;
 	void SetUsername( const AString & a_Username);
 	
-	inline short GetPing(void) const { return m_Ping; }
+	inline short GetPing(void) const { return static_cast<short>(std::chrono::duration_cast<std::chrono::milliseconds>(m_Ping).count()); }
 	
 	/** Sets the maximal view distance. */
 	void SetViewDistance(int a_ViewDistance);
@@ -378,11 +378,11 @@ private:
 	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
 	float m_TimeSinceLastPacket;
 	
-	short m_Ping;
+	std::chrono::steady_clock::duration m_Ping;
 	int   m_PingID;
-	long long m_PingStartTime;
-	long long m_LastPingTime;
-	static const unsigned short PING_TIME_MS = 1000;  // Vanilla sends 1 per 20 ticks (1 second or every 1000 ms)
+	std::chrono::steady_clock::time_point m_PingStartTime;
+	std::chrono::steady_clock::time_point m_LastPingTime;
+	std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);  // Vanilla sends 1 per 20 ticks (1 second or every 1000 ms)
 	
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging

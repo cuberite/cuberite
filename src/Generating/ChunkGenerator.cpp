@@ -6,7 +6,7 @@
 #include "ChunkDesc.h"
 #include "ComposableGenerator.h"
 #include "Noise3DGenerator.h"
-#include "../MersenneTwister.h"
+#include "FastRandom.h"
 
 
 

@@ -22,6 +22,7 @@ salts, the values they get will be different.
 
 
 #pragma once
+#include <random>
 
 
 
@@ -30,6 +31,7 @@ salts, the values they get will be different.
 class cFastRandom
 {
 public:
+
 	cFastRandom(void);
 	
 	/// Returns a random int in the range [0 .. a_Range - 1]; a_Range must be less than 1M
@@ -49,15 +51,33 @@ public:
 
 	/** Returns a random int in the range [a_Begin .. a_End] */
 	int GenerateRandomInteger(int a_Begin, int a_End);
-	
-protected:
-	int m_Seed;
-	int m_Counter;
-	
-	/// Counter that is used to initialize the seed, incremented for each object created
-	static int m_SeedCounter;
-} ;
+
+private:
+
+	std::minstd_rand m_LinearRand;
+	std::uniform_int_distribution<> m_IntDistribution;
+	std::uniform_real_distribution<float> m_FloatDistribution;
+};
 
 
 
 
+
+class MTRand
+{
+public:
+
+	MTRand(void);
+
+	int randInt(int a_Range);
+
+	int randInt(void);
+
+	double rand(double a_Range);
+
+private:
+
+	std::mt19937 m_MersenneRand;
+	std::uniform_int_distribution<> m_IntDistribution;
+	std::uniform_real_distribution<> m_DoubleDistribution;
+};
