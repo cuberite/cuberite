@@ -129,7 +129,7 @@ public:
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 	
-	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);
+	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);
 	
 	// tolua_begin
 	

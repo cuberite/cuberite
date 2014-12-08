@@ -67,8 +67,8 @@ public:  // tolua_export
 	int  GetNumPlayers(void) const;
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
-	// Get the users waiting to be put into the World.
-	std::list<AString> GetUsernames(void);
+	// Check if the player is queued to be transferred to a World.
+	bool IsPlayerInQueue(AString a_Username);
 	
 	// Can login more than once with same username.
 	bool IsAllowMultiLogin(void) { return m_bAllowMultiLogin; }

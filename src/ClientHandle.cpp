@@ -1788,19 +1788,14 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 
 
-bool cClientHandle::CheckMultiLogin(void)
+bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 {
 	if (!(cRoot::Get()->GetServer()->IsAllowMultiLogin()))
 	{
-		std::list<AString> usernamesServer = cRoot::Get()->GetServer()->GetUsernames();
-	
-		for (auto item : usernamesServer)
+		if (cRoot::Get()->GetServer()->IsPlayerInQueue(a_Username))
 		{
-			if ((item).compare(a_Username) == 0)
-			{
 				Kick("A player of the username is already logged in");
 				return false;
-			}
 		}
 	
 		class cCallback :
@@ -1837,7 +1832,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 		}
 	}
 
-	return CheckMultiLogin();
+	return CheckMultiLogin(a_Username);
 }
 
 

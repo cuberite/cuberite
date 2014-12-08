@@ -304,16 +304,17 @@ int cServer::GetNumPlayers(void) const
 
 
 
-std::list<AString> cServer::GetUsernames()
+bool cServer::IsPlayerInQueue(AString a_Username)
 {
-	std::list<AString> usernames;
 	cCSLock Lock(m_CSClients);
 	for (auto client : m_Clients)
 	{
-		AString username = (client)->GetUsername();
-		usernames.insert(usernames.begin(),username);
+		if ((client->GetUsername()).compare(a_Username) == 0)
+		{
+			return true;
+		}
 	}
-	return usernames;
+	return false;
 }
 
 
