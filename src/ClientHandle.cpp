@@ -1788,6 +1788,41 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 
 
+bool cClientHandle::CheckMultiLogin(void)
+{
+	std::list<AString> usernamesServer = cRoot::Get()->GetServer()->GetUsernames();
+	
+	for (auto item : usernamesServer)
+	{
+		if ((item).compare(a_Username) == 0)
+		{
+			Kick("A player of the username is already logged in");
+			return false;
+		}
+	}
+	
+	class cCallback :
+	public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			return true;
+		}
+	} Callback;	
+	
+	if (cRoot::Get()->GetDefaultWorld()->DoWithPlayer(a_Username, Callback))
+	{
+		Kick("A player of the username is already logged in");
+		return false;
+	}
+	
+	return true;
+}
+
+
+
+
+
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
@@ -1798,31 +1833,12 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 			return false;
 		}
 	}
+	
 	if (!(cRoot::Get()->GetServer()->IsAllowMultiLogin()))
 	{
-		std::list<AString> usernamesServer = cRoot::Get()->GetServer()->GetUsernames();
-		
-		for (auto item : usernamesServer)
-		{
-			if ((item).compare(a_Username) == 0)
-			{
-				Kick("A player of the username is already logged in");
-				return false;
-			}
-		}
-		class cCallback :
-		public cPlayerListCallback
-		{
-			virtual bool Item(cPlayer * a_Player) override
-			{
-				return true;
-			}
-		} Callback;	
-		if (cRoot::Get()->GetDefaultWorld()->DoWithPlayer(a_Username, Callback))
-		{
-			Kick("A player of the username is already logged in");
-		}
+		return CheckMultiLogin();
 	}
+	
 	return true;
 }
 

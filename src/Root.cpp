@@ -649,6 +649,15 @@ bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback
 
 
 
+bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
+{
+	
+}
+
+
+
+
+
 AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
 {
 	return cProtocolRecognizer::GetVersionTextFromInt(a_ProtocolVersion);
