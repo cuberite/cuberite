@@ -651,9 +651,9 @@ bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback
 
 bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	for (WorldMap::iterator itr = m_WorldsByName.begin(); itr != m_WorldsByName.end(); itr++)
+	for (auto World : m_WorldsByName)
 	{
-		if (itr->second->DoWithPlayer(a_PlayerName, a_Callback))
+		if (World.second->DoWithPlayer(a_PlayerName, a_Callback))
 		{
 			return true;
 		}
