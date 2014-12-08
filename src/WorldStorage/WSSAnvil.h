@@ -81,7 +81,6 @@ protected:
 		unsigned m_Header[MCA_MAX_CHUNKS];
 		
 		// Chunk timestamps, following the chunk headers
-
 		unsigned m_TimeStamps[MCA_MAX_CHUNKS];
 		
 		/// Finds a free location large enough to hold a_Data. Gets a hint of the chunk coords, places the data there if it fits. Returns the sector number.
@@ -150,6 +149,7 @@ protected:
 	cBlockEntity * LoadDropperFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadFlowerPotFromNBT   (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadFurnaceFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	cBlockEntity * LoadMobSpawnerFromNBT  (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadHopperFromNBT      (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadJukeboxFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
 	cBlockEntity * LoadMobHeadFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, int a_BlockX, int a_BlockY, int a_BlockZ);
