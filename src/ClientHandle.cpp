@@ -1838,7 +1838,6 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 	}
 
 	return CheckMultiLogin();
-	
 }
 
 
