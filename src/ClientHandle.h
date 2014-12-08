@@ -282,6 +282,7 @@ public:
 	
 	/** Kicks the current player if the same username is already logged in. */
 	bool CheckMultiLogin(const AString & a_Username);
+	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).
 	Returns true if the player is to be let in, false if they were disconnected
