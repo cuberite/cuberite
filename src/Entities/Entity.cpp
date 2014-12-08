@@ -13,10 +13,9 @@
 #include "Player.h"
 #include "Items/ItemHandler.h"
 #include "../FastRandom.h"
-#include <math.h>
 
 #define MINECART_MAXSPEED 8
-
+#define MINECART_MAXSPEED_NEGATIVE -MINECART_MAXSPEED
 
 
 int cEntity::m_EntityCount = 0;
@@ -1915,8 +1914,13 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 void cEntity::AddSpeedX(double a_AddSpeedX)
 {
 	m_Speed.x += a_AddSpeedX;
-	if (GetEntityType() == etMinecart && abs(m_Speed.x) > MINECART_MAXSPEED){
-		m_Speed.x = MINECART_MAXSPEED;
+	if (GetEntityType() == etMinecart){
+		if (m_Speed.x >= MINECART_MAXSPEED){
+			m_Speed.x = MINECART_MAXSPEED;
+		}
+		if (m_Speed.x <= MINECART_MAXSPEED_NEGATIVE){
+			m_Speed.x = MINECART_MAXSPEED_NEGATIVE;
+		}
 	}
 	WrapSpeed();
 }
@@ -1928,8 +1932,13 @@ void cEntity::AddSpeedX(double a_AddSpeedX)
 void cEntity::AddSpeedY(double a_AddSpeedY)
 {
 	m_Speed.y += a_AddSpeedY;
-	if (GetEntityType() == etMinecart && abs(m_Speed.y) > MINECART_MAXSPEED){
-		m_Speed.y = MINECART_MAXSPEED;
+	if (GetEntityType() == etMinecart){
+		if (m_Speed.y >= MINECART_MAXSPEED){
+			m_Speed.y = MINECART_MAXSPEED;
+		}
+		if (m_Speed.y <= MINECART_MAXSPEED_NEGATIVE){
+			m_Speed.y = MINECART_MAXSPEED_NEGATIVE;
+		}
 	}
 	WrapSpeed();
 }
@@ -1941,8 +1950,13 @@ void cEntity::AddSpeedY(double a_AddSpeedY)
 void cEntity::AddSpeedZ(double a_AddSpeedZ)
 {
 	m_Speed.z += a_AddSpeedZ;
-	if (GetEntityType() == etMinecart && abs(m_Speed.z) > MINECART_MAXSPEED){
-		m_Speed.z = MINECART_MAXSPEED;
+	if (GetEntityType() == etMinecart){
+		if (m_Speed.z >= MINECART_MAXSPEED){
+			m_Speed.z = MINECART_MAXSPEED;
+		}
+		if (m_Speed.z <= MINECART_MAXSPEED_NEGATIVE){
+			m_Speed.z = MINECART_MAXSPEED_NEGATIVE;
+		}
 	}
 	WrapSpeed();
 }
