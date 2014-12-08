@@ -1095,7 +1095,7 @@ cBlockEntity * cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int a_
 		return nullptr;
 	}
 
-	std::auto_ptr<cMobSpawnerEntity> MobSpawner(new cMobSpawnerEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
+	std::unique_ptr<cMobSpawnerEntity> MobSpawner(new cMobSpawnerEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
 
 	// Load entity (MCServer worlds):
 	int Type = a_NBT.FindChildByName(a_TagIdx, "Entity");
