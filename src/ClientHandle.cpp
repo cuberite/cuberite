@@ -1799,8 +1799,8 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 	// Check if the player is waiting to be transferred to the World.
 	if (cRoot::Get()->GetServer()->IsPlayerInQueue(a_Username))
 	{
-			Kick("A player of the username is already logged in");
-			return false;
+		Kick("A player of the username is already logged in");
+		return false;
 	}
 
 	class cCallback :
@@ -1816,8 +1816,8 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
 	{
 		Kick("A player of the username is already logged in");
-		return false;
 	}
+	return false;
 }
 
 

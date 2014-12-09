@@ -68,12 +68,12 @@ public:  // tolua_export
 	void SetMaxPlayers(int a_MaxPlayers) { m_MaxPlayers = a_MaxPlayers; }
 	
 	/** Check if the player is queued to be transferred to a World.
-		Returns true is Player is found in queue. */
+	Returns true is Player is found in queue. */
 	bool IsPlayerInQueue(AString a_Username);
 	
 	/** Can login more than once with same username. 
-		Returns false if it is not allowed, true otherwise. */
-	bool IsAllowMultiLogin(void) { return m_bAllowMultiLogin; }
+	Returns false if it is not allowed, true otherwise. */
+	bool DoesAllowMultiLogin(void) { return m_bAllowMultiLogin; }
 	
 	// Hardcore mode or not:
 	bool IsHardcore(void) const { return m_bIsHardcore; }
