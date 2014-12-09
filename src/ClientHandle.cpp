@@ -1816,8 +1816,9 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
 	{
 		Kick("A player of the username is already logged in");
+		return false;
 	}
-	return false;
+	return true;
 }
 
 
