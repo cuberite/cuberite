@@ -643,6 +643,22 @@ bool cRoot::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback
 
 
 
+bool cRoot::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
+{
+	for (auto World : m_WorldsByName)
+	{
+		if (World.second->DoWithPlayer(a_PlayerName, a_Callback))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
 {
 	return cProtocolRecognizer::GetVersionTextFromInt(a_ProtocolVersion);

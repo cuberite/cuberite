@@ -280,6 +280,10 @@ public:
 	void HandleEntityLeaveBed         (int a_EntityID);
 	void HandleEntitySprinting        (int a_EntityID, bool a_IsSprinting);
 	
+	/** Kicks the current player if the same username is already logged in. 
+	Returns false if a player has been kicked, true otherwise. */
+	bool CheckMultiLogin(const AString & a_Username);
+	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).
 	Returns true if the player is to be let in, false if they were disconnected

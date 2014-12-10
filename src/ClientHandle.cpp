@@ -1778,6 +1778,43 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 
 
 
+bool cClientHandle::CheckMultiLogin(const AString & a_Username)
+{
+	// If the multilogin is allowed, skip this check entirely:
+	if ((cRoot::Get()->GetServer()->DoesAllowMultiLogin()))
+	{
+		return true;
+	}
+	
+	// Check if the player is waiting to be transferred to the World.
+	if (cRoot::Get()->GetServer()->IsPlayerInQueue(a_Username))
+	{
+		Kick("A player of the username is already logged in");
+		return false;
+	}
+
+	class cCallback :
+		public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			return true;
+		}
+	} Callback;	
+
+	// Check if the player is in any World.
+	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
+	{
+		Kick("A player of the username is already logged in");
+		return false;
+	}
+	return true;
+}
+
+
+
+
+
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
 	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
@@ -1788,7 +1825,8 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 			return false;
 		}
 	}
-	return true;
+
+	return CheckMultiLogin(a_Username);
 }
 
 

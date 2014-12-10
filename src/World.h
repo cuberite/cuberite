@@ -808,7 +808,7 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
-
+	
 private:
 
 	friend class cRoot;
