@@ -1791,7 +1791,7 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 {
 	// If the multilogin is allowed, skip this check entirely:
-	if ((cRoot::Get()->GetServer()->IsAllowMultiLogin()))
+	if ((cRoot::Get()->GetServer()->DoesAllowMultiLogin()))
 	{
 		return true;
 	}
