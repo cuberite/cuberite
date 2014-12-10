@@ -115,7 +115,7 @@ public:
 		{
 			int chunkX, chunkZ;
 			DecodeChunkCoords(i, chunkX, chunkZ);
-			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
+			m_World.PrepareChunk(chunkX, chunkZ, this);
 		}  // for i
 
 		// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
@@ -2907,6 +2907,15 @@ void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter)
+{
+	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, a_CallAfter);
+}
+
+
+
+
+
 void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
@@ -3017,7 +3026,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
+	m_ChunkMap->GenerateChunk(a_ChunkX, a_ChunkZ);
 }
 
 

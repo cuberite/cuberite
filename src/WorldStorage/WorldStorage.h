@@ -25,7 +25,7 @@
 // fwd:
 class cWorld;
 
-typedef cQueue<cChunkCoords> cChunkCoordsQueue;
+typedef cQueue<cChunkCoordsWithCallback> cChunkCoordsQueue;
 
 
 
@@ -64,8 +64,8 @@ public:
 	cWorldStorage(void);
 	~cWorldStorage();
 	
-	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ);
-	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ);
+	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
 	
 	void UnqueueLoad(int a_ChunkX, int a_ChunkZ);
 	void UnqueueSave(const cChunkCoords & a_Chunk);

@@ -375,6 +375,12 @@ public:
 	
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Queues the chunk for preparing - making sure that it's generated and lit.
+	The specified chunk is queued to be loaded or generated, and lit if needed.
+	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
+	It is legal to call with no callback. */
+	void PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);
 	
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
