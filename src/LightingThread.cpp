@@ -236,6 +236,16 @@ void cLightingThread::Execute(void)
 
 void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 {
+	// If the chunk is already lit, skip it:
+	if (m_World->IsChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ))
+	{
+		if (a_Item.m_CallbackAfter != nullptr)
+		{
+			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
+		}
+		return;
+	}
+
 	cChunkDef::BlockNibbles BlockLight, SkyLight;
 	
 	ReadChunks(a_Item.m_ChunkX, a_Item.m_ChunkZ);
