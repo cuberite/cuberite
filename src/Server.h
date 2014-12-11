@@ -71,7 +71,7 @@ public:  // tolua_export
 	Returns true is Player is found in queue. */
 	bool IsPlayerInQueue(AString a_Username);
 	
-	/** Can login more than once with same username. 
+	/** Can login more than once with same username.
 	Returns false if it is not allowed, true otherwise. */
 	bool DoesAllowMultiLogin(void) { return m_bAllowMultiLogin; }
 	
@@ -225,7 +225,7 @@ private:
 	bool m_bIsHardcore;
 	
 	/** True - allow same username to login more than once False - only once */
-	bool m_bAllowMultiLogin; 
+	bool m_bAllowMultiLogin;
 	
 	cTickThread m_TickThread;
 	cEvent m_RestartEvent;

@@ -2966,10 +2966,11 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 	
 	if (writeOutNeeded)
 	{
+		m_File.Seek(0);
 		if (
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Write chunk offsets
-			(m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))     // Write chunk timestamps
-		   )
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||           // Write chunk offsets
+			(m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))  // Write chunk timestamps
+		)
 		{
 			LOGWARNING("Cannot process MCA header in file \"%s\", chunks in that file will be lost", m_FileName.c_str());
 			m_File.Close();
@@ -3104,7 +3105,7 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
 
 	// Set the modification time
-	m_TimeStamps[LocalX + 32 * LocalZ] =  htonl(time(nullptr));
+	m_TimeStamps[LocalX + 32 * LocalZ] =  htonl(static_cast<u_long>(time(nullptr)));
 
 	if (m_File.Seek(0) < 0)
 	{

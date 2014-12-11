@@ -1800,7 +1800,7 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 		{
 			return true;
 		}
-	} Callback;	
+	} Callback;
 
 	// Check if the player is in any World.
 	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))

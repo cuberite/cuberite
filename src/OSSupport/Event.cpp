@@ -63,7 +63,7 @@ bool cEvent::Wait(unsigned a_TimeoutMSec)
 		}  // switch (wait_until())
 	}  // while (m_ShouldWait && not timeout)
 
-	// The wait timed out in the while() condition:
+	// The wait timed out in the while condition:
 	return false;
 }
 
