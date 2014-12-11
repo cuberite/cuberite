@@ -2923,6 +2923,8 @@ cWSSAnvil::cMCAFile::cMCAFile(const AString & a_FileName, int a_RegionX, int a_R
 
 bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 {
+	bool writeOutNeeded = false;
+	
 	if (m_File.IsOpen())
 	{
 		// Already open
@@ -2948,12 +2950,26 @@ bool cWSSAnvil::cMCAFile::OpenFile(bool a_IsForReading)
 	if (m_File.Read(m_Header, sizeof(m_Header)) != sizeof(m_Header))
 	{
 		// Cannot read the header - perhaps the file has just been created?
-		// Try writing a nullptr header (both chunk offsets and timestamps):
+		// Try writing a nullptr header for chunk offsets:
 		memset(m_Header, 0, sizeof(m_Header));
+		writeOutNeeded = true;
+	}
+
+	// Load the TimeStamps:
+	if (m_File.Read(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
+	{
+		// Cannot read the time stamps - perhaps the file has just been created?
+		// Try writing a nullptr header for timestamps:
+		memset(m_TimeStamps, 0, sizeof(m_TimeStamps));
+		writeOutNeeded = true;
+	}
+	
+	if (writeOutNeeded)
+	{
 		if (
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Real header - chunk offsets
-			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))     // Bogus data for the chunk timestamps
-		)
+			(m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header)) ||  // Write chunk offsets
+			(m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))     // Write chunk timestamps
+		   )
 		{
 			LOGWARNING("Cannot process MCA header in file \"%s\", chunks in that file will be lost", m_FileName.c_str());
 			m_File.Close();
@@ -3083,7 +3099,13 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 		);
 		return false;
 	}
+	
+	// Store the header info in the table
 	m_Header[LocalX + 32 * LocalZ] = htonl((ChunkSector << 8) | ChunkSize);
+
+	// Set the modification time
+	m_TimeStamps[LocalX + 32 * LocalZ] =  htonl(time(nullptr));
+
 	if (m_File.Seek(0) < 0)
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], seeking in file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
@@ -3092,6 +3114,11 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	if (m_File.Write(m_Header, sizeof(m_Header)) != sizeof(m_Header))
 	{
 		LOGWARNING("Cannot save chunk [%d, %d], writing header to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
+		return false;
+	}
+	if (m_File.Write(m_TimeStamps, sizeof(m_TimeStamps)) != sizeof(m_TimeStamps))
+	{
+		LOGWARNING("Cannot save chunk [%d, %d], writing timestamps to file \"%s\" failed", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, GetFileName().c_str());
 		return false;
 	}
 	
