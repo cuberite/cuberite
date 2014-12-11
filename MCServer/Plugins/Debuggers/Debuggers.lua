@@ -35,39 +35,15 @@ function Initialize(Plugin)
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
-	PM:BindCommand("/nick",    "debuggers", HandleNickCmd,         "- Gives you a custom name");
-	PM:BindCommand("/le",      "debuggers", HandleListEntitiesCmd, "- Shows a list of all the loaded entities");
-	PM:BindCommand("/ke",      "debuggers", HandleKillEntitiesCmd, "- Kills all the loaded entities");
-	PM:BindCommand("/wool",    "debuggers", HandleWoolCmd,         "- Sets all your armor to blue wool");
-	PM:BindCommand("/testwnd", "debuggers", HandleTestWndCmd,      "- Opens up a window using plugin API");
-	PM:BindCommand("/gc",      "debuggers", HandleGCCmd,           "- Activates the Lua garbage collector");
-	PM:BindCommand("/fast",    "debuggers", HandleFastCmd,         "- Switches between fast and normal movement speed");
-	PM:BindCommand("/dash",    "debuggers", HandleDashCmd,         "- Switches between fast and normal sprinting speed");
-	PM:BindCommand("/hunger",  "debuggers", HandleHungerCmd,       "- Lists the current hunger-related variables");
-	PM:BindCommand("/poison",  "debuggers", HandlePoisonCmd,       "- Sets food-poisoning for 15 seconds");
-	PM:BindCommand("/starve",  "debuggers", HandleStarveCmd,       "- Sets the food level to zero");
-	PM:BindCommand("/fl",      "debuggers", HandleFoodLevelCmd,    "- Sets the food level to the given value");
-	PM:BindCommand("/spidey",  "debuggers", HandleSpideyCmd,       "- Shoots a line of web blocks until it hits non-air");
-	PM:BindCommand("/ench",    "debuggers", HandleEnchCmd,         "- Provides an instant dummy enchantment window");
-	PM:BindCommand("/fs",      "debuggers", HandleFoodStatsCmd,    "- Turns regular foodstats message on or off");
-	PM:BindCommand("/arr",     "debuggers", HandleArrowCmd,        "- Creates an arrow going away from the player");
-	PM:BindCommand("/fb",      "debuggers", HandleFireballCmd,     "- Creates a ghast fireball as if shot by the player");
-	PM:BindCommand("/xpa",     "debuggers", HandleAddExperience,   "- Adds 200 experience to the player");
-	PM:BindCommand("/xpr",     "debuggers", HandleRemoveXp,        "- Remove all xp");
-	PM:BindCommand("/fill",    "debuggers", HandleFill,            "- Fills all block entities in current chunk with junk");
-	PM:BindCommand("/fr",      "debuggers", HandleFurnaceRecipe,   "- Shows the furnace recipe for the currently held item");
-	PM:BindCommand("/ff",      "debuggers", HandleFurnaceFuel,     "- Shows how long the currently held item would burn in a furnace");
-	PM:BindCommand("/sched",   "debuggers", HandleSched,           "- Schedules a simple countdown using cWorld:ScheduleTask()");
-	PM:BindCommand("/cs",      "debuggers", HandleChunkStay,       "- Tests the ChunkStay Lua integration for the specified chunk coords");
-	PM:BindCommand("/compo",   "debuggers", HandleCompo,           "- Tests the cCompositeChat bindings");
-	PM:BindCommand("/sb",      "debuggers", HandleSetBiome,        "- Sets the biome around you to the specified one");
-	PM:BindCommand("/wesel",   "debuggers", HandleWESel,           "- Expands the current WE selection by 1 block in X/Z");
-	PM:BindCommand("/rmitem",  "debuggers", HandleRMItem,          "- Remove the specified item from the inventory.");
-	PM:BindCommand("/pickups", "debuggers", HandlePickups,         "- Spawns random pickups around you");
-	PM:BindCommand("/poof",    "debuggers", HandlePoof,            "- Nudges pickups close to you away from you");
+	-- Load the InfoReg shared library:
+	dofile(cPluginManager:GetPluginsPath() .. "/InfoReg.lua")
 	
-	PM:BindConsoleCommand("sched", HandleConsoleSchedule, "Tests the world scheduling");
-
+	-- Bind all the commands:
+	RegisterPluginInfoCommands();
+	
+	-- Bind all the console commands:
+	RegisterPluginInfoConsoleCommands();
+	
 	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
 	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
 
