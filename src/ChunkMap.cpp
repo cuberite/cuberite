@@ -2349,6 +2349,103 @@ void cChunkMap::TouchChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cChunkMap::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
+
+	// If the chunk is not prepared, queue it in the lighting thread, that will do all the needed processing:
+	if ((Chunk == nullptr) || !Chunk->IsValid() || !Chunk->IsLightValid())
+	{
+		m_World->GetLightingThread().QueueChunk(a_ChunkX, a_ChunkZ, a_Callback);
+		return;
+	}
+
+	// The chunk is present and lit, just call the callback:
+	if (a_Callback != nullptr)
+	{
+		a_Callback->Call(a_ChunkX, a_ChunkZ);
+	}
+}
+
+
+
+
+
+bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback)
+{
+	cCSLock Lock(m_CSLayers);
+	cChunkPtr Chunk = GetChunkNoLoad(a_ChunkX, a_ChunkZ);
+	if (Chunk == nullptr)
+	{
+		// Generic error while getting the chunk - out of memory?
+		return false;
+	}
+
+	// Try loading the chunk:
+	if ((Chunk == nullptr) || (!Chunk->IsValid()))
+	{
+		class cPrepareLoadCallback: public cChunkCoordCallback
+		{
+		public:
+			cPrepareLoadCallback(cWorld & a_World, cChunkMap & a_ChunkMap, cChunkCoordCallback * a_Callback):
+				m_World(a_World),
+				m_ChunkMap(a_ChunkMap),
+				m_Callback(a_Callback)
+			{
+			}
+
+			// cChunkCoordCallback override:
+			virtual void Call(int a_CBChunkX, int a_CBChunkZ) override
+			{
+				// The chunk has been loaded or an error occurred, check if it's valid now:
+				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_CBChunkX, a_CBChunkZ);
+
+				if (CBChunk == nullptr)
+				{
+					// An error occurred, but we promised to call the callback, so call it even when there's no real chunk data:
+					if (m_Callback != nullptr)
+					{
+						m_Callback->Call(a_CBChunkX, a_CBChunkZ);
+					}
+					return;
+				}
+
+				// If the chunk is not valid, queue it in the generator:
+				if (!CBChunk->IsValid())
+				{
+					m_World.GetGenerator().QueueGenerateChunk(a_CBChunkX, a_CBChunkZ, false, m_Callback);
+					return;
+				}
+
+				// The chunk was loaded, call the callback:
+				if (m_Callback != nullptr)
+				{
+					m_Callback->Call(a_CBChunkX, a_CBChunkZ);
+				}
+			}
+
+		protected:
+			cWorld & m_World;
+			cChunkMap & m_ChunkMap;
+			cChunkCoordCallback * m_Callback;
+		};
+		m_World->GetStorage().QueueLoadChunk(a_ChunkX, a_ChunkZ, new cPrepareLoadCallback(*m_World, *this, a_Callback));
+		return true;
+	}
+
+	// The chunk is valid, just call the callback:
+	if (a_Callback != nullptr)
+	{
+		a_Callback->Call(a_ChunkX, a_ChunkZ);
+	}
+	return true;
+}
+
+
+
+
+
 void cChunkMap::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);

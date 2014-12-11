@@ -110,29 +110,19 @@ void cChunkGenerator::Stop(void)
 
 
 
-void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate)
+void cChunkGenerator::QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate, cChunkCoordCallback * a_Callback)
 {
 	ASSERT(m_ChunkSink->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
 	{
 		cCSLock Lock(m_CS);
 
-		// Check if it is already in the queue:
-		for (cChunkCoordsWithBoolList::iterator itr = m_Queue.begin(); itr != m_Queue.end(); ++itr)
-		{
-			if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ))
-			{
-				// Already in the queue, bail out
-				return;
-			}
-		}  // for itr - m_Queue[]
-
 		// Add to queue, issue a warning if too many:
 		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
 		{
 			LOGWARN("WARNING: Adding chunk [%i, %i] to generation queue; Queue is too big! (" SIZE_T_FMT ")", a_ChunkX, a_ChunkZ, m_Queue.size());
 		}
-		m_Queue.push_back(cChunkCoordsWithBool(a_ChunkX, a_ChunkZ, a_ForceGenerate));
+		m_Queue.push_back(cQueueItem{a_ChunkX, a_ChunkZ, a_ForceGenerate, a_Callback});
 	}
 
 	m_Event.Set();
@@ -242,9 +232,9 @@ void cChunkGenerator::Execute(void)
 			continue;
 		}
 
-		cChunkCoordsWithBool coords = m_Queue.front();  // Get next coord from queue
+		cQueueItem item = m_Queue.front();  // Get next chunk from the queue
 		bool SkipEnabled = (m_Queue.size() > QUEUE_SKIP_LIMIT);
-		m_Queue.erase(m_Queue.begin());  // Remove coordinate from queue
+		m_Queue.erase(m_Queue.begin());  // Remove the item from the queue
 		Lock.Unlock();  // Unlock ASAP
 		m_evtRemoved.Set();
 
@@ -258,22 +248,35 @@ void cChunkGenerator::Execute(void)
 			LastReportTick = clock();
 		}
 
-		if (!coords.m_ForceGenerate && m_ChunkSink->IsChunkValid(coords.m_ChunkX, coords.m_ChunkZ))
+		// Skip the chunk if it's already generated and regeneration is not forced:
+		if (!item.m_ForceGenerate && m_ChunkSink->IsChunkValid(item.m_ChunkX, item.m_ChunkZ))
 		{
-			LOGD("Chunk [%d, %d] already generated, skipping generation", coords.m_ChunkX, coords.m_ChunkZ);
-			// Already generated, ignore request
+			LOGD("Chunk [%d, %d] already generated, skipping generation", item.m_ChunkX, item.m_ChunkZ);
+			if (item.m_Callback != nullptr)
+			{
+				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+			}
 			continue;
 		}
 
-		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(coords.m_ChunkX, coords.m_ChunkZ))
+		// Skip the chunk if the generator is overloaded:
+		if (SkipEnabled && !m_ChunkSink->HasChunkAnyClients(item.m_ChunkX, item.m_ChunkZ))
 		{
-			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
+			LOGWARNING("Chunk generator overloaded, skipping chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
+			if (item.m_Callback != nullptr)
+			{
+				item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+			}
 			continue;
 		}
 
-		LOGD("Generating chunk [%d, %d]", coords.m_ChunkX, coords.m_ChunkZ);
-		DoGenerate(coords.m_ChunkX, coords.m_ChunkZ);
-
+		// Generate the chunk:
+		LOGD("Generating chunk [%d, %d]", item.m_ChunkX, item.m_ChunkZ);
+		DoGenerate(item.m_ChunkX, item.m_ChunkZ);
+		if (item.m_Callback != nullptr)
+		{
+			item.m_Callback->Call(item.m_ChunkX, item.m_ChunkZ);
+		}
 		NumChunksGenerated++;
 	}  // while (!bStop)
 }

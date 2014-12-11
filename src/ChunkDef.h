@@ -410,7 +410,7 @@ typedef std::list<cChunkCoordsWithBool> cChunkCoordsWithBoolList;
 
 
 
-/// Interface class used as a callback for operations that involve chunk coords
+/** Interface class used as a callback for operations that involve chunk coords */
 class cChunkCoordCallback
 {
 public:
@@ -419,6 +419,27 @@ public:
 
 	virtual void Call(int a_ChunkX, int a_ChunkZ) = 0;
 } ;
+
+
+
+
+
+/** Provides storage for a set of chunk coords together with a callback.
+Used for chunk queues that notify about processed items. */
+class cChunkCoordsWithCallback
+{
+public:
+	cChunkCoordsWithCallback(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback):
+		m_ChunkX(a_ChunkX),
+		m_ChunkZ(a_ChunkZ),
+		m_Callback(a_Callback)
+	{
+	}
+
+	int m_ChunkX;
+	int m_ChunkZ;
+	cChunkCoordCallback * m_Callback;
+};
 
 
 
