@@ -205,6 +205,16 @@ g_PluginInfo =
 			Handler = HandleConsoleSchedule,
 			HelpString = "Tests the world scheduling",
 		},
+		["loadchunk"] =
+		{
+			Handler = HandleConsoleLoadChunk,
+			HelpString = "Loads the specified chunk into memory",
+		},
+		["preparechunk"] =
+		{
+			Handler = HandleConsolePrepareChunk,
+			HelpString = "Prepares the specified chunk completely (load / gen / light)",
+		}
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
 

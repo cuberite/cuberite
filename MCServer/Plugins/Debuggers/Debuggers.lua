@@ -1619,3 +1619,80 @@ end
 
 
 
+
+function HandleConsoleLoadChunk(a_Split)
+	-- Check params:
+	local numParams = #a_Split
+	if (numParams ~= 3) and (numParams ~= 4) then
+		return true, "Usage: " .. a_Split[1] .. " <ChunkX> <ChunkZ> [<WorldName>]"
+	end
+	
+	-- Get the chunk coords:
+	local chunkX = tonumber(a_Split[2])
+	if (chunkX == nil) then
+		return true, "Not a number: '" .. a_Split[2] .. "'"
+	end
+	local chunkZ = tonumber(a_Split[3])
+	if (chunkZ == nil) then
+		return true, "Not a number: '" .. a_Split[3] .. "'"
+	end
+
+	-- Get the world:
+	local world
+	if (a_Split[4] == nil) then
+		world = cRoot:Get():GetDefaultWorld()
+	else
+		world = cRoot:Get():GetWorld(a_Split[4])
+		if (world == nil) then
+			return true, "There's no world named '" .. a_Split[4] .. "'."
+		end
+	end
+	
+	-- Queue a ChunkStay for the chunk, log a message when the chunk is loaded:
+	world:ChunkStay({{chunkX, chunkZ}}, nil,
+		function()
+			LOG("Chunk [" .. chunkX .. ", " .. chunkZ .. "] is loaded")
+		end
+	)
+	return true
+end
+
+
+
+
+
+function HandleConsolePrepareChunk(a_Split)
+	-- Check params:
+	local numParams = #a_Split
+	if (numParams ~= 3) and (numParams ~= 4) then
+		return true, "Usage: " .. a_Split[1] .. " <ChunkX> <ChunkZ> [<WorldName>]"
+	end
+	
+	-- Get the chunk coords:
+	local chunkX = tonumber(a_Split[2])
+	if (chunkX == nil) then
+		return true, "Not a number: '" .. a_Split[2] .. "'"
+	end
+	local chunkZ = tonumber(a_Split[3])
+	if (chunkZ == nil) then
+		return true, "Not a number: '" .. a_Split[3] .. "'"
+	end
+
+	-- Get the world:
+	local world
+	if (a_Split[4] == nil) then
+		world = cRoot:Get():GetDefaultWorld()
+	else
+		world = cRoot:Get():GetWorld(a_Split[4])
+		if (world == nil) then
+			return true, "There's no world named '" .. a_Split[4] .. "'."
+		end
+	end
+	
+	-- TODO: Queue the chunk for preparing, log a message when prepared
+	return true
+end
+
+
+
+
