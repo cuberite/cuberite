@@ -131,8 +131,8 @@ protected:
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
-		int RelStartX = Clamp(a_StartX - BlockX, 0, cChunkDef::Width - 1);
-		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width - 1);
+		int RelStartX = Clamp(a_StartX - BlockX, 0, cChunkDef::Width);
+		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width);
 		int RelEndX   = Clamp(a_EndX - BlockX,   0, cChunkDef::Width);
 		int RelEndZ   = Clamp(a_EndZ - BlockZ,   0, cChunkDef::Width);
 		for (int y = a_StartY; y < a_EndY; y++)
