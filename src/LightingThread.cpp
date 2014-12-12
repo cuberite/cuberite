@@ -226,6 +226,8 @@ void cLightingThread::Execute(void)
 		}  // CSLock(m_CS)
 		
 		LightChunk(*Item);
+		Item->Disable();
+		delete Item;
 	}
 }
 
@@ -324,8 +326,6 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 	}
-	a_Item.Disable();
-	delete &a_Item;
 }
 
 
