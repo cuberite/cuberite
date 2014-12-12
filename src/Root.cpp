@@ -196,7 +196,7 @@ void cRoot::Start(void)
 		}
 		#endif
 
-		LOG("Startup complete, took %ld ms!", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count());
+		LOG("Startup complete, took %ld ms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
 		#ifdef _WIN32
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
