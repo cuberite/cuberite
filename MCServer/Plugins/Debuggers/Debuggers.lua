@@ -1689,7 +1689,12 @@ function HandleConsolePrepareChunk(a_Split)
 		end
 	end
 	
-	-- TODO: Queue the chunk for preparing, log a message when prepared
+	-- Queue the chunk for preparing, log a message when prepared:
+	world:PrepareChunk(chunkX, chunkZ,
+		function(a_CBChunkX, a_CBChunkZ)
+			LOG("Chunk [" .. chunkX .. ", " .. chunkZ .. "] has been prepared")
+		end
+	)
 	return true
 end
 
