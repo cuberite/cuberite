@@ -4,7 +4,7 @@
 #include "Player.h"
 #include "../ChatColor.h"
 #include "../Server.h"
-#include "../UI/Window.h"
+#include "../UI/InventoryWindow.h"
 #include "../UI/WindowOwner.h"
 #include "../World.h"
 #include "../Bindings/PluginManager.h"

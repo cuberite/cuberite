@@ -4,6 +4,7 @@
 #include "BeaconEntity.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
+#include "../UI/BeaconWindow.h"
 
 
 

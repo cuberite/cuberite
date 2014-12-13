@@ -4,7 +4,7 @@
 #include "EnderChestEntity.h"
 #include "../Item.h"
 #include "../Entities/Player.h"
-#include "../UI/Window.h"
+#include "../UI/EnderChestWindow.h"
 
 
 

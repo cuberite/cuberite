@@ -9,6 +9,7 @@
 #include "../Entities/Player.h"
 #include "../Entities/Pickup.h"
 #include "../Bindings/PluginManager.h"
+#include "../UI/HopperWindow.h"
 #include "ChestEntity.h"
 #include "FurnaceEntity.h"
 

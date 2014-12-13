@@ -1,3 +1,4 @@
+
 // SlotArea.cpp
 
 // Implements the cSlotArea class and its descendants
@@ -12,6 +13,7 @@
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
+#include "AnvilWindow.h"
 #include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
@@ -769,7 +771,7 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaAnvil:
 
-cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
+cSlotAreaAnvil::cSlotAreaAnvil(cWindow & a_ParentWindow) :
 	cSlotAreaTemporary(3, a_ParentWindow),
 	m_MaximumCost(0),
 	m_StackSizeToBeUsedInRepair(0)
@@ -1390,13 +1392,12 @@ void cSlotAreaBeacon::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnchanting:
 
-cSlotAreaEnchanting::cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
+cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
 	cSlotAreaTemporary(1, a_ParentWindow),
 	m_BlockX(a_BlockX),
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
 {
-	a_ParentWindow.m_SlotArea = this;
 }
 
 

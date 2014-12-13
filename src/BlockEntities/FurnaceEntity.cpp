@@ -2,7 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "FurnaceEntity.h"
-#include "../UI/Window.h"
+#include "../UI/FurnaceWindow.h"
 #include "../Entities/Player.h"
 #include "../Root.h"
 #include "../Chunk.h"

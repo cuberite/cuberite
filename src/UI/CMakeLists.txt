@@ -11,6 +11,17 @@ SET (SRCS
 SET (HDRS
 	SlotArea.h
 	Window.h
+	AnvilWindow.h
+	BeaconWindow.h
+	ChestWindow.h
+	CraftingWindow.h
+	DropSpenserWindow.h
+	EnchantingWindow.h
+	EnderChestWindow.h
+	FurnaceWindow.h
+	HopperWindow.h
+	InventoryWindow.h
+	MinecartWithChestWindow.h
 	WindowOwner.h)
 
 if(NOT MSVC)

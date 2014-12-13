@@ -17,12 +17,10 @@ class cWindow;
 class cPlayer;
 class cBeaconEntity;
 class cChestEntity;
-class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cMinecartWithChest;
 class cCraftingRecipe;
-class cEnchantingWindow;
 class cWorld;
 
 
@@ -285,7 +283,7 @@ class cSlotAreaAnvil :
 	typedef cSlotAreaTemporary super;
 
 public:
-	cSlotAreaAnvil(cAnvilWindow & a_ParentWindow);
+	cSlotAreaAnvil(cWindow & a_ParentWindow);
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
@@ -350,7 +348,7 @@ class cSlotAreaEnchanting :
 	typedef cSlotAreaTemporary super;
 
 public:
-	cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ);
+	cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ);
 
 	// cSlotArea overrides:
 	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;

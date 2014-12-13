@@ -11,6 +11,7 @@
 #include "../Chunk.h"
 #include "Player.h"
 #include "../BoundingBox.h"
+#include "../UI/MinecartWithChestWindow.h"
 
 #define NO_SPEED 0.0
 #define MAX_SPEED 8
