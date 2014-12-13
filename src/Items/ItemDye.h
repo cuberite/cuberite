@@ -40,11 +40,13 @@ public:
 			NIBBLETYPE BlockMeta;
 			a_World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
 
+			// Check if the block that the player clicked is a jungle log.
 			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x3) != E_META_LOG_JUNGLE))
 			{
 				return false;
 			}
 
+			// Get the location from the new cocoa pod.
 			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, false);
 			BlockMeta = cBlockCocoaPodHandler::BlockFaceToMeta(a_BlockFace);
 
@@ -53,6 +55,7 @@ public:
 				return false;
 			}
 
+			// Check plugins
 			if (cRoot::Get()->GetPluginManager()->CallHookPlayerPlacingBlock(*a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 0, 0, 0, E_BLOCK_COCOA_POD, BlockMeta))
 			{
 				a_World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
@@ -60,9 +63,11 @@ public:
 				return false;
 			}
 
+			// Set block and broadcast place sound
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta);
 			a_World->BroadcastSoundEffect("dig.stone", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
 
+			// Remove one cocoa pod from the inventory
 			if (!a_Player->IsGameModeCreative())
 			{
 				a_Player->GetInventory().RemoveOneEquippedItem();

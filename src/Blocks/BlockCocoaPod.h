@@ -38,7 +38,7 @@ public:
 		{
 			NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
 			NIBBLETYPE TypeMeta = Meta & 0x03;
-			int GrowState = (Meta & 0x12) >> 2;
+			int GrowState = (Meta & 0x0f) >> 2;
 
 			if (GrowState < 2)
 			{
@@ -51,7 +51,7 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		int GrowState = (a_BlockMeta & 0x12) >> 2;
+		int GrowState = (a_BlockMeta & 0x0f) >> 2;
 		a_Pickups.Add(E_ITEM_DYE, ((GrowState >= 2) ? 3 : 1), E_META_DYE_BROWN);
 	}
 

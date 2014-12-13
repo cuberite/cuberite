@@ -1520,7 +1520,21 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			return true;
 		}
-		
+
+		case E_BLOCK_COCOA_POD:
+		{
+			NIBBLETYPE TypeMeta = BlockMeta & 0x03;
+			int GrowState = (BlockMeta & 0x0f) >> 2;
+
+			if (GrowState < 2)
+			{
+				GrowState++;
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, (NIBBLETYPE) (GrowState << 2 | TypeMeta));
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
+			}
+			return true;
+		}
+
 		case E_BLOCK_CROPS:
 		{
 			if (a_IsByBonemeal && !m_IsCropsBonemealable)
