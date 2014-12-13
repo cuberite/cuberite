@@ -1021,7 +1021,7 @@ void cChunk::GrowMelonPumpkin(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Bl
 		case E_BLOCK_FARMLAND:
 		{
 			// DEBUG: This is here to catch FS #349 - melons growing over other crops.
-			LOG("Growing melon/pumpkin overwriting %s, growing on %s",
+			LOGD("Growing melon/pumpkin overwriting %s, growing on %s",
 				ItemTypeToString(BlockType[CheckType]).c_str(),
 				ItemTypeToString(Soil).c_str()
 			);
