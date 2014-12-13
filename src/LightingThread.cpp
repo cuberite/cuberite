@@ -226,6 +226,8 @@ void cLightingThread::Execute(void)
 		}  // CSLock(m_CS)
 		
 		LightChunk(*Item);
+		Item->Disable();
+		delete Item;
 	}
 }
 
@@ -236,6 +238,16 @@ void cLightingThread::Execute(void)
 
 void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 {
+	// If the chunk is already lit, skip it:
+	if (m_World->IsChunkLighted(a_Item.m_ChunkX, a_Item.m_ChunkZ))
+	{
+		if (a_Item.m_CallbackAfter != nullptr)
+		{
+			a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
+		}
+		return;
+	}
+
 	cChunkDef::BlockNibbles BlockLight, SkyLight;
 	
 	ReadChunks(a_Item.m_ChunkX, a_Item.m_ChunkZ);
@@ -314,8 +326,6 @@ void cLightingThread::LightChunk(cLightingChunkStay & a_Item)
 	{
 		a_Item.m_CallbackAfter->Call(a_Item.m_ChunkX, a_Item.m_ChunkZ);
 	}
-	a_Item.Disable();
-	delete &a_Item;
 }
 
 

@@ -52,7 +52,9 @@ static int tolua_get_AllToLua_g_BlockSpreadLightFalloff(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -78,7 +80,9 @@ static int tolua_get_AllToLua_g_BlockTransparent(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -104,7 +108,9 @@ static int tolua_get_AllToLua_g_BlockOneHitDig(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -130,7 +136,9 @@ static int tolua_get_AllToLua_g_BlockPistonBreakable(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -156,7 +164,9 @@ static int tolua_get_AllToLua_g_BlockIsSnowable(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -182,7 +192,9 @@ static int tolua_get_AllToLua_g_BlockIsSolid(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -208,7 +220,9 @@ static int tolua_get_AllToLua_g_BlockFullyOccupiesVoxel(lua_State* tolua_S)
 	{
 		tolua_Error tolua_err;
 		if (!tolua_isnumber(tolua_S, 2, 0, &tolua_err))
+		{
 			tolua_error(tolua_S, "#vinvalid type in array indexing.", &tolua_err);
+		}
 	}
 	#endif
 	BlockType = (int)tolua_tonumber(tolua_S, 2, 0);
@@ -233,8 +247,8 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 	#ifndef TOLUA_RELEASE
 	tolua_Error tolua_err;
 	if (
-		!tolua_iscppstring(tolua_S,1,0,&tolua_err) ||
-		!tolua_isnoobj(tolua_S,2,&tolua_err)
+		!tolua_iscppstring(tolua_S, 1, 0, &tolua_err) ||
+		!tolua_isnoobj(tolua_S, 2, &tolua_err)
 		)
 		goto tolua_lerror;
 	else

@@ -13,12 +13,9 @@ SET (SRCS
 	IsThread.cpp
 	ListenThread.cpp
 	Semaphore.cpp
-	Sleep.cpp
 	Socket.cpp
 	SocketThreads.cpp
 	StackTrace.cpp
-	Thread.cpp
-	Timer.cpp
 )
 
 SET (HDRS
@@ -31,12 +28,9 @@ SET (HDRS
 	ListenThread.h
 	Queue.h
 	Semaphore.h
-	Sleep.h
 	Socket.h
 	SocketThreads.h
 	StackTrace.h
-	Thread.h
-	Timer.h
 )
 
 if(NOT MSVC)

@@ -136,8 +136,10 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	/*
 	Disabled because of causing problems and being useless atm
 	char BlockBelow = m_World.GetBlock(a_X, a_Y - 1, a_Z);  // If there is nothing or fluid below it -> dominating flow is down :D
-	if (BlockBelow == E_BLOCK_AIR || IsAllowedBlock(BlockBelow))
+	if ((BlockBelow == E_BLOCK_AIR) || IsAllowedBlock(BlockBelow))
+	{
 		return Y_MINUS;
+	}
 	*/
 
 	NIBBLETYPE LowestPoint = m_World.GetBlockMeta(a_X, a_Y, a_Z);  // Current Block Meta so only lower points will be counted
@@ -185,7 +187,9 @@ Direction cFluidSimulator::GetFlowingDirection(int a_X, int a_Y, int a_Z, bool a
 	}
 
 	if (LowestPoint == m_World.GetBlockMeta(a_X, a_Y, a_Z))
+	{
 		return NONE;
+	}
 
 	if (a_X - X > 0)
 	{

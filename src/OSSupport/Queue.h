@@ -163,6 +163,29 @@ public:
 		return false;
 	}
 
+
+	/** Removes all items for which the predicate returns true. */
+	template <class Predicate>
+	void RemoveIf(Predicate a_Predicate)
+	{
+		cCSLock Lock(m_CS);
+		for (auto itr = m_Contents.begin(); itr != m_Contents.end();)
+		{
+			if (a_Predicate(*itr))
+			{
+				auto itr2 = itr;
+				++itr2;
+				m_Contents.erase(itr);
+				m_evtRemoved.Set();
+				itr = itr2;
+			}
+			else
+			{
+				++itr;
+			}
+		}  // for itr - m_Contents[]
+	}
+
 private:
 	/// The contents of the queue
 	QueueType m_Contents;

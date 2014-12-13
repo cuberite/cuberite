@@ -49,17 +49,17 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 				a_Player.Detach();
 				return;
 			}
-		
+
 			if (m_Attachee->IsPlayer())
 			{
 				// Another player is already sitting in here, cannot attach
 				return;
 			}
-		
+
 			// Detach whatever is sitting in this pig now:
 			m_Attachee->Detach();
 		}
-	
+
 		// Attach the player to this pig
 		a_Player.AttachTo(this);
 	}
@@ -100,7 +100,7 @@ void cPig::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
-{	
+{
 	if (!super::DoTakeDamage(a_TDI))
 	{
 		return false;

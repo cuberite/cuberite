@@ -10,7 +10,6 @@
 #define MAX_PLAYERS 65535
 
 #include "Simulator/SimulatorManager.h"
-#include "MersenneTwister.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
@@ -26,6 +25,7 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
+#include "FastRandom.h"
 #include "ClientHandle.h"
 
 
@@ -375,6 +375,12 @@ public:
 	
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Queues the chunk for preparing - making sure that it's generated and lit.
+	The specified chunk is queued to be loaded or generated, and lit if needed.
+	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
+	It is legal to call with no callback. */
+	void PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);
 	
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
@@ -808,7 +814,7 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
-
+	
 private:
 
 	friend class cRoot;

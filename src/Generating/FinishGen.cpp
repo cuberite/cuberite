@@ -26,6 +26,8 @@
 #define DEF_OVERWORLD_LAVA_SPRINGS  "0, 0; 10, 5; 11, 45; 48, 2; 64, 1; 255, 0"
 #define DEF_END_WATER_SPRINGS       "0, 1; 255, 1"
 #define DEF_END_LAVA_SPRINGS        "0, 1; 255, 1"
+#define DEF_ANIMAL_SPAWN_PERCENT    10
+#define DEF_NO_ANIMALS              0
 
 
 
@@ -65,7 +67,7 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			continue;
 		}
-		
+
 		// Choose what block to use.
 		NOISE_DATATYPE BlockType = m_Noise.IntNoise3D((int) ChunkX, y, (int) ChunkZ);
 		if (BlockType < -0.7)
@@ -195,10 +197,10 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			{
 				continue;
 			}
-			
+
 			// Get the top block + 1. This is the place where the grass would finaly be placed:
 			int y = a_ChunkDesc.GetHeight(x, z) + 1;
-			
+
 			if (y >= 255)
 			{
 				continue;
@@ -281,7 +283,7 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 	{
 		return false;
 	}
-	
+
 	// All conditions met, place a sugarcane here:
 	a_ChunkDesc.SetBlockType(a_RelX, a_RelY + 1, a_RelZ, E_BLOCK_SUGARCANE);
 	return true;
@@ -294,7 +296,7 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 {
 	// Generate small foliage (1-block):
-	
+
 	// TODO: Update heightmap with 1-block-tall foliage
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -319,7 +321,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 				// WEIRD, since we're using heightmap, so there should NOT be anything above it
 				continue;
 			}
-			
+
 			const float xx = (float)BlockX;
 			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f);
 			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f);
@@ -359,7 +361,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 					}
 					break;
 				}  // case E_BLOCK_GRASS
-				
+
 				case E_BLOCK_SAND:
 				{
 					int y = Top + 1;
@@ -370,7 +372,8 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x,     y, z + 1) == E_BLOCK_AIR) &&
-						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR)
+						(a_ChunkDesc.GetBlockType(x,     y, z - 1) == E_BLOCK_AIR) &&
+						IsDesertVariant(a_ChunkDesc.GetBiome(x, z))
 					)
 					{
 						a_ChunkDesc.SetBlockType(x, ++Top, z, E_BLOCK_CACTUS);
@@ -385,6 +388,72 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			a_ChunkDesc.SetHeight(x, z, Top);
 		}  // for y
 	}  // for z
+}
+
+
+
+
+
+bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_Biome)
+{
+	return
+	(
+		(a_Biome == biDesertHills) ||
+		(a_Biome == biDesert) ||
+		(a_Biome == biDesertM)
+	);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cFinishGenSoulsandRims
+
+void cFinishGenSoulsandRims::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	int ChunkX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+	int ChunkZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
+
+	for (int x = 0; x < 16; x++)
+	{
+		int xx = ChunkX + x;
+		for (int z = 0; z < 16; z++)
+		{
+			int zz = ChunkZ + z;
+
+			// Place soulsand rims when netherrack gets thin
+			for (int y = 2; y < MaxHeight - 2; y++)
+			{
+				// The current block is air. Let's bail ut.
+				BLOCKTYPE Block = a_ChunkDesc.GetBlockType(x, y, z);
+				if (Block == E_BLOCK_AIR)
+				{
+					continue;
+				}
+
+				if (
+					((a_ChunkDesc.GetBlockType(x, y + 1, z) != E_BLOCK_AIR) &&
+					( a_ChunkDesc.GetBlockType(x, y + 2, z) != E_BLOCK_AIR)) ||
+					((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_AIR) &&
+					( a_ChunkDesc.GetBlockType(x, y - 2, z) != E_BLOCK_AIR))
+				)
+				{
+					continue;
+				}
+
+				NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(xx)) / 32;
+				NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(zz)) / 32;
+				NOISE_DATATYPE CompBlock = m_Noise.CubicNoise3D(NoiseX, (float) (y) / 4, NoiseY);
+				if (CompBlock < 0)
+				{
+					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_SOULSAND);
+				}
+			}
+		}
+	}
 }
 
 
@@ -716,7 +785,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 			}  // for y
 		}  // for x
 	}  // for z
-	
+
 	// Turn fluid at the chunk edges into non-stationary fluid:
 	for (int y = 0; y < cChunkDef::Height; y++)
 	{
@@ -808,12 +877,12 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 		// Not in this chunk
 		return;
 	}
-	
+
 	// Get the height at which to try:
 	int Height = m_Noise.IntNoise3DInt(128 * a_ChunkDesc.GetChunkX(), 1024, 256 * a_ChunkDesc.GetChunkZ()) / 11;
 	Height %= m_HeightDistribution.GetSum();
 	Height = m_HeightDistribution.MapValue(Height);
-	
+
 	// Try adding the spring at the height, if unsuccessful, move lower:
 	for (int y = Height; y > 1; y--)
 	{
@@ -851,7 +920,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	{
 		return false;
 	}
-	
+
 	static const struct
 	{
 		int x, y, z;
@@ -882,10 +951,243 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	{
 		return false;
 	}
-	
+
 	// Has exactly one air neighbor, place a spring:
 	a_ChunkDesc.SetBlockTypeMeta(x, y, z, m_Fluid, 0);
 	return true;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cFinishGenPassiveMobs:
+
+cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension) :
+	m_Noise(a_Seed)
+{
+	AString SectionName = "Animals";
+	int DefaultAnimalSpawnChunkPercentage = DEF_ANIMAL_SPAWN_PERCENT;
+	switch (a_Dimension)
+	{
+		case dimOverworld:
+		{
+			DefaultAnimalSpawnChunkPercentage = DEF_ANIMAL_SPAWN_PERCENT;
+			break;
+		}
+		case dimNether:
+		case dimEnd:  // No nether or end animals (currently)
+		{
+			DefaultAnimalSpawnChunkPercentage = DEF_NO_ANIMALS;
+			break;
+		}
+		default:
+		{
+			ASSERT(!"Unhandled world dimension");
+			DefaultAnimalSpawnChunkPercentage = DEF_NO_ANIMALS;
+			break;
+		}
+	}  // switch (dimension)
+	m_AnimalProbability = a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
+	if ((m_AnimalProbability < 0) || (m_AnimalProbability > 100))
+	{
+		LOGWARNING("[Animals]: AnimalSpawnChunkPercentage is invalid, using the default of \"%d\".", DefaultAnimalSpawnChunkPercentage);
+		m_AnimalProbability = DefaultAnimalSpawnChunkPercentage;
+	}
+}
+
+
+
+
+
+void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	int chunkX = a_ChunkDesc.GetChunkX();
+	int chunkZ = a_ChunkDesc.GetChunkZ();
+	int ChanceRnd = (m_Noise.IntNoise2DInt(chunkX, chunkZ) / 7) % 100;
+	if (ChanceRnd > m_AnimalProbability)
+	{
+		return;
+	}
+
+	eMonsterType RandomMob = GetRandomMob(a_ChunkDesc);
+	if (RandomMob == mtInvalidType)
+	{
+		// No mobs here. Don't send an error, because if the biome was a desert it would return mtInvalidType as well.
+		return;
+	}
+
+	// Try spawning a pack center 10 times, should get roughly the same probability
+	for (int Tries = 0; Tries < 10; Tries++)
+	{
+		int PackCenterX = (m_Noise.IntNoise2DInt(chunkX + chunkZ, Tries) / 7) % cChunkDef::Width;
+		int PackCenterZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries) / 7) % cChunkDef::Width;
+		if (TrySpawnAnimals(a_ChunkDesc, PackCenterX, a_ChunkDesc.GetHeight(PackCenterX, PackCenterZ), PackCenterZ, RandomMob))
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				int OffsetX = (m_Noise.IntNoise2DInt(chunkX + chunkZ + i, Tries) / 7) % cChunkDef::Width;
+				int OffsetZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries + i) / 7) % cChunkDef::Width;
+				TrySpawnAnimals(a_ChunkDesc, OffsetX, a_ChunkDesc.GetHeight(OffsetX, OffsetZ), OffsetZ, RandomMob);
+			}
+			return;
+
+		}  // if pack center spawn successful
+	}  // for tries
+}
+
+
+
+
+
+bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
+{
+	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
+	{
+		return false;
+	}
+
+	BLOCKTYPE BlockAtHead    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY + 1, a_RelZ);
+	BLOCKTYPE BlockAtFeet    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ);
+	BLOCKTYPE BlockUnderFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY - 1, a_RelZ);
+
+	// Check block below (opaque, grass, water), and above (air)
+	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet != E_BLOCK_WATER))
+	{
+		return false;
+	}
+	if (
+		(AnimalToSpawn != mtSquid) &&
+		(BlockAtHead != E_BLOCK_AIR) &&
+		(BlockAtFeet != E_BLOCK_AIR) &&
+		(!cBlockInfo::IsTransparent(BlockUnderFeet))
+	)
+	{
+		return false;
+	}
+	if (
+		(BlockUnderFeet != E_BLOCK_GRASS) &&
+		((AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
+	)
+	{
+		return false;
+	}
+	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet != E_BLOCK_MYCELIUM))
+	{
+		return false;
+	}
+
+	double AnimalX = static_cast<double>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX + 0.5);
+	double AnimalY = a_RelY;
+	double AnimalZ = static_cast<double>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ + 0.5);
+
+	cMonster * NewMob = cMonster::NewMonsterFromType(AnimalToSpawn);
+	NewMob->SetPosition(AnimalX, AnimalY, AnimalZ);
+	a_ChunkDesc.GetEntities().push_back(NewMob);
+	LOGD("Spawning %s #%i at {%.02f, %.02f, %.02f}", NewMob->GetClass(), NewMob->GetUniqueID(), AnimalX, AnimalY, AnimalZ);
+
+	return true;
+}
+
+
+
+
+
+eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
+{
+
+	std::set<eMonsterType> ListOfSpawnables;
+	int chunkX = a_ChunkDesc.GetChunkX();
+	int chunkZ = a_ChunkDesc.GetChunkZ();
+	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ + 10) / 7) % cChunkDef::Width;
+	int z = (m_Noise.IntNoise2DInt(chunkX + chunkZ, chunkZ) / 7) % cChunkDef::Width;
+
+	// Check biomes first to get a list of animals
+	switch (a_ChunkDesc.GetBiome(x, z))
+	{
+		// No animals in deserts or non-overworld dimensions
+		case biNether:
+		case biEnd:
+		case biDesertHills:
+		case biDesert:
+		case biDesertM:
+		{
+			return mtInvalidType;
+		}
+
+		// Mooshroom only - no other mobs on mushroom islands
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			return mtMooshroom;
+		}
+
+		// Add squid in ocean biomes
+		case biOcean:
+		case biFrozenOcean:
+		case biFrozenRiver:
+		case biRiver:
+		case biDeepOcean:
+		{
+			ListOfSpawnables.insert(mtSquid);
+			break;
+		}
+
+		// Add ocelots in jungle biomes
+		case biJungle:
+		case biJungleHills:
+		case biJungleEdge:
+		case biJungleM:
+		case biJungleEdgeM:
+		{
+			ListOfSpawnables.insert(mtOcelot);
+			break;
+		}
+
+		// Add horses in plains-like biomes
+		case biPlains:
+		case biSunflowerPlains:
+		case biSavanna:
+		case biSavannaPlateau:
+		case biSavannaM:
+		case biSavannaPlateauM:
+		{
+			ListOfSpawnables.insert(mtHorse);
+			break;
+		}
+
+		// Add wolves in forest and spruce forests
+		case biForest:
+		case biTaiga:
+		case biMegaTaiga:
+		case biColdTaiga:
+		case biColdTaigaM:
+		{
+			ListOfSpawnables.insert(mtWolf);
+			break;
+		}
+		// Nothing special about this biome
+		default:
+		{
+			break;
+		}
+	}
+	ListOfSpawnables.insert(mtChicken);
+	ListOfSpawnables.insert(mtCow);
+	ListOfSpawnables.insert(mtPig);
+	ListOfSpawnables.insert(mtSheep);
+
+	if (ListOfSpawnables.empty())
+	{
+		return mtInvalidType;
+	}
+
+	int RandMob = (m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size();
+	auto MobIter = ListOfSpawnables.begin();
+	std::advance(MobIter, RandMob);
+
+	return *MobIter;
 }
 
 

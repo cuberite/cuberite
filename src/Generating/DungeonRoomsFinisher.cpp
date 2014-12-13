@@ -7,6 +7,7 @@
 #include "DungeonRoomsFinisher.h"
 #include "../FastRandom.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/MobSpawnerEntity.h"
 
 
 
@@ -57,6 +58,22 @@ public:
 		int SecondChestPos = (FirstChestPos + 2 + (rnd % (NumPositions - 3))) % NumPositions;
 		m_Chest1 = DecodeChestCoords(FirstChestPos,  SizeX, SizeZ);
 		m_Chest2 = DecodeChestCoords(SecondChestPos, SizeX, SizeZ);
+
+		// Choose what the mobspawner will spawn.
+		// 25% chance for a spider, 25% for a skeleton and 50% chance to get a zombie spawer.
+		int MobType = (a_Noise.IntNoise3DInt(a_OriginX, m_FloorHeight, a_OriginZ) / 7) % 100;
+		if (MobType <= 25)
+		{
+			m_MonsterType = mtSkeleton;
+		}
+		else if (MobType <= 50)
+		{
+			m_MonsterType = mtSpider;
+		}
+		else
+		{
+			m_MonsterType = mtZombie;
+		}
 	}
 
 protected:
@@ -76,6 +93,8 @@ protected:
 	/** The (absolute) coords of the second chest. The Y coord represents the chest's Meta value (facing). */
 	Vector3i m_Chest2;
 
+	/** The monster type for the mobspawner entity. */
+	eMonsterType m_MonsterType;
 
 
 	/** Decodes the position index along the room walls into a proper 2D position for a chest.
@@ -112,8 +131,8 @@ protected:
 	{
 		int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
-		int RelStartX = Clamp(a_StartX - BlockX, 0, cChunkDef::Width - 1);
-		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width - 1);
+		int RelStartX = Clamp(a_StartX - BlockX, 0, cChunkDef::Width);
+		int RelStartZ = Clamp(a_StartZ - BlockZ, 0, cChunkDef::Width);
 		int RelEndX   = Clamp(a_EndX - BlockX,   0, cChunkDef::Width);
 		int RelEndZ   = Clamp(a_EndZ - BlockZ,   0, cChunkDef::Width);
 		for (int y = a_StartY; y < a_EndY; y++)
@@ -246,7 +265,9 @@ protected:
 		)
 		{
 			a_ChunkDesc.SetBlockTypeMeta(CenterX, b, CenterZ, E_BLOCK_MOB_SPAWNER, 0);
-			// TODO: Set the spawned mob
+			cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(CenterX, b, CenterZ));
+			ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
+			MobSpawner->SetEntity(m_MonsterType);
 		}
 	}
 } ;

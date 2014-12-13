@@ -9,7 +9,6 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
-#include "../MersenneTwister.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
@@ -267,7 +266,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 
 	if ((m_Target != nullptr) && m_Target->IsDestroyed())
+	{
 		m_Target = nullptr;
+	}
 
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
@@ -1028,22 +1029,34 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedHelmet().IsEmpty()) a_Drops.push_back(GetEquippedHelmet());
+		if (!GetEquippedHelmet().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedHelmet());
+		}
 	}
 	
 	if (r1.randInt() % 200 < ((m_DropChanceChestplate * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedChestplate().IsEmpty()) a_Drops.push_back(GetEquippedChestplate());
+		if (!GetEquippedChestplate().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedChestplate());
+		}
 	}
 	
 	if (r1.randInt() % 200 < ((m_DropChanceLeggings * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedLeggings().IsEmpty()) a_Drops.push_back(GetEquippedLeggings());
+		if (!GetEquippedLeggings().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedLeggings());
+		}
 	}
 	
 	if (r1.randInt() % 200 < ((m_DropChanceBoots * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedBoots().IsEmpty()) a_Drops.push_back(GetEquippedBoots());
+		if (!GetEquippedBoots().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedBoots());
+		}
 	}
 }
 
@@ -1056,7 +1069,10 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedWeapon().IsEmpty()) a_Drops.push_back(GetEquippedWeapon());
+		if (!GetEquippedWeapon().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedWeapon());
+		}
 	}
 }
 

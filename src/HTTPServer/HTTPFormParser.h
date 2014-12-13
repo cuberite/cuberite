@@ -82,7 +82,7 @@ protected:
 	bool m_IsValid;
 	
 	/// The parser for the multipart data, if used
-	std::auto_ptr<cMultipartParser> m_MultipartParser;
+	std::unique_ptr<cMultipartParser> m_MultipartParser;
 	
 	/// Name of the currently parsed part in multipart data
 	AString m_CurrentPartName;

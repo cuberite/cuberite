@@ -294,7 +294,11 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 	for (AStringVector::const_iterator itr = Str.begin(); itr != Str.end(); ++itr)
 	{
 		// Finishers, alpha-sorted:
-		if (NoCaseCompare(*itr, "BottomLava") == 0)
+		if (NoCaseCompare(*itr, "Animals") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenPassiveMobs(Seed, a_IniFile, Dimension)));
+		}
+		else if (NoCaseCompare(*itr, "BottomLava") == 0)
 		{
 			int DefaultBottomLavaLevel = (Dimension == dimNether) ? 30 : 10;
 			int BottomLavaLevel = a_IniFile.GetValueSetI("Generator", "BottomLavaLevel", DefaultBottomLavaLevel);
@@ -569,6 +573,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 				(float)MaxCeilingHeightCenter, (float)MinCeilingHeightCenter,
 				GridSize, MaxOffset
 			)));
+		}
+		else if (NoCaseCompare(*itr, "SoulsandRims") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenSoulsandRims(Seed)));
 		}
 		else if (NoCaseCompare(*itr, "Snow") == 0)
 		{

@@ -161,26 +161,38 @@ class cMojangAPI::cUpdateThread :
 {
 	typedef cIsThread super;
 public:
-	cUpdateThread() :
-		super("cMojangAPI::cUpdateThread")
+	cUpdateThread(cMojangAPI & a_MojangAPI) :
+		super("cMojangAPI::cUpdateThread"),
+		m_MojangAPI(a_MojangAPI)
 	{
 	}
 
 	~cUpdateThread()
 	{
+		// Notify the thread that it should stop:
+		m_ShouldTerminate = true;
 		m_evtNotify.Set();
+
+		// Wait for the thread to actually finish work:
 		Stop();
 	}
 
 protected:
+
+	/** The cMojangAPI instance to update. */
+	cMojangAPI & m_MojangAPI;
+
+	/** The event used for notifying that the thread should terminate, as well as timing. */
 	cEvent m_evtNotify;
 
+
+	// cIsThread override:
 	virtual void Execute(void) override
 	{
 		do
 		{
-			cRoot::Get()->GetMojangAPI().Update();
-		} while (!m_evtNotify.Wait(60 * 60 * 1000));  // Repeat every 60 minutes
+			m_MojangAPI.Update();
+		} while (!m_ShouldTerminate && !m_evtNotify.Wait(60 * 60 * 1000));  // Repeat every 60 minutes until termination request
 	}
 } ;
 
@@ -197,7 +209,7 @@ cMojangAPI::cMojangAPI(void) :
 	m_UUIDToProfileServer(DEFAULT_UUID_TO_PROFILE_SERVER),
 	m_UUIDToProfileAddress(DEFAULT_UUID_TO_PROFILE_ADDRESS),
 	m_RankMgr(nullptr),
-	m_UpdateThread(new cUpdateThread())
+	m_UpdateThread(new cUpdateThread(*this))
 {
 }
 

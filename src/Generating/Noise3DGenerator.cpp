@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "Noise3DGenerator.h"
 #include "../OSSupport/File.h"
-#include "../OSSupport/Timer.h"
 #include "../IniFile.h"
 #include "../LinearInterpolation.h"
 #include "../LinearUpscale.h"
@@ -739,7 +738,7 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 		case biFlowerForest:         a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
 		case biForest:               a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
 		case biForestHills:          a_HeightAmp = 0.075f; a_MidPoint =  68; break;
-		case biFrozenRiver:          a_HeightAmp = 0.4f;   a_MidPoint =  57; break;
+		case biFrozenRiver:          a_HeightAmp = 0.4f;   a_MidPoint =  54; break;
 		case biFrozenOcean:          a_HeightAmp = 0.12f;  a_MidPoint =  45; break;
 		case biIceMountains:         a_HeightAmp = 0.075f; a_MidPoint =  68; break;
 		case biIcePlains:            a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
@@ -764,7 +763,7 @@ void cBiomalNoise3DComposable::GetBiomeParams(EMCSBiome a_Biome, NOISE_DATATYPE 
 		case biNether:               a_HeightAmp = 0.01f;  a_MidPoint =  64; break;
 		case biOcean:                a_HeightAmp = 0.12f;  a_MidPoint =  45; break;
 		case biPlains:               a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
-		case biRiver:                a_HeightAmp = 0.4f;   a_MidPoint =  57; break;
+		case biRiver:                a_HeightAmp = 0.4f;   a_MidPoint =  54; break;
 		case biRoofedForest:         a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
 		case biRoofedForestM:        a_HeightAmp = 0.1f;   a_MidPoint =  64; break;
 		case biSavanna:              a_HeightAmp = 0.3f;   a_MidPoint =  62; break;
