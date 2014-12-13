@@ -252,7 +252,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 		<h1>]], a_Hook.Name, [[</h1>
 		<hr />
 		</header>
-		<table><tr><td style="vertical-align: top;">
+		<table style="width: 1150px; display: block;"><tr><td style="vertical-align: top;">
 		Index:<br />
 		<a href='index.html#articles'>Articles</a><br />
 		<a href='index.html#classes'>Classes</a><br />
@@ -262,7 +262,7 @@ local function WriteHtmlHook(a_Hook, a_HookNav)
 	]]);
 	f:write(a_HookNav);
 	f:write([[
-		</td><td style="vertical-align: top;"><p>
+		</td><td style="display: block; width: 970px; vertical-align: top;"><p>
 	]]);
 	f:write(LinkifyString(a_Hook.Desc, HookName));
 	f:write("</p>\n<hr /><h1>Callback function</h1>\n<p>The default name for the callback function is ");
@@ -829,7 +829,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 		<h1>]], a_ClassAPI.Name, [[</h1>
 		<hr />
 		</header>
-		<table><tr><td style="vertical-align: top;">
+		<table style="width: 1150px; display: block;"><tr><td style="vertical-align: top;">
 		Index:<br />
 		<a href='index.html#articles'>Articles</a><br />
 		<a href='index.html#classes'>Classes</a><br />
@@ -839,7 +839,7 @@ local function WriteHtmlClass(a_ClassAPI, a_ClassMenu)
 	]]);
 	cf:write(a_ClassMenu);
 	cf:write([[
-		</td><td style="vertical-align: top;"><h1>Contents</h1>
+		</td><td style="display: block; width: 970px; vertical-align: top;"><h1>Contents</h1>
 		<p><ul>
 	]]);
 	
