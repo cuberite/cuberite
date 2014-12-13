@@ -8,13 +8,13 @@ before_install:
 
   # g++4.8
   - if [ "$CXX" = "g++"]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-  - if [ "$CXX" = "g++"]; sudo apt-get update -qq; fi
+  - if [ "$CXX" = "g++"]; then sudo apt-get update -qq; fi
 
 install:
   # g++4.8
-  - if [ "$CXX" = "g++"]; sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++"]; export CXX="g++-4.8"; fi
-  - if [ "$CXX" = "g++"]; export CC="gcc-4.8"; fi
+  - if [ "$CXX" = "g++"]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++"]; then export CXX="g++-4.8"; fi
+  - if [ "$CXX" = "g++"]; then export CC="gcc-4.8"; fi
 
 # Build MCServer
 script: ./CIbuild.sh
