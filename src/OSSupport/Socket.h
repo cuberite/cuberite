@@ -74,7 +74,7 @@ public:
 	inline static bool IsSocketError(int a_ReturnedValue)
 	{
 		#ifdef _WIN32
-			return (a_ReturnedValue == SOCKET_ERROR || a_ReturnedValue == 0);
+			return ((a_ReturnedValue == SOCKET_ERROR) || (a_ReturnedValue == 0));
 		#else
 			return (a_ReturnedValue <= 0);
 		#endif

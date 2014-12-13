@@ -11,7 +11,6 @@
 #include "IniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
-#include "OSSupport/Timer.h"
 #include "SetChunkData.h"
 
 // Serializers
@@ -45,7 +44,6 @@
 #include "MobCensus.h"
 #include "MobSpawner.h"
 
-#include "MersenneTwister.h"
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
@@ -92,7 +90,6 @@ public:
 		m_PrepareDistance(a_PrepareDistance),
 		m_MaxIdx(a_PrepareDistance * a_PrepareDistance),
 		m_NumPrepared(0),
-		m_LastReportTime(0),
 		m_LastReportChunkCount(0)
 	{
 		// Start the thread:
@@ -113,12 +110,12 @@ public:
 		m_MaxIdx = m_PrepareDistance * m_PrepareDistance;
 		int maxQueue = std::min(m_MaxIdx - 1, 100);  // Number of chunks to queue at once
 		m_NextIdx = maxQueue;
-		m_LastReportTime = m_Timer.GetNowTime();
+		m_LastReportTime = std::chrono::steady_clock::now();
 		for (int i = 0; i < maxQueue; i++)
 		{
 			int chunkX, chunkZ;
 			DecodeChunkCoords(i, chunkX, chunkZ);
-			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
+			m_World.PrepareChunk(chunkX, chunkZ, this);
 		}  // for i
 
 		// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
@@ -146,15 +143,11 @@ protected:
 	/** Event used to signal that the preparation is finished. */
 	cEvent m_EvtFinished;
 
-	/** The timer used to report progress every second. */
-	cTimer m_Timer;
-
 	/** The timestamp of the last progress report emitted. */
-	long long m_LastReportTime;
+	std::chrono::steady_clock::time_point m_LastReportTime;
 
 	/** Number of chunks prepared when the last progress report was emitted. */
 	int m_LastReportChunkCount;
-
 
 	// cChunkCoordCallback override:
 	virtual void Call(int a_ChunkX, int a_ChunkZ)
@@ -178,15 +171,15 @@ protected:
 		}
 
 		// Report progress every 1 second:
-		long long now = m_Timer.GetNowTime();
-		if (now - m_LastReportTime > 1000)
+		auto Now = std::chrono::steady_clock::now();
+		if (Now - m_LastReportTime > std::chrono::seconds(1))
 		{
-			float percentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
-			float chunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / (now - m_LastReportTime);
-			LOG("Preparing spawn (%s): %.02f%% done (%d chunks out of %d; %.02f chunks / sec)",
-				m_World.GetName().c_str(), percentDone, m_NumPrepared, m_MaxIdx, chunkSpeed
+			float PercentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
+			float ChunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(Now - m_LastReportTime).count();
+			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks/s)",
+				m_World.GetName().c_str(), PercentDone, m_NumPrepared, m_MaxIdx, ChunkSpeed
 			);
-			m_LastReportTime = now;
+			m_LastReportTime = Now;
 			m_LastReportChunkCount = m_NumPrepared;
 		}
 	}
@@ -239,23 +232,22 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 void cWorld::cTickThread::Execute(void)
 {
-	cTimer Timer;
+	auto LastTime = std::chrono::steady_clock::now();
+	static const auto msPerTick = std::chrono::milliseconds(50);
+	auto TickTime = std::chrono::steady_clock::duration(50);
 
-	const Int64 msPerTick = 50;
-	Int64 LastTime = Timer.GetNowTime();
-
-	Int64 TickDuration = 50;
 	while (!m_ShouldTerminate)
 	{
-		Int64 NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime - LastTime);
-		m_World.Tick(DeltaTime, (int)TickDuration);
-		TickDuration = Timer.GetNowTime() - NowTime;
+		auto NowTime = std::chrono::steady_clock::now();
+		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
+		auto LastTickMsec = std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count();
+		m_World.Tick(static_cast<float>(msec), LastTickMsec);
+		TickTime = std::chrono::steady_clock::now() - NowTime;
 		
-		if (TickDuration < msPerTick)
+		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			cSleep::MilliSleep((unsigned int)(msPerTick - TickDuration));
+			std::this_thread::sleep_for(msPerTick - TickTime);
 		}
 
 		LastTime = NowTime;
@@ -354,6 +346,10 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
+
+	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
+	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
+	m_ChunkMap.reset();
 }
 
 
@@ -614,7 +610,7 @@ void cWorld::Start(void)
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
-	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
+	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmSpectator);
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 	m_Weather          = (eWeather)      Clamp(Weather,          (int)wSunny,     (int)wStorm);
 
@@ -747,7 +743,7 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
 			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
-			a_IniFile.GetValueSet("Generator", "Finishers",      "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
 			break;
 		}
 		case dimNether:
@@ -759,7 +755,7 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
 			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
 			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
-			a_IniFile.GetValueSet("Generator", "Finishers",        "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Finishers",        "SoulsandRims, WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherOreNests, NetherForts, PreSimulator");
 			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
 			break;
 		}
@@ -1809,7 +1805,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		if (!IsValidItem(itr->m_ItemType) || itr->m_ItemType == E_BLOCK_AIR)
+		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
 		{
 			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
 			continue;
@@ -1835,7 +1831,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		if (!IsValidItem(itr->m_ItemType) || itr->m_ItemType == E_BLOCK_AIR)
+		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
 		{
 			continue;
 		}
@@ -2911,6 +2907,15 @@ void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter)
+{
+	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, a_CallAfter);
+}
+
+
+
+
+
 void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
@@ -3021,7 +3026,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
+	m_ChunkMap->GenerateChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -3130,6 +3135,11 @@ bool cWorld::HasEntity(int a_UniqueID)
 	}
 
 	// Check if the entity is in the chunkmap:
+	if (m_ChunkMap.get() == nullptr)
+	{
+		// Chunkmap has already been destroyed, there are no entities anymore.
+		return false;
+	}
 	return m_ChunkMap->HasEntity(a_UniqueID);
 }
 
@@ -3664,6 +3674,7 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
+
 
 
 

@@ -16,7 +16,6 @@
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
 #include "OSSupport/Socket.h"
-#include "OSSupport/Timer.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
@@ -25,8 +24,6 @@
 #include "Root.h"
 
 #include "Protocol/Authenticator.h"
-#include "MersenneTwister.h"
-
 #include "Protocol/ProtocolRecognizer.h"
 #include "CompositeChat.h"
 #include "Items/ItemSword.h"
@@ -41,15 +38,10 @@
 /** Maximum number of block change interactions a player can perform per tick - exceeding this causes a kick */
 #define MAX_BLOCK_CHANGE_INTERACTIONS 20
 
+/** The interval for sending pings to clients.
+Vanilla sends one ping every 1 second. */
+static const std::chrono::milliseconds PING_TIME_MS = std::chrono::milliseconds(1000);
 
-
-
-
-#define RECI_RAND_MAX (1.f/RAND_MAX)
-inline int fRadRand(MTRand & r1, int a_BlockCoord)
-{
-	return a_BlockCoord * 32 + (int)(16 * ((float)r1.rand() * RECI_RAND_MAX) * 16 - 8);
-}
 
 
 
@@ -76,8 +68,6 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	m_TimeSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
-	m_PingStartTime(0),
-	m_LastPingTime(1000),
 	m_BlockDigAnimStage(-1),
 	m_BlockDigAnimSpeed(0),
 	m_BlockDigAnimX(0),
@@ -101,9 +91,7 @@ cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
 	
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
-
-	cTimer t1;
-	m_LastPingTime = t1.GetNowTime();
+	m_PingStartTime = std::chrono::steady_clock::now();
 
 	LOGD("New ClientHandle created at %p", this);
 }
@@ -199,9 +187,13 @@ void cClientHandle::GenerateOfflineUUID(void)
 AString cClientHandle::FormatChatPrefix(bool ShouldAppendChatPrefixes, AString a_ChatPrefixS, AString m_Color1, AString m_Color2)
 {
 	if (ShouldAppendChatPrefixes)
+	{
 		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+	}
 	else
+	{
 		return Printf("%s", m_Color1.c_str());
+	}
 }
 
 
@@ -397,8 +389,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 
 	// Delay the first ping until the client "settles down"
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
-	cTimer t1;
-	m_LastPingTime = t1.GetNowTime() + 3000;  // Send the first KeepAlive packet in 3 seconds
+	m_PingStartTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
 
 	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
 }
@@ -1779,9 +1770,45 @@ void cClientHandle::HandleKeepAlive(int a_KeepAliveID)
 {
 	if (a_KeepAliveID == m_PingID)
 	{
-		cTimer t1;
-		m_Ping = (short)((t1.GetNowTime() - m_PingStartTime) / 2);
+		m_Ping = std::chrono::steady_clock::now() - m_PingStartTime;
 	}
+}
+
+
+
+
+
+bool cClientHandle::CheckMultiLogin(const AString & a_Username)
+{
+	// If the multilogin is allowed, skip this check entirely:
+	if ((cRoot::Get()->GetServer()->DoesAllowMultiLogin()))
+	{
+		return true;
+	}
+	
+	// Check if the player is waiting to be transferred to the World.
+	if (cRoot::Get()->GetServer()->IsPlayerInQueue(a_Username))
+	{
+		Kick("A player of the username is already logged in");
+		return false;
+	}
+
+	class cCallback :
+		public cPlayerListCallback
+	{
+		virtual bool Item(cPlayer * a_Player) override
+		{
+			return true;
+		}
+	} Callback;
+
+	// Check if the player is in any World.
+	if (cRoot::Get()->DoWithPlayer(a_Username, Callback))
+	{
+		Kick("A player of the username is already logged in");
+		return false;
+	}
+	return true;
 }
 
 
@@ -1798,7 +1825,8 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 			return false;
 		}
 	}
-	return true;
+
+	return CheckMultiLogin(a_Username);
 }
 
 
@@ -2005,13 +2033,11 @@ void cClientHandle::Tick(float a_Dt)
 	// Send a ping packet:
 	if (m_State == csPlaying)
 	{
-		cTimer t1;
-		if ((m_LastPingTime + cClientHandle::PING_TIME_MS <= t1.GetNowTime()))
+		if ((m_PingStartTime + PING_TIME_MS <= std::chrono::steady_clock::now()))
 		{
 			m_PingID++;
-			m_PingStartTime = t1.GetNowTime();
+			m_PingStartTime = std::chrono::steady_clock::now();
 			m_Protocol->SendKeepAlive(m_PingID);
-			m_LastPingTime = m_PingStartTime;
 		}
 	}
 

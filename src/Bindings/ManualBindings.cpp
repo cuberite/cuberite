@@ -1874,6 +1874,72 @@ static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_PrepareChunk(lua_State * tolua_S)
+{
+	/* Function signature:
+	World:PrepareChunk(ChunkX, ChunkZ, Callback)
+	*/
+	
+	// Check the param types:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType     (1, "cWorld") ||
+		!L.CheckParamNumber       (2, 3) ||
+		!L.CheckParamFunctionOrNil(4)
+	)
+	{
+		return 0;
+	}
+	
+	// Read the params:
+	cWorld * world = nullptr;
+	int chunkX = 0, chunkZ = 0;
+	L.GetStackValues(1, world, chunkX, chunkZ);
+	if (world == nullptr)
+	{
+		LOGWARNING("World:PrepareChunk(): invalid world parameter");
+		L.LogStackTrace();
+		return 0;
+	}
+
+	// Wrap the Lua callback inside a C++ callback class:
+	class cCallback:
+		public cChunkCoordCallback
+	{
+	public:
+		cCallback(lua_State * a_LuaState):
+			m_LuaState(a_LuaState),
+			m_Callback(m_LuaState, 4)
+		{
+		}
+
+		// cChunkCoordCallback override:
+		virtual void Call(int a_CBChunkX, int a_CBChunkZ) override
+		{
+			if (m_Callback.IsValid())
+			{
+				m_LuaState.Call(m_Callback, a_CBChunkX, a_CBChunkZ);
+			}
+
+			// This is the last reference of this object, we must delete it so that it doesn't leak:
+			delete this;
+		}
+
+	protected:
+		cLuaState m_LuaState;
+		cLuaState::cRef m_Callback;
+	};
+	cCallback * callback = new cCallback(tolua_S);
+
+	// Call the chunk preparation:
+	world->PrepareChunk(chunkX, chunkZ, callback);
+	return 0;
+}
+
+
+
+
+
 static int tolua_cPlayer_GetPermissions(lua_State * tolua_S)
 {
 	// Function signature: cPlayer:GetPermissions() -> {permissions-array}
@@ -3401,6 +3467,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetBlockInfo",              tolua_cWorld_GetBlockInfo);
 			tolua_function(tolua_S, "GetBlockTypeMeta",          tolua_cWorld_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetSignLines",              tolua_cWorld_GetSignLines);
+			tolua_function(tolua_S, "PrepareChunk",              tolua_cWorld_PrepareChunk);
 			tolua_function(tolua_S, "QueueTask",                 tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",              tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetSignLines",              tolua_cWorld_SetSignLines);

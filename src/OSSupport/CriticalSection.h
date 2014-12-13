@@ -1,5 +1,7 @@
 
 #pragma once
+#include <mutex>
+#include <thread>
 
 
 
@@ -8,8 +10,6 @@
 class cCriticalSection
 {
 public:
-	cCriticalSection(void);
-	~cCriticalSection();
 
 	void Lock(void);
 	void Unlock(void);
@@ -17,6 +17,7 @@ public:
 	// IsLocked/IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
 	// The fake versions (in Release) will not effect the program in any way
 	#ifdef _DEBUG
+	cCriticalSection(void);
 	bool IsLocked(void);
 	bool IsLockedByCurrentThread(void);
 	#else
@@ -27,15 +28,10 @@ public:
 private:
 	#ifdef _DEBUG
 	int           m_IsLocked;  // Number of times this CS is locked
-	unsigned long m_OwningThreadID;
+	std::thread::id m_OwningThreadID;
 	#endif  // _DEBUG
 	
-	#ifdef _WIN32
-		CRITICAL_SECTION m_CriticalSection;
-	#else  // _WIN32
-		pthread_mutex_t     m_CriticalSection;
-		pthread_mutexattr_t m_Attributes;
-	#endif  // else _WIN32
+	std::recursive_mutex m_Mutex;
 } ALIGN_8;
 
 

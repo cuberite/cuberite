@@ -6,6 +6,7 @@
 #include "HTTPServer/HTTPServer.h"
 #include "Defines.h"
 #include "RankManager.h"
+#include <thread>
 
 
 
@@ -128,7 +129,10 @@ public:
 
 	/** Finds the player over his uuid and calls the callback */
 	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
-
+	
+	/** Finds the player using it's complete username and calls the callback */
+	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);
+	
 	// tolua_begin
 	
 	/// Sends a chat message to all connected clients (in all worlds)
@@ -177,7 +181,7 @@ private:
 	cCriticalSection m_CSPendingCommands;
 	cCommandQueue    m_PendingCommands;
 
-	cThread * m_InputThread;
+	std::thread m_InputThread;
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
@@ -212,10 +216,10 @@ private:
 	
 	/// Does the actual work of executing a command
 	void DoExecuteConsoleCommand(const AString & a_Cmd);
-
-	static void InputThread(void* a_Params);
 	
 	static cRoot* s_Root;
+
+	static void InputThread(cRoot & a_Params);
 };  // tolua_export
 
 

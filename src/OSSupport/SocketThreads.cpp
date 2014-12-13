@@ -86,7 +86,8 @@ void cSocketThreads::RemoveClient(const cCallback * a_Client)
 		}
 	}  // for itr - m_Threads[]
 
-	ASSERT(!"Removing an unknown client");
+	// This client wasn't found.
+	// It's not an error, because it may have been removed by a different thread in the meantime.
 }
 
 
@@ -491,10 +492,17 @@ void cSocketThreads::cSocketThread::ReadFromSockets(fd_set * a_Read)
 				{
 					case sSlot::ssNormal:
 					{
-						// Notify the callback that the remote has closed the socket; keep the slot
-						m_Slots[i].m_Client->SocketClosed();
+						// Close the socket on our side:
 						m_Slots[i].m_State = sSlot::ssRemoteClosed;
 						m_Slots[i].m_Socket.CloseSocket();
+
+						// Notify the callback that the remote has closed the socket, *after* removing the socket:
+						cCallback * client = m_Slots[i].m_Client;
+						m_Slots[i] = m_Slots[--m_NumSlots];
+						if (client != nullptr)
+						{
+							client->SocketClosed();
+						}
 						break;
 					}
 					case sSlot::ssWritingRestOut:

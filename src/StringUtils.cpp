@@ -416,24 +416,30 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 	{
 		default: return false;
 		// Everything else falls through when "true"...
-		case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-		case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+		case 4: if (((a = (*--srcptr)) < 0x80) || (a > 0xbf)) return false;
+		case 3: if (((a = (*--srcptr)) < 0x80) || (a > 0xbf)) return false;
 		case 2:
 		{
-			if ((a = (*--srcptr)) > 0xBF) return false;
+			if ((a = (*--srcptr)) > 0xbf)
+			{
+				return false;
+			}
 			switch (*source)
 			{
 				// no fall-through in this inner switch
-				case 0xE0: if (a < 0xA0) return false; break;
-				case 0xED: if (a > 0x9F) return false; break;
-				case 0xF0: if (a < 0x90) return false; break;
-				case 0xF4: if (a > 0x8F) return false; break;
+				case 0xe0: if (a < 0xa0) return false; break;
+				case 0xed: if (a > 0x9f) return false; break;
+				case 0xf0: if (a < 0x90) return false; break;
+				case 0xf4: if (a > 0x8f) return false; break;
 				default:   if (a < 0x80) return false;
 			}
 		}
-		case 1: if (*source >= 0x80 && *source < 0xC2) return false;
+		case 1: if ((*source >= 0x80) && (*source < 0xc2)) return false;
 	}
-	if (*source > 0xF4) return false;
+	if (*source > 0xf4)
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -446,11 +452,11 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 	AString UTF16;
 	UTF16.reserve(a_UTF8Length * 3);
 
-	const unsigned char * source    = (const unsigned char*)a_UTF8;
+	const unsigned char * source    = (const unsigned char *)a_UTF8;
 	const unsigned char * sourceEnd = source + a_UTF8Length;
 	const int halfShift  = 10;  // used for shifting by 10 bits
 	const unsigned int halfBase = 0x0010000UL;
-	const unsigned int halfMask = 0x3FFUL;
+	const unsigned int halfMask = 0x3ffUL;
 
 	while (source < sourceEnd)
 	{
@@ -481,7 +487,7 @@ AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length)
 		if (ch <= UNI_MAX_BMP)
 		{
 			// Target is a character <= 0xFFFF
-			if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END)
+			if ((ch >= UNI_SUR_HIGH_START) && (ch <= UNI_SUR_LOW_END))
 			{
 				// UTF-16 surrogate values are illegal in UTF-32
 				ch = ' ';
@@ -520,7 +526,10 @@ are equivalent to the following loop:
 	{
 		ch += *source++;
 		--tmpBytesToRead;
-		if (tmpBytesToRead) ch <<= 6;
+		if (tmpBytesToRead)
+		{
+			ch <<= 6;
+		}
 	} while (tmpBytesToRead > 0);
 }
 ---------------------------------------------------------------------
@@ -723,15 +732,15 @@ AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_
 /// Converts one Hex character in a Base64 encoding into the data value
 static inline int UnBase64(char c)
 {
-	if (c >='A' && c <= 'Z')
+	if ((c >='A') && (c <= 'Z'))
 	{
 		return c - 'A';
 	}
-	if (c >='a' && c <= 'z')
+	if ((c >='a') && (c <= 'z'))
 	{
 		return c - 'a' + 26;
 	}
-	if (c >= '0' && c <= '9')
+	if ((c >= '0') && (c <= '9'))
 	{
 		return c - '0' + 52;
 	}

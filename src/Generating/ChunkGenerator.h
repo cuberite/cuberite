@@ -119,8 +119,12 @@ public:
 	bool Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
 	void Stop(void);
 
-	/// Queues the chunk for generation; removes duplicate requests
-	void QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate);
+	/** Queues the chunk for generation
+	If a-ForceGenerate is set, the chunk is regenerated even if the data is already present in the chunksink.
+	a_Callback is called after the chunk is generated. If the chunk was already present, the callback is still called, even if not regenerating.
+	It is legal to set the callback to nullptr, no callback is called then.
+	If the generator becomes overloaded and skips this chunk, the callback is still called. */
+	void QueueGenerateChunk(int a_ChunkX, int a_ChunkZ, bool a_ForceGenerate, cChunkCoordCallback * a_Callback = nullptr);
 	
 	/// Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading.
 	void GenerateBiomes(int a_ChunkX, int a_ChunkZ, cChunkDef::BiomeMap & a_BiomeMap);
@@ -131,22 +135,46 @@ public:
 	
 	int GetSeed(void) const { return m_Seed; }
 	
-	/// Returns the biome at the specified coords. Used by ChunkMap if an invalid chunk is queried for biome
+	/** Returns the biome at the specified coords. Used by ChunkMap if an invalid chunk is queried for biome */
 	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 
-	/// Reads a block type from the ini file; returns the blocktype on success, emits a warning and returns a_Default's representation on failure.
+	/** Reads a block type from the ini file; returns the blocktype on success, emits a warning and returns a_Default's representation on failure. */
 	static BLOCKTYPE GetIniBlock(cIniFile & a_IniFile, const AString & a_SectionName, const AString & a_ValueName, const AString & a_Default);
 	
 private:
 
+	struct cQueueItem
+	{
+		/** The chunk coords */
+		int m_ChunkX, m_ChunkZ;
+
+		/** Force the regeneration of an already existing chunk */
+		bool m_ForceGenerate;
+
+		/** Callback to call after generating.*/
+		cChunkCoordCallback * m_Callback;
+	};
+
+	typedef std::list<cQueueItem> cGenQueue;
+
+
+	/** Seed used for the generator. */
 	int m_Seed;
 
-	cCriticalSection         m_CS;
-	cChunkCoordsWithBoolList m_Queue;
-	cEvent                   m_Event;       ///< Set when an item is added to the queue or the thread should terminate
-	cEvent                   m_evtRemoved;  ///< Set when an item is removed from the queue
+	/** CS protecting access to the queue. */
+	cCriticalSection m_CS;
+
+	/** Queue of the chunks to be generated. Protected against multithreaded access by m_CS. */
+	cGenQueue m_Queue;
+
+	/** Set when an item is added to the queue or the thread should terminate. */
+	cEvent m_Event;
+
+	/** Set when an item is removed from the queue. */
+	cEvent m_evtRemoved;
 	
-	cGenerator * m_Generator;  ///< The actual generator engine used to generate chunks
+	/** The actual generator engine used to generate chunks. */
+	cGenerator * m_Generator;
 	
 	/** The plugin interface that may modify the generated chunks */
 	cPluginInterface * m_PluginInterface;
@@ -158,6 +186,7 @@ private:
 	// cIsThread override:
 	virtual void Execute(void) override;
 
+	/** Generates the specified chunk and sets it into the chunksink. */
 	void DoGenerate(int a_ChunkX, int a_ChunkZ);
 };
 

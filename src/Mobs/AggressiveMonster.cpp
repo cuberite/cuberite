@@ -75,7 +75,9 @@ void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 
 	if (m_Target == nullptr)
+	{
 		return;
+	}
 
 	cTracer LineOfSight(GetWorld());
 	Vector3d AttackDirection(m_Target->GetPosition() - GetPosition());

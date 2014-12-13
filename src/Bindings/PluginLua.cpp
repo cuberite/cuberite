@@ -382,7 +382,7 @@ bool cPluginLua::OnCollectingPickup(cPlayer & a_Player, cPickup & a_Pickup)
 
 
 
-bool cPluginLua::OnCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginLua::OnCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;

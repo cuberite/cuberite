@@ -11,7 +11,6 @@
 #include "../BlockEntities/BlockEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../Root.h"
-#include "../OSSupport/Timer.h"
 #include "../Chunk.h"
 #include "../Items/ItemHandler.h"
 #include "../Vector3.h"
@@ -27,7 +26,7 @@
 #define PLAYER_INVENTORY_SAVE_INTERVAL 6000
 
 // 1000 = once per second
-#define PLAYER_LIST_TIME_MS 1000
+#define PLAYER_LIST_TIME_MS std::chrono::milliseconds(1000)
 
 
 
@@ -91,9 +90,7 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 	SetMaxHealth(MAX_HEALTH);
 	m_Health = MAX_HEALTH;
 	
-	cTimer t1;
-	m_LastPlayerListTime = t1.GetNowTime();
-	
+	m_LastPlayerListTime = std::chrono::steady_clock::now();
 	m_PlayerName = a_PlayerName;
 
 	cWorld * World = nullptr;
@@ -119,6 +116,11 @@ cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
 		if (World->IsGameModeCreative())
 		{
 			m_CanFly = true;
+		}
+		if (World->IsGameModeSpectator())  // Otherwise Player will fall out of the world on join
+		{
+			m_CanFly = true;
+			m_IsFlying = true;
 		}
 	}
 	
@@ -263,11 +265,10 @@ void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
 	m_Inventory.UpdateItems();
 
 	// Send Player List (Once per m_LastPlayerListTime/1000 ms)
-	cTimer t1;
-	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= t1.GetNowTime())
+	if (m_LastPlayerListTime + PLAYER_LIST_TIME_MS <= std::chrono::steady_clock::now())
 	{
 		m_World->BroadcastPlayerListUpdatePing(*this);
-		m_LastPlayerListTime = t1.GetNowTime();
+		m_LastPlayerListTime = std::chrono::steady_clock::now();
 	}
 
 	if (IsFlying())
@@ -358,7 +359,7 @@ float cPlayer::GetXpPercentage()
 
 bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 {
-	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (SHRT_MAX - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<short>().max() - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false;  // oops, they gave us a dodgey number
@@ -378,18 +379,17 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 
 short cPlayer::DeltaExperience(short a_Xp_delta)
 {
-	if (a_Xp_delta > (SHRT_MAX - m_CurrentXp))
+	if (a_Xp_delta > (std::numeric_limits<short>().max() - m_CurrentXp))
 	{
 		// Value was bad, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.",
-			a_Xp_delta);
+		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.", a_Xp_delta);
 		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	m_CurrentXp = std::max<short int>(m_CurrentXp, 0);
+	m_CurrentXp = std::max<short>(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -397,8 +397,7 @@ short cPlayer::DeltaExperience(short a_Xp_delta)
 		m_LifetimeTotalXp += a_Xp_delta;
 	}
 
-	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d",
-		GetName().c_str(), a_Xp_delta, m_CurrentXp);
+	LOGD("Player \"%s\" gained/lost %d experience, total is now: %d", GetName().c_str(), a_Xp_delta, m_CurrentXp);
 
 	// Set experience to be updated
 	m_bDirtyExperience = true;
@@ -1074,7 +1073,7 @@ bool cPlayer::IsGameModeAdventure(void) const
 bool cPlayer::IsGameModeSpectator(void) const
 {
 	return (m_GameMode == gmSpectator) ||  // Either the player is explicitly in Spectator
-		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Adventure
+		((m_GameMode == gmNotSet) &&  m_World->IsGameModeSpectator());  // or they inherit from the world and the world is Spectator
 }
 
 
@@ -1893,8 +1892,8 @@ void cPlayer::UseEquippedItem(int a_Amount)
 
 void cPlayer::TickBurning(cChunk & a_Chunk)
 {
-	// Don't burn in creative and stop burning in creative if necessary
-	if (!IsGameModeCreative())
+	// Don't burn in creative or spectator and stop burning in creative if necessary
+	if (!IsGameModeCreative() && !IsGameModeSpectator())
 	{
 		super::TickBurning(a_Chunk);
 	}
@@ -1913,9 +1912,9 @@ void cPlayer::HandleFood(void)
 {
 	// Ref.: http://www.minecraftwiki.net/wiki/Hunger
 
-	if (IsGameModeCreative())
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
-		// Hunger is disabled for Creative
+		// Hunger is disabled for Creative and Spectator
 		return;
 	}
 
@@ -2080,7 +2079,7 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 
 void cPlayer::ApplyFoodExhaustionFromMovement()
 {
-	if (IsGameModeCreative())
+	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
 		return;
 	}

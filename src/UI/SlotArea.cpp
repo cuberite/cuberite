@@ -1167,7 +1167,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	{
 		m_MaximumCost = 39;
 	}
-	if (m_MaximumCost >= 40 && !a_Player.IsGameModeCreative())
+	if ((m_MaximumCost >= 40) && !a_Player.IsGameModeCreative())
 	{
 		Input.Empty();
 	}
@@ -2322,7 +2322,7 @@ cItem * cSlotAreaTemporary::GetPlayerSlots(cPlayer & a_Player)
 	{
 		return nullptr;
 	}
-	return &(itr->second[0]);
+	return itr->second.data();
 }
 
 
