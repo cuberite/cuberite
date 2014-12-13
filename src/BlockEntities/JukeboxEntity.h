@@ -7,15 +7,6 @@
 
 
 
-namespace Json
-{
-	class Value;
-}
-
-
-
-
-
 // tolua_begin
 
 class cJukeboxEntity :
@@ -26,7 +17,7 @@ public:
 
 	// tolua_end
 	
-	BLOCKENTITY_PROTODEF(cJukeboxEntity);
+	BLOCKENTITY_PROTODEF(cJukeboxEntity)
 	
 	cJukeboxEntity(int a_BlockX, int a_BlockY, int a_BlockZ, cWorld * a_World);
 	virtual ~cJukeboxEntity();

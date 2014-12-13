@@ -53,7 +53,6 @@ set(SHARED_OSS_SRC
 	../../src/OSSupport/File.cpp
 	../../src/OSSupport/GZipFile.cpp
 	../../src/OSSupport/IsThread.cpp
-	../../src/OSSupport/Timer.cpp
 )
 
 set(SHARED_OSS_HDR
@@ -62,7 +61,6 @@ set(SHARED_OSS_HDR
 	../../src/OSSupport/File.h
 	../../src/OSSupport/GZipFile.h
 	../../src/OSSupport/IsThread.h
-	../../src/OSSupport/Timer.h
 )
 
 flatten_files(SHARED_SRC)

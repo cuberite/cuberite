@@ -215,11 +215,17 @@ public:
 	const AString & GetUsername(void) const;
 	void SetUsername( const AString & a_Username);
 	
-	inline short GetPing(void) const { return m_Ping; }
+	inline short GetPing(void) const { return static_cast<short>(std::chrono::duration_cast<std::chrono::milliseconds>(m_Ping).count()); }
 	
+	/** Sets the maximal view distance. */
 	void SetViewDistance(int a_ViewDistance);
-	int  GetViewDistance(void) const { return m_ViewDistance; }
-	
+
+	/** Returns the view distance that the player currently have. */
+	int GetViewDistance(void) const { return m_CurrentViewDistance; }
+
+	/** Returns the view distance that the player request, not the used view distance. */
+	int GetRequestedViewDistance(void) const { return m_RequestedViewDistance; }
+
 	void SetLocale(AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
 
@@ -273,6 +279,10 @@ public:
 	void HandleEntityCrouch           (int a_EntityID, bool a_IsCrouching);
 	void HandleEntityLeaveBed         (int a_EntityID);
 	void HandleEntitySprinting        (int a_EntityID, bool a_IsSprinting);
+	
+	/** Kicks the client if the same username is already logged in.
+	Returns false if the client has been kicked, true otherwise. */
+	bool CheckMultiLogin(const AString & a_Username);
 	
 	/** Called when the protocol handshake has been received (for protocol versions that support it;
 	otherwise the first instant when a username is received).
@@ -333,12 +343,12 @@ private:
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
 
-	/** Number of chunks the player can see in each direction */
-	int m_ViewDistance;
-	
-	/** Server generates this many chunks AHEAD of player sight. */
-	static const int GENERATEDISTANCE = 2;
-	
+	/** The actual view distance used, the minimum of client's requested view distance and world's max view distance. */
+	int m_CurrentViewDistance;
+
+	/** The requested view distance from the player. It isn't clamped with 1 and the max view distance of the world. */
+	int m_RequestedViewDistance;
+
 	AString m_IPString;
 
 	AString m_Username;
@@ -372,12 +382,15 @@ private:
 	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
 	float m_TimeSinceLastPacket;
 	
-	short m_Ping;
-	int   m_PingID;
-	long long m_PingStartTime;
-	long long m_LastPingTime;
-	static const unsigned short PING_TIME_MS = 1000;  // Vanilla sends 1 per 20 ticks (1 second or every 1000 ms)
-	
+	/** Duration of the last completed client ping. */
+	std::chrono::steady_clock::duration m_Ping;
+
+	/** ID of the last ping request sent to the client. */
+	int m_PingID;
+
+	/** Time of the last ping request sent to the client. */
+	std::chrono::steady_clock::time_point m_PingStartTime;
+
 	// Values required for block dig animation
 	int m_BlockDigAnimStage;  // Current stage of the animation; -1 if not digging
 	int m_BlockDigAnimSpeed;  // Current speed of the animation (units ???)
@@ -432,6 +445,9 @@ private:
 
 	/** Client Settings */
 	AString m_Locale;
+
+	/** The positions from the last sign that the player placed. It's needed to verify the sign text change. */
+	Vector3i m_LastPlacedSign;
 	
 	/** The plugin channels that the client has registered. */
 	cChannels m_PluginChannels;

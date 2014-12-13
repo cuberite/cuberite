@@ -200,7 +200,7 @@ public:
 
 
 
-BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString)
+int BlockStringToType(const AString & a_BlockTypeString)
 {
 	int res = atoi(a_BlockTypeString.c_str());
 	if ((res != 0) || (a_BlockTypeString.compare("0") == 0))
@@ -217,7 +217,12 @@ BLOCKTYPE BlockStringToType(const AString & a_BlockTypeString)
 
 bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 {
-	return gsBlockIDMap.ResolveItem(TrimString(a_ItemTypeString), a_Item);
+	AString ItemName = TrimString(a_ItemTypeString);
+	if (ItemName.substr(0, 10) == "minecraft:")
+	{
+		ItemName = ItemName.substr(10);
+	}
+	return gsBlockIDMap.ResolveItem(ItemName, a_Item);
 }
 
 

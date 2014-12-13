@@ -9,7 +9,7 @@
 // Email:        Shane.Hill@dsto.defence.gov.au
 // Reason:       Remove dependancy on MFC. Code should compile on any
 //               platform.
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /*
 !! MODIFIED BY FAKETRUTH and xoft !!
@@ -79,7 +79,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		}
 	}
 
-	bool IsFirstLine = true;  
+	bool IsFirstLine = true;
 
 	while (getline(f, line))
 	{
@@ -866,7 +866,7 @@ AString cIniFile::CheckCase(const AString & s) const
 
 void cIniFile::RemoveBom(AString & a_line) const
 {
-	// The BOM sequence for UTF-8 is 0xEF,0xBB,0xBF
+	// The BOM sequence for UTF-8 is 0xEF, 0xBB, 0xBF
 	static unsigned const char BOM[] = { 0xEF, 0xBB, 0xBF };
 
 	// The BOM sequence, if present, is always th e first three characters of the input.

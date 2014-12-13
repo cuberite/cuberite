@@ -10,14 +10,14 @@
 #pragma once
 
 #include "ComposableGenerator.h"
-#include "../Noise.h"
+#include "../Noise/Noise.h"
 
 
 
 
 
 class cEndGen :
-	public cTerrainHeightGen,
+	public cTerrainShapeGen,
 	public cTerrainCompositionGen
 {
 public:
@@ -59,10 +59,10 @@ protected:
 	/// Returns true if the chunk is outside of the island's dimensions
 	bool IsChunkOutsideRange(int a_ChunkX, int a_ChunkZ);
 		
-	// cTerrainHeightGen overrides:
-	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override;
+	// cTerrainShapeGen overrides:
+	virtual void GenShape(int a_ChunkX, int a_ChunkZ, cChunkDesc::Shape & a_Shape) override;
 
 	// cTerrainCompositionGen overrides:
-	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc) override;
+	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;

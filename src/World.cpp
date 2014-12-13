@@ -11,7 +11,6 @@
 #include "IniFile.h"
 #include "ChunkMap.h"
 #include "Generating/ChunkDesc.h"
-#include "OSSupport/Timer.h"
 #include "SetChunkData.h"
 
 // Serializers
@@ -45,7 +44,6 @@
 #include "MobCensus.h"
 #include "MobSpawner.h"
 
-#include "MersenneTwister.h"
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
@@ -74,102 +72,134 @@ const int TIME_SPAWN_DIVISOR =   148;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cWorldLoadProgress:
+// cSpawnPrepare:
 
-/// A simple thread that displays the progress of world loading / saving in cWorld::InitializeSpawn()
-class cWorldLoadProgress :
-	public cIsThread
+/** Generates and lights the spawn area of the world. Runs as a separate thread. */
+class cSpawnPrepare:
+	public cIsThread,
+	public cChunkCoordCallback
 {
-public:
-	cWorldLoadProgress(cWorld * a_World) :
-		cIsThread("cWorldLoadProgress"),
-		m_World(a_World)
-	{
-		Start();
-	}
-	
-	void Stop(void)
-	{
-		m_ShouldTerminate = true;
-		Wait();
-	}
-	
-protected:
+	typedef cIsThread super;
 
-	cWorld * m_World;
-	
+public:
+	cSpawnPrepare(cWorld & a_World, int a_SpawnChunkX, int a_SpawnChunkZ, int a_PrepareDistance):
+		super("SpawnPrepare"),
+		m_World(a_World),
+		m_SpawnChunkX(a_SpawnChunkX),
+		m_SpawnChunkZ(a_SpawnChunkZ),
+		m_PrepareDistance(a_PrepareDistance),
+		m_MaxIdx(a_PrepareDistance * a_PrepareDistance),
+		m_NumPrepared(0),
+		m_LastReportChunkCount(0)
+	{
+		// Start the thread:
+		Start();
+
+		// Wait for start confirmation, so that the thread can be waited-upon after the constructor returns:
+		m_EvtStarted.Wait();
+	}
+
+
+	// cIsThread override:
 	virtual void Execute(void) override
 	{
-		for (;;)
+		// Confirm thread start:
+		m_EvtStarted.Set();
+
+		// Queue the initial chunks:
+		m_MaxIdx = m_PrepareDistance * m_PrepareDistance;
+		int maxQueue = std::min(m_MaxIdx - 1, 100);  // Number of chunks to queue at once
+		m_NextIdx = maxQueue;
+		m_LastReportTime = std::chrono::steady_clock::now();
+		for (int i = 0; i < maxQueue; i++)
 		{
-			LOG("" SIZE_T_FMT  " chunks to load, %d chunks to generate",
-				m_World->GetStorage().GetLoadQueueLength(),
-				m_World->GetGenerator().GetQueueLength()
-			);
-			
-			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
-			for (int i = 0; i < 20; i++)
-			{
-				cSleep::MilliSleep(100);
-				if (m_ShouldTerminate)
-				{
-					return;
-				}
-			}
-		}  // for (-ever)
+			int chunkX, chunkZ;
+			DecodeChunkCoords(i, chunkX, chunkZ);
+			m_World.PrepareChunk(chunkX, chunkZ, this);
+		}  // for i
+
+		// Wait for the lighting thread to prepare everything. Event is set in the Call() callback:
+		m_EvtFinished.Wait();
 	}
-	
-} ;
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWorldLightingProgress:
-
-/// A simple thread that displays the progress of world lighting in cWorld::InitializeSpawn()
-class cWorldLightingProgress :
-	public cIsThread
-{
-public:
-	cWorldLightingProgress(cLightingThread * a_Lighting) :
-		cIsThread("cWorldLightingProgress"),
-		m_Lighting(a_Lighting)
-	{
-		Start();
-	}
-	
-	void Stop(void)
-	{
-		m_ShouldTerminate = true;
-		Wait();
-	}
-	
 protected:
+	cWorld & m_World;
+	int m_SpawnChunkX;
+	int m_SpawnChunkZ;
+	int m_PrepareDistance;
 
-	cLightingThread * m_Lighting;
-	
-	virtual void Execute(void) override
+	/** The index of the next chunk to be queued in the lighting thread. */
+	int m_NextIdx;
+
+	/** The maximum index of the prepared chunks. Queueing stops when m_NextIdx reaches this number. */
+	int m_MaxIdx;
+
+	/** Total number of chunks already finished preparing. Preparation finishes when this number reaches m_MaxIdx. */
+	int m_NumPrepared;
+
+	/** Event used to signal that the thread has started. */
+	cEvent m_EvtStarted;
+
+	/** Event used to signal that the preparation is finished. */
+	cEvent m_EvtFinished;
+
+	/** The timestamp of the last progress report emitted. */
+	std::chrono::steady_clock::time_point m_LastReportTime;
+
+	/** Number of chunks prepared when the last progress report was emitted. */
+	int m_LastReportChunkCount;
+
+	// cChunkCoordCallback override:
+	virtual void Call(int a_ChunkX, int a_ChunkZ)
 	{
-		for (;;)
+		// Check if this was the last chunk:
+		m_NumPrepared += 1;
+		if (m_NumPrepared >= m_MaxIdx)
 		{
-			LOG("" SIZE_T_FMT  " chunks remaining to light", m_Lighting->GetQueueLength()
+			m_EvtFinished.Set();
+			// Must return here, because "this" may have gotten deleted by the previous line
+			return;
+		}
+
+		// Queue another chunk, if appropriate:
+		if (m_NextIdx < m_MaxIdx)
+		{
+			int chunkX, chunkZ;
+			DecodeChunkCoords(m_NextIdx, chunkX, chunkZ);
+			m_World.GetLightingThread().QueueChunk(chunkX, chunkZ, this);
+			m_NextIdx += 1;
+		}
+
+		// Report progress every 1 second:
+		auto Now = std::chrono::steady_clock::now();
+		if (Now - m_LastReportTime > std::chrono::seconds(1))
+		{
+			float PercentDone = static_cast<float>(m_NumPrepared * 100) / m_MaxIdx;
+			float ChunkSpeed = static_cast<float>((m_NumPrepared - m_LastReportChunkCount) * 1000) / std::chrono::duration_cast<std::chrono::milliseconds>(Now - m_LastReportTime).count();
+			LOG("Preparing spawn (%s): %.02f%% (%d/%d; %.02f chunks/s)",
+				m_World.GetName().c_str(), PercentDone, m_NumPrepared, m_MaxIdx, ChunkSpeed
 			);
-			
-			// Wait for 2 sec, but be "reasonably wakeable" when the thread is to finish
-			for (int i = 0; i < 20; i++)
-			{
-				cSleep::MilliSleep(100);
-				if (m_ShouldTerminate)
-				{
-					return;
-				}
-			}
-		}  // for (-ever)
+			m_LastReportTime = Now;
+			m_LastReportChunkCount = m_NumPrepared;
+		}
 	}
-	
-} ;
+
+
+	/** Decodes the index into chunk coords. Provides the specific chunk ordering. */
+	void DecodeChunkCoords(int a_Idx, int & a_ChunkX, int & a_ChunkZ)
+	{
+		// A zigzag pattern from the top to bottom, each row alternating between forward-x and backward-x:
+		int z = a_Idx / m_PrepareDistance;
+		int x = a_Idx % m_PrepareDistance;
+		if ((z & 1) == 0)
+		{
+			// Reverse every second row:
+			x = m_PrepareDistance - 1 - x;
+		}
+		a_ChunkZ = m_SpawnChunkZ + z - m_PrepareDistance / 2;
+		a_ChunkX = m_SpawnChunkX + x - m_PrepareDistance / 2;
+	}
+};
 
 
 
@@ -202,23 +232,22 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 void cWorld::cTickThread::Execute(void)
 {
-	cTimer Timer;
+	auto LastTime = std::chrono::steady_clock::now();
+	static const auto msPerTick = std::chrono::milliseconds(50);
+	auto TickTime = std::chrono::steady_clock::duration(50);
 
-	const Int64 msPerTick = 50;
-	Int64 LastTime = Timer.GetNowTime();
-
-	Int64 TickDuration = 50;
 	while (!m_ShouldTerminate)
 	{
-		Int64 NowTime = Timer.GetNowTime();
-		float DeltaTime = (float)(NowTime - LastTime);
-		m_World.Tick(DeltaTime, (int)TickDuration);
-		TickDuration = Timer.GetNowTime() - NowTime;
+		auto NowTime = std::chrono::steady_clock::now();
+		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
+		auto LastTickMsec = std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count();
+		m_World.Tick(static_cast<float>(msec), LastTickMsec);
+		TickTime = std::chrono::steady_clock::now() - NowTime;
 		
-		if (TickDuration < msPerTick)
+		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
-			cSleep::MilliSleep((unsigned int)(msPerTick - TickDuration));
+			std::this_thread::sleep_for(msPerTick - TickTime);
 		}
 
 		LastTime = NowTime;
@@ -283,6 +312,7 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_bCommandBlocksEnabled(true),
 	m_bUseChatPrefixes(false),
 	m_TNTShrapnelLevel(slNone),
+	m_MaxViewDistance(12),
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
@@ -316,6 +346,10 @@ cWorld::~cWorld()
 	Serializer.Save();
 
 	m_MapManager.SaveMapData();
+
+	// Explicitly destroy the chunkmap, so that it's guaranteed to be destroyed before the other internals
+	// This fixes crashes on stopping the server, because chunk destructor deletes entities and those access the world.
+	m_ChunkMap.reset();
 }
 
 
@@ -431,53 +465,9 @@ void cWorld::InitializeSpawn(void)
 	IniFile.ReadFile(m_IniFileName);
 	int ViewDist = IniFile.GetValueSetI("SpawnPosition", "PregenerateDistance", DefaultViewDist);
 	IniFile.WriteFile(m_IniFileName);
-	
-	LOG("Preparing spawn area in world \"%s\", %d x %d chunks, total %d chunks...", m_WorldName.c_str(), ViewDist, ViewDist, ViewDist * ViewDist);
-	for (int x = 0; x < ViewDist; x++)
-	{
-		for (int z = 0; z < ViewDist; z++)
-		{
-			m_ChunkMap->TouchChunk(x + ChunkX-(ViewDist - 1) / 2, z + ChunkZ-(ViewDist - 1) / 2);  // Queue the chunk in the generator / loader
-		}
-	}
-	
-	{
-		// Display progress during this process:
-		cWorldLoadProgress Progress(this);
-		
-		// Wait for the loader to finish loading
-		m_Storage.WaitForLoadQueueEmpty();
-		
-		// Wait for the generator to finish generating
-		m_Generator.WaitForQueueEmpty();
 
-		// Wait for the loader to finish saving
-		m_Storage.WaitForSaveQueueEmpty();
-		
-		Progress.Stop();
-	}
-	
-	// Light all chunks that have been newly generated:
-	LOG("Lighting spawn area in world \"%s\"...", m_WorldName.c_str());
-	
-	for (int x = 0; x < ViewDist; x++)
-	{
-		int ChX = x + ChunkX-(ViewDist - 1) / 2;
-		for (int z = 0; z < ViewDist; z++)
-		{
-			int ChZ = z + ChunkZ-(ViewDist - 1) / 2;
-			if (!m_ChunkMap->IsChunkLighted(ChX, ChZ))
-			{
-				m_Lighting.QueueChunk(ChX, ChZ);  // Queue the chunk in the lighting thread
-			}
-		}  // for z
-	}  // for x
-	
-	{
-		cWorldLightingProgress Progress(&m_Lighting);
-		m_Lighting.WaitForQueueEmpty();
-		Progress.Stop();
-	}
+	cSpawnPrepare prep(*this, ChunkX, ChunkZ, ViewDist);
+	prep.Wait();
 	
 	#ifdef TEST_LINEBLOCKTRACER
 	// DEBUG: Test out the cLineBlockTracer class by tracing a few lines:
@@ -561,6 +551,8 @@ void cWorld::Start(void)
 	m_BroadcastDeathMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastDeathMessages", true);
 	m_BroadcastAchievementMessages = IniFile.GetValueSetB("Broadcasting", "BroadcastAchievementMessages", true);
 
+	SetMaxViewDistance(IniFile.GetValueSetI("SpawnPosition", "MaxViewDistance", 12));
+
 	// Try to find the "SpawnPosition" key and coord values in the world configuration, set the flag if found
 	int KeyNum = IniFile.FindKey("SpawnPosition");
 	m_IsSpawnExplicitlySet =
@@ -618,7 +610,7 @@ void cWorld::Start(void)
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
-	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmAdventure);
+	m_GameMode         = (eGameMode)     Clamp(GameMode,         (int)gmSurvival, (int)gmSpectator);
 	m_TNTShrapnelLevel = (eShrapnelLevel)Clamp(TNTShrapnelLevel, (int)slNone,     (int)slAll);
 	m_Weather          = (eWeather)      Clamp(Weather,          (int)wSunny,     (int)wStorm);
 
@@ -738,28 +730,32 @@ void cWorld::InitialiseGeneratorDefaults(cIniFile & a_IniFile)
 	{
 		case dimEnd:
 		{
-			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome", "End");
-			a_IniFile.GetValueSet("Generator", "HeightGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome",  "End");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",       "End");
 			a_IniFile.GetValueSet("Generator", "CompositionGen", "End");
 			break;
 		}
 		case dimOverworld:
 		{
-			a_IniFile.GetValueSet("Generator", "BiomeGen", "MultiStepMap");
-			a_IniFile.GetValueSet("Generator", "HeightGen", "DistortedHeightmap");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "DistortedHeightmap");
-			a_IniFile.GetValueSet("Generator", "Finishers", "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Generator",      "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",       "Grown");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",       "BiomalNoise3D");
+			a_IniFile.GetValueSet("Generator", "CompositionGen", "Biomal");
+			a_IniFile.GetValueSet("Generator", "Finishers",      "Ravines, WormNestCaves, WaterLakes, WaterSprings, LavaLakes, LavaSprings, OreNests, Mineshafts, Trees, Villages, SprinkleFoliage, Ice, Snow, Lilypads, BottomLava, DeadBushes, NaturalPatches, PreSimulator, Animals");
 			break;
 		}
 		case dimNether:
 		{
-			a_IniFile.GetValueSet("Generator", "BiomeGen", "Constant");
-			a_IniFile.GetValueSet("Generator", "ConstantBiome", "Nether");
-			a_IniFile.GetValueSet("Generator", "HeightGen", "Flat");
-			a_IniFile.GetValueSet("Generator", "FlatHeight", "128");
-			a_IniFile.GetValueSet("Generator", "CompositionGen", "Nether");
-			a_IniFile.GetValueSet("Generator", "Finishers", "WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherForts, PreSimulator");
+			a_IniFile.GetValueSet("Generator", "Generator",        "Composable");
+			a_IniFile.GetValueSet("Generator", "BiomeGen",         "Constant");
+			a_IniFile.GetValueSet("Generator", "ConstantBiome",    "Nether");
+			a_IniFile.GetValueSet("Generator", "ShapeGen",         "HeightMap");
+			a_IniFile.GetValueSet("Generator", "HeightGen",        "Flat");
+			a_IniFile.GetValueSet("Generator", "FlatHeight",       "128");
+			a_IniFile.GetValueSet("Generator", "CompositionGen",   "Nether");
+			a_IniFile.GetValueSet("Generator", "Finishers",        "SoulsandRims, WormNestCaves, BottomLava, LavaSprings, NetherClumpFoliage, NetherOreNests, NetherForts, PreSimulator");
 			a_IniFile.GetValueSet("Generator", "BottomLavaHeight", "30");
 			break;
 		}
@@ -1809,7 +1805,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 	a_FlyAwaySpeed /= 100;  // Pre-divide, so that we don't have to divide each time inside the loop
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		if (!IsValidItem(itr->m_ItemType) || itr->m_ItemType == E_BLOCK_AIR)
+		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
 		{
 			// Don't spawn pickup if item isn't even valid; should prevent client crashing too
 			continue;
@@ -1835,7 +1831,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 {
 	for (cItems::const_iterator itr = a_Pickups.begin(); itr != a_Pickups.end(); ++itr)
 	{
-		if (!IsValidItem(itr->m_ItemType) || itr->m_ItemType == E_BLOCK_AIR)
+		if (!IsValidItem(itr->m_ItemType) || (itr->m_ItemType == E_BLOCK_AIR))
 		{
 			continue;
 		}
@@ -2680,7 +2676,7 @@ bool cWorld::ForEachPlayer(cPlayerListCallback & a_Callback)
 
 bool cWorld::DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback)
 {
-	// Calls the callback for each player in the list
+	// Calls the callback for the specified player in the list
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
 	{
@@ -2721,6 +2717,23 @@ bool cWorld::FindAndDoWithPlayer(const AString & a_PlayerNameHint, cPlayerListCa
 	if (BestMatch != nullptr)
 	{
 		return a_Callback.Item (BestMatch);
+	}
+	return false;
+}
+
+
+
+
+
+bool cWorld::DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback)
+{
+	cCSLock Lock(m_CSPlayers);
+	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+	{
+		if ((*itr)->GetUUID() == a_PlayerUUID)
+		{
+			return a_Callback.Item(*itr);
+		}
 	}
 	return false;
 }
@@ -2894,6 +2907,15 @@ void cWorld::TouchChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
+void cWorld::PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter)
+{
+	m_ChunkMap->PrepareChunk(a_ChunkX, a_ChunkZ, a_CallAfter);
+}
+
+
+
+
+
 void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 {
 	m_ChunkMap->ChunkLoadFailed(a_ChunkX, a_ChunkZ);
@@ -2909,25 +2931,19 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	AString Line2(a_Line2);
 	AString Line3(a_Line3);
 	AString Line4(a_Line4);
+
 	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
 	{
 		return false;
 	}
+
 	if (m_ChunkMap->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4))
 	{
 		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
 		return true;
 	}
+
 	return false;
-}
-
-
-
-
-
-bool cWorld::UpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
-{
-	return SetSignLines(a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 }
 
 
@@ -3010,7 +3026,7 @@ void cWorld::RegenerateChunk(int a_ChunkX, int a_ChunkZ)
 
 void cWorld::GenerateChunk(int a_ChunkX, int a_ChunkZ)
 {
-	m_ChunkMap->TouchChunk(a_ChunkX, a_ChunkZ);
+	m_ChunkMap->GenerateChunk(a_ChunkX, a_ChunkZ);
 }
 
 
@@ -3119,6 +3135,11 @@ bool cWorld::HasEntity(int a_UniqueID)
 	}
 
 	// Check if the entity is in the chunkmap:
+	if (m_ChunkMap.get() == nullptr)
+	{
+		// Chunkmap has already been destroyed, there are no entities anymore.
+		return false;
+	}
 	return m_ChunkMap->HasEntity(a_UniqueID);
 }
 
@@ -3653,6 +3674,7 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
 }
+
 
 
 

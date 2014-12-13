@@ -21,8 +21,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCompoGenSameBlock:
 
-void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
+	a_ChunkDesc.SetHeightFromShape(a_Shape);
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
@@ -63,7 +64,7 @@ void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cCompoGenDebugBiomes:
 
-void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	static BLOCKTYPE Blocks[] =
 	{
@@ -92,6 +93,7 @@ void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		E_BLOCK_BEDROCK,
 	} ;
 	
+	a_ChunkDesc.SetHeightFromShape(a_Shape);
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
 
 	for (int z = 0; z < cChunkDef::Width; z++)
@@ -131,7 +133,7 @@ cCompoGenClassic::cCompoGenClassic(void) :
 
 
 
-void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	/* The classic composition means:
 		- 1 layer of grass, 3 of dirt and the rest stone, if the height > sealevel + beachheight
@@ -142,6 +144,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	*/
 
 	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+	a_ChunkDesc.SetHeightFromShape(a_Shape);
 
 	// The patterns to use for different situations, must be same length!
 	const BLOCKTYPE PatternGround[] = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
@@ -194,7 +197,7 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 
 void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 {
-	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "ClassicSeaLevel",    m_SeaLevel);
+	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "SeaLevel",           m_SeaLevel);
 	m_BeachHeight      = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", m_BeachHeight);
 	m_BeachDepth       = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth",  m_BeachDepth);
 	m_BlockTop         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass").m_ItemType);
@@ -203,323 +206,6 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 	m_BlockBeach       = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand").m_ItemType);
 	m_BlockBeachBottom = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone").m_ItemType);
 	m_BlockSea         = (BLOCKTYPE)(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater").m_ItemType);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cCompoGenBiomal:
-
-void cCompoGenBiomal::ComposeTerrain(cChunkDesc & a_ChunkDesc)
-{
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
-
-	int ChunkX = a_ChunkDesc.GetChunkX();
-	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	
-	/*
-	_X 2013_04_22:
-	There's no point in generating the whole cubic noise at once, because the noise values are used in
-	only about 20 % of the cases, so the speed gained by precalculating is lost by precalculating too much data
-	*/
-	
-	for (int z = 0; z < cChunkDef::Width; z++)
-	{
-		for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			int Height = a_ChunkDesc.GetHeight(x, z);
-			if (Height > m_SeaLevel)
-			{
-				switch (a_ChunkDesc.GetBiome(x, z))
-				{
-					case biOcean:
-					case biPlains:
-					case biExtremeHills:
-					case biForest:
-					case biTaiga:
-					case biSwampland:
-					case biRiver:
-					case biFrozenOcean:
-					case biFrozenRiver:
-					case biIcePlains:
-					case biIceMountains:
-					case biForestHills:
-					case biTaigaHills:
-					case biExtremeHillsEdge:
-					case biJungle:
-					case biJungleHills:
-					case biJungleEdge:
-					case biDeepOcean:
-					case biStoneBeach:
-					case biColdBeach:
-					case biBirchForest:
-					case biBirchForestHills:
-					case biRoofedForest:
-					case biColdTaiga:
-					case biColdTaigaHills:
-					case biExtremeHillsPlus:
-					case biSavanna:
-					case biSavannaPlateau:
-					case biSunflowerPlains:
-					case biExtremeHillsM:
-					case biFlowerForest:
-					case biTaigaM:
-					case biSwamplandM:
-					case biIcePlainsSpikes:
-					case biJungleM:
-					case biJungleEdgeM:
-					case biBirchForestM:
-					case biBirchForestHillsM:
-					case biRoofedForestM:
-					case biColdTaigaM:
-					case biExtremeHillsPlusM:
-					case biSavannaM:
-					case biSavannaPlateauM:
-					{
-						FillColumnGrass(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						break;
-					}
-
-					case biMesa:
-					case biMesaPlateauF:
-					case biMesaPlateau:
-					case biMesaBryce:
-					case biMesaPlateauFM:
-					case biMesaPlateauM:
-					{
-						FillColumnClay(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						break;
-					}
-					
-					case biMegaTaiga:
-					case biMegaTaigaHills:
-					case biMegaSpruceTaiga:
-					case biMegaSpruceTaigaHills:
-					{
-						FillColumnDirt(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						break;
-					}
-
-					case biDesertHills:
-					case biDesert:
-					case biDesertM:
-					case biBeach:
-					{
-						FillColumnSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						break;
-					}
-					case biMushroomIsland:
-					case biMushroomShore:
-					{
-						FillColumnMycelium(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						break;
-					}
-					default:
-					{
-						// TODO
-						ASSERT(!"CompoGenBiomal: Biome not implemented yet!");
-						break;
-					}
-				}
-			}
-			else
-			{
-				switch (a_ChunkDesc.GetBiome(x, z))
-				{
-					case biDesert:
-					case biBeach:
-					{
-						// Fill with water, sand, sandstone and stone
-						FillColumnWaterSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						break;
-					}
-					default:
-					{
-						// Fill with water, sand/dirt/clay mix and stone
-						if (m_Noise.CubicNoise2D(0.3f * (cChunkDef::Width * ChunkX + x), 0.3f * (cChunkDef::Width * ChunkZ + z)) < 0)
-						{
-							FillColumnWaterSand(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						}
-						else
-						{
-							FillColumnWaterDirt(x, z, Height, a_ChunkDesc.GetBlockTypes());
-						}
-						break;
-					}
-				}  // switch (biome)
-				a_ChunkDesc.SetHeight(x, z, m_SeaLevel + 1);
-			}  // else (under water)
-			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
-		}  // for x
-	}  // for z
-}
-
-
-
-
-
-void cCompoGenBiomal::InitializeCompoGen(cIniFile & a_IniFile)
-{
-	m_SeaLevel = a_IniFile.GetValueSetI("Generator", "BiomalSeaLevel", m_SeaLevel) - 1;
-}
-
-
-
-
-
-void cCompoGenBiomal::FillColumnGrass(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	BLOCKTYPE Pattern[] =
-	{
-		E_BLOCK_GRASS,
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-	} ;
-	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
-	
-	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-	}
-}
-
-
-
-
-
-void cCompoGenBiomal::FillColumnClay(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	BLOCKTYPE Pattern[] =
-	{
-		E_BLOCK_HARDENED_CLAY,
-		E_BLOCK_HARDENED_CLAY,
-		E_BLOCK_HARDENED_CLAY,
-		E_BLOCK_HARDENED_CLAY,
-	} ;
-	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
-	
-	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-	}
-}
-
-
-
-
-
-void cCompoGenBiomal::FillColumnDirt(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	for (int y = 0; y < 4; y++)
-	{
-		if (a_Height - y < 0)
-		{
-			return;
-		}
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, a_Height - y, a_RelZ, E_BLOCK_DIRT);
-	}
-	for (int y = a_Height - 4; y > 0; y--)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-	}
-}
-
-
-
-
-
-void cCompoGenBiomal::FillColumnSand(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	BLOCKTYPE Pattern[] =
-	{
-		E_BLOCK_SAND,
-		E_BLOCK_SAND,
-		E_BLOCK_SAND,
-		E_BLOCK_SANDSTONE,
-	} ;
-	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
-	
-	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-	}
-}
-
-
-
-
-
-
-void cCompoGenBiomal::FillColumnMycelium (int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	BLOCKTYPE Pattern[] =
-	{
-		E_BLOCK_MYCELIUM,
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-	} ;
-	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
-	
-	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-	}
-}
-
-
-
-
-
-void cCompoGenBiomal::FillColumnWaterSand(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	FillColumnSand(a_RelX, a_RelZ, a_Height, a_BlockTypes);
-	for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
-	}
-}
-
-
-
-
-
-void cCompoGenBiomal::FillColumnWaterDirt(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes)
-{
-	// Dirt
-	BLOCKTYPE Pattern[] =
-	{
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-		E_BLOCK_DIRT,
-	} ;
-	FillColumnPattern(a_RelX, a_RelZ, a_Height, a_BlockTypes, Pattern, ARRAYCOUNT(Pattern));
-
-	for (int y = a_Height - ARRAYCOUNT(Pattern); y > 0; y--)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STONE);
-	}
-	for (int y = a_Height + 1; y <= m_SeaLevel + 1; y++)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
-	}
-}
-
-
-
-
-
-
-void cCompoGenBiomal::FillColumnPattern(int a_RelX, int a_RelZ, int a_Height, cChunkDef::BlockTypes & a_BlockTypes, const BLOCKTYPE * a_Pattern, int a_PatternSize)
-{
-	for (int y = a_Height, idx = 0; (y >= 0) && (idx < a_PatternSize); y--, idx++)
-	{
-		cChunkDef::SetBlock(a_BlockTypes, a_RelX, y, a_RelZ, a_Pattern[idx]);
-	}
 }
 
 
@@ -540,7 +226,7 @@ cCompoGenNether::cCompoGenNether(int a_Seed) :
 
 
 
-void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
 	
@@ -604,17 +290,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 				BLOCKTYPE Block = E_BLOCK_AIR;
 				if (Val < m_Threshold)  // Don't calculate if the block should be Netherrack or Soulsand when it's already decided that it's air.
 				{
-					NOISE_DATATYPE NoiseX = ((NOISE_DATATYPE)(BaseX + x)) / 8;
-					NOISE_DATATYPE NoiseY = ((NOISE_DATATYPE)(BaseZ + z)) / 8;
-					NOISE_DATATYPE CompBlock = m_Noise1.CubicNoise3D(NoiseX, (float) (y + Segment) / 2, NoiseY);
-					if (CompBlock < -0.5)
-					{
-						Block = E_BLOCK_SOULSAND;
-					}
-					else
-					{
-						Block = E_BLOCK_NETHERRACK;
-					}
+					Block = E_BLOCK_NETHERRACK;
 				}
 				a_ChunkDesc.SetBlockType(x, y + Segment, z, Block);
 			}
@@ -638,7 +314,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 			CeilingDisguise = -CeilingDisguise;
 		}
 
-		int CeilingDisguiseHeight = Height - 2 - (int)CeilingDisguise * 3;
+		int CeilingDisguiseHeight = Height - 2 - FloorC(CeilingDisguise * 3);
 
 		for (int y = Height - 1; y > CeilingDisguiseHeight; y--)
 		{
@@ -696,7 +372,7 @@ cCompoGenCache::~cCompoGenCache()
 
 
 
-void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
+void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	#ifdef _DEBUG
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
@@ -731,6 +407,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 		// Use the cached data:
 		memcpy(a_ChunkDesc.GetBlockTypes(),             m_CacheData[Idx].m_BlockTypes, sizeof(a_ChunkDesc.GetBlockTypes()));
 		memcpy(a_ChunkDesc.GetBlockMetasUncompressed(), m_CacheData[Idx].m_BlockMetas, sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
+		memcpy(a_ChunkDesc.GetHeightMap(),              m_CacheData[Idx].m_HeightMap,  sizeof(a_ChunkDesc.GetHeightMap()));
 		
 		m_NumHits++;
 		m_TotalChain += i;
@@ -739,7 +416,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	
 	// Not in the cache:
 	m_NumMisses++;
-	m_Underlying->ComposeTerrain(a_ChunkDesc);
+	m_Underlying->ComposeTerrain(a_ChunkDesc, a_Shape);
 	
 	// Insert it as the first item in the MRU order:
 	int Idx = m_CacheOrder[m_CacheSize - 1];
@@ -750,6 +427,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc)
 	m_CacheOrder[0] = Idx;
 	memcpy(m_CacheData[Idx].m_BlockTypes, a_ChunkDesc.GetBlockTypes(),             sizeof(a_ChunkDesc.GetBlockTypes()));
 	memcpy(m_CacheData[Idx].m_BlockMetas, a_ChunkDesc.GetBlockMetasUncompressed(), sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
+	memcpy(m_CacheData[Idx].m_HeightMap,  a_ChunkDesc.GetHeightMap(),              sizeof(a_ChunkDesc.GetHeightMap()));
 	m_CacheData[Idx].m_ChunkX = ChunkX;
 	m_CacheData[Idx].m_ChunkZ = ChunkZ;
 }

@@ -231,6 +231,43 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 	},  -- cJukeboxEntity
 
+	cMobHeadEntity =
+	{
+		Desc = [[
+			This class represents a mob head block entity in the world.
+		]],
+		Inherits = "cBlockEntity",
+		Functions =
+		{
+			SetType = { Params = "eMobHeadType", Return = "", Notes = "Set the type of the mob head" },
+			SetRotation = { Params = "eMobHeadRotation", Return = "", Notes = "Sets the rotation of the mob head" },
+			SetOwner = { Params = "string", Return = "", Notes = "Set the player name for mob heads with player type" },
+			GetType = { Params = "", Return = "eMobHeadType", Notes = "Returns the type of the mob head" },
+			GetRotation = { Params = "", Return = "eMobHeadRotation", Notes = "Returns the rotation of the mob head" },
+			GetOwner = { Params = "", Return = "string", Notes = "Returns the player name of the mob head" },
+		},
+	},  -- cMobHeadEntity
+
+	cMobSpawnerEntity =
+	{
+		Desc = [[
+			This class represents a mob spawner block entity in the world.
+		]],
+		Inherits = "cBlockEntity",
+		Functions =
+		{
+			UpdateActiveState = { Params = "", Return = "", Notes = "Upate the active flag from the mob spawner. This function will called every 5 seconds from the Tick() function." },
+			ResetTimer = { Params = "", Return = "", Notes = "Sets the spawn delay to a new random value." },
+			SpawnEntity = { Params = "", Return = "", Notes = "Spawns the entity. This function automaticly change the spawn delay!" },
+			GetEntity = { Params = "", Return = "{{Globals#MobType|MobType}}", Notes = "Returns the entity type that will be spawn by this mob spawner." },
+			SetEntity = { Params = "{{Globals#MobType|MobType}}", Return = "", Notes = "Sets the entity type who will be spawn by this mob spawner." },
+			GetSpawnDelay = { Params = "", Return = "number", Notes = "Returns the spawn delay. This is the tick delay that is needed to spawn new monsters." },
+			SetSpawnDelay = { Params = "number", Return = "", Notes = "Sets the spawn delay." },
+			GetNearbyPlayersNum = { Params = "", Return = "number", Notes = "Returns the amount of the nearby players in a 16-block radius." },
+			GetNearbyMonsterNum = { Params = "", Return = "number", Notes = "Returns the amount of this monster type in a 8-block radius (Y: 4-block radius)." },
+		},
+	},  -- cMobSpawnerEntity
+
 	cNoteEntity =
 	{
 		Desc = [[

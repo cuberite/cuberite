@@ -8,12 +8,13 @@
 #include <QSettings>
 #include <QDirIterator>
 #include <QStatusBar>
-#include "src/IniFile.h"
 #include "ChunkSource.h"
+#include "src/IniFile.h"
 #include "src/Generating/BioGen.h"
 #include "src/StringCompression.h"
 #include "src/WorldStorage/FastNBT.h"
 #include "GeneratorSetup.h"
+#include "RegionLoader.h"
 
 
 
@@ -31,7 +32,8 @@ const double MainWindow::m_ViewZooms[] =
 MainWindow::MainWindow(QWidget * parent) :
 	QMainWindow(parent),
 	m_GeneratorSetup(nullptr),
-	m_LineSeparator(nullptr)
+	m_LineSeparator(nullptr),
+	m_CurrentZoomLevel(2)
 {
 	initMinecraftPath();
 
@@ -40,6 +42,7 @@ MainWindow::MainWindow(QWidget * parent) :
 	connect(m_BiomeView, SIGNAL(decreaseZoom()), this, SLOT(decreaseZoom()));
 	connect(m_BiomeView, SIGNAL(wheelUp()),      this, SLOT(increaseZoom()));
 	connect(m_BiomeView, SIGNAL(wheelDown()),    this, SLOT(decreaseZoom()));
+	m_BiomeView->setZoomLevel(m_ViewZooms[m_CurrentZoomLevel]);
 
 	m_StatusBar = new QStatusBar();
 	this->setStatusBar(m_StatusBar);
@@ -70,7 +73,7 @@ MainWindow::MainWindow(QWidget * parent) :
 
 MainWindow::~MainWindow()
 {
-
+	RegionLoader::shutdown();
 }
 
 
@@ -172,7 +175,8 @@ void MainWindow::setViewZoom()
 	{
 		return;
 	}
-	double newZoom = m_ViewZooms[action->data().toInt()];
+	m_CurrentZoomLevel = action->data().toInt();
+	double newZoom = m_ViewZooms[m_CurrentZoomLevel];
 	m_BiomeView->setZoomLevel(newZoom);
 	action->setChecked(true);
 }
@@ -284,15 +288,11 @@ void MainWindow::createActions()
 	{
 		m_actViewZoom[i] = new QAction(tr("&Zoom %1%").arg(std::floor(m_ViewZooms[i] * 100)), this);
 		m_actViewZoom[i]->setCheckable(true);
-		if ((int)(m_ViewZooms[i] * 16) == 16)
-		{
-			m_actViewZoom[i]->setChecked(true);
-			m_CurrentZoomLevel = i;
-		}
 		m_actViewZoom[i]->setData(QVariant(i));
 		zoomGroup->addAction(m_actViewZoom[i]);
 		connect(m_actViewZoom[i], SIGNAL(triggered()), this, SLOT(setViewZoom()));
 	}
+	m_actViewZoom[m_CurrentZoomLevel]->setChecked(true);
 }
 
 

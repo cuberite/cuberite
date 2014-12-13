@@ -448,7 +448,7 @@ bool cPluginManager::CallHookCollectingPickup(cPlayer & a_Player, cPickup & a_Pi
 
 
 
-bool cPluginManager::CallHookCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe * a_Recipe)
+bool cPluginManager::CallHookCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe)
 {
 	FIND_HOOK(HOOK_CRAFTING_NO_RECIPE);
 	VERIFY_HOOK;
@@ -1459,11 +1459,16 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 
 
 
-cPlugin * cPluginManager::GetPlugin( const AString & a_Plugin) const
+cPlugin * cPluginManager::GetPlugin(const AString & a_Plugin) const
 {
 	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
 	{
-		if (itr->second == nullptr) continue;
+		if (itr->second == nullptr)
+		{
+			// The plugin is currently unloaded
+			continue;
+		}
+
 		if (itr->second->GetName().compare(a_Plugin) == 0)
 		{
 			return itr->second;

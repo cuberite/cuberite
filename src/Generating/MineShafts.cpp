@@ -20,6 +20,7 @@ in a depth-first processing. Each of the descendants will branch randomly, if no
 #include "MineShafts.h"
 #include "../Cuboid.h"
 #include "../BlockEntities/ChestEntity.h"
+#include "../BlockEntities/MobSpawnerEntity.h"
 
 
 
@@ -875,7 +876,9 @@ void cMineShaftCorridor::PlaceSpawner(cChunkDesc & a_ChunkDesc)
 	)
 	{
 		a_ChunkDesc.SetBlockTypeMeta(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ, E_BLOCK_MOB_SPAWNER, 0);
-		// TODO: The spawner needs its accompanying cMobSpawnerEntity, when implemented
+		cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ));
+		ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
+		MobSpawner->SetEntity(mtCaveSpider);
 	}
 }
 

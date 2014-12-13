@@ -9,7 +9,7 @@
 // Email:        Shane.Hill@dsto.defence.gov.au
 // Reason:       Remove dependancy on MFC. Code should compile on any
 //               platform. Tested on Windows/Linux/Irix
-//////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /*
 !! MODIFIED BY FAKETRUTH and madmaxoft!!

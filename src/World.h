@@ -10,7 +10,6 @@
 #define MAX_PLAYERS 65535
 
 #include "Simulator/SimulatorManager.h"
-#include "MersenneTwister.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
 #include "Generating/ChunkGenerator.h"
@@ -26,6 +25,8 @@
 #include "MapManager.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
+#include "FastRandom.h"
+#include "ClientHandle.h"
 
 
 
@@ -313,7 +314,8 @@ public:
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback & a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
 
-	/** Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found. Callback return ignored */
+	/** Calls the callback for the player of the given name; returns true if the player was found and the callback called, false if player not found.
+	Callback return value is ignored. If there are multiple players of the same name, only (random) one is processed by the callback. */
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
@@ -322,6 +324,9 @@ public:
 	// TODO: This interface is dangerous - rewrite to DoWithClosestPlayer(pos, sight, action)
 	cPlayer * FindClosestPlayer(const Vector3d & a_Pos, float a_SightLimit, bool a_CheckLineOfSight = true);
 	
+	/** Finds the player over his uuid and calls the callback */
+	bool DoWithPlayerByUUID(const AString & a_PlayerUUID, cPlayerListCallback & a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
@@ -369,15 +374,18 @@ public:
 	
 	/** Touches the chunk, causing it to be loaded or generated */
 	void TouchChunk(int a_ChunkX, int a_ChunkZ);
+
+	/** Queues the chunk for preparing - making sure that it's generated and lit.
+	The specified chunk is queued to be loaded or generated, and lit if needed.
+	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
+	It is legal to call with no callback. */
+	void PrepareChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_CallAfter = nullptr);
 	
 	/** Marks the chunk as failed-to-load: */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 	
-	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. Same as UpdateSign() */
+	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
-	
-	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. Same as SetSignLines() */
-	bool UpdateSign(int a_X, int a_Y, int a_Z, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
@@ -645,6 +653,12 @@ public:
 	eShrapnelLevel GetTNTShrapnelLevel(void) const { return m_TNTShrapnelLevel; }
 	void SetTNTShrapnelLevel(eShrapnelLevel a_Flag) { m_TNTShrapnelLevel = a_Flag; }
 
+	int GetMaxViewDistance(void) const { return m_MaxViewDistance; }
+	void SetMaxViewDistance(int a_MaxViewDistance)
+	{
+		m_MaxViewDistance = Clamp(a_MaxViewDistance, cClientHandle::MIN_VIEW_DISTANCE, cClientHandle::MAX_VIEW_DISTANCE);
+	}
+
 	bool ShouldUseChatPrefixes(void) const { return m_bUseChatPrefixes; }
 	void SetShouldUseChatPrefixes(bool a_Flag) { m_bUseChatPrefixes = a_Flag; }
 
@@ -687,6 +701,8 @@ public:
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
+
+	cLightingThread & GetLightingThread(void) { return m_Lighting; }
 
 	void InitializeSpawn(void);
 	
@@ -797,7 +813,7 @@ public:
 	This function allows nesting and task-concurrency (multiple separate tasks can request ticking and as long
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
-
+	
 private:
 
 	friend class cRoot;
@@ -959,6 +975,9 @@ private:
 	See the eShrapnelLevel enumeration for details
 	*/
 	eShrapnelLevel m_TNTShrapnelLevel;
+
+	/** The maximum view distance that a player can have in this world. */
+	int m_MaxViewDistance;
 
 	/** Name of the nether world */
 	AString m_NetherWorldName;

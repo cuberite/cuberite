@@ -9,7 +9,6 @@
 #include "../Entities/Player.h"
 #include "../Entities/ExpOrb.h"
 #include "../MonsterConfig.h"
-#include "../MersenneTwister.h"
 
 #include "../Chunk.h"
 #include "../FastRandom.h"
@@ -21,52 +20,44 @@
 /** Map for eType <-> string
 Needs to be alpha-sorted by the strings, because binary search is used in StringToMobType()
 The strings need to be lowercase (for more efficient comparisons in StringToMobType())
+m_VanillaName is the name that vanilla use for this mob.
 */
 static const struct
 {
 	eMonsterType m_Type;
 	const char * m_lcName;
+	const char * m_VanillaName;
 } g_MobTypeNames[] =
 {
-	{mtBat,          "bat"},
-	{mtBlaze,        "blaze"},
-	{mtCaveSpider,   "cavespider"},
-	{mtChicken,      "chicken"},
-	{mtCow,          "cow"},
-	{mtCreeper,      "creeper"},
-	{mtEnderman,     "enderman"},
-	{mtEnderDragon,  "enderdragon"},
-	{mtGhast,        "ghast"},
-	{mtHorse,        "horse"},
-	{mtIronGolem,    "irongolem"},
-	{mtMagmaCube,    "magmacube"},
-	{mtMooshroom,    "mooshroom"},
-	{mtOcelot,       "ocelot"},
-	{mtPig,          "pig"},
-	{mtSheep,        "sheep"},
-	{mtSilverfish,   "silverfish"},
-	{mtSkeleton,     "skeleton"},
-	{mtSlime,        "slime"},
-	{mtSnowGolem,    "snowgolem"},
-	{mtSpider,       "spider"},
-	{mtSquid,        "squid"},
-	{mtVillager,     "villager"},
-	{mtWitch,        "witch"},
-	{mtWither,       "wither"},
-	{mtWolf,         "wolf"},
-	{mtZombie,       "zombie"},
-	{mtZombiePigman, "zombiepigman"},
+	{mtBat,          "bat",          "Bat"},
+	{mtBlaze,        "blaze",        "Blaze"},
+	{mtCaveSpider,   "cavespider",   "CaveSpider"},
+	{mtChicken,      "chicken",      "Chicken"},
+	{mtCow,          "cow",          "Cow"},
+	{mtCreeper,      "creeper",      "Creeper"},
+	{mtEnderman,     "enderman",     "Enderman"},
+	{mtEnderDragon,  "enderdragon",  "EnderDragon"},
+	{mtGhast,        "ghast",        "Ghast"},
+	{mtHorse,        "horse",        "EntityHorse"},
+	{mtIronGolem,    "irongolem",    "VillagerGolem"},
+	{mtMagmaCube,    "magmacube",    "LavaSlime"},
+	{mtMooshroom,    "mooshroom",    "MushroomCow"},
+	{mtOcelot,       "ocelot",       "Ozelot"},
+	{mtPig,          "pig",          "Pig"},
+	{mtSheep,        "sheep",        "Sheep"},
+	{mtSilverfish,   "silverfish",   "Silverfish"},
+	{mtSkeleton,     "skeleton",     "Skeleton"},
+	{mtSlime,        "slime",        "Slime"},
+	{mtSnowGolem,    "snowgolem",    "SnowMan"},
+	{mtSpider,       "spider",       "Spider"},
+	{mtSquid,        "squid",        "Squid"},
+	{mtVillager,     "villager",     "Villager"},
+	{mtWitch,        "witch",        "Witch"},
+	{mtWither,       "wither",       "WitherBoss"},
+	{mtWolf,         "wolf",         "Wolf"},
+	{mtZombie,       "zombie",       "Zombie"},
+	{mtZombiePigman, "zombiepigman", "PigZombie"},
 } ;
-
-
-
-
-
-eMonsterType StringToMobType(const AString & a_MobString)
-{
-	LOGWARNING("%s: Function is obsolete, use cMonster::StringToMobType() instead", __FUNCTION__);
-	return cMonster::StringToMobType(a_MobString);
-}
 
 
 
@@ -160,7 +151,7 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtYP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 1, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
 		int LowestY = FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtLowestY = m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
+		BLOCKTYPE BlockAtLowestY = (LowestY >= cChunkDef::Height) ? E_BLOCK_AIR : m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
 
 		if (
 			(!cBlockInfo::IsSolid(BlockAtY)) &&
@@ -275,7 +266,9 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 
 	if ((m_Target != nullptr) && m_Target->IsDestroyed())
+	{
 		m_Target = nullptr;
+	}
 
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
@@ -453,7 +446,7 @@ int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 	}
 	else
 	{
-		while (cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))) && (PosY < cChunkDef::Height))
+		while ((PosY < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock((int)floor(a_PosX), PosY, (int)floor(a_PosZ))))
 		{
 			PosY++;
 		}
@@ -784,39 +777,47 @@ AString cMonster::MobTypeToString(eMonsterType a_MobType)
 
 
 
+AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
+{
+	// Mob types aren't sorted, so we need to search linearly:
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
+	{
+		if (g_MobTypeNames[i].m_Type == a_MobType)
+		{
+			return g_MobTypeNames[i].m_VanillaName;
+		}
+	}
+
+	// Not found:
+	return "";
+}
+
+
+
+
+
 eMonsterType cMonster::StringToMobType(const AString & a_Name)
 {
 	AString lcName = StrToLower(a_Name);
-	
-	// Binary-search for the lowercase name:
-	int lo = 0, hi = ARRAYCOUNT(g_MobTypeNames) - 1;
-	while (hi - lo > 1)
+
+	// Search MCServer name:
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
-		int mid = (lo + hi) / 2;
-		int res = strcmp(g_MobTypeNames[mid].m_lcName, lcName.c_str());
-		if (res == 0)
+		if (strcmp(g_MobTypeNames[i].m_lcName, lcName.c_str()) == 0)
 		{
-			return g_MobTypeNames[mid].m_Type;
-		}
-		if (res < 0)
-		{
-			lo = mid;
-		}
-		else
-		{
-			hi = mid;
+			return g_MobTypeNames[i].m_Type;
 		}
 	}
-	// Range has collapsed to at most two elements, compare each:
-	if (strcmp(g_MobTypeNames[lo].m_lcName, lcName.c_str()) == 0)
+
+	// Not found. Search Vanilla name:
+	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
 	{
-		return g_MobTypeNames[lo].m_Type;
+		if (strcmp(StrToLower(g_MobTypeNames[i].m_VanillaName).c_str(), lcName.c_str()) == 0)
+		{
+			return g_MobTypeNames[i].m_Type;
+		}
 	}
-	if ((lo != hi) && (strcmp(g_MobTypeNames[hi].m_lcName, lcName.c_str()) == 0))
-	{
-		return g_MobTypeNames[hi].m_Type;
-	}
-	
+
 	// Not found:
 	return mtInvalidType;
 }
@@ -1028,22 +1029,34 @@ void cMonster::AddRandomArmorDropItem(cItems & a_Drops, short a_LootingLevel)
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceHelmet * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedHelmet().IsEmpty()) a_Drops.push_back(GetEquippedHelmet());
+		if (!GetEquippedHelmet().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedHelmet());
+		}
 	}
 	
 	if (r1.randInt() % 200 < ((m_DropChanceChestplate * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedChestplate().IsEmpty()) a_Drops.push_back(GetEquippedChestplate());
+		if (!GetEquippedChestplate().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedChestplate());
+		}
 	}
 	
 	if (r1.randInt() % 200 < ((m_DropChanceLeggings * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedLeggings().IsEmpty()) a_Drops.push_back(GetEquippedLeggings());
+		if (!GetEquippedLeggings().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedLeggings());
+		}
 	}
 	
 	if (r1.randInt() % 200 < ((m_DropChanceBoots * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedBoots().IsEmpty()) a_Drops.push_back(GetEquippedBoots());
+		if (!GetEquippedBoots().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedBoots());
+		}
 	}
 }
 
@@ -1056,7 +1069,10 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
 	MTRand r1;
 	if (r1.randInt() % 200 < ((m_DropChanceWeapon * 200) + (a_LootingLevel * 2)))
 	{
-		if (!GetEquippedWeapon().IsEmpty()) a_Drops.push_back(GetEquippedWeapon());
+		if (!GetEquippedWeapon().IsEmpty())
+		{
+			a_Drops.push_back(GetEquippedWeapon());
+		}
 	}
 }
 
