@@ -155,12 +155,14 @@ public:
 	if a_ShouldApply is true, the changes are written into the slots;
 	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
 	*/
-	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply);
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply);
+
+	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill);
 	
-	/// Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
-	/// The items are accumulated in a_Dragging and removed from the SlotAreas immediately.
-	/// If a_CollectFullStacks is false, slots with full stacks in the area are skipped while collecting.
-	/// Returns true if full stack has been collected, false if there's space remaining to fill.
+	/** Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
+	The items are accumulated in a_Dragging and removed from the SlotAreas immediately.
+	If a_CollectFullStacks is false, slots with full stacks in the area are skipped while collecting.
+	Returns true if full stack has been collected, false if there's space remaining to fill. */
 	bool CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer & a_Player, bool a_CollectFullStacks);
 	
 	/// Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea
@@ -177,7 +179,6 @@ protected:
 	cPlayerList      m_OpenedBy;
 	
 	bool m_IsDestroyed;
-	bool m_ShouldDistributeToHotbarFirst;  ///< If set (default), shift+click tries to distribute to hotbar first, then other areas. False for doublechests
 	
 	cWindowOwner * m_Owner;
 	

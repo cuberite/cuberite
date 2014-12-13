@@ -56,8 +56,6 @@ public:
 		m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 		m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
-		m_ShouldDistributeToHotbarFirst = false;
-
 		// Play the opening sound:
 		m_World->BroadcastSoundEffect("random.chestopen", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
 
@@ -108,6 +106,25 @@ public:
 		}
 
 		cWindow::OpenedByPlayer(a_Player);
+	}
+
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
+	{
+		cSlotAreas AreasInOrder;
+
+		if (a_ClickedArea == m_SlotAreas[0])
+		{
+			// Chest Area
+			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
+			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		}
+		else
+		{
+			// Hotbar or Inventory
+			AreasInOrder.push_back(m_SlotAreas[0]);  /* Chest */
+			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		}
 	}
 	
 protected:

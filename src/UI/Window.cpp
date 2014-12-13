@@ -32,7 +32,6 @@ cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
 	m_IsDestroyed(false),
-	m_ShouldDistributeToHotbarFirst(true),
 	m_Owner(nullptr)
 {
 	if (a_WindowType == wtInventory)
@@ -392,43 +391,38 @@ bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
 
 
 
-void cWindow::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply)
+void cWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
-	// Ask each slot area to take as much of the stack as it can.
-	// First ask only slots that already have the same kind of item
-	// Then ask any remaining slots
-	for (int Pass = 0; Pass < 2; ++Pass)
+	cSlotAreas Areas;
+	for (auto Area : m_SlotAreas)
 	{
-		if (m_ShouldDistributeToHotbarFirst)
+		if (Area != a_ClickedArea)
 		{
-			// First distribute into the hotbar:
-			if (a_ExcludeArea != m_SlotAreas.back())
-			{
-				m_SlotAreas.back()->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0));
-				if (a_ItemStack.IsEmpty())
-				{
-					// Distributed it all
-					return;
-				}
-			}
+			Areas.push_back(Area);
 		}
-		
-		// The distribute to all other areas:
-		cSlotAreas::iterator end = m_ShouldDistributeToHotbarFirst ? (m_SlotAreas.end() - 1) : m_SlotAreas.end();
-		for (cSlotAreas::iterator itr = m_SlotAreas.begin(); itr != end; ++itr)
+	}
+
+	DistributeStack(a_ItemStack, a_Player, Areas, a_ShouldApply, false);
+}
+
+
+
+
+
+void cWindow::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill)
+{
+	for (size_t i = 0; i < 2; i++)
+	{
+		for (cSlotAreas::iterator itr = a_AreasInOrder.begin(); itr != a_AreasInOrder.end(); ++itr)
 		{
-			if (*itr == a_ExcludeArea)
-			{
-				continue;
-			}
-			(*itr)->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0));
+			(*itr)->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (i == 0), a_BackFill);
 			if (a_ItemStack.IsEmpty())
 			{
 				// Distributed it all
 				return;
 			}
-		}  // for itr - m_SlotAreas[]
-	}  // for Pass - repeat twice
+		}
+	}
 }
 
 

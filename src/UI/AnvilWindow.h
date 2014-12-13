@@ -55,6 +55,24 @@ public:
 		a_PosZ = m_BlockZ;
 	}
 
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
+	{
+		cSlotAreas AreasInOrder;
+
+		if (a_ClickedArea == m_SlotAreas[0])
+		{
+			// Anvil Slot
+			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
+		}
+		else
+		{
+			// Inventory or Hotbar
+			AreasInOrder.push_back(m_SlotAreas[0]);  /* Anvil */
+		}
+		super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+	}
+
 protected:
 	cSlotAreaAnvil * m_AnvilSlotArea;
 	AString m_RepairedItemName;

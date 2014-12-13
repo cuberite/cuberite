@@ -25,10 +25,29 @@ public:
 	cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper) :
 		super(wtHopper, "Hopper")
 	{
-		m_ShouldDistributeToHotbarFirst = false;
 		m_SlotAreas.push_back(new cSlotAreaItemGrid(a_Hopper->GetContents(), *this));
 		m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 		m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	}
+
+
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
+	{
+		cSlotAreas AreasInOrder;
+
+		if (a_ClickedArea == m_SlotAreas[0])
+		{
+			// Hopper Area
+			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
+			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		}
+		else
+		{
+			// Inventory or Hotbar
+			AreasInOrder.push_back(m_SlotAreas[0]);  /* Hopper */
+			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		}
 	}
 };
 

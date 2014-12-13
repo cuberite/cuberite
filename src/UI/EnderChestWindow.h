@@ -29,7 +29,6 @@ public:
 		m_BlockY(a_EnderChest->GetPosY()),
 		m_BlockZ(a_EnderChest->GetPosZ())
 	{
-		m_ShouldDistributeToHotbarFirst = false;
 		m_SlotAreas.push_back(new cSlotAreaEnderChest(a_EnderChest, *this));
 		m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 		m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
@@ -48,6 +47,25 @@ public:
 
 		// Play the closing sound
 		m_World->BroadcastSoundEffect("random.chestclosed", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
+	}
+
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
+	{
+		cSlotAreas AreasInOrder;
+
+		if (a_ClickedArea == m_SlotAreas[0])
+		{
+			// Chest Area
+			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
+			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		}
+		else
+		{
+			// Hotbar or Inventory
+			AreasInOrder.push_back(m_SlotAreas[0]);  /* Chest */
+			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		}
 	}
 
 protected:
