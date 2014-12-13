@@ -2564,7 +2564,9 @@ World:ForEachEntity(
 		if not(a_Entity:IsMob()) then
 			return;
 		end
-		local Monster = tolua.cast(a_Entity, "cMonster");  -- Get the cMonster out of cEntity, now that we know the entity represents one.
+		
+		-- Get the cMonster out of cEntity, now that we know the entity represents one.
+		local Monster = tolua.cast(a_Entity, "cMonster");
 		if (Monster:GetMobType() == mtSpider) then
 			Monster:TeleportToCoords(Monster:GetPosX(), Monster:GetPosY() + 100, Monster:GetPosZ());
 		end
