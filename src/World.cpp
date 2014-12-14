@@ -1524,7 +1524,7 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 		case E_BLOCK_COCOA_POD:
 		{
 			NIBBLETYPE TypeMeta = BlockMeta & 0x03;
-			int GrowState = (BlockMeta & 0x0f) >> 2;
+			int GrowState = BlockMeta >> 2;
 
 			if (GrowState < 2)
 			{
