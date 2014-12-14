@@ -42,7 +42,6 @@
 // Mobs:
 #include "Mobs/IncludeAllMonsters.h"
 #include "MobCensus.h"
-#include "MobSpawner.h"
 
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
@@ -316,7 +315,8 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_Scoreboard(this),
 	m_MapManager(this),
 	m_GeneratorCallbacks(*this),
-	m_TickThread(*this)
+	m_TickThread(*this),
+	m_CreatureSpawner(this)
 {
 	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
 
@@ -804,6 +804,7 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 			LOG("World \"%s\": Unknown mob type: %s", m_WorldName.c_str(), itr->c_str());
 		}
 	}
+	m_CreatureSpawner.LoadAllowedTypes(m_AllowedMobs);
 }
 
 
@@ -985,38 +986,9 @@ void cWorld::TickMobs(float a_Dt)
 	m_ChunkMap->CollectMobCensus(MobCensus);
 	if (m_bAnimals)
 	{
-		// Spawning is enabled, spawn now:
-		static const cMonster::eFamily AllFamilies[] =
-		{
-			cMonster::mfHostile,
-			cMonster::mfPassive,
-			cMonster::mfAmbient,
-			cMonster::mfWater,
-		} ;
-		for (size_t i = 0; i < ARRAYCOUNT(AllFamilies); i++)
-		{
-			cMonster::eFamily Family = AllFamilies[i];
-			int SpawnDelay = cMonster::GetSpawnDelay(Family);
-			if (
-				(m_LastSpawnMonster[Family] > m_WorldAge - SpawnDelay) ||  // Not reached the needed ticks before the next round
-				MobCensus.IsCapped(Family)
-			)
-			{
-				continue;
-			}
-			m_LastSpawnMonster[Family] = m_WorldAge;
-			cMobSpawner Spawner(Family, m_AllowedMobs);
-			if (Spawner.CanSpawnAnything())
-			{
-				m_ChunkMap->SpawnMobs(Spawner);
-				// do the spawn
-				for (cMobSpawner::tSpawnedContainer::const_iterator itr2 = Spawner.getSpawned().begin(); itr2 != Spawner.getSpawned().end(); ++itr2)
-				{
-					SpawnMobFinalize(*itr2);
-				}
-			}
-		}  // for i - AllFamilies[]
-	}  // if (Spawning enabled)
+		// Spawn mobs / animals
+		m_CreatureSpawner.SpawnRandomCreatures(true, (m_WorldAge % 400) == 0, (m_WorldAge % 400) == 0);
+	}
 
 	// move close mobs
 	cMobProximityCounter::sIterablePair allCloseEnoughToMoveMobs = MobCensus.GetProximityCounter().getMobWithinThosesDistances(-1, 64 * 16);// MG TODO : deal with this magic number (the 16 is the size of a block)
@@ -3007,6 +2979,15 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 		return true;
 	}
 	return false;
+}
+
+
+
+
+
+int cWorld::GetMonstersNum(cMonster::eFamily a_MobFamily)
+{
+	return m_ChunkMap->GetMonstersNum(a_MobFamily);
 }
 
 

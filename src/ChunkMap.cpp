@@ -14,7 +14,6 @@
 #include "Entities/TNTEntity.h"
 #include "Blocks/BlockHandler.h"
 #include "MobCensus.h"
-#include "MobSpawner.h"
 #include "BoundingBox.h"
 #include "SetChunkData.h"
 #include "Blocks/ChunkInterface.h"
@@ -2478,6 +2477,22 @@ bool cChunkMap::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const ASt
 
 
 
+int cChunkMap::GetMonstersNum(cMonster::eFamily a_MobFamily)
+{
+	cCSLock Lock(m_CSLayers);
+	int Count = 0;
+
+	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
+	{
+		Count += (*itr)->GetMonstersNum(a_MobFamily);
+	}
+	return Count;
+}
+
+
+
+
+
 void cChunkMap::MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSLayers);
@@ -2668,20 +2683,6 @@ void cChunkMap::CollectMobCensus(cMobCensus& a_ToFill)
 	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
 	{
 		(*itr)->CollectMobCensus(a_ToFill);
-	}  // for itr - m_Layers
-}
-
-
-
-
-
-
-void cChunkMap::SpawnMobs(cMobSpawner& a_MobSpawner)
-{
-	cCSLock Lock(m_CSLayers);
-	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
-	{
-		(*itr)->SpawnMobs(a_MobSpawner);
 	}  // for itr - m_Layers
 }
 
@@ -2900,17 +2901,18 @@ void cChunkMap::cChunkLayer::CollectMobCensus(cMobCensus& a_ToFill)
 
 
 
-
-void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
+int cChunkMap::cChunkLayer::GetMonstersNum(cMonster::eFamily a_MobFamily)
 {
+	int Count = 0;
+
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{
-		// We only spawn close to players
-		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->IsValid() && m_Chunks[i]->HasAnyClients())
+		if ((m_Chunks[i] != nullptr) && m_Chunks[i]->IsValid())
 		{
-			m_Chunks[i]->SpawnMobs(a_MobSpawner);
+			Count += m_Chunks[i]->GetMonstersNum(a_MobFamily);
 		}
-	}  // for i - m_Chunks[]
+	}
+	return Count;
 }
 
 
