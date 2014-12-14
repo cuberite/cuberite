@@ -80,7 +80,7 @@ void cChestEntity::UsedBy(cPlayer * a_Player)
 void cChestEntity::OpenNewWindow(void)
 {
 	// TODO: cats are an obstruction
-	if ((GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
+	if ((GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())))
 	{
 		// Obstruction, don't open
 		return;
@@ -99,7 +99,7 @@ void cChestEntity::OpenNewWindow(void)
 		
 		virtual bool Item(cChestEntity * a_Chest) override
 		{
-			if ((a_Chest->GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsSolid(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
+			if ((a_Chest->GetPosY() + 1 < cChunkDef::Height) && cBlockInfo::IsTransparent(a_Chest->GetWorld()->GetBlock(a_Chest->GetPosX(), a_Chest->GetPosY() + 1, a_Chest->GetPosZ())))
 			{
 				// Obstruction, don't open
 				return false;
