@@ -142,9 +142,14 @@ int cCreatureSpawner::SpawnRandomCreatures(cMonster::eFamily a_Family)
 					if (LastMonsterType == mtInvalidType)
 					{
 						// Can't choose a type?
-						SpawnLimit = -1;
 						break;
 					}
+				}
+
+				if (!CanSpawnHere(BlockX, BlockY, BlockZ, LastMonsterType))
+				{
+					// Can't spawn -> Abort
+					continue;
 				}
 
 				cMonster * Entity = cMonster::NewMonsterFromType(LastMonsterType);
@@ -278,17 +283,13 @@ bool cCreatureSpawner::CanSpawnFamily(int a_BlockX, int a_BlockY, int a_BlockZ, 
 			!cBlockInfo::FullyOccupiesVoxel(BlockAbove)
 		);
 	}
-	else if (!cBlockInfo::IsSolid(m_World->GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
-	{
-		return false;
-	}
 	else
 	{
 		return (
-			(BlockBelow != E_BLOCK_BEDROCK) &&
-			!cBlockInfo::FullyOccupiesVoxel(Block) &&
+			!cBlockInfo::IsTransparent(BlockBelow) && (BlockBelow != E_BLOCK_BEDROCK) &&
+			cBlockInfo::IsTransparent(Block) && (Block != E_BLOCK_BED) && (Block != E_BLOCK_LEAVES) && (Block != E_BLOCK_NEW_LEAVES) &&
 			!IsBlockLiquid(Block) &&
-			!cBlockInfo::FullyOccupiesVoxel(BlockAbove)
+			cBlockInfo::IsTransparent(BlockAbove) && (Block != E_BLOCK_LEAVES) && (Block != E_BLOCK_NEW_LEAVES)
 		);
 	}
 }
@@ -475,6 +476,7 @@ bool cCreatureSpawner::CanSpawnHere(int a_BlockX, int a_BlockY, int a_BlockZ, eM
 			return false;
 		}
 	}
+	return false;
 }
 
 
