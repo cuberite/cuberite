@@ -3294,7 +3294,6 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 		return -1;
 	}
 
-	BroadcastSpawnEntity(*a_Monster);
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
 
 	return a_Monster->GetUniqueID();
