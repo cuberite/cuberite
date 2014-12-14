@@ -17,6 +17,7 @@
 #include "BlockChest.h"
 #include "BlockCloth.h"
 #include "BlockCobWeb.h"
+#include "BlockCocoaPod.h"
 #include "BlockCommandBlock.h"
 #include "BlockComparator.h"
 #include "BlockCrops.h"
@@ -198,6 +199,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
 		case E_BLOCK_CHEST:                 return new cBlockChestHandler           (a_BlockType);
 		case E_BLOCK_COAL_ORE:              return new cBlockOreHandler             (a_BlockType);
+		case E_BLOCK_COCOA_POD:             return new cBlockCocoaPodHandler        (a_BlockType);
 		case E_BLOCK_COMMAND_BLOCK:         return new cBlockCommandBlockHandler    (a_BlockType);
 		case E_BLOCK_ACTIVE_COMPARATOR:     return new cBlockComparatorHandler      (a_BlockType);
 		case E_BLOCK_COBBLESTONE:           return new cBlockStoneHandler           (a_BlockType);
