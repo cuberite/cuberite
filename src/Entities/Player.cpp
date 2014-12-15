@@ -1606,7 +1606,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 
 	// Send current weather of target world to player
 	if (a_World->GetDimension() == dimOverworld)
+	{
 		m_ClientHandle->SendWeather(a_World->GetWeather());
+	}
 	
 	return true;
 }
