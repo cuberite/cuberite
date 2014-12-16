@@ -27,7 +27,7 @@ typedef cItemCallback<cChestEntity> cChestCallback;
 
 void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk)
 {
-	if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 	{
 		return;
 	}
@@ -45,13 +45,13 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
 
-	if (a_OtherChunk != NULL)
+	if (a_OtherChunk != nullptr)
 	{
 		RelX = a_BlockX - a_OtherChunk->GetPosX() * cChunkDef::Width;
 		RelZ = a_BlockZ - a_OtherChunk->GetPosZ() * cChunkDef::Width;
 		a_OtherChunk->GetBlockTypeMeta(RelX, a_BlockY, RelZ, Block, Meta);
 
-		// If a_OtherChunk is passed (not NULL), it is the chunk that had a block change, and a_Chunk will be the neighbouring chunk of that block
+		// If a_OtherChunk is passed (not nullptr), it is the chunk that had a block change, and a_Chunk will be the neighbouring chunk of that block
 		// Because said neighbouring chunk does not know of this change but still needs to update its redstone, we set it to dirty
 		a_Chunk->SetIsRedstoneDirty(true);
 	}
@@ -100,7 +100,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 		}
 	), RepeatersDelayList.end());
 
-	if (a_OtherChunk != NULL)
+	if (a_OtherChunk != nullptr)
 	{
 		// DO NOT touch our chunk's data structure if we are being called with coordinates from another chunk - this one caused me massive grief :P
 		return;
@@ -148,7 +148,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	m_RedstoneSimulatorChunkData = (cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
-	if (m_RedstoneSimulatorChunkData == NULL)
+	if (m_RedstoneSimulatorChunkData == nullptr)
 	{
 		m_RedstoneSimulatorChunkData = new cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData();
 		a_Chunk->SetRedstoneSimulatorData(m_RedstoneSimulatorChunkData);
@@ -343,7 +343,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		AddFaceDirection(X, Y, Z, GetHandlerCompileTime<E_BLOCK_TORCH>::type::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 
 		cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
-		if ((Neighbour == NULL) || !Neighbour->IsValid())
+		if ((Neighbour == nullptr) || !Neighbour->IsValid())
 		{
 			return;
 		}
@@ -399,7 +399,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneTorch(int a_RelBlockX, int a_R
 		AddFaceDirection(X, Y, Z, GetHandlerCompileTime<E_BLOCK_TORCH>::type::MetaDataToDirection(m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ)), true);  // Inverse true to get the block torch is on
 
 		cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(X, Z);
-		if ((Neighbour == NULL) || !Neighbour->IsValid())
+		if ((Neighbour == nullptr) || !Neighbour->IsValid())
 		{
 			return;
 		}
@@ -1050,7 +1050,7 @@ void cIncrementalRedstoneSimulator::HandlePressurePlate(int a_RelBlockX, int a_R
 			// MCS feature - stone pressure plates can only be triggered by players :D
 			cPlayer * a_Player = this->m_World.FindClosestPlayer(Vector3f(BlockX + 0.5f, (float)a_RelBlockY, BlockZ + 0.5f), 0.5f, false);
 
-			if (a_Player != NULL)
+			if (a_Player != nullptr)
 			{
 				m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0x1);
 				SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
@@ -1847,7 +1847,7 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_RelBlockX, int a_R
 void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, unsigned char a_PowerLevel)
 {
 	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ);  // Adjust coordinates for the later call using these values
-	if ((Neighbour == NULL) || !Neighbour->IsValid())
+	if ((Neighbour == nullptr) || !Neighbour->IsValid())
 	{
 		return;
 	}
@@ -1922,7 +1922,7 @@ void cIncrementalRedstoneSimulator::SetBlockLinkedPowered(
 
 	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ);
 	m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelMiddleX, a_RelMiddleZ);
-	if ((Neighbour == NULL) || !Neighbour->IsValid())
+	if ((Neighbour == nullptr) || !Neighbour->IsValid())
 	{
 		return;
 	}
@@ -2030,7 +2030,7 @@ void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_RelSourceX, int a_R
 {
 	if (!a_IsFirstCall)  // The neighbouring chunks passed when this parameter is false may be invalid
 	{
-		if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+		if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 		{
 			return;
 		}
@@ -2089,7 +2089,7 @@ void cIncrementalRedstoneSimulator::SetInvalidMiddleBlock(int a_RelMiddleX, int 
 {
 	if (!a_IsFirstCall)  // The neighbouring chunks passed when this parameter is false may be invalid
 	{
-		if ((a_Chunk == NULL) || !a_Chunk->IsValid())
+		if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
 		{
 			return;
 		}

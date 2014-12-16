@@ -108,7 +108,7 @@ private:
 	RepeatersDelayList * m_RepeatersDelayList;
 
 	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override { RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk); }
-	void RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk = NULL);
+	void RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk = nullptr);
 	cChunk * m_Chunk;
 
 	// We want a_MyState for devices needing a full FastSetBlock (as opposed to meta) because with our simulation model, we cannot keep setting the block if it is already set correctly
@@ -391,3 +391,7 @@ private:
 		return RelPos;
 	}
 };
+
+
+
+
