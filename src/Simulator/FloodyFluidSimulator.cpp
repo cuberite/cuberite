@@ -58,6 +58,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	BLOCKTYPE MyBlock; NIBBLETYPE MyMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta);
 
+
 	if (!IsAnyFluidBlock(MyBlock))
 	{
 		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
@@ -115,13 +116,15 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 			// Also has been re-scheduled for ticking in the next wave, so no marking is needed
 			return;
 		}
+
+		else if (SpreadFurther && (NewMeta < 8))
+		{
+			// Spread to the neighbors:
+			SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
+		}
 	}
 	
-	if (SpreadFurther && (NewMeta < 8))
-	{
-		// Spread to the neighbors:
-		SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
-	}
+
 	
 	// Mark as processed:
 	a_Chunk->FastSetBlock(a_RelX, a_RelY, a_RelZ, m_StationaryFluidBlock, MyMeta);
