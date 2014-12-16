@@ -133,6 +133,9 @@ public:
 	If it's false, you only see the name when you sight the mob. If it's true, you always see the custom name. */
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
+	/** Returns how many at most can spawn in a chunk at once. */
+	virtual int GetMaxPackSize(void) const { return 4; }
+
 	/** Translates MobType enum to a string, empty string if unknown */
 	static AString MobTypeToString(eMonsterType a_MobType);
 

@@ -5,7 +5,6 @@
 
 #include "../World.h"
 #include "../FastRandom.h"
-#include "../MobSpawner.h"
 #include "../Items/ItemSpawnEgg.h"
 
 
@@ -121,73 +120,36 @@ void cMobSpawnerEntity::SpawnEntity(void)
 		return;
 	}
 
-	class cCallback : public cChunkCallback
+	cFastRandom Random;
+
+	for (size_t i = 0; i < 4; i++)
 	{
-	public:
-		cCallback(int a_RelX, int a_RelY, int a_RelZ, eMonsterType a_MobType, int a_NearbyEntitiesNum) :
-			m_RelX(a_RelX),
-			m_RelY(a_RelY),
-			m_RelZ(a_RelZ),
-			m_MobType(a_MobType),
-			m_NearbyEntitiesNum(a_NearbyEntitiesNum)
+		if (NearbyEntities >= 6)
 		{
+			break;
 		}
 
-		virtual bool Item(cChunk * a_Chunk)
-		{
-			cFastRandom Random;
+		int PosX = (int) (m_PosX + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
+		int PosY = m_PosY + Random.NextInt(3) - 1;
+		int PosZ = (int) (m_PosZ + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
 
-			bool EntitiesSpawned = false;
-			for (size_t i = 0; i < 4; i++)
+		if (m_World->GetCreatureSpawner().CanSpawnHere(PosX, PosY, PosZ, m_Entity))
+		{
+			cMonster * Monster = cMonster::NewMonsterFromType(m_Entity);
+			if (Monster == NULL)
 			{
-				if (m_NearbyEntitiesNum >= 6)
-				{
-					break;
-				}
-
-				int RelX = (int) (m_RelX + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
-				int RelY = m_RelY + Random.NextInt(3) - 1;
-				int RelZ = (int) (m_RelZ + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
-
-				cChunk * Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
-				if ((Chunk == NULL) || !Chunk->IsValid())
-				{
-					continue;
-				}
-				EMCSBiome Biome = Chunk->GetBiomeAt(RelX, RelZ);
-
-				if (cMobSpawner::CanSpawnHere(Chunk, RelX, RelY, RelZ, m_MobType, Biome))
-				{
-					double PosX = Chunk->GetPosX() * cChunkDef::Width + RelX;
-					double PosZ = Chunk->GetPosZ() * cChunkDef::Width + RelZ;
-
-					cMonster * Monster = cMonster::NewMonsterFromType(m_MobType);
-					if (Monster == NULL)
-					{
-						continue;
-					}
-
-					Monster->SetPosition(PosX, RelY, PosZ);
-					Monster->SetYaw(Random.NextFloat() * 360.0f);
-					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != mtInvalidType)
-					{
-						EntitiesSpawned = true;
-						Chunk->BroadcastSoundParticleEffect(2004, (int)(PosX * 8.0), (int)(RelY * 8.0), (int)(PosZ * 8.0), 0);
-						m_NearbyEntitiesNum++;
-					}
-				}
+				continue;
 			}
-			return EntitiesSpawned;
-		}
-	protected:
-		int m_RelX, m_RelY, m_RelZ;
-		eMonsterType m_MobType;
-		int m_NearbyEntitiesNum;
-	} Callback(m_RelX, m_PosY, m_RelZ, m_Entity, NearbyEntities);
 
-	if (m_World->DoWithChunk(GetChunkX(), GetChunkZ(), Callback))
-	{
-		ResetTimer();
+			Monster->SetPosition(PosX, PosY, PosZ);
+			Monster->SetYaw(Random.NextFloat() * 360.0f);
+			if (m_World->SpawnMobFinalize(Monster) != mtInvalidType)
+			{
+				m_World->BroadcastSoundParticleEffect(2004, (int)(PosX * 8.0), (int)(PosY * 8.0), (int)(PosZ * 8.0), 0);
+				NearbyEntities++;
+				ResetTimer();
+			}
+		}
 	}
 }
 

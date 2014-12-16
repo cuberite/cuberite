@@ -23,6 +23,7 @@
 #include "ForEachChunkProvider.h"
 #include "Scoreboard.h"
 #include "MapManager.h"
+#include "CreatureSpawner.h"
 #include "Blocks/WorldInterface.h"
 #include "Blocks/BroadcastInterface.h"
 #include "FastRandom.h"
@@ -397,6 +398,14 @@ public:
 	/** Set the state of a trapdoor. Returns true if the trapdoor was updated, false if there was no trapdoor at those coords. */
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
+	/** Returns the count of all monsters in the world. */
+	int GetMonstersNum(void) { return GetMonstersNum(cMonster::mfUnhandled); }  // tolua_export
+
+	/** Returns the count of all monsters with this family in the world. */
+	int GetMonstersNum(cMonster::eFamily a_MobFamily);  // tolua_export
+
+	cCreatureSpawner & GetCreatureSpawner() { return m_CreatureSpawner; }
+
 	/** Regenerate the given chunk: */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 	
@@ -502,6 +511,7 @@ public:
 	bool DigBlock   (int a_X, int a_Y, int a_Z);
 	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player) override;
 
+	Vector3d GetSpawn(void) const { return Vector3d(m_SpawnX, m_SpawnY, m_SpawnZ); }
 	double GetSpawnX(void) const { return m_SpawnX; }
 	double GetSpawnY(void) const { return m_SpawnY; }
 	double GetSpawnZ(void) const { return m_SpawnZ; }
@@ -998,6 +1008,8 @@ private:
 	cChunkSender     m_ChunkSender;
 	cLightingThread  m_Lighting;
 	cTickThread      m_TickThread;
+
+	cCreatureSpawner m_CreatureSpawner;
 	
 	/** Guards the m_Tasks */
 	cCriticalSection m_CSTasks;

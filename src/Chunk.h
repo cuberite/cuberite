@@ -47,7 +47,6 @@ class cChunkDataSerializer;
 class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
-class cMobSpawner;
 class cRedstonePoweredEntity;
 class cSetChunkData;
 
@@ -157,8 +156,8 @@ public:
 	/** Recence all mobs proximities to players in order to know what to do with them */
 	void CollectMobCensus(cMobCensus& toFill);
 
-	/** Try to Spawn Monsters inside chunk */
-	void SpawnMobs(cMobSpawner& a_MobSpawner);
+	/** Returns the count of monsters with this family in the chunk. */
+	int GetMonstersNum(cMonster::eFamily a_MobFamily) const;
 
 	void Tick(float a_Dt);
 	

@@ -29,6 +29,7 @@ SET (SRCS
 	CommandOutput.cpp
 	CompositeChat.cpp
 	CraftingRecipes.cpp
+	CreatureSpawner.cpp
 	Cuboid.cpp
 	DeadlockDetect.cpp
 	Enchantments.cpp
@@ -49,7 +50,6 @@ SET (SRCS
 	MobCensus.cpp
 	MobFamilyCollecter.cpp
 	MobProximityCounter.cpp
-	MobSpawner.cpp
 	MonsterConfig.cpp
 	ProbabDistrib.cpp
 	RankManager.cpp
@@ -91,6 +91,7 @@ SET (HDRS
 	CommandOutput.h
 	CompositeChat.h
 	CraftingRecipes.h
+	CreatureSpawner.h
 	Cuboid.h
 	DeadlockDetect.h
 	Defines.h
@@ -116,7 +117,6 @@ SET (HDRS
 	MobCensus.h
 	MobFamilyCollecter.h
 	MobProximityCounter.h
-	MobSpawner.h
 	MonsterConfig.h
 	ProbabDistrib.h
 	RankManager.h

@@ -34,7 +34,6 @@
 #include "Blocks/BlockHandler.h"
 #include "Simulator/FluidSimulator.h"
 #include "MobCensus.h"
-#include "MobSpawner.h"
 #include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
 #include "BoundingBox.h"
@@ -529,70 +528,27 @@ void cChunk::GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z)
 
 
 
-void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
+int cChunk::GetMonstersNum(cMonster::eFamily a_MobFamily) const
 {
-	int CenterX, CenterY, CenterZ;
-	GetRandomBlockCoords(CenterX, CenterY, CenterZ);
+	int Count = 0;
 
-	BLOCKTYPE PackCenterBlock = GetBlock(CenterX, CenterY, CenterZ);
-	if (!a_MobSpawner.CheckPackCenter(PackCenterBlock))
+	// The entity list is locked by the parent chunkmap's CS
+	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
-		return;
+		if (!(*itr)->IsMob())
+		{
+			// Not a mob
+			continue;
+		}
+
+		cMonster * Mob = static_cast<cMonster *>(*itr);
+		if ((a_MobFamily == cMonster::mfUnhandled) || (Mob->GetMobFamily() == a_MobFamily))
+		{
+			Count++;
+		}
 	}
-	
-	a_MobSpawner.NewPack();
-	int NumberOfTries = 0;
-	int NumberOfSuccess = 0;
-	int MaxNbOfSuccess = 4;  // This can be changed during the process for Wolves and Ghasts
-	while ((NumberOfTries < 12) && (NumberOfSuccess < MaxNbOfSuccess))
-	{
-		const int HorizontalRange = 20;  // MG TODO : relocate
-		const int VerticalRange = 0;     // MG TODO : relocate
-		int TryX, TryY, TryZ;
-		GetThreeRandomNumbers(TryX, TryY, TryZ, 2 * HorizontalRange + 1, 2 * VerticalRange + 1, 2 * HorizontalRange + 1);
-		TryX -= HorizontalRange;
-		TryY -= VerticalRange;
-		TryZ -= HorizontalRange;
-		TryX += CenterX;
-		TryY += CenterY;
-		TryZ += CenterZ;
 
-		ASSERT(TryY > 0);
-		ASSERT(TryY < cChunkDef::Height - 1);
-		
-		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(TryX, TryZ);
-		// MG TODO :
-		// Moon cycle (for slime)
-		// check player and playerspawn presence < 24 blocks
-		// check mobs presence on the block
-
-		// MG TODO : check that "Level" really means Y
-		
-		/*
-		NIBBLETYPE SkyLight = 0;
-
-		NIBBLETYPE BlockLight = 0;
-		*/
-
-		NumberOfTries++;
-		if (!IsLightValid())
-		{
-			continue;
-		}
-		
-		cEntity * newMob = a_MobSpawner.TryToSpawnHere(this, TryX, TryY, TryZ, Biome, MaxNbOfSuccess);
-		if (newMob == nullptr)
-		{
-			continue;
-		}
-		int WorldX, WorldY, WorldZ;
-		PositionToWorldPosition(TryX, TryY, TryZ, WorldX, WorldY, WorldZ);
-		double ActualX = WorldX + 0.5;
-		double ActualZ = WorldZ + 0.5;
-		newMob->SetPosition(ActualX, WorldY, ActualZ);
-		LOGD("Spawning %s #%i at {%d, %d, %d}", newMob->GetClass(), newMob->GetUniqueID(), WorldX, WorldY, WorldZ);
-		NumberOfSuccess++;
-	}  // while (retry)
+	return Count;
 }
 
 

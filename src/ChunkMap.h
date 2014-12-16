@@ -7,6 +7,7 @@
 
 
 #include "ChunkDataCallback.h"
+#include "Mobs/Monster.h"
 
 
 
@@ -34,7 +35,6 @@ class cPickup;
 class cChunkDataSerializer;
 class cBlockArea;
 class cMobCensus;
-class cMobSpawner;
 class cSetChunkData;
 class cBoundingBox;
 
@@ -300,11 +300,17 @@ public:
 	
 	/** Sets the sign text. Returns true if sign text changed. */
 	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+
+	/** Returns the count of monsters with this family in the world. */
+	int GetMonstersNum(cMonster::eFamily a_MobFamily);
 	
 	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk()) */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 	
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
+
+	/** Calls the callback for each chunk in the world. Returns true if all chunks have been processed successfully */
+	bool ForEachChunk(cChunkDataCallback & a_Callback);
 	
 	/** Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully */
 	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
@@ -329,9 +335,6 @@ public:
 
 	/** Make a Mob census, of all mobs, their family, their chunk and theyr distance to closest player */
 	void CollectMobCensus(cMobCensus& a_ToFill);
-
-	/** Try to Spawn Monsters inside all Chunks */
-	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
 	void Tick(float a_Dt);
 	
@@ -397,8 +400,9 @@ private:
 		
 		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
 		void CollectMobCensus(cMobCensus& a_ToFill);
-		/** Try to Spawn Monsters inside all Chunks */
-		void SpawnMobs(cMobSpawner& a_MobSpawner);
+
+		/** Returns the count of monsters with this family in the layer. */
+		int GetMonstersNum(cMonster::eFamily a_MobFamily);
 
 		void Tick(float a_Dt);
 		
