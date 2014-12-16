@@ -8,8 +8,8 @@
 
 
 
-/// Converts an angle in radians into a byte representation used by the network protocol
-#define ANGLE_TO_PROTO(X) (Byte)(X * 255 / 360)
+/// Converts an angle in radians into a uint8_t representation used by the network protocol
+#define ANGLE_TO_PROTO(X) (uint8_t)(X * 255 / 360)
 
 ////////////////////////////////////////////////////////////////////////////////
 // cSplashPotionEntityCallback:

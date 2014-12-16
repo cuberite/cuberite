@@ -24,7 +24,7 @@ public:
 	
 	/** Connects to the specified server and performs SSL handshake.
 	Returns true if successful, false on failure. Sets internal error text on failure. */
-	bool Connect(const AString & a_ServerName, UInt16 a_Port);
+	bool Connect(const AString & a_ServerName, uint16_t a_Port);
 	
 	/** Sends the specified data over the connection.
 	Returns true if successful, false on failure. Sets the internal error text on failure. */

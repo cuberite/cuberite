@@ -116,7 +116,7 @@ public:
 		E_BASE_COLOR_DARK_BROWN  = 52  /* Wood    */
 	};
 
-	typedef Byte ColorID;
+	typedef uint8_t ColorID;
 
 	// tolua_end
 
@@ -207,9 +207,9 @@ protected:
 		unsigned int m_NextDecoratorUpdate;
 
 		/** Number of pixel data updates. */
-		Int64 m_DataUpdate;
+		int64_t m_DataUpdate;
 
-		Int64 m_LastUpdate;
+		int64_t m_LastUpdate;
 	};
 
 	typedef std::list<cMapClient> cMapClientList;
@@ -224,10 +224,10 @@ private:
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
 
 	/** Add a new map client. */
-	void AddPlayer(cPlayer * a_Player, Int64 a_WorldAge);
+	void AddPlayer(cPlayer * a_Player, int64_t a_WorldAge);
 
 	/** Remove inactive or invalid clients. */
-	void RemoveInactiveClients(Int64 a_WorldAge);
+	void RemoveInactiveClients(int64_t a_WorldAge);
 
 	/** Send next update packet to the specified client. */
 	void StreamNext(cMapClient & a_Client);

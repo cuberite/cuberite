@@ -19,12 +19,12 @@
 class cSha1Checksum
 {
 public:
-	typedef Byte Checksum[20];  // The type used for storing the checksum
+	typedef uint8_t Checksum[20];  // The type used for storing the checksum
 	
 	cSha1Checksum(void);
 	
 	/** Adds the specified data to the checksum */
-	void Update(const Byte * a_Data, size_t a_Length);
+	void Update(const uint8_t * a_Data, size_t a_Length);
 	
 	/** Calculates and returns the final checksum */
 	void Finalize(Checksum & a_Output);

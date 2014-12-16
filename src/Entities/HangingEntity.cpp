@@ -73,7 +73,7 @@ void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 		SetYaw(Dir * 90);
 	}
 
-	a_ClientHandle.SendSpawnObject(*this, 71, Dir, (Byte)GetYaw(), (Byte)GetPitch());
+	a_ClientHandle.SendSpawnObject(*this, 71, Dir, (uint8_t)GetYaw(), (uint8_t)GetPitch());
 	a_ClientHandle.SendEntityMetadata(*this);
 }
 

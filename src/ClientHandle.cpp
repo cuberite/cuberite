@@ -2437,7 +2437,7 @@ void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cI
 
 
 
-void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
+void cClientHandle::SendMapColumn(int a_ID, int a_X, int a_Y, const uint8_t * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
 }
@@ -2649,7 +2649,7 @@ void cClientHandle::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode)
 {
 	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
 }
@@ -2658,7 +2658,7 @@ void cClientHandle::SendScoreboardObjective(const AString & a_Name, const AStrin
 
 
 
-void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode)
 {
 	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
 }
@@ -2712,7 +2712,7 @@ void cClientHandle::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cClientHandle::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, uint8_t a_Yaw, uint8_t a_Pitch)
 {
 	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
 }
@@ -2766,7 +2766,7 @@ void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cClientHandle::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
+void cClientHandle::SendTimeUpdate(int64_t a_WorldAge, int64_t a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
 }
@@ -2956,7 +2956,7 @@ void cClientHandle::PacketBufferFull(void)
 
 
 
-void cClientHandle::PacketUnknown(UInt32 a_PacketType)
+void cClientHandle::PacketUnknown(uint32_t a_PacketType)
 {
 	LOGERROR("Unknown packet type 0x%x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
 
@@ -3034,7 +3034,7 @@ void cClientHandle::SocketClosed(void)
 
 
 
-void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
+void cClientHandle::HandleEnchantItem(uint8_t & a_WindowID, uint8_t & a_Enchantment)
 {
 	if (a_Enchantment > 2)
 	{

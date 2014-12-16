@@ -594,9 +594,9 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 		LOGWARNING("cBlockArea: Cannot open file \"%s\" for raw dump", a_FileName.c_str());
 		return;
 	}
-	UInt32 SizeX = ntohl(m_Size.x);
-	UInt32 SizeY = ntohl(m_Size.y);
-	UInt32 SizeZ = ntohl(m_Size.z);
+	uint32_t SizeX = ntohl(m_Size.x);
+	uint32_t SizeY = ntohl(m_Size.y);
+	uint32_t SizeZ = ntohl(m_Size.z);
 	f.Write(&SizeX, 4);
 	f.Write(&SizeY, 4);
 	f.Write(&SizeZ, 4);

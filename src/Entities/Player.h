@@ -547,7 +547,7 @@ protected:
 	bool m_CanFly;  // If this is true the player can fly. Even if he is not in creative.
 
 	/** The world tick in which eating will be finished. -1 if not eating */
-	Int64 m_EatingFinishTick;
+	int64_t m_EatingFinishTick;
 
 	/** Player Xp level */
 	short int m_LifetimeTotalXp;

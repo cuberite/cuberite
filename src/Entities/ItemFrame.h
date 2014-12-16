@@ -30,10 +30,10 @@ public:
 	void SetItem(cItem & a_Item) { m_Item = a_Item; }
 
 	/** Returns the rotation from the item in the frame */
-	Byte GetItemRotation(void) const { return m_ItemRotation; }
+	uint8_t GetItemRotation(void) const { return m_ItemRotation; }
 
 	/** Set the rotation from the item in the frame */
-	void SetItemRotation(Byte a_ItemRotation) { m_ItemRotation = a_ItemRotation; }
+	void SetItemRotation(uint8_t a_ItemRotation) { m_ItemRotation = a_ItemRotation; }
 
 	// tolua_end
 
@@ -44,7 +44,7 @@ private:
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
 
 	cItem m_Item;
-	Byte m_ItemRotation;
+	uint8_t m_ItemRotation;
 
 };  // tolua_export
 

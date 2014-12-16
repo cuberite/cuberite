@@ -338,7 +338,7 @@ cFastNBTWriter::cFastNBTWriter(const AString & a_RootTagName) :
 	m_Stack[0].m_Type = TAG_Compound;
 	m_Result.reserve(100 * 1024);
 	m_Result.push_back(TAG_Compound);
-	WriteString(a_RootTagName.data(), (UInt16)a_RootTagName.size());
+	WriteString(a_RootTagName.data(), (uint16_t)a_RootTagName.size());
 }
 
 
@@ -425,10 +425,10 @@ void cFastNBTWriter::AddByte(const AString & a_Name, unsigned char a_Value)
 
 
 
-void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
+void cFastNBTWriter::AddShort(const AString & a_Name, int16_t a_Value)
 {
 	TagCommon(a_Name, TAG_Short);
-	Int16 Value = htons(a_Value);
+	int16_t Value = htons(a_Value);
 	m_Result.append((const char *)&Value, 2);
 }
 
@@ -436,10 +436,10 @@ void cFastNBTWriter::AddShort(const AString & a_Name, Int16 a_Value)
 
 
 
-void cFastNBTWriter::AddInt(const AString & a_Name, Int32 a_Value)
+void cFastNBTWriter::AddInt(const AString & a_Name, int32_t a_Value)
 {
 	TagCommon(a_Name, TAG_Int);
-	Int32 Value = htonl(a_Value);
+	int32_t Value = htonl(a_Value);
 	m_Result.append((const char *)&Value, 4);
 }
 
@@ -447,10 +447,10 @@ void cFastNBTWriter::AddInt(const AString & a_Name, Int32 a_Value)
 
 
 
-void cFastNBTWriter::AddLong(const AString & a_Name, Int64 a_Value)
+void cFastNBTWriter::AddLong(const AString & a_Name, int64_t a_Value)
 {
 	TagCommon(a_Name, TAG_Long);
-	Int64 Value = HostToNetwork8(&a_Value);
+	int64_t Value = HostToNetwork8(&a_Value);
 	m_Result.append((const char *)&Value, 8);
 }
 
@@ -461,7 +461,7 @@ void cFastNBTWriter::AddLong(const AString & a_Name, Int64 a_Value)
 void cFastNBTWriter::AddFloat(const AString & a_Name, float a_Value)
 {
 	TagCommon(a_Name, TAG_Float);
-	Int32 Value = HostToNetwork4(&a_Value);
+	int32_t Value = HostToNetwork4(&a_Value);
 	m_Result.append((const char *)&Value, 4);
 }
 
@@ -472,7 +472,7 @@ void cFastNBTWriter::AddFloat(const AString & a_Name, float a_Value)
 void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 {
 	TagCommon(a_Name, TAG_Double);
-	Int64 Value = HostToNetwork8(&a_Value);
+	int64_t Value = HostToNetwork8(&a_Value);
 	m_Result.append((const char *)&Value, 8);
 }
 
@@ -483,7 +483,7 @@ void cFastNBTWriter::AddDouble(const AString & a_Name, double a_Value)
 void cFastNBTWriter::AddString(const AString & a_Name, const AString & a_Value)
 {
 	TagCommon(a_Name, TAG_String);
-	Int16 len = htons((short)(a_Value.size()));
+	int16_t len = htons((short)(a_Value.size()));
 	m_Result.append((const char *)&len, 2);
 	m_Result.append(a_Value.c_str(), a_Value.size());
 }
@@ -536,9 +536,9 @@ void cFastNBTWriter::Finish(void)
 
 
 
-void cFastNBTWriter::WriteString(const char * a_Data, UInt16 a_Length)
+void cFastNBTWriter::WriteString(const char * a_Data, uint16_t a_Length)
 {
-	Int16 Len = htons(a_Length);
+	int16_t Len = htons(a_Length);
 	m_Result.append((const char *)&Len, 2);
 	m_Result.append(a_Data, a_Length);
 }

@@ -162,7 +162,7 @@ protected:
 		int & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
 	
-	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
+	/** Compresses from 1-block-per-uint8_t (faster calc) into 2-blocks-per-uint8_t (MC storage): */
 	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
 	
 	inline void PropagateLight(

@@ -104,7 +104,7 @@ protected:
 		AString m_UUID;               // Short lowercased UUID
 		AString m_Textures;           // The Textures field of the profile properties
 		AString m_TexturesSignature;  // The signature of the Textures field of the profile properties
-		Int64   m_DateTime;           // UNIXtime of the profile lookup
+		int64_t   m_DateTime;           // UNIXtime of the profile lookup
 		
 		/** Default constructor for the container's sake. */
 		sProfile(void) :
@@ -122,7 +122,7 @@ protected:
 			const AString & a_UUID,
 			const AString & a_Textures,
 			const AString & a_TexturesSignature,
-			Int64 a_DateTime
+			int64_t a_DateTime
 		) :
 			m_PlayerName(a_PlayerName),
 			m_UUID(a_UUID),
@@ -137,7 +137,7 @@ protected:
 			const AString & a_PlayerName,
 			const AString & a_UUID,
 			const Json::Value & a_Properties,
-			Int64 a_DateTime
+			int64_t a_DateTime
 		);
 	};
 	typedef std::map<AString, sProfile> cProfileMap;

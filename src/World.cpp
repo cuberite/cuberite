@@ -646,10 +646,10 @@ void cWorld::Start(void)
 	m_TickThread.Start();
 
 	// Init of the spawn monster time (as they are supposed to have different spawn rate)
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfHostile, 0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfPassive, 0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfAmbient, 0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfWater, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, int64_t>::value_type(cMonster::mfHostile, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, int64_t>::value_type(cMonster::mfPassive, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, int64_t>::value_type(cMonster::mfAmbient, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, int64_t>::value_type(cMonster::mfWater, 0));
 
 	m_MapManager.LoadMapData();
 
@@ -871,7 +871,7 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 	}  // for itr - SetChunkDataQueue[]
 
 	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
-	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
+	m_WorldAge  = (int64_t)(m_WorldAgeSecs  * 20.0);
 
 	if (m_IsDaylightCycleEnabled)
 	{
@@ -2280,7 +2280,7 @@ void cWorld::BroadcastRemoveEntityEffect(const cEntity & a_Entity, int a_EffectI
 
 
 
-void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -2298,7 +2298,7 @@ void cWorld::BroadcastScoreboardObjective(const AString & a_Name, const AString 
 
 
 
-void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cWorld::BroadcastScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode)
 {
 	cCSLock Lock(m_CSPlayers);
 	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
@@ -3105,7 +3105,7 @@ void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
 
 void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 {
-	Int64 TargetTick = a_DelayTicks + m_WorldAge;
+	int64_t TargetTick = a_DelayTicks + m_WorldAge;
 	
 	// Insert the task into the list of scheduled tasks, ordered by its target tick
 	cCSLock Lock(m_CSScheduledTasks);

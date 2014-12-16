@@ -57,7 +57,7 @@ bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, i
 bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
-	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
+	int64_t CurrentTick = a_Chunk.GetWorld()->GetWorldAge();
 
 	bool res = false;
 	res = MoveItemsIn  (a_Chunk, CurrentTick) || res;
@@ -125,7 +125,7 @@ void cHopperEntity::OpenNewWindow(void)
 
 
 /// Moves items from the container above it into this hopper. Returns true if the contents have changed.
-bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, int64_t a_CurrentTick)
 {
 	if (m_PosY >= cChunkDef::Height)
 	{
@@ -180,7 +180,7 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 /// Moves pickups from above this hopper into it. Returns true if the contents have changed.
-bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, int64_t a_CurrentTick)
 {
 	UNUSED(a_CurrentTick);
 
@@ -273,7 +273,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 
 
 /// Moves items out from this hopper into the destination. Returns true if the contents have changed.
-bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick)
+bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, int64_t a_CurrentTick)
 {
 	if (a_CurrentTick - m_LastMoveItemsOutTick < TICKS_PER_TRANSFER)
 	{

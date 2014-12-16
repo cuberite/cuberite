@@ -365,8 +365,8 @@ void cNBTChunkSerializer::AddFlowerPotEntity(cFlowerPotEntity * a_FlowerPot)
 {
 	m_Writer.BeginCompound("");
 		AddBasicTileEntity(a_FlowerPot, "FlowerPot");
-		m_Writer.AddInt   ("Item", (Int32) a_FlowerPot->GetItem().m_ItemType);
-		m_Writer.AddInt   ("Data", (Int32) a_FlowerPot->GetItem().m_ItemDamage);
+		m_Writer.AddInt   ("Item", (int32_t) a_FlowerPot->GetItem().m_ItemType);
+		m_Writer.AddInt   ("Data", (int32_t) a_FlowerPot->GetItem().m_ItemDamage);
 	m_Writer.EndCompound();
 }
 
@@ -548,8 +548,8 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			}
 			case mtEnderman:
 			{
-				m_Writer.AddShort("carried",     (Int16)((const cEnderman *)a_Monster)->GetCarriedBlock());
-				m_Writer.AddShort("carriedData", (Int16)((const cEnderman *)a_Monster)->GetCarriedMeta());
+				m_Writer.AddShort("carried",     (int16_t)((const cEnderman *)a_Monster)->GetCarriedBlock());
+				m_Writer.AddShort("carriedData", (int16_t)((const cEnderman *)a_Monster)->GetCarriedMeta());
 				break;
 			}
 			case mtHorse:
@@ -654,7 +654,7 @@ void cNBTChunkSerializer::AddPickupEntity(cPickup * a_Pickup)
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_Pickup, "Item");
 		AddItem(a_Pickup->GetItem(), -1, "Item");
-		m_Writer.AddShort("Age",    (Int16)a_Pickup->GetAge());
+		m_Writer.AddShort("Age",    (int16_t)a_Pickup->GetAge());
 	m_Writer.EndCompound();
 }
 
@@ -674,9 +674,9 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			{
 				cArrowEntity * Arrow = (cArrowEntity *)a_Projectile;
 
-				m_Writer.AddShort("xTile", (Int16)Arrow->GetBlockHit().x);
-				m_Writer.AddShort("yTile", (Int16)Arrow->GetBlockHit().y);
-				m_Writer.AddShort("zTile", (Int16)Arrow->GetBlockHit().z);
+				m_Writer.AddShort("xTile", (int16_t)Arrow->GetBlockHit().x);
+				m_Writer.AddShort("yTile", (int16_t)Arrow->GetBlockHit().y);
+				m_Writer.AddShort("zTile", (int16_t)Arrow->GetBlockHit().z);
 				m_Writer.AddByte("pickup",   Arrow->GetPickupState());
 				m_Writer.AddDouble("damage", Arrow->GetDamageCoeff());
 				break;
@@ -685,8 +685,8 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 			{
 				cSplashPotionEntity * Potion = (cSplashPotionEntity *)a_Projectile;
 				
-				m_Writer.AddInt("EffectType",               (Int16)Potion->GetEntityEffectType());
-				m_Writer.AddInt("EffectDuration",           (Int16)Potion->GetEntityEffect().GetDuration());
+				m_Writer.AddInt("EffectType",               (int16_t)Potion->GetEntityEffectType());
+				m_Writer.AddInt("EffectDuration",           (int16_t)Potion->GetEntityEffect().GetDuration());
 				m_Writer.AddShort("EffectIntensity",         Potion->GetEntityEffect().GetIntensity());
 				m_Writer.AddDouble("EffectDistanceModifier", Potion->GetEntityEffect().GetDistanceModifier());
 				m_Writer.AddInt("PotionName",                Potion->GetPotionColor());
@@ -762,8 +762,8 @@ void cNBTChunkSerializer::AddExpOrbEntity(cExpOrb * a_ExpOrb)
 {
 	m_Writer.BeginCompound("");
 		AddBasicEntity(a_ExpOrb, "XPOrb");
-		m_Writer.AddShort("Age", (Int16)a_ExpOrb->GetAge());
-		m_Writer.AddShort("Value", (Int16)a_ExpOrb->GetReward());
+		m_Writer.AddShort("Age", (int16_t)a_ExpOrb->GetAge());
+		m_Writer.AddShort("Value", (int16_t)a_ExpOrb->GetReward());
 	m_Writer.EndCompound();
 }
 

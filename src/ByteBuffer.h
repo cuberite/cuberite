@@ -56,20 +56,20 @@ public:
 	bool ReadByte           (unsigned char & a_Value);
 	bool ReadBEShort        (short & a_Value);
 	bool ReadBEInt          (int & a_Value);
-	bool ReadBEInt64        (Int64 & a_Value);
+	bool ReadBEInt64        (int64_t & a_Value);
 	bool ReadBEFloat        (float & a_Value);
 	bool ReadBEDouble       (double & a_Value);
 	bool ReadBool           (bool & a_Value);
 	bool ReadBEUTF16String16(AString & a_Value);  // string length as BE short, then string as UTF-16BE
-	bool ReadVarInt         (UInt32 & a_Value);
+	bool ReadVarInt         (uint32_t & a_Value);
 	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool ReadLEInt          (int & a_Value);
 	bool ReadPosition       (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
 
-	/** Reads VarInt, assigns it to anything that can be assigned from an UInt32 (unsigned short, char, Byte, double, ...) */
+	/** Reads VarInt, assigns it to anything that can be assigned from an uint32_t (unsigned short, char, uint8_t, double, ...) */
 	template <typename T> bool ReadVarInt(T & a_Value)
 	{
-		UInt32 v;
+		uint32_t v;
 		bool res = ReadVarInt(v);
 		if (res)
 		{
@@ -84,11 +84,11 @@ public:
 	bool WriteBEShort        (short  a_Value);
 	bool WriteBEUShort       (unsigned short a_Value);
 	bool WriteBEInt          (int    a_Value);
-	bool WriteBEInt64        (Int64  a_Value);
+	bool WriteBEInt64        (int64_t  a_Value);
 	bool WriteBEFloat        (float  a_Value);
 	bool WriteBEDouble       (double a_Value);
 	bool WriteBool           (bool   a_Value);
-	bool WriteVarInt         (UInt32 a_Value);
+	bool WriteVarInt         (uint32_t a_Value);
 	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool WriteLEInt          (int a_Value);
 	bool WritePosition       (int a_BlockX, int a_BlockY, int a_BlockZ);

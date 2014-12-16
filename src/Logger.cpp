@@ -45,7 +45,7 @@ void cLogger::LogSimple(AString a_Message, eLogLevel a_LogLevel)
 
 	AString Line;
 	#ifdef _DEBUG
-		Printf(Line, "[%04llx|%02d:%02d:%02d] %s\n", static_cast<UInt64>(std::hash<std::thread::id>()(std::this_thread::get_id())), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
+		Printf(Line, "[%04llx|%02d:%02d:%02d] %s\n", static_cast<uint64_t>(std::hash<std::thread::id>()(std::this_thread::get_id())), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
 	#else
 		Printf(Line, "[%02d:%02d:%02d] %s\n", timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, a_Message.c_str());
 	#endif

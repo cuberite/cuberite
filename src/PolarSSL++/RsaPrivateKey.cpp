@@ -107,7 +107,7 @@ AString cRsaPrivateKey::GetPubKeyDER(void)
 
 
 
-int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
+int cRsaPrivateKey::Decrypt(const uint8_t * a_EncryptedData, size_t a_EncryptedLength, uint8_t * a_DecryptedData, size_t a_DecryptedMaxLength)
 {
 	if (a_EncryptedLength < m_Rsa.len)
 	{
@@ -141,7 +141,7 @@ int cRsaPrivateKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLeng
 
 
 
-int cRsaPrivateKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
+int cRsaPrivateKey::Encrypt(const uint8_t * a_PlainData, size_t a_PlainLength, uint8_t * a_EncryptedData, size_t a_EncryptedMaxLength)
 {
 	if (a_EncryptedMaxLength < m_Rsa.len)
 	{

@@ -131,7 +131,7 @@ protected:
 		int m_ChunkX;
 		int m_ChunkZ;
 		cChunkDef::BlockTypes        m_BlockTypes;
-		cChunkDesc::BlockNibbleBytes m_BlockMetas;  // The metas are uncompressed, 1 meta per byte
+		cChunkDesc::BlockNibbleBytes m_BlockMetas;  // The metas are uncompressed, 1 meta per uint8_t
 		cChunkDef::HeightMap         m_HeightMap;
 	} ;
 	

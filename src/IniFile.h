@@ -51,7 +51,7 @@ private:
 	/// If the object is case-insensitive, returns s as lowercase; otherwise returns s as-is
 	AString CheckCase(const AString & s) const;
 
-	/// Removes the UTF-8 BOMs (Byte order makers), if present.
+	/// Removes the UTF-8 BOMs (uint8_t order makers), if present.
 	void RemoveBom(AString & a_line) const;
 	
 public:
@@ -124,7 +124,7 @@ public:
 	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "");
 	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);
 	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0);
-	Int64   GetValueSetI(const AString & keyname, const AString & valuename, const Int64     defValue = 0);
+	int64_t   GetValueSetI(const AString & keyname, const AString & valuename, const int64_t     defValue = 0);
 	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false)
 	{
 		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) != 0);
@@ -147,7 +147,7 @@ public:
 	bool SetValue (const int keyID, const int valueID, const AString & value);
 	bool SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists = true);
 	bool SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists = true);
-	bool SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists = true);
+	bool SetValueI(const AString & a_Keyname, const AString & a_ValueName, const int64_t a_Value, const bool a_CreateIfNotExists = true);
 	bool SetValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value, const bool a_CreateIfNotExists = true)
 	{
 		return SetValueI(a_KeyName, a_ValueName, int(a_Value), a_CreateIfNotExists);
