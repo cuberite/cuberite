@@ -58,6 +58,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 	BLOCKTYPE MyBlock; NIBBLETYPE MyMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta);
 
+
 	if (!IsAnyFluidBlock(MyBlock))
 	{
 		// Can happen - if a block is scheduled for simulating and gets replaced in the meantime.
