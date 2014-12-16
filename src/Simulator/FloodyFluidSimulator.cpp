@@ -83,7 +83,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 			return;
 		}
 	}
-	
+
 	// New meta for the spreading to neighbors:
 	// If this is a source block or was falling, the new meta is just the falloff
 	// Otherwise it is the current meta plus falloff (may be larger than max height, will be checked later)
@@ -103,6 +103,11 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 				SpreadFurther = false;
 			}
 		}
+		// Spread to the neighbors:
+		if (SpreadFurther && (NewMeta < 8))
+		{	
+			SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
+		}
 		// If source creation is on, check for it here:
 		else if (
 			(m_NumNeighborsForSource > 0) &&  // Source creation is on
@@ -115,14 +120,13 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 			// Also has been re-scheduled for ticking in the next wave, so no marking is needed
 			return;
 		}
+
+		
 	}
 	
-	if (SpreadFurther && (NewMeta < 8))
-	{
-		// Spread to the neighbors:
-		SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
-	}
-	
+
+
+
 	// Mark as processed:
 	a_Chunk->FastSetBlock(a_RelX, a_RelY, a_RelZ, m_StationaryFluidBlock, MyMeta);
 }
