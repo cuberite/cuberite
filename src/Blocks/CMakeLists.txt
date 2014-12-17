@@ -76,6 +76,7 @@ SET (HDRS
 	BlockSignPost.h
 	BlockSlab.h
 	BlockSnow.h
+	BlockSponge.h
 	BlockStairs.h
 	BlockStems.h
 	BlockStone.h
