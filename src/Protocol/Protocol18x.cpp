@@ -92,7 +92,7 @@ extern bool g_ShouldLogCommIn, g_ShouldLogCommOut;
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol180:
 
-cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
+cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, uint16_t a_ServerPort, uint32_t a_State) :
 	super(a_Client),
 	m_ServerAddress(a_ServerAddress),
 	m_ServerPort(a_ServerPort),
@@ -121,11 +121,11 @@ void cProtocol180::DataReceived(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		Byte Decrypted[512];
+		uint8_t Decrypted[512];
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Decrypted)) ? sizeof(Decrypted) : a_Size;
-			m_Decryptor.ProcessData(Decrypted, (Byte *)a_Data, NumBytes);
+			m_Decryptor.ProcessData(Decrypted, (uint8_t *)a_Data, NumBytes);
 			AddReceivedData((const char *)Decrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -190,7 +190,7 @@ void cProtocol180::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLO
 
 	cPacketizer Pkt(*this, 0x23);  // Block Change packet
 	Pkt.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
-	Pkt.WriteVarInt(((UInt32)a_BlockType << 4) | ((UInt32)a_BlockMeta & 15));
+	Pkt.WriteVarInt(((uint32_t)a_BlockType << 4) | ((uint32_t)a_BlockMeta & 15));
 }
 
 
@@ -204,7 +204,7 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	cPacketizer Pkt(*this, 0x22);  // Multi Block Change packet
 	Pkt.WriteInt(a_ChunkX);
 	Pkt.WriteInt(a_ChunkZ);
-	Pkt.WriteVarInt((UInt32)a_Changes.size());
+	Pkt.WriteVarInt((uint32_t)a_Changes.size());
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
 		short Coords = (short) (itr->y | (itr->z << 8) | (itr->x << 12));
@@ -334,7 +334,7 @@ void cProtocol180::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, in
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByte(a_EffectID);
 	Pkt.WriteByte(a_Amplifier);
-	Pkt.WriteVarInt((UInt32)a_Duration);
+	Pkt.WriteVarInt((uint32_t)a_Duration);
 	Pkt.WriteBool(false);  // Hide particles
 }
 
@@ -347,7 +347,7 @@ void cProtocol180::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
-	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
+	Pkt.WriteVarInt((uint32_t)a_Entity.GetUniqueID());
 	Pkt.WriteShort(a_SlotNum);
 	Pkt.WriteItem(a_Item);
 }
@@ -361,7 +361,7 @@ void cProtocol180::SendEntityHeadLook(const cEntity & a_Entity)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x19);  // Entity Head Look packet
-	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
+	Pkt.WriteVarInt((uint32_t)a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
 }
 
@@ -391,7 +391,7 @@ void cProtocol180::SendEntityMetadata(const cEntity & a_Entity)
 	cPacketizer Pkt(*this, 0x1c);  // Entity Metadata packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteEntityMetadata(a_Entity);
-	Pkt.WriteByte(0x7f);  // The termination byte
+	Pkt.WriteByte(0x7f);  // The termination uint8_t
 }
 
 
@@ -519,7 +519,7 @@ void cProtocol180::SendHealth(void)
 	cPacketizer Pkt(*this, 0x06);  // Update Health packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteFloat((float)Player->GetHealth());
-	Pkt.WriteVarInt((UInt32)Player->GetFoodLevel());
+	Pkt.WriteVarInt((uint32_t)Player->GetFoodLevel());
 	Pkt.WriteFloat((float)Player->GetFoodSaturationLevel());
 }
 
@@ -565,7 +565,7 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteInt(a_Player.GetUniqueID());
-		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteByte((uint8_t)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteByte(Server->GetMaxPlayers());
@@ -642,7 +642,7 @@ void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol180::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
+void cProtocol180::SendMapColumn(int a_ID, int a_X, int a_Y, const uint8_t * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -736,7 +736,7 @@ void cProtocol180::SendPlayerAbilities(void)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x39);  // Player Abilities packet
-	Byte Flags = 0;
+	uint8_t Flags = 0;
 	cPlayer * Player = m_Client->GetPlayer();
 	if (Player->IsGameModeCreative())
 	{
@@ -823,8 +823,8 @@ void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 		}
 	}
 
-	Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
-	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+	Pkt.WriteVarInt((uint32_t)a_Player.GetGameMode());
+	Pkt.WriteVarInt((uint32_t)a_Player.GetClientHandle()->GetPing());
 	Pkt.WriteBool(false);
 }
 
@@ -854,7 +854,7 @@ void cProtocol180::SendPlayerListUpdateGameMode(const cPlayer & a_Player)
 	Pkt.WriteVarInt(1);
 	Pkt.WriteVarInt(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt((UInt32)a_Player.GetGameMode());
+	Pkt.WriteVarInt((uint32_t)a_Player.GetGameMode());
 }
 
 
@@ -869,7 +869,7 @@ void cProtocol180::SendPlayerListUpdatePing(const cPlayer & a_Player)
 	Pkt.WriteVarInt(2);
 	Pkt.WriteVarInt(1);
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+	Pkt.WriteVarInt((uint32_t)a_Player.GetClientHandle()->GetPing());
 }
 
 
@@ -1022,7 +1022,7 @@ void cProtocol180::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimens
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteInt((int)a_Dimension);
 	Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-	Pkt.WriteByte((Byte)Player->GetEffectiveGameMode());
+	Pkt.WriteByte((uint8_t)Player->GetEffectiveGameMode());
 	Pkt.WriteString("default");
 	m_LastSentDimension = a_Dimension;
 }
@@ -1038,8 +1038,8 @@ void cProtocol180::SendExperience(void)
 	cPacketizer Pkt(*this, 0x1f);  // Experience Packet
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteFloat(Player->GetXpPercentage());
-	Pkt.WriteVarInt((UInt32)Player->GetXpLevel());
-	Pkt.WriteVarInt((UInt32)Player->GetCurrentXp());
+	Pkt.WriteVarInt((uint32_t)Player->GetXpLevel());
+	Pkt.WriteVarInt((uint32_t)Player->GetCurrentXp());
 }
 
 
@@ -1062,7 +1062,7 @@ void cProtocol180::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocol180::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocol180::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -1080,7 +1080,7 @@ void cProtocol180::SendScoreboardObjective(const AString & a_Name, const AString
 
 
 
-void cProtocol180::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol180::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -1091,7 +1091,7 @@ void cProtocol180::SendScoreUpdate(const AString & a_Objective, const AString & 
 
 	if (a_Mode != 1)
 	{
-		Pkt.WriteVarInt((UInt32) a_Score);
+		Pkt.WriteVarInt((uint32_t) a_Score);
 	}
 }
 
@@ -1122,7 +1122,7 @@ void cProtocol180::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 	Pkt.WriteInt((int)(a_Y * 8.0));
 	Pkt.WriteInt((int)(a_Z * 8.0));
 	Pkt.WriteFloat(a_Volume);
-	Pkt.WriteByte((Byte)(a_Pitch * 63));
+	Pkt.WriteByte((uint8_t)(a_Pitch * 63));
 }
 
 
@@ -1172,7 +1172,7 @@ void cProtocol180::SendSpawnMob(const cMonster & a_Mob)
 	
 	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
 	Pkt.WriteVarInt(a_Mob.GetUniqueID());
-	Pkt.WriteByte((Byte)a_Mob.GetMobType());
+	Pkt.WriteByte((uint8_t)a_Mob.GetMobType());
 	Pkt.WriteFPInt(a_Mob.GetPosX());
 	Pkt.WriteFPInt(a_Mob.GetPosY());
 	Pkt.WriteFPInt(a_Mob.GetPosZ());
@@ -1190,7 +1190,7 @@ void cProtocol180::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cProtocol180::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, uint8_t a_Yaw, uint8_t a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	double PosX = a_Entity.GetPosX();
@@ -1319,7 +1319,7 @@ void cProtocol180::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-void cProtocol180::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
+void cProtocol180::SendTimeUpdate(int64_t a_WorldAge, int64_t a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	if (!a_DoDaylightCycle)
@@ -1359,7 +1359,7 @@ void cProtocol180::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
 	Pkt.WritePosition(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
 
-	Byte Action = 0;
+	uint8_t Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
@@ -1535,7 +1535,7 @@ bool cProtocol180::CompressPacket(const AString & a_Packet, AString & a_Compress
 
 	AString LengthData;
 	cByteBuffer Buffer(20);
-	Buffer.WriteVarInt((UInt32)a_Packet.size());
+	Buffer.WriteVarInt((uint32_t)a_Packet.size());
 	Buffer.ReadAll(LengthData);
 	Buffer.CommitRead();
 
@@ -1693,7 +1693,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 	// Handle all complete packets:
 	for (;;)
 	{
-		UInt32 PacketLen;
+		uint32_t PacketLen;
 		if (!m_ReceivedData.ReadVarInt(PacketLen))
 		{
 			// Not enough data
@@ -1708,11 +1708,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		}
 		
 		// Check packet for compression:
-		UInt32 CompressedSize = 0;
+		uint32_t CompressedSize = 0;
 		AString UncompressedData;
 		if (m_State == 3)
 		{
-			UInt32 NumBytesRead = m_ReceivedData.GetReadableSpace();
+			uint32_t NumBytesRead = m_ReceivedData.GetReadableSpace();
 			m_ReceivedData.ReadVarInt(CompressedSize);
 			if (CompressedSize > PacketLen)
 			{
@@ -1749,7 +1749,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		}
 		m_ReceivedData.CommitRead();
 
-		UInt32 PacketType;
+		uint32_t PacketType;
 		if (!bb.ReadVarInt(PacketType))
 		{
 			// Not enough data
@@ -1766,7 +1766,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
 			bb.ReadVarInt(PacketType);
-			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
+			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one uint8_t read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
 			CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
@@ -1800,7 +1800,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			return;
 		}
 
-		// The packet should have 1 byte left in the buffer - the NUL we had added
+		// The packet should have 1 uint8_t left in the buffer - the NUL we had added
 		if (bb.GetReadableSpace() != 1)
 		{
 			// Read more or less than packet length, report as error
@@ -1843,7 +1843,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 
 
 
-bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, uint32_t a_PacketType)
 {
 	switch (m_State)
 	{
@@ -1931,7 +1931,7 @@ bool cProtocol180::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
 
 void cProtocol180::HandlePacketStatusPing(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Timestamp);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt64, int64_t, Timestamp);
 
 	cPacketizer Pkt(*this, 0x01);  // Ping packet
 	Pkt.WriteInt64(Timestamp);
@@ -1988,7 +1988,7 @@ void cProtocol180::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
-	UInt32 EncKeyLength, EncNonceLength;
+	uint32_t EncKeyLength, EncNonceLength;
 	if (!a_ByteBuffer.ReadVarInt(EncKeyLength))
 	{
 		return;
@@ -2016,8 +2016,8 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 
 	// Decrypt EncNonce using privkey
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
-	Int32 DecryptedNonce[MAX_ENC_LEN / sizeof(Int32)];
-	int res = rsaDecryptor.Decrypt((const Byte *)EncNonce.data(), EncNonce.size(), (Byte *)DecryptedNonce, sizeof(DecryptedNonce));
+	int32_t DecryptedNonce[MAX_ENC_LEN / sizeof(int32_t)];
+	int res = rsaDecryptor.Decrypt((const uint8_t *)EncNonce.data(), EncNonce.size(), (uint8_t *)DecryptedNonce, sizeof(DecryptedNonce));
 	if (res != 4)
 	{
 		LOGD("Bad nonce length: got %d, exp %d", res, 4);
@@ -2032,8 +2032,8 @@ void cProtocol180::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	}
 	
 	// Decrypt the symmetric encryption key using privkey:
-	Byte DecryptedKey[MAX_ENC_LEN];
-	res = rsaDecryptor.Decrypt((const Byte *)EncKey.data(), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
+	uint8_t DecryptedKey[MAX_ENC_LEN];
+	res = rsaDecryptor.Decrypt((const uint8_t *)EncKey.data(), EncKey.size(), DecryptedKey, sizeof(DecryptedKey));
 	if (res != 16)
 	{
 		LOGD("Bad key length");
@@ -2089,7 +2089,7 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  EntityID);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Animation);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, Animation);
 	m_Client->HandleAnimation(Animation);
 }
 
@@ -2099,7 +2099,7 @@ void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Status);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, Status);
 
 	int BlockX, BlockY, BlockZ;
 	if (!a_ByteBuffer.ReadPosition(BlockX, BlockY, BlockZ))
@@ -2107,7 +2107,7 @@ void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, Face);
 	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), Status);
 }
 
@@ -2123,7 +2123,7 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, Face);
 	if (Face == 255)
 	{
 		Face = 0;
@@ -2132,9 +2132,9 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item, 3);
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, CursorX);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, CursorY);
+	HANDLE_READ(a_ByteBuffer, ReadByte,  uint8_t, CursorZ);
 	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
@@ -2155,8 +2155,8 @@ void cProtocol180::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
-	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ViewDistance);
-	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatFlags);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          uint8_t,    ViewDistance);
+	HANDLE_READ(a_ByteBuffer, ReadByte,          uint8_t,    ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
 	HANDLE_READ(a_ByteBuffer, ReadChar,          char,    SkinFlags);
 	
@@ -2218,9 +2218,9 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 
 void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32,  PlayerID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, uint32_t,  PlayerID);
 	HANDLE_READ(a_ByteBuffer, ReadChar,   char,    Action);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32,  JumpBoost);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, uint32_t,  JumpBoost);
 
 	switch (Action)
 	{
@@ -2238,7 +2238,7 @@ void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, KeepAliveID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, uint32_t, KeepAliveID);
 	m_Client->HandleKeepAlive((int)KeepAliveID);
 }
 
@@ -2258,7 +2258,7 @@ void cProtocol180::HandlePacketPlayer(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Flags);
+	HANDLE_READ(a_ByteBuffer, ReadByte,    uint8_t,  Flags);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
 
@@ -2377,7 +2377,7 @@ void cProtocol180::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 
 	if (HasPosition)
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt64, int64_t, Position);
 	}
 
 	m_Client->HandleTabCompletion(Text);
@@ -2411,8 +2411,8 @@ void cProtocol180::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, EntityID);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Type);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, uint32_t, EntityID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, uint32_t, Type);
 
 	switch (Type)
 	{
@@ -2449,8 +2449,8 @@ void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Enchantment);
+	HANDLE_READ(a_ByteBuffer, ReadByte, uint8_t, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadByte, uint8_t, Enchantment);
 
 	m_Client->HandleEnchantItem(WindowID, Enchantment);
 }
@@ -2463,9 +2463,9 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadChar,    char,  WindowID);
 	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
-	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Button);
+	HANDLE_READ(a_ByteBuffer, ReadByte,    uint8_t,  Button);
 	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, TransactionID);
-	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadByte,    uint8_t,  Mode);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
@@ -2525,7 +2525,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 {
 	if (a_Channel == "MC|AdvCdm")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode)
+		HANDLE_READ(a_ByteBuffer, ReadByte, uint8_t, Mode)
 		switch (Mode)
 		{
 			case 0x00:
@@ -2590,11 +2590,11 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 {
 	if (m_IsEncrypted)
 	{
-		Byte Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
+		uint8_t Encrypted[8192];  // Larger buffer, we may be sending lots of data (chunks)
 		while (a_Size > 0)
 		{
 			size_t NumBytes = (a_Size > sizeof(Encrypted)) ? sizeof(Encrypted) : a_Size;
-			m_Encryptor.ProcessData(Encrypted, (Byte *)a_Data, NumBytes);
+			m_Encryptor.ProcessData(Encrypted, (uint8_t *)a_Data, NumBytes);
 			m_Client->SendData((const char *)Encrypted, NumBytes);
 			a_Size -= NumBytes;
 			a_Data += NumBytes;
@@ -2716,7 +2716,7 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 
 
 
-void cProtocol180::StartEncryption(const Byte * a_Key)
+void cProtocol180::StartEncryption(const uint8_t * a_Key)
 {
 	m_Encryptor.Init(a_Key, a_Key);
 	m_Decryptor.Init(a_Key, a_Key);
@@ -2726,10 +2726,10 @@ void cProtocol180::StartEncryption(const Byte * a_Key)
 	cSha1Checksum Checksum;
 	cServer * Server = cRoot::Get()->GetServer();
 	const AString & ServerID = Server->GetServerID();
-	Checksum.Update((const Byte *)ServerID.c_str(), ServerID.length());
+	Checksum.Update((const uint8_t *)ServerID.c_str(), ServerID.length());
 	Checksum.Update(a_Key, 16);
-	Checksum.Update((const Byte *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
-	Byte Digest[20];
+	Checksum.Update((const uint8_t *)Server->GetPublicKeyDER().data(), Server->GetPublicKeyDER().size());
+	uint8_t Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
 }
@@ -2743,7 +2743,7 @@ void cProtocol180::StartEncryption(const Byte * a_Key)
 
 cProtocol180::cPacketizer::~cPacketizer()
 {
-	UInt32 PacketLen = (UInt32)m_Out.GetUsedSpace();
+	uint32_t PacketLen = (uint32_t)m_Out.GetUsedSpace();
 	AString PacketData, CompressedPacket;
 	m_Out.ReadAll(PacketData);
 	m_Out.CommitRead();
@@ -2810,7 +2810,7 @@ void cProtocol180::cPacketizer::WriteUUID(const AString & a_UUID)
 	AString UUID_1 = a_UUID.substr(0, 16);
 	AString UUID_2 = a_UUID.substr(16);
 
-	Int64 Value_1, Value_2;
+	int64_t Value_1, Value_2;
 	sscanf(UUID_1.c_str(), "%llx", &Value_1);
 	sscanf(UUID_2.c_str(), "%llx", &Value_2);
 
@@ -2968,8 +2968,8 @@ void cProtocol180::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 			Writer.AddInt("x", FlowerPotEntity.GetPosX());
 			Writer.AddInt("y", FlowerPotEntity.GetPosY());
 			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", (Int32) FlowerPotEntity.GetItem().m_ItemType);
-			Writer.AddInt("Data", (Int32) FlowerPotEntity.GetItem().m_ItemDamage);
+			Writer.AddInt("Item", (int32_t) FlowerPotEntity.GetItem().m_ItemType);
+			Writer.AddInt("Data", (int32_t) FlowerPotEntity.GetItem().m_ItemDamage);
 			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
 			break;
 		}
@@ -3018,7 +3018,7 @@ void cProtocol180::cPacketizer::WriteFPInt(double a_Value)
 void cProtocol180::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 {
 	// Common metadata:
-	Byte Flags = 0;
+	uint8_t Flags = 0;
 	if (a_Entity.IsOnFire())
 	{
 		Flags |= 0x01;
@@ -3039,7 +3039,7 @@ void cProtocol180::cPacketizer::WriteEntityMetadata(const cEntity & a_Entity)
 	{
 		Flags |= 0x20;
 	}
-	WriteByte(0);  // Byte(0) + index 0
+	WriteByte(0);  // uint8_t(0) + index 0
 	WriteByte(Flags);
 	
 	switch (a_Entity.GetEntityType())
@@ -3189,7 +3189,7 @@ void cProtocol180::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case mtWolf:
 		{
 			const cWolf & Wolf = (const cWolf &)a_Mob;
-			Byte WolfStatus = 0;
+			uint8_t WolfStatus = 0;
 			if (Wolf.IsSitting())
 			{
 				WolfStatus |= 0x1;
@@ -3217,7 +3217,7 @@ void cProtocol180::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case mtSheep:
 		{
 			WriteByte(0x10);
-			Byte SheepMetadata = 0;
+			uint8_t SheepMetadata = 0;
 			SheepMetadata = ((const cSheep &)a_Mob).GetFurColor();
 			if (((const cSheep &)a_Mob).IsSheared())
 			{
@@ -3230,9 +3230,9 @@ void cProtocol180::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case mtEnderman:
 		{
 			WriteByte(0x30);
-			WriteShort((Byte)(((const cEnderman &)a_Mob).GetCarriedBlock()));
+			WriteShort((uint8_t)(((const cEnderman &)a_Mob).GetCarriedBlock()));
 			WriteByte(0x11);
-			WriteByte((Byte)(((const cEnderman &)a_Mob).GetCarriedMeta()));
+			WriteByte((uint8_t)(((const cEnderman &)a_Mob).GetCarriedMeta()));
 			WriteByte(0x12);
 			WriteByte(((const cEnderman &)a_Mob).IsScreaming() ? 1 : 0);
 			break;
@@ -3309,7 +3309,7 @@ void cProtocol180::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			}
 			WriteByte(0x50);  // Int at index 16
 			WriteInt(Flags);
-			WriteByte(0x13);  // Byte at index 19
+			WriteByte(0x13);  // uint8_t at index 19
 			WriteByte(Horse.GetHorseType());
 			WriteByte(0x54);  // Int at index 20
 			int Appearance = 0;

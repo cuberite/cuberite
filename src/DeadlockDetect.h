@@ -35,7 +35,7 @@ protected:
 	struct sWorldAge
 	{
 		/// Last m_WorldAge that has been detected in this world
-		Int64 m_Age;
+		int64_t m_Age;
 		
 		/// Number of cycles for which the age has been the same
 		int m_NumCyclesSame;
@@ -54,10 +54,10 @@ protected:
 	virtual void Execute(void) override;
 	
 	/// Sets the initial world age
-	void SetWorldAge(const AString & a_WorldName, Int64 a_Age);
+	void SetWorldAge(const AString & a_WorldName, int64_t a_Age);
 	
 	/// Checks if the world's age has changed, updates the world's stats; calls DeadlockDetected() if deadlock detected
-	void CheckWorldAge(const AString & a_WorldName, Int64 a_Age);
+	void CheckWorldAge(const AString & a_WorldName, int64_t a_Age);
 	
 	/// Called when a deadlock is detected. Aborts the server.
 	NORETURN void DeadlockDetected(void);

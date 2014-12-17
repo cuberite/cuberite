@@ -158,7 +158,7 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
+	virtual int64_t GetWorldAge (void) const override { return m_WorldAge; }
 	virtual int GetTimeOfDay(void) const override { return m_TimeOfDay; }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
@@ -248,8 +248,8 @@ public:
 	void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
-	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
+	void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode);
+	void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode);
 	void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display);
 	void BroadcastSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr);   // tolua_export
 	void BroadcastSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data, const cClientHandle * a_Exclude = nullptr);  // tolua_export
@@ -860,11 +860,11 @@ private:
 	class cScheduledTask
 	{
 	public:
-		Int64 m_TargetTick;
+		int64_t m_TargetTick;
 		cTask * m_Task;
 		
 		/** Creates a new scheduled task; takes ownership of the task object passed to it. */
-		cScheduledTask(Int64 a_TargetTick, cTask * a_Task) :
+		cScheduledTask(int64_t a_TargetTick, cTask * a_Task) :
 			m_TargetTick(a_TargetTick),
 			m_Task(a_Task)
 		{
@@ -912,12 +912,12 @@ private:
 	bool   m_IsDaylightCycleEnabled;
 	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
 	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
-	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
+	int64_t  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
 	int    m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
-	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
-	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
-	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
-	std::map<cMonster::eFamily, Int64> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+	int64_t  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
+	int64_t  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
+	int64_t  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	std::map<cMonster::eFamily, int64_t> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
 

@@ -1313,7 +1313,7 @@ void cChunkMap::SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_B
 
 
 
-void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
+void cChunkMap::QueueSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int64_t a_Tick, BLOCKTYPE a_PreviousBlockType)
 {
 	int ChunkX, ChunkZ, X = a_BlockX, Y = a_BlockY, Z = a_BlockZ;
 	cChunkDef::AbsoluteToRelative(X, Y, Z, ChunkX, ChunkZ);

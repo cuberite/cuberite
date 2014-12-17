@@ -4,7 +4,7 @@
 // Interfaces to the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed again without further queries
 // The object also supports writing the blockdata back into cWorld, even into other coords
 
-// NOTE: All Nibble values (meta, blocklight, skylight) are stored one-nibble-per-byte for faster access / editting!
+// NOTE: All Nibble values (meta, blocklight, skylight) are stored one-nibble-per-uint8_t for faster access / editting!
 
 
 
@@ -292,9 +292,9 @@ public:
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/** Returns the internal pointer to the block types */
 	BLOCKTYPE *  GetBlockTypes   (void) const { return m_BlockTypes; }
-	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas; }     // NOTE: one uint8_t per block!
+	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight; }     // NOTE: one uint8_t per block!
+	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight; }  // NOTE: one uint8_t per block!
 	size_t       GetBlockCount(void) const { return (size_t)(m_Size.x * m_Size.y * m_Size.z); }
 	int MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const;
 
@@ -332,9 +332,9 @@ protected:
 	Vector3i m_WEOffset;
 
 	BLOCKTYPE *  m_BlockTypes;
-	NIBBLETYPE * m_BlockMetas;     // Each meta is stored as a separate byte for faster access
-	NIBBLETYPE * m_BlockLight;     // Each light value is stored as a separate byte for faster access
-	NIBBLETYPE * m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
+	NIBBLETYPE * m_BlockMetas;     // Each meta is stored as a separate uint8_t for faster access
+	NIBBLETYPE * m_BlockLight;     // Each light value is stored as a separate uint8_t for faster access
+	NIBBLETYPE * m_BlockSkyLight;  // Each light value is stored as a separate uint8_t for faster access
 	
 	/** Clears the data stored and prepares a fresh new block area with the specified dimensions */
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);

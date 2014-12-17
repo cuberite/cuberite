@@ -36,12 +36,12 @@ public:
 	/** Decrypts the data using the stored public key
 	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
 	Returns the number of bytes decrypted, or negative number for error. */
-	int Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength);
+	int Decrypt(const uint8_t * a_EncryptedData, size_t a_EncryptedLength, uint8_t * a_DecryptedData, size_t a_DecryptedMaxLength);
 	
 	/** Encrypts the data using the stored public key
 	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
 	Returns the number of bytes decrypted, or negative number for error. */
-	int Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength);
+	int Encrypt(const uint8_t * a_PlainData, size_t a_PlainLength, uint8_t * a_EncryptedData, size_t a_EncryptedMaxLength);
 	
 	/** Parses the specified data into a public key representation.
 	The key can be DER- or PEM-encoded.

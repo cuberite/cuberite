@@ -66,7 +66,7 @@ void cMapDecorator::Update(void)
 			{
 				cFastRandom Random;
 
-				Int64 WorldAge = m_Player->GetWorld()->GetWorldAge();
+				int64_t WorldAge = m_Player->GetWorld()->GetWorldAge();
 
 				// TODO 2014-02-19 xdot: Refine
 				m_Rot = Random.NextInt(16, (int) WorldAge);
@@ -346,7 +346,7 @@ void cMap::UpdateDecorators(void)
 
 
 
-void cMap::AddPlayer(cPlayer * a_Player, Int64 a_WorldAge)
+void cMap::AddPlayer(cPlayer * a_Player, int64_t a_WorldAge)
 {
 	cClientHandle * Handle = a_Player->GetClientHandle();
 	if (Handle == nullptr)
@@ -373,7 +373,7 @@ void cMap::AddPlayer(cPlayer * a_Player, Int64 a_WorldAge)
 
 
 
-void cMap::RemoveInactiveClients(Int64 a_WorldAge)
+void cMap::RemoveInactiveClients(int64_t a_WorldAge)
 {
 	for (cMapClientList::iterator it = m_Clients.begin(); it != m_Clients.end();)
 	{
@@ -442,7 +442,7 @@ void cMap::StreamNext(cMapClient & a_Client)
 
 		unsigned int Y = (a_Client.m_DataUpdate * 11) % m_Width;
 
-		const Byte * Colors = &m_Data[Y * m_Height];
+		const uint8_t * Colors = &m_Data[Y * m_Height];
 
 		Handle->SendMapColumn(m_ID, Y, 0, Colors, m_Height, m_Scale);
 	}
@@ -462,7 +462,7 @@ void cMap::UpdateClient(cPlayer * a_Player)
 		return;
 	}
 
-	Int64 WorldAge = a_Player->GetWorld()->GetWorldAge();
+	int64_t WorldAge = a_Player->GetWorld()->GetWorldAge();
 
 	RemoveInactiveClients(WorldAge - 5);
 
@@ -593,7 +593,7 @@ void cMap::SendTo(cClientHandle & a_Client)
 
 	for (unsigned int i = 0; i < m_Width; ++i)
 	{
-		const Byte* Colors = &m_Data[i * m_Height];
+		const uint8_t* Colors = &m_Data[i * m_Height];
 
 		a_Client.SendMapColumn(m_ID, i, 0, Colors, m_Height, m_Scale);
 	}

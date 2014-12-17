@@ -42,7 +42,7 @@ public:
 			for (int x = 0; x < cChunkDef::Width; x++)
 			{
 				HEIGHTTYPE height = cChunkDef::GetHeight(heightMap, x, z) + 1;
-				Byte * shapeColumn = &(a_Shape[(x + 16 * z) * 256]);
+				uint8_t * shapeColumn = &(a_Shape[(x + 16 * z) * 256]);
 				for (int y = 0; y < height; y++)
 				{
 					shapeColumn[y] = 1;

@@ -1,15 +1,14 @@
 
 $#include "../Globals.h"
 
-// Typedefs from Globals.h, so that we don't have to process that file:
-typedef long long Int64;
-typedef int       Int32;
-typedef short     Int16;
-
-typedef unsigned long long UInt64;
-typedef unsigned int       UInt32;
-typedef unsigned short     UInt16;
-
+// Definitions for fixed-size types to allow ToLua to recognised them
+typedef long long int64_t;
+typedef int       int32_t;
+typedef short     int16_t;
+typedef unsigned long long uint64_t;
+typedef unsigned int       uint32_t;
+typedef unsigned short     uint16_t;
+typedef unsigned char      uint8_t;
 
 $cfile "../Vector3.h"
 $cfile "../ChunkDef.h"
@@ -100,13 +99,6 @@ $cfile "../Protocol/MojangAPI.h"
 // Need to declare this class so that the usertype is properly registered in Bindings.cpp - 
 // it seems impossible to register a usertype in ManualBindings.cpp
 class cLineBlockTracer;
-
-
-
-
-
-// To avoid tolua treating Byte as a class, and avoid the need to $cfile entire Globals.h:
-typedef unsigned char Byte;
 
 
 

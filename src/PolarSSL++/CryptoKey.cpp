@@ -63,7 +63,7 @@ cCryptoKey::~cCryptoKey()
 
 
 
-int cCryptoKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength)
+int cCryptoKey::Decrypt(const uint8_t * a_EncryptedData, size_t a_EncryptedLength, uint8_t * a_DecryptedData, size_t a_DecryptedMaxLength)
 {
 	ASSERT(IsValid());
 	
@@ -84,7 +84,7 @@ int cCryptoKey::Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, 
 
 
 
-int cCryptoKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a_EncryptedData, size_t a_EncryptedMaxLength)
+int cCryptoKey::Encrypt(const uint8_t * a_PlainData, size_t a_PlainLength, uint8_t * a_EncryptedData, size_t a_EncryptedMaxLength)
 {
 	ASSERT(IsValid());
 	
@@ -105,11 +105,11 @@ int cCryptoKey::Encrypt(const Byte * a_PlainData, size_t a_PlainLength, Byte * a
 
 
 
-int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
+int cCryptoKey::ParsePublic(const void * a_Data, size_t a_Numuint8_ts)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 	
-	return pk_parse_public_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes);
+	return pk_parse_public_key(&m_Pk, (const unsigned char *)a_Data, a_Numuint8_ts);
 }
 
 
@@ -117,19 +117,19 @@ int cCryptoKey::ParsePublic(const void * a_Data, size_t a_NumBytes)
 
 
 
-int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AString & a_Password)
+int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_Numuint8_ts, const AString & a_Password)
 {
 	ASSERT(!IsValid());  // Cannot parse a second key
 	
 	if (a_Password.empty())
 	{
-		return pk_parse_key(&m_Pk, (const unsigned char *)a_Data, a_NumBytes, nullptr, 0);
+		return pk_parse_key(&m_Pk, (const unsigned char *)a_Data, a_Numuint8_ts, nullptr, 0);
 	}
 	else
 	{
 		return pk_parse_key(
 			&m_Pk,
-			(const unsigned char *)a_Data, a_NumBytes,
+			(const unsigned char *)a_Data, a_Numuint8_ts,
 			(const unsigned char *)a_Password.c_str(), a_Password.size()
 		);
 	}

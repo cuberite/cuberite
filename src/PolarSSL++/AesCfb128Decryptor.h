@@ -24,10 +24,10 @@ public:
 	~cAesCfb128Decryptor();
 	
 	/** Initializes the decryptor with the specified Key / IV */
-	void Init(const Byte a_Key[16], const Byte a_IV[16]);
+	void Init(const uint8_t a_Key[16], const uint8_t a_IV[16]);
 	
-	/** Decrypts a_Length bytes of the encrypted data; produces a_Length output bytes */
-	void ProcessData(Byte * a_DecryptedOut, const Byte * a_EncryptedIn, size_t a_Length);
+	/** Decrypts a_Length uint8_ts of the encrypted data; produces a_Length output uint8_ts */
+	void ProcessData(uint8_t * a_DecryptedOut, const uint8_t * a_EncryptedIn, size_t a_Length);
 	
 	/** Returns true if the object has been initialized with the Key / IV */
 	bool IsValid(void) const { return m_IsValid; }
@@ -36,7 +36,7 @@ protected:
 	aes_context m_Aes;
 	
 	/** The InitialVector, used by the CFB mode decryption */
-	Byte m_IV[16];
+	uint8_t m_IV[16];
 	
 	/** Current offset in the m_IV, used by the CFB mode decryption */
 	size_t m_IVOffset;

@@ -21,7 +21,7 @@ cBlockingSslClientSocket::cBlockingSslClientSocket(void) :
 
 
 
-bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Port)
+bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, uint16_t a_Port)
 {
 	// If already connected, report an error:
 	if (m_IsConnected)

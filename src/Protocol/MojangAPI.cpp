@@ -19,7 +19,7 @@
 
 
 /** The maximum age for items to be kept in the cache. Any item older than this will be removed. */
-const Int64 MAX_AGE = 7 * 24 * 60 * 60;  // 7 days ago
+const int64_t MAX_AGE = 7 * 24 * 60 * 60;  // 7 days ago
 
 /** The maximum number of names to send in a single query */
 const int MAX_PER_QUERY = 100;
@@ -108,7 +108,7 @@ cMojangAPI::sProfile::sProfile(
 	const AString & a_PlayerName,
 	const AString & a_UUID,
 	const Json::Value & a_Properties,
-	Int64 a_DateTime
+	int64_t a_DateTime
 ) :
 	m_PlayerName(a_PlayerName),
 	m_UUID(a_UUID),
@@ -347,7 +347,7 @@ AStringVector cMojangAPI::GetUUIDsFromPlayerNames(const AStringVector & a_Player
 void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const AString & a_UUID)
 {
 	AString UUID = MakeUUIDShort(a_UUID);
-	Int64 Now = time(nullptr);
+	int64_t Now = time(nullptr);
 	{
 		cCSLock Lock(m_CSNameToUUID);
 		m_NameToUUID[StrToLower(a_PlayerName)] = sProfile(a_PlayerName, UUID, "", "", Now);
@@ -366,7 +366,7 @@ void cMojangAPI::AddPlayerNameToUUIDMapping(const AString & a_PlayerName, const 
 void cMojangAPI::AddPlayerProfile(const AString & a_PlayerName, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	AString UUID = MakeUUIDShort(a_UUID);
-	Int64 Now = time(nullptr);
+	int64_t Now = time(nullptr);
 	{
 		cCSLock Lock(m_CSNameToUUID);
 		m_NameToUUID[StrToLower(a_PlayerName)] = sProfile(a_PlayerName, UUID, "", "", Now);
@@ -526,7 +526,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			{
 				AString PlayerName = stmt.getColumn(0);
 				AString UUID       = stmt.getColumn(1);
-				Int64 DateTime     = stmt.getColumn(2);
+				int64_t DateTime     = stmt.getColumn(2);
 				UUID = MakeUUIDShort(UUID);
 				m_NameToUUID[StrToLower(PlayerName)] = sProfile(PlayerName, UUID, "", "", DateTime);
 				m_UUIDToName[UUID] = sProfile(PlayerName, UUID, "", "", DateTime);
@@ -540,7 +540,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 				AString UUID              = stmt.getColumn(1);
 				AString Textures          = stmt.getColumn(2);
 				AString TexturesSignature = stmt.getColumn(2);
-				Int64 DateTime            = stmt.getColumn(4);
+				int64_t DateTime            = stmt.getColumn(4);
 				UUID = MakeUUIDShort(UUID);
 				m_UUIDToProfile[UUID] = sProfile(PlayerName, UUID, Textures, TexturesSignature, DateTime);
 			}
@@ -570,7 +570,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 		db.exec("DELETE FROM UUIDToProfile");
 		
 		// Save all cache entries - m_PlayerNameToUUID:
-		Int64 LimitDateTime = time(nullptr) - MAX_AGE;
+		int64_t LimitDateTime = time(nullptr) - MAX_AGE;
 		{
 			SQLite::Statement stmt(db, "INSERT INTO PlayerNameToUUID(PlayerName, UUID, DateTime) VALUES (?, ?, ?)");
 			cCSLock Lock(m_CSNameToUUID);
@@ -709,7 +709,7 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 	
 		// Store the returned results into cache:
 		Json::Value::UInt JsonCount = root.size();
-		Int64 Now = time(nullptr);
+		int64_t Now = time(nullptr);
 		{
 			cCSLock Lock(m_CSNameToUUID);
 			for (Json::Value::UInt idx = 0; idx < JsonCount; ++idx)
@@ -843,7 +843,7 @@ void cMojangAPI::QueryUUIDToProfile(const AString & a_UUID)
 		return;
 	}
 	Json::Value Properties = root.get("properties", "");
-	Int64 Now = time(nullptr);
+	int64_t Now = time(nullptr);
 	{
 		cCSLock Lock(m_CSUUIDToProfile);
 		m_UUIDToProfile[a_UUID] = sProfile(PlayerName, a_UUID, Properties, Now);
@@ -879,7 +879,7 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const AString & a_
 
 void cMojangAPI::Update(void)
 {
-	Int64 LimitDateTime = time(nullptr) - MAX_AGE;
+	int64_t LimitDateTime = time(nullptr) - MAX_AGE;
 
 	// Re-query all playernames that are stale:
 	AStringVector PlayerNames;

@@ -95,7 +95,7 @@ void cDeadlockDetect::Execute(void)
 
 
 
-void cDeadlockDetect::SetWorldAge(const AString & a_WorldName, Int64 a_Age)
+void cDeadlockDetect::SetWorldAge(const AString & a_WorldName, int64_t a_Age)
 {
 	m_WorldAges[a_WorldName].m_Age = a_Age;
 	m_WorldAges[a_WorldName].m_NumCyclesSame = 0;
@@ -105,7 +105,7 @@ void cDeadlockDetect::SetWorldAge(const AString & a_WorldName, Int64 a_Age)
 
 
 
-void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
+void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, int64_t a_Age)
 {
 	WorldAges::iterator itr = m_WorldAges.find(a_WorldName);
 	if (itr == m_WorldAges.end())

@@ -19,7 +19,7 @@ public:
 	virtual ~cWorldInterface() {}
 	
 	virtual int GetTimeOfDay(void) const = 0;
-	virtual Int64 GetWorldAge(void)  const = 0;
+	virtual int64_t GetWorldAge(void)  const = 0;
 	
 	virtual eDimension GetDimension(void) const = 0;
 	

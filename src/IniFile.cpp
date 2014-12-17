@@ -89,7 +89,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		// Unix so that the created INI file can be read under Win32
 		// without change.
 
-		// Removes UTF-8 Byte Order Markers (BOM) if, present.
+		// Removes UTF-8 uint8_t Order Markers (BOM) if, present.
 		if (IsFirstLine)
 		{
 			RemoveBom(line);
@@ -443,7 +443,7 @@ bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 
 
-bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists)
+bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const int64_t a_Value, const bool a_CreateIfNotExists)
 {
 	return SetValue(a_Keyname, a_ValueName, Printf("%lld", a_Value), a_CreateIfNotExists);
 }
@@ -562,12 +562,12 @@ int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, c
 
 
 
-Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const Int64 defValue)
+int64_t cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const int64_t defValue)
 {
 	AString Data;
 	Printf(Data, "%lld", defValue);
 	AString resultstring = GetValueSet(keyname, valuename, Data);
-	Int64 result = defValue;
+	int64_t result = defValue;
 #ifdef _WIN32
 	sscanf_s(resultstring.c_str(), "%lld", &result);
 #else

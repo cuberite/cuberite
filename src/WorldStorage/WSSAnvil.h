@@ -77,7 +77,7 @@ protected:
 		AString m_FileName;
 		
 		// The header, copied from the file so we don't have to seek to it all the time
-		// First 1024 entries are chunk locations - the 3 + 1 byte sector-offset and sector-count
+		// First 1024 entries are chunk locations - the 3 + 1 uint8_t sector-offset and sector-count
 		unsigned m_Header[MCA_MAX_CHUNKS];
 		
 		// Chunk timestamps, following the chunk headers

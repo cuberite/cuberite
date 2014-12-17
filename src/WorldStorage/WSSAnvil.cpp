@@ -112,7 +112,7 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor) :
 		Writer.AddInt("SpawnY", (int)a_World->GetSpawnY());
 		Writer.AddInt("SpawnZ", (int)a_World->GetSpawnZ());
 		Writer.AddInt("version", 19133);
-		Writer.AddLong("DayTime", (Int64)a_World->GetTimeOfDay());
+		Writer.AddLong("DayTime", (int64_t)a_World->GetTimeOfDay());
 		Writer.AddLong("Time", a_World->GetWorldAge());
 		Writer.AddLong("SizeOnDisk", 0);
 		Writer.AddString("generatorName", "default");
@@ -1064,7 +1064,7 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	int BurnTime = a_NBT.FindChildByName(a_TagIdx, "BurnTime");
 	if (BurnTime >= 0)
 	{
-		Int16 bt = a_NBT.GetShort(BurnTime);
+		int16_t bt = a_NBT.GetShort(BurnTime);
 		// Anvil doesn't store the time that the fuel can burn. We simply "reset" the current value to be the 100%
 		Furnace->SetBurnTimes(bt, 0);
 	}
@@ -1073,7 +1073,7 @@ cBlockEntity * cWSSAnvil::LoadFurnaceFromNBT(const cParsedNBT & a_NBT, int a_Tag
 	int CookTime = a_NBT.FindChildByName(a_TagIdx, "CookTime");
 	if (CookTime >= 0)
 	{
-		Int16 ct = a_NBT.GetShort(CookTime);
+		int16_t ct = a_NBT.GetShort(CookTime);
 		// Anvil doesn't store the time that an item takes to cook. We simply use the default - 10 seconds (200 ticks)
 		Furnace->SetCookTimes(200, ct);
 	}
@@ -1813,7 +1813,7 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	int Rotation = a_NBT.FindChildByName(a_TagIdx, "ItemRotation");
 	if (Rotation > 0)
 	{
-		ItemFrame->SetItemRotation((Byte)a_NBT.GetByte(Rotation));
+		ItemFrame->SetItemRotation((uint8_t)a_NBT.GetByte(Rotation));
 	}
 	
 	a_Entities.push_back(ItemFrame.release());
@@ -3145,7 +3145,7 @@ unsigned cWSSAnvil::cMCAFile::FindFreeLocation(int a_LocalX, int a_LocalZ, const
 	for (size_t i = 0; i < ARRAYCOUNT(m_Header); i++)
 	{
 		ChunkLocation = ntohl(m_Header[i]);
-		ChunkLocation = ChunkLocation + ((ChunkLocation & 0xff) << 8);  // Add the number of sectors used; don't care about the 4th byte
+		ChunkLocation = ChunkLocation + ((ChunkLocation & 0xff) << 8);  // Add the number of sectors used; don't care about the 4th uint8_t
 		if (MaxLocation < ChunkLocation)
 		{
 			MaxLocation = ChunkLocation;

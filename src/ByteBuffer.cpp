@@ -61,11 +61,11 @@ public:
 	{
 		cByteBuffer buf(50);
 		buf.Write("\x05\xac\x02\x00", 4);
-		UInt32 v1;
+		uint32_t v1;
 		assert_test(buf.ReadVarInt(v1) && (v1 == 5));
-		UInt32 v2;
+		uint32_t v2;
 		assert_test(buf.ReadVarInt(v2) && (v2 == 300));
-		UInt32 v3;
+		uint32_t v3;
 		assert_test(buf.ReadVarInt(v3) && (v3 == 0));
 	}
 	
@@ -160,7 +160,7 @@ cByteBuffer::cByteBuffer(size_t a_BufferSize) :
 	m_WritePos(0),
 	m_ReadPos(0)
 {
-	// Allocating one byte more than the buffer size requested, so that we can distinguish between
+	// Allocating one uint8_t more than the buffer size requested, so that we can distinguish between
 	// completely-full and completely-empty states
 }
 
@@ -357,7 +357,7 @@ bool cByteBuffer::ReadBEInt(int & a_Value)
 
 
 
-bool cByteBuffer::ReadBEInt64(Int64 & a_Value)
+bool cByteBuffer::ReadBEInt64(int64_t & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -435,18 +435,18 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 
 
 
-bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
+bool cByteBuffer::ReadVarInt(uint32_t & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
-	UInt32 Value = 0;
+	uint32_t Value = 0;
 	int Shift = 0;
 	unsigned char b = 0;
 	do
 	{
 		NEEDBYTES(1);
 		ReadBuf(&b, 1);
-		Value = Value | (((UInt32)(b & 0x7f)) << Shift);
+		Value = Value | (((uint32_t)(b & 0x7f)) << Shift);
 		Shift += 7;
 	} while ((b & 0x80) != 0);
 	a_Value = Value;
@@ -461,7 +461,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
-	UInt32 Size = 0;
+	uint32_t Size = 0;
 	if (!ReadVarInt(Size))
 	{
 		return false;
@@ -499,16 +499,16 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
-	Int64 Value;
+	int64_t Value;
 	if (!ReadBEInt64(Value))
 	{
 		return false;
 	}
 
 	// Convert the 64 received bits into 3 coords:
-	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
-	UInt32 BlockYRaw = (Value >> 26) & 0x0fff;      // Middle 12 bits
-	UInt32 BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
+	uint32_t BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
+	uint32_t BlockYRaw = (Value >> 26) & 0x0fff;      // Middle 12 bits
+	uint32_t BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
 	
 	// If the highest bit in the number's range is set, convert the number into negative:
 	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? BlockXRaw : -(0x04000000 - (int)BlockXRaw);
@@ -576,7 +576,7 @@ bool cByteBuffer::WriteBEInt(int a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
-	UInt32 Converted = HostToNetwork4(&a_Value);
+	uint32_t Converted = HostToNetwork4(&a_Value);
 	return WriteBuf(&Converted, 4);
 }
 
@@ -584,12 +584,12 @@ bool cByteBuffer::WriteBEInt(int a_Value)
 
 
 
-bool cByteBuffer::WriteBEInt64(Int64 a_Value)
+bool cByteBuffer::WriteBEInt64(int64_t a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
-	UInt64 Converted = HostToNetwork8(&a_Value);
+	uint64_t Converted = HostToNetwork8(&a_Value);
 	return WriteBuf(&Converted, 8);
 }
 
@@ -602,7 +602,7 @@ bool cByteBuffer::WriteBEFloat(float a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(4);
-	UInt32 Converted = HostToNetwork4(&a_Value);
+	uint32_t Converted = HostToNetwork4(&a_Value);
 	return WriteBuf(&Converted, 4);
 }
 
@@ -615,7 +615,7 @@ bool cByteBuffer::WriteBEDouble(double a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(8);
-	UInt64 Converted = HostToNetwork8(&a_Value);
+	uint64_t Converted = HostToNetwork8(&a_Value);
 	return WriteBuf(&Converted, 8);
 }
 
@@ -635,7 +635,7 @@ bool cByteBuffer::WriteBool(bool a_Value)
 
 
 
-bool cByteBuffer::WriteVarInt(UInt32 a_Value)
+bool cByteBuffer::WriteVarInt(uint32_t a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -661,7 +661,7 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
-	bool res = WriteVarInt((UInt32)(a_Value.size()));
+	bool res = WriteVarInt((uint32_t)(a_Value.size()));
 	if (!res)
 	{
 		return false;
@@ -692,7 +692,7 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	CHECK_THREAD
-	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
+	return WriteBEInt64(((int64_t)a_BlockX & 0x3FFFFFF) << 38 | ((int64_t)a_BlockY & 0xFFF) << 26 | ((int64_t)a_BlockZ & 0x3FFFFFF));
 }
 
 
@@ -704,7 +704,7 @@ bool cByteBuffer::ReadBuf(void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(a_Count);
-	char * Dst = (char *)a_Buffer;  // So that we can do byte math
+	char * Dst = (char *)a_Buffer;  // So that we can do uint8_t math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_ReadPos;
 	if (BytesToEndOfBuffer <= a_Count)
@@ -737,7 +737,7 @@ bool cByteBuffer::WriteBuf(const void * a_Buffer, size_t a_Count)
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Count);
-	char * Src = (char *)a_Buffer;  // So that we can do byte math
+	char * Src = (char *)a_Buffer;  // So that we can do uint8_t math
 	ASSERT(m_BufferSize >= m_ReadPos);
 	size_t BytesToEndOfBuffer = m_BufferSize - m_WritePos;
 	if (BytesToEndOfBuffer <= a_Count)

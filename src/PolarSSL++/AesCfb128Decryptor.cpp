@@ -30,7 +30,7 @@ cAesCfb128Decryptor::~cAesCfb128Decryptor()
 
 
 
-void cAesCfb128Decryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
+void cAesCfb128Decryptor::Init(const uint8_t a_Key[16], const uint8_t a_IV[16])
 {
 	ASSERT(!IsValid());  // Cannot Init twice
 	
@@ -43,14 +43,14 @@ void cAesCfb128Decryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 
 
 
-void cAesCfb128Decryptor::ProcessData(Byte * a_DecryptedOut, const Byte * a_EncryptedIn, size_t a_Length)
+void cAesCfb128Decryptor::ProcessData(uint8_t * a_DecryptedOut, const uint8_t * a_EncryptedIn, size_t a_Length)
 {
 	ASSERT(IsValid());  // Must Init() first
 	
 	// PolarSSL doesn't support AES-CFB8, need to implement it manually:
 	for (size_t i = 0; i < a_Length; i++)
 	{
-		Byte Buffer[sizeof(m_IV)];
+		uint8_t Buffer[sizeof(m_IV)];
 		aes_crypt_ecb(&m_Aes, AES_ENCRYPT, m_IV, Buffer);
 		for (size_t idx = 0; idx < sizeof(m_IV) - 1; idx++)
 		{

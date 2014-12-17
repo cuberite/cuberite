@@ -54,7 +54,7 @@ class cProtocol180 :
 	
 public:
 
-	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
+	cProtocol180(cClientHandle * a_Client, const AString & a_ServerAddress, uint16_t a_ServerPort, uint32_t a_State);
 	
 	/** Called when client sends some data: */
 	virtual void DataReceived(const char * a_Data, size_t a_Size) override;
@@ -89,7 +89,7 @@ public:
 	virtual void SendKeepAlive                  (int a_PingID) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendLoginSuccess               (void) override;
-	virtual void SendMapColumn                  (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale) override;
+	virtual void SendMapColumn                  (int a_ID, int a_X, int a_Y, const uint8_t * a_Colors, unsigned int a_Length, unsigned int m_Scale) override;
 	virtual void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale) override;
 	virtual void SendMapInfo                    (int a_ID, unsigned int a_Scale) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
@@ -112,19 +112,19 @@ public:
 	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
+	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode) override;
+	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
 	virtual void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data) override;
 	virtual void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch) override;
+	virtual void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, uint8_t a_Yaw, uint8_t a_Pitch) override;
 	virtual void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType) override;
 	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendTeleportEntity             (const cEntity & a_Entity) override;
 	virtual void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ) override;
-	virtual void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle) override;
+	virtual void SendTimeUpdate                 (int64_t a_WorldAge, int64_t a_TimeOfDay, bool a_DoDaylightCycle) override;
 	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
@@ -154,7 +154,7 @@ protected:
 	class cPacketizer
 	{
 	public:
-		cPacketizer(cProtocol180 & a_Protocol, UInt32 a_PacketType) :
+		cPacketizer(cProtocol180 & a_Protocol, uint32_t a_PacketType) :
 			m_Protocol(a_Protocol),
 			m_Out(a_Protocol.m_OutPacketBuffer),
 			m_Lock(a_Protocol.m_CSPacket)
@@ -169,7 +169,7 @@ protected:
 			m_Out.WriteBool(a_Value);
 		}
 		
-		void WriteByte(Byte a_Value)
+		void WriteByte(uint8_t a_Value)
 		{
 			m_Out.WriteByte(a_Value);
 		}
@@ -189,7 +189,7 @@ protected:
 			m_Out.WriteBEInt(a_Value);
 		}
 		
-		void WriteInt64(Int64 a_Value)
+		void WriteInt64(int64_t a_Value)
 		{
 			m_Out.WriteBEInt64(a_Value);
 		}
@@ -204,7 +204,7 @@ protected:
 			m_Out.WriteBEDouble(a_Value);
 		}
 		
-		void WriteVarInt(UInt32 a_Value)
+		void WriteVarInt(uint32_t a_Value)
 		{
 			m_Out.WriteVarInt(a_Value);
 		}
@@ -227,7 +227,7 @@ protected:
 		}
 		
 		void WriteItem(const cItem & a_Item);
-		void WriteByteAngle(double a_Angle);  // Writes the specified angle using a single byte
+		void WriteByteAngle(double a_Angle);  // Writes the specified angle using a single uint8_t
 		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
 		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
 		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
@@ -242,12 +242,12 @@ protected:
 
 	AString m_ServerAddress;
 	
-	UInt16 m_ServerPort;
+	uint16_t m_ServerPort;
 	
 	AString m_AuthServerID;
 	
 	/** State of the protocol. 1 = status, 2 = login, 3 = game */
-	UInt32 m_State;
+	uint32_t m_State;
 
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
@@ -277,7 +277,7 @@ protected:
 	/** Reads and handles the packet. The packet length and type have already been read.
 	Returns true if the packet was understood, false if it was an unknown packet
 	*/
-	bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType);
+	bool HandlePacket(cByteBuffer & a_ByteBuffer, uint32_t a_PacketType);
 
 	// Packet handlers while in the Status state (m_State == 1):
 	void HandlePacketStatusPing(cByteBuffer & a_ByteBuffer);
@@ -330,7 +330,7 @@ protected:
 	/** Parses item metadata as read by ReadItem(), into the item enchantments. */
 	void ParseItemMetadata(cItem & a_Item, const AString & a_Metadata);
 	
-	void StartEncryption(const Byte * a_Key);
+	void StartEncryption(const uint8_t * a_Key);
 
 } ;
 

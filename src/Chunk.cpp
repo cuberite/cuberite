@@ -726,7 +726,7 @@ void cChunk::MoveEntityToNewChunk(cEntity * a_Entity)
 
 void cChunk::ProcessQueuedSetBlocks(void)
 {
-	Int64 CurrTick = m_World->GetWorldAge();
+	int64_t CurrTick = m_World->GetWorldAge();
 	for (sSetBlockQueueVector::iterator itr = m_SetBlockQueue.begin(); itr != m_SetBlockQueue.end();)
 	{
 		if (itr->m_Tick <= CurrTick)
@@ -1492,7 +1492,7 @@ void cChunk::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType,
 
 
 
-void cChunk::QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType)
+void cChunk::QueueSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int64_t a_Tick, BLOCKTYPE a_PreviousBlockType)
 {
 	m_SetBlockQueue.push_back(sSetBlockQueueItem(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta, a_Tick, a_PreviousBlockType));
 }

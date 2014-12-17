@@ -111,10 +111,10 @@ void cChunkDataSerializer::Serialize29(AString & a_Data)
 	a_Data.append((const char *)&BitMap1, sizeof(short));
 	a_Data.append((const char *)&BitMap2, sizeof(short));
 	
-	UInt32 CompressedSizeBE = htonl((UInt32)CompressedSize);
+	uint32_t CompressedSizeBE = htonl((uint32_t)CompressedSize);
 	a_Data.append((const char *)&CompressedSizeBE, sizeof(CompressedSizeBE));
 	
-	Int32 UnusedInt32 = 0;
+	int32_t UnusedInt32 = 0;
 	a_Data.append((const char *)&UnusedInt32,      sizeof(UnusedInt32));
 	
 	a_Data.append(CompressedBlockData, CompressedSize);
@@ -169,7 +169,7 @@ void cChunkDataSerializer::Serialize39(AString & a_Data)
 	a_Data.append((const char *)&BitMap1, sizeof(short));
 	a_Data.append((const char *)&BitMap2, sizeof(short));
 	
-	UInt32 CompressedSizeBE = htonl((UInt32)CompressedSize);
+	uint32_t CompressedSizeBE = htonl((uint32_t)CompressedSize);
 	a_Data.append((const char *)&CompressedSizeBE, sizeof(CompressedSizeBE));
 	
 	// Unlike 29, 39 doesn't have the "unused" int
@@ -195,7 +195,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 
 	// Write the chunk size:
 	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
-	UInt32 ChunkSize = (
+	uint32_t ChunkSize = (
 		(cChunkDef::NumBlocks * 2) +  // Block meta + type
 		sizeof(m_BlockLight) +        // Block light
 		sizeof(m_BlockSkyLight) +     // Block sky light
@@ -234,7 +234,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	else
 	{
 		AString PostData;
-		Buffer.WriteVarInt((UInt32)Packet.GetUsedSpace() + 1);
+		Buffer.WriteVarInt((uint32_t)Packet.GetUsedSpace() + 1);
 		Buffer.WriteVarInt(0);
 		Buffer.ReadAll(PostData);
 		Buffer.CommitRead();

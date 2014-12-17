@@ -176,7 +176,7 @@ public:
 		return (m_Tags[(size_t)a_Tag].m_FirstChild < 0) ? TAG_End : m_Tags[(size_t)m_Tags[(size_t)a_Tag].m_FirstChild].m_Type;
 	}
 	
-	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
+	/** Returns the value stored in a uint8_t tag. Not valid for any other tag type. */
 	inline unsigned char GetByte(int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Byte);
@@ -184,21 +184,21 @@ public:
 	}
 	
 	/** Returns the value stored in a Short tag. Not valid for any other tag type. */
-	inline Int16 GetShort(int a_Tag) const
+	inline int16_t GetShort(int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Short);
 		return GetBEShort(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 	}
 
 	/** Returns the value stored in an Int tag. Not valid for any other tag type. */
-	inline Int32 GetInt(int a_Tag) const
+	inline int32_t GetInt(int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Int);
 		return GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 	}
 
 	/** Returns the value stored in a Long tag. Not valid for any other tag type. */
-	inline Int64 GetLong(int a_Tag) const
+	inline int64_t GetLong(int a_Tag) const
 	{
 		ASSERT(m_Tags[(size_t)a_Tag].m_Type == TAG_Long);
 		return NetworkToHostLong8(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
@@ -216,7 +216,7 @@ public:
 		UNUSED_VAR(Check1);
 		UNUSED_VAR(Check2);
 		
-		Int32 i = GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
+		int32_t i = GetBEInt(m_Data + m_Tags[(size_t)a_Tag].m_DataStart);
 		float f;
 		memcpy(&f, &i, sizeof(f));
 		return f;
@@ -285,9 +285,9 @@ public:
 	void EndList(void);
 	
 	void AddByte     (const AString & a_Name, unsigned char a_Value);
-	void AddShort    (const AString & a_Name, Int16 a_Value);
-	void AddInt      (const AString & a_Name, Int32 a_Value);
-	void AddLong     (const AString & a_Name, Int64 a_Value);
+	void AddShort    (const AString & a_Name, int16_t a_Value);
+	void AddInt      (const AString & a_Name, int32_t a_Value);
+	void AddLong     (const AString & a_Name, int64_t a_Value);
 	void AddFloat    (const AString & a_Name, float a_Value);
 	void AddDouble   (const AString & a_Name, double a_Value);
 	void AddString   (const AString & a_Name, const AString & a_Value);
@@ -323,7 +323,7 @@ protected:
 	
 	bool IsStackTopCompound(void) const { return (m_Stack[m_CurrentStack].m_Type == TAG_Compound); }
 	
-	void WriteString(const char * a_Data, UInt16 a_Length);
+	void WriteString(const char * a_Data, uint16_t a_Length);
 	
 	inline void TagCommon(const AString & a_Name, eTagType a_Type)
 	{
@@ -334,7 +334,7 @@ protected:
 		{
 			// Compound: add the type and name:
 			m_Result.push_back((char)a_Type);
-			WriteString(a_Name.c_str(), (UInt16)a_Name.length());
+			WriteString(a_Name.c_str(), (uint16_t)a_Name.length());
 		}
 		else
 		{

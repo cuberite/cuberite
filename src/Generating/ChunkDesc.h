@@ -34,9 +34,9 @@ public:
 	0 = air
 	1 = solid
 	Indexed as [y + 256 * x + 256 * 16 * z]. */
-	typedef Byte Shape[256 * 16 * 16];
+	typedef uint8_t Shape[256 * 16 * 16];
 	
-	/** Uncompressed block metas, 1 meta per byte */
+	/** Uncompressed block metas, 1 meta per uint8_t */
 	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
 	
 
@@ -212,7 +212,7 @@ public:
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
 	inline cBlockEntityList &        GetBlockEntities         (void) { return m_BlockEntities; }
 	
-	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
+	/** Compresses the metas from the BlockArea format (1 meta per uint8_t) into regular format (2 metas per uint8_t) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 	
 	#ifdef _DEBUG

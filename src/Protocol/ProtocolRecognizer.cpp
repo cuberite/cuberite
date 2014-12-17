@@ -400,7 +400,7 @@ void cProtocolRecognizer::SendLoginSuccess(void)
 
 
 
-void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
+void cProtocolRecognizer::SendMapColumn(int a_ID, int a_X, int a_Y, const uint8_t * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendMapColumn(a_ID, a_X, a_Y, a_Colors, a_Length, m_Scale);
@@ -618,7 +618,7 @@ void cProtocolRecognizer::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 
 
 
-void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode)
+void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendScoreboardObjective(a_Name, a_DisplayName, a_Mode);
@@ -628,7 +628,7 @@ void cProtocolRecognizer::SendScoreboardObjective(const AString & a_Name, const 
 
 
 
-void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocolRecognizer::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendScoreUpdate(a_Objective, a_Player, a_Score, a_Mode);
@@ -688,7 +688,7 @@ void cProtocolRecognizer::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch)
+void cProtocolRecognizer::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, uint8_t a_Yaw, uint8_t a_Pitch)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendSpawnObject(a_Entity, a_ObjectType, a_ObjectData, a_Yaw, a_Pitch);
@@ -748,7 +748,7 @@ void cProtocolRecognizer::SendThunderbolt(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cProtocolRecognizer::SendTimeUpdate(Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle)
+void cProtocolRecognizer::SendTimeUpdate(int64_t a_WorldAge, int64_t a_TimeOfDay, bool a_DoDaylightCycle)
 {
 	ASSERT(m_Protocol != nullptr);
 	m_Protocol->SendTimeUpdate(a_WorldAge, a_TimeOfDay, a_DoDaylightCycle);
@@ -864,14 +864,14 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 	// MCS_PROTOCOL_VERSIONS macros in the header file, as well as PROTO_VERSION_LATEST macro
 
 	// Lengthed protocol, try if it has the entire initial handshake packet:
-	UInt32 PacketLen;
-	UInt32 ReadSoFar = (UInt32)m_Buffer.GetReadableSpace();
+	uint32_t PacketLen;
+	uint32_t ReadSoFar = (uint32_t)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.ReadVarInt(PacketLen))
 	{
 		// Not enough bytes for the packet length, keep waiting
 		return false;
 	}
-	ReadSoFar -= (UInt32)m_Buffer.GetReadableSpace();
+	ReadSoFar -= (uint32_t)m_Buffer.GetReadableSpace();
 	if (!m_Buffer.CanReadBytes(PacketLen))
 	{
 		// Not enough bytes for the packet, keep waiting
@@ -884,9 +884,9 @@ bool cProtocolRecognizer::TryRecognizeProtocol(void)
 
 
 
-bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining)
+bool cProtocolRecognizer::TryRecognizeLengthedProtocol(uint32_t a_PacketLengthRemaining)
 {
-	UInt32 PacketType;
+	uint32_t PacketType;
 	if (!m_Buffer.ReadVarInt(PacketType))
 	{
 		return false;
@@ -900,7 +900,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		m_Client->Kick("Unsupported protocol version");
 		return false;
 	}
-	UInt32 ProtocolVersion;
+	uint32_t ProtocolVersion;
 	if (!m_Buffer.ReadVarInt(ProtocolVersion))
 	{
 		return false;
@@ -912,7 +912,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		{
 			AString ServerAddress;
 			short ServerPort;
-			UInt32 NextState;
+			uint32_t NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
@@ -926,14 +926,14 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, (uint16_t)ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_7_6:
 		{
 			AString ServerAddress;
 			short ServerPort;
-			UInt32 NextState;
+			uint32_t NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
@@ -947,14 +947,14 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol176(m_Client, ServerAddress, (uint16_t)ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_8_0:
 		{
 			AString ServerAddress;
 			short ServerPort;
-			UInt32 NextState;
+			uint32_t NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
@@ -968,7 +968,7 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol180(m_Client, ServerAddress, (uint16_t)ServerPort, NextState);
 			return true;
 		}
 	}

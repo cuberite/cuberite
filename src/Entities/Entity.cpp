@@ -1670,9 +1670,9 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 
 		if ((DiffX != 0) || (DiffY != 0) || (DiffZ != 0))  // Have we moved?
 		{
-			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a Byte
+			if ((abs(DiffX) <= 127) && (abs(DiffY) <= 127) && (abs(DiffZ) <= 127))  // Limitations of a uint8_t
 			{
-				// Difference within Byte limitations, use a relative move packet
+				// Difference within uint8_t limitations, use a relative move packet
 				if (m_bDirtyOrientation)
 				{
 					m_World->BroadcastEntityRelMoveLook(*this, (char)DiffX, (char)DiffY, (char)DiffZ, a_Exclude);

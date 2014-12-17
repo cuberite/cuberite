@@ -22,17 +22,17 @@ public:
 	Test(void)
 	{
 		AString DigestNotch, DigestJeb, DigestSimon;
-		Byte Digest[20];
+		uint8_t Digest[20];
 		cSha1Checksum Checksum;
-		Checksum.Update((const Byte *)"Notch", 5);
+		Checksum.Update((const uint8_t *)"Notch", 5);
 		Checksum.Finalize(Digest);
 		cSha1Checksum::DigestToJava(Digest, DigestNotch);
 		Checksum.Restart();
-		Checksum.Update((const Byte *)"jeb_", 4);
+		Checksum.Update((const uint8_t *)"jeb_", 4);
 		Checksum.Finalize(Digest);
 		cSha1Checksum::DigestToJava(Digest, DigestJeb);
 		Checksum.Restart();
-		Checksum.Update((const Byte *)"simon", 5);
+		Checksum.Update((const uint8_t *)"simon", 5);
 		Checksum.Finalize(Digest);
 		cSha1Checksum::DigestToJava(Digest, DigestSimon);
 		printf("Notch: \"%s\"\n", DigestNotch.c_str());
@@ -63,7 +63,7 @@ cSha1Checksum::cSha1Checksum(void) :
 
 
 
-void cSha1Checksum::Update(const Byte * a_Data, size_t a_Length)
+void cSha1Checksum::Update(const uint8_t * a_Data, size_t a_Length)
 {
 	ASSERT(m_DoesAcceptInput);  // Not Finalize()-d yet, or Restart()-ed
 	

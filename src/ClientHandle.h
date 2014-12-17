@@ -169,7 +169,7 @@ public:
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
 	void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item);
-	void SendMapColumn                  (int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale);
+	void SendMapColumn                  (int a_ID, int a_X, int a_Y, const uint8_t * a_Colors, unsigned int a_Length, unsigned int m_Scale);
 	void SendMapDecorators              (int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale);
 	void SendMapInfo                    (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
@@ -188,19 +188,19 @@ public:
 	void SendPluginMessage              (const AString & a_Channel, const AString & a_Message);  // Exported in ManualBindings.cpp
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendRespawn                    (eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks = false);
-	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
-	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
+	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, uint8_t a_Mode);
+	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, uint8_t a_Mode);
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundParticleEffect        (int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data);
 	void SendSpawnFallingBlock          (const cFallingBlock & a_FallingBlock);
 	void SendSpawnMob                   (const cMonster & a_Mob);
-	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, Byte a_Yaw, Byte a_Pitch);
+	void SendSpawnObject                (const cEntity & a_Entity, char a_ObjectType, int a_ObjectData, uint8_t a_Yaw, uint8_t a_Pitch);
 	void SendSpawnVehicle               (const cEntity & a_Vehicle, char a_VehicleType, char a_VehicleSubType = 0);
 	void SendStatistics                 (const cStatManager & a_Manager);
 	void SendTabCompletionResults       (const AStringVector & a_Results);
 	void SendTeleportEntity             (const cEntity & a_Entity);
 	void SendThunderbolt                (int a_BlockX, int a_BlockY, int a_BlockZ);
-	void SendTimeUpdate                 (Int64 a_WorldAge, Int64 a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
+	void SendTimeUpdate                 (int64_t a_WorldAge, int64_t a_TimeOfDay, bool a_DoDaylightCycle);  // tolua_export
 	void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ);
 	void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity);
 	void SendUpdateSign                 (int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
@@ -250,7 +250,7 @@ public:
 	
 	// Calls that cProtocol descendants use to report state:
 	void PacketBufferFull(void);
-	void PacketUnknown(UInt32 a_PacketType);
+	void PacketUnknown(uint32_t a_PacketType);
 	void PacketError(unsigned char a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
@@ -330,13 +330,13 @@ public:
 	void RemoveFromWorld(void);
 	
 	/** Called when the player will enchant a Item */
-	void HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment);
+	void HandleEnchantItem(uint8_t & a_WindowID, uint8_t & a_Enchantment);
 
 	/** Called by the protocol recognizer when the protocol version is known. */
-	void SetProtocolVersion(UInt32 a_ProtocolVersion) { m_ProtocolVersion = a_ProtocolVersion; }
+	void SetProtocolVersion(uint32_t a_ProtocolVersion) { m_ProtocolVersion = a_ProtocolVersion; }
 
 	/** Returns the protocol version number of the protocol that the client is talking. Returns zero if the protocol version is not (yet) known. */
-	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
+	uint32_t GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 	
 private:
 
@@ -456,7 +456,7 @@ private:
 	AString m_ClientBrand;
 
 	/** The version of the protocol that the client is talking, or 0 if unknown. */
-	UInt32 m_ProtocolVersion;
+	uint32_t m_ProtocolVersion;
 
 
 	/** Handles the block placing packet when it is a real block placement (not block-using, item-using or eating) */
