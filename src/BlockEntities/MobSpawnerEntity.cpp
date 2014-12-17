@@ -150,7 +150,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 				int RelZ = (int) (m_RelZ + (double)(Random.NextFloat() - Random.NextFloat()) * 4.0);
 
 				cChunk * Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelX, RelZ);
-				if ((Chunk == NULL) || !Chunk->IsValid())
+				if ((Chunk == nullptr) || !Chunk->IsValid())
 				{
 					continue;
 				}
@@ -162,7 +162,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 					double PosZ = Chunk->GetPosZ() * cChunkDef::Width + RelZ;
 
 					cMonster * Monster = cMonster::NewMonsterFromType(m_MobType);
-					if (Monster == NULL)
+					if (Monster == nullptr)
 					{
 						continue;
 					}

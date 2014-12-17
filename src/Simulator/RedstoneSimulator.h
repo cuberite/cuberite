@@ -13,14 +13,14 @@ public:
 
 inline cRedstoneSimulatorChunkData::~cRedstoneSimulatorChunkData() {}
 
-template <class ChunkType, class WorldType>
+
 class cRedstoneSimulator :
-	public cSimulator<ChunkType, WorldType>
+	public cSimulator
 {
-	typedef cSimulator<ChunkType, WorldType> super;
+	typedef cSimulator super;
 	
 public:
-	cRedstoneSimulator(WorldType & a_World) :
+	cRedstoneSimulator(cWorld & a_World) :
 	super(a_World)
 	{
 	}

@@ -11,7 +11,7 @@ typedef cCoordWithIntList cSandSimulatorChunkData;
 
 /// Despite the class name, this simulator takes care of all blocks that fall when suspended in the air.
 class cSandSimulator :
-	public cSimulator<cChunk, cWorld>
+	public cSimulator
 {
 public:
 	cSandSimulator(cWorld & a_World, cIniFile & a_IniFile);

@@ -3075,7 +3075,7 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 		)
 		{
 			// The cChunk destructor calls our GetChunk() while removing its entities
-			// so we still need to be able to return the chunk. Therefore we first delete, then NULLify
+			// so we still need to be able to return the chunk. Therefore we first delete, then nullptrify
 			// Doing otherwise results in bug http://forum.mc-server.org/showthread.php?tid=355
 			delete m_Chunks[i];
 			m_Chunks[i] = nullptr;
