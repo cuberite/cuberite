@@ -153,11 +153,12 @@ public:
 	
 	/** Called on shift-clicking to distribute the stack into other areas; Modifies a_ItemStack as it is distributed!
 	if a_ShouldApply is true, the changes are written into the slots;
-	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
-	*/
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply);
+	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes) */
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) = 0;
 
-	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill);
+	/** Called from DistributeStack() to distribute the stack into a_AreasInOrder; Modifies a_ItemStack as it is distributed!
+	If a_BackFill is true, the areas will be filled from the back (right side). (Example: Empty Hotbar -> Item get in slot 8, not slot 0) */
+	void DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill);
 	
 	/** Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
 	The items are accumulated in a_Dragging and removed from the SlotAreas immediately.

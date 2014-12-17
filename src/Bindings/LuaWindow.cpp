@@ -167,6 +167,24 @@ void cLuaWindow::Destroy(void)
 
 
 
+void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer& a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+{
+	cSlotAreas Areas;
+	for (auto Area : m_SlotAreas)
+	{
+		if (Area != a_ClickedArea)
+		{
+			Areas.push_back(Area);
+		}
+	}
+
+	super::DistributeStackToAreas(a_ItemStack, a_Player, Areas, a_ShouldApply, false);
+}
+
+
+
+
+
 void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
 	if (a_ItemGrid != &m_Contents)

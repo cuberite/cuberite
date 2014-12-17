@@ -79,13 +79,13 @@ public:
 			// Enchanting Area
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 		}
 		else
 		{
 			// Inventory or Hotbar
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* Enchanting */
-			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 	}
 

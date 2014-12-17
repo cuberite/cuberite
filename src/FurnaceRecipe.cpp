@@ -293,9 +293,8 @@ const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_In
 
 bool cFurnaceRecipe::IsFuel(const cItem & a_Item) const
 {
-	for (FuelList::const_iterator itr = m_pState->Fuel.begin(); itr != m_pState->Fuel.end(); ++itr)
+	for (auto & Fuel : m_pState->Fuel)
 	{
-		const cFuel & Fuel = *itr;
 		if ((Fuel.In->m_ItemType == a_Item.m_ItemType) && (Fuel.In->m_ItemCount <= a_Item.m_ItemCount))
 		{
 			return true;

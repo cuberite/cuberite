@@ -391,31 +391,13 @@ bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
 
 
 
-void cWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
-{
-	cSlotAreas Areas;
-	for (auto Area : m_SlotAreas)
-	{
-		if (Area != a_ClickedArea)
-		{
-			Areas.push_back(Area);
-		}
-	}
-
-	DistributeStack(a_ItemStack, a_Player, Areas, a_ShouldApply, false);
-}
-
-
-
-
-
-void cWindow::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill)
+void cWindow::DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill)
 {
 	for (size_t i = 0; i < 2; i++)
 	{
-		for (cSlotAreas::iterator itr = a_AreasInOrder.begin(); itr != a_AreasInOrder.end(); ++itr)
+		for (auto SlotArea : a_AreasInOrder)
 		{
-			(*itr)->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (i == 0), a_BackFill);
+			SlotArea->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (i == 0), a_BackFill);
 			if (a_ItemStack.IsEmpty())
 			{
 				// Distributed it all

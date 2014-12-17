@@ -50,28 +50,28 @@ public:
 				AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
 				AreasInOrder.push_back(m_SlotAreas[3]);  /* Hotbar    */
 			}
-			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, (a_Slot == 0));
+			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, (a_Slot == 0));
 		}
 		else if (a_ClickedArea == m_SlotAreas[1])
 		{
 			// Armor Area
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
 			AreasInOrder.push_back(m_SlotAreas[3]);  /* Hotbar    */
-			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 		else if (a_ClickedArea == m_SlotAreas[2])
 		{
 			// Inventory Area
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Armor  */
 			AreasInOrder.push_back(m_SlotAreas[3]);  /* Hotbar */
-			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 		else
 		{
 			// Hotbar
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Armor     */
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Inventory */
-			super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 	}
 	

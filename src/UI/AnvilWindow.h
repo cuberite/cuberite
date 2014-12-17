@@ -70,7 +70,7 @@ public:
 			// Inventory or Hotbar
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* Anvil */
 		}
-		super::DistributeStack(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 
 protected:
