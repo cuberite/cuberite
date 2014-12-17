@@ -38,7 +38,7 @@ public:
 
 	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
-		if (a_CanDrop && (a_Digger != NULL) && (a_Digger->GetEquippedWeapon().m_ItemType == E_ITEM_SHEARS))
+		if (a_CanDrop && (a_Digger != nullptr) && (a_Digger->GetEquippedWeapon().m_ItemType == E_ITEM_SHEARS))
 		{
 			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 			cItems Drops;

@@ -24,6 +24,7 @@ SET (HDRS
 	BlockChest.h
 	BlockCloth.h
 	BlockCobWeb.h
+	BlockCocoaPod.h
 	BlockCommandBlock.h
 	BlockComparator.h
 	BlockCrops.h
