@@ -37,6 +37,7 @@ enum eMonsterType
 	mtWolf         = E_META_SPAWN_EGG_WOLF,
 	mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
 	mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
+	mtMax          = 120,
 } ;
 
 // tolua_end
