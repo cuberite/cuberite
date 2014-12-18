@@ -495,6 +495,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 		case mtEnderman:      EntityClass = "Enderman";       break;
 		case mtGhast:         EntityClass = "Ghast";          break;
 		case mtGiant:         EntityClass = "Giant";          break;
+		case mtGuardian:      EntityClass = "Guardian";       break;
 		case mtHorse:         EntityClass = "Horse";          break;
 		case mtIronGolem:     EntityClass = "VillagerGolem";  break;
 		case mtMagmaCube:     EntityClass = "LavaSlime";      break;
@@ -627,6 +628,7 @@ void cNBTChunkSerializer::AddMonsterEntity(cMonster * a_Monster)
 			case mtEnderDragon:
 			case mtGhast:
 			case mtGiant:
+			case mtGuardian:
 			case mtIronGolem:
 			case mtMooshroom:
 			case mtOcelot:

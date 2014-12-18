@@ -83,6 +83,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 		addIfAllowed(mtSkeleton, allowedMobs);
 		addIfAllowed(mtCreeper, allowedMobs);
 		addIfAllowed(mtSquid, allowedMobs);
+		addIfAllowed(mtGuardian, allowedMobs);
 		
 		if ((a_Biome != biDesert) && (a_Biome != biBeach) && (a_Biome != biOcean))
 		{
@@ -144,6 +145,11 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 		switch (a_MobType)
 		{
+			case mtGuardian:
+			{
+				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
+			}
+			
 			case mtSquid:
 			{
 				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);

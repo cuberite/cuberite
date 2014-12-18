@@ -776,7 +776,7 @@ void cWorld::InitialiseAndLoadMobSpawningValues(cIniFile & a_IniFile)
 	AString DefaultMonsters;
 	switch (m_Dimension)
 	{
-		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
+		case dimOverworld: DefaultMonsters = "bat, cavespider, chicken, cow, creeper, enderman, guardian, horse, mooshroom, ocelot, pig, sheep, silverfish, skeleton, slime, spider, squid, wolf, zombie"; break;
 		case dimNether:    DefaultMonsters = "blaze, ghast, magmacube, skeleton, zombie, zombiepigman"; break;
 		case dimEnd:       DefaultMonsters = "enderman"; break;
 		case dimNotSet:    ASSERT(!"Dimension not set"); break;

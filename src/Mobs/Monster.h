@@ -30,7 +30,7 @@ public:
 		mfHostile  = 0,  // Spider, Zombies ...
 		mfPassive  = 1,  // Cows, Pigs
 		mfAmbient  = 2,  // Bats
-		mfWater    = 3,  // Squid
+		mfWater    = 3,  // Squid, Guardian
 
 		mfNoSpawn,
 		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
