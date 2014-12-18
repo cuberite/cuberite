@@ -1520,7 +1520,21 @@ bool cWorld::GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsBy
 			}
 			return true;
 		}
-		
+
+		case E_BLOCK_COCOA_POD:
+		{
+			NIBBLETYPE TypeMeta = BlockMeta & 0x03;
+			int GrowState = BlockMeta >> 2;
+
+			if (GrowState < 2)
+			{
+				GrowState++;
+				FastSetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, (NIBBLETYPE) (GrowState << 2 | TypeMeta));
+				BroadcastSoundParticleEffect(2005, a_BlockX, a_BlockY, a_BlockZ, 0);
+			}
+			return true;
+		}
+
 		case E_BLOCK_CROPS:
 		{
 			if (a_IsByBonemeal && !m_IsCropsBonemealable)
@@ -3280,7 +3294,6 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 		return -1;
 	}
 
-	BroadcastSpawnEntity(*a_Monster);
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
 
 	return a_Monster->GetUniqueID();
@@ -3373,7 +3386,7 @@ void cWorld::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicke
 
 
 
-cRedstoneSimulator<cChunk, cWorld> * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
+cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 {
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", "RedstoneSimulator", "Incremental");
 
@@ -3383,11 +3396,11 @@ cRedstoneSimulator<cChunk, cWorld> * cWorld::InitializeRedstoneSimulator(cIniFil
 		SimulatorName = "Incremental";
 	}
 	
-	cRedstoneSimulator<cChunk, cWorld> * res = nullptr;
+	cRedstoneSimulator * res = nullptr;
 
 	if (NoCaseCompare(SimulatorName, "Incremental") == 0)
 	{
-		res = MakeIncrementalRedstoneSimulator(*this);
+		res = new cIncrementalRedstoneSimulator(*this);
 	}
 	else if (NoCaseCompare(SimulatorName, "noop") == 0)
 	{

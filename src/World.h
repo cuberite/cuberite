@@ -34,7 +34,6 @@
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
-template <class ChunkType, class WorldType>
 class cRedstoneSimulator;
 class cItem;
 class cPlayer;
@@ -518,7 +517,7 @@ public:
 	
 	inline cFluidSimulator * GetWaterSimulator(void) { return m_WaterSimulator; }
 	inline cFluidSimulator * GetLavaSimulator (void) { return m_LavaSimulator; }
-	inline cRedstoneSimulator<cChunk, cWorld> * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
+	inline cRedstoneSimulator * GetRedstoneSimulator(void) { return m_RedstoneSimulator; }
 	
 	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -935,7 +934,7 @@ private:
 	cFluidSimulator *                    m_WaterSimulator;
 	cFluidSimulator *                    m_LavaSimulator;
 	std::unique_ptr<cFireSimulator>      m_FireSimulator;
-	cRedstoneSimulator<cChunk, cWorld> * m_RedstoneSimulator;
+	cRedstoneSimulator * m_RedstoneSimulator;
 	
 	cCriticalSection m_CSPlayers;
 	cPlayerList      m_Players;
@@ -1079,7 +1078,7 @@ private:
 	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
 
 	/** Creates a new redstone simulator.*/
-	cRedstoneSimulator<cChunk, cWorld> * InitializeRedstoneSimulator(cIniFile & a_IniFile);
+	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
 
 	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
 	Assumes it is called from the Tick thread. */

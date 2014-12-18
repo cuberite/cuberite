@@ -49,6 +49,7 @@ NetherQuartzOre  = NetherQuartz
 Sand             = Glass
 Pork             = CookedPork
 RawBeef          = Steak
+Potato           = BakedPotato
 RawChicken       = CookedChicken
 Clay             = Brick
 ClayBlock        = HardenedClay
