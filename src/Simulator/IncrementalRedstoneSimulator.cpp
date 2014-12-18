@@ -2074,9 +2074,11 @@ void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_RelSourceX, int a_R
 
 	for (const auto & itr : BlocksPotentiallyUnpowered)
 	{
-		if (!AreCoordsPowered(itr.x, itr.y, itr.z))
+		auto Neighbour = a_Chunk->GetRelNeighborChunk(itr.x, itr.z);
+		if (!AreCoordsPowered(itr.x, itr.y, itr.z) && (Neighbour->GetBlock(itr) != E_BLOCK_REDSTONE_REPEATER_ON))
 		{
-			SetSourceUnpowered(itr.x, itr.y, itr.z, a_Chunk->GetRelNeighborChunk(itr.x, itr.z));
+			// Repeaters time themselves with regards to unpowering; ensure we don't do it for them
+			SetSourceUnpowered(itr.x, itr.y, itr.z, Neighbour);
 		}
 	}
 }
