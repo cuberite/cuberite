@@ -18,6 +18,7 @@ enum eMonsterType
 	mtEnderman     = E_META_SPAWN_EGG_ENDERMAN,
 	mtGhast        = E_META_SPAWN_EGG_GHAST,
 	mtGiant        = E_META_SPAWN_EGG_GIANT,
+	mtGuardian     = E_META_SPAWN_EGG_GUARDIAN,
 	mtHorse        = E_META_SPAWN_EGG_HORSE,
 	mtIronGolem    = E_META_SPAWN_EGG_IRON_GOLEM,
 	mtMagmaCube    = E_META_SPAWN_EGG_MAGMA_CUBE,

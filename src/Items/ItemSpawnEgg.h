@@ -64,6 +64,7 @@ public:
 			case E_META_SPAWN_EGG_CREEPER:       return mtCreeper;
 			case E_META_SPAWN_EGG_ENDERMAN:      return mtEnderman;
 			case E_META_SPAWN_EGG_GHAST:         return mtGhast;
+			case E_META_SPAWN_EGG_GUARDIAN:      return mtGuardian;
 			case E_META_SPAWN_EGG_HORSE:         return mtHorse;
 			case E_META_SPAWN_EGG_MAGMA_CUBE:    return mtMagmaCube;
 			case E_META_SPAWN_EGG_MOOSHROOM:     return mtMooshroom;

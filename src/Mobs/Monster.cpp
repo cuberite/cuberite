@@ -38,6 +38,7 @@ static const struct
 	{mtEnderman,     "enderman",     "Enderman"},
 	{mtEnderDragon,  "enderdragon",  "EnderDragon"},
 	{mtGhast,        "ghast",        "Ghast"},
+	{mtGuardian,     "guardian",     "Guardian"},
 	{mtHorse,        "horse",        "EntityHorse"},
 	{mtIronGolem,    "irongolem",    "VillagerGolem"},
 	{mtMagmaCube,    "magmacube",    "LavaSlime"},
@@ -513,6 +514,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtCreeper:
 		case mtEnderman:
 		case mtGhast:
+		case mtGuardian:
 		case mtSilverfish:
 		case mtSkeleton:
 		case mtSpider:
@@ -842,6 +844,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
 		case mtGiant:        return mfNoSpawn;
+		case mtGuardian:     return mfWater; // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
 		case mtHorse:        return mfPassive;
 		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;
@@ -955,6 +958,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtEnderman:      toReturn = new cEnderman();                 break;
 		case mtGhast:         toReturn = new cGhast();                    break;
 		case mtGiant:         toReturn = new cGiant();                    break;
+		case mtGuardian:      toReturn = new cGuardian();                 break;
 		case mtIronGolem:     toReturn = new cIronGolem();                break;
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
