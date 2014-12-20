@@ -32,7 +32,3 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 }
 
-
-
-
-
