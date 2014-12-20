@@ -92,6 +92,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 			addIfAllowed(mtCow, allowedMobs);
 			addIfAllowed(mtChicken, allowedMobs);
 			addIfAllowed(mtEnderman, allowedMobs);
+			addIfAllowed(mtRabbit, allowedMobs);
 			addIfAllowed(mtSlime, allowedMobs);  // MG TODO : much more complicated rule
 			
 			if ((a_Biome == biForest) || (a_Biome == biForestHills) || (a_Biome == biTaiga) || (a_Biome == biTaigaHills))
@@ -164,6 +165,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			case mtCow:
 			case mtPig:
 			case mtHorse:
+			case mtRabbit:
 			case mtSheep:
 			{
 				return (

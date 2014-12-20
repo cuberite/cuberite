@@ -32,6 +32,7 @@ struct
 	{entOzelot,        "Ozelot"},
 	{entPig,           "Pig"},
 	{entPigZombie,     "PigZombie"},
+	{entRabbit,        "Rabbit"},
 	{entSheep,         "Sheep"},
 	{entSilverfish,    "Slverfish"},
 	{entSkeleton,      "Skeleton"},

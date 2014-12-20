@@ -25,6 +25,7 @@ enum eMonsterType
 	mtMooshroom    = E_META_SPAWN_EGG_MOOSHROOM,
 	mtOcelot       = E_META_SPAWN_EGG_OCELOT,
 	mtPig          = E_META_SPAWN_EGG_PIG,
+	mtRabbit       = E_META_SPAWN_EGG_RABBIT,
 	mtSheep        = E_META_SPAWN_EGG_SHEEP,
 	mtSilverfish   = E_META_SPAWN_EGG_SILVERFISH,
 	mtSkeleton     = E_META_SPAWN_EGG_SKELETON,

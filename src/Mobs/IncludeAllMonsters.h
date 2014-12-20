@@ -15,6 +15,7 @@
 #include "Mooshroom.h"
 #include "Ocelot.h"
 #include "Pig.h"
+#include "Rabbit.h"
 #include "Sheep.h"
 #include "Silverfish.h"
 #include "Skeleton.h"

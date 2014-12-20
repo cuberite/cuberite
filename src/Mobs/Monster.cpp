@@ -45,6 +45,7 @@ static const struct
 	{mtMooshroom,    "mooshroom",    "MushroomCow"},
 	{mtOcelot,       "ocelot",       "Ozelot"},
 	{mtPig,          "pig",          "Pig"},
+	{mtRabbit,       "rabbit",       "Rabbit"},
 	{mtSheep,        "sheep",        "Sheep"},
 	{mtSilverfish,   "silverfish",   "Silverfish"},
 	{mtSkeleton,     "skeleton",     "Skeleton"},
@@ -499,6 +500,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtCow:
 		case mtHorse:
 		case mtPig:
+		case mtRabbit:
 		case mtSheep:
 		case mtSquid:
 		case mtMooshroom:
@@ -851,6 +853,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtMooshroom:    return mfHostile;
 		case mtOcelot:       return mfPassive;
 		case mtPig:          return mfPassive;
+		case mtRabbit:       return mfPassive;
 		case mtSheep:        return mfPassive;
 		case mtSilverfish:   return mfHostile;
 		case mtSkeleton:     return mfHostile;
@@ -963,6 +966,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
 		case mtPig:           toReturn = new cPig();                      break;
+		case mtRabbit:        toReturn = new cRabbit();                   break;
 		case mtSheep:         toReturn = new cSheep();                    break;
 		case mtSilverfish:    toReturn = new cSilverfish();               break;
 		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
