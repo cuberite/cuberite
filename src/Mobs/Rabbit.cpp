@@ -10,7 +10,7 @@
 
 
 cRabbit::cRabbit(void) :
-	super("Rabbit", mtRabbit, "mob.rabbit.idle", "mob.rabbit.death", 0.9, 0.9)
+	super("Rabbit", mtRabbit, "mob.rabbit.idle", "mob.rabbit.death", 0.82, 0.68)
 {
 }
 
