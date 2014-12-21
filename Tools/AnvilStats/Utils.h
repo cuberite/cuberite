@@ -25,6 +25,7 @@ enum eEntityType
 	entEnderman,
 	entGhast,
 	entGiant,
+	entGuardian,
 	entLavaSlime,
 	entMushroomCow,
 	entOzelot,

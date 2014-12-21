@@ -8,6 +8,7 @@
 #include "EnderDragon.h"
 #include "Ghast.h"
 #include "Giant.h"
+#include "Guardian.h"
 #include "Horse.h"
 #include "IronGolem.h"
 #include "MagmaCube.h"

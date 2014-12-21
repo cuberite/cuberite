@@ -26,6 +26,7 @@ struct
 	{entEnderman,      "Enderman"},
 	{entGhast,         "Ghast"},
 	{entGiant,         "Giant"},
+	{entGuardian,      "Guardian"},
 	{entLavaSlime,     "LavaSlime"},
 	{entMushroomCow,   "MushroomCow"},
 	{entOzelot,        "Ozelot"},

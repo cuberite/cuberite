@@ -191,6 +191,7 @@ protected:
 	void LoadEndermanFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadGhastFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadGiantFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
+	void LoadGuardianFromNBT        (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadHorseFromNBT           (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadIronGolemFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);
 	void LoadMagmaCubeFromNBT       (cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx);

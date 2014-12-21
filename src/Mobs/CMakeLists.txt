@@ -16,6 +16,7 @@ SET (SRCS
 	Enderman.cpp
 	Ghast.cpp
 	Giant.cpp
+	Guardian.cpp
 	Horse.cpp
 	IronGolem.cpp
 	MagmaCube.cpp
@@ -49,6 +50,7 @@ SET (HDRS
 	Enderman.h
 	Ghast.h
 	Giant.h
+	Guardian.h
 	Horse.h
 	IncludeAllMonsters.h
 	IronGolem.h
