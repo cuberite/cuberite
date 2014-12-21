@@ -135,8 +135,9 @@ void cRoot::Start(void)
 		}
 
 		LOG("Starting server...");
+		m_MojangAPI = new cMojangAPI;
 		bool ShouldAuthenticate = IniFile.GetValueSetB("Authentication", "Authenticate", true);
-		m_MojangAPI.Start(IniFile, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
+		m_MojangAPI->Start(IniFile, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
 		if (!m_Server->InitServer(IniFile, ShouldAuthenticate))
 		{
 			IniFile.WriteFile("settings.ini");
@@ -149,7 +150,7 @@ void cRoot::Start(void)
 
 		LOGD("Loading settings...");
 		m_RankManager.reset(new cRankManager());
-		m_RankManager->Initialize(m_MojangAPI);
+		m_RankManager->Initialize(*m_MojangAPI);
 		m_CraftingRecipes = new cCraftingRecipes;
 		m_FurnaceRecipe   = new cFurnaceRecipe();
 		
@@ -196,7 +197,7 @@ void cRoot::Start(void)
 		}
 		#endif
 
-		LOG("Startup complete, took %ld ms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
+		LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
 		#ifdef _WIN32
 		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 		#endif
@@ -213,21 +214,28 @@ void cRoot::Start(void)
 
 		// Stop the server:
 		m_WebAdmin->Stop();
+
 		LOG("Shutting down server...");
 		m_Server->Shutdown();
+		delete m_MojangAPI; m_MojangAPI = nullptr;
+
 		LOGD("Shutting down deadlock detector...");
 		dd.Stop();
+
 		LOGD("Stopping world threads...");
 		StopWorlds();
+
 		LOGD("Stopping authenticator...");
 		m_Authenticator.Stop();
 
 		LOGD("Freeing MonsterConfig...");
 		delete m_MonsterConfig; m_MonsterConfig = nullptr;
 		delete m_WebAdmin; m_WebAdmin = nullptr;
+
 		LOGD("Unloading recipes...");
 		delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
 		delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
+
 		LOGD("Unloading worlds...");
 		UnloadWorlds();
 		
@@ -238,6 +246,7 @@ void cRoot::Start(void)
 
 		LOG("Cleaning up...");
 		delete m_Server; m_Server = nullptr;
+
 		LOG("Shutdown successful!");
 	}
 	
