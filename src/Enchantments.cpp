@@ -1021,26 +1021,34 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 
 
 
-cEnchantments cEnchantments::GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
+cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, int a_Seed)
 {
+	// Sum up all the enchantments' weights:
 	int AllWeights = 0;
 	for (const auto Enchantment : a_Enchantments)
 	{
 		AllWeights += Enchantment.m_Weight;
 	}
 
+	// If there's no weight for any of the enchantments, return an empty enchantment
+	if (AllWeights <= 0)
+	{
+		return cEnchantments();
+	}
+
+	// Pick a random enchantment:
 	cNoise Noise(a_Seed);
 	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
-
 	for (const auto Enchantment : a_Enchantments)
 	{
 		RandomNumber -= Enchantment.m_Weight;
-		if (RandomNumber < 0)
+		if (RandomNumber <= 0)
 		{
 			return Enchantment.m_Enchantments;
 		}
 	}
 
+	// No enchantment picked, return an empty one (we probably shouldn't ever get here):
 	return cEnchantments();
 }
 
