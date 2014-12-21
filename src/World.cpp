@@ -279,6 +279,8 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
+	m_LastSave(0),
+	m_LastUnload(0),
 	m_SkyDarkness(0),
 	m_GameMode(gmNotSet),
 	m_bEnabledPVP(false),
@@ -620,9 +622,6 @@ void cWorld::Start(void)
 
 	m_ChunkMap = make_unique<cChunkMap>(this);
 	
-	m_LastSave = 0;
-	m_LastUnload = 0;
-
 	// preallocate some memory for ticking blocks so we don't need to allocate that often
 	m_BlockTickQueue.reserve(1000);
 	m_BlockTickQueueCopy.reserve(1000);
