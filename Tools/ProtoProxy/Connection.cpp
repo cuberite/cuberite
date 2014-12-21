@@ -2687,7 +2687,7 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	char ItemCount;
 	short ItemDamage;
 	short MetadataLength;
-	a_Buffer.ReadChar(ItemCount);
+	a_Buffer.ReadChar(ItemCount);  // We already know we can read these bytes - we checked before.
 	a_Buffer.ReadBEShort(ItemDamage);
 	a_Buffer.ReadBEShort(MetadataLength);
 	Printf(a_ItemDesc, "%d:%d * %d", ItemType, ItemDamage, ItemCount);
@@ -2846,7 +2846,11 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 				bb.Write(a_Metadata.data() + pos + 1, RestLen);
 				UInt32 Length;
 				int rs = bb.GetReadableSpace();
-				bb.ReadVarInt(Length);
+				if (!bb.ReadVarInt(Length))
+				{
+					Log("Invalid metadata value, was supposed to be a varint-prefixed string, but cannot read the varint");
+					break;
+				}
 				rs = rs - bb.GetReadableSpace();
 				Log("%sstring[%d] = \"%*s\"", Indent.c_str(), Index, Length, a_Metadata.c_str() + pos + rs + 1);
 				pos += Length + rs + 2;
