@@ -39,7 +39,9 @@ cEndGen::cEndGen(int a_Seed) :
 	m_IslandSizeZ(256),
 	m_FrequencyX(80),
 	m_FrequencyY(80),
-	m_FrequencyZ(80)
+	m_FrequencyZ(80),
+	m_LastChunkX(0x7fffffff),  // Use dummy coords that won't ever be used by real chunks
+	m_LastChunkZ(0x7fffffff)
 {
 	m_Perlin.AddOctave(1, 1);
 	m_Perlin.AddOctave(2, 0.5);
