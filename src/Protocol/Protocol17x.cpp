@@ -1524,7 +1524,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			AString PacketData;
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
-			bb.ReadVarInt(PacketType);
+			bb.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again.
 			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
@@ -1753,7 +1753,10 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	{
 		return;
 	}
-	a_ByteBuffer.ReadBEShort(EncNonceLength);
+	if (!a_ByteBuffer.ReadBEShort(EncNonceLength))
+	{
+		return;
+	}
 	AString EncNonce;
 	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
 	{

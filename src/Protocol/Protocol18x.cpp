@@ -1723,7 +1723,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			{
 				// Decompress the data:
 				AString CompressedData;
-				m_ReceivedData.ReadString(CompressedData, CompressedSize);
+				if (!m_ReceivedData.ReadString(CompressedData, CompressedSize))
+				{
+					m_Client->Kick("Compression failure");
+					return;
+				}
 				InflateString(CompressedData.data(), CompressedSize, UncompressedData);
 				PacketLen = UncompressedData.size();
 			}
@@ -1765,7 +1769,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			AString PacketData;
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
-			bb.ReadVarInt(PacketType);
+			bb.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
 			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
