@@ -2945,9 +2945,9 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int
 	{
 		return false;
 	}
-	a_X = a_NBT.GetInt(x);
-	a_Y = a_NBT.GetInt(y);
-	a_Z = a_NBT.GetInt(z);
+	a_X = Clamp(a_NBT.GetInt(x), -40000000, 40000000);  // World is limited to 30M blocks in XZ, we clamp to 40M
+	a_Y = Clamp(a_NBT.GetInt(y), -10000,    10000);     // Y is limited to 0 .. 255, we clamp to 10K
+	a_Z = Clamp(a_NBT.GetInt(z), -40000000, 40000000);
 	return true;
 }
 
