@@ -73,6 +73,7 @@ cChunk::cChunk(
 	cAllocationPool<cChunkData::sChunkSection> & a_Pool
 ) :
 	m_Presence(cpInvalid),
+	m_ShouldGenerateIfLoadFailed(false),
 	m_IsLightValid(false),
 	m_IsDirty(false),
 	m_IsSaving(false),
@@ -93,6 +94,7 @@ cChunk::cChunk(
 	m_WaterSimulatorData(a_World->GetWaterSimulator()->CreateChunkData()),
 	m_LavaSimulatorData (a_World->GetLavaSimulator ()->CreateChunkData()),
 	m_RedstoneSimulatorData(a_World->GetRedstoneSimulator()->CreateChunkData()),
+	m_IsRedstoneDirty(false),
 	m_AlwaysTicked(0)
 {
 	if (a_NeighborXM != nullptr)
