@@ -70,6 +70,7 @@ public:
 			case E_META_SPAWN_EGG_MOOSHROOM:     return mtMooshroom;
 			case E_META_SPAWN_EGG_OCELOT:        return mtOcelot;
 			case E_META_SPAWN_EGG_PIG:           return mtPig;
+			case E_META_SPAWN_EGG_RABBIT:        return mtRabbit;
 			case E_META_SPAWN_EGG_SHEEP:         return mtSheep;
 			case E_META_SPAWN_EGG_SILVERFISH:    return mtSilverfish;
 			case E_META_SPAWN_EGG_SKELETON:      return mtSkeleton;

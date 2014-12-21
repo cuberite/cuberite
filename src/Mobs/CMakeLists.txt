@@ -25,6 +25,7 @@ SET (SRCS
 	PassiveAggressiveMonster.cpp
 	PassiveMonster.cpp
 	Pig.cpp
+	Rabbit.cpp
 	Sheep.cpp
 	Skeleton.cpp
 	Slime.cpp
@@ -62,6 +63,7 @@ SET (HDRS
 	PassiveAggressiveMonster.h
 	PassiveMonster.h
 	Pig.h
+	Rabbit.h
 	Sheep.h
 	Silverfish.h
 	Skeleton.h

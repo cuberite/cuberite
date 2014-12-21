@@ -31,6 +31,7 @@ enum eEntityType
 	entOzelot,
 	entPig,
 	entPigZombie,
+	entRabbit,
 	entSheep,
 	entSilverfish,
 	entSkeleton,
