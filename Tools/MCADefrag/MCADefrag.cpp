@@ -269,7 +269,7 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 		return false;
 	}
 	m_CompressedChunkDataSize = (Buf[0] << 24) | (Buf[1] << 16) | (Buf[2] << 8) | Buf[3];
-	if (m_CompressedChunkDataSize > SizeInSectors)
+	if ((m_CompressedChunkDataSize > SizeInSectors) || (m_CompressedChunkDataSize < 0))
 	{
 		LOGWARNING("Invalid chunk data - SizeInSectors (%d) smaller that RealSize (%d)", SizeInSectors, m_CompressedChunkDataSize);
 		return false;
