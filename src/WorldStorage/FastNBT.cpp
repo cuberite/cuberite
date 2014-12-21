@@ -10,6 +10,13 @@
 
 
 
+/** If a list being loaded has more than this number of items, it's considered corrupted. */
+static const int MAX_LIST_ITEMS = 10000;
+
+
+
+
+
 // The number of NBT tags that are reserved when an NBT parsing is started.
 // You can override this by using a cmdline define
 #ifndef NBT_RESERVE_SIZE
@@ -142,7 +149,7 @@ bool cParsedNBT::ReadList(eTagType a_ChildrenType)
 	NEEDBYTES(4);
 	int Count = GetBEInt(m_Data + m_Pos);
 	m_Pos += 4;
-	if (Count < 0)
+	if ((Count < 0) || (Count > MAX_LIST_ITEMS))
 	{
 		return false;
 	}
