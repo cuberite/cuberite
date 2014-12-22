@@ -39,7 +39,6 @@ public:
 
 			Handler->ConvertToPickups(Drops, BlockMeta);
 			Drops.Add(Block, 1, BlockMeta & 3);
-			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 			a_World->SpawnItemPickups(Drops, a_BlockX, a_BlockY, a_BlockZ);

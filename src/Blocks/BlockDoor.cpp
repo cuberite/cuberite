@@ -20,9 +20,9 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
 
-	if (OldMeta & 8)
+	if ((OldMeta & 0x08) != 0)
 	{
-		// Was upper part of door
+		// The coords are pointing at the top part of the door
 		if (IsDoor(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
@@ -30,7 +30,7 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 	}
 	else
 	{
-		// Was lower part
+		// The coords are pointing at the bottom part of the door
 		if (IsDoor(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)))
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_AIR, 0);

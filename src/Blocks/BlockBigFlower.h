@@ -81,7 +81,28 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR) && (a_RelY < cChunkDef::Height) && ((a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR) || (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_BIG_FLOWER)));
+		if (a_Chunk.GetBlock(a_RelX, a_RelY, a_RelZ) != m_BlockType)
+		{
+			// In placing
+			return (cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
+		}
+
+		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
+		{
+			return false;
+		}
+
+		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
+		if ((Meta & 0x08) != 0)
+		{
+			// The coords are pointing at the top part of the flower
+			return (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) == m_BlockType);
+		}
+		else
+		{
+			// The coords are pointing at the bottom part of the flower
+			return IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ));
+		}
 	}
 
 

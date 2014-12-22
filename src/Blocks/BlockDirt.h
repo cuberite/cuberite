@@ -55,29 +55,32 @@ public:
 		
 		// Grass spreads to adjacent dirt blocks:
 		cFastRandom rand;
-		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
+		for (int i = 0; i < 3; i++)  // Pick three blocks to grow to
 		{
-			int OfsX = rand.NextInt(3, a_RelX) - 1;  // [-1 .. 1]
-			int OfsY = rand.NextInt(5, a_RelY) - 3;  // [-3 .. 1]
-			int OfsZ = rand.NextInt(3, a_RelZ) - 1;  // [-1 .. 1]
-	
-			BLOCKTYPE  DestBlock;
-			NIBBLETYPE DestMeta;
-			if ((a_RelY + OfsY < 0) || (a_RelY + OfsY >= cChunkDef::Height - 1))
+			int OfsX = rand.GenerateRandomInteger(-1, 1);
+			int OfsY = rand.GenerateRandomInteger(-3, 1);
+			int OfsZ = rand.GenerateRandomInteger(-1, 1);
+			int BlockX = a_RelX + OfsX;
+			int BlockY = a_RelY + OfsY;
+			int BlockZ = a_RelZ + OfsZ;
+
+			if ((BlockY < 0) || (BlockY >= cChunkDef::Height))
 			{
 				// Y Coord out of range
 				continue;
 			}
-			int BlockX = a_RelX + OfsX;
-			int BlockY = a_RelY + OfsY;
-			int BlockZ = a_RelZ + OfsZ;
+
 			cChunk * Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(BlockX, BlockZ);
 			if (Chunk == nullptr)
 			{
 				// Unloaded chunk
 				continue;
 			}
+
+			BLOCKTYPE  DestBlock;
+			NIBBLETYPE DestMeta;
 			Chunk->GetBlockTypeMeta(BlockX, BlockY, BlockZ, DestBlock, DestMeta);
+
 			if ((DestBlock != E_BLOCK_DIRT) || (DestMeta != E_META_DIRT_NORMAL))
 			{
 				// Not a regular dirt block

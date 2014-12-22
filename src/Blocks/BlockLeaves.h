@@ -38,24 +38,29 @@ public:
 
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
-		cFastRandom rand;
+		cFastRandom Rand;
+		int DropChance = 20;
+		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_JUNGLE))
+		{
+			DropChance = 40;
+		}
 
 		// Old leaves - 3 bits contain display; new leaves - 1st bit, shifted left two for saplings to understand
-		if (rand.NextInt(6) == 0)
+		if (Rand.NextInt(DropChance) == 0)
 		{
 			a_Pickups.push_back(
 				cItem(
 					E_BLOCK_SAPLING,
 					1,
-					(m_BlockType == E_BLOCK_LEAVES) ? (a_BlockMeta & 0x03) : (2 << (a_BlockMeta & 0x01))
+					(a_BlockMeta & 0x3) + ((m_BlockType == E_BLOCK_LEAVES) ? 0 : 4)
 				)
 			);
 		}
 		
-		// 1 % chance of dropping an apple, if the leaves' type is Apple Leaves
+		// 0.5 % chance of dropping an apple, if the leaves' type is Apple Leaves
 		if ((m_BlockType == E_BLOCK_LEAVES) && ((a_BlockMeta & 0x03) == E_META_LEAVES_APPLE))
 		{
-			if (rand.NextInt(101) == 0)
+			if (Rand.NextInt(200) == 0)
 			{
 				a_Pickups.push_back(cItem(E_ITEM_RED_APPLE, 1, 0));
 			}

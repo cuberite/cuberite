@@ -773,6 +773,7 @@ void cBlockInfo::Initialize(cBlockInfoArray & a_Info)
 	a_Info[E_BLOCK_JUNGLE_DOOR         ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_ACACIA_DOOR         ].m_PlaceSound = "dig.wood";
 	a_Info[E_BLOCK_DARK_OAK_DOOR       ].m_PlaceSound = "dig.wood";
+	a_Info[E_BLOCK_BED                 ].m_PlaceSound = "dig.wood";
 }
 
 

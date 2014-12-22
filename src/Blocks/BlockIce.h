@@ -35,7 +35,7 @@ public:
 		if (Enchantments.GetLevel(cEnchantments::enchSilkTouch) == 0)
 		{
 			BLOCKTYPE BlockBelow = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ);
-			if (!cBlockInfo::FullyOccupiesVoxel(BlockBelow) && !IsBlockLiquid(BlockBelow))
+			if (!cBlockInfo::IsSolid(BlockBelow) && !IsBlockLiquid(BlockBelow))
 			{
 				return;
 			}
