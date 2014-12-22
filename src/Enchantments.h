@@ -53,6 +53,7 @@ public:
 		enchRespiration          = 5,
 		enchAquaAffinity         = 6,
 		enchThorns               = 7,
+		enchDepthStrider         = 8,
 		enchSharpness            = 16,
 		enchSmite                = 17,
 		enchBaneOfArthropods     = 18,
