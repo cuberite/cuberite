@@ -47,6 +47,7 @@ cRoot::cRoot(void) :
 	m_FurnaceRecipe(nullptr),
 	m_WebAdmin(nullptr),
 	m_PluginManager(nullptr),
+	m_MojangAPI(nullptr),
 	m_bStop(false),
 	m_bRestart(false)
 {
