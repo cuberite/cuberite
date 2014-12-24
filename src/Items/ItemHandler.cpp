@@ -106,8 +106,10 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		default:                       return new cItemHandler(a_ItemType);
 		
 		// Single item per handler, alphabetically sorted:
+		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
 		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
 		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
 		case E_BLOCK_HEAD:               return new cItemMobHeadHandler(a_ItemType);
 		case E_BLOCK_NEW_LEAVES:         return new cItemLeavesHandler(a_ItemType);
 		case E_BLOCK_PUMPKIN:            return new cItemPumpkinHandler;
@@ -134,7 +136,6 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
 		case E_ITEM_FLOWER_POT:          return new cItemFlowerPotHandler(a_ItemType);
 		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
-		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
 		case E_ITEM_MAP:                 return new cItemMapHandler();
 		case E_ITEM_MILK:                return new cItemMilkHandler();
 		case E_ITEM_MUSHROOM_SOUP:       return new cItemMushroomSoupHandler(a_ItemType);
