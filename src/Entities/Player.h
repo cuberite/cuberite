@@ -442,7 +442,8 @@ public:
 
 	/** Calls the block-placement hook and places the block in the world, unless refused by the hook.
 	If the hook prevents the placement, sends the current block at the specified coords back to the client.
-	Assumes that all the blocks are in currently loaded chunks. */
+	Assumes that the block is in a currently loaded chunk.
+	Returns true if the block is successfully placed. */
 	bool PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Sends the block in the specified range around the specified coord to the client
