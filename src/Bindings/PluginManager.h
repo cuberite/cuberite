@@ -207,10 +207,10 @@ public:
 	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
 	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
 	bool CallHookPlayerJoined             (cPlayer & a_Player);
-	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition);
 	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition);
+	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange);
+	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
 	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
 	bool CallHookPlayerShooting           (cPlayer & a_Player);

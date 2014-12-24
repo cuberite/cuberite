@@ -857,14 +857,19 @@ bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPositi
 
 
 
-bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_PLACED_BLOCK];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player,
+			a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
+			a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta,
+			cLuaState::Return,
+			res
+		);
 		if (res)
 		{
 			return true;
@@ -877,14 +882,19 @@ bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_Blo
 
 
 
-bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_PLAYER_PLACING_BLOCK];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), &a_Player,
+			a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
+			a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta,
+			cLuaState::Return,
+			res
+		);
 		if (res)
 		{
 			return true;

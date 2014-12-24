@@ -1463,7 +1463,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 	sSetBlockVector b2;
 	for (sSetBlockVector::const_iterator itr = a_Blocks.begin(); itr != a_Blocks.end(); ++itr)
 	{
-		if (itr->BlockType == E_BLOCK_LOG)
+		if (itr->m_BlockType == E_BLOCK_LOG)
 		{
 			b2.push_back(*itr);
 		}
@@ -1478,7 +1478,7 @@ void cWorld::GrowTreeImage(const sSetBlockVector & a_Blocks)
 	// Check that at each log's coord there's an block allowed to be overwritten:
 	for (sSetBlockVector::const_iterator itr = b2.begin(); itr != b2.end(); ++itr)
 	{
-		switch (itr->BlockType)
+		switch (itr->m_BlockType)
 		{
 			CASE_TREE_ALLOWED_BLOCKS:
 			{
@@ -1920,6 +1920,15 @@ void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks,
 		a_InitialVelocityCoeff * 2,
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
 	);
+}
+
+
+
+
+
+void cWorld::SetBlocks(const sSetBlockVector & a_Blocks)
+{
+	m_ChunkMap->SetBlocks(a_Blocks);
 }
 
 

@@ -101,14 +101,6 @@ public:
 	}
 
 
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override;
-
-
 	virtual bool IsUseable(void) override
 	{
 		return true;
@@ -117,11 +109,19 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR));
+		return ((a_RelY > 0) && CanBeOn(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 
 
-	bool CanReplaceBlock(BLOCKTYPE a_BlockType)
+	/** Returns true if door can be placed on the specified block type. */
+	static bool CanBeOn(BLOCKTYPE a_BlockType)
+	{
+		// Vanilla refuses to place doors on transparent blocks
+		return !cBlockInfo::IsTransparent(a_BlockType);
+	}
+
+
+	static bool CanReplaceBlock(BLOCKTYPE a_BlockType)
 	{
 		switch (a_BlockType)
 		{
@@ -170,8 +170,21 @@ public:
 	}
 
 
+	/** Returns a vector pointing one block in the direction the door is facing (where the outside is). */
+	inline static Vector3i GetRelativeDirectionToOutside(NIBBLETYPE a_BlockMeta)
+	{
+		switch (a_BlockMeta & 0x03)
+		{
+			case 0:  return Vector3i(-1, 0,  0);  // Facing West  / XM
+			case 1:  return Vector3i( 0, 0, -1);  // Facing North / ZM
+			case 2:  return Vector3i( 1, 0,  0);  // Facing East  / XP
+			default: return Vector3i( 0, 0,  1);  // Facing South / ZP
+		}
+	}
+
+
 	/** Returns true if the specified blocktype is any kind of door */
-	inline static bool IsDoor(BLOCKTYPE a_Block)
+	inline static bool IsDoorBlockType(BLOCKTYPE a_Block)
 	{
 		switch (a_Block)
 		{
@@ -193,6 +206,8 @@ public:
 	}
 
 
+	/** Returns true iff the door at the specified coords is open.
+	The coords may point to either the top part or the bottom part of the door. */
 	static NIBBLETYPE IsOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		NIBBLETYPE Meta = GetCompleteDoorMeta(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
@@ -237,7 +252,7 @@ public:
 	static void SetOpen(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 	{
 		BLOCKTYPE Block = a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		if (!IsDoor(Block))
+		if (!IsDoorBlockType(Block))
 		{
 			return;
 		}

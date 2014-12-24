@@ -49,14 +49,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // sSetBlock:
 
-sSetBlock::sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)  // absolute block position
-	: x( a_BlockX)
-	, y( a_BlockY)
-	, z( a_BlockZ)
-	, BlockType( a_BlockType)
-	, BlockMeta( a_BlockMeta)
+sSetBlock::sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+	m_RelX(a_BlockX),
+	m_RelY(a_BlockY),
+	m_RelZ(a_BlockZ),
+	m_BlockType(a_BlockType),
+	m_BlockMeta(a_BlockMeta)
 {
-	cChunkDef::AbsoluteToRelative(x, y, z, ChunkX, ChunkZ);
+	cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
 }
 
 

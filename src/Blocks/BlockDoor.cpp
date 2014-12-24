@@ -23,7 +23,7 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 	if (OldMeta & 8)
 	{
 		// Was upper part of door
-		if (IsDoor(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if (IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY - 1, a_BlockZ, E_BLOCK_AIR, 0);
 		}
@@ -31,7 +31,7 @@ void cBlockDoorHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldIn
 	else
 	{
 		// Was lower part
-		if (IsDoor(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)))
+		if (IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ)))
 		{
 			a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_AIR, 0);
 		}
@@ -84,41 +84,21 @@ void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, c
 
 
 
-void cBlockDoorHandler::OnPlacedByPlayer(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-)
-{
-	NIBBLETYPE a_TopBlockMeta = 8;
-	if (
-		((a_BlockMeta == 0) && (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ - 1) == m_BlockType)) ||
-		((a_BlockMeta == 1) && (a_ChunkInterface.GetBlock(a_BlockX + 1, a_BlockY, a_BlockZ) == m_BlockType)) ||
-		((a_BlockMeta == 2) && (a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ + 1) == m_BlockType)) ||
-		((a_BlockMeta == 3) && (a_ChunkInterface.GetBlock(a_BlockX - 1, a_BlockY, a_BlockZ) == m_BlockType))
-	)
-	{
-		a_TopBlockMeta = 9;
-	}
-	a_ChunkInterface.SetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, m_BlockType, a_TopBlockMeta);
-}
-
-
-
-
-
 NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 {
 	if (a_Meta & 0x08)
 	{
+		// The meta doesn't change for the top block
 		return a_Meta;
 	}
 	else
 	{
+		// Rotate the bottom block
 		return super::MetaRotateCCW(a_Meta);
 	}
 }
+
+
 
 
 
@@ -126,10 +106,12 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 {
 	if (a_Meta & 0x08)
 	{
+		// The meta doesn't change for the top block
 		return a_Meta;
 	}
 	else
 	{
+		// Rotate the bottom block
 		return super::MetaRotateCW(a_Meta);
 	}
 }
@@ -138,8 +120,10 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 
 NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 {
-	// Top bit (0x08) contains door panel type (Top/Bottom panel)  Only Bottom panels contain position data
-	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)
+	/*
+	Top bit (0x08) contains door block position (Top / Bottom). Only Bottom blocks contain position data
+	Return a_Meta if panel is a top panel (0x08 bit is set to 1)
+	*/
 
 	// Note: Currently, you can not properly mirror the hinges on a double door.  The orientation of the door is stored
 	// in only the bottom tile while the hinge position is in the top tile.  This function only operates on one tile at a time,

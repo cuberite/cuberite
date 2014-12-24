@@ -228,8 +228,8 @@ void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	Pkt.WriteInt((int)a_Changes.size() * 4);
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
-		unsigned int Coords = itr->y | (itr->z << 8) | (itr->x << 12);
-		unsigned int Blocks = itr->BlockMeta | (itr->BlockType << 4);
+		unsigned int Coords = itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12);
+		unsigned int Blocks = itr->m_BlockMeta | (itr->m_BlockType << 4);
 		Pkt.WriteInt((Coords << 16) | Blocks);
 	}  // for itr - a_Changes[]
 }

@@ -24,30 +24,36 @@ public:
 		return true;
 	}
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
 		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
+		// Can only be placed on the floor:
 		if (a_BlockFace != BLOCK_FACE_TOP)
 		{
-			// Can only be placed on the floor
 			return false;
 		}
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
-		a_BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player->GetYaw());
+		// The "foot" block:
+		sSetBlockVector blks;
+		NIBBLETYPE BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player.GetYaw());
+		blks.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BED, BlockMeta);
 		
-		// Check if there is empty space for the foot section:
-		Vector3i Direction = cBlockBedHandler::MetaDataToDirection(a_BlockMeta);
-		if (a_World->GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) != E_BLOCK_AIR)
+		// Check if there is empty space for the "head" block:
+		// (Vanilla only allows beds to be placed into air)
+		Vector3i Direction = cBlockBedHandler::MetaDataToDirection(BlockMeta);
+		if (a_World.GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) != E_BLOCK_AIR)
 		{
 			return false;
 		}
+		blks.emplace_back(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, BlockMeta | 0x08);
 
-		a_BlockType = E_BLOCK_BED;
-		return true;
+		// Place both bed blocks:
+		return a_Player.PlaceBlocks(blks);
 	}
 } ;
 
