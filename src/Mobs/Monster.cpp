@@ -846,7 +846,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
 		case mtGiant:        return mfNoSpawn;
-		case mtGuardian:     return mfWater; // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
+		case mtGuardian:     return mfWater;  // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
 		case mtHorse:        return mfPassive;
 		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;

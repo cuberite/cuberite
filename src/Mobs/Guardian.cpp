@@ -28,7 +28,7 @@ void cGuardian::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_PRISMARINE_SHARD);
 	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_RAW_FISH);
-	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_PRISMARINE_CRYSTALS); // ToDo: Prismarine Crystals only drop if the raw fish drop is 0
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_PRISMARINE_CRYSTALS);  // TODO: Prismarine Crystals only drop if the raw fish drop is 0
 }
 
 
