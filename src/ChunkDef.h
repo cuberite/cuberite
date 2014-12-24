@@ -399,20 +399,16 @@ public:
 typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;
 
-namespace std
-{
-
 /** A simple hash function for chunk coords, we assume that chunk coords won't use more than 16 bits, so the hash is almost an identity.
 Used for std::unordered_map<cChunkCoords, ...> */
-template<> struct hash<cChunkCoords>
+class cChunkCoordsHash
 {
-	size_t operator ()(const cChunkCoords & a_Coords)
+public:
+	size_t operator () (const cChunkCoords & a_Coords) const
 	{
 		return (static_cast<size_t>(a_Coords.m_ChunkX) << 16) ^ static_cast<size_t>(a_Coords.m_ChunkZ);
 	}
 };
-
-}  // namespace std
 
 
 

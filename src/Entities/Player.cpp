@@ -2206,7 +2206,7 @@ void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_R
 	}
 
 	// Divide the block changes by their respective chunks:
-	std::unordered_map<cChunkCoords, sSetBlockVector> Changes;
+	std::unordered_map<cChunkCoords, sSetBlockVector, cChunkCoordsHash> Changes;
 	for (const auto & blk: blks)
 	{
 		Changes[cChunkCoords(blk.m_ChunkX, blk.m_ChunkZ)].push_back(blk);
