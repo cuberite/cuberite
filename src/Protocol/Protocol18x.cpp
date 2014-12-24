@@ -207,9 +207,9 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	Pkt.WriteVarInt((UInt32)a_Changes.size());
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
-		short Coords = (short) (itr->y | (itr->z << 8) | (itr->x << 12));
+		short Coords = (short) (itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
 		Pkt.WriteShort(Coords);
-		Pkt.WriteVarInt((itr->BlockType & 0xFFF) << 4 | (itr->BlockMeta & 0xF));
+		Pkt.WriteVarInt((itr->m_BlockType & 0xFFF) << 4 | (itr->m_BlockMeta & 0xF));
 	}  // for itr - a_Changes[]
 }
 

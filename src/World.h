@@ -491,6 +491,11 @@ public:
 
 	// tolua_end
 
+	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
+	Is more efficient than calling SetBlock() multiple times.
+	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
+	void SetBlocks(const sSetBlockVector & a_Blocks);
+
 	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
 	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
 	

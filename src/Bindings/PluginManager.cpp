@@ -866,14 +866,14 @@ bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d a_O
 
 
 
-bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	FIND_HOOK(HOOK_PLAYER_PLACED_BLOCK);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPlayerPlacedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		if ((*itr)->OnPlayerPlacedBlock(a_Player, a_BlockChange))
 		{
 			return true;
 		}
@@ -885,14 +885,14 @@ bool cPluginManager::CallHookPlayerPlacedBlock(cPlayer & a_Player, int a_BlockX,
 
 
 
-bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
 	FIND_HOOK(HOOK_PLAYER_PLACING_BLOCK);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnPlayerPlacingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta))
+		if ((*itr)->OnPlayerPlacingBlock(a_Player, a_BlockChange))
 		{
 			return true;
 		}

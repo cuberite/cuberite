@@ -10,12 +10,14 @@ SET (SRCS
 SET (HDRS
 	ItemArmor.h
 	ItemBed.h
+	ItemBigFlower.h
 	ItemBoat.h
 	ItemBow.h
 	ItemBrewingStand.h
 	ItemBucket.h
 	ItemCake.h
 	ItemCauldron.h
+	ItemChest.h
 	ItemCloth.h
 	ItemComparator.h
 	ItemDoor.h
@@ -38,18 +40,21 @@ SET (HDRS
 	ItemPainting.h
 	ItemPickaxe.h
 	ItemPotion.h
+	ItemPumpkin.h
 	ItemRedstoneDust.h
 	ItemRedstoneRepeater.h
 	ItemSapling.h
 	ItemSeeds.h
 	ItemShears.h
 	ItemShovel.h
+	ItemSlab.h
 	ItemSign.h
 	ItemSpawnEgg.h
 	ItemString.h
 	ItemSugarcane.h
 	ItemSword.h
-	ItemThrowable.h)
+	ItemThrowable.h
+)
 
 if(NOT MSVC)
 	add_library(Items ${SRCS} ${HDRS})
