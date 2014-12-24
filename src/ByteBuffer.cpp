@@ -13,6 +13,15 @@
 
 
 
+/** When defined, each access to a cByteBuffer object is checked whether it's done in the same thread.
+cByteBuffer assumes that it is not used by multiple threads at once, this macro adds a runtime check for that.
+Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. */
+// #define DEBUG_SINGLE_THREAD_ACCESS
+
+
+
+
+
 // Try to determine endianness:
 #if ( \
 	defined(__i386__) || defined(__alpha__) || \
@@ -109,7 +118,7 @@ public:
 
 
 
-#ifdef _DEBUG
+#ifdef DEBUG_SINGLE_THREAD_ACCESS
 
 	/** Simple RAII class that is used for checking that no two threads are using an object simultanously.
 	It requires the monitored object to provide the storage for a thread ID.
