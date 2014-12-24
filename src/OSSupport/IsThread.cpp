@@ -68,11 +68,22 @@ cIsThread::~cIsThread()
 
 
 
+void cIsThread::DoExecute(void)
+{
+	m_evtStart.Wait();
+	Execute();
+}
+
+
+
+
+
 bool cIsThread::Start(void)
 {
 	try
 	{
-		m_Thread = std::thread(&cIsThread::Execute, this);
+		// Initialize the thread:
+		m_Thread = std::thread(&cIsThread::DoExecute, this);
 
 		#if defined (_MSC_VER) && defined(_DEBUG)
 		if (!m_ThreadName.empty())
@@ -81,9 +92,12 @@ bool cIsThread::Start(void)
 		}
 		#endif
 
+		// Notify the thread that initialization is complete and it can run its code safely:
+		m_evtStart.Set();
+
 		return true;
 	}
-	catch (std::system_error & a_Exception)
+	catch (const std::system_error & a_Exception)
 	{
 		LOGERROR("cIsThread::Start error %i: could not construct thread %s; %s", a_Exception.code().value(), m_ThreadName.c_str(), a_Exception.code().message().c_str());
 		return false;
