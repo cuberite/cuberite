@@ -150,9 +150,9 @@ public:
 		// Image for the wither at the X axis:
 		static const sSetBlock ImageWitherX[] =
 		{
-			{-1,  0, 0, E_BLOCK_HEAD, E_META_HEAD_WITHER},
-			{ 0,  0, 0, E_BLOCK_HEAD, E_META_HEAD_WITHER},
-			{ 1,  0, 0, E_BLOCK_HEAD, E_META_HEAD_WITHER},
+			{-1,  0, 0, E_BLOCK_HEAD,     0},
+			{ 0,  0, 0, E_BLOCK_HEAD,     0},
+			{ 1,  0, 0, E_BLOCK_HEAD,     0},
 			{-1, -1, 0, E_BLOCK_SOULSAND, 0},
 			{ 0, -1, 0, E_BLOCK_SOULSAND, 0},
 			{ 1, -1, 0, E_BLOCK_SOULSAND, 0},
@@ -164,9 +164,9 @@ public:
 		// Image for the wither at the Z axis:
 		static const sSetBlock ImageWitherZ[] =
 		{
-			{ 0,  0, -1, E_BLOCK_HEAD, E_META_HEAD_WITHER},
-			{ 0,  0,  0, E_BLOCK_HEAD, E_META_HEAD_WITHER},
-			{ 0,  0,  1, E_BLOCK_HEAD, E_META_HEAD_WITHER},
+			{ 0,  0, -1, E_BLOCK_HEAD,     0},
+			{ 0,  0,  0, E_BLOCK_HEAD,     0},
+			{ 0,  0,  1, E_BLOCK_HEAD,     0},
 			{ 0, -1, -1, E_BLOCK_SOULSAND, 0},
 			{ 0, -1,  0, E_BLOCK_SOULSAND, 0},
 			{ 0, -1,  1, E_BLOCK_SOULSAND, 0},
@@ -208,14 +208,14 @@ public:
 		for (size_t i = 0; i < a_ImageCount; i++)
 		{
 			// Get the absolute coords of the image:
-			int BlockX = a_PlacedHeadX + a_OffsetX + a_Image[i].m_RelX;
-			int BlockY = a_PlacedHeadY + a_Image[i].m_RelY;
-			int BlockZ = a_PlacedHeadZ + a_OffsetZ + a_Image[i].m_RelZ;
+			int BlockX = a_PlacedHeadX + a_OffsetX + a_Image[i].GetX();
+			int BlockY = a_PlacedHeadY + a_Image[i].GetY();
+			int BlockZ = a_PlacedHeadZ + a_OffsetZ + a_Image[i].GetZ();
 
 			// If the query is for the placed head, short-circuit-evaluate it:
 			if ((BlockX == a_PlacedHeadX) && (BlockY == a_PlacedHeadY) && (BlockZ == a_PlacedHeadZ))
 			{
-				if ((a_Image[i].m_BlockType != E_BLOCK_HEAD) || (a_Image[i].m_BlockMeta != E_META_HEAD_WITHER))
+				if (a_Image[i].m_BlockType != E_BLOCK_HEAD)
 				{
 					return false;  // Didn't match
 				}
@@ -232,14 +232,41 @@ public:
 			}
 
 			// Compare the world block:
-			if ((BlockType != a_Image[i].m_BlockType) || (BlockMeta != a_Image[i].m_BlockMeta))
+			if (BlockType != a_Image[i].m_BlockType)
 			{
-				return false;  // Didn't match
+				return false;
+			}
+
+			// If it is a mob head, check the correct head type using the block entity:
+			if (BlockType == E_BLOCK_HEAD)
+			{
+				class cHeadCallback: public cBlockEntityCallback
+				{
+					virtual bool Item(cBlockEntity * a_Entity) override
+					{
+						ASSERT(a_Entity->GetBlockType() == E_BLOCK_HEAD);
+						cMobHeadEntity * MobHead = static_cast<cMobHeadEntity *>(a_Entity);
+						m_IsWitherHead = (MobHead->GetType() == SKULL_TYPE_WITHER);
+						return true;
+					}
+				public:
+					cHeadCallback(void):
+						m_IsWitherHead(false)
+					{
+					}
+					bool m_IsWitherHead;
+				} callback;
+				a_World.DoWithBlockEntityAt(BlockX, BlockY, BlockZ, callback);
+				if (!callback.m_IsWitherHead)
+				{
+					return false;
+				}
 			}
 			// Matched, continue checking
+			AirBlocks.emplace_back(BlockX, BlockY, BlockZ, E_BLOCK_AIR, 0);
 		}  // for i - a_Image
 
-		// All image blocks matched, try place the wither:
+		// All image blocks matched, try replace the image with air blocks:
 		if (!a_Player.PlaceBlocks(AirBlocks))
 		{
 			return false;
