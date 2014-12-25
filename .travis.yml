@@ -13,6 +13,9 @@ before_install:
 install:
   # g++4.8 and clang
   - sudo apt-get install -qq g++-4.8
+
+  # lua, needed for style checking and possibly later on for bindings generation
+  - sudo apt-get install -qq lua5.1
   
   # g++4.8
   - if [ "$CXX" == "g++" ]; then export CXX="g++-4.8"; export CC="gcc-4.8"; fi
