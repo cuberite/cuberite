@@ -27,7 +27,7 @@ public:
 	) override
 	{
 		// Vanilla only allows door placement while clicking on the top face of the block below the door:
-		if (a_BlockFace != BLOCK_FACE_NONE)
+		if (a_BlockFace != BLOCK_FACE_TOP)
 		{
 			return false;
 		}
@@ -40,7 +40,7 @@ public:
 		}
 
 		// The door needs a compatible block below it:
-		if ((a_BlockY > 0) && cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if ((a_BlockY > 0) && !cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
 		{
 			return false;
 		}

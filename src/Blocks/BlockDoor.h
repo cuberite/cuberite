@@ -117,7 +117,8 @@ public:
 	static bool CanBeOn(BLOCKTYPE a_BlockType)
 	{
 		// Vanilla refuses to place doors on transparent blocks
-		return !cBlockInfo::IsTransparent(a_BlockType);
+		// We need to keep the door compatible with itself, otherwise the top half drops while the bottom half stays
+		return !cBlockInfo::IsTransparent(a_BlockType) || IsDoorBlockType(a_BlockType);
 	}
 
 
