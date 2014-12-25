@@ -53,7 +53,7 @@ public:
 	)
 	{
 		// Place the block:
-		if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_HEAD, static_cast<NIBBLETYPE>(a_EquippedItem.m_ItemType)))
+		if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_HEAD, BlockFaceToBlockMeta(a_BlockFace)))
 		{
 			return false;
 		}
@@ -92,7 +92,7 @@ public:
 				m_BlockMeta(a_BlockMeta)
 			{}
 		};
-		cCallback Callback(a_Player, static_cast<eMobHeadType>(a_EquippedItem.m_ItemType), static_cast<NIBBLETYPE>(a_BlockFace));
+		cCallback Callback(a_Player, static_cast<eMobHeadType>(a_EquippedItem.m_ItemDamage), static_cast<NIBBLETYPE>(a_BlockFace));
 		a_World.DoWithBlockEntityAt(a_BlockX, a_BlockY, a_BlockZ, Callback);
 		return true;
 	}
@@ -276,6 +276,26 @@ public:
 			cPlayerCallback(const Vector3f & a_Pos) : m_Pos(a_Pos) {}
 		} PlayerCallback(Vector3f(static_cast<float>(a_BlockX), static_cast<float>(a_BlockY), static_cast<float>(a_BlockZ)));
 		a_World.ForEachPlayer(PlayerCallback);
+	}
+
+
+	/** Converts the block face of the placement (which face of the block was clicked to place the head)
+	into the block's metadata value. */
+	static NIBBLETYPE BlockFaceToBlockMeta(int a_BlockFace)
+	{
+		switch (a_BlockFace)
+		{
+			case BLOCK_FACE_TOP: return 0x01;  // On ground (rotation provided in block entity)
+			case BLOCK_FACE_XM:  return 0x04;  // west wall, facing east
+			case BLOCK_FACE_XP:  return 0x05;  // east wall, facing west
+			case BLOCK_FACE_ZM:  return 0x02;  // north wall, facing south
+			case BLOCK_FACE_ZP:  return 0x03;  // south wall, facing north
+			default:
+			{
+				ASSERT(!"Unhandled block face");
+				return 0;
+			}
+		}
 	}
 
 
