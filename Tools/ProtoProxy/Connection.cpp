@@ -1392,6 +1392,9 @@ bool cConnection::HandleServerBlockChange(void)
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockType);
 	HANDLE_SERVER_PACKET_READ(ReadChar,    char,   BlockMeta);
 	Log("Received a PACKET_BLOCK_CHANGE from the server");
+	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
+	Log("  BlockType = %d (0x%x", BlockType, BlockType);
+	Log("  BlockMeta = %d", BlockMeta);
 	COPY_TO_CLIENT();
 	return true;
 }
