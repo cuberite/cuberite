@@ -70,8 +70,25 @@ After doing so, run the command `xcodebuild lib/polarssl/POLARSSL.xcodeproj` in 
 ## Linux, FreeBSD etc. ##
 
 Install git, make, cmake and gcc or clang, using your platform's package manager:
+
+### On debian-based systems ###
 ```
 sudo apt-get install git make cmake gcc g++
+```
+
+### On redhat-based systems ###
+```
+sudo yum -y install git make cmake gcc g++
+```
+
+### On arch-based systems ###
+```
+sudo pacman -S git make cmake gcc g++
+```
+
+### On your system ###
+```
+Feel free to commit the way these packages are installed on your system
 ```
 
 ### Getting the sources ###
