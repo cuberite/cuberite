@@ -52,12 +52,21 @@ end
 
 
 
+function GetTotalPlayers()
+    Players=0
+    local EachPlayer = function(Player)
+        Players = Players + 1
+    end
+    cRoot:Get():ForEachPlayer(EachPlayer)
+    return Players
+end    
 
 
 function ShowPage(WebAdmin, TemplateRequest)
 	SiteContent = {}
 	local BaseURL = WebAdmin:GetBaseURL(TemplateRequest.Request.Path)
 	local Title = "MCServer WebAdmin"
+	local NumPlayers = GetTotalPlayers()
 	local MemoryUsageKiB = cRoot:GetPhysicalRAMUsage()
 	local NumChunks = cRoot:Get():GetTotalChunkCount()
 	local PluginPage = WebAdmin:GetPage(TemplateRequest.Request)
@@ -102,6 +111,7 @@ function ShowPage(WebAdmin, TemplateRequest)
 				<div class="wrapper">
 					<ul class="menu top_links">
 						<li><a>Server Name: <strong>]] .. cRoot:Get():GetServer():GetServerID() .. [[</strong></a></li>
+						<li><a>Players online: <strong>]] .. NumPlayers .. [[</strong></a></li>
 						<li><a>Memory: <strong>]] .. MemoryUsageKiB / 1024 .. [[MB</strong></a></li>
 						<li><a>Chunks: <strong>]] .. NumChunks .. [[</strong></a></li>
 					</ul>
