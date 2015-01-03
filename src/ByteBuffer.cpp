@@ -131,7 +131,7 @@ public:
 		{
 			ASSERT(
 				(*a_ThreadID == std::this_thread::get_id()) ||  // Either the object is used by current thread...
-				(*a_ThreadID == std::thread::id())              // ... or by no thread at all
+				(*a_ThreadID == m_EmptyThreadID)                // ... or by no thread at all
 			);
 
 			// Mark as being used by this thread:
@@ -147,7 +147,12 @@ public:
 	protected:
 		/** Points to the storage used for ID of the thread using the object. */
 		std::thread::id * m_ThreadID;
+
+		/** The value of an unassigned thread ID, used to speed up checking. */
+		static std::thread::id m_EmptyThreadID;
 	};
+
+	std::thread::id cSingleThreadAccessChecker::m_EmptyThreadID;
 
 	#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
 
