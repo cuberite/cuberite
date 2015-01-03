@@ -2242,6 +2242,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 {
 	if (a_Channel == "MC|AdvCdm")
 	{
+		size_t BeginningSpace = a_ByteBuffer.GetReadableSpace();
 		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode);
 		switch (Mode)
 		{
@@ -2265,6 +2266,16 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 				return;
 			}
 		}  // switch (Mode)
+
+		// Read the remainder of the packet (Vanilla sometimes sends bogus data at the end of the packet; #1692):
+		size_t BytesRead = BeginningSpace - a_ByteBuffer.GetReadableSpace();
+		if (BytesRead < static_cast<size_t>(a_PayloadLength))
+		{
+			LOGD("Protocol 1.7: Skipping garbage data at the end of a vanilla MC|AdvCdm packet, %u bytes",
+				a_PayloadLength - BytesRead
+			);
+			a_ByteBuffer.SkipRead(a_PayloadLength - BytesRead);
+		}
 		return;
 	}
 	else if (a_Channel == "MC|Brand")

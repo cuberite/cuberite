@@ -2331,6 +2331,16 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	if (Channel.substr(0, 3) == "MC|")
 	{
 		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
+
+		// Skip any unread data (vanilla sometimes sends garbage at the end of a packet; #1692):
+		if (a_ByteBuffer.GetReadableSpace() > 1)
+		{
+			LOGD("Protocol 1.8: Skipping garbage data at the end of a vanilla PluginMessage packet, %u bytes",
+				a_ByteBuffer.GetReadableSpace() - 1
+			);
+			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+		}
+
 		return;
 	}
 
