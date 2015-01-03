@@ -2272,7 +2272,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 		if (BytesRead < static_cast<size_t>(a_PayloadLength))
 		{
 			LOGD("Protocol 1.7: Skipping garbage data at the end of a vanilla MC|AdvCdm packet, %u bytes",
-				a_PayloadLength - BytesRead
+				static_cast<unsigned>(a_PayloadLength - BytesRead)
 			);
 			a_ByteBuffer.SkipRead(a_PayloadLength - BytesRead);
 		}

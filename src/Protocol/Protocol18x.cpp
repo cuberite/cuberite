@@ -2336,7 +2336,7 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 		if (a_ByteBuffer.GetReadableSpace() > 1)
 		{
 			LOGD("Protocol 1.8: Skipping garbage data at the end of a vanilla PluginMessage packet, %u bytes",
-				a_ByteBuffer.GetReadableSpace() - 1
+				static_cast<unsigned>(a_ByteBuffer.GetReadableSpace() - 1)
 			);
 			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
 		}
