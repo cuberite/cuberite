@@ -280,7 +280,19 @@ cFileListener::cFileListener(void)
 {
 	cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
 	AString FileName;
-	FileName = Printf("%s%sLOG_%d.txt", FILE_IO_PREFIX, "logs/", (int)time(nullptr));
+	time_t rawtime;
+	time(&rawtime);
+	struct tm * timeinfo;
+
+	#ifdef _MSC_VER
+		struct tm timeinforeal;
+		timeinfo = &timeinforeal;
+		localtime_s(timeinfo, &rawtime);
+	#else
+		timeinfo = localtime(&rawtime);
+	#endif
+
+	FileName = Printf("%s%sLOG-%02d-%02d-%02d.txt", FILE_IO_PREFIX, "logs/", (timeinfo->tm_year + 1900), (timeinfo->tm_mon +1), timeinfo->tm_mday);
 	m_File.Open(FileName, cFile::fmAppend);
 }
 
