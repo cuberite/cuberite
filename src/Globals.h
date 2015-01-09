@@ -298,6 +298,16 @@ void inline LOGD(const char* a_Format, ...)
 	va_end(argList);
 }
 
+void inline LOG(const char* a_Format, ...) FORMATSTRING(1, 2);
+
+void inline LOG(const char* a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	va_end(argList);
+}
+
 #endif
 
 
