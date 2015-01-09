@@ -12,6 +12,7 @@ SET (SRCS
 	GZipFile.cpp
 	IsThread.cpp
 	ListenThread.cpp
+	Network.cpp
 	Semaphore.cpp
 	Socket.cpp
 	SocketThreads.cpp
@@ -26,6 +27,7 @@ SET (HDRS
 	GZipFile.h
 	IsThread.h
 	ListenThread.h
+	Network.h
 	Queue.h
 	Semaphore.h
 	Socket.h

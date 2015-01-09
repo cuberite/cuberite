@@ -1,0 +1,188 @@
+
+// Network.h
+
+// Declares the classes used for the Network API
+
+
+
+
+
+#pragma once
+
+
+
+
+
+/** Interface that provides the methods available on a single TCP connection. */
+class cTCPLink
+{
+	friend class cNetwork;
+
+public:
+	class cCallbacks
+	{
+	public:
+		/** Called when there's data incoming from the remote peer. */
+		virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Length) = 0;
+
+		/** Called when the remote end closes the connection.
+		The link is still available for connection information query (IP / port).
+		Sending data on the link is not an error, but the data won't be delivered. */
+		virtual void OnRemoteClosed(cTCPLink & a_Link) = 0;
+
+		/** Called when an error is detected on the connection. */
+		virtual void OnError(cTCPLink & a_Link, int a_ErrorCode) = 0;
+	};
+	typedef SharedPtr<cCallbacks> cCallbacksPtr;
+
+
+	/** Queues the specified data for sending to the remote peer.
+	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the actual data delivery. */
+	virtual bool Send(const void * a_Data, size_t a_Length) = 0;
+
+	/** Queues the specified data for sending to the remote peer.
+	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the actual data delivery. */
+	bool Send(const AString & a_Data)
+	{
+		return Send(a_Data.data(), a_Data.size());
+	}
+
+	/** Returns the IP address of the local endpoint of the connection. */
+	virtual AString GetLocalIP(void) const = 0;
+
+	/** Returns the port used by the local endpoint of the connection. */
+	virtual UInt16 GetLocalPort(void) const = 0;
+
+	/** Returns the IP address of the remote endpoint of the connection. */
+	virtual AString GetRemoteIP(void) const = 0;
+
+	/** Returns the port used by the remote endpoint of the connection. */
+	virtual UInt16 GetRemotePort(void) const = 0;
+
+	/** Closes the link gracefully.
+	The link will keep trying to send the queued data, then it will send the FIN packet. */
+	virtual void Close(void) = 0;
+
+	/** Drops the connection without any more processing.
+	Sends the RST packet, queued outgoing and incoming data is lost. */
+	virtual void Drop(void) = 0;
+
+protected:
+	/** Callbacks to be used for the various situations. */
+	cCallbacksPtr m_Callbacks;
+
+
+	/** Creates a new link, with the specified callbacks. */
+	cTCPLink(cCallbacksPtr a_Callbacks);
+};
+
+
+
+
+
+/** Interface that provides the methods available on a listening server socket. */
+class cServerHandle
+{
+	friend class cNetwork;
+public:
+
+	/** Stops the server, no more incoming connections will be accepted. */
+	virtual void Close(void) = 0;
+
+	/** Returns true if the server has been started correctly and is currently listening for incoming connections. */
+	virtual bool IsListening(void) const = 0;
+};
+typedef SharedPtr<cServerHandle> cServerHandlePtr;
+
+
+
+
+
+class cNetwork
+{
+public:
+	/** Callbacks used for connecting to other servers as a client. */
+	class cConnectCallbacks
+	{
+	public:
+		/** Called when the Connect call succeeds.
+		Provides the newly created link that can be used for communication. */
+		virtual void OnSuccess(cTCPLink & a_Link) = 0;
+
+		/** Called when the Connect call fails. */
+		virtual void OnError(int a_ErrorCode) = 0;
+	};
+	typedef SharedPtr<cConnectCallbacks> cConnectCallbacksPtr;
+
+
+	/** Callbacks used when listening for incoming connections as a server. */
+	class cListenCallbacks
+	{
+	public:
+		/** Called when the TCP server created with Listen() accepts an incoming connection.
+		Provides the newly created Link that can be used for communication. */
+		virtual void OnAccepted(cTCPLink & a_Link) = 0;
+	};
+	typedef SharedPtr<cListenCallbacks> cListenCallbacksPtr;
+
+
+	/** Callbacks used when resolving names to IPs. */
+	class cResolveNameCallbacks
+	{
+	public:
+		/** Called when the hostname is successfully resolved into an IP address. */
+		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) = 0;
+
+		/** Called when an error is encountered while resolving. */
+		virtual void OnError(int a_ErrorCode) = 0;
+	};
+	typedef SharedPtr<cResolveNameCallbacks> cResolveNameCallbacksPtr;
+
+
+	/** Queues a TCP connection to be made to the specified host.
+	Calls one the connection callbacks (success, error) when the connection is successfully established, or upon failure.
+	The a_LinkCallbacks is passed to the newly created cTCPLink.
+	Returns true if queueing was successful, false on failure to queue.
+	Note that the return value doesn't report the success of the actual connection; the connection is established asynchronously in the background. */
+	static bool Connect(
+		const AString & a_Host,
+		const UInt16 a_Port,
+		cConnectCallbacksPtr a_ConnectCallbacks,
+		cTCPLink::cCallbacksPtr a_LinkCallbacks
+	);
+
+
+	/** Opens up the specified port for incoming connections.
+	Calls an OnAccepted callback for each incoming connection.
+	A cTCPLink with the specified link callbacks is created for each connection.
+	Returns a cServerHandle that can be used to query the operation status and close the server. */
+	static cServerHandlePtr Listen(
+		const UInt16 a_Port,
+		cListenCallbacksPtr a_ListenCallbacks,
+		cTCPLink::cCallbacksPtr a_LinkCallbacks
+	);
+
+
+	/** Queues a DNS query to resolve the specified hostname to IP address.
+	Calls one of the callbacks when the resolving succeeds, or when it fails.
+	Returns true if queueing was successful, false if not.
+	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background. */
+	static bool HostnameToIP(
+		const AString & a_Hostname,
+		cResolveNameCallbacksPtr a_Callbacks
+	);
+
+
+	/** Queues a DNS query to resolve the specified IP address to a hostname.
+	Calls one of the callbacks when the resolving succeeds, or when it fails.
+	Returns true if queueing was successful, false if not.
+	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background. */
+	static bool IPToHostName(
+		const AString & a_IP,
+		cResolveNameCallbacksPtr a_Callbacks
+	);
+};
+
+
+
+
