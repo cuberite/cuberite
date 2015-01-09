@@ -95,6 +95,14 @@ set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                  
 set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
 set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
 
+# Check that the libraries are present:
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
+	message(FATAL_ERROR "SQLiteCpp is missing in folder lib/SQLiteCpp. Have you initialized the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/polarssl/CMakeLists.txt)
+	message(FATAL_ERROR "PolarSSL is missing in folder lib/polarssl. Have you initialized the submodules / downloaded the extra libraries?")
+endif()
+
 # Include all the libraries:
 add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/zlib/)
