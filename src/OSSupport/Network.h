@@ -22,6 +22,9 @@ public:
 	class cCallbacks
 	{
 	public:
+		// Force a virtual destructor for all descendants:
+		virtual ~cCallbacks() {}
+
 		/** Called when there's data incoming from the remote peer. */
 		virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Length) = 0;
 
@@ -35,6 +38,9 @@ public:
 	};
 	typedef SharedPtr<cCallbacks> cCallbacksPtr;
 
+
+	// Force a virtual destructor for all descendants:
+	virtual ~cTCPLink() {}
 
 	/** Queues the specified data for sending to the remote peer.
 	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the actual data delivery. */
@@ -86,6 +92,9 @@ class cServerHandle
 	friend class cNetwork;
 public:
 
+	// Force a virtual destructor for all descendants:
+	virtual ~cServerHandle() {}
+
 	/** Stops the server, no more incoming connections will be accepted. */
 	virtual void Close(void) = 0;
 
@@ -105,6 +114,9 @@ public:
 	class cConnectCallbacks
 	{
 	public:
+		// Force a virtual destructor for all descendants:
+		virtual ~cConnectCallbacks() {}
+
 		/** Called when the Connect call succeeds.
 		Provides the newly created link that can be used for communication. */
 		virtual void OnSuccess(cTCPLink & a_Link) = 0;
@@ -119,6 +131,9 @@ public:
 	class cListenCallbacks
 	{
 	public:
+		// Force a virtual destructor for all descendants:
+		virtual ~cListenCallbacks() {}
+
 		/** Called when the TCP server created with Listen() accepts an incoming connection.
 		Provides the newly created Link that can be used for communication. */
 		virtual void OnAccepted(cTCPLink & a_Link) = 0;
@@ -130,6 +145,9 @@ public:
 	class cResolveNameCallbacks
 	{
 	public:
+		// Force a virtual destructor for all descendants:
+		virtual ~cResolveNameCallbacks() {}
+
 		/** Called when the hostname is successfully resolved into an IP address. */
 		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) = 0;
 

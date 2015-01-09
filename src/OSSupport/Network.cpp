@@ -358,8 +358,8 @@ protected:
 	/** Converts LibEvent-generated log events into log messages in MCS log. */
 	static void LogCallback(int a_Severity, const char * a_Msg);
 
-	/** Runs the thread that LibEvent uses to dispatch event. */
-	static void EventLoopThread(cNetworkSingleton * a_Self);
+	/** Implements the thread that runs LibEvent's event dispatcher loop. */
+	static void RunEventLoop(cNetworkSingleton * a_Self);
 };
 
 
@@ -722,7 +722,8 @@ cNetworkSingleton::cNetworkSingleton(void)
 	}
 
 	// Create the event loop thread:
-	std::thread::thread(EventLoopThread, this).detach();
+	std::thread EventLoopThread(RunEventLoop, this);
+	EventLoopThread.detach();
 }
 
 
@@ -827,7 +828,7 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 
 
 
-void cNetworkSingleton::EventLoopThread(cNetworkSingleton * a_Self)
+void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
 }
