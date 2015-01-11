@@ -912,7 +912,7 @@ private:
 	bool m_BroadcastDeathMessages;
 	bool m_BroadcastAchievementMessages;
 
-	bool   m_IsDaylightCycleEnabled; 
+	bool   m_IsDaylightCycleEnabled;
 	// std::chrono::milliseconds is guaranteed to be good for 292 years by the standard.
 	std::chrono::milliseconds  m_WorldAge;
 	std::chrono::milliseconds  m_TimeOfDay;
