@@ -19,7 +19,7 @@ cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, do
 
 
 
-void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	int RelX = POSX_TOINT - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelZ = POSZ_TOINT - a_Chunk.GetPosZ() * cChunkDef::Width;
@@ -28,7 +28,7 @@ void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	if ((PosY < 0) || (PosY >= cChunkDef::Height))
 	{
 		AddSpeedY(1);
-		AddPosition(GetSpeed() * (a_Dt / 1000));
+		AddPosition(GetSpeed() * (a_Dt.count() / 1000));
 		return;
 	}
 	
@@ -53,14 +53,14 @@ void cFireworkEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	}
 	
 	AddSpeedY(1);
-	AddPosition(GetSpeed() * (a_Dt / 1000));
+	AddPosition(GetSpeed() * (a_Dt.count() / 1000));
 }
 
 
 
 
 
-void cFireworkEntity::Tick(float a_Dt, cChunk & a_Chunk)
+void cFireworkEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	

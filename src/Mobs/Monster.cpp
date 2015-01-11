@@ -252,14 +252,14 @@ bool cMonster::ReachedFinalDestination()
 
 
 
-void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
+void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
 	if (m_Health <= 0)
 	{
 		// The mob is dead, but we're still animating the "puff" they leave when they die
-		m_DestroyTimer += a_Dt / 1000;
+		m_DestroyTimer += a_Dt.count() / 1000;
 		if (m_DestroyTimer > 1)
 		{
 			Destroy(true);
@@ -274,8 +274,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
-
-	a_Dt /= 1000;
 
 	if (m_bMovingToDestination)
 	{
@@ -347,18 +345,18 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 		case IDLE:
 		{
 			// If enemy passive we ignore checks for player visibility
-			InStateIdle(a_Dt);
+			InStateIdle(std::chrono::duration_cast<std::chrono::seconds>(a_Dt).count());
 			break;
 		}
 		case CHASING:
 		{
 			// If we do not see a player anymore skip chasing action
-			InStateChasing(a_Dt);
+			InStateChasing(std::chrono::duration_cast<std::chrono::seconds>(a_Dt).count());
 			break;
 		}
 		case ESCAPING:
 		{
-			InStateEscaping(a_Dt);
+			InStateEscaping(std::chrono::duration_cast<std::chrono::seconds>(a_Dt).count());
 			break;
 		}
 			

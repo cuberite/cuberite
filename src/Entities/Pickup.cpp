@@ -110,12 +110,12 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
+void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();  // Notify clients of position
 
-	m_Timer += a_Dt;
+	m_Timer += a_Dt.count();
 	
 	if (!m_bCollected)
 	{
@@ -142,7 +142,7 @@ void cPickup::Tick(float a_Dt, cChunk & a_Chunk)
 			{
 				m_bCollected = true;
 				m_Timer = 0;  // We have to reset the timer.
-				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
+				m_Timer += a_Dt.count();  // In case we have to destroy the pickup in the same tick.
 				if (m_Timer > 500.f)
 				{
 					Destroy(true);

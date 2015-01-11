@@ -31,7 +31,7 @@ void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
+void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// GetWorld()->BroadcastTeleportEntity(*this);  // Test position
 	
@@ -82,7 +82,7 @@ void cFallingBlock::Tick(float a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	
-	float MilliDt = a_Dt * 0.001f;
+	float MilliDt = a_Dt.count() * 0.001f;
 	AddSpeedY(MilliDt * -9.8f);
 	AddPosition(GetSpeed() * MilliDt);
 

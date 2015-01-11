@@ -80,7 +80,7 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cPig::Tick(float a_Dt, cChunk & a_Chunk)
+void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 

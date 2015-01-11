@@ -50,7 +50,7 @@ void cTNTEntity::Explode(void)
 
 
 
-void cTNTEntity::Tick(float a_Dt, cChunk & a_Chunk)
+void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();

@@ -421,6 +421,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 
 // a tick is 50 ms
 using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
+using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
 #ifndef TOLUA_TEMPLATE_BIND
 	#define TOLUA_TEMPLATE_BIND(x)

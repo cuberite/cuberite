@@ -30,7 +30,7 @@ public:
 
 	// cBlockEntity overrides:
 	virtual void SendTo(cClientHandle & a_Client) override;
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
 
 	/** Modify the beacon level. (It is needed to load the beacon corectly) */

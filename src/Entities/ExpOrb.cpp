@@ -42,7 +42,7 @@ void cExpOrb::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
+void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	cPlayer * a_ClosestPlayer(m_World->FindClosestPlayer(Vector3f(GetPosition()), 5));
 	if (a_ClosestPlayer != nullptr)
@@ -69,7 +69,7 @@ void cExpOrb::Tick(float a_Dt, cChunk & a_Chunk)
 	}
 	HandlePhysics(a_Dt, a_Chunk);
 	
-	m_Timer += a_Dt;
+	m_Timer += a_Dt.count();
 	if (m_Timer >= 1000 * 60 * 5)  // 5 minutes
 	{
 		Destroy(true);

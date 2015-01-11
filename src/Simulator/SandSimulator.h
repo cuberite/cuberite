@@ -18,7 +18,7 @@ public:
 
 	// cSimulator overrides:
 	virtual void Simulate(float a_Dt) override { UNUSED(a_Dt);}  // not used
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
 	
 	/// Returns true if a falling-able block can start falling through the specified block type

@@ -19,7 +19,7 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 
 
 
-void cPawn::Tick(float a_Dt, cChunk & a_Chunk)
+void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	// Iterate through this entity's applied effects
 	for (tEffectMap::iterator iter = m_EntityEffects.begin(); iter != m_EntityEffects.end();)

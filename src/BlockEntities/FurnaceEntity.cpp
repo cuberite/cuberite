@@ -90,7 +90,7 @@ bool cFurnaceEntity::ContinueCooking(void)
 
 
 
-bool cFurnaceEntity::Tick(float a_Dt, cChunk & a_Chunk)
+bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 

@@ -174,10 +174,10 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 
 
 
-void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
+void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	m_Timer += a_Dt;
+	m_Timer += a_Dt.count();
 	
 	if (m_bIsCollected)
 	{
@@ -209,7 +209,7 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 			}
 			else
 			{
-				m_HitGroundTimer += a_Dt;
+				m_HitGroundTimer += a_Dt.count();
 			}
 		}
 		

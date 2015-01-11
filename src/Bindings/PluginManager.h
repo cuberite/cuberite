@@ -237,7 +237,7 @@ public:
 	bool CallHookWeatherChanged           (cWorld & a_World);
 	bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather);
 	bool CallHookWorldStarted             (cWorld & a_World);
-	bool CallHookWorldTick                (cWorld & a_World, float a_Dt, int a_LastTickDurationMSec);
+	bool CallHookWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 	
 	bool DisablePlugin(const AString & a_PluginName);  // tolua_export
 	bool LoadPlugin   (const AString & a_PluginName);  // tolua_export

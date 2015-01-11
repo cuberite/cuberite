@@ -21,7 +21,7 @@ public:
 	cFloater(double a_X, double a_Y, double a_Z, Vector3d a_Speed, int a_PlayerID, int a_CountDownTime);
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	
 	// tolua_begin
 	bool CanPickup(void)       const { return m_CanPickupItem; }

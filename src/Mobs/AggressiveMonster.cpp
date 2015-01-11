@@ -61,7 +61,7 @@ void cAggressiveMonster::EventSeePlayer(cEntity * a_Entity)
 
 
 
-void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
+void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
@@ -93,9 +93,9 @@ void cAggressiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cAggressiveMonster::Attack(float a_Dt)
+void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 {
-	m_AttackInterval += a_Dt * m_AttackRate;
+	m_AttackInterval += a_Dt.count() * m_AttackRate;
 
 	if ((m_Target == nullptr) || (m_AttackInterval < 3.0))
 	{

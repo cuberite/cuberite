@@ -111,7 +111,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (IsDestroyed())  // Mainly to stop detector rails triggering again after minecart is dead
 	{
@@ -165,19 +165,19 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 		switch (InsideType)
 		{
-			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
+			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt.count()); break;
 			case E_BLOCK_ACTIVATOR_RAIL: break;
 			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
 			case E_BLOCK_DETECTOR_RAIL:
 			{
-				HandleDetectorRailPhysics(InsideMeta, a_Dt);
+				HandleDetectorRailPhysics(InsideMeta, a_Dt.count());
 				WasDetectorRail = true;
 				break;
 			}
 			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
 		}
 
-		AddPosition(GetSpeed() * (a_Dt / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
+		AddPosition(GetSpeed() * (a_Dt.count() / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
 	}
 	else
 	{
@@ -1213,7 +1213,7 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cMinecartWithFurnace::Tick(float a_Dt, cChunk & a_Chunk)
+void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 

@@ -772,7 +772,7 @@ void cEntity::SetHealth(int a_Health)
 
 
 
-void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
+void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	m_TicksAlive++;
 	
@@ -841,7 +841,7 @@ void cEntity::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	int BlockX = POSX_TOINT;
 	int BlockY = POSY_TOINT;
@@ -851,15 +851,15 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	GET_AND_VERIFY_CURRENT_CHUNK(NextChunk, BlockX, BlockZ)
 
 	// TODO Add collision detection with entities.
-	a_Dt /= 1000;  // Convert from msec to sec
+	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);
 	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 	
 	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
 	{
 		// Outside of the world
-		AddSpeedY(m_Gravity * a_Dt);
-		AddPosition(GetSpeed() * a_Dt);
+		AddSpeedY(m_Gravity * DtSec.count());
+		AddPosition(GetSpeed() * DtSec.count());
 		return;
 	}
 	
@@ -930,8 +930,8 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		float fallspeed;
 		if (IsBlockWater(BlockIn))
 		{
-			fallspeed = m_Gravity * a_Dt / 3;  // Fall 3x slower in water
-			ApplyFriction(NextSpeed, 0.7, a_Dt);
+			fallspeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
+			ApplyFriction(NextSpeed, 0.7, DtSec.count());
 		}
 		else if (BlockIn == E_BLOCK_COBWEB)
 		{
@@ -941,13 +941,13 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Normal gravity
-			fallspeed = m_Gravity * a_Dt;
+			fallspeed = m_Gravity * DtSec.count();
 		}
 		NextSpeed.y += fallspeed;
 	}
 	else
 	{
-		ApplyFriction(NextSpeed, 0.7, a_Dt);
+		ApplyFriction(NextSpeed, 0.7, DtSec.count());
 	}
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
@@ -1002,14 +1002,14 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 	{
 		cTracer Tracer(GetWorld());
 		// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failurse
-		int DistanceToTrace = (int)(ceil((NextSpeed * a_Dt).SqrLength()) * 2);
+		int DistanceToTrace = (int)(ceil((NextSpeed * DtSec.count()).SqrLength()) * 2);
 		bool HasHit = Tracer.Trace(NextPos, NextSpeed, DistanceToTrace);
 
 		if (HasHit)
 		{
 			// Oh noez! We hit something: verify that the (hit position - current) was smaller or equal to the (position that we should travel without obstacles - current)
 			// This is because previously, we traced with a length that was rounded up (due to integer limitations), and in the case that something was hit, we don't want to overshoot our projected movement
-			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * a_Dt).SqrLength())
+			if ((Tracer.RealHit - NextPos).SqrLength() <= (NextSpeed * DtSec.count()).SqrLength())
 			{
 				// Block hit was within our projected path
 				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
@@ -1044,13 +1044,13 @@ void cEntity::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 				// and that this piece of software will come to be hailed as the epitome of performance and functionality in C++, never before seen, and of such a like that will never
 				// be henceforth seen again in the time of programmers and man alike
 				// </&sensationalist>
-				NextPos += (NextSpeed * a_Dt);
+				NextPos += (NextSpeed * DtSec.count());
 			}
 		}
 		else
 		{
 			// We didn't hit anything, so move =]
-			NextPos += (NextSpeed * a_Dt);
+			NextPos += (NextSpeed * DtSec.count());
 		}
 	}
 

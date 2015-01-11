@@ -2720,7 +2720,7 @@ void cChunkMap::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 
 
-void cChunkMap::Tick(float a_Dt)
+void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 {
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
@@ -2948,7 +2948,7 @@ void cChunkMap::cChunkLayer::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 
 
-void cChunkMap::cChunkLayer::Tick(float a_Dt)
+void cChunkMap::cChunkLayer::Tick(std::chrono::milliseconds a_Dt)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{

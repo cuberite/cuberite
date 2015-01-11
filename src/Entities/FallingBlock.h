@@ -30,7 +30,7 @@ public:
 	
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	
 private:
 	BLOCKTYPE  m_BlockType;

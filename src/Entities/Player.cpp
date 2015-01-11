@@ -191,7 +191,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
+void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_ClientHandle != nullptr)
 	{

@@ -1394,7 +1394,7 @@ bool cPluginManager::CallHookWorldStarted(cWorld & a_World)
 
 
 
-bool cPluginManager::CallHookWorldTick(cWorld & a_World, float a_Dt, int a_LastTickDurationMSec)
+bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
 	FIND_HOOK(HOOK_WORLD_TICK);
 	VERIFY_HOOK;

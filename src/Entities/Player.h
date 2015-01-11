@@ -46,9 +46,9 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	virtual void HandlePhysics(float a_Dt, cChunk &) override { UNUSED(a_Dt); }
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk &) override { UNUSED(a_Dt); }
 
 	/** Returns the curently equipped weapon; empty item if none */
 	virtual cItem GetEquippedWeapon(void) const override { return m_Inventory.GetEquippedItem(); }

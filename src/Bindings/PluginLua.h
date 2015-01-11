@@ -128,7 +128,7 @@ public:
 	virtual bool OnWeatherChanged           (cWorld & a_World) override;
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) override;
 	virtual bool OnWorldStarted             (cWorld & a_World) override;
-	virtual bool OnWorldTick                (cWorld & a_World, float a_Dt, int a_LastTickDurationMSec) override;
+	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) override;
 	
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player) override;
 	

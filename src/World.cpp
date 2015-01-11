@@ -238,9 +238,8 @@ void cWorld::cTickThread::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		auto NowTime = std::chrono::steady_clock::now();
-		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
-		auto LastTickMsec = std::chrono::duration_cast<std::chrono::duration<int>>(TickTime).count();
-		m_World.Tick(static_cast<float>(msec), LastTickMsec);
+		auto WaitTime = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime);
+		m_World.Tick(WaitTime, TickTime);
 		TickTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - NowTime);
 		
 		if (TickTime < cTickTime(1))
@@ -273,8 +272,6 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
 	m_IsDaylightCycleEnabled(true),
-	m_WorldAgeSecs(0),
-	m_TimeOfDaySecs(0),
 	m_WorldAge(0),
 	m_TimeOfDay(0),
 	m_LastTimeUpdate(0),
@@ -617,7 +614,7 @@ void cWorld::Start(void)
 
 	InitialiseGeneratorDefaults(IniFile);
 	InitialiseAndLoadMobSpawningValues(IniFile);
-	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", m_TimeOfDay));
+	SetTimeOfDay(IniFile.GetValueSetI("General", "TimeInTicks", GetTimeOfDay()));
 
 	m_ChunkMap = make_unique<cChunkMap>(this);
 	
@@ -644,10 +641,10 @@ void cWorld::Start(void)
 	m_TickThread.Start();
 
 	// Init of the spawn monster time (as they are supposed to have different spawn rate)
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfHostile, 0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfPassive, 0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfAmbient, 0));
-	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, Int64>::value_type(cMonster::mfWater, 0));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfHostile, cTickTimeLong(0)));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfPassive, cTickTimeLong(0)));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfAmbient, cTickTimeLong(0)));
+	m_LastSpawnMonster.insert(std::map<cMonster::eFamily, cTickTimeLong>::value_type(cMonster::mfWater, cTickTimeLong(0)));
 
 	m_MapManager.LoadMapData();
 
@@ -838,7 +835,7 @@ void cWorld::Stop(void)
 		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
 		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
 		IniFile.SetValueI("General", "Weather", (int)m_Weather);
-		IniFile.SetValueI("General", "TimeInTicks", m_TimeOfDay);
+		IniFile.SetValueI("General", "TimeInTicks", GetTimeOfDay());
 	IniFile.WriteFile(m_IniFileName);
 	
 	m_TickThread.Stop();
@@ -852,7 +849,7 @@ void cWorld::Stop(void)
 
 
 
-void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
+void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
 	// Call the plugins
 	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
@@ -868,30 +865,27 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 		SetChunkData(**itr);
 	}  // for itr - SetChunkDataQueue[]
 
-	m_WorldAgeSecs  += (double)a_Dt / 1000.0;
-	m_WorldAge  = (Int64)(m_WorldAgeSecs  * 20.0);
+	m_WorldAge += a_Dt;
 
 	if (m_IsDaylightCycleEnabled)
 	{
 		// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
-		m_TimeOfDaySecs += (double)a_Dt / 1000.0;
+		m_TimeOfDay += a_Dt;
 
 		// Wrap time of day each 20 minutes (1200 seconds)
-		if (m_TimeOfDaySecs > 1200.0)
+		if (m_TimeOfDay > std::chrono::minutes(20))
 		{
-			m_TimeOfDaySecs -= 1200.0;
+			m_TimeOfDay -= std::chrono::minutes(20);
 		}
-
-		m_TimeOfDay = static_cast<int>(m_TimeOfDaySecs * 20.0);
 
 		// Updates the sky darkness based on current time of day
 		UpdateSkyDarkness();
 
 		// Broadcast time update every 40 ticks (2 seconds)
-		if (m_LastTimeUpdate < m_WorldAge - 40)
+		if (m_LastTimeUpdate < m_WorldAge - cTickTime(40))
 		{
 			BroadcastTimeUpdate();
-			m_LastTimeUpdate = m_WorldAge;
+			m_LastTimeUpdate = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 		}
 	}
 
@@ -911,23 +905,23 @@ void cWorld::Tick(float a_Dt, int a_LastTickDurationMSec)
 
 	m_ChunkMap->Tick(a_Dt);
 
-	TickClients(a_Dt);
+	TickClients(a_Dt.count());
 	TickQueuedBlocks();
 	TickQueuedTasks();
 	TickScheduledTasks();
 	
-	GetSimulatorManager()->Simulate(a_Dt);
+	GetSimulatorManager()->Simulate(a_Dt.count());
 
-	TickWeather(a_Dt);
+	TickWeather(a_Dt.count());
 
 	m_ChunkMap->FastSetQueuedBlocks();
 
-	if (m_WorldAge - m_LastSave > 60 * 5 * 20)  // Save each 5 minutes
+	if (m_WorldAge - m_LastSave > std::chrono::minutes(5))  // Save each 5 minutes
 	{
 		SaveAllChunks();
 	}
 
-	if (m_WorldAge - m_LastUnload > 10 * 20)  // Unload every 10 seconds
+	if (m_WorldAge - m_LastUnload > std::chrono::minutes(5))  // Unload every 10 seconds
 	{
 		UnloadUnusedChunks();
 	}
@@ -973,7 +967,7 @@ void cWorld::TickWeather(float a_Dt)
 
 
 
-void cWorld::TickMobs(float a_Dt)
+void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 {
 	// _X 2013_10_22: This is a quick fix for #283 - the world needs to be locked while ticking mobs
 	cWorld::cLock Lock(*this);
@@ -994,7 +988,7 @@ void cWorld::TickMobs(float a_Dt)
 		for (size_t i = 0; i < ARRAYCOUNT(AllFamilies); i++)
 		{
 			cMonster::eFamily Family = AllFamilies[i];
-			int SpawnDelay = cMonster::GetSpawnDelay(Family);
+			cTickTime SpawnDelay = cTickTime(cMonster::GetSpawnDelay(Family));
 			if (
 				(m_LastSpawnMonster[Family] > m_WorldAge - SpawnDelay) ||  // Not reached the needed ticks before the next round
 				MobCensus.IsCapped(Family)
@@ -1002,7 +996,7 @@ void cWorld::TickMobs(float a_Dt)
 			{
 				continue;
 			}
-			m_LastSpawnMonster[Family] = m_WorldAge;
+			m_LastSpawnMonster[Family] = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 			cMobSpawner Spawner(Family, m_AllowedMobs);
 			if (Spawner.CanSpawnAnything())
 			{
@@ -1066,7 +1060,7 @@ void cWorld::TickScheduledTasks(void)
 		// Move all the due tasks from m_ScheduledTasks into Tasks:
 		for (auto itr = m_ScheduledTasks.begin(); itr != m_ScheduledTasks.end();)  // Cannot use range-basd for, we're modifying the container
 		{
-			if ((*itr)->m_TargetTick < WorldAge)
+			if ((*itr)->m_TargetTick < std::chrono::duration_cast<cTickTimeLong>(WorldAge).count())
 			{
 				auto next = itr;
 				++next;
@@ -1141,7 +1135,7 @@ void cWorld::TickClients(float a_Dt)
 
 void cWorld::UpdateSkyDarkness(void)
 {
-	int TempTime = (int)m_TimeOfDay;
+	int TempTime = std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count();
 	if (TempTime <= TIME_SUNSET)
 	{
 		m_SkyDarkness = 0;
@@ -1422,14 +1416,15 @@ void cWorld::GrowTreeFromSapling(int a_X, int a_Y, int a_Z, NIBBLETYPE a_Sapling
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
+	auto WorldAge = (int)(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff);
 	switch (a_SaplingMeta & 0x07)
 	{
-		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_CONIFER:  GetConiferTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_JUNGLE:   GetJungleTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
-		case E_META_SAPLING_DARK_OAK: GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), Logs, Other); break;
+		case E_META_SAPLING_APPLE:    GetAppleTreeImage  (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_BIRCH:    GetBirchTreeImage  (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_CONIFER:  GetConiferTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_JUNGLE:   GetJungleTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_ACACIA:   GetAcaciaTreeImage (a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
+		case E_META_SAPLING_DARK_OAK: GetDarkoakTreeImage(a_X, a_Y, a_Z, Noise, WorldAge, Logs, Other); break;
 	}
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
@@ -1444,7 +1439,7 @@ void cWorld::GrowTreeByBiome(int a_X, int a_Y, int a_Z)
 {
 	cNoise Noise(m_Generator.GetSeed());
 	sSetBlockVector Logs, Other;
-	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(m_WorldAge & 0xffffffff), GetBiomeAt(a_X, a_Z), Logs, Other);
+	GetTreeImageByBiome(a_X, a_Y, a_Z, Noise, (int)(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count() & 0xffffffff), GetBiomeAt(a_X, a_Z), Logs, Other);
 	Other.insert(Other.begin(), Logs.begin(), Logs.end());
 	Logs.clear();
 	GrowTreeImage(Other);
@@ -2405,7 +2400,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 		{
 			continue;
 		}
-		ch->SendTimeUpdate(m_WorldAge, m_TimeOfDay, m_IsDaylightCycleEnabled);
+		ch->SendTimeUpdate(std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count(), std::chrono::duration_cast<cTickTimeLong>(m_TimeOfDay).count(), m_IsDaylightCycleEnabled);
 	}
 }
 
@@ -2607,7 +2602,7 @@ bool cWorld::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 
 void cWorld::UnloadUnusedChunks(void)
 {
-	m_LastUnload = m_WorldAge;
+	m_LastUnload = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 	m_ChunkMap->UnloadUnusedChunks();
 }
 
@@ -3083,7 +3078,7 @@ bool cWorld::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunk
 
 void cWorld::SaveAllChunks(void)
 {
-	m_LastSave = m_WorldAge;
+	m_LastSave = std::chrono::duration_cast<cTickTimeLong>(m_WorldAge);
 	m_ChunkMap->SaveAllChunks();
 }
 
@@ -3112,7 +3107,7 @@ void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
 
 void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 {
-	Int64 TargetTick = a_DelayTicks + m_WorldAge;
+	Int64 TargetTick = a_DelayTicks + std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
 	
 	// Insert the task into the list of scheduled tasks, ordered by its target tick
 	cCSLock Lock(m_CSScheduledTasks);

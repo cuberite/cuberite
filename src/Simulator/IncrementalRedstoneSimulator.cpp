@@ -145,7 +145,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 
 
 
-void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	m_RedstoneSimulatorChunkData = (cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
 	if (m_RedstoneSimulatorChunkData == nullptr)
