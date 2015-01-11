@@ -25,7 +25,7 @@ class cFinishLookupCallbacks:
 	virtual void OnError(int a_ErrorCode) override
 	{
 		LOGD("Error %d while performing lookup!", a_ErrorCode);
-		abort();
+		exit(a_ErrorCode);
 	}
 
 	virtual void OnFinished(void) override
@@ -49,15 +49,28 @@ int main()
 {
 	cEvent evtFinish;
 
+	// Look up google.com (has multiple IP addresses):
 	LOGD("Network test: Looking up google.com");
 	if (!cNetwork::HostnameToIP("google.com", std::make_shared<cFinishLookupCallbacks>(evtFinish)))
 	{
-		LOGWARNING("Cannot resolve google.com");
+		LOGWARNING("Cannot resolve google.com to IP");
 		abort();
 	}
 	LOGD("Name lookup has been successfully queued");
-	
 	evtFinish.Wait();
+	LOGD("Lookup finished.");
+
+	// Look up 8.8.8.8 (Google free DNS):
+	LOGD("Network test: Looking up IP 8.8.8.8");
+	if (!cNetwork::IPToHostName("8.8.8.8", std::make_shared<cFinishLookupCallbacks>(evtFinish)))
+	{
+		LOGWARNING("Cannot resolve 8.8.8.8 to name");
+		abort();
+	}
+	LOGD("IP lookup has been successfully queued");
+	evtFinish.Wait();
+	LOGD("IP lookup finished.");
+
 	LOGD("Network test finished");
 	return 0;
 }

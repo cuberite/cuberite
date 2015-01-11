@@ -123,7 +123,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Class definitions:
 
-/** Holds information about an in-progress hostname lookup. */
+/** Holds information about an in-progress Hostname-to-IP lookup. */
 class cHostnameLookup
 {
 	/** The callbacks to call for resolved names / errors. */
@@ -139,6 +139,27 @@ public:
 };
 typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
 typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
+
+
+
+
+
+/** Holds information about an in-progress IP-to-Hostname lookup. */
+class cIPLookup
+{
+	/** The callbacks to call for resolved names / errors. */
+	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
+
+	/** The IP that was queried (needed for the callbacks). */
+	AString m_IP;
+
+	static void Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void * a_Addresses, void * a_Self);
+
+public:
+	cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
+};
+typedef SharedPtr<cIPLookup> cIPLookupPtr;
+typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 
 
 
@@ -236,6 +257,7 @@ typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 class cNetworkSingleton
 {
 	friend class cHostnameLookup;  // Needs access to m_DNSBase
+	friend class cIPLookup;        // Needs access to m_DNSBase
 	friend class cTCPLinkImpl;     // Needs access to m_EventBase and m_DNSBase
 
 public:
@@ -305,6 +327,9 @@ protected:
 	/** Container for all pending hostname lookups. */
 	cHostnameLookupPtrs m_HostnameLookups;
 
+	/** Container for all pending IP lookups. */
+	cIPLookupPtrs m_IPLookups;
+
 
 	/** Initializes the LibEvent internals. */
 	cNetworkSingleton(void);
@@ -315,8 +340,13 @@ protected:
 	/** Implements the thread that runs LibEvent's event dispatcher loop. */
 	static void RunEventLoop(cNetworkSingleton * a_Self);
 
-	/** Removes the specified hostname lookup from m_HostnameLookups. */
-	void RemoveHostnameLookup(cHostnameLookup * a_HostnameLookup);
+	/** Removes the specified hostname lookup from m_HostnameLookups.
+	Used by the underlying lookup implementation when the lookup is finished. */
+	void RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup);
+
+	/** Removes the specified IP lookup from m_IPLookups.
+	Used by the underlying lookup implementation when the lookup is finished. */
+	void RemoveIPLookup(const cIPLookup * a_IPLookup);
 };
 
 
@@ -343,7 +373,7 @@ cHostnameLookup::cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveN
 
 
 
-void cHostnameLookup::Callback(int a_ErrCode, struct evutil_addrinfo * a_Addr, void * a_Self)
+void cHostnameLookup::Callback(int a_ErrCode, evutil_addrinfo * a_Addr, void * a_Self)
 {
 	// Get the Self class:
 	cHostnameLookup * Self = reinterpret_cast<cHostnameLookup *>(a_Self);
@@ -359,6 +389,7 @@ void cHostnameLookup::Callback(int a_ErrCode, struct evutil_addrinfo * a_Addr, v
 
 	// Call the success handler for each entry received:
 	bool HasResolved = false;
+	evutil_addrinfo * OrigAddr = a_Addr;
 	for (;a_Addr != nullptr; a_Addr = a_Addr->ai_next)
 	{
 		char IP[128];
@@ -395,7 +426,59 @@ void cHostnameLookup::Callback(int a_ErrCode, struct evutil_addrinfo * a_Addr, v
 	{
 		Self->m_Callbacks->OnFinished();
 	}
+	evutil_freeaddrinfo(OrigAddr);
 	cNetworkSingleton::Get().RemoveHostnameLookup(Self);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cIPLookup:
+
+cIPLookup::cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks):
+	m_Callbacks(a_Callbacks),
+	m_IP(a_IP)
+{
+	sockaddr_storage sa;
+	int salen = static_cast<int>(sizeof(sa));
+	evutil_parse_sockaddr_port(a_IP.c_str(), reinterpret_cast<sockaddr *>(&sa), &salen);
+	switch (sa.ss_family)
+	{
+		case AF_INET:
+		{
+			sockaddr_in * sa4 = reinterpret_cast<sockaddr_in *>(&sa);
+			evdns_base_resolve_reverse(cNetworkSingleton::Get().m_DNSBase, &(sa4->sin_addr), 0, Callback, this);
+		}
+		case AF_INET6:
+		{
+		}
+	}
+}
+
+
+
+
+
+void cIPLookup::Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void * a_Addresses, void * a_Self)
+{
+	// Get the Self class:
+	cIPLookup * Self = reinterpret_cast<cIPLookup *>(a_Self);
+	ASSERT(Self != nullptr);
+
+	if ((a_Result != 0) || (a_Addresses == nullptr))
+	{
+		// An error has occurred, notify the error callback:
+		Self->m_Callbacks->OnError(a_Result);
+	}
+	else
+	{
+		// Call the success handler::
+		Self->m_Callbacks->OnNameResolved(*(reinterpret_cast<char **>(a_Addresses)), Self->m_IP);
+		Self->m_Callbacks->OnFinished();
+	}
+	cNetworkSingleton::Get().RemoveIPLookup(Self);
 }
 
 
@@ -842,9 +925,15 @@ bool cNetworkSingleton::IPToHostName(
 	cNetwork::cResolveNameCallbacksPtr a_Callbacks
 )
 {
-	// TODO
-	ASSERT(!"Not implemented yet!");
-	return false;
+	try
+	{
+		m_IPLookups.push_back(std::make_shared<cIPLookup>(a_IP, a_Callbacks));
+	}
+	catch (...)
+	{
+		return false;
+	}
+	return true;
 }
 
 
@@ -878,13 +967,30 @@ void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 
 
 
-void cNetworkSingleton::RemoveHostnameLookup(cHostnameLookup * a_HostnameLookup)
+
+void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup)
 {
 	for (auto itr = m_HostnameLookups.begin(), end = m_HostnameLookups.end(); itr != end; ++itr)
 	{
 		if (itr->get() == a_HostnameLookup)
 		{
 			m_HostnameLookups.erase(itr);
+			return;
+		}
+	}  // for itr - m_HostnameLookups[]
+}
+
+
+
+
+
+void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
+{
+	for (auto itr = m_IPLookups.begin(), end = m_IPLookups.end(); itr != end; ++itr)
+	{
+		if (itr->get() == a_IPLookup)
+		{
+			m_IPLookups.erase(itr);
 			return;
 		}
 	}  // for itr - m_HostnameLookups[]
