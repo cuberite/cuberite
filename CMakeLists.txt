@@ -137,13 +137,14 @@ endif()
 
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
 # (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
-include(lib/polarssl.cmake)
+include(lib/polarssl.cmake EXCLUDE_FROM_ALL)
 
 set_exe_flags()
 
 add_subdirectory (src)
 
 if(${SELF_TEST})
+	message("Tests enabled")
 	enable_testing()
 	add_subdirectory (tests)
 endif()
