@@ -148,11 +148,18 @@ public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cResolveNameCallbacks() {}
 
-		/** Called when the hostname is successfully resolved into an IP address. */
+		/** Called when the hostname is successfully resolved into an IP address.
+		May be called multiple times if an address resolves to multiple addresses.
+		a_IP may be either an IPv4 or an IPv6 address with their proper formatting. */
 		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) = 0;
 
-		/** Called when an error is encountered while resolving. */
+		/** Called when an error is encountered while resolving.
+		If an error is reported, the OnFinished() callback is not called. */
 		virtual void OnError(int a_ErrorCode) = 0;
+
+		/** Called when all the addresses resolved have been reported via the OnNameResolved() callback.
+		Only called if there was no error reported. */
+		virtual void OnFinished(void) = 0;
 	};
 	typedef SharedPtr<cResolveNameCallbacks> cResolveNameCallbacksPtr;
 

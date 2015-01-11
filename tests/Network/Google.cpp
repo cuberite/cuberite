@@ -1,10 +1,16 @@
 
-#include "Globals.h"
+// Google.cpp
 
+// Implements a HTTP download of the google's front page using the LibEvent-based cNetwork API
+
+#include "Globals.h"
 #include <thread>
 #include "OSSupport/Event.h"
-
 #include "OSSupport/Network.h"
+
+
+
+
 
 /** Connect callbacks that send a HTTP GET request for google.com when connected. */
 class cHTTPConnectCallbacks:
@@ -33,6 +39,9 @@ public:
 	{
 	}
 };
+
+
+
 
 
 /** cTCPLink callbacks that dump everything it received to the log. */
@@ -69,7 +78,11 @@ public:
 };
 
 
-int main() {
+
+
+
+int main()
+{
 	cEvent evtFinish;
 
 	LOGD("Network test: Connecting to google.com:80, reading front page via HTTP.");
@@ -83,3 +96,7 @@ int main() {
 	evtFinish.Wait();
 	LOGD("Network test finished");
 }
+
+
+
+
