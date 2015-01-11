@@ -268,43 +268,47 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/StackTrace.h"
 #else
 	// Logging functions
-void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGERROR(const char* a_Format, ...)
+void inline LOGERROR(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
-void inline LOGWARNING(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGWARNING(const char* a_Format, ...)
+void inline LOGWARNING(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
-void inline LOGD(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGD(const char* a_Format, ...)
+void inline LOGD(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
-void inline LOG(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOG(const char* a_Format, ...)
+void inline LOG(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
