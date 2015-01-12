@@ -823,6 +823,8 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
+		int err = EVUTIL_SOCKET_ERROR();
+		LOGD("Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (!IsValidSocket(MainSock))
 		{
@@ -850,9 +852,12 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		UInt32 Zero = 0;
 		#ifdef _WIN32
 			// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
-			NeedsTwoSockets = (
-				(setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero)) == SOCKET_ERROR) &&
-				(EVUTIL_SOCKET_ERROR() == WSAENOPROTOOPT)
+			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
+			int err = EVUTIL_SOCKET_ERROR();
+			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
+			LOGD("setsockopt(IPV6_V6ONLY) returned %d, err is %d (%s). %s",
+				res, err, evutil_socket_error_to_string(err),
+				NeedsTwoSockets ? "Second socket will be created" : "Second socket not needed"
 			);
 		#else
 			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
@@ -890,11 +895,24 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	// If a secondary socket is required (WinXP dual-stack), create it here:
 	if (NeedsTwoSockets)
 	{
+		LOGD("Creating a second socket for IPv4");
 		evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (!IsValidSocket(SecondSock))
+		if (IsValidSocket(SecondSock))
 		{
-			evutil_make_socket_nonblocking(SecondSock);
-			m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
+			if (evutil_make_socket_nonblocking(SecondSock) == 0)
+			{
+				m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
+			}
+			else
+			{
+				int err = EVUTIL_SOCKET_ERROR();
+				LOGD("evutil_make_socket_nonblocking() failed: %d, %s", err, evutil_socket_error_to_string(err));
+			}
+		}
+		else
+		{
+			int err = EVUTIL_SOCKET_ERROR();
+			LOGD("socket(AF_INET, ...) failed: %d, %s", err, evutil_socket_error_to_string(err));
 		}
 	}
 	m_IsListening = true;
