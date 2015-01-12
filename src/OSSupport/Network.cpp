@@ -5,116 +5,13 @@
 
 #include "Globals.h"
 #include "Network.h"
-#include "Event.h"
 #include <event2/event.h>
 #include <event2/thread.h>
 #include <event2/bufferevent.h>
 #include <event2/dns.h>
-
+#include <event2/listener.h>
 #include <thread>
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Self-test:
-
-class cNetworkTest
-{
-public:
-
-
-	/** cTCPLink callbacks that echo everything they receive back to the remote peer. */
-	class cEchoCallbacks:
-		public cTCPLink::cCallbacks
-	{
-		cEvent & m_Event;
-
-		virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Size) override
-		{
-			// Echo the incoming data back to outgoing data:
-			LOGD("Data received (%u bytes), echoing back.", static_cast<unsigned>(a_Size));
-			a_Link.Send(a_Data, a_Size);
-			LOGD("Echo queued");
-		}
-
-		virtual void OnRemoteClosed(cTCPLink & a_Link) override
-		{
-			LOGD("Remote has closed the connection.");
-			m_Event.Set();
-		}
-
-		virtual void OnError(cTCPLink & a_Link, int a_ErrorCode) override
-		{
-			LOGD("Error in the cEchoCallbacks.");
-			m_Event.Set();
-		}
-
-	public:
-		cEchoCallbacks(cEvent & a_Event):
-			m_Event(a_Event)
-		{
-		}
-	};
-
-
-	/** Connect callbacks that send a simple test message when connected. */
-	class cConnectCallbacks:
-		public cNetwork::cConnectCallbacks
-	{
-		cEvent & m_Event;
-
-		virtual void OnSuccess(cTCPLink & a_Link) override
-		{
-			LOGD("Connected, sending test message");
-			a_Link.Send("test message");
-			LOGD("Message queued.");
-		}
-
-		virtual void OnError(int a_ErrorCode) override
-		{
-			LOGD("Error while connecting: %d", a_ErrorCode);
-			m_Event.Set();
-		}
-
-	public:
-		cConnectCallbacks(cEvent & a_Event):
-			m_Event(a_Event)
-		{
-		}
-	};
-
-	/** Listen callbacks that send a simple welcome message to all connecting peers. */
-	class cListenCallbacks:
-		public cNetwork::cListenCallbacks
-	{
-		virtual void OnAccepted(cTCPLink & a_Link) override
-		{
-			// Send some trivial data:
-			a_Link.Send("Welcome to echo server\n");
-		}
-	};
-
-	cNetworkTest(void)
-	{
-
-		/*
-		LOGD("Creating a server on port 33033");
-		auto Server = cNetwork::Listen(33033, std::make_shared<cListenCallbacks>(), std::make_shared<cEchoCallbacks>());
-		LOGD("Test server created.");
-
-		LOGD("Connecting to test server");
-		cNetwork::Connect("localhost", 33033, std::make_shared<cConnectCallbacks>(), std::make_shared<cDumpCallbacks>());
-
-		LOGD("Waiting for network operations to finish.");
-		evtFinish.Wait();
-
-		LOGD("Terminating test server.");
-		Server->Close();
-		*/
-
-
-	}
-} g_NetworkTest;
+#include "Event.h"
 
 
 
@@ -170,6 +67,8 @@ class cTCPLinkImpl:
 	public cTCPLink
 {
 	typedef cTCPLink super;
+	friend class cServerHandleImpl;
+
 public:
 	/** Creates a new link to be queued to connect to a specified host:port.
 	Used for outgoing connections created using cNetwork::Connect().
@@ -178,7 +77,7 @@ public:
 
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen(). */
-	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks);
+	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server);
 
 	/** Queues a connection request to the specified host.
 	a_ConnectCallbacks must be valid.
@@ -203,6 +102,10 @@ protected:
 	/** The LibEvent handle representing this connection. */
 	bufferevent * m_BufferEvent;
 
+	/** The server handle that has created this link.
+	Only valid for incoming connections, NULL for outgoing connections. */
+	cServerHandleImpl * m_Server;
+
 
 	/** Callback that LibEvent calls when there's data available from the remote peer. */
 	static void ReadCallback(bufferevent * a_BufferEvent, void * a_Self);
@@ -221,6 +124,9 @@ typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 class cServerHandleImpl:
 	public cServerHandle
 {
+	typedef cServerHandle super;
+	friend class cTCPLinkImpl;
+
 public:
 	/** Creates a new instance with the specified callbacks.
 	Initializes the internals, but doesn't start listening yet. */
@@ -244,8 +150,25 @@ protected:
 	/** The callbacks used to create new cTCPLink instances for incoming connections. */
 	cTCPLink::cCallbacksPtr m_LinkCallbacks;
 
+	/** The LibEvent handle representing the main listening socket. */
+	evconnlistener * m_ConnListener;
+
+	/** The LibEvent handle representing the secondary listening socket (only when side-by-side listening is needed, such as WinXP). */
+	evconnlistener * m_SecondaryConnListener;
+
 	/** Set to true when the server is initialized successfully and is listening for incoming connections. */
 	bool m_IsListening;
+
+	/** Container for all currently active connections on this server. */
+	cTCPLinkImplPtrs m_Connections;
+
+
+	/** The callback called by LibEvent upon incoming connection. */
+	static void Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self);
+
+	/** Removes the specified link from m_Connections.
+	Called by cTCPLinkImpl when the link is terminated. */
+	void RemoveLink(const cTCPLinkImpl * a_Link);
 };
 typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
 typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
@@ -256,9 +179,10 @@ typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 
 class cNetworkSingleton
 {
-	friend class cHostnameLookup;  // Needs access to m_DNSBase
-	friend class cIPLookup;        // Needs access to m_DNSBase
-	friend class cTCPLinkImpl;     // Needs access to m_EventBase and m_DNSBase
+	friend class cHostnameLookup;    // Needs access to m_DNSBase
+	friend class cIPLookup;          // Needs access to m_DNSBase
+	friend class cTCPLinkImpl;       // Needs access to m_EventBase and m_DNSBase
+	friend class cServerHandleImpl;  // Needs access to m_EventBase
 
 public:
 	/** Returns the singleton instance of this class */
@@ -347,6 +271,10 @@ protected:
 	/** Removes the specified IP lookup from m_IPLookups.
 	Used by the underlying lookup implementation when the lookup is finished. */
 	void RemoveIPLookup(const cIPLookup * a_IPLookup);
+
+	/** Removes the specified link from m_Connections.
+	Used by the underlying link implementation when the link is closed / errored. */
+	void RemoveLink(const cTCPLinkImpl * a_Link);
 };
 
 
@@ -490,7 +418,8 @@ void cIPLookup::Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void
 
 cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, -1, BEV_OPT_CLOSE_ON_FREE))
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, -1, BEV_OPT_CLOSE_ON_FREE)),
+	m_Server(nullptr)
 {
 	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
@@ -500,9 +429,10 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 
 
-cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks):
+cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, a_Socket, BEV_OPT_CLOSE_ON_FREE))
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, a_Socket, BEV_OPT_CLOSE_ON_FREE)),
+	m_Server(a_Server)
 {
 	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
@@ -517,6 +447,7 @@ Returns true on success, false on failure. */
 bool cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks)
 {
 	ASSERT(bufferevent_getfd(m_BufferEvent) == -1);  // Did you create this object using the right constructor (the one without the Socket param)?
+	ASSERT(m_Server == nullptr);
 	ASSERT(a_ConnectCallbacks != nullptr);
 
 	m_ConnectCallbacks = a_ConnectCallbacks;
@@ -668,6 +599,14 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 		else
 		{
 			Self->m_Callbacks->OnError(*Self, EVUTIL_SOCKET_ERROR());
+			if (Self->m_Server == nullptr)
+			{
+				cNetworkSingleton::Get().RemoveLink(Self);
+			}
+			else
+			{
+				Self->m_Server->RemoveLink(Self);
+			}
 		}
 		return;
 	}
@@ -684,10 +623,18 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 		}
 	}
 
-	// If the connectino has been closed, call the link callback:
+	// If the connection has been closed, call the link callback and remove the connection:
 	if (a_What & BEV_EVENT_EOF)
 	{
 		Self->m_Callbacks->OnRemoteClosed(*Self);
+		if (Self->m_Server != nullptr)
+		{
+			Self->m_Server->RemoveLink(Self);
+		}
+		else
+		{
+			cNetworkSingleton::Get().RemoveLink(Self);
+		}
 		return;
 	}
 	
@@ -705,10 +652,11 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 
 cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks, cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	m_ListenCallbacks(a_ListenCallbacks),
-	m_LinkCallbacks(a_LinkCallbacks)
+	m_LinkCallbacks(a_LinkCallbacks),
+	m_ConnListener(nullptr),
+	m_SecondaryConnListener(nullptr),
+	m_IsListening(false)
 {
-	// TODO
-	ASSERT(!"Not implemented yet!");
 }
 
 
@@ -717,8 +665,23 @@ cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallb
 
 void cServerHandleImpl::Close(void)
 {
-	// TODO
-	ASSERT(!"Not implemented yet!");
+	// Stop the listener sockets:
+	evconnlistener_free(m_ConnListener);
+	m_ConnListener = nullptr;
+	if (m_SecondaryConnListener != nullptr)
+	{
+		evconnlistener_free(m_SecondaryConnListener);
+		m_SecondaryConnListener = nullptr;
+	}
+	m_IsListening = false;
+
+	// Close all connections:
+	cTCPLinkImplPtrs Conns;
+	std::swap(Conns, m_Connections);
+	for (auto conn: Conns)
+	{
+		conn->Close();
+	}
 }
 
 
@@ -727,9 +690,123 @@ void cServerHandleImpl::Close(void)
 
 bool cServerHandleImpl::Listen(UInt16 a_Port)
 {
-	// TODO
-	ASSERT(!"Not implemented yet!");
-	return false;
+	ASSERT(!m_IsListening);
+
+	// Set up the main socket:
+	// It should listen on IPv6 with IPv4 fallback, when available; IPv4 when IPv6 is not available.
+	bool NeedsTwoSockets = false;
+	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+	if (MainSock == SOCKET_ERROR)
+	{
+		// Failed to create IPv6 socket, create an IPv4 one instead:
+		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (MainSock == SOCKET_ERROR)
+		{
+			return false;
+		}
+
+		// Bind to all interfaces:
+		sockaddr_in name;
+		memset(&name, 0, sizeof(name));
+		name.sin_family = AF_INET;
+		name.sin_port = ntohs(a_Port);
+		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
+		{
+			int err = EVUTIL_SOCKET_ERROR();
+			LOGWARNING("Cannot bind to IPv4 port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+			evutil_closesocket(MainSock);
+			return false;
+		}
+	}
+	else
+	{
+		// IPv6 socket created, switch it into "dualstack" mode:
+		UInt32 Zero = 0;
+		#ifdef _WIN32
+			// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
+			NeedsTwoSockets = (
+				(setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero)) == SOCKET_ERROR) &&
+				(EVUTIL_SOCKET_ERROR() == WSAENOPROTOOPT)
+			);
+		#else
+			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
+		#endif
+
+		// Bind to all interfaces:
+		sockaddr_in6 name;
+		memset(&name, 0, sizeof(name));
+		name.sin6_family = AF_INET6;
+		name.sin6_port = ntohs(a_Port);
+		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
+		{
+			int err = EVUTIL_SOCKET_ERROR();
+			LOGWARNING("Cannot bind to IPv6 port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+			evutil_closesocket(MainSock);
+			return false;
+		}
+	}
+	if (evutil_make_socket_nonblocking(MainSock) != 0)
+	{
+		int err = EVUTIL_SOCKET_ERROR();
+		LOGWARNING("Cannot make socket for port %d non-blocking: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		evutil_closesocket(MainSock);
+		return false;
+	}
+	if (listen(MainSock, 0) != 0)
+	{
+		int err = EVUTIL_SOCKET_ERROR();
+		LOGWARNING("Cannot listen on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		evutil_closesocket(MainSock);
+		return false;
+	}
+	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
+
+	// If a secondary socket is required (WinXP dual-stack), create it here:
+	if (NeedsTwoSockets)
+	{
+		evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (SecondSock != SOCKET_ERROR)
+		{
+			evutil_make_socket_nonblocking(SecondSock);
+			m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
+		}
+	}
+	m_IsListening = true;
+	return true;
+}
+
+
+
+
+
+void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self)
+{
+	// Cast to true self:
+	cServerHandleImpl * Self = reinterpret_cast<cServerHandleImpl *>(a_Self);
+	ASSERT(Self != nullptr);
+
+	// Create a new cTCPLink for the incoming connection:
+	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self);
+	Self->m_Connections.push_back(Link);
+
+	// Call the OnAccepted callback:
+	Self->m_ListenCallbacks->OnAccepted(*Link);
+}
+
+
+
+
+
+void cServerHandleImpl::RemoveLink(const cTCPLinkImpl * a_Link)
+{
+	for (auto itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
+	{
+		if (itr->get() == a_Link)
+		{
+			m_Connections.erase(itr);
+			return;
+		}
+	}  // for itr - m_Connections[]
 }
 
 
@@ -993,7 +1070,23 @@ void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
 			m_IPLookups.erase(itr);
 			return;
 		}
-	}  // for itr - m_HostnameLookups[]
+	}  // for itr - m_IPLookups[]
+}
+
+
+
+
+
+void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
+{
+	for (auto itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
+	{
+		if (itr->get() == a_Link)
+		{
+			m_Connections.erase(itr);
+			return;
+		}
+	}  // for itr - m_Connections[]
 }
 
 
