@@ -17,7 +17,7 @@ class cEchoServerCallbacks:
 {
 	virtual void OnAccepted(cTCPLink & a_Link) override
 	{
-		LOGD("New client accepted, sending welcome message.");
+		LOGD("New client accepted (%s:%p), sending welcome message.", a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort());
 		// Send a welcome message to each connecting client:
 		a_Link.Send("Welcome to the simple echo server.\r\n");
 		LOGD("Welcome message queued.");
@@ -35,19 +35,19 @@ class cEchoLinkCallbacks:
 	virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Size) override
 	{
 		// Echo the incoming data back to outgoing data:
-		LOGD("%p: Data received (%u bytes), echoing back.", &a_Link, static_cast<unsigned>(a_Size));
+		LOGD("%p (%s:%d): Data received (%u bytes), echoing back.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), static_cast<unsigned>(a_Size));
 		a_Link.Send(a_Data, a_Size);
 		LOGD("Echo queued");
 	}
 
 	virtual void OnRemoteClosed(cTCPLink & a_Link) override
 	{
-		LOGD("%p: Remote has closed the connection.", &a_Link);
+		LOGD("%p (%s:%d): Remote has closed the connection.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort());
 	}
 
 	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode) override
 	{
-		LOGD("%p: Error %d in the cEchoLinkCallbacks.", &a_Link, a_ErrorCode);
+		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), a_ErrorCode);
 	}
 };
 

@@ -62,6 +62,13 @@ typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 
 
 
+// fwd:
+class cServerHandleImpl;
+
+
+
+
+
 /** Implements the cTCPLink details so that it can represent the single connection between two endpoints. */
 class cTCPLinkImpl:
 	public cTCPLink
@@ -76,8 +83,9 @@ public:
 	cTCPLinkImpl(const cCallbacksPtr a_LinkCallbacks);
 
 	/** Creates a new link based on the given socket.
-	Used for connections accepted in a server using cNetwork::Listen(). */
-	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server);
+	Used for connections accepted in a server using cNetwork::Listen().
+	a_Address and a_AddrLen describe the remote peer that has connected. */
+	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, int a_AddrLen);
 
 	/** Queues a connection request to the specified host.
 	a_ConnectCallbacks must be valid.
@@ -86,10 +94,10 @@ public:
 
 	// cTCPLink overrides:
 	virtual bool Send(const void * a_Data, size_t a_Length) override;
-	virtual AString GetLocalIP(void) const override;
-	virtual UInt16 GetLocalPort(void) const override;
-	virtual AString GetRemoteIP(void) const override;
-	virtual UInt16 GetRemotePort(void) const override;
+	virtual AString GetLocalIP(void) const override { return m_LocalIP; }
+	virtual UInt16 GetLocalPort(void) const override { return m_LocalPort; }
+	virtual AString GetRemoteIP(void) const override { return m_RemoteIP; }
+	virtual UInt16 GetRemotePort(void) const override { return m_RemotePort; }
 	virtual void Close(void) override;
 	virtual void Drop(void) override;
 
@@ -106,12 +114,33 @@ protected:
 	Only valid for incoming connections, NULL for outgoing connections. */
 	cServerHandleImpl * m_Server;
 
+	/** The IP address of the local endpoint. Valid only after the socket has been connected. */
+	AString m_LocalIP;
+
+	/** The port of the local endpoint. Valid only after the socket has been connected. */
+	UInt16 m_LocalPort;
+
+	/** The IP address of the remote endpoint. Valid only after the socket has been connected. */
+	AString m_RemoteIP;
+
+	/** The port of the remote endpoint. Valid only after the socket has been connected. */
+	UInt16 m_RemotePort;
+
 
 	/** Callback that LibEvent calls when there's data available from the remote peer. */
 	static void ReadCallback(bufferevent * a_BufferEvent, void * a_Self);
 
 	/** Callback that LibEvent calls when there's a non-data-related event on the socket. */
 	static void EventCallback(bufferevent * a_BufferEvent, short a_What, void * a_Self);
+
+	/** Sets a_IP and a_Port to values read from a_Address, based on the correct address family. */
+	static void UpdateAddress(const sockaddr * a_Address, int a_AddrLen, AString & a_IP, UInt16 & a_Port);
+
+	/** Updates m_LocalIP and m_LocalPort based on the metadata read from the socket. */
+	void UpdateLocalAddress(void);
+
+	/** Updates m_RemoteIP and m_RemotePort based on the metadata read from the socket. */
+	void UpdateRemoteAddress(void);
 };
 typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
@@ -337,13 +366,13 @@ void cHostnameLookup::Callback(int a_ErrCode, evutil_addrinfo * a_Addr, void * a
 			}
 			default:
 			{
-				// Unknown address family, handle as error
-				continue;
+				// Unknown address family, handle as if this entry wasn't received
+				continue;  // for (a_Addr)
 			}
 		}
 		Self->m_Callbacks->OnNameResolved(Self->m_Hostname, IP);
 		HasResolved = true;
-	}
+	}  // for (a_Addr)
 
 	// If only unsupported families were reported, call the Error handler:
 	if (!HasResolved)
@@ -378,11 +407,21 @@ cIPLookup::cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_
 		{
 			sockaddr_in * sa4 = reinterpret_cast<sockaddr_in *>(&sa);
 			evdns_base_resolve_reverse(cNetworkSingleton::Get().m_DNSBase, &(sa4->sin_addr), 0, Callback, this);
+			break;
 		}
 		case AF_INET6:
 		{
+			sockaddr_in6 * sa6 = reinterpret_cast<sockaddr_in6 *>(&sa);
+			evdns_base_resolve_reverse_ipv6(cNetworkSingleton::Get().m_DNSBase, &(sa6->sin6_addr), 0, Callback, this);
+			break;
 		}
-	}
+		default:
+		{
+			LOGWARNING("%s: Unknown address family: %d", __FUNCTION__, sa.ss_family);
+			ASSERT(!"Unknown address family");
+			break;
+		}
+	}  // switch (address family)
 }
 
 
@@ -429,11 +468,13 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 
 
-cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server):
+cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, int a_AddrLen):
 	super(a_LinkCallbacks),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, a_Socket, BEV_OPT_CLOSE_ON_FREE)),
 	m_Server(a_Server)
 {
+	UpdateLocalAddress();
+	UpdateAddress(a_Address, a_AddrLen, m_RemoteIP, m_RemotePort);
 	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
 }
@@ -493,50 +534,6 @@ bool cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cCon
 bool cTCPLinkImpl::Send(const void * a_Data, size_t a_Length)
 {
 	return (bufferevent_write(m_BufferEvent, a_Data, a_Length) == 0);
-}
-
-
-
-
-
-AString cTCPLinkImpl::GetLocalIP(void) const
-{
-	// TODO
-	ASSERT(!"cTCPLinkImpl::GetLocalIP: Not implemented yet");
-	return "";
-}
-
-
-
-
-
-UInt16 cTCPLinkImpl::GetLocalPort(void) const
-{
-	// TODO
-	ASSERT(!"cTCPLinkImpl::GetLocalPort(): Not implemented yet");
-	return 0;
-}
-
-
-
-
-
-AString cTCPLinkImpl::GetRemoteIP(void) const
-{
-	// TODO
-	ASSERT(!"cTCPLinkImpl::GetRemoteIP(): Not implemented yet");
-	return "";
-}
-
-
-
-
-
-UInt16 cTCPLinkImpl::GetRemotePort(void) const
-{
-	// TODO
-	ASSERT(!"cTCPLinkImpl::GetRemotePort(): Not implemented yet");
-	return 0;
 }
 
 
@@ -621,6 +618,8 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 			Self->m_ConnectCallbacks.reset();
 			return;
 		}
+		Self->UpdateLocalAddress();
+		Self->UpdateRemoteAddress();
 	}
 
 	// If the connection has been closed, call the link callback and remove the connection:
@@ -641,6 +640,64 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 	// Unknown event, report it:
 	LOGWARNING("cTCPLinkImpl: Unhandled LibEvent event %d (0x%x)", a_What, a_What);
 	ASSERT(!"cTCPLinkImpl: Unhandled LibEvent event");
+}
+
+
+
+
+
+void cTCPLinkImpl::UpdateAddress(const sockaddr * a_Address, int a_AddrLen, AString & a_IP, UInt16 & a_Port)
+{
+	char IP[128];
+	switch (a_Address->sa_family)
+	{
+		case AF_INET:  // IPv4:
+		{
+			const sockaddr_in * sin = reinterpret_cast<const sockaddr_in *>(a_Address);
+			evutil_inet_ntop(AF_INET, &(sin->sin_addr), IP, sizeof(IP));
+			a_Port = ntohs(sin->sin_port);
+			break;
+		}
+		case AF_INET6:  // IPv6
+		{
+			const sockaddr_in6 * sin = reinterpret_cast<const sockaddr_in6 *>(a_Address);
+			evutil_inet_ntop(AF_INET6, &(sin->sin6_addr), IP, sizeof(IP));
+			a_Port = ntohs(sin->sin6_port);
+			break;
+		}
+
+		default:
+		{
+			LOGWARNING("%s: Unknown socket address family: %d", __FUNCTION__, a_Address->sa_family);
+			ASSERT(!"Unknown socket address family");
+			break;
+		}
+	}
+	a_IP.assign(IP);
+}
+
+
+
+
+
+void cTCPLinkImpl::UpdateLocalAddress(void)
+{
+	sockaddr_storage sa;
+	int salen = static_cast<int>(sizeof(sa));
+	getsockname(bufferevent_getfd(m_BufferEvent), reinterpret_cast<sockaddr *>(&sa), &salen);
+	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_LocalIP, m_LocalPort);
+}
+
+
+
+
+
+void cTCPLinkImpl::UpdateRemoteAddress(void)
+{
+	sockaddr_storage sa;
+	int salen = static_cast<int>(sizeof(sa));
+	getpeername(bufferevent_getfd(m_BufferEvent), reinterpret_cast<sockaddr *>(&sa), &salen);
+	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_LocalIP, m_LocalPort);
 }
 
 
@@ -786,7 +843,7 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	ASSERT(Self != nullptr);
 
 	// Create a new cTCPLink for the incoming connection:
-	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self);
+	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self, a_Addr, a_Len);
 	Self->m_Connections.push_back(Link);
 
 	// Call the OnAccepted callback:
@@ -933,6 +990,9 @@ cNetworkSingleton & cNetworkSingleton::Get(void)
 }
 
 
+
+
+
 bool cNetworkSingleton::Connect(
 	const AString & a_Host,
 	const UInt16 a_Port,
@@ -947,7 +1007,7 @@ bool cNetworkSingleton::Connect(
 	// Queue the connection:
 	if (!ConnRequest->Connect(a_Host, a_Port, a_ConnectCallbacks))
 	{
-		// TODO: m_Connections.remove(ConnRequest);
+		RemoveLink(ConnRequest.get());
 		return false;
 	}
 
