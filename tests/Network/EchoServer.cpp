@@ -38,6 +38,16 @@ class cEchoLinkCallbacks:
 		LOGD("%p (%s:%d): Data received (%u bytes), echoing back.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), static_cast<unsigned>(a_Size));
 		a_Link.Send(a_Data, a_Size);
 		LOGD("Echo queued");
+
+		// Search for a Ctrl+Z, if found, drop the connection:
+		for (size_t i = 0; i < a_Size; i++)
+		{
+			if (a_Data[i] == '\x1a')
+			{
+				a_Link.Close();
+				return;
+			}
+		}
 	}
 
 	virtual void OnRemoteClosed(cTCPLink & a_Link) override
@@ -67,7 +77,7 @@ int main()
 	ASSERT(Server->IsListening());
 
 	// Wait for the user to terminate the server:
-	printf("Press enter to terminate the server.\n");
+	printf("Press enter to close the server.\n");
 	AString line;
 	std::getline(std::cin, line);
 
@@ -75,6 +85,10 @@ int main()
 	LOG("Server terminating.");
 	Server->Close();
 	ASSERT(!Server->IsListening());
+	LOGD("Server has been closed.");
+
+	printf("Press enter to exit test.\n");
+	std::getline(std::cin, line);
 
 	LOG("Network test finished.");
 	return 0;

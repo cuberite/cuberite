@@ -66,12 +66,13 @@ public:
 	virtual UInt16 GetRemotePort(void) const = 0;
 
 	/** Closes the link gracefully.
-	The link will keep trying to send the queued data, then it will send the FIN packet. */
-	virtual void Close(void) = 0;
+	The link will send any queued outgoing data, then it will send the FIN packet.
+	The link will still receive incoming data from remote until the remote closes the connection. */
+	virtual void Shutdown(void) = 0;
 
 	/** Drops the connection without any more processing.
 	Sends the RST packet, queued outgoing and incoming data is lost. */
-	virtual void Drop(void) = 0;
+	virtual void Close(void) = 0;
 
 protected:
 	/** Callbacks to be used for the various situations. */
@@ -95,7 +96,8 @@ public:
 	// Force a virtual destructor for all descendants:
 	virtual ~cServerHandle() {}
 
-	/** Stops the server, no more incoming connections will be accepted. */
+	/** Stops the server, no more incoming connections will be accepted.
+	All current connections will be shut down (cTCPLink::Shutdown()). */
 	virtual void Close(void) = 0;
 
 	/** Returns true if the server has been started correctly and is currently listening for incoming connections. */

@@ -87,6 +87,9 @@ public:
 	a_Address and a_AddrLen describe the remote peer that has connected. */
 	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, int a_AddrLen);
 
+	/** Destroys the LibEvent handle representing the link. */
+	~cTCPLinkImpl();
+
 	/** Queues a connection request to the specified host.
 	a_ConnectCallbacks must be valid.
 	The object must have been constructed by the right constructor (without the Socket param). */
@@ -98,8 +101,8 @@ public:
 	virtual UInt16 GetLocalPort(void) const override { return m_LocalPort; }
 	virtual AString GetRemoteIP(void) const override { return m_RemoteIP; }
 	virtual UInt16 GetRemotePort(void) const override { return m_RemotePort; }
+	virtual void Shutdown(void) override;
 	virtual void Close(void) override;
-	virtual void Drop(void) override;
 
 protected:
 
@@ -163,6 +166,9 @@ public:
 		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
 		cTCPLink::cCallbacksPtr a_LinkCallbacks
 	);
+
+	/** Closes the server, dropping all the connections. */
+	~cServerHandleImpl();
 
 	/** Starts listening on the specified port.
 	Both IPv4 and IPv6 interfaces are used, if possible. */
@@ -499,6 +505,15 @@ cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_L
 
 
 
+cTCPLinkImpl::~cTCPLinkImpl()
+{
+	bufferevent_free(m_BufferEvent);
+}
+
+
+
+
+
 /** Schedules the actual connection request.
 Returns true on success, false on failure. */
 bool cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks)
@@ -556,20 +571,31 @@ bool cTCPLinkImpl::Send(const void * a_Data, size_t a_Length)
 
 
 
-void cTCPLinkImpl::Close(void)
+void cTCPLinkImpl::Shutdown(void)
 {
-	// TODO
-	ASSERT(!"cTCPLinkImpl::Close(): Not implemented yet");
+	#ifdef _WIN32
+		shutdown(bufferevent_getfd(m_BufferEvent), SD_SEND);
+	#else
+		shutdown(bufferevent_getfd(m_BufferEvent), SHUT_WR);
+	#endif
+	bufferevent_disable(m_BufferEvent, EV_WRITE);
 }
 
 
 
 
 
-void cTCPLinkImpl::Drop(void)
+void cTCPLinkImpl::Close(void)
 {
-	// TODO
-	ASSERT(!"cTCPLinkImpl::Drop(): Not implemented yet");
+	bufferevent_disable(m_BufferEvent, EV_READ | EV_WRITE);
+	if (m_Server == nullptr)
+	{
+		cNetworkSingleton::Get().RemoveLink(this);
+	}
+	else
+	{
+		m_Server->RemoveLink(this);
+	}
 }
 
 
@@ -736,24 +762,38 @@ cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallb
 
 
 
-void cServerHandleImpl::Close(void)
+cServerHandleImpl::~cServerHandleImpl()
 {
-	// Stop the listener sockets:
-	evconnlistener_free(m_ConnListener);
-	m_ConnListener = nullptr;
+	if (m_ConnListener != nullptr)
+	{
+		evconnlistener_free(m_ConnListener);
+	}
 	if (m_SecondaryConnListener != nullptr)
 	{
 		evconnlistener_free(m_SecondaryConnListener);
-		m_SecondaryConnListener = nullptr;
+	}
+}
+
+
+
+
+
+void cServerHandleImpl::Close(void)
+{
+	// Stop the listener sockets:
+	evconnlistener_disable(m_ConnListener);
+	if (m_SecondaryConnListener != nullptr)
+	{
+		evconnlistener_disable(m_SecondaryConnListener);
 	}
 	m_IsListening = false;
 
-	// Close all connections:
+	// Shutdown all connections:
 	cTCPLinkImplPtrs Conns;
 	std::swap(Conns, m_Connections);
 	for (auto conn: Conns)
 	{
-		conn->Close();
+		conn->Shutdown();
 	}
 }
 
