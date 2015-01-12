@@ -311,6 +311,22 @@ protected:
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// Globals:
+
+bool IsValidSocket(evutil_socket_t a_Socket)
+{
+	#ifdef _WIN32
+		return (a_Socket != INVALID_SOCKET);
+	#else  // _WIN32
+		return (a_Socket >= 0);
+	#endif  // else _WIN32
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cHostnameLookup:
 
 cHostnameLookup::cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks):
@@ -683,7 +699,7 @@ void cTCPLinkImpl::UpdateAddress(const sockaddr * a_Address, int a_AddrLen, AStr
 void cTCPLinkImpl::UpdateLocalAddress(void)
 {
 	sockaddr_storage sa;
-	int salen = static_cast<int>(sizeof(sa));
+	socklen_t salen = static_cast<socklen_t>(sizeof(sa));
 	getsockname(bufferevent_getfd(m_BufferEvent), reinterpret_cast<sockaddr *>(&sa), &salen);
 	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_LocalIP, m_LocalPort);
 }
@@ -695,7 +711,7 @@ void cTCPLinkImpl::UpdateLocalAddress(void)
 void cTCPLinkImpl::UpdateRemoteAddress(void)
 {
 	sockaddr_storage sa;
-	int salen = static_cast<int>(sizeof(sa));
+	socklen_t salen = static_cast<socklen_t>(sizeof(sa));
 	getpeername(bufferevent_getfd(m_BufferEvent), reinterpret_cast<sockaddr *>(&sa), &salen);
 	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_LocalIP, m_LocalPort);
 }
@@ -753,12 +769,14 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	// It should listen on IPv6 with IPv4 fallback, when available; IPv4 when IPv6 is not available.
 	bool NeedsTwoSockets = false;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
-	if (MainSock == SOCKET_ERROR)
+	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (MainSock == SOCKET_ERROR)
+		if (!IsValidSocket(MainSock))
 		{
+			int err = EVUTIL_SOCKET_ERROR();
+			LOGWARNING("%s: Cannot create a socket for neither IPv6 nor IPv4: %d (%s)", __FUNCTION__, err, evutil_socket_error_to_string(err));
 			return false;
 		}
 
@@ -822,7 +840,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (NeedsTwoSockets)
 	{
 		evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (SecondSock != SOCKET_ERROR)
+		if (!IsValidSocket(SecondSock))
 		{
 			evutil_make_socket_nonblocking(SecondSock);
 			m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);

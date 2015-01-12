@@ -17,7 +17,7 @@ class cEchoServerCallbacks:
 {
 	virtual void OnAccepted(cTCPLink & a_Link) override
 	{
-		LOGD("New client accepted (%s:%p), sending welcome message.", a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort());
+		LOGD("New client accepted (%s:%d), sending welcome message.", a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort());
 		// Send a welcome message to each connecting client:
 		a_Link.Send("Welcome to the simple echo server.\r\n");
 		LOGD("Welcome message queued.");
