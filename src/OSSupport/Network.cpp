@@ -12,6 +12,7 @@
 #include <event2/listener.h>
 #include <thread>
 #include "Event.h"
+#include "CriticalSection.h"
 
 
 
@@ -197,6 +198,9 @@ protected:
 	/** Container for all currently active connections on this server. */
 	cTCPLinkImplPtrs m_Connections;
 
+	/** Mutex protecting m_Connections againt multithreaded access. */
+	cCriticalSection m_CS;
+
 
 	/** The callback called by LibEvent upon incoming connection. */
 	static void Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self);
@@ -288,6 +292,9 @@ protected:
 
 	/** Container for all pending IP lookups. */
 	cIPLookupPtrs m_IPLookups;
+
+	/** Mutex protecting all containers against multithreaded access. */
+	cCriticalSection m_CS;
 
 
 	/** Initializes the LibEvent internals. */
@@ -587,6 +594,7 @@ void cTCPLinkImpl::Shutdown(void)
 
 void cTCPLinkImpl::Close(void)
 {
+	// Disable all events on the socket, but keep it alive (multithreading):
 	bufferevent_disable(m_BufferEvent, EV_READ | EV_WRITE);
 	if (m_Server == nullptr)
 	{
@@ -790,7 +798,10 @@ void cServerHandleImpl::Close(void)
 
 	// Shutdown all connections:
 	cTCPLinkImplPtrs Conns;
-	std::swap(Conns, m_Connections);
+	{
+		cCSLock Lock(m_CS);
+		std::swap(Conns, m_Connections);
+	}
 	for (auto conn: Conns)
 	{
 		conn->Shutdown();
@@ -902,7 +913,10 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 
 	// Create a new cTCPLink for the incoming connection:
 	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self, a_Addr, a_Len);
-	Self->m_Connections.push_back(Link);
+	{
+		cCSLock Lock(Self->m_CS);
+		Self->m_Connections.push_back(Link);
+	}  // Lock(m_CS)
 
 	// Call the OnAccepted callback:
 	Self->m_ListenCallbacks->OnAccepted(*Link);
@@ -914,6 +928,7 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 
 void cServerHandleImpl::RemoveLink(const cTCPLinkImpl * a_Link)
 {
+	cCSLock Lock(m_CS);
 	for (auto itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
 	{
 		if (itr->get() == a_Link)
@@ -1060,7 +1075,10 @@ bool cNetworkSingleton::Connect(
 {
 	// Add a connection request to the queue:
 	cTCPLinkImplPtr ConnRequest = std::make_shared<cTCPLinkImpl>(a_LinkCallbacks);
-	m_Connections.push_back(ConnRequest);
+	{
+		cCSLock Lock(m_CS);
+		m_Connections.push_back(ConnRequest);
+	}  // Lock(m_CS)
 
 	// Queue the connection:
 	if (!ConnRequest->Connect(a_Host, a_Port, a_ConnectCallbacks))
@@ -1088,6 +1106,7 @@ cServerHandlePtr cNetworkSingleton::Listen(
 	{
 		return res;
 	}
+	cCSLock Lock(m_CS);
 	m_Servers.push_back(res);
 	return res;
 }
@@ -1103,6 +1122,7 @@ bool cNetworkSingleton::HostnameToIP(
 {
 	try
 	{
+		cCSLock Lock(m_CS);
 		m_HostnameLookups.push_back(std::make_shared<cHostnameLookup>(a_Hostname, a_Callbacks));
 	}
 	catch (...)
@@ -1122,6 +1142,7 @@ bool cNetworkSingleton::IPToHostName(
 {
 	try
 	{
+		cCSLock Lock(m_CS);
 		m_IPLookups.push_back(std::make_shared<cIPLookup>(a_IP, a_Callbacks));
 	}
 	catch (...)
@@ -1165,6 +1186,7 @@ void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 
 void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup)
 {
+	cCSLock Lock(m_CS);
 	for (auto itr = m_HostnameLookups.begin(), end = m_HostnameLookups.end(); itr != end; ++itr)
 	{
 		if (itr->get() == a_HostnameLookup)
@@ -1181,6 +1203,7 @@ void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameL
 
 void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
 {
+	cCSLock Lock(m_CS);
 	for (auto itr = m_IPLookups.begin(), end = m_IPLookups.end(); itr != end; ++itr)
 	{
 		if (itr->get() == a_IPLookup)
@@ -1197,6 +1220,7 @@ void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
 
 void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
 {
+	cCSLock Lock(m_CS);
 	for (auto itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
 	{
 		if (itr->get() == a_Link)
