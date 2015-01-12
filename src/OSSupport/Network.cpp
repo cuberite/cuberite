@@ -823,7 +823,9 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
+		#ifdef DEBUG
 		int err = EVUTIL_SOCKET_ERROR();
+		#endif
 		LOGD("Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (!IsValidSocket(MainSock))
