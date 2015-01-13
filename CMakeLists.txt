@@ -130,6 +130,9 @@ set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/
 set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
 set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
 
+# Add proper includes for LibEvent's event-config.h header:
+include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
+
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
 endif()
