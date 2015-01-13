@@ -819,13 +819,12 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	// Set up the main socket:
 	// It should listen on IPv6 with IPv4 fallback, when available; IPv4 when IPv6 is not available.
 	bool NeedsTwoSockets = false;
+	int err;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
-		#ifdef DEBUG
-		int err = EVUTIL_SOCKET_ERROR();
-		#endif
+		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (!IsValidSocket(MainSock))
@@ -842,7 +841,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		name.sin_port = ntohs(a_Port);
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
-			int err = EVUTIL_SOCKET_ERROR();
+			err = EVUTIL_SOCKET_ERROR();
 			LOGWARNING("Cannot bind to IPv4 port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 			evutil_closesocket(MainSock);
 			return false;
@@ -855,7 +854,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		#ifdef _WIN32
 			// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
 			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-			int err = EVUTIL_SOCKET_ERROR();
+			err = EVUTIL_SOCKET_ERROR();
 			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
 			LOGD("setsockopt(IPV6_V6ONLY) returned %d, err is %d (%s). %s",
 				res, err, evutil_socket_error_to_string(err),
@@ -880,14 +879,14 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	}
 	if (evutil_make_socket_nonblocking(MainSock) != 0)
 	{
-		int err = EVUTIL_SOCKET_ERROR();
+		err = EVUTIL_SOCKET_ERROR();
 		LOGWARNING("Cannot make socket for port %d non-blocking: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 		evutil_closesocket(MainSock);
 		return false;
 	}
 	if (listen(MainSock, 0) != 0)
 	{
-		int err = EVUTIL_SOCKET_ERROR();
+		err = EVUTIL_SOCKET_ERROR();
 		LOGWARNING("Cannot listen on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 		evutil_closesocket(MainSock);
 		return false;
@@ -907,13 +906,13 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 			}
 			else
 			{
-				int err = EVUTIL_SOCKET_ERROR();
+				err = EVUTIL_SOCKET_ERROR();
 				LOGD("evutil_make_socket_nonblocking() failed: %d, %s", err, evutil_socket_error_to_string(err));
 			}
 		}
 		else
 		{
-			int err = EVUTIL_SOCKET_ERROR();
+			err = EVUTIL_SOCKET_ERROR();
 			LOGD("socket(AF_INET, ...) failed: %d, %s", err, evutil_socket_error_to_string(err));
 		}
 	}
