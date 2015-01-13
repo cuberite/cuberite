@@ -463,6 +463,7 @@ void cIPLookup::Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void
 	cIPLookup * Self = reinterpret_cast<cIPLookup *>(a_Self);
 	ASSERT(Self != nullptr);
 
+	// Call the proper callback based on the event received:
 	if ((a_Result != 0) || (a_Addresses == nullptr))
 	{
 		// An error has occurred, notify the error callback:
@@ -470,7 +471,7 @@ void cIPLookup::Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void
 	}
 	else
 	{
-		// Call the success handler::
+		// Call the success handler:
 		Self->m_Callbacks->OnNameResolved(*(reinterpret_cast<char **>(a_Addresses)), Self->m_IP);
 		Self->m_Callbacks->OnFinished();
 	}
@@ -489,6 +490,7 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, -1, BEV_OPT_CLOSE_ON_FREE)),
 	m_Server(nullptr)
 {
+	// Create the LibEvent handle, but don't assign a socket to it yet (will be assigned within Connect() method):
 	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
 }
@@ -502,8 +504,11 @@ cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_L
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, a_Socket, BEV_OPT_CLOSE_ON_FREE)),
 	m_Server(a_Server)
 {
+	// Update the endpoint addresses:
 	UpdateLocalAddress();
 	UpdateAddress(a_Address, a_AddrLen, m_RemoteIP, m_RemotePort);
+
+	// Create the LibEvent handle:
 	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
 }
@@ -521,8 +526,6 @@ cTCPLinkImpl::~cTCPLinkImpl()
 
 
 
-/** Schedules the actual connection request.
-Returns true on success, false on failure. */
 bool cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks)
 {
 	ASSERT(bufferevent_getfd(m_BufferEvent) == -1);  // Did you create this object using the right constructor (the one without the Socket param)?
@@ -594,7 +597,7 @@ void cTCPLinkImpl::Shutdown(void)
 
 void cTCPLinkImpl::Close(void)
 {
-	// Disable all events on the socket, but keep it alive (multithreading):
+	// Disable all events on the socket, but keep it alive:
 	bufferevent_disable(m_BufferEvent, EV_READ | EV_WRITE);
 	if (m_Server == nullptr)
 	{
@@ -698,6 +701,7 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 
 void cTCPLinkImpl::UpdateAddress(const sockaddr * a_Address, int a_AddrLen, AString & a_IP, UInt16 & a_Port)
 {
+	// Based on the family specified in the address, use the correct datastructure to convert to IP string:
 	char IP[128];
 	switch (a_Address->sa_family)
 	{
@@ -747,7 +751,7 @@ void cTCPLinkImpl::UpdateRemoteAddress(void)
 	sockaddr_storage sa;
 	socklen_t salen = static_cast<socklen_t>(sizeof(sa));
 	getpeername(bufferevent_getfd(m_BufferEvent), reinterpret_cast<sockaddr *>(&sa), &salen);
-	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_LocalIP, m_LocalPort);
+	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_RemoteIP, m_RemotePort);
 }
 
 
@@ -1184,7 +1188,7 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 		case _EVENT_LOG_ERR:   LOGERROR  ("LibEvent: %s", a_Msg); break;
 		default:
 		{
-			printf("LibEvent: %s", a_Msg);
+			LOGWARNING("LibEvent: Unknown log severity (%d): %s", a_Severity, a_Msg);
 			break;
 		}
 	}
