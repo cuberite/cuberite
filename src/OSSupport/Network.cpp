@@ -18,6 +18,16 @@
 
 
 
+// fwd:
+class cServerHandleImpl;
+class cTCPLinkImpl;
+typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
+typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class definitions:
 
@@ -63,13 +73,6 @@ typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 
 
 
-// fwd:
-class cServerHandleImpl;
-
-
-
-
-
 /** Implements the cTCPLink details so that it can represent the single connection between two endpoints. */
 class cTCPLinkImpl:
 	public cTCPLink
@@ -78,11 +81,6 @@ class cTCPLinkImpl:
 	friend class cServerHandleImpl;
 
 public:
-	/** Creates a new link to be queued to connect to a specified host:port.
-	Used for outgoing connections created using cNetwork::Connect().
-	Call Connect() first, before using the link. */
-	cTCPLinkImpl(const cCallbacksPtr a_LinkCallbacks);
-
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen().
 	a_Address and a_AddrLen describe the remote peer that has connected. */
@@ -93,8 +91,8 @@ public:
 
 	/** Queues a connection request to the specified host.
 	a_ConnectCallbacks must be valid.
-	The object must have been constructed by the right constructor (without the Socket param). */
-	bool Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks);
+	Returns a link that has the connection request queued, or NULL for failure. */
+	static cTCPLinkImplPtr Connect(const AString & a_Host, UInt16 a_Port, cTCPLink::cCallbacksPtr a_LinkCallbacks, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks);
 
 	// cTCPLink overrides:
 	virtual bool Send(const void * a_Data, size_t a_Length) override;
@@ -131,6 +129,11 @@ protected:
 	UInt16 m_RemotePort;
 
 
+	/** Creates a new link to be queued to connect to a specified host:port.
+	Used for outgoing connections created using cNetwork::Connect().
+	To be used only by the Connect() factory function. */
+	cTCPLinkImpl(const cCallbacksPtr a_LinkCallbacks);
+
 	/** Callback that LibEvent calls when there's data available from the remote peer. */
 	static void ReadCallback(bufferevent * a_BufferEvent, void * a_Self);
 
@@ -146,8 +149,6 @@ protected:
 	/** Updates m_RemoteIP and m_RemotePort based on the metadata read from the socket. */
 	void UpdateRemoteAddress(void);
 };
-typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
-typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 
 
 
@@ -313,6 +314,10 @@ protected:
 	/** Removes the specified IP lookup from m_IPLookups.
 	Used by the underlying lookup implementation when the lookup is finished. */
 	void RemoveIPLookup(const cIPLookup * a_IPLookup);
+
+	/** Adds the specified link to m_Connections.
+	Used by the underlying link implementation when a new link is created. */
+	void AddLink(cTCPLinkImplPtr a_Link);
 
 	/** Removes the specified link from m_Connections.
 	Used by the underlying link implementation when the link is closed / errored. */
@@ -526,13 +531,15 @@ cTCPLinkImpl::~cTCPLinkImpl()
 
 
 
-bool cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks)
+cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTCPLink::cCallbacksPtr a_LinkCallbacks, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks)
 {
-	ASSERT(bufferevent_getfd(m_BufferEvent) == -1);  // Did you create this object using the right constructor (the one without the Socket param)?
-	ASSERT(m_Server == nullptr);
+	ASSERT(a_LinkCallbacks != nullptr);
 	ASSERT(a_ConnectCallbacks != nullptr);
 
-	m_ConnectCallbacks = a_ConnectCallbacks;
+	// Create a new link:
+	cTCPLinkImplPtr res{new cTCPLinkImpl(a_LinkCallbacks)};  // Cannot use std::make_shared here, constructor is not accessible
+	res->m_ConnectCallbacks = a_ConnectCallbacks;
+	cNetworkSingleton::Get().AddLink(res);
 
 	// If a_Host is an IP address, schedule a connection immediately:
 	sockaddr_storage sa;
@@ -549,23 +556,26 @@ bool cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cNetwork::cCon
 			reinterpret_cast<sockaddr_in *>(&sa)->sin_port = htons(a_Port);
 		}
 
-		if (bufferevent_socket_connect(m_BufferEvent, reinterpret_cast<sockaddr *>(&sa), salen) == 0)
+		// Queue the connect request:
+		if (bufferevent_socket_connect(res->m_BufferEvent, reinterpret_cast<sockaddr *>(&sa), salen) == 0)
 		{
 			// Success
-			return true;
+			return res;
 		}
 		// Failure
-		return false;
+		cNetworkSingleton::Get().RemoveLink(res.get());
+		return nullptr;
 	}
 
 	// a_Host is a hostname, connect after a lookup:
-	if (bufferevent_socket_connect_hostname(m_BufferEvent, cNetworkSingleton::Get().m_DNSBase, AF_UNSPEC, a_Host.c_str(), a_Port) == 0)
+	if (bufferevent_socket_connect_hostname(res->m_BufferEvent, cNetworkSingleton::Get().m_DNSBase, AF_UNSPEC, a_Host.c_str(), a_Port) == 0)
 	{
 		// Success
-		return true;
+		return res;
 	}
 	// Failure
-	return false;
+	cNetworkSingleton::Get().RemoveLink(res.get());
+	return nullptr;
 }
 
 
@@ -1097,21 +1107,8 @@ bool cNetworkSingleton::Connect(
 )
 {
 	// Add a connection request to the queue:
-	cTCPLinkImplPtr ConnRequest = std::make_shared<cTCPLinkImpl>(a_LinkCallbacks);
-	{
-		cCSLock Lock(m_CS);
-		m_Connections.push_back(ConnRequest);
-	}  // Lock(m_CS)
-
-	// Queue the connection:
-	if (!ConnRequest->Connect(a_Host, a_Port, a_ConnectCallbacks))
-	{
-		RemoveLink(ConnRequest.get());
-		return false;
-	}
-
-	// Everything successful, return success:
-	return true;
+	cTCPLinkImplPtr Conn = cTCPLinkImpl::Connect(a_Host, a_Port, a_LinkCallbacks, a_ConnectCallbacks);
+	return (Conn != nullptr);
 }
 
 
@@ -1235,6 +1232,16 @@ void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
 			return;
 		}
 	}  // for itr - m_IPLookups[]
+}
+
+
+
+
+
+void cNetworkSingleton::AddLink(cTCPLinkImplPtr a_Link)
+{
+	cCSLock Lock(m_CS);
+	m_Connections.push_back(a_Link);
 }
 
 
