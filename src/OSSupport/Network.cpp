@@ -78,7 +78,6 @@ class cTCPLinkImpl:
 	public cTCPLink
 {
 	typedef cTCPLink super;
-	friend class cServerHandleImpl;
 
 public:
 	/** Creates a new link based on the given socket.
