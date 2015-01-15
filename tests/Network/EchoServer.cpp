@@ -22,6 +22,11 @@ class cEchoServerCallbacks:
 		a_Link.Send("Welcome to the simple echo server.\r\n");
 		LOGD("Welcome message queued.");
 	}
+
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
+	{
+		LOGWARNING("An error occured while listening for connections: %d (%s).", a_ErrorCode, a_ErrorMsg.c_str());
+	}
 };
 
 

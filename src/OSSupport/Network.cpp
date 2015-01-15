@@ -841,6 +841,10 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 	{
 		cNetworkSingleton::Get().AddServer(res);
 	}
+	else
+	{
+		a_ListenCallbacks->OnError(res->m_ErrorCode, res->m_ErrorMsg);
+	}
 	return res;
 }
 
@@ -1058,6 +1062,7 @@ cTCPLink::cTCPLink(cCallbacksPtr a_Callbacks):
 	m_Callbacks(a_Callbacks)
 {
 }
+
 
 
 

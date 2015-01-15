@@ -139,6 +139,9 @@ public:
 		/** Called when the TCP server created with Listen() accepts an incoming connection.
 		Provides the newly created Link that can be used for communication. */
 		virtual void OnAccepted(cTCPLink & a_Link) = 0;
+
+		/** Called when the socket fails to listen on the specified port. */
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
 	typedef SharedPtr<cListenCallbacks> cListenCallbacksPtr;
 
