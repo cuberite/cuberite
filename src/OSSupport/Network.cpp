@@ -1076,7 +1076,13 @@ cNetworkSingleton::cNetworkSingleton(void)
 	#ifdef _WIN32
 		WSADATA wsaData;
 		memset(&wsaData, 0, sizeof(wsaData));
-		WSAStartup (MAKEWORD(2, 2), &wsaData);
+		int res = WSAStartup (MAKEWORD(2, 2), &wsaData);
+		if (res != 0)
+		{
+			int err = WSAGetLastError();
+			LOGWARNING("WSAStartup failed: %d, WSAGLE = %d (%s)", res, err, evutil_socket_error_to_string(err));
+			exit(1);
+		}
 	#endif  // _WIN32
 
 	// Initialize LibEvent logging:
