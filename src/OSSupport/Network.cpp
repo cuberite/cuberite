@@ -23,6 +23,8 @@ class cServerHandleImpl;
 class cTCPLinkImpl;
 typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
+typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
+typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 
 
 
@@ -161,19 +163,17 @@ class cServerHandleImpl:
 	friend class cTCPLinkImpl;
 
 public:
-	/** Creates a new instance with the specified callbacks.
-	Initializes the internals, but doesn't start listening yet. */
-	cServerHandleImpl(
-		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-		cTCPLink::cCallbacksPtr a_LinkCallbacks
-	);
-
 	/** Closes the server, dropping all the connections. */
 	~cServerHandleImpl();
 
-	/** Starts listening on the specified port.
-	Both IPv4 and IPv6 interfaces are used, if possible. */
-	bool Listen(UInt16 a_Port);
+	/** Creates a new server instance listening on the specified port.
+	Both IPv4 and IPv6 interfaces are used, if possible.
+	Always returns a server instance; in the event of a failure, the instance holds the error details. Use IsListening() to query success. */
+	static cServerHandleImplPtr Listen(
+		UInt16 a_Port,
+		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
+		cTCPLink::cCallbacksPtr a_LinkCallbacks
+	);
 
 	// cServerHandle overrides:
 	virtual void Close(void) override;
@@ -201,6 +201,24 @@ protected:
 	/** Mutex protecting m_Connections againt multithreaded access. */
 	cCriticalSection m_CS;
 
+	/** Contains the error code for the failure to listen. Only valid for non-listening instances. */
+	int m_ErrorCode;
+
+	/** Contains the error message for the failure to listen. Only valid for non-listening instances. */
+	AString m_ErrorMsg;
+
+
+
+	/** Creates a new instance with the specified callbacks.
+	Initializes the internals, but doesn't start listening yet. */
+	cServerHandleImpl(
+		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
+		cTCPLink::cCallbacksPtr a_LinkCallbacks
+	);
+
+	/** Starts listening on the specified port.
+	Returns true if successful, false on failure. On failure, sets m_ErrorCode and m_ErrorMsg. */
+	bool Listen(UInt16 a_Port);
 
 	/** The callback called by LibEvent upon incoming connection. */
 	static void Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self);
@@ -209,8 +227,6 @@ protected:
 	Called by cTCPLinkImpl when the link is terminated. */
 	void RemoveLink(const cTCPLinkImpl * a_Link);
 };
-typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
-typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 
 
 
@@ -229,30 +245,6 @@ public:
 
 
 	// The following functions are implementations for the cNetwork class
-
-	/** Queues a TCP connection to be made to the specified host.
-	Calls one the connection callbacks (success, error) when the connection is successfully established, or upon failure.
-	The a_LinkCallbacks is passed to the newly created cTCPLink.
-	Returns true if queueing was successful, false on failure to queue.
-	Note that the return value doesn't report the success of the actual connection; the connection is established asynchronously in the background. */
-	bool Connect(
-		const AString & a_Host,
-		const UInt16 a_Port,
-		cNetwork::cConnectCallbacksPtr a_ConnectCallbacks,
-		cTCPLink::cCallbacksPtr a_LinkCallbacks
-	);
-
-
-	/** Opens up the specified port for incoming connections.
-	Calls an OnAccepted callback for each incoming connection.
-	A cTCPLink with the specified link callbacks is created for each connection.
-	Returns a cServerHandle that can be used to query the operation status and close the server. */
-	cServerHandlePtr Listen(
-		const UInt16 a_Port,
-		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-		cTCPLink::cCallbacksPtr a_LinkCallbacks
-	);
-
 
 	/** Queues a DNS query to resolve the specified hostname to IP address.
 	Calls one of the callbacks when the resolving succeeds, or when it fails.
@@ -321,6 +313,15 @@ protected:
 	/** Removes the specified link from m_Connections.
 	Used by the underlying link implementation when the link is closed / errored. */
 	void RemoveLink(const cTCPLinkImpl * a_Link);
+
+	/** Adds the specified link to m_Servers.
+	Used by the underlying server handle implementation when a new listening server is created.
+	Only servers that succeed in listening are added. */
+	void AddServer(cServerHandleImplPtr a_Server);
+
+	/** Removes the specified server from m_Servers.
+	Used by the underlying server handle implementation when the server is closed. */
+	void RemoveServer(const cServerHandleImpl * a_Server);
 };
 
 
@@ -770,12 +771,16 @@ void cTCPLinkImpl::UpdateRemoteAddress(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cServerHandleImpl:
 
-cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks, cTCPLink::cCallbacksPtr a_LinkCallbacks):
+cServerHandleImpl::cServerHandleImpl(
+	cNetwork::cListenCallbacksPtr a_ListenCallbacks,
+	cTCPLink::cCallbacksPtr a_LinkCallbacks
+):
 	m_ListenCallbacks(a_ListenCallbacks),
 	m_LinkCallbacks(a_LinkCallbacks),
 	m_ConnListener(nullptr),
 	m_SecondaryConnListener(nullptr),
-	m_IsListening(false)
+	m_IsListening(false),
+	m_ErrorCode(0)
 {
 }
 
@@ -825,10 +830,26 @@ void cServerHandleImpl::Close(void)
 
 
 
+cServerHandleImplPtr cServerHandleImpl::Listen(
+	UInt16 a_Port,
+	cNetwork::cListenCallbacksPtr a_ListenCallbacks,
+	cTCPLink::cCallbacksPtr a_LinkCallbacks
+)
+{
+	cServerHandleImplPtr res = cServerHandleImplPtr{new cServerHandleImpl(a_ListenCallbacks, a_LinkCallbacks)};
+	if (res->Listen(a_Port))
+	{
+		cNetworkSingleton::Get().AddServer(res);
+	}
+	return res;
+}
+
+
+
+
+
 bool cServerHandleImpl::Listen(UInt16 a_Port)
 {
-	ASSERT(!m_IsListening);
-
 	// Set up the main socket:
 	// It should listen on IPv6 with IPv4 fallback, when available; IPv4 when IPv6 is not available.
 	bool NeedsTwoSockets = false;
@@ -842,8 +863,8 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		MainSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (!IsValidSocket(MainSock))
 		{
-			int err = EVUTIL_SOCKET_ERROR();
-			LOGWARNING("%s: Cannot create a socket for neither IPv6 nor IPv4: %d (%s)", __FUNCTION__, err, evutil_socket_error_to_string(err));
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Cannot create socket for port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 			return false;
 		}
 
@@ -854,8 +875,8 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		name.sin_port = ntohs(a_Port);
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
-			err = EVUTIL_SOCKET_ERROR();
-			LOGWARNING("Cannot bind to IPv4 port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Cannot bind IPv4 socket to port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 			evutil_closesocket(MainSock);
 			return false;
 		}
@@ -884,23 +905,23 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		name.sin6_port = ntohs(a_Port);
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
-			int err = EVUTIL_SOCKET_ERROR();
-			LOGWARNING("Cannot bind to IPv6 port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Cannot bind IPv6 socket to port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 			evutil_closesocket(MainSock);
 			return false;
 		}
 	}
 	if (evutil_make_socket_nonblocking(MainSock) != 0)
 	{
-		err = EVUTIL_SOCKET_ERROR();
-		LOGWARNING("Cannot make socket for port %d non-blocking: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		m_ErrorCode = EVUTIL_SOCKET_ERROR();
+		Printf(m_ErrorMsg, "Cannot make socket on port %d non-blocking: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 		evutil_closesocket(MainSock);
 		return false;
 	}
 	if (listen(MainSock, 0) != 0)
 	{
-		err = EVUTIL_SOCKET_ERROR();
-		LOGWARNING("Cannot listen on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		m_ErrorCode = EVUTIL_SOCKET_ERROR();
+		Printf(m_ErrorMsg, "Cannot listen on port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 		evutil_closesocket(MainSock);
 		return false;
 	}
@@ -985,7 +1006,9 @@ bool cNetwork::Connect(
 	cTCPLink::cCallbacksPtr a_LinkCallbacks
 )
 {
-	return cNetworkSingleton::Get().Connect(a_Host, a_Port, a_ConnectCallbacks, a_LinkCallbacks);
+	// Add a connection request to the queue:
+	cTCPLinkImplPtr Conn = cTCPLinkImpl::Connect(a_Host, a_Port, a_LinkCallbacks, a_ConnectCallbacks);
+	return (Conn != nullptr);
 }
 
 
@@ -998,7 +1021,7 @@ cServerHandlePtr cNetwork::Listen(
 	cTCPLink::cCallbacksPtr a_LinkCallbacks
 )
 {
-	return cNetworkSingleton::Get().Listen(a_Port, a_ListenCallbacks, a_LinkCallbacks);
+	return cServerHandleImpl::Listen(a_Port, a_ListenCallbacks, a_LinkCallbacks);
 }
 
 
@@ -1092,42 +1115,6 @@ cNetworkSingleton & cNetworkSingleton::Get(void)
 {
 	static cNetworkSingleton Instance;
 	return Instance;
-}
-
-
-
-
-
-bool cNetworkSingleton::Connect(
-	const AString & a_Host,
-	const UInt16 a_Port,
-	cNetwork::cConnectCallbacksPtr a_ConnectCallbacks,
-	cTCPLink::cCallbacksPtr a_LinkCallbacks
-)
-{
-	// Add a connection request to the queue:
-	cTCPLinkImplPtr Conn = cTCPLinkImpl::Connect(a_Host, a_Port, a_LinkCallbacks, a_ConnectCallbacks);
-	return (Conn != nullptr);
-}
-
-
-
-
-
-cServerHandlePtr cNetworkSingleton::Listen(
-	const UInt16 a_Port,
-	cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-	cTCPLink::cCallbacksPtr a_LinkCallbacks
-)
-{
-	cServerHandleImplPtr res = std::make_shared<cServerHandleImpl>(a_ListenCallbacks, a_LinkCallbacks);
-	if (!res->Listen(a_Port))
-	{
-		return res;
-	}
-	cCSLock Lock(m_CS);
-	m_Servers.push_back(res);
-	return res;
 }
 
 
@@ -1258,6 +1245,33 @@ void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
 			return;
 		}
 	}  // for itr - m_Connections[]
+}
+
+
+
+
+
+void cNetworkSingleton::AddServer(cServerHandleImplPtr a_Server)
+{
+	cCSLock Lock(m_CS);
+	m_Servers.push_back(a_Server);
+}
+
+
+
+
+
+void cNetworkSingleton::RemoveServer(const cServerHandleImpl * a_Server)
+{
+	cCSLock Lock(m_CS);
+	for (auto itr = m_Servers.begin(), end = m_Servers.end(); itr != end; ++itr)
+	{
+		if (itr->get() == a_Server)
+		{
+			m_Servers.erase(itr);
+			return;
+		}
+	}  // for itr - m_Servers[]
 }
 
 
