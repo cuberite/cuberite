@@ -85,10 +85,10 @@ protected:
 	bool m_IsCritical;
 	
 	/** Timer for pickup collection animation or five minute timeout */
-	float m_Timer;
+	std::chrono::milliseconds m_Timer;
 	
 	/** Timer for client arrow position confirmation via TeleportEntity */
-	float m_HitGroundTimer;
+	std::chrono::milliseconds m_HitGroundTimer;
 	
 	// Whether the arrow has already been teleported into the proper position in the ground.
 	bool m_HasTeleported;
