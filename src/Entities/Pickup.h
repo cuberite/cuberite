@@ -37,10 +37,10 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	/** Returns the number of ticks that this entity has existed */
-	int GetAge(void) const { return static_cast<int>(m_Timer / 50); }     // tolua_export
+	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }     // tolua_export
 
 	/** Set the number of ticks that this entity has existed */
-	void SetAge(int a_Age) { m_Timer = static_cast<float>(a_Age * 50); }  // tolua_export
+	void SetAge(int a_Age) { m_Timer = cTickTime(a_Age); }  // tolua_export
 
 	/** Returns true if the pickup has already been collected */
 	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
@@ -51,7 +51,7 @@ public:
 private:
 
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
-	float m_Timer;
+	std::chrono::milliseconds m_Timer;
 
 	cItem m_Item;
 

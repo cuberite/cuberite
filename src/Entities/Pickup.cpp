@@ -86,7 +86,7 @@ protected:
 
 cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_Item, bool IsPlayerCreated, float a_SpeedX /* = 0.f */, float a_SpeedY /* = 0.f */, float a_SpeedZ /* = 0.f */)
 	: cEntity(etPickup, a_PosX, a_PosY, a_PosZ, 0.2, 0.2)
-	, m_Timer(0.f)
+	, m_Timer(0)
 	, m_Item(a_Item)
 	, m_bCollected(false)
 	, m_bIsPlayerCreated(IsPlayerCreated)
@@ -115,7 +115,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	super::Tick(a_Dt, a_Chunk);
 	BroadcastMovementUpdate();  // Notify clients of position
 
-	m_Timer += a_Dt.count();
+	m_Timer += a_Dt;
 	
 	if (!m_bCollected)
 	{
@@ -141,9 +141,9 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			)
 			{
 				m_bCollected = true;
-				m_Timer = 0;  // We have to reset the timer.
-				m_Timer += a_Dt.count();  // In case we have to destroy the pickup in the same tick.
-				if (m_Timer > 500.f)
+				m_Timer = std::chrono::milliseconds(0);  // We have to reset the timer.
+				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
+				if (m_Timer > std::chrono::milliseconds(500))
 				{
 					Destroy(true);
 					return;
@@ -167,14 +167,14 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else
 	{
-		if (m_Timer > 500.f)  // 0.5 second
+		if (m_Timer > std::chrono::milliseconds(500))  // 0.5 second
 		{
 			Destroy(true);
 			return;
 		}
 	}
 
-	if (m_Timer > 1000 * 60 * 5)  // 5 minutes
+	if (m_Timer > std::chrono::minutes(5))  // 5 minutes
 	{
 		Destroy(true);
 		return;
@@ -200,7 +200,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 	}
 	
 	// Two seconds if player created the pickup (vomiting), half a second if anything else
-	if (m_Timer < (m_bIsPlayerCreated ? 2000.f : 500.f))
+	if (m_Timer < (m_bIsPlayerCreated ? std::chrono::seconds(2) : std::chrono::milliseconds(500)))
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", m_UniqueID, a_Dest->GetName().c_str());
 		return false;  // Not old enough
@@ -234,7 +234,7 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 			// All of the pickup has been collected, schedule the pickup for destroying
 			m_bCollected = true;
 		}
-		m_Timer = 0;
+		m_Timer = std::chrono::milliseconds(0);
 		return true;
 	}
 
