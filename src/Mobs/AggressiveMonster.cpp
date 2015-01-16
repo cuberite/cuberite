@@ -22,7 +22,7 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 
 
 // What to do if in Chasing State
-void cAggressiveMonster::InStateChasing(float a_Dt)
+void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 {
 	super::InStateChasing(a_Dt);
 
