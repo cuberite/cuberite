@@ -8,7 +8,7 @@
 cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 	: cEntity(etExpOrb, a_X, a_Y, a_Z, 0.98, 0.98)
 	, m_Reward(a_Reward)
-	, m_Timer(0.f)
+	, m_Timer(0)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
@@ -21,7 +21,7 @@ cExpOrb::cExpOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 cExpOrb::cExpOrb(const Vector3d & a_Pos, int a_Reward)
 	: cEntity(etExpOrb, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98)
 	, m_Reward(a_Reward)
-	, m_Timer(0.f)
+	, m_Timer(0)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
@@ -69,8 +69,8 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	HandlePhysics(a_Dt, a_Chunk);
 	
-	m_Timer += a_Dt.count();
-	if (m_Timer >= 1000 * 60 * 5)  // 5 minutes
+	m_Timer += a_Dt;
+	if (m_Timer >= std::chrono::minutes(5))
 	{
 		Destroy(true);
 	}
