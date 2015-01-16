@@ -854,6 +854,9 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 
 bool cServerHandleImpl::Listen(UInt16 a_Port)
 {
+	// Make sure the cNetwork internals are innitialized:
+	cNetworkSingleton::Get();
+
 	// Set up the main socket:
 	// It should listen on IPv6 with IPv4 fallback, when available; IPv4 when IPv6 is not available.
 	bool NeedsTwoSockets = false;
