@@ -165,12 +165,12 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		switch (InsideType)
 		{
-			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt.count()); break;
+			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
 			case E_BLOCK_ACTIVATOR_RAIL: break;
 			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
 			case E_BLOCK_DETECTOR_RAIL:
 			{
-				HandleDetectorRailPhysics(InsideMeta, a_Dt.count());
+				HandleDetectorRailPhysics(InsideMeta, a_Dt);
 				WasDetectorRail = true;
 				break;
 			}
@@ -205,7 +205,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	/*
 	NOTE: Please bear in mind that taking away from negatives make them even more negative,
@@ -565,7 +565,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 
 
-void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	m_World->SetBlockMeta(m_DetectorRailPosition, a_RailMeta | 0x08);
 
@@ -576,7 +576,7 @@ void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 
 
 
-void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
 }

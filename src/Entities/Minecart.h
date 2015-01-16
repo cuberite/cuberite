@@ -56,7 +56,7 @@ protected:
 	/** Handles physics on normal rails
 		For each tick, slow down on flat rails, speed up or slow down on ascending/descending rails (depending on direction), and turn on curved rails
 	*/
-	void HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
+	void HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Handles powered rail physics
 		Each tick, speed up or slow down cart, depending on metadata of rail (powered or not)
@@ -66,10 +66,10 @@ protected:
 	/** Handles detector rail activation
 		Activates detector rails when a minecart is on them. Calls HandleRailPhysics() for physics simulations
 	*/
-	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
+	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Handles activator rails - placeholder for future implementation */
-	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt);
+	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Snaps a mincecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
