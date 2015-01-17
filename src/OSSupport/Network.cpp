@@ -838,31 +838,52 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		return false;
 	}
 	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
+	m_IsListening = true;
+	if (!NeedsTwoSockets)
+	{
+		return true;
+	}
 
 	// If a secondary socket is required (WinXP dual-stack), create it here:
-	if (NeedsTwoSockets)
+	LOGD("Creating a second socket for IPv4");
+	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (!IsValidSocket(SecondSock))
 	{
-		LOGD("Creating a second socket for IPv4");
-		evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (IsValidSocket(SecondSock))
-		{
-			if (evutil_make_socket_nonblocking(SecondSock) == 0)
-			{
-				m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
-			}
-			else
-			{
-				err = EVUTIL_SOCKET_ERROR();
-				LOGD("evutil_make_socket_nonblocking() failed: %d, %s", err, evutil_socket_error_to_string(err));
-			}
-		}
-		else
-		{
-			err = EVUTIL_SOCKET_ERROR();
-			LOGD("socket(AF_INET, ...) failed: %d, %s", err, evutil_socket_error_to_string(err));
-		}
+		err = EVUTIL_SOCKET_ERROR();
+		LOGD("socket(AF_INET, ...) failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
+		return true;  // Report as success, the primary socket is working
 	}
-	m_IsListening = true;
+
+	// Make the secondary socket nonblocking:
+	if (evutil_make_socket_nonblocking(SecondSock) != 0)
+	{
+		err = EVUTIL_SOCKET_ERROR();
+		LOGD("evutil_make_socket_nonblocking() failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
+		evutil_closesocket(SecondSock);
+	}
+
+	// Bind to all IPv4 interfaces:
+	sockaddr_in name;
+	memset(&name, 0, sizeof(name));
+	name.sin_family = AF_INET;
+	name.sin_port = ntohs(a_Port);
+	if (bind(SecondSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
+	{
+		err = EVUTIL_SOCKET_ERROR();
+		LOGD("Cannot bind secondary socket to port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		evutil_closesocket(SecondSock);
+		return true;
+	}
+
+	if (listen(SecondSock, 0) != 0)
+	{
+		err = EVUTIL_SOCKET_ERROR();
+		LOGD("Cannot listen on on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		evutil_closesocket(SecondSock);
+		return false;
+	}
+
+	m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
 	return true;
 }
 
