@@ -13,6 +13,7 @@ SET (SRCS
 	IsThread.cpp
 	ListenThread.cpp
 	Network.cpp
+	NetworkSingleton.cpp
 	Semaphore.cpp
 	Socket.cpp
 	SocketThreads.cpp
@@ -28,6 +29,7 @@ SET (HDRS
 	IsThread.h
 	ListenThread.h
 	Network.h
+	NetworkSingleton.h
 	Queue.h
 	Semaphore.h
 	Socket.h

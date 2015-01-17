@@ -13,6 +13,7 @@
 #include <thread>
 #include "Event.h"
 #include "CriticalSection.h"
+#include "NetworkSingleton.h"
 
 
 
@@ -232,102 +233,6 @@ protected:
 
 
 
-class cNetworkSingleton
-{
-	friend class cHostnameLookup;    // Needs access to m_DNSBase
-	friend class cIPLookup;          // Needs access to m_DNSBase
-	friend class cTCPLinkImpl;       // Needs access to m_EventBase and m_DNSBase
-	friend class cServerHandleImpl;  // Needs access to m_EventBase
-
-public:
-	/** Returns the singleton instance of this class */
-	static cNetworkSingleton & Get(void);
-
-
-	// The following functions are implementations for the cNetwork class
-
-	/** Queues a DNS query to resolve the specified hostname to IP address.
-	Calls one of the callbacks when the resolving succeeds, or when it fails.
-	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background. */
-	bool HostnameToIP(
-		const AString & a_Hostname,
-		cNetwork::cResolveNameCallbacksPtr a_Callbacks
-	);
-
-
-	/** Queues a DNS query to resolve the specified IP address to a hostname.
-	Calls one of the callbacks when the resolving succeeds, or when it fails.
-	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background. */
-	bool IPToHostName(
-		const AString & a_IP,
-		cNetwork::cResolveNameCallbacksPtr a_Callbacks
-	);
-
-protected:
-
-	/** The main LibEvent container for driving the event loop. */
-	event_base * m_EventBase;
-
-	/** The LibEvent handle for doing DNS lookups. */
-	evdns_base * m_DNSBase;
-
-	/** Container for all client connections, including ones with pending-connect. */
-	cTCPLinkImplPtrs m_Connections;
-
-	/** Container for all servers that are currently active. */
-	cServerHandleImplPtrs m_Servers;
-
-	/** Container for all pending hostname lookups. */
-	cHostnameLookupPtrs m_HostnameLookups;
-
-	/** Container for all pending IP lookups. */
-	cIPLookupPtrs m_IPLookups;
-
-	/** Mutex protecting all containers against multithreaded access. */
-	cCriticalSection m_CS;
-
-
-	/** Initializes the LibEvent internals. */
-	cNetworkSingleton(void);
-
-	/** Converts LibEvent-generated log events into log messages in MCS log. */
-	static void LogCallback(int a_Severity, const char * a_Msg);
-
-	/** Implements the thread that runs LibEvent's event dispatcher loop. */
-	static void RunEventLoop(cNetworkSingleton * a_Self);
-
-	/** Removes the specified hostname lookup from m_HostnameLookups.
-	Used by the underlying lookup implementation when the lookup is finished. */
-	void RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup);
-
-	/** Removes the specified IP lookup from m_IPLookups.
-	Used by the underlying lookup implementation when the lookup is finished. */
-	void RemoveIPLookup(const cIPLookup * a_IPLookup);
-
-	/** Adds the specified link to m_Connections.
-	Used by the underlying link implementation when a new link is created. */
-	void AddLink(cTCPLinkImplPtr a_Link);
-
-	/** Removes the specified link from m_Connections.
-	Used by the underlying link implementation when the link is closed / errored. */
-	void RemoveLink(const cTCPLinkImpl * a_Link);
-
-	/** Adds the specified link to m_Servers.
-	Used by the underlying server handle implementation when a new listening server is created.
-	Only servers that succeed in listening are added. */
-	void AddServer(cServerHandleImplPtr a_Server);
-
-	/** Removes the specified server from m_Servers.
-	Used by the underlying server handle implementation when the server is closed. */
-	void RemoveServer(const cServerHandleImpl * a_Server);
-};
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
@@ -357,7 +262,7 @@ cHostnameLookup::cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveN
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_flags = EVUTIL_AI_CANONNAME;
-	evdns_getaddrinfo(cNetworkSingleton::Get().m_DNSBase, a_Hostname.c_str(), nullptr, &hints, Callback, this);
+	evdns_getaddrinfo(cNetworkSingleton::Get().GetDNSBase(), a_Hostname.c_str(), nullptr, &hints, Callback, this);
 }
 
 
@@ -440,13 +345,13 @@ cIPLookup::cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_
 		case AF_INET:
 		{
 			sockaddr_in * sa4 = reinterpret_cast<sockaddr_in *>(&sa);
-			evdns_base_resolve_reverse(cNetworkSingleton::Get().m_DNSBase, &(sa4->sin_addr), 0, Callback, this);
+			evdns_base_resolve_reverse(cNetworkSingleton::Get().GetDNSBase(), &(sa4->sin_addr), 0, Callback, this);
 			break;
 		}
 		case AF_INET6:
 		{
 			sockaddr_in6 * sa6 = reinterpret_cast<sockaddr_in6 *>(&sa);
-			evdns_base_resolve_reverse_ipv6(cNetworkSingleton::Get().m_DNSBase, &(sa6->sin6_addr), 0, Callback, this);
+			evdns_base_resolve_reverse_ipv6(cNetworkSingleton::Get().GetDNSBase(), &(sa6->sin6_addr), 0, Callback, this);
 			break;
 		}
 		default:
@@ -492,7 +397,7 @@ void cIPLookup::Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void
 
 cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, -1, BEV_OPT_CLOSE_ON_FREE)),
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE)),
 	m_Server(nullptr)
 {
 	// Create the LibEvent handle, but don't assign a socket to it yet (will be assigned within Connect() method):
@@ -506,7 +411,7 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, int a_AddrLen):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().m_EventBase, a_Socket, BEV_OPT_CLOSE_ON_FREE)),
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE)),
 	m_Server(a_Server)
 {
 	// Update the endpoint addresses:
@@ -568,7 +473,7 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 	}
 
 	// a_Host is a hostname, connect after a lookup:
-	if (bufferevent_socket_connect_hostname(res->m_BufferEvent, cNetworkSingleton::Get().m_DNSBase, AF_UNSPEC, a_Host.c_str(), a_Port) == 0)
+	if (bufferevent_socket_connect_hostname(res->m_BufferEvent, cNetworkSingleton::Get().GetDNSBase(), AF_UNSPEC, a_Host.c_str(), a_Port) == 0)
 	{
 		// Success
 		return res;
@@ -932,7 +837,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		evutil_closesocket(MainSock);
 		return false;
 	}
-	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
+	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
 
 	// If a secondary socket is required (WinXP dual-stack), create it here:
 	if (NeedsTwoSockets)
@@ -943,7 +848,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		{
 			if (evutil_make_socket_nonblocking(SecondSock) == 0)
 			{
-				m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().m_EventBase, Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
+				m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
 			}
 			else
 			{
@@ -1066,227 +971,6 @@ cTCPLink::cTCPLink(cCallbacksPtr a_Callbacks):
 {
 }
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cNetworkSingleton:
-
-cNetworkSingleton::cNetworkSingleton(void)
-{
-	// Windows: initialize networking:
-	#ifdef _WIN32
-		WSADATA wsaData;
-		memset(&wsaData, 0, sizeof(wsaData));
-		int res = WSAStartup (MAKEWORD(2, 2), &wsaData);
-		if (res != 0)
-		{
-			int err = WSAGetLastError();
-			LOGWARNING("WSAStartup failed: %d, WSAGLE = %d (%s)", res, err, evutil_socket_error_to_string(err));
-			exit(1);
-		}
-	#endif  // _WIN32
-
-	// Initialize LibEvent logging:
-	event_set_log_callback(LogCallback);
-
-	// Initialize threading:
-	#if defined(EVTHREAD_USE_WINDOWS_THREADS_IMPLEMENTED)
-		evthread_use_windows_threads();
-	#elif defined(EVTHREAD_USE_PTHREADS_IMPLEMENTED)
-		evthread_use_pthreads();
-	#else
-		#error No threading implemented for EVTHREAD
-	#endif
-
-	// Create the main event_base:
-	m_EventBase = event_base_new();
-	if (m_EventBase == nullptr)
-	{
-		LOGERROR("Failed to initialize LibEvent. The server will now terminate.");
-		abort();
-	}
-
-	// Create the DNS lookup helper:
-	m_DNSBase = evdns_base_new(m_EventBase, 1);
-	if (m_DNSBase == nullptr)
-	{
-		LOGERROR("Failed to initialize LibEvent's DNS subsystem. The server will now terminate.");
-		abort();
-	}
-
-	// Create the event loop thread:
-	std::thread EventLoopThread(RunEventLoop, this);
-	EventLoopThread.detach();
-}
-
-
-
-
-
-cNetworkSingleton & cNetworkSingleton::Get(void)
-{
-	static cNetworkSingleton Instance;
-	return Instance;
-}
-
-
-
-
-
-bool cNetworkSingleton::HostnameToIP(
-	const AString & a_Hostname,
-	cNetwork::cResolveNameCallbacksPtr a_Callbacks
-)
-{
-	try
-	{
-		cCSLock Lock(m_CS);
-		m_HostnameLookups.push_back(std::make_shared<cHostnameLookup>(a_Hostname, a_Callbacks));
-	}
-	catch (...)
-	{
-		return false;
-	}
-	return true;
-}
-
-
-
-
-bool cNetworkSingleton::IPToHostName(
-	const AString & a_IP,
-	cNetwork::cResolveNameCallbacksPtr a_Callbacks
-)
-{
-	try
-	{
-		cCSLock Lock(m_CS);
-		m_IPLookups.push_back(std::make_shared<cIPLookup>(a_IP, a_Callbacks));
-	}
-	catch (...)
-	{
-		return false;
-	}
-	return true;
-}
-
-
-
-
-void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
-{
-	switch (a_Severity)
-	{
-		case _EVENT_LOG_DEBUG: LOGD      ("LibEvent: %s", a_Msg); break;
-		case _EVENT_LOG_MSG:   LOG       ("LibEvent: %s", a_Msg); break;
-		case _EVENT_LOG_WARN:  LOGWARNING("LibEvent: %s", a_Msg); break;
-		case _EVENT_LOG_ERR:   LOGERROR  ("LibEvent: %s", a_Msg); break;
-		default:
-		{
-			LOGWARNING("LibEvent: Unknown log severity (%d): %s", a_Severity, a_Msg);
-			break;
-		}
-	}
-}
-
-
-
-
-
-void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
-{
-	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
-}
-
-
-
-
-
-void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup)
-{
-	cCSLock Lock(m_CS);
-	for (auto itr = m_HostnameLookups.begin(), end = m_HostnameLookups.end(); itr != end; ++itr)
-	{
-		if (itr->get() == a_HostnameLookup)
-		{
-			m_HostnameLookups.erase(itr);
-			return;
-		}
-	}  // for itr - m_HostnameLookups[]
-}
-
-
-
-
-
-void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
-{
-	cCSLock Lock(m_CS);
-	for (auto itr = m_IPLookups.begin(), end = m_IPLookups.end(); itr != end; ++itr)
-	{
-		if (itr->get() == a_IPLookup)
-		{
-			m_IPLookups.erase(itr);
-			return;
-		}
-	}  // for itr - m_IPLookups[]
-}
-
-
-
-
-
-void cNetworkSingleton::AddLink(cTCPLinkImplPtr a_Link)
-{
-	cCSLock Lock(m_CS);
-	m_Connections.push_back(a_Link);
-}
-
-
-
-
-
-void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
-{
-	cCSLock Lock(m_CS);
-	for (auto itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
-	{
-		if (itr->get() == a_Link)
-		{
-			m_Connections.erase(itr);
-			return;
-		}
-	}  // for itr - m_Connections[]
-}
-
-
-
-
-
-void cNetworkSingleton::AddServer(cServerHandleImplPtr a_Server)
-{
-	cCSLock Lock(m_CS);
-	m_Servers.push_back(a_Server);
-}
-
-
-
-
-
-void cNetworkSingleton::RemoveServer(const cServerHandleImpl * a_Server)
-{
-	cCSLock Lock(m_CS);
-	for (auto itr = m_Servers.begin(), end = m_Servers.end(); itr != end; ++itr)
-	{
-		if (itr->get() == a_Server)
-		{
-			m_Servers.erase(itr);
-			return;
-		}
-	}  // for itr - m_Servers[]
-}
 
 
 
