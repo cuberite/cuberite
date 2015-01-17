@@ -764,7 +764,7 @@ void cServer::cNotifyWriteThread::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		cCSLock Lock(m_CS);
-		while (m_Clients.size() == 0)
+		while (m_Clients.empty())
 		{
 			cCSUnlock Unlock(Lock);
 			m_Event.Wait();
