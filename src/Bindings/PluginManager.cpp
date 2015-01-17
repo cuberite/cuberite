@@ -771,7 +771,7 @@ bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_New
 
 
 
-bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems a_Reward)
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
 {
 	FIND_HOOK(HOOK_PLAYER_FISHED);
 	VERIFY_HOOK;
@@ -847,7 +847,7 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d a_OldPosition, const Vector3d a_NewPosition)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
 {
 	FIND_HOOK(HOOK_PLAYER_MOVING);
 	VERIFY_HOOK;

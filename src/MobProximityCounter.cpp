@@ -50,7 +50,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 	a_DistanceMin *= a_DistanceMin;// this is because is use square distance
 	a_DistanceMax *= a_DistanceMax;
 
-	if (m_DistanceToMonster.size() <= 0)
+	if (m_DistanceToMonster.empty())
 	{
 		convertMaps();
 	}
