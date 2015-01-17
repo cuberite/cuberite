@@ -869,7 +869,7 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	if (m_IsDaylightCycleEnabled)
 	{
-		// We need sub-tick precision here, that's why we store the time in seconds and calculate ticks off of it
+		// We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it
 		m_TimeOfDay += a_Dt;
 
 		// Wrap time of day each 20 minutes (1200 seconds)
