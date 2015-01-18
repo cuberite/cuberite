@@ -21,6 +21,15 @@
 /** Holds information about an in-progress Hostname-to-IP lookup. */
 class cHostnameLookup
 {
+public:
+	/** Creates the lookup object. Doesn't start the lookup yet. */
+	cHostnameLookup(cNetwork::cResolveNameCallbacksPtr a_Callbacks);
+
+	/** Starts the lookup. */
+	void Lookup(const AString & a_Hostname);
+
+protected:
+
 	/** The callbacks to call for resolved names / errors. */
 	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
 
@@ -28,9 +37,6 @@ class cHostnameLookup
 	AString m_Hostname;
 
 	static void Callback(int a_ErrCode, struct evutil_addrinfo * a_Addr, void * a_Self);
-
-public:
-	cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 };
 typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
 typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;

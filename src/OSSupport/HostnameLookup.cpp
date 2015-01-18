@@ -15,10 +15,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cHostnameLookup:
 
-cHostnameLookup::cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks):
-	m_Callbacks(a_Callbacks),
-	m_Hostname(a_Hostname)
+cHostnameLookup::cHostnameLookup(cNetwork::cResolveNameCallbacksPtr a_Callbacks):
+	m_Callbacks(a_Callbacks)
 {
+}
+
+
+
+
+
+void cHostnameLookup::Lookup(const AString & a_Hostname)
+{
+	// Store the hostname for the callback:
+	m_Hostname = a_Hostname;
+
+	// Start the lookup:
+	// Note that we don't have to store the LibEvent lookup handle, LibEvent will free it on its own.
 	evutil_addrinfo hints;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_protocol = IPPROTO_TCP;
@@ -79,7 +91,7 @@ void cHostnameLookup::Callback(int a_ErrCode, evutil_addrinfo * a_Addr, void * a
 	// If only unsupported families were reported, call the Error handler:
 	if (!HasResolved)
 	{
-		Self->m_Callbacks->OnError(1);
+		Self->m_Callbacks->OnError(DNS_ERR_NODATA);
 	}
 	else
 	{
@@ -101,7 +113,10 @@ bool cNetwork::HostnameToIP(
 	cNetwork::cResolveNameCallbacksPtr a_Callbacks
 )
 {
-	return cNetworkSingleton::Get().HostnameToIP(a_Hostname, a_Callbacks);
+	auto Lookup = std::make_shared<cHostnameLookup>(a_Callbacks);
+	cNetworkSingleton::Get().AddHostnameLookup(Lookup);
+	Lookup->Lookup(a_Hostname);
+	return true;
 }
 
 

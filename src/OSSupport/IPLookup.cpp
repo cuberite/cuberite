@@ -15,14 +15,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cIPLookup:
 
-cIPLookup::cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks):
-	m_Callbacks(a_Callbacks),
-	m_IP(a_IP)
+cIPLookup::cIPLookup(cNetwork::cResolveNameCallbacksPtr a_Callbacks):
+	m_Callbacks(a_Callbacks)
 {
+	ASSERT(a_Callbacks != nullptr);
+}
+
+
+
+
+
+bool cIPLookup::Lookup(const AString & a_IP)
+{
+	// Parse the IP address string into a sockaddr structure:
+	m_IP = a_IP;
 	sockaddr_storage sa;
 	int salen = static_cast<int>(sizeof(sa));
 	memset(&sa, 0, sizeof(sa));
-	evutil_parse_sockaddr_port(a_IP.c_str(), reinterpret_cast<sockaddr *>(&sa), &salen);
+	if (evutil_parse_sockaddr_port(a_IP.c_str(), reinterpret_cast<sockaddr *>(&sa), &salen) != 0)
+	{
+		LOGD("Failed to parse IP address \"%s\".", a_IP.c_str());
+		return false;
+	}
+
+	// Call the proper resolver based on the address family:
+	// Note that there's no need to store the evdns_request handle returned, LibEvent frees it on its own.
 	switch (sa.ss_family)
 	{
 		case AF_INET:
@@ -41,9 +58,10 @@ cIPLookup::cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_
 		{
 			LOGWARNING("%s: Unknown address family: %d", __FUNCTION__, sa.ss_family);
 			ASSERT(!"Unknown address family");
-			break;
+			return false;
 		}
 	}  // switch (address family)
+	return true;
 }
 
 
@@ -83,7 +101,9 @@ bool cNetwork::IPToHostName(
 	cNetwork::cResolveNameCallbacksPtr a_Callbacks
 )
 {
-	return cNetworkSingleton::Get().IPToHostName(a_IP, a_Callbacks);
+	auto res = std::make_shared<cIPLookup>(a_Callbacks);
+	cNetworkSingleton::Get().AddIPLookup(res);
+	return res->Lookup(a_IP);
 }
 
 

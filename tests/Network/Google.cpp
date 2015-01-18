@@ -95,6 +95,7 @@ int main()
 	
 	evtFinish.Wait();
 	LOGD("Network test finished");
+	return 0;
 }
 
 

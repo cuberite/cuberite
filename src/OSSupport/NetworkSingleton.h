@@ -14,6 +14,7 @@
 
 #include "Network.h"
 #include "CriticalSection.h"
+#include "Event.h"
 
 
 
@@ -22,16 +23,16 @@
 // fwd:
 struct event_base;
 struct evdns_base;
-class cServerHandleImpl;
 class cTCPLinkImpl;
-class cHostnameLookup;
-class cIPLookup;
 typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
+class cServerHandleImpl;
 typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
 typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
+class cHostnameLookup;
 typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
 typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
+class cIPLookup;
 typedef SharedPtr<cIPLookup> cIPLookupPtr;
 typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 
@@ -42,32 +43,10 @@ typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
 class cNetworkSingleton
 {
 public:
+	~cNetworkSingleton();
+
 	/** Returns the singleton instance of this class */
 	static cNetworkSingleton & Get(void);
-
-
-	// The following functions are implementations for the cNetwork class
-
-	/** Queues a DNS query to resolve the specified hostname to IP address.
-	Calls one of the callbacks when the resolving succeeds, or when it fails.
-	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background.
-	TODO: Move this out into a separate file with cHostnameLookup. */
-	bool HostnameToIP(
-		const AString & a_Hostname,
-		cNetwork::cResolveNameCallbacksPtr a_Callbacks
-	);
-
-
-	/** Queues a DNS query to resolve the specified IP address to a hostname.
-	Calls one of the callbacks when the resolving succeeds, or when it fails.
-	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background.
-	TODO: Move this out into a separate file with cIPLookup. */
-	bool IPToHostName(
-		const AString & a_IP,
-		cNetwork::cResolveNameCallbacksPtr a_Callbacks
-	);
 
 	/** Returns the main LibEvent handle for event registering. */
 	event_base * GetEventBase(void) { return m_EventBase; }
@@ -75,9 +54,17 @@ public:
 	/** Returns the LibEvent handle for DNS lookups. */
 	evdns_base * GetDNSBase(void) { return m_DNSBase; }
 
+	/** Adds the specified hostname lookup to m_HostnameLookups.
+	Used by the underlying lookup implementation when a new lookup is initiated. */
+	void AddHostnameLookup(cHostnameLookupPtr a_HostnameLookup);
+
 	/** Removes the specified hostname lookup from m_HostnameLookups.
 	Used by the underlying lookup implementation when the lookup is finished. */
 	void RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup);
+
+	/** Adds the specified IP lookup to M_IPLookups.
+	Used by the underlying lookup implementation when a new lookup is initiated. */
+	void AddIPLookup(cIPLookupPtr a_IPLookup);
 
 	/** Removes the specified IP lookup from m_IPLookups.
 	Used by the underlying lookup implementation when the lookup is finished. */
@@ -122,6 +109,9 @@ protected:
 
 	/** Mutex protecting all containers against multithreaded access. */
 	cCriticalSection m_CS;
+
+	/** Event that gets signalled when the event loop terminates. */
+	cEvent m_EventLoopTerminated;
 
 
 	/** Initializes the LibEvent internals. */

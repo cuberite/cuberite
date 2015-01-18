@@ -70,56 +70,36 @@ cNetworkSingleton::cNetworkSingleton(void)
 
 
 
+cNetworkSingleton::~cNetworkSingleton()
+{
+	// Wait for the LibEvent event loop to terminate:
+	event_base_loopbreak(m_EventBase);
+	m_EventLoopTerminated.Wait();
+
+	// Remove all objects:
+	{
+		cCSLock Lock(m_CS);
+		m_Connections.clear();
+		m_Servers.clear();
+		m_HostnameLookups.clear();
+		m_IPLookups.clear();
+	}
+
+	// Free the underlying LibEvent objects:
+	evdns_base_free(m_DNSBase, true);
+	event_base_free(m_EventBase);
+}
+
+
+
+
+
 cNetworkSingleton & cNetworkSingleton::Get(void)
 {
 	static cNetworkSingleton Instance;
 	return Instance;
 }
 
-
-
-
-
-bool cNetworkSingleton::HostnameToIP(
-	const AString & a_Hostname,
-	cNetwork::cResolveNameCallbacksPtr a_Callbacks
-)
-{
-	try
-	{
-		// TODO: This has a race condition with possible memory leak:
-		// If a lookup finishes immediately, the constructor calls the removal before this addition
-		cCSLock Lock(m_CS);
-		m_HostnameLookups.push_back(std::make_shared<cHostnameLookup>(a_Hostname, a_Callbacks));
-	}
-	catch (...)
-	{
-		return false;
-	}
-	return true;
-}
-
-
-
-
-bool cNetworkSingleton::IPToHostName(
-	const AString & a_IP,
-	cNetwork::cResolveNameCallbacksPtr a_Callbacks
-)
-{
-	try
-	{
-		// TODO: This has a race condition with possible memory leak:
-		// If a lookup finishes immediately, the constructor calls the removal before this addition
-		cCSLock Lock(m_CS);
-		m_IPLookups.push_back(std::make_shared<cIPLookup>(a_IP, a_Callbacks));
-	}
-	catch (...)
-	{
-		return false;
-	}
-	return true;
-}
 
 
 
@@ -147,6 +127,17 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
+	a_Self->m_EventLoopTerminated.Set();
+}
+
+
+
+
+
+void cNetworkSingleton::AddHostnameLookup(cHostnameLookupPtr a_HostnameLookup)
+{
+	cCSLock Lock(m_CS);
+	m_HostnameLookups.push_back(a_HostnameLookup);
 }
 
 
@@ -164,6 +155,16 @@ void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameL
 			return;
 		}
 	}  // for itr - m_HostnameLookups[]
+}
+
+
+
+
+
+void cNetworkSingleton::AddIPLookup(cIPLookupPtr a_IPLookup)
+{
+	cCSLock Lock(m_CS);
+	m_IPLookups.push_back(a_IPLookup);
 }
 
 
