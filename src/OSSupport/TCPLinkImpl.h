@@ -38,7 +38,7 @@ public:
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen().
 	a_Address and a_AddrLen describe the remote peer that has connected. */
-	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, int a_AddrLen);
+	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, socklen_t a_AddrLen);
 
 	/** Destroys the LibEvent handle representing the link. */
 	~cTCPLinkImpl();
@@ -95,7 +95,7 @@ protected:
 	static void EventCallback(bufferevent * a_BufferEvent, short a_What, void * a_Self);
 
 	/** Sets a_IP and a_Port to values read from a_Address, based on the correct address family. */
-	static void UpdateAddress(const sockaddr * a_Address, int a_AddrLen, AString & a_IP, UInt16 & a_Port);
+	static void UpdateAddress(const sockaddr * a_Address, socklen_t a_AddrLen, AString & a_IP, UInt16 & a_Port);
 
 	/** Updates m_LocalIP and m_LocalPort based on the metadata read from the socket. */
 	void UpdateLocalAddress(void);

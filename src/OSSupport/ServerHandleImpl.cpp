@@ -253,7 +253,7 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	ASSERT(Self != nullptr);
 
 	// Create a new cTCPLink for the incoming connection:
-	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self, a_Addr, a_Len);
+	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self, a_Addr, static_cast<socklen_t>(a_Len));
 	{
 		cCSLock Lock(Self->m_CS);
 		Self->m_Connections.push_back(Link);
