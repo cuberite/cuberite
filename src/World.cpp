@@ -905,14 +905,14 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 
 	m_ChunkMap->Tick(a_Dt);
 
-	TickClients(a_Dt.count());
+	TickClients(static_cast<float>(a_Dt.count()));
 	TickQueuedBlocks();
 	TickQueuedTasks();
 	TickScheduledTasks();
 	
-	GetSimulatorManager()->Simulate(a_Dt.count());
+	GetSimulatorManager()->Simulate(static_cast<float>(a_Dt.count()));
 
-	TickWeather(a_Dt.count());
+	TickWeather(static_cast<float>(a_Dt.count()));
 
 	m_ChunkMap->FastSetQueuedBlocks();
 

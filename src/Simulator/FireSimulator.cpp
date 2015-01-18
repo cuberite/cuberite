@@ -92,7 +92,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 {
 	cCoordWithIntList & Data = a_Chunk->GetFireSimulatorData();
 
-	int NumMSecs = a_Dt.count();
+	int NumMSecs = static_cast<int>(a_Dt.count());
 	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
 		int x = itr->x;
