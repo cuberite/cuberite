@@ -8,12 +8,32 @@ include_directories(${CMAKE_SOURCE_DIR}/lib/libevent/include)
 add_definitions(-DTEST_GLOBALS=1)
 
 # Create a single Network library that contains all the networking code:
-add_library(Network
+set (Network_SRCS
 	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.cpp
-	${CMAKE_SOURCE_DIR}/src/OSSupport/Network.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.cpp
 	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.cpp
+	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.cpp
 	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+)
+
+set (Network_HDRS
+	${CMAKE_SOURCE_DIR}/src/OSSupport/CriticalSection.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/Event.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/HostnameLookup.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/IPLookup.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/Network.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/NetworkSingleton.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/ServerHandleImpl.h
+	${CMAKE_SOURCE_DIR}/src/OSSupport/TCPLinkImpl.h
+	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+)
+
+add_library(Network
+	${Network_SRCS}
+	${Network_HDRS}
 )
 
 target_link_libraries(Network event_core event_extra)

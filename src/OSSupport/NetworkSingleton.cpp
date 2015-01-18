@@ -11,51 +11,8 @@
 #include <event2/bufferevent.h>
 #include <event2/dns.h>
 #include <event2/listener.h>
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// Class definitions:
-
-/** Holds information about an in-progress Hostname-to-IP lookup. */
-class cHostnameLookup
-{
-	/** The callbacks to call for resolved names / errors. */
-	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
-
-	/** The hostname that was queried (needed for the callbacks). */
-	AString m_Hostname;
-
-	static void Callback(int a_ErrCode, struct evutil_addrinfo * a_Addr, void * a_Self);
-
-public:
-	cHostnameLookup(const AString & a_Hostname, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
-};
-typedef SharedPtr<cHostnameLookup> cHostnameLookupPtr;
-typedef std::vector<cHostnameLookupPtr> cHostnameLookupPtrs;
-
-
-
-
-
-/** Holds information about an in-progress IP-to-Hostname lookup. */
-class cIPLookup
-{
-	/** The callbacks to call for resolved names / errors. */
-	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
-
-	/** The IP that was queried (needed for the callbacks). */
-	AString m_IP;
-
-	static void Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void * a_Addresses, void * a_Self);
-
-public:
-	cIPLookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
-};
-typedef SharedPtr<cIPLookup> cIPLookupPtr;
-typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
+#include "IPLookup.h"
+#include "HostnameLookup.h"
 
 
 
@@ -130,6 +87,8 @@ bool cNetworkSingleton::HostnameToIP(
 {
 	try
 	{
+		// TODO: This has a race condition with possible memory leak:
+		// If a lookup finishes immediately, the constructor calls the removal before this addition
 		cCSLock Lock(m_CS);
 		m_HostnameLookups.push_back(std::make_shared<cHostnameLookup>(a_Hostname, a_Callbacks));
 	}
@@ -150,6 +109,8 @@ bool cNetworkSingleton::IPToHostName(
 {
 	try
 	{
+		// TODO: This has a race condition with possible memory leak:
+		// If a lookup finishes immediately, the constructor calls the removal before this addition
 		cCSLock Lock(m_CS);
 		m_IPLookups.push_back(std::make_shared<cIPLookup>(a_IP, a_Callbacks));
 	}

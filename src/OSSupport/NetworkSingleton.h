@@ -4,6 +4,12 @@
 // Declares the cNetworkSingleton class representing the storage for global data pertaining to network API
 // such as a list of all connections, all listening sockets and the LibEvent dispatch thread.
 
+// This is an internal header, no-one outside OSSupport should need to include it; use Network.h instead
+
+
+
+
+
 #pragma once
 
 #include "Network.h"

@@ -80,7 +80,10 @@ protected:
 
 
 	/** Creates a new link, with the specified callbacks. */
-	cTCPLink(cCallbacksPtr a_Callbacks);
+	cTCPLink(cCallbacksPtr a_Callbacks):
+		m_Callbacks(a_Callbacks)
+	{
+	}
 };
 
 
@@ -154,7 +157,7 @@ public:
 		virtual ~cResolveNameCallbacks() {}
 
 		/** Called when the hostname is successfully resolved into an IP address.
-		May be called multiple times if an address resolves to multiple addresses.
+		May be called multiple times if a name resolves to multiple addresses.
 		a_IP may be either an IPv4 or an IPv6 address with their proper formatting. */
 		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) = 0;
 
@@ -173,7 +176,8 @@ public:
 	Calls one the connection callbacks (success, error) when the connection is successfully established, or upon failure.
 	The a_LinkCallbacks is passed to the newly created cTCPLink.
 	Returns true if queueing was successful, false on failure to queue.
-	Note that the return value doesn't report the success of the actual connection; the connection is established asynchronously in the background. */
+	Note that the return value doesn't report the success of the actual connection; the connection is established asynchronously in the background.
+	Implemented in TCPLinkImpl.cpp. */
 	static bool Connect(
 		const AString & a_Host,
 		const UInt16 a_Port,
@@ -185,7 +189,8 @@ public:
 	/** Opens up the specified port for incoming connections.
 	Calls an OnAccepted callback for each incoming connection.
 	A cTCPLink with the specified link callbacks is created for each connection.
-	Returns a cServerHandle that can be used to query the operation status and close the server. */
+	Returns a cServerHandle that can be used to query the operation status and close the server.
+	Implemented in ServerHandleImpl.cpp. */
 	static cServerHandlePtr Listen(
 		const UInt16 a_Port,
 		cListenCallbacksPtr a_ListenCallbacks,
@@ -196,7 +201,8 @@ public:
 	/** Queues a DNS query to resolve the specified hostname to IP address.
 	Calls one of the callbacks when the resolving succeeds, or when it fails.
 	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background. */
+	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background.
+	Implemented in HostnameLookup.cpp. */
 	static bool HostnameToIP(
 		const AString & a_Hostname,
 		cResolveNameCallbacksPtr a_Callbacks
@@ -206,7 +212,8 @@ public:
 	/** Queues a DNS query to resolve the specified IP address to a hostname.
 	Calls one of the callbacks when the resolving succeeds, or when it fails.
 	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background. */
+	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background.
+	Implemented in IPLookup.cpp. */
 	static bool IPToHostName(
 		const AString & a_IP,
 		cResolveNameCallbacksPtr a_Callbacks
