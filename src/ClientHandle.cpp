@@ -1445,7 +1445,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 
 
 
-void cClientHandle::HandleAnimation(char a_Animation)
+void cClientHandle::HandleAnimation(int a_Animation)
 {
 	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
 	{
@@ -2832,7 +2832,7 @@ void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 
 
 
-void cClientHandle::PacketError(unsigned char a_PacketType)
+void cClientHandle::PacketError(UInt32 a_PacketType)
 {
 	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
 	SendDisconnect("Protocol error");

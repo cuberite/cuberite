@@ -174,10 +174,10 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 	
 	cPacketizer Pkt(*this, 0x24);  // Block Action packet
 	Pkt.WriteInt(a_BlockX);
-	Pkt.WriteShort(a_BlockY);
+	Pkt.WriteShort(static_cast<short>(a_BlockY));
 	Pkt.WriteInt(a_BlockZ);
-	Pkt.WriteByte(a_Byte1);
-	Pkt.WriteByte(a_Byte2);
+	Pkt.WriteByte(static_cast<Byte>(a_Byte1));
+	Pkt.WriteByte(static_cast<Byte>(a_Byte2));
 	Pkt.WriteVarInt(a_BlockType);
 }
 
@@ -190,7 +190,7 @@ void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x25);  // Block Break Animation packet
-	Pkt.WriteVarInt(a_EntityID);
+	Pkt.WriteVarInt(static_cast<UInt32>(a_EntityID));
 	Pkt.WriteInt(a_BlockX);
 	Pkt.WriteInt(a_BlockY);
 	Pkt.WriteInt(a_BlockZ);
@@ -204,10 +204,11 @@ void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY
 void cProtocol172::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_BlockY >= 0) && (a_BlockY < 256));
 	
 	cPacketizer Pkt(*this, 0x23);  // Block Change packet
 	Pkt.WriteInt(a_BlockX);
-	Pkt.WriteByte(a_BlockY);
+	Pkt.WriteByte(static_cast<Byte>(a_BlockY));
 	Pkt.WriteInt(a_BlockZ);
 	Pkt.WriteVarInt(a_BlockType);
 	Pkt.WriteByte(a_BlockMeta);
@@ -228,8 +229,8 @@ void cProtocol172::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	Pkt.WriteInt((int)a_Changes.size() * 4);
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
-		unsigned int Coords = itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12);
-		unsigned int Blocks = itr->m_BlockMeta | (itr->m_BlockType << 4);
+		int Coords = itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12);
+		int Blocks = static_cast<int>(itr->m_BlockMeta | (itr->m_BlockType << 4));
 		Pkt.WriteInt((Coords << 16) | Blocks);
 	}  // for itr - a_Changes[]
 }
@@ -352,11 +353,13 @@ void cProtocol172::SendEditSign(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cProtocol172::SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, short a_Duration)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_EffectID >= 0) && (a_EffectID < 256));
+	ASSERT((a_Amplifier >= 0) && (a_Amplifier < 256));
 	
 	cPacketizer Pkt(*this, 0x1D);  // Entity Effect packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_EffectID);
-	Pkt.WriteByte(a_Amplifier);
+	Pkt.WriteByte(static_cast<Byte>(a_EffectID));
+	Pkt.WriteByte(static_cast<Byte>(a_Amplifier));
 	Pkt.WriteShort(a_Duration);
 }
 
@@ -438,9 +441,9 @@ void cProtocol172::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 	
 	cPacketizer Pkt(*this, 0x15);  // Entity Relative Move packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_RelX);
-	Pkt.WriteByte(a_RelY);
-	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteChar(a_RelX);
+	Pkt.WriteChar(a_RelY);
+	Pkt.WriteChar(a_RelZ);
 }
 
 
@@ -453,9 +456,9 @@ void cProtocol172::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 	
 	cPacketizer Pkt(*this, 0x17);  // Entity Look And Relative Move packet
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_RelX);
-	Pkt.WriteByte(a_RelY);
-	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteChar(a_RelX);
+	Pkt.WriteChar(a_RelY);
+	Pkt.WriteChar(a_RelZ);
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 }
@@ -537,9 +540,9 @@ void cProtocol172::SendHealth(void)
 	
 	cPacketizer Pkt(*this, 0x06);  // Update Health packet
 	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteFloat((float)Player->GetHealth());
-	Pkt.WriteShort(Player->GetFoodLevel());
-	Pkt.WriteFloat((float)Player->GetFoodSaturationLevel());
+	Pkt.WriteFloat(static_cast<float>(Player->GetHealth()));
+	Pkt.WriteShort(static_cast<short>(Player->GetFoodLevel()));
+	Pkt.WriteFloat(static_cast<float>(Player->GetFoodSaturationLevel()));
 }
 
 
@@ -584,10 +587,10 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
 		Pkt.WriteInt(a_Player.GetUniqueID());
-		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
-		Pkt.WriteChar((char)a_World.GetDimension());
+		Pkt.WriteByte(static_cast<Byte>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteChar(static_cast<char>(a_World.GetDimension()));
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)
-		Pkt.WriteByte(std::min(Server->GetMaxPlayers(), 60));
+		Pkt.WriteByte(static_cast<Byte>(std::min(Server->GetMaxPlayers(), 60)));
 		Pkt.WriteString("default");  // Level type - wtf?
 	}
 	m_LastSentDimension = a_World.GetDimension();
@@ -595,9 +598,9 @@ void cProtocol172::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	// Send the spawn position:
 	{
 		cPacketizer Pkt(*this, 0x05);  // Spawn Position packet
-		Pkt.WriteInt((int)a_World.GetSpawnX());
-		Pkt.WriteInt((int)a_World.GetSpawnY());
-		Pkt.WriteInt((int)a_World.GetSpawnZ());
+		Pkt.WriteInt(static_cast<int>(a_World.GetSpawnX()));
+		Pkt.WriteInt(static_cast<int>(a_World.GetSpawnY()));
+		Pkt.WriteInt(static_cast<int>(a_World.GetSpawnZ()));
 	}
 	
 	// Send player abilities:
@@ -629,11 +632,11 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
-	Pkt.WriteVarInt(a_Painting.GetUniqueID());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Painting.GetUniqueID()));
 	Pkt.WriteString(a_Painting.GetName().c_str());
-	Pkt.WriteInt((int)a_Painting.GetPosX());
-	Pkt.WriteInt((int)a_Painting.GetPosY());
-	Pkt.WriteInt((int)a_Painting.GetPosZ());
+	Pkt.WriteInt(static_cast<int>(a_Painting.GetPosX()));
+	Pkt.WriteInt(static_cast<int>(a_Painting.GetPosY()));
+	Pkt.WriteInt(static_cast<int>(a_Painting.GetPosZ()));
 	Pkt.WriteInt(a_Painting.GetDirection());
 }
 
@@ -644,19 +647,19 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colors, unsigned int a_Length, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT(a_Length + 3 <= USHRT_MAX);
+	ASSERT((a_X >= 0) && (a_X < 256));
+	ASSERT((a_Y >= 0) && (a_Y < 256));
 	
 	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt(a_ID);
-	Pkt.WriteShort (3 + a_Length);
+	Pkt.WriteVarInt(static_cast<UInt32>(a_ID));
+	Pkt.WriteShort (static_cast<short>(3 + a_Length));
 
 	Pkt.WriteByte(0);
-	Pkt.WriteByte(a_X);
-	Pkt.WriteByte(a_Y);
+	Pkt.WriteByte(static_cast<Byte>(a_X));
+	Pkt.WriteByte(static_cast<Byte>(a_Y));
 	
-	for (unsigned int i = 0; i < a_Length; ++i)
-	{
-		Pkt.WriteByte(a_Colors[i]);
-	}
+	Pkt.WriteBuf(reinterpret_cast<const char *>(a_Colors), a_Length);
 }
 
 
@@ -666,18 +669,21 @@ void cProtocol172::SendMapColumn(int a_ID, int a_X, int a_Y, const Byte * a_Colo
 void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decorators, unsigned int m_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT(1 + 3 * a_Decorators.size() < USHRT_MAX);
 	
 	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt(a_ID);
-	Pkt.WriteShort ((short)(1 + (3 * a_Decorators.size())));
+	Pkt.WriteVarInt(static_cast<UInt32>(a_ID));
+	Pkt.WriteShort (static_cast<short>(1 + (3 * a_Decorators.size())));
 
 	Pkt.WriteByte(1);
 	
 	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
 	{
-		Pkt.WriteByte((it->GetType() << 4) | (it->GetRot() & 0xf));
-		Pkt.WriteByte(it->GetPixelX());
-		Pkt.WriteByte(it->GetPixelZ());
+		ASSERT((it->GetPixelX() >= 0) && (it->GetPixelX() < 256));
+		ASSERT((it->GetPixelZ() >= 0) && (it->GetPixelZ() < 256));
+		Pkt.WriteByte(static_cast<Byte>((it->GetType() << 4) | static_cast<Byte>(it->GetRot() & 0xf)));
+		Pkt.WriteByte(static_cast<Byte>(it->GetPixelX()));
+		Pkt.WriteByte(static_cast<Byte>(it->GetPixelZ()));
 	}
 }
 
@@ -688,13 +694,14 @@ void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_Scale >= 0) && (a_Scale < 256));
 	
 	cPacketizer Pkt(*this, 0x34);
-	Pkt.WriteVarInt(a_ID);
+	Pkt.WriteVarInt(static_cast<UInt32>(a_ID));
 	Pkt.WriteShort (2);
 
 	Pkt.WriteByte(2);
-	Pkt.WriteByte(a_Scale);
+	Pkt.WriteByte(static_cast<Byte>(a_Scale));
 }
 
 
@@ -707,7 +714,7 @@ void cProtocol172::SendPickupSpawn(const cPickup & a_Pickup)
 	
 	{
 		cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
-		Pkt.WriteVarInt(a_Pickup.GetUniqueID());
+		Pkt.WriteVarInt(static_cast<UInt32>(a_Pickup.GetUniqueID()));
 		Pkt.WriteByte(2);  // Type = Pickup
 		Pkt.WriteFPInt(a_Pickup.GetPosX());
 		Pkt.WriteFPInt(a_Pickup.GetPosY());
@@ -763,7 +770,7 @@ void cProtocol172::SendEntityAnimation(const cEntity & a_Entity, char a_Animatio
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x0b);  // Animation packet
-	Pkt.WriteVarInt(a_Entity.GetUniqueID());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Entity.GetUniqueID()));
 	Pkt.WriteChar(a_Animation);
 }
 
@@ -865,7 +872,7 @@ void cProtocol172::SendPlayerMaxSpeed(void)
 	{
 		Pkt.WriteShort(1);  // Modifier count
 		Pkt.WriteInt64(0x662a6b8dda3e4c1c);
-		Pkt.WriteInt64(0x881396ea6097278d);  // UUID of the modifier
+		Pkt.WriteInt64(static_cast<Int64>(0x881396ea6097278d));  // UUID of the modifier
 		Pkt.WriteDouble(Player->GetSprintingMaxSpeed() - Player->GetNormalMaxSpeed());
 		Pkt.WriteByte(2);
 	}
@@ -960,10 +967,11 @@ void cProtocol172::SendPluginMessage(const AString & a_Channel, const AString & 
 void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_EffectID >= 0) && (a_EffectID < 256));
 	
 	cPacketizer Pkt(*this, 0x1e);
 	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_EffectID);
+	Pkt.WriteByte(static_cast<Byte>(a_EffectID));
 }
 
 
@@ -1009,13 +1017,14 @@ void cProtocol172::SendExperience (void)
 void cProtocol172::SendExperienceOrb(const cExpOrb & a_ExpOrb)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_ExpOrb.GetReward() >= 0) && (a_ExpOrb.GetReward() < SHRT_MAX));
 	
 	cPacketizer Pkt(*this, 0x11);
-	Pkt.WriteVarInt(a_ExpOrb.GetUniqueID());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_ExpOrb.GetUniqueID()));
 	Pkt.WriteFPInt(a_ExpOrb.GetPosX());
 	Pkt.WriteFPInt(a_ExpOrb.GetPosY());
 	Pkt.WriteFPInt(a_ExpOrb.GetPosZ());
-	Pkt.WriteShort(a_ExpOrb.GetReward());
+	Pkt.WriteShort(static_cast<short>(a_ExpOrb.GetReward()));
 }
 
 
@@ -1060,7 +1069,7 @@ void cProtocol172::SendDisplayObjective(const AString & a_Objective, cScoreboard
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x3d);
-	Pkt.WriteByte((int) a_Display);
+	Pkt.WriteByte(static_cast<Byte>(a_Display));
 	Pkt.WriteString(a_Objective);
 }
 
@@ -1074,11 +1083,11 @@ void cProtocol172::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 
 	cPacketizer Pkt(*this, 0x29);  // Sound Effect packet
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteInt((int)(a_X * 8.0));
-	Pkt.WriteInt((int)(a_Y * 8.0));
-	Pkt.WriteInt((int)(a_Z * 8.0));
+	Pkt.WriteInt(static_cast<int>(a_X * 8.0));
+	Pkt.WriteInt(static_cast<int>(a_Y * 8.0));
+	Pkt.WriteInt(static_cast<int>(a_Z * 8.0));
 	Pkt.WriteFloat(a_Volume);
-	Pkt.WriteByte((Byte)(a_Pitch * 63));
+	Pkt.WriteByte(static_cast<Byte>(a_Pitch * 63));
 }
 
 
@@ -1088,11 +1097,12 @@ void cProtocol172::SendSoundEffect(const AString & a_SoundName, double a_X, doub
 void cProtocol172::SendSoundParticleEffect(int a_EffectID, int a_SrcX, int a_SrcY, int a_SrcZ, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((a_SrcY >= 0) && (a_SrcY < 256));
 	
 	cPacketizer Pkt(*this, 0x28);  // Effect packet
 	Pkt.WriteInt(a_EffectID);
 	Pkt.WriteInt(a_SrcX);
-	Pkt.WriteByte(a_SrcY);
+	Pkt.WriteByte(static_cast<Byte>(a_SrcY));
 	Pkt.WriteInt(a_SrcZ);
 	Pkt.WriteInt(a_Data);
 	Pkt.WriteBool(false);
@@ -1107,17 +1117,17 @@ void cProtocol172::SendSpawnFallingBlock(const cFallingBlock & a_FallingBlock)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x0e);  // Spawn Object packet
-	Pkt.WriteVarInt(a_FallingBlock.GetUniqueID());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_FallingBlock.GetUniqueID()));
 	Pkt.WriteByte(70);  // Falling block
 	Pkt.WriteFPInt(a_FallingBlock.GetPosX());
 	Pkt.WriteFPInt(a_FallingBlock.GetPosY());
 	Pkt.WriteFPInt(a_FallingBlock.GetPosZ());
 	Pkt.WriteByteAngle(a_FallingBlock.GetYaw());
 	Pkt.WriteByteAngle(a_FallingBlock.GetPitch());
-	Pkt.WriteInt(((int)a_FallingBlock.GetBlockType()) | (((int)a_FallingBlock.GetBlockMeta()) << 16));  // Or 0x10
-	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedX() * 400));
-	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedY() * 400));
-	Pkt.WriteShort((short)(a_FallingBlock.GetSpeedZ() * 400));
+	Pkt.WriteInt((static_cast<int>(a_FallingBlock.GetBlockType()) | ((static_cast<int>(a_FallingBlock.GetBlockMeta()) << 16))));
+	Pkt.WriteShort(static_cast<short>(a_FallingBlock.GetSpeedX() * 400));
+	Pkt.WriteShort(static_cast<short>(a_FallingBlock.GetSpeedY() * 400));
+	Pkt.WriteShort(static_cast<short>(a_FallingBlock.GetSpeedZ() * 400));
 }
 
 
@@ -1129,7 +1139,7 @@ void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x0f);  // Spawn Mob packet
-	Pkt.WriteVarInt(a_Mob.GetUniqueID());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Mob.GetUniqueID()));
 	Pkt.WriteByte((Byte)a_Mob.GetMobType());
 	Pkt.WriteFPInt(a_Mob.GetPosX());
 	Pkt.WriteFPInt(a_Mob.GetPosY());
@@ -1137,9 +1147,9 @@ void cProtocol172::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
-	Pkt.WriteShort((short)(a_Mob.GetSpeedX() * 400));
-	Pkt.WriteShort((short)(a_Mob.GetSpeedY() * 400));
-	Pkt.WriteShort((short)(a_Mob.GetSpeedZ() * 400));
+	Pkt.WriteShort(static_cast<short>(a_Mob.GetSpeedX() * 400));
+	Pkt.WriteShort(static_cast<short>(a_Mob.GetSpeedY() * 400));
+	Pkt.WriteShort(static_cast<short>(a_Mob.GetSpeedZ() * 400));
 	Pkt.WriteEntityMetadata(a_Mob);
 	Pkt.WriteByte(0x7f);  // Metadata terminator
 }
@@ -1153,8 +1163,8 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
-	Pkt.WriteVarInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_ObjectType);
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Entity.GetUniqueID()));
+	Pkt.WriteChar(a_ObjectType);
 	Pkt.WriteFPInt(a_Entity.GetPosX());
 	Pkt.WriteFPInt(a_Entity.GetPosY());
 	Pkt.WriteFPInt(a_Entity.GetPosZ());
@@ -1163,9 +1173,9 @@ void cProtocol172::SendSpawnObject(const cEntity & a_Entity, char a_ObjectType, 
 	Pkt.WriteInt(a_ObjectData);
 	if (a_ObjectData != 0)
 	{
-		Pkt.WriteShort((short)(a_Entity.GetSpeedX() * 400));
-		Pkt.WriteShort((short)(a_Entity.GetSpeedY() * 400));
-		Pkt.WriteShort((short)(a_Entity.GetSpeedZ() * 400));
+		Pkt.WriteShort(static_cast<short>(a_Entity.GetSpeedX() * 400));
+		Pkt.WriteShort(static_cast<short>(a_Entity.GetSpeedY() * 400));
+		Pkt.WriteShort(static_cast<short>(a_Entity.GetSpeedZ() * 400));
 	}
 }
 
@@ -1178,8 +1188,8 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0xe);  // Spawn Object packet
-	Pkt.WriteVarInt(a_Vehicle.GetUniqueID());
-	Pkt.WriteByte(a_VehicleType);
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Vehicle.GetUniqueID()));
+	Pkt.WriteChar(a_VehicleType);
 	Pkt.WriteFPInt(a_Vehicle.GetPosX());
 	Pkt.WriteFPInt(a_Vehicle.GetPosY());
 	Pkt.WriteFPInt(a_Vehicle.GetPosZ());
@@ -1188,9 +1198,9 @@ void cProtocol172::SendSpawnVehicle(const cEntity & a_Vehicle, char a_VehicleTyp
 	Pkt.WriteInt(a_VehicleSubType);
 	if (a_VehicleSubType != 0)
 	{
-		Pkt.WriteShort((short)(a_Vehicle.GetSpeedX() * 400));
-		Pkt.WriteShort((short)(a_Vehicle.GetSpeedY() * 400));
-		Pkt.WriteShort((short)(a_Vehicle.GetSpeedZ() * 400));
+		Pkt.WriteShort(static_cast<short>(a_Vehicle.GetSpeedX() * 400));
+		Pkt.WriteShort(static_cast<short>(a_Vehicle.GetSpeedY() * 400));
+		Pkt.WriteShort(static_cast<short>(a_Vehicle.GetSpeedZ() * 400));
 	}
 }
 
@@ -1211,7 +1221,7 @@ void cProtocol172::SendStatistics(const cStatManager & a_Manager)
 		const AString & StatName = cStatInfo::GetName((eStatistic) i);
 
 		Pkt.WriteString(StatName);
-		Pkt.WriteVarInt(Value);
+		Pkt.WriteVarInt(static_cast<UInt32>(Value));
 	}
 }
 
@@ -1224,7 +1234,7 @@ void cProtocol172::SendTabCompletionResults(const AStringVector & a_Results)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x3a);  // Tab-Complete packet
-	Pkt.WriteVarInt((int)a_Results.size());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Results.size()));
 
 	for (AStringVector::const_iterator itr = a_Results.begin(), end = a_Results.end(); itr != end; ++itr)
 	{
@@ -1309,7 +1319,7 @@ void cProtocol172::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	
 	cPacketizer Pkt(*this, 0x35);  // Update tile entity packet
 	Pkt.WriteInt(a_BlockEntity.GetPosX());
-	Pkt.WriteShort(a_BlockEntity.GetPosY());
+	Pkt.WriteShort(static_cast<short>(a_BlockEntity.GetPosY()));
 	Pkt.WriteInt(a_BlockEntity.GetPosZ());
 
 	Byte Action = 0;
@@ -1389,7 +1399,7 @@ void cProtocol172::SendWholeInventory(const cWindow & a_Window)
 	
 	cPacketizer Pkt(*this, 0x30);  // Window Items packet
 	Pkt.WriteChar(a_Window.GetWindowID());
-	Pkt.WriteShort(a_Window.GetNumSlots());
+	Pkt.WriteShort(static_cast<short>(a_Window.GetNumSlots()));
 	cItems Slots;
 	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
 	for (cItems::const_iterator itr = Slots.begin(), end = Slots.end(); itr != end; ++itr)
@@ -1426,9 +1436,9 @@ void cProtocol172::SendWindowOpen(const cWindow & a_Window)
 	
 	cPacketizer Pkt(*this, 0x2d);
 	Pkt.WriteChar(a_Window.GetWindowID());
-	Pkt.WriteChar(a_Window.GetWindowType());
+	Pkt.WriteChar(static_cast<char>(a_Window.GetWindowType()));
 	Pkt.WriteString(a_Window.GetWindowTitle());
-	Pkt.WriteChar(a_Window.GetNumNonInventorySlots());
+	Pkt.WriteChar(static_cast<char>(a_Window.GetNumNonInventorySlots()));
 	Pkt.WriteBool(true);
 	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
 	{
@@ -1505,7 +1515,7 @@ void cProtocol172::AddReceivedData(const char * a_Data, size_t a_Size)
 			break;
 		}
 		cByteBuffer bb(PacketLen + 1);
-		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, (int)PacketLen));
+		VERIFY(m_ReceivedData.ReadToByteBuffer(bb, static_cast<size_t>(PacketLen)));
 		m_ReceivedData.CommitRead();
 
 		UInt32 PacketType;
@@ -1748,8 +1758,14 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 {
 	short EncKeyLength, EncNonceLength;
 	a_ByteBuffer.ReadBEShort(EncKeyLength);
+	if ((EncKeyLength < 0) || (EncKeyLength > MAX_ENC_LEN))
+	{
+		LOGD("Invalid Encryption Key length: %d. Kicking client.", EncKeyLength);
+		m_Client->Kick("Invalid EncKeyLength");
+		return;
+	}
 	AString EncKey;
-	if (!a_ByteBuffer.ReadString(EncKey, EncKeyLength))
+	if (!a_ByteBuffer.ReadString(EncKey, static_cast<size_t>(EncKeyLength)))
 	{
 		return;
 	}
@@ -1757,15 +1773,15 @@ void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffe
 	{
 		return;
 	}
-	AString EncNonce;
-	if (!a_ByteBuffer.ReadString(EncNonce, EncNonceLength))
+	if ((EncNonceLength < 0) || (EncNonceLength > MAX_ENC_LEN))
 	{
+		LOGD("Invalid Encryption Nonce length: %d. Kicking client.", EncNonceLength);
+		m_Client->Kick("Invalid EncNonceLength");
 		return;
 	}
-	if ((EncKeyLength > MAX_ENC_LEN) || (EncNonceLength > MAX_ENC_LEN))
+	AString EncNonce;
+	if (!a_ByteBuffer.ReadString(EncNonce, static_cast<size_t>(EncNonceLength)))
 	{
-		LOGD("Too long encryption");
-		m_Client->Kick("Hacked client");
 		return;
 	}
 
@@ -1854,7 +1870,7 @@ void cProtocol172::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Status);
+	HANDLE_READ(a_ByteBuffer, ReadChar,  char, Status);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockX);
 	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, BlockY);
 	HANDLE_READ(a_ByteBuffer, ReadBEInt, int,  BlockZ);
@@ -2072,7 +2088,7 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	if (Length + 1 != (int)a_ByteBuffer.GetReadableSpace())
 	{
 		LOGD("Invalid plugin message packet, payload length doesn't match packet length (exp %d, got %d)",
-			(int)a_ByteBuffer.GetReadableSpace() - 1, Length
+			static_cast<int>(a_ByteBuffer.GetReadableSpace()) - 1, Length
 		);
 		return;
 	}
@@ -2086,7 +2102,7 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	
 	// Read the plugin message and relay to clienthandle:
 	AString Data;
-	if (!a_ByteBuffer.ReadString(Data, Length))
+	if (!a_ByteBuffer.ReadString(Data, static_cast<size_t>(Length)))
 	{
 		return;
 	}
@@ -2274,7 +2290,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 			LOGD("Protocol 1.7: Skipping garbage data at the end of a vanilla MC|AdvCdm packet, %u bytes",
 				static_cast<unsigned>(a_PayloadLength - BytesRead)
 			);
-			a_ByteBuffer.SkipRead(a_PayloadLength - BytesRead);
+			a_ByteBuffer.SkipRead(static_cast<size_t>(a_PayloadLength) - BytesRead);
 		}
 		return;
 	}
@@ -2282,7 +2298,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	{
 		// Read the client's brand:
 		AString Brand;
-		if (a_ByteBuffer.ReadString(Brand, a_PayloadLength))
+		if (a_ByteBuffer.ReadString(Brand, static_cast<size_t>(a_PayloadLength)))
 		{
 			m_Client->SetClientBrand(Brand);
 		}
@@ -2301,7 +2317,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	else if (a_Channel == "MC|ItemName")
 	{
 		AString ItemName;
-		if (a_ByteBuffer.ReadString(ItemName, a_PayloadLength))
+		if (a_ByteBuffer.ReadString(ItemName, static_cast<size_t>(a_PayloadLength)))
 		{
 			m_Client->HandleAnvilItemName(ItemName);
 		}
@@ -2317,7 +2333,7 @@ void cProtocol172::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	
 	// Read the payload and send it through to the clienthandle:
 	AString Message;
-	VERIFY(a_ByteBuffer.ReadString(Message, a_PayloadLength));
+	VERIFY(a_ByteBuffer.ReadString(Message, static_cast<size_t>(a_PayloadLength)));
 	m_Client->HandlePluginMessage(a_Channel, Message);
 }
 
@@ -2377,7 +2393,7 @@ bool cProtocol172::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item)
 	
 	// Read the metadata
 	AString Metadata;
-	if (!a_ByteBuffer.ReadString(Metadata, MetadataLength))
+	if (!a_ByteBuffer.ReadString(Metadata, static_cast<size_t>(MetadataLength)))
 	{
 		return false;
 	}
@@ -2546,7 +2562,7 @@ void cProtocol172::cPacketizer::WriteItem(const cItem & a_Item)
 	}
 	
 	WriteShort(ItemType);
-	WriteByte (a_Item.m_ItemCount);
+	WriteChar (a_Item.m_ItemCount);
 	WriteShort(a_Item.m_ItemDamage);
 	
 	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR))
@@ -2706,7 +2722,7 @@ void cProtocol172::cPacketizer::WriteBlockEntity(const cBlockEntity & a_BlockEnt
 
 void cProtocol172::cPacketizer::WriteByteAngle(double a_Angle)
 {
-	WriteByte((char)(255 * a_Angle / 360));
+	WriteChar(static_cast<char>(255 * a_Angle / 360));
 }
 
 
@@ -2849,7 +2865,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case mtCreeper:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : -1);
+			WriteByte(((const cCreeper &)a_Mob).IsBlowing() ? 1 : 0);
 			WriteByte(0x11);
 			WriteByte(((const cCreeper &)a_Mob).IsCharged() ? 1 : 0);
 			break;
@@ -2918,15 +2934,14 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(0x13);
 			WriteByte(Wolf.IsBegging() ? 1 : 0);
 			WriteByte(0x14);
-			WriteByte(Wolf.GetCollarColor());
+			WriteByte(static_cast<Byte>(Wolf.GetCollarColor()));
 			break;
 		}
 		
 		case mtSheep:
 		{
 			WriteByte(0x10);
-			Byte SheepMetadata = 0;
-			SheepMetadata = ((const cSheep &)a_Mob).GetFurColor();
+			Byte SheepMetadata = static_cast<Byte>(((const cSheep &)a_Mob).GetFurColor() & 0x0f);
 			if (((const cSheep &)a_Mob).IsSheared())
 			{
 				SheepMetadata |= 0x10;
@@ -2963,7 +2978,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case mtWither:
 		{
 			WriteByte(0x54);  // Int at index 20
-			WriteInt(((const cWither &)a_Mob).GetWitherInvulnerableTicks());
+			WriteInt(static_cast<int>(((const cWither &)a_Mob).GetWitherInvulnerableTicks()));
 			WriteByte(0x66);  // Float at index 6
 			WriteFloat((float)(a_Mob.GetHealth()));
 			break;
@@ -2972,14 +2987,14 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 		case mtSlime:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cSlime &)a_Mob).GetSize());
+			WriteByte(static_cast<Byte>(((const cSlime &)a_Mob).GetSize()));
 			break;
 		}
 		
 		case mtMagmaCube:
 		{
 			WriteByte(0x10);
-			WriteByte(((const cMagmaCube &)a_Mob).GetSize());
+			WriteByte(static_cast<Byte>(((const cMagmaCube &)a_Mob).GetSize()));
 			break;
 		}
 		
@@ -3018,7 +3033,7 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			WriteByte(0x50);  // Int at index 16
 			WriteInt(Flags);
 			WriteByte(0x13);  // Byte at index 19
-			WriteByte(Horse.GetHorseType());
+			WriteByte(static_cast<Byte>(Horse.GetHorseType()));
 			WriteByte(0x54);  // Int at index 20
 			int Appearance = 0;
 			Appearance = Horse.GetHorseColor();
@@ -3026,6 +3041,12 @@ void cProtocol172::cPacketizer::WriteMobMetadata(const cMonster & a_Mob)
 			WriteInt(Appearance);
 			WriteByte(0x56);  // Int at index 22
 			WriteInt(Horse.GetHorseArmour());
+			break;
+		}
+
+		default:
+		{
+			// No data to send for this mob
 			break;
 		}
 	}  // switch (a_Mob.GetType())
@@ -3080,7 +3101,7 @@ void cProtocol176::SendPlayerSpawn(const cPlayer & a_Player)
 {
 	// Called to spawn another player for the client
 	cPacketizer Pkt(*this, 0x0c);  // Spawn Player packet
-	Pkt.WriteVarInt(a_Player.GetUniqueID());
+	Pkt.WriteVarInt(static_cast<UInt32>(a_Player.GetUniqueID()));
 	Pkt.WriteString(cMojangAPI::MakeUUIDDashed(a_Player.GetClientHandle()->GetUUID()));
 	if (a_Player.HasCustomName())
 	{

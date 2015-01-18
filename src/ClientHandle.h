@@ -251,10 +251,10 @@ public:
 	// Calls that cProtocol descendants use to report state:
 	void PacketBufferFull(void);
 	void PacketUnknown(UInt32 a_PacketType);
-	void PacketError(unsigned char a_PacketType);
+	void PacketError(UInt32 a_PacketType);
 
 	// Calls that cProtocol descendants use for handling packets:
-	void HandleAnimation(char a_Animation);
+	void HandleAnimation(int a_Animation);
 	
 	/** Called when the protocol receives a MC|ItemName plugin message, indicating that the player named
 	an item in the anvil UI. */
