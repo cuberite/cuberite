@@ -601,7 +601,7 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 
 
 
-void cChunk::Tick(float a_Dt)
+void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
 	BroadcastPendingBlockChanges();
 

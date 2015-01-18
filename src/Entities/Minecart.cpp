@@ -111,7 +111,7 @@ void cMinecart::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
+void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (IsDestroyed())  // Mainly to stop detector rails triggering again after minecart is dead
 	{
@@ -177,7 +177,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
 		}
 
-		AddPosition(GetSpeed() * (a_Dt / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
+		AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
 	}
 	else
 	{
@@ -205,7 +205,7 @@ void cMinecart::HandlePhysics(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	/*
 	NOTE: Please bear in mind that taking away from negatives make them even more negative,
@@ -565,7 +565,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 
 
 
-void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	m_World->SetBlockMeta(m_DetectorRailPosition, a_RailMeta | 0x08);
 
@@ -576,7 +576,7 @@ void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
 
 
 
-void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, float a_Dt)
+void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
 }
@@ -1213,7 +1213,7 @@ void cMinecartWithFurnace::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cMinecartWithFurnace::Tick(float a_Dt, cChunk & a_Chunk)
+void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 

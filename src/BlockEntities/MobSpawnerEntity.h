@@ -29,7 +29,7 @@ public:
 
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual void UsedBy(cPlayer * a_Player) override;
-	virtual bool Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	// tolua_begin
 

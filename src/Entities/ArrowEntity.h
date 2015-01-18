@@ -85,10 +85,10 @@ protected:
 	bool m_IsCritical;
 	
 	/** Timer for pickup collection animation or five minute timeout */
-	float m_Timer;
+	std::chrono::milliseconds m_Timer;
 	
 	/** Timer for client arrow position confirmation via TeleportEntity */
-	float m_HitGroundTimer;
+	std::chrono::milliseconds m_HitGroundTimer;
 	
 	// Whether the arrow has already been teleported into the proper position in the ground.
 	bool m_HasTeleported;
@@ -103,6 +103,6 @@ protected:
 	virtual void OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_HitPos) override;
 	virtual void CollectedBy(cPlayer & a_Player) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	
 };  // tolua_export

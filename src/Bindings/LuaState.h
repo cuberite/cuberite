@@ -217,6 +217,7 @@ public:
 	void Push(Vector3d * a_Vector);
 	void Push(Vector3i * a_Vector);
 	void Push(void * a_Ptr);
+	void Push(std::chrono::milliseconds a_time);
 	
 	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, bool & a_Value);

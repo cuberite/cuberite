@@ -42,7 +42,7 @@ void cSimulatorManager::Simulate(float a_Dt)
 
 
 
-void cSimulatorManager::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+void cSimulatorManager::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	// m_Ticks has already been increased in Simulate()
 	for (cSimulators::iterator itr = m_Simulators.begin(); itr != m_Simulators.end(); ++itr)

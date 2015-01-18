@@ -1430,7 +1430,7 @@ bool cPluginLua::OnWorldStarted(cWorld & a_World)
 
 
 
-bool cPluginLua::OnWorldTick(cWorld & a_World, float a_Dt, int a_LastTickDurationMSec)
+bool cPluginLua::OnWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
 	cCSLock Lock(m_CriticalSection);
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_WORLD_TICK];

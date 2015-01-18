@@ -46,7 +46,7 @@ void cSlime::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSlime::Attack(float a_Dt)
+void cSlime::Attack(std::chrono::milliseconds a_Dt)
 {
 	if (m_Size > 1)
 	{

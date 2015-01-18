@@ -252,15 +252,15 @@ bool cMonster::ReachedFinalDestination()
 
 
 
-void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
+void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
 	if (m_Health <= 0)
 	{
 		// The mob is dead, but we're still animating the "puff" they leave when they die
-		m_DestroyTimer += a_Dt / 1000;
-		if (m_DestroyTimer > 1)
+		m_DestroyTimer += a_Dt;
+		if (m_DestroyTimer > std::chrono::seconds(1))
 		{
 			Destroy(true);
 		}
@@ -274,8 +274,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
-
-	a_Dt /= 1000;
 
 	if (m_bMovingToDestination)
 	{
@@ -557,7 +555,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
-	m_DestroyTimer = 0;
+	m_DestroyTimer = std::chrono::milliseconds(0);
 }
 
 
@@ -640,7 +638,7 @@ void cMonster::EventLosePlayer(void)
 
 
 
-void cMonster::InStateIdle(float a_Dt)
+void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
 {
 	if (m_bMovingToDestination)
 	{
@@ -649,11 +647,11 @@ void cMonster::InStateIdle(float a_Dt)
 
 	m_IdleInterval += a_Dt;
 
-	if (m_IdleInterval > 1)
+	if (m_IdleInterval > std::chrono::seconds(1))
 	{
 		// At this interval the results are predictable
 		int rem = m_World->GetTickRandomNumber(6) + 1;
-		m_IdleInterval -= 1;  // So nothing gets dropped when the server hangs for a few seconds
+		m_IdleInterval -= std::chrono::seconds(1);  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
 		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
@@ -680,7 +678,7 @@ void cMonster::InStateIdle(float a_Dt)
 
 // What to do if in Chasing State
 // This state should always be defined in each child class
-void cMonster::InStateChasing(float a_Dt)
+void cMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 }
@@ -690,7 +688,7 @@ void cMonster::InStateChasing(float a_Dt)
 
 
 // What to do if in Escaping State
-void cMonster::InStateEscaping(float a_Dt)
+void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 	

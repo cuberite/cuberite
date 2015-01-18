@@ -44,7 +44,7 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, const Vector3d & a_Hit
 
 
 
-void cThrownEggEntity::Tick(float a_Dt, cChunk & a_Chunk)
+void cThrownEggEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_DestroyTimer > 0)
 	{

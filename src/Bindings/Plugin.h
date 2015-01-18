@@ -104,7 +104,7 @@ public:
 	virtual bool OnWeatherChanged           (cWorld & a_World) = 0;
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) = 0;
 	virtual bool OnWorldStarted             (cWorld & a_World) = 0;
-	virtual bool OnWorldTick                (cWorld & a_World, float a_Dt, int a_LastTickDurationMSec) = 0;
+	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) = 0;
 	
 	/** Handles the command split into a_Split, issued by player a_Player.
 	Command permissions have already been checked.

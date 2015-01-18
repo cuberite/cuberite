@@ -16,7 +16,7 @@ cCaveSpider::cCaveSpider(void) :
 
 
 
-void cCaveSpider::Tick(float a_Dt, cChunk & a_Chunk)
+void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
@@ -27,7 +27,7 @@ void cCaveSpider::Tick(float a_Dt, cChunk & a_Chunk)
 
 
 
-void cCaveSpider::Attack(float a_Dt)
+void cCaveSpider::Attack(std::chrono::milliseconds a_Dt)
 {
 	super::Attack(a_Dt);
 	
