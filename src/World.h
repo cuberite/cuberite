@@ -803,7 +803,7 @@ public:
 	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
-	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
+	int GetTickRandomNumber(int a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
 	
 	/** Appends all usernames starting with a_Text (case-insensitive) into Results */
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
