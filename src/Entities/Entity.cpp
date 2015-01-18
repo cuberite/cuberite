@@ -927,11 +927,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (!m_bOnGround)
 	{
-		float fallspeed;
+		double fallspeed;
 		if (IsBlockWater(BlockIn))
 		{
 			fallspeed = m_Gravity * DtSec.count() / 3;  // Fall 3x slower in water
-			ApplyFriction(NextSpeed, 0.7, DtSec.count());
+			ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
 		}
 		else if (BlockIn == E_BLOCK_COBWEB)
 		{
@@ -943,11 +943,11 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// Normal gravity
 			fallspeed = m_Gravity * DtSec.count();
 		}
-		NextSpeed.y += fallspeed;
+		NextSpeed.y += static_cast<float>(fallspeed);
 	}
 	else
 	{
-		ApplyFriction(NextSpeed, 0.7, DtSec.count());
+		ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
 	}
 
 	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we

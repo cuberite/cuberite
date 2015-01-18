@@ -28,7 +28,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 	if ((PosY < 0) || (PosY >= cChunkDef::Height))
 	{
 		AddSpeedY(1);
-		AddPosition(GetSpeed() * (a_Dt.count() / 1000));
+		AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));
 		return;
 	}
 	
@@ -53,7 +53,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 	}
 	
 	AddSpeedY(1);
-	AddPosition(GetSpeed() * (a_Dt.count() / 1000));
+	AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));
 }
 
 

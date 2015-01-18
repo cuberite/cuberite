@@ -177,7 +177,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
 		}
 
-		AddPosition(GetSpeed() * (a_Dt.count() / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
+		AddPosition(GetSpeed() * (static_cast<double>(a_Dt.count()) / 1000));  // Commit changes; as we use our own engine when on rails, this needs to be done, whereas it is normally in Entity.cpp
 	}
 	else
 	{

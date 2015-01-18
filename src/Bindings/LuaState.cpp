@@ -843,7 +843,7 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 {
 	ASSERT(IsValid());
 
-	tolua_pushnumber(m_LuaState, a_Value.count());
+	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Value.count()));
 	m_NumCurrentFunctionArgs += 1;
 }
 
