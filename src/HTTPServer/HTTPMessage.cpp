@@ -55,7 +55,7 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 	}
 	else if (Key == "content-length")
 	{
-		m_ContentLength = atoi(m_Headers[Key].c_str());
+		m_ContentLength = static_cast<size_t>(atol(m_Headers[Key].c_str()));
 	}
 }
 
