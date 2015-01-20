@@ -34,7 +34,7 @@ public:
 		virtual void OnRemoteClosed(cTCPLink & a_Link) = 0;
 
 		/** Called when an error is detected on the connection. */
-		virtual void OnError(cTCPLink & a_Link, int a_ErrorCode) = 0;
+		virtual void OnError(cTCPLink & a_Link, int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
 	typedef SharedPtr<cCallbacks> cCallbacksPtr;
 
@@ -127,7 +127,7 @@ public:
 		virtual void OnSuccess(cTCPLink & a_Link) = 0;
 
 		/** Called when the Connect call fails. */
-		virtual void OnError(int a_ErrorCode) = 0;
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
 	typedef SharedPtr<cConnectCallbacks> cConnectCallbacksPtr;
 
@@ -163,7 +163,7 @@ public:
 
 		/** Called when an error is encountered while resolving.
 		If an error is reported, the OnFinished() callback is not called. */
-		virtual void OnError(int a_ErrorCode) = 0;
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 
 		/** Called when all the addresses resolved have been reported via the OnNameResolved() callback.
 		Only called if there was no error reported. */

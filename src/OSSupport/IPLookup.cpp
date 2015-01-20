@@ -78,7 +78,7 @@ void cIPLookup::Callback(int a_Result, char a_Type, int a_Count, int a_Ttl, void
 	if ((a_Result != 0) || (a_Addresses == nullptr))
 	{
 		// An error has occurred, notify the error callback:
-		Self->m_Callbacks->OnError(a_Result);
+		Self->m_Callbacks->OnError(a_Result, evutil_socket_error_to_string(a_Result));
 	}
 	else
 	{

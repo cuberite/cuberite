@@ -173,7 +173,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			Printf(m_ErrorMsg, "Cannot bind IPv6 socket to port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
+			Printf(m_ErrorMsg, "Cannot bind IPv6 socket to port %d: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
 			evutil_closesocket(MainSock);
 			return false;
 		}
@@ -181,14 +181,14 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(MainSock) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		Printf(m_ErrorMsg, "Cannot make socket on port %d non-blocking: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
+		Printf(m_ErrorMsg, "Cannot make socket on port %d non-blocking: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
 		evutil_closesocket(MainSock);
 		return false;
 	}
 	if (listen(MainSock, 0) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		Printf(m_ErrorMsg, "Cannot listen on port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
+		Printf(m_ErrorMsg, "Cannot listen on port %d: %d (%s)", a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
 		evutil_closesocket(MainSock);
 		return false;
 	}
@@ -215,6 +215,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("evutil_make_socket_nonblocking() failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
 		evutil_closesocket(SecondSock);
+		return true;  // Report as success, the primary socket is working
 	}
 
 	// Bind to all IPv4 interfaces:
@@ -227,7 +228,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Cannot bind secondary socket to port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 		evutil_closesocket(SecondSock);
-		return true;
+		return true;  // Report as success, the primary socket is working
 	}
 
 	if (listen(SecondSock, 0) != 0)
@@ -235,7 +236,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("Cannot listen on on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 		evutil_closesocket(SecondSock);
-		return false;
+		return true;  // Report as success, the primary socket is working
 	}
 
 	m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);

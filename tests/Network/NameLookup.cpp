@@ -22,9 +22,9 @@ class cFinishLookupCallbacks:
 		LOGD("%s resolves to IP %s", a_Name.c_str(), a_IP.c_str());
 	}
 
-	virtual void OnError(int a_ErrorCode) override
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		LOGD("Error %d while performing lookup!", a_ErrorCode);
+		LOGD("Error %d (%s) while performing lookup!", a_ErrorCode, a_ErrorMsg.c_str());
 		exit(a_ErrorCode);
 	}
 

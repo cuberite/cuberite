@@ -177,13 +177,19 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 	if (a_What & BEV_EVENT_ERROR)
 	{
 		// Choose the proper callback to call based on whether we were waiting for connection or not:
+		int err = EVUTIL_SOCKET_ERROR();
 		if (Self->m_ConnectCallbacks != nullptr)
 		{
-			Self->m_ConnectCallbacks->OnError(EVUTIL_SOCKET_ERROR());
+			if (err == 0)
+			{
+				// This could be a DNS failure
+				err = bufferevent_socket_get_dns_error(a_BufferEvent);
+			}
+			Self->m_ConnectCallbacks->OnError(err, evutil_socket_error_to_string(err));
 		}
 		else
 		{
-			Self->m_Callbacks->OnError(*Self, EVUTIL_SOCKET_ERROR());
+			Self->m_Callbacks->OnError(*Self, err, evutil_socket_error_to_string(err));
 			if (Self->m_Server == nullptr)
 			{
 				cNetworkSingleton::Get().RemoveLink(Self);

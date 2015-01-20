@@ -60,9 +60,9 @@ class cEchoLinkCallbacks:
 		LOGD("%p (%s:%d): Remote has closed the connection.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort());
 	}
 
-	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode) override
+	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), a_ErrorCode);
+		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks: %s", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), a_ErrorCode, a_ErrorMsg.c_str());
 	}
 };
 

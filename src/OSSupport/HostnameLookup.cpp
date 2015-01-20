@@ -53,7 +53,7 @@ void cHostnameLookup::Callback(int a_ErrCode, evutil_addrinfo * a_Addr, void * a
 	// If an error has occurred, notify the error callback:
 	if (a_ErrCode != 0)
 	{
-		Self->m_Callbacks->OnError(a_ErrCode);
+		Self->m_Callbacks->OnError(a_ErrCode, evutil_socket_error_to_string(a_ErrCode));
 		cNetworkSingleton::Get().RemoveHostnameLookup(Self);
 		return;
 	}
@@ -91,7 +91,7 @@ void cHostnameLookup::Callback(int a_ErrCode, evutil_addrinfo * a_Addr, void * a
 	// If only unsupported families were reported, call the Error handler:
 	if (!HasResolved)
 	{
-		Self->m_Callbacks->OnError(DNS_ERR_NODATA);
+		Self->m_Callbacks->OnError(DNS_ERR_NODATA, "The name does not resolve to any known address.");
 	}
 	else
 	{

@@ -27,9 +27,9 @@ class cHTTPConnectCallbacks:
 		LOGD("HTTP GET queued.");
 	}
 
-	virtual void OnError(int a_ErrorCode) override
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		LOGD("Error while connecting HTTP: %d", a_ErrorCode);
+		LOGD("Error while connecting HTTP: %d (%s)", a_ErrorCode, a_ErrorMsg.c_str());
 		m_Event.Set();
 	}
 
@@ -64,9 +64,9 @@ class cDumpCallbacks:
 		m_Event.Set();
 	}
 
-	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode) override
+	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		LOGD("Error in the cDumpCallbacks.");
+		LOGD("Error %d (%s) in the cDumpCallbacks.", a_ErrorCode, a_ErrorMsg.c_str());
 		m_Event.Set();
 	}
 
