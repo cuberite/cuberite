@@ -141,8 +141,14 @@ typedef unsigned char Byte;
 
 
 
+// fwd declarations, to avoid clang warnings:
+AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32);
 
-AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
+
+
+
+
+AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor)
 {
 	return Printf("<%d, %d, %d> ~ {%.02f, %.02f, %.02f}",
 		a_X, a_Y, a_Z,
@@ -298,7 +304,7 @@ void cConnection::Log(const char * a_Format, ...)
 
 
 
-void cConnection::DataLog(const void * a_Data, int a_Size, const char * a_Format, ...)
+void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, ...)
 {
 	va_list args;
 	va_start(args, a_Format);
@@ -359,14 +365,14 @@ bool cConnection::ConnectToServer(void)
 bool cConnection::RelayFromServer(void)
 {
 	char Buffer[64 KiB];
-	int res = recv(m_ServerSocket, Buffer, sizeof(Buffer), 0);
+	int res = static_cast<int>(recv(m_ServerSocket, Buffer, sizeof(Buffer), 0));  // recv returns int on windows, ssize_t on linux
 	if (res <= 0)
 	{
 		Log("Server closed the socket: %d; %d; aborting connection", res, SocketError);
 		return false;
 	}
 	
-	DataLog(Buffer, res, "Received %d bytes from the SERVER", res);
+	DataLog(Buffer, static_cast<size_t>(res), "Received %d bytes from the SERVER", res);
 	
 	switch (m_ServerState)
 	{
@@ -377,15 +383,15 @@ bool cConnection::RelayFromServer(void)
 		}
 		case csEncryptedUnderstood:
 		{
-			m_ServerDecryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
+			m_ServerDecryptor.ProcessData(reinterpret_cast<Byte *>(Buffer), reinterpret_cast<Byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, res, "Decrypted %d bytes from the SERVER", res);
 			return DecodeServersPackets(Buffer, res);
 		}
 		case csEncryptedUnknown:
 		{
-			m_ServerDecryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
+			m_ServerDecryptor.ProcessData(reinterpret_cast<Byte *>(Buffer), reinterpret_cast<Byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, res, "Decrypted %d bytes from the SERVER", res);
-			return CLIENTSEND(Buffer, res);
+			return CLIENTSEND(Buffer, static_cast<size_t>(res));
 		}
 	}
 	ASSERT(!"Unhandled server state while relaying from server");
@@ -399,7 +405,7 @@ bool cConnection::RelayFromServer(void)
 bool cConnection::RelayFromClient(void)
 {
 	char Buffer[64 KiB];
-	int res = recv(m_ClientSocket, Buffer, sizeof(Buffer), 0);
+	int res = static_cast<int>(recv(m_ClientSocket, Buffer, sizeof(Buffer), 0));  // recv returns int on Windows, ssize_t on Linux
 	if (res <= 0)
 	{
 		Log("Client closed the socket: %d; %d; aborting connection", res, SocketError);
@@ -422,8 +428,8 @@ bool cConnection::RelayFromClient(void)
 		case csEncryptedUnknown:
 		{
 			DataLog(Buffer, res, "Decrypted %d bytes from the CLIENT", res);
-			m_ServerEncryptor.ProcessData((Byte *)Buffer, (Byte *)Buffer, res);
-			return SERVERSEND(Buffer, res);
+			m_ServerEncryptor.ProcessData(reinterpret_cast<Byte *>(Buffer), reinterpret_cast<Byte *>(Buffer), static_cast<size_t>(res));
+			return SERVERSEND(Buffer, static_cast<size_t>(res));
 		}
 	}
 	ASSERT(!"Unhandled server state while relaying from client");
@@ -446,9 +452,9 @@ double cConnection::GetRelativeTime(void)
 
 bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer)
 {
-	DataLog(a_Data, a_Size, "Sending data to %s, %u bytes", a_Peer, (unsigned)a_Size);
+	DataLog(a_Data, a_Size, "Sending data to %s, %u bytes", a_Peer, static_cast<unsigned>(a_Size));
 	
-	int res = send(a_Socket, a_Data, (int)a_Size, 0);
+	int res = send(a_Socket, a_Data, a_Size, 0);  // Windows uses int for a_Size, Linux uses size_t; but Windows doesn't complain
 	if (res <= 0)
 	{
 		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
@@ -511,7 +517,7 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Enc
 
 bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 {
-	if (!m_ClientBuffer.Write(a_Data, a_Size))
+	if (!m_ClientBuffer.Write(a_Data, static_cast<size_t>(a_Size)))
 	{
 		Log("Too much queued data for the server, aborting connection");
 		return false;
@@ -529,10 +535,12 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 			break;
 		}
 		UInt32 PacketType, PacketReadSoFar;
-		PacketReadSoFar = m_ClientBuffer.GetReadableSpace();
+		PacketReadSoFar = static_cast<UInt32>(m_ClientBuffer.GetReadableSpace());
 		VERIFY(m_ClientBuffer.ReadVarInt(PacketType));
 		PacketReadSoFar -= m_ClientBuffer.GetReadableSpace();
-		Log("Decoding client's packets, there are now %d bytes in the queue; next packet is 0x%0x, %u bytes long", m_ClientBuffer.GetReadableSpace(), PacketType, PacketLen);
+		Log("Decoding client's packets, there are now %u bytes in the queue; next packet is 0x%02x, %u bytes long",
+			static_cast<unsigned>(m_ClientBuffer.GetReadableSpace()), PacketType, PacketLen
+		);
 		switch (m_ClientProtocolState)
 		{
 			case -1:
