@@ -23,7 +23,7 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 	ASSERT(format != nullptr);
 	
 	char buffer[2048];
-	size_t len;
+	int len;
 	#ifdef va_copy
 	va_list argsCopy;
 	va_copy(argsCopy, args);
@@ -34,14 +34,14 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 	// MS CRT provides secure printf that doesn't behave like in the C99 standard
 	if ((len = _vsnprintf_s(buffer, ARRAYCOUNT(buffer), _TRUNCATE, format, argsCopy)) != -1)
 	#else  // _MSC_VER
-	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, argsCopy)) < ARRAYCOUNT(buffer))
+	if ((len = vsnprintf(buffer, ARRAYCOUNT(buffer), format, argsCopy)) < static_cast<int>(ARRAYCOUNT(buffer)))
 	#endif  // else _MSC_VER
 	{
 		// The result did fit into the static buffer
 		#ifdef va_copy
 		va_end(argsCopy);
 		#endif
-		str.append(buffer, len);
+		str.append(buffer, static_cast<size_t>(len));
 		return str;
 	}
 	#ifdef va_copy
@@ -51,7 +51,6 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 	// The result did not fit into the static buffer, use a dynamic buffer:
 	#ifdef _MSC_VER
 	// for MS CRT, we need to calculate the result length
-	// MS doesn't have va_copy() and does nod need it at all
 	len = _vscprintf(format, args);
 	if (len == -1)
 	{
@@ -63,11 +62,11 @@ AString & AppendVPrintf(AString & str, const char * format, va_list args)
 	#ifdef va_copy
 	va_copy(argsCopy, args);
 	#endif
-	std::vector<char> Buffer(len + 1);
+	std::vector<char> Buffer(static_cast<size_t>(len) + 1);
 	#ifdef _MSC_VER
-	vsprintf_s((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
+	vsprintf_s(&(Buffer.front()), Buffer.size(), format, argsCopy);
 	#else  // _MSC_VER
-	vsnprintf((char *)&(Buffer.front()), Buffer.size(), format, argsCopy);
+	vsnprintf(&(Buffer.front()), Buffer.size(), format, argsCopy);
 	#endif  // else _MSC_VER
 	str.append(&(Buffer.front()), Buffer.size() - 1);
 	#ifdef va_copy
@@ -85,7 +84,7 @@ AString & Printf(AString & str, const char * format, ...)
 	str.clear();
 	va_list args;
 	va_start(args, format);
-	std::string &retval = AppendVPrintf(str, format, args);
+	std::string & retval = AppendVPrintf(str, format, args);
 	va_end(args);
 	return retval;
 }
@@ -108,11 +107,11 @@ AString Printf(const char * format, ...)
 
 
 
-AString & AppendPrintf(AString &str, const char * format, ...)
+AString & AppendPrintf(AString & dst, const char * format, ...)
 {
 	va_list args;
 	va_start(args, format);
-	std::string &retval = AppendVPrintf(str, format, args);
+	std::string & retval = AppendVPrintf(dst, format, args);
 	va_end(args);
 	return retval;
 }
@@ -297,7 +296,6 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
-// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
 AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
@@ -314,22 +312,22 @@ AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UT
 			a_UTF8.push_back((char)(192 + c / 64));
 			a_UTF8.push_back((char)(128 + c % 64));
 		}
-		else if (c - 0xd800u < 0x800)
+		else if (c - 0xd800 < 0x800)
 		{
 			// Error, silently drop
 		}
 		else if (c < 0x10000)
 		{
-			a_UTF8.push_back((char)(224 + c / 4096));
-			a_UTF8.push_back((char)(128 + c / 64 % 64));
-			a_UTF8.push_back((char)(128 + c % 64));
+			a_UTF8.push_back(static_cast<char>(224 + c / 4096));
+			a_UTF8.push_back(static_cast<char>(128 + (c / 64) % 64));
+			a_UTF8.push_back(static_cast<char>(128 + c % 64));
 		}
 		else if (c < 0x110000)
 		{
-			a_UTF8.push_back((char)(240 + c / 262144));
-			a_UTF8.push_back((char)(128 + c / 4096 % 64));
-			a_UTF8.push_back((char)(128 + c / 64 % 64));
-			a_UTF8.push_back((char)(128 + c % 64));
+			a_UTF8.push_back(static_cast<char>(240 + c / 262144));
+			a_UTF8.push_back(static_cast<char>(128 + (c / 4096) % 64));
+			a_UTF8.push_back(static_cast<char>(128 + (c / 64) % 64));
+			a_UTF8.push_back(static_cast<char>(128 + c % 64));
 		}
 		else
 		{
@@ -382,7 +380,7 @@ Notice from the original file:
 
 
 
-static const char trailingBytesForUTF8[256] =
+static const Byte trailingBytesForUTF8[256] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -572,18 +570,18 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		int Count = sprintf(line, "%08x:", (unsigned)i);
 		#endif
 		// Remove the terminating nullptr / leftover garbage in line, after the sprintf-ed value
-		memset(line + Count, 32, sizeof(line) - Count);
+		memset(line + Count, 32, sizeof(line) - static_cast<size_t>(Count));
 		p = line + 10;
 		q = p + 2 + a_BytesPerLine * 3 + 1;
 		for (size_t j = 0; j < k; j++)
 		{
-			unsigned char c = ((unsigned char *)a_Data)[i + j];
+			Byte c = (reinterpret_cast<const Byte *>(a_Data))[i + j];
 			p[0] = HEX(c >> 4);
 			p[1] = HEX(c & 0xf);
 			p[2] = ' ';
 			if (c >= ' ')
 			{
-				q[0] = (char)c;
+				q[0] = static_cast<char>(c);
 			}
 			else
 			{
@@ -708,7 +706,7 @@ AString URLDecode(const AString & a_String)
 			res.push_back(ch);
 			continue;
 		}
-		res.push_back((hi << 4) | lo);
+		res.push_back(static_cast<char>((hi << 4) | lo));
 		i += 2;
 	}  // for i - a_String[]
 	return res;
@@ -767,7 +765,8 @@ AString Base64Decode(const AString & a_Base64String)
 {
 	AString res;
 	size_t i, len = a_Base64String.size();
-	int o, c;
+	size_t o;
+	int c;
 	res.resize((len * 4) / 3 + 5, 0);  // Approximate the upper bound on the result length
 	for (o = 0, i = 0; i < len; i++)
 	{
@@ -850,7 +849,7 @@ AString Base64Encode(const AString & a_Input)
 short GetBEShort(const char * a_Mem)
 {
 	const Byte * Bytes = (const Byte *)a_Mem;
-	return (Bytes[0] << 8) | Bytes[1];
+	return static_cast<short>((Bytes[0] << 8) | Bytes[1]);
 }
 
 
@@ -870,9 +869,9 @@ int GetBEInt(const char * a_Mem)
 void SetBEInt(char * a_Mem, Int32 a_Value)
 {
 	a_Mem[0] = a_Value >> 24;
-	a_Mem[1] = (a_Value >> 16) & 0xff;
-	a_Mem[2] = (a_Value >> 8) & 0xff;
-	a_Mem[3] = a_Value & 0xff;
+	a_Mem[1] = static_cast<char>((a_Value >> 16) & 0xff);
+	a_Mem[2] = static_cast<char>((a_Value >> 8) & 0xff);
+	a_Mem[3] = static_cast<char>(a_Value & 0xff);
 }
 
 
