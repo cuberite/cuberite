@@ -348,8 +348,24 @@ bool cByteBuffer::ReadBEShort(short & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(2);
+	Int16 val;
+	ReadBuf(&val, 2);
+	val = ntohs(val);
+	a_Value = *(reinterpret_cast<short *>(&val));
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadBEUInt16(UInt16 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	NEEDBYTES(2);
 	ReadBuf(&a_Value, 2);
-	a_Value = (short)ntohs((u_short)a_Value);
+	a_Value = ntohs(a_Value);
 	return true;
 }
 
@@ -364,6 +380,20 @@ bool cByteBuffer::ReadBEInt(int & a_Value)
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
 	a_Value = (int)ntohl((u_long)a_Value);
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadBEUInt32(UInt32 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	NEEDBYTES(4);
+	ReadBuf(&a_Value, 4);
+	a_Value = ntohl(a_Value);
 	return true;
 }
 
