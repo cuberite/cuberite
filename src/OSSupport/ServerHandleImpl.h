@@ -46,8 +46,7 @@ public:
 	Always returns a server instance; in the event of a failure, the instance holds the error details. Use IsListening() to query success. */
 	static cServerHandleImplPtr Listen(
 		UInt16 a_Port,
-		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-		cTCPLink::cCallbacksPtr a_LinkCallbacks
+		cNetwork::cListenCallbacksPtr a_ListenCallbacks
 	);
 
 	// cServerHandle overrides:
@@ -57,9 +56,6 @@ public:
 protected:
 	/** The callbacks used to notify about incoming connections. */
 	cNetwork::cListenCallbacksPtr m_ListenCallbacks;
-
-	/** The callbacks used to create new cTCPLink instances for incoming connections. */
-	cTCPLink::cCallbacksPtr m_LinkCallbacks;
 
 	/** The LibEvent handle representing the main listening socket. */
 	evconnlistener * m_ConnListener;
@@ -86,10 +82,7 @@ protected:
 
 	/** Creates a new instance with the specified callbacks.
 	Initializes the internals, but doesn't start listening yet. */
-	cServerHandleImpl(
-		cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-		cTCPLink::cCallbacksPtr a_LinkCallbacks
-	);
+	cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks);
 
 	/** Starts listening on the specified port.
 	Returns true if successful, false on failure. On failure, sets m_ErrorCode and m_ErrorMsg. */

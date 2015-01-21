@@ -31,12 +31,8 @@ static bool IsValidSocket(evutil_socket_t a_Socket)
 ////////////////////////////////////////////////////////////////////////////////
 // cServerHandleImpl:
 
-cServerHandleImpl::cServerHandleImpl(
-	cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-	cTCPLink::cCallbacksPtr a_LinkCallbacks
-):
+cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks):
 	m_ListenCallbacks(a_ListenCallbacks),
-	m_LinkCallbacks(a_LinkCallbacks),
 	m_ConnListener(nullptr),
 	m_SecondaryConnListener(nullptr),
 	m_IsListening(false),
@@ -92,11 +88,10 @@ void cServerHandleImpl::Close(void)
 
 cServerHandleImplPtr cServerHandleImpl::Listen(
 	UInt16 a_Port,
-	cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-	cTCPLink::cCallbacksPtr a_LinkCallbacks
+	cNetwork::cListenCallbacksPtr a_ListenCallbacks
 )
 {
-	cServerHandleImplPtr res = cServerHandleImplPtr{new cServerHandleImpl(a_ListenCallbacks, a_LinkCallbacks)};
+	cServerHandleImplPtr res = cServerHandleImplPtr{new cServerHandleImpl(a_ListenCallbacks)};
 	if (res->Listen(a_Port))
 	{
 		cNetworkSingleton::Get().AddServer(res);
@@ -253,8 +248,37 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	cServerHandleImpl * Self = reinterpret_cast<cServerHandleImpl *>(a_Self);
 	ASSERT(Self != nullptr);
 
+	// Get the textual IP address and port number out of a_Addr:
+	char IPAddress[128];
+	evutil_inet_ntop(a_Addr->sa_family, a_Addr->sa_data, IPAddress, ARRAYCOUNT(IPAddress));
+	UInt16 Port = 0;
+	switch (a_Addr->sa_family)
+	{
+		case AF_INET:
+		{
+			sockaddr_in * sin = reinterpret_cast<sockaddr_in *>(a_Addr);
+			Port = ntohs(sin->sin_port);
+			break;
+		}
+		case AF_INET6:
+		{
+			sockaddr_in6 * sin6 = reinterpret_cast<sockaddr_in6 *>(a_Addr);
+			Port = ntohs(sin6->sin6_port);
+			break;
+		}
+	}
+
+	// Call the OnIncomingConnection callback to get the link callbacks to use:
+	cTCPLink::cCallbacksPtr LinkCallbacks = Self->m_ListenCallbacks->OnIncomingConnection(IPAddress, Port);
+	if (LinkCallbacks == nullptr)
+	{
+		// Drop the connection:
+		evutil_closesocket(a_Socket);
+		return;
+	}
+
 	// Create a new cTCPLink for the incoming connection:
-	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, Self->m_LinkCallbacks, Self, a_Addr, static_cast<socklen_t>(a_Len));
+	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, LinkCallbacks, Self, a_Addr, static_cast<socklen_t>(a_Len));
 	{
 		cCSLock Lock(Self->m_CS);
 		Self->m_Connections.push_back(Link);
@@ -289,12 +313,11 @@ void cServerHandleImpl::RemoveLink(const cTCPLinkImpl * a_Link)
 // cNetwork API:
 
 cServerHandlePtr cNetwork::Listen(
-	const UInt16 a_Port,
-	cNetwork::cListenCallbacksPtr a_ListenCallbacks,
-	cTCPLink::cCallbacksPtr a_LinkCallbacks
+	UInt16 a_Port,
+	cNetwork::cListenCallbacksPtr a_ListenCallbacks
 )
 {
-	return cServerHandleImpl::Listen(a_Port, a_ListenCallbacks, a_LinkCallbacks);
+	return cServerHandleImpl::Listen(a_Port, a_ListenCallbacks);
 }
 
 

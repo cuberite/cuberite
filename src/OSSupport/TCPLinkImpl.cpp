@@ -304,7 +304,7 @@ void cTCPLinkImpl::UpdateRemoteAddress(void)
 
 bool cNetwork::Connect(
 	const AString & a_Host,
-	const UInt16 a_Port,
+	UInt16 a_Port,
 	cNetwork::cConnectCallbacksPtr a_ConnectCallbacks,
 	cTCPLink::cCallbacksPtr a_LinkCallbacks
 )

@@ -139,8 +139,15 @@ public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cListenCallbacks() {}
 
-		/** Called when the TCP server created with Listen() accepts an incoming connection.
-		Provides the newly created Link that can be used for communication. */
+		/** Called when the TCP server created with Listen() receives a new incoming connection.
+		Returns the link callbacks that the server should use for the newly created link.
+		If a nullptr is returned, the connection is dropped immediately;
+		otherwise a new cTCPLink instance is created and OnAccepted() is called. */
+		virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) = 0;
+
+		/** Called when the TCP server created with Listen() creates a new link for an incoming connection.
+		Provides the newly created Link that can be used for communication.
+		Called right after a successful OnIncomingConnection(). */
 		virtual void OnAccepted(cTCPLink & a_Link) = 0;
 
 		/** Called when the socket fails to listen on the specified port. */
@@ -180,7 +187,7 @@ public:
 	Implemented in TCPLinkImpl.cpp. */
 	static bool Connect(
 		const AString & a_Host,
-		const UInt16 a_Port,
+		UInt16 a_Port,
 		cConnectCallbacksPtr a_ConnectCallbacks,
 		cTCPLink::cCallbacksPtr a_LinkCallbacks
 	);
@@ -192,9 +199,8 @@ public:
 	Returns a cServerHandle that can be used to query the operation status and close the server.
 	Implemented in ServerHandleImpl.cpp. */
 	static cServerHandlePtr Listen(
-		const UInt16 a_Port,
-		cListenCallbacksPtr a_ListenCallbacks,
-		cTCPLink::cCallbacksPtr a_LinkCallbacks
+		UInt16 a_Port,
+		cListenCallbacksPtr a_ListenCallbacks
 	);
 
 
