@@ -16,6 +16,10 @@
 // fwd:
 class cTCPLink;
 typedef SharedPtr<cTCPLink> cTCPLinkPtr;
+typedef std::vector<cTCPLinkPtr> cTCPLinkPtrs;
+class cServerHandle;
+typedef SharedPtr<cServerHandle> cServerHandlePtr;
+typedef std::vector<cServerHandlePtr> cServerHandlePtrs;
 
 
 
@@ -118,7 +122,6 @@ public:
 	/** Returns true if the server has been started correctly and is currently listening for incoming connections. */
 	virtual bool IsListening(void) const = 0;
 };
-typedef SharedPtr<cServerHandle> cServerHandlePtr;
 
 
 
@@ -136,7 +139,7 @@ public:
 
 		/** Called when the Connect call succeeds.
 		Provides the newly created link that can be used for communication. */
-		virtual void OnSuccess(cTCPLink & a_Link) = 0;
+		virtual void OnConnected(cTCPLink & a_Link) = 0;
 
 		/** Called when the Connect call fails. */
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;

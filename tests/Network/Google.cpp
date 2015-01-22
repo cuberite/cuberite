@@ -17,7 +17,7 @@ class cHTTPConnectCallbacks:
 	public cNetwork::cConnectCallbacks
 {
 	cEvent & m_Event;
-	virtual void OnSuccess(cTCPLink & a_Link) override
+	virtual void OnConnected(cTCPLink & a_Link) override
 	{
 		LOGD("Connected, sending HTTP GET");
 		if (!a_Link.Send("GET / HTTP/1.0\r\nHost:google.com\r\n\r\n"))

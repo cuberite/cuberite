@@ -213,7 +213,7 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 	{
 		if (Self->m_ConnectCallbacks != nullptr)
 		{
-			Self->m_ConnectCallbacks->OnSuccess(*Self);
+			Self->m_ConnectCallbacks->OnConnected(*Self);
 			// Reset the connect callbacks so that later errors get reported through the link callbacks:
 			Self->m_ConnectCallbacks.reset();
 			return;
