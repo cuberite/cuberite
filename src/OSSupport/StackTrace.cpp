@@ -34,7 +34,7 @@ void PrintStackTrace(void)
 		// Use the backtrace() function to get and output the stackTrace:
 		// Code adapted from http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
 		void * stackTrace[30];
-		size_t numItems = backtrace(stackTrace, ARRAYCOUNT(stackTrace));
+		int numItems = backtrace(stackTrace, ARRAYCOUNT(stackTrace));
 		backtrace_symbols_fd(stackTrace, numItems, STDERR_FILENO);
 	#endif
 }

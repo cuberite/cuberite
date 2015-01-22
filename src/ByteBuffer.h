@@ -55,7 +55,9 @@ public:
 	bool ReadChar           (char & a_Value);
 	bool ReadByte           (unsigned char & a_Value);
 	bool ReadBEShort        (short & a_Value);
+	bool ReadBEUInt16       (UInt16 & a_Value);
 	bool ReadBEInt          (int & a_Value);
+	bool ReadBEUInt32       (UInt32 & a_Value);
 	bool ReadBEInt64        (Int64 & a_Value);
 	bool ReadBEFloat        (float & a_Value);
 	bool ReadBEDouble       (double & a_Value);
