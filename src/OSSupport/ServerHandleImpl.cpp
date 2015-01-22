@@ -283,6 +283,8 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 		cCSLock Lock(Self->m_CS);
 		Self->m_Connections.push_back(Link);
 	}  // Lock(m_CS)
+	LinkCallbacks->OnLinkCreated(Link);
+	Link->Enable();
 
 	// Call the OnAccepted callback:
 	Self->m_ListenCallbacks->OnAccepted(*Link);

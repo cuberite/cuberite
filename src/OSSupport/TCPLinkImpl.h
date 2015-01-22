@@ -37,7 +37,8 @@ class cTCPLinkImpl:
 public:
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen().
-	a_Address and a_AddrLen describe the remote peer that has connected. */
+	a_Address and a_AddrLen describe the remote peer that has connected.
+	The link is created disabled, you need to call Enable() to start the regular communication. */
 	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, socklen_t a_AddrLen);
 
 	/** Destroys the LibEvent handle representing the link. */
@@ -47,6 +48,11 @@ public:
 	a_ConnectCallbacks must be valid.
 	Returns a link that has the connection request queued, or NULL for failure. */
 	static cTCPLinkImplPtr Connect(const AString & a_Host, UInt16 a_Port, cTCPLink::cCallbacksPtr a_LinkCallbacks, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks);
+
+	/** Enables communication over the link.
+	Links are created with communication disabled, so that creation callbacks can be called first.
+	This function then enables the regular communication to be reported. */
+	void Enable(void);
 
 	// cTCPLink overrides:
 	virtual bool Send(const void * a_Data, size_t a_Length) override;
@@ -85,7 +91,8 @@ protected:
 
 	/** Creates a new link to be queued to connect to a specified host:port.
 	Used for outgoing connections created using cNetwork::Connect().
-	To be used only by the Connect() factory function. */
+	To be used only by the Connect() factory function.
+	The link is created disabled, you need to call Enable() to start the regular communication. */
 	cTCPLinkImpl(const cCallbacksPtr a_LinkCallbacks);
 
 	/** Callback that LibEvent calls when there's data available from the remote peer. */

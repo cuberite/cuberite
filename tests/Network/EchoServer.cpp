@@ -16,11 +16,21 @@
 class cEchoLinkCallbacks:
 	public cTCPLink::cCallbacks
 {
-	virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Size) override
+	// cTCPLink::cCallbacks overrides:
+	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override
 	{
+		ASSERT(m_Link == nullptr);
+		m_Link = a_Link;
+	}
+
+
+	virtual void OnReceivedData(const char * a_Data, size_t a_Size) override
+	{
+		ASSERT(m_Link != nullptr);
+
 		// Echo the incoming data back to outgoing data:
-		LOGD("%p (%s:%d): Data received (%u bytes), echoing back.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), static_cast<unsigned>(a_Size));
-		a_Link.Send(a_Data, a_Size);
+		LOGD("%p (%s:%d): Data received (%u bytes), echoing back.", m_Link.get(), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort(), static_cast<unsigned>(a_Size));
+		m_Link->Send(a_Data, a_Size);
 		LOGD("Echo queued");
 
 		// Search for a Ctrl+Z, if found, drop the connection:
@@ -28,21 +38,33 @@ class cEchoLinkCallbacks:
 		{
 			if (a_Data[i] == '\x1a')
 			{
-				a_Link.Close();
+				m_Link->Close();
+				m_Link.reset();
 				return;
 			}
 		}
 	}
 
-	virtual void OnRemoteClosed(cTCPLink & a_Link) override
+
+	virtual void OnRemoteClosed(void) override
 	{
-		LOGD("%p (%s:%d): Remote has closed the connection.", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort());
+		ASSERT(m_Link != nullptr);
+
+		LOGD("%p (%s:%d): Remote has closed the connection.", m_Link.get(), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort());
+		m_Link.reset();
 	}
 
-	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode, const AString & a_ErrorMsg) override
+
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks: %s", &a_Link, a_Link.GetRemoteIP().c_str(), a_Link.GetRemotePort(), a_ErrorCode, a_ErrorMsg.c_str());
+		ASSERT(m_Link != nullptr);
+
+		LOGD("%p (%s:%d): Error %d in the cEchoLinkCallbacks: %s", m_Link.get(), m_Link->GetRemoteIP().c_str(), m_Link->GetRemotePort(), a_ErrorCode, a_ErrorMsg.c_str());
+		m_Link.reset();
 	}
+
+	/** The link attached to this callbacks instance. */
+	cTCPLinkPtr m_Link;
 };
 
 

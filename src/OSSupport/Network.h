@@ -13,6 +13,14 @@
 
 
 
+// fwd:
+class cTCPLink;
+typedef SharedPtr<cTCPLink> cTCPLinkPtr;
+
+
+
+
+
 /** Interface that provides the methods available on a single TCP connection. */
 class cTCPLink
 {
@@ -25,16 +33,20 @@ public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cCallbacks() {}
 
+		/** Called when the cTCPLink for the connection is created.
+		The callback may store the cTCPLink instance for later use, but it should remove it in OnError(), OnRemoteClosed() or right after Close(). */
+		virtual void OnLinkCreated(cTCPLinkPtr a_Link) = 0;
+
 		/** Called when there's data incoming from the remote peer. */
-		virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Length) = 0;
+		virtual void OnReceivedData(const char * a_Data, size_t a_Length) = 0;
 
 		/** Called when the remote end closes the connection.
 		The link is still available for connection information query (IP / port).
 		Sending data on the link is not an error, but the data won't be delivered. */
-		virtual void OnRemoteClosed(cTCPLink & a_Link) = 0;
+		virtual void OnRemoteClosed(void) = 0;
 
 		/** Called when an error is detected on the connection. */
-		virtual void OnError(cTCPLink & a_Link, int a_ErrorCode, const AString & a_ErrorMsg) = 0;
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 	};
 	typedef SharedPtr<cCallbacks> cCallbacksPtr;
 

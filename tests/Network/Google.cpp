@@ -49,24 +49,39 @@ class cDumpCallbacks:
 	public cTCPLink::cCallbacks
 {
 	cEvent & m_Event;
+	cTCPLinkPtr m_Link;
 
-	virtual void OnReceivedData(cTCPLink & a_Link, const char * a_Data, size_t a_Size) override
+	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override
 	{
+		ASSERT(m_Link == nullptr);
+		m_Link = a_Link;
+	}
+
+	virtual void OnReceivedData(const char * a_Data, size_t a_Size) override
+	{
+		ASSERT(m_Link != nullptr);
+
 		// Log the incoming data size:
 		AString Hex;
 		CreateHexDump(Hex, a_Data, a_Size, 16);
 		LOGD("Incoming data: %u bytes:\n%s", static_cast<unsigned>(a_Size), Hex.c_str());
 	}
 
-	virtual void OnRemoteClosed(cTCPLink & a_Link) override
+	virtual void OnRemoteClosed(void) override
 	{
+		ASSERT(m_Link != nullptr);
+
 		LOGD("Remote has closed the connection.");
+		m_Link.reset();
 		m_Event.Set();
 	}
 
-	virtual void OnError(cTCPLink & a_Link, int a_ErrorCode, const AString & a_ErrorMsg) override
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
+		ASSERT(m_Link != nullptr);
+
 		LOGD("Error %d (%s) in the cDumpCallbacks.", a_ErrorCode, a_ErrorMsg.c_str());
+		m_Link.reset();
 		m_Event.Set();
 	}
 
