@@ -38,13 +38,41 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (m_ListenSocket < 0)
+	{
+		#ifdef _WIN32
+			int err = WSAGetLastError();
+		#else
+			int err = errno;
+		#endif
+		printf("Failed to create listener socket: %d\n", err);
+		return err;
+	}
 	sockaddr_in local;
 	memset(&local, 0, sizeof(local));
 	local.sin_family = AF_INET;
-	local.sin_addr.s_addr = 0;  // All interfaces
+	local.sin_addr.s_addr = 130;  // INADDR_ANY;  // All interfaces
 	local.sin_port = htons(a_ListenPort);
-	bind(m_ListenSocket, (sockaddr *)&local, sizeof(local));
-	listen(m_ListenSocket, 1);
+	if (!bind(m_ListenSocket, (sockaddr *)&local, sizeof(local)))
+	{
+		#ifdef _WIN32
+			int err = WSAGetLastError();
+		#else
+			int err = errno;
+		#endif
+		printf("Failed to bind listener socket: %d\n", err);
+		return err;
+	}
+	if (listen(m_ListenSocket, 1) != 0)
+	{
+		#ifdef _WIN32
+			int err = WSAGetLastError();
+		#else
+			int err = errno;
+		#endif
+		printf("Failed to listen on socket: %d\n", err);
+		return err;
+	}
 	
 	printf("Listening on port %d, connecting to localhost:%d\n", a_ListenPort, a_ConnectPort);
 	
