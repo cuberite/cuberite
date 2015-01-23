@@ -12,7 +12,8 @@ class cBlockFireHandler :
 {
 public:
 	cBlockFireHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+		: cBlockHandler(a_BlockType),
+		XZP(0), XZM(0), Dir(0)
 	{
 	}
 
