@@ -88,6 +88,8 @@ cNetworkSingleton::~cNetworkSingleton()
 	// Free the underlying LibEvent objects:
 	evdns_base_free(m_DNSBase, true);
 	event_base_free(m_EventBase);
+
+	libevent_global_shutdown();
 }
 
 

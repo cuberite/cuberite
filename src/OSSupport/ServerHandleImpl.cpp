@@ -80,6 +80,9 @@ void cServerHandleImpl::Close(void)
 	{
 		conn->Shutdown();
 	}
+
+	// Remove the ptr to self, so that the object may be freed:
+	m_SelfPtr.reset();
 }
 
 
@@ -92,6 +95,7 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 )
 {
 	cServerHandleImplPtr res = cServerHandleImplPtr{new cServerHandleImpl(a_ListenCallbacks)};
+	res->m_SelfPtr = res;
 	if (res->Listen(a_Port))
 	{
 		cNetworkSingleton::Get().AddServer(res);
@@ -99,6 +103,7 @@ cServerHandleImplPtr cServerHandleImpl::Listen(
 	else
 	{
 		a_ListenCallbacks->OnError(res->m_ErrorCode, res->m_ErrorMsg);
+		res->m_SelfPtr.reset();
 	}
 	return res;
 }
@@ -247,6 +252,7 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	// Cast to true self:
 	cServerHandleImpl * Self = reinterpret_cast<cServerHandleImpl *>(a_Self);
 	ASSERT(Self != nullptr);
+	ASSERT(Self->m_SelfPtr != nullptr);
 
 	// Get the textual IP address and port number out of a_Addr:
 	char IPAddress[128];
@@ -278,13 +284,13 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	}
 
 	// Create a new cTCPLink for the incoming connection:
-	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, LinkCallbacks, Self, a_Addr, static_cast<socklen_t>(a_Len));
+	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, LinkCallbacks, Self->m_SelfPtr, a_Addr, static_cast<socklen_t>(a_Len));
 	{
 		cCSLock Lock(Self->m_CS);
 		Self->m_Connections.push_back(Link);
 	}  // Lock(m_CS)
 	LinkCallbacks->OnLinkCreated(Link);
-	Link->Enable();
+	Link->Enable(Link);
 
 	// Call the OnAccepted callback:
 	Self->m_ListenCallbacks->OnAccepted(*Link);

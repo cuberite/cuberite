@@ -21,6 +21,7 @@
 
 // fwd:
 class cServerHandleImpl;
+typedef SharedPtr<cServerHandleImpl> cServerHandleImplPtr;
 class cTCPLinkImpl;
 typedef SharedPtr<cTCPLinkImpl> cTCPLinkImplPtr;
 typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
@@ -39,7 +40,7 @@ public:
 	Used for connections accepted in a server using cNetwork::Listen().
 	a_Address and a_AddrLen describe the remote peer that has connected.
 	The link is created disabled, you need to call Enable() to start the regular communication. */
-	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, socklen_t a_AddrLen);
+	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen);
 
 	/** Destroys the LibEvent handle representing the link. */
 	~cTCPLinkImpl();
@@ -51,8 +52,9 @@ public:
 
 	/** Enables communication over the link.
 	Links are created with communication disabled, so that creation callbacks can be called first.
-	This function then enables the regular communication to be reported. */
-	void Enable(void);
+	This function then enables the regular communication to be reported.
+	The a_Self parameter is used so that the socket can keep itself alive as long as the callbacks are coming. */
+	void Enable(cTCPLinkImplPtr a_Self);
 
 	// cTCPLink overrides:
 	virtual bool Send(const void * a_Data, size_t a_Length) override;
@@ -73,8 +75,8 @@ protected:
 	bufferevent * m_BufferEvent;
 
 	/** The server handle that has created this link.
-	Only valid for incoming connections, NULL for outgoing connections. */
-	cServerHandleImpl * m_Server;
+	Only valid for incoming connections, nullptr for outgoing connections. */
+	cServerHandleImplPtr m_Server;
 
 	/** The IP address of the local endpoint. Valid only after the socket has been connected. */
 	AString m_LocalIP;
@@ -87,6 +89,10 @@ protected:
 
 	/** The port of the remote endpoint. Valid only after the socket has been connected. */
 	UInt16 m_RemotePort;
+
+	/** SharedPtr to self, used to keep this object alive as long as the callbacks are coming.
+	Initialized in Enable(), cleared in Close() and EventCallback(RemoteClosed). */
+	cTCPLinkImplPtr m_Self;
 
 
 	/** Creates a new link to be queued to connect to a specified host:port.

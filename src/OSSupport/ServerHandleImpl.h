@@ -78,6 +78,9 @@ protected:
 	/** Contains the error message for the failure to listen. Only valid for non-listening instances. */
 	AString m_ErrorMsg;
 
+	/** The SharedPtr to self, so that it can be passed to created links. */
+	cServerHandleImplPtr m_SelfPtr;
+
 
 
 	/** Creates a new instance with the specified callbacks.

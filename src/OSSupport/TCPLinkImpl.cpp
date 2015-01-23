@@ -17,8 +17,7 @@
 
 cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE)),
-	m_Server(nullptr)
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE))
 {
 }
 
@@ -26,7 +25,7 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 
 
-cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImpl * a_Server, const sockaddr * a_Address, socklen_t a_AddrLen):
+cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen):
 	super(a_LinkCallbacks),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE)),
 	m_Server(a_Server)
@@ -59,7 +58,7 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 	res->m_ConnectCallbacks = a_ConnectCallbacks;
 	cNetworkSingleton::Get().AddLink(res);
 	res->m_Callbacks->OnLinkCreated(res);
-	res->Enable();
+	res->Enable(res);
 
 	// If a_Host is an IP address, schedule a connection immediately:
 	sockaddr_storage sa;
@@ -102,8 +101,11 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 
 
 
-void cTCPLinkImpl::Enable(void)
+void cTCPLinkImpl::Enable(cTCPLinkImplPtr a_Self)
 {
+	// Take hold of a shared copy of self, to keep as long as the callbacks are coming:
+	m_Self = a_Self;
+
 	// Set the LibEvent callbacks and enable processing:
 	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
@@ -148,6 +150,7 @@ void cTCPLinkImpl::Close(void)
 	{
 		m_Server->RemoveLink(this);
 	}
+	m_Self.reset();
 }
 
 
@@ -177,7 +180,7 @@ void cTCPLinkImpl::ReadCallback(bufferevent * a_BufferEvent, void * a_Self)
 void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void * a_Self)
 {
 	ASSERT(a_Self != nullptr);
-	cTCPLinkImpl * Self = static_cast<cTCPLinkImpl *>(a_Self);
+	cTCPLinkImplPtr Self = static_cast<cTCPLinkImpl *>(a_Self)->m_Self;
 
 	// If an error is reported, call the error callback:
 	if (a_What & BEV_EVENT_ERROR)
@@ -198,13 +201,14 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 			Self->m_Callbacks->OnError(err, evutil_socket_error_to_string(err));
 			if (Self->m_Server == nullptr)
 			{
-				cNetworkSingleton::Get().RemoveLink(Self);
+				cNetworkSingleton::Get().RemoveLink(Self.get());
 			}
 			else
 			{
-				Self->m_Server->RemoveLink(Self);
+				Self->m_Server->RemoveLink(Self.get());
 			}
 		}
+		Self->m_Self.reset();
 		return;
 	}
 
@@ -228,12 +232,13 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 		Self->m_Callbacks->OnRemoteClosed();
 		if (Self->m_Server != nullptr)
 		{
-			Self->m_Server->RemoveLink(Self);
+			Self->m_Server->RemoveLink(Self.get());
 		}
 		else
 		{
-			cNetworkSingleton::Get().RemoveLink(Self);
+			cNetworkSingleton::Get().RemoveLink(Self.get());
 		}
+		Self->m_Self.reset();
 		return;
 	}
 	
