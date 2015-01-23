@@ -271,6 +271,11 @@ cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AStrin
 #endif
 	m_Dimension(a_Dimension),
 	m_IsSpawnExplicitlySet(false),
+	m_SpawnX(0),
+	m_SpawnY(0),
+	m_SpawnZ(0),
+	m_BroadcastDeathMessages(true),
+	m_BroadcastAchievementMessages(true),
 	m_IsDaylightCycleEnabled(true),
 	m_WorldAge(0),
 	m_TimeOfDay(0),
