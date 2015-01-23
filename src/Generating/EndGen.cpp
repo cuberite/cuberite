@@ -40,6 +40,10 @@ cEndGen::cEndGen(int a_Seed) :
 	m_FrequencyX(80),
 	m_FrequencyY(80),
 	m_FrequencyZ(80),
+	m_MinChunkX(0),
+	m_MaxChunkX(0),
+	m_MinChunkZ(0),
+	m_MaxChunkZ(0),
 	m_LastChunkX(0x7fffffff),  // Use dummy coords that won't ever be used by real chunks
 	m_LastChunkZ(0x7fffffff)
 {
