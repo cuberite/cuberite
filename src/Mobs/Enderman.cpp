@@ -186,7 +186,7 @@ bool cEnderman::CheckLight()
 
 
 
-void cEnderman::Tick(float a_Dt, cChunk & a_Chunk)
+void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 

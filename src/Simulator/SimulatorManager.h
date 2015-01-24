@@ -33,7 +33,7 @@ public:
 
 	void Simulate(float a_Dt);
 	
-	void SimulateChunk(float a_DT, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk);
+	void SimulateChunk(std::chrono::milliseconds a_DT, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk);
 	
 	void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk);
 

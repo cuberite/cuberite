@@ -125,7 +125,7 @@ void cCommandBlockEntity::SetRedstonePower(bool a_IsPowered)
 
 
 
-bool cCommandBlockEntity::Tick(float a_Dt, cChunk & a_Chunk)
+bool cCommandBlockEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);

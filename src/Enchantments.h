@@ -53,6 +53,7 @@ public:
 		enchRespiration          = 5,
 		enchAquaAffinity         = 6,
 		enchThorns               = 7,
+		enchDepthStrider         = 8,
 		enchSharpness            = 16,
 		enchSmite                = 17,
 		enchBaneOfArthropods     = 18,
@@ -128,8 +129,10 @@ public:
 	/** Gets random enchantment from Vector and returns it */
 	static cEnchantments GetRandomEnchantmentFromVector(cWeightedEnchantments & a_Enchantments);
 
-	/** Returns an enchantment from a Vector using cNoise. Mostly used for generators.*/
-	static cEnchantments GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed);
+	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
+	Uses the enchantments' weights for the random distribution.
+	If a_Enchantments is empty, returns an empty enchantment. */
+	static cEnchantments SelectEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, int a_Seed);
 
 	/** Returns true if a_Other doesn't contain exactly the same enchantments and levels */
 	bool operator !=(const cEnchantments & a_Other) const;

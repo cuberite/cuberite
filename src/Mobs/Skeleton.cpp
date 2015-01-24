@@ -67,9 +67,9 @@ void cSkeleton::MoveToPosition(const Vector3d & a_Position)
 
 
 
-void cSkeleton::Attack(float a_Dt)
+void cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
-	m_AttackInterval += a_Dt * m_AttackRate;
+	m_AttackInterval += a_Dt.count() * m_AttackRate;
 
 	if ((m_Target != nullptr) && (m_AttackInterval > 3.0))
 	{

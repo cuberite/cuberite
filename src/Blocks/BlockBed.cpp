@@ -14,24 +14,6 @@
 
 
 
-void cBlockBedHandler::OnPlacedByPlayer(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-)
-{
-	if (a_BlockMeta < 8)
-	{
-		Vector3i Direction = MetaDataToDirection(a_BlockMeta);
-		a_ChunkInterface.SetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, a_BlockMeta | 0x8);
-	}
-}
-
-
-
-
-
 void cBlockBedHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
@@ -151,7 +133,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					cPlayerBedStateUnsetter Unsetter(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_WorldInterface);
 					a_WorldInterface.ForEachPlayer(Unsetter);
 					a_WorldInterface.SetTimeOfDay(0);
-					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0xB);  // Where 0xB = 1011, and zero is to make sure 'occupied' bit is always unset
+					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
 				}
 			}
 		}

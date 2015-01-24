@@ -1410,6 +1410,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadGiantFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "Guardian", a_IDTagLength) == 0)
+	{
+		LoadGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "Horse", a_IDTagLength) == 0)
 	{
 		LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1437,6 +1441,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	else if (strncmp(a_IDTag, "Pig", a_IDTagLength) == 0)
 	{
 		LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
+	else if (strncmp(a_IDTag, "Rabbit", a_IDTagLength) == 0)
+	{
+		LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
 	else if (strncmp(a_IDTag, "Sheep", a_IDTagLength) == 0)
 	{
@@ -2197,6 +2205,26 @@ void cWSSAnvil::LoadGiantFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 
 
 
+void cWSSAnvil::LoadGuardianFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::unique_ptr<cGuardian> Monster(new cGuardian());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
 void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	int TypeIdx  = a_NBT.FindChildByName(a_TagIdx, "Type");
@@ -2322,6 +2350,26 @@ void cWSSAnvil::LoadOcelotFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 void cWSSAnvil::LoadPigFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
 	std::unique_ptr<cPig> Monster(new cPig());
+	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+	
+	if (!LoadMonsterBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	a_Entities.push_back(Monster.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadRabbitFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	std::unique_ptr<cRabbit> Monster(new cRabbit());
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -2897,9 +2945,9 @@ bool cWSSAnvil::GetBlockEntityNBTPos(const cParsedNBT & a_NBT, int a_TagIdx, int
 	{
 		return false;
 	}
-	a_X = a_NBT.GetInt(x);
-	a_Y = a_NBT.GetInt(y);
-	a_Z = a_NBT.GetInt(z);
+	a_X = Clamp(a_NBT.GetInt(x), -40000000, 40000000);  // World is limited to 30M blocks in XZ, we clamp to 40M
+	a_Y = Clamp(a_NBT.GetInt(y), -10000,    10000);     // Y is limited to 0 .. 255, we clamp to 10K
+	a_Z = Clamp(a_NBT.GetInt(z), -40000000, 40000000);
 	return true;
 }
 

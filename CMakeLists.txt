@@ -95,6 +95,24 @@ set(SQLITECPP_BUILD_EXAMPLES  OFF CACHE BOOL "Build examples."                  
 set(SQLITECPP_BUILD_TESTS     OFF CACHE BOOL "Build and run tests."                            FORCE)
 set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "Add the internal SQLite3 source to the project." FORCE)
 
+# Set options for LibEvent, disable all their tests and benchmarks:
+set(EVENT__DISABLE_OPENSSL   YES CACHE BOOL "Disable OpenSSL in LibEvent"       FORCE)
+set(EVENT__DISABLE_BENCHMARK YES CACHE BOOL "Disable LibEvent benchmarks"       FORCE)
+set(EVENT__DISABLE_TESTS     YES CACHE BOOL "Disable LibEvent tests"            FORCE)
+set(EVENT__DISABLE_REGRESS   YES CACHE BOOL "Disable LibEvent regression tests" FORCE)
+set(EVENT__DISABLE_SAMPLES   YES CACHE BOOL "Disable LibEvent samples"          FORCE)
+
+# Check that the libraries are present:
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
+	message(FATAL_ERROR "SQLiteCpp is missing in folder lib/SQLiteCpp. Have you initialized the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/polarssl/CMakeLists.txt)
+	message(FATAL_ERROR "PolarSSL is missing in folder lib/polarssl. Have you initialized the submodules / downloaded the extra libraries?")
+endif()
+if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/libevent/CMakeLists.txt)
+	message(FATAL_ERROR "LibEvent is missing in folder lib/libevent. Have you initialized and updated the submodules / downloaded the extra libraries?")
+endif()
+
 # Include all the libraries:
 add_subdirectory(lib/jsoncpp/)
 add_subdirectory(lib/zlib/)
@@ -104,12 +122,16 @@ add_subdirectory(lib/sqlite/)
 add_subdirectory(lib/SQLiteCpp/)
 add_subdirectory(lib/expat/)
 add_subdirectory(lib/luaexpat/)
+add_subdirectory(lib/libevent/)
 
 # Add proper include directories so that SQLiteCpp can find SQLite3:
 get_property(SQLITECPP_INCLUDES DIRECTORY "lib/SQLiteCpp/" PROPERTY INCLUDE_DIRECTORIES)
 set(SQLITECPP_INCLUDES "${SQLITECPP_INCLUDES}" "${CMAKE_CURRENT_SOURCE_DIR}/lib/sqlite/")
 set_property(DIRECTORY lib/SQLiteCpp/ PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
 set_property(TARGET SQLiteCpp PROPERTY INCLUDE_DIRECTORIES "${SQLITECPP_INCLUDES}")
+
+# Add proper includes for LibEvent's event-config.h header:
+include_directories(SYSTEM ${LIBEVENT_INCLUDE_DIRS})
 
 if (WIN32)
 	add_subdirectory(lib/luaproxy/)
@@ -118,13 +140,14 @@ endif()
 
 # We use EXCLUDE_FROM_ALL so that only the explicit dependencies are used
 # (PolarSSL also has test and example programs in their CMakeLists.txt, we don't want those)
-include(lib/polarssl.cmake)
+include(lib/polarssl.cmake EXCLUDE_FROM_ALL)
 
 set_exe_flags()
 
 add_subdirectory (src)
 
 if(${SELF_TEST})
+	message("Tests enabled")
 	enable_testing()
 	add_subdirectory (tests)
 endif()

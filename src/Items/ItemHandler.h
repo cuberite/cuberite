@@ -31,10 +31,35 @@ public:
 	
 	/** Force virtual destructor */
 	virtual ~cItemHandler() {}
+
+
+	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
+	The default handler uses GetPlacementBlockTypeMeta and places the returned block.
+	Override this function for advanced behavior such as placing multiple blocks.
+	If the block placement is refused inside this call, it will automatically revert the client-side changes.
+	Returns true if the placement succeeded, false if the placement was aborted for any reason. */
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
+	);
 	
+
+	/** Called when the player right-clicks with this item and IsPlaceable() == true, and OnPlace() is not overridden.
+	This function should provide the block type and meta for the placed block, or refuse the placement.
+	Returns true to allow placement, false to refuse. */
+	virtual bool GetPlacementBlockTypeMeta(
+		cWorld * a_World, cPlayer * a_Player,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ,
+		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
+	);
+	
+
 	/** Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False */
 	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir);
 	
+
 	/** Called when the client sends the SHOOT status in the lclk packet */
 	virtual void OnItemShoot(cPlayer *, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
@@ -106,18 +131,8 @@ public:
 	/** Can the anvil repair this item, when a_Item is the second input? */
 	virtual bool CanRepairWithRawMaterial(short a_ItemType);
 
-	/** Called before a block is placed into a world.
-	The handler should return true to allow placement, false to refuse.
-	Also, the handler should set a_BlockType and a_BlockMeta to correct values for the newly placed block.
-	*/
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	);
-	
-	/** Returns whether this tool/item can harvest a specific block (e.g. wooden pickaxe can harvest stone, but wood can't) DEFAULT: False */
+	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
+	Defaults to false unless overridden. */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType);
 
 	static cItemHandler * GetItemHandler(int a_ItemType);

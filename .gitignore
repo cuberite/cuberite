@@ -3,6 +3,7 @@ nbproject/
 ipch/
 Win32/
 MCServer/MCServer
+MCServer/itemblacklist
 ChunkWorxSave.ini
 doxy/
 Profiling

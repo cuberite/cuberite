@@ -197,7 +197,7 @@ void cLightingThread::Execute(void)
 	{
 		{
 			cCSLock Lock(m_CS);
-			if (m_Queue.size() == 0)
+			if (m_Queue.empty())
 			{
 				cCSUnlock Unlock(Lock);
 				m_evtItemAdded.Wait();

@@ -6,39 +6,43 @@
 #include "../Entities/Player.h"
 #include "../FastRandom.h"
 #include "../BlockInServerPluginInterface.h"
+#include "../Chunk.h"
 
 // Handlers:
 #include "ItemArmor.h"
 #include "ItemBed.h"
+#include "ItemBigFlower.h"
 #include "ItemBoat.h"
 #include "ItemBow.h"
 #include "ItemBrewingStand.h"
 #include "ItemBucket.h"
 #include "ItemCake.h"
 #include "ItemCauldron.h"
+#include "ItemChest.h"
 #include "ItemCloth.h"
 #include "ItemComparator.h"
 #include "ItemDoor.h"
-#include "ItemMilk.h"
 #include "ItemDye.h"
 #include "ItemEmptyMap.h"
 #include "ItemFishingRod.h"
 #include "ItemFlowerPot.h"
 #include "ItemFood.h"
 #include "ItemGoldenApple.h"
-#include "ItemItemFrame.h"
 #include "ItemHoe.h"
+#include "ItemItemFrame.h"
 #include "ItemLeaves.h"
 #include "ItemLighter.h"
 #include "ItemLilypad.h"
 #include "ItemMap.h"
+#include "ItemMilk.h"
 #include "ItemMinecart.h"
+#include "ItemMobHead.h"
 #include "ItemMushroomSoup.h"
 #include "ItemNetherWart.h"
 #include "ItemPainting.h"
 #include "ItemPickaxe.h"
 #include "ItemPotion.h"
-#include "ItemThrowable.h"
+#include "ItemPumpkin.h"
 #include "ItemRedstoneDust.h"
 #include "ItemRedstoneRepeater.h"
 #include "ItemSapling.h"
@@ -46,11 +50,12 @@
 #include "ItemShears.h"
 #include "ItemShovel.h"
 #include "ItemSign.h"
-#include "ItemMobHead.h"
+#include "ItemSlab.h"
 #include "ItemSpawnEgg.h"
 #include "ItemString.h"
 #include "ItemSugarcane.h"
 #include "ItemSword.h"
+#include "ItemThrowable.h"
 
 #include "../Blocks/BlockHandler.h"
 
@@ -94,52 +99,59 @@ cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 
 
 
-cItemHandler *cItemHandler::CreateItemHandler(int a_ItemType)
+cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 {
 	switch (a_ItemType)
 	{
 		default:                       return new cItemHandler(a_ItemType);
 		
 		// Single item per handler, alphabetically sorted:
-		case E_BLOCK_LEAVES:           return new cItemLeavesHandler(a_ItemType);
-		case E_BLOCK_NEW_LEAVES:       return new cItemLeavesHandler(a_ItemType);
-		case E_BLOCK_SAPLING:          return new cItemSaplingHandler(a_ItemType);
-		case E_BLOCK_WOOL:             return new cItemClothHandler(a_ItemType);
-		case E_ITEM_BED:               return new cItemBedHandler(a_ItemType);
-		case E_ITEM_BOAT:              return new cItemBoatHandler(a_ItemType);
+		case E_BLOCK_BIG_FLOWER:         return new cItemBigFlowerHandler;
+		case E_BLOCK_CHEST:              return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_LEAVES:             return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_LILY_PAD:           return new cItemLilypadHandler(a_ItemType);
+		case E_BLOCK_HEAD:               return new cItemMobHeadHandler(a_ItemType);
+		case E_BLOCK_NEW_LEAVES:         return new cItemLeavesHandler(a_ItemType);
+		case E_BLOCK_PUMPKIN:            return new cItemPumpkinHandler;
+		case E_BLOCK_SAPLING:            return new cItemSaplingHandler(a_ItemType);
+		case E_BLOCK_STONE_SLAB:         return new cItemSlabHandler(E_BLOCK_STONE_SLAB,  E_BLOCK_DOUBLE_STONE_SLAB);
+		case E_BLOCK_TRAPPED_CHEST:      return new cItemChestHandler(a_ItemType);
+		case E_BLOCK_WOODEN_SLAB:        return new cItemSlabHandler(E_BLOCK_WOODEN_SLAB, E_BLOCK_DOUBLE_WOODEN_SLAB);
+		case E_BLOCK_WOOL:               return new cItemClothHandler(a_ItemType);
+		case E_ITEM_BED:                 return new cItemBedHandler(a_ItemType);
+		case E_ITEM_BOAT:                return new cItemBoatHandler(a_ItemType);
 		case E_ITEM_BOTTLE_O_ENCHANTING: return new cItemBottleOEnchantingHandler();
-		case E_ITEM_BOW:               return new cItemBowHandler();
-		case E_ITEM_BREWING_STAND:     return new cItemBrewingStandHandler(a_ItemType);
-		case E_ITEM_CAKE:              return new cItemCakeHandler(a_ItemType);
-		case E_ITEM_CAULDRON:          return new cItemCauldronHandler(a_ItemType);
-		case E_ITEM_COMPARATOR:        return new cItemComparatorHandler(a_ItemType);
-		case E_ITEM_DYE:               return new cItemDyeHandler(a_ItemType);
-		case E_ITEM_EGG:               return new cItemEggHandler();
-		case E_ITEM_EMPTY_MAP:         return new cItemEmptyMapHandler();
-		case E_ITEM_ENDER_PEARL:       return new cItemEnderPearlHandler();
-		case E_ITEM_FIRE_CHARGE:       return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FIREWORK_ROCKET:   return new cItemFireworkHandler();
-		case E_ITEM_FISHING_ROD:       return new cItemFishingRodHandler(a_ItemType);
-		case E_ITEM_FLINT_AND_STEEL:   return new cItemLighterHandler(a_ItemType);
-		case E_ITEM_FLOWER_POT:        return new cItemFlowerPotHandler(a_ItemType);
-		case E_ITEM_GOLDEN_APPLE:      return new cItemGoldenAppleHandler();
-		case E_BLOCK_LILY_PAD:         return new cItemLilypadHandler(a_ItemType);
-		case E_ITEM_MAP:               return new cItemMapHandler();
-		case E_ITEM_MILK:              return new cItemMilkHandler();
-		case E_ITEM_MUSHROOM_SOUP:     return new cItemMushroomSoupHandler(a_ItemType);
-		case E_ITEM_ITEM_FRAME:        return new cItemItemFrameHandler(a_ItemType);
-		case E_ITEM_NETHER_WART:       return new cItemNetherWartHandler(a_ItemType);
-		case E_ITEM_PAINTING:          return new cItemPaintingHandler(a_ItemType);
-		case E_ITEM_POTIONS:           return new cItemPotionHandler();
-		case E_ITEM_REDSTONE_DUST:     return new cItemRedstoneDustHandler(a_ItemType);
-		case E_ITEM_REDSTONE_REPEATER: return new cItemRedstoneRepeaterHandler(a_ItemType);
-		case E_ITEM_SHEARS:            return new cItemShearsHandler(a_ItemType);
-		case E_ITEM_SIGN:              return new cItemSignHandler(a_ItemType);
-		case E_ITEM_HEAD:              return new cItemMobHeadHandler(a_ItemType);
-		case E_ITEM_SNOWBALL:          return new cItemSnowballHandler();
-		case E_ITEM_SPAWN_EGG:         return new cItemSpawnEggHandler(a_ItemType);
-		case E_ITEM_STRING:            return new cItemStringHandler(a_ItemType);
-		case E_ITEM_SUGARCANE:         return new cItemSugarcaneHandler(a_ItemType);
+		case E_ITEM_BOW:                 return new cItemBowHandler();
+		case E_ITEM_BREWING_STAND:       return new cItemBrewingStandHandler(a_ItemType);
+		case E_ITEM_CAKE:                return new cItemCakeHandler(a_ItemType);
+		case E_ITEM_CAULDRON:            return new cItemCauldronHandler(a_ItemType);
+		case E_ITEM_COMPARATOR:          return new cItemComparatorHandler(a_ItemType);
+		case E_ITEM_DYE:                 return new cItemDyeHandler(a_ItemType);
+		case E_ITEM_EGG:                 return new cItemEggHandler();
+		case E_ITEM_EMPTY_MAP:           return new cItemEmptyMapHandler();
+		case E_ITEM_ENDER_PEARL:         return new cItemEnderPearlHandler();
+		case E_ITEM_FIRE_CHARGE:         return new cItemLighterHandler(a_ItemType);
+		case E_ITEM_FIREWORK_ROCKET:     return new cItemFireworkHandler();
+		case E_ITEM_FISHING_ROD:         return new cItemFishingRodHandler(a_ItemType);
+		case E_ITEM_FLINT_AND_STEEL:     return new cItemLighterHandler(a_ItemType);
+		case E_ITEM_FLOWER_POT:          return new cItemFlowerPotHandler(a_ItemType);
+		case E_ITEM_GOLDEN_APPLE:        return new cItemGoldenAppleHandler();
+		case E_ITEM_MAP:                 return new cItemMapHandler();
+		case E_ITEM_MILK:                return new cItemMilkHandler();
+		case E_ITEM_MUSHROOM_SOUP:       return new cItemMushroomSoupHandler(a_ItemType);
+		case E_ITEM_ITEM_FRAME:          return new cItemItemFrameHandler(a_ItemType);
+		case E_ITEM_NETHER_WART:         return new cItemNetherWartHandler(a_ItemType);
+		case E_ITEM_PAINTING:            return new cItemPaintingHandler(a_ItemType);
+		case E_ITEM_POTIONS:             return new cItemPotionHandler();
+		case E_ITEM_REDSTONE_DUST:       return new cItemRedstoneDustHandler(a_ItemType);
+		case E_ITEM_REDSTONE_REPEATER:   return new cItemRedstoneRepeaterHandler(a_ItemType);
+		case E_ITEM_SHEARS:              return new cItemShearsHandler(a_ItemType);
+		case E_ITEM_SIGN:                return new cItemSignHandler(a_ItemType);
+		case E_ITEM_HEAD:                return new cItemMobHeadHandler(a_ItemType);
+		case E_ITEM_SNOWBALL:            return new cItemSnowballHandler();
+		case E_ITEM_SPAWN_EGG:           return new cItemSpawnEggHandler(a_ItemType);
+		case E_ITEM_STRING:              return new cItemStringHandler(a_ItemType);
+		case E_ITEM_SUGARCANE:           return new cItemSugarcaneHandler(a_ItemType);
 		
 		case E_ITEM_WOODEN_HOE:
 		case E_ITEM_STONE_HOE:
@@ -291,6 +303,108 @@ void cItemHandler::Deinit()
 cItemHandler::cItemHandler(int a_ItemType)
 {
 	m_ItemType = a_ItemType;
+}
+
+
+
+
+
+bool cItemHandler::OnPlayerPlace(
+	cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+	int a_CursorX, int a_CursorY, int a_CursorZ
+)
+{
+	if (a_BlockFace < 0)
+	{
+		// Clicked in air
+		return false;
+	}
+	
+	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+	{
+		// The clicked block is outside the world, ignore this call altogether (#128)
+		return false;
+	}
+	
+	BLOCKTYPE ClickedBlock;
+	NIBBLETYPE ClickedBlockMeta;
+
+	a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
+
+	// Check if the block ignores build collision (water, grass etc.):
+	if (
+		BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() ||
+		BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(&a_Player, ClickedBlockMeta)
+		)
+	{
+		cChunkInterface ChunkInterface(a_World.GetChunkMap());
+		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ);
+	}
+	else
+	{
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			
+		if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
+		{
+			// The block is being placed outside the world, ignore this packet altogether (#128)
+			return false;
+		}
+			
+		NIBBLETYPE PlaceMeta;
+		BLOCKTYPE PlaceBlock;
+		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
+
+		// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
+		// No need to do combinability (dblslab) checks, client will do that here.
+		if (
+			!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision() &&
+			!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(&a_Player, PlaceMeta)
+			)
+		{
+			// Tried to place a block *into* another?
+			// Happens when you place a block aiming at side of block with a torch on it or stem beside it
+			return false;
+		}
+	}
+	
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	if (!GetPlacementBlockTypeMeta(&a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+	{
+		// Handler refused the placement, send that information back to the client:
+		a_World.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, &a_Player);
+		a_Player.GetInventory().SendEquippedSlot();
+		return false;
+	}
+	
+	if (!a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta))
+	{
+		// The placement failed, the block has already been re-sent, re-send inventory:
+		a_Player.GetInventory().SendEquippedSlot();
+		return false;
+	}
+
+	AString PlaceSound = cBlockInfo::GetPlaceSound(BlockType);
+	float Volume = 1.0f, Pitch = 0.8f;
+	if (PlaceSound == "dig.metal")
+	{
+		Pitch = 1.2f;
+		PlaceSound = "dig.stone";
+	}
+	else if (PlaceSound == "random.anvil_land")
+	{
+		Volume = 0.65f;
+	}
+
+	a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
+
+	// Remove the "placed" item:
+	if (a_Player.IsGameModeSurvival())
+	{
+		a_Player.GetInventory().RemoveOneEquippedItem();
+	}
+	return true;
 }
 
 

@@ -7,7 +7,10 @@ return
 		Desc = [[
 			A plugin may implement an OnServerPing() function and register it as a Hook to process pings from
 			clients in the server server list. It can change the logged in players and player capacity, as well
-			as the server description and the favicon, that are displayed to the client in the server list.
+			as the server description and the favicon, that are displayed to the client in the server list.</p>
+			<p>
+			The client handle already has its protocol version assigned to it, so the plugin can check that; however,
+			there's no username associated with the client yet, and no player object.
 		]],
 		Params = {
 			{ Name = "ClientHandle", Type = "{{cClientHandle}}", Notes = "The client handle that pinged the server" },

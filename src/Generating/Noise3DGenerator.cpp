@@ -379,7 +379,20 @@ cNoise3DComposable::cNoise3DComposable(int a_Seed) :
 	m_ChoiceNoise(a_Seed),
 	m_DensityNoiseA(a_Seed + 1),
 	m_DensityNoiseB(a_Seed + 2),
-	m_BaseNoise(a_Seed + 3)
+	m_BaseNoise(a_Seed + 3),
+	m_HeightAmplification(0.0),
+	m_MidPoint(0.0),
+	m_FrequencyX(0.0),
+	m_FrequencyY(0.0),
+	m_FrequencyZ(0.0),
+	m_BaseFrequencyX(0.0),
+	m_BaseFrequencyZ(0.0),
+	m_ChoiceFrequencyX(0.0),
+	m_ChoiceFrequencyY(0.0),
+	m_ChoiceFrequencyZ(0.0),
+	m_AirThreshold(0.0),
+	m_LastChunkX(0x7fffffff),  // Use dummy coords that won't ever be used by real chunks
+	m_LastChunkZ(0x7fffffff)
 {
 }
 

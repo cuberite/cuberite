@@ -132,7 +132,7 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 				ItemTypeToString(WorldBlockType).c_str(),  WorldBlockType
 			);
 			cBlockEntityList::iterator itr2 = itr;
-			itr2++;
+			++itr2;
 			delete *itr;
 			m_BlockEntities.erase(itr);
 			itr = itr2;

@@ -7,6 +7,9 @@ export MCSERVER_BUILD_ID=$TRAVIS_JOB_NUMBER
 export MCSERVER_BUILD_DATETIME=`date`
 
 cmake . -DBUILD_TOOLS=1 -DSELF_TEST=1;
+cd src
+lua CheckBasicStyle.lua
+cd ..
 make -j 2;
 make -j 2 test;
 cd MCServer/;

@@ -105,7 +105,7 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		}
 		// Spread to the neighbors:
 		if (SpreadFurther && (NewMeta < 8))
-		{	
+		{
 			SpreadXZ(a_Chunk, a_RelX, a_RelY, a_RelZ, NewMeta);
 		}
 		// If source creation is on, check for it here:

@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "Player.h"
+#include <unordered_map>
 #include "../ChatColor.h"
 #include "../Server.h"
 #include "../UI/Window.h"
@@ -18,6 +19,10 @@
 
 #include "../WorldStorage/StatSerializer.h"
 #include "../CompositeChat.h"
+
+#include "../Blocks/BlockHandler.h"
+#include "../Blocks/BlockSlab.h"
+#include "../Blocks/ChunkInterface.h"
 
 #include "../IniFile.h"
 #include "json/json.h"
@@ -186,7 +191,7 @@ void cPlayer::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPlayer::Tick(float a_Dt, cChunk & a_Chunk)
+void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (m_ClientHandle != nullptr)
 	{
@@ -2162,6 +2167,97 @@ void cPlayer::LoadRank(void)
 	{
 		m_SplitPermissions.push_back(StringSplit(*itr, "."));
 	}  // for itr - m_Permissions[]
+}
+
+
+
+
+
+bool cPlayer::PlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+{
+	sSetBlockVector blk{{a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta}};
+	return PlaceBlocks(blk);
+}
+
+
+
+
+
+void cPlayer::SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range)
+{
+	// Collect the coords of all the blocks to send:
+	sSetBlockVector blks;
+	for (int y = a_BlockY - a_Range + 1; y < a_BlockY + a_Range; y++)
+	{
+		for (int z = a_BlockZ - a_Range + 1; z < a_BlockZ + a_Range; z++)
+		{
+			for (int x = a_BlockX - a_Range + 1; x < a_BlockX + a_Range; x++)
+			{
+				blks.emplace_back(x, y, z, E_BLOCK_AIR, 0);  // Use fake blocktype, it will get set later on.
+			};
+		};
+	}  // for y
+
+	// Get the values of all the blocks:
+	if (!m_World->GetBlocks(blks, false))
+	{
+		LOGD("%s: Cannot query all blocks, not sending an update", __FUNCTION__);
+		return;
+	}
+
+	// Divide the block changes by their respective chunks:
+	std::unordered_map<cChunkCoords, sSetBlockVector, cChunkCoordsHash> Changes;
+	for (const auto & blk: blks)
+	{
+		Changes[cChunkCoords(blk.m_ChunkX, blk.m_ChunkZ)].push_back(blk);
+	}  // for blk - blks[]
+	blks.clear();
+
+	// Send the blocks for each affected chunk:
+	for (auto itr = Changes.cbegin(), end = Changes.cend(); itr != end; ++itr)
+	{
+		m_ClientHandle->SendBlockChanges(itr->first.m_ChunkX, itr->first.m_ChunkZ, itr->second);
+	}
+}
+
+
+
+
+
+bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
+{
+	// Call the "placing" hooks; if any fail, abort:
+	cPluginManager * pm = cPluginManager::Get();
+	for (auto blk: a_Blocks)
+	{
+		if (pm->CallHookPlayerPlacingBlock(*this, blk))
+		{
+			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
+			for (auto blk2: a_Blocks)
+			{
+				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
+			}
+			return false;
+		}
+	}  // for blk - a_Blocks[]
+
+	// Set the blocks:
+	m_World->SetBlocks(a_Blocks);
+
+	// Notify the blockhandlers:
+	cChunkInterface ChunkInterface(m_World->GetChunkMap());
+	for (auto blk: a_Blocks)
+	{
+		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
+		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, this, blk);
+	}
+
+	// Call the "placed" hooks:
+	for (auto blk: a_Blocks)
+	{
+		pm->CallHookPlayerPlacedBlock(*this, blk);
+	}
+	return true;
 }
 
 

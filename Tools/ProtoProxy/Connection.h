@@ -58,7 +58,7 @@ public:
 	void Run(void);
 	
 	void Log(const char * a_Format, ...);
-	void DataLog(const void * a_Data, int a_Size, const char * a_Format, ...);
+	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, ...);
 	void LogFlush(void);
 	
 protected:

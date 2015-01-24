@@ -24,7 +24,7 @@ public:
 	virtual void Simulate(float a_Dt) = 0;
 	
 	/// Called in each tick for each chunk, a_Dt is the time passed since the last tick, in msec; direct access to chunk data available
-	virtual void SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 	{
 		UNUSED(a_Dt);
 		UNUSED(a_ChunkX);

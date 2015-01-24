@@ -21,31 +21,40 @@ typedef std::list<AString>   AStringList;
 
 
 
-/** Add the formated string to the existing data in the string */
-extern AString & AppendVPrintf(AString & str, const char * format, va_list args) FORMATSTRING(2, 0);
+/** Add the formated string to the existing data in the string.
+Returns a_Dst. */
+extern AString & AppendVPrintf(AString & a_Dst, const char * format, va_list args) FORMATSTRING(2, 0);
 
-/// Output the formatted text into the string
-extern AString & Printf       (AString & str, const char * format, ...) FORMATSTRING(2, 3);
+/** Output the formatted text into the string.
+Returns a_Dst. */
+extern AString & Printf       (AString & a_Dst, const char * format, ...) FORMATSTRING(2, 3);
 
-/// Output the formatted text into string, return string by value
+/** Output the formatted text into string
+Returns the formatted string by value. */
 extern AString Printf(const char * format, ...) FORMATSTRING(1, 2);
 
-/// Add the formatted string to the existing data in the string
-extern AString & AppendPrintf (AString & str, const char * format, ...) FORMATSTRING(2, 3);
+/** Add the formatted string to the existing data in the string.
+Returns a_Dst */
+extern AString & AppendPrintf (AString & a_Dst, const char * format, ...) FORMATSTRING(2, 3);
 
-/// Split the string at any of the listed delimiters, return as a stringvector
+/** Split the string at any of the listed delimiters.
+Return the splitted strings as a stringvector. */
 extern AStringVector StringSplit(const AString & str, const AString & delim);
 
-/// Split the string at any of the listed delimiters and trim each value, return as a stringvector
+/** Split the string at any of the listed delimiters and trim each value.
+Returns the splitted strings as a stringvector. */
 extern AStringVector StringSplitAndTrim(const AString & str, const AString & delim);
 
-/// Trime whitespace at both ends of the string
+/** Trims whitespace at both ends of the string.
+Returns a trimmed copy of the original string. */
 extern AString TrimString(const AString & str);  // tolua_export
 
-/// In-place string conversion to uppercase; returns the same string
+/** In-place string conversion to uppercase.
+Returns the same string object. */
 extern AString & InPlaceUppercase(AString & s);
 
-/// In-place string conversion to lowercase; returns the same string
+/** In-place string conversion to lowercase.
+Returns the same string object. */
 extern AString & InPlaceLowercase(AString & s);
 
 /** Returns an upper-cased copy of the string */
@@ -54,28 +63,30 @@ extern AString StrToUpper(const AString & s);
 /** Returns a lower-cased copy of the string */
 extern AString StrToLower(const AString & s);
 
-/// Case-insensitive string comparison; returns 0 if the strings are the same
+/** Case-insensitive string comparison.
+Returns 0 if the strings are the same, <0 if s1 < s2 and >0 if s1 > s2. */
 extern int NoCaseCompare(const AString & s1, const AString & s2);  // tolua_export
 
-/// Case-insensitive string comparison that returns a rating of equal-ness between [0 - s1.length()]
+/** Case-insensitive string comparison that returns a rating of equal-ness between [0 - s1.length()]. */
 extern size_t RateCompareString(const AString & s1, const AString & s2);
 
-/// Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith
+/** Replaces *each* occurence of iNeedle in iHayStack with iReplaceWith */
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
-/// Converts a stream of BE shorts into UTF-8 string; returns a ref to a_UTF8
+/** Converts a stream of BE shorts into UTF-8 string; returns a_UTF8. */
 extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 
-/// Converts a UTF-8 string into a UTF-16 BE string; returns a ref to a_UTF16
+/** Converts a UTF-8 string into a UTF-16 BE string. */
 extern AString UTF8ToRawBEUTF16(const char * a_UTF8, size_t a_UTF8Length);
 
-/// Creates a nicely formatted HEX dump of the given memory block. Max a_BytesPerLine is 120
+/** Creates a nicely formatted HEX dump of the given memory block.
+Max a_BytesPerLine is 120. */
 extern AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine);
 
-/// Returns a copy of a_Message with all quotes and backslashes escaped by a backslash
+/** Returns a copy of a_Message with all quotes and backslashes escaped by a backslash. */
 extern AString EscapeString(const AString & a_Message);  // tolua_export
 
-/// Removes all control codes used by MC for colors and styles
+/** Removes all control codes used by MC for colors and styles. */
 extern AString StripColorCodes(const AString & a_Message);  // tolua_export
 
 /// URL-Decodes the given string, replacing all "%HH" into the correct characters. Invalid % sequences are left intact

@@ -326,10 +326,10 @@ public:
 	
 	// tolua_end
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk);
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	
 	/// Handles the physics of the entity - updates position based on speed, updates speed based on environment
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk);
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	
 	/// Updates the state related to this entity being on fire
 	virtual void TickBurning(cChunk & a_Chunk);

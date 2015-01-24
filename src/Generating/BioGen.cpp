@@ -733,7 +733,19 @@ cBioGenTwoLevel::cBioGenTwoLevel(int a_Seed) :
 	m_Noise3(a_Seed + 5003),
 	m_Noise4(a_Seed + 5004),
 	m_Noise5(a_Seed + 5005),
-	m_Noise6(a_Seed + 5006)
+	m_Noise6(a_Seed + 5006),
+	m_FreqX1(0.0),
+	m_AmpX1(0.0),
+	m_FreqX2(0.0),
+	m_AmpX2(0.0),
+	m_FreqX3(0.0),
+	m_AmpX3(0.0),
+	m_FreqZ1(0.0),
+	m_AmpZ1(0.0),
+	m_FreqZ2(0.0),
+	m_AmpZ2(0.0),
+	m_FreqZ3(0.0),
+	m_AmpZ3(0.0)
 {
 }
 

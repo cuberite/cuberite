@@ -83,6 +83,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 		addIfAllowed(mtSkeleton, allowedMobs);
 		addIfAllowed(mtCreeper, allowedMobs);
 		addIfAllowed(mtSquid, allowedMobs);
+		addIfAllowed(mtGuardian, allowedMobs);
 		
 		if ((a_Biome != biDesert) && (a_Biome != biBeach) && (a_Biome != biOcean))
 		{
@@ -91,6 +92,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 			addIfAllowed(mtCow, allowedMobs);
 			addIfAllowed(mtChicken, allowedMobs);
 			addIfAllowed(mtEnderman, allowedMobs);
+			addIfAllowed(mtRabbit, allowedMobs);
 			addIfAllowed(mtSlime, allowedMobs);  // MG TODO : much more complicated rule
 			
 			if ((a_Biome == biForest) || (a_Biome == biForestHills) || (a_Biome == biTaiga) || (a_Biome == biTaigaHills))
@@ -144,6 +146,11 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 
 		switch (a_MobType)
 		{
+			case mtGuardian:
+			{
+				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
+			}
+			
 			case mtSquid:
 			{
 				return IsBlockWater(TargetBlock) && (a_RelY >= 45) && (a_RelY <= 62);
@@ -158,6 +165,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 			case mtCow:
 			case mtPig:
 			case mtHorse:
+			case mtRabbit:
 			case mtSheep:
 			{
 				return (

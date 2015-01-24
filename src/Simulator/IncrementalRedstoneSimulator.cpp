@@ -93,7 +93,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	), SimulatedPlayerToggleableBlocks.end());
 
 	
-	auto & RepeatersDelayList = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_RepeatersDelayList;	
+	auto & RepeatersDelayList = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData())->m_RepeatersDelayList;
 	RepeatersDelayList.erase(std::remove_if(RepeatersDelayList.begin(), RepeatersDelayList.end(), [RelX, a_BlockY, RelZ, Block](const sRepeatersDelayList & itr)
 		{
 			return itr.a_RelBlockPos.Equals(Vector3i(RelX, a_BlockY, RelZ)) && (Block != E_BLOCK_REDSTONE_REPEATER_ON) && (Block != E_BLOCK_REDSTONE_REPEATER_OFF);
@@ -145,7 +145,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 
 
 
-void cIncrementalRedstoneSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	m_RedstoneSimulatorChunkData = (cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)a_Chunk->GetRedstoneSimulatorData();
 	if (m_RedstoneSimulatorChunkData == nullptr)
@@ -1488,62 +1488,92 @@ bool cIncrementalRedstoneSimulator::IsRepeaterPowered(int a_RelBlockX, int a_Rel
 
 	for (const auto & itr : *m_PoweredBlocks)
 	{
-		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		{
+			continue;
+		}
 
 		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
 				// Flip the coords to check the back of the repeater
-				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1)))) { return true; }
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1))))
+				{
+					return true;
+				}
 				break;
 			}
 			case 0x1:
 			{
-				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ))))
+				{
+					return true;
+				}
 				break;
 			}
 			case 0x2:
 			{
-				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1)))) { return true; }
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1))))
+				{
+					return true;
+				}
 				break;
 			}
 			case 0x3:
 			{
-				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				if (itr.a_SourcePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ))))
+				{
+					return true;
+				}
 				break;
 			}
 		}
-	}
+	}  // for itr - m_PoweredBlocks[]
 
 	for (const auto & itr : *m_LinkedPoweredBlocks)
 	{
-		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		{
+			continue;
+		}
 
 		switch (a_Meta & 0x3)
 		{
 			case 0x0:
 			{
-				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1)))) { return true; }
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1))))
+				{
+					return true;
+				}
 				break;
 			}
 			case 0x1:
 			{
-				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ))))
+				{
+					return true;
+				}
 				break;
 			}
 			case 0x2:
 			{
-				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1)))) { return true; }
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1))))
+				{
+					return true;
+				}
 				break;
 			}
 			case 0x3:
 			{
-				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ)))) { return true; }
+				if (itr.a_MiddlePos.Equals(AdjustRelativeCoords(Vector3i(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ))))
+				{
+					return true;
+				}
 				break;
 			}
 		}
-	}
+	}  // for itr - m_LinkedPoweredBlocks[]
 	return false;  // Couldn't find power source behind repeater
 }
 
@@ -1559,10 +1589,13 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 		case 0x0:
 		case 0x2:
 		{
-			// Check if eastern(right) neighbor is a powered on repeater who is facing us
+			// Check if eastern (right) neighbor is a powered on repeater who is facing us
 			BLOCKTYPE Block = 0;
 			NIBBLETYPE OtherRepeaterDir = 0;
-			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON)) // Is right neighbor a powered repeater?
+			if (
+				m_Chunk->UnboundedRelGetBlock(a_RelBlockX + 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) &&
+				(Block == E_BLOCK_REDSTONE_REPEATER_ON)
+			)
 			{
 				if ((OtherRepeaterDir & 0x03) == 0x3)
 				{
@@ -1571,7 +1604,10 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 			}
 
 			// Check if western(left) neighbor is a powered on repeater who is facing us
-			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			if (
+				m_Chunk->UnboundedRelGetBlock(a_RelBlockX - 1, a_RelBlockY, a_RelBlockZ, Block, OtherRepeaterDir) &&
+				(Block == E_BLOCK_REDSTONE_REPEATER_ON)
+			)
 			{
 				if ((OtherRepeaterDir & 0x03) == 0x1)
 				{
@@ -1590,7 +1626,10 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 			BLOCKTYPE Block = 0;
 			NIBBLETYPE OtherRepeaterDir = 0;
 
-			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			if (
+				m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ + 1, Block, OtherRepeaterDir) &&
+				(Block == E_BLOCK_REDSTONE_REPEATER_ON)
+			)
 			{
 				if ((OtherRepeaterDir & 0x30) == 0x00)
 				{
@@ -1599,7 +1638,10 @@ bool cIncrementalRedstoneSimulator::IsRepeaterLocked(int a_RelBlockX, int a_RelB
 			}
 
 			// Check if northern(up) neighbor is a powered on repeater who is facing us
-			if (m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block, OtherRepeaterDir) && (Block == E_BLOCK_REDSTONE_REPEATER_ON))
+			if (
+				m_Chunk->UnboundedRelGetBlock(a_RelBlockX, a_RelBlockY, a_RelBlockZ - 1, Block, OtherRepeaterDir) &&
+				(Block == E_BLOCK_REDSTONE_REPEATER_ON)
+			)
 			{
 				if ((OtherRepeaterDir & 0x03) == 0x02)
 				{
@@ -1625,7 +1667,10 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 
 	for (const auto & itr : *m_PoweredBlocks)
 	{
-		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		{
+			continue;
+		}
 
 		int X = a_RelBlockX, Z = a_RelBlockZ;
 		AddFaceDirection(X, a_RelBlockY, Z, Face);
@@ -1638,7 +1683,10 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 
 	for (const auto & itr : *m_LinkedPoweredBlocks)
 	{
-		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ))) { continue; }
+		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		{
+			continue;
+		}
 
 		int X = a_RelBlockX, Z = a_RelBlockZ;
 		AddFaceDirection(X, a_RelBlockY, Z, Face);
@@ -2074,9 +2122,11 @@ void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_RelSourceX, int a_R
 
 	for (const auto & itr : BlocksPotentiallyUnpowered)
 	{
-		if (!AreCoordsPowered(itr.x, itr.y, itr.z))
+		auto Neighbour = a_Chunk->GetRelNeighborChunk(itr.x, itr.z);
+		if (!AreCoordsPowered(itr.x, itr.y, itr.z) && (Neighbour->GetBlock(itr) != E_BLOCK_REDSTONE_REPEATER_ON))
 		{
-			SetSourceUnpowered(itr.x, itr.y, itr.z, a_Chunk->GetRelNeighborChunk(itr.x, itr.z));
+			// Repeaters time themselves with regards to unpowering; ensure we don't do it for them
+			SetSourceUnpowered(itr.x, itr.y, itr.z, Neighbour);
 		}
 	}
 }

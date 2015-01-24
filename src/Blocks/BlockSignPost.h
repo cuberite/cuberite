@@ -53,17 +53,6 @@ public:
 	}
 
 
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
-	{
-		a_Player->GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
-	}
-
-
 	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
 	{
 		return (a_Meta + 4) & 0x0f;

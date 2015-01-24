@@ -183,6 +183,7 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 		{ enchRespiration,          "Respiration"},
 		{ enchAquaAffinity,         "AquaAffinity"},
 		{ enchThorns,               "Thorns"},
+		{ enchDepthStrider,         "DepthStrider"},
 		{ enchSharpness,            "Sharpness"},
 		{ enchSmite,                "Smite"},
 		{ enchBaneOfArthropods,     "BaneOfArthropods"},
@@ -505,6 +506,20 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 			else if ((a_EnchantmentLevel >= 5) && (a_EnchantmentLevel <= 15))
 			{
 				AddEnchantmentWeightToVector(a_Enchantments, 5, enchFeatherFalling, 1);
+			}
+			
+			// Depth Strider
+			if ((a_EnchantmentLevel >= 30) && (a_EnchantmentLevel <= 45))
+			{
+				AddEnchantmentWeightToVector(a_Enchantments, 2, enchDepthStrider, 3);
+			}
+			else if ((a_EnchantmentLevel >= 20) && (a_EnchantmentLevel <= 35))
+			{
+				AddEnchantmentWeightToVector(a_Enchantments, 2, enchDepthStrider, 2);
+			}
+			else if ((a_EnchantmentLevel >= 10) && (a_EnchantmentLevel <= 25))
+			{
+				AddEnchantmentWeightToVector(a_Enchantments, 2, enchDepthStrider, 1);
 			}
 		}
 	}
@@ -1021,26 +1036,34 @@ cEnchantments cEnchantments::GetRandomEnchantmentFromVector(cWeightedEnchantment
 
 
 
-cEnchantments cEnchantments::GenerateEnchantmentFromVector(cWeightedEnchantments & a_Enchantments, int a_Seed)
+cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, int a_Seed)
 {
+	// Sum up all the enchantments' weights:
 	int AllWeights = 0;
 	for (const auto Enchantment : a_Enchantments)
 	{
 		AllWeights += Enchantment.m_Weight;
 	}
 
+	// If there's no weight for any of the enchantments, return an empty enchantment
+	if (AllWeights <= 0)
+	{
+		return cEnchantments();
+	}
+
+	// Pick a random enchantment:
 	cNoise Noise(a_Seed);
 	int RandomNumber = Noise.IntNoise1DInt(AllWeights) / 7 % AllWeights;
-
 	for (const auto Enchantment : a_Enchantments)
 	{
 		RandomNumber -= Enchantment.m_Weight;
-		if (RandomNumber < 0)
+		if (RandomNumber <= 0)
 		{
 			return Enchantment.m_Enchantments;
 		}
 	}
 
+	// No enchantment picked, return an empty one (we probably shouldn't ever get here):
 	return cEnchantments();
 }
 

@@ -143,7 +143,13 @@ public:
 	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
 	void FastSetQueuedBlocks();
-	void      FastSetBlocks      (sSetBlockList & a_BlockList);
+	void FastSetBlocks(sSetBlockList & a_BlockList);
+
+	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
+	Is more efficient than calling SetBlock() multiple times.
+	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
+	void SetBlocks(const sSetBlockVector & a_Blocks);
+
 	void      CollectPickupsByPlayer(cPlayer & a_Player);
 	
 	BLOCKTYPE  GetBlock          (int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -173,11 +179,20 @@ public:
 	(Re)sends the chunks to their relevant clients if successful. */
 	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
 	
-	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
+	/** Retrieves block types and metas of the specified blocks.
+	If a chunk is not loaded, doesn't modify the block and consults a_ContinueOnFailure whether to process the rest of the array.
+	Returns true if all blocks were read, false if any one failed. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
-	bool DigBlock   (int a_X, int a_Y, int a_Z);
-	void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer * a_Player);
+	/** Removes the block at the specified coords and wakes up simulators.
+	Returns false if the chunk is not loaded (and the block is not dug).
+	Returns true if successful. */
+	bool DigBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
+
+	/** Sends the block at the specified coords to the specified player.
+	Uses a blockchange packet to send the block.
+	If the relevant chunk isn't loaded, doesn't do anything. */
+	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer * a_Player);
 	
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -333,7 +348,7 @@ public:
 	/** Try to Spawn Monsters inside all Chunks */
 	void SpawnMobs(cMobSpawner& a_MobSpawner);
 
-	void Tick(float a_Dt);
+	void Tick(std::chrono::milliseconds a_Dt);
 	
 	/** Ticks a single block. Used by cWorld::TickQueuedBlocks() to tick the queued blocks */
 	void TickBlock(int a_BlockX, int a_BlockY, int a_BlockZ);
@@ -400,7 +415,7 @@ private:
 		/** Try to Spawn Monsters inside all Chunks */
 		void SpawnMobs(cMobSpawner& a_MobSpawner);
 
-		void Tick(float a_Dt);
+		void Tick(std::chrono::milliseconds a_Dt);
 		
 		void RemoveClient(cClientHandle * a_Client);
 		

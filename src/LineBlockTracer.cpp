@@ -15,7 +15,23 @@
 
 
 cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
-	super(a_World, a_Callbacks)
+	super(a_World, a_Callbacks),
+	m_StartX(0.0),
+	m_StartY(0.0),
+	m_StartZ(0.0),
+	m_EndX(0.0),
+	m_EndY(0.0),
+	m_EndZ(0.0),
+	m_DiffX(0.0),
+	m_DiffY(0.0),
+	m_DiffZ(0.0),
+	m_DirX(0),
+	m_DirY(0),
+	m_DirZ(0),
+	m_CurrentX(0),
+	m_CurrentY(0),
+	m_CurrentZ(0),
+	m_CurrentFace(0)
 {
 }
 

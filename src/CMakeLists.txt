@@ -5,6 +5,7 @@ project (MCServer)
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/jsoncpp/include")
 include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/polarssl/include")
+include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include")
 
 set(FOLDERS
 	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
@@ -323,4 +324,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} luaexpat jsoncpp polarssl zlib sqlite lua SQLiteCpp)
+target_link_libraries(${EXECUTABLE} luaexpat jsoncpp polarssl zlib sqlite lua SQLiteCpp event_core event_extra)

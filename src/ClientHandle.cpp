@@ -1346,12 +1346,19 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	
 	if (ItemHandler->IsPlaceable() && (a_BlockFace != BLOCK_FACE_NONE))
 	{
-		HandlePlaceBlock(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, *ItemHandler);
+		if (!ItemHandler->OnPlayerPlace(*World, *m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		{
+			// Placement failed, bail out
+			return;
+		}
 	}
 	else if ((ItemHandler->IsFood() || ItemHandler->IsDrinkable(EquippedDamage)))
 	{
-		if ((m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&
-			ItemHandler->IsFood() && (Equipped.m_ItemType != E_ITEM_GOLDEN_APPLE))
+		if (
+			(m_Player->IsSatiated() || m_Player->IsGameModeCreative()) &&  // Only creative or hungry players can eat
+			ItemHandler->IsFood() &&
+			(Equipped.m_ItemType != E_ITEM_GOLDEN_APPLE)  // Golden apple is a special case, it is used instead of eaten
+		)
 		{
 			// The player is satiated or in creative, and trying to eat
 			return;
@@ -1373,151 +1380,6 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		ItemHandler->OnItemUse(World, m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 	}
-}
-
-
-
-
-
-void cClientHandle::HandlePlaceBlock(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, cItemHandler & a_ItemHandler)
-{
-	BLOCKTYPE EquippedBlock = (BLOCKTYPE)(m_Player->GetEquippedItem().m_ItemType);
-	if (a_BlockFace < 0)
-	{
-		// Clicked in air
-		return;
-	}
-	
-	cWorld * World = m_Player->GetWorld();
-
-	BLOCKTYPE ClickedBlock;
-	NIBBLETYPE ClickedBlockMeta;
-	NIBBLETYPE EquippedBlockDamage = (NIBBLETYPE)(m_Player->GetEquippedItem().m_ItemDamage);
-
-	if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
-	{
-		// The block is being placed outside the world, ignore this packet altogether (#128)
-		return;
-	}
-	
-	World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
-
-	// Special slab handling - placing a slab onto another slab produces a dblslab instead:
-	if (
-		cBlockSlabHandler::IsAnySlabType(ClickedBlock) &&               // Is there a slab already?
-		cBlockSlabHandler::IsAnySlabType(EquippedBlock) &&              // Is the player placing another slab?
-		((ClickedBlockMeta & 0x07) == EquippedBlockDamage) &&           // Is it the same slab type?
-		(
-			(a_BlockFace == BLOCK_FACE_TOP) ||                          // Clicking the top of a bottom slab
-			(a_BlockFace == BLOCK_FACE_BOTTOM)                          // Clicking the bottom of a top slab
-		)
-	)
-	{
-		// Coordinates at clicked block, which was an eligible slab, and either top or bottom faces were clicked
-		// If clicked top face and slab occupies the top voxel, we want a slab to be placed above it (therefore increment Y)
-		// Else if clicked bottom face and slab occupies the bottom voxel, decrement Y for the same reason
-		// Don't touch coordinates if anything else because a dblslab opportunity is present
-		if ((ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_TOP))
-		{
-			++a_BlockY;
-		}
-		else if (!(ClickedBlockMeta & 0x08) && (a_BlockFace == BLOCK_FACE_BOTTOM))
-		{
-			--a_BlockY;
-		}
-		World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlock, ClickedBlockMeta);
-	}
-	else
-	{
-		// Check if the block ignores build collision (water, grass etc.):
-		if (
-			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() ||
-			BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(m_Player, ClickedBlockMeta)
-			)
-		{
-			cChunkInterface ChunkInterface(World->GetChunkMap());
-			BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ);
-		}
-		else
-		{
-			AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			
-			if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
-			{
-				// The block is being placed outside the world, ignore this packet altogether (#128)
-				return;
-			}
-			
-			NIBBLETYPE PlaceMeta;
-			BLOCKTYPE PlaceBlock;
-			World->GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlock, PlaceMeta);
-
-			// Clicked on side of block, make sure that placement won't be cancelled if there is a slab able to be double slabbed.
-			// No need to do combinability (dblslab) checks, client will do that here.
-			if (cBlockSlabHandler::IsAnySlabType(PlaceBlock))
-			{
-				// It's a slab, don't do checks and proceed to double-slabbing
-			}
-			else
-			{
-				if (
-					!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision() &&
-					!BlockHandler(PlaceBlock)->DoesIgnoreBuildCollision(m_Player, PlaceMeta)
-					)
-				{
-					// Tried to place a block *into* another?
-					// Happens when you place a block aiming at side of block with a torch on it or stem beside it
-					return;
-				}
-			}
-		}
-	}
-	
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	if (!a_ItemHandler.GetPlacementBlockTypeMeta(World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
-	{
-		// Handler refused the placement, send that information back to the client:
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		m_Player->GetInventory().SendEquippedSlot();
-		return;
-	}
-	
-	cBlockHandler * NewBlock = BlockHandler(BlockType);
-
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerPlacingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
-	{
-		// A plugin doesn't agree with placing the block, revert the block on the client:
-		World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-		m_Player->GetInventory().SendEquippedSlot();
-		return;
-	}
-	
-	// The actual block placement:
-	World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, BlockType, BlockMeta);
-	if (!m_Player->IsGameModeCreative())
-	{
-		m_Player->GetInventory().RemoveOneEquippedItem();
-	}
-
-	cChunkInterface ChunkInterface(World->GetChunkMap());
-	NewBlock->OnPlacedByPlayer(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
-	
-	AString PlaceSound = cBlockInfo::GetPlaceSound(BlockType);
-	float Volume = 1.0f, Pitch = 0.8f;
-	if (PlaceSound == "dig.metal")
-	{
-		Pitch = 1.2f;
-		PlaceSound = "dig.stone";
-	}
-	else if (PlaceSound == "random.anvil_land")
-	{
-		Volume = 0.65f;
-	}
-
-	World->BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
-
-	cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 }
 
 
@@ -1583,7 +1445,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 
 
 
-void cClientHandle::HandleAnimation(char a_Animation)
+void cClientHandle::HandleAnimation(int a_Animation)
 {
 	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
 	{
@@ -2970,7 +2832,7 @@ void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 
 
 
-void cClientHandle::PacketError(unsigned char a_PacketType)
+void cClientHandle::PacketError(UInt32 a_PacketType)
 {
 	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
 	SendDisconnect("Protocol error");

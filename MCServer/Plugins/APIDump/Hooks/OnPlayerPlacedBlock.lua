@@ -12,7 +12,11 @@ return
 			Use the {{cPlayer}}:GetWorld() function to get the world to which the block belongs.</p>
 			<p>
 			See also the {{OnPlayerPlacingBlock|HOOK_PLAYER_PLACING_BLOCK}} hook for a similar hook called
-			before the placement.
+			before the placement.</p>
+			<p>
+			If the client action results in multiple blocks being placed (such as a bed or a door), each separate
+			block is reported through this hook. All the blocks are already present in the world before the first
+			instance of this hook is called.
 		]],
 		Params =
 		{
@@ -20,10 +24,6 @@ return
 			{ Name = "BlockX", Type = "number", Notes = "X-coord of the block" },
 			{ Name = "BlockY", Type = "number", Notes = "Y-coord of the block" },
 			{ Name = "BlockZ", Type = "number", Notes = "Z-coord of the block" },
-			{ Name = "BlockFace", Type = "number", Notes = "Face of the existing block upon which the player interacted. One of the BLOCK_FACE_ constants" },
-			{ Name = "CursorX", Type = "number", Notes = "X-coord of the cursor within the block face (0 .. 15)" },
-			{ Name = "CursorY", Type = "number", Notes = "Y-coord of the cursor within the block face (0 .. 15)" },
-			{ Name = "CursorZ", Type = "number", Notes = "Z-coord of the cursor within the block face (0 .. 15)" },
 			{ Name = "BlockType", Type = "BLOCKTYPE", Notes = "The block type of the block" },
 			{ Name = "BlockMeta", Type = "NIBBLETYPE", Notes = "The block meta of the block" },
 		},

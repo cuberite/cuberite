@@ -49,8 +49,8 @@ public:
 protected:
 	
 	// cProjectileEntity overrides:
-	virtual void HandlePhysics(float a_Dt, cChunk & a_Chunk) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	
 private:
 	

@@ -268,33 +268,47 @@ template class SizeChecker<UInt16, 2>;
 	#include "OSSupport/StackTrace.h"
 #else
 	// Logging functions
-void inline LOGERROR(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGERROR(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGERROR(const char* a_Format, ...)
+void inline LOGERROR(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
-void inline LOGWARNING(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGWARNING(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGWARNING(const char* a_Format, ...)
+void inline LOGWARNING(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
-void inline LOGD(const char* a_Format, ...) FORMATSTRING(1, 2);
+void inline LOGD(const char * a_Format, ...) FORMATSTRING(1, 2);
 
-void inline LOGD(const char* a_Format, ...)
+void inline LOGD(const char * a_Format, ...)
 {
 	va_list argList;
 	va_start(argList, a_Format);
 	vprintf(a_Format, argList);
+	putchar('\n');
+	va_end(argList);
+}
+
+void inline LOG(const char * a_Format, ...) FORMATSTRING(1, 2);
+
+void inline LOG(const char * a_Format, ...)
+{
+	va_list argList;
+	va_start(argList, a_Format);
+	vprintf(a_Format, argList);
+	putchar('\n');
 	va_end(argList);
 }
 
@@ -419,6 +433,9 @@ std::unique_ptr<T> make_unique(Args&&... args)
 	return std::unique_ptr<T>(new T(args...));
 }
 
+// a tick is 50 ms
+using cTickTime = std::chrono::duration<int,  std::ratio_multiply<std::chrono::milliseconds::period, std::ratio<50>>>;
+using cTickTimeLong = std::chrono::duration<Int64,  cTickTime::period>;
 
 #ifndef TOLUA_TEMPLATE_BIND
 	#define TOLUA_TEMPLATE_BIND(x)
@@ -433,6 +450,7 @@ std::unique_ptr<T> make_unique(Args&&... args)
 #include "BiomeDef.h"
 #include "BlockID.h"
 #include "BlockInfo.h"
+
 
 
 

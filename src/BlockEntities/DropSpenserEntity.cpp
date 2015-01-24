@@ -125,7 +125,7 @@ void cDropSpenserEntity::SetRedstonePower(bool a_IsPowered)
 
 
 
-bool cDropSpenserEntity::Tick(float a_Dt, cChunk & a_Chunk)
+bool cDropSpenserEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	if (!m_ShouldDropSpense)

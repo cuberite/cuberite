@@ -85,18 +85,6 @@ public:
 	}
 
 
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
-	{
-		int Meta = (((int)floor(a_Player->GetYaw() * 4.0 / 360.0 + 0.5) & 0x3) + 2) % 4;
-		a_ChunkInterface.FastSetBlock(a_BlockX, a_BlockY + 1, a_BlockZ, m_BlockType, 0x8 | Meta);
-	}
-
-
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
 		NIBBLETYPE OldMeta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);

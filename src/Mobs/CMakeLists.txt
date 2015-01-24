@@ -16,6 +16,7 @@ SET (SRCS
 	Enderman.cpp
 	Ghast.cpp
 	Giant.cpp
+	Guardian.cpp
 	Horse.cpp
 	IronGolem.cpp
 	MagmaCube.cpp
@@ -24,6 +25,7 @@ SET (SRCS
 	PassiveAggressiveMonster.cpp
 	PassiveMonster.cpp
 	Pig.cpp
+	Rabbit.cpp
 	Sheep.cpp
 	Skeleton.cpp
 	Slime.cpp
@@ -49,6 +51,7 @@ SET (HDRS
 	Enderman.h
 	Ghast.h
 	Giant.h
+	Guardian.h
 	Horse.h
 	IncludeAllMonsters.h
 	IronGolem.h
@@ -60,6 +63,7 @@ SET (HDRS
 	PassiveAggressiveMonster.h
 	PassiveMonster.h
 	Pig.h
+	Rabbit.h
 	Sheep.h
 	Silverfish.h
 	Skeleton.h

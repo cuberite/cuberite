@@ -13,6 +13,15 @@
 
 
 
+/** When defined, each access to a cByteBuffer object is checked whether it's done in the same thread.
+cByteBuffer assumes that it is not used by multiple threads at once, this macro adds a runtime check for that.
+Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. */
+// #define DEBUG_SINGLE_THREAD_ACCESS
+
+
+
+
+
 // Try to determine endianness:
 #if ( \
 	defined(__i386__) || defined(__alpha__) || \
@@ -109,7 +118,7 @@ public:
 
 
 
-#ifdef _DEBUG
+#ifdef DEBUG_SINGLE_THREAD_ACCESS
 
 	/** Simple RAII class that is used for checking that no two threads are using an object simultanously.
 	It requires the monitored object to provide the storage for a thread ID.
@@ -122,7 +131,7 @@ public:
 		{
 			ASSERT(
 				(*a_ThreadID == std::this_thread::get_id()) ||  // Either the object is used by current thread...
-				(*a_ThreadID == std::thread::id())              // ... or by no thread at all
+				(*a_ThreadID == m_EmptyThreadID)                // ... or by no thread at all
 			);
 
 			// Mark as being used by this thread:
@@ -138,7 +147,12 @@ public:
 	protected:
 		/** Points to the storage used for ID of the thread using the object. */
 		std::thread::id * m_ThreadID;
+
+		/** The value of an unassigned thread ID, used to speed up checking. */
+		static std::thread::id m_EmptyThreadID;
 	};
+
+	std::thread::id cSingleThreadAccessChecker::m_EmptyThreadID;
 
 	#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
 
@@ -334,8 +348,24 @@ bool cByteBuffer::ReadBEShort(short & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(2);
+	Int16 val;
+	ReadBuf(&val, 2);
+	val = ntohs(val);
+	a_Value = *(reinterpret_cast<short *>(&val));
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadBEUInt16(UInt16 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	NEEDBYTES(2);
 	ReadBuf(&a_Value, 2);
-	a_Value = (short)ntohs((u_short)a_Value);
+	a_Value = ntohs(a_Value);
 	return true;
 }
 
@@ -350,6 +380,20 @@ bool cByteBuffer::ReadBEInt(int & a_Value)
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
 	a_Value = (int)ntohl((u_long)a_Value);
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadBEUInt32(UInt32 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	NEEDBYTES(4);
+	ReadBuf(&a_Value, 4);
+	a_Value = ntohl(a_Value);
 	return true;
 }
 
