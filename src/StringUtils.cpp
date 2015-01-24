@@ -914,7 +914,7 @@ AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AString
 	// Add each item from strings2 that is not already present:
 	for (auto item : a_Strings2)
 	{
-		if (std::find(res.begin(), res.end(), item) != res.end())
+		if (std::find(res.begin(), res.end(), item) == res.end())
 		{
 			res.push_back(item);
 		}
