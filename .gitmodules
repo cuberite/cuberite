@@ -25,3 +25,6 @@
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
 	url = https://github.com/mc-server/SQLiteCpp.git
+[submodule "lib/libevent"]
+	path = lib/libevent
+	url = https://github.com/mc-server/libevent.git
