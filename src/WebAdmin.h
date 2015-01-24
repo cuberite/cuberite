@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "OSSupport/Socket.h"
 #include "Bindings/LuaState.h"
 #include "IniFile.h"
 #include "HTTPServer/HTTPServer.h"
@@ -135,8 +134,16 @@ public:
 	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
 	AString GetBaseURL(const AString & a_URL);
 
-	AString GetIPv4Ports(void) const { return m_PortsIPv4; }
-	AString GetIPv6Ports(void) const { return m_PortsIPv6; }
+	/** Returns the list of ports used for the webadmin. */
+	AString GetPorts(void) const { return StringsConcat(m_Ports, ','); }
+
+	/** OBSOLETE: Returns the list of IPv4 ports used for the webadmin.
+	Currently there is no distinction between IPv4 and IPv6; use GetPorts() instead. */
+	AString GetIPv4Ports(void) const { return GetPorts(); }
+
+	/** OBSOLETE: Returns the list of IPv6 ports used for the webadmin.
+	Currently there is no distinction between IPv4 and IPv6; use GetPorts() instead. */
+	AString GetIPv6Ports(void) const { return GetPorts(); }
 
 	// tolua_end
 
@@ -205,8 +212,8 @@ protected:
 
 	PluginList m_Plugins;
 
-	AString m_PortsIPv4;
-	AString m_PortsIPv6;
+	/** The ports on which the webadmin is running. */
+	AStringVector m_Ports;
 
 	/** The Lua template script to provide templates: */
 	cLuaState m_TemplateScript;

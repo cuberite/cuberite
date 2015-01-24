@@ -119,11 +119,45 @@ class cDebugCallbacks :
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cHTTPServerListenCallbacks:
+
+class cHTTPServerListenCallbacks:
+	public cNetwork::cListenCallbacks
+{
+public:
+	cHTTPServerListenCallbacks(cHTTPServer & a_HTTPServer, UInt16 a_Port):
+		m_HTTPServer(a_HTTPServer),
+		m_Port(a_Port)
+	{
+	}
+
+protected:
+	/** The HTTP server instance that we're attached to. */
+	cHTTPServer & m_HTTPServer;
+
+	/** The port for which this instance is responsible. */
+	UInt16 m_Port;
+
+	// cNetwork::cListenCallbacks overrides:
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override
+	{
+		return m_HTTPServer.OnIncomingConnection(a_RemoteIPAddress, a_RemotePort);
+	}
+	virtual void OnAccepted(cTCPLink & a_Link) override {}
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
+	{
+		LOGWARNING("HTTP server error on port %d: %d (%s)", m_Port, a_ErrorCode, a_ErrorMsg.c_str());
+	}
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cHTTPServer:
 
 cHTTPServer::cHTTPServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "WebServer"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "WebServer"),
 	m_Callbacks(nullptr)
 {
 }
@@ -141,7 +175,7 @@ cHTTPServer::~cHTTPServer()
 
 
 
-bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_PortsIPv6)
+bool cHTTPServer::Initialize(void)
 {
 	// Read the HTTPS cert + key:
 	AString CertFile = cFile::ReadWholeFile("webadmin/httpscert.crt");
@@ -177,18 +211,6 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 	{
 		LOGINFO("WebServer: The server is running in secure HTTPS mode.");
 	}
-	
-	// Open up requested ports:
-	bool HasAnyPort;
-	m_ListenThreadIPv4.SetReuseAddr(true);
-	m_ListenThreadIPv6.SetReuseAddr(true);
-	HasAnyPort = m_ListenThreadIPv4.Initialize(a_PortsIPv4);
-	HasAnyPort = m_ListenThreadIPv6.Initialize(a_PortsIPv6) || HasAnyPort;
-	if (!HasAnyPort)
-	{
-		return false;
-	}
-	
 	return true;
 }
 
@@ -196,19 +218,28 @@ bool cHTTPServer::Initialize(const AString & a_PortsIPv4, const AString & a_Port
 
 
 
-bool cHTTPServer::Start(cCallbacks & a_Callbacks)
+bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 {
 	m_Callbacks = &a_Callbacks;
-	if (!m_ListenThreadIPv4.Start())
+
+	// Open up requested ports:
+	for (auto port : a_Ports)
 	{
-		return false;
-	}
-	if (!m_ListenThreadIPv6.Start())
-	{
-		m_ListenThreadIPv4.Stop();
-		return false;
-	}
-	return true;
+		UInt16 PortNum = static_cast<UInt16>(atoi(port.c_str()));
+		if (PortNum == 0)
+		{
+			LOGWARNING("WebServer: Invalid port value: \"%s\". Ignoring.", port.c_str());
+			continue;
+		}
+		auto Handle = cNetwork::Listen(PortNum, std::make_shared<cHTTPServerListenCallbacks>(*this, PortNum));
+		if (Handle->IsListening())
+		{
+			m_ServerHandles.push_back(Handle);
+		}
+	}  // for port - a_Ports[]
+	
+	// Report success if at least one port opened successfully:
+	return !m_ServerHandles.empty();
 }
 
 
@@ -217,63 +248,30 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks)
 
 void cHTTPServer::Stop(void)
 {
-	m_ListenThreadIPv4.Stop();
-	m_ListenThreadIPv6.Stop();
-	
-	// Drop all current connections:
-	cCSLock Lock(m_CSConnections);
-	while (!m_Connections.empty())
+	for (auto handle : m_ServerHandles)
 	{
-		m_Connections.front()->Terminate();
-	}  // for itr - m_Connections[]
+		handle->Close();
+	}
+	m_ServerHandles.clear();
 }
 
 
 
 
 
-void cHTTPServer::OnConnectionAccepted(cSocket & a_Socket)
+cTCPLink::cCallbacksPtr cHTTPServer::OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
 {
-	cHTTPConnection * Connection;
+	UNUSED(a_RemoteIPAddress);
+	UNUSED(a_RemotePort);
+
 	if (m_Cert.get() != nullptr)
 	{
-		Connection = new cSslHTTPConnection(*this, m_Cert, m_CertPrivKey);
+		return std::make_shared<cSslHTTPConnection>(*this, m_Cert, m_CertPrivKey);
 	}
 	else
 	{
-		Connection = new cHTTPConnection(*this);
+		return std::make_shared<cHTTPConnection>(*this);
 	}
-	m_SocketThreads.AddClient(a_Socket, Connection);
-	cCSLock Lock(m_CSConnections);
-	m_Connections.push_back(Connection);
-}
-
-
-
-
-
-void cHTTPServer::CloseConnection(cHTTPConnection & a_Connection)
-{
-	m_SocketThreads.RemoveClient(&a_Connection);
-	cCSLock Lock(m_CSConnections);
-	for (cHTTPConnections::iterator itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
-	{
-		if (*itr == &a_Connection)
-		{
-			m_Connections.erase(itr);
-			break;
-		}
-	}
-	delete &a_Connection;
-}
-
-
-
-
-
-void cHTTPServer::NotifyConnectionWrite(cHTTPConnection & a_Connection)
-{
-	m_SocketThreads.NotifyWrite(&a_Connection);
 }
 
 

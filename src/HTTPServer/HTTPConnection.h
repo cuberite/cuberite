@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../OSSupport/SocketThreads.h"
+#include "../OSSupport/Network.h"
 
 
 
@@ -25,7 +25,7 @@ class cHTTPRequest;
 
 
 class cHTTPConnection :
-	public cSocketThreads::cCallback
+	public cTCPLink::cCallbacks
 {
 public:
 	
@@ -78,9 +78,6 @@ protected:
 	/** Status in which the request currently is */
 	eState m_State;
 	
-	/** Data that is queued for sending, once the socket becomes writable */
-	AString m_OutgoingData;
-	
 	/** The request being currently received
 	Valid only between having parsed the headers and finishing receiving the body. */
 	cHTTPRequest * m_CurrentRequest;
@@ -88,18 +85,34 @@ protected:
 	/** Number of bytes that remain to read for the complete body of the message to be received.
 	Valid only in wcsRecvBody */
 	size_t m_CurrentRequestBodyRemaining;
+
+	/** The network link attached to this connection. */
+	cTCPLinkPtr m_Link;
 	
 	
-	// cSocketThreads::cCallback overrides:
-	/** Data is received from the client.
-	Returns true if the connection has been closed as the result of parsing the data. */
-	virtual bool DataReceived(const char * a_Data, size_t a_Size) override;
+	// cTCPLink::cCallbacks overrides:
+	/** The link instance has been created, remember it. */
+	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;
+
+	/** Data is received from the client. */
+	virtual void OnReceivedData(const char * a_Data, size_t a_Size) override;
 	
-	/** Data can be sent to client */
-	virtual void GetOutgoingData(AString & a_Data) override;
+	/** The socket has been closed for any reason. */
+	virtual void OnRemoteClosed(void) override;
 	
-	/** The socket has been closed for any reason */
-	virtual void SocketClosed(void) override;
+	/** An error has occurred on the socket. */
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
+
+	// Overridable:
+	/** Called to send raw data over the link. Descendants may provide data transformations (SSL etc.) */
+	virtual void SendData(const void * a_Data, size_t a_Size);
+
+	/** Sends the raw data over the link.
+	Descendants may provide data transformations (SSL etc.) via the overridable SendData() function. */
+	void SendData(const AString & a_Data)
+	{
+		SendData(a_Data.data(), a_Data.size());
+	}
 } ;
 
 typedef std::vector<cHTTPConnection *> cHTTPConnections;

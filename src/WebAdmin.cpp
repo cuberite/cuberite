@@ -19,7 +19,16 @@
 
 
 
-/// Helper class - appends all player names together in a HTML list
+static const char DEFAULT_WEBADMIN_PORTS[] = "8080";
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cPlayerAccum:
+
+/** Helper class - appends all player names together in an HTML list */
 class cPlayerAccum :
 	public cPlayerListCallback
 {
@@ -40,11 +49,12 @@ public:
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// cWebAdmin:
+
 cWebAdmin::cWebAdmin(void) :
 	m_IsInitialized(false),
 	m_IsRunning(false),
-	m_PortsIPv4("8080"),
-	m_PortsIPv6(""),
 	m_TemplateScript("<webadmin_template>")
 {
 }
@@ -91,8 +101,7 @@ bool cWebAdmin::Init(void)
 		m_IniFile.AddHeaderComment(" Password format: Password=*password*; for example:");
 		m_IniFile.AddHeaderComment(" [User:admin]");
 		m_IniFile.AddHeaderComment(" Password=admin");
-		m_IniFile.SetValue("WebAdmin", "Port", m_PortsIPv4);
-		m_IniFile.SetValue("WebAdmin", "PortsIPv6", m_PortsIPv6);
+		m_IniFile.SetValue("WebAdmin", "Ports", DEFAULT_WEBADMIN_PORTS);
 		m_IniFile.WriteFile("webadmin.ini");
 	}
 
@@ -104,10 +113,37 @@ bool cWebAdmin::Init(void)
 
 	LOGD("Initialising WebAdmin...");
 
-	m_PortsIPv4 = m_IniFile.GetValueSet("WebAdmin", "Port", m_PortsIPv4);
-	m_PortsIPv6 = m_IniFile.GetValueSet("WebAdmin", "PortsIPv6", m_PortsIPv6);
+	// Initialize the WebAdmin template script and load the file
+	m_TemplateScript.Create();
+	m_TemplateScript.RegisterAPILibs();
+	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
+	{
+		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
+		m_TemplateScript.Close();
+		m_HTTPServer.Stop();
+		return false;
+	}
 
-	if (!m_HTTPServer.Initialize(m_PortsIPv4, m_PortsIPv6))
+	// Load the login template, provide a fallback default if not found:
+	if (!LoadLoginTemplate())
+	{
+		LOGWARN("Could not load WebAdmin login template \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
+
+		// Sets the fallback template:
+		m_LoginTemplate = \
+		"<h1>MCServer WebAdmin</h1>" \
+		"<center>" \
+		"<form method='get' action='webadmin/'>" \
+		"<input type='submit' value='Log in'>" \
+		"</form>" \
+		"</center>";
+	}
+
+	// Read the ports to be used:
+	// Note that historically the ports were stored in the "Port" and "PortsIPv6" values
+	m_Ports = ReadUpgradeIniPorts(m_IniFile, "WebAdmin", "Ports", "Port", "PortsIPv6", DEFAULT_WEBADMIN_PORTS);
+
+	if (!m_HTTPServer.Initialize())
 	{
 		return false;
 	}
@@ -130,32 +166,7 @@ bool cWebAdmin::Start(void)
 
 	LOGD("Starting WebAdmin...");
 
-	// Initialize the WebAdmin template script and load the file
-	m_TemplateScript.Create();
-	m_TemplateScript.RegisterAPILibs();
-	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
-	{
-		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin disabled!", FILE_IO_PREFIX "webadmin/template.lua");
-		m_TemplateScript.Close();
-		m_HTTPServer.Stop();
-		return false;
-	}
-
-	if (!LoadLoginTemplate())
-	{
-		LOGWARN("Could not load WebAdmin login template \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
-
-		// Sets the fallback template:
-		m_LoginTemplate = \
-		"<h1>MCServer WebAdmin</h1>" \
-		"<center>" \
-		"<form method='get' action='webadmin/'>" \
-		"<input type='submit' value='Log in'>" \
-		"</form>" \
-		"</center>";
-	}
-
-	m_IsRunning = m_HTTPServer.Start(*this);
+	m_IsRunning = m_HTTPServer.Start(*this, m_Ports);
 	return m_IsRunning;
 }
 
