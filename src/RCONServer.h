@@ -9,8 +9,7 @@
 
 #pragma once
 
-#include "OSSupport/SocketThreads.h"
-#include "OSSupport/ListenThread.h"
+#include "OSSupport/Network.h"
 
 
 
@@ -24,8 +23,7 @@ class cIniFile;
 
 
 
-class cRCONServer :
-	public cListenThread::cCallback
+class cRCONServer
 {
 public:
 	cRCONServer(cServer & a_Server);
@@ -35,72 +33,61 @@ public:
 	
 protected:
 	friend class cRCONCommandOutput;
+	friend class cRCONListenCallbacks;
 	
 	class cConnection :
-		public cSocketThreads::cCallback
+		public cTCPLink::cCallbacks
 	{
 	public:
-		cConnection(cRCONServer & a_RCONServer, cSocket & a_Socket);
+		cConnection(cRCONServer & a_RCONServer, const AString & a_IPAddress);
 		
 	protected:
 		friend class cRCONCommandOutput;
 	
-		/// Set to true if the client has successfully authenticated
+		/** Set to true if the client has successfully authenticated */
 		bool m_IsAuthenticated;
 		
-		/// Buffer for the incoming data
+		/** Buffer for the incoming data */
 		AString m_Buffer;
 		
-		/// Buffer for the outgoing data
-		AString m_Outgoing;
-		
-		/// Server that owns this connection and processes requests
+		/** Server that owns this connection and processes requests */
 		cRCONServer & m_RCONServer;
 		
-		/// The socket belonging to the client
-		cSocket & m_Socket;
+		/** The TCP link to the client */
+		cTCPLinkPtr m_Link;
 		
-		/// Address of the client
+		/** Address of the client */
 		AString m_IPAddress;
 		
 
-		// cSocketThreads::cCallback overrides:
-		virtual bool DataReceived(const char * a_Data, size_t a_Size) override;
-		virtual void GetOutgoingData(AString & a_Data) override;
-		virtual void SocketClosed(void) override;
+		// cTCPLink::cCallbacks overrides:
+		virtual void OnLinkCreated(cTCPLinkPtr a_Link);
+		virtual void OnReceivedData(const char * a_Data, size_t a_Length) override;
+		virtual void OnRemoteClosed(void) override;
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 		
-		/// Processes the given packet and sends the response; returns true if successful, false if the connection is to be dropped
+		/** Processes the given packet and sends the response; returns true if successful, false if the connection is to be dropped */
 		bool ProcessPacket(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload);
 		
-		/// Reads 4 bytes from a_Buffer and returns the int they represent
+		/** Reads 4 bytes from a_Buffer and returns the int they represent */
 		int IntFromBuffer(const char * a_Buffer);
 		
-		/// Puts 4 bytes representing the int into the buffer
+		/** Puts 4 bytes representing the int into the buffer */
 		void IntToBuffer(int a_Value, char * a_Buffer);
 		
-		/// Sends a RCON packet back to the client
+		/** Sends a RCON packet back to the client */
 		void SendResponse(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload);
 	} ;
 	
 	
-	/// The server object that will process the commands received
+	/** The server object that will process the commands received */
 	cServer & m_Server;
 	
-	/// The thread(s) that take care of all the traffic on the RCON ports
-	cSocketThreads m_SocketThreads;
+	/** The sockets for accepting RCON connections (one socket per port). */
+	cServerHandlePtrs m_ListenServers;
 	
-	/// The thread for accepting IPv4 RCON connections
-	cListenThread  m_ListenThread4;
-	
-	/// The thread for accepting IPv6 RCON connections
-	cListenThread  m_ListenThread6;
-	
-	/// Password for authentication
+	/** Password for authentication */
 	AString m_Password;
-
-
-	// cListenThread::cCallback overrides:
-	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 } ;
 
 
