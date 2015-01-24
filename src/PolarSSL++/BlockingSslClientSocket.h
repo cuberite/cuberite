@@ -9,8 +9,8 @@
 
 #pragma once
 
+#include "OSSupport/Network.h"
 #include "CallbackSslContext.h"
-#include "../OSSupport/Socket.h"
 
 
 
@@ -51,25 +51,56 @@ public:
 	const AString & GetLastErrorText(void) const { return m_LastErrorText; }
 	
 protected:
+	friend class cBlockingSslClientSocketConnectCallbacks;
+	friend class cBlockingSslClientSocketLinkCallbacks;
+
 	/** The SSL context used for the socket */
 	cCallbackSslContext m_Ssl;
 	
 	/** The underlying socket to the SSL server */
-	cSocket m_Socket;
+	cTCPLinkPtr m_Socket;
+
+	/** The object used to signal state changes in the socket (the cause of the blocking). */
+	cEvent m_Event;
 	
 	/** The trusted CA root cert store, if we are to verify the cert strictly. Set by SetTrustedRootCertsFromString(). */
 	cX509CertPtr m_CACerts;
 	
 	/** The expected SSL peer's name, if we are to verify the cert strictly. Set by SetTrustedRootCertsFromString(). */
 	AString m_ExpectedPeerName;
+
+	/** The hostname to which the socket is connecting (stored for error reporting). */
+	AString m_ServerName;
 	
 	/** Text of the last error that has occurred. */
 	AString m_LastErrorText;
 	
 	/** Set to true if the connection established successfully. */
 	bool m_IsConnected;
+
+	/** Protects m_IncomingData against multithreaded access. */
+	cCriticalSection m_CSIncomingData;
+
+	/** Buffer for the data incoming on the network socket.
+	Protected by m_CSIncomingData. */
+	AString m_IncomingData;
 	
 	
+	/** Called when the connection is established successfully. */
+	void OnConnected(void);
+
+	/** Called when an error occurs while connecting the socket. */
+	void OnConnectError(const AString & a_ErrorMsg);
+
+	/** Called when there's incoming data from the socket. */
+	void OnReceivedData(const char * a_Data, size_t a_Size);
+
+	/** Called when the link for the connection is created. */
+	void SetLink(cTCPLinkPtr a_Link);
+
+	/** Called when the link is disconnected, either gracefully or by an error. */
+	void OnDisconnected(void);
+
 	// cCallbackSslContext::cDataCallbacks overrides:
 	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
 	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
