@@ -393,11 +393,14 @@ bool cWindow::ForEachClient(cItemCallback<cClientHandle> & a_Callback)
 
 void cWindow::DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill)
 {
-	for (size_t i = 0; i < 2; i++)
+	/* Ask each slot area to take as much of the stack as it can.
+	First ask only slots that already have the same kind of item
+	Then ask any remaining slots */
+	for (size_t Pass = 0; Pass < 2; Pass++)
 	{
 		for (auto SlotArea : a_AreasInOrder)
 		{
-			SlotArea->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (i == 0), a_BackFill);
+			SlotArea->DistributeStack(a_ItemStack, a_Player, a_ShouldApply, (Pass == 0), a_BackFill);
 			if (a_ItemStack.IsEmpty())
 			{
 				// Distributed it all
