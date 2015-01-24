@@ -815,10 +815,9 @@ void cWorld::Stop(void)
 	// Delete the clients that have been in this world:
 	{
 		cCSLock Lock(m_CSClients);
-		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+		for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 		{
 			(*itr)->Destroy();
-			delete *itr;
 		}  // for itr - m_Clients[]
 		m_Clients.clear();
 	}
@@ -1093,19 +1092,26 @@ void cWorld::TickScheduledTasks(void)
 
 void cWorld::TickClients(float a_Dt)
 {
-	cClientHandleList RemoveClients;
+	cClientHandlePtrs RemoveClients;
 	{
 		cCSLock Lock(m_CSClients);
 		
 		// Remove clients scheduled for removal:
-		for (cClientHandleList::iterator itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
+		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
 		{
-			m_Clients.remove(*itr);
+			for (auto itrC = m_Clients.begin(), endC = m_Clients.end(); itrC != endC; ++itrC)
+			{
+				if (itrC->get() == *itr)
+				{
+					m_Clients.erase(itrC);
+					break;
+				}
+			}
 		}  // for itr - m_ClientsToRemove[]
 		m_ClientsToRemove.clear();
 		
 		// Add clients scheduled for adding:
-		for (cClientHandleList::iterator itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
+		for (auto itr = m_ClientsToAdd.begin(), end = m_ClientsToAdd.end(); itr != end; ++itr)
 		{
 			ASSERT(std::find(m_Clients.begin(), m_Clients.end(), *itr) == m_Clients.end());
 			m_Clients.push_back(*itr);
@@ -1113,7 +1119,7 @@ void cWorld::TickClients(float a_Dt)
 		m_ClientsToAdd.clear();
 		
 		// Tick the clients, take out those that have been destroyed into RemoveClients
-		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
+		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
 			if ((*itr)->IsDestroyed())
 			{
@@ -1126,12 +1132,9 @@ void cWorld::TickClients(float a_Dt)
 			++itr;
 		}  // for itr - m_Clients[]
 	}
-	
-	// Delete the clients that have been destroyed
-	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
-	{
-		delete *itr;
-	}  // for itr - RemoveClients[]
+
+	// Delete the clients queued for removal:
+	RemoveClients.clear();
 }
 
 
@@ -3525,7 +3528,7 @@ void cWorld::AddQueuedPlayers(void)
 		cCSLock Lock(m_CSClients);
 		for (cPlayerList::iterator itr = PlayersToAdd.begin(), end = PlayersToAdd.end(); itr != end; ++itr)
 		{
-			cClientHandle * Client = (*itr)->GetClientHandle();
+			cClientHandlePtr Client = (*itr)->GetClientHandlePtr();
 			if (Client != nullptr)
 			{
 				m_Clients.push_back(Client);

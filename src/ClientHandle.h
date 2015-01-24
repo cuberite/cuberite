@@ -8,12 +8,10 @@
 
 
 #pragma once
-#ifndef CCLIENTHANDLE_H_INCLUDED
-#define CCLIENTHANDLE_H_INCLUDED
 
+#include "OSSupport/Network.h"
 #include "Defines.h"
 #include "Vector3.h"
-#include "OSSupport/SocketThreads.h"
 #include "ChunkDef.h"
 #include "ByteBuffer.h"
 #include "Scoreboard.h"
@@ -27,6 +25,7 @@
 
 
 
+// fwd:
 class cChunkDataSerializer;
 class cInventory;
 class cMonster;
@@ -42,25 +41,29 @@ class cItemHandler;
 class cWorld;
 class cCompositeChat;
 class cStatManager;
+class cClientHandle;
+typedef SharedPtr<cClientHandle> cClientHandlePtr;
 
 
 
 
 
-class cClientHandle :  // tolua_export
-	public cSocketThreads::cCallback
+class cClientHandle  // tolua_export
+	: public cTCPLink::cCallbacks
 {  // tolua_export
-public:
-	
-#if defined(ANDROID_NDK)
-	static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
-#else
-	static const int DEFAULT_VIEW_DISTANCE = 10;
-#endif
+public:  // tolua_export
+
+	#if defined(ANDROID_NDK)
+		static const int DEFAULT_VIEW_DISTANCE = 4;  // The default ViewDistance (used when no value is set in Settings.ini)
+	#else
+		static const int DEFAULT_VIEW_DISTANCE = 10;
+	#endif
 	static const int MAX_VIEW_DISTANCE = 32;
 	static const int MIN_VIEW_DISTANCE = 1;
 	
-	cClientHandle(const cSocket * a_Socket, int a_ViewDistance);
+	/** Creates a new client with the specified IP address in its description and the specified initial view distance. */
+	cClientHandle(const AString & a_IPString, int a_ViewDistance);
+
 	virtual ~cClientHandle();
 
 	const AString & GetIPString(void) const { return m_IPString; }  // tolua_export
@@ -276,6 +279,10 @@ public:
 	void HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand);
 	
 	void HandleCreativeInventory      (short a_SlotNum, const cItem & a_HeldItem);
+
+	/** Called when the player enchants an Item in the Enchanting table UI. */
+	void HandleEnchantItem(Byte a_WindowID, Byte a_Enchantment);
+
 	void HandleEntityCrouch           (int a_EntityID, bool a_IsCrouching);
 	void HandleEntityLeaveBed         (int a_EntityID);
 	void HandleEntitySprinting        (int a_EntityID, bool a_IsSprinting);
@@ -329,9 +336,6 @@ public:
 	Sends an UnloadChunk packet for each loaded chunk and resets the streamed chunks. */
 	void RemoveFromWorld(void);
 	
-	/** Called when the player will enchant a Item */
-	void HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment);
-
 	/** Called by the protocol recognizer when the protocol version is known. */
 	void SetProtocolVersion(UInt32 a_ProtocolVersion) { m_ProtocolVersion = a_ProtocolVersion; }
 
@@ -339,6 +343,9 @@ public:
 	UInt32 GetProtocolVersion(void) const { return m_ProtocolVersion; }  // tolua_export
 	
 private:
+
+	friend class cServer;  // Needs access to SetSelf()
+
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
@@ -361,13 +368,16 @@ private:
 	cChunkCoordsList m_SentChunks;    // Chunks that are currently sent to the client
 
 	cProtocol * m_Protocol;
-	
+
+	/** Protects m_IncomingData against multithreaded access. */
 	cCriticalSection m_CSIncomingData;
-	AString          m_IncomingData;
-	
+
+	/** Queue for the incoming data received on the link until it is processed in Tick().
+	Protected by m_CSIncomingData. */
+	AString m_IncomingData;
+
+	/** Protects data going out through m_Link against multi-threaded sending. */
 	cCriticalSection m_CSOutgoingData;
-	cByteBuffer      m_OutgoingData;
-	AString          m_OutgoingDataOverflow;  ///< For data that didn't fit into the m_OutgoingData ringbuffer temporarily
 
 	Vector3d m_ConfirmPosition;
 
@@ -379,8 +389,8 @@ private:
 	int m_LastStreamedChunkX;
 	int m_LastStreamedChunkZ;
 
-	/** Seconds since the last packet data was received (updated in Tick(), reset in DataReceived()) */
-	float m_TimeSinceLastPacket;
+	/** Number of ticks since the last network packet was received (increased in Tick(), reset in OnReceivedData()) */
+	int m_TicksSinceLastPacket;
 	
 	/** Duration of the last completed client ping. */
 	std::chrono::steady_clock::duration m_Ping;
@@ -458,6 +468,13 @@ private:
 	/** The version of the protocol that the client is talking, or 0 if unknown. */
 	UInt32 m_ProtocolVersion;
 
+	/** The link that is used for network communication.
+	m_CSOutgoingData is used to synchronize access for sending data. */
+	cTCPLinkPtr m_Link;
+
+	/** Shared pointer to self, so that this instance can keep itself alive when needed. */
+	cClientHandlePtr m_Self;
+
 
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
@@ -483,16 +500,19 @@ private:
 	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
 	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 
-	// cSocketThreads::cCallback overrides:
-	virtual bool DataReceived   (const char * a_Data, size_t a_Size) override;  // Data is received from the client
-	virtual void GetOutgoingData(AString & a_Data) override;  // Data can be sent to client
-	virtual void SocketClosed   (void) override;  // The socket has been closed for any reason
+	/** Called when the network socket has been closed. */
+	void SocketClosed(void);
+
+	/** Called right after the instance is created to store its SharedPtr inside. */
+	void SetSelf(cClientHandlePtr a_Self);
+
+	// cTCPLink::cCallbacks overrides:
+	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override;
+	virtual void OnReceivedData(const char * a_Data, size_t a_Length) override;
+	virtual void OnRemoteClosed(void) override;
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 };  // tolua_export
 
-
-
-
-#endif  // CCLIENTHANDLE_H_INCLUDED
 
 
 

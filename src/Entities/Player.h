@@ -40,7 +40,7 @@ public:
 	CLASS_PROTODEF(cPlayer)
 	
 
-	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
+	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
 	
 	virtual ~cPlayer();
 
@@ -222,7 +222,15 @@ public:
 	/** Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow */
 	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
-	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }
+	/** Returns the raw client handle associated with the player. */
+	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
+
+	// tolua_end
+
+	/** Returns the SharedPtr to client handle associated with the player. */
+	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
+
+	// tolua_begin
 
 	void SendMessage          (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtCustom); }
 	void SendMessageInfo      (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtInformation); }
@@ -467,6 +475,10 @@ public:
 	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
 
 	virtual void Detach(void);
+
+	/** Called by cClientHandle when the client is being destroyed.
+	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
+	void RemoveClientHandle(void);
 	
 protected:
 
@@ -537,7 +549,7 @@ protected:
 
 	std::chrono::steady_clock::time_point m_LastPlayerListTime;
 
-	cClientHandle * m_ClientHandle;
+	cClientHandlePtr m_ClientHandle;
 	
 	cSlotNums m_InventoryPaintSlots;
 	

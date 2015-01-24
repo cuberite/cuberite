@@ -5,7 +5,6 @@
 #include "Server.h"
 #include "ClientHandle.h"
 #include "Mobs/Monster.h"
-#include "OSSupport/Socket.h"
 #include "Root.h"
 #include "World.h"
 #include "ChunkDef.h"
@@ -58,6 +57,39 @@ typedef std::list< cClientHandle* > ClientList;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cServerListenCallbacks:
+
+class cServerListenCallbacks:
+	public cNetwork::cListenCallbacks
+{
+	cServer & m_Server;
+	UInt16 m_Port;
+
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override
+	{
+		return m_Server.OnConnectionAccepted(a_RemoteIPAddress);
+	}
+
+	virtual void OnAccepted(cTCPLink & a_Link) override {}
+
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg)
+	{
+		LOGWARNING("Cannot listen on port %d: %d (%s).", m_Port, a_ErrorCode, a_ErrorMsg.c_str());
+	}
+
+public:
+	cServerListenCallbacks(cServer & a_Server, UInt16 a_Port):
+		m_Server(a_Server),
+		m_Port(a_Port)
+	{
+	}
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
@@ -100,8 +132,6 @@ void cServer::cTickThread::Execute(void)
 // cServer:
 
 cServer::cServer(void) :
-	m_ListenThreadIPv4(*this, cSocket::IPv4, "Client"),
-	m_ListenThreadIPv6(*this, cSocket::IPv6, "Client"),
 	m_PlayerCount(0),
 	m_PlayerCountDiff(0),
 	m_ClientViewDistance(0),
@@ -115,42 +145,6 @@ cServer::cServer(void) :
 	m_ShouldLoadOfflinePlayerData(false),
 	m_ShouldLoadNamedPlayerData(true)
 {
-}
-
-
-
-
-
-void cServer::ClientDestroying(const cClientHandle * a_Client)
-{
-	m_SocketThreads.RemoveClient(a_Client);
-}
-
-
-
-
-
-void cServer::NotifyClientWrite(const cClientHandle * a_Client)
-{
-	m_NotifyWriteThread.NotifyClientWrite(a_Client);
-}
-
-
-
-
-
-void cServer::WriteToClient(const cClientHandle * a_Client, const AString & a_Data)
-{
-	m_SocketThreads.Write(a_Client, a_Data);
-}
-
-
-
-
-
-void cServer::RemoveClient(const cClientHandle * a_Client)
-{
-	m_SocketThreads.RemoveClient(a_Client);
 }
 
 
@@ -211,33 +205,8 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
 	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
-	if (cSocket::WSAStartup() != 0)  // Only does anything on Windows, but whatever
-	{
-		LOGERROR("WSAStartup() != 0");
-		return false;
-	}
-
-	bool HasAnyPorts = false;
-	AString Ports = a_SettingsIni.GetValueSet("Server", "Port", "25565");
-	m_ListenThreadIPv4.SetReuseAddr(true);
-	if (m_ListenThreadIPv4.Initialize(Ports))
-	{
-		HasAnyPorts = true;
-	}
-
-	Ports = a_SettingsIni.GetValueSet("Server", "PortsIPv6", "25565");
-	m_ListenThreadIPv6.SetReuseAddr(true);
-	if (m_ListenThreadIPv6.Initialize(Ports))
-	{
-		HasAnyPorts = true;
-	}
+	m_Ports = ReadUpgradeIniPorts(a_SettingsIni, "Server", "Ports", "Port", "PortsIPv6", "25565");
 	
-	if (!HasAnyPorts)
-	{
-		LOGERROR("Couldn't open any ports. Aborting the server");
-		return false;
-	}
-
 	m_RCONServer.Initialize(a_SettingsIni);
 
 	m_bIsConnected = true;
@@ -277,8 +246,6 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
 		LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 	}
-	
-	m_NotifyWriteThread.Start(this);
 	
 	PrepareKeys();
 	
@@ -327,36 +294,14 @@ void cServer::PrepareKeys(void)
 
 
 
-void cServer::OnConnectionAccepted(cSocket & a_Socket)
+cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIPAddress)
 {
-	if (!a_Socket.IsValid())
-	{
-		return;
-	}
-	
-	const AString & ClientIP = a_Socket.GetIPString();
-	if (ClientIP.empty())
-	{
-		LOGWARN("cServer: A client connected, but didn't present its IP, disconnecting.");
-		a_Socket.CloseSocket();
-		return;
-	}
-
-	LOGD("Client \"%s\" connected!", ClientIP.c_str());
-
-	cClientHandle * NewHandle = new cClientHandle(&a_Socket, m_ClientViewDistance);
-	if (!m_SocketThreads.AddClient(a_Socket, NewHandle))
-	{
-		// For some reason SocketThreads have rejected the handle, clean it up
-		LOGERROR("Client \"%s\" cannot be handled, server probably unstable", ClientIP.c_str());
-		a_Socket.CloseSocket();
-		delete NewHandle;
-		NewHandle = nullptr;
-		return;
-	}
-	
+	LOGD("Client \"%s\" connected!", a_RemoteIPAddress.c_str());
+	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
+	NewHandle->SetSelf(NewHandle);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
+	return NewHandle;
 }
 
 
@@ -403,23 +348,30 @@ bool cServer::Tick(float a_Dt)
 
 void cServer::TickClients(float a_Dt)
 {
-	cClientHandleList RemoveClients;
+	cClientHandlePtrs RemoveClients;
 	{
 		cCSLock Lock(m_CSClients);
 		
 		// Remove clients that have moved to a world (the world will be ticking them from now on)
-		for (cClientHandleList::const_iterator itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
+		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
 		{
-			m_Clients.remove(*itr);
+			for (auto itrC = m_Clients.begin(), endC = m_Clients.end(); itrC != endC; ++itrC)
+			{
+				if (itrC->get() == *itr)
+				{
+					m_Clients.erase(itrC);
+					break;
+				}
+			}
 		}  // for itr - m_ClientsToRemove[]
 		m_ClientsToRemove.clear();
 		
 		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
-		for (cClientHandleList::iterator itr = m_Clients.begin(); itr != m_Clients.end();)
+		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
 			if ((*itr)->IsDestroyed())
 			{
-				// Remove the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
+				// Delete the client later, when CS is not held, to avoid deadlock: http://forum.mc-server.org/showthread.php?tid=374
 				RemoveClients.push_back(*itr);
 				itr = m_Clients.erase(itr);
 				continue;
@@ -430,10 +382,7 @@ void cServer::TickClients(float a_Dt)
 	}
 	
 	// Delete the clients that have been destroyed
-	for (cClientHandleList::iterator itr = RemoveClients.begin(); itr != RemoveClients.end(); ++itr)
-	{
-		delete *itr;
-	}  // for itr - RemoveClients[]
+	RemoveClients.clear();
 }
 
 
@@ -442,12 +391,23 @@ void cServer::TickClients(float a_Dt)
 
 bool cServer::Start(void)
 {
-	if (!m_ListenThreadIPv4.Start())
+	for (auto port: m_Ports)
 	{
-		return false;
-	}
-	if (!m_ListenThreadIPv6.Start())
+		UInt16 PortNum = static_cast<UInt16>(atoi(port.c_str()));
+		if (PortNum == 0)
+		{
+			LOGWARNING("Invalid port specified for server: \"%s\". Ignoring.", port.c_str());
+			continue;
+		}
+		auto Handle = cNetwork::Listen(PortNum, std::make_shared<cServerListenCallbacks>(*this, PortNum));
+		if (Handle->IsListening())
+		{
+			m_ServerHandles.push_back(Handle);
+		}
+	}  // for port - Ports[]
+	if (m_ServerHandles.empty())
 	{
+		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
 	if (!m_TickThread.Start())
@@ -669,19 +629,24 @@ void cServer::BindBuiltInConsoleCommands(void)
 
 void cServer::Shutdown(void)
 {
-	m_ListenThreadIPv4.Stop();
-	m_ListenThreadIPv6.Stop();
+	// Stop listening on all sockets:
+	for (auto srv: m_ServerHandles)
+	{
+		srv->Close();
+	}
+	m_ServerHandles.clear();
 	
+	// Notify the tick thread and wait for it to terminate:
 	m_bRestarting = true;
 	m_RestartEvent.Wait();
 
 	cRoot::Get()->SaveAllChunks();
 
+	// Remove all clients:
 	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		(*itr)->Destroy();
-		delete *itr;
 	}
 	m_Clients.clear();
 }
@@ -693,7 +658,7 @@ void cServer::Shutdown(void)
 void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 {
 	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
@@ -709,7 +674,7 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const AString & a_UUID, const Json::Value & a_Properties)
 {
 	cCSLock Lock(m_CSClients);
-	for (ClientList::iterator itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
 	{
 		if ((*itr)->GetUniqueID() == a_ClientID)
 		{
@@ -719,85 +684,6 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const ASt
 	}  // for itr - m_Clients[]
 }
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cServer::cNotifyWriteThread:
-
-cServer::cNotifyWriteThread::cNotifyWriteThread(void) :
-	super("ClientPacketThread"),
-	m_Server(nullptr)
-{
-}
-
-
-
-
-
-cServer::cNotifyWriteThread::~cNotifyWriteThread()
-{
-	m_ShouldTerminate = true;
-	m_Event.Set();
-	Wait();
-}
-
-
-
-
-
-bool cServer::cNotifyWriteThread::Start(cServer * a_Server)
-{
-	m_Server = a_Server;
-	return super::Start();
-}
-
-
-
-
-
-void cServer::cNotifyWriteThread::Execute(void)
-{
-	cClientHandleList Clients;
-	while (!m_ShouldTerminate)
-	{
-		cCSLock Lock(m_CS);
-		while (m_Clients.empty())
-		{
-			cCSUnlock Unlock(Lock);
-			m_Event.Wait();
-			if (m_ShouldTerminate)
-			{
-				return;
-			}
-		}
-		
-		// Copy the clients to notify and unlock the CS:
-		Clients.splice(Clients.begin(), m_Clients);
-		Lock.Unlock();
-		
-		for (cClientHandleList::iterator itr = Clients.begin(); itr != Clients.end(); ++itr)
-		{
-			m_Server->m_SocketThreads.NotifyWrite(*itr);
-		}  // for itr - Clients[]
-		Clients.clear();
-	}  // while (!mShouldTerminate)
-}
-
-
-
-
-
-void cServer::cNotifyWriteThread::NotifyClientWrite(const cClientHandle * a_Client)
-{
-	{
-		cCSLock Lock(m_CS);
-		m_Clients.remove(const_cast<cClientHandle *>(a_Client));  // Put it there only once
-		m_Clients.push_back(const_cast<cClientHandle *>(a_Client));
-	}
-	m_Event.Set();
-}
 
 
 
