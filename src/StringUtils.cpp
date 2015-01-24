@@ -905,3 +905,47 @@ bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Out
 
 
 
+
+AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AStringVector & a_Strings2)
+{
+	// Initialize the resulting vector by the first vector:
+	AStringVector res = a_Strings1;
+
+	// Add each item from strings2 that is not already present:
+	for (auto item : a_Strings2)
+	{
+		if (std::find(res.begin(), res.end(), item) != res.end())
+		{
+			res.push_back(item);
+		}
+	}  // for item - a_Strings2[]
+
+	return res;
+}
+
+
+
+
+
+AString StringsConcat(const AStringVector & a_Strings, char a_Separator)
+{
+	// If the vector is empty, return an empty string:
+	if (a_Strings.empty())
+	{
+		return "";
+	}
+
+	// Concatenate the strings in the vector:
+	AString res;
+	res.append(a_Strings[0]);
+	for (auto itr = a_Strings.cbegin() + 1, end = a_Strings.cend(); itr != end; ++itr)
+	{
+		res.push_back(a_Separator);
+		res.append(*itr);
+	}
+	return res;
+}
+
+
+
+
