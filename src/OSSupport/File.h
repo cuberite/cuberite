@@ -126,6 +126,9 @@ public:
 	
 	/** Returns the entire contents of the specified file as a string. Returns empty string on error. */
 	static AString ReadWholeFile(const AString & a_FileName);
+
+	/** Replaces characters that cannot be in a file name with the specified char. */
+	static AString ReplaceFileNameInvalidChars(const AString & a_FileName, char a_Replacement = '_');
 	
 	// tolua_end
 	

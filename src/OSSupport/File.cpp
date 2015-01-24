@@ -453,6 +453,29 @@ AString cFile::ReadWholeFile(const AString & a_FileName)
 
 
 
+AString cFile::ReplaceFileNameInvalidChars(const AString & a_FileName, char a_Replacement)
+{
+	AString res(a_FileName);
+	for (auto & ch: res)
+	{
+		switch (ch)
+		{
+			case ':':
+			case '\\':
+			case '/':
+			{
+				ch = a_Replacement;
+				break;
+			}
+		}
+	}
+	return res;
+}
+
+
+
+
+
 int cFile::Printf(const char * a_Fmt, ...)
 {
 	AString buf;
