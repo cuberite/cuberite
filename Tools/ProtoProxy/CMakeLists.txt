@@ -55,12 +55,14 @@ set(SHARED_HDR
 )
 set(SHARED_OSS_SRC
 	../../src/OSSupport/CriticalSection.cpp
+	../../src/OSSupport/Event.cpp
 	../../src/OSSupport/File.cpp
 	../../src/OSSupport/IsThread.cpp
 	../../src/OSSupport/StackTrace.cpp
 )
 set(SHARED_OSS_HDR
 	../../src/OSSupport/CriticalSection.h
+	../../src/OSSupport/Event.h
 	../../src/OSSupport/File.h
 	../../src/OSSupport/IsThread.h
 	../../src/OSSupport/StackTrace.h

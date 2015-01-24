@@ -62,50 +62,11 @@ public:
 		}
 		
 		// Single chest, get meta from rotation only
-		a_BlockMeta = RotationToMetaData(yaw);
+		a_BlockMeta = PlayerYawToMetaData(yaw);
 		return true;
 	}
 	
 
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) override
-	{
-		// Check if this forms a doublechest, if so, need to adjust the meta:
-		cBlockArea Area;
-		if (!Area.Read(&a_ChunkInterface, a_BlockX - 1, a_BlockX + 1, a_BlockY, a_BlockY, a_BlockZ - 1, a_BlockZ + 1))
-		{
-			return;
-		}
-		
-		double rot = a_Player->GetYaw();  // FIXME: Rename rot to yaw
-		// Choose meta from player rotation, choose only between 2 or 3
-		NIBBLETYPE NewMeta = ((rot >= -90) && (rot < 90)) ? 2 : 3;
-		if (
-			CheckAndAdjustNeighbor(a_ChunkInterface, Area, 0, 1, NewMeta) ||
-			CheckAndAdjustNeighbor(a_ChunkInterface, Area, 2, 1, NewMeta)
-		)
-		{
-			// Forming a double chest in the X direction
-			return;
-		}
-		// Choose meta from player rotation, choose only between 4 or 5
-		NewMeta = (rot < 0) ? 4 : 5;
-		if (
-			CheckAndAdjustNeighbor(a_ChunkInterface, Area, 1, 0, NewMeta) ||
-			CheckAndAdjustNeighbor(a_ChunkInterface, Area, 2, 2, NewMeta)
-		)
-		{
-			// Forming a double chest in the Z direction
-			return;
-		}
-		
-		// Single chest, no further processing needed
-	}
-	
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
 		int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
@@ -180,30 +141,30 @@ public:
 	}
 	
 	
-	/// Translates player rotation when placing a chest into the chest block metadata. Valid for single chests only
-	static NIBBLETYPE RotationToMetaData(double a_Rotation)
+	/** Translates player yaw when placing a chest into the chest block metadata. Valid for single chests only */
+	static NIBBLETYPE PlayerYawToMetaData(double a_Yaw)
 	{
-		a_Rotation += 90 + 45;  // So its not aligned with axis
+		a_Yaw += 90 + 45;  // So its not aligned with axis
 
-		if (a_Rotation > 360.f)
+		if (a_Yaw > 360.f)
 		{
-			a_Rotation -= 360.f;
+			a_Yaw -= 360.f;
 		}
-		if ((a_Rotation >= 0.f) && (a_Rotation < 90.f))
+		if ((a_Yaw >= 0.f) && (a_Yaw < 90.f))
 		{
-			return 0x4;
+			return 0x04;
 		}
-		else if ((a_Rotation >= 180) && (a_Rotation < 270))
+		else if ((a_Yaw >= 180) && (a_Yaw < 270))
 		{
-			return 0x5;
+			return 0x05;
 		}
-		else if ((a_Rotation >= 90) && (a_Rotation < 180))
+		else if ((a_Yaw >= 90) && (a_Yaw < 180))
 		{
-			return 0x2;
+			return 0x02;
 		}
 		else
 		{
-			return 0x3;
+			return 0x03;
 		}
 	}
 	

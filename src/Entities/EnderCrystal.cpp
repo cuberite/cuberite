@@ -29,7 +29,7 @@ void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 
 
 
-void cEnderCrystal::Tick(float a_Dt, cChunk & a_Chunk)
+void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	// No further processing (physics e.t.c.) is needed

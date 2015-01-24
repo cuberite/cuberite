@@ -13,10 +13,30 @@
 class cItemSignHandler :
 	public cItemHandler
 {
+	typedef cItemHandler super;
 public:
 	cItemSignHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+		super(a_ItemType)
 	{
+	}
+
+
+	virtual bool OnPlayerPlace(
+		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
+		int a_CursorX, int a_CursorY, int a_CursorZ
+	)
+	{
+		// If the regular placement doesn't work, do no further processing:
+		if (!super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		{
+			return false;
+		}
+
+		// After successfully placing the sign, open the sign editor for the player:
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		a_Player.GetClientHandle()->SendEditSign(a_BlockX, a_BlockY, a_BlockZ);
+		return true;
 	}
 
 

@@ -23,7 +23,7 @@ cCreeper::cCreeper(void) :
 
 
 
-void cCreeper::Tick(float a_Dt, cChunk & a_Chunk)
+void cCreeper::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
@@ -119,7 +119,7 @@ bool cCreeper::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cCreeper::Attack(float a_Dt)
+void cCreeper::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 

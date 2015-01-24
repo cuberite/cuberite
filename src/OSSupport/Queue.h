@@ -86,7 +86,7 @@ public:
 	bool TryDequeueItem(ItemType & item)
 	{
 		cCSLock Lock(m_CS);
-		if (m_Contents.size() == 0)
+		if (m_Contents.empty())
 		{
 			return false;
 		}
@@ -101,7 +101,7 @@ public:
 	ItemType DequeueItem(void)
 	{
 		cCSLock Lock(m_CS);
-		while (m_Contents.size() == 0)
+		while (m_Contents.empty())
 		{
 			cCSUnlock Unlock(Lock);
 			m_evtAdded.Wait();

@@ -43,7 +43,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cWolf::Attack(float a_Dt)
+void cWolf::Attack(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 
@@ -145,7 +145,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 
 
 
-void cWolf::Tick(float a_Dt, cChunk & a_Chunk)
+void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	if (!IsAngry())
 	{

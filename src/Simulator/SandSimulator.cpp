@@ -24,7 +24,7 @@ cSandSimulator::cSandSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 
 
 
-void cSandSimulator::SimulateChunk(float a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	cSandSimulatorChunkData & ChunkData = a_Chunk->GetSandSimulatorData();
 	if (ChunkData.empty())

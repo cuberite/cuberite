@@ -201,6 +201,7 @@ typedef unsigned char Byte;
 // Common headers (without macros):
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
+#include "OSSupport/Event.h"
 #include "OSSupport/IsThread.h"
 #include "OSSupport/File.h"
 

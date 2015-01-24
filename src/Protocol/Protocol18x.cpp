@@ -207,9 +207,9 @@ void cProtocol180::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockV
 	Pkt.WriteVarInt((UInt32)a_Changes.size());
 	for (sSetBlockVector::const_iterator itr = a_Changes.begin(), end = a_Changes.end(); itr != end; ++itr)
 	{
-		short Coords = (short) (itr->y | (itr->z << 8) | (itr->x << 12));
+		short Coords = (short) (itr->m_RelY | (itr->m_RelZ << 8) | (itr->m_RelX << 12));
 		Pkt.WriteShort(Coords);
-		Pkt.WriteVarInt((itr->BlockType & 0xFFF) << 4 | (itr->BlockMeta & 0xF));
+		Pkt.WriteVarInt((itr->m_BlockType & 0xFFF) << 4 | (itr->m_BlockMeta & 0xF));
 	}  // for itr - a_Changes[]
 }
 
@@ -1723,7 +1723,11 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			{
 				// Decompress the data:
 				AString CompressedData;
-				m_ReceivedData.ReadString(CompressedData, CompressedSize);
+				if (!m_ReceivedData.ReadString(CompressedData, CompressedSize))
+				{
+					m_Client->Kick("Compression failure");
+					return;
+				}
 				InflateString(CompressedData.data(), CompressedSize, UncompressedData);
 				PacketLen = UncompressedData.size();
 			}
@@ -1765,7 +1769,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			AString PacketData;
 			bb.ReadAll(PacketData);
 			bb.ResetRead();
-			bb.ReadVarInt(PacketType);
+			bb.ReadVarInt(PacketType);  // We have already read the packet type once, it will be there again
 			ASSERT(PacketData.size() > 0);  // We have written an extra NUL, so there had to be at least one byte read
 			PacketData.resize(PacketData.size() - 1);
 			AString PacketDataHex;
@@ -2327,6 +2331,16 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 	if (Channel.substr(0, 3) == "MC|")
 	{
 		HandleVanillaPluginMessage(a_ByteBuffer, Channel);
+
+		// Skip any unread data (vanilla sometimes sends garbage at the end of a packet; #1692):
+		if (a_ByteBuffer.GetReadableSpace() > 1)
+		{
+			LOGD("Protocol 1.8: Skipping garbage data at the end of a vanilla PluginMessage packet, %u bytes",
+				static_cast<unsigned>(a_ByteBuffer.GetReadableSpace() - 1)
+			);
+			a_ByteBuffer.SkipRead(a_ByteBuffer.GetReadableSpace() - 1);
+		}
+
 		return;
 	}
 

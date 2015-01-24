@@ -42,15 +42,12 @@ public:
 		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
 	);
 
-	/// Called by cWorld::SetBlock() after the block has been set
+	/** Called by cWorld::SetBlock() after the block has been set */
 	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	
-	/// Called by cClientHandle::HandlePlaceBlock() after the player has placed a new block. Called after OnPlaced().
+	/** Called by cPlayer::PlaceBlocks() for each block after it has been set to the world. Called after OnPlaced(). */
 	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, const sSetBlock & a_BlockChange
 	);
 	
 	/// Called before the player has destroyed a block
@@ -96,7 +93,8 @@ public:
 	*/
 	// virtual bool CanBePlacedAt(cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Dir);
 		
-	/// Called to check whether this block supports a rclk action. If it returns true, OnUse() is called
+	/** Called to check whether this block supports a rclk action.
+	If it returns true, OnUse() is called */
 	virtual bool IsUseable(void);
 	
 	/** Indicates whether the client will click through this block.
@@ -109,20 +107,21 @@ public:
 	*/
 	virtual bool DoesIgnoreBuildCollision(void);
 
-	/// <summary>Similar to DoesIgnoreBuildCollision(void), but is used for cases where block meta/player item-in-hand is needed to determine collision (thin snow)</summary>
+	/** Similar to DoesIgnoreBuildCollision(void), but is used for cases where block's meta or
+	player's item-in-hand is needed to determine collision (thin snow) */
 	virtual bool DoesIgnoreBuildCollision(cPlayer *, NIBBLETYPE a_Meta)
 	{
 		UNUSED(a_Meta);
 		return DoesIgnoreBuildCollision();
 	}
 
-	/// <summary>Returns if this block drops if it gets destroyed by an unsuitable situation. Default: true</summary>
+	/** Returns if this block drops if it gets destroyed by an unsuitable situation.
+	Default: true */
 	virtual bool DoesDropOnUnsuitable(void);
 	
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
 	By default drops if position no more suitable (CanBeAt(), DoesDropOnUnsuitable(), Drop()),
-	and wakes up all simulators on the block.
-	*/
+	and wakes up all simulators on the block. */
 	virtual void Check(cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface, int a_RelX, int a_RelY, int a_RelZ, cChunk & a_Chunk);
 	
 	/// <summary>Rotates a given block meta counter-clockwise. Default: no change</summary>

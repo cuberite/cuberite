@@ -347,18 +347,32 @@ public:
 
 struct sSetBlock
 {
-	int x, y, z;
-	int ChunkX, ChunkZ;
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
+	int m_RelX, m_RelY, m_RelZ;
+	int m_ChunkX, m_ChunkZ;
+	BLOCKTYPE m_BlockType;
+	NIBBLETYPE m_BlockMeta;
 
-	sSetBlock( int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // absolute block position
-	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-		x(a_X), y(a_Y), z(a_Z),
-		ChunkX(a_ChunkX), ChunkZ(a_ChunkZ),
-		BlockType(a_BlockType),
-		BlockMeta(a_BlockMeta)
-	{}
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+
+	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
+		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ),
+		m_BlockType(a_BlockType),
+		m_BlockMeta(a_BlockMeta)
+	{
+		ASSERT((a_RelX >= 0) && (a_RelX < cChunkDef::Width));
+		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
+	}
+
+	/** Returns the absolute X coord of the stored block. */
+	int GetX(void) const { return m_RelX + cChunkDef::Width * m_ChunkX; }
+
+	/** Returns the absolute Y coord of the stored block.
+	Is the same as relative Y coords, because there's no Y relativization. */
+	int GetY(void) const { return m_RelY; }
+
+	/** Returns the absolute Z coord of the stored block. */
+	int GetZ(void) const { return m_RelZ + cChunkDef::Width * m_ChunkZ; }
 };
 
 typedef std::list<sSetBlock> sSetBlockList;
@@ -384,6 +398,17 @@ public:
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;
+
+/** A simple hash function for chunk coords, we assume that chunk coords won't use more than 16 bits, so the hash is almost an identity.
+Used for std::unordered_map<cChunkCoords, ...> */
+class cChunkCoordsHash
+{
+public:
+	size_t operator () (const cChunkCoords & a_Coords) const
+	{
+		return (static_cast<size_t>(a_Coords.m_ChunkX) << 16) ^ static_cast<size_t>(a_Coords.m_ChunkZ);
+	}
+};
 
 
 

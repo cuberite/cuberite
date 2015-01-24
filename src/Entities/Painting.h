@@ -31,7 +31,7 @@ public:
 private:
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override
 	{

@@ -31,7 +31,7 @@ void cPainting::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cPainting::Tick(float a_Dt, cChunk & a_Chunk)
+void cPainting::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	UNUSED(a_Chunk);

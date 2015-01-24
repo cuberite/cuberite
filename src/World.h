@@ -157,8 +157,8 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual Int64 GetWorldAge (void) const override { return m_WorldAge; }
-	virtual int GetTimeOfDay(void) const override { return m_TimeOfDay; }
+	virtual Int64 GetWorldAge (void) const override { return std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count(); }
+	virtual int GetTimeOfDay(void) const override { return std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count(); }
 	
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
@@ -167,8 +167,7 @@ public:
 
 	virtual void SetTimeOfDay(int a_TimeOfDay) override
 	{
-		m_TimeOfDay = a_TimeOfDay;
-		m_TimeOfDaySecs = (double)a_TimeOfDay / 20.0;
+		m_TimeOfDay = cTickTime(a_TimeOfDay);
 		UpdateSkyDarkness();
 		BroadcastTimeUpdate();
 	}
@@ -491,6 +490,11 @@ public:
 
 	// tolua_end
 
+	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
+	Is more efficient than calling SetBlock() multiple times.
+	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
+	void SetBlocks(const sSetBlockVector & a_Blocks);
+
 	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
 	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
 	
@@ -799,7 +803,7 @@ public:
 	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
-	int GetTickRandomNumber(unsigned a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
+	int GetTickRandomNumber(int a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
 	
 	/** Appends all usernames starting with a_Text (case-insensitive) into Results */
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
@@ -909,14 +913,13 @@ private:
 	bool m_BroadcastAchievementMessages;
 
 	bool   m_IsDaylightCycleEnabled;
-	double m_WorldAgeSecs;      // World age, in seconds. Is only incremented, cannot be set by plugins.
-	double m_TimeOfDaySecs;     // Time of day in seconds. Can be adjusted. Is wrapped to zero each day.
-	Int64  m_WorldAge;          // World age in ticks, calculated off of m_WorldAgeSecs
-	int    m_TimeOfDay;         // Time in ticks, calculated off of m_TimeOfDaySecs
-	Int64  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
-	Int64  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
-	Int64  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
-	std::map<cMonster::eFamily, Int64> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
+	// std::chrono::milliseconds is guaranteed to be good for 292 years by the standard.
+	std::chrono::milliseconds  m_WorldAge;
+	std::chrono::milliseconds  m_TimeOfDay;
+	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
+	cTickTimeLong  m_LastUnload;        // The last WorldAge (in ticks) in which unloading was triggerred
+	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
 
@@ -1046,13 +1049,13 @@ private:
 	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
 	virtual ~cWorld();
 
-	void Tick(float a_Dt, int a_LastTickDurationMSec);
+	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
 	
 	/** Handles the mob spawning/moving/destroying each tick */
-	void TickMobs(float a_Dt);
+	void TickMobs(std::chrono::milliseconds a_Dt);
 	
 	/** Executes all tasks queued onto the tick thread */
 	void TickQueuedTasks(void);

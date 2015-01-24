@@ -20,9 +20,9 @@ public:
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void TickFollowPlayer();
-	virtual void Attack(float a_Dt) override;
+	virtual void Attack(std::chrono::milliseconds a_Dt) override;
 
 	// Get functions
 	bool    IsSitting     (void) const { return m_IsSitting; }

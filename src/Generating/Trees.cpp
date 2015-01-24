@@ -403,17 +403,17 @@ void GetLargeAppleTreeImage(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a
 	for (auto itr : a_LogBlocks)
 	{
 		// Get the log's X and Z coordinates
-		int X = itr.ChunkX * 16 + itr.x;
-		int Z = itr.ChunkZ * 16 + itr.z;
+		int X = itr.GetX();
+		int Z = itr.GetZ();
 
-		a_OtherBlocks.push_back(sSetBlock(X, itr.y - 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
-		PushCoordBlocks(X, itr.y - 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		a_OtherBlocks.push_back(sSetBlock(X, itr.m_RelY - 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+		PushCoordBlocks(X, itr.m_RelY - 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		for (int y = -1; y <= 1; y++)
 		{
-			PushCoordBlocks (X, itr.y + y, Z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+			PushCoordBlocks (X, itr.m_RelY + y, Z, a_OtherBlocks, BigO2, ARRAYCOUNT(BigO2), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
 		}
-		PushCoordBlocks(X, itr.y + 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
-		a_OtherBlocks.push_back(sSetBlock(X, itr.y + 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
+		PushCoordBlocks(X, itr.m_RelY + 2, Z, a_OtherBlocks, BigO1, ARRAYCOUNT(BigO1), E_BLOCK_LEAVES, E_META_LEAVES_APPLE);
+		a_OtherBlocks.push_back(sSetBlock(X, itr.m_RelY + 2, Z, E_BLOCK_LEAVES, E_META_LEAVES_APPLE));
 	}
 
 	// Trunk:

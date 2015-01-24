@@ -35,7 +35,7 @@ bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-void cPassiveMonster::Tick(float a_Dt, cChunk & a_Chunk)
+void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 

@@ -86,7 +86,7 @@ public:
 	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
 	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
 	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
-	cMojangAPI &       GetMojangAPI      (void) { return m_MojangAPI; }
+	cMojangAPI &       GetMojangAPI      (void) { return *m_MojangAPI; }
 	cRankManager *     GetRankManager    (void) { return m_RankManager.get(); }
 
 	/** Queues a console command for execution through the cServer class.
@@ -191,7 +191,7 @@ private:
 	cWebAdmin *        m_WebAdmin;
 	cPluginManager *   m_PluginManager;
 	cAuthenticator     m_Authenticator;
-	cMojangAPI         m_MojangAPI;
+	cMojangAPI *       m_MojangAPI;
 
 	std::unique_ptr<cRankManager> m_RankManager;
 

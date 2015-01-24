@@ -10,12 +10,17 @@ SET (SRCS
 	Event.cpp
 	File.cpp
 	GZipFile.cpp
+	HostnameLookup.cpp
+	IPLookup.cpp
 	IsThread.cpp
 	ListenThread.cpp
+	NetworkSingleton.cpp
 	Semaphore.cpp
+	ServerHandleImpl.cpp
 	Socket.cpp
 	SocketThreads.cpp
 	StackTrace.cpp
+	TCPLinkImpl.cpp
 )
 
 SET (HDRS
@@ -24,13 +29,19 @@ SET (HDRS
 	Event.h
 	File.h
 	GZipFile.h
+	HostnameLookup.h
+	IPLookup.h
 	IsThread.h
 	ListenThread.h
+	Network.h
+	NetworkSingleton.h
 	Queue.h
 	Semaphore.h
+	ServerHandleImpl.h
 	Socket.h
 	SocketThreads.h
 	StackTrace.h
+	TCPLinkImpl.h
 )
 
 if(NOT MSVC)

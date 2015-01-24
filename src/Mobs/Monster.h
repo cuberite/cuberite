@@ -30,7 +30,7 @@ public:
 		mfHostile  = 0,  // Spider, Zombies ...
 		mfPassive  = 1,  // Cows, Pigs
 		mfAmbient  = 2,  // Bats
-		mfWater    = 3,  // Squid
+		mfWater    = 3,  // Squid, Guardian
 
 		mfNoSpawn,
 		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
@@ -52,7 +52,7 @@ public:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	virtual void Tick(float a_Dt, cChunk & a_Chunk) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
@@ -80,9 +80,9 @@ public:
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(void);
 
-	virtual void InStateIdle    (float a_Dt);
-	virtual void InStateChasing (float a_Dt);
-	virtual void InStateEscaping(float a_Dt);
+	virtual void InStateIdle    (std::chrono::milliseconds a_Dt);
+	virtual void InStateChasing (std::chrono::milliseconds a_Dt);
+	virtual void InStateEscaping(std::chrono::milliseconds a_Dt);
 
 	int GetAttackRate() { return static_cast<int>(m_AttackRate); }
 	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
@@ -217,8 +217,8 @@ protected:
 
 	/* =========================== */
 
-	float m_IdleInterval;
-	float m_DestroyTimer;
+	std::chrono::milliseconds m_IdleInterval;
+	std::chrono::milliseconds m_DestroyTimer;
 
 	eMonsterType m_MobType;
 	AString m_CustomName;

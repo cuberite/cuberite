@@ -30,7 +30,7 @@ cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
 
 
 
-void cHorse::Tick(float a_Dt, cChunk & a_Chunk)
+void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 

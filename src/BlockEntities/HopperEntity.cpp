@@ -55,7 +55,7 @@ bool cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMeta, int & a_OutputX, i
 
 
 
-bool cHopperEntity::Tick(float a_Dt, cChunk & a_Chunk)
+bool cHopperEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
 	Int64 CurrentTick = a_Chunk.GetWorld()->GetWorldAge();

@@ -55,25 +55,16 @@ public:
 				return false;
 			}
 
-			// Check plugins
-			if (cRoot::Get()->GetPluginManager()->CallHookPlayerPlacingBlock(*a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 0, 0, 0, E_BLOCK_COCOA_POD, BlockMeta))
+			// Place the cocoa pod:
+			if (a_Player->PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta))
 			{
-				a_World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-				a_Player->GetInventory().SendEquippedSlot();
-				return false;
+				a_World->BroadcastSoundEffect("dig.stone", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
+				if (a_Player->IsGameModeSurvival())
+				{
+					a_Player->GetInventory().RemoveOneEquippedItem();
+				}
+				return true;
 			}
-
-			// Set block and broadcast place sound
-			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_COCOA_POD, BlockMeta);
-			a_World->BroadcastSoundEffect("dig.stone", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
-
-			// Remove one cocoa pod from the inventory
-			if (!a_Player->IsGameModeCreative())
-			{
-				a_Player->GetInventory().RemoveOneEquippedItem();
-			}
-			cRoot::Get()->GetPluginManager()->CallHookPlayerPlacedBlock(*a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, 0, 0, 0, E_BLOCK_COCOA_POD, BlockMeta);
-			return true;
 		}
 		return false;
 	}

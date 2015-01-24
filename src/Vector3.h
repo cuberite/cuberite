@@ -307,6 +307,22 @@ public:
 		return (a_X - x) / (a_OtherEnd.x - x);
 	}
 
+	/** Rotates the vector 90 degrees clockwise around the vertical axis.
+	Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down. */
+	inline void TurnCW(void)
+	{
+		std::swap(x, z);
+		x = -x;
+	}
+
+	/** Rotates the vector 90 degrees counterclockwise around the vertical axis.
+	Note that this is specific to minecraft's axis ordering, which is X+ left, Z+ down. */
+	inline void TurnCCW(void)
+	{
+		std::swap(x, z);
+		z = -z;
+	}
+
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;
 

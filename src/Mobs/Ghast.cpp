@@ -32,9 +32,9 @@ void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cGhast::Attack(float a_Dt)
+void cGhast::Attack(std::chrono::milliseconds a_Dt)
 {
-	m_AttackInterval += a_Dt * m_AttackRate;
+	m_AttackInterval += a_Dt.count() * m_AttackRate;
 	
 	if ((m_Target != nullptr) && (m_AttackInterval > 3.0))
 	{

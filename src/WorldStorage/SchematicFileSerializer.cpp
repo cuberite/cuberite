@@ -184,7 +184,9 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 	{
 		LOG("Dimensions are missing from the schematic file (%d, %d, %d), (%d, %d, %d)",
 			TSizeX, TSizeY, TSizeZ,
-			a_NBT.GetType(TSizeX), a_NBT.GetType(TSizeY), a_NBT.GetType(TSizeZ)
+			(TSizeX >= 0) ? a_NBT.GetType(TSizeX) : -1,
+			(TSizeY >= 0) ? a_NBT.GetType(TSizeY) : -1,
+			(TSizeZ >= 0) ? a_NBT.GetType(TSizeZ) : -1
 		);
 		return false;
 	}

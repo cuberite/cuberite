@@ -123,18 +123,18 @@ void cStructGenTrees::GenerateSingleTree(
 	// Check if the generated image fits the terrain. Only the logs are checked:
 	for (sSetBlockVector::const_iterator itr = TreeLogs.begin(); itr != TreeLogs.end(); ++itr)
 	{
-		if ((itr->ChunkX != a_ChunkX) || (itr->ChunkZ != a_ChunkZ))
+		if ((itr->m_ChunkX != a_ChunkX) || (itr->m_ChunkZ != a_ChunkZ))
 		{
 			// Outside the chunk
 			continue;
 		}
-		if (itr->y >= cChunkDef::Height)
+		if (itr->m_RelY >= cChunkDef::Height)
 		{
 			// Above the chunk, cut off (this shouldn't happen too often, we're limiting trees to y < 230)
 			continue;
 		}
 
-		BLOCKTYPE Block = a_ChunkDesc.GetBlockType(itr->x, itr->y, itr->z);
+		BLOCKTYPE Block = a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 		switch (Block)
 		{
 			CASE_TREE_ALLOWED_BLOCKS:
@@ -167,14 +167,14 @@ void cStructGenTrees::ApplyTreeImage(
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
 	for (sSetBlockVector::const_iterator itr = a_Image.begin(), end = a_Image.end(); itr != end; ++itr)
 	{
-		if ((itr->ChunkX == a_ChunkX) && (itr->ChunkZ == a_ChunkZ) && (itr->y < cChunkDef::Height))
+		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_RelY < cChunkDef::Height))
 		{
 			// Inside this chunk, integrate into a_ChunkDesc:
-			switch (a_ChunkDesc.GetBlockType(itr->x, itr->y, itr->z))
+			switch (a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ))
 			{
 				case E_BLOCK_LEAVES:
 				{
-					if (itr->BlockType != E_BLOCK_LOG)
+					if (itr->m_BlockType != E_BLOCK_LOG)
 					{
 						break;
 					}
@@ -182,7 +182,7 @@ void cStructGenTrees::ApplyTreeImage(
 				}
 				CASE_TREE_OVERWRITTEN_BLOCKS:
 				{
-					a_ChunkDesc.SetBlockTypeMeta(itr->x, itr->y, itr->z, itr->BlockType, itr->BlockMeta);
+					a_ChunkDesc.SetBlockTypeMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
 					break;
 				}
 				

@@ -76,8 +76,8 @@ public:
 	virtual bool OnPlayerJoined             (cPlayer & a_Player) = 0;
 	virtual bool OnPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status) = 0;
 	virtual bool OnPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) = 0;
-	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
-	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual bool OnPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
+	virtual bool OnPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) = 0;
 	virtual bool OnPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) = 0;
 	virtual bool OnPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) = 0;
 	virtual bool OnPlayerShooting           (cPlayer & a_Player) = 0;
@@ -104,7 +104,7 @@ public:
 	virtual bool OnWeatherChanged           (cWorld & a_World) = 0;
 	virtual bool OnWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) = 0;
 	virtual bool OnWorldStarted             (cWorld & a_World) = 0;
-	virtual bool OnWorldTick                (cWorld & a_World, float a_Dt, int a_LastTickDurationMSec) = 0;
+	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) = 0;
 	
 	/** Handles the command split into a_Split, issued by player a_Player.
 	Command permissions have already been checked.

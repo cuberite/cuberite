@@ -174,20 +174,20 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 
 
 
-void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
+void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 	m_Timer += a_Dt;
 	
 	if (m_bIsCollected)
 	{
-		if (m_Timer > 500.f)  // 0.5 seconds
+		if (m_Timer > std::chrono::milliseconds(500))
 		{
 			Destroy();
 			return;
 		}
 	}
-	else if (m_Timer > 1000 * 60 * 5)  // 5 minutes
+	else if (m_Timer > std::chrono::minutes(5))
 	{
 		Destroy();
 		return;
@@ -202,7 +202,7 @@ void cArrowEntity::Tick(float a_Dt, cChunk & a_Chunk)
 		
 		if (!m_HasTeleported)  // Sent a teleport already, don't do again
 		{
-			if (m_HitGroundTimer > 500.f)  // Send after half a second, could be less, but just in case
+			if (m_HitGroundTimer > std::chrono::milliseconds(500))
 			{
 				m_World->BroadcastTeleportEntity(*this);
 				m_HasTeleported = true;

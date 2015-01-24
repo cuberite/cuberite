@@ -959,6 +959,7 @@ enum
 	E_META_SPAWN_EGG_WITHER           = 64,
 	E_META_SPAWN_EGG_BAT              = 65,
 	E_META_SPAWN_EGG_WITCH            = 66,
+	E_META_SPAWN_EGG_GUARDIAN         = 68,
 	E_META_SPAWN_EGG_PIG              = 90,
 	E_META_SPAWN_EGG_SHEEP            = 91,
 	E_META_SPAWN_EGG_COW              = 92,
@@ -970,6 +971,7 @@ enum
 	E_META_SPAWN_EGG_OCELOT           = 98,
 	E_META_SPAWN_EGG_IRON_GOLEM       = 99,
 	E_META_SPAWN_EGG_HORSE            = 100,
+	E_META_SPAWN_EGG_RABBIT           = 101,
 	E_META_SPAWN_EGG_VILLAGER         = 120,
 	E_META_SPAWN_EGG_ENDER_CRYSTAL    = 200,
 } ;

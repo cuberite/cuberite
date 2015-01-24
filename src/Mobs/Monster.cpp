@@ -38,12 +38,14 @@ static const struct
 	{mtEnderman,     "enderman",     "Enderman"},
 	{mtEnderDragon,  "enderdragon",  "EnderDragon"},
 	{mtGhast,        "ghast",        "Ghast"},
+	{mtGuardian,     "guardian",     "Guardian"},
 	{mtHorse,        "horse",        "EntityHorse"},
 	{mtIronGolem,    "irongolem",    "VillagerGolem"},
 	{mtMagmaCube,    "magmacube",    "LavaSlime"},
 	{mtMooshroom,    "mooshroom",    "MushroomCow"},
 	{mtOcelot,       "ocelot",       "Ozelot"},
 	{mtPig,          "pig",          "Pig"},
+	{mtRabbit,       "rabbit",       "Rabbit"},
 	{mtSheep,        "sheep",        "Sheep"},
 	{mtSilverfish,   "silverfish",   "Silverfish"},
 	{mtSkeleton,     "skeleton",     "Skeleton"},
@@ -250,15 +252,15 @@ bool cMonster::ReachedFinalDestination()
 
 
 
-void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
+void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
 
 	if (m_Health <= 0)
 	{
 		// The mob is dead, but we're still animating the "puff" they leave when they die
-		m_DestroyTimer += a_Dt / 1000;
-		if (m_DestroyTimer > 1)
+		m_DestroyTimer += a_Dt;
+		if (m_DestroyTimer > std::chrono::seconds(1))
 		{
 			Destroy(true);
 		}
@@ -272,8 +274,6 @@ void cMonster::Tick(float a_Dt, cChunk & a_Chunk)
 
 	// Burning in daylight
 	HandleDaylightBurning(a_Chunk);
-
-	a_Dt /= 1000;
 
 	if (m_bMovingToDestination)
 	{
@@ -498,6 +498,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtCow:
 		case mtHorse:
 		case mtPig:
+		case mtRabbit:
 		case mtSheep:
 		case mtSquid:
 		case mtMooshroom:
@@ -513,6 +514,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtCreeper:
 		case mtEnderman:
 		case mtGhast:
+		case mtGuardian:
 		case mtSilverfish:
 		case mtSkeleton:
 		case mtSpider:
@@ -553,7 +555,7 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		m_World->SpawnExperienceOrb(GetPosX(), GetPosY(), GetPosZ(), Reward);
 	}
-	m_DestroyTimer = 0;
+	m_DestroyTimer = std::chrono::milliseconds(0);
 }
 
 
@@ -636,7 +638,7 @@ void cMonster::EventLosePlayer(void)
 
 
 
-void cMonster::InStateIdle(float a_Dt)
+void cMonster::InStateIdle(std::chrono::milliseconds a_Dt)
 {
 	if (m_bMovingToDestination)
 	{
@@ -645,11 +647,11 @@ void cMonster::InStateIdle(float a_Dt)
 
 	m_IdleInterval += a_Dt;
 
-	if (m_IdleInterval > 1)
+	if (m_IdleInterval > std::chrono::seconds(1))
 	{
 		// At this interval the results are predictable
 		int rem = m_World->GetTickRandomNumber(6) + 1;
-		m_IdleInterval -= 1;  // So nothing gets dropped when the server hangs for a few seconds
+		m_IdleInterval -= std::chrono::seconds(1);  // So nothing gets dropped when the server hangs for a few seconds
 
 		Vector3d Dist;
 		Dist.x = (double)m_World->GetTickRandomNumber(10) - 5;
@@ -676,7 +678,7 @@ void cMonster::InStateIdle(float a_Dt)
 
 // What to do if in Chasing State
 // This state should always be defined in each child class
-void cMonster::InStateChasing(float a_Dt)
+void cMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 }
@@ -686,7 +688,7 @@ void cMonster::InStateChasing(float a_Dt)
 
 
 // What to do if in Escaping State
-void cMonster::InStateEscaping(float a_Dt)
+void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt)
 {
 	UNUSED(a_Dt);
 	
@@ -842,12 +844,14 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtEnderman:     return mfHostile;
 		case mtGhast:        return mfHostile;
 		case mtGiant:        return mfNoSpawn;
+		case mtGuardian:     return mfWater;  // Just because they have special spawning conditions. If Watertemples have been added, this needs to be edited!
 		case mtHorse:        return mfPassive;
 		case mtIronGolem:    return mfPassive;
 		case mtMagmaCube:    return mfHostile;
 		case mtMooshroom:    return mfHostile;
 		case mtOcelot:       return mfPassive;
 		case mtPig:          return mfPassive;
+		case mtRabbit:       return mfPassive;
 		case mtSheep:        return mfPassive;
 		case mtSilverfish:   return mfHostile;
 		case mtSkeleton:     return mfHostile;
@@ -955,10 +959,12 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtEnderman:      toReturn = new cEnderman();                 break;
 		case mtGhast:         toReturn = new cGhast();                    break;
 		case mtGiant:         toReturn = new cGiant();                    break;
+		case mtGuardian:      toReturn = new cGuardian();                 break;
 		case mtIronGolem:     toReturn = new cIronGolem();                break;
 		case mtMooshroom:     toReturn = new cMooshroom();                break;
 		case mtOcelot:        toReturn = new cOcelot();                   break;
 		case mtPig:           toReturn = new cPig();                      break;
+		case mtRabbit:        toReturn = new cRabbit();                   break;
 		case mtSheep:         toReturn = new cSheep();                    break;
 		case mtSilverfish:    toReturn = new cSilverfish();               break;
 		case mtSnowGolem:     toReturn = new cSnowGolem();                break;
