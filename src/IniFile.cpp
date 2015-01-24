@@ -888,3 +888,39 @@ void cIniFile::RemoveBom(AString & a_line) const
 
 
 
+
+AStringVector ReadUpgradeIniPorts(
+	cIniFile & a_IniFile,
+	const AString & a_KeyName,
+	const AString & a_PortsValueName,
+	const AString & a_OldIPv4ValueName,
+	const AString & a_OldIPv6ValueName,
+	const AString & a_DefaultValue
+)
+{
+	// Read the regular value, but don't use the default (in order to detect missing value for upgrade):
+	AStringVector Ports = StringSplitAndTrim(a_IniFile.GetValue(a_KeyName, a_PortsValueName), ";,");
+
+	if (Ports.empty())
+	{
+		// Historically there were two separate entries for IPv4 and IPv6, merge them and migrate:
+		AString Ports4 = a_IniFile.GetValue(a_KeyName, a_OldIPv4ValueName, a_DefaultValue);
+		AString Ports6 = a_IniFile.GetValue(a_KeyName, a_OldIPv6ValueName);
+		Ports = MergeStringVectors(StringSplitAndTrim(Ports4, ";,"), StringSplitAndTrim(Ports6, ";,"));
+		a_IniFile.DeleteValue(a_KeyName, a_OldIPv4ValueName);
+		a_IniFile.DeleteValue(a_KeyName, a_OldIPv6ValueName);
+
+		// If those weren't present or were empty, use the default:"
+		if (Ports.empty())
+		{
+			Ports = StringSplitAndTrim(a_DefaultValue, ";,");
+		}
+		a_IniFile.SetValue(a_KeyName, a_PortsValueName, StringsConcat(Ports, ','));
+	}
+
+	return Ports;
+}
+
+
+
+
