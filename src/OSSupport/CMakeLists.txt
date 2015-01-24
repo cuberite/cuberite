@@ -52,6 +52,6 @@ if(NOT MSVC)
 			target_link_libraries(OSSupport rt)
 		endif()
 
-		target_link_libraries(OSSupport pthread)
+		target_link_libraries(OSSupport pthread event_core event_extra)
 	endif()
 endif()
