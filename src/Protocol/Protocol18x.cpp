@@ -108,10 +108,12 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 	{
 		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
+		AString IP(a_Client->GetIPString());
+		ReplaceString(IP, ":", "_");
 		AString FileName = Printf("CommLogs/%x_%d__%s.log",
 			static_cast<unsigned>(time(nullptr)),
 			sCounter++,
-			cFile::ReplaceFileNameInvalidChars(a_Client->GetIPString()).c_str()
+			IP.c_str()
 		);
 		if (!m_CommLogFile.Open(FileName, cFile::fmWrite))
 		{
