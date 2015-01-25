@@ -82,7 +82,7 @@ class cRCONCommandOutput :
 	public cCommandOutputCallback
 {
 public:
-	cRCONCommandOutput(cRCONServer::cConnection & a_Connection, int a_RequestID) :
+	cRCONCommandOutput(cRCONServer::cConnection & a_Connection, UInt32 a_RequestID) :
 		m_Connection(a_Connection),
 		m_RequestID(a_RequestID)
 	{
@@ -96,13 +96,13 @@ public:
 	
 	virtual void Finished(void) override
 	{
-		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, (int)m_Buffer.size(), m_Buffer.c_str());
+		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, static_cast<UInt32>(m_Buffer.size()), m_Buffer.c_str());
 		delete this;
 	}
 	
 protected:
 	cRCONServer::cConnection & m_Connection;
-	int m_RequestID;
+	UInt32 m_RequestID;
 	AString m_Buffer;
 } ;
 
@@ -211,7 +211,7 @@ void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size
 	// Process the packets in the buffer:
 	while (m_Buffer.size() >= 14)
 	{
-		int Length = IntFromBuffer(m_Buffer.data());
+		UInt32 Length = UIntFromBuffer(m_Buffer.data());
 		if (Length > 1500)
 		{
 			// Too long, drop the connection
@@ -222,14 +222,14 @@ void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size
 			m_Link.reset();
 			return;
 		}
-		if (Length > static_cast<int>(m_Buffer.size() + 4))
+		if (Length > static_cast<Int32>(m_Buffer.size() + 4))
 		{
 			// Incomplete packet yet, wait for more data to come
 			return;
 		}
 		
-		int RequestID  = IntFromBuffer(m_Buffer.data() + 4);
-		int PacketType = IntFromBuffer(m_Buffer.data() + 8);
+		UInt32 RequestID  = UIntFromBuffer(m_Buffer.data() + 4);
+		UInt32 PacketType = UIntFromBuffer(m_Buffer.data() + 8);
 		if (!ProcessPacket(RequestID, PacketType, Length - 10, m_Buffer.data() + 12))
 		{
 			m_Link->Close();
@@ -263,7 +263,7 @@ void cRCONServer::cConnection::OnError(int a_ErrorCode, const AString & a_ErrorM
 
 
 
-bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload)
+bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload)
 {
 	switch (a_PacketType)
 	{
@@ -272,7 +272,7 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 			if (strncmp(a_Payload, m_RCONServer.m_Password.c_str(), a_PayloadLength) != 0)
 			{
 				LOGINFO("RCON: Invalid password from client %s, dropping connection.", m_IPAddress.c_str());
-				SendResponse(-1, RCON_PACKET_RESPONSE, 0, nullptr);
+				SendResponse(0xffffffffU, RCON_PACKET_RESPONSE, 0, nullptr);
 				return false;
 			}
 			m_IsAuthenticated = true;
@@ -314,23 +314,22 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 
 
 
-/// Reads 4 bytes from a_Buffer and returns the int they represent
-int cRCONServer::cConnection::IntFromBuffer(const char * a_Buffer)
+UInt32 cRCONServer::cConnection::UIntFromBuffer(const char * a_Buffer)
 {
-	return ((unsigned char)a_Buffer[3] << 24) | ((unsigned char)a_Buffer[2] << 16) | ((unsigned char)a_Buffer[1] << 8) | (unsigned char)a_Buffer[0];
+	const Byte * Buffer = reinterpret_cast<const Byte *>(a_Buffer);
+	return (Buffer[3] << 24) | (Buffer[2] << 16) | (Buffer[1] << 8) | Buffer[0];
 }
 
 
 
 
 
-/// Puts 4 bytes representing the int into the buffer
-void cRCONServer::cConnection::IntToBuffer(int a_Value, char * a_Buffer)
+void cRCONServer::cConnection::UIntToBuffer(UInt32 a_Value, char * a_Buffer)
 {
-	a_Buffer[0] = a_Value & 0xff;
-	a_Buffer[1] = (a_Value >> 8)  & 0xff;
-	a_Buffer[2] = (a_Value >> 16) & 0xff;
-	a_Buffer[3] = (a_Value >> 24) & 0xff;
+	a_Buffer[0] = static_cast<char>(a_Value & 0xff);
+	a_Buffer[1] = static_cast<char>((a_Value >> 8)  & 0xff);
+	a_Buffer[2] = static_cast<char>((a_Value >> 16) & 0xff);
+	a_Buffer[3] = static_cast<char>((a_Value >> 24) & 0xff);
 }
 
 
@@ -338,19 +337,17 @@ void cRCONServer::cConnection::IntToBuffer(int a_Value, char * a_Buffer)
 
 
 /// Sends a RCON packet back to the client
-void cRCONServer::cConnection::SendResponse(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload)
+void cRCONServer::cConnection::SendResponse(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload)
 {
 	ASSERT((a_PayloadLength == 0) || (a_Payload != nullptr));  // Either zero data to send, or a valid payload ptr
 	ASSERT(m_Link != nullptr);
 	
-	char Buffer[4];
-	int Length = a_PayloadLength + 10;
-	IntToBuffer(Length, Buffer);
-	m_Link->Send(Buffer, 4);
-	IntToBuffer(a_RequestID, Buffer);
-	m_Link->Send(Buffer, 4);
-	IntToBuffer(a_PacketType, Buffer);
-	m_Link->Send(Buffer, 4);
+	char Buffer[12];
+	UInt32 Length = a_PayloadLength + 10;
+	UIntToBuffer(Length, Buffer);
+	UIntToBuffer(a_RequestID, Buffer + 4);
+	UIntToBuffer(a_PacketType, Buffer + 8);
+	m_Link->Send(Buffer, 12);
 	if (a_PayloadLength > 0)
 	{
 		m_Link->Send(a_Payload, a_PayloadLength);

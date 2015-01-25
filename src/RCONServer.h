@@ -67,16 +67,16 @@ protected:
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 		
 		/** Processes the given packet and sends the response; returns true if successful, false if the connection is to be dropped */
-		bool ProcessPacket(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload);
+		bool ProcessPacket(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload);
 		
-		/** Reads 4 bytes from a_Buffer and returns the int they represent */
-		int IntFromBuffer(const char * a_Buffer);
+		/** Reads 4 bytes from a_Buffer and returns the LE UInt32 they represent */
+		UInt32 UIntFromBuffer(const char * a_Buffer);
 		
 		/** Puts 4 bytes representing the int into the buffer */
-		void IntToBuffer(int a_Value, char * a_Buffer);
+		void UIntToBuffer(UInt32 a_Value, char * a_Buffer);
 		
 		/** Sends a RCON packet back to the client */
-		void SendResponse(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload);
+		void SendResponse(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload);
 	} ;
 	
 	
