@@ -38,7 +38,7 @@ public:
 	}
 
 
-	bool AbsorbWater(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
+	void AbsorbWater(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		std::list<Vector3i> Blocks;
 		std::list<Vector3i> WaterBlocks;
@@ -85,11 +85,9 @@ public:
 				a_ChunkInterface.SetBlock(Block.x, Block.y, Block.z, E_BLOCK_AIR, 0);
 			}
 
-			// ChunkInterface doesn't have a BroadcastSoundParticleEffect() method :(
+			// ChunkInterface doesn't have a BroadcastSoundParticleEffect() method.
 			// a_World->BroadcastSoundParticleEffect(2001, (int) a_BlockX * 8.f), (int) (a_BlockY * 8.f), (int) (a_BlockZ * 8.f), E_BLOCK_STATIONARY_WATER);
-			return true;
 		}
-		return false;
 	}
 
 } ;
