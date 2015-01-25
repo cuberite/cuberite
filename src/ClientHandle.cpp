@@ -711,9 +711,9 @@ void cClientHandle::HandleEnchantItem(Byte a_WindowID, Byte a_Enchantment)
 		return;
 	}
 	
-	cEnchantingWindow * Window = (cEnchantingWindow*) m_Player->GetWindow();
-	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
-	int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
+	cEnchantingWindow * Window = reinterpret_cast<cEnchantingWindow *>(m_Player->GetWindow());
+	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // Make a copy of the item
+	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
 	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
 	{
