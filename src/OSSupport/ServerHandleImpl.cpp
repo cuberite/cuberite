@@ -157,10 +157,6 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 			err = EVUTIL_SOCKET_ERROR();
 			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
-			LOGD("setsockopt(IPV6_V6ONLY) returned %d, err is %d (%s). %s",
-				res, err, evutil_socket_error_to_string(err),
-				NeedsTwoSockets ? "Second socket will be created" : "Second socket not needed"
-			);
 		#else
 			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 		#endif
