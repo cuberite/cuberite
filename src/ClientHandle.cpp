@@ -1884,7 +1884,10 @@ void cClientHandle::Tick(float a_Dt)
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
 	}
-	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	if (!IncomingData.empty())
+	{
+		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
 	
 	m_TicksSinceLastPacket += 1;
 	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
@@ -1968,7 +1971,10 @@ void cClientHandle::ServerTick(float a_Dt)
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
 	}
-	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	if (!IncomingData.empty())
+	{
+		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
 	
 	if (m_State == csAuthenticated)
 	{
