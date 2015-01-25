@@ -222,7 +222,7 @@ void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size
 			m_Link.reset();
 			return;
 		}
-		if (Length > static_cast<Int32>(m_Buffer.size() + 4))
+		if (Length > static_cast<UInt32>(m_Buffer.size() + 4))
 		{
 			// Incomplete packet yet, wait for more data to come
 			return;
