@@ -26,16 +26,14 @@ public:
 	}
 
 
-	virtual void OnPlacedByPlayer(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	)
+	virtual void OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, const sSetBlock & a_BlockChange) override
 	{
-		if (a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ) == E_META_SPONGE_NORMAL)
+		if (a_BlockChange.m_BlockMeta == E_META_SPONGE_NORMAL)
 		{
-			AbsorbWater(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
+			int BlockX = a_BlockChange.m_ChunkX * cChunkDef::Width + a_BlockChange.m_RelX;
+			int BlockZ = a_BlockChange.m_ChunkZ * cChunkDef::Width + a_BlockChange.m_RelZ;
+
+			AbsorbWater(a_ChunkInterface, BlockX, a_BlockChange.m_RelY, BlockZ);
 		}
 	}
 
