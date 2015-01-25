@@ -225,8 +225,8 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 	// Open up requested ports:
 	for (auto port : a_Ports)
 	{
-		UInt16 PortNum = static_cast<UInt16>(atoi(port.c_str()));
-		if (PortNum == 0)
+		UInt16 PortNum;
+		if (!StringToInteger(port, PortNum))
 		{
 			LOGWARNING("WebServer: Invalid port value: \"%s\". Ignoring.", port.c_str());
 			continue;

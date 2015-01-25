@@ -393,8 +393,8 @@ bool cServer::Start(void)
 {
 	for (auto port: m_Ports)
 	{
-		UInt16 PortNum = static_cast<UInt16>(atoi(port.c_str()));
-		if (PortNum == 0)
+		UInt16 PortNum;
+		if (!StringToInteger(port, PortNum))
 		{
 			LOGWARNING("Invalid port specified for server: \"%s\". Ignoring.", port.c_str());
 			continue;

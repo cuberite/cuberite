@@ -155,8 +155,8 @@ void cRCONServer::Initialize(cIniFile & a_IniFile)
 	// Start listening on each specified port:
 	for (auto port: Ports)
 	{
-		UInt16 PortNum = static_cast<UInt16>(atol(port.c_str()));
-		if (PortNum == 0)
+		UInt16 PortNum;
+		if (!StringToInteger(port, PortNum))
 		{
 			LOGINFO("Invalid RCON port value: \"%s\". Ignoring.", port.c_str());
 			continue;
