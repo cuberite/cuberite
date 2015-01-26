@@ -7,6 +7,7 @@
 #include <thread>
 #include "OSSupport/Event.h"
 #include "OSSupport/Network.h"
+#include "OSSupport/NetworkSingleton.h"
 
 
 
@@ -96,7 +97,7 @@ public:
 
 
 
-int main()
+void DoTest(void)
 {
 	cEvent evtFinish;
 
@@ -109,7 +110,19 @@ int main()
 	LOGD("Connect request has been queued.");
 	
 	evtFinish.Wait();
+}
+
+
+
+
+
+int main()
+{
+	DoTest();
+
+	cNetworkSingleton::Get().Terminate();
 	LOGD("Network test finished");
+
 	return 0;
 }
 

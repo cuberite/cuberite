@@ -18,7 +18,8 @@
 
 
 
-cNetworkSingleton::cNetworkSingleton(void)
+cNetworkSingleton::cNetworkSingleton(void):
+	m_HasTerminated(false)
 {
 	// Windows: initialize networking:
 	#ifdef _WIN32
@@ -72,6 +73,29 @@ cNetworkSingleton::cNetworkSingleton(void)
 
 cNetworkSingleton::~cNetworkSingleton()
 {
+	// Check that Terminate has been called already:
+	ASSERT(m_HasTerminated);
+}
+
+
+
+
+
+cNetworkSingleton & cNetworkSingleton::Get(void)
+{
+	static cNetworkSingleton Instance;
+	return Instance;
+}
+
+
+
+
+
+void cNetworkSingleton::Terminate(void)
+{
+	ASSERT(!m_HasTerminated);
+	m_HasTerminated = true;
+
 	// Wait for the LibEvent event loop to terminate:
 	event_base_loopbreak(m_EventBase);
 	m_EventLoopTerminated.Wait();
@@ -90,16 +114,6 @@ cNetworkSingleton::~cNetworkSingleton()
 	event_base_free(m_EventBase);
 
 	libevent_global_shutdown();
-}
-
-
-
-
-
-cNetworkSingleton & cNetworkSingleton::Get(void)
-{
-	static cNetworkSingleton Instance;
-	return Instance;
 }
 
 
@@ -138,6 +152,7 @@ void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 
 void cNetworkSingleton::AddHostnameLookup(cHostnameLookupPtr a_HostnameLookup)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	m_HostnameLookups.push_back(a_HostnameLookup);
 }
@@ -148,6 +163,7 @@ void cNetworkSingleton::AddHostnameLookup(cHostnameLookupPtr a_HostnameLookup)
 
 void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameLookup)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	for (auto itr = m_HostnameLookups.begin(), end = m_HostnameLookups.end(); itr != end; ++itr)
 	{
@@ -165,6 +181,7 @@ void cNetworkSingleton::RemoveHostnameLookup(const cHostnameLookup * a_HostnameL
 
 void cNetworkSingleton::AddIPLookup(cIPLookupPtr a_IPLookup)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	m_IPLookups.push_back(a_IPLookup);
 }
@@ -175,6 +192,7 @@ void cNetworkSingleton::AddIPLookup(cIPLookupPtr a_IPLookup)
 
 void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	for (auto itr = m_IPLookups.begin(), end = m_IPLookups.end(); itr != end; ++itr)
 	{
@@ -192,6 +210,7 @@ void cNetworkSingleton::RemoveIPLookup(const cIPLookup * a_IPLookup)
 
 void cNetworkSingleton::AddLink(cTCPLinkImplPtr a_Link)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	m_Connections.push_back(a_Link);
 }
@@ -202,6 +221,7 @@ void cNetworkSingleton::AddLink(cTCPLinkImplPtr a_Link)
 
 void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	for (auto itr = m_Connections.begin(), end = m_Connections.end(); itr != end; ++itr)
 	{
@@ -219,6 +239,7 @@ void cNetworkSingleton::RemoveLink(const cTCPLinkImpl * a_Link)
 
 void cNetworkSingleton::AddServer(cServerHandleImplPtr a_Server)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	m_Servers.push_back(a_Server);
 }
@@ -229,6 +250,7 @@ void cNetworkSingleton::AddServer(cServerHandleImplPtr a_Server)
 
 void cNetworkSingleton::RemoveServer(const cServerHandleImpl * a_Server)
 {
+	ASSERT(!m_HasTerminated);
 	cCSLock Lock(m_CS);
 	for (auto itr = m_Servers.begin(), end = m_Servers.end(); itr != end; ++itr)
 	{

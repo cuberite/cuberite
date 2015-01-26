@@ -11,13 +11,17 @@
 	#include <dbghelp.h>
 #endif  // _MSC_VER
 
-
-bool cRoot::m_TerminateEventRaised = false;  // If something has told the server to stop; checked periodically in cRoot
-static bool g_ServerTerminated = false;  // Set to true when the server terminates, so our CTRL handler can then tell the OS to close the console
+#include "OSSupport/NetworkSingleton.h"
 
 
 
 
+
+/** If something has told the server to stop; checked periodically in cRoot */
+bool cRoot::m_TerminateEventRaised = false;
+
+/** Set to true when the server terminates, so our CTRL handler can then tell the OS to close the console. */
+static bool g_ServerTerminated = false;
 
 /** If set to true, the protocols will log each player's incoming (C->S) communication to a per-connection logfile */
 bool g_ShouldLogCommIn;
@@ -304,6 +308,9 @@ int main( int argc, char **argv)
 	#endif
 
 	g_ServerTerminated = true;
+
+	// Shutdown all of LibEvent:
+	cNetworkSingleton::Get().Terminate();
 
 	return EXIT_SUCCESS;
 }
