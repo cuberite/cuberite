@@ -376,8 +376,12 @@ private:
 	Protected by m_CSIncomingData. */
 	AString m_IncomingData;
 
-	/** Protects data going out through m_Link against multi-threaded sending. */
+	/** Protects m_OutgoingData against multithreaded access. */
 	cCriticalSection m_CSOutgoingData;
+
+	/** Buffer for storing outgoing data from any thread; will get sent in Tick() (to prevent deadlocks).
+	Protected by m_CSOutgoingData. */
+	AString m_OutgoingData;
 
 	Vector3d m_ConfirmPosition;
 

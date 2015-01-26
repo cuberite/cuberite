@@ -1824,10 +1824,7 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 	}
 
 	cCSLock Lock(m_CSOutgoingData);
-	if (m_Link != nullptr)
-	{
-		m_Link->Send(a_Data, a_Size);
-	}
+	m_OutgoingData.append(a_Data, a_Size);
 }
 
 
@@ -1887,6 +1884,17 @@ void cClientHandle::Tick(float a_Dt)
 	if (!IncomingData.empty())
 	{
 		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
+
+	// Send any queued outgoing data:
+	AString OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+	if ((m_Link != nullptr) && !OutgoingData.empty())
+	{
+		m_Link->Send(OutgoingData.data(), OutgoingData.size());
 	}
 	
 	m_TicksSinceLastPacket += 1;
@@ -1974,6 +1982,17 @@ void cClientHandle::ServerTick(float a_Dt)
 	if (!IncomingData.empty())
 	{
 		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
+	
+	// Send any queued outgoing data:
+	AString OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+	if ((m_Link != nullptr) && !OutgoingData.empty())
+	{
+		m_Link->Send(OutgoingData.data(), OutgoingData.size());
 	}
 	
 	if (m_State == csAuthenticated)
