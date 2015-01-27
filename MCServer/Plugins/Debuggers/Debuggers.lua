@@ -1164,7 +1164,7 @@ function HandleSched(a_Split, a_Player)
 	end
 	
 	-- Schedule a broadcast of the final message and a note to the originating player
-	-- Note that we CANNOT us the a_Player in the callback - what if the player disconnected?
+	-- Note that we CANNOT use the a_Player in the callback - what if the player disconnected?
 	-- Therefore we store the player's EntityID
 	local PlayerID = a_Player:GetUniqueID()
 	World:ScheduleTask(220,
@@ -1607,10 +1607,13 @@ end
 
 
 function HandleConsoleSchedule(a_Split)
-	LOG("Scheduling a task for 2 seconds in the future")
+	local prev = os.clock()
+	LOG("Scheduling a task for 2 seconds in the future (current os.clock is " .. prev .. ")")
 	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
 		function ()
-			LOG("Scheduled function is called.")
+			local current = os.clock()
+			local diff = current - prev
+			LOG("Scheduled function is called. Current os.clock is " .. current .. ", difference is " .. diff .. ")")
 		end
 	)
 	return true, "Task scheduled"
