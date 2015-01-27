@@ -83,6 +83,9 @@ void cServerHandleImpl::Close(void)
 
 	// Remove the ptr to self, so that the object may be freed:
 	m_SelfPtr.reset();
+
+	// Remove self from cNetworkSingleton:
+	cNetworkSingleton::Get().RemoveServer(this);
 }
 
 
