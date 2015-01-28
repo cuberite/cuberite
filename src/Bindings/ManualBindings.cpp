@@ -256,7 +256,7 @@ static int tolua_Base64Decode(lua_State * tolua_S)
 
 
 
-static cPluginLua * GetLuaPlugin(lua_State * L)
+cPluginLua * GetLuaPlugin(lua_State * L)
 {
 	// Get the plugin identification out of LuaState:
 	lua_getglobal(L, LUA_PLUGIN_INSTANCE_VAR_NAME);
@@ -3556,6 +3556,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "md5", tolua_md5);
 		
 		BindRankManager(tolua_S);
+		BindNetwork(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }

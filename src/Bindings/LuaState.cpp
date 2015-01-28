@@ -656,6 +656,18 @@ void cLuaState::Push(cItems * a_Items)
 
 
 
+void cLuaState::Push(cLuaTCPLink * a_TCPLink)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_TCPLink, "cTCPLink");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
