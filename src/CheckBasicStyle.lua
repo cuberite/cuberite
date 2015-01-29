@@ -167,6 +167,7 @@ local function ProcessFile(a_FileName)
 		os.exit(1)
 	end
 	local all = f:read("*all")
+	f:close()
 	
 	-- Check that the last line is empty - otherwise processing won't work properly:
 	local lastChar = string.byte(all, string.len(all))
