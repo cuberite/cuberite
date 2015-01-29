@@ -9,6 +9,7 @@
 #include "tolua++/include/tolua++.h"
 #include "LuaState.h"
 #include "LuaTCPLink.h"
+#include "LuaNameLookup.h"
 
 
 
@@ -62,6 +63,86 @@ static int tolua_cNetwork_Connect(lua_State * L)
 
 	// Try to connect:
 	bool res = cNetwork::Connect(Host, static_cast<UInt16>(Port), Link, Link);
+	S.Push(res);
+
+	return 1;
+}
+
+
+
+
+
+static int tolua_cNetwork_HostnameToIP(lua_State * L)
+{
+	// Function signature:
+	// cNetwork:HostnameToIP(Host, Callbacks) -> bool
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamTable(3) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the plugin instance:
+	cPluginLua * Plugin = GetLuaPlugin(L);
+	if (Plugin == nullptr)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		S.Push(false);
+		return 1;
+	}
+
+	// Read the params:
+	AString Host;
+	S.GetStackValue(2, Host);
+
+	// Try to look up:
+	bool res = cNetwork::HostnameToIP(Host, std::make_shared<cLuaNameLookup>(Host, *Plugin, 3));
+	S.Push(res);
+
+	return 1;
+}
+
+
+
+
+
+static int tolua_cNetwork_IPToHostname(lua_State * L)
+{
+	// Function signature:
+	// cNetwork:IPToHostname(IP, Callbacks) -> bool
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamString(2) ||
+		!S.CheckParamTable(3) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the plugin instance:
+	cPluginLua * Plugin = GetLuaPlugin(L);
+	if (Plugin == nullptr)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		S.Push(false);
+		return 1;
+	}
+
+	// Read the params:
+	AString Host;
+	S.GetStackValue(2, Host);
+
+	// Try to look up:
+	bool res = cNetwork::IPToHostName(Host, std::make_shared<cLuaNameLookup>(Host, *Plugin, 3));
 	S.Push(res);
 
 	return 1;
@@ -258,9 +339,9 @@ void ManualBindings::BindNetwork(lua_State * tolua_S)
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cNetwork");
 		tolua_function(tolua_S, "Connect",      tolua_cNetwork_Connect);
-		/*
 		tolua_function(tolua_S, "HostnameToIP", tolua_cNetwork_HostnameToIP);
 		tolua_function(tolua_S, "IPToHostname", tolua_cNetwork_IPToHostname);
+		/*
 		tolua_function(tolua_S, "Listen",       tolua_cNetwork_Listen);
 		*/
 	tolua_endmodule(tolua_S);

@@ -61,3 +61,45 @@ end
 
 
 
+
+function HandleConsoleNetLookup(a_Split)
+	-- Get the name to look up:
+	local Addr = a_Split[3] or "google.com"
+	
+	-- Create the callbacks "personalised" for the host:
+	local Callbacks =
+	{
+		OnNameResolved = function (a_Hostname, a_IP)
+			LOG(a_Hostname .. " resolves to " .. a_IP)
+		end,
+		
+		OnError = function (a_Query, a_ErrorCode, a_ErrorMsg)
+			LOG("Failed to retrieve information for " .. a_Query .. ": " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+			assert(a_Query == Addr)
+		end,
+		
+		OnFinished = function (a_Query)
+			LOG("Resolving " .. a_Query .. " has finished.")
+			assert(a_Query == Addr)
+		end,
+	}
+	
+	-- Queue both name and IP DNS queries;
+	-- we don't distinguish between an IP and a hostname in this command so we don't know which one to use:
+	local res = cNetwork:HostnameToIP(Addr, Callbacks)
+	if not(res) then
+		LOGWARNING("cNetwork:HostnameToIP call failed immediately")
+		return true
+	end
+	res = cNetwork:IPToHostname(Addr, Callbacks)
+	if not(res) then
+		LOGWARNING("cNetwork:IPToHostname call failed immediately")
+		return true
+	end
+	
+	return true, "DNS query has been queued."
+end
+
+
+
+

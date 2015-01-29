@@ -10,7 +10,6 @@
 #pragma once
 
 #include "../OSSupport/Network.h"
-#include "LuaState.h"
 #include "PluginLua.h"
 
 
@@ -22,7 +21,7 @@ class cLuaTCPLink:
 	public cTCPLink::cCallbacks
 {
 public:
-	/** Creates a new instance of the link, attached to the specified lua state and wrapping the callbacks that are in a table at the specified stack pos. */
+	/** Creates a new instance of the link, attached to the specified plugin and wrapping the callbacks that are in a table at the specified stack pos. */
 	cLuaTCPLink(cPluginLua & a_Plugin, int a_CallbacksTableStackPos);
 
 	/** Sends the data contained in the string to the remote peer.

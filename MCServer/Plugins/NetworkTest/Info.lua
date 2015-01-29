@@ -36,6 +36,27 @@ g_PluginInfo =
 						},
 					},  -- ParameterCombinations
 				},  -- client
+				
+				lookup =
+				{
+					HelpString = "Looks up the IP addresses corresponding to the given hostname  (google.com by default)",
+					Handler = HandleConsoleNetLookup,
+					ParameterCombinations =
+					{
+						{
+							Params = "",
+							Help = "Looks up the IP addresses of google.com.",
+						},
+						{
+							Params = "Hostname",
+							Help = "Looks up the IP addresses of the specified hostname.",
+						},
+						{
+							Params = "IP",
+							Help = "Looks up the canonical name of the specified IP.",
+						},
+					},
+				},  -- lookup
 			},  -- Subcommands
 		},  -- net
 	},
