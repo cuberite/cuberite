@@ -205,8 +205,7 @@ void cBiomeGenList::InitializeBiomes(const AString & a_Biomes)
 		int Count = 1;
 		if (Split2.size() >= 2)
 		{
-			Count = atol(Split2[1].c_str());
-			if (Count <= 0)
+			if (!StringToInteger(Split2[1], Count))
 			{
 				LOGWARNING("Cannot decode biome count: \"%s\"; using 1.", Split2[1].c_str());
 				Count = 1;

@@ -39,13 +39,50 @@ enum
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cRCONListenCallbacks:
+
+class cRCONListenCallbacks:
+	public cNetwork::cListenCallbacks
+{
+public:
+	cRCONListenCallbacks(cRCONServer & a_RCONServer, UInt16 a_Port):
+		m_RCONServer(a_RCONServer),
+		m_Port(a_Port)
+	{
+	}
+
+protected:
+	/** The RCON server instance that we're attached to. */
+	cRCONServer & m_RCONServer;
+
+	/** The port for which this instance is responsible. */
+	UInt16 m_Port;
+
+	// cNetwork::cListenCallbacks overrides:
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override
+	{
+		LOG("RCON Client \"%s\" connected!", a_RemoteIPAddress.c_str());
+		return std::make_shared<cRCONServer::cConnection>(m_RCONServer, a_RemoteIPAddress);
+	}
+	virtual void OnAccepted(cTCPLink & a_Link) override {}
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
+	{
+		LOGWARNING("RCON server error on port %d: %d (%s)", m_Port, a_ErrorCode, a_ErrorMsg.c_str());
+	}
+};
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cRCONCommandOutput:
 
 class cRCONCommandOutput :
 	public cCommandOutputCallback
 {
 public:
-	cRCONCommandOutput(cRCONServer::cConnection & a_Connection, int a_RequestID) :
+	cRCONCommandOutput(cRCONServer::cConnection & a_Connection, UInt32 a_RequestID) :
 		m_Connection(a_Connection),
 		m_RequestID(a_RequestID)
 	{
@@ -59,13 +96,13 @@ public:
 	
 	virtual void Finished(void) override
 	{
-		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, (int)m_Buffer.size(), m_Buffer.c_str());
+		m_Connection.SendResponse(m_RequestID, RCON_PACKET_RESPONSE, static_cast<UInt32>(m_Buffer.size()), m_Buffer.c_str());
 		delete this;
 	}
 	
 protected:
 	cRCONServer::cConnection & m_Connection;
-	int m_RequestID;
+	UInt32 m_RequestID;
 	AString m_Buffer;
 } ;
 
@@ -77,9 +114,7 @@ protected:
 // cRCONServer:
 
 cRCONServer::cRCONServer(cServer & a_Server) :
-	m_Server(a_Server),
-	m_ListenThread4(*this, cSocket::IPv4, "RCON"),
-	m_ListenThread6(*this, cSocket::IPv6, "RCON")
+	m_Server(a_Server)
 {
 }
 
@@ -89,8 +124,10 @@ cRCONServer::cRCONServer(cServer & a_Server) :
 
 cRCONServer::~cRCONServer()
 {
-	m_ListenThread4.Stop();
-	m_ListenThread6.Stop();
+	for (auto srv: m_ListenServers)
+	{
+		srv->Close();
+	}
 }
 
 
@@ -112,42 +149,29 @@ void cRCONServer::Initialize(cIniFile & a_IniFile)
 		return;
 	}
 	
-	// Read and initialize both IPv4 and IPv6 ports for RCON
-	bool HasAnyPorts = false;
-	AString Ports4 = a_IniFile.GetValueSet("RCON", "PortsIPv4", "25575");
-	if (m_ListenThread4.Initialize(Ports4))
+	// Read the listening ports for RCON from config:
+	AStringVector Ports = ReadUpgradeIniPorts(a_IniFile, "RCON", "Ports", "PortsIPv4", "PortsIPv6", "25575");
+
+	// Start listening on each specified port:
+	for (auto port: Ports)
 	{
-		HasAnyPorts = true;
-		m_ListenThread4.Start();
-	}
-	AString Ports6 = a_IniFile.GetValueSet("RCON", "PortsIPv6", "25575");
-	if (m_ListenThread6.Initialize(Ports6))
-	{
-		HasAnyPorts = true;
-		m_ListenThread6.Start();
-	}
-	if (!HasAnyPorts)
-	{
-		LOGWARNING("RCON is requested, but no ports are specified. Specify at least one port in PortsIPv4 or PortsIPv6. RCON is now disabled.");
-		return;
-	}
-}
-
-
-
-
-
-void cRCONServer::OnConnectionAccepted(cSocket & a_Socket)
-{
-	if (!a_Socket.IsValid())
-	{
-		return;
+		UInt16 PortNum;
+		if (!StringToInteger(port, PortNum))
+		{
+			LOGINFO("Invalid RCON port value: \"%s\". Ignoring.", port.c_str());
+			continue;
+		}
+		auto Handle = cNetwork::Listen(PortNum, std::make_shared<cRCONListenCallbacks>(*this, PortNum));
+		if (Handle->IsListening())
+		{
+			m_ListenServers.push_back(Handle);
+		}
 	}
 
-	LOG("RCON Client \"%s\" connected!", a_Socket.GetIPString().c_str());
-	
-	// Create a new cConnection object, it will be deleted when the connection is closed
-	m_SocketThreads.AddClient(a_Socket, new cConnection(*this, a_Socket));
+	if (m_ListenServers.empty())
+	{
+		LOGWARNING("RCON is enabled but no valid ports were found. RCON is not accessible.");
+	}
 }
 
 
@@ -157,11 +181,10 @@ void cRCONServer::OnConnectionAccepted(cSocket & a_Socket)
 ////////////////////////////////////////////////////////////////////////////////
 // cRCONServer::cConnection:
 
-cRCONServer::cConnection::cConnection(cRCONServer & a_RCONServer, cSocket & a_Socket) :
+cRCONServer::cConnection::cConnection(cRCONServer & a_RCONServer, const AString & a_IPAddress) :
 	m_IsAuthenticated(false),
 	m_RCONServer(a_RCONServer),
-	m_Socket(a_Socket),
-	m_IPAddress(a_Socket.GetIPString())
+	m_IPAddress(a_IPAddress)
 {
 }
 
@@ -169,71 +192,78 @@ cRCONServer::cConnection::cConnection(cRCONServer & a_RCONServer, cSocket & a_So
 
 
 
-bool cRCONServer::cConnection::DataReceived(const char * a_Data, size_t a_Size)
+void cRCONServer::cConnection::OnLinkCreated(cTCPLinkPtr a_Link)
 {
+	m_Link = a_Link;
+}
+
+
+
+
+
+void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size)
+{
+	ASSERT(m_Link != nullptr);
+
 	// Append data to the buffer:
 	m_Buffer.append(a_Data, a_Size);
 	
 	// Process the packets in the buffer:
 	while (m_Buffer.size() >= 14)
 	{
-		int Length = IntFromBuffer(m_Buffer.data());
+		UInt32 Length = UIntFromBuffer(m_Buffer.data());
 		if (Length > 1500)
 		{
 			// Too long, drop the connection
 			LOGWARNING("Received an invalid RCON packet length (%d), dropping RCON connection to %s.",
 				Length, m_IPAddress.c_str()
 			);
-			m_RCONServer.m_SocketThreads.RemoveClient(this);
-			m_Socket.CloseSocket();
-			delete this;
-			return false;
+			m_Link->Close();
+			m_Link.reset();
+			return;
 		}
-		if (Length > (int)(m_Buffer.size() + 4))
+		if (Length > static_cast<UInt32>(m_Buffer.size() + 4))
 		{
 			// Incomplete packet yet, wait for more data to come
-			return false;
+			return;
 		}
 		
-		int RequestID  = IntFromBuffer(m_Buffer.data() + 4);
-		int PacketType = IntFromBuffer(m_Buffer.data() + 8);
+		UInt32 RequestID  = UIntFromBuffer(m_Buffer.data() + 4);
+		UInt32 PacketType = UIntFromBuffer(m_Buffer.data() + 8);
 		if (!ProcessPacket(RequestID, PacketType, Length - 10, m_Buffer.data() + 12))
 		{
-			m_RCONServer.m_SocketThreads.RemoveClient(this);
-			m_Socket.CloseSocket();
-			delete this;
-			return false;
+			m_Link->Close();
+			m_Link.reset();
+			return;
 		}
 		m_Buffer.erase(0, Length + 4);
 	}  // while (m_Buffer.size() >= 14)
-	return false;
 }
 
 
 
 
 
-void cRCONServer::cConnection::GetOutgoingData(AString & a_Data)
+void cRCONServer::cConnection::OnRemoteClosed(void)
 {
-	a_Data.assign(m_Outgoing);
-	m_Outgoing.clear();
+	m_Link.reset();
 }
 
 
 
 
 
-void cRCONServer::cConnection::SocketClosed(void)
+void cRCONServer::cConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 {
-	m_RCONServer.m_SocketThreads.RemoveClient(this);
-	delete this;
+	LOGD("Error in RCON connection %s: %d (%s)", m_IPAddress.c_str(), a_ErrorCode, a_ErrorMsg.c_str());
+	m_Link.reset();
 }
 
 
 
 
 
-bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload)
+bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload)
 {
 	switch (a_PacketType)
 	{
@@ -242,7 +272,7 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 			if (strncmp(a_Payload, m_RCONServer.m_Password.c_str(), a_PayloadLength) != 0)
 			{
 				LOGINFO("RCON: Invalid password from client %s, dropping connection.", m_IPAddress.c_str());
-				SendResponse(-1, RCON_PACKET_RESPONSE, 0, nullptr);
+				SendResponse(0xffffffffU, RCON_PACKET_RESPONSE, 0, nullptr);
 				return false;
 			}
 			m_IsAuthenticated = true;
@@ -284,23 +314,22 @@ bool cRCONServer::cConnection::ProcessPacket(int a_RequestID, int a_PacketType, 
 
 
 
-/// Reads 4 bytes from a_Buffer and returns the int they represent
-int cRCONServer::cConnection::IntFromBuffer(const char * a_Buffer)
+UInt32 cRCONServer::cConnection::UIntFromBuffer(const char * a_Buffer)
 {
-	return ((unsigned char)a_Buffer[3] << 24) | ((unsigned char)a_Buffer[2] << 16) | ((unsigned char)a_Buffer[1] << 8) | (unsigned char)a_Buffer[0];
+	const Byte * Buffer = reinterpret_cast<const Byte *>(a_Buffer);
+	return (Buffer[3] << 24) | (Buffer[2] << 16) | (Buffer[1] << 8) | Buffer[0];
 }
 
 
 
 
 
-/// Puts 4 bytes representing the int into the buffer
-void cRCONServer::cConnection::IntToBuffer(int a_Value, char * a_Buffer)
+void cRCONServer::cConnection::UIntToBuffer(UInt32 a_Value, char * a_Buffer)
 {
-	a_Buffer[0] = a_Value & 0xff;
-	a_Buffer[1] = (a_Value >> 8)  & 0xff;
-	a_Buffer[2] = (a_Value >> 16) & 0xff;
-	a_Buffer[3] = (a_Value >> 24) & 0xff;
+	a_Buffer[0] = static_cast<char>(a_Value & 0xff);
+	a_Buffer[1] = static_cast<char>((a_Value >> 8)  & 0xff);
+	a_Buffer[2] = static_cast<char>((a_Value >> 16) & 0xff);
+	a_Buffer[3] = static_cast<char>((a_Value >> 24) & 0xff);
 }
 
 
@@ -308,25 +337,22 @@ void cRCONServer::cConnection::IntToBuffer(int a_Value, char * a_Buffer)
 
 
 /// Sends a RCON packet back to the client
-void cRCONServer::cConnection::SendResponse(int a_RequestID, int a_PacketType, int a_PayloadLength, const char * a_Payload)
+void cRCONServer::cConnection::SendResponse(UInt32 a_RequestID, UInt32 a_PacketType, UInt32 a_PayloadLength, const char * a_Payload)
 {
 	ASSERT((a_PayloadLength == 0) || (a_Payload != nullptr));  // Either zero data to send, or a valid payload ptr
+	ASSERT(m_Link != nullptr);
 	
-	char Buffer[4];
-	int Length = a_PayloadLength + 10;
-	IntToBuffer(Length, Buffer);
-	m_Outgoing.append(Buffer, 4);
-	IntToBuffer(a_RequestID, Buffer);
-	m_Outgoing.append(Buffer, 4);
-	IntToBuffer(a_PacketType, Buffer);
-	m_Outgoing.append(Buffer, 4);
+	char Buffer[12];
+	UInt32 Length = a_PayloadLength + 10;
+	UIntToBuffer(Length, Buffer);
+	UIntToBuffer(a_RequestID, Buffer + 4);
+	UIntToBuffer(a_PacketType, Buffer + 8);
+	m_Link->Send(Buffer, 12);
 	if (a_PayloadLength > 0)
 	{
-		m_Outgoing.append(a_Payload, a_PayloadLength);
+		m_Link->Send(a_Payload, a_PayloadLength);
 	}
-	m_Outgoing.push_back(0);
-	m_Outgoing.push_back(0);
-	m_RCONServer.m_SocketThreads.NotifyWrite(this);
+	m_Link->Send("\0", 2);  // Send two zero chars as the padding
 }
 
 
