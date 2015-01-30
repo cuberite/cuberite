@@ -17,7 +17,6 @@ cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cPluginLua & a_Plugin, int a_C
 	m_Callbacks(a_Plugin.GetLuaState(), a_CallbacksTableStackPos),
 	m_Port(a_Port)
 {
-	LOGD("Creating LuaServerHandle at %p.", this);
 }
 
 
@@ -28,7 +27,6 @@ cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cPluginLua & a_Plugin, int a_C
 cLuaServerHandle::~cLuaServerHandle()
 {
 	// If the server handle is still open, close it explicitly:
-	LOGD("Deleting LuaServerHandle at %p.", this);
 	Close();
 }
 
@@ -50,8 +48,6 @@ void cLuaServerHandle::SetServerHandle(cServerHandlePtr a_ServerHandle, cLuaServ
 
 void cLuaServerHandle::Close(void)
 {
-	LOGD("Closing LuaServerHandle at %p.", this);
-
 	// Safely grab a copy of the server handle:
 	cServerHandlePtr ServerHandle = m_ServerHandle;
 	if (ServerHandle == nullptr)
