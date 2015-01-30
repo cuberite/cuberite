@@ -10,6 +10,7 @@
 #include "LuaState.h"
 #include "LuaTCPLink.h"
 #include "LuaNameLookup.h"
+#include "LuaServerHandle.h"
 
 
 
@@ -72,6 +73,7 @@ static int tolua_cNetwork_Connect(lua_State * L)
 
 
 
+/** Binds cNetwork::HostnameToIP */
 static int tolua_cNetwork_HostnameToIP(lua_State * L)
 {
 	// Function signature:
@@ -112,6 +114,7 @@ static int tolua_cNetwork_HostnameToIP(lua_State * L)
 
 
 
+/** Binds cNetwork::IPToHostname */
 static int tolua_cNetwork_IPToHostname(lua_State * L)
 {
 	// Function signature:
@@ -152,9 +155,66 @@ static int tolua_cNetwork_IPToHostname(lua_State * L)
 
 
 
+/** Binds cNetwork::Listen */
+static int tolua_cNetwork_Listen(lua_State * L)
+{
+	// Function signature:
+	// cNetwork:Listen(Port, Callbacks) -> bool
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamNumber(2) ||
+		!S.CheckParamTable(3) ||
+		!S.CheckParamEnd(4)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the plugin instance:
+	cPluginLua * Plugin = GetLuaPlugin(L);
+	if (Plugin == nullptr)
+	{
+		// An error message has been already printed in GetLuaPlugin()
+		S.Push(false);
+		return 1;
+	}
+
+	// Read the params:
+	int Port;
+	S.GetStackValues(2, Port);
+	if ((Port < 0) || (Port > 65535))
+	{
+		LOGWARNING("cNetwork:Listen() called with invalid port (%d), failing the request.", Port);
+		S.Push(false);
+		return 1;
+	}
+	UInt16 Port16 = static_cast<UInt16>(Port);
+
+	// Create the LuaTCPLink glue class:
+	auto Srv = std::make_shared<cLuaServerHandle>(Port16, *Plugin, 3);
+
+	// Listen:
+	Srv->SetServerHandle(cNetwork::Listen(Port16, Srv), Srv);
+
+	// Register the server to be garbage-collected by Lua:
+	tolua_pushusertype(L, Srv.get(), "cServerHandle");
+	tolua_register_gc(L, lua_gettop(L));
+
+	// Return the server handle wrapper:
+	S.Push(Srv.get());
+	return 1;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cTCPLink bindings (routed through cLuaTCPLink):
 
+/** Binds cLuaTCPLink::Send */
 static int tolua_cTCPLink_Send(lua_State * L)
 {
 	// Function signature:
@@ -193,6 +253,7 @@ static int tolua_cTCPLink_Send(lua_State * L)
 
 
 
+/** Binds cLuaTCPLink::GetLocalIP */
 static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 {
 	// Function signature:
@@ -226,6 +287,7 @@ static int tolua_cTCPLink_GetLocalIP(lua_State * L)
 
 
 
+/** Binds cLuaTCPLink::GetLocalPort */
 static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 {
 	// Function signature:
@@ -259,6 +321,7 @@ static int tolua_cTCPLink_GetLocalPort(lua_State * L)
 
 
 
+/** Binds cLuaTCPLink::GetRemoteIP */
 static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 {
 	// Function signature:
@@ -292,6 +355,7 @@ static int tolua_cTCPLink_GetRemoteIP(lua_State * L)
 
 
 
+/** Binds cLuaTCPLink::GetRemotePort */
 static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 {
 	// Function signature:
@@ -326,6 +390,90 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cServerHandle bindings (routed through cLuaServerHandle):
+
+/** Called when Lua destroys the object instance.
+Close the server and let it deallocate on its own (it's in a SharedPtr). */
+static int tolua_collect_cServerHandle(lua_State * L)
+{
+	cLuaServerHandle * Srv = static_cast<cLuaServerHandle *>(tolua_tousertype(L, 1, nullptr));
+	Srv->Release();
+	return 0;
+}
+
+
+
+
+
+/** Binds cLuaServerHandle::Close */
+static int tolua_cServerHandle_Close(lua_State * L)
+{
+	// Function signature:
+	// ServerInstance:Close()
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cServerHandle") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the server handle:
+	cLuaServerHandle * Srv;
+	if (lua_isnil(L, 1))
+	{
+		LOGWARNING("cServerHandle:Close(): invalid server handle object. Stack trace:");
+		S.LogStackTrace();
+		return 0;
+	}
+	Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+
+	// Close it:
+	Srv->Close();
+	return 0;
+}
+
+
+
+
+
+/** Binds cLuaServerHandle::IsListening */
+static int tolua_cServerHandle_IsListening(lua_State * L)
+{
+	// Function signature:
+	// ServerInstance:IsListening() -> bool
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cServerHandle") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the server handle:
+	cLuaServerHandle * Srv;
+	if (lua_isnil(L, 1))
+	{
+		LOGWARNING("cServerHandle:IsListening(): invalid server handle object. Stack trace:");
+		S.LogStackTrace();
+		return 0;
+	}
+	Srv = *static_cast<cLuaServerHandle **>(lua_touserdata(L, 1));
+
+	// Close it:
+	S.Push(Srv->IsListening());
+	return 1;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Register the bindings:
 
 void ManualBindings::BindNetwork(lua_State * tolua_S)
@@ -335,15 +483,15 @@ void ManualBindings::BindNetwork(lua_State * tolua_S)
 	tolua_cclass(tolua_S, "cNetwork", "cNetwork", "", nullptr);
 	tolua_usertype(tolua_S, "cTCPLink");
 	tolua_cclass(tolua_S, "cTCPLink", "cTCPLink", "", nullptr);
+	tolua_usertype(tolua_S, "cServerHandle");
+	tolua_cclass(tolua_S, "cServerHandle", "cServerHandle", "", tolua_collect_cServerHandle);
 	
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cNetwork");
 		tolua_function(tolua_S, "Connect",      tolua_cNetwork_Connect);
 		tolua_function(tolua_S, "HostnameToIP", tolua_cNetwork_HostnameToIP);
 		tolua_function(tolua_S, "IPToHostname", tolua_cNetwork_IPToHostname);
-		/*
 		tolua_function(tolua_S, "Listen",       tolua_cNetwork_Listen);
-		*/
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cTCPLink");
@@ -352,6 +500,11 @@ void ManualBindings::BindNetwork(lua_State * tolua_S)
 		tolua_function(tolua_S, "GetLocalPort",  tolua_cTCPLink_GetLocalPort);
 		tolua_function(tolua_S, "GetRemoteIP",   tolua_cTCPLink_GetRemoteIP);
 		tolua_function(tolua_S, "GetRemotePort", tolua_cTCPLink_GetRemotePort);
+	tolua_endmodule(tolua_S);
+
+	tolua_beginmodule(tolua_S, "cServerHandle");
+		tolua_function(tolua_S, "Close",       tolua_cServerHandle_Close);
+		tolua_function(tolua_S, "IsListening", tolua_cServerHandle_IsListening);
 	tolua_endmodule(tolua_S);
 }
 

@@ -25,7 +25,7 @@ public:
 	cLuaNameLookup(const AString & a_Query, cPluginLua & a_Plugin, int a_CallbacksTableStackPos);
 
 protected:
-	/** The plugin for which the link is created. */
+	/** The plugin for which the query is created. */
 	cPluginLua & m_Plugin;
 
 	/** The Lua table that holds the callbacks to be invoked. */

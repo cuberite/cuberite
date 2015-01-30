@@ -7,11 +7,109 @@
 
 
 
-function Initialize()
+--- Map of all servers currently open
+-- g_Servers[PortNum] = cServerHandle
+local g_Servers = {}
+
+--- List of fortune messages for the fortune server
+-- A random message is chosen for each incoming connection
+-- The contents are loaded from the splashes.txt file on plugin startup
+local g_Fortunes =
+{
+	"Empty splashes.txt",
+}
+
+--- Map of all services that can be run as servers
+-- g_Services[ServiceName] = function() -> callbacks
+local g_Services =
+{
+	-- Echo service: each connection echoes back what has been sent to it
+	echo = function (a_Port)
+		return
+		{
+			-- A new connection has come, give it new link callbacks:
+			OnIncomingConnection = function (a_RemoteIP, a_RemotePort)
+				return
+				{
+					OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+						LOG("EchoServer(" .. a_Port .. ": Connection to " .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. " failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+					end,
+					
+					OnReceivedData = function (a_Link, a_Data)
+						-- Echo the received data back to the link:
+						a_Link:Send(a_Data)
+					end,
+					
+					OnRemoteClosed = function (a_Link)
+					end
+				}  -- Link callbacks
+			end,  -- OnIncomingConnection()
+			
+			-- Send a welcome message to newly accepted connections:
+			OnAccepted = function (a_Link)
+				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the echo server @ MCServer-Lua\r\n")
+			end,  -- OnAccepted()
+			
+			-- There was an error listening on the port:
+			OnError = function (a_ErrorCode, a_ErrorMsg)
+				LOGINFO("EchoServer(" .. a_Port .. ": Cannot listen: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+			end,  -- OnError()
+		}  -- Listen callbacks
+	end,  -- echo
+	
+	fortune = function (a_Port)
+		return
+		{
+			-- A new connection has come, give it new link callbacks:
+			OnIncomingConnection = function (a_RemoteIP, a_RemotePort)
+				return
+				{
+					OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+						LOG("FortuneServer(" .. a_Port .. ": Connection to " .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. " failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+					end,
+					
+					OnReceivedData = function (a_Link, a_Data)
+						-- Ignore any received data
+					end,
+					
+					OnRemoteClosed = function (a_Link)
+					end
+				}  -- Link callbacks
+			end,  -- OnIncomingConnection()
+			
+			-- Send a welcome message to newly accepted connections:
+			OnAccepted = function (a_Link)
+				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the fortune server @ MCServer-Lua\r\n\r\nYour fortune:\r\n")
+				a_Link:Send(g_Fortunes[math.random(#g_Fortunes)] .. "\r\n")
+			end,  -- OnAccepted()
+			
+			-- There was an error listening on the port:
+			OnError = function (a_ErrorCode, a_ErrorMsg)
+				LOGINFO("FortuneServer(" .. a_Port .. ": Cannot listen: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+			end,  -- OnError()
+		}  -- Listen callbacks
+	end,  -- fortune
+	
+	-- TODO: Other services (fortune, daytime, ...)
+}
+
+
+
+
+
+function Initialize(a_Plugin)
+	-- Load the splashes.txt file into g_Fortunes:
+	for line in io.lines(a_Plugin:GetLocalFolder() .. "/splashes.txt") do
+		table.insert(g_Fortunes, line)
+	end
+	
 	-- Use the InfoReg shared library to process the Info.lua file:
 	dofile(cPluginManager:GetPluginsPath() .. "/InfoReg.lua")
 	RegisterPluginInfoCommands()
 	RegisterPluginInfoConsoleCommands()
+
+	-- Seed the random generator:
+	math.randomseed(os.time())
 	
 	return true
 end
@@ -62,6 +160,26 @@ end
 
 
 
+function HandleConsoleNetClose(a_Split)
+	-- Get the port to close:
+	local Port = tonumber(a_Split[3] or 1024)
+	if not(Port) then
+		return true, "Bad port number: \"" .. Port .. "\"."
+	end
+
+	-- Close the server, if there is one:
+	if not(g_Servers[Port]) then
+		return true, "There is no server currently listening on port " .. Port .. "."
+	end
+	g_Servers[Port]:Close()
+	g_Servers[Port] = nil
+	return true, "Port " .. Port .. " closed."
+end
+
+
+
+
+
 function HandleConsoleNetLookup(a_Split)
 	-- Get the name to look up:
 	local Addr = a_Split[3] or "google.com"
@@ -98,6 +216,34 @@ function HandleConsoleNetLookup(a_Split)
 	end
 	
 	return true, "DNS query has been queued."
+end
+
+
+
+
+
+function HandleConsoleNetListen(a_Split)
+	-- Get the params:
+	local Port = tonumber(a_Split[3] or 1024)
+	if not(Port) then
+		return true, "Invalid port: \"" .. Port .. "\"."
+	end
+	local Service = string.lower(a_Split[4] or "echo")
+	
+	-- Create the callbacks specific for the service:
+	if (g_Services[Service] == nil) then
+		return true, "No such service: " .. Service
+	end
+	local Callbacks = g_Services[Service](Port)
+	
+	-- Start the server:
+	local srv = cNetwork:Listen(Port, Callbacks)
+	if not(srv:IsListening()) then
+		-- The error message has already been printed in the Callbacks.OnError()
+		return true
+	end
+	g_Servers[Port] = srv
+	return true, Service .. " server started on port " .. Port
 end
 
 

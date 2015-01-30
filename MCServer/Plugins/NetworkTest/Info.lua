@@ -37,6 +37,32 @@ g_PluginInfo =
 					},  -- ParameterCombinations
 				},  -- client
 				
+				close =
+				{
+					HelpString = "Close a listening socket",
+					Handler = HandleConsoleNetClose,
+					ParameterCombinations =
+					{
+						{
+							Params = "[Port]",
+							Help = "Closes a socket listening on the specified port [1024]",
+						},
+					},  -- ParameterCombinations
+				},  -- close
+				
+				listen =
+				{
+					HelpString = "Creates a new listening socket on the specified port with the specified service attached to it",
+					Handler = HandleConsoleNetListen,
+					ParameterCombinations =
+					{
+						{
+							Params = "[Port] [Service]",
+							Help = "Starts listening on the specified port [1024] providing the specified service [echo]",
+						},
+					},  -- ParameterCombinations
+				},  -- listen
+				
 				lookup =
 				{
 					HelpString = "Looks up the IP addresses corresponding to the given hostname  (google.com by default)",
@@ -57,6 +83,7 @@ g_PluginInfo =
 						},
 					},
 				},  -- lookup
+				
 			},  -- Subcommands
 		},  -- net
 	},

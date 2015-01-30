@@ -16,6 +16,14 @@
 
 
 
+// fwd:
+class cLuaServerHandle;
+typedef WeakPtr<cLuaServerHandle> cLuaServerHandleWPtr;
+
+
+
+
+
 class cLuaTCPLink:
 	public cNetwork::cConnectCallbacks,
 	public cTCPLink::cCallbacks
@@ -23,6 +31,11 @@ class cLuaTCPLink:
 public:
 	/** Creates a new instance of the link, attached to the specified plugin and wrapping the callbacks that are in a table at the specified stack pos. */
 	cLuaTCPLink(cPluginLua & a_Plugin, int a_CallbacksTableStackPos);
+
+	/** Creates a new instance of the link, attached to the specified plugin and wrapping the callbacks that are in the specified referenced table. */
+	cLuaTCPLink(cPluginLua & a_Plugin, cLuaState::cRef && a_CallbacksTableRef, cLuaServerHandleWPtr a_Server);
+
+	~cLuaTCPLink();
 
 	/** Sends the data contained in the string to the remote peer.
 	Returns true if successful, false on immediate failure (queueing the data failed or link not available). */
@@ -59,6 +72,14 @@ protected:
 	/** The underlying link representing the connection.
 	May be nullptr. */
 	cTCPLinkPtr m_Link;
+
+	/** The server that is responsible for this link, if any. */
+	cLuaServerHandleWPtr m_Server;
+
+
+	/** Common code called when the link is considered as terminated.
+	Releases m_Link, m_Callbacks and this from m_Server, each when applicable. */
+	void Terminated(void);
 
 	// cNetwork::cConnectCallbacks overrides:
 	virtual void OnConnected(cTCPLink & a_Link) override;

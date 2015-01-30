@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "LuaTCPLink.h"
+#include "LuaServerHandle.h"
 
 
 
@@ -14,6 +15,47 @@ cLuaTCPLink::cLuaTCPLink(cPluginLua & a_Plugin, int a_CallbacksTableStackPos):
 	m_Plugin(a_Plugin),
 	m_Callbacks(a_Plugin.GetLuaState(), a_CallbacksTableStackPos)
 {
+	// Warn if the callbacks aren't valid:
+	if (!m_Callbacks.IsValid())
+	{
+		LOGWARNING("cTCPLink in plugin %s: callbacks could not be retrieved", m_Plugin.GetName().c_str());
+		cPluginLua::cOperation Op(m_Plugin);
+		Op().LogStackTrace();
+	}
+}
+
+
+
+
+
+cLuaTCPLink::cLuaTCPLink(cPluginLua & a_Plugin, cLuaState::cRef && a_CallbacksTableRef, cLuaServerHandleWPtr a_ServerHandle):
+	m_Plugin(a_Plugin),
+	m_Callbacks(std::move(a_CallbacksTableRef)),
+	m_Server(std::move(a_ServerHandle))
+{
+	// Warn if the callbacks aren't valid:
+	if (!m_Callbacks.IsValid())
+	{
+		LOGWARNING("cTCPLink in plugin %s: callbacks could not be retrieved", m_Plugin.GetName().c_str());
+		cPluginLua::cOperation Op(m_Plugin);
+		Op().LogStackTrace();
+	}
+}
+
+
+
+
+
+cLuaTCPLink::~cLuaTCPLink()
+{
+	// If the link is still open, close it:
+	cTCPLinkPtr Link = m_Link;
+	if (Link != nullptr)
+	{
+		Link->Close();
+	}
+
+	Terminated();
 }
 
 
@@ -107,15 +149,14 @@ UInt16 cLuaTCPLink::GetRemotePort(void) const
 
 void cLuaTCPLink::Shutdown(void)
 {
-	// Safely grab a copy of the link:
+	// Safely grab a copy of the link and shut it down:
 	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	if (Link != nullptr)
 	{
-		return;
+		Link->Shutdown();
 	}
 
-	// Shutdown:
-	Link->Shutdown();
+	Terminated();
 }
 
 
@@ -124,16 +165,47 @@ void cLuaTCPLink::Shutdown(void)
 
 void cLuaTCPLink::Close(void)
 {
-	// Safely grab a copy of the link:
+	// If the link is still open, close it:
 	cTCPLinkPtr Link = m_Link;
-	if (Link == nullptr)
+	if (Link != nullptr)
 	{
-		return;
+		Link->Close();
 	}
 
-	// Close the link:
-	Link->Close();
+	Terminated();
 }
+
+
+
+
+
+void cLuaTCPLink::Terminated(void)
+{
+	// Disable the callbacks:
+	if (m_Callbacks.IsValid())
+	{
+		m_Callbacks.UnRef();
+	}
+
+	// If the managing server is still alive, let it know we're terminating:
+	auto Server = m_Server.lock();
+	if (Server != nullptr)
+	{
+		Server->RemoveLink(this);
+	}
+
+	// If the link is still open, close it:
+	cTCPLinkPtr Link = m_Link;
+	if (Link != nullptr)
+	{
+		Link->Close();
+		m_Link.reset();
+	}
+}
+
+
+
+
 
 void cLuaTCPLink::OnConnected(cTCPLink & a_Link)
 {
@@ -171,6 +243,8 @@ void cLuaTCPLink::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 			m_Plugin.GetName().c_str(), a_ErrorCode, a_ErrorMsg.c_str()
 		);
 	}
+
+	Terminated();
 }
 
 
@@ -221,7 +295,8 @@ void cLuaTCPLink::OnRemoteClosed(void)
 	{
 		LOGINFO("cTCPLink OnRemoteClosed() callback failed in plugin %s.", m_Plugin.GetName().c_str());
 	}
-	m_Link.reset();
+
+	Terminated();
 }
 
 

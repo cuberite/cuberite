@@ -381,6 +381,7 @@ void inline LOG(const char * a_Format, ...)
 
 // Unified shared ptr from before C++11. Also no silly undercores.
 #define SharedPtr std::shared_ptr
+#define WeakPtr std::weak_ptr
 
 
 
