@@ -346,20 +346,6 @@ protected:
 	/** Number of arguments currently pushed (for the Push / Call chain) */
 	int m_NumCurrentFunctionArgs;
 
-
-	/** Variadic template terminator: Counting zero args returns zero. */
-	int CountArgs(void)
-	{
-		return 0;
-	}
-
-	/** Variadic template: Counting args means add one to the count of the rest. */
-	template <typename T, typename... Args>
-	int CountArgs(T, Args... args)
-	{
-		return 1 + CountArgs(args...);
-	}
-
 	/** Variadic template terminator: If there's nothing more to push / pop, just call the function.
 	Note that there are no return values either, because those are prefixed by a cRet value, so the arg list is never empty. */
 	bool PushCallPop(void)
@@ -380,7 +366,7 @@ protected:
 	bool PushCallPop(cLuaState::cRet, Args &&... args)
 	{
 		// Calculate the number of return values (number of args left):
-		int NumReturns = CountArgs(args...);
+		int NumReturns = sizeof...(args);
 
 		// Call the function:
 		if (!CallFunction(NumReturns))
