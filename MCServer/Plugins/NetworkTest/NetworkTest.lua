@@ -20,14 +20,14 @@ local g_Fortunes =
 }
 
 --- Map of all services that can be run as servers
--- g_Services[ServiceName] = function() -> callbacks
+-- g_Services[ServiceName] = function() -> accept-callbacks
 local g_Services =
 {
 	-- Echo service: each connection echoes back what has been sent to it
 	echo = function (a_Port)
 		return
 		{
-			-- A new connection has come, give it new link callbacks:
+			-- A new connection has come, give it new link-callbacks:
 			OnIncomingConnection = function (a_RemoteIP, a_RemotePort)
 				return
 				{
@@ -57,10 +57,11 @@ local g_Services =
 		}  -- Listen callbacks
 	end,  -- echo
 	
+	-- Fortune service: each incoming connection gets a welcome message plus a random fortune text; all communication is ignored afterwards
 	fortune = function (a_Port)
 		return
 		{
-			-- A new connection has come, give it new link callbacks:
+			-- A new connection has come, give it new link-callbacks:
 			OnIncomingConnection = function (a_RemoteIP, a_RemotePort)
 				return
 				{
@@ -77,7 +78,7 @@ local g_Services =
 				}  -- Link callbacks
 			end,  -- OnIncomingConnection()
 			
-			-- Send a welcome message to newly accepted connections:
+			-- Send a welcome message and the fortune to newly accepted connections:
 			OnAccepted = function (a_Link)
 				a_Link:Send("Hello, " .. a_Link:GetRemoteIP() .. ", welcome to the fortune server @ MCServer-Lua\r\n\r\nYour fortune:\r\n")
 				a_Link:Send(g_Fortunes[math.random(#g_Fortunes)] .. "\r\n")
@@ -90,7 +91,7 @@ local g_Services =
 		}  -- Listen callbacks
 	end,  -- fortune
 	
-	-- TODO: Other services (fortune, daytime, ...)
+	-- TODO: Other services (daytime, ...)
 }
 
 
@@ -98,9 +99,11 @@ local g_Services =
 
 
 function Initialize(a_Plugin)
-	-- Load the splashes.txt file into g_Fortunes:
+	-- Load the splashes.txt file into g_Fortunes, overwriting current content:
+	local idx = 1
 	for line in io.lines(a_Plugin:GetLocalFolder() .. "/splashes.txt") do
-		table.insert(g_Fortunes, line)
+		g_Fortunes[idx] = line
+		idx = idx + 1
 	end
 	
 	-- Use the InfoReg shared library to process the Info.lua file:
