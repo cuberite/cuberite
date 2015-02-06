@@ -443,6 +443,9 @@ public:
 
 	/** Set the invulnerable ticks from the entity */
 	void SetInvulnerableTicks(int a_InvulnerableTicks) { m_InvulnerableTicks = a_InvulnerableTicks; }
+
+	/** Returns whether the player is on ground or not */
+	bool IsOnGround(void) const { return m_bOnGround; }
 	
 	// tolua_end
 	
