@@ -431,7 +431,8 @@ void cWorld::UpdateWeather(void)
 	m_RainDensity = std::max(0.0f, std::min(1.0f, m_RainDensity + RainDensityAddend));
 
 	// Send rain density when it changed
-	if (m_RainDensity != LastRainDensity) {
+	if (m_RainDensity != LastRainDensity)
+	{
 		BroadcastRainDensity(m_RainDensity);
 	}
 
