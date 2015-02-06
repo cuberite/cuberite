@@ -2727,7 +2727,10 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 }
 
 
-
+void cClientHandle::SendRainDensity(float a_RainDensity)
+{
+	m_Protocol->SendRainDensity(a_RainDensity);
+}
 
 
 void cClientHandle::SendWholeInventory(const cWindow & a_Window)
