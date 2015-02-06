@@ -435,8 +435,8 @@ void cWorld::UpdateWeather(void)
 		BroadcastRainDensity(m_RainDensity);
 	}
 
-	//TODO: when is thundering, smooth sky darkness as well
-	//Light level falls to 10 during daytime. Like rain, thunderstorms won't reduce the light level below 4 at night. [minecraft.gamepedia.com/Thunder]
+	// TODO: when is thundering, smooth sky darkness as well
+	// Light level falls to 10 during daytime. Like rain, thunderstorms won't reduce the light level below 4 at night. [minecraft.gamepedia.com/Thunder]
 }
 
 
