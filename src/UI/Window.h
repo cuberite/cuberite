@@ -157,6 +157,8 @@ public:
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) = 0;
 
 	/** Called from DistributeStack() to distribute the stack into a_AreasInOrder; Modifies a_ItemStack as it is distributed!
+	If a_ShouldApply is true, the changes are written into the slots;
+	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
 	If a_BackFill is true, the areas will be filled from the back (right side). (Example: Empty Hotbar -> Item get in slot 8, not slot 0) */
 	void DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill);
 	
