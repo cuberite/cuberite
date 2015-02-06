@@ -412,32 +412,14 @@ void cWorld::SetWeather(eWeather a_NewWeather)
 	}
 	
 	m_Weather = a_NewWeather;
-
 	BroadcastWeather(m_Weather);
-
-	// Send rain density to avoid blinking weather
-	BroadcastRainDensity(m_RainDensity);
-
+	
 	// Let the plugins know about the change:
 	cPluginManager::Get()->CallHookWeatherChanged(*this);
 }
 
 
-void cWorld::UpdateWeather(void)
-{
-	float LastRainDensity = m_RainDensity;
-	// Changing speed
-	float RainDensityAddend = IsWeatherRain() ? 0.01f : -0.01f;
-	m_RainDensity = std::max(0.0f, std::min(1.0f, m_RainDensity + RainDensityAddend));
 
-	// Send rain density when it changed
-	if (m_RainDensity != LastRainDensity) {
-		BroadcastRainDensity(m_RainDensity);
-	}
-
-	//TODO: when is thundering, smooth sky darkness as well
-	//Light level falls to 10 during daytime. Like rain, thunderstorms won't reduce the light level below 4 at night. [http://minecraft.gamepedia.com/Thunder]
-}
 
 
 void cWorld::ChangeWeather(void)
@@ -958,9 +940,6 @@ void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_La
 void cWorld::TickWeather(float a_Dt)
 {
 	UNUSED(a_Dt);
-
-	UpdateWeather();
-
 	// There are no weather changes anywhere but in the Overworld:
 	if (GetDimension() != dimOverworld)
 	{
@@ -1181,7 +1160,6 @@ void cWorld::UpdateSkyDarkness(void)
 	{
 		m_SkyDarkness = static_cast<NIBBLETYPE>((TIME_SUNRISE - TempTime) / TIME_SPAWN_DIVISOR);
 	}
-
 }
 
 
@@ -2458,20 +2436,6 @@ void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclud
 			continue;
 		}
 		ch->SendWeather(a_Weather);
-	}
-}
-
-void cWorld::BroadcastRainDensity(float a_RainDensity, const cClientHandle * a_Exclude)
-{
-	cCSLock Lock(m_CSPlayers);
-	for (cPlayerList::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-	{
-		cClientHandle * ch = (*itr)->GetClientHandle();
-		if ((ch == a_Exclude) || (ch == nullptr) || !ch->IsLoggedIn() || ch->IsDestroyed())
-		{
-			continue;
-		}
-		ch->SendRainDensity(a_RainDensity);
 	}
 }
 

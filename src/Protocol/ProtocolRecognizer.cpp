@@ -805,11 +805,7 @@ void cProtocolRecognizer::SendWeather(eWeather a_Weather)
 }
 
 
-void cProtocolRecognizer::SendRainDensity(float a_RainDensity)
-{
-	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendRainDensity(a_RainDensity);
-}
+
 
 
 void cProtocolRecognizer::SendWholeInventory(const cWindow & a_Window)
