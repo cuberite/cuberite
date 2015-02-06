@@ -218,7 +218,7 @@ static int tolua_cNetwork_Listen(lua_State * L)
 static int tolua_cTCPLink_Send(lua_State * L)
 {
 	// Function signature:
-	// LinkInstance:Send(DataString) -> bool
+	// LinkInstance:Send(DataString)
 
 	cLuaState S(L);
 	if (
