@@ -47,7 +47,7 @@ const int cPlayer::EATING_TICKS = 30;
 
 
 
-cPlayer::cPlayer(cClientHandle* a_Client, const AString & a_PlayerName) :
+cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	super(etPlayer, 0.6, 1.8),
 	m_bVisible(true),
 	m_FoodLevel(MAX_FOOD_LEVEL),
@@ -174,7 +174,7 @@ void cPlayer::Destroyed()
 
 void cPlayer::SpawnOn(cClientHandle & a_Client)
 {
-	if (!m_bVisible || (m_ClientHandle == (&a_Client)))
+	if (!m_bVisible || (m_ClientHandle.get() == (&a_Client)))
 	{
 		return;
 	}
@@ -246,7 +246,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (CanMove)
 	{
-		BroadcastMovementUpdate(m_ClientHandle);
+		BroadcastMovementUpdate(m_ClientHandle.get());
 	}
 
 	if (m_Health > 0)  // make sure player is alive
@@ -419,7 +419,7 @@ void cPlayer::StartChargingBow(void)
 	LOGD("Player \"%s\" started charging their bow", GetName().c_str());
 	m_IsChargingBow = true;
 	m_BowCharge = 0;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 }
 
 
@@ -432,7 +432,7 @@ int cPlayer::FinishChargingBow(void)
 	int res = m_BowCharge;
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 
 	return res;
 }
@@ -446,7 +446,7 @@ void cPlayer::CancelChargingBow(void)
 	LOGD("Player \"%s\" cancelled charging their bow at a charge of %d", GetName().c_str(), m_BowCharge);
 	m_IsChargingBow = false;
 	m_BowCharge = 0;
-	m_World->BroadcastEntityMetadata(*this, m_ClientHandle);
+	m_World->BroadcastEntityMetadata(*this, m_ClientHandle.get());
 }
 
 
@@ -1391,7 +1391,7 @@ void cPlayer::SetVisible(bool a_bVisible)
 	if (!a_bVisible && m_bVisible)
 	{
 		m_bVisible = false;
-		m_World->BroadcastDestroyEntity(*this, m_ClientHandle);  // Destroy on all clients
+		m_World->BroadcastDestroyEntity(*this, m_ClientHandle.get());  // Destroy on all clients
 	}
 }
 
@@ -2288,6 +2288,16 @@ void cPlayer::Detach()
 			}
 		}
 	}
+}
+
+
+
+
+
+void cPlayer::RemoveClientHandle(void)
+{
+	ASSERT(m_ClientHandle != nullptr);
+	m_ClientHandle.reset();
 }
 
 

@@ -70,7 +70,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		// so they're disabled until someone needs them
 		ssl_set_dbg(&m_Ssl, &SSLDebugMessage, this);
 		ssl_set_verify(&m_Ssl, &SSLVerifyCert, this);
-		*/
+		//*/
 		
 		/*
 		// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:

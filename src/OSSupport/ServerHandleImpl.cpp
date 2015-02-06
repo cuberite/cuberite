@@ -83,6 +83,9 @@ void cServerHandleImpl::Close(void)
 
 	// Remove the ptr to self, so that the object may be freed:
 	m_SelfPtr.reset();
+
+	// Remove self from cNetworkSingleton:
+	cNetworkSingleton::Get().RemoveServer(this);
 }
 
 
@@ -157,10 +160,6 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 			err = EVUTIL_SOCKET_ERROR();
 			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
-			LOGD("setsockopt(IPV6_V6ONLY) returned %d, err is %d (%s). %s",
-				res, err, evutil_socket_error_to_string(err),
-				NeedsTwoSockets ? "Second socket will be created" : "Second socket not needed"
-			);
 		#else
 			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 		#endif
@@ -256,19 +255,20 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 
 	// Get the textual IP address and port number out of a_Addr:
 	char IPAddress[128];
-	evutil_inet_ntop(a_Addr->sa_family, a_Addr->sa_data, IPAddress, ARRAYCOUNT(IPAddress));
 	UInt16 Port = 0;
 	switch (a_Addr->sa_family)
 	{
 		case AF_INET:
 		{
 			sockaddr_in * sin = reinterpret_cast<sockaddr_in *>(a_Addr);
+			evutil_inet_ntop(AF_INET, sin, IPAddress, ARRAYCOUNT(IPAddress));
 			Port = ntohs(sin->sin_port);
 			break;
 		}
 		case AF_INET6:
 		{
 			sockaddr_in6 * sin6 = reinterpret_cast<sockaddr_in6 *>(a_Addr);
+			evutil_inet_ntop(AF_INET, sin6, IPAddress, ARRAYCOUNT(IPAddress));
 			Port = ntohs(sin6->sin6_port);
 			break;
 		}

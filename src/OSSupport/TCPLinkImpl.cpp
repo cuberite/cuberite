@@ -17,8 +17,9 @@
 
 cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE))
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE))
 {
+	LOGD("Created new cTCPLinkImpl at %p with BufferEvent at %p", this, m_BufferEvent);
 }
 
 
@@ -27,9 +28,11 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 
 cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE)),
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE)),
 	m_Server(a_Server)
 {
+	LOGD("Created new cTCPLinkImpl at %p with BufferEvent at %p", this, m_BufferEvent);
+
 	// Update the endpoint addresses:
 	UpdateLocalAddress();
 	UpdateAddress(a_Address, a_AddrLen, m_RemoteIP, m_RemotePort);
@@ -41,6 +44,7 @@ cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_L
 
 cTCPLinkImpl::~cTCPLinkImpl()
 {
+	LOGD("Deleting cTCPLinkImpl at %p with BufferEvent at %p", this, m_BufferEvent);
 	bufferevent_free(m_BufferEvent);
 }
 
@@ -179,6 +183,8 @@ void cTCPLinkImpl::ReadCallback(bufferevent * a_BufferEvent, void * a_Self)
 
 void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void * a_Self)
 {
+	LOGD("cTCPLink event callback for link %p, BEV %p; what = 0x%02x", a_Self, a_BufferEvent, a_What);
+
 	ASSERT(a_Self != nullptr);
 	cTCPLinkImplPtr Self = static_cast<cTCPLinkImpl *>(a_Self)->m_Self;
 

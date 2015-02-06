@@ -108,8 +108,17 @@ cProtocol180::cProtocol180(cClientHandle * a_Client, const AString & a_ServerAdd
 	{
 		static int sCounter = 0;
 		cFile::CreateFolder("CommLogs");
-		AString FileName = Printf("CommLogs/%x_%d__%s.log", (unsigned)time(nullptr), sCounter++, a_Client->GetIPString().c_str());
-		m_CommLogFile.Open(FileName, cFile::fmWrite);
+		AString IP(a_Client->GetIPString());
+		ReplaceString(IP, ":", "_");
+		AString FileName = Printf("CommLogs/%x_%d__%s.log",
+			static_cast<unsigned>(time(nullptr)),
+			sCounter++,
+			IP.c_str()
+		);
+		if (!m_CommLogFile.Open(FileName, cFile::fmWrite))
+		{
+			LOG("Cannot log communication to file, the log file \"%s\" cannot be opened for writing.", FileName.c_str());
+		}
 	}
 }
 
@@ -1659,7 +1668,7 @@ void cProtocol180::FixItemFramePositions(int a_ObjectData, double & a_PosX, doub
 void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 {
 	// Write the incoming data into the comm log file:
-	if (g_ShouldLogCommIn)
+	if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 	{
 		if (m_ReceivedData.GetReadableSpace() > 0)
 		{
@@ -1764,7 +1773,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 		bb.Write("\0", 1);
 		
 		// Log the packet info into the comm log file:
-		if (g_ShouldLogCommIn)
+		if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 		{
 			AString PacketData;
 			bb.ReadAll(PacketData);
@@ -1796,7 +1805,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			#endif  // _DEBUG
 			
 			// Put a message in the comm log:
-			if (g_ShouldLogCommIn)
+			if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 			{
 				m_CommLogFile.Printf("^^^^^^ Unhandled packet ^^^^^^\n\n\n");
 			}
@@ -1813,7 +1822,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 			);
 
 			// Put a message in the comm log:
-			if (g_ShouldLogCommIn)
+			if (g_ShouldLogCommIn && m_CommLogFile.IsOpen())
 			{
 				m_CommLogFile.Printf("^^^^^^ Wrong number of bytes read for this packet (exp %d left, got " SIZE_T_FMT " left) ^^^^^^\n\n\n",
 					1, bb.GetReadableSpace()
@@ -1827,7 +1836,7 @@ void cProtocol180::AddReceivedData(const char * a_Data, size_t a_Size)
 	}  // for (ever)
 
 	// Log any leftover bytes into the logfile:
-	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0))
+	if (g_ShouldLogCommIn && (m_ReceivedData.GetReadableSpace() > 0) && m_CommLogFile.IsOpen())
 	{
 		AString AllData;
 		size_t OldReadableSpace = m_ReceivedData.GetReadableSpace();
@@ -2798,7 +2807,7 @@ cProtocol180::cPacketizer::~cPacketizer()
 	}
 
 	// Log the comm into logfile:
-	if (g_ShouldLogCommOut)
+	if (g_ShouldLogCommOut && m_Protocol.m_CommLogFile.IsOpen())
 	{
 		AString Hex;
 		ASSERT(PacketData.size() > 0);

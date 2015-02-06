@@ -115,7 +115,16 @@ a_Output is first cleared and then each separate string is pushed back into a_Ou
 Returns true if there are at least two strings in a_Output (there was at least one \0 separator). */
 extern bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Output);
 
-/// Parses any integer type. Checks bounds and returns errors out of band.
+/** Merges the two vectors of strings, removing duplicate entries from the second vector.
+The resulting vector contains items from a_Strings1 first, then from a_Strings2.
+The order of items doesn't change, only the duplicates are removed.
+If a_Strings1 contains duplicates, the result will still contain those duplicates. */
+extern AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AStringVector & a_Strings2);
+
+/** Concatenates the specified strings into a single string, separated by the specified separator. */
+extern AString StringsConcat(const AStringVector & a_Strings, char a_Separator);
+
+/** Parses any integer type. Checks bounds and returns errors out of band. */
 template <class T>
 bool StringToInteger(const AString & a_str, T & a_Num)
 {

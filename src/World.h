@@ -38,6 +38,9 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
+typedef SharedPtr<cClientHandle> cClientHandlePtr;
+typedef std::list<cClientHandlePtr> cClientHandlePtrs;
+typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
 class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
@@ -1019,13 +1022,13 @@ private:
 	cCriticalSection  m_CSClients;
 	
 	/** List of clients in this world, these will be ticked by this world */
-	cClientHandleList m_Clients;
+	cClientHandlePtrs m_Clients;
 	
 	/** Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them */
-	cClientHandleList m_ClientsToRemove;
+	cClientHandles m_ClientsToRemove;
 	
 	/** Clients that are scheduled for adding, waiting for TickClients to add them */
-	cClientHandleList m_ClientsToAdd;
+	cClientHandlePtrs m_ClientsToAdd;
 
 	/** Guards m_EntitiesToAdd */
 	cCriticalSection m_CSEntitiesToAdd;
