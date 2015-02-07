@@ -126,6 +126,143 @@ local ListenCallbacks =
 </pre></p>
 				]],
 			},
+			
+			{
+				Header = "Example client connection",
+				Contents =
+				[[
+					The following example, adapted from the NetworkTest plugin, shows a simple example of a client
+					connection using the cNetwork API. It connects to www.google.com on port 80 (http) and sends a http
+					request for the front page. It dumps the received data to the console.</p>
+					<p>
+					First, the callbacks are defined in a table. The OnConnected() callback takes care of sending the http
+					request once the socket is connected. The OnReceivedData() callback sends all data to the console. The
+					OnError() callback logs any errors. Then, the connection is initiated using the cNetwork::Connect() API
+					function.</p>
+					<p>
+<pre class="prettyprint lang-lua">
+-- Define the callbacks to use for the client connection:
+local ConnectCallbacks =
+{
+	OnConnected = function (a_Link)
+		-- Connection succeeded, send the http request:
+		a_Link:Send("GET / HTTP/1.0\r\nHost: www.google.com\r\n\r\n")
+	end,
+	
+	OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+		-- Log the error to console:
+		LOG("An error has occurred while talking to google.com: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+	end,
+	
+	OnReceivedData = function (a_Link, a_Data)
+		-- Log the received data to console:
+		LOG("Incoming http data:\r\n" .. a_Data)
+	end,
+	
+	OnRemoteClosed = function (a_Link)
+		-- Log the event into the console:
+		LOG("Connection to www.google.com closed")
+	end,
+}
+
+-- Connect:
+if not(cNetwork:Connect("www.google.com", 80, ConnectCallbacks)) then
+	-- Highly unlikely, but better check for errors
+	LOG("Cannot queue connection to www.google.com")
+end
+-- Note that the connection is being made on the background,
+-- there's no guarantee that it's already connected at this point in code
+</pre>
+				]],
+			},
+			
+			{
+				Header = "Example server implementation",
+				Contents =
+				[[
+					The following example, adapted from the NetworkTest plugin, shows a simple example of creating a
+					server listening on a TCP port using the cNetwork API. The server listens on port 9876 and for
+					each incoming connection it sends a welcome message and then echoes back whatever the client has
+					sent ("echo server").</p>
+					<p>
+					First, the callbacks for the listening server are defined. The most important of those is the
+					OnIncomingConnection() callback that must return the LinkCallbacks that will be used for the new
+					connection. In our simple scenario each connection uses the same callbacks, so a predefined
+					callbacks table is returned; it is, however, possible to define different callbacks for each
+					connection. This allows the callbacks to be "personalised", for example by the remote IP or the
+					time of connection. The OnAccepted() and OnError() callbacks only log that they occurred, there's
+					no processing needed for them.</p>
+					<p>
+					Finally, the cNetwork:Listen() API function is used to create the listening server. The status of
+					the server is checked and if it is successfully listening, it is stored in a global variable, so
+					that Lua doesn't garbage-collect it until we actually want the server closed.</p>
+					<p>
+<pre class="prettyprint lang-lua">
+-- Define the callbacks used for the incoming connections:
+local EchoLinkCallbacks =
+{
+	OnConnected = function (a_Link)
+		-- This will not be called for a server connection, ever
+		assert(false, "Unexpected Connect callback call")
+	end,
+	
+	OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+		-- Log the error to console:
+		local RemoteName = "'" .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. "'"
+		LOG("An error has occurred while talking to " .. RemoteName .. ": " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+	end,
+	
+	OnReceivedData = function (a_Link, a_Data)
+		-- Send the received data back to the remote peer
+		a_Link:Send(Data)
+	end,
+	
+	OnRemoteClosed = function (a_Link)
+		-- Log the event into the console:
+		local RemoteName = "'" .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. "'"
+		LOG("Connection to '" .. RemoteName .. "' closed")
+	end,
+}
+
+-- Define the callbacks used by the server:
+local ListenCallbacks =
+{
+	OnAccepted = function (a_Link)
+		-- No processing needed, just log that this happened:
+		LOG("OnAccepted callback called")
+	end,
+	
+	OnError = function (a_ErrorCode, a_ErrorMsg)
+		-- An error has occured while listening for incoming connections, log it:
+		LOG("Cannot listen, error " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")"
+	end,
+
+	OnIncomingConnection = function (a_RemoteIP, a_RemotePort, a_LocalPort)
+		-- A new connection is being accepted, give it the EchoCallbacks
+		return EchoLinkCallbacks
+	end,
+}
+
+-- Start the server:
+local Server = cNetwork:Listen(9876, ListenCallbacks)
+if not(Server:IsListening()) then
+	-- The error has been already printed in the OnError() callbacks
+	-- Just bail out
+	return;
+end
+
+-- Store the server globally, so that it stays open:
+g_Server = Server
+
+...
+
+-- Elsewhere in the code, when terminating:
+-- Close the server and let it be garbage-collected:
+g_Server:Close()
+g_Server = nil
+</pre>
+				]],
+			},
 		},  -- AdditionalInfo
 		
 		Functions =
