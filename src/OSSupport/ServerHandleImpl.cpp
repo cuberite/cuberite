@@ -127,14 +127,9 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 	// Set reuse flag
-	{
-		#if defined(_WIN32) || defined(ANDROID_NDK)
-			char yes = 1;
-		#else
-			int yes = 1;
-		#endif
-		setsockopt(MainSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-	}
+	#if !defined(_WIN32)
+		evutil_make_listen_socket_reuseable(MainSock);
+	#endif
 
 	if (!IsValidSocket(MainSock))
 	{
@@ -215,14 +210,9 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	// Set reuse flag
-	{
-		#if defined(_WIN32) || defined(ANDROID_NDK)
-			char yes = 1;
-		#else
-			int yes = 1;
-		#endif
-		setsockopt(SecondSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-	}
+	#if !defined(_WIN32)
+		evutil_make_listen_socket_reuseable(SecondSock);
+	#endif
 
 	if (!IsValidSocket(SecondSock))
 	{
