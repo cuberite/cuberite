@@ -656,6 +656,30 @@ void cLuaState::Push(cItems * a_Items)
 
 
 
+void cLuaState::Push(cLuaServerHandle * a_ServerHandle)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_ServerHandle, "cServerHandle");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
+void cLuaState::Push(cLuaTCPLink * a_TCPLink)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_TCPLink, "cTCPLink");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cMonster * a_Monster)
 {
 	ASSERT(IsValid());
@@ -952,6 +976,15 @@ void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
 	{
 		a_ReturnedVal = *((cWorld **)lua_touserdata(m_LuaState, a_StackPos));
 	}
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
+{
+	a_Ref.RefStack(*this, a_StackPos);
 }
 
 
@@ -1521,6 +1554,18 @@ cLuaState::cRef::cRef(cLuaState & a_LuaState, int a_StackPos) :
 	m_Ref(LUA_REFNIL)
 {
 	RefStack(a_LuaState, a_StackPos);
+}
+
+
+
+
+
+cLuaState::cRef::cRef(cRef && a_FromRef):
+	m_LuaState(a_FromRef.m_LuaState),
+	m_Ref(a_FromRef.m_Ref)
+{
+	a_FromRef.m_LuaState = nullptr;
+	a_FromRef.m_Ref = LUA_REFNIL;
 }
 
 

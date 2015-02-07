@@ -221,6 +221,8 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 	// Pending connection succeeded, call the connection callback:
 	if (a_What & BEV_EVENT_CONNECTED)
 	{
+		Self->UpdateLocalAddress();
+		Self->UpdateRemoteAddress();
 		if (Self->m_ConnectCallbacks != nullptr)
 		{
 			Self->m_ConnectCallbacks->OnConnected(*Self);
@@ -228,8 +230,6 @@ void cTCPLinkImpl::EventCallback(bufferevent * a_BufferEvent, short a_What, void
 			Self->m_ConnectCallbacks.reset();
 			return;
 		}
-		Self->UpdateLocalAddress();
-		Self->UpdateRemoteAddress();
 	}
 
 	// If the connection has been closed, call the link callback and remove the connection:

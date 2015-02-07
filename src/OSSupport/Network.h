@@ -90,6 +90,9 @@ public:
 	Sends the RST packet, queued outgoing and incoming data is lost. */
 	virtual void Close(void) = 0;
 
+	/** Returns the callbacks that are used. */
+	cCallbacksPtr GetCallbacks(void) const { return m_Callbacks; }
+
 protected:
 	/** Callbacks to be used for the various situations. */
 	cCallbacksPtr m_Callbacks;

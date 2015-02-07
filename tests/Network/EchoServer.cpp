@@ -119,6 +119,7 @@ void DoTest(void)
 	LOG("Server terminating.");
 	Server->Close();
 	ASSERT(!Server->IsListening());
+	Server.reset();
 	LOGD("Server has been closed.");
 }
 

@@ -8,9 +8,13 @@ SET (SRCS
 	Bindings.cpp
 	DeprecatedBindings.cpp
 	LuaChunkStay.cpp
+	LuaNameLookup.cpp
+	LuaServerHandle.cpp
 	LuaState.cpp
+	LuaTCPLink.cpp
 	LuaWindow.cpp
 	ManualBindings.cpp
+	ManualBindings_Network.cpp
 	ManualBindings_RankManager.cpp
 	Plugin.cpp
 	PluginLua.cpp
@@ -23,7 +27,10 @@ SET (HDRS
 	DeprecatedBindings.h
 	LuaChunkStay.h
 	LuaFunctions.h
+	LuaNameLookup.h
+	LuaServerHandle.h
 	LuaState.h
+	LuaTCPLink.h
 	LuaWindow.h
 	ManualBindings.h
 	Plugin.h
