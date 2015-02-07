@@ -386,7 +386,7 @@ void cProtocol180::SendEntityLook(const cEntity & a_Entity)
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -429,7 +429,7 @@ void cProtocol180::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 	Pkt.WriteByte(a_RelX);
 	Pkt.WriteByte(a_RelY);
 	Pkt.WriteByte(a_RelZ);
-	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -447,7 +447,7 @@ void cProtocol180::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 	Pkt.WriteByte(a_RelZ);
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(true);  // TODO: IsOnGround() on entities
+	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
@@ -947,7 +947,7 @@ void cProtocol180::SendPlayerMoveLook(void)
 	Pkt.WriteDouble(Player->GetPosX());
 	
 	// The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
-	Pkt.WriteDouble(Player->GetStance() + 0.001);
+	Pkt.WriteDouble(Player->GetPosY() + 0.001);
 	
 	Pkt.WriteDouble(Player->GetPosZ());
 	Pkt.WriteFloat((float)Player->GetYaw());
@@ -976,7 +976,7 @@ void cProtocol180::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteVarInt(a_Player.GetUniqueID());
 	Pkt.WriteUUID(cMojangAPI::MakeUUIDShort(a_Player.GetUUID()));
 	Pkt.WriteFPInt(a_Player.GetPosX());
-	Pkt.WriteFPInt(a_Player.GetPosY());
+	Pkt.WriteFPInt(a_Player.GetPosY() + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteFPInt(a_Player.GetPosZ());
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
@@ -1305,7 +1305,7 @@ void cProtocol180::SendTeleportEntity(const cEntity & a_Entity)
 	Pkt.WriteFPInt(a_Entity.GetPosZ());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(true);  // TODO: IsOnGrond() on entities
+	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
 
