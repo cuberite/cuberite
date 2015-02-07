@@ -125,6 +125,17 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	bool NeedsTwoSockets = false;
 	int err;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
+	// Set reuse flag
+	{
+		#if defined(_WIN32) || defined(ANDROID_NDK)
+			char yes = 1;
+		#else
+			int yes = 1;
+		#endif
+		setsockopt(MainSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	}
+
 	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
@@ -193,6 +204,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	}
 	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
 	m_IsListening = true;
+
 	if (!NeedsTwoSockets)
 	{
 		return true;
@@ -201,6 +213,17 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	// If a secondary socket is required (WinXP dual-stack), create it here:
 	LOGD("Creating a second socket for IPv4");
 	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	// Set reuse flag
+	{
+		#if defined(_WIN32) || defined(ANDROID_NDK)
+			char yes = 1;
+		#else
+			int yes = 1;
+		#endif
+		setsockopt(SecondSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+	}
+
 	if (!IsValidSocket(SecondSock))
 	{
 		err = EVUTIL_SOCKET_ERROR();
@@ -233,7 +256,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (listen(SecondSock, 0) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("Cannot listen on on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		LOGD("Cannot listen on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 		evutil_closesocket(SecondSock);
 		return true;  // Report as success, the primary socket is working
 	}
