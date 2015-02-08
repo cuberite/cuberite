@@ -126,11 +126,6 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	int err;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
-	// Set reuse flag
-	#if !defined(_WIN32)
-		evutil_make_listen_socket_reuseable(MainSock);
-	#endif
-
 	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
@@ -142,6 +137,16 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
 			Printf(m_ErrorMsg, "Cannot create socket for port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 			return false;
+		}
+
+		// Allow the port to be reused right after the socket closes:
+		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
+		{
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
+				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			);
+			LOG("%s", m_ErrorMsg.c_str());
 		}
 
 		// Bind to all interfaces:
@@ -169,6 +174,16 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		#else
 			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 		#endif
+
+		// Allow the port to be reused right after the socket closes:
+		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
+		{
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
+				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			);
+			LOG("%s", m_ErrorMsg.c_str());
+		}
 
 		// Bind to all interfaces:
 		sockaddr_in6 name;
@@ -209,16 +224,21 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	LOGD("Creating a second socket for IPv4");
 	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	// Set reuse flag
-	#if !defined(_WIN32)
-		evutil_make_listen_socket_reuseable(SecondSock);
-	#endif
-
 	if (!IsValidSocket(SecondSock))
 	{
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("socket(AF_INET, ...) failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
 		return true;  // Report as success, the primary socket is working
+	}
+
+	// Allow the port to be reused right after the socket closes:
+	if (evutil_make_listen_socket_reuseable(MainSock) != 0)
+	{
+		m_ErrorCode = EVUTIL_SOCKET_ERROR();
+		Printf(m_ErrorMsg, "Port %d cannot be made reusable (second socket): %d (%s). Restarting the server might not work.",
+			a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+		);
+		LOG("%s", m_ErrorMsg.c_str());
 	}
 
 	// Make the secondary socket nonblocking:
