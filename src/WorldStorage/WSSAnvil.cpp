@@ -3136,8 +3136,11 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	
 	// Add padding to 4K boundary:
 	size_t BytesWritten = a_Data.size() + MCA_CHUNK_HEADER_LENGTH;
-	static const char Padding[4095] = {0};
-	m_File.Write(Padding, 4096 - (BytesWritten % 4096));
+	if (BytesWritten % 4096 != 0)
+	{
+		static const char Padding[4095] = {0};
+		m_File.Write(Padding, 4096 - (BytesWritten % 4096));
+	}
 	
 	// Store the header:
 	ChunkSize = ((u_long)a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number
