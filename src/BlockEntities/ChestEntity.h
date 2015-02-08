@@ -53,6 +53,24 @@ private:
 
 	/** Number of players who currently have this chest open */
 	int m_NumActivePlayers;
+
+	/** cItemGrid::cListener overrides: */
+	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum)
+	{
+		UNUSED(a_SlotNum);
+		ASSERT(a_Grid == &m_Contents);
+		if (m_World != nullptr)
+		{
+			if (GetWindow() != nullptr)
+			{
+				GetWindow()->BroadcastWholeWindow();
+			}
+
+			m_World->MarkChunkDirty(GetChunkX(), GetChunkZ());
+			m_World->MarkRedstoneDirty(GetChunkX(), GetChunkZ());
+		}
+	}
+
 } ;  // tolua_export
 
 

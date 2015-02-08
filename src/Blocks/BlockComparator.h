@@ -64,6 +64,85 @@ public:
 		a_BlockMeta = cBlockRedstoneRepeaterHandler::RepeaterRotationToMetaData(a_Player->GetYaw());
 		return true;
 	}
+
+
+	inline static Vector3i GetSideCoordinate(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta, bool a_bInverse)
+	{
+		if (!a_bInverse)
+		{
+			switch (a_Meta)
+			{
+				case 0x0: a_BlockX++; break;
+				case 0x1: a_BlockZ--; break;
+				case 0x2: a_BlockX--; break;
+				case 0x3: a_BlockZ++; break;
+				default:
+				{
+					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+					ASSERT(!"Unknown metadata while determining orientation of comparator!");
+					break;
+				}
+			}
+		}
+		else
+		{
+			switch (a_Meta)
+			{
+				case 0x0: a_BlockX--; break;
+				case 0x1: a_BlockZ++; break;
+				case 0x2: a_BlockX++; break;
+				case 0x3: a_BlockZ--; break;
+				default:
+				{
+					LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+					ASSERT(!"Unknown metadata while determining orientation of comparator!");
+					break;
+				}
+			}
+		}
+
+		return Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+	}
+
+
+	inline static Vector3i GetRearCoordinate(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta)
+		{
+			case 0x0: a_BlockZ++; break;
+			case 0x1: a_BlockX--; break;
+			case 0x2: a_BlockZ--; break;
+			case 0x3: a_BlockX++; break;
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of comparator!");
+				break;
+			}
+		}
+
+		return Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+	}
+
+
+	inline static Vector3i GetFrontCoordinate(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Meta)
+	{
+		switch (a_Meta)
+		{
+			case 0x0: a_BlockZ--; break;
+			case 0x1: a_BlockX++; break;
+			case 0x2: a_BlockZ++; break;
+			case 0x3: a_BlockX--; break;
+			default:
+			{
+				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
+				ASSERT(!"Unknown metadata while determining orientation of comparator!");
+				break;
+			}
+		}
+
+		return Vector3i(a_BlockX, a_BlockY, a_BlockZ);
+	}
 } ;
 
 

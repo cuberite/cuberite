@@ -3,11 +3,10 @@
 
 #include "BlockEntities/ChestEntity.h"
 
-typedef cItemCallback<cChestEntity> cChestCallback;
-
 #include "Chunk.h"
 #include "World.h"
 #include "Blocks/GetHandlerCompileTimeTemplate.h"
+#include "Blocks/BlockComparator.h"
 #include "Blocks/BlockTorch.h"
 #include "Blocks/BlockLever.h"
 #include "Blocks/BlockButton.h"
@@ -286,6 +285,12 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 					HandleRedstoneButton(dataitr->x, dataitr->y, dataitr->z);
 					break;
 				}
+				case E_BLOCK_ACTIVE_COMPARATOR:
+				case E_BLOCK_INACTIVE_COMPARATOR:
+				{
+					HandleRedstoneComparator(dataitr->x, dataitr->y, dataitr->z);
+					break;
+				}
 				default: break;
 			}
 		}
@@ -535,19 +540,15 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 	};
 
 	// Check to see if directly beside a power source
-	unsigned char MyPower;
-	if (!IsWirePowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower))
+	unsigned char MyPower = IsWirePowered(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ));
+	if (MyPower == 0)
 	{
+		SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, 0);
 		return;
 	}
 
 	m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, MyPower);
-
-	if (MyPower < 1)
-	{
-		return;
-	}
 
 	MyPower--;
 
@@ -649,6 +650,67 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 			SetDirectionLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, BLOCK_FACE_ZM, MyPower);
 			break;
 		}
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::HandleRedstoneComparator(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ)
+{
+	auto Meta = m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
+	auto HighestSidePower = std::max(IsWirePowered(AdjustRelativeCoords(cBlockComparatorHandler::GetSideCoordinate(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Meta & 0x3, false))), IsWirePowered(AdjustRelativeCoords(cBlockComparatorHandler::GetSideCoordinate(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Meta & 0x3, true))));
+	auto FrontCoordinate = AdjustRelativeCoords(cBlockComparatorHandler::GetFrontCoordinate(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Meta & 0x3));
+	unsigned char Power = 0;
+
+	class cContainerCallback : public cBlockEntityCallback
+	{
+	public:
+		cContainerCallback() : m_SignalStrength(0)
+		{
+		}
+
+		virtual bool Item(cBlockEntity * a_BlockEntity) override
+		{
+			auto & Contents = static_cast<cBlockEntityWithItems *>(a_BlockEntity)->GetContents();
+			float Fullness = 0;  // Is a floating-point type to allow later calculation to produce a non-truncated value
+			for (int Slot = 0; Slot != Contents.GetNumSlots(); ++Slot)
+			{
+				Fullness += Contents.GetSlot(Slot).m_ItemCount / Contents.GetSlot(Slot).GetMaxStackSize();
+			}
+
+			m_SignalStrength = static_cast<unsigned char>(1 + (Fullness / Contents.GetNumSlots()) * 14);
+			return false;
+		}
+
+		unsigned char m_SignalStrength;
+	} CCB;
+
+	auto AbsoluteComparatorCoords = cChunkDef::RelativeToAbsolute(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ), m_Chunk->GetPosX(), m_Chunk->GetPosZ());
+	auto AbsoluteRearCoords = cBlockComparatorHandler::GetRearCoordinate(AbsoluteComparatorCoords.x, AbsoluteComparatorCoords.y, AbsoluteComparatorCoords.z, Meta & 0x3);
+
+	m_Chunk->DoWithBlockEntityAt(AbsoluteRearCoords.x, AbsoluteRearCoords.y, AbsoluteRearCoords.z, CCB);
+	auto RearPower = std::max(CCB.m_SignalStrength, IsWirePowered(AdjustRelativeCoords(cBlockComparatorHandler::GetRearCoordinate(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Meta & 0x3))));
+
+	if ((Meta & 0x4) == 0x4)
+	{ // Subtraction mode
+		Power = RearPower - HighestSidePower;
+	}
+	else
+	{ // Comparison mode
+		Power = std::max(HighestSidePower, RearPower);
+	}
+
+	if (Power > 0)
+	{
+		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) | 0x8);
+		SetBlockPowered(FrontCoordinate, Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ), Power);
+	}
+	else
+	{
+		m_Chunk->SetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk->GetMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ) & 0x7);
+		SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 	}
 }
 
@@ -1017,19 +1079,19 @@ void cIncrementalRedstoneSimulator::HandleDaylightSensor(int a_RelBlockX, int a_
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 
-	if (!this->m_World.IsChunkLighted(ChunkX, ChunkZ))
+	if (!m_World.IsChunkLighted(ChunkX, ChunkZ))
 	{
-		this->m_World.QueueLightChunk(ChunkX, ChunkZ);
+		m_World.QueueLightChunk(ChunkX, ChunkZ);
 	}
 	else
 	{
-		if (m_Chunk->GetTimeAlteredLight(this->m_World.GetBlockSkyLight(BlockX, a_RelBlockY + 1, BlockZ)) > 8)
+		if (m_Chunk->GetTimeAlteredLight(m_Chunk->GetSkyLight(a_RelBlockX, a_RelBlockY + 1, a_RelBlockZ)) > 8)
 		{
 			SetAllDirsAsPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
 		}
 		else
 		{
-			WakeUp(BlockX, a_RelBlockY, BlockZ, m_Chunk);
+			SetSourceUnpowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk);
 		}
 	}
 }
@@ -1702,22 +1764,22 @@ bool cIncrementalRedstoneSimulator::IsPistonPowered(int a_RelBlockX, int a_RelBl
 
 
 
-bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, unsigned char & a_PowerLevel)
+unsigned char cIncrementalRedstoneSimulator::IsWirePowered(Vector3i a_RelBlockPosition)
 {
-	a_PowerLevel = 0;
+	unsigned char PowerLevel = 0;
 
 	for (const auto & itr : *m_PoweredBlocks)  // Check powered list
 	{
-		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		if (itr.a_BlockPos != a_RelBlockPosition)
 		{
 			continue;
 		}
-		a_PowerLevel = std::max(itr.a_PowerLevel, a_PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
+		PowerLevel = std::max(itr.a_PowerLevel, PowerLevel);  // Get the highest power level (a_PowerLevel is initialised already and there CAN be multiple levels for one block)
 	}
 
 	for (const auto & itr : *m_LinkedPoweredBlocks)  // Check linked powered list
 	{
-		if (!itr.a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)))
+		if (itr.a_BlockPos != a_RelBlockPosition)
 		{
 			continue;
 		}
@@ -1727,10 +1789,10 @@ bool cIncrementalRedstoneSimulator::IsWirePowered(int a_RelBlockX, int a_RelBloc
 		{
 			continue;
 		}
-		a_PowerLevel = std::max(itr.a_PowerLevel, a_PowerLevel);
+		PowerLevel = std::max(itr.a_PowerLevel, PowerLevel);
 	}
 
-	return (a_PowerLevel != 0);  // Answer the inital question: is the wire powered?
+	return PowerLevel;
 }
 
 
@@ -1871,20 +1933,20 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_RelBlockX, int a_R
 {
 	static const struct
 	{
-		int x, y, z;
+		Vector3i Offset;
 	} gCrossCoords[] =
 	{
-		{ 1, 0, 0 },
-		{ -1, 0, 0 },
-		{ 0, 0, 1 },
-		{ 0, 0, -1 },
-		{ 0, 1, 0 },
-		{ 0, -1, 0 }
+		Vector3i(1, 0, 0),
+		Vector3i(-1, 0, 0),
+		Vector3i(0, 0, 1),
+		Vector3i(0, 0, -1),
+		Vector3i(0, 1, 0),
+		Vector3i(0, -1, 0)
 	};
 
 	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)  // Loop through struct to power all directions
 	{
-		SetBlockPowered(a_RelBlockX + gCrossCoords[i].x, a_RelBlockY + gCrossCoords[i].y, a_RelBlockZ + gCrossCoords[i].z, a_RelBlockX, a_RelBlockY, a_RelBlockZ, a_PowerLevel);
+		SetBlockPowered(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ) + gCrossCoords[i].Offset, Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ), a_PowerLevel);
 	}
 }
 
@@ -1892,60 +1954,64 @@ void cIncrementalRedstoneSimulator::SetAllDirsAsPowered(int a_RelBlockX, int a_R
 
 
 
-void cIncrementalRedstoneSimulator::SetBlockPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, unsigned char a_PowerLevel)
+void cIncrementalRedstoneSimulator::SetBlockPowered(Vector3i a_RelBlockPosition, Vector3i a_RelSourcePosition, unsigned char a_PowerLevel)
 {
-	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockX, a_RelBlockZ);  // Adjust coordinates for the later call using these values
+	cChunk * Neighbour = m_Chunk->GetRelNeighborChunkAdjustCoords(a_RelBlockPosition.x, a_RelBlockPosition.z);  // Adjust coordinates for the later call using these values
 	if ((Neighbour == nullptr) || !Neighbour->IsValid())
 	{
 		return;
 	}
+	a_RelSourcePosition.x += (m_Chunk->GetPosX() - Neighbour->GetPosX()) * cChunkDef::Width;
+	a_RelSourcePosition.z += (m_Chunk->GetPosZ() - Neighbour->GetPosZ()) * cChunkDef::Width;
 
 	auto & Powered = ((cIncrementalRedstoneSimulator::cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_PoweredBlocks;  // We need to insert the value into the chunk who owns the block position
 	for (auto itr = Powered.begin(); itr != Powered.end(); ++itr)
 	{
-		if (
-			itr->a_BlockPos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)) &&
-			itr->a_SourcePos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ))
-			)
+		if ((itr->a_BlockPos == a_RelBlockPosition) && (itr->a_SourcePos == a_RelSourcePosition))
 		{
-			// Check for duplicates, update power level, don't add a new listing
-			itr->a_PowerLevel = a_PowerLevel;
+			if (itr->a_PowerLevel != a_PowerLevel)
+			{
+				// Update power level, don't add a new listing
+				Neighbour->SetIsRedstoneDirty(true);
+				m_Chunk->SetIsRedstoneDirty(true);
+				itr->a_PowerLevel = a_PowerLevel;
+			}
 			return;
 		}
 	}
 
-	// No need to get neighbouring chunk as we can guarantee that when something is powering us, the entry will be in our chunk
-	for (auto itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
-	{
-		if (
-			itr->a_BlockPos.Equals(Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ)) &&
-			itr->a_SourcePos.Equals(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ)) &&
-			(m_Chunk->GetBlock(a_RelSourceX, a_RelSourceY, a_RelSourceZ) == E_BLOCK_REDSTONE_WIRE)
-			)
-		{
-			BLOCKTYPE Block;
-			NIBBLETYPE Meta;
-			Neighbour->GetBlockTypeMeta(a_RelBlockX, a_RelBlockY, a_RelBlockZ, Block, Meta);
+	//// No need to get neighbouring chunk as we can guarantee that when something is powering us, the entry will be in our chunk
+	//for (auto itr = m_PoweredBlocks->begin(); itr != m_PoweredBlocks->end(); ++itr)
+	//{
+	//	if (
+	//		(itr->a_BlockPos == a_RelBlockPosition) &&
+	//		(itr->a_SourcePos == a_RelSourcePosition) &&
+	//		(m_Chunk->GetBlock(a_RelSourcePosition) == E_BLOCK_REDSTONE_WIRE)
+	//		)
+	//	{
+	//		BLOCKTYPE Block;
+	//		NIBBLETYPE Meta;
+	//		Neighbour->GetBlockTypeMeta(a_RelBlockPosition.x, a_RelBlockPosition.y, a_RelBlockPosition.z, Block, Meta);
 
-			if (Block == E_BLOCK_REDSTONE_WIRE)
-			{
-				if (Meta < a_PowerLevel)
-				{
-					m_PoweredBlocks->erase(itr);  // Powering source with higher power level, allow it
-					break;
-				}
-				else
-				{
-					// Powered wires try to power their source - don't let them!
-					return;
-				}
-			}
-		}
-	}
+	//		if (Block == E_BLOCK_REDSTONE_WIRE)
+	//		{
+	//			if (Meta < a_PowerLevel)
+	//			{
+	//				m_PoweredBlocks->erase(itr);  // Powering source with higher power level, allow it
+	//				break;
+	//			}
+	//			else
+	//			{
+	//				// Powered wires try to power their source - don't let them!
+	//				return;
+	//			}
+	//		}
+	//	}
+	//}
 
 	sPoweredBlocks RC;
-	RC.a_BlockPos = Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ);
-	RC.a_SourcePos = Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ);
+	RC.a_BlockPos = a_RelBlockPosition;
+	RC.a_SourcePos = a_RelSourcePosition;
 	RC.a_PowerLevel = a_PowerLevel;
 	Powered.emplace_back(RC);
 	Neighbour->SetIsRedstoneDirty(true);
@@ -2123,7 +2189,7 @@ void cIncrementalRedstoneSimulator::SetSourceUnpowered(int a_RelSourceX, int a_R
 	for (const auto & itr : BlocksPotentiallyUnpowered)
 	{
 		auto Neighbour = a_Chunk->GetRelNeighborChunk(itr.x, itr.z);
-		if (!AreCoordsPowered(itr.x, itr.y, itr.z) && (Neighbour->GetBlock(itr) != E_BLOCK_REDSTONE_REPEATER_ON))
+		if (Neighbour->GetBlock(itr) != E_BLOCK_REDSTONE_REPEATER_ON)
 		{
 			// Repeaters time themselves with regards to unpowering; ensure we don't do it for them
 			SetSourceUnpowered(itr.x, itr.y, itr.z, Neighbour);

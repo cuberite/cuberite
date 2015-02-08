@@ -96,6 +96,12 @@ public:
 		a_Z = a_Z - a_ChunkZ * Width;
 	}
 
+	/** Converts relative block coordinates into absolute coordinates with a known chunk location */
+	inline static Vector3i RelativeToAbsolute(const Vector3i & a_RelBlockPosition, int a_ChunkX, int a_ChunkZ)
+	{
+		return Vector3i(a_RelBlockPosition.x + a_ChunkX * Width, a_RelBlockPosition.y, a_RelBlockPosition.z + a_ChunkZ * Width);
+	}
+
 
 	/// Converts absolute block coords to chunk coords:
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
