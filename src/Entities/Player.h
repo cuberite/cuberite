@@ -314,8 +314,18 @@ public:
 
 	// tolua_end
 
-	/** Sets a player's in-bed state; we can't be sure plugins will keep this value updated, so no exporting */
-	void SetIsInBed(bool a_Flag) { m_bIsInBed = a_Flag; }
+	/** Sets a player's in-bed state
+	We can't be sure plugins will keep this value updated, so no exporting
+	If value is false (not in bed), will update players of the fact that they have been ejected from the bed
+	*/
+	void SetIsInBed(bool a_Flag)
+	{
+		m_bIsInBed = a_Flag;
+		if (!a_Flag)
+		{
+			GetWorld()->BroadcastEntityAnimation(*this, 2);
+		}
+	}
 	
 	/** Starts eating the currently equipped item. Resets the eating timer and sends the proper animation packet */
 	void StartEating(void);

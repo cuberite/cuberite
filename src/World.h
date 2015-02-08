@@ -45,6 +45,7 @@ class cEntity;
 class cBlockEntity;
 class cWorldGenerator;  // The generator that actually generates the chunks for a single world
 class cChunkGenerator;  // The thread responsible for generating chunks
+class cChunkInterface;
 class cBeaconEntity;
 class cChestEntity;
 class cDispenserEntity;
@@ -138,6 +139,21 @@ public:
 		virtual void Run(cWorld & a_World) override;
 
 		std::vector<Vector3i> m_SendQueue;
+	};
+
+	class cTaskTryAwakeSleepingPlayers :
+		public cTask
+	{
+	public:
+		cTaskTryAwakeSleepingPlayers(const Vector3i & a_Position, cChunkInterface & a_ChunkInterface);
+
+	protected:
+		// cTask overrides:
+		virtual void Run(cWorld & a_World) override;
+
+	private:
+		Vector3i m_Position;
+		cChunkInterface & m_ChunkInterface;
 	};
 
 
@@ -695,7 +711,7 @@ public:
 	
 	/** Queues a task onto the tick thread, with the specified delay.
 	The task object will be deleted once the task is finished */
-	void ScheduleTask(int a_DelayTicks, cTask * a_Task);
+	virtual void ScheduleTask(int a_DelayTicks, cTask * a_Task) override;
 
 	/** Returns the number of chunks loaded	 */
 	int GetNumChunks() const;  // tolua_export
