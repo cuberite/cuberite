@@ -1,0 +1,32 @@
+body {
+  padding: 10px;
+}
+
+
+.fa-2x {
+  line-height: 22px;
+  font-size:24pt;
+}
+
+
+.fa-3x {
+  line-height: 24px;
+  font-size:32pt;
+}
+
+
+.container {
+  max-width:900px;
+}
+
+.panel-heading center {
+  font-size: 11pt;
+}
+
+.btn {
+  font-size: 10pt;
+}
+
+#subtable {
+  width: 100%;
+}
