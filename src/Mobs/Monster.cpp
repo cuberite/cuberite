@@ -95,6 +95,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
 	, m_RelativeWalkSpeed(1.0)
+	, m_ActivationRange(48)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -254,7 +255,11 @@ bool cMonster::ReachedFinalDestination()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), float(m_ActivationRange));
+	if (a_Closest_Player != nullptr)
+	{
+		super::Tick(a_Dt, a_Chunk);
+	}
 
 	if (m_Health <= 0)
 	{

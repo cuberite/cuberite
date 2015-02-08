@@ -232,6 +232,7 @@ protected:
 	int m_AttackRange;
 	float m_AttackInterval;
 	int m_SightDistance;
+	int m_ActivationRange;
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;
