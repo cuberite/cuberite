@@ -1,98 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MCServer - A performant Minecraft server written in C++</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MCServer - A performant Minecraft server written in C++</title>
 
-  <!-- Bootstrap -->
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/bootstrap-sandstone.min.css">
-  <link rel="stylesheet" href="css/font-awesome.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-simplex.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
 
 
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.2.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 <body>
-  <center>
-    <br>
-    <div class="container">
-    <img src="assets/icon_256.png" alt="MC" />
-    <div class="page-header">
-      <h1>MCServer<br><small>A custom Minecraft server written completely in C++. It's a fast, lightweight, and awesome replacement for Vanilla.</small></h1>
-      </div>
-  <br><br>
-  <h3>Downloads</h3>
-  <table class="table table-condensed">
-    <tr>
-      <td>
-        64bit
-      </td>
-      <td>
-        <a class="btn btn-primary" href="http://builds.cuberite.org/job/MCServer%20Linux%20x64/lastSuccessfulBuild/artifact/MCServer.tar"><i class="fa fa-linux fa-4x pull-left"></i>Linux<br>64bit</a>
-      </td>
-      <td>
-        <a class="btn btn-primary" href="http://builds.cuberite.org/job/MCServer%20Windows%20x64/lastSuccessfulBuild/artifact/Install/MCServer.zip"><i class="fa fa-windows fa-4x pull-left"></i>Windows<br>64bit</a>
-      </td>
-      <td>
-        <a class="btn btn-primary" href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C4250&id=EAC2A6E3A23C4250%21109"><i class="fa fa-apple fa-4x pull-left"></i>MacOS<br>64bit</a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        32bit
-      </td>
-      <td>
-        <a class="btn btn-primary" href="http://builds.cuberite.org/job/MCServer%20Linux%20x86/lastSuccessfulBuild/artifact/MCServer.tar"><i class="fa fa-linux fa-4x pull-left"></i>Linux<br>32bit</a>
-      </td>
-      <td>
-        <a class="btn btn-primary" href="http://builds.cuberite.org/job/MCServer%20Windows%20x86/lastSuccessfulBuild/artifact/Install/MCServer.zip"><i class="fa fa-windows fa-4x pull-left"></i>Windows<br>32bit</a>
-      </td>
-      <td>
-        <a class="btn btn-danger disabled" href="#"><i class="fa fa-apple fa-4x pull-left"></i>MacOS<br>32bit</a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        ARMv6<br>
-        (Raspberry PI)
-      </td>
-      <td>
-        <a class="btn btn-primary" href="http://builds.cuberite.org/job/MCServer%20Linux%20x86/lastSuccessfulBuild/artifact/MCServer.tar"><i class="fa fa-linux fa-4x pull-left"></i>Linux<br>ARMv6</a>
-      </td>
-      <td>
-        <a class="btn btn-danger disabled" href=""><i class="fa fa-windows fa-4x pull-left"></i>Windows<br>ARMv6</a>
-      </td>
-      <td>
-        <a class="btn btn-danger disabled" href="#"><i class="fa fa-apple fa-4x pull-left"></i>MacOS<br>ARMv6</a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        Source
-      </td>
-      <td colspan=3>
-        <a class="btn btn-default" href="https://github.com/mc-server/MCServer"><i class="fa fa-github fa-4x pull-left"></i>Source on Github</a>
-      </td>
-    </tr>
-  </table>
-  <!-- <br><br>
-  <h3>Other installation Methods</h3>
-  <a class="btn btn-info" href="http://doinstall.bearbin.net/install?url=https://github.com/mc-server/MCServer"><i class="fa fa-cloud-upload fa-2x pull-left"></i>Install on DigitalOcean</a>
-  <br><br>
-  <a class="btn btn-success" href="http://gamocosm.com"><i class="fa fa-shopping-cart fa-2x pull-left"></i>Rent a server at Gamocosm</a> -->
-  </div>
-  <br>
-</center>
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="js/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="js/bootstrap.min.js"></script>
+    <center>
+        <div class="container">
+            <img src="assets/icon_256.png" alt="MC" />
+            <div class="page-header">
+                <h1>MCServer<br><small>A custom Minecraft server written completely in C++. It's a fast, lightweight, and awesome replacement for Vanilla.</small></h1>
+            </div>
+            <br>
+            <table class="table table-condensed">
+              <tr>
+                  <td>
+                      64bit
+                  </td>
+                  <td>
+                      <a class="btn btn-success btn-block" href="http://builds.cuberite.org/job/MCServer%20Linux%20x62/lastSuccessfulBuild/artifact/MCServer.tar"><i class="fa fa-linux fa-2x pull-left"></i>Linux 64bit</a>
+                  </td>
+                  <td>
+                      <a class="btn btn-success btn-block" href="http://builds.cuberite.org/job/MCServer%20Windows%20x62/lastSuccessfulBuild/artifact/Install/MCServer.zip"><i class="fa fa-windows fa-2x pull-left"></i>Windows 64bit</a>
+                  </td>
+                  <td>
+                      <a class="btn btn-success btn-block" href="https://skydrive.live.com/?mkt=en-US#cid=EAC2A6E3A23C2250&id=EAC2A6E3A23C2250%21109"><i class="fa fa-apple fa-2x pull-left"></i>MacOS 64bit</a>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      32bit
+                  </td>
+                  <td>
+                      <a class="btn btn-success btn-block" href="http://builds.cuberite.org/job/MCServer%20Linux%20x86/lastSuccessfulBuild/artifact/MCServer.tar"><i class="fa fa-linux fa-2x pull-left"></i>Linux 32bit</a>
+                  </td>
+                  <td>
+                      <a class="btn btn-success btn-block" href="http://builds.cuberite.org/job/MCServer%20Windows%20x86/lastSuccessfulBuild/artifact/Install/MCServer.zip"><i class="fa fa-windows fa-2x pull-left"></i>Windows 32bit</a>
+                  </td>
+                  <td>
+                      <a class="btn btn-danger disabled btn-block" href=""><i class="fa fa-apple fa-2x pull-left"></i>MacOS 32bit</a>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      ARMv6<br>
+                      (Raspberry PI)
+                  </td>
+                  <td>
+                      <a class="btn btn-success btn-block" href="http://builds.cuberite.org/job/MCServer%20Linux%20x86/lastSuccessfulBuild/artifact/MCServer.tar"><i class="fa fa-linux fa-2x pull-left"></i>Linux ARMv6</a>
+                  </td>
+                  <td>
+                      <a class="btn btn-danger disabled btn-block" href=""><i class="fa fa-windows fa-2x pull-left"></i>Windows ARMv6</a>
+                  </td>
+                  <td>
+                      <a class="btn btn-danger disabled btn-block" href=""><i class="fa fa-apple fa-2x pull-left"></i>MacOS ARMv6</a>
+                  </td>
+              </tr>
+              <tr>
+                  <td>
+                      Source
+                  </td>
+                  <td colspan="3">
+                      <a class="btn btn-default btn-block btn-lg" href="https://github.com/mc-server/MCServer"><i class="fa fa-github fa-3x pull-left"></i>Source on Github</a>
+                  </td>
+              </tr>
+            </table>
+            <!-- <br><br>
+            <h3>Other installation Methods</h3>
+            <a class="btn btn-info" href="http://doinstall.bearbin.net/install?url=https://github.com/mc-server/MCServer"><i class="fa fa-cloud-upload fa-2x pull-left"></i>Install on DigitalOcean</a>
+            <br><br>
+            <a class="btn btn-success" href="http://gamocosm.com"><i class="fa fa-shopping-cart fa-2x pull-left"></i>Rent a server at Gamocosm</a> -->
+        </div>
+    </center>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
 </body>
 </html>
