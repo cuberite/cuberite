@@ -4,10 +4,12 @@ body {
 
 
 .fa-2x {
-  font-size:15pt;
+  line-height: 18px;
+  font-size:20pt;
 }
 
 
 .fa-3x {
-  font-size:19pt;
+  line-height: 22px;
+  font-size:30pt;
 }
