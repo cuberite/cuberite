@@ -13,3 +13,13 @@ body {
   line-height: 22px;
   font-size:30pt;
 }
+
+
+.container {
+  max-width:800px;
+}
+
+
+#subtable {
+  width: 100%;
+}
