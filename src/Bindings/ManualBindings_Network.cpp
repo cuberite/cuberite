@@ -389,6 +389,51 @@ static int tolua_cTCPLink_GetRemotePort(lua_State * L)
 
 
 
+/** Binds cLuaTCPLink::StartTLSClient */
+static int tolua_cTCPLink_StartTLSClient(lua_State * L)
+{
+	// Function signature:
+	// LinkInstance:StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword) -> [true] or [nil, ErrMsg]
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamString(2, 4) ||
+		!S.CheckParamEnd(5)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the link:
+	cLuaTCPLink * Link;
+	if (lua_isnil(L, 1))
+	{
+		LOGWARNING("cTCPLink:StartTLSClient(): invalid link object. Stack trace:");
+		S.LogStackTrace();
+		return 0;
+	}
+	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+
+	// Read the params:
+	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword;
+	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword);
+
+	// Start the TLS handshake:
+	AString res = Link->StartTLSClient(OwnCert, OwnPrivKey, OwnPrivKeyPassword);
+	if (!res.empty())
+	{
+		S.PushNil();
+		S.Push(Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
+		return 2;
+	}
+	return 1;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cServerHandle bindings (routed through cLuaServerHandle):
 
@@ -495,11 +540,12 @@ void ManualBindings::BindNetwork(lua_State * tolua_S)
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cTCPLink");
-		tolua_function(tolua_S, "Send",          tolua_cTCPLink_Send);
-		tolua_function(tolua_S, "GetLocalIP",    tolua_cTCPLink_GetLocalIP);
-		tolua_function(tolua_S, "GetLocalPort",  tolua_cTCPLink_GetLocalPort);
-		tolua_function(tolua_S, "GetRemoteIP",   tolua_cTCPLink_GetRemoteIP);
-		tolua_function(tolua_S, "GetRemotePort", tolua_cTCPLink_GetRemotePort);
+		tolua_function(tolua_S, "Send",           tolua_cTCPLink_Send);
+		tolua_function(tolua_S, "GetLocalIP",     tolua_cTCPLink_GetLocalIP);
+		tolua_function(tolua_S, "GetLocalPort",   tolua_cTCPLink_GetLocalPort);
+		tolua_function(tolua_S, "GetRemoteIP",    tolua_cTCPLink_GetRemoteIP);
+		tolua_function(tolua_S, "GetRemotePort",  tolua_cTCPLink_GetRemotePort);
+		tolua_function(tolua_S, "StartTLSClient", tolua_cTCPLink_StartTLSClient);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cServerHandle");

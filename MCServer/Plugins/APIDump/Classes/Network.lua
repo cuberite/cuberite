@@ -282,7 +282,15 @@ g_Server = nil
 			calling {{cNetwork}}:Connect() to connect to a remote server, or by listening using
 			{{cNetwork}}:Listen() and accepting incoming connections. The links are callback-based - when an event
 			such as incoming data or remote disconnect happens on the link, a specific callback is called. See the
-			additional information in {{cNetwork}} documentation for details.
+			additional information in {{cNetwork}} documentation for details.</p>
+			<p>
+			The link can also optionally perform TLS encryption. Plugins can use the StartTLSClient() function to
+			start the TLS handshake as the client side. Since that call, the OnReceivedData() callback is
+			overridden internally so that the data is first routed through the TLS decryptor, and the plugin's
+			callback is only called for the decrypted data, once it starts arriving. The Send function changes its
+			behavior so that the data written by the plugin is first encrypted and only then sent over the
+			network. Note that calling Send() before the TLS handshake finishes is supported, but the data is
+			queued internally and only sent once the TLS handshake is completed.
 		]],
 		
 		Functions =
@@ -292,6 +300,7 @@ g_Server = nil
 			GetRemoteIP = { Params = "", Return = "string", Notes = "Returns the IP address of the remote endpoint of the TCP connection." },
 			GetRemotePort = { Params = "", Return = "number", Notes = "Returns the port of the remote endpoint of the TCP connection." },
 			Send = { Params = "Data", Return = "", Notes = "Sends the data (raw string) to the remote peer. The data is sent asynchronously and there is no report on the success of the send operation, other than the connection being closed or reset by the underlying OS." },
+			StartTLSClient = { Params = "OwnCert, OwnPrivateKey, OwnPrivateKeyPassword", Return = "", Notes = "Starts a TLS handshake on the link, as a client side of the TLS. The Own___ parameters specify the client certificate and its corresponding private key and password; all three parameters are optional and no client certificate is presented to the remote peer if they are not used or all empty. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link." },
 		},
 	},  -- cTCPLink
 

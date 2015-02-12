@@ -252,3 +252,47 @@ end
 
 
 
+
+function HandleConsoleNetWasc(a_Split)
+	local Callbacks =
+	{
+		OnConnected = function (a_Link)
+			LOG("Connected to webadmin, starting TLS...")
+			local res, msg = a_Link:StartTLSClient("", "", "")
+			if not(res) then
+				LOG("Failed to start TLS client: " .. msg)
+				return
+			end
+			-- We need to send a keep-alive due to #1737
+			a_Link:Send("GET / HTTP/1.0\r\nHost: localhost\r\nConnection: keep-alive\r\n\r\n")
+		end,
+		
+		OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+			LOG("Connection to webadmin failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+		end,
+		
+		OnReceivedData = function (a_Link, a_Data)
+			LOG("Received data from webadmin:\r\n" .. a_Data)
+			
+			-- Close the link once all the data is received:
+			if (a_Data == "0\r\n\r\n") then  -- Poor man's end-of-data detection; works on localhost
+				-- TODO: The Close() method is not yet exported to Lua
+				-- a_Link:Close()
+			end
+		end,
+		
+		OnRemoteClosed = function (a_Link)
+			LOG("Connection to webadmin was closed")
+		end,
+	}
+	
+	if not(cNetwork:Connect("localhost", "8080", Callbacks)) then
+		LOG("Canot connect to webadmin")
+	end
+	
+	return true
+end
+
+
+
+

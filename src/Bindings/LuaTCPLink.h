@@ -11,6 +11,7 @@
 
 #include "../OSSupport/Network.h"
 #include "PluginLua.h"
+#include "../PolarSSL++/SslContext.h"
 
 
 
@@ -62,7 +63,53 @@ public:
 	Sends the RST packet, queued outgoing and incoming data is lost. */
 	void Close(void);
 
+	/** Starts a TLS handshake as a client connection.
+	If a client certificate should be used for the connection, set the certificate into a_OwnCertData and
+	its corresponding private key to a_OwnPrivKeyData. If both are empty, no client cert is presented.
+	a_OwnPrivKeyPassword is the password to be used for decoding PrivKey, empty if not passworded.
+	Returns empty string on success, non-empty error description on failure. */
+	AString StartTLSClient(
+		const AString & a_OwnCertData,
+		const AString & a_OwnPrivKeyData,
+		const AString & a_OwnPrivKeyPassword
+	);
+
 protected:
+	/** Wrapper around cSslContext that is used when this link is being encrypted by SSL. */
+	class cLinkSslContext :
+		public cSslContext
+	{
+		cLuaTCPLink & m_Link;
+
+		/** Buffer for storing the incoming encrypted data until it is requested by the SSL decryptor. */
+		AString m_EncryptedData;
+
+		/** Buffer for storing the outgoing cleartext data until the link has finished handshaking. */
+		AString m_CleartextData;
+
+	public:
+		cLinkSslContext(cLuaTCPLink & a_Link);
+
+		/** Stores the specified block of data into the buffer of the data to be decrypted (incoming from remote).
+		Also flushes the SSL buffers by attempting to read any data through the SSL context. */
+		void StoreReceivedData(const char * a_Data, size_t a_NumBytes);
+
+		/** Tries to read any cleartext data available through the SSL, reports it in the link. */
+		void FlushBuffers(void);
+
+		/** Tries to finish handshaking the SSL. */
+		void TryFinishHandshaking(void);
+
+		/** Sends the specified cleartext data over the SSL to the remote peer.
+		If the handshake hasn't been completed yet, queues the data for sending when it completes. */
+		void Send(const AString & a_Data);
+
+		// cSslContext overrides:
+		virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
+		virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
+	};
+
+
 	/** The plugin for which the link is created. */
 	cPluginLua & m_Plugin;
 
@@ -76,10 +123,18 @@ protected:
 	/** The server that is responsible for this link, if any. */
 	cLuaServerHandleWPtr m_Server;
 
+	/** The SSL context used for encryption, if this link uses SSL.
+	If valid, the link uses encryption through this context. */
+	UniquePtr<cLinkSslContext> m_SslContext;
+
 
 	/** Common code called when the link is considered as terminated.
 	Releases m_Link, m_Callbacks and this from m_Server, each when applicable. */
 	void Terminated(void);
+
+	/** Called by the SSL context when there's incoming data available in the cleartext.
+	Reports the data via the Lua callback function. */
+	void ReceivedCleartextData(const char * a_Data, size_t a_NumBytes);
 
 	// cNetwork::cConnectCallbacks overrides:
 	virtual void OnConnected(cTCPLink & a_Link) override;

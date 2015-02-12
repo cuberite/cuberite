@@ -45,7 +45,7 @@ cCryptoKey::cCryptoKey(const AString & a_PrivateKeyData, const AString & a_Passw
 	if (res != 0)
 	{
 		LOGWARNING("Failed to parse private key: -0x%x", res);
-		ASSERT(!"Cannot parse PubKey");
+		ASSERT(!"Cannot parse PrivKey");
 		return;
 	}
 }

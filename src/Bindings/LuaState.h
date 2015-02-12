@@ -184,6 +184,8 @@ public:
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
 	
+	void PushNil(void);
+
 	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);

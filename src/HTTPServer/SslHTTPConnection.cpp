@@ -25,6 +25,15 @@ cSslHTTPConnection::cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509Ce
 
 
 
+cSslHTTPConnection::~cSslHTTPConnection()
+{
+	m_Ssl.NotifyClose();
+}
+
+
+
+
+
 void cSslHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
 {
 	// Process the received data:

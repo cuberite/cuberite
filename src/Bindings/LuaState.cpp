@@ -343,6 +343,18 @@ bool cLuaState::PushFunction(const cTableRef & a_TableRef)
 
 
 
+void cLuaState::PushNil(void)
+{
+	ASSERT(IsValid());
+
+	lua_pushnil(m_LuaState);
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(const AString & a_String)
 {
 	ASSERT(IsValid());

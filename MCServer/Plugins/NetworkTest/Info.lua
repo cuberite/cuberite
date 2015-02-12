@@ -84,6 +84,12 @@ g_PluginInfo =
 					},
 				},  -- lookup
 				
+				wasc =
+				{
+					HelpString = "Requests the webadmin homepage using https",
+					Handler = HandleConsoleNetWasc,
+				},  -- wasc
+				
 			},  -- Subcommands
 		},  -- net
 	},
