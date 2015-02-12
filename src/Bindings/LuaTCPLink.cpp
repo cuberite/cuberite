@@ -206,7 +206,7 @@ AString cLuaTCPLink::StartTLSClient(
 	}
 
 	// Create the SSL context:
-	m_SslContext = std::make_unique<cLinkSslContext>(*this);
+	m_SslContext.reset(new cLinkSslContext(*this));
 	m_SslContext->Initialize(true);
 
 	// Create the peer cert, if required:
