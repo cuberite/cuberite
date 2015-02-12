@@ -74,6 +74,10 @@ public:
 	/// Reads the monster configuration for the specified monster name and assigns it to this object.
 	void GetMonsterConfig(const AString & a_Name);
 
+	/** Returns the item that the animal of this class follows when a player holds it in hand
+	Return an empty item not to follow (default). */
+	virtual const cItem GetFollowedItem(void) const { return cItem(); }
+
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
@@ -232,7 +236,8 @@ protected:
 	int m_AttackRange;
 	float m_AttackInterval;
 	int m_SightDistance;
-	int m_ActivationRange;
+	int m_TickSearchPlayer;
+	double m_PlayerDistance;
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;

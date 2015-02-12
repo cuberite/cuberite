@@ -95,7 +95,8 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
 	, m_RelativeWalkSpeed(1.0)
-	, m_ActivationRange(48)
+	, m_TickSearchPlayer(0)
+	, m_PlayerDistance()
 {
 	if (!a_ConfigName.empty())
 	{
@@ -255,11 +256,44 @@ bool cMonster::ReachedFinalDestination()
 
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), float(m_ActivationRange));
-	if (a_Closest_Player != nullptr)
+	if ((m_PlayerDistance < 48) && (m_PlayerDistance > 0))
 	{
 		super::Tick(a_Dt, a_Chunk);
 	}
+	if (m_TickSearchPlayer == 5)
+	{
+		// Search for players inside the mob sight
+		cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), float(m_SightDistance));
+		// Make sure we've got a player.
+		if (a_Closest_Player != nullptr)
+		{
+			m_PlayerDistance = (a_Closest_Player->GetPosition() - GetPosition()).Length();
+			// Check if the player has the item the mob wants
+			if (m_PlayerDistance < 20)
+			{
+				cItem FollowedItem = GetFollowedItem();
+				if (FollowedItem.IsEmpty())
+				{
+					return;
+				}
+				if (a_Closest_Player->GetEquippedItem().IsEqual(FollowedItem))
+				{
+					Vector3d PlayerPos = a_Closest_Player->GetPosition();
+					MoveToPosition(PlayerPos);
+				}
+			}
+			m_TickSearchPlayer = 0;
+		}
+		else
+		{
+			m_PlayerDistance = 0;
+		}
+	}
+	else
+	{
+		m_TickSearchPlayer++;
+	}
+
 
 	if (m_Health <= 0)
 	{
@@ -323,9 +357,9 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			/*
 			if (m_EMState == ESCAPING)
 			{
-				// Runs Faster when escaping :D otherwise they just walk away
-				SetSpeedX (GetSpeedX() * 2.f);
-				SetSpeedZ (GetSpeedZ() * 2.f);
+			// Runs Faster when escaping :D otherwise they just walk away
+			SetSpeedX (GetSpeedX() * 2.f);
+			SetSpeedZ (GetSpeedZ() * 2.f);
 			}
 			*/
 		}

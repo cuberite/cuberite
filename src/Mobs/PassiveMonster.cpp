@@ -43,20 +43,6 @@ void cPassiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		CheckEventLostPlayer();
 	}
-	cItem FollowedItem = GetFollowedItem();
-	if (FollowedItem.IsEmpty())
-	{
-		return;
-	}
-	cPlayer * a_Closest_Player = m_World->FindClosestPlayer(GetPosition(), (float)m_SightDistance);
-	if (a_Closest_Player != nullptr)
-	{
-		if (a_Closest_Player->GetEquippedItem().IsEqual(FollowedItem))
-		{
-			Vector3d PlayerPos = a_Closest_Player->GetPosition();
-			MoveToPosition(PlayerPos);
-		}
-	}
 }
 
 
