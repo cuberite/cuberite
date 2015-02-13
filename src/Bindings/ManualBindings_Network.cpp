@@ -502,6 +502,52 @@ static int tolua_cTCPLink_StartTLSClient(lua_State * L)
 
 
 
+/** Binds cLuaTCPLink::StartTLSServer */
+static int tolua_cTCPLink_StartTLSServer(lua_State * L)
+{
+	// Function signature:
+	// LinkInstance:StartTLSServer(OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData) -> [true] or [nil, ErrMsg]
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserType(1, "cTCPLink") ||
+		!S.CheckParamString(2, 4) ||
+		// Param 5 is optional, don't check
+		!S.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+	
+	// Get the link:
+	cLuaTCPLink * Link;
+	if (lua_isnil(L, 1))
+	{
+		LOGWARNING("cTCPLink:StartTLSServer(): invalid link object. Stack trace:");
+		S.LogStackTrace();
+		return 0;
+	}
+	Link = *static_cast<cLuaTCPLink **>(lua_touserdata(L, 1));
+
+	// Read the params:
+	AString OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData;
+	S.GetStackValues(2, OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData);
+
+	// Start the TLS handshake:
+	AString res = Link->StartTLSServer(OwnCert, OwnPrivKey, OwnPrivKeyPassword, StartTLSData);
+	if (!res.empty())
+	{
+		S.PushNil();
+		S.Push(Printf("Cannot start TLS on link to %s:%d: %s", Link->GetRemoteIP().c_str(), Link->GetRemotePort(), res.c_str()));
+		return 2;
+	}
+	return 1;
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // cServerHandle bindings (routed through cLuaServerHandle):
 
@@ -616,6 +662,7 @@ void ManualBindings::BindNetwork(lua_State * tolua_S)
 		tolua_function(tolua_S, "Send",           tolua_cTCPLink_Send);
 		tolua_function(tolua_S, "Shutdown",       tolua_cTCPLink_Shutdown);
 		tolua_function(tolua_S, "StartTLSClient", tolua_cTCPLink_StartTLSClient);
+		tolua_function(tolua_S, "StartTLSServer", tolua_cTCPLink_StartTLSServer);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cServerHandle");

@@ -74,7 +74,27 @@ public:
 		const AString & a_OwnPrivKeyPassword
 	);
 
+	/** Starts a TLS handshake as a server connection.
+	Set the server certificate into a_CertData and its corresponding private key to a_OwnPrivKeyData.
+	a_OwnPrivKeyPassword is the password to be used for decoding PrivKey, empty if not passworded.
+	a_StartTLSData is any data that should be pushed into the TLS before reading more data from the remote.
+	This is used mainly for protocols starting TLS in the middle of communication, when the TLS start command
+	can be received together with the TLS Client Hello message in one OnReceivedData() call, to re-queue the
+	Client Hello message into the TLS handshake buffer.
+	Returns empty string on success, non-empty error description on failure. */
+	AString StartTLSServer(
+		const AString & a_OwnCertData,
+		const AString & a_OwnPrivKeyData,
+		const AString & a_OwnPrivKeyPassword,
+		const AString & a_StartTLSData
+	);
+
 protected:
+	// fwd:
+	class cLinkSslContext;
+	typedef SharedPtr<cLinkSslContext> cLinkSslContextPtr;
+	typedef WeakPtr<cLinkSslContext> cLinkSslContextWPtr;
+
 	/** Wrapper around cSslContext that is used when this link is being encrypted by SSL. */
 	class cLinkSslContext :
 		public cSslContext
@@ -87,8 +107,17 @@ protected:
 		/** Buffer for storing the outgoing cleartext data until the link has finished handshaking. */
 		AString m_CleartextData;
 
+		/** Shared ownership of self, so that this object can keep itself alive for as long as it needs. */
+		cLinkSslContextWPtr m_Self;
+
 	public:
 		cLinkSslContext(cLuaTCPLink & a_Link);
+
+		/** Shares ownership of self, so that this object can keep itself alive for as long as it needs. */
+		void SetSelf(cLinkSslContextWPtr & a_Self);
+
+		/** Removes the self ownership so that we can detect the SSL closure. */
+		void ResetSelf(void);
 
 		/** Stores the specified block of data into the buffer of the data to be decrypted (incoming from remote).
 		Also flushes the SSL buffers by attempting to read any data through the SSL context. */
@@ -125,7 +154,7 @@ protected:
 
 	/** The SSL context used for encryption, if this link uses SSL.
 	If valid, the link uses encryption through this context. */
-	UniquePtr<cLinkSslContext> m_SslContext;
+	cLinkSslContextPtr m_SslContext;
 
 
 	/** Common code called when the link is considered as terminated.
