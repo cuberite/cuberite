@@ -295,11 +295,13 @@ g_Server = nil
 		
 		Functions =
 		{
+			Close = { Params = "", Return = "", Notes = "Closes the link forcefully (TCP RST). There's no guarantee that the last sent data is even being delivered. See also the Shutdown() method." },
 			GetLocalIP = { Params = "", Return = "string", Notes = "Returns the IP address of the local endpoint of the TCP connection." },
 			GetLocalPort = { Params = "", Return = "number", Notes = "Returns the port of the local endpoint of the TCP connection." },
 			GetRemoteIP = { Params = "", Return = "string", Notes = "Returns the IP address of the remote endpoint of the TCP connection." },
 			GetRemotePort = { Params = "", Return = "number", Notes = "Returns the port of the remote endpoint of the TCP connection." },
 			Send = { Params = "Data", Return = "", Notes = "Sends the data (raw string) to the remote peer. The data is sent asynchronously and there is no report on the success of the send operation, other than the connection being closed or reset by the underlying OS." },
+			Shutdown = { Params = "", Return = "", Notes = "Shuts the socket down for sending data. Notifies the remote peer that there will be no more data coming from us (TCP FIN). The data that is in flight will still be delivered. The underlying socket will be closed when the remote end shuts down as well, or after a timeout." },
 			StartTLSClient = { Params = "OwnCert, OwnPrivateKey, OwnPrivateKeyPassword", Return = "", Notes = "Starts a TLS handshake on the link, as a client side of the TLS. The Own___ parameters specify the client certificate and its corresponding private key and password; all three parameters are optional and no client certificate is presented to the remote peer if they are not used or all empty. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link." },
 		},
 	},  -- cTCPLink
