@@ -16,7 +16,11 @@ body {
 
 
 .container {
-  max-width:800px;
+  max-width:900px;
+}
+
+.panel-heading {
+  font-size: 12pt;
 }
 
 .btn {
