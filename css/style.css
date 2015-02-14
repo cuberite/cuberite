@@ -4,14 +4,14 @@ body {
 
 
 .fa-2x {
-  line-height: 18px;
-  font-size:20pt;
+  line-height: 22px;
+  font-size:24pt;
 }
 
 
 .fa-3x {
-  line-height: 22px;
-  font-size:30pt;
+  line-height: 26px;
+  font-size:32pt;
 }
 
 
@@ -19,6 +19,9 @@ body {
   max-width:800px;
 }
 
+.btn {
+  font-size: 10pt;
+}
 
 #subtable {
   width: 100%;
