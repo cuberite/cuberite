@@ -163,14 +163,15 @@ local g_Services =
 					OnReceivedData = function (a_Link, a_Data)
 						IncomingData = IncomingData .. a_Data
 						if (IncomingData:find("\r\n\r\n")) then
+							-- We have received the entire request headers, just send the response and shutdown the link:
 							local Content = os.date()
 							a_Link:Send("HTTP/1.0 200 OK\r\nContent-type: text/plain\r\nContent-length: " .. #Content .. "\r\n\r\n" .. Content)
-							-- TODO: shutdown is not yet properly implemented in cTCPLink
-							-- a_Link:Shutdown()
+							a_Link:Shutdown()
 						end
 					end,
 					
 					OnRemoteClosed = function (a_Link)
+						LOG("httpstime: link closed by remote")
 					end
 				}  -- Link callbacks
 			end,  -- OnIncomingConnection()

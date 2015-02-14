@@ -7,6 +7,7 @@
 #include "TCPLinkImpl.h"
 #include "NetworkSingleton.h"
 #include "ServerHandleImpl.h"
+#include "event2/buffer.h"
 
 
 
@@ -17,7 +18,10 @@
 
 cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 	super(a_LinkCallbacks),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE))
+	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE)),
+	m_LocalPort(0),
+	m_RemotePort(0),
+	m_ShouldShutdown(false)
 {
 	LOGD("Created new cTCPLinkImpl at %p with BufferEvent at %p", this, m_BufferEvent);
 }
@@ -29,7 +33,10 @@ cTCPLinkImpl::cTCPLinkImpl(cTCPLink::cCallbacksPtr a_LinkCallbacks):
 cTCPLinkImpl::cTCPLinkImpl(evutil_socket_t a_Socket, cTCPLink::cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen):
 	super(a_LinkCallbacks),
 	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE)),
-	m_Server(a_Server)
+	m_Server(a_Server),
+	m_LocalPort(0),
+	m_RemotePort(0),
+	m_ShouldShutdown(false)
 {
 	LOGD("Created new cTCPLinkImpl at %p with BufferEvent at %p", this, m_BufferEvent);
 
@@ -111,7 +118,7 @@ void cTCPLinkImpl::Enable(cTCPLinkImplPtr a_Self)
 	m_Self = a_Self;
 
 	// Set the LibEvent callbacks and enable processing:
-	bufferevent_setcb(m_BufferEvent, ReadCallback, nullptr, EventCallback, this);
+	bufferevent_setcb(m_BufferEvent, ReadCallback, WriteCallback, EventCallback, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE);
 }
 
@@ -121,6 +128,11 @@ void cTCPLinkImpl::Enable(cTCPLinkImplPtr a_Self)
 
 bool cTCPLinkImpl::Send(const void * a_Data, size_t a_Length)
 {
+	if (m_ShouldShutdown)
+	{
+		LOGD("%s: Cannot send data, the link is already shut down.", __FUNCTION__);
+		return false;
+	}
 	return (bufferevent_write(m_BufferEvent, a_Data, a_Length) == 0);
 }
 
@@ -130,12 +142,15 @@ bool cTCPLinkImpl::Send(const void * a_Data, size_t a_Length)
 
 void cTCPLinkImpl::Shutdown(void)
 {
-	#ifdef _WIN32
-		shutdown(bufferevent_getfd(m_BufferEvent), SD_SEND);
-	#else
-		shutdown(bufferevent_getfd(m_BufferEvent), SHUT_WR);
-	#endif
-	bufferevent_disable(m_BufferEvent, EV_WRITE);
+	// If there's no outgoing data, shutdown the socket directly:
+	if (evbuffer_get_length(bufferevent_get_output(m_BufferEvent)) == 0)
+	{
+		DoActualShutdown();
+		return;
+	}
+
+	// There's still outgoing data in the LibEvent buffer, schedule a shutdown when it's written to OS's TCP stack:
+	m_ShouldShutdown = true;
 }
 
 
@@ -174,6 +189,24 @@ void cTCPLinkImpl::ReadCallback(bufferevent * a_BufferEvent, void * a_Self)
 	while ((length = bufferevent_read(a_BufferEvent, data, sizeof(data))) > 0)
 	{
 		Self->m_Callbacks->OnReceivedData(data, length);
+	}
+}
+
+
+
+
+
+void cTCPLinkImpl::WriteCallback(bufferevent * a_BufferEvent, void * a_Self)
+{
+	ASSERT(a_Self != nullptr);
+	auto Self = static_cast<cTCPLinkImpl *>(a_Self);
+	ASSERT(Self->m_Callbacks != nullptr);
+
+	// If there's no more data to write and the link has been scheduled for shutdown, do the shutdown:
+	auto OutLen = evbuffer_get_length(bufferevent_get_output(Self->m_BufferEvent));
+	if ((OutLen == 0) && (Self->m_ShouldShutdown))
+	{
+		Self->DoActualShutdown();
 	}
 }
 
@@ -310,6 +343,20 @@ void cTCPLinkImpl::UpdateRemoteAddress(void)
 	socklen_t salen = static_cast<socklen_t>(sizeof(sa));
 	getpeername(bufferevent_getfd(m_BufferEvent), reinterpret_cast<sockaddr *>(&sa), &salen);
 	UpdateAddress(reinterpret_cast<const sockaddr *>(&sa), salen, m_RemoteIP, m_RemotePort);
+}
+
+
+
+
+
+void cTCPLinkImpl::DoActualShutdown(void)
+{
+	#ifdef _WIN32
+		shutdown(bufferevent_getfd(m_BufferEvent), SD_SEND);
+	#else
+		shutdown(bufferevent_getfd(m_BufferEvent), SHUT_WR);
+	#endif
+	bufferevent_disable(m_BufferEvent, EV_WRITE);
 }
 
 
