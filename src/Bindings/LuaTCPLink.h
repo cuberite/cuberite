@@ -114,7 +114,7 @@ protected:
 		cLinkSslContext(cLuaTCPLink & a_Link);
 
 		/** Shares ownership of self, so that this object can keep itself alive for as long as it needs. */
-		void SetSelf(cLinkSslContextWPtr & a_Self);
+		void SetSelf(cLinkSslContextWPtr a_Self);
 
 		/** Removes the self ownership so that we can detect the SSL closure. */
 		void ResetSelf(void);

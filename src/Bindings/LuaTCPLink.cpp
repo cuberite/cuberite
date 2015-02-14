@@ -468,7 +468,7 @@ cLuaTCPLink::cLinkSslContext::cLinkSslContext(cLuaTCPLink & a_Link):
 
 
 
-void cLuaTCPLink::cLinkSslContext::SetSelf(cLinkSslContextWPtr & a_Self)
+void cLuaTCPLink::cLinkSslContext::SetSelf(cLinkSslContextWPtr a_Self)
 {
 	m_Self = a_Self;
 }
