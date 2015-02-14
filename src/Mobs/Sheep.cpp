@@ -91,7 +91,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int PosY = POSY_TOINT - 1;
 	int PosZ = POSZ_TOINT;
 
-	if ((PosY <= 0) || (PosY > cChunkDef::Height))
+	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
 	{
 		return;
 	}

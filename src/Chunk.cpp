@@ -931,7 +931,7 @@ void cChunk::ApplyWeatherToTop()
 			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 		}
 	}
-	else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
+	else if (cBlockInfo::IsSnowable(TopBlock) && (Height < cChunkDef::Height - 1))
 	{
 		SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 	}
@@ -1253,7 +1253,7 @@ bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBB
 
 bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
@@ -1274,7 +1274,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelFastSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;

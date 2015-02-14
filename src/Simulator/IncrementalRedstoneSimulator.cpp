@@ -31,7 +31,7 @@ void cIncrementalRedstoneSimulator::RedstoneAddBlock(int a_BlockX, int a_BlockY,
 	{
 		return;
 	}
-	else if ((a_BlockY < 0) || (a_BlockY > cChunkDef::Height))
+	else if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
 	{
 		return;
 	}
@@ -556,7 +556,7 @@ void cIncrementalRedstoneSimulator::HandleRedstoneWire(int a_RelBlockX, int a_Re
 		if ((i >= 4) && (i <= 7))  // If we are currently checking for wire surrounding ourself one block above...
 		{
 			BLOCKTYPE Type = 0;
-			if (a_RelBlockY + 1 >= cChunkDef::Height)
+			if (a_RelBlockY >= cChunkDef::Height - 1)
 			{
 				continue;
 			}

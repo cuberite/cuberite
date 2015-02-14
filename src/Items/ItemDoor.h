@@ -34,7 +34,7 @@ public:
 		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 
 		// Door (bottom block) can be placed in Y range of [1, 254]:
-		if ((a_BlockY < 1) || (a_BlockY + 2 >= cChunkDef::Height))
+		if ((a_BlockY < 1) || (a_BlockY >= cChunkDef::Height - 2))
 		{
 			return false;
 		}
