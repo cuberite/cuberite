@@ -150,7 +150,7 @@ cChunkData::~cChunkData()
 
 BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 {
-    cChunkDef::AssertCoordinatesIsValid(a_X, a_Y, a_Z);
+	cChunkDef::AssertRelCoordsAreWithinChunk(a_X, a_Y, a_Z);
 	int Section = a_Y / SectionHeight;
 	if (m_Sections[Section] != nullptr)
 	{
@@ -204,7 +204,7 @@ void cChunkData::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 
 NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 {
-    if (cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
+	if (cChunkDef::IsRelCoordsWithinChunk(a_RelX, a_RelY, a_RelZ))
 	{
 		int Section = a_RelY / SectionHeight;
 		if (m_Sections[Section] != nullptr)
@@ -227,7 +227,7 @@ NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 
 bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
 {
-    if (!cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
+	if (!cChunkDef::IsRelCoordsWithinChunk(a_RelX, a_RelY, a_RelZ))
 	{
 		ASSERT(!"cChunkData::SetMeta(): index out of range!");
 		return false;
@@ -263,7 +263,7 @@ bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble
 
 NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
-    if (cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
+	if (cChunkDef::IsRelCoordsWithinChunk(a_RelX, a_RelY, a_RelZ))
 	{
 		int Section = a_RelY / SectionHeight;
 		if (m_Sections[Section] != nullptr)
@@ -286,7 +286,7 @@ NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 
 NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
-    if (cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
+	if (cChunkDef::IsRelCoordsWithinChunk(a_RelX, a_RelY, a_RelZ))
 	{
 		int Section = a_RelY / SectionHeight;
 		if (m_Sections[Section] != nullptr)
