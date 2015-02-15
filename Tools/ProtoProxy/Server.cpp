@@ -6,7 +6,6 @@
 #include "Globals.h"
 #include "Server.h"
 #include "Connection.h"
-#include "Logger.h"
 
 
 
@@ -34,7 +33,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 		}
 	#endif  // _WIN32
 	
-	LOG("Generating protocol encryption keypair...");
+	LOGINFO("Generating protocol encryption keypair...");
 	m_PrivateKey.Generate();
 	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 
@@ -98,10 +97,10 @@ void cServer::Run(void)
 			printf("accept returned an error: %d; bailing out.\n", SocketError);
 			return;
 		}
-		LOG("Client connected, proxying...");
+		LOGINFO("Client connected, proxying...");
 		cConnection Connection(client, *this);
 		Connection.Run();
-		LOG("Client disconnected. Ready for another connection.");
+		LOGINFO("Client disconnected. Ready for another connection.");
 	}
 }
 
