@@ -10,7 +10,7 @@ body {
 
 
 .fa-3x {
-  line-height: 26px;
+  line-height: 24px;
   font-size:32pt;
 }
 
@@ -19,8 +19,8 @@ body {
   max-width:900px;
 }
 
-.panel-heading {
-  font-size: 12pt;
+.panel-heading center {
+  font-size: 11pt;
 }
 
 .btn {
