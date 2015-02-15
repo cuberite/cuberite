@@ -33,7 +33,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 		}
 	#endif  // _WIN32
 	
-	puts("Generating protocol encryption keypair...");
+	LOG("Generating protocol encryption keypair...");
 	m_PrivateKey.Generate();
 	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
 
@@ -85,7 +85,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 
 void cServer::Run(void)
 {
-	puts("Server running.");
+	LOG("Server running.");
 	while (true)
 	{
 		sockaddr_in Addr;
@@ -97,10 +97,10 @@ void cServer::Run(void)
 			printf("accept returned an error: %d; bailing out.\n", SocketError);
 			return;
 		}
-		puts("Client connected, proxying...");
+		LOG("Client connected, proxying...");
 		cConnection Connection(client, *this);
 		Connection.Run();
-		puts("Client disconnected. Ready for another connection.");
+		LOG("Client disconnected. Ready for another connection.");
 	}
 }
 
