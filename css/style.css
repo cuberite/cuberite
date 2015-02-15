@@ -30,3 +30,7 @@ body {
 #subtable {
   width: 100%;
 }
+
+.panel {
+  border-width: 2px;
+}
