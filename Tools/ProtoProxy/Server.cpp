@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Server.h"
 #include "Connection.h"
+#include "Logger.h"
 
 
 
