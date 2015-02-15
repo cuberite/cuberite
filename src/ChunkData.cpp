@@ -150,9 +150,7 @@ cChunkData::~cChunkData()
 
 BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 {
-	ASSERT((a_X >= 0) && (a_X < cChunkDef::Width));
-	ASSERT((a_Y >= 0) && (a_Y < cChunkDef::Height));
-	ASSERT((a_Z >= 0) && (a_Z < cChunkDef::Width));
+    cChunkDef::AssertCoordinatesIsValid(a_X, a_Y, a_Z);
 	int Section = a_Y / SectionHeight;
 	if (m_Sections[Section] != nullptr)
 	{
@@ -206,10 +204,7 @@ void cChunkData::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 
 NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if (
-		(a_RelX < cChunkDef::Width) && (a_RelX > -1) &&
-		(a_RelY < cChunkDef::Height) && (a_RelY > -1) &&
-		(a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
+    if (cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
 	{
 		int Section = a_RelY / SectionHeight;
 		if (m_Sections[Section] != nullptr)
@@ -232,11 +227,7 @@ NIBBLETYPE cChunkData::GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 
 bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble)
 {
-	if (
-		(a_RelX >= cChunkDef::Width)  || (a_RelX < 0) ||
-		(a_RelY >= cChunkDef::Height) || (a_RelY < 0) ||
-		(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
-	)
+    if (!cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
 	{
 		ASSERT(!"cChunkData::SetMeta(): index out of range!");
 		return false;
@@ -272,11 +263,7 @@ bool cChunkData::SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Nibble
 
 NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if (
-		(a_RelX < cChunkDef::Width) && (a_RelX > -1) &&
-		(a_RelY < cChunkDef::Height) && (a_RelY > -1) &&
-		(a_RelZ < cChunkDef::Width) && (a_RelZ > -1)
-	)
+    if (cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
 	{
 		int Section = a_RelY / SectionHeight;
 		if (m_Sections[Section] != nullptr)
@@ -299,7 +286,7 @@ NIBBLETYPE cChunkData::GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const
 
 NIBBLETYPE cChunkData::GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const
 {
-	if ((a_RelX < cChunkDef::Width) && (a_RelX > -1) && (a_RelY < cChunkDef::Height) && (a_RelY > -1) && (a_RelZ < cChunkDef::Width) && (a_RelZ > -1))
+    if (cChunkDef::IsValidCoordinates(a_RelX, a_RelY, a_RelZ))
 	{
 		int Section = a_RelY / SectionHeight;
 		if (m_Sections[Section] != nullptr)

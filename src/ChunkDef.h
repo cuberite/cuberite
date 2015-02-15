@@ -85,6 +85,50 @@ public:
 	/** The storage wrapper used for compressed nibbledata residing in RAMz */
 	typedef std::vector<NIBBLETYPE> COMPRESSED_NIBBLETYPE;
 
+    static bool IsMoreThanChunkHeight(int v)
+    {
+        return v >= Height;
+    }
+
+    static bool IsLessThanChunkHeight(int v)
+    {
+        return v < 0;
+    }
+
+    static bool IsValidHeight(int v)
+    {
+        return !IsMoreThanChunkHeight(v) && !IsLessThanChunkHeight(v);
+    }
+
+    static bool IsMoreThanChunkWidth(int v)
+    {
+        return v >= Width;
+    }
+
+    static bool IsLessThanChunkWidth(int v)
+    {
+        return v < 0;
+    }
+
+    static bool IsValidWidth(int v)
+    {
+        return !IsMoreThanChunkWidth(v) && !IsLessThanChunkWidth(v);
+    }
+
+    static bool IsValidCoordinates(int x, int y, int z)
+    {
+        return IsValidWidth(x) && IsValidHeight(y) && IsValidWidth(z);
+    }
+
+    static void AssertCoordinatesIsValid(int x, int y, int z)
+    {
+        ASSERT(!IsLessThanChunkWidth(x));
+        ASSERT(!IsMoreThanChunkWidth(x));
+        ASSERT(!IsLessThanChunkHeight(y));
+        ASSERT(!IsMoreThanChunkHeight(y));
+        ASSERT(!IsLessThanChunkWidth(z));
+        ASSERT(!IsMoreThanChunkWidth(z));
+    }
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
 	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
@@ -115,11 +159,7 @@ public:
 
 	inline static int MakeIndex(int x, int y, int z)
 	{
-		if (
-			(x < Width)  && (x > -1) &&
-			(y < Height) && (y > -1) &&
-			(z < Width)  && (z > -1)
-		)
+        if (IsValidCoordinates(x, y, z))
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
@@ -160,9 +200,7 @@ public:
 
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
 	{
-		ASSERT((a_X >= 0) && (a_X < Width));
-		ASSERT((a_Y >= 0) && (a_Y < Height));
-		ASSERT((a_Z >= 0) && (a_Z < Width));
+        AssertCoordinatesIsValid(a_X, a_Y, a_Z);
 		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
 	}
 
@@ -282,11 +320,7 @@ public:
 
 	static void SetNibble(COMPRESSED_NIBBLETYPE & a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
 	{
-		if (
-			(x >= Width)  || (x < 0) ||
-			(y >= Height) || (y < 0) ||
-			(z >= Width)  || (z < 0)
-		)
+		if (!IsValidCoordinates(x,y,z))
 		{
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
