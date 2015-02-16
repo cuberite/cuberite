@@ -85,7 +85,7 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 
 void cServer::Run(void)
 {
-	LOG("Server running.");
+	LOGINFO("Server running.");
 	while (true)
 	{
 		sockaddr_in Addr;
