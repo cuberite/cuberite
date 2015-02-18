@@ -1007,21 +1007,28 @@ cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 
 	std::unique_ptr<cFlowerPotEntity> FlowerPot(new cFlowerPotEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
-	short ItemType = 0, ItemData = 0;
+	cItem Item;
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Item");
 	if (currentLine >= 0)
 	{
-		ItemType = (short) a_NBT.GetInt(currentLine);
+		if (a_NBT.GetType(currentLine) == TAG_String)
+		{
+			StringToItem(a_NBT.GetString(currentLine), Item);
+		}
+		else if (a_NBT.GetType(currentLine) == TAG_Int)
+		{
+			Item.m_ItemType = (short) a_NBT.GetInt(currentLine);
+		}
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Data");
-	if (currentLine >= 0)
+	if ((currentLine >= 0) && (a_NBT.GetType(currentLine) == TAG_Int))
 	{
-		ItemData = (short) a_NBT.GetInt(currentLine);
+		Item.m_ItemDamage = (short) a_NBT.GetInt(currentLine);
 	}
 
-	FlowerPot->SetItem(cItem(ItemType, 1, ItemData));
+	FlowerPot->SetItem(Item);
 	return FlowerPot.release();
 }
 
