@@ -87,8 +87,7 @@ local function MultiCommandHandler(a_Split, a_Player, a_CmdString, a_CmdInfo, a_
 			LOG("Cannot find handler for command " .. a_CmdString .. " " .. Verb);
 			return false;
 		end
-		MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1);
-		return true;
+		return MultiCommandHandler(a_Split, a_Player, a_CmdString .. " " .. Verb, Subcommand, a_Level + 1);
 	end
 	
 	-- Execute:
