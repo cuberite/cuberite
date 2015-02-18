@@ -232,7 +232,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	}
 
 	// Allow the port to be reused right after the socket closes:
-	if (evutil_make_listen_socket_reuseable(MainSock) != 0)
+	if (evutil_make_listen_socket_reuseable(SecondSock) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
 		Printf(m_ErrorMsg, "Port %d cannot be made reusable (second socket): %d (%s). Restarting the server might not work.",
