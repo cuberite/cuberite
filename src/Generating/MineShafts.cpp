@@ -671,23 +671,23 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			for (int i = 0; i < m_NumSegments; i++)
 			{
 				int x = m_BoundingBox.p1.x + i * 5 + 2 - BlockX;
-				if ((x < 0) || (x >= cChunkDef::Width))
+				if (!cChunkDef::IsRelCoordWithinChunkWidth(x))
 				{
 					continue;
 				}
-				if ((z1 >= 0) && (z1 < cChunkDef::Width))
+				if (cChunkDef::IsRelCoordLessThanChunkWidth(z1))
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x, y1, z1, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x, y2, z1, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1, E_BLOCK_PLANKS, 0);
 				}
-				if ((z2 >= 0) && (z2 < cChunkDef::Width))
+				if (cChunkDef::IsRelCoordLessThanChunkWidth(z2))
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x, y1, z2, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x, y2, z2, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x, y3, z2, E_BLOCK_PLANKS, 0);
 				}
-				if ((z1 >= -1) && (z1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
+				if ((z1 >= -1) && (cChunkDef::IsRelCoordLessThanChunkHeight(z1 + 1)) && m_HasFullBeam[i])
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1 + 1, E_BLOCK_PLANKS, 0);
 				}
@@ -706,23 +706,23 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 			for (int i = 0; i < m_NumSegments; i++)
 			{
 				int z = m_BoundingBox.p1.z + i * 5 + 2 - BlockZ;
-				if ((z < 0) || (z >= cChunkDef::Width))
+				if (!cChunkDef::IsRelCoordWithinChunkWidth(z))
 				{
 					continue;
 				}
-				if ((x1 >= 0) && (x1 < cChunkDef::Width))
+				if (cChunkDef::IsRelCoordWithinChunkWidth(x1))
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x1, y1, z, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x1, y2, z, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x1, y3, z, E_BLOCK_PLANKS, 0);
 				}
-				if ((x2 >= 0) && (x2 < cChunkDef::Width))
+				if (cChunkDef::IsRelCoordWithinChunkWidth(x2))
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x2, y1, z, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x2, y2, z, E_BLOCK_FENCE, 0);
 					a_ChunkDesc.SetBlockTypeMeta(x2, y3, z, E_BLOCK_PLANKS, 0);
 				}
-				if ((x1 >= -1) && (x1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
+				if ((x1 >= -1) && (cChunkDef::IsRelCoordLessThanChunkHeight(x1 + 1)) && m_HasFullBeam[i])
 				{
 					a_ChunkDesc.SetBlockTypeMeta(x1 + 1, y3, z, E_BLOCK_PLANKS, 0);
 				}

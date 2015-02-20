@@ -169,11 +169,7 @@ BLOCKTYPE cChunkData::GetBlock(int a_X, int a_Y, int a_Z) const
 
 void cChunkData::SetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
 {
-	if (
-		(a_RelX >= cChunkDef::Width)  || (a_RelX < 0) ||
-		(a_RelY >= cChunkDef::Height) || (a_RelY < 0) ||
-		(a_RelZ >= cChunkDef::Width)  || (a_RelZ < 0)
-	)
+	if (!cChunkDef::IsRelCoordsWithinChunk(a_RelX, a_RelY, a_RelZ))
 	{
 		ASSERT(!"cChunkData::SetMeta(): index out of range!");
 		return;

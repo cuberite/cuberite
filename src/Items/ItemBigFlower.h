@@ -43,7 +43,7 @@ public:
 		// Place both blocks atomically:
 		sSetBlockVector blks;
 		blks.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BIG_FLOWER, a_EquippedItem.m_ItemDamage & 0x07);
-		if (a_BlockY < cChunkDef::Height - 1)
+		if (!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(a_BlockY))
 		{
 			blks.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, E_BLOCK_BIG_FLOWER, (a_EquippedItem.m_ItemDamage & 0x07) | 0x08);
 		}

@@ -119,7 +119,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	int PosY = POSY_TOINT;
-	if ((PosY <= 0) || (PosY >= cChunkDef::Height))
+	if (!cChunkDef::IsRelCoordWithinChunkHeight(PosY))
 	{
 		// Outside the world, just process normal falling physics
 		super::HandlePhysics(a_Dt, a_Chunk);

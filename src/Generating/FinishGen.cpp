@@ -137,11 +137,7 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = MinY; y < MaxY; y++)
 			{
-				if (
-					((x < 0) || (x >= cChunkDef::Width)) ||
-					((y < 0) || (y >= cChunkDef::Height)) ||
-					((z < 0) || (z >= cChunkDef::Width))
-					)
+				if (!cChunkDef::IsRelCoordsWithinChunk(x, y, z))
 				{
 					continue;
 				}
@@ -250,9 +246,12 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 {
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
 	if (
-		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
-		(a_RelY < 1) || (a_RelY >= cChunkDef::Height - 2) ||
-		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
+		cChunkDef::IsRelCoordLessThanChunkWidth(a_RelX - 1) ||
+		cChunkDef::IsRelCoordMoreThanChunkWidth(a_RelX + 1) ||
+		cChunkDef::IsRelCoordLessThanChunkHeight(a_RelY - 1) ||
+		cChunkDef::IsRelCoordMoreThanChunkHeight(a_RelY + 2) ||
+		cChunkDef::IsRelCoordLessThanChunkWidth(a_RelZ - 1) ||
+		cChunkDef::IsRelCoordMoreThanChunkWidth(a_RelZ + 1)
 	)
 	{
 		return false;
@@ -366,8 +365,8 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 				{
 					int y = Top + 1;
 					if (
-						(x > 0) && (x < cChunkDef::Width - 1) &&
-						(z > 0) && (z < cChunkDef::Width - 1) &&
+						cChunkDef::IsRelCoordNeighborWithinChunkWidth(x) &&
+						cChunkDef::IsRelCoordNeighborWithinChunkWidth(z) &&
 						(val1 + val2 > 0.5f) &&
 						(a_ChunkDesc.GetBlockType(x + 1, y, z)     == E_BLOCK_AIR) &&
 						(a_ChunkDesc.GetBlockType(x - 1, y, z)     == E_BLOCK_AIR) &&
@@ -480,7 +479,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 				case biFrozenOcean:
 				{
 					int Height = a_ChunkDesc.GetHeight(x, z);
-					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
+					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (!cChunkDef::IsRelCoordMoreThanChunkHeight(Height + 1)))
 					{
 						a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
 						a_ChunkDesc.SetHeight(x, z, Height + 1);
@@ -585,7 +584,7 @@ void cFinishGenSingleTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 		}
 
 		int Height = a_ChunkDesc.GetHeight(x, z);
-		if (Height >= cChunkDef::Height - 1)
+		if (cChunkDef::IsRelCoordMoreThanChunkHeight(Height + 1))
 		{
 			// Too high up
 			continue;
@@ -744,11 +743,11 @@ void cFinishGenPreSimulator::StationarizeFluid(
 )
 {
 	// Turn fluid in the middle to stationary, unless it has air or washable block next to it:
-	for (int z = 1; z < cChunkDef::Width - 1; z++)
+	for (int z = 1; !cChunkDef::IsRelCoordMoreThanChunkWidth(z + 1); z++)
 	{
-		for (int x = 1; x < cChunkDef::Width - 1; x++)
+		for (int x = 1; !cChunkDef::IsRelCoordMoreThanChunkWidth(x + 1); x++)
 		{
-			for (int y = cChunkDef::GetHeight(a_HeightMap, x, z); y >= 0; y--)
+			for (int y = cChunkDef::GetHeight(a_HeightMap, x, z); !cChunkDef::IsRelCoordLessThanChunkHeight(y); y--)
 			{
 				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
 				if ((Block != a_Fluid) && (Block != a_StationaryFluid))
@@ -887,9 +886,9 @@ void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 	for (int y = Height; y > 1; y--)
 	{
 		// TODO: randomize the order in which the coords are being checked
-		for (int z = 1; z < cChunkDef::Width - 1; z++)
+		for (int z = 1; !cChunkDef::IsRelCoordMoreThanChunkWidth(z); z++)
 		{
-			for (int x = 1; x < cChunkDef::Width - 1; x++)
+			for (int x = 1; !cChunkDef::IsRelCoordMoreThanChunkWidth(x); x++)
 			{
 				switch (a_ChunkDesc.GetBlockType(x, y, z))
 				{
@@ -1043,7 +1042,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
 {
-	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
+	if (cChunkDef::IsRelCoordAndTopNeighborWithinChunkHeight(a_RelY))
 	{
 		return false;
 	}

@@ -123,7 +123,7 @@ void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		int BlockX = POSX_TOINT;
 		int BlockZ = POSZ_TOINT;
 
-		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
+		if (cChunkDef::IsRelCoordWithinChunkHeight(BlockY))  // Don't do anything except for falling when outside the world
 		{
 			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
 			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ)

@@ -29,7 +29,7 @@ void cSimulator::WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chu
 	{
 		AddBlock(a_BlockX, a_BlockY - 1, a_BlockZ, a_Chunk);
 	}
-	if (a_BlockY < cChunkDef::Height - 1)
+	if (cChunkDef::IsRelCoordNeighborLessThanChunkHeight(a_BlockY))
 	{
 		AddBlock(a_BlockX, a_BlockY + 1, a_BlockZ, a_Chunk);
 	}

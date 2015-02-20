@@ -76,7 +76,7 @@ public:
 		We send the block above the currently placed block back to the client to fix the bug.
 		Ref.: http://forum.mc-server.org/showthread.php?tid=434&pid=17388#pid17388
 		*/
-		if ((a_BlockFace == BLOCK_FACE_TOP) && (a_BlockY < cChunkDef::Height - 1))
+		if ((a_BlockFace == BLOCK_FACE_TOP) && (cChunkDef::IsRelCoordNeighborLessThanChunkHeight(a_BlockY)))
 		{
 			a_Player.SendBlocksAround(a_BlockX, a_BlockY + 1, a_BlockZ, 1);
 		}

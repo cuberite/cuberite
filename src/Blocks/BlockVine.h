@@ -131,7 +131,7 @@ public:
 		NIBBLETYPE MaxMeta = GetMaxMeta(a_Chunk, a_RelX, a_RelY, a_RelZ);
 		
 		// Check if vine above us, add its meta to MaxMeta
-		if ((a_RelY < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == m_BlockType))
+		if ((!cChunkDef::IsRelCoordNeighborMoreThanChunkHeight(a_RelY)) && (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == m_BlockType))
 		{
 			MaxMeta |= a_Chunk.GetMeta(a_RelX, a_RelY + 1, a_RelZ);
 		}
@@ -140,7 +140,7 @@ public:
 		if (Common != CurMeta)
 		{
 			// There is a neighbor missing, need to update the meta or even destroy the block
-			bool HasTop = (a_RelY < cChunkDef::Height - 1) && IsBlockAttachable(a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ));
+			bool HasTop = (!cChunkDef::IsRelCoordNeighborMoreThanChunkHeight(a_RelY)) && IsBlockAttachable(a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ));
 			if ((Common == 0) && !HasTop)
 			{
 				// The vine just lost all its support, destroy the block:

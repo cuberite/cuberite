@@ -90,14 +90,19 @@ public:
 		return a_Y >= Height;
 	}
 
+	static bool IsRelCoordNeighborMoreThanChunkHeight(int a_Y)
+	{
+		return a_Y > Height;
+	}
+
 	static bool IsRelCoordLessThanChunkHeight(int a_Y)
 	{
 		return a_Y < 0;
 	}
 
-	static bool IsRelCoordWithinChunkHeight(int a_Y)
+	static bool IsRelCoordNeighborLessThanChunkHeight(int a_Y)
 	{
-		return !IsRelCoordMoreThanChunkHeight(a_Y) && !IsRelCoordLessThanChunkHeight(a_Y);
+		return a_Y <= 0;
 	}
 
 	static bool IsRelCoordMoreThanChunkWidth(int a_Coord)
@@ -105,14 +110,44 @@ public:
 		return a_Coord >= Width;
 	}
 
+	static bool IsRelCoordNeighborMoreThanChunkWidth(int a_Coord)
+	{
+		return a_Coord > Width;
+	}
+
 	static bool IsRelCoordLessThanChunkWidth(int a_Coord)
 	{
 		return a_Coord < 0;
 	}
 
+	static bool IsRelCoordNeighborLessThanChunkWidth(int a_Coord)
+	{
+		return a_Coord <= 0;
+	}
+
+	static bool IsRelCoordWithinChunkHeight(int a_Y)
+	{
+		return !IsRelCoordMoreThanChunkHeight(a_Y) && !IsRelCoordLessThanChunkHeight(a_Y);
+	}
+
 	static bool IsRelCoordWithinChunkWidth(int a_Coord)
 	{
 		return !IsRelCoordMoreThanChunkWidth(a_Coord) && !IsRelCoordLessThanChunkWidth(a_Coord);
+	}
+
+	static bool IsRelCoordNeighborWithinChunkWidth(int a_Coord)
+	{
+		return !IsRelCoordNeighborLessThanChunkWidth(a_Coord) && !IsRelCoordNeighborMoreThanChunkWidth(a_Coord);
+	}
+
+	static bool IsRelCoordNeighborWithinChunkHeight(int a_Coord)
+	{
+		return !IsRelCoordNeighborLessThanChunkHeight(a_Coord) && !IsRelCoordNeighborMoreThanChunkHeight(a_Coord);
+	}
+
+	static bool IsRelCoordAndTopNeighborWithinChunkHeight(int a_Y)
+	{
+		return !IsRelCoordMoreThanChunkHeight(a_Y) && !IsRelCoordNeighborLessThanChunkHeight(a_Y);
 	}
 
 	static bool IsRelCoordsWithinChunk(int a_RelX, int a_RelY, int a_RelZ)
@@ -394,8 +429,8 @@ struct sSetBlock
 		m_BlockType(a_BlockType),
 		m_BlockMeta(a_BlockMeta)
 	{
-		ASSERT((a_RelX >= 0) && (a_RelX < cChunkDef::Width));
-		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
+		ASSERT(cChunkDef::IsRelCoordWithinChunkWidth(a_RelX));
+		ASSERT(cChunkDef::IsRelCoordWithinChunkWidth(a_RelZ));
 	}
 
 	/** Returns the absolute X coord of the stored block. */

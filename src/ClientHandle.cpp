@@ -1297,7 +1297,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 		if ((a_BlockX != -1) && (a_BlockY >= 0) && (a_BlockZ != -1))
 		{
 			World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-			if (a_BlockY < cChunkDef::Height - 1)
+			if (cChunkDef::IsRelCoordNeighborLessThanChunkHeight(a_BlockY))
 			{
 				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
 			}

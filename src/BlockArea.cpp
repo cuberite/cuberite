@@ -512,12 +512,12 @@ bool cBlockArea::Write(cForEachChunkProvider * a_ForEachChunkProvider, int a_Min
 	a_DataTypes = a_DataTypes & GetDataTypes();  // For release builds, silently cut off the datatypes that I don't have
 
 	// Check coords validity:
-	if (a_MinBlockY < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkHeight(a_MinBlockY))
 	{
 		LOGWARNING("%s: MinBlockY less than zero, adjusting to zero", __FUNCTION__);
 		a_MinBlockY = 0;
 	}
-	else if (a_MinBlockY > cChunkDef::Height - m_Size.y)
+	else if (cChunkDef::IsRelCoordMoreThanChunkHeight(a_MinBlockY + m_Size.y))
 	{
 		LOGWARNING("%s: MinBlockY + m_SizeY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MinBlockY = cChunkDef::Height - m_Size.y;

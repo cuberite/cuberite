@@ -417,7 +417,7 @@ void cBlockHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterf
 
 void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ)
 {
-	if ((a_BlockY >= 0) && (a_BlockY < cChunkDef::Height))
+	if (cChunkDef::IsRelCoordWithinChunkHeight(a_BlockY))
 	{
 		cBlockInfo::GetHandler(a_ChunkInterface.GetBlock(a_BlockX, a_BlockY, a_BlockZ))->OnNeighborChanged(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
 	}

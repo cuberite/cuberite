@@ -55,7 +55,7 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height))
+		if (!cChunkDef::IsRelCoordAndTopNeighborWithinChunkHeight(a_RelY))
 		{
 			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
 		}
