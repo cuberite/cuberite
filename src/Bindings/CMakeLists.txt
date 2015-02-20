@@ -12,6 +12,7 @@ SET (SRCS
 	LuaServerHandle.cpp
 	LuaState.cpp
 	LuaTCPLink.cpp
+	LuaUDPEndpoint.cpp
 	LuaWindow.cpp
 	ManualBindings.cpp
 	ManualBindings_Network.cpp
@@ -31,6 +32,7 @@ SET (HDRS
 	LuaServerHandle.h
 	LuaState.h
 	LuaTCPLink.h
+	LuaUDPEndpoint.h
 	LuaWindow.h
 	ManualBindings.h
 	Plugin.h

@@ -61,6 +61,7 @@ class cBlockEntity;
 class cBoundingBox;
 class cLuaTCPLink;
 class cLuaServerHandle;
+class cLuaUDPEndpoint;
 
 typedef cBoundingBox * pBoundingBox;
 typedef cWorld *       pWorld;
@@ -212,6 +213,7 @@ public:
 	void Push(cItems * a_Items);
 	void Push(cLuaServerHandle * a_ServerHandle);
 	void Push(cLuaTCPLink * a_TCPLink);
+	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	void Push(cMonster * a_Monster);
 	void Push(cPickup * a_Pickup);
 	void Push(cPlayer * a_Player);

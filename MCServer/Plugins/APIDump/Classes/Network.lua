@@ -31,11 +31,12 @@ local Server = cNetwork:Listen(1024, ListenCallbacks);
 					specific plugin-provided function is called. The callbacks are stored in tables which are passed
 					to the API functions, each table contains multiple callbacks for the various situations.</p>
 					<p>
-					There are three different callback variants used: LinkCallbacks, LookupCallbacks and
-					ListenCallbacks. Each is used in the situation appropriate by its name - LinkCallbacks are used
+					There are four different callback variants used: LinkCallbacks, LookupCallbacks, ListenCallbacks
+					and UDPCallbacks. Each is used in the situation appropriate by its name - LinkCallbacks are used
 					for handling the traffic on a single network link (plus additionally creation of such link when
-					connecting as a client), LookupCallbacks are used when doing DNS and reverse-DNS lookups, and
-					ListenCallbacks are used for handling incoming connections as a server.</p>
+					connecting as a client), LookupCallbacks are used when doing DNS and reverse-DNS lookups,
+					ListenCallbacks are used for handling incoming connections as a server and UDPCallbacks are used
+					for incoming UDP datagrams.</p>
 					<p>
 					LinkCallbacks have the following structure:<br/>
 <pre class="prettyprint lang-lua">
@@ -111,7 +112,7 @@ local ListenCallbacks =
 	
 	OnError = function (a_ErrorCode, a_ErrorMsg)
 		-- The specified error has occured while trying to listen
-		-- No other callback will be called for this lookup from now on
+		-- No other callback will be called for this server handle from now on
 		-- This callback is called before the cNetwork:Listen() call returns
 		-- All returned values are ignored
 	end,
@@ -124,6 +125,25 @@ local ListenCallbacks =
 	end,
 }
 </pre></p>
+				<p>
+				UDPCallbacks have the following structure:<br/>
+<pre class="prettyprint lang-lua">
+local UDPCallbacks =
+{
+	OnError = function (a_ErrorCode, a_ErrorMsg)
+		-- The specified error has occured when trying to listen for incoming UDP datagrams
+		-- No other callback will be called for this endpoint from now on
+		-- This callback is called before the cNetwork:CreateUDPEndpoint() call returns
+		-- All returned values are ignored
+	end,
+
+	OnReceivedData = function ({{cUDPEndpoint|a_UDPEndpoint}}, a_Data, a_RemotePeer, a_RemotePort)
+		-- A datagram has been received on the {{cUDPEndpoint|endpoint}} from the specified remote peer
+		-- a_Data contains the raw received data, as a string
+		-- All returned values are ignored
+	end,
+}
+</pre>
 				]],
 			},
 			
@@ -268,12 +288,31 @@ g_Server = nil
 		Functions =
 		{
 				Connect = { Params = "Host, Port, LinkCallbacks", Return = "bool", Notes = "(STATIC) Begins establishing a (client) TCP connection to the specified host. Uses the LinkCallbacks table to report progress, success, errors and incoming data. Returns false if it fails immediately (bad port value, bad hostname format), true otherwise. Host can be either an IP address or a hostname." },
+				CreateUDPEndpoint = { Params = "Port, UDPCallbacks", Return = "{{cUDPEndpoint|UDPEndpoint}}", Notes = "(STATIC) Creates a UDP endpoint that listens for incoming datagrams on the specified port, and can be used to send or broadcast datagrams. Uses the UDPCallbacks to report incoming datagrams or errors. If the endpoint cannot be created, the OnError callback is called with the error details and the returned endpoint will report IsOpen() == false. The plugin needs to store the returned endpoint object for as long as it needs the UDP port open; if the endpoint is garbage-collected by Lua, the socket will be closed and no more incoming data will be reported." },
 				HostnameToIP = { Params = "Host, LookupCallbacks", Return = "bool", Notes = "(STATIC) Begins a DNS lookup to find the IP address(es) for the specified host. Uses the LookupCallbacks table to report progress, success or errors. Returns false if it fails immediately (bad hostname format), true if the lookup started successfully. Host can be either a hostname or an IP address." },
 				IPToHostname = { Params = "Address, LookupCallbacks", Return = "bool", Notes = "(STATIC) Begins a reverse-DNS lookup to find out the hostname for the specified IP address. Uses the LookupCallbacks table to report progress, success or errors. Returns false if it fails immediately (bad address format), true if the lookup started successfully." },
 				Listen = { Params = "Port, ListenCallbacks", Return = "{{cServerHandle|ServerHandle}}", Notes = "(STATIC) Starts listening on the specified port. Uses the ListenCallbacks to report incoming connections or errors. Returns a {{cServerHandle}} object representing the server. If the listen operation failed, the OnError callback is called with the error details and the returned server handle will report IsListening() == false. The plugin needs to store the server handle object for as long as it needs the server running, if the server handle is garbage-collected by Lua, the listening socket will be closed and all current connections dropped." },
 		},
 	},  -- cNetwork
-	
+
+	cServerHandle =
+	{
+		Desc =
+		[[
+			This class provides an interface for TCP sockets listening for a connection. In order to listen, the
+			plugin needs to use the {{cNetwork}}:Listen() function to create the listening socket.</p>
+			<p>
+			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin
+			should keep it referenced in a global variable for as long as it wants the server running.
+		]],
+		
+		Functions =
+		{
+			Close = { Params = "", Return = "", Notes = "Closes the listening socket. No more connections will be accepted, and all current connections will be closed." },
+			IsListening = { Params = "", Return = "bool", Notes = "Returns true if the socket is listening." },
+		},
+	},  -- cServerHandle
+
 	cTCPLink =
 	{
 		Desc =
@@ -307,24 +346,24 @@ g_Server = nil
 		},
 	},  -- cTCPLink
 
-	cServerHandle =
+	cUDPEndpoint =
 	{
 		Desc =
 		[[
-			This class provides an interface for TCP sockets listening for a connection. In order to listen, the
-			plugin needs to use the {{cNetwork}}:Listen() function to create the listening socket.</p>
+			Represents a UDP socket that is listening for incoming datagrams on a UDP port and can send or broadcast datagrams to other peers on the network. Plugins can create an instance of the endpoint by calling {{cNetwork}}:CreateUDPEndpoint(). The endpoints are callback-based - when a datagram is read from the network, the OnRececeivedData() callback is called with details about the datagram. See the additional information in {{cNetwork}} documentation for details.</p>
 			<p>
-			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin
-			should keep it referenced in a global variable for as long as it wants the server running.
+			Note that when Lua garbage-collects this class, the listening socket is closed. Therefore the plugin should keep this object referenced in a global variable for as long as it wants the endpoint open.
 		]],
 		
 		Functions =
 		{
-			Close = { Params = "", Return = "", Notes = "Closes the listening socket. No more connections will be accepted, and all current connections will be closed." },
-			IsListening = { Params = "", Return = "bool", Notes = "Returns true if the socket is listening." },
+			Close = { Params = "", Return = "", Notes = "Closes the UDP endpoint. No more datagrams will be reported through the callbacks, the UDP port will be closed." },
+			EnableBroadcasts = { Params = "", Return = "", Notes = "Some OSes need this call before they allow UDP broadcasts on an endpoint." },
+			GetPort = { Params = "", Return = "number", Notes = "Returns the local port number of the UDP endpoint listening for incoming datagrams. Especially useful if the UDP endpoint was created with auto-assign port (0)." },
+			IsOpen = { Params = "", Return = "bool", Notes = "Returns true if the UDP endpoint is listening for incoming datagrams." },
+			Send = { Params = "RawData, RemoteHost, RemotePort", Return = "bool", Notes = "Sends the specified raw data (string) to the specified remote host. The RemoteHost can be either a hostname or an IP address; if it is a hostname, the endpoint will queue a DNS lookup first, if it is an IP address, the send operation is executed immediately. Returns true if there was no immediate error, false on any failure. Note that the return value needn't represent whether the packet was actually sent, only if it was successfully queued." },
 		},
-
-	},  -- cServerHandle
+	},  -- cUDPEndpoint
 }
 
 
