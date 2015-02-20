@@ -554,10 +554,10 @@ void cUDPEndpointImpl::Callback(evutil_socket_t a_Socket, short a_What)
 	{
 		// Receive datagram from the socket:
 		char buf[64 KiB];
-		int buflen = static_cast<int>(sizeof(buf));
+		socklen_t buflen = static_cast<socklen_t>(sizeof(buf));
 		sockaddr_storage sa;
 		socklen_t salen = static_cast<socklen_t>(sizeof(sa));
-		int len = recvfrom(a_Socket, buf, buflen, 0, reinterpret_cast<sockaddr *>(&sa), &salen);
+		auto len = recvfrom(a_Socket, buf, buflen, 0, reinterpret_cast<sockaddr *>(&sa), &salen);
 		if (len >= 0)
 		{
 			// Convert the remote IP address to a string:
@@ -586,7 +586,7 @@ void cUDPEndpointImpl::Callback(evutil_socket_t a_Socket, short a_What)
 			}
 
 			// Call the callback:
-			m_Callbacks.OnReceivedData(buf, len, RemoteHost, RemotePort);
+			m_Callbacks.OnReceivedData(buf, static_cast<size_t>(len), RemoteHost, RemotePort);
 		}
 	}
 }
