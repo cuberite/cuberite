@@ -855,7 +855,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	Vector3d NextPos = Vector3d(GetPosX(), GetPosY(), GetPosZ());
 	Vector3d NextSpeed = Vector3d(GetSpeedX(), GetSpeedY(), GetSpeedZ());
 	
-	if ((BlockY >= cChunkDef::Height) || (BlockY < 0))
+	if (!cChunkDef::IsRelCoordWithinChunkHeight(BlockY))
 	{
 		// Outside of the world
 		AddSpeedY(m_Gravity * DtSec.count());
@@ -1243,7 +1243,7 @@ void cEntity::DetectCacti(void)
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
 	double w = m_Width / 2;
 	if (
-		((Y > 0) && (Y < cChunkDef::Height)) &&
+		(!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(Y) && !cChunkDef::IsRelCoordMoreThanChunkHeight(Y)) &&
 		((((X + 1) - GetPosX() < w) && (GetWorld()->GetBlock(X + 1, Y, Z) == E_BLOCK_CACTUS)) ||
 		((GetPosX() - X < w) && (GetWorld()->GetBlock(X - 1, Y, Z) == E_BLOCK_CACTUS)) ||
 		(((Z + 1) - GetPosZ() < w) && (GetWorld()->GetBlock(X, Y, Z + 1) == E_BLOCK_CACTUS)) ||
@@ -1276,7 +1276,7 @@ bool cEntity::DetectPortal()
 	}
 
 	int X = POSX_TOINT, Y = POSY_TOINT, Z = POSZ_TOINT;
-	if ((Y > 0) && (Y < cChunkDef::Height))
+	if (cChunkDef::IsRelCoordWithinChunkHeight(Y))
 	{
 		switch (GetWorld()->GetBlock(X, Y, Z))
 		{
@@ -1434,7 +1434,7 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 void cEntity::SetSwimState(cChunk & a_Chunk)
 {
 	int RelY = (int)floor(GetPosY() + 0.1);
-	if ((RelY < 0) || (RelY >= cChunkDef::Height - 1))
+	if (!cChunkDef::IsRelCoordNeighborWithinChunkHeight(RelY))
 	{
 		m_IsSwimming = false;
 		m_IsSubmerged = false;

@@ -41,7 +41,7 @@ public:
 		}
 		
 		// Grass becomes dirt if there is something on top of it:
-		if (a_RelY < cChunkDef::Height - 1)
+		if (!cChunkDef::IsRelCoordNeighborMoreThanChunkHeight(a_RelY))
 		{
 			BLOCKTYPE Above;
 			NIBBLETYPE AboveMeta;
@@ -63,7 +63,7 @@ public:
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;
-			if ((a_RelY + OfsY < 0) || (a_RelY + OfsY >= cChunkDef::Height - 1))
+			if (cChunkDef::IsRelCoordAndTopNeighborWithinChunkHeight(a_RelY + OfsY))
 			{
 				// Y Coord out of range
 				continue;

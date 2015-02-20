@@ -559,8 +559,8 @@ void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
 		TryY += CenterY;
 		TryZ += CenterZ;
 
-		ASSERT(TryY > 0);
-		ASSERT(TryY < cChunkDef::Height - 1);
+		ASSERT(!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(TryY));
+		ASSERT(!cChunkDef::IsRelCoordNeighborMoreThanChunkHeight(TryY));
 		
 		EMCSBiome Biome = m_ChunkMap->GetBiomeAt(TryX, TryZ);
 		// MG TODO :

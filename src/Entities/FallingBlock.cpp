@@ -39,7 +39,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	int BlockY = (int)(GetPosY() - 0.5);
 	int BlockZ = POSZ_TOINT;
 	
-	if (BlockY < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkHeight(BlockY))
 	{
 		// Fallen out of this world, just continue falling until out of sight, then destroy:
 		if (BlockY < VOID_BOUNDARY)
@@ -49,7 +49,7 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 	
-	if (BlockY >= cChunkDef::Height)
+	if (cChunkDef::IsRelCoordMoreThanChunkHeight(BlockY))
 	{
 		// Above the world, just wait for it to fall back down
 		return;

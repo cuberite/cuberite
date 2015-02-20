@@ -135,7 +135,10 @@ void cMonster::TickPathFinding()
 		{ 0, -1},
 	} ;
 	
-	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
+	if (
+		cChunkDef::IsRelCoordLessThanChunkHeight(PosY - 1) ||
+		cChunkDef::IsRelCoordMoreThanChunkHeight(PosY + 2) /* PosY + 1 will never be true if PosY + 2 is not */
+		)
 	{
 		// Too low/high, can't really do anything
 		FinishPathFinding();
@@ -153,7 +156,7 @@ void cMonster::TickPathFinding()
 		BLOCKTYPE BlockAtYP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 1, gCrossCoords[i].z + PosZ);
 		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
 		int LowestY = FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtLowestY = (LowestY >= cChunkDef::Height) ? E_BLOCK_AIR : m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
+		BLOCKTYPE BlockAtLowestY = cChunkDef::IsRelCoordMoreThanChunkHeight(LowestY) ? E_BLOCK_AIR : m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
 
 		if (
 			(!cBlockInfo::IsSolid(BlockAtY)) &&
@@ -1094,7 +1097,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 	}
 	
 	int RelY = POSY_TOINT;
-	if ((RelY < 0) || (RelY >= cChunkDef::Height))
+	if (!cChunkDef::IsRelCoordWithinChunkHeight(RelY))
 	{
 		// Outside the world
 		return;

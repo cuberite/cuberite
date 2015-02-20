@@ -81,7 +81,8 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR) && (a_RelY < cChunkDef::Height) && ((a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR) || (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_BIG_FLOWER)));
+		return ((!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(a_RelY)) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR) &&
+			(!cChunkDef::IsRelCoordNeighborMoreThanChunkHeight(a_RelY)) && ((a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_AIR) || (a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ) == E_BLOCK_BIG_FLOWER)));
 	}
 
 

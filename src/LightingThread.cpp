@@ -528,7 +528,7 @@ void cLightingThread::CalcLightStep(
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + 1, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedX > 0)
+		if (!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(SeedX))
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - 1, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
@@ -536,15 +536,15 @@ void cLightingThread::CalcLightStep(
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + cChunkDef::Width * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedZ > 0)
+		if (!cChunkDef::IsRelCoordNeighborLessThanChunkWidth(SeedZ))
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - cChunkDef::Width * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedY < cChunkDef::Height - 1)
+		if (!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(SeedY))
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx + cChunkDef::Width * cChunkDef::Width * 3 * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}
-		if (SeedY > 0)
+		if (!cChunkDef::IsRelCoordNeighborLessThanChunkHeight(SeedY))
 		{
 			PropagateLight(a_Light, SeedIdx, SeedIdx - cChunkDef::Width * cChunkDef::Width * 3 * 3, NumSeedsOut, a_IsSeedOut, a_SeedIdxOut);
 		}

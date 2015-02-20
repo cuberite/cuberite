@@ -127,7 +127,7 @@ void cHopperEntity::OpenNewWindow(void)
 /// Moves items from the container above it into this hopper. Returns true if the contents have changed.
 bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick)
 {
-	if (m_PosY >= cChunkDef::Height)
+	if (cChunkDef::IsRelCoordMoreThanChunkHeight(m_PosY))
 	{
 		// This hopper is at the top of the world, no more blocks above
 		return false;

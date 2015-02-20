@@ -469,7 +469,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			m_LastJumpHeight = (float)GetPosY();
 		}
 		cWorld * World = GetWorld();
-		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
+		if (cChunkDef::IsRelCoordMoreThanChunkHeight(GetPosY()))
 		{
 			BLOCKTYPE BlockType = World->GetBlock(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 			if (BlockType != E_BLOCK_AIR)
@@ -2005,7 +2005,7 @@ bool cPlayer::IsClimbing(void) const
 	int PosY = POSY_TOINT;
 	int PosZ = POSZ_TOINT;
 
-	if ((PosY < 0) || (PosY >= cChunkDef::Height))
+	if (!cChunkDef::IsRelCoordWithinChunkHeight(PosY))
 	{
 		return false;
 	}

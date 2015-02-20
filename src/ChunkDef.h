@@ -85,6 +85,85 @@ public:
 	/** The storage wrapper used for compressed nibbledata residing in RAMz */
 	typedef std::vector<NIBBLETYPE> COMPRESSED_NIBBLETYPE;
 
+	static bool IsRelCoordMoreThanChunkHeight(int a_Y)
+	{
+		return a_Y >= Height;
+	}
+
+	static bool IsRelCoordNeighborMoreThanChunkHeight(int a_Y)
+	{
+		return a_Y > Height;
+	}
+
+	static bool IsRelCoordLessThanChunkHeight(int a_Y)
+	{
+		return a_Y < 0;
+	}
+
+	static bool IsRelCoordNeighborLessThanChunkHeight(int a_Y)
+	{
+		return a_Y <= 0;
+	}
+
+	static bool IsRelCoordMoreThanChunkWidth(int a_Coord)
+	{
+		return a_Coord >= Width;
+	}
+
+	static bool IsRelCoordNeighborMoreThanChunkWidth(int a_Coord)
+	{
+		return a_Coord > Width;
+	}
+
+	static bool IsRelCoordLessThanChunkWidth(int a_Coord)
+	{
+		return a_Coord < 0;
+	}
+
+	static bool IsRelCoordNeighborLessThanChunkWidth(int a_Coord)
+	{
+		return a_Coord <= 0;
+	}
+
+	static bool IsRelCoordWithinChunkHeight(int a_Y)
+	{
+		return !IsRelCoordMoreThanChunkHeight(a_Y) && !IsRelCoordLessThanChunkHeight(a_Y);
+	}
+
+	static bool IsRelCoordWithinChunkWidth(int a_Coord)
+	{
+		return !IsRelCoordMoreThanChunkWidth(a_Coord) && !IsRelCoordLessThanChunkWidth(a_Coord);
+	}
+
+	static bool IsRelCoordNeighborWithinChunkWidth(int a_Coord)
+	{
+		return !IsRelCoordNeighborLessThanChunkWidth(a_Coord) && !IsRelCoordNeighborMoreThanChunkWidth(a_Coord);
+	}
+
+	static bool IsRelCoordNeighborWithinChunkHeight(int a_Coord)
+	{
+		return !IsRelCoordNeighborLessThanChunkHeight(a_Coord) && !IsRelCoordNeighborMoreThanChunkHeight(a_Coord);
+	}
+
+	static bool IsRelCoordAndTopNeighborWithinChunkHeight(int a_Y)
+	{
+		return !IsRelCoordMoreThanChunkHeight(a_Y) && !IsRelCoordNeighborLessThanChunkHeight(a_Y);
+	}
+
+	static bool IsRelCoordsWithinChunk(int a_RelX, int a_RelY, int a_RelZ)
+	{
+		return IsRelCoordWithinChunkWidth(a_RelX) && IsRelCoordWithinChunkHeight(a_RelY) && IsRelCoordWithinChunkWidth(a_RelZ);
+	}
+
+	static void AssertRelCoordsAreWithinChunk(int a_RelX, int a_RelY, int a_RelZ)
+	{
+		ASSERT(!IsRelCoordLessThanChunkWidth(a_RelX));
+		ASSERT(!IsRelCoordMoreThanChunkWidth(a_RelX));
+		ASSERT(!IsRelCoordLessThanChunkHeight(a_RelY));
+		ASSERT(!IsRelCoordMoreThanChunkHeight(a_RelY));
+		ASSERT(!IsRelCoordLessThanChunkWidth(a_RelZ));
+		ASSERT(!IsRelCoordMoreThanChunkWidth(a_RelZ));
+	}
 
 	/// Converts absolute block coords into relative (chunk + block) coords:
 	inline static void AbsoluteToRelative(/* in-out */ int & a_X, int & a_Y, int & a_Z, /* out */ int & a_ChunkX, int & a_ChunkZ)
@@ -115,11 +194,7 @@ public:
 
 	inline static int MakeIndex(int x, int y, int z)
 	{
-		if (
-			(x < Width)  && (x > -1) &&
-			(y < Height) && (y > -1) &&
-			(z < Width)  && (z > -1)
-		)
+		if (IsRelCoordsWithinChunk(x, y, z))
 		{
 			return MakeIndexNoCheck(x, y, z);
 		}
@@ -131,38 +206,36 @@ public:
 
 	inline static int MakeIndexNoCheck(int x, int y, int z)
 	{
-		#if AXIS_ORDER == AXIS_ORDER_XZY
-			// For some reason, NOT using the Horner schema is faster. Weird.
-			return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
-		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
-		#endif
+#if AXIS_ORDER == AXIS_ORDER_XZY
+		// For some reason, NOT using the Horner schema is faster. Weird.
+		return x + (z * cChunkDef::Width) + (y * cChunkDef::Width * cChunkDef::Width);   // 1.2 uses XZY
+#elif AXIS_ORDER == AXIS_ORDER_YZX
+		return y + (z * cChunkDef::Width) + (x * cChunkDef::Height * cChunkDef::Width);  // 1.1 uses YZX
+#endif
 	}
 
 
-	inline static Vector3i IndexToCoordinate( unsigned int index)
+	inline static Vector3i IndexToCoordinate(unsigned int index)
 	{
-		#if AXIS_ORDER == AXIS_ORDER_XZY
-			return Vector3i(  // 1.2
-				index % cChunkDef::Width,                       // X
-				index / (cChunkDef::Width * cChunkDef::Width),  // Y
-				(index / cChunkDef::Width) % cChunkDef::Width   // Z
+#if AXIS_ORDER == AXIS_ORDER_XZY
+		return Vector3i(  // 1.2
+			index % cChunkDef::Width,                       // X
+			index / (cChunkDef::Width * cChunkDef::Width),  // Y
+			(index / cChunkDef::Width) % cChunkDef::Width   // Z
 			);
-		#elif AXIS_ORDER == AXIS_ORDER_YZX
-			return Vector3i(  // 1.1
-				index / (cChunkDef::Height * cChunkDef::Width),  // X
-				index % cChunkDef::Height,                       // Y
-				(index / cChunkDef::Height) % cChunkDef::Width   // Z
+#elif AXIS_ORDER == AXIS_ORDER_YZX
+		return Vector3i(  // 1.1
+			index / (cChunkDef::Height * cChunkDef::Width),  // X
+			index % cChunkDef::Height,                       // Y
+			(index / cChunkDef::Height) % cChunkDef::Width   // Z
 			);
-		#endif
+#endif
 	}
 
 
 	inline static void SetBlock(BLOCKTYPE * a_BlockTypes, int a_X, int a_Y, int a_Z, BLOCKTYPE a_Type)
 	{
-		ASSERT((a_X >= 0) && (a_X < Width));
-		ASSERT((a_Y >= 0) && (a_Y < Height));
-		ASSERT((a_Z >= 0) && (a_Z < Width));
+		AssertRelCoordsAreWithinChunk(a_X, a_Y, a_Z);
 		a_BlockTypes[MakeIndexNoCheck(a_X, a_Y, a_Z)] = a_Type;
 	}
 
@@ -282,11 +355,7 @@ public:
 
 	static void SetNibble(COMPRESSED_NIBBLETYPE & a_Buffer, int x, int y, int z, NIBBLETYPE a_Nibble)
 	{
-		if (
-			(x >= Width)  || (x < 0) ||
-			(y >= Height) || (y < 0) ||
-			(z >= Width)  || (z < 0)
-		)
+		if (!IsRelCoordsWithinChunk(x, y, z))
 		{
 			ASSERT(!"cChunkDef::SetNibble(): index out of range!");
 			return;
@@ -309,7 +378,7 @@ private:
 		return static_cast<NIBBLETYPE>(
 			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
 			((a_Nibble & 0x0f) << ((a_Index & 1) * 4))  // The nibble being set
-		);
+			);
 	}
 
 
@@ -319,7 +388,7 @@ private:
 	}
 
 
-} ;
+};
 
 
 
@@ -339,7 +408,7 @@ public:
 
 	/// Called for clients that are in Chunk2 and not in Chunk1.
 	virtual void Added(cClientHandle * a_Client) = 0;
-} ;
+};
 
 
 
@@ -360,8 +429,8 @@ struct sSetBlock
 		m_BlockType(a_BlockType),
 		m_BlockMeta(a_BlockMeta)
 	{
-		ASSERT((a_RelX >= 0) && (a_RelX < cChunkDef::Width));
-		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
+		ASSERT(cChunkDef::IsRelCoordWithinChunkWidth(a_RelX));
+		ASSERT(cChunkDef::IsRelCoordWithinChunkWidth(a_RelZ));
 	}
 
 	/** Returns the absolute X coord of the stored block. */
@@ -394,7 +463,7 @@ public:
 	{
 		return ((m_ChunkX == a_Other.m_ChunkX) && (m_ChunkZ == a_Other.m_ChunkZ));
 	}
-} ;
+};
 
 typedef std::list<cChunkCoords> cChunkCoordsList;
 typedef std::vector<cChunkCoords> cChunkCoordsVector;
@@ -443,7 +512,7 @@ public:
 	virtual ~cChunkCoordCallback() {}
 
 	virtual void Call(int a_ChunkX, int a_ChunkZ) = 0;
-} ;
+};
 
 
 
@@ -454,7 +523,7 @@ Used for chunk queues that notify about processed items. */
 class cChunkCoordsWithCallback
 {
 public:
-	cChunkCoordsWithCallback(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback):
+	cChunkCoordsWithCallback(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback) :
 		m_ChunkX(a_ChunkX),
 		m_ChunkZ(a_ChunkZ),
 		m_Callback(a_Callback)
@@ -488,7 +557,7 @@ public:
 		x(a_X), y(a_Y), z(a_Z), Data(a_Data)
 	{
 	}
-} ;
+};
 
 typedef cCoordWithData<int>        cCoordWithInt;
 typedef cCoordWithData<BLOCKTYPE>  cCoordWithBlock;

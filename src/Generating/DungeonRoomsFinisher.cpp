@@ -187,10 +187,7 @@ protected:
 	{
 		int RelX = a_Chest.x - a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 		int RelZ = a_Chest.z - a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
-		if (
-			(RelX < 0) || (RelX >= cChunkDef::Width) ||  // The X coord is not in this chunk
-			(RelZ < 0) || (RelZ >= cChunkDef::Width)     // The Z coord is not in this chunk
-		)
+		if (!cChunkDef::IsRelCoordWithinChunkWidth(RelX) || !cChunkDef::IsRelCoordWithinChunkWidth(RelZ))
 		{
 			return;
 		}

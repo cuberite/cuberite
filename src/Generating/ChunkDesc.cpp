@@ -300,64 +300,64 @@ void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX
 	a_MaxRelZ += 1;
 
 	// Check coords validity:
-	if (a_MinRelX < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkWidth(a_MinRelX))
 	{
 		LOGWARNING("%s: MinRelX less than zero, adjusting to zero", __FUNCTION__);
 		a_MinRelX = 0;
 	}
-	else if (a_MinRelX >= cChunkDef::Width)
+	else if (cChunkDef::IsRelCoordMoreThanChunkWidth(a_MinRelX))
 	{
 		LOGWARNING("%s: MinRelX more than chunk width, adjusting to chunk width", __FUNCTION__);
 		a_MinRelX = cChunkDef::Width - 1;
 	}
-	if (a_MaxRelX < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkWidth(a_MaxRelX))
 	{
 		LOGWARNING("%s: MaxRelX less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelX = 0;
 	}
-	else if (a_MaxRelX > cChunkDef::Width)
+	else if (cChunkDef::IsRelCoordMoreThanChunkWidth(a_MaxRelX))
 	{
 		LOGWARNING("%s: MaxRelX more than chunk width, adjusting to chunk width", __FUNCTION__);
 		a_MaxRelX = cChunkDef::Width;
 	}
 
-	if (a_MinRelY < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkHeight(a_MinRelY))
 	{
 		LOGWARNING("%s: MinRelY less than zero, adjusting to zero", __FUNCTION__);
 		a_MinRelY = 0;
 	}
-	else if (a_MinRelY >= cChunkDef::Height)
+	else if (cChunkDef::IsRelCoordMoreThanChunkHeight(a_MinRelY))
 	{
 		LOGWARNING("%s: MinRelY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MinRelY = cChunkDef::Height - 1;
 	}
-	if (a_MaxRelY < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkHeight(a_MaxRelY))
 	{
 		LOGWARNING("%s: MaxRelY less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelY = 0;
 	}
-	else if (a_MaxRelY > cChunkDef::Height)
+	else if (cChunkDef::IsRelCoordMoreThanChunkHeight(a_MaxRelY))
 	{
 		LOGWARNING("%s: MaxRelY more than chunk height, adjusting to chunk height", __FUNCTION__);
 		a_MaxRelY = cChunkDef::Height;
 	}
 
-	if (a_MinRelZ < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkWidth(a_MinRelZ))
 	{
 		LOGWARNING("%s: MinRelZ less than zero, adjusting to zero", __FUNCTION__);
 		a_MinRelZ = 0;
 	}
-	else if (a_MinRelZ >= cChunkDef::Width)
+	else if (cChunkDef::IsRelCoordMoreThanChunkWidth(a_MinRelZ))
 	{
 		LOGWARNING("%s: MinRelZ more than chunk width, adjusting to chunk width", __FUNCTION__);
 		a_MinRelZ = cChunkDef::Width - 1;
 	}
-	if (a_MaxRelZ < 0)
+	if (cChunkDef::IsRelCoordLessThanChunkWidth(a_MaxRelZ))
 	{
 		LOGWARNING("%s: MaxRelZ less than zero, adjusting to zero", __FUNCTION__);
 		a_MaxRelZ = 0;
 	}
-	else if (a_MaxRelZ > cChunkDef::Width)
+	else if (cChunkDef::IsRelCoordMoreThanChunkWidth(a_MaxRelZ))
 	{
 		LOGWARNING("%s: MaxRelZ more than chunk width, adjusting to chunk width", __FUNCTION__);
 		a_MaxRelZ = cChunkDef::Width;

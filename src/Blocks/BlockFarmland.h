@@ -45,7 +45,7 @@ public:
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		BLOCKTYPE UpperBlock = (a_RelY >= cChunkDef::Height) ? E_BLOCK_AIR : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
+		BLOCKTYPE UpperBlock = (cChunkDef::IsRelCoordMoreThanChunkHeight(a_RelY)) ? E_BLOCK_AIR : a_Chunk.GetBlock(a_RelX, a_RelY + 1, a_RelZ);
 		switch (UpperBlock)
 		{
 			case E_BLOCK_CROPS:
@@ -67,7 +67,7 @@ public:
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override
 	{
-		if (a_BlockY >= cChunkDef::Height)
+		if (cChunkDef::IsRelCoordMoreThanChunkHeight(a_BlockY))
 		{
 			return;
 		}
