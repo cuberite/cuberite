@@ -46,7 +46,7 @@ public:
 
 
 
-void DoTest(void)
+static void DoTest(void)
 {
 	cEvent evtFinish;
 
