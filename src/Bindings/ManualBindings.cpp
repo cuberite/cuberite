@@ -165,6 +165,14 @@ static AString GetLogMessage(lua_State * tolua_S)
 
 static int tolua_LOG(lua_State * tolua_S)
 {
+	// If there's no param, spit out an error message instead of crashing:
+	if (lua_isnil(tolua_S, 1))
+	{
+		LOGWARNING("Attempting to LOG a nil value!");
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
 	// If the param is a cCompositeChat, read the log level from it:
 	cLogger::eLogLevel LogLevel = cLogger::llRegular;
 	tolua_Error err;
@@ -184,6 +192,14 @@ static int tolua_LOG(lua_State * tolua_S)
 
 static int tolua_LOGINFO(lua_State * tolua_S)
 {
+	// If there's no param, spit out an error message instead of crashing:
+	if (lua_isnil(tolua_S, 1))
+	{
+		LOGWARNING("Attempting to LOGINFO a nil value!");
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
 	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llInfo);
 	return 0;
 }
@@ -194,6 +210,14 @@ static int tolua_LOGINFO(lua_State * tolua_S)
 
 static int tolua_LOGWARN(lua_State * tolua_S)
 {
+	// If there's no param, spit out an error message instead of crashing:
+	if (lua_isnil(tolua_S, 1))
+	{
+		LOGWARNING("Attempting to LOGWARN a nil value!");
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
 	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llWarning);
 	return 0;
 }
@@ -204,6 +228,14 @@ static int tolua_LOGWARN(lua_State * tolua_S)
 
 static int tolua_LOGERROR(lua_State * tolua_S)
 {
+	// If there's no param, spit out an error message instead of crashing:
+	if (lua_isnil(tolua_S, 1))
+	{
+		LOGWARNING("Attempting to LOGERROR a nil value!");
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
 	cLogger::GetInstance().LogSimple(GetLogMessage(tolua_S).c_str(), cLogger::llError);
 	return 0;
 }
