@@ -84,6 +84,48 @@ g_PluginInfo =
 					},
 				},  -- lookup
 				
+				udp =
+				{
+					Subcommands =
+					{
+						close =
+						{
+							Handler = HandleConsoleNetUdpClose,
+							ParameterCombinations =
+							{
+								{
+									Params = "[Port]",
+									Help = "Closes the UDP endpoint on the specified port [1024].",
+								}
+							},
+						},  -- close
+						
+						listen =
+						{
+							Handler = HandleConsoleNetUdpListen,
+							ParameterCombinations =
+							{
+								{
+									Params = "[Port]",
+									Help = "Listens on the specified UDP port [1024], dumping the incoming datagrams into log",
+								},
+							},
+						},  -- listen
+						
+						send =
+						{
+							Handler = HandleConsoleNetUdpSend,
+							ParameterCombinations =
+							{
+								{
+									Params = "[Host] [Port] [Message]",
+									Help = "Sends the message [\"hello\"] through UDP to the specified host [localhost] and port [1024]",
+								},
+							},
+						}  -- send
+					},  -- Subcommands ("net udp")
+				},  -- udp
+				
 				wasc =
 				{
 					HelpString = "Requests the webadmin homepage using https",

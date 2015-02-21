@@ -69,12 +69,24 @@ void cHostnameLookup::Callback(int a_ErrCode, evutil_addrinfo * a_Addr, void * a
 			case AF_INET:  // IPv4
 			{
 				sockaddr_in * sin = reinterpret_cast<sockaddr_in *>(a_Addr->ai_addr);
+				if (!Self->m_Callbacks->OnNameResolvedV4(Self->m_Hostname, sin))
+				{
+					// Callback indicated that the IP shouldn't be serialized to a string, just continue with the next address:
+					HasResolved = true;
+					continue;
+				}
 				evutil_inet_ntop(AF_INET, &(sin->sin_addr), IP, sizeof(IP));
 				break;
 			}
 			case AF_INET6:  // IPv6
 			{
 				sockaddr_in6 * sin = reinterpret_cast<sockaddr_in6 *>(a_Addr->ai_addr);
+				if (!Self->m_Callbacks->OnNameResolvedV6(Self->m_Hostname, sin))
+				{
+					// Callback indicated that the IP shouldn't be serialized to a string, just continue with the next address:
+					HasResolved = true;
+					continue;
+				}
 				evutil_inet_ntop(AF_INET6, &(sin->sin6_addr), IP, sizeof(IP));
 				break;
 			}

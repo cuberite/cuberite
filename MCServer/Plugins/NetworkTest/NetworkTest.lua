@@ -11,6 +11,10 @@
 -- g_Servers[PortNum] = cServerHandle
 local g_Servers = {}
 
+--- Map of all UDP endpoints currently open
+-- g_UDPEndpoints[PortNum] = cUDPEndpoint
+local g_UDPEndpoints = {}
+
 --- List of fortune messages for the fortune server
 -- A random message is chosen for each incoming connection
 -- The contents are loaded from the splashes.txt file on plugin startup
@@ -268,7 +272,7 @@ function HandleConsoleNetClose(a_Split)
 	-- Get the port to close:
 	local Port = tonumber(a_Split[3] or 1024)
 	if not(Port) then
-		return true, "Bad port number: \"" .. Port .. "\"."
+		return true, "Bad port number: \"" .. a_Split[3] .. "\"."
 	end
 
 	-- Close the server, if there is one:
@@ -348,6 +352,93 @@ function HandleConsoleNetListen(a_Split)
 	end
 	g_Servers[Port] = srv
 	return true, Service .. " server started on port " .. Port
+end
+
+
+
+
+
+function HandleConsoleNetUdpClose(a_Split)
+	-- Get the port to close:
+	local Port = tonumber(a_Split[4] or 1024)
+	if not(Port) then
+		return true, "Bad port number: \"" .. a_Split[4] .. "\"."
+	end
+
+	-- Close the server, if there is one:
+	if not(g_UDPEndpoints[Port]) then
+		return true, "There is no UDP endpoint currently listening on port " .. Port .. "."
+	end
+	g_UDPEndpoints[Port]:Close()
+	g_UDPEndpoints[Port] = nil
+	return true, "UDP Port " .. Port .. " closed."
+end
+
+
+
+
+
+function HandleConsoleNetUdpListen(a_Split)
+	-- Get the params:
+	local Port = tonumber(a_Split[4] or 1024)
+	if not(Port) then
+		return true, "Invalid port: \"" .. a_Split[4] .. "\"."
+	end
+	
+	local Callbacks =
+	{
+		OnReceivedData = function (a_Endpoint, a_Data, a_RemotePeer, a_RemotePort)
+			LOG("Incoming UDP datagram from " .. a_RemotePeer .. " port " .. a_RemotePort .. ":\r\n" .. a_Data)
+		end,
+		
+		OnError = function (a_Endpoint, a_ErrorCode, a_ErrorMsg)
+			LOG("Error in UDP endpoint: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+		end,
+	}
+	
+	g_UDPEndpoints[Port] = cNetwork:CreateUDPEndpoint(Port, Callbacks)
+	return true, "UDP listener on port " .. Port .. " started."
+end
+
+
+
+
+
+function HandleConsoleNetUdpSend(a_Split)
+	-- Get the params:
+	local Host = a_Split[4] or "localhost"
+	local Port = tonumber(a_Split[5] or 1024)
+	if not(Port) then
+		return true, "Invalid port: \"" .. a_Split[5] .. "\"."
+	end
+	local Message
+	if (a_Split[6]) then
+		Message = table.concat(a_Split, " ", 6)
+	else
+		Message = "hello"
+	end
+	
+	-- Define minimum callbacks for the UDP endpoint:
+	local Callbacks =
+	{
+		OnError = function (a_Endpoint, a_ErrorCode, a_ErrorMsg)
+			LOG("Error in UDP datagram sending: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+		end,
+		
+		OnReceivedData = function ()
+			-- ignore
+		end,
+	}
+	
+	-- Send the data:
+	local Endpoint = cNetwork:CreateUDPEndpoint(0, Callbacks)
+	Endpoint:EnableBroadcasts()
+	if not(Endpoint:Send(Message, Host, Port)) then
+		Endpoint:Close()
+		return true, "Sending UDP datagram failed"
+	end
+	Endpoint:Close()
+	return true, "UDP datagram sent"
 end
 
 

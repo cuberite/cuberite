@@ -99,7 +99,7 @@ class cEchoServerCallbacks:
 
 
 
-void DoTest(void)
+static void DoTest(void)
 {
 	LOGD("EchoServer: starting up");
 	cServerHandlePtr Server = cNetwork::Listen(9876, std::make_shared<cEchoServerCallbacks>());
