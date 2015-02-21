@@ -3,8 +3,11 @@
 
 #include "ManualBindings.h"
 #undef TOLUA_TEMPLATE_BIND
+#include <sstream>
+#include <iomanip>
 #include "tolua++/include/tolua++.h"
 #include "polarssl/md5.h"
+#include "polarssl/sha1.h"
 #include "PluginLua.h"
 #include "PluginManager.h"
 #include "LuaWindow.h"
@@ -2203,13 +2206,103 @@ static int tolua_cPlugin_Call(lua_State * tolua_S)
 
 
 
-static int tolua_md5(lua_State* tolua_S)
+static int tolua_md5(lua_State * tolua_S)
 {
+	// Calculate the raw md5 checksum byte array:
 	unsigned char Output[16];
 	size_t len = 0;
 	const unsigned char * SourceString = (const unsigned char *)lua_tolstring(tolua_S, 1, &len);
+	if (SourceString == nullptr)
+	{
+		return 0;
+	}
 	md5(SourceString, len, Output);
 	lua_pushlstring(tolua_S, (const char *)Output, ARRAYCOUNT(Output));
+	return 1;
+}
+
+
+
+
+
+/** Does the same as tolua_md5, but reports that the usage is obsolete and the plugin should use cCrypto.md5(). */
+static int tolua_md5_obsolete(lua_State * tolua_S)
+{
+	LOGWARNING("Using md5() is obsolete, please change your plugin to use cCryptoHash.md5()");
+	cLuaState::LogStackTrace(tolua_S);
+	return tolua_md5(tolua_S);
+}
+
+
+
+
+
+static int tolua_md5HexString(lua_State * tolua_S)
+{
+	// Calculate the raw md5 checksum byte array:
+	unsigned char md5Output[16];
+	size_t len = 0;
+	const unsigned char * SourceString = (const unsigned char *)lua_tolstring(tolua_S, 1, &len);
+	if (SourceString == nullptr)
+	{
+		return 0;
+	}
+	md5(SourceString, len, md5Output);
+
+	// Convert the md5 checksum to hex string:
+	std::stringstream Output;
+	Output << std::hex << std::setw(2) << std::setfill('0');
+	for (size_t i = 0; i < ARRAYCOUNT(md5Output); i++)
+	{
+		Output << static_cast<unsigned short>(md5Output[i]);  // Need to cast to a number, otherwise a char is output
+	}
+	lua_pushlstring(tolua_S, Output.str().c_str(), Output.str().size());
+	return 1;
+}
+
+
+
+
+
+static int tolua_sha1(lua_State * tolua_S)
+{
+	// Calculate the raw SHA1 checksum byte array from the input string:
+	unsigned char Output[20];
+	size_t len = 0;
+	const unsigned char * SourceString = (const unsigned char *)lua_tolstring(tolua_S, 1, &len);
+	if (SourceString == nullptr)
+	{
+		return 0;
+	}
+	sha1(SourceString, len, Output);
+	lua_pushlstring(tolua_S, (const char *)Output, ARRAYCOUNT(Output));
+	return 1;
+}
+
+
+
+
+
+static int tolua_sha1HexString(lua_State * tolua_S)
+{
+	// Calculate the raw SHA1 checksum byte array from the input string:
+	unsigned char sha1Output[20];
+	size_t len = 0;
+	const unsigned char * SourceString = (const unsigned char *)lua_tolstring(tolua_S, 1, &len);
+	if (SourceString == nullptr)
+	{
+		return 0;
+	}
+	sha1(SourceString, len, sha1Output);
+
+	// Convert the sha1 checksum to hex string:
+	std::stringstream Output;
+	Output << std::hex << std::setw(2) << std::setfill('0');
+	for (size_t i = 0; i < ARRAYCOUNT(sha1Output); i++)
+	{
+		Output << static_cast<unsigned short>(sha1Output[i]);  // Need to cast to a number, otherwise a char is output
+	}
+	lua_pushlstring(tolua_S, Output.str().c_str(), Output.str().size());
 	return 1;
 }
 
@@ -3419,6 +3512,12 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 void ManualBindings::Bind(lua_State * tolua_S)
 {
 	tolua_beginmodule(tolua_S, nullptr);
+
+		// Create the new classes:
+		tolua_usertype(tolua_S, "cCryptoHash");
+		tolua_cclass(tolua_S, "cCryptoHash", "cCryptoHash", "", nullptr);
+
+		// Globals:
 		tolua_function(tolua_S, "Clamp",              tolua_Clamp);
 		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
 		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
@@ -3429,6 +3528,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
 		tolua_function(tolua_S, "Base64Encode",       tolua_Base64Encode);
 		tolua_function(tolua_S, "Base64Decode",       tolua_Base64Decode);
+		tolua_function(tolua_S, "md5",                tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead
 		
 		tolua_beginmodule(tolua_S, "cFile");
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
@@ -3585,7 +3685,12 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetSlotCoords", Lua_ItemGrid_GetSlotCoords);
 		tolua_endmodule(tolua_S);
 
-		tolua_function(tolua_S, "md5", tolua_md5);
+		tolua_beginmodule(tolua_S, "cCryptoHash");
+			tolua_function(tolua_S, "md5", tolua_md5);
+			tolua_function(tolua_S, "md5HexString", tolua_md5HexString);
+			tolua_function(tolua_S, "sha1", tolua_sha1);
+			tolua_function(tolua_S, "sha1HexString", tolua_sha1HexString);
+		tolua_endmodule(tolua_S);
 		
 		BindRankManager(tolua_S);
 		BindNetwork(tolua_S);
