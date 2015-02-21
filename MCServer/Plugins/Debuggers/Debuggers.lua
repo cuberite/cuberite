@@ -1476,7 +1476,7 @@ function HandleWESel(a_Split, a_Player)
 	SelCuboid:Expand(NumBlocks, NumBlocks, 0, 0, NumBlocks, NumBlocks)
 	
 	-- Set the selection:
-	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
+	IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
 	if not(IsSuccess) then
 		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while setting new selection"))
 		return true
@@ -1606,17 +1606,36 @@ end
 
 
 
-function HandleConsoleSchedule(a_Split)
-	local prev = os.clock()
-	LOG("Scheduling a task for 2 seconds in the future (current os.clock is " .. prev .. ")")
-	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
-		function ()
-			local current = os.clock()
-			local diff = current - prev
-			LOG("Scheduled function is called. Current os.clock is " .. current .. ", difference is " .. diff .. ")")
-		end
-	)
-	return true, "Task scheduled"
+-- List of hashing functions to test:
+local HashFunctions =
+{
+	{"md5", md5 },
+	{"cCryptoHash.md5", cCryptoHash.md5 },
+	{"cCryptoHash.md5HexString", cCryptoHash.md5HexString },
+	{"cCryptoHash.sha1", cCryptoHash.sha1 },
+	{"cCryptoHash.sha1HexString", cCryptoHash.sha1HexString },
+}
+
+-- List of strings to try hashing:
+local HashExamples =
+{
+	"",
+	"\0",
+	"test",
+}
+
+function HandleConsoleHash(a_Split)
+	for _, str in ipairs(HashExamples) do
+		LOG("Hashing string \"" .. str .. "\":")
+		for _, hash in ipairs(HashFunctions) do
+			if not(hash[2]) then
+				LOG("Hash function " .. hash[1] .. " doesn't exist in the API!")
+			else
+				LOG(hash[1] .. "() = " .. hash[2](str))
+			end
+		end  -- for hash - HashFunctions[]
+	end  -- for str - HashExamples[]
+	return true
 end
 
 
@@ -1699,6 +1718,23 @@ function HandleConsolePrepareChunk(a_Split)
 		end
 	)
 	return true
+end
+
+
+
+
+
+function HandleConsoleSchedule(a_Split)
+	local prev = os.clock()
+	LOG("Scheduling a task for 2 seconds in the future (current os.clock is " .. prev .. ")")
+	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
+		function ()
+			local current = os.clock()
+			local diff = current - prev
+			LOG("Scheduled function is called. Current os.clock is " .. current .. ", difference is " .. diff .. ")")
+		end
+	)
+	return true, "Task scheduled"
 end
 
 

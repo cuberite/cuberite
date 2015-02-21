@@ -685,6 +685,28 @@ end</pre>
 			},
 		},  -- cCraftingRecipe
 
+		cCryptoHash =
+		{
+			Desc =
+			[[
+				Provides functions for generating cryptographic hashes.</p>
+				<p>
+				Note that all functions in this class are static, so they should be called in the dot convention:
+<pre class="prettyprint lang-lua">
+local Hash = cCryptoHash.sha1HexString("DataToHash")
+</pre></p>
+				<p>Each cryptographic hash has two variants, one returns the hash as a raw binary string, the other returns the hash as a hex-encoded string twice as long as the binary string.
+			]],
+			
+			Functions =
+			{
+				md5 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a raw (binary) string of 16 characters." },
+				md5HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a hex-encoded string of 32 characters." },
+				sha1 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a raw (binary) string of 20 characters." },
+				sha1HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a hex-encoded string of 40 characters." },
+			},
+		},  -- cCryptoHash
+		
 		cEnchantments =
 		{
 			Desc = [[
@@ -2929,7 +2951,7 @@ end
 				StringToMobType = {Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "<b>DEPRECATED!</b> Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
 				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
-				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
+				md5 = {Params = "string", Return = "string", Notes = "<b>OBSOLETE</b>, use the {{cCryptoHash}} functions instead.<br>Converts a string to a raw binary md5 hash."},
 			},
 			ConstantGroups =
 			{

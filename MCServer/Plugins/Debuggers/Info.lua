@@ -200,21 +200,29 @@ g_PluginInfo =
 	
 	ConsoleCommands =
 	{
-		["sched"] =
+		["hash"] =
 		{
-			Handler = HandleConsoleSchedule,
-			HelpString = "Tests the world scheduling",
+			Handler = HandleConsoleHash,
+			HelpString = "Tests the crypto hashing functions",
 		},
+		
 		["loadchunk"] =
 		{
 			Handler = HandleConsoleLoadChunk,
 			HelpString = "Loads the specified chunk into memory",
 		},
+		
 		["preparechunk"] =
 		{
 			Handler = HandleConsolePrepareChunk,
 			HelpString = "Prepares the specified chunk completely (load / gen / light)",
-		}
+		},
+		
+		["sched"] =
+		{
+			Handler = HandleConsoleSchedule,
+			HelpString = "Tests the world scheduling",
+		},
 	},  -- ConsoleCommands
 }  -- g_PluginInfo
 
