@@ -98,7 +98,7 @@ AStringVector cNetwork::EnumLocalIPAddresses(void)
 		// Enumerate all active adapters
 		for (auto pCurrAddresses = pAddresses; pCurrAddresses != nullptr; pCurrAddresses = pCurrAddresses->Next)
 		{
-			if (pCurrAddresses->OperStatus != 1)
+			if (pCurrAddresses->OperStatus != IfOperStatusUp)
 			{
 				// Adapter not active, skip it:
 				continue;
