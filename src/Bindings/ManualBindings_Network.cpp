@@ -129,6 +129,30 @@ static int tolua_cNetwork_CreateUDPEndpoint(lua_State * L)
 
 
 
+/** Binds cNetwork::EnumLocalIPAddresses */
+static int tolua_cNetwork_EnumLocalIPAddresses(lua_State * L)
+{
+	// Function signature:
+	// cNetwork:EnumLocalIPAddresses() -> {string, ...}
+
+	cLuaState S(L);
+	if (
+		!S.CheckParamUserTable(1, "cNetwork") ||
+		!S.CheckParamEnd(2)
+	)
+	{
+		return 0;
+	}
+	
+	// Push the enumerated addresses:
+	S.Push(cNetwork::EnumLocalIPAddresses());
+	return 1;
+}
+
+
+
+
+
 /** Binds cNetwork::HostnameToIP */
 static int tolua_cNetwork_HostnameToIP(lua_State * L)
 {
@@ -903,11 +927,12 @@ void ManualBindings::BindNetwork(lua_State * tolua_S)
 	
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cNetwork");
-		tolua_function(tolua_S, "Connect",           tolua_cNetwork_Connect);
-		tolua_function(tolua_S, "CreateUDPEndpoint", tolua_cNetwork_CreateUDPEndpoint);
-		tolua_function(tolua_S, "HostnameToIP",      tolua_cNetwork_HostnameToIP);
-		tolua_function(tolua_S, "IPToHostname",      tolua_cNetwork_IPToHostname);
-		tolua_function(tolua_S, "Listen",            tolua_cNetwork_Listen);
+		tolua_function(tolua_S, "Connect",              tolua_cNetwork_Connect);
+		tolua_function(tolua_S, "CreateUDPEndpoint",    tolua_cNetwork_CreateUDPEndpoint);
+		tolua_function(tolua_S, "EnumLocalIPAddresses", tolua_cNetwork_EnumLocalIPAddresses);
+		tolua_function(tolua_S, "HostnameToIP",         tolua_cNetwork_HostnameToIP);
+		tolua_function(tolua_S, "IPToHostname",         tolua_cNetwork_IPToHostname);
+		tolua_function(tolua_S, "Listen",               tolua_cNetwork_Listen);
 	tolua_endmodule(tolua_S);
 
 	tolua_beginmodule(tolua_S, "cServerHandle");

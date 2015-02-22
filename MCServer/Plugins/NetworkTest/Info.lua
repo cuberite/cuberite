@@ -50,6 +50,12 @@ g_PluginInfo =
 					},  -- ParameterCombinations
 				},  -- close
 				
+				ips =
+				{
+					HelpString = "Prints all locally available IP addresses",
+					Handler = HandleConsoleNetIps,
+				},  -- ips
+				
 				listen =
 				{
 					HelpString = "Creates a new listening socket on the specified port with the specified service attached to it",
