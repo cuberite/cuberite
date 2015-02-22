@@ -31,6 +31,7 @@
 #include "../LineBlockTracer.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
+#include "../StringCompression.h"
 
 
 
@@ -103,6 +104,40 @@ static int tolua_Clamp(lua_State * tolua_S)
 
 	lua_Number Result = Clamp(Number, Min, Max);
 	LuaState.Push(Result);
+	return 1;
+}
+
+
+
+
+
+static int tolua_CompressString(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	const char * ToCompress = tolua_tocppstring(LuaState, 1, 0);
+	int Length              = (int)tolua_tonumber(LuaState, 2, 0);
+	int Factor              = (int)tolua_tonumber(LuaState, 3, 0);
+	AString res;
+
+	CompressString(ToCompress, Length, res, Factor);
+	LuaState.Push(res);
+	return 1;
+}
+
+
+
+
+
+static int tolua_UncompressString(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	const char * ToUncompress = tolua_tocppstring(LuaState, 1, 0);
+	int Length                = (int)tolua_tonumber(LuaState, 2, 0);
+	int UncompressedSize      = (int)tolua_tonumber(LuaState, 3, 0);
+	AString res;
+
+	UncompressString(ToUncompress, Length, res, UncompressedSize);
+	LuaState.Push(res);
 	return 1;
 }
 
@@ -3519,6 +3554,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",              tolua_Clamp);
+		tolua_function(tolua_S, "CompressString",     tolua_CompressString);
+		tolua_function(tolua_S, "UncompressString",   tolua_UncompressString);
 		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
 		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
 		tolua_function(tolua_S, "LOG",                tolua_LOG);
