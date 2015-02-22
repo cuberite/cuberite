@@ -2900,6 +2900,7 @@ end
 				BlockStringToType = {Params = "BlockTypeString", Return = "BLOCKTYPE", Notes = "Returns the block type parsed from the given string"},
 				Clamp = {Params = "Number, Min, Max", Return = "number", Notes = "Clamp the number to the specified range."},
 				ClickActionToString = {Params = "{{Globals#ClickAction|ClickAction}}", Return = "string", Notes = "Returns a string description of the ClickAction enumerated value"},
+				CompressString = {Params = "string, length, factor", Return = "string", Notes = "Compresses a string using ZLIB"},
 				DamageTypeToString = {Params = "{{Globals#DamageType|DamageType}}", Return = "string", Notes = "Converts the {{Globals#DamageType|DamageType}} enumerated value to a string representation "},
 				EscapeString = {Params = "string", Return = "string", Notes = "Returns a copy of the string with all quotes and backslashes escaped by a backslash"},
 				GetChar = {Params = "String, Pos", Return = "string", Notes = "Returns one character from the string, specified by position "},
@@ -2951,6 +2952,7 @@ end
 				StringToMobType = {Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "<b>DEPRECATED!</b> Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
 				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
+				UncompressString = {Params = "string, length, uncompressed length", Return = "string", Notes = "Uncompresses a string using ZLIB"},
 				md5 = {Params = "string", Return = "string", Notes = "<b>OBSOLETE</b>, use the {{cCryptoHash}} functions instead.<br>Converts a string to a raw binary md5 hash."},
 			},
 			ConstantGroups =
