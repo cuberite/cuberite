@@ -73,7 +73,7 @@ Install git, make, cmake and gcc or clang, using your platform's package manager
 ```
 sudo apt-get install git make cmake gcc g++
 ```
-(Ensure you have the latest versions installed to avoid errors during compilation)
+(Ensure you have gcc/g++ 4.8 or higher installed to avoid errors during compilation)
 
 ### Getting the sources ###
 ```
