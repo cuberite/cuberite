@@ -115,9 +115,9 @@ static int tolua_CompressStringZLIB(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamString(1) &&
+		!S.CheckParamString(1) ||
 		(
-			!S.CheckParamNumber(2) ||
+			!S.CheckParamNumber(2) &&
 			!S.CheckParamEnd(2)
 		)
 	)
@@ -146,7 +146,7 @@ static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamString(1) &&
+		!S.CheckParamString(1) ||
 		!S.CheckParamNumber(2)
 	)
 	{
@@ -174,7 +174,7 @@ static int tolua_CompressStringGZIP(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamString(1) &&
+		!S.CheckParamString(1) ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -201,7 +201,7 @@ static int tolua_UncompressStringGZIP(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamString(1) &&
+		!S.CheckParamString(1) ||
 		!S.CheckParamEnd(2)
 	)
 	{
@@ -228,7 +228,7 @@ static int tolua_InflateString(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!S.CheckParamString(1) &&
+		!S.CheckParamString(1) ||
 		!S.CheckParamEnd(2)
 	)
 	{
