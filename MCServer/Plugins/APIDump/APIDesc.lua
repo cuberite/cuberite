@@ -2269,7 +2269,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 			Functions =
 			{
 				CompressStringGZIP   = {Params = "string", Return = "string", Notes = "Compress a string using GZIP"},
-				CompressStringZLIB   = {Params = "string, factor", Return = "string", Notes = "Compresses a string using ZLIB"},
+				CompressStringZLIB   = {Params = "string, factor", Return = "string", Notes = "Compresses a string using ZLIB. Factor 0 is no compression and factor 9 is maximum compression"},
 				InflateString        = {Params = "string", Return = "string", Notes = "Uncompresses a string using Inflate"},
 				UncompressStringGZIP = {Params = "string", Return = "string", Notes = "Uncompress a string using GZIP"},
 				UncompressStringZLIB = {Params = "string, uncompressed length", Return = "string", Notes = "Uncompresses a string using ZLIB"},
