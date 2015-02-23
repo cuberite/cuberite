@@ -117,8 +117,8 @@ static int tolua_CompressStringZLIB(lua_State * tolua_S)
 	if (
 		!S.CheckParamString(1) &&
 		(
-		!S.CheckParamNumber(2) ||
-		!S.CheckParamEnd(2)
+			!S.CheckParamNumber(2) ||
+			!S.CheckParamEnd(2)
 		)
 	)
 	{
