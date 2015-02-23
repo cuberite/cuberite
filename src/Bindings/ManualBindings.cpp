@@ -115,10 +115,10 @@ static int tolua_CompressStringZLIB(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!lua_isstring(tolua_S, 1) ||
+		!S.CheckParamString(1) &&
 		(
-		!lua_isnumber(tolua_S, 2) &&
-		!lua_isnil(tolua_S, 2)
+		!S.CheckParamNumber(2) ||
+		!S.CheckParamEnd(2)
 		)
 	)
 	{
@@ -146,8 +146,8 @@ static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!lua_isstring(tolua_S, 1) ||
-		!lua_isnumber(tolua_S, 2)
+		!S.CheckParamString(1) &&
+		!S.CheckParamNumber(2)
 	)
 	{
 		cLuaState::LogStackTrace(tolua_S);
@@ -173,7 +173,10 @@ static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 static int tolua_CompressStringGZIP(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
-	if (!lua_isstring(tolua_S, 1))
+	if (
+		!S.CheckParamString(1) &&
+		!S.CheckParamEnd(2)
+	)
 	{
 		cLuaState::LogStackTrace(tolua_S);
 		return 0;
@@ -198,14 +201,13 @@ static int tolua_UncompressStringGZIP(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!lua_isstring(tolua_S, 1)
+		!S.CheckParamString(1) &&
+		!S.CheckParamEnd(2)
 	)
 	{
 		cLuaState::LogStackTrace(tolua_S);
 		return 0;
 	}
-
-	
 
 	// Get the params:
 	AString ToUncompress;
@@ -226,14 +228,13 @@ static int tolua_InflateString(lua_State * tolua_S)
 {
 	cLuaState S(tolua_S);
 	if (
-		!lua_isstring(tolua_S, 1)
+		!S.CheckParamString(1) &&
+		!S.CheckParamEnd(2)
 	)
 	{
 		cLuaState::LogStackTrace(tolua_S);
 		return 0;
 	}
-
-	
 
 	// Get the params:
 	AString ToUncompress;
