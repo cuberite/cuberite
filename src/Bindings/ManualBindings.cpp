@@ -111,16 +111,30 @@ static int tolua_Clamp(lua_State * tolua_S)
 
 
 
-static int tolua_CompressString(lua_State * tolua_S)
+static int tolua_CompressStringZLIB(lua_State * tolua_S)
 {
-	cLuaState LuaState(tolua_S);
-	const char * ToCompress = tolua_tocppstring(LuaState, 1, 0);
-	int Length              = (int)tolua_tonumber(LuaState, 2, 0);
-	int Factor              = (int)tolua_tonumber(LuaState, 3, 0);
-	AString res;
+	cLuaState S(tolua_S);
+	if (
+		!lua_isstring(tolua_S, 1) ||
+		(
+		!lua_isnumber(tolua_S, 2) &&
+		!lua_isnil(tolua_S, 2)
+		)
+	)
+	{
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
 
-	CompressString(ToCompress, Length, res, Factor);
-	LuaState.Push(res);
+	// Get the params:
+	AString ToCompress;
+	int CompressionLevel = 5;
+	S.GetStackValues(1, ToCompress, CompressionLevel);
+
+	// Compress the string:
+	AString res;
+	CompressString(ToCompress.data(), ToCompress.size(), res, CompressionLevel);
+	S.Push(res);
 	return 1;
 }
 
@@ -128,16 +142,107 @@ static int tolua_CompressString(lua_State * tolua_S)
 
 
 
-static int tolua_UncompressString(lua_State * tolua_S)
+static int tolua_UncompressStringZLIB(lua_State * tolua_S)
 {
-	cLuaState LuaState(tolua_S);
-	const char * ToUncompress = tolua_tocppstring(LuaState, 1, 0);
-	int Length                = (int)tolua_tonumber(LuaState, 2, 0);
-	int UncompressedSize      = (int)tolua_tonumber(LuaState, 3, 0);
-	AString res;
+	cLuaState S(tolua_S);
+	if (
+		!lua_isstring(tolua_S, 1) ||
+		!lua_isnumber(tolua_S, 2)
+	)
+	{
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
 
-	UncompressString(ToUncompress, Length, res, UncompressedSize);
-	LuaState.Push(res);
+	// Get the params:
+	AString ToUncompress;
+	int UncompressedSize;
+	S.GetStackValues(1, ToUncompress, UncompressedSize);
+
+	// Compress the string:
+	AString res;
+	UncompressString(ToUncompress.data(), ToUncompress.size(), res, UncompressedSize);
+	S.Push(res);
+	return 1;
+}
+
+
+
+
+
+static int tolua_CompressStringGZIP(lua_State * tolua_S)
+{
+	cLuaState S(tolua_S);
+	if (!lua_isstring(tolua_S, 1))
+	{
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
+	// Get the params:
+	AString ToCompress;
+	S.GetStackValues(1, ToCompress);
+
+	// Compress the string:
+	AString res;
+	CompressStringGZIP(ToCompress.data(), ToCompress.size(), res);
+	S.Push(res);
+	return 1;
+}
+
+
+
+
+
+static int tolua_UncompressStringGZIP(lua_State * tolua_S)
+{
+	cLuaState S(tolua_S);
+	if (
+		!lua_isstring(tolua_S, 1)
+	)
+	{
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
+	
+
+	// Get the params:
+	AString ToUncompress;
+	S.GetStackValues(1, ToUncompress);
+
+	// Compress the string:
+	AString res;
+	UncompressStringGZIP(ToUncompress.data(), ToUncompress.size(), res);
+	S.Push(res);
+	return 1;
+}
+
+
+
+
+
+static int tolua_InflateString(lua_State * tolua_S)
+{
+	cLuaState S(tolua_S);
+	if (
+		!lua_isstring(tolua_S, 1)
+	)
+	{
+		cLuaState::LogStackTrace(tolua_S);
+		return 0;
+	}
+
+	
+
+	// Get the params:
+	AString ToUncompress;
+	S.GetStackValues(1, ToUncompress);
+
+	// Compress the string:
+	AString res;
+	InflateString(ToUncompress.data(), ToUncompress.size(), res);
+	S.Push(res);
 	return 1;
 }
 
@@ -3551,11 +3656,11 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		// Create the new classes:
 		tolua_usertype(tolua_S, "cCryptoHash");
 		tolua_cclass(tolua_S, "cCryptoHash", "cCryptoHash", "", nullptr);
+		tolua_usertype(tolua_S, "cStringCompression");
+		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",              tolua_Clamp);
-		tolua_function(tolua_S, "CompressString",     tolua_CompressString);
-		tolua_function(tolua_S, "UncompressString",   tolua_UncompressString);
 		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
 		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
 		tolua_function(tolua_S, "LOG",                tolua_LOG);
@@ -3727,6 +3832,14 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "md5HexString", tolua_md5HexString);
 			tolua_function(tolua_S, "sha1", tolua_sha1);
 			tolua_function(tolua_S, "sha1HexString", tolua_sha1HexString);
+		tolua_endmodule(tolua_S);
+		
+		tolua_beginmodule(tolua_S, "cStringCompression");
+			tolua_function(tolua_S, "CompressStringZLIB",     tolua_CompressStringZLIB);
+			tolua_function(tolua_S, "UncompressStringZLIB",   tolua_UncompressStringZLIB);
+			tolua_function(tolua_S, "CompressStringGZIP",     tolua_CompressStringGZIP);
+			tolua_function(tolua_S, "UncompressStringGZIP",   tolua_UncompressStringGZIP);
+			tolua_function(tolua_S, "InflateString",          tolua_InflateString);
 		tolua_endmodule(tolua_S);
 		
 		BindRankManager(tolua_S);
