@@ -874,11 +874,15 @@ void cProtocol180::SendPlayerListUpdatePing(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
-	Pkt.WriteVarInt(2);
-	Pkt.WriteVarInt(1);
-	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt((UInt32)a_Player.GetClientHandle()->GetPing());
+	auto ClientHandle = a_Player.GetClientHandlePtr();
+	if (ClientHandle != nullptr)
+	{
+		cPacketizer Pkt(*this, 0x38);  // Playerlist Item packet
+		Pkt.WriteVarInt(2);
+		Pkt.WriteVarInt(1);
+		Pkt.WriteUUID(a_Player.GetUUID());
+		Pkt.WriteVarInt(static_cast<UInt32>(ClientHandle->GetPing()));
+	}
 }
 
 
