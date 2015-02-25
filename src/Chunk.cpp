@@ -925,7 +925,7 @@ void cChunk::ApplyWeatherToTop()
 			{
 				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 			}
-			else if ((TopBlock == E_BLOCK_WATER) || (TopBlock == E_BLOCK_STATIONARY_WATER))
+			else if (IsBlockWater(TopBlock) && (TopMeta == 0))
 			{
 				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
 			}
