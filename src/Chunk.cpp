@@ -874,80 +874,71 @@ void cChunk::ApplyWeatherToTop()
 	
 	int X = m_World->GetTickRandomNumber(15);
 	int Z = m_World->GetTickRandomNumber(15);
-	switch (GetBiomeAt(X, Z))
+
+	// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
+	int Height = GetHeight(X, Z);
+
+	if (GetSnowStartHeight(GetBiomeAt(X, Z)) > Height)
 	{
-		case biTaiga:
-		case biFrozenOcean:
-		case biFrozenRiver:
-		case biIcePlains:
-		case biIceMountains:
-		case biTaigaHills:
+		return;
+	}
+
+	BLOCKTYPE TopBlock = GetBlock(X, Height, Z);
+	NIBBLETYPE TopMeta = GetMeta (X, Height, Z);
+	if (m_World->IsDeepSnowEnabled() && (TopBlock == E_BLOCK_SNOW))
+	{
+		int MaxSize = 7;
+		BLOCKTYPE  BlockType[4];
+		NIBBLETYPE BlockMeta[4];
+		UnboundedRelGetBlock(X - 1, Height, Z,     BlockType[0], BlockMeta[0]);
+		UnboundedRelGetBlock(X + 1, Height, Z,     BlockType[1], BlockMeta[1]);
+		UnboundedRelGetBlock(X,     Height, Z - 1, BlockType[2], BlockMeta[2]);
+		UnboundedRelGetBlock(X,     Height, Z + 1, BlockType[3], BlockMeta[3]);
+		for (int i = 0; i < 4; i++)
 		{
-			// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
-			int Height = GetHeight(X, Z);
-			BLOCKTYPE TopBlock = GetBlock(X, Height, Z);
-			NIBBLETYPE TopMeta = GetMeta (X, Height, Z);
-			if (m_World->IsDeepSnowEnabled() && (TopBlock == E_BLOCK_SNOW))
+			switch (BlockType[i])
 			{
-				int MaxSize = 7;
-				BLOCKTYPE  BlockType[4];
-				NIBBLETYPE BlockMeta[4];
-				UnboundedRelGetBlock(X - 1, Height, Z,     BlockType[0], BlockMeta[0]);
-				UnboundedRelGetBlock(X + 1, Height, Z,     BlockType[1], BlockMeta[1]);
-				UnboundedRelGetBlock(X,     Height, Z - 1, BlockType[2], BlockMeta[2]);
-				UnboundedRelGetBlock(X,     Height, Z + 1, BlockType[3], BlockMeta[3]);
-				for (int i = 0; i < 4; i++)
+				case E_BLOCK_AIR:
 				{
-					switch (BlockType[i])
-					{
-						case E_BLOCK_AIR:
-						{
-							MaxSize = 0;
-							break;
-						}
-						case E_BLOCK_SNOW:
-						{
-							MaxSize = std::min(BlockMeta[i] + 1, MaxSize);
-							break;
-						}
-					}
+					MaxSize = 0;
+					break;
 				}
-				if (TopMeta < MaxSize)
+				case E_BLOCK_SNOW:
 				{
-					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta + 1);
-				}
-				else if (TopMeta > MaxSize)
-				{
-					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
+					MaxSize = std::min(BlockMeta[i] + 1, MaxSize);
+					break;
 				}
 			}
-			else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
-			{
-				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
-			}
-			else if (IsBlockWater(TopBlock) && (TopMeta == 0))
-			{
-				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
-			}
-			else if (
-				(m_World->IsDeepSnowEnabled()) &&
-				(
-					(TopBlock == E_BLOCK_RED_ROSE) ||
-					(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
-					(TopBlock == E_BLOCK_RED_MUSHROOM) ||
-					(TopBlock == E_BLOCK_BROWN_MUSHROOM)
-				)
-			)
-			{
-				SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
-			}
-			break;
-		}  // case (snowy biomes)
-		default:
-		{
-			break;
 		}
-	}  // switch (biome)
+		if (TopMeta < MaxSize)
+		{
+			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta + 1);
+		}
+		else if (TopMeta > MaxSize)
+		{
+			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
+		}
+	}
+	else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
+	{
+		SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
+	}
+	else if (IsBlockWater(TopBlock) && (TopMeta == 0))
+	{
+		SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
+	}
+	else if (
+		(m_World->IsDeepSnowEnabled()) &&
+		(
+			(TopBlock == E_BLOCK_RED_ROSE) ||
+			(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
+			(TopBlock == E_BLOCK_RED_MUSHROOM) ||
+			(TopBlock == E_BLOCK_BROWN_MUSHROOM)
+		)
+	)
+	{
+		SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
+	}
 }
 
 
