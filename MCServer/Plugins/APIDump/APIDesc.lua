@@ -2254,6 +2254,27 @@ end
 				ShouldAuthenticate = { Params = "", Return = "bool", Notes = "Returns true iff the server is set to authenticate players (\"online mode\")." },
 			},
 		},  -- cServer
+		
+		cStringCompression =
+		{
+			Desc = [[
+				Provides functions to compress or decompress string
+				<p>
+				All functions in this class are static, so they should be called in the dot convention:
+<pre class="prettyprint lang-lua">
+local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
+</pre>
+			]],
+			
+			Functions =
+			{
+				CompressStringGZIP   = {Params = "string", Return = "string", Notes = "Compress a string using GZIP"},
+				CompressStringZLIB   = {Params = "string, factor", Return = "string", Notes = "Compresses a string using ZLIB. Factor 0 is no compression and factor 9 is maximum compression"},
+				InflateString        = {Params = "string", Return = "string", Notes = "Uncompresses a string using Inflate"},
+				UncompressStringGZIP = {Params = "string", Return = "string", Notes = "Uncompress a string using GZIP"},
+				UncompressStringZLIB = {Params = "string, uncompressed length", Return = "string", Notes = "Uncompresses a string using ZLIB"},
+			},
+		},
 
 		cTeam =
 		{
