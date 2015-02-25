@@ -470,30 +470,22 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			switch (a_ChunkDesc.GetBiome(x, z))
+			int Height = a_ChunkDesc.GetHeight(x, z);
+			if (GetSnowStartHeight(a_ChunkDesc.GetBiome(x, z)) > Height)
 			{
-				case biIcePlains:
-				case biIceMountains:
-				case biTaiga:
-				case biTaigaHills:
-				case biFrozenRiver:
-				case biFrozenOcean:
-				{
-					int Height = a_ChunkDesc.GetHeight(x, z);
-					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
-					{
-						a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
-						a_ChunkDesc.SetHeight(x, z, Height + 1);
-					}
-					break;
-				}
-				default:
-				{
-					// There's no snow in the other biomes.
-					break;
-				}
+				// Height isn't high enough for snow to start forming.
+				continue;
 			}
-		}
+
+			if (!cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
+			{
+				// The top block can't be snown over.
+				continue;
+			}
+
+			a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
+			a_ChunkDesc.SetHeight(x, z, Height + 1);
+		}  // for x
 	}  // for z
 }
 
