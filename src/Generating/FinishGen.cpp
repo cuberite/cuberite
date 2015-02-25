@@ -503,34 +503,27 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			switch (a_ChunkDesc.GetBiome(x, z))
+			int Height = a_ChunkDesc.GetHeight(x, z);
+			if (GetSnowStartHeight(a_ChunkDesc.GetBiome(x, z)) > Height)
 			{
-				case biIcePlains:
-				case biIceMountains:
-				case biTaiga:
-				case biTaigaHills:
-				case biFrozenRiver:
-				case biFrozenOcean:
-				{
-					int Height = a_ChunkDesc.GetHeight(x, z);
-					switch (a_ChunkDesc.GetBlockType(x, Height, z))
-					{
-						case E_BLOCK_WATER:
-						case E_BLOCK_STATIONARY_WATER:
-						{
-							a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_ICE);
-							break;
-						}
-					}
-					break;
-				}
-				default:
-				{
-					// No icy water in other biomes.
-					break;
-				}
+				// Height isn't high enough for snow to start forming.
+				continue;
 			}
-		}
+
+			if (!IsBlockWater(a_ChunkDesc.GetBlockType(x, Height, z)))
+			{
+				// The block isn't a water block.
+				continue;
+			}
+
+			if (a_ChunkDesc.GetBlockMeta(x, Height, z) != 0)
+			{
+				// The water block isn't a source block.
+				continue;
+			}
+
+			a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_ICE);
+		}  // for x
 	}  // for z
 }
 
