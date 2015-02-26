@@ -223,7 +223,7 @@ bool IsBiomeCold(EMCSBiome a_Biome)
 
 
 
-int GetSnowStartHeight(EMCSBiome a_Biome)
+unsigned GetSnowStartHeight(EMCSBiome a_Biome)
 {
 	switch (a_Biome)
 	{
@@ -237,7 +237,7 @@ int GetSnowStartHeight(EMCSBiome a_Biome)
 		case biColdTaigaM:
 		{
 			// Always snow
-			return -1;
+			return 0;
 		}
 	
 		case biExtremeHills:
@@ -341,7 +341,7 @@ int GetSnowStartHeight(EMCSBiome a_Biome)
 
 		default:
 		{
-			return -1;
+			return 0;
 		}
 	}
 }
