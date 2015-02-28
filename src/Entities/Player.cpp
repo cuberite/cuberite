@@ -296,7 +296,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-short cPlayer::CalcLevelFromXp(short a_XpTotal)
+int cPlayer::CalcLevelFromXp(int a_XpTotal)
 {
 	// level 0 to 15
 	if (a_XpTotal <= XP_TO_LEVEL15)
@@ -307,18 +307,18 @@ short cPlayer::CalcLevelFromXp(short a_XpTotal)
 	// level 30+
 	if (a_XpTotal > XP_TO_LEVEL30)
 	{
-		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
+		return (int) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
 	}
 
 	// level 16 to 30
-	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3;
+	return (int) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3;
 }
 
 
 
 
 
-short cPlayer::XpForLevel(short a_Level)
+int cPlayer::XpForLevel(int a_Level)
 {
 	// level 0 to 15
 	if (a_Level <= 15)
@@ -329,18 +329,18 @@ short cPlayer::XpForLevel(short a_Level)
 	// level 30+
 	if (a_Level >= 31)
 	{
-		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220);
+		return (int) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220);
 	}
 
 	// level 16 to 30
-	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360);
+	return (int) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360);
 }
 
 
 
 
 
-short cPlayer::GetXpLevel()
+int cPlayer::GetXpLevel()
 {
 	return CalcLevelFromXp(m_CurrentXp);
 }
@@ -351,8 +351,8 @@ short cPlayer::GetXpLevel()
 
 float cPlayer::GetXpPercentage()
 {
-	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
-	short int currentLevel_XpBase = XpForLevel(currentLevel);
+	int currentLevel = CalcLevelFromXp(m_CurrentXp);
+	int currentLevel_XpBase = XpForLevel(currentLevel);
 
 	return (float)(m_CurrentXp - currentLevel_XpBase) /
 		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
@@ -362,9 +362,9 @@ float cPlayer::GetXpPercentage()
 
 
 
-bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
+bool cPlayer::SetCurrentExperience(int a_CurrentXp)
 {
-	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<short>().max() - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<int>().max() - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false;  // oops, they gave us a dodgey number
@@ -382,19 +382,19 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 
 
 
-short cPlayer::DeltaExperience(short a_Xp_delta)
+int cPlayer::DeltaExperience(int a_Xp_delta)
 {
-	if (a_Xp_delta > (std::numeric_limits<short>().max() - m_CurrentXp))
+	if (a_Xp_delta > (std::numeric_limits<int>().max() - m_CurrentXp))
 	{
 		// Value was bad, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.", a_Xp_delta);
+		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the int datatype. Ignoring.", a_Xp_delta);
 		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	m_CurrentXp = std::max<short>(m_CurrentXp, 0);
+	m_CurrentXp = std::max<int>(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -1725,8 +1725,8 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
-	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
-	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
+	m_LifetimeTotalXp     = (int) root.get("xpTotal", 0).asInt();
+	m_CurrentXp           = (int) root.get("xpCurrent", 0).asInt();
 	m_IsFlying            = root.get("isflying", 0).asBool();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
