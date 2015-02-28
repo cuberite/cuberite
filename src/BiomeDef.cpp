@@ -223,7 +223,7 @@ bool IsBiomeCold(EMCSBiome a_Biome)
 
 
 
-unsigned GetSnowStartHeight(EMCSBiome a_Biome)
+int GetSnowStartHeight(EMCSBiome a_Biome)
 {
 	switch (a_Biome)
 	{

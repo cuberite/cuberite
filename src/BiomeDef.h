@@ -130,6 +130,6 @@ Doesn't report Very Cold biomes, use IsBiomeVeryCold() for those. */
 extern bool IsBiomeCold(EMCSBiome a_Biome);
 
 /** Returns the height when a biome when a biome starts snowing.*/
-extern unsigned GetSnowStartHeight(EMCSBiome a_Biome);
+extern int GetSnowStartHeight(EMCSBiome a_Biome);
 
 // tolua_end
