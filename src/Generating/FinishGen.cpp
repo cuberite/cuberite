@@ -287,7 +287,7 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 
 			int Height = a_ChunkDesc.GetHeight(x, z);
-			for (int y = Height; y > 40; y--)
+			for (int y = Height; y > m_Level; y--)
 			{
 				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
 				{

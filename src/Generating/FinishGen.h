@@ -122,8 +122,9 @@ class cFinishGenVines :
 	public cFinishGen
 {
 public:
-	cFinishGenVines(int a_Seed) : 
-		m_Noise(a_Seed) 
+	cFinishGenVines(int a_Seed, int a_Level) : 
+		m_Noise(a_Seed),
+		m_Level(a_Level)
 	{
 	}
 
@@ -131,6 +132,7 @@ public:
 
 protected:
 	cNoise m_Noise;
+	int    m_Level;
 
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 };
