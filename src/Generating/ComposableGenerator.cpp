@@ -616,6 +616,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			int MaxDensity = a_IniFile.GetValueSetI("Generator", "VillageMaxDensity", 80);
 			m_FinishGens.push_back(std::make_shared<cVillageGen>(Seed, GridSize, MaxOffset, MaxDepth, MaxSize, MinDensity, MaxDensity, m_BiomeGen, m_CompositedHeightCache));
 		}
+		else if (NoCaseCompare(*itr, "Vines") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenVines(Seed)));
+		}
 		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
 			int Probability = a_IniFile.GetValueSetI("Generator", "WaterLakesProbability", 25);

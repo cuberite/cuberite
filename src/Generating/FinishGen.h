@@ -118,6 +118,27 @@ protected:
 
 
 
+class cFinishGenVines :
+	public cFinishGen
+{
+public:
+	cFinishGenVines(int a_Seed) : 
+		m_Noise(a_Seed) 
+	{
+	}
+
+	bool IsJungleVariant(EMCSBiome a_Biome);
+
+protected:
+	cNoise m_Noise;
+
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+};
+
+
+
+
+
 class cFinishGenSoulsandRims :
 	public cFinishGen
 {
