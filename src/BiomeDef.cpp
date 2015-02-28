@@ -222,3 +222,130 @@ bool IsBiomeCold(EMCSBiome a_Biome)
 
 
 
+
+int GetSnowStartHeight(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biIcePlainsSpikes:
+		case biIcePlains:
+		case biIceMountains:
+		case biFrozenRiver:
+		case biColdBeach:
+		case biColdTaiga:
+		case biColdTaigaHills:
+		case biColdTaigaM:
+		{
+			// Always snow
+			return 0;
+		}
+	
+		case biExtremeHills:
+		case biExtremeHillsM:
+		case biExtremeHillsPlus:
+		case biExtremeHillsPlusM:
+		case biStoneBeach:
+		{
+			// Starts snowing at 96
+			return 96;
+		}
+
+		case biTaiga:
+		case biTaigaHills:
+		case biTaigaM:
+		{
+			// Start snowing at 130
+			return 130;
+		}
+
+		case biMegaTaiga:
+		case biMegaSpruceTaiga:
+		case biMegaTaigaHills:
+		case biMegaSpruceTaigaHills:
+		{
+			// Start snowing at 160
+			return 160;
+		}
+
+		case biRiver:
+		case biOcean:
+		case biDeepOcean:
+		{
+			// Starts snowing at 280
+			return 280;
+		}
+
+		case biBirchForest:
+		case biBirchForestHills:
+		case biBirchForestM:
+		case biBirchForestHillsM:
+		{
+			// Starts snowing at 335
+			return 335;
+		}
+
+		case biForest:
+		case biForestHills:
+		case biFlowerForest:
+		case biRoofedForest:
+		case biRoofedForestM:
+		{
+			// Starts snowing at 400
+			return 400;
+		}
+
+		case biPlains:
+		case biSunflowerPlains:
+		case biSwampland:
+		case biSwamplandM:
+		case biBeach:
+		{
+			// Starts snowing at 460
+			return 460;
+		}
+
+		case biMushroomIsland:
+		case biMushroomShore:
+		{
+			// Starts snowing at 520
+			return 520;
+		}
+
+		case biJungle:
+		case biJungleHills:
+		case biJungleM:
+		case biJungleEdge:
+		case biJungleEdgeM:
+		{
+			// Starts snowing at 550
+			return 550;
+		}
+
+		case biDesert:
+		case biDesertHills:
+		case biDesertM:
+		case biSavanna:
+		case biSavannaM:
+		case biSavannaPlateau:
+		case biSavannaPlateauM:
+		case biMesa:
+		case biMesaBryce:
+		case biMesaPlateau:
+		case biMesaPlateauF:
+		case biMesaPlateauFM:
+		case biMesaPlateauM:
+		{
+			// These biomes don't actualy have any downfall.
+			return 1000;
+		}
+
+		default:
+		{
+			return 0;
+		}
+	}
+}
+
+
+
+
