@@ -71,14 +71,17 @@ public:
 };
 
 template<size_t size, class... Args>
-struct PackToInt {
-	enum {
+struct PackToInt
+{
+	enum
+	{
 		value = size - sizeof...(Args),
 	};
 };
 
 template<class Gen, class... Args>
-class cIntGenFactory {
+class cIntGenFactory
+{
 	
 public:
 
@@ -88,13 +91,10 @@ public:
 		m_args(std::make_tuple<Args...>(std::forward<Args>(a_args)...))
 	{
 	}
-	
-	//X >> Y
-	//Y(X)
-	//cIntGenFactory<cIntGenZoom<10, 10>, int>::construct<std::shared_ptr<cIntGenChoice<2, 7, 7> > >
-	
-	template<class LhsGen>
-	std::shared_ptr<Gen> construct(LhsGen&& lhs) {
+
+	template <class LhsGen>
+	std::shared_ptr<Gen> construct(LhsGen&& lhs)
+	{
 		return std::make_shared<Gen>(std::get<PackToInt<sizeof...(Args), Args>::value>(m_args)..., std::forward<LhsGen>(lhs));
 	}
 
@@ -104,12 +104,14 @@ private:
 };
 
 template<class T, class RhsGen, class... Args>
-std::shared_ptr<RhsGen> operator>> (std::shared_ptr<T> lhs, cIntGenFactory<RhsGen, Args...> rhs) {
+std::shared_ptr<RhsGen> operator>> (std::shared_ptr<T> lhs, cIntGenFactory<RhsGen, Args...> rhs)
+{
 	return rhs.construct(static_cast<std::shared_ptr<typename T::IntGenType>>(lhs));
 }
 
 template<class Gen, class... Args>
-cIntGenFactory<Gen, Args...> MakeIntGen(Args&&... args) {
+cIntGenFactory<Gen, Args...> MakeIntGen(Args&&... args)
+{
 	return cIntGenFactory<Gen, Args...>(std::forward<Args>(args)...);
 }
 

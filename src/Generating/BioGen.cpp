@@ -942,7 +942,7 @@ public:
 	{
 		auto FinalRivers =
 		
-			std::make_shared<cIntGenChoice<2, 7>>(a_Seed + 12) 
+			std::make_shared<cIntGenChoice<2, 7>>(a_Seed + 12)
 			>> MakeIntGen<cIntGenZoom  <10>>(a_Seed + 11)
 			>> MakeIntGen<cIntGenSmooth<8>>(a_Seed + 6)
 			>> MakeIntGen<cIntGenSmooth<6>>(a_Seed + 5)
