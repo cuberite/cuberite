@@ -31,6 +31,8 @@ by using templates.
 
 #include "../BiomeDef.h"
 
+#include <tuple>
+
 
 
 
@@ -53,6 +55,9 @@ template <int SizeX, int SizeZ = SizeX>
 class cIntGen
 {
 public:
+
+	typedef cIntGen<SizeX, SizeZ> IntGenType;
+
 	/** Force a virtual destructor in all descendants.
 	Descendants contain virtual functions and are referred to via pointer-to-base, so they need a virtual destructor. */
 	virtual ~cIntGen() {}
@@ -62,9 +67,51 @@ public:
 
 	/** Generates the array of templated size into a_Values, based on given min coords. */
 	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) = 0;
+	
 };
 
+template<size_t size, class... Args>
+struct PackToInt {
+	enum {
+		value = size - sizeof...(Args),
+	};
+};
 
+template<class Gen, class... Args>
+class cIntGenFactory {
+	
+public:
+
+	typedef Gen Generator;
+
+	cIntGenFactory(Args&&... a_args) :
+		m_args(std::make_tuple<Args...>(std::forward<Args>(a_args)...))
+	{
+	}
+	
+	//X >> Y
+	//Y(X)
+	//cIntGenFactory<cIntGenZoom<10, 10>, int>::construct<std::shared_ptr<cIntGenChoice<2, 7, 7> > >
+	
+	template<class LhsGen>
+	std::shared_ptr<Gen> construct(LhsGen&& lhs) {
+		return std::make_shared<Gen>(std::get<PackToInt<sizeof...(Args), Args>::value>(m_args)..., std::forward<LhsGen>(lhs));
+	}
+
+private:
+	std::tuple<Args...> m_args;
+	
+};
+
+template<class T, class RhsGen, class... Args>
+std::shared_ptr<RhsGen> operator>> (std::shared_ptr<T> lhs, cIntGenFactory<RhsGen, Args...> rhs) {
+	return rhs.construct(static_cast<std::shared_ptr<typename T::IntGenType>>(lhs));
+}
+
+template<class Gen, class... Args>
+cIntGenFactory<Gen, Args...> MakeIntGen(Args&&... args) {
+	return cIntGenFactory<Gen, Args...>(std::forward<Args>(args)...);
+}
 
 
 
@@ -688,7 +735,7 @@ public:
 			int IdxZ = z * SizeX;
 			for (int x = 0; x < SizeX; x++)
 			{
-				int val = a_Values[x + IdxZ];
+				size_t val = (size_t)a_Values[x + IdxZ];
 				const cBiomesInGroups & Biomes = (val > bgfRare) ?
 					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
 					biomesInGroups[val % ARRAYCOUNT(biomesInGroups)];

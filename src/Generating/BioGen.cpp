@@ -941,21 +941,21 @@ public:
 	cBioGenGrown(int a_Seed)
 	{
 		auto FinalRivers =
-			std::make_shared<cIntGenSmooth<8>>   (a_Seed + 1,
-			std::make_shared<cIntGenZoom  <10>>  (a_Seed + 2,
-			std::make_shared<cIntGenRiver <7>>   (a_Seed + 3,
-			std::make_shared<cIntGenZoom  <9>>   (a_Seed + 4,
-			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
-			std::make_shared<cIntGenZoom  <8>>   (a_Seed + 8,
-			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
-			std::make_shared<cIntGenZoom  <8>>   (a_Seed + 9,
-			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
-			std::make_shared<cIntGenZoom  <8>>   (a_Seed + 10,
-			std::make_shared<cIntGenSmooth<6>>   (a_Seed + 5,
-			std::make_shared<cIntGenSmooth<8>>   (a_Seed + 6,
-			std::make_shared<cIntGenZoom  <10>>  (a_Seed + 11,
-			std::make_shared<cIntGenChoice<2, 7>>(a_Seed + 12
-		))))))))))))));
+		
+			std::make_shared<cIntGenChoice<2, 7>>(a_Seed + 12) 
+			>> MakeIntGen<cIntGenZoom  <10>>(a_Seed + 11)
+			>> MakeIntGen<cIntGenSmooth<8>>(a_Seed + 6)
+			>> MakeIntGen<cIntGenSmooth<6>>(a_Seed + 5)
+			>> MakeIntGen<cIntGenZoom  <8>>(a_Seed + 10)
+			>> MakeIntGen<cIntGenSmooth<6>>(a_Seed + 5)
+			>> MakeIntGen<cIntGenZoom  <8>>(a_Seed + 9)
+			>> MakeIntGen<cIntGenSmooth<6>>(a_Seed + 5)
+			>> MakeIntGen<cIntGenZoom  <8>>(a_Seed + 8)
+			>> MakeIntGen<cIntGenSmooth<6>>(a_Seed + 5)
+			>> MakeIntGen<cIntGenZoom  <9>>(a_Seed + 4)
+			>> MakeIntGen<cIntGenRiver <7>>(a_Seed + 3)
+			>> MakeIntGen<cIntGenZoom  <10>>(a_Seed + 2)
+			>> MakeIntGen<cIntGenSmooth<8>>(a_Seed + 1);
 
 		auto alteration =
 			std::make_shared<cIntGenZoom     <8>>(a_Seed,
