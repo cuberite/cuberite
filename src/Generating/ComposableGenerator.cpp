@@ -619,7 +619,7 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 		else if (NoCaseCompare(*itr, "Vines") == 0)
 		{
 			int Level = a_IniFile.GetValueSetI("Generator", "VinesLevel", 40);
-			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenVines(Seed, Level)));
+			m_FinishGens.push_back(std::make_shared<cFinishGenVines>(Seed, Level));
 		}
 		else if (NoCaseCompare(*itr, "WaterLakes") == 0)
 		{
