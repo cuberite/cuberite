@@ -122,7 +122,7 @@ class cFinishGenVines :
 	public cFinishGen
 {
 public:
-	cFinishGenVines(int a_Seed, int a_Level) : 
+	cFinishGenVines(int a_Seed, int a_Level) :
 		m_Noise(a_Seed),
 		m_Level(a_Level)
 	{
