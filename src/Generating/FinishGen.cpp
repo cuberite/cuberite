@@ -281,7 +281,7 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
-			if (m_Noise.IntNoise2D(xx, zz) < 0.5)
+			if ((m_Noise.IntNoise2DInt(xx, zz) % 101) < 50)
 			{
 				continue;
 			}
@@ -295,7 +295,7 @@ void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				if (m_Noise.IntNoise3D(xx, y, zz) < 0.5)
+				if ((m_Noise.IntNoise3DInt(xx, y, zz) % 101) < 50)
 				{
 					continue;
 				}
