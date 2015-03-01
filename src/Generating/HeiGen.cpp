@@ -10,6 +10,66 @@
 #include "DistortedHeightmap.h"
 #include "EndGen.h"
 #include "Noise3DGenerator.h"
+#include "ProtIntGen.h"
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cHeiGenSteppy:
+
+class cHeiGenSteppy:
+	public cTerrainHeightGen
+{
+public:
+	cHeiGenSteppy(int a_Seed) :
+		m_Seed(a_Seed)
+	{
+		m_Gen =
+			std::make_shared<cProtIntGenWeightAvg<16, 1, 0>>(
+			std::make_shared<cProtIntGenSmooth>             (a_Seed + 1,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 2,
+			std::make_shared<cProtIntGenSmooth>             (a_Seed + 3,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 4,
+			std::make_shared<cProtIntGenAddRnd>             (a_Seed + 5, 1,
+			std::make_shared<cProtIntGenSmooth>             (a_Seed + 6,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 7,
+			std::make_shared<cProtIntGenRndBetween>         (a_Seed + 8, 60,
+			std::make_shared<cProtIntGenAddRnd>             (a_Seed + 9, 1,
+			std::make_shared<cProtIntGenSmooth>             (a_Seed + 1,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 2,
+			std::make_shared<cProtIntGenRndBetween>         (a_Seed + 3, 60,
+			std::make_shared<cProtIntGenSmooth>             (a_Seed + 4,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 5,
+			std::make_shared<cProtIntGenRndBetween>         (a_Seed + 6, 60,
+			std::make_shared<cProtIntGenRndChoice>          (a_Seed + 7, 10, 50, 50,
+			std::make_shared<cProtIntGenSmooth>             (a_Seed + 8,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 9,
+			std::make_shared<cProtIntGenRndChoice>          (a_Seed + 1, 10, 50, 50,
+			std::make_shared<cProtIntGenAddRnd>             (a_Seed + 2, 2,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 3,
+			std::make_shared<cProtIntGenZoom>               (a_Seed + 4,
+			std::make_shared<cProtIntGenChoice>             (a_Seed + 5, 10)
+		)))))))))))))))))))))));
+	}
+
+	// cTerrainHeightGen overrides:
+	virtual void GenHeightMap(int a_ChunkX, int a_ChunkZ, cChunkDef::HeightMap & a_HeightMap) override
+	{
+		int heights[cChunkDef::Width * cChunkDef::Width];
+		m_Gen->GetInts(a_ChunkX * cChunkDef::Width, a_ChunkZ * cChunkDef::Width, cChunkDef::Width, cChunkDef::Width, heights);
+		for (auto i = 0; i < ARRAYCOUNT(heights); i++)
+		{
+			a_HeightMap[i] = static_cast<HEIGHTTYPE>(std::max(std::min(60 + heights[i], cChunkDef::Height - 60), 40));
+		}
+	}
+
+protected:
+	int m_Seed;
+
+	SharedPtr<cProtIntGen> m_Gen;
+};
 
 
 
@@ -820,6 +880,10 @@ cTerrainHeightGenPtr cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cB
 		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
 		// Return an empty pointer, the caller will create the proper generator:
 		return cTerrainHeightGenPtr();
+	}
+	else if (NoCaseCompare(HeightGenName, "Steppy") == 0)
+	{
+		res = std::make_shared<cHeiGenSteppy>(a_Seed);
 	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
