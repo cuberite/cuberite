@@ -25,13 +25,14 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
 	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
 	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
-	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined);
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 	PM:AddHook(cPluginManager.HOOK_CHUNK_UNLOADING,              OnChunkUnloading);
 	PM:AddHook(cPluginManager.HOOK_WORLD_STARTED,                OnWorldStarted);
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 
+	-- _X: Disabled WECUI manipulation:
+	-- PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
