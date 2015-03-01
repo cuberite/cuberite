@@ -105,15 +105,15 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 		SetPosX(World->GetSpawnX());
 		SetPosY(World->GetSpawnY());
 		SetPosZ(World->GetSpawnZ());
-		SetBedPos(Vector3i((int)World->GetSpawnX(), (int)World->GetSpawnY(), (int)World->GetSpawnZ()));
+		SetBedPos(Vector3i(static_cast<int>(World->GetSpawnX()), static_cast<int>(World->GetSpawnY()), static_cast<int>(World->GetSpawnZ())));
 		
 		LOGD("Player \"%s\" is connecting for the first time, spawning at default world spawn {%.2f, %.2f, %.2f}",
 			a_PlayerName.c_str(), GetPosX(), GetPosY(), GetPosZ()
 		);
 	}
 
-	m_LastJumpHeight = (float)(GetPosY());
-	m_LastGroundHeight = (float)(GetPosY());
+	m_LastJumpHeight = static_cast<float>(GetPosY());
+	m_LastGroundHeight = static_cast<float>(GetPosY());
 	m_Stance = GetPosY() + 1.62;
 
 	if (m_GameMode == gmNotSet)
@@ -278,7 +278,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (IsFlying())
 	{
-		m_LastGroundHeight = (float)GetPosY();
+		m_LastGroundHeight = static_cast<float>(GetPosY());
 	}
 
 	if (m_TicksUntilNextSave == 0)
@@ -296,7 +296,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-short cPlayer::CalcLevelFromXp(short a_XpTotal)
+int cPlayer::CalcLevelFromXp(int a_XpTotal)
 {
 	// level 0 to 15
 	if (a_XpTotal <= XP_TO_LEVEL15)
@@ -307,18 +307,18 @@ short cPlayer::CalcLevelFromXp(short a_XpTotal)
 	// level 30+
 	if (a_XpTotal > XP_TO_LEVEL30)
 	{
-		return (short) (151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7;
+		return static_cast<int>((151.5 + sqrt( 22952.25 - (14 * (2220 - a_XpTotal)))) / 7);
 	}
 
 	// level 16 to 30
-	return (short) ( 29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3;
+	return static_cast<int>((29.5 + sqrt( 870.25 - (6 * ( 360 - a_XpTotal)))) / 3);
 }
 
 
 
 
 
-short cPlayer::XpForLevel(short a_Level)
+int cPlayer::XpForLevel(int a_Level)
 {
 	// level 0 to 15
 	if (a_Level <= 15)
@@ -329,18 +329,18 @@ short cPlayer::XpForLevel(short a_Level)
 	// level 30+
 	if (a_Level >= 31)
 	{
-		return (short) ( (3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220);
+		return static_cast<int>((3.5 * a_Level * a_Level) - (151.5 * a_Level) + 2220);
 	}
 
 	// level 16 to 30
-	return (short) ( (1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360);
+	return static_cast<int>((1.5 * a_Level * a_Level) - (29.5 * a_Level) + 360);
 }
 
 
 
 
 
-short cPlayer::GetXpLevel()
+int cPlayer::GetXpLevel()
 {
 	return CalcLevelFromXp(m_CurrentXp);
 }
@@ -351,20 +351,20 @@ short cPlayer::GetXpLevel()
 
 float cPlayer::GetXpPercentage()
 {
-	short int currentLevel = CalcLevelFromXp(m_CurrentXp);
-	short int currentLevel_XpBase = XpForLevel(currentLevel);
+	int currentLevel = CalcLevelFromXp(m_CurrentXp);
+	int currentLevel_XpBase = XpForLevel(currentLevel);
 
-	return (float)(m_CurrentXp - currentLevel_XpBase) /
-		(float)(XpForLevel(1+currentLevel) - currentLevel_XpBase);
+	return static_cast<float>(m_CurrentXp - currentLevel_XpBase) /
+		static_cast<float>(XpForLevel(1+currentLevel) - currentLevel_XpBase);
 }
 
 
 
 
 
-bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
+bool cPlayer::SetCurrentExperience(int a_CurrentXp)
 {
-	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<short>().max() - m_LifetimeTotalXp)))
+	if (!(a_CurrentXp >= 0) || (a_CurrentXp > (std::numeric_limits<int>().max() - m_LifetimeTotalXp)))
 	{
 		LOGWARNING("Tried to update experiece with an invalid Xp value: %d", a_CurrentXp);
 		return false;  // oops, they gave us a dodgey number
@@ -382,19 +382,19 @@ bool cPlayer::SetCurrentExperience(short int a_CurrentXp)
 
 
 
-short cPlayer::DeltaExperience(short a_Xp_delta)
+int cPlayer::DeltaExperience(int a_Xp_delta)
 {
-	if (a_Xp_delta > (std::numeric_limits<short>().max() - m_CurrentXp))
+	if (a_Xp_delta > (std::numeric_limits<int>().max() - m_CurrentXp))
 	{
 		// Value was bad, abort and report
-		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the short datatype. Ignoring.", a_Xp_delta);
+		LOGWARNING("Attempt was made to increment Xp by %d, which overflowed the int datatype. Ignoring.", a_Xp_delta);
 		return -1;  // Should we instead just return the current Xp?
 	}
 
 	m_CurrentXp += a_Xp_delta;
 
 	// Make sure they didn't subtract too much
-	m_CurrentXp = std::max<short>(m_CurrentXp, 0);
+	m_CurrentXp = std::max(m_CurrentXp, 0);
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -466,7 +466,7 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 	{
 		if (GetPosY() > m_LastJumpHeight)
 		{
-			m_LastJumpHeight = (float)GetPosY();
+			m_LastJumpHeight = static_cast<float>(GetPosY());
 		}
 		cWorld * World = GetWorld();
 		if ((GetPosY() >= 0) && (GetPosY() < cChunkDef::Height))
@@ -483,13 +483,13 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 				(BlockType == E_BLOCK_VINES)
 			)
 			{
-				m_LastGroundHeight = (float)GetPosY();
+				m_LastGroundHeight = static_cast<float>(GetPosY());
 			}
 		}
 	}
 	else
 	{
-		float Dist = (float)(m_LastGroundHeight - floor(GetPosY()));
+		float Dist = static_cast<float>(m_LastGroundHeight - floor(GetPosY()));
 
 		if (Dist >= 2.0)  // At least two blocks - TODO: Use m_LastJumpHeight instead of m_LastGroundHeight above
 		{
@@ -497,12 +497,12 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			m_Stats.AddValue(statDistFallen, (StatValue)floor(Dist * 100 + 0.5));
 		}
 
-		int Damage = (int)(Dist - 3.f);
+		int Damage = static_cast<int>(Dist - 3.f);
 		if (m_LastJumpHeight > m_LastGroundHeight)
 		{
 			Damage++;
 		}
-		m_LastJumpHeight = (float)GetPosY();
+		m_LastJumpHeight = static_cast<float>(GetPosY());
 
 		if (Damage > 0)
 		{
@@ -510,10 +510,10 @@ void cPlayer::SetTouchGround(bool a_bTouchGround)
 			TakeDamage(dtFalling, nullptr, Damage, Damage, 0);
 			
 			// Fall particles
-			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, (int)GetPosY() - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
+			GetWorld()->BroadcastSoundParticleEffect(2006, POSX_TOINT, static_cast<int>(GetPosY()) - 1, POSZ_TOINT, Damage /* Used as particle effect speed modifier */);
 		}
 
-		m_LastGroundHeight = (float)GetPosY();
+		m_LastGroundHeight = static_cast<float>(GetPosY());
 	}
 }
 
@@ -551,7 +551,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 
 void cPlayer::SetFoodSaturationLevel(double a_FoodSaturationLevel)
 {
-	m_FoodSaturationLevel = Clamp(a_FoodSaturationLevel, 0.0, (double) m_FoodLevel);
+	m_FoodSaturationLevel = Clamp(a_FoodSaturationLevel, 0.0, static_cast<double>(m_FoodLevel));
 }
 
 
@@ -1275,8 +1275,8 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	SetPosition(a_PosX, a_PosY, a_PosZ);
-	m_LastGroundHeight = (float)a_PosY;
-	m_LastJumpHeight = (float)a_PosY;
+	m_LastGroundHeight = static_cast<float>(a_PosY);
+	m_LastJumpHeight = static_cast<float>(a_PosY);
 	m_bIsTeleporting = true;
 
 	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
@@ -1714,9 +1714,9 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	Json::Value & JSON_PlayerRotation = root["rotation"];
 	if (JSON_PlayerRotation.size() == 3)
 	{
-		SetYaw      ((float)JSON_PlayerRotation[(unsigned)0].asDouble());
-		SetPitch    ((float)JSON_PlayerRotation[(unsigned)1].asDouble());
-		SetRoll     ((float)JSON_PlayerRotation[(unsigned)2].asDouble());
+		SetYaw      (static_cast<float>(JSON_PlayerRotation[(unsigned)0].asDouble()));
+		SetPitch    (static_cast<float>(JSON_PlayerRotation[(unsigned)1].asDouble()));
+		SetRoll     (static_cast<float>(JSON_PlayerRotation[(unsigned)2].asDouble()));
 	}
 
 	m_Health              = root.get("health",         0).asInt();
@@ -1725,8 +1725,8 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
-	m_LifetimeTotalXp     = (short) root.get("xpTotal", 0).asInt();
-	m_CurrentXp           = (short) root.get("xpCurrent", 0).asInt();
+	m_LifetimeTotalXp     = root.get("xpTotal", 0).asInt();
+	m_CurrentXp           = root.get("xpCurrent", 0).asInt();
 	m_IsFlying            = root.get("isflying", 0).asBool();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
@@ -1812,18 +1812,18 @@ bool cPlayer::SaveToDisk()
 		root["world"] = m_World->GetName();
 		if (m_GameMode == m_World->GetGameMode())
 		{
-			root["gamemode"] = (int) eGameMode_NotSet;
+			root["gamemode"] = static_cast<int>(eGameMode_NotSet);
 		}
 		else
 		{
-			root["gamemode"] = (int) m_GameMode;
+			root["gamemode"] = static_cast<int>(m_GameMode);
 		}
 	}
 	else
 	{
 		// This happens if the player is saved to new format after loading from the old format
 		root["world"]    = m_LoadedWorldName;
-		root["gamemode"] = (int) eGameMode_NotSet;
+		root["gamemode"] = static_cast<int>(eGameMode_NotSet);
 	}
 
 	Json::StyledWriter writer;
@@ -1839,7 +1839,7 @@ bool cPlayer::SaveToDisk()
 		);
 		return false;
 	}
-	if (f.Write(JsonData.c_str(), JsonData.size()) != (int)JsonData.size())
+	if (f.Write(JsonData.c_str(), JsonData.size()) != static_cast<int>(JsonData.size()))
 	{
 		LOGWARNING("Error writing player \"%s\" to file \"%s\" - cannot save data. Player will lose their progress. ",
 			GetName().c_str(), SourceFile.c_str()
@@ -1894,7 +1894,7 @@ void cPlayer::UseEquippedItem(int a_Amount)
 
 	if (GetInventory().DamageEquippedItem(a_Amount))
 	{
-		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, (float)(0.75 + ((float)((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect("random.break", GetPosX(), GetPosY(), GetPosZ(), 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 	}
 }
 
@@ -2042,17 +2042,17 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos)
 		else if (IsSubmerged())
 		{
 			m_Stats.AddValue(statDistDove, Value);
-			AddFoodExhaustion(0.00015 * (double)Value);
+			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
 		else if (IsSwimming())
 		{
 			m_Stats.AddValue(statDistSwum, Value);
-			AddFoodExhaustion(0.00015 * (double)Value);
+			AddFoodExhaustion(0.00015 * static_cast<double>(Value));
 		}
 		else if (IsOnGround())
 		{
 			m_Stats.AddValue(statDistWalked, Value);
-			AddFoodExhaustion((m_IsSprinting ? 0.001 : 0.0001) * (double)Value);
+			AddFoodExhaustion((m_IsSprinting ? 0.001 : 0.0001) * static_cast<double>(Value));
 		}
 		else
 		{
