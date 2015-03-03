@@ -2392,10 +2392,10 @@ static int tolua_md5HexString(lua_State * tolua_S)
 
 	// Convert the md5 checksum to hex string:
 	std::stringstream Output;
-	Output << std::hex << std::setw(2) << std::setfill('0');
+	Output << std::hex << std::setfill('0');
 	for (size_t i = 0; i < ARRAYCOUNT(md5Output); i++)
 	{
-		Output << static_cast<unsigned short>(md5Output[i]);  // Need to cast to a number, otherwise a char is output
+		Output << std::setw(2) << static_cast<unsigned short>(md5Output[i]);  // Need to cast to a number, otherwise a char is output
 	}
 	lua_pushlstring(tolua_S, Output.str().c_str(), Output.str().size());
 	return 1;
@@ -2438,10 +2438,10 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 
 	// Convert the sha1 checksum to hex string:
 	std::stringstream Output;
-	Output << std::hex << std::setw(2) << std::setfill('0');
+	Output << std::hex << std::setfill('0');
 	for (size_t i = 0; i < ARRAYCOUNT(sha1Output); i++)
 	{
-		Output << static_cast<unsigned short>(sha1Output[i]);  // Need to cast to a number, otherwise a char is output
+		Output << std::setw(2) << static_cast<unsigned short>(sha1Output[i]);  // Need to cast to a number, otherwise a char is output
 	}
 	lua_pushlstring(tolua_S, Output.str().c_str(), Output.str().size());
 	return 1;
