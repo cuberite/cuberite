@@ -1,13 +1,9 @@
 #include "Globals.h"
 #include "BlockBed.h"
 
-
-
-
 #include "BroadcastInterface.h"
 #include "Entities/../World.h"
 #include "Entities/Player.h"
-#include "WorldInterface.h"
 
 
 
@@ -127,7 +123,14 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 				a_Player->SetIsInBed(true);
 				a_Player->SendMessageSuccess("Home position set successfully");
 
-				a_WorldInterface.ScheduleTask(20, cWorld::cTaskTryAwakeSleepingPlayers(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_ChunkInterface));
+				cTimeFastForwardTester Tester;
+				if (a_WorldInterface.ForEachPlayer(Tester))
+				{
+					cPlayerBedStateUnsetter Unsetter(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_ChunkInterface);
+					a_WorldInterface.ForEachPlayer(Unsetter);
+					a_WorldInterface.SetTimeOfDay(0);
+					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block
+				}
 			}
 		}
 		else

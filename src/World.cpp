@@ -47,7 +47,6 @@
 #include "Generating/Trees.h"
 #include "Bindings/PluginManager.h"
 #include "Blocks/BlockHandler.h"
-#include "Blocks/BlockBed.cpp"
 
 #include "Tracer.h"
 
@@ -3615,30 +3614,6 @@ void cWorld::cTaskSendBlockToAllPlayers::Run(cWorld & a_World)
 	} PlayerCallback(m_SendQueue, a_World);
 
 	a_World.ForEachPlayer(PlayerCallback);
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// cWorld::cTaskSendBlockToAllPlayers
-
-cWorld::cTaskTryAwakeSleepingPlayers::cTaskTryAwakeSleepingPlayers(const Vector3i & a_Position, cChunkInterface & a_ChunkInterface) :
-	m_Position(a_Position),
-	m_ChunkInterface(a_ChunkInterface)
-{
-}
-
-void cWorld::cTaskTryAwakeSleepingPlayers::Run(cWorld & a_World)
-{
-	cTimeFastForwardTester Tester;
-	if (a_World.ForEachPlayer(Tester))
-	{
-		cPlayerBedStateUnsetter Unsetter(m_Position, m_ChunkInterface);
-		a_World.ForEachPlayer(Unsetter);
-		a_World.SetTimeOfDay(0);
-	}
 }
 
 

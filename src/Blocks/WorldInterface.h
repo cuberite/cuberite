@@ -11,7 +11,6 @@ typedef cItemCallback<cBlockEntity> cBlockEntityCallback;
 
 class cMonster;
 class cPlayer;
-class cTask;
 
 
 class cWorldInterface
@@ -59,9 +58,5 @@ public:
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ) = 0;
-
-	/** Queues a task onto the tick thread, with the specified delay.
-	The task object will be deleted once the task is finished */
-	virtual void ScheduleTask(int a_DelayTicks, cTask * a_Task) = 0;
 
 };

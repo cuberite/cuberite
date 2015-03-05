@@ -1740,7 +1740,8 @@ void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
 		return;
 	}
 
-	cBlockBedHandler::SetBedOccupationState(cChunkInterface(GetPlayer()->GetWorld()->GetChunkMap()), GetPlayer()->GetLastBedPos(), false);
+	cChunkInterface Interface(GetPlayer()->GetWorld()->GetChunkMap());
+	cBlockBedHandler::SetBedOccupationState(Interface, GetPlayer()->GetLastBedPos(), false);
 	GetPlayer()->SetIsInBed(false);
 }
 
