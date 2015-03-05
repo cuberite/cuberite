@@ -1632,8 +1632,12 @@ void cEntity::TeleportToEntity(cEntity & a_Entity)
 
 void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	SetPosition(a_PosX, a_PosY, a_PosZ);
-	m_World->BroadcastTeleportEntity(*this);
+	//  ask the plugins to allow teleport to the new position.
+	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	{
+		SetPosition(a_PosX, a_PosY, a_PosZ);
+		m_World->BroadcastTeleportEntity(*this);
+	}
 }
 
 

@@ -23,6 +23,7 @@ function Initialize(Plugin)
 	cPluginManager.AddHook(cPluginManager.HOOK_COLLECTING_PICKUP,     OnCollectingPickup);
 	cPluginManager.AddHook(cPluginManager.HOOK_CRAFTING_NO_RECIPE,    OnCraftingNoRecipe);
 	cPluginManager.AddHook(cPluginManager.HOOK_DISCONNECT,            OnDisconnect);
+	cPluginManager.AddHook(cPluginManager.HOOK_ENTITY_TELEPORT,       OnEntityTeleport);
 	cPluginManager.AddHook(cPluginManager.HOOK_EXECUTE_COMMAND,       OnExecuteCommand);
 	cPluginManager.AddHook(cPluginManager.HOOK_HANDSHAKE,             OnHandshake);
 	cPluginManager.AddHook(cPluginManager.HOOK_KILLING,               OnKilling);
@@ -173,6 +174,22 @@ end
 
 function OnDisconnect(...)
 	LogHook("OnDisconnect", unpack(arg));
+end
+
+
+
+
+
+function OnEntityTeleport(arg1,arg2,arg3)
+	if arg1.IsPlayer() then
+		-- if it's a player, get his name
+		LOG("OnEntityTeleport: Player: " .. arg1.GetName());
+	else
+		-- if it's a entity, get its type
+		LOG("OnEntityTeleport: EntityType: " .. arg1.GetEntityType());
+	end
+	LOG("OldPos: " .. arg2.x .. " / " .. arg2.y .. " / " .. arg2.z);
+	LOG("NewPos: " .. arg3.x .. " / " .. arg3.y .. " / " .. arg3.z);
 end
 
 
