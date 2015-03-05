@@ -109,6 +109,7 @@ public:
 		HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
 		HOOK_PLAYER_SHOOTING,
 		HOOK_PLAYER_SPAWNED,
+		HOOK_ENTITY_TELEPORT,
 		HOOK_PLAYER_TOSSING_ITEM,
 		HOOK_PLAYER_USED_BLOCK,
 		HOOK_PLAYER_USED_ITEM,
@@ -190,6 +191,7 @@ public:
 	bool CallHookCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
 	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
 	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
+	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
 	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == nullptr, it is a console cmd
 	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
 	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);

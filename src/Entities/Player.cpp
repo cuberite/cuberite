@@ -232,7 +232,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	bool CanMove = true;
-	if (!GetPosition().EqualsEps(m_LastPos, 0.01))  // Non negligible change in position from last tick?
+	if (!GetPosition().EqualsEps(m_LastPos, 0.02))  // Non negligible change in position from last tick? 0.02 tp prevent continous calling while floating sometimes.
 	{
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
@@ -395,6 +395,7 @@ int cPlayer::DeltaExperience(int a_Xp_delta)
 
 	// Make sure they didn't subtract too much
 	m_CurrentXp = std::max(m_CurrentXp, 0);
+
 
 	// Update total for score calculation
 	if (a_Xp_delta > 0)
@@ -1274,13 +1275,17 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	SetPosition(a_PosX, a_PosY, a_PosZ);
-	m_LastGroundHeight = static_cast<float>(a_PosY);
-	m_LastJumpHeight = static_cast<float>(a_PosY);
-	m_bIsTeleporting = true;
+	//  ask plugins to allow teleport to the new position.
+	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	{
+		SetPosition(a_PosX, a_PosY, a_PosZ);
+		m_LastGroundHeight = static_cast<float>(a_PosY);
+		m_LastJumpHeight = static_cast<float>(a_PosY);
+		m_bIsTeleporting = true;
 
-	m_World->BroadcastTeleportEntity(*this, GetClientHandle());
-	m_ClientHandle->SendPlayerMoveLook();
+		m_World->BroadcastTeleportEntity(*this, GetClientHandle());
+		m_ClientHandle->SendPlayerMoveLook();
+	}
 }
 
 
@@ -1725,9 +1730,9 @@ bool cPlayer::LoadFromFile(const AString & a_FileName, cWorldPtr & a_World)
 	m_FoodSaturationLevel = root.get("foodSaturation", MAX_FOOD_LEVEL).asDouble();
 	m_FoodTickTimer       = root.get("foodTickTimer",  0).asInt();
 	m_FoodExhaustionLevel = root.get("foodExhaustion", 0).asDouble();
-	m_LifetimeTotalXp     = root.get("xpTotal", 0).asInt();
-	m_CurrentXp           = root.get("xpCurrent", 0).asInt();
-	m_IsFlying            = root.get("isflying", 0).asBool();
+	m_LifetimeTotalXp     = root.get("xpTotal",        0).asInt();
+	m_CurrentXp           = root.get("xpCurrent",      0).asInt();
+	m_IsFlying            = root.get("isflying",       0).asBool();
 
 	m_GameMode = (eGameMode) root.get("gamemode", eGameMode_NotSet).asInt();
 

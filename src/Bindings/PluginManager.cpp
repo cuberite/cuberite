@@ -505,6 +505,24 @@ bool cPluginManager::CallHookEntityAddEffect(cEntity & a_Entity, int a_EffectTyp
 
 
 
+bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+{
+	FIND_HOOK(HOOK_ENTITY_TELEPORT);
+	VERIFY_HOOK;
+
+	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
+	{
+		if ((*itr)->OnEntityTeleport(a_Entity, a_OldPosition, a_NewPosition))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
 bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
