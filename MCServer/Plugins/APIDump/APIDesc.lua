@@ -197,7 +197,7 @@ g_APIDesc =
 				baMetas = { Notes = "Operations should work on block metas" },
 				baLight = { Notes = "Operations should work on block (emissive) light" },
 				baSkyLight = { Notes = "Operations should work on skylight" },
-				msDifference = { Notes = "Block becomes air if Src and Dst are the same." },
+				msDifference = { Notes = "Block becomes air if Src and Dst are the same. Else it becomes the source block." },
 				msOverwrite = { Notes = "Src overwrites anything in Dst" },
 				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
