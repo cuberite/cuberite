@@ -2490,7 +2490,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				GetMapManager = { Params = "", Return = "{{cMapManager}}", Notes = "Returns the {{cMapManager|MapManager}} object used by this world." },
 				GetMaxCactusHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which cacti will grow naturally." },
 				GetMaxSugarcaneHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which sugarcane will grow naturally." },
-				GetMaxViewDistance = { Params = "", Return = "number", Notes = "Returns the maximum viewdistance." },
+				GetMaxViewDistance = { Params = "", Return = "number", Notes = "Returns the maximum viewdistance that players can see in this world.." },
 				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },
 				GetNetherWorldName = { Params = "", Return = "string", Notes = "Returns the name of the Netherworld linked to this world." },
 				GetNumChunks = { Params = "", Return = "number", Notes = "Returns the number of chunks currently loaded." },
