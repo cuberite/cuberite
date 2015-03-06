@@ -356,9 +356,11 @@ g_APIDesc =
 			]],
 			Functions =
 			{
+				CanBeTerraformed = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns true if the block is suitable to be changed by a generator" },
 				FullyOccupiesVoxel = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block fully occupies its voxel." },
 				Get = { Params = "Type", Return = "{{cBlockInfo}}", Notes = "(STATIC) Returns the {{cBlockInfo}} structure for the specified type." },
 				GetLightValue = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block emits on its own." },
+				GetPlaceSound = { Params = "Type", Return = "", Notes = "(STATIC) Returns the name of the sound that is played when placing the block." },
 				GetSpreadLightFalloff = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block consumes." },
 				IsOneHitDig = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block will be destroyed after a single hit." },
 				IsPistonBreakable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether a piston can break the specified block." },
@@ -369,12 +371,14 @@ g_APIDesc =
 			},
 			Variables =
 			{
+				m_CanBeTerraformed = { Type = "bool", Notes = "Is this block suited to be terraformed?" },
 				m_FullyOccupiesVoxel = { Type = "bool", Notes = "Does this block fully occupy its voxel - is it a 'full' block?" },
 				m_IsSnowable = { Type = "bool", Notes = "Can this block hold snow atop?" },
 				m_IsSolid = { Type = "bool", Notes = "Is this block solid (player cannot walk through)?" },
 				m_LightValue = { Type = "number", Notes = "How much light do the blocks emit on their own?" },
 				m_OneHitDig = { Type = "bool", Notes = "Is a block destroyed after a single hit?" },
 				m_PistonBreakable = { Type = "bool", Notes = "Can a piston break this block?" },
+				m_PlaceSound = { Type = "string", Notes = "The name of the sound that is placed when a block is placed." },
 				m_RequiresSpecialTool = { Type = "bool", Notes = "Does this block require a tool to drop?" },
 				m_SpreadLightFalloff = { Type = "number", Notes = "How much light do the blocks consume?" },
 				m_Transparent = { Type = "bool", Notes = "Is a block completely transparent? (light doesn't get decreased(?))" },
