@@ -244,6 +244,100 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// cFinishGenVines
+
+bool cFinishGenVines::IsJungleVariant(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biJungle:
+		case biJungleEdge:
+		case biJungleEdgeM:
+		case biJungleHills:
+		case biJungleM:
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
+
+
+void cFinishGenVines::GenFinish(cChunkDesc & a_ChunkDesc)
+{
+	for (int x = 0; x < cChunkDef::Width; x++)
+	{
+		int xx = x + a_ChunkDesc.GetChunkX() * cChunkDef::Width;
+		for (int z = 0; z < cChunkDef::Width; z++)
+		{
+			int zz = z + a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
+			if (!IsJungleVariant(a_ChunkDesc.GetBiome(x, z)))
+			{
+				// Current biome isn't a jungle
+				continue;
+			}
+
+			if ((m_Noise.IntNoise2DInt(xx, zz) % 101) < 50)
+			{
+				continue;
+			}
+
+			int Height = a_ChunkDesc.GetHeight(x, z);
+			for (int y = Height; y > m_Level; y--)
+			{
+				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR)
+				{
+					// Can't place vines in non-air blocks
+					continue;
+				}
+
+				if ((m_Noise.IntNoise3DInt(xx, y, zz) % 101) < 50)
+				{
+					continue;
+				}
+
+				std::vector<NIBBLETYPE> Places;
+				if ((x + 1 < cChunkDef::Width) && cBlockInfo::FullyOccupiesVoxel(a_ChunkDesc.GetBlockType(x + 1, y, z)))
+				{
+					Places.push_back(8);
+				}
+
+				if ((x - 1 > 0) && cBlockInfo::FullyOccupiesVoxel(a_ChunkDesc.GetBlockType(x - 1, y, z)))
+				{
+					Places.push_back(2);
+				}
+
+				if ((z + 1 < cChunkDef::Width) && cBlockInfo::FullyOccupiesVoxel(a_ChunkDesc.GetBlockType(x, y, z + 1)))
+				{
+					Places.push_back(1);
+				}
+
+				if ((z - 1 > 0) && cBlockInfo::FullyOccupiesVoxel(a_ChunkDesc.GetBlockType(x, y, z - 1)))
+				{
+					Places.push_back(4);
+				}
+
+				if (Places.size() == 0)
+				{
+					continue;
+				}
+
+				NIBBLETYPE Meta = Places[m_Noise.IntNoise3DInt(xx, y, zz) % Places.size()];
+				a_ChunkDesc.SetBlockTypeMeta(x, y, z, E_BLOCK_VINES, Meta);
+			}
+		}
+	}
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // cFinishGenSprinkleFoliage:
 
 bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ)
@@ -470,30 +564,22 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			switch (a_ChunkDesc.GetBiome(x, z))
+			int Height = a_ChunkDesc.GetHeight(x, z);
+			if (GetSnowStartHeight(a_ChunkDesc.GetBiome(x, z)) > Height)
 			{
-				case biIcePlains:
-				case biIceMountains:
-				case biTaiga:
-				case biTaigaHills:
-				case biFrozenRiver:
-				case biFrozenOcean:
-				{
-					int Height = a_ChunkDesc.GetHeight(x, z);
-					if (cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
-					{
-						a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
-						a_ChunkDesc.SetHeight(x, z, Height + 1);
-					}
-					break;
-				}
-				default:
-				{
-					// There's no snow in the other biomes.
-					break;
-				}
+				// Height isn't high enough for snow to start forming.
+				continue;
 			}
-		}
+
+			if (!cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
+			{
+				// The top block can't be snown over.
+				continue;
+			}
+
+			a_ChunkDesc.SetBlockType(x, Height + 1, z, E_BLOCK_SNOW);
+			a_ChunkDesc.SetHeight(x, z, Height + 1);
+		}  // for x
 	}  // for z
 }
 
@@ -511,34 +597,27 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			switch (a_ChunkDesc.GetBiome(x, z))
+			int Height = a_ChunkDesc.GetHeight(x, z);
+			if (GetSnowStartHeight(a_ChunkDesc.GetBiome(x, z)) > Height)
 			{
-				case biIcePlains:
-				case biIceMountains:
-				case biTaiga:
-				case biTaigaHills:
-				case biFrozenRiver:
-				case biFrozenOcean:
-				{
-					int Height = a_ChunkDesc.GetHeight(x, z);
-					switch (a_ChunkDesc.GetBlockType(x, Height, z))
-					{
-						case E_BLOCK_WATER:
-						case E_BLOCK_STATIONARY_WATER:
-						{
-							a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_ICE);
-							break;
-						}
-					}
-					break;
-				}
-				default:
-				{
-					// No icy water in other biomes.
-					break;
-				}
+				// Height isn't high enough for snow to start forming.
+				continue;
 			}
-		}
+
+			if (!IsBlockWater(a_ChunkDesc.GetBlockType(x, Height, z)))
+			{
+				// The block isn't a water block.
+				continue;
+			}
+
+			if (a_ChunkDesc.GetBlockMeta(x, Height, z) != 0)
+			{
+				// The water block isn't a source block.
+				continue;
+			}
+
+			a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_ICE);
+		}  // for x
 	}  // for z
 }
 

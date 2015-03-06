@@ -70,7 +70,7 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		// These functions allow us to debug SSL and certificate problems, but produce way too much output,
 		// so they're disabled until someone needs them
 		ssl_set_dbg(&m_Ssl, &SSLDebugMessage, this);
-		debug_set_threshold(4);
+		debug_set_threshold(2);
 
 		ssl_set_verify(&m_Ssl, &SSLVerifyCert, this);
 		//*/

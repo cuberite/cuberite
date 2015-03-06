@@ -3,7 +3,12 @@ nbproject/
 ipch/
 Win32/
 MCServer/MCServer
+MCServer/buildinfo
+MCServer/CONTRIBUTORS
+MCServer/LICENSE
+MCServer/Licenses
 MCServer/itemblacklist
+Testing/
 ChunkWorxSave.ini
 doxy/
 Profiling
@@ -14,6 +19,7 @@ cloc.xsl
 *.ncb
 *.user
 *.suo
+*.sqlite
 /EveryNight.cmd
 /UploadLuaAPI.cmd
 AllFiles.lst

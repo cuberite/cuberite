@@ -11,6 +11,10 @@
 -- g_Servers[PortNum] = cServerHandle
 local g_Servers = {}
 
+--- Map of all UDP endpoints currently open
+-- g_UDPEndpoints[PortNum] = cUDPEndpoint
+local g_UDPEndpoints = {}
+
 --- List of fortune messages for the fortune server
 -- A random message is chosen for each incoming connection
 -- The contents are loaded from the splashes.txt file on plugin startup
@@ -18,6 +22,62 @@ local g_Fortunes =
 {
 	"Empty splashes.txt",
 }
+
+-- HTTPS certificate to be used for the SSL server:
+local g_HTTPSCert = [[
+-----BEGIN CERTIFICATE-----
+MIIDfzCCAmegAwIBAgIJAOBHN+qOWodcMA0GCSqGSIb3DQEBBQUAMFYxCzAJBgNV
+BAYTAmN6MQswCQYDVQQIDAJjejEMMAoGA1UEBwwDbG9jMQswCQYDVQQKDAJfWDEL
+MAkGA1UECwwCT1UxEjAQBgNVBAMMCWxvY2FsaG9zdDAeFw0xNTAxMjQwODQ2MzFa
+Fw0yNTAxMjEwODQ2MzFaMFYxCzAJBgNVBAYTAmN6MQswCQYDVQQIDAJjejEMMAoG
+A1UEBwwDbG9jMQswCQYDVQQKDAJfWDELMAkGA1UECwwCT1UxEjAQBgNVBAMMCWxv
+Y2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJkFYSElu/jw
+nxqjimmj246DejKJK8uy/l9QQibb/Z4kO/3s0gVPOYo0mKv32xUFP7wYIE3XWT61
+zyfvK+1jpnlQTCtM8T5xw/7CULKgLmuIzlQx5Dhy7d+tW46kOjFKwQajS9YzwqWu
+KBOPnFamQWz6vIzuM05+7aIMXbzamInvW/1x3klIrpGQgALwSB1N+oUzTInTBRKK
+21pecUE9t3qrU40Cs5bN0fQBnBjLwbgmnTh6LEplfQZHG5wLvj0IeERVU9vH7luM
+e9/IxuEZluCiu5ViF3jqLPpjYOrkX7JDSKme64CCmNIf0KkrwtFjF104Qylike60
+YD3+kw8Q+DECAwEAAaNQME4wHQYDVR0OBBYEFHHIDTc7mrLDXftjQ5ejU9Udfdyo
+MB8GA1UdIwQYMBaAFHHIDTc7mrLDXftjQ5ejU9UdfdyoMAwGA1UdEwQFMAMBAf8w
+DQYJKoZIhvcNAQEFBQADggEBAHxCJxZPmH9tvx8GKiDV3rgGY++sMItzrW5Uhf0/
+bl3DPbVz51CYF8nXiWvSJJzxhH61hKpZiqvRlpyMuovV415dYQ+Xc2d2IrTX6e+d
+Z4Pmwfb4yaX+kYqIygjXMoyNxOJyhTnCbJzycV3v5tvncBWN9Wqez6ZonWDdFdAm
+J+Moty+atc4afT02sUg1xz+CDr1uMbt62tHwKYCdxXCwT//bOs6W21+mQJ5bEAyA
+YrHQPgX76uo8ed8rPf6y8Qj//lzq/+33EIWqf9pnbklQgIPXJU07h+5L+Y63RF4A
+ComLkzas+qnQLcEN28Dg8QElXop6hfiD0xq3K0ac2bDnjoU=
+-----END CERTIFICATE-----
+]]
+
+local g_HTTPSPrivKey = [[
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCZBWEhJbv48J8a
+o4ppo9uOg3oyiSvLsv5fUEIm2/2eJDv97NIFTzmKNJir99sVBT+8GCBN11k+tc8n
+7yvtY6Z5UEwrTPE+ccP+wlCyoC5riM5UMeQ4cu3frVuOpDoxSsEGo0vWM8KlrigT
+j5xWpkFs+ryM7jNOfu2iDF282piJ71v9cd5JSK6RkIAC8EgdTfqFM0yJ0wUSitta
+XnFBPbd6q1ONArOWzdH0AZwYy8G4Jp04eixKZX0GRxucC749CHhEVVPbx+5bjHvf
+yMbhGZbgoruVYhd46iz6Y2Dq5F+yQ0ipnuuAgpjSH9CpK8LRYxddOEMpYpHutGA9
+/pMPEPgxAgMBAAECggEAWxQ4m+I54BJYoSJ2YCqHpGvdb/b1emkvvsumlDqc2mP2
+0U0ENOTS+tATj0gXvotBRFOX5r0nAYx1oO9a1hFaJRsGOz+w19ofLqO6JJfzCU6E
+gNixXmgJ7fjhZiWZ/XzhJ3JK0VQ9px/h+sKf63NJvfQABmJBZ5dlGe8CXEZARNin
+03TnE3RUIEK+jEgwShN2OrGjwK9fjcnXMHwEnKZtCBiYEfD2N+pQmS20gIm13L1t
++ZmObIC24NqllXxl4I821qzBdhmcT7+rGmKR0OT5YKbt6wFA5FPKD9dqlzXzlKck
+r2VAh+JlCtFKxcScmWtQOnVDtf5+mcKFbP4ck724AQKBgQDLk+RDhvE5ykin5R+B
+dehUQZgHb2pPL7N1DAZShfzwSmyZSOPQDFr7c0CMijn6G0Pw9VX6Vrln0crfTQYz
+Hli+zxlmcMAD/WC6VImM1LCUzouNRy37rSCnuPtngZyHdsyzfheGnjORH7HlPjtY
+JCTLaekg0ckQvt//HpRV3DCdaQKBgQDAbLmIOTyGfne74HLswWnY/kCOfFt6eO+E
+lZ724MWmVPWkxq+9rltC2CDx2i8jjdkm90dsgR5OG2EaLnUWldUpkE0zH0ATrZSV
+ezJWD9SsxTm8ksbThD+pJKAVPxDAboejF7kPvpaO2wY+bf0AbO3M24rJ2tccpMv8
+AcfXBICDiQKBgQCSxp81/I3hf7HgszaC7ZLDZMOK4M6CJz847aGFUCtsyAwCfGYb
+8zyJvK/WZDam14+lpA0IQAzPCJg/ZVZJ9uA/OivzCum2NrHNxfOiQRrLPxuokaBa
+q5k2tA02tGE53fJ6mze1DEzbnkFxqeu5gd2xdzvpOLfBxgzT8KU8PlQiuQKBgGn5
+NvCj/QZhDhYFVaW4G1ArLmiKamL3yYluUV7LiW7CaYp29gBzzsTwfKxVqhJdo5NH
+KinCrmr7vy2JGmj22a+LTkjyU/rCZQsyDxXAoDMKZ3LILwH8WocPqa4pzlL8TGzw
+urXGE+rXCwhE0Mp0Mz7YRgZHJKMcy06duG5dh11pAoGBALHbsBIDihgHPyp2eKMP
+K1f42MdKrTBiIXV80hv2OnvWVRCYvnhrqpeRMzCR1pmVbh+QhnwIMAdWq9PAVTTn
+ypusoEsG8Y5fx8xhgjs0D2yMcrmi0L0kCgHIFNoym+4pI+sv6GgxpemfrmaPNcMx
+DXi9JpaquFRJLGJ7jMCDgotL
+-----END PRIVATE KEY-----
+]]
 
 --- Map of all services that can be run as servers
 -- g_Services[ServiceName] = function() -> accept-callbacks
@@ -66,7 +126,7 @@ local g_Services =
 				return
 				{
 					OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
-						LOG("FortuneServer(" .. a_Port .. ": Connection to " .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. " failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+						LOG("FortuneServer(" .. a_Port .. "): Connection to " .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. " failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
 					end,
 					
 					OnReceivedData = function (a_Link, a_Data)
@@ -86,10 +146,55 @@ local g_Services =
 			
 			-- There was an error listening on the port:
 			OnError = function (a_ErrorCode, a_ErrorMsg)
-				LOGINFO("FortuneServer(" .. a_Port .. ": Cannot listen: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+				LOGINFO("FortuneServer(" .. a_Port .. "): Cannot listen: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
 			end,  -- OnError()
 		}  -- Listen callbacks
 	end,  -- fortune
+	
+	-- HTTPS time - serves current time for each https request received
+	httpstime = function (a_Port)
+		return
+		{
+			-- A new connection has come, give it new link-callbacks:
+			OnIncomingConnection = function (a_RemoteIP, a_RemotePort)
+				local IncomingData = ""  -- accumulator for the incoming data, until processed by the http
+				return
+				{
+					OnError = function (a_Link, a_ErrorCode, a_ErrorMsg)
+						LOG("https-time server(" .. a_Port .. "): Connection to " .. a_Link:GetRemoteIP() .. ":" .. a_Link:GetRemotePort() .. " failed: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+					end,
+					
+					OnReceivedData = function (a_Link, a_Data)
+						IncomingData = IncomingData .. a_Data
+						if (IncomingData:find("\r\n\r\n")) then
+							-- We have received the entire request headers, just send the response and shutdown the link:
+							local Content = os.date()
+							a_Link:Send("HTTP/1.0 200 OK\r\nContent-type: text/plain\r\nContent-length: " .. #Content .. "\r\n\r\n" .. Content)
+							a_Link:Shutdown()
+						end
+					end,
+					
+					OnRemoteClosed = function (a_Link)
+						LOG("httpstime: link closed by remote")
+					end
+				}  -- Link callbacks
+			end,  -- OnIncomingConnection()
+			
+			-- Start TLS on the new link:
+			OnAccepted = function (a_Link)
+				local res, msg = a_Link:StartTLSServer(g_HTTPSCert, g_HTTPSPrivKey, "")
+				if not(res) then
+					LOG("https-time server(" .. a_Port .. "): Cannot start TLS server: " .. msg)
+					a_Link:Close()
+				end
+			end,  -- OnAccepted()
+			
+			-- There was an error listening on the port:
+			OnError = function (a_ErrorCode, a_ErrorMsg)
+				LOGINFO("https-time server(" .. a_Port .. "): Cannot listen: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+			end,  -- OnError()
+		}  -- Listen callbacks
+	end,  -- httpstime
 	
 	-- TODO: Other services (daytime, ...)
 }
@@ -167,7 +272,7 @@ function HandleConsoleNetClose(a_Split)
 	-- Get the port to close:
 	local Port = tonumber(a_Split[3] or 1024)
 	if not(Port) then
-		return true, "Bad port number: \"" .. Port .. "\"."
+		return true, "Bad port number: \"" .. a_Split[3] .. "\"."
 	end
 
 	-- Close the server, if there is one:
@@ -229,7 +334,7 @@ function HandleConsoleNetListen(a_Split)
 	-- Get the params:
 	local Port = tonumber(a_Split[3] or 1024)
 	if not(Port) then
-		return true, "Invalid port: \"" .. Port .. "\"."
+		return true, "Invalid port: \"" .. a_Split[3] .. "\"."
 	end
 	local Service = string.lower(a_Split[4] or "echo")
 	
@@ -247,6 +352,93 @@ function HandleConsoleNetListen(a_Split)
 	end
 	g_Servers[Port] = srv
 	return true, Service .. " server started on port " .. Port
+end
+
+
+
+
+
+function HandleConsoleNetUdpClose(a_Split)
+	-- Get the port to close:
+	local Port = tonumber(a_Split[4] or 1024)
+	if not(Port) then
+		return true, "Bad port number: \"" .. a_Split[4] .. "\"."
+	end
+
+	-- Close the server, if there is one:
+	if not(g_UDPEndpoints[Port]) then
+		return true, "There is no UDP endpoint currently listening on port " .. Port .. "."
+	end
+	g_UDPEndpoints[Port]:Close()
+	g_UDPEndpoints[Port] = nil
+	return true, "UDP Port " .. Port .. " closed."
+end
+
+
+
+
+
+function HandleConsoleNetUdpListen(a_Split)
+	-- Get the params:
+	local Port = tonumber(a_Split[4] or 1024)
+	if not(Port) then
+		return true, "Invalid port: \"" .. a_Split[4] .. "\"."
+	end
+	
+	local Callbacks =
+	{
+		OnReceivedData = function (a_Endpoint, a_Data, a_RemotePeer, a_RemotePort)
+			LOG("Incoming UDP datagram from " .. a_RemotePeer .. " port " .. a_RemotePort .. ":\r\n" .. a_Data)
+		end,
+		
+		OnError = function (a_Endpoint, a_ErrorCode, a_ErrorMsg)
+			LOG("Error in UDP endpoint: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+		end,
+	}
+	
+	g_UDPEndpoints[Port] = cNetwork:CreateUDPEndpoint(Port, Callbacks)
+	return true, "UDP listener on port " .. Port .. " started."
+end
+
+
+
+
+
+function HandleConsoleNetUdpSend(a_Split)
+	-- Get the params:
+	local Host = a_Split[4] or "localhost"
+	local Port = tonumber(a_Split[5] or 1024)
+	if not(Port) then
+		return true, "Invalid port: \"" .. a_Split[5] .. "\"."
+	end
+	local Message
+	if (a_Split[6]) then
+		Message = table.concat(a_Split, " ", 6)
+	else
+		Message = "hello"
+	end
+	
+	-- Define minimum callbacks for the UDP endpoint:
+	local Callbacks =
+	{
+		OnError = function (a_Endpoint, a_ErrorCode, a_ErrorMsg)
+			LOG("Error in UDP datagram sending: " .. a_ErrorCode .. " (" .. a_ErrorMsg .. ")")
+		end,
+		
+		OnReceivedData = function ()
+			-- ignore
+		end,
+	}
+	
+	-- Send the data:
+	local Endpoint = cNetwork:CreateUDPEndpoint(0, Callbacks)
+	Endpoint:EnableBroadcasts()
+	if not(Endpoint:Send(Message, Host, Port)) then
+		Endpoint:Close()
+		return true, "Sending UDP datagram failed"
+	end
+	Endpoint:Close()
+	return true, "UDP datagram sent"
 end
 
 

@@ -52,7 +52,19 @@ public:
 				return;
 			}
 		}
-		
+
+		// Make sure that there is enough light at the source block to spread
+		if (!a_Chunk.GetWorld()->IsChunkLighted(a_Chunk.GetPosX(), a_Chunk.GetPosZ()))
+		{
+			a_Chunk.GetWorld()->QueueLightChunk(a_Chunk.GetPosX(), a_Chunk.GetPosZ());
+			return;
+		}
+		else if (std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ))) < 9)
+		{
+			// Source block is not bright enough to spread
+			return;
+		}
+
 		// Grass spreads to adjacent dirt blocks:
 		cFastRandom rand;
 		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to

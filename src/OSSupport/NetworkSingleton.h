@@ -116,11 +116,11 @@ protected:
 	/** Mutex protecting all containers against multithreaded access. */
 	cCriticalSection m_CS;
 
-	/** Event that gets signalled when the event loop terminates. */
-	cEvent m_EventLoopTerminated;
-
 	/** Set to true if Terminate has been called. */
 	volatile bool m_HasTerminated;
+
+	/** The thread in which the main LibEvent loop runs. */
+	std::thread m_EventLoopThread;
 
 
 	/** Initializes the LibEvent internals. */
