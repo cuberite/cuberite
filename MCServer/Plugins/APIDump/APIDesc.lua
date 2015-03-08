@@ -2503,7 +2503,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				GetStorageSaveQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks queued up for saving" },
 				GetTicksUntilWeatherChange = { Params = "", Return = "number", Notes = "Returns the number of ticks that will pass before the weather is changed" },
 				GetTimeOfDay = { Params = "", Return = "number", Notes = "Returns the number of ticks that have passed from the sunrise, 0 .. 24000." },
-				GetTNTShrapnelLevel = { Params = "", Return = "eShrapnelLevel", Notes = "Returns the level of Shrapnel." },
+				GetTNTShrapnelLevel = { Params = "", Return = "eShrapnelLevel", Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards." },
 				GetWeather = { Params = "", Return = "eWeather", Notes = "Returns the current weather in the world (wSunny, wRain, wStorm). To check for weather, use IsWeatherXXX() functions instead." },
 				GetWorldAge = { Params = "", Return = "number", Notes = "Returns the total age of the world, in ticks. The age always grows, cannot be set by plugins and is unrelated to TimeOfDay." },
 				GrowCactus = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight())." },
@@ -3094,14 +3094,14 @@ end
 						These constants are used to differentiate the various sources of spreads, such as grass growing.
 						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
 					]],
-				}
+				},
 				ShrapnelLevel =
 				{
 					Include = "^sl.*",
 					TextBefore = [[
 						The following constants define the block types  that are propelled outwards after an explosion.
 					]],
-				}
+				},
 			},
 		},  -- Globals
 	},
