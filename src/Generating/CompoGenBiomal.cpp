@@ -542,6 +542,20 @@ protected:
 			HasHadWater = true;
 		}  // for y
 		a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+
+		EMCSBiome MesaVersion = a_ChunkDesc.GetBiome(a_RelX, a_RelZ);
+		if ((MesaVersion == biMesaPlateauF) || (MesaVersion == biMesaPlateauFM))
+		{
+			if (Top < 95 + static_cast<int>(m_MesaFloor.CubicNoise2D(NoiseY * 2, NoiseX * 2) * 6))
+			{
+				return;
+			}
+
+			BLOCKTYPE Block = m_MesaFloor.CubicNoise2D(NoiseX * 4, NoiseY * 4) < 0 ? E_BLOCK_DIRT : E_BLOCK_GRASS;
+			NIBBLETYPE Meta = Block == E_BLOCK_GRASS ? 0 : 1;
+
+			a_ChunkDesc.SetBlockTypeMeta(a_RelX, Top, a_RelZ, Block, Meta);
+		}
 	}
 
 
