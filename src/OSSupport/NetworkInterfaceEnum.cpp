@@ -10,6 +10,10 @@
 	#include <IPHlpApi.h>
 	#pragma comment(lib, "IPHLPAPI.lib")
 #else  // _WIN32
+	#include <sys/types.h>
+	#include <ifaddrs.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
 #endif  // else _WIN32
 
 
@@ -29,7 +33,7 @@ public:
 		{
 			printf("  %s\n", ip.c_str());
 		}
-		printf("done.\n");
+		printf("Done.\n");
 	}
 } g_EnumIPAddressTest;
 
@@ -65,10 +69,36 @@ static AString PrintAddress(SOCKET_ADDRESS & a_Addr)
 			break;
 		}
 	}
-	return AString(IP);
+	return IP;
 }
 
-#endif  // _WIN32
+#else  // _WIN32
+
+static AString PrintAddress(ifaddrs * InterfaceAddress)
+{
+	switch (InterfaceAddress->ifa_addr->sa_family)
+	{
+		case AF_INET:
+		{  // IPv4
+			char AddressBuffer[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &(reinterpret_cast<struct sockaddr_in *>(reinterpret_cast<void *>(InterfaceAddress->ifa_addr))->sin_addr), AddressBuffer, INET_ADDRSTRLEN);
+			return AddressBuffer;
+		}
+		case AF_INET6:
+		{  // IPv6
+			char AddressBuffer[INET6_ADDRSTRLEN];
+			inet_ntop(AF_INET6, &(reinterpret_cast<struct sockaddr_in6 *>(reinterpret_cast<void *>(InterfaceAddress->ifa_addr))->sin6_addr), AddressBuffer, INET6_ADDRSTRLEN);
+			return AddressBuffer;
+		}
+		default:
+		{
+			LOG("Unknown address family: %i", InterfaceAddress->ifa_addr->sa_family);
+			return "";
+		}
+	}
+}
+
+#endif  // else _WIN32
 
 
 
@@ -117,7 +147,27 @@ AStringVector cNetwork::EnumLocalIPAddresses(void)
 
 	#else  // _WIN32
 
-		// TODO: Enumerate network interfaces on Linux
+		struct ifaddrs * ifAddrStruct = nullptr;
+		getifaddrs(&ifAddrStruct);
+
+		for (auto ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
+		{
+			if (ifa->ifa_addr == nullptr)
+			{
+				continue;
+			}
+
+			auto Address = PrintAddress(ifa);
+			if (!Address.empty())
+			{
+				res.emplace_back(Address);
+			}
+		}
+
+		if (ifAddrStruct != nullptr)
+		{
+			freeifaddrs(ifAddrStruct);
+		}
 
 	#endif  // else _WIN32
 
