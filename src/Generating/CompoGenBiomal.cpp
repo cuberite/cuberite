@@ -551,8 +551,8 @@ protected:
 				return;
 			}
 
-			BLOCKTYPE Block = m_MesaFloor.CubicNoise2D(NoiseX * 4, NoiseY * 4) < 0 ? E_BLOCK_DIRT : E_BLOCK_GRASS;
-			NIBBLETYPE Meta = Block == E_BLOCK_GRASS ? 0 : 1;
+			BLOCKTYPE Block = (m_MesaFloor.CubicNoise2D(NoiseX * 4, NoiseY * 4) < 0) ? E_BLOCK_DIRT : E_BLOCK_GRASS;
+			NIBBLETYPE Meta = (Block == E_BLOCK_GRASS) ? 0 : 1;
 
 			a_ChunkDesc.SetBlockTypeMeta(a_RelX, Top, a_RelZ, Block, Meta);
 		}
