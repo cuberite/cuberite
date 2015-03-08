@@ -3095,6 +3095,13 @@ end
 						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
 					]],
 				}
+				ShrapnelLevel =
+				{
+					Include = "^sl.*",
+					TextBefore = [[
+						The following constants define the block types  that are propelled outwards after an explosion.
+					]],
+				}
 			},
 		},  -- Globals
 	},
