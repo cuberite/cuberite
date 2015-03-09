@@ -776,10 +776,22 @@ void cChunk::BroadcastPendingBlockChanges(void)
 	{
 		return;
 	}
-	
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+
+	if (m_PendingSendBlocks.size() >= 10240)
 	{
-		(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+		// Resend the full chunk
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+		{
+			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, (*itr));
+		}
+	}
+	else
+	{
+		// Only send block changes
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+		{
+			(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+		}
 	}
 	m_PendingSendBlocks.clear();
 }
