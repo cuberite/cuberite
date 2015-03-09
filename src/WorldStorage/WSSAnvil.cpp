@@ -1007,21 +1007,28 @@ cBlockEntity * cWSSAnvil::LoadFlowerPotFromNBT(const cParsedNBT & a_NBT, int a_T
 	}
 
 	std::unique_ptr<cFlowerPotEntity> FlowerPot(new cFlowerPotEntity(a_BlockX, a_BlockY, a_BlockZ, m_World));
-	short ItemType = 0, ItemData = 0;
+	cItem Item;
 
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "Item");
 	if (currentLine >= 0)
 	{
-		ItemType = (short) a_NBT.GetInt(currentLine);
+		if (a_NBT.GetType(currentLine) == TAG_String)
+		{
+			StringToItem(a_NBT.GetString(currentLine), Item);
+		}
+		else if (a_NBT.GetType(currentLine) == TAG_Int)
+		{
+			Item.m_ItemType = (short) a_NBT.GetInt(currentLine);
+		}
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Data");
-	if (currentLine >= 0)
+	if ((currentLine >= 0) && (a_NBT.GetType(currentLine) == TAG_Int))
 	{
-		ItemData = (short) a_NBT.GetInt(currentLine);
+		Item.m_ItemDamage = (short) a_NBT.GetInt(currentLine);
 	}
 
-	FlowerPot->SetItem(cItem(ItemType, 1, ItemData));
+	FlowerPot->SetItem(Item);
 	return FlowerPot.release();
 }
 
@@ -3136,8 +3143,11 @@ bool cWSSAnvil::cMCAFile::SetChunkData(const cChunkCoords & a_Chunk, const AStri
 	
 	// Add padding to 4K boundary:
 	size_t BytesWritten = a_Data.size() + MCA_CHUNK_HEADER_LENGTH;
-	static const char Padding[4095] = {0};
-	m_File.Write(Padding, 4096 - (BytesWritten % 4096));
+	if (BytesWritten % 4096 != 0)
+	{
+		static const char Padding[4095] = {0};
+		m_File.Write(Padding, 4096 - (BytesWritten % 4096));
+	}
 	
 	// Store the header:
 	ChunkSize = ((u_long)a_Data.size() + MCA_CHUNK_HEADER_LENGTH + 4095) / 4096;  // Round data size *up* to nearest 4KB sector, make it a sector number

@@ -318,6 +318,350 @@ protected:
 
 
 
+/** Averages the values of the underlying 2 * 2 neighbors. */
+class cProtIntGenAvgValues :
+	public cProtIntGen
+{
+	typedef cProtIntGen super;
+
+public:
+	cProtIntGenAvgValues(Underlying a_Underlying) :
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		int lowerSizeX = a_SizeX + 1;
+		int lowerSizeZ = a_SizeZ + 1;
+		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
+		int lowerData[m_BufferSize];
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
+
+		// Average - add all 4 "neighbors" and divide by 4:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int idxLower = x + lowerSizeX * z;
+				a_Values[x + a_SizeX * z] = (
+					lowerData[idxLower] + lowerData[idxLower + 1] +
+					lowerData[idxLower + lowerSizeX] + lowerData[idxLower + lowerSizeX + 1]
+				) / 4;
+			}
+		}
+	}
+
+protected:
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Averages the values of the underlying 4 * 4 neighbors. */
+class cProtIntGenAvg4Values :
+	public cProtIntGen
+{
+	typedef cProtIntGen super;
+
+public:
+	cProtIntGenAvg4Values(Underlying a_Underlying) :
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		int lowerSizeX = a_SizeX + 4;
+		int lowerSizeZ = a_SizeZ + 4;
+		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
+		int lowerData[m_BufferSize];
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+
+		// Calculate the weighted average of all 16 "neighbors":
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int idxLower1 = x + lowerSizeX * z;
+				int idxLower2 = idxLower1 + lowerSizeX;
+				int idxLower3 = idxLower1 + 2 * lowerSizeX;
+				int idxLower4 = idxLower1 + 3 * lowerSizeX;
+				a_Values[x + a_SizeX * z] = (
+					1 * lowerData[idxLower1] + 2 * lowerData[idxLower1 + 1] + 2 * lowerData[idxLower1 + 2] + 1 * lowerData[idxLower1 + 3] +
+					2 * lowerData[idxLower2] + 32 * lowerData[idxLower2 + 1] + 32 * lowerData[idxLower2 + 2] + 2 * lowerData[idxLower2 + 3] +
+					2 * lowerData[idxLower3] + 32 * lowerData[idxLower3 + 1] + 32 * lowerData[idxLower3 + 2] + 2 * lowerData[idxLower3 + 3] +
+					1 * lowerData[idxLower4] + 2 * lowerData[idxLower4 + 1] + 2 * lowerData[idxLower4 + 2] + 1 * lowerData[idxLower4 + 3]
+				) / 148;
+			}
+		}
+	}
+
+protected:
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Averages the values of the underlying 3 * 3 neighbors with custom weight. */
+template <int WeightCenter, int WeightCardinal, int WeightDiagonal>
+class cProtIntGenWeightAvg :
+	public cProtIntGen
+{
+	typedef cProtIntGen super;
+
+public:
+	cProtIntGenWeightAvg(Underlying a_Underlying) :
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		int lowerSizeX = a_SizeX + 3;
+		int lowerSizeZ = a_SizeZ + 3;
+		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
+		int lowerData[m_BufferSize];
+		m_Underlying->GetInts(a_MinX, a_MinZ, lowerSizeX, lowerSizeZ, lowerData);
+
+		// Calculate the weighted average the neighbors:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int idxLower1 = x + lowerSizeX * z;
+				int idxLower2 = idxLower1 + lowerSizeX;
+				int idxLower3 = idxLower1 + 2 * lowerSizeX;
+				a_Values[x + a_SizeX * z] = (
+					WeightDiagonal * lowerData[idxLower1] + WeightCardinal * lowerData[idxLower1 + 1] + WeightDiagonal * lowerData[idxLower1 + 2] +
+					WeightCardinal * lowerData[idxLower2] + WeightCenter   * lowerData[idxLower2 + 1] + WeightCardinal * lowerData[idxLower2 + 2] +
+					WeightDiagonal * lowerData[idxLower3] + WeightCardinal * lowerData[idxLower3 + 1] + WeightDiagonal * lowerData[idxLower3 + 2]
+				) / (4 * WeightDiagonal + 4 * WeightCardinal + WeightCenter);
+			}
+		}
+	}
+
+protected:
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Replaces random values of the underlying data with random integers in the specified range [Min .. Min + Range). */
+class cProtIntGenRndChoice :
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenRndChoice(int a_Seed, int a_ChancePct, int a_Min, int a_Range, Underlying a_Underlying) :
+		super(a_Seed),
+		m_ChancePct(a_ChancePct),
+		m_Min(a_Min),
+		m_Range(a_Range),
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
+
+		// Replace random values:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			int BaseZ = a_MinZ + z;
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				if (((super::m_Noise.IntNoise2DInt(BaseZ, a_MinX + x) / 13) % 101) < m_ChancePct)
+				{
+					a_Values[x + a_SizeX * z] = m_Min + (super::m_Noise.IntNoise2DInt(a_MinX + x, BaseZ) / 7) % m_Range;
+				}
+			}  // for x
+		}  // for z
+	}
+
+protected:
+	int m_ChancePct;
+	int m_Min;
+	int m_Range;
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Adds a random value in range [-a_HalfRange, +a_HalfRange] to each of the underlying values. */
+class cProtIntGenAddRnd :
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenAddRnd(int a_Seed, int a_HalfRange, Underlying a_Underlying) :
+		super(a_Seed),
+		m_Range(a_HalfRange * 2 + 1),
+		m_HalfRange(a_HalfRange),
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		m_Underlying->GetInts(a_MinX, a_MinZ, a_SizeX, a_SizeZ, a_Values);
+
+		// Add the random values:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			int NoiseZ = a_MinZ + z;
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int noiseVal = ((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % m_Range) - m_HalfRange;
+				a_Values[x + z * a_SizeX] += noiseVal;
+			}
+		}
+	}
+
+protected:
+	int m_Range;
+	int m_HalfRange;
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Replaces random underlying values with the average of the neighbors. */
+class cProtIntGenRndAvg :
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenRndAvg(int a_Seed, int a_AvgChancePct, Underlying a_Underlying) :
+		super(a_Seed),
+		m_AvgChancePct(a_AvgChancePct),
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		int lowerSizeX = a_SizeX + 2;
+		int lowerSizeZ = a_SizeZ + 2;
+		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
+		int lowerData[m_BufferSize];
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+
+		// Average random values:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			int NoiseZ = a_MinZ + z;
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int idxLower = x + 1 + lowerSizeX * (z + 1);
+				if (((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 100) > m_AvgChancePct)
+				{
+					// Average the 4 neighbors:
+					a_Values[x + z * a_SizeX] = (
+						lowerData[idxLower - 1] + lowerData[idxLower + 1] +
+						lowerData[idxLower - lowerSizeX] + lowerData[idxLower + lowerSizeX]
+					) / 4;
+				}
+				else
+				{
+					// Keep the underlying value:
+					a_Values[x + z * a_SizeX] = lowerData[idxLower];
+				}
+			}
+		}
+	}
+
+protected:
+	int m_AvgChancePct;
+	Underlying m_Underlying;
+};
+
+
+
+
+
+/** Replaces random underlying values with a random value in between the max and min of the neighbors. */
+class cProtIntGenRndBetween :
+	public cProtIntGenWithNoise
+{
+	typedef cProtIntGenWithNoise super;
+
+public:
+	cProtIntGenRndBetween(int a_Seed, int a_AvgChancePct, Underlying a_Underlying) :
+		super(a_Seed),
+		m_AvgChancePct(a_AvgChancePct),
+		m_Underlying(a_Underlying)
+	{
+	}
+
+
+	virtual void GetInts(int a_MinX, int a_MinZ, int a_SizeX, int a_SizeZ, int * a_Values) override
+	{
+		// Generate the underlying values:
+		int lowerSizeX = a_SizeX + 2;
+		int lowerSizeZ = a_SizeZ + 2;
+		ASSERT(lowerSizeX * lowerSizeZ <= m_BufferSize);
+		int lowerData[m_BufferSize];
+		m_Underlying->GetInts(a_MinX - 1, a_MinZ - 1, lowerSizeX, lowerSizeZ, lowerData);
+
+		// Average random values:
+		for (int z = 0; z < a_SizeZ; z++)
+		{
+			int NoiseZ = a_MinZ + z;
+			for (int x = 0; x < a_SizeX; x++)
+			{
+				int idxLower = x + 1 + lowerSizeX * (z + 1);
+				if (((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ) / 7) % 100) > m_AvgChancePct)
+				{
+					// Chose a value in between the min and max neighbor:
+					int min = std::min(std::min(lowerData[idxLower - 1], lowerData[idxLower + 1]), std::min(lowerData[idxLower - lowerSizeX], lowerData[idxLower + lowerSizeX]));
+					int max = std::max(std::max(lowerData[idxLower - 1], lowerData[idxLower + 1]), std::max(lowerData[idxLower - lowerSizeX], lowerData[idxLower + lowerSizeX]));
+					a_Values[x + z * a_SizeX] = min + ((super::m_Noise.IntNoise2DInt(a_MinX + x, NoiseZ + 10) / 7) % (max - min + 1));
+				}
+				else
+				{
+					// Keep the underlying value:
+					a_Values[x + z * a_SizeX] = lowerData[idxLower];
+				}
+			}
+		}
+	}
+
+protected:
+	int m_AvgChancePct;
+	Underlying m_Underlying;
+};
+
+
+
+
+
 /** Converts land biomes at the edge of an ocean into the respective beach biome. */
 class cProtIntGenBeaches :
 	public cProtIntGen

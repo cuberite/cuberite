@@ -99,7 +99,7 @@ class cEchoServerCallbacks:
 
 
 
-void DoTest(void)
+static void DoTest(void)
 {
 	LOGD("EchoServer: starting up");
 	cServerHandlePtr Server = cNetwork::Listen(9876, std::make_shared<cEchoServerCallbacks>());
@@ -119,6 +119,7 @@ void DoTest(void)
 	LOG("Server terminating.");
 	Server->Close();
 	ASSERT(!Server->IsListening());
+	Server.reset();
 	LOGD("Server has been closed.");
 }
 

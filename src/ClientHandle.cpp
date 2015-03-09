@@ -1895,9 +1895,13 @@ void cClientHandle::Tick(float a_Dt)
 		cCSLock Lock(m_CSOutgoingData);
 		std::swap(OutgoingData, m_OutgoingData);
 	}
-	if ((m_Link != nullptr) && !OutgoingData.empty())
+	if (!OutgoingData.empty())
 	{
-		m_Link->Send(OutgoingData.data(), OutgoingData.size());
+		cTCPLinkPtr Link(m_Link);  // Grab a copy of the link in a multithread-safe way
+		if ((Link != nullptr))
+		{
+			Link->Send(OutgoingData.data(), OutgoingData.size());
+		}
 	}
 	
 	m_TicksSinceLastPacket += 1;

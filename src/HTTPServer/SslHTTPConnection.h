@@ -25,6 +25,8 @@ public:
 	/** Creates a new connection on the specified server.
 	Sends the specified cert as the server certificate, uses the private key for decryption. */
 	cSslHTTPConnection(cHTTPServer & a_HTTPServer, const cX509CertPtr & a_Cert, const cCryptoKeyPtr & a_PrivateKey);
+
+	~cSslHTTPConnection();
 	
 protected:
 	cBufferedSslContext m_Ssl;

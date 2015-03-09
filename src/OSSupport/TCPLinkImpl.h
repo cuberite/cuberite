@@ -94,6 +94,11 @@ protected:
 	Initialized in Enable(), cleared in Close() and EventCallback(RemoteClosed). */
 	cTCPLinkImplPtr m_Self;
 
+	/** If true, Shutdown() has been called and is in queue.
+	No more data is allowed to be sent via Send() and after all the currently buffered
+	data is sent to the OS TCP stack, the socket gets shut down. */
+	bool m_ShouldShutdown;
+
 
 	/** Creates a new link to be queued to connect to a specified host:port.
 	Used for outgoing connections created using cNetwork::Connect().
@@ -103,6 +108,9 @@ protected:
 
 	/** Callback that LibEvent calls when there's data available from the remote peer. */
 	static void ReadCallback(bufferevent * a_BufferEvent, void * a_Self);
+
+	/** Callback that LibEvent calls when the remote peer can receive more data. */
+	static void WriteCallback(bufferevent * a_BufferEvent, void * a_Self);
 
 	/** Callback that LibEvent calls when there's a non-data-related event on the socket. */
 	static void EventCallback(bufferevent * a_BufferEvent, short a_What, void * a_Self);
@@ -115,6 +123,10 @@ protected:
 
 	/** Updates m_RemoteIP and m_RemotePort based on the metadata read from the socket. */
 	void UpdateRemoteAddress(void);
+
+	/** Calls shutdown on the link and disables LibEvent writing.
+	Called after all data from LibEvent buffers is sent to the OS TCP stack and shutdown() has been called before. */
+	void DoActualShutdown(void);
 };
 
 

@@ -685,6 +685,28 @@ end</pre>
 			},
 		},  -- cCraftingRecipe
 
+		cCryptoHash =
+		{
+			Desc =
+			[[
+				Provides functions for generating cryptographic hashes.</p>
+				<p>
+				Note that all functions in this class are static, so they should be called in the dot convention:
+<pre class="prettyprint lang-lua">
+local Hash = cCryptoHash.sha1HexString("DataToHash")
+</pre></p>
+				<p>Each cryptographic hash has two variants, one returns the hash as a raw binary string, the other returns the hash as a hex-encoded string twice as long as the binary string.
+			]],
+			
+			Functions =
+			{
+				md5 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a raw (binary) string of 16 characters." },
+				md5HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the md5 hash of the data, returns it as a hex-encoded string of 32 characters." },
+				sha1 = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a raw (binary) string of 20 characters." },
+				sha1HexString = { Params = "Data", Return = "string", Notes = "(STATIC) Calculates the sha1 hash of the data, returns it as a hex-encoded string of 40 characters." },
+			},
+		},  -- cCryptoHash
+		
 		cEnchantments =
 		{
 			Desc = [[
@@ -844,6 +866,7 @@ end</pre>
 				IsMinecart = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cMinecart|minecart}}" },
 				IsMob = { Params = "", Return = "bool", Notes = "Returns true if the entity represents any {{cMonster|mob}}." },
 				IsOnFire = { Params = "", Return = "bool", Notes = "Returns true if the entity is on fire" },
+				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the entity is on ground (not falling, not jumping, not flying)" },
 				IsPainting = { Params = "", Return = "bool", Notes = "Returns if this entity is a painting." },
 				IsPawn = { Params = "", Return = "bool", Notes = "Returns true if the entity is a {{cPawn}} descendant." },
 				IsPickup = { Params = "", Return = "bool", Notes = "Returns true if the entity represents a {{cPickup|pickup}}." },
@@ -902,8 +925,8 @@ end</pre>
 					{ Params = "DamageType, AttackerEntity, RawDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The final damage is calculated from RawDamage using the currently equipped armor." },
 					{ Params = "DamageType, ArrackerEntity, RawDamage, FinalDamage, KnockbackAmount", Return = "", Notes = "Causes this entity to take damage of the specified type, from the specified attacker (may be nil). The values are wrapped into a {{TakeDamageInfo}} structure and applied directly." },
 				},
-				TeleportToCoords = { Params = "PosX, PosY, PosZ", Return = "", Notes = "Teleports the entity to the specified coords." },
-				TeleportToEntity = { Params = "DestEntity", Return = "", Notes = "Teleports this entity to the specified destination entity." },
+				TeleportToCoords = { Params = "PosX, PosY, PosZ", Return = "", Notes = "Teleports the entity to the specified coords. Asks plugins if the teleport is allowed." },
+				TeleportToEntity = { Params = "DestEntity", Return = "", Notes = "Teleports this entity to the specified destination entity. Asks plugins if the teleport is allowed." },
 			},
 			Constants =
 			{
@@ -1832,7 +1855,6 @@ a_Player:OpenWindow(Window);
 				IsGameModeSpectator = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSpectator gamemode, or has their gamemode unset and the world is a gmSpectator world." },
 				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the player is in the gmSurvival gamemode, or has their gamemode unset and the world is a gmSurvival world." },
 				IsInBed = { Params = "", Return = "bool", Notes = "Returns true if the player is currently lying in a bed." },
-				IsOnGround = { Params = "", Return = "bool", Notes = "Returns true if the player is on ground (not falling, not jumping, not flying)" },
 				IsSatiated = { Params = "", Return = "bool", Notes = "Returns true if the player is satiated (cannot eat)." },
 				IsVisible = { Params = "", Return = "bool", Notes = "Returns true if the player is visible to other players" },
 				LoadRank = { Params = "", Return = "", Notes = "Reloads the player's rank, message visuals and permissions from the {{cRankManager}}, based on the player's current rank." },
@@ -2232,6 +2254,27 @@ end
 				ShouldAuthenticate = { Params = "", Return = "bool", Notes = "Returns true iff the server is set to authenticate players (\"online mode\")." },
 			},
 		},  -- cServer
+		
+		cStringCompression =
+		{
+			Desc = [[
+				Provides functions to compress or decompress string
+				<p>
+				All functions in this class are static, so they should be called in the dot convention:
+<pre class="prettyprint lang-lua">
+local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
+</pre>
+			]],
+			
+			Functions =
+			{
+				CompressStringGZIP   = {Params = "string", Return = "string", Notes = "Compress a string using GZIP"},
+				CompressStringZLIB   = {Params = "string, factor", Return = "string", Notes = "Compresses a string using ZLIB. Factor 0 is no compression and factor 9 is maximum compression"},
+				InflateString        = {Params = "string", Return = "string", Notes = "Uncompresses a string using Inflate"},
+				UncompressStringGZIP = {Params = "string", Return = "string", Notes = "Uncompress a string using GZIP"},
+				UncompressStringZLIB = {Params = "string, uncompressed length", Return = "string", Notes = "Uncompresses a string using ZLIB"},
+			},
+		},
 
 		cTeam =
 		{
@@ -2929,7 +2972,7 @@ end
 				StringToMobType = {Params = "string", Return = "{{Globals#MobType|MobType}}", Notes = "<b>DEPRECATED!</b> Please use cMonster:StringToMobType(). Converts a string representation to a {{Globals#MobType|MobType}} enumerated value"},
 				StripColorCodes = {Params = "string", Return = "string", Notes = "Removes all control codes used by MC for colors and styles"},
 				TrimString = {Params = "string", Return = "string", Notes = "Trims whitespace at both ends of the string"},
-				md5 = {Params = "string", Return = "string", Notes = "converts a string to an md5 hash"},
+				md5 = {Params = "string", Return = "string", Notes = "<b>OBSOLETE</b>, use the {{cCryptoHash}} functions instead.<br>Converts a string to a raw binary md5 hash."},
 			},
 			ConstantGroups =
 			{

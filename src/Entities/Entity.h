@@ -443,6 +443,9 @@ public:
 
 	/** Set the invulnerable ticks from the entity */
 	void SetInvulnerableTicks(int a_InvulnerableTicks) { m_InvulnerableTicks = a_InvulnerableTicks; }
+
+	/** Returns whether the entity is on ground or not */
+	virtual bool IsOnGround(void) const { return m_bOnGround; }
 	
 	// tolua_end
 	

@@ -63,8 +63,7 @@ cNetworkSingleton::cNetworkSingleton(void):
 	}
 
 	// Create the event loop thread:
-	std::thread EventLoopThread(RunEventLoop, this);
-	EventLoopThread.detach();
+	m_EventLoopThread = std::thread(RunEventLoop, this);
 }
 
 
@@ -98,7 +97,7 @@ void cNetworkSingleton::Terminate(void)
 
 	// Wait for the LibEvent event loop to terminate:
 	event_base_loopbreak(m_EventBase);
-	m_EventLoopTerminated.Wait();
+	m_EventLoopThread.join();
 
 	// Remove all objects:
 	{
@@ -143,7 +142,6 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
-	a_Self->m_EventLoopTerminated.Set();
 }
 
 

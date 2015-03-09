@@ -18,6 +18,7 @@ SET (SRCS
 	ServerHandleImpl.cpp
 	StackTrace.cpp
 	TCPLinkImpl.cpp
+	UDPEndpointImpl.cpp
 )
 
 SET (HDRS
@@ -36,6 +37,7 @@ SET (HDRS
 	ServerHandleImpl.h
 	StackTrace.h
 	TCPLinkImpl.h
+	UDPEndpointImpl.h
 )
 
 if(NOT MSVC)

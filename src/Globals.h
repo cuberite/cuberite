@@ -379,8 +379,10 @@ void inline LOG(const char * a_Format, ...)
 	#define assert_test(x) ( !!(x) || (assert(!#x), exit(1), 0))
 #endif
 
-// Unified shared ptr from before C++11. Also no silly undercores.
+// Unified ptr types from before C++11. Also no silly undercores.
 #define SharedPtr std::shared_ptr
+#define WeakPtr std::weak_ptr
+#define UniquePtr std::unique_ptr
 
 
 
