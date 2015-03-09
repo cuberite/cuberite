@@ -61,14 +61,16 @@ public:
 	{
 		switch (a_BlockFace)
 		{
+			case BLOCK_FACE_YP: return 0x6;
 			case BLOCK_FACE_ZM: return 0x4;
 			case BLOCK_FACE_ZP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
 			case BLOCK_FACE_XP: return 0x1;
+			case BLOCK_FACE_YM: return 0x0;
 			default:
 			{
 				ASSERT(!"Unhandled block face!");
-				return 0x0;  // No idea, give a special meta (button in centre of block)
+				return 0x0;
 			}
 		}
 	}
@@ -81,6 +83,10 @@ public:
 			case 0x2: return BLOCK_FACE_XM;
 			case 0x3: return BLOCK_FACE_ZP;
 			case 0x4: return BLOCK_FACE_ZM;
+			case 0x5:
+			case 0x6: return BLOCK_FACE_YP;
+			case 0x7:
+			case 0x0: return BLOCK_FACE_YM;
 			default:
 			{
 				ASSERT(!"Unhandled block meta!");
