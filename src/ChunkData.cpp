@@ -361,7 +361,7 @@ void cChunkData::CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx, size_t a_Lengt
 			}
 			else
 			{
-				memset(&a_Dest[(i * SectionBlockCount) - a_Idx], 0, sizeof(BLOCKTYPE) * ToCopy);
+				memset(&a_Dest[(i * SectionBlockCount) + StartPos - a_Idx], 0, sizeof(BLOCKTYPE) * ToCopy);
 			}
 		}
 	}
