@@ -90,6 +90,9 @@ public:
 	Sends the RST packet, queued outgoing and incoming data is lost. */
 	virtual void Close(void) = 0;
 
+	/** Returns the callbacks that are used. */
+	cCallbacksPtr GetCallbacks(void) const { return m_Callbacks; }
+
 protected:
 	/** Callbacks to be used for the various situations. */
 	cCallbacksPtr m_Callbacks;
@@ -122,6 +125,64 @@ public:
 	/** Returns true if the server has been started correctly and is currently listening for incoming connections. */
 	virtual bool IsListening(void) const = 0;
 };
+
+
+
+
+
+/** Interface that provides methods available on UDP communication endpoints. */
+class cUDPEndpoint
+{
+public:
+	/** Interface for the callbacks for events that can happen on the endpoint. */
+	class cCallbacks
+	{
+	public:
+		// Force a virtual destructor in all descendants:
+		virtual ~cCallbacks() {}
+
+		/** Called when an error occurs on the endpoint. */
+		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
+
+		/** Called when there is an incoming datagram from a remote host. */
+		virtual void OnReceivedData(const char * a_Data, size_t a_Size, const AString & a_RemoteHost, UInt16 a_RemotePort) = 0;
+	};
+
+
+	// Force a virtual destructor for all descendants:
+	virtual ~cUDPEndpoint() {}
+
+	/** Closes the underlying socket.
+	Note that there still might be callbacks in-flight after this method returns. */
+	virtual void Close(void) = 0;
+
+	/** Returns true if the endpoint is open. */
+	virtual bool IsOpen(void) const = 0;
+
+	/** Returns the local port to which the underlying socket is bound. */
+	virtual UInt16 GetPort(void) const = 0;
+
+	/** Sends the specified payload in a single UDP datagram to the specified host+port combination.
+	Note that in order to send to a broadcast address, you need to call EnableBroadcasts() first. */
+	virtual bool Send(const AString & a_Payload, const AString & a_Host, UInt16 a_Port) = 0;
+
+	/** Marks the socket as capable of sending broadcast, using whatever OS API is needed.
+	Without this call, sending to a broadcast address using Send() may fail. */
+	virtual void EnableBroadcasts(void) = 0;
+
+protected:
+	/** The callbacks used for various events on the endpoint. */
+	cCallbacks & m_Callbacks;
+
+
+	/** Creates a new instance of an endpoint, with the specified callbacks. */
+	cUDPEndpoint(cCallbacks & a_Callbacks):
+		m_Callbacks(a_Callbacks)
+	{
+	}
+};
+
+typedef SharedPtr<cUDPEndpoint> cUDPEndpointPtr;
 
 
 
@@ -180,8 +241,21 @@ public:
 
 		/** Called when the hostname is successfully resolved into an IP address.
 		May be called multiple times if a name resolves to multiple addresses.
-		a_IP may be either an IPv4 or an IPv6 address with their proper formatting. */
+		a_IP may be either an IPv4 or an IPv6 address with their proper formatting.
+		Each call to OnNameResolved() is preceded by a call to either OnNameResolvedV4() or OnNameResolvedV6(). */
 		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) = 0;
+
+		/** Called when the hostname is successfully resolved into an IPv4 address.
+		May be called multiple times if a name resolves to multiple addresses.
+		Each call to OnNameResolvedV4 is followed by OnNameResolved with the IP address serialized to a string.
+		If this callback returns false, the OnNameResolved() call is skipped for this address. */
+		virtual bool OnNameResolvedV4(const AString & a_Name, const sockaddr_in * a_IP) { return true; }
+
+		/** Called when the hostname is successfully resolved into an IPv6 address.
+		May be called multiple times if a name resolves to multiple addresses.
+		Each call to OnNameResolvedV4 is followed by OnNameResolved with the IP address serialized to a string.
+		If this callback returns false, the OnNameResolved() call is skipped for this address. */
+		virtual bool OnNameResolvedV6(const AString & a_Name, const sockaddr_in6 * a_IP) { return true; }
 
 		/** Called when an error is encountered while resolving.
 		If an error is reported, the OnFinished() callback is not called. */
@@ -239,6 +313,11 @@ public:
 		const AString & a_IP,
 		cResolveNameCallbacksPtr a_Callbacks
 	);
+
+	/** Opens up an UDP endpoint for sending and receiving UDP datagrams on the specified port.
+	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint.
+	Returns the endpoint object that can be interacted with. */
+	static cUDPEndpointPtr CreateUDPEndpoint(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_Callbacks);
 };
 
 

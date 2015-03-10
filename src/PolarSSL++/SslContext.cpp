@@ -7,6 +7,7 @@
 #include "SslContext.h"
 #include "EntropyContext.h"
 #include "CtrDrbgContext.h"
+#include "polarssl/debug.h"
 
 
 
@@ -69,8 +70,10 @@ int cSslContext::Initialize(bool a_IsClient, const SharedPtr<cCtrDrbgContext> & 
 		// These functions allow us to debug SSL and certificate problems, but produce way too much output,
 		// so they're disabled until someone needs them
 		ssl_set_dbg(&m_Ssl, &SSLDebugMessage, this);
+		debug_set_threshold(2);
+
 		ssl_set_verify(&m_Ssl, &SSLVerifyCert, this);
-		*/
+		//*/
 		
 		/*
 		// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:

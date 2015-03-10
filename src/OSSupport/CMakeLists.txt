@@ -13,14 +13,12 @@ SET (SRCS
 	HostnameLookup.cpp
 	IPLookup.cpp
 	IsThread.cpp
-	ListenThread.cpp
 	NetworkSingleton.cpp
 	Semaphore.cpp
 	ServerHandleImpl.cpp
-	Socket.cpp
-	SocketThreads.cpp
 	StackTrace.cpp
 	TCPLinkImpl.cpp
+	UDPEndpointImpl.cpp
 )
 
 SET (HDRS
@@ -32,16 +30,14 @@ SET (HDRS
 	HostnameLookup.h
 	IPLookup.h
 	IsThread.h
-	ListenThread.h
 	Network.h
 	NetworkSingleton.h
 	Queue.h
 	Semaphore.h
 	ServerHandleImpl.h
-	Socket.h
-	SocketThreads.h
 	StackTrace.h
 	TCPLinkImpl.h
+	UDPEndpointImpl.h
 )
 
 if(NOT MSVC)
@@ -52,6 +48,6 @@ if(NOT MSVC)
 			target_link_libraries(OSSupport rt)
 		endif()
 
-		target_link_libraries(OSSupport pthread)
+		target_link_libraries(OSSupport pthread event_core event_extra)
 	endif()
 endif()

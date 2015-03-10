@@ -25,13 +25,14 @@ function Initialize(Plugin)
 	PM:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY, OnPlayerRightClickingEntity);
 	PM:AddHook(cPluginManager.HOOK_WORLD_TICK,                   OnWorldTick);
 	PM:AddHook(cPluginManager.HOOK_PLUGINS_LOADED,               OnPluginsLoaded);
-	PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 	PM:AddHook(cPluginManager.HOOK_PLAYER_JOINED,                OnPlayerJoined);
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 	PM:AddHook(cPluginManager.HOOK_CHUNK_UNLOADING,              OnChunkUnloading);
 	PM:AddHook(cPluginManager.HOOK_WORLD_STARTED,                OnWorldStarted);
 	PM:AddHook(cPluginManager.HOOK_PROJECTILE_HIT_BLOCK,         OnProjectileHitBlock);
 
+	-- _X: Disabled WECUI manipulation:
+	-- PM:AddHook(cPluginManager.HOOK_PLUGIN_MESSAGE,               OnPluginMessage);
 	-- _X: Disabled so that the normal operation doesn't interfere with anything
 	-- PM:AddHook(cPluginManager.HOOK_CHUNK_GENERATED,              OnChunkGenerated);
 
@@ -1164,7 +1165,7 @@ function HandleSched(a_Split, a_Player)
 	end
 	
 	-- Schedule a broadcast of the final message and a note to the originating player
-	-- Note that we CANNOT us the a_Player in the callback - what if the player disconnected?
+	-- Note that we CANNOT use the a_Player in the callback - what if the player disconnected?
 	-- Therefore we store the player's EntityID
 	local PlayerID = a_Player:GetUniqueID()
 	World:ScheduleTask(220,
@@ -1476,7 +1477,7 @@ function HandleWESel(a_Split, a_Player)
 	SelCuboid:Expand(NumBlocks, NumBlocks, 0, 0, NumBlocks, NumBlocks)
 	
 	-- Set the selection:
-	local IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
+	IsSuccess = cPluginManager:CallPlugin("WorldEdit", "SetPlayerCuboidSelection", a_Player, SelCuboid)
 	if not(IsSuccess) then
 		a_Player:SendMessage(cCompositeChat():SetMessageType(mtFailure):AddTextPart("Cannot adjust selection, WorldEdit reported failure while setting new selection"))
 		return true
@@ -1606,14 +1607,36 @@ end
 
 
 
-function HandleConsoleSchedule(a_Split)
-	LOG("Scheduling a task for 2 seconds in the future")
-	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
-		function ()
-			LOG("Scheduled function is called.")
-		end
-	)
-	return true, "Task scheduled"
+-- List of hashing functions to test:
+local HashFunctions =
+{
+	{"md5", md5 },
+	{"cCryptoHash.md5", cCryptoHash.md5 },
+	{"cCryptoHash.md5HexString", cCryptoHash.md5HexString },
+	{"cCryptoHash.sha1", cCryptoHash.sha1 },
+	{"cCryptoHash.sha1HexString", cCryptoHash.sha1HexString },
+}
+
+-- List of strings to try hashing:
+local HashExamples =
+{
+	"",
+	"\0",
+	"test",
+}
+
+function HandleConsoleHash(a_Split)
+	for _, str in ipairs(HashExamples) do
+		LOG("Hashing string \"" .. str .. "\":")
+		for _, hash in ipairs(HashFunctions) do
+			if not(hash[2]) then
+				LOG("Hash function " .. hash[1] .. " doesn't exist in the API!")
+			else
+				LOG(hash[1] .. "() = " .. hash[2](str))
+			end
+		end  -- for hash - HashFunctions[]
+	end  -- for str - HashExamples[]
+	return true
 end
 
 
@@ -1696,6 +1719,23 @@ function HandleConsolePrepareChunk(a_Split)
 		end
 	)
 	return true
+end
+
+
+
+
+
+function HandleConsoleSchedule(a_Split)
+	local prev = os.clock()
+	LOG("Scheduling a task for 2 seconds in the future (current os.clock is " .. prev .. ")")
+	cRoot:Get():GetDefaultWorld():ScheduleTask(40,
+		function ()
+			local current = os.clock()
+			local diff = current - prev
+			LOG("Scheduled function is called. Current os.clock is " .. current .. ", difference is " .. diff .. ")")
+		end
+	)
+	return true, "Task scheduled"
 end
 
 

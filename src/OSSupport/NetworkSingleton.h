@@ -4,7 +4,8 @@
 // Declares the cNetworkSingleton class representing the storage for global data pertaining to network API
 // such as a list of all connections, all listening sockets and the LibEvent dispatch thread.
 
-// This is an internal header, no-one outside OSSupport should need to include it; use Network.h instead
+// This is an internal header, no-one outside OSSupport should need to include it; use Network.h instead;
+// the only exception being the main app entrypoint that needs to call Terminate before quitting.
 
 
 
@@ -47,6 +48,11 @@ public:
 
 	/** Returns the singleton instance of this class */
 	static cNetworkSingleton & Get(void);
+
+	/** Terminates all network-related threads.
+	To be used only on app shutdown.
+	MSVC runtime requires that the LibEvent networking be shut down before the main() function is exitted; this is the way to do it. */
+	void Terminate(void);
 
 	/** Returns the main LibEvent handle for event registering. */
 	event_base * GetEventBase(void) { return m_EventBase; }
@@ -110,8 +116,11 @@ protected:
 	/** Mutex protecting all containers against multithreaded access. */
 	cCriticalSection m_CS;
 
-	/** Event that gets signalled when the event loop terminates. */
-	cEvent m_EventLoopTerminated;
+	/** Set to true if Terminate has been called. */
+	volatile bool m_HasTerminated;
+
+	/** The thread in which the main LibEvent loop runs. */
+	std::thread m_EventLoopThread;
 
 
 	/** Initializes the LibEvent internals. */

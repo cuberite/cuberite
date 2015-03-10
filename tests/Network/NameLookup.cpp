@@ -7,6 +7,7 @@
 #include <thread>
 #include "OSSupport/Event.h"
 #include "OSSupport/Network.h"
+#include "OSSupport/NetworkSingleton.h"
 
 
 
@@ -45,7 +46,7 @@ public:
 
 
 
-int main()
+static void DoTest(void)
 {
 	cEvent evtFinish;
 
@@ -70,7 +71,16 @@ int main()
 	LOGD("IP lookup has been successfully queued");
 	evtFinish.Wait();
 	LOGD("IP lookup finished.");
+}
 
+
+
+
+
+int main()
+{
+	DoTest();
+	cNetworkSingleton::Get().Terminate();
 	LOGD("Network test finished");
 	return 0;
 }

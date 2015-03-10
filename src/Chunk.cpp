@@ -776,10 +776,22 @@ void cChunk::BroadcastPendingBlockChanges(void)
 	{
 		return;
 	}
-	
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+
+	if (m_PendingSendBlocks.size() >= 10240)
 	{
-		(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+		// Resend the full chunk
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+		{
+			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, (*itr));
+		}
+	}
+	else
+	{
+		// Only send block changes
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+		{
+			(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+		}
 	}
 	m_PendingSendBlocks.clear();
 }
@@ -874,80 +886,71 @@ void cChunk::ApplyWeatherToTop()
 	
 	int X = m_World->GetTickRandomNumber(15);
 	int Z = m_World->GetTickRandomNumber(15);
-	switch (GetBiomeAt(X, Z))
+
+	// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
+	int Height = GetHeight(X, Z);
+
+	if (GetSnowStartHeight(GetBiomeAt(X, Z)) > Height)
 	{
-		case biTaiga:
-		case biFrozenOcean:
-		case biFrozenRiver:
-		case biIcePlains:
-		case biIceMountains:
-		case biTaigaHills:
+		return;
+	}
+
+	BLOCKTYPE TopBlock = GetBlock(X, Height, Z);
+	NIBBLETYPE TopMeta = GetMeta (X, Height, Z);
+	if (m_World->IsDeepSnowEnabled() && (TopBlock == E_BLOCK_SNOW))
+	{
+		int MaxSize = 7;
+		BLOCKTYPE  BlockType[4];
+		NIBBLETYPE BlockMeta[4];
+		UnboundedRelGetBlock(X - 1, Height, Z,     BlockType[0], BlockMeta[0]);
+		UnboundedRelGetBlock(X + 1, Height, Z,     BlockType[1], BlockMeta[1]);
+		UnboundedRelGetBlock(X,     Height, Z - 1, BlockType[2], BlockMeta[2]);
+		UnboundedRelGetBlock(X,     Height, Z + 1, BlockType[3], BlockMeta[3]);
+		for (int i = 0; i < 4; i++)
 		{
-			// TODO: Check light levels, don't snow over when the BlockLight is higher than (7?)
-			int Height = GetHeight(X, Z);
-			BLOCKTYPE TopBlock = GetBlock(X, Height, Z);
-			NIBBLETYPE TopMeta = GetMeta (X, Height, Z);
-			if (m_World->IsDeepSnowEnabled() && (TopBlock == E_BLOCK_SNOW))
+			switch (BlockType[i])
 			{
-				int MaxSize = 7;
-				BLOCKTYPE  BlockType[4];
-				NIBBLETYPE BlockMeta[4];
-				UnboundedRelGetBlock(X - 1, Height, Z,     BlockType[0], BlockMeta[0]);
-				UnboundedRelGetBlock(X + 1, Height, Z,     BlockType[1], BlockMeta[1]);
-				UnboundedRelGetBlock(X,     Height, Z - 1, BlockType[2], BlockMeta[2]);
-				UnboundedRelGetBlock(X,     Height, Z + 1, BlockType[3], BlockMeta[3]);
-				for (int i = 0; i < 4; i++)
+				case E_BLOCK_AIR:
 				{
-					switch (BlockType[i])
-					{
-						case E_BLOCK_AIR:
-						{
-							MaxSize = 0;
-							break;
-						}
-						case E_BLOCK_SNOW:
-						{
-							MaxSize = std::min(BlockMeta[i] + 1, MaxSize);
-							break;
-						}
-					}
+					MaxSize = 0;
+					break;
 				}
-				if (TopMeta < MaxSize)
+				case E_BLOCK_SNOW:
 				{
-					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta + 1);
-				}
-				else if (TopMeta > MaxSize)
-				{
-					FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
+					MaxSize = std::min(BlockMeta[i] + 1, MaxSize);
+					break;
 				}
 			}
-			else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
-			{
-				SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
-			}
-			else if ((TopBlock == E_BLOCK_WATER) || (TopBlock == E_BLOCK_STATIONARY_WATER))
-			{
-				SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
-			}
-			else if (
-				(m_World->IsDeepSnowEnabled()) &&
-				(
-					(TopBlock == E_BLOCK_RED_ROSE) ||
-					(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
-					(TopBlock == E_BLOCK_RED_MUSHROOM) ||
-					(TopBlock == E_BLOCK_BROWN_MUSHROOM)
-				)
-			)
-			{
-				SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
-			}
-			break;
-		}  // case (snowy biomes)
-		default:
-		{
-			break;
 		}
-	}  // switch (biome)
+		if (TopMeta < MaxSize)
+		{
+			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta + 1);
+		}
+		else if (TopMeta > MaxSize)
+		{
+			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
+		}
+	}
+	else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
+	{
+		SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
+	}
+	else if (IsBlockWater(TopBlock) && (TopMeta == 0))
+	{
+		SetBlock(X, Height, Z, E_BLOCK_ICE, 0);
+	}
+	else if (
+		(m_World->IsDeepSnowEnabled()) &&
+		(
+			(TopBlock == E_BLOCK_RED_ROSE) ||
+			(TopBlock == E_BLOCK_YELLOW_FLOWER) ||
+			(TopBlock == E_BLOCK_RED_MUSHROOM) ||
+			(TopBlock == E_BLOCK_BROWN_MUSHROOM)
+		)
+	)
+	{
+		SetBlock(X, Height, Z, E_BLOCK_SNOW, 0);
+	}
 }
 
 
@@ -1570,12 +1573,18 @@ void cChunk::FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockT
 	if (
 		a_SendToClients &&                  // ... we are told to do so AND ...
 		(
-			(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
-			!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them):
-				((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
-				((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
-				((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
-				((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+			!(                                // ... the old and new blocktypes AREN'T leaves (because the client doesn't need meta updates)
+				((OldBlockType == E_BLOCK_LEAVES) && (a_BlockType == E_BLOCK_LEAVES)) ||
+				((OldBlockType == E_BLOCK_NEW_LEAVES) && (a_BlockType == E_BLOCK_NEW_LEAVES))
+			) &&                              // ... AND ...
+			(
+				(OldBlockMeta != a_BlockMeta) ||  // ... the meta value is different OR ...
+				!(                                // ... the old and new blocktypes AREN'T liquids (because client doesn't need to distinguish betwixt them):
+					((OldBlockType == E_BLOCK_STATIONARY_WATER) && (a_BlockType == E_BLOCK_WATER)) ||             // Replacing stationary water with water
+					((OldBlockType == E_BLOCK_WATER)            && (a_BlockType == E_BLOCK_STATIONARY_WATER)) ||  // Replacing water with stationary water
+					((OldBlockType == E_BLOCK_STATIONARY_LAVA)  && (a_BlockType == E_BLOCK_LAVA)) ||              // Replacing stationary water with water
+					((OldBlockType == E_BLOCK_LAVA)             && (a_BlockType == E_BLOCK_STATIONARY_LAVA))      // Replacing water with stationary water
+				)
 			)
 		)
 	)

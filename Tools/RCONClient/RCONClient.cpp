@@ -80,14 +80,14 @@ bool cRCONPacketizer::SendPacket(int a_PacketType, const AString & a_PacketPaylo
 	size_t Length = Packet.size();
 	if (!m_Socket.Send((const char *)&Length, 4))
 	{
-		fprintf(stderr, "Network error while sending packet: %d (%s). Aborting.",
+		fprintf(stderr, "Network error while sending packet: %d (%s). Aborting.\n",
 			cSocket::GetLastError(), cSocket::GetLastErrorString().c_str()
 		);
 		return false;
 	}
 	if (!m_Socket.Send(Packet.data(), Packet.size()))
 	{
-		fprintf(stderr, "Network error while sending packet: %d (%s). Aborting.",
+		fprintf(stderr, "Network error while sending packet: %d (%s). Aborting.\n",
 			cSocket::GetLastError(), cSocket::GetLastErrorString().c_str()
 		);
 		return false;
@@ -110,12 +110,12 @@ bool cRCONPacketizer::ReceiveResponse(void)
 		int NumReceived = m_Socket.Receive(buf, sizeof(buf), 0);
 		if (NumReceived == 0)
 		{
-			fprintf(stderr, "The remote end closed the connection. Aborting.");
+			fprintf(stderr, "The remote end closed the connection. Aborting.\n");
 			return false;
 		}
 		if (NumReceived < 0)
 		{
-			fprintf(stderr, "Network error while receiving response: %d, %d (%s). Aborting.",
+			fprintf(stderr, "Network error while receiving response: %d, %d (%s). Aborting.\n",
 				NumReceived, cSocket::GetLastError(), cSocket::GetLastErrorString().c_str()
 			);
 			return false;
@@ -156,13 +156,13 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 	{
 		if ((RequestID == -1) && (m_RequestID == 0))
 		{
-			fprintf(stderr, "Login failed. Aborting.");
+			fprintf(stderr, "Login failed. Aborting.\n");
 			IsValid = false;
 			// Continue, so that the payload is printed before the program aborts.
 		}
 		else
 		{
-			fprintf(stderr, "The server returned an invalid request ID, got %d, exp. %d. Aborting.", RequestID, m_RequestID);
+			fprintf(stderr, "The server returned an invalid request ID, got %d, exp. %d. Aborting.\n", RequestID, m_RequestID);
 			return false;
 		}
 	}
@@ -172,7 +172,7 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 	VERIFY(a_Buffer.ReadLEInt(PacketType));
 	if (PacketType != ptCommand)
 	{
-		fprintf(stderr, "The server returned an unknown packet type: %d. Aborting.", PacketType);
+		fprintf(stderr, "The server returned an unknown packet type: %d. Aborting.\n", PacketType);
 		IsValid = false;
 		// Continue, so that the payload is printed before the program aborts.
 	}
@@ -200,8 +200,8 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 
 int RealMain(int argc, char * argv[])
 {
-	new cMCLogger;  // Create a new logger
-	
+	cLogger::InitiateMultithreading();
+
 	// Parse the cmdline params for server IP, port, password and the commands to send:
 	AString ServerAddress, Password;
 	int ServerPort = -1;
@@ -301,6 +301,7 @@ int RealMain(int argc, char * argv[])
 		}
 	}
 	
+	// Send each command:
 	for (AStringVector::const_iterator itr = Commands.begin(), end = Commands.end(); itr != end; ++itr)
 	{
 		if (g_IsVerbose)

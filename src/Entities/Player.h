@@ -40,7 +40,7 @@ public:
 	CLASS_PROTODEF(cPlayer)
 	
 
-	cPlayer(cClientHandle * a_Client, const AString & a_PlayerName);
+	cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName);
 	
 	virtual ~cPlayer();
 
@@ -72,22 +72,22 @@ public:
 	Returns true on success
 	"should" really only be called at init or player death, plugins excepted
 	*/
-	bool SetCurrentExperience(short a_XpTotal);
+	bool SetCurrentExperience(int a_XpTotal);
 
 	/* changes Xp by Xp_delta, you "shouldn't" inc more than MAX_EXPERIENCE_ORB_SIZE
 	Wont't allow xp to go negative
 	Returns the new current experience, -1 on error
 	*/
-	short DeltaExperience(short a_Xp_delta);
+	int DeltaExperience(int a_Xp_delta);
 
 	/** Gets the experience total - XpTotal for score on death */
-	inline short GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
+	inline int GetXpLifetimeTotal(void) { return m_LifetimeTotalXp; }
 
 	/** Gets the currrent experience */
-	inline short GetCurrentXp(void) { return m_CurrentXp; }
+	inline int GetCurrentXp(void) { return m_CurrentXp; }
 
 	/** Gets the current level - XpLevel */
-	short GetXpLevel(void);
+	int GetXpLevel(void);
 
 	/** Gets the experience bar percentage - XpP */
 	float GetXpPercentage(void);
@@ -95,13 +95,13 @@ public:
 	/** Caculates the amount of XP needed for a given level
 	Ref: http://minecraft.gamepedia.com/XP
 	*/
-	static short XpForLevel(short int a_Level);
+	static int XpForLevel(int a_Level);
 
 	/** Inverse of XpForLevel
 	Ref: http://minecraft.gamepedia.com/XP
 	values are as per this with pre-calculations
 	*/
-	static short CalcLevelFromXp(short int a_CurrentXp);
+	static int CalcLevelFromXp(int a_CurrentXp);
 
 	// tolua_end
 	
@@ -121,7 +121,7 @@ public:
 	inline void SetStance( const double a_Stance) { m_Stance = a_Stance; }
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
-	inline bool IsOnGround(void) const {return m_bTouchGround; }  // tolua_export
+	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
 	inline double GetStance(void) const { return GetPosY() + 1.62; }  // tolua_export  // TODO: Proper stance when crouching etc.
 	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
@@ -222,7 +222,15 @@ public:
 	/** Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow */
 	void CloseWindowIfID(char a_WindowID, bool a_CanRefuse = true);
 
-	cClientHandle * GetClientHandle(void) const { return m_ClientHandle; }
+	/** Returns the raw client handle associated with the player. */
+	cClientHandle * GetClientHandle(void) const { return m_ClientHandle.get(); }
+
+	// tolua_end
+
+	/** Returns the SharedPtr to client handle associated with the player. */
+	cClientHandlePtr GetClientHandlePtr(void) const { return m_ClientHandle; }
+
+	// tolua_begin
 
 	void SendMessage          (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtCustom); }
 	void SendMessageInfo      (const AString & a_Message) { m_ClientHandle->SendChat(a_Message, mtInformation); }
@@ -467,6 +475,10 @@ public:
 	virtual bool IsRclking  (void) const { return IsEating() || IsChargingBow(); }
 
 	virtual void Detach(void);
+
+	/** Called by cClientHandle when the client is being destroyed.
+	The player removes its m_ClientHandle ownership so that the ClientHandle gets deleted. */
+	void RemoveClientHandle(void);
 	
 protected:
 
@@ -537,7 +549,7 @@ protected:
 
 	std::chrono::steady_clock::time_point m_LastPlayerListTime;
 
-	cClientHandle * m_ClientHandle;
+	cClientHandlePtr m_ClientHandle;
 	
 	cSlotNums m_InventoryPaintSlots;
 	
@@ -569,8 +581,8 @@ protected:
 	Int64 m_EatingFinishTick;
 
 	/** Player Xp level */
-	short int m_LifetimeTotalXp;
-	short int m_CurrentXp;
+	int m_LifetimeTotalXp;
+	int m_CurrentXp;
 
 	// flag saying we need to send a xp update to client
 	bool m_bDirtyExperience;

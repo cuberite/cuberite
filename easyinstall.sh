@@ -7,7 +7,7 @@ case $PLATFORM in
 	"i686") DOWNLOADURL="http://builds.cuberite.org/job/MCServer%20Linux%20x86/lastSuccessfulBuild/artifact/MCServer.tar" ;;
 	"x86_64") DOWNLOADURL="http://builds.cuberite.org/job/MCServer%20Linux%20x64/lastSuccessfulBuild/artifact/MCServer.tar" ;;
 	# Assume that all arm devices are a raspi for now.
-	"arm*") DOWNLOADURL="http://builds.cuberite.org/job/MCServer%20Linux%20armhf/lastSuccessfulBuild/artifact/MCServer/MCServer.tar"
+	arm*) DOWNLOADURL="http://builds.cuberite.org/job/MCServer%20Linux%20armhf/lastSuccessfulBuild/artifact/MCServer/MCServer.tar"
 esac
 
 echo "Downloading precompiled binaries."

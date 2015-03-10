@@ -15,7 +15,6 @@
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
-#include "OSSupport/Socket.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
@@ -56,16 +55,15 @@ int cClientHandle::s_ClientCount = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // cClientHandle:
 
-cClientHandle::cClientHandle(const cSocket * a_Socket, int a_ViewDistance) :
+cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_CurrentViewDistance(a_ViewDistance),
 	m_RequestedViewDistance(a_ViewDistance),
-	m_IPString(a_Socket->GetIPString()),
-	m_OutgoingData(64 KiB),
+	m_IPString(a_IPString),
 	m_Player(nullptr),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(0x7fffffff),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(0x7fffffff),
-	m_TimeSinceLastPacket(0),
+	m_TicksSinceLastPacket(0),
 	m_Ping(1000),
 	m_PingID(1),
 	m_BlockDigAnimStage(-1),
@@ -135,9 +133,6 @@ cClientHandle::~cClientHandle()
 		SendDisconnect("Server shut down? Kthnxbai");
 	}
 	
-	// Close the socket as soon as it sends all outgoing data:
-	cRoot::Get()->GetServer()->RemoveClient(this);
-	
 	delete m_Protocol;
 	m_Protocol = nullptr;
 	
@@ -150,6 +145,10 @@ cClientHandle::~cClientHandle()
 
 void cClientHandle::Destroy(void)
 {
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		m_Link.reset();
+	}
 	{
 		cCSLock Lock(m_CSDestroyingState);
 		if (m_State >= csDestroying)
@@ -167,6 +166,10 @@ void cClientHandle::Destroy(void)
 	{
 		RemoveFromAllChunks();
 		m_Player->GetWorld()->RemoveClientFromChunkSender(this);
+	}
+	if (m_Player != nullptr)
+	{
+		m_Player->RemoveClientHandle();
 	}
 	m_State = csDestroyed;
 }
@@ -326,7 +329,8 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	m_Protocol->SendLoginSuccess();
 
 	// Spawn player (only serversided, so data is loaded)
-	m_Player = new cPlayer(this, GetUsername());
+	m_Player = new cPlayer(m_Self, GetUsername());
+	m_Self.reset();
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
 	if (World == nullptr)
@@ -683,6 +687,47 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 	}
 	
 	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, (a_SlotNum >= 0) ? caLeftClick : caLeftClickOutside, a_HeldItem);
+}
+
+
+
+
+
+void cClientHandle::HandleEnchantItem(Byte a_WindowID, Byte a_Enchantment)
+{
+	if (a_Enchantment > 2)
+	{
+		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
+		Kick("Invalid enchanting!");
+		return;
+	}
+
+	if (
+		(m_Player->GetWindow() == nullptr) ||
+		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
+		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
+	)
+	{
+		return;
+	}
+	
+	cEnchantingWindow * Window = reinterpret_cast<cEnchantingWindow *>(m_Player->GetWindow());
+	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);  // Make a copy of the item
+	short BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
+
+	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
+	{
+		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
+		{
+			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
+			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
+			Window->BroadcastWholeWindow();
+
+			Window->SetProperty(0, 0, *m_Player);
+			Window->SetProperty(1, 0, *m_Player);
+			Window->SetProperty(2, 0, *m_Player);
+		}
+	}
 }
 
 
@@ -1777,44 +1822,9 @@ void cClientHandle::SendData(const char * a_Data, size_t a_Size)
 		// This could crash the client, because they've already unloaded the world etc., and suddenly a wild packet appears (#31)
 		return;
 	}
-	
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		
-		// _X 2012_09_06: We need an overflow buffer, usually when streaming the initial chunks
-		if (m_OutgoingDataOverflow.empty())
-		{
-			// No queued overflow data; if this packet fits into the ringbuffer, put it in, otherwise put it in the overflow buffer:
-			size_t CanFit = m_OutgoingData.GetFreeSpace();
-			if (CanFit > a_Size)
-			{
-				CanFit = a_Size;
-			}
-			if (CanFit > 0)
-			{
-				m_OutgoingData.Write(a_Data, CanFit);
-			}
-			if (a_Size > CanFit)
-			{
-				m_OutgoingDataOverflow.append(a_Data + CanFit, a_Size - CanFit);
-			}
-		}
-		else
-		{
-			// There is a queued overflow. Append to it, then send as much from its front as possible
-			m_OutgoingDataOverflow.append(a_Data, a_Size);
-			size_t CanFit = m_OutgoingData.GetFreeSpace();
-			if (CanFit > 128)
-			{
-				// No point in moving the data over if it's not large enough - too much effort for too little an effect
-				m_OutgoingData.Write(m_OutgoingDataOverflow.data(), CanFit);
-				m_OutgoingDataOverflow.erase(0, CanFit);
-			}
-		}
-	}  // Lock(m_CSOutgoingData)
-	
-	// Notify SocketThreads that we have something to write:
-	cRoot::Get()->GetServer()->NotifyClientWrite(this);
+
+	cCSLock Lock(m_CSOutgoingData);
+	m_OutgoingData.append(a_Data, a_Size);
 }
 
 
@@ -1871,10 +1881,28 @@ void cClientHandle::Tick(float a_Dt)
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
 	}
-	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	if (!IncomingData.empty())
+	{
+		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
+
+	// Send any queued outgoing data:
+	AString OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+	if (!OutgoingData.empty())
+	{
+		cTCPLinkPtr Link(m_Link);  // Grab a copy of the link in a multithread-safe way
+		if ((Link != nullptr))
+		{
+			Link->Send(OutgoingData.data(), OutgoingData.size());
+		}
+	}
 	
-	m_TimeSinceLastPacket += a_Dt;
-	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
+	m_TicksSinceLastPacket += 1;
+	if (m_TicksSinceLastPacket > 600)  // 30 seconds time-out
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		Destroy();
@@ -1955,7 +1983,21 @@ void cClientHandle::ServerTick(float a_Dt)
 		cCSLock Lock(m_CSIncomingData);
 		std::swap(IncomingData, m_IncomingData);
 	}
-	m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	if (!IncomingData.empty())
+	{
+		m_Protocol->DataReceived(IncomingData.data(), IncomingData.size());
+	}
+	
+	// Send any queued outgoing data:
+	AString OutgoingData;
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		std::swap(OutgoingData, m_OutgoingData);
+	}
+	if ((m_Link != nullptr) && !OutgoingData.empty())
+	{
+		m_Link->Send(OutgoingData.data(), OutgoingData.size());
+	}
 	
 	if (m_State == csAuthenticated)
 	{
@@ -1970,8 +2012,8 @@ void cClientHandle::ServerTick(float a_Dt)
 		return;
 	}
 	
-	m_TimeSinceLastPacket += a_Dt;
-	if (m_TimeSinceLastPacket > 30000.f)  // 30 seconds time-out
+	m_TicksSinceLastPacket += 1;
+	if (m_TicksSinceLastPacket > 600)  // 30 seconds
 	{
 		SendDisconnect("Nooooo!! You timed out! D: Come back!");
 		Destroy();
@@ -2843,49 +2885,13 @@ void cClientHandle::PacketError(UInt32 a_PacketType)
 
 
 
-bool cClientHandle::DataReceived(const char * a_Data, size_t a_Size)
-{
-	// Data is received from the client, store it in the buffer to be processed by the Tick thread:
-	m_TimeSinceLastPacket = 0;
-	cCSLock Lock(m_CSIncomingData);
-	m_IncomingData.append(a_Data, a_Size);
-	return false;
-}
-
-
-
-
-
-void cClientHandle::GetOutgoingData(AString & a_Data)
-{
-	// Data can be sent to client
-	{
-		cCSLock Lock(m_CSOutgoingData);
-		m_OutgoingData.ReadAll(a_Data);
-		m_OutgoingData.CommitRead();
-		a_Data.append(m_OutgoingDataOverflow);
-		m_OutgoingDataOverflow.clear();
-	}
-
-	// Disconnect player after all packets have been sent
-	if (m_HasSentDC && a_Data.empty())
-	{
-		Destroy();
-	}
-}
-
-
-
-
-
 void cClientHandle::SocketClosed(void)
 {
 	// The socket has been closed for any reason
 	
-	LOGD("Player %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
-
 	if (!m_Username.empty())  // Ignore client pings
 	{
+		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
 		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
 	}
 
@@ -2896,41 +2902,62 @@ void cClientHandle::SocketClosed(void)
 
 
 
-void cClientHandle::HandleEnchantItem(Byte & a_WindowID, Byte & a_Enchantment)
+void cClientHandle::SetSelf(cClientHandlePtr a_Self)
 {
-	if (a_Enchantment > 2)
-	{
-		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
-		Kick("Invalid enchanting!");
-		return;
-	}
+	ASSERT(m_Self == nullptr);
+	m_Self = a_Self;
+}
 
-	if (
-		(m_Player->GetWindow() == nullptr) ||
-		(m_Player->GetWindow()->GetWindowID() != a_WindowID) ||
-		(m_Player->GetWindow()->GetWindowType() != cWindow::wtEnchantment)
-	)
-	{
-		return;
-	}
-	
-	cEnchantingWindow * Window = (cEnchantingWindow*) m_Player->GetWindow();
-	cItem Item = *Window->m_SlotArea->GetSlot(0, *m_Player);
-	int BaseEnchantmentLevel = Window->GetPropertyValue(a_Enchantment);
 
-	if (Item.EnchantByXPLevels(BaseEnchantmentLevel))
-	{
-		if (m_Player->IsGameModeCreative() || m_Player->DeltaExperience(-m_Player->XpForLevel(BaseEnchantmentLevel)) >= 0)
-		{
-			Window->m_SlotArea->SetSlot(0, *m_Player, Item);
-			Window->SendSlot(*m_Player, Window->m_SlotArea, 0);
-			Window->BroadcastWholeWindow();
 
-			Window->SetProperty(0, 0, *m_Player);
-			Window->SetProperty(1, 0, *m_Player);
-			Window->SetProperty(2, 0, *m_Player);
-		}
+
+
+void cClientHandle::OnLinkCreated(cTCPLinkPtr a_Link)
+{
+	m_Link = a_Link;
+}
+
+
+
+
+
+void cClientHandle::OnReceivedData(const char * a_Data, size_t a_Length)
+{
+	// Reset the timeout:
+	m_TicksSinceLastPacket = 0;
+
+	// Queue the incoming data to be processed in the tick thread:
+	cCSLock Lock(m_CSIncomingData);
+	m_IncomingData.append(a_Data, a_Length);
+}
+
+
+
+
+
+void cClientHandle::OnRemoteClosed(void)
+{
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		m_Link.reset();
 	}
+	SocketClosed();
+}
+
+
+
+
+
+void cClientHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
+{
+	LOGD("An error has occurred on client link for %s @ %s: %d (%s). Client disconnected.",
+		m_Username.c_str(), m_IPString.c_str(), a_ErrorCode, a_ErrorMsg.c_str()
+	);
+	{
+		cCSLock Lock(m_CSOutgoingData);
+		m_Link.reset();
+	}
+	SocketClosed();
 }
 
 

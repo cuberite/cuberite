@@ -181,43 +181,49 @@ void cRoot::Start(void)
 		IniFile.WriteFile("settings.ini");
 
 		LOGD("Finalising startup...");
-		m_Server->Start();
-		
-		m_WebAdmin->Start();
-
-		#if !defined(ANDROID_NDK)
-		LOGD("Starting InputThread...");
-		try
+		if (m_Server->Start())
 		{
-			m_InputThread = std::thread(InputThread, std::ref(*this));
-			m_InputThread.detach();
-		}
-		catch (std::system_error & a_Exception)
-		{
-			LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
-		}
-		#endif
+			m_WebAdmin->Start();
 
-		LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
-		#ifdef _WIN32
-		EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
-		#endif
+			#if !defined(ANDROID_NDK)
+			LOGD("Starting InputThread...");
+			try
+			{
+				m_InputThread = std::thread(InputThread, std::ref(*this));
+				m_InputThread.detach();
+			}
+			catch (std::system_error & a_Exception)
+			{
+				LOGERROR("cRoot::Start (std::thread) error %i: could not construct input thread; %s", a_Exception.code().value(), a_Exception.what());
+			}
+			#endif
 
-		while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
-		{
-			std::this_thread::sleep_for(std::chrono::seconds(1));
-		}
+			LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
+			#ifdef _WIN32
+			EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
+			#endif
 
-		if (m_TerminateEventRaised)
+			while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
+			{
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+			}
+
+			if (m_TerminateEventRaised)
+			{
+				m_bStop = true;
+			}
+
+			// Stop the server:
+			m_WebAdmin->Stop();
+
+			LOG("Shutting down server...");
+			m_Server->Shutdown();
+		}  // if (m_Server->Start())
+		else
 		{
 			m_bStop = true;
 		}
 
-		// Stop the server:
-		m_WebAdmin->Stop();
-
-		LOG("Shutting down server...");
-		m_Server->Shutdown();
 		delete m_MojangAPI; m_MojangAPI = nullptr;
 
 		LOGD("Shutting down deadlock detector...");

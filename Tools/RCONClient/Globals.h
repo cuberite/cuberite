@@ -22,6 +22,18 @@
 	#define ALIGN_8
 	#define ALIGN_16
 	
+	#define FORMATSTRING(formatIndex, va_argsIndex)
+
+	// MSVC has its own custom version of zu format
+	#define SIZE_T_FMT "%Iu"
+	#define SIZE_T_FMT_PRECISION(x) "%" #x "Iu"
+	#define SIZE_T_FMT_HEX "%Ix"
+	
+	#define NORETURN      __declspec(noreturn)
+
+	// Use non-standard defines in <cmath>
+	#define _USE_MATH_DEFINES
+
 #elif defined(__GNUC__)
 
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
@@ -37,6 +49,29 @@
 
 	// Some portability macros :)
 	#define stricmp strcasecmp
+
+	#define FORMATSTRING(formatIndex, va_argsIndex) __attribute__((format (printf, formatIndex, va_argsIndex)))
+
+	#if defined(_WIN32)
+		// We're compiling on MinGW, which uses an old MSVCRT library that has no support for size_t printfing.
+		// We need direct size formats:
+		#if defined(_WIN64)
+			#define SIZE_T_FMT "%I64u"
+			#define SIZE_T_FMT_PRECISION(x) "%" #x "I64u"
+			#define SIZE_T_FMT_HEX "%I64x"
+		#else
+			#define SIZE_T_FMT "%u"
+			#define SIZE_T_FMT_PRECISION(x) "%" #x "u"
+			#define SIZE_T_FMT_HEX "%x"
+		#endif
+	#else
+		// We're compiling on Linux, so we can use libc's size_t printf format:
+		#define SIZE_T_FMT "%zu"
+		#define SIZE_T_FMT_PRECISION(x) "%" #x "zu"
+		#define SIZE_T_FMT_HEX "%zx"
+	#endif
+	
+	#define NORETURN      __attribute((__noreturn__))
 
 #else
 
@@ -74,6 +109,8 @@ typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
 
+typedef unsigned char Byte;
+
 
 
 
@@ -94,7 +131,7 @@ typedef unsigned short     UInt16;
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
 
-	#define _WIN32_WINNT 0x501  // We want to target WinXP and higher
+	#define _WIN32_WINNT 0x502  // We want to target WinXP SP2 and higher
 
 	#include <Windows.h>
 	#include <winsock2.h>
@@ -175,7 +212,8 @@ typedef unsigned short     UInt16;
 #include "StringUtils.h"
 #include "OSSupport/CriticalSection.h"
 #include "OSSupport/File.h"
-#include "MCLogger.h"
+#include "OSSupport/Event.h"
+#include "Logger.h"
 
 
 

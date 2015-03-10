@@ -83,6 +83,9 @@ void cServerHandleImpl::Close(void)
 
 	// Remove the ptr to self, so that the object may be freed:
 	m_SelfPtr.reset();
+
+	// Remove self from cNetworkSingleton:
+	cNetworkSingleton::Get().RemoveServer(this);
 }
 
 
@@ -122,6 +125,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	bool NeedsTwoSockets = false;
 	int err;
 	evutil_socket_t MainSock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
 	if (!IsValidSocket(MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
@@ -133,6 +137,16 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
 			Printf(m_ErrorMsg, "Cannot create socket for port %d: %s", a_Port, evutil_socket_error_to_string(m_ErrorCode));
 			return false;
+		}
+
+		// Allow the port to be reused right after the socket closes:
+		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
+		{
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
+				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			);
+			LOG("%s", m_ErrorMsg.c_str());
 		}
 
 		// Bind to all interfaces:
@@ -157,13 +171,19 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 			err = EVUTIL_SOCKET_ERROR();
 			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
-			LOGD("setsockopt(IPV6_V6ONLY) returned %d, err is %d (%s). %s",
-				res, err, evutil_socket_error_to_string(err),
-				NeedsTwoSockets ? "Second socket will be created" : "Second socket not needed"
-			);
 		#else
 			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
 		#endif
+
+		// Allow the port to be reused right after the socket closes:
+		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
+		{
+			m_ErrorCode = EVUTIL_SOCKET_ERROR();
+			Printf(m_ErrorMsg, "Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
+				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			);
+			LOG("%s", m_ErrorMsg.c_str());
+		}
 
 		// Bind to all interfaces:
 		sockaddr_in6 name;
@@ -194,6 +214,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	}
 	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
 	m_IsListening = true;
+
 	if (!NeedsTwoSockets)
 	{
 		return true;
@@ -202,11 +223,22 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	// If a secondary socket is required (WinXP dual-stack), create it here:
 	LOGD("Creating a second socket for IPv4");
 	evutil_socket_t SecondSock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
 	if (!IsValidSocket(SecondSock))
 	{
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("socket(AF_INET, ...) failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
 		return true;  // Report as success, the primary socket is working
+	}
+
+	// Allow the port to be reused right after the socket closes:
+	if (evutil_make_listen_socket_reuseable(SecondSock) != 0)
+	{
+		m_ErrorCode = EVUTIL_SOCKET_ERROR();
+		Printf(m_ErrorMsg, "Port %d cannot be made reusable (second socket): %d (%s). Restarting the server might not work.",
+			a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+		);
+		LOG("%s", m_ErrorMsg.c_str());
 	}
 
 	// Make the secondary socket nonblocking:
@@ -234,7 +266,7 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (listen(SecondSock, 0) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("Cannot listen on on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
+		LOGD("Cannot listen on secondary socket on port %d: %d (%s)", a_Port, err, evutil_socket_error_to_string(err));
 		evutil_closesocket(SecondSock);
 		return true;  // Report as success, the primary socket is working
 	}
@@ -256,19 +288,20 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 
 	// Get the textual IP address and port number out of a_Addr:
 	char IPAddress[128];
-	evutil_inet_ntop(a_Addr->sa_family, a_Addr->sa_data, IPAddress, ARRAYCOUNT(IPAddress));
 	UInt16 Port = 0;
 	switch (a_Addr->sa_family)
 	{
 		case AF_INET:
 		{
 			sockaddr_in * sin = reinterpret_cast<sockaddr_in *>(a_Addr);
+			evutil_inet_ntop(AF_INET, sin, IPAddress, ARRAYCOUNT(IPAddress));
 			Port = ntohs(sin->sin_port);
 			break;
 		}
 		case AF_INET6:
 		{
 			sockaddr_in6 * sin6 = reinterpret_cast<sockaddr_in6 *>(a_Addr);
+			evutil_inet_ntop(AF_INET, sin6, IPAddress, ARRAYCOUNT(IPAddress));
 			Port = ntohs(sin6->sin6_port);
 			break;
 		}

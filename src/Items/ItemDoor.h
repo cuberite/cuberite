@@ -40,7 +40,7 @@ public:
 		}
 
 		// The door needs a compatible block below it:
-		if ((a_BlockY > 0) && !cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
 		{
 			return false;
 		}
@@ -62,10 +62,10 @@ public:
 				return false;
 			}
 		}
-		
+
 		// Check the two blocks that will get replaced by the door:
-		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
-		BLOCKTYPE UpperBlockType = a_World.GetBlock(a_BlockX, a_BlockY + 2, a_BlockZ);
+		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+		BLOCKTYPE UpperBlockType = a_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
 		if (
 			!cBlockDoorHandler::CanReplaceBlock(LowerBlockType) ||
 			!cBlockDoorHandler::CanReplaceBlock(UpperBlockType))
@@ -77,19 +77,32 @@ public:
 		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::PlayerYawToMetaData(a_Player.GetYaw());
 		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlockMeta);
 		Vector3i LeftNeighborPos = RelDirToOutside;
-		LeftNeighborPos.TurnCCW();
+		LeftNeighborPos.TurnCW();
 		LeftNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
 		Vector3i RightNeighborPos = RelDirToOutside;
-		RightNeighborPos.TurnCW();
+		RightNeighborPos.TurnCCW();
 		RightNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
 
 		// Decide whether the hinge is on the left (default) or on the right:
 		NIBBLETYPE UpperBlockMeta = 0x08;
+		BLOCKTYPE LeftNeighborBlock = a_World.GetBlock(LeftNeighborPos);
+		BLOCKTYPE RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
+		/*
+		// DEBUG:
+		LOGD("Door being placed at {%d, %d, %d}", a_BlockX, a_BlockY, a_BlockZ);
+		LOGD("RelDirToOutside: {%d, %d, %d}", RelDirToOutside.x, RelDirToOutside.y, RelDirToOutside.z);
+		LOGD("Left neighbor at {%d, %d, %d}: %d (%s)", LeftNeighborPos.x, LeftNeighborPos.y, LeftNeighborPos.z, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock).c_str());
+		LOGD("Right neighbor at {%d, %d, %d}: %d (%s)", RightNeighborPos.x, RightNeighborPos.y, RightNeighborPos.z, RightNeighborBlock, ItemTypeToString(RightNeighborBlock).c_str());
+		*/
 		if (
-			cBlockDoorHandler::IsDoorBlockType(a_World.GetBlock(LeftNeighborPos)) ||  // The block to the left is a door block
-			cBlockInfo::IsSolid(a_World.GetBlock(RightNeighborPos))                   // The block to the right is solid
+			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
+			(
+				cBlockInfo::IsSolid(RightNeighborBlock) &&               // The block to the right is solid...
+				!cBlockDoorHandler::IsDoorBlockType(RightNeighborBlock)  // ... but not a door
+			)
 		)
 		{
+			// DEBUG: LOGD("Setting hinge to right side");
 			UpperBlockMeta = 0x09;  // Upper block | hinge on right
 		}
 
@@ -106,7 +119,3 @@ public:
 		return true;
 	}
 } ;
-
-
-
-

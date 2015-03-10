@@ -38,8 +38,7 @@ cHTTPConnection::~cHTTPConnection()
 
 void cHTTPConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Response)
 {
-	AppendPrintf(m_OutgoingData, "%d %s\r\nContent-Length: 0\r\n\r\n", a_StatusCode, a_Response.c_str());
-	m_HTTPServer.NotifyConnectionWrite(*this);
+	SendData(Printf("%d %s\r\nContent-Length: 0\r\n\r\n", a_StatusCode, a_Response.c_str()));
 	m_State = wcsRecvHeaders;
 }
 
@@ -49,8 +48,7 @@ void cHTTPConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Re
 
 void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
 {
-	AppendPrintf(m_OutgoingData, "HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"%s\"\r\nContent-Length: 0\r\n\r\n", a_Realm.c_str());
-	m_HTTPServer.NotifyConnectionWrite(*this);
+	SendData(Printf("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"%s\"\r\nContent-Length: 0\r\n\r\n", a_Realm.c_str()));
 	m_State = wcsRecvHeaders;
 }
 
@@ -61,9 +59,10 @@ void cHTTPConnection::SendNeedAuth(const AString & a_Realm)
 void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 {
 	ASSERT(m_State == wcsRecvIdle);
-	a_Response.AppendToData(m_OutgoingData);
+	AString toSend;
+	a_Response.AppendToData(toSend);
 	m_State = wcsSendingResp;
-	m_HTTPServer.NotifyConnectionWrite(*this);
+	SendData(toSend);
 }
 
 
@@ -73,10 +72,10 @@ void cHTTPConnection::Send(const cHTTPResponse & a_Response)
 void cHTTPConnection::Send(const void * a_Data, size_t a_Size)
 {
 	ASSERT(m_State == wcsSendingResp);
-	AppendPrintf(m_OutgoingData, SIZE_T_FMT_HEX "\r\n", a_Size);
-	m_OutgoingData.append((const char *)a_Data, a_Size);
-	m_OutgoingData.append("\r\n");
-	m_HTTPServer.NotifyConnectionWrite(*this);
+	// We're sending in Chunked transfer encoding
+	SendData(Printf(SIZE_T_FMT_HEX "\r\n", a_Size));
+	SendData(a_Data, a_Size);
+	SendData("\r\n");
 }
 
 
@@ -86,9 +85,8 @@ void cHTTPConnection::Send(const void * a_Data, size_t a_Size)
 void cHTTPConnection::FinishResponse(void)
 {
 	ASSERT(m_State == wcsSendingResp);
-	m_OutgoingData.append("0\r\n\r\n");
+	SendData("0\r\n\r\n");
 	m_State = wcsRecvHeaders;
-	m_HTTPServer.NotifyConnectionWrite(*this);
 }
 
 
@@ -108,8 +106,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 		case wcsRecvIdle:
 		{
 			// The client is waiting for a response, send an "Internal server error":
-			m_OutgoingData.append("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-			m_HTTPServer.NotifyConnectionWrite(*this);
+			SendData("HTTP/1.1 500 Internal Server Error\r\n\r\n");
 			m_State = wcsRecvHeaders;
 			break;
 		}
@@ -117,7 +114,7 @@ void cHTTPConnection::AwaitNextRequest(void)
 		case wcsSendingResp:
 		{
 			// The response headers have been sent, we need to terminate the response body:
-			m_OutgoingData.append("0\r\n\r\n");
+			SendData("0\r\n\r\n");
 			m_State = wcsRecvHeaders;
 			break;
 		}
@@ -140,15 +137,27 @@ void cHTTPConnection::Terminate(void)
 	{
 		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 	}
-	m_HTTPServer.CloseConnection(*this);
+	m_Link.reset();
 }
 
 
 
 
 
-bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
+void cHTTPConnection::OnLinkCreated(cTCPLinkPtr a_Link)
 {
+	ASSERT(m_Link == nullptr);
+	m_Link = a_Link;
+}
+
+
+
+
+
+void cHTTPConnection::OnReceivedData(const char * a_Data, size_t a_Size)
+{
+	ASSERT(m_Link != nullptr);
+
 	switch (m_State)
 	{
 		case wcsRecvHeaders:
@@ -164,13 +173,14 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 				delete m_CurrentRequest;
 				m_CurrentRequest = nullptr;
 				m_State = wcsInvalid;
-				m_HTTPServer.CloseConnection(*this);
-				return true;
+				m_Link->Close();
+				m_Link.reset();
+				return;
 			}
 			if (m_CurrentRequest->IsInHeaders())
 			{
 				// The request headers are not yet complete
-				return false;
+				return;
 			}
 			
 			// The request has finished parsing its headers successfully, notify of it:
@@ -186,11 +196,13 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 			// Process the rest of the incoming data into the request body:
 			if (a_Size > BytesConsumed)
 			{
-				return cHTTPConnection::DataReceived(a_Data + BytesConsumed, a_Size - BytesConsumed);
+				cHTTPConnection::OnReceivedData(a_Data + BytesConsumed, a_Size - BytesConsumed);
+				return;
 			}
 			else
 			{
-				return cHTTPConnection::DataReceived("", 0);  // If the request has zero body length, let it be processed right-away
+				cHTTPConnection::OnReceivedData("", 0);  // If the request has zero body length, let it be processed right-away
+				return;
 			}
 		}
 
@@ -210,8 +222,9 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 				if (!m_CurrentRequest->DoesAllowKeepAlive())
 				{
 					m_State = wcsInvalid;
-					m_HTTPServer.CloseConnection(*this);
-					return true;
+					m_Link->Close();
+					m_Link.reset();
+					return;
 				}
 				delete m_CurrentRequest;
 				m_CurrentRequest = nullptr;
@@ -225,31 +238,38 @@ bool cHTTPConnection::DataReceived(const char * a_Data, size_t a_Size)
 			break;
 		}
 	}
-	return false;
 }
 
 
 
 
 
-void cHTTPConnection::GetOutgoingData(AString & a_Data)
-{
-	std::swap(a_Data, m_OutgoingData);
-}
-
-
-
-
-
-void cHTTPConnection::SocketClosed(void)
+void cHTTPConnection::OnRemoteClosed(void)
 {
 	if (m_CurrentRequest != nullptr)
 	{
 		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 	}
-	m_HTTPServer.CloseConnection(*this);
+	m_Link.reset();
 }
 
+
+
+
+
+
+void cHTTPConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
+{
+	OnRemoteClosed();
+}
+
+
+
+
+void cHTTPConnection::SendData(const void * a_Data, size_t a_Size)
+{
+	m_Link->Send(a_Data, a_Size);
+}
 
 
 

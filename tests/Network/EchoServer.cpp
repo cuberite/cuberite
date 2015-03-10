@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include "OSSupport/Network.h"
+#include "OSSupport/NetworkSingleton.h"
 
 
 
@@ -98,7 +99,7 @@ class cEchoServerCallbacks:
 
 
 
-int main()
+static void DoTest(void)
 {
 	LOGD("EchoServer: starting up");
 	cServerHandlePtr Server = cNetwork::Listen(9876, std::make_shared<cEchoServerCallbacks>());
@@ -118,10 +119,22 @@ int main()
 	LOG("Server terminating.");
 	Server->Close();
 	ASSERT(!Server->IsListening());
+	Server.reset();
 	LOGD("Server has been closed.");
+}
+
+
+
+
+
+int main()
+{
+	DoTest();
 
 	printf("Press enter to exit test.\n");
+	AString line;
 	std::getline(std::cin, line);
+	cNetworkSingleton::Get().Terminate();
 
 	LOG("Network test finished.");
 	return 0;

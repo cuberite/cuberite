@@ -679,8 +679,8 @@ void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 	
 	for (cMapDecoratorList::const_iterator it = a_Decorators.begin(); it != a_Decorators.end(); ++it)
 	{
-		ASSERT((it->GetPixelX() >= 0) && (it->GetPixelX() < 256));
-		ASSERT((it->GetPixelZ() >= 0) && (it->GetPixelZ() < 256));
+		ASSERT(it->GetPixelX() < 256);
+		ASSERT(it->GetPixelZ() < 256);
 		Pkt.WriteByte(static_cast<Byte>((it->GetType() << 4) | static_cast<Byte>(it->GetRot() & 0xf)));
 		Pkt.WriteByte(static_cast<Byte>(it->GetPixelX()));
 		Pkt.WriteByte(static_cast<Byte>(it->GetPixelZ()));
@@ -694,7 +694,7 @@ void cProtocol172::SendMapDecorators(int a_ID, const cMapDecoratorList & a_Decor
 void cProtocol172::SendMapInfo(int a_ID, unsigned int a_Scale)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	ASSERT((a_Scale >= 0) && (a_Scale < 256));
+	ASSERT(a_Scale < 256);
 	
 	cPacketizer Pkt(*this, 0x34);
 	Pkt.WriteVarInt(static_cast<UInt32>(a_ID));
@@ -1757,7 +1757,10 @@ void cProtocol172::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 void cProtocol172::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {
 	short EncKeyLength, EncNonceLength;
-	a_ByteBuffer.ReadBEShort(EncKeyLength);
+	if (!a_ByteBuffer.ReadBEShort(EncKeyLength))
+	{
+		return;
+	}
 	if ((EncKeyLength < 0) || (EncKeyLength > MAX_ENC_LEN))
 	{
 		LOGD("Invalid Encryption Key length: %d. Kicking client.", EncKeyLength);

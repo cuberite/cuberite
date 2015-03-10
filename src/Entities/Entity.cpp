@@ -1632,8 +1632,12 @@ void cEntity::TeleportToEntity(cEntity & a_Entity)
 
 void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	SetPosition(a_PosX, a_PosY, a_PosZ);
-	m_World->BroadcastTeleportEntity(*this);
+	//  ask the plugins to allow teleport to the new position.
+	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	{
+		SetPosition(a_PosX, a_PosY, a_PosZ);
+		m_World->BroadcastTeleportEntity(*this);
+	}
 }
 
 
@@ -1913,10 +1917,7 @@ void cEntity::AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
 
 void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ)
 {
-	m_Speed.x += a_AddSpeedX;
-	m_Speed.y += a_AddSpeedY;
-	m_Speed.z += a_AddSpeedZ;
-	WrapSpeed();
+	DoSetSpeed(m_Speed.x + a_AddSpeedX, m_Speed.y + a_AddSpeedY, m_Speed.z + a_AddSpeedZ);
 }
 
 
@@ -1925,8 +1926,7 @@ void cEntity::AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeed
 
 void cEntity::AddSpeedX(double a_AddSpeedX)
 {
-	m_Speed.x += a_AddSpeedX;
-	WrapSpeed();
+	AddSpeed(a_AddSpeedX, 0, 0);
 }
 
 
@@ -1935,8 +1935,7 @@ void cEntity::AddSpeedX(double a_AddSpeedX)
 
 void cEntity::AddSpeedY(double a_AddSpeedY)
 {
-	m_Speed.y += a_AddSpeedY;
-	WrapSpeed();
+	AddSpeed(0, a_AddSpeedY, 0);
 }
 
 
@@ -1945,8 +1944,7 @@ void cEntity::AddSpeedY(double a_AddSpeedY)
 
 void cEntity::AddSpeedZ(double a_AddSpeedZ)
 {
-	m_Speed.z += a_AddSpeedZ;
-	WrapSpeed();
+	AddSpeed(0, 0, a_AddSpeedZ);
 }
 
 

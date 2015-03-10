@@ -9,10 +9,9 @@
 
 #pragma once
 
-#include "OSSupport/SocketThreads.h"
-#include "OSSupport/ListenThread.h"
-
 #include "RCONServer.h"
+#include "OSSupport/IsThread.h"
+#include "OSSupport/Network.h"
 
 #ifdef _MSC_VER
 	#pragma warning(push)
@@ -36,10 +35,12 @@
 // fwd:
 class cPlayer;
 class cClientHandle;
+typedef SharedPtr<cClientHandle> cClientHandlePtr;
+typedef std::list<cClientHandlePtr> cClientHandlePtrs;
+typedef std::list<cClientHandle *> cClientHandles;
 class cIniFile;
 class cCommandOutputCallback;
 
-typedef std::list<cClientHandle *> cClientHandleList;
 
 namespace Json
 {
@@ -50,10 +51,11 @@ namespace Json
 
 
 
-class cServer  // tolua_export
-	: public cListenThread::cCallback
-{        // tolua_export
-public:  // tolua_export
+// tolua_begin
+class cServer
+{
+public:
+	// tolua_end
 
 	virtual ~cServer() {}
 	bool InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth);
@@ -105,13 +107,6 @@ public:  // tolua_export
 	/** Called by cClientHandle's destructor; stop m_SocketThreads from calling back into a_Client */
 	void ClientDestroying(const cClientHandle * a_Client);
 	
-	/** Notifies m_SocketThreads that client has something to be written */
-	void NotifyClientWrite(const cClientHandle * a_Client);
-	
-	void WriteToClient(const cClientHandle * a_Client, const AString & a_Data);  // Queues outgoing data for the client through m_SocketThreads
-	
-	void RemoveClient(const cClientHandle * a_Client);  // Removes the clienthandle from m_SocketThreads
-	
 	/** Don't tick a_Client anymore, it will be ticked from its cPlayer instead */
 	void ClientMovedToWorld(const cClientHandle * a_Client);
 	
@@ -147,30 +142,7 @@ public:  // tolua_export
 private:
 
 	friend class cRoot;  // so cRoot can create and destroy cServer
-	
-	/** When NotifyClientWrite() is called, it is queued for this thread to process (to avoid deadlocks between cSocketThreads, cClientHandle and cChunkMap) */
-	class cNotifyWriteThread :
-		public cIsThread
-	{
-		typedef cIsThread super;
-		
-		cEvent    m_Event;  // Set when m_Clients gets appended
-		cServer * m_Server;
-
-		cCriticalSection  m_CS;
-		cClientHandleList m_Clients;
-		
-		virtual void Execute(void);
-		
-	public:
-	
-		cNotifyWriteThread(void);
-		~cNotifyWriteThread();
-	
-		bool Start(cServer * a_Server);
-		
-		void NotifyClientWrite(const cClientHandle * a_Client);
-	} ;
+	friend class cServerListenCallbacks;  // Accessing OnConnectionAccepted()
 	
 	/** The server tick thread takes care of the players who aren't yet spawned in a world */
 	class cTickThread :
@@ -189,21 +161,29 @@ private:
 	} ;
 	
 	
-	cNotifyWriteThread m_NotifyWriteThread;
+	/** The network sockets listening for client connections. */
+	cServerHandlePtrs m_ServerHandles;
+		
+	/** Protects m_Clients and m_ClientsToRemove against multithreaded access. */
+	cCriticalSection m_CSClients;
+
+	/** Clients that are connected to the server and not yet assigned to a cWorld. */
+	cClientHandlePtrs m_Clients;
+
+	/** Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick(). */
+	cClientHandles m_ClientsToRemove;
 	
-	cListenThread m_ListenThreadIPv4;
-	cListenThread m_ListenThreadIPv6;
-	
-	cCriticalSection  m_CSClients;        ///< Locks client lists
-	cClientHandleList m_Clients;          ///< Clients that are connected to the server and not yet assigned to a cWorld
-	cClientHandleList m_ClientsToRemove;  ///< Clients that have just been moved into a world and are to be removed from m_Clients in the next Tick()
-	
-	mutable cCriticalSection m_CSPlayerCount;      ///< Locks the m_PlayerCount
-	int              m_PlayerCount;        ///< Number of players currently playing in the server
-	cCriticalSection m_CSPlayerCountDiff;  ///< Locks the m_PlayerCountDiff
-	int              m_PlayerCountDiff;    ///< Adjustment to m_PlayerCount to be applied in the Tick thread
-	
-	cSocketThreads m_SocketThreads;
+	/** Protects m_PlayerCount against multithreaded access. */
+	mutable cCriticalSection m_CSPlayerCount;
+
+	/** Number of players currently playing in the server. */
+	int m_PlayerCount;
+
+	/** Protects m_PlayerCountDiff against multithreaded access. */
+	cCriticalSection m_CSPlayerCountDiff;
+
+	/** Adjustment to m_PlayerCount to be applied in the Tick thread. */
+	int m_PlayerCountDiff;
 	
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
@@ -250,19 +230,24 @@ private:
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;
 
+	/** The list of ports on which the server should listen for connections.
+	Initialized in InitServer(), used in Start(). */
+	AStringVector m_Ports;
+
 
 	cServer(void);
 
 	/** Loads, or generates, if missing, RSA keys for protocol encryption */
 	void PrepareKeys(void);
+
+	/** Creates a new cClientHandle instance and adds it to the list of clients.
+	Returns the cClientHandle reinterpreted as cTCPLink callbacks. */
+	cTCPLink::cCallbacksPtr OnConnectionAccepted(const AString & a_RemoteIPAddress);
 	
 	bool Tick(float a_Dt);
 	
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
-
-	// cListenThread::cCallback overrides:
-	virtual void OnConnectionAccepted(cSocket & a_Socket) override;
 };  // tolua_export
 
 

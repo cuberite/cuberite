@@ -59,6 +59,9 @@ class cTNTEntity;
 class cHopperEntity;
 class cBlockEntity;
 class cBoundingBox;
+class cLuaTCPLink;
+class cLuaServerHandle;
+class cLuaUDPEndpoint;
 
 typedef cBoundingBox * pBoundingBox;
 typedef cWorld *       pWorld;
@@ -83,6 +86,10 @@ public:
 		
 		/** Creates a reference in the specified LuaState for object at the specified StackPos */
 		cRef(cLuaState & a_LuaState, int a_StackPos);
+
+		/** Moves the reference from the specified instance into a newly created instance.
+		The old instance is then "!IsValid()". */
+		cRef(cRef && a_FromRef);
 		
 		~cRef();
 		
@@ -178,6 +185,8 @@ public:
 	/** Returns true if a_FunctionName is a valid Lua function that can be called */
 	bool HasFunction(const char * a_FunctionName);
 	
+	void PushNil(void);
+
 	// Push a const value onto the stack (keep alpha-sorted):
 	void Push(const AString & a_String);
 	void Push(const AStringVector & a_Vector);
@@ -202,6 +211,9 @@ public:
 	void Push(cHopperEntity * a_Hopper);
 	void Push(cItem * a_Item);
 	void Push(cItems * a_Items);
+	void Push(cLuaServerHandle * a_ServerHandle);
+	void Push(cLuaTCPLink * a_TCPLink);
+	void Push(cLuaUDPEndpoint * a_UDPEndpoint);
 	void Push(cMonster * a_Monster);
 	void Push(cPickup * a_Pickup);
 	void Push(cPlayer * a_Player);
@@ -240,6 +252,9 @@ public:
 	
 	/** Retrieve value at a_StackPos, if it is a valid cWorld class. If not, a_Value is unchanged */
 	void GetStackValue(int a_StackPos, pWorld & a_Value);
+
+	/** Store the value at a_StackPos as a reference. */
+	void GetStackValue(int a_StackPos, cRef & a_Ref);
 	
 	/** Call the specified Lua function.
 	Returns true if call succeeded, false if there was an error.
@@ -346,20 +361,6 @@ protected:
 	/** Number of arguments currently pushed (for the Push / Call chain) */
 	int m_NumCurrentFunctionArgs;
 
-
-	/** Variadic template terminator: Counting zero args returns zero. */
-	int CountArgs(void)
-	{
-		return 0;
-	}
-
-	/** Variadic template: Counting args means add one to the count of the rest. */
-	template <typename T, typename... Args>
-	int CountArgs(T, Args... args)
-	{
-		return 1 + CountArgs(args...);
-	}
-
 	/** Variadic template terminator: If there's nothing more to push / pop, just call the function.
 	Note that there are no return values either, because those are prefixed by a cRet value, so the arg list is never empty. */
 	bool PushCallPop(void)
@@ -380,7 +381,7 @@ protected:
 	bool PushCallPop(cLuaState::cRet, Args &&... args)
 	{
 		// Calculate the number of return values (number of args left):
-		int NumReturns = CountArgs(args...);
+		int NumReturns = sizeof...(args);
 
 		// Call the function:
 		if (!CallFunction(NumReturns))
