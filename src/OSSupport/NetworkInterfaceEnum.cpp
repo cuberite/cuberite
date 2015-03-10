@@ -81,13 +81,19 @@ static AString PrintAddress(ifaddrs * InterfaceAddress)
 		case AF_INET:
 		{  // IPv4
 			char AddressBuffer[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &(reinterpret_cast<struct sockaddr_in *>(reinterpret_cast<void *>(InterfaceAddress->ifa_addr))->sin_addr), AddressBuffer, INET_ADDRSTRLEN);
+			sockaddr_in InternetSocket;
+
+			std::memcpy(&InternetSocket, InterfaceAddress->ifa_addr, sizeof(InternetSocket));
+			inet_ntop(AF_INET, &InternetSocket.sin_addr, AddressBuffer, INET_ADDRSTRLEN);
 			return AddressBuffer;
 		}
 		case AF_INET6:
 		{  // IPv6
 			char AddressBuffer[INET6_ADDRSTRLEN];
-			inet_ntop(AF_INET6, &(reinterpret_cast<struct sockaddr_in6 *>(reinterpret_cast<void *>(InterfaceAddress->ifa_addr))->sin6_addr), AddressBuffer, INET6_ADDRSTRLEN);
+			sockaddr_in6 InternetSocket;
+
+			std::memcpy(&InternetSocket, InterfaceAddress->ifa_addr, sizeof(InternetSocket));
+			inet_ntop(AF_INET6, &InternetSocket.sin6_addr, AddressBuffer, INET6_ADDRSTRLEN);
 			return AddressBuffer;
 		}
 		default:
