@@ -70,14 +70,19 @@ public:
 	
 };
 
-template<size_t size, class... Args>
-struct PackToInt
-{
-	enum
-	{
-		value = size - sizeof...(Args),
-	};
+// Code adapted from http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
+
+template<int ...>
+struct seq { };
+
+template<int N, int ...S>
+struct gens : gens<N-1, N-1, S...> { };
+
+template<int ...S>
+struct gens<0, S...> {
+  typedef seq<S...> type;
 };
+
 
 template<class Gen, class... Args>
 class cIntGenFactory
@@ -91,15 +96,22 @@ public:
 		m_args(std::make_tuple<Args...>(std::forward<Args>(a_args)...))
 	{
 	}
-
+	
 	template <class LhsGen>
 	std::shared_ptr<Gen> construct(LhsGen&& lhs)
 	{
-		return std::make_shared<Gen>(std::get<PackToInt<sizeof...(Args), Args>::value>(m_args)..., std::forward<LhsGen>(lhs));
+		return construct_impl<LhsGen>(std::forward<LhsGen>(lhs), typename gens<sizeof...(Args)>::type());
 	}
+
 
 private:
 	std::tuple<Args...> m_args;
+	
+	template <class LhsGen, int... S>
+	std::shared_ptr<Gen> construct_impl(LhsGen&& lhs, seq<S...>)
+	{
+		return std::make_shared<Gen>(std::get<S>(m_args)..., std::forward<LhsGen>(lhs));
+	}
 	
 };
 

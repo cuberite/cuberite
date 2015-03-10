@@ -1000,9 +1000,9 @@ public:
 			std::make_shared<cIntGenReplaceRandomly<6>> (a_Seed + 101, bgIce, bgTemperate, 150,
 			std::make_shared<cIntGenAddIslands     <6>> (a_Seed + 2000, 200,
 			std::make_shared<cIntGenSetRandomly    <6>> (a_Seed + 9, 50, bgOcean,
-			std::make_shared<cIntGenZoom           <6>> (a_Seed + 10,
-			std::make_shared<cIntGenLandOcean      <5>> (a_Seed + 100, 30
-		)))))))))))))))))))))))))))))));
+			std::make_shared<cIntGenLandOcean      <5>> (a_Seed + 100, 30)
+			>> MakeIntGen<cIntGenZoom           <6>> (a_Seed + 10)
+		)))))))))))))))))))))))))))));
 
 		m_Gen =
 			std::make_shared<cIntGenSmooth   <16>>(a_Seed,
