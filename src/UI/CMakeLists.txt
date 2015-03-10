@@ -6,7 +6,17 @@ include_directories ("${PROJECT_SOURCE_DIR}/../")
 
 SET (SRCS
 	SlotArea.cpp
-	Window.cpp)
+	Window.cpp
+	AnvilWindow.cpp
+	BeaconWindow.cpp
+	ChestWindow.cpp
+	CraftingWindow.cpp
+	DropSpenserWindow.cpp
+	EnchantingWindow.cpp
+	EnderChestWindow.cpp
+	FurnaceWindow.cpp
+	HopperWindow.cpp
+	InventoryWindow.cpp)
 
 SET (HDRS
 	SlotArea.h

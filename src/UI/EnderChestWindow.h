@@ -22,51 +22,11 @@ class cEnderChestWindow :
 	typedef cWindow super;
 
 public:
-	cEnderChestWindow(cEnderChestEntity * a_EnderChest) :
-		cWindow(wtChest, "Ender Chest"),
-		m_World(a_EnderChest->GetWorld()),
-		m_BlockX(a_EnderChest->GetPosX()),
-		m_BlockY(a_EnderChest->GetPosY()),
-		m_BlockZ(a_EnderChest->GetPosZ())
-	{
-		m_SlotAreas.push_back(new cSlotAreaEnderChest(a_EnderChest, *this));
-		m_SlotAreas.push_back(new cSlotAreaInventory(*this));
-		m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
+	cEnderChestWindow(cEnderChestEntity * a_EnderChest);
 
-		// Play the opening sound:
-		m_World->BroadcastSoundEffect("random.chestopen", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
+	~cEnderChestWindow();
 
-		// Send out the chest-open packet:
-		m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 1, E_BLOCK_ENDER_CHEST);
-	}
-
-	~cEnderChestWindow()
-	{
-		// Send out the chest-close packet:
-		m_World->BroadcastBlockAction(m_BlockX, m_BlockY, m_BlockZ, 1, 0, E_BLOCK_ENDER_CHEST);
-
-		// Play the closing sound
-		m_World->BroadcastSoundEffect("random.chestclosed", (double)m_BlockX, (double)m_BlockY, (double)m_BlockZ, 1, 1);
-	}
-
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
-	{
-		cSlotAreas AreasInOrder;
-
-		if (a_ClickedArea == m_SlotAreas[0])
-		{
-			// Chest Area
-			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
-			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
-		}
-		else
-		{
-			// Hotbar or Inventory
-			AreasInOrder.push_back(m_SlotAreas[0]);  /* Chest */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
-		}
-	}
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
 protected:
 	cWorld * m_World;
