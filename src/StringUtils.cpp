@@ -150,10 +150,12 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
 		AString current = str.substr(Prev, cutAt - Prev);
-		if (current.at(0) == '"' || current.at(0) == '\'') {
+		if ((current.at(0) == '"') || (current.at(0) == '\'')) 
+		{
 			Prev += 1;
 			cutAt = str.find_first_of(current.at(0), Prev);
-			if (cutAt != str.npos) {
+			if (cutAt != str.npos) 
+			{
 				current = str.substr(Prev, cutAt - Prev);
 				cutAt += 1;
 			}
@@ -167,7 +169,7 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 	{
 		AString current = str.substr(Prev);
 
-		if (current.length() >= 2 && (current.front() == '"' || current.front() == '\'') && current.front() == current.back()) {
+		if ((current.length() >= 2) && ((current.front() == '"') || (current.front() == '\'')) && (current.front() == current.back())) {
 			current = current.substr(1, current.length() - 2);
 		}
 
