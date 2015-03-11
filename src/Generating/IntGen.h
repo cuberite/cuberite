@@ -121,7 +121,7 @@ private:
 };
 
 template<class T, class RhsGen, class... Args>
-std::shared_ptr<RhsGen> operator>> (std::shared_ptr<T> lhs, cIntGenFactory<RhsGen, Args...> rhs)
+std::shared_ptr<RhsGen> operator| (std::shared_ptr<T> lhs, cIntGenFactory<RhsGen, Args...> rhs)
 {
 	return rhs.construct(static_cast<std::shared_ptr<typename T::IntGenType>>(lhs));
 }
