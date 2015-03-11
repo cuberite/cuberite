@@ -73,14 +73,19 @@ public:
 // Code adapted from http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
 
 template<int ...>
-struct seq { };
+struct seq
+{
+};
 
 template<int N, int ...S>
-struct gens : gens<N-1, N-1, S...> { };
+struct gens : gens<N-1, N-1, S...>
+{
+};
 
 template<int ...S>
-struct gens<0, S...> {
-  typedef seq<S...> type;
+struct gens<0, S...>
+{
+	typedef seq<S...> type;
 };
 
 

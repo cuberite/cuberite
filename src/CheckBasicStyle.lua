@@ -101,9 +101,9 @@ local g_ViolationPatterns =
 	{"&&[^(]+!=",     "Add parenthesis around comparison"},
 	{"!=[^)]+||",     "Add parenthesis around comparison"},
 	{"||[^(]+!=",     "Add parenthesis around comparison"},
-	{"<[^)T][^)]*&&", "Add parenthesis around comparison"},  -- Must take special care of templates: "template <T> fn(Args && ...)"
-	{"&&[^(]+<",      "Add parenthesis around comparison"},
-	{"<[^)T][^)]*||", "Add parenthesis around comparison"},  -- Must take special care of templates: "template <T> fn(Args && ...)"
+	{"<[^)>]*&&", "Add parenthesis around comparison"},  -- Must take special care of templates: "template <T> fn(Args && ...)"
+	-- Cannot check a < following a && due to functions of the form x fn(y&& a, z<b> c)
+	{"<[^)>]*||", "Add parenthesis around comparison"},  -- Must take special care of templates: "template <T> fn(Args && ...)"
 	{"||[^(]+<",      "Add parenthesis around comparison"},
 	-- Cannot check ">" because of "obj->m_Flag &&". Check at least ">=":
 	{">=[^)]+&&",     "Add parenthesis around comparison"},
