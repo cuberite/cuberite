@@ -170,7 +170,12 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 	{
 		AString current = str.substr(Prev);
 
-		if ((current.length() >= 2) && ((current.front() == '"') || (current.front() == '\'')) && (current.front() == current.back()))
+		// If the remant is wrapped in matching quotes, remove them:
+		if (
+			(current.length() >= 2) &&
+			((current.front() == '"') || (current.front() == '\'')) &&
+			(current.front() == current.back())
+		)
 		{
 			current = current.substr(1, current.length() - 2);
 		}
