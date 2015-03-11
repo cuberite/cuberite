@@ -140,6 +140,54 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 
 
 
+AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
+{
+	AStringVector results;
+
+	size_t cutAt = 0;
+	size_t Prev = 0;
+	size_t cutAtQuote = 0;
+
+	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
+	{
+		AString current = str.substr(Prev, cutAt - Prev);
+		if ((current.at(0) == '"') || (current.at(0) == '\''))
+		{
+			Prev += 1;
+			cutAtQuote = str.find_first_of(current.at(0), Prev);
+			if (cutAtQuote != str.npos)
+			{
+				current = str.substr(Prev, cutAtQuote - Prev);
+				cutAt = cutAtQuote + 1;
+			}
+		}
+
+		results.push_back(current);
+		Prev = cutAt + 1;
+	}
+
+	if (Prev < str.length())
+	{
+		AString current = str.substr(Prev);
+
+		// If the remant is wrapped in matching quotes, remove them:
+		if (
+			(current.length() >= 2) &&
+			((current.front() == '"') || (current.front() == '\'')) &&
+			(current.front() == current.back())
+		)
+		{
+			current = current.substr(1, current.length() - 2);
+		}
+
+		results.push_back(current);
+	}
+
+	return results;
+}
+
+
+
 
 AStringVector StringSplitAndTrim(const AString & str, const AString & delim)
 {

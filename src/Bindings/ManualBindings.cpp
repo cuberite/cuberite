@@ -266,6 +266,24 @@ static int tolua_StringSplit(lua_State * tolua_S)
 
 
 
+static int tolua_StringSplitWithQuotes(lua_State * tolua_S)
+{
+	cLuaState S(tolua_S);
+
+	AString str;
+	AString delim;
+
+	S.GetStackValues(1, str, delim);
+
+	AStringVector Split = StringSplitWithQuotes(str, delim);
+	S.Push(Split);
+	return 1;
+}
+
+
+
+
+
 static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 {
 	cLuaState LuaState(tolua_S);
@@ -3661,17 +3679,18 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
 
 		// Globals:
-		tolua_function(tolua_S, "Clamp",              tolua_Clamp);
-		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
-		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
-		tolua_function(tolua_S, "LOG",                tolua_LOG);
-		tolua_function(tolua_S, "LOGINFO",            tolua_LOGINFO);
-		tolua_function(tolua_S, "LOGWARN",            tolua_LOGWARN);
-		tolua_function(tolua_S, "LOGWARNING",         tolua_LOGWARN);
-		tolua_function(tolua_S, "LOGERROR",           tolua_LOGERROR);
-		tolua_function(tolua_S, "Base64Encode",       tolua_Base64Encode);
-		tolua_function(tolua_S, "Base64Decode",       tolua_Base64Decode);
-		tolua_function(tolua_S, "md5",                tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead
+		tolua_function(tolua_S, "Clamp",                 tolua_Clamp);
+		tolua_function(tolua_S, "StringSplit",           tolua_StringSplit);
+		tolua_function(tolua_S, "StringSplitWithQuotes", tolua_StringSplitWithQuotes);
+		tolua_function(tolua_S, "StringSplitAndTrim",    tolua_StringSplitAndTrim);
+		tolua_function(tolua_S, "LOG",                   tolua_LOG);
+		tolua_function(tolua_S, "LOGINFO",               tolua_LOGINFO);
+		tolua_function(tolua_S, "LOGWARN",               tolua_LOGWARN);
+		tolua_function(tolua_S, "LOGWARNING",            tolua_LOGWARN);
+		tolua_function(tolua_S, "LOGERROR",              tolua_LOGERROR);
+		tolua_function(tolua_S, "Base64Encode",          tolua_Base64Encode);
+		tolua_function(tolua_S, "Base64Decode",          tolua_Base64Decode);
+		tolua_function(tolua_S, "md5",                   tolua_md5_obsolete);  // OBSOLETE, use cCryptoHash.md5() instead
 		
 		tolua_beginmodule(tolua_S, "cFile");
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);

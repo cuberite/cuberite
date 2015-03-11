@@ -1465,7 +1465,7 @@ bool cPluginLua::OnWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, s
 
 
 
-bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player)
+bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
@@ -1477,7 +1477,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 	
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(cmd->second, a_Split, &a_Player, cLuaState::Return, res);
+	m_LuaState.Call(cmd->second, a_Split, &a_Player, a_FullCommand, cLuaState::Return, res);
 	return res;
 }
 
@@ -1485,7 +1485,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 
 
 
-bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
+bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
@@ -1500,7 +1500,7 @@ bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOut
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	AString str;
-	m_LuaState.Call(cmd->second, a_Split, cLuaState::Return, res, str);
+	m_LuaState.Call(cmd->second, a_Split, a_FullCommand, cLuaState::Return, res, str);
 	if (res && !str.empty())
 	{
 		a_Output.Out(str);

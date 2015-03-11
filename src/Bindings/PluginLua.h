@@ -131,9 +131,9 @@ public:
 	virtual bool OnWorldStarted             (cWorld & a_World) override;
 	virtual bool OnWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) override;
 	
-	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player) override;
+	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) override;
 	
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) override;
+	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) override;
 
 	virtual void ClearCommands(void) override;
 	
