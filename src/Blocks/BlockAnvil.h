@@ -4,6 +4,7 @@
 #include "BlockHandler.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../UI/AnvilWindow.h"
 
 
 

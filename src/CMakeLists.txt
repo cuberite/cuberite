@@ -9,7 +9,7 @@ include_directories (SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/../lib/libevent/include
 
 set(FOLDERS
 	OSSupport HTTPServer Items Blocks Protocol Generating PolarSSL++ Bindings
-	WorldStorage Mobs Entities Simulator UI BlockEntities Generating/Prefabs
+	WorldStorage Mobs Entities Simulator BlockEntities UI Generating/Prefabs
 	Noise
 )
 
@@ -318,7 +318,7 @@ if (NOT MSVC)
 	target_link_libraries(${EXECUTABLE}
 		OSSupport HTTPServer Bindings Items Blocks Noise
 		Protocol Generating Generating_Prefabs WorldStorage
-		Mobs Entities Simulator UI BlockEntities PolarSSL++
+		Mobs Entities Simulator BlockEntities UI PolarSSL++
 	)
 endif ()
 if (WIN32)
