@@ -1,7 +1,5 @@
 language: cpp
-compiler:
-  - gcc
-  - clang
+compiler: clang
 
 before_install:
   - if [ "$TRAVIS_MCSERVER_BUILD_TYPE" == "COVERAGE" ]; then sudo pip install cpp_coveralls; fi
@@ -29,8 +27,6 @@ after_success:
 env:
   - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE MCSERVER_PATH=./MCServer
   - TRAVIS_MCSERVER_BUILD_TYPE=DEBUG   MCSERVER_PATH=./MCServer_debug
-  - TRAVIS_MCSERVER_BUILD_TYPE=RELEASE TRAVIS_MCSERVER_FORCE32=1 MCSERVER_PATH=./MCServer
-  - TRAVIS_MCSERVER_BUILD_TYPE=DEBUG   TRAVIS_MCSERVER_FORCE32=1 MCSERVER_PATH=./MCServer_debug
 
 matrix:
   include:
