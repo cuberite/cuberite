@@ -266,6 +266,21 @@ static int tolua_StringSplit(lua_State * tolua_S)
 
 
 
+static int tolua_StringSplitWithQuotes(lua_State * tolua_S)
+{
+	cLuaState LuaState(tolua_S);
+	std::string str = (std::string)tolua_tocppstring(LuaState, 1, 0);
+	std::string delim = (std::string)tolua_tocppstring(LuaState, 2, 0);
+
+	AStringVector Split = StringSplitWithQuotes(str, delim);
+	LuaState.Push(Split);
+	return 1;
+}
+
+
+
+
+
 static int tolua_StringSplitAndTrim(lua_State * tolua_S)
 {
 	cLuaState LuaState(tolua_S);
@@ -3663,6 +3678,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		// Globals:
 		tolua_function(tolua_S, "Clamp",              tolua_Clamp);
 		tolua_function(tolua_S, "StringSplit",        tolua_StringSplit);
+		tolua_function(tolua_S, "StringSplitWithQuotes", tolua_StringSplitWithQuotes);
 		tolua_function(tolua_S, "StringSplitAndTrim", tolua_StringSplitAndTrim);
 		tolua_function(tolua_S, "LOG",                tolua_LOG);
 		tolua_function(tolua_S, "LOGINFO",            tolua_LOGINFO);

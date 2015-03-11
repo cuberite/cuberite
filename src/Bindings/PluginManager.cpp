@@ -1465,7 +1465,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 
 	ASSERT(cmd->second.m_Plugin != nullptr);
 
-	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player))
+	if (!cmd->second.m_Plugin->HandleCommand(Split, a_Player, a_Command))
 	{
 		return crError;
 	}
@@ -1768,7 +1768,7 @@ bool cPluginManager::IsConsoleCommandBound(const AString & a_Command)
 
 
 
-bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
+bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_Command)
 {
 	if (a_Split.empty())
 	{
@@ -1795,7 +1795,7 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 		return false;
 	}
 
-	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output);
+	return cmd->second.m_Plugin->HandleConsoleCommand(a_Split, a_Output, a_Command);
 }
 
 

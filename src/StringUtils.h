@@ -41,6 +41,11 @@ extern AString & AppendPrintf (AString & a_Dst, const char * format, ...) FORMAT
 Return the splitted strings as a stringvector. */
 extern AStringVector StringSplit(const AString & str, const AString & delim);
 
+/** Split the string at any of the listed delimiters. Keeps quoted content together
+Resolves issue #490
+Return the splitted strings as a stringvector. */
+extern AStringVector StringSplitWithQuotes(const AString & str, const AString & delim);
+
 /** Split the string at any of the listed delimiters and trim each value.
 Returns the splitted strings as a stringvector. */
 extern AStringVector StringSplitAndTrim(const AString & str, const AString & delim);
