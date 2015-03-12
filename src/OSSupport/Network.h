@@ -318,6 +318,9 @@ public:
 	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint.
 	Returns the endpoint object that can be interacted with. */
 	static cUDPEndpointPtr CreateUDPEndpoint(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_Callbacks);
+
+	/** Returns all local IP addresses for network interfaces currently available. */
+	static AStringVector EnumLocalIPAddresses(void);
 };
 
 

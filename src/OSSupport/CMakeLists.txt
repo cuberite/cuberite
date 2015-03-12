@@ -13,6 +13,7 @@ SET (SRCS
 	HostnameLookup.cpp
 	IPLookup.cpp
 	IsThread.cpp
+	NetworkInterfaceEnum.cpp
 	NetworkSingleton.cpp
 	Semaphore.cpp
 	ServerHandleImpl.cpp
