@@ -85,7 +85,7 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (ReachedFinalDestination() && !LineOfSight.Trace(GetPosition(), AttackDirection, (int)AttackDirection.Length()))
 	{
 		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
-		Attack(a_Dt / 1000);
+		Attack(a_Dt);
 	}
 }
 
@@ -95,8 +95,7 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 {
-	m_AttackInterval += a_Dt.count() * m_AttackRate;
-
+	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;
 	if ((m_Target == nullptr) || (m_AttackInterval < 3.0))
 	{
 		return;
