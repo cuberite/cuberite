@@ -726,24 +726,10 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 
 void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 {
-	m_Writer.AddInt("TileX", a_Hanging->GetBlockX());
-	m_Writer.AddInt("TileY", a_Hanging->GetBlockY());
-	m_Writer.AddInt("TileZ", a_Hanging->GetBlockZ());
-	switch (a_Hanging->GetFacing())
-	{
-		case BLOCK_FACE_XM: m_Writer.AddByte("Facing", 1); break;
-		case BLOCK_FACE_XP: m_Writer.AddByte("Facing", 3); break;
-		case BLOCK_FACE_ZM: m_Writer.AddByte("Facing", 2); break;
-		case BLOCK_FACE_ZP: m_Writer.AddByte("Facing", 0); break;
-		
-		case BLOCK_FACE_YM:
-		case BLOCK_FACE_YP:
-		case BLOCK_FACE_NONE:
-		{
-			// These directions are invalid, but they may have been previously loaded, so keep them.
-			break;
-		}
-	}
+	m_Writer.AddInt("TileX", FloorC(a_Hanging->GetPosX()));
+	m_Writer.AddInt("TileY", FloorC(a_Hanging->GetPosY()));
+	m_Writer.AddInt("TileZ", FloorC(a_Hanging->GetPosZ()));
+	m_Writer.AddByte("Facing", a_Hanging->GetProtocolFacing());
 }
 
 
