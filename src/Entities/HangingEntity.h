@@ -27,7 +27,7 @@ public:
 	eBlockFace GetFacing() const { return cHangingEntity::ProtocolFaceToBlockFace(m_Facing); }
 
 	/** Set the direction in which the entity is facing. */
-	void SetFacing(eBlockFace a_Facing)	{ m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }
+	void SetFacing(eBlockFace a_Facing) { m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }
 
 	// tolua_end
 
@@ -88,7 +88,7 @@ protected:
 			case BLOCK_FACE_XP: Dir = 3; break;
 			default:
 			{
-				// Uncomment when entities are initialised with their real data, instead of dummy values: 
+				// Uncomment when entities are initialised with their real data, instead of dummy values:
 				// LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_BlockFace);
 				// ASSERT(!"Tried to convert a bad facing!");
 
