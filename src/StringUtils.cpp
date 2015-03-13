@@ -151,10 +151,10 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
 		AString current = str.substr(Prev, cutAt - Prev);
-		if ((current.at(0) == '"') || (current.at(0) == '\''))
+		if ((current.front() == '"') || (current.front() == '\''))
 		{
 			Prev += 1;
-			cutAtQuote = str.find_first_of(current.at(0), Prev);
+			cutAtQuote = str.find_first_of(current.front(), Prev);
 			if (cutAtQuote != str.npos)
 			{
 				current = str.substr(Prev, cutAtQuote - Prev);
@@ -162,7 +162,7 @@ AStringVector StringSplitWithQuotes(const AString & str, const AString & delim)
 			}
 		}
 
-		results.push_back(current);
+		results.push_back(std::move(current));
 		Prev = cutAt + 1;
 	}
 
