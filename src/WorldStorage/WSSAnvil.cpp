@@ -50,6 +50,7 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/Painting.h"
 
 #include "../Protocol/MojangAPI.h"
 #include "Server.h"
@@ -1337,6 +1338,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "Painting", a_IDTagLength) == 0)
+	{
+		LoadPaintingFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
 	{
 		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1802,6 +1807,29 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 	
 	a_Entities.push_back(ItemFrame.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// Load painting name:
+	int MotiveTag = a_NBT.FindChildByName(a_TagIdx, "Motive");
+	if ((MotiveTag < 0) || (a_NBT.GetType(MotiveTag) != TAG_String))
+	{
+		return;
+	}
+
+	std::unique_ptr<cPainting> Painting(new cPainting(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, 0.0, 0.0, 0.0));
+	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	LoadHangingFromNBT(*Painting.get(), a_NBT, a_TagIdx);
+	a_Entities.push_back(Painting.release());
 }
 
 

@@ -24,8 +24,6 @@ cHangingEntity::cHangingEntity(eEntityType a_EntityType, eBlockFace a_Facing, do
 void cHangingEntity::SpawnOn(cClientHandle & a_ClientHandle)
 {
 	SetYaw(GetProtocolFacing() * 90);
-	a_ClientHandle.SendSpawnObject(*this, 71, GetProtocolFacing(), (Byte)GetYaw(), (Byte)GetPitch());
-	a_ClientHandle.SendEntityMetadata(*this);
 }
 
 

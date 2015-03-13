@@ -36,20 +36,9 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/Painting.h"
 
-#include "../Mobs/Monster.h"
-#include "../Mobs/Bat.h"
-#include "../Mobs/Creeper.h"
-#include "../Mobs/Enderman.h"
-#include "../Mobs/Horse.h"
-#include "../Mobs/MagmaCube.h"
-#include "../Mobs/Sheep.h"
-#include "../Mobs/Slime.h"
-#include "../Mobs/Skeleton.h"
-#include "../Mobs/Villager.h"
-#include "../Mobs/Wither.h"
-#include "../Mobs/Wolf.h"
-#include "../Mobs/Zombie.h"
+#include "../Mobs/IncludeAllMonsters.h"
 
 
 
@@ -776,6 +765,19 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 
 
 
+void cNBTChunkSerializer::AddPaintingEntity(cPainting * a_Painting)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_Painting, "Painting");
+		AddHangingEntity(a_Painting);
+		m_Writer.AddString("Motive", a_Painting->GetName());
+	m_Writer.EndCompound();
+}
+
+
+
+
+
 void cNBTChunkSerializer::AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 {
 	m_Writer.BeginList("Items", TAG_Compound);
@@ -874,7 +876,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etTNT:          AddTNTEntity         ((cTNTEntity *)       a_Entity); break;
 		case cEntity::etExpOrb:       AddExpOrbEntity      ((cExpOrb *)          a_Entity); break;
 		case cEntity::etItemFrame:    AddItemFrameEntity   ((cItemFrame *)       a_Entity); break;
-		case cEntity::etPainting: /* TODO */ break;
+		case cEntity::etPainting:     AddPaintingEntity    (reinterpret_cast<cPainting *>(a_Entity)); break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		default:
 		{

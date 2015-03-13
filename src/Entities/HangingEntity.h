@@ -41,10 +41,14 @@ public:
 		m_Facing = a_Facing;
 	}
 
-private:
+protected:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override {}
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
+	{
+		UNUSED(a_Dt);
+		UNUSED(a_Chunk);
+	}
 
 	/** Converts protocol hanging item facing to eBlockFace values */
 	inline static eBlockFace ProtocolFaceToBlockFace(Byte a_ProtocolFace)
@@ -84,8 +88,9 @@ private:
 			case BLOCK_FACE_XP: Dir = 3; break;
 			default:
 			{
-				LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_BlockFace);
-				// Uncomment when entities are initialised with their real data, instead of dummy values: ASSERT(!"Tried to convert a bad facing!");
+				// Uncomment when entities are initialised with their real data, instead of dummy values: 
+				// LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_BlockFace);
+				// ASSERT(!"Tried to convert a bad facing!");
 
 				Dir = cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
 			}
