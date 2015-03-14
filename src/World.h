@@ -1077,6 +1077,9 @@ private:
 	/** <summary>Generates a random spawnpoint on solid land by walking chunks and finding their biomes</summary> */
 	void GenerateRandomSpawn(void);
 
+	/** Check if player starting point is acceptable **/
+	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
+
 	/** Chooses a reasonable transition from the current weather to a new weather **/
 	eWeather ChooseNewWeather(void);
 
