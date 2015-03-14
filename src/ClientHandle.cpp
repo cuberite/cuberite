@@ -21,6 +21,7 @@
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
+#include "Blocks/BlockBed.h"
 #include "Blocks/ChunkInterface.h"
 
 #include "Root.h"
@@ -1501,30 +1502,6 @@ void cClientHandle::HandleAnimation(int a_Animation)
 		return;
 	}
 
-	// Because the animation ID sent to servers by clients are different to those sent back, we need this
-	switch (a_Animation)
-	{
-		case 0:  // No animation - wiki.vg doesn't say that client has something specific for it, so I suppose it will just become -1
-		case 1:
-		case 2:
-		case 3:
-		{
-			a_Animation--;  // Offset by -1
-			break;
-		}
-		case 5:
-		case 6:
-		case 7:
-		{
-			a_Animation -= 2;  // Offset by -2
-			break;
-		}
-		default:  // Anything else is the same
-		{
-			break;
-		}
-	}
-
 	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
 }
 
@@ -1766,7 +1743,9 @@ void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
 		return;
 	}
 
-	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
+	cChunkInterface Interface(GetPlayer()->GetWorld()->GetChunkMap());
+	cBlockBedHandler::SetBedOccupationState(Interface, GetPlayer()->GetLastBedPos(), false);
+	GetPlayer()->SetIsInBed(false);
 }
 
 

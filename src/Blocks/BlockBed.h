@@ -4,9 +4,9 @@
 #include "BlockHandler.h"
 #include "MetaRotator.h"
 #include "Item.h"
+#include "ChunkInterface.h"
 
 
-class cChunkInterface;
 class cPlayer;
 class cWorldInterface;
 
@@ -21,17 +21,14 @@ public:
 		: cMetaRotator<cBlockHandler, 0x3, 0x02, 0x03, 0x00, 0x01, true>(a_BlockType)
 	{
 	}
-
-
+	
 	virtual void OnDestroyed(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, int a_BlockX, int a_BlockY, int a_BlockZ) override;
 	virtual void OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
-
 
 	virtual bool IsUseable(void) override
 	{
 		return true;
 	}
-
 	
 	virtual void ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta) override
 	{
@@ -39,12 +36,10 @@ public:
 		a_Pickups.push_back(cItem(E_ITEM_BED, 1, 0));
 	}
 
-
 	virtual bool CanDirtGrowGrass(NIBBLETYPE a_Meta) override
 	{
 		return true;
 	}
-
 
 
 	// Bed specific helper functions
@@ -61,7 +56,6 @@ public:
 		return ((char)a_Rotation + 2) % 4;
 	}
 
-
 	static Vector3i MetaDataToDirection(NIBBLETYPE a_MetaData)
 	{
 		switch (a_MetaData)
@@ -72,6 +66,21 @@ public:
 			case 3: return Vector3i(1, 0, 0);
 		}
 		return Vector3i();
+	}
+
+	static void SetBedOccupationState(cChunkInterface & a_ChunkInterface, const Vector3i & a_BedPosition, bool a_IsOccupied)
+	{
+		auto Meta = a_ChunkInterface.GetBlockMeta(a_BedPosition.x, a_BedPosition.y, a_BedPosition.z);
+		if (a_IsOccupied)
+		{
+			Meta |= 0x04;  // Where 0x4 = occupied bit
+		}
+		else
+		{
+			Meta &= 0x0b;  // Clear the "occupied" bit of the bed's block
+		}
+
+		a_ChunkInterface.SetBlockMeta(a_BedPosition.x, a_BedPosition.y, a_BedPosition.z, Meta);
 	}
 } ;
 

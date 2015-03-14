@@ -3638,7 +3638,7 @@ void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cWorld::cTaskSendBlockTo
+// cWorld::cTaskSendBlockToAllPlayers
 
 cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue) :
 	m_SendQueue(a_SendQueue)
