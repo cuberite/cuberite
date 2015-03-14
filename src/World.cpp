@@ -731,7 +731,7 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 	{
 		BLOCKTYPE BlockType = GetBlock(a_PosX + Coords[i].x, a_PosY, a_PosZ + Coords[i].x);
 
-		if (cBlockInfo::IsSolid(BlockType) && IsBlockLiquid(BlockType))
+		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
 			return false;
 		}
