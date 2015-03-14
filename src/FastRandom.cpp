@@ -6,6 +6,12 @@
 #include "Globals.h"
 #include "FastRandom.h"
 
+#ifdef _WIN32
+	#define thread_local __declspec(thread)
+#endif
+
+thread_local unsigned int m_Counter = 0;
+
 
 
 
@@ -86,7 +92,7 @@ public:
 
 
 cFastRandom::cFastRandom(void) :
-	m_LinearRand(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()))
+	m_LinearRand(m_Counter++)
 {
 }
 
@@ -130,7 +136,7 @@ int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
 // MTRand:
 
 MTRand::MTRand() :
-	m_MersenneRand(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()))
+	m_MersenneRand(m_Counter++)
 {
 }
 
