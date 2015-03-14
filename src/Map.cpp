@@ -66,10 +66,8 @@ void cMapDecorator::Update(void)
 			{
 				cFastRandom Random;
 
-				Int64 WorldAge = m_Player->GetWorld()->GetWorldAge();
-
 				// TODO 2014-02-19 xdot: Refine
-				m_Rot = Random.NextInt(16, (int) WorldAge);
+				m_Rot = Random.NextInt(16);
 			}
 			else
 			{

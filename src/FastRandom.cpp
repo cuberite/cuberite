@@ -105,32 +105,8 @@ int cFastRandom::NextInt(int a_Range)
 
 
 
-int cFastRandom::NextInt(int a_Range, int a_Salt)
-{
-	m_LinearRand.seed(a_Salt);
-	std::uniform_int_distribution<> distribution(0, a_Range - 1);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-
 float cFastRandom::NextFloat(float a_Range)
 {
-	std::uniform_real_distribution<float> distribution(0, a_Range);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-
-float cFastRandom::NextFloat(float a_Range, int a_Salt)
-{
-	m_LinearRand.seed(a_Salt);
 	std::uniform_real_distribution<float> distribution(0, a_Range);
 	return distribution(m_LinearRand);
 }
