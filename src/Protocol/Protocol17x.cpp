@@ -637,7 +637,7 @@ void cProtocol172::SendPaintingSpawn(const cPainting & a_Painting)
 	Pkt.WriteInt(static_cast<int>(a_Painting.GetPosX()));
 	Pkt.WriteInt(static_cast<int>(a_Painting.GetPosY()));
 	Pkt.WriteInt(static_cast<int>(a_Painting.GetPosZ()));
-	Pkt.WriteInt(a_Painting.GetDirection());
+	Pkt.WriteInt(a_Painting.GetProtocolFacing());
 }
 
 

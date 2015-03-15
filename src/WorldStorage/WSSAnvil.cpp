@@ -50,6 +50,7 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/Painting.h"
 
 #include "../Protocol/MojangAPI.h"
 #include "Server.h"
@@ -1337,6 +1338,10 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 	{
 		LoadPickupFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
 	}
+	else if (strncmp(a_IDTag, "Painting", a_IDTagLength) == 0)
+	{
+		LoadPaintingFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+	}
 	else if (strncmp(a_IDTag, "PrimedTnt", a_IDTagLength) == 0)
 	{
 		LoadTNTFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
@@ -1747,42 +1752,12 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 {
 	// "Facing" tag is the prime source of the Facing; if not available, translate from older "Direction" or "Dir"
 	int Facing = a_NBT.FindChildByName(a_TagIdx, "Facing");
-	if (Facing > 0)
+	if (Facing < 0)
 	{
-		Facing = (int)a_NBT.GetByte(Facing);
-		if ((Facing >= 2) && (Facing <= 5))
-		{
-			a_Hanging.SetFacing(static_cast<eBlockFace>(Facing));
-		}
+		return;
 	}
-	else
-	{
-		Facing = a_NBT.FindChildByName(a_TagIdx, "Direction");
-		if (Facing > 0)
-		{
-			switch ((int)a_NBT.GetByte(Facing))
-			{
-				case 0: a_Hanging.SetFacing(BLOCK_FACE_ZM); break;
-				case 1: a_Hanging.SetFacing(BLOCK_FACE_XM); break;
-				case 2: a_Hanging.SetFacing(BLOCK_FACE_ZP); break;
-				case 3: a_Hanging.SetFacing(BLOCK_FACE_XP); break;
-			}
-		}
-		else
-		{
-			Facing = a_NBT.FindChildByName(a_TagIdx, "Dir");  // Has values 0 and 2 swapped
-			if (Facing > 0)
-			{
-				switch ((int)a_NBT.GetByte(Facing))
-				{
-					case 0: a_Hanging.SetFacing(BLOCK_FACE_ZP); break;
-					case 1: a_Hanging.SetFacing(BLOCK_FACE_XM); break;
-					case 2: a_Hanging.SetFacing(BLOCK_FACE_ZM); break;
-					case 3: a_Hanging.SetFacing(BLOCK_FACE_XP); break;
-				}
-			}
-		}
-	}
+
+	a_Hanging.SetProtocolFacing(a_NBT.GetByte(Facing));
 
 	int TileX = a_NBT.FindChildByName(a_TagIdx, "TileX");
 	int TileY = a_NBT.FindChildByName(a_TagIdx, "TileY");
@@ -1790,9 +1765,9 @@ void cWSSAnvil::LoadHangingFromNBT(cHangingEntity & a_Hanging, const cParsedNBT 
 	if ((TileX > 0) && (TileY > 0) && (TileZ > 0))
 	{
 		a_Hanging.SetPosition(
-			(double)a_NBT.GetInt(TileX),
-			(double)a_NBT.GetInt(TileY),
-			(double)a_NBT.GetInt(TileZ)
+			static_cast<double>(a_NBT.GetInt(TileX)),
+			static_cast<double>(a_NBT.GetInt(TileY)),
+			static_cast<double>(a_NBT.GetInt(TileZ))
 		);
 	}
 }
@@ -1832,6 +1807,29 @@ void cWSSAnvil::LoadItemFrameFromNBT(cEntityList & a_Entities, const cParsedNBT 
 	}
 	
 	a_Entities.push_back(ItemFrame.release());
+}
+
+
+
+
+
+void cWSSAnvil::LoadPaintingFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	// Load painting name:
+	int MotiveTag = a_NBT.FindChildByName(a_TagIdx, "Motive");
+	if ((MotiveTag < 0) || (a_NBT.GetType(MotiveTag) != TAG_String))
+	{
+		return;
+	}
+
+	std::unique_ptr<cPainting> Painting(new cPainting(a_NBT.GetString(MotiveTag), BLOCK_FACE_NONE, 0.0, 0.0, 0.0));
+	if (!LoadEntityBaseFromNBT(*Painting.get(), a_NBT, a_TagIdx))
+	{
+		return;
+	}
+
+	LoadHangingFromNBT(*Painting.get(), a_NBT, a_TagIdx);
+	a_Entities.push_back(Painting.release());
 }
 
 

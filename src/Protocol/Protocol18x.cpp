@@ -632,19 +632,11 @@ void cProtocol180::SendPaintingSpawn(const cPainting & a_Painting)
 	double PosY = a_Painting.GetPosY();
 	double PosZ = a_Painting.GetPosZ();
 
-	switch (a_Painting.GetDirection())
-	{
-		case 0: PosZ += 1; break;
-		case 1: PosX -= 1; break;
-		case 2: PosZ -= 1; break;
-		case 3: PosX += 1; break;
-	}
-
 	cPacketizer Pkt(*this, 0x10);  // Spawn Painting packet
 	Pkt.WriteVarInt(a_Painting.GetUniqueID());
 	Pkt.WriteString(a_Painting.GetName().c_str());
 	Pkt.WritePosition((int)PosX, (int)PosY, (int)PosZ);
-	Pkt.WriteChar(a_Painting.GetDirection());
+	Pkt.WriteChar(a_Painting.GetProtocolFacing());
 }
 
 

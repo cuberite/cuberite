@@ -10,10 +10,9 @@
 
 
 
-cPainting::cPainting(const AString & a_Name, int a_Direction, double a_X, double a_Y, double a_Z)
-	: cEntity(etPainting, a_X, a_Y, a_Z, 1, 1),
-	m_Name(a_Name),
-	m_Direction(a_Direction)
+cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, double a_X, double a_Y, double a_Z)
+	: cHangingEntity(etPainting, a_Direction, a_X, a_Y, a_Z),
+	m_Name(a_Name)
 {
 }
 
@@ -24,17 +23,8 @@ cPainting::cPainting(const AString & a_Name, int a_Direction, double a_X, double
 
 void cPainting::SpawnOn(cClientHandle & a_Client)
 {
+	super::SpawnOn(a_Client);
 	a_Client.SendPaintingSpawn(*this);
-}
-
-
-
-
-
-void cPainting::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-{
-	UNUSED(a_Dt);
-	UNUSED(a_Chunk);
 }
 
 
