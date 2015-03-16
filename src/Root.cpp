@@ -70,11 +70,11 @@ cRoot::~cRoot()
 void cRoot::InputThread(cRoot & a_Params)
 {
 	cLogCommandOutputCallback Output;
-	std::cout << std::endl; // an endline to avoid interference with previous outputs
+	std::cout << std::endl;  // an endline to avoid interference with previous outputs
 	while (!a_Params.m_bStop && !a_Params.m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
-		std::cout << "$ "; // Indicator for console input
+		std::cout << "$ ";  // Indicator for console input
 		std::getline(std::cin, Command);
 		if (!Command.empty())
 		{
