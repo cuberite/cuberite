@@ -11,10 +11,10 @@
 // Changes endianness
 inline UInt64 HostToNetwork8(const void * a_Value)
 {
-	unsigned long long __HostToNetwork8;
-	memcpy( &__HostToNetwork8, a_Value, sizeof( __HostToNetwork8));
-	__HostToNetwork8 = (( ( (unsigned long long)htonl((u_long)__HostToNetwork8)) << 32) + htonl(__HostToNetwork8 >> 32));
-	return __HostToNetwork8;
+	unsigned long long buf;
+	memcpy( &buf, a_Value, sizeof( buf));
+	buf = (( ( (unsigned long long)htonl((u_long)buf)) << 32) + htonl(buf >> 32));
+	return buf;
 }
 
 
@@ -23,10 +23,10 @@ inline UInt64 HostToNetwork8(const void * a_Value)
 
 inline UInt32 HostToNetwork4(const void* a_Value)
 {
-	unsigned int __HostToNetwork4;
-	memcpy( &__HostToNetwork4, a_Value, sizeof( __HostToNetwork4));
-	__HostToNetwork4 = ntohl( __HostToNetwork4);
-	return __HostToNetwork4;
+	unsigned int buf;
+	memcpy( &buf, a_Value, sizeof( buf));
+	buf = ntohl( buf);
+	return buf;
 }
 
 
