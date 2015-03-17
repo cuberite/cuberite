@@ -2,7 +2,7 @@
 #pragma once
 
 #undef  ntohll
-#define ntohll(x) ((((UInt64)ntohl((u_long)x)) << 32) + ntohl(x >> 32))
+#define ntohll(x) ((((UInt64)ntohl((UInt32)x)) << 32) + ntohl(x >> 32))
 
 
 
@@ -11,9 +11,9 @@
 // Changes endianness
 inline UInt64 HostToNetwork8(const void * a_Value)
 {
-	unsigned long long buf;
+	UInt64 buf;
 	memcpy( &buf, a_Value, sizeof( buf));
-	buf = (( ( (unsigned long long)htonl((u_long)buf)) << 32) + htonl(buf >> 32));
+	buf = (( ( (UInt64)htonl((UInt32)buf)) << 32) + htonl(buf >> 32));
 	return buf;
 }
 
@@ -23,7 +23,7 @@ inline UInt64 HostToNetwork8(const void * a_Value)
 
 inline UInt32 HostToNetwork4(const void* a_Value)
 {
-	unsigned int buf;
+	UInt32 buf;
 	memcpy( &buf, a_Value, sizeof( buf));
 	buf = ntohl( buf);
 	return buf;
