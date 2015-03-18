@@ -1741,3 +1741,58 @@ end
 
 
 
+
+function HandleConsoleBBox(a_Split)
+	local bbox = cBoundingBox(0, 10, 0, 10, 0, 10)
+	local v1 = Vector3d(1, 1, 1)
+	local v2 = Vector3d(5, 5, 5)
+	local v3 = Vector3d(11, 11, 11)
+	
+	if (bbox:IsInside(v1)) then
+		LOG("v1 is inside bbox")
+	else
+		LOG("v1 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v2)) then
+		LOG("v2 is inside bbox")
+	else
+		LOG("v2 is not inside bbox")
+	end
+
+	if (bbox:IsInside(v3)) then
+		LOG("v3 is inside bbox")
+	else
+		LOG("v3 is not inside bbox")
+	end
+
+	if (bbox:IsInside(v1, v2)) then
+		LOG("v1*v2 is inside bbox")
+	else
+		LOG("v1*v2 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v2, v1)) then
+		LOG("v2*v1 is inside bbox")
+	else
+		LOG("v2*v1 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v1, v3)) then
+		LOG("v1*v3 is inside bbox")
+	else
+		LOG("v1*v3 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v2, v3)) then
+		LOG("v2*v3 is inside bbox")
+	else
+		LOG("v2*v3 is not inside bbox")
+	end
+	
+	return true
+end
+
+
+
+
