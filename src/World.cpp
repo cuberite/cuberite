@@ -2911,6 +2911,20 @@ bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
 {
+	// First check the entities-to-add:
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		for (auto & ent: m_EntitiesToAdd)
+		{
+			if (ent->GetUniqueID() == a_UniqueID)
+			{
+				a_Callback.Item(ent);
+				return true;
+			}
+		}  // for ent - m_EntitiesToAdd[]
+	}
+
+	// Then check the chunkmap:
 	return m_ChunkMap->DoWithEntityByID(a_UniqueID, a_Callback);
 }
 
