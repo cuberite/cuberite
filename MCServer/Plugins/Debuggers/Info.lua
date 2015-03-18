@@ -212,6 +212,12 @@ g_PluginInfo =
 			HelpString = "Tests the crypto hashing functions",
 		},
 		
+		["inh"] =
+		{
+			Handler = HandleConsoleInh,
+			HelpString = "Tests the bindings of the cEntity inheritance",
+		},
+		
 		["loadchunk"] =
 		{
 			Handler = HandleConsoleLoadChunk,
