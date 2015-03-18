@@ -197,6 +197,15 @@ cUDPEndpointImpl::cUDPEndpointImpl(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_C
 
 
 
+cUDPEndpointImpl::~cUDPEndpointImpl()
+{
+	Close();
+}
+
+
+
+
+
 void cUDPEndpointImpl::Close(void)
 {
 	if (m_Port == 0)
