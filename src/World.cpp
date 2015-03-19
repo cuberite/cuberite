@@ -714,6 +714,7 @@ void cWorld::GenerateRandomSpawn(void)
 
 bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 {
+	// Check that spawnblock and surrounding blocks are neither solid nor water / lava
 	static const struct
 	{
 		int x, z;
@@ -725,26 +726,22 @@ bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
 		{ 0, -1 },
 		{ 0, 1 },
 	};
-
-	// Checking that spawnblock and surrounding blocks are air and not water/lava
 	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
 		BLOCKTYPE BlockType = GetBlock(a_PosX + Coords[i].x, a_PosY, a_PosZ + Coords[i].x);
-
 		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
 		{
 			return false;
 		}
 	}  // for i - Coords[]
 
-	// Check if block below is solid
-	BLOCKTYPE BlockType = GetBlock(a_PosX, a_PosY - 1, a_PosZ);
-	if (!cBlockInfo::IsSolid(BlockType))
+	// Check that the block below is solid:
+	if (!cBlockInfo::IsSolid(GetBlock(a_PosX, a_PosY - 1, a_PosZ)))
 	{
 		return false;
 	}
 
-	// Checking that all the blocks above the spawnpoint is air.
+	// Check that all the blocks above the spawnpoint are not solid:
 	for (int i = a_PosY; i < cChunkDef::Height; i++)
 	{
 		BLOCKTYPE BlockType = GetBlock(a_PosX, i, a_PosZ);
