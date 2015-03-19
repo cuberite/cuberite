@@ -3677,6 +3677,8 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_cclass(tolua_S, "cCryptoHash", "cCryptoHash", "", nullptr);
 		tolua_usertype(tolua_S, "cStringCompression");
 		tolua_cclass(tolua_S, "cStringCompression", "cStringCompression", "", nullptr);
+		tolua_usertype(tolua_S, "cLineBlockTracer");
+		tolua_cclass(tolua_S, "cLineBlockTracer", "cLineBlockTracer", "", nullptr);
 
 		// Globals:
 		tolua_function(tolua_S, "Clamp",                 tolua_Clamp);

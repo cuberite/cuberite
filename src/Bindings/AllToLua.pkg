@@ -116,14 +116,6 @@ $cfile "../BlockEntities/FlowerPotEntity.h"
 
 
 
-// Need to declare this class so that the usertype is properly registered in Bindings.cpp - 
-// it seems impossible to register a usertype in ManualBindings.cpp
-class cLineBlockTracer;
-
-
-
-
-
 // To avoid tolua treating Byte as a class, and avoid the need to $cfile entire Globals.h:
 typedef unsigned char Byte;
 
