@@ -2871,41 +2871,18 @@ end
 				This class represents the tolua bridge between the Lua API and MCServer. It supports some low
 				level operations and queries on the objects. See also the tolua++'s documentation at
 				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
-				functions except for cast() and type()
+				functions except for type()
 			]],
 			Functions =
 			{
-				cast = { Params = "Object, TypeStr", Return = "Object", Notes = "Casts the object to the specified type through the inheritance hierarchy." },
+				cast = { Params = "Object, TypeStr", Return = "Object", Notes = "Casts the object to the specified type.<br/><b>Note:</b> This is a potentially unsafe operation and it could crash the server. There is normally no need to use this function at all, so don't use it unless you know exactly what you're doing." },
 				getpeer = { Params = "", Return = "", Notes = "" },
 				inherit = { Params = "", Return = "", Notes = "" },
 				releaseownership = { Params = "", Return = "", Notes = "" },
 				setpeer = { Params = "", Return = "", Notes = "" },
 				takeownership = { Params = "", Return = "", Notes = "" },
-				type = { Params = "Object", Return = "TypeStr", Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ types, too." },
+				type = { Params = "Object", Return = "TypeStr", Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ classes, too." },
 			},
-			AdditionalInfo =
-			{
-				{
-					Header = "Usage example",
-					Contents =
-					[[
-						The tolua.cast() function is normally used to cast between related types. For example in the
-						hook callbacks you often receive a generic {{cEntity}} object, when in fact you know that the
-						object is a {{cMonster}}. You can cast the object to access its cMonster functions:
-<pre class="prettyprint lang-lua">
-function OnTakeDamage(a_ReceiverEntity, TDI)
-	if (a_ReceiverEntity.IsMob()) then
-		local Mob = tolua.cast(a_ReceiverEntity, "cMonster");  -- Cast a_ReceiverEntity into a {{cMonster}} instance
-		if (Mob:GetMonsterType() == cMonster.mtSheep) then
-			local Sheep = tolua.cast(Mob, "cSheep");  -- Cast Mob into a {{cSheep}} instance
-			-- Do something sheep-specific
-		end
-	end
-end
-</pre>
-					]],
-				}
-			}  -- AdditionalInfo
 		},  -- tolua
 
 		Globals =
