@@ -638,11 +638,11 @@ static int tolua_DoWithID(lua_State* tolua_S)
 	private:
 		virtual bool Item(Ty2 * a_Item) override
 		{
-			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);            // Push function to call
-			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());  // Push the item
+			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);         // Push function to call
+			tolua_pushusertype(LuaState, a_Item, a_Item->GetClass());  // Push the item
 			if (TableRef != LUA_REFNIL)
 			{
-				lua_rawgeti(LuaState, LUA_REGISTRYINDEX, TableRef);         // Push the optional callbackdata param
+				lua_rawgeti(LuaState, LUA_REGISTRYINDEX, TableRef);      // Push the optional callbackdata param
 			}
 
 			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
