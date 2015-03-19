@@ -95,7 +95,9 @@ struct sWebAdminPage
 
 // tolua_begin
 class cWebAdmin :
+	// tolua_end
 	public cHTTPServer::cCallbacks
+	// tolua_begin
 {
 public:
 	// tolua_end

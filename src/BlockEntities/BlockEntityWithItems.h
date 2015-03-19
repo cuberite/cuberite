@@ -21,7 +21,9 @@
 // tolua_begin
 class cBlockEntityWithItems :
 	public cBlockEntity,
+	// tolua_end
 	public cItemGrid::cListener,
+	// tolua_begin
 	public cBlockEntityWindowOwner
 {
 	typedef cBlockEntity super;

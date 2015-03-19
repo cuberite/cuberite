@@ -31,7 +31,9 @@ You can use the invArmorOffset, invInventoryOffset and invHotbarOffset constants
 */
 
 class cInventory :
+	// tolua_end
 	public cItemGrid::cListener
+	// tolua_begin
 {
 public:
 	

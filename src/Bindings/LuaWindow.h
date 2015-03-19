@@ -35,8 +35,10 @@ This reference needs to be unreferenced in the Destroy() function.
 */
 // tolua_begin
 class cLuaWindow :
-	public cWindow,
-	public cItemGrid::cListener
+	public cWindow
+	// tolua_end
+	, public cItemGrid::cListener
+	// tolua_begin
 {
 	typedef cWindow super;
 	
