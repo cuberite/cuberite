@@ -22,7 +22,8 @@ class cIncrementalRedstoneSimulator :
 public:
 
 	cIncrementalRedstoneSimulator(cWorld & a_World)
-		: cRedstoneSimulator(a_World)
+		: cRedstoneSimulator(a_World),
+		m_Chunk(nullptr)
 	{
 	}
 
@@ -209,7 +210,7 @@ private:
 	/** Removes a block from the Powered and LinkedPowered lists
 	Used for variable sources such as tripwire hooks, daylight sensors, and trapped chests
 	*/
-	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
+	void SetSourceUnpowered(int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, cChunk * a_Chunk);
 	void SetInvalidMiddleBlock(int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
 
 	/** Returns if a coordinate is powered or linked powered */
@@ -384,14 +385,14 @@ private:
 		}
 	}
 
-	inline static bool AreCoordsOnChunkBoundary(int a_BlockX, int a_BlockY, int a_BlockZ)
+	inline static Vector3i GetCoordinateAdjacentChunk(const Vector3i &  a_BlockPos)
 	{
-		return (  // Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
-			((a_BlockX % cChunkDef::Width) <= 1) ||
-			((a_BlockX % cChunkDef::Width) >= 14) ||
-			((a_BlockZ % cChunkDef::Width) <= 1) ||
-			((a_BlockZ % cChunkDef::Width) >= 14)
-			);
+		// Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
+		if ((a_BlockPos.x % cChunkDef::Width) <= 1) { return{ -2, 0, 0 }; }
+		if ((a_BlockPos.x % cChunkDef::Width) >= 14) { return{ 2, 0, 0 }; }
+		if ((a_BlockPos.z % cChunkDef::Width) <= 1) { return{ 0, 0, -2 }; }
+		if ((a_BlockPos.z % cChunkDef::Width) >= 14) { return{ 0, 0, 2 }; }
+		return { 0, 0, 0 };
 	}
 
 	inline static Vector3i AdjustRelativeCoords(const Vector3i & a_RelPosition)
