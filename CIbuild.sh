@@ -11,7 +11,7 @@ cd src
 lua CheckBasicStyle.lua
 cd ..
 make -j 2;
-make -j 2 test;
+make -j 2 test ARGS="-V";
 cd MCServer/;
 if [ "$TRAVIS_MCSERVER_BUILD_TYPE" != "COVERAGE" ]
 	then echo stop | $MCSERVER_PATH;
