@@ -106,7 +106,8 @@ public:
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
-	typedef std::vector<std::unique_ptr<cTask>> cTasks;
+	typedef SharedPtr<cTask> cTaskPtr;
+	typedef std::vector<cTaskPtr> cTasks;
 
 	
 	class cTaskSaveAllChunks :
@@ -691,11 +692,10 @@ public:
 	void QueueSaveAllChunks(void);  // tolua_export
 	
 	/** Queues a task onto the tick thread. The task object will be deleted once the task is finished */
-	void QueueTask(std::unique_ptr<cTask> a_Task);  // Exported in ManualBindings.cpp
+	void QueueTask(cTaskPtr a_Task);  // Exported in ManualBindings.cpp
 	
-	/** Queues a task onto the tick thread, with the specified delay.
-	The task object will be deleted once the task is finished */
-	void ScheduleTask(int a_DelayTicks, cTask * a_Task);
+	/** Queues a task onto the tick thread, with the specified delay. */
+	void ScheduleTask(int a_DelayTicks, cTaskPtr a_Task);
 
 	/** Returns the number of chunks loaded	 */
 	int GetNumChunks() const;  // tolua_export
@@ -867,20 +867,16 @@ private:
 	{
 	public:
 		Int64 m_TargetTick;
-		cTask * m_Task;
+		cTaskPtr m_Task;
 		
 		/** Creates a new scheduled task; takes ownership of the task object passed to it. */
-		cScheduledTask(Int64 a_TargetTick, cTask * a_Task) :
+		cScheduledTask(Int64 a_TargetTick, cTaskPtr a_Task) :
 			m_TargetTick(a_TargetTick),
 			m_Task(a_Task)
 		{
 		}
 		
-		virtual ~cScheduledTask()
-		{
-			delete m_Task;
-			m_Task = nullptr;
-		}
+		virtual ~cScheduledTask() {}
 	};
 
 	typedef std::unique_ptr<cScheduledTask> cScheduledTaskPtr;

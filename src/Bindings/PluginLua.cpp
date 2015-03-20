@@ -6,10 +6,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifdef __APPLE__
-#define LUA_USE_MACOSX
+	#define LUA_USE_MACOSX
 #else
-#define LUA_USE_POSIX
+	#define LUA_USE_POSIX
 #endif
+
 #include "PluginLua.h"
 #include "../CommandOutput.h"
 #include "PluginManager.h"
@@ -52,24 +53,35 @@ cPluginLua::~cPluginLua()
 
 void cPluginLua::Close(void)
 {
-	if (m_LuaState.IsValid())
+	cCSLock Lock(m_CriticalSection);
+
+	// If already closed, bail out:
+	if (!m_LuaState.IsValid())
 	{
-		// Release all the references in the hook map:
-		for (cHookMap::iterator itrH = m_HookMap.begin(), endH = m_HookMap.end(); itrH != endH; ++itrH)
-		{
-			for (cLuaRefs::iterator itrR = itrH->second.begin(), endR = itrH->second.end(); itrR != endR; ++itrR)
-			{
-				delete *itrR;
-			}  // for itrR - itrH->second[]
-		}  // for itrH - m_HookMap[]
-		m_HookMap.clear();
-		
-		m_LuaState.Close();
-	}
-	else
-	{
+		ASSERT(m_Resettables.empty());
 		ASSERT(m_HookMap.empty());
+		return;
 	}
+
+	// Notify and remove all m_Resettables:
+	for (auto resettable: m_Resettables)
+	{
+		resettable->Reset();
+	}
+	m_Resettables.clear();
+
+	// Release all the references in the hook map:
+	for (cHookMap::iterator itrH = m_HookMap.begin(), endH = m_HookMap.end(); itrH != endH; ++itrH)
+	{
+		for (cLuaRefs::iterator itrR = itrH->second.begin(), endR = itrH->second.end(); itrR != endR; ++itrR)
+		{
+			delete *itrR;
+		}  // for itrR - itrH->second[]
+	}  // for itrH - m_HookMap[]
+	m_HookMap.clear();
+
+	// Close the Lua engine:
+	m_LuaState.Close();
 }
 
 
@@ -1709,6 +1721,16 @@ int cPluginLua::CallFunctionFromForeignState(
 
 
 
+void cPluginLua::AddResettable(cPluginLua::cResettablePtr a_Resettable)
+{
+	cCSLock Lock(m_CriticalSection);
+	m_Resettables.push_back(a_Resettable);
+}
+
+
+
+
+
 AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1821,6 +1843,29 @@ void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int 
 	
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cPluginLua::cResettable:
+
+cPluginLua::cResettable::cResettable(cPluginLua & a_Plugin):
+	m_Plugin(&a_Plugin),
+	m_CSPlugin(a_Plugin.m_CriticalSection)
+{
+}
+
+
+
+
+
+void cPluginLua::cResettable::Reset(void)
+{
+	cCSLock Lock(m_CSPlugin);
+	m_Plugin = nullptr;
 }
 
 
