@@ -334,12 +334,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 void cProjectileEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	
-	// TODO: see BroadcastMovementUpdate; RelativeMove packet jerkiness affects projectiles too (cause of sympton described in cArrowEntity::Tick())
-	if (GetProjectileKind() != pkArrow)
-	{
-		BroadcastMovementUpdate();
-	}
+	BroadcastMovementUpdate();
 }
 
 

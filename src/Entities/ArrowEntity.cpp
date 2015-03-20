@@ -72,14 +72,8 @@ bool cArrowEntity::CanPickup(const cPlayer & a_Player) const
 
 void cArrowEntity::OnHitSolidBlock(const Vector3d & a_HitPos, eBlockFace a_HitFace)
 {
-	if (GetSpeed().EqualsEps(Vector3d(0, 0, 0), 0.0000001))
-	{
-		SetSpeed(GetLookVector().NormalizeCopy() * 0.1);  // Ensure that no division by zero happens later
-	}
-
 	Vector3d Hit = a_HitPos;
-	Vector3d SinkMovement = (GetSpeed() / 1000);
-	Hit += SinkMovement * (0.0005 / SinkMovement.Length());  // Make arrow sink into block a centimetre so it lodges (but not to far so it goes black clientside)
+	Hit += GetSpeed().NormalizeCopy() / 100000;  // Make arrow sink into block a bit so it lodges (TODO: investigate how to stop them going so far so that they become black clientside)
 
 	super::OnHitSolidBlock(Hit, a_HitFace);
 	Vector3i BlockHit = Hit.Floor();
@@ -194,12 +188,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	
 	if (m_IsInGround)
-	{
-		// When an arrow hits, the client doesn't think its in the ground and keeps on moving, IF BroadcastMovementUpdate() and TeleportEntity was called during flight, AT ALL
-		// Fix is to simply not sync with the client and send a teleport to confirm pos after arrow has stabilised (around 1 sec after landing)
-		// We can afford to do this because xoft's algorithm for trajectory is near perfect, so things are pretty close anyway without sync
-		// Besides, this seems to be what the vanilla server does, note how arrows teleport half a second after they hit to the server position
-		
+	{		
 		if (!m_HasTeleported)  // Sent a teleport already, don't do again
 		{
 			if (m_HitGroundTimer > std::chrono::milliseconds(500))
