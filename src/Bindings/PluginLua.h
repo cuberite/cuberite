@@ -84,9 +84,8 @@ public:
 		Protected against multithreaded access by m_CSPlugin. */
 		cPluginLua * m_Plugin;
 
-		/** The mutex protecting m_Plugin against multithreaded access.
-		Actually points to m_Plugin's internal m_CriticalSection in order to prevent deadlocks. */
-		cCriticalSection & m_CSPlugin;
+		/** The mutex protecting m_Plugin against multithreaded access. */
+		cCriticalSection m_CSPlugin;
 	};
 
 	typedef SharedPtr<cResettable> cResettablePtr;

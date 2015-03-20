@@ -63,12 +63,17 @@ void cPluginLua::Close(void)
 		return;
 	}
 
-	// Notify and remove all m_Resettables:
-	for (auto resettable: m_Resettables)
+	// Notify and remove all m_Resettables (unlock the m_CriticalSection while resetting them):
+	cResettablePtrs resettables;
+	std::swap(m_Resettables, resettables);
 	{
-		resettable->Reset();
-	}
-	m_Resettables.clear();
+		cCSUnlock Unlock(Lock);
+		for (auto resettable: resettables)
+		{
+			resettable->Reset();
+		}
+		m_Resettables.clear();
+	}  // cCSUnlock (m_CriticalSection)
 
 	// Release all the references in the hook map:
 	for (cHookMap::iterator itrH = m_HookMap.begin(), endH = m_HookMap.end(); itrH != endH; ++itrH)
@@ -1853,8 +1858,7 @@ void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int 
 // cPluginLua::cResettable:
 
 cPluginLua::cResettable::cResettable(cPluginLua & a_Plugin):
-	m_Plugin(&a_Plugin),
-	m_CSPlugin(a_Plugin.m_CriticalSection)
+	m_Plugin(&a_Plugin)
 {
 }
 
