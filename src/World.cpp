@@ -3167,14 +3167,14 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::QueueSaveAllChunks(void)
 {
-	QueueTask(make_unique<cWorld::cTaskSaveAllChunks>());
+	QueueTask(std::make_shared<cWorld::cTaskSaveAllChunks>());
 }
 
 
 
 
 
-void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
+void cWorld::QueueTask(cTaskPtr a_Task)
 {
 	cCSLock Lock(m_CSTasks);
 	m_Tasks.push_back(std::move(a_Task));
@@ -3184,7 +3184,7 @@ void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
 
 
 
-void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
+void cWorld::ScheduleTask(int a_DelayTicks, cTaskPtr a_Task)
 {
 	Int64 TargetTick = a_DelayTicks + std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
 	
@@ -3194,11 +3194,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 	{
 		if ((*itr)->m_TargetTick >= TargetTick)
 		{
-			m_ScheduledTasks.insert(itr, make_unique<cScheduledTask>(TargetTick, a_Task));
+			m_ScheduledTasks.insert(itr, cScheduledTaskPtr(new cScheduledTask(TargetTick, a_Task)));
 			return;
 		}
 	}
-	m_ScheduledTasks.push_back(make_unique<cScheduledTask>(TargetTick, a_Task));
+	m_ScheduledTasks.push_back(cScheduledTaskPtr(new cScheduledTask(TargetTick, a_Task)));
 }
 
 

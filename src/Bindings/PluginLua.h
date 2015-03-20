@@ -59,6 +59,38 @@ public:
 		/** RAII lock for m_Plugin.m_CriticalSection */
 		cCSLock m_Lock;
 	} ;
+
+
+
+	/** A base class that represents something related to a plugin
+	The plugin can reset this class so that the instance can continue to exist but will not engage the (possibly non-existent) plugin anymore.
+	This is used for scheduled tasks etc., so that they can be queued and reset when the plugin is terminated, without removing them from the queue. */
+	class cResettable
+	{
+	public:
+		/** Creates a new instance bound to the specified plugin. */
+		cResettable(cPluginLua & a_Plugin);
+
+		// Force a virtual destructor in descendants:
+		virtual ~cResettable() {}
+
+		/** Resets the plugin instance stored within.
+		The instance will continue to exist, but should not call into the plugin anymore. */
+		virtual void Reset(void);
+
+	protected:
+		/** The plugin that this instance references.
+		If nullptr, the plugin has already unloaded and the instance should bail out any processing.
+		Protected against multithreaded access by m_CSPlugin. */
+		cPluginLua * m_Plugin;
+
+		/** The mutex protecting m_Plugin against multithreaded access.
+		Actually points to m_Plugin's internal m_CriticalSection in order to prevent deadlocks. */
+		cCriticalSection & m_CSPlugin;
+	};
+
+	typedef SharedPtr<cResettable> cResettablePtr;
+	typedef std::vector<cResettablePtr> cResettablePtrs;
 	
 	
 	cPluginLua(const AString & a_PluginDirectory);
@@ -187,42 +219,16 @@ public:
 		int a_ParamEnd
 	);
 	
-	// The following templates allow calls to arbitrary Lua functions residing in the plugin:
-	
-	/** Call a Lua function with 0 args */
-	template <typename FnT> bool Call(FnT a_Fn)
+	/** Call a Lua function residing in the plugin. */
+	template <typename FnT, typename... Args>
+	bool Call(FnT a_Fn, Args && ... a_Args)
 	{
 		cCSLock Lock(m_CriticalSection);
-		return m_LuaState.Call(a_Fn);
+		return m_LuaState.Call(a_Fn, a_Args...);
 	}
 
-	/** Call a Lua function with 1 arg */
-	template <typename FnT, typename ArgT0> bool Call(FnT a_Fn, ArgT0 a_Arg0)
-	{
-		cCSLock Lock(m_CriticalSection);
-		return m_LuaState.Call(a_Fn, a_Arg0);
-	}
-
-	/** Call a Lua function with 2 args */
-	template <typename FnT, typename ArgT0, typename ArgT1> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1)
-	{
-		cCSLock Lock(m_CriticalSection);
-		return m_LuaState.Call(a_Fn, a_Arg0, a_Arg1);
-	}
-
-	/** Call a Lua function with 3 args */
-	template <typename FnT, typename ArgT0, typename ArgT1, typename ArgT2> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1, ArgT2 a_Arg2)
-	{
-		cCSLock Lock(m_CriticalSection);
-		return m_LuaState.Call(a_Fn, a_Arg0, a_Arg1, a_Arg2);
-	}
-
-	/** Call a Lua function with 4 args */
-	template <typename FnT, typename ArgT0, typename ArgT1, typename ArgT2, typename ArgT3> bool Call(FnT a_Fn, ArgT0 a_Arg0, ArgT1 a_Arg1, ArgT2 a_Arg2, ArgT3 a_Arg3)
-	{
-		cCSLock Lock(m_CriticalSection);
-		return m_LuaState.Call(a_Fn, a_Arg0, a_Arg1, a_Arg2, a_Arg3);
-	}
+	/** Adds the specified cResettable instance to m_Resettables, so that it is notified when the plugin is being closed. */
+	void AddResettable(cResettablePtr a_Resettable);
 
 protected:
 	/** Maps command name into Lua function reference */
@@ -234,15 +240,27 @@ protected:
 	/** Maps hook types into arrays of Lua function references to call for each hook type */
 	typedef std::map<int, cLuaRefs> cHookMap;
 	
+
+	/** The mutex protecting m_LuaState and each of the m_Resettables[] against multithreaded use. */
 	cCriticalSection m_CriticalSection;
+
+	/** The plugin's Lua state. */
 	cLuaState m_LuaState;
 	
+	/** Objects that need notification when the plugin is about to be unloaded. */
+	cResettablePtrs m_Resettables;
+
+	/** In-game commands that the plugin has registered. */
 	CommandMap m_Commands;
+
+	/** Console commands that the plugin has registered. */
 	CommandMap m_ConsoleCommands;
 	
+	/** Hooks that the plugin has registered. */
 	cHookMap m_HookMap;
 	
-	/** Releases all Lua references and closes the LuaState */
+
+	/** Releases all Lua references, notifies and removes all m_Resettables[] and closes the m_LuaState. */
 	void Close(void);
 } ;  // tolua_export
 

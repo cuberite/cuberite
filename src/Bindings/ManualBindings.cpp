@@ -1299,23 +1299,27 @@ tolua_lerror:
 
 
 class cLuaWorldTask :
-	public cWorld::cTask
+	public cWorld::cTask,
+	public cPluginLua::cResettable
 {
 public:
 	cLuaWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
-		m_Plugin(a_Plugin),
+		cPluginLua::cResettable(a_Plugin),
 		m_FnRef(a_FnRef)
 	{
 	}
 
 protected:
-	cPluginLua & m_Plugin;
 	int m_FnRef;
 	
 	// cWorld::cTask overrides:
 	virtual void Run(cWorld & a_World) override
 	{
-		m_Plugin.Call(m_FnRef, &a_World);
+		cCSLock Lock(m_CSPlugin);
+		if (m_Plugin != nullptr)
+		{
+			m_Plugin->Call(m_FnRef, &a_World);
+		}
 	}
 } ;
 
@@ -1354,7 +1358,9 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
 	}
 
-	self->QueueTask(make_unique<cLuaWorldTask>(*Plugin, FnRef));
+	auto task = std::make_shared<cLuaWorldTask>(*Plugin, FnRef);
+	Plugin->AddResettable(task);
+	self->QueueTask(task);
 	return 0;
 }
 
@@ -1363,23 +1369,27 @@ static int tolua_cWorld_QueueTask(lua_State * tolua_S)
 
 
 class cLuaScheduledWorldTask :
-	public cWorld::cTask
+	public cWorld::cTask,
+	public cPluginLua::cResettable
 {
 public:
 	cLuaScheduledWorldTask(cPluginLua & a_Plugin, int a_FnRef) :
-		m_Plugin(a_Plugin),
+		cPluginLua::cResettable(a_Plugin),
 		m_FnRef(a_FnRef)
 	{
 	}
 
 protected:
-	cPluginLua & m_Plugin;
 	int m_FnRef;
 	
 	// cWorld::cTask overrides:
 	virtual void Run(cWorld & a_World) override
 	{
-		m_Plugin.Call(m_FnRef, &a_World);
+		cCSLock Lock(m_CSPlugin);
+		if (m_Plugin != nullptr)
+		{
+			m_Plugin->Call(m_FnRef, &a_World);
+		}
 	}
 };
 
@@ -1425,7 +1435,9 @@ static int tolua_cWorld_ScheduleTask(lua_State * tolua_S)
 	
 	int DelayTicks = (int)tolua_tonumber(tolua_S, 2, 0);
 
-	World->ScheduleTask(DelayTicks, new cLuaScheduledWorldTask(*Plugin, FnRef));
+	auto task = std::make_shared<cLuaScheduledWorldTask>(*Plugin, FnRef);
+	Plugin->AddResettable(task);
+	World->ScheduleTask(DelayTicks, task);
 	return 0;
 }
 
