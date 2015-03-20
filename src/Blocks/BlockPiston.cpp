@@ -61,6 +61,16 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 
 
 
+void cBlockPistonHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
+{
+	// Returning Piston Item without Direction-Metavalue
+	a_Pickups.push_back(cItem(m_BlockType, 1));
+}
+
+
+
+
+
 bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
