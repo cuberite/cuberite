@@ -978,7 +978,7 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 
 
 
-void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
+void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status)
 {
 	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status

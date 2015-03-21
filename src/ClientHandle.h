@@ -300,7 +300,7 @@ public:  // tolua_export
 	bool HandleHandshake        (const AString & a_Username);
 	
 	void HandleKeepAlive        (int a_KeepAliveID);
-	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status);
+	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status);
 	
 	/** Called when the protocol receives a MC|TrSel packet, indicating that the player used a trade in
 	the NPC UI. */

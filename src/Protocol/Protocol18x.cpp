@@ -162,8 +162,8 @@ void cProtocol180::SendAttachEntity(const cEntity & a_Entity, const cEntity * a_
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x1b);  // Attach Entity packet
-	Pkt.WriteInt(a_Entity.GetUniqueID());
-	Pkt.WriteInt((a_Vehicle != nullptr) ? a_Vehicle->GetUniqueID() : 0);
+	Pkt.WriteUInt32(a_Entity.GetUniqueID());
+	Pkt.WriteUInt32((a_Vehicle != nullptr) ? a_Vehicle->GetUniqueID() : 0);
 	Pkt.WriteBool(false);
 }
 
@@ -363,7 +363,7 @@ void cProtocol180::SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x04);  // Entity Equipment packet
-	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteShort(a_SlotNum);
 	Pkt.WriteItem(a_Item);
 }
@@ -377,7 +377,7 @@ void cProtocol180::SendEntityHeadLook(const cEntity & a_Entity)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x19);  // Entity Head Look packet
-	Pkt.WriteVarInt((UInt32)a_Entity.GetUniqueID());
+	Pkt.WriteVarInt(a_Entity.GetUniqueID());
 	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
 }
 
@@ -433,9 +433,9 @@ void cProtocol180::SendEntityRelMove(const cEntity & a_Entity, char a_RelX, char
 	
 	cPacketizer Pkt(*this, 0x15);  // Entity Relative Move packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_RelX);
-	Pkt.WriteByte(a_RelY);
-	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteChar(a_RelX);
+	Pkt.WriteChar(a_RelY);
+	Pkt.WriteChar(a_RelZ);
 	Pkt.WriteBool(a_Entity.IsOnGround());
 }
 
@@ -449,9 +449,9 @@ void cProtocol180::SendEntityRelMoveLook(const cEntity & a_Entity, char a_RelX, 
 	
 	cPacketizer Pkt(*this, 0x17);  // Entity Look And Relative Move packet
 	Pkt.WriteVarInt(a_Entity.GetUniqueID());
-	Pkt.WriteByte(a_RelX);
-	Pkt.WriteByte(a_RelY);
-	Pkt.WriteByte(a_RelZ);
+	Pkt.WriteChar(a_RelX);
+	Pkt.WriteChar(a_RelY);
+	Pkt.WriteChar(a_RelZ);
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteBool(a_Entity.IsOnGround());
@@ -466,7 +466,7 @@ void cProtocol180::SendEntityStatus(const cEntity & a_Entity, char a_Status)
 	ASSERT(m_State == 3);  // In game mode?
 	
 	cPacketizer Pkt(*this, 0x1a);  // Entity Status packet
-	Pkt.WriteInt(a_Entity.GetUniqueID());
+	Pkt.WriteUInt32(a_Entity.GetUniqueID());
 	Pkt.WriteChar(a_Status);
 }
 
@@ -580,7 +580,7 @@ void cProtocol180::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, 0x01);  // Join Game packet
-		Pkt.WriteInt(a_Player.GetUniqueID());
+		Pkt.WriteUInt32(a_Player.GetUniqueID());
 		Pkt.WriteByte((Byte)a_Player.GetEffectiveGameMode() | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
 		Pkt.WriteChar((char)a_World.GetDimension());
 		Pkt.WriteByte(2);  // TODO: Difficulty (set to Normal)

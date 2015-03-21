@@ -189,6 +189,11 @@ protected:
 			m_Out.WriteBEInt32(a_Value);
 		}
 		
+		void WriteUInt32(UInt32 a_Value)
+		{
+			m_Out.WriteBEUInt32(a_Value);
+		}
+		
 		void WriteInt64(Int64 a_Value)
 		{
 			m_Out.WriteBEInt64(a_Value);
