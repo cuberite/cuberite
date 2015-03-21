@@ -188,7 +188,7 @@ void cArrowEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	
 	if (m_IsInGround)
-	{		
+	{
 		if (!m_HasTeleported)  // Sent a teleport already, don't do again
 		{
 			if (m_HitGroundTimer > std::chrono::milliseconds(500))
