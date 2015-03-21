@@ -373,19 +373,19 @@ void cChunkMap::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, c
 
 
 
-void cChunkMap::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
+void cChunkMap::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
 	cCSLock Lock(m_CSLayers);
 	int ChunkX, ChunkZ;
 
-	cChunkDef::BlockToChunk(a_blockX, a_blockZ, ChunkX, ChunkZ);
+	cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 	cChunkPtr Chunk = GetChunkNoGen(ChunkX, ChunkZ);
 	if (Chunk == nullptr)
 	{
 		return;
 	}
 	// It's perfectly legal to broadcast packets even to invalid chunks!
-	Chunk->BroadcastBlockBreakAnimation(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage, a_Exclude);
+	Chunk->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
 }
 
 
@@ -1753,7 +1753,7 @@ void cChunkMap::AddEntityIfNotPresent(cEntity * a_Entity)
 
 
 
-bool cChunkMap::HasEntity(int a_UniqueID)
+bool cChunkMap::HasEntity(UInt32 a_UniqueID)
 {
 	cCSLock Lock(m_CSLayers);
 	for (cChunkLayerList::const_iterator itr = m_Layers.begin(); itr != m_Layers.end(); ++itr)
@@ -2045,7 +2045,7 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 
 
 
-bool cChunkMap::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
+bool cChunkMap::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 {
 	cCSLock Lock(m_CSLayers);
 	bool res = false;
@@ -2996,7 +2996,7 @@ bool cChunkMap::cChunkLayer::ForEachEntity(cEntityCallback & a_Callback)
 
 
 
-bool cChunkMap::cChunkLayer::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn)
+bool cChunkMap::cChunkLayer::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn)
 {
 	// Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found.
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
@@ -3016,7 +3016,7 @@ bool cChunkMap::cChunkLayer::DoWithEntityByID(int a_EntityID, cEntityCallback & 
 
 
 
-bool cChunkMap::cChunkLayer::HasEntity(int a_EntityID)
+bool cChunkMap::cChunkLayer::HasEntity(UInt32 a_EntityID)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_Chunks); i++)
 	{

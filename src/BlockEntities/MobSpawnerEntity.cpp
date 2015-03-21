@@ -169,7 +169,7 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 					Monster->SetPosition(PosX, RelY, PosZ);
 					Monster->SetYaw(Random.NextFloat() * 360.0f);
-					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != mtInvalidType)
+					if (Chunk->GetWorld()->SpawnMobFinalize(Monster) != cEntity::INVALID_ID)
 					{
 						EntitiesSpawned = true;
 						Chunk->BroadcastSoundParticleEffect(2004, (int)(PosX * 8.0), (int)(RelY * 8.0), (int)(PosZ * 8.0), 0);

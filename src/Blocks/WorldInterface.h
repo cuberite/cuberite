@@ -30,14 +30,16 @@ public:
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;
 	
-	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
+	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) = 0;
 	
-	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) = 0;
+	/** Spawns a mob of the specified type.
+	Returns the mob's UniqueID if recognized and spawned, or cEntity::INVALID_ID on failure. */
+	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) = 0;
 
-	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
-	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
+	/** Spawns an experience orb at the given location with the given reward.
+	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
+	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) = 0;
 
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
 	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback) = 0;

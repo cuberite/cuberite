@@ -24,7 +24,7 @@ class cMinecartCollisionCallback :
 	public cEntityCallback
 {
 public:
-	cMinecartCollisionCallback(Vector3d a_Pos, double a_Height, double a_Width, int a_UniqueID, int a_AttacheeUniqueID) :
+	cMinecartCollisionCallback(Vector3d a_Pos, double a_Height, double a_Width, UInt32 a_UniqueID, UInt32 a_AttacheeUniqueID) :
 		m_DoesInteserct(false),
 		m_CollidedEntityPos(0, 0, 0),
 		m_Pos(a_Pos),
@@ -77,8 +77,8 @@ protected:
 
 	Vector3d m_Pos;
 	double m_Height, m_Width;
-	int m_UniqueID;
-	int m_AttacheeUniqueID;
+	UInt32 m_UniqueID;
+	UInt32 m_AttacheeUniqueID;
 };
 
 
@@ -824,7 +824,10 @@ bool cMinecart::TestBlockCollision(NIBBLETYPE a_RailMeta)
 
 bool cMinecart::TestEntityCollision(NIBBLETYPE a_RailMeta)
 {
-	cMinecartCollisionCallback MinecartCollisionCallback(GetPosition(), GetHeight(), GetWidth(), GetUniqueID(), ((m_Attachee == nullptr) ? -1 : m_Attachee->GetUniqueID()));
+	cMinecartCollisionCallback MinecartCollisionCallback(
+		GetPosition(), GetHeight(), GetWidth(), GetUniqueID(),
+		((m_Attachee == nullptr) ? cEntity::INVALID_ID : m_Attachee->GetUniqueID())
+	);
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(POSX_TOINT, POSZ_TOINT, ChunkX, ChunkZ);
 	m_World->ForEachEntityInChunk(ChunkX, ChunkZ, MinecartCollisionCallback);

@@ -1969,7 +1969,7 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 
 
-bool cChunk::HasEntity(int a_EntityID)
+bool cChunk::HasEntity(UInt32 a_EntityID)
 {
 	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
@@ -2027,7 +2027,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 
 
-bool cChunk::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
+bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)

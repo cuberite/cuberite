@@ -590,7 +590,7 @@ static int tolua_DoWith(lua_State* tolua_S)
 template <
 	class Ty1,
 	class Ty2,
-	bool (Ty1::*Func1)(int, cItemCallback<Ty2> &)
+	bool (Ty1::*Func1)(UInt32, cItemCallback<Ty2> &)
 >
 static int tolua_DoWithID(lua_State* tolua_S)
 {
@@ -3866,6 +3866,10 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		BindRankManager(tolua_S);
 		BindNetwork(tolua_S);
+
+		tolua_beginmodule(tolua_S, "cEntity");
+			tolua_constant(tolua_S, "INVALID_ID", cEntity::INVALID_ID);
+		tolua_endmodule(tolua_S);
 
 	tolua_endmodule(tolua_S);
 }

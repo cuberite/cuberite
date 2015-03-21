@@ -24,8 +24,9 @@ public:
 
 	// tolua_begin
 	
-	/** Spawns a projectile of the given kind in front of the dispenser with the specified speed. */
-	void SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_Speed);
+	/** Spawns a projectile of the given kind in front of the dispenser with the specified speed.
+	Returns the UniqueID of the spawned projectile, or 0 on failure. */
+	UInt32 SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_Speed);
 
 	/** Returns a unit vector in the cardinal direction of where the dispenser is facing. */
 	Vector3d GetShootVector(NIBBLETYPE a_Meta);
