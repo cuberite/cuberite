@@ -192,7 +192,7 @@ void cProtocol172::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, cha
 
 
 
-void cProtocol172::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+void cProtocol172::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	
@@ -2133,7 +2133,7 @@ void cProtocol172::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 
 void cProtocol172::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt16, UInt16, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
 	m_Client->HandleSlotSelected(SlotNum);
 }
 

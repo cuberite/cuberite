@@ -144,7 +144,7 @@ public:  // tolua_export
 	// (Please keep these alpha-sorted)
 	void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
-	void SendBlockBreakAnim             (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
+	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
