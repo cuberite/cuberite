@@ -18,6 +18,7 @@ SET (SRCS
 	BlockArea.cpp
 	BlockID.cpp
 	BlockInfo.cpp
+	Broadcaster.cpp
 	BoundingBox.cpp
 	ByteBuffer.cpp
 	ChatColor.cpp
@@ -77,6 +78,7 @@ SET (HDRS
 	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
+	Broadcaster.h
 	BoundingBox.h
 	BuildInfo.h.cmake
 	ByteBuffer.h

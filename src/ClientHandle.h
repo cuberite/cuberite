@@ -22,6 +22,7 @@
 #include "ChunkSender.h"
 
 
+#include <array>
 
 
 
@@ -177,6 +178,7 @@ public:  // tolua_export
 	void SendMapInfo                    (int a_ID, unsigned int a_Scale);
 	void SendPaintingSpawn              (const cPainting & a_Painting);
 	void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount);
+	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPickupSpawn                (const cPickup & a_Pickup);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);

@@ -439,6 +439,17 @@ void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, flo
 
 
 
+
+void cProtocolRecognizer::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	ASSERT(m_Protocol != nullptr);
+	m_Protocol->SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
+}
+
+
+
+
+
 void cProtocolRecognizer::SendPaintingSpawn(const cPainting & a_Painting)
 {
 	m_Protocol->SendPaintingSpawn(a_Painting);

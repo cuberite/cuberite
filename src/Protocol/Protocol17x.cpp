@@ -804,6 +804,16 @@ void cProtocol172::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
+void cProtocol172::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	// 1.72 doesn't support extra data
+	this->SendParticleEffect(a_ParticleName, a_Src.x, a_Src.y, a_Src.z, a_Offset.x, a_Offset.y, a_Offset.z, a_ParticleData, a_ParticleAmount);
+}
+
+
+
+
+
 void cProtocol172::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?

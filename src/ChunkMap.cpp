@@ -791,6 +791,28 @@ bool cChunkMap::DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback & a_Callb
 }
 
 
+bool cChunkMap::DoWithChunkAt(Vector3i a_BlockPos, std::function<bool(cChunk &)> a_Callback)
+{
+	int ChunkX, ChunkZ;
+	cChunkDef::BlockToChunk(a_BlockPos.x, a_BlockPos.z, ChunkX, ChunkZ);
+	struct cCallBackWrapper : cChunkCallback
+	{
+		cCallBackWrapper(std::function<bool(cChunk &)> a_InnerCallback) :
+			m_Callback(a_InnerCallback)
+		{
+		}
+		
+		virtual bool Item(cChunk * a_Chunk)
+		{
+			return m_Callback(*a_Chunk);
+		}
+
+	private:
+		std::function<bool(cChunk &)> m_Callback;
+	} callback(a_Callback);
+	return DoWithChunk(ChunkX, ChunkZ, callback);
+}
+
 
 
 

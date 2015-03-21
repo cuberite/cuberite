@@ -2374,6 +2374,15 @@ void cClientHandle::SendParticleEffect(const AString & a_ParticleName, float a_S
 
 
 
+void cClientHandle::SendParticleEffect(const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	m_Protocol->SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount, a_Data);
+}
+
+
+
+
+
 void cClientHandle::SendPickupSpawn(const cPickup & a_Pickup)
 {
 	m_Protocol->SendPickupSpawn(a_Pickup);
