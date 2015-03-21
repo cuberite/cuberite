@@ -31,6 +31,8 @@ by using templates.
 
 #include "../BiomeDef.h"
 
+#include <tuple>
+
 
 
 
@@ -53,6 +55,9 @@ template <int SizeX, int SizeZ = SizeX>
 class cIntGen
 {
 public:
+
+	typedef cIntGen<SizeX, SizeZ> IntGenType;
+
 	/** Force a virtual destructor in all descendants.
 	Descendants contain virtual functions and are referred to via pointer-to-base, so they need a virtual destructor. */
 	virtual ~cIntGen() {}
@@ -62,9 +67,70 @@ public:
 
 	/** Generates the array of templated size into a_Values, based on given min coords. */
 	virtual void GetInts(int a_MinX, int a_MinZ, Values & a_Values) = 0;
+	
+};
+
+// Code adapted from http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
+
+template<int... >
+struct sSeq
+{
+};
+
+template<int N, int... S>
+struct sGens : sGens<N - 1, N - 1, S...>
+{
+};
+
+template<int... S>
+struct sGens<0, S...>
+{
+	typedef sSeq<S...> type;
 };
 
 
+template<class Gen, class... Args>
+class cIntGenFactory
+{
+	
+public:
+
+	typedef Gen Generator;
+
+	cIntGenFactory(Args&&... a_args) :
+		m_args(std::make_tuple<Args...>(std::forward<Args>(a_args)...))
+	{
+	}
+	
+	template <class LhsGen>
+	std::shared_ptr<Gen> construct(LhsGen&& a_Lhs)
+	{
+		return construct_impl<LhsGen>(std::forward<LhsGen>(a_Lhs), typename sGens<sizeof...(Args)>::type());
+	}
+
+
+private:
+	std::tuple<Args...> m_args;
+	
+	template <class LhsGen, int... S>
+	std::shared_ptr<Gen> construct_impl(LhsGen&& a_Lhs, sSeq<S...>)
+	{
+		return std::make_shared<Gen>(std::get<S>(m_args)..., std::forward<LhsGen>(a_Lhs));
+	}
+	
+};
+
+template<class T, class RhsGen, class... Args>
+std::shared_ptr<RhsGen> operator| (std::shared_ptr<T> a_Lhs, cIntGenFactory<RhsGen, Args...> a_Rhs)
+{
+	return a_Rhs.construct(static_cast<std::shared_ptr<typename T::IntGenType>>(a_Lhs));
+}
+
+template<class Gen, class... Args>
+cIntGenFactory<Gen, Args...> MakeIntGen(Args&&... a_Args)
+{
+	return cIntGenFactory<Gen, Args...>(std::forward<Args>(a_Args)...);
+}
 
 
 
@@ -688,7 +754,7 @@ public:
 			int IdxZ = z * SizeX;
 			for (int x = 0; x < SizeX; x++)
 			{
-				int val = a_Values[x + IdxZ];
+				size_t val = (size_t)a_Values[x + IdxZ];
 				const cBiomesInGroups & Biomes = (val > bgfRare) ?
 					rareBiomesInGroups[(val & (bgfRare - 1)) % ARRAYCOUNT(rareBiomesInGroups)] :
 					biomesInGroups[val % ARRAYCOUNT(biomesInGroups)];
