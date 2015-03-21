@@ -67,30 +67,29 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
 
-	if ((a_Killer != nullptr) && a_Killer->IsProjectile() && (((cProjectileEntity *)a_Killer)->GetCreatorUniqueID() >= 0))
+	// If the creeper was killed by a skeleton, add a random music disc drop:
+	if (
+		(a_Killer != nullptr) &&
+		a_Killer->IsProjectile() &&
+		((reinterpret_cast<cProjectileEntity *>(a_Killer))->GetCreatorUniqueID() != cEntity::INVALID_ID))
 	{
 		class cProjectileCreatorCallback : public cEntityCallback
 		{
 		public:
-			cProjectileCreatorCallback(void)
-			{
-			}
+			cProjectileCreatorCallback(void) {}
 
 			virtual bool Item(cEntity * a_Entity) override
 			{
-				if (a_Entity->IsMob() && ((cMonster *)a_Entity)->GetMobType() == mtSkeleton)
+				if (a_Entity->IsMob() && ((reinterpret_cast<cMonster *>(a_Entity))->GetMobType() == mtSkeleton))
 				{
 					return true;
 				}
 				return false;
 			}
-		};
-
-		cProjectileCreatorCallback PCC;
-		if (GetWorld()->DoWithEntityByID(((cProjectileEntity *)a_Killer)->GetCreatorUniqueID(), PCC))
+		} PCC;
+		if (GetWorld()->DoWithEntityByID((reinterpret_cast<cProjectileEntity *>(a_Killer))->GetCreatorUniqueID(), PCC))
 		{
-			// 12 music discs. TickRand starts from 0 to 11. Disk IDs start at 2256, so add that. There.
-			AddRandomDropItem(a_Drops, 1, 1, (short)m_World->GetTickRandomNumber(11) + 2256);
+			AddRandomDropItem(a_Drops, 1, 1, static_cast<short>(m_World->GetTickRandomNumber(11) + E_ITEM_FIRST_DISC));
 		}
 	}
 }
