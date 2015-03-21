@@ -72,20 +72,20 @@ public:
 
 // Code adapted from http://stackoverflow.com/questions/7858817/unpacking-a-tuple-to-call-a-matching-function-pointer
 
-template<int ...>
-struct seq
+template<int... >
+struct sSeq
 {
 };
 
-template<int N, int ...S>
-struct gens : gens<N-1, N-1, S...>
+template<int N, int... S>
+struct sGens : sGens<N - 1, N - 1, S...>
 {
 };
 
-template<int ...S>
-struct gens<0, S...>
+template<int... S>
+struct sGens<0, S...>
 {
-	typedef seq<S...> type;
+	typedef sSeq<S...> type;
 };
 
 
@@ -103,9 +103,9 @@ public:
 	}
 	
 	template <class LhsGen>
-	std::shared_ptr<Gen> construct(LhsGen&& lhs)
+	std::shared_ptr<Gen> construct(LhsGen&& a_Lhs)
 	{
-		return construct_impl<LhsGen>(std::forward<LhsGen>(lhs), typename gens<sizeof...(Args)>::type());
+		return construct_impl<LhsGen>(std::forward<LhsGen>(a_Lhs), typename sGens<sizeof...(Args)>::type());
 	}
 
 
@@ -113,23 +113,23 @@ private:
 	std::tuple<Args...> m_args;
 	
 	template <class LhsGen, int... S>
-	std::shared_ptr<Gen> construct_impl(LhsGen&& lhs, seq<S...>)
+	std::shared_ptr<Gen> construct_impl(LhsGen&& a_Lhs, sSeq<S...>)
 	{
-		return std::make_shared<Gen>(std::get<S>(m_args)..., std::forward<LhsGen>(lhs));
+		return std::make_shared<Gen>(std::get<S>(m_args)..., std::forward<LhsGen>(a_Lhs));
 	}
 	
 };
 
 template<class T, class RhsGen, class... Args>
-std::shared_ptr<RhsGen> operator| (std::shared_ptr<T> lhs, cIntGenFactory<RhsGen, Args...> rhs)
+std::shared_ptr<RhsGen> operator| (std::shared_ptr<T> a_Lhs, cIntGenFactory<RhsGen, Args...> a_Rhs)
 {
-	return rhs.construct(static_cast<std::shared_ptr<typename T::IntGenType>>(lhs));
+	return a_Rhs.construct(static_cast<std::shared_ptr<typename T::IntGenType>>(a_Lhs));
 }
 
 template<class Gen, class... Args>
-cIntGenFactory<Gen, Args...> MakeIntGen(Args&&... args)
+cIntGenFactory<Gen, Args...> MakeIntGen(Args&&... a_Args)
 {
-	return cIntGenFactory<Gen, Args...>(std::forward<Args>(args)...);
+	return cIntGenFactory<Gen, Args...>(std::forward<Args>(a_Args)...);
 }
 
 
