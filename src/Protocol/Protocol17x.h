@@ -161,22 +161,22 @@ protected:
 		
 		void WriteByte(Byte a_Value)
 		{
-			m_Out.WriteByte(a_Value);
+			m_Out.WriteBEUInt8(a_Value);
 		}
 		
 		void WriteChar(char a_Value)
 		{
-			m_Out.WriteChar(a_Value);
+			m_Out.WriteBEInt8(a_Value);
 		}
 		
 		void WriteShort(short a_Value)
 		{
-			m_Out.WriteBEShort(a_Value);
+			m_Out.WriteBEInt16(a_Value);
 		}
 		
-		void WriteInt(int a_Value)
+		void WriteInt(Int32 a_Value)
 		{
-			m_Out.WriteBEInt(a_Value);
+			m_Out.WriteBEInt32(a_Value);
 		}
 		
 		void WriteInt64(Int64 a_Value)
@@ -297,7 +297,7 @@ protected:
 	
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, to be read by this function. */
-	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, short a_PayloadLength);
+	void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const AString & a_Channel, UInt16 a_PayloadLength);
 	
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
@@ -312,6 +312,9 @@ protected:
 	
 	void StartEncryption(const Byte * a_Key);
 
+	/** Converts the BlockFace received by the protocol into eBlockFace constants.
+	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
+	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
 } ;
 
 

@@ -676,7 +676,7 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 
 
 
-void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
+void cClientHandle::HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction)
 {
 	// This is for creative Inventory changes
 	if (!m_Player->IsGameModeCreative())
@@ -690,18 +690,18 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 		return;
 	}
 	
-	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, (a_SlotNum >= 0) ? caLeftClick : caLeftClickOutside, a_HeldItem);
+	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, a_ClickAction, a_HeldItem);
 }
 
 
 
 
 
-void cClientHandle::HandleEnchantItem(Byte a_WindowID, Byte a_Enchantment)
+void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 {
 	if (a_Enchantment > 2)
 	{
-		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
+		LOGWARNING("%s attempt to crash the server with invalid enchanting selection (%u)!", GetUsername().c_str(), a_Enchantment);
 		Kick("Invalid enchanting!");
 		return;
 	}
@@ -951,7 +951,7 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 
 
 
-void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand)
+void cClientHandle::HandleCommandBlockEntityChange(UInt32 a_EntityID, const AString & a_NewCommand)
 {
 	// TODO
 	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
@@ -1509,7 +1509,7 @@ void cClientHandle::HandleAnimation(int a_Animation)
 
 
 
-void cClientHandle::HandleSlotSelected(short a_SlotNum)
+void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 {
 	m_Player->GetInventory().SetEquippedSlotNum(a_SlotNum);
 	m_Player->GetWorld()->BroadcastEntityEquipment(*m_Player, 0, m_Player->GetInventory().GetEquippedItem(), this);
@@ -1528,7 +1528,7 @@ void cClientHandle::HandleSteerVehicle(float a_Forward, float a_Sideways)
 
 
 
-void cClientHandle::HandleWindowClose(char a_WindowID)
+void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 {
 	m_Player->CloseWindowIfID(a_WindowID);
 }
@@ -1537,7 +1537,7 @@ void cClientHandle::HandleWindowClose(char a_WindowID)
 
 
 
-void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
+void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
 {
 	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
 		a_WindowID, a_SlotNum, ClickActionToString(a_ClickAction),
@@ -1575,7 +1575,7 @@ void cClientHandle::HandleUpdateSign(
 
 
 
-void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
+void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 {
 	// TODO: Let plugins interfere via a hook
 	
@@ -1720,7 +1720,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
+void cClientHandle::HandleEntityCrouch(UInt32 a_EntityID, bool a_IsCrouching)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1735,7 +1735,7 @@ void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
 
 
 
-void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
+void cClientHandle::HandleEntityLeaveBed(UInt32 a_EntityID)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1752,7 +1752,7 @@ void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
 
 
 
-void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
+void cClientHandle::HandleEntitySprinting(UInt32 a_EntityID, bool a_IsSprinting)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{

@@ -49,6 +49,13 @@ Implements the 1.8.x protocol classes:
 
 
 
+/** The slot number that the client uses to indicate "outside the window". */
+static const Int16 SLOT_NUM_OUTSIDE = -999;
+
+
+
+
+
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
 	Type Var; \
 	if (!ByteBuf.Proc(Var))\
@@ -2106,7 +2113,7 @@ void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Status);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
 	int BlockX, BlockY, BlockZ;
 	if (!a_ByteBuffer.ReadPosition(BlockX, BlockY, BlockZ))
@@ -2114,8 +2121,8 @@ void cProtocol180::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), Status);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
+	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -2130,19 +2137,15 @@ void cProtocol180::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, Face);
-	if (Face == 255)
-	{
-		Face = 0;
-	}
+	HANDLE_READ(a_ByteBuffer, ReadBEInt8, Int8, Face);
 
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item, 3);
 
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorX);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorY);
-	HANDLE_READ(a_ByteBuffer, ReadByte,  Byte, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, static_cast<eBlockFace>(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorX);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
+	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, m_Client->GetPlayer()->GetEquippedItem());
 }
 
 
@@ -2162,10 +2165,10 @@ void cProtocol180::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
-	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ViewDistance);
-	HANDLE_READ(a_ByteBuffer, ReadByte,          Byte,    ChatFlags);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ViewDistance);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
 	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
-	HANDLE_READ(a_ByteBuffer, ReadChar,          char,    SkinFlags);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinFlags);
 	
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
@@ -2178,7 +2181,7 @@ void cProtocol180::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadChar, char, ActionID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ActionID);
 	switch (ActionID)
 	{
 		case 0:
@@ -2210,13 +2213,13 @@ void cProtocol180::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
 	cItem Item;
 	if (!ReadItem(a_ByteBuffer, Item))
 	{
 		return;
 	}
-	m_Client->HandleCreativeInventory(SlotNum, Item);
+	m_Client->HandleCreativeInventory(SlotNum, Item, (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutside : caLeftClick);
 }
 
 
@@ -2225,9 +2228,9 @@ void cProtocol180::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffe
 
 void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32,  PlayerID);
-	HANDLE_READ(a_ByteBuffer, ReadChar,   char,    Action);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32,  JumpBoost);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, PlayerID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  Action);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, JumpBoost);
 
 	switch (Action)
 	{
@@ -2246,7 +2249,7 @@ void cProtocol180::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, KeepAliveID);
-	m_Client->HandleKeepAlive((int)KeepAliveID);
+	m_Client->HandleKeepAlive(static_cast<int>(KeepAliveID));
 }
 
 
@@ -2265,10 +2268,11 @@ void cProtocol180::HandlePacketPlayer(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Flags);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Flags);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, FlyingSpeed);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, WalkingSpeed);
 
+	// COnvert the bitfield into individual boolean flags:
 	bool IsFlying = false, CanFly = false;
 	if ((Flags & 2) != 0)
 	{
@@ -2359,7 +2363,7 @@ void cProtocol180::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
 	m_Client->HandleSlotSelected(SlotNum);
 }
 
@@ -2371,7 +2375,7 @@ void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Forward);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Sideways);
-	HANDLE_READ(a_ByteBuffer, ReadChar,    char,  Flags);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Flags);
 
 	if ((Flags & 0x2) != 0)
 	{
@@ -2390,7 +2394,7 @@ void cProtocol180::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 void cProtocol180::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Text);
-	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasPosition);
+	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    HasPosition);
 
 	if (HasPosition)
 	{
@@ -2435,12 +2439,12 @@ void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 	{
 		case 0:
 		{
-			m_Client->HandleUseEntity((int)EntityID, false);
+			m_Client->HandleUseEntity(EntityID, false);
 			break;
 		}
 		case 1:
 		{
-			m_Client->HandleUseEntity((int)EntityID, true);
+			m_Client->HandleUseEntity(EntityID, true);
 			break;
 		}
 		case 2:
@@ -2466,8 +2470,8 @@ void cProtocol180::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Enchantment);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Enchantment);
 
 	m_Client->HandleEnchantItem(WindowID, Enchantment);
 }
@@ -2478,11 +2482,11 @@ void cProtocol180::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadChar,    char,  WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, SlotNum);
-	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Button);
-	HANDLE_READ(a_ByteBuffer, ReadBEShort, short, TransactionID);
-	HANDLE_READ(a_ByteBuffer, ReadByte,    Byte,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt16, UInt16, TransactionID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Mode);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
@@ -2490,8 +2494,8 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	eClickAction Action;
 	switch ((Mode << 8) | Button)
 	{
-		case 0x0000: Action = (SlotNum != -999) ? caLeftClick  : caLeftClickOutside;  break;
-		case 0x0001: Action = (SlotNum != -999) ? caRightClick : caRightClickOutside; break;
+		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick  : caLeftClickOutside;  break;
+		case 0x0001: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightClick : caRightClickOutside; break;
 		case 0x0100: Action = caShiftLeftClick;  break;
 		case 0x0101: Action = caShiftRightClick; break;
 		case 0x0200: Action = caNumber1;         break;
@@ -2504,14 +2508,14 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		case 0x0207: Action = caNumber8;         break;
 		case 0x0208: Action = caNumber9;         break;
 		case 0x0300: Action = caMiddleClick;     break;
-		case 0x0400: Action = (SlotNum == -999) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
-		case 0x0401: Action = (SlotNum == -999) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
-		case 0x0500: Action = (SlotNum == -999) ? caLeftPaintBegin               : caUnknown;     break;
-		case 0x0501: Action = (SlotNum != -999) ? caLeftPaintProgress            : caUnknown;     break;
-		case 0x0502: Action = (SlotNum == -999) ? caLeftPaintEnd                 : caUnknown;     break;
-		case 0x0504: Action = (SlotNum == -999) ? caRightPaintBegin              : caUnknown;     break;
-		case 0x0505: Action = (SlotNum != -999) ? caRightPaintProgress           : caUnknown;     break;
-		case 0x0506: Action = (SlotNum == -999) ? caRightPaintEnd                : caUnknown;     break;
+		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
+		case 0x0401: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
+		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
+		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress            : caUnknown;     break;
+		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd                 : caUnknown;     break;
+		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin              : caUnknown;     break;
+		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress           : caUnknown;     break;
+		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd                : caUnknown;     break;
 		case 0x0600: Action = caDblClick; break;
 		default:
 		{
@@ -2530,7 +2534,7 @@ void cProtocol180::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadChar, char, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
 	m_Client->HandleWindowClose(WindowID);
 }
 
@@ -2542,14 +2546,14 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 {
 	if (a_Channel == "MC|AdvCdm")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadByte, Byte, Mode)
+		HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode)
 		switch (Mode)
 		{
 			case 0x00:
 			{
-				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockX);
-				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockY);
-				HANDLE_READ(a_ByteBuffer, ReadBEInt, int, BlockZ);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockX);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockY);
+				HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, BlockZ);
 				HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Command);
 				m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
 				break;
@@ -2557,7 +2561,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 
 			default:
 			{
-				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %d", Mode), mtFailure);
+				m_Client->SendChat(Printf("Failure setting command block command; unhandled mode %u (0x%02x)", Mode, Mode), mtFailure);
 				LOG("Unhandled MC|AdvCdm packet mode.");
 				return;
 			}
@@ -2574,8 +2578,8 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	}
 	else if (a_Channel == "MC|Beacon")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect1);
-		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, Effect2);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect1);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, Effect2);
 		m_Client->HandleBeaconSelection(Effect1, Effect2);
 		return;
 	}
@@ -2587,7 +2591,7 @@ void cProtocol180::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, const 
 	}
 	else if (a_Channel == "MC|TrSel")
 	{
-		HANDLE_READ(a_ByteBuffer, ReadBEInt, int, SlotNum);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt32, Int32, SlotNum);
 		m_Client->HandleNPCTrade(SlotNum);
 		return;
 	}
@@ -2629,7 +2633,7 @@ void cProtocol180::SendData(const char * a_Data, size_t a_Size)
 
 bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes)
 {
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemType);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemType);
 	if (ItemType == -1)
 	{
 		// The item is empty, no more data follows
@@ -2638,8 +2642,8 @@ bool cProtocol180::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a
 	}
 	a_Item.m_ItemType = ItemType;
 	
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadChar,    char,  ItemCount);
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEShort, short, ItemDamage);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
 	a_Item.m_ItemCount  = ItemCount;
 	a_Item.m_ItemDamage = ItemDamage;
 	if (ItemCount <= 0)
@@ -2749,6 +2753,26 @@ void cProtocol180::StartEncryption(const Byte * a_Key)
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
+}
+
+
+
+
+
+eBlockFace cProtocol180::FaceIntToBlockFace(Int8 a_BlockFace)
+{
+	// Normalize the blockface values returned from the protocol
+	// Anything known gets mapped 1:1, everything else returns BLOCK_FACE_NONE
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
+		case BLOCK_FACE_YM: return BLOCK_FACE_YM;
+		case BLOCK_FACE_YP: return BLOCK_FACE_YP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
+		default: return BLOCK_FACE_NONE;
+	}
 }
 
 

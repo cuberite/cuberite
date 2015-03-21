@@ -911,13 +911,13 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_7_2:
 		{
 			AString ServerAddress;
-			short ServerPort;
+			UInt16 ServerPort;
 			UInt32 NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
 			}
-			if (!m_Buffer.ReadBEShort(ServerPort))
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
 			{
 				break;
 			}
@@ -926,19 +926,19 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_7_6:
 		{
 			AString ServerAddress;
-			short ServerPort;
+			UInt16 ServerPort;
 			UInt32 NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
 			}
-			if (!m_Buffer.ReadBEShort(ServerPort))
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
 			{
 				break;
 			}
@@ -947,19 +947,19 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol176(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_8_0:
 		{
 			AString ServerAddress;
-			short ServerPort;
+			UInt16 ServerPort;
 			UInt32 NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
 			}
-			if (!m_Buffer.ReadBEShort(ServerPort))
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
 			{
 				break;
 			}
@@ -968,12 +968,12 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 	}
-	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u)",
-		m_Client->GetIPString().c_str(), ProtocolVersion
+	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
+		m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
 	);
 	m_Client->Kick("Unsupported protocol version");
 	return false;

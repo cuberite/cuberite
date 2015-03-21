@@ -169,24 +169,24 @@ protected:
 			m_Out.WriteBool(a_Value);
 		}
 		
-		void WriteByte(Byte a_Value)
+		void WriteByte(UInt8 a_Value)
 		{
-			m_Out.WriteByte(a_Value);
+			m_Out.WriteBEUInt8(a_Value);
 		}
 		
-		void WriteChar(char a_Value)
+		void WriteChar(Int8 a_Value)
 		{
-			m_Out.WriteChar(a_Value);
+			m_Out.WriteBEInt8(a_Value);
 		}
 		
-		void WriteShort(short a_Value)
+		void WriteShort(Int16 a_Value)
 		{
-			m_Out.WriteBEShort(a_Value);
+			m_Out.WriteBEInt16(a_Value);
 		}
 		
-		void WriteInt(int a_Value)
+		void WriteInt(Int32 a_Value)
 		{
-			m_Out.WriteBEInt(a_Value);
+			m_Out.WriteBEInt32(a_Value);
 		}
 		
 		void WriteInt64(Int64 a_Value)
@@ -332,6 +332,9 @@ protected:
 	
 	void StartEncryption(const Byte * a_Key);
 
+	/** Converts the BlockFace received by the protocol into eBlockFace constants.
+	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
+	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
 } ;
 
 
