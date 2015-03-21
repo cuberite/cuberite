@@ -674,14 +674,14 @@ public:
 	bool ShouldBroadcastAchievementMessages(void) const { return m_BroadcastAchievementMessages; }
 
 
-	AString GetNetherWorldName(void) const { return m_NetherWorldName; }
-	void SetNetherWorldName(const AString & a_Name) { m_NetherWorldName = a_Name; }
+	AString GetLinkedNetherWorldName(void) const { return m_LinkedNetherWorldName; }
+	void SetLinkedNetherWorldName(const AString & a_Name) { m_LinkedNetherWorldName = a_Name; }
 
-	AString GetEndWorldName(void) const { return m_EndWorldName; }
-	void SetEndWorldName(const AString & a_Name) { m_EndWorldName = a_Name; }
+	AString GetLinkedEndWorldName(void) const { return m_LinkedEndWorldName; }
+	void SetLinkedEndWorldName(const AString & a_Name) { m_LinkedEndWorldName = a_Name; }
 
-	AString GetLinkedOverworldName(void) const { return m_OverworldName; }
-	void SetLinkedOverworldName(const AString & a_Name) { m_OverworldName = a_Name; }
+	AString GetLinkedOverworldName(void) const { return m_LinkedOverworldName; }
+	void SetLinkedOverworldName(const AString & a_Name) { m_LinkedOverworldName = a_Name; }
 	
 	// tolua_end
 	
@@ -885,10 +885,9 @@ private:
 
 	AString m_WorldName;
 
-	/** The name of the world that a portal in this world should link to
-	Only has effect if this world is a nether or end world, as it is used by entities to see which world to teleport to when in a portal
-	*/
-	AString m_OverworldName;
+	/** The name of the overworld that portals in this world should link to.
+	Only has effect if this world is a Nether or End world. */
+	AString m_LinkedOverworldName;
 
 	AString m_IniFileName;
 	
@@ -981,11 +980,13 @@ private:
 	/** The maximum view distance that a player can have in this world. */
 	int m_MaxViewDistance;
 
-	/** Name of the nether world */
-	AString m_NetherWorldName;
+	/** Name of the nether world - where Nether portals should teleport.
+	Only used when this world is an Overworld. */
+	AString m_LinkedNetherWorldName;
 
-	/** Name of the end world */
-	AString m_EndWorldName;
+	/** Name of the End world - where End portals should teleport.
+	Only used when this world is an Overworld. */
+	AString m_LinkedEndWorldName;
 	
 
 	cChunkGenerator  m_Generator;
@@ -1045,7 +1046,7 @@ private:
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
-	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
+	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
 	virtual ~cWorld();
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);

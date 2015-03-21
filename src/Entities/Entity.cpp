@@ -1263,7 +1263,7 @@ bool cEntity::DetectPortal()
 {
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
-		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty())
+		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
 		{
 			// Teleportation to either dimension not enabled, don't bother proceeding
 			return false;
@@ -1314,7 +1314,7 @@ bool cEntity::DetectPortal()
 				}
 				else
 				{
-					if (GetWorld()->GetNetherWorldName().empty())
+					if (GetWorld()->GetLinkedNetherWorldName().empty())
 					{
 						return false;
 					}
@@ -1327,7 +1327,7 @@ bool cEntity::DetectPortal()
 						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
 					}
 					
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName()), false);
 				}
 			}
 			case E_BLOCK_END_PORTAL:
@@ -1358,7 +1358,7 @@ bool cEntity::DetectPortal()
 				}
 				else
 				{
-					if (GetWorld()->GetEndWorldName().empty())
+					if (GetWorld()->GetLinkedEndWorldName().empty())
 					{
 						return false;
 					}
@@ -1371,7 +1371,7 @@ bool cEntity::DetectPortal()
 						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
 					}
 
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedEndWorldName(), dimEnd, GetWorld()->GetName()), false);
 				}
 				
 			}

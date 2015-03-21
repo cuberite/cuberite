@@ -259,9 +259,9 @@ void cWorld::cTickThread::Execute(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName) :
+cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
 	m_WorldName(a_WorldName),
-	m_OverworldName(a_OverworldName),
+	m_LinkedOverworldName(a_LinkedOverworldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef __arm__
@@ -604,12 +604,12 @@ void cWorld::Start(void)
 	
 	if (GetDimension() == dimOverworld)
 	{
-		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
-		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", GetName() + "_end");
+		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
+		m_LinkedEndWorldName    = IniFile.GetValueSet("LinkedWorlds", "EndWorldName",    GetName() + "_end");
 	}
 	else
 	{
-		m_OverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
+		m_LinkedOverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
@@ -884,18 +884,18 @@ void cWorld::Stop(void)
 	IniFile.ReadFile(m_IniFileName);
 		if (GetDimension() == dimOverworld)
 		{
-			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_NetherWorldName);
-			IniFile.SetValue("LinkedWorlds", "EndWorldName", m_EndWorldName);
+			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_LinkedNetherWorldName);
+			IniFile.SetValue("LinkedWorlds", "EndWorldName",    m_LinkedEndWorldName);
 		}
 		else
 		{
-			IniFile.SetValue("LinkedWorlds", "OverworldName", m_OverworldName);
+			IniFile.SetValue("LinkedWorlds", "OverworldName", m_LinkedOverworldName);
 		}
-		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
+		IniFile.SetValueI("Physics", "TNTShrapnelLevel", static_cast<int>(m_TNTShrapnelLevel));
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
 		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
 		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
-		IniFile.SetValueI("General", "Weather", (int)m_Weather);
+		IniFile.SetValueI("General", "Weather", static_cast<int>(m_Weather));
 		IniFile.SetValueI("General", "TimeInTicks", GetTimeOfDay());
 	IniFile.WriteFile(m_IniFileName);
 	
