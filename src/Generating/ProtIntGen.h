@@ -34,7 +34,7 @@ class cProtIntGen
 protected:
 	/** Maximum size of the generated area.
 	Adjust the constant if you need larger areas, these are just so that we can use fixed-size buffers. */
-	static const int m_BufferSize = 900;
+	static constexpr int m_BufferSize = 900;
 
 public:
 
