@@ -247,7 +247,3 @@ public:
 
 
 
-
-#define LOGERROR   printf
-#define LOGINFO    printf
-#define LOGWARNING printf

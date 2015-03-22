@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "Server.h"
 #include "Connection.h"
+#include "../../src/Logger.h"
 
 
 
@@ -28,15 +29,11 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 		int res = WSAStartup(0x0202, &wsa);
 		if (res != 0)
 		{
-			printf("Cannot initialize WinSock: %d\n", res);
+			LOGERROR("Cannot initialize WinSock: %d", res);
 			return res;
 		}
 	#endif  // _WIN32
 	
-	LOGINFO("Generating protocol encryption keypair...");
-	m_PrivateKey.Generate();
-	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
-
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (m_ListenSocket < 0)
 	{
@@ -45,22 +42,22 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 		#else
 			int err = errno;
 		#endif
-		printf("Failed to create listener socket: %d\n", err);
+		LOGERROR("Failed to create listener socket: %d", err);
 		return err;
 	}
 	sockaddr_in local;
 	memset(&local, 0, sizeof(local));
 	local.sin_family = AF_INET;
-	local.sin_addr.s_addr = 130;  // INADDR_ANY;  // All interfaces
+	local.sin_addr.s_addr = INADDR_ANY;  // All interfaces
 	local.sin_port = htons(a_ListenPort);
-	if (!bind(m_ListenSocket, (sockaddr *)&local, sizeof(local)))
+	if (bind(m_ListenSocket, (sockaddr *)&local, sizeof(local)) != 0)
 	{
 		#ifdef _WIN32
 			int err = WSAGetLastError();
 		#else
 			int err = errno;
 		#endif
-		printf("Failed to bind listener socket: %d\n", err);
+		LOGERROR("Failed to bind listener socket: %d", err);
 		return err;
 	}
 	if (listen(m_ListenSocket, 1) != 0)
@@ -73,9 +70,12 @@ int cServer::Init(short a_ListenPort, short a_ConnectPort)
 		printf("Failed to listen on socket: %d\n", err);
 		return err;
 	}
+	LOGINFO("Listening on port %d, connecting to localhost:%d", a_ListenPort, a_ConnectPort);
 	
-	printf("Listening on port %d, connecting to localhost:%d\n", a_ListenPort, a_ConnectPort);
-	
+	LOGINFO("Generating protocol encryption keypair...");
+	m_PrivateKey.Generate();
+	m_PublicKeyDER = m_PrivateKey.GetPubKeyDER();
+
 	return 0;
 }
 

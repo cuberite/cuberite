@@ -8,6 +8,7 @@
 #include "Server.h"
 #include <iostream>
 #include "PolarSSL++/CryptoKey.h"
+#include "../../src/Logger.h"
 
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
