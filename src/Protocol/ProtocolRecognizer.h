@@ -136,9 +136,12 @@ protected:
 	
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
-	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining
-	**/
+	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. **/
 	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
+
+	/** Sends a single packet contained within the cPacketizer class.
+	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
+	virtual void SendPacket(cPacketizer & a_Pkt) override;
 } ;
 
 

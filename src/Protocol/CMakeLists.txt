@@ -8,19 +8,23 @@ SET (SRCS
 	Authenticator.cpp
 	ChunkDataSerializer.cpp
 	MojangAPI.cpp
+	Packetizer.cpp
 	Protocol17x.cpp
 	Protocol18x.cpp
-	ProtocolRecognizer.cpp)
+	ProtocolRecognizer.cpp
+)
 
 SET (HDRS
 	Authenticator.h
 	ChunkDataSerializer.h
 	MojangAPI.h
+	Packetizer.h
 	Protocol.h
 	Protocol17x.h
 	Protocol18x.h
-	ProtocolRecognizer.h)
+	ProtocolRecognizer.h
+)
 
-if(NOT MSVC)
+if (NOT MSVC)
 	add_library(Protocol ${SRCS} ${HDRS})
 endif()

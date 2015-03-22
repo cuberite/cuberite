@@ -96,7 +96,7 @@ public:
 	bool WriteVarInt         (UInt32 a_Value);
 	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
 	bool WriteLEInt32        (Int32 a_Value);
-	bool WritePosition       (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
+	bool WritePosition64     (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
 	
 	/** Reads a_Count bytes into a_Buffer; returns true if successful */
 	bool ReadBuf(void * a_Buffer, size_t a_Count);

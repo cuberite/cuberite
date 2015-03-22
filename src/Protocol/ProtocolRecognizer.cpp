@@ -982,3 +982,15 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 
 
 
+void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
+{
+	// This function should never be called - it needs to exists so that cProtocolRecognizer can be instantiated,
+	// but the actual sending is done by the internal m_Protocol itself.
+	LOGWARNING("%s: This function shouldn't ever be called.", __FUNCTION__);
+	ASSERT(!"Function not to be called");
+}
+
+
+
+
+

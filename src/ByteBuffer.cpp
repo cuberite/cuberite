@@ -762,10 +762,10 @@ bool cByteBuffer::WriteLEInt32(Int32 a_Value)
 	CHECK_THREAD
 	CheckValid();
 	#ifdef IS_LITTLE_ENDIAN
-		return WriteBuf((const char *)&a_Value, 4);
+		return WriteBuf(reinterpret_cast<const char *>(&a_Value), 4);
 	#else
 		int Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
-		return WriteBuf((const char *)&Value, 4);
+		return WriteBuf(reinterpret_cast<const char *>(&Value), 4);
 	#endif
 }
 
@@ -773,11 +773,15 @@ bool cByteBuffer::WriteLEInt32(Int32 a_Value)
 
 
 
-bool cByteBuffer::WritePosition(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ)
+bool cByteBuffer::WritePosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ)
 {
 	CHECK_THREAD
 	CheckValid();
-	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
+	return WriteBEInt64(
+		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
+		(static_cast<Int64>(a_BlockY & 0xFFF) << 26) |
+		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF))
+	);
 }
 
 
