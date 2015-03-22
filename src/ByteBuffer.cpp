@@ -81,9 +81,9 @@ public:
 	void TestWrite(void)
 	{
 		cByteBuffer buf(50);
-		buf.WriteVarInt(5);
-		buf.WriteVarInt(300);
-		buf.WriteVarInt(0);
+		buf.WriteVarInt32(5);
+		buf.WriteVarInt32(300);
+		buf.WriteVarInt32(0);
 		AString All;
 		buf.ReadAll(All);
 		assert_test(All.size() == 4);
@@ -490,7 +490,7 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 
 
 
-bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
+bool cByteBuffer::ReadVarInt32(UInt32 & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -501,7 +501,29 @@ bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
 	{
 		NEEDBYTES(1);
 		ReadBuf(&b, 1);
-		Value = Value | (((UInt32)(b & 0x7f)) << Shift);
+		Value = Value | ((static_cast<UInt32>(b & 0x7f)) << Shift);
+		Shift += 7;
+	} while ((b & 0x80) != 0);
+	a_Value = Value;
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadVarInt64(UInt64 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	UInt64 Value = 0;
+	int Shift = 0;
+	unsigned char b = 0;
+	do
+	{
+		NEEDBYTES(1);
+		ReadBuf(&b, 1);
+		Value = Value | ((static_cast<UInt64>(b & 0x7f)) << Shift);
 		Shift += 7;
 	} while ((b & 0x80) != 0);
 	a_Value = Value;
@@ -551,7 +573,7 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 
 
-bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
 	Int64 Value;
@@ -719,7 +741,7 @@ bool cByteBuffer::WriteBool(bool a_Value)
 
 
 
-bool cByteBuffer::WriteVarInt(UInt32 a_Value)
+bool cByteBuffer::WriteVarInt32(UInt32 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -740,12 +762,35 @@ bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 
 
 
+
+bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	
+	// A 64-bit integer can be encoded by at most 10 bytes:
+	unsigned char b[10];
+	size_t idx = 0;
+	do
+	{
+		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
+		a_Value = a_Value >> 7;
+		idx++;
+	} while (a_Value > 0);
+
+	return WriteBuf(b, idx);
+}
+
+
+
+
+
 bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
-	bool res = WriteVarInt((UInt32)(a_Value.size()));
+	bool res = WriteVarInt32(static_cast<UInt32>(a_Value.size()));
 	if (!res)
 	{
 		return false;

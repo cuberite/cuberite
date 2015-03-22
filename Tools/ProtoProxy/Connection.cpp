@@ -805,11 +805,11 @@ bool cConnection::HandleClientHandshake(void)
 
 	// Send the same packet to the server, but with our port:
 	cByteBuffer Packet(512);
-	Packet.WriteVarInt(0);  // Packet type - initial handshake
-	Packet.WriteVarInt(ProtocolVersion);
+	Packet.WriteVarInt32(0);  // Packet type - initial handshake
+	Packet.WriteVarInt32(ProtocolVersion);
 	Packet.WriteVarUTF8String(ServerHost);
 	Packet.WriteBEUInt16(m_Server.GetConnectPort());
-	Packet.WriteVarInt(NextState);
+	Packet.WriteVarInt32(NextState);
 	AString Pkt;
 	Packet.ReadAll(Pkt);
 	cByteBuffer ToServer(512);
@@ -2459,7 +2459,7 @@ bool cConnection::HandleServerStatusResponse(void)
 		Log("Cannot find the description json element, ProtoProxy signature not inserted");
 	}
 	cByteBuffer Packet(Response.size() + 50);
-	Packet.WriteVarInt(0);  // Packet type - status response
+	Packet.WriteVarInt32(0);  // Packet type - status response
 	Packet.WriteVarUTF8String(Response);
 	AString Pkt;
 	Packet.ReadAll(Pkt);
@@ -2775,7 +2775,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 				}
 				rs = rs - static_cast<int>(a_Buffer.GetReadableSpace());
 				cByteBuffer LenBuf(8);
-				LenBuf.WriteVarInt(Len);
+				LenBuf.WriteVarInt32(Len);
 				AString VarLen;
 				LenBuf.ReadAll(VarLen);
 				a_Metadata.append(VarLen);
@@ -2960,7 +2960,7 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	DataLog(EncryptedSecret, sizeof(EncryptedSecret), "Encrypted secret (%u bytes)", static_cast<unsigned>(sizeof(EncryptedSecret)));
 	DataLog(EncryptedNonce,  sizeof(EncryptedNonce),  "Encrypted nonce (%u bytes)",  static_cast<unsigned>(sizeof(EncryptedNonce)));
 	cByteBuffer Len(5);
-	Len.WriteVarInt(static_cast<UInt32>(ToServer.GetReadableSpace()));
+	Len.WriteVarInt32(static_cast<UInt32>(ToServer.GetReadableSpace()));
 	SERVERSEND(Len);
 	SERVERSEND(ToServer);
 	m_ServerState = csEncryptedUnderstood;

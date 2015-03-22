@@ -64,7 +64,7 @@ cPacketizer::~cPacketizer()
 
 void cPacketizer::WriteByteAngle(double a_Angle)
 {
-	WriteChar(static_cast<char>(255 * a_Angle / 360));
+	WriteBEInt8(static_cast<Int8>(255 * a_Angle / 360));
 }
 
 
@@ -73,8 +73,7 @@ void cPacketizer::WriteByteAngle(double a_Angle)
 
 void cPacketizer::WriteFPInt(double a_Value)
 {
-	Int32 Value = static_cast<Int32>(a_Value * 32);
-	WriteInt(Value);
+	WriteBEInt32(static_cast<Int32>(a_Value * 32));
 }
 
 

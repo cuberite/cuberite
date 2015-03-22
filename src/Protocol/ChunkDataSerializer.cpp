@@ -187,7 +187,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
-	Packet.WriteVarInt(0x21);  // Packet id (Chunk Data packet)
+	Packet.WriteVarInt32(0x21);  // Packet id (Chunk Data packet)
 	Packet.WriteBEInt32(a_ChunkX);
 	Packet.WriteBEInt32(a_ChunkZ);
 	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
@@ -201,7 +201,7 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 		sizeof(m_BlockSkyLight) +     // Block sky light
 		BiomeDataSize                 // Biome data
 	);
-	Packet.WriteVarInt(ChunkSize);
+	Packet.WriteVarInt32(ChunkSize);
 
 	// Write the block types to the packet:
 	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
@@ -234,8 +234,8 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	else
 	{
 		AString PostData;
-		Buffer.WriteVarInt((UInt32)Packet.GetUsedSpace() + 1);
-		Buffer.WriteVarInt(0);
+		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
+		Buffer.WriteVarInt32(0);
 		Buffer.ReadAll(PostData);
 		Buffer.CommitRead();
 

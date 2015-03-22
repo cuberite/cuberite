@@ -29,7 +29,7 @@ public:
 		m_Lock(a_Protocol.m_CSPacket),
 		m_PacketType(a_PacketType)  // Used for logging purposes
 	{
-		m_Out.WriteVarInt(a_PacketType);
+		m_Out.WriteVarInt32(a_PacketType);
 	}
 
 	/** Sends the packet via the contained protocol's SendPacket() function. */
@@ -40,19 +40,19 @@ public:
 		VERIFY(m_Out.WriteBool(a_Value));
 	}
 
-	inline void WriteByte(Byte a_Value)
+	inline void WriteBEUInt8(UInt8 a_Value)
 	{
 		VERIFY(m_Out.WriteBEUInt8(a_Value));
 	}
 
 
-	inline void WriteChar(char a_Value)
+	inline void WriteBEInt8(Int8 a_Value)
 	{
 		VERIFY(m_Out.WriteBEInt8(a_Value));
 	}
 
 
-	inline void WriteShort(short a_Value)
+	inline void WriteBEInt16(Int16 a_Value)
 	{
 		VERIFY(m_Out.WriteBEInt16(a_Value));
 	}
@@ -64,39 +64,45 @@ public:
 	}
 
 
-	inline void WriteInt(Int32 a_Value)
+	inline void WriteBEInt32(Int32 a_Value)
 	{
 		VERIFY(m_Out.WriteBEInt32(a_Value));
 	}
 
 
-	inline void WriteUInt32(UInt32 a_Value)
+	inline void WriteBEUInt32(UInt32 a_Value)
 	{
 		VERIFY(m_Out.WriteBEUInt32(a_Value));
 	}
 
 
-	inline void WriteInt64(Int64 a_Value)
+	inline void WriteBEInt64(Int64 a_Value)
 	{
 		VERIFY(m_Out.WriteBEInt64(a_Value));
 	}
 
 
-	inline void WriteFloat(float a_Value)
+	inline void WriteBEUInt64(UInt64 a_Value)
+	{
+		VERIFY(m_Out.WriteBEUInt64(a_Value));
+	}
+
+
+	inline void WriteBEFloat(float a_Value)
 	{
 		VERIFY(m_Out.WriteBEFloat(a_Value));
 	}
 
 
-	inline void WriteDouble(double a_Value)
+	inline void WriteBEDouble(double a_Value)
 	{
 		VERIFY(m_Out.WriteBEDouble(a_Value));
 	}
 
 
-	inline void WriteVarInt(UInt32 a_Value)
+	inline void WriteVarInt32(UInt32 a_Value)
 	{
-		VERIFY(m_Out.WriteVarInt(a_Value));
+		VERIFY(m_Out.WriteVarInt32(a_Value));
 	}
 
 
@@ -113,7 +119,7 @@ public:
 
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer. */
-	inline void WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
+	inline void WritePosition64(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
 		VERIFY(m_Out.WritePosition64(a_BlockX, a_BlockY, a_BlockZ));
 	}
