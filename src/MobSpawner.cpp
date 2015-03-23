@@ -132,7 +132,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
-		if ((a_RelY + 1 > cChunkDef::Height) || (a_RelY - 1 < 0))
+		if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
 		{
 			return false;
 		}

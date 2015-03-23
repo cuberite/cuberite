@@ -571,7 +571,7 @@ void cFinishGenSnow::GenFinish(cChunkDesc & a_ChunkDesc)
 				continue;
 			}
 
-			if (!cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) && (Height < cChunkDef::Height - 1))
+			if (!cBlockInfo::IsSnowable(a_ChunkDesc.GetBlockType(x, Height, z)) || (Height >= cChunkDef::Height - 1))
 			{
 				// The top block can't be snown over.
 				continue;

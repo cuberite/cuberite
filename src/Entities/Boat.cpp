@@ -98,7 +98,7 @@ void cBoat::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	SetSpeed(GetSpeed() * 0.97);  // Slowly decrease the speed
 
-	if ((POSY_TOINT < 0) || (POSY_TOINT > cChunkDef::Height))
+	if ((POSY_TOINT < 0) || (POSY_TOINT >= cChunkDef::Height))
 	{
 		return;
 	}

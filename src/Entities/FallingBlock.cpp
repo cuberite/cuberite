@@ -77,7 +77,10 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		);
 		*/
 
-		cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
+		if (BlockY < cChunkDef::Height - 1)
+		{
+			cSandSimulator::FinishFalling(m_World, BlockX, BlockY + 1, BlockZ, m_BlockType, m_BlockMeta);
+		}
 		Destroy(true);
 		return;
 	}

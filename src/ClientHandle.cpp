@@ -1006,6 +1006,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
 		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
+
+		if ((BlockY < 0) || (BlockY >= cChunkDef::Height))
+		{
+			return;
+		}
+
 		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough())
 		{
 			a_BlockX = BlockX;
