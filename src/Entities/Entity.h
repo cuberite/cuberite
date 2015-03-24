@@ -142,6 +142,10 @@ public:
 	
 	static const int VOID_BOUNDARY         = -46;  ///< Y position to begin applying void damage
 	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
+
+	/** Special ID that is considered an "invalid value", signifying no entity. */
+	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
+
 	
 	cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height);
 	virtual ~cEntity();
@@ -248,7 +252,7 @@ public:
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways);
 	void SteerVehicle(float a_Forward, float a_Sideways);
 
-	inline int  GetUniqueID(void) const { return m_UniqueID; }
+	inline UInt32 GetUniqueID(void) const { return m_UniqueID; }
 	inline bool IsDestroyed(void) const { return !m_IsInitialized; }
 
 	/// Schedules the entity for destroying; if a_ShouldBroadcast is set to true, broadcasts the DestroyEntity packet
@@ -464,12 +468,15 @@ public:
 
 protected:
 	static cCriticalSection m_CSCount;
-	static int m_EntityCount;
+	static UInt32 m_EntityCount;
 	
 	/** Measured in meter/second (m/s) */
 	Vector3d m_Speed;
 
-	int m_UniqueID;
+	/** The ID of the entity that is guaranteed to be unique within a single run of the server.
+	Always nonzero (a zero UniqueID (cEntity::INVALID_ID) is used for error reporting).
+	Note that the UniqueID is not persisted through storage. */
+	UInt32 m_UniqueID;
 	
 	int m_Health;
 	int m_MaxHealth;

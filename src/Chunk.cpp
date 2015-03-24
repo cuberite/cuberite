@@ -1969,7 +1969,7 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 
 
-bool cChunk::HasEntity(int a_EntityID)
+bool cChunk::HasEntity(UInt32 a_EntityID)
 {
 	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
@@ -2027,7 +2027,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 
 
-bool cChunk::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
+bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
@@ -2814,7 +2814,7 @@ void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 
 
-void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
+void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2822,7 +2822,7 @@ void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_bl
 		{
 			continue;
 		}
-		(*itr)->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);
+		(*itr)->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
 	}  // for itr - LoadedByClient[]
 }
 

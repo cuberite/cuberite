@@ -69,7 +69,7 @@ public:
 	/** Returns the unique ID of the entity who created this projectile
 	May return an ID <0
 	*/
-	int GetCreatorUniqueID(void) { return m_CreatorData.m_UniqueID; }
+	UInt32 GetCreatorUniqueID(void) { return m_CreatorData.m_UniqueID; }
 
 	/** Returns the name of the player that created the projectile
 	Will be empty for non-player creators
@@ -90,18 +90,17 @@ public:
 protected:
 
 	/** A structure that stores the Entity ID and Playername of the projectile's creator
-	Used to migitate invalid pointers caused by the creator being destroyed
-	*/
+	Used to migitate invalid pointers caused by the creator being destroyed. */
 	struct CreatorData
 	{
-		CreatorData(int a_UniqueID, const AString & a_Name, const cEnchantments & a_Enchantments) :
+		CreatorData(UInt32 a_UniqueID, const AString & a_Name, const cEnchantments & a_Enchantments) :
 			m_UniqueID(a_UniqueID),
 			m_Name(a_Name),
 			m_Enchantments(a_Enchantments)
 		{
 		}
 
-		const int m_UniqueID;
+		const UInt32 m_UniqueID;
 		AString m_Name;
 		cEnchantments m_Enchantments;
 	};
@@ -110,8 +109,7 @@ protected:
 	eKind m_ProjectileKind;
 	
 	/** The structure for containing the entity ID and name who has created this projectile
-	The ID and/or name may be nullptr (e.g. for dispensers/mobs)
-	*/
+	The ID and/or name may be nullptr (e.g. for dispensers/mobs). */
 	CreatorData m_CreatorData;
 	
 	/** True if the projectile has hit the ground and is stuck there */

@@ -81,9 +81,9 @@ public:
 	void TestWrite(void)
 	{
 		cByteBuffer buf(50);
-		buf.WriteVarInt(5);
-		buf.WriteVarInt(300);
-		buf.WriteVarInt(0);
+		buf.WriteVarInt32(5);
+		buf.WriteVarInt32(300);
+		buf.WriteVarInt32(0);
 		AString All;
 		buf.ReadAll(All);
 		assert_test(All.size() == 4);
@@ -101,8 +101,8 @@ public:
 			assert_test(buf.Write("a", 1));
 			assert_test(buf.CanReadBytes(1));
 			assert_test(buf.GetReadableSpace() == 1);
-			unsigned char v = 0;
-			assert_test(buf.ReadByte(v));
+			UInt8 v = 0;
+			assert_test(buf.ReadBEUInt8(v));
 			assert_test(v == 'a');
 			assert_test(buf.GetReadableSpace() == 0);
 			buf.CommitRead();
@@ -317,7 +317,7 @@ bool cByteBuffer::CanWriteBytes(size_t a_Count) const
 
 
 
-bool cByteBuffer::ReadChar(char & a_Value)
+bool cByteBuffer::ReadBEInt8(Int8 & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -330,7 +330,7 @@ bool cByteBuffer::ReadChar(char & a_Value)
 
 
 
-bool cByteBuffer::ReadByte(unsigned char & a_Value)
+bool cByteBuffer::ReadBEUInt8(UInt8 & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -343,15 +343,15 @@ bool cByteBuffer::ReadByte(unsigned char & a_Value)
 
 
 
-bool cByteBuffer::ReadBEShort(short & a_Value)
+bool cByteBuffer::ReadBEInt16(Int16 & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(2);
-	Int16 val;
+	UInt16 val;
 	ReadBuf(&val, 2);
 	val = ntohs(val);
-	a_Value = *(reinterpret_cast<short *>(&val));
+	memcpy(&a_Value, &val, 2);
 	return true;
 }
 
@@ -373,13 +373,15 @@ bool cByteBuffer::ReadBEUInt16(UInt16 & a_Value)
 
 
 
-bool cByteBuffer::ReadBEInt(int & a_Value)
+bool cByteBuffer::ReadBEInt32(Int32 & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(4);
-	ReadBuf(&a_Value, 4);
-	a_Value = (int)ntohl((u_long)a_Value);
+	UInt32 val;
+	ReadBuf(&val, 4);
+	val = ntohl(val);
+	memcpy(&a_Value, &val, 4);
 	return true;
 }
 
@@ -408,6 +410,20 @@ bool cByteBuffer::ReadBEInt64(Int64 & a_Value)
 	NEEDBYTES(8);
 	ReadBuf(&a_Value, 8);
 	a_Value = NetworkToHostLong8(&a_Value);
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadBEUInt64(UInt64 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	NEEDBYTES(8);
+	ReadBuf(&a_Value, 8);
+	a_Value = NetworkToHostULong8(&a_Value);
 	return true;
 }
 
@@ -448,7 +464,7 @@ bool cByteBuffer::ReadBool(bool & a_Value)
 	CHECK_THREAD
 	CheckValid();
 	NEEDBYTES(1);
-	char Value = 0;
+	UInt8 Value = 0;
 	ReadBuf(&Value, 1);
 	a_Value = (Value != 0);
 	return true;
@@ -462,24 +478,19 @@ bool cByteBuffer::ReadBEUTF16String16(AString & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
-	short Length;
-	if (!ReadBEShort(Length))
+	UInt16 Length;
+	if (!ReadBEUInt16(Length))
 	{
 		return false;
 	}
-	if (Length < 0)
-	{
-		ASSERT(!"Negative string length? Are you sure?");
-		return true;
-	}
-	return ReadUTF16String(a_Value, (size_t)Length);
+	return ReadUTF16String(a_Value, Length);
 }
 
 
 
 
 
-bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
+bool cByteBuffer::ReadVarInt32(UInt32 & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -490,7 +501,29 @@ bool cByteBuffer::ReadVarInt(UInt32 & a_Value)
 	{
 		NEEDBYTES(1);
 		ReadBuf(&b, 1);
-		Value = Value | (((UInt32)(b & 0x7f)) << Shift);
+		Value = Value | ((static_cast<UInt32>(b & 0x7f)) << Shift);
+		Shift += 7;
+	} while ((b & 0x80) != 0);
+	a_Value = Value;
+	return true;
+}
+
+
+
+
+
+bool cByteBuffer::ReadVarInt64(UInt64 & a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	UInt64 Value = 0;
+	int Shift = 0;
+	unsigned char b = 0;
+	do
+	{
+		NEEDBYTES(1);
+		ReadBuf(&b, 1);
+		Value = Value | ((static_cast<UInt64>(b & 0x7f)) << Shift);
 		Shift += 7;
 	} while ((b & 0x80) != 0);
 	a_Value = Value;
@@ -540,7 +573,7 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 
 
 
-bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
+bool cByteBuffer::ReadPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 {
 	CHECK_THREAD
 	Int64 Value;
@@ -565,7 +598,7 @@ bool cByteBuffer::ReadPosition(int & a_BlockX, int & a_BlockY, int & a_BlockZ)
 
 
 
-bool cByteBuffer::WriteChar(char a_Value)
+bool cByteBuffer::WriteBEInt8(Int8 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -577,7 +610,7 @@ bool cByteBuffer::WriteChar(char a_Value)
 
 
 
-bool cByteBuffer::WriteByte(unsigned char a_Value)
+bool cByteBuffer::WriteBEUInt8(UInt8 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -589,33 +622,48 @@ bool cByteBuffer::WriteByte(unsigned char a_Value)
 
 
 
-bool cByteBuffer::WriteBEShort(short a_Value)
+bool cByteBuffer::WriteBEInt16(Int16 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(2);
-	u_short Converted = htons((u_short)a_Value);
-	return WriteBuf(&Converted, 2);
+	UInt16 val;
+	memcpy(&val, &a_Value, 2);
+	val = htons(val);
+	return WriteBuf(&val, 2);
 }
 
 
 
 
 
-bool cByteBuffer::WriteBEUShort(unsigned short a_Value)
+bool cByteBuffer::WriteBEUInt16(UInt16 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(2);
-	u_short Converted = htons((u_short)a_Value);
-	return WriteBuf(&Converted, 2);
+	a_Value = htons(a_Value);
+	return WriteBuf(&a_Value, 2);
 }
 
 
 
 
 
-bool cByteBuffer::WriteBEInt(int a_Value)
+bool cByteBuffer::WriteBEInt32(Int32 a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	PUTBYTES(4);
+	UInt32 Converted = HostToNetwork4(&a_Value);
+	return WriteBuf(&Converted, 4);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEUInt32(UInt32 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -629,6 +677,19 @@ bool cByteBuffer::WriteBEInt(int a_Value)
 
 
 bool cByteBuffer::WriteBEInt64(Int64 a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	PUTBYTES(8);
+	UInt64 Converted = HostToNetwork8(&a_Value);
+	return WriteBuf(&Converted, 8);
+}
+
+
+
+
+
+bool cByteBuffer::WriteBEUInt64(UInt64 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -672,14 +733,15 @@ bool cByteBuffer::WriteBool(bool a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
-	return WriteChar(a_Value ? 1 : 0);
+	UInt8 val = a_Value ? 1 : 0;
+	return Write(&val, 1);
 }
 
 
 
 
 
-bool cByteBuffer::WriteVarInt(UInt32 a_Value)
+bool cByteBuffer::WriteVarInt32(UInt32 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
@@ -700,12 +762,35 @@ bool cByteBuffer::WriteVarInt(UInt32 a_Value)
 
 
 
+
+bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
+{
+	CHECK_THREAD
+	CheckValid();
+	
+	// A 64-bit integer can be encoded by at most 10 bytes:
+	unsigned char b[10];
+	size_t idx = 0;
+	do
+	{
+		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
+		a_Value = a_Value >> 7;
+		idx++;
+	} while (a_Value > 0);
+
+	return WriteBuf(b, idx);
+}
+
+
+
+
+
 bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	PUTBYTES(a_Value.size() + 1);  // This is a lower-bound on the bytes that will be actually written. Fail early.
-	bool res = WriteVarInt((UInt32)(a_Value.size()));
+	bool res = WriteVarInt32(static_cast<UInt32>(a_Value.size()));
 	if (!res)
 	{
 		return false;
@@ -717,15 +802,15 @@ bool cByteBuffer::WriteVarUTF8String(const AString & a_Value)
 
 
 
-bool cByteBuffer::WriteLEInt(int a_Value)
+bool cByteBuffer::WriteLEInt32(Int32 a_Value)
 {
 	CHECK_THREAD
 	CheckValid();
 	#ifdef IS_LITTLE_ENDIAN
-		return WriteBuf((const char *)&a_Value, 4);
+		return WriteBuf(reinterpret_cast<const char *>(&a_Value), 4);
 	#else
 		int Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
-		return WriteBuf((const char *)&Value, 4);
+		return WriteBuf(reinterpret_cast<const char *>(&Value), 4);
 	#endif
 }
 
@@ -733,10 +818,15 @@ bool cByteBuffer::WriteLEInt(int a_Value)
 
 
 
-bool cByteBuffer::WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
+bool cByteBuffer::WritePosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ)
 {
 	CHECK_THREAD
-	return WriteBEInt64(((Int64)a_BlockX & 0x3FFFFFF) << 38 | ((Int64)a_BlockY & 0xFFF) << 26 | ((Int64)a_BlockZ & 0x3FFFFFF));
+	CheckValid();
+	return WriteBEInt64(
+		(static_cast<Int64>(a_BlockX & 0x3FFFFFF) << 38) |
+		(static_cast<Int64>(a_BlockY & 0xFFF) << 26) |
+		(static_cast<Int64>(a_BlockZ & 0x3FFFFFF))
+	);
 }
 
 

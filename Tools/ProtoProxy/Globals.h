@@ -73,13 +73,15 @@
 
 
 // Integral types with predefined sizes:
-typedef long long Int64;
-typedef int       Int32;
-typedef short     Int16;
+typedef signed long long Int64;
+typedef signed int       Int32;
+typedef signed short     Int16;
+typedef signed char      Int8;
 
 typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
+typedef unsigned char      UInt8;
 
 typedef unsigned char Byte;
 
@@ -245,7 +247,3 @@ public:
 
 
 
-
-#define LOGERROR   printf
-#define LOGINFO    printf
-#define LOGWARNING printf
