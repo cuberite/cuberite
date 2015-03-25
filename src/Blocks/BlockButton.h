@@ -61,7 +61,7 @@ public:
 	{
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_YP: return 0x6;
+			case BLOCK_FACE_YP: return 0x5;
 			case BLOCK_FACE_ZM: return 0x4;
 			case BLOCK_FACE_ZP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
@@ -79,14 +79,12 @@ public:
 	{
 		switch (a_Meta & 0x7)
 		{
+			case 0x0: return BLOCK_FACE_YM;
 			case 0x1: return BLOCK_FACE_XP;
 			case 0x2: return BLOCK_FACE_XM;
 			case 0x3: return BLOCK_FACE_ZP;
 			case 0x4: return BLOCK_FACE_ZM;
-			case 0x5:
-			case 0x6: return BLOCK_FACE_YP;
-			case 0x7:
-			case 0x0: return BLOCK_FACE_YM;
+			case 0x5: return BLOCK_FACE_YP;
 			default:
 			{
 				ASSERT(!"Unhandled block meta!");
