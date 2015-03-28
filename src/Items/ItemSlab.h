@@ -44,8 +44,8 @@ public:
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlockType, ClickedBlockMeta);
 		if (
-			(ClickedBlockType == m_ItemType) &&                // Placing the same slab material
-			(ClickedBlockMeta == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
+			(ClickedBlockType == m_ItemType) &&                         // Placing the same slab material
+			((ClickedBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
 			// If clicking the top side of a bottom-half slab, combine into a doubleslab:
