@@ -176,8 +176,7 @@ template class SizeChecker<UInt16, 2>;
 // OS-dependent stuff:
 #ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN
-
-	#define _WIN32_WINNT 0x501  // We want to target WinXP and higher
+	#define _WIN32_WINNT _WIN32_WINNT_WS03  // We want to target Windows XP with Service Pack 2 & Windows Server 2003 with Service Pack 1 and higher
 
 	#include <Windows.h>
 	#include <winsock2.h>
@@ -248,11 +247,9 @@ template class SizeChecker<UInt16, 2>;
 #ifndef TEST_GLOBALS
 	// Common headers (part 1, without macros):
 	#include "src/StringUtils.h"
-	#include "src/OSSupport/Sleep.h"
 	#include "src/OSSupport/CriticalSection.h"
 	#include "src/OSSupport/Semaphore.h"
 	#include "src/OSSupport/Event.h"
-	#include "src/OSSupport/Thread.h"
 	#include "src/OSSupport/File.h"
 	#include "src/Logger.h"
 #else
