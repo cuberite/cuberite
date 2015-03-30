@@ -14,6 +14,7 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 	, m_EntityEffects(tEffectMap())
 {
 	SetGravity(-32.0f);
+	SetAirDrag(0.4f);
 }
 
 

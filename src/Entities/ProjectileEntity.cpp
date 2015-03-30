@@ -228,7 +228,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	m_IsInGround(false)
 {
 	SetGravity(-12.0f);
-	SetAirDrag(0.2);
+	SetAirDrag(0.2f);
 }
 
 
@@ -244,8 +244,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 	SetSpeed(a_Speed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
-	SetGravity(-12.f);
-	SetAirDrag(0.2);
+	SetGravity(-12.0f);
+	SetAirDrag(0.2f);
 }
 
 
