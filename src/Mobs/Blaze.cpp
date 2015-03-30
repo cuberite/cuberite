@@ -11,6 +11,7 @@
 cBlaze::cBlaze(void) :
 	super("Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.6, 1.8)
 {
+	SetGravity(-8.f);
 }
 
 

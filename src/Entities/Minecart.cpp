@@ -93,6 +93,8 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 	m_bIsOnDetectorRail(false)
 {
 	SetMass(20.f);
+	SetGravity(-16.f);
+	SetAirDrag(1.f);
 	SetMaxHealth(6);
 	SetHealth(6);
 	SetWidth(1);

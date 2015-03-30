@@ -12,6 +12,7 @@ cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, double a_X, double a_Y
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);
+	SetAirDrag(0);
 }
 
 
