@@ -21,6 +21,8 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
+	SetGravity(-20.0f);
+	SetAirDrag(0.2f);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",
@@ -48,6 +50,8 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 	{
 		m_PickupState = psInCreative;
 	}
+	SetGravity(-20.0f);
+	SetAirDrag(0.2f);
 }
 
 
