@@ -48,23 +48,8 @@ public:
 			((ClickedBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
 		)
 		{
-			// If clicking the top side of a bottom-half slab, combine into a doubleslab:
-			if (
-				(a_BlockFace == BLOCK_FACE_TOP) &&
-				((ClickedBlockMeta & 0x08) == 0)
-			)
-			{
-				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
-			}
-
-			// If clicking the bottom side of a top-half slab, combine into a doubleslab:
-			if (
-				(a_BlockFace == BLOCK_FACE_BOTTOM) &&
-				((ClickedBlockMeta & 0x08) != 0)
-			)
-			{
-				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
-			}
+			a_World.BroadcastSoundEffect("dig.wood", a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, 1.0f, 0.8f);
+			return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
 		}
 
 		// The slabs didn't combine, use the default handler to place the slab:
