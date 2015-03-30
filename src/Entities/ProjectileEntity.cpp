@@ -227,7 +227,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	),
 	m_IsInGround(false)
 {
-	SetGravity(12.f);
+	SetGravity(-12.f);
 	SetAirDrag(0.2);
 }
 

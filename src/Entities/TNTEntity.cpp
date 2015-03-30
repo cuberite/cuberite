@@ -12,7 +12,7 @@ cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks) :
 	super(etTNT, a_X, a_Y, a_Z, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
-	SetGravity(16);
+	SetGravity(-16.f);
 	SetAirDrag(0.4);
 }
 
