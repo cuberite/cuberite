@@ -17,7 +17,7 @@ cBoat::cBoat(double a_X, double a_Y, double a_Z) :
 	super(etBoat, a_X, a_Y, a_Z, 0.98, 0.7)
 {
 	SetMass(20.f);
-	SetGravity(-16.f);
+	SetGravity(-16.0f);
 	SetAirDrag(1.f);
 	SetMaxHealth(6);
 	SetHealth(6);

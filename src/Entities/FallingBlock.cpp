@@ -16,7 +16,7 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 	m_BlockMeta(a_BlockMeta),
 	m_OriginalPosition(a_BlockPosition)
 {
-	SetGravity(-16.f);
+	SetGravity(-16.0f);
 	SetAirDrag(0.4);
 }
 
