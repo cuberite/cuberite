@@ -108,10 +108,10 @@ void cProtocolRecognizer::SendBlockAction(int a_BlockX, int a_BlockY, int a_Bloc
 
 
 
-void cProtocolRecognizer::SendBlockBreakAnim(int a_entityID, int a_BlockX, int a_BlockY, int a_BlockZ, char stage)
+void cProtocolRecognizer::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	ASSERT(m_Protocol != nullptr);
-	m_Protocol->SendBlockBreakAnim(a_entityID, a_BlockX, a_BlockY, a_BlockZ, stage);
+	m_Protocol->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
 }
 
 
@@ -911,13 +911,13 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 		case PROTO_VERSION_1_7_2:
 		{
 			AString ServerAddress;
-			short ServerPort;
+			UInt16 ServerPort;
 			UInt32 NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
 			}
-			if (!m_Buffer.ReadBEShort(ServerPort))
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
 			{
 				break;
 			}
@@ -926,19 +926,19 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol172(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol172(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_7_6:
 		{
 			AString ServerAddress;
-			short ServerPort;
+			UInt16 ServerPort;
 			UInt32 NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
 			}
-			if (!m_Buffer.ReadBEShort(ServerPort))
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
 			{
 				break;
 			}
@@ -947,19 +947,19 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol176(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol176(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 		case PROTO_VERSION_1_8_0:
 		{
 			AString ServerAddress;
-			short ServerPort;
+			UInt16 ServerPort;
 			UInt32 NextState;
 			if (!m_Buffer.ReadVarUTF8String(ServerAddress))
 			{
 				break;
 			}
-			if (!m_Buffer.ReadBEShort(ServerPort))
+			if (!m_Buffer.ReadBEUInt16(ServerPort))
 			{
 				break;
 			}
@@ -968,16 +968,28 @@ bool cProtocolRecognizer::TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRema
 				break;
 			}
 			m_Buffer.CommitRead();
-			m_Protocol = new cProtocol180(m_Client, ServerAddress, (UInt16)ServerPort, NextState);
+			m_Protocol = new cProtocol180(m_Client, ServerAddress, ServerPort, NextState);
 			return true;
 		}
 	}
-	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u)",
-		m_Client->GetIPString().c_str(), ProtocolVersion
+	LOGINFO("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
+		m_Client->GetIPString().c_str(), ProtocolVersion, ProtocolVersion
 	);
 	m_Client->Kick("Unsupported protocol version");
 	return false;
 }
+
+
+
+
+void cProtocolRecognizer::SendPacket(cPacketizer & a_Pkt)
+{
+	// This function should never be called - it needs to exists so that cProtocolRecognizer can be instantiated,
+	// but the actual sending is done by the internal m_Protocol itself.
+	LOGWARNING("%s: This function shouldn't ever be called.", __FUNCTION__);
+	ASSERT(!"Function not to be called");
+}
+
 
 
 

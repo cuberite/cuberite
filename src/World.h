@@ -216,7 +216,7 @@ public:
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);  // tolua_export
-	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = nullptr);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
 	// tolua_begin
@@ -336,7 +336,9 @@ public:
 	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
 	void AddEntity(cEntity * a_Entity);
 	
-	bool HasEntity(int a_UniqueID);
+	/** Returns true if an entity with the specified UniqueID exists in the world.
+	Note: Only loaded chunks are considered. */
+	bool HasEntity(UInt32 a_UniqueID);
 	
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -349,8 +351,9 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
-	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false. */
-	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
+	Returns true if entity found and callback returned false. */
+	bool DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -477,20 +480,25 @@ public:
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) override;
 	
-	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
+	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) override;
 	
-	/** Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block. */
-	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
+	/** Spawns an falling block entity at the given position.
+	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
 
-	/** Spawns an minecart at the given coordinates. */
-	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+	/** Spawns an minecart at the given coordinates.
+	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
 
-	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
-	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
+	/** Spawns an experience orb at the given location with the given reward.
+	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
+	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
 
-	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided */
-	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
+	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration.
+	Initial velocity is given based on the relative coefficient provided.
+	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
 
 	// tolua_end
 
@@ -796,14 +804,14 @@ public:
 
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
-	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) override;  // tolua_export
-	int SpawnMobFinalize(cMonster* a_Monster);
+	/** Spawns a mob of the specified type. Returns the mob's UniqueID if recognized and spawned, cEntity::INVALID_ID otherwise */
+	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) override;  // tolua_export
+
+	UInt32 SpawnMobFinalize(cMonster * a_Monster);
 	
-	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
-	Item parameter used currently for Fireworks to correctly set entity metadata based on item metadata
-	*/
-	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
+	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
+	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
+	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
 	int GetTickRandomNumber(int a_Range) { return (int)(m_TickRand.randInt(a_Range)); }

@@ -8,6 +8,7 @@
 #include "Server.h"
 #include <iostream>
 #include "PolarSSL++/CryptoKey.h"
+#include "../../src/Logger.h"
 
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
@@ -214,7 +215,11 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	Printf(m_LogNameBase, "Logs/Log_%d_%d", (int)time(NULL), a_ClientSocket);
 	AString fnam(m_LogNameBase);
 	fnam.append(".log");
-	m_LogFile = fopen(fnam.c_str(), "w");
+	#ifdef _WIN32
+		fopen_s(&m_LogFile, fnam.c_str(), "w");
+	#else
+		m_LogFile = fopen(fnam.c_str(), "w");
+	#endif
 	Log("Log file created");
 	printf("Connection is logged to file \"%s\"\n", fnam.c_str());
 }
@@ -788,31 +793,31 @@ bool cConnection::HandleClientHandshake(void)
 	// Read the packet from the client:
 	HANDLE_CLIENT_PACKET_READ(ReadVarInt,        UInt32,  ProtocolVersion);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, ServerHost);
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort,       short,   ServerPort);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,  ServerPort);
 	HANDLE_CLIENT_PACKET_READ(ReadVarInt,        UInt32,  NextState);
 	m_ClientBuffer.CommitRead();
 	
 	Log("Received an initial handshake packet from the client:");
 	Log("  ProtocolVersion = %u", ProtocolVersion);
 	Log("  ServerHost = \"%s\"", ServerHost.c_str());
-	Log("  ServerPort = %d", ServerPort);
+	Log("  ServerPort = %u", ServerPort);
 	Log("  NextState = %u", NextState);
 
 	// Send the same packet to the server, but with our port:
 	cByteBuffer Packet(512);
-	Packet.WriteVarInt(0);  // Packet type - initial handshake
-	Packet.WriteVarInt(ProtocolVersion);
+	Packet.WriteVarInt32(0);  // Packet type - initial handshake
+	Packet.WriteVarInt32(ProtocolVersion);
 	Packet.WriteVarUTF8String(ServerHost);
-	Packet.WriteBEShort(m_Server.GetConnectPort());
-	Packet.WriteVarInt(NextState);
+	Packet.WriteBEUInt16(m_Server.GetConnectPort());
+	Packet.WriteVarInt32(NextState);
 	AString Pkt;
 	Packet.ReadAll(Pkt);
 	cByteBuffer ToServer(512);
 	ToServer.WriteVarUTF8String(Pkt);
 	SERVERSEND(ToServer);
 	
-	m_ClientProtocolState = (int)NextState;
-	m_ServerProtocolState = (int)NextState;
+	m_ClientProtocolState = static_cast<int>(NextState);
+	m_ServerProtocolState = static_cast<int>(NextState);
 	
 	return true;
 }
@@ -852,10 +857,10 @@ bool cConnection::HandleClientLoginStart(void)
 
 bool cConnection::HandleClientAnimation(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, Animation);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,   Int8,   Animation);
 	Log("Received a PACKET_ANIMATION from the client:");
-	Log("  EntityID: %d", EntityID);
+	Log("  EntityID: %u", EntityID);
 	Log("  Animation: %d", Animation);
 	COPY_TO_SERVER();
 	return true;
@@ -867,15 +872,15 @@ bool cConnection::HandleClientAnimation(void)
 
 bool cConnection::HandleClientBlockDig(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, Status);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  BlockX);
-	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, BlockY);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  BlockZ);
-	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, BlockFace);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Status);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, BlockFace);
 	Log("Received a PACKET_BLOCK_DIG from the client:");
-	Log("  Status = %d", Status);
-	Log("  Pos = <%d, %d, %d>", BlockX, BlockY, BlockZ);
-	Log("  BlockFace = %d", BlockFace);
+	Log("  Status = %u (0x%02x)", Status, Status);
+	Log("  Pos = <%d, %u, %d>", BlockX, BlockY, BlockZ);
+	Log("  BlockFace = %u (0x%02x)", BlockFace, BlockFace);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -886,23 +891,23 @@ bool cConnection::HandleClientBlockDig(void)
 
 bool cConnection::HandleClientBlockPlace(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  BlockX);
-	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, BlockY);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  BlockZ);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, Face);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Face);
 	AString Desc;
 	if (!ParseSlot(m_ClientBuffer, Desc))
 	{
 		return false;
 	}
-	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, CursorX);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, CursorY);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, CursorZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, CursorX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, CursorY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, CursorZ);
 	Log("Received a PACKET_BLOCK_PLACE from the client:");
-	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
-	Log("  Face = %d", Face);
+	Log("  Block = {%d, %u, %d}", BlockX, BlockY, BlockZ);
+	Log("  Face = %u (0x%02x)", Face, Face);
 	Log("  Item = %s", Desc.c_str());
-	Log("  Cursor = <%d, %d, %d>", CursorX, CursorY, CursorZ);
+	Log("  Cursor = <%u, %u, %u>", CursorX, CursorY, CursorZ);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -926,9 +931,9 @@ bool cConnection::HandleClientChatMessage(void)
 
 bool cConnection::HandleClientClientStatuses(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, Statuses);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Statuses);
 	Log("Received a PACKET_CLIENT_STATUSES from the CLIENT:");
-	Log("  Statuses = %d", Statuses);
+	Log("  Statuses = %u (0x%02x)", Statuses, Statuses);
 	
 	COPY_TO_SERVER();
 	return true;
@@ -940,14 +945,14 @@ bool cConnection::HandleClientClientStatuses(void)
 
 bool cConnection::HandleClientCreativeInventoryAction(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, SlotNum);
 	AString Item;
 	if (!ParseSlot(m_ClientBuffer, Item))
 	{
 		return false;
 	}
 	Log("Received a PACKET_CREATIVE_INVENTORY_ACTION from the client:");
-	Log("  SlotNum = %d", SlotNum);
+	Log("  SlotNum = %u", SlotNum);
 	Log("  Item = %s", Item.c_str());
 	COPY_TO_SERVER();
 	return true;
@@ -972,12 +977,12 @@ bool cConnection::HandleClientDisconnect(void)
 
 bool cConnection::HandleClientEntityAction(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  PlayerID);
-	HANDLE_CLIENT_PACKET_READ(ReadByte,  Byte, ActionType);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  HorseJumpBoost);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, PlayerID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, ActionType);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, HorseJumpBoost);
 	Log("Received a PACKET_ENTITY_ACTION from the client:");
 	Log("  PlayerID = %d", PlayerID);
-	Log("  ActionType = %d", ActionType);
+	Log("  ActionType = %u", ActionType);
 	Log("  HorseJumpBoost = %d (0x%08x)", HorseJumpBoost, HorseJumpBoost);
 	COPY_TO_SERVER();
 	return true;
@@ -989,7 +994,7 @@ bool cConnection::HandleClientEntityAction(void)
 
 bool cConnection::HandleClientKeepAlive(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int, ID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, ID);
 	Log("Received a PACKET_KEEPALIVE from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1002,11 +1007,11 @@ bool cConnection::HandleClientKeepAlive(void)
 bool cConnection::HandleClientLocaleAndView(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Locale);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    ViewDistance);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    ChatFlags);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    Unused);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    Difficulty);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,          char,    ShowCape);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    ViewDistance);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    ChatFlags);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    Unused);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    Difficulty);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    ShowCape);
 	Log("Received a PACKET_LOCALE_AND_VIEW from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1031,11 +1036,11 @@ bool cConnection::HandleClientPing(void)
 
 bool cConnection::HandleClientPlayerAbilities(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char, Flags);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Flags);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, FlyingSpeed);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, WalkingSpeed);
 	Log("Receives a PACKET_PLAYER_ABILITIES from the client:");
-	Log("  Flags = %d (0x%02x)", Flags, Flags);
+	Log("  Flags = %u (0x%02x)", Flags, Flags);
 	Log("  FlyingSpeed = %f", FlyingSpeed);
 	Log("  WalkingSpeed = %f", WalkingSpeed);
 	COPY_TO_SERVER();
@@ -1050,7 +1055,7 @@ bool cConnection::HandleClientPlayerLook(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, Yaw);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, Pitch);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  OnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, OnGround);
 	Log("Received a PACKET_PLAYER_LOOK from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1062,7 +1067,7 @@ bool cConnection::HandleClientPlayerLook(void)
 
 bool cConnection::HandleClientPlayerOnGround(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, OnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, OnGround);
 	Log("Received a PACKET_PLAYER_ON_GROUND from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1078,7 +1083,7 @@ bool cConnection::HandleClientPlayerPosition(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,     char,   IsOnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION from the client");
 
 	// TODO: list packet contents
@@ -1099,7 +1104,7 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Yaw);
 	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Pitch);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,     char,   IsOnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the client");
 	Log("  Pos = {%.03f, %.03f, %.03f}", PosX, PosY, PosZ);
 	Log("  Stance = %.03f", Stance);
@@ -1117,7 +1122,7 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 bool cConnection::HandleClientPluginMessage(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,   Length);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,  Length);
 	AString Data;
 	if (!m_ClientBuffer.ReadString(Data, Length))
 	{
@@ -1136,7 +1141,7 @@ bool cConnection::HandleClientPluginMessage(void)
 
 bool cConnection::HandleClientSlotSelect(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt16, Int16, SlotNum);
 	Log("Received a PACKET_SLOT_SELECT from the client");
 	Log("  SlotNum = %d", SlotNum);
 	COPY_TO_SERVER();
@@ -1186,9 +1191,9 @@ bool cConnection::HandleClientTabCompletion(void)
 
 bool cConnection::HandleClientUpdateSign(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt,         int,     BlockX);
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort,       short,   BlockY);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt,         int,     BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32,       Int32,   BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt16,       Int16,   BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32,       Int32,   BlockZ);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line1);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line2);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line3);
@@ -1206,11 +1211,11 @@ bool cConnection::HandleClientUpdateSign(void)
 
 bool cConnection::HandleClientUseEntity(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,  char, MouseButton);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  MouseButton);
 	Log("Received a PACKET_USE_ENTITY from the client:");
 	Log("  EntityID = %d", EntityID);
-	Log("  MouseButton = %d", MouseButton);
+	Log("  MouseButton = %u", MouseButton);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1221,20 +1226,20 @@ bool cConnection::HandleClientUseEntity(void)
 
 bool cConnection::HandleClientWindowClick(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  WindowID);
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, SlotNum);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  Button);
-	HANDLE_CLIENT_PACKET_READ(ReadBEShort, short, TransactionID);
-	HANDLE_CLIENT_PACKET_READ(ReadChar,    char,  Mode);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, SlotNum);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  Button);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, TransactionID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  Mode);
 	AString Item;
 	if (!ParseSlot(m_ClientBuffer, Item))
 	{
 		return false;
 	}
 	Log("Received a PACKET_WINDOW_CLICK from the client");
-	Log("  WindowID = %d", WindowID);
-	Log("  SlotNum = %d", SlotNum);
-	Log("  Button = %d, Mode = %d", Button, Mode);
+	Log("  WindowID = %u", WindowID);
+	Log("  SlotNum = %u", SlotNum);
+	Log("  Button = %u, Mode = %u", Button, Mode);
 	Log("  TransactionID = 0x%x", TransactionID);
 	Log("  ClickedItem = %s", Item.c_str());
 	COPY_TO_SERVER();
@@ -1247,9 +1252,9 @@ bool cConnection::HandleClientWindowClick(void)
 
 bool cConnection::HandleClientWindowClose(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadChar, char, WindowID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, WindowID);
 	Log("Received a PACKET_WINDOW_CLOSE from the client:");
-	Log("  WindowID = %d", WindowID);
+	Log("  WindowID = %u", WindowID);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1355,13 +1360,13 @@ bool cConnection::HandleServerLoginSuccess(void)
 
 bool cConnection::HandleServerAttachEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  VehicleID);
-	HANDLE_SERVER_PACKET_READ(ReadBool,  bool, Leash);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  VehicleID);
+	HANDLE_SERVER_PACKET_READ(ReadBool,     bool,    IsOnLeash);
 	Log("Received a PACKET_ATTACH_ENTITY from the server:");
-	Log("  EntityID = %d (0x%x)", EntityID, EntityID);
-	Log("  VehicleID = %d (0x%x)", VehicleID, VehicleID);
-	Log("  Leash = %s", Leash ? "true" : "false");
+	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
+	Log("  VehicleID = %u (0x%x)", VehicleID, VehicleID);
+	Log("  IsOnLeash = %s", IsOnLeash ? "true" : "false");
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1372,15 +1377,15 @@ bool cConnection::HandleServerAttachEntity(void)
 
 bool cConnection::HandleServerBlockAction(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Byte1);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Byte2);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  Byte1);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  Byte2);
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockID);
 	Log("Received a PACKET_BLOCK_ACTION from the server:");
 	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
-	Log("  Bytes = (%d, %d) == (0x%x, 0x%x)", Byte1, Byte2, Byte1, Byte2);
+	Log("  Bytes = (%u, %u) == (0x%x, 0x%x)", Byte1, Byte2, Byte1, Byte2);
 	Log("  BlockID = %u", BlockID);
 	COPY_TO_CLIENT();
 	return true;
@@ -1392,15 +1397,15 @@ bool cConnection::HandleServerBlockAction(void)
 
 bool cConnection::HandleServerBlockChange(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockZ);
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockType);
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,   BlockMeta);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  BlockMeta);
 	Log("Received a PACKET_BLOCK_CHANGE from the server");
-	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
-	Log("  BlockType = %d (0x%x", BlockType, BlockType);
-	Log("  BlockMeta = %d", BlockMeta);
+	Log("  Pos = {%d, %u, %d}", BlockX, BlockY, BlockZ);
+	Log("  BlockType = %u (0x%x", BlockType, BlockType);
+	Log("  BlockMeta = %u", BlockMeta);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1411,10 +1416,10 @@ bool cConnection::HandleServerBlockChange(void)
 
 bool cConnection::HandleServerChangeGameState(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  Reason);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  Reason);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Data);
 	Log("Received a PACKET_CHANGE_GAME_STATE from the server:");
-	Log("  Reason = %d", Reason);
+	Log("  Reason = %u", Reason);
 	Log("  Data = %f", Data);
 	COPY_TO_CLIENT();
 	return true;
@@ -1439,11 +1444,11 @@ bool cConnection::HandleServerChatMessage(void)
 
 bool cConnection::HandleServerCollectPickup(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, CollectedID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, CollectorID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CollectedID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CollectorID);
 	Log("Received a PACKET_COLLECT_PICKUP from the server:");
-	Log("  CollectedID = %d", CollectedID);
-	Log("  CollectorID = %d", CollectorID);
+	Log("  CollectedID = %u", CollectedID);
+	Log("  CollectorID = %u", CollectorID);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1454,9 +1459,9 @@ bool cConnection::HandleServerCollectPickup(void)
 
 bool cConnection::HandleServerCompass(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, SpawnZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, SpawnX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, SpawnY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, SpawnZ);
 	Log("Received PACKET_COMPASS from the server:");
 	Log("  Spawn = {%d, %d, %d}", SpawnX, SpawnY, SpawnZ);
 	COPY_TO_CLIENT();
@@ -1469,7 +1474,7 @@ bool cConnection::HandleServerCompass(void)
 
 bool cConnection::HandleServerDestroyEntities(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadByte, Byte, NumEntities);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, NumEntities);
 	if (!m_ServerBuffer.SkipRead(static_cast<size_t>(NumEntities) * 4))
 	{
 		return false;
@@ -1486,9 +1491,9 @@ bool cConnection::HandleServerDestroyEntities(void)
 
 bool cConnection::HandleServerEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
 	Log("Received a PACKET_ENTITY from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u", EntityID);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1499,16 +1504,16 @@ bool cConnection::HandleServerEntity(void)
 
 bool cConnection::HandleServerEntityEquipment(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, SlotNum);
 	AString Item;
 	if (!ParseSlot(m_ServerBuffer, Item))
 	{
 		return false;
 	}
 	Log("Received a PACKET_ENTITY_EQUIPMENT from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  SlotNum = %d", SlotNum);
+	Log("  EntityID = %u", EntityID);
+	Log("  SlotNum = %u", SlotNum);
 	Log("  Item = %s", Item.c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -1520,11 +1525,11 @@ bool cConnection::HandleServerEntityEquipment(void)
 
 bool cConnection::HandleServerEntityHeadLook(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, HeadYaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  HeadYaw);
 	Log("Received a PACKET_ENTITY_HEAD_LOOK from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  HeadYaw = %d", HeadYaw);
+	Log("  EntityID = %u", EntityID);
+	Log("  HeadYaw = %u", HeadYaw);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1535,13 +1540,13 @@ bool cConnection::HandleServerEntityHeadLook(void)
 
 bool cConnection::HandleServerEntityLook(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Pitch);
 	Log("Received a PACKET_ENTITY_LOOK from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  Yaw = %d", Yaw);
-	Log("  Pitch = %d", Pitch);
+	Log("  EntityID = %u", EntityID);
+	Log("  Yaw = %u", Yaw);
+	Log("  Pitch = %u", Pitch);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1552,7 +1557,7 @@ bool cConnection::HandleServerEntityLook(void)
 
 bool cConnection::HandleServerEntityMetadata(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
 	{
@@ -1561,8 +1566,9 @@ bool cConnection::HandleServerEntityMetadata(void)
 	AString HexDump;
 	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_ENTITY_METADATA from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	Log("  EntityID = %u", EntityID);
+	auto len = static_cast<unsigned>(Metadata.length());
+	Log("  Metadata, length = %u (0x%x):\n%s", len, len, HexDump.c_str());
 	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
 	return true;
@@ -1574,24 +1580,24 @@ bool cConnection::HandleServerEntityMetadata(void)
 
 bool cConnection::HandleServerEntityProperties(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, Count);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, Count);
 	Log("Received a PACKET_ENTITY_PROPERTIES from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  Count = %d", Count);
+	Log("  EntityID = %u", EntityID);
+	Log("  Count = %u", Count);
 	
-	for (int i = 0; i < Count; i++)
+	for (UInt32 i = 0; i < Count; i++)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Key);
 		HANDLE_SERVER_PACKET_READ(ReadBEDouble,      double,  Value);
-		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, ListLength);
-		Log(" \"%s\" = %f; %d modifiers", Key.c_str(), Value, ListLength);
-		for (short j = 0; j < ListLength; j++)
+		HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16, ListLength);
+		Log(" \"%s\" = %f; %u modifiers", Key.c_str(), Value, ListLength);
+		for (UInt16 j = 0; j < ListLength; j++)
 		{
-			HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDHi);
-			HANDLE_SERVER_PACKET_READ(ReadBEInt64,  Int64,  UUIDLo);
+			HANDLE_SERVER_PACKET_READ(ReadBEUInt64, UInt64, UUIDHi);
+			HANDLE_SERVER_PACKET_READ(ReadBEUInt64, UInt64, UUIDLo);
 			HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
-			HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   ByteVal);
+			HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  ByteVal);
 			Log("  [%d] = {0x%08llx%08llx, %f, %u}", j, UUIDHi, UUIDLo, DblVal, ByteVal);
 		}
 	}  // for i
@@ -1605,12 +1611,12 @@ bool cConnection::HandleServerEntityProperties(void)
 
 bool cConnection::HandleServerEntityRelativeMove(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dx);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dy);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dz);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dx);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dy);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dz);
 	Log("Received a PACKET_ENTITY_RELATIVE_MOVE from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u", EntityID);
 	Log("  RelMove = %s", PrintableAbsIntTriplet(dx, dy, dz).c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -1622,17 +1628,17 @@ bool cConnection::HandleServerEntityRelativeMove(void)
 
 bool cConnection::HandleServerEntityRelativeMoveLook(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dx);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dy);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, dz);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dx);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dy);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dz);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Pitch);
 	Log("Received a PACKET_ENTITY_RELATIVE_MOVE_LOOK from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u", EntityID);
 	Log("  RelMove = %s", PrintableAbsIntTriplet(dx, dy, dz).c_str());
-	Log("  Yaw = %d", Yaw);
-	Log("  Pitch = %d", Pitch);
+	Log("  Yaw = %u", Yaw);
+	Log("  Pitch = %u", Pitch);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1643,11 +1649,11 @@ bool cConnection::HandleServerEntityRelativeMoveLook(void)
 
 bool cConnection::HandleServerEntityStatus(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Status);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Status);
 	Log("Received a PACKET_ENTITY_STATUS from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  Status = %d", Status);
+	Log("  EntityID = %u", EntityID);
+	Log("  Status = %u (0x%02x)", Status, Status);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1658,17 +1664,17 @@ bool cConnection::HandleServerEntityStatus(void)
 
 bool cConnection::HandleServerEntityTeleport(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  AbsZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,   AbsX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,   AbsY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,   AbsZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Pitch);
 	Log("Received a PACKET_ENTITY_TELEPORT from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u", EntityID);
 	Log("  Pos = %s", PrintableAbsIntTriplet(AbsX, AbsY, AbsZ).c_str());
-	Log("  Yaw = %d", Yaw);
-	Log("  Pitch = %d", Pitch);
+	Log("  Yaw = %u", Yaw);
+	Log("  Pitch = %u", Pitch);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1679,12 +1685,12 @@ bool cConnection::HandleServerEntityTeleport(void)
 
 bool cConnection::HandleServerEntityVelocity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityY);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, VelocityZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  VelocityZ);
 	Log("Received a PACKET_ENTITY_VELOCITY from the server:");
-	Log("  EntityID = %d", EntityID);
+	Log("  EntityID = %u", EntityID);
 	Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -1703,12 +1709,12 @@ bool cConnection::HandleServerExplosion(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, NumRecords);
 	std::vector<sCoords> Records;
 	Records.reserve(NumRecords);
-	int PosXI = (int)PosX, PosYI = (int)PosY, PosZI = (int)PosZ;
+	int PosXI = static_cast<int>(PosX), PosYI = static_cast<int>(PosY), PosZI = static_cast<int>(PosZ);
 	for (UInt32 i = 0; i < NumRecords; i++)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadChar, char, rx);
-		HANDLE_SERVER_PACKET_READ(ReadChar, char, ry);
-		HANDLE_SERVER_PACKET_READ(ReadChar, char, rz);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, rx);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, ry);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, rz);
 		Records.push_back(sCoords(PosXI + rx, PosYI + ry, PosZI + rz));
 	}
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PlayerMotionX);
@@ -1734,10 +1740,10 @@ bool cConnection::HandleServerExplosion(void)
 bool cConnection::HandleServerIncrementStatistic(void)
 {
 	// 0xc8
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, StatisticID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, Amount);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, StatisticID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  Amount);
 	Log("Received a PACKET_INCREMENT_STATISTIC from the server:");
-	Log("  StatisticID = %d (0x%x)", StatisticID, StatisticID);
+	Log("  StatisticID = %u (0x%x)", StatisticID, StatisticID);
 	Log("  Amount = %d", Amount);
 	COPY_TO_CLIENT();
 	return true;
@@ -1749,18 +1755,18 @@ bool cConnection::HandleServerIncrementStatistic(void)
 
 bool cConnection::HandleServerJoinGame(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    GameMode);
-	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    Dimension);
-	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    Difficulty);
-	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    MaxPlayers);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32,      UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   MaxPlayers);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, LevelType);
 	Log("Received a PACKET_LOGIN from the server:");
-	Log("  EntityID = %d",      EntityID);
-	Log("  GameMode = %d",      GameMode);
-	Log("  Dimension = %d",     Dimension);
-	Log("  Difficulty = %d",    Difficulty);
-	Log("  MaxPlayers = %d",    MaxPlayers);
+	Log("  EntityID = %u",      EntityID);
+	Log("  GameMode = %u",      GameMode);
+	Log("  Dimension = %u",     Dimension);
+	Log("  Difficulty = %u",    Difficulty);
+	Log("  MaxPlayers = %u",    MaxPlayers);
 	Log("  LevelType = \"%s\"", LevelType.c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -1772,9 +1778,9 @@ bool cConnection::HandleServerJoinGame(void)
 
 bool cConnection::HandleServerKeepAlive(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int, PingID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, PingID);
 	Log("Received a PACKET_KEEP_ALIVE from the server:");
-	Log("  ID = %d", PingID);
+	Log("  ID = %u", PingID);
 	COPY_TO_CLIENT()
 	return true;
 }
@@ -1856,11 +1862,11 @@ bool cConnection::HandleServerKick(void)
 
 bool cConnection::HandleServerMapChunk(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    ChunkX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    ChunkZ);
-	HANDLE_SERVER_PACKET_READ(ReadChar,     char,   IsContiguous);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,  short,  PrimaryBitmap);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,  short,  AdditionalBitmap);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  IsContiguous);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, PrimaryBitmap);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, AdditionalBitmap);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CompressedSize);
 	AString CompressedData;
 	if (!m_ServerBuffer.ReadString(CompressedData, CompressedSize))
@@ -1899,10 +1905,10 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	ChunkMetas.reserve(ChunkCount);
 	for (short i = 0; i < ChunkCount; i++)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkX);
-		HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   ChunkZ);
-		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, PrimaryBitmap);
-		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, AddBitmap);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, ChunkX);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, ChunkZ);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, PrimaryBitmap);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, AddBitmap);
 		ChunkMetas.push_back(sChunkMeta(ChunkX, ChunkZ, PrimaryBitmap, AddBitmap));
 	}
 	
@@ -1932,8 +1938,8 @@ bool cConnection::HandleServerMapChunkBulk(void)
 
 bool cConnection::HandleServerMultiBlockChange(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    ChunkX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    ChunkZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, NumBlocks);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, DataSize);
 	AString BlockChangeData;
@@ -1955,16 +1961,16 @@ bool cConnection::HandleServerMultiBlockChange(void)
 bool cConnection::HandleServerNamedSoundEffect(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, SoundName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat,       float,   Volume);
-	HANDLE_SERVER_PACKET_READ(ReadByte,          Byte,    Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   Pitch);
 	Log("Received a PACKET_NAMED_SOUND_EFFECT from the server:");
 	Log("  SoundName = \"%s\"", SoundName.c_str());
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ, 8).c_str());
 	Log("  Volume = %f", Volume);
-	Log("  Pitch = %d", Pitch);
+	Log("  Pitch = %u", Pitch);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -1975,11 +1981,11 @@ bool cConnection::HandleServerNamedSoundEffect(void)
 
 bool cConnection::HandleServerPlayerAbilities(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar, char, Flags);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Flags);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, FlyingSpeed);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, WalkingSpeed);
 	Log("Received a PACKET_PLAYER_ABILITIES from the server:");
-	Log("  Flags = %d (0x%02x)", Flags, Flags);
+	Log("  Flags = %u (0x%02x)", Flags, Flags);
 	Log("  FlyingSpeed = %f", FlyingSpeed);
 	Log("  WalkingSpeed = %f", WalkingSpeed);
 	COPY_TO_CLIENT();
@@ -1992,11 +1998,11 @@ bool cConnection::HandleServerPlayerAbilities(void)
 
 bool cConnection::HandleServerPlayerAnimation(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, PlayerID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,   Byte,   AnimationID);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, PlayerID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  AnimationID);
 	Log("Received a PACKET_PLAYER_ANIMATION from the server:");
 	Log("  PlayerID: %u (0x%x)", PlayerID, PlayerID);
-	Log("  Animation: %d", AnimationID);
+	Log("  Animation: %u", AnimationID);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2008,10 +2014,10 @@ bool cConnection::HandleServerPlayerAnimation(void)
 bool cConnection::HandleServerPlayerListItem(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, PlayerName);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    IsOnline);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short,   Ping);
+	HANDLE_SERVER_PACKET_READ(ReadBool,          bool,    IsOnline);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16,  Ping);
 	Log("Received a PACKET_PLAYERLIST_ITEM from the server:");
-	Log("  PlayerName = \"%s\"", PlayerName.c_str());
+	Log("  PlayerName = \"%s\" (%s)", PlayerName.c_str(), IsOnline ? "online" : "offline");
 	Log("  Ping = %d", Ping);
 	COPY_TO_CLIENT();
 	return true;
@@ -2028,7 +2034,7 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Yaw);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadChar,     char,   IsOnGround);
+	HANDLE_SERVER_PACKET_READ(ReadBool,     bool,   IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the server");
 
 	// TODO: list packet contents
@@ -2063,14 +2069,14 @@ bool cConnection::HandleServerPluginMessage(void)
 
 bool cConnection::HandleServerRespawn(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     Dimension);
-	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    Difficulty);
-	HANDLE_SERVER_PACKET_READ(ReadChar,          char,    GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,     Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,    Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,    GameMode);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, LevelType);
 	Log("Received a respawn packet from the server:");
 	Log("  Dimension = %d", Dimension);
-	Log("  Difficulty = %d", Difficulty);
-	Log("  GameMode = %d", GameMode);
+	Log("  Difficulty = %u", Difficulty);
+	Log("  GameMode = %u", GameMode);
 	Log("  LevelType = \"%s\"", LevelType.c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -2082,13 +2088,13 @@ bool cConnection::HandleServerRespawn(void)
 
 bool cConnection::HandleServerSetExperience(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, ExperienceBar);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, Level);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, TotalExperience);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  ExperienceBar);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, Level);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, TotalExperience);
 	Log("Received a PACKET_SET_EXPERIENCE from the server:");
 	Log("  ExperienceBar = %.05f", ExperienceBar);
-	Log("  Level = %d", Level);
-	Log("  TotalExperience = %d", TotalExperience);
+	Log("  Level = %u", Level);
+	Log("  TotalExperience = %u", TotalExperience);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2099,16 +2105,16 @@ bool cConnection::HandleServerSetExperience(void)
 
 bool cConnection::HandleServerSetSlot(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,  WindowID);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SlotNum);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, SlotNum);
 	AString Item;
 	if (!ParseSlot(m_ServerBuffer, Item))
 	{
 		return false;
 	}
 	Log("Received a PACKET_SET_SLOT from the server:");
-	Log("  WindowID = %d", WindowID);
-	Log("  SlotNum = %d", SlotNum);
+	Log("  WindowID = %u", WindowID);
+	Log("  SlotNum = %u", SlotNum);
 	Log("  Item = %s", Item.c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -2120,9 +2126,9 @@ bool cConnection::HandleServerSetSlot(void)
 
 bool cConnection::HandleServerSlotSelect(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadByte, Byte, SlotNum);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, SlotNum);
 	Log("Received a PACKET_SLOT_SELECT from the server:");
-	Log("  SlotNum = %d", SlotNum);
+	Log("  SlotNum = %u", SlotNum);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2133,17 +2139,17 @@ bool cConnection::HandleServerSlotSelect(void)
 
 bool cConnection::HandleServerSoundEffect(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EffectID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   Data);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  NoVolumeDecrease);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, EffectID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, Data);
+	HANDLE_SERVER_PACKET_READ(ReadBool,    bool,  NoVolumeDecrease);
 	Log("Received a PACKET_SOUND_EFFECT from the server:");
 	Log("  EffectID = %d", EffectID);
 	Log("  Pos = {%d, %d, %d}", PosX, PosY, PosZ);
 	Log("  Data = %d", Data);
-	Log("  NoVolumeDecrease = %d", NoVolumeDecrease);
+	Log("  NoVolumeDecrease = %s", NoVolumeDecrease ? "true" : "false");
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2154,15 +2160,15 @@ bool cConnection::HandleServerSoundEffect(void)
 
 bool cConnection::HandleServerSpawnExperienceOrbs(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  Count);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,   UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, Count);
 	Log("Received a SPAWN_EXPERIENCE_ORBS packet from the server:");
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
-	Log("  Count = %d", Count);
+	Log("  Count = %u", Count);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2174,16 +2180,16 @@ bool cConnection::HandleServerSpawnExperienceOrbs(void)
 bool cConnection::HandleServerSpawnMob(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadChar,    char,   MobType);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   HeadYaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  VelocityX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  VelocityY);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short,  VelocityZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   MobType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,    PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,    PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,    PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   HeadYaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  VelocityZ);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
 	{
@@ -2193,11 +2199,12 @@ bool cConnection::HandleServerSpawnMob(void)
 	CreateHexDump(HexDump, Metadata.data(), Metadata.size(), 32);
 	Log("Received a PACKET_SPAWN_MOB from the server:");
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
-	Log("  MobType = %d", MobType);
+	Log("  MobType = %u (0x%x)", MobType, MobType);
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
-	Log("  Angles = [%d, %d, %d]", Yaw, Pitch, HeadYaw);
+	Log("  Angles = [%u, %u, %u]", Yaw, Pitch, HeadYaw);
 	Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
-	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	auto len = static_cast<unsigned>(Metadata.length());
+	Log("  Metadata, length = %u (0x%x):\n%s", len, len, HexDump.c_str());
 	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
 	return true;
@@ -2240,12 +2247,12 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature)
 		Data.push_back(sSpawnData(Name, Value, Signature));
 	}
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,          Byte,    Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadByte,          Byte,    Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,       short,   CurrentItem);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, SelectedItem);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
 	{
@@ -2265,9 +2272,10 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 		);
 	}  // for itr - Data[]
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
-	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
-	Log("  CurrentItem = %d", CurrentItem);
-	Log("  Metadata, length = %d (0x%x):\n%s", Metadata.length(), Metadata.length(), HexDump.c_str());
+	Log("  Rotation = <yaw %u, pitch %u>", Yaw, Pitch);
+	Log("  SelectedItem = %u", SelectedItem);
+	auto len = static_cast<unsigned>(Metadata.length());
+	Log("  Metadata, length = %u (0x%x):\n%s", len, len, HexDump.c_str());
 	LogMetadata(Metadata, 4);
 	COPY_TO_CLIENT();
 	return true;
@@ -2294,26 +2302,26 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		// Only log up to 128 bytes
 		Buffer.erase(128, AString::npos);
 	}
-	DataLog(Buffer.data(), Buffer.size(), "Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%d bytes):", Buffer.size());
+	DataLog(Buffer.data(), Buffer.size(), "Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%u bytes):", static_cast<unsigned>(Buffer.size()));
 	#endif  // _DEBUG
 	
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   ObjType);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,   Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,    DataIndicator);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt,   UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  ObjType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, DataIndicator);
 	AString ExtraData;
-	short VelocityX = 0;
-	short VelocityY = 0;
-	short VelocityZ = 0;
+	Int16 VelocityX = 0;
+	Int16 VelocityY = 0;
+	Int16 VelocityZ = 0;
 	if (DataIndicator != 0)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedX);
-		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedY);
-		HANDLE_SERVER_PACKET_READ(ReadBEShort, short, SpeedZ);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, SpeedX);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, SpeedY);
+		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, SpeedZ);
 		VelocityX = SpeedX; VelocityY = SpeedY; VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
 		/*
 		// This doesn't seem to work - for a falling block I'm getting no extra data at all
@@ -2340,14 +2348,14 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	}
 	Log("Received a PACKET_SPAWN_OBJECT_VEHICLE from the server:");
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
-	Log("  ObjType = %d (0x%x)", ObjType, ObjType);
+	Log("  ObjType = %u (0x%x)", ObjType, ObjType);
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
-	Log("  Rotation = <yaw %d, pitch %d>", Yaw, Pitch);
-	Log("  DataIndicator = %d (0x%x)", DataIndicator, DataIndicator);
+	Log("  Rotation = <yaw %u, pitch %u>", Yaw, Pitch);
+	Log("  DataIndicator = %u (0x%x)", DataIndicator, DataIndicator);
 	if (DataIndicator != 0)
 	{
 		Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
-		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %d:", ExtraData.size());
+		DataLog(ExtraData.data(), ExtraData.size(), "  ExtraData size = %u:", static_cast<unsigned>(ExtraData.size()));
 	}
 	COPY_TO_CLIENT();
 	return true;
@@ -2361,10 +2369,10 @@ bool cConnection::HandleServerSpawnPainting(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ImageName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,         int,     Direction);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   Direction);
 	Log("Received a PACKET_SPAWN_PAINTING from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  ImageName = \"%s\"", ImageName.c_str());
@@ -2380,23 +2388,23 @@ bool cConnection::HandleServerSpawnPainting(void)
 
 bool cConnection::HandleServerSpawnPickup(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
 	AString ItemDesc;
 	if (!ParseSlot(m_ServerBuffer, ItemDesc))
 	{
 		return false;
 	}
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,   int,   PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Rotation);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadByte,    Byte,  Roll);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Roll);
 	Log("Received a PACKET_SPAWN_PICKUP from the server:");
 	Log("  EntityID = %d", EntityID);
 	Log("  Item = %s", ItemDesc.c_str());
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
-	Log("  Angles = [%d, %d, %d]", Rotation, Pitch, Roll);
+	Log("  Angles = [%u, %u, %u]", Yaw, Pitch, Roll);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2446,8 +2454,12 @@ bool cConnection::HandleServerStatusResponse(void)
 	{
 		Response.assign(Response.substr(0, idx + sizeof(DescSearch) - 1) + "ProtoProxy: " + Response.substr(idx + sizeof(DescSearch) - 1));
 	}
+	else
+	{
+		Log("Cannot find the description json element, ProtoProxy signature not inserted");
+	}
 	cByteBuffer Packet(Response.size() + 50);
-	Packet.WriteVarInt(0);  // Packet type - status response
+	Packet.WriteVarInt32(0);  // Packet type - status response
 	Packet.WriteVarUTF8String(Response);
 	AString Pkt;
 	Packet.ReadAll(Pkt);
@@ -2492,8 +2504,8 @@ bool cConnection::HandleServerTabCompletion(void)
 
 bool cConnection::HandleServerTimeUpdate(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, WorldAge);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, TimeOfDay);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt64, UInt64, WorldAge);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt64, UInt64, TimeOfDay);
 	Log("Received a PACKET_TIME_UPDATE from the server");
 	COPY_TO_CLIENT();
 	return true;
@@ -2506,7 +2518,7 @@ bool cConnection::HandleServerTimeUpdate(void)
 bool cConnection::HandleServerUpdateHealth(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Health);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, Food);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, Food);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Saturation);
 	Log("Received a PACKET_UPDATE_HEALTH from the server");
 	COPY_TO_CLIENT();
@@ -2519,9 +2531,9 @@ bool cConnection::HandleServerUpdateHealth(void)
 
 bool cConnection::HandleServerUpdateSign(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,   BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,         short, BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,           int,   BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16,       Int16,   BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   BlockZ);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line1);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line2);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line3);
@@ -2539,10 +2551,10 @@ bool cConnection::HandleServerUpdateSign(void)
 
 bool cConnection::HandleServerUpdateTileEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort,  short,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt,    int,    BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadByte,     Byte,   Action);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Action);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, DataLength);	
 
 	AString Data;
@@ -2552,8 +2564,8 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	}
 	Log("Received a PACKET_UPDATE_TILE_ENTITY from the server:");
 	Log("  Block = {%d, %d, %d}", BlockX, BlockY, BlockZ);
-	Log("  Action = %d", Action);
-	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", Data.size());
+	Log("  Action = %u", Action);
+	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", DataLength);
 
 	// Save metadata to a file:
 	AString fnam;
@@ -2576,13 +2588,13 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 
 bool cConnection::HandleServerUseBed(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BedX);
-	HANDLE_SERVER_PACKET_READ(ReadByte,  Byte, BedY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt, int,  BedZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BedX);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  BedY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BedZ);
 	Log("Received a use bed packet from the server:");
-	Log("  EntityID = %d", EntityID);
-	Log("  Bed = {%d, %d, %d}", BedX, BedY, BedZ);
+	Log("  EntityID = %u", EntityID);
+	Log("  Bed = {%d, %u, %d}", BedX, BedY, BedZ);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2593,9 +2605,9 @@ bool cConnection::HandleServerUseBed(void)
 
 bool cConnection::HandleServerWindowClose(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar, char, WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, WindowID);
 	Log("Received a PACKET_WINDOW_CLOSE from the server:");
-	Log("  WindowID = %d", WindowID);
+	Log("  WindowID = %u", WindowID);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2606,20 +2618,20 @@ bool cConnection::HandleServerWindowClose(void)
 
 bool cConnection::HandleServerWindowContents(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar, char, WindowID);
-	HANDLE_SERVER_PACKET_READ(ReadBEShort, short, NumSlots);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, NumSlots);
 	Log("Received a PACKET_WINDOW_CONTENTS from the server:");
-	Log("  WindowID = %d", WindowID);
-	Log("  NumSlots = %d", NumSlots);
+	Log("  WindowID = %u", WindowID);
+	Log("  NumSlots = %u", NumSlots);
 	AStringVector Items;
-	for (short i = 0; i < NumSlots; i++)
+	for (UInt16 i = 0; i < NumSlots; i++)
 	{
 		AString Item;
 		if (!ParseSlot(m_ServerBuffer, Item))
 		{
 			return false;
 		}
-		Log("    %d: %s", i, Item.c_str());
+		Log("    %u: %s", i, Item.c_str());
 	}
 
 	COPY_TO_CLIENT();
@@ -2632,25 +2644,25 @@ bool cConnection::HandleServerWindowContents(void)
 
 bool cConnection::HandleServerWindowOpen(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowID);
-	HANDLE_SERVER_PACKET_READ(ReadChar,            char,    WindowType);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   WindowType);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Title);
-	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    NumSlots);
-	HANDLE_SERVER_PACKET_READ(ReadByte,            Byte,    UseProvidedTitle);
-	int HorseEntityID = 0;
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   NumSlots);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   UseProvidedTitle);
+	UInt32 HorseEntityID = 0;
 	if (WindowType == 11)  // Horse / Donkey / Mule
 	{
-		HANDLE_SERVER_PACKET_READ(ReadBEInt, int, intHorseInt);
+		HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, intHorseInt);
 		HorseEntityID = intHorseInt;
 	}
 	Log("Received a PACKET_WINDOW_OPEN from the server:");
-	Log("  WindowID = %d", WindowID);
-	Log("  WindowType = %d", WindowType);
-	Log("  Title = \"%s\", Use = %d", Title.c_str(), UseProvidedTitle);
-	Log("  NumSlots = %d", NumSlots);
+	Log("  WindowID = %u", WindowID);
+	Log("  WindowType = %u (0x%02x)", WindowType, WindowType);
+	Log("  Title = \"%s\", Use = %u", Title.c_str(), UseProvidedTitle);
+	Log("  NumSlots = %u", NumSlots);
 	if (WindowType == 11)
 	{
-		Log("  HorseEntityID = %d (0x%08x)", HorseEntityID, HorseEntityID);
+		Log("  HorseEntityID = %u (0x%08x)", HorseEntityID, HorseEntityID);
 	}
 	COPY_TO_CLIENT();
 	return true;
@@ -2680,7 +2692,7 @@ bool cConnection::HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_Packet
 bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 {
 	short ItemType;
-	if (!a_Buffer.ReadBEShort(ItemType))
+	if (!a_Buffer.ReadBEInt16(ItemType))
 	{
 		return false;
 	}
@@ -2693,11 +2705,11 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	{
 		return false;
 	}
-	char ItemCount;
-	short ItemDamage;
+	Int8 ItemCount;
+	Int16 ItemDamage;
 	UInt16 MetadataLength;
-	a_Buffer.ReadChar(ItemCount);  // We already know we can read these bytes - we checked before.
-	a_Buffer.ReadBEShort(ItemDamage);
+	a_Buffer.ReadBEInt8(ItemCount);  // We already know we can read these bytes - we checked before.
+	a_Buffer.ReadBEInt16(ItemDamage);
 	a_Buffer.ReadBEUInt16(MetadataLength);
 	Printf(a_ItemDesc, "%d:%d * %d", ItemType, ItemDamage, ItemCount);
 	if (MetadataLength <= 0)
@@ -2734,8 +2746,8 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 
 bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 {
-	Byte x;
-	if (!a_Buffer.ReadByte(x))
+	UInt8 x;
+	if (!a_Buffer.ReadBEUInt8(x))
 	{
 		return false;
 	}
@@ -2763,7 +2775,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 				}
 				rs = rs - static_cast<int>(a_Buffer.GetReadableSpace());
 				cByteBuffer LenBuf(8);
-				LenBuf.WriteVarInt(Len);
+				LenBuf.WriteVarInt32(Len);
 				AString VarLen;
 				LenBuf.ReadAll(VarLen);
 				a_Metadata.append(VarLen);
@@ -2800,7 +2812,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 			return false;
 		}
 		a_Metadata.append(data);
-		if (!a_Buffer.ReadByte(x))
+		if (!a_Buffer.ReadBEUInt8(x))
 		{
 			return false;
 		}
@@ -2826,7 +2838,7 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 		{
 			case 0:
 			{
-				Log("%sbyte[%u] = %d", Indent.c_str(), Index, a_Metadata[pos + 1]);
+				Log("%sbyte[%u] = %u", Indent.c_str(), Index, static_cast<unsigned char>(a_Metadata[pos + 1]));
 				pos += 1;
 				break;
 			}
@@ -2940,15 +2952,15 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	// Send the packet to the server:
 	Log("Sending PACKET_ENCRYPTION_KEY_RESPONSE to the SERVER");
 	cByteBuffer ToServer(1024);
-	ToServer.WriteByte(0x01);  // To server: Encryption key response
-	ToServer.WriteBEShort((short)sizeof(EncryptedSecret));
+	ToServer.WriteBEUInt8(0x01);  // To server: Encryption key response
+	ToServer.WriteBEUInt16(static_cast<UInt16>(sizeof(EncryptedSecret)));
 	ToServer.WriteBuf(EncryptedSecret, sizeof(EncryptedSecret));
-	ToServer.WriteBEShort((short)sizeof(EncryptedNonce));
+	ToServer.WriteBEUInt16(static_cast<UInt16>(sizeof(EncryptedNonce)));
 	ToServer.WriteBuf(EncryptedNonce, sizeof(EncryptedNonce));
-	DataLog(EncryptedSecret, sizeof(EncryptedSecret), "Encrypted secret (%u bytes)", (unsigned)sizeof(EncryptedSecret));
-	DataLog(EncryptedNonce,  sizeof(EncryptedNonce),  "Encrypted nonce (%u bytes)",  (unsigned)sizeof(EncryptedNonce));
+	DataLog(EncryptedSecret, sizeof(EncryptedSecret), "Encrypted secret (%u bytes)", static_cast<unsigned>(sizeof(EncryptedSecret)));
+	DataLog(EncryptedNonce,  sizeof(EncryptedNonce),  "Encrypted nonce (%u bytes)",  static_cast<unsigned>(sizeof(EncryptedNonce)));
 	cByteBuffer Len(5);
-	Len.WriteVarInt(static_cast<UInt32>(ToServer.GetReadableSpace()));
+	Len.WriteVarInt32(static_cast<UInt32>(ToServer.GetReadableSpace()));
 	SERVERSEND(Len);
 	SERVERSEND(ToServer);
 	m_ServerState = csEncryptedUnderstood;

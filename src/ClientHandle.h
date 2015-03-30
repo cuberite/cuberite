@@ -144,7 +144,7 @@ public:  // tolua_export
 	// (Please keep these alpha-sorted)
 	void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
-	void SendBlockBreakAnim             (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
+	void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage);
 	void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendChat                       (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
@@ -276,16 +276,18 @@ public:  // tolua_export
 	
 	/** Called when the protocol receives a MC|AdvCdm plugin message, indicating that the player set a new
 	command in the command block UI, for an entity-based commandblock (minecart?). */
-	void HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand);
+	void HandleCommandBlockEntityChange(UInt32 a_EntityID, const AString & a_NewCommand);
 	
-	void HandleCreativeInventory      (short a_SlotNum, const cItem & a_HeldItem);
+	/** Called when the client clicks the creative inventory window.
+	a_ClickAction specifies whether the click was inside the window or not (caLeftClick or caLeftClickOutside). */
+	void HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction);
 
 	/** Called when the player enchants an Item in the Enchanting table UI. */
-	void HandleEnchantItem(Byte a_WindowID, Byte a_Enchantment);
+	void HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment);
 
-	void HandleEntityCrouch           (int a_EntityID, bool a_IsCrouching);
-	void HandleEntityLeaveBed         (int a_EntityID);
-	void HandleEntitySprinting        (int a_EntityID, bool a_IsSprinting);
+	void HandleEntityCrouch           (UInt32 a_EntityID, bool a_IsCrouching);
+	void HandleEntityLeaveBed         (UInt32 a_EntityID);
+	void HandleEntitySprinting        (UInt32 a_EntityID, bool a_IsSprinting);
 	
 	/** Kicks the client if the same username is already logged in.
 	Returns false if the client has been kicked, true otherwise. */
@@ -298,7 +300,7 @@ public:  // tolua_export
 	bool HandleHandshake        (const AString & a_Username);
 	
 	void HandleKeepAlive        (int a_KeepAliveID);
-	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status);
+	void HandleLeftClick        (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status);
 	
 	/** Called when the protocol receives a MC|TrSel packet, indicating that the player used a trade in
 	the NPC UI. */
@@ -312,7 +314,7 @@ public:  // tolua_export
 	void HandlePluginMessage    (const AString & a_Channel, const AString & a_Message);
 	void HandleRespawn          (void);
 	void HandleRightClick       (int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, const cItem & a_HeldItem);
-	void HandleSlotSelected     (short a_SlotNum);
+	void HandleSlotSelected     (Int16 a_SlotNum);
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text);
 	void HandleUpdateSign       (
@@ -321,9 +323,9 @@ public:  // tolua_export
 		const AString & a_Line3, const AString & a_Line4
 	);
 	void HandleUnmount          (void);
-	void HandleUseEntity        (int a_TargetEntityID, bool a_IsLeftClick);
-	void HandleWindowClick      (char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
-	void HandleWindowClose      (char a_WindowID);
+	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
+	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
+	void HandleWindowClose      (UInt8 a_WindowID);
 
 	/** Called when the protocol has finished logging the user in.
 	Return true to allow the user in; false to kick them.

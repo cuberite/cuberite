@@ -24,7 +24,7 @@ public:
 	// tolua_begin
 
 	/** Returns the item in the frame */
-	const cItem & GetItem(void) { return m_Item; }
+	const cItem & GetItem(void) const { return m_Item; }
 
 	/** Set the item in the frame */
 	void SetItem(cItem & a_Item) { m_Item = a_Item; }

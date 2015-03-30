@@ -132,13 +132,15 @@
 
 
 // Integral types with predefined sizes:
-typedef long long Int64;
-typedef int       Int32;
-typedef short     Int16;
+typedef signed long long Int64;
+typedef signed int       Int32;
+typedef signed short     Int16;
+typedef signed char      Int8;
 
 typedef unsigned long long UInt64;
 typedef unsigned int       UInt32;
 typedef unsigned short     UInt16;
+typedef unsigned char      UInt8;
 
 typedef unsigned char Byte;
 
@@ -156,10 +158,12 @@ class SizeChecker<T, Size, true>
 template class SizeChecker<Int64, 8>;
 template class SizeChecker<Int32, 4>;
 template class SizeChecker<Int16, 2>;
+template class SizeChecker<Int8,  1>;
 
 template class SizeChecker<UInt64, 8>;
 template class SizeChecker<UInt32, 4>;
 template class SizeChecker<UInt16, 2>;
+template class SizeChecker<UInt8,  1>;
 
 // A macro to disallow the copy constructor and operator = functions
 // This should be used in the private: declarations for any class that shouldn't allow copying itself

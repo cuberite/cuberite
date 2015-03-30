@@ -248,28 +248,31 @@ public:
 
 
 protected:
-	/// Maps player's EntityID -> current recipe; not a std::map because cCraftingGrid needs proper constructor params
-	typedef std::list<std::pair<int, cCraftingRecipe> > cRecipeMap;
+	/** Maps player's EntityID -> current recipe.
+	Not a std::map because cCraftingGrid needs proper constructor params. */
+	typedef std::list<std::pair<UInt32, cCraftingRecipe> > cRecipeMap;
 	
 	int        m_GridSize;
 	cRecipeMap m_Recipes;
 	
-	/// Handles a click in the result slot. Crafts using the current recipe, if possible
+	/** Handles a click in the result slot.
+	Crafts using the current recipe, if possible. */
 	void ClickedResult(cPlayer & a_Player);
 	
-	/// Handles a shift-click in the result slot. Crafts using the current recipe until it changes or no more space for result.
+	/** Handles a shift-click in the result slot.
+	Crafts using the current recipe until it changes or no more space for result. */
 	void ShiftClickedResult(cPlayer & a_Player);
 
 	/** Handles a drop-click in the result slot. */
 	void DropClickedResult(cPlayer & a_Player);
 
-	/// Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the specified player
+	/** Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the specified player. */
 	void UpdateRecipe(cPlayer & a_Player);
 	
-	/// Retrieves the recipe for the specified player from the map, or creates one if not found
+	/** Retrieves the recipe for the specified player from the map, or creates one if not found. */
 	cCraftingRecipe & GetRecipeForPlayer(cPlayer & a_Player);
 
-	/// Called after an item has been crafted to handle statistics e.t.c.
+	/** Called after an item has been crafted to handle statistics e.t.c. */
 	void HandleCraftItem(const cItem & a_Result, cPlayer & a_Player);
 } ;
 

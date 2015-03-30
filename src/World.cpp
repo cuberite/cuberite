@@ -1920,7 +1920,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
 	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
 	FallingBlock->Initialize(*this);
@@ -1931,11 +1931,12 @@ int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NI
 
 
 
-int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
 	if (a_Reward < 1)
 	{
-		return -1;
+		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
+		return cEntity::INVALID_ID;
 	}
 
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
@@ -1947,7 +1948,7 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 
 
 
-int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	cMinecart * Minecart;
 	switch (a_MinecartType)
@@ -1959,7 +1960,7 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
 		default:
 		{
-			return -1;
+			return cEntity::INVALID_ID;
 		}
 	}  // switch (a_MinecartType)
 	Minecart->Initialize(*this);
@@ -1970,7 +1971,7 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 
 
 
-void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
 	TNT->Initialize(*this);
@@ -1979,6 +1980,7 @@ void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks,
 		a_InitialVelocityCoeff * 2,
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
 	);
+	return TNT->GetUniqueID();
 }
 
 
@@ -2069,7 +2071,7 @@ void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 
 
-void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
 }
@@ -2906,7 +2908,7 @@ bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 
 
-bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
+bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 {
 	// First check the entities-to-add:
 	{
@@ -3215,7 +3217,7 @@ void cWorld::AddEntity(cEntity * a_Entity)
 
 
 
-bool cWorld::HasEntity(int a_UniqueID)
+bool cWorld::HasEntity(UInt32 a_UniqueID)
 {
 	// Check if the entity is in the queue to be added to the world:
 	{
@@ -3332,15 +3334,16 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
+UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
 {
 	cMonster * Monster = nullptr;
 
 	Monster = cMonster::NewMonsterFromType(a_MonsterType);
-	if (Monster != nullptr)
+	if (Monster == nullptr)
 	{
-		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
+		return cEntity::INVALID_ID;
 	}
+	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	
 	return SpawnMobFinalize(Monster);
 }
@@ -3348,13 +3351,9 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a
 
 
 
-int cWorld::SpawnMobFinalize(cMonster * a_Monster)
+UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 {
-	// Invalid cMonster object. Bail out.
-	if (!a_Monster)
-	{
-		return -1;
-	}
+	ASSERT(a_Monster != nullptr);
 
 	// Give the mob  full health.
 	a_Monster->SetHealth(a_Monster->GetMaxHealth());
@@ -3364,7 +3363,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	{
 		delete a_Monster;
 		a_Monster = nullptr;
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 
 	// Initialize the monster into the current world.
@@ -3372,7 +3371,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	{
 		delete a_Monster;
 		a_Monster = nullptr;
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
@@ -3384,18 +3383,18 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == nullptr)
 	{
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
 		Projectile = nullptr;
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 	return Projectile->GetUniqueID();
 }

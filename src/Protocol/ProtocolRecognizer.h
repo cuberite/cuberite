@@ -50,7 +50,7 @@ public:
 	/// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
-	virtual void SendBlockBreakAnim             (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
+	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendChat                       (const AString & a_Message) override;
@@ -136,9 +136,12 @@ protected:
 	
 	/** Tries to recognize a protocol in the lengthed family (1.7+), based on m_Buffer; returns true if recognized.
 	The packet length and type have already been read, type is 0
-	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining
-	**/
+	The number of bytes remaining in the packet is passed as a_PacketLengthRemaining. **/
 	bool TryRecognizeLengthedProtocol(UInt32 a_PacketLengthRemaining);
+
+	/** Sends a single packet contained within the cPacketizer class.
+	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
+	virtual void SendPacket(cPacketizer & a_Pkt) override;
 } ;
 
 

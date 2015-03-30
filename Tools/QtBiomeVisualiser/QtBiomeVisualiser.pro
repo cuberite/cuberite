@@ -22,6 +22,7 @@ SOURCES += \
 	../../src/LoggerListeners.cpp \
 	../../src/Logger.cpp \
 	../../src/IniFile.cpp \
+	../../src/OSSupport/Event.cpp \
 	../../src/OSSupport/File.cpp \
 	../../src/OSSupport/CriticalSection.cpp \
 	../../src/OSSupport/IsThread.cpp \
@@ -69,6 +70,7 @@ HEADERS += \
 	../../src/LoggerListeners.h \
 	../../src/Logger.h \
 	../../src/IniFile.h \
+	../../src/OSSupport/Event.h \
 	../../src/OSSupport/File.h \
 	../../src/OSSupport/CriticalSection.h \
 	../../src/OSSupport/IsThread.h \

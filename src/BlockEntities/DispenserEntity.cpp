@@ -105,7 +105,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 		{
 			double MobX = 0.5 + (DispX + DispChunk->GetPosX() * cChunkDef::Width);
 			double MobZ = 0.5 + (DispZ + DispChunk->GetPosZ() * cChunkDef::Width);
-			if (m_World->SpawnMob(MobX, DispY, MobZ, static_cast<eMonsterType>(m_Contents.GetSlot(a_SlotNum).m_ItemDamage)) >= 0)
+			if (m_World->SpawnMob(MobX, DispY, MobZ, static_cast<eMonsterType>(m_Contents.GetSlot(a_SlotNum).m_ItemDamage)) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -144,29 +144,37 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case E_ITEM_FIRE_CHARGE:
 		{
-			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkFireCharge, GetShootVector(Meta) * 20);
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			if (SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkFireCharge, GetShootVector(Meta) * 20) != cEntity::INVALID_ID)
+			{
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			}
 			break;
 		}
 
 		case E_ITEM_ARROW:
 		{
-			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkArrow, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0));
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			if (SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkArrow, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			{
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			}
 			break;
 		}
 
 		case E_ITEM_SNOWBALL:
 		{
-			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkSnowball, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0));
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			if (SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkSnowball, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			{
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			}
 			break;
 		}
 
 		case E_ITEM_EGG:
 		{
-			SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkEgg, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0));
-			m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			if (SpawnProjectileFromDispenser(BlockX, DispY, BlockZ, cProjectileEntity::pkEgg, GetShootVector(Meta) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			{
+				m_Contents.ChangeSlotCount(a_SlotNum, -1);
+			}
 			break;
 		}
 
@@ -188,9 +196,14 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 
 
-void cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_ShootVector)
+UInt32 cDispenserEntity::SpawnProjectileFromDispenser(int a_BlockX, int a_BlockY, int a_BlockZ, cProjectileEntity::eKind a_Kind, const Vector3d & a_ShootVector)
 {
-	m_World->CreateProjectile(static_cast<double>(a_BlockX + 0.5), static_cast<double>(a_BlockY + 0.5), static_cast<double>(a_BlockZ + 0.5), a_Kind, nullptr, nullptr, &a_ShootVector);
+	return m_World->CreateProjectile(
+		static_cast<double>(a_BlockX + 0.5),
+		static_cast<double>(a_BlockY + 0.5),
+		static_cast<double>(a_BlockZ + 0.5),
+		a_Kind, nullptr, nullptr, &a_ShootVector
+	);
 }
 
 

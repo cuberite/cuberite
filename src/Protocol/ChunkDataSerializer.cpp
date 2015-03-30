@@ -187,11 +187,11 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 
 	// Create the packet:
 	cByteBuffer Packet(512 KiB);
-	Packet.WriteVarInt(0x21);  // Packet id (Chunk Data packet)
-	Packet.WriteBEInt(a_ChunkX);
-	Packet.WriteBEInt(a_ChunkZ);
-	Packet.WriteBool(true);  // "Ground-up continuous", or rather, "biome data present" flag
-	Packet.WriteBEUShort(0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
+	Packet.WriteVarInt32(0x21);  // Packet id (Chunk Data packet)
+	Packet.WriteBEInt32(a_ChunkX);
+	Packet.WriteBEInt32(a_ChunkZ);
+	Packet.WriteBool(true);        // "Ground-up continuous", or rather, "biome data present" flag
+	Packet.WriteBEUInt16(0xffff);  // We're aways sending the full chunk with no additional data, so the bitmap is 0xffff
 
 	// Write the chunk size:
 	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
@@ -201,15 +201,15 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 		sizeof(m_BlockSkyLight) +     // Block sky light
 		BiomeDataSize                 // Biome data
 	);
-	Packet.WriteVarInt(ChunkSize);
+	Packet.WriteVarInt32(ChunkSize);
 
 	// Write the block types to the packet:
 	for (size_t Index = 0; Index < cChunkDef::NumBlocks; Index++)
 	{
 		BLOCKTYPE BlockType = m_BlockTypes[Index] & 0xFF;
 		NIBBLETYPE BlockMeta = m_BlockMetas[Index / 2] >> ((Index & 1) * 4) & 0x0f;
-		Packet.WriteByte((unsigned char)(BlockType << 4) | BlockMeta);
-		Packet.WriteByte((unsigned char)(BlockType >> 4));
+		Packet.WriteBEUInt8(static_cast<unsigned char>(BlockType << 4) | BlockMeta);
+		Packet.WriteBEUInt8(static_cast<unsigned char>(BlockType >> 4));
 	}
 
 	// Write the rest:
@@ -234,8 +234,8 @@ void cChunkDataSerializer::Serialize47(AString & a_Data, int a_ChunkX, int a_Chu
 	else
 	{
 		AString PostData;
-		Buffer.WriteVarInt((UInt32)Packet.GetUsedSpace() + 1);
-		Buffer.WriteVarInt(0);
+		Buffer.WriteVarInt32(static_cast<UInt32>(Packet.GetUsedSpace() + 1));
+		Buffer.WriteVarInt32(0);
 		Buffer.ReadAll(PostData);
 		Buffer.CommitRead();
 

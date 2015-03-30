@@ -62,7 +62,7 @@ public:
 	/** Sending stuff to clients (alphabetically sorted): */
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) override;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
-	virtual void SendBlockBreakAnim	            (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
+	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) override;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendChat                       (const AString & a_Message) override;
@@ -150,96 +150,6 @@ public:
 
 protected:
 
-	/** Composes individual packets in the protocol's m_OutPacketBuffer; sends them upon being destructed */
-	class cPacketizer
-	{
-	public:
-		cPacketizer(cProtocol180 & a_Protocol, UInt32 a_PacketType) :
-			m_Protocol(a_Protocol),
-			m_Out(a_Protocol.m_OutPacketBuffer),
-			m_Lock(a_Protocol.m_CSPacket)
-		{
-			m_Out.WriteVarInt(a_PacketType);
-		}
-		
-		~cPacketizer();
-
-		void WriteBool(bool a_Value)
-		{
-			m_Out.WriteBool(a_Value);
-		}
-		
-		void WriteByte(Byte a_Value)
-		{
-			m_Out.WriteByte(a_Value);
-		}
-		
-		void WriteChar(char a_Value)
-		{
-			m_Out.WriteChar(a_Value);
-		}
-		
-		void WriteShort(short a_Value)
-		{
-			m_Out.WriteBEShort(a_Value);
-		}
-		
-		void WriteInt(int a_Value)
-		{
-			m_Out.WriteBEInt(a_Value);
-		}
-		
-		void WriteInt64(Int64 a_Value)
-		{
-			m_Out.WriteBEInt64(a_Value);
-		}
-		
-		void WriteFloat(float a_Value)
-		{
-			m_Out.WriteBEFloat(a_Value);
-		}
-		
-		void WriteDouble(double a_Value)
-		{
-			m_Out.WriteBEDouble(a_Value);
-		}
-		
-		void WriteVarInt(UInt32 a_Value)
-		{
-			m_Out.WriteVarInt(a_Value);
-		}
-		
-		void WriteString(const AString & a_Value)
-		{
-			m_Out.WriteVarUTF8String(a_Value);
-		}
-
-		void WritePosition(int a_BlockX, int a_BlockY, int a_BlockZ)
-		{
-			m_Out.WritePosition(a_BlockX, a_BlockY, a_BlockZ);
-		}
-		
-		void WriteUUID(const AString & a_UUID);
-		
-		void WriteBuf(const char * a_Data, size_t a_Size)
-		{
-			m_Out.Write(a_Data, a_Size);
-		}
-		
-		void WriteItem(const cItem & a_Item);
-		void WriteByteAngle(double a_Angle);  // Writes the specified angle using a single byte
-		void WriteFPInt(double a_Value);  // Writes the double value as a 27:5 fixed-point integer
-		void WriteEntityMetadata(const cEntity & a_Entity);  // Writes the metadata for the specified entity, not including the terminating 0x7f
-		void WriteMobMetadata(const cMonster & a_Mob);  // Writes the mob-specific metadata for the specified mob
-		void WriteEntityProperties(const cEntity & a_Entity);  // Writes the entity properties for the specified entity, including the Count field
-		void WriteBlockEntity(const cBlockEntity & a_BlockEntity);
-		
-	protected:
-		cProtocol180 & m_Protocol;
-		cByteBuffer & m_Out;
-		cCSLock m_Lock;
-	} ;
-
 	AString m_ServerAddress;
 	
 	UInt16 m_ServerPort;
@@ -251,12 +161,6 @@ protected:
 
 	/** Buffer for the received data */
 	cByteBuffer m_ReceivedData;
-	
-	/** Buffer for composing the outgoing packets, through cPacketizer */
-	cByteBuffer m_OutPacketBuffer;
-	
-	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
-	cByteBuffer m_OutPacketLenBuffer;
 	
 	bool m_IsEncrypted;
 	
@@ -320,6 +224,9 @@ protected:
 	/** Sends the data to the client, encrypting them if needed. */
 	virtual void SendData(const char * a_Data, size_t a_Size) override;
 
+	/** Sends the packet to the client. Called by the cPacketizer's destructor. */
+	virtual void SendPacket(cPacketizer & a_Packet) override;
+
 	void SendCompass(const cWorld & a_World);
 	
 	/** Reads an item out of the received data, sets a_Item to the values read.
@@ -332,6 +239,24 @@ protected:
 	
 	void StartEncryption(const Byte * a_Key);
 
+	/** Converts the BlockFace received by the protocol into eBlockFace constants.
+	If the received value doesn't match any of our eBlockFace constants, BLOCK_FACE_NONE is returned. */
+	eBlockFace FaceIntToBlockFace(Int8 a_FaceInt);
+
+	/** Writes the item data into a packet. */
+	void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item);
+
+	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
+	void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity);
+
+	/** Writes the mob-specific metadata for the specified mob */
+	void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob);
+
+	/** Writes the entity properties for the specified entity, including the Count field. */
+	void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity);
+
+	/** Writes the block entity data for the specified block entity into the packet. */
+	void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity);
 } ;
 
 

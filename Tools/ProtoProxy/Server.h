@@ -21,7 +21,7 @@ class cServer
 	SOCKET m_ListenSocket;
 	cRsaPrivateKey m_PrivateKey;
 	AString m_PublicKeyDER;
-	short m_ConnectPort;
+	UInt16 m_ConnectPort;
 	
 public:
 	cServer(void);
@@ -32,7 +32,7 @@ public:
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
 	const AString & GetPublicKeyDER (void) { return m_PublicKeyDER; }
 	
-	short GetConnectPort(void) const { return m_ConnectPort; }
+	UInt16 GetConnectPort(void) const { return m_ConnectPort; }
 } ;
 
 

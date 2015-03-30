@@ -59,6 +59,18 @@ inline Int64 NetworkToHostLong8(const void * a_Value)
 
 
 
+inline UInt64 NetworkToHostULong8(const void * a_Value)
+{
+	UInt64 buf;
+	memcpy(&buf, a_Value, 8);
+	buf = ntohll(buf);
+	return buf;
+}
+
+
+
+
+
 inline float NetworkToHostFloat4(const void * a_Value)
 {
 	UInt32 buf;
