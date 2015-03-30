@@ -262,8 +262,12 @@ class cIntGenZoom :
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
 
 protected:
-	static const int m_LowerSizeX = (SizeX / 2) + 2;
-	static const int m_LowerSizeZ = (SizeZ / 2) + 2;
+
+	enum
+	{
+		m_LowerSizeX = (SizeX / 2) + 2,
+		m_LowerSizeZ = (SizeZ / 2) + 2
+	};
 
 public:
 	typedef std::shared_ptr<cIntGen<m_LowerSizeX, m_LowerSizeZ>> Underlying;
@@ -283,8 +287,11 @@ public:
 		int lowerMinZ = a_MinZ >> 1;
 		int lowerData[m_LowerSizeX * m_LowerSizeZ];
 		m_UnderlyingGen->GetInts(lowerMinX, lowerMinZ, lowerData);
-		const int lowStepX = (m_LowerSizeX - 1) * 2;
-		const int lowStepZ = (m_LowerSizeZ - 1) * 2;
+		enum
+		{
+			lowStepX = (m_LowerSizeX - 1) * 2,
+			lowStepZ = (m_LowerSizeZ - 1) * 2
+		};
 		int cache[lowStepX * lowStepZ];
 
 		// Discreet-interpolate the values into twice the size:
@@ -332,8 +339,11 @@ class cIntGenSmooth :
 	public cIntGenWithNoise<SizeX, SizeZ>
 {
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
-	static const int m_LowerSizeX = SizeX + 2;
-	static const int m_LowerSizeZ = SizeZ + 2;
+	enum
+	{
+		m_LowerSizeX = SizeX + 2,
+		m_LowerSizeZ = SizeZ + 2
+	};
 
 public:
 	typedef std::shared_ptr<cIntGen<m_LowerSizeX, m_LowerSizeZ>> Underlying;
@@ -408,8 +418,11 @@ class cIntGenBeaches :
 	public cIntGen<SizeX, SizeZ>
 {
 	typedef cIntGen<SizeX, SizeZ> super;
-	static const int m_UnderlyingSizeX = SizeX + 2;
-	static const int m_UnderlyingSizeZ = SizeZ + 2;
+	enum
+	{
+		m_UnderlyingSizeX = SizeX + 2,
+		m_UnderlyingSizeZ = SizeZ + 2
+	};
 
 public:
 	typedef std::shared_ptr<cIntGen<m_UnderlyingSizeX, m_UnderlyingSizeZ>> Underlying;
@@ -560,8 +573,11 @@ class cIntGenBiomeGroupEdges :
 {
 	typedef cIntGen<SizeX, SizeZ> super;
 
-	static const int m_UnderlyingSizeX = SizeX + 2;
-	static const int m_UnderlyingSizeZ = SizeZ + 2;
+	enum
+	{
+		m_UnderlyingSizeX = SizeX + 2,
+		m_UnderlyingSizeZ = SizeZ + 2
+	};
 
 public:
 
@@ -920,8 +936,11 @@ class cIntGenRiver:
 	public cIntGenWithNoise<SizeX, SizeZ>
 {
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
-	static const int UnderlyingSizeX = SizeX + 2;
-	static const int UnderlyingSizeZ = SizeZ + 2;
+	enum
+	{
+		UnderlyingSizeX = SizeX + 2,
+		UnderlyingSizeZ = SizeZ + 2
+	};
 
 public:
 	typedef std::shared_ptr<cIntGen<UnderlyingSizeX, UnderlyingSizeZ>> Underlying;
@@ -979,8 +998,11 @@ class cIntGenAddToOcean:
 	public cIntGenWithNoise<SizeX, SizeZ>
 {
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
-	static const int UnderlyingSizeX = SizeX + 2;
-	static const int UnderlyingSizeZ = SizeZ + 2;
+	enum
+	{
+		UnderlyingSizeX = SizeX + 2,
+		UnderlyingSizeZ = SizeZ + 2
+	};
 
 public:
 	typedef std::shared_ptr<cIntGen<UnderlyingSizeX, UnderlyingSizeZ>> Underlying;
@@ -1245,8 +1267,12 @@ class cIntGenBiomeEdges:
 	public cIntGenWithNoise<SizeX, SizeZ>
 {
 	typedef cIntGenWithNoise<SizeX, SizeZ> super;
-	static const int m_LowerSizeX = SizeX + 2;
-	static const int m_LowerSizeZ = SizeZ + 2;
+	
+	enum
+	{
+		m_LowerSizeX = SizeX + 2,
+		m_LowerSizeZ = SizeZ + 2
+	};
 
 public:
 	typedef std::shared_ptr<cIntGen<m_LowerSizeX, m_LowerSizeZ>> Underlying;
