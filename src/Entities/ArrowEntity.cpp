@@ -21,8 +21,11 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, double a_X, double a_Y, double a
 {
 	SetSpeed(a_Speed);
 	SetMass(0.1);
+<<<<<<< HEAD
 	SetGravity(-20.0f);
 	SetAirDrag(0.2);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	LOGD("Created arrow %d with speed {%.02f, %.02f, %.02f} and rot {%.02f, %.02f}",

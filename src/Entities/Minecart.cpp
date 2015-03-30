@@ -92,9 +92,13 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 	m_DetectorRailPosition(0, 0, 0),
 	m_bIsOnDetectorRail(false)
 {
+<<<<<<< HEAD
 	SetMass(20.0f);
 	SetGravity(-16.0f);
 	SetAirDrag(1.0f);
+=======
+	SetMass(20.f);
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 	SetMaxHealth(6);
 	SetHealth(6);
 	SetWidth(1);

@@ -11,8 +11,11 @@
 cBlaze::cBlaze(void) :
 	super("Blaze", mtBlaze, "mob.blaze.hit", "mob.blaze.death", 0.6, 1.8)
 {
+<<<<<<< HEAD
 	SetGravity(-8.0f);
 	SetAirDrag(0.8f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 

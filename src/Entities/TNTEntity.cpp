@@ -12,8 +12,11 @@ cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks) :
 	super(etTNT, a_X, a_Y, a_Z, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
+<<<<<<< HEAD
 	SetGravity(-16.0f);
 	SetAirDrag(0.4f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 
@@ -24,8 +27,11 @@ cTNTEntity::cTNTEntity(const Vector3d & a_Pos, int a_FuseTicks) :
 	super(etTNT, a_Pos.x, a_Pos.y, a_Pos.z, 0.98, 0.98),
 	m_FuseTicks(a_FuseTicks)
 {
+<<<<<<< HEAD
 	SetGravity(-16.0f);
 	SetAirDrag(0.4f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 

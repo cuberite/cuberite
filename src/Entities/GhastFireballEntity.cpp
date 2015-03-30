@@ -12,7 +12,6 @@ cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, double a_X, doub
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);
-	SetAirDrag(0);
 }
 
 

@@ -13,8 +13,11 @@ cPawn::cPawn(eEntityType a_EntityType, double a_Width, double a_Height) :
 	super(a_EntityType, 0, 0, 0, a_Width, a_Height)
 	, m_EntityEffects(tEffectMap())
 {
+<<<<<<< HEAD
 	SetGravity(-32.0f);
 	SetAirDrag(0.4f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 

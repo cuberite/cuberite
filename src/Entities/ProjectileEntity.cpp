@@ -227,8 +227,11 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	),
 	m_IsInGround(false)
 {
+<<<<<<< HEAD
 	SetGravity(-12.0f);
 	SetAirDrag(0.2f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 
@@ -244,8 +247,11 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 	SetSpeed(a_Speed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
+<<<<<<< HEAD
 	SetGravity(-12.0f);
 	SetAirDrag(0.2f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 
