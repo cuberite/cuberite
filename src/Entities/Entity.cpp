@@ -36,7 +36,7 @@ cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, d
 	m_bHasSentNoSpeed(true),
 	m_bOnGround(false),
 	m_Gravity(-9.81f),
-	m_AirDrag(0.4f),
+	m_AirDrag(0.02f),
 	m_LastPos(a_X, a_Y, a_Z),
 	m_IsInitialized(false),
 	m_WorldTravellingFrom(nullptr),
@@ -944,7 +944,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			// Normal gravity
 			fallspeed = m_Gravity * DtSec.count();
-			NextSpeed -= NextSpeed * m_AirDrag * DtSec.count();
+			NextSpeed -= NextSpeed * (m_AirDrag * 20.0f) * DtSec.count();
 		}
 		NextSpeed.y += static_cast<float>(fallspeed);
 	}

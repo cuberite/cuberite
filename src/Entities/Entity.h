@@ -508,8 +508,10 @@ protected:
 	For realistic effects, this should be negative. For spaaaaaaace, this can be zero or even positive */
 	float m_Gravity;
 	
-	/** Stores the air drag that is applied to the entity every tick, measured in speed ratio per second
-	Acts as air friction and slows down flight */
+	/** Stores the air drag that is applied to the entity every tick, measured in speed ratio per tick
+	Acts as air friction and slows down flight
+	Will be interpolated if the server tick rate varies
+	Data: http://minecraft.gamepedia.com/Entity#Motion_of_entities */
 	float m_AirDrag;
 
 	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)

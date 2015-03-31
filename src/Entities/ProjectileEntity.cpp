@@ -228,7 +228,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	m_IsInGround(false)
 {
 	SetGravity(-12.0f);
-	SetAirDrag(0.2f);
+	SetAirDrag(0.01f);
 }
 
 
@@ -245,7 +245,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
 	SetGravity(-12.0f);
-	SetAirDrag(0.2f);
+	SetAirDrag(0.01f);
 }
 
 
@@ -395,7 +395,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 	// Add slowdown and gravity effect to the speed:
 	Vector3d NewSpeed(GetSpeed());
 	NewSpeed.y += m_Gravity * DtSec.count();
-	NewSpeed -= NewSpeed * m_AirDrag * DtSec.count();
+	NewSpeed -= NewSpeed * (m_AirDrag * 20.0f) * DtSec.count();
 	SetSpeed(NewSpeed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();

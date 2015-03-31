@@ -13,7 +13,7 @@ cTNTEntity::cTNTEntity(double a_X, double a_Y, double a_Z, int a_FuseTicks) :
 	m_FuseTicks(a_FuseTicks)
 {
 	SetGravity(-16.0f);
-	SetAirDrag(0.4f);
+	SetAirDrag(0.02f);
 }
 
 

@@ -51,7 +51,7 @@ cArrowEntity::cArrowEntity(cPlayer & a_Player, double a_Force) :
 		m_PickupState = psInCreative;
 	}
 	SetGravity(-20.0f);
-	SetAirDrag(0.2f);
+	SetAirDrag(0.01f);
 }
 
 

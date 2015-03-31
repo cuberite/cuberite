@@ -94,7 +94,7 @@ cMinecart::cMinecart(ePayload a_Payload, double a_X, double a_Y, double a_Z) :
 {
 	SetMass(20.0f);
 	SetGravity(-16.0f);
-	SetAirDrag(1.0f);
+	SetAirDrag(0.05f);
 	SetMaxHealth(6);
 	SetHealth(6);
 	SetWidth(1);
