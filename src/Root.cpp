@@ -84,7 +84,10 @@ void cRoot::InputThread(cRoot & a_Params)
 	if (m_TerminateEventRaised || !std::cin.good())
 	{
 		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
-		a_Params.m_bStop = true;
+		if (m_RunAsService)  // HACK: Dont kill if running as a service
+		{
+			a_Params.m_bStop = true;
+		}
 	}
 }
 
@@ -265,6 +268,13 @@ void cRoot::Start(void)
 	delete fileLogListener;
 }
 
+
+
+
+void cRoot::SetStopping(bool a_Stopping)
+{
+	m_bStop = a_Stopping;
+}
 
 
 

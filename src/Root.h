@@ -46,12 +46,16 @@ public:
 	// tolua_end
 
 	static bool m_TerminateEventRaised;
+	static bool m_RunAsService;
 
 
 	cRoot(void);
 	~cRoot();
 
 	void Start(void);
+
+	// Added so the service handler can request a stop
+	void SetStopping(bool a_Stopping);
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
