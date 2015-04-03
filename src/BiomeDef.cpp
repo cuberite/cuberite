@@ -338,6 +338,13 @@ int GetSnowStartHeight(EMCSBiome a_Biome)
 			// These biomes don't actualy have any downfall.
 			return 1000;
 		}
+		
+		case biNether:
+		case biEnd:
+		{
+			// These shouldn't get any snow at all.
+			return 9999;
+		}
 
 		default:
 		{
