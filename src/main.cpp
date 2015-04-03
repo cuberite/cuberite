@@ -15,6 +15,8 @@
 
 
 
+/** Make the Root instance global, so it can be terminated from the worker threads */
+cRoot Root;
 
 
 /** If something has told the server to stop; checked periodically in cRoot */
@@ -29,8 +31,15 @@ bool g_ShouldLogCommIn;
 /** If set to true, the protocols will log each player's outgoing (S->C) communication to a per-connection logfile */
 bool g_ShouldLogCommOut;
 
+/** If set to true, binary will attempt to run as a service on Windows */
+bool cRoot::m_RunAsService = false;
 
 
+#if defined(_WIN32)
+SERVICE_STATUS_HANDLE g_StatusHandle  = NULL;
+HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
+#define               SERVICE_NAME      "MCServerService"
+#endif
 
 
 /// If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
@@ -179,6 +188,165 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// universalMain - Main startup logic for both standard running and as a service
+
+void universalMain()
+{
+	#ifdef _WIN32
+	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
+	{
+		LOGERROR("Could not install the Windows CTRL handler!");
+	}
+	#endif
+
+	// Initialize logging subsystem:
+	cLogger::InitiateMultithreading();
+
+	// Initialize LibEvent:
+	cNetworkSingleton::Get();
+
+	#if !defined(ANDROID_NDK)
+	try
+	#endif
+	{
+		Root.Start();
+	}
+	#if !defined(ANDROID_NDK)
+	catch (std::exception & e)
+	{
+		LOGERROR("Standard exception: %s", e.what());
+	}
+	catch (...)
+	{
+		LOGERROR("Unknown exception!");
+	}
+	#endif
+
+	g_ServerTerminated = true;
+
+	// Shutdown all of LibEvent:
+	cNetworkSingleton::Get().Terminate();
+}
+
+
+
+
+#if defined(_WIN32)
+////////////////////////////////////////////////////////////////////////////////
+// serviceWorkerThread: Keep the service alive
+
+DWORD WINAPI serviceWorkerThread(LPVOID lpParam)
+{
+	UNREFERENCED_PARAMETER(lpParam);
+
+	// Do the normal startup
+	universalMain();
+
+	return ERROR_SUCCESS;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// serviceSetState: Set the internal status of the service
+
+void serviceSetState(DWORD acceptedControls, DWORD newState, DWORD exitCode)
+{
+	SERVICE_STATUS serviceStatus;
+	ZeroMemory(&serviceStatus, sizeof(SERVICE_STATUS));
+	serviceStatus.dwCheckPoint = 0;
+	serviceStatus.dwControlsAccepted = acceptedControls;
+	serviceStatus.dwCurrentState = newState;
+	serviceStatus.dwServiceSpecificExitCode = 0;
+	serviceStatus.dwServiceType = SERVICE_WIN32;
+	serviceStatus.dwWaitHint = 0;
+	serviceStatus.dwWin32ExitCode = exitCode;
+
+	if (SetServiceStatus(g_StatusHandle, &serviceStatus) == FALSE)
+	{
+		LOGERROR("SetServiceStatus() failed\n");
+	}
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// serviceCtrlHandler: Handle stop events from the Service Control Manager
+
+void WINAPI serviceCtrlHandler(DWORD CtrlCode)
+{
+	switch (CtrlCode)
+	{
+		case SERVICE_CONTROL_STOP:
+		{
+			Root.SetStopping(true);
+			serviceSetState(0, SERVICE_STOP_PENDING, 0);
+			break;
+		}
+
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// serviceMain: Startup logic for running as a service
+
+void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
+{
+	#if defined(_DEBUG) && defined(DEBUG_SERVICE_STARTUP)
+	Sleep(10000);
+	#endif
+	
+	char applicationFilename[MAX_PATH];
+	char applicationDirectory[MAX_PATH];
+
+	GetModuleFileName(NULL, applicationFilename, MAX_PATH);  // This binaries fill path.
+
+	// GetModuleFileName() returns the path and filename. Strip off the filename.
+	strncpy(applicationDirectory, applicationFilename, (strrchr(applicationFilename, '\\') - applicationFilename));
+	applicationDirectory[strlen(applicationDirectory)] = '\0';  // Make sure new path is null terminated
+
+	// Services are run by the SCM, and inherit its working directory - usually System32.
+	// Set the working directory to the same location as the binary.
+	SetCurrentDirectory(applicationDirectory);
+
+	g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, serviceCtrlHandler);
+	
+	if (g_StatusHandle == NULL)
+	{
+		OutputDebugString("RegisterServiceCtrlHandler() failed\n");
+		serviceSetState(0, SERVICE_STOPPED, GetLastError());
+		return;
+	}
+	
+	serviceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
+	
+	g_ServiceThread = CreateThread(NULL, 0, serviceWorkerThread, NULL, 0, NULL);
+	if (g_ServiceThread == NULL)
+	{
+		OutputDebugString("CreateThread() failed\n");
+		serviceSetState(0, SERVICE_STOPPED, GetLastError());
+		return;
+	}
+	WaitForSingleObject(g_ServiceThread, INFINITE);  // Wait here for a stop signal.
+	
+	CloseHandle(g_ServiceThread);
+	
+	serviceSetState(0, SERVICE_STOPPED, 0);
+}
+#endif
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // main:
@@ -219,13 +387,6 @@ int main( int argc, char **argv)
 	#endif  // _WIN32 && !_WIN64
 	// End of dump-file magic
 
-	#ifdef _WIN32
-	if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
-	{
-		LOGERROR("Could not install the Windows CTRL handler!");
-	}
-	#endif
-	
 	#if defined(_DEBUG) && defined(_MSC_VER)
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	
@@ -280,41 +441,38 @@ int main( int argc, char **argv)
 		{
 			setvbuf(stdout, nullptr, _IONBF, 0);
 		}
+		else if (NoCaseCompare(Arg, "/service") == 0)
+		{
+			cRoot::m_RunAsService = true;
+		}
 	}  // for i - argv[]
-	
-	// Initialize logging subsystem:
-	cLogger::InitiateMultithreading();
-	
-	// Initialize LibEvent:
-	cNetworkSingleton::Get();
-	
-	#if !defined(ANDROID_NDK)
-	try
-	#endif
-	{
-		cRoot Root;
-		Root.Start();
-	}
-	#if !defined(ANDROID_NDK)
-	catch (std::exception & e)
-	{
-		LOGERROR("Standard exception: %s", e.what());
-	}
-	catch (...)
-	{
-		LOGERROR("Unknown exception!");
-	}
-	#endif
 
+	#if defined(_WIN32)
+	// Attempt to run as a service
+	if (cRoot::m_RunAsService)
+	{
+		SERVICE_TABLE_ENTRY ServiceTable[] =
+		{
+			{ SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)serviceMain },
+			{ NULL, NULL }
+		};
+
+		if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
+		{
+			LOGERROR("Attempted, but failed, service startup.");
+			return GetLastError();
+		}
+	}
+	else
+	#endif
+	{
+		// Not running as a service, do normal startup
+		universalMain();
+	}
 
 	#if defined(_MSC_VER) && defined(_DEBUG) && defined(ENABLE_LEAK_FINDER)
 	DeinitLeakFinder();
 	#endif
-
-	g_ServerTerminated = true;
-
-	// Shutdown all of LibEvent:
-	cNetworkSingleton::Get().Terminate();
 
 	return EXIT_SUCCESS;
 }
