@@ -1603,6 +1603,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 		m_ClientHandle->SendRespawn(a_World->GetDimension());
 	}
 
+	// Broadcast for other people that the player is gone.
+	GetWorld()->BroadcastDestroyEntity(*this);
+
 	// Remove player from the old world
 	SetWorldTravellingFrom(GetWorld());  // cChunk handles entity removal
 	GetWorld()->RemovePlayer(this, false);
@@ -1619,6 +1622,9 @@ bool cPlayer::DoMoveToWorld(cWorld * a_World, bool a_ShouldSendRespawn)
 	{
 		m_ClientHandle->SendWeather(a_World->GetWeather());
 	}
+
+	// Broadcast the player into the new world.
+	a_World->BroadcastSpawnEntity(*this);
 	
 	return true;
 }
