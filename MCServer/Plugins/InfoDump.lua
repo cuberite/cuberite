@@ -18,6 +18,13 @@ only that one plugin's documentation. This mode of operation doesn't require Lua
 
 
 
+-- If this file is called using the loadfile function the arg variable isn't filled. We have to do it manualy then.
+local arg = arg or {...}
+
+
+
+
+
 -- Check Lua version. We use 5.1-specific construct when loading the plugin info, 5.2 is not compatible!
 if (_VERSION ~= "Lua 5.1") then
 	print("Unsupported Lua version. This script requires Lua version 5.1, this Lua is version " .. (_VERSION or "<nil>"))
