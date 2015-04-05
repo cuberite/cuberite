@@ -33,7 +33,8 @@
 
 
 
-cRoot* cRoot::s_Root = nullptr;
+cRoot * cRoot::s_Root = nullptr;
+bool cRoot::m_ShouldStop = false;
 
 
 
@@ -48,7 +49,6 @@ cRoot::cRoot(void) :
 	m_WebAdmin(nullptr),
 	m_PluginManager(nullptr),
 	m_MojangAPI(nullptr),
-	m_bStop(false),
 	m_bRestart(false)
 {
 	s_Root = this;
@@ -71,7 +71,7 @@ void cRoot::InputThread(cRoot & a_Params)
 {
 	cLogCommandOutputCallback Output;
 	
-	while (!a_Params.m_bStop && !a_Params.m_bRestart && !m_TerminateEventRaised && std::cin.good())
+	while (!cRoot::m_ShouldStop && !a_Params.m_bRestart && !m_TerminateEventRaised && std::cin.good())
 	{
 		AString Command;
 		std::getline(std::cin, Command);
@@ -83,10 +83,11 @@ void cRoot::InputThread(cRoot & a_Params)
 
 	if (m_TerminateEventRaised || !std::cin.good())
 	{
-		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running; stop the server:
-		if (m_RunAsService)  // HACK: Dont kill if running as a service
+		// We have come here because the std::cin has received an EOF / a terminate signal has been sent, and the server is still running
+		// Stop the server:
+		if (!m_RunAsService)  // Dont kill if running as a service
 		{
-			a_Params.m_bStop = true;
+			a_Params.m_ShouldStop = true;
 		}
 	}
 }
@@ -117,8 +118,8 @@ void cRoot::Start(void)
 
 	cDeadlockDetect dd;
 
-	m_bStop = false;
-	while (!m_bStop)
+	m_ShouldStop = false;
+	while (!m_ShouldStop)
 	{
 		auto BeginTime = std::chrono::steady_clock::now();
 		m_bRestart = false;
@@ -206,14 +207,14 @@ void cRoot::Start(void)
 			EnableMenuItem(hmenu, SC_CLOSE, MF_ENABLED);  // Re-enable close button
 			#endif
 
-			while (!m_bStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
+			while (!m_ShouldStop && !m_bRestart && !m_TerminateEventRaised)  // These are modified by external threads
 			{
 				std::this_thread::sleep_for(std::chrono::seconds(1));
 			}
 
 			if (m_TerminateEventRaised)
 			{
-				m_bStop = true;
+				m_ShouldStop = true;
 			}
 
 			// Stop the server:
@@ -224,7 +225,7 @@ void cRoot::Start(void)
 		}  // if (m_Server->Start())
 		else
 		{
-			m_bStop = true;
+			m_ShouldStop = true;
 		}
 
 		delete m_MojangAPI; m_MojangAPI = nullptr;
@@ -268,13 +269,6 @@ void cRoot::Start(void)
 	delete fileLogListener;
 }
 
-
-
-
-void cRoot::SetStopping(bool a_Stopping)
-{
-	m_bStop = a_Stopping;
-}
 
 
 
@@ -466,7 +460,7 @@ void cRoot::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCall
 	// Some commands are built-in:
 	if (a_Cmd == "stop")
 	{
-		m_bStop = true;
+		m_ShouldStop = true;
 	}
 	else if (a_Cmd == "restart")
 	{
@@ -498,7 +492,7 @@ void cRoot::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback 
 	// cRoot handles stopping and restarting due to our access to controlling variables
 	if (a_Cmd == "stop")
 	{
-		m_bStop = true;
+		m_ShouldStop = true;
 		return;
 	}
 	else if (a_Cmd == "restart")

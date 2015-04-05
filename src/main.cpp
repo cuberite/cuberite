@@ -15,8 +15,6 @@
 
 
 
-/** Make the Root instance global, so it can be terminated from the worker threads */
-cRoot Root;
 
 
 /** If something has told the server to stop; checked periodically in cRoot */
@@ -35,14 +33,20 @@ bool g_ShouldLogCommOut;
 bool cRoot::m_RunAsService = false;
 
 
+
+
+
 #if defined(_WIN32)
-SERVICE_STATUS_HANDLE g_StatusHandle  = NULL;
-HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
-#define               SERVICE_NAME      "MCServerService"
+	SERVICE_STATUS_HANDLE g_StatusHandle  = NULL;
+	HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
+	#define               SERVICE_NAME      "MCServerService"
 #endif
 
 
-/// If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window
+
+
+
+/** If defined, a thorough leak finder will be used (debug MSVC only); leaks will be output to the Output window */
 // _X 2014_02_20: Disabled for canon repo, it makes the debug version too slow in MSVC2013
 // and we haven't had a memory leak for over a year anyway.
 // #define ENABLE_LEAK_FINDER
@@ -169,6 +173,7 @@ LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_Except
 
 
 
+
 #ifdef _WIN32
 // Handle CTRL events in windows, including console window close
 BOOL CtrlHandler(DWORD fdwCtrlType)
@@ -184,6 +189,7 @@ BOOL CtrlHandler(DWORD fdwCtrlType)
 	return TRUE;
 }
 #endif
+
 
 
 
@@ -210,6 +216,7 @@ void universalMain()
 	try
 	#endif
 	{
+		cRoot Root;
 		Root.Start();
 	}
 	#if !defined(ANDROID_NDK)
@@ -282,7 +289,7 @@ void WINAPI serviceCtrlHandler(DWORD CtrlCode)
 	{
 		case SERVICE_CONTROL_STOP:
 		{
-			Root.SetStopping(true);
+			cRoot::m_ShouldStop = true;
 			serviceSetState(0, SERVICE_STOP_PENDING, 0);
 			break;
 		}
