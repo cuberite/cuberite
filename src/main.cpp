@@ -316,10 +316,10 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 	char applicationFilename[MAX_PATH];
 	char applicationDirectory[MAX_PATH];
 
-	GetModuleFileName(NULL, applicationFilename, MAX_PATH);  // This binaries fill path.
+	GetModuleFileName(NULL, applicationFilename, sizeof(applicationFilename));  // This binary's file path.
 
-	// GetModuleFileName() returns the path and filename. Strip off the filename.
-	strncpy(applicationDirectory, applicationFilename, (strrchr(applicationFilename, '\\') - applicationFilename));
+	// Strip off the filename, keep only the path:
+	strncpy_s(applicationDirectory, sizeof(applicationDirectory), applicationFilename, (strrchr(applicationFilename, '\\') - applicationFilename));
 	applicationDirectory[strlen(applicationDirectory)] = '\0';  // Make sure new path is null terminated
 
 	// Services are run by the SCM, and inherit its working directory - usually System32.
@@ -330,7 +330,7 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 	
 	if (g_StatusHandle == NULL)
 	{
-		OutputDebugString("RegisterServiceCtrlHandler() failed\n");
+		OutputDebugStringA("RegisterServiceCtrlHandler() failed\n");
 		serviceSetState(0, SERVICE_STOPPED, GetLastError());
 		return;
 	}
@@ -340,7 +340,7 @@ void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
 	g_ServiceThread = CreateThread(NULL, 0, serviceWorkerThread, NULL, 0, NULL);
 	if (g_ServiceThread == NULL)
 	{
-		OutputDebugString("CreateThread() failed\n");
+		OutputDebugStringA("CreateThread() failed\n");
 		serviceSetState(0, SERVICE_STOPPED, GetLastError());
 		return;
 	}
