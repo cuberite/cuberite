@@ -453,6 +453,29 @@ AString cFile::ReadWholeFile(const AString & a_FileName)
 
 
 
+AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewExt)
+{
+	auto res = a_FileName;
+	auto DotPos = res.rfind('.');
+	if (DotPos == AString::npos)
+	{
+		// No extension, just append it:
+		res.push_back('.');
+		res.append(a_NewExt);
+	}
+	else
+	{
+		// Replace existing extension:
+		res.erase(DotPos + 1, AString::npos);
+		res.append(a_NewExt);
+	}
+	return res;
+}
+
+
+
+
+
 int cFile::Printf(const char * a_Fmt, ...)
 {
 	AString buf;

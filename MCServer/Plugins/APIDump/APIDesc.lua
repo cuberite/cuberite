@@ -973,6 +973,7 @@ cFile:Delete("/usr/bin/virus.exe");
 			]],
 			Functions =
 			{
+				ChangeFileExt = { Params = "FileName, NewExt", Return = "string", Notes = "(STATIC) Returns FileName with its extension changed to NewExt. FileName may contain path elements, extension is recognized as the last dot in the string." },
 				Copy = { Params = "SrcFileName, DstFileName", Return = "bool", Notes = "(STATIC) Copies a single file to a new destination. Returns true if successful. Fails if the destination already exists." },
 				CreateFolder = { Params = "FolderName", Return = "bool", Notes = "(STATIC) Creates a new folder. Returns true if successful." },
 				Delete = { Params = "FileName", Return = "bool", Notes = "(STATIC) Deletes the specified file. Returns true if successful." },

@@ -127,6 +127,10 @@ public:
 	/** Returns the entire contents of the specified file as a string. Returns empty string on error. */
 	static AString ReadWholeFile(const AString & a_FileName);
 
+	/** Returns a_FileName with its extension changed to a_NewExt.
+	a_FileName may contain path specification. */
+	static AString ChangeFileExt(const AString & a_FileName, const AString & a_NewExt);
+
 	// tolua_end
 	
 	/** Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there). */
