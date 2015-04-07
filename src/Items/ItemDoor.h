@@ -40,7 +40,7 @@ public:
 		}
 
 		// The door needs a compatible block below it:
-		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ), a_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ)))
 		{
 			return false;
 		}

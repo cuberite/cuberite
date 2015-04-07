@@ -6,7 +6,7 @@
 #include "Chunk.h"
 #include "MetaRotator.h"
 #include "ChunkInterface.h"
-
+#include "BlockSlab.h"
 
 
 
@@ -109,16 +109,31 @@ public:
 
 	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
 	{
-		return ((a_RelY > 0) && CanBeOn(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ)));
+		return ((a_RelY > 0) && CanBeOn(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ), a_Chunk.GetMeta(a_RelX, a_RelY - 1, a_RelZ)));
 	}
 
 
 	/** Returns true if door can be placed on the specified block type. */
-	static bool CanBeOn(BLOCKTYPE a_BlockType)
+	static bool CanBeOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		// Vanilla refuses to place doors on transparent blocks
+		// Vanilla refuses to place doors on transparent blocks, except top-half slabs and other doors
 		// We need to keep the door compatible with itself, otherwise the top half drops while the bottom half stays
-		return !cBlockInfo::IsTransparent(a_BlockType) || IsDoorBlockType(a_BlockType);
+		
+		// Doors can be placed on upside-down slabs
+		if (cBlockSlabHandler::IsAnySlabType(a_BlockType) && ((a_BlockMeta & 0x08) != 0))
+		{
+			return true;
+		}
+		// Doors can also be placed on other doors
+		else if (IsDoorBlockType(a_BlockType))
+		{
+			return true;
+		}
+		// Doors can not be placed on transparent blocks, but on any other block
+		else
+		{
+			return !cBlockInfo::IsTransparent(a_BlockType);
+		}
 	}
 
 
