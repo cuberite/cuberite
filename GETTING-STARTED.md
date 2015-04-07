@@ -19,7 +19,7 @@ Useful Resources
  * [Minecraft Wiki](http://minecraft.gamepedia.com/Minecraft_Wiki)
  * [Minecraft Protocol Wiki](http://wiki.vg)
  * [Lua API Documentation](http://mc-server.xoft.cz/LuaAPI)
- * [VS2008 Download](http://stackoverflow.com/questions/15318560/visual-c-2008-express-download-link-dead)
+ * [VS2013 Community Edition Download](https://www.visualstudio.com/products/visual-studio-community-vs)
 
 Setting up a Dev Environment
 ============================
@@ -39,12 +39,12 @@ You'll also need CMake to generate the makefile to build from.
 
 **Windows:**
 
-If you use Windows, your best bet is the MSVC2008 (available as a free download in the Express edition from MS) or MSVS2013 (ditto), solution files for which can be generated with cmake. You'll also need cmake to generate the project files.
+If you use Windows, your best bet is the MSVC2013 (available as a free download in the Community edition from MS), solution files for which can be generated with cmake. You'll also need cmake to generate the project files.
 
 Setting up the Repo
 -------------------
 
-Next, you'll need to set up the repo. You can make a fork and work on that then PR in, or I can set you up with membership for the repo so you can work on branches here (still use PRs though, they're great tools and for the first few you'll definitely need some changes). If you want membership to the repo, just create an issue and I can set you up. 
+Next, you'll need to set up the repo. You should make a fork and work on that, then create a Pull Request so that we can review and merge your code. After you've "earned" an honorable status, we'll give you write access to the repository, so that you can work on branches in the main repo here (still use PRs though, they're great tools for review and discussion).
 
 Once you've cloned, you need to pull down the submodules:
 
@@ -71,6 +71,8 @@ Code Styles
 
 Mainly follow the code styles in [CONTRIBUTING.md](https://github.com/mc-server/MCServer/blob/master/CONTRIBUTING.md), which is definitely an important read.
 
+Note that there is a script file, $/src/CheckBasicStyle.lua, that can check some common violations of the coding style. You should run this file to check your code regularly. This script is run during the integration builds and if it fails, the build will fail. Note that you need Lua installed in order to run this script.
+
 
 How to Build
 ------------------
@@ -85,12 +87,14 @@ Basically, the process is:
 
 **Windows:**
 
-You need to first generate a project file with `cmake . -DCMAKE_BUILD_TYPE=DEBUG` then execute the `src/Bindings/AllToLua.bat` script file, then just open the solution file in your MSVC of choice and build.
+You need to first generate a solution file by executing `cmake .` on the commandline at the top-level folder of the repository, then just open the solution file in MSVC and build. Note that the first time after generating the solution, you will need to do extra setup in order to be able to fully debug in MSVC:
+- Set the startup project to MCServer: right-click the MCServer project in the Solution Explorer and choose "Set as Startup Project".
+- Set the debugging folder: right-click the MCServer project in the Solution Explorer, choose "Properties". In the dialog, browse to "Configuration Properties" -> "Debugging" and set "Working Directory" to "../MCServer".
 
 How to Run
 ----------
 
-The server can be run (on *nix) by a simple `./MCServer` in the `MCServer` directory. On first run it will generate the world and start a server on the default port (configurable in `settings.ini`) so you can connect in minecraft via `localhost`.
+The server can be run (on *nix) by a simple `./MCServer` in the `MCServer` directory. On first run it will generate the world and start a server on the default port (configurable in `settings.ini`) so you can connect in minecraft via `localhost`. Note that if you build a debug version, the executable will be names `MCServer_debug` instead
 
 Where to Get Started
 -------------------------------
@@ -116,6 +120,5 @@ You may also want to write some plugins. They are written in lua, with excellent
 
 Special Things
 ---------------------
-
- * MCServer uses ToLUA for the Lua API, and you'll really have to ask @madmaxoft for how to export stuff and @worktycho for how to add stuff to the auto generated bindings (he just re-worked it with CMake).
+ * Make yourself familiar with the community. Visit the forums: http://forum.mc-server.org
  * Ask questions as much as you like, we're here to help :smiley: 
