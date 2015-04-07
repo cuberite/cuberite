@@ -10,22 +10,22 @@
 class cCriticalSection
 {
 public:
-
 	void Lock(void);
 	void Unlock(void);
 	
 	// IsLocked/IsLockedByCurrentThread are only used in ASSERT statements, but because of the changes with ASSERT they must always be defined
 	// The fake versions (in Release) will not effect the program in any way
 	#ifdef _DEBUG
-	cCriticalSection(void);
-	bool IsLocked(void);
-	bool IsLockedByCurrentThread(void);
+		cCriticalSection(void);
+		bool IsLocked(void);
+		bool IsLockedByCurrentThread(void);
 	#else
-	bool IsLocked(void) { return false; }
-	bool IsLockedByCurrentThread(void) { return false; }
+		bool IsLocked(void) { return false; }
+		bool IsLockedByCurrentThread(void) { return false; }
 	#endif  // _DEBUG
 	
 private:
+
 	#ifdef _DEBUG
 	int           m_IsLocked;  // Number of times this CS is locked
 	std::thread::id m_OwningThreadID;

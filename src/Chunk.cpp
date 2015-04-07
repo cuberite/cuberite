@@ -776,10 +776,22 @@ void cChunk::BroadcastPendingBlockChanges(void)
 	{
 		return;
 	}
-	
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+
+	if (m_PendingSendBlocks.size() >= 10240)
 	{
-		(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+		// Resend the full chunk
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+		{
+			m_World->ForceSendChunkTo(m_PosX, m_PosZ, cChunkSender::E_CHUNK_PRIORITY_MEDIUM, (*itr));
+		}
+	}
+	else
+	{
+		// Only send block changes
+		for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+		{
+			(*itr)->SendBlockChanges(m_PosX, m_PosZ, m_PendingSendBlocks);
+		}
 	}
 	m_PendingSendBlocks.clear();
 }
@@ -919,7 +931,7 @@ void cChunk::ApplyWeatherToTop()
 			FastSetBlock(X, Height, Z, E_BLOCK_SNOW, TopMeta - 1);
 		}
 	}
-	else if (cBlockInfo::IsSnowable(TopBlock) && (Height + 1 < cChunkDef::Height))
+	else if (cBlockInfo::IsSnowable(TopBlock) && (Height < cChunkDef::Height - 1))
 	{
 		SetBlock(X, Height + 1, Z, E_BLOCK_SNOW, 0);
 	}
@@ -1241,7 +1253,7 @@ bool cChunk::UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBB
 
 bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
@@ -1262,7 +1274,7 @@ bool cChunk::UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 bool cChunk::UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if ((a_RelY < 0) || (a_RelY > cChunkDef::Height))
+	if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height))
 	{
 		LOGWARNING("UnboundedRelFastSetBlock(): requesting a block with a_RelY out of range: %d", a_RelY);
 		return false;
@@ -1957,7 +1969,7 @@ void cChunk::RemoveEntity(cEntity * a_Entity)
 
 
 
-bool cChunk::HasEntity(int a_EntityID)
+bool cChunk::HasEntity(UInt32 a_EntityID)
 {
 	for (cEntityList::const_iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
 	{
@@ -2015,7 +2027,7 @@ bool cChunk::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 
 
-bool cChunk::DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
+bool cChunk::DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackResult)
 {
 	// The entity list is locked by the parent chunkmap's CS
 	for (cEntityList::iterator itr = m_Entities.begin(), end = m_Entities.end(); itr != end; ++itr)
@@ -2802,7 +2814,7 @@ void cChunk::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 
 
-void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude)
+void cChunk::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
 	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(); itr != m_LoadedByClient.end(); ++itr)
 	{
@@ -2810,7 +2822,7 @@ void cChunk::BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_bl
 		{
 			continue;
 		}
-		(*itr)->SendBlockBreakAnim(a_entityID, a_blockX, a_blockY, a_blockZ, a_stage);
+		(*itr)->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
 	}  // for itr - LoadedByClient[]
 }
 

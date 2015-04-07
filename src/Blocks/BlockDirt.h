@@ -59,7 +59,7 @@ public:
 			a_Chunk.GetWorld()->QueueLightChunk(a_Chunk.GetPosX(), a_Chunk.GetPosZ());
 			return;
 		}
-		else if (std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ))) < 9)
+		else if ((a_RelY < cChunkDef::Height - 1) && std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY + 1, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY + 1, a_RelZ))) < 9)
 		{
 			// Source block is not bright enough to spread
 			return;
@@ -69,9 +69,9 @@ public:
 		cFastRandom rand;
 		for (int i = 0; i < 2; i++)  // Pick two blocks to grow to
 		{
-			int OfsX = rand.NextInt(3, a_RelX) - 1;  // [-1 .. 1]
-			int OfsY = rand.NextInt(5, a_RelY) - 3;  // [-3 .. 1]
-			int OfsZ = rand.NextInt(3, a_RelZ) - 1;  // [-1 .. 1]
+			int OfsX = rand.NextInt(3) - 1;  // [-1 .. 1]
+			int OfsY = rand.NextInt(5) - 3;  // [-3 .. 1]
+			int OfsZ = rand.NextInt(3) - 1;  // [-1 .. 1]
 	
 			BLOCKTYPE  DestBlock;
 			NIBBLETYPE DestMeta;

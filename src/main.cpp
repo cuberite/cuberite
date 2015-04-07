@@ -282,7 +282,11 @@ int main( int argc, char **argv)
 		}
 	}  // for i - argv[]
 	
+	// Initialize logging subsystem:
 	cLogger::InitiateMultithreading();
+	
+	// Initialize LibEvent:
+	cNetworkSingleton::Get();
 	
 	#if !defined(ANDROID_NDK)
 	try

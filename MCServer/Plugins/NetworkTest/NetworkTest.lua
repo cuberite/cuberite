@@ -288,6 +288,19 @@ end
 
 
 
+function HandleConsoleNetIps(a_Split)
+	local Addresses = cNetwork:EnumLocalIPAddresses()
+	LOG("IP addresses enumerated, " .. #Addresses .. " found")
+	for idx, addr in ipairs(Addresses) do
+		LOG("  IP #" .. idx .. ": " .. addr)
+	end
+	return true
+end
+
+
+
+
+
 function HandleConsoleNetLookup(a_Split)
 	-- Get the name to look up:
 	local Addr = a_Split[3] or "google.com"

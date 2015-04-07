@@ -259,9 +259,9 @@ void cWorld::cTickThread::Execute(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld:
 
-cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_OverworldName) :
+cWorld::cWorld(const AString & a_WorldName, eDimension a_Dimension, const AString & a_LinkedOverworldName) :
 	m_WorldName(a_WorldName),
-	m_OverworldName(a_OverworldName),
+	m_LinkedOverworldName(a_LinkedOverworldName),
 	m_IniFileName(m_WorldName + "/world.ini"),
 	m_StorageSchema("Default"),
 #ifdef __arm__
@@ -604,12 +604,12 @@ void cWorld::Start(void)
 	
 	if (GetDimension() == dimOverworld)
 	{
-		m_NetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
-		m_EndWorldName = IniFile.GetValueSet("LinkedWorlds", "EndWorldName", GetName() + "_end");
+		m_LinkedNetherWorldName = IniFile.GetValueSet("LinkedWorlds", "NetherWorldName", GetName() + "_nether");
+		m_LinkedEndWorldName    = IniFile.GetValueSet("LinkedWorlds", "EndWorldName",    GetName() + "_end");
 	}
 	else
 	{
-		m_OverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
+		m_LinkedOverworldName = IniFile.GetValueSet("LinkedWorlds", "OverworldName", GetLinkedOverworldName());
 	}
 	
 	// Adjust the enum-backed variables into their respective bounds:
@@ -667,18 +667,23 @@ void cWorld::Start(void)
 void cWorld::GenerateRandomSpawn(void)
 {
 	LOGD("Generating random spawnpoint...");
-
+	bool foundSpawnPoint = false;
 	// Look for a spawn point at most 100 chunks away from map center:
 	for (int i = 0; i < 100; i++)
 	{
 		EMCSBiome biome = GetBiomeAt((int)m_SpawnX, (int)m_SpawnZ);
+
 		if (
 			(biome != biOcean) && (biome != biFrozenOcean) &&  // The biome is acceptable (don't want a small ocean island)
 			!IsBlockWaterOrIce(GetBlock((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ))  // The terrain is acceptable (don't want to spawn inside a lake / river)
 		)
 		{
-			// A good spawnpoint was found
-			break;
+			if (CheckPlayerSpawnPoint((int)m_SpawnX, GetHeight((int)m_SpawnX, (int)m_SpawnZ), (int)m_SpawnZ))
+			{
+				// A good spawnpoint was found
+				foundSpawnPoint = true;
+				break;
+			}
 		}
 		// Try a neighboring chunk:
 		if ((GetTickRandomNumber(4) % 2) == 0)  // Randomise whether to increment X or Z coords
@@ -692,8 +697,60 @@ void cWorld::GenerateRandomSpawn(void)
 	}  // for i - 100*
 
 	m_SpawnY = (double)GetHeight((int)m_SpawnX, (int)m_SpawnZ) + 1.6f;  // 1.6f to accomodate player height
+	if (foundSpawnPoint)
+	{
+		LOGINFO("Generated random spawnpoint position at {%i, %i, %i}", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
+	}
+	else
+	{
+		LOGINFO("Did not find an acceptable spawnpoint. Generated a random spawnpoint position at {%i, %i, %i}", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
+	}  // Maybe widen the search instead?
 
-	LOGINFO("Generated random spawnpoint position {%i, %i, %i}", (int)m_SpawnX, (int)m_SpawnY, (int)m_SpawnZ);
+}
+
+
+
+
+
+bool cWorld::CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
+{
+	// Check that spawnblock and surrounding blocks are neither solid nor water / lava
+	static const struct
+	{
+		int x, z;
+	} Coords[] =
+	{
+		{ 0, 0 },
+		{ -1, 0 },
+		{ 1, 0 },
+		{ 0, -1 },
+		{ 0, 1 },
+	};
+	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
+	{
+		BLOCKTYPE BlockType = GetBlock(a_PosX + Coords[i].x, a_PosY, a_PosZ + Coords[i].x);
+		if (cBlockInfo::IsSolid(BlockType) || IsBlockLiquid(BlockType))
+		{
+			return false;
+		}
+	}  // for i - Coords[]
+
+	// Check that the block below is solid:
+	if (!cBlockInfo::IsSolid(GetBlock(a_PosX, a_PosY - 1, a_PosZ)))
+	{
+		return false;
+	}
+
+	// Check that all the blocks above the spawnpoint are not solid:
+	for (int i = a_PosY; i < cChunkDef::Height; i++)
+	{
+		BLOCKTYPE BlockType = GetBlock(a_PosX, i, a_PosZ);
+		if (cBlockInfo::IsSolid(BlockType))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 
@@ -827,18 +884,18 @@ void cWorld::Stop(void)
 	IniFile.ReadFile(m_IniFileName);
 		if (GetDimension() == dimOverworld)
 		{
-			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_NetherWorldName);
-			IniFile.SetValue("LinkedWorlds", "EndWorldName", m_EndWorldName);
+			IniFile.SetValue("LinkedWorlds", "NetherWorldName", m_LinkedNetherWorldName);
+			IniFile.SetValue("LinkedWorlds", "EndWorldName",    m_LinkedEndWorldName);
 		}
 		else
 		{
-			IniFile.SetValue("LinkedWorlds", "OverworldName", m_OverworldName);
+			IniFile.SetValue("LinkedWorlds", "OverworldName", m_LinkedOverworldName);
 		}
-		IniFile.SetValueI("Physics", "TNTShrapnelLevel", (int)m_TNTShrapnelLevel);
+		IniFile.SetValueI("Physics", "TNTShrapnelLevel", static_cast<int>(m_TNTShrapnelLevel));
 		IniFile.SetValueB("Mechanics", "CommandBlocksEnabled", m_bCommandBlocksEnabled);
 		IniFile.SetValueB("Mechanics", "UseChatPrefixes", m_bUseChatPrefixes);
 		IniFile.SetValueB("General", "IsDaylightCycleEnabled", m_IsDaylightCycleEnabled);
-		IniFile.SetValueI("General", "Weather", (int)m_Weather);
+		IniFile.SetValueI("General", "Weather", static_cast<int>(m_Weather));
 		IniFile.SetValueI("General", "TimeInTicks", GetTimeOfDay());
 	IniFile.WriteFile(m_IniFileName);
 	
@@ -1863,7 +1920,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double 
 
 
 
-int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
+UInt32 cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta)
 {
 	cFallingBlock * FallingBlock = new cFallingBlock(Vector3i(a_X, a_Y, a_Z), BlockType, BlockMeta);
 	FallingBlock->Initialize(*this);
@@ -1874,11 +1931,12 @@ int cWorld::SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NI
 
 
 
-int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
+UInt32 cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 {
 	if (a_Reward < 1)
 	{
-		return -1;
+		LOGWARNING("%s: Attempting to create an experience orb with non-positive reward!", __FUNCTION__);
+		return cEntity::INVALID_ID;
 	}
 
 	cExpOrb * ExpOrb = new cExpOrb(a_X, a_Y, a_Z, a_Reward);
@@ -1890,7 +1948,7 @@ int cWorld::SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward)
 
 
 
-int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
+UInt32 cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content, int a_BlockHeight)
 {
 	cMinecart * Minecart;
 	switch (a_MinecartType)
@@ -1902,7 +1960,7 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 		case E_ITEM_MINECART_WITH_HOPPER: Minecart = new cMinecartWithHopper   (a_X, a_Y, a_Z); break;
 		default:
 		{
-			return -1;
+			return cEntity::INVALID_ID;
 		}
 	}  // switch (a_MinecartType)
 	Minecart->Initialize(*this);
@@ -1913,7 +1971,7 @@ int cWorld::SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType
 
 
 
-void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
+UInt32 cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks, double a_InitialVelocityCoeff)
 {
 	cTNTEntity * TNT = new cTNTEntity(a_X, a_Y, a_Z, a_FuseTicks);
 	TNT->Initialize(*this);
@@ -1922,6 +1980,7 @@ void cWorld::SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTicks,
 		a_InitialVelocityCoeff * 2,
 		a_InitialVelocityCoeff * (GetTickRandomNumber(2) - 1)
 	);
+	return TNT->GetUniqueID();
 }
 
 
@@ -2012,7 +2071,7 @@ void cWorld::BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char
 
 
 
-void cWorld::BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude)
 {
 	m_ChunkMap->BroadcastBlockBreakAnimation(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage, a_Exclude);
 }
@@ -2849,8 +2908,22 @@ bool cWorld::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_
 
 
 
-bool cWorld::DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback)
+bool cWorld::DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback)
 {
+	// First check the entities-to-add:
+	{
+		cCSLock Lock(m_CSEntitiesToAdd);
+		for (auto & ent: m_EntitiesToAdd)
+		{
+			if (ent->GetUniqueID() == a_UniqueID)
+			{
+				a_Callback.Item(ent);
+				return true;
+			}
+		}  // for ent - m_EntitiesToAdd[]
+	}
+
+	// Then check the chunkmap:
 	return m_ChunkMap->DoWithEntityByID(a_UniqueID, a_Callback);
 }
 
@@ -3096,14 +3169,14 @@ void cWorld::SaveAllChunks(void)
 
 void cWorld::QueueSaveAllChunks(void)
 {
-	QueueTask(make_unique<cWorld::cTaskSaveAllChunks>());
+	QueueTask(std::make_shared<cWorld::cTaskSaveAllChunks>());
 }
 
 
 
 
 
-void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
+void cWorld::QueueTask(cTaskPtr a_Task)
 {
 	cCSLock Lock(m_CSTasks);
 	m_Tasks.push_back(std::move(a_Task));
@@ -3113,7 +3186,7 @@ void cWorld::QueueTask(std::unique_ptr<cTask> a_Task)
 
 
 
-void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
+void cWorld::ScheduleTask(int a_DelayTicks, cTaskPtr a_Task)
 {
 	Int64 TargetTick = a_DelayTicks + std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count();
 	
@@ -3123,11 +3196,11 @@ void cWorld::ScheduleTask(int a_DelayTicks, cTask * a_Task)
 	{
 		if ((*itr)->m_TargetTick >= TargetTick)
 		{
-			m_ScheduledTasks.insert(itr, make_unique<cScheduledTask>(TargetTick, a_Task));
+			m_ScheduledTasks.insert(itr, cScheduledTaskPtr(new cScheduledTask(TargetTick, a_Task)));
 			return;
 		}
 	}
-	m_ScheduledTasks.push_back(make_unique<cScheduledTask>(TargetTick, a_Task));
+	m_ScheduledTasks.push_back(cScheduledTaskPtr(new cScheduledTask(TargetTick, a_Task)));
 }
 
 
@@ -3144,7 +3217,7 @@ void cWorld::AddEntity(cEntity * a_Entity)
 
 
 
-bool cWorld::HasEntity(int a_UniqueID)
+bool cWorld::HasEntity(UInt32 a_UniqueID)
 {
 	// Check if the entity is in the queue to be added to the world:
 	{
@@ -3261,15 +3334,16 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
+UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType)
 {
 	cMonster * Monster = nullptr;
 
 	Monster = cMonster::NewMonsterFromType(a_MonsterType);
-	if (Monster != nullptr)
+	if (Monster == nullptr)
 	{
-		Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
+		return cEntity::INVALID_ID;
 	}
+	Monster->SetPosition(a_PosX, a_PosY, a_PosZ);
 	
 	return SpawnMobFinalize(Monster);
 }
@@ -3277,13 +3351,9 @@ int cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a
 
 
 
-int cWorld::SpawnMobFinalize(cMonster * a_Monster)
+UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 {
-	// Invalid cMonster object. Bail out.
-	if (!a_Monster)
-	{
-		return -1;
-	}
+	ASSERT(a_Monster != nullptr);
 
 	// Give the mob  full health.
 	a_Monster->SetHealth(a_Monster->GetMaxHealth());
@@ -3293,7 +3363,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	{
 		delete a_Monster;
 		a_Monster = nullptr;
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 
 	// Initialize the monster into the current world.
@@ -3301,7 +3371,7 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	{
 		delete a_Monster;
 		a_Monster = nullptr;
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 
 	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
@@ -3313,18 +3383,18 @@ int cWorld::SpawnMobFinalize(cMonster * a_Monster)
 
 
 
-int cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	cProjectileEntity * Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_PosX, a_PosY, a_PosZ, a_Item, a_Speed);
 	if (Projectile == nullptr)
 	{
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 	if (!Projectile->Initialize(*this))
 	{
 		delete Projectile;
 		Projectile = nullptr;
-		return -1;
+		return cEntity::INVALID_ID;
 	}
 	return Projectile->GetUniqueID();
 }
@@ -3578,7 +3648,7 @@ void cWorld::cTaskUnloadUnusedChunks::Run(cWorld & a_World)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// cWorld::cTaskSendBlockTo
+// cWorld::cTaskSendBlockToAllPlayers
 
 cWorld::cTaskSendBlockToAllPlayers::cTaskSendBlockToAllPlayers(std::vector<Vector3i> & a_SendQueue) :
 	m_SendQueue(a_SendQueue)

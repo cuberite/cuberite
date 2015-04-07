@@ -549,7 +549,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	#endif
 
-	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output))
+	else if (cPluginManager::Get()->ExecuteConsoleCommand(split, a_Output, a_Cmd))
 	{
 		a_Output.Finished();
 		return;

@@ -92,3 +92,14 @@ void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
 
 
 
+
+void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
+{
+	super::SpawnOn(a_ClientHandle);
+	a_ClientHandle.SendSpawnObject(*this, 71, GetProtocolFacing(), (Byte)GetYaw(), (Byte)GetPitch());
+	a_ClientHandle.SendEntityMetadata(*this);
+}
+
+
+
+

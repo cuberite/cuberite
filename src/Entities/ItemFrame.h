@@ -24,7 +24,7 @@ public:
 	// tolua_begin
 
 	/** Returns the item in the frame */
-	const cItem & GetItem(void) { return m_Item; }
+	const cItem & GetItem(void) const { return m_Item; }
 
 	/** Set the item in the frame */
 	void SetItem(cItem & a_Item) { m_Item = a_Item; }
@@ -42,6 +42,7 @@ private:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
 	cItem m_Item;
 	Byte m_ItemRotation;

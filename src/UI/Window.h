@@ -19,7 +19,6 @@ class cPlayer;
 class cWindowOwner;
 class cClientHandle;
 class cChestEntity;
-class cDropSpenserEntity;
 class cEnderChestEntity;
 class cFurnaceEntity;
 class cHopperEntity;
@@ -154,14 +153,19 @@ public:
 	
 	/** Called on shift-clicking to distribute the stack into other areas; Modifies a_ItemStack as it is distributed!
 	if a_ShouldApply is true, the changes are written into the slots;
+	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes) */
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) = 0;
+
+	/** Called from DistributeStack() to distribute the stack into a_AreasInOrder; Modifies a_ItemStack as it is distributed!
+	If a_ShouldApply is true, the changes are written into the slots;
 	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
-	*/
-	void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, cSlotArea * a_ExcludeArea, bool a_ShouldApply);
+	If a_BackFill is true, the areas will be filled from the back (right side). (Example: Empty Hotbar -> Item get in slot 8, not slot 0) */
+	void DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill);
 	
-	/// Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
-	/// The items are accumulated in a_Dragging and removed from the SlotAreas immediately.
-	/// If a_CollectFullStacks is false, slots with full stacks in the area are skipped while collecting.
-	/// Returns true if full stack has been collected, false if there's space remaining to fill.
+	/** Called on DblClicking to collect all stackable items from all areas into hand, starting with the specified area.
+	The items are accumulated in a_Dragging and removed from the SlotAreas immediately.
+	If a_CollectFullStacks is false, slots with full stacks in the area are skipped while collecting.
+	Returns true if full stack has been collected, false if there's space remaining to fill. */
 	bool CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer & a_Player, bool a_CollectFullStacks);
 	
 	/// Used by cSlotAreas to send individual slots to clients, a_RelativeSlotNum is the slot number relative to a_SlotArea
@@ -178,7 +182,6 @@ protected:
 	cPlayerList      m_OpenedBy;
 	
 	bool m_IsDestroyed;
-	bool m_ShouldDistributeToHotbarFirst;  ///< If set (default), shift+click tries to distribute to hotbar first, then other areas. False for doublechests
 	
 	cWindowOwner * m_Owner;
 	
@@ -215,191 +218,6 @@ protected:
 	/// Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed
 	int DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums);
 } ;  // tolua_export
-
-
-
-
-
-class cCraftingWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cCraftingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
-} ;
-
-
-
-
-
-class cAnvilWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
-
-	/** Gets the repaired item name. */
-	AString GetRepairedItemName(void) const { return m_RepairedItemName; }
-
-	/** Set the repaired item name. */
-	void SetRepairedItemName(const AString & a_Name, cPlayer * a_Player);
-
-	/** Gets the Position from the Anvil */
-	void GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ);
-
-protected:
-	cSlotAreaAnvil * m_AnvilSlotArea;
-	AString m_RepairedItemName;
-	int m_BlockX, m_BlockY, m_BlockZ;
-} ;
-
-
-
-
-
-class cBeaconWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cBeaconWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconEntity * a_Beacon);
-
-	cBeaconEntity * GetBeaconEntity(void) const { return m_Beacon; }
-
-	// cWindow Overrides:
-	virtual void OpenedByPlayer(cPlayer & a_Player) override;
-
-protected:
-	cBeaconEntity * m_Beacon;
-} ;
-
-
-
-
-
-class cEnchantingWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
-	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player) override;
-	virtual void SetProperty(short a_Property, short a_Value) override;
-
-	/** Return the Value of a Property */
-	short GetPropertyValue(short a_Property);
-
-	cSlotArea * m_SlotArea;
-
-protected:
-	short m_PropertyValue[3];
-	int m_BlockX, m_BlockY, m_BlockZ;
-};
-
-
-
-
-
-class cFurnaceWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cFurnaceWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceEntity * a_Furnace);
-} ;
-
-
-
-
-
-class cDropSpenserWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cDropSpenserWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserEntity * a_Dispenser);
-} ;
-
-
-
-
-
-class cHopperWindow :
-	public cWindow
-{
-	typedef cWindow super;
-public:
-	cHopperWindow(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperEntity * a_Hopper);
-} ;
-
-
-
-
-
-class cChestWindow :
-	public cWindow
-{
-public:
-	cChestWindow(cChestEntity * a_Chest);
-	cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest);
-	~cChestWindow();
-
-	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
-	virtual void OpenedByPlayer(cPlayer & a_Player) override;
-	
-protected:
-	cWorld * m_World;
-	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the chest, for the window-close packet
-	cChestEntity * m_PrimaryChest;
-	cChestEntity * m_SecondaryChest;
-} ;
-
-
-
-
-
-class cMinecartWithChestWindow :
-	public cWindow
-{
-public:
-	cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart);
-	~cMinecartWithChestWindow();
-private:
-	cMinecartWithChest * m_ChestCart;
-};
-
-
-
-
-
-class cEnderChestWindow :
-	public cWindow
-{
-public:
-	cEnderChestWindow(cEnderChestEntity * a_EnderChest);
-	~cEnderChestWindow();
-
-protected:
-	cWorld * m_World;
-	int m_BlockX, m_BlockY, m_BlockZ;  // Position of the enderchest, for the window-close packet
-};
-
-
-
-
-
-class cInventoryWindow :
-	public cWindow
-{
-public:
-	cInventoryWindow(cPlayer & a_Player);
-	
-protected:
-	cPlayer & m_Player;
-
-} ;
-
 
 
 

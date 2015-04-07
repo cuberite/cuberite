@@ -4,6 +4,7 @@
 #include "BeaconEntity.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
+#include "../UI/BeaconWindow.h"
 
 
 
@@ -289,7 +290,7 @@ void cBeaconEntity::UsedBy(cPlayer * a_Player)
 		OpenWindow(new cBeaconWindow(m_PosX, m_PosY, m_PosZ, this));
 		Window = GetWindow();
 	}
-	
+
 	if (Window != nullptr)
 	{
 		// if (a_Player->GetWindow() != Window)

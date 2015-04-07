@@ -6,10 +6,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #ifdef __APPLE__
-#define LUA_USE_MACOSX
+	#define LUA_USE_MACOSX
 #else
-#define LUA_USE_POSIX
+	#define LUA_USE_POSIX
 #endif
+
 #include "PluginLua.h"
 #include "../CommandOutput.h"
 #include "PluginManager.h"
@@ -52,24 +53,40 @@ cPluginLua::~cPluginLua()
 
 void cPluginLua::Close(void)
 {
-	if (m_LuaState.IsValid())
+	cCSLock Lock(m_CriticalSection);
+
+	// If already closed, bail out:
+	if (!m_LuaState.IsValid())
 	{
-		// Release all the references in the hook map:
-		for (cHookMap::iterator itrH = m_HookMap.begin(), endH = m_HookMap.end(); itrH != endH; ++itrH)
-		{
-			for (cLuaRefs::iterator itrR = itrH->second.begin(), endR = itrH->second.end(); itrR != endR; ++itrR)
-			{
-				delete *itrR;
-			}  // for itrR - itrH->second[]
-		}  // for itrH - m_HookMap[]
-		m_HookMap.clear();
-		
-		m_LuaState.Close();
-	}
-	else
-	{
+		ASSERT(m_Resettables.empty());
 		ASSERT(m_HookMap.empty());
+		return;
 	}
+
+	// Notify and remove all m_Resettables (unlock the m_CriticalSection while resetting them):
+	cResettablePtrs resettables;
+	std::swap(m_Resettables, resettables);
+	{
+		cCSUnlock Unlock(Lock);
+		for (auto resettable: resettables)
+		{
+			resettable->Reset();
+		}
+		m_Resettables.clear();
+	}  // cCSUnlock (m_CriticalSection)
+
+	// Release all the references in the hook map:
+	for (cHookMap::iterator itrH = m_HookMap.begin(), endH = m_HookMap.end(); itrH != endH; ++itrH)
+	{
+		for (cLuaRefs::iterator itrR = itrH->second.begin(), endR = itrH->second.end(); itrR != endR; ++itrR)
+		{
+			delete *itrR;
+		}  // for itrR - itrH->second[]
+	}  // for itrH - m_HookMap[]
+	m_HookMap.clear();
+
+	// Close the Lua engine:
+	m_LuaState.Close();
 }
 
 
@@ -1465,7 +1482,7 @@ bool cPluginLua::OnWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, s
 
 
 
-bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player)
+bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_Commands.find(a_Split[0]);
@@ -1477,7 +1494,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 	
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
-	m_LuaState.Call(cmd->second, a_Split, &a_Player, cLuaState::Return, res);
+	m_LuaState.Call(cmd->second, a_Split, &a_Player, a_FullCommand, cLuaState::Return, res);
 	return res;
 }
 
@@ -1485,7 +1502,7 @@ bool cPluginLua::HandleCommand(const AStringVector & a_Split, cPlayer & a_Player
 
 
 
-bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output)
+bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand)
 {
 	ASSERT(!a_Split.empty());
 	CommandMap::iterator cmd = m_ConsoleCommands.find(a_Split[0]);
@@ -1500,7 +1517,7 @@ bool cPluginLua::HandleConsoleCommand(const AStringVector & a_Split, cCommandOut
 	cCSLock Lock(m_CriticalSection);
 	bool res = false;
 	AString str;
-	m_LuaState.Call(cmd->second, a_Split, cLuaState::Return, res, str);
+	m_LuaState.Call(cmd->second, a_Split, a_FullCommand, cLuaState::Return, res, str);
 	if (res && !str.empty())
 	{
 		a_Output.Out(str);
@@ -1709,6 +1726,16 @@ int cPluginLua::CallFunctionFromForeignState(
 
 
 
+void cPluginLua::AddResettable(cPluginLua::cResettablePtr a_Resettable)
+{
+	cCSLock Lock(m_CriticalSection);
+	m_Resettables.push_back(a_Resettable);
+}
+
+
+
+
+
 AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request)
 {
 	cCSLock Lock(m_CriticalSection);
@@ -1821,6 +1848,28 @@ void cPluginLua::CallbackWindowSlotChanged(int a_FnRef, cWindow & a_Window, int 
 	
 	cCSLock Lock(m_CriticalSection);
 	m_LuaState.Call(a_FnRef, &a_Window, a_SlotNum);
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// cPluginLua::cResettable:
+
+cPluginLua::cResettable::cResettable(cPluginLua & a_Plugin):
+	m_Plugin(&a_Plugin)
+{
+}
+
+
+
+
+
+void cPluginLua::cResettable::Reset(void)
+{
+	cCSLock Lock(m_CSPlugin);
+	m_Plugin = nullptr;
 }
 
 

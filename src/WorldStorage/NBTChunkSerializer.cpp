@@ -36,20 +36,9 @@
 #include "../Entities/ExpOrb.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
+#include "../Entities/Painting.h"
 
-#include "../Mobs/Monster.h"
-#include "../Mobs/Bat.h"
-#include "../Mobs/Creeper.h"
-#include "../Mobs/Enderman.h"
-#include "../Mobs/Horse.h"
-#include "../Mobs/MagmaCube.h"
-#include "../Mobs/Sheep.h"
-#include "../Mobs/Slime.h"
-#include "../Mobs/Skeleton.h"
-#include "../Mobs/Villager.h"
-#include "../Mobs/Wither.h"
-#include "../Mobs/Wolf.h"
-#include "../Mobs/Zombie.h"
+#include "../Mobs/IncludeAllMonsters.h"
 
 
 
@@ -726,24 +715,10 @@ void cNBTChunkSerializer::AddProjectileEntity(cProjectileEntity * a_Projectile)
 
 void cNBTChunkSerializer::AddHangingEntity(cHangingEntity * a_Hanging)
 {
-	m_Writer.AddInt("TileX", a_Hanging->GetBlockX());
-	m_Writer.AddInt("TileY", a_Hanging->GetBlockY());
-	m_Writer.AddInt("TileZ", a_Hanging->GetBlockZ());
-	switch (a_Hanging->GetFacing())
-	{
-		case BLOCK_FACE_XM: m_Writer.AddByte("Facing", 1); break;
-		case BLOCK_FACE_XP: m_Writer.AddByte("Facing", 3); break;
-		case BLOCK_FACE_ZM: m_Writer.AddByte("Facing", 2); break;
-		case BLOCK_FACE_ZP: m_Writer.AddByte("Facing", 0); break;
-		
-		case BLOCK_FACE_YM:
-		case BLOCK_FACE_YP:
-		case BLOCK_FACE_NONE:
-		{
-			// These directions are invalid, but they may have been previously loaded, so keep them.
-			break;
-		}
-	}
+	m_Writer.AddInt("TileX", FloorC(a_Hanging->GetPosX()));
+	m_Writer.AddInt("TileY", FloorC(a_Hanging->GetPosY()));
+	m_Writer.AddInt("TileZ", FloorC(a_Hanging->GetPosZ()));
+	m_Writer.AddByte("Facing", a_Hanging->GetProtocolFacing());
 }
 
 
@@ -783,6 +758,19 @@ void cNBTChunkSerializer::AddItemFrameEntity(cItemFrame * a_ItemFrame)
 		AddItem(a_ItemFrame->GetItem(), -1, "Item");
 		m_Writer.AddByte("ItemRotation", (unsigned char)a_ItemFrame->GetItemRotation());
 		m_Writer.AddFloat("ItemDropChance", 1.0F);
+	m_Writer.EndCompound();
+}
+
+
+
+
+
+void cNBTChunkSerializer::AddPaintingEntity(cPainting * a_Painting)
+{
+	m_Writer.BeginCompound("");
+		AddBasicEntity(a_Painting, "Painting");
+		AddHangingEntity(a_Painting);
+		m_Writer.AddString("Motive", a_Painting->GetName());
 	m_Writer.EndCompound();
 }
 
@@ -888,7 +876,7 @@ void cNBTChunkSerializer::Entity(cEntity * a_Entity)
 		case cEntity::etTNT:          AddTNTEntity         ((cTNTEntity *)       a_Entity); break;
 		case cEntity::etExpOrb:       AddExpOrbEntity      ((cExpOrb *)          a_Entity); break;
 		case cEntity::etItemFrame:    AddItemFrameEntity   ((cItemFrame *)       a_Entity); break;
-		case cEntity::etPainting: /* TODO */ break;
+		case cEntity::etPainting:     AddPaintingEntity    (reinterpret_cast<cPainting *>(a_Entity)); break;
 		case cEntity::etPlayer: return;  // Players aren't saved into the world
 		default:
 		{

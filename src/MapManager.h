@@ -32,8 +32,7 @@ public:
 	cMapManager(cWorld * a_World);
 
 	/** Returns the map with the specified ID, nullptr if out of range.
-	WARNING: The returned map object is not thread safe.
-	*/
+	WARNING: The returned map object is not thread safe. */
 	cMap * GetMapData(unsigned int a_ID);
 
 	/** Creates a new map. Returns nullptr on error */
@@ -41,13 +40,11 @@ public:
 
 	/** Calls the callback for the map with the specified ID.
 	Returns true if the map was found and the callback called, false if map not found.
-	Callback return value is ignored.
-	*/
-	bool DoWithMap(int a_ID, cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
+	Callback return value is ignored. */
+	bool DoWithMap(UInt32 a_ID, cMapCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Calls the callback for each map.
-	Returns true if all maps processed, false if the callback aborted by returning true.
-	*/
+	Returns true if all maps processed, false if the callback aborted by returning true. */
 	bool ForEachMap(cMapCallback & a_Callback);
 
 	size_t GetNumMaps(void) const;  // tolua_export

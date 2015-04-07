@@ -1,3 +1,4 @@
+
 // SlotArea.cpp
 
 // Implements the cSlotArea class and its descendants
@@ -12,6 +13,7 @@
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../Entities/Minecart.h"
 #include "../Items/ItemHandler.h"
+#include "AnvilWindow.h"
 #include "Window.h"
 #include "../CraftingRecipes.h"
 #include "../Root.h"
@@ -205,7 +207,7 @@ void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_
 {
 	// Make a copy of the slot, distribute it among the other areas, then update the slot to contain the leftover:
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
-	m_ParentWindow.DistributeStack(Slot, a_Player, this, true);
+	m_ParentWindow.DistributeStack(Slot, a_SlotNum, a_Player, this, true);
 	if (Slot.IsEmpty())
 	{
 		// Empty the slot completely, the client doesn't like left-over ItemType with zero count
@@ -340,31 +342,31 @@ void cSlotArea::OnPlayerRemoved(cPlayer & a_Player)
 
 
 
-void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+void cSlotArea::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	for (int i = 0; i < m_NumSlots; i++)
 	{
-		const cItem * Slot = GetSlot(i, a_Player);
+		int SlotNum = (a_BackFill) ? (m_NumSlots - 1 - i) : i;
+
+		const cItem * Slot = GetSlot(SlotNum, a_Player);
 		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
 		{
 			// Different items
 			continue;
 		}
-		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
 			continue;
 		}
-		if (NumFit > a_ItemStack.m_ItemCount)
-		{
-			NumFit = a_ItemStack.m_ItemCount;
-		}
+		NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
 		if (a_ShouldApply)
 		{
 			cItem NewSlot(a_ItemStack);
 			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
-			SetSlot(i, a_Player, NewSlot);
+			SetSlot(SlotNum, a_Player, NewSlot);
 		}
 		a_ItemStack.m_ItemCount -= NumFit;
 		if (a_ItemStack.IsEmpty())
@@ -589,12 +591,13 @@ void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem &
 
 
 
-void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	UNUSED(a_ItemStack);
 	UNUSED(a_Player);
 	UNUSED(a_ShouldApply);
 	UNUSED(a_KeepEmptySlots);
+	UNUSED(a_BackFill);
 }
 
 
@@ -656,7 +659,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 	{
 		// Try distributing the result. If it fails, bail out:
 		cItem ResultCopy(Result);
-		m_ParentWindow.DistributeStack(ResultCopy, a_Player, this, false);
+		m_ParentWindow.DistributeStack(ResultCopy, 0, a_Player, this, false);
 		if (!ResultCopy.IsEmpty())
 		{
 			// Couldn't distribute all of it. Bail out
@@ -665,7 +668,7 @@ void cSlotAreaCrafting::ShiftClickedResult(cPlayer & a_Player)
 		
 		// Distribute the result, this time for real:
 		ResultCopy = Result;
-		m_ParentWindow.DistributeStack(ResultCopy, a_Player, this, true);
+		m_ParentWindow.DistributeStack(ResultCopy, 0, a_Player, this, true);
 
 		// Remove the ingredients from the crafting grid and update the recipe:
 		cCraftingRecipe & Recipe = GetRecipeForPlayer(a_Player);
@@ -769,7 +772,7 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaAnvil:
 
-cSlotAreaAnvil::cSlotAreaAnvil(cAnvilWindow & a_ParentWindow) :
+cSlotAreaAnvil::cSlotAreaAnvil(cWindow & a_ParentWindow) :
 	cSlotAreaTemporary(3, a_ParentWindow),
 	m_MaximumCost(0),
 	m_StackSizeToBeUsedInRepair(0)
@@ -894,7 +897,7 @@ void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem
 		return;
 	}
 
-	m_ParentWindow.DistributeStack(Slot, a_Player, this, true);
+	m_ParentWindow.DistributeStack(Slot, a_SlotNum, a_Player, this, true);
 	if (Slot.IsEmpty())
 	{
 		Slot.Empty();
@@ -910,31 +913,31 @@ void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem
 
 
 
-void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+void cSlotAreaAnvil::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	for (int i = 0; i < 2; i++)
 	{
-		const cItem * Slot = GetSlot(i, a_Player);
+		int SlotNum = (a_BackFill) ? (2 - 1 - i) : i;
+
+		const cItem * Slot = GetSlot(SlotNum, a_Player);
 		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
 		{
 			// Different items
 			continue;
 		}
-		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+		char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
 		if (NumFit <= 0)
 		{
 			// Full stack already
 			continue;
 		}
-		if (NumFit > a_ItemStack.m_ItemCount)
-		{
-			NumFit = a_ItemStack.m_ItemCount;
-		}
+		NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
 		if (a_ShouldApply)
 		{
 			cItem NewSlot(a_ItemStack);
 			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
-			SetSlot(i, a_Player, NewSlot);
+			SetSlot(SlotNum, a_Player, NewSlot);
 		}
 		a_ItemStack.m_ItemCount -= NumFit;
 		if (a_ItemStack.IsEmpty())
@@ -1051,7 +1054,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 	cItem SecondInput(*GetSlot(1, a_Player));
 	cItem Output(*GetSlot(2, a_Player));
 	
-	if (Input.IsEmpty() && !Output.IsEmpty())
+	if (Input.IsEmpty())
 	{
 		Output.Empty();
 		SetSlot(2, a_Player, Output);
@@ -1335,7 +1338,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 
 
 
-void cSlotAreaBeacon::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+void cSlotAreaBeacon::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	const cItem * Slot = GetSlot(0, a_Player);
 	if (!Slot->IsEmpty() || !IsPlaceableItem(a_ItemStack.m_ItemType) || (a_ItemStack.m_ItemCount != 1))
@@ -1390,13 +1393,12 @@ void cSlotAreaBeacon::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaEnchanting:
 
-cSlotAreaEnchanting::cSlotAreaEnchanting(cEnchantingWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
+cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, int a_BlockX, int a_BlockY, int a_BlockZ) :
 	cSlotAreaTemporary(1, a_ParentWindow),
 	m_BlockX(a_BlockX),
 	m_BlockY(a_BlockY),
 	m_BlockZ(a_BlockZ)
 {
-	a_ParentWindow.m_SlotArea = this;
 }
 
 
@@ -1503,7 +1505,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 
 
-void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots)
+void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	const cItem * Slot = GetSlot(0, a_Player);
 	if (!Slot->IsEmpty())
@@ -1833,38 +1835,50 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 
 
 
-void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+void cSlotAreaFurnace::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
-	for (int i = 0; i < 2; i++)
+	int SlotNum;
+	cFurnaceRecipe * FurnaceRecipes = cRoot::Get()->GetFurnaceRecipe();
+
+	if (FurnaceRecipes->GetRecipeFrom(a_ItemStack) != nullptr)
 	{
-		const cItem * Slot = GetSlot(i, a_Player);
-		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
-		{
-			// Different items
-			continue;
-		}
-		int NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
-		if (NumFit <= 0)
-		{
-			// Full stack already
-			continue;
-		}
-		if (NumFit > a_ItemStack.m_ItemCount)
-		{
-			NumFit = a_ItemStack.m_ItemCount;
-		}
-		if (a_ShouldApply)
-		{
-			cItem NewSlot(a_ItemStack);
-			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
-			SetSlot(i, a_Player, NewSlot);
-		}
-		a_ItemStack.m_ItemCount -= NumFit;
-		if (a_ItemStack.IsEmpty())
-		{
-			return;
-		}
-	}  // for i - Slots
+		SlotNum = 0;
+	}
+	else if (FurnaceRecipes->IsFuel(a_ItemStack))
+	{
+		SlotNum = 1;
+	}
+	else
+	{
+		return;
+	}
+
+	const cItem * Slot = GetSlot(SlotNum, a_Player);
+	if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+	{
+		// Different items
+		return;
+	}
+
+	char NumFit = ItemHandler(Slot->m_ItemType)->GetMaxStackSize() - Slot->m_ItemCount;
+	if (NumFit <= 0)
+	{
+		// Full stack already
+		return;
+	}
+	NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
+	if (a_ShouldApply)
+	{
+		cItem NewSlot(a_ItemStack);
+		NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+		SetSlot(SlotNum, a_Player, NewSlot);
+	}
+	a_ItemStack.m_ItemCount -= NumFit;
+	if (a_ItemStack.IsEmpty())
+	{
+		return;
+	}
 }
 
 
@@ -2013,7 +2027,7 @@ void cSlotAreaInventoryBase::SetSlot(int a_SlotNum, cPlayer & a_Player, const cI
 ////////////////////////////////////////////////////////////////////////////////
 // cSlotAreaArmor:
 
-void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots)
+void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
 	if (ItemCategory::IsHelmet(a_ItemStack.m_ItemType) && GetSlot(0, a_Player)->IsEmpty())
 	{

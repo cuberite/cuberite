@@ -39,7 +39,7 @@ public:
 		Vector3d Pos = a_Player->GetThrowStartPos();
 		Vector3d Speed = a_Player->GetLookVector() * 7;
 		
-		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity::pkSplashPotion, a_Player, &a_Player->GetEquippedItem(), &Speed) < 0)
+		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity::pkSplashPotion, a_Player, &a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
 		{
 			return false;
 		}

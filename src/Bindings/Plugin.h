@@ -111,12 +111,12 @@ public:
 	Command permissions have already been checked.
 	Returns true if command handled successfully
 	*/
-	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player) = 0;
+	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) = 0;
 	
 	/** Handles the console command split into a_Split.
 	Returns true if command handled successfully. Output is to be sent to the a_Output callback.
 	*/
-	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output) = 0;
+	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) = 0;
 	
 	/// All bound commands are to be removed, do any language-dependent cleanup here
 	virtual void ClearCommands(void) {}

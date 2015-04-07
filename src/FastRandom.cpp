@@ -6,6 +6,12 @@
 #include "Globals.h"
 #include "FastRandom.h"
 
+#ifdef _WIN32
+	#define thread_local __declspec(thread)
+#endif
+
+thread_local unsigned int m_Counter = 0;
+
 
 
 
@@ -86,7 +92,7 @@ public:
 
 
 cFastRandom::cFastRandom(void) :
-	m_LinearRand(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()))
+	m_LinearRand(m_Counter++)
 {
 }
 
@@ -105,32 +111,8 @@ int cFastRandom::NextInt(int a_Range)
 
 
 
-int cFastRandom::NextInt(int a_Range, int a_Salt)
-{
-	m_LinearRand.seed(a_Salt);
-	std::uniform_int_distribution<> distribution(0, a_Range - 1);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-
 float cFastRandom::NextFloat(float a_Range)
 {
-	std::uniform_real_distribution<float> distribution(0, a_Range);
-	return distribution(m_LinearRand);
-}
-
-
-
-
-
-
-float cFastRandom::NextFloat(float a_Range, int a_Salt)
-{
-	m_LinearRand.seed(a_Salt);
 	std::uniform_real_distribution<float> distribution(0, a_Range);
 	return distribution(m_LinearRand);
 }
@@ -154,7 +136,7 @@ int cFastRandom::GenerateRandomInteger(int a_Begin, int a_End)
 // MTRand:
 
 MTRand::MTRand() :
-	m_MersenneRand(static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count()))
+	m_MersenneRand(m_Counter++)
 {
 }
 

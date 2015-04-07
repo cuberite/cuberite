@@ -14,6 +14,7 @@
 #include "../Endianness.h"
 #include "../Scoreboard.h"
 #include "../Map.h"
+#include "../ByteBuffer.h"
 
 
 
@@ -32,6 +33,7 @@ class cChunkDataSerializer;
 class cFallingBlock;
 class cCompositeChat;
 class cStatManager;
+class cPacketizer;
 
 
 
@@ -47,7 +49,9 @@ class cProtocol
 {
 public:
 	cProtocol(cClientHandle * a_Client) :
-		m_Client(a_Client)
+		m_Client(a_Client),
+		m_OutPacketBuffer(64 KiB),
+		m_OutPacketLenBuffer(20)  // 20 bytes is more than enough for one VarInt
 	{
 	}
 
@@ -59,7 +63,7 @@ public:
 	// Sending stuff to clients (alphabetically sorted):
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity * a_Vehicle) = 0;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
-	virtual void SendBlockBreakAnim             (int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) = 0;
+	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) = 0;
 	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendChat                       (const AString & a_Message) = 0;
@@ -136,11 +140,27 @@ public:
 	virtual AString GetAuthServerID(void) = 0;
 
 protected:
-	cClientHandle * m_Client;
-	cCriticalSection m_CSPacket;  // Each SendXYZ() function must acquire this CS in order to send the whole packet at once
+	friend class cPacketizer;
 
-	/// A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it
+	cClientHandle * m_Client;
+
+	/** Provides synchronization for sending the entire packet at once.
+	Each SendXYZ() function must acquire this CS in order to send the whole packet at once.
+	Automated via cPacketizer class. */
+	cCriticalSection m_CSPacket;
+
+	/** Buffer for composing the outgoing packets, through cPacketizer */
+	cByteBuffer m_OutPacketBuffer;
+	
+	/** Buffer for composing packet length (so that each cPacketizer instance doesn't allocate a new cPacketBuffer) */
+	cByteBuffer m_OutPacketLenBuffer;
+	
+	/** A generic data-sending routine, all outgoing packet data needs to be routed through this so that descendants may override it. */
 	virtual void SendData(const char * a_Data, size_t a_Size) = 0;
+
+	/** Sends a single packet contained within the cPacketizer class.
+	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
+	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 } ;
 
 

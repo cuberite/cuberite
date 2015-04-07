@@ -200,10 +200,22 @@ g_PluginInfo =
 	
 	ConsoleCommands =
 	{
+		["bbox"] =
+		{
+			Handler = HandleConsoleBBox,
+			HelpString = "Performs cBoundingBox API tests",
+		},
+		
 		["hash"] =
 		{
 			Handler = HandleConsoleHash,
 			HelpString = "Tests the crypto hashing functions",
+		},
+		
+		["inh"] =
+		{
+			Handler = HandleConsoleInh,
+			HelpString = "Tests the bindings of the cEntity inheritance",
 		},
 		
 		["loadchunk"] =

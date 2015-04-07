@@ -120,15 +120,23 @@ void GeneratorSetup::editChanged(const QString & a_NewValue)
 
 void GeneratorSetup::updateFromIni()
 {
-	m_eSeed->setText(QString::number(m_IniFile->GetValueI("Seed", "Seed", 0)));
+	// Set the seed editbox:
+	int seed = m_IniFile->GetValueI("Seed", "Seed", 0);
+	m_eSeed->setText(QString::number(seed));
 	int keyID = m_IniFile->FindKey("Generator");
 	if (keyID <= -1)
 	{
 		return;
 	}
-	int numItems = m_IniFile->GetNumValues(keyID);
+
+	// Set the Generator combobox:
 	AString generatorName = m_IniFile->GetValue("Generator", "BiomeGen");
 	size_t generatorNameLen = generatorName.length();
+	int index = m_cbGenerator->findText(QString::fromStdString(generatorName));
+	m_cbGenerator->setCurrentIndex(index);
+
+	// Create the controls for all the generator settings in the INI file:
+	int numItems = m_IniFile->GetNumValues(keyID);
 	for (int i = 0; i < numItems; i++)
 	{
 		AString itemName  = m_IniFile->GetValueName(keyID, i);

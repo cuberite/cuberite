@@ -224,9 +224,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biMegaTaiga:
 		case biMegaTaigaHills:
 		case biExtremeHillsPlus:
-		case biMesa:
-		case biMesaPlateauF:
-		case biMesaPlateau:
 		case biSunflowerPlains:
 		case biDesertM:
 		case biExtremeHillsM:
@@ -239,9 +236,6 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
 		case biExtremeHillsPlusM:
-		case biMesaBryce:
-		case biMesaPlateauFM:
-		case biMesaPlateauM:
 		{
 			// TODO: These need their special trees
 			GetBirchTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
@@ -264,6 +258,16 @@ void GetTreeImageByBiome(int a_BlockX, int a_BlockY, int a_BlockZ, cNoise & a_No
 			return;
 		}
 			
+		case biMesa:
+		case biMesaPlateauF:
+		case biMesaPlateau:
+		case biMesaBryce:
+		case biMesaPlateauFM:
+		case biMesaPlateauM:
+		{
+			GetSmallAppleTreeImage(a_BlockX, a_BlockY, a_BlockZ, a_Noise, a_Seq, a_LogBlocks, a_OtherBlocks);
+		}
+
 		case biDesert:
 		case biDesertHills:
 		case biRiver:

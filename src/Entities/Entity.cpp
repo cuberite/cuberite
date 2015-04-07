@@ -18,49 +18,50 @@
 
 
 
-int cEntity::m_EntityCount = 0;
+UInt32 cEntity::m_EntityCount = 0;
 cCriticalSection cEntity::m_CSCount;
 
 
 
 
 
-cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height)
-	: m_UniqueID(0)
-	, m_Health(1)
-	, m_MaxHealth(1)
-	, m_AttachedTo(nullptr)
-	, m_Attachee(nullptr)
-	, m_bDirtyHead(true)
-	, m_bDirtyOrientation(true)
-	, m_bHasSentNoSpeed(true)
-	, m_bOnGround(false)
-	, m_Gravity(-9.81f)
-	, m_LastPos(a_X, a_Y, a_Z)
-	, m_IsInitialized(false)
-	, m_WorldTravellingFrom(nullptr)
-	, m_EntityType(a_EntityType)
-	, m_World(nullptr)
-	, m_IsFireproof(false)
-	, m_TicksSinceLastBurnDamage(0)
-	, m_TicksSinceLastLavaDamage(0)
-	, m_TicksSinceLastFireDamage(0)
-	, m_TicksLeftBurning(0)
-	, m_TicksSinceLastVoidDamage(0)
-	, m_IsSwimming(false)
-	, m_IsSubmerged(false)
-	, m_AirLevel(0)
-	, m_AirTickTimer(0)
-	, m_TicksAlive(0)
-	, m_HeadYaw(0.0)
-	, m_Rot(0.0, 0.0, 0.0)
-	, m_Pos(a_X, a_Y, a_Z)
-	, m_WaterSpeed(0, 0, 0)
-	, m_Mass (0.001)  // Default 1g
-	, m_Width(a_Width)
-	, m_Height(a_Height)
-	, m_InvulnerableTicks(0)
+cEntity::cEntity(eEntityType a_EntityType, double a_X, double a_Y, double a_Z, double a_Width, double a_Height):
+	m_UniqueID(INVALID_ID),  // Proper ID will be assigned later in the constructor code
+	m_Health(1),
+	m_MaxHealth(1),
+	m_AttachedTo(nullptr),
+	m_Attachee(nullptr),
+	m_bDirtyHead(true),
+	m_bDirtyOrientation(true),
+	m_bHasSentNoSpeed(true),
+	m_bOnGround(false),
+	m_Gravity(-9.81f),
+	m_LastPos(a_X, a_Y, a_Z),
+	m_IsInitialized(false),
+	m_WorldTravellingFrom(nullptr),
+	m_EntityType(a_EntityType),
+	m_World(nullptr),
+	m_IsFireproof(false),
+	m_TicksSinceLastBurnDamage(0),
+	m_TicksSinceLastLavaDamage(0),
+	m_TicksSinceLastFireDamage(0),
+	m_TicksLeftBurning(0),
+	m_TicksSinceLastVoidDamage(0),
+	m_IsSwimming(false),
+	m_IsSubmerged(false),
+	m_AirLevel(0),
+	m_AirTickTimer(0),
+	m_TicksAlive(0),
+	m_HeadYaw(0.0),
+	m_Rot(0.0, 0.0, 0.0),
+	m_Pos(a_X, a_Y, a_Z),
+	m_WaterSpeed(0, 0, 0),
+	m_Mass (0.001),  // Default 1g
+	m_Width(a_Width),
+	m_Height(a_Height),
+	m_InvulnerableTicks(0)
 {
+	// Assign a proper ID:
 	cCSLock Lock(m_CSCount);
 	m_EntityCount++;
 	m_UniqueID = m_EntityCount;
@@ -1263,7 +1264,7 @@ bool cEntity::DetectPortal()
 {
 	if (GetWorld()->GetDimension() == dimOverworld)
 	{
-		if (GetWorld()->GetNetherWorldName().empty() && GetWorld()->GetEndWorldName().empty())
+		if (GetWorld()->GetLinkedNetherWorldName().empty() && GetWorld()->GetLinkedEndWorldName().empty())
 		{
 			// Teleportation to either dimension not enabled, don't bother proceeding
 			return false;
@@ -1314,7 +1315,7 @@ bool cEntity::DetectPortal()
 				}
 				else
 				{
-					if (GetWorld()->GetNetherWorldName().empty())
+					if (GetWorld()->GetLinkedNetherWorldName().empty())
 					{
 						return false;
 					}
@@ -1327,7 +1328,7 @@ bool cEntity::DetectPortal()
 						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimNether);
 					}
 					
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetNetherWorldName(), dimNether, GetWorld()->GetName()), false);
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedNetherWorldName(), dimNether, GetWorld()->GetName()), false);
 				}
 			}
 			case E_BLOCK_END_PORTAL:
@@ -1358,7 +1359,7 @@ bool cEntity::DetectPortal()
 				}
 				else
 				{
-					if (GetWorld()->GetEndWorldName().empty())
+					if (GetWorld()->GetLinkedEndWorldName().empty())
 					{
 						return false;
 					}
@@ -1371,7 +1372,7 @@ bool cEntity::DetectPortal()
 						((cPlayer *)this)->GetClientHandle()->SendRespawn(dimEnd);
 					}
 
-					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetEndWorldName(), dimEnd, GetWorld()->GetName()), false);
+					return MoveToWorld(cRoot::Get()->CreateAndInitializeWorld(GetWorld()->GetLinkedEndWorldName(), dimEnd, GetWorld()->GetName()), false);
 				}
 				
 			}

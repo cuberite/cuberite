@@ -110,8 +110,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	if (allowedMobsSize > 0)
 	{
 		std::set<eMonsterType>::iterator itr = allowedMobs.begin();
-		static int Counter = 0;
-		int iRandom = m_Random.NextInt((int)allowedMobsSize, Counter++);
+		int iRandom = m_Random.NextInt((int)allowedMobsSize);
 
 		for (int i = 0; i < iRandom; i++)
 		{
@@ -133,7 +132,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 	BLOCKTYPE TargetBlock = E_BLOCK_AIR;
 	if (a_Chunk->UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, TargetBlock))
 	{
-		if ((a_RelY + 1 > cChunkDef::Height) || (a_RelY - 1 < 0))
+		if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
 		{
 			return false;
 		}
@@ -187,7 +186,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 						(BlockBelow == E_BLOCK_GRASS) || (BlockBelow == E_BLOCK_LEAVES) || (BlockBelow == E_BLOCK_NEW_LEAVES)
 					) &&
 					(a_RelY >= 62) &&
-					(Random.NextInt(3, a_Biome) != 0)
+					(Random.NextInt(3) != 0)
 				);
 			}
 			
@@ -248,7 +247,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(!cBlockInfo::IsTransparent(BlockBelow)) &&
 					(SkyLight <= 7) &&
 					(BlockLight <= 7) &&
-					(Random.NextInt(2, a_Biome) == 0)
+					(Random.NextInt(2) == 0)
 				);
 			}
 
@@ -272,7 +271,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_R
 					(TargetBlock == E_BLOCK_AIR) &&
 					(BlockAbove == E_BLOCK_AIR) &&
 					(!cBlockInfo::IsTransparent(BlockBelow)) &&
-					(Random.NextInt(20, a_Biome) == 0)
+					(Random.NextInt(20) == 0)
 				);
 			}
 			

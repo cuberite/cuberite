@@ -221,7 +221,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	super(etProjectile, a_X, a_Y, a_Z, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
-		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : -1),
+		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : cEntity::INVALID_ID),
 		((a_Creator != nullptr) ? (a_Creator->IsPlayer() ? ((cPlayer *)a_Creator)->GetName() : "") : ""),
 		((a_Creator != nullptr) ? a_Creator->GetEquippedWeapon().m_Enchantments : cEnchantments())
 	),
@@ -334,12 +334,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 void cProjectileEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
-	
-	// TODO: see BroadcastMovementUpdate; RelativeMove packet jerkiness affects projectiles too (cause of sympton described in cArrowEntity::Tick())
-	if (GetProjectileKind() != pkArrow)
-	{
-		BroadcastMovementUpdate();
-	}
+	BroadcastMovementUpdate();
 }
 
 

@@ -24,28 +24,82 @@ public:
 	// tolua_begin
 
 	/** Returns the direction in which the entity is facing. */
-	eBlockFace GetFacing() const { return m_Facing; }
-	
+	eBlockFace GetFacing() const { return cHangingEntity::ProtocolFaceToBlockFace(m_Facing); }
+
 	/** Set the direction in which the entity is facing. */
-	void SetFacing(eBlockFace a_Facing);
-	
-	/** Returns the X coord of the block in which the entity resides. */
-	int GetBlockX() const { return POSX_TOINT; }
-	
-	/** Returns the Y coord of the block in which the entity resides. */
-	int GetBlockY() const { return POSY_TOINT; }
-	
-	/** Returns the Z coord of the block in which the entity resides. */
-	int GetBlockZ() const { return POSZ_TOINT; }
+	void SetFacing(eBlockFace a_Facing) { m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }
 
 	// tolua_end
 
-private:
+	/** Returns the direction in which the entity is facing. */
+	Byte GetProtocolFacing() const { return m_Facing; }
+
+	/** Set the direction in which the entity is facing. */
+	void SetProtocolFacing(Byte a_Facing)
+	{
+		ASSERT((a_Facing <= 3) && (a_Facing >= 0));
+		m_Facing = a_Facing;
+	}
+
+protected:
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override {}
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
+	{
+		UNUSED(a_Dt);
+		UNUSED(a_Chunk);
+	}
 
-	eBlockFace m_Facing;
+	/** Converts protocol hanging item facing to eBlockFace values */
+	inline static eBlockFace ProtocolFaceToBlockFace(Byte a_ProtocolFace)
+	{
+		eBlockFace Dir;
+
+		// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
+		switch (a_ProtocolFace)
+		{
+			case 0: Dir = BLOCK_FACE_ZP; break;
+			case 2: Dir = BLOCK_FACE_ZM; break;
+			case 1: Dir = BLOCK_FACE_XM; break;
+			case 3: Dir = BLOCK_FACE_XP; break;
+			default:
+			{
+				LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_ProtocolFace);
+				ASSERT(!"Tried to convert a bad facing!");
+
+				Dir = cHangingEntity::ProtocolFaceToBlockFace(3);
+			}
+		}
+
+		return Dir;
+	}
+
+	/** Converts eBlockFace values to protocol hanging item faces */
+	inline static Byte BlockFaceToProtocolFace(eBlockFace a_BlockFace)
+	{
+		Byte Dir;
+
+		// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
+		switch (a_BlockFace)
+		{
+			case BLOCK_FACE_ZP: Dir = 0; break;
+			case BLOCK_FACE_ZM: Dir = 2; break;
+			case BLOCK_FACE_XM: Dir = 1; break;
+			case BLOCK_FACE_XP: Dir = 3; break;
+			default:
+			{
+				// Uncomment when entities are initialised with their real data, instead of dummy values:
+				// LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_BlockFace);
+				// ASSERT(!"Tried to convert a bad facing!");
+
+				Dir = cHangingEntity::BlockFaceToProtocolFace(BLOCK_FACE_XP);
+			}
+		}
+
+		return Dir;
+	}
+
+	Byte m_Facing;
 
 };  // tolua_export
 

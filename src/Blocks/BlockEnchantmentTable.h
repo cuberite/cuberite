@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "../UI/Window.h"
+#include "../UI/EnchantingWindow.h"
 #include "../Entities/Player.h"
 
 

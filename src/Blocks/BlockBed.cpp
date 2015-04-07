@@ -1,14 +1,9 @@
 #include "Globals.h"
 #include "BlockBed.h"
 
-
-
-
 #include "BroadcastInterface.h"
-#include "ChunkInterface.h"
 #include "Entities/../World.h"
 #include "Entities/Player.h"
-#include "WorldInterface.h"
 
 
 
@@ -64,21 +59,22 @@ class cPlayerBedStateUnsetter :
 	public cPlayerListCallback
 {
 public:
-	cPlayerBedStateUnsetter(Vector3i a_Position, cWorldInterface & a_WorldInterface) :
-		m_Position(a_Position), m_WorldInterface(a_WorldInterface)
+	cPlayerBedStateUnsetter(Vector3i a_Position, cChunkInterface & a_ChunkInterface) :
+		m_Position(a_Position),
+		m_ChunkInterface(a_ChunkInterface)
 	{
 	}
 
 	virtual bool Item(cPlayer * a_Player) override
 	{
+		cBlockBedHandler::SetBedOccupationState(m_ChunkInterface, a_Player->GetLastBedPos(), false);
 		a_Player->SetIsInBed(false);
-		m_WorldInterface.GetBroadcastManager().BroadcastEntityAnimation(*a_Player, 2);
 		return false;
 	}
 
 private:
 	Vector3i m_Position;
-	cWorldInterface & m_WorldInterface;
+	cChunkInterface & m_ChunkInterface;
 };
 
 
@@ -97,7 +93,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 		if (a_WorldInterface.GetTimeOfDay() > 13000)
 		{
 			NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockX, a_BlockY, a_BlockZ);
-			if (Meta & 0x4)
+			if ((Meta & 0x4) == 0x4)
 			{
 				a_Player->SendMessageFailure("This bed is occupied");
 			}
@@ -105,7 +101,7 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 			{
 				Vector3i PillowDirection(0, 0, 0);
 
-				if (Meta & 0x8)
+				if ((Meta & 0x8) == 0x8)
 				{
 					// Is pillow
 					a_WorldInterface.GetBroadcastManager().BroadcastUseBed(*a_Player, a_BlockX, a_BlockY, a_BlockZ);
@@ -122,15 +118,15 @@ void cBlockBedHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface
 					}
 				}
 
-				a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta | 0x4);  // Where 0x4 = occupied bit
-				a_Player->SetIsInBed(true);
 				a_Player->SetBedPos(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
+				SetBedOccupationState(a_ChunkInterface, a_Player->GetLastBedPos(), true);
+				a_Player->SetIsInBed(true);
 				a_Player->SendMessageSuccess("Home position set successfully");
 
 				cTimeFastForwardTester Tester;
 				if (a_WorldInterface.ForEachPlayer(Tester))
 				{
-					cPlayerBedStateUnsetter Unsetter(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_WorldInterface);
+					cPlayerBedStateUnsetter Unsetter(Vector3i(a_BlockX + PillowDirection.x, a_BlockY, a_BlockZ + PillowDirection.z), a_ChunkInterface);
 					a_WorldInterface.ForEachPlayer(Unsetter);
 					a_WorldInterface.SetTimeOfDay(0);
 					a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta & 0x0b);  // Clear the "occupied" bit of the bed's block

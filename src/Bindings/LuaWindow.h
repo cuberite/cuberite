@@ -35,8 +35,10 @@ This reference needs to be unreferenced in the Destroy() function.
 */
 // tolua_begin
 class cLuaWindow :
-	public cWindow,
-	public cItemGrid::cListener
+	public cWindow
+	// tolua_end
+	, public cItemGrid::cListener
+	// tolua_begin
 {
 	typedef cWindow super;
 	
@@ -84,6 +86,7 @@ protected:
 	// cWindow overrides:
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 	virtual void Destroy(void) override;
+	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 	
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;

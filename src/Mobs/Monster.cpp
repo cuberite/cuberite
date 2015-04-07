@@ -135,7 +135,7 @@ void cMonster::TickPathFinding()
 		{ 0, -1},
 	} ;
 	
-	if ((PosY - 1 < 0) || (PosY + 2 > cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
+	if ((PosY - 1 < 0) || (PosY + 2 >= cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
 	{
 		// Too low/high, can't really do anything
 		FinishPathFinding();

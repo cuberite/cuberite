@@ -12,12 +12,16 @@
 #include "BlockEntities/CommandBlockEntity.h"
 #include "BlockEntities/SignEntity.h"
 #include "UI/Window.h"
+#include "UI/AnvilWindow.h"
+#include "UI/BeaconWindow.h"
+#include "UI/EnchantingWindow.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
 #include "ChatColor.h"
 #include "Items/ItemHandler.h"
 #include "Blocks/BlockHandler.h"
 #include "Blocks/BlockSlab.h"
+#include "Blocks/BlockBed.h"
 #include "Blocks/ChunkInterface.h"
 
 #include "Root.h"
@@ -672,7 +676,7 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 
 
 
-void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_HeldItem)
+void cClientHandle::HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction)
 {
 	// This is for creative Inventory changes
 	if (!m_Player->IsGameModeCreative())
@@ -686,18 +690,18 @@ void cClientHandle::HandleCreativeInventory(short a_SlotNum, const cItem & a_Hel
 		return;
 	}
 	
-	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, (a_SlotNum >= 0) ? caLeftClick : caLeftClickOutside, a_HeldItem);
+	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, a_ClickAction, a_HeldItem);
 }
 
 
 
 
 
-void cClientHandle::HandleEnchantItem(Byte a_WindowID, Byte a_Enchantment)
+void cClientHandle::HandleEnchantItem(UInt8 a_WindowID, UInt8 a_Enchantment)
 {
 	if (a_Enchantment > 2)
 	{
-		LOGWARNING("%s attempt to crash the server with invalid enchanting selection!", GetUsername().c_str());
+		LOGWARNING("%s attempt to crash the server with invalid enchanting selection (%u)!", GetUsername().c_str(), a_Enchantment);
 		Kick("Invalid enchanting!");
 		return;
 	}
@@ -947,7 +951,7 @@ void cClientHandle::HandleCommandBlockBlockChange(int a_BlockX, int a_BlockY, in
 
 
 
-void cClientHandle::HandleCommandBlockEntityChange(int a_EntityID, const AString & a_NewCommand)
+void cClientHandle::HandleCommandBlockEntityChange(UInt32 a_EntityID, const AString & a_NewCommand)
 {
 	// TODO
 	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
@@ -974,7 +978,7 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 
 
 
-void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
+void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, UInt8 a_Status)
 {
 	LOGD("HandleLeftClick: {%i, %i, %i}; Face: %i; Stat: %i",
 		a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status
@@ -1002,6 +1006,12 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 		int BlockY = a_BlockY;
 		int BlockZ = a_BlockZ;
 		AddFaceDirection(BlockX, BlockY, BlockZ, a_BlockFace);
+
+		if ((BlockY < 0) || (BlockY >= cChunkDef::Height))
+		{
+			return;
+		}
+
 		if (cBlockInfo::GetHandler(m_Player->GetWorld()->GetBlock(BlockX, BlockY, BlockZ))->IsClickedThrough())
 		{
 			a_BlockX = BlockX;
@@ -1498,30 +1508,6 @@ void cClientHandle::HandleAnimation(int a_Animation)
 		return;
 	}
 
-	// Because the animation ID sent to servers by clients are different to those sent back, we need this
-	switch (a_Animation)
-	{
-		case 0:  // No animation - wiki.vg doesn't say that client has something specific for it, so I suppose it will just become -1
-		case 1:
-		case 2:
-		case 3:
-		{
-			a_Animation--;  // Offset by -1
-			break;
-		}
-		case 5:
-		case 6:
-		case 7:
-		{
-			a_Animation -= 2;  // Offset by -2
-			break;
-		}
-		default:  // Anything else is the same
-		{
-			break;
-		}
-	}
-
 	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, a_Animation, this);
 }
 
@@ -1529,7 +1515,7 @@ void cClientHandle::HandleAnimation(int a_Animation)
 
 
 
-void cClientHandle::HandleSlotSelected(short a_SlotNum)
+void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 {
 	m_Player->GetInventory().SetEquippedSlotNum(a_SlotNum);
 	m_Player->GetWorld()->BroadcastEntityEquipment(*m_Player, 0, m_Player->GetInventory().GetEquippedItem(), this);
@@ -1548,7 +1534,7 @@ void cClientHandle::HandleSteerVehicle(float a_Forward, float a_Sideways)
 
 
 
-void cClientHandle::HandleWindowClose(char a_WindowID)
+void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 {
 	m_Player->CloseWindowIfID(a_WindowID);
 }
@@ -1557,7 +1543,7 @@ void cClientHandle::HandleWindowClose(char a_WindowID)
 
 
 
-void cClientHandle::HandleWindowClick(char a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
+void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
 {
 	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
 		a_WindowID, a_SlotNum, ClickActionToString(a_ClickAction),
@@ -1595,7 +1581,7 @@ void cClientHandle::HandleUpdateSign(
 
 
 
-void cClientHandle::HandleUseEntity(int a_TargetEntityID, bool a_IsLeftClick)
+void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 {
 	// TODO: Let plugins interfere via a hook
 	
@@ -1740,7 +1726,7 @@ bool cClientHandle::HandleHandshake(const AString & a_Username)
 
 
 
-void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
+void cClientHandle::HandleEntityCrouch(UInt32 a_EntityID, bool a_IsCrouching)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1755,7 +1741,7 @@ void cClientHandle::HandleEntityCrouch(int a_EntityID, bool a_IsCrouching)
 
 
 
-void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
+void cClientHandle::HandleEntityLeaveBed(UInt32 a_EntityID)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -1763,14 +1749,16 @@ void cClientHandle::HandleEntityLeaveBed(int a_EntityID)
 		return;
 	}
 
-	m_Player->GetWorld()->BroadcastEntityAnimation(*m_Player, 2);
+	cChunkInterface Interface(GetPlayer()->GetWorld()->GetChunkMap());
+	cBlockBedHandler::SetBedOccupationState(Interface, GetPlayer()->GetLastBedPos(), false);
+	GetPlayer()->SetIsInBed(false);
 }
 
 
 
 
 
-void cClientHandle::HandleEntitySprinting(int a_EntityID, bool a_IsSprinting)
+void cClientHandle::HandleEntitySprinting(UInt32 a_EntityID, bool a_IsSprinting)
 {
 	if (a_EntityID != m_Player->GetUniqueID())
 	{
@@ -2042,7 +2030,7 @@ void cClientHandle::SendBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, ch
 
 
 
-void cClientHandle::SendBlockBreakAnim(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
+void cClientHandle::SendBlockBreakAnim(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage)
 {
 	m_Protocol->SendBlockBreakAnim(a_EntityID, a_BlockX, a_BlockY, a_BlockZ, a_Stage);
 }

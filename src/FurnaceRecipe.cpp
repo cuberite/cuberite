@@ -291,6 +291,22 @@ const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_In
 
 
 
+bool cFurnaceRecipe::IsFuel(const cItem & a_Item) const
+{
+	for (auto & Fuel : m_pState->Fuel)
+	{
+		if ((Fuel.In->m_ItemType == a_Item.m_ItemType) && (Fuel.In->m_ItemCount <= a_Item.m_ItemCount))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+
+
 int cFurnaceRecipe::GetBurnTime(const cItem & a_Fuel) const
 {
 	int BestFuel = 0;

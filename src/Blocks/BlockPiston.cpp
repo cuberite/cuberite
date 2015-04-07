@@ -61,6 +61,16 @@ void cBlockPistonHandler::OnDestroyed(cChunkInterface & a_ChunkInterface, cWorld
 
 
 
+void cBlockPistonHandler::ConvertToPickups(cItems & a_Pickups, NIBBLETYPE a_BlockMeta)
+{
+	// Returning Piston Item without Direction-Metavalue
+	a_Pickups.push_back(cItem(m_BlockType, 1));
+}
+
+
+
+
+
 bool cBlockPistonHandler::GetPlacementBlockTypeMeta(
 	cChunkInterface & a_ChunkInterface, cPlayer * a_Player,
 	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
@@ -169,7 +179,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 
 	a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, pistonBlock, pistonMeta | 0x8);
 	a_World->SetBlock(extx, exty, extz, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0), false);
-	a_World->ScheduleTask(PISTON_TICK_DELAY, new cWorld::cTaskSendBlockToAllPlayers(ScheduledBlocks));
+	a_World->ScheduleTask(PISTON_TICK_DELAY, std::make_shared<cWorld::cTaskSendBlockToAllPlayers>(ScheduledBlocks));
 }
 
 
@@ -219,7 +229,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 			std::vector<Vector3i> ScheduledBlocks;
 			ScheduledBlocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
 			ScheduledBlocks.push_back(Vector3i(tempx, tempy, tempz));
-			a_World->ScheduleTask(PISTON_TICK_DELAY + 1, new cWorld::cTaskSendBlockToAllPlayers(ScheduledBlocks));
+			a_World->ScheduleTask(PISTON_TICK_DELAY + 1, std::make_shared<cWorld::cTaskSendBlockToAllPlayers>(ScheduledBlocks));
 			return;
 		}
 	}
@@ -229,7 +239,7 @@ void cBlockPistonHandler::RetractPiston(int a_BlockX, int a_BlockY, int a_BlockZ
 
 	std::vector<Vector3i> ScheduledBlocks;
 	ScheduledBlocks.push_back(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
-	a_World->ScheduleTask(PISTON_TICK_DELAY + 1, new cWorld::cTaskSendBlockToAllPlayers(ScheduledBlocks));
+	a_World->ScheduleTask(PISTON_TICK_DELAY + 1, std::make_shared<cWorld::cTaskSendBlockToAllPlayers>(ScheduledBlocks));
 }
 
 

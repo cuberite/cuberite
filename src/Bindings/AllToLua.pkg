@@ -1,4 +1,19 @@
 
+// AllToLua.pkg
+
+// Defines the bindings that are exported to Lua by the ToLua processor
+
+/*
+	Each file referenced in the $cfile is parsed by ToLua, and bindings are generated for classes and functions
+marked with "// tolua_export", or between the "// tolua_begin" and "// tolua_end" markers.
+
+  Note that if class D inherits from class B, then class B needs to be parsed before class D, otherwise the
+inheritance doesn't work properly (#1789).
+*/
+
+
+
+
 $#include "../Globals.h"
 
 // Typedefs from Globals.h, so that we don't have to process that file:
@@ -27,14 +42,38 @@ $cfile "WebPlugin.h"
 $cfile "LuaWindow.h"
 
 $cfile "../BlockID.h"
-$cfile "../Mobs/MonsterTypes.h"
 $cfile "../BlockInfo.h"
 $cfile "../StringUtils.h"
 $cfile "../Defines.h"
 $cfile "../ChatColor.h"
 $cfile "../ClientHandle.h"
-$cfile "../Entities/ArrowEntity.h"
+$cfile "../Server.h"
+$cfile "../World.h"
+$cfile "../Inventory.h"
+$cfile "../Enchantments.h"
+$cfile "../Item.h"
+$cfile "../ItemGrid.h"
+$cfile "../WebAdmin.h"
+$cfile "../Root.h"
+$cfile "../Cuboid.h"
+$cfile "../BoundingBox.h"
+$cfile "../Tracer.h"
+$cfile "../BlockArea.h"
+$cfile "../Generating/ChunkDesc.h"
+$cfile "../CraftingRecipes.h"
+$cfile "../UI/Window.h"
+$cfile "../CompositeChat.h"
+$cfile "../Map.h"
+$cfile "../MapManager.h"
+$cfile "../Scoreboard.h"
+$cfile "../Statistics.h"
+$cfile "../Protocol/MojangAPI.h"
+
+// Entities:
 $cfile "../Entities/Entity.h"
+$cfile "../Entities/Pawn.h"
+$cfile "../Entities/ProjectileEntity.h"
+$cfile "../Entities/ArrowEntity.h"
 $cfile "../Entities/EntityEffect.h"
 $cfile "../Entities/ExpBottleEntity.h"
 $cfile "../Entities/FireChargeEntity.h"
@@ -43,25 +82,21 @@ $cfile "../Entities/Floater.h"
 $cfile "../Entities/GhastFireballEntity.h"
 $cfile "../Entities/HangingEntity.h"
 $cfile "../Entities/ItemFrame.h"
-$cfile "../Entities/Pawn.h"
 $cfile "../Entities/Player.h"
 $cfile "../Entities/Painting.h"
 $cfile "../Entities/Pickup.h"
-$cfile "../Entities/ProjectileEntity.h"
 $cfile "../Entities/SplashPotionEntity.h"
 $cfile "../Entities/ThrownEggEntity.h"
 $cfile "../Entities/ThrownEnderPearlEntity.h"
 $cfile "../Entities/ThrownSnowballEntity.h"
 $cfile "../Entities/TNTEntity.h"
 $cfile "../Entities/WitherSkullEntity.h"
-$cfile "../Server.h"
-$cfile "../World.h"
-$cfile "../Inventory.h"
-$cfile "../Enchantments.h"
-$cfile "../Item.h"
-$cfile "../ItemGrid.h"
-$cfile "../BlockEntities/BeaconEntity.h"
+$cfile "../Mobs/MonsterTypes.h"
+$cfile "../Mobs/Monster.h"
+
+// Block entities:
 $cfile "../BlockEntities/BlockEntity.h"
+$cfile "../BlockEntities/BeaconEntity.h"
 $cfile "../BlockEntities/BlockEntityWithItems.h"
 $cfile "../BlockEntities/ChestEntity.h"
 $cfile "../BlockEntities/CommandBlockEntity.h"
@@ -76,30 +111,6 @@ $cfile "../BlockEntities/SignEntity.h"
 $cfile "../BlockEntities/MobHeadEntity.h"
 $cfile "../BlockEntities/MobSpawnerEntity.h"
 $cfile "../BlockEntities/FlowerPotEntity.h"
-$cfile "../WebAdmin.h"
-$cfile "../Root.h"
-$cfile "../Cuboid.h"
-$cfile "../BoundingBox.h"
-$cfile "../Tracer.h"
-$cfile "../BlockArea.h"
-$cfile "../Generating/ChunkDesc.h"
-$cfile "../CraftingRecipes.h"
-$cfile "../UI/Window.h"
-$cfile "../Mobs/Monster.h"
-$cfile "../CompositeChat.h"
-$cfile "../Map.h"
-$cfile "../MapManager.h"
-$cfile "../Scoreboard.h"
-$cfile "../Statistics.h"
-$cfile "../Protocol/MojangAPI.h"
-
-
-
-
-
-// Need to declare this class so that the usertype is properly registered in Bindings.cpp - 
-// it seems impossible to register a usertype in ManualBindings.cpp
-class cLineBlockTracer;
 
 
 

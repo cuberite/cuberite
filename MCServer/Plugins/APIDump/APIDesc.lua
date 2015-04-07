@@ -197,6 +197,7 @@ g_APIDesc =
 				baMetas = { Notes = "Operations should work on block metas" },
 				baLight = { Notes = "Operations should work on block (emissive) light" },
 				baSkyLight = { Notes = "Operations should work on skylight" },
+				msDifference = { Notes = "Block becomes air if Src and Dst are the same. Otherwise it becomes the source block." },
 				msOverwrite = { Notes = "Src overwrites anything in Dst" },
 				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
 				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
@@ -355,9 +356,11 @@ g_APIDesc =
 			]],
 			Functions =
 			{
+				CanBeTerraformed = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns true if the block is suitable to be changed by a generator" },
 				FullyOccupiesVoxel = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block fully occupies its voxel." },
 				Get = { Params = "Type", Return = "{{cBlockInfo}}", Notes = "(STATIC) Returns the {{cBlockInfo}} structure for the specified type." },
 				GetLightValue = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block emits on its own." },
+				GetPlaceSound = { Params = "Type", Return = "", Notes = "(STATIC) Returns the name of the sound that is played when placing the block." },
 				GetSpreadLightFalloff = { Params = "Type", Return = "number", Notes = "(STATIC) Returns how much light the specified block consumes." },
 				IsOneHitDig = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether the specified block will be destroyed after a single hit." },
 				IsPistonBreakable = { Params = "Type", Return = "bool", Notes = "(STATIC) Returns whether a piston can break the specified block." },
@@ -368,12 +371,14 @@ g_APIDesc =
 			},
 			Variables =
 			{
+				m_CanBeTerraformed = { Type = "bool", Notes = "Is this block suited to be terraformed?" },
 				m_FullyOccupiesVoxel = { Type = "bool", Notes = "Does this block fully occupy its voxel - is it a 'full' block?" },
 				m_IsSnowable = { Type = "bool", Notes = "Can this block hold snow atop?" },
 				m_IsSolid = { Type = "bool", Notes = "Is this block solid (player cannot walk through)?" },
 				m_LightValue = { Type = "number", Notes = "How much light do the blocks emit on their own?" },
 				m_OneHitDig = { Type = "bool", Notes = "Is a block destroyed after a single hit?" },
 				m_PistonBreakable = { Type = "bool", Notes = "Can a piston break this block?" },
+				m_PlaceSound = { Type = "string", Notes = "The name of the sound that is placed when a block is placed." },
 				m_RequiresSpecialTool = { Type = "bool", Notes = "Does this block require a tool to drop?" },
 				m_SpreadLightFalloff = { Type = "number", Notes = "How much light do the blocks consume?" },
 				m_Transparent = { Type = "bool", Notes = "Is a block completely transparent? (light doesn't get decreased(?))" },
@@ -447,6 +452,7 @@ g_APIDesc =
 				GetChunkZ                 = { Params = "", Return = "number", Notes = "Returns the Z coord of the chunk contained." },
 				GetHeight                 = { Params = "RelX, RelZ", Return = "number", Notes = "Returns the height at the specified relative coords" },
 				GetMaxHeight              = { Params = "", Return = "number", Notes = "Returns the maximum height contained in the heightmap." },
+				GetMinHeight              = { Params = "", Return = "number", Notes = "Returns the minimum height value in the heightmap." },
 				IsUsingDefaultBiomes      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default biome generator" },
 				IsUsingDefaultComposition = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default composition generator" },
 				IsUsingDefaultFinish      = { Params = "", Return = "bool", Notes = "Returns true if the chunk is set to use default finishers" },
@@ -2419,6 +2425,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				BroadcastChatInfo = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Yellow [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For informational messages, such as command usage." },
 				BroadcastChatSuccess = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Green [INFO] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For success messages." },
 				BroadcastChatWarning = { Params = "Message, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Prepends Rose [WARN] / colours entire text (depending on ShouldUseChatPrefixes()) and broadcasts message. For concerning events, such as plugin reload etc." },
+				BroadcastEntityAnimation = { Params = "{{cEntity|TargetEntity}}, Animation, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends an animation of an entity to all clienthandles (except ExcludeClient if given)" },
 				BroadcastParticleEffect = { Params = "ParticleName, X, Y, Z, OffSetX, OffSetY, OffSetZ, ParticleData, ParticleAmmount, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Spawns the specified particles to all players in the world exept the optional ExeptClient. A list of available particles by thinkofdeath can be found {{https://gist.github.com/thinkofdeath/5110835|Here}}" },
 				BroadcastSoundEffect = { Params = "SoundName, X, Y, Z, Volume, Pitch, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified sound effect to all players in this world, except the optional ExceptClient" },
 				BroadcastSoundParticleEffect = { Params = "EffectID, X, Y, Z, EffectData, [{{cClientHandle|ExcludeClient}}]", Return = "", Notes = "Sends the specified effect to all players in this world, except the optional ExceptClient" },
@@ -2471,15 +2478,20 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				},
 				GetBlockSkyLight = { Params = "BlockX, BlockY, BlockZ", Return = "number", Notes = "Returns the block skylight of the block at the specified coords, or 0 if the appropriate chunk is not loaded." },
 				GetBlockTypeMeta = { Params = "BlockX, BlockY, BlockZ", Return = "BlockValid, BlockType, BlockMeta", Notes = "Returns the block type and metadata for the block at the specified coords. The first value specifies if the block is in a valid loaded chunk, the other values are valid only if BlockValid is true." },
+				GetDefaultWeatherInterval = { Params = "eWeather", Return = "", Notes = "Returns the default weather interval for the specific weather type. Returns -1 for any unknown weather." },
 				GetDimension = { Params = "", Return = "eDimension", Notes = "Returns the dimension of the world - dimOverworld, dimNether or dimEnd." },
 				GetGameMode = { Params = "", Return = "eGameMode", Notes = "Returns the gamemode of the world - gmSurvival, gmCreative or gmAdventure." },
 				GetGeneratorQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks that are queued in the chunk generator." },
 				GetHeight = { Params = "BlockX, BlockZ", Return = "number", Notes = "Returns the maximum height of the particula block column in the world. If the chunk is not loaded, it waits for it to load / generate. <b>WARNING</b>: Do not use, Use TryGetHeight() instead for a non-waiting version, otherwise you run the risk of a deadlock!" },
 				GetIniFileName = { Params = "", Return = "string", Notes = "Returns the name of the world.ini file that the world uses to store the information." },
 				GetLightingQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks in the lighting thread's queue." },				
+				GetLinkedEndWorldName = { Params = "", Return = "string", Notes = "Returns the name of the end world this world is linked to." },
+				GetLinkedNetherWorldName = { Params = "", Return = "string", Notes = "Returns the name of the Netherworld linked to this world." },
+				GetLinkedOverworldName = { Params = "", Return = "string", Notes = "Returns the name of the world this world is linked to." },
 				GetMapManager = { Params = "", Return = "{{cMapManager}}", Notes = "Returns the {{cMapManager|MapManager}} object used by this world." },
 				GetMaxCactusHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which cacti will grow naturally." },
 				GetMaxSugarcaneHeight = { Params = "", Return = "number", Notes = "Returns the configured maximum height to which sugarcane will grow naturally." },
+				GetMaxViewDistance = { Params = "", Return = "number", Notes = "Returns the maximum viewdistance that players can see in this world. The view distance is the amount of chunks around the player that the player can see." },
 				GetName = { Params = "", Return = "string", Notes = "Returns the name of the world, as specified in the settings.ini file." },
 				GetNumChunks = { Params = "", Return = "number", Notes = "Returns the number of chunks currently loaded." },
 				GetScoreBoard = { Params = "", Return = "{{cScoreBoard}}", Notes = "Returns the {{cScoreBoard|ScoreBoard}} object used by this world. " },
@@ -2491,6 +2503,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				GetStorageSaveQueueLength = { Params = "", Return = "number", Notes = "Returns the number of chunks queued up for saving" },
 				GetTicksUntilWeatherChange = { Params = "", Return = "number", Notes = "Returns the number of ticks that will pass before the weather is changed" },
 				GetTimeOfDay = { Params = "", Return = "number", Notes = "Returns the number of ticks that have passed from the sunrise, 0 .. 24000." },
+				GetTNTShrapnelLevel = { Params = "", Return = "{{Globals#ShrapnelLevel|ShrapnelLevel}}", Notes = "Returns the shrapnel level, representing the block types that are propelled outwards following an explosion. Based on this value and a random picker, blocks are selectively converted to physics entities (FallingSand) and flung outwards." },
 				GetWeather = { Params = "", Return = "eWeather", Notes = "Returns the current weather in the world (wSunny, wRain, wStorm). To check for weather, use IsWeatherXXX() functions instead." },
 				GetWorldAge = { Params = "", Return = "number", Notes = "Returns the total age of the world, in ticks. The age always grows, cannot be set by plugins and is unrelated to TimeOfDay." },
 				GrowCactus = { Params = "BlockX, BlockY, BlockZ, NumBlocksToGrow", Return = "", Notes = "Grows a cactus block at the specified coords, by up to the specified number of blocks. Adheres to the world's maximum cactus growth (GetMaxCactusHeight())." },
@@ -2501,11 +2514,14 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				GrowTreeByBiome = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Grows a tree based at the specified coords. The tree type is picked from types available for the biome at those coords." },
 				GrowTreeFromSapling = { Params = "BlockX, BlockY, BlockZ, SaplingMeta", Return = "", Notes = "Grows a tree based at the specified coords. The tree type is determined from the sapling meta (the sapling itself needn't be present)." },
 				IsBlockDirectlyWatered = { Params = "BlockX, BlockY, BlockZ", Return = "bool", Notes = "Returns true if the specified block has a water block right next to it (on the X/Z axes)" },
+				IsDaylightCycleEnabled = { Params = "", Return = "bool", Notes = "Returns true if the daylight cycle is enabled." },
 				IsDeepSnowEnabled = { Params = "", Return = "bool", Notes = "Returns whether the configuration has DeepSnow enabled." },
 				IsGameModeAdventure = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmAdventure." },
 				IsGameModeCreative = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmCreative." },
+				IsGameModeSpectator = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmSpectator." },
 				IsGameModeSurvival = { Params = "", Return = "bool", Notes = "Returns true if the current gamemode is gmSurvival." },
 				IsPVPEnabled = { Params = "", Return = "bool", Notes = "Returns whether PVP is enabled in the world settings." },
+				IsTrapdoorOpen = { Params = "BlockX, BlockY, BlockZ", Return = "bool", Notes = "Returns false if there is no trapdoor there or if the block isn't a trapdoor or if the chunk wasn't loaded. Returns true if trapdoor is open." },
 				IsWeatherRain = { Params = "", Return = "bool", Notes = "Returns true if the current world is raining." },
 				IsWeatherRainAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location is raining (takes into account biomes)." },
 				IsWeatherStorm = { Params = "", Return = "bool", Notes = "Returns true if the current world is stormy." },
@@ -2514,6 +2530,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				IsWeatherSunnyAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the current weather is sunny at the specified location (takes into account biomes)." },
 				IsWeatherWet = { Params = "", Return = "bool", Notes = "Returns true if the current world has any precipitation (rain or storm)." },
 				IsWeatherWetAt = { Params = "BlockX, BlockZ", Return = "bool", Notes = "Returns true if the specified location has any precipitation (rain or storm) (takes into account biomes)." },
+				PrepareChunk = { Params = "ChunkX, ChunkZ, [Callback]", Return = "", Notes = "Queues the chunk for preparing - making sure that it's generated and lit. It is legal to call with no callback. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback(ChunkX, ChunkZ)</pre>" },
 				QueueBlockForTick = { Params = "BlockX, BlockY, BlockZ, TicksToWait", Return = "", Notes = "Queues the specified block to be ticked after the specified number of gameticks." },
 				QueueSaveAllChunks = { Params = "", Return = "", Notes = "Queues all chunks to be saved in the world storage thread" },
 				QueueSetBlock = { Params = "BlockX, BlockY, BlockZ, BlockType, BlockMeta, TickDelay", Return = "", Notes = "Queues the block to be set to the specified blocktype and meta after the specified amount of game ticks. Uses SetBlock() for the actual setting, so simulators are woken up and block entities are handled correctly." },
@@ -2537,18 +2554,28 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				SetNextBlockTick = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Sets the blockticking to start at the specified block in the next tick." },
 				SetCommandBlockCommand = { Params = "BlockX, BlockY, BlockZ, Command", Return = "bool", Notes = "Sets the command to be executed in a command block at the specified coordinates. Returns if command was changed." },
 				SetCommandBlocksEnabled = { Params = "IsEnabled (bool)", Return = "", Notes = "Sets whether command blocks should be enabled on the (entire) server." },
+				SetDaylightCycleEnabled = { Params = "bool", Return = "", Notes = "Starts or stops the daylight cycle." },
+				SetLinkedEndWorldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the end portal should link to." },
+				SetLinkedNetherWorldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the nether portal should link to." },
+				SetLinkedOverworldName = { Params = "string", Return = "", Notes = "Sets the name of the world that the nether portal should link to?" },
+				SetMaxViewDistance = { Params = "number", Return = "", Notes = "Sets the maximum viewdistance of the players in the world." },
 				SetShouldUseChatPrefixes = { Params = "", Return = "ShouldUse (bool)", Notes = "Sets whether coloured chat prefixes such as [INFO] is used with the SendMessageXXX() or BroadcastChatXXX(), or simply the entire message is coloured in the respective colour." },
-				ShouldUseChatPrefixes = { Params = "", Return = "bool", Notes = "Returns whether coloured chat prefixes are prepended to chat messages or the entire message is simply coloured." },
 				SetSignLines = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "Sets the sign text at the specified coords. The sign-updating hooks are called for the change. The Player parameter is used to indicate the player from whom the change has come, it may be nil." },
 				SetTicksUntilWeatherChange = { Params = "NumTicks", Return = "", Notes = "Sets the number of ticks after which the weather will be changed." },
 				SetTimeOfDay = { Params = "TimeOfDayTicks", Return = "", Notes = "Sets the time of day, expressed as number of ticks past sunrise, in the range 0 .. 24000." },
+				SetTNTShrapnelLevel = { Params = "{{Globals#ShrapnelLevel|ShrapnelLevel}}", Return = "", Notes = "Sets the Shrampel level of the world." },
+				SetTrapdoorOpen = { Params = "BlockX, BlockY, BlockZ, bool", Return = "", Notes = "Opens or closes a trapdoor at the specific coordinates." },
 				SetWeather = { Params = "Weather", Return = "", Notes = "Sets the current weather (wSunny, wRain, wStorm) and resets the TicksUntilWeatherChange to the default value for the new weather. The normal weather-changing hooks are called for the change." },
+				ShouldBroadcastAchievementMessages = { Params = "", Return = "bool", Notes = "Returns true if the server should broadcast achievement messages in this world." },
+				ShouldBroadcastDeathMessages = { Params = "", Return = "bool", Notes = "Returns true if the server should broadcast death messages in this world." },
+				ShouldUseChatPrefixes = { Params = "", Return = "bool", Notes = "Returns whether coloured chat prefixes are prepended to chat messages or the entire message is simply coloured." },
 				ShouldLavaSpawnFire = { Params = "", Return = "bool", Notes = "Returns true if the world is configured to spawn fires near lava (world.ini: [Physics].ShouldLavaSpawnFire value)" },
 				SpawnItemPickups =
 				{
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, FlyAwaySpeed", Return = "", Notes = "Spawns the specified pickups at the position specified. The FlyAway speed is used to initialize the random speed in which the pickups fly away from the spawn position." },
 					{ Params = "{{cItems|Pickups}}, X, Y, Z, SpeedX, SpeedY, SpeedZ", Return = "", Notes = "Spawns the specified pickups at the position specified. All the pickups fly away from the spawn position using the specified speed." },
 				},
+				SpawnMinecart = { Params = "X, Y, Z, MinecartType, Item, BlockHeight", Return = "number", Notes = "Spawns a minecart at the specific coordinates. MinecartType is the item type of the minecart. If the minecart is an empty minecart then the given item is the block inside the minecart, and blockheight is the distance of the block and the minecart." },
 				SpawnMob = { Params = "X, Y, Z, {{cMonster|MonsterType}}", Return = "EntityID", Notes = "Spawns the specified type of mob at the specified coords. Returns the EntityID of the creates entity, or -1 on failure. " },
 				SpawnFallingBlock = { Params = "X, Y, Z, BlockType, BlockMeta", Return = "EntityID", Notes = "Spawns an {{cFallingBlock|Falling Block}} entity at the specified coords with the given block type/meta" },
 				SpawnExperienceOrb = { Params = "X, Y, Z, Reward", Return = "EntityID", Notes = "Spawns an {{cExpOrb|experience orb}} at the specified coords, with the given reward" },
@@ -2556,6 +2583,7 @@ local CompressedString = cStringCompression.CompressStringGZIP("DataToCompress")
 				TryGetHeight = { Params = "BlockX, BlockZ", Return = "IsValid, Height", Notes = "Returns true and height of the highest non-air block if the chunk is loaded, or false otherwise." },
 				UpdateSign = { Params = "X, Y, Z, Line1, Line2, Line3, Line4, [{{cPlayer|Player}}]", Return = "", Notes = "(<b>DEPRECATED</b>) Please use SetSignLines()." },
 				UseBlockEntity = { Params = "{{cPlayer|Player}}, BlockX, BlockY, BlockZ", Return = "", Notes = "Makes the specified Player use the block entity at the specified coords (open chest UI, etc.) If the cords are in an unloaded chunk or there's no block entity, ignores the call." },
+				VillagersShouldHarvestCrops = { Params = "", Return = "", Notes = "Returns true if villagers can harvest crops." },
 				WakeUpSimulators = { Params = "BlockX, BlockY, BlockZ", Return = "", Notes = "Wakes up the simulators for the specified block." },
 				WakeUpSimulatorsInArea = { Params = "MinBlockX, MaxBlockX, MinBlockY, MaxBlockY, MinBlockZ, MaxBlockZ", Return = "", Notes = "Wakes up the simulators for all the blocks in the specified area (edges inclusive)." },
 			},
@@ -2871,41 +2899,18 @@ end
 				This class represents the tolua bridge between the Lua API and MCServer. It supports some low
 				level operations and queries on the objects. See also the tolua++'s documentation at
 				{{http://www.codenix.com/~tolua/tolua++.html#utilities}}. Normally you shouldn't use any of these
-				functions except for cast() and type()
+				functions except for type()
 			]],
 			Functions =
 			{
-				cast = { Params = "Object, TypeStr", Return = "Object", Notes = "Casts the object to the specified type through the inheritance hierarchy." },
+				cast = { Params = "Object, TypeStr", Return = "Object", Notes = "Casts the object to the specified type.<br/><b>Note:</b> This is a potentially unsafe operation and it could crash the server. There is normally no need to use this function at all, so don't use it unless you know exactly what you're doing." },
 				getpeer = { Params = "", Return = "", Notes = "" },
 				inherit = { Params = "", Return = "", Notes = "" },
 				releaseownership = { Params = "", Return = "", Notes = "" },
 				setpeer = { Params = "", Return = "", Notes = "" },
 				takeownership = { Params = "", Return = "", Notes = "" },
-				type = { Params = "Object", Return = "TypeStr", Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ types, too." },
+				type = { Params = "Object", Return = "TypeStr", Notes = "Returns a string representing the type of the object. This works similar to Lua's built-in type() function, but recognizes the underlying C++ classes, too." },
 			},
-			AdditionalInfo =
-			{
-				{
-					Header = "Usage example",
-					Contents =
-					[[
-						The tolua.cast() function is normally used to cast between related types. For example in the
-						hook callbacks you often receive a generic {{cEntity}} object, when in fact you know that the
-						object is a {{cMonster}}. You can cast the object to access its cMonster functions:
-<pre class="prettyprint lang-lua">
-function OnTakeDamage(a_ReceiverEntity, TDI)
-	if (a_ReceiverEntity.IsMob()) then
-		local Mob = tolua.cast(a_ReceiverEntity, "cMonster");  -- Cast a_ReceiverEntity into a {{cMonster}} instance
-		if (Mob:GetMonsterType() == cMonster.mtSheep) then
-			local Sheep = tolua.cast(Mob, "cSheep");  -- Cast Mob into a {{cSheep}} instance
-			-- Do something sheep-specific
-		end
-	end
-end
-</pre>
-					]],
-				}
-			}  -- AdditionalInfo
 		},  -- tolua
 
 		Globals =
@@ -2965,6 +2970,7 @@ end
 				RotateBlockFaceCW = { Params = "{{Globals#BlockFaces|eBlockFace}}", Return = "{{Globals#BlockFaces|eBlockFace}}", Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise." },
 				StringSplit = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered."},
 				StringSplitAndTrim = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Each of the separate strings is trimmed (whitespace removed from the beginning and end of the string)"},
+				StringSplitWithQuotes = {Params = "string, SeperatorsString", Return = "array table of strings", Notes = "Seperates string into multiple by splitting every time any of the characters in SeperatorsString is encountered. Whitespace wrapped with single or double quotes will be ignored"},
 				StringToBiome = {Params = "string", Return = "{{Globals#BiomeTypes|BiomeType}}", Notes = "Converts a string representation to a {{Globals#BiomeTypes|BiomeType}} enumerated value"},
 				StringToDamageType = {Params = "string", Return = "{{Globals#DamageType|DamageType}}", Notes = "Converts a string representation to a {{Globals#DamageType|DamageType}} enumerated value."},
 				StringToDimension = {Params = "string", Return = "{{Globals#WorldDimension|Dimension}}", Notes = "Converts a string representation to a {{Globals#WorldDimension|Dimension}} enumerated value"},
@@ -3088,7 +3094,14 @@ end
 						These constants are used to differentiate the various sources of spreads, such as grass growing.
 						They are used in the {{OnBlockSpread|HOOK_BLOCK_SPREAD}} hook.
 					]],
-				}
+				},
+				ShrapnelLevel =
+				{
+					Include = "^sl.*",
+					TextBefore = [[
+						The following constants define the block types  that are propelled outwards after an explosion.
+					]],
+				},
 			},
 		},  -- Globals
 	},

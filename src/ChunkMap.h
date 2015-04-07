@@ -71,7 +71,7 @@ public:
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity(const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void BroadcastBlockAction(int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);
-	void BroadcastBlockBreakAnimation(int a_entityID, int a_blockX, int a_blockY, int a_blockZ, char a_stage, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockEntity(int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude);
 	void BroadcastChunkData(int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastCollectEntity(const cEntity & a_Entity, const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
@@ -217,7 +217,7 @@ public:
 	void AddEntityIfNotPresent(cEntity * a_Entity);
 	
 	/** Returns true if the entity with specified ID is present in the chunks */
-	bool HasEntity(int a_EntityID);
+	bool HasEntity(UInt32 a_EntityID);
 	
 	/** Removes the entity from its appropriate chunk */
 	void RemoveEntity(cEntity * a_Entity);
@@ -236,61 +236,80 @@ public:
 	/** Destroys and returns a list of blocks destroyed in the explosion at the specified coordinates */
 	void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, cVector3iArray & a_BlockAffected);
 	
-	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false. */
-	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Lua-accessible
+	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
+	Returns true if entity found and callback returned false. */
+	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
+	/** Calls the callback for each block entity in the specified chunk.
+	Returns true if all block entities processed, false if the callback aborted by returning true. */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true */
+	/** Calls the callback for each chest in the specified chunk.
+	Returns true if all chests processed, false if the callback aborted by returning true. */
 	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for each dispenser in the specified chunk; returns true if all dispensers processed, false if the callback aborted by returning true */
+	/** Calls the callback for each dispenser in the specified chunk.
+	Returns true if all dispensers processed, false if the callback aborted by returning true. */
 	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback & a_Callback);
 
-	/** Calls the callback for each dropper in the specified chunk; returns true if all droppers processed, false if the callback aborted by returning true */
+	/** Calls the callback for each dropper in the specified chunk.
+	Returns true if all droppers processed, false if the callback aborted by returning true. */
 	bool ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback & a_Callback);
 
-	/** Calls the callback for each dropspenser in the specified chunk; returns true if all dropspensers processed, false if the callback aborted by returning true */
+	/** Calls the callback for each dropspenser in the specified chunk.
+	Returns true if all dropspensers processed, false if the callback aborted by returning true. */
 	bool ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback & a_Callback);
 
-	/** Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true */
+	/** Calls the callback for each furnace in the specified chunk.
+	Returns true if all furnaces processed, false if the callback aborted by returning true. */
 	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback & a_Callback);  // Lua-accessible
 	
-	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
+	/** Calls the callback for the block entity at the specified coords.
+	Returns false if there's no block entity at those coords, true if found. */
 	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback & a_Callback);  // Lua-acessible
 
-	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
+	/** Calls the callback for the beacon at the specified coords.
+	Returns false if there's no beacon at those coords, true if found. */
 	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback & a_Callback);  // Lua-acessible
 
-	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
+	/** Calls the callback for the chest at the specified coords.
+	Returns false if there's no chest at those coords, true if found. */
 	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback & a_Callback);  // Lua-acessible
 
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the dispenser at the specified coords.
+	Returns false if there's no dispenser at those coords or callback returns true, returns true if found. */
 	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the dropper at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the dropper at the specified coords.
+	Returns false if there's no dropper at those coords or callback returns true, returns true if found. */
 	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the dropspenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the dropspenser at the specified coords.
+	Returns false if there's no dropspenser at those coords or callback returns true, returns true if found. */
 	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the furnace at the specified coords.
+	Returns false if there's no furnace at those coords or callback returns true, returns true if found. */
 	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the noteblock at the specified coords.
+	Returns false if there's no noteblock at those coords or callback returns true, returns true if found. */
 	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the command block at the specified coords.
+	Returns false if there's no command block at those coords or callback returns true, returns true if found. */
 	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the mob head block at the specified coords.
+	Returns false if there's no mob head block at those coords or callback returns true, returns true if found. */
 	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback & a_Callback);  // Lua-accessible
 
-	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
+	/** Calls the callback for the flower pot at the specified coords.
+	Returns false if there's no flower pot at those coords or callback returns true, returns true if found. */
 	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback & a_Callback);  // Lua-accessible
 
-	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
+	/** Retrieves the test on the sign at the specified coords.
+	Returns false if there's no sign at those coords, true if found. */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
 
 	/** Touches the chunk, causing it to be loaded or generated */
@@ -423,10 +442,10 @@ private:
 		bool ForEachEntity(cEntityCallback & a_Callback);  // Lua-accessible
 
 		/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
-		bool DoWithEntityByID(int a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn);  // Lua-accessible
+		bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback & a_Callback, bool & a_CallbackReturn);  // Lua-accessible
 
 		/** Returns true if there is an entity with the specified ID within this layer's chunks */
-		bool HasEntity(int a_EntityID);
+		bool HasEntity(UInt32 a_EntityID);
 		
 	protected:
 	

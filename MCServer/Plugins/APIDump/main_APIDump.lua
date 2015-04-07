@@ -62,7 +62,7 @@ local function CreateAPITables()
 			Variables = {
 			},
 			Descendants = {},  -- Will be filled by ReadDescriptions(), array of class APIs (references to other member in the tree)
-		}},
+		},
 		{
 			Name = "cBlockArea",
 			Functions = {
@@ -78,7 +78,9 @@ local function CreateAPITables()
 			Variables = {
 			},
 			...
-		}}
+		},
+		
+		cCuboid = {}  -- Each array item also has the map item by its name
 	};
 	local Globals = {
 		Functions = {
@@ -135,7 +137,9 @@ local function CreateAPITables()
 			(v ~= g_APIDesc)
 		) then
 			if (type(v) == "table") then
-				table.insert(API, ParseClass(i, v));
+				local cls = ParseClass(i, v)
+				table.insert(API, cls);
+				API[cls.Name] = cls
 			else
 				Add(Globals, i, v);
 			end
@@ -1449,6 +1453,103 @@ end
 
 
 
+--- Returns true if a_Descendant is declared to be a (possibly indirect) descendant of a_Base
+local function IsDeclaredDescendant(a_DescendantName, a_BaseName, a_API)
+	-- Check params:
+	assert(type(a_DescendantName) == "string")
+	assert(type(a_BaseName) == "string")
+	assert(type(a_API) == "table")
+	if not(a_API[a_BaseName]) then
+		return false
+	end
+	assert(type(a_API[a_BaseName]) == "table", "Not a class name: " .. a_BaseName)
+	assert(type(a_API[a_BaseName].Descendants) == "table")
+	
+	-- Check direct inheritance:
+	for _, desc in ipairs(a_API[a_BaseName].Descendants) do
+		if (desc.Name == a_DescendantName) then
+			return true
+		end
+	end  -- for desc - a_BaseName's descendants
+	
+	-- Check indirect inheritance:
+	for _, desc in ipairs(a_API[a_BaseName].Descendants) do
+		if (IsDeclaredDescendant(a_DescendantName, desc.Name, a_API)) then
+			return true
+		end
+	end  -- for desc - a_BaseName's descendants
+	
+	return false
+end
+
+
+
+
+
+--- Checks the specified class' inheritance
+-- Reports any problems as new items in the a_Report table
+local function CheckClassInheritance(a_Class, a_API, a_Report)
+	-- Check params:
+	assert(type(a_Class) == "table")
+	assert(type(a_API) == "table")
+	assert(type(a_Report) == "table")
+	
+	-- Check that the declared descendants are really descendants:
+	local registry = debug.getregistry()
+	for _, desc in ipairs(a_Class.Descendants or {}) do
+		local isParent = false
+		local parents = registry["tolua_super"][_G[desc.Name]]
+		if not(parents[a_Class.Name]) then
+			table.insert(a_Report, desc.Name .. " is not a descendant of " .. a_Class.Name)
+		end
+	end  -- for desc - a_Class.Descendants[]
+	
+	-- Check that all inheritance is listed for the class:
+	local parents = registry["tolua_super"][_G[a_Class.Name]]  -- map of "classname" -> true for each class that a_Class inherits
+	for clsName, isParent in pairs(parents or {}) do
+		if ((clsName ~= "") and not(clsName:match("const .*"))) then
+			if not(IsDeclaredDescendant(a_Class.Name, clsName, a_API)) then
+				table.insert(a_Report, a_Class.Name .. " inherits from " .. clsName .. " but this isn't documented")
+			end
+		end
+	end
+end
+
+
+
+
+
+--- Checks each class's declared inheritance versus the actual inheritance
+local function CheckAPIDescendants(a_API)
+	-- Check each class:
+	local report = {}
+	for _, cls in ipairs(a_API) do
+		if (cls.Name ~= "Globals") then
+			CheckClassInheritance(cls, a_API, report)
+		end
+	end
+	
+	-- If there's anything to report, output it to a file:
+	if (report[1] ~= nil) then
+		LOG("There are inheritance errors in the API description:")
+		for _, msg in ipairs(report) do
+			LOG("  " .. msg)
+		end
+
+		local f, err = io.open("API/_inheritance_errors.txt", "w")
+		if (f == nil) then
+			LOG("Cannot report inheritance problems to a file: " .. tostring(err))
+			return
+		end
+		f:write(table.concat(report, "\n"))
+		f:close()
+	end
+end
+
+
+
+
+
 local function DumpApi()
 	LOG("Dumping the API...")
 	
@@ -1501,6 +1602,9 @@ local function DumpApi()
 	LOG("Reading descriptions...");
 	ReadDescriptions(API);
 
+	-- Check that the API lists the inheritance properly, report any problems to a file:
+	CheckAPIDescendants(API)
+	
 	-- Dump all available API objects in HTML format into a subfolder:
 	DumpAPIHtml(API);
 	

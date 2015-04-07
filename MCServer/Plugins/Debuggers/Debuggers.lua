@@ -1643,6 +1643,81 @@ end
 
 
 
+--- Monitors the state of the "inh" entity-spawning hook
+-- if false, the hook is installed before the "inh" command processing
+local isInhHookInstalled = false
+
+function HandleConsoleInh(a_Split, a_FullCmd)
+	-- Check the param:
+	local kindStr = a_Split[2] or "pkArrow"
+	local kind = cProjectileEntity[kindStr]
+	if (kind == nil) then
+		return true, "There's no projectile kind '" .. kindStr .. "'."
+	end
+
+	-- Get the world to test in:
+	local world = cRoot:Get():GetDefaultWorld()
+	if (world == nil) then
+		return true, "Cannot test inheritance, no default world"
+	end
+	
+	-- Install the hook, if needed:
+	if not(isInhHookInstalled) then
+		cPluginManager:AddHook(cPluginManager.HOOK_SPAWNING_ENTITY,
+			function (a_CBWorld, a_CBEntity)
+				LOG("New entity is spawning:")
+				LOG("  Lua type:        '" .. type(a_CBEntity)           .. "'")
+				LOG("  ToLua type:      '" .. tolua.type(a_CBEntity)     .. "'")
+				LOG("  GetEntityType(): '" .. a_CBEntity:GetEntityType() .. "'")
+				LOG("  GetClass():      '" .. a_CBEntity:GetClass()      .. "'")
+			end
+		)
+		isInhHookInstalled = true
+	end
+	
+	-- Create the projectile:
+	LOG("Creating a " .. kindStr .. " projectile in world " .. world:GetName() .. "...")
+	local msg
+	world:ChunkStay({{0, 0}},
+		nil,
+		function ()
+			-- Create a projectile at {8, 100, 8}:
+			local entityID = world:CreateProjectile(8, 100, 8, kind, nil, nil)
+			if (entityID < 0) then
+				msg = "Cannot test inheritance, projectile creation failed."
+				return
+			end
+			LOG("Entity created, ID #" .. entityID)
+			
+			-- Call a function on the newly created entity:
+			local hasExecutedCallback = false
+			world:DoWithEntityByID(
+				entityID,
+				function (a_CBEntity)
+					LOG("Projectile created and found using the DoWithEntityByID() callback")
+					LOG("Lua type:        '" .. type(a_CBEntity)           .. "'")
+					LOG("ToLua type:      '" .. tolua.type(a_CBEntity)     .. "'")
+					LOG("GetEntityType(): '" .. a_CBEntity:GetEntityType() .. "'")
+					LOG("GetClass():      '" .. a_CBEntity:GetClass()      .. "'")
+					hasExecutedCallback = true
+				end
+			)
+			if not(hasExecutedCallback) then
+				msg = "The callback failed to execute"
+				return
+			end
+			
+			msg = "Inheritance test finished"
+		end
+	)
+	
+	return true, msg
+end
+
+
+
+
+
 function HandleConsoleLoadChunk(a_Split)
 	-- Check params:
 	local numParams = #a_Split
@@ -1736,6 +1811,61 @@ function HandleConsoleSchedule(a_Split)
 		end
 	)
 	return true, "Task scheduled"
+end
+
+
+
+
+
+function HandleConsoleBBox(a_Split)
+	local bbox = cBoundingBox(0, 10, 0, 10, 0, 10)
+	local v1 = Vector3d(1, 1, 1)
+	local v2 = Vector3d(5, 5, 5)
+	local v3 = Vector3d(11, 11, 11)
+	
+	if (bbox:IsInside(v1)) then
+		LOG("v1 is inside bbox")
+	else
+		LOG("v1 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v2)) then
+		LOG("v2 is inside bbox")
+	else
+		LOG("v2 is not inside bbox")
+	end
+
+	if (bbox:IsInside(v3)) then
+		LOG("v3 is inside bbox")
+	else
+		LOG("v3 is not inside bbox")
+	end
+
+	if (bbox:IsInside(v1, v2)) then
+		LOG("v1*v2 is inside bbox")
+	else
+		LOG("v1*v2 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v2, v1)) then
+		LOG("v2*v1 is inside bbox")
+	else
+		LOG("v2*v1 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v1, v3)) then
+		LOG("v1*v3 is inside bbox")
+	else
+		LOG("v1*v3 is not inside bbox")
+	end
+	
+	if (bbox:IsInside(v2, v3)) then
+		LOG("v2*v3 is inside bbox")
+	else
+		LOG("v2*v3 is not inside bbox")
+	end
+	
+	return true
 end
 
 

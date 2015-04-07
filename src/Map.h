@@ -189,6 +189,11 @@ public:
 		return "cMap";
 	}
 
+	const char * GetClass(void)  // Needed for ManualBindings' DoWith templates
+	{
+		return "cMap";
+	}
+
 
 protected:
 

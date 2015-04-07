@@ -106,7 +106,8 @@ public:
 		virtual void Run(cWorld & a_World) = 0;
 	} ;
 	
-	typedef std::vector<std::unique_ptr<cTask>> cTasks;
+	typedef SharedPtr<cTask> cTaskPtr;
+	typedef std::vector<cTaskPtr> cTasks;
 
 	
 	class cTaskSaveAllChunks :
@@ -215,7 +216,7 @@ public:
 	// (Please keep these alpha-sorted)
 	void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity * a_Vehicle);
 	void BroadcastBlockAction        (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr);  // tolua_export
-	void BroadcastBlockBreakAnimation(int a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
+	void BroadcastBlockBreakAnimation(UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage, const cClientHandle * a_Exclude = nullptr);
 	void BroadcastBlockEntity        (int a_BlockX, int a_BlockY, int a_BlockZ, const cClientHandle * a_Exclude = nullptr);  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 
 	// tolua_begin
@@ -335,7 +336,9 @@ public:
 	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
 	void AddEntity(cEntity * a_Entity);
 	
-	bool HasEntity(int a_UniqueID);
+	/** Returns true if an entity with the specified UniqueID exists in the world.
+	Note: Only loaded chunks are considered. */
+	bool HasEntity(UInt32 a_UniqueID);
 	
 	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
@@ -348,8 +351,9 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
-	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found and callback returned false. */
-	bool DoWithEntityByID(int a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
+	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
+	Returns true if entity found and callback returned false. */
+	bool DoWithEntityByID(UInt32 a_UniqueID, cEntityCallback & a_Callback);  // Exported in ManualBindings.cpp
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
@@ -476,20 +480,25 @@ public:
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) override;
 	
-	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified: */
+	/** Spawns item pickups for each item in the list. May compress pickups if too many entities. All pickups get the speed specified. */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_SpeedX, double a_SpeedY, double a_SpeedZ, bool IsPlayerCreated = false) override;
 	
-	/** Spawns an falling block entity at the given position. It returns the UniqueID of the spawned falling block. */
-	int SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
+	/** Spawns an falling block entity at the given position.
+	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE BlockType, NIBBLETYPE BlockMeta);
 
-	/** Spawns an minecart at the given coordinates. */
-	int SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+	/** Spawns an minecart at the given coordinates.
+	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
 
-	/** Spawns an experience orb at the given location with the given reward. It returns the UniqueID of the spawned experience orb. */
-	virtual int SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
+	/** Spawns an experience orb at the given location with the given reward.
+	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
+	virtual UInt32 SpawnExperienceOrb(double a_X, double a_Y, double a_Z, int a_Reward) override;
 
-	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration. Initial velocity is given based on the relative coefficient provided */
-	void SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
+	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration.
+	Initial velocity is given based on the relative coefficient provided.
+	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
 
 	// tolua_end
 
@@ -673,14 +682,14 @@ public:
 	bool ShouldBroadcastAchievementMessages(void) const { return m_BroadcastAchievementMessages; }
 
 
-	AString GetNetherWorldName(void) const { return m_NetherWorldName; }
-	void SetNetherWorldName(const AString & a_Name) { m_NetherWorldName = a_Name; }
+	AString GetLinkedNetherWorldName(void) const { return m_LinkedNetherWorldName; }
+	void SetLinkedNetherWorldName(const AString & a_Name) { m_LinkedNetherWorldName = a_Name; }
 
-	AString GetEndWorldName(void) const { return m_EndWorldName; }
-	void SetEndWorldName(const AString & a_Name) { m_EndWorldName = a_Name; }
+	AString GetLinkedEndWorldName(void) const { return m_LinkedEndWorldName; }
+	void SetLinkedEndWorldName(const AString & a_Name) { m_LinkedEndWorldName = a_Name; }
 
-	AString GetLinkedOverworldName(void) const { return m_OverworldName; }
-	void SetLinkedOverworldName(const AString & a_Name) { m_OverworldName = a_Name; }
+	AString GetLinkedOverworldName(void) const { return m_LinkedOverworldName; }
+	void SetLinkedOverworldName(const AString & a_Name) { m_LinkedOverworldName = a_Name; }
 	
 	// tolua_end
 	
@@ -691,11 +700,10 @@ public:
 	void QueueSaveAllChunks(void);  // tolua_export
 	
 	/** Queues a task onto the tick thread. The task object will be deleted once the task is finished */
-	void QueueTask(std::unique_ptr<cTask> a_Task);  // Exported in ManualBindings.cpp
+	void QueueTask(cTaskPtr a_Task);  // Exported in ManualBindings.cpp
 	
-	/** Queues a task onto the tick thread, with the specified delay.
-	The task object will be deleted once the task is finished */
-	void ScheduleTask(int a_DelayTicks, cTask * a_Task);
+	/** Queues a task onto the tick thread, with the specified delay. */
+	void ScheduleTask(int a_DelayTicks, cTaskPtr a_Task);
 
 	/** Returns the number of chunks loaded	 */
 	int GetNumChunks() const;  // tolua_export
@@ -796,14 +804,14 @@ public:
 
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 	
-	/** Spawns a mob of the specified type. Returns the mob's EntityID if recognized and spawned, <0 otherwise */
-	virtual int SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) override;  // tolua_export
-	int SpawnMobFinalize(cMonster* a_Monster);
+	/** Spawns a mob of the specified type. Returns the mob's UniqueID if recognized and spawned, cEntity::INVALID_ID otherwise */
+	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType) override;  // tolua_export
+
+	UInt32 SpawnMobFinalize(cMonster * a_Monster);
 	
-	/** Creates a projectile of the specified type. Returns the projectile's EntityID if successful, <0 otherwise
-	Item parameter used currently for Fireworks to correctly set entity metadata based on item metadata
-	*/
-	int CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
+	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
+	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
+	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 	
 	/** Returns a random number from the m_TickRand in range [0 .. a_Range]. To be used only in the tick thread! */
 	int GetTickRandomNumber(int a_Range) { return (int)(m_TickRand.randInt(a_Range)); }
@@ -867,20 +875,16 @@ private:
 	{
 	public:
 		Int64 m_TargetTick;
-		cTask * m_Task;
+		cTaskPtr m_Task;
 		
 		/** Creates a new scheduled task; takes ownership of the task object passed to it. */
-		cScheduledTask(Int64 a_TargetTick, cTask * a_Task) :
+		cScheduledTask(Int64 a_TargetTick, cTaskPtr a_Task) :
 			m_TargetTick(a_TargetTick),
 			m_Task(a_Task)
 		{
 		}
 		
-		virtual ~cScheduledTask()
-		{
-			delete m_Task;
-			m_Task = nullptr;
-		}
+		virtual ~cScheduledTask() {}
 	};
 
 	typedef std::unique_ptr<cScheduledTask> cScheduledTaskPtr;
@@ -889,10 +893,9 @@ private:
 
 	AString m_WorldName;
 
-	/** The name of the world that a portal in this world should link to
-	Only has effect if this world is a nether or end world, as it is used by entities to see which world to teleport to when in a portal
-	*/
-	AString m_OverworldName;
+	/** The name of the overworld that portals in this world should link to.
+	Only has effect if this world is a Nether or End world. */
+	AString m_LinkedOverworldName;
 
 	AString m_IniFileName;
 	
@@ -985,11 +988,13 @@ private:
 	/** The maximum view distance that a player can have in this world. */
 	int m_MaxViewDistance;
 
-	/** Name of the nether world */
-	AString m_NetherWorldName;
+	/** Name of the nether world - where Nether portals should teleport.
+	Only used when this world is an Overworld. */
+	AString m_LinkedNetherWorldName;
 
-	/** Name of the end world */
-	AString m_EndWorldName;
+	/** Name of the End world - where End portals should teleport.
+	Only used when this world is an Overworld. */
+	AString m_LinkedEndWorldName;
 	
 
 	cChunkGenerator  m_Generator;
@@ -1049,7 +1054,7 @@ private:
 	cSetChunkDataPtrs m_SetChunkDataQueue;
 
 
-	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_OverworldName = "");
+	cWorld(const AString & a_WorldName, eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = "");
 	virtual ~cWorld();
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
@@ -1076,6 +1081,9 @@ private:
 
 	/** <summary>Generates a random spawnpoint on solid land by walking chunks and finding their biomes</summary> */
 	void GenerateRandomSpawn(void);
+
+	/** Check if player starting point is acceptable **/
+	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
 
 	/** Chooses a reasonable transition from the current weather to a new weather **/
 	eWeather ChooseNewWeather(void);
