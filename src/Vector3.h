@@ -244,6 +244,15 @@ public:
 		);
 	}
 
+	inline Vector3<T> operator / (const Vector3<T> & a_Rhs)
+	{
+		return Vector3<T>(
+			x / a_Rhs.x,
+			y / a_Rhs.y,
+			z / a_Rhs.z
+		);
+	}
+
 	inline Vector3<T> operator * (T a_v) const
 	{
 		return Vector3<T>(
