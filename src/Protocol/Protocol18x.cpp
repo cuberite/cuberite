@@ -542,6 +542,18 @@ void cProtocol180::SendHealth(void)
 
 
 
+void cProtocol180::SendHideTitle(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x45);  // Title packet
+	Pkt.WriteVarInt32(3);  // Hide title
+}
+
+
+
+
+
 void cProtocol180::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1021,6 +1033,18 @@ void cProtocol180::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
+void cProtocol180::SendResetTitle(void)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x45);  // Title packet
+	Pkt.WriteVarInt32(4);  // Reset title
+}
+
+
+
+
+
 void cProtocol180::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	if ((m_LastSentDimension == a_Dimension) && !a_ShouldIgnoreDimensionChecks)
@@ -1117,6 +1141,52 @@ void cProtocol180::SendDisplayObjective(const AString & a_Objective, cScoreboard
 	cPacketizer Pkt(*this, 0x3d);
 	Pkt.WriteBEUInt8((int) a_Display);
 	Pkt.WriteString(a_Objective);
+}
+
+
+
+
+
+void cProtocol180::SendSetSubTitle(const cCompositeChat & a_SubTitle)
+{
+	SendSetRawSubTitle(a_SubTitle.CreateJsonString(false));
+}
+
+
+
+
+
+void cProtocol180::SendSetRawSubTitle(const AString & a_SubTitle)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x45);  // Title packet
+	Pkt.WriteVarInt32(1);  // Set subtitle
+
+	Pkt.WriteString(a_SubTitle);
+}
+
+
+
+
+
+void cProtocol180::SendSetTitle(const cCompositeChat & a_Title)
+{
+	SendSetRawTitle(a_Title.CreateJsonString(false));
+}
+
+
+
+
+
+void cProtocol180::SendSetRawTitle(const AString & a_Title)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x45);  // Title packet
+	Pkt.WriteVarInt32(0);  // Set title
+
+	Pkt.WriteString(a_Title);
 }
 
 
@@ -1324,6 +1394,22 @@ void cProtocol180::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 	Pkt.WriteFPInt(a_BlockX);
 	Pkt.WriteFPInt(a_BlockY);
 	Pkt.WriteFPInt(a_BlockZ);
+}
+
+
+
+
+
+void cProtocol180::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, 0x45);  // Title packet
+	Pkt.WriteVarInt32(2);  // Set title display times
+
+	Pkt.WriteBEInt32(a_FadeInTicks);
+	Pkt.WriteBEInt32(a_DisplayTicks);
+	Pkt.WriteBEInt32(a_FadeOutTicks);
 }
 
 

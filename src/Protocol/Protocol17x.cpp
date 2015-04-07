@@ -555,6 +555,15 @@ void cProtocol172::SendHealth(void)
 
 
 
+void cProtocol172::SendHideTitle(void)
+{
+	// Not implemented in this protocol version
+}
+
+
+
+
+
 void cProtocol172::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -985,6 +994,15 @@ void cProtocol172::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effect
 
 
 
+void cProtocol172::SendResetTitle(void)
+{
+	// Not implemented in this protocol version
+}
+
+
+
+
+
 void cProtocol172::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	if ((m_LastSentDimension == a_Dimension) && !a_ShouldIgnoreDimensionChecks)
@@ -1078,6 +1096,42 @@ void cProtocol172::SendDisplayObjective(const AString & a_Objective, cScoreboard
 	cPacketizer Pkt(*this, 0x3d);
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Display));
 	Pkt.WriteString(a_Objective);
+}
+
+
+
+
+
+void cProtocol172::SendSetSubTitle(const cCompositeChat & a_SubTitle)
+{
+	// Not implemented in this protocol version
+}
+
+
+
+
+
+void cProtocol172::SendSetRawSubTitle(const AString & a_SubTitle)
+{
+	// Not implemented in this protocol version
+}
+
+
+
+
+
+void cProtocol172::SendSetTitle(const cCompositeChat & a_Title)
+{
+	// Not implemented in this protocol version
+}
+
+
+
+
+
+void cProtocol172::SendSetRawTitle(const AString & a_Title)
+{
+	// Not implemented in this protocol version
 }
 
 
@@ -1280,6 +1334,15 @@ void cProtocol172::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 	Pkt.WriteFPInt(a_BlockX);
 	Pkt.WriteFPInt(a_BlockY);
 	Pkt.WriteFPInt(a_BlockZ);
+}
+
+
+
+
+
+void cProtocol172::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
+{
+	// Not implemented in this protocol version
 }
 
 

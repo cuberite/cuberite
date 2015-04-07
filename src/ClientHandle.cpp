@@ -2320,6 +2320,15 @@ void cClientHandle::SendHealth(void)
 
 
 
+void cClientHandle::SendHideTitle(void)
+{
+	m_Protocol->SendHideTitle();
+}
+
+
+
+
+
 void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
@@ -2514,6 +2523,15 @@ void cClientHandle::SendRemoveEntityEffect(const cEntity & a_Entity, int a_Effec
 
 
 
+void cClientHandle::SendResetTitle()
+{
+	m_Protocol->SendResetTitle();
+}
+
+
+
+
+
 void cClientHandle::SendRespawn(eDimension a_Dimension, bool a_ShouldIgnoreDimensionChecks)
 {
 	m_Protocol->SendRespawn(a_Dimension, a_ShouldIgnoreDimensionChecks);
@@ -2562,6 +2580,42 @@ void cClientHandle::SendScoreUpdate(const AString & a_Objective, const AString &
 void cClientHandle::SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display)
 {
 	m_Protocol->SendDisplayObjective(a_Objective, a_Display);
+}
+
+
+
+
+
+void cClientHandle::SendSetSubTitle(const cCompositeChat & a_SubTitle)
+{
+	m_Protocol->SendSetSubTitle(a_SubTitle);
+}
+
+
+
+
+
+void cClientHandle::SendSetRawSubTitle(const AString & a_SubTitle)
+{
+	m_Protocol->SendSetRawSubTitle(a_SubTitle);
+}
+
+
+
+
+
+void cClientHandle::SendSetTitle(const cCompositeChat & a_Title)
+{
+	m_Protocol->SendSetTitle(a_Title);
+}
+
+
+
+
+
+void cClientHandle::SendSetRawTitle(const AString & a_Title)
+{
+	m_Protocol->SendSetRawTitle(a_Title);
 }
 
 
@@ -2652,6 +2706,15 @@ void cClientHandle::SendTeleportEntity(const cEntity & a_Entity)
 void cClientHandle::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	m_Protocol->SendThunderbolt(a_BlockX, a_BlockY, a_BlockZ);
+}
+
+
+
+
+
+void cClientHandle::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks)
+{
+	m_Protocol->SendTitleTimes(a_FadeInTicks, a_DisplayTicks, a_FadeOutTicks);
 }
 
 
