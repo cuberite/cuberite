@@ -62,6 +62,7 @@ function Initialize(Plugin)
 	TestStringBase64()
 	-- TestUUIDFromName()
 	-- TestRankMgr()
+	TestFileExt()
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -74,6 +75,18 @@ function Initialize(Plugin)
 	
 	return true
 end;
+
+
+
+
+
+function TestFileExt()
+	assert(cFile:ChangeFileExt("fileless_dir/", "new") == "fileless_dir/")
+	assert(cFile:ChangeFileExt("pathless_file.ext", "new") == "pathless_file.new")
+	assert(cFile:ChangeFileExt("path/to/file.ext", "new") == "path/to/file.new")
+	assert(cFile:ChangeFileExt("path/to.dir/file", "new") == "path/to.dir/file.new")
+	assert(cFile:ChangeFileExt("path/to.dir/file.ext", "new") == "path/to.dir/file.new")
+end
 
 
 

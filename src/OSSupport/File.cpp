@@ -456,10 +456,25 @@ AString cFile::ReadWholeFile(const AString & a_FileName)
 AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewExt)
 {
 	auto res = a_FileName;
-	auto DotPos = res.rfind('.');
-	if (DotPos == AString::npos)
+
+	// If the path separator is the last character of the string, return the string unmodified (refers to a folder):
+	#ifdef _WIN32
+		auto LastPathSep = res.find_last_of("/\\");  // Find either path separator - Windows accepts slashes as separators, too
+	#else
+		auto LastPathSep = res.rfind('/');
+	#endif
+	if ((LastPathSep != AString::npos) && (LastPathSep + 1 == res.size()))
 	{
-		// No extension, just append it:
+		return res;
+	}
+
+	auto DotPos = res.rfind('.');
+	if (
+		(DotPos == AString::npos) ||  // No dot found
+		((LastPathSep != AString::npos) && (LastPathSep > DotPos))  // Last dot is before the last path separator (-> in folder name)
+	)
+	{
+		// No extension, just append the new one:
 		res.push_back('.');
 		res.append(a_NewExt);
 	}
