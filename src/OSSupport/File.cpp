@@ -481,13 +481,25 @@ AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewEx
 	)
 	{
 		// No extension, just append the new one:
-		res.push_back('.');
+		if (!a_NewExt.empty() && (a_NewExt[0] != '.'))
+		{
+			// a_NewExt doesn't start with a dot, insert one:
+			res.push_back('.');
+		}
 		res.append(a_NewExt);
 	}
 	else
 	{
 		// Replace existing extension:
-		res.erase(DotPos + 1, AString::npos);
+		if (!a_NewExt.empty() && (a_NewExt[0] != '.'))
+		{
+			// a_NewExt doesn't start with a dot, keep the current one:
+			res.erase(DotPos + 1, AString::npos);
+		}
+		else
+		{
+			res.erase(DotPos, AString::npos);
+		}
 		res.append(a_NewExt);
 	}
 	return res;
