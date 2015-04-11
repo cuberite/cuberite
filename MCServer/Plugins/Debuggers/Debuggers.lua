@@ -9,7 +9,7 @@ g_ShowFoodStats = false;  -- When true, each player's food stats are sent to the
 
 
 
-function Initialize(Plugin)
+function Initialize(a_Plugin)
 	--[[
 	-- Test multiple hook handlers:
 	cPluginManager.AddHook(cPluginManager.HOOK_TICK,                         OnTick1);
@@ -45,14 +45,12 @@ function Initialize(Plugin)
 	-- Bind all the console commands:
 	RegisterPluginInfoConsoleCommands();
 	
-	Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
-	Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
+	a_Plugin:AddWebTab("Debuggers",  HandleRequest_Debuggers)
+	a_Plugin:AddWebTab("StressTest", HandleRequest_StressTest)
 
 	-- Enable the following line for BlockArea / Generator interface testing:
 	-- PluginManager:AddHook(Plugin, cPluginManager.HOOK_CHUNK_GENERATED);
 	
-	LOG("Initialized " .. Plugin:GetName() .. " v." .. Plugin:GetVersion())
-
 	-- TestBlockAreas()
 	-- TestSQLiteBindings()
 	-- TestExpatBindings()
@@ -63,6 +61,10 @@ function Initialize(Plugin)
 	-- TestUUIDFromName()
 	-- TestRankMgr()
 	TestFileExt()
+	TestFileLastMod()
+	
+	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
+	LOG("Debuggers.lua last modified on " .. os.date("%Y-%m-%dT%H:%M:%S", LastSelfMod))
 
 	--[[
 	-- Test cCompositeChat usage in console-logging:
@@ -86,6 +88,19 @@ function TestFileExt()
 	assert(cFile:ChangeFileExt("path/to/file.ext", "new") == "path/to/file.new")
 	assert(cFile:ChangeFileExt("path/to.dir/file", "new") == "path/to.dir/file.new")
 	assert(cFile:ChangeFileExt("path/to.dir/file.ext", "new") == "path/to.dir/file.new")
+end
+
+
+
+
+
+function TestFileLastMod()
+	local f = assert(io.open("test.txt", "w"))
+	f:write("test")
+	f:close()
+	local filetime = cFile:GetLastModificationTime("test.txt")
+	local ostime = os.time()
+	LOG("file time: " .. filetime .. ", OS time: " .. ostime .. ", difference: " .. ostime - filetime)
 end
 
 

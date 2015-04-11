@@ -458,9 +458,14 @@ AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewEx
 	auto res = a_FileName;
 
 	// If the path separator is the last character of the string, return the string unmodified (refers to a folder):
-	#ifdef _WIN32
-		auto LastPathSep = res.find_last_of("/\\");  // Find either path separator - Windows accepts slashes as separators, too
+	#if defined(_MSC_VER)
+		// Find either path separator - MSVC CRT accepts slashes as separators, too
+		auto LastPathSep = res.find_last_of("/\\");
+	#elif defined(_WIN32)
+		// Windows with different CRTs support only the backslash separator
+		auto LastPathSep = res.rfind('\\');
 	#else
+		// Linux supports only the slash separator
 		auto LastPathSep = res.rfind('/');
 	#endif
 	if ((LastPathSep != AString::npos) && (LastPathSep + 1 == res.size()))
@@ -468,6 +473,7 @@ AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewEx
 		return res;
 	}
 
+	// Append or replace the extension:
 	auto DotPos = res.rfind('.');
 	if (
 		(DotPos == AString::npos) ||  // No dot found
@@ -485,6 +491,52 @@ AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewEx
 		res.append(a_NewExt);
 	}
 	return res;
+}
+
+
+
+
+
+unsigned cFile::GetLastModificationTime(const AString & a_FileName)
+{
+	struct stat st;
+	if (stat(a_FileName.c_str(), &st) < 0)
+	{
+		return 0;
+	}
+	#ifdef _WIN32
+		// Windows returns times in local time already
+		return static_cast<unsigned>(st.st_mtime);
+	#else
+		// Linux returns UTC time, convert to local timezone:
+		return static_cast<unsigned>(mktime(localtime(&st.st_mtime)));
+	#endif
+}
+
+
+
+
+
+AString cFile::GetPathSeparator(void)
+{
+	#ifdef _WIN32
+		return "\\";
+	#else
+		return "/";
+	#endif
+}
+
+
+
+
+
+AString cFile::GetExecutableExt(void)
+{
+	#ifdef _WIN32
+		return ".exe";
+	#else
+		return "";
+	#endif
 }
 
 
