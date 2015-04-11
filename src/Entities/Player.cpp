@@ -95,7 +95,11 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 	SetMaxHealth(MAX_HEALTH);
 	m_Health = MAX_HEALTH;
 	
+	m_LastSecPosition = new Vector3d(0.0, 0.0, 0.0);
+
 	m_LastPlayerListTime = std::chrono::steady_clock::now();
+	m_SpeedCalculationClock = std::chrono::steady_clock::now();
+
 	m_PlayerName = a_PlayerName;
 
 	cWorld * World = nullptr;
@@ -207,6 +211,15 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			// We're not yet in the game, ignore everything
 			return;
 		}
+	}
+
+	if (std::chrono::steady_clock::now() >= m_SpeedCalculationClock + std::chrono::seconds(1))
+	{
+		Vector3d CurrPos = GetPosition();
+		SetSpeed(new Vector3d(abs(m_LastSecPosition.x - CurrPos.x), abs(m_LastSecPosition.y - CurrPos.y), abs(m_LastSecPosition.z - CurrPos.z)));
+
+		m_LastSecPosition = GetPosition();
+		m_SpeedCalculationClock = std::chrono::steady_clock::now();
 	}
 
 	m_Stats.AddValue(statMinutesPlayed, 1);
@@ -1348,6 +1361,24 @@ void cPlayer::DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ)
 
 	// Send the speed to the client so he actualy moves
 	m_ClientHandle->SendEntityVelocity(*this);
+}
+
+
+
+
+
+Vector3d cPlayer::GetSpeed()
+{
+	return m_Speed;
+}
+
+
+
+
+
+void cPlayer::SetSpeed(Vector3d a_Speed)
+{
+	m_Speed = a_Speed;
 }
 
 
