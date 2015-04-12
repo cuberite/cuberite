@@ -878,11 +878,11 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 
 	// Get the data to send:
 	AString Data, RemotePeer;
-	int RemotePort = 0;
+	UInt16 RemotePort = 0;
 	S.GetStackValues(2, Data, RemotePeer, RemotePort);
 
 	// Check the port:
-	if ((RemotePort < 0) || (RemotePort > USHRT_MAX))
+	if ((RemotePort < 0) || (RemotePort > std::numeric_limits<UInt16>::max()))
 	{
 		LOGWARNING("cUDPEndpoint:Send() called with invalid port (%d), failing.", RemotePort);
 		S.LogStackTrace();
@@ -891,7 +891,7 @@ static int tolua_cUDPEndpoint_Send(lua_State * L)
 	}
 
 	// Send the data:
-	S.Push(Endpoint->Send(Data, RemotePeer, static_cast<UInt16>(RemotePort)));
+	S.Push(Endpoint->Send(Data, RemotePeer, RemotePort));
 	return 1;
 }
 

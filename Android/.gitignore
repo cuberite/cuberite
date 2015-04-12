@@ -1,0 +1,9 @@
+/bin/
+/libs/
+/MCServer/
+/CMakeFiles/
+/gen/
+/lua_native-prefix/
+/tolua_native-prefix/
+CMakeCache.txt
+local.properties

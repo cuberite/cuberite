@@ -382,7 +382,7 @@ protected:
 // cRankManager:
 
 cRankManager::cRankManager(void) :
-	m_DB("Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
+	m_DB(FILE_IO_PREFIX "Ranks.sqlite", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE),
 	m_IsInitialized(false),
 	m_MojangAPI(nullptr)
 {

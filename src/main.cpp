@@ -212,14 +212,14 @@ void UniversalMain(std::unique_ptr<cSettingsRepositoryInterface> a_OverridesRepo
 	// Initialize LibEvent:
 	cNetworkSingleton::Get().Initialise();
 
-	#if !defined(ANDROID_NDK)
+	#if !defined(ANDROID)
 	try
 	#endif
 	{
 		cRoot Root;
 		Root.Start(std::move(a_OverridesRepo));
 	}
-	#if !defined(ANDROID_NDK)
+	#if !defined(ANDROID)
 	catch (std::exception & e)
 	{
 		LOGERROR("Standard exception: %s", e.what());

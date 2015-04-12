@@ -326,7 +326,7 @@ void cWorld::SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cWorld::InitializeSpawn(void)
 {
 	// For the debugging builds, don't make the server build too much world upon start:
-	#if defined(_DEBUG) || defined(ANDROID_NDK)
+	#if defined(_DEBUG) || defined(ANDROID)
 	const int DefaultViewDist = 9;
 	#else
 	const int DefaultViewDist = 20;  // Always prepare an area 20 chunks across, no matter what the actual cClientHandle::VIEWDISTANCE is

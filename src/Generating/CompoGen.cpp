@@ -338,16 +338,16 @@ void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cCompoGenCache:
 
-cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize) :
+cCompoGenCache::cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, size_t a_CacheSize) :
 	m_Underlying(a_Underlying),
 	m_CacheSize(a_CacheSize),
-	m_CacheOrder(new int[a_CacheSize]),
+	m_CacheOrder(new size_t[a_CacheSize]),
 	m_CacheData(new sCacheData[a_CacheSize]),
 	m_NumHits(0),
 	m_NumMisses(0),
 	m_TotalChain(0)
 {
-	for (int i = 0; i < m_CacheSize; i++)
+	for (size_t i = 0; i < m_CacheSize; i++)
 	{
 		m_CacheOrder[i] = i;
 		m_CacheData[i].m_ChunkX = 0x7fffffff;
@@ -384,7 +384,7 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 	
-	for (int i = 0; i < m_CacheSize; i++)
+	for (size_t i = 0; i < m_CacheSize; i++)
 	{
 		if (
 			(m_CacheData[m_CacheOrder[i]].m_ChunkX != ChunkX) ||
@@ -394,10 +394,10 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 			continue;
 		}
 		// Found it in the cache
-		int Idx = m_CacheOrder[i];
+		auto Idx = m_CacheOrder[i];
 		
 		// Move to front:
-		for (int j = i; j > 0; j--)
+		for (size_t j = i; j > 0; j--)
 		{
 			m_CacheOrder[j] = m_CacheOrder[j - 1];
 		}
@@ -418,8 +418,8 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 	m_Underlying->ComposeTerrain(a_ChunkDesc, a_Shape);
 	
 	// Insert it as the first item in the MRU order:
-	int Idx = m_CacheOrder[m_CacheSize - 1];
-	for (int i = m_CacheSize - 1; i > 0; i--)
+	auto Idx = m_CacheOrder[m_CacheSize - 1];
+	for (size_t i = m_CacheSize - 1; i > 0; i--)
 	{
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]

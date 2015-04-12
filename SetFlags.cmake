@@ -86,7 +86,11 @@ macro(set_flags)
 		else()
 			add_flags_cxx("-pthread")
 		endif()
-
+	elseif(ANDROID)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++14")
+		set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_COVERAGE} -std=c++14")
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++14")
 	else()
 		# Let gcc / clang know that we're compiling a multi-threaded app:
 		if (${UNIX})

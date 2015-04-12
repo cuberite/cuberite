@@ -8,14 +8,14 @@
 #if defined(_WIN32)
 	#include <io.h>  // Needed for _isatty(), not available on Linux
 	#include <time.h>
-#elif defined(__linux) && !defined(ANDROID_NDK)
+#elif defined(__linux) && !defined(ANDROID)
 	#include <unistd.h>  // Needed for isatty() on Linux
-#elif defined(ANDROID_NDK)
+#elif defined(ANDROID)
 	#include <android/log.h>
 #endif
 
 
-#if defined(_WIN32) || (defined (__linux) && !defined(ANDROID_NDK))
+#if defined(_WIN32) || (defined (__linux) && !defined(ANDROID))
 	class cColouredConsoleListener
 		: public cLogger::cListener
 	{
@@ -107,7 +107,7 @@
 	
 	
 	
-#elif defined (__linux) && !defined(ANDROID_NDK)
+#elif defined (__linux) && !defined(ANDROID)
 
 
 
@@ -156,7 +156,7 @@
 	
 	
 	
-#elif defined(ANDROID_NDK)
+#elif defined(ANDROID)
 
 
 
@@ -181,7 +181,7 @@
 				}
 				case cLogger::llWarning:
 				{
-					AndroidLogLevel = ANDROID_LOG_WARNING;
+					AndroidLogLevel = ANDROID_LOG_WARN;
 					break;
 				}
 				case cLogger::llError:
@@ -274,7 +274,7 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 			return cpp14::make_unique<cVanillaCPPConsoleListener>();
 		}
 		
-	#elif defined (__linux) && !defined(ANDROID_NDK)
+	#elif defined (__linux) && !defined(ANDROID)
 		// TODO: lookup terminal in terminfo
 		if (isatty(fileno(stdout)))
 		{
@@ -284,6 +284,8 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 		{
 			return cpp14::make_unique<cVanillaCPPConsoleListener>();
 		}
+	#elif defined(ANDROID)
+		return cpp14::make_unique<cAndroidConsoleListener>();
 	#else
 		return cpp14::make_unique<cVanillaCPPConsoleListener>();
 	#endif
@@ -295,6 +297,27 @@ std::unique_ptr<cLogger::cListener> MakeConsoleListener(bool a_IsService)
 
 ////////////////////////////////////////////////////////////////////////////////
 // cFileListener:
+#if defined (ANDROID)
+
+class cFileListener
+	: public cLogger::cListener
+{
+public:
+
+	bool Open()
+	{
+		// Android is buggy and doesn't create the log file, nevermind and give up
+		return true;
+	}
+
+	virtual void Log(AString a_Message, cLogger::eLogLevel a_LogLevel) override
+	{
+		UNUSED(a_Message);
+		UNUSED(a_LogLevel);
+	}
+};
+
+#else
 
 class cFileListener
 	: public cLogger::cListener
@@ -306,7 +329,7 @@ public:
 	bool Open()
 	{
 		// Assume creation succeeds, as the API does not provide a way to tell if the folder exists.
-		cFile::CreateFolder(FILE_IO_PREFIX + AString("logs"));
+		cFile::CreateFolder(FILE_IO_PREFIX "logs");
 		bool success = m_File.Open(
 			FILE_IO_PREFIX + Printf(
 				"logs/LOG_%d.txt",
@@ -360,6 +383,8 @@ private:
 	cFile m_File;
 };
 
+#endif
+
 
 
 
@@ -373,5 +398,3 @@ std::pair<bool, std::unique_ptr<cLogger::cListener>> MakeFileListener()
 	}
 	return {true, std::move(listener)};
 }
-
-

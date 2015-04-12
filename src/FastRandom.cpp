@@ -8,8 +8,11 @@
 
 #include <random>
 
-#if defined (__GNUC__)
-	#define ATTRIBUTE_TLS static __thread
+#if defined (ANDROID)
+	// Tycho: I'm sorry, I'm sorry, I'm so, so, sorry, but please blame the NDK developers for lack of, thread_local
+	#define ATTRIBUTE_TLS static
+#elif defined (__GNUC__)
+	#define ATTRIBUTE_TLS static thread_local
 #elif defined (_MSC_VER)
 	#define ATTRIBUTE_TLS static __declspec(thread)
 #else

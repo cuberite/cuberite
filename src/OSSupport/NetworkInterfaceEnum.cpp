@@ -8,10 +8,10 @@
 #include "event2/util.h"
 #include "../SelfTests.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 	#include <IPHlpApi.h>
 	#pragma comment(lib, "IPHLPAPI.lib")
-#else  // _WIN32
+#elif !defined(ANDROID)  // _WIN32
 	#include <sys/types.h>
 	#include <ifaddrs.h>
 	#include <netinet/in.h>
@@ -50,7 +50,7 @@ public:
 
 
 
-#ifdef _WIN32
+#if defined(_WIN32)
 
 /** Converts the SOCKET_ADDRESS structure received from the OS into an IP address string. */
 static AString PrintAddress(SOCKET_ADDRESS & a_Addr)
@@ -79,7 +79,7 @@ static AString PrintAddress(SOCKET_ADDRESS & a_Addr)
 	return IP;
 }
 
-#else  // _WIN32
+#elif !defined(ANDROID)  // _WIN32
 
 static AString PrintAddress(ifaddrs * InterfaceAddress)
 {
@@ -111,7 +111,7 @@ static AString PrintAddress(ifaddrs * InterfaceAddress)
 	}
 }
 
-#endif  // else _WIN32
+#endif  // else !ANDROID
 
 
 
@@ -121,7 +121,7 @@ AStringVector cNetwork::EnumLocalIPAddresses(void)
 {
 	AStringVector res;
 
-	#ifdef _WIN32
+	#if defined(_WIN32)
 
 		// Query the OS for all adapters' addresses:
 		char buffer[64 KiB];  // A buffer backing the address list
@@ -158,7 +158,7 @@ AStringVector cNetwork::EnumLocalIPAddresses(void)
 			}  // for pUnicast
 		}  // for pCurrAddresses
 
-	#else  // _WIN32
+	#elif !defined(ANDROID)  // _WIN32
 
 		struct ifaddrs * ifAddrStruct = nullptr;
 		getifaddrs(&ifAddrStruct);

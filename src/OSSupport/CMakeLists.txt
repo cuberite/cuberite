@@ -47,10 +47,13 @@ if(NOT MSVC)
 	add_library(OSSupport ${SRCS} ${HDRS})
 
 	if(UNIX)
-		if(NOT APPLE)
+		if(APPLE)
+			target_link_libraries(OSSupport pthread event_core event_extra)
+		elseif(ANDROID)
+			# Android has neither pthread nor rt
+			target_link_libraries(OSSupport)
+		else()
 			target_link_libraries(OSSupport rt)
-		endif()
-
-		target_link_libraries(OSSupport pthread event_core event_extra)
+		endif()		
 	endif()
 endif()
