@@ -131,6 +131,18 @@ public:
 	a_FileName may contain path specification. */
 	static AString ChangeFileExt(const AString & a_FileName, const AString & a_NewExt);
 
+	/** Returns the last modification time (in current timezone) of the specified file.
+	The value returned is in the same units as the value returned by time() function.
+	If the file is not found / accessible, zero is returned. */
+	static unsigned GetLastModificationTime(const AString & a_FileName);
+
+	/** Returns the path separator used by the current platform.
+	Note that the platform / CRT may support additional path separators (such as slashes on Windows), these don't get reported. */
+	static AString GetPathSeparator(void);
+
+	/** Returns the customary executable extension used by the current platform. */
+	static AString GetExecutableExt(void);
+
 	// tolua_end
 	
 	/** Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there). */

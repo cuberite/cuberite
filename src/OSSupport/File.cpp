@@ -456,20 +456,99 @@ AString cFile::ReadWholeFile(const AString & a_FileName)
 AString cFile::ChangeFileExt(const AString & a_FileName, const AString & a_NewExt)
 {
 	auto res = a_FileName;
-	auto DotPos = res.rfind('.');
-	if (DotPos == AString::npos)
+
+	// If the path separator is the last character of the string, return the string unmodified (refers to a folder):
+	#if defined(_MSC_VER)
+		// Find either path separator - MSVC CRT accepts slashes as separators, too
+		auto LastPathSep = res.find_last_of("/\\");
+	#elif defined(_WIN32)
+		// Windows with different CRTs support only the backslash separator
+		auto LastPathSep = res.rfind('\\');
+	#else
+		// Linux supports only the slash separator
+		auto LastPathSep = res.rfind('/');
+	#endif
+	if ((LastPathSep != AString::npos) && (LastPathSep + 1 == res.size()))
 	{
-		// No extension, just append it:
-		res.push_back('.');
+		return res;
+	}
+
+	// Append or replace the extension:
+	auto DotPos = res.rfind('.');
+	if (
+		(DotPos == AString::npos) ||  // No dot found
+		((LastPathSep != AString::npos) && (LastPathSep > DotPos))  // Last dot is before the last path separator (-> in folder name)
+	)
+	{
+		// No extension, just append the new one:
+		if (!a_NewExt.empty() && (a_NewExt[0] != '.'))
+		{
+			// a_NewExt doesn't start with a dot, insert one:
+			res.push_back('.');
+		}
 		res.append(a_NewExt);
 	}
 	else
 	{
 		// Replace existing extension:
-		res.erase(DotPos + 1, AString::npos);
+		if (!a_NewExt.empty() && (a_NewExt[0] != '.'))
+		{
+			// a_NewExt doesn't start with a dot, keep the current one:
+			res.erase(DotPos + 1, AString::npos);
+		}
+		else
+		{
+			res.erase(DotPos, AString::npos);
+		}
 		res.append(a_NewExt);
 	}
 	return res;
+}
+
+
+
+
+
+unsigned cFile::GetLastModificationTime(const AString & a_FileName)
+{
+	struct stat st;
+	if (stat(a_FileName.c_str(), &st) < 0)
+	{
+		return 0;
+	}
+	#ifdef _WIN32
+		// Windows returns times in local time already
+		return static_cast<unsigned>(st.st_mtime);
+	#else
+		// Linux returns UTC time, convert to local timezone:
+		return static_cast<unsigned>(mktime(localtime(&st.st_mtime)));
+	#endif
+}
+
+
+
+
+
+AString cFile::GetPathSeparator(void)
+{
+	#ifdef _WIN32
+		return "\\";
+	#else
+		return "/";
+	#endif
+}
+
+
+
+
+
+AString cFile::GetExecutableExt(void)
+{
+	#ifdef _WIN32
+		return ".exe";
+	#else
+		return "";
+	#endif
 }
 
 
