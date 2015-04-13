@@ -2031,8 +2031,6 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				HOOK_HOPPER_PUSHING_ITEM = { Notes = "Called when a hopper is pushing an item into the container it is aimed at." },
 				HOOK_KILLING = { Notes = "Called when an entity has just been killed. A plugin may resurrect the entity by setting its health to above zero." },
 				HOOK_LOGIN = { Notes = "Called when a Login packet is sent to the client, before the client is queued for authentication." },
-				HOOK_MAX = { Notes = "The maximum TypeID of a hook. Used internally by MCS to check hook type for validity." },
-				HOOK_NUM_HOOKS = { Notes = "Total number of hook types MCS supports. Used internally by MCS to check hook type for validity." },
 				HOOK_PLAYER_ANIMATION = { Notes = "Called when a client send the Animation packet." },
 				HOOK_PLAYER_BREAKING_BLOCK = { Notes = "Called when a player is about to break a block. A plugin may cancel the event." },
 				HOOK_PLAYER_BROKEN_BLOCK = { Notes = "Called after a player has broken a block." },
