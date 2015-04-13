@@ -28,7 +28,7 @@ g_PluginInfo =
 			Handler = HandleCompo,
 			HelpString = "Tests the cCompositeChat bindings"
 		},
-		["/cs"] =
+		["/cstay"] =
 		{
 			Permission = "debuggers",
 			Handler = HandleChunkStay,
