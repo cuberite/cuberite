@@ -91,7 +91,12 @@ cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_It
 	, m_bCollected(false)
 	, m_bIsPlayerCreated(IsPlayerCreated)
 {
+<<<<<<< HEAD
+	SetGravity(-16.0f);
+	SetAirDrag(0.4f);
+=======
 	SetGravity(-10.5f);
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 	SetMaxHealth(5);
 	SetHealth(5);
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);

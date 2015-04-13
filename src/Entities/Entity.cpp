@@ -999,7 +999,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	NextSpeed += m_WaterSpeed;
 
-	if (NextSpeed.SqrLength() > 0.f)
+	if (NextSpeed.SqrLength() > 0.0f)
 	{
 		cTracer Tracer(GetWorld());
 		// Distance traced is an integer, so we round up from the distance we should go (Speed * Delta), else we will encounter collision detection failurse
@@ -1015,20 +1015,20 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				// Block hit was within our projected path
 				// Begin by stopping movement in the direction that we hit something. The Normal is the line perpendicular to a 2D face and in this case, stores what block face was hit through either -1 or 1.
 				// For example: HitNormal.y = -1 : BLOCK_FACE_YM; HitNormal.y = 1 : BLOCK_FACE_YP
-				if (Tracer.HitNormal.x != 0.f)
+				if (Tracer.HitNormal.x != 0.0f)
 				{
-					NextSpeed.x = 0.f;
+					NextSpeed.x = 0.0f;
 				}
-				if (Tracer.HitNormal.y != 0.f)
+				if (Tracer.HitNormal.y != 0.0f)
 				{
-					NextSpeed.y = 0.f;
+					NextSpeed.y = 0.0f;
 				}
-				if (Tracer.HitNormal.z != 0.f)
+				if (Tracer.HitNormal.z != 0.0f)
 				{
-					NextSpeed.z = 0.f;
+					NextSpeed.z = 0.0f;
 				}
 
-				if (Tracer.HitNormal.y == 1.f)  // Hit BLOCK_FACE_YP, we are on the ground
+				if (Tracer.HitNormal.y == 1.0f)  // Hit BLOCK_FACE_YP, we are on the ground
 				{
 					m_bOnGround = true;
 				}
@@ -1971,7 +1971,7 @@ void cEntity::SteerVehicle(float a_Forward, float a_Sideways)
 	{
 		return;
 	}
-	if ((a_Forward != 0.f) || (a_Sideways != 0.f))
+	if ((a_Forward != 0.0f) || (a_Sideways != 0.0f))
 	{
 		m_AttachedTo->HandleSpeedFromAttachee(a_Forward, a_Sideways);
 	}

@@ -16,6 +16,11 @@ cFallingBlock::cFallingBlock(const Vector3i & a_BlockPosition, BLOCKTYPE a_Block
 	m_BlockMeta(a_BlockMeta),
 	m_OriginalPosition(a_BlockPosition)
 {
+<<<<<<< HEAD
+	SetGravity(-16.0f);
+	SetAirDrag(0.4);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 }
 
 

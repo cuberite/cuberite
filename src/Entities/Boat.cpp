@@ -17,6 +17,11 @@ cBoat::cBoat(double a_X, double a_Y, double a_Z) :
 	super(etBoat, a_X, a_Y, a_Z, 0.98, 0.7)
 {
 	SetMass(20.f);
+<<<<<<< HEAD
+	SetGravity(-16.0f);
+	SetAirDrag(1.f);
+=======
+>>>>>>> parent of 5d9eb71... Gave entities more vanilla-like gravity and created 'air drag' property
 	SetMaxHealth(6);
 	SetHealth(6);
 }
