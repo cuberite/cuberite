@@ -411,15 +411,19 @@ bool cItemHandler::OnPlayerPlace(
 
 
 
-bool cItemHandler::OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir)
+bool cItemHandler::OnItemUse(
+	cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+)
 {
 	UNUSED(a_World);
 	UNUSED(a_Player);
+	UNUSED(a_PluginInterface);
 	UNUSED(a_Item);
 	UNUSED(a_BlockX);
 	UNUSED(a_BlockY);
 	UNUSED(a_BlockZ);
-	UNUSED(a_Dir);
+	UNUSED(a_BlockFace);
 
 	return false;
 }
