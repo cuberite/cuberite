@@ -401,11 +401,11 @@ public:
 	/** Gets the flying relative maximum speed */
 	double GetFlyingMaxSpeed(void) const { return m_FlyingMaxSpeed; }
 	
-	/** Get the current speed of the player */
-	Vector3d GetSpeed(void);
+	/** Get the current speed value of the player */
+	Vector3d GetSpeedValue(void);
 
-	/** Sets the current speed of the player */
-	void SetSpeed(Vector3d a_Speed);
+	/** Sets the current speed value of the player */
+	void SetSpeedValue(Vector3d a_Speed);
 
 	/** Sets the normal relative maximum speed. Sends the update to player, if needed. */
 	void SetNormalMaxSpeed(double a_Speed);
@@ -566,7 +566,7 @@ protected:
 	std::chrono::steady_clock::time_point m_LastPlayerListTime;
 
 	/** Clock used to calculate the player speed every second */
-	std::chrono::steady_clock::time_point m_SpeedCalculationClock;
+	std::chrono::steady_clock::time_point m_LastTickTime;
 
 	cClientHandlePtr m_ClientHandle;
 	
@@ -587,8 +587,8 @@ protected:
 	Default value is 1. */
 	double m_FlyingMaxSpeed;
 	
-	/* The position of the player that will be reuse one second after to calculate his speed */
-	Vector3d m_LastSecPosition;
+	/* The position of the player that will be use to calculate his speed */
+	Vector3d m_LastPosition;
 
 	bool m_IsCrouched;
 	bool m_IsSprinting;
