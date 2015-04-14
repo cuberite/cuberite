@@ -511,7 +511,7 @@ bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_E
 
 
 
-bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -522,7 +522,7 @@ bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Sp
 	cLuaRefs & Refs = m_HookMap[cPluginManager::HOOK_EXECUTE_COMMAND];
 	for (cLuaRefs::iterator itr = Refs.begin(), end = Refs.end(); itr != end; ++itr)
 	{
-		m_LuaState.Call((int)(**itr), a_Player, a_Split, cLuaState::Return, res);
+		m_LuaState.Call((int)(**itr), a_Player, a_Split, a_EntireCommand, cLuaState::Return, res);
 		if (res)
 		{
 			return true;
@@ -761,7 +761,7 @@ bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 
 
 
-bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -785,7 +785,7 @@ bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_B
 
 
 
-bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -953,7 +953,7 @@ bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -1083,7 +1083,7 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 
 
 
-bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -1203,7 +1203,7 @@ bool cPluginLua::OnPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -1227,7 +1227,7 @@ bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -1251,7 +1251,7 @@ bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY
 
 
 
-bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -1275,7 +1275,7 @@ bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_Bloc
 
 
 
-bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())

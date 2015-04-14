@@ -35,7 +35,6 @@
 #include "Simulator/FluidSimulator.h"
 #include "MobCensus.h"
 #include "MobSpawner.h"
-#include "BlockInServerPluginInterface.h"
 #include "SetChunkData.h"
 #include "BoundingBox.h"
 #include "Blocks/ChunkInterface.h"
@@ -672,8 +671,7 @@ void cChunk::TickBlock(int a_RelX, int a_RelY, int a_RelZ)
 	cBlockHandler * Handler = BlockHandler(GetBlock(a_RelX, a_RelY, a_RelZ));
 	ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
-	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
-	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, a_RelX, a_RelY, a_RelZ);
+	Handler->OnUpdate(ChunkInterface, *this->GetWorld(), *cPluginManager::Get(), *this, a_RelX, a_RelY, a_RelZ);
 }
 
 
@@ -810,14 +808,13 @@ void cChunk::CheckBlocks()
 	std::swap(m_ToTickBlocks, ToTickBlocks);
 	
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
-	cBlockInServerPluginInterface PluginInterface(*m_World);
 	
 	for (std::vector<Vector3i>::const_iterator itr = ToTickBlocks.begin(), end = ToTickBlocks.end(); itr != end; ++itr)
 	{
 		Vector3i Pos = (*itr);
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(Pos));
-		Handler->Check(ChunkInterface, PluginInterface, Pos.x, Pos.y, Pos.z, *this);
+		Handler->Check(ChunkInterface, *cPluginManager::Get(), Pos.x, Pos.y, Pos.z, *this);
 	}  // for itr - ToTickBlocks[]
 }
 
@@ -837,7 +834,6 @@ void cChunk::TickBlocks(void)
 	int TickZ = m_BlockTickZ;
 	
 	cChunkInterface ChunkInterface(this->GetWorld()->GetChunkMap());
-	cBlockInServerPluginInterface PluginInterface(*this->GetWorld());
 
 	// This for loop looks disgusting, but it actually does a simple thing - first processes m_BlockTick, then adds random to it
 	// This is so that SetNextBlockTick() works
@@ -862,7 +858,7 @@ void cChunk::TickBlocks(void)
 
 		cBlockHandler * Handler = BlockHandler(GetBlock(m_BlockTickX, m_BlockTickY, m_BlockTickZ));
 		ASSERT(Handler != nullptr);  // Happenned on server restart, FS #243
-		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), PluginInterface, *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
+		Handler->OnUpdate(ChunkInterface, *this->GetWorld(), *cPluginManager::Get(), *this, m_BlockTickX, m_BlockTickY, m_BlockTickZ);
 	}  // for i - tickblocks
 }
 

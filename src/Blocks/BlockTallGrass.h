@@ -36,7 +36,7 @@ public:
 	}
 
 
-	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_BlockPluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
+	virtual void DropBlock(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPluginInterface & a_PluginInterface, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, bool a_CanDrop) override
 	{
 		if (a_CanDrop && (a_Digger != nullptr) && (a_Digger->GetEquippedWeapon().m_ItemType == E_ITEM_SHEARS))
 		{
@@ -45,7 +45,7 @@ public:
 			Drops.Add(m_BlockType, 1, Meta);
 
 			// Allow plugins to modify the pickups:
-			a_BlockPluginInterface.CallHookBlockToPickups(a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Drops);
+			a_PluginInterface.CallHookBlockToPickups(*a_Digger->GetWorld(), a_Digger, a_BlockX, a_BlockY, a_BlockZ, m_BlockType, Meta, Drops);
 
 			// Spawn the pickups:
 			if (!Drops.empty())
@@ -67,7 +67,7 @@ public:
 			return;
 		}
 
-		super::DropBlock(a_ChunkInterface, a_WorldInterface, a_BlockPluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
+		super::DropBlock(a_ChunkInterface, a_WorldInterface, a_PluginInterface, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_CanDrop);
 	}
 
 

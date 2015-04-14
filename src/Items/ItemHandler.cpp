@@ -5,7 +5,7 @@
 #include "../World.h"
 #include "../Entities/Player.h"
 #include "../FastRandom.h"
-#include "../BlockInServerPluginInterface.h"
+#include "../Bindings/PluginInterface.h"
 #include "../Chunk.h"
 
 // Handlers:
@@ -455,8 +455,7 @@ void cItemHandler::OnBlockDestroyed(cWorld * a_World, cPlayer * a_Player, const 
 	if (a_Player->IsGameModeSurvival())
 	{
 		cChunkInterface ChunkInterface(a_World->GetChunkMap());
-		cBlockInServerPluginInterface PluginInterface(*a_World);
-		Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
+		Handler->DropBlock(ChunkInterface, *a_World, *cPluginManager::Get(), a_Player, a_BlockX, a_BlockY, a_BlockZ, CanHarvestBlock(Block));
 	}
 
 	if (!cBlockInfo::IsOneHitDig(Block))

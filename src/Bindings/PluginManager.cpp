@@ -523,14 +523,14 @@ bool cPluginManager::CallHookEntityTeleport(cEntity & a_Entity, const Vector3d &
 
 
 
-bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split)
+bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand)
 {
 	FIND_HOOK(HOOK_EXECUTE_COMMAND);
 	VERIFY_HOOK;
 
 	for (PluginList::iterator itr = Plugins->second.begin(); itr != Plugins->second.end(); ++itr)
 	{
-		if ((*itr)->OnExecuteCommand(a_Player, a_Split))
+		if ((*itr)->OnExecuteCommand(a_Player, a_Split, a_EntireCommand))
 		{
 			return true;
 		}
@@ -694,7 +694,7 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 
 
-bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	FIND_HOOK(HOOK_PLAYER_BREAKING_BLOCK);
 	VERIFY_HOOK;
@@ -713,7 +713,7 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_Block
 
 
 
-bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	FIND_HOOK(HOOK_PLAYER_BROKEN_BLOCK);
 	VERIFY_HOOK;
@@ -846,7 +846,7 @@ bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
 {
 	FIND_HOOK(HOOK_PLAYER_LEFT_CLICK);
 	VERIFY_HOOK;
@@ -922,7 +922,7 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBl
 
 
 
-bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	FIND_HOOK(HOOK_PLAYER_RIGHT_CLICK);
 	VERIFY_HOOK;
@@ -1017,7 +1017,7 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	FIND_HOOK(HOOK_PLAYER_USED_BLOCK);
 	VERIFY_HOOK;
@@ -1036,7 +1036,7 @@ bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	FIND_HOOK(HOOK_PLAYER_USED_ITEM);
 	VERIFY_HOOK;
@@ -1055,7 +1055,7 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, in
 
 
 
-bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	FIND_HOOK(HOOK_PLAYER_USING_BLOCK);
 	VERIFY_HOOK;
@@ -1074,7 +1074,7 @@ bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, 
 
 
 
-bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	FIND_HOOK(HOOK_PLAYER_USING_ITEM);
 	VERIFY_HOOK;
@@ -1447,7 +1447,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	}
 
 	// Ask plugins first if a command is okay to execute the command:
-	if (CallHookExecuteCommand(&a_Player, Split))
+	if (CallHookExecuteCommand(&a_Player, Split, a_Command))
 	{
 		LOGINFO("Player %s tried executing command \"%s\" that was stopped by the HOOK_EXECUTE_COMMAND hook", a_Player.GetName().c_str(), Split[0].c_str());
 		return crBlocked;
@@ -1789,7 +1789,7 @@ bool cPluginManager::ExecuteConsoleCommand(const AStringVector & a_Split, cComma
 	}
 
 	// Ask plugins first if a command is okay to execute the console command:
-	if (CallHookExecuteCommand(nullptr, a_Split))
+	if (CallHookExecuteCommand(nullptr, a_Split, a_Command))
 	{
 		a_Output.Out("Command \"%s\" was stopped by the HOOK_EXECUTE_COMMAND hook", a_Split[0].c_str());
 		return false;

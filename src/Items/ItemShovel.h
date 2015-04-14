@@ -4,9 +4,8 @@
 #include "ItemHandler.h"
 #include "../World.h"
 #include "../Entities/Player.h"
-
+#include "../Bindings/PluginManager.h"
 #include "../Blocks/BlockHandler.h"
-#include "../BlockInServerPluginInterface.h"
 
 
 
@@ -21,14 +20,14 @@ public:
 	{
 	}
 
+
 	virtual bool OnDiggingBlock(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
 	{
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
 		if (Block == E_BLOCK_SNOW)
 		{
 			cChunkInterface ChunkInterface(a_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*a_World);
-			BlockHandler(Block)->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+			BlockHandler(Block)->DropBlock(ChunkInterface, *a_World, *cPluginManager::Get(), a_Player, a_BlockX, a_BlockY, a_BlockZ);
 
 			a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
 			a_Player->UseEquippedItem();
@@ -37,6 +36,7 @@ public:
 		return false;
 	}
 	
+
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
 	{
 		if (a_BlockType == E_BLOCK_SNOW)
@@ -46,6 +46,7 @@ public:
 		return super::CanHarvestBlock(a_BlockType);
 	}
 
+	
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
 	{
 		switch (m_ItemType)
@@ -60,3 +61,7 @@ public:
 	}
 
 };
+
+
+
+

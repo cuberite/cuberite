@@ -4,9 +4,8 @@
 #include "../Item.h"
 #include "../World.h"
 #include "../Entities/Player.h"
-#include "BlockInServerPluginInterface.h"
 #include "ChunkInterface.h"
-
+#include "../Bindings/PluginManager.h"
 
 
 
@@ -148,8 +147,7 @@ void cBlockPistonHandler::ExtendPiston(int a_BlockX, int a_BlockY, int a_BlockZ,
 		if (Handler->DoesDropOnUnsuitable())
 		{
 			cChunkInterface ChunkInterface(a_World->GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(*a_World);
-			Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, nullptr, a_BlockX, a_BlockY, a_BlockZ);
+			Handler->DropBlock(ChunkInterface, *a_World, *cPluginManager::Get(), nullptr, a_BlockX, a_BlockY, a_BlockZ);
 		}
 	}
 
