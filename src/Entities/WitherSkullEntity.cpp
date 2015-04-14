@@ -16,6 +16,8 @@ cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, double a_X, double a
 	super(pkWitherSkull, a_Creator, a_X, a_Y, a_Z, 0.25, 0.25)
 {
 	SetSpeed(a_Speed);
+	SetGravity(0);
+	SetAirDrag(0);
 }
 
 

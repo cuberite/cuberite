@@ -270,6 +270,10 @@ public:
 	float GetGravity(void) const { return m_Gravity; }
 	
 	void SetGravity(float a_Gravity) { m_Gravity = a_Gravity; }
+
+	float GetAirDrag(void) const { return m_AirDrag; }
+
+	void SetAirDrag(float a_AirDrag) { m_AirDrag = a_AirDrag; }
 	
 	/// Sets the rotation to match the speed vector (entity goes "face-forward")
 	void SetYawFromSpeed(void);
@@ -504,6 +508,12 @@ protected:
 	For realistic effects, this should be negative. For spaaaaaaace, this can be zero or even positive */
 	float m_Gravity;
 	
+	/** Stores the air drag that is applied to the entity every tick, measured in speed ratio per tick
+	Acts as air friction and slows down flight
+	Will be interpolated if the server tick rate varies
+	Data: http://minecraft.gamepedia.com/Entity#Motion_of_entities */
+	float m_AirDrag;
+
 	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)
 	Only updated if cEntity::BroadcastMovementUpdate() is called! */
 	Vector3d m_LastPos;
