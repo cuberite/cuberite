@@ -45,7 +45,7 @@ public:
 	
 	
 	
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
@@ -80,6 +80,12 @@ public:
 			return false;
 		}
 		
+		// Remove water / lava block (unless plugins disagree)
+		if (!a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0))
+		{
+			return false;
+		}
+
 		// Give new bucket, filled with fluid when the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
@@ -90,11 +96,13 @@ public:
 				ASSERT(!"Inventory bucket mismatch");
 				return true;
 			}
-			a_Player->GetInventory().AddItem(cItem(NewItem), true, true);
+			if (a_Player->GetInventory().AddItem(cItem(NewItem), true, true) != 1)
+			{
+				// The bucket didn't fit, toss it as a pickup:
+				a_Player->TossPickup(cItem(NewItem));
+			}
 		}
 
-		// Remove water / lava block
-		a_Player->GetWorld()->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0);
 		return true;
 	}
 
