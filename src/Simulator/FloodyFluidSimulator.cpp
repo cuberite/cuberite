@@ -11,7 +11,7 @@
 #include "../Chunk.h"
 #include "../BlockArea.h"
 #include "../Blocks/BlockHandler.h"
-#include "../BlockInServerPluginInterface.h"
+#include "../Bindings/PluginManager.h"
 #include "../Blocks/ChunkInterface.h"
 
 
@@ -292,11 +292,10 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		if (Handler->DoesDropOnUnsuitable())
 		{
 			cChunkInterface ChunkInterface(m_World.GetChunkMap());
-			cBlockInServerPluginInterface PluginInterface(m_World);
 			Handler->DropBlock(
 				ChunkInterface,
 				m_World,
-				PluginInterface,
+				*cPluginManager::Get(),
 				nullptr,
 				BlockX,
 				a_RelY,

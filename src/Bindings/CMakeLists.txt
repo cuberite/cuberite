@@ -36,6 +36,7 @@ SET (HDRS
 	LuaWindow.h
 	ManualBindings.h
 	Plugin.h
+	PluginInterface.h
 	PluginLua.h
 	PluginManager.h
 	WebPlugin.h

@@ -1,58 +1,19 @@
 
 #pragma once
 
+#include "PluginInterface.h"
 
-#include "Defines.h"
-
-
-
+// fwd:
 class cPlugin;
 
-// fwd: World.h
-class cWorld;
-
-// fwd: ChunkDesc.h
-class cChunkDesc;
-
-// fwd: Entities/Entity.h
-class cEntity;
-
-// fwd: Entities/ProjectileEntity.h
-class cProjectileEntity;
-
-// fwd: Mobs/Monster.h
-class cMonster;
-
-// fwd: Player.h
-class cPlayer;
-
-// fwd: CraftingRecipes.h
-class cCraftingGrid;
-class cCraftingRecipe;
-
-// fwd: Pickup.h
-class cPickup;
-
-// fwd: Pawn.h
-struct TakeDamageInfo;
-
-// fwd: CommandOutput.h
-class cCommandOutputCallback;
-
-// fwd: BlockEntities/HopperEntity.h
-class cHopperEntity;
-
-// fwd: BlockEntities/BlockEntityWithItems.h
-class cBlockEntityWithItems;
 
 
-
-class cItems;
 
 
 
 // tolua_begin
-class cPluginManager
+class cPluginManager:
+	public cPluginInterface
 {
 public:
 	// tolua_end
@@ -179,67 +140,67 @@ public:
 	size_t GetNumPlugins() const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
-	bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
-	bool CallHookBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups);
-	bool CallHookChat                     (cPlayer & a_Player, AString & a_Message);
-	bool CallHookChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
-	bool CallHookChunkGenerating          (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
-	bool CallHookChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup);
-	bool CallHookCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
-	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
-	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
-	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split);  // If a_Player == nullptr, it is a console cmd
-	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
-	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
-	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);
-	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
-	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
-	bool CallHookLogin                    (cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username);
-	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
-	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
-	bool CallHookPlayerEating             (cPlayer & a_Player);
-	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward);
-	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward);
-	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
-	bool CallHookPlayerJoined             (cPlayer & a_Player);
-	bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status);
-	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
-	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange);
-	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
-	bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
-	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
-	bool CallHookPlayerShooting           (cPlayer & a_Player);
-	bool CallHookPlayerSpawned            (cPlayer & a_Player);
-	bool CallHookPlayerTossingItem        (cPlayer & a_Player);
-	bool CallHookPlayerUsedBlock          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerUsedItem           (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
-	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ);
-	bool CallHookPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message);
-	bool CallHookPluginsLoaded            (void);
-	bool CallHookPostCrafting             (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookPreCrafting              (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
-	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
-	bool CallHookServerPing               (cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon);
-	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
-	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
-	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);
-	bool CallHookSpawningMonster          (cWorld & a_World, cMonster & a_Monster);
-	bool CallHookTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TDI);
-	bool CallHookUpdatedSign              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
-	bool CallHookUpdatingSign             (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
-	bool CallHookWeatherChanged           (cWorld & a_World);
-	bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather);
-	bool CallHookWorldStarted             (cWorld & a_World);
-	bool CallHookWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
+	virtual bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
+	virtual bool CallHookBlockToPickups           (cWorld & a_World, cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override;
+	virtual bool CallHookChat                     (cPlayer & a_Player, AString & a_Message) override;
+	virtual bool CallHookChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool CallHookChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
+	virtual bool CallHookChunkGenerating          (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc) override;
+	virtual bool CallHookChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool CallHookChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ) override;
+	virtual bool CallHookCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup) override;
+	virtual bool CallHookCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
+	virtual bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason) override;
+	virtual bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier) override;
+	virtual bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;
+	virtual bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand) override;  // If a_Player == nullptr, it is a console cmd
+	virtual bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
+	virtual bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData) override;
+	virtual bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username) override;
+	virtual bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum) override;
+	virtual bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum) override;
+	virtual bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI) override;
+	virtual bool CallHookLogin                    (cClientHandle & a_Client, int a_ProtocolVersion, const AString & a_Username) override;
+	virtual bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
+	virtual bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool CallHookPlayerDestroyed          (cPlayer & a_Player) override;
+	virtual bool CallHookPlayerEating             (cPlayer & a_Player) override;
+	virtual bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward) override;
+	virtual bool CallHookPlayerFishing            (cPlayer & a_Player, cItems a_Reward) override;
+	virtual bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel) override;
+	virtual bool CallHookPlayerJoined             (cPlayer & a_Player) override;
+	virtual bool CallHookPlayerLeftClick          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status) override;
+	virtual bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;
+	virtual bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
+	virtual bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange) override;
+	virtual bool CallHookPlayerRightClick         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity) override;
+	virtual bool CallHookPlayerShooting           (cPlayer & a_Player) override;
+	virtual bool CallHookPlayerSpawned            (cPlayer & a_Player) override;
+	virtual bool CallHookPlayerTossingItem        (cPlayer & a_Player) override;
+	virtual bool CallHookPlayerUsedBlock          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool CallHookPlayerUsedItem           (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual bool CallHookPlayerUsingBlock         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool CallHookPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
+	virtual bool CallHookPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message) override;
+	virtual bool CallHookPluginsLoaded            (void) override;
+	virtual bool CallHookPostCrafting             (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
+	virtual bool CallHookPreCrafting              (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe) override;
+	virtual bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos) override;
+	virtual bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity) override;
+	virtual bool CallHookServerPing               (cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon) override;
+	virtual bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity) override;
+	virtual bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster) override;
+	virtual bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity) override;
+	virtual bool CallHookSpawningMonster          (cWorld & a_World, cMonster & a_Monster) override;
+	virtual bool CallHookTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TDI) override;
+	virtual bool CallHookUpdatedSign              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player) override;
+	virtual bool CallHookUpdatingSign             (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player) override;
+	virtual bool CallHookWeatherChanged           (cWorld & a_World) override;
+	virtual bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather) override;
+	virtual bool CallHookWorldStarted             (cWorld & a_World) override;
+	virtual bool CallHookWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec) override;
 	
 	bool DisablePlugin(const AString & a_PluginName);  // tolua_export
 	bool LoadPlugin   (const AString & a_PluginName);  // tolua_export

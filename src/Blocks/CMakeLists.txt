@@ -60,7 +60,6 @@ SET (HDRS
 	BlockOre.h
 	BlockPiston.h
 	BlockPlanks.h
-	BlockPluginInterface.h
 	BlockPortal.h
 	BlockPressurePlate.h
 	BlockPumpkin.h

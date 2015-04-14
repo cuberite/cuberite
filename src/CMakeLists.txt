@@ -74,7 +74,6 @@ SET (HDRS
 	BiomeDef.h
 	BlockArea.h
 	BlockID.h
-	BlockInServerPluginInterface.h
 	BlockInfo.h
 	BlockTracer.h
 	BoundingBox.h
