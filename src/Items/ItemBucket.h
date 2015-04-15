@@ -23,13 +23,18 @@ public:
 
 	}
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+
+
+	virtual bool OnItemUse(
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	) override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_Dir);
-			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_Dir, E_BLOCK_LAVA);
-			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_Dir, E_BLOCK_WATER);
+			case E_ITEM_BUCKET:       return ScoopUpFluid(a_World, a_Player, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+			case E_ITEM_LAVA_BUCKET:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_LAVA);
+			case E_ITEM_WATER_BUCKET: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_Item, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, E_BLOCK_WATER);
 			default:
 			{
 				ASSERT(!"Unhandled ItemType");
@@ -40,7 +45,7 @@ public:
 	
 	
 	
-	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace)
+	bool ScoopUpFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
 	{
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
@@ -75,6 +80,12 @@ public:
 			return false;
 		}
 		
+		// Remove water / lava block (unless plugins disagree)
+		if (!a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0))
+		{
+			return false;
+		}
+
 		// Give new bucket, filled with fluid when the gamemode is not creative:
 		if (!a_Player->IsGameModeCreative())
 		{
@@ -85,25 +96,33 @@ public:
 				ASSERT(!"Inventory bucket mismatch");
 				return true;
 			}
-			a_Player->GetInventory().AddItem(cItem(NewItem), true, true);
+			if (a_Player->GetInventory().AddItem(cItem(NewItem), true, true) != 1)
+			{
+				// The bucket didn't fit, toss it as a pickup:
+				a_Player->TossPickup(cItem(NewItem));
+			}
 		}
 
-		// Remove water / lava block
-		a_Player->GetWorld()->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, E_BLOCK_AIR, 0);
 		return true;
 	}
 
 
-	bool PlaceFluid(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock)
+
+	bool PlaceFluid(
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_FluidBlock
+	)
 	{
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
 			return false;
 		}
 		
-		BLOCKTYPE CurrentBlock;
+		BLOCKTYPE CurrentBlockType;
+		NIBBLETYPE CurrentBlockMeta;
+		eBlockFace EntryFace;
 		Vector3i BlockPos;
-		if (!GetPlacementCoordsFromTrace(a_World, a_Player, BlockPos, CurrentBlock))
+		if (!GetPlacementCoordsFromTrace(a_World, a_Player, BlockPos, CurrentBlockType, CurrentBlockMeta, EntryFace))
 		{
 			return false;
 		}
@@ -125,21 +144,27 @@ public:
 		}
 		
 		// Wash away anything that was there prior to placing:
-		if (cFluidSimulator::CanWashAway(CurrentBlock))
+		if (cFluidSimulator::CanWashAway(CurrentBlockType))
 		{
-			cBlockHandler * Handler = BlockHandler(CurrentBlock);
+			if (a_PluginInterface.CallHookPlayerBreakingBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta))
+			{
+				// Plugin disagrees with the washing-away
+				return false;
+			}
+
+			cBlockHandler * Handler = BlockHandler(CurrentBlockType);
 			if (Handler->DoesDropOnUnsuitable())
 			{
 				cChunkInterface ChunkInterface(a_World->GetChunkMap());
-				cBlockInServerPluginInterface PluginInterface(*a_World);
-				Handler->DropBlock(ChunkInterface, *a_World, PluginInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ);
+				Handler->DropBlock(ChunkInterface, *a_World, a_PluginInterface, a_Player, BlockPos.x, BlockPos.y, BlockPos.z);
 			}
+			a_PluginInterface.CallHookPlayerBrokenBlock(*a_Player, BlockPos.x, BlockPos.y, BlockPos.z, EntryFace, CurrentBlockType, CurrentBlockMeta);
 		}
 
-		a_World->SetBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
-		
-		return true;
+		// Place the actual fluid block:
+		return a_Player->PlaceBlock(BlockPos.x, BlockPos.y, BlockPos.z, a_FluidBlock, 0);
 	}
+
 
 
 	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos)
@@ -190,20 +215,25 @@ public:
 	}
 	
 	
-	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType)
+
+	bool GetPlacementCoordsFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta, eBlockFace & a_BlockFace)
 	{
 		class cCallbacks :
 			public cBlockTracer::cCallbacks
 		{
 		public:
 			Vector3i   m_Pos;
-			BLOCKTYPE  m_ReplacedBlock;
+			BLOCKTYPE  m_ReplacedBlockType;
+			NIBBLETYPE m_ReplacedBlockMeta;
+			eBlockFace m_EntryFace;
 			
 			virtual bool OnNextBlock(int a_CBBlockX, int a_CBBlockY, int a_CBBlockZ, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, char a_CBEntryFace) override
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
-					m_ReplacedBlock = a_CBBlockType;
+					m_ReplacedBlockType = a_CBBlockType;
+					m_ReplacedBlockMeta = a_CBBlockMeta;
+					m_EntryFace = static_cast<eBlockFace>(a_CBEntryFace);
 					if (!cFluidSimulator::CanWashAway(a_CBBlockType) && !IsBlockLiquid(a_CBBlockType))
 					{
 						AddFaceDirection(a_CBBlockX, a_CBBlockY, a_CBBlockZ, (eBlockFace)a_CBEntryFace);  // Was an unwashawayable block, can't overwrite it!
@@ -219,12 +249,14 @@ public:
 		Vector3d Start(a_Player->GetEyePosition());
 		Vector3d End(a_Player->GetEyePosition() + a_Player->GetLookVector() * 5);
 
-		// cTracer::Trace returns true when whole line was traversed. By returning true when we hit something, we ensure that this never happens if liquid could be placed
+		// cTracer::Trace returns true when whole line was traversed. By returning true from the callback when we hit something, we ensure that this never happens if liquid could be placed
 		// Use this to judge whether the position is valid
 		if (!Tracer.Trace(Start.x, Start.y, Start.z, End.x, End.y, End.z))
 		{
 			a_BlockPos = Callbacks.m_Pos;
-			a_BlockType = Callbacks.m_ReplacedBlock;
+			a_BlockType = Callbacks.m_ReplacedBlockType;
+			a_BlockMeta = Callbacks.m_ReplacedBlockMeta;
+			a_BlockFace = Callbacks.m_EntryFace;
 			return true;
 		}
 

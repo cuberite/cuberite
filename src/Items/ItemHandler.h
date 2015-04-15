@@ -4,6 +4,7 @@
 #include "../Defines.h"
 #include "../Item.h"
 #include "../Entities/EntityEffect.h"
+#include "../Blocks/BlockPluginInterface.h"
 
 
 
@@ -56,8 +57,12 @@ public:
 	);
 	
 
-	/** Called when the player tries to use the item (right mouse button). Return false to make the item unusable. DEFAULT: False */
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir);
+	/** Called when the player tries to use the item (right mouse button).
+	Return false to abort the usage. DEFAULT: False */
+	virtual bool OnItemUse(
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	);
 	
 
 	/** Called when the client sends the SHOOT status in the lclk packet */

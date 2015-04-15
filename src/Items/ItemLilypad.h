@@ -29,7 +29,11 @@ public:
 	}
 
 
-	virtual bool OnItemUse(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+	virtual bool OnItemUse(
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	) override
 	{
 		if (a_BlockFace > BLOCK_FACE_NONE)
 		{
