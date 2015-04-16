@@ -336,7 +336,7 @@ bool cItemHandler::OnPlayerPlace(
 	if (
 		BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision() ||
 		BlockHandler(ClickedBlock)->DoesIgnoreBuildCollision(&a_Player, ClickedBlockMeta)
-		)
+	)
 	{
 		cChunkInterface ChunkInterface(a_World.GetChunkMap());
 		BlockHandler(ClickedBlock)->OnDestroyedByPlayer(ChunkInterface, a_World, &a_Player, a_BlockX, a_BlockY, a_BlockZ);
@@ -757,7 +757,7 @@ bool cItemHandler::GetPlacementBlockTypeMeta(
 		return false;
 	}
 	
-	cBlockHandler * BlockH = BlockHandler((BLOCKTYPE)m_ItemType);
+	cBlockHandler * BlockH = BlockHandler(static_cast<BLOCKTYPE>(m_ItemType));
 	cChunkInterface ChunkInterface(a_World->GetChunkMap());
 	return BlockH->GetPlacementBlockTypeMeta(
 		ChunkInterface, a_Player,
