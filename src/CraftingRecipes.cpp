@@ -673,10 +673,10 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 		if (
 			(itrS->x >= a_GridWidth) ||
 			(itrS->y >= a_GridHeight) ||
-			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||       // same item type?
+			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||   // same item type?
 			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
 			(
-				(Item.m_ItemDamage > 0) &&  // should compare damage values?
+				(Item.m_ItemDamage >= 0) &&  // should compare damage values?
 				(Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
 			)
 		)
