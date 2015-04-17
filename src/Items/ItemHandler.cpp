@@ -287,7 +287,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 void cItemHandler::Deinit()
 {
-	for (int i = 0; i < 2267; i++)
+	for (int i = 0; i < ARRAYCOUNT(m_ItemHandler); i++)
 	{
 		delete m_ItemHandler[i];
 		m_ItemHandler[i] = nullptr;
