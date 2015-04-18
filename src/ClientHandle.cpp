@@ -347,9 +347,9 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 		m_Player->LoginSetGameMode(World->GetGameMode());
 	}
 
-	m_Player->SetIP (m_IPString);
+	m_Player->SetIP(m_IPString);
 
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_JOINED, m_Player))
 	{
 		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", GetUsername().c_str()));
 		LOGINFO("Player %s has joined the game", m_Username.c_str());
@@ -399,7 +399,7 @@ void cClientHandle::Authenticate(const AString & a_Name, const AString & a_UUID,
 	// This should fix #889, "BadCast exception, cannot convert bit to fm" error in client
 	m_PingStartTime = std::chrono::steady_clock::now() + std::chrono::seconds(3);  // Send the first KeepAlive packet in 3 seconds
 
-	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWNED, m_Player);
 }
 
 
@@ -660,7 +660,7 @@ bool cClientHandle::HandleLogin(int a_ProtocolVersion, const AString & a_Usernam
 	m_Username = a_Username;
 
 	// Let the plugins know about this event, they may refuse the player:
-	if (cRoot::Get()->GetPluginManager()->CallHookLogin(*this, a_ProtocolVersion, a_Username))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_LOGIN, this, a_ProtocolVersion, a_Username))
 	{
 		Destroy();
 		return false;
@@ -823,7 +823,7 @@ void cClientHandle::HandlePluginMessage(const AString & a_Channel, const AString
 		return;
 	}
 
-	cPluginManager::Get()->CallHookPluginMessage(*this, a_Channel, a_Message);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_PLUGIN_MESSAGE, this, a_Channel, a_Message);
 }
 
 
@@ -1031,7 +1031,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerLeftClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
+	if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_LEFT_CLICK, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -1042,7 +1042,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 	{
 		case DIG_STATUS_DROP_HELD:  // Drop held item
 		{
-			if (PlgMgr->CallHookPlayerTossingItem(*m_Player))
+			if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_TOSSING_ITEM, m_Player))
 			{
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
@@ -1062,7 +1062,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 			}
 			else
 			{
-				if (PlgMgr->CallHookPlayerShooting(*m_Player))
+				if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_SHOOTING, m_Player))
 				{
 					// A plugin doesn't agree with the action. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 					return;
@@ -1099,7 +1099,7 @@ void cClientHandle::HandleLeftClick(int a_BlockX, int a_BlockY, int a_BlockZ, eB
 
 		case DIG_STATUS_DROP_STACK:
 		{
-			if (PlgMgr->CallHookPlayerTossingItem(*m_Player))
+			if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_TOSSING_ITEM, m_Player))
 			{
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;
@@ -1227,7 +1227,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	cWorld * World = m_Player->GetWorld();
 	cItemHandler * ItemHandler = cItemHandler::GetItemHandler(m_Player->GetEquippedItem());
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerBreakingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta))
 	{
 		// A plugin doesn't agree with the breaking. Bail out. Send the block back to the client, so that it knows:
 		m_Player->GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
@@ -1248,7 +1248,7 @@ void cClientHandle::HandleBlockDigFinished(int a_BlockX, int a_BlockY, int a_Blo
 	World->BroadcastSoundParticleEffect(2001, a_BlockX, a_BlockY, a_BlockZ, a_OldBlock, this);
 	World->DigBlock(a_BlockX, a_BlockY, a_BlockZ);
 
-	cRoot::Get()->GetPluginManager()->CallHookPlayerBrokenBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_OldBlock, a_OldMeta);
 }
 
 
@@ -1326,7 +1326,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
-	if (PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+	if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_RIGHT_CLICK, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 	{
 		// A plugin doesn't agree with the action, replace the block on the client and quit:
 		if (AreRealCoords)
@@ -1384,14 +1384,14 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 
 		if (BlockHandler->IsUseable() && !m_Player->IsCrouched())
 		{
-			if (PlgMgr->CallHookPlayerUsingBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
+			if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_USING_BLOCK, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta))
 			{
 				// A plugin doesn't agree with using the block, abort
 				return;
 			}
 			cChunkInterface ChunkInterface(World->GetChunkMap());
 			BlockHandler->OnUse(ChunkInterface, *World, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
-			PlgMgr->CallHookPlayerUsedBlock(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
+			PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_USED_BLOCK, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, BlockType, BlockMeta);
 			return;
 		}
 	}
@@ -1419,7 +1419,7 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			return;
 		}
 		m_Player->StartEating();
-		if (PlgMgr->CallHookPlayerEating(*m_Player))
+		if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_EATING, m_Player))
 		{
 			// A plugin won't let us eat, abort (send the proper packets to the client, too):
 			m_Player->AbortEating();
@@ -1427,13 +1427,13 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 	}
 	else
 	{
-		if (PlgMgr->CallHookPlayerUsingItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
+		if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_USING_ITEM, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ))
 		{
 			// A plugin doesn't agree with using the item, abort
 			return;
 		}
 		ItemHandler->OnItemUse(World, m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-		PlgMgr->CallHookPlayerUsedItem(*m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+		PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_USED_ITEM, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 	}
 }
 
@@ -1502,7 +1502,7 @@ void cClientHandle::HandlePlayerMoveLook(double a_PosX, double a_PosY, double a_
 
 void cClientHandle::HandleAnimation(int a_Animation)
 {
-	if (cPluginManager::Get()->CallHookPlayerAnimation(*m_Player, a_Animation))
+	if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_PLAYER_ANIMATION, m_Player, a_Animation))
 	{
 		// Plugin disagrees, bail out
 		return;
@@ -1593,7 +1593,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 			cPlayer & m_Player;
 			virtual bool Item(cEntity * a_Entity) override
 			{
-				if (cPluginManager::Get()->CallHookPlayerRightClickingEntity(m_Player, *a_Entity))
+				if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY, &m_Player, a_Entity))
 				{
 					return false;
 				}
@@ -1604,8 +1604,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 			cRclkEntity(cPlayer & a_Player) : m_Player(a_Player) {}
 		} Callback (*m_Player);
 		
-		cWorld * World = m_Player->GetWorld();
-		World->DoWithEntityByID(a_TargetEntityID, Callback);
+		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, Callback);
 		return;
 	}
 
@@ -1631,9 +1630,8 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	} Callback;
 
 	Callback.m_Attacker = m_Player;
-
-	cWorld * World = m_Player->GetWorld();
-	if (World->DoWithEntityByID(a_TargetEntityID, Callback))
+	
+	if (m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, Callback))
 	{
 		// Any kind of an attack implies food exhaustion
 		m_Player->AddFoodExhaustion(0.3);
@@ -1652,7 +1650,7 @@ void cClientHandle::HandleRespawn(void)
 		return;
 	}
 	m_Player->Respawn();
-	cRoot::Get()->GetPluginManager()->CallHookPlayerSpawned(*m_Player);
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_SPAWNED, m_Player);
 }
 
 
@@ -1710,7 +1708,7 @@ bool cClientHandle::CheckMultiLogin(const AString & a_Username)
 
 bool cClientHandle::HandleHandshake(const AString & a_Username)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookHandshake(*this, a_Username))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_HANDSHAKE, this, a_Username))
 	{
 		if (cRoot::Get()->GetServer()->GetNumPlayers() >= cRoot::Get()->GetServer()->GetMaxPlayers())
 		{
@@ -2880,7 +2878,7 @@ void cClientHandle::SocketClosed(void)
 	if (!m_Username.empty())  // Ignore client pings
 	{
 		LOGD("Client %s @ %s disconnected", m_Username.c_str(), m_IPString.c_str());
-		cRoot::Get()->GetPluginManager()->CallHookDisconnect(*this, "Player disconnected");
+		cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_DISCONNECT, this, "Player disconnected");
 	}
 
 	Destroy();

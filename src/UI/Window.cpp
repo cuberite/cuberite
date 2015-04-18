@@ -210,7 +210,7 @@ void cWindow::Clicked(
 		case caLeftClickOutside:
 		case caRightClickOutside:
 		{
-			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
+			if (PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_TOSSING_ITEM, &a_Player))
 			{
 				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
 				return;

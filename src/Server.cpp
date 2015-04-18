@@ -575,7 +575,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	public:
 		cCallback(void) : m_MaxLen(0) {}
 		
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
+		virtual bool Command(const AString & a_Command, const cPluginLua * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
 		UNUSED(a_Plugin);
 		UNUSED(a_Permission);

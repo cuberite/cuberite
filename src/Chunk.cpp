@@ -121,7 +121,7 @@ cChunk::cChunk(
 
 cChunk::~cChunk()
 {
-	cPluginManager::Get()->CallHookChunkUnloaded(*m_World, m_PosX, m_PosZ);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_CHUNK_UNLOADED, m_World, m_PosX, m_PosZ);
 	
 	// LOGINFO("### delete cChunk() (%i, %i) from %p, thread 0x%x ###", m_PosX, m_PosZ, this, GetCurrentThreadId());
 	

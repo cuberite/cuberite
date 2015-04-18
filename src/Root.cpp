@@ -341,7 +341,7 @@ cWorld * cRoot::CreateAndInitializeWorld(const AString & a_WorldName, eDimension
 	m_WorldsByName[a_WorldName] = NewWorld;
 	NewWorld->Start();
 	NewWorld->InitializeSpawn();
-	m_PluginManager->CallHookWorldStarted(*NewWorld);
+	m_PluginManager->CallHook(cPluginManager::HOOK_WORLD_STARTED, NewWorld);
 	return NewWorld;
 }
 
@@ -355,7 +355,7 @@ void cRoot::StartWorlds(void)
 	{
 		itr->second->Start();
 		itr->second->InitializeSpawn();
-		m_PluginManager->CallHookWorldStarted(*itr->second);
+		m_PluginManager->CallHook(cPluginManager::HOOK_WORLD_STARTED, itr->second);
 	}
 }
 

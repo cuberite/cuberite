@@ -504,7 +504,7 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 		{
 			if (a_AllowNewStacks)
 			{
-				if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
+				if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_HOPPER_PULLING_ITEM, m_World, this, i, &a_Entity, a_SlotNum))
 				{
 					// Plugin disagrees with the move
 					continue;
@@ -515,7 +515,7 @@ bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_Sl
 		}
 		else if (m_Contents.GetSlot(i).IsEqual(One))
 		{
-			if (cPluginManager::Get()->CallHookHopperPullingItem(*m_World, *this, i, a_Entity, a_SlotNum))
+			if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_HOPPER_PULLING_ITEM, m_World, this, i, &a_Entity, a_SlotNum))
 			{
 				// Plugin disagrees with the move
 				continue;
@@ -648,7 +648,7 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		{
 			if (!m_Contents.IsSlotEmpty(i))
 			{
-				if (cPluginManager::Get()->CallHookHopperPushingItem(*m_World, *this, i, a_Entity, a_DstSlotNum))
+				if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, m_World, this, i, &a_Entity, a_DstSlotNum))
 				{
 					// A plugin disagrees with the move
 					continue;
@@ -672,7 +672,7 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		{
 			if (m_Contents.GetSlot(i).IsEqual(DestSlot))
 			{
-				if (cPluginManager::Get()->CallHookHopperPushingItem(*m_World, *this, i, a_Entity, a_DstSlotNum))
+				if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, m_World, this, i, &a_Entity, a_DstSlotNum))
 				{
 					// A plugin disagrees with the move
 					continue;

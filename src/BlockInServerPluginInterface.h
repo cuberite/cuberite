@@ -18,12 +18,12 @@ public:
 
 	virtual bool CallHookBlockSpread(int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
 	{
-		return cPluginManager::Get()->CallHookBlockSpread(m_World, a_BlockX, a_BlockY, a_BlockZ, a_Source);
+		return cPluginManager::Get()->CallHook(cPluginManager::HOOK_BLOCK_SPREAD, &m_World, a_BlockX, a_BlockY, a_BlockZ, a_Source);
 	}
 
 	virtual bool CallHookBlockToPickups(cEntity * a_Digger, int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, cItems & a_Pickups) override
 	{
-		return cPluginManager::Get()->CallHookBlockToPickups(m_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups);
+		return cPluginManager::Get()->CallHook(cPluginManager::HOOK_BLOCK_TO_PICKUPS, &m_World, a_Digger, a_BlockX, a_BlockY, a_BlockZ, a_BlockType, a_BlockMeta, a_Pickups);
 	}
 
 private:

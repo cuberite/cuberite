@@ -62,7 +62,7 @@ void cPawn::KilledBy(TakeDamageInfo & a_TDI)
 void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
 {
 	// Check if the plugins allow the addition:
-	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
+	if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_ENTITY_ADD_EFFECT, this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
 	{
 		// A plugin disallows the addition, bail out.
 		return;
