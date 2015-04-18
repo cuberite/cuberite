@@ -91,7 +91,8 @@ cPickup::cPickup(double a_PosX, double a_PosY, double a_PosZ, const cItem & a_It
 	, m_bCollected(false)
 	, m_bIsPlayerCreated(IsPlayerCreated)
 {
-	SetGravity(-10.5f);
+	SetGravity(-16.0f);
+	SetAirDrag(0.02f);
 	SetMaxHealth(5);
 	SetHealth(5);
 	SetSpeed(a_SpeedX, a_SpeedY, a_SpeedZ);

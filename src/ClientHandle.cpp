@@ -23,6 +23,7 @@
 #include "Blocks/BlockSlab.h"
 #include "Blocks/BlockBed.h"
 #include "Blocks/ChunkInterface.h"
+#include "BlockInServerPluginInterface.h"
 
 #include "Root.h"
 
@@ -1432,7 +1433,8 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			// A plugin doesn't agree with using the item, abort
 			return;
 		}
-		ItemHandler->OnItemUse(World, m_Player, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		cBlockInServerPluginInterface PluginInterface(*World);
+		ItemHandler->OnItemUse(World, m_Player, PluginInterface, Equipped, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 		PlgMgr->CallHook(cPluginManager::HOOK_PLAYER_USED_ITEM, m_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 	}
 }

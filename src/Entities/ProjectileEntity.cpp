@@ -227,6 +227,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, double a
 	),
 	m_IsInGround(false)
 {
+	SetGravity(-12.0f);
+	SetAirDrag(0.01f);
 }
 
 
@@ -242,6 +244,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, const Ve
 	SetSpeed(a_Speed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
+	SetGravity(-12.0f);
+	SetAirDrag(0.01f);
 }
 
 
@@ -349,9 +353,11 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		return;
 	}
 	
-	const Vector3d PerTickSpeed = GetSpeed() / 20;
+	auto DtSec = std::chrono::duration_cast<std::chrono::duration<double>>(a_Dt);
+
+	const Vector3d DeltaSpeed = GetSpeed() * DtSec.count();
 	const Vector3d Pos = GetPosition();
-	const Vector3d NextPos = Pos + PerTickSpeed;
+	const Vector3d NextPos = Pos + DeltaSpeed;
 
 	// Test for entity collisions:
 	cProjectileEntityCollisionCallback EntityCollisionCallback(this, Pos, NextPos);
@@ -388,8 +394,8 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 	
 	// Add slowdown and gravity effect to the speed:
 	Vector3d NewSpeed(GetSpeed());
-	NewSpeed.y += m_Gravity / 20;
-	NewSpeed *= TracerCallback.GetSlowdownCoeff();
+	NewSpeed.y += m_Gravity * DtSec.count();
+	NewSpeed -= NewSpeed * (m_AirDrag * 20.0f) * DtSec.count();
 	SetSpeed(NewSpeed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();

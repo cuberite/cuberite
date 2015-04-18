@@ -38,6 +38,7 @@ static const struct
 	{mtEnderman,     "enderman",     "Enderman"},
 	{mtEnderDragon,  "enderdragon",  "EnderDragon"},
 	{mtGhast,        "ghast",        "Ghast"},
+	{mtGiant,        "giant",        "Giant"},
 	{mtGuardian,     "guardian",     "Guardian"},
 	{mtHorse,        "horse",        "EntityHorse"},
 	{mtIronGolem,    "irongolem",    "VillagerGolem"},

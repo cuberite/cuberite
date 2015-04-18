@@ -140,6 +140,8 @@ public:
 		HOOK_WEATHER_CHANGING,
 		HOOK_WORLD_STARTED,
 		HOOK_WORLD_TICK,
+
+		// tolua_end
 		
 		// Note that if a hook type is added, it may need processing in cPluginLua::CanAddHook() descendants,
 		//   and it definitely needs adding in cPluginLua::GetHookFnName() !
@@ -147,8 +149,7 @@ public:
 		// Keep these two as the last items, they are used for validity checking and get their values automagically
 		HOOK_NUM_HOOKS,
 		HOOK_MAX = HOOK_NUM_HOOKS - 1,
-	} ;
-	// tolua_end
+	} ;  // tolua_export
 
 	/** Used as a callback for enumerating bound commands */
 	class cCommandEnumCallback

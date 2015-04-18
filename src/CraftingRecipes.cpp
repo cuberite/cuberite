@@ -366,6 +366,7 @@ void cCraftingRecipes::ClearRecipes(void)
 
 void cCraftingRecipes::AddRecipeLine(int a_LineNum, const AString & a_RecipeLine)
 {
+	// Remove any spaces within the line:
 	AString RecipeLine(a_RecipeLine);
 	RecipeLine.erase(std::remove_if(RecipeLine.begin(), RecipeLine.end(), isspace), RecipeLine.end());
 

@@ -19,21 +19,26 @@ public:
 
 	}
 
-	virtual bool OnItemUse(cWorld *a_World, cPlayer *a_Player, const cItem & a_Item, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Dir) override
+
+
+	virtual bool OnItemUse(
+		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
+		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
+	) override
 	{
-		if ((a_Dir == BLOCK_FACE_NONE) || (a_Dir == BLOCK_FACE_YP) || (a_Dir == BLOCK_FACE_YM))
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_BlockFace == BLOCK_FACE_YP) || (a_BlockFace == BLOCK_FACE_YM))
 		{
 			// Client sends this if clicked on top or bottom face
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir);  // Make sure block that will be occupied is free
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);  // Make sure block that will be occupied is free
 		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_Dir, true);  // We want the clicked block, so go back again
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // We want the clicked block, so go back again
 
 		if (Block == E_BLOCK_AIR)
 		{
-			cItemFrame * ItemFrame = new cItemFrame(a_Dir, a_BlockX, a_BlockY, a_BlockZ);
+			cItemFrame * ItemFrame = new cItemFrame(a_BlockFace, a_BlockX, a_BlockY, a_BlockZ);
 			if (!ItemFrame->Initialize(*a_World))
 			{
 				delete ItemFrame;

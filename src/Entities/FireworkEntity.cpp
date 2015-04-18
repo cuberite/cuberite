@@ -13,6 +13,8 @@ cFireworkEntity::cFireworkEntity(cEntity * a_Creator, double a_X, double a_Y, do
 	m_TicksToExplosion(a_Item.m_FireworkItem.m_FlightTimeInTicks),
 	m_FireworkItem(a_Item)
 {
+	SetGravity(0);
+	SetAirDrag(0);
 }
 
 

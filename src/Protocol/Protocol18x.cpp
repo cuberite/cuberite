@@ -2106,7 +2106,7 @@ void cProtocol180::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 void cProtocol180::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
-	m_Client->HandleAnimation(1);  // Packet exists solely for arm-swing notification
+	m_Client->HandleAnimation(0);  // Packet exists solely for arm-swing notification
 }
 
 

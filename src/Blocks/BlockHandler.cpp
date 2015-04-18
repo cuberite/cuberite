@@ -353,7 +353,7 @@ bool cBlockHandler::GetPlacementBlockTypeMeta(
 {
 	// By default, all blocks can be placed and the meta is copied over from the item's damage value:
 	a_BlockType = m_BlockType;
-	a_BlockMeta = (NIBBLETYPE)(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);
+	a_BlockMeta = static_cast<NIBBLETYPE>(a_Player->GetEquippedItem().m_ItemDamage & 0x0f);
 	return true;
 }
 
