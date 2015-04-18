@@ -81,7 +81,7 @@ protected:
 			{
 				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, &Intersection))
+				if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_PROJECTILE_HIT_BLOCK, m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, Intersection))
 				{
 					return false;
 				}
@@ -173,7 +173,7 @@ public:
 			return false;
 		}
 
-		if (cPluginManager::Get()->CallHookProjectileHitEntity(*m_Projectile, *a_Entity))
+		if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_PROJECTILE_HIT_ENTITY, m_Projectile, a_Entity))
 		{
 			// A plugin disagreed.
 			return false;

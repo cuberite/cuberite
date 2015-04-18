@@ -136,7 +136,7 @@ const char * cEntity::GetParentClass(void) const
 
 bool cEntity::Initialize(cWorld & a_World)
 {
-	if (cPluginManager::Get()->CallHookSpawningEntity(a_World, *this) && !IsPlayer())
+	if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_SPAWNING_ENTITY, &a_World, this) && !IsPlayer())
 	{
 		return false;
 	}
@@ -152,7 +152,7 @@ bool cEntity::Initialize(cWorld & a_World)
 	m_World = &a_World;
 	m_World->AddEntity(this);
 	
-	cPluginManager::Get()->CallHookSpawnedEntity(a_World, *this);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_SPAWNED_ENTITY, &a_World, this);
 	
 	// Spawn the entity on the clients:
 	a_World.BroadcastSpawnEntity(*this);
@@ -305,7 +305,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookTakeDamage(*this, a_TDI))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_TAKE_DAMAGE, this, &a_TDI))
 	{
 		return false;
 	}
@@ -735,7 +735,7 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 {
 	m_Health = 0;
 
-	cRoot::Get()->GetPluginManager()->CallHookKilling(*this, a_TDI.Attacker, a_TDI);
+	cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_KILLING, this, a_TDI.Attacker, &a_TDI);
 	
 	if (m_Health > 0)
 	{
@@ -1636,7 +1636,7 @@ void cEntity::TeleportToEntity(cEntity & a_Entity)
 void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	//  ask the plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_ENTITY_TELEPORT, this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition(a_PosX, a_PosY, a_PosZ);
 		m_World->BroadcastTeleportEntity(*this);

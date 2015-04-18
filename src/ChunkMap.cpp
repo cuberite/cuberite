@@ -955,7 +955,7 @@ void cChunkMap::SetChunkData(cSetChunkData & a_SetChunkData)
 	}
 
 	// Notify plugins of the chunk becoming available
-	cPluginManager::Get()->CallHookChunkAvailable(*m_World, ChunkX, ChunkZ);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_CHUNK_AVAILABLE, m_World, ChunkX, ChunkZ);
 }
 
 
@@ -3099,7 +3099,7 @@ void cChunkMap::cChunkLayer::UnloadUnusedChunks(void)
 		if (
 			(m_Chunks[i] != nullptr) &&   // Is valid
 			(m_Chunks[i]->CanUnload()) &&  // Can unload
-			!cPluginManager::Get()->CallHookChunkUnloading(*(m_Parent->GetWorld()), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
+			!cPluginManager::Get()->CallHook(cPluginManager::HOOK_CHUNK_UNLOADING, m_Parent->GetWorld(), m_Chunks[i]->GetPosX(), m_Chunks[i]->GetPosZ())  // Plugins agree
 		)
 		{
 			// The cChunk destructor calls our GetChunk() while removing its entities

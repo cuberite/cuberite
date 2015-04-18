@@ -138,7 +138,7 @@ cPlayer::cPlayer(cClientHandlePtr a_Client, const AString & a_PlayerName) :
 
 cPlayer::~cPlayer(void)
 {
-	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_DESTROYED, this))
 	{
 		cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
 		LOGINFO("Player %s has left the game", GetName().c_str());
@@ -237,7 +237,7 @@ void cPlayer::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Apply food exhaustion from movement:
 		ApplyFoodExhaustionFromMovement();
 		
-		if (cRoot::Get()->GetPluginManager()->CallHookPlayerMoving(*this, m_LastPos, GetPosition()))
+		if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_MOVING, this, m_LastPos, GetPosition()))
 		{
 			CanMove = false;
 			TeleportToCoords(m_LastPos.x, m_LastPos.y, m_LastPos.z);
@@ -536,7 +536,7 @@ void cPlayer::SetFoodLevel(int a_FoodLevel)
 {
 	int FoodLevel = Clamp(a_FoodLevel, 0, MAX_FOOD_LEVEL);
 
-	if (cRoot::Get()->GetPluginManager()->CallHookPlayerFoodLevelChange(*this, FoodLevel))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_FOOD_LEVEL_CHANGE, this, FoodLevel))
 	{
 		m_FoodSaturationLevel = 5.0;
 		return;
@@ -1276,7 +1276,7 @@ unsigned int cPlayer::AwardAchievement(const eStatistic a_Ach)
 void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
 	//  ask plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	if (!cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_ENTITY_TELEPORT, this, m_LastPos, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition(a_PosX, a_PosY, a_PosZ);
 		m_LastGroundHeight = static_cast<float>(a_PosY);
@@ -2239,12 +2239,12 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 {
 	// Call the "placing" hooks; if any fail, abort:
 	cPluginManager * pm = cPluginManager::Get();
-	for (auto blk: a_Blocks)
+	for (const auto & blk : a_Blocks)
 	{
-		if (pm->CallHookPlayerPlacingBlock(*this, blk))
+		if (pm->CallHook(cPluginManager::HOOK_PLAYER_PLACING_BLOCK, this, blk.GetX(), blk.GetY(), blk.GetZ(), blk.m_BlockType, blk.m_BlockMeta))
 		{
 			// Abort - re-send all the current blocks in the a_Blocks' coords to the client:
-			for (auto blk2: a_Blocks)
+			for (const auto blk2: a_Blocks)
 			{
 				m_World->SendBlockTo(blk2.GetX(), blk2.GetY(), blk2.GetZ(), this);
 			}
@@ -2257,17 +2257,18 @@ bool cPlayer::PlaceBlocks(const sSetBlockVector & a_Blocks)
 
 	// Notify the blockhandlers:
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
-	for (auto blk: a_Blocks)
+	for (const auto & blk: a_Blocks)
 	{
 		cBlockHandler * newBlock = BlockHandler(blk.m_BlockType);
 		newBlock->OnPlacedByPlayer(ChunkInterface, *m_World, this, blk);
 	}
 
 	// Call the "placed" hooks:
-	for (auto blk: a_Blocks)
+	for (const auto & blk: a_Blocks)
 	{
-		pm->CallHookPlayerPlacedBlock(*this, blk);
+		pm->CallHook(cPluginManager::HOOK_PLAYER_PLACED_BLOCK, this, blk.GetX(), blk.GetY(), blk.GetZ(), blk.m_BlockType, blk.m_BlockMeta);
 	}
+	for (auto blk : a_Blocks);
 	return true;
 }
 

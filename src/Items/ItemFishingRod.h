@@ -232,14 +232,14 @@ public:
 					a_Player->GetStatManager().AddValue(statFishCaught, 1);
 				}
 
-				if (cRoot::Get()->GetPluginManager()->CallHookPlayerFishing(*a_Player, Drops))
+				if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_FISHING, a_Player, Drops))
 				{
 					return true;
 				}
 				Vector3d FloaterPos = FloaterInfo.GetPos();
 				Vector3d FlyDirection = a_Player->GetEyePosition() - FloaterPos;
 				a_World->SpawnItemPickups(Drops, FloaterPos.x, FloaterPos.y, FloaterPos.z, FlyDirection.x, FlyDirection.y + 1, FlyDirection.z);
-				cRoot::Get()->GetPluginManager()->CallHookPlayerFished(*a_Player, Drops);
+				cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_PLAYER_FISHED, a_Player, Drops);
 			}
 		}
 		else

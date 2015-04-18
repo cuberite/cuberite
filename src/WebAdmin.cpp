@@ -5,7 +5,6 @@
 #include "Bindings/WebPlugin.h"
 
 #include "Bindings/PluginManager.h"
-#include "Bindings/Plugin.h"
 
 #include "World.h"
 #include "Entities/Player.h"

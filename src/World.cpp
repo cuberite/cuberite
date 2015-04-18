@@ -396,7 +396,7 @@ int cWorld::GetDefaultWeatherInterval(eWeather a_Weather)
 void cWorld::SetWeather(eWeather a_NewWeather)
 {
 	// Do the plugins agree? Do they want a different weather?
-	if (cRoot::Get()->GetPluginManager()->CallHookWeatherChanging(*this, a_NewWeather))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_WEATHER_CHANGING, this, a_NewWeather))
 	{
 		m_WeatherInterval = GetDefaultWeatherInterval(m_Weather);
 		return;
@@ -415,7 +415,7 @@ void cWorld::SetWeather(eWeather a_NewWeather)
 	BroadcastWeather(m_Weather);
 	
 	// Let the plugins know about the change:
-	cPluginManager::Get()->CallHookWeatherChanged(*this);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_WEATHER_CHANGED, this);
 }
 
 
@@ -913,7 +913,7 @@ void cWorld::Stop(void)
 void cWorld::Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
 {
 	// Call the plugins
-	cPluginManager::Get()->CallHookWorldTick(*this, a_Dt, a_LastTickDurationMSec);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_WORLD_TICK, this, a_Dt, a_LastTickDurationMSec);
 	
 	// Set any chunk data that has been queued for setting:
 	cSetChunkDataPtrs SetChunkDataQueue;
@@ -3029,14 +3029,14 @@ bool cWorld::SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AStrin
 	AString Line3(a_Line3);
 	AString Line4(a_Line4);
 
-	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
+	if (cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_UPDATING_SIGN, this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player))
 	{
 		return false;
 	}
 
 	if (m_ChunkMap->SetSignLines(a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4))
 	{
-		cRoot::Get()->GetPluginManager()->CallHookUpdatedSign(*this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
+		cRoot::Get()->GetPluginManager()->CallHook(cPluginManager::HOOK_UPDATED_SIGN, this, a_BlockX, a_BlockY, a_BlockZ, Line1, Line2, Line3, Line4, a_Player);
 		return true;
 	}
 
@@ -3359,7 +3359,7 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 	a_Monster->SetHealth(a_Monster->GetMaxHealth());
 
 	// A plugin doesn't agree with the spawn. bail out.
-	if (cPluginManager::Get()->CallHookSpawningMonster(*this, *a_Monster))
+	if (cPluginManager::Get()->CallHook(cPluginManager::HOOK_SPAWNING_MONSTER, this, a_Monster))
 	{
 		delete a_Monster;
 		a_Monster = nullptr;
@@ -3374,7 +3374,7 @@ UInt32 cWorld::SpawnMobFinalize(cMonster * a_Monster)
 		return cEntity::INVALID_ID;
 	}
 
-	cPluginManager::Get()->CallHookSpawnedMonster(*this, *a_Monster);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_SPAWNED_MONSTER, this, a_Monster);
 
 	return a_Monster->GetUniqueID();
 }
@@ -3752,9 +3752,7 @@ bool cWorld::cChunkGeneratorCallbacks::HasChunkAnyClients(int a_ChunkX, int a_Ch
 
 void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_ChunkDesc)
 {
-	cPluginManager::Get()->CallHookChunkGenerating(
-		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
-	);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_CHUNK_GENERATING, m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc);
 }
 
 
@@ -3763,9 +3761,7 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerating(cChunkDesc & a_Ch
 
 void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_ChunkDesc)
 {
-	cPluginManager::Get()->CallHookChunkGenerated(
-		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
-	);
+	cPluginManager::Get()->CallHook(cPluginManager::HOOK_CHUNK_GENERATED, m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc);
 }
 
 
