@@ -239,7 +239,7 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 	const Vector3i AvailableDirections[] =
 	{
 		{ -1,  0,  0 }, { 1, 0, 0 },
-		{  0, -1,  0 }, // Don't let the glowstone go up
+		{  0, -1,  0 },  // Don't let the glowstone go up
 		{  0,  0, -1 }, { 0, 0, 1 },
 		
 		// Diagonal direction. Only X or Z with Y.
@@ -261,7 +261,7 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 		for (int j = 0; j < a_Size; j++)
 		{
 			Vector3i Direction = AvailableDirections[m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z) % ARRAYCOUNT(AvailableDirections)];
-			int Attempts = 2; // multiply by 1 would make no difference, so multiply by 2 instead
+			int Attempts = 2;  // multiply by 1 would make no difference, so multiply by 2 instead
 
 			while (Direction.Equals(PreviousDirection))
 			{
