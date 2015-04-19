@@ -464,6 +464,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
+			cPluginManager::Get()->RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
 			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
