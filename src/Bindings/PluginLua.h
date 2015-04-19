@@ -176,12 +176,13 @@ public:
 	/** Returns true if the plugin contains the function for the specified hook type, using the old-style registration (#121) */
 	bool CanAddOldStyleHook(int a_HookType);
 	
-	// cWebPlugin override
+	// cWebPlugin overrides
 	virtual const AString GetWebTitle(void) const {return GetName(); }
+	virtual AString HandleWebRequest(const HTTPRequest & a_Request) override;
 
-	// cWebPlugin and WebAdmin stuff
-	virtual AString HandleWebRequest(const HTTPRequest * a_Request) override;
-	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);  // >> EXPORTED IN MANUALBINDINGS <<
+	/** Adds a new web tab to webadmin.
+	Displaying the tab calls the referenced function. */
+	bool AddWebTab(const AString & a_Title, lua_State * a_LuaState, int a_FunctionReference);  // Exported in ManualBindings.cpp
 	
 	/** Binds the command to call the function specified by a Lua function reference. Simply adds to CommandMap. */
 	void BindCommand(const AString & a_Command, int a_FnRef);

@@ -464,10 +464,10 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 		{
 			if ((*itr)->GetWebTitle() == Split[1])
 			{
-				Page.Content = (*itr)->HandleWebRequest(&a_Request);
+				Page.Content = (*itr)->HandleWebRequest(a_Request);
 				cWebPlugin * WebPlugin = *itr;
 				FoundPlugin = WebPlugin->GetWebTitle();
-				AString TabName = WebPlugin->GetTabNameForRequest(&a_Request).first;
+				AString TabName = WebPlugin->GetTabNameForRequest(a_Request).first;
 				Page.PluginName = FoundPlugin;
 				Page.TabName = TabName;
 				break;

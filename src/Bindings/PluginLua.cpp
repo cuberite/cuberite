@@ -200,6 +200,7 @@ bool cPluginLua::Load(void)
 
 void cPluginLua::Unload(void)
 {
+	ClearTabs();
 	super::Unload();
 	Close();
 }
@@ -2000,40 +2001,29 @@ void cPluginLua::AddResettable(cPluginLua::cResettablePtr a_Resettable)
 
 
 
-AString cPluginLua::HandleWebRequest(const HTTPRequest * a_Request)
+AString cPluginLua::HandleWebRequest(const HTTPRequest & a_Request)
 {
-	cCSLock Lock(m_CriticalSection);
-	std::string RetVal = "";
-
-	std::pair< std::string, std::string > TabName = GetTabNameForRequest(a_Request);
-	std::string SafeTabName = TabName.second;
-	if (SafeTabName.empty())
+	// Find the tab to use for the request:
+	auto TabName = GetTabNameForRequest(a_Request);
+	AString SafeTabTitle = TabName.second;
+	if (SafeTabTitle.empty())
+	{
+		return "";
+	}
+	auto Tab = GetTabBySafeTitle(SafeTabTitle);
+	if (Tab == nullptr)
 	{
 		return "";
 	}
 
-	sWebPluginTab * Tab = 0;
-	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
+	// Get the page content from the plugin:
+	cCSLock Lock(m_CriticalSection);
+	AString Contents = Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->m_Title.c_str());
+	if (!m_LuaState.Call(Tab->m_UserData, &a_Request, cLuaState::Return, Contents))
 	{
-		if ((*itr)->SafeTitle.compare(SafeTabName) == 0)  // This is the one! Rawr
-		{
-			Tab = *itr;
-			break;
-		}
+		return "Lua encountered error while processing the page request";
 	}
-
-	if (Tab != nullptr)
-	{
-		AString Contents = Printf("WARNING: WebPlugin tab '%s' did not return a string!", Tab->Title.c_str());
-		if (!m_LuaState.Call(Tab->UserData, a_Request, cLuaState::Return, Contents))
-		{
-			return "Lua encountered error while processing the page request";
-		}
-
-		RetVal += Contents;
-	}
-
-	return RetVal;
+	return Contents;
 }
 
 
@@ -2048,13 +2038,7 @@ bool cPluginLua::AddWebTab(const AString & a_Title, lua_State * a_LuaState, int 
 		LOGERROR("Only allowed to add a tab to a WebPlugin of your own Plugin!");
 		return false;
 	}
-	sWebPluginTab * Tab = new sWebPluginTab();
-	Tab->Title = a_Title;
-	Tab->SafeTitle = SafeString(a_Title);
-
-	Tab->UserData = a_FunctionReference;
-
-	GetTabs().push_back(Tab);
+	AddNewWebTab(a_Title, a_FunctionReference);
 	return true;
 }
 

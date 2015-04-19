@@ -24,32 +24,26 @@ cWebPlugin::cWebPlugin()
 
 cWebPlugin::~cWebPlugin()
 {
+	ASSERT(m_Tabs.empty());  // Has ClearTabs() been called?
+
+	// Remove from WebAdmin:
 	cWebAdmin * WebAdmin = cRoot::Get()->GetWebAdmin();
 	if (WebAdmin != nullptr)
 	{
 		WebAdmin->RemovePlugin(this);
 	}
-
-	for (TabList::iterator itr = m_Tabs.begin(); itr != m_Tabs.end(); ++itr)
-	{
-		delete *itr;
-	}
-	m_Tabs.clear();
 }
 
 
 
 
 
-std::list<std::pair<AString, AString> > cWebPlugin::GetTabNames(void)
+cWebPlugin::cTabNames cWebPlugin::GetTabNames(void) const
 {
-	std::list< std::pair< AString, AString > > NameList;
-	for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
+	std::list< std::pair<AString, AString>> NameList;
+	for (auto itr = m_Tabs.cbegin(), end = m_Tabs.cend(); itr != end; ++itr)
 	{
-		std::pair< AString, AString > StringPair;
-		StringPair.first = (*itr)->Title;
-		StringPair.second = (*itr)->SafeTitle;
-		NameList.push_back( StringPair);
+		NameList.push_back(std::make_pair((*itr)->m_Title, (*itr)->m_SafeTitle));
 	}
 	return NameList;
 }
@@ -58,41 +52,54 @@ std::list<std::pair<AString, AString> > cWebPlugin::GetTabNames(void)
 
 
 
-std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest * a_Request)
+cWebPlugin::cTabPtr cWebPlugin::GetTabBySafeTitle(const AString & a_SafeTitle) const
 {
-	std::pair< AString, AString > Names;
-	AStringVector Split = StringSplit(a_Request->Path, "/");
-
-	if (Split.size() > 1)
+	cCSLock Lock(m_CSTabs);
+	for (auto itr = m_Tabs.cbegin(), end = m_Tabs.cend(); itr != end; ++itr)
 	{
-		sWebPluginTab * Tab = nullptr;
-		if (Split.size() > 2)  // If we got the tab name, show that page
+		if ((*itr)->m_SafeTitle == a_SafeTitle)
 		{
-			for (TabList::iterator itr = GetTabs().begin(); itr != GetTabs().end(); ++itr)
-			{
-				if ((*itr)->SafeTitle.compare(Split[2]) == 0)  // This is the one!
-				{
-					Tab = *itr;
-					break;
-				}
-			}
-		}
-		else  // Otherwise show the first tab
-		{
-			if (GetTabs().size() > 0)
-			{
-				Tab = *GetTabs().begin();
-			}
-		}
-
-		if (Tab != nullptr)
-		{
-			Names.first = Tab->Title;
-			Names.second = Tab->SafeTitle;
+			return *itr;
 		}
 	}
+	return nullptr;
+}
 
-	return Names;
+
+
+
+
+std::pair<AString, AString> cWebPlugin::GetTabNameForRequest(const HTTPRequest & a_Request)
+{
+	AStringVector Split = StringSplit(a_Request.Path, "/");
+	if (Split.empty())
+	{
+		return std::make_pair(AString(), AString());
+	}
+
+	cCSLock Lock(m_CSTabs);
+	cTabPtr Tab;
+	if (Split.size() > 2)  // If we got the tab name, show that page
+	{
+		for (auto itr = m_Tabs.cbegin(), end = m_Tabs.cend(); itr != end; ++itr)
+		{
+			if ((*itr)->m_SafeTitle.compare(Split[2]) == 0)  // This is the one!
+			{
+				return std::make_pair((*itr)->m_Title, (*itr)->m_SafeTitle);
+			}
+		}
+		// Tab name not found, display an "empty" page:
+		return std::make_pair(AString(), AString());
+	}
+
+	// Show the first tab:
+	if (!m_Tabs.empty())
+	{
+		return std::make_pair(m_Tabs.front()->m_SafeTitle, m_Tabs.front()->m_SafeTitle);
+	}
+
+	// No tabs at all:
+	return std::make_pair(AString(), AString());
 }
 
 
@@ -101,16 +108,43 @@ std::pair< AString, AString > cWebPlugin::GetTabNameForRequest(const HTTPRequest
 AString cWebPlugin::SafeString(const AString & a_String)
 {
 	AString RetVal;
-	for (unsigned int i = 0; i < a_String.size(); ++i)
+	auto len = a_String.size();
+	RetVal.reserve(len);
+	for (size_t i = 0; i < len; ++i)
 	{
 		char c = a_String[i];
 		if (c == ' ')
 		{
 			c = '_';
 		}
-		RetVal.push_back( c);
+		RetVal.push_back(c);
 	}
 	return RetVal;
+}
+
+
+
+
+
+void cWebPlugin::AddNewWebTab(const AString & a_Title, int a_UserData)
+{
+	auto Tab = std::make_shared<cTab>(a_Title, a_UserData);
+	cCSLock Lock(m_CSTabs);
+	m_Tabs.push_back(Tab);
+}
+
+
+
+
+
+void cWebPlugin::ClearTabs(void)
+{
+	// Remove the webadmin tabs:
+	cTabPtrs Tabs;
+	{
+		cCSLock Lock(m_CSTabs);
+		std::swap(Tabs, m_Tabs);
+	}
 }
 
 

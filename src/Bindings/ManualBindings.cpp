@@ -2647,22 +2647,16 @@ static int tolua_AllToLua_cWebAdmin_GetURLEncodedString(lua_State * tolua_S)
 
 static int tolua_cWebPlugin_GetTabNames(lua_State * tolua_S)
 {
-	cWebPlugin* self = (cWebPlugin*)  tolua_tousertype(tolua_S, 1, nullptr);
-
-	const cWebPlugin::TabNameList & TabNames = self->GetTabNames();
-
+	// Returns a map of (SafeTitle -> Title) for the plugin's web tabs.
+	auto self = reinterpret_cast<cWebPlugin *>(tolua_tousertype(tolua_S, 1, nullptr));
+	auto TabNames = self->GetTabNames();
 	lua_newtable(tolua_S);
 	int index = 1;
-	cWebPlugin::TabNameList::const_iterator iter = TabNames.begin();
-	while (iter != TabNames.end())
+	for (auto itr = TabNames.cbegin(), end = TabNames.cend(); itr != end; ++itr)
 	{
-		const AString & FancyName = iter->first;
-		const AString & WebName = iter->second;
-		tolua_pushstring(tolua_S, WebName.c_str());  // Because the WebName is supposed to be unique, use it as key
-		tolua_pushstring(tolua_S, FancyName.c_str());
-		//
+		tolua_pushstring(tolua_S, itr->second.c_str());  // Because the SafeTitle is supposed to be unique, use it as key
+		tolua_pushstring(tolua_S, itr->first.c_str());
 		lua_rawset(tolua_S, -3);
-		++iter;
 		++index;
 	}
 	return 1;
