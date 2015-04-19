@@ -27,7 +27,10 @@ public:
 	eBlockFace GetFacing() const { return cHangingEntity::ProtocolFaceToBlockFace(m_Facing); }
 
 	/** Set the direction in which the entity is facing. */
-	void SetFacing(eBlockFace a_Facing) { m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }
+	void SetFacing(eBlockFace a_Facing)
+	{
+		m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing);
+	}
 
 	// tolua_end
 
@@ -37,7 +40,7 @@ public:
 	/** Set the direction in which the entity is facing. */
 	void SetProtocolFacing(Byte a_Facing)
 	{
-		ASSERT((a_Facing <= 3) && (a_Facing >= 0));
+		ASSERT(a_Facing <= 3);
 		m_Facing = a_Facing;
 	}
 
