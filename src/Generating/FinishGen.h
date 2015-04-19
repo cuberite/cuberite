@@ -75,8 +75,8 @@ class cFinishGenGlowStone :
 {
 public:
 	cFinishGenGlowStone(int a_Seed) :
-		m_Seed(a_Seed),
-		m_Noise(a_Seed)
+		m_Noise(a_Seed),
+		m_Seed(a_Seed)
 	{
 	}
 
