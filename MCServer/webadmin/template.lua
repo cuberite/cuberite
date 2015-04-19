@@ -30,20 +30,22 @@ function GetDefaultPage()
 	Content = Content .. "<p>" .. cRoot:Get():GetServer():GetServerID() .. "</p>"
 	
 	Content = Content .. "<h4>Plugins:</h4><ul>"
-	local AllPlugins = PM:GetAllPlugins()
-	for key,value in pairs(AllPlugins) do
-		if( value ~= nil and value ~= false ) then
-			Content = Content ..  "<li>" .. key .. " (version " .. value:GetVersion() .. ")</li>"
+	PM:ForEachPlugin(
+		function (a_CBPlugin)
+			if (a_CBPlugin:IsLoaded()) then
+				Content = Content ..  "<li>" .. a_CBPlugin:GetName() .. " (version " .. a_CBPlugin:GetVersion() .. ")</li>"
+			end
 		end
-	end
+	)
 	
 	Content = Content .. "</ul>"
 	Content = Content .. "<h4>Players:</h4><ul>"
 	
-	local AddPlayerToTable = function( Player )
-		Content = Content .. "<li>" .. Player:GetName() .. "</li>"
-	end
-	cRoot:Get():ForEachPlayer( AddPlayerToTable )
+	cRoot:Get():ForEachPlayer(
+		function(a_CBPlayer)
+			Content = Content .. "<li>" .. Player:GetName() .. "</li>"
+		end
+	)
 	
 	Content = Content .. "</ul><br>";
 

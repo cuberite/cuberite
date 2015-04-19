@@ -93,7 +93,7 @@ void cPluginLua::Close(void)
 
 
 
-bool cPluginLua::Initialize(void)
+bool cPluginLua::Load(void)
 {
 	cCSLock Lock(m_CriticalSection);
 	if (!m_LuaState.IsValid())
@@ -144,6 +144,7 @@ bool cPluginLua::Initialize(void)
 	// Warn if there are no Lua files in the plugin folder:
 	if (LuaFiles.empty())
 	{
+		SetLoadError("No lua files found, plugin is probably missing.");
 		LOGWARNING("No lua files found: plugin %s is missing.", GetName().c_str());
 		Close();
 		return false;
@@ -155,6 +156,7 @@ bool cPluginLua::Initialize(void)
 		AString Path = PluginPath + *itr;
 		if (!m_LuaState.LoadFile(Path))
 		{
+			SetLoadError(Printf("Failed to load file %s.", itr->c_str()));
 			Close();
 			return false;
 		}
@@ -164,6 +166,8 @@ bool cPluginLua::Initialize(void)
 		AString Path = PluginPath + "Info.lua";
 		if (!m_LuaState.LoadFile(Path))
 		{
+			SetLoadError("Failed to load file Info.lua.");
+			m_Status = cPluginManager::psError;
 			Close();
 			return false;
 		}
@@ -173,18 +177,31 @@ bool cPluginLua::Initialize(void)
 	bool res = false;
 	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
+		SetLoadError("Cannot call the Initialize() function.");
 		LOGWARNING("Error in plugin %s: Cannot call the Initialize() function. Plugin is temporarily disabled.", GetName().c_str());
 		Close();
 		return false;
 	}
 	if (!res)
 	{
+		SetLoadError("The Initialize() function failed.");
 		LOGINFO("Plugin %s: Initialize() call failed, plugin is temporarily disabled.", GetName().c_str());
 		Close();
 		return false;
 	}
 
+	m_Status = cPluginManager::psLoaded;
 	return true;
+}
+
+
+
+
+
+void cPluginLua::Unload(void)
+{
+	super::Unload();
+	Close();
 }
 
 

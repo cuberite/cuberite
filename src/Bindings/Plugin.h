@@ -1,30 +1,16 @@
 
+// Plugin.h
+
+// Declares the cPlugin class representing an interface that a plugin implementation needs to expose, with some helping functions
+
+
+
+
+
 #pragma once
 
 #include "Defines.h"
-
-class cCommandOutputCallback;
-class cItems;
-class cHopperEntity;
-
-
-
-class cBlockEntityWithItems;
-class cClientHandle;
-class cPickup;
-class cPlayer;
-class cProjectileEntity;
-class cEntity;
-class cMonster;
-class cWorld;
-class cChunkDesc;
-struct TakeDamageInfo;
-
-
-// fwd: CraftingRecipes.h
-class cCraftingGrid;
-class cCraftingRecipe;
-
+#include "PluginManager.h"
 
 
 
@@ -35,11 +21,23 @@ class cPlugin
 public:
 	// tolua_end
 	
-	cPlugin( const AString & a_PluginDirectory);
+	/** Creates a new instance.
+	a_FolderName is the name of the folder (in the Plugins folder) from which the plugin is loaded.
+	The plugin's name defaults to the folder name. */
+	cPlugin(const AString & a_FolderName);
+
 	virtual ~cPlugin();
 	
+	/** Called as the last call into the plugin before it is unloaded. */
 	virtual void OnDisable(void) {}
-	virtual bool Initialize(void) = 0;
+
+	/** Loads and initializes the plugin. Sets m_Status to psLoaded or psError accordingly.
+	Returns true if the initialization succeeded, false otherwise. */
+	virtual bool Load(void) = 0;
+
+	/** Unloads the plugin. Sets m_Status to psDisabled.
+	The default implementation removes the plugin's associations with cPluginManager, descendants should call it as well. */
+	virtual void Unload(void);
 
 	// Called each tick
 	virtual void Tick(float a_Dt) = 0;
@@ -109,19 +107,17 @@ public:
 	
 	/** Handles the command split into a_Split, issued by player a_Player.
 	Command permissions have already been checked.
-	Returns true if command handled successfully
-	*/
+	Returns true if command handled successfully. */
 	virtual bool HandleCommand(const AStringVector & a_Split, cPlayer & a_Player, const AString & a_FullCommand) = 0;
 	
 	/** Handles the console command split into a_Split.
-	Returns true if command handled successfully. Output is to be sent to the a_Output callback.
-	*/
+	Returns true if command handled successfully. Output is to be sent to the a_Output callback. */
 	virtual bool HandleConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_FullCommand) = 0;
 	
-	/// All bound commands are to be removed, do any language-dependent cleanup here
+	/** All bound commands are to be removed, do any language-dependent cleanup here */
 	virtual void ClearCommands(void) {}
 	
-	/// All bound console commands are to be removed, do any language-dependent cleanup here
+	/** All bound console commands are to be removed, do any language-dependent cleanup here */
 	virtual void ClearConsoleCommands(void) {}
 	
 	// tolua_begin
@@ -131,28 +127,43 @@ public:
 	int GetVersion(void) const     { return m_Version; }
 	void SetVersion(int a_Version) { m_Version = a_Version; }
 
-	const AString & GetDirectory(void) const {return m_Directory; }
-	AString GetLocalDirectory(void) const {return GetLocalFolder(); }  // OBSOLETE, use GetLocalFolder() instead
+	/** Returns the name of the folder (in the Plugins folder) from which the plugin is loaded. */
+	const AString & GetFolderName(void) const {return m_FolderName; }
+
+	/** Returns the folder relative to the MCS Executable, from which the plugin is loaded. */
 	AString GetLocalFolder(void) const;
+
+	/** Returns the error encountered while loading the plugin. Only valid if m_Status == psError. */
+	const AString & GetLoadError(void) const { return m_LoadError; }
+
+	cPluginManager::ePluginStatus GetStatus(void) const { return m_Status; }
+
+	bool IsLoaded(void) const { return (m_Status == cPluginManager::psLoaded); }
 	// tolua_end
 	
+	// Needed for ManualBindings' tolua_ForEach<>
+	static const char * GetClassStatic(void) { return "cPlugin"; }
 
-	/* This should not be exposed to scripting languages */
-	enum PluginLanguage
-	{
-		E_CPP,
-		E_LUA,
-		E_SQUIRREL,  // OBSOLETE, but kept in place to remind us of the horrors lurking in the history
-	};
-	PluginLanguage GetLanguage() { return m_Language; }
-	void SetLanguage( PluginLanguage a_Language) { m_Language = a_Language; }
+protected:
+	friend class cPluginManager;
 
-private:
-	PluginLanguage m_Language;
+	cPluginManager::ePluginStatus m_Status;
+
+	/** The name of the plugin, used to identify the plugin in the system and for inter-plugin calls. */
 	AString m_Name;
+
 	int m_Version;
 
-	AString m_Directory;
+	/** Name of the folder (in the Plugins folder) from which the plugin is loaded. */
+	AString m_FolderName;
+
+	/** The error encountered while loading the plugin.
+	Only valid if m_Status == psError. */
+	AString m_LoadError;
+
+
+	/** Sets m_LoadError to the specified string and m_Status to psError. */
+	void SetLoadError(const AString & a_LoadError);
 };  // tolua_export
 
 

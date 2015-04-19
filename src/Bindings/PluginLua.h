@@ -32,6 +32,8 @@ class cPluginLua :
 	public cPlugin,
 	public cWebPlugin
 {
+	typedef cPlugin super;
+
 public:
 	// tolua_end
 	
@@ -96,7 +98,8 @@ public:
 	~cPluginLua();
 
 	virtual void OnDisable(void) override;
-	virtual bool Initialize(void) override;
+	virtual bool Load(void) override;
+	virtual void Unload(void) override;
 
 	virtual void Tick(float a_Dt) override;
 

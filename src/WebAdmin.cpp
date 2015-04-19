@@ -489,20 +489,32 @@ AString cWebAdmin::GetDefaultPage(void)
 	Content += "<h4>Server Name:</h4>";
 	Content += "<p>" + AString( cRoot::Get()->GetServer()->GetServerID()) + "</p>";
 
+	// Display a list of all plugins:
 	Content += "<h4>Plugins:</h4><ul>";
-	cPluginManager * PM = cPluginManager::Get();
-	const cPluginManager::PluginMap & List = PM->GetAllPlugins();
-	for (cPluginManager::PluginMap::const_iterator itr = List.begin(); itr != List.end(); ++itr)
+	struct cPluginCallback:
+		public cPluginManager::cPluginCallback
 	{
-		if (itr->second == nullptr)
-		{
-			continue;
-		}
-		AppendPrintf(Content, "<li>%s V.%i</li>", itr->second->GetName().c_str(), itr->second->GetVersion());
-	}
-	Content += "</ul>";
-	Content += "<h4>Players:</h4><ul>";
+		AString & m_Content;
 
+		cPluginCallback(AString & a_Content):
+			m_Content(a_Content)
+		{
+		}
+
+		virtual bool Item(cPlugin * a_Plugin) override
+		{
+			if (a_Plugin->IsLoaded())
+			{
+				AppendPrintf(m_Content, "<li>%s V.%i</li>", a_Plugin->GetName().c_str(), a_Plugin->GetVersion());
+			}
+			return false;
+		}
+	} Callback(Content);
+	cPluginManager::Get()->ForEachPlugin(Callback);
+	Content += "</ul>";
+
+	// Display a list of all players:
+	Content += "<h4>Players:</h4><ul>";
 	cPlayerAccum PlayerAccum;
 	cWorld * World = cRoot::Get()->GetDefaultWorld();  // TODO - Create a list of worlds and players
 	if (World != nullptr)

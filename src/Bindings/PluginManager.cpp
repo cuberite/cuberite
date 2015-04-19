@@ -59,39 +59,48 @@ void cPluginManager::ReloadPlugins(void)
 
 
 
-void cPluginManager::FindPlugins(void)
+void cPluginManager::RefreshPluginList(void)
 {
+	// Get a list of currently available folders:
 	AString PluginsPath = GetPluginsPath() + "/";
-
-	// First get a clean list of only the currently running plugins, we don't want to mess those up
-	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
+	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
+	AStringVector Folders;
+	for (auto & item: Contents)
 	{
-		if (itr->second == nullptr)
-		{
-			PluginMap::iterator thiz = itr;
-			++thiz;
-			m_Plugins.erase( itr);
-			itr = thiz;
-			continue;
-		}
-		++itr;
-	}
-
-	AStringVector Files = cFile::GetFolderContents(PluginsPath.c_str());
-	for (AStringVector::const_iterator itr = Files.begin(); itr != Files.end(); ++itr)
-	{
-		if ((*itr == ".") || (*itr == "..") || (!cFile::IsFolder(PluginsPath + *itr)))
+		if ((item == ".") || (item == "..") || (!cFile::IsFolder(PluginsPath + item)))
 		{
 			// We only want folders, and don't want "." or ".."
 			continue;
 		}
+		Folders.push_back(item);
+	}  // for item - Contents[]
 
-		// Add plugin name/directory to the list
-		if (m_Plugins.find(*itr) == m_Plugins.end())
+	// Set all plugins with invalid folders as psNotFound:
+	for (auto & plugin: m_Plugins)
+	{
+		if (std::find(Folders.cbegin(), Folders.cend(), plugin->GetFolderName()) == Folders.end())
 		{
-			m_Plugins[*itr] = nullptr;
+			plugin->m_Status = psNotFound;
 		}
-	}
+	}  // for plugin - m_Plugins[]
+
+	// Add all newly discovered plugins:
+	for (auto & folder: Folders)
+	{
+		bool hasFound = false;
+		for (auto & plugin: m_Plugins)
+		{
+			if (plugin->GetFolderName() == folder)
+			{
+				hasFound = true;
+				break;
+			}
+		}  // for plugin - m_Plugins[]
+		if (!hasFound)
+		{
+			m_Plugins.push_back(std::make_shared<cPluginLua>(folder));
+		}
+	}  // for folder - Folders[]
 }
 
 
@@ -112,57 +121,23 @@ void cPluginManager::ReloadPluginsNow(void)
 void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 {
 	LOG("-- Loading Plugins --");
+
+	// Unload any existing plugins:
 	m_bReloadPlugins = false;
 	UnloadPluginsNow();
 
-	FindPlugins();
+	// Refresh the list of plugins to load new ones from disk / remove the deleted ones:
+	RefreshPluginList();
 
-	cServer::BindBuiltInConsoleCommands();
-
-	// Check if the Plugins section exists.
-	int KeyNum = a_SettingsIni.FindKey("Plugins");
-
-	if (KeyNum == -1)
+	// Load the plugins:
+	AStringVector ToLoad = GetFoldersToLoad(a_SettingsIni);
+	for (auto & pluginFolder: ToLoad)
 	{
-		InsertDefaultPlugins(a_SettingsIni);
-		KeyNum = a_SettingsIni.FindKey("Plugins");
-	}
+		LoadPlugin(pluginFolder);
+	}  // for pluginFolder - ToLoad[]
 
-	// How many plugins are there?
-	int NumPlugins = a_SettingsIni.GetNumValues(KeyNum);
-
-	for (int i = 0; i < NumPlugins; i++)
-	{
-		AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
-		if (ValueName.compare("Plugin") == 0)
-		{
-			AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
-			if (!PluginFile.empty())
-			{
-				if (m_Plugins.find(PluginFile) != m_Plugins.end())
-				{
-					LoadPlugin(PluginFile);
-				}
-			}
-		}
-	}
-
-
-	// Remove invalid plugins from the PluginMap.
-	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end();)
-	{
-		if (itr->second == nullptr)
-		{
-			PluginMap::iterator thiz = itr;
-			++thiz;
-			m_Plugins.erase(itr);
-			itr = thiz;
-			continue;
-		}
-		++itr;
-	}
-
-	size_t NumLoadedPlugins = GetNumPlugins();
+	// Log a report of the loading process
+	size_t NumLoadedPlugins = GetNumLoadedPlugins();
 	if (NumLoadedPlugins == 0)
 	{
 		LOG("-- No Plugins Loaded --");
@@ -173,7 +148,7 @@ void cPluginManager::ReloadPluginsNow(cIniFile & a_SettingsIni)
 	}
 	else
 	{
-		LOG("-- Loaded %i Plugins --", (int)NumLoadedPlugins);
+		LOG("-- Loaded %u Plugins --", static_cast<unsigned>(NumLoadedPlugins));
 	}
 	CallHookPluginsLoaded();
 }
@@ -200,12 +175,21 @@ void cPluginManager::InsertDefaultPlugins(cIniFile & a_SettingsIni)
 
 void cPluginManager::Tick(float a_Dt)
 {
-	while (!m_DisablePluginList.empty())
+	// Unload plugins that have been scheduled for unloading:
+	AStringVector PluginsToUnload;
 	{
-		RemovePlugin(m_DisablePluginList.front());
-		m_DisablePluginList.pop_front();
+		cCSLock Lock(m_CSPluginsToUnload);
+		std::swap(m_PluginsToUnload, PluginsToUnload);
 	}
+	for (auto & plugin: m_Plugins)
+	{
+		if (std::find(PluginsToUnload.cbegin(), PluginsToUnload.cend(), plugin->GetFolderName()) != PluginsToUnload.cend())
+		{
+			plugin->Unload();
+		}
+	}  // for plugin - m_Plugins[]
 
+	// If a plugin reload has been scheduled, reload now:
 	if (m_bReloadPlugins)
 	{
 		ReloadPluginsNow();
@@ -1477,78 +1461,57 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 
 
 
-cPlugin * cPluginManager::GetPlugin(const AString & a_Plugin) const
-{
-	for (PluginMap::const_iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
-	{
-		if (itr->second == nullptr)
-		{
-			// The plugin is currently unloaded
-			continue;
-		}
-
-		if (itr->second->GetName().compare(a_Plugin) == 0)
-		{
-			return itr->second;
-		}
-	}
-	return 0;
-}
-
-
-
-
-
-const cPluginManager::PluginMap & cPluginManager::GetAllPlugins() const
-{
-	return m_Plugins;
-}
-
-
-
-
-
 void cPluginManager::UnloadPluginsNow()
 {
+	// Remove all bindings:
 	m_Hooks.clear();
-
-	while (!m_Plugins.empty())
-	{
-		RemovePlugin(m_Plugins.begin()->second);
-	}
-
 	m_Commands.clear();
 	m_ConsoleCommands.clear();
+
+	// Re-bind built-in console commands:
+	cServer::BindBuiltInConsoleCommands();
+
+	// Unload all loaded plugins:
+	for (auto & plugin: m_Plugins)
+	{
+		if (plugin->IsLoaded())
+		{
+			plugin->Unload();
+		}
+	}
 }
 
 
 
 
 
-bool cPluginManager::DisablePlugin(const AString & a_PluginName)
+void cPluginManager::UnloadPlugin(const AString & a_PluginFolder)
 {
-	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
-	if (itr == m_Plugins.end())
-	{
-		return false;
-	}
+	cCSLock Lock(m_CSPluginsToUnload);
+	m_PluginsToUnload.push_back(a_PluginFolder);
+}
 
-	if (itr->first.compare(a_PluginName) == 0)  // _X 2013_02_01: wtf? Isn't this supposed to be what find() does?
+
+
+
+
+bool cPluginManager::LoadPlugin(const AString & a_FolderName)
+{
+	for (auto & plugin: m_Plugins)
 	{
-		m_DisablePluginList.push_back(itr->second);
-		itr->second = nullptr;  // Get rid of this thing right away
-		return true;
-	}
+		if (plugin->GetFolderName() == a_FolderName)
+		{
+			if (!plugin->IsLoaded())
+			{
+				return plugin->Load();
+			}
+			return true;
+		}
+	}  // for plugin - m_Plugins[]
+
+	// Plugin not found
+	LOGD("%s: Plugin folder %s not found in the list of plugins.", __FUNCTION__, a_FolderName.c_str());
 	return false;
-}
-
-
-
-
-
-bool cPluginManager::LoadPlugin(const AString & a_PluginName)
-{
-	return AddPlugin(new cPluginLua(a_PluginName.c_str()));
 }
 
 
@@ -1561,32 +1524,6 @@ void cPluginManager::RemoveHooks(cPlugin * a_Plugin)
 	{
 		itr->second.remove(a_Plugin);
 	}
-}
-
-
-
-
-
-void cPluginManager::RemovePlugin(cPlugin * a_Plugin)
-{
-	for (PluginMap::iterator itr = m_Plugins.begin(); itr != m_Plugins.end(); ++itr)
-	{
-		if (itr->second == a_Plugin)
-		{
-			m_Plugins.erase(itr);
-			break;
-		}
-	}
-
-	RemovePluginCommands(a_Plugin);
-	RemovePluginConsoleCommands(a_Plugin);
-	RemoveHooks(a_Plugin);
-	if (a_Plugin != nullptr)
-	{
-		a_Plugin->OnDisable();
-	}
-	delete a_Plugin;
-	a_Plugin = nullptr;
 }
 
 
@@ -1836,31 +1773,31 @@ bool cPluginManager::IsValidHookType(int a_HookType)
 bool cPluginManager::DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback)
 {
 	// TODO: Implement locking for plugins
-	PluginMap::iterator itr = m_Plugins.find(a_PluginName);
-	if ((itr == m_Plugins.end()) || (itr->second == nullptr))
+	for (auto & plugin: m_Plugins)
 	{
-		return false;
+		if (plugin->GetName() == a_PluginName)
+		{
+			return a_Callback.Item(plugin.get());
+		}
 	}
-	return a_Callback.Item(itr->second);
+	return false;
 }
 
 
 
 
 
-bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
+bool cPluginManager::ForEachPlugin(cPluginCallback & a_Callback)
 {
-	m_Plugins[a_Plugin->GetDirectory()] = a_Plugin;
-
-	if (a_Plugin->Initialize())
+	// TODO: Implement locking for plugins
+	for (auto & plugin: m_Plugins)
 	{
-		// Initialization OK
-		return true;
+		if (a_Callback.Item(plugin.get()))
+		{
+			return false;
+		}
 	}
-
-	// Initialization failed
-	RemovePlugin(a_Plugin);  // Also undoes any registrations that Initialize() might have made
-	return false;
+	return true;
 }
 
 
@@ -1869,23 +1806,75 @@ bool cPluginManager::AddPlugin(cPlugin * a_Plugin)
 
 void cPluginManager::AddHook(cPlugin * a_Plugin, int a_Hook)
 {
-	if (!a_Plugin)
+	if (a_Plugin == nullptr)
 	{
 		LOGWARN("Called cPluginManager::AddHook() with a_Plugin == nullptr");
 		return;
 	}
 	PluginList & Plugins = m_Hooks[a_Hook];
-	Plugins.remove(a_Plugin);
-	Plugins.push_back(a_Plugin);
+	if (std::find(Plugins.cbegin(), Plugins.cend(), a_Plugin) == Plugins.cend())
+	{
+		Plugins.push_back(a_Plugin);
+	}
 }
 
 
 
 
 
-size_t cPluginManager::GetNumPlugins() const
+size_t cPluginManager::GetNumPlugins(void) const
 {
 	return m_Plugins.size();
+}
+
+
+
+
+
+size_t cPluginManager::GetNumLoadedPlugins(void) const
+{
+	size_t res = 0;
+	for (auto & plugin: m_Plugins)
+	{
+		if (plugin->IsLoaded())
+		{
+			res += 1;
+		}
+	}
+	return res;
+}
+
+
+
+
+
+AStringVector cPluginManager::GetFoldersToLoad(cIniFile & a_SettingsIni)
+{
+	// Check if the Plugins section exists.
+	int KeyNum = a_SettingsIni.FindKey("Plugins");
+	if (KeyNum == -1)
+	{
+		InsertDefaultPlugins(a_SettingsIni);
+		KeyNum = a_SettingsIni.FindKey("Plugins");
+	}
+
+	// Get the list of plugins to load:
+	AStringVector res;
+	int NumPlugins = a_SettingsIni.GetNumValues(KeyNum);
+	for (int i = 0; i < NumPlugins; i++)
+	{
+		AString ValueName = a_SettingsIni.GetValueName(KeyNum, i);
+		if (ValueName.compare("Plugin") == 0)
+		{
+			AString PluginFile = a_SettingsIni.GetValue(KeyNum, i);
+			if (!PluginFile.empty())
+			{
+				res.push_back(PluginFile);
+			}
+		}
+	}  // for i - ini values
+
+	return res;
 }
 
 
