@@ -265,7 +265,10 @@ public:
 	
 	/** Removes all command bindings that the specified plugin has made */
 	void RemovePluginCommands(cPlugin * a_Plugin);
-	
+
+	/** Returns true if the specified plugin is loaded. */
+	bool IsPluginLoaded(const AString & a_PluginName);  // tolua_export
+
 	/** Binds a command to the specified plugin. Returns true if successful, false if command already bound. */
 	bool BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
 	

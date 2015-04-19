@@ -181,11 +181,29 @@ void cPluginManager::Tick(float a_Dt)
 		cCSLock Lock(m_CSPluginsToUnload);
 		std::swap(m_PluginsToUnload, PluginsToUnload);
 	}
-	for (auto & plugin: m_Plugins)
+	for (auto & folder: PluginsToUnload)
 	{
-		if (std::find(PluginsToUnload.cbegin(), PluginsToUnload.cend(), plugin->GetFolderName()) != PluginsToUnload.cend())
+		bool HasUnloaded = false;
+		bool HasFound = false;
+		for (auto & plugin: m_Plugins)
 		{
-			plugin->Unload();
+			if (plugin->GetFolderName() == folder)
+			{
+				HasFound = true;
+				if (plugin->IsLoaded())
+				{
+					plugin->Unload();
+					HasUnloaded = true;
+				}
+			}
+		}
+		if (!HasFound)
+		{
+			LOG("Cannot unload plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
+		}
+		else if (!HasUnloaded)
+		{
+			LOG("Cannot unload plugin in folder \"%s\", it has not been loaded.", folder.c_str());
 		}
 	}  // for plugin - m_Plugins[]
 
@@ -1510,7 +1528,7 @@ bool cPluginManager::LoadPlugin(const AString & a_FolderName)
 	}  // for plugin - m_Plugins[]
 
 	// Plugin not found
-	LOGD("%s: Plugin folder %s not found in the list of plugins.", __FUNCTION__, a_FolderName.c_str());
+	LOG("Cannot load plugin, folder \"%s\" not found.", a_FolderName.c_str());
 	return false;
 }
 
@@ -1550,6 +1568,22 @@ void cPluginManager::RemovePluginCommands(cPlugin * a_Plugin)
 			++itr;
 		}
 	}  // for itr - m_Commands[]
+}
+
+
+
+
+
+bool cPluginManager::IsPluginLoaded(const AString & a_PluginName)
+{
+	for (auto & plugin: m_Plugins)
+	{
+		if (plugin->GetName() == a_PluginName)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
