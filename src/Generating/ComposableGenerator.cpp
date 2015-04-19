@@ -347,6 +347,10 @@ void cComposableGenerator::InitFinishGens(cIniFile & a_IniFile)
 			AString HeightDistrib = a_IniFile.GetValueSet ("Generator", "DungeonRoomsHeightDistrib", "0, 0; 10, 10; 11, 500; 40, 500; 60, 40; 90, 1");
 			m_FinishGens.push_back(cFinishGenPtr(new cDungeonRoomsFinisher(m_ShapeGen, Seed, GridSize, MaxSize, MinSize, HeightDistrib)));
 		}
+		else if (NoCaseCompare(*itr, "GlowStone") == 0)
+		{
+			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenGlowStone(Seed)));
+		}
 		else if (NoCaseCompare(*itr, "Ice") == 0)
 		{
 			m_FinishGens.push_back(cFinishGenPtr(new cFinishGenIce));
