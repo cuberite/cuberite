@@ -464,22 +464,12 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::PluginMap map = cPluginManager::Get()->GetAllPlugins();
-
-			for (auto plugin_entry : map)
-			{
-				if (plugin_entry.first == split[1])
-				{
-					a_Output.Out("Error! Plugin is already loaded!");
-					a_Output.Finished();
-					return;
-				}
-			}
+			cPluginManager::Get()->RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
 			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
 		{
-			a_Output.Out("Usage: load <pluginname>");
+			a_Output.Out("Usage: load <PluginFolder>");
 		}
 		a_Output.Finished();
 		return;
@@ -488,12 +478,12 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::Get()->RemovePlugin(cPluginManager::Get()->GetPlugin(split[1]));
-			a_Output.Out("Plugin unloaded");
+			cPluginManager::Get()->UnloadPlugin(split[1]);
+			a_Output.Out("Plugin unload scheduled");
 		}
 		else
 		{
-			a_Output.Out("Usage: unload <pluginname>");
+			a_Output.Out("Usage: unload <PluginFolder>");
 		}
 		a_Output.Finished();
 		return;

@@ -6,48 +6,30 @@
 
 
 
-class cPlugin;
 
-// fwd: World.h
-class cWorld;
 
-// fwd: ChunkDesc.h
+// fwd:
+class cBlockEntityWithItems;
 class cChunkDesc;
-
-// fwd: Entities/Entity.h
-class cEntity;
-
-// fwd: Entities/ProjectileEntity.h
-class cProjectileEntity;
-
-// fwd: Mobs/Monster.h
-class cMonster;
-
-// fwd: Player.h
-class cPlayer;
-
-// fwd: CraftingRecipes.h
+class cClientHandle;
+class cCommandOutputCallback;
 class cCraftingGrid;
 class cCraftingRecipe;
-
-// fwd: Pickup.h
+class cEntity;
+class cHopperEntity;
+class cItems;
+class cMonster;
 class cPickup;
-
-// fwd: Pawn.h
+class cPlayer;
+class cPlugin;
+class cProjectileEntity;
+class cWorld;
 struct TakeDamageInfo;
 
-// fwd: CommandOutput.h
-class cCommandOutputCallback;
-
-// fwd: BlockEntities/HopperEntity.h
-class cHopperEntity;
-
-// fwd: BlockEntities/BlockEntityWithItems.h
-class cBlockEntityWithItems;
+typedef SharedPtr<cPlugin> cPluginPtr;
+typedef std::vector<cPluginPtr> cPluginPtrs;
 
 
-
-class cItems;
 
 
 
@@ -55,12 +37,7 @@ class cItems;
 class cPluginManager
 {
 public:
-	// tolua_end
-	
-	// Called each tick
-	virtual void Tick(float a_Dt);
-	
-	// tolua_begin
+
 	enum CommandResult
 	{
 		crExecuted,
@@ -69,6 +46,29 @@ public:
 		crBlocked,
 		crNoPermission,
 	} ;
+
+
+	/** Defines the status of a single plugin - whether it is loaded, disabled or errored. */
+	enum ePluginStatus
+	{
+		/** The plugin has been loaded successfully. */
+		psLoaded,
+
+		/** The plugin is disabled in settings.ini. */
+		psDisabled,
+
+		/** The plugin is enabled in settings.ini but has been unloaded (by a command). */
+		psUnloaded,
+
+		/** The plugin is enabled in settings.ini but has failed to load.
+		m_LoadError is the description of the error. */
+		psError,
+
+		/** The plugin has been loaded before, but after a folder refresh it is no longer present.
+		The plugin will be unloaded in the next call to ReloadPlugins(). */
+		psNotFound,
+	};
+
 
 	enum PluginHook
 	{
@@ -160,24 +160,31 @@ public:
 	/** The interface used for enumerating and extern-calling plugins */
 	typedef cItemCallback<cPlugin> cPluginCallback;
 	
+	typedef std::list<cPlugin *> PluginList;
+
+
+	/** Called each tick, calls the plugins' OnTick hook, as well as processes plugin events (addition, removal) */
+	void Tick(float a_Dt);
 	
 	/** Returns the instance of the Plugin Manager (there is only ever one) */
 	static cPluginManager * Get(void);  // tolua_export
 
-	typedef std::map< AString, cPlugin * > PluginMap;
-	typedef std::list< cPlugin * > PluginList;
-	cPlugin * GetPlugin( const AString & a_Plugin) const;  // tolua_export
-	const PluginMap & GetAllPlugins() const;  // >> EXPORTED IN MANUALBINDINGS <<
+	/** Refreshes the m_Plugins list based on the current contents of the Plugins folder.
+	If an active plugin's folder is not found anymore, the plugin is set as psNotFound, but not yet unloaded. */
+	void RefreshPluginList();  // tolua_export
 
-	// tolua_begin
-	void FindPlugins();
-	void ReloadPlugins();
-	// tolua_end
+	/** Schedules a reload of the plugins to happen within the next call to Tick(). */
+	void ReloadPlugins();  // tolua_export
 	
-	/** Adds the plugin to the list of plugins called for the specified hook type. Handles multiple adds as a single add */
+	/** Adds the plugin to the list of plugins called for the specified hook type.
+	If a plugin adds multiple handlers for a single hook, it is added only once (ignore-duplicates). */
 	void AddHook(cPlugin * a_Plugin, int a_HookType);
 
+	/** Returns the number of all plugins in m_Plugins (includes disabled, unloaded and errored plugins). */
 	size_t GetNumPlugins() const;  // tolua_export
+
+	/** Returns the number of plugins that are psLoaded. */
+	size_t GetNumLoadedPlugins(void) const;  // tolua_export
 	
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
 	bool CallHookBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source);
@@ -242,18 +249,26 @@ public:
 	bool CallHookWorldStarted             (cWorld & a_World);
 	bool CallHookWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
 	
-	bool DisablePlugin(const AString & a_PluginName);  // tolua_export
-	bool LoadPlugin   (const AString & a_PluginName);  // tolua_export
+	/** Queues the specified plugin to be unloaded in the next call to Tick().
+	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
+	void UnloadPlugin(const AString & a_PluginFolder);  // tolua_export
+
+	/** Loads the plugin from the specified plugin folder.
+	Returns true if the plugin was loaded successfully or was already loaded before, false otherwise. */
+	bool LoadPlugin(const AString & a_PluginFolder);  // tolua_export
 
 	/** Removes all hooks the specified plugin has registered */
 	void RemoveHooks(cPlugin * a_Plugin);
 	
-	/** Removes the plugin from the internal structures and deletes its object. */
-	void RemovePlugin(cPlugin * a_Plugin);
+	/** Removes the plugin of the specified name from the internal structures and deletes its object. */
+	void RemovePlugin(const AString & a_PluginName);
 	
 	/** Removes all command bindings that the specified plugin has made */
 	void RemovePluginCommands(cPlugin * a_Plugin);
-	
+
+	/** Returns true if the specified plugin is loaded. */
+	bool IsPluginLoaded(const AString & a_PluginName);  // tolua_export
+
 	/** Binds a command to the specified plugin. Returns true if successful, false if command already bound. */
 	bool BindCommand(const AString & a_Command, cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString);  // Exported in ManualBindings.cpp, without the a_Plugin param
 	
@@ -296,8 +311,12 @@ public:
 	static bool IsValidHookType(int a_HookType);
 	
 	/** Calls the specified callback with the plugin object of the specified plugin.
-	Returns false if plugin not found, and the value that the callback has returned otherwise. */
+	Returns false if plugin not found, otherwise returns the value that the callback has returned. */
 	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback & a_Callback);
+
+	/** Calls the specified callback for each plugin in m_Plugins.
+	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
+	bool ForEachPlugin(cPluginCallback & a_Callback);
 	
 	/** Returns the path where individual plugins' folders are expected.
 	The path doesn't end in a slash. */
@@ -317,13 +336,25 @@ private:
 	typedef std::map<int, cPluginManager::PluginList> HookMap;
 	typedef std::map<AString, cCommandReg> CommandMap;
 
-	PluginList m_DisablePluginList;
-	PluginMap  m_Plugins;
+
+	/** FolderNames of plugins that should be unloaded.
+	The plugins will be unloaded within the next call to Tick(), to avoid multithreading issues.
+	Protected against multithreaded access by m_CSPluginsToUnload. */
+	AStringVector m_PluginsToUnload;
+
+	/** Protects m_PluginsToUnload against multithreaded access. */
+	mutable cCriticalSection m_CSPluginsToUnload;
+
+	/** All plugins that have been found in the Plugins folder. */
+	cPluginPtrs m_Plugins;
+
 	HookMap    m_Hooks;
 	CommandMap m_Commands;
 	CommandMap m_ConsoleCommands;
 
+	/** If set to true, all the plugins will be reloaded within the next call to Tick(). */
 	bool m_bReloadPlugins;
+
 
 	cPluginManager();
 	virtual ~cPluginManager();
@@ -340,11 +371,11 @@ private:
 	/** Handles writing default plugins if 'Plugins' key not found using a cIniFile object expected to be intialised to settings.ini */
 	void InsertDefaultPlugins(cIniFile & a_SettingsIni);
 
-	/** Adds the plugin into the internal list of plugins and initializes it. If initialization fails, the plugin is removed again. */
-	bool AddPlugin(cPlugin * a_Plugin);
-
 	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
 	CommandResult HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
+
+	/** Returns the folders that are specified in the settings ini to load plugins from. */
+	AStringVector GetFoldersToLoad(cIniFile & a_SettingsIni);
 } ;  // tolua_export
 
 
