@@ -82,6 +82,7 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			GetPluginsPath = { Params = "", Return = "string", Notes = "Returns the path where the individual plugin folders are located. Doesn't include the path separator at the end of the returned string." },
 			IsCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if in-game Command is already bound (by any plugin)" },
 			IsConsoleCommandBound = { Params = "Command", Return = "bool", Notes = "Returns true if console Command is already bound (by any plugin)" },
+			IsPluginLoaded = { Params = "PluginName", Return = "", Notes = "Returns true if the specified plugin is loaded." },
 			LoadPlugin = { Params = "PluginFolder", Return = "", Notes = "(<b>DEPRECATED</b>) Loads a plugin from the specified folder. NOTE: Loading plugins may be an unsafe operation and may result in a deadlock or a crash. This API is deprecated and might be removed." },
 			LogStackTrace = { Params = "", Return = "", Notes = "(STATIC) Logs a current stack trace of the Lua engine to the server console log. Same format as is used when the plugin fails." },
 			RefreshPluginList = { Params = "", Return = "", Notes = "Refreshes the list of plugins to include all folders inside the Plugins folder (potentially new disabled plugins)" },
