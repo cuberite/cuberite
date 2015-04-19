@@ -1341,7 +1341,14 @@ void cClientHandle::HandleRightClick(int a_BlockX, int a_BlockY, int a_BlockZ, e
 			{
 				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
 				World->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, m_Player);
-				World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+				if (a_BlockY < cChunkDef::Height - 1)
+				{
+					World->SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, m_Player);  // 2 block high things
+				}
+				if (a_BlockY > 1)
+				{
+					World->SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, m_Player);  // 2 block high things
+				}
 				m_Player->GetInventory().SendEquippedSlot();
 			}
 		}
