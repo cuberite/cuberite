@@ -41,7 +41,8 @@ public:
 	cHTTPConnection(cHTTPServer & a_HTTPServer);
 	virtual ~cHTTPConnection();
 	
-	/** Sends HTTP status code together with a_Reason (used for HTTP errors) */
+	/** Sends HTTP status code together with a_Reason (used for HTTP errors).
+	Sends the a_Reason as the body as well, so that browsers display it. */
 	void SendStatusAndReason(int a_StatusCode, const AString & a_Reason);
 	
 	/** Sends the "401 unauthorized" reply together with instructions on authorizing, using the specified realm */

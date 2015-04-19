@@ -38,7 +38,9 @@ cHTTPConnection::~cHTTPConnection()
 
 void cHTTPConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Response)
 {
-	SendData(Printf("%d %s\r\nContent-Length: 0\r\n\r\n", a_StatusCode, a_Response.c_str()));
+	SendData(Printf("HTTP/1.1 %d %s\r\n", a_StatusCode, a_Response.c_str()));
+	SendData(Printf("Content-Length: %u\r\n\r\n", static_cast<unsigned>(a_Response.size())));
+	SendData(a_Response.data(), a_Response.size());
 	m_State = wcsRecvHeaders;
 }
 
