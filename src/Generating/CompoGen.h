@@ -99,7 +99,7 @@ protected:
 	cNoise m_Noise1;
 	cNoise m_Noise2;
 	
-	int m_Threshold;
+	double m_MaxThreshold;
 	
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;

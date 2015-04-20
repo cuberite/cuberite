@@ -218,7 +218,7 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 cCompoGenNether::cCompoGenNether(int a_Seed) :
 	m_Noise1(a_Seed + 10),
 	m_Noise2(a_Seed * a_Seed * 10 + a_Seed * 1000 + 6000),
-	m_Threshold(0)
+	m_MaxThreshold(10000)
 {
 }
 
@@ -229,6 +229,8 @@ cCompoGenNether::cCompoGenNether(int a_Seed) :
 void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
+
+	int Threshold = static_cast<int>(m_Noise1.CubicNoise2D(static_cast<float>(a_ChunkDesc.GetChunkX()) / 50, static_cast<float>(a_ChunkDesc.GetChunkZ()) / 50) * m_MaxThreshold);
 	
 	const int SEGMENT_HEIGHT = 8;
 	const int INTERPOL_X = 16;  // Must be a divisor of 16
@@ -287,12 +289,10 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 			for (int y = 0; y < SEGMENT_HEIGHT; y++)
 			{
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
-				BLOCKTYPE Block = E_BLOCK_AIR;
-				if (Val < m_Threshold)  // Don't calculate if the block should be Netherrack or Soulsand when it's already decided that it's air.
+				if (Val < Threshold)  // Don't calculate if the block should be Netherrack when it's already decided that it's air.
 				{
-					Block = E_BLOCK_NETHERRACK;
+					a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_NETHERRACK);
 				}
-				a_ChunkDesc.SetBlockType(x, y + Segment, z, Block);
 			}
 		}
 		
@@ -329,7 +329,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 
 void cCompoGenNether::InitializeCompoGen(cIniFile & a_IniFile)
 {
-	m_Threshold = a_IniFile.GetValueSetI("Generator", "NetherThreshold", m_Threshold);
+	m_MaxThreshold = a_IniFile.GetValueSetF("Generator", "NetherMaxThreshold", m_MaxThreshold);
 }
 
 
