@@ -415,7 +415,7 @@ BlackBanner         = Stick, 2:3 | BlackWool, 1:1, 1:2, 2:1, 2:2, 2:1, 2:2
 
 WhiteDye, 3   = Bone, *
 RedDye, 2     = Rose, *
-YellowDye, 2  = Flower, *
+YellowDye, 2  = Dandelion, *
 
 # Color mixing, duals:
 OrangeDye, 2  = YellowDye, * | RedDye, *
