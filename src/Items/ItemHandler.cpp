@@ -72,7 +72,7 @@ cItemHandler * cItemHandler::m_ItemHandler[2268];
 
 cItemHandler * cItemHandler::GetItemHandler(int a_ItemType)
 {
-	if ((a_ItemType < 0) || ((size_t)a_ItemType >= ARRAYCOUNT(m_ItemHandler)))
+	if ((a_ItemType < 0) || (static_cast<size_t>(a_ItemType) >= ARRAYCOUNT(m_ItemHandler)))
 	{
 		// Either nothing (-1), or bad value, both cases should return the air handler
 		if (a_ItemType < -1)
@@ -287,7 +287,7 @@ cItemHandler * cItemHandler::CreateItemHandler(int a_ItemType)
 
 void cItemHandler::Deinit()
 {
-	for (int i = 0; i < ARRAYCOUNT(m_ItemHandler); i++)
+	for (size_t i = 0; i < ARRAYCOUNT(m_ItemHandler); i++)
 	{
 		delete m_ItemHandler[i];
 		m_ItemHandler[i] = nullptr;
