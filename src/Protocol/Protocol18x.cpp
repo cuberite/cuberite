@@ -2675,7 +2675,7 @@ void cProtocol180::ParseItemMetadata(cItem & a_Item, const AString & a_Metadata)
 	if (!NBT.IsValid())
 	{
 		AString HexDump;
-		CreateHexDump(HexDump, a_Metadata.data(), a_Metadata.size(), 16);
+		CreateHexDump(HexDump, a_Metadata.data(), std::max<size_t>(a_Metadata.size(), 1024), 16);
 		LOGWARNING("Cannot parse NBT item metadata: (" SIZE_T_FMT " bytes)\n%s", a_Metadata.size(), HexDump.c_str());
 		return;
 	}
