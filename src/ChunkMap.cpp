@@ -2413,6 +2413,7 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 	// Try loading the chunk:
 	if ((Chunk == nullptr) || (!Chunk->IsValid()))
 	{
+		Chunk->SetPresence(cChunk::cpQueued);
 		class cPrepareLoadCallback: public cChunkCoordCallback
 		{
 		public:
@@ -2427,6 +2428,7 @@ bool cChunkMap::GenerateChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * 
 			virtual void Call(int a_CBChunkX, int a_CBChunkZ) override
 			{
 				// The chunk has been loaded or an error occurred, check if it's valid now:
+				cCSLock Lock(m_ChunkMap.m_CSLayers);
 				cChunkPtr CBChunk = m_ChunkMap.GetChunkNoLoad(a_CBChunkX, a_CBChunkZ);
 
 				if (CBChunk == nullptr)
