@@ -229,8 +229,6 @@ cCompoGenNether::cCompoGenNether(int a_Seed) :
 void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	HEIGHTTYPE MaxHeight = a_ChunkDesc.GetMaxHeight();
-
-	int Threshold = static_cast<int>(m_Noise1.CubicNoise2D(static_cast<float>(a_ChunkDesc.GetChunkX()) / 50, static_cast<float>(a_ChunkDesc.GetChunkZ()) / 50) * m_MaxThreshold);
 	
 	const int SEGMENT_HEIGHT = 8;
 	const int INTERPOL_X = 16;  // Must be a divisor of 16
@@ -284,6 +282,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 		// Interpolate between FloorLo and FloorHi:
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
+			int Threshold = static_cast<int>(m_Noise1.CubicNoise2D(static_cast<float>(BaseX + x) / 75, static_cast<float>(BaseZ + z) / 75) * m_MaxThreshold);
 			int Lo = FloorLo[x + 17 * z] / 256;
 			int Hi = FloorHi[x + 17 * z] / 256;
 			for (int y = 0; y < SEGMENT_HEIGHT; y++)
