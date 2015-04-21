@@ -218,7 +218,7 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 cCompoGenNether::cCompoGenNether(int a_Seed) :
 	m_Noise1(a_Seed + 10),
 	m_Noise2(a_Seed * a_Seed * 10 + a_Seed * 1000 + 6000),
-	m_MaxThreshold(10000)
+	m_MaxThreshold(25000)
 {
 }
 
