@@ -384,7 +384,7 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		// Failed to create IPv6 socket, create an IPv4 one instead:
 		m_IsMainSockIPv6 = false;
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
+		LOGD("UDP: Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		m_MainSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if (!IsValidSocket(m_MainSock))
 		{
