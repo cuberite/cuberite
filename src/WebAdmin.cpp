@@ -234,7 +234,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	bool ShouldWrapInTemplate = ((BareURL.length() > 1) && (BareURL[1] != '~'));
 
 	// Retrieve the request data:
-	cWebadminRequestData * Data = (cWebadminRequestData *)(a_Request.GetUserData());
+	cWebadminRequestData * Data = reinterpret_cast<cWebadminRequestData *>(a_Request.GetUserData());
 	if (Data == nullptr)
 	{
 		a_Connection.SendStatusAndReason(500, "Bad UserData");
@@ -244,6 +244,7 @@ void cWebAdmin::HandleWebadminRequest(cHTTPConnection & a_Connection, cHTTPReque
 	// Wrap it all up for the Lua call:
 	AString Template;
 	HTTPTemplateRequest TemplateRequest;
+	TemplateRequest.Request.URL = a_Request.GetURL();
 	TemplateRequest.Request.Username = a_Request.GetAuthUsername();
 	TemplateRequest.Request.Method = a_Request.GetMethod();
 	TemplateRequest.Request.Path = BareURL.substr(1);
