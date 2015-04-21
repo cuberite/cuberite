@@ -50,9 +50,18 @@ struct HTTPRequest
 	typedef std::map< std::string, std::string > StringStringMap;
 	typedef std::map< std::string, HTTPFormData > FormDataMap;
 
+	/** The entire URL presented to the HTTP server. */
+	AString URL;
+
+	/** HTTP method used for the request ("GET", "POST" etc.) */
 	AString Method;
+
+	/** The Path part of the request's URL (excluding GET params). */
 	AString Path;
+
+	/** Name of the logged-in user. Empty if not logged in. */
 	AString Username;
+
 	// tolua_end
 
 	/** Parameters given in the URL, after the questionmark */
