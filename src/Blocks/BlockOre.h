@@ -54,7 +54,7 @@ public:
 			{
 				a_Pickups.push_back(cItem(E_ITEM_QUARTZ));
 				break;
-		        }
+			}
 			default:
 			{
 				a_Pickups.push_back(cItem(m_BlockType));
