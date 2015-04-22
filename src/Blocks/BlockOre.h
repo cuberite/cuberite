@@ -52,7 +52,7 @@ public:
 			}
 			case E_BLOCK_NETHER_QUARTZ_ORE:
 			{
-				a_Pickups.push_back(cItem(E_ITEM_QUARTZ));
+				a_Pickups.push_back(cItem(E_ITEM_NETHER_QUARTZ));
 				break;
 			}
 			default:
