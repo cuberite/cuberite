@@ -39,10 +39,15 @@ public:
 		int a_CursorX, int a_CursorY, int a_CursorZ
 	) override
 	{
+		// Prepare sound effect
+		AString PlaceSound = cBlockInfo::GetPlaceSound(m_ItemType);
+		float Volume = 1.0f, Pitch = 0.8f;
+
 		// Special slab handling - placing a slab onto another slab produces a dblslab instead:
 		BLOCKTYPE ClickedBlockType;
 		NIBBLETYPE ClickedBlockMeta;
 		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, ClickedBlockType, ClickedBlockMeta);
+		// If clicked on a half slab directly
 		if (
 			(ClickedBlockType == m_ItemType) &&                         // Placing the same slab material
 			((ClickedBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
@@ -54,6 +59,7 @@ public:
 				((ClickedBlockMeta & 0x08) == 0)
 			)
 			{
+				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
 				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
 			}
 
@@ -63,11 +69,28 @@ public:
 				((ClickedBlockMeta & 0x08) != 0)
 			)
 			{
+				a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
 				return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, ClickedBlockMeta & 0x07);
 			}
 		}
 
+		// Checking the type of block that should be placed
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
+		BLOCKTYPE PlaceBlockType;
+		NIBBLETYPE PlaceBlockMeta;
+		a_World.GetBlockTypeMeta(a_BlockX, a_BlockY, a_BlockZ, PlaceBlockType, PlaceBlockMeta);
+		// If it's a slab combine into a doubleslab (means that clicked on side, top or bottom of a block adjacent to a half slab)
+		if (
+			(PlaceBlockType == m_ItemType) &&                         // Placing the same slab material
+			((PlaceBlockMeta & 0x07) == a_EquippedItem.m_ItemDamage)  // Placing the same slab sub-kind (and existing slab is single)
+		)
+		{
+			a_World.BroadcastSoundEffect(PlaceSound, a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5, Volume, Pitch);
+			return a_Player.PlaceBlock(a_BlockX, a_BlockY, a_BlockZ, m_DoubleSlabBlockType, PlaceBlockMeta & 0x07);
+		}
+
 		// The slabs didn't combine, use the default handler to place the slab:
+		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);
 		bool res = super::OnPlayerPlace(a_World, a_Player, a_EquippedItem, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 
 		/*
