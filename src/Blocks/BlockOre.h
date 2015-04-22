@@ -50,6 +50,10 @@ public:
 				a_Pickups.push_back(cItem(E_ITEM_COAL));
 				break;
 			}
+			case E_BLOCK_QUARTZ_ORE:
+				a_Pickups.push_back(cItem(E_ITEM_QUARTZ));
+				break;
+		        }
 			default:
 			{
 				a_Pickups.push_back(cItem(m_BlockType));
