@@ -55,6 +55,11 @@ public:
 				a_Pickups.push_back(cItem(E_ITEM_NETHER_QUARTZ));
 				break;
 			}
+			case E_BLOCK_CLAY:
+			{
+				a_Pickups.push_back(cItem(E_ITEM_CLAY, 4));
+				break;
+			}
 			default:
 			{
 				a_Pickups.push_back(cItem(m_BlockType));
