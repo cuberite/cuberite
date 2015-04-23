@@ -24,6 +24,7 @@ SET (SRCS
 	Mooshroom.cpp
 	PassiveAggressiveMonster.cpp
 	PassiveMonster.cpp
+        PathFinder.cpp
 	Pig.cpp
 	Rabbit.cpp
 	Sheep.cpp
@@ -62,6 +63,8 @@ SET (HDRS
 	Ocelot.h
 	PassiveAggressiveMonster.h
 	PassiveMonster.h
+        Path.h
+        PathFinder.h
 	Pig.h
 	Rabbit.h
 	Sheep.h
