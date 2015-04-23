@@ -384,23 +384,23 @@ typedef Vector3<int>    Vector3i;
 /* Hash function, this allows the vector to be used in std::unordered_map, this is needed for the PathFinder */
 namespace std
 {
-    template <>
-    struct hash<Vector3d>
-    {
-        std::size_t operator()(const Vector3d & v2) const
-        {
-			// Guaranteed to have no hash collisions for any 128x128x128 area.
-			// Suitable for path finding
-            size_t t=0;
-            t+=(char)v2.x;
-            t=t << 8;
-            t+=(char)v2.y;
-            t=t << 8;
-            t+=(char)v2.z;
-            t=t << 8;
-            return t;
-        }
-    };
+template <>
+struct hash<Vector3d>
+{
+	std::size_t operator()(const Vector3d & v2) const
+	{
+		// Guaranteed to have no collisions for small distances,
+		// Suitable for pathfinding.
+		size_t t=0;
+		t+=(char)v2.x;
+		t=t << 8;
+		t+=(char)v2.y;
+		t=t << 8;
+		t+=(char)v2.z;
+		t=t << 8;
+		return t;
+	}
+};
 }
 
 
