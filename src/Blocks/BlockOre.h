@@ -57,7 +57,7 @@ public:
 			}
 			case E_BLOCK_CLAY:
 			{
-				a_Pickups.push_back(cItem(E_ITEM_CLAY,4));
+				a_Pickups.push_back(cItem(E_ITEM_CLAY, 4));
 				break;
 			}
 			default:
