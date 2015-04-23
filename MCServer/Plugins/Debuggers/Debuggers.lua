@@ -82,7 +82,7 @@ function Initialize(a_Plugin)
 			a_CBPlayer:GetWorld():DoWithEntityByID(  -- This will crash the server in #1889
 				a_CBEntity:GetUniqueID(),
 				function(Entity)
-					LOG("RightClicking an entity, crash #1889 fixed")
+					LOG("RightClicking an entity, crash #1889 fixed. Entity is a " .. tolua.type(Entity))
 				end
 			)
 		end

@@ -50,6 +50,7 @@ class cItems;
 class cLuaServerHandle;
 class cLuaTCPLink;
 class cLuaUDPEndpoint;
+class cMapManager;
 class cMonster;
 class cPickup;
 class cPlayer;
@@ -68,6 +69,7 @@ struct HTTPTemplateRequest;
 struct TakeDamageInfo;
 
 typedef cBoundingBox *   pBoundingBox;
+typedef cMapManager *    pMapManager;
 typedef cPluginManager * pPluginManager;
 typedef cRoot *          pRoot;
 typedef cScoreboard *    pScoreboard;
@@ -248,6 +250,7 @@ public:
 	void GetStackValue(int a_StackPos, eWeather & a_Value);
 	void GetStackValue(int a_StackPos, int & a_Value);
 	void GetStackValue(int a_StackPos, pBoundingBox & a_Value);
+	void GetStackValue(int a_StackPos, pMapManager & a_Value);
 	void GetStackValue(int a_StackPos, pPluginManager & a_Value);
 	void GetStackValue(int a_StackPos, pRoot & a_Value);
 	void GetStackValue(int a_StackPos, pScoreboard & a_Value);
