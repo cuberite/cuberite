@@ -32,18 +32,21 @@ struct Vector3d
 };
 namespace std
 {
-template <>
-struct hash<Vector3d>
-{
-	std::size_t operator()(const Vector3d & v2) const
-	{
-		using std::size_t;
-		using std::hash;
-		using std::string;
-		
-		return(v2.x + v2.y  + v2.z);  // TODO this is not the best hash out there
-	}
-};
+    template <>
+    struct hash<Vector3d>
+    {
+        std::size_t operator()(const Vector3d & v2) const
+        {
+            size_t t=0;
+            t+=(char)v2.x;
+            t=t << 8;
+            t+=(char)v2.y;
+            t=t << 8;
+            t+=(char)v2.z;
+            t=t << 8;
+            return t;
+        }
+    };
 }
 #endif
 
