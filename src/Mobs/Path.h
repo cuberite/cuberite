@@ -8,6 +8,10 @@ class cPath;
 using namespace std;
 #include "PathFinder.h"
 
+#ifndef __PATHFIND_DEBUG__
+#include "../World.h"
+#endif
+
 class cPath
 {
 public:

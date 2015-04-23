@@ -14,7 +14,7 @@ class compareHeuristics;
 
 /* MCServer headers */
 #ifndef __PATHFIND_DEBUG__
-//TODO FILL THESE
+#include "../World.h"
 
 
 
@@ -30,6 +30,21 @@ struct Vector3d
 	Vector3d(int _x,  int _y,  int _z);
 	int x,  y,  z;
 };
+namespace std
+{
+template <>
+struct hash<Vector3d>
+{
+	std::size_t operator()(const Vector3d & v2) const
+	{
+		using std::size_t;
+		using std::hash;
+		using std::string;
+		
+		return(v2.x + v2.y  + v2.z);  // TODO this is not the best hash out there
+	}
+};
+}
 #endif
 
 
@@ -46,22 +61,6 @@ using namespace std;
 
 
 
-/* Hashtable */
-namespace std
-{
-template <>
-struct hash<Vector3d>
-{
-	std::size_t operator()(const Vector3d & v2) const
-	{
-		using std::size_t;
-		using std::hash;
-		using std::string;
-		
-		return(v2.x + v2.y  + v2.z);  // TODO this is not the best hash out there
-	}
-};
-}
 
 
 
@@ -189,5 +188,3 @@ private:
 	
 	friend class cPathCell;
 };
-
-

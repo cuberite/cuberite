@@ -1,3 +1,7 @@
+#ifndef __PATHFIND_DEBUG__
+#include "Globals.h"
+#endif
+
 #include "PathFinder.h"
 #include "Path.h"
 #include <stdio.h>
@@ -9,7 +13,7 @@
 // The only version which guarantees the shortest path is 0, 0.
 
 
-
+#include <cmath>
 
 #ifdef __PATHFIND_DEBUG__
 txt cPathFinder::debug_solid;
@@ -200,7 +204,7 @@ void cPathFinder::processCell(const Vector3d & a_Location, cPathCell * a_Caller,
 #if DISTANCE_MANHATTEN == 1
 		cell->m_h = 10 *(abs(cell->m_Location.x-m_Destination.x) + abs(cell->m_Location.y-m_Destination.y)+ abs(cell->m_Location.z-m_Destination.z));
 #else
-		cell->m_h = sqrt( (cell->m_Location.x-m_Destination.x) * (cell->m_Location.x-m_Destination.x) * 100+ (cell->m_Location.y-m_Destination.y) *(cell->m_Location.y-m_Destination.y) * 100 + (cell->m_Location.z-m_Destination.z) * (cell->m_Location.z-m_Destination.z) * 100);
+		cell->m_h = std::sqrt( (cell->m_Location.x-m_Destination.x) * (cell->m_Location.x-m_Destination.x) * 100+ (cell->m_Location.y-m_Destination.y) *(cell->m_Location.y-m_Destination.y) * 100 + (cell->m_Location.z-m_Destination.z) * (cell->m_Location.z-m_Destination.z) * 100);
 #endif
 		
 #if HEURISTICS_ONLY == 1
@@ -290,7 +294,7 @@ bool cPathFinder::isCalculationFinished_internal()
 			for (z = -1; z <= 1; ++z)
 			{
 				// TODO There's room for optimization here
-				int cost = sqrt(x * x * 100 + y * y * 100 + z * z * 100);
+				int cost = std::sqrt(x * x * 100 + y * y * 100 + z * z * 100);
 				
 				if (!getCell(currentCell->m_Location+Vector3d(x, y, z))->m_IsSolid && getCell(currentCell->m_Location+Vector3d(x, y, z-1))->m_IsSolid && !getCell(currentCell->m_Location+Vector3d(x, y, z+1))->m_IsSolid)
 				{
@@ -371,7 +375,7 @@ void cPathFinder::closedListAdd(cPathCell * point)
 
 
 
-
+#ifdef __PATHFIND_DEBUG__
 Vector3d::Vector3d(int _x, int _y, int _z)
 {
 	x = _x;
@@ -396,5 +400,4 @@ bool Vector3d::operator == (const Vector3d & v2) const
 {
 	return ((this->x == v2.x) && (this->y == v2.y) && (this->z == v2.z));
 }
-
-
+#endif

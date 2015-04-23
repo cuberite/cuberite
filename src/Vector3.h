@@ -354,6 +354,7 @@ protected:
 
 
 
+
 template <> inline Vector3<int> Vector3<int>::Floor(void) const
 {
 	return *this;
@@ -380,6 +381,23 @@ typedef Vector3<int>    Vector3i;
 // tolua_end
 
 
+/* Hash function, this allows the vector to be used in std::unordered_map, this is needed for the PathFinder */
+
+namespace std
+{
+template <>
+struct hash<Vector3d>
+{
+	std::size_t operator()(const Vector3d & vector) const
+	{
+		using std::size_t;
+		using std::hash;
+		using std::string;
+		
+		return(vector.x + vector.y  + vector.z);  // TODO this is not the best hash out there, ZCURVE soon.
+	}
+};
+}
 
 
 
