@@ -37,6 +37,8 @@ struct hash<Vector3d>
 {
 	std::size_t operator()(const Vector3d & v2) const
 	{
+		// Guaranteed to have no hash collisions for any 128x128x128 area
+		// Suitable for pathfinding
 		size_t t=0;
 		t+=(char)v2.x;
 		t=t << 8;
