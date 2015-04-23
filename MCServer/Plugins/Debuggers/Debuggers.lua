@@ -62,6 +62,7 @@ function Initialize(a_Plugin)
 	-- TestRankMgr()
 	TestFileExt()
 	TestFileLastMod()
+	TestPluginInterface()
 	
 	local LastSelfMod = cFile:GetLastModificationTime(a_Plugin:GetLocalFolder() .. "/Debuggers.lua")
 	LOG("Debuggers.lua last modified on " .. os.date("%Y-%m-%dT%H:%M:%S", LastSelfMod))
@@ -75,9 +76,42 @@ function Initialize(a_Plugin)
 	)
 	--]]
 	
+	-- Test the crash in #1889:
+	cPluginManager:AddHook(cPluginManager.HOOK_PLAYER_RIGHT_CLICKING_ENTITY,
+		function (a_CBPlayer, a_CBEntity)
+			a_CBPlayer:GetWorld():DoWithEntityByID(  -- This will crash the server in #1889
+				a_CBEntity:GetUniqueID(),
+				function(Entity)
+					LOG("RightClicking an entity, crash #1889 fixed")
+				end
+			)
+		end
+	)
+	
 	return true
 end;
 
+
+
+
+
+function TestPluginInterface()
+	cPluginManager:DoWithPlugin("Core",
+		function (a_CBPlugin)
+			if (a_CBPlugin:GetStatus() == cPluginManager.psLoaded) then
+				LOG("Core plugin was found, version " .. a_CBPlugin:GetVersion())
+			else
+				LOG("Core plugin is not loaded")
+			end
+		end
+	)
+	
+	cPluginManager:ForEachPlugin(
+		function (a_CBPlugin)
+			LOG("Plugin in " .. a_CBPlugin:GetFolderName() .. " has an API name of " .. a_CBPlugin:GetName() .. " and status " .. a_CBPlugin:GetStatus())
+		end
+	)
+end
 
 
 

@@ -740,6 +740,18 @@ void cLuaState::Push(cPlayer * a_Player)
 
 
 
+void cLuaState::Push(cPlugin * a_Plugin)
+{
+	ASSERT(IsValid());
+
+	tolua_pushusertype(m_LuaState, a_Plugin, "cPlugin");
+	m_NumCurrentFunctionArgs += 1;
+}
+
+
+
+
+
 void cLuaState::Push(cPluginLua * a_Plugin)
 {
 	ASSERT(IsValid());
@@ -911,15 +923,6 @@ void cLuaState::PushUserType(void * a_Object, const char * a_Type)
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
-{
-	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
-}
-
-
-
-
-
 void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 {
 	size_t len = 0;
@@ -934,12 +937,18 @@ void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 
 
 
-void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
+void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
-	if (lua_isnumber(m_LuaState, a_StackPos))
-	{
-		a_ReturnedVal = (int)tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal);
-	}
+	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
+{
+	a_Ref.RefStack(*this, a_StackPos);
 }
 
 
@@ -960,9 +969,25 @@ void cLuaState::GetStackValue(int a_StackPos, double & a_ReturnedVal)
 
 void cLuaState::GetStackValue(int a_StackPos, eWeather & a_ReturnedVal)
 {
+	if (!lua_isnumber(m_LuaState, a_StackPos))
+	{
+		return;
+	}
+	a_ReturnedVal = static_cast<eWeather>(Clamp(
+		static_cast<int>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal)),
+		static_cast<int>(wSunny), static_cast<int>(wThunderstorm))
+	);
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
+{
 	if (lua_isnumber(m_LuaState, a_StackPos))
 	{
-		a_ReturnedVal = (eWeather)Clamp((int)tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal), (int)wSunny, (int)wThunderstorm);
+		a_ReturnedVal = static_cast<int>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
 	}
 }
 
@@ -988,6 +1013,60 @@ void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, pPluginManager & a_ReturnedVal)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cPluginManager", false, &err))
+	{
+		a_ReturnedVal = *(reinterpret_cast<cPluginManager **>(lua_touserdata(m_LuaState, a_StackPos)));
+	}
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, pRoot & a_ReturnedVal)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cRoot", false, &err))
+	{
+		a_ReturnedVal = *(reinterpret_cast<cRoot **>(lua_touserdata(m_LuaState, a_StackPos)));
+	}
+}
+
+
+
+
+
+void cLuaState::GetStackValue(int a_StackPos, pScoreboard & a_ReturnedVal)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cScoreboard", false, &err))
+	{
+		a_ReturnedVal = *(reinterpret_cast<cScoreboard **>(lua_touserdata(m_LuaState, a_StackPos)));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
 {
 	if (lua_isnil(m_LuaState, a_StackPos))
@@ -998,17 +1077,8 @@ void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
 	tolua_Error err;
 	if (tolua_isusertype(m_LuaState, a_StackPos, "cWorld", false, &err))
 	{
-		a_ReturnedVal = *((cWorld **)lua_touserdata(m_LuaState, a_StackPos));
+		a_ReturnedVal = *(reinterpret_cast<cWorld **>(lua_touserdata(m_LuaState, a_StackPos)));
 	}
-}
-
-
-
-
-
-void cLuaState::GetStackValue(int a_StackPos, cRef & a_Ref)
-{
-	a_Ref.RefStack(*this, a_StackPos);
 }
 
 

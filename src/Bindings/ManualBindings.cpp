@@ -67,7 +67,7 @@ static int lua_do_error(lua_State* L, const char * a_pFormat, ...)
 
 	// Insert function name into error msg
 	AString msg(a_pFormat);
-	ReplaceString(msg, "#funcname#", entry.name?entry.name:"?");
+	ReplaceString(msg, "#funcname#", (entry.name != nullptr) ? entry.name : "?");
 
 	// Copied from luaL_error and modified
 	va_list argp;
@@ -493,94 +493,130 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 
 
 
+/** Binds the DoWith(ItemName) functions of regular classes. */
 template <
 	class Ty1,
 	class Ty2,
-	bool (Ty1::*Func1)(const AString &, cItemCallback<Ty2> &)
+	bool (Ty1::*DoWithFn)(const AString &, cItemCallback<Ty2> &)
 >
-static int tolua_DoWith(lua_State* tolua_S)
+static int tolua_DoWith(lua_State * tolua_S)
 {
-	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if ((NumArgs != 2) && (NumArgs != 3))
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamString(2) ||
+		!L.CheckParamFunction(3)
+	)
 	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Requires 2 or 3 arguments, got %i", NumArgs);
+		return 0;
 	}
 
-	Ty1 * self = (Ty1 *)  tolua_tousertype(tolua_S, 1, nullptr);
-
-	const char * ItemName = tolua_tocppstring(tolua_S, 2, "");
-	if ((ItemName == nullptr) || (ItemName[0] == 0))
+	// Get parameters:
+	Ty1 * Self;
+	AString ItemName;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, ItemName, FnRef);
+	if (Self == nullptr)
 	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1", NumArgs);
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
-	if (!lua_isfunction(tolua_S, 3))
+	if (ItemName.empty() || (ItemName[0] == 0))
 	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #2", NumArgs);
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1");
 	}
-
-	/* luaL_ref gets reference to value on top of the stack, the table is the last argument and therefore on the top */
-	int TableRef = LUA_REFNIL;
-	if (NumArgs == 3)
+	if (!FnRef.IsValid())
 	{
-		TableRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		if (TableRef == LUA_REFNIL)
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get value reference of parameter #3", NumArgs);
-		}
-	}
-
-	/* table value is popped, and now function is on top of the stack */
-	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FuncRef == LUA_REFNIL)
-	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #2", NumArgs);
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
 	}
 
 	class cLuaCallback : public cItemCallback<Ty2>
 	{
 	public:
-		cLuaCallback(lua_State* a_LuaState, int a_FuncRef, int a_TableRef):
-			LuaState(a_LuaState),
-			FuncRef(a_FuncRef),
-			TableRef(a_TableRef)
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FnRef)
 		{
 		}
 
 	private:
 		virtual bool Item(Ty2 * a_Item) override
 		{
-			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
-			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());
-			if (TableRef != LUA_REFNIL)
-			{
-				lua_rawgeti(LuaState, LUA_REGISTRYINDEX, TableRef);  /* Push table reference */
-			}
-
-			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (cLuaState::ReportErrors(LuaState, s))
-			{
-				return true;  // Abort enumeration
-			}
-			if (lua_isboolean(LuaState, -1))
-			{
-				return (tolua_toboolean(LuaState, -1, 0) > 0);
-			}
-			return false;  /* Continue enumeration */
+			bool ret = false;
+			m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
+			return ret;
 		}
-		lua_State * LuaState;
-		int FuncRef;
-		int TableRef;
-	} Callback(tolua_S, FuncRef, TableRef);
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+	} Callback(L, FnRef);
 
-	
-	bool bRetVal = (self->*Func1)(ItemName, Callback);
+	// Call the DoWith function:
+	bool res = (Self->*DoWithFn)(ItemName, Callback);
 
-	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, TableRef);
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
 
-	/* Push return value on stack */
-	tolua_pushboolean(tolua_S, bRetVal);
+
+
+
+
+/** Template for static functions DoWith(ItemName), on a type that has a static ::Get() function. */
+template <
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*DoWithFn)(const AString &, cItemCallback<Ty2> &)
+>
+static int tolua_StaticDoWith(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamString(2) ||
+		!L.CheckParamFunction(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	AString ItemName;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(2, ItemName, FnRef);
+	if (ItemName.empty() || (ItemName[0] == 0))
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a non-empty string for parameter #1");
+	}
+	if (!FnRef.IsValid())
+	{
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
+	}
+
+	class cLuaCallback : public cItemCallback<Ty2>
+	{
+	public:
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FnRef)
+		{
+		}
+
+	private:
+		virtual bool Item(Ty2 * a_Item) override
+		{
+			bool ret = false;
+			m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
+			return ret;
+		}
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+	} Callback(L, FnRef);
+
+	// Call the DoWith function:
+	bool res = (Ty1::Get()->*DoWithFn)(ItemName, Callback);
+
+	// Push the result as the return value:
+	L.Push(res);
 	return 1;
 }
 
@@ -916,6 +952,9 @@ static int tolua_ForEachInBox(lua_State * tolua_S)
 		}
 
 	private:
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+
 		// cItemCallback<Ty2> overrides:
 		virtual bool Item(Ty2 * a_Item) override
 		{
@@ -929,8 +968,6 @@ static int tolua_ForEachInBox(lua_State * tolua_S)
 
 			return res;
 		}
-		cLuaState & m_LuaState;
-		cLuaState::cRef & m_FnRef;
 	} Callback(L, FnRef);
 
 	bool bRetVal = (Self->*Func1)(*Box, Callback);
@@ -953,86 +990,105 @@ template <
 >
 static int tolua_ForEach(lua_State * tolua_S)
 {
-	int NumArgs = lua_gettop(tolua_S) - 1;  /* This includes 'self' */
-	if ((NumArgs != 1) && (NumArgs != 2))
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamFunction(2) ||
+		!L.CheckParamEnd(3)
+	)
 	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Requires 1 or 2 arguments, got %i", NumArgs);
+		return 0;
 	}
 
-	Ty1 * self = (Ty1 *)tolua_tousertype(tolua_S, 1, nullptr);
+	// Get the params:
+	Ty1 * self;
+	L.GetStackValues(1, self);
+	cLuaState::cRef FnRef(L, 2);
 	if (self == nullptr)
 	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Not called on an object instance");
-	}
-
-	if (!lua_isfunction(tolua_S, 2))
-	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a function for parameter #1");
-	}
-
-	/* luaL_ref gets reference to value on top of the stack, the table is the last argument and therefore on the top */
-	int TableRef = LUA_REFNIL;
-	if (NumArgs == 2)
-	{
-		TableRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-		if (TableRef == LUA_REFNIL)
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get value reference of parameter #2");
-		}
-	}
-
-	/* table value is popped, and now function is on top of the stack */
-	int FuncRef = luaL_ref(tolua_S, LUA_REGISTRYINDEX);
-	if (FuncRef == LUA_REFNIL)
-	{
-		return lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #1");
+		return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'.");
 	}
 
 	class cLuaCallback : public cItemCallback<Ty2>
 	{
 	public:
-		cLuaCallback(lua_State* a_LuaState, int a_FuncRef, int a_TableRef):
-			LuaState(a_LuaState),
-			FuncRef(a_FuncRef),
-			TableRef(a_TableRef)
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FnRef)
 		{
 		}
 
 	private:
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+
 		virtual bool Item(Ty2 * a_Item) override
 		{
-			lua_rawgeti(LuaState, LUA_REGISTRYINDEX, FuncRef);  /* Push function reference */
-			tolua_pushusertype(LuaState, a_Item, Ty2::GetClassStatic());
-			if (TableRef != LUA_REFNIL)
-			{
-				lua_rawgeti(LuaState, LUA_REGISTRYINDEX, TableRef);  /* Push table reference */
-			}
-
-			int s = lua_pcall(LuaState, (TableRef == LUA_REFNIL ? 1 : 2), 1, 0);
-			if (cLuaState::ReportErrors(LuaState, s))
-			{
-				return true;  /* Abort enumeration */
-			}
-
-			if (lua_isboolean(LuaState, -1))
-			{
-				return (tolua_toboolean(LuaState, -1, 0) > 0);
-			}
-			return false;  /* Continue enumeration */
+			bool res = false;  // By default continue the enumeration
+			m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
+			return res;
 		}
-		lua_State * LuaState;
-		int FuncRef;
-		int TableRef;
-	} Callback(tolua_S, FuncRef, TableRef);
+	} Callback(L, FnRef);
 
-	bool bRetVal = (self->*Func1)(Callback);
+	// Call the enumeration:
+	bool res = (self->*Func1)(Callback);
 
-	/* Unreference the values again, so the LUA_REGISTRYINDEX can make place for other references */
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, TableRef);
-	luaL_unref(tolua_S, LUA_REGISTRYINDEX, FuncRef);
+	// Push the return value:
+	L.Push(res);
+	return 1;
+}
 
-	/* Push return value on stack */
-	tolua_pushboolean(tolua_S, bRetVal);
+
+
+
+
+/** Implements bindings for ForEach() functions in a class that is static (has a ::Get() static function). */
+template <
+	class Ty1,
+	class Ty2,
+	bool (Ty1::*Func1)(cItemCallback<Ty2> &)
+>
+static int tolua_StaticForEach(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamFunction(2) ||
+		!L.CheckParamEnd(3)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cLuaState::cRef FnRef(L, 2);
+
+	class cLuaCallback : public cItemCallback<Ty2>
+	{
+	public:
+		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
+			m_LuaState(a_LuaState),
+			m_FnRef(a_FnRef)
+		{
+		}
+
+	private:
+		cLuaState & m_LuaState;
+		cLuaState::cRef & m_FnRef;
+
+		virtual bool Item(Ty2 * a_Item) override
+		{
+			bool res = false;  // By default continue the enumeration
+			m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
+			return res;
+		}
+	} Callback(L, FnRef);
+
+	// Call the enumeration:
+	bool res = (Ty1::Get()->*Func1)(Callback);
+
+	// Push the return value:
+	L.Push(res);
 	return 1;
 }
 
@@ -3814,10 +3870,11 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "BindCommand",           tolua_cPluginManager_BindCommand);
 			tolua_function(tolua_S, "BindConsoleCommand",    tolua_cPluginManager_BindConsoleCommand);
 			tolua_function(tolua_S, "CallPlugin",            tolua_cPluginManager_CallPlugin);
+			tolua_function(tolua_S, "DoWithPlugin",          tolua_StaticDoWith<cPluginManager, cPlugin, &cPluginManager::DoWithPlugin>);
 			tolua_function(tolua_S, "FindPlugins",           tolua_cPluginManager_FindPlugins);
 			tolua_function(tolua_S, "ForEachCommand",        tolua_cPluginManager_ForEachCommand);
 			tolua_function(tolua_S, "ForEachConsoleCommand", tolua_cPluginManager_ForEachConsoleCommand);
-			tolua_function(tolua_S, "ForEachPlugin",         tolua_ForEach<cPluginManager, cPlugin, &cPluginManager::ForEachPlugin>);
+			tolua_function(tolua_S, "ForEachPlugin",         tolua_StaticForEach<cPluginManager, cPlugin, &cPluginManager::ForEachPlugin>);
 			tolua_function(tolua_S, "GetAllPlugins",         tolua_cPluginManager_GetAllPlugins);
 			tolua_function(tolua_S, "GetCurrentPlugin",      tolua_cPluginManager_GetCurrentPlugin);
 			tolua_function(tolua_S, "GetPlugin",             tolua_cPluginManager_GetPlugin);
