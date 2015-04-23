@@ -37,34 +37,41 @@ extern "C"
 
 
 
-class cWorld;
-class cPlayer;
-class cEntity;
-class cProjectileEntity;
-class cMonster;
-class cItem;
-class cItems;
-class cClientHandle;
-class cPickup;
-class cChunkDesc;
-class cCraftingGrid;
-class cCraftingRecipe;
-struct TakeDamageInfo;
-class cWindow;
-class cPluginLua;
-struct HTTPRequest;
-class cWebAdmin;
-struct HTTPTemplateRequest;
-class cTNTEntity;
-class cHopperEntity;
 class cBlockEntity;
 class cBoundingBox;
-class cLuaTCPLink;
+class cChunkDesc;
+class cClientHandle;
+class cCraftingGrid;
+class cCraftingRecipe;
+class cEntity;
+class cHopperEntity;
+class cItem;
+class cItems;
 class cLuaServerHandle;
+class cLuaTCPLink;
 class cLuaUDPEndpoint;
+class cMonster;
+class cPickup;
+class cPlayer;
+class cPlugin;
+class cPluginLua;
+class cPluginManager;
+class cProjectileEntity;
+class cRoot;
+class cScoreboard;
+class cTNTEntity;
+class cWebAdmin;
+class cWindow;
+class cWorld;
+struct HTTPRequest;
+struct HTTPTemplateRequest;
+struct TakeDamageInfo;
 
-typedef cBoundingBox * pBoundingBox;
-typedef cWorld *       pWorld;
+typedef cBoundingBox *   pBoundingBox;
+typedef cPluginManager * pPluginManager;
+typedef cRoot *          pRoot;
+typedef cScoreboard *    pScoreboard;
+typedef cWorld *         pWorld;
 
 
 
@@ -217,6 +224,7 @@ public:
 	void Push(cMonster * a_Monster);
 	void Push(cPickup * a_Pickup);
 	void Push(cPlayer * a_Player);
+	void Push(cPlugin * a_Plugin);
 	void Push(cPluginLua * a_Plugin);
 	void Push(cProjectileEntity * a_ProjectileEntity);
 	void Push(cTNTEntity * a_TNTEntity);
@@ -231,30 +239,19 @@ public:
 	void Push(void * a_Ptr);
 	void Push(std::chrono::milliseconds a_time);
 	
-	/** Retrieve value at a_StackPos, if it is a valid bool. If not, a_Value is unchanged */
-	void GetStackValue(int a_StackPos, bool & a_Value);
-	
-	/** Retrieve value at a_StackPos, if it is a valid string. If not, a_Value is unchanged */
+	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
+	// Enum values are clamped to their allowed range.
 	void GetStackValue(int a_StackPos, AString & a_Value);
-	
-	/** Retrieve value at a_StackPos, if it is a valid number. If not, a_Value is unchanged */
-	void GetStackValue(int a_StackPos, int & a_Value);
-	
-	/** Retrieve value at a_StackPos, if it is a valid number. If not, a_Value is unchanged */
-	void GetStackValue(int a_StackPos, double & a_Value);
-	
-	/** Retrieve value at a_StackPos, if it is a valid number, converting and clamping it to eWeather.
-	If not, a_Value is unchanged. */
-	void GetStackValue(int a_StackPos, eWeather & a_Value);
-
-	/** Retrieve value at a_StackPos, if it is a valid cBoundingBox class. If not, a_Value is unchanged */
-	void GetStackValue(int a_StackPos, pBoundingBox & a_Value);
-	
-	/** Retrieve value at a_StackPos, if it is a valid cWorld class. If not, a_Value is unchanged */
-	void GetStackValue(int a_StackPos, pWorld & a_Value);
-
-	/** Store the value at a_StackPos as a reference. */
+	void GetStackValue(int a_StackPos, bool & a_Value);
 	void GetStackValue(int a_StackPos, cRef & a_Ref);
+	void GetStackValue(int a_StackPos, double & a_Value);
+	void GetStackValue(int a_StackPos, eWeather & a_Value);
+	void GetStackValue(int a_StackPos, int & a_Value);
+	void GetStackValue(int a_StackPos, pBoundingBox & a_Value);
+	void GetStackValue(int a_StackPos, pPluginManager & a_Value);
+	void GetStackValue(int a_StackPos, pRoot & a_Value);
+	void GetStackValue(int a_StackPos, pScoreboard & a_Value);
+	void GetStackValue(int a_StackPos, pWorld & a_Value);
 	
 	/** Call the specified Lua function.
 	Returns true if call succeeded, false if there was an error.
