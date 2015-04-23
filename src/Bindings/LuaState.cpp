@@ -1013,6 +1013,24 @@ void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, pMapManager & a_ReturnedVal)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cMapManager", false, &err))
+	{
+		a_ReturnedVal = *(reinterpret_cast<cMapManager **>(lua_touserdata(m_LuaState, a_StackPos)));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, pPluginManager & a_ReturnedVal)
 {
 	if (lua_isnil(m_LuaState, a_StackPos))
