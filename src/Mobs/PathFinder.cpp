@@ -83,9 +83,15 @@ bool cPathFinder::isSolid(const Vector3d & a_Location)
 	bool ret = si::checkTexture(a_Location.x, a_Location.y, a_Location.z, debug_solid);
 	printf("Cache #%d\n", ++CACHE_CNT);
 	return ret;
+
+
+
 #else
-	IMPLEMENT_ME_OR_ELSE_I_WONT_COMPILE
-		#endif
+	/* TODO implement MCServer version of isSolid here */
+	return true;
+	
+	
+#endif
 }
 
 
