@@ -21,6 +21,10 @@ class cPath
 public:
 	
 	/** Returns the first point in the path. */
+	cPath()
+	{
+		m_PointCount = 0;
+	}
 	inline Vector3d getFirstPoint()
 	{
 		m_CurrentPoint=m_PointCount - 1;
@@ -65,7 +69,6 @@ private:
 	{
 		m_Points.push_back(a_Vector);
 		++m_PointCount;
-		printf("%d %d %d --- %d\n",a_Vector.x, a_Vector.y, a_Vector.z,m_PointCount);
 	}
 	
 	

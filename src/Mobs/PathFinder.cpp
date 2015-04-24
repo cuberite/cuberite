@@ -11,11 +11,11 @@
 #include <exception>
 #include <cmath>
 
-
 #define DISTANCE_MANHATTEN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
 #define CALCULATIONS_PER_CALL 30  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
+
 
 
 
@@ -72,7 +72,7 @@ bool cPathFinder::IsSolid(const Vector3d & a_Location)
 
 
 
-
+// Incomplete
 bool cPathFinder::Item(cChunk * a_Chunk)
 {
 	printf("cPathFinder::item Mindelessly returning true\n");
@@ -85,7 +85,7 @@ bool cPathFinder::Item(cChunk * a_Chunk)
 
 
 
-
+// For testing only, will eventually be removed along with the changes made to server.cpp
 void cPathFinder::consoleCommand()
 {
 	printf("HELLO WORLD\n");
@@ -100,7 +100,6 @@ void cPathFinder::consoleCommand()
 cPathFinder::cPathFinder(double a_BoundingBoxWidth, double a_BoundingBoxHeight, int a_MaxUp, int a_MaxDown)
 {
 	m_PathFound = false;
-	m_Path = NULL;
 	m_Status = IDLE;
 }
 
@@ -117,15 +116,17 @@ cPathFinder::~cPathFinder()
 
 
 
-void cPathFinder::clearPath()
+void cPathFinder::clearPath(bool freePath)
 {
 	for (std::unordered_map<Vector3d, cPathCell *>::iterator it = m_Map.begin(); it != m_Map.end(); ++it)
 	{
 		delete (it->second);
 	}
 	
-	delete m_Path;
-	m_Path = NULL;
+	if (freePath)
+	{
+		delete m_Path;
+	}
 	m_Map.clear();
 	m_Status = IDLE;
 }
@@ -142,14 +143,12 @@ void cPathFinder::StartPathFinding(int a_MaxSteps, const Vector3d & a_StartingPo
 	}
 	if (GetCell(a_StartingPoint)->m_IsSolid || GetCell(a_EndingPoint)->m_IsSolid)
 	{
-		printf("StartPath NOT FOUND\n");
 		m_Status = PATH_NOT_FOUND;
 		return;
 	}
 	
 	m_Status = CALCULATING;
 	m_Path = new cPath();
-	m_Path->m_PointCount=0;
 	m_Source = a_StartingPoint;
 	m_Destination = a_EndingPoint;
 	m_StepsLeft = a_MaxSteps;
@@ -245,10 +244,11 @@ void cPathFinder::ProcessCell(const Vector3d & a_Location, cPathCell * a_Caller,
 
 bool cPathFinder::Step()
 {
+	ASSERT (m_Status != IDLE);
+		
 	// This merely calls Step_Internal several times
 	if (m_StepsLeft-- == 0)
 	{
-		printf("Step PATH NOT FOUND\n");
 		m_Status = PATH_NOT_FOUND;
 		return true;
 	}
@@ -280,7 +280,6 @@ bool cPathFinder::Step_Internal()
 	if (currentCell == NULL)  // If nothing is in the open list, return true.
 	{
 		clearPath();
-		printf("Path not found!\n");
 		m_Status = PATH_NOT_FOUND;
 		return true;
 	}
@@ -293,7 +292,6 @@ bool cPathFinder::Step_Internal()
 		
 		for (;;)
 		{
-			printf("BEEP\n");
 			m_Path->addPoint(currentCell->m_Location);  // Populate the cPath with points.
 			currentCell = currentCell->m_Parent;
 			if (currentCell == NULL)
@@ -331,35 +329,20 @@ bool cPathFinder::Step_Internal()
 
 
 
-cPath * cPathFinder::getPath()
+cPath * cPathFinder::GetPath()
 {
-	printf("GETING\n");
 	if (m_Status == PATH_NOT_FOUND)
 	{
-		printf("1\n");
 		clearPath();
 		return NULL;
 	}
-	if (m_Status == CALCULATING)
-	{
-		printf("2\n");
-		// TODO ASSERT INSTEAD
-		throw pathFindException("cPathFinder::getPath was called before calculation had finished\n");
-	}
-	if (m_Status == IDLE)
-	{
-		printf("3\n");
-		// TODO ASSERT INSTEAD
-		// TODO this might be changed, depending on what we decide regarding cPath.
-		throw pathFindException("cPathFinder::getPath was called before cPathFinder::StartPathFinding or twice after path calculation completed.\n");
-	}
-	printf("4\n");
-	// m_Status is PATH_FOUND
-	cPath * temp = m_Path;
-	m_Path = NULL;  // TODO this is unclean, I'm bypassing clearPath and duplicating code
-	m_Map.clear();
-	m_Status = IDLE;
-	return temp;
+
+	ASSERT(m_Status != CALCULATING);  // getPath was called before calculation had finished.
+	ASSERT(m_Status != IDLE);  // getPath was called before StartPathFinding or twice after path calculation completed.
+
+	// if m_Status is PATH_FOUND...
+	clearPath(false);  // Clear everything except m_Path because we want to return it.
+	return m_Path;
 }
 
 
@@ -379,12 +362,13 @@ void cPathFinder::OpenListAdd(cPathCell * a_Cell)
 
 
 
-cPathCell * cPathFinder::OpenListPop()
+cPathCell * cPathFinder::OpenListPop()  // Popping from the open list also means adding to the closed list.
 {
 	if (m_OpenList.size() == 0)
 	{
-		return NULL;
+		return NULL;  //We've exhausted the search space and nothing was found, this will trigger a PATH_NOT_FOUND status.
 	}
+	
 	cPathCell * ret = m_OpenList.top();
 	m_OpenList.pop();
 	ClosedListAdd(ret);
@@ -402,34 +386,3 @@ void cPathFinder::ClosedListAdd(cPathCell * point)
 {
 	point->m_Status = CLOSEDLIST;
 }
-
-
-
-
-
-#ifdef __PATHFIND_DEBUG__
-Vector3d::Vector3d(int _x, int _y, int _z)
-{
-	x = _x;
-	y = _y;
-	z = _z;
-}
-
-
-
-
-
-Vector3d Vector3d::operator + (const Vector3d & v2) const
-{
-	return Vector3d(this->x+v2.x, this->y+v2.y, this->z+v2.z);
-}
-
-
-
-
-
-bool Vector3d::operator == (const Vector3d & v2) const
-{
-	return ((this->x == v2.x) && (this->y == v2.y) && (this->z == v2.z));
-}
-#endif

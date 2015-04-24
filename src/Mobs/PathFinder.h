@@ -42,6 +42,8 @@ public:
 
 
 
+// TODO clarify (And possibly modify) what is legal and what is not when it comes to calling 
+// Step, GetPath,StartPathFinding in different combinations, etc.
 
 
 class cPathFinder
@@ -88,7 +90,7 @@ public:
 	/** Returns the calculated path. one must call this only after isCalculationFinished returns true.
 	Returns null if no path was found or if a_MaxSearch caused the algorithm to give up.
 	Note that the user is responsible for deleting the path or storing it for later.*/
-	cPath * getPath();
+	cPath * GetPath();
 	
 	/* The interface ends here */
 	
@@ -108,6 +110,7 @@ public:
 	
 	
 	
+	
 private:
 	
 	#ifdef __PATHFIND_DEBUG__
@@ -118,11 +121,9 @@ private:
 	#endif
 	
 	/* Misc */
-	// Query our hosting world and ask it if there's a solid at a_location.
-	static bool IsSolid(const Vector3d & a_Location);
-	// The public version just calls this version * CALCULATIONS_PER_CALL times.
-	bool Step_Internal();
-	void clearPath();
+	static bool IsSolid(const Vector3d & a_Location);  // Query our hosting world and ask it if there's a solid at a_location.
+	bool Step_Internal();  // The public version just calls this version * CALCULATIONS_PER_CALL times.
+	void clearPath(bool freePath=true);  //Clears the path and also frees it from memory when called with true.
 	
 	
 	/* Openlist and closedlist management */
@@ -145,7 +146,6 @@ private:
 	Vector3d m_Destination;
 	Vector3d m_Source;
 	int m_StepsLeft;
-	
 	
 	/* Control fields */
 	bool m_PathFound;
