@@ -65,6 +65,7 @@ private:
 	{
 		m_Points.push_back(a_Vector);
 		++m_PointCount;
+		printf("%d %d %d --- %d\n",a_Vector.x, a_Vector.y, a_Vector.z,m_PointCount);
 	}
 	
 	

@@ -18,31 +18,6 @@
 // The only version which guarantees the shortest path is 0, 0.
 
 
-#ifdef __PATHFIND_DEBUG__
-txt cPathFinder::debug_solid;
-txt cPathFinder::debug_open;
-txt cPathFinder::debug_closed;
-txt cPathFinder::debug_unchecked;
-void cPathFinder::debug_SetSolidBlock(txt texture)
-{
-	debug_solid = texture;
-}
-void cPathFinder::debug_SetUncheckedBlock(txt texture)
-{
-	debug_unchecked = texture;
-}
-void cPathFinder::debug_SetClosedBlock(txt texture)
-{
-	debug_closed = texture;
-}
-void cPathFinder::debug_SetOpenBlock(txt texture)
-{
-	debug_open = texture;
-}
-#endif
-
-
-
 
 
 /* Mini structs */
@@ -60,7 +35,7 @@ struct pathFindException : public std::exception
 
 
 
-// Each cell corresponds to
+
 struct cPathCell
 {
 	Vector3d m_Location;   // Location of the cell in the world
@@ -84,21 +59,8 @@ bool compareHeuristics::operator()(cPathCell * & a_v1, cPathCell * & a_v2)
 
 
 /* cPath implementation */
-#ifdef __PATHFIND_DEBUG__
-int CACHE_CNT = 0;
-bool cPathFinder::isSolid(const Vector3d & a_Location)  // external debugger only. This has nothing to do with MCServer!
-{
-	bool ret = si::checkTexture(a_Location.x, a_Location.y, a_Location.z, debug_solid);
-	printf("Cache #%d\n", ++CACHE_CNT);
-	return ret;
-}
-
-
-
-
-
-#else
-bool cPathFinder::IsSolid(const Vector3d & a_Location)  // MCServer version of isSolid
+#ifndef __PATHFIND_DEBUG__
+bool cPathFinder::IsSolid(const Vector3d & a_Location)
 {
 	return true;
 	/* TODO complete this */
@@ -180,12 +142,14 @@ void cPathFinder::StartPathFinding(int a_MaxSteps, const Vector3d & a_StartingPo
 	}
 	if (GetCell(a_StartingPoint)->m_IsSolid || GetCell(a_EndingPoint)->m_IsSolid)
 	{
+		printf("StartPath NOT FOUND\n");
 		m_Status = PATH_NOT_FOUND;
 		return;
 	}
 	
 	m_Status = CALCULATING;
 	m_Path = new cPath();
+	m_Path->m_PointCount=0;
 	m_Source = a_StartingPoint;
 	m_Destination = a_EndingPoint;
 	m_StepsLeft = a_MaxSteps;
@@ -284,6 +248,7 @@ bool cPathFinder::Step()
 	// This merely calls Step_Internal several times
 	if (m_StepsLeft-- == 0)
 	{
+		printf("Step PATH NOT FOUND\n");
 		m_Status = PATH_NOT_FOUND;
 		return true;
 	}
@@ -315,6 +280,7 @@ bool cPathFinder::Step_Internal()
 	if (currentCell == NULL)  // If nothing is in the open list, return true.
 	{
 		clearPath();
+		printf("Path not found!\n");
 		m_Status = PATH_NOT_FOUND;
 		return true;
 	}
@@ -322,10 +288,12 @@ bool cPathFinder::Step_Internal()
 	// Calculation finished!
 	if (currentCell->m_Location == m_Destination)
 	{
+		
 		m_Status = PATH_FOUND;
 		
 		for (;;)
 		{
+			printf("BEEP\n");
 			m_Path->addPoint(currentCell->m_Location);  // Populate the cPath with points.
 			currentCell = currentCell->m_Parent;
 			if (currentCell == NULL)
@@ -365,26 +333,32 @@ bool cPathFinder::Step_Internal()
 
 cPath * cPathFinder::getPath()
 {
+	printf("GETING\n");
 	if (m_Status == PATH_NOT_FOUND)
 	{
+		printf("1\n");
 		clearPath();
 		return NULL;
 	}
 	if (m_Status == CALCULATING)
 	{
+		printf("2\n");
 		// TODO ASSERT INSTEAD
 		throw pathFindException("cPathFinder::getPath was called before calculation had finished\n");
 	}
 	if (m_Status == IDLE)
 	{
+		printf("3\n");
 		// TODO ASSERT INSTEAD
 		// TODO this might be changed, depending on what we decide regarding cPath.
 		throw pathFindException("cPathFinder::getPath was called before cPathFinder::StartPathFinding or twice after path calculation completed.\n");
 	}
-	
+	printf("4\n");
 	// m_Status is PATH_FOUND
 	cPath * temp = m_Path;
-	clearPath();
+	m_Path = NULL;  // TODO this is unclean, I'm bypassing clearPath and duplicating code
+	m_Map.clear();
+	m_Status = IDLE;
 	return temp;
 }
 

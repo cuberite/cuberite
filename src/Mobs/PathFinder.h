@@ -1,4 +1,7 @@
 #pragma once
+#ifdef __PATHFIND_DEBUG__
+#include "PathFinderIrrlicht_Head.h"
+#endif
 #include <vector>
 #include <queue>
 #include <unordered_map>
@@ -8,9 +11,9 @@ using namespace std;
 /* Note: the __PATHFIND_DEBUG__ is used by Native to debug this class outside of MCServer.
 This preprocessor flag is never set when compiling MCServer. */
 
-
 /* MCServer forward declarations */
 #ifndef __PATHFIND_DEBUG__
+
 // fwd: Vector3.h
 template <typename T> class Vector3;
 typedef Vector3<double> Vector3d;
@@ -18,40 +21,6 @@ typedef Vector3<double> Vector3d;
 // fwd: cChunkMap.h
 typedef cItemCallback<cChunk> cChunkCallback;
 
-
-
-
-/* Debug headers, not used in MCServer */
-#else
-#include "si.h"
-struct Vector3d
-{
-	Vector3d() {}
-	Vector3d operator+ (const Vector3d & v2) const;
-	bool operator== (const Vector3d & v2) const;
-	Vector3d(int _x,  int _y,  int _z);
-	int x,  y,  z;
-};
-namespace std
-{
-template <>
-struct hash<Vector3d>
-{
-	std::size_t operator()(const Vector3d & v2) const
-	{
-		// Guaranteed to have no hash collisions for any 128x128x128 area
-		// Suitable for pathfinding
-		size_t t=0;
-		t+=(char)v2.x;
-		t=t << 8;
-		t+=(char)v2.y;
-		t=t << 8;
-		t+=(char)v2.z;
-		t=t << 8;
-		return t;
-	}
-};
-}
 #endif
 
 
@@ -130,23 +99,23 @@ public:
 	
 	
 	
-#ifdef __PATHFIND_DEBUG__
+	#ifdef __PATHFIND_DEBUG__
 	static void debug_SetSolidBlock(txt texture);
 	static void debug_SetOpenBlock(txt texture);
 	static void debug_SetClosedBlock(txt texture);
 	static void debug_SetUncheckedBlock(txt texture);
-#endif
+	#endif
 	
 	
 	
 private:
 	
-#ifdef __PATHFIND_DEBUG__
+	#ifdef __PATHFIND_DEBUG__
 	static txt debug_solid;
 	static txt debug_open;
 	static txt debug_closed;
 	static txt debug_unchecked;
-#endif
+	#endif
 	
 	/* Misc */
 	// Query our hosting world and ask it if there's a solid at a_location.
@@ -183,10 +152,10 @@ private:
 	ePathFinderStatus m_Status;
 
 	/* Interfacing with MCServer's world */
-#ifndef __PATHFIND_DEBUG__
+	#ifndef __PATHFIND_DEBUG__
 protected:
 	virtual bool Item(cChunk * a_Chunk) override;
-#endif
+	#endif
 	
 	friend class cPathCell;
 };
