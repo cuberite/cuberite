@@ -3,11 +3,19 @@
 // Note that this class is rather trivial and therefore it was inlined for performance.
 // Note that this class has no .cpp file.
 
+
 class cPath;
 #include <vector>
 using namespace std;
 #include "PathFinder.h"
 
+/** Typical usage:
+cPath * myPath = ...;
+Vector3d myPoint;
+for(myPoint=myPath->getfirstPoint(); !myPath->isLastPoint(); myPoint=myPath->getNextPoint())
+{
+	Do something with myPoint here.
+} */
 class cPath
 {
 public:
@@ -28,7 +36,7 @@ public:
 	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
 	inline bool isLastPoint()
 	{
-		return m_CurrentPoint==0;
+		return m_CurrentPoint == 0;
 	}
 	
 	/** Get the point at a_index. Remark: Internally, the indexes are reversed. */

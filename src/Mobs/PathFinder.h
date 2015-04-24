@@ -10,6 +10,9 @@ This preprocessor flag is never set when compiling MCServer. */
 template <typename T> class Vector3;
 typedef Vector3<double> Vector3d;
 
+// fwd: cChunkMap.h
+typedef cItemCallback<cChunk> cChunkCallback;
+
 
 
 
@@ -83,12 +86,16 @@ public:
 
 
 class cPathFinder
+#ifndef __PATHFIND_DEBUG__
+: public cChunkCallback
+#endif
 {
 	
 	/* The interface starts here */
 	
 public:
 	
+	static void consoleCommand();  // Temporary, used for debugging, called when one writes "pathfind" in the console.
 	/** Creates a pathfinder instance. A Mob will probably need a single pathfinder instance for its entire life.
 	
 	Note that if you have a man-sized mob (1x1x2, zombies, etc), you are advised to call this function without parameters
@@ -153,7 +160,7 @@ private:
 	
 	/* Misc */
 	// Query our hosting world and ask it if there's a solid at a_location.
-	static bool isSolid(const Vector3d & a_location);
+	static bool isSolid(const Vector3d & a_Location);
 	// The public version just calls this version * CALCULATIONS_PER_CALL times.
 	bool isCalculationFinished_internal();
 	void clearPath();
@@ -183,7 +190,12 @@ private:
 	/* Control fields */
 	bool m_PathFound;
 	ePathFinderStatus m_Status;
-	
+
+	/* Interfacing with MCServer's world */
+#ifndef __PATHFIND_DEBUG__
+protected:
+	virtual bool Item(cChunk * a_Chunk) override;
+#endif
 	
 	friend class cPathCell;
 };

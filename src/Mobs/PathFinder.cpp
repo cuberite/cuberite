@@ -38,6 +38,12 @@ void cPathFinder::debug_SetOpenBlock(txt texture)
 {
 	debug_open = texture;
 }
+#else
+void cPathFinder::consoleCommand()
+{
+	printf("HELLO WORLD\n");
+}
+
 #endif
 
 
@@ -82,26 +88,34 @@ bool compareHeuristics::operator()(cPathCell * & a_v1, cPathCell * & a_v2)
 /* cPath implementation */
 #ifdef __PATHFIND_DEBUG__
 int CACHE_CNT = 0;
-#endif
-bool cPathFinder::isSolid(const Vector3d & a_Location)
+bool cPathFinder::isSolid(const Vector3d & a_Location) // external debugger only. This has nothing to do with MCServer!
 {
-#ifdef __PATHFIND_DEBUG__
 	bool ret = si::checkTexture(a_Location.x, a_Location.y, a_Location.z, debug_solid);
 	printf("Cache #%d\n", ++CACHE_CNT);
 	return ret;
-
-
-
-#else
-	/* TODO implement MCServer version of isSolid here */
-	return true;
-	
-	
-#endif
 }
 
 
+#else
+bool cPathFinder::isSolid(const Vector3d & a_Location) // MCServer version of isSolid
+{
+	return true;
+	/* TODO complete this */
+	//int ChunkX, ChunkZ;
+	//cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
+	//return m_World->DoWithChunk(ChunkX, ChunkZ, *this);
+}
 
+bool cPathFinder::Item(cChunk * a_Chunk)
+{
+	printf("Mindlessly returning a solid :P\n");
+	// TODO intelligently return the right state here.
+	// TODO I probably need to store a_Location.x and a_Location.y as fields, is that correct?
+	// TODO Maybe I should later queue several blocks and call this at once for all of them for better performance?
+	return true;
+}
+
+#endif
 
 
 cPathFinder::cPathFinder(double a_BoundingBoxWidth, double a_BoundingBoxHeight, int a_MaxUp, int a_MaxDown)
