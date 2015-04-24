@@ -21,6 +21,8 @@
 #include "IniFile.h"
 #include "Vector3.h"
 
+#include "Mobs/PathFinder.h"  // Debug for PathFinder.cpp, temporary.
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -429,7 +431,7 @@ bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 
 
 
-#include "Mobs/PathFinder.h"
+
 void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
 	AStringVector split = StringSplit(a_Cmd, " ");
@@ -438,7 +440,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 	
-	if (split[0] == "pathfind") //Debug command for Pathfinder.cpp, temporary. 
+	if (split[0] == "pathfind")  // Debug command for Pathfinder.cpp, temporary.
 	{
 		cPathFinder::consoleCommand();
 		return;
@@ -447,10 +449,6 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
 	
 	// "help" and "reload" are to be handled by MCS, so that they work no matter what
-	if (split[0] == "pathfind") //Debug command for Pathfinder.cpp, temporary. 
-	{
-		
-	}
 	if (split[0] == "help")
 	{
 		PrintHelp(split, a_Output);

@@ -1,4 +1,9 @@
 #pragma once
+#include <vector>
+#include <queue>
+#include <unordered_map>
+#include "Path.h"
+using namespace std;
 
 /* Note: the __PATHFIND_DEBUG__ is used by Native to debug this class outside of MCServer.
 This preprocessor flag is never set when compiling MCServer. */
@@ -16,7 +21,7 @@ typedef cItemCallback<cChunk> cChunkCallback;
 
 
 
-/* debug headers, not used in MCServer */
+/* Debug headers, not used in MCServer */
 #else
 #include "si.h"
 struct Vector3d
@@ -53,22 +58,7 @@ struct hash<Vector3d>
 
 
 
-/* STL headers */
-#include <vector>
-#include <queue>
-#include <unordered_map>
-using namespace std;
-
-
-
-
-
-
-
-
-
 /* Various minor structs and classes */
-#include "Path.h"
 enum ePathFinderStatus {IDLE,  CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND};
 enum eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
 struct cPathCell;
@@ -115,20 +105,20 @@ public:
 	~cPathFinder();
 	
 	/** Attempts to find a path starting from source to destination.
-	After calling this, you are expected to call isCalculationFinished once per tick or once per several ticks until it returns true. You should then call getPath().
+	After calling this, you are expected to call Step() once per tick or once per several ticks until it returns true. You should then call getPath() to obtain the path.
+	Calling this before a path is found resets the current path and starts another search.
 	@param a_StartingPoint The function expects this position to be the lowest block the mob is in, a rule of thumb: "The block where the Zombie's knees are at".
 	@param a_EndingPoint "The block where the Zombie's knees want to be".
-	@param a_MaxSearch The maximum nodes to scan, note that this isn't the same as the maximum distance. */
-	void findPath(int a_MaxSearch,  const Vector3d & a_StartingPoint,  const Vector3d & a_EndingPoint);
+	@param a_MaxSteps The maximum steps before giving up. */
+	void StartPathFinding(int a_MaxSteps,  const Vector3d & a_StartingPoint,  const Vector3d & a_EndingPoint);
 	
 	/** Performs part of the path calculation and returns true if the path computation has finished.
-	One must call findPath first, one usually calls getPath right after this function returns true.*/
-	bool isCalculationFinished();
+	One must call StartPathFinding first, one usually calls getPath right after this function returns true.*/
+	bool Step();
 	
 	/** Returns the calculated path. one must call this only after isCalculationFinished returns true.
 	Returns null if no path was found or if a_MaxSearch caused the algorithm to give up.
-	Note that the user is responsible for deleting the path or storing it for later.
-	It is safe to call findPath again after this. */
+	Note that the user is responsible for deleting the path or storing it for later.*/
 	cPath * getPath();
 	
 	/* The interface ends here */
@@ -160,23 +150,23 @@ private:
 	
 	/* Misc */
 	// Query our hosting world and ask it if there's a solid at a_location.
-	static bool isSolid(const Vector3d & a_Location);
+	static bool IsSolid(const Vector3d & a_Location);
 	// The public version just calls this version * CALCULATIONS_PER_CALL times.
-	bool isCalculationFinished_internal();
+	bool Step_Internal();
 	void clearPath();
 	
 	
 	/* Openlist and closedlist management */
-	void openListAdd(cPathCell * a_Cell);
-	cPathCell * openListPop();
-	void closedListAdd(cPathCell * a_Point);
-	bool isInOpenList(cPathCell * a_Point);
-	bool isInClosedList(cPathCell * a_Point);
+	void OpenListAdd(cPathCell * a_Cell);
+	cPathCell * OpenListPop();
+	void ClosedListAdd(cPathCell * a_Point);
+	bool IsInOpenList(cPathCell * a_Point);
+	bool IsInClosedList(cPathCell * a_Point);
 	
 	
 	/* Map management */
-	void processCell(const Vector3d & a_Location,  cPathCell * a_Caller,  int a_GDelta);
-	cPathCell* getCell(const Vector3d & a_location);
+	void ProcessCell(const Vector3d & a_Location,  cPathCell * a_Caller,  int a_GDelta);
+	cPathCell* GetCell(const Vector3d & a_location);
 	
 	
 	/* Pathfinding fields */
@@ -185,6 +175,7 @@ private:
 	unordered_map<Vector3d,  cPathCell *> m_Map;
 	Vector3d m_Destination;
 	Vector3d m_Source;
+	int m_StepsLeft;
 	
 	
 	/* Control fields */
