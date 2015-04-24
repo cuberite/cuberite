@@ -607,7 +607,7 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			size_t Rating = RateCompareString (m_PlayerName, a_pPlayer->GetName());
 			if ((Rating > 0) && (Rating >= m_BestRating))
 			{
-				m_BestMatch = a_pPlayer;
+				m_BestMatch = a_pPlayer->GetName();
 				if (Rating > m_BestRating)
 				{
 					m_NumMatches = 0;
@@ -627,18 +627,18 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			m_BestRating(0),
 			m_NameLength(a_PlayerName.length()),
 			m_PlayerName(a_PlayerName),
-			m_BestMatch(nullptr),
+			m_BestMatch(),
 			m_NumMatches(0)
 		{}
 
-		cPlayer * m_BestMatch;
+		AString m_BestMatch;
 		unsigned  m_NumMatches;
 	} Callback (a_PlayerName);
 	ForEachPlayer(Callback);
 
 	if (Callback.m_NumMatches == 1)
 	{
-		return a_Callback.Item(Callback.m_BestMatch);
+		return DoWithPlayer(Callback.m_BestMatch, a_Callback);
 	}
 	return false;
 }
