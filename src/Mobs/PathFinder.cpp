@@ -1,5 +1,7 @@
 #ifndef __PATHFIND_DEBUG__
+/* MCServer headers */
 #include "Globals.h"
+#include "../World.h"
 #endif
 
 #include "PathFinder.h"

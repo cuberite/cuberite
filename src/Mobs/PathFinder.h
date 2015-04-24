@@ -3,23 +3,17 @@
 /* Note: the __PATHFIND_DEBUG__ is used by Native to debug this class outside of MCServer.
 This preprocessor flag is never set when compiling MCServer. */
 
-/* Forward declarations */
-struct cPathCell;
-class cPathFinder;
-class compareHeuristics;
 
-
-
-
-
-/* MCServer headers */
+/* MCServer forward declarations */
 #ifndef __PATHFIND_DEBUG__
-#include "../World.h"
+// fwd: Vector3.h
+template <typename T> class Vector3;
+typedef Vector3<double> Vector3d;
 
 
 
 
-/* Debug headers */
+/* debug headers, not used in MCServer */
 #else
 #include "si.h"
 struct Vector3d
@@ -158,9 +152,9 @@ private:
 #endif
 	
 	/* Misc */
-	// Query our hosting world and ask it if there's a solid at a_dpos.
+	// Query our hosting world and ask it if there's a solid at a_location.
 	static bool isSolid(const Vector3d & a_location);
-	// The public version just calls this version multiple CALCULATIONS_PER_CALL times.
+	// The public version just calls this version * CALCULATIONS_PER_CALL times.
 	bool isCalculationFinished_internal();
 	void clearPath();
 	
