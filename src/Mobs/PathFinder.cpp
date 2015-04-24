@@ -17,6 +17,7 @@
 #define CALCULATIONS_PER_CALL 30  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
+
 #ifdef __PATHFIND_DEBUG__
 txt cPathFinder::debug_solid;
 txt cPathFinder::debug_open;
