@@ -63,6 +63,11 @@ void cPluginLua::Close(void)
 		return;
 	}
 
+	// Remove the command bindings and web tabs:
+	ClearCommands();
+	ClearConsoleCommands();
+	ClearTabs();
+
 	// Notify and remove all m_Resettables (unlock the m_CriticalSection while resetting them):
 	cResettablePtrs resettables;
 	std::swap(m_Resettables, resettables);
