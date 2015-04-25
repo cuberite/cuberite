@@ -71,6 +71,10 @@ public:
 	If the player has no rank assigned to them, returns the default rank's permissions. */
 	AStringVector GetPlayerPermissions(const AString & a_PlayerUUID);
 	
+	/** Returns the restrictions that the specified player has assigned to them.
+	If the player has no rank assigned to them, returns the default rank's restrictions. */
+	AStringVector GetPlayerRestrictions(const AString & a_PlayerUUID);
+	
 	/** Returns the names of groups that the specified rank has assigned to it.
 	Returns an empty vector if the rank doesn't exist. */
 	AStringVector GetRankGroups(const AString & a_RankName);
@@ -79,9 +83,17 @@ public:
 	Returns an empty vector if the group doesn't exist. */
 	AStringVector GetGroupPermissions(const AString & a_GroupName);
 	
+	/** Returns the restrictions that the specified group has assigned to it.
+	Returns an empty vector if the group doesn't exist. */
+	AStringVector GetGroupRestrictions(const AString & a_GroupName);
+	
 	/** Returns all permissions that the specified rank has assigned to it, through all its groups.
 	Returns an empty vector if the rank doesn't exist. Any non-existent groups are ignored. */
 	AStringVector GetRankPermissions(const AString & a_RankName);
+	
+	/** Returns all restrictions that the specified rank has assigned to it, through all its groups.
+	Returns an empty vector if the rank doesn't exist. Any non-existent groups are ignored. */
+	AStringVector GetRankRestrictions(const AString & a_RankName);
 	
 	/** Returns the short uuids of all defined players. The returned players are ordered by their name (NOT their UUIDs). */
 	AStringVector GetAllPlayerUUIDs(void);
@@ -95,6 +107,12 @@ public:
 	/** Returns all the distinct permissions that are stored in the DB. */
 	AStringVector GetAllPermissions(void);
 	
+	/** Returns all the distinct restrictions that are stored in the DB. */
+	AStringVector GetAllRestrictions(void);
+	
+	/** Returns all the distinct permissions and restrictions that are stored in the DB. */
+	AStringVector GetAllPermissionsRestrictions(void);
+
 	/** Returns the message visuals (prefix, postfix, color) for the specified player.
 	Returns true if the visuals were read from the DB, false if not (player not found etc). */
 	bool GetPlayerMsgVisuals(
@@ -128,17 +146,27 @@ public:
 	Returns true if successful, false on error. */
 	bool AddPermissionToGroup(const AString & a_Permission, const AString & a_GroupName);
 	
+	/** Adds the specified restriction to the specified group.
+	Fails if the group name is not found.
+	Returns true if successful, false on error. */
+	bool AddRestrictionToGroup(const AString & a_Restriction, const AString & a_GroupName);
+	
 	/** Adds the specified permissions to the specified permission group.
 	Fails if the permission group name is not found.
 	Returns true if successful, false on error. */
 	bool AddPermissionsToGroup(const AStringVector & a_Permissions, const AString & a_GroupName);
+	
+	/** Adds the specified restrictions to the specified group.
+	Fails if the group name is not found.
+	Returns true if successful, false on error. */
+	bool AddRestrictionsToGroup(const AStringVector & a_Restrictions, const AString & a_GroupName);
 	
 	/** Removes the specified rank.
 	All players assigned to that rank will be re-assigned to a_ReplacementRankName.
 	If a_ReplacementRankName is empty or not a valid rank, the player will be removed from the DB,
 	which means they will receive the default rank the next time they are queried.
 	If the rank being removed is the default rank, the default will be changed to the replacement
-	rank; the operation fails if there's no replacement. */
+	rank; the operation fails silently if there's no replacement. */
 	void RemoveRank(const AString & a_RankName, const AString & a_ReplacementRankName);
 	
 	/** Removes the specified group completely.
@@ -151,6 +179,9 @@ public:
 	
 	/** Removes the specified permission from the specified group. */
 	void RemovePermissionFromGroup(const AString & a_Permission, const AString & a_GroupName);
+	
+	/** Removes the specified restriction from the specified group. */
+	void RemoveRestrictionFromGroup(const AString & a_Restriction, const AString & a_GroupName);
 	
 	/** Renames the specified rank. No action if the rank name is not found.
 	Fails if the new name is already used.
@@ -208,6 +239,9 @@ public:
 	/** Returns true iff the specified group contains the specified permission. */
 	bool IsPermissionInGroup(const AString & a_Permission, const AString & a_GroupName);
 	
+	/** Returns true iff the specified group contains the specified restriction. */
+	bool IsRestrictionInGroup(const AString & a_Restriction, const AString & a_GroupName);
+	
 	/** Called by cMojangAPI whenever the playername-uuid pairing is discovered. Updates the DB. */
 	void NotifyNameUUID(const AString & a_PlayerName, const AString & a_UUID);
 
@@ -253,6 +287,13 @@ protected:
 
 	/** Creates a default set of ranks / groups / permissions. */
 	void CreateDefaults(void);
+
+	/** Returns true if the specified column exists in the specified table. */
+	bool DoesColumnExist(const char * a_TableName, const char * a_ColumnName);
+
+	/** If the specified table doesn't contain the specified column, it is added to the table.
+	The column type is used only when creating the column, it is not used when checking for existence. */
+	void CreateColumnIfNotExists(const char * a_TableName, const char * a_ColumnName, const char * a_ColumnType = "");
 } ;
 
 
