@@ -2125,6 +2125,37 @@ static int tolua_cPlayer_GetPermissions(lua_State * tolua_S)
 
 
 
+static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
+{
+	// Function signature: cPlayer:GetRestrictions() -> {restrictions-array}
+
+	// Check the params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cPlayer") ||
+		!L.CheckParamEnd     (2)
+	)
+	{
+		return 0;
+	}
+
+	// Get the params:
+	cPlayer * self = (cPlayer *)tolua_tousertype(tolua_S, 1, nullptr);
+	if (self == nullptr)
+	{
+		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, self);
+		return 0;
+	}
+	
+	// Push the permissions:
+	L.Push(self->GetRestrictions());
+	return 1;
+}
+
+
+
+
+
 static int tolua_cPlayer_OpenWindow(lua_State * tolua_S)
 {
 	// Function signature: cPlayer:OpenWindow(Window)
@@ -3756,6 +3787,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cPlayer");
 			tolua_function(tolua_S, "GetPermissions",    tolua_cPlayer_GetPermissions);
+			tolua_function(tolua_S, "GetRestrictions",   tolua_cPlayer_GetRestrictions);
 			tolua_function(tolua_S, "OpenWindow",        tolua_cPlayer_OpenWindow);
 			tolua_function(tolua_S, "PermissionMatches", tolua_cPlayer_PermissionMatches);
 		tolua_endmodule(tolua_S);

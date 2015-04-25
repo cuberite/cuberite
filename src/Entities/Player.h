@@ -254,7 +254,10 @@ public:
 	static bool PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template);  // Exported in ManualBindings with AString params
 
 	/** Returns all the permissions that the player has assigned to them. */
-	const AStringVector & GetPermissions(void) { return m_Permissions; }  // Exported in ManualBindings.cpp
+	const AStringVector & GetPermissions(void) const { return m_Permissions; }  // Exported in ManualBindings.cpp
+
+	/** Returns all the restrictions that the player has assigned to them. */
+	const AStringVector & GetRestrictions(void) const { return m_Restrictions; }  // Exported in ManualBindings.cpp
 
 	// tolua_begin
 	
@@ -500,9 +503,17 @@ protected:
 	/** All the permissions that this player has, based on their rank. */
 	AStringVector m_Permissions;
 
+	/** All the restrictions that this player has, based on their rank. */
+	AStringVector m_Restrictions;
+
 	/** All the permissions that this player has, based on their rank, split into individual dot-delimited parts.
 	This is used mainly by the HasPermission() function to optimize the lookup. */
 	AStringVectorVector m_SplitPermissions;
+
+	/** All the restrictions that this player has, based on their rank, split into individual dot-delimited parts.
+	This is used mainly by the HasPermission() function to optimize the lookup. */
+	AStringVectorVector m_SplitRestrictions;
+
 
 	// Message visuals:
 	AString m_MsgPrefix, m_MsgSuffix;

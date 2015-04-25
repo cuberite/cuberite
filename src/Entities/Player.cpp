@@ -1414,14 +1414,23 @@ bool cPlayer::HasPermission(const AString & a_Permission)
 	
 	AStringVector Split = StringSplit(a_Permission, ".");
 
-	// Iterate over all granted permissions; if any matches, then return success:
-	for (AStringVectorVector::const_iterator itr = m_SplitPermissions.begin(), end = m_SplitPermissions.end(); itr != end; ++itr)
+	// Iterate over all restrictions; if any matches, then return failure:
+	for (auto & Restriction: m_SplitRestrictions)
 	{
-		if (PermissionMatches(Split, *itr))
+		if (PermissionMatches(Split, Restriction))
+		{
+			return false;
+		}
+	}  // for Restriction - m_SplitRestrictions[]
+
+	// Iterate over all granted permissions; if any matches, then return success:
+	for (auto & Permission: m_SplitPermissions)
+	{
+		if (PermissionMatches(Split, Permission))
 		{
 			return true;
 		}
-	}  // for itr - m_SplitPermissions[]
+	}  // for Permission - m_SplitPermissions[]
 
 	// No granted permission matches
 	return false;
@@ -2169,15 +2178,24 @@ void cPlayer::LoadRank(void)
 		RankMgr->UpdatePlayerName(m_UUID, m_PlayerName);
 	}
 	m_Permissions = RankMgr->GetPlayerPermissions(m_UUID);
+	m_Restrictions = RankMgr->GetPlayerRestrictions(m_UUID);
 	RankMgr->GetRankVisuals(m_Rank, m_MsgPrefix, m_MsgSuffix, m_MsgNameColorCode);
 
 	// Break up the individual permissions on each dot, into m_SplitPermissions:
 	m_SplitPermissions.clear();
 	m_SplitPermissions.reserve(m_Permissions.size());
-	for (AStringVector::const_iterator itr = m_Permissions.begin(), end = m_Permissions.end(); itr != end; ++itr)
+	for (auto & Permission: m_Permissions)
 	{
-		m_SplitPermissions.push_back(StringSplit(*itr, "."));
-	}  // for itr - m_Permissions[]
+		m_SplitPermissions.push_back(StringSplit(Permission, "."));
+	}  // for Permission - m_Permissions[]
+
+	// Break up the individual restrictions on each dot, into m_SplitRestrictions:
+	m_SplitRestrictions.clear();
+	m_SplitRestrictions.reserve(m_Restrictions.size());
+	for (auto & Restriction: m_Restrictions)
+	{
+		m_SplitRestrictions.push_back(StringSplit(Restriction, "."));
+	}  // for itr - m_Restrictions[]
 }
 
 
