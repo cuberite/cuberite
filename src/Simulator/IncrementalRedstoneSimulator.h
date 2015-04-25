@@ -3,6 +3,7 @@
 
 #include "RedstoneSimulator.h"
 #include "BlockEntities/RedstonePoweredEntity.h"
+#include <bitset>
 
 class cWorld;
 class cChunk;
@@ -37,15 +38,14 @@ public:
 	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override { return IsRedstone(a_BlockType); }
 	virtual void WakeUp(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
 
-	enum eRedstoneDirection
+	enum eRedstoneWireDirectionBitfieldPositions
 	{
-		REDSTONE_NONE = 0,
-		REDSTONE_X_POS = 0x1,
-		REDSTONE_X_NEG = 0x2,
-		REDSTONE_Z_POS = 0x4,
-		REDSTONE_Z_NEG = 0x8,
+		eWbpXP = 0,
+		eWbpXN = 1,
+		eWbpZP = 2,
+		eWbpZN = 3,
 	};
-	eRedstoneDirection GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ);
+	std::bitset<4> GetWireDirection(int a_BlockX, int a_BlockY, int a_BlockZ);
 
 private:
 
@@ -108,8 +108,9 @@ private:
 	SimulatedPlayerToggleableList * m_SimulatedPlayerToggleableBlocks;
 	RepeatersDelayList * m_RepeatersDelayList;
 
-	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override { RedstoneAddBlock(a_BlockX, a_BlockY, a_BlockZ, a_Chunk); }
-	void RedstoneAddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk, cChunk * a_OtherChunk = nullptr);
+	virtual void AddBlock(int a_BlockX, int a_BlockY, int a_BlockZ, cChunk * a_Chunk) override;
+
+	void AddBlock(const Vector3i & a_BlockPosition, cChunk * a_Chunk, cChunk * a_OtherChunk = nullptr);
 	cChunk * m_Chunk;
 
 	// We want a_MyState for devices needing a full FastSetBlock (as opposed to meta) because with our simulation model, we cannot keep setting the block if it is already set correctly
@@ -192,6 +193,9 @@ private:
 	void SetBlockPowered(Vector3i a_RelBlockPosition, Vector3i a_RelSourcePosition, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 	void SetBlockPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, unsigned char a_PowerLevel = MAX_POWER_LEVEL) { SetBlockPowered(Vector3i(a_RelBlockX, a_RelBlockY, a_RelBlockZ), Vector3i(a_RelSourceX, a_RelSourceY, a_RelSourceZ), a_PowerLevel); }
 
+	/** Recursively searches for a wire path and powers everything that should be powered */
+	void FindAndPowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const std::pair<Vector3i, cChunk *> & a_Entry);
+
 	/** Marks a block as being powered through another block */
 	void SetBlockLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 
@@ -214,13 +218,13 @@ private:
 	void SetInvalidMiddleBlock(int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, cChunk * a_Chunk, bool a_IsFirstCall = true);
 
 	/** Returns if a coordinate is powered or linked powered */
-	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ); }
+	bool AreCoordsPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ) { return AreCoordsDirectlyPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk) || AreCoordsLinkedPowered(a_RelBlockX, a_RelBlockY, a_RelBlockZ, m_Chunk); }
 
 	/** Returns if a coordinate is in the directly powered blocks list */
-	bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk);
+	static bool AreCoordsDirectlyPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk);
 
 	/** Returns if a coordinate is in the indirectly powered blocks list */
-	bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ);
+	static bool AreCoordsLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, cChunk * a_Chunk);
 
 	/** Returns if a coordinate was marked as simulated (for blocks toggleable by players) */
 	bool AreCoordsSimulated(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, bool IsCurrentStatePowered);
@@ -236,7 +240,7 @@ private:
 
 	/** Returns if a wire is powered
 	The only diffence between this and a normal AreCoordsPowered is that this function checks for a wire powering another wire */
-	unsigned char IsWirePowered(Vector3i a_RelBlockPosition);
+	static unsigned char IsWirePowered(Vector3i a_RelBlockPosition, cChunk * a_Chunk);
 
 	/** Handles delayed updates to repeaters **/
 	void HandleRedstoneRepeaterDelays(void);
@@ -249,14 +253,14 @@ private:
 
 
 	/** Returns if a block is viable to be the MiddleBlock of a SetLinkedPowered operation */
-	inline static bool IsViableMiddleBlock(BLOCKTYPE Block) { return cBlockInfo::FullyOccupiesVoxel(Block); }
+	inline static bool IsViableMiddleBlock(BLOCKTYPE a_Block) { return cBlockInfo::FullyOccupiesVoxel(a_Block); }
 
 	/** Returns if a block is a mechanism (something that accepts power and does something)
 	Used by torches to determine if they power a block whilst not standing on the ground
 	*/
-	inline static bool IsMechanism(BLOCKTYPE Block)
+	inline static bool IsMechanism(BLOCKTYPE a_Block)
 	{
-		switch (Block)
+		switch (a_Block)
 		{
 			case E_BLOCK_ACACIA_DOOR:
 			case E_BLOCK_ACACIA_FENCE_GATE:
@@ -298,9 +302,9 @@ private:
 	}
 
 	/** Returns if a block has the potential to output power */
-	inline static bool IsPotentialSource(BLOCKTYPE Block)
+	inline static bool IsPotentialSource(BLOCKTYPE a_Block)
 	{
-		switch (Block)
+		switch (a_Block)
 		{
 			case E_BLOCK_DETECTOR_RAIL:
 			case E_BLOCK_DAYLIGHT_SENSOR:
@@ -326,9 +330,9 @@ private:
 	}
 
 	/** Returns if a block is any sort of redstone device */
-	inline static bool IsRedstone(BLOCKTYPE Block)
+	inline static bool IsRedstone(BLOCKTYPE a_Block)
 	{
-		switch (Block)
+		switch (a_Block)
 		{
 			// All redstone devices, please alpha sort
 			case E_BLOCK_ACACIA_DOOR:
@@ -385,15 +389,26 @@ private:
 		}
 	}
 
-	inline static Vector3i GetCoordinateAdjacentChunk(const Vector3i &  a_BlockPos)
+	inline static bool DoesIgnorePlayerToggle(BLOCKTYPE a_Block)
 	{
-		// Are we on a chunk boundary? +- 2 because of LinkedPowered blocks
-		if ((a_BlockPos.x % cChunkDef::Width) <= 1) { return{ -2, 0, 0 }; }
-		if ((a_BlockPos.x % cChunkDef::Width) >= 14) { return{ 2, 0, 0 }; }
-		if ((a_BlockPos.z % cChunkDef::Width) <= 1) { return{ 0, 0, -2 }; }
-		if ((a_BlockPos.z % cChunkDef::Width) >= 14) { return{ 0, 0, 2 }; }
-		return { 0, 0, 0 };
+		switch (a_Block)
+		{
+			case E_BLOCK_ACACIA_FENCE_GATE:
+			case E_BLOCK_BIRCH_FENCE_GATE:
+			case E_BLOCK_DARK_OAK_FENCE_GATE:
+			case E_BLOCK_FENCE_GATE:
+			case E_BLOCK_JUNGLE_FENCE_GATE:
+			case E_BLOCK_SPRUCE_FENCE_GATE:
+			case E_BLOCK_IRON_TRAPDOOR:
+			case E_BLOCK_TRAPDOOR:
+			{
+				return true;
+			}
+			default: return false;
+		}
 	}
+
+	inline static std::vector<cChunk *> GetAdjacentChunks(const Vector3i & a_RelBlockPosition, cChunk * a_Chunk);
 
 	inline static Vector3i AdjustRelativeCoords(const Vector3i & a_RelPosition)
 	{
