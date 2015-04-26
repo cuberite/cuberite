@@ -1880,10 +1880,12 @@ void cChunkMap::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_
 	if (ShouldDestroyBlocks)
 	{
 		cBlockArea area;
-
 		a_BlocksAffected.reserve(8 * ExplosionSizeInt * ExplosionSizeInt * ExplosionSizeInt);
-
-		area.Read(m_World, bx - ExplosionSizeInt, (int)ceil(a_BlockX + ExplosionSizeInt), MinY, MaxY, bz - ExplosionSizeInt, (int)ceil(a_BlockZ + ExplosionSizeInt));
+		if (!area.Read(m_World, bx - ExplosionSizeInt, (int)ceil(a_BlockX + ExplosionSizeInt), MinY, MaxY, bz - ExplosionSizeInt, (int)ceil(a_BlockZ + ExplosionSizeInt)))
+		{
+			return;
+		}
+		
 		for (int x = -ExplosionSizeInt; x < ExplosionSizeInt; x++)
 		{
 			for (int y = -ExplosionSizeInt; y < ExplosionSizeInt; y++)
