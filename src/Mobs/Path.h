@@ -140,6 +140,7 @@ private:
 	static txt debug_open;
 	static txt debug_closed;
 	static txt debug_unchecked;
+	modeEnum SetMini(cPathCell * a_Cell);
 	#endif
 	
 	/* Misc */

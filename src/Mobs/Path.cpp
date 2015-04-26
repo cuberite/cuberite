@@ -194,7 +194,7 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 
 	
 	// Case 3: Cell is in the open list, check if G and H need an update.
-	int newG = a_Cell->m_Parent->m_G + a_GDelta;
+	int newG = a_Caller->m_G + a_GDelta;
 	if (newG < a_Cell->m_G)
 	{
 		a_Cell->m_G = newG;
@@ -308,7 +308,7 @@ void cPath::OpenListAdd(cPathCell * a_Cell)
 	a_Cell->m_Status = OPENLIST;
 	m_OpenList.push(a_Cell);
 	#ifdef COMPILING_PATHFIND_DEBUGGER
-	si::setBlock(a_Cell->m_Location.x, a_Cell->m_Location.y, a_Cell->m_Location.z, debug_open, true);
+	si::setBlock(a_Cell->m_Location.x, a_Cell->m_Location.y, a_Cell->m_Location.z, debug_open, SetMini(a_Cell));
 	#endif
 }
 
@@ -327,7 +327,7 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 	m_OpenList.pop();
 	ClosedListAdd(ret);
 	#ifdef COMPILING_PATHFIND_DEBUGGER
-	si::setBlock((ret)->m_Location.x, (ret)->m_Location.y, (ret)->m_Location.z, debug_closed, true);
+	si::setBlock((ret)->m_Location.x, (ret)->m_Location.y, (ret)->m_Location.z, debug_closed, SetMini(ret));
 	#endif
 	return ret;
 }
