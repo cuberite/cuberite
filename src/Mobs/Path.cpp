@@ -12,7 +12,7 @@
 
 #define DISTANCE_MANHATTEN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
-#define CALCULATIONS_PER_CALL 30  // Higher means more CPU load but faster path calculations.
+#define CALCULATIONS_PER_CALL 1  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
 
@@ -92,6 +92,7 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 	m_Source = a_StartingPoint;
 	m_Destination = a_EndingPoint;
 	m_StepsLeft = a_MaxSteps;
+	m_PointCount = 0;
 	ProcessCell(a_StartingPoint, NULL, 0);
 }
 
@@ -249,13 +250,13 @@ bool cPath::Step_Internal()
 	// Path found.
 	if (currentCell->m_Location == m_Destination)
 	{
-		// TODO the last few vectors are garbage. why?
 		do
 		{
 			addPoint(currentCell->m_Location);  // Populate the cPath with points.
 			currentCell = currentCell->m_Parent;
 		}
 		while (currentCell != NULL);
+		m_CurrentPoint = m_PointCount - 1;
 		FinishCalculation(PATH_FOUND);
 		return true;
 	}
