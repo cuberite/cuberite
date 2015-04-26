@@ -640,16 +640,26 @@ void cIncrementalRedstoneSimulator::FindAndPowerBorderingWires(std::vector<std::
 		auto Neighbour = a_Entry.second->GetRelNeighborChunkAdjustCoords(AdjustedPos.x, AdjustedPos.z);
 		auto MyPower = IsWirePowered(a_Entry.first, a_Entry.second);
 
+		auto & PoweredBlocks = ((cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_PoweredBlocks;  // We need to insert the value into the chunk who owns the block position
+		sPoweredBlocks RC;
+		RC.a_BlockPos = AdjustedPos;
+		RC.a_SourcePos = a_Entry.first + Vector3i((a_Entry.second->GetPosX() - Neighbour->GetPosX()) * cChunkDef::Width, 0, (a_Entry.second->GetPosZ() - Neighbour->GetPosZ()) * cChunkDef::Width);
+		RC.a_PowerLevel = MyPower - 1;
+
 		if ((Neighbour->GetBlock(AdjustedPos) == E_BLOCK_REDSTONE_WIRE) && (MyPower > 1) && (MyPower > IsWirePowered(AdjustedPos, Neighbour)))
 		{
-			sPoweredBlocks RC;
-			RC.a_BlockPos = AdjustedPos;
-			RC.a_SourcePos = a_Entry.first + Vector3i((a_Entry.second->GetPosX() - Neighbour->GetPosX()) * cChunkDef::Width, 0, (a_Entry.second->GetPosZ() - Neighbour->GetPosZ()) * cChunkDef::Width);
-			RC.a_PowerLevel = MyPower - 1;
-			((cIncrementalRedstoneSimulatorChunkData *)Neighbour->GetRedstoneSimulatorData())->m_PoweredBlocks.emplace_back(RC);  // We need to insert the value into the chunk who owns the block position
+			auto Position = std::find_if(PoweredBlocks.begin(), PoweredBlocks.end(), [RC](const sPoweredBlocks & itr) { return itr.a_BlockPos == RC.a_BlockPos && itr.a_SourcePos == RC.a_SourcePos; });
+			if (Position != PoweredBlocks.end())
+			{
+				Position->a_PowerLevel = RC.a_PowerLevel;
+			}
+			else
+			{
+				PoweredBlocks.emplace_back(RC);
 
-			Neighbour->SetIsRedstoneDirty(true);
-			m_Chunk->SetIsRedstoneDirty(true);
+				Neighbour->SetIsRedstoneDirty(true);
+				m_Chunk->SetIsRedstoneDirty(true);
+			}
 
 			Neighbour->SetMeta(AdjustedPos.x, AdjustedPos.y, AdjustedPos.z, MyPower - 1);
 			a_PotentialWireList.emplace_back(std::make_pair(AdjustedPos, Neighbour));
