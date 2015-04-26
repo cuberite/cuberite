@@ -158,7 +158,7 @@ private:
 	
 	
 	/* Map management */
-	void ProcessCell(cPathCell *a_Cell,  cPathCell * a_Caller,  int a_GDelta);
+	void ProcessCell(cPathCell * a_Cell,  cPathCell * a_Caller,  int a_GDelta);
 	cPathCell* GetCell(const Vector3d & a_location);
 	
 	
