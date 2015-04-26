@@ -15,10 +15,7 @@
 #define CALCULATIONS_PER_CALL 1  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
-
-
-
-
+enum eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
 struct cPathCell
 {
 	Vector3d m_Location;   // Location of the cell in the world
@@ -32,9 +29,9 @@ struct cPathCell
 
 
 
-bool compareHeuristics::operator()(cPathCell * & a_v1, cPathCell * & a_v2)
+bool compareHeuristics::operator()(cPathCell * & a_V1, cPathCell * & a_V2)
 {
-	return a_v1->m_F > a_v2->m_F;
+	return a_V1->m_F > a_V2->m_F;
 }
 
 
@@ -43,10 +40,10 @@ bool compareHeuristics::operator()(cPathCell * & a_v1, cPathCell * & a_v2)
 
 /* cPath implementation */
 #ifndef COMPILING_PATHFIND_DEBUGGER
+// Incomplete
 bool cPath::IsSolid(const Vector3d & a_Location)
 {
 	return true;
-	/* TODO complete this */
 	// int ChunkX, ChunkZ;
 	// cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
 	// return m_World->DoWithChunk(ChunkX, ChunkZ, *this);
@@ -67,7 +64,7 @@ bool cPath::Item(cChunk * a_Chunk)
 
 
 
-
+// Incomplete
 // For testing only, will eventually be removed along with the changes made to server.cpp
 void cPath::consoleCommand()
 {
@@ -109,9 +106,9 @@ cPath::~cPath()
 
 
 
-void cPath::FinishCalculation(ePathFinderStatus newStatus)
+void cPath::FinishCalculation(ePathFinderStatus a_NewStatus)
 {
-	m_Status = newStatus;
+	m_Status = a_NewStatus;
 	for (std::unordered_map<Vector3d, cPathCell *>::iterator it = m_Map.begin(); it != m_Map.end(); ++it)
 	{
 		delete (it->second);
@@ -264,7 +261,7 @@ bool cPath::Step_Internal()
 			currentCell = currentCell->m_Parent;
 		}
 		while (currentCell != NULL);
-		m_CurrentPoint = m_PointCount - 1;
+		m_CurrentPoint = -1;
 		FinishCalculation(PATH_FOUND);
 		return true;
 	}
@@ -336,15 +333,15 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 
 
 
-void cPath::ClosedListAdd(cPathCell * point)
+void cPath::ClosedListAdd(cPathCell * a_Point)
 {
-	point->m_Status = CLOSEDLIST;
+	a_Point->m_Status = CLOSEDLIST;
 }
 
 
 
 
-
+// Add the next point in the final path.
 void cPath::addPoint(Vector3d a_Vector)
 {
 	m_PathPoints.push_back(a_Vector);

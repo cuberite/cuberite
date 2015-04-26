@@ -1,15 +1,15 @@
 #pragma once
+
 #ifdef COMPILING_PATHFIND_DEBUGGER
+/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug this class outside of MCServer.
+This preprocessor flag is never set when compiling MCServer. */
 #include "PathFinderIrrlicht_Head.h"
 #endif
+
 #include <vector>
 #include <queue>
 #include <unordered_map>
-#include "Path.h"
 using namespace std;
-
-/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native to debug this class outside of MCServer.
-This preprocessor flag is never set when compiling MCServer. */
 
 /* MCServer forward declarations */
 #ifndef COMPILING_PATHFIND_DEBUGGER
@@ -20,21 +20,15 @@ typedef Vector3<double> Vector3d;
 
 // fwd: cChunkMap.h
 typedef cItemCallback<cChunk> cChunkCallback;
-
 #endif
 
-
-
-
-
-/* Various minor structs and classes */
+/* Various little structs and classes */
 enum ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND};
-enum eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
-struct cPathCell;
+struct cPathCell;  // Defined inside Path.cpp
 class compareHeuristics
 {
 public:
-	bool operator()(cPathCell * & v1,  cPathCell * &  v2);
+	bool operator()(cPathCell * & a_V1,  cPathCell * &  a_V2);
 };
 
 
@@ -46,12 +40,10 @@ class cPath
 : public cChunkCallback
 #endif
 {
-	
-	/* The interface starts here */
-	
 public:
 	
 	static void consoleCommand();  // Temporary, used for debugging, called when one writes "pathfind" in the console.
+	
 	/** Creates a pathfinder instance. A Mob will probably need a single pathfinder instance for its entire life.
 	
 	Note that if you have a man-sized mob (1x1x2, zombies, etc), you are advised to call this function without parameters
@@ -70,7 +62,12 @@ public:
 	@param a_StartingPoint The function expects this position to be the lowest block the mob is in, a rule of thumb: "The block where the Zombie's knees are at".
 	@param a_EndingPoint "The block where the Zombie's knees want to be".
 	@param a_MaxSteps The maximum steps before giving up. */
-	cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps, double a_BoundingBoxWidth = 1, double a_BoundingBoxHeight = 2, int a_MaxUp = 1, int a_MaxDown = 1);
+	cPath(
+		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint,
+		int a_MaxSteps,
+		double a_BoundingBoxWidth = 1, double a_BoundingBoxHeight = 2,
+		int a_MaxUp = 1, int a_MaxDown = 1
+	);
 	
 	/** Destroys the path and frees its memory. */
 	~cPath();
@@ -78,26 +75,43 @@ public:
 	/** Performs part of the path calculation and returns true if the path computation has finished. */
 	ePathFinderStatus Step();
 	
-	Vector3d getFirstPoint()
+	/* Point retrieval functions, inlined for performance. */
+	
+	/** Returns the first point*/
+	inline Vector3d getFirstPoint()
 	{
 		ASSERT(m_Status == PATH_FOUND);
 		m_CurrentPoint = m_PointCount - 1;
 		return m_PathPoints[m_CurrentPoint];
 	}
 	
-	/** Returns the next point in the path. Assumes you called getFirstPoint at least once before. */
+	
+	
+	
+	
+	/** Returns the next point in the path. */
 	inline Vector3d getnextPoint()
 	{
 		ASSERT(m_Status == PATH_FOUND);
+		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
 		return m_PathPoints[m_PointCount - 1 - (--m_CurrentPoint)];
 	}
+	
+	
+	
+	
 	
 	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
 	inline bool isLastPoint()
 	{
 		ASSERT(m_Status == PATH_FOUND);
+		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
 		return m_CurrentPoint == 0;
 	}
+	
+	
+	
+	
 	
 	/** Get the point at a_index. Remark: Internally, the indexes are reversed. */
 	inline Vector3d getPoint(int a_index)
@@ -107,6 +121,10 @@ public:
 		return m_PathPoints[m_PointCount - 1 - a_index];
 	}
 	
+	
+	
+	
+	
 	/** Returns the total number of points this path has. */
 	inline int getPointCount()
 	{
@@ -114,40 +132,16 @@ public:
 		return m_PointCount;
 	}
 	
-	/* The interface ends here */
-	
-	
-	
-	
-	
-	
-	
-	
-	#ifdef COMPILING_PATHFIND_DEBUGGER
-	static void debug_SetSolidBlock(txt texture);
-	static void debug_SetOpenBlock(txt texture);
-	static void debug_SetClosedBlock(txt texture);
-	static void debug_SetUncheckedBlock(txt texture);
-	#endif
 	
 	
 	
 	
 private:
 	
-	#ifdef COMPILING_PATHFIND_DEBUGGER
-	static txt debug_solid;
-	static txt debug_open;
-	static txt debug_closed;
-	static txt debug_unchecked;
-	modeEnum SetMini(cPathCell * a_Cell);
-	#endif
-	
 	/* Misc */
 	static bool IsSolid(const Vector3d & a_Location);  // Query our hosting world and ask it if there's a solid at a_location.
 	bool Step_Internal();  // The public version just calls this version * CALCULATIONS_PER_CALL times.
-	void FinishCalculation(ePathFinderStatus newStatus);  // Clears the memory used for calculating the path.
-	
+	void FinishCalculation(ePathFinderStatus a_NewStatus);  // Clears the memory used for calculating the path.
 	
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
@@ -157,11 +151,9 @@ private:
 	bool IsInOpenList(cPathCell * a_Point);
 	bool IsInClosedList(cPathCell * a_Point);
 	
-	
 	/* Map management */
 	void ProcessCell(cPathCell * a_Cell,  cPathCell * a_Caller,  int a_GDelta);
 	cPathCell* GetCell(const Vector3d & a_location);
-	
 	
 	/* Pathfinding fields */
 	priority_queue<cPathCell *,  vector<cPathCell *>,  compareHeuristics> m_OpenList;
@@ -183,5 +175,9 @@ private:
 	#ifndef COMPILING_PATHFIND_DEBUGGER
 protected:
 	virtual bool Item(cChunk * a_Chunk) override;
+	
+	/* Interfacing with Irrlicht, has nothing to do with MCServer*/
+	#else
+	#include "../path_irrlicht.cpp"
 	#endif
 };
