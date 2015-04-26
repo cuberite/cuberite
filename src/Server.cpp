@@ -21,7 +21,7 @@
 #include "IniFile.h"
 #include "Vector3.h"
 
-#include "Mobs/PathFinder.h"  // Debug for PathFinder.cpp, temporary.
+#include "Mobs/Path.h"  // Debug for PathFinder.cpp, temporary.
 
 #include <fstream>
 #include <sstream>
@@ -442,7 +442,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	
 	if (split[0] == "pathfind")  // Debug command for Pathfinder.cpp, temporary.
 	{
-		cPathFinder::consoleCommand();
+		cPath::consoleCommand();
 		return;
 	}
 	

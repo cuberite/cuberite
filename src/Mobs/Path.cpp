@@ -72,7 +72,7 @@ bool cPath::Item(cChunk * a_Chunk)
 void cPath::consoleCommand()
 {
 	printf("HELLO WORLD\n");
-	printf("cPath::isSolid returned %s.\n", cPath().IsSolid(Vector3d(0, 0, 0)) ? "true" : "false");
+	// printf("cPath::isSolid returned %s.\n", cPath().IsSolid(Vector3d(0, 0, 0)) ? "true" : "false");
 }
 #endif
 
