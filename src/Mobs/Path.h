@@ -1,5 +1,5 @@
 #pragma once
-#ifdef __PATHFIND_DEBUG__
+#ifdef COMPILING_PATHFIND_DEBUGGER
 #include "PathFinderIrrlicht_Head.h"
 #endif
 #include <vector>
@@ -8,11 +8,11 @@
 #include "Path.h"
 using namespace std;
 
-/* Note: the __PATHFIND_DEBUG__ is used by Native to debug this class outside of MCServer.
+/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native to debug this class outside of MCServer.
 This preprocessor flag is never set when compiling MCServer. */
 
 /* MCServer forward declarations */
-#ifndef __PATHFIND_DEBUG__
+#ifndef COMPILING_PATHFIND_DEBUGGER
 
 // fwd: Vector3.h
 template <typename T> class Vector3;
@@ -42,7 +42,7 @@ public:
 
 
 class cPath
-#ifndef __PATHFIND_DEBUG__
+#ifndef COMPILING_PATHFIND_DEBUGGER
 : public cChunkCallback
 #endif
 {
@@ -123,7 +123,7 @@ public:
 	
 	
 	
-	#ifdef __PATHFIND_DEBUG__
+	#ifdef COMPILING_PATHFIND_DEBUGGER
 	static void debug_SetSolidBlock(txt texture);
 	static void debug_SetOpenBlock(txt texture);
 	static void debug_SetClosedBlock(txt texture);
@@ -135,7 +135,7 @@ public:
 	
 private:
 	
-	#ifdef __PATHFIND_DEBUG__
+	#ifdef COMPILING_PATHFIND_DEBUGGER
 	static txt debug_solid;
 	static txt debug_open;
 	static txt debug_closed;
@@ -151,13 +151,14 @@ private:
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
 	cPathCell * OpenListPop();
+	void processIfWalkable(const Vector3d &a_Location, cPathCell *a_Parent, int a_Cost);
 	void ClosedListAdd(cPathCell * a_Point);
 	bool IsInOpenList(cPathCell * a_Point);
 	bool IsInClosedList(cPathCell * a_Point);
 	
 	
 	/* Map management */
-	void ProcessCell(const Vector3d & a_Location,  cPathCell * a_Caller,  int a_GDelta);
+	void ProcessCell(cPathCell *a_Cell,  cPathCell * a_Caller,  int a_GDelta);
 	cPathCell* GetCell(const Vector3d & a_location);
 	
 	
@@ -178,7 +179,7 @@ private:
 	void addPoint(Vector3d a_Vector);
 	
 	/* Interfacing with MCServer's world */
-	#ifndef __PATHFIND_DEBUG__
+	#ifndef COMPILING_PATHFIND_DEBUGGER
 protected:
 	virtual bool Item(cChunk * a_Chunk) override;
 	#endif

@@ -1,4 +1,4 @@
-#ifndef __PATHFIND_DEBUG__
+#ifndef COMPILING_PATHFIND_DEBUGGER
 /* MCServer headers */
 #include "Globals.h"
 #include "../World.h"
@@ -42,7 +42,7 @@ bool compareHeuristics::operator()(cPathCell * & a_v1, cPathCell * & a_v2)
 
 
 /* cPath implementation */
-#ifndef __PATHFIND_DEBUG__
+#ifndef COMPILING_PATHFIND_DEBUGGER
 bool cPath::IsSolid(const Vector3d & a_Location)
 {
 	return true;
@@ -93,7 +93,7 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 	m_Destination = a_EndingPoint;
 	m_StepsLeft = a_MaxSteps;
 	m_PointCount = 0;
-	ProcessCell(a_StartingPoint, NULL, 0);
+	processIfWalkable(a_StartingPoint, NULL, 0);
 }
 
 
@@ -136,8 +136,10 @@ cPathCell * cPath::GetCell(const Vector3d & a_Location)
 		m_Map[a_Location] = cell;
 		cell->m_IsSolid = cPath::IsSolid(a_Location);
 		cell->m_Status = NOLIST;
-		#ifdef __PATHFIND_DEBUG__
+		#ifdef COMPILING_PATHFIND_DEBUGGER
+		#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
 		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, !cell->m_IsSolid);
+		#endif
 		#endif
 		return cell;
 	}
@@ -148,58 +150,56 @@ cPathCell * cPath::GetCell(const Vector3d & a_Location)
 
 
 
-void cPath::ProcessCell(const Vector3d & a_Location, cPathCell * a_Caller, int a_GDelta)
+void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 {
-	cPathCell * cell = GetCell(a_Location);  // Convert a Vector3d to its corresponding cPathCell.
-	
 	// Case 1: Cell is in the closed list, ignore it.
-	if (cell->m_Status == CLOSEDLIST)
+	if (a_Cell->m_Status == CLOSEDLIST)
 	{
 		return;
 	}
 	
-	if (cell->m_Status == NOLIST)  // Case 2: The cell is not in any list.
+	if (a_Cell->m_Status == NOLIST)  // Case 2: The cell is not in any list.
 	{
 		// Cell is walkable, add it to the open list.
 		// Note that non-walkable cells are filtered out in Step_internal();
 		// Special case: Start cell goes here, gDelta is 0, caller is NULL.
-		cell->m_Parent = a_Caller;
+		a_Cell->m_Parent = a_Caller;
 		if (a_Caller != NULL)
 		{
-			cell->m_G = a_Caller->m_G + a_GDelta;
+			a_Cell->m_G = a_Caller->m_G + a_GDelta;
 		}
 		else
 		{
-			cell->m_G = 0;
+			a_Cell->m_G = 0;
 		}
 		
 		// Calculate m_H. This is A*'s Heuristics value.
 		#if DISTANCE_MANHATTEN == 1
-		cell->m_H = 10 * (abs(cell->m_Location.x-m_Destination.x) + abs(cell->m_Location.y-m_Destination.y) + abs(cell->m_Location.z-m_Destination.z));
+		a_Cell->m_H = 10 * (abs(a_Cell->m_Location.x-m_Destination.x) + abs(a_Cell->m_Location.y-m_Destination.y) + abs(a_Cell->m_Location.z-m_Destination.z));
 		#else
-		cell->m_H = std::sqrt( (cell->m_Location.x-m_Destination.x) * (cell->m_Location.x-m_Destination.x) * 100+ (cell->m_Location.y-m_Destination.y) * (cell->m_Location.y-m_Destination.y) * 100 + (cell->m_Location.z-m_Destination.z) * (cell->m_Location.z-m_Destination.z) * 100);
+		a_Cell->m_H = std::sqrt( (a_Cell->m_Location.x-m_Destination.x) * (a_Cell->m_Location.x-m_Destination.x) * 100+ (a_Cell->m_Location.y-m_Destination.y) * (a_Cell->m_Location.y-m_Destination.y) * 100 + (a_Cell->m_Location.z-m_Destination.z) * (a_Cell->m_Location.z-m_Destination.z) * 100);
 		#endif
 		
 		
 		#if HEURISTICS_ONLY == 1
-		cell->m_F = cell->m_H;  // Depth-first search.
+		a_Cell->m_F = a_Cell->m_H;  // Depth-first search.
 		#else
-		cell->m_F = cell->m_H + cell->m_G;  // Regular A*.
+		a_Cell->m_F = a_Cell->m_H + a_Cell->m_G;  // Regular A*.
 		#endif
 		
-		OpenListAdd(cell);
+		OpenListAdd(a_Cell);
 		return;
 	}
 	
 
 	
 	// Case 3: Cell is in the open list, check if G and H need an update.
-	int newG = cell->m_Parent->m_G + a_GDelta;
-	if (newG < cell->m_G)
+	int newG = a_Cell->m_Parent->m_G + a_GDelta;
+	if (newG < a_Cell->m_G)
 	{
-		cell->m_G = newG;
-		cell->m_H = cell->m_F + cell->m_G;
-		cell->m_Parent = a_Caller;
+		a_Cell->m_G = newG;
+		a_Cell->m_H = a_Cell->m_F + a_Cell->m_G;
+		a_Cell->m_Parent = a_Caller;
 	}
 	
 }
@@ -234,7 +234,14 @@ ePathFinderStatus cPath::Step()
 
 
 
-
+void cPath::processIfWalkable(const Vector3d & a_Location, cPathCell * a_Parent, int a_Cost)
+{
+	cPathCell * cell =  GetCell(a_Location);
+	if (!cell->m_IsSolid && GetCell(a_Location+Vector3d(0, -1, 0))->m_IsSolid && !GetCell(a_Location+Vector3d(0, 1, 0))->m_IsSolid)
+	{
+		ProcessCell(cell, a_Parent, a_Cost);
+	}
+}
 
 bool cPath::Step_Internal()
 {
@@ -263,29 +270,32 @@ bool cPath::Step_Internal()
 	}
 	
 	// Calculation not finished yet, process a currentCell by inspecting all 8 neighbors.
-	int x, y, z;
-	for (x = -1; x <= 1; ++x)
+	
+	// Forward, backward, left, right. on all 3 different heights.
+	int i;
+	for (i=-1; i<=1; ++i)
 	{
-		for (y = -1; y <= 1; ++y)
+		processIfWalkable(currentCell->m_Location + Vector3d(1, i, 0), currentCell, 10);
+		processIfWalkable(currentCell->m_Location + Vector3d(-1, i, 0), currentCell, 10);
+		processIfWalkable(currentCell->m_Location + Vector3d(0, i, 1), currentCell, 10);
+		processIfWalkable(currentCell->m_Location + Vector3d(0, i, -1), currentCell, 10);
+	}
+	
+	// Diagonals
+	int x, z;
+	for (x=-1; x<=1; x+=2)
+	{
+		for (z=-1; z<=1; z+=2)
 		{
-			for (z = -1; z <= 1; ++z)
+			// This condition prevents diagonal corner cutting.
+			if (!GetCell(currentCell->m_Location + Vector3d(x, 0, 0))->m_IsSolid && !GetCell(currentCell->m_Location + Vector3d(0, 0, z))->m_IsSolid)
 			{
-				// TODO this whole thing requires re-doing
-				// TODO Fix diagonal cutting
-				// TODO There's room for optimization here
-				// TODO flip axis
-				// TODO optimize cost by precalculating it
-				int cost = std::sqrt(x * x * 100 + y * y * 100 + z * z * 100);
-				
-				// If this neighbor: A. isn't solid. B. Has ground beneath. C. Has air above.
-				if (!GetCell(currentCell->m_Location+Vector3d(x, y, z))->m_IsSolid && GetCell(currentCell->m_Location+Vector3d(x, y-1, z))->m_IsSolid && !GetCell(currentCell->m_Location+Vector3d(x, y+1, z))->m_IsSolid)
-				{
-					// ...Then we process it.
-					ProcessCell(currentCell->m_Location+Vector3d(x, y, z), currentCell, cost);
-				}
+				processIfWalkable(currentCell->m_Location + Vector3d(x, 0, z), currentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
 			}
 		}
 	}
+	
+	
 	return false;
 }
 
@@ -297,7 +307,7 @@ void cPath::OpenListAdd(cPathCell * a_Cell)
 {
 	a_Cell->m_Status = OPENLIST;
 	m_OpenList.push(a_Cell);
-	#ifdef __PATHFIND_DEBUG__
+	#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock(a_Cell->m_Location.x, a_Cell->m_Location.y, a_Cell->m_Location.z, debug_open, true);
 	#endif
 }
@@ -316,7 +326,7 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 	cPathCell * ret = m_OpenList.top();
 	m_OpenList.pop();
 	ClosedListAdd(ret);
-	#ifdef __PATHFIND_DEBUG__
+	#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock((ret)->m_Location.x, (ret)->m_Location.y, (ret)->m_Location.z, debug_closed, true);
 	#endif
 	return ret;
