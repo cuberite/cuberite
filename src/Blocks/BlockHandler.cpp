@@ -198,6 +198,7 @@ cBlockHandler * cBlockHandler::CreateBlockHandler(BLOCKTYPE a_BlockType)
 		case E_BLOCK_CARPET:                return new cBlockCarpetHandler          (a_BlockType);
 		case E_BLOCK_CAULDRON:              return new cBlockCauldronHandler        (a_BlockType);
 		case E_BLOCK_CHEST:                 return new cBlockChestHandler           (a_BlockType);
+		case E_BLOCK_CLAY:									return new cBlockOreHandler							(a_BlockType);
 		case E_BLOCK_COAL_ORE:              return new cBlockOreHandler             (a_BlockType);
 		case E_BLOCK_COCOA_POD:             return new cBlockCocoaPodHandler        (a_BlockType);
 		case E_BLOCK_COMMAND_BLOCK:         return new cBlockCommandBlockHandler    (a_BlockType);
