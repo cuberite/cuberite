@@ -118,6 +118,7 @@ void cPath::FinishCalculation(ePathFinderStatus newStatus)
 	}
 	
 	m_Map.clear();
+	m_OpenList.empty();
 }
 
 
@@ -269,12 +270,15 @@ bool cPath::Step_Internal()
 		{
 			for (z = -1; z <= 1; ++z)
 			{
+				// TODO this whole thing requires re-doing
+				// TODO Fix diagonal cutting
 				// TODO There's room for optimization here
 				// TODO flip axis
+				// TODO optimize cost by precalculating it
 				int cost = std::sqrt(x * x * 100 + y * y * 100 + z * z * 100);
 				
 				// If this neighbor: A. isn't solid. B. Has ground beneath. C. Has air above.
-				if (!GetCell(currentCell->m_Location+Vector3d(x, y, z))->m_IsSolid && GetCell(currentCell->m_Location+Vector3d(x, y, z-1))->m_IsSolid && !GetCell(currentCell->m_Location+Vector3d(x, y, z+1))->m_IsSolid)
+				if (!GetCell(currentCell->m_Location+Vector3d(x, y, z))->m_IsSolid && GetCell(currentCell->m_Location+Vector3d(x, y-1, z))->m_IsSolid && !GetCell(currentCell->m_Location+Vector3d(x, y+1, z))->m_IsSolid)
 				{
 					// ...Then we process it.
 					ProcessCell(currentCell->m_Location+Vector3d(x, y, z), currentCell, cost);
