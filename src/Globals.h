@@ -61,11 +61,6 @@
 	// TODO: Can GCC explicitly mark classes as abstract (no instances can be created)?
 	#define abstract
 
-	// override is part of c++11
-	#if __cplusplus < 201103L
-		#define override
-	#endif
-
 	#define OBSOLETE __attribute__((deprecated))
 
 	#define ALIGN_8 __attribute__((aligned(8)))
