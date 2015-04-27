@@ -4,6 +4,9 @@
 #include "../World.h"
 #endif
 
+// Root is used for getting the default world, remove later
+#include "../Chunk.h"
+#include "../Root.h"
 #include "Path.h"
 
 #include <stdio.h>
@@ -40,36 +43,54 @@ bool compareHeuristics::operator()(cPathCell * & a_V1, cPathCell * & a_V2)
 
 /* cPath implementation */
 #ifndef COMPILING_PATHFIND_DEBUGGER
-// Incomplete
 bool cPath::IsSolid(const Vector3d & a_Location)
 {
-	return true;
-	// int ChunkX, ChunkZ;
-	// cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
-	// return m_World->DoWithChunk(ChunkX, ChunkZ, *this);
+	int ChunkX, ChunkZ;
+	m_CurrentBlock=a_Location;
+	printf("IsSolid called: (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y ,(int) m_CurrentBlock.z);
+	cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
+	return !m_World->DoWithChunk(ChunkX, ChunkZ, *this);
 }
 
 
 
 
 // Incomplete
-bool cPath::Item(cChunk * a_Chunk)
+bool cPath::Item(cChunk * a_Chunk)  //returns FALSE if there's a solid or if we failed
 {
-	printf("cPath::item Mindelessly returning true\n");
-	// TODO intelligently return the right state here.
-	// TODO I probably need to store a_Location.x and a_Location.y as fields, is that correct?
+	if (!a_Chunk->IsValid())
+	{
+		printf("cPath::item - Invalid chunk. (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y , (int)m_CurrentBlock.z);
+		return false;
+	}
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	int RelX = m_CurrentBlock.x - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = m_CurrentBlock.z - a_Chunk->GetPosZ() * cChunkDef::Width;
+	a_Chunk->GetBlockTypeMeta(RelX, m_CurrentBlock.y, RelZ, BlockType, BlockMeta);
+	if (BlockType == E_BLOCK_AIR) 
+	{
+		printf("cPath::item - it's air. (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y , (int)m_CurrentBlock.z);
+		return true;
+	}
+	else
+	{
+		printf("cPath::item - it's a solid. (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y ,(int) m_CurrentBlock.z);
+		return false;
+	}
+	
 	// TODO Maybe I should later queue several blocks and call this at once for all of them for better performance?
-	return true;
+	
 }
 
 
 
 // Incomplete
 // For testing only, will eventually be removed along with the changes made to server.cpp
+// And along with TEMP_PathHelper.cpp
 void cPath::consoleCommand()
 {
-	printf("HELLO WORLD\n");
-	// printf("cPath::isSolid returned %s.\n", cPath().IsSolid(Vector3d(0, 0, 0)) ? "true" : "false");
+	cPath myPath(Vector3d(-10, 60, 2), Vector3d(-10, 60, 2), 1000);
 }
 #endif
 
@@ -79,8 +100,16 @@ void cPath::consoleCommand()
 
 cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps, double a_BoundingBoxWidth, double a_BoundingBoxHeight, int a_MaxUp, int a_MaxDown)
 {
+	// TODO: if src not walkable OR dest not walkable, then abort
+	// Borrow a new "isWalkable" from processIfWalkable, make processIfWalkable also call isWalkable
+	
+	#ifndef COMPILING_PATHFIND_DEBUGGER
+	m_World = cRoot::Get()->GetDefaultWorld();
+	#endif
+	
 	if (GetCell(a_StartingPoint)->m_IsSolid || GetCell(a_EndingPoint)->m_IsSolid)
 	{
+		printf("No path found!\n");
 		m_Status = PATH_NOT_FOUND;
 		return;
 	}
@@ -90,7 +119,6 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 	m_Destination = a_EndingPoint;
 	m_StepsLeft = a_MaxSteps;
 	m_PointCount = 0;
-	processIfWalkable(a_StartingPoint, NULL, 0);
 }
 
 
@@ -99,16 +127,18 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 
 cPath::~cPath()
 {
-	// FinishCalculation();  // TODO: Needed? STD is supposed to clean it all.
+	if (m_Status==CALCULATING)
+	{
+		FinishCalculation();
+	}
 }
 
 
 
 
 
-void cPath::FinishCalculation(ePathFinderStatus a_NewStatus)
+void cPath::FinishCalculation()
 {
-	m_Status = a_NewStatus;
 	for (std::unordered_map<Vector3d, cPathCell *>::iterator it = m_Map.begin(); it != m_Map.end(); ++it)
 	{
 		delete (it->second);
@@ -122,23 +152,33 @@ void cPath::FinishCalculation(ePathFinderStatus a_NewStatus)
 
 
 
+void cPath::FinishCalculation(ePathFinderStatus a_NewStatus)
+{
+	m_Status = a_NewStatus;
+	FinishCalculation();
+}
+
+
+
+
+
 cPathCell * cPath::GetCell(const Vector3d & a_Location)
 {
 	// Create the cell in the hash table if it's not already there.
-	cPathCell * cell;
+	cPathCell * Cell;
 	if (m_Map.count(a_Location) == 0)  // Case 1: Cell is not on any list. We've never checked this cell before.
 	{
-		cell = new cPathCell();
-		cell->m_Location = a_Location;
-		m_Map[a_Location] = cell;
-		cell->m_IsSolid = cPath::IsSolid(a_Location);
-		cell->m_Status = NOLIST;
+		Cell = new cPathCell();
+		Cell->m_Location = a_Location;
+		m_Map[a_Location] = Cell;
+		Cell->m_IsSolid = IsSolid(a_Location);
+		Cell->m_Status = NOLIST;
 		#ifdef COMPILING_PATHFIND_DEBUGGER
 		#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
-		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, !cell->m_IsSolid);
+		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, cell->m_IsSolid ? NORMAL : MINI);
 		#endif
 		#endif
-		return cell;
+		return Cell;
 	}
 	else return m_Map[a_Location];
 }
@@ -170,16 +210,18 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 			a_Cell->m_G = 0;
 		}
 		
-		// Calculate m_H. This is A*'s Heuristics value.
+		// Calculate H. This is A*'s Heuristics value.
 		#if DISTANCE_MANHATTEN == 1
+		// Manhatten distance. DeltaX + DeltaY + DeltaZ.
 		a_Cell->m_H = 10 * (abs(a_Cell->m_Location.x-m_Destination.x) + abs(a_Cell->m_Location.y-m_Destination.y) + abs(a_Cell->m_Location.z-m_Destination.z));
 		#else
+		// Euclidian distance. sqrt(DeltaX^2 + DeltaY^2 + DeltaZ^2), more precise.
 		a_Cell->m_H = std::sqrt( (a_Cell->m_Location.x-m_Destination.x) * (a_Cell->m_Location.x-m_Destination.x) * 100+ (a_Cell->m_Location.y-m_Destination.y) * (a_Cell->m_Location.y-m_Destination.y) * 100 + (a_Cell->m_Location.z-m_Destination.z) * (a_Cell->m_Location.z-m_Destination.z) * 100);
 		#endif
 		
 		
 		#if HEURISTICS_ONLY == 1
-		a_Cell->m_F = a_Cell->m_H;  // Depth-first search.
+		a_Cell->m_F = a_Cell->m_H;  // Depth-first search(Might be the wrong name). Faster, can yeild paths that are far from optimal.
 		#else
 		a_Cell->m_F = a_Cell->m_H + a_Cell->m_G;  // Regular A*.
 		#endif
@@ -191,10 +233,10 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 
 	
 	// Case 3: Cell is in the open list, check if G and H need an update.
-	int newG = a_Caller->m_G + a_GDelta;
-	if (newG < a_Cell->m_G)
+	int NewG = a_Caller->m_G + a_GDelta;
+	if (NewG < a_Cell->m_G)
 	{
-		a_Cell->m_G = newG;
+		a_Cell->m_G = NewG;
 		a_Cell->m_H = a_Cell->m_F + a_Cell->m_G;
 		a_Cell->m_Parent = a_Caller;
 	}
@@ -320,23 +362,15 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 		return NULL;  // We've exhausted the search space and nothing was found, this will trigger a PATH_NOT_FOUND status.
 	}
 	
-	cPathCell * ret = m_OpenList.top();
+	cPathCell * Ret = m_OpenList.top();
 	m_OpenList.pop();
-	ClosedListAdd(ret);
+	Ret->m_Status = CLOSEDLIST;
 	#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock((ret)->m_Location.x, (ret)->m_Location.y, (ret)->m_Location.z, debug_closed, SetMini(ret));
 	#endif
-	return ret;
+	return Ret;
 }
 
-
-
-
-
-void cPath::ClosedListAdd(cPathCell * a_Point)
-{
-	a_Point->m_Status = CLOSEDLIST;
-}
 
 
 

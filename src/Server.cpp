@@ -21,7 +21,11 @@
 #include "IniFile.h"
 #include "Vector3.h"
 
-#include "Mobs/Path.h"  // Debug for PathFinder.cpp, temporary.
+#include "TEMP_PathHelper.h"  
+/* A chain of recompilation is being caused for every little header change in cPath, 
+So this temporary class is here to prevent that, it will be removed once I finished debugging. */
+
+
 
 #include <fstream>
 #include <sstream>
@@ -442,7 +446,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	
 	if (split[0] == "pathfind")  // Debug command for Pathfinder.cpp, temporary.
 	{
-		cPath::consoleCommand();
+		cPathHelper::consoleCommand();
 		return;
 	}
 	

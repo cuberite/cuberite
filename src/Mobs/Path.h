@@ -138,18 +138,16 @@ public:
 	
 private:
 	
-	/* Misc */
-	static bool IsSolid(const Vector3d & a_Location);  // Query our hosting world and ask it if there's a solid at a_location.
+	/* General */
+	bool IsSolid(const Vector3d & a_Location);  // Query our hosting world and ask it if there's a solid at a_location.
 	bool Step_Internal();  // The public version just calls this version * CALCULATIONS_PER_CALL times.
-	void FinishCalculation(ePathFinderStatus a_NewStatus);  // Clears the memory used for calculating the path.
+	void FinishCalculation();  // Clears the memory used for calculating the path.
+	void FinishCalculation(ePathFinderStatus a_NewStatus);  // Clears the memory used for calculating the path and changes the status.
 	
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
 	cPathCell * OpenListPop();
 	void processIfWalkable(const Vector3d &a_Location, cPathCell *a_Parent, int a_Cost);
-	void ClosedListAdd(cPathCell * a_Point);
-	bool IsInOpenList(cPathCell * a_Point);
-	bool IsInClosedList(cPathCell * a_Point);
 	
 	/* Map management */
 	void ProcessCell(cPathCell * a_Cell,  cPathCell * a_Caller,  int a_GDelta);
@@ -168,11 +166,13 @@ private:
 	/* Final path fields */
 	int m_PointCount;
 	int m_CurrentPoint;
+	cWorld* m_World;
 	vector<Vector3d> m_PathPoints;
 	void addPoint(Vector3d a_Vector);
 	
 	/* Interfacing with MCServer's world */
 	#ifndef COMPILING_PATHFIND_DEBUGGER
+	Vector3d m_CurrentBlock;  // Read by Item();, it's the only way to "pass it" parameters
 protected:
 	virtual bool Item(cChunk * a_Chunk) override;
 	

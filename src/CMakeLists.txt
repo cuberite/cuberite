@@ -67,6 +67,7 @@ SET (SRCS
 	WebAdmin.cpp
 	World.cpp
 	main.cpp
+	TEMP_PathHelper.cpp
 )
 
 SET (HDRS
@@ -135,6 +136,7 @@ SET (HDRS
 	WebAdmin.h
 	World.h
 	XMLParser.h
+	TEMP_PathHelper.h
 )
 
 include_directories(".")
