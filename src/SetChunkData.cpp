@@ -33,8 +33,8 @@ cSetChunkData::cSetChunkData(
 	const NIBBLETYPE * a_SkyLight,
 	const cChunkDef::HeightMap * a_HeightMap,
 	const cChunkDef::BiomeMap * a_Biomes,
-	cEntityList & a_Entities,
-	cBlockEntityList & a_BlockEntities,
+	cEntityList && a_Entities,
+	cBlockEntityList && a_BlockEntities,
 	bool a_ShouldMarkDirty
 ) :
 	m_ChunkX(a_ChunkX),
@@ -84,8 +84,8 @@ cSetChunkData::cSetChunkData(
 	}
 	
 	// Move entities and blockentities:
-	std::swap(m_Entities,      a_Entities);
-	std::swap(m_BlockEntities, a_BlockEntities);
+	m_Entities = std::move(a_Entities);
+	m_BlockEntities = std::move(a_BlockEntities);
 }
 
 

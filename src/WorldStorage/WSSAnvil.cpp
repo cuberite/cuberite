@@ -431,7 +431,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 		IsLightValid ? BlockLight : nullptr,
 		IsLightValid ? SkyLight : nullptr,
 		nullptr, Biomes,
-		Entities, BlockEntities,
+		std::move(Entities), std::move(BlockEntities),
 		false
 	));
 	m_World->QueueSetChunkData(SetChunkData);
