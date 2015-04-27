@@ -24,8 +24,10 @@ public:
 
 	/** Constructs a new instance based on data existing elsewhere, will copy all the memory. Prefer to use the
 	other constructor as much as possible.
-	Will move the entity and blockentity lists into the internal storage, and empty the a_Entities and
-	a_BlockEntities lists.
+	Will move the entity and blockentity lists into the internal storage, and invalidate a_Entities and
+	a_BlockEntities.
+	When passing an lvalue, a_Entities and a_BlockEntities must be explicitly converted to an rvalue beforehand
+	with std::move().
 	a_BlockTypes and a_BlockMetas must always be valid.
 	If either of the light arrays are nullptr, the chunk data will be marked as not having any light at all and
 	will be scheduled for re-lighting once it is set into the chunkmap.
@@ -41,8 +43,8 @@ public:
 		const NIBBLETYPE * a_SkyLight,
 		const cChunkDef::HeightMap * a_HeightMap,
 		const cChunkDef::BiomeMap * a_Biomes,
-		cEntityList & a_Entities,
-		cBlockEntityList & a_BlockEntities,
+		cEntityList && a_Entities,
+		cBlockEntityList && a_BlockEntities,
 		bool a_ShouldMarkDirty
 	);
 	
