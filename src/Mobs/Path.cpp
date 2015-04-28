@@ -302,7 +302,7 @@ bool cPath::Step_Internal()
 		// printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
 		do
 		{
-			addPoint(CurrentCell->m_Location);  // Populate the cPath with points.
+			addPoint(CurrentCell->m_Location+Vector3d(0.5, 0, 0.5));  // Populate the cPath with points.
 			CurrentCell = CurrentCell->m_Parent;
 		}
 		while (CurrentCell != NULL);
