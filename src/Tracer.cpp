@@ -98,37 +98,38 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 		tDelta.z = 0;
 	}
 
+
 	// start voxel coordinates
-	pos.x = (int)floorf(a_Start.x);
-	pos.y = (int)floorf(a_Start.y);
-	pos.z = (int)floorf(a_Start.z);
+	pos.x = static_cast<int>(floorf(a_Start.x));
+	pos.y = static_cast<int>(floorf(a_Start.y));
+	pos.z = static_cast<int>(floorf(a_Start.z));
 
 	// calculate distance to first intersection in the voxel we start from
 	if (dir.x < 0)
 	{
-		tMax.x = ((float)pos.x - a_Start.x) / dir.x;
+		tMax.x = (static_cast<float>(pos.x) - a_Start.x) / dir.x;
 	}
 	else
 	{
-		tMax.x = (((float)pos.x + 1) - a_Start.x) / dir.x;
+		tMax.x = (static_cast<float>(pos.x + 1) - a_Start.x) / dir.x; //TODO: Possible division by zero
 	}
 
 	if (dir.y < 0)
 	{
-		tMax.y = ((float)pos.y - a_Start.y) / dir.y;
+		tMax.y = (static_cast<float>(pos.y) - a_Start.y) / dir.y;
 	}
 	else
 	{
-		tMax.y = (((float)pos.y + 1) - a_Start.y) / dir.y;
+		tMax.y = (static_cast<float>(pos.y + 1) - a_Start.y) / dir.y; //TODO: Possible division by zero
 	}
 
 	if (dir.z < 0)
 	{
-		tMax.z = ((float)pos.z - a_Start.z) / dir.z;
+		tMax.z = (static_cast<float>(pos.z) - a_Start.z) / dir.z;
 	}
 	else
 	{
-		tMax.z = (((float)pos.z + 1) - a_Start.z) / dir.z;
+		tMax.z = (static_cast<float>(pos.z + 1) - a_Start.z) / dir.z; //TODO: Possible division by zero
 	}
 }
 
@@ -146,18 +147,18 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	
 	SetValues(a_Start, a_Direction);
 
-	Vector3f End = a_Start + (dir * (float)a_Distance);
+	Vector3f End = a_Start + (dir * static_cast<float>(a_Distance));
 	
 	if (End.y < 0)
 	{
-		float dist = -a_Start.y / dir.y;
+		float dist = -a_Start.y / dir.y; // No division by 0 possible
 		End = a_Start + (dir * dist);
 	}
 
 	// end voxel coordinates
-	end1.x = (int)floorf(End.x);
-	end1.y = (int)floorf(End.y);
-	end1.z = (int)floorf(End.z);
+	end1.x = static_cast<int>(floorf(End.x));
+	end1.y = static_cast<int>(floorf(End.y));
+	end1.z = static_cast<int>(floorf(End.z));
 	
 	// check if first is occupied
 	if (pos.Equals(end1))
