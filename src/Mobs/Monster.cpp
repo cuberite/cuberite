@@ -127,7 +127,7 @@ void cMonster::TickPathFinding()
 		printf("%d %d %d > %d %d %d\n",(int)floor(GetPosition().x),(int)floor(GetPosition().y),(int)floor(GetPosition().z),
 			   (int)floor(m_FinalDestination.x),(int)floor(m_FinalDestination.y),(int)floor(m_FinalDestination.z));
 		//m_Path = new cPath(GetWorld(),GetPosition(),m_FinalDestination,30);
-		m_Path = new cPath(GetWorld(),Vector3d(179.5, 63.5, 292), Vector3d(180, 63, 300),30);
+		m_Path = new cPath(GetWorld(),Vector3d(179.5, 63.5, 292), Vector3d(180, 63, 300),30);  //this behaves DIFFERENTLY than the one below. WHY?
 		//m_Path = new cPath(GetWorld(),Vector3d(179, 63, 292), Vector3d(180, 63, 300),30);
 		m_IsFollowingPath = false;
 	}
