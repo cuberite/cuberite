@@ -12,17 +12,17 @@
 
 
 
-const float FLOAT_EPSILON = 0.0001f; //TODO: Stash this in some header where it can be reused
+const float FLOAT_EPSILON = 0.0001f;  // TODO: Stash this in some header where it can be reused
 
 
 const std::array<const Vector3f, 6> cTracer::m_NormalTable =
 {
-	Vector3f(-1,  0,  0), // 1: -x
-	Vector3f( 0,  0, -1), // 2: -z
-	Vector3f( 1,  0,  0), // 3: +x
-	Vector3f( 0,  0,  1), // 4: +z
-	Vector3f( 0,  1,  0), // 5: +y
-	Vector3f( 0, -1,  0)  // 6: -y
+	Vector3f(-1,  0,  0),  // 1: -x
+	Vector3f( 0,  0, -1),  // 2: -z
+	Vector3f( 1,  0,  0),  // 3: +x
+	Vector3f( 0,  0,  1),  // 4: +z
+	Vector3f( 0,  1,  0),  // 5: +y
+	Vector3f( 0, -1,  0)   // 6: -y
 };
 
 
@@ -120,7 +120,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	else
 	{
-		tMax.x = (static_cast<float>(pos.x + 1) - a_Start.x) / dir.x; //TODO: Possible division by zero
+		tMax.x = (static_cast<float>(pos.x + 1) - a_Start.x) / dir.x;  // TODO: Possible division by zero
 	}
 
 	if (dir.y < 0)
@@ -129,7 +129,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	else
 	{
-		tMax.y = (static_cast<float>(pos.y + 1) - a_Start.y) / dir.y; //TODO: Possible division by zero
+		tMax.y = (static_cast<float>(pos.y + 1) - a_Start.y) / dir.y;  // TODO: Possible division by zero
 	}
 
 	if (dir.z < 0)
@@ -138,7 +138,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	else
 	{
-		tMax.z = (static_cast<float>(pos.z + 1) - a_Start.z) / dir.z; //TODO: Possible division by zero
+		tMax.z = (static_cast<float>(pos.z + 1) - a_Start.z) / dir.z;  // TODO: Possible division by zero
 	}
 }
 
@@ -165,7 +165,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	
 	if (End.y < 0)
 	{
-		float dist = -a_Start.y / dir.y; // No division by 0 possible
+		float dist = -a_Start.y / dir.y;  // No division by 0 possible
 		End = a_Start + (dir * dist);
 	}
 
