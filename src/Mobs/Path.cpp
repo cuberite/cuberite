@@ -332,7 +332,11 @@ bool cPath::Step_Internal()
 			// This condition prevents diagonal corner cutting.
 			if (!GetCell(CurrentCell->m_Location + Vector3d(x, 0, 0))->m_IsSolid && !GetCell(CurrentCell->m_Location + Vector3d(0, 0, z))->m_IsSolid)
 			{
-				processIfWalkable(CurrentCell->m_Location + Vector3d(x, 0, z), CurrentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
+				// This prevents falling of "sharp turns" e.g. a 1x1x20 rectangle in the air which breaks in a right angle suddenly.
+				if (GetCell(CurrentCell->m_Location + Vector3d(x, -1, 0))->m_IsSolid && GetCell(CurrentCell->m_Location + Vector3d(0, -1, z))->m_IsSolid)
+				{
+					processIfWalkable(CurrentCell->m_Location + Vector3d(x, 0, z), CurrentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
+				}
 			}
 		}
 	}
