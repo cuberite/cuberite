@@ -73,7 +73,9 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 	if (BlockType == E_BLOCK_AIR)
 	{
 		printf("cPath::item - it's air. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
-		// a_Chunk->SetBlock(Vector3i(RelX, m_CurrentBlock.z, RelZ), E_BLOCK_COBBLESTONE, BlockMeta);
+		
+		// I'd like to use SetBlock for some debugging, but this isn't working. Why?
+		a_Chunk->SetBlock(Vector3i(RelX, m_CurrentBlock.z, RelZ), E_BLOCK_COBBLESTONE, BlockMeta);
 		return true;
 	}
 	else
