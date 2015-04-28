@@ -48,8 +48,9 @@ bool compareHeuristics::operator()(cPathCell * & a_V1, cPathCell * & a_V2)
 bool cPath::IsSolid(const Vector3d & a_Location)
 {
 	int ChunkX, ChunkZ;
-	m_CurrentBlock=a_Location;
-	printf("IsSolid called: (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
+	m_Item_CurrentBlock = a_Location;
+	m_Item_SetMode = false;  // Causes item() to tell us whether the block is solid or not, this field is for testing and will be removed later.
+	// printf("IsSolid called: (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 	cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
 	return !m_World->DoWithChunk(ChunkX, ChunkZ, *this);
 }
@@ -60,42 +61,77 @@ bool cPath::IsSolid(const Vector3d & a_Location)
 // Incomplete
 bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we failed.
 {
+	int RelX = m_Item_CurrentBlock.x - a_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = m_Item_CurrentBlock.z - a_Chunk->GetPosZ() * cChunkDef::Width;
+	
+	// If it's setmode, Sets a block to cobblestone and exits, will be removed eventually.
+	if (m_Item_SetMode)
+	{
+		a_Chunk->FastSetBlock(RelX, m_Item_CurrentBlock.y, RelZ, E_BLOCK_COBBLESTONE, 0);
+		return false;
+	}
+	
+	
 	if (!a_Chunk->IsValid())
 	{
-		printf("cPath::item - Invalid chunk. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
+		printf("cPath::item - Invalid chunk. Probably nobody is standing there. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 		return false;
 	}
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	int RelX = m_CurrentBlock.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = m_CurrentBlock.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	a_Chunk->GetBlockTypeMeta(RelX, m_CurrentBlock.y, RelZ, BlockType, BlockMeta);
+	a_Chunk->GetBlockTypeMeta(RelX, m_Item_CurrentBlock.y, RelZ, BlockType, BlockMeta);
 	if (BlockType == E_BLOCK_AIR)
 	{
-		printf("cPath::item - it's air. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
-		
-		// I'd like to use SetBlock for some debugging, but this isn't working. Why?
-		a_Chunk->SetBlock(Vector3i(RelX, m_CurrentBlock.z, RelZ), E_BLOCK_COBBLESTONE, BlockMeta);
+		// printf("cPath::item - it's air. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 		return true;
 	}
 	else
 	{
-		printf("cPath::item - it's a solid. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
+		// printf("cPath::item - it's a solid. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 		return false;
 	}
 	
-	// TODO Maybe I should later queue several blocks and call this at once for all of them for better performance?
+	// TODO Maybe I should queue several blocks and call item() at once for all of them for better performance?
+	// I think Worktycho said each item() call needs 2 locks.
 	
 }
 
 
 
-// Incomplete
+
 // For testing only, will eventually be removed along with the changes made to server.cpp
-// And along with TEMP_PathHelper.cpp
+// And along with TEMP_PathHelper.cpp, and along with m_Item_SetMode
 void cPath::consoleCommand()
 {
-	cPath myPath(Vector3d(-40, 70, -50), Vector3d(-40, 70, -50), 1000);
+	int SourceX = -160, SourceY = 63, SourceZ = -65;
+	int DestX = -174, DestY = 63, DestZ = -76;
+	cPath myPath(Vector3d(SourceX, SourceY, SourceZ), Vector3d(DestX, DestY, DestZ), 900);
+	printf("cPath::consoleCOmmand() - Finding path from (%d, %d, %d) to (%d, %d, %d)\n", SourceX, SourceY, SourceZ, DestX, DestY, DestZ);
+	
+	printf("1...\n");
+	while (myPath.Step()==CALCULATING){printf("cPath::consoleCOmmand() - Calculating...\n");};
+	printf("2...\n");
+	myPath.m_Item_SetMode = true;  // Causes Item() to set m_Item_currentBlock to cobblestone.
+	switch (myPath.Step())
+	{
+		case PATH_FOUND:
+			// Paint the found path using cobblestone, primitive, I know.
+			for(myPath.m_Item_CurrentBlock=myPath.getFirstPoint(); !myPath.isLastPoint(); myPath.m_Item_CurrentBlock=myPath.getnextPoint())
+			{
+				int ChunkX, ChunkZ;
+				cChunkDef::BlockToChunk(myPath.m_Item_CurrentBlock.x, myPath.m_Item_CurrentBlock.z, ChunkX, ChunkZ);
+				myPath.m_World->DoWithChunk(ChunkX, ChunkZ, myPath);
+			}
+			printf("cPath::consoleCommand() - Path found and marked with cobblestone!\n");
+			break;
+			
+		case PATH_NOT_FOUND:
+			printf("cPath::consoleCommand() - No path found!\n");
+			break;
+		case CALCULATING:
+		ASSERT(1 == 2);  // Just to shut a stupid compiler warning
+		break;
+	}
 }
 #endif
 
@@ -114,8 +150,9 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 	
 	if (GetCell(a_StartingPoint)->m_IsSolid || GetCell(a_EndingPoint)->m_IsSolid)
 	{
-		printf("No path found!\n");
+		printf("cPath::cPath() - No path found!\n");
 		m_Status = PATH_NOT_FOUND;
+		ASSERT( 1==2 );
 		return;
 	}
 	
@@ -124,6 +161,8 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 	m_Destination = a_EndingPoint;
 	m_StepsLeft = a_MaxSteps;
 	m_PointCount = 0;
+	
+	ProcessCell(GetCell(a_StartingPoint), NULL, 0);
 }
 
 
@@ -254,10 +293,12 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 
 ePathFinderStatus cPath::Step()
 {
+	// printf("cPath::step() - Stepping...\n");
 	if (m_Status == CALCULATING)
 	{
 		if (m_StepsLeft == 0)
 		{
+			printf("cPath::step() - No more steps left. Path either too far or non existent.\nIf the former, increase MaxSteps in constructor.\n");
 			FinishCalculation(PATH_NOT_FOUND);
 		}
 		else
@@ -294,6 +335,7 @@ bool cPath::Step_Internal()
 	// Path not reachable, open list exauhsted.
 	if (CurrentCell == NULL)
 	{
+		printf("cPath::Step_Internal() - Open list is empty. Path not found.\n");
 		FinishCalculation(PATH_NOT_FOUND);
 		ASSERT(m_Status == PATH_NOT_FOUND);
 		return true;
@@ -302,6 +344,7 @@ bool cPath::Step_Internal()
 	// Path found.
 	if (CurrentCell->m_Location == m_Destination)
 	{
+		printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
 		do
 		{
 			addPoint(CurrentCell->m_Location);  // Populate the cPath with points.

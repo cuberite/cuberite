@@ -172,7 +172,8 @@ private:
 	
 	/* Interfacing with MCServer's world */
 	#ifndef COMPILING_PATHFIND_DEBUGGER
-	Vector3d m_CurrentBlock;  // Read by Item();, it's the only way to "pass it" parameters
+	Vector3d m_Item_CurrentBlock;  // Read by Item();, it's the only way to "pass it" parameters
+	bool m_Item_SetMode;  // If true, Item() will just set a block to cobblestone and leave, this is for testing only.
 protected:
 	virtual bool Item(cChunk * a_Chunk) override;
 	
