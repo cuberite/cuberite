@@ -313,7 +313,8 @@ bool cPath::Step_Internal()
 	
 	// Calculation not finished yet, process a currentCell by inspecting all 8 neighbors.
 	
-	// Forward, backward, left, right. on all 3 different heights.
+	// Forward, backward, left, right. on all 2 different heights.
+	// TODO give the upper height special treatment (jump helpers)
 	int i;
 	for (i=-1; i<=1; ++i)
 	{
