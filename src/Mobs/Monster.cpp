@@ -139,19 +139,19 @@ void cMonster::TickPathFinding()
 	m_PathStatus = m_Path->Step();
 	if (m_PathStatus == PATH_NOT_FOUND)
 	{
-		printf("No PATH *******************...\n");
+		// printf("No PATH *******************...\n");
 		FinishPathFinding();
 	}
 	if (m_PathStatus == CALCULATING)
 	{
-		printf("calculating...\n");
+		// printf("calculating...\n");
 		m_Destination=GetPosition();
 	}
 	if (m_PathStatus == PATH_FOUND)
 	{
 		if (ReachedDestination() || (m_IsFollowingPath == false))
 		{
-			printf("Getting next point...\n");
+			// printf("Getting next point...\n");
 			m_Destination = m_Path->GetNextPoint();
 			m_IsFollowingPath = true;
 			m_GiveUpCounter=40; // Give up after 2 seconds if failed to reach m_Dest
@@ -169,7 +169,7 @@ void cMonster::TickPathFinding()
 		}*/
 		if (m_Path->IsLastPoint())
 		{
-			printf("Last point\n");
+			// printf("Last point\n");
 			FinishPathFinding();
 		}
 	}
@@ -293,7 +293,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				
 				if (--m_GiveUpCounter == 0) 
 				{
-					printf("Giving up.\n");
+					// printf("Giving up.\n");
 					FinishPathFinding();
 				}
 				else
@@ -304,7 +304,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					AddPosX(Distance.x);
 					AddPosY(Distance.y);
 					AddPosZ(Distance.z);
-					AddSpeedY(-2);
+					AddSpeedY(-0.5);
 				}
 			}
 		}
