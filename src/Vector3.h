@@ -78,7 +78,7 @@ public:
 		);
 	}
 
-	inline bool hasNonZeroLength(void) const
+	inline bool HasNonZeroLength(void) const
 	{
 		return ((x != 0) || (y != 0) || (z != 0));
 	}

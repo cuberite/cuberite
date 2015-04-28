@@ -64,7 +64,7 @@ int cTracer::SigNum(float a_Num)
 void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 {
 	// Since this method should only be called by Trace, zero length vectors should already have been taken care of
-	ASSERT(a_Direction.hasNonZeroLength());
+	ASSERT(a_Direction.HasNonZeroLength());
 
 	// calculate the direction of the ray (linear algebra)
 	dir = a_Direction;
@@ -148,7 +148,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight)
 {
-	if(!a_Direction.hasNonZeroLength())
+	if(!a_Direction.HasNonZeroLength())
 	{
 		return false;
 	}
