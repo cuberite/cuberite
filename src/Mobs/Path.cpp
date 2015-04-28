@@ -262,7 +262,7 @@ ePathFinderStatus cPath::Step()
 	{
 		if (m_StepsLeft == 0)
 		{
-			printf("cPath::step() - No more steps left. Path either too far or non existent.\nIf the former, increase MaxSteps in constructor.\n");
+			// printf("cPath::step() - No more steps left. Path either too far or non existent.\nIf the former, increase MaxSteps in constructor.\n");
 			FinishCalculation(PATH_NOT_FOUND);
 		}
 		else

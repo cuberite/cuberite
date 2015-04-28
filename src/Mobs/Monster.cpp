@@ -104,6 +104,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	m_Path = nullptr;
 	m_PathStatus = PATH_NOT_FOUND;
 	m_IsFollowingPath = false;
+	m_GiveUpCounter=0;
 }
 
 
@@ -122,7 +123,7 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 void cMonster::TickPathFinding()
 {
 	
-	if (m_Path == NULL)
+	if (m_Path == nullptr)
 	{
 		/*printf("%d %d %d > %d %d %d\n", floor(GetPosition().x), floor(GetPosition().y), floor(GetPosition().z), floor(m_FinalDestination.x), floor(m_FinalDestination.y), floor(m_FinalDestination.z));*/
 		Vector3d position=GetPosition();
@@ -130,7 +131,6 @@ void cMonster::TickPathFinding()
 		
 		// Can someone explain why are these two NOT THE SAME???
 		// m_Path = new cPath(GetWorld(), GetPosition(), m_FinalDestination, 30);
-		
 		m_Path = new cPath(GetWorld(), Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 30);
 		
 		
@@ -154,6 +154,7 @@ void cMonster::TickPathFinding()
 			// printf("Getting next point...\n");
 			m_Destination = m_Path->GetNextPoint();
 			m_IsFollowingPath = true;
+			m_GiveUpCounter=40; // Give up after 2 seconds if failed to reach m_Dest
 		}
 		/*else
 		{
@@ -286,16 +287,24 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					// Don't let the mob move too much if he's falling.
 					Distance *= 0.25f;
 				}
-	
+				
 				// Apply walk speed:
 				Distance *= m_RelativeWalkSpeed;*/
-				Distance=Distance / 6;
-				// AddSpeedX(Distance.x);
-				// AddSpeedZ(Distance.z);
-				AddPosX(Distance.x);
-				AddPosY(Distance.y);
-				AddPosZ(Distance.z);
-				AddSpeedY(-2);
+				
+				if (--m_GiveUpCounter == 0) 
+				{
+					FinishPathFinding();
+				}
+				else
+				{
+					Distance=Distance / 6;
+					// AddSpeedX(Distance.x);
+					// AddSpeedZ(Distance.z);
+					AddPosX(Distance.x);
+					AddPosY(Distance.y);
+					AddPosZ(Distance.z);
+					AddSpeedY(-2);
+				}
 			}
 		}
 	}

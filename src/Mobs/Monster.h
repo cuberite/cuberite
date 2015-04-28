@@ -165,6 +165,7 @@ protected:
 	cPath * m_Path;
 	ePathFinderStatus m_PathStatus;
 	bool m_IsFollowingPath;
+	int m_GiveUpCounter;  // If 0, will give up reaching the next m_Dest and will re-compute path.
 	/** Coordinates of the next position that should be reached */
 	Vector3d m_Destination;
 	/** Coordinates for the ultimate, final destination. */
@@ -206,12 +207,12 @@ protected:
 	/** Finishes a pathfinding task, be it due to failure or something else */
 	inline void FinishPathFinding(void)
 	{
-		if ((m_Path != nullptr) && (m_PathStatus != CALCULATING))
+		m_bMovingToDestination = false;
+		if (m_Path != nullptr)
 		{
-			// printf("Finished pathfinding.\n");
 			delete m_Path;
 			m_Path = nullptr;
-			m_bMovingToDestination = false;
+			
 		}
 	}
 	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
