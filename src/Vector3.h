@@ -78,6 +78,11 @@ public:
 		);
 	}
 
+	inline bool HasNonZeroLength(void) const
+	{
+		return ((x != 0) || (y != 0) || (z != 0));
+	}
+
 	inline double Length(void) const
 	{
 		return sqrt(static_cast<double>(x * x + y * y + z * z));

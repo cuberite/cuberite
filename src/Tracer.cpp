@@ -69,6 +69,9 @@ float cTracer::SigNum(float a_Num)
 
 void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 {
+	// Since this method should only be called by Trace, zero length vectors should already have been taken care of
+	ASSERT(a_Direction.HasNonZeroLength());
+
 	// calculate the direction of the ray (linear algebra)
 	dir = a_Direction;
 
@@ -78,10 +81,8 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	step.z = (int) SigNum(dir.z);
 
 	// normalize the direction vector
-	if (dir.SqrLength() > 0.f)
-	{
-		dir.Normalize();
-	}
+	dir.Normalize();
+
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
@@ -151,6 +152,11 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight)
 {
+	if (!a_Direction.HasNonZeroLength())
+	{
+		return false;
+	}
+
 	if ((a_Start.y < 0) || (a_Start.y >= cChunkDef::Height))
 	{
 		LOGD("%s: Start Y is outside the world (%.2f), not tracing.", __FUNCTION__, a_Start.y);
