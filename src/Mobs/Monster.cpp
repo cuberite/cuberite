@@ -271,25 +271,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_Destination != GetPosition())
 			{
-				/*Distance.y = 0;
-				Distance.Normalize();
-	
-				if (m_bOnGround)
-				{
-					Distance *= 2.5f;
-				}
-				else if (IsSwimming())
-				{
-					Distance *= 1.3f;
-				}
-				else
-				{
-					// Don't let the mob move too much if he's falling.
-					Distance *= 0.25f;
-				}
-				
-				// Apply walk speed:
-				Distance *= m_RelativeWalkSpeed;*/
+
 				
 				if (--m_GiveUpCounter == 0)
 				{
@@ -298,13 +280,36 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 				else
 				{
+					Distance.y = 0;
+					Distance.Normalize();
+		
+					if (m_bOnGround)
+					{
+						Distance *= 2.5f;
+					}
+					else if (IsSwimming())
+					{
+						Distance *= 1.3f;
+					}
+					else
+					{
+						// Don't let the mob move too much if he's falling.
+						Distance *= 0.25f;
+					}
+					
+					// Apply walk speed:
+					Distance *= m_RelativeWalkSpeed;
+					AddSpeedX(Distance.x);
+					AddSpeedZ(Distance.z);
+					
+					/*
 					Distance=Distance / 6;
 					// AddSpeedX(Distance.x);
 					// AddSpeedZ(Distance.z);
 					AddPosX(Distance.x);
 					AddPosY(Distance.y);
 					AddPosZ(Distance.z);
-					AddSpeedY(-0.5);
+					AddSpeedY(-0.5);*/
 				}
 			}
 		}
