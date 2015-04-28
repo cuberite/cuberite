@@ -21,9 +21,6 @@
 #include "IniFile.h"
 #include "Vector3.h"
 
-#include "Mobs/Path.h"  
-/* This will be removed once I finish debugging. */
-
 
 
 #include <fstream>
@@ -440,12 +437,6 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	AStringVector split = StringSplit(a_Cmd, " ");
 	if (split.empty())
 	{
-		return;
-	}
-	
-	if (split[0] == "pathfind")  // Debug command for Pathfinder.cpp, temporary.
-	{
-		cPath::consoleCommand();
 		return;
 	}
 	

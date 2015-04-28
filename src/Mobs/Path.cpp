@@ -5,8 +5,6 @@
 #include "Globals.h"
 #include "../World.h"
 #include "../Chunk.h"
-// Root is used for getting the default world, remove later
-#include "../Root.h"
 #endif
 
 
@@ -75,7 +73,7 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 	
 	if (!a_Chunk->IsValid())
 	{
-		printf("cPath::item - Invalid chunk. Probably nobody is standing there. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
+		// printf("cPath::item - Invalid chunk. Probably nobody is standing there. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 		return false;
 	}
 	BLOCKTYPE BlockType;
@@ -95,42 +93,6 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 	// TODO Maybe I should queue several blocks and call item() at once for all of them for better performance?
 	// I think Worktycho said each item() call needs 2 locks.
 	
-}
-
-
-
-
-// For testing only, will eventually be removed along with the changes made to server.cpp
-// And along with TEMP_PathHelper.cpp, and along with m_Item_SetMode
-void cPath::consoleCommand()
-{
-	int SourceX = -160, SourceY = 63, SourceZ = -65;
-	int DestX = -170, DestY = 63, DestZ = -65;
-	cPath myPath(cRoot::Get()->GetDefaultWorld(), Vector3d(SourceX, SourceY, SourceZ), Vector3d(DestX, DestY, DestZ), 900);
-	printf("cPath::consoleCOmmand() - Finding path from (%d, %d, %d) to (%d, %d, %d)\n", SourceX, SourceY, SourceZ, DestX, DestY, DestZ);
-	
-	while (myPath.Step()==CALCULATING){printf("cPath::consoleCOmmand() - Calculating...\n");};
-	myPath.m_Item_SetMode = true;  // Causes Item() to set m_Item_currentBlock to cobblestone.
-	switch (myPath.Step())
-	{
-		case PATH_FOUND:
-			// Paint the found path using cobblestone, primitive, I know.
-			for (myPath.m_Item_CurrentBlock=myPath.GetNextPoint(); !myPath.IsLastPoint(); myPath.m_Item_CurrentBlock = myPath.GetNextPoint())
-			{
-				int ChunkX, ChunkZ;
-				cChunkDef::BlockToChunk(myPath.m_Item_CurrentBlock.x, myPath.m_Item_CurrentBlock.z, ChunkX, ChunkZ);
-				myPath.m_World->DoWithChunk(ChunkX, ChunkZ, myPath);
-			}
-			printf("cPath::consoleCommand() - Path found and marked with cobblestone!\n");
-			break;
-			
-		case PATH_NOT_FOUND:
-			printf("cPath::consoleCommand() - No path found!\n");
-			break;
-		case CALCULATING:
-		ASSERT(1 == 2);  // Just to shut a stupid compiler warning and to crash us if there's a really unlikely bug.
-		break;
-	}
 }
 #endif
 
@@ -152,13 +114,9 @@ int a_MaxUp, int a_MaxDown)
 	m_Source = a_StartingPoint.Floor();
 	m_Destination = a_EndingPoint.Floor();
 	
-	printf("DUDE %d, %g\n",(int)m_Source.x, m_Source.x);
-	
 	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{
-		printf("cPath::cPath() - No path found (%d, %d, %d) -> (%d, %d, %d)!\n",
-               (int)m_Source.x, (int)m_Source.y, (int)m_Source.z,
-               (int)m_Destination.x, (int)m_Destination.y, (int)m_Destination.z);
+		/*printf("cPath::cPath() - No path found (%d, %d, %d) -> (%d, %d, %d)!\n", (int)m_Source.x, (int)m_Source.y, (int)m_Source.z, (int)m_Destination.x, (int)m_Destination.y, (int)m_Destination.z);*/
 		m_Status = PATH_NOT_FOUND;
 		return;
 	}
@@ -341,7 +299,7 @@ bool cPath::Step_Internal()
 	// Path not reachable, open list exauhsted.
 	if (CurrentCell == NULL)
 	{
-		printf("cPath::Step_Internal() - Open list is empty. Path not found.\n");
+		// printf("cPath::Step_Internal() - Open list is empty. Path not found.\n");
 		FinishCalculation(PATH_NOT_FOUND);
 		ASSERT(m_Status == PATH_NOT_FOUND);
 		return true;
@@ -350,7 +308,7 @@ bool cPath::Step_Internal()
 	// Path found.
 	if (CurrentCell->m_Location == m_Destination)
 	{
-		printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
+		// printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
 		do
 		{
 			addPoint(CurrentCell->m_Location);  // Populate the cPath with points.

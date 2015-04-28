@@ -124,18 +124,14 @@ void cMonster::TickPathFinding()
 	
 	if (m_Path == NULL)
 	{
-		/*printf("%d %d %d > %d %d %d\n",floor(GetPosition().x),floor(GetPosition().y),floor(GetPosition().z),
-			   floor(m_FinalDestination.x),floor(m_FinalDestination.y),floor(m_FinalDestination.z));*/
+		/*printf("%d %d %d > %d %d %d\n", floor(GetPosition().x), floor(GetPosition().y), floor(GetPosition().z), floor(m_FinalDestination.x), floor(m_FinalDestination.y), floor(m_FinalDestination.z));*/
 		Vector3d position=GetPosition();
 		Vector3d Dest = m_FinalDestination;
 		
 		// Can someone explain why are these two NOT THE SAME???
-		//m_Path = new cPath(GetWorld(),GetPosition(),m_FinalDestination,30);
+		// m_Path = new cPath(GetWorld(), GetPosition(), m_FinalDestination, 30);
 		
-		m_Path = new cPath(GetWorld(),
-						   Vector3d(floor(position.x),floor(position.y),floor(position.z)),
-						   Vector3d(floor(Dest.x),floor(Dest.y),floor(Dest.z)),
-						   30);
+		m_Path = new cPath(GetWorld(), Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 30);
 		
 		
 		m_IsFollowingPath = false;
@@ -143,33 +139,36 @@ void cMonster::TickPathFinding()
 	m_PathStatus = m_Path->Step();
 	if (m_PathStatus == PATH_NOT_FOUND)
 	{
-		printf("No PATH *******************...\n");
+		// printf("No PATH *******************...\n");
 		FinishPathFinding();
 	}
 	if (m_PathStatus == CALCULATING)
 	{
-		//printf("calculating...\n");
+		// printf("calculating...\n");
 		m_Destination=GetPosition();
 	}
 	if (m_PathStatus == PATH_FOUND)
 	{
-		if (ReachedDestination() || m_IsFollowingPath == false)
+		if (ReachedDestination() || (m_IsFollowingPath == false))
 		{
-			printf("Getting next point...\n");
+			// printf("Getting next point...\n");
 			m_Destination = m_Path->GetNextPoint();
 			m_IsFollowingPath = true;
 		}
-		else
+		/*else
 		{
 			if (!ReachedDestination())
+			{
 				printf("Did not reach destination\n");
+			}
 			if (!m_IsFollowingPath)
+			{
 				printf("Not following.\n");
-						
-		}
+			}
+		}*/
 		if (m_Path->IsLastPoint())
 		{
-			printf("Last point\n");
+			// printf("Last point\n");
 			FinishPathFinding();
 		}
 	}
@@ -186,7 +185,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 	{
 		return;
 	}
-	printf("ANSWERED\n");
+	// printf("ANSWERED\n");
 	m_FinalDestination = a_Position;
 	m_bMovingToDestination = true;
 }
@@ -291,8 +290,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				// Apply walk speed:
 				Distance *= m_RelativeWalkSpeed;*/
 				Distance=Distance / 6;
-				//AddSpeedX(Distance.x);
-				//AddSpeedZ(Distance.z);
+				// AddSpeedX(Distance.x);
+				// AddSpeedZ(Distance.z);
 				AddPosX(Distance.x);
 				AddPosY(Distance.y);
 				AddPosZ(Distance.z);

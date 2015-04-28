@@ -206,7 +206,7 @@ protected:
 	/** Finishes a pathfinding task, be it due to failure or something else */
 	inline void FinishPathFinding(void)
 	{
-		if (m_Path != nullptr && m_PathStatus!=CALCULATING)
+		if ((m_Path != nullptr) && (m_PathStatus != CALCULATING))
 		{
 			printf("Finished pathfinding.\n");
 			delete m_Path;

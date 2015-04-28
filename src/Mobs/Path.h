@@ -41,9 +41,6 @@ class cPath
 #endif
 {
 public:
-	
-	static void consoleCommand();  // Temporary, used for debugging, called when one writes "pathfind" in the console.
-	
 	/** Creates a pathfinder instance. A Mob will probably need a single pathfinder instance for its entire life.
 	
 	Note that if you have a man-sized mob (1x1x2, zombies, etc), you are advised to call this function without parameters
