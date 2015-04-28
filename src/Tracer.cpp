@@ -148,7 +148,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight)
 {
-	if(!a_Direction.HasNonZeroLength())
+	if (!a_Direction.HasNonZeroLength())
 	{
 		return false;
 	}
