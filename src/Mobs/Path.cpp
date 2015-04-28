@@ -1,3 +1,5 @@
+// TODO uniq_ptr instead of ptr whenever possible
+
 #ifndef COMPILING_PATHFIND_DEBUGGER
 /* MCServer headers */
 #include "Globals.h"
@@ -47,7 +49,7 @@ bool cPath::IsSolid(const Vector3d & a_Location)
 {
 	int ChunkX, ChunkZ;
 	m_CurrentBlock=a_Location;
-	printf("IsSolid called: (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y ,(int) m_CurrentBlock.z);
+	printf("IsSolid called: (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
 	cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
 	return !m_World->DoWithChunk(ChunkX, ChunkZ, *this);
 }
@@ -56,11 +58,11 @@ bool cPath::IsSolid(const Vector3d & a_Location)
 
 
 // Incomplete
-bool cPath::Item(cChunk * a_Chunk)  //returns FALSE if there's a solid or if we failed
+bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we failed.
 {
 	if (!a_Chunk->IsValid())
 	{
-		printf("cPath::item - Invalid chunk. (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y , (int)m_CurrentBlock.z);
+		printf("cPath::item - Invalid chunk. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
 		return false;
 	}
 	BLOCKTYPE BlockType;
@@ -68,14 +70,14 @@ bool cPath::Item(cChunk * a_Chunk)  //returns FALSE if there's a solid or if we 
 	int RelX = m_CurrentBlock.x - a_Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = m_CurrentBlock.z - a_Chunk->GetPosZ() * cChunkDef::Width;
 	a_Chunk->GetBlockTypeMeta(RelX, m_CurrentBlock.y, RelZ, BlockType, BlockMeta);
-	if (BlockType == E_BLOCK_AIR) 
+	if (BlockType == E_BLOCK_AIR)
 	{
-		printf("cPath::item - it's air. (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y , (int)m_CurrentBlock.z);
+		printf("cPath::item - it's air. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
 		return true;
 	}
 	else
 	{
-		printf("cPath::item - it's a solid. (%d %d %d)\n",(int)m_CurrentBlock.x,(int)m_CurrentBlock.y ,(int) m_CurrentBlock.z);
+		printf("cPath::item - it's a solid. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
 		return false;
 	}
 	
@@ -90,7 +92,7 @@ bool cPath::Item(cChunk * a_Chunk)  //returns FALSE if there's a solid or if we 
 // And along with TEMP_PathHelper.cpp
 void cPath::consoleCommand()
 {
-	cPath myPath(Vector3d(-10, 60, 2), Vector3d(-10, 60, 2), 1000);
+	cPath myPath(Vector3d(-40, 70, -50), Vector3d(-40, 70, -50), 1000);
 }
 #endif
 
