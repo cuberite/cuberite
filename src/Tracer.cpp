@@ -12,6 +12,8 @@
 
 
 
+const float FLOAT_EPSILON = 0.0001f; //TODO: Stash this in some header where it can be reused
+
 
 
 cTracer::cTracer(cWorld * a_World):
@@ -37,7 +39,7 @@ cTracer::~cTracer()
 
 
 
-float cTracer::SigNum(float a_Num)
+int cTracer::SigNum(float a_Num)
 {
 	if (a_Num < 0.f)
 	{
@@ -63,9 +65,10 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	dir = a_Direction;
 
 	// decide which direction to start walking in
-	step.x = (int) SigNum(dir.x);
-	step.y = (int) SigNum(dir.y);
-	step.z = (int) SigNum(dir.z);
+	step.x = SigNum(dir.x);
+	step.y = SigNum(dir.y);
+	step.z = SigNum(dir.z);
+
 
 	// normalize the direction vector
 	dir.Normalize();
@@ -302,8 +305,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 	float     D = a_PlaneNormal.Dot(u);      // dot(Pn.n, u);
 	float     N = -(a_PlaneNormal.Dot(w));  // -dot(a_Plane.n, w);
 
-	const float EPSILON = 0.0001f;
-	if (fabs(D) < EPSILON)
+	if (fabs(D) < FLOAT_EPSILON)
 	{
 		// segment is parallel to plane
 		if (N == 0.0)
