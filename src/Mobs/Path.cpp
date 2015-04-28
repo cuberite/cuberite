@@ -116,7 +116,7 @@ void cPath::consoleCommand()
 	{
 		case PATH_FOUND:
 			// Paint the found path using cobblestone, primitive, I know.
-			for(myPath.m_Item_CurrentBlock=myPath.getFirstPoint(); !myPath.isLastPoint(); myPath.m_Item_CurrentBlock=myPath.getnextPoint())
+			for(myPath.m_Item_CurrentBlock=myPath.getFirstPoint(); !myPath.isLastPoint(); myPath.m_Item_CurrentBlock = myPath.getnextPoint())
 			{
 				int ChunkX, ChunkZ;
 				cChunkDef::BlockToChunk(myPath.m_Item_CurrentBlock.x, myPath.m_Item_CurrentBlock.z, ChunkX, ChunkZ);
@@ -129,7 +129,7 @@ void cPath::consoleCommand()
 			printf("cPath::consoleCommand() - No path found!\n");
 			break;
 		case CALCULATING:
-		ASSERT(1 == 2);  // Just to shut a stupid compiler warning
+		ASSERT(1 == 2);  // Just to shut a stupid compiler warning and to crash us if there's a really unlikely bug.
 		break;
 	}
 }
@@ -152,7 +152,6 @@ cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, i
 	{
 		printf("cPath::cPath() - No path found!\n");
 		m_Status = PATH_NOT_FOUND;
-		ASSERT( 1==2 );
 		return;
 	}
 	
