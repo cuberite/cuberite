@@ -63,7 +63,8 @@ private:
 	/// Return 1 through 6 for the following block faces, repectively: -x, -z, x, z, y, -y
 	int GetHitNormal( const Vector3f & start, const Vector3f & end, const Vector3i &  a_BlockPos);
 
-	float SigNum( float a_Num);
+	/// Signum function
+	int SigNum( float a_Num);
 	cWorld* m_World;
 
 	static const std::array<const Vector3f, 6> & m_NormalTable(void);
