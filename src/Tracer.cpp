@@ -15,16 +15,21 @@
 const float FLOAT_EPSILON = 0.0001f; //TODO: Stash this in some header where it can be reused
 
 
+const std::array<const Vector3f, 6> cTracer::m_NormalTable =
+{
+	Vector3f(-1,  0,  0), // 1: -x
+	Vector3f( 0,  0, -1), // 2: -z
+	Vector3f( 1,  0,  0), // 3: +x
+	Vector3f( 0,  0,  1), // 4: +z
+	Vector3f( 0,  1,  0), // 5: +y
+	Vector3f( 0, -1,  0)  // 6: -y
+};
+
+
 
 cTracer::cTracer(cWorld * a_World):
 	m_World(a_World)
 {
-	m_NormalTable[0].Set(-1,  0,  0);
-	m_NormalTable[1].Set( 0,  0, -1);
-	m_NormalTable[2].Set( 1,  0,  0);
-	m_NormalTable[3].Set( 0,  0,  1);
-	m_NormalTable[4].Set( 0,  1,  0);
-	m_NormalTable[5].Set( 0, -1,  0);
 }
 
 

@@ -3,6 +3,8 @@
 
 #include "Vector3.h"
 
+#include <array>
+
 
 
 
@@ -65,7 +67,7 @@ private:
 	int SigNum( float a_Num);
 	cWorld* m_World;
 
-	Vector3f m_NormalTable[6];
+	static const std::array<const Vector3f, 6> m_NormalTable;
 
 	Vector3f dir;
 	Vector3f tDelta;
