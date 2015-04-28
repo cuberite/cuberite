@@ -16,5 +16,5 @@
 | Mail: faketruth@gmail.com  |
 \============================/
 
-Compatible clients: 1.2.4, 1.2.5, 1.3.1, 1.3.2, 1.4.2, 1.4.4, 1.4.5, 1.4.6, 1.4.7, 1.5, 1.5.1, 1.5.2, 1.6.1, 1.6.2, 1.6.3, 1.6.4
-Compatible protocol versions: 29, 39, 47, 49, 51, 60, 61, 73, 74, 77, 78
+Compatible clients: 1.7.x and 1.8.x
+Compatible protocol versions: 4, 5, 47
