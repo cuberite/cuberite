@@ -271,7 +271,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_Destination != GetPosition())
 			{
-				Distance.y = 0;
+				/*Distance.y = 0;
 				Distance.Normalize();
 	
 				if (m_bOnGround)
@@ -289,20 +289,14 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 	
 				// Apply walk speed:
-				Distance *= m_RelativeWalkSpeed;
-	
-				AddSpeedX(Distance.x);
-				AddSpeedZ(Distance.z);
-	
-				// It's too buggy!
-				/*
-				if (m_EMState == ESCAPING)
-				{
-					// Runs Faster when escaping :D otherwise they just walk away
-					SetSpeedX (GetSpeedX() * 2.f);
-					SetSpeedZ (GetSpeedZ() * 2.f);
-				}
-				*/
+				Distance *= m_RelativeWalkSpeed;*/
+				Distance=Distance / 6;
+				//AddSpeedX(Distance.x);
+				//AddSpeedZ(Distance.z);
+				AddPosX(Distance.x);
+				AddPosY(Distance.y);
+				AddPosZ(Distance.z);
+				AddSpeedY(-2);
 			}
 		}
 	}
