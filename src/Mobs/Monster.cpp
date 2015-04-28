@@ -101,6 +101,9 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	{
 		GetMonsterConfig(a_ConfigName);
 	}
+	m_Path = nullptr;
+	m_PathStatus = PATH_NOT_FOUND;
+	m_IsFollowingPath = false;
 }
 
 
@@ -118,87 +121,48 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 void cMonster::TickPathFinding()
 {
-	const int PosX = POSX_TOINT;
-	const int PosY = POSY_TOINT;
-	const int PosZ = POSZ_TOINT;
-
-	std::vector<Vector3d> m_PotentialCoordinates;
-	m_TraversedCoordinates.push_back(Vector3i(PosX, PosY, PosZ));
-
-	static const struct  // Define which directions to try to move to
-	{
-		int x, z;
-	} gCrossCoords[] =
-	{
-		{ 1, 0},
-		{-1, 0},
-		{ 0, 1},
-		{ 0, -1},
-	} ;
 	
-	if ((PosY - 1 < 0) || (PosY + 2 >= cChunkDef::Height) /* PosY + 1 will never be true if PosY + 2 is not */)
+	if (m_Path == NULL)
 	{
-		// Too low/high, can't really do anything
+		printf("%d %d %d > %d %d %d\n",(int)floor(GetPosition().x),(int)floor(GetPosition().y),(int)floor(GetPosition().z),
+			   (int)floor(m_FinalDestination.x),(int)floor(m_FinalDestination.y),(int)floor(m_FinalDestination.z));
+		//m_Path = new cPath(GetWorld(),GetPosition(),m_FinalDestination,30);
+		m_Path = new cPath(GetWorld(),Vector3d(179.5, 63.5, 292), Vector3d(180, 63, 300),30);
+		//m_Path = new cPath(GetWorld(),Vector3d(179, 63, 292), Vector3d(180, 63, 300),30);
+		m_IsFollowingPath = false;
+	}
+	m_PathStatus = m_Path->Step();
+	if (m_PathStatus == PATH_NOT_FOUND)
+	{
+		printf("No PATH *******************...\n");
 		FinishPathFinding();
-		return;
 	}
-
-	for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
+	if (m_PathStatus == CALCULATING)
 	{
-		if (IsCoordinateInTraversedList(Vector3i(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ)))
-		{
-			continue;
-		}
-
-		BLOCKTYPE BlockAtY = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtYP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 1, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtYPP = m_World->GetBlock(gCrossCoords[i].x + PosX, PosY + 2, gCrossCoords[i].z + PosZ);
-		int LowestY = FindFirstNonAirBlockPosition(gCrossCoords[i].x + PosX, gCrossCoords[i].z + PosZ);
-		BLOCKTYPE BlockAtLowestY = (LowestY >= cChunkDef::Height) ? E_BLOCK_AIR : m_World->GetBlock(gCrossCoords[i].x + PosX, LowestY, gCrossCoords[i].z + PosZ);
-
-		if (
-			(!cBlockInfo::IsSolid(BlockAtY)) &&
-			(!cBlockInfo::IsSolid(BlockAtYP)) &&
-			(!IsBlockLava(BlockAtLowestY)) &&
-			(BlockAtLowestY != E_BLOCK_CACTUS) &&
-			(PosY - LowestY < FALL_DAMAGE_HEIGHT)
-			)
-		{
-			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY, gCrossCoords[i].z + PosZ));
-		}
-		else if (
-			(cBlockInfo::IsSolid(BlockAtY)) &&
-			(BlockAtY != E_BLOCK_CACTUS) &&
-			(!cBlockInfo::IsSolid(BlockAtYP)) &&
-			(!cBlockInfo::IsSolid(BlockAtYPP)) &&
-			(BlockAtY != E_BLOCK_FENCE) &&
-			(BlockAtY != E_BLOCK_FENCE_GATE)
-			)
-		{
-			m_PotentialCoordinates.push_back(Vector3d((gCrossCoords[i].x + PosX), PosY + 1, gCrossCoords[i].z + PosZ));
-		}
+		//printf("calculating...\n");
+		m_Destination=GetPosition();
 	}
-
-	if (!m_PotentialCoordinates.empty())
+	if (m_PathStatus == PATH_FOUND)
 	{
-		Vector3f ShortestCoords = m_PotentialCoordinates.front();
-		for (std::vector<Vector3d>::const_iterator itr = m_PotentialCoordinates.begin(); itr != m_PotentialCoordinates.end(); ++itr)
+		if (ReachedDestination() || m_IsFollowingPath == false)
 		{
-			Vector3f Distance = m_FinalDestination - ShortestCoords;
-			Vector3f Distance2 = m_FinalDestination - *itr;
-			if (Distance.SqrLength() > Distance2.SqrLength())
-			{
-				ShortestCoords = *itr;
-			}
+			printf("Getting next point...\n");
+			m_Destination = m_Path->GetNextPoint();
+			m_IsFollowingPath = true;
 		}
-
-		m_Destination = ShortestCoords;
-		m_Destination.z += 0.5f;
-		m_Destination.x += 0.5f;
-	}
-	else
-	{
-		FinishPathFinding();
+		else
+		{
+			if (!ReachedDestination())
+				printf("Did not reach destination\n");
+			if (!m_IsFollowingPath)
+				printf("Not following.\n");
+						
+		}
+		if (m_Path->IsLastPoint())
+		{
+			printf("Last point\n");
+			FinishPathFinding();
+		}
 	}
 }
 
@@ -208,11 +172,14 @@ void cMonster::TickPathFinding()
 
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
-	FinishPathFinding();
-
+	
+	if (m_PathStatus == CALCULATING)
+	{
+		return;
+	}
+	printf("ANSWERED\n");
 	m_FinalDestination = a_Position;
 	m_bMovingToDestination = true;
-	TickPathFinding();
 }
 
 
@@ -278,6 +245,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_bMovingToDestination)
 	{
+		TickPathFinding();
 		if (m_bOnGround)
 		{
 			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
@@ -292,48 +260,40 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3d Distance = m_Destination - GetPosition();
 		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move
 		{
-			Distance.y = 0;
-			Distance.Normalize();
-
-			if (m_bOnGround)
+			if (m_Destination != GetPosition())
 			{
-				Distance *= 2.5f;
-			}
-			else if (IsSwimming())
-			{
-				Distance *= 1.3f;
-			}
-			else
-			{
-				// Don't let the mob move too much if he's falling.
-				Distance *= 0.25f;
-			}
-
-			// Apply walk speed:
-			Distance *= m_RelativeWalkSpeed;
-
-			AddSpeedX(Distance.x);
-			AddSpeedZ(Distance.z);
-
-			// It's too buggy!
-			/*
-			if (m_EMState == ESCAPING)
-			{
-				// Runs Faster when escaping :D otherwise they just walk away
-				SetSpeedX (GetSpeedX() * 2.f);
-				SetSpeedZ (GetSpeedZ() * 2.f);
-			}
-			*/
-		}
-		else
-		{
-			if (ReachedFinalDestination())  // If we have reached the ultimate, final destination, stop pathfinding and attack if appropriate
-			{
-				FinishPathFinding();
-			}
-			else
-			{
-				TickPathFinding();  // We have reached the next point in our path, calculate another point
+				Distance.y = 0;
+				Distance.Normalize();
+	
+				if (m_bOnGround)
+				{
+					Distance *= 2.5f;
+				}
+				else if (IsSwimming())
+				{
+					Distance *= 1.3f;
+				}
+				else
+				{
+					// Don't let the mob move too much if he's falling.
+					Distance *= 0.25f;
+				}
+	
+				// Apply walk speed:
+				Distance *= m_RelativeWalkSpeed;
+	
+				AddSpeedX(Distance.x);
+				AddSpeedZ(Distance.z);
+	
+				// It's too buggy!
+				/*
+				if (m_EMState == ESCAPING)
+				{
+					// Runs Faster when escaping :D otherwise they just walk away
+					SetSpeedX (GetSpeedX() * 2.f);
+					SetSpeedZ (GetSpeedZ() * 2.f);
+				}
+				*/
 			}
 		}
 	}

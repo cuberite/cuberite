@@ -93,7 +93,7 @@ public:
 	{
 		ASSERT(m_Status == PATH_FOUND);
 		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
-		return m_CurrentPoint == 0;
+		return (m_CurrentPoint == m_PointCount - 1);
 	}
 	
 	

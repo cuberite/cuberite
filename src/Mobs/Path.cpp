@@ -147,15 +147,12 @@ int a_MaxUp, int a_MaxDown)
 	// Borrow a new "isWalkable" from processIfWalkable, make processIfWalkable also call isWalkable
 	
 	m_World = a_World;
-	m_World = cRoot::Get()->GetDefaultWorld();
+	// m_World = cRoot::Get()->GetDefaultWorld();
 	
-	m_Source.x = floor(a_StartingPoint.x);
-	m_Source.y = floor(a_StartingPoint.y);
-	m_Source.z = floor(a_StartingPoint.z);
-	m_Destination.x = floor(a_EndingPoint.x);
-	m_Destination.y = floor(a_EndingPoint.y);
-	m_Destination.z = floor(a_EndingPoint.z);
-
+	m_Source = a_StartingPoint.Floor();
+	m_Destination = a_EndingPoint.Floor();
+	
+	printf("DUDE %d, %g\n",(int)m_Source.x, m_Source.x);
 	
 	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{
