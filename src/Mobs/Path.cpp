@@ -79,16 +79,7 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	a_Chunk->GetBlockTypeMeta(RelX, m_Item_CurrentBlock.y, RelZ, BlockType, BlockMeta);
-	if (BlockType == E_BLOCK_AIR)
-	{
-		// printf("cPath::item - it's air. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
-		return true;
-	}
-	else
-	{
-		// printf("cPath::item - it's a solid. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
-		return false;
-	}
+	return (!cBlockInfo::IsSolid(BlockType));
 	
 	// TODO Maybe I should queue several blocks and call item() at once for all of them for better performance?
 	// I think Worktycho said each item() call needs 2 locks.
