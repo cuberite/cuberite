@@ -13,16 +13,29 @@
 
 
 
+const std::array<const Vector3f, 6>& cTracer::m_NormalTable(void)
+{
+	static std::array<const Vector3f, 6>* table =
+		new std::array<const Vector3f, 6>
+	{
+		{
+		Vector3f(-1,  0,  0),  // 1: -x
+		Vector3f( 0,  0, -1),  // 2: -z
+		Vector3f( 1,  0,  0),  // 3: +x
+		Vector3f( 0,  0,  1),  // 4: +z
+		Vector3f( 0,  1,  0),  // 5: +y
+		Vector3f( 0, -1,  0)   // 6: -y
+		}
+	};
+
+	return *table;
+};
+
+
 
 cTracer::cTracer(cWorld * a_World):
 	m_World(a_World)
 {
-	m_NormalTable[0].Set(-1,  0,  0);
-	m_NormalTable[1].Set( 0,  0, -1);
-	m_NormalTable[2].Set( 1,  0,  0);
-	m_NormalTable[3].Set( 0,  0,  1);
-	m_NormalTable[4].Set( 0,  1,  0);
-	m_NormalTable[5].Set( 0, -1,  0);
 }
 
 
@@ -241,7 +254,7 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 			int Normal = GetHitNormal(a_Start, End, pos);
 			if (Normal > 0)
 			{
-				HitNormal = m_NormalTable[Normal-1];
+				HitNormal = m_NormalTable()[Normal - 1];
 			}
 			return true;
 		}
