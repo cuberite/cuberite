@@ -105,7 +105,7 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 void cPath::consoleCommand()
 {
 	int SourceX = -160, SourceY = 63, SourceZ = -65;
-	int DestX = -174, DestY = 63, DestZ = -76;
+	int DestX = -170, DestY = 63, DestZ = -65;
 	cPath myPath(cRoot::Get()->GetDefaultWorld(), Vector3d(SourceX, SourceY, SourceZ), Vector3d(DestX, DestY, DestZ), 900);
 	printf("cPath::consoleCOmmand() - Finding path from (%d, %d, %d) to (%d, %d, %d)\n", SourceX, SourceY, SourceZ, DestX, DestY, DestZ);
 	
@@ -115,7 +115,7 @@ void cPath::consoleCommand()
 	{
 		case PATH_FOUND:
 			// Paint the found path using cobblestone, primitive, I know.
-			for (myPath.m_Item_CurrentBlock=myPath.getFirstPoint(); !myPath.isLastPoint(); myPath.m_Item_CurrentBlock = myPath.getnextPoint())
+			for (myPath.m_Item_CurrentBlock=myPath.GetNextPoint(); !myPath.IsLastPoint(); myPath.m_Item_CurrentBlock = myPath.GetNextPoint())
 			{
 				int ChunkX, ChunkZ;
 				cChunkDef::BlockToChunk(myPath.m_Item_CurrentBlock.x, myPath.m_Item_CurrentBlock.z, ChunkX, ChunkZ);
@@ -147,17 +147,27 @@ int a_MaxUp, int a_MaxDown)
 	// Borrow a new "isWalkable" from processIfWalkable, make processIfWalkable also call isWalkable
 	
 	m_World = a_World;
+	m_World = cRoot::Get()->GetDefaultWorld();
 	
-	if (GetCell(a_StartingPoint)->m_IsSolid || GetCell(a_EndingPoint)->m_IsSolid)
+	m_Source.x = floor(a_StartingPoint.x);
+	m_Source.y = floor(a_StartingPoint.y);
+	m_Source.z = floor(a_StartingPoint.z);
+	m_Destination.x = floor(a_EndingPoint.x);
+	m_Destination.y = floor(a_EndingPoint.y);
+	m_Destination.z = floor(a_EndingPoint.z);
+
+	
+	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{
-		printf("cPath::cPath() - No path found!\n");
+		printf("cPath::cPath() - No path found (%d, %d, %d) -> (%d, %d, %d)!\n",
+               (int)m_Source.x, (int)m_Source.y, (int)m_Source.z,
+               (int)m_Destination.x, (int)m_Destination.y, (int)m_Destination.z);
 		m_Status = PATH_NOT_FOUND;
 		return;
 	}
 	
 	m_Status = CALCULATING;
-	m_Source = a_StartingPoint;
-	m_Destination = a_EndingPoint;
+
 	m_StepsLeft = a_MaxSteps;
 	m_PointCount = 0;
 	

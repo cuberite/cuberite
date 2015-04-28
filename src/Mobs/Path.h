@@ -77,24 +77,11 @@ public:
 	
 	/* Point retrieval functions, inlined for performance. */
 	
-	/** Returns the first point*/
-	inline Vector3d getFirstPoint()
-	{
-		ASSERT(m_Status == PATH_FOUND);
-		m_CurrentPoint = m_PointCount - 1;
-		return m_PathPoints[m_CurrentPoint];
-	}
-	
-	
-	
-	
-	
 	/** Returns the next point in the path. */
-	inline Vector3d getnextPoint()
+	inline Vector3d GetNextPoint()
 	{
 		ASSERT(m_Status == PATH_FOUND);
-		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
-		return m_PathPoints[m_PointCount - 1 - (--m_CurrentPoint)];
+		return m_PathPoints[m_PointCount - 1 - (++m_CurrentPoint)];
 	}
 	
 	
@@ -102,7 +89,7 @@ public:
 	
 	
 	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
-	inline bool isLastPoint()
+	inline bool IsLastPoint()
 	{
 		ASSERT(m_Status == PATH_FOUND);
 		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
