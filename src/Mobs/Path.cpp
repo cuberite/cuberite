@@ -4,11 +4,12 @@
 /* MCServer headers */
 #include "Globals.h"
 #include "../World.h"
+#include "../Chunk.h"
+// Root is used for getting the default world, remove later
+#include "../Root.h"
 #endif
 
-// Root is used for getting the default world, remove later
-#include "../Chunk.h"
-#include "../Root.h"
+
 #include "Path.h"
 
 #include <stdio.h>
@@ -105,18 +106,16 @@ void cPath::consoleCommand()
 {
 	int SourceX = -160, SourceY = 63, SourceZ = -65;
 	int DestX = -174, DestY = 63, DestZ = -76;
-	cPath myPath(Vector3d(SourceX, SourceY, SourceZ), Vector3d(DestX, DestY, DestZ), 900);
+	cPath myPath(cRoot::Get()->GetDefaultWorld(), Vector3d(SourceX, SourceY, SourceZ), Vector3d(DestX, DestY, DestZ), 900);
 	printf("cPath::consoleCOmmand() - Finding path from (%d, %d, %d) to (%d, %d, %d)\n", SourceX, SourceY, SourceZ, DestX, DestY, DestZ);
 	
-	printf("1...\n");
 	while (myPath.Step()==CALCULATING){printf("cPath::consoleCOmmand() - Calculating...\n");};
-	printf("2...\n");
 	myPath.m_Item_SetMode = true;  // Causes Item() to set m_Item_currentBlock to cobblestone.
 	switch (myPath.Step())
 	{
 		case PATH_FOUND:
 			// Paint the found path using cobblestone, primitive, I know.
-			for(myPath.m_Item_CurrentBlock=myPath.getFirstPoint(); !myPath.isLastPoint(); myPath.m_Item_CurrentBlock = myPath.getnextPoint())
+			for (myPath.m_Item_CurrentBlock=myPath.getFirstPoint(); !myPath.isLastPoint(); myPath.m_Item_CurrentBlock = myPath.getnextPoint())
 			{
 				int ChunkX, ChunkZ;
 				cChunkDef::BlockToChunk(myPath.m_Item_CurrentBlock.x, myPath.m_Item_CurrentBlock.z, ChunkX, ChunkZ);
@@ -139,14 +138,15 @@ void cPath::consoleCommand()
 
 
 
-cPath::cPath(const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps, double a_BoundingBoxWidth, double a_BoundingBoxHeight, int a_MaxUp, int a_MaxDown)
+cPath::cPath(cWorld * a_World,
+const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
+double a_BoundingBoxWidth, double a_BoundingBoxHeight,
+int a_MaxUp, int a_MaxDown)
 {
 	// TODO: if src not walkable OR dest not walkable, then abort
 	// Borrow a new "isWalkable" from processIfWalkable, make processIfWalkable also call isWalkable
 	
-	#ifndef COMPILING_PATHFIND_DEBUGGER
-	m_World = cRoot::Get()->GetDefaultWorld();
-	#endif
+	m_World = a_World;
 	
 	if (GetCell(a_StartingPoint)->m_IsSolid || GetCell(a_EndingPoint)->m_IsSolid)
 	{
@@ -218,7 +218,7 @@ cPathCell * cPath::GetCell(const Vector3d & a_Location)
 		Cell->m_Status = NOLIST;
 		#ifdef COMPILING_PATHFIND_DEBUGGER
 		#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
-		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, cell->m_IsSolid ? NORMAL : MINI);
+		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, Cell->m_IsSolid ? NORMAL : MINI);
 		#endif
 		#endif
 		return Cell;
@@ -413,7 +413,7 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 	m_OpenList.pop();
 	Ret->m_Status = CLOSEDLIST;
 	#ifdef COMPILING_PATHFIND_DEBUGGER
-	si::setBlock((ret)->m_Location.x, (ret)->m_Location.y, (ret)->m_Location.z, debug_closed, SetMini(ret));
+	si::setBlock((Ret)->m_Location.x, (Ret)->m_Location.y, (Ret)->m_Location.z, debug_closed, SetMini(Ret));
 	#endif
 	return Ret;
 }

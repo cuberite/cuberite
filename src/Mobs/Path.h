@@ -63,8 +63,8 @@ public:
 	@param a_EndingPoint "The block where the Zombie's knees want to be".
 	@param a_MaxSteps The maximum steps before giving up. */
 	cPath(
-		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint,
-		int a_MaxSteps,
+		cWorld * a_World,
+		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 		double a_BoundingBoxWidth = 1, double a_BoundingBoxHeight = 2,
 		int a_MaxUp = 1, int a_MaxDown = 1
 	);
@@ -166,11 +166,11 @@ private:
 	/* Final path fields */
 	int m_PointCount;
 	int m_CurrentPoint;
-	cWorld* m_World;
 	vector<Vector3d> m_PathPoints;
 	void addPoint(Vector3d a_Vector);
 	
 	/* Interfacing with MCServer's world */
+	cWorld * m_World;
 	#ifndef COMPILING_PATHFIND_DEBUGGER
 	Vector3d m_Item_CurrentBlock;  // Read by Item();, it's the only way to "pass it" parameters
 	bool m_Item_SetMode;  // If true, Item() will just set a block to cobblestone and leave, this is for testing only.
