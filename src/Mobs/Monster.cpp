@@ -124,11 +124,20 @@ void cMonster::TickPathFinding()
 	
 	if (m_Path == NULL)
 	{
-		printf("%d %d %d > %d %d %d\n",(int)floor(GetPosition().x),(int)floor(GetPosition().y),(int)floor(GetPosition().z),
-			   (int)floor(m_FinalDestination.x),(int)floor(m_FinalDestination.y),(int)floor(m_FinalDestination.z));
+		/*printf("%d %d %d > %d %d %d\n",floor(GetPosition().x),floor(GetPosition().y),floor(GetPosition().z),
+			   floor(m_FinalDestination.x),floor(m_FinalDestination.y),floor(m_FinalDestination.z));*/
+		Vector3d position=GetPosition();
+		Vector3d Dest = m_FinalDestination;
+		
+		// Can someone explain why are these two NOT THE SAME???
 		//m_Path = new cPath(GetWorld(),GetPosition(),m_FinalDestination,30);
-		m_Path = new cPath(GetWorld(),Vector3d(179.5, 63.5, 292), Vector3d(180, 63, 300),30);  //this behaves DIFFERENTLY than the one below. WHY?
-		//m_Path = new cPath(GetWorld(),Vector3d(179, 63, 292), Vector3d(180, 63, 300),30);
+		
+		m_Path = new cPath(GetWorld(),
+						   Vector3d(floor(position.x),floor(position.y),floor(position.z)),
+						   Vector3d(floor(Dest.x),floor(Dest.y),floor(Dest.z)),
+						   30);
+		
+		
 		m_IsFollowingPath = false;
 	}
 	m_PathStatus = m_Path->Step();
