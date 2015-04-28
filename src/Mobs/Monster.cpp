@@ -131,7 +131,7 @@ void cMonster::TickPathFinding()
 		
 		// Can someone explain why are these two NOT THE SAME???
 		// m_Path = new cPath(GetWorld(), GetPosition(), m_FinalDestination, 30);
-		m_Path = new cPath(GetWorld(), Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 90);
+		m_Path = new cPath(GetWorld(), Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 20);
 		
 		
 		m_IsFollowingPath = false;
