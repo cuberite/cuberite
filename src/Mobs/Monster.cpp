@@ -154,7 +154,7 @@ void cMonster::TickPathFinding()
 			// printf("Getting next point...\n");
 			m_Destination = m_Path->GetNextPoint();
 			m_IsFollowingPath = true;
-			m_GiveUpCounter=40; // Give up after 2 seconds if failed to reach m_Dest
+			m_GiveUpCounter=40;  // Give up after 2 seconds if failed to reach m_Dest
 		}
 		/*else
 		{
@@ -291,7 +291,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				// Apply walk speed:
 				Distance *= m_RelativeWalkSpeed;*/
 				
-				if (--m_GiveUpCounter == 0) 
+				if (--m_GiveUpCounter == 0)
 				{
 					// printf("Giving up.\n");
 					FinishPathFinding();
