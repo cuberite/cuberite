@@ -208,7 +208,7 @@ protected:
 	{
 		if ((m_Path != nullptr) && (m_PathStatus != CALCULATING))
 		{
-			printf("Finished pathfinding.\n");
+			// printf("Finished pathfinding.\n");
 			delete m_Path;
 			m_Path = nullptr;
 			m_bMovingToDestination = false;
