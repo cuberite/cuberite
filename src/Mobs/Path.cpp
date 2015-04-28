@@ -17,7 +17,7 @@
 
 #define DISTANCE_MANHATTEN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
-#define CALCULATIONS_PER_CALL 1  // Higher means more CPU load but faster path calculations.
+#define CALCULATIONS_PER_STEP 1  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
 enum eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
@@ -73,6 +73,7 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 	if (BlockType == E_BLOCK_AIR)
 	{
 		printf("cPath::item - it's air. (%d %d %d)\n", (int)m_CurrentBlock.x, (int)m_CurrentBlock.y, (int)m_CurrentBlock.z);
+		// a_Chunk->SetBlock(Vector3i(RelX, m_CurrentBlock.z, RelZ), E_BLOCK_COBBLESTONE, BlockMeta);
 		return true;
 	}
 	else
@@ -261,7 +262,7 @@ ePathFinderStatus cPath::Step()
 		{
 			--m_StepsLeft;
 			int i;
-			for (i = 0; i < CALCULATIONS_PER_CALL; ++i)
+			for (i = 0; i < CALCULATIONS_PER_STEP; ++i)
 			{
 				if (Step_Internal())  // Step_Internal returns true when no more calculation is needed.
 				{
@@ -286,10 +287,10 @@ void cPath::processIfWalkable(const Vector3d & a_Location, cPathCell * a_Parent,
 
 bool cPath::Step_Internal()
 {
-	cPathCell * currentCell = OpenListPop();
+	cPathCell * CurrentCell = OpenListPop();
 	
 	// Path not reachable, open list exauhsted.
-	if (currentCell == NULL)
+	if (CurrentCell == NULL)
 	{
 		FinishCalculation(PATH_NOT_FOUND);
 		ASSERT(m_Status == PATH_NOT_FOUND);
@@ -297,14 +298,14 @@ bool cPath::Step_Internal()
 	}
 	
 	// Path found.
-	if (currentCell->m_Location == m_Destination)
+	if (CurrentCell->m_Location == m_Destination)
 	{
 		do
 		{
-			addPoint(currentCell->m_Location);  // Populate the cPath with points.
-			currentCell = currentCell->m_Parent;
+			addPoint(CurrentCell->m_Location);  // Populate the cPath with points.
+			CurrentCell = CurrentCell->m_Parent;
 		}
-		while (currentCell != NULL);
+		while (CurrentCell != NULL);
 		m_CurrentPoint = -1;
 		FinishCalculation(PATH_FOUND);
 		return true;
@@ -316,10 +317,10 @@ bool cPath::Step_Internal()
 	int i;
 	for (i=-1; i<=1; ++i)
 	{
-		processIfWalkable(currentCell->m_Location + Vector3d(1, i, 0), currentCell, 10);
-		processIfWalkable(currentCell->m_Location + Vector3d(-1, i, 0), currentCell, 10);
-		processIfWalkable(currentCell->m_Location + Vector3d(0, i, 1), currentCell, 10);
-		processIfWalkable(currentCell->m_Location + Vector3d(0, i, -1), currentCell, 10);
+		processIfWalkable(CurrentCell->m_Location + Vector3d(1, i, 0), CurrentCell, 10);
+		processIfWalkable(CurrentCell->m_Location + Vector3d(-1, i, 0), CurrentCell, 10);
+		processIfWalkable(CurrentCell->m_Location + Vector3d(0, i, 1), CurrentCell, 10);
+		processIfWalkable(CurrentCell->m_Location + Vector3d(0, i, -1), CurrentCell, 10);
 	}
 	
 	// Diagonals
@@ -329,9 +330,9 @@ bool cPath::Step_Internal()
 		for (z=-1; z<=1; z+=2)
 		{
 			// This condition prevents diagonal corner cutting.
-			if (!GetCell(currentCell->m_Location + Vector3d(x, 0, 0))->m_IsSolid && !GetCell(currentCell->m_Location + Vector3d(0, 0, z))->m_IsSolid)
+			if (!GetCell(CurrentCell->m_Location + Vector3d(x, 0, 0))->m_IsSolid && !GetCell(CurrentCell->m_Location + Vector3d(0, 0, z))->m_IsSolid)
 			{
-				processIfWalkable(currentCell->m_Location + Vector3d(x, 0, z), currentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
+				processIfWalkable(CurrentCell->m_Location + Vector3d(x, 0, z), CurrentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
 			}
 		}
 	}
