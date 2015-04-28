@@ -95,7 +95,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_DropChanceBoots(0.085f)
 	, m_CanPickUpLoot(true)
 	, m_BurnsInDaylight(false)
-	, m_RelativeWalkSpeed(1.0)
+	, m_RelativeWalkSpeed(0.5)
 {
 	if (!a_ConfigName.empty())
 	{
