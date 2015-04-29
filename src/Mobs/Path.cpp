@@ -19,7 +19,7 @@
 #define CALCULATIONS_PER_STEP 5  // Higher means more CPU load but faster path calculations.
 // The only version which guarantees the shortest path is 0, 0.
 
-enum eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
+enum class eCellStatus {OPENLIST,  CLOSEDLIST,  NOLIST};
 struct cPathCell
 {
 	Vector3d m_Location;   // Location of the cell in the world
@@ -97,7 +97,7 @@ double a_BoundingBoxWidth, double a_BoundingBoxHeight,
 int a_MaxUp, int a_MaxDown)
 {
 	// TODO: if src not walkable OR dest not walkable, then abort
-	// Borrow a new "isWalkable" from processIfWalkable, make processIfWalkable also call isWalkable
+	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
 	
 	m_World = a_World;
 	// m_World = cRoot::Get()->GetDefaultWorld();
@@ -108,11 +108,11 @@ int a_MaxUp, int a_MaxDown)
 	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{
 		/*printf("cPath::cPath() - No path found (%d, %d, %d) -> (%d, %d, %d)!\n", (int)m_Source.x, (int)m_Source.y, (int)m_Source.z, (int)m_Destination.x, (int)m_Destination.y, (int)m_Destination.z);*/
-		m_Status = PATH_NOT_FOUND;
+		m_Status = ePathFinderStatus::PATH_NOT_FOUND;
 		return;
 	}
 	
-	m_Status = CALCULATING;
+	m_Status = ePathFinderStatus::CALCULATING;
 
 	m_StepsLeft = a_MaxSteps;
 	m_PointCount = 0;
@@ -126,7 +126,7 @@ int a_MaxUp, int a_MaxDown)
 
 cPath::~cPath()
 {
-	if (m_Status==CALCULATING)
+	if (m_Status == ePathFinderStatus::CALCULATING)
 	{
 		FinishCalculation();
 	}
@@ -171,7 +171,7 @@ cPathCell * cPath::GetCell(const Vector3d & a_Location)
 		Cell->m_Location = a_Location;
 		m_Map[a_Location] = Cell;
 		Cell->m_IsSolid = IsSolid(a_Location);
-		Cell->m_Status = NOLIST;
+		Cell->m_Status = eCellStatus::NOLIST;
 		#ifdef COMPILING_PATHFIND_DEBUGGER
 		#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
 		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, Cell->m_IsSolid ? NORMAL : MINI);
@@ -189,12 +189,12 @@ cPathCell * cPath::GetCell(const Vector3d & a_Location)
 void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 {
 	// Case 1: Cell is in the closed list, ignore it.
-	if (a_Cell->m_Status == CLOSEDLIST)
+	if (a_Cell->m_Status == eCellStatus::CLOSEDLIST)
 	{
 		return;
 	}
 	
-	if (a_Cell->m_Status == NOLIST)  // Case 2: The cell is not in any list.
+	if (a_Cell->m_Status == eCellStatus::NOLIST)  // Case 2: The cell is not in any list.
 	{
 		// Cell is walkable, add it to the open list.
 		// Note that non-walkable cells are filtered out in Step_internal();
@@ -249,12 +249,12 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 ePathFinderStatus cPath::Step()
 {
 	// printf("cPath::step() - Stepping...\n");
-	if (m_Status == CALCULATING)
+	if (m_Status == ePathFinderStatus::CALCULATING)
 	{
 		if (m_StepsLeft == 0)
 		{
 			// printf("cPath::step() - No more steps left. Path either too far or non existent.\nIf the former, increase MaxSteps in constructor.\n");
-			FinishCalculation(PATH_NOT_FOUND);
+			FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
 		}
 		else
 		{
@@ -274,7 +274,7 @@ ePathFinderStatus cPath::Step()
 
 
 
-void cPath::processIfWalkable(const Vector3d & a_Location, cPathCell * a_Parent, int a_Cost)
+void cPath::ProcessIfWalkable(const Vector3d & a_Location, cPathCell * a_Parent, int a_Cost)
 {
 	cPathCell * cell =  GetCell(a_Location);
 	if (!cell->m_IsSolid && GetCell(a_Location+Vector3d(0, -1, 0))->m_IsSolid && !GetCell(a_Location+Vector3d(0, 1, 0))->m_IsSolid)
@@ -291,8 +291,8 @@ bool cPath::Step_Internal()
 	if (CurrentCell == NULL)
 	{
 		// printf("cPath::Step_Internal() - Open list is empty. Path not found.\n");
-		FinishCalculation(PATH_NOT_FOUND);
-		ASSERT(m_Status == PATH_NOT_FOUND);
+		FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
+		ASSERT(m_Status == ePathFinderStatus::PATH_NOT_FOUND);
 		return true;
 	}
 	
@@ -302,12 +302,12 @@ bool cPath::Step_Internal()
 		// printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
 		do
 		{
-			addPoint(CurrentCell->m_Location+Vector3d(0.5, 0, 0.5));  // Populate the cPath with points.
+			AddPoint(CurrentCell->m_Location+Vector3d(0.5, 0, 0.5));  // Populate the cPath with points.
 			CurrentCell = CurrentCell->m_Parent;
 		}
 		while (CurrentCell != NULL);
 		m_CurrentPoint = -1;
-		FinishCalculation(PATH_FOUND);
+		FinishCalculation(ePathFinderStatus::PATH_FOUND);
 		return true;
 	}
 	
@@ -318,10 +318,10 @@ bool cPath::Step_Internal()
 	int i;
 	for (i=-1; i<=1; ++i)
 	{
-		processIfWalkable(CurrentCell->m_Location + Vector3d(1, i, 0), CurrentCell, 10);
-		processIfWalkable(CurrentCell->m_Location + Vector3d(-1, i, 0), CurrentCell, 10);
-		processIfWalkable(CurrentCell->m_Location + Vector3d(0, i, 1), CurrentCell, 10);
-		processIfWalkable(CurrentCell->m_Location + Vector3d(0, i, -1), CurrentCell, 10);
+		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(1, i, 0), CurrentCell, 10);
+		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(-1, i, 0), CurrentCell, 10);
+		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(0, i, 1), CurrentCell, 10);
+		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(0, i, -1), CurrentCell, 10);
 	}
 	
 	// Diagonals
@@ -336,7 +336,7 @@ bool cPath::Step_Internal()
 				// This prevents falling of "sharp turns" e.g. a 1x1x20 rectangle in the air which breaks in a right angle suddenly.
 				if (GetCell(CurrentCell->m_Location + Vector3d(x, -1, 0))->m_IsSolid && GetCell(CurrentCell->m_Location + Vector3d(0, -1, z))->m_IsSolid)
 				{
-					processIfWalkable(CurrentCell->m_Location + Vector3d(x, 0, z), CurrentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
+					ProcessIfWalkable(CurrentCell->m_Location + Vector3d(x, 0, z), CurrentCell, 14);  // 14 is a good enough approximation of sqrt(10 + 10).
 				}
 			}
 		}
@@ -352,7 +352,7 @@ bool cPath::Step_Internal()
 
 void cPath::OpenListAdd(cPathCell * a_Cell)
 {
-	a_Cell->m_Status = OPENLIST;
+	a_Cell->m_Status = eCellStatus::OPENLIST;
 	m_OpenList.push(a_Cell);
 	#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock(a_Cell->m_Location.x, a_Cell->m_Location.y, a_Cell->m_Location.z, debug_open, SetMini(a_Cell));
@@ -372,7 +372,7 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 	
 	cPathCell * Ret = m_OpenList.top();
 	m_OpenList.pop();
-	Ret->m_Status = CLOSEDLIST;
+	Ret->m_Status = eCellStatus::CLOSEDLIST;
 	#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock((Ret)->m_Location.x, (Ret)->m_Location.y, (Ret)->m_Location.z, debug_closed, SetMini(Ret));
 	#endif
@@ -384,7 +384,7 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 
 
 // Add the next point in the final path.
-void cPath::addPoint(Vector3d a_Vector)
+void cPath::AddPoint(Vector3d a_Vector)
 {
 	m_PathPoints.push_back(a_Vector);
 	++m_PointCount;

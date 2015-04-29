@@ -9,7 +9,6 @@ This preprocessor flag is never set when compiling MCServer. */
 #include <vector>
 #include <queue>
 #include <unordered_map>
-using namespace std;
 
 /* MCServer forward declarations */
 #ifndef COMPILING_PATHFIND_DEBUGGER
@@ -23,7 +22,7 @@ typedef cItemCallback<cChunk> cChunkCallback;
 #endif
 
 /* Various little structs and classes */
-enum ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND};
+enum class ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND};
 struct cPathCell;  // Defined inside Path.cpp
 class compareHeuristics
 {
@@ -77,7 +76,7 @@ public:
 	/** Returns the next point in the path. */
 	inline Vector3d GetNextPoint()
 	{
-		ASSERT(m_Status == PATH_FOUND);
+		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return m_PathPoints[m_PointCount - 1 - (++m_CurrentPoint)];
 	}
 	
@@ -88,7 +87,7 @@ public:
 	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
 	inline bool IsLastPoint()
 	{
-		ASSERT(m_Status == PATH_FOUND);
+		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
 		return (m_CurrentPoint == m_PointCount - 1);
 	}
@@ -98,9 +97,9 @@ public:
 	
 	
 	/** Get the point at a_index. Remark: Internally, the indexes are reversed. */
-	inline Vector3d getPoint(int a_index)
+	inline Vector3d GetPoint(int a_index)
 	{
-		ASSERT(m_Status == PATH_FOUND);
+		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		ASSERT(a_index < m_PointCount);
 		return m_PathPoints[m_PointCount - 1 - a_index];
 	}
@@ -110,9 +109,9 @@ public:
 	
 	
 	/** Returns the total number of points this path has. */
-	inline int getPointCount()
+	inline int GetPointCount()
 	{
-		ASSERT(m_Status == PATH_FOUND);
+		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return m_PointCount;
 	}
 	
@@ -131,15 +130,15 @@ private:
 	/* Openlist and closedlist management */
 	void OpenListAdd(cPathCell * a_Cell);
 	cPathCell * OpenListPop();
-	void processIfWalkable(const Vector3d &a_Location, cPathCell *a_Parent, int a_Cost);
+	void ProcessIfWalkable(const Vector3d &a_Location, cPathCell * a_Parent, int a_Cost);
 	
 	/* Map management */
 	void ProcessCell(cPathCell * a_Cell,  cPathCell * a_Caller,  int a_GDelta);
-	cPathCell* GetCell(const Vector3d & a_location);
+	cPathCell * GetCell(const Vector3d & a_location);
 	
 	/* Pathfinding fields */
-	priority_queue<cPathCell *,  vector<cPathCell *>,  compareHeuristics> m_OpenList;
-	unordered_map<Vector3d,  cPathCell *> m_Map;
+	std::priority_queue<cPathCell *,  std::vector<cPathCell *>,  compareHeuristics> m_OpenList;
+	std::unordered_map<Vector3d,  cPathCell *> m_Map;
 	Vector3d m_Destination;
 	Vector3d m_Source;
 	int m_StepsLeft;
@@ -150,8 +149,8 @@ private:
 	/* Final path fields */
 	int m_PointCount;
 	int m_CurrentPoint;
-	vector<Vector3d> m_PathPoints;
-	void addPoint(Vector3d a_Vector);
+	std::vector<Vector3d> m_PathPoints;
+	void AddPoint(Vector3d a_Vector);
 	
 	/* Interfacing with MCServer's world */
 	cWorld * m_World;

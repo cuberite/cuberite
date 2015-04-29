@@ -102,7 +102,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 		GetMonsterConfig(a_ConfigName);
 	}
 	m_Path = nullptr;
-	m_PathStatus = PATH_NOT_FOUND;
+	m_PathStatus = ePathFinderStatus::PATH_NOT_FOUND;
 	m_IsFollowingPath = false;
 	m_GiveUpCounter=0;
 }
@@ -137,17 +137,17 @@ void cMonster::TickPathFinding()
 		m_IsFollowingPath = false;
 	}
 	m_PathStatus = m_Path->Step();
-	if (m_PathStatus == PATH_NOT_FOUND)
+	if (m_PathStatus == ePathFinderStatus::PATH_NOT_FOUND)
 	{
 		// printf("No PATH *******************...\n");
 		FinishPathFinding();
 	}
-	if (m_PathStatus == CALCULATING)
+	if (m_PathStatus == ePathFinderStatus::CALCULATING)
 	{
 		// printf("calculating...\n");
 		m_Destination=GetPosition();
 	}
-	if (m_PathStatus == PATH_FOUND)
+	if (m_PathStatus == ePathFinderStatus::PATH_FOUND)
 	{
 		if (ReachedDestination() || (m_IsFollowingPath == false))
 		{
@@ -182,7 +182,7 @@ void cMonster::TickPathFinding()
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 	
-	if (m_PathStatus == CALCULATING)
+	if (m_PathStatus == ePathFinderStatus::CALCULATING)
 	{
 		return;
 	}

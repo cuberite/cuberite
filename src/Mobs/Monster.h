@@ -162,10 +162,11 @@ protected:
 
 	/** A pointer to the entity this mobile is aiming to reach */
 	cEntity * m_Target;
-	cPath * m_Path;
+	cPath *  m_Path;  // TODO unique ptr
 	ePathFinderStatus m_PathStatus;
 	bool m_IsFollowingPath;
-	int m_GiveUpCounter;  // If 0, will give up reaching the next m_Dest and will re-compute path.
+	/* If 0, will give up reaching the next m_Dest and will re-compute path. */
+	int m_GiveUpCounter;
 	/** Coordinates of the next position that should be reached */
 	Vector3d m_Destination;
 	/** Coordinates for the ultimate, final destination. */
