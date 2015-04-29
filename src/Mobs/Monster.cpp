@@ -104,7 +104,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	m_Path = nullptr;
 	m_PathStatus = ePathFinderStatus::PATH_NOT_FOUND;
 	m_IsFollowingPath = false;
-	m_GiveUpCounter=0;
+	m_GiveUpCounter = 0;
 }
 
 
