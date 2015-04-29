@@ -391,13 +391,13 @@ struct hash<Vector3d>
 	{
 		// Guaranteed to have no hash collisions for any 128x128x128 area suitable for pathfinding.
 		// TODO check the bit length thing.
-		size_t t=0;
-		t+=(char)v2.x;
-		t=t << 8;
-		t+=(char)v2.y;
-		t=t << 8;
-		t+=(char)v2.z;
-		t=t << 8;
+		size_t t = 0;
+		t += (char)v2.x;
+		t = t << 8;
+		t += (char)v2.y;
+		t = t << 8;
+		t += (char)v2.z;
+		t = t << 8;
 		return t;
 	}
 };

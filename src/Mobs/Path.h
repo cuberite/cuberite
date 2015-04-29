@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef COMPILING_PATHFIND_DEBUGGER
-/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug 
+/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug
 this class outside of MCServer. This preprocessor flag is never set when compiling MCServer. */
 #include "PathFinderIrrlicht_Head.h"
 #endif
@@ -66,18 +66,12 @@ public:
 	ePathFinderStatus Step();
 	
 	/* Point retrieval functions, inlined for performance. */
-	
 	/** Returns the next point in the path. */
 	inline Vector3d GetNextPoint()
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return m_PathPoints[m_PointCount - 1 - (++m_CurrentPoint)];
 	}
-	
-	
-	
-	
-	
 	/** Checks whether this is the last point or not. Never call getnextPoint when this is true. */
 	inline bool IsLastPoint()
 	{
@@ -85,11 +79,6 @@ public:
 		ASSERT(m_CurrentPoint != -1);  // You must call getFirstPoint at least once before calling this.
 		return (m_CurrentPoint == m_PointCount - 1);
 	}
-	
-	
-	
-	
-	
 	/** Get the point at a_index. Remark: Internally, the indexes are reversed. */
 	inline Vector3d GetPoint(int a_index)
 	{
@@ -97,21 +86,12 @@ public:
 		ASSERT(a_index < m_PointCount);
 		return m_PathPoints[m_PointCount - 1 - a_index];
 	}
-	
-	
-	
-	
-	
 	/** Returns the total number of points this path has. */
 	inline int GetPointCount()
 	{
 		ASSERT(m_Status == ePathFinderStatus::PATH_FOUND);
 		return m_PointCount;
 	}
-	
-	
-	
-	
 	
 private:
 	

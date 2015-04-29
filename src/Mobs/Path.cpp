@@ -89,10 +89,12 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 
 
 
-cPath::cPath(cWorld * a_World,
-const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
-double a_BoundingBoxWidth, double a_BoundingBoxHeight,
-int a_MaxUp, int a_MaxDown)
+cPath::cPath(
+	cWorld * a_World,
+	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
+	double a_BoundingBoxWidth, double a_BoundingBoxHeight,
+	int a_MaxUp, int a_MaxDown
+)
 {
 	// TODO: if src not walkable OR dest not walkable, then abort
 	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
@@ -191,7 +193,6 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 	{
 		return;
 	}
-	
 	if (a_Cell->m_Status == eCellStatus::NOLIST)  // Case 2: The cell is not in any list.
 	{
 		// Cell is walkable, add it to the open list.
@@ -206,7 +207,6 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 		{
 			a_Cell->m_G = 0;
 		}
-		
 		// Calculate H. This is A*'s Heuristics value.
 		#if DISTANCE_MANHATTEN == 1
 		// Manhatten distance. DeltaX + DeltaY + DeltaZ.
@@ -215,19 +215,14 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 		// Euclidian distance. sqrt(DeltaX^2 + DeltaY^2 + DeltaZ^2), more precise.
 		a_Cell->m_H = std::sqrt( (a_Cell->m_Location.x-m_Destination.x) * (a_Cell->m_Location.x-m_Destination.x) * 100+ (a_Cell->m_Location.y-m_Destination.y) * (a_Cell->m_Location.y-m_Destination.y) * 100 + (a_Cell->m_Location.z-m_Destination.z) * (a_Cell->m_Location.z-m_Destination.z) * 100);
 		#endif
-		
-		
 		#if HEURISTICS_ONLY == 1
 		a_Cell->m_F = a_Cell->m_H;  // Depth-first search(Might be the wrong name). Faster, can yeild paths that are far from optimal.
 		#else
 		a_Cell->m_F = a_Cell->m_H + a_Cell->m_G;  // Regular A*.
 		#endif
-		
 		OpenListAdd(a_Cell);
 		return;
 	}
-	
-
 	
 	// Case 3: Cell is in the open list, check if G and H need an update.
 	int NewG = a_Caller->m_G + a_GDelta;
@@ -272,6 +267,8 @@ ePathFinderStatus cPath::Step()
 
 
 
+
+
 void cPath::ProcessIfWalkable(const Vector3d & a_Location, cPathCell * a_Parent, int a_Cost)
 {
 	cPathCell * cell =  GetCell(a_Location);
@@ -280,6 +277,10 @@ void cPath::ProcessIfWalkable(const Vector3d & a_Location, cPathCell * a_Parent,
 		ProcessCell(cell, a_Parent, a_Cost);
 	}
 }
+
+
+
+
 
 bool cPath::Step_Internal()
 {
@@ -300,21 +301,20 @@ bool cPath::Step_Internal()
 		// printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
 		do
 		{
-			AddPoint(CurrentCell->m_Location+Vector3d(0.5, 0, 0.5));  // Populate the cPath with points.
+			AddPoint(CurrentCell->m_Location + Vector3d(0.5, 0, 0.5));  // Populate the cPath with points.
 			CurrentCell = CurrentCell->m_Parent;
-		}
-		while (CurrentCell != NULL);
+		} while (CurrentCell != NULL);
+		
 		m_CurrentPoint = -1;
 		FinishCalculation(ePathFinderStatus::PATH_FOUND);
 		return true;
 	}
 	
-	// Calculation not finished yet, process a currentCell by inspecting all 8 neighbors.
+	// Calculation not finished yet, process a currentCell by inspecting all neighbors.
 	
-	// Forward, backward, left, right. on all 2 different heights.
-	// TODO give the upper height special treatment (jump helpers)
+	// Check North, South, East, West on all 3 different heights.
 	int i;
-	for (i=-1; i<=1; ++i)
+	for (i=-1; i <= 1; ++i)
 	{
 		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(1, i, 0), CurrentCell, 10);
 		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(-1, i, 0), CurrentCell, 10);
@@ -322,11 +322,11 @@ bool cPath::Step_Internal()
 		ProcessIfWalkable(CurrentCell->m_Location + Vector3d(0, i, -1), CurrentCell, 10);
 	}
 	
-	// Diagonals
+	// Check diagonals on mob's height only.
 	int x, z;
-	for (x=-1; x<=1; x+=2)
+	for (x = -1; x <= 1; x += 2)
 	{
-		for (z=-1; z<=1; z+=2)
+		for (z = -1; z <= 1; z += 2)
 		{
 			// This condition prevents diagonal corner cutting.
 			if (!GetCell(CurrentCell->m_Location + Vector3d(x, 0, 0))->m_IsSolid && !GetCell(CurrentCell->m_Location + Vector3d(0, 0, z))->m_IsSolid)
