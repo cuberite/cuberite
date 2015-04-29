@@ -86,7 +86,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	// same but y-direction
 	if (dir.x != 0.f)
 	{
-		tDelta.x = 1 / fabs(dir.x);
+		tDelta.x = 1 / std::abs(dir.x);
 	}
 	else
 	{
@@ -94,7 +94,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	if (dir.y != 0.f)
 	{
-		tDelta.y = 1 / fabs(dir.y);
+		tDelta.y = 1 / std::abs(dir.y);
 	}
 	else
 	{
@@ -102,7 +102,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	if (dir.z != 0.f)
 	{
-		tDelta.z = 1 / fabs(dir.z);
+		tDelta.z = 1 / std::abs(dir.z);
 	}
 	else
 	{
@@ -312,7 +312,7 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 	float     D = a_PlaneNormal.Dot(u);      // dot(Pn.n, u);
 	float     N = -(a_PlaneNormal.Dot(w));  // -dot(a_Plane.n, w);
 
-	if (fabs(D) < FLOAT_EPSILON)
+	if (std::abs(D) < FLOAT_EPSILON)
 	{
 		// segment is parallel to plane
 		if (N == 0.0)
