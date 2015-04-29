@@ -137,41 +137,43 @@ void cMonster::TickPathFinding()
 		m_IsFollowingPath = false;
 	}
 	m_PathStatus = m_Path->Step();
-	if (m_PathStatus == ePathFinderStatus::PATH_NOT_FOUND)
+	switch (m_PathStatus)
 	{
-		// printf("No PATH *******************...\n");
-		FinishPathFinding();
-	}
-	if (m_PathStatus == ePathFinderStatus::CALCULATING)
-	{
-		// printf("calculating...\n");
-		m_Destination=GetPosition();
-	}
-	if (m_PathStatus == ePathFinderStatus::PATH_FOUND)
-	{
-		if (ReachedDestination() || (m_IsFollowingPath == false))
-		{
-			// printf("Getting next point...\n");
-			m_Destination = m_Path->GetNextPoint();
-			m_IsFollowingPath = true;
-			m_GiveUpCounter=40;  // Give up after 2 seconds if failed to reach m_Dest
-		}
-		/*else
-		{
-			if (!ReachedDestination())
-			{
-				printf("Did not reach destination\n");
-			}
-			if (!m_IsFollowingPath)
-			{
-				printf("Not following.\n");
-			}
-		}*/
-		if (m_Path->IsLastPoint())
-		{
-			// printf("Last point\n");
+		case ePathFinderStatus::PATH_NOT_FOUND:
 			FinishPathFinding();
-		}
+			break;
+		
+		case ePathFinderStatus::CALCULATING:
+			// printf("calculating...\n");
+			m_Destination = GetPosition();
+			break;
+		
+		case ePathFinderStatus::PATH_FOUND:
+			if (ReachedDestination() || (!m_IsFollowingPath))
+			{
+				// printf("Getting next point...\n");
+				m_Destination = m_Path->GetNextPoint();
+				m_IsFollowingPath = true;
+				m_GiveUpCounter=40;  // Give up after 2 seconds if failed to reach m_Dest
+			}
+			/*else
+			{
+				if (!ReachedDestination())
+				{
+					printf("Did not reach destination\n");
+				}
+				if (!m_IsFollowingPath)
+				{
+					printf("Not following.\n");
+				}
+			}*/
+			if (m_Path->IsLastPoint())
+			{
+				// printf("Last point\n");
+				FinishPathFinding();
+			}
+			break;
+		
 	}
 }
 
