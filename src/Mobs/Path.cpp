@@ -135,9 +135,9 @@ cPath::~cPath()
 
 void cPath::FinishCalculation()
 {
-	for (std::unordered_map<Vector3d, cPathCell *>::iterator it = m_Map.begin(); it != m_Map.end(); ++it)
+	for (auto&& pair : m_Map)
 	{
-		delete (it->second);
+	    delete pair.second;
 	}
 	
 	m_Map.clear();
