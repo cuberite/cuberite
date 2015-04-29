@@ -137,7 +137,7 @@ void cPath::FinishCalculation()
 {
 	for (auto&& pair : m_Map)
 	{
-	    delete pair.second;
+		delete pair.second;
 	}
 	
 	m_Map.clear();
