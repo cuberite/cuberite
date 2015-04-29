@@ -21,6 +21,8 @@
 #include "IniFile.h"
 #include "Vector3.h"
 
+
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -437,7 +439,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		return;
 	}
-
+	
 	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
 	
 	// "help" and "reload" are to be handled by MCS, so that they work no matter what

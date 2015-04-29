@@ -354,6 +354,7 @@ protected:
 
 
 
+
 template <> inline Vector3<int> Vector3<int>::Floor(void) const
 {
 	return *this;
@@ -378,10 +379,6 @@ typedef Vector3<double> Vector3d;
 typedef Vector3<float>  Vector3f;
 typedef Vector3<int>    Vector3i;
 // tolua_end
-
-
-
-
 
 typedef std::list<Vector3i>   cVector3iList;
 typedef std::vector<Vector3i> cVector3iArray;
