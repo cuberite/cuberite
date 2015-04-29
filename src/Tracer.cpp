@@ -16,14 +16,14 @@ const float FLOAT_EPSILON = 0.0001f;  // TODO: Stash this in some header where i
 
 
 const std::array<const Vector3f, 6> cTracer::m_NormalTable =
-{
+{{
 	Vector3f(-1,  0,  0),  // 1: -x
 	Vector3f( 0,  0, -1),  // 2: -z
 	Vector3f( 1,  0,  0),  // 3: +x
 	Vector3f( 0,  0,  1),  // 4: +z
 	Vector3f( 0,  1,  0),  // 5: +y
 	Vector3f( 0, -1,  0)   // 6: -y
-};
+}};
 
 
 
