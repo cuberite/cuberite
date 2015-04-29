@@ -125,7 +125,6 @@ void cMonster::TickPathFinding()
 	
 	if (m_Path == nullptr)
 	{
-		/*printf("%d %d %d > %d %d %d\n", floor(GetPosition().x), floor(GetPosition().y), floor(GetPosition().z), floor(m_FinalDestination.x), floor(m_FinalDestination.y), floor(m_FinalDestination.z));*/
 		Vector3d position=GetPosition();
 		Vector3d Dest = m_FinalDestination;
 		
@@ -144,32 +143,18 @@ void cMonster::TickPathFinding()
 			break;
 		
 		case ePathFinderStatus::CALCULATING:
-			// printf("calculating...\n");
 			m_Destination = GetPosition();
 			break;
 		
 		case ePathFinderStatus::PATH_FOUND:
 			if (ReachedDestination() || (!m_IsFollowingPath))
 			{
-				// printf("Getting next point...\n");
 				m_Destination = m_Path->GetNextPoint();
 				m_IsFollowingPath = true;
-				m_GiveUpCounter=40;  // Give up after 2 seconds if failed to reach m_Dest
+				m_GiveUpCounter=40;  // Give up after 2 seconds if failed to reach m_Dest.
 			}
-			/*else
-			{
-				if (!ReachedDestination())
-				{
-					printf("Did not reach destination\n");
-				}
-				if (!m_IsFollowingPath)
-				{
-					printf("Not following.\n");
-				}
-			}*/
 			if (m_Path->IsLastPoint())
 			{
-				// printf("Last point\n");
 				FinishPathFinding();
 			}
 			break;
@@ -188,7 +173,6 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 	{
 		return;
 	}
-	// printf("ANSWERED\n");
 	m_FinalDestination = a_Position;
 	m_bMovingToDestination = true;
 }
@@ -277,7 +261,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				
 				if (--m_GiveUpCounter == 0)
 				{
-					// printf("Giving up.\n");
 					FinishPathFinding();
 				}
 				else

@@ -47,7 +47,6 @@ bool cPath::IsSolid(const Vector3d & a_Location)
 	int ChunkX, ChunkZ;
 	m_Item_CurrentBlock = a_Location;
 	m_Item_SetMode = false;  // Causes item() to tell us whether the block is solid or not, this field is for testing and will be removed later.
-	// printf("IsSolid called: (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 	cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
 	return !m_World->DoWithChunk(ChunkX, ChunkZ, *this);
 }
@@ -71,7 +70,6 @@ bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we
 	
 	if (!a_Chunk->IsValid())
 	{
-		// printf("cPath::item - Invalid chunk. Probably nobody is standing there. (%d %d %d)\n", (int)m_Item_CurrentBlock.x, (int)m_Item_CurrentBlock.y, (int)m_Item_CurrentBlock.z);
 		return false;
 	}
 	BLOCKTYPE BlockType;
@@ -107,7 +105,6 @@ cPath::cPath(
 	
 	if (GetCell(m_Source)->m_IsSolid || GetCell(m_Destination)->m_IsSolid)
 	{
-		/*printf("cPath::cPath() - No path found (%d, %d, %d) -> (%d, %d, %d)!\n", (int)m_Source.x, (int)m_Source.y, (int)m_Source.z, (int)m_Destination.x, (int)m_Destination.y, (int)m_Destination.z);*/
 		m_Status = ePathFinderStatus::PATH_NOT_FOUND;
 		return;
 	}
@@ -241,12 +238,10 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 
 ePathFinderStatus cPath::Step()
 {
-	// printf("cPath::step() - Stepping...\n");
 	if (m_Status == ePathFinderStatus::CALCULATING)
 	{
 		if (m_StepsLeft == 0)
 		{
-			// printf("cPath::step() - No more steps left. Path either too far or non existent.\nIf the former, increase MaxSteps in constructor.\n");
 			FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
 		}
 		else
@@ -289,7 +284,6 @@ bool cPath::Step_Internal()
 	// Path not reachable, open list exauhsted.
 	if (CurrentCell == NULL)
 	{
-		// printf("cPath::Step_Internal() - Open list is empty. Path not found.\n");
 		FinishCalculation(ePathFinderStatus::PATH_NOT_FOUND);
 		ASSERT(m_Status == ePathFinderStatus::PATH_NOT_FOUND);
 		return true;
@@ -298,7 +292,6 @@ bool cPath::Step_Internal()
 	// Path found.
 	if (CurrentCell->m_Location == m_Destination)
 	{
-		// printf("cPath::Step_Internal() - Destination in closed list. Path Found.\n");
 		do
 		{
 			AddPoint(CurrentCell->m_Location + Vector3d(0.5, 0, 0.5));  // Populate the cPath with points.
