@@ -1,21 +1,15 @@
 #pragma once
 
 #ifdef COMPILING_PATHFIND_DEBUGGER
-/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug this class outside of MCServer.
-This preprocessor flag is never set when compiling MCServer. */
+/* Note: the COMPILING_PATHFIND_DEBUGGER flag is used by Native/WiseOldMan95 to debug 
+this class outside of MCServer. This preprocessor flag is never set when compiling MCServer. */
 #include "PathFinderIrrlicht_Head.h"
 #endif
 
-#include <vector>
-#include <queue>
 #include <unordered_map>
 
 /* MCServer forward declarations */
 #ifndef COMPILING_PATHFIND_DEBUGGER
-
-// fwd: Vector3.h
-template <typename T> class Vector3;
-typedef Vector3<double> Vector3d;
 
 // fwd: cChunkMap.h
 typedef cItemCallback<cChunk> cChunkCallback;

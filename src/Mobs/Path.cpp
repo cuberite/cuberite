@@ -1,8 +1,6 @@
-// TODO uniq_ptr instead of ptr whenever possible
-
+#include "Globals.h"
 #ifndef COMPILING_PATHFIND_DEBUGGER
 /* MCServer headers */
-#include "Globals.h"
 #include "../World.h"
 #include "../Chunk.h"
 #endif
