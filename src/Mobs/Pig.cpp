@@ -90,7 +90,6 @@ void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == E_ITEM_CARROT_ON_STICK))
 		{
 			MoveToPosition((m_Attachee->GetPosition()) + (m_Attachee->GetLookVector()*10));
-			m_bMovingToDestination = true;
 		}
 	}
 }

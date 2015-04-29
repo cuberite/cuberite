@@ -113,7 +113,7 @@ void cServer::cTickThread::Execute(void)
 		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
 		m_ShouldTerminate = !m_Server.Tick(static_cast<float>(msec));
 		auto TickTime = std::chrono::steady_clock::now() - NowTime;
-		
+
 		if (TickTime < msPerTick)
 		{
 			// Stretch tick time until it's at least msPerTick
@@ -206,7 +206,7 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
 	m_Ports = ReadUpgradeIniPorts(a_SettingsIni, "Server", "Ports", "Port", "PortsIPv6", "25565");
-	
+
 	m_RCONServer.Initialize(a_SettingsIni);
 
 	m_bIsConnected = true;
@@ -231,10 +231,10 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 	{
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
-	
+
 	m_ShouldLoadOfflinePlayerData = a_SettingsIni.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
 	m_ShouldLoadNamedPlayerData   = a_SettingsIni.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
-	
+
 	m_ClientViewDistance = a_SettingsIni.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
 	if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
@@ -246,9 +246,9 @@ bool cServer::InitServer(cIniFile & a_SettingsIni, bool a_ShouldAuth)
 		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
 		LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
 	}
-	
+
 	PrepareKeys();
-	
+
 	return true;
 }
 
@@ -320,13 +320,13 @@ bool cServer::Tick(float a_Dt)
 		cCSLock Lock(m_CSPlayerCount);
 		m_PlayerCount += PlayerCountDiff;
 	}
-	
+
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
 	cPluginManager::Get()->Tick(a_Dt);
-	
+
 	// Let the Root process all the queued commands:
 	cRoot::Get()->TickCommands();
-	
+
 	// Tick all clients not yet assigned to a world:
 	TickClients(a_Dt);
 
@@ -351,7 +351,7 @@ void cServer::TickClients(float a_Dt)
 	cClientHandlePtrs RemoveClients;
 	{
 		cCSLock Lock(m_CSClients);
-		
+
 		// Remove clients that have moved to a world (the world will be ticking them from now on)
 		for (auto itr = m_ClientsToRemove.begin(), end = m_ClientsToRemove.end(); itr != end; ++itr)
 		{
@@ -365,7 +365,7 @@ void cServer::TickClients(float a_Dt)
 			}
 		}  // for itr - m_ClientsToRemove[]
 		m_ClientsToRemove.clear();
-		
+
 		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
 		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
@@ -380,7 +380,7 @@ void cServer::TickClients(float a_Dt)
 			++itr;
 		}  // for itr - m_Clients[]
 	}
-	
+
 	// Delete the clients that have been destroyed
 	RemoveClients.clear();
 }
@@ -439,7 +439,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 
 	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
-	
+
 	// "help" and "reload" are to be handled by MCS, so that they work no matter what
 	if (split[0] == "help")
 	{
@@ -529,7 +529,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		DumpUsedMemory(&Output);
 		return;
 	}
-	
+
 	else if (split[0].compare("killmem") == 0)
 	{
 		for (;;)
@@ -544,7 +544,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		a_Output.Finished();
 		return;
 	}
-	
+
 	a_Output.Out("Unknown command, type 'help' for all commands.");
 	a_Output.Finished();
 }
@@ -558,13 +558,13 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	UNUSED(a_Split);
 	typedef std::pair<AString, AString> AStringPair;
 	typedef std::vector<AStringPair> AStringPairs;
-	
+
 	class cCallback :
 		public cPluginManager::cCommandEnumCallback
 	{
 	public:
 		cCallback(void) : m_MaxLen(0) {}
-		
+
 		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
 		{
 		UNUSED(a_Plugin);
@@ -579,7 +579,7 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 			}
 			return false;
 		}
-		
+
 		AStringPairs m_Commands;
 		size_t m_MaxLen;
 	} Callback;
@@ -625,7 +625,7 @@ void cServer::Shutdown(void)
 		srv->Close();
 	}
 	m_ServerHandles.clear();
-	
+
 	// Notify the tick thread and wait for it to terminate:
 	m_bRestarting = true;
 	m_RestartEvent.Wait();

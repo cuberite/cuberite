@@ -98,7 +98,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_TimeToStopEating > 0)
 	{
-		m_bMovingToDestination = false;  // The sheep should not move when he's eating
+		StopMovingToPosition();
 		m_TimeToStopEating--;
 
 		if (m_TimeToStopEating == 0)
