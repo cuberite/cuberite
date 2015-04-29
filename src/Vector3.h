@@ -380,30 +380,6 @@ typedef Vector3<float>  Vector3f;
 typedef Vector3<int>    Vector3i;
 // tolua_end
 
-
-/* Hash function, this allows the vector to be used in std::unordered_map, this is needed for cPath */
-namespace std
-{
-template <>
-struct hash<Vector3d>
-{
-	std::size_t operator()(const Vector3d & v2) const
-	{
-		// Guaranteed to have no hash collisions for any 128x128x128 area suitable for pathfinding.
-		// TODO check the bit length thing.
-		size_t t = 0;
-		t += (char)v2.x;
-		t = t << 8;
-		t += (char)v2.y;
-		t = t << 8;
-		t += (char)v2.z;
-		t = t << 8;
-		return t;
-	}
-};
-}
-
-
 typedef std::list<Vector3i>   cVector3iList;
 typedef std::vector<Vector3i> cVector3iArray;
 

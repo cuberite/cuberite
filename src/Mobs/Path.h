@@ -27,6 +27,23 @@ public:
 
 
 
+struct VectorHasher
+{
+	std::size_t operator()(const Vector3d & v2) const
+	{
+		// Guaranteed to have no hash collisions for any 128x128x128 area suitable for pathfinding.
+		// TODO check the bit length thing.
+		size_t t = 0;
+		t += (char)v2.x;
+		t = t << 8;
+		t += (char)v2.y;
+		t = t << 8;
+		t += (char)v2.z;
+		t = t << 8;
+		return t;
+	}
+};
+
 
 class cPath
 #ifndef COMPILING_PATHFIND_DEBUGGER
@@ -112,7 +129,7 @@ private:
 	
 	/* Pathfinding fields */
 	std::priority_queue<cPathCell *,  std::vector<cPathCell *>,  compareHeuristics> m_OpenList;
-	std::unordered_map<Vector3d,  cPathCell *> m_Map;
+	std::unordered_map<Vector3d,  cPathCell *, VectorHasher> m_Map;
 	Vector3d m_Destination;
 	Vector3d m_Source;
 	int m_StepsLeft;
