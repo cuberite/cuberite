@@ -54,6 +54,7 @@ public:
 		msLake,
 		msSpongePrint,
 		msDifference,
+		msSimpleCompare,
 		msMask,
 	} ;
 	
@@ -156,6 +157,22 @@ public:
 	| A        | sponge | A      |  Sponge is the NOP block
 	| *        | B      | B      |  Everything else overwrites anything
 	
+	msDifference:
+	Used to determine the differences between two areas. Only the differring blocks are preserved:
+	|  area block  |        |
+	| this | Src   | result |
+	+------+-------+--------+
+	| A    | A     | air    |  Same blocks are replaced with air
+	| A    | non-A | A      |  Differring blocks are kept from "this"
+
+	msSimpleCompare:
+	Used to determine the differences between two areas. Blocks that differ are replaced with stone, same blocks are replaced with air
+	|  area block  |        |
+	| this | Src   | result |
+	+------+-------+--------+
+	| A    | A     | air    |  Same blocks are replaced with air
+	| A    | non-A | stone  |  Differring blocks are replaced with stone
+
 	msMask:
 	Combines two areas, the blocks that are the same are kept, differing ones are reset to air
 	|  area block  |        |
