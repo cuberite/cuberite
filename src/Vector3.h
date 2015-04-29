@@ -381,7 +381,7 @@ typedef Vector3<int>    Vector3i;
 // tolua_end
 
 
-/* Hash function, this allows the vector to be used in std::unordered_map, this is needed for the PathFinder */
+/* Hash function, this allows the vector to be used in std::unordered_map, this is needed for cPath */
 namespace std
 {
 template <>
@@ -389,8 +389,7 @@ struct hash<Vector3d>
 {
 	std::size_t operator()(const Vector3d & v2) const
 	{
-		// Guaranteed to have no hash collisions for any 128x128x128 area
-		// Suitable for pathfinding
+		// Guaranteed to have no hash collisions for any 128x128x128 area suitable for pathfinding.
 		// TODO check the bit length thing.
 		size_t t=0;
 		t+=(char)v2.x;

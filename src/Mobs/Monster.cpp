@@ -282,7 +282,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				{
 					Distance.y = 0;
 					Distance.Normalize();
-		
+					
 					if (m_bOnGround)
 					{
 						Distance *= 2.5f;
