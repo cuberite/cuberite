@@ -246,6 +246,7 @@ template class SizeChecker<UInt8,  1>;
 
 // STL stuff:
 #include <chrono>
+#include <functional>
 #include <vector>
 #include <list>
 #include <deque>
