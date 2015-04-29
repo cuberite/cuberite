@@ -1614,6 +1614,73 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 
 
 
+void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType)
+{
+	// Check if blocktypes are valid:
+	if (m_BlockTypes == nullptr)
+	{
+		LOGWARNING("%s: BlockTypes have not been read!", __FUNCTION__);
+		a_MinRelX = 1;
+		a_MaxRelX = 0;
+		return;
+	}
+
+	// Walk all the blocks and find the min and max coords for the non-ignored ones:
+	int MaxX = 0, MinX = m_Size.x - 1;
+	int MaxY = 0, MinY = m_Size.y - 1;
+	int MaxZ = 0, MinZ = m_Size.z - 1;
+	for (int y = 0; y < m_Size.y; y++)
+	{
+		for (int z = 0; z < m_Size.z; z++)
+		{
+			for (int x = 0; x < m_Size.x; x++)
+			{
+				if (m_BlockTypes[MakeIndex(x, y, z)] == a_IgnoreBlockType)
+				{
+					continue;
+				}
+				// The block is not ignored, update any coords that need updating:
+				if (x < MinX)
+				{
+					MinX = x;
+				}
+				if (x > MaxX)
+				{
+					MaxX = x;
+				}
+				if (y < MinY)
+				{
+					MinY = y;
+				}
+				if (y > MaxY)
+				{
+					MaxY = y;
+				}
+				if (z < MinZ)
+				{
+					MinZ = z;
+				}
+				if (z > MaxZ)
+				{
+					MaxZ = z;
+				}
+			}  // for x
+		}  // for z
+	}  // for y
+
+	// Assign to the output:
+	a_MinRelX = MinX;
+	a_MinRelY = MinY;
+	a_MinRelZ = MinZ;
+	a_MaxRelX = MaxX;
+	a_MaxRelY = MaxY;
+	a_MaxRelZ = MaxZ;
+}
+
+
+
+
+
 int cBlockArea::GetDataTypes(void) const
 {
 	int res = 0;

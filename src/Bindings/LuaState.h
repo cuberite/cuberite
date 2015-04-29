@@ -37,6 +37,7 @@ extern "C"
 
 
 
+class cBlockArea;
 class cBlockEntity;
 class cBoundingBox;
 class cChunkDesc;
@@ -68,6 +69,7 @@ struct HTTPRequest;
 struct HTTPTemplateRequest;
 struct TakeDamageInfo;
 
+typedef cBlockArea *     pBlockArea;
 typedef cBoundingBox *   pBoundingBox;
 typedef cMapManager *    pMapManager;
 typedef cPluginManager * pPluginManager;
@@ -244,11 +246,13 @@ public:
 	// GetStackValue() retrieves the value at a_StackPos, if it is a valid type. If not, a_Value is unchanged.
 	// Enum values are clamped to their allowed range.
 	void GetStackValue(int a_StackPos, AString & a_Value);
+	void GetStackValue(int a_StackPos, BLOCKTYPE & a_Value);
 	void GetStackValue(int a_StackPos, bool & a_Value);
 	void GetStackValue(int a_StackPos, cRef & a_Ref);
 	void GetStackValue(int a_StackPos, double & a_Value);
 	void GetStackValue(int a_StackPos, eWeather & a_Value);
 	void GetStackValue(int a_StackPos, int & a_Value);
+	void GetStackValue(int a_StackPos, pBlockArea & a_Value);
 	void GetStackValue(int a_StackPos, pBoundingBox & a_Value);
 	void GetStackValue(int a_StackPos, pMapManager & a_Value);
 	void GetStackValue(int a_StackPos, pPluginManager & a_Value);
