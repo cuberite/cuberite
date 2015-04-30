@@ -120,6 +120,7 @@ g_APIDesc =
 				GetOriginX = { Params = "", Return = "number", Notes = "Returns the origin x-coord" },
 				GetOriginY = { Params = "", Return = "number", Notes = "Returns the origin y-coord" },
 				GetOriginZ = { Params = "", Return = "number", Notes = "Returns the origin z-coord" },
+				GetNonAirCropRelCoords = { Params = "[IgnoreBlockType]", Return = "MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ", Notes = "Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction. If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.). IgnoreBlockType defaults to air." },
 				GetRelBlockLight = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the blocklight at the specified relative coords" },
 				GetRelBlockMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
 				GetRelBlockSkyLight = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the skylight at the specified relative coords" },
