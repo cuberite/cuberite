@@ -1634,6 +1634,37 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 
 
 
+size_t cBlockArea::CountNonAirBlocks(void) const
+{
+	// Check if blocktypes are valid:
+	if (m_BlockTypes == nullptr)
+	{
+		LOGWARNING("%s: BlockTypes have not been read!", __FUNCTION__);
+		return 0;
+	}
+
+	// Count the blocks:
+	size_t res = 0;
+	for (int y = 0; y < m_Size.y; y++)
+	{
+		for (int z = 0; z < m_Size.z; z++)
+		{
+			for (int x = 0; x < m_Size.x; x++)
+			{
+				if (m_BlockTypes[MakeIndex(x, y, z)] != E_BLOCK_AIR)
+				{
+					++res;
+				}
+			}  // for x
+		}  // for z
+	}  // for y
+	return res;
+}
+
+
+
+
+
 void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType)
 {
 	// Check if blocktypes are valid:
