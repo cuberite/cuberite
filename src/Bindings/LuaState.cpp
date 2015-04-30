@@ -937,6 +937,18 @@ void cLuaState::GetStackValue(int a_StackPos, AString & a_Value)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, BLOCKTYPE & a_ReturnedVal)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = static_cast<BLOCKTYPE>(tolua_tonumber(m_LuaState, a_StackPos, a_ReturnedVal));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, bool & a_ReturnedVal)
 {
 	a_ReturnedVal = (tolua_toboolean(m_LuaState, a_StackPos, a_ReturnedVal ? 1 : 0) > 0);
@@ -995,6 +1007,24 @@ void cLuaState::GetStackValue(int a_StackPos, int & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, pBlockArea & a_ReturnedVal)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cBlockArea", false, &err))
+	{
+		a_ReturnedVal = *(reinterpret_cast<cBlockArea **>(lua_touserdata(m_LuaState, a_StackPos)));
+	}
+}
+
+
+
+
+
 void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 {
 	if (lua_isnil(m_LuaState, a_StackPos))
@@ -1005,7 +1035,7 @@ void cLuaState::GetStackValue(int a_StackPos, pBoundingBox & a_ReturnedVal)
 	tolua_Error err;
 	if (tolua_isusertype(m_LuaState, a_StackPos, "cBoundingBox", false, &err))
 	{
-		a_ReturnedVal = *((cBoundingBox **)lua_touserdata(m_LuaState, a_StackPos));
+		a_ReturnedVal = *(reinterpret_cast<cBoundingBox **>(lua_touserdata(m_LuaState, a_StackPos)));
 	}
 }
 

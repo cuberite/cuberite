@@ -54,6 +54,7 @@ public:
 		msLake,
 		msSpongePrint,
 		msDifference,
+		msSimpleCompare,
 		msMask,
 	} ;
 	
@@ -156,6 +157,22 @@ public:
 	| A        | sponge | A      |  Sponge is the NOP block
 	| *        | B      | B      |  Everything else overwrites anything
 	
+	msDifference:
+	Used to determine the differences between two areas. Only the differring blocks are preserved:
+	|  area block  |        |
+	| this | Src   | result |
+	+------+-------+--------+
+	| A    | A     | air    |  Same blocks are replaced with air
+	| A    | non-A | A      |  Differring blocks are kept from "this"
+
+	msSimpleCompare:
+	Used to determine the differences between two areas. Blocks that differ are replaced with stone, same blocks are replaced with air
+	|  area block  |        |
+	| this | Src   | result |
+	+------+-------+--------+
+	| A    | A     | air    |  Same blocks are replaced with air
+	| A    | non-A | stone  |  Differring blocks are replaced with stone
+
 	msMask:
 	Combines two areas, the blocks that are the same are kept, differing ones are reset to air
 	|  area block  |        |
@@ -288,6 +305,11 @@ public:
 	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != nullptr); }
 	
 	// tolua_end
+
+	/** Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction.
+	If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.)
+	Exported to Lua in ManualBindings.cpp. */
+	void GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType = E_BLOCK_AIR);
 	
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/** Returns the internal pointer to the block types */

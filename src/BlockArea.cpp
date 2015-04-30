@@ -245,6 +245,26 @@ void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBL
 
 
 
+/** Combinator used for cBlockArea::msSimpleCompare merging */
+template <bool MetaValid>
+void MergeCombinatorSimpleCompare(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+{
+	if ((a_DstType == a_SrcType) && (!MetaValid || (a_DstMeta == a_SrcMeta)))
+	{
+		// The blocktypes are the same, and the blockmetas are not present or are the same
+		a_DstType = E_BLOCK_AIR;
+	}
+	else
+	{
+		// The blocktypes or blockmetas differ
+		a_DstType = E_BLOCK_STONE;
+	}
+}
+
+
+
+
+
 /** Combinator used for cBlockArea::msMask merging */
 template <bool MetaValid>
 void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
@@ -1614,6 +1634,73 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 
 
 
+void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType)
+{
+	// Check if blocktypes are valid:
+	if (m_BlockTypes == nullptr)
+	{
+		LOGWARNING("%s: BlockTypes have not been read!", __FUNCTION__);
+		a_MinRelX = 1;
+		a_MaxRelX = 0;
+		return;
+	}
+
+	// Walk all the blocks and find the min and max coords for the non-ignored ones:
+	int MaxX = 0, MinX = m_Size.x - 1;
+	int MaxY = 0, MinY = m_Size.y - 1;
+	int MaxZ = 0, MinZ = m_Size.z - 1;
+	for (int y = 0; y < m_Size.y; y++)
+	{
+		for (int z = 0; z < m_Size.z; z++)
+		{
+			for (int x = 0; x < m_Size.x; x++)
+			{
+				if (m_BlockTypes[MakeIndex(x, y, z)] == a_IgnoreBlockType)
+				{
+					continue;
+				}
+				// The block is not ignored, update any coords that need updating:
+				if (x < MinX)
+				{
+					MinX = x;
+				}
+				if (x > MaxX)
+				{
+					MaxX = x;
+				}
+				if (y < MinY)
+				{
+					MinY = y;
+				}
+				if (y > MaxY)
+				{
+					MaxY = y;
+				}
+				if (z < MinZ)
+				{
+					MinZ = z;
+				}
+				if (z > MaxZ)
+				{
+					MaxZ = z;
+				}
+			}  // for x
+		}  // for z
+	}  // for y
+
+	// Assign to the output:
+	a_MinRelX = MinX;
+	a_MinRelY = MinY;
+	a_MinRelZ = MinZ;
+	a_MaxRelX = MaxX;
+	a_MaxRelY = MaxY;
+	a_MaxRelZ = MaxZ;
+}
+
+
+
+
+
 int cBlockArea::GetDataTypes(void) const
 {
 	int res = 0;
@@ -2121,10 +2208,12 @@ void cBlockArea::RelSetData(
 
 
 
+
+
 template <bool MetasValid>
 void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas)
 {
-	// Block types are compulsory, block metas are voluntary
+	// Block types are compulsory, block metas are optional
 	if (!HasBlockTypes() || !a_Src.HasBlockTypes())
 	{
 		LOGWARNING("%s: cannot merge because one of the areas doesn't have blocktypes.", __FUNCTION__);
@@ -2229,6 +2318,20 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 			);
 			return;
 		}  // case msDifference
+		
+		case cBlockArea::msSimpleCompare:
+		{
+			InternalMergeBlocks<MetasValid, MergeCombinatorSimpleCompare<MetasValid> >(
+				m_BlockTypes, a_Src.GetBlockTypes(),
+				DstMetas, SrcMetas,
+				SizeX, SizeY, SizeZ,
+				SrcOffX, SrcOffY, SrcOffZ,
+				DstOffX, DstOffY, DstOffZ,
+				a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
+				m_Size.x, m_Size.y, m_Size.z
+			);
+			return;
+		}  // case msSimpleCompare
 		
 		case cBlockArea::msMask:
 		{

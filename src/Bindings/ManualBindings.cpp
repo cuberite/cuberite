@@ -3187,6 +3187,44 @@ static int tolua_cBlockArea_GetOrigin(lua_State * tolua_S)
 
 
 
+static int tolua_cBlockArea_GetNonAirCropRelCoords(lua_State * tolua_S)
+{
+	// function cBlockArea::GetNonAirCropRelCoords()
+	// Exported manually because tolua would generate extra input params for the outputs
+	
+	cLuaState L(tolua_S);
+	if (!L.CheckParamUserType(1, "cBlockArea"))
+	{
+		return 0;
+	}
+	
+	cBlockArea * self = nullptr;
+	BLOCKTYPE IgnoreBlockType = E_BLOCK_AIR;
+	L.GetStackValues(1, self, IgnoreBlockType);
+	if (self == nullptr)
+	{
+		tolua_error(tolua_S, "invalid 'self' in function 'cBlockArea:GetNonAirCropRelCoords'", nullptr);
+		return 0;
+	}
+	
+	// Calculate the crop coords:
+	int MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ;
+	self->GetNonAirCropRelCoords(MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ, IgnoreBlockType);
+
+	// Push the six crop coords:
+	L.Push(MinRelX);
+	L.Push(MinRelY);
+	L.Push(MinRelZ);
+	L.Push(MaxRelX);
+	L.Push(MaxRelY);
+	L.Push(MaxRelZ);
+	return 6;
+}
+
+
+
+
+
 static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * tolua_S)
 {
 	// function cBlockArea::GetRelBlockTypeMeta()
@@ -3687,6 +3725,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetBlockTypeMeta",        tolua_cBlockArea_GetBlockTypeMeta);
 			tolua_function(tolua_S, "GetCoordRange",           tolua_cBlockArea_GetCoordRange);
 			tolua_function(tolua_S, "GetOrigin",               tolua_cBlockArea_GetOrigin);
+			tolua_function(tolua_S, "GetNonAirCropRelCoords",  tolua_cBlockArea_GetNonAirCropRelCoords);
 			tolua_function(tolua_S, "GetRelBlockTypeMeta",     tolua_cBlockArea_GetRelBlockTypeMeta);
 			tolua_function(tolua_S, "GetSize",                 tolua_cBlockArea_GetSize);
 			tolua_function(tolua_S, "LoadFromSchematicFile",   tolua_cBlockArea_LoadFromSchematicFile);

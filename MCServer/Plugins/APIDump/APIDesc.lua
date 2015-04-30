@@ -120,6 +120,7 @@ g_APIDesc =
 				GetOriginX = { Params = "", Return = "number", Notes = "Returns the origin x-coord" },
 				GetOriginY = { Params = "", Return = "number", Notes = "Returns the origin y-coord" },
 				GetOriginZ = { Params = "", Return = "number", Notes = "Returns the origin z-coord" },
+				GetNonAirCropRelCoords = { Params = "[IgnoreBlockType]", Return = "MinRelX, MinRelY, MinRelZ, MaxRelX, MaxRelY, MaxRelZ", Notes = "Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction. If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.). IgnoreBlockType defaults to air." },
 				GetRelBlockLight = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the blocklight at the specified relative coords" },
 				GetRelBlockMeta = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the block meta at the specified relative coords" },
 				GetRelBlockSkyLight = { Params = "RelBlockX, RelBlockY, RelBlockZ", Return = "NIBBLETYPE", Notes = "Returns the skylight at the specified relative coords" },
@@ -197,13 +198,14 @@ g_APIDesc =
 				baMetas = { Notes = "Operations should work on block metas" },
 				baLight = { Notes = "Operations should work on block (emissive) light" },
 				baSkyLight = { Notes = "Operations should work on skylight" },
-				msDifference = { Notes = "Block becomes air if Src and Dst are the same. Otherwise it becomes the source block." },
-				msOverwrite = { Notes = "Src overwrites anything in Dst" },
-				msFillAir = { Notes = "Dst is overwritten by Src only where Src has air blocks" },
-				msImprint = { Notes = "Src overwrites Dst anywhere where Dst has non-air blocks" },
+				msDifference = { Notes = "Block becomes air if 'self' and src are the same. Otherwise it becomes the src block." },
+				msFillAir = { Notes = "'self' is overwritten by Src only where 'self' has air blocks" },
+				msImprint = { Notes = "Src overwrites 'self' anywhere where 'self' has non-air blocks" },
 				msLake = { Notes = "Special mode for merging lake images" },
+				msMask = { Notes = "The blocks that are exactly the same are kept in 'self', all differing blocks are replaced by air"},
+				msOverwrite = { Notes = "Src overwrites anything in 'self'" },
+				msSimpleCompare = { Notes = "The blocks that are exactly the same are replaced with air, all differing blocks are replaced by stone"},
 				msSpongePrint = { Notes = "Similar to msImprint, sponge block doesn't overwrite anything, all other blocks overwrite everything"},
-				msMask = { Notes = "The blocks that are exactly the same are kept in Dst, all differing blocks are replaced by air"},
 			},
 			ConstantGroups =
 			{
@@ -287,7 +289,7 @@ g_APIDesc =
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
 						</tr><tr>
-						<th> this </th><th> Src </th><th> result </th><th> </th>
+						<th> self </th><th> Src </th><th> result </th><th> </th>
 						</tr><tr>
 						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
 						</tr><tr>
@@ -321,7 +323,7 @@ g_APIDesc =
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
 						</tr><tr>
-						<th> this </th><th> Src </th><th> result </th><th> </th>
+						<th> self </th><th> Src </th><th> result </th><th> </th>
 						</tr><tr>
 						<td> A </td><td> sponge </td><td> A </td><td> Sponge is the NOP block </td>
 						</tr><tr>
@@ -337,11 +339,43 @@ g_APIDesc =
 						<table><tbody><tr>
 						<th colspan="2"> area block </th><th> </th><th> Notes </th>
 						</tr><tr>
-						<th> this </th><th> Src </th><th> result </th><th> </th>
+						<th> self </th><th> Src </th><th> result </th><th> </th>
 						</tr><tr>
 						<td> A </td><td> A </td><td> A </td><td> Same blocks are kept </td>
 						</tr><tr>
 						<td> A </td><td> non-A </td><td> air </td><td> Differing blocks are replaced with air </td>
+						</tr>
+						</tbody></table>
+
+						<p>
+						<strong>msDifference</strong> - the blocks that are the same in both areas are replaced with air, all the
+						differing blocks are kept from the first area. Meta is used in the comparison, too, two blocks of the
+						same type but different meta are considered different.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> self </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> A </td><td> air </td><td> Same blocks are replaced with air </td>
+						</tr><tr>
+						<td> A </td><td> non-A </td><td> A </td><td> Differing blocks are kept from 'self' </td>
+						</tr>
+						</tbody></table>
+						
+						<p>
+						<strong>msSimpleCompare</strong> - the blocks that are the same in both areas are replaced with air, all the
+						differing blocks are replaced with stone. Meta is used in the comparison, too, two blocks of the
+						same type but different meta are considered different.
+						</p>
+						<table><tbody><tr>
+						<th colspan="2"> area block </th><th> </th><th> Notes </th>
+						</tr><tr>
+						<th> self </th><th> Src </th><th> result </th><th> </th>
+						</tr><tr>
+						<td> A </td><td> A </td><td> air </td><td> Same blocks are replaced with air </td>
+						</tr><tr>
+						<td> A </td><td> non-A </td><td> stone </td><td> Differing blocks are replaced with stone </td>
 						</tr>
 						</tbody></table>
 ]],
