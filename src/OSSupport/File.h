@@ -124,8 +124,13 @@ public:
 	/** Creates a new folder with the specified name. Returns true if successful. Path may be relative or absolute */
 	static bool CreateFolder(const AString & a_FolderPath);
 	
-	/** Returns the entire contents of the specified file as a string. Returns empty string on error. */
+	// tolua_end
+
+	/** Returns the entire contents of the specified file as a string. Returns empty string on error.
+	Exported manually in ManualBindings.cpp due to #1914 - ToLua code doesn't work well with binary files. */
 	static AString ReadWholeFile(const AString & a_FileName);
+
+	// tolua_begin
 
 	/** Returns a_FileName with its extension changed to a_NewExt.
 	a_FileName may contain path specification. */

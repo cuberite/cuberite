@@ -253,12 +253,13 @@ static int tolua_InflateString(lua_State * tolua_S)
 
 static int tolua_StringSplit(lua_State * tolua_S)
 {
+	// Get the params:
 	cLuaState LuaState(tolua_S);
-	std::string str   = (std::string)tolua_tocppstring(LuaState, 1, 0);
-	std::string delim = (std::string)tolua_tocppstring(LuaState, 2, 0);
+	AString str, delim;
+	LuaState.GetStackValues(1, str, delim);
 
-	AStringVector Split = StringSplit(str, delim);
-	LuaState.Push(Split);
+	// Execute and push the result:
+	LuaState.Push(StringSplit(str, delim));
 	return 1;
 }
 
@@ -472,6 +473,7 @@ cPluginLua * GetLuaPlugin(lua_State * L)
 
 static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 {
+	// Check params:
 	cLuaState LuaState(tolua_S);
 	if (
 		!LuaState.CheckParamUserTable(1, "cFile") ||
@@ -482,10 +484,38 @@ static int tolua_cFile_GetFolderContents(lua_State * tolua_S)
 		return 0;
 	}
 	
-	AString Folder = (AString)tolua_tocppstring(LuaState, 2, 0);
+	// Get params:
+	AString Folder;
+	LuaState.GetStackValues(2, Folder);
 
-	AStringVector Contents = cFile::GetFolderContents(Folder);
-	LuaState.Push(Contents);
+	// Execute and push result:
+	LuaState.Push(cFile::GetFolderContents(Folder));
+	return 1;
+}
+
+
+
+
+
+static int tolua_cFile_ReadWholeFile(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState LuaState(tolua_S);
+	if (
+		!LuaState.CheckParamUserTable(1, "cFile") ||
+		!LuaState.CheckParamString   (2) ||
+		!LuaState.CheckParamEnd      (3)
+	)
+	{
+		return 0;
+	}
+	
+	// Get params:
+	AString FileName;
+	LuaState.GetStackValues(2, FileName);
+
+	// Execute and push result:
+	LuaState.Push(cFile::ReadWholeFile(FileName));
 	return 1;
 }
 
@@ -3719,6 +3749,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		
 		tolua_beginmodule(tolua_S, "cFile");
 			tolua_function(tolua_S, "GetFolderContents", tolua_cFile_GetFolderContents);
+			tolua_function(tolua_S, "ReadWholeFile",     tolua_cFile_ReadWholeFile);
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cBlockArea");
