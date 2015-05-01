@@ -303,7 +303,11 @@ public:
 	bool HasBlockMetas    (void) const { return (m_BlockMetas    != nullptr); }
 	bool HasBlockLights   (void) const { return (m_BlockLight    != nullptr); }
 	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != nullptr); }
-	
+
+	/** Returns the count of blocks that are not air.
+	Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered air). */
+	size_t CountNonAirBlocks(void) const;
+
 	// tolua_end
 
 	/** Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction.
