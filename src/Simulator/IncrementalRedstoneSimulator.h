@@ -196,6 +196,8 @@ private:
 	/** Recursively searches for a wire path and powers everything that should be powered */
 	void FindAndPowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const std::pair<Vector3i, cChunk *> & a_Entry);
 
+	void PowerBorderingWires(std::vector<std::pair<Vector3i, cChunk *>> & a_PotentialWireList, const std::pair<Vector3i, cChunk *> & a_Entry, const Vector3i & a_AdjustedPos, cChunk * a_NeighbourChunk, unsigned char a_MyPower);
+
 	/** Marks a block as being powered through another block */
 	void SetBlockLinkedPowered(int a_RelBlockX, int a_RelBlockY, int a_RelBlockZ, int a_RelMiddleX, int a_RelMiddleY, int a_RelMiddleZ, int a_RelSourceX, int a_RelSourceY, int a_RelSourceZ, BLOCKTYPE a_MiddeBlock, unsigned char a_PowerLevel = MAX_POWER_LEVEL);
 
