@@ -1,12 +1,9 @@
 #include "Globals.h"
-#ifndef COMPILING_PATHFIND_DEBUGGER
-	/* MCServer headers */
-	#include "../World.h"
-	#include "../Chunk.h"
-#endif
 
 #include <cmath>
+
 #include "Path.h"
+#include "../Chunk.h"
 
 #define DISTANCE_MANHATTAN 0  // 1: More speed, a bit less accuracy 0: Max accuracy, less speed.
 #define HEURISTICS_ONLY 0  // 1: Much more speed, much less accurate.
@@ -38,18 +35,17 @@ bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 
 /* cPath implementation */
 cPath::cPath(
-	cWorld * a_World,
+	cChunk * a_Chunk,
 	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 	double a_BoundingBoxWidth, double a_BoundingBoxHeight,
 	int a_MaxUp, int a_MaxDown
 )
 {
+	ASSERT(m_Chunk != nullptr);
 	// TODO: if src not walkable OR dest not walkable, then abort.
 	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
 
-	m_World = a_World;
-	// m_World = cRoot::Get()->GetDefaultWorld();
-
+	m_Chunk = a_Chunk;
 	m_Source = a_StartingPoint.Floor();
 	m_Destination = a_EndingPoint.Floor();
 
@@ -65,6 +61,7 @@ cPath::cPath(
 	m_PointCount = 0;
 
 	ProcessCell(GetCell(a_StartingPoint), nullptr, 0);
+	m_Chunk = nullptr;
 }
 
 
@@ -83,8 +80,10 @@ cPath::~cPath()
 
 
 
-ePathFinderStatus cPath::Step()
+ePathFinderStatus cPath::Step(cChunk * a_Chunk)
 {
+	m_Chunk = a_Chunk;
+	ASSERT(m_Chunk != nullptr);
 	if (m_Status != ePathFinderStatus::CALCULATING)
 	{
 		return m_Status;
@@ -106,6 +105,7 @@ ePathFinderStatus cPath::Step()
 			}
 		}
 	}
+	m_Chunk = nullptr;
 	return m_Status;
 }
 
@@ -113,15 +113,25 @@ ePathFinderStatus cPath::Step()
 
 
 
-#ifndef COMPILING_PATHFIND_DEBUGGER
 bool cPath::IsSolid(const Vector3d & a_Location)
 {
-	int ChunkX, ChunkZ;
-	m_Item_CurrentBlock = a_Location;
-	cChunkDef::BlockToChunk(a_Location.x, a_Location.z, ChunkX, ChunkZ);
-	return !m_World->DoWithChunk(ChunkX, ChunkZ, * this);
+	ASSERT(m_Chunk != nullptr);
+	m_Chunk = m_Chunk->GetNeighborChunk(a_Location.x, a_Location.z);
+	if (!m_Chunk->IsValid())
+	{
+		return true;
+	}
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	int RelX = a_Location.x - m_Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = a_Location.z - m_Chunk->GetPosZ() * cChunkDef::Width;
+	m_Chunk->GetBlockTypeMeta(RelX, a_Location.y, RelZ, BlockType, BlockMeta);
+	if ((BlockType == E_BLOCK_FENCE) || (BlockType == E_BLOCK_FENCE_GATE))
+	{
+		GetCell(a_Location + Vector3d(0, 1, 0))->m_IsSolid = true;  // Mobs will always think that the fence is 2 blocks high and therefore won't jump over.
+	}
+	return cBlockInfo::IsSolid(BlockType);
 }
-#endif
 
 
 
@@ -352,28 +362,3 @@ void cPath::AddPoint(Vector3d a_Vector)
 	m_PathPoints.push_back(a_Vector);
 	++m_PointCount;
 }
-
-
-
-
-
-#ifndef COMPILING_PATHFIND_DEBUGGER
-bool cPath::Item(cChunk * a_Chunk)  // returns FALSE if there's a solid or if we failed.
-{
-	int RelX = m_Item_CurrentBlock.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = m_Item_CurrentBlock.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-
-	if (!a_Chunk->IsValid())
-	{
-		return false;
-	}
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	a_Chunk->GetBlockTypeMeta(RelX, m_Item_CurrentBlock.y, RelZ, BlockType, BlockMeta);
-	return (!cBlockInfo::IsSolid(BlockType));
-
-	// TODO Maybe I should queue several blocks and call item() at once for all of them for better performance?
-	// I think Worktycho said each item() call needs 2 locks.
-
-}
-#endif

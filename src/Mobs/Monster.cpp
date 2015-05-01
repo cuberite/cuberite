@@ -121,7 +121,7 @@ void cMonster::SpawnOn(cClientHandle & a_Client)
 
 
 
-void cMonster::TickPathFinding()
+void cMonster::TickPathFinding(cChunk & a_Chunk)
 {
 
 	if (m_Path == nullptr)
@@ -131,12 +131,12 @@ void cMonster::TickPathFinding()
 
 		// Can someone explain why are these two NOT THE SAME???
 		// m_Path = new cPath(GetWorld(), GetPosition(), m_FinalDestination, 30);
-		m_Path = new cPath(GetWorld(), Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 20);
+		m_Path = new cPath(&a_Chunk, Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 20);
 
 
 		m_IsFollowingPath = false;
 	}
-	m_PathStatus = m_Path->Step();
+	m_PathStatus = m_Path->Step(&a_Chunk);
 	switch (m_PathStatus)
 	{
 
@@ -293,7 +293,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			}
 		}
 
-		TickPathFinding();
+		TickPathFinding(a_Chunk);
 
 		Vector3d Distance = m_Destination - GetPosition();
 		if (!ReachedDestination() && !ReachedFinalDestination())  // If we haven't reached any sort of destination, move

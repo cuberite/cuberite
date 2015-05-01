@@ -206,7 +206,7 @@ protected:
 
 	/** Finds the next place to go
 		This is based on the ultimate, final destination and the current position, as well as the traversed coordinates, and any environmental hazards */
-	void TickPathFinding(void);
+	void TickPathFinding(cChunk & a_Chunk);
 	/** Finishes a pathfinding task, be it due to failure or something else */
 	void FinishPathFinding(void);
 	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
