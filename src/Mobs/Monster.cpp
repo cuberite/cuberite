@@ -142,7 +142,7 @@ void cMonster::TickPathFinding()
 
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
-			FinishPathFinding();
+			ResetPathFinding();
 			break;
 		}
 
@@ -164,7 +164,7 @@ void cMonster::TickPathFinding()
 			}
 			if (m_Path->IsLastPoint())
 			{
-				FinishPathFinding();
+				ResetPathFinding();
 			}
 			break;
 
@@ -191,7 +191,7 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 void cMonster::StopMovingToPosition()
 {
 	m_bMovingToDestination = false;
-	FinishPathFinding();
+	ResetPathFinding();
 }
 
 
@@ -209,7 +209,7 @@ bool cMonster::IsCoordinateInTraversedList(Vector3i a_Coords)
 
 /* No one should call this except the pathfinder orthe monster tick or StopMovingToPosition.
 Resets the pathfinder, usually starting a brand new path, unless called from StopMovingToPosition. */
-void cMonster::FinishPathFinding(void)
+void cMonster::ResetPathFinding(void)
 {
 	if (m_Path != nullptr)
 	{
@@ -254,6 +254,7 @@ bool cMonster::ReachedFinalDestination()
 void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	super::Tick(a_Dt, a_Chunk);
+	GET_AND_VERIFY_CURRENT_CHUNK(Chunk, POSX_TOINT, POSZ_TOINT);
 
 	if (m_Health <= 0)
 	{
@@ -276,7 +277,8 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Burning in daylight
-	HandleDaylightBurning(a_Chunk);
+	bool WouldBurnRightNow = WouldBurnAt(GetPosition(), *Chunk);  // cached so that we use it twice, spares some cycles.
+	HandleDaylightBurning(*Chunk, WouldBurnRightNow);
 
 
 
@@ -300,7 +302,12 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (--m_GiveUpCounter == 0)
 			{
-				FinishPathFinding();
+				ResetPathFinding();  // Not to be confused with StopMovingToPosition, this just discards the current path and calculates another.
+			}
+			else if (m_BurnsInDaylight && WouldBurnAt(m_Destination, *Chunk) && !WouldBurnRightNow && (m_TicksSinceLastDamaged == 100))
+			{
+				// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
+				StopMovingToPosition();
 			}
 			else
 			{
@@ -1091,7 +1098,7 @@ void cMonster::AddRandomWeaponDropItem(cItems & a_Drops, short a_LootingLevel)
 
 
 
-void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
+void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 {
 	if (!m_BurnsInDaylight)
 	{
@@ -1110,7 +1117,7 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk)
 		return;
 	}
 
-	if (WouldBurnAt(GetPosition(), a_Chunk))
+	if (!IsOnFire() && WouldBurn)
 	{
 		// Burn for 100 ticks, then decide again
 		StartBurning(100);
@@ -1129,7 +1136,6 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		(a_Chunk.GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
 		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
-		!IsOnFire() &&                                               // Not already burning
 		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)         // Not raining
 	)
 	{
