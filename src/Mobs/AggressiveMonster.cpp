@@ -37,10 +37,7 @@ void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt)
 			}
 		}
 
-		if (!IsMovingToTargetPosition())
-		{
-			MoveToPosition(m_Target->GetPosition());
-		}
+		MoveToPosition(m_Target->GetPosition());
 	}
 }
 
@@ -100,7 +97,7 @@ void cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
 	{
 		return;
 	}
-	
+
 	// Setting this higher gives us more wiggle room for attackrate
 	m_AttackInterval = 0.0;
 	m_Target->TakeDamage(dtMobAttack, this, m_AttackDamage, 0);

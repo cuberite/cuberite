@@ -10,11 +10,12 @@
 
 
 
-
-
 class cClientHandle;
 class cWorld;
 
+// Fwd: cPath
+enum class ePathFinderStatus;
+class cPath;
 
 
 
@@ -61,6 +62,7 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
+	virtual void StopMovingToPosition();
 	virtual bool ReachedDestination(void);
 
 	// tolua_begin
@@ -162,6 +164,11 @@ protected:
 
 	/** A pointer to the entity this mobile is aiming to reach */
 	cEntity * m_Target;
+	cPath *  m_Path;  // TODO unique ptr
+	ePathFinderStatus m_PathStatus;
+	bool m_IsFollowingPath;
+	/* If 0, will give up reaching the next m_Dest and will re-compute path. */
+	int m_GiveUpCounter;
 	/** Coordinates of the next position that should be reached */
 	Vector3d m_Destination;
 	/** Coordinates for the ultimate, final destination. */
@@ -201,11 +208,7 @@ protected:
 		This is based on the ultimate, final destination and the current position, as well as the traversed coordinates, and any environmental hazards */
 	void TickPathFinding(void);
 	/** Finishes a pathfinding task, be it due to failure or something else */
-	inline void FinishPathFinding(void)
-	{
-		m_TraversedCoordinates.clear();
-		m_bMovingToDestination = false;
-	}
+	void FinishPathFinding(void);
 	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
 
@@ -239,10 +242,11 @@ protected:
 	float m_DropChanceLeggings;
 	float m_DropChanceBoots;
 	bool m_CanPickUpLoot;
+	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
 	void HandleDaylightBurning(cChunk & a_Chunk);
+	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
-
 	double m_RelativeWalkSpeed;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops*/

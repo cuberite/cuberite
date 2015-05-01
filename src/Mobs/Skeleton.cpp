@@ -37,7 +37,7 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	else
 	{
 		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ARROW);
-		
+
 	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
 	AddRandomArmorDropItem(a_Drops, LootingLevel);
@@ -50,17 +50,18 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSkeleton::MoveToPosition(const Vector3d & a_Position)
 {
-	// If the destination is sufficiently skylight challenged AND the skeleton isn't on fire then block the movement
+	// Todo use WouldBurnAt(), not sure how to obtain a chunk though...
+	super::MoveToPosition(a_Position);  // Look at the player and update m_Destination to hit them if they're close
+
+	// If the destination is sufficiently skylight challenged AND the skeleton isn't on fire AND we weren't attacked recently then block the movement
 	if (
 		!IsOnFire() &&
-		(m_World->GetBlockSkyLight((int)floor(a_Position.x), (int)floor(a_Position.y), (int)floor(a_Position.z)) - m_World->GetSkyDarkness() > 8)
+		(m_World->GetBlockSkyLight((int)floor(a_Position.x), (int)floor(a_Position.y), (int)floor(a_Position.z)) - m_World->GetSkyDarkness() > 8) &&
+			m_TicksSinceLastDamaged == 100
 		)
 	{
-		m_bMovingToDestination = false;
-		return;
+		StopMovingToPosition();
 	}
-
-	super::MoveToPosition(a_Position);
 }
 
 

@@ -137,7 +137,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			}
 		}
 	}
-	
+
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -203,7 +203,7 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else if (IsSitting())
 	{
-		m_bMovingToDestination = false;
+		StopMovingToPosition();
 	}
 }
 
