@@ -208,7 +208,7 @@ protected:
 		This is based on the ultimate, final destination and the current position, as well as the traversed coordinates, and any environmental hazards */
 	void TickPathFinding(void);
 	/** Finishes a pathfinding task, be it due to failure or something else */
-	void FinishPathFinding(void);
+	void ResetPathFinding(void);
 	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
 
@@ -244,7 +244,7 @@ protected:
 	bool m_CanPickUpLoot;
 	int m_TicksSinceLastDamaged;  // How many ticks ago we were last damaged by a player?
 
-	void HandleDaylightBurning(cChunk & a_Chunk);
+	void HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn);
 	bool WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk);
 	bool m_BurnsInDaylight;
 	double m_RelativeWalkSpeed;

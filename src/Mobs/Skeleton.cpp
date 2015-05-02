@@ -48,26 +48,6 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cSkeleton::MoveToPosition(const Vector3d & a_Position)
-{
-	// Todo use WouldBurnAt(), not sure how to obtain a chunk though...
-	super::MoveToPosition(a_Position);  // Look at the player and update m_Destination to hit them if they're close
-
-	// If the destination is sufficiently skylight challenged AND the skeleton isn't on fire AND we weren't attacked recently then block the movement
-	if (
-		!IsOnFire() &&
-		(m_World->GetBlockSkyLight((int)floor(a_Position.x), (int)floor(a_Position.y), (int)floor(a_Position.z)) - m_World->GetSkyDarkness() > 8) &&
-			m_TicksSinceLastDamaged == 100
-		)
-	{
-		StopMovingToPosition();
-	}
-}
-
-
-
-
-
 void cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
 	m_AttackInterval += (static_cast<float>(a_Dt.count()) / 1000) * m_AttackRate;

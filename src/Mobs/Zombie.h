@@ -10,17 +10,15 @@ class cZombie :
 	public cAggressiveMonster
 {
 	typedef cAggressiveMonster super;
-	
+
 public:
 	cZombie(bool a_IsVillagerZombie);
 
 	CLASS_PROTODEF(cZombie)
-	
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	virtual void MoveToPosition(const Vector3d & a_Position) override;
 
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool IsUndead(void) override { return true; }
-	
+
 	bool IsVillagerZombie(void) const { return m_IsVillagerZombie; }
 	bool IsConverting    (void) const { return m_IsConverting; }
 
