@@ -64,11 +64,11 @@ public:
 	
 	
 	/** The interface through which the plugins are called for their OnChunkGenerating / OnChunkGenerated hooks. */
-	class cPluginInterface
+	class cPluginLuaInterface
 	{
 	public:
 		// Force a virtual destructor
-		virtual ~cPluginInterface() {}
+		virtual ~cPluginLuaInterface() {}
 		
 		/** Called when the chunk is about to be generated.
 		The generator may be partly or fully overriden by the implementation
@@ -116,7 +116,7 @@ public:
 	cChunkGenerator (void);
 	~cChunkGenerator();
 
-	bool Start(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
+	bool Start(cPluginLuaInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile);
 	void Stop(void);
 
 	/** Queues the chunk for generation
@@ -177,7 +177,7 @@ private:
 	cGenerator * m_Generator;
 	
 	/** The plugin interface that may modify the generated chunks */
-	cPluginInterface * m_PluginInterface;
+	cPluginLuaInterface * m_PluginInterface;
 	
 	/** The destination where the generated chunks are sent */
 	cChunkSink * m_ChunkSink;

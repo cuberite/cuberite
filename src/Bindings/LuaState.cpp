@@ -242,7 +242,7 @@ bool cLuaState::HasFunction(const char * a_FunctionName)
 {
 	if (!IsValid())
 	{
-		// This happens if cPlugin::Initialize() fails with an error
+		// This happens if cPluginLua::Initialize() fails with an error
 		return false;
 	}
 
@@ -262,7 +262,7 @@ bool cLuaState::PushFunction(const char * a_FunctionName)
 
 	if (!IsValid())
 	{
-		// This happens if cPlugin::Initialize() fails with an error
+		// This happens if cPluginLua::Initialize() fails with an error
 		return false;
 	}
 	
