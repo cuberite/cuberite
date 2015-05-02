@@ -1643,6 +1643,15 @@ end
 
 
 
+local function HandleCmdApiShow(a_Split, a_EntireCmd)
+	os.execute("API" .. cFile:GetPathSeparator() .. "index.html")
+	return true, "Launching the browser to show the API docs..."
+end
+
+
+
+
+
 function Initialize(Plugin)
 	g_Plugin = Plugin;
 	g_PluginFolder = Plugin:GetLocalFolder();
@@ -1651,6 +1660,7 @@ function Initialize(Plugin)
 	
 	-- Bind a console command to dump the API:
 	cPluginManager:BindConsoleCommand("api", HandleCmdApi, "Dumps the Lua API docs into the API/ subfolder")
+	cPluginManager:BindConsoleCommand("apishow", HandleCmdApiShow, "Runs the default browser to show the API docs")
 
 	-- Add a WebAdmin tab that has a Dump button
 	g_Plugin:AddWebTab("APIDump", HandleWebAdminDump)
