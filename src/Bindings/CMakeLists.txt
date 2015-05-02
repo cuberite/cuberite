@@ -142,5 +142,5 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/src/Bindings/Bindings.cpp PROPER
 if(NOT MSVC)
 	add_library(Bindings ${SRCS} ${HDRS})
 
-	target_link_libraries(Bindings lua sqlite tolualib polarssl)
+	target_link_libraries(Bindings lua sqlite tolualib mbedtls)
 endif()
