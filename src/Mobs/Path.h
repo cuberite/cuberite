@@ -18,12 +18,8 @@ Put this in your .cpp:
 
 #include <unordered_map>
 
-/* MCServer forward declarations */
-#ifndef COMPILING_PATHFIND_DEBUGGER
-
-// fwd: cChunkMap.h
-typedef cItemCallback<cChunk> cChunkCallback;
-#endif
+//fwd: ../Chunk.h
+class cChunk;
 
 /* Various little structs and classes */
 enum class ePathFinderStatus {CALCULATING,  PATH_FOUND,  PATH_NOT_FOUND};
@@ -35,9 +31,6 @@ public:
 };
 
 class cPath
-#ifndef COMPILING_PATHFIND_DEBUGGER
-: public cChunkCallback
-#endif
 {
 public:
 	/** Creates a pathfinder instance. A Mob will probably need a single pathfinder instance for its entire life.
@@ -59,7 +52,7 @@ public:
 	@param a_EndingPoint "The block where the Zombie's knees want to be".
 	@param a_MaxSteps The maximum steps before giving up. */
 	cPath(
-		cWorld * a_World,
+		cChunk * a_Chunk,
 		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 		double a_BoundingBoxWidth = 1, double a_BoundingBoxHeight = 2,
 		int a_MaxUp = 1, int a_MaxDown = 1
@@ -69,7 +62,7 @@ public:
 	~cPath();
 
 	/** Performs part of the path calculation and returns true if the path computation has finished. */
-	ePathFinderStatus Step();
+	ePathFinderStatus Step(cChunk * a_Chunk);
 
 	/* Point retrieval functions, inlined for performance. */
 	/** Returns the next point in the path. */
@@ -147,15 +140,9 @@ private:
 	std::vector<Vector3d> m_PathPoints;
 	void AddPoint(Vector3d a_Vector);
 
-	/* Interfacing with MCServer's world */
-	cWorld * m_World;
-	#ifndef COMPILING_PATHFIND_DEBUGGER
-	Vector3d m_Item_CurrentBlock;  // Read by Item();, it's the only way to "pass it" parameters
-protected:
-	virtual bool Item(cChunk * a_Chunk) override;
-
-	/* Interfacing with Irrlicht, has nothing to do with MCServer*/
-	#else
+	/* Interfacing with the world */
+	cChunk * m_Chunk;  // Only valid inside Step()!
+	#ifdef COMPILING_PATHFIND_DEBUGGER
 	#include "../path_irrlicht.cpp"
 	#endif
 };
