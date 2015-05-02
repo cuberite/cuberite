@@ -40,7 +40,7 @@ function GetDefaultPage()
 	
 	cRoot:Get():ForEachPlayer(
 		function(a_CBPlayer)
-			Content = Content .. "<li>" .. Player:GetName() .. "</li>"
+			Content = Content .. "<li>" .. a_CBPlayer:GetName() .. "</li>"
 		end
 	)
 	
