@@ -80,6 +80,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_GiveUpCounter(0)
 	, m_bMovingToDestination(false)
 	, m_LastGroundHeight(POSY_TOINT)
+	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
@@ -286,12 +287,21 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_bOnGround)
 		{
-			if (DoesPosYRequireJump((int)floor(m_Destination.y)))
+			if (m_JumpCoolDown == 0)
 			{
-				m_bOnGround = false;
-
-				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
-				AddPosY(1.2);  // Jump!!
+				if (DoesPosYRequireJump(static_cast<int>(floor(m_Destination.y))))
+				{
+					m_bOnGround = false;
+					m_JumpCoolDown = 20;
+					// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
+					AddPosY(1.6);  // Jump!!
+					SetSpeedX(3.2 * (m_Destination.x - GetPosition().x));  // Move forward in a preset speed.
+					SetSpeedZ(3.2 * (m_Destination.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
+				}
+			}
+			else
+			{
+				--m_JumpCoolDown;
 			}
 		}
 
