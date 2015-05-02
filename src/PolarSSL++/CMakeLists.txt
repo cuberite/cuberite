@@ -37,6 +37,6 @@ if(NOT MSVC)
 	add_library(PolarSSL++ ${SRCS} ${HDRS})
 
 	if (UNIX)
-		target_link_libraries(PolarSSL++ polarssl)
+		target_link_libraries(PolarSSL++ mbedtls)
 	endif()
 endif()

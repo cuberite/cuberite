@@ -105,5 +105,5 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(ProtoProxy zlib polarssl)
+target_link_libraries(ProtoProxy zlib mbedtls)
 
