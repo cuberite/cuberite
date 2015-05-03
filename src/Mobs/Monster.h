@@ -217,6 +217,7 @@ protected:
 
 	virtual void HandleFalling(void);
 	int m_LastGroundHeight;
+	int m_JumpCoolDown;
 
 	/* =========================== */
 
