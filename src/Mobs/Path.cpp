@@ -117,7 +117,7 @@ bool cPath::IsSolid(const Vector3d & a_Location)
 {
 	ASSERT(m_Chunk != nullptr);
 	m_Chunk = m_Chunk->GetNeighborChunk(a_Location.x, a_Location.z);
-	if (!m_Chunk->IsValid())
+	if ((m_Chunk == nullptr) || (!m_Chunk->IsValid()))
 	{
 		return true;
 	}
