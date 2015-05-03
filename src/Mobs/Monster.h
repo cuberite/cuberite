@@ -61,9 +61,9 @@ public:
 
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
+	/** Engage pathfinder and tell it to calculate a path to a given position, and move the mobile accordingly
+	Currently, the mob will only start moving to a new position after the position it is currently going to is reached. */
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
-	virtual void StopMovingToPosition();
-	virtual bool ReachedDestination(void);
 
 	// tolua_begin
 	eMonsterType GetMobType(void) const { return m_MobType; }
@@ -160,24 +160,21 @@ public:
 
 protected:
 
-	/* ======= PATHFINDING ======= */
-
 	/** A pointer to the entity this mobile is aiming to reach */
 	cEntity * m_Target;
 	cPath *  m_Path;  // TODO unique ptr
-	ePathFinderStatus m_PathStatus;
-	bool m_IsFollowingPath;
-	/* If 0, will give up reaching the next m_Dest and will re-compute path. */
-	int m_GiveUpCounter;
-	/** Coordinates of the next position that should be reached */
-	Vector3d m_Destination;
-	/** Coordinates for the ultimate, final destination. */
-	Vector3d m_FinalDestination;
-	/** Returns if the ultimate, final destination has been reached */
-	bool ReachedFinalDestination(void);
 
 	/** Stores if mobile is currently moving towards the ultimate, final destination */
-	bool m_bMovingToDestination;
+	bool m_IsFollowingPath;
+
+	/* If 0, will give up reaching the next m_Destination and will re-compute path. */
+	int m_GiveUpCounter;
+
+	/** Coordinates of the next position that should be reached */
+	Vector3d m_Destination;
+
+	/** Coordinates for the ultimate, final destination. */
+	Vector3d m_FinalDestination;
 
 	/** Finds the lowest non-air block position (not the highest, as cWorld::GetHeight does)
 	If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
@@ -185,41 +182,40 @@ protected:
 	If no suitable position is found, returns cChunkDef::Height. */
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
 
-	/** Returns if a monster can actually reach a given height by jumping or walking */
-	inline bool IsNextYPosReachable(int a_PosY)
-	{
-		return (
-			(a_PosY <= POSY_TOINT) ||
-			DoesPosYRequireJump(a_PosY)
-			);
-	}
+	/** Returns if the ultimate, final destination has been reached */
+	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
+
+	/** Returns if the intermediate waypoint of m_Destination has been reached */
+	bool ReachedDestination(void) { return ((m_Destination - GetPosition()).SqrLength() < 0.25); }
+
 	/** Returns if a monster can reach a given height by jumping */
 	inline bool DoesPosYRequireJump(int a_PosY)
 	{
 		return ((a_PosY > POSY_TOINT) && (a_PosY == POSY_TOINT + 1));
 	}
 
-	/** A semi-temporary list to store the traversed coordinates during active pathfinding so we don't visit them again */
-	std::vector<Vector3i> m_TraversedCoordinates;
-	/** Returns if coordinate is in the traversed list */
-	bool IsCoordinateInTraversedList(Vector3i a_Coords);
+	/** Finds the next place to go by calculating a path and setting the m_Destination variable for the next block to head to
+	This is based on the ultimate, final destination and the current position, as well as the A* algorithm, and any environmental hazards
+	Returns if a path is ready, and therefore if the mob should move to m_Destination
+	*/
+	bool TickPathFinding(cChunk & a_Chunk);
+	void MoveToWayPoint(cChunk & a_Chunk);
 
-	/** Finds the next place to go
-		This is based on the ultimate, final destination and the current position, as well as the traversed coordinates, and any environmental hazards */
-	void TickPathFinding(cChunk & a_Chunk);
-	/** Finishes a pathfinding task, be it due to failure or something else */
+	/** Resets a pathfinding task, be it due to failure or something else
+	Resets the pathfinder. If m_IsFollowingPath is true, TickPathFinding starts a brand new path.
+	Should only be called by the pathfinder, cMonster::Tick or StopMovingToPosition. */
 	void ResetPathFinding(void);
+
+	/** Stops pathfinding
+	Calls ResetPathFinding and sets m_IsFollowingPath to false */
+	void StopMovingToPosition();
+
 	/** Sets the body yaw and head yaw/pitch based on next/ultimate destinations */
 	void SetPitchAndYawFromDestination(void);
-
-	/* =========================== */
-	/* ========= FALLING ========= */
 
 	virtual void HandleFalling(void);
 	int m_LastGroundHeight;
 	int m_JumpCoolDown;
-
-	/* =========================== */
 
 	std::chrono::milliseconds m_IdleInterval;
 	std::chrono::milliseconds m_DestroyTimer;
