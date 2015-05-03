@@ -52,7 +52,7 @@ public:
 	@param a_EndingPoint "The block where the Zombie's knees want to be".
 	@param a_MaxSteps The maximum steps before giving up. */
 	cPath(
-		cChunk * a_Chunk,
+		cChunk & a_Chunk,
 		const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 		double a_BoundingBoxWidth = 1, double a_BoundingBoxHeight = 2,
 		int a_MaxUp = 1, int a_MaxDown = 1
@@ -62,7 +62,7 @@ public:
 	~cPath();
 
 	/** Performs part of the path calculation and returns true if the path computation has finished. */
-	ePathFinderStatus Step(cChunk * a_Chunk);
+	ePathFinderStatus Step(cChunk & a_Chunk);
 
 	/* Point retrieval functions, inlined for performance. */
 	/** Returns the next point in the path. */

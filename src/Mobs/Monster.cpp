@@ -131,12 +131,12 @@ void cMonster::TickPathFinding(cChunk & a_Chunk)
 
 		// Can someone explain why are these two NOT THE SAME???
 		// m_Path = new cPath(GetWorld(), GetPosition(), m_FinalDestination, 30);
-		m_Path = new cPath(&a_Chunk, Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 20);
+		m_Path = new cPath(a_Chunk, Vector3d(floor(position.x), floor(position.y), floor(position.z)), Vector3d(floor(Dest.x), floor(Dest.y), floor(Dest.z)), 20);
 
 
 		m_IsFollowingPath = false;
 	}
-	m_PathStatus = m_Path->Step(&a_Chunk);
+	m_PathStatus = m_Path->Step(a_Chunk);
 	switch (m_PathStatus)
 	{
 
