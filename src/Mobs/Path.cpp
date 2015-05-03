@@ -35,17 +35,16 @@ bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 
 /* cPath implementation */
 cPath::cPath(
-	cChunk * a_Chunk,
+	cChunk & a_Chunk,
 	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
 	double a_BoundingBoxWidth, double a_BoundingBoxHeight,
 	int a_MaxUp, int a_MaxDown
 )
 {
-	ASSERT(m_Chunk != nullptr);
 	// TODO: if src not walkable OR dest not walkable, then abort.
 	// Borrow a new "isWalkable" from ProcessIfWalkable, make ProcessIfWalkable also call isWalkable
 
-	m_Chunk = a_Chunk;
+	m_Chunk = &a_Chunk;
 	m_Source = a_StartingPoint.Floor();
 	m_Destination = a_EndingPoint.Floor();
 
@@ -80,10 +79,9 @@ cPath::~cPath()
 
 
 
-ePathFinderStatus cPath::Step(cChunk * a_Chunk)
+ePathFinderStatus cPath::Step(cChunk & a_Chunk)
 {
-	m_Chunk = a_Chunk;
-	ASSERT(m_Chunk != nullptr);
+	m_Chunk = &a_Chunk;
 	if (m_Status != ePathFinderStatus::CALCULATING)
 	{
 		return m_Status;
