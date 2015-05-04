@@ -12,6 +12,7 @@
 #endif  // _MSC_VER
 
 #include "OSSupport/NetworkSingleton.h"
+#include "BuildInfo.h"
 
 
 
@@ -78,6 +79,10 @@ void NonCtrlHandler(int a_Signal)
 			std::signal(SIGSEGV, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGSEGV: Segmentation fault");
+			#ifdef BUILD_ID
+			LOGERROR("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+			LOGERROR("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
+			#endif
 			PrintStackTrace();
 			abort();
 		}
@@ -89,6 +94,10 @@ void NonCtrlHandler(int a_Signal)
 			std::signal(a_Signal, SIG_DFL);
 			LOGERROR("  D:    | MCServer has encountered an error and needs to close");
 			LOGERROR("Details | SIGABRT: Server self-terminated due to an internal fault");
+			#ifdef BUILD_ID
+			LOGERROR("MCServer " BUILD_SERIES_NAME " build id: " BUILD_ID);
+			LOGERROR("from commit id: " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
+			#endif
 			PrintStackTrace();
 			abort();
 		}
