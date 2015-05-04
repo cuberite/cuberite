@@ -1,5 +1,5 @@
 name: MCServer
-image: ubuntu-14-04-x64
+image: ubuntu-15-04-x64
 config:
   #cloud-config
   packages:
