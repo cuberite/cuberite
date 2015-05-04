@@ -1970,7 +1970,7 @@ void cProtocol180::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 
 	// Version:
 	Json::Value Version;
-	Version["name"] = "1.8";
+	Version["name"] = "MCServer 1.8";
 	Version["protocol"] = 47;
 
 	// Players:
