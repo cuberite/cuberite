@@ -247,7 +247,6 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	if (a_Attacker != nullptr)
 	{
 		Heading = a_Attacker->GetLookVector() * (a_Attacker->IsSprinting() ? 16 : 11);
-		Heading.y = 1.6;
 	}
 
 	TDI.Knockback = Heading * a_KnockbackAmount;
