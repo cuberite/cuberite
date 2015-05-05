@@ -80,7 +80,16 @@ public:
 
 	inline bool HasNonZeroLength(void) const
 	{
+		#ifndef __GNUC__
+		#pragma clang diagnostics push
+		#pragma clang diagnostics ignored "-Wfloat-equal"
+		#endif
+
 		return ((x != 0) || (y != 0) || (z != 0));
+
+		#ifndef __GNUC__
+		#pragma clang diagnostics pop
+		#endif
 	}
 
 	inline double Length(void) const
@@ -127,16 +136,16 @@ public:
 		// Perform a strict comparison of the contents - we want to know whether this object is exactly equal
 		// To perform EPS-based comparison, use the EqualsEps() function
 
-#ifndef __GNUC__
-#pragma clang diagnostics push
-#pragma clang diagnostics ignored "-Wfloat-equal"
-#endif
+		#ifndef __GNUC__
+		#pragma clang diagnostics push
+		#pragma clang diagnostics ignored "-Wfloat-equal"
+		#endif
 
 		return !((x != a_Rhs.x) || (y != a_Rhs.y) || (z != a_Rhs.z));
 
-#ifndef __GNUC__
-#pragma clang diagnostics pop
-#endif
+		#ifndef __GNUC__
+		#pragma clang diagnostics pop
+		#endif
 	}
 	
 	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
