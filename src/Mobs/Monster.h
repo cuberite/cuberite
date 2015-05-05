@@ -167,14 +167,18 @@ protected:
 	/** Stores if mobile is currently moving towards the ultimate, final destination */
 	bool m_IsFollowingPath;
 
-	/* If 0, will give up reaching the next m_Destination and will re-compute path. */
+	/* If 0, will give up reaching the next m_NextWayPointPosition and will re-compute path. */
 	int m_GiveUpCounter;
+	int m_TicksSinceLastPathReset;
 
 	/** Coordinates of the next position that should be reached */
-	Vector3d m_Destination;
+	Vector3d m_NextWayPointPosition;
 
 	/** Coordinates for the ultimate, final destination. */
 	Vector3d m_FinalDestination;
+
+	/** Coordinates for the ultimate, final destination last given to the pathfinder. */
+	Vector3d m_PathFinderDestination;
 
 	/** Finds the lowest non-air block position (not the highest, as cWorld::GetHeight does)
 	If current Y is nonsolid, goes down to try to find a solid block, then returns that + 1
@@ -185,8 +189,8 @@ protected:
 	/** Returns if the ultimate, final destination has been reached */
 	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < (m_AttackRange * m_AttackRange)); }
 
-	/** Returns if the intermediate waypoint of m_Destination has been reached */
-	bool ReachedDestination(void) { return ((m_Destination - GetPosition()).SqrLength() < 0.25); }
+	/** Returns if the intermediate waypoint of m_NextWayPointPosition has been reached */
+	bool ReachedNextWaypoint(void) { return ((m_NextWayPointPosition - GetPosition()).SqrLength() < 0.25); }
 
 	/** Returns if a monster can reach a given height by jumping */
 	inline bool DoesPosYRequireJump(int a_PosY)
@@ -194,9 +198,9 @@ protected:
 		return ((a_PosY > POSY_TOINT) && (a_PosY == POSY_TOINT + 1));
 	}
 
-	/** Finds the next place to go by calculating a path and setting the m_Destination variable for the next block to head to
+	/** Finds the next place to go by calculating a path and setting the m_NextWayPointPosition variable for the next block to head to
 	This is based on the ultimate, final destination and the current position, as well as the A* algorithm, and any environmental hazards
-	Returns if a path is ready, and therefore if the mob should move to m_Destination
+	Returns if a path is ready, and therefore if the mob should move to m_NextWayPointPosition
 	*/
 	bool TickPathFinding(cChunk & a_Chunk);
 	void MoveToWayPoint(cChunk & a_Chunk);
