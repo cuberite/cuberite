@@ -77,6 +77,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_Path(nullptr)
 	, m_IsFollowingPath(false)
 	, m_GiveUpCounter(0)
+	, m_TicksSinceLastPathReset(1000)
 	, m_LastGroundHeight(POSY_TOINT)
 	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
@@ -126,6 +127,11 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 	{
 		return false;
 	}
+	if (m_TicksSinceLastPathReset < 1000)
+	{
+		// No need to count beyond 1000. 1000 is arbitary here.
+		++m_TicksSinceLastPathReset;
+	}
 
 	if (ReachedFinalDestination())
 	{
@@ -133,16 +139,31 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		return false;
 	}
 
+	if ((m_FinalDestination - m_PathFinderDestination).Length() > 0.25)  // if the distance between where we're going and where we should go is too big.
+	{
+		/* If we reached the last path waypoint,
+		Or if we haven't re-calculated for too long.
+		Interval is proportional to distance squared. (Recalculate lots when close, calculate rarely when far) */
+		if (
+			((GetPosition() - m_PathFinderDestination).Length() < 0.25) ||
+			m_TicksSinceLastPathReset > (0.15 * (m_FinalDestination - GetPosition()).SqrLength())
+		)
+		{
+			ResetPathFinding();
+		}
+	}
+
 	if (m_Path == nullptr)
 	{
-		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_FinalDestination.Floor(), 20);
+		m_PathFinderDestination = m_FinalDestination;
+		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_PathFinderDestination.Floor(), 20);
 	}
 
 	switch (m_Path->Step(a_Chunk))
 	{
 		case ePathFinderStatus::PATH_NOT_FOUND:
 		{
-			StopMovingToPosition();  // Give up pathfinding to that destination
+			StopMovingToPosition();  // Give up pathfinding to that destination.
 			break;
 		}
 		case ePathFinderStatus::CALCULATING:
@@ -154,13 +175,13 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 		{
 			if (--m_GiveUpCounter == 0)
 			{
-				ResetPathFinding();  // Try to calculate a path again
+				ResetPathFinding();  // Try to calculate a path again.
 				return false;
 			}
-			else if (!m_Path->IsLastPoint() && (m_Path->IsFirstPoint() || ReachedDestination()))  // Have we arrived at the next cell, as denoted by m_Destination?
+			else if (!m_Path->IsLastPoint() && (m_Path->IsFirstPoint() || ReachedNextWaypoint()))  // Have we arrived at the next cell, as denoted by m_NextWayPointPosition?
 			{
-				m_Destination = Vector3d(0.5, 0, 0.5) + m_Path->GetNextPoint();
-				m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_Destination.
+				m_NextWayPointPosition = Vector3d(0.5, 0, 0.5) + m_Path->GetNextPoint();
+				m_GiveUpCounter = 40;  // Give up after 40 ticks (2 seconds) if failed to reach m_NextWayPointPosition.
 			}
 			return true;
 		}
@@ -177,8 +198,8 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 {
 	if (m_JumpCoolDown == 0)
 	{
-		// We're not moving and waypoint is above us, it means we are hitting something and we should jump.
-		if ((GetSpeedX() < 0.1) && (GetSpeedY() < 0.1) && DoesPosYRequireJump(FloorC(m_Destination.y)))
+		// We're not moving (or barely moving), and waypoint is above us, it means we are hitting something and we should jump.
+		if ((GetSpeedX() < 0.1) && (GetSpeedZ() < 0.1) && DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
 			if (IsOnGround() || IsSwimming())
 			{
@@ -186,8 +207,8 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 				m_JumpCoolDown = 20;
 				// TODO: Change to AddSpeedY once collision detection is fixed - currently, mobs will go into blocks attempting to jump without a teleport
 				AddPosY(1.6);  // Jump!!
-				SetSpeedX(3.2 * (m_Destination.x - GetPosition().x));  // Move forward in a preset speed.
-				SetSpeedZ(3.2 * (m_Destination.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
+				SetSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
+				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error and 1.6 and 3.2 are perfect.
 			}
 		}
 	}
@@ -196,7 +217,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		--m_JumpCoolDown;
 	}
 
-	Vector3d Distance = m_Destination - GetPosition();
+	Vector3d Distance = m_NextWayPointPosition - GetPosition();
 	if ((Distance.x != 0) || (Distance.z != 0))
 	{
 		Distance.y = 0;
@@ -218,7 +239,7 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		// Apply walk speed:
 		Distance *= m_RelativeWalkSpeed;
 		/* Reduced default speed.
-		Close to Vanilla, easier for mobs to follow m_Destinations, hence
+		Close to Vanilla, easier for mobs to follow m_NextWayPointPositions, hence
 		better pathfinding. */
 		Distance *= 0.5;
 		AddSpeedX(Distance.x);
@@ -232,13 +253,8 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
-	if ((m_FinalDestination - a_Position).Length() > 0.25)
-	{
-		ResetPathFinding();
-
 		m_FinalDestination = a_Position;
 		m_IsFollowingPath = true;
-	}
 }
 
 
@@ -248,7 +264,6 @@ void cMonster::MoveToPosition(const Vector3d & a_Position)
 void cMonster::StopMovingToPosition()
 {
 	m_IsFollowingPath = false;
-	ResetPathFinding();
 }
 
 
@@ -257,6 +272,7 @@ void cMonster::StopMovingToPosition()
 
 void cMonster::ResetPathFinding(void)
 {
+	m_TicksSinceLastPathReset = 0;
 	if (m_Path != nullptr)
 	{
 		delete m_Path;
@@ -297,10 +313,11 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 	if (TickPathFinding(*Chunk))
 	{
-		if (m_BurnsInDaylight && WouldBurnAt(m_Destination, *Chunk->GetNeighborChunk(FloorC(m_Destination.x), FloorC(m_Destination.z))) && !IsOnFire() && (m_TicksSinceLastDamaged == 100))
+		if (m_BurnsInDaylight && WouldBurnAt(m_NextWayPointPosition, *Chunk->GetNeighborChunk(FloorC(m_NextWayPointPosition.x), FloorC(m_NextWayPointPosition.z))) && !IsOnFire() && (m_TicksSinceLastDamaged == 100))
 		{
 			// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
 			StopMovingToPosition();
+			m_GiveUpCounter = 40;  // This doesn't count as giving up, keep the giveup timer as is.
 		}
 		else
 		{
@@ -365,7 +382,7 @@ void cMonster::SetPitchAndYawFromDestination()
 	}
 
 	{
-		Vector3d BodyDistance = m_Destination - GetPosition();
+		Vector3d BodyDistance = m_NextWayPointPosition - GetPosition();
 		double Rotation, Pitch;
 		BodyDistance.Normalize();
 		VectorToEuler(BodyDistance.x, BodyDistance.y, BodyDistance.z, Rotation, Pitch);
