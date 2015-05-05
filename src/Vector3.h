@@ -78,6 +78,11 @@ public:
 		);
 	}
 
+	inline bool HasNonZeroLength(void) const
+	{
+		return ((x != 0) || (y != 0) || (z != 0));
+	}
+
 	inline double Length(void) const
 	{
 		return sqrt(static_cast<double>(x * x + y * y + z * z));
@@ -121,11 +126,7 @@ public:
 	{
 		// Perform a bitwise comparison of the contents - we want to know whether this object is exactly equal
 		// To perform EPS-based comparison, use the EqualsEps() function
-		return (
-			(memcmp(&x, &a_Rhs.x, sizeof(x)) == 0) &&
-			(memcmp(&y, &a_Rhs.y, sizeof(y)) == 0) &&
-			(memcmp(&z, &a_Rhs.z, sizeof(z)) == 0)
-		);
+		return !((x != a_Rhs.x) || (y != a_Rhs.y) || (z != a_Rhs.z));
 	}
 	
 	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const

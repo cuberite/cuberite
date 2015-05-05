@@ -103,7 +103,7 @@ void cSetChunkData::CalculateHeightMap(void)
 				int index = cChunkDef::MakeIndexNoCheck(x, y, z);
 				if (m_BlockTypes[index] != E_BLOCK_AIR)
 				{
-					m_HeightMap[x + z * cChunkDef::Width] = (HEIGHTTYPE)y;
+					m_HeightMap[x + z * cChunkDef::Width] = static_cast<HEIGHTTYPE>(y);
 					break;
 				}
 			}  // for y
@@ -131,11 +131,8 @@ void cSetChunkData::RemoveInvalidBlockEntities(void)
 				ItemTypeToString(EntityBlockType).c_str(), EntityBlockType,
 				ItemTypeToString(WorldBlockType).c_str(),  WorldBlockType
 			);
-			cBlockEntityList::iterator itr2 = itr;
-			++itr2;
 			delete *itr;
-			m_BlockEntities.erase(itr);
-			itr = itr2;
+			itr = m_BlockEntities.erase(itr);
 		}
 		else
 		{
