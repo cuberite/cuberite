@@ -12,26 +12,17 @@
 
 
 
-const float FLOAT_EPSILON = 0.0001f;  // TODO: Stash this in some header where it can be reused
-
-
-const std::array<const Vector3f, 6> cTracer::m_NormalTable =
-{
-	{
-	Vector3f(-1,  0,  0),  // 1: -x
-	Vector3f( 0,  0, -1),  // 2: -z
-	Vector3f( 1,  0,  0),  // 3: +x
-	Vector3f( 0,  0,  1),  // 4: +z
-	Vector3f( 0,  1,  0),  // 5: +y
-	Vector3f( 0, -1,  0)   // 6: -y
-	}
-};
-
 
 
 cTracer::cTracer(cWorld * a_World):
 	m_World(a_World)
 {
+	m_NormalTable[0].Set(-1,  0,  0);
+	m_NormalTable[1].Set( 0,  0, -1);
+	m_NormalTable[2].Set( 1,  0,  0);
+	m_NormalTable[3].Set( 0,  0,  1);
+	m_NormalTable[4].Set( 0,  1,  0);
+	m_NormalTable[5].Set( 0, -1,  0);
 }
 
 
@@ -46,7 +37,7 @@ cTracer::~cTracer()
 
 
 
-int cTracer::SigNum(float a_Num)
+float cTracer::SigNum(float a_Num)
 {
 	if (a_Num < 0.f)
 	{
@@ -65,28 +56,26 @@ int cTracer::SigNum(float a_Num)
 
 void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 {
-	// Since this method should only be called by Trace, zero length vectors should already have been taken care of
-	ASSERT(a_Direction.HasNonZeroLength());
-
 	// calculate the direction of the ray (linear algebra)
 	dir = a_Direction;
 
 	// decide which direction to start walking in
-	step.x = SigNum(dir.x);
-	step.y = SigNum(dir.y);
-	step.z = SigNum(dir.z);
-
+	step.x = (int) SigNum(dir.x);
+	step.y = (int) SigNum(dir.y);
+	step.z = (int) SigNum(dir.z);
 
 	// normalize the direction vector
-	dir.Normalize();
-
+	if (dir.SqrLength() > 0.f)
+	{
+		dir.Normalize();
+	}
 
 	// how far we must move in the ray direction before
 	// we encounter a new voxel in x-direction
 	// same but y-direction
 	if (dir.x != 0.f)
 	{
-		tDelta.x = 1 / std::abs(dir.x);
+		tDelta.x = 1 / fabs(dir.x);
 	}
 	else
 	{
@@ -94,7 +83,7 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	if (dir.y != 0.f)
 	{
-		tDelta.y = 1 / std::abs(dir.y);
+		tDelta.y = 1 / fabs(dir.y);
 	}
 	else
 	{
@@ -102,45 +91,44 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 	}
 	if (dir.z != 0.f)
 	{
-		tDelta.z = 1 / std::abs(dir.z);
+		tDelta.z = 1 / fabs(dir.z);
 	}
 	else
 	{
 		tDelta.z = 0;
 	}
 
-
 	// start voxel coordinates
-	pos.x = static_cast<int>(floorf(a_Start.x));
-	pos.y = static_cast<int>(floorf(a_Start.y));
-	pos.z = static_cast<int>(floorf(a_Start.z));
+	pos.x = (int)floorf(a_Start.x);
+	pos.y = (int)floorf(a_Start.y);
+	pos.z = (int)floorf(a_Start.z);
 
 	// calculate distance to first intersection in the voxel we start from
 	if (dir.x < 0)
 	{
-		tMax.x = (static_cast<float>(pos.x) - a_Start.x) / dir.x;
+		tMax.x = ((float)pos.x - a_Start.x) / dir.x;
 	}
 	else
 	{
-		tMax.x = (static_cast<float>(pos.x + 1) - a_Start.x) / dir.x;  // TODO: Possible division by zero
+		tMax.x = (((float)pos.x + 1) - a_Start.x) / dir.x;
 	}
 
 	if (dir.y < 0)
 	{
-		tMax.y = (static_cast<float>(pos.y) - a_Start.y) / dir.y;
+		tMax.y = ((float)pos.y - a_Start.y) / dir.y;
 	}
 	else
 	{
-		tMax.y = (static_cast<float>(pos.y + 1) - a_Start.y) / dir.y;  // TODO: Possible division by zero
+		tMax.y = (((float)pos.y + 1) - a_Start.y) / dir.y;
 	}
 
 	if (dir.z < 0)
 	{
-		tMax.z = (static_cast<float>(pos.z) - a_Start.z) / dir.z;
+		tMax.z = ((float)pos.z - a_Start.z) / dir.z;
 	}
 	else
 	{
-		tMax.z = (static_cast<float>(pos.z + 1) - a_Start.z) / dir.z;  // TODO: Possible division by zero
+		tMax.z = (((float)pos.z + 1) - a_Start.z) / dir.z;
 	}
 }
 
@@ -150,11 +138,6 @@ void cTracer::SetValues(const Vector3f & a_Start, const Vector3f & a_Direction)
 
 bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int a_Distance, bool a_LineOfSight)
 {
-	if (!a_Direction.HasNonZeroLength())
-	{
-		return false;
-	}
-
 	if ((a_Start.y < 0) || (a_Start.y >= cChunkDef::Height))
 	{
 		LOGD("%s: Start Y is outside the world (%.2f), not tracing.", __FUNCTION__, a_Start.y);
@@ -163,18 +146,18 @@ bool cTracer::Trace(const Vector3f & a_Start, const Vector3f & a_Direction, int 
 	
 	SetValues(a_Start, a_Direction);
 
-	Vector3f End = a_Start + (dir * static_cast<float>(a_Distance));
+	Vector3f End = a_Start + (dir * (float)a_Distance);
 	
 	if (End.y < 0)
 	{
-		float dist = -a_Start.y / dir.y;  // No division by 0 possible
+		float dist = -a_Start.y / dir.y;
 		End = a_Start + (dir * dist);
 	}
 
 	// end voxel coordinates
-	end1.x = static_cast<int>(floorf(End.x));
-	end1.y = static_cast<int>(floorf(End.y));
-	end1.z = static_cast<int>(floorf(End.z));
+	end1.x = (int)floorf(End.x);
+	end1.y = (int)floorf(End.y);
+	end1.z = (int)floorf(End.z);
 	
 	// check if first is occupied
 	if (pos.Equals(end1))
@@ -312,7 +295,8 @@ int cTracer::intersect3D_SegmentPlane(const Vector3f & a_Origin, const Vector3f 
 	float     D = a_PlaneNormal.Dot(u);      // dot(Pn.n, u);
 	float     N = -(a_PlaneNormal.Dot(w));  // -dot(a_Plane.n, w);
 
-	if (std::abs(D) < FLOAT_EPSILON)
+	const float EPSILON = 0.0001f;
+	if (fabs(D) < EPSILON)
 	{
 		// segment is parallel to plane
 		if (N == 0.0)
