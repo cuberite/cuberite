@@ -266,49 +266,48 @@ bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
 	NIBBLETYPE BlockMeta;
 	int RelX = m_FinalDestination.x - Chunk->GetPosX() * cChunkDef::Width;
 	int RelZ = m_FinalDestination.z - Chunk->GetPosZ() * cChunkDef::Width;
-	if ((Chunk != nullptr) && Chunk->IsValid())
-	{
-		// If destination in the air, go down to the lowest air block.
-		for (;;)
-		{
-			Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y - 1, RelZ, BlockType, BlockMeta);
-			if (cBlockInfo::IsSolid(BlockType))
-			{
-				break;
-			}
-			m_FinalDestination += Vector3d(0, -1, 0);
-		}
-
-
-		// If destination in water, go up to the highest water block.
-		// If destination in solid, go up to first air block.
-		bool InWater = false;
-		for (;;)
-		{
-			Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y, RelZ, BlockType, BlockMeta);
-			if (BlockType == E_BLOCK_STATIONARY_WATER)
-			{
-				InWater = true;
-			}
-			else if (cBlockInfo::IsSolid(BlockType))
-			{
-				InWater = false;
-			}
-			else
-			{
-				break;
-			}
-			m_FinalDestination += Vector3d(0, 1, 0);
-		}
-		if (InWater)
-		{
-			m_FinalDestination += Vector3d(0, -1, 0);
-		}
-	}
-	else
+	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
 		return false;
 	}
+
+	// If destination in the air, go down to the lowest air block.
+	while (m_FinalDestination.y > 0)
+	{
+		Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y - 1, RelZ, BlockType, BlockMeta);
+		if (cBlockInfo::IsSolid(BlockType))
+		{
+			break;
+		}
+		m_FinalDestination.y -= 1;
+	}
+
+
+	// If destination in water, go up to the highest water block.
+	// If destination in solid, go up to first air block.
+	bool InWater = false;
+	while (m_FinalDestination.y < cChunkDef::Height)
+	{
+		Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y, RelZ, BlockType, BlockMeta);
+		if (BlockType == E_BLOCK_STATIONARY_WATER)
+		{
+			InWater = true;
+		}
+		else if (cBlockInfo::IsSolid(BlockType))
+		{
+			InWater = false;
+		}
+		else
+		{
+			break;
+		}
+		m_FinalDestination.y += 1;
+	}
+	if (InWater)
+	{
+		m_FinalDestination.y -= 1;
+	}
+
 
 	return true;
 }
