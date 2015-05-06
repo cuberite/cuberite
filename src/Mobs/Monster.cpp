@@ -383,9 +383,9 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		2. I was not hurt by a player recently.
 		Then STOP. */
 		if (
-			m_BurnsInDaylight && ((m_TicksSinceLastDamaged == 100) || (m_EMState == IDLE)) &&
-			WouldBurnAt(m_NextWayPointPosition, *Chunk->GetNeighborChunk(FloorC(m_NextWayPointPosition.x), FloorC(m_NextWayPointPosition.z))) &&
-			!WouldBurnAt(GetPosition(), *Chunk->GetNeighborChunk(FloorC(GetPosition().x), FloorC(GetPosition().z)))
+			m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
+			WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
+			!WouldBurnAt(GetPosition(), *Chunk)
 		)
 		{
 			// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
@@ -1170,6 +1170,11 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 
 bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
+	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(m_NextWayPointPosition.x), FloorC(m_NextWayPointPosition.z));
+	if ((Chunk == nullptr) || (!Chunk->IsValid()))
+	{
+		return false;
+	}
 	int RelX = FloorC(a_Location.x) - a_Chunk.GetPosX() * cChunkDef::Width;
 	int RelY = FloorC(a_Location.y);
 	int RelZ = FloorC(a_Location.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
