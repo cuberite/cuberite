@@ -60,12 +60,12 @@ cPath::cPath(
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		int RelX = m_Destination.x - m_Chunk->GetPosX() * cChunkDef::Width;
-		int RelZ = m_Destination.z - m_Chunk->GetPosZ() * cChunkDef::Width;
+		int RelX = m_Destination.x - Chunk->GetPosX() * cChunkDef::Width;
+		int RelZ = m_Destination.z - Chunk->GetPosZ() * cChunkDef::Width;
 		bool inwater = false;
 		for (;;)
 		{
-			m_Chunk->GetBlockTypeMeta(RelX, m_Destination.y, RelZ, BlockType, BlockMeta);
+			Chunk->GetBlockTypeMeta(RelX, m_Destination.y, RelZ, BlockType, BlockMeta);
 			if (BlockType != E_BLOCK_STATIONARY_WATER)
 			{
 				break;
@@ -182,7 +182,13 @@ bool cPath::Step_Internal()
 	}
 
 	// Path found.
-	if (CurrentCell->m_Location == m_Destination)
+	if (
+			(CurrentCell->m_Location == m_Destination + Vector3i(0, 0, 1)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(1, 0, 0)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(-1, 0, 0)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(0, 0, -1)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(0, -1, 0))
+	)
 	{
 		do
 		{
