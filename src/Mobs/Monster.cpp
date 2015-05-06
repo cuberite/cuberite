@@ -155,6 +155,11 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 
 	if (m_Path == nullptr)
 	{
+		if (!EnsureProperDestination(a_Chunk))
+		{
+			StopMovingToPosition();  // Invalid chunks, probably world is loading or something, cancel movement.
+			return false;
+		}
 		m_PathFinderDestination = m_FinalDestination;
 		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_PathFinderDestination.Floor(), 20);
 	}
@@ -245,6 +250,64 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		AddSpeedX(Distance.x);
 		AddSpeedZ(Distance.z);
 	}
+}
+
+
+
+
+
+bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
+{
+	cChunk * Chunk = a_Chunk.GetNeighborChunk(m_FinalDestination.x, m_FinalDestination.z);
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	int RelX = m_FinalDestination.x - Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = m_FinalDestination.z - Chunk->GetPosZ() * cChunkDef::Width;
+	if ((Chunk != nullptr) && Chunk->IsValid())
+	{
+		// If destination in the air, go down to the lowest air block.
+		for (;;)
+		{
+			Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y - 1, RelZ, BlockType, BlockMeta);
+			if (cBlockInfo::IsSolid(BlockType))
+			{
+				break;
+			}
+			m_FinalDestination += Vector3d(0, -1, 0);
+		}
+
+
+		// If destination in water, go up to the highest water block.
+		// If destination in solid, go up to first air block.
+		bool InWater = false;
+		for (;;)
+		{
+			Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y, RelZ, BlockType, BlockMeta);
+			if (BlockType == E_BLOCK_STATIONARY_WATER)
+			{
+				InWater = true;
+			}
+			else if (cBlockInfo::IsSolid(BlockType))
+			{
+				InWater = false;
+			}
+			else
+			{
+				break;
+			}
+			m_FinalDestination += Vector3d(0, 1, 0);
+		}
+		if (InWater)
+		{
+			m_FinalDestination += Vector3d(0, -1, 0);
+		}
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
 }
 
 

@@ -204,6 +204,7 @@ protected:
 	*/
 	bool TickPathFinding(cChunk & a_Chunk);
 	void MoveToWayPoint(cChunk & a_Chunk);
+	bool EnsureProperDestination(cChunk & a_Chunk);
 
 	/** Resets a pathfinding task, be it due to failure or something else
 	Resets the pathfinder. If m_IsFollowingPath is true, TickPathFinding starts a brand new path.
