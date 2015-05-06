@@ -143,10 +143,11 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 	{
 		/* If we reached the last path waypoint,
 		Or if we haven't re-calculated for too long.
-		Interval is proportional to distance squared. (Recalculate lots when close, calculate rarely when far) */
+		Interval is proportional to distance squared, and its minimum is 10.
+		(Recalculate lots when close, calculate rarely when far) */
 		if (
 			((GetPosition() - m_PathFinderDestination).Length() < 0.25) ||
-			m_TicksSinceLastPathReset > (0.15 * (m_FinalDestination - GetPosition()).SqrLength())
+			((m_TicksSinceLastPathReset > 10) && (m_TicksSinceLastPathReset > (0.15 * (m_FinalDestination - GetPosition()).SqrLength())))
 		)
 		{
 			ResetPathFinding();

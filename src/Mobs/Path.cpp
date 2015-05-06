@@ -157,7 +157,13 @@ bool cPath::Step_Internal()
 	}
 
 	// Path found.
-	if (CurrentCell->m_Location == m_Destination)
+	if (
+			(CurrentCell->m_Location == m_Destination + Vector3i(0, 0, 1)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(1, 0, 0)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(-1, 0, 0)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(0, 0, -1)) ||
+			(CurrentCell->m_Location == m_Destination + Vector3i(0, -1, 0))
+	)
 	{
 		do
 		{
