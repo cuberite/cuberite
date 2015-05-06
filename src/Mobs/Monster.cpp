@@ -203,10 +203,12 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 {
 	if (m_JumpCoolDown == 0)
 	{
-		// We're not moving (or barely moving), and waypoint is above us, it means we are hitting something and we should jump.
-		if ((GetSpeedX() < 0.1) && (GetSpeedZ() < 0.1) && DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
+		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
-			if (IsOnGround() || IsSwimming())
+			if (
+				(IsOnGround() && (GetSpeedX() == 0) && (GetSpeedY() == 0)) ||
+				(IsSwimming() && (m_GiveUpCounter < 15))
+			)
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
@@ -354,7 +356,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_Health <= 0)
 	{
-		// The mob is dead, but we're still animating the "puff" they leave when they die
+		// The mob is dead, but we're still animating the "puff" they leave when they die.
 		m_DestroyTimer += a_Dt;
 		if (m_DestroyTimer > std::chrono::seconds(1))
 		{
@@ -372,7 +374,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_Target = nullptr;
 	}
 
-	// Process the undead burning in daylight
+	// Process the undead burning in daylight.
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 	if (TickPathFinding(*Chunk))
 	{
