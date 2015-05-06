@@ -156,6 +156,11 @@ bool cMonster::TickPathFinding(cChunk & a_Chunk)
 
 	if (m_Path == nullptr)
 	{
+		if (!EnsureProperDestination(a_Chunk))
+		{
+			StopMovingToPosition();  // Invalid chunks, probably world is loading or something, cancel movement.
+			return false;
+		}
 		m_PathFinderDestination = m_FinalDestination;
 		m_Path = new cPath(a_Chunk, GetPosition().Floor(), m_PathFinderDestination.Floor(), 20);
 	}
@@ -199,10 +204,12 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 {
 	if (m_JumpCoolDown == 0)
 	{
-		// We're not moving (or barely moving), and waypoint is above us, it means we are hitting something and we should jump.
-		if ((GetSpeedX() < 0.1) && (GetSpeedZ() < 0.1) && DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
+		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
-			if (IsOnGround() || IsSwimming())
+			if (
+				(IsOnGround() && (GetSpeedX() == 0) && (GetSpeedY() == 0)) ||
+				(IsSwimming() && (m_GiveUpCounter < 15))
+			)
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
@@ -252,6 +259,63 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 
 
 
+bool cMonster::EnsureProperDestination(cChunk & a_Chunk)
+{
+	cChunk * Chunk = a_Chunk.GetNeighborChunk(m_FinalDestination.x, m_FinalDestination.z);
+	BLOCKTYPE BlockType;
+	NIBBLETYPE BlockMeta;
+	int RelX = m_FinalDestination.x - Chunk->GetPosX() * cChunkDef::Width;
+	int RelZ = m_FinalDestination.z - Chunk->GetPosZ() * cChunkDef::Width;
+	if ((Chunk == nullptr) || !Chunk->IsValid())
+	{
+		return false;
+	}
+
+	// If destination in the air, go down to the lowest air block.
+	while (m_FinalDestination.y > 0)
+	{
+		Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y - 1, RelZ, BlockType, BlockMeta);
+		if (cBlockInfo::IsSolid(BlockType))
+		{
+			break;
+		}
+		m_FinalDestination.y -= 1;
+	}
+
+
+	// If destination in water, go up to the highest water block.
+	// If destination in solid, go up to first air block.
+	bool InWater = false;
+	while (m_FinalDestination.y < cChunkDef::Height)
+	{
+		Chunk->GetBlockTypeMeta(RelX, m_FinalDestination.y, RelZ, BlockType, BlockMeta);
+		if (BlockType == E_BLOCK_STATIONARY_WATER)
+		{
+			InWater = true;
+		}
+		else if (cBlockInfo::IsSolid(BlockType))
+		{
+			InWater = false;
+		}
+		else
+		{
+			break;
+		}
+		m_FinalDestination.y += 1;
+	}
+	if (InWater)
+	{
+		m_FinalDestination.y -= 1;
+	}
+
+
+	return true;
+}
+
+
+
+
+
 void cMonster::MoveToPosition(const Vector3d & a_Position)
 {
 		m_FinalDestination = a_Position;
@@ -292,7 +356,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_Health <= 0)
 	{
-		// The mob is dead, but we're still animating the "puff" they leave when they die
+		// The mob is dead, but we're still animating the "puff" they leave when they die.
 		m_DestroyTimer += a_Dt;
 		if (m_DestroyTimer > std::chrono::seconds(1))
 		{
@@ -310,7 +374,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_Target = nullptr;
 	}
 
-	// Process the undead burning in daylight
+	// Process the undead burning in daylight.
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 	if (TickPathFinding(*Chunk))
 	{
@@ -1121,7 +1185,3 @@ cMonster::eFamily cMonster::GetMobFamily(void) const
 {
 	return FamilyFromType(m_MobType);
 }
-
-
-
-
