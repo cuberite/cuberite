@@ -8,8 +8,7 @@
 g_APIDesc =
 {
 	Classes =
-	{
-		--[[
+F		--[[
 		-- What the APIDump plugin understands / how to document stuff:
 		ExampleClassName =
 		{
@@ -2046,8 +2045,8 @@ a_Player:OpenWindow(Window);
 				BroadcastChatLeave = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtLeave. Use for players leaving the server." },
 				BroadcastChatSuccess = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtSuccess. Use for success messages." },
 				BroadcastChatWarning = { Params = "MessageText", Return = "", Notes = "Broadcasts the specified message to all players, with its message type set to mtWarning. Use for concerning events, such as plugin reload etc." },
-				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil.<br/><br/><b>NOTE</b>This function is currently unsafe, do not use!" },
-				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for all players with names partially (or fully) matching the name string provided." },
+				CreateAndInitializeWorld = { Params = "WorldName", Return = "{{cWorld|cWorld}}", Notes = "Creates a new world and initializes it. If there is a world whith the same name it returns nil.<br><br><b>NOTE</b>This function is currently unsafe, do not use!" },
+				FindAndDoWithPlayer = { Params = "PlayerName, CallbackFunction", Return = "", Notes = "Calls the given callback function for all players with names partially (or fully) matching the name string provided.<br>This function is not case-sensitive." },
 				DoWithPlayerByUUID = { Params = "PlayerUUID, CallbackFunction", Return = "bool", Notes = "If there is the player with the uuid, calls the CallbackFunction with the {{cPlayer}} parameter representing the player. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|Player}})</pre> The function returns false if the player was not found, or whatever bool value the callback returned if the player was found." },
 				ForEachPlayer = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each player. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cPlayer|cPlayer}})</pre>" },
 				ForEachWorld = { Params = "CallbackFunction", Return = "", Notes = "Calls the given callback function for each world. The callback function has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cWorld|cWorld}})</pre>" },
