@@ -378,7 +378,15 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 	if (TickPathFinding(*Chunk))
 	{
-		if (m_BurnsInDaylight && WouldBurnAt(m_NextWayPointPosition, *Chunk->GetNeighborChunk(FloorC(m_NextWayPointPosition.x), FloorC(m_NextWayPointPosition.z))) && !IsOnFire() && (m_TicksSinceLastDamaged == 100))
+		/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
+		1. I am idle
+		2. I was not hurt by a player recently.
+		Then STOP. */
+		if (
+			m_BurnsInDaylight && ((m_TicksSinceLastDamaged == 100) || (m_EMState == IDLE)) &&
+			WouldBurnAt(m_NextWayPointPosition, *Chunk->GetNeighborChunk(FloorC(m_NextWayPointPosition.x), FloorC(m_NextWayPointPosition.z))) &&
+			!WouldBurnAt(GetPosition(), *Chunk->GetNeighborChunk(FloorC(GetPosition().x), FloorC(GetPosition().z)))
+		)
 		{
 			// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
 			StopMovingToPosition();
