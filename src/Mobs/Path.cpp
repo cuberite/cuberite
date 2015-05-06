@@ -245,7 +245,7 @@ void cPath::FinishCalculation()
 	}
 
 	m_Map.clear();
-	m_OpenList.empty();
+	m_OpenList = std::priority_queue<cPathCell *, std::vector<cPathCell *>, compareHeuristics>{};
 }
 
 
