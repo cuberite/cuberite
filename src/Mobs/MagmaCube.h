@@ -19,6 +19,10 @@ public:
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	int GetSize(void) const { return m_Size; }
+
+	/** Returns the text describing the slime's size, as used by the client's resource subsystem for sounds.
+	Returns either "big" or "small". */
+	const AString GetSizeName(int a_Size) const;
 	
 protected:
 
