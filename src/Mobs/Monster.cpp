@@ -886,7 +886,7 @@ cMonster * cMonster::NewMonsterFromType(eMonsterType a_MobType)
 	{
 		case mtMagmaCube:
 		{
-			toReturn = new cMagmaCube(Random.NextInt(2) + 1);
+			toReturn = new cMagmaCube(1 << Random.NextInt(3));  // Size 1, 2 or 4
 			break;
 		}
 		case mtSlime:
