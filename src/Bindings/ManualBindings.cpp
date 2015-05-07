@@ -1988,6 +1988,11 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 	{
 		return 0;
 	}
+	if (Callback.m_NumReturns < 0)
+	{
+		// The call has failed, there are zero return values. Do NOT return negative number (Lua considers that a "yield")
+		return 0;
+	}
 	return Callback.m_NumReturns;
 }
 

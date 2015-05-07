@@ -54,7 +54,7 @@ function Initialize(a_Plugin)
 	-- TestBlockAreas()
 	-- TestSQLiteBindings()
 	-- TestExpatBindings()
-	-- TestPluginCalls()
+	TestPluginCalls()
 	
 	TestBlockAreasString()
 	TestStringBase64()
@@ -157,26 +157,18 @@ function TestPluginCalls()
 	-- The Split parameter should be a table, but it is not used in that function anyway,
 	-- so we can get away with passing nil to it.
 	
-	-- Use the old, deprecated and unsafe method:
-	local Core = cPluginManager:Get():GetPlugin("Core")
-	if (Core ~= nil) then
-		LOGINFO("Calling Core::ReturnColorFromChar() the old-fashioned way...")
-		local Gray = Core:Call("ReturnColorFromChar", nil, "8")
-		if (Gray ~= cChatColor.Gray) then
-			LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
-		else
-			LOGINFO("Call succeeded")
-		end
-	end
-	
-	-- Use the new method:
-	LOGINFO("Calling Core::ReturnColorFromChar() the recommended way...")
-	local Gray = cPluginManager:CallPlugin("Core", "ReturnColorFromChar", nil, "8")
+	LOG("Debuggers: Calling NoSuchPlugin.FnName()...")
+	cPluginManager:CallPlugin("NoSuchPlugin", "FnName", "SomeParam")
+	LOG("Debuggers: Calling Core.NoSuchFunction()...")
+	cPluginManager:CallPlugin("Core", "NoSuchFunction", "SomeParam")
+	LOG("Debuggers: Calling Core.ReturnColorFromChar(..., \"8\")...")
+	local Gray = cPluginManager:CallPlugin("Core", "ReturnColorFromChar", "split", "8")
 	if (Gray ~= cChatColor.Gray) then
-		LOGWARNING("Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
+		LOGWARNING("Debuggers: Call failed, exp " .. cChatColor.Gray .. ", got " .. (Gray or "<nil>"))
 	else
-		LOGINFO("Call succeeded")
+		LOG("Debuggers: Call succeeded")
 	end
+	LOG("Debuggers: Inter-plugin calls done.")
 end
 
 
