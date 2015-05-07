@@ -579,6 +579,7 @@ char cItemHandler::GetMaxStackSize(void)
 		case E_ITEM_MELON_SEEDS:          return 64;
 		case E_ITEM_MELON_SLICE:          return 64;
 		case E_ITEM_NETHER_BRICK:         return 64;
+		case E_ITEM_NETHER_QUARTZ:        return 64;
 		case E_ITEM_NETHER_WART:          return 64;
 		case E_ITEM_PAINTING:             return 64;
 		case E_ITEM_PAPER:                return 64;
