@@ -26,7 +26,7 @@ public:
 	
 protected:
 
-	/// Size of the MagmaCube, 1 .. 3, with 1 being the smallest
+	/// Size of the MagmaCube, 1, 2 and 4, with 1 being the smallest
 	int m_Size;
 } ;
 
