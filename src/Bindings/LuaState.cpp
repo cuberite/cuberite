@@ -1133,6 +1133,23 @@ void cLuaState::GetStackValue(int a_StackPos, pWorld & a_ReturnedVal)
 
 
 
+void cLuaState::GetStackValue(int a_StackPos, pClientHandle & a_ReturnedVal)
+{
+	if (lua_isnil(m_LuaState, a_StackPos))
+	{
+		a_ReturnedVal = nullptr;
+		return;
+	}
+	tolua_Error err;
+	if (tolua_isusertype(m_LuaState, a_StackPos, "cClientHandle", false, &err))
+	{
+		a_ReturnedVal = *(reinterpret_cast<cClientHandle **>(lua_touserdata(m_LuaState, a_StackPos)));
+	}
+}
+
+
+
+
 bool cLuaState::CallFunction(int a_NumResults)
 {
 	ASSERT (m_NumCurrentFunctionArgs >= 0);  // A function must be pushed to stack first
@@ -1409,6 +1426,30 @@ bool cLuaState::CheckParamEnd(int a_Param)
 	AString ErrMsg = Printf("#ferror in function '%s': Too many arguments.", (entry.name != nullptr) ? entry.name : "?");
 	tolua_error(m_LuaState, ErrMsg.c_str(), &tolua_err);
 	return false;
+}
+
+
+
+
+
+bool cLuaState::IsParamUserType(int a_Param, AString a_UserType)
+{
+	ASSERT(IsValid());
+	
+	tolua_Error tolua_err;
+	return tolua_isusertype(m_LuaState, a_Param, a_UserType.c_str(), 0, &tolua_err);
+}
+
+
+
+
+
+bool cLuaState::IsParamNumber(int a_Param)
+{
+	ASSERT(IsValid());
+	
+	tolua_Error tolua_err;
+	return tolua_isnumber(m_LuaState, a_Param, 0, &tolua_err);
 }
 
 

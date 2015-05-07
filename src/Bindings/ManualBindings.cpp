@@ -32,9 +32,10 @@
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../CompositeChat.h"
 #include "../StringCompression.h"
+#include "../Broadcaster.h"
 
 
-
+#include <array>
 
 
 // Better error reporting for Lua
@@ -2009,6 +2010,60 @@ static int tolua_cPluginManager_FindPlugins(lua_State * tolua_S)
 
 
 
+static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
+{
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamUserType(1, "cWorld") ||
+		!L.CheckParamString  (2) ||
+		!L.CheckParamNumber  (3, 10)
+	)
+	{
+		return 0;
+	}
+	
+	cPluginLua * Plugin = GetLuaPlugin(tolua_S);
+	if (Plugin == nullptr)
+	{
+		return 0;
+	}
+	
+	// Read the params:
+	cWorld * World = nullptr;
+	AString Name;
+	double PosX, PosY, PosZ, OffX, OffY, OffZ;
+	double ParticleData;
+	int ParticleAmmount;
+	L.GetStackValues(1, World, Name, PosX, PosY, PosZ, OffX, OffY, OffZ, ParticleData, ParticleAmmount);
+	if (World == nullptr)
+	{
+		LOGWARNING("World:BroadcastParticleEffect(): invalid world parameter");
+		L.LogStackTrace();
+		return 0;
+	}
+
+	std::array<int, 2> data;
+
+	for (int i = 0; (i < 2) && L.IsParamNumber(11 + i); i++)
+	{
+		L.GetStackValue(11 + i, data[i]);
+	}
+
+	cClientHandle * Exclude = nullptr;
+
+	if (L.IsParamUserType(11, "cClientHandle"))
+	{
+		L.GetStackValue(11, Exclude);
+	}
+	World->GetBroadcaster().BroadcastParticleEffect(Name, Vector3f(PosX, PosY, PosZ), Vector3f(OffX, OffY, OffZ), ParticleData, ParticleAmmount, Exclude);
+
+	return 0;
+}
+
+
+
+
+
 static int tolua_cWorld_ChunkStay(lua_State * tolua_S)
 {
 	/* Function signature:
@@ -3792,6 +3847,7 @@ void ManualBindings::Bind(lua_State * tolua_S)
 		tolua_endmodule(tolua_S);
 		
 		tolua_beginmodule(tolua_S, "cWorld");
+			tolua_function(tolua_S, "BroadcastParticleEffect",   tolua_cWorld_BroadcastParticleEffect);
 			tolua_function(tolua_S, "ChunkStay",                 tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",       tolua_DoWithXYZ<cWorld, cBlockEntity,        &cWorld::DoWithBlockEntityAt>);
 			tolua_function(tolua_S, "DoWithBeaconAt",            tolua_DoWithXYZ<cWorld, cBeaconEntity,       &cWorld::DoWithBeaconAt>);

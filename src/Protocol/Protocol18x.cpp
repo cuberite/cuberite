@@ -802,6 +802,50 @@ void cProtocol180::SendParticleEffect(const AString & a_ParticleName, float a_Sr
 
 
 
+void cProtocol180::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	int ParticleID = GetParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, 0x2A);
+	Pkt.WriteBEInt32(ParticleID);
+	Pkt.WriteBool(false);
+	Pkt.WriteBEFloat(a_Src.x);
+	Pkt.WriteBEFloat(a_Src.y);
+	Pkt.WriteBEFloat(a_Src.z);
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+	switch (ParticleID)
+	{
+		// iconcrack
+		case 36:
+		{
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[1]));
+			break;
+		}
+		// blockcrack
+		// blockdust
+		case 37:
+		case 38:
+		{
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
 void cProtocol180::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	ASSERT(m_State == 3);  // In game mode?

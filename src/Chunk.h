@@ -439,6 +439,9 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
+	// Makes a copy of the list
+	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
+
 private:
 
 	friend class cChunkMap;
@@ -530,9 +533,6 @@ private:
 	
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
-	
-	// Makes a copy of the list
-	cClientHandleList GetAllClients(void) const {return m_LoadedByClient; }
 
 	/** Sends m_PendingSendBlocks to all clients */
 	void BroadcastPendingBlockChanges(void);

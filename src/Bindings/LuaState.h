@@ -76,6 +76,7 @@ typedef cPluginManager * pPluginManager;
 typedef cRoot *          pRoot;
 typedef cScoreboard *    pScoreboard;
 typedef cWorld *         pWorld;
+typedef cClientHandle *  pClientHandle;
 
 
 
@@ -254,6 +255,7 @@ public:
 	void GetStackValue(int a_StackPos, int & a_Value);
 	void GetStackValue(int a_StackPos, pBlockArea & a_Value);
 	void GetStackValue(int a_StackPos, pBoundingBox & a_Value);
+	void GetStackValue(int a_StackPos, pClientHandle & a_Value);
 	void GetStackValue(int a_StackPos, pMapManager & a_Value);
 	void GetStackValue(int a_StackPos, pPluginManager & a_Value);
 	void GetStackValue(int a_StackPos, pRoot & a_Value);
@@ -307,6 +309,10 @@ public:
 	/** Returns true if the specified parameter on the stack is nil (indicating an end-of-parameters) */
 	bool CheckParamEnd(int a_Param);
 	
+	bool IsParamUserType(int a_Param, AString a_UserType);
+
+	bool IsParamNumber(int a_Param);
+
 	/** If the status is nonzero, prints the text on the top of Lua stack and returns true */
 	bool ReportErrors(int status);
 	

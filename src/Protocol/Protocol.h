@@ -16,6 +16,8 @@
 #include "../Map.h"
 #include "../ByteBuffer.h"
 
+#include <array>
+
 
 
 
@@ -98,6 +100,7 @@ public:
 	virtual void SendPlayerAbilities            (void) = 0;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, char a_Animation) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) = 0;
+	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) = 0;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
