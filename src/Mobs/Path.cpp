@@ -54,31 +54,6 @@ cPath::cPath(
 		return;
 	}
 
-	// If destination in water, set water surface as destination.
-	cChunk * Chunk = m_Chunk->GetNeighborChunk(m_Destination.x, m_Destination.z);
-	if ((Chunk != nullptr) && Chunk->IsValid())
-	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		int RelX = m_Destination.x - Chunk->GetPosX() * cChunkDef::Width;
-		int RelZ = m_Destination.z - Chunk->GetPosZ() * cChunkDef::Width;
-		bool inwater = false;
-		for (;;)
-		{
-			Chunk->GetBlockTypeMeta(RelX, m_Destination.y, RelZ, BlockType, BlockMeta);
-			if (BlockType != E_BLOCK_STATIONARY_WATER)
-			{
-				break;
-			}
-			inwater = true;
-			m_Destination+=Vector3d(0, 1, 0);
-		}
-		if (inwater)
-		{
-			m_Destination+=Vector3d(0, -1, 0);
-		}
-	}
-
 	m_Status = ePathFinderStatus::CALCULATING;
 	m_StepsLeft = a_MaxSteps;
 
