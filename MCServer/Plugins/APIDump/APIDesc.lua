@@ -8,6 +8,7 @@
 g_APIDesc =
 {
 	Classes =
+	{
 		--[[
 		-- What the APIDump plugin understands / how to document stuff:
 		ExampleClassName =
