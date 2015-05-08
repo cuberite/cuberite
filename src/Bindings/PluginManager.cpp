@@ -64,7 +64,7 @@ void cPluginManager::RefreshPluginList(void)
 	AString PluginsPath = GetPluginsPath() + "/";
 	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
 	AStringVector Folders;
-	for (auto & item: Contents)
+	for (const auto & item : Contents)
 	{
 		if ((item == ".") || (item == "..") || (!cFile::IsFolder(PluginsPath + item)))
 		{
@@ -75,27 +75,27 @@ void cPluginManager::RefreshPluginList(void)
 	}  // for item - Contents[]
 
 	// Set all plugins with invalid folders as psNotFound:
-	for (auto & plugin: m_Plugins)
+	for (const auto & plugin : m_Plugins)
 	{
-		if (std::find(Folders.cbegin(), Folders.cend(), plugin->GetLocalFolder()) == Folders.end())
+		if (std::find(Folders.cbegin(), Folders.cend(), plugin->GetFolderName()) == Folders.end())
 		{
 			plugin->SetStatus(psNotFound);
 		}
 	}  // for plugin - m_Plugins[]
 
 	// Add all newly discovered plugins:
-	for (auto & folder: Folders)
+	for (const auto & folder : Folders)
 	{
-		bool hasFound = false;
-		for (auto & plugin: m_Plugins)
+		bool HasFound = false;
+		for (const auto & plugin : m_Plugins)
 		{
 			if (plugin->GetLocalFolder() == folder)
 			{
-				hasFound = true;
+				HasFound = true;
 				break;
 			}
 		}  // for plugin - m_Plugins[]
-		if (!hasFound)
+		if (!HasFound)
 		{
 			m_Plugins.push_back(std::make_shared<cPluginLua>(folder));
 		}

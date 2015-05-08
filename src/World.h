@@ -856,7 +856,7 @@ private:
 	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	class cChunkGeneratorCallbacks :
 		public cChunkGenerator::cChunkSink,
-		public cChunkGenerator::cPluginLuaInterface
+		public cChunkGenerator::cPluginInterface
 	{
 		cWorld * m_World;
 		
@@ -866,7 +866,7 @@ private:
 		virtual bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) override;
 		virtual bool IsChunkQueued     (int a_ChunkX, int a_ChunkZ) override;
 		
-		// cPluginLuaInterface overrides:
+		// cPluginInterface overrides:
 		virtual void CallHookChunkGenerating(cChunkDesc & a_ChunkDesc) override;
 		virtual void CallHookChunkGenerated (cChunkDesc & a_ChunkDesc) override;
 		
