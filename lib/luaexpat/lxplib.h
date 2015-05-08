@@ -20,5 +20,6 @@
 #define ProcessingInstructionKey	"ProcessingInstruction"
 #define UnparsedEntityDeclKey		"UnparsedEntityDecl"
 #define StartDoctypeDeclKey		"StartDoctypeDecl"
+#define XmlDeclKey			"XmlDecl"
 
 int luaopen_lxp (lua_State *L);
