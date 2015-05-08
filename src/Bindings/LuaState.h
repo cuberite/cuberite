@@ -251,6 +251,7 @@ public:
 	void GetStackValue(int a_StackPos, bool & a_Value);
 	void GetStackValue(int a_StackPos, cRef & a_Ref);
 	void GetStackValue(int a_StackPos, double & a_Value);
+	void GetStackValue(int a_StackPos, float & a_ReturnedVal);
 	void GetStackValue(int a_StackPos, eWeather & a_Value);
 	void GetStackValue(int a_StackPos, int & a_Value);
 	void GetStackValue(int a_StackPos, pBlockArea & a_Value);

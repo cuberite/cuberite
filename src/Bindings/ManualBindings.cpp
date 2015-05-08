@@ -2036,8 +2036,8 @@ static int tolua_cWorld_BroadcastParticleEffect(lua_State * tolua_S)
 	// Read the params:
 	cWorld * World = nullptr;
 	AString Name;
-	double PosX, PosY, PosZ, OffX, OffY, OffZ;
-	double ParticleData;
+	float PosX, PosY, PosZ, OffX, OffY, OffZ;
+	float ParticleData;
 	int ParticleAmmount;
 	L.GetStackValues(1, World, Name, PosX, PosY, PosZ, OffX, OffY, OffZ, ParticleData, ParticleAmmount);
 	if (World == nullptr)

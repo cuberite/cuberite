@@ -1827,7 +1827,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 		)
 		{
 			MarkDirty();
-			(reinterpret_cast<cSignEntity *>(*itr))->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
+			reinterpret_cast<cSignEntity *>(*itr)->SetLines(a_Line1, a_Line2, a_Line3, a_Line4);
 			m_World->BroadcastBlockEntity(a_PosX, a_PosY, a_PosZ);
 			return true;
 		}

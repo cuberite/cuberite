@@ -15,7 +15,7 @@ void cBroadcaster::BroadcastParticleEffect(const AString & a_ParticleName, const
 	m_World->DoWithChunkAt(a_Src,
 		[=](cChunk & a_Chunk) -> bool
 		{
-			for (auto&& client : a_Chunk.GetAllClients())
+			for (auto && client : a_Chunk.GetAllClients())
 			{
 				if (client == a_Exclude)
 				{
