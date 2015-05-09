@@ -27,7 +27,7 @@ void cMagmaCube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-const AString cMagmaCube::GetSizeName(int a_Size) const
+AString cMagmaCube::GetSizeName(int a_Size)
 {
 	if (a_Size > 1)
 	{
