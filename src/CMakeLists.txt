@@ -326,7 +326,4 @@ endif ()
 if (WIN32)
 	target_link_libraries(${EXECUTABLE} expat tolualib ws2_32.lib Psapi.lib)
 endif()
-target_link_libraries(${EXECUTABLE} luaexpat mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)
-
-find_library(JSONCPP_LIBRARY jsoncpp ../lib/jsoncpp/src/lib_json)
-target_link_libraries(${EXECUTABLE} ${JSONCPP_LIBRARY})
+target_link_libraries(${EXECUTABLE} luaexpat jsoncpp mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)
