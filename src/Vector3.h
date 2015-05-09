@@ -81,14 +81,14 @@ public:
 	inline bool HasNonZeroLength(void) const
 	{
 		#ifdef __clang__
-		#pragma clang diagnostics push
-		#pragma clang diagnostics ignored "-Wfloat-equal"
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wfloat-equal"
 		#endif
 
 		return ((x != 0) || (y != 0) || (z != 0));
 
 		#ifdef __clang__
-		#pragma clang diagnostics pop
+		#pragma clang diagnostic pop
 		#endif
 	}
 
