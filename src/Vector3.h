@@ -137,14 +137,14 @@ public:
 		// To perform EPS-based comparison, use the EqualsEps() function
 
 		#ifdef __clang__
-		#pragma clang diagnostics push
-		#pragma clang diagnostics ignored "-Wfloat-equal"
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wfloat-equal"
 		#endif
 
 		return !((x != a_Rhs.x) || (y != a_Rhs.y) || (z != a_Rhs.z));
 
 		#ifdef __clang__
-		#pragma clang diagnostics pop
+		#pragma clang diagnostic pop
 		#endif
 	}
 	
