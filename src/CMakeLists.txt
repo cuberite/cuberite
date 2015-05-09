@@ -376,4 +376,5 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD")
 	add_flags_lnk(-L/usr/local/lib)
 endif()
 
-target_link_libraries(${EXECUTABLE} luaexpat jsoncpp mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)
+find_library(JSONCPP_LIBRARY jsoncpp ../lib/jsoncpp/src/lib_json)
+target_link_libraries(${EXECUTABLE} luaexpat ${JSONCPP_LIBRARY} mbedtls zlib sqlite lua SQLiteCpp event_core event_extra)

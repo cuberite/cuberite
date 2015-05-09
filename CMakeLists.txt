@@ -147,6 +147,11 @@ set(EVENT__DISABLE_TESTS     YES CACHE BOOL "Disable LibEvent tests"            
 set(EVENT__DISABLE_REGRESS   YES CACHE BOOL "Disable LibEvent regression tests" FORCE)
 set(EVENT__DISABLE_SAMPLES   YES CACHE BOOL "Disable LibEvent samples"          FORCE)
 
+# Set options for JsonCPP, disabling all of their tests
+set(JSONCPP_WITH_TESTS OFF CACHE BOOL "Compile and (for jsoncpp_check) run JsonCpp test executables")
+set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE BOOL "Automatically run unit-tests as a post build step")
+set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE BOOL "Generate and install .pc files")
+
 # Check that the libraries are present:
 if (NOT EXISTS ${CMAKE_SOURCE_DIR}/lib/SQLiteCpp/CMakeLists.txt)
 	message(FATAL_ERROR "SQLiteCpp is missing in folder lib/SQLiteCpp. Have you initialized the submodules / downloaded the extra libraries?")

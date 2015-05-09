@@ -23,6 +23,8 @@
 #include "OverridesSettingsRepository.h"
 #include "SelfTests.h"
 
+#include <iostream>
+
 #ifdef _WIN32
 	#include <conio.h>
 	#include <psapi.h>

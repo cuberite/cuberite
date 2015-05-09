@@ -28,6 +28,10 @@
 [submodule "lib/libevent"]
 	path = lib/libevent
 	url = https://github.com/mc-server/libevent.git
+[submodule "lib/jsoncpp"]
+	path = lib/jsoncpp
+	url = https://github.com/open-source-parsers/jsoncpp.git
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
 	url = https://github.com/mc-server/TCLAP.git
+	
