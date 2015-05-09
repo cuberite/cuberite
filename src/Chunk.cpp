@@ -472,26 +472,26 @@ void cChunk::Stay(bool a_Stay)
 
 
 
-void cChunk::CollectMobCensus(cMobCensus& toFill)
+void cChunk::CollectMobCensus(cMobCensus & toFill)
 {
 	toFill.CollectSpawnableChunk(*this);
-	std::list<const Vector3d*> playerPositions;
-	cPlayer* currentPlayer;
-	for (cClientHandleList::iterator itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
+	std::list<const Vector3d *> playerPositions;
+	cPlayer * currentPlayer;
+	for (auto itr = m_LoadedByClient.begin(), end = m_LoadedByClient.end(); itr != end; ++itr)
 	{
 		currentPlayer = (*itr)->GetPlayer();
 		playerPositions.push_back(&(currentPlayer->GetPosition()));
 	}
 
 	Vector3d currentPosition;
-	for (cEntityList::iterator itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
+	for (auto itr = m_Entities.begin(); itr != m_Entities.end(); ++itr)
 	{
 		// LOGD("Counting entity #%i (%s)", (*itr)->GetUniqueID(), (*itr)->GetClass());
 		if ((*itr)->IsMob())
 		{
-			cMonster& Monster = (cMonster&)(**itr);
+			auto & Monster = reinterpret_cast<cMonster &>(**itr);
 			currentPosition = Monster.GetPosition();
-			for (std::list<const Vector3d*>::const_iterator itr2 = playerPositions.begin(); itr2 != playerPositions.end(); ++itr2)
+			for (auto itr2 = playerPositions.cbegin(); itr2 != playerPositions.cend(); ++itr2)
 			{
 				toFill.CollectMob(Monster, *this, (currentPosition - **itr2).SqrLength());
 			}
@@ -531,7 +531,7 @@ void cChunk::GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z)
 
 
 
-void cChunk::SpawnMobs(cMobSpawner& a_MobSpawner)
+void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 {
 	int CenterX, CenterY, CenterZ;
 	GetRandomBlockCoords(CenterX, CenterY, CenterZ);
@@ -1839,7 +1839,7 @@ bool cChunk::SetSignLines(int a_PosX, int a_PosY, int a_PosZ, const AString & a_
 
 
 
-void cChunk::RemoveBlockEntity( cBlockEntity* a_BlockEntity)
+void cChunk::RemoveBlockEntity(cBlockEntity * a_BlockEntity)
 {
 	MarkDirty();
 	m_BlockEntities.remove(a_BlockEntity);

@@ -499,7 +499,7 @@ int cInventory::ArmorSlotNumToEntityEquipmentID(short a_ArmorSlotNum)
 
 
 #if 0
-bool cInventory::AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode /* = 0 */)
+bool cInventory::AddToBar(cItem & a_Item, const int a_Offset, const int a_Size, bool * a_bChangedSlots, int a_Mode /* = 0 */)
 {
 	// Fill already present stacks
 	if (a_Mode < 2)

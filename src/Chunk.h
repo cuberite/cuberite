@@ -155,10 +155,10 @@ public:
 	void Stay(bool a_Stay = true);
 	
 	/** Recence all mobs proximities to players in order to know what to do with them */
-	void CollectMobCensus(cMobCensus& toFill);
+	void CollectMobCensus(cMobCensus & toFill);
 
 	/** Try to Spawn Monsters inside chunk */
-	void SpawnMobs(cMobSpawner& a_MobSpawner);
+	void SpawnMobs(cMobSpawner & a_MobSpawner);
 
 	void Tick(std::chrono::milliseconds a_Dt);
 	

@@ -529,7 +529,7 @@ void cCaveTunnel::ProcessChunk(
 
 	/*
 	#ifdef _DEBUG
-	// For debugging purposes, outline the shape of the cave using glowstone, *after* carving the entire cave:
+	// For debugging purposes, outline the shape of the cave using glowstone, after carving the entire cave:
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
 		int DifX = itr->m_BlockX - BlockStartX;  // substitution for faster calc

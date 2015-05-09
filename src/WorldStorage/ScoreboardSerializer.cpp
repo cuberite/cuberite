@@ -14,13 +14,13 @@
 
 
 
-cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard* a_ScoreBoard)
-	: m_ScoreBoard(a_ScoreBoard)
+cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard):
+	m_ScoreBoard(a_ScoreBoard)
 {
 	AString DataPath;
 	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);
 
-	m_Path = DataPath + "/scoreboard.dat";
+	m_Path = DataPath + cFile::PathSeparator + "scoreboard.dat";
 
 	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
 }

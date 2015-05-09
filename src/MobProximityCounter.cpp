@@ -6,7 +6,11 @@
 #include "Entities/Entity.h"
 #include "Chunk.h"
 
-void cMobProximityCounter::CollectMob(cEntity& a_Monster, cChunk& a_Chunk, double a_Distance)
+
+
+
+
+void cMobProximityCounter::CollectMob(cEntity & a_Monster, cChunk & a_Chunk, double a_Distance)
 {
 	// LOGD("Collecting monster %s, with distance %f", a_Monster->GetClass(), a_Distance);
 	tMonsterToDistance::iterator it = m_MonsterToDistance.find(&a_Monster);

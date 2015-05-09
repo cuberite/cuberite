@@ -64,7 +64,7 @@ public:
 
 	static const int LAYER_SIZE = 32;
 
-	cChunkMap(cWorld* a_World);
+	cChunkMap(cWorld * a_World);
 	~cChunkMap();
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
@@ -364,11 +364,11 @@ public:
 	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
 	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	/** Make a Mob census, of all mobs, their family, their chunk and theyr distance to closest player */
-	void CollectMobCensus(cMobCensus& a_ToFill);
+	/** Make a Mob census, of all mobs, their family, their chunk and their distance to closest player */
+	void CollectMobCensus(cMobCensus & a_ToFill);
 
 	/** Try to Spawn Monsters inside all Chunks */
-	void SpawnMobs(cMobSpawner& a_MobSpawner);
+	void SpawnMobs(cMobSpawner & a_MobSpawner);
 
 	void Tick(std::chrono::milliseconds a_Dt);
 	
@@ -433,9 +433,10 @@ private:
 		void UnloadUnusedChunks(void);
 		
 		/** Collect a mob census, of all mobs, their megatype, their chunk and their distance o closest player */
-		void CollectMobCensus(cMobCensus& a_ToFill);
+		void CollectMobCensus(cMobCensus & a_ToFill);
+		
 		/** Try to Spawn Monsters inside all Chunks */
-		void SpawnMobs(cMobSpawner& a_MobSpawner);
+		void SpawnMobs(cMobSpawner & a_MobSpawner);
 
 		void Tick(std::chrono::milliseconds a_Dt);
 		

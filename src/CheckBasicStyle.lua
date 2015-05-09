@@ -164,12 +164,20 @@ local g_ViolationPatterns =
 	-- Cannot check spaces around "-", because the minus is sometimes used as a hyphen between-words
 
 	-- Check spaces around "*":
-	{"^[a-zA-Z0-9]+%*[a-zA-Z0-9]+",                            "Add space around *"},
-	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%*[a-zA-Z0-9]+", "Add space around *"},
+	{"^[a-zA-Z0-9]+%*[a-zA-Z0-9]+",                             "Add space around *"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%*[a-zA-Z0-9]+",  "Add space around *"},
+	{"^[a-zB-Z0-9]+%* [a-zA-Z0-9]+",                            "Add space before *"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zB-Z0-9]+%* [a-zA-Z0-9]+", "Add space before *"},
 
 	-- Check spaces around "/":
 	{"^[a-zA-Z0-9]+%/[a-zA-Z0-9]+",                            "Add space around /"},
 	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%/[a-zA-Z0-9]+", "Add space around /"},
+
+	-- Check spaces around "&":
+	{"^[a-zA-Z0-9]+%&[a-zA-Z0-9]+",                             "Add space around /"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%&[a-zA-Z0-9]+",  "Add space around /"},
+	{"^[a-zA-Z0-9]+%& [a-zA-Z0-9]+",                            "Add space before &"},
+	{"^[^\"]*[!@#$%%%^&*() %[%]\t][a-zA-Z0-9]+%& [a-zA-Z0-9]+", "Add space before &"},
 }
 
 

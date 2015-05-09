@@ -15,8 +15,8 @@
 
 
 
-cMapSerializer::cMapSerializer(const AString& a_WorldName, cMap * a_Map)
-	: m_Map(a_Map)
+cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
+	m_Map(a_Map)
 {
 	AString DataPath;
 	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator);

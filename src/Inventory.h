@@ -171,7 +171,7 @@ public:
 	bool LoadFromJson(Json::Value & a_Value);
 
 protected:
-	bool AddToBar( cItem & a_Item, const int a_Offset, const int a_Size, bool* a_bChangedSlots, int a_Mode = 0);
+	bool AddToBar(cItem & a_Item, const int a_Offset, const int a_Size, bool * a_bChangedSlots, int a_Mode = 0);
 	
 	cItemGrid m_ArmorSlots;
 	cItemGrid m_InventorySlots;
