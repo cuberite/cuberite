@@ -1170,17 +1170,19 @@ void cMonster::HandleDaylightBurning(cChunk & a_Chunk, bool WouldBurn)
 
 bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 {
-	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(m_NextWayPointPosition.x), FloorC(m_NextWayPointPosition.z));
+	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Location.x), FloorC(a_Location.z));
 	if ((Chunk == nullptr) || (!Chunk->IsValid()))
 	{
 		return false;
 	}
-	int RelX = FloorC(a_Location.x) - a_Chunk.GetPosX() * cChunkDef::Width;
+
+	int RelX = FloorC(a_Location.x) - Chunk->GetPosX() * cChunkDef::Width;
 	int RelY = FloorC(a_Location.y);
-	int RelZ = FloorC(a_Location.z) - a_Chunk.GetPosZ() * cChunkDef::Width;
+	int RelZ = FloorC(a_Location.z) - Chunk->GetPosZ() * cChunkDef::Width;
+
 	if (
-		(a_Chunk.GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
-		(a_Chunk.GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
+		(Chunk->GetSkyLight(RelX, RelY, RelZ) == 15) &&             // In the daylight
+		(Chunk->GetBlock(RelX, RelY, RelZ) != E_BLOCK_SOULSAND) &&  // Not on soulsand
 		(GetWorld()->GetTimeOfDay() < (12000 + 1000)) &&             // It is nighttime
 		GetWorld()->IsWeatherSunnyAt(POSX_TOINT, POSZ_TOINT)         // Not raining
 	)
