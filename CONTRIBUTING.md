@@ -8,8 +8,8 @@ Here are the conventions:
  * We use the subset of C++11 supported by MSVC 2013 (ask if you think that something would be useful)
  * All new public functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
  * Use spaces after the comment markers: `// Comment` instead of `//Comment`. A comment must be prefixed with two spaces if it's on the same line with code:
-  - `SomeFunction()  // Note the two spaces prefixed to me and the space after the slashes.`
- * All variable names and function names use CamelCase style.
+  - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
+ * All variable names and function names use CamelCase style, with the exception of single letter variables.  
   - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad` `GoodVariableName` `badVariableName`.
  * All member variables start with `m_`, all function parameters start with `a_`, all class names start with `c`.
   - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); }`
